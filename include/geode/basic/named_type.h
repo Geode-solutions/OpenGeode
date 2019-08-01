@@ -61,7 +61,7 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.archive( value_ );
+            archive( value_ );
         }
 
     private:

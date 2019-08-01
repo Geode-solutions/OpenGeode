@@ -34,11 +34,11 @@
         TContext context{};                                                    \
         register_basic_deserialize_pcontext( std::get< 0 >( context ) );       \
         register_mesh_deserialize_pcontext( std::get< 0 >( context ) );        \
-        Deserializer archive{ file, &context };                                \
+        Deserializer archive{ context, file };                                \
         archive.object( mesh_ );                                               \
-        auto& reader = bitsery::AdapterAccess::getReader( archive );           \
-        OPENGEODE_EXCEPTION( reader.error() == bitsery::ReaderError::NoError   \
-                                 && reader.isCompletedSuccessfully()           \
+        auto& adapter = archive.adapter();           \
+        OPENGEODE_EXCEPTION( adapter.error() == bitsery::ReaderError::NoError   \
+                                 && adapter.isCompletedSuccessfully()           \
                                  && std::get< 1 >( context ).isValid(),        \
             "Error while reading file: " + this->filename() );                 \
     }

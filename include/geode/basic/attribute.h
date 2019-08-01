@@ -30,8 +30,8 @@
 #include <bitsery/bitsery.h>
 #include <bitsery/ext/inheritance.h>
 #include <bitsery/ext/std_map.h>
-#include <bitsery/flexible.h>
-#include <bitsery/flexible/vector.h>
+#include <bitsery/brief_syntax.h>
+#include <bitsery/brief_syntax/vector.h>
 
 #include <geode/basic/common.h>
 #include <geode/basic/range.h>
@@ -127,7 +127,7 @@ namespace geode
         {
             archive.ext(
                 *this, bitsery::ext::BaseClass< ReadOnlyAttribute< T > >{} );
-            archive.archive( value_ );
+            archive( value_ );
         }
 
         void resize( index_t /*unused*/ ) override {}
@@ -196,9 +196,9 @@ namespace geode
         {
             archive.ext(
                 *this, bitsery::ext::BaseClass< ReadOnlyAttribute< T > >{} );
-            archive.archive( default_value_ );
+            archive( default_value_ );
             archive.container( values_, values_.max_size(),
-                [&archive]( T& item ) { archive.archive( item ); } );
+                []( Archive& archive, T& item ) { archive( item ); } );
         }
 
         void resize( index_t size ) override
@@ -313,11 +313,11 @@ namespace geode
         {
             archive.ext(
                 *this, bitsery::ext::BaseClass< ReadOnlyAttribute< T > >{} );
-            archive.archive( default_value_ );
+            archive( default_value_ );
             archive.ext( values_, bitsery::ext::StdMap{ values_.max_size() },
-                [&archive]( index_t& i, T& item ) {
+                []( Archive& archive, index_t& i, T& item ) {
                     archive.value4b( i );
-                    archive.archive( item );
+                    archive( item );
                 } );
         }
 

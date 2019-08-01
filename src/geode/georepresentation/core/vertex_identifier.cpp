@@ -145,9 +145,9 @@ namespace geode
             register_mesh_serialize_pcontext( std::get< 0 >( context ) );
             register_georepresentation_serialize_pcontext(
                 std::get< 0 >( context ) );
-            Serializer archive{ file, &context };
+            Serializer archive{ context, file };
             archive.object( *this );
-            bitsery::AdapterAccess::getWriter( archive ).flush();
+            archive.adapter().flush();
             OPENGEODE_EXCEPTION( std::get< 1 >( context ).isValid(),
                 "Error while writing file: " + filename );
             return filename;
@@ -162,11 +162,11 @@ namespace geode
             register_mesh_deserialize_pcontext( std::get< 0 >( context ) );
             register_georepresentation_deserialize_pcontext(
                 std::get< 0 >( context ) );
-            Deserializer archive{ file, &context };
+            Deserializer archive{ context, file };
             archive.object( *this );
-            auto& reader = bitsery::AdapterAccess::getReader( archive );
-            OPENGEODE_EXCEPTION( reader.error() == bitsery::ReaderError::NoError
-                                     && reader.isCompletedSuccessfully()
+            auto& adapter = archive.adapter();
+            OPENGEODE_EXCEPTION( adapter.error() == bitsery::ReaderError::NoError
+                                     && adapter.isCompletedSuccessfully()
                                      && std::get< 1 >( context ).isValid(),
                 "Error while reading file: " + filename );
         }
@@ -180,7 +180,7 @@ namespace geode
             archive.ext( component_vertices_, bitsery::ext::StdSmartPtr{} );
             archive.ext( vertex2unique_vertex_,
                 bitsery::ext::StdMap{ vertex2unique_vertex_.max_size() },
-                [&archive]( uuid& id,
+                []( Archive& archive, uuid& id,
                     std::shared_ptr< VariableAttribute< index_t > >&
                         attribute ) {
                     archive.object( id );

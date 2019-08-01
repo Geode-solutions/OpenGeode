@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <bitsery/flexible/string.h>
+#include <bitsery/brief_syntax/string.h>
 
 #include <geode/basic/named_type.h>
 #include <geode/basic/uuid.h>

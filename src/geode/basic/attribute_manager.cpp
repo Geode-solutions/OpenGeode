@@ -135,7 +135,7 @@ namespace geode
             archive.value4b( nb_elements_ );
             archive.ext( attributes_,
                 bitsery::ext::StdMap{ attributes_.max_size() },
-                [&archive]( std::string &name,
+                []( Archive& archive, std::string &name,
                     std::shared_ptr< AttributeBase > &attribute ) {
                     archive.text1b( name, name.max_size() );
                     archive.ext( attribute, bitsery::ext::StdSmartPtr{} );

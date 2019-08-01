@@ -35,13 +35,11 @@ namespace geode
     using TContext = std::tuple< PContext,
         bitsery::ext::PointerLinkingContext,
         bitsery::ext::InheritanceContext >;
-    using OutputAdapter = bitsery::OutputBufferedStreamAdapter;
-    using InputAdapter = bitsery::InputStreamAdapter;
-    using Serializer = bitsery::BasicSerializer<
-        bitsery::AdapterWriter< OutputAdapter, bitsery::DefaultConfig >,
+    using Serializer = bitsery::Serializer<
+        bitsery::OutputBufferedStreamAdapter,
         TContext >;
-    using Deserializer = bitsery::BasicDeserializer<
-        bitsery::AdapterReader< InputAdapter, bitsery::DefaultConfig >,
+    using Deserializer = bitsery::Deserializer<
+        bitsery::InputStreamAdapter,
         TContext >;
 
     /*!

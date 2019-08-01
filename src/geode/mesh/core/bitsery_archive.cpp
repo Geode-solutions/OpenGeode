@@ -23,7 +23,7 @@
 
 #include <geode/mesh/core/bitsery_archive.h>
 
-#include <bitsery/flexible/vector.h>
+#include <bitsery/brief_syntax/vector.h>
 
 #include <geode/basic/attribute_manager.h>
 #include <geode/mesh/core/geode_edged_curve.h>

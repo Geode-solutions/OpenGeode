@@ -146,9 +146,9 @@ void test_serialize_manager( geode::AttributeManager& manager )
     std::ofstream file{ filename, std::ofstream::binary };
     geode::TContext context{};
     geode::register_basic_serialize_pcontext( std::get< 0 >( context ) );
-    geode::Serializer archive{ file, &context };
+    geode::Serializer archive{ context, file };
     archive.object( manager );
-    bitsery::AdapterAccess::getWriter( archive ).flush();
+    archive.adapter().flush();
     OPENGEODE_EXCEPTION( std::get< 1 >( context ).isValid(),
         "Error while writing file: " + filename );
 
@@ -157,11 +157,11 @@ void test_serialize_manager( geode::AttributeManager& manager )
     geode::TContext reload_context{};
     geode::register_basic_deserialize_pcontext(
         std::get< 0 >( reload_context ) );
-    geode::Deserializer unarchive{ infile, &reload_context };
+    geode::Deserializer unarchive{ reload_context, infile };
     unarchive.object( reloaded_manager );
-    auto& reader = bitsery::AdapterAccess::getReader( unarchive );
-    OPENGEODE_EXCEPTION( reader.error() == bitsery::ReaderError::NoError
-                             && reader.isCompletedSuccessfully()
+    auto& adapter = unarchive.adapter();
+    OPENGEODE_EXCEPTION( adapter.error() == bitsery::ReaderError::NoError
+                             && adapter.isCompletedSuccessfully()
                              && std::get< 1 >( context ).isValid(),
         "Error while reading file: " + filename );
 
