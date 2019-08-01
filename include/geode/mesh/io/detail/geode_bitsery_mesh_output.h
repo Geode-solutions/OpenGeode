@@ -34,9 +34,9 @@
         TContext context{};                                                    \
         register_basic_serialize_pcontext( std::get< 0 >( context ) );         \
         register_mesh_serialize_pcontext( std::get< 0 >( context ) );          \
-        Serializer archive{ context, file };                                  \
+        Serializer archive{ context, file };                                   \
         archive.object( mesh_ );                                               \
-        archive.adapter().flush();                  \
+        archive.adapter().flush();                                             \
         OPENGEODE_EXCEPTION( std::get< 1 >( context ).isValid(),               \
             "Error while writing file: " + this->filename() );                 \
     }

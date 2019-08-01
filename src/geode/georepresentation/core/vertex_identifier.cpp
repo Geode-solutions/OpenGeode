@@ -165,9 +165,10 @@ namespace geode
             Deserializer archive{ context, file };
             archive.object( *this );
             auto& adapter = archive.adapter();
-            OPENGEODE_EXCEPTION( adapter.error() == bitsery::ReaderError::NoError
-                                     && adapter.isCompletedSuccessfully()
-                                     && std::get< 1 >( context ).isValid(),
+            OPENGEODE_EXCEPTION(
+                adapter.error() == bitsery::ReaderError::NoError
+                    && adapter.isCompletedSuccessfully()
+                    && std::get< 1 >( context ).isValid(),
                 "Error while reading file: " + filename );
         }
 

@@ -28,10 +28,10 @@
 #include <vector>
 
 #include <bitsery/bitsery.h>
-#include <bitsery/ext/inheritance.h>
-#include <bitsery/ext/std_map.h>
 #include <bitsery/brief_syntax.h>
 #include <bitsery/brief_syntax/vector.h>
+#include <bitsery/ext/inheritance.h>
+#include <bitsery/ext/std_map.h>
 
 #include <geode/basic/common.h>
 #include <geode/basic/range.h>
