@@ -1,0 +1,82 @@
+/*
+ * Copyright (c) 2019 Geode-solutions
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ */
+
+/*!
+
+\page opengeode_how_to_create_module How to create your own OpenGeode module
+
+This page explains how you can create a module that depends on OpenGeode, for developing your own features.
+The procedure is very simple and we provide you tools for working quickly.
+
+# What do you need
+
+The only thing you need is OpenGeode. Make sure OpenGeode is compiled and installed.
+
+# First step - Create an OpenGeode module architecture
+
+The first step is to create your module architecture. We help you by providing a template for module architecture.
+
+1. Go on our GitHub template repository for OpenGeode modules: https://github.com/Geode-solutions/OpenGeode-ModuleTemplate
+2. Click on `Use this template`. Il will allow you to create a repository from this template repository. Choose all options you want inclding, ownership, repo name, public or private access.
+3. Finalize by clicking on `Create repository from template`.
+
+You have created a repository. You can now clone it and go to the second step.
+
+# Second step - Replace templated names by your own.
+
+Have a quick look at your new repository. There are three folders: one for the headers of your libs, one for the sources, and the last for tests.
+There are also few files. If you need information on these files go to the last section `What are these files in module repository`.
+
+Open CMakeLists.txt in your favorite text editor or IDE.
+
+1. Define the name of your module in place of `MyModule` in `project(MyModule CXX)`.
+2. Change the name of the option `MYMODULE_WITH_TESTS` or remove this option if you do not want to make tests for your module (which is never a good idea!). Be careful this option appears twice in the file.
+3. Define the libraries in your module by adding one call to `add_geode_library` per library. 
+
+Your CMakeLists.txt is now ready.
+
+# Last step - Configure and build your module.
+
+As for OpenGeode \link opengeode_how_to_compile configuration and compilation\endlink, this step depends on your platform.
+Follow the same procedure than for OpenGeode but by specifying the `CMAKE_PREFIX_PATH` to OpenGeode install path. For example:
+
+\code
+cmake -DCMAKE_PREFIX_PATH=path/to/OpenGeode/build/opengeode/install ..
+\endcode
+
+The last thing to do is to modify headers (.h) and sources (.cpp) files by replacing `mylib` by the name your choose for your libs and `mymodule` by the name of your module.
+The rest is up to you!
+
+### Additional info - What are these files in module repository
+
+Template repository contains some files. Here is information on these files:
+
+ - `LICENSE` - In this file you specify the Licence of your module 
+ - `README.md` - This file is used as overview of your GitHub project. Add any information you consider necessary.
+ - `azure-pipelines.yml` - Configuration file for running jobs in Azure DevOps pipelines (for formatting, testing and much more).
+ - `.clang-format` - Format rules file used by clang. Run it by your own or automatize formatting using this file and CI tools.
+ - `.gitattributes` - List of attributes on files and folders (e.g. ignored by GitHub for repository languages) 
+ - `.gitignore` - List of files and folders ignored by Git.
+ - `.releaserc` - Configuration file for semantic-release. Have a look at https://github.com/semantic-release/semantic-release it's great!
+
+*/

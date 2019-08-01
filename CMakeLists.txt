@@ -1,0 +1,42 @@
+# Copyright (c) 2019 Geode-solutions
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+cmake_minimum_required(VERSION 3.5)
+
+#-------------------------------------------------------------------------------
+# Project options
+
+# Optional components
+option(OPENGEODE_WITH_TESTS "Compile test projects" ON)
+
+# Internal options
+option(USE_SUPERBUILD "Whether or not a superbuild should be invoked" ON)
+mark_as_advanced(USE_SUPERBUILD)
+
+#-------------------------------------------------------------------------------
+# When CMake is called, a main project (super build project) is generated.
+# This main project is responsible to create third party cmake projects including
+# the one of OpenGeode. This is done during compilation, i.e., OpenGeode.cmake is
+# called (USE_SUPERBUILD = OFF) when the super build project is compiled.
+if(USE_SUPERBUILD)
+    include(cmake/SuperBuild.cmake)
+else()
+    include(cmake/OpenGeode.cmake)
+endif()

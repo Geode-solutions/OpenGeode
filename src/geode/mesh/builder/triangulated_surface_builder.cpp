@@ -1,0 +1,83 @@
+/*
+ * Copyright (c) 2019 Geode-solutions
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ */
+
+#include <geode/mesh/builder/triangulated_surface_builder.h>
+
+#include <algorithm>
+
+#include <geode/basic/attribute_manager.h>
+
+#include <geode/mesh/core/triangulated_surface.h>
+
+namespace geode
+{
+    template < index_t dimension >
+    std::unique_ptr< TriangulatedSurfaceBuilder< dimension > >
+        TriangulatedSurfaceBuilder< dimension >::create(
+            TriangulatedSurface< dimension >& mesh )
+    {
+        try
+        {
+            return TriangulatedSurfaceBuilderFactory< dimension >::create(
+                mesh.type_name(), mesh );
+        }
+        catch( const OpenGeodeException& e )
+        {
+            Logger::error( e.what() );
+            throw OpenGeodeException( "Could not create TriangulatedSurface "
+                                      "builder of data structure: ",
+                mesh.type_name().get() );
+        }
+    }
+
+    template < index_t dimension >
+    void TriangulatedSurfaceBuilder< dimension >::do_create_polygon(
+        const std::vector< index_t >& vertices )
+    {
+        OPENGEODE_EXCEPTION(
+            vertices.size() == 3, "Only triangles are handled" );
+        std::array< index_t, 3 > triangle_vertices{};
+        std::copy_n( vertices.begin(), 3, triangle_vertices.begin() );
+        do_create_triangle( triangle_vertices );
+    }
+
+    template < index_t dimension >
+    index_t TriangulatedSurfaceBuilder< dimension >::create_triangle(
+        const std::array< index_t, 3 >& vertices )
+    {
+        auto first_added_triangle = triangulated_surface_.nb_polygons();
+        triangulated_surface_.polygon_attribute_manager().resize(
+            first_added_triangle + 1 );
+        index_t vertex_id{ 0 };
+        for( const auto& vertex : vertices )
+        {
+            this->associate_polygon_vertex_to_vertex(
+                { first_added_triangle, vertex_id++ }, vertex );
+        }
+        do_create_triangle( vertices );
+        return first_added_triangle;
+    }
+
+    template class opengeode_mesh_api TriangulatedSurfaceBuilder< 2 >;
+    template class opengeode_mesh_api TriangulatedSurfaceBuilder< 3 >;
+} // namespace geode

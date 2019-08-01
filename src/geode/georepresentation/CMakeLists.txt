@@ -1,0 +1,65 @@
+set(sources
+    "${lib_source_dir}/builder/blocks_builder.cpp"
+    "${lib_source_dir}/builder/corners_builder.cpp"
+    "${lib_source_dir}/builder/lines_builder.cpp"
+    "${lib_source_dir}/builder/boundary_representation_builder.cpp"
+    "${lib_source_dir}/builder/surfaces_builder.cpp"
+    "${lib_source_dir}/core/bitsery_archive.cpp"
+    "${lib_source_dir}/core/block.cpp"
+    "${lib_source_dir}/core/blocks.cpp"
+    "${lib_source_dir}/core/component.cpp"
+    "${lib_source_dir}/core/corner.cpp"
+    "${lib_source_dir}/core/corners.cpp"
+    "${lib_source_dir}/core/line.cpp"
+    "${lib_source_dir}/core/lines.cpp"
+    "${lib_source_dir}/core/relationship_manager.cpp"
+    "${lib_source_dir}/core/boundary_representation.cpp"
+    "${lib_source_dir}/core/surface.cpp"
+    "${lib_source_dir}/core/surfaces.cpp"
+    "${lib_source_dir}/core/vertex_identifier.cpp"
+    "${lib_source_dir}/io/boundary_representation_input.cpp"
+    "${lib_source_dir}/io/boundary_representation_output.cpp"
+)
+set(public_headers
+    "${lib_include_dir}/common.h"
+    "${lib_include_dir}/builder/blocks_builder.h"
+    "${lib_include_dir}/builder/corners_builder.h"
+    "${lib_include_dir}/builder/georepresentation_builder.h"
+    "${lib_include_dir}/builder/lines_builder.h"
+    "${lib_include_dir}/builder/boundary_representation_builder.h"
+    "${lib_include_dir}/builder/surfaces_builder.h"
+    "${lib_include_dir}/core/bitsery_archive.h"
+    "${lib_include_dir}/core/block.h"
+    "${lib_include_dir}/core/blocks.h"
+    "${lib_include_dir}/core/component.h"
+    "${lib_include_dir}/core/component_type.h"
+    "${lib_include_dir}/core/corner.h"
+    "${lib_include_dir}/core/corners.h"
+    "${lib_include_dir}/core/georepresentation.h"
+    "${lib_include_dir}/core/line.h"
+    "${lib_include_dir}/core/lines.h"
+    "${lib_include_dir}/core/relationship_manager.h"
+    "${lib_include_dir}/core/boundary_representation.h"
+    "${lib_include_dir}/core/surface.h"
+    "${lib_include_dir}/core/surfaces.h"
+    "${lib_include_dir}/core/vertex_identifier.h"
+    "${lib_include_dir}/io/boundary_representation_input.h"
+    "${lib_include_dir}/io/boundary_representation_output.h"
+)
+set(private_headers
+    "${lib_include_dir}/core/detail/components_storage.h"
+    "${lib_include_dir}/core/detail/mesh_storage.h"
+    "${lib_include_dir}/core/detail/uuid_to_index.h"
+    "${lib_include_dir}/io/detail/geode_boundary_representation_input.h"
+    "${lib_include_dir}/io/detail/geode_boundary_representation_output.h"
+)
+target_link_libraries(${target_name}
+    PUBLIC
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::mesh
+        Bitsery::bitsery
+    PRIVATE
+        filesystem
+        MINIZIP::minizip
+)
+

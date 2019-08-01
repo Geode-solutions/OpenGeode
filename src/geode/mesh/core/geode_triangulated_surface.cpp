@@ -1,0 +1,201 @@
+/*
+ * Copyright (c) 2019 Geode-solutions
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ */
+
+#include <geode/mesh/core/geode_triangulated_surface.h>
+
+#include <array>
+#include <fstream>
+
+#include <bitsery/flexible/array.h>
+
+#include <geode/basic/attribute.h>
+#include <geode/basic/attribute_manager.h>
+#include <geode/basic/bitsery_archive.h>
+#include <geode/basic/pimpl_impl.h>
+#include <geode/basic/point.h>
+
+#include <geode/mesh/core/detail/points_impl.h>
+
+namespace geode
+{
+    template < index_t dimension >
+    class OpenGeodeTriangulatedSurface< dimension >::Impl
+        : public detail::PointsImpl< dimension >
+    {
+    public:
+        explicit Impl( OpenGeodeTriangulatedSurface< dimension >& mesh )
+            : detail::PointsImpl< dimension >( mesh ),
+              triangle_vertices_(
+                  mesh.polygon_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          std::array< index_t, 3 > >( "triangle_vertices",
+                          [] {
+                              std::array< index_t, 3 > triangle{};
+                              triangle.fill( NO_ID );
+                              return triangle;
+                          }() ) ),
+              triangle_adjacents_(
+                  mesh.polygon_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          std::array< index_t, 3 > >( "triangle_adjacents", [] {
+                          std::array< index_t, 3 > triangle{};
+                          triangle.fill( NO_ID );
+                          return triangle;
+                      }() ) )
+        {
+        }
+
+        index_t get_polygon_vertex( const PolygonVertex& polygon_vertex ) const
+        {
+            return triangle_vertices_->value( polygon_vertex.polygon_id )
+                .at( polygon_vertex.vertex_id );
+        }
+
+        index_t get_polygon_adjacent( const PolygonEdge& polygon_edge ) const
+        {
+            return triangle_adjacents_->value( polygon_edge.polygon_id )
+                .at( polygon_edge.edge_id );
+        }
+
+        void set_polygon_vertex(
+            const PolygonVertex& polygon_vertex, index_t vertex_id )
+        {
+            triangle_vertices_->value( polygon_vertex.polygon_id )
+                .at( polygon_vertex.vertex_id ) = vertex_id;
+        }
+
+        void set_polygon_adjacent(
+            const PolygonEdge& polygon_edge, index_t adjacent_id )
+        {
+            triangle_adjacents_->value( polygon_edge.polygon_id )
+                .at( polygon_edge.edge_id ) = adjacent_id;
+        }
+
+        void add_triangle(
+            const OpenGeodeTriangulatedSurface< dimension >& surface,
+            const std::array< index_t, 3 >& vertices )
+        {
+            triangle_vertices_->value( surface.nb_polygons() - 1 ) = vertices;
+        }
+
+    private:
+        friend class bitsery::Access;
+        Impl() = default;
+
+        friend class bitsery::Access;
+        template < typename Archive >
+        void serialize( Archive& archive )
+        {
+            archive.ext( *this,
+                bitsery::ext::BaseClass< detail::PointsImpl< dimension > >{} );
+            archive.ext( triangle_vertices_, bitsery::ext::StdSmartPtr{} );
+            archive.ext( triangle_adjacents_, bitsery::ext::StdSmartPtr{} );
+        }
+
+    private:
+        std::shared_ptr< VariableAttribute< std::array< index_t, 3 > > >
+            triangle_vertices_;
+        std::shared_ptr< VariableAttribute< std::array< index_t, 3 > > >
+            triangle_adjacents_;
+    };
+
+    template < index_t dimension >
+    OpenGeodeTriangulatedSurface< dimension >::OpenGeodeTriangulatedSurface()
+        : impl_( *this )
+    {
+    }
+
+    template < index_t dimension >
+    OpenGeodeTriangulatedSurface<
+        dimension >::~OpenGeodeTriangulatedSurface() // NOLINT
+    {
+    }
+
+    template < index_t dimension >
+    const Point< dimension >&
+        OpenGeodeTriangulatedSurface< dimension >::get_point(
+            index_t vertex_id ) const
+    {
+        return impl_->get_point( vertex_id );
+    }
+
+    template < index_t dimension >
+    void OpenGeodeTriangulatedSurface< dimension >::set_vertex(
+        index_t vertex_id, const Point< dimension >& point )
+    {
+        impl_->set_point( vertex_id, point );
+    }
+
+    template < index_t dimension >
+    index_t OpenGeodeTriangulatedSurface< dimension >::get_polygon_vertex(
+        const PolygonVertex& polygon_vertex ) const
+    {
+        return impl_->get_polygon_vertex( polygon_vertex );
+    }
+
+    template < index_t dimension >
+    index_t OpenGeodeTriangulatedSurface< dimension >::get_polygon_adjacent(
+        const PolygonEdge& polygon_edge ) const
+    {
+        return impl_->get_polygon_adjacent( polygon_edge );
+    }
+
+    template < index_t dimension >
+    template < typename Archive >
+    void OpenGeodeTriangulatedSurface< dimension >::serialize(
+        Archive& archive )
+    {
+        archive.ext( *this,
+            bitsery::ext::BaseClass< TriangulatedSurface< dimension > >{} );
+        archive.object( impl_ );
+    }
+
+    template < index_t dimension >
+    void OpenGeodeTriangulatedSurface< dimension >::set_polygon_vertex(
+        const PolygonVertex& polygon_vertex, index_t vertex_id )
+    {
+        impl_->set_polygon_vertex( polygon_vertex, vertex_id );
+    }
+
+    template < index_t dimension >
+    void OpenGeodeTriangulatedSurface< dimension >::add_triangle(
+        const std::array< index_t, 3 >& vertices )
+    {
+        impl_->add_triangle( *this, vertices );
+    }
+
+    template < index_t dimension >
+    void OpenGeodeTriangulatedSurface< dimension >::set_polygon_adjacent(
+        const PolygonEdge& polygon_edge, index_t adjacent_id )
+    {
+        impl_->set_polygon_adjacent( polygon_edge, adjacent_id );
+    }
+
+    template class opengeode_mesh_api OpenGeodeTriangulatedSurface< 2 >;
+    template class opengeode_mesh_api OpenGeodeTriangulatedSurface< 3 >;
+
+    SERIALIZE_BITSERY_ARCHIVE(
+        opengeode_mesh_api, OpenGeodeTriangulatedSurface< 2 > );
+    SERIALIZE_BITSERY_ARCHIVE(
+        opengeode_mesh_api, OpenGeodeTriangulatedSurface< 3 > );
+} // namespace geode

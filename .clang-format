@@ -1,0 +1,93 @@
+# clang-format configuration file based on the version 3.8
+# releases.llvm.org/3.8.0/tools/clang/docs/ClangFormatStyleOptions.html
+#BasedOnStyle (desactivated since we want to control everything [BC])
+AccessModifierOffset: -4
+AlignAfterOpenBracket: DontAlign
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+# If AlignEscapedNewlinesLeft is false, that put as far right as possible,
+# else left. In newer clang-format version,
+#use AlignEscapedNewlines: Right instead.
+AlignEscapedNewlinesLeft: false
+AlignOperands: true
+AlignTrailingComments: false
+AllowAllParametersOfDeclarationOnNextLine: true
+AllowShortBlocksOnASingleLine: true
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Empty # pb with 3.5
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+#AlwaysBreakAfterDefinitionReturnType (not set because deprecated [BC])
+AlwaysBreakAfterReturnType: None
+AlwaysBreakBeforeMultilineStrings: false
+AlwaysBreakTemplateDeclarations: true
+BinPackArguments: true
+BinPackParameters: false
+BraceWrapping:
+    AfterClass: true
+    AfterControlStatement: true
+    AfterEnum: true
+    AfterFunction: true
+    AfterNamespace: true
+    AfterObjCDeclaration: true
+    AfterStruct: true
+    AfterUnion: true
+    BeforeCatch: true
+    BeforeElse: true
+    IndentBraces: false
+    #SplitEmptyFunctionBody: false (this option provokes a clang-format error [BC])
+BreakBeforeBinaryOperators: NonAssignment # pb with 3.5
+BreakBeforeBraces: Custom # pb with 3.5
+#BreakBeforeInheritanceComma: false  (this option needs a newer clang version)
+BreakBeforeTernaryOperators: true
+# For newer clang version, consider the new macro:
+# BreakConstructorInitializers
+BreakConstructorInitializersBeforeComma: false
+#BreakStringLiterals
+ColumnLimit: 80
+CommentPragmas: ''
+#CompactNamespaces: false (this option is in newer clang version)
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+ConstructorInitializerIndentWidth: 4
+ContinuationIndentWidth: 4
+Cpp11BracedListStyle: false
+DerivePointerAlignment: true
+DisableFormat: false
+#ExperimentalAutoDetectBinPacking (Not defined since the documentation to not use it)
+#FixNamespaceComments: false (this option needs a newer clang version)
+#ForEachMacros: TODO
+#IncludeCategories: TODO
+#IncludeIsMainRegex (this option needs a newer clang version)
+IndentCaseLabels: false
+IndentWidth: 4
+IndentWrappedFunctionNames: true
+KeepEmptyLinesAtTheStartOfBlocks: false
+Language: Cpp
+#MacroBlockBegin TODO
+#MacroBlockEnd TODO
+MaxEmptyLinesToKeep: 1
+NamespaceIndentation: All
+#PenaltyBreakBeforeFirstCallParameter TODO
+#PenaltyBreakComment TODO
+#PenaltyBreakFirstLessLess TODO
+#PenaltyBreakString TODO
+#PenaltyExcessCharacter TODO
+#PenaltyReturnTypeOnItsOwnLine TODO
+PointerAlignment: Left
+ReflowComments: true # TODO check if 3.5 or 3.8
+#SortIncludes (this option needs a newer clang version)
+#SortUsingDeclarations (this option needs a newer clang version)
+SpaceAfterCStyleCast: true
+#SpaceAfterTemplateKeyword: false (this option needs a newer clang version)
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeParens: Never
+SpaceInEmptyParentheses: false
+SpacesBeforeTrailingComments: 1
+SpacesInAngles: true
+SpacesInCStyleCastParentheses: false
+SpacesInContainerLiterals: false
+SpacesInParentheses: true
+SpacesInSquareBrackets: false
+Standard: Cpp11
+TabWidth: 4
+UseTab: Never

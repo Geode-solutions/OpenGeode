@@ -1,0 +1,16 @@
+{
+    "C_Cpp.default.cppStandard": "c++11",
+    "C_Cpp.default.includePath": [
+        "${workspaceFolder}/include",
+        "${workspaceFolder}/build/opengeode",
+        "${workspaceFolder}/build/third_party/backward_cpp/src/backward_cpp",
+        "${workspaceFolder}/build/third_party/bitsery/install/include",
+        "${workspaceFolder}/build/third_party/filesystem/src/filesystem",
+        "${workspaceFolder}/build/third_party/minizip/install/include",
+        "${workspaceFolder}/build/third_party/nanoflann/src/nanoflann/include",                
+        "${workspaceFolder}/build/third_party/spdlog/install/include"
+    ],
+    "files.exclude": {
+        "${workspaceFolder}/build/opengeode/install/**": true
+    }
+}

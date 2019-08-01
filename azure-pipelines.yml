@@ -1,0 +1,119 @@
+resources:
+  repositories:
+    - repository: templates
+      type: github
+      name: Geode-solutions/ci_tools
+      endpoint: Geode-solutions
+
+variables:
+- group: Tokens
+
+jobs:
+- template: clang-format.yml@templates
+
+- job: Test_Ubuntu
+  dependsOn: Format
+  pool:
+    vmImage: "ubuntu-16.04"
+  steps:
+    - template: unix-compilation.yml@templates
+      parameters:
+        type: "Debug"
+    - template: unix-testing.yml@templates
+      parameters:
+        type: "Debug"
+        cmakeArgs: "-DCMAKE_PREFIX_PATH=$(Build.SourcesDirectory)/build/opengeode/install"
+    - template: coverage.yml@templates
+      parameters:
+        directory: "$(Build.SourcesDirectory)/build/opengeode/bin"
+
+- job: Test_Windows
+  dependsOn: Format
+  pool:
+    vmImage: "vs2017-win2016"
+  steps:
+    - template: windows-compilation.yml@templates
+      parameters:
+        type: "Debug"
+    - template: windows-testing.yml@templates
+      parameters:
+        type: "Debug"
+        path: "opengeode"
+
+- job: Test_Mac
+  dependsOn: Format
+  pool:
+    vmImage: "macOS-10.13"
+  steps:
+    - template: unix-compilation.yml@templates
+      parameters:
+        type: "Debug"
+    - template: unix-testing.yml@templates
+      parameters:
+        type: "Debug"
+        cmakeArgs: "-DCMAKE_PREFIX_PATH=$(Build.SourcesDirectory)/build/opengeode/install"
+
+
+- template: semantic-release.yml@templates
+  parameters:
+    dependencies:
+      - Test_Ubuntu
+      - Test_Windows
+      - Test_Mac
+
+- job: Release_Ubuntu
+  dependsOn: Semantic_release
+  condition: eq(dependencies.Semantic_release.outputs['save.newRelease'], 'true')
+  pool:
+    vmImage: "ubuntu-16.04"
+  variables:
+    Version: $[ dependencies.Semantic_release.outputs['save.versionNumber'] ] 
+  steps:
+    - template: unix-compilation.yml@templates
+      parameters:
+        type: "Release"
+        cmakeArgs: "-DOPENGEODE_WITH_TESTS:BOOL=OFF -DCPACK_PACKAGE_VERSION:STRING=$(Version)"
+    - template: unix-release.yml@templates
+      parameters:
+        version: $(Version)
+        path: "opengeode"
+
+- job: Release_Mac
+  dependsOn: Semantic_release
+  condition: eq(dependencies.Semantic_release.outputs['save.newRelease'], 'true')
+  pool:
+    vmImage: "macOS-10.13"
+  variables:
+    Version: $[ dependencies.Semantic_release.outputs['save.versionNumber'] ] 
+  steps:
+    - template: unix-compilation.yml@templates
+      parameters:
+        type: "Release"
+        cmakeArgs: "-DOPENGEODE_WITH_TESTS:BOOL=OFF -DCPACK_PACKAGE_VERSION:STRING=$(Version)"
+    - template: unix-release.yml@templates
+      parameters:
+        version: $(Version)
+        path: "opengeode"
+
+- job: Release_Windows
+  dependsOn: Semantic_release
+  condition: eq(dependencies.Semantic_release.outputs['save.newRelease'], 'true')
+  pool:
+    vmImage: "vs2017-win2016"
+  variables:
+    Version: $[ dependencies.Semantic_release.outputs['save.versionNumber'] ] 
+  steps:
+    - template: windows-compilation.yml@templates
+      parameters:
+        type: "Release"
+        cmakeArgs: "-DOPENGEODE_WITH_TESTS:BOOL=OFF -DCPACK_PACKAGE_VERSION:STRING=$(Version)"
+    - template: windows-release.yml@templates
+      parameters:
+        version: $(Version)
+        path: "opengeode"
+
+- template: documentation.yml@templates
+  parameters:
+    dependencies: 
+      - Semantic_release
+    repo: "OpenGeode"
