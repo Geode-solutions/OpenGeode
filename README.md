@@ -3,8 +3,8 @@
 
 <p align="center">
   <img src="https://dev.azure.com/GeodeSolutions/Geode/_apis/build/status/Geode-solutions.OpenGeode?branchName=master" alt="Build Status">
-  <img src="https://img.shields.io/azure-devops/tests/GeodeSolutions/Geode/1/master.svg?compact_message" alt="Test Status">
-  <img src="https://img.shields.io/azure-devops/coverage/GeodeSolutions/Geode/1/master.svg" alt="Coverage Status">
+  <img src="https://img.shields.io/azure-devops/tests/GeodeSolutions/Geode/9/master.svg?compact_message" alt="Test Status">
+  <img src="https://img.shields.io/azure-devops/coverage/GeodeSolutions/Geode/9/master.svg" alt="Coverage Status">
   <img src="https://img.shields.io/github/release/Geode-solutions/OpenGeode.svg" alt="Version">
 </p>
 
