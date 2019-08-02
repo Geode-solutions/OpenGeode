@@ -38,6 +38,19 @@ if(WIN32)
     add_custom_target(windows_post_compilation ALL)
 endif()
 
+if(EXISTS ${PROJECT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in)
+    set(OUTPUT_CONFIG_FILE ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}Config.cmake)
+    configure_package_config_file(
+        ${PROJECT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in 
+        ${OUTPUT_CONFIG_FILE}
+        INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+    )
+    install(
+        FILES ${OUTPUT_CONFIG_FILE}
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+    )
+endif()
+
 function(add_geode_library folder_path)
     get_filename_component(target_name ${folder_path} NAME)
     set(lib_source_dir ${PROJECT_SOURCE_DIR}/src/${folder_path})
