@@ -22,6 +22,7 @@
 project(OpenGeode CXX)
 
 set(UTILS_FILE "${PROJECT_SOURCE_DIR}/cmake/utils.cmake")
+file(READ "${UTILS_FILE}" OPENGEODE_UTILS)
 include("${UTILS_FILE}")
 
 #------------------------------------------------------------------------------------------------
@@ -56,9 +57,6 @@ install(
     DESTINATION
         .
 )
-
-file(READ "${UTILS_FILE}" OPENGEODE_UTILS)
-include(${UTILS_FILE})
 
 #------------------------------------------------------------------------------------------------
 # Configure the OpenGeode libraries
