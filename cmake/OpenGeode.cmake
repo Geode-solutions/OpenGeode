@@ -57,6 +57,8 @@ install(
         .
 )
 
+file(READ "${UTILS_FILE}" OPENGEODE_UTILS)
+
 #------------------------------------------------------------------------------------------------
 # Configure the OpenGeode libraries
 add_geode_library(geode/basic)
