@@ -25,7 +25,7 @@ jobs:
         cmakeArgs: "-DCMAKE_PREFIX_PATH=$(Build.SourcesDirectory)/build/opengeode/install"
     - template: coverage.yml@templates
       parameters:
-        directory: "$(Build.SourcesDirectory)/build/opengeode/bin"
+        directory: "$(Build.SourcesDirectory)/test/bin"
 
 - job: Test_Windows
   dependsOn: Format
