@@ -93,7 +93,8 @@ namespace geode
         void remove_component( const MeshComponent& component )
         {
             const auto& mesh = component.mesh();
-             mesh.vertex_attribute_manager().delete_attribute( "unique vertices" );
+            mesh.vertex_attribute_manager().delete_attribute(
+                "unique vertices" );
             vertex2unique_vertex_.erase( component.id() );
         }
 
