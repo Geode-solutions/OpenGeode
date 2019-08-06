@@ -30,7 +30,7 @@ include("${UTILS_FILE}")
 if(UNIX)
     add_compile_options(-Wall -Wextra -Wno-attributes)
 else()
-    add_compile_options(/DNOMINMAX /wd4250)
+    add_compile_options(/DNOMINMAX /wd4250 /bigobj)
 endif()
 
 # Get OpenGeode dependencies

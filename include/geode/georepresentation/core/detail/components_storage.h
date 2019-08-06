@@ -86,9 +86,9 @@ namespace geode
                 register_mesh_serialize_pcontext( std::get< 0 >( context ) );
                 register_georepresentation_serialize_pcontext(
                     std::get< 0 >( context ) );
-                Serializer archive{ file, &context };
+                Serializer archive{ context, file };
                 archive.object( *this );
-                bitsery::AdapterAccess::getWriter( archive ).flush();
+                archive.adapter().flush();
                 OPENGEODE_EXCEPTION( std::get< 1 >( context ).isValid(),
                     "Error while writing file: " + filename );
             }
@@ -106,12 +106,12 @@ namespace geode
                 register_mesh_deserialize_pcontext( std::get< 0 >( context ) );
                 register_georepresentation_deserialize_pcontext(
                     std::get< 0 >( context ) );
-                Deserializer archive{ file, &context };
+                Deserializer archive{ context, file };
                 archive.object( *this );
-                auto& reader = bitsery::AdapterAccess::getReader( archive );
+                auto& adapter = archive.adapter();
                 OPENGEODE_EXCEPTION(
-                    reader.error() == bitsery::ReaderError::NoError
-                        && reader.isCompletedSuccessfully()
+                    adapter.error() == bitsery::ReaderError::NoError
+                        && adapter.isCompletedSuccessfully()
                         && std::get< 1 >( context ).isValid(),
                     "Error while reading file: " + filename );
             }
@@ -123,7 +123,7 @@ namespace geode
             {
                 archive.ext( components_,
                     bitsery::ext::StdMap{ components_.max_size() },
-                    [&archive]( uuid& id, ComponentPtr& item ) {
+                    []( Archive& archive, uuid& id, ComponentPtr& item ) {
                         archive.object( id );
                         archive.ext( item, bitsery::ext::StdSmartPtr{} );
                     } );

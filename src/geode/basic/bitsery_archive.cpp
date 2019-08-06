@@ -23,7 +23,7 @@
 
 #include <geode/basic/bitsery_archive.h>
 
-#include <bitsery/flexible/array.h>
+#include <bitsery/brief_syntax/array.h>
 
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/point.h>
