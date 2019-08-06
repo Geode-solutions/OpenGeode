@@ -22,6 +22,7 @@
 project(OpenGeode CXX)
 
 set(UTILS_FILE "${PROJECT_SOURCE_DIR}/cmake/utils.cmake")
+file(READ "${UTILS_FILE}" OPENGEODE_UTILS)
 include("${UTILS_FILE}")
 
 #------------------------------------------------------------------------------------------------
@@ -55,20 +56,6 @@ install(
         ${BITSERY_INSTALL_PREFIX}/
     DESTINATION
         .
-)
-
-#------------------------------------------------------------------------------------------------
-# Export and install OpenGeode configuration
-file(READ "${UTILS_FILE}" OPENGEODE_UTILS)
-set(OUTPUT_CONFIG_FILE ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}Config.cmake)
-configure_package_config_file(
-    cmake/${PROJECT_NAME}Config.cmake.in 
-    ${OUTPUT_CONFIG_FILE}
-    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
-)
-install(
-    FILES ${OUTPUT_CONFIG_FILE}
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )
 
 #------------------------------------------------------------------------------------------------
