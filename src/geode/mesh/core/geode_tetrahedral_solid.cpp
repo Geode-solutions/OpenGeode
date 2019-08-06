@@ -26,7 +26,7 @@
 #include <array>
 #include <fstream>
 
-#include <bitsery/flexible/array.h>
+#include <bitsery/brief_syntax/array.h>
 
 #include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>

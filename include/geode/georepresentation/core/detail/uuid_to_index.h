@@ -75,7 +75,7 @@ namespace geode
             {
                 archive.ext( uuid2index_,
                     bitsery::ext::StdMap{ uuid2index_.max_size() },
-                    [&archive]( uuid& id, index_t& index ) {
+                    []( Archive& archive, uuid& id, index_t& index ) {
                         archive.object( id );
                         archive.value4b( index );
                     } );

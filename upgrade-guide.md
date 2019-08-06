@@ -1,7 +1,7 @@
 # Upgrade Guide
 
-## Upgrading to v1.0.0
+## Upgrading from OpenGeode v0.x.x to v1.0.0
 
 #### Breaking Changes
 
-Here is the list of instructions to follow for upgrading to OpenGeode v1.0.0
+- **Bitsery 5.0.0**: upgrading to Bitsery 5.0.0 (serialization library). Previously saved OpenGeode objects may potentially not be reloaded. 
