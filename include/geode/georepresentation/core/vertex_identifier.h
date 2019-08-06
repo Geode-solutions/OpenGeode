@@ -95,9 +95,10 @@ namespace geode
 
         /*!
          * Remove a component from the VertexIdentifier and delete corresponding
-         * information.
+         * information (i.e. the attribute on component mesh).
          */
-        void remove_component( const uuid& component_id );
+        template < typename MeshComponent >
+        void remove_component( const MeshComponent& component );
 
         /*!
          * Create an empty unique vertex.

@@ -103,28 +103,28 @@ namespace geode
     void BRepBuilder::remove_corner( const Corner3D& corner )
     {
         relationships().remove_component( corner.id() );
-        unique_vertices().remove_component( corner.id() );
+        unique_vertices().remove_component( corner );
         delete_corner( corner );
     }
 
     void BRepBuilder::remove_line( const Line3D& line )
     {
         relationships().remove_component( line.id() );
-        unique_vertices().remove_component( line.id() );
+        unique_vertices().remove_component( line );
         delete_line( line );
     }
 
     void BRepBuilder::remove_surface( const Surface3D& surface )
     {
         relationships().remove_component( surface.id() );
-        unique_vertices().remove_component( surface.id() );
+        unique_vertices().remove_component( surface );
         delete_surface( surface );
     }
 
     void BRepBuilder::remove_block( const Block3D& block )
     {
         relationships().remove_component( block.id() );
-        unique_vertices().remove_component( block.id() );
+        unique_vertices().remove_component( block );
         delete_block( block );
     }
 

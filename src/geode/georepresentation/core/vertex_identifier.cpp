@@ -89,9 +89,12 @@ namespace geode
             }
         }
 
-        void remove_component( const uuid& component_id )
+        template < typename MeshComponent >
+        void remove_component( const MeshComponent& component )
         {
-            vertex2unique_vertex_.erase( component_id );
+            const auto& mesh = component.mesh();
+             mesh.vertex_attribute_manager().delete_attribute( "unique vertices" );
+            vertex2unique_vertex_.erase( component.id() );
         }
 
         index_t create_unique_vertex()
@@ -263,9 +266,10 @@ namespace geode
         impl_->register_component( component );
     }
 
-    void VertexIdentifier::remove_component( const uuid& component_id )
+    template < typename MeshComponent >
+    void VertexIdentifier::remove_component( const MeshComponent& component )
     {
-        impl_->remove_component( component_id );
+        impl_->remove_component( component );
     }
 
     index_t VertexIdentifier::create_unique_vertex()
@@ -310,4 +314,19 @@ namespace geode
         VertexIdentifier::register_component( const Surface3D& );
     template void opengeode_georepresentation_api
         VertexIdentifier::register_component( const Block3D& );
+
+    template void opengeode_georepresentation_api
+        VertexIdentifier::remove_component( const Corner2D& );
+    template void opengeode_georepresentation_api
+        VertexIdentifier::remove_component( const Corner3D& );
+    template void opengeode_georepresentation_api
+        VertexIdentifier::remove_component( const Line2D& );
+    template void opengeode_georepresentation_api
+        VertexIdentifier::remove_component( const Line3D& );
+    template void opengeode_georepresentation_api
+        VertexIdentifier::remove_component( const Surface2D& );
+    template void opengeode_georepresentation_api
+        VertexIdentifier::remove_component( const Surface3D& );
+    template void opengeode_georepresentation_api
+        VertexIdentifier::remove_component( const Block3D& );
 } // namespace geode
