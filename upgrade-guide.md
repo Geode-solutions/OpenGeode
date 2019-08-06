@@ -32,6 +32,6 @@ vertex_identifier.remove_component( line.id() );
 
 ```
 const geode::Line3D& line = get_a_line();
-vertex_identifier.remove_component< geode::Line3D >( line );
+vertex_identifier.remove_component( line );
 ```
 
