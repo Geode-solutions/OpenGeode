@@ -41,7 +41,7 @@ namespace geode
     /*!
      * This abstract class represents an assembly of geometric components.
      * The geometric component types composing the GeoRepresentation
-     * are brief_syntax.
+     * are flexible.
      * Syntax for create a derivated class is
      * class DerivateClass : public GeoRepresentation<
      *	dimension, ComponentClassA, ComponentClassB, ComponentClassC >
