@@ -80,6 +80,11 @@ namespace geode
             return names;
         }
 
+        bool attribute_exists( const std::string &name ) const
+        {
+            return attributes_.find( name ) != attributes_.end();
+        }
+
         void delete_attribute( const std::string &name )
         {
             auto it = attributes_.find( name );
@@ -89,7 +94,7 @@ namespace geode
             }
         }
 
-        std::string attribute_type( const std::string &name )
+        std::string attribute_type( const std::string &name ) const
         {
             auto it = attributes_.find( name );
             if( it == attributes_.end() )
@@ -173,12 +178,17 @@ namespace geode
         return impl_->attribute_names();
     }
 
+    bool AttributeManager::attribute_exists( const std::string &name ) const
+    {
+        return impl_->attribute_exists( name );
+    }
+
     void AttributeManager::delete_attribute( const std::string &name )
     {
         impl_->delete_attribute( name );
     }
 
-    std::string AttributeManager::attribute_type( const std::string &name )
+    std::string AttributeManager::attribute_type( const std::string &name ) const
     {
         return impl_->attribute_type( name );
     }
