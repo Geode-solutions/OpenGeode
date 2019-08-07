@@ -30,6 +30,14 @@
 
 namespace geode
 {
+    /*
+     * Return the index of the first occurence of a given value in a container.
+     * @tparam T Type of the container elements.
+     * @tparam container Type of container.
+     * @param[in] in Container in which perform the search.
+     * @param[in] value Value to find.
+     * @return The index of the first occurence of value, NO_ID if not found
+     */
     template < typename T, typename container >
     index_t find( const container& in, const T& value )
     {
@@ -44,12 +52,27 @@ namespace geode
         }
     }
 
+    /*
+     * Return true if a given value exists in a container.
+     * @tparam T Type of the container elements.
+     * @tparam container Type of container.
+     * @param[in] in Container in which perform the search.
+     * @param[in] value Value to find
+     */
     template < typename T, typename container >
     bool contain( const container& in, const T& value )
     {
         return find( in, value ) != NO_ID;
     }
 
+    /*
+     * Delete some elements from a given vector.
+     * @tparam T Type of the vector elements.
+     * @param[in] to_delete Vector of the same size than values. If to_delete[i] is true the i-th element is deleted, else the element is kept.
+     * @param[in/out] values Vector in which perform deletions.
+     * @param[in] resize If true, the size of vector values is adapt to the number of remaining elements.
+     * @return The number of deleted elements
+     */
     template < typename T >
     index_t delete_vector_elements( const std::vector< bool >& to_delete,
         std::vector< T >& values,
