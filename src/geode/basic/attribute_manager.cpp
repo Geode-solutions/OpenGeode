@@ -188,7 +188,8 @@ namespace geode
         impl_->delete_attribute( name );
     }
 
-    std::string AttributeManager::attribute_type( const std::string &name ) const
+    std::string AttributeManager::attribute_type(
+        const std::string &name ) const
     {
         return impl_->attribute_type( name );
     }
