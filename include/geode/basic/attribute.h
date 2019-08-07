@@ -34,7 +34,7 @@
 #include <bitsery/ext/std_map.h>
 
 #include <geode/basic/common.h>
-#include <geode/basic/range.h>
+#include <geode/basic/algorithm.h>
 
 namespace geode
 {
@@ -140,29 +140,6 @@ namespace geode
         T value_;
     };
 
-    namespace detail
-    {
-        template < typename T >
-        index_t compress_vector(
-            const std::vector< bool >& to_delete, std::vector< T >& values )
-        {
-            index_t nb_removed_elements{ 0 };
-            for( auto i : Range{ to_delete.size() } )
-            {
-                if( to_delete[i] )
-                {
-                    nb_removed_elements++;
-                }
-                else
-                {
-                    values[i - nb_removed_elements] = values[i];
-                }
-            }
-            return nb_removed_elements;
-        }
-
-    } // namespace detail
-
     /*!
      * Read and write interface for variable attribute storage
      */
@@ -209,7 +186,7 @@ namespace geode
         void delete_elements( const std::vector< bool >& to_delete ) override
         {
             auto nb_removed_elements =
-                detail::compress_vector( to_delete, values_ );
+                delete_vector_elements( to_delete, values_ );
             resize( values_.size() - nb_removed_elements );
         }
 
@@ -265,7 +242,7 @@ namespace geode
         void delete_elements( const std::vector< bool >& to_delete ) override
         {
             auto nb_removed_elements =
-                detail::compress_vector( to_delete, values_ );
+                delete_vector_elements( to_delete, values_ );
             resize( values_.size() - nb_removed_elements );
         }
 
