@@ -25,7 +25,6 @@
 
 #include <memory>
 #include <string>
-#include <vector>
 
 #include <bitsery/bitsery.h>
 
