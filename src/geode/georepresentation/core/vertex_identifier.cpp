@@ -62,6 +62,11 @@ namespace geode
             const auto& mesh = component.mesh();
             if( it == vertex2unique_vertex_.end() )
             {
+                OPENGEODE_EXCEPTION(
+                    !mesh.vertex_attribute_manager().attribute_exists(
+                        "unique_vertices" ),
+                    "At component registration, no attribute called "
+                    "\"unique_vertices\" should exists on component mesh. " );
                 vertex2unique_vertex_.emplace( component.id(),
                     mesh.vertex_attribute_manager()
                         .template find_or_create_attribute< VariableAttribute,
@@ -96,6 +101,7 @@ namespace geode
             mesh.vertex_attribute_manager().delete_attribute(
                 "unique vertices" );
             vertex2unique_vertex_.erase( component.id() );
+            filter_component_vertices( component.id() );
         }
 
         index_t create_unique_vertex()
@@ -191,6 +197,28 @@ namespace geode
                     archive.object( id );
                     archive.ext( attribute, bitsery::ext::StdSmartPtr{} );
                 } );
+        }
+
+        void filter_component_vertices( const uuid& component_id )
+        {
+            for( auto uv_id : Range( nb_unique_vertices() ) )
+            {
+                auto& mesh_component_vertices =
+                    component_vertices_->value( uv_id );
+
+                std::vector< bool > to_keep(
+                    mesh_component_vertices.size(), true );
+                for( auto i : Range( mesh_component_vertices.size() ) )
+                {
+                    if( mesh_component_vertices[i].component_id.id()
+                        == component_id )
+                    {
+                        to_keep[i] = false;
+                    }
+                }
+                mesh_component_vertices =
+                    extract_vector_elements( to_keep, mesh_component_vertices );
+            }
         }
 
     private:

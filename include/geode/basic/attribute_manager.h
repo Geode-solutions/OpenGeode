@@ -115,6 +115,12 @@ namespace geode
         std::vector< std::string > attribute_names() const;
 
         /*!
+         * Return true if an attribute matching the given name.
+         * @param[in] name The attribute name to use
+         */
+        bool attribute_exists( const std::string& name ) const;
+
+        /*!
          * Delete the attribute matching the given name.
          * Do nothing if the name does not exist.
          * @param[in] name The attribute name to delete
@@ -125,7 +131,7 @@ namespace geode
          * Get the typeid name of the attribute type
          * @param[in] name The attribute name to use
          */
-        std::string attribute_type( const std::string& name );
+        std::string attribute_type( const std::string& name ) const;
 
         /*!
          * Remove all the attributes in the manager

@@ -185,9 +185,10 @@ namespace geode
 
         void delete_elements( const std::vector< bool >& to_delete ) override
         {
-            auto nb_removed_elements =
-                delete_vector_elements( to_delete, values_ );
-            resize( values_.size() - nb_removed_elements );
+            std::vector< bool > to_keep( to_delete );
+            to_keep.flip();
+            values_ =
+                extract_vector_elements( to_keep, values_ );
         }
 
     private:
@@ -241,9 +242,10 @@ namespace geode
 
         void delete_elements( const std::vector< bool >& to_delete ) override
         {
-            auto nb_removed_elements =
-                delete_vector_elements( to_delete, values_ );
-            resize( values_.size() - nb_removed_elements );
+            std::vector< bool > to_keep( to_delete );
+            to_keep.flip();
+            values_ =
+                extract_vector_elements( to_keep, values_ );
         }
 
     private:
