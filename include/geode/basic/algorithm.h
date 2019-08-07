@@ -27,6 +27,7 @@
 #include <geode/basic/range.h>
 
 #include <algorithm>
+#include <vector>
 
 namespace geode
 {

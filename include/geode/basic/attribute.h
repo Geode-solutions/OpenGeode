@@ -25,7 +25,6 @@
 
 #include <typeinfo>
 #include <unordered_map>
-#include <vector>
 
 #include <bitsery/bitsery.h>
 #include <bitsery/brief_syntax.h>
