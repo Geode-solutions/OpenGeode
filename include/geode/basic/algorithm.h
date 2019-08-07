@@ -24,6 +24,7 @@
 #pragma once
 
 #include <geode/basic/common.h>
+#include <geode/basic/range.h>
 
 #include <algorithm>
 
@@ -48,4 +49,31 @@ namespace geode
     {
         return find( in, value ) != NO_ID;
     }
+
+    template < typename T >
+    index_t delete_vector_elements( const std::vector< bool >& to_delete,
+        std::vector< T >& values,
+        bool resize = false )
+    {
+        OPENGEODE_EXCEPTION( to_delete.size() == values.size(),
+            "Number of elements in the two vector should match" );
+        index_t nb_removed_elements{ 0 };
+        for( auto i : Range{ to_delete.size() } )
+        {
+            if( to_delete[i] )
+            {
+                nb_removed_elements++;
+            }
+            else
+            {
+                values[i - nb_removed_elements] = values[i];
+            }
+        }
+        if( resize )
+        {
+            values.resize( to_delete.size() - nb_removed_elements );
+        }
+        return nb_removed_elements;
+    }
+
 } // namespace geode
