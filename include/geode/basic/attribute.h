@@ -33,8 +33,8 @@
 #include <bitsery/ext/inheritance.h>
 #include <bitsery/ext/std_map.h>
 
-#include <geode/basic/common.h>
 #include <geode/basic/algorithm.h>
+#include <geode/basic/common.h>
 
 namespace geode
 {
@@ -187,8 +187,7 @@ namespace geode
         {
             std::vector< bool > to_keep( to_delete );
             to_keep.flip();
-            values_ =
-                extract_vector_elements( to_keep, values_ );
+            values_ = extract_vector_elements( to_keep, values_ );
         }
 
     private:
@@ -244,8 +243,7 @@ namespace geode
         {
             std::vector< bool > to_keep( to_delete );
             to_keep.flip();
-            values_ =
-                extract_vector_elements( to_keep, values_ );
+            values_ = extract_vector_elements( to_keep, values_ );
         }
 
     private:

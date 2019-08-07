@@ -68,10 +68,13 @@ namespace geode
     /*
      * Delete some elements from a given vector.
      * @tparam T Type of the vector elements.
-     * @param[in] to_delete Vector of the same size than values. If to_delete[i] is true the i-th element is deleted, else the element is kept.
+     * @param[in] to_delete Vector of the same size than values. If to_delete[i]
+     * is true the i-th element is deleted, else the element is kept.
      * @param[in/out] values Vector in which perform deletions.
-     * @param[in] resize If true, the size of vector values is adapt to the number of remaining elements.
-     * @pre T should have default constructor (needed for call resize method on vector).
+     * @param[in] resize If true, the size of vector values is adapt to the
+     * number of remaining elements.
+     * @pre T should have default constructor (needed for call resize method on
+     * vector).
      * @return The number of deleted elements
      */
     template < typename T >
@@ -103,18 +106,20 @@ namespace geode
     /*
      * Create a new vector containing only some elements from a given vector.
      * @tparam T Type of the vector elements.
-     * @param[in] to_keep Vector of the same size than in_values. If to_keep[i] is true the i-th element is kept.
+     * @param[in] to_keep Vector of the same size than in_values. If to_keep[i]
+     * is true the i-th element is kept.
      * @param[in] in_values Vector in which perform deletions.
      * @return A vector containing only kept elements of in_values
      */
     template < typename T >
-    std::vector< T > extract_vector_elements( const std::vector< bool >& to_keep,
-        const std::vector< T >& in_values )
+    std::vector< T > extract_vector_elements(
+        const std::vector< bool >& to_keep, const std::vector< T >& in_values )
     {
         OPENGEODE_EXCEPTION( to_keep.size() == in_values.size(),
             "Number of elements in the two vectors should match" );
         std::vector< T > out_values;
-        out_values.reserve( std::count( to_keep.begin(), to_keep.end(), true ) );
+        out_values.reserve(
+            std::count( to_keep.begin(), to_keep.end(), true ) );
         for( auto i : Range{ to_keep.size() } )
         {
             if( to_keep[i] )
