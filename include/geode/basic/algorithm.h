@@ -86,6 +86,10 @@ namespace geode
         OPENGEODE_EXCEPTION( to_delete.size() == values.size(),
             "Number of elements in the two vectors should match" );
         index_t nb_removed_elements{ 0 };
+        if( !contain( to_delete, true ) )
+        {
+            return 0;
+        }
         for( auto i : Range{ to_delete.size() } )
         {
             if( to_delete[i] )
@@ -118,6 +122,10 @@ namespace geode
     {
         OPENGEODE_EXCEPTION( to_keep.size() == in_values.size(),
             "Number of elements in the two vectors should match" );
+        if( !contain( to_keep, false ) )
+        {
+            return in_values;
+        }
         std::vector< T > out_values;
         out_values.reserve(
             std::count( to_keep.begin(), to_keep.end(), true ) );
