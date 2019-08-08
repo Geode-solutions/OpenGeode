@@ -198,6 +198,9 @@ int main()
         test_modify_unique_vertices( vertex_identifier );
         test_save_and_load_unique_vertices( vertex_identifier );
 
+        vertex_identifier.remove_component( provider.corner( corner2_id ) );
+        vertex_identifier.register_component( provider.corner( corner2_id ) );
+
         Logger::info( "TEST SUCCESS" );
         return 0;
     }
