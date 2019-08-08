@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+add_geode_test(test-algorithm.cpp ${PROJECT_NAME}::basic)
 add_geode_test(test-assert.cpp ${PROJECT_NAME}::basic)
 add_geode_test(test-attribute.cpp ${PROJECT_NAME}::basic)
 add_geode_test(test-bounding-box.cpp ${PROJECT_NAME}::basic)
