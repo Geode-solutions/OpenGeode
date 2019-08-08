@@ -21,6 +21,7 @@
  *
  */
 
+#include <functional>
 #include <numeric>
 
 #include <geode/basic/algorithm.h>
