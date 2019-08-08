@@ -110,6 +110,11 @@ void test_extract_vector_elements()
         "Extract elements result (size) for double is not correct" );
     OPENGEODE_EXCEPTION( double_result[0] == 1.1,
         "Extract elements result (values) for double is not correct" );
+    std::vector< bool > keep_all( 4, true );
+    auto double_copy_result =
+        geode::extract_vector_elements( keep_all, double_vector );
+    OPENGEODE_EXCEPTION( double_copy_result == double_vector,
+        "Extract elements result (keep_all) for double is not correct" );
 }
 
 int main()
