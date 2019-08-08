@@ -21,6 +21,8 @@
  *
  */
 
+#include <numeric>
+
 #include <geode/basic/algorithm.h>
 #include <geode/basic/logger.h>
 
