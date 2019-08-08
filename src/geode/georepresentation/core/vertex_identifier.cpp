@@ -201,14 +201,14 @@ namespace geode
 
         void filter_component_vertices( const uuid& component_id )
         {
-            for( auto uv_id : Range( nb_unique_vertices() ) )
+            for( auto uv_id : Range{ nb_unique_vertices() } )
             {
                 auto& mesh_component_vertices =
                     component_vertices_->value( uv_id );
 
                 std::vector< bool > to_keep(
                     mesh_component_vertices.size(), true );
-                for( auto i : Range( mesh_component_vertices.size() ) )
+                for( auto i : Range{ mesh_component_vertices.size() } )
                 {
                     if( mesh_component_vertices[i].component_id.id()
                         == component_id )
@@ -216,8 +216,11 @@ namespace geode
                         to_keep[i] = false;
                     }
                 }
-                mesh_component_vertices =
-                    extract_vector_elements( to_keep, mesh_component_vertices );
+                if( contain( to_keep, false ) )
+                {
+                    mesh_component_vertices = extract_vector_elements(
+                        to_keep, mesh_component_vertices );
+                }
             }
         }
 
