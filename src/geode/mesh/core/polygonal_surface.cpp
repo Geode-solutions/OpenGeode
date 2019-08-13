@@ -463,17 +463,22 @@ namespace geode
         Vector3D normal;
         for( index_t v = 1; v < nb_polygon_vertices( polygon_id ); v++ )
         {
-            const auto& p1 = this->point( polygon_vertex( { polygon_id, v - 1 } ) );
+            const auto& p1 =
+                this->point( polygon_vertex( { polygon_id, v - 1 } ) );
             const auto& p2 = this->point( polygon_vertex( { polygon_id, v } ) );
-            normal = normal + Vector3D{ p1, barycenter }.cross( { p2, barycenter } );
+            normal =
+                normal + Vector3D{ p1, barycenter }.cross( { p2, barycenter } );
         }
-        const auto& p1 = this->point( polygon_vertex( { polygon_id, nb_polygon_vertices( polygon_id ) - 1 } ) );
+        const auto& p1 = this->point( polygon_vertex(
+            { polygon_id, nb_polygon_vertices( polygon_id ) - 1 } ) );
         const auto& p2 = this->point( polygon_vertex( { polygon_id, 0 } ) );
-        normal = normal + Vector3D{ p1, barycenter }.cross( { p2, barycenter } );
+        normal =
+            normal + Vector3D{ p1, barycenter }.cross( { p2, barycenter } );
         return normal.normalize();
     }
 
-    Vector3D PolygonalSurface< 3 >::polygon_vertex_normal( index_t vertex_id ) const
+    Vector3D PolygonalSurface< 3 >::polygon_vertex_normal(
+        index_t vertex_id ) const
     {
         Vector3D normal;
         for( const auto& polygon : polygons_around_vertex( vertex_id ) )
