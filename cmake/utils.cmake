@@ -29,6 +29,14 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR})
 
 #------------------------------------------------------------------------------------------------
+# Platform dependent settings
+if(UNIX)
+    add_compile_options(-Wall -Wextra)
+else()
+    add_compile_options(/DNOMINMAX /bigobj)
+endif()
+
+#------------------------------------------------------------------------------------------------
 # Install configuration
 set(CMAKE_MACOSX_RPATH ON)
 set(CMAKE_INSTALL_RPATH ".")
@@ -36,6 +44,7 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
 
 if(WIN32)
     add_custom_target(windows_post_compilation ALL)
+    string(REPLACE "/MDd" "/MD" CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
 endif()
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in)

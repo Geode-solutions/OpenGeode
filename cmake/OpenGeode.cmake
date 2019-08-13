@@ -25,14 +25,6 @@ set(UTILS_FILE "${PROJECT_SOURCE_DIR}/cmake/utils.cmake")
 file(READ "${UTILS_FILE}" OPENGEODE_UTILS)
 include("${UTILS_FILE}")
 
-#------------------------------------------------------------------------------------------------
-# Platform dependent settings
-if(UNIX)
-    add_compile_options(-Wall -Wextra -Wno-attributes)
-else()
-    add_compile_options(/DNOMINMAX /wd4250 /bigobj)
-endif()
-
 # Get OpenGeode dependencies
 find_package(Async++ REQUIRED CONFIG NO_DEFAULT_PATH PATHS ${ASYNCPLUSPLUS_INSTALL_PREFIX})
 find_package(Bitsery REQUIRED CONFIG NO_DEFAULT_PATH PATHS ${BITSERY_INSTALL_PREFIX})
