@@ -246,7 +246,8 @@ namespace geode
 
         /*!
          * Get all the polygons with one of the vertices matching given vertex.
-         * @param[in] vertex_id Index of the vertex
+         * @param[in] vertex_id Index of the vertex.
+         * @pre This function needs that polygon adjacencies are computed
          */
         std::vector< PolygonVertex > polygons_around_vertex(
             index_t vertex_id ) const;
