@@ -250,10 +250,7 @@ void test_polygon_vertex_normal()
 
     builder->create_polygon( { 0, 1, 2 } );
     builder->create_polygon( { 0, 3, 1 } );
-
-    DEBUG( polygonal_surface->polygon_normal( 0 ) );
-    DEBUG( polygonal_surface->polygon_normal( 1 ) );
-    DEBUG( polygonal_surface->polygon_vertex_normal( 0 ) );
+    builder->compute_polygon_adjacencies();
 
     geode::Vector3D answer{ { 0., 0., 1. } };
 
