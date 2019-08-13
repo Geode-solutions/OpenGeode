@@ -236,6 +236,31 @@ void test_polygon_normal()
         "PolygonalSurface polygon normal is not correct" );
 }
 
+void test_polygon_vertex_normal()
+{
+    auto polygonal_surface = geode::PolygonalSurface3D::create(
+        geode::OpenGeodePolygonalSurface3D::type_name_static() );
+    auto builder =
+        geode::PolygonalSurfaceBuilder3D::create( *polygonal_surface );
+
+    builder->create_point( { { 0.0, 0.0, 0.0 } } );
+    builder->create_point( { { 1.0, 0.0, 0.0 } } );
+    builder->create_point( { { 0.0, 1.0, 1.0 } } );
+    builder->create_point( { { 0.0, -1.0, 1.0 } } );
+
+    builder->create_polygon( { 0, 1, 2 } );
+    builder->create_polygon( { 0, 3, 1 } );
+
+    DEBUG(polygonal_surface->polygon_normal(0) );
+    DEBUG(polygonal_surface->polygon_normal(1) );
+    DEBUG(polygonal_surface->polygon_vertex_normal(0) );
+
+    geode::Vector3D answer{ { 0., 0., 1. } };
+
+    OPENGEODE_EXCEPTION( polygonal_surface->polygon_vertex_normal( 0 ) == answer,
+        "PolygonalSurface polygon vertex normal is not correct" );
+}
+
 void test_io( const geode::PolygonalSurface3D& polygonal_surface,
     const std::string& filename )
 {
@@ -265,6 +290,7 @@ int main()
         test_polygon_barycenter( *polygonal_surface );
         test_polygon_area();
         test_polygon_normal();
+        test_polygon_vertex_normal();
 
         auto base_file = "test." + polygonal_surface->native_extension();
         test_io( *polygonal_surface, base_file );
