@@ -337,6 +337,11 @@ namespace geode
          */
         Vector3D polygon_normal( index_t polygon_id ) const;
 
+        /*!
+         * Return the normal of a polygon vertex
+         */
+        Vector3D polygon_vertex_normal( index_t vertex_id ) const;
+
     protected:
         PolygonalSurface() = default;
     };
