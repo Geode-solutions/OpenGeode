@@ -40,16 +40,16 @@ namespace geode
 
 namespace geode
 {
-    /*!
-     * Get a pointer to the builder of a Surface mesh
-     * @param[in] id Unique index of the Surface
-     */
     template < index_t dimension >
     class SurfacesBuilder
     {
     public:
         void load_surfaces( const std::string& directory );
 
+        /*!
+         * Get a pointer to the builder of a Surface mesh
+         * @param[in] id Unique index of the Surface
+         */
         std::unique_ptr< PolygonalSurfaceBuilder< dimension > >
             surface_mesh_builder( const uuid& id );
 

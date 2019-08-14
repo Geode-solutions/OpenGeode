@@ -40,16 +40,16 @@ namespace geode
 
 namespace geode
 {
-    /*!
-     * Get a pointer to the builder of a Line mesh
-     * @param[in] id Unique index of the Line
-     */
     template < index_t dimension >
     class LinesBuilder
     {
     public:
         void load_lines( const std::string& directory );
 
+        /*!
+         * Get a pointer to the builder of a Line mesh
+         * @param[in] id Unique index of the Line
+         */
         std::unique_ptr< EdgedCurveBuilder< dimension > > line_mesh_builder(
             const uuid& id );
 
