@@ -70,8 +70,8 @@ namespace geode
             ghc::filesystem::create_directory( directory );
             archive_file(
                 brep().relationships().save_relationships( directory ) );
-            archive_file( brep().unique_vertices().save_unique_vertices(
-                directory ) );
+            archive_file(
+                brep().unique_vertices().save_unique_vertices( directory ) );
             archive_files( brep().save_corners( directory ) );
             archive_files( brep().save_lines( directory ) );
             archive_files( brep().save_surfaces( directory ) );
