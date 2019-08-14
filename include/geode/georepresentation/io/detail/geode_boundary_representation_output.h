@@ -25,7 +25,7 @@
 
 #include <fstream>
 
-#include <filesystem/path.h>
+#include <ghc/filesystem.hpp>
 
 #include <mz.h>
 #include <mz_strm.h>
@@ -66,17 +66,17 @@ namespace geode
                 writer_, this->filename().c_str(), 0, 0 );
             OPENGEODE_EXCEPTION(
                 status == MZ_OK, "Error opening zip for writing" );
-            filesystem::path directory{ uuid{}.string() };
-            filesystem::create_directory( directory );
+            ghc::filesystem::path directory{ uuid{}.string() };
+            ghc::filesystem::create_directory( directory );
             archive_file(
-                brep().relationships().save_relationships( directory.str() ) );
+                brep().relationships().save_relationships( directory ) );
             archive_file( brep().unique_vertices().save_unique_vertices(
-                directory.str() ) );
-            archive_files( brep().save_corners( directory.str() ) );
-            archive_files( brep().save_lines( directory.str() ) );
-            archive_files( brep().save_surfaces( directory.str() ) );
-            archive_files( brep().save_blocks( directory.str() ) );
-            directory.remove_file();
+                directory ) );
+            archive_files( brep().save_corners( directory ) );
+            archive_files( brep().save_lines( directory ) );
+            archive_files( brep().save_surfaces( directory ) );
+            archive_files( brep().save_blocks( directory ) );
+            ghc::filesystem::remove( directory );
             status = mz_zip_writer_close( writer_ );
             OPENGEODE_EXCEPTION(
                 status == MZ_OK, "Error closing zip for writing" );
@@ -93,11 +93,11 @@ namespace geode
 
         void archive_file( const std::string& file ) const
         {
-            filesystem::path file_path{ file };
+            ghc::filesystem::path file_path{ file };
             auto status = mz_zip_writer_add_path(
-                writer_, file_path.str().c_str(), NULL, 0, 1 );
+                writer_, file_path.c_str(), NULL, 0, 1 );
             OPENGEODE_EXCEPTION( status == MZ_OK, "Error adding path to zip" );
-            file_path.remove_file();
+            ghc::filesystem::remove( file_path );
         }
 
     private:

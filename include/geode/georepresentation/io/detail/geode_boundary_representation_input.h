@@ -25,7 +25,7 @@
 
 #include <fstream>
 
-#include <filesystem/path.h>
+#include <ghc/filesystem.hpp>
 
 #include <mz.h>
 #include <mz_strm.h>
@@ -64,10 +64,10 @@ namespace geode
                 mz_zip_reader_open_file( reader_, this->filename().c_str() );
             OPENGEODE_EXCEPTION(
                 status == MZ_OK, "Error opening zip for reading" );
-            filesystem::path directory{ uuid{}.string() };
-            filesystem::create_directory( directory );
+            ghc::filesystem::path directory{ uuid{}.string() };
+            ghc::filesystem::create_directory( directory );
 
-            std::vector< filesystem::path > files;
+            std::vector< ghc::filesystem::path > files;
             status = mz_zip_reader_goto_first_entry( reader_ );
             while( status == MZ_OK )
             {
@@ -78,7 +78,7 @@ namespace geode
 
                 files.emplace_back( directory / file_info->filename );
                 status = mz_zip_reader_entry_save_file(
-                    reader_, files.back().str().c_str() );
+                    reader_, files.back().c_str() );
                 OPENGEODE_EXCEPTION(
                     status == MZ_OK, "Error extracting entry file" );
                 status = mz_zip_reader_goto_next_entry( reader_ );
@@ -86,12 +86,12 @@ namespace geode
 
             BRepBuilder builder( brep() );
 
-            builder.load_corners( directory.str() );
-            builder.load_lines( directory.str() );
-            builder.load_surfaces( directory.str() );
-            builder.load_blocks( directory.str() );
-            builder.load_relationships( directory.str() );
-            builder.unique_vertices().load_unique_vertices( directory.str() );
+            builder.load_corners( directory );
+            builder.load_lines( directory );
+            builder.load_surfaces( directory );
+            builder.load_blocks( directory );
+            builder.load_relationships( directory );
+            builder.unique_vertices().load_unique_vertices( directory );
 
             for( const auto& corner : brep().corners() )
             {
@@ -109,12 +109,7 @@ namespace geode
             {
                 builder.unique_vertices().register_component( block );
             }
-
-            for( auto& file : files )
-            {
-                file.remove_file();
-            }
-            directory.remove_file();
+            ghc::filesystem::remove_all( directory );
         }
 
     private:

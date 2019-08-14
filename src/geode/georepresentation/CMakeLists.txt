@@ -59,7 +59,7 @@ target_link_libraries(${target_name}
         ${PROJECT_NAME}::mesh
         Bitsery::bitsery
     PRIVATE
-        filesystem
+        ghc_filesystem
         MINIZIP::minizip
 )
 
