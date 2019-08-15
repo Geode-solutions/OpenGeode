@@ -45,7 +45,6 @@ jobs:
   pool:
     vmImage: "macOS-10.13"
   steps:
-    - script: cmake --version
     - template: unix-compilation.yml@templates
       parameters:
         type: "Debug"
