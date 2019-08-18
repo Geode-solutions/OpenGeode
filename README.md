@@ -16,7 +16,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/C%2B%2B-11-blue.svg" alt="Language">
-  <img src="https://img.shields.io/badge/license-Modified%20MIT-blue.svg" alt="License">
+  <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License">
   <img src="https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg" alt="Semantic-release">
   <a href="https://slackin-opengeode.herokuapp.com"><img src="https://slackin-opengeode.herokuapp.com/badge.svg" alt="Slack invite"></a>
 </p>
