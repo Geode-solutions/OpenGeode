@@ -18,12 +18,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-set(FILESYSTEM_PATH ${PROJECT_BINARY_DIR}/third_party/ghcfilesystem)
+set(FILESYSTEM_PATH ${PROJECT_BINARY_DIR}/third_party/ghcFilesystem)
 set(FILESYSTEM_INSTALL_PREFIX ${FILESYSTEM_PATH}/install)
-ExternalProject_Add(ghcfilesystem
+ExternalProject_Add(ghcFilesystem
     PREFIX ${FILESYSTEM_PATH}
-    GIT_REPOSITORY https://github.com/gulrak/filesystem
-    GIT_TAG b6526679a3fe4d5c71a664f006ef4192a761f006
+    GIT_REPOSITORY https://github.com/JonasVautherin/filesystem
+    GIT_TAG daebcb3c9616cef575b85a3f31eb384100e76e87
     CMAKE_GENERATOR ${CMAKE_GENERATOR}
     CMAKE_GENERATOR_PLATFORM ${CMAKE_GENERATOR_PLATFORM}
     CMAKE_ARGS

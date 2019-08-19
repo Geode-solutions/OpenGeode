@@ -42,7 +42,7 @@ ExternalProject_Add(opengeode
     DEPENDS 
         asyncplusplus
         bitsery
-        ghcfilesystem
+        ghcFilesystem
         minizip
         nanoflann
         spdlog
