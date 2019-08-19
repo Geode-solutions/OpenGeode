@@ -42,8 +42,8 @@ namespace geode
         Impl(
             const std::string& file, const std::string& archive_temp_filename )
         {
-            directory_ = ghc::filesystem::current_path()
-                         / archive_temp_filename;
+            directory_ =
+                ghc::filesystem::current_path() / archive_temp_filename;
             ghc::filesystem::create_directory( directory_ );
             mz_zip_writer_create( &writer_ );
             mz_zip_writer_set_compress_method(
@@ -119,8 +119,8 @@ namespace geode
         Impl( const std::string& file,
             const std::string& unarchive_temp_filename )
         {
-            directory_ = ghc::filesystem::current_path()
-                         / unarchive_temp_filename;
+            directory_ =
+                ghc::filesystem::current_path() / unarchive_temp_filename;
             ghc::filesystem::create_directory( directory_ );
             mz_zip_reader_create( &reader_ );
             auto status = mz_zip_reader_open_file( reader_, file.c_str() );
