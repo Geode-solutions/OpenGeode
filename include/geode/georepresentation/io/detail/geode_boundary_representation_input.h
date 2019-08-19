@@ -39,9 +39,7 @@ namespace geode
         {
         }
 
-        ~OpenGeodeBRepInput()
-        {
-        }
+        ~OpenGeodeBRepInput() {}
 
         static std::string extension()
         {
@@ -59,7 +57,8 @@ namespace geode
             builder.load_surfaces( zip_reader.directory() );
             builder.load_blocks( zip_reader.directory() );
             builder.load_relationships( zip_reader.directory() );
-            builder.unique_vertices().load_unique_vertices( zip_reader.directory() );
+            builder.unique_vertices().load_unique_vertices(
+                zip_reader.directory() );
 
             for( const auto& corner : brep().corners() )
             {
