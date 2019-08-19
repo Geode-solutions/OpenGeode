@@ -19,6 +19,7 @@ set(sources
     "${lib_source_dir}/core/vertex_identifier.cpp"
     "${lib_source_dir}/io/boundary_representation_input.cpp"
     "${lib_source_dir}/io/boundary_representation_output.cpp"
+    "${lib_source_dir}/io/zip_file.cpp"
 )
 set(public_headers
     "${lib_include_dir}/common.h"
@@ -45,6 +46,7 @@ set(public_headers
     "${lib_include_dir}/core/vertex_identifier.h"
     "${lib_include_dir}/io/boundary_representation_input.h"
     "${lib_include_dir}/io/boundary_representation_output.h"
+    "${lib_include_dir}/io/zip_file.h"
 )
 set(private_headers
     "${lib_include_dir}/core/detail/components_storage.h"

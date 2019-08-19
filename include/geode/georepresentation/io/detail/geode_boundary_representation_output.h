@@ -23,19 +23,11 @@
 
 #pragma once
 
-#include <fstream>
-
-#include <ghc/filesystem.hpp>
-
-#include <mz.h>
-#include <mz_strm.h>
-#include <mz_zip.h>
-#include <mz_zip_rw.h>
-
 #include <geode/basic/uuid.h>
 
 #include <geode/georepresentation/core/boundary_representation.h>
 #include <geode/georepresentation/io/boundary_representation_output.h>
+#include <geode/georepresentation/io/zip_file.h>
 
 namespace geode
 {
@@ -45,15 +37,9 @@ namespace geode
         OpenGeodeBRepOutput( const BRep& brep, std::string filename )
             : BRepOutput( brep, std::move( filename ) )
         {
-            mz_zip_writer_create( &writer_ );
-            mz_zip_writer_set_compress_method(
-                writer_, MZ_COMPRESS_METHOD_STORE );
         }
 
-        ~OpenGeodeBRepOutput()
-        {
-            mz_zip_writer_delete( &writer_ );
-        }
+        ~OpenGeodeBRepOutput() {}
 
         static std::string extension()
         {
@@ -62,45 +48,20 @@ namespace geode
 
         void write() const final
         {
-            auto status = mz_zip_writer_open_file(
-                writer_, this->filename().c_str(), 0, 0 );
-            OPENGEODE_EXCEPTION(
-                status == MZ_OK, "Error opening zip for writing" );
-            ghc::filesystem::path directory{ uuid{}.string() };
-            ghc::filesystem::create_directory( directory );
-            archive_file(
-                brep().relationships().save_relationships( directory ) );
-            archive_file(
-                brep().unique_vertices().save_unique_vertices( directory ) );
-            archive_files( brep().save_corners( directory ) );
-            archive_files( brep().save_lines( directory ) );
-            archive_files( brep().save_surfaces( directory ) );
-            archive_files( brep().save_blocks( directory ) );
-            ghc::filesystem::remove( directory );
-            status = mz_zip_writer_close( writer_ );
-            OPENGEODE_EXCEPTION(
-                status == MZ_OK, "Error closing zip for writing" );
+            ZipFile zip_writer{ filename(), uuid{}.string() };
+            zip_writer.archive_file( brep().relationships().save_relationships(
+                zip_writer.directory() ) );
+            zip_writer.archive_file(
+                brep().unique_vertices().save_unique_vertices(
+                    zip_writer.directory() ) );
+            zip_writer.archive_files(
+                brep().save_corners( zip_writer.directory() ) );
+            zip_writer.archive_files(
+                brep().save_lines( zip_writer.directory() ) );
+            zip_writer.archive_files(
+                brep().save_surfaces( zip_writer.directory() ) );
+            zip_writer.archive_files(
+                brep().save_blocks( zip_writer.directory() ) );
         }
-
-    private:
-        void archive_files( const std::vector< std::string >& files ) const
-        {
-            for( const auto& file : files )
-            {
-                archive_file( file );
-            }
-        }
-
-        void archive_file( const std::string& file ) const
-        {
-            ghc::filesystem::path file_path{ file };
-            auto status = mz_zip_writer_add_path(
-                writer_, file_path.c_str(), NULL, 0, 1 );
-            OPENGEODE_EXCEPTION( status == MZ_OK, "Error adding path to zip" );
-            ghc::filesystem::remove( file_path );
-        }
-
-    private:
-        void* writer_{ nullptr };
     };
 } // namespace geode
