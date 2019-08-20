@@ -41,7 +41,6 @@ install(
     DIRECTORY
         ${ASYNCPLUSPLUS_INSTALL_PREFIX}/
         ${BITSERY_INSTALL_PREFIX}/
-        ${MINIZIP_INSTALL_PREFIX}/
     DESTINATION
         .
 )

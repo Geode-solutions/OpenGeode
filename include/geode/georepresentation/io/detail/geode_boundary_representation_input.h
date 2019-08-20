@@ -24,10 +24,10 @@
 #pragma once
 
 #include <geode/basic/uuid.h>
+#include <geode/basic/zip_file.h>
 
 #include <geode/georepresentation/core/boundary_representation.h>
 #include <geode/georepresentation/io/boundary_representation_input.h>
-#include <geode/georepresentation/io/zip_file.h>
 
 namespace geode
 {
@@ -38,8 +38,6 @@ namespace geode
             : BRepInput( brep, std::move( filename ) )
         {
         }
-
-        ~OpenGeodeBRepInput() {}
 
         static std::string extension()
         {

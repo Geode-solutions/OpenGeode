@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/georepresentation/io/zip_file.h>
+#include <geode/basic/zip_file.h>
 
 #include <fstream>
 

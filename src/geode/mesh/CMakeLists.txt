@@ -109,7 +109,7 @@ set(public_headers
     "${lib_include_dir}/io/vertex_set_input.h"
     "${lib_include_dir}/io/vertex_set_output.h"
 )
-set(private_headers
+set(advanced_headers
     "${lib_include_dir}/builder/detail/mapping_after_deletion.h"
     "${lib_include_dir}/builder/detail/register_builder.h"
     "${lib_include_dir}/core/detail/edges_impl.h"

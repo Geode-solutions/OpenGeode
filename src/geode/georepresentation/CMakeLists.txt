@@ -19,7 +19,6 @@ set(sources
     "${lib_source_dir}/core/vertex_identifier.cpp"
     "${lib_source_dir}/io/boundary_representation_input.cpp"
     "${lib_source_dir}/io/boundary_representation_output.cpp"
-    "${lib_source_dir}/io/zip_file.cpp"
 )
 set(public_headers
     "${lib_include_dir}/common.h"
@@ -46,9 +45,8 @@ set(public_headers
     "${lib_include_dir}/core/vertex_identifier.h"
     "${lib_include_dir}/io/boundary_representation_input.h"
     "${lib_include_dir}/io/boundary_representation_output.h"
-    "${lib_include_dir}/io/zip_file.h"
 )
-set(private_headers
+set(advanced_headers
     "${lib_include_dir}/core/detail/components_storage.h"
     "${lib_include_dir}/core/detail/mesh_storage.h"
     "${lib_include_dir}/core/detail/uuid_to_index.h"
@@ -60,8 +58,5 @@ target_link_libraries(${target_name}
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::mesh
         Bitsery::bitsery
-    PRIVATE
-        ghcFilesystem::ghc_filesystem
-        MINIZIP::minizip
 )
 

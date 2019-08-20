@@ -78,14 +78,11 @@ namespace geode
                 components_.emplace( component->id(), std::move( component ) );
             }
 
-            void save_components( const std::string& filename ) const
+            virtual void save_components( const std::string& filename ) const
             {
                 std::ofstream file{ filename, std::ofstream::binary };
                 TContext context{};
-                register_basic_serialize_pcontext( std::get< 0 >( context ) );
-                register_mesh_serialize_pcontext( std::get< 0 >( context ) );
-                register_georepresentation_serialize_pcontext(
-                    std::get< 0 >( context ) );
+                register_librairies_in_serialize_pcontext( context );
                 Serializer archive{ context, file };
                 archive.object( *this );
                 archive.adapter().flush();
@@ -102,10 +99,7 @@ namespace geode
             {
                 std::ifstream file{ filename, std::ifstream::binary };
                 TContext context{};
-                register_basic_deserialize_pcontext( std::get< 0 >( context ) );
-                register_mesh_deserialize_pcontext( std::get< 0 >( context ) );
-                register_georepresentation_deserialize_pcontext(
-                    std::get< 0 >( context ) );
+                register_librairies_in_deserialize_pcontext( context );
                 Deserializer archive{ context, file };
                 archive.object( *this );
                 auto& adapter = archive.adapter();
@@ -114,6 +108,23 @@ namespace geode
                         && adapter.isCompletedSuccessfully()
                         && std::get< 1 >( context ).isValid(),
                     "Error while reading file: " + filename );
+            }
+        
+        protected:
+            virtual void register_librairies_in_serialize_pcontext( TContext& context ) const
+            {
+                register_basic_serialize_pcontext( std::get< 0 >( context ) );
+                register_mesh_serialize_pcontext( std::get< 0 >( context ) );
+                register_georepresentation_serialize_pcontext(
+                    std::get< 0 >( context ) );
+            }
+
+            virtual void register_librairies_in_deserialize_pcontext( TContext& context ) const
+            {
+                register_basic_deserialize_pcontext( std::get< 0 >( context ) );
+                register_mesh_deserialize_pcontext( std::get< 0 >( context ) );
+                register_georepresentation_deserialize_pcontext(
+                    std::get< 0 >( context ) );
             }
 
         private:

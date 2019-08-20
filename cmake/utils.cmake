@@ -73,7 +73,7 @@ function(add_geode_library folder_path)
     set(all_sources
         "${sources}"
         "${public_headers}"
-        "${private_headers}"
+        "${advanced_headers}"
     )
     target_sources(${target_name} PRIVATE "${all_sources}")
     set_target_properties(${target_name}
@@ -86,7 +86,7 @@ function(add_geode_library folder_path)
     )
     # TODO: Use TREE keyword when we change to cmake 3.8
     source_group("Public Header Files" FILES ${public_headers})
-    source_group("Private Header Files" FILES ${private_headers})
+    source_group("Advanced Header Files" FILES ${advanced_headers})
     source_group("Source Files" FILES ${sources})
     target_include_directories(${target_name}
         PUBLIC
