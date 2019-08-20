@@ -23,16 +23,8 @@
 
 #pragma once
 
-#include <fstream>
-
-#include <filesystem/path.h>
-
-#include <mz.h>
-#include <mz_strm.h>
-#include <mz_zip.h>
-#include <mz_zip_rw.h>
-
 #include <geode/basic/uuid.h>
+#include <geode/basic/zip_file.h>
 
 #include <geode/georepresentation/core/boundary_representation.h>
 #include <geode/georepresentation/io/boundary_representation_input.h>
@@ -45,12 +37,6 @@ namespace geode
         OpenGeodeBRepInput( BRep& brep, std::string filename )
             : BRepInput( brep, std::move( filename ) )
         {
-            mz_zip_reader_create( &reader_ );
-        }
-
-        ~OpenGeodeBRepInput()
-        {
-            mz_zip_reader_delete( &reader_ );
         }
 
         static std::string extension()
@@ -60,38 +46,17 @@ namespace geode
 
         void read() final
         {
-            auto status =
-                mz_zip_reader_open_file( reader_, this->filename().c_str() );
-            OPENGEODE_EXCEPTION(
-                status == MZ_OK, "Error opening zip for reading" );
-            filesystem::path directory{ uuid{}.string() };
-            filesystem::create_directory( directory );
-
-            std::vector< filesystem::path > files;
-            status = mz_zip_reader_goto_first_entry( reader_ );
-            while( status == MZ_OK )
-            {
-                mz_zip_file* file_info{ nullptr };
-                status = mz_zip_reader_entry_get_info( reader_, &file_info );
-                OPENGEODE_EXCEPTION(
-                    status == MZ_OK, "Error getting entry info in zip file" );
-
-                files.emplace_back( directory / file_info->filename );
-                status = mz_zip_reader_entry_save_file(
-                    reader_, files.back().str().c_str() );
-                OPENGEODE_EXCEPTION(
-                    status == MZ_OK, "Error extracting entry file" );
-                status = mz_zip_reader_goto_next_entry( reader_ );
-            }
-
             BRepBuilder builder( brep() );
+            UnzipFile zip_reader{ filename(), uuid{}.string() };
+            zip_reader.extract_all();
 
-            builder.load_corners( directory.str() );
-            builder.load_lines( directory.str() );
-            builder.load_surfaces( directory.str() );
-            builder.load_blocks( directory.str() );
-            builder.load_relationships( directory.str() );
-            builder.unique_vertices().load_unique_vertices( directory.str() );
+            builder.load_corners( zip_reader.directory() );
+            builder.load_lines( zip_reader.directory() );
+            builder.load_surfaces( zip_reader.directory() );
+            builder.load_blocks( zip_reader.directory() );
+            builder.load_relationships( zip_reader.directory() );
+            builder.unique_vertices().load_unique_vertices(
+                zip_reader.directory() );
 
             for( const auto& corner : brep().corners() )
             {
@@ -109,15 +74,6 @@ namespace geode
             {
                 builder.unique_vertices().register_component( block );
             }
-
-            for( auto& file : files )
-            {
-                file.remove_file();
-            }
-            directory.remove_file();
         }
-
-    private:
-        void* reader_{ nullptr };
     };
 } // namespace geode

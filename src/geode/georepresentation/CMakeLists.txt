@@ -46,7 +46,7 @@ set(public_headers
     "${lib_include_dir}/io/boundary_representation_input.h"
     "${lib_include_dir}/io/boundary_representation_output.h"
 )
-set(private_headers
+set(advanced_headers
     "${lib_include_dir}/core/detail/components_storage.h"
     "${lib_include_dir}/core/detail/mesh_storage.h"
     "${lib_include_dir}/core/detail/uuid_to_index.h"
@@ -58,8 +58,5 @@ target_link_libraries(${target_name}
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::mesh
         Bitsery::bitsery
-    PRIVATE
-        filesystem
-        MINIZIP::minizip
 )
 
