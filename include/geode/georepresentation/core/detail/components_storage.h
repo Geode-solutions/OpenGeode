@@ -109,9 +109,10 @@ namespace geode
                         && std::get< 1 >( context ).isValid(),
                     "Error while reading file: " + filename );
             }
-        
+
         protected:
-            virtual void register_librairies_in_serialize_pcontext( TContext& context ) const
+            virtual void register_librairies_in_serialize_pcontext(
+                TContext& context ) const
             {
                 register_basic_serialize_pcontext( std::get< 0 >( context ) );
                 register_mesh_serialize_pcontext( std::get< 0 >( context ) );
@@ -119,7 +120,8 @@ namespace geode
                     std::get< 0 >( context ) );
             }
 
-            virtual void register_librairies_in_deserialize_pcontext( TContext& context ) const
+            virtual void register_librairies_in_deserialize_pcontext(
+                TContext& context ) const
             {
                 register_basic_deserialize_pcontext( std::get< 0 >( context ) );
                 register_mesh_deserialize_pcontext( std::get< 0 >( context ) );
