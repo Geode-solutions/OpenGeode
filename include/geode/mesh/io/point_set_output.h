@@ -50,9 +50,6 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( PointSetOutput );
 
-    public:
-        virtual ~PointSetOutput() = default;
-
     protected:
         PointSetOutput(
             const PointSet< dimension >& point_set, std::string filename );
