@@ -44,9 +44,8 @@ namespace geode
             return BRep::native_extension_static();
         }
 
-        void write() const final
+        void archive_brep_files( const ZipFile& zip_writer ) const
         {
-            ZipFile zip_writer{ filename(), uuid{}.string() };
             zip_writer.archive_file( brep().relationships().save_relationships(
                 zip_writer.directory() ) );
             zip_writer.archive_file(
@@ -60,6 +59,14 @@ namespace geode
                 brep().save_surfaces( zip_writer.directory() ) );
             zip_writer.archive_files(
                 brep().save_blocks( zip_writer.directory() ) );
+        }
+
+        void write() const final
+        {
+            DEBUG( "OGBRep_write");
+            DEBUG( filename());
+            ZipFile zip_writer{ filename(), uuid{}.string() };
+            archive_brep_files( zip_writer );
         }
     };
 } // namespace geode
