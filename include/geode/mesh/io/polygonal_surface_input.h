@@ -51,9 +51,6 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( PolygonalSurfaceInput );
 
-    public:
-        virtual ~PolygonalSurfaceInput() = default;
-
     protected:
         PolygonalSurfaceInput( PolygonalSurface< dimension >& polygonal_surface,
             std::string filename );

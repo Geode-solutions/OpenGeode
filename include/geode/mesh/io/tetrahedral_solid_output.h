@@ -52,9 +52,6 @@ namespace geode
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
         OPENGEODE_DISABLE_COPY_AND_MOVE( TetrahedralSolidOutput );
 
-    public:
-        virtual ~TetrahedralSolidOutput() = default;
-
     protected:
         TetrahedralSolidOutput(
             const TetrahedralSolid< dimension >& tetrahedral_solid,

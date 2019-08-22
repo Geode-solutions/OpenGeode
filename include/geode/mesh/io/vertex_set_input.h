@@ -48,9 +48,6 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( VertexSetInput );
 
-    public:
-        virtual ~VertexSetInput() = default;
-
         void read() final;
 
     protected:

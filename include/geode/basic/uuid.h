@@ -132,7 +132,7 @@ namespace geode
 namespace std
 {
     template <>
-    class hash< geode::uuid >
+    struct hash< geode::uuid >
     {
     public:
         size_t operator()( const geode::uuid &uuid ) const
