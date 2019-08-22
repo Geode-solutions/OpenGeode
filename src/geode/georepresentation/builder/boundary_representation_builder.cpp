@@ -24,6 +24,7 @@
 #include <geode/georepresentation/builder/boundary_representation_builder.h>
 
 #include <geode/georepresentation/core/block.h>
+#include <geode/georepresentation/core/boundary.h>
 #include <geode/georepresentation/core/boundary_representation.h>
 #include <geode/georepresentation/core/corner.h>
 #include <geode/georepresentation/core/line.h>
@@ -102,6 +103,13 @@ namespace geode
         return id;
     }
 
+    const uuid& BRepBuilder::add_boundary()
+    {
+        const auto& id = create_boundary();
+        relationships().add_component( id );
+        return id;
+    }
+
     void BRepBuilder::remove_corner( const Corner3D& corner )
     {
         relationships().remove_component( corner.id() );
@@ -130,6 +138,12 @@ namespace geode
         delete_block( block );
     }
 
+    void BRepBuilder::remove_boundary( const Boundary3D& boundary )
+    {
+        relationships().remove_component( boundary.id() );
+        delete_boundary( boundary );
+    }
+
     void BRepBuilder::add_boundary_relation(
         const Corner3D& corner, const Line3D& line )
     {
@@ -146,5 +160,11 @@ namespace geode
         const Surface3D& surface, const Block3D& block )
     {
         relationships().add_boundary_relation( surface.id(), block.id() );
+    }
+
+    void BRepBuilder::add_surface_in_boundary(
+        const Surface3D& surface, const Boundary3D& boundary )
+    {
+        relationships().add_item_in_collection( surface.id(), boundary.id() );
     }
 } // namespace geode

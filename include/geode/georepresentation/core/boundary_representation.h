@@ -44,9 +44,11 @@ namespace geode
 {
     /*!
      * A Boundary Representation is a GeoRepresentation composed of
-     * Corners, Lines, Surfaces and Blocks.
-     * This class provides classes for range-based iteration on Component
-     * boundaries and incidences.
+     * Corners, Lines, Surfaces and Blocks. BRep is also defined by
+     * collections of Surfaces called Boundaries defining the limit between the
+     * interior and the exterior of the model. This class provides classes for
+     * range-based iteration on Component boundaries and incidences and
+     * Collection items.
      */
     class opengeode_georepresentation_api BRep
         : public GeoRepresentation< 3, Corners, Lines, Surfaces, Blocks >,

@@ -45,6 +45,7 @@ namespace geode
     ALIAS_3D( Corner );
     ALIAS_3D( Line );
     ALIAS_3D( Surface );
+    ALIAS_3D( Boundary );
 
     class BRep;
 
@@ -85,6 +86,8 @@ namespace geode
 
         const uuid& add_block( const MeshType& type );
 
+        const uuid& add_boundary();
+
         void remove_corner( const Corner3D& corner );
 
         void remove_line( const Line3D& line );
@@ -92,6 +95,8 @@ namespace geode
         void remove_surface( const Surface3D& surface );
 
         void remove_block( const Block3D& block );
+
+        void remove_boundary( const Boundary3D& boundary );
 
         void add_boundary_relation(
             const Corner3D& corner, const Line3D& line );
@@ -101,6 +106,9 @@ namespace geode
 
         void add_boundary_relation(
             const Surface3D& surface, const Block3D& block );
+
+        void add_surface_in_boundary(
+            const Surface3D& surface, const Boundary3D& boundary );
 
     private:
         BRep& brep_;
