@@ -25,6 +25,7 @@
 
 #include <geode/georepresentation/common.h>
 #include <geode/georepresentation/core/blocks.h>
+#include <geode/georepresentation/core/boundaries.h>
 #include <geode/georepresentation/core/corners.h>
 #include <geode/georepresentation/core/georepresentation.h>
 #include <geode/georepresentation/core/lines.h>
@@ -33,6 +34,7 @@
 namespace geode
 {
     ALIAS_3D( Block );
+    ALIAS_3D( Boundary );
     ALIAS_3D( Corner );
     ALIAS_3D( Line );
     ALIAS_3D( Surface );
@@ -47,7 +49,8 @@ namespace geode
      * boundaries and incidences.
      */
     class opengeode_georepresentation_api BRep
-        : public GeoRepresentation< 3, Corners, Lines, Surfaces, Blocks >
+        : public GeoRepresentation< 3, Corners, Lines, Surfaces, Blocks >,
+          public Boundaries< 3 >
     {
     public:
         class opengeode_georepresentation_api LineBoundaryRange
@@ -195,6 +198,30 @@ namespace geode
             const BRep& brep_;
         };
 
+        class opengeode_georepresentation_api BoundaryItemRange
+            : public RelationshipManager::ItemRange
+        {
+        public:
+            BoundaryItemRange( const BRep& brep,
+                const RelationshipManager& manager,
+                const Boundary3D& boundary );
+
+            const BoundaryItemRange& begin() const
+            {
+                return *this;
+            }
+
+            const BoundaryItemRange& end() const
+            {
+                return *this;
+            }
+
+            const Surface3D& operator*() const;
+
+        private:
+            const BRep& brep_;
+        };
+
     public:
         LineBoundaryRange boundaries( const Line3D& line ) const;
 
@@ -207,6 +234,8 @@ namespace geode
         LineIncidenceRange incidences( const Line3D& line ) const;
 
         SurfaceIncidenceRange incidences( const Surface3D& surface ) const;
+
+        BoundaryItemRange items( const Boundary3D& boundary ) const;
 
         static std::string native_extension_static()
         {

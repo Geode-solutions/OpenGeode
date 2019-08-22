@@ -60,6 +60,8 @@ namespace geode
                 brep().save_surfaces( zip_writer.directory() ) );
             zip_writer.archive_files(
                 brep().save_blocks( zip_writer.directory() ) );
+            zip_writer.archive_files(
+                brep().save_boundaries( zip_writer.directory() ) );
         }
     };
 } // namespace geode

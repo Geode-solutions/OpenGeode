@@ -27,6 +27,7 @@
 #include <geode/basic/vector.h>
 
 #include <geode/georepresentation/core/block.h>
+#include <geode/georepresentation/core/boundary.h>
 #include <geode/georepresentation/core/corner.h>
 #include <geode/georepresentation/core/line.h>
 #include <geode/georepresentation/core/surface.h>
@@ -144,6 +145,25 @@ namespace geode
     const Block3D& BRep::SurfaceIncidenceRange::operator*() const
     {
         return brep_.block( RelationshipManager::IncidenceRange::operator*() );
+    }
+
+    BRep::BoundaryItemRange BRep::items(
+        const Boundary3D& boundary ) const
+    {
+        return { *this, relationships(), boundary };
+    }
+
+    BRep::BoundaryItemRange::BoundaryItemRange( const BRep& brep,
+        const RelationshipManager& manager,
+        const Boundary3D& boundary )
+        : RelationshipManager::ItemRange( manager, boundary.id() ),
+          brep_( brep )
+    {
+    }
+
+    const Surface3D& BRep::BoundaryItemRange::operator*() const
+    {
+        return brep_.surface( RelationshipManager::ItemRange::operator*() );
     }
 
     void BRep::compute_epsilon( double& epsilon ) const

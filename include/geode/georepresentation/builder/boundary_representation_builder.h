@@ -24,12 +24,14 @@
 #pragma once
 
 #include <geode/georepresentation/builder/blocks_builder.h>
+#include <geode/georepresentation/builder/boundaries_builder.h>
 #include <geode/georepresentation/builder/corners_builder.h>
 #include <geode/georepresentation/builder/georepresentation_builder.h>
 #include <geode/georepresentation/builder/lines_builder.h>
 #include <geode/georepresentation/builder/surfaces_builder.h>
 #include <geode/georepresentation/common.h>
 #include <geode/georepresentation/core/blocks.h>
+#include <geode/georepresentation/core/boundaries.h>
 #include <geode/georepresentation/core/corners.h>
 #include <geode/georepresentation/core/georepresentation.h>
 #include <geode/georepresentation/core/lines.h>
@@ -59,7 +61,8 @@ namespace geode
               CornersBuilder,
               LinesBuilder,
               SurfacesBuilder,
-              BlocksBuilder >
+              BlocksBuilder >,
+          public BoundariesBuilder< 3 >
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( BRepBuilder );
 

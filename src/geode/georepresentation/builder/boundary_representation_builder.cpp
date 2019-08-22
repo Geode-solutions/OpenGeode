@@ -32,7 +32,9 @@
 namespace geode
 {
     BRepBuilder::BRepBuilder( BRep& brep )
-        : GeoRepresentationBuilder( brep ), brep_( brep )
+        : GeoRepresentationBuilder( brep ),
+          BoundariesBuilder( brep ),
+          brep_( brep )
     {
     }
 
