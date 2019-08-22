@@ -63,8 +63,6 @@ namespace geode
 
         void write() const final
         {
-            DEBUG( "OGBRep_write");
-            DEBUG( filename());
             ZipFile zip_writer{ filename(), uuid{}.string() };
             archive_brep_files( zip_writer );
         }
