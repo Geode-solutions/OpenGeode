@@ -49,6 +49,7 @@ namespace geode
     class EdgedCurveInput : public GraphInput
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( EdgedCurveInput );
+
     protected:
         EdgedCurveInput(
             EdgedCurve< dimension >& edged_curve, std::string filename );
