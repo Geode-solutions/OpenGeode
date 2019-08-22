@@ -147,8 +147,7 @@ namespace geode
         return brep_.block( RelationshipManager::IncidenceRange::operator*() );
     }
 
-    BRep::BoundaryItemRange BRep::items(
-        const Boundary3D& boundary ) const
+    BRep::BoundaryItemRange BRep::items( const Boundary3D& boundary ) const
     {
         return { *this, relationships(), boundary };
     }
