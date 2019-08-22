@@ -50,9 +50,6 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( PointSetInput );
 
-    public:
-        virtual ~PointSetInput() = default;
-
     protected:
         PointSetInput( PointSet< dimension >& point_set, std::string filename );
 

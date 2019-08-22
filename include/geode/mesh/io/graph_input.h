@@ -46,9 +46,6 @@ namespace geode
 
     class opengeode_mesh_api GraphInput : public VertexSetInput
     {
-    public:
-        virtual ~GraphInput() = default;
-
     protected:
         GraphInput( Graph& graph, std::string filename );
 

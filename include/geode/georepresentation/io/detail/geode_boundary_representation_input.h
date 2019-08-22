@@ -31,7 +31,7 @@
 
 namespace geode
 {
-    class OpenGeodeBRepInput final : public BRepInput
+    class opengeode_georepresentation_api OpenGeodeBRepInput final : public BRepInput
     {
     public:
         OpenGeodeBRepInput( BRep& brep, std::string filename )
