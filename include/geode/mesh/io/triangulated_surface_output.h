@@ -51,9 +51,6 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( TriangulatedSurfaceOutput );
 
-    public:
-        virtual ~TriangulatedSurfaceOutput() = default;
-
     protected:
         TriangulatedSurfaceOutput(
             const TriangulatedSurface< dimension >& triangulated_surface,
