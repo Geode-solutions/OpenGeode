@@ -50,9 +50,6 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( EdgedCurveInput );
 
-    public:
-        virtual ~EdgedCurveInput() = default;
-
     protected:
         EdgedCurveInput(
             EdgedCurve< dimension >& edged_curve, std::string filename );

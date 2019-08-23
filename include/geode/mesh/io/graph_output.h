@@ -46,9 +46,6 @@ namespace geode
 
     class opengeode_mesh_api GraphOutput : public VertexSetOutput
     {
-    public:
-        virtual ~GraphOutput() = default;
-
     protected:
         GraphOutput( const Graph& graph, std::string filename );
 

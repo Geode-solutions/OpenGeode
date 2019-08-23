@@ -48,9 +48,6 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( VertexSetOutput );
 
-    public:
-        virtual ~VertexSetOutput() = default;
-
     protected:
         VertexSetOutput( const VertexSet& vertex_set, std::string filename );
 

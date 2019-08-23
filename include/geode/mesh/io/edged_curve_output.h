@@ -50,9 +50,6 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( EdgedCurveOutput );
 
-    public:
-        virtual ~EdgedCurveOutput() = default;
-
         const EdgedCurve< dimension >& edged_curve() const
         {
             return edged_curve_;

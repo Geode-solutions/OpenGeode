@@ -51,9 +51,6 @@ namespace geode
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
         OPENGEODE_DISABLE_COPY_AND_MOVE( PolyhedralSolidInput );
 
-    public:
-        virtual ~PolyhedralSolidInput() = default;
-
     protected:
         PolyhedralSolidInput( PolyhedralSolid< dimension >& polyhedral_solid,
             std::string filename );
