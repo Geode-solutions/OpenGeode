@@ -239,6 +239,8 @@ namespace geode
 
         BoundaryItemRange items( const Boundary3D& boundary ) const;
 
+        BoundaryRange boundaries() const;
+
         static std::string native_extension_static()
         {
             return "og_brep";

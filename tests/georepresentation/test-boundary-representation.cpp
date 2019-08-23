@@ -148,7 +148,7 @@ std::vector< geode::uuid > add_boundaries(
     auto message = "BRep should have " + std::to_string( nb ) + " boundaries";
     OPENGEODE_EXCEPTION( model.nb_boundaries() == nb, message );
     OPENGEODE_EXCEPTION(
-        count_components( model.Boundaries::boundaries() ) == nb, message );
+        count_components( model.boundaries() ) == nb, message );
     return uuids;
 }
 

@@ -166,6 +166,11 @@ namespace geode
         return brep_.surface( RelationshipManager::ItemRange::operator*() );
     }
 
+    Boundaries3D::BoundaryRange BRep::boundaries() const
+    {
+        return Boundaries::boundaries();
+    }
+
     void BRep::compute_epsilon( double& epsilon ) const
     {
         BoundingBox3D box;

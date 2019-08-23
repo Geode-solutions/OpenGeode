@@ -26,6 +26,7 @@
 #include <geode/basic/attribute_manager.h>
 
 #include <geode/georepresentation/core/block.h>
+#include <geode/georepresentation/core/boundary.h>
 #include <geode/georepresentation/core/corner.h>
 #include <geode/georepresentation/core/line.h>
 #include <geode/georepresentation/core/surface.h>
@@ -39,7 +40,8 @@ namespace bitsery
         struct PolymorphicBaseClass< geode::Component2D >
             : PolymorphicDerivedClasses< geode::Corner2D,
                   geode::Line2D,
-                  geode::Surface2D >
+                  geode::Surface2D,
+                  geode::Boundary2D >
         {
         };
 
@@ -48,7 +50,8 @@ namespace bitsery
             : PolymorphicDerivedClasses< geode::Corner3D,
                   geode::Line3D,
                   geode::Surface3D,
-                  geode::Block3D >
+                  geode::Block3D,
+                  geode::Boundary3D >
         {
         };
     } // namespace ext
