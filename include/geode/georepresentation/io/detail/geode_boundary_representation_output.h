@@ -69,11 +69,5 @@ namespace geode
             ZipFile zip_writer{ filename(), uuid{}.string() };
             archive_brep_files( zip_writer );
         }
-
-        void write() const final
-        {
-            ZipFile zip_writer{ filename(), uuid{}.string() };
-            archive_brep_files( zip_writer );
-        }
     };
 } // namespace geode
