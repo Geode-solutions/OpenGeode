@@ -49,7 +49,8 @@ namespace geode
 
     const Corner2D& Section::LineBoundaryRange::operator*() const
     {
-        return section_.corner( RelationshipManager::BoundaryRange::operator*() );
+        return section_.corner(
+            RelationshipManager::BoundaryRange::operator*() );
     }
 
     Section::SurfaceBoundaryRange Section::boundaries(
@@ -71,7 +72,8 @@ namespace geode
         return section_.line( RelationshipManager::BoundaryRange::operator*() );
     }
 
-    Section::CornerIncidenceRange Section::incidences( const Corner2D& corner ) const
+    Section::CornerIncidenceRange Section::incidences(
+        const Corner2D& corner ) const
     {
         return { *this, relationships(), corner };
     }
@@ -86,7 +88,8 @@ namespace geode
 
     const Line2D& Section::CornerIncidenceRange::operator*() const
     {
-        return section_.line( RelationshipManager::IncidenceRange::operator*() );
+        return section_.line(
+            RelationshipManager::IncidenceRange::operator*() );
     }
 
     Section::LineIncidenceRange Section::incidences( const Line2D& line ) const

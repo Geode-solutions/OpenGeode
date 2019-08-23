@@ -38,7 +38,8 @@ namespace
 
     void register_section_input()
     {
-        geode::SectionInputFactory::register_creator< geode::OpenGeodeSectionInput >(
+        geode::SectionInputFactory::register_creator<
+            geode::OpenGeodeSectionInput >(
             geode::OpenGeodeSectionOutput::extension() );
     }
 

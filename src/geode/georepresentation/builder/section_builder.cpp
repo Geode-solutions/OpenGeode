@@ -24,9 +24,9 @@
 #include <geode/georepresentation/builder/section_builder.h>
 
 #include <geode/georepresentation/core/block.h>
-#include <geode/georepresentation/core/section.h>
 #include <geode/georepresentation/core/corner.h>
 #include <geode/georepresentation/core/line.h>
+#include <geode/georepresentation/core/section.h>
 #include <geode/georepresentation/core/surface.h>
 
 namespace geode
