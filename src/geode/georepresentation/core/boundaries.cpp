@@ -26,8 +26,8 @@
 #include <geode/basic/pimpl_impl.h>
 #include <geode/basic/range.h>
 
-#include <geode/georepresentation/core/detail/components_storage.h>
 #include <geode/georepresentation/core/boundary.h>
+#include <geode/georepresentation/core/detail/components_storage.h>
 
 namespace geode
 {
@@ -78,7 +78,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    void Boundaries< dimension >::load_boundaries( const std::string& directory )
+    void Boundaries< dimension >::load_boundaries(
+        const std::string& directory )
     {
         impl_->load_components( directory + "/boundaries" );
     }

@@ -34,8 +34,8 @@
 
 #include <geode/basic/attribute_manager.h>
 #include <geode/georepresentation/core/block.h>
-#include <geode/georepresentation/core/boundary.h>
 #include <geode/georepresentation/core/boundaries.h>
+#include <geode/georepresentation/core/boundary.h>
 #include <geode/georepresentation/core/corner.h>
 #include <geode/georepresentation/core/line.h>
 #include <geode/georepresentation/core/surface.h>
@@ -449,8 +449,8 @@ void test_reloaded_brep( const geode::BRep& model )
 {
     OPENGEODE_EXCEPTION( model.nb_corners() == 6,
         "Number of Corners in reloaded BRep should be 6" );
-    OPENGEODE_EXCEPTION( model.nb_lines() == 9,
-        "Number of Lines in reloaded BRep should be 9" );
+    OPENGEODE_EXCEPTION(
+        model.nb_lines() == 9, "Number of Lines in reloaded BRep should be 9" );
     OPENGEODE_EXCEPTION( model.nb_surfaces() == 5,
         "Number of Surfaces in reloaded BRep should be 5" );
     OPENGEODE_EXCEPTION( model.nb_blocks() == 1,

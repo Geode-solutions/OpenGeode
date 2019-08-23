@@ -23,8 +23,8 @@
 
 #include <geode/georepresentation/builder/boundaries_builder.h>
 
-#include <geode/georepresentation/core/boundary.h>
 #include <geode/georepresentation/core/boundaries.h>
+#include <geode/georepresentation/core/boundary.h>
 
 namespace geode
 {
