@@ -19,5 +19,6 @@
 # SOFTWARE.
 
 add_geode_test(test-boundary-representation.cpp ${PROJECT_NAME}::georepresentation)
+add_geode_test(test-section.cpp ${PROJECT_NAME}::georepresentation)
 add_geode_test(test-relationship-manager.cpp ${PROJECT_NAME}::georepresentation)
 add_geode_test(test-vertex-identifier.cpp ${PROJECT_NAME}::georepresentation)

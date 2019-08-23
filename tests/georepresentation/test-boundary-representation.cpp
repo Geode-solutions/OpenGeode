@@ -374,7 +374,7 @@ void test_incidence_ranges( const geode::BRep& model,
             "LineIncidenceRange iteration result is not correct" );
     }
     OPENGEODE_EXCEPTION( line_incidence_count == 2,
-        "LineIncidenceRange should iterates on 2 Surface" );
+        "LineIncidenceRange should iterates on 2 Surfaces" );
 
     const auto& surface_incidences =
         model.incidences( model.surface( surface_uuids[0] ) );
