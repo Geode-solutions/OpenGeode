@@ -23,13 +23,13 @@
 
 #pragma once
 
-#include <geode/georepresentation/common.h>
+#include <geode/basic/common.h>
 
 #include <geode/basic/pimpl.h>
 
 namespace geode
 {
-    class opengeode_georepresentation_api ZipFile
+    class opengeode_basic_api ZipFile
     {
     public:
         ZipFile(
@@ -46,7 +46,7 @@ namespace geode
         IMPLEMENTATION_MEMBER( impl_ );
     };
 
-    class opengeode_georepresentation_api UnzipFile
+    class opengeode_basic_api UnzipFile
     {
     public:
         UnzipFile(
