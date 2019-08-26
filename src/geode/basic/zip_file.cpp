@@ -32,6 +32,7 @@
 
 #include <ghc/filesystem.hpp>
 
+#include <geode/basic/logger.h>
 #include <geode/basic/pimpl_impl.h>
 
 namespace geode
@@ -50,8 +51,10 @@ namespace geode
                 writer_, MZ_COMPRESS_METHOD_STORE );
             auto status =
                 mz_zip_writer_open_file( writer_, file.c_str(), 0, 0 );
-            OPENGEODE_EXCEPTION(
-                status == MZ_OK, "Error opening zip for writing" );
+            if( status != MZ_OK )
+            {
+                Logger::error( "Error opening zip for writing" );
+            }
         }
 
         ~Impl()
