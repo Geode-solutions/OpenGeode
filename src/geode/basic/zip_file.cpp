@@ -61,8 +61,10 @@ namespace geode
         {
             ghc::filesystem::remove( directory_ );
             auto status = mz_zip_writer_close( writer_ );
-            OPENGEODE_EXCEPTION(
-                status == MZ_OK, "Error closing zip for writing" );
+            if( status != MZ_OK )
+            {
+                Logger::error( "Error closing zip for writing" );
+            }
             mz_zip_writer_delete( &writer_ );
         }
 
@@ -127,8 +129,10 @@ namespace geode
             ghc::filesystem::create_directory( directory_ );
             mz_zip_reader_create( &reader_ );
             auto status = mz_zip_reader_open_file( reader_, file.c_str() );
-            OPENGEODE_EXCEPTION(
-                status == MZ_OK, "Error opening zip for reading" );
+            if( status != MZ_OK )
+            {
+                Logger::error( "Error opening zip for writing" );
+            }
         }
 
         ~Impl()
