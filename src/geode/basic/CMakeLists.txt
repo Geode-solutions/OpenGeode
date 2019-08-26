@@ -43,8 +43,8 @@ target_link_libraries(${target_name}
         MINIZIP::minizip
 )
 if(WIN32)
-set_target_properties( ${target_name}
-    PROPERTIES
-        LINK_FLAGS_DEBUG "/NODEFAULTLIB:MSVCRTD"
-)
+    set_target_properties( ${target_name}
+        PROPERTIES
+            LINK_FLAGS_DEBUG "/NODEFAULTLIB:MSVCRTD"
+    )
 endif()
