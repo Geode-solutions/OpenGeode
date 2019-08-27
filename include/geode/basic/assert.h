@@ -89,7 +89,7 @@ namespace geode
     if( !( condition ) )                                                       \
     geode::geode_assertion_failed( #condition, message, __FILE__, __LINE__ )
 #define OPENGEODE_ASSERT_NOT_REACHED( message )                                \
-    geode::OPENGEODE_ASSERTion_failed(                                         \
+    geode::geode_assertion_failed(                                             \
         "should not reached", message, __FILE__, __LINE__ )
 #else
 #define OPENGEODE_ASSERT( x, message )
