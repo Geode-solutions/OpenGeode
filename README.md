@@ -33,7 +33,7 @@ OpenGeode is an open source platform for representing and manipulating geometric
 | Project | Version | Description |
 |---------|---------|-------------|
 | [OpenGeode-IO]          | ![OpenGeode-IO-version] | Implementation of input and output formats |
-| [OpenGeode-Geosciences]          | Coming soon! | Custom objects and algorithms tailored for Geosciences |
+| [OpenGeode-Geosciences]          | ![OpenGeode-Geosciences-version] | Custom objects and algorithms tailored for Geosciences |
 | [OpenGeode-GeosciencesIO]          | Coming soon! | Implementation of input and output formats for Geosciences |
 | [OpenGeode-ModuleTemplate]          | ![OpenGeode-ModuleTemplate-version] | Template for creating your own OpenGeode modules |
 
