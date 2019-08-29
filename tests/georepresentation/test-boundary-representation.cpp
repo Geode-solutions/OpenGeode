@@ -41,6 +41,7 @@
 #include <geode/mesh/core/geode_point_set.h>
 #include <geode/mesh/core/geode_polygonal_surface.h>
 #include <geode/mesh/core/geode_polyhedral_solid.h>
+#include <geode/mesh/core/geode_triangulated_surface.h>
 #include <geode/mesh/core/point_set.h>
 
 template < typename Range >
@@ -98,13 +99,19 @@ std::vector< geode::uuid > add_surfaces(
 {
     geode::index_t nb{ 5 };
     std::vector< geode::uuid > uuids;
-    for( auto unused : geode::Range{ nb } )
+    for( auto unused : geode::Range{ 2 } )
     {
         geode_unused( unused );
-        uuids.push_back( builder.add_surface() );
+        uuids.push_back( builder.add_surface(
+            geode::OpenGeodeTriangulatedSurface3D::type_name_static() ) );
     }
-    const auto& temp_surface = model.surface( builder.add_surface(
-        geode::OpenGeodePolygonalSurface3D::type_name_static() ) );
+    for( auto unused : geode::Range{ 2, nb } )
+    {
+        geode_unused( unused );
+        uuids.push_back( builder.add_surface(
+            geode::OpenGeodePolygonalSurface3D::type_name_static() ) );
+    }
+    const auto& temp_surface = model.surface( builder.add_surface() );
     builder.remove_surface( temp_surface );
     auto message = "BRep should have " + std::to_string( nb ) + " surfaces";
     OPENGEODE_EXCEPTION( model.nb_surfaces() == nb, message );

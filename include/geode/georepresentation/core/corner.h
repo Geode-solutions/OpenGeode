@@ -78,6 +78,9 @@ namespace geode
         friend class CornersBuilder< dimension >;
         PointSet< dimension >& modifiable_mesh();
 
+        friend class CornersBuilder< dimension >;
+        void ensure_mesh_type();
+
         friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive );

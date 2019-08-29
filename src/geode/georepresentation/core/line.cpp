@@ -36,6 +36,14 @@ namespace geode
     class Line< dimension >::Impl
         : public detail::MeshStorage< EdgedCurve< dimension > >
     {
+        using base_class = detail::MeshStorage< EdgedCurve< dimension > >;
+        public:
+            Impl():base_class( &create_mesh ){}
+            
+            static void create_mesh( const MeshType& type, base_class& storage )
+            {
+                storage.set_mesh( EdgedCurve< dimension >::create( type ) );
+            }
     };
 
     template < index_t dimension >
@@ -52,7 +60,7 @@ namespace geode
     template < index_t dimension >
     Line< dimension >::Line( const MeshType& type )
     {
-        impl_->set_mesh( EdgedCurve< dimension >::create( type ) );
+        Impl::create_mesh( type, *impl_ );
     }
 
     template < index_t dimension >
@@ -68,9 +76,16 @@ namespace geode
     }
 
     template < index_t dimension >
+    void Line< dimension >::ensure_mesh_type()
+    {
+        return impl_->ensure_mesh_type();
+    }
+
+    template < index_t dimension >
     template < typename Archive >
     void Line< dimension >::serialize( Archive& archive )
     {
+        archive.object( impl_ );
         archive.ext(
             *this, bitsery::ext::BaseClass< Component< dimension > >{} );
     }

@@ -26,6 +26,8 @@
 #include <string>
 #include <utility>
 
+#include <bitsery/brief_syntax/string.h>
+
 #include <geode/basic/named_type.h>
 
 namespace geode
