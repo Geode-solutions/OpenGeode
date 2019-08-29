@@ -37,13 +37,14 @@ namespace geode
         : public detail::MeshStorage< PointSet< dimension > >
     {
         using base_class = detail::MeshStorage< PointSet< dimension > >;
-        public:
-            Impl():base_class( &create_mesh ){}
-            
-            static void create_mesh( const MeshType& type, base_class& storage ) 
-            {
-                storage.set_mesh( PointSet< dimension >::create( type ) );
-            }
+
+    public:
+        Impl() : base_class( &create_mesh ) {}
+
+        static void create_mesh( const MeshType& type, base_class& storage )
+        {
+            storage.set_mesh( PointSet< dimension >::create( type ) );
+        }
     };
 
     template < index_t dimension >
