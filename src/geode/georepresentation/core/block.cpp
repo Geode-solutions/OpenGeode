@@ -38,24 +38,27 @@ namespace geode
         : public detail::MeshStorage< PolyhedralSolid< dimension > >
     {
         using base_class = detail::MeshStorage< PolyhedralSolid< dimension > >;
-        public:
-            Impl():base_class( &create_mesh ){}
 
-            static void create_mesh( const MeshType& type, base_class& storage )
+    public:
+        Impl() : base_class( &create_mesh ) {}
+
+        static void create_mesh( const MeshType& type, base_class& storage )
+        {
+            if( TetrahedralSolidFactory< dimension >::has_creator( type ) )
             {
-                if( TetrahedralSolidFactory< dimension >::has_creator( type ) )
-                {
-                    storage.set_mesh( TetrahedralSolid< dimension >::create( type ) );
-                }
-                else if( PolyhedralSolidFactory< dimension >::has_creator( type ) )
-                {
-                    storage.set_mesh( PolyhedralSolid< dimension >::create( type ) );
-                }
-                else
-                {
-                    throw OpenGeodeException( "Unknown mesh type: ", type.get() );
-                }
+                storage.set_mesh(
+                    TetrahedralSolid< dimension >::create( type ) );
             }
+            else if( PolyhedralSolidFactory< dimension >::has_creator( type ) )
+            {
+                storage.set_mesh(
+                    PolyhedralSolid< dimension >::create( type ) );
+            }
+            else
+            {
+                throw OpenGeodeException( "Unknown mesh type: ", type.get() );
+            }
+        }
     };
 
     template < index_t dimension >
