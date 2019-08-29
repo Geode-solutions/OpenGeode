@@ -95,6 +95,7 @@ namespace geode
         impl_->load_components( directory + "/corners" );
         for( auto& corner : modifiable_corners() )
         {
+            corner.ensure_mesh_type();
             auto& mesh = corner.modifiable_mesh();
             load_point_set( mesh,
                 directory + "/" + corner.component_type().get()

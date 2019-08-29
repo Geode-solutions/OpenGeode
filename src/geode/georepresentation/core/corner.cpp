@@ -36,6 +36,14 @@ namespace geode
     class Corner< dimension >::Impl
         : public detail::MeshStorage< PointSet< dimension > >
     {
+        using base_class = detail::MeshStorage< PointSet< dimension > >;
+        public:
+            Impl():base_class( &create_mesh ){}
+            
+            static void create_mesh( const MeshType& type, base_class& storage ) 
+            {
+                storage.set_mesh( PointSet< dimension >::create( type ) );
+            }
     };
 
     template < index_t dimension >
@@ -52,7 +60,7 @@ namespace geode
     template < index_t dimension >
     Corner< dimension >::Corner( const MeshType& type )
     {
-        impl_->set_mesh( PointSet< dimension >::create( type ) );
+        Impl::create_mesh( type, *impl_ );
     }
 
     template < index_t dimension >
@@ -68,9 +76,16 @@ namespace geode
     }
 
     template < index_t dimension >
+    void Corner< dimension >::ensure_mesh_type()
+    {
+        return impl_->ensure_mesh_type();
+    }
+
+    template < index_t dimension >
     template < typename Archive >
     void Corner< dimension >::serialize( Archive& archive )
     {
+        archive.object( impl_ );
         archive.ext(
             *this, bitsery::ext::BaseClass< Component< dimension > >{} );
     }

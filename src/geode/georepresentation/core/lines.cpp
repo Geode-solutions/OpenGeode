@@ -93,6 +93,7 @@ namespace geode
         impl_->load_components( directory + "/lines" );
         for( auto& line : modifiable_lines() )
         {
+            line.ensure_mesh_type();
             auto& mesh = line.modifiable_mesh();
             load_edged_curve( mesh,
                 directory + "/" + line.component_type().get()

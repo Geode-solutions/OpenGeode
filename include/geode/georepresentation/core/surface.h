@@ -78,6 +78,9 @@ namespace geode
         friend class SurfacesBuilder< dimension >;
         PolygonalSurface< dimension >& modifiable_mesh();
 
+        friend class SurfacesBuilder< dimension >;
+        void ensure_mesh_type();
+
         friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive );

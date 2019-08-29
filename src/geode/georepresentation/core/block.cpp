@@ -37,6 +37,25 @@ namespace geode
     class Block< dimension >::Impl
         : public detail::MeshStorage< PolyhedralSolid< dimension > >
     {
+        using base_class = detail::MeshStorage< PolyhedralSolid< dimension > >;
+        public:
+            Impl():base_class( &create_mesh ){}
+
+            static void create_mesh( const MeshType& type, base_class& storage )
+            {
+                if( TetrahedralSolidFactory< dimension >::has_creator( type ) )
+                {
+                    storage.set_mesh( TetrahedralSolid< dimension >::create( type ) );
+                }
+                else if( PolyhedralSolidFactory< dimension >::has_creator( type ) )
+                {
+                    storage.set_mesh( PolyhedralSolid< dimension >::create( type ) );
+                }
+                else
+                {
+                    throw OpenGeodeException( "Unknown mesh type: ", type.get() );
+                }
+            }
     };
 
     template < index_t dimension >
@@ -48,18 +67,7 @@ namespace geode
     template < index_t dimension >
     Block< dimension >::Block( const MeshType& type )
     {
-        if( TetrahedralSolidFactory< dimension >::has_creator( type ) )
-        {
-            impl_->set_mesh( TetrahedralSolid< dimension >::create( type ) );
-        }
-        else if( PolyhedralSolidFactory< dimension >::has_creator( type ) )
-        {
-            impl_->set_mesh( PolyhedralSolid< dimension >::create( type ) );
-        }
-        else
-        {
-            throw OpenGeodeException( "Unknown mesh type: ", type.get() );
-        }
+        Impl::create_mesh( type, *impl_ );
     }
 
     template < index_t dimension >
@@ -80,9 +88,16 @@ namespace geode
     }
 
     template < index_t dimension >
+    void Block< dimension >::ensure_mesh_type()
+    {
+        return impl_->ensure_mesh_type();
+    }
+
+    template < index_t dimension >
     template < typename Archive >
     void Block< dimension >::serialize( Archive& archive )
     {
+        archive.object( impl_ );
         archive.ext(
             *this, bitsery::ext::BaseClass< Component< dimension > >{} );
     }

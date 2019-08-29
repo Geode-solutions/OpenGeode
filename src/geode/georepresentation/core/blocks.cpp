@@ -105,6 +105,7 @@ namespace geode
         impl_->load_components( directory + "/blocks" );
         for( auto& block : modifiable_blocks() )
         {
+            block.ensure_mesh_type();
             auto& mesh = block.modifiable_mesh();
             auto file = directory + "/" + block.component_type().get()
                         + block.id().string() + "." + mesh.native_extension();

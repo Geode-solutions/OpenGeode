@@ -24,6 +24,7 @@
 #pragma once
 
 #include <bitsery/bitsery.h>
+#include <bitsery/brief_syntax.h>
 
 namespace geode
 {
@@ -51,6 +52,11 @@ namespace geode
         bool operator==( const NamedType& other ) const
         {
             return value_ == other.value_;
+        }
+
+        bool operator!=( const NamedType& other ) const
+        {
+            return !( operator==( other ) );
         }
 
     private:
