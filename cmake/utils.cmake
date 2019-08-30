@@ -31,7 +31,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}
 #------------------------------------------------------------------------------------------------
 # Platform dependent settings
 if(UNIX)
-    add_compile_options(-Wall -Wextra -Wno-attributes)
+    add_compile_options(-Wall -Wextra -Wpedantic -Wno-attributes)
 else()
     add_compile_options(/DNOMINMAX /bigobj)
 endif()
