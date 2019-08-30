@@ -37,9 +37,14 @@ else()
 endif()
 
 #------------------------------------------------------------------------------------------------
-# Install configuration
+# Install configuration    
+if(APPLE)
+    set(OS_RPATH "@executable_path")
+else()
+    set(OS_RPATH "$ORIGIN")
+endif()
 set(CMAKE_MACOSX_RPATH ON)
-set(CMAKE_INSTALL_RPATH ".")
+set(CMAKE_INSTALL_RPATH "${OS_RPATH}")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
 
 if(WIN32)
@@ -135,11 +140,6 @@ macro(add_geode_executable exe_path folder_name)
     endforeach()
     
     # Add the project to a folder of projects for the tests
-    if(APPLE)
-        set(OS_RPATH "@executable_path")
-    else()
-        set(OS_RPATH "$ORIGIN")
-    endif()
     set_target_properties(${exe_name}
         PROPERTIES
             FOLDER ${folder_name}
