@@ -73,11 +73,11 @@ public:                                                                        \
 
 #define FORWARD_DECLARATION_DIMENSION_CLASS( Class )                           \
     template < index_t >                                                       \
-    class Class;
+    class Class
 
 #define FORWARD_DECLARATION_DIMENSION_STRUCT( Struct )                         \
     template < index_t >                                                       \
-    struct Struct;
+    struct Struct
 
 // To avoid unused argument warning in function definition
 template < typename T >
