@@ -52,9 +52,6 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( PolygonalSurfaceOutput );
 
-    public:
-        virtual ~PolygonalSurfaceOutput() = default;
-
     protected:
         PolygonalSurfaceOutput(
             const PolygonalSurface< dimension >& polygonal_surface,

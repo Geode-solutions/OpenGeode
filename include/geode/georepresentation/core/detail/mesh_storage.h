@@ -25,6 +25,8 @@
 
 #include <memory>
 
+#include <geode/mesh/core/mesh_type.h>
+
 namespace geode
 {
     namespace detail
@@ -32,9 +34,17 @@ namespace geode
         template < typename Mesh >
         class MeshStorage
         {
+            using CreateMesh = typename std::add_pointer< void(
+                const MeshType&, MeshStorage< Mesh >& ) >::type;
+
         public:
+            MeshStorage() = default;
+
+            MeshStorage( CreateMesh impl ) : create_mesh{ impl } {}
+
             void set_mesh( std::unique_ptr< Mesh > mesh )
             {
+                mesh_type_ = mesh->type_name();
                 mesh_ = std::move( mesh );
             }
 
@@ -48,8 +58,24 @@ namespace geode
                 return *mesh_;
             }
 
+            void ensure_mesh_type()
+            {
+                if( !mesh_ || mesh_->type_name() != mesh_type_ )
+                {
+                    create_mesh( mesh_type_, *this );
+                }
+            }
+
+            template < typename Archive >
+            void serialize( Archive& archive )
+            {
+                archive.object( mesh_type_ );
+            }
+
         private:
             std::unique_ptr< Mesh > mesh_;
+            MeshType mesh_type_{ "" };
+            CreateMesh create_mesh;
         };
     } // namespace detail
 } // namespace geode

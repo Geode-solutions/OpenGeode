@@ -49,9 +49,6 @@ namespace geode
 
     class opengeode_georepresentation_api BRepInput : public Input
     {
-    public:
-        virtual ~BRepInput() = default;
-
     protected:
         BRepInput( BRep& brep, std::string filename );
 

@@ -1,5 +1,9 @@
 # Upgrade Guide
 
+## Upgrading from OpenGeode v1.x.x to v2.0.0
+
+TBD...
+
 ## Upgrading from OpenGeode v0.x.x to v1.0.0
 
 #### Breaking Changes

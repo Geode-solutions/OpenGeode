@@ -26,46 +26,45 @@
 #include <geode/basic/uuid.h>
 #include <geode/basic/zip_file.h>
 
-#include <geode/georepresentation/core/boundary_representation.h>
-#include <geode/georepresentation/io/boundary_representation_output.h>
+#include <geode/georepresentation/core/section.h>
+#include <geode/georepresentation/io/section_output.h>
 
 namespace geode
 {
-    class opengeode_georepresentation_api OpenGeodeBRepOutput final
-        : public BRepOutput
+    class opengeode_georepresentation_api OpenGeodeSectionOutput final
+        : public SectionOutput
     {
     public:
-        OpenGeodeBRepOutput( const BRep& brep, std::string filename )
-            : BRepOutput( brep, std::move( filename ) )
+        OpenGeodeSectionOutput( const Section& section, std::string filename )
+            : SectionOutput( section, std::move( filename ) )
         {
         }
 
         static std::string extension()
         {
-            return BRep::native_extension_static();
+            return Section::native_extension_static();
         }
 
-        void archive_brep_files( const ZipFile& zip_writer ) const
+        void archive_section_files( const ZipFile& zip_writer ) const
         {
-            zip_writer.archive_file( brep().relationships().save_relationships(
-                zip_writer.directory() ) );
             zip_writer.archive_file(
-                brep().unique_vertices().save_unique_vertices(
+                section().relationships().save_relationships(
+                    zip_writer.directory() ) );
+            zip_writer.archive_file(
+                section().unique_vertices().save_unique_vertices(
                     zip_writer.directory() ) );
             zip_writer.archive_files(
-                brep().save_corners( zip_writer.directory() ) );
+                section().save_corners( zip_writer.directory() ) );
             zip_writer.archive_files(
-                brep().save_lines( zip_writer.directory() ) );
+                section().save_lines( zip_writer.directory() ) );
             zip_writer.archive_files(
-                brep().save_surfaces( zip_writer.directory() ) );
-            zip_writer.archive_files(
-                brep().save_blocks( zip_writer.directory() ) );
+                section().save_surfaces( zip_writer.directory() ) );
         }
 
         void write() const final
         {
             ZipFile zip_writer{ filename(), uuid{}.string() };
-            archive_brep_files( zip_writer );
+            archive_section_files( zip_writer );
         }
     };
 } // namespace geode

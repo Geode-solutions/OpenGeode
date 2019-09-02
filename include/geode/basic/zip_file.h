@@ -23,32 +23,42 @@
 
 #pragma once
 
-#include <string>
-#include <utility>
+#include <geode/basic/common.h>
 
-#include <bitsery/brief_syntax/string.h>
-
-#include <geode/basic/named_type.h>
+#include <geode/basic/pimpl.h>
 
 namespace geode
 {
-    struct MeshTag
+    class opengeode_basic_api ZipFile
     {
-    };
-    /*!
-     * Strong type for a mesh data structure
-     */
-    using MeshType = NamedType< std::string, MeshTag >;
-} // namespace geode
+    public:
+        ZipFile(
+            const std::string& file, const std::string& archive_temp_filename );
+        ~ZipFile();
 
-namespace std
-{
-    template <>
-    struct hash< geode::MeshType >
-    {
-        std::size_t operator()( const geode::MeshType& f ) const
-        {
-            return std::hash< std::string >{}( f.get() );
-        }
+        void archive_files( const std::vector< std::string >& files ) const;
+
+        void archive_file( const std::string& file ) const;
+
+        std::string directory() const;
+
+    private:
+        IMPLEMENTATION_MEMBER( impl_ );
     };
-} // namespace std
+
+    class opengeode_basic_api UnzipFile
+    {
+    public:
+        UnzipFile(
+            const std::string& file, std::string unarchive_temp_filename );
+        ~UnzipFile();
+
+        void extract_all() const;
+
+        std::string directory() const;
+
+    private:
+        IMPLEMENTATION_MEMBER( impl_ );
+    };
+
+} // namespace geode

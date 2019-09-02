@@ -44,7 +44,7 @@ OpenGeode comes with a CMake configuration file. You can modified two items:
 * `CMAKE_BUILD_TYPE`: choose build configuration (Release, Debug). By default Release.
 * `OPENGEODE_WITH_TESTS`: switch on/off the OpenGeode test environment
 
-Your version of CMake should be at least 3.5.
+Your version of CMake should be at least 3.7.2.
 
 ## Compiler
 

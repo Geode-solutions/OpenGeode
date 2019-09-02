@@ -108,6 +108,7 @@ namespace geode
         impl_->load_components( directory + "/surfaces" );
         for( auto& surface : modifiable_surfaces() )
         {
+            surface.ensure_mesh_type();
             auto& mesh = surface.modifiable_mesh();
             auto file = directory + "/" + surface.component_type().get()
                         + surface.id().string() + "." + mesh.native_extension();

@@ -32,31 +32,30 @@
 
 namespace geode
 {
-    ALIAS_3D( Block );
-    ALIAS_3D( Corner );
-    ALIAS_3D( Line );
-    ALIAS_3D( Surface );
+    ALIAS_2D( Corner );
+    ALIAS_2D( Line );
+    ALIAS_2D( Surface );
 } // namespace geode
 
 namespace geode
 {
     /*!
-     * A Boundary Representation is a GeoRepresentation composed of
-     * Corners, Lines, Surfaces and Blocks.
+     * A Section is a 2D GeoRepresentation composed of
+     * Corners, Lines, and Surfaces.
      * This class provides classes for range-based iteration on Component
      * boundaries and incidences.
      */
-    class opengeode_georepresentation_api BRep
-        : public GeoRepresentation< 3, Corners, Lines, Surfaces, Blocks >
+    class opengeode_georepresentation_api Section
+        : public GeoRepresentation< 2, Corners, Lines, Surfaces >
     {
     public:
         class opengeode_georepresentation_api LineBoundaryRange
             : public RelationshipManager::BoundaryRange
         {
         public:
-            LineBoundaryRange( const BRep& brep,
+            LineBoundaryRange( const Section& section,
                 const RelationshipManager& manager,
-                const Line3D& line );
+                const Line2D& line );
 
             const LineBoundaryRange& begin() const
             {
@@ -68,19 +67,19 @@ namespace geode
                 return *this;
             }
 
-            const Corner3D& operator*() const;
+            const Corner2D& operator*() const;
 
         private:
-            const BRep& brep_;
+            const Section& section_;
         };
 
         class opengeode_georepresentation_api SurfaceBoundaryRange
             : public RelationshipManager::BoundaryRange
         {
         public:
-            SurfaceBoundaryRange( const BRep& brep,
+            SurfaceBoundaryRange( const Section& section,
                 const RelationshipManager& manager,
-                const Surface3D& surface );
+                const Surface2D& surface );
 
             const SurfaceBoundaryRange& begin() const
             {
@@ -92,34 +91,10 @@ namespace geode
                 return *this;
             }
 
-            const Line3D& operator*() const;
+            const Line2D& operator*() const;
 
         private:
-            const BRep& brep_;
-        };
-
-        class opengeode_georepresentation_api BlockBoundaryRange
-            : public RelationshipManager::BoundaryRange
-        {
-        public:
-            BlockBoundaryRange( const BRep& brep,
-                const RelationshipManager& manager,
-                const Block3D& block );
-
-            const BlockBoundaryRange& begin() const
-            {
-                return *this;
-            }
-
-            const BlockBoundaryRange& end() const
-            {
-                return *this;
-            }
-
-            const Surface3D& operator*() const;
-
-        private:
-            const BRep& brep_;
+            const Section& section_;
         };
 
     public:
@@ -127,9 +102,9 @@ namespace geode
             : public RelationshipManager::IncidenceRange
         {
         public:
-            CornerIncidenceRange( const BRep& brep,
+            CornerIncidenceRange( const Section& section,
                 const RelationshipManager& manager,
-                const Corner3D& corner );
+                const Corner2D& corner );
 
             const CornerIncidenceRange& begin() const
             {
@@ -141,19 +116,19 @@ namespace geode
                 return *this;
             }
 
-            const Line3D& operator*() const;
+            const Line2D& operator*() const;
 
         private:
-            const BRep& brep_;
+            const Section& section_;
         };
 
         class opengeode_georepresentation_api LineIncidenceRange
             : public RelationshipManager::IncidenceRange
         {
         public:
-            LineIncidenceRange( const BRep& brep,
+            LineIncidenceRange( const Section& section,
                 const RelationshipManager& manager,
-                const Line3D& line );
+                const Line2D& line );
 
             const LineIncidenceRange& begin() const
             {
@@ -165,52 +140,24 @@ namespace geode
                 return *this;
             }
 
-            const Surface3D& operator*() const;
+            const Surface2D& operator*() const;
 
         private:
-            const BRep& brep_;
-        };
-
-        class opengeode_georepresentation_api SurfaceIncidenceRange
-            : public RelationshipManager::IncidenceRange
-        {
-        public:
-            SurfaceIncidenceRange( const BRep& brep,
-                const RelationshipManager& manager,
-                const Surface3D& surface );
-
-            const SurfaceIncidenceRange& begin() const
-            {
-                return *this;
-            }
-
-            const SurfaceIncidenceRange& end() const
-            {
-                return *this;
-            }
-
-            const Block3D& operator*() const;
-
-        private:
-            const BRep& brep_;
+            const Section& section_;
         };
 
     public:
-        LineBoundaryRange boundaries( const Line3D& line ) const;
+        LineBoundaryRange boundaries( const Line2D& line ) const;
 
-        SurfaceBoundaryRange boundaries( const Surface3D& surface ) const;
+        SurfaceBoundaryRange boundaries( const Surface2D& surface ) const;
 
-        BlockBoundaryRange boundaries( const Block3D& block ) const;
+        CornerIncidenceRange incidences( const Corner2D& corner ) const;
 
-        CornerIncidenceRange incidences( const Corner3D& corner ) const;
-
-        LineIncidenceRange incidences( const Line3D& line ) const;
-
-        SurfaceIncidenceRange incidences( const Surface3D& surface ) const;
+        LineIncidenceRange incidences( const Line2D& line ) const;
 
         static std::string native_extension_static()
         {
-            return "og_brep";
+            return "og_sctn";
         }
 
         std::string native_extension() const

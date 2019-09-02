@@ -459,10 +459,33 @@ namespace geode
     Vector3D PolygonalSurface< 3 >::polygon_normal( index_t polygon_id ) const
     {
         check_polygon_id( *this, polygon_id );
-        const auto& p1 = this->point( polygon_vertex( { polygon_id, 0 } ) );
-        const auto& p2 = this->point( polygon_vertex( { polygon_id, 1 } ) );
-        const auto& p3 = this->point( polygon_vertex( { polygon_id, 2 } ) );
-        return Vector3D{ p1, p2 }.cross( { p1, p3 } ).normalize();
+        auto barycenter = polygon_barycenter( polygon_id );
+        Vector3D normal;
+        for( index_t v = 1; v < nb_polygon_vertices( polygon_id ); v++ )
+        {
+            const auto& p1 =
+                this->point( polygon_vertex( { polygon_id, v - 1 } ) );
+            const auto& p2 = this->point( polygon_vertex( { polygon_id, v } ) );
+            normal =
+                normal + Vector3D{ p1, barycenter }.cross( { p2, barycenter } );
+        }
+        const auto& p1 = this->point( polygon_vertex(
+            { polygon_id, nb_polygon_vertices( polygon_id ) - 1 } ) );
+        const auto& p2 = this->point( polygon_vertex( { polygon_id, 0 } ) );
+        normal =
+            normal + Vector3D{ p1, barycenter }.cross( { p2, barycenter } );
+        return normal.normalize();
+    }
+
+    Vector3D PolygonalSurface< 3 >::polygon_vertex_normal(
+        index_t vertex_id ) const
+    {
+        Vector3D normal;
+        for( const auto& polygon : polygons_around_vertex( vertex_id ) )
+        {
+            normal = normal + polygon_normal( polygon.polygon_id );
+        }
+        return normal.normalize();
     }
 
     template < index_t dimension >

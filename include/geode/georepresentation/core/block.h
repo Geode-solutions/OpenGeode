@@ -79,6 +79,9 @@ namespace geode
         friend class BlocksBuilder< dimension >;
         PolyhedralSolid< dimension >& modifiable_mesh();
 
+        friend class BlocksBuilder< dimension >;
+        void ensure_mesh_type();
+
         friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive );

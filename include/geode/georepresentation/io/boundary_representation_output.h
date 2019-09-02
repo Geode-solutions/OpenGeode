@@ -47,9 +47,6 @@ namespace geode
 
     class opengeode_georepresentation_api BRepOutput : public Output
     {
-    public:
-        virtual ~BRepOutput() = default;
-
     protected:
         BRepOutput( const BRep& brep, std::string filename );
 

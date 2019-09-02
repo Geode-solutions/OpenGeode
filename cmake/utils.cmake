@@ -31,15 +31,20 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}
 #------------------------------------------------------------------------------------------------
 # Platform dependent settings
 if(UNIX)
-    add_compile_options(-Wall -Wextra)
+    add_compile_options(-Wall -Wextra -Wpedantic -Wno-attributes)
 else()
     add_compile_options(/DNOMINMAX /bigobj)
 endif()
 
 #------------------------------------------------------------------------------------------------
-# Install configuration
+# Install configuration    
+if(APPLE)
+    set(OS_RPATH "@executable_path")
+else()
+    set(OS_RPATH "$ORIGIN")
+endif()
 set(CMAKE_MACOSX_RPATH ON)
-set(CMAKE_INSTALL_RPATH ".")
+set(CMAKE_INSTALL_RPATH "${OS_RPATH}")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
 
 if(WIN32)
@@ -73,7 +78,7 @@ function(add_geode_library folder_path)
     set(all_sources
         "${sources}"
         "${public_headers}"
-        "${private_headers}"
+        "${advanced_headers}"
     )
     target_sources(${target_name} PRIVATE "${all_sources}")
     set_target_properties(${target_name}
@@ -86,7 +91,7 @@ function(add_geode_library folder_path)
     )
     # TODO: Use TREE keyword when we change to cmake 3.8
     source_group("Public Header Files" FILES ${public_headers})
-    source_group("Private Header Files" FILES ${private_headers})
+    source_group("Advanced Header Files" FILES ${advanced_headers})
     source_group("Source Files" FILES ${sources})
     target_include_directories(${target_name}
         PUBLIC
@@ -135,11 +140,6 @@ macro(add_geode_executable exe_path folder_name)
     endforeach()
     
     # Add the project to a folder of projects for the tests
-    if(APPLE)
-        set(OS_RPATH "@executable_path")
-    else()
-        set(OS_RPATH "$ORIGIN")
-    endif()
     set_target_properties(${exe_name}
         PROPERTIES
             FOLDER ${folder_name}

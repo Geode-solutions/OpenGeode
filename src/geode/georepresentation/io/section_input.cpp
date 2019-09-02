@@ -21,34 +21,30 @@
  *
  */
 
-#pragma once
+#include <geode/georepresentation/io/section_input.h>
 
-#include <string>
-#include <utility>
-
-#include <bitsery/brief_syntax/string.h>
-
-#include <geode/basic/named_type.h>
+#include <geode/georepresentation/core/section.h>
 
 namespace geode
 {
-    struct MeshTag
+    void load_section( Section& section, const std::string& filename )
     {
-    };
-    /*!
-     * Strong type for a mesh data structure
-     */
-    using MeshType = NamedType< std::string, MeshTag >;
-} // namespace geode
-
-namespace std
-{
-    template <>
-    struct hash< geode::MeshType >
-    {
-        std::size_t operator()( const geode::MeshType& f ) const
+        try
         {
-            return std::hash< std::string >{}( f.get() );
+            auto input = SectionInputFactory::create(
+                extension_from_filename( filename ), section, filename );
+            input->read();
         }
-    };
-} // namespace std
+        catch( const OpenGeodeException& e )
+        {
+            Logger::error( e.what() );
+            throw OpenGeodeException(
+                "Cannot load Section from file: ", filename );
+        }
+    }
+
+    SectionInput::SectionInput( Section& section, std::string filename )
+        : Input( std::move( filename ) ), section_( section )
+    {
+    }
+} // namespace geode

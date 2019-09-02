@@ -52,9 +52,6 @@ namespace geode
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
         OPENGEODE_DISABLE_COPY_AND_MOVE( PolyhedralSolidOutput );
 
-    public:
-        virtual ~PolyhedralSolidOutput() = default;
-
     protected:
         PolyhedralSolidOutput(
             const PolyhedralSolid< dimension >& polyhedral_solid,

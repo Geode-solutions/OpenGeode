@@ -78,6 +78,9 @@ namespace geode
         friend class LinesBuilder< dimension >;
         EdgedCurve< dimension >& modifiable_mesh();
 
+        friend class LinesBuilder< dimension >;
+        void ensure_mesh_type();
+
         friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive );

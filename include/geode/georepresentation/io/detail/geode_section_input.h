@@ -26,54 +26,49 @@
 #include <geode/basic/uuid.h>
 #include <geode/basic/zip_file.h>
 
-#include <geode/georepresentation/core/boundary_representation.h>
-#include <geode/georepresentation/io/boundary_representation_input.h>
+#include <geode/georepresentation/core/section.h>
+#include <geode/georepresentation/io/section_input.h>
 
 namespace geode
 {
-    class opengeode_georepresentation_api OpenGeodeBRepInput final
-        : public BRepInput
+    class opengeode_georepresentation_api OpenGeodeSectionInput final
+        : public SectionInput
     {
     public:
-        OpenGeodeBRepInput( BRep& brep, std::string filename )
-            : BRepInput( brep, std::move( filename ) )
+        OpenGeodeSectionInput( Section& section, std::string filename )
+            : SectionInput( section, std::move( filename ) )
         {
         }
 
         static std::string extension()
         {
-            return BRep::native_extension_static();
+            return Section::native_extension_static();
         }
 
         void read() final
         {
-            BRepBuilder builder( brep() );
+            SectionBuilder builder( section() );
             UnzipFile zip_reader{ filename(), uuid{}.string() };
             zip_reader.extract_all();
 
             builder.load_corners( zip_reader.directory() );
             builder.load_lines( zip_reader.directory() );
             builder.load_surfaces( zip_reader.directory() );
-            builder.load_blocks( zip_reader.directory() );
             builder.load_relationships( zip_reader.directory() );
             builder.unique_vertices().load_unique_vertices(
                 zip_reader.directory() );
 
-            for( const auto& corner : brep().corners() )
+            for( const auto& corner : section().corners() )
             {
                 builder.unique_vertices().register_component( corner );
             }
-            for( const auto& line : brep().lines() )
+            for( const auto& line : section().lines() )
             {
                 builder.unique_vertices().register_component( line );
             }
-            for( const auto& surface : brep().surfaces() )
+            for( const auto& surface : section().surfaces() )
             {
                 builder.unique_vertices().register_component( surface );
-            }
-            for( const auto& block : brep().blocks() )
-            {
-                builder.unique_vertices().register_component( block );
             }
         }
     };

@@ -23,32 +23,44 @@
 
 #pragma once
 
-#include <string>
-#include <utility>
+#include <geode/basic/factory.h>
 
-#include <bitsery/brief_syntax/string.h>
+#include <geode/georepresentation/builder/section_builder.h>
+#include <geode/georepresentation/common.h>
 
-#include <geode/basic/named_type.h>
+#include <geode/mesh/io/vertex_set_input.h>
 
 namespace geode
 {
-    struct MeshTag
-    {
-    };
-    /*!
-     * Strong type for a mesh data structure
-     */
-    using MeshType = NamedType< std::string, MeshTag >;
+    class Section;
+    class SectionBuilder;
 } // namespace geode
 
-namespace std
+namespace geode
 {
-    template <>
-    struct hash< geode::MeshType >
+    /*!
+     * API function for loading a Section.
+     * The adequate loader is called depending on the filename extension.
+     * @param[out] section Loaded Section.
+     * @param[in] filename Path to the file to load.
+     */
+    void opengeode_georepresentation_api load_section(
+        Section& section, const std::string& filename );
+
+    class opengeode_georepresentation_api SectionInput : public Input
     {
-        std::size_t operator()( const geode::MeshType& f ) const
+    protected:
+        SectionInput( Section& section, std::string filename );
+
+        Section& section()
         {
-            return std::hash< std::string >{}( f.get() );
+            return section_;
         }
+
+    private:
+        Section& section_;
     };
-} // namespace std
+
+    using SectionInputFactory =
+        Factory< std::string, SectionInput, Section&, std::string >;
+} // namespace geode

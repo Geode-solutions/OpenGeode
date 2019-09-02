@@ -7,6 +7,7 @@ set(sources
     "${lib_source_dir}/nn_search.cpp"
     "${lib_source_dir}/singleton.cpp"
     "${lib_source_dir}/uuid.cpp"
+    "${lib_source_dir}/zip_file.cpp"
 )
 set(public_headers
     "${lib_include_dir}/algorithm.h"
@@ -28,6 +29,7 @@ set(public_headers
     "${lib_include_dir}/types.h"
     "${lib_include_dir}/uuid.h"
     "${lib_include_dir}/vector.h"
+    "${lib_include_dir}/zip_file.h"
 )
 target_link_libraries(${target_name}
     PUBLIC
@@ -37,4 +39,12 @@ target_link_libraries(${target_name}
         Async++
         spdlog::spdlog_header_only
         nanoflann::nanoflann
+        ghcFilesystem::ghc_filesystem
+        MINIZIP::minizip
 )
+if(WIN32)
+    set_target_properties(${target_name}
+        PROPERTIES
+            LINK_FLAGS_DEBUG "/NODEFAULTLIB:MSVCRTD"
+    )
+endif()

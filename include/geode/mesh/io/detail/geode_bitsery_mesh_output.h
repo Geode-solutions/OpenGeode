@@ -75,4 +75,4 @@
                                                                                \
     private:                                                                   \
         const OpenGeode##Mesh& mesh_;                                          \
-    };
+    }

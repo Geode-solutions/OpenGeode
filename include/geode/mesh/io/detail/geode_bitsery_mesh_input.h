@@ -76,4 +76,4 @@
                                                                                \
     private:                                                                   \
         OpenGeode##Mesh& mesh_;                                                \
-    };
+    }

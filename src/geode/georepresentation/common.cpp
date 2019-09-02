@@ -25,6 +25,8 @@
 
 #include <geode/georepresentation/io/detail/geode_boundary_representation_input.h>
 #include <geode/georepresentation/io/detail/geode_boundary_representation_output.h>
+#include <geode/georepresentation/io/detail/geode_section_input.h>
+#include <geode/georepresentation/io/detail/geode_section_output.h>
 
 namespace
 {
@@ -34,6 +36,13 @@ namespace
             geode::OpenGeodeBRepOutput::extension() );
     }
 
+    void register_section_input()
+    {
+        geode::SectionInputFactory::register_creator<
+            geode::OpenGeodeSectionInput >(
+            geode::OpenGeodeSectionOutput::extension() );
+    }
+
     void register_brep_output()
     {
         geode::BRepOutputFactory::register_creator<
@@ -41,9 +50,18 @@ namespace
             geode::OpenGeodeBRepOutput::extension() );
     }
 
+    void register_section_output()
+    {
+        geode::SectionOutputFactory::register_creator<
+            geode::OpenGeodeSectionOutput >(
+            geode::OpenGeodeSectionOutput::extension() );
+    }
+
     OPENGEODE_LIBRARY_INITIALIZE( OpenGeode_georepresentation )
     {
         register_brep_input();
+        register_section_input();
         register_brep_output();
+        register_section_output();
     }
 } // namespace

@@ -23,32 +23,42 @@
 
 #pragma once
 
-#include <string>
-#include <utility>
+#include <geode/basic/factory.h>
 
-#include <bitsery/brief_syntax/string.h>
+#include <geode/georepresentation/common.h>
 
-#include <geode/basic/named_type.h>
+#include <geode/mesh/io/output.h>
 
 namespace geode
 {
-    struct MeshTag
-    {
-    };
-    /*!
-     * Strong type for a mesh data structure
-     */
-    using MeshType = NamedType< std::string, MeshTag >;
+    class Section;
 } // namespace geode
 
-namespace std
+namespace geode
 {
-    template <>
-    struct hash< geode::MeshType >
+    /*!
+     * API function for saving a Section.
+     * The adequate saver is called depending on the given filename extension.
+     * @param[in] section Section to save.
+     * @param[in] filename Path to the file where save the section.
+     */
+    void opengeode_georepresentation_api save_section(
+        const Section& section, const std::string& filename );
+
+    class opengeode_georepresentation_api SectionOutput : public Output
     {
-        std::size_t operator()( const geode::MeshType& f ) const
+    protected:
+        SectionOutput( const Section& section, std::string filename );
+
+        const Section& section() const
         {
-            return std::hash< std::string >{}( f.get() );
+            return section_;
         }
+
+    private:
+        const Section& section_;
     };
-} // namespace std
+
+    using SectionOutputFactory =
+        Factory< std::string, SectionOutput, const Section&, std::string >;
+} // namespace geode

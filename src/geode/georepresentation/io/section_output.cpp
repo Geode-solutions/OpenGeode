@@ -21,34 +21,31 @@
  *
  */
 
-#pragma once
+#include <geode/georepresentation/io/section_output.h>
 
-#include <string>
-#include <utility>
-
-#include <bitsery/brief_syntax/string.h>
-
-#include <geode/basic/named_type.h>
+#include <geode/georepresentation/core/section.h>
 
 namespace geode
 {
-    struct MeshTag
+    void save_section( const Section& section, const std::string& filename )
     {
-    };
-    /*!
-     * Strong type for a mesh data structure
-     */
-    using MeshType = NamedType< std::string, MeshTag >;
-} // namespace geode
-
-namespace std
-{
-    template <>
-    struct hash< geode::MeshType >
-    {
-        std::size_t operator()( const geode::MeshType& f ) const
+        try
         {
-            return std::hash< std::string >{}( f.get() );
+            auto output = SectionOutputFactory::create(
+                extension_from_filename( filename ), section,
+                filename.c_str() );
+            output->write();
         }
-    };
-} // namespace std
+        catch( const OpenGeodeException& e )
+        {
+            Logger::error( e.what() );
+            throw OpenGeodeException(
+                "Cannot save Section in file: ", filename );
+        }
+    }
+
+    SectionOutput::SectionOutput( const Section& section, std::string filename )
+        : Output( std::move( filename ) ), section_( section )
+    {
+    }
+} // namespace geode
