@@ -105,14 +105,14 @@ namespace geode
             return uuids_->value( graph_.edge_vertex( edge_vertex ) );
         }
 
-        void add_entity( const uuid& id )
+        void add_component( const uuid& id )
         {
             auto index = OpenGeodeGraphBuilder{ graph_ }.create_vertex();
             uuid2index_.set_new_mapping( id, index );
             uuids_->value( index ) = id;
         }
 
-        void remove_entity( const uuid& id )
+        void remove_component( const uuid& id )
         {
             auto index = vertex_id( id );
             std::vector< bool > to_delete( graph_.nb_vertices(), false );
@@ -218,12 +218,12 @@ namespace geode
 
     void RelationshipManager::add_component( const uuid& id )
     {
-        impl_->add_entity( id );
+        impl_->add_component( id );
     }
 
     void RelationshipManager::remove_component( const uuid& id )
     {
-        impl_->remove_entity( id );
+        impl_->remove_component( id );
     }
 
     index_t RelationshipManager::nb_boundaries( const uuid& id ) const
