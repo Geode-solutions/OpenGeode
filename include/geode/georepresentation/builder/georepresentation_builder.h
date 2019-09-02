@@ -34,8 +34,8 @@ namespace geode
      * It gives a modifiable access to the VertexIdentifier
      */
     template < index_t dimension,
-        template < index_t > class... EntityBuilderList >
-    class GeoRepresentationBuilder : public EntityBuilderList< dimension >...
+        template < index_t > class... ComponentBuilderList >
+    class GeoRepresentationBuilder : public ComponentBuilderList< dimension >...
     {
     public:
         void load_relationships( const std::string& directory )
@@ -49,10 +49,11 @@ namespace geode
         }
 
     protected:
-        template < template < index_t > class... EntityList >
+        template < template < index_t > class... ComponentList >
         GeoRepresentationBuilder(
-            GeoRepresentation< dimension, EntityList... >& georepresentation )
-            : EntityBuilderList< dimension >( georepresentation )...,
+            GeoRepresentation< dimension, ComponentList... >&
+                georepresentation )
+            : ComponentBuilderList< dimension >( georepresentation )...,
               relationships_( georepresentation.relationships_ ),
               unique_vertices_( georepresentation.unique_vertices_ )
         {
