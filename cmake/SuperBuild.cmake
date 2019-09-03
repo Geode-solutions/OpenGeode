@@ -49,21 +49,3 @@ include(${PROJECT_SOURCE_DIR}/cmake/ConfigureMinizip.cmake)
 include(${PROJECT_SOURCE_DIR}/cmake/ConfigureNanoflann.cmake)
 include(${PROJECT_SOURCE_DIR}/cmake/ConfigureSpdlog.cmake)
 include(${PROJECT_SOURCE_DIR}/cmake/ConfigureOpenGeode.cmake)
-
-find_package(Doxygen QUIET)
-if(DOXYGEN_FOUND)
-    # set input and output files
-    set(DOXYGEN_IN ${PROJECT_SOURCE_DIR}/cmake/Doxyfile.in)
-    set(DOXYGEN_OUT ${PROJECT_BINARY_DIR}/Doxyfile)
-
-    # request to configure the file
-    configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
-    message(STATUS "Configuring Doxygen target")
-
-    # note the option ALL which allows to build the docs together with the application
-    add_custom_target(doc
-        COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
-        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
-        COMMENT "Generating API documentation with Doxygen"
-        VERBATIM )
-endif(DOXYGEN_FOUND)
