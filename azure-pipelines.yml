@@ -117,3 +117,4 @@ jobs:
     dependencies: 
       - Semantic_release
     repo: "OpenGeode"
+    path: "opengeode"
