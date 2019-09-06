@@ -93,8 +93,6 @@ namespace geode
     template class opengeode_model_api Component< 2 >;
     template class opengeode_model_api Component< 3 >;
 
-    SERIALIZE_BITSERY_ARCHIVE(
-        opengeode_model_api, Component< 2 > );
-    SERIALIZE_BITSERY_ARCHIVE(
-        opengeode_model_api, Component< 3 > );
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_model_api, Component< 2 > );
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_model_api, Component< 3 > );
 } // namespace geode

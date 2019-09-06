@@ -74,8 +74,7 @@ namespace geode
         /*!
          * Class for range-based iteration on unmodifiable Corners
          */
-        class opengeode_model_api CornerRange
-            : public CornerRangeBase
+        class opengeode_model_api CornerRange : public CornerRangeBase
         {
         public:
             CornerRange( const Corners& corners );

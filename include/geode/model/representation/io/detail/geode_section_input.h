@@ -31,8 +31,7 @@
 
 namespace geode
 {
-    class opengeode_model_api OpenGeodeSectionInput final
-        : public SectionInput
+    class opengeode_model_api OpenGeodeSectionInput final : public SectionInput
     {
     public:
         OpenGeodeSectionInput( Section& section, std::string filename )

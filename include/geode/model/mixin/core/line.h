@@ -27,8 +27,8 @@
 
 #include <geode/model/common.h>
 
-#include <geode/model/mixin/core/component.h>
 #include <geode/mesh/core/mesh_type.h>
+#include <geode/model/mixin/core/component.h>
 
 namespace geode
 {

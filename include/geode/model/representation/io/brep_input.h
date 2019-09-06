@@ -25,8 +25,8 @@
 
 #include <geode/basic/factory.h>
 
-#include <geode/model/representation/builder/brep_builder.h>
 #include <geode/model/common.h>
+#include <geode/model/representation/builder/brep_builder.h>
 
 #include <geode/mesh/io/vertex_set_input.h>
 
