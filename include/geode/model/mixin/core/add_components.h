@@ -33,12 +33,10 @@
 namespace geode
 {
     /*!
-     * This abstract class represents an assembly of geometric components.
-     * The geometric component types composing the GeoRepresentation
-     * are flexible.
+     * This mixin represents an assembly of geometric components.
+     * The geometric component types are flexible.
      * Syntax for create a derivated class is
-     * class DerivateClass : public GeoRepresentation<
-     *	dimension, ComponentClassA, ComponentClassB, ComponentClassC >
+     * class DerivateClass : public AddComponents< dimension, ComponentClassA, ComponentClassB, ComponentClassC >, public OtherOptionalMixins
      */
     template < index_t dimension, template < index_t > class... Components >
     class AddComponents : public Components< dimension >...
