@@ -27,9 +27,9 @@
 #include <geode/model/mixin/core/add_components.h>
 #include <geode/model/mixin/core/blocks.h>
 #include <geode/model/mixin/core/corners.h>
-#include <geode/model/mixin/core/georepresentation.h>
 #include <geode/model/mixin/core/lines.h>
 #include <geode/model/mixin/core/surfaces.h>
+#include <geode/model/mixin/core/topology.h>
 
 namespace geode
 {
@@ -41,13 +41,13 @@ namespace geode
 namespace geode
 {
     /*!
-     * A Section is a 2D GeoRepresentation composed of
+     * A Section is a 2D model composed of
      * Corners, Lines, and Surfaces.
      * This class provides classes for range-based iteration on Component
      * boundaries and incidences.
      */
     class opengeode_model_api Section
-        : public GeoRepresentation,
+        : public Topology,
           public AddComponents< 2, Corners, Lines, Surfaces >
     {
     public:
@@ -56,7 +56,6 @@ namespace geode
         {
         public:
             LineBoundaryRange( const Section& section,
-                const Relationships& manager,
                 const Line2D& line );
 
             const LineBoundaryRange& begin() const
@@ -80,7 +79,6 @@ namespace geode
         {
         public:
             SurfaceBoundaryRange( const Section& section,
-                const Relationships& manager,
                 const Surface2D& surface );
 
             const SurfaceBoundaryRange& begin() const
@@ -105,7 +103,6 @@ namespace geode
         {
         public:
             CornerIncidenceRange( const Section& section,
-                const Relationships& manager,
                 const Corner2D& corner );
 
             const CornerIncidenceRange& begin() const
@@ -129,7 +126,6 @@ namespace geode
         {
         public:
             LineIncidenceRange( const Section& section,
-                const Relationships& manager,
                 const Line2D& line );
 
             const LineIncidenceRange& begin() const

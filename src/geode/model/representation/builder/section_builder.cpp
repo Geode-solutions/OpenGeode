@@ -32,7 +32,7 @@
 namespace geode
 {
     SectionBuilder::SectionBuilder( Section& section )
-        : GeoRepresentationBuilder( section ),
+        : TopologyBuilder( section ),
           AddComponentsBuilders< 2, Corners, Lines, Surfaces >( section ),
           section_( section )
     {
@@ -41,82 +41,82 @@ namespace geode
     const uuid& SectionBuilder::add_corner()
     {
         const auto& id = create_corner();
-        relationships().register_component( id );
-        unique_vertices().register_mesh_component( section_.corner( id ) );
+        register_component( id );
+        register_mesh_component( section_.corner( id ) );
         return id;
     }
 
-    const uuid& SectionBuilder::add_corner( const MeshType& type )
+const uuid& SectionBuilder::add_corner( const MeshType& type )
     {
         const auto& id = create_corner( type );
-        relationships().register_component( id );
-        unique_vertices().register_mesh_component( section_.corner( id ) );
+        register_component( id );
+        register_mesh_component( section_.corner( id ) );
         return id;
     }
 
     const uuid& SectionBuilder::add_line()
     {
         const auto& id = create_line();
-        relationships().register_component( id );
-        unique_vertices().register_mesh_component( section_.line( id ) );
+        register_component( id );
+        register_mesh_component( section_.line( id ) );
         return id;
     }
 
     const uuid& SectionBuilder::add_line( const MeshType& type )
     {
         const auto& id = create_line( type );
-        relationships().register_component( id );
-        unique_vertices().register_mesh_component( section_.line( id ) );
+        register_component( id );
+        register_mesh_component( section_.line( id ) );
         return id;
     }
 
     const uuid& SectionBuilder::add_surface()
     {
         const auto& id = create_surface();
-        relationships().register_component( id );
-        unique_vertices().register_mesh_component( section_.surface( id ) );
+        register_component( id );
+        register_mesh_component( section_.surface( id ) );
         return id;
     }
 
     const uuid& SectionBuilder::add_surface( const MeshType& type )
     {
         const auto& id = create_surface( type );
-        relationships().register_component( id );
-        unique_vertices().register_mesh_component( section_.surface( id ) );
+        register_component( id );
+        register_mesh_component( section_.surface( id ) );
         return id;
     }
 
     void SectionBuilder::remove_corner( const Corner2D& corner )
     {
-        relationships().unregister_component( corner.id() );
-        unique_vertices().unregister_mesh_component( corner );
+        unregister_component( corner.id() );
+        unregister_mesh_component( corner );
         delete_corner( corner );
     }
 
     void SectionBuilder::remove_line( const Line2D& line )
     {
-        relationships().unregister_component( line.id() );
-        unique_vertices().unregister_mesh_component( line );
+        unregister_component( line.id() );
+        unregister_mesh_component( line );
         delete_line( line );
     }
 
     void SectionBuilder::remove_surface( const Surface2D& surface )
     {
-        relationships().unregister_component( surface.id() );
-        unique_vertices().unregister_mesh_component( surface );
+        unregister_component( surface.id() );
+        unregister_mesh_component( surface );
         delete_surface( surface );
     }
 
-    void SectionBuilder::add_boundary_relation(
+    void SectionBuilder::add_corner_line_relationship(
         const Corner2D& corner, const Line2D& line )
     {
-        relationships().add_boundary_relation( corner.id(), line.id() );
+        add_boundary_relation( corner.id(), line.id() );
     }
 
-    void SectionBuilder::add_boundary_relation(
+    void SectionBuilder::add_line_surface_relationship(
         const Line2D& line, const Surface2D& surface )
     {
-        relationships().add_boundary_relation( line.id(), surface.id() );
+        add_boundary_relation( line.id(), surface.id() );
     }
 
 } // namespace geode

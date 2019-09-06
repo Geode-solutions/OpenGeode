@@ -32,7 +32,7 @@
 
 namespace geode
 {
-    class GeoRepresentationBuilder;
+    class TopologyBuilder;
 } // namespace geode
 
 namespace geode
@@ -45,43 +45,10 @@ namespace geode
      * class DerivateClass : public GeoRepresentation<
      *	dimension, ComponentClassA, ComponentClassB, ComponentClassC >
      */
-    class GeoRepresentation
+    class Topology : public Relationships, public VertexIdentifier
     {
-        friend class GeoRepresentationBuilder;
-
-    public:
-        const Relationships& relationships() const
-        {
-            return relationships_;
-        }
-
-        const VertexIdentifier& unique_vertices() const
-        {
-            return unique_vertices_;
-        }
-
-        double epsilon() const
-        {
-            std::call_once( is_epsilon_initialized_,
-                &GeoRepresentation::compute_epsilon, this,
-                std::ref( epsilon_ ) );
-            return epsilon_;
-        }
+        friend class TopologyBuilder;
 
     protected:
-        GeoRepresentation() = default;
-
-    private:
-        virtual void compute_epsilon( double& epsilon ) const = 0;
-
-    protected:
-        static constexpr double epsilon_scaling = 1e-7;
-
-    private:
-        Relationships relationships_;
-        VertexIdentifier unique_vertices_;
-
-        mutable std::once_flag is_epsilon_initialized_;
-        mutable double epsilon_{ 0 };
-    };
+        Topology() = default;
 } // namespace geode

@@ -27,14 +27,14 @@
 #include <geode/model/mixin/builder/add_components_builders.h>
 #include <geode/model/mixin/builder/blocks_builder.h>
 #include <geode/model/mixin/builder/corners_builder.h>
-#include <geode/model/mixin/builder/georepresentation_builder.h>
+#include <geode/model/mixin/builder/topology_builder.h>
 #include <geode/model/mixin/builder/lines_builder.h>
 #include <geode/model/mixin/builder/surfaces_builder.h>
 #include <geode/model/mixin/core/blocks.h>
 #include <geode/model/mixin/core/corners.h>
-#include <geode/model/mixin/core/georepresentation.h>
 #include <geode/model/mixin/core/lines.h>
 #include <geode/model/mixin/core/surfaces.h>
+#include <geode/model/mixin/core/topology.h>
 
 #include <geode/mesh/core/mesh_type.h>
 
@@ -56,7 +56,7 @@ namespace geode
      * Class managing modification of a BRep
      */
     class opengeode_model_api BRepBuilder
-        : public GeoRepresentationBuilder,
+        : public TopologyBuilder,
           public AddComponentsBuilders< 3, Corners, Lines, Surfaces, Blocks >
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( BRepBuilder );
@@ -88,13 +88,13 @@ namespace geode
 
         void remove_block( const Block3D& block );
 
-        void add_boundary_relation(
+        void add_corner_line_relationship(
             const Corner3D& corner, const Line3D& line );
 
-        void add_boundary_relation(
+        void add_line_surface_relationship(
             const Line3D& line, const Surface3D& surface );
 
-        void add_boundary_relation(
+        void add_surface_block_relationship(
             const Surface3D& surface, const Block3D& block );
 
     private:

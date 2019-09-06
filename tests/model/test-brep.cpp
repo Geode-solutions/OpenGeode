@@ -143,66 +143,63 @@ void add_corner_line_relation( const geode::BRep& model,
     const std::vector< geode::uuid >& corner_uuids,
     const std::vector< geode::uuid >& line_uuids )
 {
-    builder.add_boundary_relation(
+    builder.add_corner_line_relationship(
         model.corner( corner_uuids[0] ), model.line( line_uuids[0] ) );
-    builder.add_boundary_relation(
+    builder.add_corner_line_relationship(
         model.corner( corner_uuids[0] ), model.line( line_uuids[5] ) );
-    builder.add_boundary_relation(
+    builder.add_corner_line_relationship(
         model.corner( corner_uuids[0] ), model.line( line_uuids[2] ) );
-    builder.add_boundary_relation(
+    builder.add_corner_line_relationship(
         model.corner( corner_uuids[1] ), model.line( line_uuids[0] ) );
-    builder.add_boundary_relation(
+    builder.add_corner_line_relationship(
         model.corner( corner_uuids[1] ), model.line( line_uuids[1] ) );
-    builder.add_boundary_relation(
+    builder.add_corner_line_relationship(
         model.corner( corner_uuids[1] ), model.line( line_uuids[3] ) );
-    builder.add_boundary_relation(
+    builder.add_corner_line_relationship(
         model.corner( corner_uuids[2] ), model.line( line_uuids[1] ) );
-    builder.add_boundary_relation(
+    builder.add_corner_line_relationship(
         model.corner( corner_uuids[2] ), model.line( line_uuids[2] ) );
-    builder.add_boundary_relation(
+    builder.add_corner_line_relationship(
         model.corner( corner_uuids[2] ), model.line( line_uuids[4] ) );
-    builder.add_boundary_relation(
+    builder.add_corner_line_relationship(
         model.corner( corner_uuids[3] ), model.line( line_uuids[5] ) );
-    builder.add_boundary_relation(
+    builder.add_corner_line_relationship(
         model.corner( corner_uuids[3] ), model.line( line_uuids[6] ) );
-    builder.add_boundary_relation(
+    builder.add_corner_line_relationship(
         model.corner( corner_uuids[3] ), model.line( line_uuids[8] ) );
-    builder.add_boundary_relation(
+    builder.add_corner_line_relationship(
         model.corner( corner_uuids[4] ), model.line( line_uuids[3] ) );
-    builder.add_boundary_relation(
+    builder.add_corner_line_relationship(
         model.corner( corner_uuids[4] ), model.line( line_uuids[6] ) );
-    builder.add_boundary_relation(
+    builder.add_corner_line_relationship(
         model.corner( corner_uuids[4] ), model.line( line_uuids[7] ) );
-    builder.add_boundary_relation(
+    builder.add_corner_line_relationship(
         model.corner( corner_uuids[5] ), model.line( line_uuids[4] ) );
-    builder.add_boundary_relation(
+    builder.add_corner_line_relationship(
         model.corner( corner_uuids[5] ), model.line( line_uuids[7] ) );
-    builder.add_boundary_relation(
+    builder.add_corner_line_relationship(
         model.corner( corner_uuids[5] ), model.line( line_uuids[8] ) );
 
     for( const auto& corner_id : corner_uuids )
     {
         for( const auto& incidence :
-            model.relationships().incidences( corner_id ) )
+            model.incidences( model.corner( corner_id ) ) )
         {
-            OPENGEODE_EXCEPTION( geode::contain( line_uuids, incidence ),
+            OPENGEODE_EXCEPTION( geode::contain( line_uuids, incidence.id() ),
                 "All Corners incidences should be Lines" );
         }
-        OPENGEODE_EXCEPTION(
-            model.relationships().nb_incidences( corner_id ) == 3,
+        OPENGEODE_EXCEPTION( model.nb_incidences( corner_id ) == 3,
             "All Corners should be connected to 3 Lines" );
     }
 
     for( const auto& line_id : line_uuids )
     {
-        for( const auto& boundary :
-            model.relationships().boundaries( line_id ) )
+        for( const auto& boundary : model.boundaries( model.line( line_id ) ) )
         {
-            OPENGEODE_EXCEPTION( geode::contain( corner_uuids, boundary ),
+            OPENGEODE_EXCEPTION( geode::contain( corner_uuids, boundary.id() ),
                 "All Lines incidences should be Corners" );
         }
-        OPENGEODE_EXCEPTION(
-            model.relationships().nb_boundaries( line_id ) == 2,
+        OPENGEODE_EXCEPTION( model.nb_boundaries( line_id ) == 2,
             "All Lines should be connected to 2 Corners" );
     }
 }
@@ -212,53 +209,52 @@ void add_line_surface_relation( const geode::BRep& model,
     const std::vector< geode::uuid >& line_uuids,
     const std::vector< geode::uuid >& surface_uuids )
 {
-    builder.add_boundary_relation(
+    builder.add_line_surface_relationship(
         model.line( line_uuids[0] ), model.surface( surface_uuids[0] ) );
-    builder.add_boundary_relation(
+    builder.add_line_surface_relationship(
         model.line( line_uuids[0] ), model.surface( surface_uuids[1] ) );
-    builder.add_boundary_relation(
+    builder.add_line_surface_relationship(
         model.line( line_uuids[1] ), model.surface( surface_uuids[0] ) );
-    builder.add_boundary_relation(
+    builder.add_line_surface_relationship(
         model.line( line_uuids[1] ), model.surface( surface_uuids[2] ) );
-    builder.add_boundary_relation(
+    builder.add_line_surface_relationship(
         model.line( line_uuids[2] ), model.surface( surface_uuids[0] ) );
-    builder.add_boundary_relation(
+    builder.add_line_surface_relationship(
         model.line( line_uuids[2] ), model.surface( surface_uuids[3] ) );
-    builder.add_boundary_relation(
+    builder.add_line_surface_relationship(
         model.line( line_uuids[3] ), model.surface( surface_uuids[1] ) );
-    builder.add_boundary_relation(
+    builder.add_line_surface_relationship(
         model.line( line_uuids[3] ), model.surface( surface_uuids[2] ) );
-    builder.add_boundary_relation(
+    builder.add_line_surface_relationship(
         model.line( line_uuids[4] ), model.surface( surface_uuids[2] ) );
-    builder.add_boundary_relation(
+    builder.add_line_surface_relationship(
         model.line( line_uuids[4] ), model.surface( surface_uuids[3] ) );
-    builder.add_boundary_relation(
+    builder.add_line_surface_relationship(
         model.line( line_uuids[5] ), model.surface( surface_uuids[1] ) );
-    builder.add_boundary_relation(
+    builder.add_line_surface_relationship(
         model.line( line_uuids[5] ), model.surface( surface_uuids[3] ) );
-    builder.add_boundary_relation(
+    builder.add_line_surface_relationship(
         model.line( line_uuids[6] ), model.surface( surface_uuids[1] ) );
-    builder.add_boundary_relation(
+    builder.add_line_surface_relationship(
         model.line( line_uuids[6] ), model.surface( surface_uuids[4] ) );
-    builder.add_boundary_relation(
+    builder.add_line_surface_relationship(
         model.line( line_uuids[7] ), model.surface( surface_uuids[2] ) );
-    builder.add_boundary_relation(
+    builder.add_line_surface_relationship(
         model.line( line_uuids[7] ), model.surface( surface_uuids[4] ) );
-    builder.add_boundary_relation(
+    builder.add_line_surface_relationship(
         model.line( line_uuids[8] ), model.surface( surface_uuids[3] ) );
-    builder.add_boundary_relation(
+    builder.add_line_surface_relationship(
         model.line( line_uuids[8] ), model.surface( surface_uuids[4] ) );
 
     for( const auto& line_id : line_uuids )
     {
-        for( const auto& incidence :
-            model.relationships().incidences( line_id ) )
+        for( const auto& incidence : model.incidences( model.line( line_id ) ) )
         {
-            OPENGEODE_EXCEPTION( geode::contain( surface_uuids, incidence ),
+            OPENGEODE_EXCEPTION(
+                geode::contain( surface_uuids, incidence.id() ),
                 "All Lines incidences should be Surfaces" );
         }
-        OPENGEODE_EXCEPTION(
-            model.relationships().nb_incidences( line_id ) == 2,
+        OPENGEODE_EXCEPTION( model.nb_incidences( line_id ) == 2,
             "All Lines should be connected to 2 Surfaces" );
     }
 }
@@ -270,26 +266,24 @@ void add_surface_block_relation( const geode::BRep& model,
 {
     for( const auto& surface_id : surface_uuids )
     {
-        builder.add_boundary_relation(
+        builder.add_surface_block_relationship(
             model.surface( surface_id ), model.block( block_uuids.front() ) );
     }
 
     for( const auto& surface_id : surface_uuids )
     {
         for( const auto& incidence :
-            model.relationships().incidences( surface_id ) )
+            model.incidences( model.surface( surface_id ) ) )
         {
-            OPENGEODE_EXCEPTION( geode::contain( block_uuids, incidence ),
+            OPENGEODE_EXCEPTION( geode::contain( block_uuids, incidence.id() ),
                 "All Surfaces incidences should be Blocks" );
         }
-        OPENGEODE_EXCEPTION(
-            model.relationships().nb_incidences( surface_id ) == 1,
+        OPENGEODE_EXCEPTION( model.nb_incidences( surface_id ) == 1,
             "All Surfaces should be connected to 1 Block" );
     }
 
     OPENGEODE_EXCEPTION(
-        model.relationships().nb_boundaries( block_uuids.front() )
-            == surface_uuids.size(),
+        model.nb_boundaries( block_uuids.front() ) == surface_uuids.size(),
         "The Block should be connected to all Surfaces" );
 }
 

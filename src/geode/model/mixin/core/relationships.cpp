@@ -324,8 +324,8 @@ namespace geode
         using Iterator = typename Relationships::Impl::Iterator;
 
     public:
-        Impl( const Relationships::Impl& manager, Iterator begin, Iterator end )
-            : BaseRange< Iterator >( begin, end ), manager_( manager )
+        Impl( const Relationships::Impl& relationships, Iterator begin, Iterator end )
+            : BaseRange< Iterator >( begin, end ), relationships_( relationships )
         {
             next_boundary_iterator();
         }
@@ -339,7 +339,7 @@ namespace geode
         const uuid& vertex_uuid() const
         {
             const auto iterator = this->current();
-            return manager_.vertex_uuid(
+            return relationships_.vertex_uuid(
                 { iterator->edge_id, ( iterator->vertex_id + 1 ) % 2 } );
         }
 
@@ -354,7 +354,7 @@ namespace geode
         {
             while(
                 this->operator!=( *this )
-                && ( !manager_.is_boundary_relation( this->current()->edge_id )
+                && ( !relationships_.is_boundary_relation( this->current()->edge_id )
                        || is_boundary_edge_vertex() ) )
             {
                 this->operator++();
@@ -362,14 +362,14 @@ namespace geode
         }
 
     private:
-        const Relationships::Impl& manager_;
+        const Relationships::Impl& relationships_;
     };
 
     Relationships::BoundaryRange::BoundaryRange(
-        const Relationships& manager, const uuid& id )
-        : impl_( *manager.impl_,
-              manager.impl_->begin_edge( id ),
-              manager.impl_->end_edge( id ) )
+        const Relationships& relationships, const uuid& id )
+        : impl_( *relationships.impl_,
+              relationships.impl_->begin_edge( id ),
+              relationships.impl_->end_edge( id ) )
     {
     }
 
@@ -408,8 +408,8 @@ namespace geode
         using Iterator = typename Relationships::Impl::Iterator;
 
     public:
-        Impl( const Relationships::Impl& manager, Iterator begin, Iterator end )
-            : BaseRange< Iterator >( begin, end ), manager_( manager )
+        Impl( const Relationships::Impl& relationships, Iterator begin, Iterator end )
+            : BaseRange< Iterator >( begin, end ), relationships_( relationships )
         {
             next_incidence_iterator();
         }
@@ -423,7 +423,7 @@ namespace geode
         const uuid& vertex_uuid() const
         {
             const auto iterator = this->current();
-            return manager_.vertex_uuid(
+            return relationships_.vertex_uuid(
                 { iterator->edge_id, ( iterator->vertex_id + 1 ) % 2 } );
         }
 
@@ -438,7 +438,7 @@ namespace geode
         {
             while(
                 this->operator!=( *this )
-                && ( !manager_.is_boundary_relation( this->current()->edge_id )
+                && ( !relationships_.is_boundary_relation( this->current()->edge_id )
                        || is_incident_edge_vertex() ) )
             {
                 this->operator++();
@@ -446,14 +446,14 @@ namespace geode
         }
 
     private:
-        const Relationships::Impl& manager_;
+        const Relationships::Impl& relationships_;
     };
 
     Relationships::IncidenceRange::IncidenceRange(
-        const Relationships& manager, const uuid& id )
-        : impl_( *manager.impl_,
-              manager.impl_->begin_edge( id ),
-              manager.impl_->end_edge( id ) )
+        const Relationships& relationships, const uuid& id )
+        : impl_( *relationships.impl_,
+              relationships.impl_->begin_edge( id ),
+              relationships.impl_->end_edge( id ) )
     {
     }
 
@@ -492,8 +492,8 @@ namespace geode
         using Iterator = typename Relationships::Impl::Iterator;
 
     public:
-        Impl( const Relationships::Impl& manager, Iterator begin, Iterator end )
-            : BaseRange< Iterator >( begin, end ), manager_( manager )
+        Impl( const Relationships::Impl& relationships, Iterator begin, Iterator end )
+            : BaseRange< Iterator >( begin, end ), relationships_( relationships )
         {
             next_item_iterator();
         }
@@ -507,7 +507,7 @@ namespace geode
         const uuid& vertex_uuid() const
         {
             const auto iterator = this->current();
-            return manager_.vertex_uuid(
+            return relationships_.vertex_uuid(
                 { iterator->edge_id, ( iterator->vertex_id + 1 ) % 2 } );
         }
 
@@ -521,7 +521,7 @@ namespace geode
         void next_item_iterator()
         {
             while( this->operator!=( *this )
-                   && ( !manager_.is_item_relation( this->current()->edge_id )
+                   && ( !relationships_.is_item_relation( this->current()->edge_id )
                           || is_item_edge_vertex() ) )
             {
                 this->operator++();
@@ -529,14 +529,14 @@ namespace geode
         }
 
     private:
-        const Relationships::Impl& manager_;
+        const Relationships::Impl& relationships_;
     };
 
     Relationships::ItemRange::ItemRange(
-        const Relationships& manager, const uuid& id )
-        : impl_( *manager.impl_,
-              manager.impl_->begin_edge( id ),
-              manager.impl_->end_edge( id ) )
+        const Relationships& relationships, const uuid& id )
+        : impl_( *relationships.impl_,
+              relationships.impl_->begin_edge( id ),
+              relationships.impl_->end_edge( id ) )
     {
     }
 
@@ -574,8 +574,8 @@ namespace geode
         using Iterator = typename Relationships::Impl::Iterator;
 
     public:
-        Impl( const Relationships::Impl& manager, Iterator begin, Iterator end )
-            : BaseRange< Iterator >( begin, end ), manager_( manager )
+        Impl( const Relationships::Impl& relationships, Iterator begin, Iterator end )
+            : BaseRange< Iterator >( begin, end ), relationships_( relationships )
         {
             next_collection_iterator();
         }
@@ -589,7 +589,7 @@ namespace geode
         const uuid& vertex_uuid() const
         {
             const auto iterator = this->current();
-            return manager_.vertex_uuid(
+            return relationships_.vertex_uuid(
                 { iterator->edge_id, ( iterator->vertex_id + 1 ) % 2 } );
         }
 
@@ -603,7 +603,7 @@ namespace geode
         void next_collection_iterator()
         {
             while( this->operator!=( *this )
-                   && ( !manager_.is_item_relation( this->current()->edge_id )
+                   && ( !relationships_.is_item_relation( this->current()->edge_id )
                           || is_collection_edge_vertex() ) )
             {
                 this->operator++();
@@ -611,14 +611,14 @@ namespace geode
         }
 
     private:
-        const Relationships::Impl& manager_;
+        const Relationships::Impl& relationships_;
     };
 
     Relationships::CollectionRange::CollectionRange(
-        const Relationships& manager, const uuid& id )
-        : impl_( *manager.impl_,
-              manager.impl_->begin_edge( id ),
-              manager.impl_->end_edge( id ) )
+        const Relationships& relationships, const uuid& id )
+        : impl_( *relationships.impl_,
+              relationships.impl_->begin_edge( id ),
+              relationships.impl_->end_edge( id ) )
     {
     }
 

@@ -46,11 +46,10 @@ namespace geode
 
         void archive_brep_files( const ZipFile& zip_writer ) const
         {
-            zip_writer.archive_file( brep().relationships().save_relationships(
-                zip_writer.directory() ) );
             zip_writer.archive_file(
-                brep().unique_vertices().save_unique_vertices(
-                    zip_writer.directory() ) );
+                brep().save_relationships( zip_writer.directory() ) );
+            zip_writer.archive_file(
+                brep().save_unique_vertices( zip_writer.directory() ) );
             zip_writer.archive_files(
                 brep().save_corners( zip_writer.directory() ) );
             zip_writer.archive_files(
