@@ -40,9 +40,9 @@ namespace geode
     }
 
     Section::LineBoundaryRange::LineBoundaryRange( const Section& section,
-        const RelationshipManager& manager,
+        const Relationships& manager,
         const Line2D& line )
-        : RelationshipManager::BoundaryRange( manager, line.id() ),
+        : Relationships::BoundaryRange( manager, line.id() ),
           section_( section )
     {
     }
@@ -50,7 +50,7 @@ namespace geode
     const Corner2D& Section::LineBoundaryRange::operator*() const
     {
         return section_.corner(
-            RelationshipManager::BoundaryRange::operator*() );
+            Relationships::BoundaryRange::operator*() );
     }
 
     Section::SurfaceBoundaryRange Section::boundaries(
@@ -60,16 +60,16 @@ namespace geode
     }
 
     Section::SurfaceBoundaryRange::SurfaceBoundaryRange( const Section& section,
-        const RelationshipManager& manager,
+        const Relationships& manager,
         const Surface2D& surface )
-        : RelationshipManager::BoundaryRange( manager, surface.id() ),
+        : Relationships::BoundaryRange( manager, surface.id() ),
           section_( section )
     {
     }
 
     const Line2D& Section::SurfaceBoundaryRange::operator*() const
     {
-        return section_.line( RelationshipManager::BoundaryRange::operator*() );
+        return section_.line( Relationships::BoundaryRange::operator*() );
     }
 
     Section::CornerIncidenceRange Section::incidences(
@@ -79,9 +79,9 @@ namespace geode
     }
 
     Section::CornerIncidenceRange::CornerIncidenceRange( const Section& section,
-        const RelationshipManager& manager,
+        const Relationships& manager,
         const Corner2D& corner )
-        : RelationshipManager::IncidenceRange( manager, corner.id() ),
+        : Relationships::IncidenceRange( manager, corner.id() ),
           section_( section )
     {
     }
@@ -89,7 +89,7 @@ namespace geode
     const Line2D& Section::CornerIncidenceRange::operator*() const
     {
         return section_.line(
-            RelationshipManager::IncidenceRange::operator*() );
+            Relationships::IncidenceRange::operator*() );
     }
 
     Section::LineIncidenceRange Section::incidences( const Line2D& line ) const
@@ -98,9 +98,9 @@ namespace geode
     }
 
     Section::LineIncidenceRange::LineIncidenceRange( const Section& section,
-        const RelationshipManager& manager,
+        const Relationships& manager,
         const Line2D& line )
-        : RelationshipManager::IncidenceRange( manager, line.id() ),
+        : Relationships::IncidenceRange( manager, line.id() ),
           section_( section )
     {
     }
@@ -108,7 +108,7 @@ namespace geode
     const Surface2D& Section::LineIncidenceRange::operator*() const
     {
         return section_.surface(
-            RelationshipManager::IncidenceRange::operator*() );
+            Relationships::IncidenceRange::operator*() );
     }
 
     void Section::compute_epsilon( double& epsilon ) const

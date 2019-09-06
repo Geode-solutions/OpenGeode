@@ -27,10 +27,10 @@
 #include <geode/basic/range.h>
 #include <geode/basic/uuid.h>
 
-#include <geode/model/mixin/core/relationship_manager.h>
+#include <geode/model/mixin/core/relationships.h>
 
 std::vector< geode::uuid > create_uuids(
-    geode::RelationshipManager& relationships )
+    geode::Relationships& relationships )
 {
     geode::index_t nb{ 6 };
     std::vector< geode::uuid > uuids;
@@ -44,7 +44,7 @@ std::vector< geode::uuid > create_uuids(
     return uuids;
 }
 
-void add_boundary_relations( geode::RelationshipManager& relations,
+void add_boundary_relations( geode::Relationships& relations,
     const std::vector< geode::uuid >& uuids )
 {
     relations.add_boundary_relation( uuids[0], uuids[1] );
@@ -60,7 +60,7 @@ void add_boundary_relations( geode::RelationshipManager& relations,
     relations.add_boundary_relation( uuids[5], uuids[0] );
 }
 
-void add_items_in_collections( geode::RelationshipManager& relations,
+void add_items_in_collections( geode::Relationships& relations,
     const std::vector< geode::uuid >& uuids )
 {
     relations.add_item_in_collection( uuids[1], uuids[5] );
@@ -72,7 +72,7 @@ void add_items_in_collections( geode::RelationshipManager& relations,
     relations.add_item_in_collection( uuids[0], uuids[4] );
 }
 
-void test_uuid( const geode::RelationshipManager& relations,
+void test_uuid( const geode::Relationships& relations,
     const geode::uuid& uuid,
     geode::index_t nb_boundaries,
     geode::index_t nb_incidences,
@@ -102,7 +102,7 @@ void test_uuid( const geode::RelationshipManager& relations,
         message_collection );
 }
 
-void test_relations( const geode::RelationshipManager& relations,
+void test_relations( const geode::Relationships& relations,
     const std::vector< geode::uuid >& uuids )
 {
     test_uuid( relations, uuids[0], 2, 3, 0, 1 );
@@ -119,7 +119,7 @@ int main()
 
     try
     {
-        RelationshipManager relationships;
+        Relationships relationships;
         auto uuids = create_uuids( relationships );
 
         // This Relationships do not represent anything.
@@ -128,7 +128,7 @@ int main()
         test_relations( relationships, uuids );
 
         relationships.save_relationships( "." );
-        RelationshipManager reloaded_relationships;
+        Relationships reloaded_relationships;
         reloaded_relationships.load_relationships( "." );
         test_relations( reloaded_relationships, uuids );
 

@@ -52,11 +52,11 @@ namespace geode
     {
     public:
         class opengeode_model_api LineBoundaryRange
-            : public RelationshipManager::BoundaryRange
+            : public Relationships::BoundaryRange
         {
         public:
             LineBoundaryRange( const Section& section,
-                const RelationshipManager& manager,
+                const Relationships& manager,
                 const Line2D& line );
 
             const LineBoundaryRange& begin() const
@@ -76,11 +76,11 @@ namespace geode
         };
 
         class opengeode_model_api SurfaceBoundaryRange
-            : public RelationshipManager::BoundaryRange
+            : public Relationships::BoundaryRange
         {
         public:
             SurfaceBoundaryRange( const Section& section,
-                const RelationshipManager& manager,
+                const Relationships& manager,
                 const Surface2D& surface );
 
             const SurfaceBoundaryRange& begin() const
@@ -101,11 +101,11 @@ namespace geode
 
     public:
         class opengeode_model_api CornerIncidenceRange
-            : public RelationshipManager::IncidenceRange
+            : public Relationships::IncidenceRange
         {
         public:
             CornerIncidenceRange( const Section& section,
-                const RelationshipManager& manager,
+                const Relationships& manager,
                 const Corner2D& corner );
 
             const CornerIncidenceRange& begin() const
@@ -125,11 +125,11 @@ namespace geode
         };
 
         class opengeode_model_api LineIncidenceRange
-            : public RelationshipManager::IncidenceRange
+            : public Relationships::IncidenceRange
         {
         public:
             LineIncidenceRange( const Section& section,
-                const RelationshipManager& manager,
+                const Relationships& manager,
                 const Line2D& line );
 
             const LineIncidenceRange& begin() const

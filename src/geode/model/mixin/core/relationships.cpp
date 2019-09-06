@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/model/mixin/core/relationship_manager.h>
+#include <geode/model/mixin/core/relationships.h>
 
 #include <fstream>
 
@@ -42,7 +42,7 @@
 
 namespace geode
 {
-    class RelationshipManager::Impl
+    class Relationships::Impl
     {
     public:
         using Iterator = typename std::vector< EdgeVertex >::const_iterator;
@@ -213,20 +213,20 @@ namespace geode
         std::shared_ptr< VariableAttribute< uuid > > uuids_;
     };
 
-    RelationshipManager::RelationshipManager() {} // NOLINT
-    RelationshipManager::~RelationshipManager() {} // NOLINT
+    Relationships::Relationships() {} // NOLINT
+    Relationships::~Relationships() {} // NOLINT
 
-    void RelationshipManager::add_component( const uuid& id )
+    void Relationships::add_component( const uuid& id )
     {
         impl_->add_component( id );
     }
 
-    void RelationshipManager::remove_component( const uuid& id )
+    void Relationships::remove_component( const uuid& id )
     {
         impl_->remove_component( id );
     }
 
-    index_t RelationshipManager::nb_boundaries( const uuid& id ) const
+    index_t Relationships::nb_boundaries( const uuid& id ) const
     {
         index_t nb{ 0 };
         for( const auto& unused : boundaries( id ) )
@@ -237,13 +237,13 @@ namespace geode
         return nb;
     }
 
-    RelationshipManager::BoundaryRange RelationshipManager::boundaries(
+    Relationships::BoundaryRange Relationships::boundaries(
         const uuid& id ) const
     {
         return { *this, id };
     }
 
-    index_t RelationshipManager::nb_incidences( const uuid& id ) const
+    index_t Relationships::nb_incidences( const uuid& id ) const
     {
         index_t nb{ 0 };
         for( const auto& unused : incidences( id ) )
@@ -254,20 +254,20 @@ namespace geode
         return nb;
     }
 
-    RelationshipManager::IncidenceRange RelationshipManager::incidences(
+    Relationships::IncidenceRange Relationships::incidences(
         const uuid& id ) const
     {
         return { *this, id };
     }
 
-    void RelationshipManager::add_boundary_relation(
+    void Relationships::add_boundary_relation(
         const uuid& boundary, const uuid& incidence )
     {
         impl_->add_relation(
-            boundary, incidence, RelationshipManager::Impl::BOUNDARY_RELATION );
+            boundary, incidence, Relationships::Impl::BOUNDARY_RELATION );
     }
 
-    index_t RelationshipManager::nb_items( const uuid& id ) const
+    index_t Relationships::nb_items( const uuid& id ) const
     {
         index_t nb{ 0 };
         for( const auto& unused : items( id ) )
@@ -278,13 +278,13 @@ namespace geode
         return nb;
     }
 
-    RelationshipManager::ItemRange RelationshipManager::items(
+    Relationships::ItemRange Relationships::items(
         const uuid& id ) const
     {
         return { *this, id };
     }
 
-    index_t RelationshipManager::nb_collections( const uuid& id ) const
+    index_t Relationships::nb_collections( const uuid& id ) const
     {
         index_t nb{ 0 };
         for( const auto& unused : collections( id ) )
@@ -295,37 +295,37 @@ namespace geode
         return nb;
     }
 
-    RelationshipManager::CollectionRange RelationshipManager::collections(
+    Relationships::CollectionRange Relationships::collections(
         const uuid& id ) const
     {
         return { *this, id };
     }
 
-    void RelationshipManager::add_item_in_collection(
+    void Relationships::add_item_in_collection(
         const uuid& item, const uuid& collection )
     {
         impl_->add_relation(
-            item, collection, RelationshipManager::Impl::ITEM_RELATION );
+            item, collection, Relationships::Impl::ITEM_RELATION );
     }
 
-    std::string RelationshipManager::save_relationships(
+    std::string Relationships::save_relationships(
         const std::string& directory ) const
     {
         return impl_->save( directory );
     }
 
-    void RelationshipManager::load_relationships( const std::string& directory )
+    void Relationships::load_relationships( const std::string& directory )
     {
         return impl_->load( directory );
     }
 
-    class RelationshipManager::BoundaryRange::Impl
-        : public BaseRange< typename RelationshipManager::Impl::Iterator >
+    class Relationships::BoundaryRange::Impl
+        : public BaseRange< typename Relationships::Impl::Iterator >
     {
-        using Iterator = typename RelationshipManager::Impl::Iterator;
+        using Iterator = typename Relationships::Impl::Iterator;
 
     public:
-        Impl( const RelationshipManager::Impl& manager,
+        Impl( const Relationships::Impl& manager,
             Iterator begin,
             Iterator end )
             : BaseRange< Iterator >( begin, end ), manager_( manager )
@@ -350,7 +350,7 @@ namespace geode
         bool is_boundary_edge_vertex()
         {
             return this->current()->vertex_id
-                   == RelationshipManager::Impl::BOUNDARY_EDGE_VERTEX;
+                   == Relationships::Impl::BOUNDARY_EDGE_VERTEX;
         }
 
         void next_boundary_iterator()
@@ -365,54 +365,54 @@ namespace geode
         }
 
     private:
-        const RelationshipManager::Impl& manager_;
+        const Relationships::Impl& manager_;
     };
 
-    RelationshipManager::BoundaryRange::BoundaryRange(
-        const RelationshipManager& manager, const uuid& id )
+    Relationships::BoundaryRange::BoundaryRange(
+        const Relationships& manager, const uuid& id )
         : impl_( *manager.impl_,
               manager.impl_->begin_edge( id ),
               manager.impl_->end_edge( id ) )
     {
     }
 
-    RelationshipManager::BoundaryRange::BoundaryRange(
+    Relationships::BoundaryRange::BoundaryRange(
         BoundaryRange&& other ) noexcept
         : impl_( *other.impl_ )
     {
     }
 
-    RelationshipManager::BoundaryRange::BoundaryRange(
+    Relationships::BoundaryRange::BoundaryRange(
         const BoundaryRange& other )
         : impl_( *other.impl_ )
     {
     }
 
-    RelationshipManager::BoundaryRange::~BoundaryRange() {} // NOLINT
+    Relationships::BoundaryRange::~BoundaryRange() {} // NOLINT
 
-    bool RelationshipManager::BoundaryRange::operator!=(
+    bool Relationships::BoundaryRange::operator!=(
         const BoundaryRange& /*unused*/ ) const
     {
         return impl_->operator!=( *impl_ );
     }
 
-    void RelationshipManager::BoundaryRange::operator++()
+    void Relationships::BoundaryRange::operator++()
     {
         return impl_->next();
     }
 
-    const uuid& RelationshipManager::BoundaryRange::operator*() const
+    const uuid& Relationships::BoundaryRange::operator*() const
     {
         return impl_->vertex_uuid();
     }
 
-    class RelationshipManager::IncidenceRange::Impl
-        : public BaseRange< typename RelationshipManager::Impl::Iterator >
+    class Relationships::IncidenceRange::Impl
+        : public BaseRange< typename Relationships::Impl::Iterator >
     {
-        using Iterator = typename RelationshipManager::Impl::Iterator;
+        using Iterator = typename Relationships::Impl::Iterator;
 
     public:
-        Impl( const RelationshipManager::Impl& manager,
+        Impl( const Relationships::Impl& manager,
             Iterator begin,
             Iterator end )
             : BaseRange< Iterator >( begin, end ), manager_( manager )
@@ -437,7 +437,7 @@ namespace geode
         bool is_incident_edge_vertex()
         {
             return this->current()->vertex_id
-                   == RelationshipManager::Impl::INCIDENT_EDGE_VERTEX;
+                   == Relationships::Impl::INCIDENT_EDGE_VERTEX;
         }
 
         void next_incidence_iterator()
@@ -452,54 +452,54 @@ namespace geode
         }
 
     private:
-        const RelationshipManager::Impl& manager_;
+        const Relationships::Impl& manager_;
     };
 
-    RelationshipManager::IncidenceRange::IncidenceRange(
-        const RelationshipManager& manager, const uuid& id )
+    Relationships::IncidenceRange::IncidenceRange(
+        const Relationships& manager, const uuid& id )
         : impl_( *manager.impl_,
               manager.impl_->begin_edge( id ),
               manager.impl_->end_edge( id ) )
     {
     }
 
-    RelationshipManager::IncidenceRange::IncidenceRange(
+    Relationships::IncidenceRange::IncidenceRange(
         IncidenceRange&& other ) noexcept
         : impl_( *other.impl_ )
     {
     }
 
-    RelationshipManager::IncidenceRange::IncidenceRange(
+    Relationships::IncidenceRange::IncidenceRange(
         const IncidenceRange& other )
         : impl_( *other.impl_ )
     {
     }
 
-    RelationshipManager::IncidenceRange::~IncidenceRange() {} // NOLINT
+    Relationships::IncidenceRange::~IncidenceRange() {} // NOLINT
 
-    bool RelationshipManager::IncidenceRange::operator!=(
+    bool Relationships::IncidenceRange::operator!=(
         const IncidenceRange& /*unused*/ ) const
     {
         return impl_->operator!=( *impl_ );
     }
 
-    void RelationshipManager::IncidenceRange::operator++()
+    void Relationships::IncidenceRange::operator++()
     {
         return impl_->next();
     }
 
-    const uuid& RelationshipManager::IncidenceRange::operator*() const
+    const uuid& Relationships::IncidenceRange::operator*() const
     {
         return impl_->vertex_uuid();
     }
 
-    class RelationshipManager::ItemRange::Impl
-        : public BaseRange< typename RelationshipManager::Impl::Iterator >
+    class Relationships::ItemRange::Impl
+        : public BaseRange< typename Relationships::Impl::Iterator >
     {
-        using Iterator = typename RelationshipManager::Impl::Iterator;
+        using Iterator = typename Relationships::Impl::Iterator;
 
     public:
-        Impl( const RelationshipManager::Impl& manager,
+        Impl( const Relationships::Impl& manager,
             Iterator begin,
             Iterator end )
             : BaseRange< Iterator >( begin, end ), manager_( manager )
@@ -524,7 +524,7 @@ namespace geode
         bool is_item_edge_vertex()
         {
             return this->current()->vertex_id
-                   == RelationshipManager::Impl::ITEM_EDGE_VERTEX;
+                   == Relationships::Impl::ITEM_EDGE_VERTEX;
         }
 
         void next_item_iterator()
@@ -538,52 +538,52 @@ namespace geode
         }
 
     private:
-        const RelationshipManager::Impl& manager_;
+        const Relationships::Impl& manager_;
     };
 
-    RelationshipManager::ItemRange::ItemRange(
-        const RelationshipManager& manager, const uuid& id )
+    Relationships::ItemRange::ItemRange(
+        const Relationships& manager, const uuid& id )
         : impl_( *manager.impl_,
               manager.impl_->begin_edge( id ),
               manager.impl_->end_edge( id ) )
     {
     }
 
-    RelationshipManager::ItemRange::ItemRange( ItemRange&& other ) noexcept
+    Relationships::ItemRange::ItemRange( ItemRange&& other ) noexcept
         : impl_( *other.impl_ )
     {
     }
 
-    RelationshipManager::ItemRange::ItemRange( const ItemRange& other )
+    Relationships::ItemRange::ItemRange( const ItemRange& other )
         : impl_( *other.impl_ )
     {
     }
 
-    RelationshipManager::ItemRange::~ItemRange() {} // NOLINT
+    Relationships::ItemRange::~ItemRange() {} // NOLINT
 
-    bool RelationshipManager::ItemRange::operator!=(
+    bool Relationships::ItemRange::operator!=(
         const ItemRange& /*unused*/ ) const
     {
         return impl_->operator!=( *impl_ );
     }
 
-    void RelationshipManager::ItemRange::operator++()
+    void Relationships::ItemRange::operator++()
     {
         return impl_->next();
     }
 
-    const uuid& RelationshipManager::ItemRange::operator*() const
+    const uuid& Relationships::ItemRange::operator*() const
     {
         return impl_->vertex_uuid();
     }
 
-    class RelationshipManager::CollectionRange::Impl
-        : public BaseRange< typename RelationshipManager::Impl::Iterator >
+    class Relationships::CollectionRange::Impl
+        : public BaseRange< typename Relationships::Impl::Iterator >
     {
-        using Iterator = typename RelationshipManager::Impl::Iterator;
+        using Iterator = typename Relationships::Impl::Iterator;
 
     public:
-        Impl( const RelationshipManager::Impl& manager,
+        Impl( const Relationships::Impl& manager,
             Iterator begin,
             Iterator end )
             : BaseRange< Iterator >( begin, end ), manager_( manager )
@@ -608,7 +608,7 @@ namespace geode
         bool is_collection_edge_vertex()
         {
             return this->current()->vertex_id
-                   == RelationshipManager::Impl::COLLECTION_EDGE_VERTEX;
+                   == Relationships::Impl::COLLECTION_EDGE_VERTEX;
         }
 
         void next_collection_iterator()
@@ -622,43 +622,43 @@ namespace geode
         }
 
     private:
-        const RelationshipManager::Impl& manager_;
+        const Relationships::Impl& manager_;
     };
 
-    RelationshipManager::CollectionRange::CollectionRange(
-        const RelationshipManager& manager, const uuid& id )
+    Relationships::CollectionRange::CollectionRange(
+        const Relationships& manager, const uuid& id )
         : impl_( *manager.impl_,
               manager.impl_->begin_edge( id ),
               manager.impl_->end_edge( id ) )
     {
     }
 
-    RelationshipManager::CollectionRange::CollectionRange(
+    Relationships::CollectionRange::CollectionRange(
         CollectionRange&& other ) noexcept
         : impl_( *other.impl_ )
     {
     }
 
-    RelationshipManager::CollectionRange::CollectionRange(
+    Relationships::CollectionRange::CollectionRange(
         const CollectionRange& other )
         : impl_( *other.impl_ )
     {
     }
 
-    RelationshipManager::CollectionRange::~CollectionRange() {} // NOLINT
+    Relationships::CollectionRange::~CollectionRange() {} // NOLINT
 
-    bool RelationshipManager::CollectionRange::operator!=(
+    bool Relationships::CollectionRange::operator!=(
         const CollectionRange& /*unused*/ ) const
     {
         return impl_->operator!=( *impl_ );
     }
 
-    void RelationshipManager::CollectionRange::operator++()
+    void Relationships::CollectionRange::operator++()
     {
         return impl_->next();
     }
 
-    const uuid& RelationshipManager::CollectionRange::operator*() const
+    const uuid& Relationships::CollectionRange::operator*() const
     {
         return impl_->vertex_uuid();
     }
