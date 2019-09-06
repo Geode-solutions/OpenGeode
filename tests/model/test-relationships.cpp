@@ -37,7 +37,7 @@ std::vector< geode::uuid > create_uuids( geode::Relationships& relationships )
     {
         geode_unused( unused );
         geode::uuid cur_uuid;
-        relationships.add_component( cur_uuid );
+        relationships.register_component( cur_uuid );
         uuids.push_back( cur_uuid );
     }
     return uuids;

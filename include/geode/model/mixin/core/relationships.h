@@ -188,14 +188,19 @@ namespace geode
 
         CollectionRange collections( const uuid& id ) const;
 
-        void add_component( const uuid& id );
+        /*!
+         * Add a component in the set of components registered by the
+         * Relationships
+         * @param[in] id Unique index of the component to add
+         */
+        void register_component( const uuid& id );
 
         /*!
-         * Remove a component from the set of components managed by the
+         * Remove a component from the set of components registered by the
          * Relationships and all its associated relationships
          * @param[in] id Unique index of the component to remove
          */
-        void remove_component( const uuid& id );
+        void unregister_component( const uuid& id );
 
         /*!
          * Add a new relationship of type boundary-incidence between two

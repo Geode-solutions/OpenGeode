@@ -59,15 +59,15 @@ namespace geode
 
             for( const auto& corner : section().corners() )
             {
-                builder.unique_vertices().register_component( corner );
+                builder.unique_vertices().register_mesh_component( corner );
             }
             for( const auto& line : section().lines() )
             {
-                builder.unique_vertices().register_component( line );
+                builder.unique_vertices().register_mesh_component( line );
             }
             for( const auto& surface : section().surfaces() )
             {
-                builder.unique_vertices().register_component( surface );
+                builder.unique_vertices().register_mesh_component( surface );
             }
         }
     };
