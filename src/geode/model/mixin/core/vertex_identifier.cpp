@@ -332,33 +332,33 @@ namespace geode
         return impl_->load( directory );
     }
 
-    template void opengeode_model_api
-        VertexIdentifier::register_component( const Corner2D& );
-    template void opengeode_model_api
-        VertexIdentifier::register_component( const Corner3D& );
-    template void opengeode_model_api
-        VertexIdentifier::register_component( const Line2D& );
-    template void opengeode_model_api
-        VertexIdentifier::register_component( const Line3D& );
-    template void opengeode_model_api
-        VertexIdentifier::register_component( const Surface2D& );
-    template void opengeode_model_api
-        VertexIdentifier::register_component( const Surface3D& );
-    template void opengeode_model_api
-        VertexIdentifier::register_component( const Block3D& );
+    template void opengeode_model_api VertexIdentifier::register_component(
+        const Corner2D& );
+    template void opengeode_model_api VertexIdentifier::register_component(
+        const Corner3D& );
+    template void opengeode_model_api VertexIdentifier::register_component(
+        const Line2D& );
+    template void opengeode_model_api VertexIdentifier::register_component(
+        const Line3D& );
+    template void opengeode_model_api VertexIdentifier::register_component(
+        const Surface2D& );
+    template void opengeode_model_api VertexIdentifier::register_component(
+        const Surface3D& );
+    template void opengeode_model_api VertexIdentifier::register_component(
+        const Block3D& );
 
-    template void opengeode_model_api
-        VertexIdentifier::remove_component( const Corner2D& );
-    template void opengeode_model_api
-        VertexIdentifier::remove_component( const Corner3D& );
-    template void opengeode_model_api
-        VertexIdentifier::remove_component( const Line2D& );
-    template void opengeode_model_api
-        VertexIdentifier::remove_component( const Line3D& );
-    template void opengeode_model_api
-        VertexIdentifier::remove_component( const Surface2D& );
-    template void opengeode_model_api
-        VertexIdentifier::remove_component( const Surface3D& );
-    template void opengeode_model_api
-        VertexIdentifier::remove_component( const Block3D& );
+    template void opengeode_model_api VertexIdentifier::remove_component(
+        const Corner2D& );
+    template void opengeode_model_api VertexIdentifier::remove_component(
+        const Corner3D& );
+    template void opengeode_model_api VertexIdentifier::remove_component(
+        const Line2D& );
+    template void opengeode_model_api VertexIdentifier::remove_component(
+        const Line3D& );
+    template void opengeode_model_api VertexIdentifier::remove_component(
+        const Surface2D& );
+    template void opengeode_model_api VertexIdentifier::remove_component(
+        const Surface3D& );
+    template void opengeode_model_api VertexIdentifier::remove_component(
+        const Block3D& );
 } // namespace geode

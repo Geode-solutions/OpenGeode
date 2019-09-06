@@ -66,8 +66,7 @@ namespace geode
             IMPLEMENTATION_MEMBER( impl_ );
         };
 
-        class opengeode_model_api SurfaceRange
-            : public SurfaceRangeBase
+        class opengeode_model_api SurfaceRange : public SurfaceRangeBase
         {
         public:
             SurfaceRange( const Surfaces& surfaces );
