@@ -54,8 +54,7 @@ namespace geode
             builder.load_lines( zip_reader.directory() );
             builder.load_surfaces( zip_reader.directory() );
             builder.load_relationships( zip_reader.directory() );
-            builder.load_unique_vertices(
-                zip_reader.directory() );
+            builder.load_unique_vertices( zip_reader.directory() );
 
             for( const auto& corner : section().corners() )
             {

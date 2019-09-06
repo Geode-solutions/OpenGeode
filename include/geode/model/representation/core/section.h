@@ -55,8 +55,7 @@ namespace geode
             : public Relationships::BoundaryRange
         {
         public:
-            LineBoundaryRange( const Section& section,
-                const Line2D& line );
+            LineBoundaryRange( const Section& section, const Line2D& line );
 
             const LineBoundaryRange& begin() const
             {
@@ -78,8 +77,8 @@ namespace geode
             : public Relationships::BoundaryRange
         {
         public:
-            SurfaceBoundaryRange( const Section& section,
-                const Surface2D& surface );
+            SurfaceBoundaryRange(
+                const Section& section, const Surface2D& surface );
 
             const SurfaceBoundaryRange& begin() const
             {
@@ -102,8 +101,8 @@ namespace geode
             : public Relationships::IncidenceRange
         {
         public:
-            CornerIncidenceRange( const Section& section,
-                const Corner2D& corner );
+            CornerIncidenceRange(
+                const Section& section, const Corner2D& corner );
 
             const CornerIncidenceRange& begin() const
             {
@@ -125,8 +124,7 @@ namespace geode
             : public Relationships::IncidenceRange
         {
         public:
-            LineIncidenceRange( const Section& section,
-                const Line2D& line );
+            LineIncidenceRange( const Section& section, const Line2D& line );
 
             const LineIncidenceRange& begin() const
             {

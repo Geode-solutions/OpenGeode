@@ -154,8 +154,7 @@ void add_corner_line_relation( const geode::Section& model,
 
     for( const auto& line_id : line_uuids )
     {
-        for( const auto& boundary :
-            model.boundaries( model.line( line_id ) ) )
+        for( const auto& boundary : model.boundaries( model.line( line_id ) ) )
         {
             OPENGEODE_EXCEPTION( geode::contain( corner_uuids, boundary.id() ),
                 "All Lines incidences should be Corners" );
@@ -185,18 +184,16 @@ void add_line_surface_relation( const geode::Section& model,
 
     for( const auto& line_id : line_uuids )
     {
-        for( const auto& incidence :
-            model.incidences( model.line( line_id ) ) )
+        for( const auto& incidence : model.incidences( model.line( line_id ) ) )
         {
-            OPENGEODE_EXCEPTION( geode::contain( surface_uuids, incidence.id() ),
+            OPENGEODE_EXCEPTION(
+                geode::contain( surface_uuids, incidence.id() ),
                 "All Lines incidences should be Surfaces" );
         }
     }
-    OPENGEODE_EXCEPTION(
-        model.nb_boundaries( surface_uuids[0] ) == 3,
+    OPENGEODE_EXCEPTION( model.nb_boundaries( surface_uuids[0] ) == 3,
         "Surface 0 should have 3 Lines as boundaries" );
-    OPENGEODE_EXCEPTION(
-        model.nb_boundaries( surface_uuids[1] ) == 4,
+    OPENGEODE_EXCEPTION( model.nb_boundaries( surface_uuids[1] ) == 4,
         "Surface 1 should have 4 Lines as boundaries" );
 }
 

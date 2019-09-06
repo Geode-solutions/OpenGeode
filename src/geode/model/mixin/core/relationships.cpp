@@ -324,8 +324,11 @@ namespace geode
         using Iterator = typename Relationships::Impl::Iterator;
 
     public:
-        Impl( const Relationships::Impl& relationships, Iterator begin, Iterator end )
-            : BaseRange< Iterator >( begin, end ), relationships_( relationships )
+        Impl( const Relationships::Impl& relationships,
+            Iterator begin,
+            Iterator end )
+            : BaseRange< Iterator >( begin, end ),
+              relationships_( relationships )
         {
             next_boundary_iterator();
         }
@@ -352,10 +355,10 @@ namespace geode
 
         void next_boundary_iterator()
         {
-            while(
-                this->operator!=( *this )
-                && ( !relationships_.is_boundary_relation( this->current()->edge_id )
-                       || is_boundary_edge_vertex() ) )
+            while( this->operator!=( *this )
+                   && ( !relationships_.is_boundary_relation(
+                            this->current()->edge_id )
+                          || is_boundary_edge_vertex() ) )
             {
                 this->operator++();
             }
@@ -408,8 +411,11 @@ namespace geode
         using Iterator = typename Relationships::Impl::Iterator;
 
     public:
-        Impl( const Relationships::Impl& relationships, Iterator begin, Iterator end )
-            : BaseRange< Iterator >( begin, end ), relationships_( relationships )
+        Impl( const Relationships::Impl& relationships,
+            Iterator begin,
+            Iterator end )
+            : BaseRange< Iterator >( begin, end ),
+              relationships_( relationships )
         {
             next_incidence_iterator();
         }
@@ -436,10 +442,10 @@ namespace geode
 
         void next_incidence_iterator()
         {
-            while(
-                this->operator!=( *this )
-                && ( !relationships_.is_boundary_relation( this->current()->edge_id )
-                       || is_incident_edge_vertex() ) )
+            while( this->operator!=( *this )
+                   && ( !relationships_.is_boundary_relation(
+                            this->current()->edge_id )
+                          || is_incident_edge_vertex() ) )
             {
                 this->operator++();
             }
@@ -492,8 +498,11 @@ namespace geode
         using Iterator = typename Relationships::Impl::Iterator;
 
     public:
-        Impl( const Relationships::Impl& relationships, Iterator begin, Iterator end )
-            : BaseRange< Iterator >( begin, end ), relationships_( relationships )
+        Impl( const Relationships::Impl& relationships,
+            Iterator begin,
+            Iterator end )
+            : BaseRange< Iterator >( begin, end ),
+              relationships_( relationships )
         {
             next_item_iterator();
         }
@@ -521,7 +530,8 @@ namespace geode
         void next_item_iterator()
         {
             while( this->operator!=( *this )
-                   && ( !relationships_.is_item_relation( this->current()->edge_id )
+                   && ( !relationships_.is_item_relation(
+                            this->current()->edge_id )
                           || is_item_edge_vertex() ) )
             {
                 this->operator++();
@@ -574,8 +584,11 @@ namespace geode
         using Iterator = typename Relationships::Impl::Iterator;
 
     public:
-        Impl( const Relationships::Impl& relationships, Iterator begin, Iterator end )
-            : BaseRange< Iterator >( begin, end ), relationships_( relationships )
+        Impl( const Relationships::Impl& relationships,
+            Iterator begin,
+            Iterator end )
+            : BaseRange< Iterator >( begin, end ),
+              relationships_( relationships )
         {
             next_collection_iterator();
         }
@@ -603,7 +616,8 @@ namespace geode
         void next_collection_iterator()
         {
             while( this->operator!=( *this )
-                   && ( !relationships_.is_item_relation( this->current()->edge_id )
+                   && ( !relationships_.is_item_relation(
+                            this->current()->edge_id )
                           || is_collection_edge_vertex() ) )
             {
                 this->operator++();
