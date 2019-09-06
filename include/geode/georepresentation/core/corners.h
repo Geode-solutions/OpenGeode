@@ -46,9 +46,10 @@ namespace geode
     class opengeode_georepresentation_api Corners
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( Corners );
-        friend class CornersBuilder< dimension >;
 
     public:
+        using Builder = CornersBuilder< dimension >;
+        friend Builder;
         /*!
          * Base class for range-based iteration on Corners
          */

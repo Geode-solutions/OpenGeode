@@ -32,7 +32,6 @@
 
 namespace geode
 {
-    template < index_t, template < index_t > class... >
     class GeoRepresentationBuilder;
 } // namespace geode
 
@@ -46,10 +45,8 @@ namespace geode
      * class DerivateClass : public GeoRepresentation<
      *	dimension, ComponentClassA, ComponentClassB, ComponentClassC >
      */
-    template < index_t dimension, template < index_t > class... Components >
-    class GeoRepresentation : public Components< dimension >...
+    class GeoRepresentation
     {
-        template < index_t, template < index_t > class... >
         friend class GeoRepresentationBuilder;
 
     public:
@@ -66,13 +63,13 @@ namespace geode
         double epsilon() const
         {
             std::call_once( is_epsilon_initialized_,
-                &GeoRepresentation< dimension, Components... >::compute_epsilon,
+                &GeoRepresentation::compute_epsilon,
                 this, std::ref( epsilon_ ) );
             return epsilon_;
         }
 
     protected:
-        GeoRepresentation() : Components< dimension >()... {}
+        GeoRepresentation() = default;
 
     private:
         virtual void compute_epsilon( double& epsilon ) const = 0;

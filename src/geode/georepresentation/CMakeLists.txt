@@ -26,6 +26,7 @@ set(sources
 )
 set(public_headers
     "${lib_include_dir}/common.h"
+    "${lib_include_dir}/builder/add_components_builders.h"
     "${lib_include_dir}/builder/blocks_builder.h"
     "${lib_include_dir}/builder/corners_builder.h"
     "${lib_include_dir}/builder/lines_builder.h"
@@ -33,6 +34,7 @@ set(public_headers
     "${lib_include_dir}/builder/boundary_representation_builder.h"
     "${lib_include_dir}/builder/section_builder.h"
     "${lib_include_dir}/builder/surfaces_builder.h"
+    "${lib_include_dir}/core/add_components.h"
     "${lib_include_dir}/core/bitsery_archive.h"
     "${lib_include_dir}/core/block.h"
     "${lib_include_dir}/core/blocks.h"

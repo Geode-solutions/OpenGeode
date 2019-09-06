@@ -27,16 +27,19 @@
 
 #include <geode/georepresentation/core/vertex_identifier.h>
 
+#include <geode/georepresentation/builder/add_components_builders.h>
 #include <geode/georepresentation/builder/corners_builder.h>
 #include <geode/georepresentation/builder/georepresentation_builder.h>
 
+#include <geode/georepresentation/core/add_components.h>
 #include <geode/georepresentation/core/corner.h>
 #include <geode/georepresentation/core/corners.h>
 #include <geode/georepresentation/core/georepresentation.h>
 
 #include <geode/mesh/builder/point_set_builder.h>
 
-class CornerProvider : public geode::GeoRepresentation< 2, geode::Corners >
+class CornerProvider : public geode::GeoRepresentation,
+                       public geode::AddComponents< 2, geode::Corners >
 {
 public:
     CornerProvider() = default;
@@ -49,12 +52,14 @@ private:
 };
 
 class CornerProviderBuilder
-    : public geode::GeoRepresentationBuilder< 2, geode::CornersBuilder >
+    : public geode::GeoRepresentationBuilder,
+      public geode::AddComponentsBuilders< 2, geode::Corners >
 {
 public:
     CornerProviderBuilder( CornerProvider& corner_provider )
         : GeoRepresentationBuilder( corner_provider ),
-          corner_provider_( corner_provider )
+          AddComponentsBuilders< 2, geode::Corners >( corner_provider ),
+              corner_provider_( corner_provider )
     {
     }
 

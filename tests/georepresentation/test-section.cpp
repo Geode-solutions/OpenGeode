@@ -264,6 +264,13 @@ void test_incidence_ranges( const geode::Section& model,
         "LineIncidenceRange should iterates on 1 Surface" );
 }
 
+class OtherModel : public geode::Section,
+                   public geode::AddComponents< 3, geode::Blocks >
+{
+public:
+    OtherModel() = default;
+};
+
 int main()
 {
     using namespace geode;
@@ -272,6 +279,7 @@ int main()
     {
         Section model;
         SectionBuilder builder( model );
+        OtherModel other;
 
         // This Section represents a house (with one triangle and one square as
         // in children sketches)

@@ -24,6 +24,7 @@
 #pragma once
 
 #include <geode/georepresentation/common.h>
+#include <geode/georepresentation/core/add_components.h>
 #include <geode/georepresentation/core/blocks.h>
 #include <geode/georepresentation/core/corners.h>
 #include <geode/georepresentation/core/georepresentation.h>
@@ -46,7 +47,7 @@ namespace geode
      * boundaries and incidences.
      */
     class opengeode_georepresentation_api Section
-        : public GeoRepresentation< 2, Corners, Lines, Surfaces >
+        : public GeoRepresentation, public AddComponents< 2, Corners, Lines, Surfaces >
     {
     public:
         class opengeode_georepresentation_api LineBoundaryRange

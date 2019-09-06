@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/georepresentation/builder/add_components_builders.h>
 #include <geode/georepresentation/builder/blocks_builder.h>
 #include <geode/georepresentation/builder/corners_builder.h>
 #include <geode/georepresentation/builder/georepresentation_builder.h>
@@ -55,11 +56,11 @@ namespace geode
      * Class managing modification of a BRep
      */
     class opengeode_georepresentation_api BRepBuilder
-        : public GeoRepresentationBuilder< 3,
-              CornersBuilder,
-              LinesBuilder,
-              SurfacesBuilder,
-              BlocksBuilder >
+        : public GeoRepresentationBuilder, public AddComponentsBuilders< 3,
+              Corners,
+              Lines,
+              Surfaces,
+              Blocks >
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( BRepBuilder );
 

@@ -43,9 +43,11 @@ namespace geode
     class opengeode_georepresentation_api Lines
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( Lines );
-        friend class LinesBuilder< dimension >;
 
     public:
+        using Builder = LinesBuilder< dimension >;
+        friend Builder;
+
         class opengeode_georepresentation_api LineRangeBase
         {
         public:
