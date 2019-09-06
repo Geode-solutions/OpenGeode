@@ -161,7 +161,7 @@ namespace geode
             TContext context{};
             register_basic_serialize_pcontext( std::get< 0 >( context ) );
             register_mesh_serialize_pcontext( std::get< 0 >( context ) );
-            register_georepresentation_serialize_pcontext(
+            register_model_serialize_pcontext(
                 std::get< 0 >( context ) );
             Serializer archive{ context, file };
             archive.object( *this );
@@ -178,7 +178,7 @@ namespace geode
             TContext context{};
             register_basic_deserialize_pcontext( std::get< 0 >( context ) );
             register_mesh_deserialize_pcontext( std::get< 0 >( context ) );
-            register_georepresentation_deserialize_pcontext(
+            register_model_deserialize_pcontext(
                 std::get< 0 >( context ) );
             Deserializer archive{ context, file };
             archive.object( *this );

@@ -43,12 +43,6 @@ class CornerProvider : public geode::Topology,
 {
 public:
     CornerProvider() = default;
-
-private:
-    void compute_epsilon( double& epsilon ) const override
-    {
-        epsilon = epsilon_scaling;
-    }
 };
 
 class CornerProviderBuilder

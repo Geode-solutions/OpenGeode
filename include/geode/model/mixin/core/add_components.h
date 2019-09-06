@@ -33,8 +33,8 @@
 namespace geode
 {
     /*!
-     * This mixin represents an assembly of geometric components.
-     * The geometric component types are flexible.
+     * This mixin represents an assembly of components.
+     * The component types are flexible.
      * Syntax for create a derivated class is
      * class DerivateClass : public AddComponents< dimension, ComponentClassA, ComponentClassB, ComponentClassC >, public OtherOptionalMixins
      */

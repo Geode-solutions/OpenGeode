@@ -70,12 +70,12 @@ namespace
 
 namespace geode
 {
-    void register_georepresentation_serialize_pcontext( PContext& context )
+    void register_model_serialize_pcontext( PContext& context )
     {
         register_pcontext< Serializer >( context );
     }
 
-    void register_georepresentation_deserialize_pcontext( PContext& context )
+    void register_model_deserialize_pcontext( PContext& context )
     {
         register_pcontext< Deserializer >( context );
     }
