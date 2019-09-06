@@ -27,7 +27,9 @@ namespace geode
 {
     VertexIdentifierBuilder::VertexIdentifierBuilder(
         VertexIdentifier& vertex_identifier )
-        : vertex_identifier_( vertex_identifier ){};
+        : vertex_identifier_( vertex_identifier )
+    {
+    }
 
     index_t VertexIdentifierBuilder::create_unique_vertex()
     {

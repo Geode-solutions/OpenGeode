@@ -33,7 +33,7 @@ namespace geode
      * @param[in] context The context where to register this information.
      * @warning The context can be used only once per archive.
      */
-    void opengeode_model_api register_georepresentation_serialize_pcontext(
+    void opengeode_model_api register_model_serialize_pcontext(
         PContext& context );
 
     /*!
@@ -42,6 +42,6 @@ namespace geode
      * @param[in] context The context where to register this information.
      * @warning The context can be used only once per archive.
      */
-    void opengeode_model_api register_georepresentation_deserialize_pcontext(
+    void opengeode_model_api register_model_deserialize_pcontext(
         PContext& context );
 } // namespace geode

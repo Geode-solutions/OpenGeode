@@ -103,21 +103,4 @@ namespace geode
     {
         return section_.surface( Relationships::IncidenceRange::operator*() );
     }
-
-    void Section::compute_epsilon( double& epsilon ) const
-    {
-        BoundingBox2D box;
-        for( const auto& surface : surfaces() )
-        {
-            const auto& mesh = surface.mesh();
-            for( auto v : Range{ mesh.nb_vertices() } )
-            {
-                box.add_point( mesh.point( v ) );
-            }
-        }
-        Vector2D diagonal{ box.min(), box.max() };
-        epsilon = epsilon_scaling
-                  * std::min( diagonal.value( 0 ),
-                        std::min( diagonal.value( 1 ), diagonal.value( 2 ) ) );
-    }
 } // namespace geode

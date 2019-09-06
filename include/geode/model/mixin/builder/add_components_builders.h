@@ -30,10 +30,10 @@
 namespace geode
 {
     /*!
-     * This mixins represents the builders of an assembly of geometric components.
+     * This mixin represents the builders of an assembly of components.
      * Syntax for create a derived class is
      * class DerivateClass : public AddComponentsBuilders< dimension, ComponentClassA, ComponentClassB, ComponentClassC >
-     * Each ComponentClass should have a ComponentClass::Builder
+     * Each ComponentClass should have a ComponentClass::Builder.
      */
     template < index_t dimension, template < index_t > class... Components >
     class AddComponentsBuilders : public Components< dimension >::Builder...

@@ -207,8 +207,5 @@ namespace geode
         {
             return native_extension_static();
         }
-
-    private:
-        void compute_epsilon( double& epsilon ) const override;
     };
 } // namespace geode

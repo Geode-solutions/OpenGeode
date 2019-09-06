@@ -57,7 +57,7 @@ namespace
             geode::OpenGeodeSectionOutput::extension() );
     }
 
-    OPENGEODE_LIBRARY_INITIALIZE( OpenGeode_georepresentation )
+    OPENGEODE_LIBRARY_INITIALIZE( OpenGeode_model )
     {
         register_brep_input();
         register_section_input();
