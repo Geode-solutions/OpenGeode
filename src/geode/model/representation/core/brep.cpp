@@ -37,12 +37,12 @@ namespace geode
 {
     BRep::LineBoundaryRange BRep::boundaries( const Line3D& line ) const
     {
-        return { *this, relationships(), line };
+        return { *this, line };
     }
 
     BRep::LineBoundaryRange::LineBoundaryRange(
-        const BRep& brep, const Relationships& manager, const Line3D& line )
-        : Relationships::BoundaryRange( manager, line.id() ), brep_( brep )
+        const BRep& brep, const Line3D& line )
+        : Relationships::BoundaryRange( brep, line.id() ), brep_( brep )
     {
     }
 
@@ -54,13 +54,12 @@ namespace geode
     BRep::SurfaceBoundaryRange BRep::boundaries(
         const Surface3D& surface ) const
     {
-        return { *this, relationships(), surface };
+        return { *this, surface };
     }
 
-    BRep::SurfaceBoundaryRange::SurfaceBoundaryRange( const BRep& brep,
-        const Relationships& manager,
-        const Surface3D& surface )
-        : Relationships::BoundaryRange( manager, surface.id() ), brep_( brep )
+    BRep::SurfaceBoundaryRange::SurfaceBoundaryRange(
+        const BRep& brep, const Surface3D& surface )
+        : Relationships::BoundaryRange( brep, surface.id() ), brep_( brep )
     {
     }
 
@@ -71,12 +70,12 @@ namespace geode
 
     BRep::BlockBoundaryRange BRep::boundaries( const Block3D& block ) const
     {
-        return { *this, relationships(), block };
+        return { *this, block };
     }
 
     BRep::BlockBoundaryRange::BlockBoundaryRange(
-        const BRep& brep, const Relationships& manager, const Block3D& block )
-        : Relationships::BoundaryRange( manager, block.id() ), brep_( brep )
+        const BRep& brep, const Block3D& block )
+        : Relationships::BoundaryRange( brep, block.id() ), brep_( brep )
     {
     }
 
@@ -87,12 +86,12 @@ namespace geode
 
     BRep::CornerIncidenceRange BRep::incidences( const Corner3D& corner ) const
     {
-        return { *this, relationships(), corner };
+        return { *this, corner };
     }
 
     BRep::CornerIncidenceRange::CornerIncidenceRange(
-        const BRep& brep, const Relationships& manager, const Corner3D& corner )
-        : Relationships::IncidenceRange( manager, corner.id() ), brep_( brep )
+        const BRep& brep, const Corner3D& corner )
+        : Relationships::IncidenceRange( brep, corner.id() ), brep_( brep )
     {
     }
 
@@ -103,12 +102,12 @@ namespace geode
 
     BRep::LineIncidenceRange BRep::incidences( const Line3D& line ) const
     {
-        return { *this, relationships(), line };
+        return { *this, line };
     }
 
     BRep::LineIncidenceRange::LineIncidenceRange(
-        const BRep& brep, const Relationships& manager, const Line3D& line )
-        : Relationships::IncidenceRange( manager, line.id() ), brep_( brep )
+        const BRep& brep, const Line3D& line )
+        : Relationships::IncidenceRange( brep, line.id() ), brep_( brep )
     {
     }
 
@@ -120,13 +119,12 @@ namespace geode
     BRep::SurfaceIncidenceRange BRep::incidences(
         const Surface3D& surface ) const
     {
-        return { *this, relationships(), surface };
+        return { *this, surface };
     }
 
-    BRep::SurfaceIncidenceRange::SurfaceIncidenceRange( const BRep& brep,
-        const Relationships& manager,
-        const Surface3D& surface )
-        : Relationships::IncidenceRange( manager, surface.id() ), brep_( brep )
+    BRep::SurfaceIncidenceRange::SurfaceIncidenceRange(
+        const BRep& brep, const Surface3D& surface )
+        : Relationships::IncidenceRange( brep, surface.id() ), brep_( brep )
     {
     }
 

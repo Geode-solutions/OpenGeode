@@ -29,16 +29,16 @@
 
 #include <geode/model/mixin/builder/add_components_builders.h>
 #include <geode/model/mixin/builder/corners_builder.h>
-#include <geode/model/mixin/builder/georepresentation_builder.h>
+#include <geode/model/mixin/builder/topology_builder.h>
 
 #include <geode/model/mixin/core/add_components.h>
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/corners.h>
-#include <geode/model/mixin/core/georepresentation.h>
+#include <geode/model/mixin/core/topology.h>
 
 #include <geode/mesh/builder/point_set_builder.h>
 
-class CornerProvider : public geode::GeoRepresentation,
+class CornerProvider : public geode::Topology,
                        public geode::AddComponents< 2, geode::Corners >
 {
 public:
@@ -52,12 +52,12 @@ private:
 };
 
 class CornerProviderBuilder
-    : public geode::GeoRepresentationBuilder,
+    : public geode::TopologyBuilder,
       public geode::AddComponentsBuilders< 2, geode::Corners >
 {
 public:
     CornerProviderBuilder( CornerProvider& corner_provider )
-        : GeoRepresentationBuilder( corner_provider ),
+        : TopologyBuilder( corner_provider ),
           AddComponentsBuilders< 2, geode::Corners >( corner_provider ),
           corner_provider_( corner_provider )
     {
@@ -66,8 +66,7 @@ public:
     const geode::uuid& add_corner()
     {
         const auto& id = create_corner();
-        unique_vertices().register_mesh_component(
-            corner_provider_.corner( id ) );
+        register_mesh_component( corner_provider_.corner( id ) );
         return id;
     }
 
@@ -77,7 +76,8 @@ private:
 
 void test_create_unique_vertices( geode::VertexIdentifier& vertex_identifier )
 {
-    vertex_identifier.create_unique_vertices( 4 );
+    geode::VertexIdentifierBuilder builder{ vertex_identifier };
+    builder.create_unique_vertices( 4 );
     OPENGEODE_EXCEPTION( vertex_identifier.nb_unique_vertices() == 4,
         "Creation of unique vertices is not correct" );
 }
@@ -87,10 +87,10 @@ void test_set_unique_vertices(
 {
     geode::index_t count{ 0 };
     std::vector< geode::uuid > uuids;
+    geode::VertexIdentifierBuilder builder{ vertex_identifier };
     for( const auto& corner : provider.corners() )
     {
-        vertex_identifier.set_unique_vertex(
-            { corner.component_id(), 0 }, count++ % 3 );
+        builder.set_unique_vertex( { corner.component_id(), 0 }, count++ % 3 );
         uuids.push_back( corner.id() );
     }
 
@@ -117,19 +117,20 @@ void test_set_unique_vertices(
 
 void test_modify_unique_vertices( geode::VertexIdentifier& vertex_identifier )
 {
-    OPENGEODE_EXCEPTION( vertex_identifier.create_unique_vertex() == 4,
+    geode::VertexIdentifierBuilder builder{ vertex_identifier };
+    OPENGEODE_EXCEPTION( builder.create_unique_vertex() == 4,
         "Creation of an unique vertices is not correct" );
 
     const auto mesh_component_vertex0 =
         vertex_identifier.mesh_component_vertices( 0 ).front();
 
-    vertex_identifier.set_unique_vertex( mesh_component_vertex0, 0 );
+    builder.set_unique_vertex( mesh_component_vertex0, 0 );
     OPENGEODE_EXCEPTION(
         vertex_identifier.mesh_component_vertices( 0 ).size() == 2
             && vertex_identifier.mesh_component_vertices( 3 ).size() == 0,
         "Reset of a unique vertex (to similar value) is not correct" );
 
-    vertex_identifier.set_unique_vertex( mesh_component_vertex0, 3 );
+    builder.set_unique_vertex( mesh_component_vertex0, 3 );
     OPENGEODE_EXCEPTION(
         vertex_identifier.mesh_component_vertices( 0 ).size() == 1
             && vertex_identifier.mesh_component_vertices( 3 ).size() == 1,
@@ -144,7 +145,8 @@ void test_save_and_load_unique_vertices(
 {
     vertex_identifier.save_unique_vertices( "." );
     geode::VertexIdentifier vertex_identifier2;
-    vertex_identifier2.load_unique_vertices( "." );
+    geode::VertexIdentifierBuilder loader{ vertex_identifier2 };
+    loader.load_unique_vertices( "." );
     OPENGEODE_EXCEPTION( vertex_identifier2.nb_unique_vertices()
                              == vertex_identifier.nb_unique_vertices(),
         "Save/Load of unique vertices are not correct (different number of "
@@ -194,13 +196,14 @@ int main()
         builder.corner_mesh_builder( corner3_id )
             ->create_point( geode::Point2D{ { 0.1, 2.3 } } );
 
-        vertex_identifier.register_mesh_component(
+        VertexIdentifierBuilder vertex_id_builder{ vertex_identifier };
+        vertex_id_builder.register_mesh_component(
             provider.corner( corner0_id ) );
-        vertex_identifier.register_mesh_component(
+        vertex_id_builder.register_mesh_component(
             provider.corner( corner1_id ) );
-        vertex_identifier.register_mesh_component(
+        vertex_id_builder.register_mesh_component(
             provider.corner( corner2_id ) );
-        vertex_identifier.register_mesh_component(
+        vertex_id_builder.register_mesh_component(
             provider.corner( corner3_id ) );
 
         test_create_unique_vertices( vertex_identifier );
@@ -208,10 +211,8 @@ int main()
         test_modify_unique_vertices( vertex_identifier );
         test_save_and_load_unique_vertices( vertex_identifier );
 
-        vertex_identifier.unregister_mesh_component(
-            provider.corner( corner2_id ) );
-        vertex_identifier.register_mesh_component(
-            provider.corner( corner2_id ) );
+        builder.unregister_mesh_component( provider.corner( corner2_id ) );
+        builder.register_mesh_component( provider.corner( corner2_id ) );
 
         Logger::info( "TEST SUCCESS" );
         return 0;

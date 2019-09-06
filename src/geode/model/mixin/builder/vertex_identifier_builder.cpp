@@ -21,30 +21,34 @@
  *
  */
 
-#pragma once
-
-#include <mutex>
-
-#include <geode/model/common.h>
+#include <geode/model/mixin/builder/vertex_identifier_builder.h>
 
 namespace geode
 {
-    /*!
-     * This abstract class represents an assembly of geometric components.
-     * The geometric component types composing a model
-     * are flexible.
-     * Syntax for create a model is
-     * class DerivateClass : public GeoRepresentation, public AddComponents<
-     *	dimension, ComponentClassA, ComponentClassB, ComponentClassC >
-     */
-    template < index_t dimension, template < index_t > class... Components >
-    class AddComponentsBuilders : public Components< dimension >::Builder...
+    VertexIdentifierBuilder::VertexIdentifierBuilder(
+        VertexIdentifier& vertex_identifier )
+        : vertex_identifier_( vertex_identifier ){};
+
+    index_t VertexIdentifierBuilder::create_unique_vertex()
     {
-    protected:
-        template < typename Model >
-        AddComponentsBuilders( Model& model )
-            : Components< dimension >::Builder( model )...
-        {
-        }
-    };
+        return vertex_identifier_.create_unique_vertex();
+    }
+
+    index_t VertexIdentifierBuilder::create_unique_vertices( index_t nb )
+    {
+        return vertex_identifier_.create_unique_vertices( nb );
+    }
+
+    void VertexIdentifierBuilder::set_unique_vertex(
+        MeshComponentVertex component_vertex_id, index_t unique_vertex_id )
+    {
+        vertex_identifier_.set_unique_vertex(
+            component_vertex_id, unique_vertex_id );
+    }
+
+    void VertexIdentifierBuilder::load_unique_vertices(
+        const std::string& directory )
+    {
+        vertex_identifier_.load_unique_vertices( directory );
+    }
 } // namespace geode

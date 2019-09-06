@@ -27,7 +27,7 @@
 #include <geode/model/mixin/core/add_components.h>
 #include <geode/model/mixin/core/blocks.h>
 #include <geode/model/mixin/core/corners.h>
-#include <geode/model/mixin/core/georepresentation.h>
+#include <geode/model/mixin/core/topology.h>
 #include <geode/model/mixin/core/lines.h>
 #include <geode/model/mixin/core/surfaces.h>
 
@@ -42,13 +42,13 @@ namespace geode
 namespace geode
 {
     /*!
-     * A Boundary Representation is a GeoRepresentation composed of
+     * A Boundary Representation is a model composed of
      * Corners, Lines, Surfaces and Blocks.
      * This class provides classes for range-based iteration on Component
      * boundaries and incidences.
      */
     class opengeode_model_api BRep
-        : public GeoRepresentation,
+        : public Topology,
           public AddComponents< 3, Corners, Lines, Surfaces, Blocks >
     {
     public:
@@ -57,7 +57,6 @@ namespace geode
         {
         public:
             LineBoundaryRange( const BRep& brep,
-                const Relationships& manager,
                 const Line3D& line );
 
             const LineBoundaryRange& begin() const
@@ -81,7 +80,6 @@ namespace geode
         {
         public:
             SurfaceBoundaryRange( const BRep& brep,
-                const Relationships& manager,
                 const Surface3D& surface );
 
             const SurfaceBoundaryRange& begin() const
@@ -105,7 +103,6 @@ namespace geode
         {
         public:
             BlockBoundaryRange( const BRep& brep,
-                const Relationships& manager,
                 const Block3D& block );
 
             const BlockBoundaryRange& begin() const
@@ -130,7 +127,6 @@ namespace geode
         {
         public:
             CornerIncidenceRange( const BRep& brep,
-                const Relationships& manager,
                 const Corner3D& corner );
 
             const CornerIncidenceRange& begin() const
@@ -154,7 +150,6 @@ namespace geode
         {
         public:
             LineIncidenceRange( const BRep& brep,
-                const Relationships& manager,
                 const Line3D& line );
 
             const LineIncidenceRange& begin() const
@@ -178,7 +173,6 @@ namespace geode
         {
         public:
             SurfaceIncidenceRange( const BRep& brep,
-                const Relationships& manager,
                 const Surface3D& surface );
 
             const SurfaceIncidenceRange& begin() const

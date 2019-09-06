@@ -36,13 +36,12 @@ namespace geode
 {
     Section::LineBoundaryRange Section::boundaries( const Line2D& line ) const
     {
-        return { *this, relationships(), line };
+        return { *this, line };
     }
 
     Section::LineBoundaryRange::LineBoundaryRange( const Section& section,
-        const Relationships& manager,
         const Line2D& line )
-        : Relationships::BoundaryRange( manager, line.id() ),
+        : Relationships::BoundaryRange( section, line.id() ),
           section_( section )
     {
     }
@@ -55,13 +54,12 @@ namespace geode
     Section::SurfaceBoundaryRange Section::boundaries(
         const Surface2D& surface ) const
     {
-        return { *this, relationships(), surface };
+        return { *this, surface };
     }
 
     Section::SurfaceBoundaryRange::SurfaceBoundaryRange( const Section& section,
-        const Relationships& manager,
         const Surface2D& surface )
-        : Relationships::BoundaryRange( manager, surface.id() ),
+        : Relationships::BoundaryRange( section, surface.id() ),
           section_( section )
     {
     }
@@ -74,13 +72,12 @@ namespace geode
     Section::CornerIncidenceRange Section::incidences(
         const Corner2D& corner ) const
     {
-        return { *this, relationships(), corner };
+        return { *this, corner };
     }
 
     Section::CornerIncidenceRange::CornerIncidenceRange( const Section& section,
-        const Relationships& manager,
         const Corner2D& corner )
-        : Relationships::IncidenceRange( manager, corner.id() ),
+        : Relationships::IncidenceRange( section, corner.id() ),
           section_( section )
     {
     }
@@ -92,13 +89,12 @@ namespace geode
 
     Section::LineIncidenceRange Section::incidences( const Line2D& line ) const
     {
-        return { *this, relationships(), line };
+        return { *this, line };
     }
 
     Section::LineIncidenceRange::LineIncidenceRange( const Section& section,
-        const Relationships& manager,
         const Line2D& line )
-        : Relationships::IncidenceRange( manager, line.id() ),
+        : Relationships::IncidenceRange( section, line.id() ),
           section_( section )
     {
     }

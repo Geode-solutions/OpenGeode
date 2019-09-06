@@ -48,10 +48,10 @@ namespace geode
         void archive_section_files( const ZipFile& zip_writer ) const
         {
             zip_writer.archive_file(
-                section().relationships().save_relationships(
+                section().save_relationships(
                     zip_writer.directory() ) );
             zip_writer.archive_file(
-                section().unique_vertices().save_unique_vertices(
+                section().save_unique_vertices(
                     zip_writer.directory() ) );
             zip_writer.archive_files(
                 section().save_corners( zip_writer.directory() ) );

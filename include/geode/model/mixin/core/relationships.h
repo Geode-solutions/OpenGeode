@@ -43,6 +43,7 @@ namespace geode
      */
     class opengeode_model_api Relationships
     {
+        friend class RelationshipsBuilder;
     public:
         /*!
          * Range to iterates on all boundaries of one component
@@ -50,7 +51,7 @@ namespace geode
         class opengeode_model_api BoundaryRange
         {
         public:
-            BoundaryRange( const Relationships& manager, const uuid& id );
+            BoundaryRange( const Relationships& relationships, const uuid& id );
             BoundaryRange( BoundaryRange&& other ) noexcept;
             BoundaryRange( const BoundaryRange& other );
             ~BoundaryRange();
@@ -81,7 +82,7 @@ namespace geode
         class opengeode_model_api IncidenceRange
         {
         public:
-            IncidenceRange( const Relationships& manager, const uuid& id );
+            IncidenceRange( const Relationships& relationships, const uuid& id );
             IncidenceRange( IncidenceRange&& other ) noexcept;
             IncidenceRange( const IncidenceRange& other );
             ~IncidenceRange();
@@ -112,7 +113,7 @@ namespace geode
         class opengeode_model_api ItemRange
         {
         public:
-            ItemRange( const Relationships& manager, const uuid& id );
+            ItemRange( const Relationships& relationships, const uuid& id );
             ItemRange( ItemRange&& other ) noexcept;
             ItemRange( const ItemRange& other );
             ~ItemRange();
@@ -143,7 +144,7 @@ namespace geode
         class opengeode_model_api CollectionRange
         {
         public:
-            CollectionRange( const Relationships& manager, const uuid& id );
+            CollectionRange( const Relationships& relationships, const uuid& id );
             CollectionRange( CollectionRange&& other ) noexcept;
             CollectionRange( const CollectionRange& other );
             ~CollectionRange();
@@ -188,6 +189,9 @@ namespace geode
 
         CollectionRange collections( const uuid& id ) const;
 
+        std::string save_relationships( const std::string& directory ) const;
+
+    private:
         /*!
          * Add a component in the set of components registered by the
          * Relationships
@@ -216,8 +220,6 @@ namespace geode
          * @param[in] collection Unique index of the collection component
          */
         void add_item_in_collection( const uuid& item, const uuid& collection );
-
-        std::string save_relationships( const std::string& directory ) const;
 
         void load_relationships( const std::string& directory );
 

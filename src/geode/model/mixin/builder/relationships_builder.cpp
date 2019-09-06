@@ -21,45 +21,41 @@
  *
  */
 
-#pragma once
-
-#include <geode/model/common.h>
-
-#include <geode/model/mixin/core/georepresentation.h>
+#include <geode/model/mixin/builder/relationships_builder.h>
 
 namespace geode
 {
-    /*!
-     * Class managing modification of GeoRepresentation
-     * It gives a modifiable access to the VertexIdentifier
-     */
-    class GeoRepresentationBuilder
+    RelationshipsBuilder::RelationshipsBuilder( Relationships& relationships )
+        : relationships_( relationships )
     {
-    public:
-        void load_relationships( const std::string& directory )
-        {
-            relationships().load_relationships( directory );
-        }
+    }
 
-        VertexIdentifier& unique_vertices()
-        {
-            return unique_vertices_;
-        }
+    void RelationshipsBuilder::register_component( const uuid& id )
+    {
+        relationships_.register_component( id );
+    }
 
-    protected:
-        GeoRepresentationBuilder( GeoRepresentation& georepresentation )
-            : relationships_( georepresentation.relationships_ ),
-              unique_vertices_( georepresentation.unique_vertices_ )
-        {
-        }
+    void RelationshipsBuilder::unregister_component( const uuid& id )
+    {
+        relationships_.unregister_component( id );
+    }
 
-        Relationships& relationships()
-        {
-            return relationships_;
-        }
+    void RelationshipsBuilder::add_boundary_relation(
+        const uuid& boundary, const uuid& incidence )
+    {
+        relationships_.add_boundary_relation( boundary, incidence );
+    }
 
-    private:
-        Relationships& relationships_;
-        VertexIdentifier& unique_vertices_;
-    };
+    void RelationshipsBuilder::add_item_in_collection(
+        const uuid& item, const uuid& collection )
+    {
+        relationships_.add_item_in_collection( item, collection );
+    }
+
+    void RelationshipsBuilder::load_relationships(
+        const std::string& directory )
+    {
+        relationships_.load_relationships( directory );
+    }
+
 } // namespace geode

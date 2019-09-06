@@ -27,14 +27,14 @@
 #include <geode/model/mixin/builder/add_components_builders.h>
 #include <geode/model/mixin/builder/blocks_builder.h>
 #include <geode/model/mixin/builder/corners_builder.h>
-#include <geode/model/mixin/builder/georepresentation_builder.h>
+#include <geode/model/mixin/builder/topology_builder.h>
 #include <geode/model/mixin/builder/lines_builder.h>
 #include <geode/model/mixin/builder/surfaces_builder.h>
 #include <geode/model/mixin/core/blocks.h>
 #include <geode/model/mixin/core/corners.h>
-#include <geode/model/mixin/core/georepresentation.h>
 #include <geode/model/mixin/core/lines.h>
 #include <geode/model/mixin/core/surfaces.h>
+#include <geode/model/mixin/core/topology.h>
 
 #include <geode/mesh/core/mesh_type.h>
 
@@ -55,7 +55,7 @@ namespace geode
      * Class managing modification of a Section
      */
     class opengeode_model_api SectionBuilder
-        : public GeoRepresentationBuilder,
+        : public TopologyBuilder,
           public AddComponentsBuilders< 2, Corners, Lines, Surfaces >
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( SectionBuilder );
@@ -81,10 +81,10 @@ namespace geode
 
         void remove_surface( const Surface2D& surface );
 
-        void add_boundary_relation(
+        void add_corner_line_relationship(
             const Corner2D& corner, const Line2D& line );
 
-        void add_boundary_relation(
+        void add_line_surface_relationship(
             const Line2D& line, const Surface2D& surface );
 
     private:

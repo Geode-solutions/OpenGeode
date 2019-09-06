@@ -28,47 +28,51 @@
 #include <geode/basic/uuid.h>
 
 #include <geode/model/mixin/core/relationships.h>
+#include <geode/model/mixin/builder/relationships_builder.h>
 
 std::vector< geode::uuid > create_uuids( geode::Relationships& relationships )
 {
     geode::index_t nb{ 6 };
     std::vector< geode::uuid > uuids;
+    geode::RelationshipsBuilder builder{ relationships };
     for( auto unused : geode::Range{ nb } )
     {
         geode_unused( unused );
         geode::uuid cur_uuid;
-        relationships.register_component( cur_uuid );
+        builder.register_component( cur_uuid );
         uuids.push_back( cur_uuid );
     }
     return uuids;
 }
 
 void add_boundary_relations(
-    geode::Relationships& relations, const std::vector< geode::uuid >& uuids )
+    geode::Relationships& relationships, const std::vector< geode::uuid >& uuids )
 {
-    relations.add_boundary_relation( uuids[0], uuids[1] );
-    relations.add_boundary_relation( uuids[0], uuids[2] );
-    relations.add_boundary_relation( uuids[0], uuids[3] );
-    relations.add_boundary_relation( uuids[1], uuids[2] );
-    relations.add_boundary_relation( uuids[1], uuids[3] );
-    relations.add_boundary_relation( uuids[2], uuids[3] );
-    relations.add_boundary_relation( uuids[4], uuids[0] );
-    relations.add_boundary_relation( uuids[4], uuids[5] );
-    relations.add_boundary_relation( uuids[5], uuids[0] );
+    geode::RelationshipsBuilder builder{ relationships };
+    builder.add_boundary_relation( uuids[0], uuids[1] );
+    builder.add_boundary_relation( uuids[0], uuids[2] );
+    builder.add_boundary_relation( uuids[0], uuids[3] );
+    builder.add_boundary_relation( uuids[1], uuids[2] );
+    builder.add_boundary_relation( uuids[1], uuids[3] );
+    builder.add_boundary_relation( uuids[2], uuids[3] );
+    builder.add_boundary_relation( uuids[4], uuids[0] );
+    builder.add_boundary_relation( uuids[4], uuids[5] );
+    builder.add_boundary_relation( uuids[5], uuids[0] );
     // Repete last relation to test duplications
-    relations.add_boundary_relation( uuids[5], uuids[0] );
+    builder.add_boundary_relation( uuids[5], uuids[0] );
 }
 
 void add_items_in_collections(
-    geode::Relationships& relations, const std::vector< geode::uuid >& uuids )
+    geode::Relationships& relationships, const std::vector< geode::uuid >& uuids )
 {
-    relations.add_item_in_collection( uuids[1], uuids[5] );
-    relations.add_item_in_collection( uuids[2], uuids[5] );
-    relations.add_item_in_collection( uuids[3], uuids[5] );
-    relations.add_item_in_collection( uuids[5], uuids[4] );
-    relations.add_item_in_collection( uuids[0], uuids[4] );
+    geode::RelationshipsBuilder builder{ relationships };
+    builder.add_item_in_collection( uuids[1], uuids[5] );
+    builder.add_item_in_collection( uuids[2], uuids[5] );
+    builder.add_item_in_collection( uuids[3], uuids[5] );
+    builder.add_item_in_collection( uuids[5], uuids[4] );
+    builder.add_item_in_collection( uuids[0], uuids[4] );
     // Repete last relation to test duplications
-    relations.add_item_in_collection( uuids[0], uuids[4] );
+    builder.add_item_in_collection( uuids[0], uuids[4] );
 }
 
 void test_uuid( const geode::Relationships& relations,
@@ -128,7 +132,8 @@ int main()
 
         relationships.save_relationships( "." );
         Relationships reloaded_relationships;
-        reloaded_relationships.load_relationships( "." );
+        RelationshipsBuilder reloader{ reloaded_relationships };
+        reloader.load_relationships( "." );
         test_relations( reloaded_relationships, uuids );
 
         Logger::info( "TEST SUCCESS" );

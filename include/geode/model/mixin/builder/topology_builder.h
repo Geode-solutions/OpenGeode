@@ -23,28 +23,28 @@
 
 #pragma once
 
-#include <mutex>
-
 #include <geode/model/common.h>
+
+#include <geode/model/mixin/builder/relationships_builder.h>
+#include <geode/model/mixin/builder/vertex_identifier_builder.h>
+#include <geode/model/mixin/core/topology.h>
+
 
 namespace geode
 {
     /*!
-     * This abstract class represents an assembly of geometric components.
-     * The geometric component types composing a model
-     * are flexible.
-     * Syntax for create a model is
-     * class DerivateClass : public GeoRepresentation, public AddComponents<
-     *	dimension, ComponentClassA, ComponentClassB, ComponentClassC >
+     * Class managing modification of Topology
      */
-    template < index_t dimension, template < index_t > class... Components >
-    class AddComponentsBuilders : public Components< dimension >::Builder...
+    class TopologyBuilder : public RelationshipsBuilder,
+                            public VertexIdentifierBuilder
     {
     protected:
-        template < typename Model >
-        AddComponentsBuilders( Model& model )
-            : Components< dimension >::Builder( model )...
-        {
-        }
+        TopologyBuilder( Topology& topology )
+            : RelationshipsBuilder( topology ),
+              VertexIdentifierBuilder( topology ),
+              topology_( topology ){};
+
+    private:
+        Topology& topology_;
     };
 } // namespace geode

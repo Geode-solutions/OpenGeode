@@ -48,6 +48,8 @@ namespace geode
      */
     class opengeode_model_api VertexIdentifier
     {
+        friend class VertexIdentifierBuilder;
+        
     public:
         VertexIdentifier();
         ~VertexIdentifier();
@@ -88,6 +90,14 @@ namespace geode
             const MeshComponentVertex& component_vertex ) const;
 
         /*!
+         * Save the VertexIdentifier into a file.
+         * @param[in] directory Folder in which create the file.
+         * @return the filename.
+         */
+        std::string save_unique_vertices( const std::string& directory ) const;
+
+    private:
+        /*!
          * Add a component in the VertexIdentifier
          */
         template < typename MeshComponent >
@@ -119,13 +129,6 @@ namespace geode
          */
         void set_unique_vertex(
             MeshComponentVertex component_vertex_id, index_t unique_vertex_id );
-
-        /*!
-         * Save the VertexIdentifier into a file.
-         * @param[in] directory Folder in which create the file.
-         * @return the filename.
-         */
-        std::string save_unique_vertices( const std::string& directory ) const;
 
         /*!
          * Load the VertexIdentifier from a file.

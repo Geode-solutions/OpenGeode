@@ -55,24 +55,23 @@ namespace geode
             builder.load_surfaces( zip_reader.directory() );
             builder.load_blocks( zip_reader.directory() );
             builder.load_relationships( zip_reader.directory() );
-            builder.unique_vertices().load_unique_vertices(
-                zip_reader.directory() );
+            builder.load_unique_vertices( zip_reader.directory() );
 
             for( const auto& corner : brep().corners() )
             {
-                builder.unique_vertices().register_mesh_component( corner );
+                builder.register_mesh_component( corner );
             }
             for( const auto& line : brep().lines() )
             {
-                builder.unique_vertices().register_mesh_component( line );
+                builder.register_mesh_component( line );
             }
             for( const auto& surface : brep().surfaces() )
             {
-                builder.unique_vertices().register_mesh_component( surface );
+                builder.register_mesh_component( surface );
             }
             for( const auto& block : brep().blocks() )
             {
-                builder.unique_vertices().register_mesh_component( block );
+                builder.register_mesh_component( block );
             }
         }
     };
