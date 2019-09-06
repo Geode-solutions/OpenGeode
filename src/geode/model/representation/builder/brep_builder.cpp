@@ -41,92 +41,92 @@ namespace geode
     const uuid& BRepBuilder::add_corner()
     {
         const auto& id = create_corner();
-        relationships().add_component( id );
-        unique_vertices().register_component( brep_.corner( id ) );
+        relationships().register_component( id );
+        unique_vertices().register_mesh_component( brep_.corner( id ) );
         return id;
     }
 
     const uuid& BRepBuilder::add_corner( const MeshType& type )
     {
         const auto& id = create_corner( type );
-        relationships().add_component( id );
-        unique_vertices().register_component( brep_.corner( id ) );
+        relationships().register_component( id );
+        unique_vertices().register_mesh_component( brep_.corner( id ) );
         return id;
     }
 
     const uuid& BRepBuilder::add_line()
     {
         const auto& id = create_line();
-        relationships().add_component( id );
-        unique_vertices().register_component( brep_.line( id ) );
+        relationships().register_component( id );
+        unique_vertices().register_mesh_component( brep_.line( id ) );
         return id;
     }
 
     const uuid& BRepBuilder::add_line( const MeshType& type )
     {
         const auto& id = create_line( type );
-        relationships().add_component( id );
-        unique_vertices().register_component( brep_.line( id ) );
+        relationships().register_component( id );
+        unique_vertices().register_mesh_component( brep_.line( id ) );
         return id;
     }
 
     const uuid& BRepBuilder::add_surface()
     {
         const auto& id = create_surface();
-        relationships().add_component( id );
-        unique_vertices().register_component( brep_.surface( id ) );
+        relationships().register_component( id );
+        unique_vertices().register_mesh_component( brep_.surface( id ) );
         return id;
     }
 
     const uuid& BRepBuilder::add_surface( const MeshType& type )
     {
         const auto& id = create_surface( type );
-        relationships().add_component( id );
-        unique_vertices().register_component( brep_.surface( id ) );
+        relationships().register_component( id );
+        unique_vertices().register_mesh_component( brep_.surface( id ) );
         return id;
     }
 
     const uuid& BRepBuilder::add_block()
     {
         const auto& id = create_block();
-        relationships().add_component( id );
-        unique_vertices().register_component( brep_.block( id ) );
+        relationships().register_component( id );
+        unique_vertices().register_mesh_component( brep_.block( id ) );
         return id;
     }
 
     const uuid& BRepBuilder::add_block( const MeshType& type )
     {
         const auto& id = create_block( type );
-        relationships().add_component( id );
-        unique_vertices().register_component( brep_.block( id ) );
+        relationships().register_component( id );
+        unique_vertices().register_mesh_component( brep_.block( id ) );
         return id;
     }
 
     void BRepBuilder::remove_corner( const Corner3D& corner )
     {
-        relationships().remove_component( corner.id() );
-        unique_vertices().remove_component( corner );
+        relationships().unregister_component( corner.id() );
+        unique_vertices().unregister_mesh_component( corner );
         delete_corner( corner );
     }
 
     void BRepBuilder::remove_line( const Line3D& line )
     {
-        relationships().remove_component( line.id() );
-        unique_vertices().remove_component( line );
+        relationships().unregister_component( line.id() );
+        unique_vertices().unregister_mesh_component( line );
         delete_line( line );
     }
 
     void BRepBuilder::remove_surface( const Surface3D& surface )
     {
-        relationships().remove_component( surface.id() );
-        unique_vertices().remove_component( surface );
+        relationships().unregister_component( surface.id() );
+        unique_vertices().unregister_mesh_component( surface );
         delete_surface( surface );
     }
 
     void BRepBuilder::remove_block( const Block3D& block )
     {
-        relationships().remove_component( block.id() );
-        unique_vertices().remove_component( block );
+        relationships().unregister_component( block.id() );
+        unique_vertices().unregister_mesh_component( block );
         delete_block( block );
     }
 

@@ -60,19 +60,19 @@ namespace geode
 
             for( const auto& corner : brep().corners() )
             {
-                builder.unique_vertices().register_component( corner );
+                builder.unique_vertices().register_mesh_component( corner );
             }
             for( const auto& line : brep().lines() )
             {
-                builder.unique_vertices().register_component( line );
+                builder.unique_vertices().register_mesh_component( line );
             }
             for( const auto& surface : brep().surfaces() )
             {
-                builder.unique_vertices().register_component( surface );
+                builder.unique_vertices().register_mesh_component( surface );
             }
             for( const auto& block : brep().blocks() )
             {
-                builder.unique_vertices().register_component( block );
+                builder.unique_vertices().register_mesh_component( block );
             }
         }
     };

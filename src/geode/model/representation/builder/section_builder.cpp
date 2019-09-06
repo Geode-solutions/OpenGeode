@@ -41,69 +41,69 @@ namespace geode
     const uuid& SectionBuilder::add_corner()
     {
         const auto& id = create_corner();
-        relationships().add_component( id );
-        unique_vertices().register_component( section_.corner( id ) );
+        relationships().register_component( id );
+        unique_vertices().register_mesh_component( section_.corner( id ) );
         return id;
     }
 
     const uuid& SectionBuilder::add_corner( const MeshType& type )
     {
         const auto& id = create_corner( type );
-        relationships().add_component( id );
-        unique_vertices().register_component( section_.corner( id ) );
+        relationships().register_component( id );
+        unique_vertices().register_mesh_component( section_.corner( id ) );
         return id;
     }
 
     const uuid& SectionBuilder::add_line()
     {
         const auto& id = create_line();
-        relationships().add_component( id );
-        unique_vertices().register_component( section_.line( id ) );
+        relationships().register_component( id );
+        unique_vertices().register_mesh_component( section_.line( id ) );
         return id;
     }
 
     const uuid& SectionBuilder::add_line( const MeshType& type )
     {
         const auto& id = create_line( type );
-        relationships().add_component( id );
-        unique_vertices().register_component( section_.line( id ) );
+        relationships().register_component( id );
+        unique_vertices().register_mesh_component( section_.line( id ) );
         return id;
     }
 
     const uuid& SectionBuilder::add_surface()
     {
         const auto& id = create_surface();
-        relationships().add_component( id );
-        unique_vertices().register_component( section_.surface( id ) );
+        relationships().register_component( id );
+        unique_vertices().register_mesh_component( section_.surface( id ) );
         return id;
     }
 
     const uuid& SectionBuilder::add_surface( const MeshType& type )
     {
         const auto& id = create_surface( type );
-        relationships().add_component( id );
-        unique_vertices().register_component( section_.surface( id ) );
+        relationships().register_component( id );
+        unique_vertices().register_mesh_component( section_.surface( id ) );
         return id;
     }
 
     void SectionBuilder::remove_corner( const Corner2D& corner )
     {
-        relationships().remove_component( corner.id() );
-        unique_vertices().remove_component( corner );
+        relationships().unregister_component( corner.id() );
+        unique_vertices().unregister_mesh_component( corner );
         delete_corner( corner );
     }
 
     void SectionBuilder::remove_line( const Line2D& line )
     {
-        relationships().remove_component( line.id() );
-        unique_vertices().remove_component( line );
+        relationships().unregister_component( line.id() );
+        unique_vertices().unregister_mesh_component( line );
         delete_line( line );
     }
 
     void SectionBuilder::remove_surface( const Surface2D& surface )
     {
-        relationships().remove_component( surface.id() );
-        unique_vertices().remove_component( surface );
+        relationships().unregister_component( surface.id() );
+        unique_vertices().unregister_mesh_component( surface );
         delete_surface( surface );
     }
 

@@ -88,17 +88,17 @@ namespace geode
             const MeshComponentVertex& component_vertex ) const;
 
         /*!
-         * Add a component
+         * Add a component in the VertexIdentifier
          */
         template < typename MeshComponent >
-        void register_component( const MeshComponent& component );
+        void register_mesh_component( const MeshComponent& component );
 
         /*!
          * Remove a component from the VertexIdentifier and delete corresponding
          * information (i.e. the attribute on component mesh).
          */
         template < typename MeshComponent >
-        void remove_component( const MeshComponent& component );
+        void unregister_mesh_component( const MeshComponent& component );
 
         /*!
          * Create an empty unique vertex.
