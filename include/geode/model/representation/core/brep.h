@@ -42,7 +42,7 @@ namespace geode
 namespace geode
 {
     /*!
-     * A Boundary Representation is a model composed of
+     * A BRep (for Boundary Representation) is a 3D model composed of
      * Corners, Lines, Surfaces and Blocks.
      * This class provides classes for range-based iteration on Component
      * boundaries and incidences.

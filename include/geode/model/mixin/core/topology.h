@@ -38,12 +38,8 @@ namespace geode
 namespace geode
 {
     /*!
-     * This abstract class represents an assembly of geometric components.
-     * The geometric component types composing the GeoRepresentation
-     * are flexible.
-     * Syntax for create a derivated class is
-     * class DerivateClass : public GeoRepresentation<
-     *	dimension, ComponentClassA, ComponentClassB, ComponentClassC >
+     * This mixin stores topological information about a set of components.
+     * This information is topological relationships between components and identifications between geometric component vertices.
      */
     class Topology : public Relationships, public VertexIdentifier
     {
