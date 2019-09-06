@@ -34,7 +34,7 @@ namespace geode
     /*!
      * Class managing modification of Topology
      */
-    class TopologyBuilder : public RelationshipsBuilder,
+    class opengeode_model_api TopologyBuilder : public RelationshipsBuilder,
                             public VertexIdentifierBuilder
     {
     protected:
