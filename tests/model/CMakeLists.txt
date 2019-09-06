@@ -20,5 +20,5 @@
 
 add_geode_test(test-brep.cpp ${PROJECT_NAME}::model)
 add_geode_test(test-section.cpp ${PROJECT_NAME}::model)
-add_geode_test(test-relationship-manager.cpp ${PROJECT_NAME}::model)
+add_geode_test(test-relationships.cpp ${PROJECT_NAME}::model)
 add_geode_test(test-vertex-identifier.cpp ${PROJECT_NAME}::model)

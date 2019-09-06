@@ -53,11 +53,11 @@ namespace geode
     {
     public:
         class opengeode_model_api LineBoundaryRange
-            : public RelationshipManager::BoundaryRange
+            : public Relationships::BoundaryRange
         {
         public:
             LineBoundaryRange( const BRep& brep,
-                const RelationshipManager& manager,
+                const Relationships& manager,
                 const Line3D& line );
 
             const LineBoundaryRange& begin() const
@@ -77,11 +77,11 @@ namespace geode
         };
 
         class opengeode_model_api SurfaceBoundaryRange
-            : public RelationshipManager::BoundaryRange
+            : public Relationships::BoundaryRange
         {
         public:
             SurfaceBoundaryRange( const BRep& brep,
-                const RelationshipManager& manager,
+                const Relationships& manager,
                 const Surface3D& surface );
 
             const SurfaceBoundaryRange& begin() const
@@ -101,11 +101,11 @@ namespace geode
         };
 
         class opengeode_model_api BlockBoundaryRange
-            : public RelationshipManager::BoundaryRange
+            : public Relationships::BoundaryRange
         {
         public:
             BlockBoundaryRange( const BRep& brep,
-                const RelationshipManager& manager,
+                const Relationships& manager,
                 const Block3D& block );
 
             const BlockBoundaryRange& begin() const
@@ -126,11 +126,11 @@ namespace geode
 
     public:
         class opengeode_model_api CornerIncidenceRange
-            : public RelationshipManager::IncidenceRange
+            : public Relationships::IncidenceRange
         {
         public:
             CornerIncidenceRange( const BRep& brep,
-                const RelationshipManager& manager,
+                const Relationships& manager,
                 const Corner3D& corner );
 
             const CornerIncidenceRange& begin() const
@@ -150,11 +150,11 @@ namespace geode
         };
 
         class opengeode_model_api LineIncidenceRange
-            : public RelationshipManager::IncidenceRange
+            : public Relationships::IncidenceRange
         {
         public:
             LineIncidenceRange( const BRep& brep,
-                const RelationshipManager& manager,
+                const Relationships& manager,
                 const Line3D& line );
 
             const LineIncidenceRange& begin() const
@@ -174,11 +174,11 @@ namespace geode
         };
 
         class opengeode_model_api SurfaceIncidenceRange
-            : public RelationshipManager::IncidenceRange
+            : public Relationships::IncidenceRange
         {
         public:
             SurfaceIncidenceRange( const BRep& brep,
-                const RelationshipManager& manager,
+                const Relationships& manager,
                 const Surface3D& surface );
 
             const SurfaceIncidenceRange& begin() const

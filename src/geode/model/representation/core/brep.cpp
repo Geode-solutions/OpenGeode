@@ -41,16 +41,16 @@ namespace geode
     }
 
     BRep::LineBoundaryRange::LineBoundaryRange( const BRep& brep,
-        const RelationshipManager& manager,
+        const Relationships& manager,
         const Line3D& line )
-        : RelationshipManager::BoundaryRange( manager, line.id() ),
+        : Relationships::BoundaryRange( manager, line.id() ),
           brep_( brep )
     {
     }
 
     const Corner3D& BRep::LineBoundaryRange::operator*() const
     {
-        return brep_.corner( RelationshipManager::BoundaryRange::operator*() );
+        return brep_.corner( Relationships::BoundaryRange::operator*() );
     }
 
     BRep::SurfaceBoundaryRange BRep::boundaries(
@@ -60,16 +60,16 @@ namespace geode
     }
 
     BRep::SurfaceBoundaryRange::SurfaceBoundaryRange( const BRep& brep,
-        const RelationshipManager& manager,
+        const Relationships& manager,
         const Surface3D& surface )
-        : RelationshipManager::BoundaryRange( manager, surface.id() ),
+        : Relationships::BoundaryRange( manager, surface.id() ),
           brep_( brep )
     {
     }
 
     const Line3D& BRep::SurfaceBoundaryRange::operator*() const
     {
-        return brep_.line( RelationshipManager::BoundaryRange::operator*() );
+        return brep_.line( Relationships::BoundaryRange::operator*() );
     }
 
     BRep::BlockBoundaryRange BRep::boundaries( const Block3D& block ) const
@@ -78,16 +78,16 @@ namespace geode
     }
 
     BRep::BlockBoundaryRange::BlockBoundaryRange( const BRep& brep,
-        const RelationshipManager& manager,
+        const Relationships& manager,
         const Block3D& block )
-        : RelationshipManager::BoundaryRange( manager, block.id() ),
+        : Relationships::BoundaryRange( manager, block.id() ),
           brep_( brep )
     {
     }
 
     const Surface3D& BRep::BlockBoundaryRange::operator*() const
     {
-        return brep_.surface( RelationshipManager::BoundaryRange::operator*() );
+        return brep_.surface( Relationships::BoundaryRange::operator*() );
     }
 
     BRep::CornerIncidenceRange BRep::incidences( const Corner3D& corner ) const
@@ -96,16 +96,16 @@ namespace geode
     }
 
     BRep::CornerIncidenceRange::CornerIncidenceRange( const BRep& brep,
-        const RelationshipManager& manager,
+        const Relationships& manager,
         const Corner3D& corner )
-        : RelationshipManager::IncidenceRange( manager, corner.id() ),
+        : Relationships::IncidenceRange( manager, corner.id() ),
           brep_( brep )
     {
     }
 
     const Line3D& BRep::CornerIncidenceRange::operator*() const
     {
-        return brep_.line( RelationshipManager::IncidenceRange::operator*() );
+        return brep_.line( Relationships::IncidenceRange::operator*() );
     }
 
     BRep::LineIncidenceRange BRep::incidences( const Line3D& line ) const
@@ -114,9 +114,9 @@ namespace geode
     }
 
     BRep::LineIncidenceRange::LineIncidenceRange( const BRep& brep,
-        const RelationshipManager& manager,
+        const Relationships& manager,
         const Line3D& line )
-        : RelationshipManager::IncidenceRange( manager, line.id() ),
+        : Relationships::IncidenceRange( manager, line.id() ),
           brep_( brep )
     {
     }
@@ -124,7 +124,7 @@ namespace geode
     const Surface3D& BRep::LineIncidenceRange::operator*() const
     {
         return brep_.surface(
-            RelationshipManager::IncidenceRange::operator*() );
+            Relationships::IncidenceRange::operator*() );
     }
 
     BRep::SurfaceIncidenceRange BRep::incidences(
@@ -134,16 +134,16 @@ namespace geode
     }
 
     BRep::SurfaceIncidenceRange::SurfaceIncidenceRange( const BRep& brep,
-        const RelationshipManager& manager,
+        const Relationships& manager,
         const Surface3D& surface )
-        : RelationshipManager::IncidenceRange( manager, surface.id() ),
+        : Relationships::IncidenceRange( manager, surface.id() ),
           brep_( brep )
     {
     }
 
     const Block3D& BRep::SurfaceIncidenceRange::operator*() const
     {
-        return brep_.block( RelationshipManager::IncidenceRange::operator*() );
+        return brep_.block( Relationships::IncidenceRange::operator*() );
     }
 
     void BRep::compute_epsilon( double& epsilon ) const

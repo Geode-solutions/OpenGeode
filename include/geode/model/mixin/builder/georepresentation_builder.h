@@ -53,13 +53,13 @@ namespace geode
         {
         }
 
-        RelationshipManager& relationships()
+        Relationships& relationships()
         {
             return relationships_;
         }
 
     private:
-        RelationshipManager& relationships_;
+        Relationships& relationships_;
         VertexIdentifier& unique_vertices_;
     };
 } // namespace geode

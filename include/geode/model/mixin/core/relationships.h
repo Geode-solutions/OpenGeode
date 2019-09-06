@@ -35,13 +35,13 @@ namespace geode
 namespace geode
 {
     /*!
-     * This class manages all the relations between a set of components.
+     * This class stores all the relations between a set of components.
      * Each relationship links two components.
      * Relationship types are boundary and its dual incidence, and
      * item and its dual collection.
      * Components should be added through their uuids.
      */
-    class opengeode_model_api RelationshipManager
+    class opengeode_model_api Relationships
     {
     public:
         /*!
@@ -50,7 +50,7 @@ namespace geode
         class opengeode_model_api BoundaryRange
         {
         public:
-            BoundaryRange( const RelationshipManager& manager, const uuid& id );
+            BoundaryRange( const Relationships& manager, const uuid& id );
             BoundaryRange( BoundaryRange&& other ) noexcept;
             BoundaryRange( const BoundaryRange& other );
             ~BoundaryRange();
@@ -82,7 +82,7 @@ namespace geode
         {
         public:
             IncidenceRange(
-                const RelationshipManager& manager, const uuid& id );
+                const Relationships& manager, const uuid& id );
             IncidenceRange( IncidenceRange&& other ) noexcept;
             IncidenceRange( const IncidenceRange& other );
             ~IncidenceRange();
@@ -113,7 +113,7 @@ namespace geode
         class opengeode_model_api ItemRange
         {
         public:
-            ItemRange( const RelationshipManager& manager, const uuid& id );
+            ItemRange( const Relationships& manager, const uuid& id );
             ItemRange( ItemRange&& other ) noexcept;
             ItemRange( const ItemRange& other );
             ~ItemRange();
@@ -145,7 +145,7 @@ namespace geode
         {
         public:
             CollectionRange(
-                const RelationshipManager& manager, const uuid& id );
+                const Relationships& manager, const uuid& id );
             CollectionRange( CollectionRange&& other ) noexcept;
             CollectionRange( const CollectionRange& other );
             ~CollectionRange();
@@ -171,8 +171,8 @@ namespace geode
         };
 
     public:
-        RelationshipManager();
-        ~RelationshipManager();
+        Relationships();
+        ~Relationships();
 
         index_t nb_boundaries( const uuid& id ) const;
 
@@ -194,7 +194,7 @@ namespace geode
 
         /*!
          * Remove a component from the set of components managed by the
-         * RelationshipManager and all its associated relationships
+         * Relationships and all its associated relationships
          * @param[in] id Unique index of the component to remove
          */
         void remove_component( const uuid& id );

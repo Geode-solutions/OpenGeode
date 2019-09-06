@@ -27,7 +27,7 @@
 
 #include <geode/model/common.h>
 
-#include <geode/model/mixin/core/relationship_manager.h>
+#include <geode/model/mixin/core/relationships.h>
 #include <geode/model/mixin/core/vertex_identifier.h>
 
 namespace geode
@@ -50,7 +50,7 @@ namespace geode
         friend class GeoRepresentationBuilder;
 
     public:
-        const RelationshipManager& relationships() const
+        const Relationships& relationships() const
         {
             return relationships_;
         }
@@ -78,7 +78,7 @@ namespace geode
         static constexpr double epsilon_scaling = 1e-7;
 
     private:
-        RelationshipManager relationships_;
+        Relationships relationships_;
         VertexIdentifier unique_vertices_;
 
         mutable std::once_flag is_epsilon_initialized_;
