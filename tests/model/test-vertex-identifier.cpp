@@ -66,7 +66,8 @@ public:
     const geode::uuid& add_corner()
     {
         const auto& id = create_corner();
-        unique_vertices().register_mesh_component( corner_provider_.corner( id ) );
+        unique_vertices().register_mesh_component(
+            corner_provider_.corner( id ) );
         return id;
     }
 
@@ -192,19 +193,25 @@ int main()
             ->create_point( geode::Point2D{ { 0.9, -3.7 } } );
         builder.corner_mesh_builder( corner3_id )
             ->create_point( geode::Point2D{ { 0.1, 2.3 } } );
-        
-        vertex_identifier.register_mesh_component( provider.corner( corner0_id ) );
-        vertex_identifier.register_mesh_component( provider.corner( corner1_id ) );
-        vertex_identifier.register_mesh_component( provider.corner( corner2_id ) );
-        vertex_identifier.register_mesh_component( provider.corner( corner3_id ) );
+
+        vertex_identifier.register_mesh_component(
+            provider.corner( corner0_id ) );
+        vertex_identifier.register_mesh_component(
+            provider.corner( corner1_id ) );
+        vertex_identifier.register_mesh_component(
+            provider.corner( corner2_id ) );
+        vertex_identifier.register_mesh_component(
+            provider.corner( corner3_id ) );
 
         test_create_unique_vertices( vertex_identifier );
         test_set_unique_vertices( vertex_identifier, provider );
         test_modify_unique_vertices( vertex_identifier );
         test_save_and_load_unique_vertices( vertex_identifier );
 
-        vertex_identifier.unregister_mesh_component( provider.corner( corner2_id ) );
-        vertex_identifier.register_mesh_component( provider.corner( corner2_id ) );
+        vertex_identifier.unregister_mesh_component(
+            provider.corner( corner2_id ) );
+        vertex_identifier.register_mesh_component(
+            provider.corner( corner2_id ) );
 
         Logger::info( "TEST SUCCESS" );
         return 0;
