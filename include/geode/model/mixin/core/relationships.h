@@ -81,8 +81,7 @@ namespace geode
         class opengeode_model_api IncidenceRange
         {
         public:
-            IncidenceRange(
-                const Relationships& manager, const uuid& id );
+            IncidenceRange( const Relationships& manager, const uuid& id );
             IncidenceRange( IncidenceRange&& other ) noexcept;
             IncidenceRange( const IncidenceRange& other );
             ~IncidenceRange();
@@ -144,8 +143,7 @@ namespace geode
         class opengeode_model_api CollectionRange
         {
         public:
-            CollectionRange(
-                const Relationships& manager, const uuid& id );
+            CollectionRange( const Relationships& manager, const uuid& id );
             CollectionRange( CollectionRange&& other ) noexcept;
             CollectionRange( const CollectionRange& other );
             ~CollectionRange();

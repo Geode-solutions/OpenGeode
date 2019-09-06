@@ -278,8 +278,7 @@ namespace geode
         return nb;
     }
 
-    Relationships::ItemRange Relationships::items(
-        const uuid& id ) const
+    Relationships::ItemRange Relationships::items( const uuid& id ) const
     {
         return { *this, id };
     }
@@ -325,9 +324,7 @@ namespace geode
         using Iterator = typename Relationships::Impl::Iterator;
 
     public:
-        Impl( const Relationships::Impl& manager,
-            Iterator begin,
-            Iterator end )
+        Impl( const Relationships::Impl& manager, Iterator begin, Iterator end )
             : BaseRange< Iterator >( begin, end ), manager_( manager )
         {
             next_boundary_iterator();
@@ -382,8 +379,7 @@ namespace geode
     {
     }
 
-    Relationships::BoundaryRange::BoundaryRange(
-        const BoundaryRange& other )
+    Relationships::BoundaryRange::BoundaryRange( const BoundaryRange& other )
         : impl_( *other.impl_ )
     {
     }
@@ -412,9 +408,7 @@ namespace geode
         using Iterator = typename Relationships::Impl::Iterator;
 
     public:
-        Impl( const Relationships::Impl& manager,
-            Iterator begin,
-            Iterator end )
+        Impl( const Relationships::Impl& manager, Iterator begin, Iterator end )
             : BaseRange< Iterator >( begin, end ), manager_( manager )
         {
             next_incidence_iterator();
@@ -469,8 +463,7 @@ namespace geode
     {
     }
 
-    Relationships::IncidenceRange::IncidenceRange(
-        const IncidenceRange& other )
+    Relationships::IncidenceRange::IncidenceRange( const IncidenceRange& other )
         : impl_( *other.impl_ )
     {
     }
@@ -499,9 +492,7 @@ namespace geode
         using Iterator = typename Relationships::Impl::Iterator;
 
     public:
-        Impl( const Relationships::Impl& manager,
-            Iterator begin,
-            Iterator end )
+        Impl( const Relationships::Impl& manager, Iterator begin, Iterator end )
             : BaseRange< Iterator >( begin, end ), manager_( manager )
         {
             next_item_iterator();
@@ -583,9 +574,7 @@ namespace geode
         using Iterator = typename Relationships::Impl::Iterator;
 
     public:
-        Impl( const Relationships::Impl& manager,
-            Iterator begin,
-            Iterator end )
+        Impl( const Relationships::Impl& manager, Iterator begin, Iterator end )
             : BaseRange< Iterator >( begin, end ), manager_( manager )
         {
             next_collection_iterator();
