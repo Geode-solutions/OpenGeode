@@ -44,6 +44,7 @@ namespace geode
     class opengeode_model_api Relationships
     {
         friend class RelationshipsBuilder;
+
     public:
         /*!
          * Range to iterates on all boundaries of one component
@@ -82,7 +83,8 @@ namespace geode
         class opengeode_model_api IncidenceRange
         {
         public:
-            IncidenceRange( const Relationships& relationships, const uuid& id );
+            IncidenceRange(
+                const Relationships& relationships, const uuid& id );
             IncidenceRange( IncidenceRange&& other ) noexcept;
             IncidenceRange( const IncidenceRange& other );
             ~IncidenceRange();
@@ -144,7 +146,8 @@ namespace geode
         class opengeode_model_api CollectionRange
         {
         public:
-            CollectionRange( const Relationships& relationships, const uuid& id );
+            CollectionRange(
+                const Relationships& relationships, const uuid& id );
             CollectionRange( CollectionRange&& other ) noexcept;
             CollectionRange( const CollectionRange& other );
             ~CollectionRange();

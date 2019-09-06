@@ -29,7 +29,6 @@
 #include <geode/model/mixin/builder/vertex_identifier_builder.h>
 #include <geode/model/mixin/core/topology.h>
 
-
 namespace geode
 {
     /*!

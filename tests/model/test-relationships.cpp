@@ -27,8 +27,8 @@
 #include <geode/basic/range.h>
 #include <geode/basic/uuid.h>
 
-#include <geode/model/mixin/core/relationships.h>
 #include <geode/model/mixin/builder/relationships_builder.h>
+#include <geode/model/mixin/core/relationships.h>
 
 std::vector< geode::uuid > create_uuids( geode::Relationships& relationships )
 {
@@ -45,8 +45,8 @@ std::vector< geode::uuid > create_uuids( geode::Relationships& relationships )
     return uuids;
 }
 
-void add_boundary_relations(
-    geode::Relationships& relationships, const std::vector< geode::uuid >& uuids )
+void add_boundary_relations( geode::Relationships& relationships,
+    const std::vector< geode::uuid >& uuids )
 {
     geode::RelationshipsBuilder builder{ relationships };
     builder.add_boundary_relation( uuids[0], uuids[1] );
@@ -62,8 +62,8 @@ void add_boundary_relations(
     builder.add_boundary_relation( uuids[5], uuids[0] );
 }
 
-void add_items_in_collections(
-    geode::Relationships& relationships, const std::vector< geode::uuid >& uuids )
+void add_items_in_collections( geode::Relationships& relationships,
+    const std::vector< geode::uuid >& uuids )
 {
     geode::RelationshipsBuilder builder{ relationships };
     builder.add_item_in_collection( uuids[1], uuids[5] );

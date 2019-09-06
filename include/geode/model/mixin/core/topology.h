@@ -51,4 +51,4 @@ namespace geode
 
     protected:
         Topology() = default;
-} // namespace geode
+    } // namespace geode

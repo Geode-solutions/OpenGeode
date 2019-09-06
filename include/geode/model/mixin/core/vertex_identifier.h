@@ -49,7 +49,7 @@ namespace geode
     class opengeode_model_api VertexIdentifier
     {
         friend class VertexIdentifierBuilder;
-        
+
     public:
         VertexIdentifier();
         ~VertexIdentifier();

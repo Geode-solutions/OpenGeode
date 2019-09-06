@@ -36,7 +36,7 @@ namespace geode
     {
     public:
         RelationshipsBuilder( Relationships& relationships );
-    
+
         /*!
          * Add a component in the set of components registered by the
          * Relationships

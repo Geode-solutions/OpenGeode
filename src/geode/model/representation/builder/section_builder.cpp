@@ -46,7 +46,7 @@ namespace geode
         return id;
     }
 
-const uuid& SectionBuilder::add_corner( const MeshType& type )
+    const uuid& SectionBuilder::add_corner( const MeshType& type )
     {
         const auto& id = create_corner( type );
         register_component( id );

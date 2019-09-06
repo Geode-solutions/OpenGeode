@@ -39,8 +39,8 @@ namespace geode
         return { *this, line };
     }
 
-    Section::LineBoundaryRange::LineBoundaryRange( const Section& section,
-        const Line2D& line )
+    Section::LineBoundaryRange::LineBoundaryRange(
+        const Section& section, const Line2D& line )
         : Relationships::BoundaryRange( section, line.id() ),
           section_( section )
     {
@@ -57,8 +57,8 @@ namespace geode
         return { *this, surface };
     }
 
-    Section::SurfaceBoundaryRange::SurfaceBoundaryRange( const Section& section,
-        const Surface2D& surface )
+    Section::SurfaceBoundaryRange::SurfaceBoundaryRange(
+        const Section& section, const Surface2D& surface )
         : Relationships::BoundaryRange( section, surface.id() ),
           section_( section )
     {
@@ -75,8 +75,8 @@ namespace geode
         return { *this, corner };
     }
 
-    Section::CornerIncidenceRange::CornerIncidenceRange( const Section& section,
-        const Corner2D& corner )
+    Section::CornerIncidenceRange::CornerIncidenceRange(
+        const Section& section, const Corner2D& corner )
         : Relationships::IncidenceRange( section, corner.id() ),
           section_( section )
     {
@@ -92,8 +92,8 @@ namespace geode
         return { *this, line };
     }
 
-    Section::LineIncidenceRange::LineIncidenceRange( const Section& section,
-        const Line2D& line )
+    Section::LineIncidenceRange::LineIncidenceRange(
+        const Section& section, const Line2D& line )
         : Relationships::IncidenceRange( section, line.id() ),
           section_( section )
     {
