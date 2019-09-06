@@ -29,7 +29,7 @@ namespace geode
 {
     /*!
      * Register all the information needed by Bitsery to serialize the objects
-     * in the georepresentation library.
+     * in the model library.
      * @param[in] context The context where to register this information.
      * @warning The context can be used only once per archive.
      */
@@ -38,7 +38,7 @@ namespace geode
 
     /*!
      * Register all the information needed by Bitsery to deserialize the objects
-     * in the georepresentation library.
+     * in the model library.
      * @param[in] context The context where to register this information.
      * @warning The context can be used only once per archive.
      */
