@@ -23,43 +23,25 @@
 
 #pragma once
 
-#include <geode/georepresentation/common.h>
+#include <mutex>
 
-#include <geode/georepresentation/core/georepresentation.h>
+#include <geode/georepresentation/common.h>
 
 namespace geode
 {
     /*!
-     * Class managing modification of GeoRepresentation
-     * It gives a modifiable access to the VertexIdentifier
+     * This abstract class represents an assembly of geometric components.
+     * The geometric component types composing the GeoRepresentation
+     * are flexible.
+     * Syntax for create a derivated class is
+     * class DerivateClass : public GeoRepresentation<
+     *	dimension, ComponentClassA, ComponentClassB, ComponentClassC >
      */
-    class GeoRepresentationBuilder
+    template < index_t dimension, template < index_t > class... Components >
+    class AddComponentsBuilders : public Components< dimension >::Builder...
     {
-    public:
-        void load_relationships( const std::string& directory )
-        {
-            relationships().load_relationships( directory );
-        }
-
-        VertexIdentifier& unique_vertices()
-        {
-            return unique_vertices_;
-        }
-
     protected:
-        GeoRepresentationBuilder( GeoRepresentation& georepresentation )
-            : relationships_( georepresentation.relationships_ ),
-              unique_vertices_( georepresentation.unique_vertices_ )
-        {
-        }
-
-        RelationshipManager& relationships()
-        {
-            return relationships_;
-        }
-
-    private:
-        RelationshipManager& relationships_;
-        VertexIdentifier& unique_vertices_;
+        template <typename Model >
+        AddComponentsBuilders( Model& model ): Components< dimension >::Builder( model )...{}
     };
 } // namespace geode

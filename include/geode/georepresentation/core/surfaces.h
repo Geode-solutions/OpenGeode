@@ -43,9 +43,11 @@ namespace geode
     class opengeode_georepresentation_api Surfaces
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( Surfaces );
-        friend class SurfacesBuilder< dimension >;
 
     public:
+        using Builder = SurfacesBuilder< dimension >;
+        friend Builder;
+
         class opengeode_georepresentation_api SurfaceRangeBase
         {
         public:

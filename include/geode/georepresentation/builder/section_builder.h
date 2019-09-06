@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/georepresentation/builder/add_components_builders.h>
 #include <geode/georepresentation/builder/blocks_builder.h>
 #include <geode/georepresentation/builder/corners_builder.h>
 #include <geode/georepresentation/builder/georepresentation_builder.h>
@@ -54,10 +55,10 @@ namespace geode
      * Class managing modification of a Section
      */
     class opengeode_georepresentation_api SectionBuilder
-        : public GeoRepresentationBuilder< 2,
-              CornersBuilder,
-              LinesBuilder,
-              SurfacesBuilder >
+        : public GeoRepresentationBuilder, public AddComponentsBuilders< 2,
+              Corners,
+              Lines,
+              Surfaces >
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( SectionBuilder );
 

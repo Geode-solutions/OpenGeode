@@ -47,9 +47,11 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( Blocks );
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
-        friend class BlocksBuilder< dimension >;
 
     public:
+        using Builder = BlocksBuilder< dimension >;
+        friend Builder;
+
         /*!
          * Base class for range-based iteration on Blocks
          */
