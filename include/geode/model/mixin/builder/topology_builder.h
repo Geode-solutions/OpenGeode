@@ -40,10 +40,6 @@ namespace geode
     protected:
         TopologyBuilder( Topology& topology )
             : RelationshipsBuilder( topology ),
-              VertexIdentifierBuilder( topology ),
-              topology_( topology ){};
-
-    private:
-        Topology& topology_;
+              VertexIdentifierBuilder( topology ){};
     };
 } // namespace geode
