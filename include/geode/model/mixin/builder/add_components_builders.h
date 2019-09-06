@@ -33,7 +33,7 @@ namespace geode
      * This mixin represents the builders of an assembly of components.
      * Syntax for create a derived class is
      * class DerivateClass : public AddComponentsBuilders< dimension,
-     * ComponentClassA, ComponentClassB, ComponentClassC > 
+     * ComponentClassA, ComponentClassB, ComponentClassC >
      * Each ComponentClass should have a ComponentClass::Builder.
      */
     template < index_t dimension, template < index_t > class... Components >
