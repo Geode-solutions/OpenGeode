@@ -18,16 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.7.2)
-    
-if(NOT TARGET OpenGeode::basic)
-    project(OpenGeode CXX)
-    find_package(OpenGeode REQUIRED CONFIG)
-    enable_testing()
-endif()
-
-set(CTEST_OUTPUT_ON_FAILURE ON)
-
-add_subdirectory(basic)
-add_subdirectory(mesh)
-add_subdirectory(model)
+add_geode_test(test-brep.cpp ${PROJECT_NAME}::model)
+add_geode_test(test-section.cpp ${PROJECT_NAME}::model)
+add_geode_test(test-relationship-manager.cpp ${PROJECT_NAME}::model)
+add_geode_test(test-vertex-identifier.cpp ${PROJECT_NAME}::model)
