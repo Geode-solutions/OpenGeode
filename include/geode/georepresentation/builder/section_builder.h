@@ -55,10 +55,8 @@ namespace geode
      * Class managing modification of a Section
      */
     class opengeode_georepresentation_api SectionBuilder
-        : public GeoRepresentationBuilder, public AddComponentsBuilders< 2,
-              Corners,
-              Lines,
-              Surfaces >
+        : public GeoRepresentationBuilder,
+          public AddComponentsBuilders< 2, Corners, Lines, Surfaces >
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( SectionBuilder );
 

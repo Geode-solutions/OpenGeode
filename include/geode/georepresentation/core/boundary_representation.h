@@ -48,7 +48,8 @@ namespace geode
      * boundaries and incidences.
      */
     class opengeode_georepresentation_api BRep
-        : public GeoRepresentation, public AddComponents< 3, Corners, Lines, Surfaces, Blocks >
+        : public GeoRepresentation,
+          public AddComponents< 3, Corners, Lines, Surfaces, Blocks >
     {
     public:
         class opengeode_georepresentation_api LineBoundaryRange

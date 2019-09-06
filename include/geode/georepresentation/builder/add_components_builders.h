@@ -41,7 +41,10 @@ namespace geode
     class AddComponentsBuilders : public Components< dimension >::Builder...
     {
     protected:
-        template <typename Model >
-        AddComponentsBuilders( Model& model ): Components< dimension >::Builder( model )...{}
+        template < typename Model >
+        AddComponentsBuilders( Model& model )
+            : Components< dimension >::Builder( model )...
+        {
+        }
     };
 } // namespace geode

@@ -59,7 +59,7 @@ public:
     CornerProviderBuilder( CornerProvider& corner_provider )
         : GeoRepresentationBuilder( corner_provider ),
           AddComponentsBuilders< 2, geode::Corners >( corner_provider ),
-              corner_provider_( corner_provider )
+          corner_provider_( corner_provider )
     {
     }
 

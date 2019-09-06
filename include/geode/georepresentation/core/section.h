@@ -47,7 +47,8 @@ namespace geode
      * boundaries and incidences.
      */
     class opengeode_georepresentation_api Section
-        : public GeoRepresentation, public AddComponents< 2, Corners, Lines, Surfaces >
+        : public GeoRepresentation,
+          public AddComponents< 2, Corners, Lines, Surfaces >
     {
     public:
         class opengeode_georepresentation_api LineBoundaryRange
