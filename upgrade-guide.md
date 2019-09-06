@@ -4,7 +4,8 @@
 
 ### Motivations
 
-Faciliter la fabrication de model exploser/organiser les functionnalités en mixins.Flexible. Chaque mixins est indépendant
+In this new major version of OpenGeode, we aim at easing model objects conception. We organize basic features in independant mixins. Model conception is therefore very flexible ans extensible by combining mixins and/or defining new mixins.
+
 
 ### Breaking Changes
 
@@ -29,11 +30,11 @@ You must call these methods only from Builders since they modify either `Relatio
 
 - **BRep and Section**:
 
-`GeoRepresentation` no long exists. BRep and Section are now inheriting from `Topology` and `AddComponents`. BRep and Section have nomore methods `relationships()` and `unique_vertex`. Moreover, overloaded methods `add_boundary_relation(...)` has been renamed and are not overloaded anymore.
+`GeoRepresentation` no longer exists. BRep and Section are now inheriting from `Topology` and `AddComponents`. BRep and Section have no more methods `relationships()` and `unique_vertex`. Moreover, overloaded methods `add_boundary_relation(...)` has been renamed and are not overloaded anymore.
 
 **How to upgrade**
 
-BRep and Section have nomore methods `relationships()` and `unique_vertex()`, but you can call (public) methods of `Relationships` and `VertexIdentifier` directly from an instance of `BRep` or `Section`, since they inherit from them. See `BRep` and `Section` definitions to have examples of `AddComponents` mixin usage. 
+BRep and Section have no more methods `relationships()` and `unique_vertex()`, but you can call (public) methods of `Relationships` and `VertexIdentifier` directly from an instance of `BRep` or `Section`, since they inherit from them. See `BRep` and `Section` definitions to have examples of `AddComponents` mixin usage. 
 
 Replace `add_boundary_relation( ... )` by `add_x_y_relationships( const X& x, const Y& y)` with `x` and `y` being `corner`, `line`, `surface` or `block` depending of the case.
 
