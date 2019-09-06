@@ -32,7 +32,7 @@ namespace geode
     /*!
      * Class managing modification of VertexIdentifier
      */
-    class VertexIdentifierBuilder
+    class opengeode_model_api VertexIdentifierBuilder
     {
     public:
         VertexIdentifierBuilder( VertexIdentifier& vertex_identifier );
