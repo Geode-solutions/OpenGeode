@@ -42,7 +42,8 @@ namespace geode
      * This information is topological relationships between components and
      * identifications between geometric component vertices.
      */
-    class opengeode_model_api Topology : public Relationships, public VertexIdentifier
+    class opengeode_model_api Topology : public Relationships,
+                                         public VertexIdentifier
     {
         friend class TopologyBuilder;
 
