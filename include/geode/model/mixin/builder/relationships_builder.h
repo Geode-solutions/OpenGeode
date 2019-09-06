@@ -32,7 +32,7 @@ namespace geode
     /*!
      * Class managing modification of Relationships
      */
-    class RelationshipsBuilder
+    class opengeode_model_api RelationshipsBuilder
     {
     public:
         RelationshipsBuilder( Relationships& relationships );
