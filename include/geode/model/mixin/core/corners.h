@@ -50,7 +50,7 @@ namespace geode
     public:
         using Builder = CornersBuilder< dimension >;
         friend Builder;
-        
+
         /*!
          * Base class for range-based iteration on Corners
          */

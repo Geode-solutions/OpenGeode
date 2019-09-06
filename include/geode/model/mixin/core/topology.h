@@ -39,7 +39,8 @@ namespace geode
 {
     /*!
      * This mixin stores topological information about a set of components.
-     * This information is topological relationships between components and identifications between geometric component vertices.
+     * This information is topological relationships between components and
+     * identifications between geometric component vertices.
      */
     class Topology : public Relationships, public VertexIdentifier
     {

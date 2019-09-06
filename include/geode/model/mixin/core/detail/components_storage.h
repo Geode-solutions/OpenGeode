@@ -116,8 +116,7 @@ namespace geode
             {
                 register_basic_serialize_pcontext( std::get< 0 >( context ) );
                 register_mesh_serialize_pcontext( std::get< 0 >( context ) );
-                register_model_serialize_pcontext(
-                    std::get< 0 >( context ) );
+                register_model_serialize_pcontext( std::get< 0 >( context ) );
             }
 
             virtual void register_librairies_in_deserialize_pcontext(
@@ -125,8 +124,7 @@ namespace geode
             {
                 register_basic_deserialize_pcontext( std::get< 0 >( context ) );
                 register_mesh_deserialize_pcontext( std::get< 0 >( context ) );
-                register_model_deserialize_pcontext(
-                    std::get< 0 >( context ) );
+                register_model_deserialize_pcontext( std::get< 0 >( context ) );
             }
 
         private:
