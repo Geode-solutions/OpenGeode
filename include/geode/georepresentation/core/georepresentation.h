@@ -63,8 +63,8 @@ namespace geode
         double epsilon() const
         {
             std::call_once( is_epsilon_initialized_,
-                &GeoRepresentation::compute_epsilon,
-                this, std::ref( epsilon_ ) );
+                &GeoRepresentation::compute_epsilon, this,
+                std::ref( epsilon_ ) );
             return epsilon_;
         }
 

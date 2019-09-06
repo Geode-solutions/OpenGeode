@@ -32,10 +32,9 @@
 namespace geode
 {
     SectionBuilder::SectionBuilder( Section& section )
-        : GeoRepresentationBuilder( section ), AddComponentsBuilders< 2,
-              Corners,
-              Lines,
-              Surfaces >(section), section_( section )
+        : GeoRepresentationBuilder( section ),
+          AddComponentsBuilders< 2, Corners, Lines, Surfaces >( section ),
+          section_( section )
     {
     }
 

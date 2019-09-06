@@ -56,11 +56,8 @@ namespace geode
      * Class managing modification of a BRep
      */
     class opengeode_georepresentation_api BRepBuilder
-        : public GeoRepresentationBuilder, public AddComponentsBuilders< 3,
-              Corners,
-              Lines,
-              Surfaces,
-              Blocks >
+        : public GeoRepresentationBuilder,
+          public AddComponentsBuilders< 3, Corners, Lines, Surfaces, Blocks >
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( BRepBuilder );
 
