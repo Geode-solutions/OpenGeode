@@ -28,11 +28,15 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}
 
 #------------------------------------------------------------------------------------------------
 # Platform dependent settings
-if(UNIX)
-    add_compile_options(-Wall -Wextra -Wpedantic -Wno-attributes)
-else()
-    add_compile_options(/DNOMINMAX /bigobj)
-endif()
+add_compile_options(
+	$<$<CXX_COMPILER_ID:MSVC>:/bigobj>
+	$<$<CXX_COMPILER_ID:MSVC>:/DNOMINMAX>
+	$<$<CXX_COMPILER_ID:MSVC>:/W4>
+	$<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wall>
+	$<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wextra>
+	$<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wpedantic>
+	$<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wno-attributes>
+)
 
 #------------------------------------------------------------------------------------------------
 # Install configuration    
