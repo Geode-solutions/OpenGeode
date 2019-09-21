@@ -21,88 +21,88 @@
  *
  */
 
-#include <geode/georepresentation/core/boundaries.h>
+#include <geode/model/mixin/core/model_boundaries.h>
 
 #include <geode/basic/pimpl_impl.h>
 #include <geode/basic/range.h>
 
-#include <geode/georepresentation/core/boundary.h>
-#include <geode/georepresentation/core/detail/components_storage.h>
+#include <geode/model/mixin/core/model_boundary.h>
+#include <geode/model/mixin/core/detail/components_storage.h>
 
 namespace geode
 {
     template < index_t dimension >
-    class Boundaries< dimension >::Impl
-        : public detail::ComponentsStorage< Boundary< dimension > >
+    class ModelBoundaries< dimension >::Impl
+        : public detail::ComponentsStorage< ModelBoundary< dimension > >
     {
     };
 
     template < index_t dimension >
-    Boundaries< dimension >::Boundaries() // NOLINT
+    ModelBoundaries< dimension >::ModelBoundaries() // NOLINT
     {
     }
 
     template < index_t dimension >
-    Boundaries< dimension >::~Boundaries() // NOLINT
+    ModelBoundaries< dimension >::~ModelBoundaries() // NOLINT
     {
     }
 
     template < index_t dimension >
-    index_t Boundaries< dimension >::nb_boundaries() const
+    index_t ModelBoundaries< dimension >::nb_model_boundaries() const
     {
         return impl_->nb_components();
     }
 
     template < index_t dimension >
-    const Boundary< dimension >& Boundaries< dimension >::boundary(
+    const ModelBoundary< dimension >& ModelBoundaries< dimension >::model_boundary(
         const uuid& id ) const
     {
         return impl_->component( id );
     }
 
     template < index_t dimension >
-    Boundary< dimension >& Boundaries< dimension >::modifiable_boundary(
+    ModelBoundary< dimension >& ModelBoundaries< dimension >::modifiable_model_boundary(
         const uuid& id )
     {
         return impl_->component( id );
     }
 
     template < index_t dimension >
-    std::vector< std::string > Boundaries< dimension >::save_boundaries(
+    std::vector< std::string > ModelBoundaries< dimension >::save_model_boundaries(
         const std::string& directory ) const
     {
         std::vector< std::string > files;
-        files.emplace_back( directory + "/boundaries" );
+        files.emplace_back( directory + "/model_boundaries" );
         impl_->save_components( files.back() );
         return files;
     }
 
     template < index_t dimension >
-    void Boundaries< dimension >::load_boundaries(
+    void ModelBoundaries< dimension >::load_model_boundaries(
         const std::string& directory )
     {
-        impl_->load_components( directory + "/boundaries" );
+        impl_->load_components( directory + "/model_boundaries" );
     }
 
     template < index_t dimension >
-    typename Boundaries< dimension >::BoundaryRange
-        Boundaries< dimension >::boundaries() const
+    typename ModelBoundaries< dimension >::ModelBoundaryRange
+        ModelBoundaries< dimension >::model_boundaries() const
     {
         return { *this };
     }
 
     template < index_t dimension >
-    typename Boundaries< dimension >::ModifiableBoundaryRange
-        Boundaries< dimension >::modifiable_boundaries()
+    typename ModelBoundaries< dimension >::ModifiableModelBoundaryRange
+        ModelBoundaries< dimension >::modifiable_model_boundaries()
     {
         return { *this };
     }
 
     template < index_t dimension >
-    const uuid& Boundaries< dimension >::create_boundary()
+    const uuid& ModelBoundaries< dimension >::create_model_boundary()
     {
-        typename Boundaries< dimension >::Impl::ComponentPtr boundary{
-            new Boundary< dimension >
+        typename ModelBoundaries< dimension >::Impl::ComponentPtr boundary{
+            new ModelBoundary< dimension >
         };
         const auto& id = boundary->id();
         impl_->add_component( std::move( boundary ) );
@@ -110,17 +110,17 @@ namespace geode
     }
 
     template < index_t dimension >
-    void Boundaries< dimension >::delete_boundary(
-        const Boundary< dimension >& boundary )
+    void ModelBoundaries< dimension >::delete_model_boundary(
+        const ModelBoundary< dimension >& boundary )
     {
         impl_->delete_component( boundary.id() );
     }
 
     template < index_t dimension >
-    class Boundaries< dimension >::BoundaryRangeBase::Impl
-        : public BaseRange< typename Boundaries< dimension >::Impl::Iterator >
+    class ModelBoundaries< dimension >::ModelBoundaryRangeBase::Impl
+        : public BaseRange< typename ModelBoundaries< dimension >::Impl::Iterator >
     {
-        using Iterator = typename Boundaries< dimension >::Impl::Iterator;
+        using Iterator = typename ModelBoundaries< dimension >::Impl::Iterator;
 
     public:
         Impl( Iterator begin, Iterator end )
@@ -128,79 +128,79 @@ namespace geode
         {
         }
 
-        Boundary< dimension >& boundary() const
+        ModelBoundary< dimension >& model_boundary() const
         {
             return *this->current()->second;
         }
     };
 
     template < index_t dimension >
-    Boundaries< dimension >::BoundaryRangeBase::BoundaryRangeBase(
-        const Boundaries& boundaries )
+    ModelBoundaries< dimension >::ModelBoundaryRangeBase::ModelBoundaryRangeBase(
+        const ModelBoundaries& boundaries )
         : impl_( boundaries.impl_->begin(), boundaries.impl_->end() )
     {
     }
 
     template < index_t dimension >
-    Boundaries< dimension >::BoundaryRangeBase::BoundaryRangeBase(
-        BoundaryRangeBase&& other ) noexcept
+    ModelBoundaries< dimension >::ModelBoundaryRangeBase::ModelBoundaryRangeBase(
+        ModelBoundaryRangeBase&& other ) noexcept
         : impl_( std::move( *other.impl_ ) )
     {
     }
 
     template < index_t dimension >
-    Boundaries< dimension >::BoundaryRangeBase::BoundaryRangeBase(
-        const BoundaryRangeBase& other )
+    ModelBoundaries< dimension >::ModelBoundaryRangeBase::ModelBoundaryRangeBase(
+        const ModelBoundaryRangeBase& other )
         : impl_( *other.impl_ )
     {
     }
 
     template < index_t dimension >
-    Boundaries< dimension >::BoundaryRangeBase::~BoundaryRangeBase() // NOLINT
+    ModelBoundaries< dimension >::ModelBoundaryRangeBase::~ModelBoundaryRangeBase() // NOLINT
     {
     }
 
     template < index_t dimension >
-    bool Boundaries< dimension >::BoundaryRangeBase::operator!=(
-        const BoundaryRangeBase& /*unused*/ ) const
+    bool ModelBoundaries< dimension >::ModelBoundaryRangeBase::operator!=(
+        const ModelBoundaryRangeBase& /*unused*/ ) const
     {
         return impl_->operator!=( *impl_ );
     }
 
     template < index_t dimension >
-    void Boundaries< dimension >::BoundaryRangeBase::operator++()
+    void ModelBoundaries< dimension >::ModelBoundaryRangeBase::operator++()
     {
         return impl_->operator++();
     }
 
     template < index_t dimension >
-    Boundaries< dimension >::BoundaryRange::BoundaryRange(
-        const Boundaries& boundaries )
-        : BoundaryRangeBase( boundaries )
+    ModelBoundaries< dimension >::ModelBoundaryRange::ModelBoundaryRange(
+        const ModelBoundaries& boundaries )
+        : ModelBoundaryRangeBase( boundaries )
     {
     }
 
     template < index_t dimension >
-    const Boundary< dimension >& Boundaries< dimension >::BoundaryRange::
+    const ModelBoundary< dimension >& ModelBoundaries< dimension >::ModelBoundaryRange::
         operator*() const
     {
-        return this->impl_->boundary();
+        return this->impl_->model_boundary();
     }
 
     template < index_t dimension >
-    Boundaries< dimension >::ModifiableBoundaryRange::ModifiableBoundaryRange(
-        const Boundaries& boundaries )
-        : BoundaryRangeBase( boundaries )
+    ModelBoundaries< dimension >::ModifiableModelBoundaryRange::ModifiableModelBoundaryRange(
+        const ModelBoundaries& boundaries )
+        : ModelBoundaryRangeBase( boundaries )
     {
     }
 
     template < index_t dimension >
-    Boundary< dimension >& Boundaries< dimension >::ModifiableBoundaryRange::
+    ModelBoundary< dimension >& ModelBoundaries< dimension >::ModifiableModelBoundaryRange::
         operator*() const
     {
-        return this->impl_->boundary();
+        return this->impl_->model_boundary();
     }
 
-    template class opengeode_georepresentation_api Boundaries< 2 >;
-    template class opengeode_georepresentation_api Boundaries< 3 >;
+    template class opengeode_model_api ModelBoundaries< 2 >;
+    template class opengeode_model_api ModelBoundaries< 3 >;
 } // namespace geode

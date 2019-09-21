@@ -29,6 +29,8 @@
 
 #include <bitsery/ext/std_map.h>
 
+#include <ghc/filesystem.hpp>
+
 #include <geode/basic/uuid.h>
 
 #include <geode/mesh/core/bitsery_archive.h>
@@ -97,6 +99,10 @@ namespace geode
 
             void load_components( const std::string& filename )
             {
+                if( !ghc::filesystem::exists( filename ) )
+                {
+                    return;
+                }
                 std::ifstream file{ filename, std::ifstream::binary };
                 TContext context{};
                 register_librairies_in_deserialize_pcontext( context );

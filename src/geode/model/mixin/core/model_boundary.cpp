@@ -21,55 +21,24 @@
  *
  */
 
-#pragma once
+#include <geode/model/mixin/core/model_boundary.h>
 
-#include <geode/basic/pimpl.h>
-
-#include <geode/georepresentation/common.h>
-#include <geode/georepresentation/core/component.h>
+#include <geode/basic/bitsery_archive.h>
+#include <geode/basic/pimpl_impl.h>
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( Boundaries );
-    FORWARD_DECLARATION_DIMENSION_CLASS( BoundariesBuilder );
-} // namespace geode
-
-namespace geode
-{
-    /*!
-     * Collection component describing a Boundary.
-     */
     template < index_t dimension >
-    class Boundary : public Component< dimension >
+    template < typename Archive >
+    void ModelBoundary< dimension >::serialize( Archive& archive )
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( Boundary );
-        friend class Boundaries< dimension >;
+        archive.ext(
+            *this, bitsery::ext::BaseClass< Component< dimension > >{} );
+    }
 
-    public:
-        ~Boundary() = default;
+    template class opengeode_model_api ModelBoundary< 2 >;
+    template class opengeode_model_api ModelBoundary< 3 >;
 
-        static ComponentType component_type_static()
-        {
-            return ComponentType{ "Boundary" };
-        }
-
-        ComponentType component_type() const
-        {
-            return component_type_static();
-        }
-
-        ComponentID component_id() const
-        {
-            return { this->component_type_static(), this->id() };
-        };
-
-    private:
-        friend class bitsery::Access;
-        Boundary() = default;
-
-        friend class bitsery::Access;
-        template < typename Archive >
-        void serialize( Archive& archive );
-    };
-    ALIAS_2D_AND_3D( Boundary );
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_model_api, ModelBoundary< 2 > );
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_model_api, ModelBoundary< 3 > );
 } // namespace geode

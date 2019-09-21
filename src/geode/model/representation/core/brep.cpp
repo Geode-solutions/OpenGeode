@@ -29,6 +29,7 @@
 #include <geode/model/mixin/core/block.h>
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/line.h>
+#include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
 
 #include <geode/mesh/core/polygonal_surface.h>
@@ -131,5 +132,22 @@ namespace geode
     const Block3D& BRep::SurfaceIncidenceRange::operator*() const
     {
         return brep_.block( Relationships::IncidenceRange::operator*() );
+    }
+
+    BRep::ModelBoundaryItemRange::ModelBoundaryItemRange(
+        const BRep& brep, const ModelBoundary3D& boundary )
+        : Relationships::ItemRange( brep, boundary.id() ), brep_( brep )
+    {
+    }
+
+    const Surface3D& BRep::ModelBoundaryItemRange::operator*() const
+    {
+        return brep_.surface( Relationships::ItemRange::operator*() );
+    }
+
+    BRep::ModelBoundaryItemRange BRep::items(
+        const ModelBoundary3D& boundary ) const
+    {
+        return { *this, boundary };
     }
 } // namespace geode

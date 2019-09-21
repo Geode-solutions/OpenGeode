@@ -54,7 +54,7 @@ namespace geode
             builder.load_lines( zip_reader.directory() );
             builder.load_surfaces( zip_reader.directory() );
             builder.load_blocks( zip_reader.directory() );
-            builder.load_boundaries( zip_reader.directory() );
+            builder.load_model_boundaries( zip_reader.directory() );
             builder.load_relationships( zip_reader.directory() );
             builder.load_unique_vertices( zip_reader.directory() );
 

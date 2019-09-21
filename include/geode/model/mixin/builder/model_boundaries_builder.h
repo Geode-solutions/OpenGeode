@@ -21,24 +21,39 @@
  *
  */
 
-#include <geode/georepresentation/core/boundary.h>
+#pragma once
 
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/pimpl_impl.h>
+#include <memory>
+
+#include <geode/model/common.h>
+
+namespace geode
+{
+    FORWARD_DECLARATION_DIMENSION_CLASS( ModelBoundary );
+    FORWARD_DECLARATION_DIMENSION_CLASS( ModelBoundaries );
+
+    struct uuid;
+} // namespace geode
 
 namespace geode
 {
     template < index_t dimension >
-    template < typename Archive >
-    void Boundary< dimension >::serialize( Archive& archive )
+    class ModelBoundariesBuilder
     {
-        archive.ext(
-            *this, bitsery::ext::BaseClass< Component< dimension > >{} );
-    }
+    public:
+        void load_model_boundaries( const std::string& directory );
 
-    template class opengeode_georepresentation_api Boundary< 2 >;
-    template class opengeode_georepresentation_api Boundary< 3 >;
+    protected:
+        ModelBoundariesBuilder( ModelBoundaries< dimension >& boundaries )
+            : model_boundaries_( boundaries )
+        {
+        }
 
-    SERIALIZE_BITSERY_ARCHIVE( opengeode_georepresentation_api, Boundary< 2 > );
-    SERIALIZE_BITSERY_ARCHIVE( opengeode_georepresentation_api, Boundary< 3 > );
+        const uuid& create_model_boundary();
+
+        void delete_model_boundary( const ModelBoundary< dimension >& boundary );
+
+    private:
+        ModelBoundaries< dimension >& model_boundaries_;
+    };
 } // namespace geode

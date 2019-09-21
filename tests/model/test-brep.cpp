@@ -138,7 +138,7 @@ std::vector< geode::uuid > add_blocks(
     return uuids;
 }
 
-std::vector< geode::uuid > add_boundaries(
+std::vector< geode::uuid > add_model_boundaries(
     const geode::BRep& model, geode::BRepBuilder& builder )
 {
     geode::index_t nb{ 3 };
@@ -146,14 +146,14 @@ std::vector< geode::uuid > add_boundaries(
     for( auto unused : geode::Range{ nb } )
     {
         geode_unused( unused );
-        uuids.push_back( builder.add_boundary() );
+        uuids.push_back( builder.add_model_boundary() );
     }
-    const auto& temp_boundary = model.boundary( builder.add_boundary() );
-    builder.remove_boundary( temp_boundary );
-    auto message = "BRep should have " + std::to_string( nb ) + " boundaries";
-    OPENGEODE_EXCEPTION( model.nb_boundaries() == nb, message );
+    const auto& temp_boundary = model.model_boundary( builder.add_model_boundary() );
+    builder.remove_model_boundary( temp_boundary );
+    auto message = "BRep should have " + std::to_string( nb ) + " model boundaries";
+    OPENGEODE_EXCEPTION( model.nb_model_boundaries() == nb, message );
     OPENGEODE_EXCEPTION(
-        count_components( model.boundaries() ) == nb, message );
+        count_components( model.model_boundaries() ) == nb, message );
     return uuids;
 }
 
@@ -306,25 +306,25 @@ void add_surface_block_relation( const geode::BRep& model,
         "The Block should be connected to all Surfaces" );
 }
 
-void add_surfaces_in_boundaries( const geode::BRep& model,
+void add_surfaces_in_model_boundaries( const geode::BRep& model,
     geode::BRepBuilder& builder,
     const std::vector< geode::uuid >& surface_uuids,
     const std::vector< geode::uuid >& boundary_uuids )
 {
-    builder.add_surface_in_boundary( model.surface( surface_uuids[0] ),
-        model.boundary( boundary_uuids[0] ) );
+    builder.add_surface_in_model_boundary( model.surface( surface_uuids[0] ),
+        model.model_boundary( boundary_uuids[0] ) );
     for( auto i : geode::Range( 1, 4 ) )
     {
-        builder.add_surface_in_boundary( model.surface( surface_uuids[i] ),
-            model.boundary( boundary_uuids[1] ) );
+        builder.add_surface_in_model_boundary( model.surface( surface_uuids[i] ),
+            model.model_boundary( boundary_uuids[1] ) );
     }
-    builder.add_surface_in_boundary( model.surface( surface_uuids[4] ),
-        model.boundary( boundary_uuids[2] ) );
+    builder.add_surface_in_model_boundary( model.surface( surface_uuids[4] ),
+        model.model_boundary( boundary_uuids[2] ) );
 
     for( const auto& surface_id : surface_uuids )
     {
         OPENGEODE_EXCEPTION(
-            model.relationships().nb_collections( surface_id ) == 1,
+            model.nb_collections( surface_id ) == 1,
             "All Surfaces should be in 1 collection (of type Boundary)" );
     }
 }
@@ -430,7 +430,7 @@ void test_item_ranges( const geode::BRep& model,
     const std::vector< geode::uuid >& boundary_uuids )
 {
     const auto& boundary_items =
-        model.items( model.boundary( boundary_uuids[1] ) );
+        model.items( model.model_boundary( boundary_uuids[1] ) );
     geode::index_t boundary_item_count{ 0 };
     for( const auto& boundary_item : boundary_items )
     {
@@ -438,7 +438,7 @@ void test_item_ranges( const geode::BRep& model,
         OPENGEODE_EXCEPTION( boundary_item.id() == surface_uuids[1]
                                  || boundary_item.id() == surface_uuids[2]
                                  || boundary_item.id() == surface_uuids[3],
-            "BoundaryItemRange iteration result is not correct" );
+            "ModelBoundaryItemRange iteration result is not correct" );
     }
     OPENGEODE_EXCEPTION( boundary_item_count == 3,
         "CornerIncidenceRange should iterates on 3 Surfaces (Boundary 1)" );
@@ -454,7 +454,7 @@ void test_reloaded_brep( const geode::BRep& model )
         "Number of Surfaces in reloaded BRep should be 5" );
     OPENGEODE_EXCEPTION( model.nb_blocks() == 1,
         "Number of Blocks in reloaded BRep should be 1" );
-    OPENGEODE_EXCEPTION( model.nb_boundaries() == 3,
+    OPENGEODE_EXCEPTION( model.nb_model_boundaries() == 3,
         "Number of Boundaries in reloaded BRep should be 3" );
 }
 
@@ -472,19 +472,19 @@ int main()
         auto line_uuids = add_lines( model, builder );
         auto surface_uuids = add_surfaces( model, builder );
         auto block_uuids = add_blocks( model, builder );
-        auto boundary_uuids = add_boundaries( model, builder );
+        auto model_boundary_uuids = add_model_boundaries( model, builder );
 
         add_corner_line_relation( model, builder, corner_uuids, line_uuids );
         add_line_surface_relation( model, builder, line_uuids, surface_uuids );
         add_surface_block_relation(
             model, builder, surface_uuids, block_uuids );
-        add_surfaces_in_boundaries(
-            model, builder, surface_uuids, boundary_uuids );
+        add_surfaces_in_model_boundaries(
+            model, builder, surface_uuids, model_boundary_uuids );
         test_boundary_ranges(
             model, corner_uuids, line_uuids, surface_uuids, block_uuids );
         test_incidence_ranges(
             model, corner_uuids, line_uuids, surface_uuids, block_uuids );
-        test_item_ranges( model, surface_uuids, boundary_uuids );
+        test_item_ranges( model, surface_uuids, model_boundary_uuids );
 
         std::string file_io{ "test." + model.native_extension() };
         save_brep( model, file_io );

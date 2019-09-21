@@ -21,39 +21,33 @@
  *
  */
 
-#pragma once
+#include <geode/model/mixin/builder/model_boundaries_builder.h>
 
-#include <memory>
-
-#include <geode/georepresentation/common.h>
-
-namespace geode
-{
-    FORWARD_DECLARATION_DIMENSION_CLASS( Boundary );
-    FORWARD_DECLARATION_DIMENSION_CLASS( Boundaries );
-
-    struct uuid;
-} // namespace geode
+#include <geode/model/mixin/core/model_boundaries.h>
+#include <geode/model/mixin/core/model_boundary.h>
 
 namespace geode
 {
     template < index_t dimension >
-    class BoundariesBuilder
+    const uuid& ModelBoundariesBuilder< dimension >::create_model_boundary()
     {
-    public:
-        void load_boundaries( const std::string& directory );
+        return model_boundaries_.create_model_boundary();
+    }
 
-    protected:
-        BoundariesBuilder( Boundaries< dimension >& boundaries )
-            : boundaries_( boundaries )
-        {
-        }
+    template < index_t dimension >
+    void ModelBoundariesBuilder< dimension >::delete_model_boundary(
+        const ModelBoundary< dimension >& boundary )
+    {
+        model_boundaries_.delete_model_boundary( boundary );
+    }
 
-        const uuid& create_boundary();
+    template < index_t dimension >
+    void ModelBoundariesBuilder< dimension >::load_model_boundaries(
+        const std::string& directory )
+    {
+        return model_boundaries_.load_model_boundaries( directory );
+    }
 
-        void delete_boundary( const Boundary< dimension >& boundary );
-
-    private:
-        Boundaries< dimension >& boundaries_;
-    };
+    template class opengeode_model_api ModelBoundariesBuilder< 2 >;
+    template class opengeode_model_api ModelBoundariesBuilder< 3 >;
 } // namespace geode

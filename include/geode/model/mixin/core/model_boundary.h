@@ -21,33 +21,55 @@
  *
  */
 
-#include <geode/georepresentation/builder/boundaries_builder.h>
+#pragma once
 
-#include <geode/georepresentation/core/boundaries.h>
-#include <geode/georepresentation/core/boundary.h>
+#include <geode/basic/pimpl.h>
+
+#include <geode/model/common.h>
+#include <geode/model/mixin/core/component.h>
 
 namespace geode
 {
-    template < index_t dimension >
-    const uuid& BoundariesBuilder< dimension >::create_boundary()
-    {
-        return boundaries_.create_boundary();
-    }
+    FORWARD_DECLARATION_DIMENSION_CLASS( ModelBoundaries );
+    FORWARD_DECLARATION_DIMENSION_CLASS( ModelBoundariesBuilder );
+} // namespace geode
 
+namespace geode
+{
+    /*!
+     * Collection component describing a Boundary.
+     */
     template < index_t dimension >
-    void BoundariesBuilder< dimension >::delete_boundary(
-        const Boundary< dimension >& boundary )
+    class ModelBoundary : public Component< dimension >
     {
-        boundaries_.delete_boundary( boundary );
-    }
+        OPENGEODE_DISABLE_COPY_AND_MOVE( ModelBoundary );
+        friend class ModelBoundaries< dimension >;
 
-    template < index_t dimension >
-    void BoundariesBuilder< dimension >::load_boundaries(
-        const std::string& directory )
-    {
-        return boundaries_.load_boundaries( directory );
-    }
+    public:
+        ~ModelBoundary() = default;
 
-    template class opengeode_georepresentation_api BoundariesBuilder< 2 >;
-    template class opengeode_georepresentation_api BoundariesBuilder< 3 >;
+        static ComponentType component_type_static()
+        {
+            return ComponentType{ "ModelBoundary" };
+        }
+
+        ComponentType component_type() const
+        {
+            return component_type_static();
+        }
+
+        ComponentID component_id() const
+        {
+            return { this->component_type_static(), this->id() };
+        };
+
+    private:
+        friend class bitsery::Access;
+        ModelBoundary() = default;
+
+        friend class bitsery::Access;
+        template < typename Archive >
+        void serialize( Archive& archive );
+    };
+    ALIAS_2D_AND_3D( ModelBoundary );
 } // namespace geode

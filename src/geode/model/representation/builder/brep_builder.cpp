@@ -26,6 +26,7 @@
 #include <geode/model/mixin/core/block.h>
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/line.h>
+#include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
 #include <geode/model/representation/core/brep.h>
 
@@ -33,7 +34,7 @@ namespace geode
 {
     BRepBuilder::BRepBuilder( BRep& brep )
         : TopologyBuilder( brep ),
-          AddComponentsBuilders< 3, Corners, Lines, Surfaces, Blocks, Boundaries >( brep ),
+          AddComponentsBuilders< 3, Corners, Lines, Surfaces, Blocks, ModelBoundaries >( brep ),
           brep_( brep )
     {
     }
@@ -102,10 +103,10 @@ namespace geode
         return id;
     }
 
-    const uuid& BRepBuilder::add_boundary()
+    const uuid& BRepBuilder::add_model_boundary()
     {
-        const auto& id = create_boundary();
-        relationships().add_component( id );
+        const auto& id = create_model_boundary();
+        register_component( id );
         return id;
     }
 
@@ -137,10 +138,10 @@ namespace geode
         delete_block( block );
     }
     
-    void BRepBuilder::remove_boundary( const Boundary3D& boundary )
+    void BRepBuilder::remove_model_boundary( const ModelBoundary3D& boundary )
     {
-        relationships().remove_component( boundary.id() );
-        delete_boundary( boundary );
+        unregister_component( boundary.id() );
+        delete_model_boundary( boundary );
     }
 
     void BRepBuilder::add_corner_line_relationship(
@@ -161,9 +162,9 @@ namespace geode
         add_boundary_relation( surface.id(), block.id() );
     }
 
-    void BRepBuilder::add_surface_in_boundary(
-        const Surface3D& surface, const Boundary3D& boundary )
+    void BRepBuilder::add_surface_in_model_boundary(
+        const Surface3D& surface, const ModelBoundary3D& boundary )
     {
-        relationships().add_item_in_collection( surface.id(), boundary.id() );
+        add_item_in_collection( surface.id(), boundary.id() );
     }
 } // namespace geode
