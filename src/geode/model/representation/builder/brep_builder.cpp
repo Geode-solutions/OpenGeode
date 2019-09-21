@@ -34,7 +34,12 @@ namespace geode
 {
     BRepBuilder::BRepBuilder( BRep& brep )
         : TopologyBuilder( brep ),
-          AddComponentsBuilders< 3, Corners, Lines, Surfaces, Blocks, ModelBoundaries >( brep ),
+          AddComponentsBuilders< 3,
+              Corners,
+              Lines,
+              Surfaces,
+              Blocks,
+              ModelBoundaries >( brep ),
           brep_( brep )
     {
     }
@@ -137,7 +142,7 @@ namespace geode
         unregister_mesh_component( block );
         delete_block( block );
     }
-    
+
     void BRepBuilder::remove_model_boundary( const ModelBoundary3D& boundary )
     {
         unregister_component( boundary.id() );

@@ -148,9 +148,11 @@ std::vector< geode::uuid > add_model_boundaries(
         geode_unused( unused );
         uuids.push_back( builder.add_model_boundary() );
     }
-    const auto& temp_boundary = model.model_boundary( builder.add_model_boundary() );
+    const auto& temp_boundary =
+        model.model_boundary( builder.add_model_boundary() );
     builder.remove_model_boundary( temp_boundary );
-    auto message = "BRep should have " + std::to_string( nb ) + " model boundaries";
+    auto message =
+        "BRep should have " + std::to_string( nb ) + " model boundaries";
     OPENGEODE_EXCEPTION( model.nb_model_boundaries() == nb, message );
     OPENGEODE_EXCEPTION(
         count_components( model.model_boundaries() ) == nb, message );
@@ -315,7 +317,8 @@ void add_surfaces_in_model_boundaries( const geode::BRep& model,
         model.model_boundary( boundary_uuids[0] ) );
     for( auto i : geode::Range( 1, 4 ) )
     {
-        builder.add_surface_in_model_boundary( model.surface( surface_uuids[i] ),
+        builder.add_surface_in_model_boundary(
+            model.surface( surface_uuids[i] ),
             model.model_boundary( boundary_uuids[1] ) );
     }
     builder.add_surface_in_model_boundary( model.surface( surface_uuids[4] ),
@@ -323,8 +326,7 @@ void add_surfaces_in_model_boundaries( const geode::BRep& model,
 
     for( const auto& surface_id : surface_uuids )
     {
-        OPENGEODE_EXCEPTION(
-            model.nb_collections( surface_id ) == 1,
+        OPENGEODE_EXCEPTION( model.nb_collections( surface_id ) == 1,
             "All Surfaces should be in 1 collection (of type Boundary)" );
     }
 }

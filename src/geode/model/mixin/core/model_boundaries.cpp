@@ -26,8 +26,8 @@
 #include <geode/basic/pimpl_impl.h>
 #include <geode/basic/range.h>
 
-#include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/detail/components_storage.h>
+#include <geode/model/mixin/core/model_boundary.h>
 
 namespace geode
 {
@@ -54,22 +54,24 @@ namespace geode
     }
 
     template < index_t dimension >
-    const ModelBoundary< dimension >& ModelBoundaries< dimension >::model_boundary(
-        const uuid& id ) const
+    const ModelBoundary< dimension >&
+        ModelBoundaries< dimension >::model_boundary( const uuid& id ) const
     {
         return impl_->component( id );
     }
 
     template < index_t dimension >
-    ModelBoundary< dimension >& ModelBoundaries< dimension >::modifiable_model_boundary(
-        const uuid& id )
+    ModelBoundary< dimension >&
+        ModelBoundaries< dimension >::modifiable_model_boundary(
+            const uuid& id )
     {
         return impl_->component( id );
     }
 
     template < index_t dimension >
-    std::vector< std::string > ModelBoundaries< dimension >::save_model_boundaries(
-        const std::string& directory ) const
+    std::vector< std::string >
+        ModelBoundaries< dimension >::save_model_boundaries(
+            const std::string& directory ) const
     {
         std::vector< std::string > files;
         files.emplace_back( directory + "/model_boundaries" );
@@ -118,7 +120,8 @@ namespace geode
 
     template < index_t dimension >
     class ModelBoundaries< dimension >::ModelBoundaryRangeBase::Impl
-        : public BaseRange< typename ModelBoundaries< dimension >::Impl::Iterator >
+        : public BaseRange<
+              typename ModelBoundaries< dimension >::Impl::Iterator >
     {
         using Iterator = typename ModelBoundaries< dimension >::Impl::Iterator;
 
@@ -135,28 +138,29 @@ namespace geode
     };
 
     template < index_t dimension >
-    ModelBoundaries< dimension >::ModelBoundaryRangeBase::ModelBoundaryRangeBase(
-        const ModelBoundaries& boundaries )
+    ModelBoundaries< dimension >::ModelBoundaryRangeBase::
+        ModelBoundaryRangeBase( const ModelBoundaries& boundaries )
         : impl_( boundaries.impl_->begin(), boundaries.impl_->end() )
     {
     }
 
     template < index_t dimension >
-    ModelBoundaries< dimension >::ModelBoundaryRangeBase::ModelBoundaryRangeBase(
-        ModelBoundaryRangeBase&& other ) noexcept
+    ModelBoundaries< dimension >::ModelBoundaryRangeBase::
+        ModelBoundaryRangeBase( ModelBoundaryRangeBase&& other ) noexcept
         : impl_( std::move( *other.impl_ ) )
     {
     }
 
     template < index_t dimension >
-    ModelBoundaries< dimension >::ModelBoundaryRangeBase::ModelBoundaryRangeBase(
-        const ModelBoundaryRangeBase& other )
+    ModelBoundaries< dimension >::ModelBoundaryRangeBase::
+        ModelBoundaryRangeBase( const ModelBoundaryRangeBase& other )
         : impl_( *other.impl_ )
     {
     }
 
     template < index_t dimension >
-    ModelBoundaries< dimension >::ModelBoundaryRangeBase::~ModelBoundaryRangeBase() // NOLINT
+    ModelBoundaries<
+        dimension >::ModelBoundaryRangeBase::~ModelBoundaryRangeBase() // NOLINT
     {
     }
 
@@ -181,22 +185,23 @@ namespace geode
     }
 
     template < index_t dimension >
-    const ModelBoundary< dimension >& ModelBoundaries< dimension >::ModelBoundaryRange::
-        operator*() const
+    const ModelBoundary< dimension >&
+        ModelBoundaries< dimension >::ModelBoundaryRange::operator*() const
     {
         return this->impl_->model_boundary();
     }
 
     template < index_t dimension >
-    ModelBoundaries< dimension >::ModifiableModelBoundaryRange::ModifiableModelBoundaryRange(
-        const ModelBoundaries& boundaries )
+    ModelBoundaries< dimension >::ModifiableModelBoundaryRange::
+        ModifiableModelBoundaryRange( const ModelBoundaries& boundaries )
         : ModelBoundaryRangeBase( boundaries )
     {
     }
 
     template < index_t dimension >
-    ModelBoundary< dimension >& ModelBoundaries< dimension >::ModifiableModelBoundaryRange::
-        operator*() const
+    ModelBoundary< dimension >&
+        ModelBoundaries< dimension >::ModifiableModelBoundaryRange::
+            operator*() const
     {
         return this->impl_->model_boundary();
     }

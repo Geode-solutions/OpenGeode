@@ -58,9 +58,13 @@ namespace geode
     /*!
      * Class managing modification of a BRep
      */
-    class opengeode_model_api BRepBuilder
-        : public TopologyBuilder,
-          public AddComponentsBuilders< 3, Corners, Lines, Surfaces, Blocks, ModelBoundaries >
+    class opengeode_model_api BRepBuilder : public TopologyBuilder,
+                                            public AddComponentsBuilders< 3,
+                                                Corners,
+                                                Lines,
+                                                Surfaces,
+                                                Blocks,
+                                                ModelBoundaries >
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( BRepBuilder );
 

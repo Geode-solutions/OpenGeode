@@ -90,7 +90,8 @@ namespace geode
 
         index_t nb_model_boundaries() const;
 
-        const ModelBoundary< dimension >& model_boundary( const uuid& id ) const;
+        const ModelBoundary< dimension >& model_boundary(
+            const uuid& id ) const;
 
         ModelBoundaryRange model_boundaries() const;
 
@@ -122,7 +123,8 @@ namespace geode
     private:
         const uuid& create_model_boundary();
 
-        void delete_model_boundary( const ModelBoundary< dimension >& boundary );
+        void delete_model_boundary(
+            const ModelBoundary< dimension >& boundary );
 
         void load_model_boundaries( const std::string& directory );
 

@@ -49,9 +49,13 @@ namespace geode
      * This class provides classes for range-based iteration on Component
      * boundaries and incidences.
      */
-    class opengeode_model_api BRep
-        : public Topology,
-          public AddComponents< 3, Corners, Lines, Surfaces, Blocks, ModelBoundaries >
+    class opengeode_model_api BRep : public Topology,
+                                     public AddComponents< 3,
+                                         Corners,
+                                         Lines,
+                                         Surfaces,
+                                         Blocks,
+                                         ModelBoundaries >
     {
     public:
         class opengeode_model_api LineBoundaryRange
@@ -191,8 +195,8 @@ namespace geode
             : public Relationships::ItemRange
         {
         public:
-            ModelBoundaryItemRange( const BRep& brep,
-                const ModelBoundary3D& boundary );
+            ModelBoundaryItemRange(
+                const BRep& brep, const ModelBoundary3D& boundary );
 
             const ModelBoundaryItemRange& begin() const
             {
