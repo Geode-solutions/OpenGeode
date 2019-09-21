@@ -30,4 +30,4 @@ set(CTEST_OUTPUT_ON_FAILURE ON)
 
 add_subdirectory(basic)
 add_subdirectory(mesh)
-add_subdirectory(georepresentation)
+add_subdirectory(model)

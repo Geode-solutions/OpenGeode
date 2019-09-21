@@ -27,6 +27,8 @@ find_dependency(Threads)
 # Load information for each target
 include(${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@_basic_target.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@_mesh_target.cmake)
-include(${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@_georepresentation_target.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@_model_target.cmake)
 
+if(NOT COMMAND add_geode_library)
 @OPENGEODE_UTILS@
+endif()

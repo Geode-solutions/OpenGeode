@@ -33,8 +33,8 @@ OpenGeode is an open source platform for representing and manipulating geometric
 | Project | Version | Description |
 |---------|---------|-------------|
 | [OpenGeode-IO]          | ![OpenGeode-IO-version] | Implementation of input and output formats |
-| [OpenGeode-Geosciences]          | Coming soon! | Custom objects and algorithms tailored for Geosciences |
-| [OpenGeode-GeosciencesIO]          | Coming soon! | Implementation of input and output formats for Geosciences |
+| [OpenGeode-Geosciences]          | ![OpenGeode-Geosciences-version] | Custom objects and algorithms tailored for Geosciences |
+| [OpenGeode-GeosciencesIO]          | ![OpenGeode-GeosciencesIO-version] | Implementation of input and output formats for Geosciences |
 | [OpenGeode-ModuleTemplate]          | ![OpenGeode-ModuleTemplate-version] | Template for creating your own OpenGeode modules |
 
 [OpenGeode-IO]: https://github.com/Geode-solutions/OpenGeode-IO
@@ -45,7 +45,6 @@ OpenGeode is an open source platform for representing and manipulating geometric
 
 [OpenGeode-GeosciencesIO]: https://github.com/Geode-solutions/OpenGeode-GeosciencesIO
 [OpenGeode-GeosciencesIO-version]: https://img.shields.io/github/release/Geode-solutions/OpenGeode-GeosciencesIO.svg
-
 
 [OpenGeode-ModuleTemplate]: https://github.com/Geode-solutions/OpenGeode-ModuleTemplate
 [OpenGeode-ModuleTemplate-version]: https://img.shields.io/github/release/Geode-solutions/OpenGeode-ModuleTemplate.svg

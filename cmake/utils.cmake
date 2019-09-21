@@ -7,14 +7,12 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-if(${CMAKE_VERSION} VERSION_GREATER "3.6.0")
-    find_program(CLANG_TIDY "clang-tidy-6.0" "clang-tidy-5.0" "clang-tidy")
-    if(CLANG_TIDY)
-        option(USE_CLANG_TIDY "Toggle clang-tidy while compiling" ON)
-        if(USE_CLANG_TIDY)
-            message(STATUS "Using clang-tidy")
-            set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY};-checks=*,-abseil*,-fuchsia*,-google*,-llvm*")
-        endif()
+find_program(CLANG_TIDY "clang-tidy-6.0" "clang-tidy-5.0" "clang-tidy")
+if(CLANG_TIDY)
+    option(USE_CLANG_TIDY "Toggle clang-tidy while compiling" OFF)
+    if(USE_CLANG_TIDY)
+        message(STATUS "Using clang-tidy")
+        set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY};-checks=*,-abseil*,-fuchsia*,-google*,-llvm*")
     endif()
 endif()
 
@@ -30,16 +28,24 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}
 
 #------------------------------------------------------------------------------------------------
 # Platform dependent settings
-if(UNIX)
-    add_compile_options(-Wall -Wextra -Wno-attributes)
-else()
-    add_compile_options(/DNOMINMAX /bigobj)
-endif()
+add_compile_options(
+	$<$<CXX_COMPILER_ID:MSVC>:/bigobj>
+	$<$<CXX_COMPILER_ID:MSVC>:/DNOMINMAX>
+	$<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wall>
+	$<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wextra>
+	$<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wpedantic>
+	$<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wno-attributes>
+)
 
 #------------------------------------------------------------------------------------------------
-# Install configuration
+# Install configuration    
+if(APPLE)
+    set(OS_RPATH "@executable_path")
+else()
+    set(OS_RPATH "$ORIGIN")
+endif()
 set(CMAKE_MACOSX_RPATH ON)
-set(CMAKE_INSTALL_RPATH ".")
+set(CMAKE_INSTALL_RPATH "${OS_RPATH}")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
 
 if(WIN32)
@@ -58,6 +64,24 @@ if(EXISTS ${PROJECT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in)
         FILES ${OUTPUT_CONFIG_FILE}
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
     )
+endif()
+
+find_package(Doxygen QUIET)
+if(DOXYGEN_FOUND AND EXISTS ${PROJECT_SOURCE_DIR}/cmake/Doxyfile.in)
+    # set input and output files
+    set(DOXYGEN_IN ${PROJECT_SOURCE_DIR}/cmake/Doxyfile.in)
+    set(DOXYGEN_OUT ${PROJECT_BINARY_DIR}/Doxyfile)
+
+    # request to configure the file
+    configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+    message(STATUS "Configuring Doxygen target")
+
+    # note the option ALL which allows to build the docs together with the application
+    add_custom_target(doc
+        COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+        COMMENT "Generating API documentation with Doxygen"
+        VERBATIM )
 endif()
 
 function(add_geode_library folder_path)
@@ -135,11 +159,6 @@ macro(add_geode_executable exe_path folder_name)
     endforeach()
     
     # Add the project to a folder of projects for the tests
-    if(APPLE)
-        set(OS_RPATH "@executable_path")
-    else()
-        set(OS_RPATH "$ORIGIN")
-    endif()
     set_target_properties(${exe_name}
         PROPERTIES
             FOLDER ${folder_name}
