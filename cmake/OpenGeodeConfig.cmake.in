@@ -22,6 +22,7 @@
 
 include(CMakeFindDependencyMacro)
 find_dependency(Bitsery)
+find_dependency(ghcFilesystem)
 find_dependency(Threads)
 
 # Load information for each target
