@@ -41,6 +41,7 @@ install(
     DIRECTORY
         ${ASYNCPLUSPLUS_INSTALL_PREFIX}/
         ${BITSERY_INSTALL_PREFIX}/
+        ${FILESYSTEM_INSTALL_PREFIX}/
     DESTINATION
         .
 )
