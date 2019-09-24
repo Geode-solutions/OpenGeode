@@ -2,6 +2,7 @@ set(sources
     "${lib_source_dir}/mixin/builder/blocks_builder.cpp"
     "${lib_source_dir}/mixin/builder/corners_builder.cpp"
     "${lib_source_dir}/mixin/builder/lines_builder.cpp"
+    "${lib_source_dir}/mixin/builder/model_boundaries_builder.cpp"
     "${lib_source_dir}/mixin/builder/surfaces_builder.cpp"
     "${lib_source_dir}/mixin/builder/relationships_builder.cpp"
     "${lib_source_dir}/mixin/builder/vertex_identifier_builder.cpp"
@@ -13,6 +14,8 @@ set(sources
     "${lib_source_dir}/mixin/core/corners.cpp"
     "${lib_source_dir}/mixin/core/line.cpp"
     "${lib_source_dir}/mixin/core/lines.cpp"
+    "${lib_source_dir}/mixin/core/model_boundaries.cpp"
+    "${lib_source_dir}/mixin/core/model_boundary.cpp"
     "${lib_source_dir}/mixin/core/relationships.cpp"
     "${lib_source_dir}/mixin/core/surface.cpp"
     "${lib_source_dir}/mixin/core/surfaces.cpp"
@@ -32,6 +35,7 @@ set(public_headers
     "${lib_include_dir}/mixin/builder/blocks_builder.h"
     "${lib_include_dir}/mixin/builder/corners_builder.h"
     "${lib_include_dir}/mixin/builder/lines_builder.h"
+    "${lib_include_dir}/mixin/builder/model_boundaries_builder.h"
     "${lib_include_dir}/mixin/builder/surfaces_builder.h"
     "${lib_include_dir}/mixin/builder/relationships_builder.h"
     "${lib_include_dir}/mixin/builder/topology_builder.h"
@@ -46,6 +50,8 @@ set(public_headers
     "${lib_include_dir}/mixin/core/corners.h"
     "${lib_include_dir}/mixin/core/line.h"
     "${lib_include_dir}/mixin/core/lines.h"
+    "${lib_include_dir}/mixin/core/model_boundary.h"
+    "${lib_include_dir}/mixin/core/model_boundaries.h"
     "${lib_include_dir}/mixin/core/relationships.h"
     "${lib_include_dir}/mixin/core/surface.h"
     "${lib_include_dir}/mixin/core/surfaces.h"
@@ -74,5 +80,6 @@ target_link_libraries(${target_name}
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::mesh
         Bitsery::bitsery
+        ghcFilesystem::ghc_filesystem
 )
 

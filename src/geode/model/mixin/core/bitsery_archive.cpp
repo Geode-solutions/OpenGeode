@@ -28,6 +28,7 @@
 #include <geode/model/mixin/core/block.h>
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/line.h>
+#include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
 #include <geode/model/mixin/core/vertex_identifier.h>
 
@@ -39,7 +40,8 @@ namespace bitsery
         struct PolymorphicBaseClass< geode::Component2D >
             : PolymorphicDerivedClasses< geode::Corner2D,
                   geode::Line2D,
-                  geode::Surface2D >
+                  geode::Surface2D,
+                  geode::ModelBoundary2D >
         {
         };
 
@@ -48,7 +50,8 @@ namespace bitsery
             : PolymorphicDerivedClasses< geode::Corner3D,
                   geode::Line3D,
                   geode::Surface3D,
-                  geode::Block3D >
+                  geode::Block3D,
+                  geode::ModelBoundary3D >
         {
         };
     } // namespace ext

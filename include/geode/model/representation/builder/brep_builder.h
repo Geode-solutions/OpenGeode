@@ -28,11 +28,13 @@
 #include <geode/model/mixin/builder/blocks_builder.h>
 #include <geode/model/mixin/builder/corners_builder.h>
 #include <geode/model/mixin/builder/lines_builder.h>
+#include <geode/model/mixin/builder/model_boundaries_builder.h>
 #include <geode/model/mixin/builder/surfaces_builder.h>
 #include <geode/model/mixin/builder/topology_builder.h>
 #include <geode/model/mixin/core/blocks.h>
 #include <geode/model/mixin/core/corners.h>
 #include <geode/model/mixin/core/lines.h>
+#include <geode/model/mixin/core/model_boundaries.h>
 #include <geode/model/mixin/core/surfaces.h>
 #include <geode/model/mixin/core/topology.h>
 
@@ -43,6 +45,7 @@ namespace geode
     ALIAS_3D( Block );
     ALIAS_3D( Corner );
     ALIAS_3D( Line );
+    ALIAS_3D( ModelBoundary );
     ALIAS_3D( Surface );
 
     class BRep;
@@ -55,9 +58,13 @@ namespace geode
     /*!
      * Class managing modification of a BRep
      */
-    class opengeode_model_api BRepBuilder
-        : public TopologyBuilder,
-          public AddComponentsBuilders< 3, Corners, Lines, Surfaces, Blocks >
+    class opengeode_model_api BRepBuilder : public TopologyBuilder,
+                                            public AddComponentsBuilders< 3,
+                                                Corners,
+                                                Lines,
+                                                Surfaces,
+                                                Blocks,
+                                                ModelBoundaries >
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( BRepBuilder );
 
@@ -80,6 +87,8 @@ namespace geode
 
         const uuid& add_block( const MeshType& type );
 
+        const uuid& add_model_boundary();
+
         void remove_corner( const Corner3D& corner );
 
         void remove_line( const Line3D& line );
@@ -87,6 +96,8 @@ namespace geode
         void remove_surface( const Surface3D& surface );
 
         void remove_block( const Block3D& block );
+
+        void remove_model_boundary( const ModelBoundary3D& boundary );
 
         void add_corner_line_relationship(
             const Corner3D& corner, const Line3D& line );
@@ -96,6 +107,9 @@ namespace geode
 
         void add_surface_block_relationship(
             const Surface3D& surface, const Block3D& block );
+
+        void add_surface_in_model_boundary(
+            const Surface3D& surface, const ModelBoundary3D& boundary );
 
     private:
         BRep& brep_;

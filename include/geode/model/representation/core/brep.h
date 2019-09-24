@@ -28,12 +28,14 @@
 #include <geode/model/mixin/core/blocks.h>
 #include <geode/model/mixin/core/corners.h>
 #include <geode/model/mixin/core/lines.h>
+#include <geode/model/mixin/core/model_boundaries.h>
 #include <geode/model/mixin/core/surfaces.h>
 #include <geode/model/mixin/core/topology.h>
 
 namespace geode
 {
     ALIAS_3D( Block );
+    ALIAS_3D( ModelBoundary );
     ALIAS_3D( Corner );
     ALIAS_3D( Line );
     ALIAS_3D( Surface );
@@ -47,9 +49,13 @@ namespace geode
      * This class provides classes for range-based iteration on Component
      * boundaries and incidences.
      */
-    class opengeode_model_api BRep
-        : public Topology,
-          public AddComponents< 3, Corners, Lines, Surfaces, Blocks >
+    class opengeode_model_api BRep : public Topology,
+                                     public AddComponents< 3,
+                                         Corners,
+                                         Lines,
+                                         Surfaces,
+                                         Blocks,
+                                         ModelBoundaries >
     {
     public:
         class opengeode_model_api LineBoundaryRange
@@ -185,6 +191,29 @@ namespace geode
             const BRep& brep_;
         };
 
+        class opengeode_model_api ModelBoundaryItemRange
+            : public Relationships::ItemRange
+        {
+        public:
+            ModelBoundaryItemRange(
+                const BRep& brep, const ModelBoundary3D& boundary );
+
+            const ModelBoundaryItemRange& begin() const
+            {
+                return *this;
+            }
+
+            const ModelBoundaryItemRange& end() const
+            {
+                return *this;
+            }
+
+            const Surface3D& operator*() const;
+
+        private:
+            const BRep& brep_;
+        };
+
     public:
         LineBoundaryRange boundaries( const Line3D& line ) const;
 
@@ -197,6 +226,8 @@ namespace geode
         LineIncidenceRange incidences( const Line3D& line ) const;
 
         SurfaceIncidenceRange incidences( const Surface3D& surface ) const;
+
+        ModelBoundaryItemRange items( const ModelBoundary3D& boundary ) const;
 
         static std::string native_extension_static()
         {
