@@ -67,6 +67,12 @@ namespace geode
         friend class bitsery::Access;
         ModelBoundary() = default;
 
+        friend class ModelBoundariesBuilder< dimension >;
+        void set_model_boundary_name( std::string name )
+        {
+            this->set_name( std::move( name ) );
+        }
+
         friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive );

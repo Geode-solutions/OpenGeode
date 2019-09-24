@@ -43,6 +43,8 @@ namespace geode
     public:
         void load_model_boundaries( const std::string& directory );
 
+        void set_model_boundary_name( const uuid& id, std::string name );
+
     protected:
         ModelBoundariesBuilder( ModelBoundaries< dimension >& boundaries )
             : model_boundaries_( boundaries )

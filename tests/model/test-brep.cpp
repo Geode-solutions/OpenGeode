@@ -42,6 +42,7 @@
 #include <geode/model/mixin/core/block.h>
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/line.h>
+#include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
 
 template < typename Range >
@@ -155,6 +156,7 @@ std::vector< geode::uuid > add_model_boundaries(
     {
         geode_unused( unused );
         uuids.push_back( builder.add_model_boundary() );
+        builder.set_model_boundary_name( uuids.back(), "boundary" + std::to_string( uuids.size() ) );
     }
     const auto& temp_boundary =
         model.model_boundary( builder.add_model_boundary() );
@@ -164,6 +166,7 @@ std::vector< geode::uuid > add_model_boundaries(
     OPENGEODE_EXCEPTION( model.nb_model_boundaries() == nb, message );
     OPENGEODE_EXCEPTION(
         count_components( model.model_boundaries() ) == nb, message );
+    OPENGEODE_EXCEPTION( model.model_boundary( uuids[0] ).name() == "boundary1", "Wrong ModelBoundary name" );
     return uuids;
 }
 
