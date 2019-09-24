@@ -65,6 +65,12 @@ namespace geode
             corners_.modifiable_corner( id ).modifiable_mesh() );
     }
 
+    template < index_t dimension >
+    void CornersBuilder< dimension >::set_corner_name( const uuid& id, std::string name )
+    {
+        corners_.modifiable_corner( id ).set_corner_name( std::move( name ) );
+    }
+
     template class opengeode_model_api CornersBuilder< 2 >;
     template class opengeode_model_api CornersBuilder< 3 >;
 } // namespace geode

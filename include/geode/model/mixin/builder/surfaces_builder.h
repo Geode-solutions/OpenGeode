@@ -53,6 +53,8 @@ namespace geode
         std::unique_ptr< PolygonalSurfaceBuilder< dimension > >
             surface_mesh_builder( const uuid& id );
 
+        void set_surface_name( const uuid& id, std::string name );
+
     protected:
         SurfacesBuilder( Surfaces< dimension >& surfaces )
             : surfaces_( surfaces )

@@ -79,6 +79,11 @@ namespace geode
         PolygonalSurface< dimension >& modifiable_mesh();
 
         friend class SurfacesBuilder< dimension >;
+        void set_surface_name( std::string name )
+        {
+            this->set_name( std::move( name ) );
+        }
+
         void ensure_mesh_type();
 
         friend class bitsery::Access;

@@ -78,5 +78,11 @@ namespace geode
             "Unknown mesh type: ", mesh.type_name().get() );
     }
 
+    template < index_t dimension >
+    void BlocksBuilder< dimension >::set_block_name( const uuid& id, std::string name )
+    {
+        blocks_.modifiable_block( id ).set_block_name( std::move( name ) );
+    }
+
     template class opengeode_model_api BlocksBuilder< 3 >;
 } // namespace geode

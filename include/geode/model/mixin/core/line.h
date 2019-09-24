@@ -79,6 +79,11 @@ namespace geode
         EdgedCurve< dimension >& modifiable_mesh();
 
         friend class LinesBuilder< dimension >;
+        void set_line_name( std::string name )
+        {
+            this->set_name( std::move( name ) );
+        }
+
         void ensure_mesh_type();
 
         friend class bitsery::Access;

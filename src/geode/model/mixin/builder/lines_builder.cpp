@@ -62,6 +62,12 @@ namespace geode
             lines_.modifiable_line( id ).modifiable_mesh() );
     }
 
+    template < index_t dimension >
+    void LinesBuilder< dimension >::set_line_name( const uuid& id, std::string name )
+    {
+        lines_.modifiable_line( id ).set_line_name( std::move( name ) );
+    }
+
     template class opengeode_model_api LinesBuilder< 2 >;
     template class opengeode_model_api LinesBuilder< 3 >;
 } // namespace geode

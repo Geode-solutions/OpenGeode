@@ -53,6 +53,8 @@ namespace geode
         std::unique_ptr< EdgedCurveBuilder< dimension > > line_mesh_builder(
             const uuid& id );
 
+        void set_line_name( const uuid& id, std::string name );
+
     protected:
         LinesBuilder( Lines< dimension >& lines ) : lines_( lines ) {}
 

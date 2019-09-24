@@ -57,6 +57,8 @@ namespace geode
         friend class bitsery::Access;
         Component();
 
+        void set_name( std::string name );
+
     private:
         friend class bitsery::Access;
         template < typename Archive >
