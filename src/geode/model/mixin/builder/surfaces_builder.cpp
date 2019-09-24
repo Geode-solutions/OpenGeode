@@ -81,9 +81,11 @@ namespace geode
     }
 
     template < index_t dimension >
-    void SurfacesBuilder< dimension >::set_surface_name( const uuid& id, std::string name )
+    void SurfacesBuilder< dimension >::set_surface_name(
+        const uuid& id, std::string name )
     {
-        surfaces_.modifiable_surface( id ).set_surface_name( std::move( name ) );
+        surfaces_.modifiable_surface( id ).set_surface_name(
+            std::move( name ) );
     }
 
     template class opengeode_model_api SurfacesBuilder< 2 >;
