@@ -79,7 +79,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    void BlocksBuilder< dimension >::set_block_name( const uuid& id, std::string name )
+    void BlocksBuilder< dimension >::set_block_name(
+        const uuid& id, std::string name )
     {
         blocks_.modifiable_block( id ).set_block_name( std::move( name ) );
     }

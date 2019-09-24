@@ -63,7 +63,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    void LinesBuilder< dimension >::set_line_name( const uuid& id, std::string name )
+    void LinesBuilder< dimension >::set_line_name(
+        const uuid& id, std::string name )
     {
         lines_.modifiable_line( id ).set_line_name( std::move( name ) );
     }
