@@ -77,9 +77,14 @@ namespace geode
         explicit Block( const MeshType& type );
 
         friend class BlocksBuilder< dimension >;
-        PolyhedralSolid< dimension >& modifiable_mesh();
+        void set_block_name( std::string name )
+        {
+            this->set_name( std::move( name ) );
+        }
 
         friend class BlocksBuilder< dimension >;
+        PolyhedralSolid< dimension >& modifiable_mesh();
+
         void ensure_mesh_type();
 
         friend class bitsery::Access;

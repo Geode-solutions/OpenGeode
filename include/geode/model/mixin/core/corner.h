@@ -79,6 +79,11 @@ namespace geode
         PointSet< dimension >& modifiable_mesh();
 
         friend class CornersBuilder< dimension >;
+        void set_corner_name( std::string name )
+        {
+            this->set_name( std::move( name ) );
+        }
+
         void ensure_mesh_type();
 
         friend class bitsery::Access;

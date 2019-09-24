@@ -42,6 +42,11 @@ namespace geode
             return name_;
         }
 
+        void set_name( std::string name )
+        {
+            name_ = std::move( name );
+        }
+
         const uuid& id() const
         {
             return id_;
@@ -81,6 +86,12 @@ namespace geode
     const uuid& Component< dimension >::id() const
     {
         return impl_->id();
+    }
+
+    template < index_t dimension >
+    void Component< dimension >::set_name( std::string name )
+    {
+        impl_->set_name( std::move( name ) );
     }
 
     template < index_t dimension >

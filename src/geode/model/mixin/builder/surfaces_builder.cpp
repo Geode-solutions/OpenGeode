@@ -80,6 +80,12 @@ namespace geode
             "Unknown mesh type: ", mesh.type_name().get() );
     }
 
+    template < index_t dimension >
+    void SurfacesBuilder< dimension >::set_surface_name( const uuid& id, std::string name )
+    {
+        surfaces_.modifiable_surface( id ).set_surface_name( std::move( name ) );
+    }
+
     template class opengeode_model_api SurfacesBuilder< 2 >;
     template class opengeode_model_api SurfacesBuilder< 3 >;
 } // namespace geode
