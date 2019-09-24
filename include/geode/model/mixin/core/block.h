@@ -78,7 +78,7 @@ namespace geode
 
         friend class BlocksBuilder< dimension >;
         PolyhedralSolid< dimension >& modifiable_mesh();
-        
+
         friend class BlocksBuilder< dimension >;
         void set_block_name( std::string name )
         {
