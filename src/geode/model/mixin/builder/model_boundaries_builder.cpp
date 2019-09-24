@@ -52,7 +52,8 @@ namespace geode
     void ModelBoundariesBuilder< dimension >::set_model_boundary_name(
         const uuid& id, std::string name )
     {
-        model_boundaries_.modifiable_model_boundary( id ).set_model_boundary_name( std::move( name ) );
+        model_boundaries_.modifiable_model_boundary( id )
+            .set_model_boundary_name( std::move( name ) );
     }
 
     template class opengeode_model_api ModelBoundariesBuilder< 2 >;
