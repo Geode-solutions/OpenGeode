@@ -66,7 +66,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    void CornersBuilder< dimension >::set_corner_name( const uuid& id, std::string name )
+    void CornersBuilder< dimension >::set_corner_name(
+        const uuid& id, std::string name )
     {
         corners_.modifiable_corner( id ).set_corner_name( std::move( name ) );
     }
