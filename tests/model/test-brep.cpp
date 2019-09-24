@@ -65,7 +65,8 @@ std::vector< geode::uuid > add_corners(
     {
         geode_unused( unused );
         uuids.push_back( builder.add_corner() );
-        builder.set_corner_name( uuids.back(), "corner" + std::to_string( uuids.size() ) );
+        builder.set_corner_name(
+            uuids.back(), "corner" + std::to_string( uuids.size() ) );
     }
     const auto& temp_corner = model.corner(
         builder.add_corner( geode::OpenGeodePointSet3D::type_name_static() ) );
@@ -73,7 +74,8 @@ std::vector< geode::uuid > add_corners(
     auto message = "BRep should have " + std::to_string( nb ) + " corners";
     OPENGEODE_EXCEPTION( model.nb_corners() == nb, message );
     OPENGEODE_EXCEPTION( count_components( model.corners() ) == nb, message );
-    OPENGEODE_EXCEPTION( model.corner( uuids[3] ).name() == "corner4", "Wrong Corner name" );
+    OPENGEODE_EXCEPTION(
+        model.corner( uuids[3] ).name() == "corner4", "Wrong Corner name" );
     return uuids;
 }
 
@@ -86,7 +88,8 @@ std::vector< geode::uuid > add_lines(
     {
         geode_unused( unused );
         uuids.push_back( builder.add_line() );
-        builder.set_line_name( uuids.back(), "line" + std::to_string( uuids.size() ) );
+        builder.set_line_name(
+            uuids.back(), "line" + std::to_string( uuids.size() ) );
     }
     const auto& temp_line = model.line(
         builder.add_line( geode::OpenGeodeEdgedCurve3D::type_name_static() ) );
@@ -94,7 +97,8 @@ std::vector< geode::uuid > add_lines(
     auto message = "BRep should have " + std::to_string( nb ) + " lines";
     OPENGEODE_EXCEPTION( model.nb_lines() == nb, message );
     OPENGEODE_EXCEPTION( count_components( model.lines() ) == nb, message );
-    OPENGEODE_EXCEPTION( model.line( uuids[3] ).name() == "line4", "Wrong Line name" );
+    OPENGEODE_EXCEPTION(
+        model.line( uuids[3] ).name() == "line4", "Wrong Line name" );
     return uuids;
 }
 
@@ -108,7 +112,8 @@ std::vector< geode::uuid > add_surfaces(
         geode_unused( unused );
         uuids.push_back( builder.add_surface(
             geode::OpenGeodeTriangulatedSurface3D::type_name_static() ) );
-        builder.set_surface_name( uuids.back(), "surface" + std::to_string( uuids.size() ) );
+        builder.set_surface_name(
+            uuids.back(), "surface" + std::to_string( uuids.size() ) );
     }
     for( auto unused : geode::Range{ 2, nb } )
     {
@@ -121,7 +126,8 @@ std::vector< geode::uuid > add_surfaces(
     auto message = "BRep should have " + std::to_string( nb ) + " surfaces";
     OPENGEODE_EXCEPTION( model.nb_surfaces() == nb, message );
     OPENGEODE_EXCEPTION( count_components( model.surfaces() ) == nb, message );
-    OPENGEODE_EXCEPTION( model.surface( uuids[1] ).name() == "surface2", "Wrong Surface name" );
+    OPENGEODE_EXCEPTION(
+        model.surface( uuids[1] ).name() == "surface2", "Wrong Surface name" );
     return uuids;
 }
 
@@ -134,7 +140,8 @@ std::vector< geode::uuid > add_blocks(
     {
         geode_unused( unused );
         uuids.push_back( builder.add_block() );
-        builder.set_block_name( uuids.back(), "block" + std::to_string( uuids.size() ) );
+        builder.set_block_name(
+            uuids.back(), "block" + std::to_string( uuids.size() ) );
     }
     const auto& temp_block = model.block( builder.add_block(
         geode::OpenGeodePolyhedralSolid3D::type_name_static() ) );
@@ -142,7 +149,8 @@ std::vector< geode::uuid > add_blocks(
     auto message = "BRep should have " + std::to_string( nb ) + " blocks";
     OPENGEODE_EXCEPTION( model.nb_blocks() == nb, message );
     OPENGEODE_EXCEPTION( count_components( model.blocks() ) == nb, message );
-    OPENGEODE_EXCEPTION( model.block( uuids[0] ).name() == "block1", "Wrong Block name" );
+    OPENGEODE_EXCEPTION(
+        model.block( uuids[0] ).name() == "block1", "Wrong Block name" );
     return uuids;
 }
 
