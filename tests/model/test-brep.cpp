@@ -315,7 +315,7 @@ void add_surfaces_in_model_boundaries( const geode::BRep& model,
 {
     builder.add_surface_in_model_boundary( model.surface( surface_uuids[0] ),
         model.model_boundary( boundary_uuids[0] ) );
-    for( auto i : geode::Range( 1, 4 ) )
+    for( auto i : geode::Range{ 1, 4 } )
     {
         builder.add_surface_in_model_boundary(
             model.surface( surface_uuids[i] ),
