@@ -147,7 +147,8 @@ namespace geode
             : public Relationships::InternalRange
         {
         public:
-            SurfaceInternalRange( const Section& section, const Surface2D& surface );
+            SurfaceInternalRange(
+                const Section& section, const Surface2D& surface );
 
             const SurfaceInternalRange& begin() const
             {

@@ -259,17 +259,17 @@ void add_internal_relations( const geode::Section& model,
 
     for( const auto& line_id : line_uuids )
     {
-        for( const auto& embedding :
-            model.embeddings( model.line( line_id ) ) )
+        for( const auto& embedding : model.embeddings( model.line( line_id ) ) )
         {
-            OPENGEODE_EXCEPTION( geode::contain( surface_uuids, embedding.id() ),
+            OPENGEODE_EXCEPTION(
+                geode::contain( surface_uuids, embedding.id() ),
                 "All Lines embeddings should be Surfaces" );
         }
         OPENGEODE_EXCEPTION( model.nb_embeddings( line_id ) == 1,
             "All Lines should be embedded to 1 Surface" );
     }
 
-        OPENGEODE_EXCEPTION(
+    OPENGEODE_EXCEPTION(
         model.nb_internals( surface_uuids.front() ) == line_uuids.size(),
         "The Surface should embed all Lines (that are internal to the Block)" );
 }

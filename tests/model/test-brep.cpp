@@ -377,7 +377,8 @@ void add_internal_relations( const geode::BRep& model,
 
     OPENGEODE_EXCEPTION(
         model.nb_internals( block_uuids.front() ) == surface_uuids.size(),
-        "The Block should embed all Surfaces (that are internal to the Block)" );
+        "The Block should embed all Surfaces (that are internal to the "
+        "Block)" );
 }
 
 void test_boundary_ranges( const geode::BRep& model,
@@ -531,8 +532,7 @@ int main()
             model, builder, surface_uuids, block_uuids );
         add_surfaces_in_model_boundaries(
             model, builder, surface_uuids, model_boundary_uuids );
-        add_internal_relations(
-            model, builder, surface_uuids, block_uuids );
+        add_internal_relations( model, builder, surface_uuids, block_uuids );
         test_boundary_ranges(
             model, corner_uuids, line_uuids, surface_uuids, block_uuids );
         test_incidence_ranges(
