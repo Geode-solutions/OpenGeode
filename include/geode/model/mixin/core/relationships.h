@@ -110,6 +110,69 @@ namespace geode
         };
 
         /*!
+         * Range to iterates on all internal components of one component
+         */
+        class opengeode_model_api InternalRange
+        {
+        public:
+            InternalRange( const Relationships& relationships, const uuid& id );
+            InternalRange( InternalRange&& other ) noexcept;
+            InternalRange( const InternalRange& other );
+            ~InternalRange();
+
+            const InternalRange& begin() const
+            {
+                return *this;
+            }
+
+            const InternalRange& end() const
+            {
+                return *this;
+            }
+
+            bool operator!=( const InternalRange& /*unused*/ ) const;
+
+            void operator++();
+
+            const uuid& operator*() const;
+
+        private:
+            IMPLEMENTATION_MEMBER( impl_ );
+        };
+
+        /*!
+         * Range to iterates on all embeddings of one component
+         */
+        class opengeode_model_api EmbeddingRange
+        {
+        public:
+            EmbeddingRange(
+                const Relationships& relationships, const uuid& id );
+            EmbeddingRange( EmbeddingRange&& other ) noexcept;
+            EmbeddingRange( const EmbeddingRange& other );
+            ~EmbeddingRange();
+
+            const EmbeddingRange& begin() const
+            {
+                return *this;
+            }
+
+            const EmbeddingRange& end() const
+            {
+                return *this;
+            }
+
+            bool operator!=( const EmbeddingRange& /*unused*/ ) const;
+
+            void operator++();
+
+            const uuid& operator*() const;
+
+        private:
+            IMPLEMENTATION_MEMBER( impl_ );
+        };
+
+        /*!
          * Range to iterates on all items of one component
          */
         class opengeode_model_api ItemRange
@@ -184,6 +247,14 @@ namespace geode
 
         IncidenceRange incidences( const uuid& id ) const;
 
+        index_t nb_internals( const uuid& id ) const;
+
+        InternalRange internals( const uuid& id ) const;
+
+        index_t nb_embeddings( const uuid& id ) const;
+
+        EmbeddingRange embeddings( const uuid& id ) const;
+
         index_t nb_items( const uuid& id ) const;
 
         ItemRange items( const uuid& id ) const;
@@ -217,6 +288,16 @@ namespace geode
          */
         void add_boundary_relation(
             const uuid& boundary, const uuid& incidence );
+
+        /*!
+         * Add a new relationship of type internal-embedding between two
+         * components
+         * @param[in] internal Unique index of the internal component
+         * @param[in] embedding Unique index of the embedding component
+         */
+        void add_internal_relation(
+            const uuid& internal, const uuid& embedding );
+
         /*!
          * Add a new relationship of type item-collection between two components
          * @param[in] item Unique index of the item component
