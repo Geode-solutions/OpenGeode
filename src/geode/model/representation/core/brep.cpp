@@ -134,8 +134,7 @@ namespace geode
         return brep_.block( Relationships::IncidenceRange::operator*() );
     }
 
-    BRep::SurfaceInternalRange BRep::internals(
-        const Surface3D& surface ) const
+    BRep::SurfaceInternalRange BRep::internals( const Surface3D& surface ) const
     {
         return { *this, surface };
     }
@@ -151,8 +150,7 @@ namespace geode
         return brep_.line( Relationships::InternalRange::operator*() );
     }
 
-    BRep::BlockInternalRange BRep::internals(
-        const Block3D& block ) const
+    BRep::BlockInternalRange BRep::internals( const Block3D& block ) const
     {
         return { *this, block };
     }
@@ -168,8 +166,7 @@ namespace geode
         return brep_.surface( Relationships::InternalRange::operator*() );
     }
 
-    BRep::LineEmbeddingRange BRep::embeddings(
-        const Line3D& line ) const
+    BRep::LineEmbeddingRange BRep::embeddings( const Line3D& line ) const
     {
         return { *this, line };
     }

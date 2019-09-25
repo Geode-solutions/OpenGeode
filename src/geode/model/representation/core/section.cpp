@@ -113,7 +113,8 @@ namespace geode
 
     Section::SurfaceInternalRange::SurfaceInternalRange(
         const Section& section, const Surface2D& surface )
-        : Relationships::InternalRange( section, surface.id() ), section_( section )
+        : Relationships::InternalRange( section, surface.id() ),
+          section_( section )
     {
     }
 
@@ -122,15 +123,15 @@ namespace geode
         return section_.line( Relationships::InternalRange::operator*() );
     }
 
-    Section::LineEmbeddingRange Section::embeddings(
-        const Line2D& line ) const
+    Section::LineEmbeddingRange Section::embeddings( const Line2D& line ) const
     {
         return { *this, line };
     }
 
     Section::LineEmbeddingRange::LineEmbeddingRange(
         const Section& section, const Line2D& line )
-        : Relationships::EmbeddingRange( section, line.id() ), section_( section )
+        : Relationships::EmbeddingRange( section, line.id() ),
+          section_( section )
     {
     }
 
@@ -141,7 +142,8 @@ namespace geode
 
     Section::ModelBoundaryItemRange::ModelBoundaryItemRange(
         const Section& section, const ModelBoundary2D& boundary )
-        : Relationships::ItemRange( section, boundary.id() ), section_( section )
+        : Relationships::ItemRange( section, boundary.id() ),
+          section_( section )
     {
     }
 
