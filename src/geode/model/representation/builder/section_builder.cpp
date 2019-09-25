@@ -26,6 +26,7 @@
 #include <geode/model/mixin/core/block.h>
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/line.h>
+#include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
 #include <geode/model/representation/core/section.h>
 
@@ -33,7 +34,8 @@ namespace geode
 {
     SectionBuilder::SectionBuilder( Section& section )
         : TopologyBuilder( section ),
-          AddComponentsBuilders< 2, Corners, Lines, Surfaces >( section ),
+          AddComponentsBuilders< 2, Corners, Lines, Surfaces, ModelBoundaries >(
+              section ),
           section_( section )
     {
     }
@@ -86,6 +88,13 @@ namespace geode
         return id;
     }
 
+    const uuid& SectionBuilder::add_model_boundary()
+    {
+        const auto& id = create_model_boundary();
+        register_component( id );
+        return id;
+    }
+
     void SectionBuilder::remove_corner( const Corner2D& corner )
     {
         unregister_component( corner.id() );
@@ -107,6 +116,13 @@ namespace geode
         delete_surface( surface );
     }
 
+    void SectionBuilder::remove_model_boundary(
+        const ModelBoundary2D& boundary )
+    {
+        unregister_component( boundary.id() );
+        delete_model_boundary( boundary );
+    }
+
     void SectionBuilder::add_corner_line_relationship(
         const Corner2D& corner, const Line2D& line )
     {
@@ -119,4 +135,15 @@ namespace geode
         add_boundary_relation( line.id(), surface.id() );
     }
 
+    void SectionBuilder::add_line_surface_internal_relationship(
+        const Line2D& line, const Surface2D& surface )
+    {
+        add_internal_relation( line.id(), surface.id() );
+    }
+
+    void SectionBuilder::add_line_in_model_boundary(
+        const Line2D& line, const ModelBoundary2D& boundary )
+    {
+        add_item_in_collection( line.id(), boundary.id() );
+    }
 } // namespace geode

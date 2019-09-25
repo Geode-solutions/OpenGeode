@@ -28,6 +28,7 @@
 #include <geode/model/mixin/core/blocks.h>
 #include <geode/model/mixin/core/corners.h>
 #include <geode/model/mixin/core/lines.h>
+#include <geode/model/mixin/core/model_boundaries.h>
 #include <geode/model/mixin/core/surfaces.h>
 #include <geode/model/mixin/core/topology.h>
 
@@ -36,6 +37,7 @@ namespace geode
     ALIAS_2D( Corner );
     ALIAS_2D( Line );
     ALIAS_2D( Surface );
+    ALIAS_2D( ModelBoundary );
 } // namespace geode
 
 namespace geode
@@ -48,7 +50,7 @@ namespace geode
      */
     class opengeode_model_api Section
         : public Topology,
-          public AddComponents< 2, Corners, Lines, Surfaces >
+          public AddComponents< 2, Corners, Lines, Surfaces, ModelBoundaries >
     {
     public:
         class opengeode_model_api LineBoundaryRange
@@ -96,7 +98,6 @@ namespace geode
             const Section& section_;
         };
 
-    public:
         class opengeode_model_api CornerIncidenceRange
             : public Relationships::IncidenceRange
         {
@@ -142,6 +143,73 @@ namespace geode
             const Section& section_;
         };
 
+        class opengeode_model_api SurfaceInternalRange
+            : public Relationships::InternalRange
+        {
+        public:
+            SurfaceInternalRange( const Section& section, const Surface2D& surface );
+
+            const SurfaceInternalRange& begin() const
+            {
+                return *this;
+            }
+
+            const SurfaceInternalRange& end() const
+            {
+                return *this;
+            }
+
+            const Line2D& operator*() const;
+
+        private:
+            const Section& section_;
+        };
+
+        class opengeode_model_api LineEmbeddingRange
+            : public Relationships::EmbeddingRange
+        {
+        public:
+            LineEmbeddingRange( const Section& section, const Line2D& line );
+
+            const LineEmbeddingRange& begin() const
+            {
+                return *this;
+            }
+
+            const LineEmbeddingRange& end() const
+            {
+                return *this;
+            }
+
+            const Surface2D& operator*() const;
+
+        private:
+            const Section& section_;
+        };
+
+        class opengeode_model_api ModelBoundaryItemRange
+            : public Relationships::ItemRange
+        {
+        public:
+            ModelBoundaryItemRange(
+                const Section& section, const ModelBoundary2D& boundary );
+
+            const ModelBoundaryItemRange& begin() const
+            {
+                return *this;
+            }
+
+            const ModelBoundaryItemRange& end() const
+            {
+                return *this;
+            }
+
+            const Line2D& operator*() const;
+
+        private:
+            const Section& section_;
+        };
+
     public:
         LineBoundaryRange boundaries( const Line2D& line ) const;
 
@@ -150,6 +218,12 @@ namespace geode
         CornerIncidenceRange incidences( const Corner2D& corner ) const;
 
         LineIncidenceRange incidences( const Line2D& line ) const;
+
+        SurfaceInternalRange internals( const Surface2D& surface ) const;
+
+        LineEmbeddingRange embeddings( const Line2D& line ) const;
+
+        ModelBoundaryItemRange items( const ModelBoundary2D& boundary ) const;
 
         static std::string native_extension_static()
         {

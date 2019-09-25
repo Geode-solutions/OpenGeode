@@ -41,6 +41,7 @@
 #include <geode/model/mixin/core/block.h>
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/line.h>
+#include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
 
 template < typename Range >
@@ -109,6 +110,32 @@ std::vector< geode::uuid > add_surfaces(
     auto message = "Section should have " + std::to_string( nb ) + " surfaces";
     OPENGEODE_EXCEPTION( model.nb_surfaces() == nb, message );
     OPENGEODE_EXCEPTION( count_components( model.surfaces() ) == nb, message );
+    return uuids;
+}
+
+std::vector< geode::uuid > add_model_boundaries(
+    const geode::Section& section, geode::SectionBuilder& builder )
+{
+    geode::index_t nb{ 2 };
+    std::vector< geode::uuid > uuids;
+    for( auto unused : geode::Range{ nb } )
+    {
+        geode_unused( unused );
+        uuids.push_back( builder.add_model_boundary() );
+        builder.set_model_boundary_name(
+            uuids.back(), "boundary" + std::to_string( uuids.size() ) );
+    }
+    const auto& temp_boundary =
+        section.model_boundary( builder.add_model_boundary() );
+    builder.remove_model_boundary( temp_boundary );
+    auto message =
+        "BRep should have " + std::to_string( nb ) + " model boundaries";
+    OPENGEODE_EXCEPTION( section.nb_model_boundaries() == nb, message );
+    OPENGEODE_EXCEPTION(
+        count_components( section.model_boundaries() ) == nb, message );
+    OPENGEODE_EXCEPTION(
+        section.model_boundary( uuids[0] ).name() == "boundary1",
+        "Wrong ModelBoundary name" );
     return uuids;
 }
 
@@ -197,6 +224,56 @@ void add_line_surface_relation( const geode::Section& model,
         "Surface 1 should have 4 Lines as boundaries" );
 }
 
+void add_lines_in_model_boundaries( const geode::Section& model,
+    geode::SectionBuilder& builder,
+    const std::vector< geode::uuid >& line_uuids,
+    const std::vector< geode::uuid >& boundary_uuids )
+{
+    builder.add_line_in_model_boundary( model.line( line_uuids[0] ),
+        model.model_boundary( boundary_uuids[0] ) );
+    for( auto i : geode::Range{ 1, 3 } )
+    {
+        builder.add_line_in_model_boundary( model.line( line_uuids[i] ),
+            model.model_boundary( boundary_uuids[1] ) );
+    }
+
+    for( auto i : geode::Range{ 3 } )
+    {
+        OPENGEODE_EXCEPTION( model.nb_collections( line_uuids[i] ) == 1,
+            "This Line should be in 1 collection (of type Boundary)" );
+    }
+    OPENGEODE_EXCEPTION( model.nb_collections( line_uuids[4] ) == 0,
+        "Last Line should be in no collection (of type Boundary)" );
+}
+
+void add_internal_relations( const geode::Section& model,
+    geode::SectionBuilder& builder,
+    const std::vector< geode::uuid >& line_uuids,
+    const std::vector< geode::uuid >& surface_uuids )
+{
+    for( const auto& line_id : line_uuids )
+    {
+        builder.add_line_surface_internal_relationship(
+            model.line( line_id ), model.surface( surface_uuids.front() ) );
+    }
+
+    for( const auto& line_id : line_uuids )
+    {
+        for( const auto& embedding :
+            model.embeddings( model.line( line_id ) ) )
+        {
+            OPENGEODE_EXCEPTION( geode::contain( surface_uuids, embedding.id() ),
+                "All Lines embeddings should be Surfaces" );
+        }
+        OPENGEODE_EXCEPTION( model.nb_embeddings( line_id ) == 1,
+            "All Lines should be embedded to 1 Surface" );
+    }
+
+        OPENGEODE_EXCEPTION(
+        model.nb_internals( surface_uuids.front() ) == line_uuids.size(),
+        "The Surface should embed all Lines (that are internal to the Block)" );
+}
+
 void test_boundary_ranges( const geode::Section& model,
     const std::vector< geode::uuid >& corner_uuids,
     const std::vector< geode::uuid >& line_uuids,
@@ -261,12 +338,23 @@ void test_incidence_ranges( const geode::Section& model,
         "LineIncidenceRange should iterates on 1 Surface" );
 }
 
-class OtherModel : public geode::Section,
-                   public geode::AddComponents< 3, geode::Blocks >
+void test_item_ranges( const geode::Section& model,
+    const std::vector< geode::uuid >& line_uuids,
+    const std::vector< geode::uuid >& boundary_uuids )
 {
-public:
-    OtherModel() = default;
-};
+    const auto& boundary_items =
+        model.items( model.model_boundary( boundary_uuids[1] ) );
+    geode::index_t boundary_item_count{ 0 };
+    for( const auto& boundary_item : boundary_items )
+    {
+        boundary_item_count++;
+        OPENGEODE_EXCEPTION( boundary_item.id() == line_uuids[1]
+                                 || boundary_item.id() == line_uuids[2],
+            "ModelBoundaryItemRange iteration result is not correct" );
+    }
+    OPENGEODE_EXCEPTION( boundary_item_count == 2,
+        "CornerIncidenceRange should iterates on 2 Lines (Boundary 1)" );
+}
 
 int main()
 {
@@ -276,18 +364,22 @@ int main()
     {
         Section model;
         SectionBuilder builder( model );
-        OtherModel other;
 
         // This Section represents a house (with one triangle and one square as
         // in children sketches)
         auto corner_uuids = add_corners( model, builder );
         auto line_uuids = add_lines( model, builder );
         auto surface_uuids = add_surfaces( model, builder );
+        auto model_boundary_uuids = add_model_boundaries( model, builder );
 
         add_corner_line_relation( model, builder, corner_uuids, line_uuids );
         add_line_surface_relation( model, builder, line_uuids, surface_uuids );
+        add_lines_in_model_boundaries(
+            model, builder, line_uuids, model_boundary_uuids );
+        add_internal_relations( model, builder, line_uuids, surface_uuids );
         test_boundary_ranges( model, corner_uuids, line_uuids, surface_uuids );
         test_incidence_ranges( model, corner_uuids, line_uuids, surface_uuids );
+        test_item_ranges( model, line_uuids, model_boundary_uuids );
 
         std::string file_io{ "test." + model.native_extension() };
         save_section( model, file_io );
