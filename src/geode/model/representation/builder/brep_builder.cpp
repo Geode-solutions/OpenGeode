@@ -167,6 +167,18 @@ namespace geode
         add_boundary_relation( surface.id(), block.id() );
     }
 
+    void BRepBuilder::add_line_surface_internal_relationship(
+        const Line3D& line, const Surface3D& surface )
+    {
+        add_internal_relation( line.id(), surface.id() );
+    }
+
+    void BRepBuilder::add_surface_block_internal_relationship(
+        const Surface3D& surface, const Block3D& block )
+    {
+        add_internal_relation( surface.id(), block.id() );
+    }
+
     void BRepBuilder::add_surface_in_model_boundary(
         const Surface3D& surface, const ModelBoundary3D& boundary )
     {

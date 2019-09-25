@@ -352,6 +352,34 @@ void add_surfaces_in_model_boundaries( const geode::BRep& model,
     }
 }
 
+void add_internal_relations( const geode::BRep& model,
+    geode::BRepBuilder& builder,
+    const std::vector< geode::uuid >& surface_uuids,
+    const std::vector< geode::uuid >& block_uuids )
+{
+    for( const auto& surface_id : surface_uuids )
+    {
+        builder.add_surface_block_internal_relationship(
+            model.surface( surface_id ), model.block( block_uuids.front() ) );
+    }
+
+    for( const auto& surface_id : surface_uuids )
+    {
+        for( const auto& embedding :
+            model.embeddings( model.surface( surface_id ) ) )
+        {
+            OPENGEODE_EXCEPTION( geode::contain( block_uuids, embedding.id() ),
+                "All Surfaces embeddings should be Blocks" );
+        }
+        OPENGEODE_EXCEPTION( model.nb_embeddings( surface_id ) == 1,
+            "All Surfaces should be embedded to 1 Block" );
+    }
+
+    OPENGEODE_EXCEPTION(
+        model.nb_internals( block_uuids.front() ) == surface_uuids.size(),
+        "The Block should embed all Surfaces (that are internal to the Block)" );
+}
+
 void test_boundary_ranges( const geode::BRep& model,
     const std::vector< geode::uuid >& corner_uuids,
     const std::vector< geode::uuid >& line_uuids,
@@ -503,6 +531,8 @@ int main()
             model, builder, surface_uuids, block_uuids );
         add_surfaces_in_model_boundaries(
             model, builder, surface_uuids, model_boundary_uuids );
+        add_internal_relations(
+            model, builder, surface_uuids, block_uuids );
         test_boundary_ranges(
             model, corner_uuids, line_uuids, surface_uuids, block_uuids );
         test_incidence_ranges(

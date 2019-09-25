@@ -124,7 +124,6 @@ namespace geode
             const BRep& brep_;
         };
 
-    public:
         class opengeode_model_api CornerIncidenceRange
             : public Relationships::IncidenceRange
         {
@@ -191,6 +190,94 @@ namespace geode
             const BRep& brep_;
         };
 
+        class opengeode_model_api SurfaceInternalRange
+            : public Relationships::InternalRange
+        {
+        public:
+            SurfaceInternalRange( const BRep& brep, const Surface3D& surface );
+
+            const SurfaceInternalRange& begin() const
+            {
+                return *this;
+            }
+
+            const SurfaceInternalRange& end() const
+            {
+                return *this;
+            }
+
+            const Line3D& operator*() const;
+
+        private:
+            const BRep& brep_;
+        };
+
+        class opengeode_model_api BlockInternalRange
+            : public Relationships::InternalRange
+        {
+        public:
+            BlockInternalRange( const BRep& brep, const Block3D& block );
+
+            const BlockInternalRange& begin() const
+            {
+                return *this;
+            }
+
+            const BlockInternalRange& end() const
+            {
+                return *this;
+            }
+
+            const Surface3D& operator*() const;
+
+        private:
+            const BRep& brep_;
+        };
+
+        class opengeode_model_api LineEmbeddingRange
+            : public Relationships::EmbeddingRange
+        {
+        public:
+            LineEmbeddingRange( const BRep& brep, const Line3D& line );
+
+            const LineEmbeddingRange& begin() const
+            {
+                return *this;
+            }
+
+            const LineEmbeddingRange& end() const
+            {
+                return *this;
+            }
+
+            const Surface3D& operator*() const;
+
+        private:
+            const BRep& brep_;
+        };
+
+        class opengeode_model_api SurfaceEmbeddingRange
+            : public Relationships::EmbeddingRange
+        {
+        public:
+            SurfaceEmbeddingRange( const BRep& brep, const Surface3D& surface );
+
+            const SurfaceEmbeddingRange& begin() const
+            {
+                return *this;
+            }
+
+            const SurfaceEmbeddingRange& end() const
+            {
+                return *this;
+            }
+
+            const Block3D& operator*() const;
+
+        private:
+            const BRep& brep_;
+        };
+
         class opengeode_model_api ModelBoundaryItemRange
             : public Relationships::ItemRange
         {
@@ -226,6 +313,14 @@ namespace geode
         LineIncidenceRange incidences( const Line3D& line ) const;
 
         SurfaceIncidenceRange incidences( const Surface3D& surface ) const;
+
+        SurfaceInternalRange internals( const Surface3D& surface ) const;
+
+        BlockInternalRange internals( const Block3D& block ) const;
+
+        LineEmbeddingRange embeddings( const Line3D& line ) const;
+
+        SurfaceEmbeddingRange embeddings( const Surface3D& surface ) const;
 
         ModelBoundaryItemRange items( const ModelBoundary3D& boundary ) const;
 

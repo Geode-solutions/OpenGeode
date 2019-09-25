@@ -28,6 +28,7 @@
 
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/line.h>
+#include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
 
 #include <geode/mesh/core/polygonal_surface.h>
@@ -102,5 +103,56 @@ namespace geode
     const Surface2D& Section::LineIncidenceRange::operator*() const
     {
         return section_.surface( Relationships::IncidenceRange::operator*() );
+    }
+
+    Section::SurfaceInternalRange Section::internals(
+        const Surface2D& surface ) const
+    {
+        return { *this, surface };
+    }
+
+    Section::SurfaceInternalRange::SurfaceInternalRange(
+        const Section& section, const Surface2D& surface )
+        : Relationships::InternalRange( section, surface.id() ), section_( section )
+    {
+    }
+
+    const Line2D& Section::SurfaceInternalRange::operator*() const
+    {
+        return section_.line( Relationships::InternalRange::operator*() );
+    }
+
+    Section::LineEmbeddingRange Section::embeddings(
+        const Line2D& line ) const
+    {
+        return { *this, line };
+    }
+
+    Section::LineEmbeddingRange::LineEmbeddingRange(
+        const Section& section, const Line2D& line )
+        : Relationships::EmbeddingRange( section, line.id() ), section_( section )
+    {
+    }
+
+    const Surface2D& Section::LineEmbeddingRange::operator*() const
+    {
+        return section_.surface( Relationships::EmbeddingRange::operator*() );
+    }
+
+    Section::ModelBoundaryItemRange::ModelBoundaryItemRange(
+        const Section& section, const ModelBoundary2D& boundary )
+        : Relationships::ItemRange( section, boundary.id() ), section_( section )
+    {
+    }
+
+    const Line2D& Section::ModelBoundaryItemRange::operator*() const
+    {
+        return section_.line( Relationships::ItemRange::operator*() );
+    }
+
+    Section::ModelBoundaryItemRange Section::items(
+        const ModelBoundary2D& boundary ) const
+    {
+        return { *this, boundary };
     }
 } // namespace geode

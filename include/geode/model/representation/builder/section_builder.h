@@ -29,10 +29,12 @@
 #include <geode/model/mixin/builder/corners_builder.h>
 #include <geode/model/mixin/builder/lines_builder.h>
 #include <geode/model/mixin/builder/surfaces_builder.h>
+#include <geode/model/mixin/builder/model_boundaries_builder.h>
 #include <geode/model/mixin/builder/topology_builder.h>
 #include <geode/model/mixin/core/blocks.h>
 #include <geode/model/mixin/core/corners.h>
 #include <geode/model/mixin/core/lines.h>
+#include <geode/model/mixin/core/model_boundaries.h>
 #include <geode/model/mixin/core/surfaces.h>
 #include <geode/model/mixin/core/topology.h>
 
@@ -42,6 +44,7 @@ namespace geode
 {
     ALIAS_2D( Corner );
     ALIAS_2D( Line );
+    ALIAS_2D( ModelBoundary );
     ALIAS_2D( Surface );
 
     class Section;
@@ -56,7 +59,7 @@ namespace geode
      */
     class opengeode_model_api SectionBuilder
         : public TopologyBuilder,
-          public AddComponentsBuilders< 2, Corners, Lines, Surfaces >
+          public AddComponentsBuilders< 2, Corners, Lines, Surfaces, ModelBoundaries >
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( SectionBuilder );
 
@@ -75,17 +78,27 @@ namespace geode
 
         const uuid& add_surface( const MeshType& type );
 
+        const uuid& add_model_boundary();
+
         void remove_corner( const Corner2D& corner );
 
         void remove_line( const Line2D& line );
 
         void remove_surface( const Surface2D& surface );
 
+        void remove_model_boundary( const ModelBoundary2D& boundary );
+
         void add_corner_line_relationship(
             const Corner2D& corner, const Line2D& line );
 
         void add_line_surface_relationship(
             const Line2D& line, const Surface2D& surface );
+
+        void add_line_surface_internal_relationship(
+            const Line2D& line, const Surface2D& surface );
+        
+        void add_line_in_model_boundary(
+            const Line2D& line, const ModelBoundary2D& boundary );
 
     private:
         Section& section_;

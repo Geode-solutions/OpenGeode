@@ -134,6 +134,74 @@ namespace geode
         return brep_.block( Relationships::IncidenceRange::operator*() );
     }
 
+    BRep::SurfaceInternalRange BRep::internals(
+        const Surface3D& surface ) const
+    {
+        return { *this, surface };
+    }
+
+    BRep::SurfaceInternalRange::SurfaceInternalRange(
+        const BRep& brep, const Surface3D& surface )
+        : Relationships::InternalRange( brep, surface.id() ), brep_( brep )
+    {
+    }
+
+    const Line3D& BRep::SurfaceInternalRange::operator*() const
+    {
+        return brep_.line( Relationships::InternalRange::operator*() );
+    }
+
+    BRep::BlockInternalRange BRep::internals(
+        const Block3D& block ) const
+    {
+        return { *this, block };
+    }
+
+    BRep::BlockInternalRange::BlockInternalRange(
+        const BRep& brep, const Block3D& block )
+        : Relationships::InternalRange( brep, block.id() ), brep_( brep )
+    {
+    }
+
+    const Surface3D& BRep::BlockInternalRange::operator*() const
+    {
+        return brep_.surface( Relationships::InternalRange::operator*() );
+    }
+
+    BRep::LineEmbeddingRange BRep::embeddings(
+        const Line3D& line ) const
+    {
+        return { *this, line };
+    }
+
+    BRep::LineEmbeddingRange::LineEmbeddingRange(
+        const BRep& brep, const Line3D& line )
+        : Relationships::EmbeddingRange( brep, line.id() ), brep_( brep )
+    {
+    }
+
+    const Surface3D& BRep::LineEmbeddingRange::operator*() const
+    {
+        return brep_.surface( Relationships::EmbeddingRange::operator*() );
+    }
+
+    BRep::SurfaceEmbeddingRange BRep::embeddings(
+        const Surface3D& surface ) const
+    {
+        return { *this, surface };
+    }
+
+    BRep::SurfaceEmbeddingRange::SurfaceEmbeddingRange(
+        const BRep& brep, const Surface3D& surface )
+        : Relationships::EmbeddingRange( brep, surface.id() ), brep_( brep )
+    {
+    }
+
+    const Block3D& BRep::SurfaceEmbeddingRange::operator*() const
+    {
+        return brep_.block( Relationships::EmbeddingRange::operator*() );
+    }
+
     BRep::ModelBoundaryItemRange::ModelBoundaryItemRange(
         const BRep& brep, const ModelBoundary3D& boundary )
         : Relationships::ItemRange( brep, boundary.id() ), brep_( brep )

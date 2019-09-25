@@ -108,6 +108,12 @@ namespace geode
         void add_surface_block_relationship(
             const Surface3D& surface, const Block3D& block );
 
+        void add_line_surface_internal_relationship(
+            const Line3D& line, const Surface3D& surface );
+
+        void add_surface_block_internal_relationship(
+            const Surface3D& surface, const Block3D& block );
+
         void add_surface_in_model_boundary(
             const Surface3D& surface, const ModelBoundary3D& boundary );
 
