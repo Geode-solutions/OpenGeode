@@ -59,6 +59,16 @@ namespace geode
          */
         void add_boundary_relation(
             const uuid& boundary, const uuid& incidence );
+
+        /*!
+         * Add a new relationship of type internal-embedding between two
+         * components
+         * @param[in] internal Unique index of the internal component
+         * @param[in] embedding Unique index of the embedding component
+         */
+        void add_internal_relation(
+            const uuid& internal, const uuid& embedding );
+
         /*!
          * Add a new relationship of type item-collection between two components
          * @param[in] item Unique index of the item component

@@ -46,6 +46,12 @@ namespace geode
         relationships_.add_boundary_relation( boundary, incidence );
     }
 
+    void RelationshipsBuilder::add_internal_relation(
+        const uuid& internal, const uuid& embedding )
+    {
+        relationships_.add_internal_relation( internal, embedding );
+    }
+
     void RelationshipsBuilder::add_item_in_collection(
         const uuid& item, const uuid& collection )
     {

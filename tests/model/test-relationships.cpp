@@ -62,6 +62,18 @@ void add_boundary_relations( geode::Relationships& relationships,
     builder.add_boundary_relation( uuids[5], uuids[0] );
 }
 
+void add_internal_relations( geode::Relationships& relationships,
+    const std::vector< geode::uuid >& uuids )
+{
+    geode::RelationshipsBuilder builder{ relationships };
+    builder.add_internal_relation( uuids[0], uuids[1] );
+    builder.add_internal_relation( uuids[2], uuids[3] );
+    builder.add_internal_relation( uuids[4], uuids[5] );
+    builder.add_internal_relation( uuids[4], uuids[0] );
+    // Repete last relation to test duplications
+    builder.add_internal_relation( uuids[4], uuids[0] );
+}
+
 void add_items_in_collections( geode::Relationships& relationships,
     const std::vector< geode::uuid >& uuids )
 {
@@ -79,6 +91,8 @@ void test_uuid( const geode::Relationships& relations,
     const geode::uuid& uuid,
     geode::index_t nb_boundaries,
     geode::index_t nb_incidences,
+    geode::index_t nb_internals,
+    geode::index_t nb_embeddings,
     geode::index_t nb_items,
     geode::index_t nb_collections )
 {
@@ -94,6 +108,18 @@ void test_uuid( const geode::Relationships& relations,
     OPENGEODE_EXCEPTION(
         relations.nb_incidences( uuid ) == nb_incidences, message_incidence );
 
+    std::string message_internal = uuid.string() + " should have "
+                                   + std::to_string( nb_internals )
+                                   + " internal component(s)";
+    OPENGEODE_EXCEPTION(
+        relations.nb_internals( uuid ) == nb_internals, message_internal );
+
+    std::string message_embedding = uuid.string() + " should have "
+                                    + std::to_string( nb_embeddings )
+                                    + " embedding(s)";
+    OPENGEODE_EXCEPTION(
+        relations.nb_embeddings( uuid ) == nb_embeddings, message_embedding );
+
     std::string message_item = uuid.string() + " should have "
                                + std::to_string( nb_boundaries ) + " item(s)";
     OPENGEODE_EXCEPTION( relations.nb_items( uuid ) == nb_items, message_item );
@@ -108,12 +134,12 @@ void test_uuid( const geode::Relationships& relations,
 void test_relations( const geode::Relationships& relations,
     const std::vector< geode::uuid >& uuids )
 {
-    test_uuid( relations, uuids[0], 2, 3, 0, 1 );
-    test_uuid( relations, uuids[1], 1, 2, 0, 1 );
-    test_uuid( relations, uuids[2], 2, 1, 0, 1 );
-    test_uuid( relations, uuids[3], 3, 0, 0, 1 );
-    test_uuid( relations, uuids[4], 0, 2, 2, 0 );
-    test_uuid( relations, uuids[5], 1, 1, 3, 1 );
+    test_uuid( relations, uuids[0], 2, 3, 1, 1, 0, 1 );
+    test_uuid( relations, uuids[1], 1, 2, 1, 0, 0, 1 );
+    test_uuid( relations, uuids[2], 2, 1, 0, 1, 0, 1 );
+    test_uuid( relations, uuids[3], 3, 0, 1, 0, 0, 1 );
+    test_uuid( relations, uuids[4], 0, 2, 0, 2, 2, 0 );
+    test_uuid( relations, uuids[5], 1, 1, 1, 0, 3, 1 );
 }
 
 int main()
@@ -127,6 +153,7 @@ int main()
 
         // This Relationships do not represent anything.
         add_boundary_relations( relationships, uuids );
+        add_internal_relations( relationships, uuids );
         add_items_in_collections( relationships, uuids );
         test_relations( relationships, uuids );
 

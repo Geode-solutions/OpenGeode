@@ -48,11 +48,14 @@ namespace geode
         using Iterator = typename std::vector< EdgeVertex >::const_iterator;
         using RelationType = index_t;
         static const index_t BOUNDARY_RELATION = index_t( 0 );
-        static const index_t ITEM_RELATION = index_t( 1 );
+        static const index_t INTERNAL_RELATION = index_t( 1 );
+        static const index_t ITEM_RELATION = index_t( 2 );
         static const index_t BOUNDARY_EDGE_VERTEX = index_t( 0 );
         static const index_t INCIDENT_EDGE_VERTEX = index_t( 1 );
         static const index_t ITEM_EDGE_VERTEX = index_t( 0 );
         static const index_t COLLECTION_EDGE_VERTEX = index_t( 1 );
+        static const index_t INTERNAL_EDGE_VERTEX = index_t( 0 );
+        static const index_t EMBEDDING_EDGE_VERTEX = index_t( 1 );
 
         Impl()
             : relation_type_(
@@ -73,6 +76,11 @@ namespace geode
         bool is_boundary_relation( index_t edge_id ) const
         {
             return relation_type_->value( edge_id ) == BOUNDARY_RELATION;
+        }
+
+        bool is_internal_relation( index_t edge_id ) const
+        {
+            return relation_type_->value( edge_id ) == INTERNAL_RELATION;
         }
 
         bool is_item_relation( index_t edge_id ) const
@@ -263,6 +271,47 @@ namespace geode
     {
         impl_->add_relation(
             boundary, incidence, Relationships::Impl::BOUNDARY_RELATION );
+    }
+
+    index_t Relationships::nb_internals( const uuid& id ) const
+    {
+        index_t nb{ 0 };
+        for( const auto& unused : internals( id ) )
+        {
+            geode_unused( unused );
+            nb++;
+        }
+        return nb;
+    }
+
+    Relationships::InternalRange Relationships::internals(
+        const uuid& id ) const
+    {
+        return { *this, id };
+    }
+
+    index_t Relationships::nb_embeddings( const uuid& id ) const
+    {
+        index_t nb{ 0 };
+        for( const auto& unused : embeddings( id ) )
+        {
+            geode_unused( unused );
+            nb++;
+        }
+        return nb;
+    }
+
+    Relationships::EmbeddingRange Relationships::embeddings(
+        const uuid& id ) const
+    {
+        return { *this, id };
+    }
+
+    void Relationships::add_internal_relation(
+        const uuid& internal, const uuid& embedding )
+    {
+        impl_->add_relation(
+            internal, embedding, Relationships::Impl::INTERNAL_RELATION );
     }
 
     index_t Relationships::nb_items( const uuid& id ) const
@@ -486,6 +535,180 @@ namespace geode
     }
 
     const uuid& Relationships::IncidenceRange::operator*() const
+    {
+        return impl_->vertex_uuid();
+    }
+
+    class Relationships::InternalRange::Impl
+        : public BaseRange< typename Relationships::Impl::Iterator >
+    {
+        using Iterator = typename Relationships::Impl::Iterator;
+
+    public:
+        Impl( const Relationships::Impl& relationships,
+            Iterator begin,
+            Iterator end )
+            : BaseRange< Iterator >( begin, end ),
+              relationships_( relationships )
+        {
+            next_internal_iterator();
+        }
+
+        void next()
+        {
+            this->operator++();
+            next_internal_iterator();
+        }
+
+        const uuid& vertex_uuid() const
+        {
+            const auto iterator = this->current();
+            return relationships_.vertex_uuid(
+                { iterator->edge_id, ( iterator->vertex_id + 1 ) % 2 } );
+        }
+
+    private:
+        bool is_internal_edge_vertex()
+        {
+            return this->current()->vertex_id
+                   == Relationships::Impl::INTERNAL_EDGE_VERTEX;
+        }
+
+        void next_internal_iterator()
+        {
+            while( this->operator!=( *this )
+                   && ( !relationships_.is_internal_relation(
+                            this->current()->edge_id )
+                          || is_internal_edge_vertex() ) )
+            {
+                this->operator++();
+            }
+        }
+
+    private:
+        const Relationships::Impl& relationships_;
+    };
+
+    Relationships::InternalRange::InternalRange(
+        const Relationships& relationships, const uuid& id )
+        : impl_( *relationships.impl_,
+              relationships.impl_->begin_edge( id ),
+              relationships.impl_->end_edge( id ) )
+    {
+    }
+
+    Relationships::InternalRange::InternalRange(
+        InternalRange&& other ) noexcept
+        : impl_( *other.impl_ )
+    {
+    }
+
+    Relationships::InternalRange::InternalRange( const InternalRange& other )
+        : impl_( *other.impl_ )
+    {
+    }
+
+    Relationships::InternalRange::~InternalRange() {} // NOLINT
+
+    bool Relationships::InternalRange::operator!=(
+        const InternalRange& /*unused*/ ) const
+    {
+        return impl_->operator!=( *impl_ );
+    }
+
+    void Relationships::InternalRange::operator++()
+    {
+        return impl_->next();
+    }
+
+    const uuid& Relationships::InternalRange::operator*() const
+    {
+        return impl_->vertex_uuid();
+    }
+
+    class Relationships::EmbeddingRange::Impl
+        : public BaseRange< typename Relationships::Impl::Iterator >
+    {
+        using Iterator = typename Relationships::Impl::Iterator;
+
+    public:
+        Impl( const Relationships::Impl& relationships,
+            Iterator begin,
+            Iterator end )
+            : BaseRange< Iterator >( begin, end ),
+              relationships_( relationships )
+        {
+            next_embedding_iterator();
+        }
+
+        void next()
+        {
+            this->operator++();
+            next_embedding_iterator();
+        }
+
+        const uuid& vertex_uuid() const
+        {
+            const auto iterator = this->current();
+            return relationships_.vertex_uuid(
+                { iterator->edge_id, ( iterator->vertex_id + 1 ) % 2 } );
+        }
+
+    private:
+        bool is_embedding_edge_vertex()
+        {
+            return this->current()->vertex_id
+                   == Relationships::Impl::EMBEDDING_EDGE_VERTEX;
+        }
+
+        void next_embedding_iterator()
+        {
+            while( this->operator!=( *this )
+                   && ( !relationships_.is_internal_relation(
+                            this->current()->edge_id )
+                          || is_embedding_edge_vertex() ) )
+            {
+                this->operator++();
+            }
+        }
+
+    private:
+        const Relationships::Impl& relationships_;
+    };
+
+    Relationships::EmbeddingRange::EmbeddingRange(
+        const Relationships& relationships, const uuid& id )
+        : impl_( *relationships.impl_,
+              relationships.impl_->begin_edge( id ),
+              relationships.impl_->end_edge( id ) )
+    {
+    }
+
+    Relationships::EmbeddingRange::EmbeddingRange(
+        EmbeddingRange&& other ) noexcept
+        : impl_( *other.impl_ )
+    {
+    }
+
+    Relationships::EmbeddingRange::EmbeddingRange( const EmbeddingRange& other )
+        : impl_( *other.impl_ )
+    {
+    }
+
+    Relationships::EmbeddingRange::~EmbeddingRange() {} // NOLINT
+
+    bool Relationships::EmbeddingRange::operator!=(
+        const EmbeddingRange& /*unused*/ ) const
+    {
+        return impl_->operator!=( *impl_ );
+    }
+
+    void Relationships::EmbeddingRange::operator++()
+    {
+        return impl_->next();
+    }
+
+    const uuid& Relationships::EmbeddingRange::operator*() const
     {
         return impl_->vertex_uuid();
     }
