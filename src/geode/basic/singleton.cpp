@@ -32,27 +32,26 @@ namespace geode
     class Singleton::Impl
     {
     public:
-    void set_instance(
-        const std::type_info &type, Singleton *singleton )
-    {
-        singletons_[type.name()].reset( singleton );
-    }
-
-    Singleton* instance( const std::type_info &type )
-    {
-        auto iter = singletons_.find( type.name() );
-        if( iter == singletons_.end() )
+        void set_instance( const std::type_info &type, Singleton *singleton )
         {
-            return nullptr;
+            singletons_[type.name()].reset( singleton );
         }
-        return iter->second.get();
-    }
+
+        Singleton *instance( const std::type_info &type )
+        {
+            auto iter = singletons_.find( type.name() );
+            if( iter == singletons_.end() )
+            {
+                return nullptr;
+            }
+            return iter->second.get();
+        }
 
     private:
         std::map< const char *, std::unique_ptr< Singleton > > singletons_;
     };
 
-    Singleton::Singleton() : impl_( new Impl ){}
+    Singleton::Singleton() : impl_( new Impl ) {}
 
     Singleton::~Singleton() {}
 
