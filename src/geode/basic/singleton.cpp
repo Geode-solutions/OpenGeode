@@ -52,9 +52,9 @@ namespace geode
         std::map< const char *, std::unique_ptr< Singleton > > singletons_;
     };
 
-    Singleton::Singleton() : impl_( new Impl ){}
+    Singleton::Singleton() {} // NOLINT
 
-    Singleton::~Singleton() {}
+    Singleton::~Singleton() {} // NOLINT
 
     Singleton &Singleton::instance()
     {
