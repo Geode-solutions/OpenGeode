@@ -23,29 +23,53 @@
 
 #include <geode/basic/singleton.h>
 
-#include <map>
-#include <memory>
+#include <geode/basic/pimpl_impl.h>
 
-namespace
-{
-    std::map< std::string, std::unique_ptr< geode::Singleton > > singletons;
-} // namespace
+#include <map>
 
 namespace geode
 {
-    void Singleton::set_instance(
+    class Singleton::Impl
+    {
+    public:
+    void set_instance(
         const std::type_info &type, Singleton *singleton )
     {
-        singletons[type.name()].reset( singleton );
+        singletons_[type.name()].reset( singleton );
     }
 
-    Singleton *Singleton::instance( const std::type_info &type )
+    Singleton* instance( const std::type_info &type )
     {
-        auto iter = singletons.find( type.name() );
-        if( iter == singletons.end() )
+        auto iter = singletons_.find( type.name() );
+        if( iter == singletons_.end() )
         {
             return nullptr;
         }
         return iter->second.get();
+    }
+
+    private:
+        std::map< const char *, std::unique_ptr< Singleton > > singletons_;
+    };
+
+    Singleton::Singleton() : impl_( new Impl ){}
+
+    Singleton::~Singleton() {}
+
+    Singleton &Singleton::instance()
+    {
+        static Singleton singleton;
+        return singleton;
+    }
+
+    void Singleton::set_instance(
+        const std::type_info &type, Singleton *singleton )
+    {
+        instance().impl_->set_instance( type, singleton );
+    }
+
+    Singleton *Singleton::instance( const std::type_info &type )
+    {
+        return instance().impl_->instance( type );
     }
 } // namespace geode

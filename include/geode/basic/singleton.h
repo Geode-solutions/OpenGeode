@@ -23,9 +23,11 @@
 
 #pragma once
 
+#include <memory>
 #include <typeinfo>
 
 #include <geode/basic/common.h>
+#include <geode/basic/pimpl.h>
 
 namespace geode
 {
@@ -43,10 +45,10 @@ namespace geode
         OPENGEODE_DISABLE_COPY_AND_MOVE( Singleton );
 
     public:
-        virtual ~Singleton() = default;
+        virtual ~Singleton();
 
     protected:
-        Singleton() = default;
+        Singleton();
 
         template < class SingletonType >
         static SingletonType &instance()
@@ -63,8 +65,12 @@ namespace geode
         }
 
     private:
+        static Singleton &instance();
         static void set_instance(
             const std::type_info &type, Singleton *singleton );
         static Singleton *instance( const std::type_info &type );
+
+    private:
+        IMPLEMENTATION_MEMBER( impl_ );
     };
 } // namespace geode
