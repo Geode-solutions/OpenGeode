@@ -53,14 +53,14 @@ namespace geode
         {
         }
 
+        double length2() const
+        {
+            return dot( *this );
+        }
+
         double length() const
         {
-            double result2{ 0 };
-            for( auto i : Range{ dimension } )
-            {
-                result2 += this->value( i ) * this->value( i );
-            }
-            return std::sqrt( result2 );
+            return std::sqrt( length2() );
         }
 
         Vector normalize() const
@@ -68,7 +68,17 @@ namespace geode
             return *this / length();
         }
 
-        double dot( const Vector &other )
+        Vector operator*( double s ) const
+        {
+            Vector< dimension > result{ *this };
+            for( auto d : Range{ dimension } )
+            {
+                result.set_value( d, s * result.value( d ) );
+            }
+            return result;
+        }
+
+        double dot( const Vector &other ) const
         {
             double result{ 0 };
             for( auto i : Range{ dimension } )
@@ -78,7 +88,7 @@ namespace geode
             return result;
         }
 
-        Vector cross( const Vector &other )
+        Vector cross( const Vector &other ) const
         {
             static_assert(
                 dimension == 3, "Cross product only possible in 3D" );
