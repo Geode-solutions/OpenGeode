@@ -496,9 +496,9 @@ void test_item_ranges( const geode::BRep& model,
                                  || boundary_item.id() == surface_uuids[3],
             "[Test] ModelBoundaryItemRange iteration result is not correct" );
     }
-    OPENGEODE_EXCEPTION(
-        boundary_item_count == 3, "[Test] CornerIncidenceRange should iterates "
-                                  "on 3 Surfaces (Boundary 1)" );
+    OPENGEODE_EXCEPTION( boundary_item_count == 3,
+        "[Test] CornerIncidenceRange should iterates "
+        "on 3 Surfaces (Boundary 1)" );
 }
 
 void test_reloaded_brep( const geode::BRep& model )
