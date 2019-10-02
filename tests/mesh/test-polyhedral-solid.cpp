@@ -84,7 +84,8 @@ void test_polygon_adjacencies( const geode::PolyhedralSolid3D& polyhedral_solid,
 
     OPENGEODE_EXCEPTION(
         polyhedral_solid.polyhedron_facets_on_border( 0 ).size() == 4,
-        "[Test] First polygon of PolyhedralSolid should have 4 facets on border" );
+        "[Test] First polygon of PolyhedralSolid should have 4 facets on "
+        "border" );
 }
 
 void test_delete_vertex( const geode::PolyhedralSolid3D& polyhedral_solid,

@@ -37,7 +37,7 @@ template < typename GeodeFactory >
 void check_register( const geode::MeshType& key )
 {
     OPENGEODE_EXCEPTION( GeodeFactory::has_creator( key ),
-         "[Test] No creator for " + key.get() + " is not correct" );
+        "[Test] No creator for " + key.get() + " is not correct" );
 }
 
 int main()

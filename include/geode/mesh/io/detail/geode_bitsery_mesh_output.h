@@ -38,7 +38,8 @@
         archive.object( mesh_ );                                               \
         archive.adapter().flush();                                             \
         OPENGEODE_EXCEPTION( std::get< 1 >( context ).isValid(),               \
-            "[Bitsery::write] Error while writing file: " + this->filename() );                 \
+            "[Bitsery::write] Error while writing file: "                      \
+                + this->filename() );                                          \
     }
 
 #define BITSERY_OUTPUT_MESH_DIMENSION( Mesh )                                  \

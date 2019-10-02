@@ -61,7 +61,8 @@ namespace geode
                 std::dynamic_pointer_cast< ReadOnlyAttribute< T > >(
                     find_attribute_base( name ) );
             OPENGEODE_EXCEPTION( attribute.get(),
-                "[AttributeManager::find_attribute] You have to create an attribute before using it. "
+                "[AttributeManager::find_attribute] You have to create an "
+                "attribute before using it. "
                 "See find_or_create_attribute method and "
                 "derived classes of ReadOnlyAttribute." );
             return attribute;
@@ -92,7 +93,8 @@ namespace geode
             if( !typed_attribute.get() )
             {
                 OPENGEODE_EXCEPTION( attribute.use_count() < 2,
-                    "[AttributeManager::find_or_create_attribute] Do not instantiate an attribute "
+                    "[AttributeManager::find_or_create_attribute] Do not "
+                    "instantiate an attribute "
                     "if an instantiated attribute of the same name "
                     "with different storage already exists." );
 

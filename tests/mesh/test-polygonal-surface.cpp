@@ -153,15 +153,18 @@ void test_polygon_edge_requests(
     geode::PolygonEdge polygon_edge;
     std::tie( found, std::ignore ) =
         polygonal_surface.polygon_edge_from_vertices( 3, 5 );
-    OPENGEODE_EXCEPTION( !found, "[Test] Polygon edge from vertices is not correct" );
+    OPENGEODE_EXCEPTION(
+        !found, "[Test] Polygon edge from vertices is not correct" );
     std::tie( found, polygon_edge ) =
         polygonal_surface.polygon_edge_from_vertices( 0, 1 );
-    OPENGEODE_EXCEPTION( found, "[Test] Polygon edge from vertices is not correct" );
+    OPENGEODE_EXCEPTION(
+        found, "[Test] Polygon edge from vertices is not correct" );
     OPENGEODE_EXCEPTION( polygon_edge == geode::PolygonEdge( 0, 0 ),
         "[Test] Polygon edge from vertices is not correct" );
     std::tie( found, std::ignore ) =
         polygonal_surface.polygon_edge_from_vertices( 1, 0 );
-    OPENGEODE_EXCEPTION( !found, "[Test] Polygon edge from vertices is not correct" );
+    OPENGEODE_EXCEPTION(
+        !found, "[Test] Polygon edge from vertices is not correct" );
 }
 
 void test_delete_polygon( const geode::PolygonalSurface3D& polygonal_surface,

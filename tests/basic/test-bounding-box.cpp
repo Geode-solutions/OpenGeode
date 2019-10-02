@@ -40,7 +40,8 @@ int main()
         BoundingBox2D box2{ box };
         box2.add_point( { { -2, -2 } } );
         box2.add_point( { { 0, 0 } } );
-        OPENGEODE_EXCEPTION( box.boxes_overlap( box2 ), "[Test] BBox should overlap" );
+        OPENGEODE_EXCEPTION(
+            box.boxes_overlap( box2 ), "[Test] BBox should overlap" );
 
         BoundingBox2D box3;
         box3.add_point( { { 2, 2 } } );

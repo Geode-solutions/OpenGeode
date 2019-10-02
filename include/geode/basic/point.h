@@ -91,7 +91,8 @@ namespace geode
         Point operator/( double divider ) const
         {
             OPENGEODE_EXCEPTION( std::fabs( divider ) > 1e-30,
-                "[Point::operator/] Cannot divide Point by something close to zero" );
+                "[Point::operator/] Cannot divide Point by something close to "
+                "zero" );
             Point result{ *this };
             for( auto i : Range{ dimension } )
             {

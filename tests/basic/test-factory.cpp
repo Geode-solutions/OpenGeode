@@ -89,8 +89,8 @@ int main()
 
         A a;
         B b;
-        OPENGEODE_EXCEPTION(
-            factory::has_creator( "Derived" ), "[Test] Key has not been registered" );
+        OPENGEODE_EXCEPTION( factory::has_creator( "Derived" ),
+            "[Test] Key has not been registered" );
         auto d = factory::create( "Derived", a, b );
         verdict( d != nullptr, "Derived" );
 

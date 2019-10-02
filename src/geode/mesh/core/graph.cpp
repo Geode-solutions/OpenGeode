@@ -130,8 +130,9 @@ namespace geode
     {
         OPENGEODE_EXCEPTION( edge_vertex.edge_id < nb_edges(),
             "[Graph::edge_vertex] Trying to access an invalid edge" );
-        OPENGEODE_EXCEPTION( edge_vertex.vertex_id < 2,
-            "[Graph::edge_vertex] Trying to access an invalid edge local vertex" );
+        OPENGEODE_EXCEPTION(
+            edge_vertex.vertex_id < 2, "[Graph::edge_vertex] Trying to access "
+                                       "an invalid edge local vertex" );
         return get_edge_vertex( edge_vertex );
     }
 
@@ -143,8 +144,8 @@ namespace geode
     const std::vector< EdgeVertex >& Graph::edges_around_vertex(
         index_t vertex_id ) const
     {
-        OPENGEODE_EXCEPTION(
-            vertex_id < this->nb_vertices(), "[Graph::edges_around_vertex] Accessing an invalid vertex" );
+        OPENGEODE_EXCEPTION( vertex_id < this->nb_vertices(),
+            "[Graph::edges_around_vertex] Accessing an invalid vertex" );
         return impl_->edges_around_vertex( vertex_id );
     }
 

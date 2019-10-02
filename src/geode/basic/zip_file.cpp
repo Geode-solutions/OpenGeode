@@ -81,7 +81,8 @@ namespace geode
             ghc::filesystem::path file_path{ file };
             auto status = mz_zip_writer_add_path(
                 writer_, file_path.c_str(), NULL, 0, 1 );
-            OPENGEODE_EXCEPTION( status == MZ_OK, "[ZipFile::archive_file] Error adding path to zip" );
+            OPENGEODE_EXCEPTION( status == MZ_OK,
+                "[ZipFile::archive_file] Error adding path to zip" );
             ghc::filesystem::remove( file_path );
         }
 
@@ -149,14 +150,15 @@ namespace geode
             {
                 mz_zip_file* file_info{ nullptr };
                 status = mz_zip_reader_entry_get_info( reader_, &file_info );
-                OPENGEODE_EXCEPTION(
-                    status == MZ_OK, "[UnzipFile::extract_all] Error getting entry info in zip file" );
+                OPENGEODE_EXCEPTION( status == MZ_OK, "[UnzipFile::extract_all]"
+                                                      " Error getting entry "
+                                                      "info in zip file" );
 
                 files.emplace_back( directory_ / file_info->filename );
                 status = mz_zip_reader_entry_save_file(
                     reader_, files.back().c_str() );
-                OPENGEODE_EXCEPTION(
-                    status == MZ_OK, "[UnzipFile::extract_all] Error extracting entry file" );
+                OPENGEODE_EXCEPTION( status == MZ_OK,
+                    "[UnzipFile::extract_all] Error extracting entry file" );
                 status = mz_zip_reader_goto_next_entry( reader_ );
             }
         }

@@ -35,8 +35,8 @@ void test_comparison()
     OPENGEODE_EXCEPTION( P != P2, "[Test] Points should be different" );
 
     geode::Point3D p_epsilon{ { 2.0000000001, 1, 2.6 } };
-    OPENGEODE_EXCEPTION(
-        p.inexact_equal( p_epsilon, 0.0001 ), "[Test] Points should be almost equal" );
+    OPENGEODE_EXCEPTION( p.inexact_equal( p_epsilon, 0.0001 ),
+        "[Test] Points should be almost equal" );
 }
 
 void test_operators()
@@ -46,7 +46,8 @@ void test_operators()
     geode::Point3D answer{ { 4, 2, 5.2 } };
     OPENGEODE_EXCEPTION( p + p2 == answer, "[Test] Points should be equal" );
     OPENGEODE_EXCEPTION( p * 2 == answer, "[Test] Points should be equal" );
-    OPENGEODE_EXCEPTION( p - p2 == geode::Point3D{}, "[Test] Points should be equal" );
+    OPENGEODE_EXCEPTION(
+        p - p2 == geode::Point3D{}, "[Test] Points should be equal" );
     OPENGEODE_EXCEPTION( answer / 2 == p, "[Test] Points should be equal" );
 }
 

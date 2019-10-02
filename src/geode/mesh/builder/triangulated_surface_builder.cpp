@@ -54,8 +54,9 @@ namespace geode
     void TriangulatedSurfaceBuilder< dimension >::do_create_polygon(
         const std::vector< index_t >& vertices )
     {
-        OPENGEODE_EXCEPTION(
-            vertices.size() == 3, "[TriangulatedSurfaceBuilder::do_create_polygon] Only triangles are handled" );
+        OPENGEODE_EXCEPTION( vertices.size() == 3, "[TriangulatedSurfaceBuilder"
+                                                   "::do_create_polygon] Only "
+                                                   "triangles are handled" );
         std::array< index_t, 3 > triangle_vertices{};
         std::copy_n( vertices.begin(), 3, triangle_vertices.begin() );
         do_create_triangle( triangle_vertices );
