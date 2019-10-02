@@ -72,11 +72,11 @@ std::vector< geode::uuid > add_corners(
     const auto& temp_corner = model.corner(
         builder.add_corner( geode::OpenGeodePointSet3D::type_name_static() ) );
     builder.remove_corner( temp_corner );
-    auto message = "BRep should have " + std::to_string( nb ) + " corners";
+    auto message = "[Test] BRep should have " + std::to_string( nb ) + " corners";
     OPENGEODE_EXCEPTION( model.nb_corners() == nb, message );
     OPENGEODE_EXCEPTION( count_components( model.corners() ) == nb, message );
     OPENGEODE_EXCEPTION(
-        model.corner( uuids[3] ).name() == "corner4", "Wrong Corner name" );
+        model.corner( uuids[3] ).name() == "corner4", "[Test] Wrong Corner name" );
     return uuids;
 }
 
@@ -95,11 +95,11 @@ std::vector< geode::uuid > add_lines(
     const auto& temp_line = model.line(
         builder.add_line( geode::OpenGeodeEdgedCurve3D::type_name_static() ) );
     builder.remove_line( temp_line );
-    auto message = "BRep should have " + std::to_string( nb ) + " lines";
+    auto message = "[Test] BRep should have " + std::to_string( nb ) + " lines";
     OPENGEODE_EXCEPTION( model.nb_lines() == nb, message );
     OPENGEODE_EXCEPTION( count_components( model.lines() ) == nb, message );
     OPENGEODE_EXCEPTION(
-        model.line( uuids[3] ).name() == "line4", "Wrong Line name" );
+        model.line( uuids[3] ).name() == "line4", "[Test] Wrong Line name" );
     return uuids;
 }
 
@@ -124,11 +124,11 @@ std::vector< geode::uuid > add_surfaces(
     }
     const auto& temp_surface = model.surface( builder.add_surface() );
     builder.remove_surface( temp_surface );
-    auto message = "BRep should have " + std::to_string( nb ) + " surfaces";
+    auto message = "[Test] BRep should have " + std::to_string( nb ) + " surfaces";
     OPENGEODE_EXCEPTION( model.nb_surfaces() == nb, message );
     OPENGEODE_EXCEPTION( count_components( model.surfaces() ) == nb, message );
     OPENGEODE_EXCEPTION(
-        model.surface( uuids[1] ).name() == "surface2", "Wrong Surface name" );
+        model.surface( uuids[1] ).name() == "surface2", "[Test] Wrong Surface name" );
     return uuids;
 }
 
@@ -147,11 +147,11 @@ std::vector< geode::uuid > add_blocks(
     const auto& temp_block = model.block( builder.add_block(
         geode::OpenGeodePolyhedralSolid3D::type_name_static() ) );
     builder.remove_block( temp_block );
-    auto message = "BRep should have " + std::to_string( nb ) + " blocks";
+    auto message = "[Test] BRep should have " + std::to_string( nb ) + " blocks";
     OPENGEODE_EXCEPTION( model.nb_blocks() == nb, message );
     OPENGEODE_EXCEPTION( count_components( model.blocks() ) == nb, message );
     OPENGEODE_EXCEPTION(
-        model.block( uuids[0] ).name() == "block1", "Wrong Block name" );
+        model.block( uuids[0] ).name() == "block1", "[Test] Wrong Block name" );
     return uuids;
 }
 
@@ -171,12 +171,12 @@ std::vector< geode::uuid > add_model_boundaries(
         model.model_boundary( builder.add_model_boundary() );
     builder.remove_model_boundary( temp_boundary );
     auto message =
-        "BRep should have " + std::to_string( nb ) + " model boundaries";
+        "[Test] BRep should have " + std::to_string( nb ) + " model boundaries";
     OPENGEODE_EXCEPTION( model.nb_model_boundaries() == nb, message );
     OPENGEODE_EXCEPTION(
         count_components( model.model_boundaries() ) == nb, message );
     OPENGEODE_EXCEPTION( model.model_boundary( uuids[0] ).name() == "boundary1",
-        "Wrong ModelBoundary name" );
+        "[Test] Wrong ModelBoundary name" );
     return uuids;
 }
 
@@ -228,10 +228,10 @@ void add_corner_line_relation( const geode::BRep& model,
             model.incidences( model.corner( corner_id ) ) )
         {
             OPENGEODE_EXCEPTION( geode::contain( line_uuids, incidence.id() ),
-                "All Corners incidences should be Lines" );
+                "[Test] All Corners incidences should be Lines" );
         }
         OPENGEODE_EXCEPTION( model.nb_incidences( corner_id ) == 3,
-            "All Corners should be connected to 3 Lines" );
+            "[Test] All Corners should be connected to 3 Lines" );
     }
 
     for( const auto& line_id : line_uuids )
@@ -239,10 +239,10 @@ void add_corner_line_relation( const geode::BRep& model,
         for( const auto& boundary : model.boundaries( model.line( line_id ) ) )
         {
             OPENGEODE_EXCEPTION( geode::contain( corner_uuids, boundary.id() ),
-                "All Lines incidences should be Corners" );
+                "[Test] All Lines incidences should be Corners" );
         }
         OPENGEODE_EXCEPTION( model.nb_boundaries( line_id ) == 2,
-            "All Lines should be connected to 2 Corners" );
+            "[Test] All Lines should be connected to 2 Corners" );
     }
 }
 
@@ -294,10 +294,10 @@ void add_line_surface_relation( const geode::BRep& model,
         {
             OPENGEODE_EXCEPTION(
                 geode::contain( surface_uuids, incidence.id() ),
-                "All Lines incidences should be Surfaces" );
+                "[Test] All Lines incidences should be Surfaces" );
         }
         OPENGEODE_EXCEPTION( model.nb_incidences( line_id ) == 2,
-            "All Lines should be connected to 2 Surfaces" );
+            "[Test] All Lines should be connected to 2 Surfaces" );
     }
 }
 
@@ -318,15 +318,15 @@ void add_surface_block_relation( const geode::BRep& model,
             model.incidences( model.surface( surface_id ) ) )
         {
             OPENGEODE_EXCEPTION( geode::contain( block_uuids, incidence.id() ),
-                "All Surfaces incidences should be Blocks" );
+                "[Test] All Surfaces incidences should be Blocks" );
         }
         OPENGEODE_EXCEPTION( model.nb_incidences( surface_id ) == 1,
-            "All Surfaces should be connected to 1 Block" );
+            "[Test] All Surfaces should be connected to 1 Block" );
     }
 
     OPENGEODE_EXCEPTION(
         model.nb_boundaries( block_uuids.front() ) == surface_uuids.size(),
-        "The Block should be connected to all Surfaces" );
+        "[Test] The Block should be connected to all Surfaces" );
 }
 
 void add_surfaces_in_model_boundaries( const geode::BRep& model,
@@ -348,7 +348,7 @@ void add_surfaces_in_model_boundaries( const geode::BRep& model,
     for( const auto& surface_id : surface_uuids )
     {
         OPENGEODE_EXCEPTION( model.nb_collections( surface_id ) == 1,
-            "All Surfaces should be in 1 collection (of type Boundary)" );
+            "[Test] All Surfaces should be in 1 collection (of type Boundary)" );
     }
 }
 
@@ -369,15 +369,15 @@ void add_internal_relations( const geode::BRep& model,
             model.embeddings( model.surface( surface_id ) ) )
         {
             OPENGEODE_EXCEPTION( geode::contain( block_uuids, embedding.id() ),
-                "All Surfaces embeddings should be Blocks" );
+                "[Test] All Surfaces embeddings should be Blocks" );
         }
         OPENGEODE_EXCEPTION( model.nb_embeddings( surface_id ) == 1,
-            "All Surfaces should be embedded to 1 Block" );
+            "[Test] All Surfaces should be embedded to 1 Block" );
     }
 
     OPENGEODE_EXCEPTION(
         model.nb_internals( block_uuids.front() ) == surface_uuids.size(),
-        "The Block should embed all Surfaces (that are internal to the "
+        "[Test] The Block should embed all Surfaces (that are internal to the "
         "Block)" );
 }
 
@@ -395,10 +395,10 @@ void test_boundary_ranges( const geode::BRep& model,
         line_boundary_count++;
         OPENGEODE_EXCEPTION( line_boundary.id() == corner_uuids[0]
                                  || line_boundary.id() == corner_uuids[1],
-            "LineBoundaryRange iteration result is not correct" );
+            "[Test] LineBoundaryRange iteration result is not correct" );
     }
     OPENGEODE_EXCEPTION( line_boundary_count == 2,
-        "LineBoundaryRange should iterates on 2 Corners" );
+        "[Test] LineBoundaryRange should iterates on 2 Corners" );
 
     const auto& surface_boundaries =
         model.boundaries( model.surface( surface_uuids[0] ) );
@@ -409,10 +409,10 @@ void test_boundary_ranges( const geode::BRep& model,
         OPENGEODE_EXCEPTION( surface_boundary.id() == line_uuids[0]
                                  || surface_boundary.id() == line_uuids[1]
                                  || surface_boundary.id() == line_uuids[2],
-            "SurfaceBoundaryRange iteration result is not correct" );
+            "[Test] SurfaceBoundaryRange iteration result is not correct" );
     }
     OPENGEODE_EXCEPTION( surface_boundary_count == 3,
-        "SurfaceBoundaryRange should iterates on 3 Lines" );
+        "[Test] SurfaceBoundaryRange should iterates on 3 Lines" );
 
     const auto& block_boundaries =
         model.boundaries( model.block( block_uuids[0] ) );
@@ -425,10 +425,10 @@ void test_boundary_ranges( const geode::BRep& model,
                                  || block_boundary.id() == surface_uuids[2]
                                  || block_boundary.id() == surface_uuids[3]
                                  || block_boundary.id() == surface_uuids[4],
-            "BlockBoundaryRange iteration result is not correct" );
+            "[Test] BlockBoundaryRange iteration result is not correct" );
     }
     OPENGEODE_EXCEPTION( block_boundary_count == 5,
-        "BlockBoundaryRange should iterates on 5 Surfaces" );
+        "[Test] BlockBoundaryRange should iterates on 5 Surfaces" );
 }
 
 void test_incidence_ranges( const geode::BRep& model,
@@ -446,10 +446,10 @@ void test_incidence_ranges( const geode::BRep& model,
         OPENGEODE_EXCEPTION( corner_incidence.id() == line_uuids[0]
                                  || corner_incidence.id() == line_uuids[2]
                                  || corner_incidence.id() == line_uuids[5],
-            "CornerIncidenceRange iteration result is not correct" );
+            "[Test] CornerIncidenceRange iteration result is not correct" );
     }
     OPENGEODE_EXCEPTION( corner_incidence_count == 3,
-        "CornerIncidenceRange should iterates on 3 Lines" );
+        "[Test] CornerIncidenceRange should iterates on 3 Lines" );
 
     const auto& line_incidences =
         model.incidences( model.line( line_uuids[0] ) );
@@ -459,10 +459,10 @@ void test_incidence_ranges( const geode::BRep& model,
         line_incidence_count++;
         OPENGEODE_EXCEPTION( line_incidence.id() == surface_uuids[0]
                                  || line_incidence.id() == surface_uuids[1],
-            "LineIncidenceRange iteration result is not correct" );
+            "[Test] LineIncidenceRange iteration result is not correct" );
     }
     OPENGEODE_EXCEPTION( line_incidence_count == 2,
-        "LineIncidenceRange should iterates on 2 Surfaces" );
+        "[Test] LineIncidenceRange should iterates on 2 Surfaces" );
 
     const auto& surface_incidences =
         model.incidences( model.surface( surface_uuids[0] ) );
@@ -471,10 +471,10 @@ void test_incidence_ranges( const geode::BRep& model,
     {
         surface_incidence_count++;
         OPENGEODE_EXCEPTION( surface_incidence.id() == block_uuids[0],
-            "SurfaceIncidenceRange iteration result is not correct" );
+            "[Test] SurfaceIncidenceRange iteration result is not correct" );
     }
     OPENGEODE_EXCEPTION( surface_incidence_count == 1,
-        "SurfaceIncidenceRange should iterates on 1 Block" );
+        "[Test] SurfaceIncidenceRange should iterates on 1 Block" );
 }
 
 void test_item_ranges( const geode::BRep& model,
@@ -490,24 +490,24 @@ void test_item_ranges( const geode::BRep& model,
         OPENGEODE_EXCEPTION( boundary_item.id() == surface_uuids[1]
                                  || boundary_item.id() == surface_uuids[2]
                                  || boundary_item.id() == surface_uuids[3],
-            "ModelBoundaryItemRange iteration result is not correct" );
+            "[Test] ModelBoundaryItemRange iteration result is not correct" );
     }
     OPENGEODE_EXCEPTION( boundary_item_count == 3,
-        "CornerIncidenceRange should iterates on 3 Surfaces (Boundary 1)" );
+        "[Test] CornerIncidenceRange should iterates on 3 Surfaces (Boundary 1)" );
 }
 
 void test_reloaded_brep( const geode::BRep& model )
 {
     OPENGEODE_EXCEPTION( model.nb_corners() == 6,
-        "Number of Corners in reloaded BRep should be 6" );
+        "[Test] Number of Corners in reloaded BRep should be 6" );
     OPENGEODE_EXCEPTION(
-        model.nb_lines() == 9, "Number of Lines in reloaded BRep should be 9" );
+        model.nb_lines() == 9, "[Test] Number of Lines in reloaded BRep should be 9" );
     OPENGEODE_EXCEPTION( model.nb_surfaces() == 5,
-        "Number of Surfaces in reloaded BRep should be 5" );
+        "[Test] Number of Surfaces in reloaded BRep should be 5" );
     OPENGEODE_EXCEPTION( model.nb_blocks() == 1,
-        "Number of Blocks in reloaded BRep should be 1" );
+        "[Test] Number of Blocks in reloaded BRep should be 1" );
     OPENGEODE_EXCEPTION( model.nb_model_boundaries() == 3,
-        "Number of Boundaries in reloaded BRep should be 3" );
+        "[Test] Number of Boundaries in reloaded BRep should be 3" );
 }
 
 int main()

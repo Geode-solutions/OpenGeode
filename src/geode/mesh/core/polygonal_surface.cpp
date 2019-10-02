@@ -43,7 +43,7 @@ namespace
         geode::index_t polygon_id )
     {
         OPENGEODE_EXCEPTION( polygon_id < surface.nb_polygons(),
-            "Trying to access an invalid polygon" );
+            "[check_polygon_id] Trying to access an invalid polygon" );
     }
 
     template < geode::index_t dimension >
@@ -54,7 +54,7 @@ namespace
     {
         OPENGEODE_EXCEPTION(
             vertex_id < surface.nb_polygon_vertices( polygon_id ),
-            "Trying to access an invalid polygon local vertex" );
+            "[check_polygon_vertex_id] Trying to access an invalid polygon local vertex" );
     }
 
     template < geode::index_t dimension >
@@ -64,7 +64,7 @@ namespace
         geode::index_t edge_id )
     {
         OPENGEODE_EXCEPTION( edge_id < surface.nb_polygon_edges( polygon_id ),
-            "Trying to access an invalid polygon local edge" );
+            "[check_polygon_edge_id] Trying to access an invalid polygon local edge" );
     }
 
     template < geode::index_t dimension >
@@ -284,7 +284,7 @@ namespace geode
         const PolygonEdge& polygon_edge ) const
     {
         OPENGEODE_EXCEPTION( is_edge_on_border( polygon_edge ),
-            "Polygon edge should be on border" );
+            "[PolygonalSurfaceBase::next_on_border] Polygon edge should be on border" );
         auto next_border = next_polygon_edge( polygon_edge );
         while( !is_edge_on_border( next_border ) )
         {
@@ -299,7 +299,7 @@ namespace geode
         const PolygonEdge& polygon_edge ) const
     {
         OPENGEODE_EXCEPTION( is_edge_on_border( polygon_edge ),
-            "Polygon edge should be on border" );
+            "[PolygonalSurfaceBase::previous_on_border] Polygon edge should be on border" );
         auto previous_border = previous_polygon_edge( polygon_edge );
         while( !is_edge_on_border( previous_border ) )
         {
@@ -333,7 +333,7 @@ namespace geode
     index_t PolygonalSurfaceBase< dimension >::polygon_edge_vertex(
         const PolygonEdge& polygon_edge, index_t vertex_id ) const
     {
-        OPENGEODE_EXCEPTION( vertex_id < 2, "vertex_id should be 0 or 1" );
+        OPENGEODE_EXCEPTION( vertex_id < 2, "[PolygonalSurfaceBase::polygon_edge_vertex] vertex_id should be 0 or 1" );
         if( vertex_id == 0 )
         {
             return polygon_vertex( polygon_edge );
@@ -444,7 +444,7 @@ namespace geode
         index_t vertex_id ) const
     {
         OPENGEODE_EXCEPTION(
-            vertex_id < nb_vertices(), "Trying to access an invalid point" );
+            vertex_id < nb_vertices(), "[PolygonalSurfaceBase::point] Trying to access an invalid point" );
         return get_point( vertex_id );
     }
 

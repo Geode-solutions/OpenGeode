@@ -40,7 +40,7 @@ void test_create_vertices( const geode::TetrahedralSolid3D& solid,
     builder.create_point( { { 4.7, 2.1, 1.3 } } );
     builder.create_point( { { 1.6, 8.7, 6.1 } } );
     OPENGEODE_EXCEPTION(
-        solid.nb_vertices() == 6, "TetrahedralSolid should have 6 vertices" );
+        solid.nb_vertices() == 6, "[Test] TetrahedralSolid should have 6 vertices" );
 }
 
 void test_create_tetrahedra( const geode::TetrahedralSolid3D& solid,
@@ -51,7 +51,7 @@ void test_create_tetrahedra( const geode::TetrahedralSolid3D& solid,
     builder.create_polyhedron( { 1, 4, 3, 5 },
         { { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 } } );
     OPENGEODE_EXCEPTION( solid.nb_polyhedra() == 3,
-        "TetrahedralSolid should have 3 tetrahedra" );
+        "[Test] TetrahedralSolid should have 3 tetrahedra" );
 }
 
 void test_polyhedron_adjacencies( const geode::TetrahedralSolid3D& solid,
@@ -59,19 +59,19 @@ void test_polyhedron_adjacencies( const geode::TetrahedralSolid3D& solid,
 {
     builder.compute_polyhedron_adjacencies();
     OPENGEODE_EXCEPTION( solid.polyhedron_adjacent( { 0, 0 } ) == 1,
-        "TetrahedralSolid adjacent index is not correct" );
+        "[Test] TetrahedralSolid adjacent index is not correct" );
     OPENGEODE_EXCEPTION( solid.polyhedron_adjacent( { 0, 1 } ) == geode::NO_ID,
-        "TetrahedralSolid adjacent index is not correct" );
+        "[Test] TetrahedralSolid adjacent index is not correct" );
     OPENGEODE_EXCEPTION( solid.polyhedron_adjacent( { 1, 3 } ) == 0,
-        "TetrahedralSolid adjacent index is not correct" );
+        "[Test] TetrahedralSolid adjacent index is not correct" );
     OPENGEODE_EXCEPTION( solid.polyhedron_adjacent_facet( { 0, 0 } )
                              == geode::PolyhedronFacet( 1, 3 ),
-        "TetrahedralSolid adjacent index is not correct" );
+        "[Test] TetrahedralSolid adjacent index is not correct" );
 
     OPENGEODE_EXCEPTION( solid.polyhedron_adjacent( { 2, 3 } ) == 1,
-        "TetrahedralSolid adjacent index is not correct" );
+        "[Test] TetrahedralSolid adjacent index is not correct" );
     OPENGEODE_EXCEPTION( solid.polyhedron_adjacent( { 2, 0 } ) == geode::NO_ID,
-        "TetrahedralSolid adjacent index is not correct" );
+        "[Test] TetrahedralSolid adjacent index is not correct" );
 }
 
 void test_delete_vertex( const geode::TetrahedralSolid3D& solid,
@@ -81,14 +81,14 @@ void test_delete_vertex( const geode::TetrahedralSolid3D& solid,
     to_delete.front() = true;
     builder.delete_vertices( to_delete );
     OPENGEODE_EXCEPTION(
-        solid.nb_vertices() == 5, "TetrahedralSolid should have 5 vertices" );
+        solid.nb_vertices() == 5, "[Test] TetrahedralSolid should have 5 vertices" );
     geode::Point3D answer{ { 2.1, 9.4, 6.7 } };
     OPENGEODE_EXCEPTION( solid.point( 0 ) == answer,
-        "TetrahedralSolid vertex coordinates are not correct" );
+        "[Test] TetrahedralSolid vertex coordinates are not correct" );
     OPENGEODE_EXCEPTION(
-        solid.nb_polyhedra() == 2, "TetrahedralSolid should have 2 ttrahedra" );
+        solid.nb_polyhedra() == 2, "[Test] TetrahedralSolid should have 2 ttrahedra" );
     OPENGEODE_EXCEPTION( solid.polyhedron_adjacent( { 1, 3 } ) == 0,
-        "TetrahedralSolid adjacent index is not correct" );
+        "[Test] TetrahedralSolid adjacent index is not correct" );
 }
 
 void test_delete_polyhedron( const geode::TetrahedralSolid3D& solid,
@@ -98,15 +98,15 @@ void test_delete_polyhedron( const geode::TetrahedralSolid3D& solid,
     to_delete.front() = true;
     builder.delete_polyhedra( to_delete );
     OPENGEODE_EXCEPTION( solid.nb_polyhedra() == 1,
-        "TetrahedralSolid should have 1 polyhedron" );
+        "[Test] TetrahedralSolid should have 1 polyhedron" );
     OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 0, 0 } ) == 0,
-        "TetrahedralSolid facet vertex index is not correct" );
+        "[Test] TetrahedralSolid facet vertex index is not correct" );
     OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 0, 1 } ) == 3,
-        "TetrahedralSolid facet vertex index is not correct" );
+        "[Test] TetrahedralSolid facet vertex index is not correct" );
     OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 0, 2 } ) == 2,
-        "TetrahedralSolid facet vertex index is not correct" );
+        "[Test] TetrahedralSolid facet vertex index is not correct" );
     OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 0, 3 } ) == 4,
-        "TetrahedralSolid facet vertex index is not correct" );
+        "[Test] TetrahedralSolid facet vertex index is not correct" );
 }
 
 void test_io(

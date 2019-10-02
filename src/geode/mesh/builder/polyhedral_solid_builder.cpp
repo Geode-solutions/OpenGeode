@@ -109,13 +109,13 @@ namespace geode
     {
         OPENGEODE_EXCEPTION(
             polyhedron_vertex.polyhedron_id < polyhedral_solid_.nb_polyhedra(),
-            "Accessing a polyhedron that does not exist" );
+            "[PolyhedralSolidBuilder::set_polyhedron_vertex] Accessing a polyhedron that does not exist" );
         OPENGEODE_EXCEPTION( polyhedron_vertex.vertex_id
                                  < polyhedral_solid_.nb_polyhedron_vertices(
                                        polyhedron_vertex.polyhedron_id ),
-            "Accessing an invalid polyhedron vertex" );
+            "[PolyhedralSolidBuilder::set_polyhedron_vertex] Accessing an invalid polyhedron vertex" );
         OPENGEODE_EXCEPTION( vertex_id < polyhedral_solid_.nb_vertices(),
-            "Accessing a vertex that does not exist" );
+            "[PolyhedralSolidBuilder::set_polyhedron_vertex] Accessing a vertex that does not exist" );
         associate_polyhedron_vertex_to_vertex( polyhedron_vertex, vertex_id );
         do_set_polyhedron_vertex( polyhedron_vertex, vertex_id );
     }
@@ -161,14 +161,14 @@ namespace geode
     {
         OPENGEODE_EXCEPTION(
             polyhedron_facet.polyhedron_id < polyhedral_solid_.nb_polyhedra(),
-            "Accessing a polyhedron that does not exist" );
+            "[PolyhedralSolidBuilder::set_polyhedron_adjacent] Accessing a polyhedron that does not exist" );
         OPENGEODE_EXCEPTION(
             polyhedron_facet.facet_id < polyhedral_solid_.nb_polyhedron_facets(
                                             polyhedron_facet.polyhedron_id ),
-            "Accessing an invalid polyhedron vertex" );
+            "[PolyhedralSolidBuilder::set_polyhedron_adjacent] Accessing an invalid polyhedron vertex" );
         OPENGEODE_EXCEPTION( adjacent_id < polyhedral_solid_.nb_polyhedra()
                                  || adjacent_id == NO_ID,
-            "Accessing a polyhedron that does not exist" );
+            "[PolyhedralSolidBuilder::set_polyhedron_adjacent] Accessing a polyhedron that does not exist" );
         do_set_polyhedron_adjacent( polyhedron_facet, adjacent_id );
     }
 
@@ -279,7 +279,7 @@ namespace geode
         index_t vertex_id, const Point< dimension >& point )
     {
         OPENGEODE_EXCEPTION( vertex_id < polyhedral_solid_.nb_vertices(),
-            "Accessing a vertex that does not exist" );
+            "[PolyhedralSolidBuilder::set_point] Accessing a vertex that does not exist" );
         do_set_point( vertex_id, point );
     }
 
