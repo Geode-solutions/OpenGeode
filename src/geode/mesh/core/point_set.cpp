@@ -60,7 +60,7 @@ namespace geode
         index_t vertex_id ) const
     {
         OPENGEODE_EXCEPTION(
-            vertex_id < nb_vertices(), "Trying to access an invalid point" );
+            vertex_id < nb_vertices(), "[PointSet::point] Trying to access an invalid point" );
         return get_point( vertex_id );
     }
 

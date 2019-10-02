@@ -40,7 +40,7 @@
         OPENGEODE_EXCEPTION( adapter.error() == bitsery::ReaderError::NoError  \
                                  && adapter.isCompletedSuccessfully()          \
                                  && std::get< 1 >( context ).isValid(),        \
-            "Error while reading file: " + this->filename() );                 \
+            "[Bitsery::read] Error while reading file: " + this->filename() );                 \
     }
 
 #define BITSERY_INPUT_MESH_DIMENSION( Mesh )                                   \

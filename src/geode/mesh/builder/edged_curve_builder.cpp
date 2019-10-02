@@ -50,7 +50,7 @@ namespace geode
         index_t vertex_id, const Point< dimension >& point )
     {
         OPENGEODE_EXCEPTION( vertex_id < edged_curve_.nb_vertices(),
-            "Accessing a vertex that does not exist" );
+            "[EdgedCurveBuilder::set_point] Accessing a vertex that does not exist" );
         do_set_point( vertex_id, point );
     }
 

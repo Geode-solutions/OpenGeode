@@ -34,9 +34,9 @@ int main()
         Logger::info( id.string() );
         uuid id2;
         Logger::info( id2 );
-        OPENGEODE_EXCEPTION( id2 != id, "UUIDs should be different" );
+        OPENGEODE_EXCEPTION( id2 != id, "[Test] UUIDs should be different" );
         OPENGEODE_EXCEPTION(
-            id2 < id || id < id2, "UUIDs should be different" );
+            id2 < id || id < id2, "[Test] UUIDs should be different" );
 
         Logger::info( "TEST SUCCESS" );
         return 0;

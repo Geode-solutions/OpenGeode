@@ -39,7 +39,7 @@ void test_create_vertices( const geode::TriangulatedSurface3D& surface,
     builder.create_point( { { 8.1, 1.4, 4.7 } } );
     builder.create_point( { { 4.7, 2.1, 1.3 } } );
     OPENGEODE_EXCEPTION( surface.nb_vertices() == 5,
-        "TriangulatedSurface should have 5 vertices" );
+        "[Test] TriangulatedSurface should have 5 vertices" );
 }
 
 void test_create_polygons( const geode::TriangulatedSurface3D& surface,
@@ -49,7 +49,7 @@ void test_create_polygons( const geode::TriangulatedSurface3D& surface,
     builder.create_triangle( { 1, 3, 2 } );
     builder.create_polygon( { 3, 4, 2 } );
     OPENGEODE_EXCEPTION( surface.nb_polygons() == 3,
-        "TriangulatedSurface should have 3 triangles" );
+        "[Test] TriangulatedSurface should have 3 triangles" );
 }
 
 void test_polygon_adjacencies( const geode::TriangulatedSurface3D& surface,
@@ -57,19 +57,19 @@ void test_polygon_adjacencies( const geode::TriangulatedSurface3D& surface,
 {
     builder.compute_polygon_adjacencies();
     OPENGEODE_EXCEPTION( surface.polygon_adjacent( { 0, 0 } ) == geode::NO_ID,
-        "TriangulatedSurface adjacent index is not correct" );
+        "[Test] TriangulatedSurface adjacent index is not correct" );
     OPENGEODE_EXCEPTION( surface.polygon_adjacent( { 0, 1 } ) == 1,
-        "TriangulatedSurface adjacent index is not correct" );
+        "[Test] TriangulatedSurface adjacent index is not correct" );
     OPENGEODE_EXCEPTION( surface.polygon_adjacent( { 1, 2 } ) == 0,
-        "TriangulatedSurface adjacent index is not correct" );
+        "[Test] TriangulatedSurface adjacent index is not correct" );
     OPENGEODE_EXCEPTION(
         surface.polygon_adjacent_edge( { 0, 1 } ) == geode::PolygonEdge( 1, 2 ),
-        "TriangulatedSurface adjacent index is not correct" );
+        "[Test] TriangulatedSurface adjacent index is not correct" );
 
     OPENGEODE_EXCEPTION( surface.polygon_adjacent( { 2, 2 } ) == 1,
-        "TriangulatedSurface adjacent index is not correct" );
+        "[Test] TriangulatedSurface adjacent index is not correct" );
     OPENGEODE_EXCEPTION( surface.polygon_adjacent( { 2, 0 } ) == geode::NO_ID,
-        "TriangulatedSurface adjacent index is not correct" );
+        "[Test] TriangulatedSurface adjacent index is not correct" );
 }
 
 void test_delete_vertex( const geode::TriangulatedSurface3D& surface,
@@ -79,14 +79,14 @@ void test_delete_vertex( const geode::TriangulatedSurface3D& surface,
     to_delete.front() = true;
     builder.delete_vertices( to_delete );
     OPENGEODE_EXCEPTION( surface.nb_vertices() == 4,
-        "TriangulatedSurface should have 4 vertices" );
+        "[Test] TriangulatedSurface should have 4 vertices" );
     geode::Point3D answer{ { 2.1, 9.4, 6.7 } };
     OPENGEODE_EXCEPTION( surface.point( 0 ) == answer,
-        "TriangulatedSurface vertex coordinates are not correct" );
+        "[Test] TriangulatedSurface vertex coordinates are not correct" );
     OPENGEODE_EXCEPTION( surface.nb_polygons() == 2,
-        "TriangulatedSurface should have 2 polygons" );
+        "[Test] TriangulatedSurface should have 2 polygons" );
     OPENGEODE_EXCEPTION( surface.polygon_adjacent( { 1, 2 } ) == 0,
-        "TriangulatedSurface adjacent index is not correct" );
+        "[Test] TriangulatedSurface adjacent index is not correct" );
 }
 
 void test_delete_polygon( const geode::TriangulatedSurface3D& surface,
@@ -96,13 +96,13 @@ void test_delete_polygon( const geode::TriangulatedSurface3D& surface,
     to_delete.front() = true;
     builder.delete_polygons( to_delete );
     OPENGEODE_EXCEPTION( surface.nb_polygons() == 1,
-        "TriangulatedSurface should have 1 polygon" );
+        "[Test] TriangulatedSurface should have 1 polygon" );
     OPENGEODE_EXCEPTION( surface.polygon_vertex( { 0, 0 } ) == 2,
-        "TriangulatedSurface edge vertex index is not correct" );
+        "[Test] TriangulatedSurface edge vertex index is not correct" );
     OPENGEODE_EXCEPTION( surface.polygon_vertex( { 0, 1 } ) == 3,
-        "TriangulatedSurface edge vertex index is not correct" );
+        "[Test] TriangulatedSurface edge vertex index is not correct" );
     OPENGEODE_EXCEPTION( surface.polygon_vertex( { 0, 2 } ) == 1,
-        "TriangulatedSurface edge vertex index is not correct" );
+        "[Test] TriangulatedSurface edge vertex index is not correct" );
 }
 
 void test_io(

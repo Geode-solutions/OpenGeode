@@ -129,9 +129,9 @@ namespace geode
     index_t Graph::edge_vertex( const EdgeVertex& edge_vertex ) const
     {
         OPENGEODE_EXCEPTION( edge_vertex.edge_id < nb_edges(),
-            "Trying to access an invalid edge" );
+            "[Graph::edge_vertex] Trying to access an invalid edge" );
         OPENGEODE_EXCEPTION( edge_vertex.vertex_id < 2,
-            "Trying to access an invalid edge local vertex" );
+            "[Graph::edge_vertex] Trying to access an invalid edge local vertex" );
         return get_edge_vertex( edge_vertex );
     }
 
@@ -144,7 +144,7 @@ namespace geode
         index_t vertex_id ) const
     {
         OPENGEODE_EXCEPTION(
-            vertex_id < this->nb_vertices(), "Accessing an invalid vertex" );
+            vertex_id < this->nb_vertices(), "[Graph::edges_around_vertex] Accessing an invalid vertex" );
         return impl_->edges_around_vertex( vertex_id );
     }
 

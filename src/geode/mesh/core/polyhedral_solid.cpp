@@ -39,7 +39,7 @@ namespace
         geode::index_t polyhedron_id )
     {
         OPENGEODE_EXCEPTION( polyhedron_id < solid.nb_polyhedra(),
-            "Trying to access an invalid polyhedron" );
+            "[check_polyhedron_id] Trying to access an invalid polyhedron" );
     }
 
     template < geode::index_t dimension >
@@ -50,7 +50,7 @@ namespace
     {
         OPENGEODE_EXCEPTION(
             vertex_id < solid.nb_polyhedron_vertices( polyhedron_id ),
-            "Trying to access an invalid polyhedron vertex" );
+            "[check_polyhedron_vertex_id] Trying to access an invalid polyhedron vertex" );
     }
 
     template < geode::index_t dimension >
@@ -61,7 +61,7 @@ namespace
     {
         OPENGEODE_EXCEPTION(
             facet_id < solid.nb_polyhedron_facets( polyhedron_id ),
-            "Trying to access an invalid polyhedron facet" );
+            "[check_polyhedron_facet_id] Trying to access an invalid polyhedron facet" );
     }
 
     template < geode::index_t dimension >
@@ -73,7 +73,7 @@ namespace
     {
         OPENGEODE_EXCEPTION( vertex_id < solid.nb_polyhedron_facet_vertices(
                                              { polyhedron_id, facet_id } ),
-            "Trying to access an invalid polyhedron facet vertex" );
+            "[check_polyhedron_facet_vertex_id] Trying to access an invalid polyhedron facet vertex" );
     }
 
 } // namespace
@@ -409,7 +409,7 @@ namespace geode
         index_t vertex_id ) const
     {
         OPENGEODE_EXCEPTION(
-            vertex_id < nb_vertices(), "Trying to access an invalid point" );
+            vertex_id < nb_vertices(), "[PolyhedralSolid::point] Trying to access an invalid point" );
         return get_point( vertex_id );
     }
 

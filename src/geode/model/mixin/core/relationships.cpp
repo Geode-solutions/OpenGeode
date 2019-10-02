@@ -174,7 +174,7 @@ namespace geode
             archive.object( *this );
             archive.adapter().flush();
             OPENGEODE_EXCEPTION( std::get< 1 >( context ).isValid(),
-                "Error while writing file: " + filename );
+                "[Relationships::save] Error while writing file: " + filename );
             return filename;
         }
 
@@ -193,7 +193,7 @@ namespace geode
                 adapter.error() == bitsery::ReaderError::NoError
                     && adapter.isCompletedSuccessfully()
                     && std::get< 1 >( context ).isValid(),
-                "Error while reading file: " + filename );
+                "[Relationships::load] Error while reading file: " + filename );
         }
 
     private:

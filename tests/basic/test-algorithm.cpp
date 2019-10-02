@@ -47,30 +47,30 @@ void test_find()
 {
     auto bool_vector = create_bool_vector();
     OPENGEODE_EXCEPTION( geode::find( bool_vector, true ) == 1,
-        "Find result for bool true is not correct" );
+        "[Test] Find result for bool true is not correct" );
     OPENGEODE_EXCEPTION( geode::find( bool_vector, false ) == 0,
-        "Find result for bool false is not correct" );
+        "[Test] Find result for bool false is not correct" );
 
     auto double_vector = create_double_vector();
     OPENGEODE_EXCEPTION( geode::find( double_vector, 2.2 ) == 2,
-        "Find result for double 2.2 is not correct" );
+        "[Test] Find result for double 2.2 is not correct" );
     OPENGEODE_EXCEPTION( geode::find( double_vector, 1.3 ) == geode::NO_ID,
-        "Find result for double 1.3 true is not correct" );
+        "[Test] Find result for double 1.3 true is not correct" );
 }
 
 void test_contain()
 {
     auto bool_vector = create_bool_vector();
     OPENGEODE_EXCEPTION( geode::contain( bool_vector, true ),
-        "Contain result for bool true is not correct" );
+        "[Test] Contain result for bool true is not correct" );
     OPENGEODE_EXCEPTION( geode::contain( bool_vector, false ),
-        "Contain result for bool false is not correct" );
+        "[Test] Contain result for bool false is not correct" );
 
     auto double_vector = create_double_vector();
     OPENGEODE_EXCEPTION( geode::contain( double_vector, 2.2 ),
-        "Contain result for double 2.2 is not correct" );
+        "[Test] Contain result for double 2.2 is not correct" );
     OPENGEODE_EXCEPTION( !geode::contain( double_vector, 1.3 ),
-        "Contain result for double 1.3 is not correct" );
+        "[Test] Contain result for double 1.3 is not correct" );
 }
 
 void test_delete_vector_elements()
@@ -79,18 +79,18 @@ void test_delete_vector_elements()
     auto to_delete{ bool_vector };
     geode::delete_vector_elements( to_delete, bool_vector, false );
     OPENGEODE_EXCEPTION( bool_vector.size() == 4,
-        "Delete elements result (size) for bool is not correct" );
+        "[Test] Delete elements result (size) for bool is not correct" );
     OPENGEODE_EXCEPTION( !bool_vector[0] & !bool_vector[1] & !bool_vector[2],
-        "Delete elements result (values) for bool is not correct" );
+        "[Test] Delete elements result (values) for bool is not correct" );
 
     auto double_vector = create_double_vector();
     geode::delete_vector_elements( to_delete, double_vector, true );
     OPENGEODE_EXCEPTION( double_vector.size() == 3,
-        "Delete elements result (size) for double is not correct" );
+        "[Test] Delete elements result (size) for double is not correct" );
     OPENGEODE_EXCEPTION( ( double_vector[0] == 0. )
                              & ( double_vector[1] == 2 * 1.1 )
                              & ( double_vector[2] == 3 * 1.1 ),
-        "Delete elements result (values) for double is not correct" );
+        "[Test] Delete elements result (values) for double is not correct" );
 }
 
 void test_extract_vector_elements()
@@ -99,22 +99,22 @@ void test_extract_vector_elements()
     auto to_keep{ bool_vector };
     auto bool_result = geode::extract_vector_elements( to_keep, bool_vector );
     OPENGEODE_EXCEPTION( bool_result.size() == 1,
-        "Extract elements result (size) for bool is not correct" );
+        "[Test] Extract elements result (size) for bool is not correct" );
     OPENGEODE_EXCEPTION( bool_result[0],
-        "Extract elements result (values) for bool is not correct" );
+        "[Test] Extract elements result (values) for bool is not correct" );
 
     auto double_vector = create_double_vector();
     auto double_result =
         geode::extract_vector_elements( to_keep, double_vector );
     OPENGEODE_EXCEPTION( double_result.size() == 1,
-        "Extract elements result (size) for double is not correct" );
+        "[Test] Extract elements result (size) for double is not correct" );
     OPENGEODE_EXCEPTION( double_result[0] == 1.1,
-        "Extract elements result (values) for double is not correct" );
+        "[Test] Extract elements result (values) for double is not correct" );
     std::vector< bool > keep_all( 4, true );
     auto double_copy_result =
         geode::extract_vector_elements( keep_all, double_vector );
     OPENGEODE_EXCEPTION( double_copy_result == double_vector,
-        "Extract elements result (keep_all) for double is not correct" );
+        "[Test] Extract elements result (keep_all) for double is not correct" );
 }
 
 int main()

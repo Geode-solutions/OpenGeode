@@ -39,16 +39,16 @@ void test_create_vertices(
     builder.create_point( { { 0.1, 0.2, 0.3 } } );
     builder.create_point( { { 2.1, 9.4, 6.7 } } );
     OPENGEODE_EXCEPTION(
-        point_set.nb_vertices() == 2, "PointSet should have 2 vertices" );
+        point_set.nb_vertices() == 2, "[Test] PointSet should have 2 vertices" );
     builder.create_vertices( 2 );
     OPENGEODE_EXCEPTION(
-        point_set.nb_vertices() == 4, "PointSet should have 4 vertices" );
+        point_set.nb_vertices() == 4, "[Test] PointSet should have 4 vertices" );
     OPENGEODE_EXCEPTION( point_set.point( 2 ) == geode::Point3D(),
-        "Default coordinates are not correct" );
+        "[Test] Default coordinates are not correct" );
     builder.set_point( 2, { { 2.3, 5.0, -1.2 } } );
     OPENGEODE_EXCEPTION(
         point_set.point( 2 ) == geode::Point3D( { 2.3, 5.0, -1.2 } ),
-        "Point coordinates have not been correctly set" );
+        "[Test] Point coordinates have not been correctly set" );
 }
 
 void test_create_vertex_attribute( const geode::PointSet3D& point_set )
@@ -59,7 +59,7 @@ void test_create_vertex_attribute( const geode::PointSet3D& point_set )
                 "test" );
     attribute->value() = true;
     OPENGEODE_EXCEPTION(
-        attribute->value() == true, "PointSet attribute value should be true" );
+        attribute->value() == true, "[Test] PointSet attribute value should be true" );
 }
 
 void test_delete_vertex(
@@ -69,10 +69,10 @@ void test_delete_vertex(
     to_delete.front() = true;
     builder.delete_vertices( to_delete );
     OPENGEODE_EXCEPTION(
-        point_set.nb_vertices() == 3, "PointSet should have 3 vertices" );
+        point_set.nb_vertices() == 3, "[Test] PointSet should have 3 vertices" );
     geode::Point3D answer{ { 2.1, 9.4, 6.7 } };
     OPENGEODE_EXCEPTION( point_set.point( 0 ) == answer,
-        "PointSet vertex coordinates are not correct" );
+        "[Test] PointSet vertex coordinates are not correct" );
 }
 
 void test_io( const geode::PointSet3D& point_set, const std::string& filename )

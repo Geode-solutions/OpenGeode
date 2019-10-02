@@ -61,6 +61,6 @@ namespace geode
     void VertexSetInput::check_emptiness()
     {
         OPENGEODE_EXCEPTION(
-            vertex_set_.nb_vertices() == 0, "The given mesh should be empty." );
+            vertex_set_.nb_vertices() == 0, "[VertexSetInput::check_emptiness] The given mesh should be empty." );
     }
 } // namespace geode

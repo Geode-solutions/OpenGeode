@@ -85,12 +85,12 @@ int main()
         auto creators = factory::list_creators();
         factory::register_creator< Derived >( "Derived" );
         OPENGEODE_EXCEPTION( factory::list_creators().size() == creators.size(),
-            "Key registered twice" );
+            "[Test] Key registered twice" );
 
         A a;
         B b;
         OPENGEODE_EXCEPTION(
-            factory::has_creator( "Derived" ), "Key has not been registered" );
+            factory::has_creator( "Derived" ), "[Test] Key has not been registered" );
         auto d = factory::create( "Derived", a, b );
         verdict( d != nullptr, "Derived" );
 
