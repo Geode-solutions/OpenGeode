@@ -39,8 +39,8 @@ void test_create_vertices( const geode::TetrahedralSolid3D& solid,
     builder.create_point( { { 8.1, 1.4, 4.7 } } );
     builder.create_point( { { 4.7, 2.1, 1.3 } } );
     builder.create_point( { { 1.6, 8.7, 6.1 } } );
-    OPENGEODE_EXCEPTION(
-        solid.nb_vertices() == 6, "[Test] TetrahedralSolid should have 6 vertices" );
+    OPENGEODE_EXCEPTION( solid.nb_vertices() == 6,
+        "[Test] TetrahedralSolid should have 6 vertices" );
 }
 
 void test_create_tetrahedra( const geode::TetrahedralSolid3D& solid,
@@ -80,13 +80,13 @@ void test_delete_vertex( const geode::TetrahedralSolid3D& solid,
     std::vector< bool > to_delete( solid.nb_vertices(), false );
     to_delete.front() = true;
     builder.delete_vertices( to_delete );
-    OPENGEODE_EXCEPTION(
-        solid.nb_vertices() == 5, "[Test] TetrahedralSolid should have 5 vertices" );
+    OPENGEODE_EXCEPTION( solid.nb_vertices() == 5,
+        "[Test] TetrahedralSolid should have 5 vertices" );
     geode::Point3D answer{ { 2.1, 9.4, 6.7 } };
     OPENGEODE_EXCEPTION( solid.point( 0 ) == answer,
         "[Test] TetrahedralSolid vertex coordinates are not correct" );
-    OPENGEODE_EXCEPTION(
-        solid.nb_polyhedra() == 2, "[Test] TetrahedralSolid should have 2 ttrahedra" );
+    OPENGEODE_EXCEPTION( solid.nb_polyhedra() == 2,
+        "[Test] TetrahedralSolid should have 2 ttrahedra" );
     OPENGEODE_EXCEPTION( solid.polyhedron_adjacent( { 1, 3 } ) == 0,
         "[Test] TetrahedralSolid adjacent index is not correct" );
 }

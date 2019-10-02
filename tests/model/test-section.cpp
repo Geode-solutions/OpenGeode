@@ -69,7 +69,8 @@ std::vector< geode::uuid > add_corners(
     const auto& temp_corner = model.corner(
         builder.add_corner( geode::OpenGeodePointSet2D::type_name_static() ) );
     builder.remove_corner( temp_corner );
-    auto message = "[Test] Section should have " + std::to_string( nb ) + " corners";
+    auto message =
+        "[Test] Section should have " + std::to_string( nb ) + " corners";
     OPENGEODE_EXCEPTION( model.nb_corners() == nb, message );
     OPENGEODE_EXCEPTION( count_components( model.corners() ) == nb, message );
     return uuids;
@@ -88,7 +89,8 @@ std::vector< geode::uuid > add_lines(
     const auto& temp_line = model.line(
         builder.add_line( geode::OpenGeodeEdgedCurve2D::type_name_static() ) );
     builder.remove_line( temp_line );
-    auto message = "[Test] Section should have " + std::to_string( nb ) + " lines";
+    auto message =
+        "[Test] Section should have " + std::to_string( nb ) + " lines";
     OPENGEODE_EXCEPTION( model.nb_lines() == nb, message );
     OPENGEODE_EXCEPTION( count_components( model.lines() ) == nb, message );
     return uuids;
@@ -107,7 +109,8 @@ std::vector< geode::uuid > add_surfaces(
     const auto& temp_surface = model.surface( builder.add_surface(
         geode::OpenGeodePolygonalSurface2D::type_name_static() ) );
     builder.remove_surface( temp_surface );
-    auto message = "[Test] Section should have " + std::to_string( nb ) + " surfaces";
+    auto message =
+        "[Test] Section should have " + std::to_string( nb ) + " surfaces";
     OPENGEODE_EXCEPTION( model.nb_surfaces() == nb, message );
     OPENGEODE_EXCEPTION( count_components( model.surfaces() ) == nb, message );
     return uuids;
@@ -271,7 +274,8 @@ void add_internal_relations( const geode::Section& model,
 
     OPENGEODE_EXCEPTION(
         model.nb_internals( surface_uuids.front() ) == line_uuids.size(),
-        "[Test] The Surface should embed all Lines (that are internal to the Block)" );
+        "[Test] The Surface should embed all Lines (that are internal to the "
+        "Block)" );
 }
 
 void test_boundary_ranges( const geode::Section& model,

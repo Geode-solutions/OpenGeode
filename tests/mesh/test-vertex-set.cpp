@@ -49,11 +49,11 @@ void test_create_vertices(
     const geode::VertexSet& vertex_set, geode::VertexSetBuilder& builder )
 {
     builder.create_vertex();
-    OPENGEODE_EXCEPTION(
-        vertex_set.nb_vertices() == 1, "[Test] VertexSet should have 1 vertex" );
+    OPENGEODE_EXCEPTION( vertex_set.nb_vertices() == 1,
+        "[Test] VertexSet should have 1 vertex" );
     builder.create_vertices( 5 );
-    OPENGEODE_EXCEPTION(
-        vertex_set.nb_vertices() == 6, "[Test] VertexSet should have 6 vertices" );
+    OPENGEODE_EXCEPTION( vertex_set.nb_vertices() == 6,
+        "[Test] VertexSet should have 6 vertices" );
 }
 
 void test_delete_vertex(
@@ -62,8 +62,8 @@ void test_delete_vertex(
     std::vector< bool > to_delete( vertex_set.nb_vertices(), false );
     to_delete.front() = true;
     builder.delete_vertices( to_delete );
-    OPENGEODE_EXCEPTION(
-        vertex_set.nb_vertices() == 5, "[Test] VertexSet should have 5 vertices" );
+    OPENGEODE_EXCEPTION( vertex_set.nb_vertices() == 5,
+        "[Test] VertexSet should have 5 vertices" );
 }
 
 int main()

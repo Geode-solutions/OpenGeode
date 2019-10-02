@@ -89,7 +89,9 @@ namespace geode
                 archive.object( *this );
                 archive.adapter().flush();
                 OPENGEODE_EXCEPTION( std::get< 1 >( context ).isValid(),
-                    "[ComponentsStorage::save_components] Error while writing file: " + filename );
+                    "[ComponentsStorage::save_components] Error while writing "
+                    "file: "
+                        + filename );
             }
 
             void delete_component( const uuid& id )
@@ -113,7 +115,9 @@ namespace geode
                     adapter.error() == bitsery::ReaderError::NoError
                         && adapter.isCompletedSuccessfully()
                         && std::get< 1 >( context ).isValid(),
-                    "[ComponentsStorage::load_components] Error while reading file: " + filename );
+                    "[ComponentsStorage::load_components] Error while reading "
+                    "file: "
+                        + filename );
             }
 
         protected:
