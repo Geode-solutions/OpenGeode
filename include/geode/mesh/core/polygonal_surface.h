@@ -280,6 +280,8 @@ namespace geode
         virtual const Point< dimension >& get_point(
             index_t vertex_id ) const = 0;
 
+        const PolygonVertex& polygon_around_vertex( index_t vertex_id ) const;
+
         void associate_polygon_vertex_to_vertex(
             const PolygonVertex& polygon_vertex, index_t vertex_id );
 
