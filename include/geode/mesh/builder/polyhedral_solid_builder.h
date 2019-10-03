@@ -117,6 +117,22 @@ namespace geode
          * is kept.
          */
         void delete_polyhedra( const std::vector< bool >& to_delete );
+        
+        /*!
+         * Return one polyhedron with one of the vertices matching given vertex.
+         * @param[in] vertex_id Index of the vertex.
+         * @detail If vertex is isolated (no incident polyhedron), default
+         * PolyhedronVertex is returned.
+         */
+        const PolyhedronVertex& polyhedron_around_vertex( index_t vertex_id ) const;
+
+        /*!
+         * Set a polyhedron vertex to a given vertex.
+         * @param[in] polyhedron_vertex PolyhedronVertex corresponding to the vertex.
+         * @param[in] vertex_id Index of the vertex.
+         */
+        void associate_polyhedron_vertex_to_vertex(
+            const PolyhedronVertex& polyhedron_vertex, index_t vertex_id );
 
     protected:
         PolyhedralSolidBuilder( PolyhedralSolid< dimension >& polyhedral_solid )
@@ -125,8 +141,6 @@ namespace geode
         {
         }
 
-        void associate_polyhedron_vertex_to_vertex(
-            const PolyhedronVertex& polyhedron_vertex, index_t vertex_id );
 
     private:
         /*!

@@ -129,6 +129,14 @@ namespace geode
     }
 
     template < index_t dimension >
+    const PolygonVertex&
+        PolygonalSurfaceBuilder< dimension >::polygon_around_vertex(
+            index_t vertex_id ) const
+    {
+        return polygonal_surface_.polygon_around_vertex( vertex_id );
+    }
+
+    template < index_t dimension >
     void PolygonalSurfaceBuilder< dimension >::set_polygon_vertex(
         const PolygonVertex& polygon_vertex, index_t vertex_id )
     {
