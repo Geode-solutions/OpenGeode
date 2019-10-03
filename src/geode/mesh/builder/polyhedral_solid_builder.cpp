@@ -274,6 +274,29 @@ namespace geode
         const std::vector< bool >& to_delete )
     {
         auto old2new = mapping_after_deletion( to_delete );
+
+        for( auto v : geode::Range{ polyhedral_solid_.nb_vertices() } )
+        {
+            const auto& polyhedron_vertex =
+                polyhedral_solid_.polyhedron_around_vertex( v );
+            PolyhedronVertex new_polyhedron_vertex{ polyhedron_vertex };
+            new_polyhedron_vertex.polyhedron_id = old2new[polyhedron_vertex.polyhedron_id];
+            if( new_polyhedron_vertex.polyhedron_id == geode::NO_ID )
+            {
+                for( auto&& polyhedron :
+                    polyhedral_solid_.polyhedra_around_vertex( v ) )
+                {
+                    polyhedron.polyhedron_id = old2new[polyhedron.polyhedron_id];
+                    if( polyhedron.polyhedron_id != geode::NO_ID )
+                    {
+                        new_polyhedron_vertex = std::move( polyhedron );
+                        break;
+                    }
+                }
+            }
+            associate_polyhedron_vertex_to_vertex( new_polyhedron_vertex, v );
+        }
+
         update_polyhedron_adjacencies( polyhedral_solid_, *this, old2new );
         polyhedral_solid_.polyhedron_attribute_manager().delete_elements(
             to_delete );

@@ -273,6 +273,9 @@ namespace geode
         virtual const Point< dimension >& get_point(
             index_t vertex_id ) const = 0;
 
+        const PolyhedronVertex& polyhedron_around_vertex(
+            index_t vertex_id ) const;
+
         void associate_polyhedron_vertex_to_vertex(
             const PolyhedronVertex& polyhedron_vertex, index_t vertex_id );
 

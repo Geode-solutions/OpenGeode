@@ -295,6 +295,14 @@ namespace geode
     }
 
     template < index_t dimension >
+    const PolyhedronVertex&
+        PolyhedralSolid< dimension >::polyhedron_around_vertex(
+            index_t vertex_id ) const
+    {
+        return impl_->polyhedron_around_vertex( vertex_id );
+    }
+
+    template < index_t dimension >
     void PolyhedralSolid< dimension >::associate_polyhedron_vertex_to_vertex(
         const PolyhedronVertex& polyhedron_vertex, index_t vertex_id )
     {
