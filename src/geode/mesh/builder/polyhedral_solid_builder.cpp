@@ -279,18 +279,21 @@ namespace geode
         {
             const auto& polyhedron_vertex =
                 polyhedral_solid_.polyhedron_around_vertex( v );
-            if( polyhedron_vertex.polyhedron_id == geode::NO_ID ){
+            if( polyhedron_vertex.polyhedron_id == geode::NO_ID )
+            {
                 continue;
             }
             PolyhedronVertex new_polyhedron_vertex{ polyhedron_vertex };
-            new_polyhedron_vertex.polyhedron_id = old2new[polyhedron_vertex.polyhedron_id];
-            
+            new_polyhedron_vertex.polyhedron_id =
+                old2new[polyhedron_vertex.polyhedron_id];
+
             if( new_polyhedron_vertex.polyhedron_id == geode::NO_ID )
             {
                 for( auto&& polyhedron :
                     polyhedral_solid_.polyhedra_around_vertex( v ) )
                 {
-                    polyhedron.polyhedron_id = old2new[polyhedron.polyhedron_id];
+                    polyhedron.polyhedron_id =
+                        old2new[polyhedron.polyhedron_id];
                     if( polyhedron.polyhedron_id != geode::NO_ID )
                     {
                         new_polyhedron_vertex = std::move( polyhedron );

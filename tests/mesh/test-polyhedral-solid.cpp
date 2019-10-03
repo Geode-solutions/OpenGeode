@@ -59,7 +59,8 @@ void test_create_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
         "[Test] PolyhedralSolid should have 3 polyhedra" );
 }
 
-void test_polyhedron_adjacencies( const geode::PolyhedralSolid3D& polyhedral_solid,
+void test_polyhedron_adjacencies(
+    const geode::PolyhedralSolid3D& polyhedral_solid,
     geode::PolyhedralSolidBuilder3D& builder )
 {
     builder.compute_polyhedron_adjacencies();
