@@ -169,6 +169,9 @@ namespace geode
         PolygonalSurfaceBase< dimension >::polygon_around_vertex(
             index_t vertex_id ) const
     {
+        OPENGEODE_EXCEPTION( vertex_id < this->nb_vertices(),
+            "[PolyhedralSurfaceBase::polygon_around_vertex] Accessing an "
+            "invalid vertex" );
         return impl_->polygon_around_vertex( vertex_id );
     }
 
@@ -393,6 +396,9 @@ namespace geode
         PolygonalSurfaceBase< dimension >::polygons_around_vertex(
             index_t vertex_id ) const
     {
+        OPENGEODE_EXCEPTION( vertex_id < this->nb_vertices(),
+            "[PolyhedralSurfaceBase::polygons_around_vertex] Accessing an "
+            "invalid vertex" );
         std::vector< PolygonVertex > polygons;
         const auto& first_polygon = impl_->polygon_around_vertex( vertex_id );
         if( first_polygon.polygon_id == NO_ID )

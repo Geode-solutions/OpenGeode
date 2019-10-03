@@ -235,6 +235,8 @@ namespace geode
         PolyhedralSolid< dimension >::polyhedra_around_vertex(
             index_t vertex_id ) const
     {
+        OPENGEODE_EXCEPTION( vertex_id < this->nb_vertices(),
+            "[PolyhedralSolid::polyhedra_around_vertex] Accessing an invalid vertex" );
         std::vector< PolyhedronVertex > polyhedra;
         const auto& first_polyhedron =
             impl_->polyhedron_around_vertex( vertex_id );
@@ -299,6 +301,8 @@ namespace geode
         PolyhedralSolid< dimension >::polyhedron_around_vertex(
             index_t vertex_id ) const
     {
+        OPENGEODE_EXCEPTION( vertex_id < this->nb_vertices(),
+            "[PolyhedralSolid::polyhedron_around_vertex] Accessing an invalid vertex" );
         return impl_->polyhedron_around_vertex( vertex_id );
     }
 

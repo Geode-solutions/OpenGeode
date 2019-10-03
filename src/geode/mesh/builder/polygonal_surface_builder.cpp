@@ -128,36 +128,6 @@ namespace geode
             polygon_vertex, vertex_id );
     }
 
-    // template < index_t dimension >
-    // void PolygonalSurfaceBuilder< dimension
-    // >::update_polygon_around_vertices(
-    //     const std::vector< index_t >& old2new )
-    // {
-    //     // auto polygon_around_vertex =
-    //     //     surface.vertex_attribute_manager()
-    //     //         .template find_or_create_attribute<
-    //     geode::VariableAttribute,
-    //     //             geode::PolygonVertex >(
-    //     //             "polygon_around_vertex", geode::PolygonVertex{} );
-    //     for( auto v : geode::Range{ surface.nb_vertices() } )
-    //     {
-    //         auto& polygon_vertex = polygon_around_vertex.value( v );
-    //         polygon_vertex.polygon_id = old2new[polygon_vertex.polygon_id];
-    //         if( polygon_vertex.polygon_id == geode::NO_ID )
-    //         {
-    //             for( auto&& polygon : surface.polygons_around_vertex( v ) )
-    //             {
-    //                 polygon.polygon_id = old2new[polygon.polygon_id];
-    //                 if( polygon.polygon_id != geode::NO_ID )
-    //                 {
-    //                     polygon_vertex = std::move( polygon );
-    //                     break;
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
-
     template < index_t dimension >
     void PolygonalSurfaceBuilder< dimension >::set_polygon_vertex(
         const PolygonVertex& polygon_vertex, index_t vertex_id )
@@ -278,6 +248,10 @@ namespace geode
         {
             const auto& polygon_vertex =
                 polygonal_surface_.polygon_around_vertex( v );
+            if( polygon_vertex.polygon_id == geode::NO_ID )
+            {
+                continue;
+            }
             PolygonVertex new_polygon_vertex{ polygon_vertex };
             new_polygon_vertex.polygon_id = old2new[polygon_vertex.polygon_id];
             if( new_polygon_vertex.polygon_id == geode::NO_ID )
