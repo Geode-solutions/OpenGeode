@@ -123,6 +123,9 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive );
 
+        std::vector< EdgeVertex >& get_edges_around_vertex(
+            index_t vertex_id );
+
         void associate_edge_vertex_to_vertex(
             const EdgeVertex& edge_vertex, index_t vertex_id );
 

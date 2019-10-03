@@ -59,7 +59,7 @@ void test_create_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
         "[Test] PolyhedralSolid should have 3 polyhedra" );
 }
 
-void test_polygon_adjacencies( const geode::PolyhedralSolid3D& polyhedral_solid,
+void test_polyhedron_adjacencies( const geode::PolyhedralSolid3D& polyhedral_solid,
     geode::PolyhedralSolidBuilder3D& builder )
 {
     builder.compute_polyhedron_adjacencies();
@@ -84,7 +84,7 @@ void test_polygon_adjacencies( const geode::PolyhedralSolid3D& polyhedral_solid,
 
     OPENGEODE_EXCEPTION(
         polyhedral_solid.polyhedron_facets_on_border( 0 ).size() == 4,
-        "[Test] First polygon of PolyhedralSolid should have 4 facets on "
+        "[Test] First polyhedron of PolyhedralSolid should have 4 facets on "
         "border" );
 }
 
@@ -105,7 +105,7 @@ void test_delete_vertex( const geode::PolyhedralSolid3D& polyhedral_solid,
         "[Test] PolyhedralSolid adjacent index is not correct" );
 }
 
-void test_delete_polygon( const geode::PolyhedralSolid3D& polyhedral_solid,
+void test_delete_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
     geode::PolyhedralSolidBuilder3D& builder )
 {
     std::vector< bool > to_delete( polyhedral_solid.nb_polyhedra(), false );
@@ -154,11 +154,11 @@ void test_barycenters()
     OPENGEODE_EXCEPTION(
         polyhedral_solid->polyhedron_facet_barycenter( { 0, 0 } )
             == answer_facet_barycenter,
-        "[Test] PolyhedralSolid polygon facet barycenter is not correct" );
-    geode::Point3D answer_polygon_barycenter{ { a / 3., 0.5 * b, c / 3. } };
+        "[Test] PolyhedralSolid polyhedron_facet_barycenter is not correct" );
+    geode::Point3D answer_polyhedron_barycenter{ { a / 3., 0.5 * b, c / 3. } };
     OPENGEODE_EXCEPTION( polyhedral_solid->polyhedron_barycenter( 0 )
-                             == answer_polygon_barycenter,
-        "[Test] PolyhedralSolid polygon barycenter is not correct" );
+                             == answer_polyhedron_barycenter,
+        "[Test] PolyhedralSolid polyhedron barycenter is not correct" );
 }
 
 int main()
@@ -173,12 +173,12 @@ int main()
 
         test_create_vertices( *polyhedral_solid, *builder );
         test_create_polyhedra( *polyhedral_solid, *builder );
-        test_polygon_adjacencies( *polyhedral_solid, *builder );
+        test_polyhedron_adjacencies( *polyhedral_solid, *builder );
         auto base_file = "test." + polyhedral_solid->native_extension();
         test_io( *polyhedral_solid, base_file );
 
         test_delete_vertex( *polyhedral_solid, *builder );
-        test_delete_polygon( *polyhedral_solid, *builder );
+        test_delete_polyhedra( *polyhedral_solid, *builder );
 
         test_barycenters();
 

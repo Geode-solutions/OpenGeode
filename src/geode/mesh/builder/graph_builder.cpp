@@ -58,31 +58,6 @@ namespace
         }
         builder.delete_edges( edges_to_delete );
     }
-
-    void update_edges_around_vertices(
-        const geode::Graph& graph, const std::vector< index_t >& old2new )
-    {
-        auto edges_around_vertex =
-            graph.vertex_attribute_manager()
-                .template find_or_create_attribute< geode::VariableAttribute,
-                    std::vector< geode::EdgeVertex > >(
-                    "edges_around_vertex", std::vector< geode::EdgeVertex >{} );
-        for( auto v : geode::Range{ graph.nb_vertices() } )
-        {
-            auto& edges = edges_around_vertex->value( v );
-            typename std::decay< decltype( edges ) >::type new_edges;
-            new_edges.reserve( edges.size() );
-            for( auto&& edge : edges )
-            {
-                edge.edge_id = old2new[edge.edge_id];
-                if( edge.edge_id != geode::NO_ID )
-                {
-                    new_edges.emplace_back( edge );
-                }
-            }
-            edges = std::move( new_edges );
-        }
-    }
 } // namespace
 
 namespace geode
@@ -166,7 +141,23 @@ namespace geode
     void GraphBuilder::delete_edges( const std::vector< bool >& to_delete )
     {
         auto old2new = mapping_after_deletion( to_delete );
-        update_edges_around_vertices( graph_, old2new );
+
+        for( auto v : geode::Range{ graph_.nb_vertices() } )
+        {
+            auto& edges = graph_.get_edges_around_vertex( v );
+            std::vector< EdgeVertex > new_edges;
+            new_edges.reserve( edges.size() );
+            for( auto&& edge : edges )
+            {
+                edge.edge_id = old2new[edge.edge_id];
+                if( edge.edge_id != geode::NO_ID )
+                {
+                    new_edges.emplace_back( edge );
+                }
+            }
+            edges = std::move( new_edges );
+        }
+
         graph_.edge_attribute_manager().delete_elements( to_delete );
         do_delete_edges( to_delete );
     }

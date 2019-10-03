@@ -62,6 +62,12 @@ namespace geode
             return edges_around_vertex_->value( vertex_id );
         }
 
+        std::vector< EdgeVertex >& get_edges_around_vertex(
+            index_t vertex_id )
+        {
+            return edges_around_vertex_->value( vertex_id );
+        }
+
         void associate_edge_vertex_to_vertex( const Graph& graph,
             const EdgeVertex& edge_vertex,
             index_t vertex_id )
@@ -146,6 +152,14 @@ namespace geode
         OPENGEODE_EXCEPTION( vertex_id < this->nb_vertices(),
             "[Graph::edges_around_vertex] Accessing an invalid vertex" );
         return impl_->edges_around_vertex( vertex_id );
+    }
+
+    std::vector< EdgeVertex >& Graph::get_edges_around_vertex(
+            index_t vertex_id )
+    {
+        OPENGEODE_EXCEPTION( vertex_id < this->nb_vertices(),
+            "[Graph::get_edges_around_vertex] Accessing an invalid vertex" );
+        return impl_->get_edges_around_vertex( vertex_id );
     }
 
     void Graph::associate_edge_vertex_to_vertex(
