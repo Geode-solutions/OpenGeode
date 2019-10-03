@@ -62,8 +62,7 @@ namespace geode
             return edges_around_vertex_->value( vertex_id );
         }
 
-        std::vector< EdgeVertex >& get_edges_around_vertex(
-            index_t vertex_id )
+        std::vector< EdgeVertex >& get_edges_around_vertex( index_t vertex_id )
         {
             return edges_around_vertex_->value( vertex_id );
         }
@@ -155,7 +154,7 @@ namespace geode
     }
 
     std::vector< EdgeVertex >& Graph::get_edges_around_vertex(
-            index_t vertex_id )
+        index_t vertex_id )
     {
         OPENGEODE_EXCEPTION( vertex_id < this->nb_vertices(),
             "[Graph::get_edges_around_vertex] Accessing an invalid vertex" );
