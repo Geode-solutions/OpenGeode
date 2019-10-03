@@ -129,12 +129,14 @@ namespace geode
     }
 
     // template < index_t dimension >
-    // void PolygonalSurfaceBuilder< dimension >::update_polygon_around_vertices(
+    // void PolygonalSurfaceBuilder< dimension
+    // >::update_polygon_around_vertices(
     //     const std::vector< index_t >& old2new )
     // {
     //     // auto polygon_around_vertex =
     //     //     surface.vertex_attribute_manager()
-    //     //         .template find_or_create_attribute< geode::VariableAttribute,
+    //     //         .template find_or_create_attribute<
+    //     geode::VariableAttribute,
     //     //             geode::PolygonVertex >(
     //     //             "polygon_around_vertex", geode::PolygonVertex{} );
     //     for( auto v : geode::Range{ surface.nb_vertices() } )
@@ -274,12 +276,14 @@ namespace geode
 
         for( auto v : geode::Range{ polygonal_surface_.nb_vertices() } )
         {
-            const auto& polygon_vertex = polygonal_surface_.polygon_around_vertex( v );
+            const auto& polygon_vertex =
+                polygonal_surface_.polygon_around_vertex( v );
             PolygonVertex new_polygon_vertex{ polygon_vertex };
             new_polygon_vertex.polygon_id = old2new[polygon_vertex.polygon_id];
             if( new_polygon_vertex.polygon_id == geode::NO_ID )
             {
-                for( auto&& polygon : polygonal_surface_.polygons_around_vertex( v ) )
+                for( auto&& polygon :
+                    polygonal_surface_.polygons_around_vertex( v ) )
                 {
                     polygon.polygon_id = old2new[polygon.polygon_id];
                     if( polygon.polygon_id != geode::NO_ID )
