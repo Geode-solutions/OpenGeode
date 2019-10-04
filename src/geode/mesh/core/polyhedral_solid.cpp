@@ -374,16 +374,39 @@ namespace geode
     {
         if( !is_polyhedron_facet_on_border( polyhedron_facet ) )
         {
+            std::vector< index_t > vertices(
+                nb_polyhedron_facet_vertices( polyhedron_facet ) );
+            for( auto v : Range{ vertices.size() } )
+            {
+                vertices[v] =
+                    polyhedron_facet_vertex( { polyhedron_facet, v } );
+            }
             auto polyhedron_adj = polyhedron_adjacent( polyhedron_facet );
             for( auto f : Range{ nb_polyhedron_facets( polyhedron_adj ) } )
             {
                 auto polyhedron = polyhedron_adjacent( { polyhedron_adj, f } );
                 if( polyhedron == polyhedron_facet.polyhedron_id )
                 {
-                    return { polyhedron_adj, f };
+                    bool all_contained{ true };
+                    for( auto v : Range{ nb_polyhedron_facet_vertices(
+                             { polyhedron_adj, f } ) } )
+                    {
+                        if( !contain(
+                                vertices, polyhedron_facet_vertex(
+                                              { { polyhedron_adj, f }, v } ) ) )
+                        {
+                            all_contained = false;
+                            break;
+                        }
+                    }
+                    if( all_contained )
+                    {
+                        return { polyhedron_adj, f };
+                    }
                 }
             }
-            throw OpenGeodeException( "Wrong adjacency with polyhedra: ",
+            throw OpenGeodeException( "[PolyhedralSolid::polyhedron_adjacent_"
+                                      "facet] Wrong adjacency with polyhedra: ",
                 polyhedron_facet.polyhedron_id, " and ", polyhedron_adj );
         }
         return {};
