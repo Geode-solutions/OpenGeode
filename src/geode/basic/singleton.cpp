@@ -48,7 +48,7 @@ namespace geode
         }
 
     private:
-        std::map< const char *, std::unique_ptr< Singleton > > singletons_;
+        std::map< std::string, std::unique_ptr< Singleton > > singletons_;
     };
 
     Singleton::Singleton() {} // NOLINT
