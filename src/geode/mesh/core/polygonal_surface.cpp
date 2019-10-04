@@ -253,16 +253,23 @@ namespace geode
     {
         if( !is_edge_on_border( polygon_edge ) )
         {
+            auto v0 = polygon_edge_vertex( polygon_edge, 0 );
+            auto v1 = polygon_edge_vertex( polygon_edge, 1 );
             auto polygon_adj = polygon_adjacent( polygon_edge );
             for( auto e : Range{ nb_polygon_edges( polygon_adj ) } )
             {
                 auto polygon = polygon_adjacent( { polygon_adj, e } );
-                if( polygon == polygon_edge.polygon_id )
+                if( polygon == polygon_edge.polygon_id
+                    && polygon_edge_vertex( { polygon_edge.polygon_id, e }, 0 )
+                           == v1
+                    && polygon_edge_vertex( { polygon_edge.polygon_id, e }, 1 )
+                           == v0 )
                 {
                     return { polygon_adj, e };
                 }
             }
-            throw OpenGeodeException( "Wrong adjacency with polygons: ",
+            throw OpenGeodeException( "[PolygonalSurfaceBase::polygon_adjacent_"
+                                      "edge] Wrong adjacency with polygons: ",
                 polygon_edge.polygon_id, " and ", polygon_adj );
         }
         return {};
