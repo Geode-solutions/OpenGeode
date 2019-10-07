@@ -52,7 +52,7 @@ namespace geode
         const TetrahedralSolid< dimension >& tetrahedral_solid,
         std::string filename )
         : PolyhedralSolidOutput< dimension >(
-              tetrahedral_solid, std::move( filename ) ),
+            tetrahedral_solid, std::move( filename ) ),
           tetrahedral_solid_( tetrahedral_solid )
     {
     }
