@@ -23,7 +23,6 @@
 
 #pragma once
 
-#include <memory>
 #include <typeinfo>
 
 #include <geode/basic/common.h>
