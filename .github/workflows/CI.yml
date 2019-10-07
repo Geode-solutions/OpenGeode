@@ -28,14 +28,12 @@ jobs:
         cmake --build . -- -j2
     - name: Test
       run: |
-        pwd
-        ls
-        ls $workspace
+        ls build
         mkdir -p test
         cd test
-        cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH:PATH=..
+        cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH:PATH=$workspace/build/opengeode/install ../tests
         cmake --build . -- -j2
-
+        ctest --output-on-failure
       
   build-mac:
     runs-on: macOS-10.14
