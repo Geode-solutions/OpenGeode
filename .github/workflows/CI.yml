@@ -26,6 +26,16 @@ jobs:
         cd build
         cmake -DCMAKE_BUILD_TYPE=Debug ..
         cmake --build . -- -j2
+    - name: Test
+      run: |
+        pwd
+        ls
+        ls $workspace
+        mkdir -p test
+        cd test
+        cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH:PATH=..
+        cmake --build . -- -j2
+
       
   build-mac:
     runs-on: macOS-10.14
@@ -40,7 +50,7 @@ jobs:
         cmake -DCMAKE_BUILD_TYPE=Debug ..
         cmake --build . -- -j2
         cd opengeode
-        ctest
+        ctest --output-on-failure
       
   build-windows:
     runs-on: windows-2016
@@ -52,10 +62,10 @@ jobs:
       run: |
         mkdir -p build
         cd build
-        cmake -G \"Visual Studio 15 2017 Win64\ ..
+        cmake -G \"Visual Studio 15 2017 Win64\" ..
         cmake --build . --config Debug
         cd opengeode
-        ctest -C Debug
+        ctest -C Debug --output-on-failure
         
   semantic-release:
     runs-on: ubuntu-18.04
