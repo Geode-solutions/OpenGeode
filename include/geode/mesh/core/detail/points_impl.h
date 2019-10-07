@@ -39,10 +39,10 @@ namespace geode
         public:
             PointsImpl( VertexSet& mesh )
                 : points_(
-                    mesh.vertex_attribute_manager()
-                        .template find_or_create_attribute< VariableAttribute,
-                            Point< dimension > >(
-                            "points", Point< dimension >{} ) )
+                      mesh.vertex_attribute_manager()
+                          .template find_or_create_attribute< VariableAttribute,
+                              Point< dimension > >(
+                              "points", Point< dimension >{} ) )
             {
             }
 

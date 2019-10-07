@@ -51,7 +51,7 @@ namespace geode
     TetrahedralSolidInput< dimension >::TetrahedralSolidInput(
         TetrahedralSolid< dimension >& tetrahedral_solid, std::string filename )
         : PolyhedralSolidInput< dimension >(
-            tetrahedral_solid, std::move( filename ) ),
+              tetrahedral_solid, std::move( filename ) ),
           tetrahedral_solid_( tetrahedral_solid )
     {
     }
