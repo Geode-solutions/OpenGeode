@@ -1,0 +1,69 @@
+name: CI
+
+on: 
+  push:
+  pull_request:
+
+jobs:
+  format:
+    runs-on: ubuntu-18.04
+    
+    steps:
+      - uses: actions/checkout@v1
+      - uses: Geode-solutions/actions/clang-format@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+      
+  build-ubuntu:
+    runs-on: ubuntu-18.04
+    needs: format
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Compile
+      run: |
+        mkdir -p build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=Debug ..
+        cmake --build . -- -j2
+      
+  build-mac:
+    runs-on: macOS-10.14
+    needs: format
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Compile & Test
+      run: |
+        mkdir -p build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=Debug ..
+        cmake --build . -- -j2
+        cd opengeode
+        ctest
+      
+  build-windows:
+    runs-on: windows-2016
+    needs: format
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Compile & Test
+      run: |
+        mkdir -p build
+        cd build
+        cmake -G \"Visual Studio 15 2017 Win64\ ..
+        cmake --build . --config Debug
+        cd opengeode
+        ctest -C Debug
+        
+  semantic-release:
+    runs-on: ubuntu-18.04
+    needs: [build-ubuntu, build-mac, build-windows]
+    steps:
+    - uses: actions/checkout@v1
+    - run: npx semantic-release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    
