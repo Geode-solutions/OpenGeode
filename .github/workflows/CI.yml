@@ -35,11 +35,11 @@ jobs:
         ctest --output-on-failure
     - uses: Geode-solutions/actions/kcov@master
       with:
-        directory: $GITHUB_WORKSPACE/build/opengeode/bin
+        directory: ${{ GITHUB_WORKSPACE }}/build/opengeode/bin
     - uses: codecov/codecov-action@v1.0.2
       with: 
-        token: ${{secrets.CODECOV_TOKEN}}
-        file: $GITHUB_WORKSPACE/kcov/kcov-merged/cobertura.xml
+        token: ${{ secrets.CODECOV_TOKEN }}
+        file: ${{ GITHUB_WORKSPACE }}/kcov/kcov-merged/cobertura.xml
       
   build-mac:
     runs-on: macOS-10.14
