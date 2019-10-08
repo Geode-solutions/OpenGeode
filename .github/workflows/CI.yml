@@ -29,7 +29,7 @@ jobs:
     - name: Test
       run: |
         ls build/opengeode/install
-        ls $workspace/build/opengeode/install
+        ls $GITHUB_WORKSPACE/build/opengeode/install
         mkdir -p test
         cd test
         cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH:PATH=$workspace/build/opengeode/install ../tests
@@ -61,7 +61,7 @@ jobs:
       run: |
         mkdir -p build
         cd build
-        cmake -G \"Visual Studio 15 2017 Win64\" ..
+        cmake -G "Visual Studio 15 2017 Win64" ..
         cmake --build . --config Debug
         cd opengeode
         ctest -C Debug --output-on-failure
