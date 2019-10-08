@@ -33,7 +33,8 @@ jobs:
         cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH:PATH=$GITHUB_WORKSPACE/build/opengeode/install ../tests
         cmake --build . -- -j2
         ctest --output-on-failure
-    - run: curl -s https://raw.githubusercontent.com/Geode-solutions/actions/master/kcov/entrypoint.sh | bash -s -- ${GITHUB_WORKSPACE}/build/opengeode/bin
+    - name: Kcov
+      run: curl -s https://raw.githubusercontent.com/Geode-solutions/actions/master/kcov/entrypoint.sh | bash -s -- ${GITHUB_WORKSPACE}/build/opengeode/bin
     - uses: codecov/codecov-action@v1.0.2
       with: 
         token: ${{ secrets.CODECOV_TOKEN }}
