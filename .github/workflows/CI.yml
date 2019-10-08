@@ -28,7 +28,8 @@ jobs:
         cmake --build . -- -j2
     - name: Test
       run: |
-        ls build
+        ls build/opengeode/install
+        ls $workspace/build/opengeode/install
         mkdir -p test
         cd test
         cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH:PATH=$workspace/build/opengeode/install ../tests
