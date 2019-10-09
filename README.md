@@ -3,6 +3,7 @@
 
 <p align="center">
   <img src="https://github.com/Geode-solutions/OpenGeode/workflows/CI/badge.svg" alt="Build Status">
+  <img src="https://github.com/Geode-solutions/OpenGeode/workflows/CD/badge.svg" alt="Deploy Status">
   <img src="https://codecov.io/gh/Geode-solutions/OpenGeode/branch/master/graph/badge.svg" alt="Coverage Status">
   <img src="https://img.shields.io/github/release/Geode-solutions/OpenGeode.svg" alt="Version">
 </p>
