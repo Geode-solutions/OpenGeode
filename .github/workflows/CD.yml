@@ -1,1 +1,67 @@
+on:
+  push:
+    tags: v*
 
+jobs:      
+  release-ubuntu:
+    runs-on: ubuntu-18.04
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Generate package
+      run: |
+        mkdir -p build
+        cd build
+        version="${GITHUB_REF##*/*/}"
+        cmake -DCMAKE_BUILD_TYPE=Release -DOPENGEODE_WITH_TESTS:BOOL=OFF -DCPACK_PACKAGE_VERSION:STRING=$version ..
+        cmake --build . -- -j2
+        cd opengeode
+        cmake --build . --target package
+    - name: Upload
+      uses: softprops/action-gh-release@v1
+      with:
+        files: "*$version*"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+  build-mac:
+    runs-on: macOS-10.14
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Generate package
+      run: |
+        mkdir -p build
+        cd build
+        version="${GITHUB_REF##*/*/}"
+        cmake -DCMAKE_BUILD_TYPE=Release -DOPENGEODE_WITH_TESTS:BOOL=OFF -DCPACK_PACKAGE_VERSION:STRING=$version ..
+        cmake --build . -- -j2
+        cd opengeode
+        cmake --build . --target package
+    - name: Upload
+      uses: softprops/action-gh-release@v1
+      with:
+        files: "*$version*"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+  build-windows:
+    runs-on: windows-2016
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Generate package
+      run: |
+        mkdir -p build
+        cd build
+        version="${GITHUB_REF##*/*/}"
+        cmake -G "Visual Studio 15 2017 Win64" -DOPENGEODE_WITH_TESTS:BOOL=OFF -DCPACK_PACKAGE_VERSION:STRING=$version ..
+        cmake --build . --config Release
+        cd opengeode
+        cmake --build . --target PACKAGE --config Release
+    - name: Upload
+      uses: softprops/action-gh-release@v1
+      with:
+        files: "*$version*"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}        
