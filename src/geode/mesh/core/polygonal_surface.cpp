@@ -260,9 +260,9 @@ namespace geode
             {
                 auto polygon = polygon_adjacent( { polygon_adj, e } );
                 if( polygon == polygon_edge.polygon_id
-                    && polygon_edge_vertex( { polygon_edge.polygon_id, e }, 0 )
+                    && polygon_edge_vertex( { polygon_adj, e }, 0 )
                            == v1
-                    && polygon_edge_vertex( { polygon_edge.polygon_id, e }, 1 )
+                    && polygon_edge_vertex( { polygon_adj, e }, 1 )
                            == v0 )
                 {
                     return { polygon_adj, e };
