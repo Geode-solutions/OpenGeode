@@ -23,6 +23,12 @@ jobs:
         files: "*$version*"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Doc
+      uses: Geode-solutions/actions/doc@master
+      with:
+        directory: $GITHUB_WORKSPACE/build/opengeode
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
   release-mac:
     runs-on: macOS-10.14
