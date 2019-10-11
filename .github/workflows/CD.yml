@@ -11,6 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Generate package
+      id: package
       run: |
         mkdir -p build
         cd build
@@ -23,7 +24,7 @@ jobs:
     - name: Upload
       uses: softprops/action-gh-release@v1
       with:
-        files: "build/opengeode/OpenGeode-${{ version }}-Linux.tar.gz"
+        files: "build/opengeode/OpenGeode-${{ steps.package.outputs.version }}-Linux.tar.gz"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Doc
@@ -39,6 +40,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Generate package
+      id: package
       run: |
         mkdir -p build
         cd build
@@ -51,7 +53,7 @@ jobs:
     - name: Upload
       uses: softprops/action-gh-release@v1
       with:
-        files: "build/opengeode/OpenGeode-${{ version }}-Darwin.tar.gz"
+        files: "build/opengeode/OpenGeode-${{ steps.package.outputs.version }}-Darwin.tar.gz"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
@@ -61,6 +63,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Generate package
+      id: package
       run: |
         mkdir -p build
         cd build
@@ -73,6 +76,6 @@ jobs:
     - name: Upload
       uses: softprops/action-gh-release@v1
       with:
-        files: "build/opengeode/OpenGeode-${{ version }}-win64.zip"
+        files: "build/opengeode/OpenGeode-${{ steps.package.outputs.version }}-win64.zip"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}        
