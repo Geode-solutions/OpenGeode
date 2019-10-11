@@ -53,7 +53,7 @@ namespace geode
         TriangulatedSurface< dimension >& triangulated_surface,
         std::string filename )
         : PolygonalSurfaceInput< dimension >(
-              triangulated_surface, std::move( filename ) ),
+            triangulated_surface, std::move( filename ) ),
           triangulated_surface_( triangulated_surface )
     {
     }
