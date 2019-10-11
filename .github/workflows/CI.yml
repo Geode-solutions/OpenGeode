@@ -36,7 +36,7 @@ jobs:
         cmake --build . -- -j2
         ctest --output-on-failure
     - name: Kcov
-      run: curl -s https://raw.githubusercontent.com/Geode-solutions/actions/kcov.sh | bash -s -- ${GITHUB_WORKSPACE}/build/opengeode/bin
+      run: curl -s https://raw.githubusercontent.com/Geode-solutions/actions/master/kcov.sh | bash -s -- ${GITHUB_WORKSPACE}/build/opengeode/bin
     - uses: codecov/codecov-action@v1.0.2
       with: 
         token: ${{ secrets.CODECOV_TOKEN }}
