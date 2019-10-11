@@ -13,6 +13,7 @@ jobs:
     - name: Generate package
       id: package
       run: |
+        sudo apt install doxygen
         mkdir -p build
         cd build
         version="${GITHUB_REF##*/*/}"
