@@ -39,7 +39,7 @@ namespace
         geode::index_t polyhedron_id )
     {
         OPENGEODE_EXCEPTION( polyhedron_id < solid.nb_polyhedra(),
-            "Trying to access an invalid polyhedron" );
+            "[check_polyhedron_id] Trying to access an invalid polyhedron" );
     }
 
     template < geode::index_t dimension >
@@ -50,7 +50,8 @@ namespace
     {
         OPENGEODE_EXCEPTION(
             vertex_id < solid.nb_polyhedron_vertices( polyhedron_id ),
-            "Trying to access an invalid polyhedron vertex" );
+            "[check_polyhedron_vertex_id] Trying to access an invalid "
+            "polyhedron vertex" );
     }
 
     template < geode::index_t dimension >
@@ -61,7 +62,8 @@ namespace
     {
         OPENGEODE_EXCEPTION(
             facet_id < solid.nb_polyhedron_facets( polyhedron_id ),
-            "Trying to access an invalid polyhedron facet" );
+            "[check_polyhedron_facet_id] Trying to access an invalid "
+            "polyhedron facet" );
     }
 
     template < geode::index_t dimension >
@@ -72,8 +74,9 @@ namespace
         geode::index_t vertex_id )
     {
         OPENGEODE_EXCEPTION( vertex_id < solid.nb_polyhedron_facet_vertices(
-                                             { polyhedron_id, facet_id } ),
-            "Trying to access an invalid polyhedron facet vertex" );
+                                 { polyhedron_id, facet_id } ),
+            "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
+            "polyhedron facet vertex" );
     }
 
 } // namespace
@@ -86,10 +89,10 @@ namespace geode
     public:
         explicit Impl( PolyhedralSolid& solid )
             : polyhedron_around_vertex_(
-                  solid.vertex_attribute_manager()
-                      .template find_or_create_attribute< VariableAttribute,
-                          PolyhedronVertex >(
-                          "polyhedron_around_vertex", PolyhedronVertex{} ) )
+                solid.vertex_attribute_manager()
+                    .template find_or_create_attribute< VariableAttribute,
+                        PolyhedronVertex >(
+                        "polyhedron_around_vertex", PolyhedronVertex{} ) )
         {
         }
 
@@ -216,7 +219,7 @@ namespace geode
         {
             barycenter = barycenter
                          + this->point( polyhedron_facet_vertex(
-                               { polyhedron_facet, v } ) );
+                             { polyhedron_facet, v } ) );
         }
         return barycenter / nb_polyhedron_facet_vertices( polyhedron_facet );
     }
@@ -408,8 +411,8 @@ namespace geode
     const Point< dimension >& PolyhedralSolid< dimension >::point(
         index_t vertex_id ) const
     {
-        OPENGEODE_EXCEPTION(
-            vertex_id < nb_vertices(), "Trying to access an invalid point" );
+        OPENGEODE_EXCEPTION( vertex_id < nb_vertices(),
+            "[PolyhedralSolid::point] Trying to access an invalid point" );
         return get_point( vertex_id );
     }
 

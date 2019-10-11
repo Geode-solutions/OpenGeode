@@ -79,7 +79,8 @@ namespace geode
             auto &store = get_store();
             auto creator = store.find( key );
             OPENGEODE_EXCEPTION( creator != store.end(),
-                "Factory does not contain the requested key" );
+                "[Factory::create] Factory does not "
+                "contain the requested key" );
             return creator->second( std::forward< Args >( args )... );
         }
 

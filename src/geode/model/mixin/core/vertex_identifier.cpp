@@ -30,11 +30,11 @@ namespace geode
     public:
         Impl()
             : component_vertices_(
-                  unique_vertices_.vertex_attribute_manager()
-                      .find_or_create_attribute< VariableAttribute,
-                          std::vector< MeshComponentVertex > >(
-                          "component vertices",
-                          std::vector< MeshComponentVertex >{} ) )
+                unique_vertices_.vertex_attribute_manager()
+                    .find_or_create_attribute< VariableAttribute,
+                        std::vector< MeshComponentVertex > >(
+                        "component vertices",
+                        std::vector< MeshComponentVertex >{} ) )
         {
         }
 
@@ -65,7 +65,8 @@ namespace geode
                 OPENGEODE_EXCEPTION(
                     !mesh.vertex_attribute_manager().attribute_exists(
                         "unique_vertices" ),
-                    "At component registration, no attribute called "
+                    "[VertexIdentifier::register_component] At component "
+                    "registration, no attribute called "
                     "\"unique_vertices\" should exists on component mesh. " );
                 vertex2unique_vertex_.emplace( component.id(),
                     mesh.vertex_attribute_manager()
@@ -158,7 +159,8 @@ namespace geode
             archive.object( *this );
             archive.adapter().flush();
             OPENGEODE_EXCEPTION( std::get< 1 >( context ).isValid(),
-                "Error while writing file: " + filename );
+                "[VertexIdentifier::save] Error while writing file: "
+                    + filename );
             return filename;
         }
 
@@ -177,7 +179,8 @@ namespace geode
                 adapter.error() == bitsery::ReaderError::NoError
                     && adapter.isCompletedSuccessfully()
                     && std::get< 1 >( context ).isValid(),
-                "Error while reading file: " + filename );
+                "[VertexIdentifier::load] Error while reading file: "
+                    + filename );
         }
 
     private:

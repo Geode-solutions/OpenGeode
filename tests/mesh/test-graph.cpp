@@ -34,10 +34,10 @@ void test_create_vertices(
 {
     builder.create_vertex();
     OPENGEODE_EXCEPTION(
-        graph.nb_vertices() == 1, "Graph should have 1 vertex" );
+        graph.nb_vertices() == 1, "[Test] Graph should have 1 vertex" );
     builder.create_vertices( 3 );
     OPENGEODE_EXCEPTION(
-        graph.nb_vertices() == 4, "Graph should have 4 vertices" );
+        graph.nb_vertices() == 4, "[Test] Graph should have 4 vertices" );
 }
 
 void test_delete_vertex(
@@ -47,24 +47,25 @@ void test_delete_vertex(
     to_delete.front() = true;
     builder.delete_vertices( to_delete );
     OPENGEODE_EXCEPTION(
-        graph.nb_vertices() == 3, "Graph should have 3 vertices" );
-    OPENGEODE_EXCEPTION( graph.nb_edges() == 2, "Graph should have 2 edges" );
+        graph.nb_vertices() == 3, "[Test] Graph should have 3 vertices" );
+    OPENGEODE_EXCEPTION(
+        graph.nb_edges() == 2, "[Test] Graph should have 2 edges" );
 
     const auto& edges_around_0 = graph.edges_around_vertex( 0 );
-    OPENGEODE_EXCEPTION(
-        edges_around_0.size() == 1, "edges_around_0 should have 1 edge" );
-    OPENGEODE_EXCEPTION(
-        edges_around_0[0].edge_id == 1, "edges_around_0 has wrong value" );
-    OPENGEODE_EXCEPTION(
-        edges_around_0[0].vertex_id == 0, "edges_around_0 has wrong value" );
+    OPENGEODE_EXCEPTION( edges_around_0.size() == 1,
+        "[Test] edges_around_0 should have 1 edge" );
+    OPENGEODE_EXCEPTION( edges_around_0[0].edge_id == 1,
+        "[Test] edges_around_0 has wrong value" );
+    OPENGEODE_EXCEPTION( edges_around_0[0].vertex_id == 0,
+        "[Test] edges_around_0 has wrong value" );
 
     const auto& edges_around_2 = graph.edges_around_vertex( 2 );
-    OPENGEODE_EXCEPTION(
-        edges_around_2.size() == 1, "edges_around_2 should have 1 edge" );
-    OPENGEODE_EXCEPTION(
-        edges_around_2[0].edge_id == 0, "edges_around_2 has wrong value" );
-    OPENGEODE_EXCEPTION(
-        edges_around_2[0].vertex_id == 0, "edges_around_2 has wrong value" );
+    OPENGEODE_EXCEPTION( edges_around_2.size() == 1,
+        "[Test] edges_around_2 should have 1 edge" );
+    OPENGEODE_EXCEPTION( edges_around_2[0].edge_id == 0,
+        "[Test] edges_around_2 has wrong value" );
+    OPENGEODE_EXCEPTION( edges_around_2[0].vertex_id == 0,
+        "[Test] edges_around_2 has wrong value" );
 }
 
 void test_create_edges(
@@ -74,35 +75,36 @@ void test_create_edges(
     builder.create_edge( 0, 2 );
     builder.create_edge( 3, 2 );
     builder.create_edge( 1, 2 );
-    OPENGEODE_EXCEPTION( graph.nb_edges() == 4, "Graph should have 4 edges" );
+    OPENGEODE_EXCEPTION(
+        graph.nb_edges() == 4, "[Test] Graph should have 4 edges" );
 
     const auto& edges_around_0 = graph.edges_around_vertex( 0 );
-    OPENGEODE_EXCEPTION(
-        edges_around_0.size() == 2, "edges_around_0 should have 2 edges" );
-    OPENGEODE_EXCEPTION(
-        edges_around_0[0].edge_id == 0, "edges_around_0 has wrong value" );
-    OPENGEODE_EXCEPTION(
-        edges_around_0[0].vertex_id == 0, "edges_around_0 has wrong value" );
-    OPENGEODE_EXCEPTION(
-        edges_around_0[1].edge_id == 1, "edges_around_0 has wrong value" );
-    OPENGEODE_EXCEPTION(
-        edges_around_0[1].vertex_id == 0, "edges_around_0 has wrong value" );
+    OPENGEODE_EXCEPTION( edges_around_0.size() == 2,
+        "[Test] edges_around_0 should have 2 edges" );
+    OPENGEODE_EXCEPTION( edges_around_0[0].edge_id == 0,
+        "[Test] edges_around_0 has wrong value" );
+    OPENGEODE_EXCEPTION( edges_around_0[0].vertex_id == 0,
+        "[Test] edges_around_0 has wrong value" );
+    OPENGEODE_EXCEPTION( edges_around_0[1].edge_id == 1,
+        "[Test] edges_around_0 has wrong value" );
+    OPENGEODE_EXCEPTION( edges_around_0[1].vertex_id == 0,
+        "[Test] edges_around_0 has wrong value" );
 
     const auto& edges_around_2 = graph.edges_around_vertex( 2 );
-    OPENGEODE_EXCEPTION(
-        edges_around_2.size() == 3, "edges_around_2 should have 3 edges" );
-    OPENGEODE_EXCEPTION(
-        edges_around_2[0].edge_id == 1, "edges_around_2 has wrong value" );
-    OPENGEODE_EXCEPTION(
-        edges_around_2[0].vertex_id == 1, "edges_around_2 has wrong value" );
-    OPENGEODE_EXCEPTION(
-        edges_around_2[1].edge_id == 2, "edges_around_2 has wrong value" );
-    OPENGEODE_EXCEPTION(
-        edges_around_2[1].vertex_id == 1, "edges_around_2 has wrong value" );
-    OPENGEODE_EXCEPTION(
-        edges_around_2[2].edge_id == 3, "edges_around_2 has wrong value" );
-    OPENGEODE_EXCEPTION(
-        edges_around_2[2].vertex_id == 1, "edges_around_2 has wrong value" );
+    OPENGEODE_EXCEPTION( edges_around_2.size() == 3,
+        "[Test] edges_around_2 should have 3 edges" );
+    OPENGEODE_EXCEPTION( edges_around_2[0].edge_id == 1,
+        "[Test] edges_around_2 has wrong value" );
+    OPENGEODE_EXCEPTION( edges_around_2[0].vertex_id == 1,
+        "[Test] edges_around_2 has wrong value" );
+    OPENGEODE_EXCEPTION( edges_around_2[1].edge_id == 2,
+        "[Test] edges_around_2 has wrong value" );
+    OPENGEODE_EXCEPTION( edges_around_2[1].vertex_id == 1,
+        "[Test] edges_around_2 has wrong value" );
+    OPENGEODE_EXCEPTION( edges_around_2[2].edge_id == 3,
+        "[Test] edges_around_2 has wrong value" );
+    OPENGEODE_EXCEPTION( edges_around_2[2].vertex_id == 1,
+        "[Test] edges_around_2 has wrong value" );
 }
 
 void test_delete_edge( const geode::Graph& graph, geode::GraphBuilder& builder )
@@ -110,18 +112,21 @@ void test_delete_edge( const geode::Graph& graph, geode::GraphBuilder& builder )
     std::vector< bool > to_delete( graph.nb_edges(), false );
     to_delete.front() = true;
     builder.delete_edges( to_delete );
-    OPENGEODE_EXCEPTION( graph.nb_edges() == 1, "Graph should have 1 edge" );
+    OPENGEODE_EXCEPTION(
+        graph.nb_edges() == 1, "[Test] Graph should have 1 edge" );
     OPENGEODE_EXCEPTION( graph.edge_vertex( { 0, 0 } ) == 0,
-        "Graph edge vertex index is not correct" );
+        "[Test] Graph edge vertex index is not correct" );
     OPENGEODE_EXCEPTION( graph.edge_vertex( { 0, 1 } ) == 1,
-        "Graph edge vertex index is not correct" );
+        "[Test] Graph edge vertex index is not correct" );
 
     builder.create_edges( 10 );
-    OPENGEODE_EXCEPTION( graph.nb_edges() == 11, "Graph should have 11 edges" );
+    OPENGEODE_EXCEPTION(
+        graph.nb_edges() == 11, "[Test] Graph should have 11 edges" );
 
     to_delete.resize( graph.nb_edges(), true );
     builder.delete_edges( to_delete );
-    OPENGEODE_EXCEPTION( graph.nb_edges() == 1, "Graph should have 1 edge" );
+    OPENGEODE_EXCEPTION(
+        graph.nb_edges() == 1, "[Test] Graph should have 1 edge" );
 }
 
 void test_io( const geode::Graph& graph, const std::string& filename )
@@ -154,7 +159,7 @@ int main()
         auto default_graph = Graph::create();
         OPENGEODE_EXCEPTION(
             default_graph->type_name() == OpenGeodeGraph::type_name_static(),
-            "Default type for Graph should be OpenGeodeGraph" );
+            "[Test] Default type for Graph should be OpenGeodeGraph" );
 
         Logger::info( "TEST SUCCESS" );
         return 0;

@@ -59,9 +59,9 @@ namespace geode
 
         Impl()
             : relation_type_(
-                  graph_.edge_attribute_manager()
-                      .find_or_create_attribute< VariableAttribute,
-                          RelationType >( "relation_type", NO_ID ) ),
+                graph_.edge_attribute_manager()
+                    .find_or_create_attribute< VariableAttribute,
+                        RelationType >( "relation_type", NO_ID ) ),
               uuids_( graph_.vertex_attribute_manager()
                           .find_or_create_attribute< VariableAttribute, uuid >(
                               "uuid", uuid{} ) )
@@ -174,7 +174,7 @@ namespace geode
             archive.object( *this );
             archive.adapter().flush();
             OPENGEODE_EXCEPTION( std::get< 1 >( context ).isValid(),
-                "Error while writing file: " + filename );
+                "[Relationships::save] Error while writing file: " + filename );
             return filename;
         }
 
@@ -193,7 +193,7 @@ namespace geode
                 adapter.error() == bitsery::ReaderError::NoError
                     && adapter.isCompletedSuccessfully()
                     && std::get< 1 >( context ).isValid(),
-                "Error while reading file: " + filename );
+                "[Relationships::load] Error while reading file: " + filename );
         }
 
     private:
@@ -405,7 +405,7 @@ namespace geode
             while( this->operator!=( *this )
                    && ( !relationships_.is_boundary_relation(
                             this->current()->edge_id )
-                          || is_boundary_edge_vertex() ) )
+                        || is_boundary_edge_vertex() ) )
             {
                 this->operator++();
             }
@@ -418,8 +418,8 @@ namespace geode
     Relationships::BoundaryRange::BoundaryRange(
         const Relationships& relationships, const uuid& id )
         : impl_( *relationships.impl_,
-              relationships.impl_->begin_edge( id ),
-              relationships.impl_->end_edge( id ) )
+            relationships.impl_->begin_edge( id ),
+            relationships.impl_->end_edge( id ) )
     {
     }
 
@@ -492,7 +492,7 @@ namespace geode
             while( this->operator!=( *this )
                    && ( !relationships_.is_boundary_relation(
                             this->current()->edge_id )
-                          || is_incident_edge_vertex() ) )
+                        || is_incident_edge_vertex() ) )
             {
                 this->operator++();
             }
@@ -505,8 +505,8 @@ namespace geode
     Relationships::IncidenceRange::IncidenceRange(
         const Relationships& relationships, const uuid& id )
         : impl_( *relationships.impl_,
-              relationships.impl_->begin_edge( id ),
-              relationships.impl_->end_edge( id ) )
+            relationships.impl_->begin_edge( id ),
+            relationships.impl_->end_edge( id ) )
     {
     }
 
@@ -579,7 +579,7 @@ namespace geode
             while( this->operator!=( *this )
                    && ( !relationships_.is_internal_relation(
                             this->current()->edge_id )
-                          || is_internal_edge_vertex() ) )
+                        || is_internal_edge_vertex() ) )
             {
                 this->operator++();
             }
@@ -592,8 +592,8 @@ namespace geode
     Relationships::InternalRange::InternalRange(
         const Relationships& relationships, const uuid& id )
         : impl_( *relationships.impl_,
-              relationships.impl_->begin_edge( id ),
-              relationships.impl_->end_edge( id ) )
+            relationships.impl_->begin_edge( id ),
+            relationships.impl_->end_edge( id ) )
     {
     }
 
@@ -666,7 +666,7 @@ namespace geode
             while( this->operator!=( *this )
                    && ( !relationships_.is_internal_relation(
                             this->current()->edge_id )
-                          || is_embedding_edge_vertex() ) )
+                        || is_embedding_edge_vertex() ) )
             {
                 this->operator++();
             }
@@ -679,8 +679,8 @@ namespace geode
     Relationships::EmbeddingRange::EmbeddingRange(
         const Relationships& relationships, const uuid& id )
         : impl_( *relationships.impl_,
-              relationships.impl_->begin_edge( id ),
-              relationships.impl_->end_edge( id ) )
+            relationships.impl_->begin_edge( id ),
+            relationships.impl_->end_edge( id ) )
     {
     }
 
@@ -753,7 +753,7 @@ namespace geode
             while( this->operator!=( *this )
                    && ( !relationships_.is_item_relation(
                             this->current()->edge_id )
-                          || is_item_edge_vertex() ) )
+                        || is_item_edge_vertex() ) )
             {
                 this->operator++();
             }
@@ -766,8 +766,8 @@ namespace geode
     Relationships::ItemRange::ItemRange(
         const Relationships& relationships, const uuid& id )
         : impl_( *relationships.impl_,
-              relationships.impl_->begin_edge( id ),
-              relationships.impl_->end_edge( id ) )
+            relationships.impl_->begin_edge( id ),
+            relationships.impl_->end_edge( id ) )
     {
     }
 
@@ -839,7 +839,7 @@ namespace geode
             while( this->operator!=( *this )
                    && ( !relationships_.is_item_relation(
                             this->current()->edge_id )
-                          || is_collection_edge_vertex() ) )
+                        || is_collection_edge_vertex() ) )
             {
                 this->operator++();
             }
@@ -852,8 +852,8 @@ namespace geode
     Relationships::CollectionRange::CollectionRange(
         const Relationships& relationships, const uuid& id )
         : impl_( *relationships.impl_,
-              relationships.impl_->begin_edge( id ),
-              relationships.impl_->end_edge( id ) )
+            relationships.impl_->begin_edge( id ),
+            relationships.impl_->end_edge( id ) )
     {
     }
 

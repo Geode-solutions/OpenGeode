@@ -28,26 +28,28 @@ void test_length()
 {
     geode::Vector3D p{ { 1, 2, 4 } };
     OPENGEODE_EXCEPTION(
-        p.length() == std::sqrt( 1 + 4 + 16 ), "Wrong vector length" );
+        p.length() == std::sqrt( 1 + 4 + 16 ), "[Test] Wrong vector length" );
 
     auto p_normalized = p.normalize();
-    OPENGEODE_EXCEPTION( p_normalized.length() == 1, "Wrong vector length" );
+    OPENGEODE_EXCEPTION(
+        p_normalized.length() == 1, "[Test] Wrong vector length" );
 }
 
 void test_operations()
 {
     geode::Vector3D unit{ { 0, 2, 0 } };
     geode::Vector3D p{ { 1, 2, 4 } };
-    OPENGEODE_EXCEPTION( p.dot( unit ) == 4, "Wrong dot product" );
+    OPENGEODE_EXCEPTION( p.dot( unit ) == 4, "[Test] Wrong dot product" );
 
     auto cross_unit =
         geode::Vector3D{ { 1, 0, 0 } }.cross( geode::Vector3D{ { 0, 1, 0 } } );
     geode::Vector3D answer_unit{ { 0, 0, 1 } };
     OPENGEODE_EXCEPTION(
-        cross_unit == answer_unit, "Wrong unit cross product" );
+        cross_unit == answer_unit, "[Test] Wrong unit cross product" );
 
     geode::Vector3D answer{ { -8, 0, 2 } };
-    OPENGEODE_EXCEPTION( p.cross( unit ) == answer, "Wrong cross product" );
+    OPENGEODE_EXCEPTION(
+        p.cross( unit ) == answer, "[Test] Wrong cross product" );
 }
 
 int main()

@@ -163,13 +163,16 @@ namespace geode
     {
         OPENGEODE_EXCEPTION(
             polygon_vertex.polygon_id < polygonal_surface_.nb_polygons(),
-            "Accessing a polygon that does not exist" );
+            "[PolygonalSurfaceBuilder::set_polygon_vertex] Accessing a polygon "
+            "that does not exist" );
         OPENGEODE_EXCEPTION(
             polygon_vertex.vertex_id < polygonal_surface_.nb_polygon_vertices(
-                                           polygon_vertex.polygon_id ),
-            "Accessing an invalid polygon vertex" );
+                polygon_vertex.polygon_id ),
+            "[PolygonalSurfaceBuilder::set_polygon_vertex] Accessing an "
+            "invalid polygon vertex" );
         OPENGEODE_EXCEPTION( vertex_id < polygonal_surface_.nb_vertices(),
-            "Accessing a vertex that does not exist" );
+            "[PolygonalSurfaceBuilder::set_polygon_vertex] Accessing a vertex "
+            "that does not exist" );
         associate_polygon_vertex_to_vertex( polygon_vertex, vertex_id );
         do_set_polygon_vertex( polygon_vertex, vertex_id );
     }
@@ -189,14 +192,17 @@ namespace geode
     {
         OPENGEODE_EXCEPTION(
             polygon_edge.polygon_id < polygonal_surface_.nb_polygons(),
-            "Accessing a polygon that does not exist" );
+            "[PolygonalSurfaceBuilder::set_polygon_adjacent] Accessing a "
+            "polygon that does not exist" );
         OPENGEODE_EXCEPTION(
             polygon_edge.edge_id < polygonal_surface_.nb_polygon_edges(
-                                       polygon_edge.polygon_id ),
-            "Accessing an invalid polygon vertex" );
+                polygon_edge.polygon_id ),
+            "[PolygonalSurfaceBuilder::set_polygon_adjacent] Accessing an "
+            "invalid polygon vertex" );
         OPENGEODE_EXCEPTION( adjacent_id < polygonal_surface_.nb_polygons()
                                  || adjacent_id == NO_ID,
-            "Accessing a polygon that does not exist" );
+            "[PolygonalSurfaceBuilder::set_polygon_adjacent] Accessing a "
+            "polygon that does not exist" );
         do_set_polygon_adjacent( polygon_edge, adjacent_id );
     }
 
@@ -278,7 +284,8 @@ namespace geode
         index_t vertex_id, const Point< dimension >& point )
     {
         OPENGEODE_EXCEPTION( vertex_id < polygonal_surface_.nb_vertices(),
-            "Accessing a vertex that does not exist" );
+            "[PolygonalSurfaceBuilder::set_point] Accessing a vertex that does "
+            "not exist" );
         do_set_point( vertex_id, point );
     }
 

@@ -41,14 +41,13 @@ namespace geode
     public:
         explicit Impl( Graph& graph )
             : edges_around_vertex_(
-                  graph.vertex_attribute_manager()
-                      .template find_or_create_attribute< VariableAttribute,
-                          std::vector< EdgeVertex > >(
-                          "edges_around_vertex", [] {
-                              std::vector< EdgeVertex > edges;
-                              edges.reserve( 2 );
-                              return edges;
-                          }() ) )
+                graph.vertex_attribute_manager()
+                    .template find_or_create_attribute< VariableAttribute,
+                        std::vector< EdgeVertex > >( "edges_around_vertex", [] {
+                        std::vector< EdgeVertex > edges;
+                        edges.reserve( 2 );
+                        return edges;
+                    }() ) )
         {
         }
 
@@ -129,9 +128,10 @@ namespace geode
     index_t Graph::edge_vertex( const EdgeVertex& edge_vertex ) const
     {
         OPENGEODE_EXCEPTION( edge_vertex.edge_id < nb_edges(),
-            "Trying to access an invalid edge" );
+            "[Graph::edge_vertex] Trying to access an invalid edge" );
         OPENGEODE_EXCEPTION( edge_vertex.vertex_id < 2,
-            "Trying to access an invalid edge local vertex" );
+            "[Graph::edge_vertex] Trying to access "
+            "an invalid edge local vertex" );
         return get_edge_vertex( edge_vertex );
     }
 
@@ -143,8 +143,8 @@ namespace geode
     const std::vector< EdgeVertex >& Graph::edges_around_vertex(
         index_t vertex_id ) const
     {
-        OPENGEODE_EXCEPTION(
-            vertex_id < this->nb_vertices(), "Accessing an invalid vertex" );
+        OPENGEODE_EXCEPTION( vertex_id < this->nb_vertices(),
+            "[Graph::edges_around_vertex] Accessing an invalid vertex" );
         return impl_->edges_around_vertex( vertex_id );
     }
 

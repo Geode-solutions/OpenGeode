@@ -96,35 +96,35 @@ void test_uuid( const geode::Relationships& relations,
     geode::index_t nb_items,
     geode::index_t nb_collections )
 {
-    std::string message_boundary = uuid.string() + " should have "
+    std::string message_boundary = "[Test] " + uuid.string() + " should have "
                                    + std::to_string( nb_boundaries )
                                    + " boundary(ies)";
     OPENGEODE_EXCEPTION(
         relations.nb_boundaries( uuid ) == nb_boundaries, message_boundary );
 
-    std::string message_incidence = uuid.string() + " should have "
+    std::string message_incidence = "[Test] " + uuid.string() + " should have "
                                     + std::to_string( nb_incidences )
                                     + " incidence(s)";
     OPENGEODE_EXCEPTION(
         relations.nb_incidences( uuid ) == nb_incidences, message_incidence );
 
-    std::string message_internal = uuid.string() + " should have "
+    std::string message_internal = "[Test] " + uuid.string() + " should have "
                                    + std::to_string( nb_internals )
                                    + " internal component(s)";
     OPENGEODE_EXCEPTION(
         relations.nb_internals( uuid ) == nb_internals, message_internal );
 
-    std::string message_embedding = uuid.string() + " should have "
+    std::string message_embedding = "[Test] " + uuid.string() + " should have "
                                     + std::to_string( nb_embeddings )
                                     + " embedding(s)";
     OPENGEODE_EXCEPTION(
         relations.nb_embeddings( uuid ) == nb_embeddings, message_embedding );
 
-    std::string message_item = uuid.string() + " should have "
+    std::string message_item = "[Test] " + uuid.string() + " should have "
                                + std::to_string( nb_boundaries ) + " item(s)";
     OPENGEODE_EXCEPTION( relations.nb_items( uuid ) == nb_items, message_item );
 
-    std::string message_collection = uuid.string() + " should have "
+    std::string message_collection = "[Test] " + uuid.string() + " should have "
                                      + std::to_string( nb_collections )
                                      + " collection(s)";
     OPENGEODE_EXCEPTION( relations.nb_collections( uuid ) == nb_collections,

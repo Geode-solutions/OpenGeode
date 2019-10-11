@@ -34,26 +34,26 @@ void test_default_vertex_set( const geode::VertexSet& vertex_set )
 {
     auto type_static = geode::OpenGeodeVertexSet::type_name_static();
     OPENGEODE_EXCEPTION( vertex_set.type_name() == type_static,
-        "VertexSet type name is not correct" );
+        "[Test] VertexSet type name is not correct" );
 
     auto extension_static =
         geode::OpenGeodeVertexSet::native_extension_static();
     OPENGEODE_EXCEPTION( vertex_set.native_extension() == extension_static,
-        "VertexSet native extension is not correct" );
+        "[Test] VertexSet native extension is not correct" );
 
     OPENGEODE_EXCEPTION( vertex_set.nb_vertices() == 0,
-        "Default VertexSet should have no vertex" );
+        "[Test] Default VertexSet should have no vertex" );
 }
 
 void test_create_vertices(
     const geode::VertexSet& vertex_set, geode::VertexSetBuilder& builder )
 {
     builder.create_vertex();
-    OPENGEODE_EXCEPTION(
-        vertex_set.nb_vertices() == 1, "VertexSet should have 1 vertex" );
+    OPENGEODE_EXCEPTION( vertex_set.nb_vertices() == 1,
+        "[Test] VertexSet should have 1 vertex" );
     builder.create_vertices( 5 );
-    OPENGEODE_EXCEPTION(
-        vertex_set.nb_vertices() == 6, "VertexSet should have 6 vertices" );
+    OPENGEODE_EXCEPTION( vertex_set.nb_vertices() == 6,
+        "[Test] VertexSet should have 6 vertices" );
 }
 
 void test_delete_vertex(
@@ -62,8 +62,8 @@ void test_delete_vertex(
     std::vector< bool > to_delete( vertex_set.nb_vertices(), false );
     to_delete.front() = true;
     builder.delete_vertices( to_delete );
-    OPENGEODE_EXCEPTION(
-        vertex_set.nb_vertices() == 5, "VertexSet should have 5 vertices" );
+    OPENGEODE_EXCEPTION( vertex_set.nb_vertices() == 5,
+        "[Test] VertexSet should have 5 vertices" );
 }
 
 int main()
