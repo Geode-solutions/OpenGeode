@@ -1,0 +1,84 @@
+name: CI
+
+on: 
+  push:
+  pull_request:
+  schedule:
+    - cron: 0 0 * * *
+
+jobs:
+  format:
+    runs-on: ubuntu-18.04
+    
+    steps:
+      - uses: actions/checkout@v1
+      - uses: Geode-solutions/actions/clang-format@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+      
+  build-ubuntu:
+    runs-on: ubuntu-18.04
+    needs: format
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Compile
+      run: |
+        mkdir -p build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=Debug ..
+        cmake --build . -- -j2
+    - name: Test
+      run: |
+        mkdir -p test
+        cd test
+        cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH:PATH=$GITHUB_WORKSPACE/build/opengeode/install ../tests
+        cmake --build . -- -j2
+        ctest --output-on-failure
+    - name: Kcov
+      run: curl -s https://raw.githubusercontent.com/Geode-solutions/actions/master/kcov.sh | bash -s -- ${GITHUB_WORKSPACE}/build/opengeode/bin
+    - uses: codecov/codecov-action@v1.0.2
+      with: 
+        token: ${{ secrets.CODECOV_TOKEN }}
+        file: kcov/kcov-merged/cobertura.xml
+      
+  build-mac:
+    runs-on: macOS-10.14
+    needs: format
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Compile & Test
+      run: |
+        mkdir -p build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=Debug ..
+        cmake --build . -- -j2
+        cd opengeode
+        ctest --output-on-failure
+      
+  build-windows:
+    runs-on: windows-2016
+    needs: format
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Compile & Test
+      run: |
+        mkdir -p build
+        cd build
+        cmake -G "Visual Studio 15 2017 Win64" ..
+        cmake --build . --config Debug
+        cd opengeode
+        ctest -C Debug --output-on-failure
+        
+  semantic-release:
+    runs-on: ubuntu-18.04
+    needs: [build-ubuntu, build-mac, build-windows]
+    steps:
+    - uses: actions/checkout@v1
+    - run: npx semantic-release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    
