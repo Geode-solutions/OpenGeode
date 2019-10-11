@@ -79,6 +79,6 @@ jobs:
     - uses: actions/checkout@v1
     - run: npx semantic-release
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.TOKEN }}
         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     
