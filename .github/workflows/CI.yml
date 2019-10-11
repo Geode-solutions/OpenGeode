@@ -2,7 +2,6 @@ name: CI
 
 on: 
   push:
-    tags: '!v*'
   pull_request:
   schedule:
     - cron: 0 0 * * *
