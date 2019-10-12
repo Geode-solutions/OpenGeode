@@ -31,7 +31,7 @@ jobs:
     - name: Doc
       uses: Geode-solutions/actions/doc@master
       with:
-        directory: build/opengeode
+        directory: OpenGeode/build/opengeode
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
