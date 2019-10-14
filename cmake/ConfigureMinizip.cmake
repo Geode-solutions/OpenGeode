@@ -18,13 +18,18 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+find_package(Iconv QUIET)
+if(NOT Iconv_FOUND)
+    cmake_minimum_required(3.11)
+endif()
+
 set(MINIZIP_PATH ${PROJECT_BINARY_DIR}/third_party/minizip)
 set(MINIZIP_INSTALL_PREFIX ${MINIZIP_PATH}/install)
 ExternalProject_Add(minizip
     PREFIX ${MINIZIP_PATH}
     BINARY_DIR ${MINIZIP_PATH}/src/minizip
     GIT_REPOSITORY https://github.com/nmoinvaz/minizip
-    GIT_TAG 68d2dbe5e2a054efe2bb212b887f233c52d82d3d
+    GIT_TAG 6f9a9c6b1117def0c88944b607c3cd8251d68729
     CMAKE_GENERATOR ${CMAKE_GENERATOR}
     CMAKE_GENERATOR_PLATFORM ${CMAKE_GENERATOR_PLATFORM}
     CMAKE_ARGS
