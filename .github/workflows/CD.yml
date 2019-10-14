@@ -29,7 +29,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Doc
-      run: curl -s https://raw.githubusercontent.com/Geode-solutions/actions/master/doc/entrypoint.sh | bash -s -- ${GITHUB_WORKSPACE}/build/opengeode
+      run: curl -s https://raw.githubusercontent.com/Geode-solutions/actions/master/doc/doc.sh | bash -s -- ${GITHUB_WORKSPACE}/build/opengeode
       env:
         GITHUB_TOKEN: ${{ secrets.TOKEN }}
       
