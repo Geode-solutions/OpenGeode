@@ -29,11 +29,9 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Doc
-      uses: Geode-solutions/actions/doc@master
-      with:
-        directory: OpenGeode/build/opengeode
+      run: curl -s https://raw.githubusercontent.com/Geode-solutions/actions/master/doc/entrypoint.sh | bash -s -- ${GITHUB_WORKSPACE}/build/opengeode
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.TOKEN }}
       
   release-mac:
     runs-on: macOS-10.14
