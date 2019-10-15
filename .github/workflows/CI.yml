@@ -19,6 +19,9 @@ jobs:
   build-ubuntu:
     runs-on: ubuntu-18.04
     needs: format
+    strategy:
+      matrix:
+        compiler: [g++, clang++]
 
     steps:
     - uses: actions/checkout@v1
@@ -28,6 +31,8 @@ jobs:
         cd build
         cmake -DCMAKE_BUILD_TYPE=Debug ..
         cmake --build . -- -j2
+      env:
+        CXX: ${{ matrix.compiler }}
     - name: Test
       run: |
         mkdir -p test
@@ -37,6 +42,7 @@ jobs:
         ctest --output-on-failure
     - name: Kcov
       run: curl -s https://raw.githubusercontent.com/Geode-solutions/actions/master/kcov.sh | bash -s -- ${GITHUB_WORKSPACE}/build/opengeode/bin
+      if: matrix.compiler == 'g++'
     - uses: codecov/codecov-action@v1.0.2
       with: 
         token: ${{ secrets.CODECOV_TOKEN }}
@@ -45,6 +51,9 @@ jobs:
   build-mac:
     runs-on: macOS-10.14
     needs: format
+    strategy:
+      matrix:
+        cmake_args: ['-DCMAKE_BUILD_TYPE=Debug', '-G Xcode']
 
     steps:
     - uses: actions/checkout@v1
@@ -52,8 +61,8 @@ jobs:
       run: |
         mkdir -p build
         cd build
-        cmake -DCMAKE_BUILD_TYPE=Debug ..
-        cmake --build . -- -j2
+        cmake ${{ matrix.cmake_args }} ..
+        cmake --build . --config Debug
         cd opengeode
         ctest --output-on-failure
       
