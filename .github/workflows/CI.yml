@@ -56,7 +56,7 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
         file: kcov/kcov-merged/cobertura.xml
     - name: Notify slack
-      if: failure()
+      if: failure() && github.ref == 'refs/heads/master'
       env:
         SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       uses: pullreminders/slack-action@master
@@ -81,7 +81,7 @@ jobs:
         cd opengeode
         ctest -C Debug --output-on-failure
     - name: Notify slack
-      if: failure()
+      if: failure() && github.ref == 'refs/heads/master'
       env:
         SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       uses: pullreminders/slack-action@master
@@ -103,7 +103,7 @@ jobs:
         cd opengeode
         ctest -C Debug --output-on-failure
     - name: Notify slack
-      if: failure()
+      if: failure() && github.ref == 'refs/heads/master'
       env:
         SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       uses: pullreminders/slack-action@master
