@@ -49,7 +49,7 @@ jobs:
         ctest --output-on-failure
     - name: Kcov
       run: curl -s https://raw.githubusercontent.com/Geode-solutions/actions/master/kcov.sh | bash -s -- ${GITHUB_WORKSPACE}/build/opengeode/bin
-      if: matrix.cc == g++
+      if: matrix.cc == 'gcc'
     - uses: codecov/codecov-action@v1.0.2
       with: 
         token: ${{ secrets.CODECOV_TOKEN }}
