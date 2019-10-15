@@ -9,6 +9,7 @@ on:
 jobs:
   format:
     runs-on: ubuntu-18.04
+    if: github.event_name == 'push'
     
     steps:
       - uses: actions/checkout@v1
@@ -49,8 +50,9 @@ jobs:
         ctest --output-on-failure
     - name: Kcov
       run: curl -s https://raw.githubusercontent.com/Geode-solutions/actions/master/kcov.sh | bash -s -- ${GITHUB_WORKSPACE}/build/opengeode/bin
-      if: matrix.cc == 'gcc'
+      if: matrix.cc == 'gcc' && github.event_name == 'pull_request'
     - uses: codecov/codecov-action@v1.0.2
+      if: matrix.cc == 'gcc' && github.event_name == 'pull_request'
       with: 
         token: ${{ secrets.CODECOV_TOKEN }}
         file: kcov/kcov-merged/cobertura.xml
@@ -71,7 +73,7 @@ jobs:
         cmake ${{ matrix.cmake_args }} ..
         cmake --build . --config Debug
         cd opengeode
-        ctest --output-on-failure
+        ctest -C Debug --output-on-failure
       
   build-windows:
     runs-on: windows-2016
