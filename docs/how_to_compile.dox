@@ -44,7 +44,7 @@ OpenGeode comes with a CMake configuration file. You can modified two items:
 * `CMAKE_BUILD_TYPE`: choose build configuration (Release, Debug). By default Release.
 * `OPENGEODE_WITH_TESTS`: switch on/off the OpenGeode test environment
 
-Your version of CMake should be at least 3.7.2.
+Your version of CMake should be at least 3.7.2 (3.11 for MacOS Mojave and above users).
 
 ## Compiler
 
@@ -104,7 +104,14 @@ If you want to use Xcode, we suggest you to use CMake GUI interface to select Xc
 
 ### Compilation
 
-1. Run `make` command in the build directory.
+#### Without Xcode (Clang in command line)
+Run `make` command in the build directory.
+
+#### With Xcode
+* Open the project "SuperBuild.xcodeproj" with Xcode: `open SuperBuild.xcodeproj`, and then compile using the graphical interface.
+
+Or, you can directly compile with the terminal: `xcodebuild -project SuperBuild.xcodeproj -alltargets -configuration Release`.
+Replace "Release" by "Debug" to compile in debug mode.
 
 Now you are ready to work with OpenGeode.
 
