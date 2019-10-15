@@ -103,10 +103,10 @@ namespace geode
     public:
         explicit Impl( PolygonalSurfaceBase& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) )
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
@@ -410,6 +410,9 @@ namespace geode
         {
             return polygons;
         }
+        OPENGEODE_ASSERT( polygon_vertex( first_polygon ) == vertex_id,
+            "[PolygonalSurfaceBase::polygons_around_vertex] Wrong polygon "
+            "around vertex" );
         std::vector< index_t > polygons_visited;
         polygons_visited.reserve( 10 );
         std::stack< PolygonVertex > S;
