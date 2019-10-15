@@ -9,7 +9,6 @@ on:
 jobs:
   format:
     runs-on: ubuntu-18.04
-    if: github.event_name == 'push'
     
     steps:
       - uses: actions/checkout@v1
