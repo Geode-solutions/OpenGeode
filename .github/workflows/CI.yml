@@ -55,6 +55,13 @@ jobs:
       with: 
         token: ${{ secrets.CODECOV_TOKEN }}
         file: kcov/kcov-merged/cobertura.xml
+    - name: Notify slack
+      if: failure()
+      env:
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      uses: pullreminders/slack-action@master
+      with:
+        args: '{\"channel\":\"CLJ1PS7UN\",\"text\":\"Compilation or Testing failed for OpenGeode on Ubuntu\"}'        
       
   build-mac:
     runs-on: macOS-10.14
@@ -73,7 +80,14 @@ jobs:
         cmake --build . --config Debug
         cd opengeode
         ctest -C Debug --output-on-failure
-      
+    - name: Notify slack
+      if: failure()
+      env:
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      uses: pullreminders/slack-action@master
+      with:
+        args: '{\"channel\":\"CLJ1PS7UN\",\"text\":\"Compilation or Testing failed for OpenGeode on macOS\"}' 
+
   build-windows:
     runs-on: windows-2016
     needs: format
@@ -88,6 +102,13 @@ jobs:
         cmake --build . --config Debug
         cd opengeode
         ctest -C Debug --output-on-failure
+    - name: Notify slack
+      if: failure()
+      env:
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      uses: pullreminders/slack-action@master
+      with:
+        args: '{\"channel\":\"CLJ1PS7UN\",\"text\":\"Compilation or Testing failed for OpenGeode on Windows\"}' 
         
   semantic-release:
     runs-on: ubuntu-18.04
