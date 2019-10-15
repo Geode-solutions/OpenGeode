@@ -21,7 +21,13 @@ jobs:
     needs: format
     strategy:
       matrix:
-        compiler: [g++, clang++]
+        cc: [gcc, clang]
+        cxx: [g++, clang++]
+        exclude:
+          - cc: gcc
+            cxx: clang++
+          - cc: clang
+            cxx: g++
 
     steps:
     - uses: actions/checkout@v1
@@ -32,7 +38,8 @@ jobs:
         cmake -DCMAKE_BUILD_TYPE=Debug ..
         cmake --build . -- -j2
       env:
-        CXX: ${{ matrix.compiler }}
+        CC: ${{ matrix.cc }}
+        CXX: ${{ matrix.cxx }}
     - name: Test
       run: |
         mkdir -p test
@@ -42,7 +49,7 @@ jobs:
         ctest --output-on-failure
     - name: Kcov
       run: curl -s https://raw.githubusercontent.com/Geode-solutions/actions/master/kcov.sh | bash -s -- ${GITHUB_WORKSPACE}/build/opengeode/bin
-      if: matrix.compiler == 'g++'
+      if: matrix.cc == g++
     - uses: codecov/codecov-action@v1.0.2
       with: 
         token: ${{ secrets.CODECOV_TOKEN }}
@@ -53,7 +60,7 @@ jobs:
     needs: format
     strategy:
       matrix:
-        cmake_args: ['-DCMAKE_BUILD_TYPE=Debug', '-G Xcode']
+        cmake_args: ['-DCMAKE_BUILD_TYPE=Debug', '-G "Xcode"']
 
     steps:
     - uses: actions/checkout@v1
