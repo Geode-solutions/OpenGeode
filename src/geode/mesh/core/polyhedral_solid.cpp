@@ -245,7 +245,7 @@ namespace geode
         {
             return polyhedra;
         }
-        OPENGEODE_ASSERT( polygon_vertex( first_polyhedron ) == vertex_id,
+        OPENGEODE_ASSERT( polyhedron_vertex( first_polyhedron ) == vertex_id,
             "[PolyhedralSolid::polyhedra_around_vertex] Wrong polyhedron "
             "around vertex" );
         std::vector< index_t > polyhedra_visited;
