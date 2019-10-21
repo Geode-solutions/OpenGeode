@@ -45,10 +45,10 @@ jobs:
         cd build
         version="${GITHUB_REF##*/*/}"
         echo ::set-output name=version::$version
-        cmake -DCMAKE_BUILD_TYPE=Release -DOPENGEODE_WITH_TESTS:BOOL=OFF -DCPACK_PACKAGE_VERSION:STRING=$version ..
-        cmake --build . -- -j2
+        cmake -G "Xcode" -DCMAKE_BUILD_TYPE=Release -DOPENGEODE_WITH_TESTS:BOOL=OFF -DCPACK_PACKAGE_VERSION:STRING=$version ..
+        cmake --build . --config Release
         cd opengeode
-        cmake --build . --target package
+        cmake --build . --target package --config Release
     - name: Upload
       uses: softprops/action-gh-release@v1
       with:
