@@ -123,7 +123,7 @@ jobs:
     needs: [build-ubuntu, build-mac, build-windows]
     steps:
     - uses: actions/checkout@v1
-    - run: npx semantic-release@beta
+    - run: npx semantic-release
       env:
         GITHUB_TOKEN: ${{ secrets.TOKEN }}
  
