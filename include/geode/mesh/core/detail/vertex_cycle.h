@@ -24,9 +24,9 @@
 #pragma once
 
 #include <geode/basic/common.h>
-#include <vector>
-
+#include <numeric>
 #include <utility>
+#include <vector>
 
 namespace geode
 {
