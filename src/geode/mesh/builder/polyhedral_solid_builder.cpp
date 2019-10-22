@@ -113,7 +113,7 @@ namespace geode
             "polyhedron that does not exist" );
         OPENGEODE_EXCEPTION( polyhedron_vertex.vertex_id
                                  < polyhedral_solid_.nb_polyhedron_vertices(
-                                     polyhedron_vertex.polyhedron_id ),
+                                       polyhedron_vertex.polyhedron_id ),
             "[PolyhedralSolidBuilder::set_polyhedron_vertex] Accessing an "
             "invalid polyhedron vertex" );
         OPENGEODE_EXCEPTION( vertex_id < polyhedral_solid_.nb_vertices(),
@@ -136,8 +136,32 @@ namespace geode
             associate_polyhedron_vertex_to_vertex(
                 { first_added_polyhedron, v }, vertices[v] );
         }
+        auto polyhedron_facet_vertices = get_polyhedron_facet_vertices( vertices, facets );
+        for( const auto& facet_vertices : polyhedron_facet_vertices )
+        {
+            this->find_or_create_facet( facet_vertices );
+        }
         do_create_polyhedron( vertices, facets );
         return first_added_polyhedron;
+    }
+    template < index_t dimension >
+    std::vector< std::vector< index_t > >
+        PolyhedralSolidBuilder< dimension >::get_polyhedron_facet_vertices(
+            const std::vector< index_t >& vertices,
+            const std::vector< std::vector< index_t > >& facets ) const
+    {
+        std::vector< std::vector< index_t > > polyhedron_facet_vertices(
+            facets.size() );
+        for( auto f : Range{ facets.size() } )
+        {
+            polyhedron_facet_vertices[f].resize( facets[f].size() );
+            for( auto v : Range{ facets[f].size() } )
+            {
+                polyhedron_facet_vertices[f][v] = vertices[facets[f][v]];
+            }
+            // this->find_or_create_facet( facet_vertices );
+        }
+        return polyhedron_facet_vertices;
     }
 
     template < index_t dimension >
@@ -150,10 +174,18 @@ namespace geode
     }
 
     template < index_t dimension >
+    index_t PolyhedralSolidBuilder< dimension >::find_or_create_facet(
+        const std::vector< index_t >& facet_vertices )
+    {
+        return polyhedral_solid_.find_or_create_facet( facet_vertices );
+    }
+
+    template < index_t dimension >
     void PolyhedralSolidBuilder< dimension >::do_delete_vertices(
         const std::vector< bool >& to_delete )
     {
         auto old2new = mapping_after_deletion( to_delete );
+        update_facet_vertices( old2new );
         update_polyhedron_vertices( polyhedral_solid_, *this, old2new );
         do_delete_solid_vertices( to_delete );
     }
@@ -168,7 +200,7 @@ namespace geode
             "polyhedron that does not exist" );
         OPENGEODE_EXCEPTION(
             polyhedron_facet.facet_id < polyhedral_solid_.nb_polyhedron_facets(
-                polyhedron_facet.polyhedron_id ),
+                                            polyhedron_facet.polyhedron_id ),
             "[PolyhedralSolidBuilder::set_polyhedron_adjacent] Accessing an "
             "invalid polyhedron vertex" );
         OPENGEODE_EXCEPTION( adjacent_id < polyhedral_solid_.nb_polyhedra()
@@ -304,10 +336,44 @@ namespace geode
             associate_polyhedron_vertex_to_vertex( new_polyhedron_vertex, v );
         }
 
+        std::vector< bool > facet_to_delete(
+            polyhedral_solid_.nb_facets(), true );
+        for( auto p : geode::Range{ polyhedral_solid_.nb_polyhedra() } )
+        {
+            if( to_delete[p] )
+            {
+                continue;
+            }
+            for( auto f :
+                geode::Range{ polyhedral_solid_.nb_polyhedron_facets( p ) } )
+            {
+                auto facet_id = polyhedral_solid_.polyhedron_facet( { p, f } );
+                facet_to_delete[facet_id] = false;
+            }
+        }
+
+        delete_facets( mapping_after_deletion( facet_to_delete ) );
+        polyhedral_solid_.facet_attribute_manager().delete_elements(
+            facet_to_delete );
+
         update_polyhedron_adjacencies( polyhedral_solid_, *this, old2new );
         polyhedral_solid_.polyhedron_attribute_manager().delete_elements(
             to_delete );
         do_delete_polyhedra( to_delete );
+    }
+
+    template < index_t dimension >
+    void PolyhedralSolidBuilder< dimension >::update_facet_vertices(
+        const std::vector< index_t >& old2new )
+    {
+        polyhedral_solid_.update_facet_vertices( old2new );
+    }
+
+    template < index_t dimension >
+    void PolyhedralSolidBuilder< dimension >::delete_facets(
+        const std::vector< index_t >& old2new )
+    {
+        polyhedral_solid_.delete_facets( old2new );
     }
 
     template < index_t dimension >

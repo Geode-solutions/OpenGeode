@@ -154,6 +154,8 @@ namespace geode
 
         const Point< dimension >& point( index_t vertex_id ) const;
 
+        index_t nb_facets() const;
+
         index_t nb_polyhedra() const;
 
         /*!
@@ -181,6 +183,13 @@ namespace geode
             const PolyhedronVertex& polyhedron_vertex ) const;
 
         /*!
+         * Return the index in the mesh of a local facet in a polyhedron.
+         * @param[in] polyhedron_facet Local index of facet in polyhedron.
+         */
+        index_t polyhedron_facet(
+            const PolyhedronFacet& polyhedron_facet ) const;
+
+        /*!
          * Return the index in the mesh of a given polyhedron facet vertex.
          * @param[in] polyhedron_facet_vertex Local index of the vertex in the
          * facet of a polyhedron.
@@ -190,7 +199,7 @@ namespace geode
 
         /*!
          * Return the index of the polyhedron adjacent through a facet.
-         * @param[in] polygon_edge Local index of edge in polygon.
+         * @param[in] polygon_facet Local index of facet in polygon.
          * @return NO_ID if the polyhedron facet is on border, else the index of
          * the adjacent polyhedron.
          */
@@ -200,7 +209,7 @@ namespace geode
         /*!
          * Return the index of the facet of the adjacent polyhedron through
          * which polyhedra are adjacent.
-         * @param[in] polyhedron_facet Local index of edge in polyhedron.
+         * @param[in] polyhedron_facet Local index of facet in polyhedron.
          * @return Undefined PolyhedronFacet if the polyhedron facet is on
          * border, else the index of the adjacent polyhedron facet.
          */
@@ -262,8 +271,16 @@ namespace geode
          */
         AttributeManager& polyhedron_attribute_manager() const;
 
+        /*!
+         * Access to the manager of attributes associated with facets.
+         */
+        AttributeManager& facet_attribute_manager() const;
+
     protected:
         PolyhedralSolid();
+
+        index_t find_or_create_facet(
+            const std::vector< index_t >& facet_vertices );
 
     private:
         friend class bitsery::Access;
@@ -278,6 +295,10 @@ namespace geode
 
         void associate_polyhedron_vertex_to_vertex(
             const PolyhedronVertex& polyhedron_vertex, index_t vertex_id );
+
+        void update_facet_vertices( const std::vector< index_t >& old2new );
+
+        void delete_facets( const std::vector< index_t >& old2new );
 
         virtual index_t get_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex ) const = 0;

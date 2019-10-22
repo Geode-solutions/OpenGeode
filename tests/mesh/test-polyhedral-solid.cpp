@@ -57,6 +57,8 @@ void test_create_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
         { { 1, 3, 2 }, { 0, 2, 3 }, { 3, 1, 0 }, { 0, 1, 2 } } );
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_polyhedra() == 3,
         "[Test] PolyhedralSolid should have 3 polyhedra" );
+    OPENGEODE_EXCEPTION( polyhedral_solid.nb_facets() == 11,
+        "[Test] PolyhedralSolid should have 11 facets" );
 }
 
 void test_polyhedron_adjacencies(
@@ -104,6 +106,8 @@ void test_delete_vertex( const geode::PolyhedralSolid3D& polyhedral_solid,
         "[Test] PolyhedralSolid should have 2 polyhedra" );
     OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_adjacent( { 1, 3 } ) == 0,
         "[Test] PolyhedralSolid adjacent index is not correct" );
+    OPENGEODE_EXCEPTION( polyhedral_solid.nb_facets() == 7,
+        "[Test] PolyhedralSolid should have 7 facets" );
 }
 
 void test_delete_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
@@ -122,6 +126,8 @@ void test_delete_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
         "[Test] PolyhedralSolid vertex index is not correct" );
     OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_vertex( { 0, 3 } ) == 6,
         "[Test] PolyhedralSolid vertex index is not correct" );
+    OPENGEODE_EXCEPTION( polyhedral_solid.nb_facets() == 4,
+        "[Test] PolyhedralSolid should have 4 facets" );
 }
 
 void test_io( const geode::PolyhedralSolid3D& polyhedral_solid,

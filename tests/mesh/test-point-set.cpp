@@ -77,7 +77,6 @@ void test_delete_vertex(
 
 void test_io( const geode::PointSet3D& point_set, const std::string& filename )
 {
-    DEBUG( point_set.nb_vertices() );
     save_point_set( point_set, filename );
     auto new_point_set = geode::PointSet3D::create(
         geode::OpenGeodePointSet3D::type_name_static() );
