@@ -232,7 +232,7 @@ void test_delete_polygon( const geode::PolygonalSurface3D& polygonal_surface,
     OPENGEODE_EXCEPTION( attribute->value( 3 ) == 8,
         "[Test] Update of edge attributes after "
         "polygon deletion is not correct (value of 3)" );
-        OPENGEODE_EXCEPTION( polygonal_surface.polygon_edge( { 0, 0 } ) == 1,
+    OPENGEODE_EXCEPTION( polygonal_surface.polygon_edge( { 0, 0 } ) == 1,
         "[Test] Edge index for PolygonEdge( 0, 0 ) is not correct" );
     OPENGEODE_EXCEPTION( polygonal_surface.polygon_edge( { 0, 3 } ) == 0,
         "[Test] Edge index for PolygonEdge( 0, 3 ) is not correct" );
