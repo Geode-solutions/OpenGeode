@@ -107,7 +107,7 @@ void test_delete_polygon( const geode::TriangulatedSurface3D& surface,
         "[Test] TriangulatedSurface edge vertex index is not correct" );
     OPENGEODE_EXCEPTION( surface.polygon_vertex( { 0, 2 } ) == 1,
         "[Test] TriangulatedSurface edge vertex index is not correct" );
-            OPENGEODE_EXCEPTION( surface.nb_edges() == 3,
+    OPENGEODE_EXCEPTION( surface.nb_edges() == 3,
         "[Test] TriangulatedSurface should have 3 edges" );
 }
 
