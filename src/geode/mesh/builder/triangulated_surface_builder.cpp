@@ -77,11 +77,9 @@ namespace geode
         }
         for( auto e : Range{ vertices.size() - 1 } )
         {
-            this->find_or_create_edge(
-                { vertices[e], vertices[e + 1] } );
+            this->find_or_create_edge( { vertices[e], vertices[e + 1] } );
         }
-        this->find_or_create_edge(
-            { vertices.back(), vertices.front() } );
+        this->find_or_create_edge( { vertices.back(), vertices.front() } );
         do_create_triangle( vertices );
         return first_added_triangle;
     }

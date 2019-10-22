@@ -287,7 +287,7 @@ namespace geode
 
         index_t find_or_create_edge(
             const std::array< index_t, 2 >& edge_vertices );
-    
+
     private:
         friend class bitsery::Access;
         template < typename Archive >
