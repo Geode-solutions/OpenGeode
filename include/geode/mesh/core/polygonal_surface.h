@@ -119,6 +119,8 @@ namespace geode
 
         const Point< dimension >& point( index_t vertex_id ) const;
 
+        index_t nb_edges() const;
+
         index_t nb_polygons() const;
 
         /*!
@@ -136,6 +138,12 @@ namespace geode
          * @param[in] polygon_vertex Local index of vertex in polygon
          */
         index_t polygon_vertex( const PolygonVertex& polygon_vertex ) const;
+
+        /*!
+         * Return the index in the mesh of a local edge in a polygon
+         * @param[in] polygon_edge Local index of edge in polygon
+         */
+        index_t polygon_edge( const PolygonEdge& polygon_edge ) const;
 
         /*!
          * Return the index in the mesh of a given polygon edge vertex.
@@ -265,6 +273,11 @@ namespace geode
             index_t from_vertex_id, index_t to_vertex_id ) const;
 
         /*!
+         * Access to the manager of attributes associated with edges.
+         */
+        AttributeManager& edge_attribute_manager() const;
+
+        /*!
          * Access to the manager of attributes associated with polygons.
          */
         AttributeManager& polygon_attribute_manager() const;
@@ -284,6 +297,13 @@ namespace geode
 
         void associate_polygon_vertex_to_vertex(
             const PolygonVertex& polygon_vertex, index_t vertex_id );
+
+        index_t find_or_create_edge(
+            const std::array< index_t, 2 >& edge_vertices );
+
+        void update_edge_vertices( const std::vector< index_t >& old2new );
+
+        void delete_edges( const std::vector< index_t >& old2new );
 
         virtual index_t get_polygon_vertex(
             const PolygonVertex& polygon_vertex ) const = 0;

@@ -115,6 +115,7 @@ set(advanced_headers
     "${lib_include_dir}/core/detail/edges_impl.h"
     "${lib_include_dir}/core/detail/points_impl.h"
     "${lib_include_dir}/core/detail/register_mesh.h"
+    "${lib_include_dir}/core/detail/vertex_cycle.h"
     "${lib_include_dir}/io/detail/geode_bitsery_mesh_input.h"
     "${lib_include_dir}/io/detail/geode_bitsery_mesh_output.h"
     "${lib_include_dir}/io/detail/geode_edged_curve_input.h"
