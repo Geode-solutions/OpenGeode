@@ -69,11 +69,13 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< std::vector< index_t > > OpenGeodeTetrahedralSolidBuilder< dimension >::
-        get_polyhedron_facet_vertices(
-            const std::array< index_t, 4 >& vertices ) const
+    std::vector< std::vector< index_t > >
+        OpenGeodeTetrahedralSolidBuilder< dimension >::
+            get_polyhedron_facet_vertices(
+                const std::array< index_t, 4 >& vertices ) const
     {
-        return geode_tetrahedral_solid_.get_polyhedron_facet_vertices( vertices );
+        return geode_tetrahedral_solid_.get_polyhedron_facet_vertices(
+            vertices );
     }
 
     template < index_t dimension >
