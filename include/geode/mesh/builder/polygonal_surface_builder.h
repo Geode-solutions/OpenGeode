@@ -139,6 +139,9 @@ namespace geode
         {
         }
 
+        index_t find_or_create_edge(
+            const std::array< index_t, 2 >& edge_vertices );
+
     private:
         virtual void do_set_point(
             index_t vertex_id, const Point< dimension >& point ) = 0;

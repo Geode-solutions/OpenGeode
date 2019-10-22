@@ -117,10 +117,10 @@ namespace geode
         }
         for( auto e : Range{ vertices.size() - 1 } )
         {
-            polygonal_surface_.find_or_create_edge(
+            this->find_or_create_edge(
                 { vertices[e], vertices[e + 1] } );
         }
-        polygonal_surface_.find_or_create_edge(
+        this->find_or_create_edge(
             { vertices.back(), vertices.front() } );
         do_create_polygon( vertices );
         return first_added_polygon;
@@ -133,6 +133,13 @@ namespace geode
     {
         polygonal_surface_.associate_polygon_vertex_to_vertex(
             polygon_vertex, vertex_id );
+    }
+
+    template < index_t dimension >
+    index_t PolygonalSurfaceBuilder< dimension >::find_or_create_edge(
+        const std::array< index_t, 2 >& edge_vertices )
+    {
+        return polygonal_surface_.find_or_create_edge( edge_vertices );
     }
 
     template < index_t dimension >
@@ -153,7 +160,7 @@ namespace geode
             "that does not exist" );
         OPENGEODE_EXCEPTION(
             polygon_vertex.vertex_id < polygonal_surface_.nb_polygon_vertices(
-                polygon_vertex.polygon_id ),
+                                           polygon_vertex.polygon_id ),
             "[PolygonalSurfaceBuilder::set_polygon_vertex] Accessing an "
             "invalid polygon vertex" );
         OPENGEODE_EXCEPTION( vertex_id < polygonal_surface_.nb_vertices(),
@@ -183,7 +190,7 @@ namespace geode
             "polygon that does not exist" );
         OPENGEODE_EXCEPTION(
             polygon_edge.edge_id < polygonal_surface_.nb_polygon_edges(
-                polygon_edge.polygon_id ),
+                                       polygon_edge.polygon_id ),
             "[PolygonalSurfaceBuilder::set_polygon_adjacent] Accessing an "
             "invalid polygon vertex" );
         OPENGEODE_EXCEPTION( adjacent_id < polygonal_surface_.nb_polygons()

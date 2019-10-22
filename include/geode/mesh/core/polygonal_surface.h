@@ -285,6 +285,9 @@ namespace geode
     protected:
         PolygonalSurfaceBase();
 
+        index_t find_or_create_edge(
+            const std::array< index_t, 2 >& edge_vertices );
+    
     private:
         friend class bitsery::Access;
         template < typename Archive >
@@ -297,9 +300,6 @@ namespace geode
 
         void associate_polygon_vertex_to_vertex(
             const PolygonVertex& polygon_vertex, index_t vertex_id );
-
-        index_t find_or_create_edge(
-            const std::array< index_t, 2 >& edge_vertices );
 
         void update_edge_vertices( const std::vector< index_t >& old2new );
 
