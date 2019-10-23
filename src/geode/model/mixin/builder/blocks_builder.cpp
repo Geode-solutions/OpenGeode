@@ -85,5 +85,11 @@ namespace geode
         blocks_.modifiable_block( id ).set_block_name( std::move( name ) );
     }
 
+    template < index_t dimension >
+    void BlocksBuilder< dimension >::set_block_mesh( const uuid& id, std::unique_ptr< PolyhedralSolid< dimension > > mesh )
+    {
+        blocks_.modifiable_block( id ).set_mesh( std::move( mesh ) );
+    }
+
     template class opengeode_model_api BlocksBuilder< 3 >;
 } // namespace geode

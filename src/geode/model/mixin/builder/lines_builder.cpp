@@ -26,6 +26,7 @@
 #include <geode/model/mixin/core/line.h>
 #include <geode/model/mixin/core/lines.h>
 
+#include <geode/mesh/core/edged_curve.h>
 #include <geode/mesh/builder/edged_curve_builder.h>
 
 namespace geode
@@ -67,6 +68,12 @@ namespace geode
         const uuid& id, std::string name )
     {
         lines_.modifiable_line( id ).set_line_name( std::move( name ) );
+    }
+
+    template < index_t dimension >
+    void LinesBuilder< dimension >::set_line_mesh( const uuid& id, std::unique_ptr< EdgedCurve< dimension > > mesh )
+    {
+        lines_.modifiable_line( id ).set_mesh( std::move( mesh ) );
     }
 
     template class opengeode_model_api LinesBuilder< 2 >;

@@ -25,8 +25,10 @@
 
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/bitsery_archive.h>
+#include <geode/basic/logger.h>
 #include <geode/basic/pimpl_impl.h>
 
+#include <geode/mesh/builder/vertex_set_builder.h>
 #include <geode/mesh/core/geode_vertex_set.h>
 
 namespace geode
@@ -60,6 +62,20 @@ namespace geode
         return std::unique_ptr< VertexSet >{ new OpenGeodeVertexSet };
     }
 
+    std::unique_ptr< VertexSet > VertexSet::create( const MeshType& type )
+    {
+        try
+        {
+            return VertexSetFactory::create( type );
+        }
+        catch( const OpenGeodeException& e )
+        {
+            Logger::error( e.what() );
+            throw OpenGeodeException(
+                "Could not create VertexSet data structure: ", type.get() );
+        }
+    }
+
     index_t VertexSet::nb_vertices() const
     {
         return vertex_attribute_manager().nb_elements();
@@ -74,6 +90,14 @@ namespace geode
     void VertexSet::serialize( Archive& archive )
     {
         archive.object( impl_ );
+    }
+
+    std::unique_ptr< VertexSet > VertexSet::clone() const
+    {
+        auto new_clone = create( type_name() );
+        auto builder = VertexSetBuilder::create( *new_clone );
+        builder->copy( *this );
+        return new_clone;
     }
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, VertexSet );

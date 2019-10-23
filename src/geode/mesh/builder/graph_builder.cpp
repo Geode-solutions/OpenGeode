@@ -161,4 +161,19 @@ namespace geode
         graph_.edge_attribute_manager().delete_elements( to_delete );
         do_delete_edges( to_delete );
     }
+
+    void GraphBuilder::copy( const Graph& graph )
+    {
+        VertexSetBuilder::copy( graph );
+        create_edges( graph.nb_edges() );
+        graph_.edge_attribute_manager().copy( graph.edge_attribute_manager() );
+        for( auto e : Range{ graph.nb_edges() } )
+        {
+            for( auto v : Range{ 2 } )
+            {
+                EdgeVertex id{e, v};
+                set_edge_vertex( id, graph.edge_vertex( id ) );
+            }
+        }
+    }
 } // namespace geode

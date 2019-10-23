@@ -23,6 +23,7 @@
 
 #include <geode/mesh/core/triangulated_surface.h>
 
+#include <geode/mesh/builder/triangulated_surface_builder.h>
 #include <geode/mesh/core/geode_triangulated_surface.h>
 
 namespace geode
@@ -51,6 +52,15 @@ namespace geode
                 "Could not create TriangulatedSurface data structure: ",
                 type.get() );
         }
+    }
+    
+    template < index_t dimension >
+    std::unique_ptr< TriangulatedSurface< dimension > > TriangulatedSurface< dimension >::clone() const
+    {
+        auto new_clone = create( this->type_name() );
+        auto builder = TriangulatedSurfaceBuilder< dimension >::create( *new_clone );
+        builder->copy( *this );
+        return new_clone;
     }
 
     template class opengeode_mesh_api TriangulatedSurface< 2 >;

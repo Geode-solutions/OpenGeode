@@ -93,6 +93,8 @@ namespace geode
          */
         static std::unique_ptr< Graph > create( const MeshType& type );
 
+        std::unique_ptr< Graph > clone() const;
+
         ~Graph();
 
         /*!

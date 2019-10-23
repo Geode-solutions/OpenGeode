@@ -69,7 +69,26 @@ namespace geode
         OPENGEODE_DISABLE_COPY_AND_MOVE( BRepBuilder );
 
     public:
+        struct ComponentMapping
+        {
+            using Mapping = std::unordered_map< uuid, uuid >;
+            Mapping corners;
+            Mapping lines;
+            Mapping surfaces;
+            Mapping blocks;
+            Mapping model_boundaries;
+        };
+
+    public:
         BRepBuilder( BRep& brep );
+
+        void copy( const BRep& brep );
+
+        ComponentMapping copy_components( const BRep& brep );
+
+        void copy_component_relationships( const ComponentMapping& mapping, const BRep& brep );
+
+        void copy_component_geometry( const ComponentMapping& mapping, const BRep& brep );
 
         const uuid& add_corner();
 

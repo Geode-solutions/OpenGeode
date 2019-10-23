@@ -23,6 +23,10 @@
 
 #include <geode/model/representation/builder/section_builder.h>
 
+#include <geode/mesh/core/point_set.h>
+#include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/core/polygonal_surface.h>
+
 #include <geode/model/mixin/core/block.h>
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/line.h>
@@ -38,6 +42,104 @@ namespace geode
               section ),
           section_( section )
     {
+    }
+
+    void SectionBuilder::copy( const Section& section )
+    {
+        auto mapping = copy_components( section );
+        copy_component_relationships( mapping, section );
+        copy_component_geometry( mapping, section );
+    }
+
+    SectionBuilder::ComponentMapping SectionBuilder::copy_components(
+        const Section& section )
+    {
+        ComponentMapping mapping;
+        for( const auto& corner : section.corners() )
+        {
+            mapping.corners.emplace(
+                corner.id(), add_corner( corner.mesh().type_name() ) );
+        }
+        for( const auto& line : section.lines() )
+        {
+            mapping.lines.emplace(
+                line.id(), add_line( line.mesh().type_name() ) );
+        }
+        for( const auto& surface : section.surfaces() )
+        {
+            mapping.surfaces.emplace(
+                surface.id(), add_surface( surface.mesh().type_name() ) );
+        }
+        for( const auto& model_boundary : section.model_boundaries() )
+        {
+            mapping.model_boundaries.emplace(
+                model_boundary.id(), add_model_boundary() );
+        }
+        return mapping;
+    }
+
+    void SectionBuilder::copy_component_relationships(
+        const ComponentMapping& mapping, const Section& section )
+    {
+        for( const auto& line : section.lines() )
+        {
+            const auto& new_line = section_.line( mapping.lines.at( line.id() ) );
+            for( const auto& corner : section.boundaries( line ) )
+            {
+                const auto& new_corner =
+                    section_.corner( mapping.corners.at( corner.id() ) );
+                add_corner_line_relationship( new_corner, new_line );
+            }
+        }
+        for( const auto& surface : section.surfaces() )
+        {
+            const auto& new_surface =
+                section_.surface( mapping.surfaces.at( surface.id() ) );
+            for( const auto& line : section.boundaries( surface ) )
+            {
+                const auto& new_line =
+                    section_.line( mapping.lines.at( line.id() ) );
+                add_line_surface_relationship( new_line, new_surface );
+            }
+            for( const auto& line : section.internals( surface ) )
+            {
+                const auto& new_line =
+                    section_.line( mapping.lines.at( line.id() ) );
+                add_line_surface_internal_relationship( new_line, new_surface );
+            }
+        }
+        for( const auto& model_boundary : section.model_boundaries() )
+        {
+            const auto& new_model_boundary = section_.model_boundary(
+                mapping.model_boundaries.at( model_boundary.id() ) );
+            for( const auto& line : section.items( model_boundary ) )
+            {
+                const auto& new_line =
+                    section_.line( mapping.lines.at( line.id() ) );
+                add_line_in_model_boundary(
+                    new_line, new_model_boundary );
+            }
+        }
+    }
+
+    void SectionBuilder::copy_component_geometry(
+        const ComponentMapping& mapping, const Section& section )
+    {
+        for( const auto& corner : section.corners() )
+        {
+            set_corner_mesh(
+                mapping.corners.at( corner.id() ), corner.mesh().clone() );
+        }
+        for( const auto& line : section.lines() )
+        {
+            set_line_mesh(
+                mapping.lines.at( line.id() ), line.mesh().clone() );
+        }
+        for( const auto& surface : section.surfaces() )
+        {
+            set_surface_mesh(
+                mapping.surfaces.at( surface.id() ), surface.mesh().clone() );
+        }
     }
 
     const uuid& SectionBuilder::add_corner()

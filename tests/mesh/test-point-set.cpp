@@ -84,6 +84,18 @@ void test_io( const geode::PointSet3D& point_set, const std::string& filename )
     load_point_set( *new_point_set, filename );
 }
 
+void test_copy( const geode::PointSet3D& point_set )
+{
+    auto point_set2 = point_set.clone();
+    OPENGEODE_EXCEPTION( point_set2->nb_vertices() == 3,
+        "[Test] PointSet2 should have 3 vertices" );
+
+    auto attribute =
+        point_set2->vertex_attribute_manager().find_attribute< bool >( "test" );
+    OPENGEODE_EXCEPTION( attribute->value( 0 ) == true,
+        "[Test] PointSet2 attribute value should be true" );
+}
+
 int main()
 {
     using namespace geode;
@@ -98,6 +110,7 @@ int main()
         auto base_file = "test." + point_set->native_extension();
         test_io( *point_set, base_file );
         test_delete_vertex( *point_set, *builder );
+        test_copy( *point_set );
 
         Logger::info( "TEST SUCCESS" );
         return 0;

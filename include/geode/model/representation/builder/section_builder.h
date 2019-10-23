@@ -67,7 +67,26 @@ namespace geode
         OPENGEODE_DISABLE_COPY_AND_MOVE( SectionBuilder );
 
     public:
+        struct ComponentMapping
+        {
+            using Mapping = std::unordered_map< uuid, uuid >;
+            Mapping corners;
+            Mapping lines;
+            Mapping surfaces;
+            Mapping model_boundaries;
+        };
+
+    public:
         SectionBuilder( Section& section );
+
+        void copy( const Section& section );
+
+        ComponentMapping copy_components( const Section& section );
+
+        void copy_component_relationships( const ComponentMapping& mapping, const Section& section );
+
+        void copy_component_geometry( const ComponentMapping& mapping, const Section& section );
+
 
         const uuid& add_corner();
 

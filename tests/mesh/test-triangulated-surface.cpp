@@ -114,6 +114,15 @@ void test_io(
     load_triangulated_surface( *new_surface, filename );
 }
 
+void test_copy( const geode::TriangulatedSurface3D& surface )
+{
+    auto surface2 = surface.clone();
+    OPENGEODE_EXCEPTION( surface2->nb_vertices() == 4,
+        "[Test] TriangulatedSurface2 should have 4 vertices" );
+    OPENGEODE_EXCEPTION( surface2->nb_polygons() == 1,
+        "[Test] TriangulatedSurface2 should have 1 polygon" );
+}
+
 int main()
 {
     using namespace geode;
@@ -132,6 +141,7 @@ int main()
 
         test_delete_vertex( *surface, *builder );
         test_delete_polygon( *surface, *builder );
+        test_copy( *surface );
 
         Logger::info( "TEST SUCCESS" );
         return 0;

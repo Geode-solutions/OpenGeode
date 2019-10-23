@@ -74,6 +74,9 @@ namespace geode
         {
         }
 
+        friend class PointSet< dimension >;
+        void copy( const PointSet< dimension >& point_set );
+
     private:
         virtual void do_set_point(
             index_t vertex_id, const Point< dimension >& point ) = 0;

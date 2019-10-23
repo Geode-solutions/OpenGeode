@@ -150,6 +150,8 @@ namespace geode
         static std::unique_ptr< PolyhedralSolid< dimension > > create(
             const MeshType& type );
 
+        std::unique_ptr< PolyhedralSolid< dimension > > clone() const;
+
         ~PolyhedralSolid();
 
         const Point< dimension >& point( index_t vertex_id ) const;

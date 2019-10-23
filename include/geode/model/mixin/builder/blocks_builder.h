@@ -33,6 +33,7 @@ namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Block );
     FORWARD_DECLARATION_DIMENSION_CLASS( Blocks );
+    FORWARD_DECLARATION_DIMENSION_CLASS( PolyhedralSolid );
     FORWARD_DECLARATION_DIMENSION_CLASS( PolyhedralSolidBuilder );
 
     struct uuid;
@@ -54,6 +55,8 @@ namespace geode
             block_mesh_builder( const uuid& id );
 
         void set_block_name( const uuid& id, std::string name );
+
+        void set_block_mesh( const uuid& id, std::unique_ptr< PolyhedralSolid< dimension > > mesh );
 
     protected:
         BlocksBuilder( Blocks< dimension >& blocks ) : blocks_( blocks ) {}

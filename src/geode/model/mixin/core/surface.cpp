@@ -29,7 +29,6 @@
 #include <geode/model/mixin/core/detail/mesh_storage.h>
 
 #include <geode/mesh/core/polygonal_surface.h>
-#include <geode/mesh/core/triangulated_surface.h>
 
 namespace geode
 {
@@ -37,28 +36,6 @@ namespace geode
     class Surface< dimension >::Impl
         : public detail::MeshStorage< PolygonalSurface< dimension > >
     {
-        using base_class = detail::MeshStorage< PolygonalSurface< dimension > >;
-
-    public:
-        Impl() : base_class( &create_mesh ) {}
-
-        static void create_mesh( const MeshType& type, base_class& storage )
-        {
-            if( TriangulatedSurfaceFactory< dimension >::has_creator( type ) )
-            {
-                storage.set_mesh(
-                    TriangulatedSurface< dimension >::create( type ) );
-            }
-            else if( PolygonalSurfaceFactory< dimension >::has_creator( type ) )
-            {
-                storage.set_mesh(
-                    PolygonalSurface< dimension >::create( type ) );
-            }
-            else
-            {
-                throw OpenGeodeException( "Unknown mesh type: ", type.get() );
-            }
-        }
     };
 
     template < index_t dimension >
@@ -75,7 +52,7 @@ namespace geode
     template < index_t dimension >
     Surface< dimension >::Surface( const MeshType& type )
     {
-        Impl::create_mesh( type, *impl_ );
+        impl_->set_mesh( PolygonalSurface< dimension >::create( type ) );
     }
 
     template < index_t dimension >
@@ -103,6 +80,13 @@ namespace geode
         archive.object( impl_ );
         archive.ext(
             *this, bitsery::ext::BaseClass< Component< dimension > >{} );
+    }
+
+    template < index_t dimension >
+    void Surface< dimension >::set_mesh(
+        std::unique_ptr< PolygonalSurface< dimension > > mesh )
+    {
+        impl_->set_mesh( std::move( mesh ) );
     }
 
     template class opengeode_model_api Surface< 2 >;

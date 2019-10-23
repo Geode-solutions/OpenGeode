@@ -25,6 +25,8 @@
 
 #include <vector>
 
+#include <geode/basic/factory.h>
+
 #include <geode/mesh/common.h>
 #include <geode/mesh/core/mesh_type.h>
 
@@ -44,6 +46,13 @@ namespace geode
 
     public:
         virtual ~VertexSetBuilder() = default;
+
+        /*!
+         * Create the builder associated with a VertexSet.
+         * @param[in] mesh The VertexSet to build/modify
+         */
+        static std::unique_ptr< VertexSetBuilder > create(
+            VertexSet& mesh );
 
         /*!
          * Create a new vertex.
@@ -69,6 +78,9 @@ namespace geode
     protected:
         VertexSetBuilder( VertexSet& vertex_set ) : vertex_set_( vertex_set ) {}
 
+        friend class VertexSet;
+        void copy( const VertexSet& vertex_set );
+
     private:
         virtual void do_create_vertex() = 0;
 
@@ -80,4 +92,6 @@ namespace geode
     private:
         VertexSet& vertex_set_;
     };
+
+    using VertexSetBuilderFactory = Factory< MeshType, VertexSetBuilder, VertexSet& >;
 } // namespace geode

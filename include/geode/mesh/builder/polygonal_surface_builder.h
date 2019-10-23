@@ -139,6 +139,9 @@ namespace geode
         {
         }
 
+        friend class PolygonalSurface< dimension >;
+        void copy( const PolygonalSurface< dimension >& polygonal_surface );
+
     private:
         virtual void do_set_point(
             index_t vertex_id, const Point< dimension >& point ) = 0;
