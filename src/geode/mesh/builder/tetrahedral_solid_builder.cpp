@@ -87,14 +87,14 @@ namespace geode
     index_t TetrahedralSolidBuilder< dimension >::create_tetrahedron(
         const std::array< index_t, 4 >& vertices )
     {
-        auto first_added_tetra = tetrahedral_solid_.nb_polyhedra();
+        auto added_tetra = tetrahedral_solid_.nb_polyhedra();
         tetrahedral_solid_.polyhedron_attribute_manager().resize(
-            first_added_tetra + 1 );
+            added_tetra + 1 );
         index_t vertex_id{ 0 };
         for( const auto& vertex : vertices )
         {
             this->associate_polyhedron_vertex_to_vertex(
-                { first_added_tetra, vertex_id++ }, vertex );
+                { added_tetra, vertex_id++ }, vertex );
         }
         do_create_tetrahedron( vertices );
         for( auto f : Range{ 4 } )
@@ -103,11 +103,11 @@ namespace geode
             for( auto v : Range{ 3 } )
             {
                 facet_vertices[v] = tetrahedral_solid_.polyhedron_facet_vertex(
-                    { { first_added_tetra, f }, v } );
+                    { { added_tetra, f }, v } );
             }
             this->find_or_create_facet( facet_vertices );
         }
-        return first_added_tetra;
+        return added_tetra;
     }
 
     template class opengeode_mesh_api TetrahedralSolidBuilder< 3 >;

@@ -31,10 +31,10 @@ namespace geode
 {
     index_t VertexSetBuilder::create_vertex()
     {
-        auto first_added_vertex = vertex_set_.nb_vertices();
-        vertex_set_.vertex_attribute_manager().resize( first_added_vertex + 1 );
+        auto added_vertex = vertex_set_.nb_vertices();
+        vertex_set_.vertex_attribute_manager().resize( added_vertex + 1 );
         do_create_vertex();
-        return first_added_vertex;
+        return added_vertex;
     }
 
     index_t VertexSetBuilder::create_vertices( index_t nb )

@@ -128,13 +128,13 @@ namespace geode
         const std::vector< index_t >& vertices,
         const std::vector< std::vector< index_t > >& facets )
     {
-        auto first_added_polyhedron = polyhedral_solid_.nb_polyhedra();
+        auto added_polyhedron = polyhedral_solid_.nb_polyhedra();
         polyhedral_solid_.polyhedron_attribute_manager().resize(
-            first_added_polyhedron + 1 );
+            added_polyhedron + 1 );
         for( auto v : Range{ vertices.size() } )
         {
             associate_polyhedron_vertex_to_vertex(
-                { first_added_polyhedron, v }, vertices[v] );
+                { added_polyhedron, v }, vertices[v] );
         }
         auto polyhedron_facet_vertices =
             get_polyhedron_facet_vertices( vertices, facets );
@@ -143,7 +143,7 @@ namespace geode
             this->find_or_create_facet( facet_vertices );
         }
         do_create_polyhedron( vertices, facets );
-        return first_added_polyhedron;
+        return added_polyhedron;
     }
     template < index_t dimension >
     std::vector< std::vector< index_t > >
@@ -391,10 +391,10 @@ namespace geode
     index_t PolyhedralSolidBuilder< dimension >::create_point(
         const Point< dimension >& point )
     {
-        auto first_added_vertex = polyhedral_solid_.nb_vertices();
+        auto added_vertex = polyhedral_solid_.nb_vertices();
         create_vertex();
-        set_point( first_added_vertex, point );
-        return first_added_vertex;
+        set_point( added_vertex, point );
+        return added_vertex;
     }
 
     template class opengeode_mesh_api PolyhedralSolidBuilder< 3 >;

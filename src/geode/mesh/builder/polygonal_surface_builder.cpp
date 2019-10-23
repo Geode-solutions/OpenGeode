@@ -107,13 +107,13 @@ namespace geode
     index_t PolygonalSurfaceBuilder< dimension >::create_polygon(
         const std::vector< index_t >& vertices )
     {
-        auto first_added_polygon = polygonal_surface_.nb_polygons();
+        auto added_polygon = polygonal_surface_.nb_polygons();
         polygonal_surface_.polygon_attribute_manager().resize(
-            first_added_polygon + 1 );
+            added_polygon + 1 );
         for( auto v : Range{ vertices.size() } )
         {
             associate_polygon_vertex_to_vertex(
-                { first_added_polygon, v }, vertices[v] );
+                { added_polygon, v }, vertices[v] );
         }
         for( auto e : Range{ vertices.size() - 1 } )
         {
@@ -121,7 +121,7 @@ namespace geode
         }
         this->find_or_create_edge( { vertices.back(), vertices.front() } );
         do_create_polygon( vertices );
-        return first_added_polygon;
+        return added_polygon;
     }
 
     template < index_t dimension >
@@ -346,10 +346,10 @@ namespace geode
     index_t PolygonalSurfaceBuilder< dimension >::create_point(
         const Point< dimension >& point )
     {
-        auto first_added_vertex = polygonal_surface_.nb_vertices();
+        auto added_vertex = polygonal_surface_.nb_vertices();
         create_vertex();
-        set_point( first_added_vertex, point );
-        return first_added_vertex;
+        set_point( added_vertex, point );
+        return added_vertex;
     }
 
     template class opengeode_mesh_api PolygonalSurfaceBuilder< 2 >;
