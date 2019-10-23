@@ -267,7 +267,7 @@ namespace geode
         std::shared_ptr< AttributeBase > clone() const override
         {
             std::shared_ptr< VariableAttribute< bool > > attribute{
-                new VariableAttribute< bool >{ default_value_ }
+                new VariableAttribute< bool >{ static_cast< bool >( default_value_ ) }
             };
             attribute->values_ = values_;
             return attribute;
