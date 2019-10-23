@@ -105,7 +105,7 @@ jobs:
       run: |
         mkdir -p build
         cd build
-        cmake-G "Xcode" ..
+        cmake -G "Xcode" ..
         cmake --build . --config ${{ matrix.config }}
         cd opengeode
         ctest -C ${{ matrix.config }} --output-on-failure
