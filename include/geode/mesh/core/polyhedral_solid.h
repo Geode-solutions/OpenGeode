@@ -170,7 +170,7 @@ namespace geode
 
         /*!
          * Return the number of vertices in polyhedron facet.
-         * @param[in] polyhedron_facet Local index of the facet in polygon.
+         * @param[in] polyhedron_facet Local index of the facet in polyhedron.
          */
         index_t nb_polyhedron_facet_vertices(
             const PolyhedronFacet& polyhedron_facet ) const;
@@ -199,7 +199,7 @@ namespace geode
 
         /*!
          * Return the index of the polyhedron adjacent through a facet.
-         * @param[in] polygon_facet Local index of facet in polygon.
+         * @param[in] polyhedron_facet Local index of facet in polyhedron.
          * @return NO_ID if the polyhedron facet is on border, else the index of
          * the adjacent polyhedron.
          */
