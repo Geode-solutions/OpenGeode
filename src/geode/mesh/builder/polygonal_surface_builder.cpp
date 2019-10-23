@@ -28,7 +28,9 @@
 #include <geode/basic/attribute_manager.h>
 
 #include <geode/mesh/builder/detail/mapping_after_deletion.h>
+#include <geode/mesh/builder/triangulated_surface_builder.h>
 #include <geode/mesh/core/polygonal_surface.h>
+#include <geode/mesh/core/triangulated_surface.h>
 
 namespace
 {
@@ -96,10 +98,26 @@ namespace geode
         }
         catch( const OpenGeodeException& e )
         {
-            Logger::error( e.what() );
-            throw OpenGeodeException(
-                "Could not create PolygonalSurface builder of data structure: ",
-                mesh.type_name().get() );
+            try
+            {
+                return TriangulatedSurfaceBuilderFactory< dimension >::create(
+                    mesh.type_name(),
+                    dynamic_cast
+                            < TriangulatedSurface< dimension > & >( mesh ) );
+            }
+            catch( const std::bad_cast& e )
+            {
+                Logger::error( e.what() );
+                throw OpenGeodeException( "Could not cast PolygonalSurface "
+                                          "to TriangulatedSurface" );
+            }
+            catch( const OpenGeodeException& e )
+            {
+                Logger::error( e.what() );
+                throw OpenGeodeException( "Could not create PolygonalSurface "
+                                          "builder of data structure: ",
+                    mesh.type_name().get() );
+            }
         }
     }
 
@@ -146,7 +164,7 @@ namespace geode
             "that does not exist" );
         OPENGEODE_EXCEPTION(
             polygon_vertex.vertex_id < polygonal_surface_.nb_polygon_vertices(
-                polygon_vertex.polygon_id ),
+                                           polygon_vertex.polygon_id ),
             "[PolygonalSurfaceBuilder::set_polygon_vertex] Accessing an "
             "invalid polygon vertex" );
         OPENGEODE_EXCEPTION( vertex_id < polygonal_surface_.nb_vertices(),
@@ -175,7 +193,7 @@ namespace geode
             "polygon that does not exist" );
         OPENGEODE_EXCEPTION(
             polygon_edge.edge_id < polygonal_surface_.nb_polygon_edges(
-                polygon_edge.polygon_id ),
+                                       polygon_edge.polygon_id ),
             "[PolygonalSurfaceBuilder::set_polygon_adjacent] Accessing an "
             "invalid polygon vertex" );
         OPENGEODE_EXCEPTION( adjacent_id < polygonal_surface_.nb_polygons()
@@ -303,6 +321,30 @@ namespace geode
         create_vertex();
         set_point( first_added_vertex, point );
         return first_added_vertex;
+    }
+
+    template < index_t dimension >
+    void PolygonalSurfaceBuilder< dimension >::copy(
+        const PolygonalSurface< dimension >& polygonal_surface )
+    {
+        VertexSetBuilder::copy( polygonal_surface );
+        for( const auto p : Range{ polygonal_surface.nb_vertices() } )
+        {
+            set_point( p, polygonal_surface.point( p ) );
+        }
+        for( const auto p : Range{ polygonal_surface.nb_polygons() } )
+        {
+            std::vector< index_t > vertices(
+                polygonal_surface.nb_polygon_vertices( p ) );
+            for( const auto v :
+                Range{ polygonal_surface.nb_polygon_vertices( p ) } )
+            {
+                vertices[v] = polygonal_surface.polygon_vertex( { p, v } );
+            }
+            create_polygon( vertices );
+        }
+        polygonal_surface_.polygon_attribute_manager().copy(
+            polygonal_surface.polygon_attribute_manager() );
     }
 
     template class opengeode_mesh_api PolygonalSurfaceBuilder< 2 >;

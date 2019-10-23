@@ -29,6 +29,27 @@
 
 namespace geode
 {
+    std::unique_ptr< VertexSetBuilder > VertexSetBuilder::create( VertexSet& mesh )
+    {
+        try
+        {
+            return VertexSetBuilderFactory::create( mesh.type_name(), mesh );
+        }
+        catch( const OpenGeodeException& e )
+        {
+            Logger::error( e.what() );
+            throw OpenGeodeException(
+                "Could not create VertexSet builder of data structure: ",
+                mesh.type_name().get() );
+        }
+    }
+
+    void VertexSetBuilder::copy( const VertexSet& vertex_set )
+    {
+        create_vertices( vertex_set.nb_vertices() );
+        vertex_set_.vertex_attribute_manager().copy( vertex_set.vertex_attribute_manager() );
+    }
+
     index_t VertexSetBuilder::create_vertex()
     {
         auto first_added_vertex = vertex_set_.nb_vertices();

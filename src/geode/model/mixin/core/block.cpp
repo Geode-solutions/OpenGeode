@@ -29,7 +29,6 @@
 #include <geode/model/mixin/core/detail/mesh_storage.h>
 
 #include <geode/mesh/core/polyhedral_solid.h>
-#include <geode/mesh/core/tetrahedral_solid.h>
 
 namespace geode
 {
@@ -37,28 +36,6 @@ namespace geode
     class Block< dimension >::Impl
         : public detail::MeshStorage< PolyhedralSolid< dimension > >
     {
-        using base_class = detail::MeshStorage< PolyhedralSolid< dimension > >;
-
-    public:
-        Impl() : base_class( &create_mesh ) {}
-
-        static void create_mesh( const MeshType& type, base_class& storage )
-        {
-            if( TetrahedralSolidFactory< dimension >::has_creator( type ) )
-            {
-                storage.set_mesh(
-                    TetrahedralSolid< dimension >::create( type ) );
-            }
-            else if( PolyhedralSolidFactory< dimension >::has_creator( type ) )
-            {
-                storage.set_mesh(
-                    PolyhedralSolid< dimension >::create( type ) );
-            }
-            else
-            {
-                throw OpenGeodeException( "Unknown mesh type: ", type.get() );
-            }
-        }
     };
 
     template < index_t dimension >
@@ -70,7 +47,7 @@ namespace geode
     template < index_t dimension >
     Block< dimension >::Block( const MeshType& type )
     {
-        Impl::create_mesh( type, *impl_ );
+        impl_->set_mesh( PolyhedralSolid< dimension >::create( type ) );
     }
 
     template < index_t dimension >
@@ -103,6 +80,13 @@ namespace geode
         archive.object( impl_ );
         archive.ext(
             *this, bitsery::ext::BaseClass< Component< dimension > >{} );
+    }
+
+    template < index_t dimension >
+    void Block< dimension >::set_mesh(
+        std::unique_ptr< PolyhedralSolid< dimension > > mesh )
+    {
+        impl_->set_mesh( std::move( mesh ) );
     }
 
     template class opengeode_model_api Block< 3 >;

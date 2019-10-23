@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/basic/factory.h>
 #include <geode/basic/pimpl.h>
 
 #include <geode/mesh/common.h>
@@ -47,6 +48,14 @@ namespace geode
          * Create a new VertexSet
          */
         static std::unique_ptr< VertexSet > create();
+
+        /*!
+         * Create a new VertexSet using a specified data structure.
+         * @param[in] type Data structure type
+         */
+        static std::unique_ptr< VertexSet > create( const MeshType& type );
+
+        std::unique_ptr< VertexSet > clone() const;
 
         virtual ~VertexSet();
 
@@ -74,4 +83,6 @@ namespace geode
     private:
         IMPLEMENTATION_MEMBER( impl_ );
     };
+
+    using VertexSetFactory = Factory< MeshType, VertexSet >;
 } // namespace geode

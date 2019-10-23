@@ -22,6 +22,7 @@
  */
 
 #include <geode/basic/attribute.h>
+#include <geode/basic/attribute_manager.h>
 #include <geode/basic/logger.h>
 #include <geode/basic/point.h>
 
@@ -162,6 +163,38 @@ void test_barycenters()
         "[Test] PolyhedralSolid polyhedron barycenter is not correct" );
 }
 
+void test_create_vertex_attribute(
+    const geode::PolyhedralSolid3D& polyhedral_solid )
+{
+    auto attribute =
+        polyhedral_solid.vertex_attribute_manager()
+            .find_or_create_attribute< geode::VariableAttribute, double >(
+                "test" );
+    for( auto v : geode::Range{ polyhedral_solid.nb_vertices() } )
+    {
+        attribute->value( v ) = v;
+    }
+}
+
+void test_copy( const geode::PolyhedralSolid3D& polyhedral_solid )
+{
+    auto polyhedral_solid2 = polyhedral_solid.clone();
+    OPENGEODE_EXCEPTION( polyhedral_solid2->nb_vertices() == 7,
+        "[Test] PolyhedralSolid2 should have 7 vertices" );
+    OPENGEODE_EXCEPTION( polyhedral_solid2->nb_polyhedra() == 1,
+        "[Test] PolyhedralSolid2 should have 1 polyhedron" );
+
+    auto attribute2 =
+        polyhedral_solid2->vertex_attribute_manager().find_attribute< double >(
+            "test" );
+    for( auto v : geode::Range{ polyhedral_solid2->nb_vertices() } )
+    {
+        OPENGEODE_EXCEPTION( attribute2->value( v ) == v + 1,
+            "[Test]PolyhedralSolid2 attribute should be "
+                + std::to_string( v + 1 ) );
+    }
+}
+
 int main()
 {
     using namespace geode;
@@ -173,6 +206,7 @@ int main()
         auto builder = PolyhedralSolidBuilder3D::create( *polyhedral_solid );
 
         test_create_vertices( *polyhedral_solid, *builder );
+        test_create_vertex_attribute( *polyhedral_solid );
         test_create_polyhedra( *polyhedral_solid, *builder );
         test_polyhedron_adjacencies( *polyhedral_solid, *builder );
         auto base_file = "test." + polyhedral_solid->native_extension();
@@ -180,6 +214,7 @@ int main()
 
         test_delete_vertex( *polyhedral_solid, *builder );
         test_delete_polyhedra( *polyhedral_solid, *builder );
+        test_copy( *polyhedral_solid );
 
         test_barycenters();
 

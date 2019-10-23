@@ -23,6 +23,11 @@
 
 #include <geode/model/representation/builder/brep_builder.h>
 
+#include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/core/point_set.h>
+#include <geode/mesh/core/polygonal_surface.h>
+#include <geode/mesh/core/polyhedral_solid.h>
+
 #include <geode/model/mixin/core/block.h>
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/line.h>
@@ -42,6 +47,132 @@ namespace geode
               ModelBoundaries >( brep ),
           brep_( brep )
     {
+    }
+
+    void BRepBuilder::copy( const BRep& brep )
+    {
+        auto mapping = copy_components( brep );
+        copy_component_relationships( mapping, brep );
+        copy_component_geometry( mapping, brep );
+    }
+
+    BRepBuilder::ComponentMapping BRepBuilder::copy_components(
+        const BRep& brep )
+    {
+        ComponentMapping mapping;
+        for( const auto& corner : brep.corners() )
+        {
+            mapping.corners.emplace(
+                corner.id(), add_corner( corner.mesh().type_name() ) );
+        }
+        for( const auto& line : brep.lines() )
+        {
+            mapping.lines.emplace(
+                line.id(), add_line( line.mesh().type_name() ) );
+        }
+        for( const auto& surface : brep.surfaces() )
+        {
+            mapping.surfaces.emplace(
+                surface.id(), add_surface( surface.mesh().type_name() ) );
+        }
+        for( const auto& block : brep.blocks() )
+        {
+            mapping.blocks.emplace(
+                block.id(), add_block( block.mesh().type_name() ) );
+        }
+        for( const auto& model_boundary : brep.model_boundaries() )
+        {
+            mapping.model_boundaries.emplace(
+                model_boundary.id(), add_model_boundary() );
+        }
+        return mapping;
+    }
+
+    void BRepBuilder::copy_component_relationships(
+        const ComponentMapping& mapping, const BRep& brep )
+    {
+        for( const auto& line : brep.lines() )
+        {
+            const auto& new_line = brep_.line( mapping.lines.at( line.id() ) );
+            for( const auto& corner : brep.boundaries( line ) )
+            {
+                const auto& new_corner =
+                    brep_.corner( mapping.corners.at( corner.id() ) );
+                add_corner_line_relationship( new_corner, new_line );
+            }
+        }
+        for( const auto& surface : brep.surfaces() )
+        {
+            const auto& new_surface =
+                brep_.surface( mapping.surfaces.at( surface.id() ) );
+            for( const auto& line : brep.boundaries( surface ) )
+            {
+                const auto& new_line =
+                    brep_.line( mapping.lines.at( line.id() ) );
+                add_line_surface_relationship( new_line, new_surface );
+            }
+            for( const auto& line : brep.internals( surface ) )
+            {
+                const auto& new_line =
+                    brep_.line( mapping.lines.at( line.id() ) );
+                add_line_surface_internal_relationship( new_line, new_surface );
+            }
+        }
+        for( const auto& block : brep.blocks() )
+        {
+            const auto& new_block =
+                brep_.block( mapping.blocks.at( block.id() ) );
+            for( const auto& surface : brep.boundaries( block ) )
+            {
+                const auto& new_surface =
+                    brep_.surface( mapping.surfaces.at( surface.id() ) );
+                add_surface_block_relationship( new_surface, new_block );
+            }
+            for( const auto& surface : brep.internals( block ) )
+            {
+                const auto& new_surface =
+                    brep_.surface( mapping.surfaces.at( surface.id() ) );
+                add_surface_block_internal_relationship(
+                    new_surface, new_block );
+            }
+        }
+        for( const auto& model_boundary : brep.model_boundaries() )
+        {
+            const auto& new_model_boundary = brep_.model_boundary(
+                mapping.model_boundaries.at( model_boundary.id() ) );
+            for( const auto& surface : brep.items( model_boundary ) )
+            {
+                const auto& new_surface =
+                    brep_.surface( mapping.surfaces.at( surface.id() ) );
+                add_surface_in_model_boundary(
+                    new_surface, new_model_boundary );
+            }
+        }
+    }
+
+    void BRepBuilder::copy_component_geometry(
+        const ComponentMapping& mapping, const BRep& brep )
+    {
+        for( const auto& corner : brep.corners() )
+        {
+            set_corner_mesh(
+                mapping.corners.at( corner.id() ), corner.mesh().clone() );
+        }
+        for( const auto& line : brep.lines() )
+        {
+            set_line_mesh(
+                mapping.lines.at( line.id() ), line.mesh().clone() );
+        }
+        for( const auto& surface : brep.surfaces() )
+        {
+            set_surface_mesh(
+                mapping.surfaces.at( surface.id() ), surface.mesh().clone() );
+        }
+        for( const auto& block : brep.blocks() )
+        {
+            set_block_mesh(
+                mapping.blocks.at( block.id() ), block.mesh().clone() );
+        }
     }
 
     const uuid& BRepBuilder::add_corner()

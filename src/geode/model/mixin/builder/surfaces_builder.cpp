@@ -88,6 +88,12 @@ namespace geode
             std::move( name ) );
     }
 
+    template < index_t dimension >
+    void SurfacesBuilder< dimension >::set_surface_mesh( const uuid& id, std::unique_ptr< PolygonalSurface< dimension > > mesh )
+    {
+        surfaces_.modifiable_surface( id ).set_mesh( std::move( mesh ) );
+    }
+
     template class opengeode_model_api SurfacesBuilder< 2 >;
     template class opengeode_model_api SurfacesBuilder< 3 >;
 } // namespace geode

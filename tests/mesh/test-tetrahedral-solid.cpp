@@ -118,6 +118,15 @@ void test_io(
     load_tetrahedral_solid( *new_solid, filename );
 }
 
+void test_copy( const geode::TetrahedralSolid3D& solid )
+{
+    auto solid2 = solid.clone();
+    OPENGEODE_EXCEPTION( solid2->nb_vertices() == 5,
+        "[Test] TetrahedralSolid2 should have 5 vertices" );
+    OPENGEODE_EXCEPTION( solid2->nb_polyhedra() == 1,
+        "[Test] TetrahedralSolid2 should have 1 polyhedron" );
+}
+
 int main()
 {
     using namespace geode;
@@ -136,6 +145,7 @@ int main()
 
         test_delete_vertex( *solid, *builder );
         test_delete_polyhedron( *solid, *builder );
+        test_copy( *solid );
 
         Logger::info( "TEST SUCCESS" );
         return 0;

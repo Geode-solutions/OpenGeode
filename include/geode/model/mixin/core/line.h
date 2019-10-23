@@ -79,6 +79,9 @@ namespace geode
         EdgedCurve< dimension >& modifiable_mesh();
 
         friend class LinesBuilder< dimension >;
+        void set_mesh( std::unique_ptr< EdgedCurve< dimension > > mesh );
+
+        friend class LinesBuilder< dimension >;
         void set_line_name( std::string name )
         {
             this->set_name( std::move( name ) );

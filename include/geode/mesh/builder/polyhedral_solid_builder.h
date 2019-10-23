@@ -143,6 +143,9 @@ namespace geode
         {
         }
 
+        friend class PolyhedralSolid< dimension >;
+        void copy( const PolyhedralSolid< dimension >& polyhedral_solid );
+
     private:
         /*!
          * @brief Sets a point.

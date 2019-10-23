@@ -132,7 +132,7 @@ std::vector< geode::uuid > add_model_boundaries(
         section.model_boundary( builder.add_model_boundary() );
     builder.remove_model_boundary( temp_boundary );
     auto message =
-        "[Test] BRep should have " + std::to_string( nb ) + " model boundaries";
+        "[Test] Section should have " + std::to_string( nb ) + " model boundaries";
     OPENGEODE_EXCEPTION( section.nb_model_boundaries() == nb, message );
     OPENGEODE_EXCEPTION(
         count_components( section.model_boundaries() ) == nb, message );
@@ -358,6 +358,90 @@ void test_item_ranges( const geode::Section& model,
     }
     OPENGEODE_EXCEPTION( boundary_item_count == 2,
         "[Test] CornerIncidenceRange should iterates on 2 Lines (Boundary 1)" );
+}
+
+void test_copy( const geode::Section& section )
+{
+    geode::Section section2;
+    geode::SectionBuilder builder{ section2 };
+    builder.copy( section );
+    OPENGEODE_EXCEPTION(
+        section2.nb_corners() == 5, "[Test] Section should have 5 corners" );
+    OPENGEODE_EXCEPTION(
+        section2.nb_lines() == 6, "[Test] Section should have 6 lines" );
+    OPENGEODE_EXCEPTION(
+        section2.nb_surfaces() == 2, "[Test] Section should have 2 surfaces" );
+    OPENGEODE_EXCEPTION( section2.nb_model_boundaries() == 2,
+        "[Test] Section should have 2 model boundaries" );
+
+    auto mapping = builder.copy_components( section );
+    builder.copy_component_relationships( mapping, section );
+    OPENGEODE_EXCEPTION(
+        section2.nb_corners() == 10, "[Test] Section should have 10 corners" );
+    OPENGEODE_EXCEPTION(
+        section2.nb_lines() == 12, "[Test] Section should have 12 lines" );
+    OPENGEODE_EXCEPTION(
+        section2.nb_surfaces() == 4, "[Test] Section should have 4 surfaces" );
+    OPENGEODE_EXCEPTION( section2.nb_model_boundaries() == 4,
+        "[Test] Section should have 4 model boundaries" );
+
+    for( const auto& corner : section.corners() )
+    {
+        const auto& new_corner =
+            section2.corner( mapping.corners.at( corner.id() ) );
+        for( const auto& line : section.incidences( corner ) )
+        {
+            bool found = { false };
+            for( const auto& new_line : section2.incidences( new_corner ) )
+            {
+                if( mapping.lines.at( line.id() ) == new_line.id() )
+                {
+                    found = true;
+                    break;
+                }
+            }
+            OPENGEODE_EXCEPTION(
+                found, "[Test] All Corners incidences are not correct" );
+        }
+    }
+    for( const auto& line : section.lines() )
+    {
+        const auto& new_line =
+            section2.line( mapping.lines.at( line.id() ) );
+        for( const auto& surface : section.incidences( line ) )
+        {
+            bool found = { false };
+            for( const auto& new_surface : section2.incidences( new_line ) )
+            {
+                if( mapping.surfaces.at( surface.id() ) == new_surface.id() )
+                {
+                    found = true;
+                    break;
+                }
+            }
+            OPENGEODE_EXCEPTION(
+                found, "[Test] All Lines incidences are not correct" );
+        }
+    }
+    for( const auto& model_boundary : section.model_boundaries() )
+    {
+        const auto& new_model_boundary =
+            section2.model_boundary( mapping.model_boundaries.at( model_boundary.id() ) );
+        for( const auto& line : section.items( model_boundary ) )
+        {
+            bool found = { false };
+            for( const auto& new_line : section2.items( new_model_boundary ) )
+            {
+                if( mapping.lines.at( line.id() ) == new_line.id() )
+                {
+                    found = true;
+                    break;
+                }
+            }
+            OPENGEODE_EXCEPTION(
+                found, "[Test] All ModelBoundaries incidences are not correct" );
+        }
+    }
 }
 
 int main()

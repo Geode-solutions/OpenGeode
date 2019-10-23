@@ -80,6 +80,9 @@ namespace geode
         PolyhedralSolid< dimension >& modifiable_mesh();
 
         friend class BlocksBuilder< dimension >;
+        void set_mesh( std::unique_ptr< PolyhedralSolid< dimension > > mesh );
+
+        friend class BlocksBuilder< dimension >;
         void set_block_name( std::string name )
         {
             this->set_name( std::move( name ) );

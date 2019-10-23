@@ -134,6 +134,30 @@ namespace geode
             return nb_elements_;
         }
 
+        void copy( const AttributeManager::Impl& attribute_manager )
+        {
+            nb_elements_ = attribute_manager.nb_elements_;
+            for( const auto& attribute : attribute_manager.attributes_ )
+            {
+                auto it = attributes_.find( attribute.first );
+                if( it != attributes_.end() )
+                {
+                    try
+                    {
+                        it->second->copy( *attribute.second, nb_elements_ );
+                    }
+                    catch( const std::bad_cast& e)
+                    {
+                        Logger::error(attribute.first, " attribute cannot be copied: ", e.what() );
+                    }                    
+                }
+                else
+                {
+                    attributes_.emplace( attribute.first, attribute.second->clone() );
+                }
+            }
+        }
+
         template < typename Archive >
         void serialize( Archive &archive )
         {
@@ -221,6 +245,11 @@ namespace geode
     index_t AttributeManager::nb_elements() const
     {
         return impl_->nb_elements();
+    }
+
+    void AttributeManager::copy( const AttributeManager& attribute_manager )
+    {
+        impl_->copy( *attribute_manager.impl_ );
     }
 
     template < typename Archive >

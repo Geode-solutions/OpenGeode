@@ -59,6 +59,8 @@ namespace geode
         static std::unique_ptr< PointSet< dimension > > create(
             const MeshType& type );
 
+        std::unique_ptr< PointSet< dimension > > clone() const;
+
         const Point< dimension >& point( index_t vertex_id ) const;
 
     protected:

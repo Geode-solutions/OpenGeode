@@ -157,6 +157,8 @@ namespace geode
          */
         index_t nb_elements() const;
 
+        void copy( const AttributeManager& attribute_manager );
+
         template < typename Type, typename Serializer >
         static void register_attribute_type( PContext& context )
         {

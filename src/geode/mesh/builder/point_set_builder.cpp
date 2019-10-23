@@ -67,6 +67,16 @@ namespace geode
         return first_added_vertex;
     }
 
+    template < index_t dimension >
+    void PointSetBuilder< dimension >::copy( const PointSet< dimension >& point_set )
+    {
+        VertexSetBuilder::copy( point_set );
+        for( const auto p : Range{ point_set.nb_vertices() } )
+        {
+            set_point( p, point_set.point( p ) );
+        }
+    }
+
     template class opengeode_mesh_api PointSetBuilder< 2 >;
     template class opengeode_mesh_api PointSetBuilder< 3 >;
 } // namespace geode

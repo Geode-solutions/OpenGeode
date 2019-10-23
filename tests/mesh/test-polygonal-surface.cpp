@@ -271,6 +271,25 @@ void test_io( const geode::PolygonalSurface3D& polygonal_surface,
     load_polygonal_surface( *new_polygonal_surface, filename );
 }
 
+void test_copy( const geode::PolygonalSurface3D& polygonal_surface )
+{
+    auto polygonal_surface2 = polygonal_surface.clone();
+    OPENGEODE_EXCEPTION( polygonal_surface2->nb_vertices() == 6,
+        "[Test] PolygonalSurface2 should have 6 vertices" );
+    OPENGEODE_EXCEPTION( polygonal_surface2->nb_polygons() == 1,
+        "[Test] PolygonalSurface2 should have 1 polygon" );
+
+    auto attribute2 =
+        polygonal_surface2->vertex_attribute_manager().find_attribute< double >(
+            "test" );
+    for( auto v : geode::Range{ polygonal_surface2->nb_vertices() } )
+    {
+        OPENGEODE_EXCEPTION( attribute2->value( v ) == v + 1,
+            "[Test] PolygonalSurface2 attribute should be "
+                + std::to_string( v + 1 ) );
+    }
+}
+
 int main()
 {
     using namespace geode;
@@ -298,6 +317,7 @@ int main()
 
         test_delete_vertex( *polygonal_surface, *builder );
         test_delete_polygon( *polygonal_surface, *builder );
+        test_copy( *polygonal_surface );
 
         Logger::info( "TEST SUCCESS" );
         return 0;

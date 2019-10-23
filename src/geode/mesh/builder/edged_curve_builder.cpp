@@ -65,6 +65,17 @@ namespace geode
         return first_added_vertex;
     }
 
+    template < index_t dimension >
+    void EdgedCurveBuilder< dimension >::copy( const EdgedCurve< dimension >& edged_curve )
+    {
+        VertexSetBuilder::copy( edged_curve );
+        GraphBuilder::copy( edged_curve );
+        for( const auto p : Range{ edged_curve.nb_vertices() } )
+        {
+            set_point( p, edged_curve.point( p ) );
+        }
+    }
+
     template class opengeode_mesh_api EdgedCurveBuilder< 2 >;
     template class opengeode_mesh_api EdgedCurveBuilder< 3 >;
 } // namespace geode

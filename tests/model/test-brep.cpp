@@ -515,6 +515,113 @@ void test_reloaded_brep( const geode::BRep& model )
         "[Test] Number of Boundaries in reloaded BRep should be 3" );
 }
 
+void test_copy( const geode::BRep& brep )
+{
+    geode::BRep brep2;
+    geode::BRepBuilder builder{ brep2 };
+    builder.copy( brep );
+    OPENGEODE_EXCEPTION(
+        brep2.nb_corners() == 6, "[Test] BRep should have 6 corners" );
+    OPENGEODE_EXCEPTION(
+        brep2.nb_lines() == 9, "[Test] BRep should have 9 lines" );
+    OPENGEODE_EXCEPTION(
+        brep2.nb_surfaces() == 5, "[Test] BRep should have 5 surfaces" );
+    OPENGEODE_EXCEPTION(
+        brep2.nb_blocks() == 1, "[Test] BRep should have 1 block" );
+    OPENGEODE_EXCEPTION( brep2.nb_model_boundaries() == 3,
+        "[Test] BRep should have 3 model boundaries" );
+
+    auto mapping = builder.copy_components( brep );
+    builder.copy_component_relationships( mapping, brep );
+    OPENGEODE_EXCEPTION(
+        brep2.nb_corners() == 12, "[Test] BRep should have 12 corners" );
+    OPENGEODE_EXCEPTION(
+        brep2.nb_lines() == 18, "[Test] BRep should have 18 lines" );
+    OPENGEODE_EXCEPTION(
+        brep2.nb_surfaces() == 10, "[Test] BRep should have 10 surfaces" );
+    OPENGEODE_EXCEPTION(
+        brep2.nb_blocks() == 2, "[Test] BRep should have 2 block" );
+    OPENGEODE_EXCEPTION( brep2.nb_model_boundaries() == 6,
+        "[Test] BRep should have 6 model boundaries" );
+
+    for( const auto& corner : brep.corners() )
+    {
+        const auto& new_corner =
+            brep2.corner( mapping.corners.at( corner.id() ) );
+        for( const auto& line : brep.incidences( corner ) )
+        {
+            bool found = { false };
+            for( const auto& new_line : brep2.incidences( new_corner ) )
+            {
+                if( mapping.lines.at( line.id() ) == new_line.id() )
+                {
+                    found = true;
+                    break;
+                }
+            }
+            OPENGEODE_EXCEPTION(
+                found, "[Test] All Corners incidences are not correct" );
+        }
+    }
+    for( const auto& line : brep.lines() )
+    {
+        const auto& new_line =
+            brep2.line( mapping.lines.at( line.id() ) );
+        for( const auto& surface : brep.incidences( line ) )
+        {
+            bool found = { false };
+            for( const auto& new_surface : brep2.incidences( new_line ) )
+            {
+                if( mapping.surfaces.at( surface.id() ) == new_surface.id() )
+                {
+                    found = true;
+                    break;
+                }
+            }
+            OPENGEODE_EXCEPTION(
+                found, "[Test] All Lines incidences are not correct" );
+        }
+    }
+    for( const auto& surface : brep.surfaces() )
+    {
+        const auto& new_surface =
+            brep2.surface( mapping.surfaces.at( surface.id() ) );
+        for( const auto& block : brep.incidences( surface ) )
+        {
+            bool found = { false };
+            for( const auto& new_block : brep2.incidences( new_surface ) )
+            {
+                if( mapping.blocks.at( block.id() ) == new_block.id() )
+                {
+                    found = true;
+                    break;
+                }
+            }
+            OPENGEODE_EXCEPTION(
+                found, "[Test] All Surfaces incidences are not correct" );
+        }
+    }
+    for( const auto& model_boundary : brep.model_boundaries() )
+    {
+        const auto& new_model_boundary =
+            brep2.model_boundary( mapping.model_boundaries.at( model_boundary.id() ) );
+        for( const auto& surface : brep.items( model_boundary ) )
+        {
+            bool found = { false };
+            for( const auto& new_surface : brep2.items( new_model_boundary ) )
+            {
+                if( mapping.surfaces.at( surface.id() ) == new_surface.id() )
+                {
+                    found = true;
+                    break;
+                }
+            }
+            OPENGEODE_EXCEPTION(
+                found, "[Test] All ModelBoundaries incidences are not correct" );
+        }
+    }
+}
+
 int main()
 {
     using namespace geode;
@@ -543,6 +650,7 @@ int main()
         test_incidence_ranges(
             model, corner_uuids, line_uuids, surface_uuids, block_uuids );
         test_item_ranges( model, surface_uuids, model_boundary_uuids );
+        test_copy( model );
 
         std::string file_io{ "test." + model.native_extension() };
         save_brep( model, file_io );

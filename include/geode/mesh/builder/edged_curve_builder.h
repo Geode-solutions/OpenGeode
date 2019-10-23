@@ -68,6 +68,9 @@ namespace geode
         {
         }
 
+        friend class EdgedCurve< dimension >;
+        void copy( const EdgedCurve< dimension >& edged_curve );
+
     private:
         virtual void do_set_point(
             index_t vertex_id, const Point< dimension >& point ) = 0;
