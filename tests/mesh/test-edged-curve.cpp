@@ -167,17 +167,15 @@ void test_copy( const geode::EdgedCurve3D& edged_curve )
     attribute->value( 0 ) = 42;
 
     auto edged_curve2 = edged_curve.clone();
-    OPENGEODE_EXCEPTION(
-        edged_curve2->nb_vertices() == 3, "[Test] EdgedCurve2 should have 3 vertices" );
-    OPENGEODE_EXCEPTION(
-        edged_curve2->nb_edges() == 1, "[Test] EdgedCurve2 should have 1 edge" );
-            
+    OPENGEODE_EXCEPTION( edged_curve2->nb_vertices() == 3,
+        "[Test] EdgedCurve2 should have 3 vertices" );
+    OPENGEODE_EXCEPTION( edged_curve2->nb_edges() == 1,
+        "[Test] EdgedCurve2 should have 1 edge" );
+
     auto attribute2 =
-        edged_curve2->edge_attribute_manager()
-            .find_attribute< int >(
-                "test" );
-                OPENGEODE_EXCEPTION(
-        attribute2->value( 0 ) == 42, "[Test] EdgedCurve2 attribute should be 42" );
+        edged_curve2->edge_attribute_manager().find_attribute< int >( "test" );
+    OPENGEODE_EXCEPTION( attribute2->value( 0 ) == 42,
+        "[Test] EdgedCurve2 attribute should be 42" );
 }
 
 int main()

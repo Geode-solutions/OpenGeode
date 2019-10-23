@@ -66,7 +66,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    void EdgedCurveBuilder< dimension >::copy( const EdgedCurve< dimension >& edged_curve )
+    void EdgedCurveBuilder< dimension >::copy(
+        const EdgedCurve< dimension >& edged_curve )
     {
         VertexSetBuilder::copy( edged_curve );
         GraphBuilder::copy( edged_curve );

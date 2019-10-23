@@ -89,7 +89,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    void SurfacesBuilder< dimension >::set_surface_mesh( const uuid& id, std::unique_ptr< PolygonalSurface< dimension > > mesh )
+    void SurfacesBuilder< dimension >::set_surface_mesh(
+        const uuid& id, std::unique_ptr< PolygonalSurface< dimension > > mesh )
     {
         surfaces_.modifiable_surface( id ).set_mesh( std::move( mesh ) );
     }

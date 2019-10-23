@@ -56,7 +56,8 @@ namespace geode
 
         void set_corner_name( const uuid& id, std::string name );
 
-        void set_corner_mesh( const uuid& id, std::unique_ptr< PointSet< dimension > > mesh );
+        void set_corner_mesh(
+            const uuid& id, std::unique_ptr< PointSet< dimension > > mesh );
 
     protected:
         CornersBuilder( Corners< dimension >& corners ) : corners_( corners ) {}

@@ -86,9 +86,11 @@ namespace geode
 
         ComponentMapping copy_components( const BRep& brep );
 
-        void copy_component_relationships( const ComponentMapping& mapping, const BRep& brep );
+        void copy_component_relationships(
+            const ComponentMapping& mapping, const BRep& brep );
 
-        void copy_component_geometry( const ComponentMapping& mapping, const BRep& brep );
+        void copy_component_geometry(
+            const ComponentMapping& mapping, const BRep& brep );
 
         const uuid& add_corner();
 

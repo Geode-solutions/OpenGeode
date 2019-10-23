@@ -68,7 +68,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    void PointSetBuilder< dimension >::copy( const PointSet< dimension >& point_set )
+    void PointSetBuilder< dimension >::copy(
+        const PointSet< dimension >& point_set )
     {
         VertexSetBuilder::copy( point_set );
         for( const auto p : Range{ point_set.nb_vertices() } )

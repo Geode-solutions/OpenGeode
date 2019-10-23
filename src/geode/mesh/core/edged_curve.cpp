@@ -89,7 +89,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::unique_ptr< EdgedCurve< dimension > > EdgedCurve< dimension >::clone() const
+    std::unique_ptr< EdgedCurve< dimension > >
+        EdgedCurve< dimension >::clone() const
     {
         auto new_clone = create( type_name() );
         auto builder = EdgedCurveBuilder< dimension >::create( *new_clone );

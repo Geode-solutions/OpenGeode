@@ -80,7 +80,7 @@ int main()
 
         auto vertex_set2 = vertex_set.clone();
         OPENGEODE_EXCEPTION( vertex_set2->nb_vertices() == 5,
-        "[Test] VertexSet2 should have 5 vertices" );
+            "[Test] VertexSet2 should have 5 vertices" );
 
         Logger::info( "TEST SUCCESS" );
         return 0;

@@ -83,7 +83,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    void Corner< dimension >::set_mesh( std::unique_ptr< PointSet< dimension > > mesh )
+    void Corner< dimension >::set_mesh(
+        std::unique_ptr< PointSet< dimension > > mesh )
     {
         impl_->set_mesh( std::move( mesh ) );
     }

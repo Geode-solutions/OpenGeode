@@ -51,8 +51,7 @@ namespace geode
          * Create the builder associated with a VertexSet.
          * @param[in] mesh The VertexSet to build/modify
          */
-        static std::unique_ptr< VertexSetBuilder > create(
-            VertexSet& mesh );
+        static std::unique_ptr< VertexSetBuilder > create( VertexSet& mesh );
 
         /*!
          * Create a new vertex.
@@ -93,5 +92,6 @@ namespace geode
         VertexSet& vertex_set_;
     };
 
-    using VertexSetBuilderFactory = Factory< MeshType, VertexSetBuilder, VertexSet& >;
+    using VertexSetBuilderFactory =
+        Factory< MeshType, VertexSetBuilder, VertexSet& >;
 } // namespace geode
