@@ -83,7 +83,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    void Line< dimension >::set_mesh( std::unique_ptr< EdgedCurve< dimension > > mesh )
+    void Line< dimension >::set_mesh(
+        std::unique_ptr< EdgedCurve< dimension > > mesh )
     {
         impl_->set_mesh( std::move( mesh ) );
     }

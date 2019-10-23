@@ -86,7 +86,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    void BlocksBuilder< dimension >::set_block_mesh( const uuid& id, std::unique_ptr< PolyhedralSolid< dimension > > mesh )
+    void BlocksBuilder< dimension >::set_block_mesh(
+        const uuid& id, std::unique_ptr< PolyhedralSolid< dimension > > mesh )
     {
         blocks_.modifiable_block( id ).set_mesh( std::move( mesh ) );
     }

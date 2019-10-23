@@ -565,8 +565,7 @@ void test_copy( const geode::BRep& brep )
     }
     for( const auto& line : brep.lines() )
     {
-        const auto& new_line =
-            brep2.line( mapping.lines.at( line.id() ) );
+        const auto& new_line = brep2.line( mapping.lines.at( line.id() ) );
         for( const auto& surface : brep.incidences( line ) )
         {
             bool found = { false };
@@ -603,8 +602,8 @@ void test_copy( const geode::BRep& brep )
     }
     for( const auto& model_boundary : brep.model_boundaries() )
     {
-        const auto& new_model_boundary =
-            brep2.model_boundary( mapping.model_boundaries.at( model_boundary.id() ) );
+        const auto& new_model_boundary = brep2.model_boundary(
+            mapping.model_boundaries.at( model_boundary.id() ) );
         for( const auto& surface : brep.items( model_boundary ) )
         {
             bool found = { false };
@@ -616,8 +615,8 @@ void test_copy( const geode::BRep& brep )
                     break;
                 }
             }
-            OPENGEODE_EXCEPTION(
-                found, "[Test] All ModelBoundaries incidences are not correct" );
+            OPENGEODE_EXCEPTION( found,
+                "[Test] All ModelBoundaries incidences are not correct" );
         }
     }
 }

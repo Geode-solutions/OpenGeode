@@ -53,12 +53,14 @@ namespace geode
                 type.get() );
         }
     }
-    
+
     template < index_t dimension >
-    std::unique_ptr< TetrahedralSolid< dimension > > TetrahedralSolid< dimension >::clone() const
+    std::unique_ptr< TetrahedralSolid< dimension > >
+        TetrahedralSolid< dimension >::clone() const
     {
         auto new_clone = create( this->type_name() );
-        auto builder = TetrahedralSolidBuilder< dimension >::create( *new_clone );
+        auto builder =
+            TetrahedralSolidBuilder< dimension >::create( *new_clone );
         builder->copy( *this );
         return new_clone;
     }

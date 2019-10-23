@@ -73,7 +73,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::unique_ptr< PointSet< dimension > > PointSet< dimension >::clone() const
+    std::unique_ptr< PointSet< dimension > >
+        PointSet< dimension >::clone() const
     {
         auto new_clone = create( type_name() );
         auto builder = PointSetBuilder< dimension >::create( *new_clone );

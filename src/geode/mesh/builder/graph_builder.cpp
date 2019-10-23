@@ -171,7 +171,7 @@ namespace geode
         {
             for( auto v : Range{ 2 } )
             {
-                EdgeVertex id{e, v};
+                EdgeVertex id{ e, v };
                 set_edge_vertex( id, graph.edge_vertex( id ) );
             }
         }

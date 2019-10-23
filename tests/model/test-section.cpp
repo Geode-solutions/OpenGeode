@@ -131,8 +131,8 @@ std::vector< geode::uuid > add_model_boundaries(
     const auto& temp_boundary =
         section.model_boundary( builder.add_model_boundary() );
     builder.remove_model_boundary( temp_boundary );
-    auto message =
-        "[Test] Section should have " + std::to_string( nb ) + " model boundaries";
+    auto message = "[Test] Section should have " + std::to_string( nb )
+                   + " model boundaries";
     OPENGEODE_EXCEPTION( section.nb_model_boundaries() == nb, message );
     OPENGEODE_EXCEPTION(
         count_components( section.model_boundaries() ) == nb, message );
@@ -406,8 +406,7 @@ void test_copy( const geode::Section& section )
     }
     for( const auto& line : section.lines() )
     {
-        const auto& new_line =
-            section2.line( mapping.lines.at( line.id() ) );
+        const auto& new_line = section2.line( mapping.lines.at( line.id() ) );
         for( const auto& surface : section.incidences( line ) )
         {
             bool found = { false };
@@ -425,8 +424,8 @@ void test_copy( const geode::Section& section )
     }
     for( const auto& model_boundary : section.model_boundaries() )
     {
-        const auto& new_model_boundary =
-            section2.model_boundary( mapping.model_boundaries.at( model_boundary.id() ) );
+        const auto& new_model_boundary = section2.model_boundary(
+            mapping.model_boundaries.at( model_boundary.id() ) );
         for( const auto& line : section.items( model_boundary ) )
         {
             bool found = { false };
@@ -438,8 +437,8 @@ void test_copy( const geode::Section& section )
                     break;
                 }
             }
-            OPENGEODE_EXCEPTION(
-                found, "[Test] All ModelBoundaries incidences are not correct" );
+            OPENGEODE_EXCEPTION( found,
+                "[Test] All ModelBoundaries incidences are not correct" );
         }
     }
 }

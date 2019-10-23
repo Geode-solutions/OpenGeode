@@ -160,8 +160,7 @@ namespace geode
         }
         for( const auto& line : brep.lines() )
         {
-            set_line_mesh(
-                mapping.lines.at( line.id() ), line.mesh().clone() );
+            set_line_mesh( mapping.lines.at( line.id() ), line.mesh().clone() );
         }
         for( const auto& surface : brep.surfaces() )
         {

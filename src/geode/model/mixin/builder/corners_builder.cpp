@@ -26,8 +26,8 @@
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/corners.h>
 
-#include <geode/mesh/core/point_set.h>
 #include <geode/mesh/builder/point_set_builder.h>
+#include <geode/mesh/core/point_set.h>
 
 namespace geode
 {
@@ -74,7 +74,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    void CornersBuilder< dimension >::set_corner_mesh( const uuid& id, std::unique_ptr< PointSet< dimension > > mesh )
+    void CornersBuilder< dimension >::set_corner_mesh(
+        const uuid& id, std::unique_ptr< PointSet< dimension > > mesh )
     {
         corners_.modifiable_corner( id ).set_mesh( std::move( mesh ) );
     }

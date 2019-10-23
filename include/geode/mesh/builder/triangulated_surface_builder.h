@@ -68,7 +68,8 @@ namespace geode
         }
 
         friend class TriangulatedSurface< dimension >;
-        void copy( const TriangulatedSurface< dimension >& triangulated_surface );
+        void copy(
+            const TriangulatedSurface< dimension >& triangulated_surface );
 
     private:
         void do_create_polygon( const std::vector< index_t >& vertices ) final;

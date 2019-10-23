@@ -83,10 +83,11 @@ namespace geode
 
         ComponentMapping copy_components( const Section& section );
 
-        void copy_component_relationships( const ComponentMapping& mapping, const Section& section );
+        void copy_component_relationships(
+            const ComponentMapping& mapping, const Section& section );
 
-        void copy_component_geometry( const ComponentMapping& mapping, const Section& section );
-
+        void copy_component_geometry(
+            const ComponentMapping& mapping, const Section& section );
 
         const uuid& add_corner();
 

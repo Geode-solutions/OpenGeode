@@ -23,8 +23,8 @@
 
 #include <geode/model/representation/builder/section_builder.h>
 
-#include <geode/mesh/core/point_set.h>
 #include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/core/point_set.h>
 #include <geode/mesh/core/polygonal_surface.h>
 
 #include <geode/model/mixin/core/block.h>
@@ -83,7 +83,8 @@ namespace geode
     {
         for( const auto& line : section.lines() )
         {
-            const auto& new_line = section_.line( mapping.lines.at( line.id() ) );
+            const auto& new_line =
+                section_.line( mapping.lines.at( line.id() ) );
             for( const auto& corner : section.boundaries( line ) )
             {
                 const auto& new_corner =
@@ -116,8 +117,7 @@ namespace geode
             {
                 const auto& new_line =
                     section_.line( mapping.lines.at( line.id() ) );
-                add_line_in_model_boundary(
-                    new_line, new_model_boundary );
+                add_line_in_model_boundary( new_line, new_model_boundary );
             }
         }
     }
@@ -132,8 +132,7 @@ namespace geode
         }
         for( const auto& line : section.lines() )
         {
-            set_line_mesh(
-                mapping.lines.at( line.id() ), line.mesh().clone() );
+            set_line_mesh( mapping.lines.at( line.id() ), line.mesh().clone() );
         }
         for( const auto& surface : section.surfaces() )
         {
