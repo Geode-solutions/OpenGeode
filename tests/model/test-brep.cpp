@@ -515,7 +515,7 @@ void test_reloaded_brep( const geode::BRep& model )
         "[Test] Number of Boundaries in reloaded BRep should be 3" );
 }
 
-void test_copy( const geode::BRep& brep )
+void test_clone( const geode::BRep& brep )
 {
     geode::BRep brep2;
     geode::BRepBuilder builder{ brep2 };
@@ -540,7 +540,7 @@ void test_copy( const geode::BRep& brep )
     OPENGEODE_EXCEPTION(
         brep2.nb_surfaces() == 10, "[Test] BRep should have 10 surfaces" );
     OPENGEODE_EXCEPTION(
-        brep2.nb_blocks() == 2, "[Test] BRep should have 2 block" );
+        brep2.nb_blocks() == 2, "[Test] BRep should have 2 blocks" );
     OPENGEODE_EXCEPTION( brep2.nb_model_boundaries() == 6,
         "[Test] BRep should have 6 model boundaries" );
 
@@ -550,7 +550,7 @@ void test_copy( const geode::BRep& brep )
             brep2.corner( mapping.corners.at( corner.id() ) );
         for( const auto& line : brep.incidences( corner ) )
         {
-            bool found = { false };
+            bool found{ false };
             for( const auto& new_line : brep2.incidences( new_corner ) )
             {
                 if( mapping.lines.at( line.id() ) == new_line.id() )
@@ -649,7 +649,7 @@ int main()
         test_incidence_ranges(
             model, corner_uuids, line_uuids, surface_uuids, block_uuids );
         test_item_ranges( model, surface_uuids, model_boundary_uuids );
-        test_copy( model );
+        test_clone( model );
 
         std::string file_io{ "test." + model.native_extension() };
         save_brep( model, file_io );

@@ -271,7 +271,7 @@ void test_io( const geode::PolygonalSurface3D& polygonal_surface,
     load_polygonal_surface( *new_polygonal_surface, filename );
 }
 
-void test_copy( const geode::PolygonalSurface3D& polygonal_surface )
+void test_clone( const geode::PolygonalSurface3D& polygonal_surface )
 {
     auto polygonal_surface2 = polygonal_surface.clone();
     OPENGEODE_EXCEPTION( polygonal_surface2->nb_vertices() == 6,
@@ -317,7 +317,7 @@ int main()
 
         test_delete_vertex( *polygonal_surface, *builder );
         test_delete_polygon( *polygonal_surface, *builder );
-        test_copy( *polygonal_surface );
+        test_clone( *polygonal_surface );
 
         Logger::info( "TEST SUCCESS" );
         return 0;

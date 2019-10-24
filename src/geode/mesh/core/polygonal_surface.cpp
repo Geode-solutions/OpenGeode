@@ -539,7 +539,7 @@ namespace geode
         {
             try
             {
-                return TriangulatedSurfaceFactory< dimension >::create( type );
+                return TriangulatedSurface< dimension >::create( type );
             }
             catch( const OpenGeodeException& e )
             {
@@ -555,11 +555,11 @@ namespace geode
     std::unique_ptr< PolygonalSurface< dimension > >
         PolygonalSurface< dimension >::clone() const
     {
-        auto new_clone = create( this->type_name() );
+        auto clone = create( this->type_name() );
         auto builder =
-            PolygonalSurfaceBuilder< dimension >::create( *new_clone );
+            PolygonalSurfaceBuilder< dimension >::create( *clone );
         builder->copy( *this );
-        return new_clone;
+        return clone;
     }
 
     std::unique_ptr< PolygonalSurface< 3 > > PolygonalSurface< 3 >::create()
@@ -595,10 +595,10 @@ namespace geode
     std::unique_ptr< PolygonalSurface< 3 > >
         PolygonalSurface< 3 >::clone() const
     {
-        auto new_clone = create( type_name() );
-        auto builder = PolygonalSurfaceBuilder< 3 >::create( *new_clone );
+        auto clone = create( type_name() );
+        auto builder = PolygonalSurfaceBuilder< 3 >::create( *clone );
         builder->copy( *this );
-        return new_clone;
+        return clone;
     }
 
     template class opengeode_mesh_api PolygonalSurfaceBase< 2 >;

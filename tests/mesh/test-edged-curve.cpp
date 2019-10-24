@@ -158,7 +158,7 @@ void test_edge_requests( const geode::EdgedCurve3D& edged_curve,
         "[Test] Edge length is not correct" );
 }
 
-void test_copy( const geode::EdgedCurve3D& edged_curve )
+void test_clone( const geode::EdgedCurve3D& edged_curve )
 {
     auto attribute =
         edged_curve.edge_attribute_manager()
@@ -195,6 +195,7 @@ int main()
 
         test_delete_vertex( *edged_curve, *builder );
         test_delete_edge( *edged_curve, *builder );
+        test_clone( *edged_curve );
 
         test_edge_requests( *edged_curve, *builder );
 

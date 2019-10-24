@@ -360,7 +360,7 @@ void test_item_ranges( const geode::Section& model,
         "[Test] CornerIncidenceRange should iterates on 2 Lines (Boundary 1)" );
 }
 
-void test_copy( const geode::Section& section )
+void test_clone( const geode::Section& section )
 {
     geode::Section section2;
     geode::SectionBuilder builder{ section2 };

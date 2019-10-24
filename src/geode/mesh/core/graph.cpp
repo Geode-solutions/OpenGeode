@@ -182,10 +182,10 @@ namespace geode
 
     std::unique_ptr< Graph > Graph::clone() const
     {
-        auto new_clone = create( type_name() );
-        auto builder = GraphBuilder::create( *new_clone );
+        auto clone = create( type_name() );
+        auto builder = GraphBuilder::create( *clone );
         builder->copy( *this );
-        return new_clone;
+        return clone;
     }
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, Graph );

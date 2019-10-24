@@ -94,10 +94,10 @@ namespace geode
 
     std::unique_ptr< VertexSet > VertexSet::clone() const
     {
-        auto new_clone = create( type_name() );
-        auto builder = VertexSetBuilder::create( *new_clone );
+        auto clone = create( type_name() );
+        auto builder = VertexSetBuilder::create( *clone );
         builder->copy( *this );
-        return new_clone;
+        return clone;
     }
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, VertexSet );

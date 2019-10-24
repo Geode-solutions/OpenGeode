@@ -76,10 +76,10 @@ namespace geode
     std::unique_ptr< PointSet< dimension > >
         PointSet< dimension >::clone() const
     {
-        auto new_clone = create( type_name() );
-        auto builder = PointSetBuilder< dimension >::create( *new_clone );
+        auto clone = create( type_name() );
+        auto builder = PointSetBuilder< dimension >::create( *clone );
         builder->copy( *this );
-        return new_clone;
+        return clone;
     }
 
     template class opengeode_mesh_api PointSet< 2 >;

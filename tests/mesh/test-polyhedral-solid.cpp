@@ -176,7 +176,7 @@ void test_create_vertex_attribute(
     }
 }
 
-void test_copy( const geode::PolyhedralSolid3D& polyhedral_solid )
+void test_clone( const geode::PolyhedralSolid3D& polyhedral_solid )
 {
     auto polyhedral_solid2 = polyhedral_solid.clone();
     OPENGEODE_EXCEPTION( polyhedral_solid2->nb_vertices() == 7,
@@ -214,7 +214,7 @@ int main()
 
         test_delete_vertex( *polyhedral_solid, *builder );
         test_delete_polyhedra( *polyhedral_solid, *builder );
-        test_copy( *polyhedral_solid );
+        test_clone( *polyhedral_solid );
 
         test_barycenters();
 

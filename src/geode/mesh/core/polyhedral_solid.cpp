@@ -165,7 +165,7 @@ namespace geode
         {
             try
             {
-                return TetrahedralSolidFactory< dimension >::create( type );
+                return TetrahedralSolid< dimension >::create( type );
             }
             catch( const OpenGeodeException& e )
             {
@@ -477,11 +477,11 @@ namespace geode
     std::unique_ptr< PolyhedralSolid< dimension > >
         PolyhedralSolid< dimension >::clone() const
     {
-        auto new_clone = create( this->type_name() );
+        auto clone = create( this->type_name() );
         auto builder =
-            PolyhedralSolidBuilder< dimension >::create( *new_clone );
+            PolyhedralSolidBuilder< dimension >::create( *clone );
         builder->copy( *this );
-        return new_clone;
+        return clone;
     }
 
     template class opengeode_mesh_api PolyhedralSolid< 3 >;
