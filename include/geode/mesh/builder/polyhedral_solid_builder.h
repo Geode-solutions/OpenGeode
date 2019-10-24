@@ -174,7 +174,7 @@ namespace geode
         virtual void do_set_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet, index_t adjacent_id ) = 0;
 
-        void delete_facets( const std::vector< index_t >& old2new );
+        void delete_facets( const std::vector< bool >& to_delete );
 
         void update_facet_vertices( const std::vector< index_t >& old2new );
 

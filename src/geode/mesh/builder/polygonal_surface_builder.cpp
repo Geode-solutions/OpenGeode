@@ -307,7 +307,7 @@ namespace geode
             }
         }
 
-        delete_edges( mapping_after_deletion( edge_to_delete ) );
+        delete_edges( edge_to_delete );
         polygonal_surface_.edge_attribute_manager().delete_elements(
             edge_to_delete );
 
@@ -327,9 +327,9 @@ namespace geode
 
     template < index_t dimension >
     void PolygonalSurfaceBuilder< dimension >::delete_edges(
-        const std::vector< index_t >& old2new )
+        const std::vector< bool >& to_delete )
     {
-        polygonal_surface_.delete_edges( old2new );
+        polygonal_surface_.delete_edges( to_delete );
     }
 
     template < index_t dimension >

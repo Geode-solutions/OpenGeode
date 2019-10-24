@@ -38,6 +38,10 @@ namespace geode
             VertexCycle( std::vector< index_t > vertices )
                 : vertices_( std::move( vertices ) )
             {
+                auto min_itr = std::min_element(
+                    vertices_.begin(), vertices_.end() );
+                std::rotate(
+                    vertices_.begin(), min_itr, vertices_.end() );
             }
 
             const std::vector< index_t >& vertices() const
@@ -52,26 +56,17 @@ namespace geode
                 {
                     return false;
                 }
-                auto vertices_copy = vertices_;
-                auto min_itr = std::min_element(
-                    vertices_copy.begin(), vertices_copy.end() );
-                auto other_min_itr = std::min_element(
-                    other_vertices.begin(), other_vertices.end() );
-                if( *min_itr != *other_min_itr )
+                if( this->vertices().front() != other_vertices.front() )
                 {
                     return false;
                 }
-                std::rotate( other_vertices.begin(), other_min_itr,
-                    other_vertices.end() );
-                std::rotate(
-                    vertices_copy.begin(), min_itr, vertices_copy.end() );
-                if( vertices_copy == other_vertices )
+                if( this->vertices() == other_vertices )
                 {
                     return true;
                 }
                 std::reverse(
                     other_vertices.begin() + 1, other_vertices.end() );
-                return vertices_copy == other_vertices;
+                return this->vertices() == other_vertices;
             }
 
             bool operator!=( const VertexCycle& other ) const

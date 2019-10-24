@@ -163,7 +163,7 @@ namespace geode
         virtual void do_set_polygon_adjacent(
             const PolygonEdge& polygon_edge, index_t adjacent_id ) = 0;
 
-        void delete_edges( const std::vector< index_t >& old2new );
+        void delete_edges( const std::vector< bool >& to_delete );
 
         void update_edge_vertices( const std::vector< index_t >& old2new );
 

@@ -303,7 +303,7 @@ namespace geode
 
         void update_edge_vertices( const std::vector< index_t >& old2new );
 
-        void delete_edges( const std::vector< index_t >& old2new );
+        void delete_edges( const std::vector< bool >& to_delete );
 
         virtual index_t get_polygon_vertex(
             const PolygonVertex& polygon_vertex ) const = 0;

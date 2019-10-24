@@ -353,7 +353,7 @@ namespace geode
             }
         }
 
-        delete_facets( mapping_after_deletion( facet_to_delete ) );
+        delete_facets( facet_to_delete );
         polyhedral_solid_.facet_attribute_manager().delete_elements(
             facet_to_delete );
 
@@ -372,9 +372,9 @@ namespace geode
 
     template < index_t dimension >
     void PolyhedralSolidBuilder< dimension >::delete_facets(
-        const std::vector< index_t >& old2new )
+        const std::vector< bool >& to_delete )
     {
-        polyhedral_solid_.delete_facets( old2new );
+        polyhedral_solid_.delete_facets( to_delete );
     }
 
     template < index_t dimension >

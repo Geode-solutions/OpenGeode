@@ -32,6 +32,7 @@
 
 #include <geode/mesh/core/detail/vertex_cycle.h>
 #include <geode/mesh/core/geode_polyhedral_solid.h>
+#include <geode/mesh/builder/detail/mapping_after_deletion.h>
 
 namespace
 {
@@ -135,7 +136,7 @@ namespace geode
 
         void update_facet_vertices( const std::vector< index_t >& old2new )
         {
-            auto old_facet_indices = std::move( facet_indices_ );
+            auto old_facet_indices = facet_indices_;
             facet_indices_.clear();
             facet_indices_.reserve( old_facet_indices.size() );
             for( const auto& cycle : old_facet_indices )
@@ -150,15 +151,16 @@ namespace geode
             }
         }
 
-        void delete_facets( const std::vector< index_t >& old2new )
+        void delete_facets( const std::vector< bool >& to_delete )
         {
+            auto old2new = mapping_after_deletion( to_delete );
             std::vector< detail::VertexCycle > key_to_erase;
             key_to_erase.reserve( old2new.size() );
-            for( auto cycle : facet_indices_ )
+            for( const auto& cycle : facet_indices_ )
             {
                 if( old2new[cycle.second] == NO_ID )
                 {
-                    key_to_erase.emplace_back( std::move( cycle.first ) );
+                    key_to_erase.emplace_back( cycle.first );
                 }
             }
             for( const auto& key : key_to_erase )
@@ -414,9 +416,9 @@ namespace geode
 
     template < index_t dimension >
     void PolyhedralSolid< dimension >::delete_facets(
-        const std::vector< index_t >& old2new )
+        const std::vector< bool >& to_delete )
     {
-        impl_->delete_facets( old2new );
+        impl_->delete_facets( to_delete );
     }
 
     template < index_t dimension >

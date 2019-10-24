@@ -33,6 +33,7 @@
 #include <geode/basic/pimpl_impl.h>
 #include <geode/basic/vector.h>
 
+#include <geode/mesh/builder/detail/mapping_after_deletion.h>
 #include <geode/mesh/core/detail/vertex_cycle.h>
 #include <geode/mesh/core/geode_polygonal_surface.h>
 
@@ -104,10 +105,10 @@ namespace geode
     public:
         explicit Impl( PolygonalSurfaceBase& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) )
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
@@ -136,9 +137,8 @@ namespace geode
             const std::array< index_t, 2 >& edge_vertices )
         {
             auto size = edge_indices_.size();
-            std::vector< index_t > vertices( 2 );
-            vertices[0] = edge_vertices[0];
-            vertices[1] = edge_vertices[1];
+            std::vector< index_t > vertices{ edge_vertices[0],
+                edge_vertices[1] };
             auto id = find_edge( vertices );
             if( id != NO_ID )
             {
@@ -151,7 +151,7 @@ namespace geode
 
         void update_edge_vertices( const std::vector< index_t >& old2new )
         {
-            auto old_edge_indices = std::move( edge_indices_ );
+            auto old_edge_indices = edge_indices_;
             edge_indices_.clear();
             edge_indices_.reserve( old_edge_indices.size() );
             for( const auto& cycle : old_edge_indices )
@@ -166,15 +166,16 @@ namespace geode
             }
         }
 
-        void delete_edges( const std::vector< index_t >& old2new )
+        void delete_edges( const std::vector< bool >& to_delete )
         {
+            auto old2new = mapping_after_deletion( to_delete );
             std::vector< detail::VertexCycle > key_to_erase;
             key_to_erase.reserve( old2new.size() );
-            for( auto cycle : edge_indices_ )
+            for( const auto& cycle : edge_indices_ )
             {
                 if( old2new[cycle.second] == NO_ID )
                 {
-                    key_to_erase.emplace_back( std::move( cycle.first ) );
+                    key_to_erase.emplace_back( cycle.first );
                 }
             }
             for( const auto& key : key_to_erase )
@@ -275,9 +276,9 @@ namespace geode
 
     template < index_t dimension >
     void PolygonalSurfaceBase< dimension >::delete_edges(
-        const std::vector< index_t >& old2new )
+        const std::vector< bool >& to_delete )
     {
-        impl_->delete_edges( old2new );
+        impl_->delete_edges( to_delete );
     }
 
     template < index_t dimension >

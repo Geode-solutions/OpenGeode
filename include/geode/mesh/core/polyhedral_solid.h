@@ -298,7 +298,7 @@ namespace geode
 
         void update_facet_vertices( const std::vector< index_t >& old2new );
 
-        void delete_facets( const std::vector< index_t >& old2new );
+        void delete_facets( const std::vector< bool >& to_delete );
 
         virtual index_t get_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex ) const = 0;
