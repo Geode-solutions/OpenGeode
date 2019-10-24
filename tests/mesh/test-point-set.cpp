@@ -94,7 +94,7 @@ void test_clone( const geode::PointSet3D& point_set )
         point_set2->vertex_attribute_manager().find_attribute< bool >( "test" );
     OPENGEODE_EXCEPTION( attribute->value( 0 ) == true,
         "[Test] PointSet2 attribute value should be true" );
-    
+
     geode::Point3D answer{ { 2.1, 9.4, 6.7 } };
     OPENGEODE_EXCEPTION( point_set2->point( 0 ) == answer,
         "[Test] PointSet2 vertex coordinates are not correct" );

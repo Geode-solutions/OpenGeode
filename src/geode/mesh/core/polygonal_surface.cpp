@@ -556,8 +556,7 @@ namespace geode
         PolygonalSurface< dimension >::clone() const
     {
         auto clone = create( this->type_name() );
-        auto builder =
-            PolygonalSurfaceBuilder< dimension >::create( *clone );
+        auto builder = PolygonalSurfaceBuilder< dimension >::create( *clone );
         builder->copy( *this );
         return clone;
     }
