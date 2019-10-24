@@ -30,9 +30,9 @@
 #include <geode/basic/pimpl_impl.h>
 #include <geode/basic/vector.h>
 
+#include <geode/mesh/builder/detail/mapping_after_deletion.h>
 #include <geode/mesh/core/detail/vertex_cycle.h>
 #include <geode/mesh/core/geode_polyhedral_solid.h>
-#include <geode/mesh/builder/detail/mapping_after_deletion.h>
 
 namespace
 {

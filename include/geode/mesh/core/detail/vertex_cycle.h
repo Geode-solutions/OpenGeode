@@ -38,10 +38,9 @@ namespace geode
             VertexCycle( std::vector< index_t > vertices )
                 : vertices_( std::move( vertices ) )
             {
-                auto min_itr = std::min_element(
-                    vertices_.begin(), vertices_.end() );
-                std::rotate(
-                    vertices_.begin(), min_itr, vertices_.end() );
+                auto min_itr =
+                    std::min_element( vertices_.begin(), vertices_.end() );
+                std::rotate( vertices_.begin(), min_itr, vertices_.end() );
             }
 
             const std::vector< index_t >& vertices() const
