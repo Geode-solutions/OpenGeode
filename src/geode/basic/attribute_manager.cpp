@@ -148,7 +148,8 @@ namespace geode
                     }
                     catch( const std::bad_cast &e )
                     {
-                        Logger::error("Attribute \"", attribute.first, "\" cannot be copied: ", e.what() );
+                        Logger::error( "Attribute \"", attribute.first,
+                            "\" cannot be copied: ", e.what() );
                     }
                 }
                 else

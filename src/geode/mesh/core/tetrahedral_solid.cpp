@@ -59,8 +59,7 @@ namespace geode
         TetrahedralSolid< dimension >::clone() const
     {
         auto clone = create( this->type_name() );
-        auto builder =
-            TetrahedralSolidBuilder< dimension >::create( *clone );
+        auto builder = TetrahedralSolidBuilder< dimension >::create( *clone );
         builder->copy( *this );
         return clone;
     }
