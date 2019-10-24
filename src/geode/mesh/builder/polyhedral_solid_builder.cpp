@@ -100,8 +100,7 @@ namespace geode
         {
             try
             {
-                return TetrahedralSolidBuilderFactory< dimension >::create(
-                    mesh.type_name(),
+                return TetrahedralSolidBuilder< dimension >::create(
                     dynamic_cast< TetrahedralSolid< dimension >& >( mesh ) );
             }
             catch( const std::bad_cast& e )

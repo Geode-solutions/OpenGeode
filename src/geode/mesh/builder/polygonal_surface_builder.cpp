@@ -100,8 +100,7 @@ namespace geode
         {
             try
             {
-                return TriangulatedSurfaceBuilderFactory< dimension >::create(
-                    mesh.type_name(),
+                return TriangulatedSurfaceBuilder< dimension >::create(
                     dynamic_cast< TriangulatedSurface< dimension >& >( mesh ) );
             }
             catch( const std::bad_cast& e )

@@ -58,11 +58,11 @@ namespace geode
     std::unique_ptr< TetrahedralSolid< dimension > >
         TetrahedralSolid< dimension >::clone() const
     {
-        auto new_clone = create( this->type_name() );
+        auto clone = create( this->type_name() );
         auto builder =
-            TetrahedralSolidBuilder< dimension >::create( *new_clone );
+            TetrahedralSolidBuilder< dimension >::create( *clone );
         builder->copy( *this );
-        return new_clone;
+        return clone;
     }
 
     template class opengeode_mesh_api TetrahedralSolid< 3 >;

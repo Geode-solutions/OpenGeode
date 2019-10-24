@@ -92,10 +92,10 @@ namespace geode
     std::unique_ptr< EdgedCurve< dimension > >
         EdgedCurve< dimension >::clone() const
     {
-        auto new_clone = create( type_name() );
-        auto builder = EdgedCurveBuilder< dimension >::create( *new_clone );
+        auto clone = create( type_name() );
+        auto builder = EdgedCurveBuilder< dimension >::create( *clone );
         builder->copy( *this );
-        return new_clone;
+        return clone;
     }
 
     template class opengeode_mesh_api EdgedCurve< 2 >;

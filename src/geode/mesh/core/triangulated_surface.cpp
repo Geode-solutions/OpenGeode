@@ -58,11 +58,11 @@ namespace geode
     std::unique_ptr< TriangulatedSurface< dimension > >
         TriangulatedSurface< dimension >::clone() const
     {
-        auto new_clone = create( this->type_name() );
+        auto clone = create( this->type_name() );
         auto builder =
-            TriangulatedSurfaceBuilder< dimension >::create( *new_clone );
+            TriangulatedSurfaceBuilder< dimension >::create( *clone );
         builder->copy( *this );
-        return new_clone;
+        return clone;
     }
 
     template class opengeode_mesh_api TriangulatedSurface< 2 >;
