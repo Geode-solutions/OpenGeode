@@ -131,10 +131,16 @@ jobs:
         mkdir -p build
         cd build
         set version=%GITHUB_REF:*tags/=%
-        echo "::set-output name={version1}::{%version%}"
+        echo "::set-output name=version1::%version%"
         echo ::set-output name=version2::%version%
         echo %version1%
         echo %version2%
+        echo version1
+        echo version2
+        echo ${env:version1}
+        echo ${env:version2}
+        echo $version1
+        echo $version2
         cmake -G "Visual Studio 15 2017 Win64" ..
         cmake --build . --config ${{ matrix.config }}
         cd opengeode
