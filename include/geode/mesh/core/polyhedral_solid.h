@@ -65,7 +65,7 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, geode::Growable< Archive, PolyhedronVertex >{},
+            archive.ext( *this, DefaultGrowable< Archive, PolyhedronVertex >{},
                 []( Archive& archive, PolyhedronVertex& polyhedron_vertex ) {
                     archive.value4b( polyhedron_vertex.polyhedron_id );
                     archive.value4b( polyhedron_vertex.vertex_id );
@@ -97,7 +97,7 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, geode::Growable< Archive, PolyhedronFacet >{},
+            archive.ext( *this, DefaultGrowable< Archive, PolyhedronFacet >{},
                 []( Archive& archive, PolyhedronFacet& polyhedron_facet ) {
                     archive.value4b( polyhedron_facet.polyhedron_id );
                     archive.value4b( polyhedron_facet.facet_id );
@@ -127,7 +127,7 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this,
-                geode::Growable< Archive, PolyhedronFacetVertex >{},
+                DefaultGrowable< Archive, PolyhedronFacetVertex >{},
                 []( Archive& archive,
                     PolyhedronFacetVertex& polyhedron_facet_vertex ) {
                     archive.object( polyhedron_facet_vertex.polyhedron_facet );

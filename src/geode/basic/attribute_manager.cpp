@@ -137,7 +137,7 @@ namespace geode
         template < typename Archive >
         void serialize( Archive &archive )
         {
-            archive.ext( *this, geode::Growable< Archive, Impl >{},
+            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
                 []( Archive &archive, Impl &impl ) {
                     archive.value4b( impl.nb_elements_ );
                     archive.ext( impl.attributes_,
@@ -230,7 +230,7 @@ namespace geode
     template < typename Archive >
     void AttributeManager::serialize( Archive &archive )
     {
-        archive.ext( *this, geode::Growable< Archive, AttributeManager >{},
+        archive.ext( *this, DefaultGrowable< Archive, AttributeManager >{},
             []( Archive &archive, AttributeManager &attribute_manager ) {
                 archive.object( attribute_manager.impl_ );
             } );

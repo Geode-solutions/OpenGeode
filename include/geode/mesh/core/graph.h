@@ -61,7 +61,7 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, geode::Growable< Archive, EdgeVertex >{},
+            archive.ext( *this, DefaultGrowable< Archive, EdgeVertex >{},
                 []( Archive& archive, EdgeVertex& edge_vertex ) {
                     archive.value4b( edge_vertex.edge_id );
                     archive.value4b( edge_vertex.vertex_id );

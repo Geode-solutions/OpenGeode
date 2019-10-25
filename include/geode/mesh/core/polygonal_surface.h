@@ -69,7 +69,7 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, geode::Growable< Archive, PolygonVertex >{},
+            archive.ext( *this, DefaultGrowable< Archive, PolygonVertex >{},
                 []( Archive& archive, PolygonVertex& polygon_vertex ) {
                     archive.value4b( polygon_vertex.polygon_id );
                     archive.value4b( polygon_vertex.vertex_id );
@@ -101,7 +101,7 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, geode::Growable< Archive, PolygonEdge >{},
+            archive.ext( *this, DefaultGrowable< Archive, PolygonEdge >{},
                 []( Archive& archive, PolygonEdge& polygon_edge ) {
                     archive.value4b( polygon_edge.polygon_id );
                     archive.value4b( polygon_edge.edge_id );

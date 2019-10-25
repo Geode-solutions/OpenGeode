@@ -27,7 +27,7 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this,
-                geode::Growable< Archive, MeshComponentVertex >{},
+                DefaultGrowable< Archive, MeshComponentVertex >{},
                 []( Archive& archive,
                     MeshComponentVertex& mesh_component_vertex ) {
                     archive.object( mesh_component_vertex.component_id );

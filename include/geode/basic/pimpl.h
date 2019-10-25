@@ -50,7 +50,7 @@ namespace geode
         template < typename Archive >
         void serialize( Archive &archive )
         {
-            archive.ext( *this, geode::Growable< Archive, PImpl >{},
+            archive.ext( *this, DefaultGrowable< Archive, PImpl >{},
                 []( Archive &archive, PImpl &impl ) {
                     archive.ext( impl.pimpl_, bitsery::ext::StdSmartPtr{} );
                 } );

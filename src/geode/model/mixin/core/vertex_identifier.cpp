@@ -188,7 +188,7 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, geode::Growable< Archive, Impl >{},
+            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
                 []( Archive& archive, Impl& impl ) {
                     archive.object( impl.unique_vertices_ );
                     archive.ext(

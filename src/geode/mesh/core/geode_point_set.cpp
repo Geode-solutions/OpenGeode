@@ -52,7 +52,7 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, geode::Growable< Archive, Impl >{},
+            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
                 []( Archive& archive, Impl& impl ) {
                     archive.ext(
                         impl, bitsery::ext::BaseClass<
@@ -89,7 +89,7 @@ namespace geode
     template < typename Archive >
     void OpenGeodePointSet< dimension >::serialize( Archive& archive )
     {
-        archive.ext( *this, geode::Growable< Archive, OpenGeodePointSet >{},
+        archive.ext( *this, DefaultGrowable< Archive, OpenGeodePointSet >{},
             []( Archive& archive, OpenGeodePointSet& point_set ) {
                 archive.ext( point_set,
                     bitsery::ext::BaseClass< PointSet< dimension > >{} );

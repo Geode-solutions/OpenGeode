@@ -65,7 +65,7 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, Growable< Archive, Impl >{},
+            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
                 []( Archive& archive, Impl& impl ) {
                     archive.ext(
                         impl, bitsery::ext::BaseClass< detail::MeshStorage<
@@ -113,7 +113,7 @@ namespace geode
     template < typename Archive >
     void Surface< dimension >::serialize( Archive& archive )
     {
-        archive.ext( *this, geode::Growable< Archive, Surface >{},
+        archive.ext( *this, DefaultGrowable< Archive, Surface >{},
             []( Archive& archive, Surface& surface ) {
                 archive.object( surface.impl_ );
                 archive.ext( surface,

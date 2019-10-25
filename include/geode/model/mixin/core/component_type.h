@@ -83,7 +83,7 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, geode::Growable< Archive, ComponentID >{},
+            archive.ext( *this, DefaultGrowable< Archive, ComponentID >{},
                 []( Archive& archive, ComponentID& component_id ) {
                     archive.object( component_id.type_ );
                     archive.object( component_id.id_ );

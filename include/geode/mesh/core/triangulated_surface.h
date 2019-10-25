@@ -59,7 +59,7 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this,
-                geode::Growable< Archive, TriangulatedSurface >{},
+                DefaultGrowable< Archive, TriangulatedSurface >{},
                 []( Archive& archive,
                     TriangulatedSurface& triangulated_surface ) {
                     archive.ext( triangulated_surface,

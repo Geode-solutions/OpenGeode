@@ -124,7 +124,7 @@ namespace geode
         template < typename Archive >
         void serialize( Archive &archive )
         {
-            archive.ext( *this, geode::Growable< Archive, uuid >{},
+            archive.ext( *this, DefaultGrowable< Archive, uuid >{},
                 []( Archive &archive, uuid &id ) {
                     archive.value8b( id.ab );
                     archive.value8b( id.cd );

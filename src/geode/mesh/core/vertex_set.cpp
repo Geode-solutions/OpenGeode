@@ -44,7 +44,7 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, geode::Growable< Archive, Impl >{},
+            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
                 []( Archive& archive, Impl& impl ) {
                     archive.object( impl.vertex_attribute_manager_ );
                 } );
@@ -76,7 +76,7 @@ namespace geode
     template < typename Archive >
     void VertexSet::serialize( Archive& archive )
     {
-        archive.ext( *this, geode::Growable< Archive, VertexSet >{},
+        archive.ext( *this, DefaultGrowable< Archive, VertexSet >{},
             []( Archive& archive, VertexSet& vertex_set ) {
                 archive.object( vertex_set.impl_ );
             } );

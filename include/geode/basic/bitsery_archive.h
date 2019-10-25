@@ -65,12 +65,32 @@ namespace geode
         PContext &context );
 
     template < typename Archive, typename T >
+    class DefaultGrowable
+    {
+    public:
+        template < typename Fnc >
+        void serialize( Archive &ser, const T &obj, Fnc &&fnc ) const
+        {
+            index_t FIRST_VERSION{ 1 };
+            ser.ext4b( FIRST_VERSION, bitsery::ext::CompactValue{} );
+            fnc( ser, const_cast< T & >( obj ) );
+        }
+
+        template < typename Fnc >
+        void deserialize( Archive &des, T &obj, Fnc &&fnc ) const
+        {
+            index_t current_version;
+            des.ext4b( current_version, bitsery::ext::CompactValue{} );
+            fnc( des, obj );
+        }
+    };
+
+    template < typename Archive, typename T >
     class Growable
     {
         static constexpr index_t FIRST_VERSION{ 1 };
 
     public:
-        Growable() = default;
         Growable(
             std::vector< std::function< void( Archive &, T & ) > > serializers )
             : version_( serializers.size() ),
@@ -143,6 +163,14 @@ namespace bitsery
 {
     namespace traits
     {
+        template < typename Archive, typename T >
+        struct ExtensionTraits< geode::DefaultGrowable< Archive, T >, T >
+        {
+            using TValue = T;
+            static constexpr bool SupportValueOverload = false;
+            static constexpr bool SupportObjectOverload = true;
+            static constexpr bool SupportLambdaOverload = true;
+        };
         template < typename Archive, typename T >
         struct ExtensionTraits< geode::Growable< Archive, T >, T >
         {

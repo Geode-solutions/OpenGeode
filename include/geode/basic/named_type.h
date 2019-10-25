@@ -69,7 +69,7 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, Growable< Archive, NamedType >{},
+            archive.ext( *this, DefaultGrowable< Archive, NamedType >{},
                 []( Archive& archive, NamedType& named_type ) {
                     archive( named_type.value_ );
                 } );

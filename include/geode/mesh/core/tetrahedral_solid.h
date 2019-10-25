@@ -56,7 +56,7 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, geode::Growable< Archive, TetrahedralSolid >{},
+            archive.ext( *this, DefaultGrowable< Archive, TetrahedralSolid >{},
                 []( Archive& archive, TetrahedralSolid& tetrahedral_solid ) {
                     archive.ext( tetrahedral_solid,
                         bitsery::ext::BaseClass<

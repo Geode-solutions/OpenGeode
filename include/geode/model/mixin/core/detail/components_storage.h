@@ -144,7 +144,7 @@ namespace geode
             void serialize( Archive& archive )
             {
                 archive.ext( *this,
-                    geode::Growable< Archive, ComponentsStorage >{},
+                    DefaultGrowable< Archive, ComponentsStorage >{},
                     []( Archive& archive, ComponentsStorage& storage ) {
                         archive.ext( storage.components_,
                             bitsery::ext::StdMap{

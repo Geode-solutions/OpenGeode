@@ -127,7 +127,7 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, geode::Growable< Archive, Impl >{},
+            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
                 []( Archive& archive, Impl& impl ) {
                     archive.container4b( impl.polygon_vertices_,
                         impl.polygon_vertices_.max_size() );
@@ -204,7 +204,7 @@ namespace geode
     void OpenGeodePolygonalSurface< dimension >::serialize( Archive& archive )
     {
         archive.ext( *this,
-            geode::Growable< Archive, OpenGeodePolygonalSurface >{},
+            DefaultGrowable< Archive, OpenGeodePolygonalSurface >{},
             []( Archive& archive, OpenGeodePolygonalSurface& surface ) {
                 archive.ext( surface, bitsery::ext::BaseClass<
                                           PolygonalSurface< dimension > >{} );

@@ -34,7 +34,7 @@ struct Foo
     template < typename Archive >
     void serialize( Archive &archive )
     {
-        archive.ext( *this, geode::Growable< Archive, Foo >{},
+        archive.ext( *this, geode::DefaultGrowable< Archive, Foo >{},
             []( Archive &archive, Foo &foo ) {
                 archive.value8b( foo.double_ );
                 archive.value4b( foo.unsigned_int_ );

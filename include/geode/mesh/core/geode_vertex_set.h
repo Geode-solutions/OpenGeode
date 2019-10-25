@@ -61,7 +61,7 @@ namespace geode
         void serialize( Archive &archive )
         {
             archive.ext( *this,
-                geode::Growable< Archive, OpenGeodeVertexSet >{},
+                DefaultGrowable< Archive, OpenGeodeVertexSet >{},
                 []( Archive &archive, OpenGeodeVertexSet &vertex_set ) {
                     archive.ext(
                         vertex_set, bitsery::ext::BaseClass< VertexSet >{} );

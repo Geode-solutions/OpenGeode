@@ -73,7 +73,7 @@ namespace geode
             template < typename Archive >
             void serialize( Archive& archive )
             {
-                archive.ext( *this, geode::Growable< Archive, UuidToIndex >{},
+                archive.ext( *this, DefaultGrowable< Archive, UuidToIndex >{},
                     []( Archive& archive, UuidToIndex& uuids ) {
                         archive.ext( uuids.uuid2index_,
                             bitsery::ext::StdMap{

@@ -54,7 +54,7 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, Growable< Archive, AttributeBase >{},
+            archive.ext( *this, DefaultGrowable< Archive, AttributeBase >{},
                 []( Archive& /*unused*/, AttributeBase& /*unused*/ ) {} );
         }
 
@@ -92,7 +92,7 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, Growable< Archive, ReadOnlyAttribute< T > >{},
+            archive.ext( *this, DefaultGrowable< Archive, ReadOnlyAttribute< T > >{},
                 []( Archive& archive, ReadOnlyAttribute< T >& attribute ) {
                     archive.ext(
                         attribute, bitsery::ext::BaseClass< AttributeBase >{} );
@@ -131,7 +131,7 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, Growable< Archive, ConstantAttribute< T > >{},
+            archive.ext( *this, DefaultGrowable< Archive, ConstantAttribute< T > >{},
                 []( Archive& archive, ConstantAttribute< T >& attribute ) {
                     archive.ext( attribute,
                         bitsery::ext::BaseClass< ReadOnlyAttribute< T > >{} );
@@ -180,7 +180,7 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, Growable< Archive, VariableAttribute< T > >{},
+            archive.ext( *this, DefaultGrowable< Archive, VariableAttribute< T > >{},
                 []( Archive& archive, VariableAttribute< T >& attribute ) {
                     archive.ext( attribute,
                         bitsery::ext::BaseClass< ReadOnlyAttribute< T > >{} );
@@ -242,7 +242,7 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this,
-                Growable< Archive, VariableAttribute< bool > >{},
+                DefaultGrowable< Archive, VariableAttribute< bool > >{},
                 []( Archive& archive, VariableAttribute< bool >& attribute ) {
                     archive.ext( attribute, bitsery::ext::BaseClass<
                                                 ReadOnlyAttribute< bool > >{} );
@@ -306,7 +306,7 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, Growable< Archive, SparseAttribute< T > >{},
+            archive.ext( *this, DefaultGrowable< Archive, SparseAttribute< T > >{},
                 []( Archive& archive, SparseAttribute< T >& attribute ) {
                     archive.ext( attribute,
                         bitsery::ext::BaseClass< ReadOnlyAttribute< T > >{} );

@@ -97,7 +97,7 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, geode::Growable< Archive, Impl >{},
+            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
                 []( Archive& archive, Impl& impl ) {
                     archive.object( impl.edge_attribute_manager_ );
                     archive.ext( impl.edges_around_vertex_,
@@ -179,7 +179,7 @@ namespace geode
     template < typename Archive >
     void Graph::serialize( Archive& archive )
     {
-        archive.ext( *this, geode::Growable< Archive, Graph >{},
+        archive.ext( *this, DefaultGrowable< Archive, Graph >{},
             []( Archive& archive, Graph& graph ) {
                 archive.ext( graph, bitsery::ext::BaseClass< VertexSet >{} );
                 archive.object( graph.impl_ );

@@ -106,7 +106,7 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, geode::Growable< Archive, Impl >{},
+            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
                 []( Archive& archive, Impl& impl ) {
                     archive.ext(
                         impl, bitsery::ext::BaseClass<
@@ -172,7 +172,7 @@ namespace geode
         Archive& archive )
     {
         archive.ext( *this,
-            geode::Growable< Archive, OpenGeodeTriangulatedSurface >{},
+            DefaultGrowable< Archive, OpenGeodeTriangulatedSurface >{},
             []( Archive& archive, OpenGeodeTriangulatedSurface& surface ) {
                 archive.ext(
                     surface, bitsery::ext::BaseClass<
