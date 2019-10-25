@@ -58,12 +58,14 @@ namespace geode
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive &archive )
         {
-        archive.ext( *this, geode::Growable< Archive, OpenGeodeVertexSet >{},
-            []( Archive &archive, OpenGeodeVertexSet &vertex_set ) {
-            archive.ext( vertex_set, bitsery::ext::BaseClass< VertexSet >{} );
-            });
+            archive.ext( *this,
+                geode::Growable< Archive, OpenGeodeVertexSet >{},
+                []( Archive &archive, OpenGeodeVertexSet &vertex_set ) {
+                    archive.ext(
+                        vertex_set, bitsery::ext::BaseClass< VertexSet >{} );
+                } );
         }
     };
 } // namespace geode

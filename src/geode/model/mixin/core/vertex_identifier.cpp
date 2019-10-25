@@ -188,19 +188,22 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-        archive.ext( *this, geode::Growable< Archive, Impl >{},
-            []( Archive &archive, Impl &impl ) {
-            archive.object( impl.unique_vertices_ );
-            archive.ext( impl.component_vertices_, bitsery::ext::StdSmartPtr{} );
-            archive.ext( impl.vertex2unique_vertex_,
-                bitsery::ext::StdMap{ impl.vertex2unique_vertex_.max_size() },
-                []( Archive& archive, uuid& id,
-                    std::shared_ptr< VariableAttribute< index_t > >&
-                        attribute ) {
-                    archive.object( id );
-                    archive.ext( attribute, bitsery::ext::StdSmartPtr{} );
+            archive.ext( *this, geode::Growable< Archive, Impl >{},
+                []( Archive& archive, Impl& impl ) {
+                    archive.object( impl.unique_vertices_ );
+                    archive.ext(
+                        impl.component_vertices_, bitsery::ext::StdSmartPtr{} );
+                    archive.ext( impl.vertex2unique_vertex_,
+                        bitsery::ext::StdMap{
+                            impl.vertex2unique_vertex_.max_size() },
+                        []( Archive& archive, uuid& id,
+                            std::shared_ptr< VariableAttribute< index_t > >&
+                                attribute ) {
+                            archive.object( id );
+                            archive.ext(
+                                attribute, bitsery::ext::StdSmartPtr{} );
+                        } );
                 } );
-            });
         }
 
         void filter_component_vertices( const uuid& component_id )

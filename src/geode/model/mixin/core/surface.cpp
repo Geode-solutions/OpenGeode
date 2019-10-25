@@ -66,9 +66,11 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this, Growable< Archive, Impl >{},
-            []( Archive &archive, Impl & impl ) {
-            archive.ext( impl, bitsery::ext::BaseClass< detail::MeshStorage< PolygonalSurface< dimension > > >{} );
-            } );
+                []( Archive& archive, Impl& impl ) {
+                    archive.ext(
+                        impl, bitsery::ext::BaseClass< detail::MeshStorage<
+                                  PolygonalSurface< dimension > > >{} );
+                } );
         }
     };
 
@@ -112,11 +114,11 @@ namespace geode
     void Surface< dimension >::serialize( Archive& archive )
     {
         archive.ext( *this, geode::Growable< Archive, Surface >{},
-            []( Archive &archive, Surface &surface ) {
-        archive.object( surface.impl_ );
-        archive.ext(
-            surface, bitsery::ext::BaseClass< Component< dimension > >{} );
-            });
+            []( Archive& archive, Surface& surface ) {
+                archive.object( surface.impl_ );
+                archive.ext( surface,
+                    bitsery::ext::BaseClass< Component< dimension > >{} );
+            } );
     }
 
     template class opengeode_model_api Surface< 2 >;

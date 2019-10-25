@@ -52,9 +52,11 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this, Growable< Archive, Impl >{},
-            []( Archive &archive, Impl & impl ) {
-            archive.ext( impl, bitsery::ext::BaseClass< detail::MeshStorage< EdgedCurve< dimension > > >{} );
-            } );
+                []( Archive& archive, Impl& impl ) {
+                    archive.ext(
+                        impl, bitsery::ext::BaseClass< detail::MeshStorage<
+                                  EdgedCurve< dimension > > >{} );
+                } );
         }
     };
 
@@ -98,11 +100,11 @@ namespace geode
     void Line< dimension >::serialize( Archive& archive )
     {
         archive.ext( *this, geode::Growable< Archive, Line >{},
-            []( Archive &archive, Line &line ) {
-        archive.object( line.impl_ );
-        archive.ext(
-            line, bitsery::ext::BaseClass< Component< dimension > >{} );
-            });
+            []( Archive& archive, Line& line ) {
+                archive.object( line.impl_ );
+                archive.ext(
+                    line, bitsery::ext::BaseClass< Component< dimension > >{} );
+            } );
     }
 
     template class opengeode_model_api Line< 2 >;

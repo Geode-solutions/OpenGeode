@@ -41,9 +41,11 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this, Growable< Archive, Impl >{},
-            []( Archive &archive, Impl & impl ) {
-            archive.ext( impl, bitsery::ext::BaseClass< detail::ComponentsStorage< ModelBoundary< dimension > > >{} );
-            } );
+                []( Archive& archive, Impl& impl ) {
+                    archive.ext( impl,
+                        bitsery::ext::BaseClass< detail::ComponentsStorage<
+                            ModelBoundary< dimension > > >{} );
+                } );
         }
     };
 

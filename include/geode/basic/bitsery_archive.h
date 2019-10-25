@@ -53,7 +53,7 @@ namespace geode
      * @warning The context can be used only once per archive.
      */
     void opengeode_basic_api register_basic_serialize_pcontext(
-        PContext& context );
+        PContext &context );
 
     /*!
      * Register all the information needed by Bitsery to deserialize the objects
@@ -62,81 +62,81 @@ namespace geode
      * @warning The context can be used only once per archive.
      */
     void opengeode_basic_api register_basic_deserialize_pcontext(
-        PContext& context );
+        PContext &context );
 
-
-template < typename Archive, typename T >
-class Growable
-{
-    static constexpr index_t FIRST_VERSION{ 1 };
-
-public:
-    Growable() = default;
-    Growable(
-        std::vector< std::function< void( Archive &, T & ) > > serializers )
-        : version_( serializers.size() ),
-          serializers_( std::move( serializers ) )
+    template < typename Archive, typename T >
+    class Growable
     {
-    }
-    Growable(
-        std::vector< std::function< void( Archive &, T & ) > > serializers,
-        std::vector< std::function< void( T & ) > > initializers )
-        : version_( serializers.size() ),
-          serializers_( std::move( serializers ) ),
-          initializers_( std::move( initializers ) )
-    {
-        OPENGEODE_EXCEPTION( initializers_.size() == version_ - 1,
-            "Should have as many initializers than the version number minus "
-            "one" );
-    }
+        static constexpr index_t FIRST_VERSION{ 1 };
 
-    template < typename Fnc >
-    void serialize( Archive &ser, const T &obj, Fnc &&fnc ) const
-    {
-        ser.ext4b( version_, bitsery::ext::CompactValue{} );
-        if( serializers_.empty() )
+    public:
+        Growable() = default;
+        Growable(
+            std::vector< std::function< void( Archive &, T & ) > > serializers )
+            : version_( serializers.size() ),
+              serializers_( std::move( serializers ) )
         {
-            fnc( ser, const_cast< T & >( obj ) );
         }
-        else
+        Growable(
+            std::vector< std::function< void( Archive &, T & ) > > serializers,
+            std::vector< std::function< void( T & ) > > initializers )
+            : version_( serializers.size() ),
+              serializers_( std::move( serializers ) ),
+              initializers_( std::move( initializers ) )
         {
-            for( auto f : serializers_ )
+            OPENGEODE_EXCEPTION( initializers_.size() == version_ - 1,
+                "Should have as many initializers than the version number "
+                "minus "
+                "one" );
+        }
+
+        template < typename Fnc >
+        void serialize( Archive &ser, const T &obj, Fnc &&fnc ) const
+        {
+            ser.ext4b( version_, bitsery::ext::CompactValue{} );
+            if( serializers_.empty() )
             {
-                f( ser, const_cast< T & >( obj ) );
+                fnc( ser, const_cast< T & >( obj ) );
             }
-        }
-    }
-
-    template < typename Fnc >
-    void deserialize( Archive &des, T &obj, Fnc &&fnc ) const
-    {
-        index_t current_version;
-        des.ext4b( current_version, bitsery::ext::CompactValue{} );
-        if( version_ == FIRST_VERSION )
-        {
-            fnc( des, obj );
-        }
-        else
-        {
-            for( auto i : Range{ current_version } )
+            else
             {
-                serializers_.at( i )( des, obj );
-            }
-            if( !initializers_.empty() )
-            {
-                for( auto i : Range{ current_version, version_ } )
+                for( auto f : serializers_ )
                 {
-                    initializers_.at( i - 1 )( obj );
+                    f( ser, const_cast< T & >( obj ) );
                 }
             }
         }
-    }
 
-private:
-    index_t version_{ FIRST_VERSION };
-    std::vector< std::function< void( Archive &, T & ) > > serializers_;
-    std::vector< std::function< void( T & ) > > initializers_;
-};
+        template < typename Fnc >
+        void deserialize( Archive &des, T &obj, Fnc &&fnc ) const
+        {
+            index_t current_version;
+            des.ext4b( current_version, bitsery::ext::CompactValue{} );
+            if( version_ == FIRST_VERSION )
+            {
+                fnc( des, obj );
+            }
+            else
+            {
+                for( auto i : Range{ current_version } )
+                {
+                    serializers_.at( i )( des, obj );
+                }
+                if( !initializers_.empty() )
+                {
+                    for( auto i : Range{ current_version, version_ } )
+                    {
+                        initializers_.at( i - 1 )( obj );
+                    }
+                }
+            }
+        }
+
+    private:
+        index_t version_{ FIRST_VERSION };
+        std::vector< std::function< void( Archive &, T & ) > > serializers_;
+        std::vector< std::function< void( T & ) > > initializers_;
+    };
 } // namespace geode
 
 namespace bitsery
@@ -156,6 +156,6 @@ namespace bitsery
 
 #define SERIALIZE_BITSERY_ARCHIVE( EXPORT, TYPE )                              \
     template EXPORT void TYPE::serialize< geode::Serializer >(                 \
-        geode::Serializer& );                                                  \
+        geode::Serializer & );                                                 \
     template EXPORT void TYPE::serialize< geode::Deserializer >(               \
-        geode::Deserializer& )
+        geode::Deserializer & )

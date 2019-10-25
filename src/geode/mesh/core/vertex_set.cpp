@@ -44,10 +44,10 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-        archive.ext( *this, geode::Growable< Archive, Impl >{},
-            []( Archive &archive, Impl &impl ) {
-            archive.object( impl.vertex_attribute_manager_ );
-            });
+            archive.ext( *this, geode::Growable< Archive, Impl >{},
+                []( Archive& archive, Impl& impl ) {
+                    archive.object( impl.vertex_attribute_manager_ );
+                } );
         }
 
     private:
@@ -77,9 +77,9 @@ namespace geode
     void VertexSet::serialize( Archive& archive )
     {
         archive.ext( *this, geode::Growable< Archive, VertexSet >{},
-            []( Archive &archive, VertexSet &vertex_set ) {
-        archive.object( vertex_set.impl_ );
-            });
+            []( Archive& archive, VertexSet& vertex_set ) {
+                archive.object( vertex_set.impl_ );
+            } );
     }
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, VertexSet );

@@ -70,10 +70,10 @@ namespace geode
             template < typename Archive >
             void serialize( Archive& archive )
             {
-        archive.ext( *this, geode::Growable< Archive, MeshStorage >{},
-            []( Archive &archive, MeshStorage &storage ) {
-                archive.object( storage.mesh_type_ );
-            });
+                archive.ext( *this, geode::Growable< Archive, MeshStorage >{},
+                    []( Archive& archive, MeshStorage& storage ) {
+                        archive.object( storage.mesh_type_ );
+                    } );
             }
 
         private:

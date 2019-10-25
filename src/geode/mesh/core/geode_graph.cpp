@@ -46,9 +46,10 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this, Growable< Archive, Impl >{},
-            []( Archive &archive, Impl & impl) {
-        archive.ext( impl, bitsery::ext::BaseClass< detail::EdgesImpl >{} );
-            } );
+                []( Archive& archive, Impl& impl ) {
+                    archive.ext(
+                        impl, bitsery::ext::BaseClass< detail::EdgesImpl >{} );
+                } );
         }
     };
 
@@ -72,10 +73,10 @@ namespace geode
     void OpenGeodeGraph::serialize( Archive& archive )
     {
         archive.ext( *this, geode::Growable< Archive, OpenGeodeGraph >{},
-            []( Archive &archive, OpenGeodeGraph &graph ) {
-        archive.ext( graph, bitsery::ext::BaseClass< Graph >{} );
-        archive.object( graph.impl_ );
-            });
+            []( Archive& archive, OpenGeodeGraph& graph ) {
+                archive.ext( graph, bitsery::ext::BaseClass< Graph >{} );
+                archive.object( graph.impl_ );
+            } );
     }
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, OpenGeodeGraph );

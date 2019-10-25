@@ -56,11 +56,12 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-        archive.ext( *this, geode::Growable< Archive, TetrahedralSolid >{},
-            []( Archive &archive, TetrahedralSolid &tetrahedral_solid ) {
-            archive.ext( tetrahedral_solid,
-                bitsery::ext::BaseClass< PolyhedralSolid< dimension > >{} );
-            });
+            archive.ext( *this, geode::Growable< Archive, TetrahedralSolid >{},
+                []( Archive& archive, TetrahedralSolid& tetrahedral_solid ) {
+                    archive.ext( tetrahedral_solid,
+                        bitsery::ext::BaseClass<
+                            PolyhedralSolid< dimension > >{} );
+                } );
         }
 
         index_t get_nb_polyhedron_vertices( index_t /*unused*/ ) const final

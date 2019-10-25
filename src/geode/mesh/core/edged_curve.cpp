@@ -85,9 +85,9 @@ namespace geode
     void EdgedCurve< dimension >::serialize( Archive& archive )
     {
         archive.ext( *this, geode::Growable< Archive, EdgedCurve >{},
-            []( Archive &archive, EdgedCurve &edged_curve ) {
-        archive.ext( edged_curve, bitsery::ext::BaseClass< Graph >{} );
-            });
+            []( Archive& archive, EdgedCurve& edged_curve ) {
+                archive.ext( edged_curve, bitsery::ext::BaseClass< Graph >{} );
+            } );
     }
 
     template class opengeode_mesh_api EdgedCurve< 2 >;

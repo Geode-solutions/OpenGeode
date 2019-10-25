@@ -97,11 +97,12 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-        archive.ext( *this, geode::Growable< Archive, Impl >{},
-            []( Archive &archive, Impl &impl ) {
-            archive.object( impl.edge_attribute_manager_ );
-            archive.ext( impl.edges_around_vertex_, bitsery::ext::StdSmartPtr{} );
-            });
+            archive.ext( *this, geode::Growable< Archive, Impl >{},
+                []( Archive& archive, Impl& impl ) {
+                    archive.object( impl.edge_attribute_manager_ );
+                    archive.ext( impl.edges_around_vertex_,
+                        bitsery::ext::StdSmartPtr{} );
+                } );
         }
 
     private:
@@ -179,10 +180,10 @@ namespace geode
     void Graph::serialize( Archive& archive )
     {
         archive.ext( *this, geode::Growable< Archive, Graph >{},
-            []( Archive &archive, Graph &graph ) {
-        archive.ext( graph, bitsery::ext::BaseClass< VertexSet >{} );
-        archive.object( graph.impl_ );
-            });
+            []( Archive& archive, Graph& graph ) {
+                archive.ext( graph, bitsery::ext::BaseClass< VertexSet >{} );
+                archive.object( graph.impl_ );
+            } );
     }
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, Graph );

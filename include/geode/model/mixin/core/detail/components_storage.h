@@ -143,15 +143,19 @@ namespace geode
             template < typename Archive >
             void serialize( Archive& archive )
             {
-        archive.ext( *this, geode::Growable< Archive, ComponentsStorage >{},
-            []( Archive &archive, ComponentsStorage &storage ) {
-                archive.ext( storage.components_,
-                    bitsery::ext::StdMap{ storage.components_.max_size() },
-                    []( Archive& archive, uuid& id, ComponentPtr& item ) {
-                        archive.object( id );
-                        archive.ext( item, bitsery::ext::StdSmartPtr{} );
+                archive.ext( *this,
+                    geode::Growable< Archive, ComponentsStorage >{},
+                    []( Archive& archive, ComponentsStorage& storage ) {
+                        archive.ext( storage.components_,
+                            bitsery::ext::StdMap{
+                                storage.components_.max_size() },
+                            []( Archive& archive, uuid& id,
+                                ComponentPtr& item ) {
+                                archive.object( id );
+                                archive.ext(
+                                    item, bitsery::ext::StdSmartPtr{} );
+                            } );
                     } );
-            });
             }
 
         private:

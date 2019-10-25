@@ -52,9 +52,11 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this, Growable< Archive, Impl >{},
-            []( Archive &archive, Impl & impl ) {
-            archive.ext( impl, bitsery::ext::BaseClass< detail::MeshStorage< PointSet< dimension > > >{} );
-            } );
+                []( Archive& archive, Impl& impl ) {
+                    archive.ext( impl,
+                        bitsery::ext::BaseClass<
+                            detail::MeshStorage< PointSet< dimension > > >{} );
+                } );
         }
     };
 
@@ -98,11 +100,11 @@ namespace geode
     void Corner< dimension >::serialize( Archive& archive )
     {
         archive.ext( *this, geode::Growable< Archive, Corner >{},
-            []( Archive &archive, Corner &corner ) {
-        archive.object( corner.impl_ );
-        archive.ext(
-            corner, bitsery::ext::BaseClass< Component< dimension > >{} );
-            });
+            []( Archive& archive, Corner& corner ) {
+                archive.object( corner.impl_ );
+                archive.ext( corner,
+                    bitsery::ext::BaseClass< Component< dimension > >{} );
+            } );
     }
 
     template class opengeode_model_api Corner< 2 >;

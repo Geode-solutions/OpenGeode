@@ -138,10 +138,10 @@ namespace geode
         template < typename Archive >
         void serialize( Archive &archive )
         {
-        archive.ext( *this, geode::Growable< Archive, Point >{},
-            []( Archive &archive, Point &point ) {
-            archive.container8b( point.values_ );
-            });
+            archive.ext( *this, geode::Growable< Archive, Point >{},
+                []( Archive &archive, Point &point ) {
+                    archive.container8b( point.values_ );
+                } );
         }
 
     private:

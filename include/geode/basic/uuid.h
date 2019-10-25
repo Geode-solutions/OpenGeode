@@ -124,11 +124,11 @@ namespace geode
         template < typename Archive >
         void serialize( Archive &archive )
         {
-        archive.ext( *this, geode::Growable< Archive, uuid >{},
-            []( Archive &archive, uuid &id ) {
-            archive.value8b( id.ab );
-            archive.value8b( id.cd );
-            });
+            archive.ext( *this, geode::Growable< Archive, uuid >{},
+                []( Archive &archive, uuid &id ) {
+                    archive.value8b( id.ab );
+                    archive.value8b( id.cd );
+                } );
         }
     };
 } // namespace geode
