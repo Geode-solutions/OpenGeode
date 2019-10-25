@@ -110,5 +110,12 @@ namespace geode
         return added_tetra;
     }
 
+    template < index_t dimension >
+    void TetrahedralSolidBuilder< dimension >::copy(
+        const TetrahedralSolid< dimension >& tetrahedral_solid )
+    {
+        PolyhedralSolidBuilder< dimension >::copy( tetrahedral_solid );
+    }
+
     template class opengeode_mesh_api TetrahedralSolidBuilder< 3 >;
 } // namespace geode

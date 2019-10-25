@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <memory>
 #include <typeinfo>
 #include <unordered_map>
 
@@ -47,6 +48,11 @@ namespace geode
 
     public:
         virtual ~AttributeBase() = default;
+
+        virtual std::shared_ptr< AttributeBase > clone() const = 0;
+
+        virtual void copy(
+            const AttributeBase& attribute, index_t nb_elements ) = 0;
 
     private:
         friend class bitsery::Access;
@@ -115,6 +121,26 @@ namespace geode
             return value_;
         }
 
+        std::shared_ptr< AttributeBase > clone() const override
+        {
+            std::shared_ptr< ConstantAttribute< T > > attribute{
+                new ConstantAttribute< T >{}
+            };
+            attribute->value_ = value_;
+            return attribute;
+        }
+
+        void copy(
+            const AttributeBase& attribute, index_t nb_elements ) override
+        {
+            if( nb_elements != 0 )
+            {
+                const auto& typed_attribute =
+                    dynamic_cast< const ReadOnlyAttribute< T >& >( attribute );
+                value_ = typed_attribute.value( 0 );
+            }
+        }
+
     private:
         friend class bitsery::Access;
         friend class AttributeManager;
@@ -154,6 +180,31 @@ namespace geode
         T& value( index_t element )
         {
             return values_.at( element );
+        }
+
+        std::shared_ptr< AttributeBase > clone() const override
+        {
+            std::shared_ptr< VariableAttribute< T > > attribute{
+                new VariableAttribute< T >{ default_value_ }
+            };
+            attribute->values_ = values_;
+            return attribute;
+        }
+
+        void copy(
+            const AttributeBase& attribute, index_t nb_elements ) override
+        {
+            const auto& typed_attribute =
+                dynamic_cast< const VariableAttribute< T >& >( attribute );
+            default_value_ = typed_attribute.default_value_;
+            if( nb_elements != 0 )
+            {
+                values_.resize( nb_elements );
+                for( const auto i : Range{ nb_elements } )
+                {
+                    values_[i] = typed_attribute.value( i );
+                }
+            }
         }
 
     protected:
@@ -211,6 +262,32 @@ namespace geode
         bool& value( index_t element )
         {
             return reinterpret_cast< bool& >( values_.at( element ) );
+        }
+
+        std::shared_ptr< AttributeBase > clone() const override
+        {
+            std::shared_ptr< VariableAttribute< bool > > attribute{
+                new VariableAttribute< bool >{
+                    static_cast< bool >( default_value_ ) }
+            };
+            attribute->values_ = values_;
+            return attribute;
+        }
+
+        void copy(
+            const AttributeBase& attribute, index_t nb_elements ) override
+        {
+            const auto& typed_attribute =
+                dynamic_cast< const VariableAttribute< bool >& >( attribute );
+            default_value_ = typed_attribute.default_value_;
+            if( nb_elements != 0 )
+            {
+                values_.resize( nb_elements );
+                for( const auto i : Range{ nb_elements } )
+                {
+                    values_[i] = typed_attribute.value( i );
+                }
+            }
         }
 
     protected:
@@ -271,6 +348,33 @@ namespace geode
         T& value( index_t element )
         {
             return values_.emplace( element, default_value_ ).first->second;
+        }
+
+        std::shared_ptr< AttributeBase > clone() const override
+        {
+            std::shared_ptr< SparseAttribute< T > > attribute{
+                new SparseAttribute< T >{ default_value_ }
+            };
+            attribute->values_ = values_;
+            return attribute;
+        }
+
+        void copy(
+            const AttributeBase& attribute, index_t nb_elements ) override
+        {
+            const auto& typed_attribute =
+                dynamic_cast< const SparseAttribute< T >& >( attribute );
+            default_value_ = typed_attribute.default_value_;
+            if( nb_elements != 0 )
+            {
+                for( const auto i : Range{ nb_elements } )
+                {
+                    if( typed_attribute.value( i ) != default_value_ )
+                    {
+                        values_[i] = typed_attribute.value( i );
+                    }
+                }
+            }
         }
 
     private:

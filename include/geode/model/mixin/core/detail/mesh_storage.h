@@ -34,13 +34,8 @@ namespace geode
         template < typename Mesh >
         class MeshStorage
         {
-            using CreateMesh = typename std::add_pointer< void(
-                const MeshType&, MeshStorage< Mesh >& ) >::type;
-
         public:
             MeshStorage() = default;
-
-            MeshStorage( CreateMesh impl ) : create_mesh{ impl } {}
 
             void set_mesh( std::unique_ptr< Mesh > mesh )
             {
@@ -62,7 +57,7 @@ namespace geode
             {
                 if( !mesh_ || mesh_->type_name() != mesh_type_ )
                 {
-                    create_mesh( mesh_type_, *this );
+                    set_mesh( Mesh::create( mesh_type_ ) );
                 }
             }
 
@@ -75,7 +70,6 @@ namespace geode
         private:
             std::unique_ptr< Mesh > mesh_;
             MeshType mesh_type_{ "" };
-            CreateMesh create_mesh;
         };
     } // namespace detail
 } // namespace geode

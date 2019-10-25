@@ -21,6 +21,8 @@
  *
  */
 
+#pragma once
+
 #include <bitsery/adapter/stream.h>
 #include <bitsery/bitsery.h>
 #include <bitsery/ext/inheritance.h>

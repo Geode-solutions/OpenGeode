@@ -36,15 +36,6 @@ namespace geode
     class Corner< dimension >::Impl
         : public detail::MeshStorage< PointSet< dimension > >
     {
-        using base_class = detail::MeshStorage< PointSet< dimension > >;
-
-    public:
-        Impl() : base_class( &create_mesh ) {}
-
-        static void create_mesh( const MeshType& type, base_class& storage )
-        {
-            storage.set_mesh( PointSet< dimension >::create( type ) );
-        }
     };
 
     template < index_t dimension >
@@ -61,7 +52,7 @@ namespace geode
     template < index_t dimension >
     Corner< dimension >::Corner( const MeshType& type )
     {
-        Impl::create_mesh( type, *impl_ );
+        impl_->set_mesh( PointSet< dimension >::create( type ) );
     }
 
     template < index_t dimension >
@@ -89,6 +80,13 @@ namespace geode
         archive.object( impl_ );
         archive.ext(
             *this, bitsery::ext::BaseClass< Component< dimension > >{} );
+    }
+
+    template < index_t dimension >
+    void Corner< dimension >::set_mesh(
+        std::unique_ptr< PointSet< dimension > > mesh )
+    {
+        impl_->set_mesh( std::move( mesh ) );
     }
 
     template class opengeode_model_api Corner< 2 >;

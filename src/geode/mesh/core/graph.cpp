@@ -32,6 +32,7 @@
 #include <geode/basic/pimpl_impl.h>
 #include <geode/basic/vector.h>
 
+#include <geode/mesh/builder/graph_builder.h>
 #include <geode/mesh/core/geode_graph.h>
 
 namespace geode
@@ -177,6 +178,14 @@ namespace geode
     {
         archive.ext( *this, bitsery::ext::BaseClass< VertexSet >{} );
         archive.object( impl_ );
+    }
+
+    std::unique_ptr< Graph > Graph::clone() const
+    {
+        auto clone = create( type_name() );
+        auto builder = GraphBuilder::create( *clone );
+        builder->copy( *this );
+        return clone;
     }
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, Graph );

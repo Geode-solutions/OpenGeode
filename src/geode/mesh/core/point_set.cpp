@@ -27,6 +27,7 @@
 
 #include <geode/basic/bitsery_archive.h>
 
+#include <geode/mesh/builder/point_set_builder.h>
 #include <geode/mesh/core/geode_point_set.h>
 
 namespace geode
@@ -69,6 +70,16 @@ namespace geode
     void PointSet< dimension >::serialize( Archive& archive )
     {
         archive.ext( *this, bitsery::ext::BaseClass< VertexSet >{} );
+    }
+
+    template < index_t dimension >
+    std::unique_ptr< PointSet< dimension > >
+        PointSet< dimension >::clone() const
+    {
+        auto clone = create( type_name() );
+        auto builder = PointSetBuilder< dimension >::create( *clone );
+        builder->copy( *this );
+        return clone;
     }
 
     template class opengeode_mesh_api PointSet< 2 >;

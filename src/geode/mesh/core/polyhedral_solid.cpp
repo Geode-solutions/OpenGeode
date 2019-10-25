@@ -31,8 +31,10 @@
 #include <geode/basic/vector.h>
 
 #include <geode/mesh/builder/detail/mapping_after_deletion.h>
+#include <geode/mesh/builder/polyhedral_solid_builder.h>
 #include <geode/mesh/core/detail/vertex_cycle.h>
 #include <geode/mesh/core/geode_polyhedral_solid.h>
+#include <geode/mesh/core/tetrahedral_solid.h>
 
 namespace
 {
@@ -76,7 +78,7 @@ namespace
         geode::index_t vertex_id )
     {
         OPENGEODE_EXCEPTION( vertex_id < solid.nb_polyhedron_facet_vertices(
-                                 { polyhedron_id, facet_id } ),
+                                             { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -91,10 +93,10 @@ namespace geode
     public:
         explicit Impl( PolyhedralSolid& solid )
             : polyhedron_around_vertex_(
-                solid.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolyhedronVertex >(
-                        "polyhedron_around_vertex", PolyhedronVertex{} ) )
+                  solid.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolyhedronVertex >(
+                          "polyhedron_around_vertex", PolyhedronVertex{} ) )
         {
         }
 
@@ -233,10 +235,17 @@ namespace geode
         }
         catch( const OpenGeodeException& e )
         {
-            Logger::error( e.what() );
-            throw OpenGeodeException(
-                "Could not create PolyhedralSolid data structure: ",
-                type.get() );
+            try
+            {
+                return TetrahedralSolid< dimension >::create( type );
+            }
+            catch( const OpenGeodeException& e )
+            {
+                Logger::error( e.what() );
+                throw OpenGeodeException(
+                    "Could not create PolyhedralSolid data structure: ",
+                    type.get() );
+            }
         }
     }
 
@@ -308,7 +317,7 @@ namespace geode
         {
             barycenter = barycenter
                          + this->point( polyhedron_facet_vertex(
-                             { polyhedron_facet, v } ) );
+                               { polyhedron_facet, v } ) );
         }
         return barycenter / nb_polyhedron_facet_vertices( polyhedron_facet );
     }
@@ -585,6 +594,16 @@ namespace geode
     {
         archive.ext( *this, bitsery::ext::BaseClass< VertexSet >{} );
         archive.object( impl_ );
+    }
+
+    template < index_t dimension >
+    std::unique_ptr< PolyhedralSolid< dimension > >
+        PolyhedralSolid< dimension >::clone() const
+    {
+        auto clone = create( this->type_name() );
+        auto builder = PolyhedralSolidBuilder< dimension >::create( *clone );
+        builder->copy( *this );
+        return clone;
     }
 
     template class opengeode_mesh_api PolyhedralSolid< 3 >;

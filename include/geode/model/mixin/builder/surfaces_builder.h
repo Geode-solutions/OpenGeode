@@ -33,6 +33,7 @@ namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Surface );
     FORWARD_DECLARATION_DIMENSION_CLASS( Surfaces );
+    FORWARD_DECLARATION_DIMENSION_CLASS( PolygonalSurface );
     FORWARD_DECLARATION_DIMENSION_CLASS( PolygonalSurfaceBuilder );
 
     struct uuid;
@@ -54,6 +55,9 @@ namespace geode
             surface_mesh_builder( const uuid& id );
 
         void set_surface_name( const uuid& id, std::string name );
+
+        void set_surface_mesh( const uuid& id,
+            std::unique_ptr< PolygonalSurface< dimension > > mesh );
 
     protected:
         SurfacesBuilder( Surfaces< dimension >& surfaces )

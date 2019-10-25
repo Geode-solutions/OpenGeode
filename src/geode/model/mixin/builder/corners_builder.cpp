@@ -27,6 +27,7 @@
 #include <geode/model/mixin/core/corners.h>
 
 #include <geode/mesh/builder/point_set_builder.h>
+#include <geode/mesh/core/point_set.h>
 
 namespace geode
 {
@@ -70,6 +71,13 @@ namespace geode
         const uuid& id, std::string name )
     {
         corners_.modifiable_corner( id ).set_corner_name( std::move( name ) );
+    }
+
+    template < index_t dimension >
+    void CornersBuilder< dimension >::set_corner_mesh(
+        const uuid& id, std::unique_ptr< PointSet< dimension > > mesh )
+    {
+        corners_.modifiable_corner( id ).set_mesh( std::move( mesh ) );
     }
 
     template class opengeode_model_api CornersBuilder< 2 >;

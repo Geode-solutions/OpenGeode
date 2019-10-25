@@ -34,8 +34,10 @@
 #include <geode/basic/vector.h>
 
 #include <geode/mesh/builder/detail/mapping_after_deletion.h>
+#include <geode/mesh/builder/polygonal_surface_builder.h>
 #include <geode/mesh/core/detail/vertex_cycle.h>
 #include <geode/mesh/core/geode_polygonal_surface.h>
+#include <geode/mesh/core/triangulated_surface.h>
 
 namespace
 {
@@ -105,10 +107,10 @@ namespace geode
     public:
         explicit Impl( PolygonalSurfaceBase& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) )
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
@@ -654,11 +656,28 @@ namespace geode
         }
         catch( const OpenGeodeException& e )
         {
-            Logger::error( e.what() );
-            throw OpenGeodeException(
-                "Could not create PolygonalSurface data structure: ",
-                type.get() );
+            try
+            {
+                return TriangulatedSurface< dimension >::create( type );
+            }
+            catch( const OpenGeodeException& e )
+            {
+                Logger::error( e.what() );
+                throw OpenGeodeException(
+                    "Could not create PolygonalSurface data structure: ",
+                    type.get() );
+            }
         }
+    }
+
+    template < index_t dimension >
+    std::unique_ptr< PolygonalSurface< dimension > >
+        PolygonalSurface< dimension >::clone() const
+    {
+        auto clone = create( this->type_name() );
+        auto builder = PolygonalSurfaceBuilder< dimension >::create( *clone );
+        builder->copy( *this );
+        return clone;
     }
 
     std::unique_ptr< PolygonalSurface< 3 > > PolygonalSurface< 3 >::create()
@@ -677,11 +696,27 @@ namespace geode
         }
         catch( const OpenGeodeException& e )
         {
-            Logger::error( e.what() );
-            throw OpenGeodeException(
-                "Could not create PolygonalSurface data structure: ",
-                type.get() );
+            try
+            {
+                return TriangulatedSurfaceFactory< 3 >::create( type );
+            }
+            catch( const OpenGeodeException& e )
+            {
+                Logger::error( e.what() );
+                throw OpenGeodeException(
+                    "Could not create PolygonalSurface data structure: ",
+                    type.get() );
+            }
         }
+    }
+
+    std::unique_ptr< PolygonalSurface< 3 > >
+        PolygonalSurface< 3 >::clone() const
+    {
+        auto clone = create( type_name() );
+        auto builder = PolygonalSurfaceBuilder< 3 >::create( *clone );
+        builder->copy( *this );
+        return clone;
     }
 
     template class opengeode_mesh_api PolygonalSurfaceBase< 2 >;

@@ -28,7 +28,9 @@
 #include <geode/basic/attribute_manager.h>
 
 #include <geode/mesh/builder/detail/mapping_after_deletion.h>
+#include <geode/mesh/builder/triangulated_surface_builder.h>
 #include <geode/mesh/core/polygonal_surface.h>
+#include <geode/mesh/core/triangulated_surface.h>
 
 namespace
 {
@@ -96,10 +98,24 @@ namespace geode
         }
         catch( const OpenGeodeException& e )
         {
-            Logger::error( e.what() );
-            throw OpenGeodeException(
-                "Could not create PolygonalSurface builder of data structure: ",
-                mesh.type_name().get() );
+            try
+            {
+                return TriangulatedSurfaceBuilder< dimension >::create(
+                    dynamic_cast< TriangulatedSurface< dimension >& >( mesh ) );
+            }
+            catch( const std::bad_cast& e )
+            {
+                Logger::error( e.what() );
+                throw OpenGeodeException( "Could not cast PolygonalSurface "
+                                          "to TriangulatedSurface" );
+            }
+            catch( const OpenGeodeException& e )
+            {
+                Logger::error( e.what() );
+                throw OpenGeodeException( "Could not create PolygonalSurface "
+                                          "builder of data structure: ",
+                    mesh.type_name().get() );
+            }
         }
     }
 
@@ -350,6 +366,30 @@ namespace geode
         create_vertex();
         set_point( added_vertex, point );
         return added_vertex;
+    }
+
+    template < index_t dimension >
+    void PolygonalSurfaceBuilder< dimension >::copy(
+        const PolygonalSurface< dimension >& polygonal_surface )
+    {
+        VertexSetBuilder::copy( polygonal_surface );
+        for( const auto p : Range{ polygonal_surface.nb_vertices() } )
+        {
+            set_point( p, polygonal_surface.point( p ) );
+        }
+        for( const auto p : Range{ polygonal_surface.nb_polygons() } )
+        {
+            std::vector< index_t > vertices(
+                polygonal_surface.nb_polygon_vertices( p ) );
+            for( const auto v :
+                Range{ polygonal_surface.nb_polygon_vertices( p ) } )
+            {
+                vertices[v] = polygonal_surface.polygon_vertex( { p, v } );
+            }
+            create_polygon( vertices );
+        }
+        polygonal_surface_.polygon_attribute_manager().copy(
+            polygonal_surface.polygon_attribute_manager() );
     }
 
     template class opengeode_mesh_api PolygonalSurfaceBuilder< 2 >;

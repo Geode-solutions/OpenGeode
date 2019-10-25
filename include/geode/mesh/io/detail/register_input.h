@@ -21,6 +21,8 @@
  *
  */
 
+#pragma once
+
 #include <geode/mesh/common.h>
 
 namespace geode

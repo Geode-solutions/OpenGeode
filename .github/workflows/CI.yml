@@ -19,6 +19,16 @@ jobs:
   build-ubuntu:
     runs-on: ubuntu-18.04
     needs: format
+    strategy:
+      matrix:
+        cc: [gcc, clang]
+        cxx: [g++, clang++]
+        config: [Debug, Release]
+        exclude:
+          - cc: gcc
+            cxx: clang++
+          - cc: clang
+            cxx: g++
 
     steps:
     - uses: actions/checkout@v1
@@ -26,25 +36,43 @@ jobs:
       run: |
         mkdir -p build
         cd build
-        cmake -DCMAKE_BUILD_TYPE=Debug ..
+        cmake -DCMAKE_BUILD_TYPE=${{ matrix.config }} ..
         cmake --build . -- -j2
+      env:
+        CC: ${{ matrix.cc }}
+        CXX: ${{ matrix.cxx }}
     - name: Test
       run: |
         mkdir -p test
         cd test
-        cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH:PATH=$GITHUB_WORKSPACE/build/opengeode/install ../tests
+        cmake -DCMAKE_BUILD_TYPE=${{ matrix.config }} -DCMAKE_PREFIX_PATH:PATH=$GITHUB_WORKSPACE/build/opengeode/install ../tests
         cmake --build . -- -j2
         ctest --output-on-failure
+      env:
+        CC: ${{ matrix.cc }}
+        CXX: ${{ matrix.cxx }}
     - name: Kcov
       run: curl -s https://raw.githubusercontent.com/Geode-solutions/actions/master/kcov.sh | bash -s -- ${GITHUB_WORKSPACE}/build/opengeode/bin
+      if: matrix.cc == 'gcc' && github.event_name == 'pull_request' && matrix.config == 'Debug'
     - uses: codecov/codecov-action@v1.0.2
+      if: matrix.cc == 'gcc' && github.event_name == 'pull_request' && matrix.config == 'Debug'
       with: 
         token: ${{ secrets.CODECOV_TOKEN }}
         file: kcov/kcov-merged/cobertura.xml
+    - name: Notify slack
+      if: failure() && github.ref == 'refs/heads/master'
+      env:
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      uses: pullreminders/slack-action@master
+      with:
+        args: '{\"channel\":\"CLJ1PS7UN\",\"text\":\"Compilation or Testing failed for OpenGeode on Ubuntu\"}'        
       
   build-mac:
     runs-on: macOS-10.14
     needs: format
+    strategy:
+      matrix:
+        config: [Debug, Release]
 
     steps:
     - uses: actions/checkout@v1
@@ -52,14 +80,49 @@ jobs:
       run: |
         mkdir -p build
         cd build
-        cmake -DCMAKE_BUILD_TYPE=Debug ..
-        cmake --build . -- -j2
+        cmake -DCMAKE_BUILD_TYPE=${{ matrix.config }} ..
+        cmake --build .
         cd opengeode
         ctest --output-on-failure
+    - name: Notify slack
+      if: failure() && github.ref == 'refs/heads/master'
+      env:
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      uses: pullreminders/slack-action@master
+      with:
+        args: '{\"channel\":\"CLJ1PS7UN\",\"text\":\"Compilation or Testing failed for OpenGeode on macOS\"}'   
       
+  build-mac-xcode:
+    runs-on: macOS-10.14
+    needs: format
+    strategy:
+      matrix:
+        config: [Debug, Release]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Compile & Test
+      run: |
+        mkdir -p build
+        cd build
+        cmake -G "Xcode" ..
+        cmake --build . --config ${{ matrix.config }}
+        cd opengeode
+        ctest -C ${{ matrix.config }} --output-on-failure
+    - name: Notify slack
+      if: failure() && github.ref == 'refs/heads/master'
+      env:
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      uses: pullreminders/slack-action@master
+      with:
+        args: '{\"channel\":\"CLJ1PS7UN\",\"text\":\"Compilation or Testing failed for OpenGeode on macOS\"}' 
+
   build-windows:
     runs-on: windows-2016
     needs: format
+    strategy:
+      matrix:
+        config: [Debug, Release]
 
     steps:
     - uses: actions/checkout@v1
@@ -67,18 +130,28 @@ jobs:
       run: |
         mkdir -p build
         cd build
+        set version=%GITHUB_REF:*tags/=%
+        echo "::set-output name={version1}::{%version%}"
+        echo ::set-output name=version2::%version%
+        echo %version1%
+        echo %version2%
         cmake -G "Visual Studio 15 2017 Win64" ..
-        cmake --build . --config Debug
+        cmake --build . --config ${{ matrix.config }}
         cd opengeode
-        ctest -C Debug --output-on-failure
+        ctest -C ${{ matrix.config }} --output-on-failure
+    - name: Notify slack
+      if: failure() && github.ref == 'refs/heads/master'
+      env:
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      uses: pullreminders/slack-action@master
+      with:
+        args: '{\"channel\":\"CLJ1PS7UN\",\"text\":\"Compilation or Testing failed for OpenGeode on Windows\"}' 
         
   semantic-release:
     runs-on: ubuntu-18.04
-    needs: [build-ubuntu, build-mac, build-windows]
+    needs: [build-ubuntu, build-mac, build-mac-xcode, build-windows]
     steps:
     - uses: actions/checkout@v1
     - run: npx semantic-release
       env:
         GITHUB_TOKEN: ${{ secrets.TOKEN }}
-        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
- 

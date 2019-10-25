@@ -30,6 +30,7 @@
 #include <geode/mesh/builder/geode_polyhedral_solid_builder.h>
 #include <geode/mesh/builder/geode_tetrahedral_solid_builder.h>
 #include <geode/mesh/builder/geode_triangulated_surface_builder.h>
+#include <geode/mesh/builder/geode_vertex_set_builder.h>
 
 #include <geode/mesh/core/geode_edged_curve.h>
 #include <geode/mesh/core/geode_graph.h>
@@ -38,11 +39,15 @@
 #include <geode/mesh/core/geode_polyhedral_solid.h>
 #include <geode/mesh/core/geode_tetrahedral_solid.h>
 #include <geode/mesh/core/geode_triangulated_surface.h>
+#include <geode/mesh/core/geode_vertex_set.h>
 
 namespace geode
 {
     void register_geode_builder()
     {
+        VertexSetBuilderFactory::register_creator< OpenGeodeVertexSetBuilder >(
+            OpenGeodeVertexSet::type_name_static() );
+
         GraphBuilderFactory::register_creator< OpenGeodeGraphBuilder >(
             OpenGeodeGraph::type_name_static() );
 

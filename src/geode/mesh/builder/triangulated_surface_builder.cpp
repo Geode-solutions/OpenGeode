@@ -84,6 +84,13 @@ namespace geode
         return added_triangle;
     }
 
+    template < index_t dimension >
+    void TriangulatedSurfaceBuilder< dimension >::copy(
+        const TriangulatedSurface< dimension >& triangulated_surface )
+    {
+        PolygonalSurfaceBuilder< dimension >::copy( triangulated_surface );
+    }
+
     template class opengeode_mesh_api TriangulatedSurfaceBuilder< 2 >;
     template class opengeode_mesh_api TriangulatedSurfaceBuilder< 3 >;
 } // namespace geode

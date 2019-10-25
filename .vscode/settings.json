@@ -10,7 +10,7 @@
         "${workspaceFolder}/build/third_party/nanoflann/src/nanoflann/include",                
         "${workspaceFolder}/build/third_party/spdlog/install/include"
     ],
-    "files.exclude": {
-        "${workspaceFolder}/build/opengeode/install/**": true
+    "files.watcherExclude": {
+        "${workspaceFolder}/build/**": true
     }
 }

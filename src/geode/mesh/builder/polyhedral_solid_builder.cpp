@@ -28,7 +28,9 @@
 #include <geode/basic/attribute_manager.h>
 
 #include <geode/mesh/builder/detail/mapping_after_deletion.h>
+#include <geode/mesh/builder/tetrahedral_solid_builder.h>
 #include <geode/mesh/core/polyhedral_solid.h>
+#include <geode/mesh/core/tetrahedral_solid.h>
 
 namespace
 {
@@ -96,10 +98,24 @@ namespace geode
         }
         catch( const OpenGeodeException& e )
         {
-            Logger::error( e.what() );
-            throw OpenGeodeException(
-                "Could not create PolyhedralSolid builder of data structure: ",
-                mesh.type_name().get() );
+            try
+            {
+                return TetrahedralSolidBuilder< dimension >::create(
+                    dynamic_cast< TetrahedralSolid< dimension >& >( mesh ) );
+            }
+            catch( const std::bad_cast& e )
+            {
+                Logger::error( e.what() );
+                throw OpenGeodeException( "Could not cast PolyhedralSolid "
+                                          "to TetrahedralSolid" );
+            }
+            catch( const OpenGeodeException& e )
+            {
+                Logger::error( e.what() );
+                throw OpenGeodeException( "Could not create PolyhedralSolid "
+                                          "builder of data structure: ",
+                    mesh.type_name().get() );
+            }
         }
     }
 
@@ -113,7 +129,7 @@ namespace geode
             "polyhedron that does not exist" );
         OPENGEODE_EXCEPTION( polyhedron_vertex.vertex_id
                                  < polyhedral_solid_.nb_polyhedron_vertices(
-                                     polyhedron_vertex.polyhedron_id ),
+                                       polyhedron_vertex.polyhedron_id ),
             "[PolyhedralSolidBuilder::set_polyhedron_vertex] Accessing an "
             "invalid polyhedron vertex" );
         OPENGEODE_EXCEPTION( vertex_id < polyhedral_solid_.nb_vertices(),
@@ -201,7 +217,7 @@ namespace geode
             "polyhedron that does not exist" );
         OPENGEODE_EXCEPTION(
             polyhedron_facet.facet_id < polyhedral_solid_.nb_polyhedron_facets(
-                polyhedron_facet.polyhedron_id ),
+                                            polyhedron_facet.polyhedron_id ),
             "[PolyhedralSolidBuilder::set_polyhedron_adjacent] Accessing an "
             "invalid polyhedron vertex" );
         OPENGEODE_EXCEPTION( adjacent_id < polyhedral_solid_.nb_polyhedra()
@@ -395,6 +411,50 @@ namespace geode
         create_vertex();
         set_point( added_vertex, point );
         return added_vertex;
+    }
+
+    template < index_t dimension >
+    void PolyhedralSolidBuilder< dimension >::copy(
+        const PolyhedralSolid< dimension >& polyhedral_solid )
+    {
+        VertexSetBuilder::copy( polyhedral_solid );
+        for( const auto p : Range{ polyhedral_solid.nb_vertices() } )
+        {
+            set_point( p, polyhedral_solid.point( p ) );
+        }
+        for( const auto p : Range{ polyhedral_solid.nb_polyhedra() } )
+        {
+            std::vector< index_t > vertices(
+                polyhedral_solid.nb_polyhedron_vertices( p ) );
+            for( const auto v :
+                Range{ polyhedral_solid.nb_polyhedron_vertices( p ) } )
+            {
+                vertices[v] = polyhedral_solid.polyhedron_vertex( { p, v } );
+            }
+            std::vector< std::vector< index_t > > facets(
+                polyhedral_solid.nb_polyhedron_facets( p ) );
+            for( const auto f :
+                Range{ polyhedral_solid.nb_polyhedron_facets( p ) } )
+            {
+                auto& facet = facets[f];
+                facet.resize(
+                    polyhedral_solid.nb_polyhedron_facet_vertices( { p, f } ) );
+                for( auto v :
+                    Range{ polyhedral_solid.nb_polyhedron_facet_vertices(
+                        { p, f } ) } )
+                {
+                    facet[v] = geode::find(
+                        vertices, polyhedral_solid.polyhedron_facet_vertex(
+                                      { { p, f }, v } ) );
+                    OPENGEODE_ASSERT( facet[v] != NO_ID,
+                        "[PolyhedralSolidBuilder::copy] Wrong indexing between "
+                        "polyhedron_vertex and polyhedron_facet_vertex" );
+                }
+            }
+            create_polyhedron( vertices, facets );
+        }
+        polyhedral_solid_.polyhedron_attribute_manager().copy(
+            polyhedral_solid.polyhedron_attribute_manager() );
     }
 
     template class opengeode_mesh_api PolyhedralSolidBuilder< 3 >;

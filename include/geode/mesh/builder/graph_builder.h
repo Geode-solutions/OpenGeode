@@ -91,6 +91,9 @@ namespace geode
     protected:
         GraphBuilder( Graph& graph );
 
+        friend class Graph;
+        void copy( const Graph& graph );
+
     private:
         void do_delete_vertices( const std::vector< bool >& to_delete ) final;
 

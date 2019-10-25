@@ -79,6 +79,9 @@ namespace geode
         PolygonalSurface< dimension >& modifiable_mesh();
 
         friend class SurfacesBuilder< dimension >;
+        void set_mesh( std::unique_ptr< PolygonalSurface< dimension > > mesh );
+
+        friend class SurfacesBuilder< dimension >;
         void set_surface_name( std::string name )
         {
             this->set_name( std::move( name ) );

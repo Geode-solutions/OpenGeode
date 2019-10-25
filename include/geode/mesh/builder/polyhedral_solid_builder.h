@@ -146,6 +146,9 @@ namespace geode
         index_t find_or_create_facet(
             const std::vector< index_t >& facet_vertices );
 
+        friend class PolyhedralSolid< dimension >;
+        void copy( const PolyhedralSolid< dimension >& polyhedral_solid );
+
     private:
         /*!
          * @brief Sets a point.
