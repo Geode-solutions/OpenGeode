@@ -75,6 +75,6 @@ jobs:
     - name: Upload
       uses: softprops/action-gh-release@v1
       with:
-        files: "build/opengeode/OpenGeode-${{ steps.package.outputs.version }}-win64.zip"
+        files: "build/opengeode/OpenGeode-*-win64.zip"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}        
