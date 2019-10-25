@@ -92,7 +92,8 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, DefaultGrowable< Archive, ReadOnlyAttribute< T > >{},
+            archive.ext( *this,
+                DefaultGrowable< Archive, ReadOnlyAttribute< T > >{},
                 []( Archive& archive, ReadOnlyAttribute< T >& attribute ) {
                     archive.ext(
                         attribute, bitsery::ext::BaseClass< AttributeBase >{} );
@@ -131,7 +132,8 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, DefaultGrowable< Archive, ConstantAttribute< T > >{},
+            archive.ext( *this,
+                DefaultGrowable< Archive, ConstantAttribute< T > >{},
                 []( Archive& archive, ConstantAttribute< T >& attribute ) {
                     archive.ext( attribute,
                         bitsery::ext::BaseClass< ReadOnlyAttribute< T > >{} );
@@ -180,7 +182,8 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, DefaultGrowable< Archive, VariableAttribute< T > >{},
+            archive.ext( *this,
+                DefaultGrowable< Archive, VariableAttribute< T > >{},
                 []( Archive& archive, VariableAttribute< T >& attribute ) {
                     archive.ext( attribute,
                         bitsery::ext::BaseClass< ReadOnlyAttribute< T > >{} );
@@ -306,7 +309,8 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, DefaultGrowable< Archive, SparseAttribute< T > >{},
+            archive.ext( *this,
+                DefaultGrowable< Archive, SparseAttribute< T > >{},
                 []( Archive& archive, SparseAttribute< T >& attribute ) {
                     archive.ext( attribute,
                         bitsery::ext::BaseClass< ReadOnlyAttribute< T > >{} );
