@@ -58,6 +58,8 @@ Your CMakeLists.txt is now ready.
 # Last step - Configure and build your module.
 
 As for OpenGeode \link opengeode_how_to_compile configuration and compilation\endlink, this step depends on your platform.
+Follow \link opengeode_how_to_compile_module this page\endlink to learn how to configure and compile your own module.
+
 Follow the same procedure than for OpenGeode but by specifying the `CMAKE_PREFIX_PATH` to OpenGeode install path. For example:
 
 \code
@@ -73,7 +75,6 @@ Template repository contains some files. Here is information on these files:
 
  - `LICENSE` - In this file you specify the Licence of your module 
  - `README.md` - This file is used as overview of your GitHub project. Add any information you consider necessary.
- - `azure-pipelines.yml` - Configuration file for running jobs in Azure DevOps pipelines (for formatting, testing and much more).
  - `.clang-format` - Format rules file used by clang. Run it by your own or automatize formatting using this file and CI tools.
  - `.gitattributes` - List of attributes on files and folders (e.g. ignored by GitHub for repository languages) 
  - `.gitignore` - List of files and folders ignored by Git.
