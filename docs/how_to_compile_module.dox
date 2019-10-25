@@ -26,7 +26,7 @@
 \page opengeode_how_to_compile_module How to configure and compile an OpenGeode module
 
 This page explains how to configure and compile a module that depends on OpenGeode, 
-either is it an existing module (for instance OpenGeode-Geosciences) or \link opengeode_how_to_create_module your own module\endlink.
+either it is an provided module (for instance OpenGeode-Geosciences) or \link opengeode_how_to_create_module your own module\endlink.
 As for \link opengeode_how_to_compile OpenGeode configuration and compilation\endlink, the procedure is very simple.
 
 
@@ -35,12 +35,19 @@ As for \link opengeode_how_to_compile OpenGeode configuration and compilation\en
 You need exactly the same tools than for compiling OpenGeode (given \link opengeode_how_to_compile here\endlink).
 You also need to have installed OpenGeode
 
+# Module configuration
 
-As for OpenGeode configuration and compilation, this step depends on your platform.
+As for OpenGeode configuration, this step depends on your platform.
 Follow the same \link opengeode_how_to_compile procedure\endlink than for OpenGeode but by specifying the `CMAKE_PREFIX_PATH` to OpenGeode install path. 
 
 For example:
 
 \code
 cmake -DCMAKE_PREFIX_PATH=path/to/OpenGeode/build/opengeode/install ..
+\endcode
+
+If the module depends on several modules (for instance OpenGeode-GeosciencesIO that depends on OpenGeode and OpenGeode-Geosciences), do the following:
+
+\code
+cmake -DCMAKE_PREFIX_PATH="where/is/install/OpenGeode;where/is/install/OpenGeode-Geosciences" ..
 \endcode
