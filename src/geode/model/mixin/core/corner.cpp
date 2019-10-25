@@ -45,6 +45,17 @@ namespace geode
         {
             storage.set_mesh( PointSet< dimension >::create( type ) );
         }
+
+    private:
+        friend class bitsery::Access;
+        template < typename Archive >
+        void serialize( Archive& archive )
+        {
+            archive.ext( *this, Growable< Archive, Impl >{},
+            []( Archive &archive, Impl & impl ) {
+            archive.ext( impl, bitsery::ext::BaseClass< detail::MeshStorage< PointSet< dimension > > >{} );
+            } );
+        }
     };
 
     template < index_t dimension >
@@ -86,9 +97,12 @@ namespace geode
     template < typename Archive >
     void Corner< dimension >::serialize( Archive& archive )
     {
-        archive.object( impl_ );
+        archive.ext( *this, geode::Growable< Archive, Corner >{},
+            []( Archive &archive, Corner &corner ) {
+        archive.object( corner.impl_ );
         archive.ext(
-            *this, bitsery::ext::BaseClass< Component< dimension > >{} );
+            corner, bitsery::ext::BaseClass< Component< dimension > >{} );
+            });
     }
 
     template class opengeode_model_api Corner< 2 >;

@@ -121,9 +121,12 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.object( polyhedron_attribute_manager_ );
+        archive.ext( *this, geode::Growable< Archive, Impl >{},
+            []( Archive &archive, Impl &impl ) {
+            archive.object( impl.polyhedron_attribute_manager_ );
             archive.ext(
-                polyhedron_around_vertex_, bitsery::ext::StdSmartPtr{} );
+                impl.polyhedron_around_vertex_, bitsery::ext::StdSmartPtr{} );
+            });
         }
 
     private:
@@ -460,8 +463,11 @@ namespace geode
     template < typename Archive >
     void PolyhedralSolid< dimension >::serialize( Archive& archive )
     {
-        archive.ext( *this, bitsery::ext::BaseClass< VertexSet >{} );
-        archive.object( impl_ );
+        archive.ext( *this, geode::Growable< Archive, PolyhedralSolid >{},
+            []( Archive &archive, PolyhedralSolid &solid ) {
+        archive.ext( solid, bitsery::ext::BaseClass< VertexSet >{} );
+        archive.object( solid.impl_ );
+            });
     }
 
     template class opengeode_mesh_api PolyhedralSolid< 3 >;

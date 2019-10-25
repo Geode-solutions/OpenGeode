@@ -68,7 +68,10 @@ namespace geode
     template < typename Archive >
     void PointSet< dimension >::serialize( Archive& archive )
     {
-        archive.ext( *this, bitsery::ext::BaseClass< VertexSet >{} );
+        archive.ext( *this, geode::Growable< Archive, PointSet >{},
+            []( Archive &archive, PointSet &point_set ) {
+        archive.ext( point_set, bitsery::ext::BaseClass< VertexSet >{} );
+            });
     }
 
     template class opengeode_mesh_api PointSet< 2 >;

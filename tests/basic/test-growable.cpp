@@ -21,111 +21,20 @@
  *
  */
 
-#include <bitsery/ext/compact_value.h>
-
 #include <fstream>
-#include <functional>
 
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/logger.h>
-#include <geode/basic/range.h>
 
 #define CHECK( arg, value )                                                    \
     OPENGEODE_EXCEPTION( arg == value, "[Test] Wrong value for " #arg );
 
-template < typename Archive, typename T >
-class Growable
-{
-    static constexpr geode::index_t FIRST_VERSION{ 1 };
-
-public:
-    Growable() = default;
-    Growable(
-        std::vector< std::function< void( Archive &, T & ) > > serializers )
-        : version_( serializers.size() ),
-          serializers_( std::move( serializers ) )
-    {
-    }
-    Growable(
-        std::vector< std::function< void( Archive &, T & ) > > serializers,
-        std::vector< std::function< void( T & ) > > initializers )
-        : version_( serializers.size() ),
-          serializers_( std::move( serializers ) ),
-          initializers_( std::move( initializers ) )
-    {
-        OPENGEODE_EXCEPTION( initializers_.size() == version_ - 1,
-            "Should have as many initializers than the version number minus "
-            "one" );
-    }
-
-    template < typename Fnc >
-    void serialize( Archive &ser, const T &obj, Fnc &&fnc ) const
-    {
-        ser.ext4b( version_, bitsery::ext::CompactValue{} );
-        if( serializers_.empty() )
-        {
-            fnc( ser, const_cast< T & >( obj ) );
-        }
-        else
-        {
-            for( auto f : serializers_ )
-            {
-                f( ser, const_cast< T & >( obj ) );
-            }
-        }
-    }
-
-    template < typename Fnc >
-    void deserialize( Archive &des, T &obj, Fnc &&fnc ) const
-    {
-        geode::index_t current_version;
-        des.ext4b( current_version, bitsery::ext::CompactValue{} );
-        if( version_ == FIRST_VERSION )
-        {
-            fnc( des, obj );
-        }
-        else
-        {
-            for( auto i : geode::Range{ current_version } )
-            {
-                serializers_.at( i )( des, obj );
-            }
-            if( !initializers_.empty() )
-            {
-                for( auto i : geode::Range{ current_version, version_ } )
-                {
-                    initializers_.at( i - 1 )( obj );
-                }
-            }
-        }
-    }
-
-private:
-    geode::index_t version_{ FIRST_VERSION };
-    std::vector< std::function< void( Archive &, T & ) > > serializers_;
-    std::vector< std::function< void( T & ) > > initializers_;
-};
-
-namespace bitsery
-{
-    namespace traits
-    {
-        template < typename Archive, typename T >
-        struct ExtensionTraits< Growable< Archive, T >, T >
-        {
-            using TValue = T;
-            static constexpr bool SupportValueOverload = false;
-            static constexpr bool SupportObjectOverload = true;
-            static constexpr bool SupportLambdaOverload = true;
-        };
-    } // namespace traits
-} // namespace bitsery
 struct Foo
 {
     template < typename Archive >
     void serialize( Archive &archive )
     {
-        archive.ext( *this, Growable< Archive, Foo >{},
+        archive.ext( *this, geode::Growable< Archive, Foo >{},
             []( Archive &archive, Foo &foo ) {
                 archive.value8b( foo.double_ );
                 archive.value4b( foo.unsigned_int_ );
@@ -141,7 +50,7 @@ struct Foo2
     template < typename Archive >
     void serialize( Archive &archive )
     {
-        archive.ext( *this, Growable< Archive, Foo2 >{
+        archive.ext( *this, geode::Growable< Archive, Foo2 >{
                                 { []( Archive &archive, Foo2 &foo ) {
                                      archive.value8b( foo.double_ );
                                      archive.value4b( foo.unsigned_int_ );
@@ -160,7 +69,7 @@ struct Foo3
     template < typename Archive >
     void serialize( Archive &archive )
     {
-        archive.ext( *this, Growable< Archive, Foo3 >{
+        archive.ext( *this, geode::Growable< Archive, Foo3 >{
                                 { []( Archive &archive, Foo3 &foo ) {
                                      archive.value8b( foo.double_ );
                                      archive.value4b( foo.unsigned_int_ );

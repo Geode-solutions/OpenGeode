@@ -25,6 +25,7 @@
 
 #include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>
+#include <geode/basic/bitsery_archive.h>
 #include <geode/basic/point.h>
 
 #include <geode/mesh/core/vertex_set.h>
@@ -61,7 +62,10 @@ namespace geode
             template < typename Archive >
             void serialize( Archive& archive )
             {
-                archive.ext( points_, bitsery::ext::StdSmartPtr{} );
+        archive.ext( *this, geode::Growable< Archive, PointsImpl >{},
+            []( Archive &archive, PointsImpl &impl ) {
+                archive.ext( impl.points_, bitsery::ext::StdSmartPtr{} );
+            });
             }
 
         protected:

@@ -127,13 +127,16 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
+        archive.ext( *this, geode::Growable< Archive, Impl >{},
+            []( Archive &archive, Impl &impl ) {
             archive.container4b(
-                polygon_vertices_, polygon_vertices_.max_size() );
+                impl.polygon_vertices_, impl.polygon_vertices_.max_size() );
             archive.container4b(
-                polygon_adjacents_, polygon_adjacents_.max_size() );
-            archive.container4b( polygon_ptr_, polygon_ptr_.max_size() );
-            archive.ext( *this,
+                impl.polygon_adjacents_, impl.polygon_adjacents_.max_size() );
+            archive.container4b( impl.polygon_ptr_, impl.polygon_ptr_.max_size() );
+            archive.ext( impl,
                 bitsery::ext::BaseClass< detail::PointsImpl< dimension > >{} );
+            });
         }
 
         index_t starting_index( index_t polygon ) const
@@ -198,9 +201,12 @@ namespace geode
     template < typename Archive >
     void OpenGeodePolygonalSurface< dimension >::serialize( Archive& archive )
     {
+        archive.ext( *this, geode::Growable< Archive, OpenGeodePolygonalSurface >{},
+            []( Archive &archive, OpenGeodePolygonalSurface &surface ) {
         archive.ext(
-            *this, bitsery::ext::BaseClass< PolygonalSurface< dimension > >{} );
-        archive.object( impl_ );
+            surface, bitsery::ext::BaseClass< PolygonalSurface< dimension > >{} );
+        archive.object( surface.impl_ );
+            });
     }
 
     template < index_t dimension >

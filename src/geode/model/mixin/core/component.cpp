@@ -57,8 +57,11 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.text1b( name_, name_.max_size() );
-            archive.object( id_ );
+        archive.ext( *this, geode::Growable< Archive, Impl >{},
+            []( Archive &archive, Impl &impl ) {
+            archive.text1b( impl.name_, impl.name_.max_size() );
+            archive.object( impl.id_ );
+            });
         }
 
     private:
@@ -98,7 +101,10 @@ namespace geode
     template < typename Archive >
     void Component< dimension >::serialize( Archive& archive )
     {
-        archive.object( impl_ );
+        archive.ext( *this, geode::Growable< Archive, Component >{},
+            []( Archive &archive, Component &component ) {
+        archive.object( component.impl_ );
+            });
     }
 
     template class opengeode_model_api Component< 2 >;

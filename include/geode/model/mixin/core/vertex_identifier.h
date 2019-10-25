@@ -26,8 +26,11 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.object( component_id );
-            archive.value4b( vertex );
+        archive.ext( *this, geode::Growable< Archive, MeshComponentVertex >{},
+            []( Archive &archive, MeshComponentVertex &mesh_component_vertex ) {
+            archive.object( mesh_component_vertex.component_id );
+            archive.value4b( mesh_component_vertex.vertex );
+            });
         }
 
         ComponentID component_id;

@@ -39,6 +39,16 @@ namespace geode
     class Lines< dimension >::Impl
         : public detail::ComponentsStorage< Line< dimension > >
     {
+    private:
+        friend class bitsery::Access;
+        template < typename Archive >
+        void serialize( Archive& archive )
+        {
+            archive.ext( *this, Growable< Archive, Impl >{},
+            []( Archive &archive, Impl & impl ) {
+            archive.ext( impl, bitsery::ext::BaseClass< detail::ComponentsStorage< Line< dimension > > >{} );
+            } );
+        }
     };
 
     template < index_t dimension >

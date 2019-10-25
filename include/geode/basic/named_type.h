@@ -26,6 +26,8 @@
 #include <bitsery/bitsery.h>
 #include <bitsery/brief_syntax.h>
 
+#include <geode/basic/bitsery_archive.h>
+
 namespace geode
 {
     /*!
@@ -67,7 +69,10 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive( value_ );
+        archive.ext( *this, Growable< Archive, NamedType >{},
+            []( Archive &archive, NamedType &named_type ) {
+            archive( named_type.value_ );
+            });
         }
 
     private:

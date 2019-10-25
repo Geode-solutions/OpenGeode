@@ -201,10 +201,13 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.object( graph_ );
-            archive.object( uuid2index_ );
-            archive.ext( relation_type_, bitsery::ext::StdSmartPtr{} );
-            archive.ext( uuids_, bitsery::ext::StdSmartPtr{} );
+        archive.ext( *this, geode::Growable< Archive, Impl >{},
+            []( Archive &archive, Impl &impl ) {
+            archive.object( impl.graph_ );
+            archive.object( impl.uuid2index_ );
+            archive.ext( impl.relation_type_, bitsery::ext::StdSmartPtr{} );
+            archive.ext( impl.uuids_, bitsery::ext::StdSmartPtr{} );
+            });
         }
 
         index_t vertex_id( const uuid& id ) const

@@ -24,6 +24,7 @@
 #pragma once
 
 #include <geode/basic/attribute.h>
+#include <geode/basic/bitsery_archive.h>
 #include <geode/basic/factory.h>
 #include <geode/basic/pimpl.h>
 
@@ -68,8 +69,11 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.value4b( polygon_id );
-            archive.value4b( vertex_id );
+        archive.ext( *this, geode::Growable< Archive, PolygonVertex >{},
+            []( Archive &archive, PolygonVertex &polygon_vertex ) {
+            archive.value4b( polygon_vertex.polygon_id );
+            archive.value4b( polygon_vertex.vertex_id );
+            });
         }
         index_t polygon_id{ NO_ID };
         index_t vertex_id{ NO_ID };
@@ -97,8 +101,11 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.value4b( polygon_id );
-            archive.value4b( edge_id );
+        archive.ext( *this, geode::Growable< Archive, PolygonEdge >{},
+            []( Archive &archive, PolygonEdge &polygon_edge ) {
+            archive.value4b( polygon_edge.polygon_id );
+            archive.value4b( polygon_edge.edge_id );
+            });
         }
         index_t polygon_id{ NO_ID };
         index_t edge_id{ NO_ID };

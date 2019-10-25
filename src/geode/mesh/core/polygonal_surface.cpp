@@ -134,8 +134,11 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.object( polygon_attribute_manager_ );
-            archive.ext( polygon_around_vertex_, bitsery::ext::StdSmartPtr{} );
+        archive.ext( *this, geode::Growable< Archive, Impl >{},
+            []( Archive &archive, Impl &impl ) {
+            archive.object( impl.polygon_attribute_manager_ );
+            archive.ext( impl.polygon_around_vertex_, bitsery::ext::StdSmartPtr{} );
+            });
         }
 
     private:
@@ -480,8 +483,11 @@ namespace geode
     template < typename Archive >
     void PolygonalSurfaceBase< dimension >::serialize( Archive& archive )
     {
-        archive.ext( *this, bitsery::ext::BaseClass< VertexSet >{} );
-        archive.object( impl_ );
+        archive.ext( *this, geode::Growable< Archive, PolygonalSurfaceBase >{},
+            []( Archive &archive, PolygonalSurfaceBase &surface ) {
+        archive.ext( surface, bitsery::ext::BaseClass< VertexSet >{} );
+        archive.object( surface.impl_ );
+            });
     }
 
     Vector3D PolygonalSurface< 3 >::polygon_normal( index_t polygon_id ) const

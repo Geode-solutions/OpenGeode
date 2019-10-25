@@ -59,6 +59,17 @@ namespace geode
                 throw OpenGeodeException( "Unknown mesh type: ", type.get() );
             }
         }
+
+    private:
+        friend class bitsery::Access;
+        template < typename Archive >
+        void serialize( Archive& archive )
+        {
+            archive.ext( *this, Growable< Archive, Impl >{},
+            []( Archive &archive, Impl & impl ) {
+            archive.ext( impl, bitsery::ext::BaseClass< detail::MeshStorage< PolygonalSurface< dimension > > >{} );
+            } );
+        }
     };
 
     template < index_t dimension >
@@ -100,9 +111,12 @@ namespace geode
     template < typename Archive >
     void Surface< dimension >::serialize( Archive& archive )
     {
-        archive.object( impl_ );
+        archive.ext( *this, geode::Growable< Archive, Surface >{},
+            []( Archive &archive, Surface &surface ) {
+        archive.object( surface.impl_ );
         archive.ext(
-            *this, bitsery::ext::BaseClass< Component< dimension > >{} );
+            surface, bitsery::ext::BaseClass< Component< dimension > >{} );
+            });
     }
 
     template class opengeode_model_api Surface< 2 >;

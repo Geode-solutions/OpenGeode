@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/basic/bitsery_archive.h>
 #include <geode/basic/common.h>
 
 #include <memory>
@@ -49,7 +50,10 @@ namespace geode
         template < typename Archive >
         void serialize( Archive &archive )
         {
-            archive.ext( pimpl_, bitsery::ext::StdSmartPtr{} );
+        archive.ext( *this, geode::Growable< Archive, PImpl >{},
+            []( Archive &archive, PImpl &impl ) {
+            archive.ext( impl.pimpl_, bitsery::ext::StdSmartPtr{} );
+            });
         }
 
     private:

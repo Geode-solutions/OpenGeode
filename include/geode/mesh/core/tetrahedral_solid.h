@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <geode/basic/bitsery_archive.h>
+
 #include <geode/mesh/common.h>
 #include <geode/mesh/core/polyhedral_solid.h>
 
@@ -54,8 +56,11 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this,
+        archive.ext( *this, geode::Growable< Archive, TetrahedralSolid >{},
+            []( Archive &archive, TetrahedralSolid &tetrahedral_solid ) {
+            archive.ext( tetrahedral_solid,
                 bitsery::ext::BaseClass< PolyhedralSolid< dimension > >{} );
+            });
         }
 
         index_t get_nb_polyhedron_vertices( index_t /*unused*/ ) const final

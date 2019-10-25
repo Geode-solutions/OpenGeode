@@ -125,10 +125,13 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this,
+        archive.ext( *this, geode::Growable< Archive, Impl >{},
+            []( Archive &archive, Impl &impl ) {
+            archive.ext( impl,
                 bitsery::ext::BaseClass< detail::PointsImpl< dimension > >{} );
-            archive.ext( tetrahedron_vertices_, bitsery::ext::StdSmartPtr{} );
-            archive.ext( tetrahedron_adjacents_, bitsery::ext::StdSmartPtr{} );
+            archive.ext( impl.tetrahedron_vertices_, bitsery::ext::StdSmartPtr{} );
+            archive.ext( impl.tetrahedron_adjacents_, bitsery::ext::StdSmartPtr{} );
+            });
         }
 
     private:
@@ -189,9 +192,12 @@ namespace geode
     template < typename Archive >
     void OpenGeodeTetrahedralSolid< dimension >::serialize( Archive& archive )
     {
+        archive.ext( *this, geode::Growable< Archive, OpenGeodeTetrahedralSolid >{},
+            []( Archive &archive, OpenGeodeTetrahedralSolid &solid ) {
         archive.ext(
-            *this, bitsery::ext::BaseClass< TetrahedralSolid< dimension > >{} );
-        archive.object( impl_ );
+            solid, bitsery::ext::BaseClass< TetrahedralSolid< dimension > >{} );
+        archive.object( solid.impl_ );
+            });
     }
 
     template < index_t dimension >
