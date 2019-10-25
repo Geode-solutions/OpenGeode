@@ -136,9 +136,7 @@ void test_delete_edge( const geode::Graph& graph, geode::GraphBuilder& builder )
 
 void test_io( const geode::Graph& graph, const std::string& filename )
 {
-    DEBUG( "WRITE" );
     save_graph( graph, filename );
-    DEBUG( "READ" );
     auto new_graph =
         geode::Graph::create( geode::OpenGeodeGraph::type_name_static() );
     load_graph( *new_graph, filename );

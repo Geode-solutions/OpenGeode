@@ -66,17 +66,22 @@ namespace geode
     index_t TriangulatedSurfaceBuilder< dimension >::create_triangle(
         const std::array< index_t, 3 >& vertices )
     {
-        auto first_added_triangle = triangulated_surface_.nb_polygons();
+        auto added_triangle = triangulated_surface_.nb_polygons();
         triangulated_surface_.polygon_attribute_manager().resize(
-            first_added_triangle + 1 );
+            added_triangle + 1 );
         index_t vertex_id{ 0 };
         for( const auto& vertex : vertices )
         {
             this->associate_polygon_vertex_to_vertex(
-                { first_added_triangle, vertex_id++ }, vertex );
+                { added_triangle, vertex_id++ }, vertex );
         }
+        for( auto e : Range{ vertices.size() - 1 } )
+        {
+            this->find_or_create_edge( { vertices[e], vertices[e + 1] } );
+        }
+        this->find_or_create_edge( { vertices.back(), vertices.front() } );
         do_create_triangle( vertices );
-        return first_added_triangle;
+        return added_triangle;
     }
 
     template < index_t dimension >

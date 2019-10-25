@@ -123,16 +123,21 @@ namespace geode
     index_t PolygonalSurfaceBuilder< dimension >::create_polygon(
         const std::vector< index_t >& vertices )
     {
-        auto first_added_polygon = polygonal_surface_.nb_polygons();
+        auto added_polygon = polygonal_surface_.nb_polygons();
         polygonal_surface_.polygon_attribute_manager().resize(
-            first_added_polygon + 1 );
+            added_polygon + 1 );
         for( auto v : Range{ vertices.size() } )
         {
             associate_polygon_vertex_to_vertex(
-                { first_added_polygon, v }, vertices[v] );
+                { added_polygon, v }, vertices[v] );
         }
+        for( auto e : Range{ vertices.size() - 1 } )
+        {
+            this->find_or_create_edge( { vertices[e], vertices[e + 1] } );
+        }
+        this->find_or_create_edge( { vertices.back(), vertices.front() } );
         do_create_polygon( vertices );
-        return first_added_polygon;
+        return added_polygon;
     }
 
     template < index_t dimension >
@@ -142,6 +147,13 @@ namespace geode
     {
         polygonal_surface_.associate_polygon_vertex_to_vertex(
             polygon_vertex, vertex_id );
+    }
+
+    template < index_t dimension >
+    index_t PolygonalSurfaceBuilder< dimension >::find_or_create_edge(
+        const std::array< index_t, 2 >& edge_vertices )
+    {
+        return polygonal_surface_.find_or_create_edge( edge_vertices );
     }
 
     template < index_t dimension >
@@ -177,6 +189,7 @@ namespace geode
         const std::vector< bool >& to_delete )
     {
         auto old2new = mapping_after_deletion( to_delete );
+        update_edge_vertices( old2new );
         update_polygon_vertices( polygonal_surface_, *this, old2new );
         do_delete_surface_vertices( to_delete );
     }
@@ -294,11 +307,45 @@ namespace geode
             associate_polygon_vertex_to_vertex( new_polygon_vertex, v );
         }
 
+        std::vector< bool > edge_to_delete(
+            polygonal_surface_.nb_edges(), true );
+        for( auto p : geode::Range{ polygonal_surface_.nb_polygons() } )
+        {
+            if( to_delete[p] )
+            {
+                continue;
+            }
+            for( auto e :
+                geode::Range{ polygonal_surface_.nb_polygon_edges( p ) } )
+            {
+                auto edge_id = polygonal_surface_.polygon_edge( { p, e } );
+                edge_to_delete[edge_id] = false;
+            }
+        }
+
+        delete_edges( edge_to_delete );
+        polygonal_surface_.edge_attribute_manager().delete_elements(
+            edge_to_delete );
+
         update_polygon_adjacencies( polygonal_surface_, *this, old2new );
 
         polygonal_surface_.polygon_attribute_manager().delete_elements(
             to_delete );
         do_delete_polygons( to_delete );
+    }
+
+    template < index_t dimension >
+    void PolygonalSurfaceBuilder< dimension >::update_edge_vertices(
+        const std::vector< index_t >& old2new )
+    {
+        polygonal_surface_.update_edge_vertices( old2new );
+    }
+
+    template < index_t dimension >
+    void PolygonalSurfaceBuilder< dimension >::delete_edges(
+        const std::vector< bool >& to_delete )
+    {
+        polygonal_surface_.delete_edges( to_delete );
     }
 
     template < index_t dimension >
@@ -315,10 +362,10 @@ namespace geode
     index_t PolygonalSurfaceBuilder< dimension >::create_point(
         const Point< dimension >& point )
     {
-        auto first_added_vertex = polygonal_surface_.nb_vertices();
+        auto added_vertex = polygonal_surface_.nb_vertices();
         create_vertex();
-        set_point( first_added_vertex, point );
-        return first_added_vertex;
+        set_point( added_vertex, point );
+        return added_vertex;
     }
 
     template < index_t dimension >

@@ -51,6 +51,8 @@ void test_create_tetrahedra( const geode::TetrahedralSolid3D& solid,
         { { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 } } );
     OPENGEODE_EXCEPTION( solid.nb_polyhedra() == 3,
         "[Test] TetrahedralSolid should have 3 tetrahedra" );
+    OPENGEODE_EXCEPTION( solid.nb_facets() == 10,
+        "[Test] PolyhedralSolid should have 10 facets" );
 }
 
 void test_polyhedron_adjacencies( const geode::TetrahedralSolid3D& solid,
@@ -122,6 +124,8 @@ void test_clone( const geode::TetrahedralSolid3D& solid )
     auto solid2 = solid.clone();
     OPENGEODE_EXCEPTION( solid2->nb_vertices() == 5,
         "[Test] TetrahedralSolid2 should have 5 vertices" );
+    OPENGEODE_EXCEPTION( solid2->nb_facets() == 4,
+        "[Test] TetrahedralSolid2 should have 4 facets" );
     OPENGEODE_EXCEPTION( solid2->nb_polyhedra() == 1,
         "[Test] TetrahedralSolid2 should have 1 polyhedron" );
 }

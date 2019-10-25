@@ -104,10 +104,10 @@ namespace geode
 
     index_t GraphBuilder::create_edge()
     {
-        auto first_added_edge = graph_.nb_edges();
-        graph_.edge_attribute_manager().resize( first_added_edge + 1 );
+        auto added_edge = graph_.nb_edges();
+        graph_.edge_attribute_manager().resize( added_edge + 1 );
         do_create_edge();
-        return first_added_edge;
+        return added_edge;
     }
 
     index_t GraphBuilder::create_edge( index_t v0_id, index_t v1_id )
@@ -115,11 +115,11 @@ namespace geode
         OPENGEODE_EXCEPTION( v0_id != v1_id, "[GraphBuilder::create_edge] "
                                              "Trying to create an edge with "
                                              "same extremities" );
-        auto first_added_edge = graph_.nb_edges();
+        auto added_edge = graph_.nb_edges();
         create_edge();
-        set_edge_vertex( { first_added_edge, 0 }, v0_id );
-        set_edge_vertex( { first_added_edge, 1 }, v1_id );
-        return first_added_edge;
+        set_edge_vertex( { added_edge, 0 }, v0_id );
+        set_edge_vertex( { added_edge, 1 }, v1_id );
+        return added_edge;
     }
 
     index_t GraphBuilder::create_edges( index_t nb )

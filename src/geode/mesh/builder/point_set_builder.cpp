@@ -61,10 +61,10 @@ namespace geode
     index_t PointSetBuilder< dimension >::create_point(
         const Point< dimension >& point )
     {
-        auto first_added_vertex = point_set_.nb_vertices();
+        auto added_vertex = point_set_.nb_vertices();
         create_vertex();
-        set_point( first_added_vertex, point );
-        return first_added_vertex;
+        set_point( added_vertex, point );
+        return added_vertex;
     }
 
     template < index_t dimension >
