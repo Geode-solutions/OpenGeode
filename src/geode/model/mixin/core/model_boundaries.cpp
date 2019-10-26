@@ -35,18 +35,6 @@ namespace geode
     class ModelBoundaries< dimension >::Impl
         : public detail::ComponentsStorage< ModelBoundary< dimension > >
     {
-    private:
-        friend class bitsery::Access;
-        template < typename Archive >
-        void serialize( Archive& archive )
-        {
-            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& archive, Impl& impl ) {
-                    archive.ext( impl,
-                        bitsery::ext::BaseClass< detail::ComponentsStorage<
-                            ModelBoundary< dimension > > >{} );
-                } );
-        }
     };
 
     template < index_t dimension >
