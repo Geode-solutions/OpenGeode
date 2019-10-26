@@ -39,18 +39,6 @@ namespace geode
     class Corners< dimension >::Impl
         : public detail::ComponentsStorage< Corner< dimension > >
     {
-    private:
-        friend class bitsery::Access;
-        template < typename Archive >
-        void serialize( Archive& archive )
-        {
-            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& archive, Impl& impl ) {
-                    archive.ext( impl,
-                        bitsery::ext::BaseClass< detail::ComponentsStorage<
-                            Corner< dimension > > >{} );
-                } );
-        }
     };
 
     template < index_t dimension >
