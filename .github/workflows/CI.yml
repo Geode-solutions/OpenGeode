@@ -53,9 +53,9 @@ jobs:
         CXX: ${{ matrix.cxx }}
     - name: Kcov
       run: curl -s https://raw.githubusercontent.com/Geode-solutions/actions/master/kcov.sh | bash -s -- ${GITHUB_WORKSPACE}/build/opengeode/bin
-      if: matrix.cc == 'gcc' && github.event_name == 'pull_request' && matrix.config == 'Debug'
+      if: matrix.cc == 'gcc' && (github.event_name == 'pull_request' || github.ref == 'refs/heads/master') && matrix.config == 'Debug'
     - uses: codecov/codecov-action@v1.0.2
-      if: matrix.cc == 'gcc' && github.event_name == 'pull_request' && matrix.config == 'Debug'
+      if: matrix.cc == 'gcc' && (github.event_name == 'pull_request' || github.ref == 'refs/heads/master') && matrix.config == 'Debug'
       with: 
         token: ${{ secrets.CODECOV_TOKEN }}
         file: kcov/kcov-merged/cobertura.xml
