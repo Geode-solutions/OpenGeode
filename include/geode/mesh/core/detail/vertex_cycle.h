@@ -43,6 +43,14 @@ namespace geode
                 std::rotate( vertices_.begin(), min_itr, vertices_.end() );
             }
 
+            VertexCycle( const std::array< index_t, 2 >& vertices )
+                : vertices_( { vertices[0], vertices[1] } )
+            {
+                auto min_itr =
+                    std::min_element( vertices_.begin(), vertices_.end() );
+                std::rotate( vertices_.begin(), min_itr, vertices_.end() );
+            }
+
             const std::vector< index_t >& vertices() const
             {
                 return vertices_;

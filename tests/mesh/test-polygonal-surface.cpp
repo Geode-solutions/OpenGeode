@@ -345,6 +345,18 @@ void test_clone( const geode::PolygonalSurface3D& polygonal_surface )
     }
 }
 
+void test_set_polygon_vertex(
+    const geode::PolygonalSurface3D& polygonal_surface,
+    geode::PolygonalSurfaceBuilder3D& builder )
+{
+    builder.set_polygon_vertex( { 0, 2 }, 1 );
+    OPENGEODE_EXCEPTION( polygonal_surface.polygon_vertex( { 0, 2 } ) == 1,
+        "[Test] PolygonVertex after set_polygon_vertex is wrong" );
+    OPENGEODE_EXCEPTION( polygonal_surface.polygon_edge( { 0, 1 } ) == 2
+                             && polygonal_surface.polygon_edge( { 0, 2 } ) == 3,
+        "[Test] Polygon edges after set_polygon_vertex is wrong" );
+}
+
 int main()
 {
     using namespace geode;
@@ -374,6 +386,7 @@ int main()
         test_delete_vertex( *polygonal_surface, *builder );
         test_delete_polygon( *polygonal_surface, *builder );
         test_clone( *polygonal_surface );
+        test_set_polygon_vertex( *polygonal_surface, *builder );
 
         Logger::info( "TEST SUCCESS" );
         return 0;
