@@ -149,6 +149,24 @@ namespace geode
         auto next_id = polygonal_surface_.polygon_vertex(
             polygonal_surface_.next_polygon_edge( polygon_vertex ) );
 
+        auto polygon_around =
+            polygonal_surface_.polygon_around_vertex( polygon_vertex_id );
+        if( polygon_around == polygon_vertex )
+        {
+            auto polygon_arounds =
+                polygonal_surface_.polygons_around_vertex( polygon_vertex_id );
+            if( polygon_arounds.size() < 2 )
+            {
+                associate_polygon_vertex_to_vertex(
+                    PolygonVertex{}, polygon_vertex_id );
+            }
+            else
+            {
+                associate_polygon_vertex_to_vertex(
+                    polygon_arounds[1], polygon_vertex_id );
+            }
+        }
+
         update_polygon_vertex( polygon_vertex, vertex_id );
         polygonal_surface_.update_edge_vertex(
             { polygon_vertex_id, next_id }, 0, vertex_id );
@@ -218,6 +236,38 @@ namespace geode
             "[PolygonalSurfaceBuilder::update_polygon_vertex] Accessing a "
             "vertex "
             "that does not exist" );
+        DEBUG( polygon_vertex.polygon_id );
+        DEBUG( polygon_vertex.vertex_id );
+        DEBUG( vertex_id );
+
+        // auto v = polygonal_surface_.polygon_vertex(polygon_vertex);
+        // DEBUG(v);
+        // DEBUG(polygonal_surface_.nb_vertices());
+        // const auto& polygon_vertex_around =
+        //     polygonal_surface_.polygon_around_vertex( v );
+        // DEBUG(polygon_vertex_around.polygon_id);
+        // DEBUG(polygon_vertex_around.vertex_id);
+        // if( polygon_vertex.polygon_id == geode::NO_ID )
+        // {
+        //     continue;
+        // }
+        // PolygonVertex new_polygon_vertex{ polygon_vertex };
+        // new_polygon_vertex.polygon_id = old2new[polygon_vertex.polygon_id];
+        // if( new_polygon_vertex.polygon_id == geode::NO_ID )
+        // {
+        //     for( auto&& polygon :
+        //         polygonal_surface_.polygons_around_vertex( v ) )
+        //     {
+        //         polygon.polygon_id = old2new[polygon.polygon_id];
+        //         if( polygon.polygon_id != geode::NO_ID )
+        //         {
+        //             new_polygon_vertex = std::move( polygon );
+        //             break;
+        //         }
+        //     }
+        // }
+        // associate_polygon_vertex_to_vertex( new_polygon_vertex, v );
+
         associate_polygon_vertex_to_vertex( polygon_vertex, vertex_id );
         do_set_polygon_vertex( polygon_vertex, vertex_id );
     }

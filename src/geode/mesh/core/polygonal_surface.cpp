@@ -122,6 +122,9 @@ namespace geode
         void associate_polygon_vertex_to_vertex(
             const PolygonVertex& polygon_vertex, index_t vertex_id )
         {
+            DEBUG( polygon_vertex.polygon_id );
+            DEBUG( polygon_vertex.vertex_id );
+            DEBUG( vertex_id );
             polygon_around_vertex_->value( vertex_id ) = polygon_vertex;
         }
 
