@@ -61,11 +61,13 @@ jobs:
         file: kcov/kcov-merged/cobertura.xml
     - name: Notify slack
       if: failure() && github.ref == 'refs/heads/master'
-      env:
-        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      uses: pullreminders/slack-action@master
+      uses: 8398a7/action-slack@v2
       with:
-        args: '{\"channel\":\"CLJ1PS7UN\",\"text\":\"Compilation or Testing failed for OpenGeode on Ubuntu\"}'        
+        staus: failure
+        text: 'Compilation or Testing failed for OpenGeode on Ubuntu'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       
   build-mac:
     runs-on: macOS-10.14
@@ -86,11 +88,13 @@ jobs:
         ctest --output-on-failure
     - name: Notify slack
       if: failure() && github.ref == 'refs/heads/master'
-      env:
-        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      uses: pullreminders/slack-action@master
+      uses: 8398a7/action-slack@v2
       with:
-        args: '{\"channel\":\"CLJ1PS7UN\",\"text\":\"Compilation or Testing failed for OpenGeode on macOS\"}'   
+        staus: failure
+        text: 'Compilation or Testing failed for OpenGeode on macOS'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} 
       
   build-mac-xcode:
     runs-on: macOS-10.14
@@ -111,11 +115,13 @@ jobs:
         ctest -C ${{ matrix.config }} --output-on-failure
     - name: Notify slack
       if: failure() && github.ref == 'refs/heads/master'
-      env:
-        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      uses: pullreminders/slack-action@master
+      uses: 8398a7/action-slack@v2
       with:
-        args: '{\"channel\":\"CLJ1PS7UN\",\"text\":\"Compilation or Testing failed for OpenGeode on macOS\"}' 
+        staus: failure
+        text: 'Compilation or Testing failed for OpenGeode on macOS'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
   build-windows:
     runs-on: windows-2016
@@ -136,11 +142,13 @@ jobs:
         ctest -C ${{ matrix.config }} --output-on-failure
     - name: Notify slack
       if: failure() && github.ref == 'refs/heads/master'
-      env:
-        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      uses: pullreminders/slack-action@master
+      uses: 8398a7/action-slack@v2
       with:
-        args: '{\"channel\":\"CLJ1PS7UN\",\"text\":\"Compilation or Testing failed for OpenGeode on Windows\"}' 
+        staus: failure
+        text: 'Compilation or Testing failed for OpenGeode on Windows'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} 
         
   semantic-release:
     runs-on: ubuntu-18.04
