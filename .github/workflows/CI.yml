@@ -64,7 +64,6 @@ jobs:
       uses: 8398a7/action-slack@v2
       with:
         staus: failure
-        text: 'Compilation or Testing failed for OpenGeode on Ubuntu'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -91,7 +90,6 @@ jobs:
       uses: 8398a7/action-slack@v2
       with:
         staus: failure
-        text: 'Compilation or Testing failed for OpenGeode on macOS'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} 
@@ -118,7 +116,6 @@ jobs:
       uses: 8398a7/action-slack@v2
       with:
         staus: failure
-        text: 'Compilation or Testing failed for OpenGeode on macOS'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -145,7 +142,6 @@ jobs:
       uses: 8398a7/action-slack@v2
       with:
         staus: failure
-        text: 'Compilation or Testing failed for OpenGeode on Windows'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} 
