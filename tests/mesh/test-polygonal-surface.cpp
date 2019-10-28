@@ -349,14 +349,12 @@ void test_set_polygon_vertex(
     const geode::PolygonalSurface3D& polygonal_surface,
     geode::PolygonalSurfaceBuilder3D& builder )
 {
-    DEBUG("================= set pv");
     builder.set_polygon_vertex( { 0, 2 }, 1 );
     OPENGEODE_EXCEPTION( polygonal_surface.polygon_vertex( { 0, 2 } ) == 1,
         "[Test] PolygonVertex after set_polygon_vertex is wrong" );
     OPENGEODE_EXCEPTION( polygonal_surface.polygon_edge( { 0, 1 } ) == 2
                              && polygonal_surface.polygon_edge( { 0, 2 } ) == 3,
         "[Test] Polygon edges after set_polygon_vertex is wrong" );
-    DEBUG("================= end set pv");
 }
 
 void test_delete_all( const geode::PolygonalSurface3D& polygonal_surface,
@@ -365,11 +363,11 @@ void test_delete_all( const geode::PolygonalSurface3D& polygonal_surface,
     std::vector< bool > to_delete( polygonal_surface.nb_polygons(), true );
     builder.delete_polygons( to_delete );
     OPENGEODE_EXCEPTION( polygonal_surface.nb_vertices() == 6,
-        "[Test] PolygonalSurface2 should have 6 vertices" );
+        "[Test] PolygonalSurface should have 6 vertices" );
     OPENGEODE_EXCEPTION( polygonal_surface.nb_edges() == 0,
-        "[Test] PolygonalSurface2 should have 0 edge" );
-    OPENGEODE_EXCEPTION( polygonal_surface.nb_polygons() ==0,
-        "[Test] PolygonalSurface2 should have 0 polygon" );
+        "[Test] PolygonalSurface should have 0 edge" );
+    OPENGEODE_EXCEPTION( polygonal_surface.nb_polygons() == 0,
+        "[Test] PolygonalSurface should have 0 polygon" );
 }
 
 int main()
@@ -401,10 +399,6 @@ int main()
         test_delete_vertex( *polygonal_surface, *builder );
         test_delete_polygon( *polygonal_surface, *builder );
         test_clone( *polygonal_surface );
-        auto pav = polygonal_surface->polygons_around_vertex( 0 );
-        DEBUG(0);
-        pav = polygonal_surface->polygons_around_vertex( 1 );
-        DEBUG(1);
         test_set_polygon_vertex( *polygonal_surface, *builder );
         test_delete_all( *polygonal_surface, *builder );
 
