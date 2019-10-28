@@ -107,10 +107,10 @@ namespace geode
     public:
         explicit Impl( PolygonalSurfaceBase& surface )
             : polygon_around_vertex_(
-                  surface.vertex_attribute_manager()
-                      .template find_or_create_attribute< VariableAttribute,
-                          PolygonVertex >(
-                          "polygon_around_vertex", PolygonVertex{} ) )
+                surface.vertex_attribute_manager()
+                    .template find_or_create_attribute< VariableAttribute,
+                        PolygonVertex >(
+                        "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
@@ -253,7 +253,7 @@ namespace geode
 
     template < index_t dimension >
     void PolygonalSurfaceBase< dimension >::update_edge_vertex(
-         const std::array< index_t, 2 >& edge_vertices,
+        const std::array< index_t, 2 >& edge_vertices,
         index_t edge_vertex_id,
         index_t new_vertex_id )
     {

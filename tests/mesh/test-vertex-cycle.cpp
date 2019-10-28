@@ -34,9 +34,12 @@ void test_vertex_cycle()
     geode::detail::VertexCycle cycle3{ { 2, 3, 1, 0 } };
     geode::detail::VertexCycle cycle4{ { 1, 0, 3, 2 } };
 
-    geode::detail::VertexCycle cycle5{ std::array< geode::index_t, 2 >{ 2, 3 } };
-    geode::detail::VertexCycle cycle6{ std::array< geode::index_t, 2 >{ 3, 2 } };
-    geode::detail::VertexCycle cycle7{ std::array< geode::index_t, 2 >{ 3, 1 } };
+    geode::detail::VertexCycle cycle5{ std::array< geode::index_t, 2 >{
+        2, 3 } };
+    geode::detail::VertexCycle cycle6{ std::array< geode::index_t, 2 >{
+        3, 2 } };
+    geode::detail::VertexCycle cycle7{ std::array< geode::index_t, 2 >{
+        3, 1 } };
 
     OPENGEODE_EXCEPTION( cycle1 == cycle2,
         "[Test] Wrong result for operator== with cycle1 and cycle2" );
