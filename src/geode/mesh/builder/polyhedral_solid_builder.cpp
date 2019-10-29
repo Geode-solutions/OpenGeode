@@ -103,9 +103,9 @@ namespace geode
             polyhedral_solid_.polyhedron_around_vertex( polyhedron_vertex_id );
         if( polyhedron_around == polyhedron_vertex )
         {
-            auto polyhedron_arounds = polyhedral_solid_.polyhedra_around_vertex(
+            auto polyhedra_around = polyhedral_solid_.polyhedra_around_vertex(
                 polyhedron_vertex_id );
-            if( polyhedron_arounds.size() < 2 )
+            if( polyhedra_around.size() < 2 )
             {
                 associate_polyhedron_vertex_to_vertex(
                     PolyhedronVertex{}, polyhedron_vertex_id );
@@ -113,7 +113,7 @@ namespace geode
             else
             {
                 associate_polyhedron_vertex_to_vertex(
-                    polyhedron_arounds[1], polyhedron_vertex_id );
+                    polyhedra_around[1], polyhedron_vertex_id );
             }
         }
 

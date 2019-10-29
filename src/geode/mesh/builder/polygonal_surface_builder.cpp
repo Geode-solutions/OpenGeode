@@ -153,9 +153,9 @@ namespace geode
             polygonal_surface_.polygon_around_vertex( polygon_vertex_id );
         if( polygon_around == polygon_vertex )
         {
-            auto polygon_arounds =
+            auto polygons_around =
                 polygonal_surface_.polygons_around_vertex( polygon_vertex_id );
-            if( polygon_arounds.size() < 2 )
+            if( polygons_around.size() < 2 )
             {
                 associate_polygon_vertex_to_vertex(
                     PolygonVertex{}, polygon_vertex_id );
@@ -163,7 +163,7 @@ namespace geode
             else
             {
                 associate_polygon_vertex_to_vertex(
-                    polygon_arounds[1], polygon_vertex_id );
+                    polygons_around[1], polygon_vertex_id );
             }
         }
 
