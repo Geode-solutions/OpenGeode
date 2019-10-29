@@ -63,7 +63,8 @@ namespace geode
         ComponentMapping mapping;
         mapping.corners = detail::copy_corner_components( brep, brep_, *this );
         mapping.lines = detail::copy_line_components( brep, brep_, *this );
-        mapping.surfaces = detail::copy_surface_components( brep, brep_, *this );
+        mapping.surfaces =
+            detail::copy_surface_components( brep, brep_, *this );
         mapping.blocks = detail::copy_block_components( brep, brep_, *this );
         mapping.model_boundaries =
             detail::copy_model_boundary_components( brep, *this );

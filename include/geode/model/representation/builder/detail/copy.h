@@ -36,9 +36,8 @@ namespace geode
         using Mapping = std::unordered_map< uuid, uuid >;
 
         template < typename ModelFrom, typename ModelTo, typename Builder >
-        Mapping copy_corner_components( const ModelFrom& from,
-            const ModelTo& to,
-            Builder& builder )
+        Mapping copy_corner_components(
+            const ModelFrom& from, const ModelTo& to, Builder& builder )
         {
             Mapping mapping;
             mapping.reserve( from.nb_corners() );
@@ -52,51 +51,45 @@ namespace geode
         }
 
         template < typename ModelFrom, typename ModelTo, typename Builder >
-        Mapping copy_line_components( const ModelFrom& from,
-            const ModelTo& to,
-            Builder& builder )
+        Mapping copy_line_components(
+            const ModelFrom& from, const ModelTo& to, Builder& builder )
         {
             Mapping mapping;
             mapping.reserve( from.nb_lines() );
             for( const auto& line : from.lines() )
             {
                 auto id = builder.add_line( line.mesh().type_name() );
-                mapping.emplace(
-                    line.id(), id );
+                mapping.emplace( line.id(), id );
                 builder.register_mesh_component( to.line( id ) );
             }
             return mapping;
         }
 
         template < typename ModelFrom, typename ModelTo, typename Builder >
-        Mapping copy_surface_components(const ModelFrom& from,
-            const ModelTo& to,
-            Builder& builder)
+        Mapping copy_surface_components(
+            const ModelFrom& from, const ModelTo& to, Builder& builder )
         {
             Mapping mapping;
             mapping.reserve( from.nb_surfaces() );
             for( const auto& surface : from.surfaces() )
             {
                 auto id = builder.add_surface( surface.mesh().type_name() );
-                mapping.emplace( surface.id(),
-                    id );
+                mapping.emplace( surface.id(), id );
                 builder.register_mesh_component( to.surface( id ) );
             }
             return mapping;
         }
 
         template < typename ModelFrom, typename ModelTo, typename Builder >
-        Mapping copy_block_components( const ModelFrom& from,
-            const ModelTo& to,
-            Builder& builder )
+        Mapping copy_block_components(
+            const ModelFrom& from, const ModelTo& to, Builder& builder )
         {
             Mapping mapping;
             mapping.reserve( from.nb_blocks() );
             for( const auto& block : from.blocks() )
             {
                 auto id = builder.add_block( block.mesh().type_name() );
-                mapping.emplace(
-                    block.id(), id );
+                mapping.emplace( block.id(), id );
                 builder.register_mesh_component( to.block( id ) );
             }
             return mapping;
