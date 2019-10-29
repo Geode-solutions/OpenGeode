@@ -98,7 +98,7 @@ namespace geode
             {
                 const auto& new_corner =
                     brep_.corner( mapping.corners.at( corner.id() ) );
-                add_corner_line_relationship( new_corner, new_line );
+                add_corner_line_boundary_relationship( new_corner, new_line );
             }
         }
         for( const auto& surface : brep.surfaces() )
@@ -109,7 +109,7 @@ namespace geode
             {
                 const auto& new_line =
                     brep_.line( mapping.lines.at( line.id() ) );
-                add_line_surface_relationship( new_line, new_surface );
+                add_line_surface_boundary_relationship( new_line, new_surface );
             }
             for( const auto& line : brep.internals( surface ) )
             {
@@ -126,7 +126,7 @@ namespace geode
             {
                 const auto& new_surface =
                     brep_.surface( mapping.surfaces.at( surface.id() ) );
-                add_surface_block_relationship( new_surface, new_block );
+                add_surface_block_boundary_relationship( new_surface, new_block );
             }
             for( const auto& surface : brep.internals( block ) )
             {
@@ -279,19 +279,19 @@ namespace geode
         delete_model_boundary( boundary );
     }
 
-    void BRepBuilder::add_corner_line_relationship(
+    void BRepBuilder::add_corner_line_boundary_relationship(
         const Corner3D& corner, const Line3D& line )
     {
         add_boundary_relation( corner.id(), line.id() );
     }
 
-    void BRepBuilder::add_line_surface_relationship(
+    void BRepBuilder::add_line_surface_boundary_relationship(
         const Line3D& line, const Surface3D& surface )
     {
         add_boundary_relation( line.id(), surface.id() );
     }
 
-    void BRepBuilder::add_surface_block_relationship(
+    void BRepBuilder::add_surface_block_boundary_relationship(
         const Surface3D& surface, const Block3D& block )
     {
         add_boundary_relation( surface.id(), block.id() );

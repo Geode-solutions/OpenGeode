@@ -111,10 +111,10 @@ namespace geode
 
         void remove_model_boundary( const ModelBoundary2D& boundary );
 
-        void add_corner_line_relationship(
+        void add_corner_line_boundary_relationship(
             const Corner2D& corner, const Line2D& line );
 
-        void add_line_surface_relationship(
+        void add_line_surface_boundary_relationship(
             const Line2D& line, const Surface2D& surface );
 
         void add_line_surface_internal_relationship(

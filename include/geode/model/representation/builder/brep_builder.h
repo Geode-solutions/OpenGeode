@@ -120,13 +120,13 @@ namespace geode
 
         void remove_model_boundary( const ModelBoundary3D& boundary );
 
-        void add_corner_line_relationship(
+        void add_corner_line_boundary_relationship(
             const Corner3D& corner, const Line3D& line );
 
-        void add_line_surface_relationship(
+        void add_line_surface_boundary_relationship(
             const Line3D& line, const Surface3D& surface );
 
-        void add_surface_block_relationship(
+        void add_surface_block_boundary_relationship(
             const Surface3D& surface, const Block3D& block );
 
         void add_line_surface_internal_relationship(

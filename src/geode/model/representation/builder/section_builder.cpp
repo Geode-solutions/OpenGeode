@@ -89,7 +89,7 @@ namespace geode
             {
                 const auto& new_corner =
                     section_.corner( mapping.corners.at( corner.id() ) );
-                add_corner_line_relationship( new_corner, new_line );
+                add_corner_line_boundary_relationship( new_corner, new_line );
             }
         }
         for( const auto& surface : section.surfaces() )
@@ -100,7 +100,7 @@ namespace geode
             {
                 const auto& new_line =
                     section_.line( mapping.lines.at( line.id() ) );
-                add_line_surface_relationship( new_line, new_surface );
+                add_line_surface_boundary_relationship( new_line, new_surface );
             }
             for( const auto& line : section.internals( surface ) )
             {
@@ -224,13 +224,13 @@ namespace geode
         delete_model_boundary( boundary );
     }
 
-    void SectionBuilder::add_corner_line_relationship(
+    void SectionBuilder::add_corner_line_boundary_relationship(
         const Corner2D& corner, const Line2D& line )
     {
         add_boundary_relation( corner.id(), line.id() );
     }
 
-    void SectionBuilder::add_line_surface_relationship(
+    void SectionBuilder::add_line_surface_boundary_relationship(
         const Line2D& line, const Surface2D& surface )
     {
         add_boundary_relation( line.id(), surface.id() );
