@@ -192,47 +192,47 @@ namespace geode
             }
         }
 
-        template < typename Model, typename Builder >
+        template < typename ModelFrom, typename ModelTo, typename Builder >
         void copy_corner_geometry(
-            const Model& from, Builder& builder, const Mapping& corners )
+            const ModelFrom& from, const ModelTo& to,Builder& builder, const Mapping& corners )
         {
             for( const auto& corner : from.corners() )
             {
-                builder.set_corner_mesh(
-                    corners.at( corner.id() ), corner.mesh().clone() );
+                builder.update_corner_mesh(
+                    to.corner( corners.at( corner.id() ) ), corner.mesh().clone() );
             }
         }
 
-        template < typename Model, typename Builder >
+        template < typename ModelFrom, typename ModelTo, typename Builder >
         void copy_line_geometry(
-            const Model& from, Builder& builder, const Mapping& lines )
+            const ModelFrom& from, const ModelTo& to,Builder& builder, const Mapping& lines )
         {
             for( const auto& line : from.lines() )
             {
-                builder.set_line_mesh(
-                    lines.at( line.id() ), line.mesh().clone() );
+                builder.update_line_mesh(
+                    to.line( lines.at( line.id() ) ), line.mesh().clone() );
             }
         }
 
-        template < typename Model, typename Builder >
+        template < typename ModelFrom, typename ModelTo, typename Builder >
         void copy_surface_geometry(
-            const Model& from, Builder& builder, const Mapping& surfaces )
+            const ModelFrom& from, const ModelTo& to,Builder& builder, const Mapping& surfaces )
         {
             for( const auto& surface : from.surfaces() )
             {
-                builder.set_surface_mesh(
-                    surfaces.at( surface.id() ), surface.mesh().clone() );
+                builder.update_surface_mesh(
+                    to.surface( surfaces.at( surface.id() ) ), surface.mesh().clone() );
             }
         }
 
-        template < typename Model, typename Builder >
+        template < typename ModelFrom, typename ModelTo, typename Builder >
         void copy_block_geometry(
-            const Model& from, Builder& builder, const Mapping& blocks )
+            const ModelFrom& from,const ModelTo& to, Builder& builder, const Mapping& blocks )
         {
             for( const auto& block : from.blocks() )
             {
-                builder.set_block_mesh(
-                    blocks.at( block.id() ), block.mesh().clone() );
+                builder.update_block_mesh(
+                    to.block( blocks.at( block.id() ) ), block.mesh().clone() );
             }
         }
 
