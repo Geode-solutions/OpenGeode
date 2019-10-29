@@ -44,7 +44,7 @@ namespace geode
             }
 
             VertexCycle( const std::array< index_t, 2 >& vertices )
-                : vertices_( { vertices[0], vertices[1] } )
+                : vertices_( std::vector{ vertices[0], vertices[1] } )
             {
                 auto min_itr =
                     std::min_element( vertices_.begin(), vertices_.end() );
