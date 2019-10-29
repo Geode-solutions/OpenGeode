@@ -33,7 +33,7 @@ As for \link opengeode_how_to_compile OpenGeode configuration and compilation\en
 # What do you need
 
 You need exactly the same tools than for compiling OpenGeode (given \link opengeode_how_to_compile here\endlink).
-You also need to have installed OpenGeode
+You also need to have compiled or installed OpenGeode.
 
 # Module configuration
 
