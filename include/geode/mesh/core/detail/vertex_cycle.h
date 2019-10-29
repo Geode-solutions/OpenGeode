@@ -25,8 +25,8 @@
 
 #include <geode/basic/common.h>
 
-#include <array>
 #include <algorithm>
+#include <array>
 #include <numeric>
 #include <utility>
 #include <vector>
