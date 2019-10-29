@@ -368,6 +368,8 @@ void test_delete_all( const geode::PolygonalSurface3D& polygonal_surface,
         "[Test] PolygonalSurface should have 0 edge" );
     OPENGEODE_EXCEPTION( polygonal_surface.nb_polygons() == 0,
         "[Test] PolygonalSurface should have 0 polygon" );
+    OPENGEODE_EXCEPTION( polygonal_surface.polygons_around_vertex( 0 ).empty(),
+        "[Test] No more polygon around vertices" );
 }
 
 int main()
