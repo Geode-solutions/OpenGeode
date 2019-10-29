@@ -24,6 +24,9 @@
 #pragma once
 
 #include <geode/basic/common.h>
+
+#include <array>
+#include <algorithm>
 #include <numeric>
 #include <utility>
 #include <vector>
@@ -44,7 +47,7 @@ namespace geode
             }
 
             VertexCycle( const std::array< index_t, 2 >& vertices )
-                : vertices_( std::vector< index_t >{ vertices[0], vertices[1] } )
+                : vertices_{ vertices[0], vertices[1] }
             {
                 auto min_itr =
                     std::min_element( vertices_.begin(), vertices_.end() );
