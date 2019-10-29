@@ -239,18 +239,16 @@ namespace geode
         template < typename Model, typename Builder >
         void copy_vertex_identifier_components( const Model& from,
             Builder& builder,
-            const ComponentType& old_type,
-            const ComponentType& new_type,
+            const ComponentType& type,
             const Mapping& mapping )
         {
             for( auto v : Range{ from.nb_unique_vertices() } )
             {
-                auto vertices = from.mesh_component_vertices( v, old_type );
+                auto vertices = from.mesh_component_vertices( v, type );
                 for( const auto& mesh_vertex : vertices )
                 {
                     builder.set_unique_vertex(
-                        { { new_type,
-                              mapping.at( mesh_vertex.component_id.id() ) },
+                        { { type, mapping.at( mesh_vertex.component_id.id() ) },
                             mesh_vertex.vertex },
                         v );
                 }
