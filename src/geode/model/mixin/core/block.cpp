@@ -36,6 +36,18 @@ namespace geode
     class Block< dimension >::Impl
         : public detail::MeshStorage< PolyhedralSolid< dimension > >
     {
+    private:
+        friend class bitsery::Access;
+        template < typename Archive >
+        void serialize( Archive& archive )
+        {
+            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
+                []( Archive& archive, Impl& impl ) {
+                    archive.ext(
+                        impl, bitsery::ext::BaseClass< detail::MeshStorage<
+                                  PolyhedralSolid< dimension > > >{} );
+                } );
+        }
     };
 
     template < index_t dimension >
@@ -77,9 +89,12 @@ namespace geode
     template < typename Archive >
     void Block< dimension >::serialize( Archive& archive )
     {
-        archive.object( impl_ );
-        archive.ext(
-            *this, bitsery::ext::BaseClass< Component< dimension > >{} );
+        archive.ext( *this, DefaultGrowable< Archive, Block >{},
+            []( Archive& archive, Block& block ) {
+                archive.object( block.impl_ );
+                archive.ext( block,
+                    bitsery::ext::BaseClass< Component< dimension > >{} );
+            } );
     }
 
     template < index_t dimension >

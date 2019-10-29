@@ -56,10 +56,14 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext(
-                *this, bitsery::ext::BaseClass< detail::EdgesImpl >{} );
-            archive.ext( *this,
-                bitsery::ext::BaseClass< detail::PointsImpl< dimension > >{} );
+            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
+                []( Archive& archive, Impl& impl ) {
+                    archive.ext(
+                        impl, bitsery::ext::BaseClass< detail::EdgesImpl >{} );
+                    archive.ext(
+                        impl, bitsery::ext::BaseClass<
+                                  detail::PointsImpl< dimension > >{} );
+                } );
         }
     };
 
@@ -105,9 +109,12 @@ namespace geode
     template < typename Archive >
     void OpenGeodeEdgedCurve< dimension >::serialize( Archive& archive )
     {
-        archive.ext(
-            *this, bitsery::ext::BaseClass< EdgedCurve< dimension > >{} );
-        archive.object( impl_ );
+        archive.ext( *this, DefaultGrowable< Archive, OpenGeodeEdgedCurve >{},
+            []( Archive& archive, OpenGeodeEdgedCurve& edged_curve ) {
+                archive.ext( edged_curve,
+                    bitsery::ext::BaseClass< EdgedCurve< dimension > >{} );
+                archive.object( edged_curve.impl_ );
+            } );
     }
 
     template class opengeode_mesh_api OpenGeodeEdgedCurve< 2 >;

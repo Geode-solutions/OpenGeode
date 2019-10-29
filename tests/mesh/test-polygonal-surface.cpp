@@ -51,13 +51,14 @@ void test_create_vertices( const geode::PolygonalSurface3D& polygonal_surface,
 void test_create_vertex_attribute(
     const geode::PolygonalSurface3D& polygonal_surface )
 {
-    auto attribute =
-        polygonal_surface.vertex_attribute_manager()
-            .find_or_create_attribute< geode::VariableAttribute, double >(
-                "test" );
+    auto attribute = polygonal_surface.vertex_attribute_manager()
+                         .find_or_create_attribute< geode::VariableAttribute,
+                             geode::PolygonEdge >( "test" );
     for( auto v : geode::Range{ polygonal_surface.nb_vertices() } )
     {
-        attribute->value( v ) = v;
+        attribute->value( v ).polygon_id = v;
+        OPENGEODE_EXCEPTION( geode::PolygonVertex{} != attribute->value( v ),
+            "[Test] PolygonalSurface attribute assignation is not correct" );
     }
 }
 
@@ -334,14 +335,15 @@ void test_clone( const geode::PolygonalSurface3D& polygonal_surface )
     OPENGEODE_EXCEPTION( polygonal_surface2->nb_polygons() == 1,
         "[Test] PolygonalSurface2 should have 1 polygon" );
 
-    auto attribute2 =
-        polygonal_surface2->vertex_attribute_manager().find_attribute< double >(
-            "test" );
+    auto attribute2 = polygonal_surface2->vertex_attribute_manager()
+                          .find_attribute< geode::PolygonEdge >( "test" );
     for( auto v : geode::Range{ polygonal_surface2->nb_vertices() } )
     {
-        OPENGEODE_EXCEPTION( attribute2->value( v ) == v + 1,
-            "[Test] PolygonalSurface2 attribute should be "
-                + std::to_string( v + 1 ) );
+        geode::PolygonEdge answer{ v + 1, geode::NO_ID };
+        OPENGEODE_EXCEPTION( attribute2->value( v ) != geode::PolygonEdge{},
+            "[Test] PolygonalSurface2 attribute is not correct" );
+        OPENGEODE_EXCEPTION( attribute2->value( v ) == answer,
+            "[Test] PolygonalSurface2 attribute is not correct" );
     }
 }
 

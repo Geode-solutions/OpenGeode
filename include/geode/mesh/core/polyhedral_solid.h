@@ -26,6 +26,7 @@
 #include <vector>
 
 #include <geode/basic/attribute.h>
+#include <geode/basic/bitsery_archive.h>
 #include <geode/basic/factory.h>
 #include <geode/basic/pimpl.h>
 
@@ -64,8 +65,11 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.value4b( polyhedron_id );
-            archive.value4b( vertex_id );
+            archive.ext( *this, DefaultGrowable< Archive, PolyhedronVertex >{},
+                []( Archive& archive, PolyhedronVertex& polyhedron_vertex ) {
+                    archive.value4b( polyhedron_vertex.polyhedron_id );
+                    archive.value4b( polyhedron_vertex.vertex_id );
+                } );
         }
         index_t polyhedron_id{ NO_ID };
         index_t vertex_id{ NO_ID };
@@ -93,8 +97,11 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.value4b( polyhedron_id );
-            archive.value4b( facet_id );
+            archive.ext( *this, DefaultGrowable< Archive, PolyhedronFacet >{},
+                []( Archive& archive, PolyhedronFacet& polyhedron_facet ) {
+                    archive.value4b( polyhedron_facet.polyhedron_id );
+                    archive.value4b( polyhedron_facet.facet_id );
+                } );
         }
         index_t polyhedron_id{ NO_ID };
         index_t facet_id{ NO_ID };
@@ -119,8 +126,13 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.object( polyhedron_facet );
-            archive.value4b( vertex_id );
+            archive.ext( *this,
+                DefaultGrowable< Archive, PolyhedronFacetVertex >{},
+                []( Archive& archive,
+                    PolyhedronFacetVertex& polyhedron_facet_vertex ) {
+                    archive.object( polyhedron_facet_vertex.polyhedron_facet );
+                    archive.value4b( polyhedron_facet_vertex.vertex_id );
+                } );
         }
         PolyhedronFacet polyhedron_facet;
         index_t vertex_id{ NO_ID };

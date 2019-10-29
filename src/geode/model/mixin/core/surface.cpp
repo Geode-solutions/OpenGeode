@@ -36,6 +36,18 @@ namespace geode
     class Surface< dimension >::Impl
         : public detail::MeshStorage< PolygonalSurface< dimension > >
     {
+    private:
+        friend class bitsery::Access;
+        template < typename Archive >
+        void serialize( Archive& archive )
+        {
+            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
+                []( Archive& archive, Impl& impl ) {
+                    archive.ext(
+                        impl, bitsery::ext::BaseClass< detail::MeshStorage<
+                                  PolygonalSurface< dimension > > >{} );
+                } );
+        }
     };
 
     template < index_t dimension >
@@ -77,9 +89,12 @@ namespace geode
     template < typename Archive >
     void Surface< dimension >::serialize( Archive& archive )
     {
-        archive.object( impl_ );
-        archive.ext(
-            *this, bitsery::ext::BaseClass< Component< dimension > >{} );
+        archive.ext( *this, DefaultGrowable< Archive, Surface >{},
+            []( Archive& archive, Surface& surface ) {
+                archive.object( surface.impl_ );
+                archive.ext( surface,
+                    bitsery::ext::BaseClass< Component< dimension > >{} );
+            } );
     }
 
     template < index_t dimension >

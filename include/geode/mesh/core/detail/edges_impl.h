@@ -27,6 +27,7 @@
 
 #include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>
+#include <geode/basic/bitsery_archive.h>
 
 #include <geode/mesh/core/graph.h>
 
@@ -82,7 +83,10 @@ namespace geode
             template < typename Archive >
             void serialize( Archive& archive )
             {
-                archive.ext( edges_, bitsery::ext::StdSmartPtr{} );
+                archive.ext( *this, DefaultGrowable< Archive, EdgesImpl >{},
+                    []( Archive& archive, EdgesImpl& impl ) {
+                        archive.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
+                    } );
             }
 
         private:

@@ -36,6 +36,18 @@ namespace geode
     class Line< dimension >::Impl
         : public detail::MeshStorage< EdgedCurve< dimension > >
     {
+    private:
+        friend class bitsery::Access;
+        template < typename Archive >
+        void serialize( Archive& archive )
+        {
+            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
+                []( Archive& archive, Impl& impl ) {
+                    archive.ext(
+                        impl, bitsery::ext::BaseClass< detail::MeshStorage<
+                                  EdgedCurve< dimension > > >{} );
+                } );
+        }
     };
 
     template < index_t dimension >
@@ -77,9 +89,12 @@ namespace geode
     template < typename Archive >
     void Line< dimension >::serialize( Archive& archive )
     {
-        archive.object( impl_ );
-        archive.ext(
-            *this, bitsery::ext::BaseClass< Component< dimension > >{} );
+        archive.ext( *this, DefaultGrowable< Archive, Line >{},
+            []( Archive& archive, Line& line ) {
+                archive.object( line.impl_ );
+                archive.ext(
+                    line, bitsery::ext::BaseClass< Component< dimension > >{} );
+            } );
     }
 
     template < index_t dimension >

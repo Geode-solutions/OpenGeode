@@ -25,6 +25,7 @@
 
 #include <bitsery/brief_syntax/string.h>
 
+#include <geode/basic/bitsery_archive.h>
 #include <geode/basic/named_type.h>
 #include <geode/basic/uuid.h>
 
@@ -82,8 +83,11 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.object( type_ );
-            archive.object( id_ );
+            archive.ext( *this, DefaultGrowable< Archive, ComponentID >{},
+                []( Archive& archive, ComponentID& component_id ) {
+                    archive.object( component_id.type_ );
+                    archive.object( component_id.id_ );
+                } );
         }
 
     private:

@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <geode/basic/bitsery_archive.h>
+
 #include <geode/mesh/common.h>
 #include <geode/mesh/core/polygonal_surface.h>
 
@@ -59,7 +61,13 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this,
-                bitsery::ext::BaseClass< PolygonalSurface< dimension > >{} );
+                DefaultGrowable< Archive, TriangulatedSurface >{},
+                []( Archive& archive,
+                    TriangulatedSurface& triangulated_surface ) {
+                    archive.ext( triangulated_surface,
+                        bitsery::ext::BaseClass<
+                            PolygonalSurface< dimension > >{} );
+                } );
         }
 
         index_t get_nb_polygon_vertices( index_t /*unused*/ ) const final

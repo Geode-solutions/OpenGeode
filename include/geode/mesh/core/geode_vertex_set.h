@@ -25,6 +25,8 @@
 
 #include <bitsery/ext/inheritance.h>
 
+#include <geode/basic/bitsery_archive.h>
+
 #include <geode/mesh/common.h>
 #include <geode/mesh/core/vertex_set.h>
 
@@ -56,9 +58,14 @@ namespace geode
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive )
+        void serialize( Archive &archive )
         {
-            archive.ext( *this, bitsery::ext::BaseClass< VertexSet >{} );
+            archive.ext( *this,
+                DefaultGrowable< Archive, OpenGeodeVertexSet >{},
+                []( Archive &archive, OpenGeodeVertexSet &vertex_set ) {
+                    archive.ext(
+                        vertex_set, bitsery::ext::BaseClass< VertexSet >{} );
+                } );
         }
     };
 } // namespace geode
