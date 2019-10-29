@@ -186,7 +186,9 @@ namespace geode
                 auto new_polygon_around =
                     polygonal_surface_.polygon_around_vertex( old2new[v] );
                 associate_polygon_vertex_to_vertex( new_polygon_around, v );
-            } else {
+            }
+            else
+            {
                 associate_polygon_vertex_to_vertex( PolygonVertex{}, v );
             }
         }
@@ -238,7 +240,7 @@ namespace geode
             "that does not exist" );
         OPENGEODE_EXCEPTION(
             polygon_vertex.vertex_id < polygonal_surface_.nb_polygon_vertices(
-                                           polygon_vertex.polygon_id ),
+                polygon_vertex.polygon_id ),
             "[PolygonalSurfaceBuilder::update_polygon_vertex] Accessing an "
             "invalid polygon vertex" );
         OPENGEODE_EXCEPTION( vertex_id < polygonal_surface_.nb_vertices(),
@@ -269,7 +271,7 @@ namespace geode
             "polygon that does not exist" );
         OPENGEODE_EXCEPTION(
             polygon_edge.edge_id < polygonal_surface_.nb_polygon_edges(
-                                       polygon_edge.polygon_id ),
+                polygon_edge.polygon_id ),
             "[PolygonalSurfaceBuilder::set_polygon_adjacent] Accessing an "
             "invalid polygon vertex" );
         OPENGEODE_EXCEPTION( adjacent_id < polygonal_surface_.nb_polygons()
