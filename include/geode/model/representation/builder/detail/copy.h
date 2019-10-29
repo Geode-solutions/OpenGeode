@@ -193,19 +193,24 @@ namespace geode
         }
 
         template < typename ModelFrom, typename ModelTo, typename Builder >
-        void copy_corner_geometry(
-            const ModelFrom& from, const ModelTo& to,Builder& builder, const Mapping& corners )
+        void copy_corner_geometry( const ModelFrom& from,
+            const ModelTo& to,
+            Builder& builder,
+            const Mapping& corners )
         {
             for( const auto& corner : from.corners() )
             {
                 builder.update_corner_mesh(
-                    to.corner( corners.at( corner.id() ) ), corner.mesh().clone() );
+                    to.corner( corners.at( corner.id() ) ),
+                    corner.mesh().clone() );
             }
         }
 
         template < typename ModelFrom, typename ModelTo, typename Builder >
-        void copy_line_geometry(
-            const ModelFrom& from, const ModelTo& to,Builder& builder, const Mapping& lines )
+        void copy_line_geometry( const ModelFrom& from,
+            const ModelTo& to,
+            Builder& builder,
+            const Mapping& lines )
         {
             for( const auto& line : from.lines() )
             {
@@ -215,19 +220,24 @@ namespace geode
         }
 
         template < typename ModelFrom, typename ModelTo, typename Builder >
-        void copy_surface_geometry(
-            const ModelFrom& from, const ModelTo& to,Builder& builder, const Mapping& surfaces )
+        void copy_surface_geometry( const ModelFrom& from,
+            const ModelTo& to,
+            Builder& builder,
+            const Mapping& surfaces )
         {
             for( const auto& surface : from.surfaces() )
             {
                 builder.update_surface_mesh(
-                    to.surface( surfaces.at( surface.id() ) ), surface.mesh().clone() );
+                    to.surface( surfaces.at( surface.id() ) ),
+                    surface.mesh().clone() );
             }
         }
 
         template < typename ModelFrom, typename ModelTo, typename Builder >
-        void copy_block_geometry(
-            const ModelFrom& from,const ModelTo& to, Builder& builder, const Mapping& blocks )
+        void copy_block_geometry( const ModelFrom& from,
+            const ModelTo& to,
+            Builder& builder,
+            const Mapping& blocks )
         {
             for( const auto& block : from.blocks() )
             {

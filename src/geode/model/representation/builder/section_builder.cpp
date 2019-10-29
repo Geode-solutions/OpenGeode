@@ -86,9 +86,11 @@ namespace geode
     void SectionBuilder::copy_component_geometry(
         const ComponentMapping& mapping, const Section& section )
     {
-        detail::copy_corner_geometry( section, section_, *this, mapping.corners );
+        detail::copy_corner_geometry(
+            section, section_, *this, mapping.corners );
         detail::copy_line_geometry( section, section_, *this, mapping.lines );
-        detail::copy_surface_geometry( section, section_, *this, mapping.surfaces );
+        detail::copy_surface_geometry(
+            section, section_, *this, mapping.surfaces );
         create_unique_vertices( section.nb_unique_vertices() );
         detail::copy_vertex_identifier_components( section, *this,
             Corner2D::component_type_static(), mapping.corners );
@@ -151,31 +153,31 @@ namespace geode
         const auto& id = create_model_boundary();
         register_component( id );
         return id;
-    }        
-    
-    void SectionBuilder::update_corner_mesh( const Corner2D& corner,
-            std::unique_ptr< PointSet2D > mesh )
-            {
-                unregister_mesh_component( corner );
-                set_corner_mesh( corner.id(), std::move( mesh ) );
-                register_mesh_component( corner );
-            }
+    }
 
-        void SectionBuilder::update_line_mesh( const Line2D& line,
-            std::unique_ptr< EdgedCurve2D > mesh )
-            {
-                unregister_mesh_component( line );
-                set_line_mesh( line.id(), std::move( mesh ) );
-                register_mesh_component( line );
-            }
+    void SectionBuilder::update_corner_mesh(
+        const Corner2D& corner, std::unique_ptr< PointSet2D > mesh )
+    {
+        unregister_mesh_component( corner );
+        set_corner_mesh( corner.id(), std::move( mesh ) );
+        register_mesh_component( corner );
+    }
 
-        void SectionBuilder::update_surface_mesh( const Surface2D& surface,
-            std::unique_ptr< PolygonalSurface2D > mesh )
-            {
-                unregister_mesh_component( surface );
-                set_surface_mesh( surface.id(), std::move( mesh ) );
-                register_mesh_component( surface );
-            }
+    void SectionBuilder::update_line_mesh(
+        const Line2D& line, std::unique_ptr< EdgedCurve2D > mesh )
+    {
+        unregister_mesh_component( line );
+        set_line_mesh( line.id(), std::move( mesh ) );
+        register_mesh_component( line );
+    }
+
+    void SectionBuilder::update_surface_mesh(
+        const Surface2D& surface, std::unique_ptr< PolygonalSurface2D > mesh )
+    {
+        unregister_mesh_component( surface );
+        set_surface_mesh( surface.id(), std::move( mesh ) );
+        register_mesh_component( surface );
+    }
 
     void SectionBuilder::remove_corner( const Corner2D& corner )
     {
