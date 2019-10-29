@@ -183,46 +183,46 @@ std::vector< geode::uuid > add_model_boundaries(
     return uuids;
 }
 
-void add_corner_line_relation( const geode::BRep& model,
+void add_corner_line_boundary_relation( const geode::BRep& model,
     geode::BRepBuilder& builder,
     const std::vector< geode::uuid >& corner_uuids,
     const std::vector< geode::uuid >& line_uuids )
 {
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[0] ), model.line( line_uuids[0] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[0] ), model.line( line_uuids[5] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[0] ), model.line( line_uuids[2] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[1] ), model.line( line_uuids[0] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[1] ), model.line( line_uuids[1] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[1] ), model.line( line_uuids[3] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[2] ), model.line( line_uuids[1] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[2] ), model.line( line_uuids[2] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[2] ), model.line( line_uuids[4] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[3] ), model.line( line_uuids[5] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[3] ), model.line( line_uuids[6] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[3] ), model.line( line_uuids[8] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[4] ), model.line( line_uuids[3] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[4] ), model.line( line_uuids[6] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[4] ), model.line( line_uuids[7] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[5] ), model.line( line_uuids[4] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[5] ), model.line( line_uuids[7] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[5] ), model.line( line_uuids[8] ) );
 
     for( const auto& corner_id : corner_uuids )
@@ -249,46 +249,46 @@ void add_corner_line_relation( const geode::BRep& model,
     }
 }
 
-void add_line_surface_relation( const geode::BRep& model,
+void add_line_surface_boundary_relation( const geode::BRep& model,
     geode::BRepBuilder& builder,
     const std::vector< geode::uuid >& line_uuids,
     const std::vector< geode::uuid >& surface_uuids )
 {
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[0] ), model.surface( surface_uuids[0] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[0] ), model.surface( surface_uuids[1] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[1] ), model.surface( surface_uuids[0] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[1] ), model.surface( surface_uuids[2] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[2] ), model.surface( surface_uuids[0] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[2] ), model.surface( surface_uuids[3] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[3] ), model.surface( surface_uuids[1] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[3] ), model.surface( surface_uuids[2] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[4] ), model.surface( surface_uuids[2] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[4] ), model.surface( surface_uuids[3] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[5] ), model.surface( surface_uuids[1] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[5] ), model.surface( surface_uuids[3] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[6] ), model.surface( surface_uuids[1] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[6] ), model.surface( surface_uuids[4] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[7] ), model.surface( surface_uuids[2] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[7] ), model.surface( surface_uuids[4] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[8] ), model.surface( surface_uuids[3] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[8] ), model.surface( surface_uuids[4] ) );
 
     for( const auto& line_id : line_uuids )
@@ -311,7 +311,7 @@ void add_surface_block_relation( const geode::BRep& model,
 {
     for( const auto& surface_id : surface_uuids )
     {
-        builder.add_surface_block_relationship(
+        builder.add_surface_block_boundary_relationship(
             model.surface( surface_id ), model.block( block_uuids.front() ) );
     }
 
@@ -637,8 +637,8 @@ int main()
         auto block_uuids = add_blocks( model, builder );
         auto model_boundary_uuids = add_model_boundaries( model, builder );
 
-        add_corner_line_relation( model, builder, corner_uuids, line_uuids );
-        add_line_surface_relation( model, builder, line_uuids, surface_uuids );
+        add_corner_line_boundary_relation( model, builder, corner_uuids, line_uuids );
+        add_line_surface_boundary_relation( model, builder, line_uuids, surface_uuids );
         add_surface_block_relation(
             model, builder, surface_uuids, block_uuids );
         add_surfaces_in_model_boundaries(
