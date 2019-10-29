@@ -459,8 +459,10 @@ int main()
         auto surface_uuids = add_surfaces( model, builder );
         auto model_boundary_uuids = add_model_boundaries( model, builder );
 
-        add_corner_line_boundary_relation( model, builder, corner_uuids, line_uuids );
-        add_line_surface_boundary_relation( model, builder, line_uuids, surface_uuids );
+        add_corner_line_boundary_relation(
+            model, builder, corner_uuids, line_uuids );
+        add_line_surface_boundary_relation(
+            model, builder, line_uuids, surface_uuids );
         add_lines_in_model_boundaries(
             model, builder, line_uuids, model_boundary_uuids );
         add_internal_relations( model, builder, line_uuids, surface_uuids );

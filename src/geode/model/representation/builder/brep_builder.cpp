@@ -126,7 +126,8 @@ namespace geode
             {
                 const auto& new_surface =
                     brep_.surface( mapping.surfaces.at( surface.id() ) );
-                add_surface_block_boundary_relationship( new_surface, new_block );
+                add_surface_block_boundary_relationship(
+                    new_surface, new_block );
             }
             for( const auto& surface : brep.internals( block ) )
             {
