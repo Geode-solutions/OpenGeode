@@ -108,11 +108,11 @@ namespace geode
 
         const uuid& add_model_boundary();
 
-        void update_corner_mesh( const Corner2D& corner,
-            std::unique_ptr< PointSet2D > mesh );
+        void update_corner_mesh(
+            const Corner2D& corner, std::unique_ptr< PointSet2D > mesh );
 
-        void update_line_mesh( const Line2D& line,
-            std::unique_ptr< EdgedCurve2D > mesh );
+        void update_line_mesh(
+            const Line2D& line, std::unique_ptr< EdgedCurve2D > mesh );
 
         void update_surface_mesh( const Surface2D& surface,
             std::unique_ptr< PolygonalSurface2D > mesh );
