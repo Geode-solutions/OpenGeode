@@ -211,7 +211,8 @@ void test_set_polyhedron_vertex(
     OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_vertex( { 0, 2 } ) == 1,
         "[Test] PolyhedronVertex after set_polyhedron_vertex is wrong" );
     // OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_edge( { 0, 1 } ) == 2
-    //                          && polyhedral_solid.polyhedron_edge( { 0, 2 } ) == 3,
+    //                          && polyhedral_solid.polyhedron_edge( { 0, 2 } )
+    //                          == 3,
     //     "[Test] Polyhedron facets after set_polyhedron_vertex is wrong" );
 }
 

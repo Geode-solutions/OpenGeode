@@ -299,7 +299,7 @@ namespace geode
             const PolyhedronVertex& polyhedron_vertex, index_t vertex_id );
 
         void update_facet_vertices( const std::vector< index_t >& old2new );
-    
+
         void update_facet_vertex( const std::vector< index_t >& facet_vertices,
             index_t facet_vertex_id,
             index_t new_vertex_id );
