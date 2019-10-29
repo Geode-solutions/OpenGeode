@@ -23,6 +23,7 @@
 
 #include <geode/mesh/core/tetrahedral_solid.h>
 
+#include <geode/mesh/builder/tetrahedral_solid_builder.h>
 #include <geode/mesh/core/geode_tetrahedral_solid.h>
 
 namespace geode
@@ -51,6 +52,16 @@ namespace geode
                 "Could not create TetrahedralSolid data structure: ",
                 type.get() );
         }
+    }
+
+    template < index_t dimension >
+    std::unique_ptr< TetrahedralSolid< dimension > >
+        TetrahedralSolid< dimension >::clone() const
+    {
+        auto clone = create( this->type_name() );
+        auto builder = TetrahedralSolidBuilder< dimension >::create( *clone );
+        builder->copy( *this );
+        return clone;
     }
 
     template class opengeode_mesh_api TetrahedralSolid< 3 >;

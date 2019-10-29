@@ -59,10 +59,22 @@ namespace geode
     index_t EdgedCurveBuilder< dimension >::create_point(
         const Point< dimension >& point )
     {
-        auto first_added_vertex = edged_curve_.nb_vertices();
+        auto added_vertex = edged_curve_.nb_vertices();
         create_vertex();
-        set_point( first_added_vertex, point );
-        return first_added_vertex;
+        set_point( added_vertex, point );
+        return added_vertex;
+    }
+
+    template < index_t dimension >
+    void EdgedCurveBuilder< dimension >::copy(
+        const EdgedCurve< dimension >& edged_curve )
+    {
+        VertexSetBuilder::copy( edged_curve );
+        GraphBuilder::copy( edged_curve );
+        for( const auto p : Range{ edged_curve.nb_vertices() } )
+        {
+            set_point( p, edged_curve.point( p ) );
+        }
     }
 
     template class opengeode_mesh_api EdgedCurveBuilder< 2 >;

@@ -33,7 +33,11 @@
 #include <geode/basic/pimpl_impl.h>
 #include <geode/basic/vector.h>
 
+#include <geode/mesh/builder/detail/mapping_after_deletion.h>
+#include <geode/mesh/builder/polygonal_surface_builder.h>
+#include <geode/mesh/core/detail/vertex_cycle.h>
 #include <geode/mesh/core/geode_polygonal_surface.h>
+#include <geode/mesh/core/triangulated_surface.h>
 
 namespace
 {
@@ -121,9 +125,79 @@ namespace geode
             polygon_around_vertex_->value( vertex_id ) = polygon_vertex;
         }
 
+        index_t find_edge( const std::vector< index_t >& edge_vertices ) const
+        {
+            auto itr = edge_indices_.find( edge_vertices );
+            if( itr != edge_indices_.end() )
+            {
+                return edge_indices_.at( edge_vertices );
+            }
+            return NO_ID;
+        }
+
+        index_t find_or_create_edge(
+            const std::array< index_t, 2 >& edge_vertices )
+        {
+            auto size = edge_indices_.size();
+            std::vector< index_t > vertices{ edge_vertices[0],
+                edge_vertices[1] };
+            auto id = find_edge( vertices );
+            if( id != NO_ID )
+            {
+                return id;
+            }
+            edge_indices_[vertices] = size;
+            edge_attribute_manager_.resize( size + 1 );
+            return size;
+        }
+
+        void update_edge_vertices( const std::vector< index_t >& old2new )
+        {
+            auto old_edge_indices = edge_indices_;
+            edge_indices_.clear();
+            edge_indices_.reserve( old_edge_indices.size() );
+            for( const auto& cycle : old_edge_indices )
+            {
+                auto updated_vertices = cycle.first.vertices();
+                for( auto& v : updated_vertices )
+                {
+                    v = old2new[v];
+                }
+                detail::VertexCycle updated_cycle{ updated_vertices };
+                edge_indices_[updated_cycle] = cycle.second;
+            }
+        }
+
+        void delete_edges( const std::vector< bool >& to_delete )
+        {
+            auto old2new = mapping_after_deletion( to_delete );
+            std::vector< detail::VertexCycle > key_to_erase;
+            key_to_erase.reserve( old2new.size() );
+            for( const auto& cycle : edge_indices_ )
+            {
+                if( old2new[cycle.second] == NO_ID )
+                {
+                    key_to_erase.emplace_back( cycle.first );
+                }
+            }
+            for( const auto& key : key_to_erase )
+            {
+                edge_indices_.erase( key );
+            }
+            for( auto& cycle : edge_indices_ )
+            {
+                cycle.second = old2new[cycle.second];
+            }
+        }
+
         AttributeManager& polygon_attribute_manager() const
         {
             return polygon_attribute_manager_;
+        }
+
+        AttributeManager& edge_attribute_manager() const
+        {
+            return edge_attribute_manager_;
         }
 
     private:
@@ -144,8 +218,10 @@ namespace geode
 
     private:
         mutable AttributeManager polygon_attribute_manager_;
+        mutable AttributeManager edge_attribute_manager_;
         std::shared_ptr< VariableAttribute< PolygonVertex > >
             polygon_around_vertex_;
+        std::unordered_map< detail::VertexCycle, index_t > edge_indices_;
     };
 
     template < index_t dimension >
@@ -169,6 +245,17 @@ namespace geode
     }
 
     template < index_t dimension >
+    index_t PolygonalSurfaceBase< dimension >::polygon_edge(
+        const PolygonEdge& polygon_edge ) const
+    {
+        check_polygon_id( *this, polygon_edge.polygon_id );
+        check_polygon_edge_id(
+            *this, polygon_edge.polygon_id, polygon_edge.edge_id );
+        return impl_->find_edge( { polygon_edge_vertex( polygon_edge, 0 ),
+            polygon_edge_vertex( polygon_edge, 1 ) } );
+    }
+
+    template < index_t dimension >
     const PolygonVertex&
         PolygonalSurfaceBase< dimension >::polygon_around_vertex(
             index_t vertex_id ) const
@@ -180,10 +267,37 @@ namespace geode
     }
 
     template < index_t dimension >
+    index_t PolygonalSurfaceBase< dimension >::find_or_create_edge(
+        const std::array< index_t, 2 >& edge_vertices )
+    {
+        return impl_->find_or_create_edge( edge_vertices );
+    }
+
+    template < index_t dimension >
+    void PolygonalSurfaceBase< dimension >::update_edge_vertices(
+        const std::vector< index_t >& old2new )
+    {
+        impl_->update_edge_vertices( old2new );
+    }
+
+    template < index_t dimension >
+    void PolygonalSurfaceBase< dimension >::delete_edges(
+        const std::vector< bool >& to_delete )
+    {
+        impl_->delete_edges( to_delete );
+    }
+
+    template < index_t dimension >
     void PolygonalSurfaceBase< dimension >::associate_polygon_vertex_to_vertex(
         const PolygonVertex& polygon_vertex, index_t vertex_id )
     {
         impl_->associate_polygon_vertex_to_vertex( polygon_vertex, vertex_id );
+    }
+
+    template < index_t dimension >
+    index_t PolygonalSurfaceBase< dimension >::nb_edges() const
+    {
+        return edge_attribute_manager().nb_elements();
     }
 
     template < index_t dimension >
@@ -466,6 +580,13 @@ namespace geode
 
     template < index_t dimension >
     AttributeManager&
+        PolygonalSurfaceBase< dimension >::edge_attribute_manager() const
+    {
+        return impl_->edge_attribute_manager();
+    }
+
+    template < index_t dimension >
+    AttributeManager&
         PolygonalSurfaceBase< dimension >::polygon_attribute_manager() const
     {
         return impl_->polygon_attribute_manager();
@@ -542,11 +663,28 @@ namespace geode
         }
         catch( const OpenGeodeException& e )
         {
-            Logger::error( e.what() );
-            throw OpenGeodeException(
-                "Could not create PolygonalSurface data structure: ",
-                type.get() );
+            try
+            {
+                return TriangulatedSurface< dimension >::create( type );
+            }
+            catch( const OpenGeodeException& e )
+            {
+                Logger::error( e.what() );
+                throw OpenGeodeException(
+                    "Could not create PolygonalSurface data structure: ",
+                    type.get() );
+            }
         }
+    }
+
+    template < index_t dimension >
+    std::unique_ptr< PolygonalSurface< dimension > >
+        PolygonalSurface< dimension >::clone() const
+    {
+        auto clone = create( this->type_name() );
+        auto builder = PolygonalSurfaceBuilder< dimension >::create( *clone );
+        builder->copy( *this );
+        return clone;
     }
 
     std::unique_ptr< PolygonalSurface< 3 > > PolygonalSurface< 3 >::create()
@@ -565,11 +703,27 @@ namespace geode
         }
         catch( const OpenGeodeException& e )
         {
-            Logger::error( e.what() );
-            throw OpenGeodeException(
-                "Could not create PolygonalSurface data structure: ",
-                type.get() );
+            try
+            {
+                return TriangulatedSurfaceFactory< 3 >::create( type );
+            }
+            catch( const OpenGeodeException& e )
+            {
+                Logger::error( e.what() );
+                throw OpenGeodeException(
+                    "Could not create PolygonalSurface data structure: ",
+                    type.get() );
+            }
         }
+    }
+
+    std::unique_ptr< PolygonalSurface< 3 > >
+        PolygonalSurface< 3 >::clone() const
+    {
+        auto clone = create( type_name() );
+        auto builder = PolygonalSurfaceBuilder< 3 >::create( *clone );
+        builder->copy( *this );
+        return clone;
     }
 
     template class opengeode_mesh_api PolygonalSurfaceBase< 2 >;

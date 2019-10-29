@@ -61,10 +61,21 @@ namespace geode
     index_t PointSetBuilder< dimension >::create_point(
         const Point< dimension >& point )
     {
-        auto first_added_vertex = point_set_.nb_vertices();
+        auto added_vertex = point_set_.nb_vertices();
         create_vertex();
-        set_point( first_added_vertex, point );
-        return first_added_vertex;
+        set_point( added_vertex, point );
+        return added_vertex;
+    }
+
+    template < index_t dimension >
+    void PointSetBuilder< dimension >::copy(
+        const PointSet< dimension >& point_set )
+    {
+        VertexSetBuilder::copy( point_set );
+        for( const auto p : Range{ point_set.nb_vertices() } )
+        {
+            set_point( p, point_set.point( p ) );
+        }
     }
 
     template class opengeode_mesh_api PointSetBuilder< 2 >;

@@ -21,7 +21,6 @@
  *
  */
 
-#include <geode/basic/attribute.h>
 #include <geode/basic/logger.h>
 
 #include <geode/mesh/builder/geode_graph_builder.h>
@@ -120,6 +119,8 @@ void test_delete_edge( const geode::Graph& graph, geode::GraphBuilder& builder )
         "[Test] Graph edge vertex index is not correct" );
 
     builder.create_edges( 10 );
+    builder.set_edge_vertex( { 1, 0 }, 1 );
+    builder.set_edge_vertex( { 1, 1 }, 0 );
     OPENGEODE_EXCEPTION(
         graph.nb_edges() == 11, "[Test] Graph should have 11 edges" );
 
@@ -127,16 +128,27 @@ void test_delete_edge( const geode::Graph& graph, geode::GraphBuilder& builder )
     builder.delete_edges( to_delete );
     OPENGEODE_EXCEPTION(
         graph.nb_edges() == 1, "[Test] Graph should have 1 edge" );
+    OPENGEODE_EXCEPTION( graph.edge_vertex( { 0, 0 } ) == 1,
+        "[Test] Graph edge vertex index is not correct (0, 0)" );
+    OPENGEODE_EXCEPTION( graph.edge_vertex( { 0, 1 } ) == 0,
+        "[Test] Graph edge vertex index is not correct (0, 1)" );
 }
 
 void test_io( const geode::Graph& graph, const std::string& filename )
 {
-    DEBUG( "WRITE" );
     save_graph( graph, filename );
-    DEBUG( "READ" );
     auto new_graph =
         geode::Graph::create( geode::OpenGeodeGraph::type_name_static() );
     load_graph( *new_graph, filename );
+}
+
+void test_clone( const geode::Graph& graph )
+{
+    auto graph2 = graph.clone();
+    OPENGEODE_EXCEPTION(
+        graph2->nb_vertices() == 3, "[Test] Graph2 should have 3 vertices" );
+    OPENGEODE_EXCEPTION(
+        graph2->nb_edges() == 1, "[Test] Graph2 should have 1 edge" );
 }
 
 int main()
@@ -155,6 +167,7 @@ int main()
 
         test_delete_vertex( *graph, *builder );
         test_delete_edge( *graph, *builder );
+        test_clone( *graph );
 
         auto default_graph = Graph::create();
         OPENGEODE_EXCEPTION(

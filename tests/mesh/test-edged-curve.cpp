@@ -22,6 +22,7 @@
  */
 
 #include <geode/basic/attribute.h>
+#include <geode/basic/attribute_manager.h>
 #include <geode/basic/logger.h>
 #include <geode/basic/point.h>
 
@@ -157,6 +158,26 @@ void test_edge_requests( const geode::EdgedCurve3D& edged_curve,
         "[Test] Edge length is not correct" );
 }
 
+void test_clone( const geode::EdgedCurve3D& edged_curve )
+{
+    auto attribute =
+        edged_curve.edge_attribute_manager()
+            .find_or_create_attribute< geode::VariableAttribute, int >(
+                "test" );
+    attribute->value( 0 ) = 42;
+
+    auto edged_curve2 = edged_curve.clone();
+    OPENGEODE_EXCEPTION( edged_curve2->nb_vertices() == 3,
+        "[Test] EdgedCurve2 should have 3 vertices" );
+    OPENGEODE_EXCEPTION( edged_curve2->nb_edges() == 1,
+        "[Test] EdgedCurve2 should have 1 edge" );
+
+    auto attribute2 =
+        edged_curve2->edge_attribute_manager().find_attribute< int >( "test" );
+    OPENGEODE_EXCEPTION( attribute2->value( 0 ) == 42,
+        "[Test] EdgedCurve2 attribute should be 42" );
+}
+
 int main()
 {
     using namespace geode;
@@ -174,6 +195,7 @@ int main()
 
         test_delete_vertex( *edged_curve, *builder );
         test_delete_edge( *edged_curve, *builder );
+        test_clone( *edged_curve );
 
         test_edge_requests( *edged_curve, *builder );
 

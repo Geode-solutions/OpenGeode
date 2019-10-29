@@ -28,7 +28,9 @@
 #include <geode/basic/attribute_manager.h>
 
 #include <geode/mesh/builder/detail/mapping_after_deletion.h>
+#include <geode/mesh/builder/tetrahedral_solid_builder.h>
 #include <geode/mesh/core/polyhedral_solid.h>
+#include <geode/mesh/core/tetrahedral_solid.h>
 
 namespace
 {
@@ -96,10 +98,24 @@ namespace geode
         }
         catch( const OpenGeodeException& e )
         {
-            Logger::error( e.what() );
-            throw OpenGeodeException(
-                "Could not create PolyhedralSolid builder of data structure: ",
-                mesh.type_name().get() );
+            try
+            {
+                return TetrahedralSolidBuilder< dimension >::create(
+                    dynamic_cast< TetrahedralSolid< dimension >& >( mesh ) );
+            }
+            catch( const std::bad_cast& e )
+            {
+                Logger::error( e.what() );
+                throw OpenGeodeException( "Could not cast PolyhedralSolid "
+                                          "to TetrahedralSolid" );
+            }
+            catch( const OpenGeodeException& e )
+            {
+                Logger::error( e.what() );
+                throw OpenGeodeException( "Could not create PolyhedralSolid "
+                                          "builder of data structure: ",
+                    mesh.type_name().get() );
+            }
         }
     }
 
@@ -128,16 +144,41 @@ namespace geode
         const std::vector< index_t >& vertices,
         const std::vector< std::vector< index_t > >& facets )
     {
-        auto first_added_polyhedron = polyhedral_solid_.nb_polyhedra();
+        auto added_polyhedron = polyhedral_solid_.nb_polyhedra();
         polyhedral_solid_.polyhedron_attribute_manager().resize(
-            first_added_polyhedron + 1 );
+            added_polyhedron + 1 );
         for( auto v : Range{ vertices.size() } )
         {
             associate_polyhedron_vertex_to_vertex(
-                { first_added_polyhedron, v }, vertices[v] );
+                { added_polyhedron, v }, vertices[v] );
+        }
+        auto polyhedron_facet_vertices =
+            get_polyhedron_facet_vertices( vertices, facets );
+        for( const auto& facet_vertices : polyhedron_facet_vertices )
+        {
+            this->find_or_create_facet( facet_vertices );
         }
         do_create_polyhedron( vertices, facets );
-        return first_added_polyhedron;
+        return added_polyhedron;
+    }
+    template < index_t dimension >
+    std::vector< std::vector< index_t > >
+        PolyhedralSolidBuilder< dimension >::get_polyhedron_facet_vertices(
+            const std::vector< index_t >& vertices,
+            const std::vector< std::vector< index_t > >& facets ) const
+    {
+        std::vector< std::vector< index_t > > polyhedron_facet_vertices(
+            facets.size() );
+        for( auto f : Range{ facets.size() } )
+        {
+            polyhedron_facet_vertices[f].resize( facets[f].size() );
+            for( auto v : Range{ facets[f].size() } )
+            {
+                polyhedron_facet_vertices[f][v] = vertices[facets[f][v]];
+            }
+            // this->find_or_create_facet( facet_vertices );
+        }
+        return polyhedron_facet_vertices;
     }
 
     template < index_t dimension >
@@ -150,10 +191,18 @@ namespace geode
     }
 
     template < index_t dimension >
+    index_t PolyhedralSolidBuilder< dimension >::find_or_create_facet(
+        const std::vector< index_t >& facet_vertices )
+    {
+        return polyhedral_solid_.find_or_create_facet( facet_vertices );
+    }
+
+    template < index_t dimension >
     void PolyhedralSolidBuilder< dimension >::do_delete_vertices(
         const std::vector< bool >& to_delete )
     {
         auto old2new = mapping_after_deletion( to_delete );
+        update_facet_vertices( old2new );
         update_polyhedron_vertices( polyhedral_solid_, *this, old2new );
         do_delete_solid_vertices( to_delete );
     }
@@ -304,10 +353,44 @@ namespace geode
             associate_polyhedron_vertex_to_vertex( new_polyhedron_vertex, v );
         }
 
+        std::vector< bool > facet_to_delete(
+            polyhedral_solid_.nb_facets(), true );
+        for( auto p : geode::Range{ polyhedral_solid_.nb_polyhedra() } )
+        {
+            if( to_delete[p] )
+            {
+                continue;
+            }
+            for( auto f :
+                geode::Range{ polyhedral_solid_.nb_polyhedron_facets( p ) } )
+            {
+                auto facet_id = polyhedral_solid_.polyhedron_facet( { p, f } );
+                facet_to_delete[facet_id] = false;
+            }
+        }
+
+        delete_facets( facet_to_delete );
+        polyhedral_solid_.facet_attribute_manager().delete_elements(
+            facet_to_delete );
+
         update_polyhedron_adjacencies( polyhedral_solid_, *this, old2new );
         polyhedral_solid_.polyhedron_attribute_manager().delete_elements(
             to_delete );
         do_delete_polyhedra( to_delete );
+    }
+
+    template < index_t dimension >
+    void PolyhedralSolidBuilder< dimension >::update_facet_vertices(
+        const std::vector< index_t >& old2new )
+    {
+        polyhedral_solid_.update_facet_vertices( old2new );
+    }
+
+    template < index_t dimension >
+    void PolyhedralSolidBuilder< dimension >::delete_facets(
+        const std::vector< bool >& to_delete )
+    {
+        polyhedral_solid_.delete_facets( to_delete );
     }
 
     template < index_t dimension >
@@ -324,10 +407,54 @@ namespace geode
     index_t PolyhedralSolidBuilder< dimension >::create_point(
         const Point< dimension >& point )
     {
-        auto first_added_vertex = polyhedral_solid_.nb_vertices();
+        auto added_vertex = polyhedral_solid_.nb_vertices();
         create_vertex();
-        set_point( first_added_vertex, point );
-        return first_added_vertex;
+        set_point( added_vertex, point );
+        return added_vertex;
+    }
+
+    template < index_t dimension >
+    void PolyhedralSolidBuilder< dimension >::copy(
+        const PolyhedralSolid< dimension >& polyhedral_solid )
+    {
+        VertexSetBuilder::copy( polyhedral_solid );
+        for( const auto p : Range{ polyhedral_solid.nb_vertices() } )
+        {
+            set_point( p, polyhedral_solid.point( p ) );
+        }
+        for( const auto p : Range{ polyhedral_solid.nb_polyhedra() } )
+        {
+            std::vector< index_t > vertices(
+                polyhedral_solid.nb_polyhedron_vertices( p ) );
+            for( const auto v :
+                Range{ polyhedral_solid.nb_polyhedron_vertices( p ) } )
+            {
+                vertices[v] = polyhedral_solid.polyhedron_vertex( { p, v } );
+            }
+            std::vector< std::vector< index_t > > facets(
+                polyhedral_solid.nb_polyhedron_facets( p ) );
+            for( const auto f :
+                Range{ polyhedral_solid.nb_polyhedron_facets( p ) } )
+            {
+                auto& facet = facets[f];
+                facet.resize(
+                    polyhedral_solid.nb_polyhedron_facet_vertices( { p, f } ) );
+                for( auto v :
+                    Range{ polyhedral_solid.nb_polyhedron_facet_vertices(
+                        { p, f } ) } )
+                {
+                    facet[v] = geode::find(
+                        vertices, polyhedral_solid.polyhedron_facet_vertex(
+                                      { { p, f }, v } ) );
+                    OPENGEODE_ASSERT( facet[v] != NO_ID,
+                        "[PolyhedralSolidBuilder::copy] Wrong indexing between "
+                        "polyhedron_vertex and polyhedron_facet_vertex" );
+                }
+            }
+            create_polyhedron( vertices, facets );
+        }
+        polyhedral_solid_.polyhedron_attribute_manager().copy(
+            polyhedral_solid.polyhedron_attribute_manager() );
     }
 
     template class opengeode_mesh_api PolyhedralSolidBuilder< 3 >;

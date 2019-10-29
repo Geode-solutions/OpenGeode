@@ -55,12 +55,23 @@ namespace geode
         {
         }
 
+        friend class TetrahedralSolid< dimension >;
+        void copy( const TetrahedralSolid< dimension >& tetrahedral_solid );
+
     private:
         void do_create_polyhedron( const std::vector< index_t >& vertices,
             const std::vector< std::vector< index_t > >& facets ) final;
 
+        std::vector< std::vector< index_t > > get_polyhedron_facet_vertices(
+            const std::vector< index_t >& vertices,
+            const std::vector< std::vector< index_t > >& facets ) const final;
+
         virtual void do_create_tetrahedron(
             const std::array< index_t, 4 >& vertices ) = 0;
+
+        virtual std::vector< std::vector< index_t > >
+            get_polyhedron_facet_vertices(
+                const std::array< index_t, 4 >& vertices ) const = 0;
 
     private:
         TetrahedralSolid< dimension >& tetrahedral_solid_;

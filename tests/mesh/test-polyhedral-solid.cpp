@@ -22,6 +22,7 @@
  */
 
 #include <geode/basic/attribute.h>
+#include <geode/basic/attribute_manager.h>
 #include <geode/basic/logger.h>
 #include <geode/basic/point.h>
 
@@ -57,6 +58,8 @@ void test_create_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
         { { 1, 3, 2 }, { 0, 2, 3 }, { 3, 1, 0 }, { 0, 1, 2 } } );
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_polyhedra() == 3,
         "[Test] PolyhedralSolid should have 3 polyhedra" );
+    OPENGEODE_EXCEPTION( polyhedral_solid.nb_facets() == 11,
+        "[Test] PolyhedralSolid should have 11 facets" );
 }
 
 void test_polyhedron_adjacencies(
@@ -104,6 +107,8 @@ void test_delete_vertex( const geode::PolyhedralSolid3D& polyhedral_solid,
         "[Test] PolyhedralSolid should have 2 polyhedra" );
     OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_adjacent( { 1, 3 } ) == 0,
         "[Test] PolyhedralSolid adjacent index is not correct" );
+    OPENGEODE_EXCEPTION( polyhedral_solid.nb_facets() == 7,
+        "[Test] PolyhedralSolid should have 7 facets" );
 }
 
 void test_delete_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
@@ -122,6 +127,8 @@ void test_delete_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
         "[Test] PolyhedralSolid vertex index is not correct" );
     OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_vertex( { 0, 3 } ) == 6,
         "[Test] PolyhedralSolid vertex index is not correct" );
+    OPENGEODE_EXCEPTION( polyhedral_solid.nb_facets() == 4,
+        "[Test] PolyhedralSolid should have 4 facets" );
 }
 
 void test_io( const geode::PolyhedralSolid3D& polyhedral_solid,
@@ -162,6 +169,40 @@ void test_barycenters()
         "[Test] PolyhedralSolid polyhedron barycenter is not correct" );
 }
 
+void test_create_vertex_attribute(
+    const geode::PolyhedralSolid3D& polyhedral_solid )
+{
+    auto attribute =
+        polyhedral_solid.vertex_attribute_manager()
+            .find_or_create_attribute< geode::VariableAttribute, double >(
+                "test" );
+    for( auto v : geode::Range{ polyhedral_solid.nb_vertices() } )
+    {
+        attribute->value( v ) = v;
+    }
+}
+
+void test_clone( const geode::PolyhedralSolid3D& polyhedral_solid )
+{
+    auto polyhedral_solid2 = polyhedral_solid.clone();
+    OPENGEODE_EXCEPTION( polyhedral_solid2->nb_vertices() == 7,
+        "[Test] PolyhedralSolid2 should have 7 vertices" );
+    OPENGEODE_EXCEPTION( polyhedral_solid2->nb_facets() == 4,
+        "[Test]PolyhedralSolid2 should have 4 facets" );
+    OPENGEODE_EXCEPTION( polyhedral_solid2->nb_polyhedra() == 1,
+        "[Test] PolyhedralSolid2 should have 1 polyhedron" );
+
+    auto attribute2 =
+        polyhedral_solid2->vertex_attribute_manager().find_attribute< double >(
+            "test" );
+    for( auto v : geode::Range{ polyhedral_solid2->nb_vertices() } )
+    {
+        OPENGEODE_EXCEPTION( attribute2->value( v ) == v + 1,
+            "[Test]PolyhedralSolid2 attribute should be "
+                + std::to_string( v + 1 ) );
+    }
+}
+
 int main()
 {
     using namespace geode;
@@ -173,6 +214,7 @@ int main()
         auto builder = PolyhedralSolidBuilder3D::create( *polyhedral_solid );
 
         test_create_vertices( *polyhedral_solid, *builder );
+        test_create_vertex_attribute( *polyhedral_solid );
         test_create_polyhedra( *polyhedral_solid, *builder );
         test_polyhedron_adjacencies( *polyhedral_solid, *builder );
         auto base_file = "test." + polyhedral_solid->native_extension();
@@ -180,6 +222,7 @@ int main()
 
         test_delete_vertex( *polyhedral_solid, *builder );
         test_delete_polyhedra( *polyhedral_solid, *builder );
+        test_clone( *polyhedral_solid );
 
         test_barycenters();
 

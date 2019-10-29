@@ -21,6 +21,8 @@
  *
  */
 
+#pragma once
+
 #include <geode/basic/bitsery_archive.h>
 
 #include <geode/mesh/common.h>

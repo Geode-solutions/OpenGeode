@@ -21,7 +21,6 @@
  *
  */
 
-#include <geode/basic/attribute.h>
 #include <geode/basic/logger.h>
 #include <geode/basic/point.h>
 
@@ -50,6 +49,8 @@ void test_create_polygons( const geode::TriangulatedSurface3D& surface,
     builder.create_polygon( { 3, 4, 2 } );
     OPENGEODE_EXCEPTION( surface.nb_polygons() == 3,
         "[Test] TriangulatedSurface should have 3 triangles" );
+    OPENGEODE_EXCEPTION( surface.nb_edges() == 7,
+        "[Test] TriangulatedSurface should have 7 edges" );
 }
 
 void test_polygon_adjacencies( const geode::TriangulatedSurface3D& surface,
@@ -87,6 +88,8 @@ void test_delete_vertex( const geode::TriangulatedSurface3D& surface,
         "[Test] TriangulatedSurface should have 2 polygons" );
     OPENGEODE_EXCEPTION( surface.polygon_adjacent( { 1, 2 } ) == 0,
         "[Test] TriangulatedSurface adjacent index is not correct" );
+    OPENGEODE_EXCEPTION( surface.nb_edges() == 5,
+        "[Test] TriangulatedSurface should have 5 edges" );
 }
 
 void test_delete_polygon( const geode::TriangulatedSurface3D& surface,
@@ -103,6 +106,8 @@ void test_delete_polygon( const geode::TriangulatedSurface3D& surface,
         "[Test] TriangulatedSurface edge vertex index is not correct" );
     OPENGEODE_EXCEPTION( surface.polygon_vertex( { 0, 2 } ) == 1,
         "[Test] TriangulatedSurface edge vertex index is not correct" );
+    OPENGEODE_EXCEPTION( surface.nb_edges() == 3,
+        "[Test] TriangulatedSurface should have 3 edges" );
 }
 
 void test_io(
@@ -112,6 +117,17 @@ void test_io(
     auto new_surface = geode::TriangulatedSurface3D::create(
         geode::OpenGeodeTriangulatedSurface3D::type_name_static() );
     load_triangulated_surface( *new_surface, filename );
+}
+
+void test_clone( const geode::TriangulatedSurface3D& surface )
+{
+    auto surface2 = surface.clone();
+    OPENGEODE_EXCEPTION( surface2->nb_vertices() == 4,
+        "[Test] TriangulatedSurface2 should have 4 vertices" );
+    OPENGEODE_EXCEPTION( surface2->nb_edges() == 3,
+        "[Test] TriangulatedSurface2 should have 3 edges" );
+    OPENGEODE_EXCEPTION( surface2->nb_polygons() == 1,
+        "[Test] TriangulatedSurface2 should have 1 polygon" );
 }
 
 int main()
@@ -132,6 +148,7 @@ int main()
 
         test_delete_vertex( *surface, *builder );
         test_delete_polygon( *surface, *builder );
+        test_clone( *surface );
 
         Logger::info( "TEST SUCCESS" );
         return 0;

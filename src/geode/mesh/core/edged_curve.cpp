@@ -26,6 +26,7 @@
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/vector.h>
 
+#include <geode/mesh/builder/edged_curve_builder.h>
 #include <geode/mesh/core/geode_edged_curve.h>
 
 namespace geode
@@ -88,6 +89,16 @@ namespace geode
             []( Archive& archive, EdgedCurve& edged_curve ) {
                 archive.ext( edged_curve, bitsery::ext::BaseClass< Graph >{} );
             } );
+    }
+
+    template < index_t dimension >
+    std::unique_ptr< EdgedCurve< dimension > >
+        EdgedCurve< dimension >::clone() const
+    {
+        auto clone = create( type_name() );
+        auto builder = EdgedCurveBuilder< dimension >::create( *clone );
+        builder->copy( *this );
+        return clone;
     }
 
     template class opengeode_mesh_api EdgedCurve< 2 >;

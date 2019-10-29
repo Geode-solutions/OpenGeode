@@ -45,6 +45,8 @@ namespace geode
         static std::unique_ptr< EdgedCurve< dimension > > create(
             const MeshType& type );
 
+        std::unique_ptr< EdgedCurve< dimension > > clone() const;
+
         const Point< dimension >& point( index_t vertex_id ) const;
 
         double edge_length( index_t edge_id ) const;

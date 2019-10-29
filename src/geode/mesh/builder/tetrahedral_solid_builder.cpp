@@ -67,20 +67,54 @@ namespace geode
     }
 
     template < index_t dimension >
+    std::vector< std::vector< index_t > >
+        TetrahedralSolidBuilder< dimension >::get_polyhedron_facet_vertices(
+            const std::vector< index_t >& vertices,
+            const std::vector< std::vector< index_t > >& facets ) const
+    {
+        OPENGEODE_EXCEPTION( vertices.size() == 4, "[TetrahedralSolidBuilder::"
+                                                   "do_create_polyhedron] Only "
+                                                   "tetrahedra are handled" );
+        OPENGEODE_EXCEPTION( facets.size() == 4, "[TetrahedralSolidBuilder::do_"
+                                                 "create_polyhedron] Only "
+                                                 "tetrahedra are handled" );
+        std::array< index_t, 4 > tetra_vertices{};
+        std::copy_n( vertices.begin(), 4, tetra_vertices.begin() );
+        return get_polyhedron_facet_vertices( tetra_vertices );
+    }
+
+    template < index_t dimension >
     index_t TetrahedralSolidBuilder< dimension >::create_tetrahedron(
         const std::array< index_t, 4 >& vertices )
     {
-        auto first_added_tetra = tetrahedral_solid_.nb_polyhedra();
+        auto added_tetra = tetrahedral_solid_.nb_polyhedra();
         tetrahedral_solid_.polyhedron_attribute_manager().resize(
-            first_added_tetra + 1 );
+            added_tetra + 1 );
         index_t vertex_id{ 0 };
         for( const auto& vertex : vertices )
         {
             this->associate_polyhedron_vertex_to_vertex(
-                { first_added_tetra, vertex_id++ }, vertex );
+                { added_tetra, vertex_id++ }, vertex );
         }
         do_create_tetrahedron( vertices );
-        return first_added_tetra;
+        for( auto f : Range{ 4 } )
+        {
+            std::vector< index_t > facet_vertices( 3 );
+            for( auto v : Range{ 3 } )
+            {
+                facet_vertices[v] = tetrahedral_solid_.polyhedron_facet_vertex(
+                    { { added_tetra, f }, v } );
+            }
+            this->find_or_create_facet( facet_vertices );
+        }
+        return added_tetra;
+    }
+
+    template < index_t dimension >
+    void TetrahedralSolidBuilder< dimension >::copy(
+        const TetrahedralSolid< dimension >& tetrahedral_solid )
+    {
+        PolyhedralSolidBuilder< dimension >::copy( tetrahedral_solid );
     }
 
     template class opengeode_mesh_api TetrahedralSolidBuilder< 3 >;

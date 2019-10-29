@@ -66,6 +66,13 @@ void test_delete_vertex(
         "[Test] VertexSet should have 5 vertices" );
 }
 
+void test_clone( const geode::VertexSet& vertex_set )
+{
+    auto vertex_set2 = vertex_set.clone();
+    OPENGEODE_EXCEPTION( vertex_set2->nb_vertices() == 5,
+        "[Test] VertexSet2 should have 5 vertices" );
+}
+
 int main()
 {
     using namespace geode;
@@ -77,6 +84,7 @@ int main()
         OpenGeodeVertexSetBuilder builder( vertex_set );
         test_create_vertices( vertex_set, builder );
         test_delete_vertex( vertex_set, builder );
+        test_clone( vertex_set );
 
         Logger::info( "TEST SUCCESS" );
         return 0;

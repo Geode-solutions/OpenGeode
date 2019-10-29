@@ -30,7 +30,11 @@
 #include <geode/basic/pimpl_impl.h>
 #include <geode/basic/vector.h>
 
+#include <geode/mesh/builder/detail/mapping_after_deletion.h>
+#include <geode/mesh/builder/polyhedral_solid_builder.h>
+#include <geode/mesh/core/detail/vertex_cycle.h>
 #include <geode/mesh/core/geode_polyhedral_solid.h>
+#include <geode/mesh/core/tetrahedral_solid.h>
 
 namespace
 {
@@ -108,9 +112,77 @@ namespace geode
             polyhedron_around_vertex_->value( vertex_id ) = polyhedron_vertex;
         }
 
+        index_t find_facet( const std::vector< index_t >& facet_vertices ) const
+        {
+            auto itr = facet_indices_.find( facet_vertices );
+            if( itr != facet_indices_.end() )
+            {
+                return facet_indices_.at( facet_vertices );
+            }
+            return NO_ID;
+        }
+
+        index_t find_or_create_facet(
+            const std::vector< index_t >& facet_vertices )
+        {
+            auto size = facet_indices_.size();
+            auto id = find_facet( facet_vertices );
+            if( id != NO_ID )
+            {
+                return id;
+            }
+            facet_indices_[facet_vertices] = size;
+            facet_attribute_manager_.resize( size + 1 );
+            return size;
+        }
+
+        void update_facet_vertices( const std::vector< index_t >& old2new )
+        {
+            auto old_facet_indices = facet_indices_;
+            facet_indices_.clear();
+            facet_indices_.reserve( old_facet_indices.size() );
+            for( const auto& cycle : old_facet_indices )
+            {
+                auto updated_vertices = cycle.first.vertices();
+                for( auto& v : updated_vertices )
+                {
+                    v = old2new[v];
+                }
+                detail::VertexCycle updated_cycle{ updated_vertices };
+                facet_indices_[updated_cycle] = cycle.second;
+            }
+        }
+
+        void delete_facets( const std::vector< bool >& to_delete )
+        {
+            auto old2new = mapping_after_deletion( to_delete );
+            std::vector< detail::VertexCycle > key_to_erase;
+            key_to_erase.reserve( old2new.size() );
+            for( const auto& cycle : facet_indices_ )
+            {
+                if( old2new[cycle.second] == NO_ID )
+                {
+                    key_to_erase.emplace_back( cycle.first );
+                }
+            }
+            for( const auto& key : key_to_erase )
+            {
+                facet_indices_.erase( key );
+            }
+            for( auto& cycle : facet_indices_ )
+            {
+                cycle.second = old2new[cycle.second];
+            }
+        }
+
         AttributeManager& polyhedron_attribute_manager() const
         {
             return polyhedron_attribute_manager_;
+        }
+
+        AttributeManager& facet_attribute_manager() const
+        {
+            return facet_attribute_manager_;
         }
 
     private:
@@ -131,8 +203,10 @@ namespace geode
 
     private:
         mutable AttributeManager polyhedron_attribute_manager_;
+        mutable AttributeManager facet_attribute_manager_;
         std::shared_ptr< VariableAttribute< PolyhedronVertex > >
             polyhedron_around_vertex_;
+        std::unordered_map< detail::VertexCycle, index_t > facet_indices_;
     };
 
     template < index_t dimension >
@@ -164,10 +238,17 @@ namespace geode
         }
         catch( const OpenGeodeException& e )
         {
-            Logger::error( e.what() );
-            throw OpenGeodeException(
-                "Could not create PolyhedralSolid data structure: ",
-                type.get() );
+            try
+            {
+                return TetrahedralSolid< dimension >::create( type );
+            }
+            catch( const OpenGeodeException& e )
+            {
+                Logger::error( e.what() );
+                throw OpenGeodeException(
+                    "Could not create PolyhedralSolid data structure: ",
+                    type.get() );
+            }
         }
     }
 
@@ -195,6 +276,23 @@ namespace geode
         check_polyhedron_vertex_id( *this, polyhedron_vertex.polyhedron_id,
             polyhedron_vertex.vertex_id );
         return get_polyhedron_vertex( polyhedron_vertex );
+    }
+
+    template < index_t dimension >
+    index_t PolyhedralSolid< dimension >::polyhedron_facet(
+        const PolyhedronFacet& polyhedron_facet ) const
+    {
+        check_polyhedron_id( *this, polyhedron_facet.polyhedron_id );
+        check_polyhedron_facet_id(
+            *this, polyhedron_facet.polyhedron_id, polyhedron_facet.facet_id );
+        std::vector< index_t > facet_vertices(
+            nb_polyhedron_facet_vertices( polyhedron_facet ) );
+        for( auto v : Range{ facet_vertices.size() } )
+        {
+            facet_vertices[v] =
+                polyhedron_facet_vertex( { polyhedron_facet, v } );
+        }
+        return impl_->find_facet( facet_vertices );
     }
 
     template < index_t dimension >
@@ -315,11 +413,38 @@ namespace geode
     }
 
     template < index_t dimension >
+    index_t PolyhedralSolid< dimension >::find_or_create_facet(
+        const std::vector< index_t >& facet_vertices )
+    {
+        return impl_->find_or_create_facet( facet_vertices );
+    }
+
+    template < index_t dimension >
+    void PolyhedralSolid< dimension >::update_facet_vertices(
+        const std::vector< index_t >& old2new )
+    {
+        impl_->update_facet_vertices( old2new );
+    }
+
+    template < index_t dimension >
+    void PolyhedralSolid< dimension >::delete_facets(
+        const std::vector< bool >& to_delete )
+    {
+        impl_->delete_facets( to_delete );
+    }
+
+    template < index_t dimension >
     void PolyhedralSolid< dimension >::associate_polyhedron_vertex_to_vertex(
         const PolyhedronVertex& polyhedron_vertex, index_t vertex_id )
     {
         impl_->associate_polyhedron_vertex_to_vertex(
             polyhedron_vertex, vertex_id );
+    }
+
+    template < index_t dimension >
+    index_t PolyhedralSolid< dimension >::nb_facets() const
+    {
+        return facet_attribute_manager().nb_elements();
     }
 
     template < index_t dimension >
@@ -445,6 +570,13 @@ namespace geode
 
     template < index_t dimension >
     AttributeManager&
+        PolyhedralSolid< dimension >::facet_attribute_manager() const
+    {
+        return impl_->facet_attribute_manager();
+    }
+
+    template < index_t dimension >
+    AttributeManager&
         PolyhedralSolid< dimension >::polyhedron_attribute_manager() const
     {
         return impl_->polyhedron_attribute_manager();
@@ -468,6 +600,16 @@ namespace geode
                 archive.ext( solid, bitsery::ext::BaseClass< VertexSet >{} );
                 archive.object( solid.impl_ );
             } );
+    }
+
+    template < index_t dimension >
+    std::unique_ptr< PolyhedralSolid< dimension > >
+        PolyhedralSolid< dimension >::clone() const
+    {
+        auto clone = create( this->type_name() );
+        auto builder = PolyhedralSolidBuilder< dimension >::create( *clone );
+        builder->copy( *this );
+        return clone;
     }
 
     template class opengeode_mesh_api PolyhedralSolid< 3 >;

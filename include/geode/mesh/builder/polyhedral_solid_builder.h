@@ -143,6 +143,12 @@ namespace geode
         {
         }
 
+        index_t find_or_create_facet(
+            const std::vector< index_t >& facet_vertices );
+
+        friend class PolyhedralSolid< dimension >;
+        void copy( const PolyhedralSolid< dimension >& polyhedral_solid );
+
     private:
         /*!
          * @brief Sets a point.
@@ -170,6 +176,15 @@ namespace geode
 
         virtual void do_set_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet, index_t adjacent_id ) = 0;
+
+        void delete_facets( const std::vector< bool >& to_delete );
+
+        void update_facet_vertices( const std::vector< index_t >& old2new );
+
+        virtual std::vector< std::vector< index_t > >
+            get_polyhedron_facet_vertices(
+                const std::vector< index_t >& vertices,
+                const std::vector< std::vector< index_t > >& facets ) const;
 
     private:
         PolyhedralSolid< dimension >& polyhedral_solid_;

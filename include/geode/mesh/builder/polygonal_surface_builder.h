@@ -139,6 +139,12 @@ namespace geode
         {
         }
 
+        index_t find_or_create_edge(
+            const std::array< index_t, 2 >& edge_vertices );
+
+        friend class PolygonalSurface< dimension >;
+        void copy( const PolygonalSurface< dimension >& polygonal_surface );
+
     private:
         virtual void do_set_point(
             index_t vertex_id, const Point< dimension >& point ) = 0;
@@ -159,6 +165,10 @@ namespace geode
 
         virtual void do_set_polygon_adjacent(
             const PolygonEdge& polygon_edge, index_t adjacent_id ) = 0;
+
+        void delete_edges( const std::vector< bool >& to_delete );
+
+        void update_edge_vertices( const std::vector< index_t >& old2new );
 
     private:
         PolygonalSurface< dimension >& polygonal_surface_;

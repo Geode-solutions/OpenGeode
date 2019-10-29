@@ -36,6 +36,13 @@
 
 #include <geode/mesh/core/detail/points_impl.h>
 
+namespace
+{
+    static const std::array< std::array< geode::index_t, 3 >, 4 >
+        tetrahedron_facet_vertices{ { { 1, 3, 2 }, { 0, 2, 3 }, { 3, 1, 0 },
+            { 0, 1, 2 } } };
+} // namespace
+
 namespace geode
 {
     template < index_t dimension >
@@ -77,9 +84,6 @@ namespace geode
         index_t get_polyhedron_facet_vertex(
             const PolyhedronFacetVertex& polyhedron_facet_vertex ) const
         {
-            static const std::array< std::array< index_t, 3 >, 4 >
-                tetrahedron_facet_vertices{ { { 1, 3, 2 }, { 0, 2, 3 },
-                    { 3, 1, 0 }, { 0, 1, 2 } } };
             auto vertex_id = tetrahedron_facet_vertices.at(
                 polyhedron_facet_vertex.polyhedron_facet
                     .facet_id )[polyhedron_facet_vertex.vertex_id];
@@ -115,6 +119,22 @@ namespace geode
         {
             tetrahedron_vertices_->value( surface.nb_polyhedra() - 1 ) =
                 vertices;
+        }
+
+        std::vector< std::vector< index_t > > get_polyhedron_facet_vertices(
+            const std::array< index_t, 4 >& vertices ) const
+        {
+            std::vector< std::vector< index_t > > facet_vertices( 4 );
+            for( auto f : Range{ 4 } )
+            {
+                facet_vertices[f].resize( 3 );
+                for( auto v : Range{ 3 } )
+                {
+                    facet_vertices[f][v] =
+                        vertices[tetrahedron_facet_vertices[f][v]];
+                }
+            }
+            return facet_vertices;
         }
 
     private:
@@ -216,6 +236,13 @@ namespace geode
         const std::array< index_t, 4 >& vertices )
     {
         impl_->add_tetrahedron( *this, vertices );
+    }
+    template < index_t dimension >
+    std::vector< std::vector< index_t > >
+        OpenGeodeTetrahedralSolid< dimension >::get_polyhedron_facet_vertices(
+            const std::array< index_t, 4 >& vertices ) const
+    {
+        return impl_->get_polyhedron_facet_vertices( vertices );
     }
 
     template < index_t dimension >

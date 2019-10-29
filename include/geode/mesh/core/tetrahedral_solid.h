@@ -48,6 +48,8 @@ namespace geode
         static std::unique_ptr< TetrahedralSolid< dimension > > create(
             const MeshType& type );
 
+        std::unique_ptr< TetrahedralSolid< dimension > > clone() const;
+
     protected:
         TetrahedralSolid() = default;
 

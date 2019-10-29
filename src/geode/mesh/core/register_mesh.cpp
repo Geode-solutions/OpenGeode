@@ -30,11 +30,15 @@
 #include <geode/mesh/core/geode_polyhedral_solid.h>
 #include <geode/mesh/core/geode_tetrahedral_solid.h>
 #include <geode/mesh/core/geode_triangulated_surface.h>
+#include <geode/mesh/core/geode_vertex_set.h>
 
 namespace geode
 {
     void register_geode_mesh()
     {
+        VertexSetFactory::register_creator< OpenGeodeVertexSet >(
+            OpenGeodeVertexSet::type_name_static() );
+
         GraphFactory::register_creator< OpenGeodeGraph >(
             OpenGeodeGraph::type_name_static() );
 
