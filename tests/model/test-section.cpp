@@ -467,6 +467,7 @@ int main()
         test_boundary_ranges( model, corner_uuids, line_uuids, surface_uuids );
         test_incidence_ranges( model, corner_uuids, line_uuids, surface_uuids );
         test_item_ranges( model, line_uuids, model_boundary_uuids );
+        test_clone( model );
 
         std::string file_io{ "test." + model.native_extension() };
         save_section( model, file_io );
