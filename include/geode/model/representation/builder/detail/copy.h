@@ -249,7 +249,8 @@ namespace geode
                 for( const auto& mesh_vertex : vertices )
                 {
                     builder.set_unique_vertex(
-                        { { new_type, mapping.at( mesh_vertex.component_id.id() ) },
+                        { { new_type,
+                              mapping.at( mesh_vertex.component_id.id() ) },
                             mesh_vertex.vertex },
                         v );
                 }
