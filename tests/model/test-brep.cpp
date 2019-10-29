@@ -637,8 +637,10 @@ int main()
         auto block_uuids = add_blocks( model, builder );
         auto model_boundary_uuids = add_model_boundaries( model, builder );
 
-        add_corner_line_boundary_relation( model, builder, corner_uuids, line_uuids );
-        add_line_surface_boundary_relation( model, builder, line_uuids, surface_uuids );
+        add_corner_line_boundary_relation(
+            model, builder, corner_uuids, line_uuids );
+        add_line_surface_boundary_relation(
+            model, builder, line_uuids, surface_uuids );
         add_surface_block_relation(
             model, builder, surface_uuids, block_uuids );
         add_surfaces_in_model_boundaries(
