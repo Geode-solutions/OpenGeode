@@ -1,5 +1,26 @@
 # Upgrade Guide
 
+## Upgrading from OpenGeode v2.x.x to v3.0.0
+
+### Motivations
+
+TODO
+
+
+### Breaking Changes
+
+- **BRepBuilder / SectionBuilder**: methods adding relationships between model Components have now explicitely the relationship type in their name.
+
+**How to upgrade**
+
+Replace:
+-`geode::SectionBuilder::add_corner_line_relationship(...)` by `geode::SectionBuilder::add_corner_line_boundary_relationship(...)`
+-`geode::SectionBuilder::add_line_surface_relationship(...)` by `geode::SectionBuilder::add_line_surface_boundary_relationship(...)`
+-`geode::BRepBuilder::add_corner_line_relationship(...)` by `geode::BRepBuilder::add_corner_line_boundary_relationship(...)`
+-`geode::BRepBuilder::add_line_surface_relationship(...)` by `geode::BRepBuilder::add_line_surface_boundary_relationship(...)`
+-`geode::BRepBuilder::add_surface_block_relationship(...)` by `geode::BRepBuilder::add_surface_block_boundary_relationship(...)`
+
+
 ## Upgrading from OpenGeode v1.x.x to v2.0.0
 
 ### Motivations
