@@ -23,11 +23,6 @@
 
 #include <geode/model/representation/builder/brep_builder.h>
 
-#include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/core/point_set.h>
-#include <geode/mesh/core/polygonal_surface.h>
-#include <geode/mesh/core/polyhedral_solid.h>
-
 #include <geode/model/mixin/core/block.h>
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/line.h>
@@ -97,10 +92,10 @@ namespace geode
     void BRepBuilder::copy_component_geometry(
         const ComponentMapping& mapping, const BRep& brep )
     {
-        detail::copy_corner_geometry( brep, *this, mapping.corners );
-        detail::copy_line_geometry( brep, *this, mapping.lines );
-        detail::copy_surface_geometry( brep, *this, mapping.surfaces );
-        detail::copy_block_geometry( brep, *this, mapping.blocks );
+        detail::copy_corner_geometry( brep, brep_, *this, mapping.corners );
+        detail::copy_line_geometry( brep, brep_, *this, mapping.lines );
+        detail::copy_surface_geometry( brep, brep_, *this, mapping.surfaces );
+        detail::copy_block_geometry( brep, brep_, *this, mapping.blocks );
         create_unique_vertices( brep.nb_unique_vertices() );
         detail::copy_vertex_identifier_components(
             brep, *this, Corner3D::component_type_static(), mapping.corners );
@@ -182,6 +177,38 @@ namespace geode
         register_component( id );
         return id;
     }
+
+        void BRepBuilder::update_corner_mesh( const Corner3D& corner,
+            std::unique_ptr< PointSet3D > mesh )
+            {
+                unregister_mesh_component( corner );
+                set_corner_mesh( corner.id(), std::move( mesh ) );
+                register_mesh_component( corner );
+            }
+
+        void BRepBuilder::update_line_mesh( const Line3D& line,
+            std::unique_ptr< EdgedCurve3D > mesh )
+            {
+                unregister_mesh_component( line );
+                set_line_mesh( line.id(), std::move( mesh ) );
+                register_mesh_component( line );
+            }
+
+        void BRepBuilder::update_surface_mesh( const Surface3D& surface,
+            std::unique_ptr< PolygonalSurface3D > mesh )
+            {
+                unregister_mesh_component( surface );
+                set_surface_mesh( surface.id(), std::move( mesh ) );
+                register_mesh_component( surface );
+            }
+
+        void BRepBuilder::update_block_mesh( const Block3D& block,
+            std::unique_ptr< PolyhedralSolid3D > mesh )
+            {
+                unregister_mesh_component( block );
+                set_block_mesh( block.id(), std::move( mesh ) );
+                register_mesh_component( block );
+            }
 
     void BRepBuilder::remove_corner( const Corner3D& corner )
     {

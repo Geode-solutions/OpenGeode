@@ -56,9 +56,6 @@ namespace geode
 
         void set_line_name( const uuid& id, std::string name );
 
-        void set_line_mesh(
-            const uuid& id, std::unique_ptr< EdgedCurve< dimension > > mesh );
-
     protected:
         LinesBuilder( Lines< dimension >& lines ) : lines_( lines ) {}
 
@@ -67,6 +64,9 @@ namespace geode
         const uuid& create_line( const MeshType& type );
 
         void delete_line( const Line< dimension >& line );
+
+        void set_line_mesh(
+            const uuid& id, std::unique_ptr< EdgedCurve< dimension > > mesh );
 
     private:
         Lines< dimension >& lines_;
