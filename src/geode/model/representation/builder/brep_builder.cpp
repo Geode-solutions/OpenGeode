@@ -103,13 +103,13 @@ namespace geode
         detail::copy_block_geometry( brep, *this, mapping.blocks );
         create_unique_vertices( brep.nb_unique_vertices() );
         detail::copy_vertex_identifier_components(
-            brep, *this, Corner3D::component_type_static(), mapping.corners );
+            brep, *this, Corner3D::component_type_static(),Corner3D::component_type_static(), mapping.corners );
         detail::copy_vertex_identifier_components(
-            brep, *this, Line3D::component_type_static(), mapping.lines );
+            brep, *this, Line3D::component_type_static(), Line3D::component_type_static(), mapping.lines );
         detail::copy_vertex_identifier_components(
-            brep, *this, Surface3D::component_type_static(), mapping.surfaces );
+            brep, *this, Surface3D::component_type_static(),  Surface3D::component_type_static(), mapping.surfaces );
         detail::copy_vertex_identifier_components(
-            brep, *this, Block3D::component_type_static(), mapping.blocks );
+            brep, *this, Block3D::component_type_static(),Block3D::component_type_static(), mapping.blocks );
     }
 
     const uuid& BRepBuilder::add_corner()

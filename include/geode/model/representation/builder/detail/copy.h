@@ -27,7 +27,17 @@
 
 #include <geode/basic/range.h>
 #include <geode/basic/uuid.h>
-#include <geode/model/mixin/core/component_type.h>
+
+#include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/core/point_set.h>
+#include <geode/mesh/core/polygonal_surface.h>
+#include <geode/mesh/core/polyhedral_solid.h>
+
+#include <geode/model/mixin/core/block.h>
+#include <geode/model/mixin/core/corner.h>
+#include <geode/model/mixin/core/line.h>
+#include <geode/model/mixin/core/model_boundary.h>
+#include <geode/model/mixin/core/surface.h>
 
 namespace geode
 {
@@ -229,16 +239,17 @@ namespace geode
         template < typename Model, typename Builder >
         void copy_vertex_identifier_components( const Model& from,
             Builder& builder,
-            const ComponentType& type,
+            const ComponentType& old_type,
+            const ComponentType& new_type,
             const Mapping& mapping )
         {
             for( auto v : Range{ from.nb_unique_vertices() } )
             {
-                auto vertices = from.mesh_component_vertices( v, type );
+                auto vertices = from.mesh_component_vertices( v, old_type );
                 for( const auto& mesh_vertex : vertices )
                 {
                     builder.set_unique_vertex(
-                        { { type, mapping.at( mesh_vertex.component_id.id() ) },
+                        { { new_type, mapping.at( mesh_vertex.component_id.id() ) },
                             mesh_vertex.vertex },
                         v );
                 }
