@@ -203,6 +203,31 @@ void test_clone( const geode::PolyhedralSolid3D& polyhedral_solid )
     }
 }
 
+void test_set_polyhedron_vertex(
+    const geode::PolyhedralSolid3D& polyhedral_solid,
+    geode::PolyhedralSolidBuilder3D& builder )
+{
+    builder.set_polyhedron_vertex( { 0, 2 }, 1 );
+    OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_vertex( { 0, 2 } ) == 1,
+        "[Test] PolyhedronVertex after set_polyhedron_vertex is wrong" );
+    // OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_edge( { 0, 1 } ) == 2
+    //                          && polyhedral_solid.polyhedron_edge( { 0, 2 } ) == 3,
+    //     "[Test] Polyhedron facets after set_polyhedron_vertex is wrong" );
+}
+
+void test_delete_all( const geode::PolyhedralSolid3D& polyhedral_solid,
+    geode::PolyhedralSolidBuilder3D& builder )
+{
+    std::vector< bool > to_delete( polyhedral_solid.nb_polyhedra(), true );
+    builder.delete_polyhedra( to_delete );
+    OPENGEODE_EXCEPTION( polyhedral_solid.nb_vertices() == 7,
+        "[Test] PolyhedralSolid should have 7 vertices" );
+    OPENGEODE_EXCEPTION( polyhedral_solid.nb_facets() == 0,
+        "[Test] PolyhedralSolid should have 0 facet" );
+    OPENGEODE_EXCEPTION( polyhedral_solid.nb_polyhedra() == 0,
+        "[Test] PolyhedralSolid should have 0 polyhedron" );
+}
+
 int main()
 {
     using namespace geode;
@@ -223,6 +248,8 @@ int main()
         test_delete_vertex( *polyhedral_solid, *builder );
         test_delete_polyhedra( *polyhedral_solid, *builder );
         test_clone( *polyhedral_solid );
+        test_set_polyhedron_vertex( *polyhedral_solid, *builder );
+        test_delete_all( *polyhedral_solid, *builder );
 
         test_barycenters();
 

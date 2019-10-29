@@ -189,10 +189,8 @@ namespace geode
 
     private:
         mutable AttributeManager polygon_attribute_manager_;
-        // mutable AttributeManager edge_attribute_manager_;
         std::shared_ptr< VariableAttribute< PolygonVertex > >
             polygon_around_vertex_;
-        // std::unordered_map< detail::VertexCycle, index_t > edge_indices_;
     };
 
     template < index_t dimension >
