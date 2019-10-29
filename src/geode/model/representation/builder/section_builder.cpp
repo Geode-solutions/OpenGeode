@@ -95,13 +95,10 @@ namespace geode
         detail::copy_surface_geometry( section, *this, mapping.surfaces );
         create_unique_vertices( section.nb_unique_vertices() );
         detail::copy_vertex_identifier_components( section, *this,
-            Corner2D::component_type_static(),
             Corner2D::component_type_static(), mapping.corners );
+        detail::copy_vertex_identifier_components(
+            section, *this, Line2D::component_type_static(), mapping.lines );
         detail::copy_vertex_identifier_components( section, *this,
-            Line2D::component_type_static(), Line2D::component_type_static(),
-            mapping.lines );
-        detail::copy_vertex_identifier_components( section, *this,
-            Surface2D::component_type_static(),
             Surface2D::component_type_static(), mapping.surfaces );
     }
 
