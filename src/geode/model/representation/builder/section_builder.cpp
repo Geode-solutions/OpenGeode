@@ -32,6 +32,7 @@
 #include <geode/model/mixin/core/line.h>
 #include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
+#include <geode/model/representation/builder/detail/copy.h>
 #include <geode/model/representation/core/section.h>
 
 namespace geode
@@ -55,60 +56,24 @@ namespace geode
         const Section& section )
     {
         ComponentMapping mapping;
-        for( const auto& corner : section.corners() )
-        {
-            mapping.corners.emplace(
-                corner.id(), add_corner( corner.mesh().type_name() ) );
-        }
-        for( const auto& line : section.lines() )
-        {
-            mapping.lines.emplace(
-                line.id(), add_line( line.mesh().type_name() ) );
-        }
-        for( const auto& surface : section.surfaces() )
-        {
-            mapping.surfaces.emplace(
-                surface.id(), add_surface( surface.mesh().type_name() ) );
-        }
-        for( const auto& model_boundary : section.model_boundaries() )
-        {
-            mapping.model_boundaries.emplace(
-                model_boundary.id(), add_model_boundary() );
-        }
+        mapping.corners =
+            detail::copy_corner_components( section, section_, *this );
+        mapping.lines =
+            detail::copy_line_components( section, section_, *this );
+        mapping.surfaces =
+            detail::copy_surface_components( section, section_, *this );
+        mapping.model_boundaries =
+            detail::copy_model_boundary_components( section, *this );
         return mapping;
     }
 
     void SectionBuilder::copy_component_relationships(
         const ComponentMapping& mapping, const Section& section )
     {
-        for( const auto& line : section.lines() )
-        {
-            const auto& new_line =
-                section_.line( mapping.lines.at( line.id() ) );
-            for( const auto& corner : section.boundaries( line ) )
-            {
-                const auto& new_corner =
-                    section_.corner( mapping.corners.at( corner.id() ) );
-                add_corner_line_relationship( new_corner, new_line );
-            }
-        }
-        for( const auto& surface : section.surfaces() )
-        {
-            const auto& new_surface =
-                section_.surface( mapping.surfaces.at( surface.id() ) );
-            for( const auto& line : section.boundaries( surface ) )
-            {
-                const auto& new_line =
-                    section_.line( mapping.lines.at( line.id() ) );
-                add_line_surface_relationship( new_line, new_surface );
-            }
-            for( const auto& line : section.internals( surface ) )
-            {
-                const auto& new_line =
-                    section_.line( mapping.lines.at( line.id() ) );
-                add_line_surface_internal_relationship( new_line, new_surface );
-            }
-        }
+        detail::copy_corner_line_relationships(
+            section, section_, *this, mapping.corners, mapping.lines );
+        detail::copy_line_surface_relationships(
+            section, section_, *this, mapping.lines, mapping.surfaces );
         for( const auto& model_boundary : section.model_boundaries() )
         {
             const auto& new_model_boundary = section_.model_boundary(
@@ -125,20 +90,16 @@ namespace geode
     void SectionBuilder::copy_component_geometry(
         const ComponentMapping& mapping, const Section& section )
     {
-        for( const auto& corner : section.corners() )
-        {
-            set_corner_mesh(
-                mapping.corners.at( corner.id() ), corner.mesh().clone() );
-        }
-        for( const auto& line : section.lines() )
-        {
-            set_line_mesh( mapping.lines.at( line.id() ), line.mesh().clone() );
-        }
-        for( const auto& surface : section.surfaces() )
-        {
-            set_surface_mesh(
-                mapping.surfaces.at( surface.id() ), surface.mesh().clone() );
-        }
+        detail::copy_corner_geometry( section, *this, mapping.corners );
+        detail::copy_line_geometry( section, *this, mapping.lines );
+        detail::copy_surface_geometry( section, *this, mapping.surfaces );
+        create_unique_vertices( section.nb_unique_vertices() );
+        detail::copy_vertex_identifier_components( section, *this,
+            Corner2D::component_type_static(), mapping.corners );
+        detail::copy_vertex_identifier_components(
+            section, *this, Line2D::component_type_static(), mapping.lines );
+        detail::copy_vertex_identifier_components( section, *this,
+            Surface2D::component_type_static(), mapping.surfaces );
     }
 
     const uuid& SectionBuilder::add_corner()
