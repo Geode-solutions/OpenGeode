@@ -151,6 +151,16 @@ void test_clone( const geode::Graph& graph )
         graph2->nb_edges() == 1, "[Test] Graph2 should have 1 edge" );
 }
 
+void test_delete_isolated_vertices(
+    const geode::Graph& graph, geode::GraphBuilder& builder )
+{
+    builder.delete_isolated_vertices();
+    OPENGEODE_EXCEPTION(
+        graph.nb_vertices() == 2, "[Test] Graph should have 2 vertices" );
+    OPENGEODE_EXCEPTION(
+        graph.nb_edges() == 1, "[Test] Graph2 should have 1 edge" );
+}
+
 int main()
 {
     using namespace geode;
@@ -168,6 +178,7 @@ int main()
         test_delete_vertex( *graph, *builder );
         test_delete_edge( *graph, *builder );
         test_clone( *graph );
+        test_delete_isolated_vertices( *graph, *builder );
 
         auto default_graph = Graph::create();
         OPENGEODE_EXCEPTION(
