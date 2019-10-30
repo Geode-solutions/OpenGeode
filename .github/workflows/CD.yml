@@ -66,15 +66,16 @@ jobs:
       run: |
         mkdir -p build
         cd build
-        set version=%GITHUB_REF:*tags/=%
-        echo "::set-output name=version::%version%"
-        cmake -G "Visual Studio 15 2017 Win64" -DOPENGEODE_WITH_TESTS:BOOL=OFF -DCPACK_PACKAGE_VERSION:STRING=%version% ..
+        version="${GITHUB_REF##*/*/}"
+        echo ::set-output name=version::$version
+        cmake -G "Visual Studio 15 2017 Win64" -DOPENGEODE_WITH_TESTS:BOOL=OFF -DCPACK_PACKAGE_VERSION:STRING=$version ..
         cmake --build . --config Release
         cd opengeode
         cmake --build . --target PACKAGE --config Release
+      shell: bash
     - name: Upload
       uses: softprops/action-gh-release@v1
       with:
-        files: "build/opengeode/OpenGeode-*-win64.zip"
+        files: "build/opengeode/OpenGeode-${{ steps.package.outputs.version }}-win64.zip"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}        
