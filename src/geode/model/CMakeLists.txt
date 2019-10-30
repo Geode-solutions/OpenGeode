@@ -79,6 +79,7 @@ set(advanced_headers
 target_link_libraries(${target_name}
     PUBLIC
         ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
         ${PROJECT_NAME}::mesh
         Bitsery::bitsery
         ghcFilesystem::ghc_filesystem

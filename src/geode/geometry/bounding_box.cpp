@@ -21,13 +21,14 @@
  *
  */
 
-#include <geode/basic/bounding_box.h>
+#include <geode/geometry/bounding_box.h>
 
 #include <limits>
 
 #include <geode/basic/logger.h>
 #include <geode/basic/pimpl_impl.h>
-#include <geode/basic/point.h>
+
+#include <geode/geometry/point.h>
 
 namespace geode
 {

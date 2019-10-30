@@ -2,9 +2,8 @@ set(sources
     "${lib_source_dir}/assert.cpp"
     "${lib_source_dir}/attribute_manager.cpp"
     "${lib_source_dir}/bitsery_archive.cpp"
-    "${lib_source_dir}/bounding_box.cpp"
+    "${lib_source_dir}/common.cpp"
     "${lib_source_dir}/logger.cpp"
-    "${lib_source_dir}/nn_search.cpp"
     "${lib_source_dir}/singleton.cpp"
     "${lib_source_dir}/uuid.cpp"
     "${lib_source_dir}/zip_file.cpp"
@@ -15,30 +14,23 @@ set(public_headers
     "${lib_include_dir}/attribute_manager.h"
     "${lib_include_dir}/attribute.h"
     "${lib_include_dir}/bitsery_archive.h"
-    "${lib_include_dir}/bounding_box.h"
     "${lib_include_dir}/common.h"
     "${lib_include_dir}/factory.h"
     "${lib_include_dir}/logger.h"
     "${lib_include_dir}/named_type.h"
-    "${lib_include_dir}/nn_search.h"
     "${lib_include_dir}/pimpl.h"
     "${lib_include_dir}/pimpl_impl.h"
-    "${lib_include_dir}/point.h"
     "${lib_include_dir}/range.h"
     "${lib_include_dir}/singleton.h"
     "${lib_include_dir}/types.h"
     "${lib_include_dir}/uuid.h"
-    "${lib_include_dir}/vector.h"
     "${lib_include_dir}/zip_file.h"
 )
 target_link_libraries(${target_name}
     PUBLIC
         Bitsery::bitsery
-        Threads::Threads
     PRIVATE
-        Async++
         spdlog::spdlog_header_only
-        nanoflann::nanoflann
         ghcFilesystem::ghc_filesystem
         MINIZIP::minizip
 )

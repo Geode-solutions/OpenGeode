@@ -31,7 +31,7 @@
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
-#include <geode/basic/vector.h>
+#include <geode/geometry/vector.h>
 
 #include <geode/mesh/builder/detail/mapping_after_deletion.h>
 #include <geode/mesh/builder/polygonal_surface_builder.h>

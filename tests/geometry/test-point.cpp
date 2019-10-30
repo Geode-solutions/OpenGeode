@@ -22,7 +22,7 @@
  */
 
 #include <geode/basic/logger.h>
-#include <geode/basic/point.h>
+#include <geode/geometry/point.h>
 
 void test_comparison()
 {

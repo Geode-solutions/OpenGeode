@@ -18,10 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-add_geode_test(test-algorithm.cpp ${PROJECT_NAME}::basic)
-add_geode_test(test-assert.cpp ${PROJECT_NAME}::basic)
-add_geode_test(test-attribute.cpp ${PROJECT_NAME}::basic)
-add_geode_test(test-factory.cpp ${PROJECT_NAME}::basic)
-add_geode_test(test-growable.cpp ${PROJECT_NAME}::basic)
-add_geode_test(test-logger.cpp ${PROJECT_NAME}::basic)
-add_geode_test(test-uuid.cpp ${PROJECT_NAME}::basic)
+add_geode_test(test-bounding-box.cpp ${PROJECT_NAME}::geometry)
+add_geode_test(test-nnsearch.cpp ${PROJECT_NAME}::geometry)
+add_geode_test(test-point.cpp ${PROJECT_NAME}::geometry)
+add_geode_test(test-vector.cpp ${PROJECT_NAME}::geometry)

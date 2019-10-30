@@ -23,8 +23,8 @@
 
 #include <geode/model/representation/core/brep.h>
 
-#include <geode/basic/bounding_box.h>
-#include <geode/basic/vector.h>
+#include <geode/geometry/bounding_box.h>
+#include <geode/geometry/vector.h>
 
 #include <geode/model/mixin/core/block.h>
 #include <geode/model/mixin/core/corner.h>
