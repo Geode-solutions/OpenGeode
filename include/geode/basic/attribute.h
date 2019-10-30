@@ -296,7 +296,7 @@ namespace geode
         template < typename Modifier >
         void modify_value( index_t element, Modifier&& modifier )
         {
-            modifier( reinterpret_cast< bool& >(values_.at( element ) ));
+            modifier( reinterpret_cast< bool& >( values_.at( element ) ) );
         }
 
         std::shared_ptr< AttributeBase > clone() const override

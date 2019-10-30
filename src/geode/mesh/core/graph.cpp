@@ -80,16 +80,20 @@ namespace geode
                 auto it = std::find( edges.begin(), edges.end(), edge_vertex );
                 if( it != edges.end() )
                 {
-                    edges_around_vertex_->modify_value( previous_vertex, 
-                        [&it](std::vector< EdgeVertex >& edges){edges.erase( it );} );
+                    edges_around_vertex_->modify_value( previous_vertex,
+                        [&it]( std::vector< EdgeVertex >& edges ) {
+                            edges.erase( it );
+                        } );
                 }
             }
             auto& edges = edges_around_vertex_->value( vertex_id );
             auto it = std::find( edges.begin(), edges.end(), edge_vertex );
             if( it == edges.end() )
             {
-                    edges_around_vertex_->modify_value( vertex_id, 
-                        [&edge_vertex](std::vector< EdgeVertex >& edges){edges.push_back( edge_vertex );} );
+                edges_around_vertex_->modify_value( vertex_id,
+                    [&edge_vertex]( std::vector< EdgeVertex >& edges ) {
+                        edges.push_back( edge_vertex );
+                    } );
             }
         }
 

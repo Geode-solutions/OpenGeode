@@ -137,19 +137,22 @@ namespace geode
                 if( it != NO_ID )
                 {
                     component_vertices_->modify_value( old_unique_id,
-                        [&it](std::vector< MeshComponentVertex >& vertices){
-                            vertices.erase( vertices.begin() + it );});
+                        [&it]( std::vector< MeshComponentVertex >& vertices ) {
+                            vertices.erase( vertices.begin() + it );
+                        } );
                 }
             }
-            vertex2unique_vertex_
-                    .at( component_vertex_id.component_id.id() )
-                    ->set_value( component_vertex_id.vertex, unique_vertex_id );
-            const auto& vertices = component_vertices_->value( unique_vertex_id );
+            vertex2unique_vertex_.at( component_vertex_id.component_id.id() )
+                ->set_value( component_vertex_id.vertex, unique_vertex_id );
+            const auto& vertices =
+                component_vertices_->value( unique_vertex_id );
             if( !contain( vertices, component_vertex_id ) )
             {
-                    component_vertices_->modify_value( unique_vertex_id,
-                        [&component_vertex_id](std::vector< MeshComponentVertex >& vertices){
-                            vertices.emplace_back( component_vertex_id );});
+                component_vertices_->modify_value( unique_vertex_id,
+                    [&component_vertex_id](
+                        std::vector< MeshComponentVertex >& vertices ) {
+                        vertices.emplace_back( component_vertex_id );
+                    } );
                 ;
             }
         }
@@ -232,8 +235,9 @@ namespace geode
                 }
                 if( contain( to_keep, false ) )
                 {
-                    component_vertices_->set_value( uv_id, extract_vector_elements(
-                        to_keep, mesh_component_vertices ) );
+                    component_vertices_->set_value(
+                        uv_id, extract_vector_elements(
+                                   to_keep, mesh_component_vertices ) );
                 }
             }
         }

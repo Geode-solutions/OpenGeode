@@ -59,10 +59,11 @@ namespace geode
             void set_edge_vertex(
                 const EdgeVertex& edge_vertex, index_t vertex_id )
             {
-                edges_->modify_value( edge_vertex.edge_id, 
-                    [&edge_vertex, vertex_id]( std::array< index_t, 2 >& array ){
-                        array.at(edge_vertex.vertex_id) = vertex_id;
-                    } ) ;
+                edges_->modify_value(
+                    edge_vertex.edge_id, [&edge_vertex, vertex_id](
+                                             std::array< index_t, 2 >& array ) {
+                        array.at( edge_vertex.vertex_id ) = vertex_id;
+                    } );
             }
 
             void register_attributes( Graph& graph )

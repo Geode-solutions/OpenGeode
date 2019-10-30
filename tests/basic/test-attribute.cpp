@@ -33,18 +33,18 @@ struct Foo
     {
         return double_ == foo.double_ || int_ == foo.int_;
     }
-    
+
     bool operator!=( const Foo& foo ) const
     {
         return double_ != foo.double_ || int_ != foo.int_;
     }
 
     template < typename Archive >
-        void serialize( Archive& archive )
-        {
-            archive.value8b( double_ );
-            archive.value4b( int_ );
-        }
+    void serialize( Archive& archive )
+    {
+        archive.value8b( double_ );
+        archive.value4b( int_ );
+    }
     double double_{ 0 };
     int int_{ 0 };
 };
@@ -72,11 +72,9 @@ void test_foo_constant_attribute( geode::AttributeManager& manager )
     auto constant_attribute =
         manager.find_or_create_attribute< geode::ConstantAttribute, Foo >(
             "foo_cst" );
-    constant_attribute->modify_value( []( Foo& foo )
-    {
-        foo.double_ = 12.4;
-    } );
-    OPENGEODE_EXCEPTION( constant_attribute->value().double_ == 12.4, "[Test] Should be equal to 12.4" );
+    constant_attribute->modify_value( []( Foo& foo ) { foo.double_ = 12.4; } );
+    OPENGEODE_EXCEPTION( constant_attribute->value().double_ == 12.4,
+        "[Test] Should be equal to 12.4" );
 }
 
 void test_foo_variable_attribute( geode::AttributeManager& manager )
@@ -84,12 +82,12 @@ void test_foo_variable_attribute( geode::AttributeManager& manager )
     auto variable_attribute =
         manager.find_or_create_attribute< geode::VariableAttribute, Foo >(
             "foo_var" );
-    variable_attribute->modify_value( 3, []( Foo& foo )
-    {
-        foo.double_ = 12.4;
-    } );
-    OPENGEODE_EXCEPTION( variable_attribute->value( 0 ).double_ == 0, "[Test] Should be equal to 12.4" );
-    OPENGEODE_EXCEPTION( variable_attribute->value( 3 ).double_ == 12.4, "[Test] Should be equal to 12.4" );
+    variable_attribute->modify_value(
+        3, []( Foo& foo ) { foo.double_ = 12.4; } );
+    OPENGEODE_EXCEPTION( variable_attribute->value( 0 ).double_ == 0,
+        "[Test] Should be equal to 12.4" );
+    OPENGEODE_EXCEPTION( variable_attribute->value( 3 ).double_ == 12.4,
+        "[Test] Should be equal to 12.4" );
 }
 
 void test_int_variable_attribute( geode::AttributeManager& manager )
@@ -114,13 +112,12 @@ void test_foo_sparse_attribute( geode::AttributeManager& manager )
 {
     auto sparse_attribute =
         manager.find_or_create_attribute< geode::SparseAttribute, Foo >(
-            "foo_spr");
-    sparse_attribute->modify_value( 3, []( Foo& foo )
-    {
-        foo.double_ = 12.4;
-    } );
-    OPENGEODE_EXCEPTION( sparse_attribute->value( 0 ).double_ == 0, "[Test] Should be equal to 12.4" );
-    OPENGEODE_EXCEPTION( sparse_attribute->value( 3 ).double_ == 12.4, "[Test] Should be equal to 12.4" );
+            "foo_spr" );
+    sparse_attribute->modify_value( 3, []( Foo& foo ) { foo.double_ = 12.4; } );
+    OPENGEODE_EXCEPTION( sparse_attribute->value( 0 ).double_ == 0,
+        "[Test] Should be equal to 12.4" );
+    OPENGEODE_EXCEPTION( sparse_attribute->value( 3 ).double_ == 12.4,
+        "[Test] Should be equal to 12.4" );
 }
 
 void test_double_sparse_attribute( geode::AttributeManager& manager )
@@ -219,8 +216,8 @@ void test_serialize_manager( geode::AttributeManager& manager )
     std::ofstream file{ filename, std::ofstream::binary };
     geode::TContext context{};
     geode::register_basic_serialize_pcontext( std::get< 0 >( context ) );
-    geode::AttributeManager::register_attribute_type<
-            Foo, geode::Serializer >( std::get< 0 >( context ) );
+    geode::AttributeManager::register_attribute_type< Foo, geode::Serializer >(
+        std::get< 0 >( context ) );
     geode::Serializer archive{ context, file };
     archive.object( manager );
     archive.adapter().flush();
@@ -232,8 +229,8 @@ void test_serialize_manager( geode::AttributeManager& manager )
     geode::TContext reload_context{};
     geode::register_basic_deserialize_pcontext(
         std::get< 0 >( reload_context ) );
-    geode::AttributeManager::register_attribute_type<
-            Foo, geode::Deserializer >( std::get< 0 >( reload_context ) );
+    geode::AttributeManager::register_attribute_type< Foo,
+        geode::Deserializer >( std::get< 0 >( reload_context ) );
     geode::Deserializer unarchive{ reload_context, infile };
     unarchive.object( reloaded_manager );
     auto& adapter = unarchive.adapter();
