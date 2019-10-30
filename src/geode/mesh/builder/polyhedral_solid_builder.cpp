@@ -85,12 +85,10 @@ namespace
         const geode::PolyhedralSolid< dimension >& solid,
         const std::vector< index_t >& vertices_old2new )
     {
-        std::vector< bool > polyhedra_to_delete(
-            solid.nb_polyhedra(), false );
+        std::vector< bool > polyhedra_to_delete( solid.nb_polyhedra(), false );
         for( auto p : geode::Range{ solid.nb_polyhedra() } )
         {
-            for( auto v :
-                geode::Range{ solid.nb_polyhedron_vertices( p ) } )
+            for( auto v : geode::Range{ solid.nb_polyhedron_vertices( p ) } )
             {
                 geode::PolyhedronVertex id{ p, v };
                 auto new_vertex =
@@ -224,7 +222,7 @@ namespace geode
             "polyhedron that does not exist" );
         OPENGEODE_EXCEPTION( polyhedron_vertex.vertex_id
                                  < polyhedral_solid_.nb_polyhedron_vertices(
-                                       polyhedron_vertex.polyhedron_id ),
+                                     polyhedron_vertex.polyhedron_id ),
             "[PolyhedralSolidBuilder::update_polyhedron_vertex] Accessing an "
             "invalid polyhedron vertex" );
         OPENGEODE_EXCEPTION( vertex_id < polyhedral_solid_.nb_vertices(),
@@ -322,7 +320,7 @@ namespace geode
             "polyhedron that does not exist" );
         OPENGEODE_EXCEPTION(
             polyhedron_facet.facet_id < polyhedral_solid_.nb_polyhedron_facets(
-                                            polyhedron_facet.polyhedron_id ),
+                polyhedron_facet.polyhedron_id ),
             "[PolyhedralSolidBuilder::set_polyhedron_adjacent] Accessing an "
             "invalid polyhedron vertex" );
         OPENGEODE_EXCEPTION( adjacent_id < polyhedral_solid_.nb_polyhedra()
