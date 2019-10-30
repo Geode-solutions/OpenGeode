@@ -80,22 +80,26 @@ namespace geode
         void set_polygon_vertex(
             const PolygonVertex& polygon_vertex, index_t vertex_id )
         {
-            triangle_vertices_->value( polygon_vertex.polygon_id )
-                .at( polygon_vertex.vertex_id ) = vertex_id;
+            triangle_vertices_->modify_value( polygon_vertex.polygon_id,
+             [&polygon_vertex, vertex_id](std::array< index_t, 3 >& array){
+                 array.at( polygon_vertex.vertex_id ) = vertex_id;
+             });
         }
 
         void set_polygon_adjacent(
             const PolygonEdge& polygon_edge, index_t adjacent_id )
         {
-            triangle_adjacents_->value( polygon_edge.polygon_id )
-                .at( polygon_edge.edge_id ) = adjacent_id;
+            triangle_adjacents_->modify_value( polygon_edge.polygon_id,
+             [&polygon_edge, adjacent_id](std::array< index_t, 3 >& array){
+                 array.at( polygon_edge.edge_id ) = adjacent_id;
+             });
         }
 
         void add_triangle(
             const OpenGeodeTriangulatedSurface< dimension >& surface,
             const std::array< index_t, 3 >& vertices )
         {
-            triangle_vertices_->value( surface.nb_polygons() - 1 ) = vertices;
+            triangle_vertices_->set_value( surface.nb_polygons() - 1, vertices );
         }
 
     private:

@@ -83,7 +83,7 @@ namespace geode
                 {
                     for( auto v : Range{ mesh.nb_vertices() } )
                     {
-                        attribute->value( v ) = it->second->value( v );
+                        attribute->set_value( v, it->second->value( v ) );
                     }
                 }
                 catch( const std::out_of_range& )
@@ -120,7 +120,7 @@ namespace geode
         void set_unique_vertex(
             MeshComponentVertex component_vertex_id, index_t unique_vertex_id )
         {
-            auto& old_unique_id =
+            const auto& old_unique_id =
                 vertex2unique_vertex_
                     .at( component_vertex_id.component_id.id() )
                     ->value( component_vertex_id.vertex );
@@ -131,19 +131,26 @@ namespace geode
 
             if( old_unique_id != NO_ID )
             {
-                auto& old_vertices =
+                const auto& old_vertices =
                     component_vertices_->value( old_unique_id );
                 auto it = find( old_vertices, component_vertex_id );
                 if( it != NO_ID )
                 {
-                    old_vertices.erase( old_vertices.begin() + it );
+                    component_vertices_->modify_value( old_unique_id,
+                        [&it](std::vector< MeshComponentVertex >& vertices){
+                            vertices.erase( vertices.begin() + it );});
                 }
             }
-            old_unique_id = unique_vertex_id;
-            auto& vertices = component_vertices_->value( unique_vertex_id );
+            vertex2unique_vertex_
+                    .at( component_vertex_id.component_id.id() )
+                    ->set_value( component_vertex_id.vertex, unique_vertex_id );
+            const auto& vertices = component_vertices_->value( unique_vertex_id );
             if( !contain( vertices, component_vertex_id ) )
             {
-                vertices.emplace_back( std::move( component_vertex_id ) );
+                    component_vertices_->modify_value( unique_vertex_id,
+                        [&component_vertex_id](std::vector< MeshComponentVertex >& vertices){
+                            vertices.emplace_back( component_vertex_id );});
+                ;
             }
         }
 
@@ -210,7 +217,7 @@ namespace geode
         {
             for( auto uv_id : Range{ nb_unique_vertices() } )
             {
-                auto& mesh_component_vertices =
+                const auto& mesh_component_vertices =
                     component_vertices_->value( uv_id );
 
                 std::vector< bool > to_keep(
@@ -225,8 +232,8 @@ namespace geode
                 }
                 if( contain( to_keep, false ) )
                 {
-                    mesh_component_vertices = extract_vector_elements(
-                        to_keep, mesh_component_vertices );
+                    component_vertices_->set_value( uv_id, extract_vector_elements(
+                        to_keep, mesh_component_vertices ) );
                 }
             }
         }

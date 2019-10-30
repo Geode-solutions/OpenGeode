@@ -124,9 +124,15 @@ namespace geode
             return value_;
         }
 
-        T& value()
+        void set_value( T value )
         {
-            return value_;
+            value_ = std::move( value );
+        }
+
+        template < typename Modifier >
+        void modify_value( Modifier&& modifier )
+        {
+            modifier( value_ );
         }
 
         std::shared_ptr< AttributeBase > clone() const override
@@ -189,9 +195,15 @@ namespace geode
             return values_.at( element );
         }
 
-        T& value( index_t element )
+        void set_value( index_t element, T value )
         {
-            return values_.at( element );
+            values_.at( element ) = std::move( value );
+        }
+
+        template < typename Modifier >
+        void modify_value( index_t element, Modifier&& modifier )
+        {
+            modifier( values_.at( element ) );
         }
 
         std::shared_ptr< AttributeBase > clone() const override
@@ -276,9 +288,15 @@ namespace geode
             return reinterpret_cast< const bool& >( values_.at( element ) );
         }
 
-        bool& value( index_t element )
+        void set_value( index_t element, bool value )
         {
-            return reinterpret_cast< bool& >( values_.at( element ) );
+            values_.at( element ) = std::move( value );
+        }
+
+        template < typename Modifier >
+        void modify_value( index_t element, Modifier&& modifier )
+        {
+            modifier( reinterpret_cast< bool& >(values_.at( element ) ));
         }
 
         std::shared_ptr< AttributeBase > clone() const override
@@ -365,6 +383,17 @@ namespace geode
                 return it->second;
             }
             return default_value_;
+        }
+
+        void set_value( index_t element, T value )
+        {
+            values_[element] = std::move( value );
+        }
+
+        template < typename Modifier >
+        void modify_value( index_t element, Modifier&& modifier )
+        {
+            modifier( values_[element] );
         }
 
         T& value( index_t element )

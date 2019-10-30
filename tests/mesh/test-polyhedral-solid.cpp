@@ -177,7 +177,7 @@ void test_create_vertex_attribute(
                              geode::PolyhedronFacetVertex >( "test" );
     for( auto v : geode::Range{ polyhedral_solid.nb_vertices() } )
     {
-        attribute->value( v ).vertex_id = v;
+        attribute->set_value( v, geode::PolyhedronFacetVertex{{v, v}, v} );
     }
 }
 
@@ -196,7 +196,7 @@ void test_clone( const geode::PolyhedralSolid3D& polyhedral_solid )
             .find_attribute< geode::PolyhedronFacetVertex >( "test" );
     for( auto v : geode::Range{ polyhedral_solid2->nb_vertices() } )
     {
-        geode::PolyhedronFacetVertex answer{ {}, v + 1 };
+        geode::PolyhedronFacetVertex answer{ {v + 1, v + 1}, v + 1 };
         OPENGEODE_EXCEPTION(
             attribute2->value( v ) != geode::PolyhedronFacetVertex{},
             "[Test] PolyhedralSolid2 attribute is not correct" );
