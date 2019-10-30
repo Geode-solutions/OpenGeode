@@ -65,8 +65,8 @@ namespace geode
                     .find_or_create_attribute< VariableAttribute,
                         RelationType >( "relation_type", NO_ID ) ),
               ids_( graph_.vertex_attribute_manager()
-                          .find_or_create_attribute< VariableAttribute, ComponentID >(
-                              "id" ) )
+                        .find_or_create_attribute< VariableAttribute,
+                            ComponentID >( "id" ) )
         {
         }
 
@@ -110,7 +110,8 @@ namespace geode
             return end_edge( vertex_id( id ) );
         }
 
-        const ComponentID& vertex_component_id( const EdgeVertex& edge_vertex ) const
+        const ComponentID& vertex_component_id(
+            const EdgeVertex& edge_vertex ) const
         {
             return ids_->value( graph_.edge_vertex( edge_vertex ) );
         }
@@ -139,8 +140,9 @@ namespace geode
                 graph_.edges_around_vertex( vertex_id( from ) );
             for( const auto& edge_vertex : edges_around )
             {
-                const auto& other = this->vertex_component_id( { edge_vertex.edge_id,
-                    ( edge_vertex.vertex_id + 1 ) % 2 } );
+                const auto& other =
+                    this->vertex_component_id( { edge_vertex.edge_id,
+                        ( edge_vertex.vertex_id + 1 ) % 2 } );
                 if( to == other.id()
                     && relation_type( edge_vertex.edge_id ) == type )
                 {
@@ -154,9 +156,9 @@ namespace geode
         {
             if( check_relation_exists( from, to, type ) )
             {
-                Logger::warn( "This relation already exists (", 
-                ids_->value(vertex_id( from )).type().get(), " and ",  
-                ids_->value(vertex_id( to )).type().get(), ")" );
+                Logger::warn( "This relation already exists (",
+                    ids_->value( vertex_id( from ) ).type().get(), " and ",
+                    ids_->value( vertex_id( to ) ).type().get(), ")" );
                 return;
             }
 

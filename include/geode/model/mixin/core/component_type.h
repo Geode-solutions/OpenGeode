@@ -43,7 +43,7 @@ namespace geode
     class ComponentID
     {
     public:
-        ComponentID() : ComponentID( ComponentType{"undefined"}, uuid{} ){}
+        ComponentID() : ComponentID( ComponentType{ "undefined" }, uuid{} ) {}
 
         ComponentID( ComponentType component_type, uuid id )
             : type_( std::move( component_type ) ), id_( std::move( id ) )

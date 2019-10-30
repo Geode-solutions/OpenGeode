@@ -34,7 +34,8 @@
 namespace
 {
     template < typename Component >
-    void register_new_component( geode::BRepBuilder& builder, const Component& component )
+    void register_new_component(
+        geode::BRepBuilder& builder, const Component& component )
     {
         builder.register_component( component.component_id() );
         builder.register_mesh_component( component );
