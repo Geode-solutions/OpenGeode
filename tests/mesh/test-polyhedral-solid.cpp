@@ -164,9 +164,9 @@ void test_io( const geode::PolyhedralSolid3D& polyhedral_solid,
                          .find_attribute< geode::index_t >( "test" );
     for( auto e : geode::Range{ new_polyhedral_solid->nb_facets() } )
     {
-        OPENGEODE_EXCEPTION(
-            attribute->value( e ) == e, "[Test] Reloaded PolyhedralSolid has "
-                                        "wrong attributes on its facets" );
+        OPENGEODE_EXCEPTION( attribute->value( e ) == e,
+            "[Test] Reloaded PolyhedralSolid has "
+            "wrong attributes on its facets" );
     }
 }
 

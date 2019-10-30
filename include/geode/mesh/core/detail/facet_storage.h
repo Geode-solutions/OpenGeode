@@ -42,9 +42,9 @@ namespace geode
             friend class bitsery::Access;
             FacetStorage()
                 : counter_(
-                      facet_attribute_manager_
-                          .template find_or_create_attribute< VariableAttribute,
-                              index_t >( "counter", 1 ) )
+                    facet_attribute_manager_
+                        .template find_or_create_attribute< VariableAttribute,
+                            index_t >( "counter", 1 ) )
             {
             }
 
@@ -103,8 +103,7 @@ namespace geode
             {
                 std::vector< bool > to_delete(
                     facet_attribute_manager_.nb_elements(), false );
-                for( auto e :
-                    Range{ facet_attribute_manager_.nb_elements() } )
+                for( auto e : Range{ facet_attribute_manager_.nb_elements() } )
                 {
                     if( counter_->value( e ) == 0 )
                     {
@@ -165,12 +164,11 @@ namespace geode
                         archive.ext( storage.facet_indices_,
                             bitsery::ext::StdMap{
                                 storage.facet_indices_.max_size() },
-                        []( Archive& archive, VertexCycle& cycle,
-                            index_t&
-                                attribute ) {
-                            archive.object( cycle );
-                            archive.value4b( attribute );
-                        } );
+                            []( Archive& archive, VertexCycle& cycle,
+                                index_t& attribute ) {
+                                archive.object( cycle );
+                                archive.value4b( attribute );
+                            } );
                         archive.ext(
                             storage.counter_, bitsery::ext::StdSmartPtr{} );
                     } );

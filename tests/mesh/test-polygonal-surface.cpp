@@ -337,9 +337,9 @@ void test_io( const geode::PolygonalSurface3D& polygonal_surface,
                          .find_attribute< geode::index_t >( "test" );
     for( auto e : geode::Range{ new_polygonal_surface->nb_edges() } )
     {
-        OPENGEODE_EXCEPTION(
-            attribute->value( e ) == e, "[Test] Reloaded PolygonalSurface has "
-                                        "wrong attributes on its edges" );
+        OPENGEODE_EXCEPTION( attribute->value( e ) == e,
+            "[Test] Reloaded PolygonalSurface has "
+            "wrong attributes on its edges" );
     }
 }
 
