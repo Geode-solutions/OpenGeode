@@ -37,32 +37,6 @@ namespace
     using geode::index_t;
 
     template < index_t dimension >
-    void update_polygon_vertices(
-        const geode::PolygonalSurface< dimension >& surface,
-        geode::PolygonalSurfaceBuilder< dimension >& builder,
-        const std::vector< index_t >& old2new )
-    {
-        std::vector< bool > polygons_to_delete( surface.nb_polygons(), false );
-        for( auto p : geode::Range{ surface.nb_polygons() } )
-        {
-            for( auto v : geode::Range{ surface.nb_polygon_vertices( p ) } )
-            {
-                geode::PolygonVertex id{ p, v };
-                auto new_vertex = old2new[surface.polygon_vertex( id )];
-                if( new_vertex == geode::NO_ID )
-                {
-                    polygons_to_delete[p] = true;
-                }
-                else
-                {
-                    builder.set_polygon_vertex( id, new_vertex );
-                }
-            }
-        }
-        builder.delete_polygons( polygons_to_delete );
-    }
-
-    template < index_t dimension >
     void update_polygon_adjacencies(
         const geode::PolygonalSurface< dimension >& surface,
         geode::PolygonalSurfaceBuilder< dimension >& builder,
@@ -81,6 +55,52 @@ namespace
                 builder.set_polygon_adjacent( id, new_adjacent );
             }
         }
+    }
+
+    template < index_t dimension >
+    void update_polygon_around_vertices(
+        const geode::PolygonalSurface< dimension >& surface,
+        geode::PolygonalSurfaceBuilder< dimension >& builder,
+        const std::vector< index_t >& vertices_old2new )
+    {
+        for( auto v : geode::Range{ surface.nb_vertices() } )
+        {
+            if( vertices_old2new[v] != geode::NO_ID )
+            {
+                auto new_polygon_around =
+                    builder.polygon_around_vertex( vertices_old2new[v] );
+                builder.associate_polygon_vertex_to_vertex(
+                    new_polygon_around, v );
+            }
+            else
+            {
+                builder.associate_polygon_vertex_to_vertex(
+                    geode::PolygonVertex{}, v );
+            }
+        }
+    }
+
+    template < index_t dimension >
+    std::vector< bool > find_polygons_to_delete(
+        const geode::PolygonalSurface< dimension >& surface,
+        const std::vector< index_t >& vertices_old2new )
+    {
+        std::vector< bool > polygons_to_delete( surface.nb_polygons(), false );
+
+        for( auto p : geode::Range{ surface.nb_polygons() } )
+        {
+            for( auto v : geode::Range{ surface.nb_polygon_vertices( p ) } )
+            {
+                geode::PolygonVertex id{ p, v };
+                auto new_vertex =
+                    vertices_old2new[surface.polygon_vertex( id )];
+                if( new_vertex == geode::NO_ID )
+                {
+                    polygons_to_delete[p] = true;
+                }
+            }
+        }
+        return polygons_to_delete;
     }
 } // namespace
 
@@ -168,18 +188,82 @@ namespace geode
     void PolygonalSurfaceBuilder< dimension >::set_polygon_vertex(
         const PolygonVertex& polygon_vertex, index_t vertex_id )
     {
+        auto polygon_vertex_id =
+            polygonal_surface_.polygon_vertex( polygon_vertex );
+        auto previous_id = polygonal_surface_.polygon_vertex(
+            polygonal_surface_.previous_polygon_vertex( polygon_vertex ) );
+        auto next_id = polygonal_surface_.polygon_vertex(
+            polygonal_surface_.next_polygon_edge( polygon_vertex ) );
+
+        auto polygon_around =
+            polygonal_surface_.polygon_around_vertex( polygon_vertex_id );
+        if( polygon_around == polygon_vertex )
+        {
+            auto polygons_around =
+                polygonal_surface_.polygons_around_vertex( polygon_vertex_id );
+            if( polygons_around.size() < 2 )
+            {
+                associate_polygon_vertex_to_vertex(
+                    PolygonVertex{}, polygon_vertex_id );
+            }
+            else
+            {
+                associate_polygon_vertex_to_vertex(
+                    polygons_around[1], polygon_vertex_id );
+            }
+        }
+
+        polygonal_surface_.update_edge_vertex(
+            { polygon_vertex_id, next_id }, 0, vertex_id );
+        polygonal_surface_.update_edge_vertex(
+            { previous_id, polygon_vertex_id }, 1, vertex_id );
+        polygonal_surface_.remove_isolated_edges();
+        update_polygon_vertex( polygon_vertex, vertex_id );
+    }
+
+    template < index_t dimension >
+    void PolygonalSurfaceBuilder< dimension >::update_polygon_vertices(
+        const std::vector< index_t >& old2new )
+    {
+        update_polygon_around_vertices( polygonal_surface_, *this, old2new );
+
+        auto polygons_to_delete =
+            find_polygons_to_delete( polygonal_surface_, old2new );
+        delete_polygons( polygons_to_delete );
+
+        for( auto p : geode::Range{ polygonal_surface_.nb_polygons() } )
+        {
+            for( auto v :
+                geode::Range{ polygonal_surface_.nb_polygon_vertices( p ) } )
+            {
+                geode::PolygonVertex id{ p, v };
+                auto new_vertex =
+                    old2new[polygonal_surface_.polygon_vertex( id )];
+                OPENGEODE_ASSERT( new_vertex != NO_ID,
+                    "[PolygonalSurfaceBuilder::update_polygon_vertices] No "
+                    "more polygons with vertices to delete should remain at "
+                    "this point" );
+                update_polygon_vertex( id, new_vertex );
+            }
+        }
+    }
+
+    template < index_t dimension >
+    void PolygonalSurfaceBuilder< dimension >::update_polygon_vertex(
+        const PolygonVertex& polygon_vertex, index_t vertex_id )
+    {
         OPENGEODE_EXCEPTION(
             polygon_vertex.polygon_id < polygonal_surface_.nb_polygons(),
-            "[PolygonalSurfaceBuilder::set_polygon_vertex] Accessing a polygon "
-            "that does not exist" );
+            "[PolygonalSurfaceBuilder::update_polygon_vertex] Accessing a "
+            "polygon that does not exist" );
         OPENGEODE_EXCEPTION(
             polygon_vertex.vertex_id < polygonal_surface_.nb_polygon_vertices(
                 polygon_vertex.polygon_id ),
-            "[PolygonalSurfaceBuilder::set_polygon_vertex] Accessing an "
+            "[PolygonalSurfaceBuilder::update_polygon_vertex] Accessing an "
             "invalid polygon vertex" );
         OPENGEODE_EXCEPTION( vertex_id < polygonal_surface_.nb_vertices(),
-            "[PolygonalSurfaceBuilder::set_polygon_vertex] Accessing a vertex "
-            "that does not exist" );
+            "[PolygonalSurfaceBuilder::update_polygon_vertex] Accessing a "
+            "vertex that does not exist" );
         associate_polygon_vertex_to_vertex( polygon_vertex, vertex_id );
         do_set_polygon_vertex( polygon_vertex, vertex_id );
     }
@@ -189,8 +273,8 @@ namespace geode
         const std::vector< bool >& to_delete )
     {
         auto old2new = mapping_after_deletion( to_delete );
+        update_polygon_vertices( old2new );
         update_edge_vertices( old2new );
-        update_polygon_vertices( polygonal_surface_, *this, old2new );
         do_delete_surface_vertices( to_delete );
     }
 
@@ -279,6 +363,22 @@ namespace geode
     void PolygonalSurfaceBuilder< dimension >::delete_polygons(
         const std::vector< bool >& to_delete )
     {
+        for( auto p : geode::Range{ polygonal_surface_.nb_polygons() } )
+        {
+            if( to_delete[p] )
+            {
+                for( auto e :
+                    geode::Range{ polygonal_surface_.nb_polygon_edges( p ) } )
+                {
+                    polygonal_surface_.remove_edge(
+                        { polygonal_surface_.polygon_edge_vertex( { p, e }, 0 ),
+                            polygonal_surface_.polygon_edge_vertex(
+                                { p, e }, 1 ) } );
+                }
+            }
+        }
+        polygonal_surface_.remove_isolated_edges();
+
         auto old2new = mapping_after_deletion( to_delete );
 
         for( auto v : geode::Range{ polygonal_surface_.nb_vertices() } )
@@ -307,26 +407,6 @@ namespace geode
             associate_polygon_vertex_to_vertex( new_polygon_vertex, v );
         }
 
-        std::vector< bool > edge_to_delete(
-            polygonal_surface_.nb_edges(), true );
-        for( auto p : geode::Range{ polygonal_surface_.nb_polygons() } )
-        {
-            if( to_delete[p] )
-            {
-                continue;
-            }
-            for( auto e :
-                geode::Range{ polygonal_surface_.nb_polygon_edges( p ) } )
-            {
-                auto edge_id = polygonal_surface_.polygon_edge( { p, e } );
-                edge_to_delete[edge_id] = false;
-            }
-        }
-
-        delete_edges( edge_to_delete );
-        polygonal_surface_.edge_attribute_manager().delete_elements(
-            edge_to_delete );
-
         update_polygon_adjacencies( polygonal_surface_, *this, old2new );
 
         polygonal_surface_.polygon_attribute_manager().delete_elements(
@@ -339,6 +419,19 @@ namespace geode
         const std::vector< index_t >& old2new )
     {
         polygonal_surface_.update_edge_vertices( old2new );
+    }
+
+    template < index_t dimension >
+    void PolygonalSurfaceBuilder< dimension >::update_edge_vertex(
+        const std::array< index_t, 2 >& edge_vertices,
+        index_t edge_vertex_id,
+        index_t new_vertex_id )
+    {
+        OPENGEODE_EXCEPTION( edge_vertex_id < 2,
+            "[PolygonalSurfaceBuilder::update_edge_vertex] "
+            "Accessing an invalid vertex in edge" );
+        polygonal_surface_.update_edge_vertex(
+            edge_vertices, edge_vertex_id, new_vertex_id );
     }
 
     template < index_t dimension >
