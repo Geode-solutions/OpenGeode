@@ -283,8 +283,7 @@ namespace geode
          */
         std::tuple< bool, PolygonEdge > polygon_edge_from_vertices(
             index_t from_vertex_id, index_t to_vertex_id ) const;
-        
-        
+
         /*!
          * Get the index of edge corresponding to given vertices
          * @param[in] vertices Ordered vertex indices

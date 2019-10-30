@@ -270,8 +270,7 @@ namespace geode
          * @param[in] facet_id Index of facet.
          * @warning Not implemented yet.
          */
-        double facet_area(
-            index_t facet_id  ) const;
+        double facet_area( index_t facet_id ) const;
 
         /*!
          * Return the barycenter of a polyhedron
@@ -283,8 +282,7 @@ namespace geode
          * Return the barycenter coordinates of a given facet.
          * @param[in] facet_id Index of facet.
          */
-        Point< dimension > facet_barycenter(
-            index_t facet_id ) const;
+        Point< dimension > facet_barycenter( index_t facet_id ) const;
 
         /*!
          * Get all the polyhedra with one of the vertices matching given vertex.
