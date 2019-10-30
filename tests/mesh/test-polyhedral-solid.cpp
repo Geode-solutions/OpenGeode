@@ -70,7 +70,7 @@ void test_create_facet_attribute(
                              geode::index_t >( "test" );
     for( auto e : geode::Range{ polyhedral_solid.nb_facets() } )
     {
-        attribute->value( e ) = e;
+        attribute->set_value( e, e );
     }
 }
 
