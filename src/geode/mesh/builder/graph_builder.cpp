@@ -142,7 +142,7 @@ namespace geode
     {
         auto old2new = mapping_after_deletion( to_delete );
 
-        for( auto v : geode::Range{ graph_.nb_vertices() } )
+        for( auto v : Range{ graph_.nb_vertices() } )
         {
             auto& edges = graph_.get_edges_around_vertex( v );
             std::vector< EdgeVertex > new_edges;
@@ -150,7 +150,7 @@ namespace geode
             for( auto&& edge : edges )
             {
                 edge.edge_id = old2new[edge.edge_id];
-                if( edge.edge_id != geode::NO_ID )
+                if( edge.edge_id != NO_ID )
                 {
                     new_edges.emplace_back( edge );
                 }
@@ -165,7 +165,7 @@ namespace geode
     void GraphBuilder::delete_isolated_vertices()
     {
         std::vector< bool > to_delete( graph_.nb_vertices(), false );
-        for( auto v : geode::Range{ graph_.nb_vertices() } )
+        for( auto v : Range{ graph_.nb_vertices() } )
         {
             const auto& edge_vertices = graph_.edges_around_vertex( v );
             if( edge_vertices.empty() )
