@@ -51,7 +51,6 @@ namespace
             std::array< geode::index_t, 4 >, Serializer >( context );
         geode::AttributeManager::register_attribute_type< geode::uuid,
             Serializer >( context );
-        
     }
 } // namespace
 

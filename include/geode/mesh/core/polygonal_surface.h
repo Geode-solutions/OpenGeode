@@ -249,8 +249,7 @@ namespace geode
          * Return the coordinates of the barycenter of a given polygon edge.
          * @param[in] polygon_edge Local index of edge in a polygon.
          */
-        Point< dimension > edge_barycenter(
-            index_t edge_id ) const;
+        Point< dimension > edge_barycenter( index_t edge_id ) const;
 
         /*!
          * Return the barycenter of a polygon
@@ -284,7 +283,7 @@ namespace geode
          */
         std::tuple< bool, PolygonEdge > polygon_edge_from_vertices(
             index_t from_vertex_id, index_t to_vertex_id ) const;
-        
+
         index_t edge_from_vertices(
             const std::array< index_t, 2 >& vertices ) const;
 
