@@ -85,6 +85,21 @@ namespace geode
             }
 
         private:
+            friend class bitsery::Access;
+            VertexCycle() = default;
+
+            friend class bitsery::Access;
+            template < typename Archive >
+            void serialize( Archive& archive )
+            {
+                archive.ext( *this, DefaultGrowable< Archive, VertexCycle >{},
+                    []( Archive& archive, VertexCycle& storage ) {
+                        archive.container4b(
+                            storage.vertices_, storage.vertices_.max_size() );
+                    } );
+            }
+
+        private:
             std::vector< index_t > vertices_;
         };
     } // namespace detail
