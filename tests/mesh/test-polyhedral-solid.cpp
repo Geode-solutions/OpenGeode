@@ -62,6 +62,18 @@ void test_create_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
         "[Test] PolyhedralSolid should have 11 facets" );
 }
 
+void test_create_facet_attribute(
+    const geode::PolyhedralSolid3D& polyhedral_solid )
+{
+    auto attribute = polyhedral_solid.facet_attribute_manager()
+                         .find_or_create_attribute< geode::VariableAttribute,
+                             geode::index_t >( "test" );
+    for( auto e : geode::Range{ polyhedral_solid.nb_facets() } )
+    {
+        attribute->value( e ) = e;
+    }
+}
+
 void test_polyhedron_adjacencies(
     const geode::PolyhedralSolid3D& polyhedral_solid,
     geode::PolyhedralSolidBuilder3D& builder )
@@ -138,6 +150,24 @@ void test_io( const geode::PolyhedralSolid3D& polyhedral_solid,
     auto new_polyhedral_solid = geode::PolyhedralSolid3D::create(
         geode::OpenGeodePolyhedralSolid3D::type_name_static() );
     load_polyhedral_solid( *new_polyhedral_solid, filename );
+
+    OPENGEODE_EXCEPTION( new_polyhedral_solid->nb_vertices() == 8,
+        "[Test] Reloaded PolyhedralSolid should have 8 vertices" );
+    OPENGEODE_EXCEPTION( new_polyhedral_solid->nb_facets() == 11,
+        "[Test] Reloaded PolyhedralSolid should have 11 edges" );
+    OPENGEODE_EXCEPTION( new_polyhedral_solid->nb_polyhedra() == 3,
+        "[Test] Reloaded PolyhedralSolid should have 3 polygons" );
+    OPENGEODE_EXCEPTION( new_polyhedral_solid->polyhedron_facet( { 1, 0 } )
+                             == polyhedral_solid.polyhedron_facet( { 1, 0 } ),
+        "[Test] Reloaded PolyhedralSolid has wrong polygon edge index" );
+    auto attribute = new_polyhedral_solid->facet_attribute_manager()
+                         .find_attribute< geode::index_t >( "test" );
+    for( auto e : geode::Range{ new_polyhedral_solid->nb_facets() } )
+    {
+        OPENGEODE_EXCEPTION(
+            attribute->value( e ) == e, "[Test] Reloaded PolyhedralSolid has "
+                                        "wrong attributes on its facets" );
+    }
 }
 
 void test_barycenters()
@@ -255,6 +285,7 @@ int main()
         test_create_vertices( *polyhedral_solid, *builder );
         test_create_vertex_attribute( *polyhedral_solid );
         test_create_polyhedra( *polyhedral_solid, *builder );
+        test_create_facet_attribute( *polyhedral_solid );
         test_polyhedron_adjacencies( *polyhedral_solid, *builder );
         auto base_file = "test." + polyhedral_solid->native_extension();
         test_io( *polyhedral_solid, base_file );
