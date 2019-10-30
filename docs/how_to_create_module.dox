@@ -79,5 +79,6 @@ Template repository contains some files. Here is information on these files:
  - `.gitattributes` - List of attributes on files and folders (e.g. ignored by GitHub for repository languages) 
  - `.gitignore` - List of files and folders ignored by Git.
  - `.releaserc` - Configuration file for semantic-release. Have a look at https://github.com/semantic-release/semantic-release it's great!
+ - `.github/workflows/{CI.yml,CD.yml}` - Configuration files for Github Actions (https://github.com/features/actions) for core formatting, core testing, release generation and upload, ... Be aware that the variables used in these files are configured for `OpenGeode-ModuleTemplate` repository. They have to be modified depending on your project and your needs.
 
 */
