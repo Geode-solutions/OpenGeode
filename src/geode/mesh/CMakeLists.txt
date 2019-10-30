@@ -113,6 +113,7 @@ set(advanced_headers
     "${lib_include_dir}/builder/detail/mapping_after_deletion.h"
     "${lib_include_dir}/builder/detail/register_builder.h"
     "${lib_include_dir}/core/detail/edges_impl.h"
+    "${lib_include_dir}/core/detail/facet_storage.h"
     "${lib_include_dir}/core/detail/points_impl.h"
     "${lib_include_dir}/core/detail/register_mesh.h"
     "${lib_include_dir}/core/detail/vertex_cycle.h"
@@ -139,5 +140,6 @@ set(advanced_headers
 target_link_libraries(${target_name} 
     PUBLIC 
         ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
         Bitsery::bitsery
 )

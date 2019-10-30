@@ -9,6 +9,8 @@
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
 
+#include <geode/geometry/bitsery_archive.h>
+
 #include <geode/model/mixin/core/bitsery_archive.h>
 #include <geode/model/mixin/core/block.h>
 #include <geode/model/mixin/core/corner.h>
@@ -163,6 +165,7 @@ namespace geode
             std::ofstream file{ filename, std::ofstream::binary };
             TContext context{};
             register_basic_serialize_pcontext( std::get< 0 >( context ) );
+            register_geometry_serialize_pcontext( std::get< 0 >( context ) );
             register_mesh_serialize_pcontext( std::get< 0 >( context ) );
             register_model_serialize_pcontext( std::get< 0 >( context ) );
             Serializer archive{ context, file };
@@ -180,6 +183,7 @@ namespace geode
             std::ifstream file{ filename, std::ifstream::binary };
             TContext context{};
             register_basic_deserialize_pcontext( std::get< 0 >( context ) );
+            register_geometry_deserialize_pcontext( std::get< 0 >( context ) );
             register_mesh_deserialize_pcontext( std::get< 0 >( context ) );
             register_model_deserialize_pcontext( std::get< 0 >( context ) );
             Deserializer archive{ context, file };

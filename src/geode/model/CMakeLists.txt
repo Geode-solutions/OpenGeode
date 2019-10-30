@@ -70,6 +70,7 @@ set(advanced_headers
     "${lib_include_dir}/mixin/core/detail/components_storage.h"
     "${lib_include_dir}/mixin/core/detail/mesh_storage.h"
     "${lib_include_dir}/mixin/core/detail/uuid_to_index.h"
+    "${lib_include_dir}/representation/builder/detail/copy.h"
     "${lib_include_dir}/representation/io/detail/geode_brep_input.h"
     "${lib_include_dir}/representation/io/detail/geode_section_input.h"
     "${lib_include_dir}/representation/io/detail/geode_brep_output.h"
@@ -78,6 +79,7 @@ set(advanced_headers
 target_link_libraries(${target_name}
     PUBLIC
         ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
         ${PROJECT_NAME}::mesh
         Bitsery::bitsery
         ghcFilesystem::ghc_filesystem

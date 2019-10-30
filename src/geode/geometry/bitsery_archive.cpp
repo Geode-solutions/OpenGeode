@@ -21,45 +21,32 @@
  *
  */
 
-#include <geode/basic/bitsery_archive.h>
-
-#include <bitsery/brief_syntax/array.h>
+#include <geode/geometry/bitsery_archive.h>
 
 #include <geode/basic/attribute_manager.h>
-#include <geode/basic/uuid.h>
+
+#include <geode/geometry/point.h>
 
 namespace
 {
     template < typename Serializer >
     void register_pcontext( geode::PContext& context )
     {
-        geode::AttributeManager::register_attribute_type< bool, Serializer >(
-            context );
-        geode::AttributeManager::register_attribute_type< int, Serializer >(
-            context );
-        geode::AttributeManager::register_attribute_type< double, Serializer >(
-            context );
-        geode::AttributeManager::register_attribute_type< geode::index_t,
+        geode::AttributeManager::register_attribute_type< geode::Point2D,
             Serializer >( context );
-        geode::AttributeManager::register_attribute_type<
-            std::array< geode::index_t, 2 >, Serializer >( context );
-        geode::AttributeManager::register_attribute_type<
-            std::array< geode::index_t, 3 >, Serializer >( context );
-        geode::AttributeManager::register_attribute_type<
-            std::array< geode::index_t, 4 >, Serializer >( context );
-        geode::AttributeManager::register_attribute_type< geode::uuid,
+        geode::AttributeManager::register_attribute_type< geode::Point3D,
             Serializer >( context );
     }
 } // namespace
 
 namespace geode
 {
-    void register_basic_serialize_pcontext( PContext& context )
+    void register_geometry_serialize_pcontext( PContext& context )
     {
         register_pcontext< Serializer >( context );
     }
 
-    void register_basic_deserialize_pcontext( PContext& context )
+    void register_geometry_deserialize_pcontext( PContext& context )
     {
         register_pcontext< Deserializer >( context );
     }

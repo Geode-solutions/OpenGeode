@@ -119,6 +119,11 @@ namespace geode
         void delete_polyhedra( const std::vector< bool >& to_delete );
 
         /*!
+         * Delete all the isolated vertices (not used as polyhedron vertices)
+         */
+        void delete_isolated_vertices();
+
+        /*!
          * Return one polyhedron with one of the vertices matching given vertex.
          * @param[in] vertex_id Index of the vertex.
          * @detail If vertex is isolated (no incident polyhedron), default
@@ -177,7 +182,17 @@ namespace geode
         virtual void do_set_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet, index_t adjacent_id ) = 0;
 
+        void update_polyhedron_vertex(
+            const PolyhedronVertex& polyhedron_vertex, index_t vertex_id );
+
+        void update_polyhedron_vertices(
+            const std::vector< index_t >& old2new );
+
         void delete_facets( const std::vector< bool >& to_delete );
+
+        void update_facet_vertex( const std::vector< index_t >& facet_vertices,
+            index_t facet_vertex_id,
+            index_t new_vertex_id );
 
         void update_facet_vertices( const std::vector< index_t >& old2new );
 

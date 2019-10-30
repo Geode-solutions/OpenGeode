@@ -21,13 +21,14 @@
  *
  */
 
-#include <geode/basic/bounding_box.h>
+#include <geode/geometry/bounding_box.h>
 
 #include <limits>
 
 #include <geode/basic/logger.h>
 #include <geode/basic/pimpl_impl.h>
-#include <geode/basic/point.h>
+
+#include <geode/geometry/point.h>
 
 namespace geode
 {
@@ -212,6 +213,6 @@ namespace geode
         return true;
     }
 
-    template class opengeode_basic_api BoundingBox< 2 >;
-    template class opengeode_basic_api BoundingBox< 3 >;
+    template class opengeode_geometry_api BoundingBox< 2 >;
+    template class opengeode_geometry_api BoundingBox< 3 >;
 } // namespace geode

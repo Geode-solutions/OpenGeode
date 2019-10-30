@@ -22,7 +22,7 @@
  */
 
 #include <geode/basic/logger.h>
-#include <geode/basic/point.h>
+#include <geode/geometry/point.h>
 
 #include <geode/mesh/builder/geode_triangulated_surface_builder.h>
 #include <geode/mesh/core/geode_triangulated_surface.h>
@@ -128,6 +128,34 @@ void test_clone( const geode::TriangulatedSurface3D& surface )
         "[Test] TriangulatedSurface2 should have 3 edges" );
     OPENGEODE_EXCEPTION( surface2->nb_polygons() == 1,
         "[Test] TriangulatedSurface2 should have 1 polygon" );
+}
+
+void test_delete_all( const geode::TriangulatedSurface3D& triangulated_surface,
+    geode::TriangulatedSurfaceBuilder3D& builder )
+{
+    builder.delete_isolated_vertices();
+    OPENGEODE_EXCEPTION( triangulated_surface.nb_vertices() == 3,
+        "[Test]TriangulatedSurface should have 3 vertices" );
+    OPENGEODE_EXCEPTION( triangulated_surface.nb_edges() == 3,
+        "[Test]TriangulatedSurface should have 3 edges" );
+    OPENGEODE_EXCEPTION( triangulated_surface.nb_polygons() == 1,
+        "[Test]TriangulatedSurface should have 1 polygon" );
+
+    std::vector< bool > to_delete( triangulated_surface.nb_polygons(), true );
+    builder.delete_polygons( to_delete );
+    OPENGEODE_EXCEPTION( triangulated_surface.nb_vertices() == 3,
+        "[Test]TriangulatedSurface should have 3 vertices" );
+    OPENGEODE_EXCEPTION( triangulated_surface.nb_edges() == 0,
+        "[Test]TriangulatedSurface should have 0 edge" );
+    OPENGEODE_EXCEPTION( triangulated_surface.nb_polygons() == 0,
+        "[Test]TriangulatedSurface should have 0 polygon" );
+    OPENGEODE_EXCEPTION(
+        triangulated_surface.polygons_around_vertex( 0 ).empty(),
+        "[Test] No more polygon around vertices" );
+
+    builder.delete_isolated_vertices();
+    OPENGEODE_EXCEPTION( triangulated_surface.nb_vertices() == 0,
+        "[Test]TriangulatedSurface should have 0 vertex" );
 }
 
 int main()

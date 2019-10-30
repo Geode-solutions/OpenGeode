@@ -26,7 +26,7 @@
 #include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/logger.h>
-#include <geode/basic/point.h>
+#include <geode/geometry/point.h>
 
 #include <geode/mesh/builder/geode_point_set_builder.h>
 #include <geode/mesh/core/geode_point_set.h>

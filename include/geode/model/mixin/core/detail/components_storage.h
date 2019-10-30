@@ -34,6 +34,8 @@
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/uuid.h>
 
+#include <geode/geometry/bitsery_archive.h>
+
 #include <geode/mesh/core/bitsery_archive.h>
 #include <geode/mesh/core/mesh_type.h>
 
@@ -126,6 +128,8 @@ namespace geode
                 TContext& context ) const
             {
                 register_basic_serialize_pcontext( std::get< 0 >( context ) );
+                register_geometry_serialize_pcontext(
+                    std::get< 0 >( context ) );
                 register_mesh_serialize_pcontext( std::get< 0 >( context ) );
                 register_model_serialize_pcontext( std::get< 0 >( context ) );
             }
@@ -134,6 +138,8 @@ namespace geode
                 TContext& context ) const
             {
                 register_basic_deserialize_pcontext( std::get< 0 >( context ) );
+                register_geometry_deserialize_pcontext(
+                    std::get< 0 >( context ) );
                 register_mesh_deserialize_pcontext( std::get< 0 >( context ) );
                 register_model_deserialize_pcontext( std::get< 0 >( context ) );
             }

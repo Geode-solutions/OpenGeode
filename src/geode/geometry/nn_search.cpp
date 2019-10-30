@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/basic/nn_search.h>
+#include <geode/geometry/nn_search.h>
 
 #include <numeric>
 
@@ -208,6 +208,6 @@ namespace geode
         return { mapping, unique_points };
     }
 
-    template class opengeode_basic_api NNSearch< 2 >;
-    template class opengeode_basic_api NNSearch< 3 >;
+    template class opengeode_geometry_api NNSearch< 2 >;
+    template class opengeode_geometry_api NNSearch< 3 >;
 } // namespace geode

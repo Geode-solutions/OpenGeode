@@ -29,9 +29,10 @@
 
 #include <bitsery/bitsery.h>
 
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/common.h>
 #include <geode/basic/range.h>
+
+#include <geode/geometry/bitsery_archive.h>
+#include <geode/geometry/common.h>
 
 namespace geode
 {

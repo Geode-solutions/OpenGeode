@@ -24,7 +24,7 @@
 #include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/logger.h>
-#include <geode/basic/point.h>
+#include <geode/geometry/point.h>
 
 #include <geode/mesh/builder/geode_polyhedral_solid_builder.h>
 #include <geode/mesh/core/geode_polyhedral_solid.h>
@@ -205,6 +205,43 @@ void test_clone( const geode::PolyhedralSolid3D& polyhedral_solid )
     }
 }
 
+void test_set_polyhedron_vertex(
+    const geode::PolyhedralSolid3D& polyhedral_solid,
+    geode::PolyhedralSolidBuilder3D& builder )
+{
+    auto facet_id = polyhedral_solid.polyhedron_facet( { 0, 1 } );
+    builder.set_polyhedron_vertex( { 0, 2 }, 1 );
+
+    OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_vertex( { 0, 2 } ) == 1,
+        "[Test] PolyhedronVertex after set_polyhedron_vertex is wrong" );
+    OPENGEODE_EXCEPTION(
+        polyhedral_solid.polyhedron_facet_vertex( { { 0, 1 }, 1 } ) == 1,
+        "[Test] PolyhedronFacetVertex after set_polyhedron_vertex is wrong" );
+    OPENGEODE_EXCEPTION(
+        polyhedral_solid.polyhedron_facet( { 0, 1 } ) == facet_id,
+        "[Test] Polyhedron facet id after set_polyhedron_vertex is wrong" );
+}
+
+void test_delete_all( const geode::PolyhedralSolid3D& polyhedral_solid,
+    geode::PolyhedralSolidBuilder3D& builder )
+{
+    std::vector< bool > to_delete( polyhedral_solid.nb_polyhedra(), true );
+    builder.delete_polyhedra( to_delete );
+
+    OPENGEODE_EXCEPTION( polyhedral_solid.nb_vertices() == 7,
+        "[Test] PolyhedralSolid should have 7 vertices" );
+    OPENGEODE_EXCEPTION( polyhedral_solid.nb_facets() == 0,
+        "[Test] PolyhedralSolid should have 0 facet" );
+    OPENGEODE_EXCEPTION( polyhedral_solid.nb_polyhedra() == 0,
+        "[Test] PolyhedralSolid should have 0 polyhedron" );
+    OPENGEODE_EXCEPTION( polyhedral_solid.polyhedra_around_vertex( 0 ).empty(),
+        "[Test] No more polyhedra around vertices" );
+
+    builder.delete_isolated_vertices();
+    OPENGEODE_EXCEPTION( polyhedral_solid.nb_vertices() == 0,
+        "[Test]PolyhedralSolid should have 0 vertex" );
+}
+
 int main()
 {
     using namespace geode;
@@ -225,6 +262,8 @@ int main()
         test_delete_vertex( *polyhedral_solid, *builder );
         test_delete_polyhedra( *polyhedral_solid, *builder );
         test_clone( *polyhedral_solid );
+        test_set_polyhedron_vertex( *polyhedral_solid, *builder );
+        test_delete_all( *polyhedral_solid, *builder );
 
         test_barycenters();
 

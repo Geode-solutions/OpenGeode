@@ -32,8 +32,8 @@
 OpenGeode is supported and continuously tested on several platforms:
 
 * Windows - Visual Studio 2017
-* Ubuntu 16.04
-* macOS X High Sierra (10.13)
+* Ubuntu 18.04
+* macOS X Mojave (10.14)
 
 Pre-compiled binaries on these three platforms are also provided. \link opengeode_where_to_get_binaries This page\endlink describes where to download these binaries.
 

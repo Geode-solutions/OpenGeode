@@ -32,7 +32,7 @@
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
-#include <geode/basic/point.h>
+#include <geode/geometry/point.h>
 
 #include <geode/mesh/core/detail/points_impl.h>
 

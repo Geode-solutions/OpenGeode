@@ -116,6 +116,11 @@ namespace geode
         void delete_polygons( const std::vector< bool >& to_delete );
 
         /*!
+         * Delete all the isolated vertices (not used as polygon vertices)
+         */
+        void delete_isolated_vertices();
+
+        /*!
          * Return one polygon with one of the vertices matching given vertex.
          * @param[in] vertex_id Index of the vertex.
          * @detail If vertex is isolated (no incident polygon), default
@@ -168,7 +173,16 @@ namespace geode
 
         void delete_edges( const std::vector< bool >& to_delete );
 
+        void update_polygon_vertex(
+            const PolygonVertex& polygon_vertex, index_t vertex_id );
+
+        void update_polygon_vertices( const std::vector< index_t >& old2new );
+
         void update_edge_vertices( const std::vector< index_t >& old2new );
+
+        void update_edge_vertex( const std::array< index_t, 2 >& edge_vertices,
+            index_t edge_vertex_id,
+            index_t new_vertex_id );
 
     private:
         PolygonalSurface< dimension >& polygonal_surface_;

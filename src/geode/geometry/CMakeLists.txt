@@ -1,0 +1,23 @@
+set(sources
+    "${lib_source_dir}/bitsery_archive.cpp"
+    "${lib_source_dir}/bounding_box.cpp"
+    "${lib_source_dir}/common.cpp"
+    "${lib_source_dir}/nn_search.cpp"
+)
+set(public_headers
+    "${lib_include_dir}/bitsery_archive.h"
+    "${lib_include_dir}/bounding_box.h"
+    "${lib_include_dir}/common.h"
+    "${lib_include_dir}/nn_search.h"
+    "${lib_include_dir}/point.h"
+    "${lib_include_dir}/vector.h"
+)
+target_link_libraries(${target_name}
+    PUBLIC
+        Bitsery::bitsery
+        Threads::Threads
+        ${PROJECT_NAME}::basic
+    PRIVATE
+        Async++
+        nanoflann::nanoflann
+)

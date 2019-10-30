@@ -312,7 +312,15 @@ namespace geode
 
         void update_facet_vertices( const std::vector< index_t >& old2new );
 
+        void update_facet_vertex( const std::vector< index_t >& facet_vertices,
+            index_t facet_vertex_id,
+            index_t new_vertex_id );
+
+        void remove_facet( const std::vector< index_t >& facet_vertices );
+
         void delete_facets( const std::vector< bool >& to_delete );
+
+        void remove_isolated_facets();
 
         virtual index_t get_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex ) const = 0;

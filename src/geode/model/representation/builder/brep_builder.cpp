@@ -23,16 +23,12 @@
 
 #include <geode/model/representation/builder/brep_builder.h>
 
-#include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/core/point_set.h>
-#include <geode/mesh/core/polygonal_surface.h>
-#include <geode/mesh/core/polyhedral_solid.h>
-
 #include <geode/model/mixin/core/block.h>
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/line.h>
 #include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
+#include <geode/model/representation/builder/detail/copy.h>
 #include <geode/model/representation/core/brep.h>
 
 namespace geode
@@ -60,83 +56,25 @@ namespace geode
         const BRep& brep )
     {
         ComponentMapping mapping;
-        for( const auto& corner : brep.corners() )
-        {
-            mapping.corners.emplace(
-                corner.id(), add_corner( corner.mesh().type_name() ) );
-        }
-        for( const auto& line : brep.lines() )
-        {
-            mapping.lines.emplace(
-                line.id(), add_line( line.mesh().type_name() ) );
-        }
-        for( const auto& surface : brep.surfaces() )
-        {
-            mapping.surfaces.emplace(
-                surface.id(), add_surface( surface.mesh().type_name() ) );
-        }
-        for( const auto& block : brep.blocks() )
-        {
-            mapping.blocks.emplace(
-                block.id(), add_block( block.mesh().type_name() ) );
-        }
-        for( const auto& model_boundary : brep.model_boundaries() )
-        {
-            mapping.model_boundaries.emplace(
-                model_boundary.id(), add_model_boundary() );
-        }
+        mapping.corners = detail::copy_corner_components( brep, brep_, *this );
+        mapping.lines = detail::copy_line_components( brep, brep_, *this );
+        mapping.surfaces =
+            detail::copy_surface_components( brep, brep_, *this );
+        mapping.blocks = detail::copy_block_components( brep, brep_, *this );
+        mapping.model_boundaries =
+            detail::copy_model_boundary_components( brep, *this );
         return mapping;
     }
 
     void BRepBuilder::copy_component_relationships(
         const ComponentMapping& mapping, const BRep& brep )
     {
-        for( const auto& line : brep.lines() )
-        {
-            const auto& new_line = brep_.line( mapping.lines.at( line.id() ) );
-            for( const auto& corner : brep.boundaries( line ) )
-            {
-                const auto& new_corner =
-                    brep_.corner( mapping.corners.at( corner.id() ) );
-                add_corner_line_boundary_relationship( new_corner, new_line );
-            }
-        }
-        for( const auto& surface : brep.surfaces() )
-        {
-            const auto& new_surface =
-                brep_.surface( mapping.surfaces.at( surface.id() ) );
-            for( const auto& line : brep.boundaries( surface ) )
-            {
-                const auto& new_line =
-                    brep_.line( mapping.lines.at( line.id() ) );
-                add_line_surface_boundary_relationship( new_line, new_surface );
-            }
-            for( const auto& line : brep.internals( surface ) )
-            {
-                const auto& new_line =
-                    brep_.line( mapping.lines.at( line.id() ) );
-                add_line_surface_internal_relationship( new_line, new_surface );
-            }
-        }
-        for( const auto& block : brep.blocks() )
-        {
-            const auto& new_block =
-                brep_.block( mapping.blocks.at( block.id() ) );
-            for( const auto& surface : brep.boundaries( block ) )
-            {
-                const auto& new_surface =
-                    brep_.surface( mapping.surfaces.at( surface.id() ) );
-                add_surface_block_boundary_relationship(
-                    new_surface, new_block );
-            }
-            for( const auto& surface : brep.internals( block ) )
-            {
-                const auto& new_surface =
-                    brep_.surface( mapping.surfaces.at( surface.id() ) );
-                add_surface_block_internal_relationship(
-                    new_surface, new_block );
-            }
-        }
+        detail::copy_corner_line_relationships(
+            brep, brep_, *this, mapping.corners, mapping.lines );
+        detail::copy_line_surface_relationships(
+            brep, brep_, *this, mapping.lines, mapping.surfaces );
+        detail::copy_surface_block_relationships(
+            brep, brep_, *this, mapping.surfaces, mapping.blocks );
         for( const auto& model_boundary : brep.model_boundaries() )
         {
             const auto& new_model_boundary = brep_.model_boundary(
@@ -154,25 +92,19 @@ namespace geode
     void BRepBuilder::copy_component_geometry(
         const ComponentMapping& mapping, const BRep& brep )
     {
-        for( const auto& corner : brep.corners() )
-        {
-            set_corner_mesh(
-                mapping.corners.at( corner.id() ), corner.mesh().clone() );
-        }
-        for( const auto& line : brep.lines() )
-        {
-            set_line_mesh( mapping.lines.at( line.id() ), line.mesh().clone() );
-        }
-        for( const auto& surface : brep.surfaces() )
-        {
-            set_surface_mesh(
-                mapping.surfaces.at( surface.id() ), surface.mesh().clone() );
-        }
-        for( const auto& block : brep.blocks() )
-        {
-            set_block_mesh(
-                mapping.blocks.at( block.id() ), block.mesh().clone() );
-        }
+        detail::copy_corner_geometry( brep, brep_, *this, mapping.corners );
+        detail::copy_line_geometry( brep, brep_, *this, mapping.lines );
+        detail::copy_surface_geometry( brep, brep_, *this, mapping.surfaces );
+        detail::copy_block_geometry( brep, brep_, *this, mapping.blocks );
+        create_unique_vertices( brep.nb_unique_vertices() );
+        detail::copy_vertex_identifier_components(
+            brep, *this, Corner3D::component_type_static(), mapping.corners );
+        detail::copy_vertex_identifier_components(
+            brep, *this, Line3D::component_type_static(), mapping.lines );
+        detail::copy_vertex_identifier_components(
+            brep, *this, Surface3D::component_type_static(), mapping.surfaces );
+        detail::copy_vertex_identifier_components(
+            brep, *this, Block3D::component_type_static(), mapping.blocks );
     }
 
     const uuid& BRepBuilder::add_corner()
@@ -244,6 +176,38 @@ namespace geode
         const auto& id = create_model_boundary();
         register_component( id );
         return id;
+    }
+
+    void BRepBuilder::update_corner_mesh(
+        const Corner3D& corner, std::unique_ptr< PointSet3D > mesh )
+    {
+        unregister_mesh_component( corner );
+        set_corner_mesh( corner.id(), std::move( mesh ) );
+        register_mesh_component( corner );
+    }
+
+    void BRepBuilder::update_line_mesh(
+        const Line3D& line, std::unique_ptr< EdgedCurve3D > mesh )
+    {
+        unregister_mesh_component( line );
+        set_line_mesh( line.id(), std::move( mesh ) );
+        register_mesh_component( line );
+    }
+
+    void BRepBuilder::update_surface_mesh(
+        const Surface3D& surface, std::unique_ptr< PolygonalSurface3D > mesh )
+    {
+        unregister_mesh_component( surface );
+        set_surface_mesh( surface.id(), std::move( mesh ) );
+        register_mesh_component( surface );
+    }
+
+    void BRepBuilder::update_block_mesh(
+        const Block3D& block, std::unique_ptr< PolyhedralSolid3D > mesh )
+    {
+        unregister_mesh_component( block );
+        set_block_mesh( block.id(), std::move( mesh ) );
+        register_mesh_component( block );
     }
 
     void BRepBuilder::remove_corner( const Corner3D& corner )

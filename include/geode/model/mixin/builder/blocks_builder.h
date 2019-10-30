@@ -56,9 +56,6 @@ namespace geode
 
         void set_block_name( const uuid& id, std::string name );
 
-        void set_block_mesh( const uuid& id,
-            std::unique_ptr< PolyhedralSolid< dimension > > mesh );
-
     protected:
         BlocksBuilder( Blocks< dimension >& blocks ) : blocks_( blocks ) {}
 
@@ -67,6 +64,9 @@ namespace geode
         const uuid& create_block( const MeshType& type );
 
         void delete_block( const Block< dimension >& block );
+
+        void set_block_mesh( const uuid& id,
+            std::unique_ptr< PolyhedralSolid< dimension > > mesh );
 
     private:
         Blocks< dimension >& blocks_;

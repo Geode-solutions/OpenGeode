@@ -28,11 +28,11 @@
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
-#include <geode/basic/vector.h>
+#include <geode/geometry/vector.h>
 
 #include <geode/mesh/builder/detail/mapping_after_deletion.h>
 #include <geode/mesh/builder/polyhedral_solid_builder.h>
-#include <geode/mesh/core/detail/vertex_cycle.h>
+#include <geode/mesh/core/detail/facet_storage.h>
 #include <geode/mesh/core/geode_polyhedral_solid.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
 
@@ -88,7 +88,7 @@ namespace
 namespace geode
 {
     template < index_t dimension >
-    class PolyhedralSolid< dimension >::Impl
+    class PolyhedralSolid< dimension >::Impl : public detail::FacetStorage
     {
     public:
         explicit Impl( PolyhedralSolid& solid )
@@ -115,65 +115,42 @@ namespace geode
 
         index_t find_facet( const std::vector< index_t >& facet_vertices ) const
         {
-            auto itr = facet_indices_.find( facet_vertices );
-            if( itr != facet_indices_.end() )
-            {
-                return facet_indices_.at( facet_vertices );
-            }
-            return NO_ID;
+            return FacetStorage::find_facet( facet_vertices );
         }
 
         index_t find_or_create_facet(
             const std::vector< index_t >& facet_vertices )
         {
-            auto size = facet_indices_.size();
-            auto id = find_facet( facet_vertices );
-            if( id != NO_ID )
-            {
-                return id;
-            }
-            facet_indices_[facet_vertices] = size;
-            facet_attribute_manager_.resize( size + 1 );
-            return size;
+            return this->add_facet( facet_vertices );
+        }
+
+        void update_facet_vertex( const std::vector< index_t >& facet_vertices,
+            index_t facet_vertex_id,
+            index_t new_vertex_id )
+        {
+            auto updated_facet_vertices = facet_vertices;
+            updated_facet_vertices[facet_vertex_id] = new_vertex_id;
+            this->replace_facet( facet_vertices, updated_facet_vertices );
         }
 
         void update_facet_vertices( const std::vector< index_t >& old2new )
         {
-            auto old_facet_indices = facet_indices_;
-            facet_indices_.clear();
-            facet_indices_.reserve( old_facet_indices.size() );
-            for( const auto& cycle : old_facet_indices )
-            {
-                auto updated_vertices = cycle.first.vertices();
-                for( auto& v : updated_vertices )
-                {
-                    v = old2new[v];
-                }
-                detail::VertexCycle updated_cycle{ updated_vertices };
-                facet_indices_[updated_cycle] = cycle.second;
-            }
+            FacetStorage::update_facet_vertices( old2new );
+        }
+
+        void remove_facet( const std::vector< index_t >& facet_vertices )
+        {
+            FacetStorage::remove_facet( facet_vertices );
         }
 
         void delete_facets( const std::vector< bool >& to_delete )
         {
-            auto old2new = mapping_after_deletion( to_delete );
-            std::vector< detail::VertexCycle > key_to_erase;
-            key_to_erase.reserve( old2new.size() );
-            for( const auto& cycle : facet_indices_ )
-            {
-                if( old2new[cycle.second] == NO_ID )
-                {
-                    key_to_erase.emplace_back( cycle.first );
-                }
-            }
-            for( const auto& key : key_to_erase )
-            {
-                facet_indices_.erase( key );
-            }
-            for( auto& cycle : facet_indices_ )
-            {
-                cycle.second = old2new[cycle.second];
-            }
+            FacetStorage::delete_facets( to_delete );
+        }
+
+        void remove_isolated_facets()
+        {
+            this->clean_facets();
         }
 
         AttributeManager& polyhedron_attribute_manager() const
@@ -183,7 +160,7 @@ namespace geode
 
         AttributeManager& facet_attribute_manager() const
         {
-            return facet_attribute_manager_;
+            return FacetStorage::facet_attribute_manager();
         }
 
     private:
@@ -204,10 +181,8 @@ namespace geode
 
     private:
         mutable AttributeManager polyhedron_attribute_manager_;
-        mutable AttributeManager facet_attribute_manager_;
         std::shared_ptr< VariableAttribute< PolyhedronVertex > >
             polyhedron_around_vertex_;
-        std::unordered_map< detail::VertexCycle, index_t > facet_indices_;
     };
 
     template < index_t dimension >
@@ -425,6 +400,29 @@ namespace geode
         const std::vector< index_t >& old2new )
     {
         impl_->update_facet_vertices( old2new );
+    }
+
+    template < index_t dimension >
+    void PolyhedralSolid< dimension >::update_facet_vertex(
+        const std::vector< index_t >& facet_vertices,
+        index_t facet_vertex_id,
+        index_t new_vertex_id )
+    {
+        impl_->update_facet_vertex(
+            facet_vertices, facet_vertex_id, new_vertex_id );
+    }
+
+    template < index_t dimension >
+    void PolyhedralSolid< dimension >::remove_facet(
+        const std::vector< index_t >& facet_vertices )
+    {
+        impl_->remove_facet( facet_vertices );
+    }
+
+    template < index_t dimension >
+    void PolyhedralSolid< dimension >::remove_isolated_facets()
+    {
+        impl_->remove_isolated_facets();
     }
 
     template < index_t dimension >
