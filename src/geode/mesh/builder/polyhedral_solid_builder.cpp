@@ -429,8 +429,8 @@ namespace geode
         {
             if( to_delete[p] )
             {
-                for( auto f : Range{
-                         polyhedral_solid_.nb_polyhedron_facets( p ) } )
+                for( auto f :
+                    Range{ polyhedral_solid_.nb_polyhedron_facets( p ) } )
                 {
                     PolyhedronFacet id{ p, f };
                     std::vector< index_t > facet_vertices(

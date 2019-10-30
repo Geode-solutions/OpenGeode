@@ -233,8 +233,7 @@ namespace geode
 
         for( auto p : Range{ polygonal_surface_.nb_polygons() } )
         {
-            for( auto v :
-                Range{ polygonal_surface_.nb_polygon_vertices( p ) } )
+            for( auto v : Range{ polygonal_surface_.nb_polygon_vertices( p ) } )
             {
                 PolygonVertex id{ p, v };
                 auto new_vertex =
