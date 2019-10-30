@@ -35,7 +35,7 @@
 
 #include <geode/mesh/builder/detail/mapping_after_deletion.h>
 #include <geode/mesh/builder/polygonal_surface_builder.h>
-#include <geode/mesh/core/detail/vertex_cycle.h>
+#include <geode/mesh/core/detail/facet_storage.h>
 #include <geode/mesh/core/geode_polygonal_surface.h>
 #include <geode/mesh/core/triangulated_surface.h>
 
@@ -102,7 +102,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    class PolygonalSurfaceBase< dimension >::Impl
+    class PolygonalSurfaceBase< dimension >::Impl : public detail::FacetStorage
     {
     public:
         explicit Impl( PolygonalSurfaceBase& surface )
@@ -125,69 +125,44 @@ namespace geode
             polygon_around_vertex_->value( vertex_id ) = polygon_vertex;
         }
 
-        index_t find_edge( const std::vector< index_t >& edge_vertices ) const
+        index_t find_edge( const std::array< index_t, 2 >& edge_vertices ) const
         {
-            auto itr = edge_indices_.find( edge_vertices );
-            if( itr != edge_indices_.end() )
-            {
-                return edge_indices_.at( edge_vertices );
-            }
-            return NO_ID;
+            return this->find_facet( edge_vertices );
         }
 
         index_t find_or_create_edge(
             const std::array< index_t, 2 >& edge_vertices )
         {
-            auto size = edge_indices_.size();
-            std::vector< index_t > vertices{ edge_vertices[0],
-                edge_vertices[1] };
-            auto id = find_edge( vertices );
-            if( id != NO_ID )
-            {
-                return id;
-            }
-            edge_indices_[vertices] = size;
-            edge_attribute_manager_.resize( size + 1 );
-            return size;
+            return this->add_facet( edge_vertices );
+        }
+
+        void update_edge_vertex( const std::array< index_t, 2 >& edge_vertices,
+            index_t edge_vertex_id,
+            index_t new_vertex_id )
+        {
+            auto updated_edge_vertices = edge_vertices;
+            updated_edge_vertices[edge_vertex_id] = new_vertex_id;
+            this->replace_facet( edge_vertices, updated_edge_vertices );
         }
 
         void update_edge_vertices( const std::vector< index_t >& old2new )
         {
-            auto old_edge_indices = edge_indices_;
-            edge_indices_.clear();
-            edge_indices_.reserve( old_edge_indices.size() );
-            for( const auto& cycle : old_edge_indices )
-            {
-                auto updated_vertices = cycle.first.vertices();
-                for( auto& v : updated_vertices )
-                {
-                    v = old2new[v];
-                }
-                detail::VertexCycle updated_cycle{ updated_vertices };
-                edge_indices_[updated_cycle] = cycle.second;
-            }
+            this->update_facet_vertices( old2new );
+        }
+
+        void remove_edge( const std::array< index_t, 2 >& edge_vertices )
+        {
+            this->remove_facet( edge_vertices );
         }
 
         void delete_edges( const std::vector< bool >& to_delete )
         {
-            auto old2new = mapping_after_deletion( to_delete );
-            std::vector< detail::VertexCycle > key_to_erase;
-            key_to_erase.reserve( old2new.size() );
-            for( const auto& cycle : edge_indices_ )
-            {
-                if( old2new[cycle.second] == NO_ID )
-                {
-                    key_to_erase.emplace_back( cycle.first );
-                }
-            }
-            for( const auto& key : key_to_erase )
-            {
-                edge_indices_.erase( key );
-            }
-            for( auto& cycle : edge_indices_ )
-            {
-                cycle.second = old2new[cycle.second];
-            }
+            this->delete_facets( to_delete );
+        }
+
+        void remove_isolated_edges()
+        {
+            this->clean_facets();
         }
 
         AttributeManager& polygon_attribute_manager() const
@@ -197,7 +172,7 @@ namespace geode
 
         AttributeManager& edge_attribute_manager() const
         {
-            return edge_attribute_manager_;
+            return facet_attribute_manager();
         }
 
     private:
@@ -214,10 +189,8 @@ namespace geode
 
     private:
         mutable AttributeManager polygon_attribute_manager_;
-        mutable AttributeManager edge_attribute_manager_;
         std::shared_ptr< VariableAttribute< PolygonVertex > >
             polygon_around_vertex_;
-        std::unordered_map< detail::VertexCycle, index_t > edge_indices_;
     };
 
     template < index_t dimension >
@@ -277,10 +250,33 @@ namespace geode
     }
 
     template < index_t dimension >
+    void PolygonalSurfaceBase< dimension >::update_edge_vertex(
+        const std::array< index_t, 2 >& edge_vertices,
+        index_t edge_vertex_id,
+        index_t new_vertex_id )
+    {
+        impl_->update_edge_vertex(
+            edge_vertices, edge_vertex_id, new_vertex_id );
+    }
+
+    template < index_t dimension >
+    void PolygonalSurfaceBase< dimension >::remove_edge(
+        const std::array< index_t, 2 >& edge_vertices )
+    {
+        impl_->remove_edge( edge_vertices );
+    }
+
+    template < index_t dimension >
     void PolygonalSurfaceBase< dimension >::delete_edges(
         const std::vector< bool >& to_delete )
     {
         impl_->delete_edges( to_delete );
+    }
+
+    template < index_t dimension >
+    void PolygonalSurfaceBase< dimension >::remove_isolated_edges()
+    {
+        impl_->remove_isolated_edges();
     }
 
     template < index_t dimension >

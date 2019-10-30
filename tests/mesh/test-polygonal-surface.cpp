@@ -345,6 +345,33 @@ void test_clone( const geode::PolygonalSurface3D& polygonal_surface )
     }
 }
 
+void test_set_polygon_vertex(
+    const geode::PolygonalSurface3D& polygonal_surface,
+    geode::PolygonalSurfaceBuilder3D& builder )
+{
+    builder.set_polygon_vertex( { 0, 2 }, 1 );
+    OPENGEODE_EXCEPTION( polygonal_surface.polygon_vertex( { 0, 2 } ) == 1,
+        "[Test] PolygonVertex after set_polygon_vertex is wrong" );
+    OPENGEODE_EXCEPTION( polygonal_surface.polygon_edge( { 0, 1 } ) == 2
+                             && polygonal_surface.polygon_edge( { 0, 2 } ) == 3,
+        "[Test] Polygon edges after set_polygon_vertex is wrong" );
+}
+
+void test_delete_all( const geode::PolygonalSurface3D& polygonal_surface,
+    geode::PolygonalSurfaceBuilder3D& builder )
+{
+    std::vector< bool > to_delete( polygonal_surface.nb_polygons(), true );
+    builder.delete_polygons( to_delete );
+    OPENGEODE_EXCEPTION( polygonal_surface.nb_vertices() == 6,
+        "[Test] PolygonalSurface should have 6 vertices" );
+    OPENGEODE_EXCEPTION( polygonal_surface.nb_edges() == 0,
+        "[Test] PolygonalSurface should have 0 edge" );
+    OPENGEODE_EXCEPTION( polygonal_surface.nb_polygons() == 0,
+        "[Test] PolygonalSurface should have 0 polygon" );
+    OPENGEODE_EXCEPTION( polygonal_surface.polygons_around_vertex( 0 ).empty(),
+        "[Test] No more polygon around vertices" );
+}
+
 int main()
 {
     using namespace geode;
@@ -374,6 +401,8 @@ int main()
         test_delete_vertex( *polygonal_surface, *builder );
         test_delete_polygon( *polygonal_surface, *builder );
         test_clone( *polygonal_surface );
+        test_set_polygon_vertex( *polygonal_surface, *builder );
+        test_delete_all( *polygonal_surface, *builder );
 
         Logger::info( "TEST SUCCESS" );
         return 0;
