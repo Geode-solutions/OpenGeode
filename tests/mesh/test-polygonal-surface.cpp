@@ -323,6 +323,24 @@ void test_io( const geode::PolygonalSurface3D& polygonal_surface,
     auto new_polygonal_surface = geode::PolygonalSurface3D::create(
         geode::OpenGeodePolygonalSurface3D::type_name_static() );
     load_polygonal_surface( *new_polygonal_surface, filename );
+
+    OPENGEODE_EXCEPTION( new_polygonal_surface->nb_vertices() == 7,
+        "[Test] Reloaded PolygonalSurface should have 7 vertices" );
+    OPENGEODE_EXCEPTION( new_polygonal_surface->nb_edges() == 9,
+        "[Test] Reloaded PolygonalSurface should have 9 edges" );
+    OPENGEODE_EXCEPTION( new_polygonal_surface->nb_polygons() == 3,
+        "[Test] Reloaded PolygonalSurface should have 3 polygons" );
+    OPENGEODE_EXCEPTION( new_polygonal_surface->polygon_edge( { 1, 0 } )
+                             == polygonal_surface.polygon_edge( { 1, 0 } ),
+        "[Test] Reloaded PolygonalSurface has wrong polygon edge index" );
+    auto attribute = new_polygonal_surface->edge_attribute_manager()
+                         .find_attribute< geode::index_t >( "test" );
+    for( auto e : geode::Range{ new_polygonal_surface->nb_edges() } )
+    {
+        OPENGEODE_EXCEPTION(
+            attribute->value( e ) == e, "[Test] Reloaded PolygonalSurface has "
+                                        "wrong attributes on its edges" );
+    }
 }
 
 void test_clone( const geode::PolygonalSurface3D& polygonal_surface )

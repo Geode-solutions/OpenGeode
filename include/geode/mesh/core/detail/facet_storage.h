@@ -39,11 +39,12 @@ namespace geode
         class FacetStorage
         {
         protected:
+            friend class bitsery::Access;
             FacetStorage()
                 : counter_(
-                    facet_attribute_manager_
-                        .template find_or_create_attribute< VariableAttribute,
-                            index_t >( "counter", 1 ) )
+                      facet_attribute_manager_
+                          .template find_or_create_attribute< VariableAttribute,
+                              index_t >( "counter", 1 ) )
             {
             }
 
@@ -103,7 +104,7 @@ namespace geode
                 std::vector< bool > to_delete(
                     facet_attribute_manager_.nb_elements(), false );
                 for( auto e :
-                    geode::Range{ facet_attribute_manager_.nb_elements() } )
+                    Range{ facet_attribute_manager_.nb_elements() } )
                 {
                     if( counter_->value( e ) == 0 )
                     {
@@ -116,7 +117,7 @@ namespace geode
             void delete_facets( const std::vector< bool >& to_delete )
             {
                 auto old2new = mapping_after_deletion( to_delete );
-                std::vector< detail::VertexCycle > key_to_erase;
+                std::vector< VertexCycle > key_to_erase;
                 key_to_erase.reserve( old2new.size() );
                 for( const auto& cycle : facet_indices_ )
                 {
@@ -148,14 +149,36 @@ namespace geode
                     {
                         v = old2new[v];
                     }
-                    detail::VertexCycle updated_cycle{ updated_vertices };
+                    VertexCycle updated_cycle{ updated_vertices };
                     facet_indices_[updated_cycle] = cycle.second;
                 }
             }
 
         private:
+            friend class bitsery::Access;
+            template < typename Archive >
+            void serialize( Archive& archive )
+            {
+                archive.ext( *this, DefaultGrowable< Archive, FacetStorage >{},
+                    []( Archive& archive, FacetStorage& storage ) {
+                        archive.object( storage.facet_attribute_manager_ );
+                        archive.ext( storage.facet_indices_,
+                            bitsery::ext::StdMap{
+                                storage.facet_indices_.max_size() },
+                        []( Archive& archive, VertexCycle& cycle,
+                            index_t&
+                                attribute ) {
+                            archive.object( cycle );
+                            archive.value4b( attribute );
+                        } );
+                        archive.ext(
+                            storage.counter_, bitsery::ext::StdSmartPtr{} );
+                    } );
+            }
+
+        private:
             mutable AttributeManager facet_attribute_manager_;
-            std::unordered_map< detail::VertexCycle, index_t > facet_indices_;
+            std::unordered_map< VertexCycle, index_t > facet_indices_;
             std::shared_ptr< VariableAttribute< index_t > > counter_;
         };
     } // namespace detail
