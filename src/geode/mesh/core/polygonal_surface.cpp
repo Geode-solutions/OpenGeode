@@ -185,6 +185,8 @@ namespace geode
         {
             archive.ext( *this, DefaultGrowable< Archive, Impl >{},
                 []( Archive& archive, Impl& impl ) {
+                    archive.ext( impl,
+                        bitsery::ext::BaseClass< detail::FacetStorage >{} );
                     archive.object( impl.polygon_attribute_manager_ );
                     archive.ext( impl.polygon_around_vertex_,
                         bitsery::ext::StdSmartPtr{} );

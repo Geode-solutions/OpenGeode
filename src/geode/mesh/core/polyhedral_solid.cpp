@@ -173,6 +173,8 @@ namespace geode
         {
             archive.ext( *this, DefaultGrowable< Archive, Impl >{},
                 []( Archive& archive, Impl& impl ) {
+                    archive.ext( impl,
+                        bitsery::ext::BaseClass< detail::FacetStorage >{} );
                     archive.object( impl.polyhedron_attribute_manager_ );
                     archive.ext( impl.polyhedron_around_vertex_,
                         bitsery::ext::StdSmartPtr{} );
