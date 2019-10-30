@@ -162,6 +162,22 @@ namespace geode
         do_delete_edges( to_delete );
     }
 
+    void GraphBuilder::delete_isolated_vertices()
+    {
+        std::vector< bool > to_delete(
+            graph_.nb_vertices(), false );
+        for( auto v : geode::Range{ graph_.nb_vertices() } )
+        {
+            const auto& edge_vertices =
+                graph_.edges_around_vertex( v );
+            if( edge_vertices.empty() )
+            {
+                to_delete[v] = true;
+            }
+        }
+        delete_vertices( to_delete );
+    }
+
     void GraphBuilder::copy( const Graph& graph )
     {
         VertexSetBuilder::copy( graph );

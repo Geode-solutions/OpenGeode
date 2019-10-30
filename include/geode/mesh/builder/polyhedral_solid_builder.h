@@ -119,6 +119,11 @@ namespace geode
         void delete_polyhedra( const std::vector< bool >& to_delete );
 
         /*!
+         * Delete all the isolated vertices (not used as polyhedron vertices)
+         */
+        void delete_isolated_vertices();
+
+        /*!
          * Return one polyhedron with one of the vertices matching given vertex.
          * @param[in] vertex_id Index of the vertex.
          * @detail If vertex is isolated (no incident polyhedron), default
