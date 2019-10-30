@@ -45,84 +45,84 @@ namespace geode
     {
         using Mapping = std::unordered_map< uuid, uuid >;
 
-        template < typename ModelFrom, typename ModelTo, typename Builder >
+        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
         Mapping copy_corner_components(
-            const ModelFrom& from, const ModelTo& to, Builder& builder )
+            const ModelFrom& from, const ModelTo& to, BuilderTo& builder_to )
         {
             Mapping mapping;
             mapping.reserve( from.nb_corners() );
             for( const auto& corner : from.corners() )
             {
-                auto id = builder.add_corner( corner.mesh().type_name() );
+                auto id = builder_to.add_corner( corner.mesh().type_name() );
                 mapping.emplace( corner.id(), id );
-                builder.register_mesh_component( to.corner( id ) );
+                builder_to.register_mesh_component( to.corner( id ) );
             }
             return mapping;
         }
 
-        template < typename ModelFrom, typename ModelTo, typename Builder >
+        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
         Mapping copy_line_components(
-            const ModelFrom& from, const ModelTo& to, Builder& builder )
+            const ModelFrom& from, const ModelTo& to, BuilderTo& builder_to )
         {
             Mapping mapping;
             mapping.reserve( from.nb_lines() );
             for( const auto& line : from.lines() )
             {
-                auto id = builder.add_line( line.mesh().type_name() );
+                auto id = builder_to.add_line( line.mesh().type_name() );
                 mapping.emplace( line.id(), id );
-                builder.register_mesh_component( to.line( id ) );
+                builder_to.register_mesh_component( to.line( id ) );
             }
             return mapping;
         }
 
-        template < typename ModelFrom, typename ModelTo, typename Builder >
+        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
         Mapping copy_surface_components(
-            const ModelFrom& from, const ModelTo& to, Builder& builder )
+            const ModelFrom& from, const ModelTo& to, BuilderTo& builder_to )
         {
             Mapping mapping;
             mapping.reserve( from.nb_surfaces() );
             for( const auto& surface : from.surfaces() )
             {
-                auto id = builder.add_surface( surface.mesh().type_name() );
+                auto id = builder_to.add_surface( surface.mesh().type_name() );
                 mapping.emplace( surface.id(), id );
-                builder.register_mesh_component( to.surface( id ) );
+                builder_to.register_mesh_component( to.surface( id ) );
             }
             return mapping;
         }
 
-        template < typename ModelFrom, typename ModelTo, typename Builder >
+        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
         Mapping copy_block_components(
-            const ModelFrom& from, const ModelTo& to, Builder& builder )
+            const ModelFrom& from, const ModelTo& to, BuilderTo& builder_to )
         {
             Mapping mapping;
             mapping.reserve( from.nb_blocks() );
             for( const auto& block : from.blocks() )
             {
-                auto id = builder.add_block( block.mesh().type_name() );
+                auto id = builder_to.add_block( block.mesh().type_name() );
                 mapping.emplace( block.id(), id );
-                builder.register_mesh_component( to.block( id ) );
+                builder_to.register_mesh_component( to.block( id ) );
             }
             return mapping;
         }
 
-        template < typename Model, typename Builder >
+        template < typename Model, typename BuilderTo >
         Mapping copy_model_boundary_components(
-            const Model& from, Builder& builder )
+            const Model& from, BuilderTo& builder_to )
         {
             Mapping mapping;
             mapping.reserve( from.nb_model_boundaries() );
             for( const auto& model_boundary : from.model_boundaries() )
             {
                 mapping.emplace(
-                    model_boundary.id(), builder.add_model_boundary() );
+                    model_boundary.id(), builder_to.add_model_boundary() );
             }
             return mapping;
         }
 
-        template < typename ModelFrom, typename ModelTo, typename Builder >
+        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
         void copy_corner_line_relationships( const ModelFrom& from,
             const ModelTo& to,
-            Builder& builder,
+            BuilderTo& builder_to,
             const Mapping& corners,
             const Mapping& lines )
         {
@@ -133,16 +133,16 @@ namespace geode
                 {
                     const auto& new_corner =
                         to.corner( corners.at( corner.id() ) );
-                    builder.add_corner_line_relationship(
+                    builder_to.add_corner_line_relationship(
                         new_corner, new_line );
                 }
             }
         }
 
-        template < typename ModelFrom, typename ModelTo, typename Builder >
+        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
         void copy_line_surface_relationships( const ModelFrom& from,
             const ModelTo& to,
-            Builder& builder,
+            BuilderTo& builder_to,
             const Mapping& lines,
             const Mapping& surfaces )
         {
@@ -153,22 +153,22 @@ namespace geode
                 for( const auto& line : from.boundaries( surface ) )
                 {
                     const auto& new_line = to.line( lines.at( line.id() ) );
-                    builder.add_line_surface_relationship(
+                    builder_to.add_line_surface_relationship(
                         new_line, new_surface );
                 }
                 for( const auto& line : from.internals( surface ) )
                 {
                     const auto& new_line = to.line( lines.at( line.id() ) );
-                    builder.add_line_surface_internal_relationship(
+                    builder_to.add_line_surface_internal_relationship(
                         new_line, new_surface );
                 }
             }
         }
 
-        template < typename ModelFrom, typename ModelTo, typename Builder >
+        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
         void copy_surface_block_relationships( const ModelFrom& from,
             const ModelTo& to,
-            Builder& builder,
+            BuilderTo& builder_to,
             const Mapping& surfaces,
             const Mapping& blocks )
         {
@@ -179,76 +179,76 @@ namespace geode
                 {
                     const auto& new_surface =
                         to.surface( surfaces.at( surface.id() ) );
-                    builder.add_surface_block_relationship(
+                    builder_to.add_surface_block_relationship(
                         new_surface, new_block );
                 }
                 for( const auto& surface : from.internals( block ) )
                 {
                     const auto& new_surface =
                         to.surface( surfaces.at( surface.id() ) );
-                    builder.add_surface_block_internal_relationship(
+                    builder_to.add_surface_block_internal_relationship(
                         new_surface, new_block );
                 }
             }
         }
 
-        template < typename ModelFrom, typename ModelTo, typename Builder >
+        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
         void copy_corner_geometry( const ModelFrom& from,
             const ModelTo& to,
-            Builder& builder,
+            BuilderTo& builder_to,
             const Mapping& corners )
         {
             for( const auto& corner : from.corners() )
             {
-                builder.update_corner_mesh(
+                builder_to.update_corner_mesh(
                     to.corner( corners.at( corner.id() ) ),
                     corner.mesh().clone() );
             }
         }
 
-        template < typename ModelFrom, typename ModelTo, typename Builder >
+        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
         void copy_line_geometry( const ModelFrom& from,
             const ModelTo& to,
-            Builder& builder,
+            BuilderTo& builder_to,
             const Mapping& lines )
         {
             for( const auto& line : from.lines() )
             {
-                builder.update_line_mesh(
+                builder_to.update_line_mesh(
                     to.line( lines.at( line.id() ) ), line.mesh().clone() );
             }
         }
 
-        template < typename ModelFrom, typename ModelTo, typename Builder >
+        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
         void copy_surface_geometry( const ModelFrom& from,
             const ModelTo& to,
-            Builder& builder,
+            BuilderTo& builder_to,
             const Mapping& surfaces )
         {
             for( const auto& surface : from.surfaces() )
             {
-                builder.update_surface_mesh(
+                builder_to.update_surface_mesh(
                     to.surface( surfaces.at( surface.id() ) ),
                     surface.mesh().clone() );
             }
         }
 
-        template < typename ModelFrom, typename ModelTo, typename Builder >
+        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
         void copy_block_geometry( const ModelFrom& from,
             const ModelTo& to,
-            Builder& builder,
+            BuilderTo& builder_to,
             const Mapping& blocks )
         {
             for( const auto& block : from.blocks() )
             {
-                builder.update_block_mesh(
+                builder_to.update_block_mesh(
                     to.block( blocks.at( block.id() ) ), block.mesh().clone() );
             }
         }
 
-        template < typename Model, typename Builder >
+        template < typename Model, typename BuilderTo >
         void copy_vertex_identifier_components( const Model& from,
-            Builder& builder,
+            BuilderTo& builder_to,
             const ComponentType& type,
             const Mapping& mapping )
         {
@@ -257,7 +257,7 @@ namespace geode
                 auto vertices = from.mesh_component_vertices( v, type );
                 for( const auto& mesh_vertex : vertices )
                 {
-                    builder.set_unique_vertex(
+                    builder_to.set_unique_vertex(
                         { { type, mapping.at( mesh_vertex.component_id.id() ) },
                             mesh_vertex.vertex },
                         v );
