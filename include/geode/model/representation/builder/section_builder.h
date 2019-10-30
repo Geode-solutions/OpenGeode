@@ -24,6 +24,11 @@
 #pragma once
 
 #include <geode/model/common.h>
+
+#include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/core/point_set.h>
+#include <geode/mesh/core/polygonal_surface.h>
+
 #include <geode/model/mixin/builder/add_components_builders.h>
 #include <geode/model/mixin/builder/blocks_builder.h>
 #include <geode/model/mixin/builder/corners_builder.h>
@@ -102,6 +107,15 @@ namespace geode
         const uuid& add_surface( const MeshType& type );
 
         const uuid& add_model_boundary();
+
+        void update_corner_mesh(
+            const Corner2D& corner, std::unique_ptr< PointSet2D > mesh );
+
+        void update_line_mesh(
+            const Line2D& line, std::unique_ptr< EdgedCurve2D > mesh );
+
+        void update_surface_mesh( const Surface2D& surface,
+            std::unique_ptr< PolygonalSurface2D > mesh );
 
         void remove_corner( const Corner2D& corner );
 
