@@ -42,9 +42,9 @@ namespace geode
             friend class bitsery::Access;
             FacetStorage()
                 : counter_(
-                      facet_attribute_manager_
-                          .template find_or_create_attribute< VariableAttribute,
-                              index_t >( "counter", 1 ) ),
+                    facet_attribute_manager_
+                        .template find_or_create_attribute< VariableAttribute,
+                            index_t >( "counter", 1 ) ),
                   vertices_(
                       facet_attribute_manager_
                           .template find_or_create_attribute< VariableAttribute,
@@ -78,7 +78,7 @@ namespace geode
                 auto size = facet_indices_.size();
                 facet_indices_[vertices] = size;
                 facet_attribute_manager_.resize( size + 1 );
-                vertices_->value(size) = vertices.vertices();
+                vertices_->value( size ) = vertices.vertices();
                 return size;
             }
 
@@ -103,7 +103,6 @@ namespace geode
                 facet_indices_.erase( from );
                 facet_indices_[to] = facet_id;
                 vertices_->value( facet_id ) = to.vertices();
-
             }
 
             void clean_facets()

@@ -249,8 +249,7 @@ namespace geode
          * Return the coordinates of the barycenter of a given edge.
          * @param[in] edge_id Index of edge polygon.
          */
-        Point< dimension > edge_barycenter(
-            index_t edge_id ) const;
+        Point< dimension > edge_barycenter( index_t edge_id ) const;
 
         /*!
          * Return the barycenter of a polygon
