@@ -31,6 +31,16 @@
 #include <geode/model/representation/builder/detail/copy.h>
 #include <geode/model/representation/core/brep.h>
 
+namespace
+{
+    template < typename Component >
+    void register_new_component( geode::BRepBuilder& builder, const Component& component )
+    {
+        builder.register_component( component.component_id() );
+        builder.register_mesh_component( component );
+    }
+} // namespace
+
 namespace geode
 {
     BRepBuilder::BRepBuilder( BRep& brep )
@@ -110,71 +120,63 @@ namespace geode
     const uuid& BRepBuilder::add_corner()
     {
         const auto& id = create_corner();
-        register_component( id );
-        register_mesh_component( brep_.corner( id ) );
+        register_new_component( *this, brep_.corner( id ) );
         return id;
     }
 
     const uuid& BRepBuilder::add_corner( const MeshType& type )
     {
         const auto& id = create_corner( type );
-        register_component( id );
-        register_mesh_component( brep_.corner( id ) );
+        register_new_component( *this, brep_.corner( id ) );
         return id;
     }
 
     const uuid& BRepBuilder::add_line()
     {
         const auto& id = create_line();
-        register_component( id );
-        register_mesh_component( brep_.line( id ) );
+        register_new_component( *this, brep_.line( id ) );
         return id;
     }
 
     const uuid& BRepBuilder::add_line( const MeshType& type )
     {
         const auto& id = create_line( type );
-        register_component( id );
-        register_mesh_component( brep_.line( id ) );
+        register_new_component( *this, brep_.line( id ) );
         return id;
     }
 
     const uuid& BRepBuilder::add_surface()
     {
         const auto& id = create_surface();
-        register_component( id );
-        register_mesh_component( brep_.surface( id ) );
+        register_new_component( *this, brep_.surface( id ) );
         return id;
     }
 
     const uuid& BRepBuilder::add_surface( const MeshType& type )
     {
         const auto& id = create_surface( type );
-        register_component( id );
-        register_mesh_component( brep_.surface( id ) );
+        register_new_component( *this, brep_.surface( id ) );
         return id;
     }
 
     const uuid& BRepBuilder::add_block()
     {
         const auto& id = create_block();
-        register_component( id );
-        register_mesh_component( brep_.block( id ) );
+        register_new_component( *this, brep_.block( id ) );
         return id;
     }
 
     const uuid& BRepBuilder::add_block( const MeshType& type )
     {
         const auto& id = create_block( type );
-        register_component( id );
-        register_mesh_component( brep_.block( id ) );
+        register_new_component( *this, brep_.block( id ) );
         return id;
     }
 
     const uuid& BRepBuilder::add_model_boundary()
     {
         const auto& id = create_model_boundary();
-        register_component( id );
+        register_component( brep_.model_boundary( id ).component_id() );
         return id;
     }
 

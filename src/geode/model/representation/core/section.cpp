@@ -49,7 +49,7 @@ namespace geode
 
     const Corner2D& Section::LineBoundaryRange::operator*() const
     {
-        return section_.corner( Relationships::BoundaryRange::operator*() );
+        return section_.corner( Relationships::BoundaryRange::operator*().id() );
     }
 
     Section::SurfaceBoundaryRange Section::boundaries(
@@ -67,7 +67,7 @@ namespace geode
 
     const Line2D& Section::SurfaceBoundaryRange::operator*() const
     {
-        return section_.line( Relationships::BoundaryRange::operator*() );
+        return section_.line( Relationships::BoundaryRange::operator*().id() );
     }
 
     Section::CornerIncidenceRange Section::incidences(
@@ -85,7 +85,7 @@ namespace geode
 
     const Line2D& Section::CornerIncidenceRange::operator*() const
     {
-        return section_.line( Relationships::IncidenceRange::operator*() );
+        return section_.line( Relationships::IncidenceRange::operator*().id() );
     }
 
     Section::LineIncidenceRange Section::incidences( const Line2D& line ) const
@@ -102,7 +102,7 @@ namespace geode
 
     const Surface2D& Section::LineIncidenceRange::operator*() const
     {
-        return section_.surface( Relationships::IncidenceRange::operator*() );
+        return section_.surface( Relationships::IncidenceRange::operator*().id() );
     }
 
     Section::SurfaceInternalRange Section::internals(
@@ -120,7 +120,7 @@ namespace geode
 
     const Line2D& Section::SurfaceInternalRange::operator*() const
     {
-        return section_.line( Relationships::InternalRange::operator*() );
+        return section_.line( Relationships::InternalRange::operator*().id() );
     }
 
     Section::LineEmbeddingRange Section::embeddings( const Line2D& line ) const
@@ -137,7 +137,7 @@ namespace geode
 
     const Surface2D& Section::LineEmbeddingRange::operator*() const
     {
-        return section_.surface( Relationships::EmbeddingRange::operator*() );
+        return section_.surface( Relationships::EmbeddingRange::operator*().id() );
     }
 
     Section::ModelBoundaryItemRange::ModelBoundaryItemRange(
@@ -149,7 +149,7 @@ namespace geode
 
     const Line2D& Section::ModelBoundaryItemRange::operator*() const
     {
-        return section_.line( Relationships::ItemRange::operator*() );
+        return section_.line( Relationships::ItemRange::operator*().id() );
     }
 
     Section::ModelBoundaryItemRange Section::items(

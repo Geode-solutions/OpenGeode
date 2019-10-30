@@ -64,9 +64,9 @@ namespace geode
                 graph_.edge_attribute_manager()
                     .find_or_create_attribute< VariableAttribute,
                         RelationType >( "relation_type", NO_ID ) ),
-              uuids_( graph_.vertex_attribute_manager()
-                          .find_or_create_attribute< VariableAttribute, uuid >(
-                              "uuid", uuid{} ) )
+              ids_( graph_.vertex_attribute_manager()
+                          .find_or_create_attribute< VariableAttribute, ComponentID >(
+                              "id" ) )
         {
         }
 
@@ -110,16 +110,16 @@ namespace geode
             return end_edge( vertex_id( id ) );
         }
 
-        const uuid& vertex_uuid( const EdgeVertex& edge_vertex ) const
+        const ComponentID& vertex_component_id( const EdgeVertex& edge_vertex ) const
         {
-            return uuids_->value( graph_.edge_vertex( edge_vertex ) );
+            return ids_->value( graph_.edge_vertex( edge_vertex ) );
         }
 
-        void register_component( const uuid& id )
+        void register_component( const ComponentID& id )
         {
             auto index = OpenGeodeGraphBuilder{ graph_ }.create_vertex();
-            uuid2index_.set_new_mapping( id, index );
-            uuids_->value( index ) = id;
+            uuid2index_.set_new_mapping( id.id(), index );
+            ids_->value( index ) = id;
         }
 
         void unregister_component( const uuid& id )
@@ -139,9 +139,9 @@ namespace geode
                 graph_.edges_around_vertex( vertex_id( from ) );
             for( const auto& edge_vertex : edges_around )
             {
-                const auto& other = this->vertex_uuid( { edge_vertex.edge_id,
+                const auto& other = this->vertex_component_id( { edge_vertex.edge_id,
                     ( edge_vertex.vertex_id + 1 ) % 2 } );
-                if( to == other
+                if( to == other.id()
                     && relation_type( edge_vertex.edge_id ) == type )
                 {
                     return true;
@@ -154,7 +154,9 @@ namespace geode
         {
             if( check_relation_exists( from, to, type ) )
             {
-                Logger::warn( "Relation already exists" );
+                Logger::warn( "This relation already exists (", 
+                ids_->value(vertex_id( from )).type().get(), " and ",  
+                ids_->value(vertex_id( to )).type().get(), ")" );
                 return;
             }
 
@@ -211,7 +213,7 @@ namespace geode
                     archive.object( impl.uuid2index_ );
                     archive.ext(
                         impl.relation_type_, bitsery::ext::StdSmartPtr{} );
-                    archive.ext( impl.uuids_, bitsery::ext::StdSmartPtr{} );
+                    archive.ext( impl.ids_, bitsery::ext::StdSmartPtr{} );
                 } );
         }
 
@@ -224,13 +226,13 @@ namespace geode
         OpenGeodeGraph graph_;
         detail::UuidToIndex uuid2index_;
         std::shared_ptr< VariableAttribute< RelationType > > relation_type_;
-        std::shared_ptr< VariableAttribute< uuid > > uuids_;
+        std::shared_ptr< VariableAttribute< ComponentID > > ids_;
     };
 
     Relationships::Relationships() {} // NOLINT
     Relationships::~Relationships() {} // NOLINT
 
-    void Relationships::register_component( const uuid& id )
+    void Relationships::register_component( const ComponentID& id )
     {
         impl_->register_component( id );
     }
@@ -394,10 +396,10 @@ namespace geode
             next_boundary_iterator();
         }
 
-        const uuid& vertex_uuid() const
+        const ComponentID& vertex_component_id() const
         {
             const auto iterator = this->current();
-            return relationships_.vertex_uuid(
+            return relationships_.vertex_component_id(
                 { iterator->edge_id, ( iterator->vertex_id + 1 ) % 2 } );
         }
 
@@ -455,9 +457,9 @@ namespace geode
         return impl_->next();
     }
 
-    const uuid& Relationships::BoundaryRange::operator*() const
+    const ComponentID& Relationships::BoundaryRange::operator*() const
     {
-        return impl_->vertex_uuid();
+        return impl_->vertex_component_id();
     }
 
     class Relationships::IncidenceRange::Impl
@@ -481,10 +483,10 @@ namespace geode
             next_incidence_iterator();
         }
 
-        const uuid& vertex_uuid() const
+        const ComponentID& vertex_component_id() const
         {
             const auto iterator = this->current();
-            return relationships_.vertex_uuid(
+            return relationships_.vertex_component_id(
                 { iterator->edge_id, ( iterator->vertex_id + 1 ) % 2 } );
         }
 
@@ -542,9 +544,9 @@ namespace geode
         return impl_->next();
     }
 
-    const uuid& Relationships::IncidenceRange::operator*() const
+    const ComponentID& Relationships::IncidenceRange::operator*() const
     {
-        return impl_->vertex_uuid();
+        return impl_->vertex_component_id();
     }
 
     class Relationships::InternalRange::Impl
@@ -568,10 +570,10 @@ namespace geode
             next_internal_iterator();
         }
 
-        const uuid& vertex_uuid() const
+        const ComponentID& vertex_component_id() const
         {
             const auto iterator = this->current();
-            return relationships_.vertex_uuid(
+            return relationships_.vertex_component_id(
                 { iterator->edge_id, ( iterator->vertex_id + 1 ) % 2 } );
         }
 
@@ -629,9 +631,9 @@ namespace geode
         return impl_->next();
     }
 
-    const uuid& Relationships::InternalRange::operator*() const
+    const ComponentID& Relationships::InternalRange::operator*() const
     {
-        return impl_->vertex_uuid();
+        return impl_->vertex_component_id();
     }
 
     class Relationships::EmbeddingRange::Impl
@@ -655,10 +657,10 @@ namespace geode
             next_embedding_iterator();
         }
 
-        const uuid& vertex_uuid() const
+        const ComponentID& vertex_component_id() const
         {
             const auto iterator = this->current();
-            return relationships_.vertex_uuid(
+            return relationships_.vertex_component_id(
                 { iterator->edge_id, ( iterator->vertex_id + 1 ) % 2 } );
         }
 
@@ -716,9 +718,9 @@ namespace geode
         return impl_->next();
     }
 
-    const uuid& Relationships::EmbeddingRange::operator*() const
+    const ComponentID& Relationships::EmbeddingRange::operator*() const
     {
-        return impl_->vertex_uuid();
+        return impl_->vertex_component_id();
     }
 
     class Relationships::ItemRange::Impl
@@ -742,10 +744,10 @@ namespace geode
             next_item_iterator();
         }
 
-        const uuid& vertex_uuid() const
+        const ComponentID& vertex_component_id() const
         {
             const auto iterator = this->current();
-            return relationships_.vertex_uuid(
+            return relationships_.vertex_component_id(
                 { iterator->edge_id, ( iterator->vertex_id + 1 ) % 2 } );
         }
 
@@ -802,9 +804,9 @@ namespace geode
         return impl_->next();
     }
 
-    const uuid& Relationships::ItemRange::operator*() const
+    const ComponentID& Relationships::ItemRange::operator*() const
     {
-        return impl_->vertex_uuid();
+        return impl_->vertex_component_id();
     }
 
     class Relationships::CollectionRange::Impl
@@ -828,10 +830,10 @@ namespace geode
             next_collection_iterator();
         }
 
-        const uuid& vertex_uuid() const
+        const ComponentID& vertex_component_id() const
         {
             const auto iterator = this->current();
-            return relationships_.vertex_uuid(
+            return relationships_.vertex_component_id(
                 { iterator->edge_id, ( iterator->vertex_id + 1 ) % 2 } );
         }
 
@@ -890,8 +892,8 @@ namespace geode
         return impl_->next();
     }
 
-    const uuid& Relationships::CollectionRange::operator*() const
+    const ComponentID& Relationships::CollectionRange::operator*() const
     {
-        return impl_->vertex_uuid();
+        return impl_->vertex_component_id();
     }
 } // namespace geode

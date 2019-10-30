@@ -49,7 +49,7 @@ namespace geode
 
     const Corner3D& BRep::LineBoundaryRange::operator*() const
     {
-        return brep_.corner( Relationships::BoundaryRange::operator*() );
+        return brep_.corner( Relationships::BoundaryRange::operator*().id() );
     }
 
     BRep::SurfaceBoundaryRange BRep::boundaries(
@@ -66,7 +66,7 @@ namespace geode
 
     const Line3D& BRep::SurfaceBoundaryRange::operator*() const
     {
-        return brep_.line( Relationships::BoundaryRange::operator*() );
+        return brep_.line( Relationships::BoundaryRange::operator*().id() );
     }
 
     BRep::BlockBoundaryRange BRep::boundaries( const Block3D& block ) const
@@ -82,7 +82,7 @@ namespace geode
 
     const Surface3D& BRep::BlockBoundaryRange::operator*() const
     {
-        return brep_.surface( Relationships::BoundaryRange::operator*() );
+        return brep_.surface( Relationships::BoundaryRange::operator*().id() );
     }
 
     BRep::CornerIncidenceRange BRep::incidences( const Corner3D& corner ) const
@@ -98,7 +98,7 @@ namespace geode
 
     const Line3D& BRep::CornerIncidenceRange::operator*() const
     {
-        return brep_.line( Relationships::IncidenceRange::operator*() );
+        return brep_.line( Relationships::IncidenceRange::operator*().id() );
     }
 
     BRep::LineIncidenceRange BRep::incidences( const Line3D& line ) const
@@ -114,7 +114,7 @@ namespace geode
 
     const Surface3D& BRep::LineIncidenceRange::operator*() const
     {
-        return brep_.surface( Relationships::IncidenceRange::operator*() );
+        return brep_.surface( Relationships::IncidenceRange::operator*().id() );
     }
 
     BRep::SurfaceIncidenceRange BRep::incidences(
@@ -131,7 +131,7 @@ namespace geode
 
     const Block3D& BRep::SurfaceIncidenceRange::operator*() const
     {
-        return brep_.block( Relationships::IncidenceRange::operator*() );
+        return brep_.block( Relationships::IncidenceRange::operator*().id() );
     }
 
     BRep::SurfaceInternalRange BRep::internals( const Surface3D& surface ) const
@@ -147,7 +147,7 @@ namespace geode
 
     const Line3D& BRep::SurfaceInternalRange::operator*() const
     {
-        return brep_.line( Relationships::InternalRange::operator*() );
+        return brep_.line( Relationships::InternalRange::operator*().id() );
     }
 
     BRep::BlockInternalRange BRep::internals( const Block3D& block ) const
@@ -163,7 +163,7 @@ namespace geode
 
     const Surface3D& BRep::BlockInternalRange::operator*() const
     {
-        return brep_.surface( Relationships::InternalRange::operator*() );
+        return brep_.surface( Relationships::InternalRange::operator*().id() );
     }
 
     BRep::LineEmbeddingRange BRep::embeddings( const Line3D& line ) const
@@ -179,7 +179,7 @@ namespace geode
 
     const Surface3D& BRep::LineEmbeddingRange::operator*() const
     {
-        return brep_.surface( Relationships::EmbeddingRange::operator*() );
+        return brep_.surface( Relationships::EmbeddingRange::operator*().id() );
     }
 
     BRep::SurfaceEmbeddingRange BRep::embeddings(
@@ -196,7 +196,7 @@ namespace geode
 
     const Block3D& BRep::SurfaceEmbeddingRange::operator*() const
     {
-        return brep_.block( Relationships::EmbeddingRange::operator*() );
+        return brep_.block( Relationships::EmbeddingRange::operator*().id() );
     }
 
     BRep::ModelBoundaryItemRange::ModelBoundaryItemRange(
@@ -207,7 +207,7 @@ namespace geode
 
     const Surface3D& BRep::ModelBoundaryItemRange::operator*() const
     {
-        return brep_.surface( Relationships::ItemRange::operator*() );
+        return brep_.surface( Relationships::ItemRange::operator*().id() );
     }
 
     BRep::ModelBoundaryItemRange BRep::items(

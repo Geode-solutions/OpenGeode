@@ -9,6 +9,12 @@ TODO
 
 ### Breaking Changes
 
+- **Relationships**: replace the component registration key from uuid to ComponentID.
+
+**How to upgrade**
+
+Replace `id0` and `id1` in  `geode::RelationshipsBuilder::register_component( id0, id1 )` by their ComponentIDs.
+
 - **Geometry**: new library called geometry gathering files related to geometry: bounding_box, nn_search, point and vector.
 
 **How to upgrade**

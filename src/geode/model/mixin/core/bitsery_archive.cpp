@@ -64,6 +64,8 @@ namespace
     {
         geode::AttributeManager::register_attribute_type<
             std::vector< geode::MeshComponentVertex >, Serializer >( context );
+        geode::AttributeManager::register_attribute_type<
+            geode::ComponentID, Serializer >( context );
         context.registerBasesList< Serializer >(
             bitsery::ext::PolymorphicClassesList< geode::Component2D >{} );
         context.registerBasesList< Serializer >(
