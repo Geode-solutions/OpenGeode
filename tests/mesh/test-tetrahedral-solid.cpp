@@ -136,8 +136,8 @@ void test_delete_all( const geode::TetrahedralSolid3D& solid,
     builder.delete_isolated_vertices();
     OPENGEODE_EXCEPTION( solid.nb_vertices() == 5,
         "[Test]TetrahedralSolid should have 5 vertices" );
-        OPENGEODE_EXCEPTION( solid.nb_facets() == 4,
-        "[Test]TetrahedralSolid should have 4 facets" );
+    OPENGEODE_EXCEPTION(
+        solid.nb_facets() == 4, "[Test]TetrahedralSolid should have 4 facets" );
     OPENGEODE_EXCEPTION( solid.nb_polyhedra() == 1,
         "[Test]TetrahedralSolid should have 1 polyhedron" );
 
@@ -145,17 +145,16 @@ void test_delete_all( const geode::TetrahedralSolid3D& solid,
     builder.delete_polyhedra( to_delete );
     OPENGEODE_EXCEPTION( solid.nb_vertices() == 5,
         "[Test]TetrahedralSolid should have 5 vertices" );
-    OPENGEODE_EXCEPTION( solid.nb_facets() == 0,
-        "[Test]TetrahedralSolid should have 0 facet" );
+    OPENGEODE_EXCEPTION(
+        solid.nb_facets() == 0, "[Test]TetrahedralSolid should have 0 facet" );
     OPENGEODE_EXCEPTION( solid.nb_polyhedra() == 0,
         "[Test]TetrahedralSolid should have 0 polyhedron" );
     OPENGEODE_EXCEPTION( solid.polyhedra_around_vertex( 0 ).empty(),
         "[Test] No more polyhedron around vertices" );
-        
+
     builder.delete_isolated_vertices();
     OPENGEODE_EXCEPTION( solid.nb_vertices() == 0,
         "[Test]TetrahedralSolid should have 0 vertex" );
-
 }
 
 int main()

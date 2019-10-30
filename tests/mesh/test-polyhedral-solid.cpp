@@ -236,7 +236,7 @@ void test_delete_all( const geode::PolyhedralSolid3D& polyhedral_solid,
         "[Test] PolyhedralSolid should have 0 polyhedron" );
     OPENGEODE_EXCEPTION( polyhedral_solid.polyhedra_around_vertex( 0 ).empty(),
         "[Test] No more polyhedra around vertices" );
-        
+
     builder.delete_isolated_vertices();
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_vertices() == 0,
         "[Test]PolyhedralSolid should have 0 vertex" );

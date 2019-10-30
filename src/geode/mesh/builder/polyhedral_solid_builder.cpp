@@ -489,8 +489,7 @@ namespace geode
     template < index_t dimension >
     void PolyhedralSolidBuilder< dimension >::delete_isolated_vertices()
     {
-        std::vector< bool > to_delete(
-            polyhedral_solid_.nb_vertices(), false );
+        std::vector< bool > to_delete( polyhedral_solid_.nb_vertices(), false );
         for( auto v : geode::Range{ polyhedral_solid_.nb_vertices() } )
         {
             const auto& polyhedron_vertex =
