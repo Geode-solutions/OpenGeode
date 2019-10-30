@@ -78,6 +78,7 @@ namespace geode
                 auto size = facet_indices_.size();
                 facet_indices_[vertices] = size;
                 facet_attribute_manager_.resize( size + 1 );
+                vertices_->value(size) = vertices.vertices();
                 return size;
             }
 
@@ -101,6 +102,8 @@ namespace geode
                     "find facet from given vertices" );
                 facet_indices_.erase( from );
                 facet_indices_[to] = facet_id;
+                vertices_->value( facet_id ) = to.vertices();
+
             }
 
             void clean_facets()
@@ -181,6 +184,8 @@ namespace geode
                             } );
                         archive.ext(
                             storage.counter_, bitsery::ext::StdSmartPtr{} );
+                        archive.ext(
+                            storage.vertices_, bitsery::ext::StdSmartPtr{} );
                     } );
             }
 

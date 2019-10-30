@@ -243,14 +243,14 @@ namespace geode
          * Return the length of a given polygon edge
          * @param[in] polygon_edge Local index of edge in a polygon
          */
-        double polygon_edge_length( const PolygonEdge& polygon_edge ) const;
+        double edge_length( index_t edge_id ) const;
 
         /*!
          * Return the coordinates of the barycenter of a given polygon edge.
          * @param[in] polygon_edge Local index of edge in a polygon.
          */
-        Point< dimension > polygon_edge_barycenter(
-            const PolygonEdge& polygon_edge ) const;
+        Point< dimension > edge_barycenter(
+            index_t edge_id ) const;
 
         /*!
          * Return the barycenter of a polygon

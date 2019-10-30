@@ -459,23 +459,21 @@ namespace geode
     }
 
     template < index_t dimension >
-    double PolygonalSurfaceBase< dimension >::polygon_edge_length(
-        const PolygonEdge& polygon_edge ) const
+    double PolygonalSurfaceBase< dimension >::edge_length(
+        index_t edge_id ) const
     {
-        auto v0 = polygon_edge_vertex( polygon_edge, 0 );
-        auto v1 = polygon_edge_vertex( polygon_edge, 1 );
-        return Vector< dimension >{ this->point( v0 ), this->point( v1 ) }
+        auto vertices = edge_vertices( edge_id );
+        return Vector< dimension >{ this->point( vertices[0] ),
+            this->point( vertices[1] ) }
             .length();
     }
 
     template < index_t dimension >
-    Point< dimension >
-        PolygonalSurfaceBase< dimension >::polygon_edge_barycenter(
-            const PolygonEdge& polygon_edge ) const
+    Point< dimension > PolygonalSurfaceBase< dimension >::edge_barycenter(
+        index_t edge_id ) const
     {
-        auto v0 = polygon_edge_vertex( polygon_edge, 0 );
-        auto v1 = polygon_edge_vertex( polygon_edge, 1 );
-        return ( this->point( v0 ) + this->point( v1 ) ) / 2;
+        auto vertices = edge_vertices( edge_id );
+        return ( this->point( vertices[0] ) + this->point( vertices[1] ) ) / 2;
     }
 
     template < index_t dimension >
