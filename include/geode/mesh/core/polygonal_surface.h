@@ -161,6 +161,12 @@ namespace geode
             const PolygonEdge& polygon_edge, index_t vertex_id ) const;
 
         /*!
+         * Return the indices of edge vertices.
+         * @param[in] edge_id Index of an edge.
+         */
+        std::array< index_t, 2 > edge_vertices( index_t edge_id ) const;
+
+        /*!
          * Return the next vertex in a polygon (local indexation)
          * @param[in] polygon_vertex Local index of vertex in polygon
          */
@@ -278,6 +284,9 @@ namespace geode
          */
         std::tuple< bool, PolygonEdge > polygon_edge_from_vertices(
             index_t from_vertex_id, index_t to_vertex_id ) const;
+        
+        index_t edge_from_vertices(
+            const std::array< index_t, 2 >& vertices ) const;
 
         /*!
          * Access to the manager of attributes associated with edges.

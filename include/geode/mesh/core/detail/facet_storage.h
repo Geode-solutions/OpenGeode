@@ -41,9 +41,13 @@ namespace geode
         protected:
             FacetStorage()
                 : counter_(
-                    facet_attribute_manager_
-                        .template find_or_create_attribute< VariableAttribute,
-                            index_t >( "counter", 1 ) )
+                      facet_attribute_manager_
+                          .template find_or_create_attribute< VariableAttribute,
+                              index_t >( "counter", 1 ) ),
+                  vertices_(
+                      facet_attribute_manager_
+                          .template find_or_create_attribute< VariableAttribute,
+                              std::vector< index_t > >( "edge_vertices" ) )
             {
             }
 
@@ -150,13 +154,21 @@ namespace geode
                     }
                     detail::VertexCycle updated_cycle{ updated_vertices };
                     facet_indices_[updated_cycle] = cycle.second;
+                    vertices_->value( cycle.second ) = updated_vertices;
                 }
+            }
+
+            std::vector< index_t > get_facet_vertices( index_t facet_id ) const
+            {
+                return vertices_->value( facet_id );
             }
 
         private:
             mutable AttributeManager facet_attribute_manager_;
             std::unordered_map< detail::VertexCycle, index_t > facet_indices_;
             std::shared_ptr< VariableAttribute< index_t > > counter_;
+            std::shared_ptr< VariableAttribute< std::vector< index_t > > >
+                vertices_;
         };
     } // namespace detail
 } // namespace geode
