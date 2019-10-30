@@ -24,7 +24,7 @@
 #include <geode/mesh/core/edged_curve.h>
 
 #include <geode/basic/bitsery_archive.h>
-#include <geode/basic/vector.h>
+#include <geode/geometry/vector.h>
 
 #include <geode/mesh/builder/edged_curve_builder.h>
 #include <geode/mesh/core/geode_edged_curve.h>

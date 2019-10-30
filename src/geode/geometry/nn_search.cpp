@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/basic/nn_search.h>
+#include <geode/geometry/nn_search.h>
 
 #include <numeric>
 

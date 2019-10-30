@@ -25,8 +25,8 @@
 #include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/logger.h>
-#include <geode/basic/point.h>
-#include <geode/basic/vector.h>
+#include <geode/geometry/point.h>
+#include <geode/geometry/vector.h>
 
 #include <geode/mesh/builder/geode_polygonal_surface_builder.h>
 #include <geode/mesh/core/geode_polygonal_surface.h>

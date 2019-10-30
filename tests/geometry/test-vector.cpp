@@ -22,7 +22,7 @@
  */
 
 #include <geode/basic/logger.h>
-#include <geode/basic/vector.h>
+#include <geode/geometry/vector.h>
 
 void test_length()
 {

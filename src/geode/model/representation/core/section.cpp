@@ -23,8 +23,8 @@
 
 #include <geode/model/representation/core/section.h>
 
-#include <geode/basic/bounding_box.h>
-#include <geode/basic/vector.h>
+#include <geode/geometry/bounding_box.h>
+#include <geode/geometry/vector.h>
 
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/line.h>

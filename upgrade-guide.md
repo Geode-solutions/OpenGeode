@@ -9,6 +9,12 @@ TODO
 
 ### Breaking Changes
 
+- **Geometry**: new library called geometry gathering files related to geometry: bounding_box, nn_search, point and vector.
+
+**How to upgrade**
+
+Add `OpenGeode::geometry` to use this library. Update the path of OpenGeode files you include.
+
 - **BRepBuilder / SectionBuilder**: methods adding relationships between model Components have now explicitely the relationship type in their name.
 
 **How to upgrade**

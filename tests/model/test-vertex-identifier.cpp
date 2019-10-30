@@ -23,7 +23,7 @@
 
 #include <geode/basic/assert.h>
 #include <geode/basic/logger.h>
-#include <geode/basic/point.h>
+#include <geode/geometry/point.h>
 
 #include <geode/model/mixin/core/vertex_identifier.h>
 

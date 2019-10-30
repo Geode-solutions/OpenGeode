@@ -139,5 +139,6 @@ set(advanced_headers
 target_link_libraries(${target_name} 
     PUBLIC 
         ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
         Bitsery::bitsery
 )

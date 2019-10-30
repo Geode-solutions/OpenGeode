@@ -21,9 +21,9 @@
  *
  */
 
-#include <geode/basic/bounding_box.h>
+#include <geode/geometry/bounding_box.h>
 #include <geode/basic/logger.h>
-#include <geode/basic/point.h>
+#include <geode/geometry/point.h>
 
 int main()
 {
