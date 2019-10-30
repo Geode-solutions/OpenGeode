@@ -154,12 +154,12 @@ void test_io( const geode::PolyhedralSolid3D& polyhedral_solid,
     OPENGEODE_EXCEPTION( new_polyhedral_solid->nb_vertices() == 8,
         "[Test] Reloaded PolyhedralSolid should have 8 vertices" );
     OPENGEODE_EXCEPTION( new_polyhedral_solid->nb_facets() == 11,
-        "[Test] Reloaded PolyhedralSolid should have 11 edges" );
+        "[Test] Reloaded PolyhedralSolid should have 11 facets" );
     OPENGEODE_EXCEPTION( new_polyhedral_solid->nb_polyhedra() == 3,
-        "[Test] Reloaded PolyhedralSolid should have 3 polygons" );
+        "[Test] Reloaded PolyhedralSolid should have 3 polyhedra" );
     OPENGEODE_EXCEPTION( new_polyhedral_solid->polyhedron_facet( { 1, 0 } )
                              == polyhedral_solid.polyhedron_facet( { 1, 0 } ),
-        "[Test] Reloaded PolyhedralSolid has wrong polygon edge index" );
+        "[Test] Reloaded PolyhedralSolid has wrong polyhedron facet index" );
     auto attribute = new_polyhedral_solid->facet_attribute_manager()
                          .find_attribute< geode::index_t >( "test" );
     for( auto e : geode::Range{ new_polyhedral_solid->nb_facets() } )
