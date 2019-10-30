@@ -35,7 +35,7 @@
         std::ifstream file{ this->filename(), std::ifstream::binary };         \
         TContext context{};                                                    \
         register_basic_deserialize_pcontext( std::get< 0 >( context ) );       \
-        register_geometry_deserialize_pcontext( std::get< 0 >( context ) );       \
+        register_geometry_deserialize_pcontext( std::get< 0 >( context ) );    \
         register_mesh_deserialize_pcontext( std::get< 0 >( context ) );        \
         Deserializer archive{ context, file };                                 \
         archive.object( mesh_ );                                               \
