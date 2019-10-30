@@ -67,7 +67,7 @@ namespace geode
                 auto id = find_facet( vertices );
                 if( id != NO_ID )
                 {
-                    counter_->value( id )++;
+                    counter_->set_value( id, counter_->value( id ) + 1 );
                     return id;
                 }
                 auto size = facet_indices_.size();
@@ -84,7 +84,7 @@ namespace geode
                     "find facet from given vertices" );
                 if( counter_ > 0 )
                 {
-                    counter_->value( id )--;
+                    counter_->set_value( id, counter_->value( id ) - 1 );
                 }
             }
 
