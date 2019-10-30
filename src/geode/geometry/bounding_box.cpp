@@ -213,6 +213,6 @@ namespace geode
         return true;
     }
 
-    template class opengeode_basic_api BoundingBox< 2 >;
-    template class opengeode_basic_api BoundingBox< 3 >;
+    template class opengeode_geometry_api BoundingBox< 2 >;
+    template class opengeode_geometry_api BoundingBox< 3 >;
 } // namespace geode
