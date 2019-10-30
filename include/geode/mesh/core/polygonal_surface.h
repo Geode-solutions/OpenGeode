@@ -240,14 +240,14 @@ namespace geode
         PolygonEdge previous_on_border( const PolygonEdge& polygon_edge ) const;
 
         /*!
-         * Return the length of a given polygon edge
-         * @param[in] polygon_edge Local index of edge in a polygon
+         * Return the length of a given edge.
+         * @param[in] edge_id Index of edge.
          */
         double edge_length( index_t edge_id ) const;
 
         /*!
-         * Return the coordinates of the barycenter of a given polygon edge.
-         * @param[in] polygon_edge Local index of edge in a polygon.
+         * Return the coordinates of the barycenter of a given edge.
+         * @param[in] edge_id Index of edge polygon.
          */
         Point< dimension > edge_barycenter(
             index_t edge_id ) const;
@@ -285,6 +285,11 @@ namespace geode
         std::tuple< bool, PolygonEdge > polygon_edge_from_vertices(
             index_t from_vertex_id, index_t to_vertex_id ) const;
         
+        
+        /*!
+         * Get the index of edge corresponding to given vertices
+         * @param[in] vertices Ordered vertex indices
+         */
         index_t edge_from_vertices(
             const std::array< index_t, 2 >& vertices ) const;
 

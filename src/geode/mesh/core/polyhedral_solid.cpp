@@ -78,7 +78,7 @@ namespace
         geode::index_t vertex_id )
     {
         OPENGEODE_EXCEPTION( vertex_id < solid.nb_polyhedron_facet_vertices(
-                                 { polyhedron_id, facet_id } ),
+                                             { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -93,10 +93,10 @@ namespace geode
     public:
         explicit Impl( PolyhedralSolid& solid )
             : polyhedron_around_vertex_(
-                solid.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolyhedronVertex >(
-                        "polyhedron_around_vertex", PolyhedronVertex{} ) )
+                  solid.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolyhedronVertex >(
+                          "polyhedron_around_vertex", PolyhedronVertex{} ) )
         {
         }
 
@@ -121,6 +121,11 @@ namespace geode
             const std::vector< index_t >& facet_vertices )
         {
             return this->add_facet( facet_vertices );
+        }
+
+        std::vector< index_t > get_facet_vertices( index_t facet_id ) const
+        {
+            return FacetStorage::get_facet_vertices( facet_id );
         }
 
         void update_facet_vertex( const std::vector< index_t >& facet_vertices,
@@ -238,10 +243,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    double PolyhedralSolid< dimension >::polyhedron_facet_area(
-        const PolyhedronFacet& /*unused*/ ) const
+    double PolyhedralSolid< dimension >::facet_area( index_t /*unused*/ ) const
     {
-        throw OpenGeodeException( "polyhedron_facet_area not implemented yet" );
+        throw OpenGeodeException( "facet_area not implemented yet" );
         return 0;
     }
 
@@ -287,19 +291,16 @@ namespace geode
     }
 
     template < index_t dimension >
-    Point< dimension >
-        PolyhedralSolid< dimension >::polyhedron_facet_barycenter(
-            const PolyhedronFacet& polyhedron_facet ) const
+    Point< dimension > PolyhedralSolid< dimension >::facet_barycenter(
+        index_t facet_id ) const
     {
         Point< dimension > barycenter;
-        for( auto v :
-            Range{ nb_polyhedron_facet_vertices( polyhedron_facet ) } )
+        auto vertices = facet_vertices( facet_id );
+        for( auto v : vertices )
         {
-            barycenter = barycenter
-                         + this->point( polyhedron_facet_vertex(
-                             { polyhedron_facet, v } ) );
+            barycenter = barycenter + this->point( v );
         }
-        return barycenter / nb_polyhedron_facet_vertices( polyhedron_facet );
+        return barycenter / vertices.size();
     }
 
     template < index_t dimension >
@@ -394,6 +395,20 @@ namespace geode
         const std::vector< index_t >& facet_vertices )
     {
         return impl_->find_or_create_facet( facet_vertices );
+    }
+
+    template < index_t dimension >
+    std::vector< index_t > PolyhedralSolid< dimension >::facet_vertices(
+        index_t facet_id ) const
+    {
+        return impl_->get_facet_vertices( facet_id );
+    }
+
+    template < index_t dimension >
+    index_t PolyhedralSolid< dimension >::facet_from_vertices(
+        const std::vector< index_t >& vertices ) const
+    {
+        return impl_->find_facet( vertices );
     }
 
     template < index_t dimension >

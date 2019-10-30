@@ -190,9 +190,9 @@ void test_barycenters()
                                   { 0, 3, 5, 2 }, { 3, 4, 5 } } );
     geode::Point3D answer_facet_barycenter{ { a / 3., 0, c / 3. } };
     OPENGEODE_EXCEPTION(
-        polyhedral_solid->polyhedron_facet_barycenter( { 0, 0 } )
+        polyhedral_solid->facet_barycenter( 0 )
             == answer_facet_barycenter,
-        "[Test] PolyhedralSolid polyhedron_facet_barycenter is not correct" );
+        "[Test] PolyhedralSolid facet_barycenter is not correct" );
     geode::Point3D answer_polyhedron_barycenter{ { a / 3., 0.5 * b, c / 3. } };
     OPENGEODE_EXCEPTION( polyhedral_solid->polyhedron_barycenter( 0 )
                              == answer_polyhedron_barycenter,
