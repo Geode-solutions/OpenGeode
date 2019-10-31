@@ -82,8 +82,14 @@ namespace geode
     {
         detail::copy_corner_line_relationships(
             brep, brep_, *this, mapping.corners, mapping.lines );
+        detail::copy_corner_surface_relationships(
+            brep, brep_, *this, mapping.corners, mapping.surfaces );
         detail::copy_line_surface_relationships(
             brep, brep_, *this, mapping.lines, mapping.surfaces );
+        detail::copy_corner_block_relationships(
+            brep, brep_, *this, mapping.corners, mapping.blocks );
+        detail::copy_line_block_relationships(
+            brep, brep_, *this, mapping.lines, mapping.blocks );
         detail::copy_surface_block_relationships(
             brep, brep_, *this, mapping.surfaces, mapping.blocks );
         for( const auto& model_boundary : brep.model_boundaries() )
@@ -269,6 +275,24 @@ namespace geode
         const Line3D& line, const Surface3D& surface )
     {
         add_internal_relation( line.id(), surface.id() );
+    }
+
+        void  BRepBuilder::add_corner_surface_internal_relationship(
+            const Corner3D& corner, const Surface3D& surface )
+    {
+        add_internal_relation( corner.id(), surface.id() );
+    }
+
+        void  BRepBuilder::add_corner_block_internal_relationship(
+            const Corner3D& corner, const Block3D& block )
+    {
+        add_internal_relation( corner.id(), block.id() );
+    }
+
+        void BRepBuilder::add_line_block_internal_relationship(
+             const Line3D& line, const Block3D& block )
+    {
+        add_internal_relation( line.id(), block.id() );
     }
 
     void BRepBuilder::add_surface_block_internal_relationship(

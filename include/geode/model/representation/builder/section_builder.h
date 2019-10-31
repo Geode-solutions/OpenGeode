@@ -131,6 +131,9 @@ namespace geode
         void add_line_surface_boundary_relationship(
             const Line2D& line, const Surface2D& surface );
 
+        void add_corner_surface_internal_relationship(
+            const Corner2D& corner, const Surface2D& surface );
+
         void add_line_surface_internal_relationship(
             const Line2D& line, const Surface2D& surface );
 

@@ -79,6 +79,8 @@ namespace geode
     {
         detail::copy_corner_line_relationships(
             section, section_, *this, mapping.corners, mapping.lines );
+        detail::copy_corner_surface_relationships(
+            section, section_, *this, mapping.corners, mapping.surfaces );
         detail::copy_line_surface_relationships(
             section, section_, *this, mapping.lines, mapping.surfaces );
         for( const auto& model_boundary : section.model_boundaries() )
@@ -222,6 +224,12 @@ namespace geode
         const Line2D& line, const Surface2D& surface )
     {
         add_boundary_relation( line.id(), surface.id() );
+    }
+
+    void SectionBuilder::add_corner_surface_internal_relationship(
+        const Corner2D& corner, const Surface2D& surface )
+    {
+        add_internal_relation( corner.id(), surface.id() );
     }
 
     void SectionBuilder::add_line_surface_internal_relationship(

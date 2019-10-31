@@ -53,12 +53,12 @@ namespace geode
           public AddComponents< 2, Corners, Lines, Surfaces, ModelBoundaries >
     {
     public:
-        class opengeode_model_api LineBoundaryRange
+        class opengeode_model_api BoundaryCornerRange
             : public Relationships::BoundaryRangeIterator,
-              public BeginEnd< LineBoundaryRange >
+              public BeginEnd< BoundaryCornerRange >
         {
         public:
-            LineBoundaryRange( const Section& section, const Line2D& line );
+            BoundaryCornerRange( const Section& section, const Line2D& line );
 
             const Corner2D& operator*() const;
 
@@ -66,12 +66,12 @@ namespace geode
             const Section& section_;
         };
 
-        class opengeode_model_api SurfaceBoundaryRange
+        class opengeode_model_api BoundaryLineRange
             : public Relationships::BoundaryRangeIterator,
-              public BeginEnd< SurfaceBoundaryRange >
+              public BeginEnd< BoundaryLineRange >
         {
         public:
-            SurfaceBoundaryRange(
+            BoundaryLineRange(
                 const Section& section, const Surface2D& surface );
 
             const Line2D& operator*() const;
@@ -80,12 +80,12 @@ namespace geode
             const Section& section_;
         };
 
-        class opengeode_model_api CornerIncidenceRange
+        class opengeode_model_api IncidentLineRange
             : public Relationships::IncidenceRangeIterator,
-              public BeginEnd< CornerIncidenceRange >
+              public BeginEnd< IncidentLineRange >
         {
         public:
-            CornerIncidenceRange(
+            IncidentLineRange(
                 const Section& section, const Corner2D& corner );
 
             const Line2D& operator*() const;
@@ -94,12 +94,12 @@ namespace geode
             const Section& section_;
         };
 
-        class opengeode_model_api LineIncidenceRange
+        class opengeode_model_api IncidentSurfaceRange
             : public Relationships::IncidenceRangeIterator,
-              public BeginEnd< LineIncidenceRange >
+              public BeginEnd< IncidentSurfaceRange >
         {
         public:
-            LineIncidenceRange( const Section& section, const Line2D& line );
+            IncidentSurfaceRange( const Section& section, const Line2D& line );
 
             const Surface2D& operator*() const;
 
@@ -107,39 +107,61 @@ namespace geode
             const Section& section_;
         };
 
-        class opengeode_model_api SurfaceInternalRange
+        class opengeode_model_api InternalLineRange
             : public Relationships::InternalRangeIterator,
-              public BeginEnd< SurfaceInternalRange >
+              public BeginEnd< InternalLineRange >
         {
         public:
-            SurfaceInternalRange(
+            InternalLineRange(
                 const Section& section, const Surface2D& surface );
 
+            void operator++();
+            
             const Line2D& operator*() const;
 
         private:
             const Section& section_;
         };
 
-        class opengeode_model_api LineEmbeddingRange
-            : public Relationships::EmbeddingRangeIterator,
-              public BeginEnd< LineEmbeddingRange >
+        class opengeode_model_api InternalCornerRange
+            : public Relationships::InternalRangeIterator,
+              public BeginEnd< InternalCornerRange >
         {
         public:
-            LineEmbeddingRange( const Section& section, const Line2D& line );
+            InternalCornerRange(
+                const Section& section, const Surface2D& surface );
 
+            void operator++();
+            
+            const Corner2D& operator*() const;
+
+        private:
+            const Section& section_;
+        };
+
+        class opengeode_model_api EmbeddedSurfaceRange
+            : public Relationships::EmbeddingRangeIterator,
+              public BeginEnd< EmbeddedSurfaceRange >
+        {
+        public:
+            EmbeddedSurfaceRange( const Section& section, const Line2D& line );
+
+            EmbeddedSurfaceRange( const Section& section, const Corner2D& corner );
+
+            void operator++();
+            
             const Surface2D& operator*() const;
 
         private:
             const Section& section_;
         };
 
-        class opengeode_model_api ModelBoundaryItemRange
+        class opengeode_model_api ItemLineRange
             : public Relationships::ItemRangeIterator,
-              public BeginEnd< ModelBoundaryItemRange >
+              public BeginEnd< ItemLineRange >
         {
         public:
-            ModelBoundaryItemRange(
+            ItemLineRange(
                 const Section& section, const ModelBoundary2D& boundary );
 
             const Line2D& operator*() const;
@@ -149,19 +171,23 @@ namespace geode
         };
 
     public:
-        LineBoundaryRange boundaries( const Line2D& line ) const;
+        BoundaryCornerRange boundaries( const Line2D& line ) const;
 
-        SurfaceBoundaryRange boundaries( const Surface2D& surface ) const;
+        BoundaryLineRange boundaries( const Surface2D& surface ) const;
 
-        CornerIncidenceRange incidences( const Corner2D& corner ) const;
+        IncidentLineRange incidences( const Corner2D& corner ) const;
 
-        LineIncidenceRange incidences( const Line2D& line ) const;
+        IncidentSurfaceRange incidences( const Line2D& line ) const;
 
-        SurfaceInternalRange internals( const Surface2D& surface ) const;
+        InternalCornerRange internal_corners( const Surface2D& surface ) const;
 
-        LineEmbeddingRange embeddings( const Line2D& line ) const;
+        InternalLineRange internal_lines( const Surface2D& surface ) const;
 
-        ModelBoundaryItemRange items( const ModelBoundary2D& boundary ) const;
+        EmbeddedSurfaceRange embeddings( const Corner2D& corner ) const;
+
+        EmbeddedSurfaceRange embeddings( const Line2D& line ) const;
+
+        ItemLineRange items( const ModelBoundary2D& boundary ) const;
 
         static std::string native_extension_static()
         {

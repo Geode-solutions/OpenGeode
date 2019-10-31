@@ -457,7 +457,7 @@ namespace geode
 
     void Relationships::BoundaryRangeIterator::operator++()
     {
-        return impl_->next();
+        impl_->next();
     }
 
     const ComponentID& Relationships::BoundaryRangeIterator::operator*() const
@@ -546,7 +546,7 @@ namespace geode
 
     void Relationships::IncidenceRangeIterator::operator++()
     {
-        return impl_->next();
+        impl_->next();
     }
 
     const ComponentID& Relationships::IncidenceRangeIterator::operator*() const
@@ -634,7 +634,7 @@ namespace geode
 
     void Relationships::InternalRangeIterator::operator++()
     {
-        return impl_->next();
+        impl_->next();
     }
 
     const ComponentID& Relationships::InternalRangeIterator::operator*() const
@@ -723,7 +723,7 @@ namespace geode
 
     void Relationships::EmbeddingRangeIterator::operator++()
     {
-        return impl_->next();
+        impl_->next();
     }
 
     const ComponentID& Relationships::EmbeddingRangeIterator::operator*() const
@@ -811,7 +811,7 @@ namespace geode
 
     void Relationships::ItemRangeIterator::operator++()
     {
-        return impl_->next();
+        impl_->next();
     }
 
     const ComponentID& Relationships::ItemRangeIterator::operator*() const
@@ -900,7 +900,7 @@ namespace geode
 
     void Relationships::CollectionRangeIterator::operator++()
     {
-        return impl_->next();
+        impl_->next();
     }
 
     const ComponentID& Relationships::CollectionRangeIterator::operator*() const

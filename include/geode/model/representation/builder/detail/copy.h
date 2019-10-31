@@ -140,6 +140,26 @@ namespace geode
         }
 
         template < typename ModelFrom, typename ModelTo, typename BuilderTo >
+        void copy_corner_surface_relationships( const ModelFrom& from,
+            const ModelTo& to,
+            BuilderTo& builder_to,
+            const Mapping& corners,
+            const Mapping& surfaces )
+        {
+            for( const auto& surface : from.surfaces() )
+            {
+                const auto& new_surface =
+                    to.surface( surfaces.at( surface.id() ) );
+                for( const auto& corner : from.internal_corners( surface ) )
+                {
+                    const auto& new_corner = to.corner( corners.at( corner.id() ) );
+                    builder_to.add_corner_surface_internal_relationship(
+                        new_corner, new_surface );
+                }
+            }
+        }
+
+        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
         void copy_line_surface_relationships( const ModelFrom& from,
             const ModelTo& to,
             BuilderTo& builder_to,
@@ -156,11 +176,51 @@ namespace geode
                     builder_to.add_line_surface_boundary_relationship(
                         new_line, new_surface );
                 }
-                for( const auto& line : from.internals( surface ) )
+                for( const auto& line : from.internal_lines( surface ) )
                 {
                     const auto& new_line = to.line( lines.at( line.id() ) );
                     builder_to.add_line_surface_internal_relationship(
                         new_line, new_surface );
+                }
+            }
+        }
+
+        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
+        void copy_corner_block_relationships( const ModelFrom& from,
+            const ModelTo& to,
+            BuilderTo& builder_to,
+            const Mapping& corners,
+            const Mapping& blocks )
+        {
+            for( const auto& block : from.blocks() )
+            {
+                const auto& new_block =
+                    to.block( blocks.at( block.id() ) );
+                for( const auto& corner : from.internal_corners( block ) )
+                {
+                    const auto& new_corner = to.corner( corners.at( corner.id() ) );
+                    builder_to.add_corner_block_internal_relationship(
+                        new_corner, new_block );
+                }
+            }
+        }
+
+        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
+        void copy_line_block_relationships( const ModelFrom& from,
+            const ModelTo& to,
+            BuilderTo& builder_to,
+            const Mapping& lines,
+            const Mapping& blocks )
+        {
+            for( const auto& block : from.blocks() )
+            {
+                const auto& new_block =
+                    to.block( blocks.at( block.id() ) );
+                for( const auto& line : from.internal_lines( block ) )
+                {
+                    const auto& new_line = to.line( lines.at( line.id() ) );
+                    builder_to.add_line_block_internal_relationship(
+                        new_line, new_block );
                 }
             }
         }
@@ -182,7 +242,7 @@ namespace geode
                     builder_to.add_surface_block_boundary_relationship(
                         new_surface, new_block );
                 }
-                for( const auto& surface : from.internals( block ) )
+                for( const auto& surface : from.internal_surfaces( block ) )
                 {
                     const auto& new_surface =
                         to.surface( surfaces.at( surface.id() ) );
