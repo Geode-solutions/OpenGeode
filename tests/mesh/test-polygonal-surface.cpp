@@ -176,10 +176,10 @@ void test_previous_next_on_border(
 void test_polygon_edge_requests(
     const geode::PolygonalSurface3D& polygonal_surface )
 {
-    OPENGEODE_EXCEPTION( polygonal_surface.polygon_edge_length( { 0, 0 } )
+    OPENGEODE_EXCEPTION( polygonal_surface.edge_length( 0 )
                              == std::sqrt( 2 * 2 + 9.2 * 9.2 + 6.4 * 6.4 ),
         "[Test] Polygon edge length is not correct" );
-    OPENGEODE_EXCEPTION( polygonal_surface.polygon_edge_barycenter( { 0, 0 } )
+    OPENGEODE_EXCEPTION( polygonal_surface.edge_barycenter( 0 )
                              == geode::Point3D( { 1.1, 4.8, 3.5 } ),
         "[Test] Polygon edge barycenter is not correct" );
     OPENGEODE_EXCEPTION(
@@ -375,6 +375,10 @@ void test_set_polygon_vertex(
     OPENGEODE_EXCEPTION( polygonal_surface.polygon_edge( { 0, 1 } ) == 2
                              && polygonal_surface.polygon_edge( { 0, 2 } ) == 3,
         "[Test] Polygon edges after set_polygon_vertex is wrong" );
+
+    auto vertices = polygonal_surface.edge_vertices( 2 );
+    OPENGEODE_EXCEPTION( vertices[0] == 1 && vertices[1] == 4,
+        "[Test] Edge vertices after set_polygon_vertex is wrong" );
 }
 
 void test_delete_all( const geode::PolygonalSurface3D& polygonal_surface,
