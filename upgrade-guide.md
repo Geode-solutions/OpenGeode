@@ -9,6 +9,26 @@ TODO
 
 ### Breaking Changes
 
+- **Solid Facets & Surface Edges**: Edge/Facet indices are used as parameters of methods like `PolygonalSurface< dimension >::edge_length`, `PolyhedralSolid< dimension >::facet_barycenter`.
+
+**How to upgrade**
+
+Example
+
+from
+
+```
+PolygonEdge polygon_edge{ 0, 0 };
+auto edge_length = surface.polygon_edge_length( polygon_edge );
+```
+
+to 
+
+```
+index_t edge_id = polygon_edge( { 0, 0 } );
+auto edge_length = surface.edge_length( edge_id );
+```
+
 - **Geometry**: new library called geometry gathering files related to geometry: bounding_box, nn_search, point and vector.
 
 **How to upgrade**
