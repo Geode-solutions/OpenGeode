@@ -49,9 +49,9 @@ namespace geode
 
             void operator()( std::array< index_t, 2 >& to )
             {
-                OPENGEODE_ASSERT(
-                    values_.size() == 2, "[SetValue::operator()] Size of "
-                                         "vector values should be 2" );
+                OPENGEODE_ASSERT( values_.size() == 2,
+                    "[SetValue::operator()] Size of "
+                    "vector values should be 2" );
                 to[0] = values_[0];
                 to[1] = values_[1];
             }
@@ -66,9 +66,9 @@ namespace geode
             friend class bitsery::Access;
             FacetStorage()
                 : counter_(
-                      facet_attribute_manager_
-                          .template find_or_create_attribute< VariableAttribute,
-                              index_t >( "counter", 1 ) ),
+                    facet_attribute_manager_
+                        .template find_or_create_attribute< VariableAttribute,
+                            index_t >( "counter", 1 ) ),
                   vertices_(
                       facet_attribute_manager_
                           .template find_or_create_attribute< VariableAttribute,
