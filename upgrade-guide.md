@@ -15,6 +15,32 @@ TODO
 
 Add `OpenGeode::geometry` to use this library. Update the path of OpenGeode files you include.
 
+- **Attributes**: force Attribute API for writing by removing the reference access to attribute values
+
+**How to upgrade**
+
+Example using `VariableAttribute< double >` and modifying the `index_t id` value to `double new_value`
+```
+attribute.value( id ) = new_value;
+```
+
+to 
+
+```
+attribute.set_value( id, new_value );
+```
+
+Example using `VariableAttribute< std::vector< double > >` and modifying the `index_t id` value by adding `double new_value`
+```
+attribute.value( id ).push_back( new_value );
+```
+
+to 
+
+```
+attribute.modify_value( id, [&new_value]( std::vector< double >& values ) { values.push_back( new_value ); } );
+```
+
 - **BRepBuilder / SectionBuilder**: methods adding relationships between model Components have now explicitely the relationship type in their name.
 
 **How to upgrade**

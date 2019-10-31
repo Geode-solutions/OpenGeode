@@ -57,7 +57,7 @@ void test_create_vertex_attribute( const geode::PointSet3D& point_set )
         point_set.vertex_attribute_manager()
             .find_or_create_attribute< geode::ConstantAttribute, bool >(
                 "test" );
-    attribute->value() = true;
+    attribute->set_value( true );
     OPENGEODE_EXCEPTION( attribute->value() == true,
         "[Test] PointSet attribute value should be true" );
 }

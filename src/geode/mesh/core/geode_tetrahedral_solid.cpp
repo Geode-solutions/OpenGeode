@@ -103,22 +103,30 @@ namespace geode
         void set_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex, index_t vertex_id )
         {
-            tetrahedron_vertices_->value( polyhedron_vertex.polyhedron_id )
-                .at( polyhedron_vertex.vertex_id ) = vertex_id;
+            tetrahedron_vertices_->modify_value(
+                polyhedron_vertex.polyhedron_id,
+                [&polyhedron_vertex, vertex_id](
+                    std::array< index_t, 4 >& array ) {
+                    array.at( polyhedron_vertex.vertex_id ) = vertex_id;
+                } );
         }
 
         void set_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet, index_t adjacent_id )
         {
-            tetrahedron_adjacents_->value( polyhedron_facet.polyhedron_id )
-                .at( polyhedron_facet.facet_id ) = adjacent_id;
+            tetrahedron_adjacents_->modify_value(
+                polyhedron_facet.polyhedron_id,
+                [&polyhedron_facet, adjacent_id](
+                    std::array< index_t, 4 >& array ) {
+                    array.at( polyhedron_facet.facet_id ) = adjacent_id;
+                } );
         }
 
         void add_tetrahedron( const TetrahedralSolid< dimension >& surface,
             const std::array< index_t, 4 >& vertices )
         {
-            tetrahedron_vertices_->value( surface.nb_polyhedra() - 1 ) =
-                vertices;
+            tetrahedron_vertices_->set_value(
+                surface.nb_polyhedra() - 1, vertices );
         }
 
         std::vector< std::vector< index_t > > get_polyhedron_facet_vertices(

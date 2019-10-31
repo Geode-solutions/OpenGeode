@@ -56,7 +56,7 @@ void test_create_vertex_attribute(
                              geode::PolygonEdge >( "test" );
     for( auto v : geode::Range{ polygonal_surface.nb_vertices() } )
     {
-        attribute->value( v ).polygon_id = v;
+        attribute->set_value( v, geode::PolygonEdge{ v, v } );
         OPENGEODE_EXCEPTION( geode::PolygonVertex{} != attribute->value( v ),
             "[Test] PolygonalSurface attribute assignation is not correct" );
     }
@@ -117,7 +117,7 @@ void test_create_edge_attribute(
                              geode::index_t >( "test" );
     for( auto e : geode::Range{ polygonal_surface.nb_edges() } )
     {
-        attribute->value( e ) = e;
+        attribute->set_value( e, e );
     }
 }
 
@@ -357,7 +357,7 @@ void test_clone( const geode::PolygonalSurface3D& polygonal_surface )
                           .find_attribute< geode::PolygonEdge >( "test" );
     for( auto v : geode::Range{ polygonal_surface2->nb_vertices() } )
     {
-        geode::PolygonEdge answer{ v + 1, geode::NO_ID };
+        geode::PolygonEdge answer{ v + 1, v + 1 };
         OPENGEODE_EXCEPTION( attribute2->value( v ) != geode::PolygonEdge{},
             "[Test] PolygonalSurface2 attribute is not correct" );
         OPENGEODE_EXCEPTION( attribute2->value( v ) == answer,

@@ -110,7 +110,8 @@ namespace geode
         void associate_polyhedron_vertex_to_vertex(
             const PolyhedronVertex& polyhedron_vertex, index_t vertex_id )
         {
-            polyhedron_around_vertex_->value( vertex_id ) = polyhedron_vertex;
+            polyhedron_around_vertex_->set_value(
+                vertex_id, polyhedron_vertex );
         }
 
         index_t find_facet( const std::vector< index_t >& facet_vertices ) const
