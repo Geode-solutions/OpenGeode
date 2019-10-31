@@ -164,7 +164,7 @@ namespace geode
          * Return the indices of edge vertices.
          * @param[in] edge_id Index of an edge.
          */
-        std::array< index_t, 2 > edge_vertices( index_t edge_id ) const;
+        const std::array< index_t, 2 >& edge_vertices( index_t edge_id ) const;
 
         /*!
          * Return the next vertex in a polygon (local indexation)

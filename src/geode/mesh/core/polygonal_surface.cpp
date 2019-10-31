@@ -139,10 +139,9 @@ namespace geode
             return this->add_facet( edge_vertices );
         }
 
-        std::array< index_t, 2 > get_edge_vertices( index_t edge_id ) const
+        const std::array< index_t, 2 >& get_edge_vertices( index_t edge_id ) const
         {
-            const auto& vertices = this->get_facet_vertices( edge_id );
-            return { vertices[0], vertices[1] };
+            return this->get_facet_vertices( edge_id );
         }
 
         void update_edge_vertex( const std::array< index_t, 2 >& edge_vertices,
@@ -259,7 +258,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::array< index_t, 2 > PolygonalSurfaceBase< dimension >::edge_vertices(
+    const std::array< index_t, 2 >& PolygonalSurfaceBase< dimension >::edge_vertices(
         index_t edge_id ) const
     {
         return impl_->get_edge_vertices( edge_id );
