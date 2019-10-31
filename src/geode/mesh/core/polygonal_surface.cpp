@@ -122,7 +122,7 @@ namespace geode
         void associate_polygon_vertex_to_vertex(
             const PolygonVertex& polygon_vertex, index_t vertex_id )
         {
-            polygon_around_vertex_->value( vertex_id ) = polygon_vertex;
+            polygon_around_vertex_->set_value( vertex_id, polygon_vertex );
         }
 
         index_t find_edge( const std::array< index_t, 2 >& edge_vertices ) const
