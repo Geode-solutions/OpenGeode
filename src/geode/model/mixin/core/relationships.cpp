@@ -441,7 +441,8 @@ namespace geode
     {
     }
 
-    Relationships::BoundaryRangeIterator::BoundaryRangeIterator( const BoundaryRangeIterator& other )
+    Relationships::BoundaryRangeIterator::BoundaryRangeIterator(
+        const BoundaryRangeIterator& other )
         : impl_( *other.impl_ )
     {
     }
@@ -528,12 +529,14 @@ namespace geode
     {
     }
 
-    Relationships::IncidenceRangeIterator::IncidenceRangeIterator( const IncidenceRangeIterator& other )
+    Relationships::IncidenceRangeIterator::IncidenceRangeIterator(
+        const IncidenceRangeIterator& other )
         : impl_( *other.impl_ )
     {
     }
 
-    Relationships::IncidenceRangeIterator::~IncidenceRangeIterator() {} // NOLINT
+    Relationships::IncidenceRangeIterator::~IncidenceRangeIterator() {
+    } // NOLINT
 
     bool Relationships::IncidenceRangeIterator::operator!=(
         const IncidenceRangeIterator& /*unused*/ ) const
@@ -615,7 +618,8 @@ namespace geode
     {
     }
 
-    Relationships::InternalRangeIterator::InternalRangeIterator( const InternalRangeIterator& other )
+    Relationships::InternalRangeIterator::InternalRangeIterator(
+        const InternalRangeIterator& other )
         : impl_( *other.impl_ )
     {
     }
@@ -702,12 +706,14 @@ namespace geode
     {
     }
 
-    Relationships::EmbeddingRangeIterator::EmbeddingRangeIterator( const EmbeddingRangeIterator& other )
+    Relationships::EmbeddingRangeIterator::EmbeddingRangeIterator(
+        const EmbeddingRangeIterator& other )
         : impl_( *other.impl_ )
     {
     }
 
-    Relationships::EmbeddingRangeIterator::~EmbeddingRangeIterator() {} // NOLINT
+    Relationships::EmbeddingRangeIterator::~EmbeddingRangeIterator() {
+    } // NOLINT
 
     bool Relationships::EmbeddingRangeIterator::operator!=(
         const EmbeddingRangeIterator& /*unused*/ ) const
@@ -783,12 +789,14 @@ namespace geode
     {
     }
 
-    Relationships::ItemRangeIterator::ItemRangeIterator( ItemRangeIterator&& other ) noexcept
+    Relationships::ItemRangeIterator::ItemRangeIterator(
+        ItemRangeIterator&& other ) noexcept
         : impl_( *other.impl_ )
     {
     }
 
-    Relationships::ItemRangeIterator::ItemRangeIterator( const ItemRangeIterator& other )
+    Relationships::ItemRangeIterator::ItemRangeIterator(
+        const ItemRangeIterator& other )
         : impl_( *other.impl_ )
     {
     }
@@ -881,7 +889,8 @@ namespace geode
     {
     }
 
-    Relationships::CollectionRangeIterator::~CollectionRangeIterator() {} // NOLINT
+    Relationships::CollectionRangeIterator::~CollectionRangeIterator() {
+    } // NOLINT
 
     bool Relationships::CollectionRangeIterator::operator!=(
         const CollectionRangeIterator& /*unused*/ ) const

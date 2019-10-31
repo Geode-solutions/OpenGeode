@@ -66,7 +66,8 @@ namespace geode
             IMPLEMENTATION_MEMBER( impl_ );
         };
 
-        class opengeode_model_api LineRange : public LineRangeBase, public BeginEnd< LineRange >
+        class opengeode_model_api LineRange : public LineRangeBase,
+                                              public BeginEnd< LineRange >
         {
         public:
             LineRange( const Lines& lines );
@@ -90,7 +91,8 @@ namespace geode
         Lines();
 
     private:
-        class ModifiableLineRange : public LineRangeBase, public BeginEnd< ModifiableLineRange >
+        class ModifiableLineRange : public LineRangeBase,
+                                    public BeginEnd< ModifiableLineRange >
         {
         public:
             ModifiableLineRange( const Lines& lines );

@@ -67,7 +67,8 @@ namespace geode
         };
 
         class opengeode_model_api ModelBoundaryRange
-            : public ModelBoundaryRangeBase, public BeginEnd< ModelBoundaryRange >
+            : public ModelBoundaryRangeBase,
+              public BeginEnd< ModelBoundaryRange >
         {
         public:
             ModelBoundaryRange( const ModelBoundaries& boundaries );
@@ -92,7 +93,9 @@ namespace geode
         ModelBoundaries();
 
     private:
-        class ModifiableModelBoundaryRange : public ModelBoundaryRangeBase, public BeginEnd< ModifiableModelBoundaryRange >
+        class ModifiableModelBoundaryRange
+            : public ModelBoundaryRangeBase,
+              public BeginEnd< ModifiableModelBoundaryRange >
         {
         public:
             ModifiableModelBoundaryRange( const ModelBoundaries& boundaries );

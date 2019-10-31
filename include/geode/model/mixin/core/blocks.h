@@ -76,7 +76,8 @@ namespace geode
         /*!
          * Class for range-based iteration on unmodifiable Blocks
          */
-        class opengeode_model_api BlockRange : public BlockRangeBase, public BeginEnd< BlockRange >
+        class opengeode_model_api BlockRange : public BlockRangeBase,
+                                               public BeginEnd< BlockRange >
         {
         public:
             BlockRange( const Blocks& blocks );
@@ -107,7 +108,8 @@ namespace geode
         Blocks();
 
     private:
-        class ModifiableBlockRange : public BlockRangeBase, public BeginEnd< ModifiableBlockRange >
+        class ModifiableBlockRange : public BlockRangeBase,
+                                     public BeginEnd< ModifiableBlockRange >
         {
         public:
             ModifiableBlockRange( const Blocks& blocks );

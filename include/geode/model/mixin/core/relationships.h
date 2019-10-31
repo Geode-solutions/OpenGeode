@@ -53,7 +53,8 @@ namespace geode
         class opengeode_model_api BoundaryRangeIterator
         {
         public:
-            BoundaryRangeIterator( const Relationships& relationships, const uuid& id );
+            BoundaryRangeIterator(
+                const Relationships& relationships, const uuid& id );
             BoundaryRangeIterator( BoundaryRangeIterator&& other ) noexcept;
             BoundaryRangeIterator( const BoundaryRangeIterator& other );
             ~BoundaryRangeIterator();
@@ -68,10 +69,15 @@ namespace geode
             IMPLEMENTATION_MEMBER( impl_ );
         };
 
-        class opengeode_model_api BoundaryRange : public BoundaryRangeIterator, public BeginEnd< BoundaryRange >
+        class opengeode_model_api BoundaryRange
+            : public BoundaryRangeIterator,
+              public BeginEnd< BoundaryRange >
         {
-            public:
-            BoundaryRange( const Relationships& relationships, const uuid& id ):BoundaryRangeIterator(relationships, id), BeginEnd(*this){}
+        public:
+            BoundaryRange( const Relationships& relationships, const uuid& id )
+                : BoundaryRangeIterator( relationships, id ), BeginEnd( *this )
+            {
+            }
         };
 
         /*!
@@ -96,10 +102,15 @@ namespace geode
             IMPLEMENTATION_MEMBER( impl_ );
         };
 
-        class opengeode_model_api IncidenceRange : public IncidenceRangeIterator, public BeginEnd< IncidenceRange >
+        class opengeode_model_api IncidenceRange
+            : public IncidenceRangeIterator,
+              public BeginEnd< IncidenceRange >
         {
-            public:
-            IncidenceRange( const Relationships& relationships, const uuid& id ):IncidenceRangeIterator(relationships, id), BeginEnd(*this){}
+        public:
+            IncidenceRange( const Relationships& relationships, const uuid& id )
+                : IncidenceRangeIterator( relationships, id ), BeginEnd( *this )
+            {
+            }
         };
 
         /*!
@@ -108,7 +119,8 @@ namespace geode
         class opengeode_model_api InternalRangeIterator
         {
         public:
-            InternalRangeIterator( const Relationships& relationships, const uuid& id );
+            InternalRangeIterator(
+                const Relationships& relationships, const uuid& id );
             InternalRangeIterator( InternalRangeIterator&& other ) noexcept;
             InternalRangeIterator( const InternalRangeIterator& other );
             ~InternalRangeIterator();
@@ -123,10 +135,15 @@ namespace geode
             IMPLEMENTATION_MEMBER( impl_ );
         };
 
-        class opengeode_model_api InternalRange : public InternalRangeIterator, public BeginEnd< InternalRange >
+        class opengeode_model_api InternalRange
+            : public InternalRangeIterator,
+              public BeginEnd< InternalRange >
         {
-            public:
-            InternalRange( const Relationships& relationships, const uuid& id ):InternalRangeIterator(relationships, id), BeginEnd(*this){}
+        public:
+            InternalRange( const Relationships& relationships, const uuid& id )
+                : InternalRangeIterator( relationships, id ), BeginEnd( *this )
+            {
+            }
         };
 
         /*!
@@ -151,10 +168,15 @@ namespace geode
             IMPLEMENTATION_MEMBER( impl_ );
         };
 
-        class opengeode_model_api EmbeddingRange : public EmbeddingRangeIterator, public BeginEnd< EmbeddingRange >
+        class opengeode_model_api EmbeddingRange
+            : public EmbeddingRangeIterator,
+              public BeginEnd< EmbeddingRange >
         {
-            public:
-            EmbeddingRange( const Relationships& relationships, const uuid& id ):EmbeddingRangeIterator(relationships, id), BeginEnd(*this){}
+        public:
+            EmbeddingRange( const Relationships& relationships, const uuid& id )
+                : EmbeddingRangeIterator( relationships, id ), BeginEnd( *this )
+            {
+            }
         };
 
         /*!
@@ -163,7 +185,8 @@ namespace geode
         class opengeode_model_api ItemRangeIterator
         {
         public:
-            ItemRangeIterator( const Relationships& relationships, const uuid& id );
+            ItemRangeIterator(
+                const Relationships& relationships, const uuid& id );
             ItemRangeIterator( ItemRangeIterator&& other ) noexcept;
             ItemRangeIterator( const ItemRangeIterator& other );
             ~ItemRangeIterator();
@@ -178,10 +201,14 @@ namespace geode
             IMPLEMENTATION_MEMBER( impl_ );
         };
 
-        class opengeode_model_api ItemRange : public ItemRangeIterator, public BeginEnd< ItemRange >
+        class opengeode_model_api ItemRange : public ItemRangeIterator,
+                                              public BeginEnd< ItemRange >
         {
-            public:
-            ItemRange( const Relationships& relationships, const uuid& id ):ItemRangeIterator(relationships, id), BeginEnd(*this){}
+        public:
+            ItemRange( const Relationships& relationships, const uuid& id )
+                : ItemRangeIterator( relationships, id ), BeginEnd( *this )
+            {
+            }
         };
 
         /*!
@@ -206,10 +233,17 @@ namespace geode
             IMPLEMENTATION_MEMBER( impl_ );
         };
 
-        class opengeode_model_api CollectionRange : public CollectionRangeIterator, public BeginEnd< CollectionRange >
+        class opengeode_model_api CollectionRange
+            : public CollectionRangeIterator,
+              public BeginEnd< CollectionRange >
         {
-            public:
-            CollectionRange( const Relationships& relationships, const uuid& id ):CollectionRangeIterator(relationships, id), BeginEnd(*this){}
+        public:
+            CollectionRange(
+                const Relationships& relationships, const uuid& id )
+                : CollectionRangeIterator( relationships, id ),
+                  BeginEnd( *this )
+            {
+            }
         };
 
     public:

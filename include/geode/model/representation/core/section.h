@@ -54,7 +54,8 @@ namespace geode
     {
     public:
         class opengeode_model_api LineBoundaryRange
-            : public Relationships::BoundaryRangeIterator, public BeginEnd< LineBoundaryRange >
+            : public Relationships::BoundaryRangeIterator,
+              public BeginEnd< LineBoundaryRange >
         {
         public:
             LineBoundaryRange( const Section& section, const Line2D& line );
@@ -66,7 +67,8 @@ namespace geode
         };
 
         class opengeode_model_api SurfaceBoundaryRange
-            : public Relationships::BoundaryRangeIterator, public BeginEnd< SurfaceBoundaryRange >
+            : public Relationships::BoundaryRangeIterator,
+              public BeginEnd< SurfaceBoundaryRange >
         {
         public:
             SurfaceBoundaryRange(
@@ -79,7 +81,8 @@ namespace geode
         };
 
         class opengeode_model_api CornerIncidenceRange
-            : public Relationships::IncidenceRangeIterator, public BeginEnd< CornerIncidenceRange >
+            : public Relationships::IncidenceRangeIterator,
+              public BeginEnd< CornerIncidenceRange >
         {
         public:
             CornerIncidenceRange(
@@ -92,7 +95,8 @@ namespace geode
         };
 
         class opengeode_model_api LineIncidenceRange
-            : public Relationships::IncidenceRangeIterator, public BeginEnd< LineIncidenceRange >
+            : public Relationships::IncidenceRangeIterator,
+              public BeginEnd< LineIncidenceRange >
         {
         public:
             LineIncidenceRange( const Section& section, const Line2D& line );
@@ -104,7 +108,8 @@ namespace geode
         };
 
         class opengeode_model_api SurfaceInternalRange
-            : public Relationships::InternalRangeIterator, public BeginEnd< SurfaceInternalRange >
+            : public Relationships::InternalRangeIterator,
+              public BeginEnd< SurfaceInternalRange >
         {
         public:
             SurfaceInternalRange(
@@ -117,7 +122,8 @@ namespace geode
         };
 
         class opengeode_model_api LineEmbeddingRange
-            : public Relationships::EmbeddingRangeIterator, public BeginEnd< LineEmbeddingRange >
+            : public Relationships::EmbeddingRangeIterator,
+              public BeginEnd< LineEmbeddingRange >
         {
         public:
             LineEmbeddingRange( const Section& section, const Line2D& line );
@@ -129,7 +135,8 @@ namespace geode
         };
 
         class opengeode_model_api ModelBoundaryItemRange
-            : public Relationships::ItemRangeIterator, public BeginEnd< ModelBoundaryItemRange >
+            : public Relationships::ItemRangeIterator,
+              public BeginEnd< ModelBoundaryItemRange >
         {
         public:
             ModelBoundaryItemRange(

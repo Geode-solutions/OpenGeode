@@ -35,7 +35,7 @@ namespace geode
     class BaseRange
     {
     public:
-        bool operator!=( const BaseRange & /*unused*/ ) const
+        bool operator!=( const BaseRange& /*unused*/ ) const
         {
             return iter_ != last_;
         }
@@ -68,19 +68,17 @@ namespace geode
      * See derived classes for usage.
      */
     template < typename Type >
-        class BeginEnd 
+    class BeginEnd
     {
     public:
-        explicit BeginEnd( const Type& type ) : type_( type )
-        {
-        }
+        explicit BeginEnd( const Type& type ) : type_( type ) {}
 
-        const Type &begin() const
+        const Type& begin() const
         {
             return type_;
         }
 
-        const Type &end() const
+        const Type& end() const
         {
             return type_;
         }
