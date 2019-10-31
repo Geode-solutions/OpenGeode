@@ -215,7 +215,7 @@ namespace geode
          * Return the indices of facet vertices.
          * @param[in] edge_id Index of an edge.
          */
-        std::vector< index_t > facet_vertices( index_t facet_id ) const;
+        const std::vector< index_t >& facet_vertices( index_t facet_id ) const;
 
         /*!
          * Get the index of facet corresponding to given vertices

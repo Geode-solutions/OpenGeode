@@ -36,6 +36,7 @@ namespace geode
 {
     namespace detail
     {
+        template< typename VertexContainer >
         class FacetStorage
         {
         protected:
@@ -48,7 +49,7 @@ namespace geode
                   vertices_(
                       facet_attribute_manager_
                           .template find_or_create_attribute< VariableAttribute,
-                              std::vector< index_t > >( "edge_vertices" ) )
+                              VertexContainer >( "facet_vertices" ) )
             {
             }
 
@@ -160,7 +161,7 @@ namespace geode
                 }
             }
 
-            std::vector< index_t > get_facet_vertices( index_t facet_id ) const
+            const VertexContainer& get_facet_vertices( index_t facet_id ) const
             {
                 return vertices_->value( facet_id );
             }
@@ -192,8 +193,7 @@ namespace geode
             mutable AttributeManager facet_attribute_manager_;
             std::unordered_map< VertexCycle, index_t > facet_indices_;
             std::shared_ptr< VariableAttribute< index_t > > counter_;
-            std::shared_ptr< VariableAttribute< std::vector< index_t > > >
-                vertices_;
+            std::shared_ptr< VariableAttribute< VertexContainer > > vertices_;
         };
     } // namespace detail
 } // namespace geode

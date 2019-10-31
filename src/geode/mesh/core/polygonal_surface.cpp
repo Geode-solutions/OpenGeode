@@ -102,15 +102,16 @@ namespace geode
     }
 
     template < index_t dimension >
-    class PolygonalSurfaceBase< dimension >::Impl : public detail::FacetStorage
+    class PolygonalSurfaceBase< dimension >::Impl
+        : public detail::FacetStorage< std::array< index_t, 2 > >
     {
     public:
         explicit Impl( PolygonalSurfaceBase& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) )
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
@@ -138,7 +139,7 @@ namespace geode
 
         std::array< index_t, 2 > get_edge_vertices( index_t edge_id ) const
         {
-            auto vertices = this->get_facet_vertices( edge_id );
+            const auto& vertices = this->get_facet_vertices( edge_id );
             return { vertices[0], vertices[1] };
         }
 
@@ -191,8 +192,9 @@ namespace geode
         {
             archive.ext( *this, DefaultGrowable< Archive, Impl >{},
                 []( Archive& archive, Impl& impl ) {
-                    archive.ext( impl,
-                        bitsery::ext::BaseClass< detail::FacetStorage >{} );
+                    archive.ext(
+                        impl, bitsery::ext::BaseClass< detail::FacetStorage<
+                                  std::array< index_t, 2 > > >{} );
                     archive.object( impl.polygon_attribute_manager_ );
                     archive.ext( impl.polygon_around_vertex_,
                         bitsery::ext::StdSmartPtr{} );
