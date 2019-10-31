@@ -377,7 +377,7 @@ namespace geode
         return impl_->load( directory );
     }
 
-    class Relationships::BoundaryRange::Impl
+    class Relationships::BoundaryRangeIterator::Impl
         : public BaseRange< typename Relationships::Impl::Iterator >
     {
         using Iterator = typename Relationships::Impl::Iterator;
@@ -427,7 +427,7 @@ namespace geode
         const Relationships::Impl& relationships_;
     };
 
-    Relationships::BoundaryRange::BoundaryRange(
+    Relationships::BoundaryRangeIterator::BoundaryRangeIterator(
         const Relationships& relationships, const uuid& id )
         : impl_( *relationships.impl_,
             relationships.impl_->begin_edge( id ),
@@ -435,36 +435,36 @@ namespace geode
     {
     }
 
-    Relationships::BoundaryRange::BoundaryRange(
-        BoundaryRange&& other ) noexcept
+    Relationships::BoundaryRangeIterator::BoundaryRangeIterator(
+        BoundaryRangeIterator&& other ) noexcept
         : impl_( *other.impl_ )
     {
     }
 
-    Relationships::BoundaryRange::BoundaryRange( const BoundaryRange& other )
+    Relationships::BoundaryRangeIterator::BoundaryRangeIterator( const BoundaryRangeIterator& other )
         : impl_( *other.impl_ )
     {
     }
 
-    Relationships::BoundaryRange::~BoundaryRange() {} // NOLINT
+    Relationships::BoundaryRangeIterator::~BoundaryRangeIterator() {} // NOLINT
 
-    bool Relationships::BoundaryRange::operator!=(
-        const BoundaryRange& /*unused*/ ) const
+    bool Relationships::BoundaryRangeIterator::operator!=(
+        const BoundaryRangeIterator& /*unused*/ ) const
     {
         return impl_->operator!=( *impl_ );
     }
 
-    void Relationships::BoundaryRange::operator++()
+    void Relationships::BoundaryRangeIterator::operator++()
     {
         return impl_->next();
     }
 
-    const ComponentID& Relationships::BoundaryRange::operator*() const
+    const ComponentID& Relationships::BoundaryRangeIterator::operator*() const
     {
         return impl_->vertex_component_id();
     }
 
-    class Relationships::IncidenceRange::Impl
+    class Relationships::IncidenceRangeIterator::Impl
         : public BaseRange< typename Relationships::Impl::Iterator >
     {
         using Iterator = typename Relationships::Impl::Iterator;
@@ -514,7 +514,7 @@ namespace geode
         const Relationships::Impl& relationships_;
     };
 
-    Relationships::IncidenceRange::IncidenceRange(
+    Relationships::IncidenceRangeIterator::IncidenceRangeIterator(
         const Relationships& relationships, const uuid& id )
         : impl_( *relationships.impl_,
             relationships.impl_->begin_edge( id ),
@@ -522,36 +522,36 @@ namespace geode
     {
     }
 
-    Relationships::IncidenceRange::IncidenceRange(
-        IncidenceRange&& other ) noexcept
+    Relationships::IncidenceRangeIterator::IncidenceRangeIterator(
+        IncidenceRangeIterator&& other ) noexcept
         : impl_( *other.impl_ )
     {
     }
 
-    Relationships::IncidenceRange::IncidenceRange( const IncidenceRange& other )
+    Relationships::IncidenceRangeIterator::IncidenceRangeIterator( const IncidenceRangeIterator& other )
         : impl_( *other.impl_ )
     {
     }
 
-    Relationships::IncidenceRange::~IncidenceRange() {} // NOLINT
+    Relationships::IncidenceRangeIterator::~IncidenceRangeIterator() {} // NOLINT
 
-    bool Relationships::IncidenceRange::operator!=(
-        const IncidenceRange& /*unused*/ ) const
+    bool Relationships::IncidenceRangeIterator::operator!=(
+        const IncidenceRangeIterator& /*unused*/ ) const
     {
         return impl_->operator!=( *impl_ );
     }
 
-    void Relationships::IncidenceRange::operator++()
+    void Relationships::IncidenceRangeIterator::operator++()
     {
         return impl_->next();
     }
 
-    const ComponentID& Relationships::IncidenceRange::operator*() const
+    const ComponentID& Relationships::IncidenceRangeIterator::operator*() const
     {
         return impl_->vertex_component_id();
     }
 
-    class Relationships::InternalRange::Impl
+    class Relationships::InternalRangeIterator::Impl
         : public BaseRange< typename Relationships::Impl::Iterator >
     {
         using Iterator = typename Relationships::Impl::Iterator;
@@ -601,7 +601,7 @@ namespace geode
         const Relationships::Impl& relationships_;
     };
 
-    Relationships::InternalRange::InternalRange(
+    Relationships::InternalRangeIterator::InternalRangeIterator(
         const Relationships& relationships, const uuid& id )
         : impl_( *relationships.impl_,
             relationships.impl_->begin_edge( id ),
@@ -609,36 +609,36 @@ namespace geode
     {
     }
 
-    Relationships::InternalRange::InternalRange(
-        InternalRange&& other ) noexcept
+    Relationships::InternalRangeIterator::InternalRangeIterator(
+        InternalRangeIterator&& other ) noexcept
         : impl_( *other.impl_ )
     {
     }
 
-    Relationships::InternalRange::InternalRange( const InternalRange& other )
+    Relationships::InternalRangeIterator::InternalRangeIterator( const InternalRangeIterator& other )
         : impl_( *other.impl_ )
     {
     }
 
-    Relationships::InternalRange::~InternalRange() {} // NOLINT
+    Relationships::InternalRangeIterator::~InternalRangeIterator() {} // NOLINT
 
-    bool Relationships::InternalRange::operator!=(
-        const InternalRange& /*unused*/ ) const
+    bool Relationships::InternalRangeIterator::operator!=(
+        const InternalRangeIterator& /*unused*/ ) const
     {
         return impl_->operator!=( *impl_ );
     }
 
-    void Relationships::InternalRange::operator++()
+    void Relationships::InternalRangeIterator::operator++()
     {
         return impl_->next();
     }
 
-    const ComponentID& Relationships::InternalRange::operator*() const
+    const ComponentID& Relationships::InternalRangeIterator::operator*() const
     {
         return impl_->vertex_component_id();
     }
 
-    class Relationships::EmbeddingRange::Impl
+    class Relationships::EmbeddingRangeIterator::Impl
         : public BaseRange< typename Relationships::Impl::Iterator >
     {
         using Iterator = typename Relationships::Impl::Iterator;
@@ -688,7 +688,7 @@ namespace geode
         const Relationships::Impl& relationships_;
     };
 
-    Relationships::EmbeddingRange::EmbeddingRange(
+    Relationships::EmbeddingRangeIterator::EmbeddingRangeIterator(
         const Relationships& relationships, const uuid& id )
         : impl_( *relationships.impl_,
             relationships.impl_->begin_edge( id ),
@@ -696,36 +696,36 @@ namespace geode
     {
     }
 
-    Relationships::EmbeddingRange::EmbeddingRange(
-        EmbeddingRange&& other ) noexcept
+    Relationships::EmbeddingRangeIterator::EmbeddingRangeIterator(
+        EmbeddingRangeIterator&& other ) noexcept
         : impl_( *other.impl_ )
     {
     }
 
-    Relationships::EmbeddingRange::EmbeddingRange( const EmbeddingRange& other )
+    Relationships::EmbeddingRangeIterator::EmbeddingRangeIterator( const EmbeddingRangeIterator& other )
         : impl_( *other.impl_ )
     {
     }
 
-    Relationships::EmbeddingRange::~EmbeddingRange() {} // NOLINT
+    Relationships::EmbeddingRangeIterator::~EmbeddingRangeIterator() {} // NOLINT
 
-    bool Relationships::EmbeddingRange::operator!=(
-        const EmbeddingRange& /*unused*/ ) const
+    bool Relationships::EmbeddingRangeIterator::operator!=(
+        const EmbeddingRangeIterator& /*unused*/ ) const
     {
         return impl_->operator!=( *impl_ );
     }
 
-    void Relationships::EmbeddingRange::operator++()
+    void Relationships::EmbeddingRangeIterator::operator++()
     {
         return impl_->next();
     }
 
-    const ComponentID& Relationships::EmbeddingRange::operator*() const
+    const ComponentID& Relationships::EmbeddingRangeIterator::operator*() const
     {
         return impl_->vertex_component_id();
     }
 
-    class Relationships::ItemRange::Impl
+    class Relationships::ItemRangeIterator::Impl
         : public BaseRange< typename Relationships::Impl::Iterator >
     {
         using Iterator = typename Relationships::Impl::Iterator;
@@ -775,7 +775,7 @@ namespace geode
         const Relationships::Impl& relationships_;
     };
 
-    Relationships::ItemRange::ItemRange(
+    Relationships::ItemRangeIterator::ItemRangeIterator(
         const Relationships& relationships, const uuid& id )
         : impl_( *relationships.impl_,
             relationships.impl_->begin_edge( id ),
@@ -783,35 +783,35 @@ namespace geode
     {
     }
 
-    Relationships::ItemRange::ItemRange( ItemRange&& other ) noexcept
+    Relationships::ItemRangeIterator::ItemRangeIterator( ItemRangeIterator&& other ) noexcept
         : impl_( *other.impl_ )
     {
     }
 
-    Relationships::ItemRange::ItemRange( const ItemRange& other )
+    Relationships::ItemRangeIterator::ItemRangeIterator( const ItemRangeIterator& other )
         : impl_( *other.impl_ )
     {
     }
 
-    Relationships::ItemRange::~ItemRange() {} // NOLINT
+    Relationships::ItemRangeIterator::~ItemRangeIterator() {} // NOLINT
 
-    bool Relationships::ItemRange::operator!=(
-        const ItemRange& /*unused*/ ) const
+    bool Relationships::ItemRangeIterator::operator!=(
+        const ItemRangeIterator& /*unused*/ ) const
     {
         return impl_->operator!=( *impl_ );
     }
 
-    void Relationships::ItemRange::operator++()
+    void Relationships::ItemRangeIterator::operator++()
     {
         return impl_->next();
     }
 
-    const ComponentID& Relationships::ItemRange::operator*() const
+    const ComponentID& Relationships::ItemRangeIterator::operator*() const
     {
         return impl_->vertex_component_id();
     }
 
-    class Relationships::CollectionRange::Impl
+    class Relationships::CollectionRangeIterator::Impl
         : public BaseRange< typename Relationships::Impl::Iterator >
     {
         using Iterator = typename Relationships::Impl::Iterator;
@@ -861,7 +861,7 @@ namespace geode
         const Relationships::Impl& relationships_;
     };
 
-    Relationships::CollectionRange::CollectionRange(
+    Relationships::CollectionRangeIterator::CollectionRangeIterator(
         const Relationships& relationships, const uuid& id )
         : impl_( *relationships.impl_,
             relationships.impl_->begin_edge( id ),
@@ -869,32 +869,32 @@ namespace geode
     {
     }
 
-    Relationships::CollectionRange::CollectionRange(
-        CollectionRange&& other ) noexcept
+    Relationships::CollectionRangeIterator::CollectionRangeIterator(
+        CollectionRangeIterator&& other ) noexcept
         : impl_( *other.impl_ )
     {
     }
 
-    Relationships::CollectionRange::CollectionRange(
-        const CollectionRange& other )
+    Relationships::CollectionRangeIterator::CollectionRangeIterator(
+        const CollectionRangeIterator& other )
         : impl_( *other.impl_ )
     {
     }
 
-    Relationships::CollectionRange::~CollectionRange() {} // NOLINT
+    Relationships::CollectionRangeIterator::~CollectionRangeIterator() {} // NOLINT
 
-    bool Relationships::CollectionRange::operator!=(
-        const CollectionRange& /*unused*/ ) const
+    bool Relationships::CollectionRangeIterator::operator!=(
+        const CollectionRangeIterator& /*unused*/ ) const
     {
         return impl_->operator!=( *impl_ );
     }
 
-    void Relationships::CollectionRange::operator++()
+    void Relationships::CollectionRangeIterator::operator++()
     {
         return impl_->next();
     }
 
-    const ComponentID& Relationships::CollectionRange::operator*() const
+    const ComponentID& Relationships::CollectionRangeIterator::operator*() const
     {
         return impl_->vertex_component_id();
     }

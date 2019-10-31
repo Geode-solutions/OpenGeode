@@ -205,7 +205,7 @@ namespace geode
 
     template < index_t dimension >
     Corners< dimension >::CornerRange::CornerRange( const Corners& corners )
-        : CornerRangeBase( corners )
+        : CornerRangeBase( corners ), BeginEnd< CornerRange >( *this )
     {
     }
 
@@ -219,7 +219,7 @@ namespace geode
     template < index_t dimension >
     Corners< dimension >::ModifiableCornerRange::ModifiableCornerRange(
         const Corners& corners )
-        : CornerRangeBase( corners )
+        : CornerRangeBase( corners ), BeginEnd< ModifiableCornerRange >( *this )
     {
     }
 

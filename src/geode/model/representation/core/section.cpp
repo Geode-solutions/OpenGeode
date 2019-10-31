@@ -42,7 +42,8 @@ namespace geode
 
     Section::LineBoundaryRange::LineBoundaryRange(
         const Section& section, const Line2D& line )
-        : Relationships::BoundaryRange( section, line.id() ),
+        : Relationships::BoundaryRangeIterator( section, line.id() ),
+          BeginEnd< LineBoundaryRange >( *this ),
           section_( section )
     {
     }
@@ -50,7 +51,7 @@ namespace geode
     const Corner2D& Section::LineBoundaryRange::operator*() const
     {
         return section_.corner(
-            Relationships::BoundaryRange::operator*().id() );
+            Relationships::BoundaryRangeIterator::operator*().id() );
     }
 
     Section::SurfaceBoundaryRange Section::boundaries(
@@ -61,14 +62,14 @@ namespace geode
 
     Section::SurfaceBoundaryRange::SurfaceBoundaryRange(
         const Section& section, const Surface2D& surface )
-        : Relationships::BoundaryRange( section, surface.id() ),
+        : Relationships::BoundaryRangeIterator( section, surface.id() ), BeginEnd< SurfaceBoundaryRange >( *this ),
           section_( section )
     {
     }
 
     const Line2D& Section::SurfaceBoundaryRange::operator*() const
     {
-        return section_.line( Relationships::BoundaryRange::operator*().id() );
+        return section_.line( Relationships::BoundaryRangeIterator::operator*().id() );
     }
 
     Section::CornerIncidenceRange Section::incidences(
@@ -79,14 +80,14 @@ namespace geode
 
     Section::CornerIncidenceRange::CornerIncidenceRange(
         const Section& section, const Corner2D& corner )
-        : Relationships::IncidenceRange( section, corner.id() ),
+        : Relationships::IncidenceRangeIterator( section, corner.id() ), BeginEnd< CornerIncidenceRange >( *this),
           section_( section )
     {
     }
 
     const Line2D& Section::CornerIncidenceRange::operator*() const
     {
-        return section_.line( Relationships::IncidenceRange::operator*().id() );
+        return section_.line( Relationships::IncidenceRangeIterator::operator*().id() );
     }
 
     Section::LineIncidenceRange Section::incidences( const Line2D& line ) const
@@ -96,7 +97,7 @@ namespace geode
 
     Section::LineIncidenceRange::LineIncidenceRange(
         const Section& section, const Line2D& line )
-        : Relationships::IncidenceRange( section, line.id() ),
+        : Relationships::IncidenceRangeIterator( section, line.id() ),BeginEnd< LineIncidenceRange >(*this),
           section_( section )
     {
     }
@@ -104,7 +105,7 @@ namespace geode
     const Surface2D& Section::LineIncidenceRange::operator*() const
     {
         return section_.surface(
-            Relationships::IncidenceRange::operator*().id() );
+            Relationships::IncidenceRangeIterator::operator*().id() );
     }
 
     Section::SurfaceInternalRange Section::internals(
@@ -115,14 +116,14 @@ namespace geode
 
     Section::SurfaceInternalRange::SurfaceInternalRange(
         const Section& section, const Surface2D& surface )
-        : Relationships::InternalRange( section, surface.id() ),
+        : Relationships::InternalRangeIterator( section, surface.id() ),BeginEnd< SurfaceInternalRange >(*this),
           section_( section )
     {
     }
 
     const Line2D& Section::SurfaceInternalRange::operator*() const
     {
-        return section_.line( Relationships::InternalRange::operator*().id() );
+        return section_.line( Relationships::InternalRangeIterator::operator*().id() );
     }
 
     Section::LineEmbeddingRange Section::embeddings( const Line2D& line ) const
@@ -132,7 +133,7 @@ namespace geode
 
     Section::LineEmbeddingRange::LineEmbeddingRange(
         const Section& section, const Line2D& line )
-        : Relationships::EmbeddingRange( section, line.id() ),
+        : Relationships::EmbeddingRangeIterator( section, line.id() ),BeginEnd< LineEmbeddingRange >(*this),
           section_( section )
     {
     }
@@ -140,19 +141,20 @@ namespace geode
     const Surface2D& Section::LineEmbeddingRange::operator*() const
     {
         return section_.surface(
-            Relationships::EmbeddingRange::operator*().id() );
+            Relationships::EmbeddingRangeIterator::operator*().id() );
     }
 
     Section::ModelBoundaryItemRange::ModelBoundaryItemRange(
         const Section& section, const ModelBoundary2D& boundary )
-        : Relationships::ItemRange( section, boundary.id() ),
+        : Relationships::ItemRangeIterator( section, boundary.id() ),
+          BeginEnd( *this ),
           section_( section )
     {
     }
 
     const Line2D& Section::ModelBoundaryItemRange::operator*() const
     {
-        return section_.line( Relationships::ItemRange::operator*().id() );
+        return section_.line( Relationships::ItemRangeIterator::operator*().id() );
     }
 
     Section::ModelBoundaryItemRange Section::items(

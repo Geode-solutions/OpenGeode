@@ -59,20 +59,10 @@ namespace geode
     {
     public:
         class opengeode_model_api LineBoundaryRange
-            : public Relationships::BoundaryRange
+            : public Relationships::BoundaryRangeIterator, public BeginEnd< LineBoundaryRange >
         {
         public:
             LineBoundaryRange( const BRep& brep, const Line3D& line );
-
-            const LineBoundaryRange& begin() const
-            {
-                return *this;
-            }
-
-            const LineBoundaryRange& end() const
-            {
-                return *this;
-            }
 
             const Corner3D& operator*() const;
 
@@ -81,20 +71,10 @@ namespace geode
         };
 
         class opengeode_model_api SurfaceBoundaryRange
-            : public Relationships::BoundaryRange
+            : public Relationships::BoundaryRangeIterator, public BeginEnd< SurfaceBoundaryRange >
         {
         public:
             SurfaceBoundaryRange( const BRep& brep, const Surface3D& surface );
-
-            const SurfaceBoundaryRange& begin() const
-            {
-                return *this;
-            }
-
-            const SurfaceBoundaryRange& end() const
-            {
-                return *this;
-            }
 
             const Line3D& operator*() const;
 
@@ -103,20 +83,10 @@ namespace geode
         };
 
         class opengeode_model_api BlockBoundaryRange
-            : public Relationships::BoundaryRange
+            : public Relationships::BoundaryRangeIterator, public BeginEnd< BlockBoundaryRange >
         {
         public:
             BlockBoundaryRange( const BRep& brep, const Block3D& block );
-
-            const BlockBoundaryRange& begin() const
-            {
-                return *this;
-            }
-
-            const BlockBoundaryRange& end() const
-            {
-                return *this;
-            }
 
             const Surface3D& operator*() const;
 
@@ -125,20 +95,10 @@ namespace geode
         };
 
         class opengeode_model_api CornerIncidenceRange
-            : public Relationships::IncidenceRange
+            : public Relationships::IncidenceRangeIterator, public BeginEnd< CornerIncidenceRange >
         {
         public:
             CornerIncidenceRange( const BRep& brep, const Corner3D& corner );
-
-            const CornerIncidenceRange& begin() const
-            {
-                return *this;
-            }
-
-            const CornerIncidenceRange& end() const
-            {
-                return *this;
-            }
 
             const Line3D& operator*() const;
 
@@ -147,20 +107,10 @@ namespace geode
         };
 
         class opengeode_model_api LineIncidenceRange
-            : public Relationships::IncidenceRange
+            : public Relationships::IncidenceRangeIterator, public BeginEnd< LineIncidenceRange >
         {
         public:
             LineIncidenceRange( const BRep& brep, const Line3D& line );
-
-            const LineIncidenceRange& begin() const
-            {
-                return *this;
-            }
-
-            const LineIncidenceRange& end() const
-            {
-                return *this;
-            }
 
             const Surface3D& operator*() const;
 
@@ -169,20 +119,10 @@ namespace geode
         };
 
         class opengeode_model_api SurfaceIncidenceRange
-            : public Relationships::IncidenceRange
+            : public Relationships::IncidenceRangeIterator, public BeginEnd< SurfaceIncidenceRange >
         {
         public:
             SurfaceIncidenceRange( const BRep& brep, const Surface3D& surface );
-
-            const SurfaceIncidenceRange& begin() const
-            {
-                return *this;
-            }
-
-            const SurfaceIncidenceRange& end() const
-            {
-                return *this;
-            }
 
             const Block3D& operator*() const;
 
@@ -191,20 +131,10 @@ namespace geode
         };
 
         class opengeode_model_api SurfaceInternalRange
-            : public Relationships::InternalRange
+            : public Relationships::InternalRangeIterator, public BeginEnd< SurfaceInternalRange >
         {
         public:
             SurfaceInternalRange( const BRep& brep, const Surface3D& surface );
-
-            const SurfaceInternalRange& begin() const
-            {
-                return *this;
-            }
-
-            const SurfaceInternalRange& end() const
-            {
-                return *this;
-            }
 
             const Line3D& operator*() const;
 
@@ -213,20 +143,10 @@ namespace geode
         };
 
         class opengeode_model_api BlockInternalRange
-            : public Relationships::InternalRange
+            : public Relationships::InternalRangeIterator, public BeginEnd< BlockInternalRange >
         {
         public:
             BlockInternalRange( const BRep& brep, const Block3D& block );
-
-            const BlockInternalRange& begin() const
-            {
-                return *this;
-            }
-
-            const BlockInternalRange& end() const
-            {
-                return *this;
-            }
 
             const Surface3D& operator*() const;
 
@@ -235,20 +155,10 @@ namespace geode
         };
 
         class opengeode_model_api LineEmbeddingRange
-            : public Relationships::EmbeddingRange
+            : public Relationships::EmbeddingRangeIterator, public BeginEnd< LineEmbeddingRange >
         {
         public:
             LineEmbeddingRange( const BRep& brep, const Line3D& line );
-
-            const LineEmbeddingRange& begin() const
-            {
-                return *this;
-            }
-
-            const LineEmbeddingRange& end() const
-            {
-                return *this;
-            }
 
             const Surface3D& operator*() const;
 
@@ -257,20 +167,10 @@ namespace geode
         };
 
         class opengeode_model_api SurfaceEmbeddingRange
-            : public Relationships::EmbeddingRange
+            : public Relationships::EmbeddingRangeIterator, public BeginEnd< SurfaceEmbeddingRange >
         {
         public:
             SurfaceEmbeddingRange( const BRep& brep, const Surface3D& surface );
-
-            const SurfaceEmbeddingRange& begin() const
-            {
-                return *this;
-            }
-
-            const SurfaceEmbeddingRange& end() const
-            {
-                return *this;
-            }
 
             const Block3D& operator*() const;
 
@@ -279,21 +179,11 @@ namespace geode
         };
 
         class opengeode_model_api ModelBoundaryItemRange
-            : public Relationships::ItemRange
+            : public Relationships::ItemRangeIterator, public BeginEnd< ModelBoundaryItemRange >
         {
         public:
             ModelBoundaryItemRange(
                 const BRep& brep, const ModelBoundary3D& boundary );
-
-            const ModelBoundaryItemRange& begin() const
-            {
-                return *this;
-            }
-
-            const ModelBoundaryItemRange& end() const
-            {
-                return *this;
-            }
 
             const Surface3D& operator*() const;
 
