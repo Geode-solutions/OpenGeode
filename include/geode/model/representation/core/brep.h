@@ -195,7 +195,7 @@ namespace geode
             EmbeddedSurfaceRange( const BRep& brep, const Line3D& line );
 
             void operator++();
-            
+
             const Surface3D& operator*() const;
 
         private:
@@ -214,7 +214,7 @@ namespace geode
             EmbeddedBlockRange( const BRep& brep, const Surface3D& surface );
 
             void operator++();
-            
+
             const Block3D& operator*() const;
 
         private:

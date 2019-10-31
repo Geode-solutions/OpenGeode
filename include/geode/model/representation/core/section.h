@@ -85,8 +85,7 @@ namespace geode
               public BeginEnd< IncidentLineRange >
         {
         public:
-            IncidentLineRange(
-                const Section& section, const Corner2D& corner );
+            IncidentLineRange( const Section& section, const Corner2D& corner );
 
             const Line2D& operator*() const;
 
@@ -116,7 +115,7 @@ namespace geode
                 const Section& section, const Surface2D& surface );
 
             void operator++();
-            
+
             const Line2D& operator*() const;
 
         private:
@@ -132,7 +131,7 @@ namespace geode
                 const Section& section, const Surface2D& surface );
 
             void operator++();
-            
+
             const Corner2D& operator*() const;
 
         private:
@@ -146,10 +145,11 @@ namespace geode
         public:
             EmbeddedSurfaceRange( const Section& section, const Line2D& line );
 
-            EmbeddedSurfaceRange( const Section& section, const Corner2D& corner );
+            EmbeddedSurfaceRange(
+                const Section& section, const Corner2D& corner );
 
             void operator++();
-            
+
             const Surface2D& operator*() const;
 
         private:

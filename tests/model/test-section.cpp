@@ -262,7 +262,8 @@ void add_internal_corner_relations( const geode::Section& model,
 
     for( const auto& corner_id : corner_uuids )
     {
-        for( const auto& embedding : model.embeddings( model.corner( corner_id ) ) )
+        for( const auto& embedding :
+            model.embeddings( model.corner( corner_id ) ) )
         {
             OPENGEODE_EXCEPTION(
                 geode::contain( surface_uuids, embedding.id() ),
@@ -484,12 +485,15 @@ int main()
             model, builder, line_uuids, surface_uuids );
         add_lines_in_model_boundaries(
             model, builder, line_uuids, model_boundary_uuids );
-        add_internal_corner_relations( model, builder, corner_uuids, surface_uuids );
-        add_internal_line_relations( model, builder, line_uuids, surface_uuids );
-    OPENGEODE_EXCEPTION(
-        model.nb_internals( surface_uuids.front() ) == corner_uuids.size()+line_uuids.size(),
-        "[Test] The Surface should embed all Corners & Lines (that are internal to the "
-        "Surface)" );
+        add_internal_corner_relations(
+            model, builder, corner_uuids, surface_uuids );
+        add_internal_line_relations(
+            model, builder, line_uuids, surface_uuids );
+        OPENGEODE_EXCEPTION( model.nb_internals( surface_uuids.front() )
+                                 == corner_uuids.size() + line_uuids.size(),
+            "[Test] The Surface should embed all Corners & Lines (that are "
+            "internal to the "
+            "Surface)" );
         test_boundary_ranges( model, corner_uuids, line_uuids, surface_uuids );
         test_incidence_ranges( model, corner_uuids, line_uuids, surface_uuids );
         test_item_ranges( model, line_uuids, model_boundary_uuids );

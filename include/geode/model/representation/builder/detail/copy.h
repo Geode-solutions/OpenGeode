@@ -152,7 +152,8 @@ namespace geode
                     to.surface( surfaces.at( surface.id() ) );
                 for( const auto& corner : from.internal_corners( surface ) )
                 {
-                    const auto& new_corner = to.corner( corners.at( corner.id() ) );
+                    const auto& new_corner =
+                        to.corner( corners.at( corner.id() ) );
                     builder_to.add_corner_surface_internal_relationship(
                         new_corner, new_surface );
                 }
@@ -194,11 +195,11 @@ namespace geode
         {
             for( const auto& block : from.blocks() )
             {
-                const auto& new_block =
-                    to.block( blocks.at( block.id() ) );
+                const auto& new_block = to.block( blocks.at( block.id() ) );
                 for( const auto& corner : from.internal_corners( block ) )
                 {
-                    const auto& new_corner = to.corner( corners.at( corner.id() ) );
+                    const auto& new_corner =
+                        to.corner( corners.at( corner.id() ) );
                     builder_to.add_corner_block_internal_relationship(
                         new_corner, new_block );
                 }
@@ -214,8 +215,7 @@ namespace geode
         {
             for( const auto& block : from.blocks() )
             {
-                const auto& new_block =
-                    to.block( blocks.at( block.id() ) );
+                const auto& new_block = to.block( blocks.at( block.id() ) );
                 for( const auto& line : from.internal_lines( block ) )
                 {
                     const auto& new_line = to.line( lines.at( line.id() ) );

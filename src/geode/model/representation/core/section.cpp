@@ -35,24 +35,32 @@
 
 namespace
 {
-    template < typename Filter,  typename Iterator >
-void next_filtered_internal_iterator( Iterator& iterator )
-{
-            while( iterator.operator!=( iterator ) && iterator. geode::Relationships::InternalRangeIterator::operator*().type() != Filter::component_type_static() )
-            {
-                 iterator. geode::Relationships::InternalRangeIterator::operator++();
-            }
-}
+    template < typename Filter, typename Iterator >
+    void next_filtered_internal_iterator( Iterator& iterator )
+    {
+        while(
+            iterator.operator!=( iterator )
+            && iterator.geode::Relationships::InternalRangeIterator::operator*()
+                       .type()
+                   != Filter::component_type_static() )
+        {
+            iterator.geode::Relationships::InternalRangeIterator::operator++();
+        }
+    }
 
-    template < typename Filter,  typename Iterator >
-void next_filtered_embedding_iterator( Iterator& iterator )
-{
-            while( iterator.operator!=( iterator ) && iterator. geode::Relationships::EmbeddingRangeIterator::operator*().type() != Filter::component_type_static() )
-            {
-                 iterator. geode::Relationships::EmbeddingRangeIterator::operator++();
-            }
-}
-}
+    template < typename Filter, typename Iterator >
+    void next_filtered_embedding_iterator( Iterator& iterator )
+    {
+        while( iterator.operator!=( iterator )
+               && iterator.geode::Relationships::EmbeddingRangeIterator::
+                          operator*()
+                              .type()
+                      != Filter::component_type_static() )
+        {
+            iterator.geode::Relationships::EmbeddingRangeIterator::operator++();
+        }
+    }
+} // namespace
 
 namespace geode
 {
@@ -115,7 +123,8 @@ namespace geode
             Relationships::IncidenceRangeIterator::operator*().id() );
     }
 
-    Section::IncidentSurfaceRange Section::incidences( const Line2D& line ) const
+    Section::IncidentSurfaceRange Section::incidences(
+        const Line2D& line ) const
     {
         return { *this, line };
     }
@@ -146,13 +155,13 @@ namespace geode
           BeginEnd< InternalLineRange >( *this ),
           section_( section )
     {
-            next_filtered_internal_iterator< Line2D >( *this );
+        next_filtered_internal_iterator< Line2D >( *this );
     }
 
     void Section::InternalLineRange::operator++()
     {
-            Relationships::InternalRangeIterator::operator++();
-            next_filtered_internal_iterator< Line2D >( *this );
+        Relationships::InternalRangeIterator::operator++();
+        next_filtered_internal_iterator< Line2D >( *this );
     }
 
     const Line2D& Section::InternalLineRange::operator*() const
@@ -173,13 +182,13 @@ namespace geode
           BeginEnd< InternalCornerRange >( *this ),
           section_( section )
     {
-            next_filtered_internal_iterator< Corner2D >( *this );
+        next_filtered_internal_iterator< Corner2D >( *this );
     }
 
     void Section::InternalCornerRange::operator++()
     {
-            Relationships::InternalRangeIterator::operator++();
-            next_filtered_internal_iterator< Corner2D >( *this );
+        Relationships::InternalRangeIterator::operator++();
+        next_filtered_internal_iterator< Corner2D >( *this );
     }
 
     const Corner2D& Section::InternalCornerRange::operator*() const
@@ -188,12 +197,14 @@ namespace geode
             Relationships::InternalRangeIterator::operator*().id() );
     }
 
-    Section::EmbeddedSurfaceRange Section::embeddings( const Corner2D& corner ) const
+    Section::EmbeddedSurfaceRange Section::embeddings(
+        const Corner2D& corner ) const
     {
         return { *this, corner };
     }
 
-    Section::EmbeddedSurfaceRange Section::embeddings( const Line2D& line ) const
+    Section::EmbeddedSurfaceRange Section::embeddings(
+        const Line2D& line ) const
     {
         return { *this, line };
     }
@@ -204,7 +215,7 @@ namespace geode
           BeginEnd< EmbeddedSurfaceRange >( *this ),
           section_( section )
     {
-            next_filtered_embedding_iterator< Surface2D >( *this );
+        next_filtered_embedding_iterator< Surface2D >( *this );
     }
 
     Section::EmbeddedSurfaceRange::EmbeddedSurfaceRange(
@@ -213,13 +224,13 @@ namespace geode
           BeginEnd< EmbeddedSurfaceRange >( *this ),
           section_( section )
     {
-            next_filtered_embedding_iterator< Surface2D >( *this );
+        next_filtered_embedding_iterator< Surface2D >( *this );
     }
 
     void Section::EmbeddedSurfaceRange::operator++()
     {
-            Relationships::EmbeddingRangeIterator::operator++();
-            next_filtered_embedding_iterator< Surface2D >( *this );
+        Relationships::EmbeddingRangeIterator::operator++();
+        next_filtered_embedding_iterator< Surface2D >( *this );
     }
 
     const Surface2D& Section::EmbeddedSurfaceRange::operator*() const

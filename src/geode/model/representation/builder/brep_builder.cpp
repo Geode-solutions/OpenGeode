@@ -277,20 +277,20 @@ namespace geode
         add_internal_relation( line.id(), surface.id() );
     }
 
-        void  BRepBuilder::add_corner_surface_internal_relationship(
-            const Corner3D& corner, const Surface3D& surface )
+    void BRepBuilder::add_corner_surface_internal_relationship(
+        const Corner3D& corner, const Surface3D& surface )
     {
         add_internal_relation( corner.id(), surface.id() );
     }
 
-        void  BRepBuilder::add_corner_block_internal_relationship(
-            const Corner3D& corner, const Block3D& block )
+    void BRepBuilder::add_corner_block_internal_relationship(
+        const Corner3D& corner, const Block3D& block )
     {
         add_internal_relation( corner.id(), block.id() );
     }
 
-        void BRepBuilder::add_line_block_internal_relationship(
-             const Line3D& line, const Block3D& block )
+    void BRepBuilder::add_line_block_internal_relationship(
+        const Line3D& line, const Block3D& block )
     {
         add_internal_relation( line.id(), block.id() );
     }
