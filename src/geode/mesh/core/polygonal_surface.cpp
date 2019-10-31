@@ -26,6 +26,8 @@
 #include <algorithm>
 #include <stack>
 
+#include <bitsery/brief_syntax/array.h>
+
 #include <geode/basic/algorithm.h>
 #include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>

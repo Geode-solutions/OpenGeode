@@ -300,6 +300,9 @@ namespace geode
     {
         Point< dimension > barycenter;
         auto vertices = facet_vertices( facet_id );
+        OPENGEODE_ASSERT(
+            !vertices.empty(), "[PolyhedralSolid::facet_barycenter] Facet "
+                               "vertices should not be empty" );
         for( auto v : vertices )
         {
             barycenter = barycenter + this->point( v );

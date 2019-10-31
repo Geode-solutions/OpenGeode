@@ -36,16 +36,39 @@ namespace geode
 {
     namespace detail
     {
-        template< typename VertexContainer >
+        struct SetValue
+        {
+            SetValue( const std::vector< index_t >& values ) : values_( values )
+            {
+            }
+
+            void operator()( std::vector< index_t >& to )
+            {
+                to = values_;
+            }
+
+            void operator()( std::array< index_t, 2 >& to )
+            {
+                OPENGEODE_ASSERT(
+                    values_.size() == 2, "[SetValue::operator()] Size of "
+                                         "vector values should be 2" );
+                to[0] = values_[0];
+                to[1] = values_[1];
+            }
+
+            const std::vector< index_t >& values_;
+        };
+
+        template < typename VertexContainer >
         class FacetStorage
         {
         protected:
             friend class bitsery::Access;
             FacetStorage()
                 : counter_(
-                    facet_attribute_manager_
-                        .template find_or_create_attribute< VariableAttribute,
-                            index_t >( "counter", 1 ) ),
+                      facet_attribute_manager_
+                          .template find_or_create_attribute< VariableAttribute,
+                              index_t >( "counter", 1 ) ),
                   vertices_(
                       facet_attribute_manager_
                           .template find_or_create_attribute< VariableAttribute,
@@ -79,7 +102,8 @@ namespace geode
                 auto size = facet_indices_.size();
                 facet_indices_[vertices] = size;
                 facet_attribute_manager_.resize( size + 1 );
-                vertices_->value( size ) = vertices.vertices();
+                vertices_->modify_value(
+                    size, SetValue{ vertices.vertices() } );
                 return size;
             }
 
@@ -103,7 +127,7 @@ namespace geode
                     "find facet from given vertices" );
                 facet_indices_.erase( from );
                 facet_indices_[to] = facet_id;
-                vertices_->value( facet_id ) = to.vertices();
+                vertices_->modify_value( facet_id, SetValue{ to.vertices() } );
             }
 
             void clean_facets()
@@ -157,7 +181,8 @@ namespace geode
                     }
                     VertexCycle updated_cycle{ updated_vertices };
                     facet_indices_[updated_cycle] = cycle.second;
-                    vertices_->value( cycle.second ) = updated_vertices;
+                    vertices_->modify_value(
+                        cycle.second, SetValue{ updated_vertices } );
                 }
             }
 
@@ -171,8 +196,11 @@ namespace geode
             template < typename Archive >
             void serialize( Archive& archive )
             {
-                archive.ext( *this, DefaultGrowable< Archive, FacetStorage >{},
-                    []( Archive& archive, FacetStorage& storage ) {
+                archive.ext( *this,
+                    DefaultGrowable< Archive,
+                        FacetStorage< VertexContainer > >{},
+                    []( Archive& archive,
+                        FacetStorage< VertexContainer >& storage ) {
                         archive.object( storage.facet_attribute_manager_ );
                         archive.ext( storage.facet_indices_,
                             bitsery::ext::StdMap{
