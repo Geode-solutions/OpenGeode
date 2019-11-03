@@ -352,9 +352,6 @@ void test_set_polygon_vertex(
     builder.set_polygon_vertex( { 0, 2 }, 1 );
     OPENGEODE_EXCEPTION( polygonal_surface.polygon_vertex( { 0, 2 } ) == 1,
         "[Test] PolygonVertex after set_polygon_vertex is wrong" );
-    OPENGEODE_EXCEPTION( polygonal_surface.polygon_edge( { 0, 1 } ) == 2
-                             && polygonal_surface.polygon_edge( { 0, 2 } ) == 3,
-        "[Test] Polygon edges after set_polygon_vertex is wrong" );
 }
 
 void test_delete_all( const geode::PolygonalSurface3D& polygonal_surface,
