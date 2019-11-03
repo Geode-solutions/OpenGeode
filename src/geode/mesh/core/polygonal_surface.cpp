@@ -142,8 +142,8 @@ namespace geode
         {
             auto updated_edge_vertices = edge_vertices;
             updated_edge_vertices[edge_vertex_id] = new_vertex_id;
-            this->add_facet(updated_edge_vertices);
-            this->remove_facet(edge_vertices);
+            this->add_facet( updated_edge_vertices );
+            this->remove_facet( edge_vertices );
             this->clean_facets();
         }
 
