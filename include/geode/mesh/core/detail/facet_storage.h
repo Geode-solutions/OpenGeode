@@ -118,7 +118,7 @@ namespace geode
                     counter_->set_value( id, counter_->value( id ) - 1 );
                 }
             }
-            
+
             void clean_facets()
             {
                 std::vector< bool > to_delete(
