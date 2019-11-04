@@ -118,18 +118,7 @@ namespace geode
                     counter_->set_value( id, counter_->value( id ) - 1 );
                 }
             }
-
-            void replace_facet( const VertexCycle& from, const VertexCycle& to )
-            {
-                auto facet_id = find_facet( from );
-                OPENGEODE_ASSERT( facet_id != NO_ID,
-                    "[FacetStorage::replace_facet] Cannot "
-                    "find facet from given vertices" );
-                facet_indices_.erase( from );
-                facet_indices_[to] = facet_id;
-                vertices_->modify_value( facet_id, SetValue{ to.vertices() } );
-            }
-
+            
             void clean_facets()
             {
                 std::vector< bool > to_delete(
@@ -147,7 +136,7 @@ namespace geode
             void delete_facets( const std::vector< bool >& to_delete )
             {
                 auto old2new = mapping_after_deletion( to_delete );
-                std::vector< detail::VertexCycle > key_to_erase;
+                std::vector< VertexCycle > key_to_erase;
                 key_to_erase.reserve( old2new.size() );
                 for( const auto& cycle : facet_indices_ )
                 {
@@ -179,7 +168,7 @@ namespace geode
                     {
                         v = old2new[v];
                     }
-                    detail::VertexCycle updated_cycle{ updated_vertices };
+                    VertexCycle updated_cycle{ updated_vertices };
                     facet_indices_[updated_cycle] = cycle.second;
                     vertices_->modify_value(
                         cycle.second, SetValue{ updated_vertices } );
@@ -219,7 +208,7 @@ namespace geode
 
         private:
             mutable AttributeManager facet_attribute_manager_;
-            std::unordered_map< detail::VertexCycle, index_t > facet_indices_;
+            std::unordered_map< VertexCycle, index_t > facet_indices_;
             std::shared_ptr< VariableAttribute< index_t > > counter_;
             std::shared_ptr< VariableAttribute< VertexContainer > > vertices_;
         };
