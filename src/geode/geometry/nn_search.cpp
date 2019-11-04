@@ -30,7 +30,6 @@
 
 #include <geode/basic/pimpl_impl.h>
 
-
 namespace geode
 {
     template < index_t dimension >

@@ -23,7 +23,6 @@
 
 #include <geode/basic/logger.h>
 
-#include <geode/mesh/io/detail/register_output.h>
 #include <geode/mesh/core/geode_edged_curve.h>
 #include <geode/mesh/core/geode_graph.h>
 #include <geode/mesh/core/geode_point_set.h>
@@ -38,6 +37,7 @@
 #include <geode/mesh/io/detail/geode_polyhedral_solid_output.h>
 #include <geode/mesh/io/detail/geode_tetrahedral_solid_output.h>
 #include <geode/mesh/io/detail/geode_triangulated_surface_output.h>
+#include <geode/mesh/io/detail/register_output.h>
 
 template < typename GeodeFactory >
 void check_register( const std::string& extension )
