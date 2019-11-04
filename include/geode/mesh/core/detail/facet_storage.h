@@ -23,12 +23,13 @@
 
 #pragma once
 
-#include <geode/basic/common.h>
 #include <unordered_map>
 
 #include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>
+#include <geode/basic/common.h>
 #include <geode/basic/range.h>
+
 #include <geode/mesh/builder/detail/mapping_after_deletion.h>
 #include <geode/mesh/core/detail/vertex_cycle.h>
 

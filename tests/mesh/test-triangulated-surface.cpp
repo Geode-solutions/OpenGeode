@@ -22,6 +22,7 @@
  */
 
 #include <geode/basic/logger.h>
+
 #include <geode/geometry/point.h>
 
 #include <geode/mesh/builder/geode_triangulated_surface_builder.h>

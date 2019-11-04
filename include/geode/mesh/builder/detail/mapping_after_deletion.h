@@ -23,9 +23,9 @@
 
 #pragma once
 
-#include <geode/basic/range.h>
-
 #include <vector>
+
+#include <geode/basic/range.h>
 
 namespace
 {

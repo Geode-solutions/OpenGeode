@@ -24,6 +24,7 @@
 #include <fstream>
 
 #include <geode/basic/logger.h>
+
 #include <geode/geometry/point.h>
 
 #include <geode/mesh/builder/geode_vertex_set_builder.h>

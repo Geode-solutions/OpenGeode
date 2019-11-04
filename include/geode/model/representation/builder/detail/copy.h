@@ -21,8 +21,6 @@
  *
  */
 
-#include <geode/model/common.h>
-
 #include <unordered_map>
 
 #include <geode/basic/range.h>
@@ -33,6 +31,7 @@
 #include <geode/mesh/core/polygonal_surface.h>
 #include <geode/mesh/core/polyhedral_solid.h>
 
+#include <geode/model/common.h>
 #include <geode/model/mixin/core/block.h>
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/line.h>

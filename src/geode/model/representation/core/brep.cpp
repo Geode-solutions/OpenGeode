@@ -26,13 +26,13 @@
 #include <geode/geometry/bounding_box.h>
 #include <geode/geometry/vector.h>
 
+#include <geode/mesh/core/polygonal_surface.h>
+
 #include <geode/model/mixin/core/block.h>
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/line.h>
 #include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
-
-#include <geode/mesh/core/polygonal_surface.h>
 
 namespace
 {

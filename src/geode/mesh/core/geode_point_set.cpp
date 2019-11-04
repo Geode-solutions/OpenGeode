@@ -28,6 +28,7 @@
 #include <geode/basic/attribute.h>
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
+
 #include <geode/geometry/point.h>
 
 #include <geode/mesh/core/detail/points_impl.h>

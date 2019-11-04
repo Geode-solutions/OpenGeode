@@ -22,6 +22,7 @@
  */
 
 #include <geode/basic/logger.h>
+
 #include <geode/geometry/bounding_box.h>
 #include <geode/geometry/point.h>
 

@@ -24,4 +24,5 @@
 #pragma once
 
 #include <geode/basic/common.h>
+
 #include <geode/model/opengeode_model_export.h>

@@ -24,7 +24,6 @@
 #include <geode/basic/logger.h>
 
 #include <geode/mesh/io/detail/register_output.h>
-
 #include <geode/mesh/core/geode_edged_curve.h>
 #include <geode/mesh/core/geode_graph.h>
 #include <geode/mesh/core/geode_point_set.h>
@@ -32,7 +31,6 @@
 #include <geode/mesh/core/geode_polyhedral_solid.h>
 #include <geode/mesh/core/geode_tetrahedral_solid.h>
 #include <geode/mesh/core/geode_triangulated_surface.h>
-
 #include <geode/mesh/io/detail/geode_edged_curve_output.h>
 #include <geode/mesh/io/detail/geode_graph_output.h>
 #include <geode/mesh/io/detail/geode_point_set_output.h>

@@ -23,13 +23,13 @@
 
 #include <geode/model/mixin/builder/surfaces_builder.h>
 
-#include <geode/model/mixin/core/surface.h>
-#include <geode/model/mixin/core/surfaces.h>
-
 #include <geode/mesh/builder/polygonal_surface_builder.h>
 #include <geode/mesh/builder/triangulated_surface_builder.h>
 #include <geode/mesh/core/polygonal_surface.h>
 #include <geode/mesh/core/triangulated_surface.h>
+
+#include <geode/model/mixin/core/surface.h>
+#include <geode/model/mixin/core/surfaces.h>
 
 namespace geode
 {

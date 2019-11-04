@@ -23,13 +23,13 @@
 
 #pragma once
 
+#include <functional>
+
 #include <bitsery/adapter/stream.h>
 #include <bitsery/bitsery.h>
 #include <bitsery/ext/compact_value.h>
 #include <bitsery/ext/inheritance.h>
 #include <bitsery/ext/pointer.h>
-
-#include <functional>
 
 #include <geode/basic/common.h>
 #include <geode/basic/range.h>

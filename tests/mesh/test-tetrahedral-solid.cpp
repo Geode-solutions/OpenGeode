@@ -22,6 +22,7 @@
  */
 
 #include <geode/basic/logger.h>
+
 #include <geode/geometry/point.h>
 
 #include <geode/mesh/builder/geode_tetrahedral_solid_builder.h>

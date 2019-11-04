@@ -23,13 +23,13 @@
 
 #pragma once
 
-#include <geode/model/common.h>
-
 #include <geode/mesh/core/edged_curve.h>
 #include <geode/mesh/core/point_set.h>
 #include <geode/mesh/core/polygonal_surface.h>
 #include <geode/mesh/core/polyhedral_solid.h>
+#include <geode/mesh/core/mesh_type.h>
 
+#include <geode/model/common.h>
 #include <geode/model/mixin/builder/add_components_builders.h>
 #include <geode/model/mixin/builder/blocks_builder.h>
 #include <geode/model/mixin/builder/corners_builder.h>
@@ -43,8 +43,6 @@
 #include <geode/model/mixin/core/model_boundaries.h>
 #include <geode/model/mixin/core/surfaces.h>
 #include <geode/model/mixin/core/topology.h>
-
-#include <geode/mesh/core/mesh_type.h>
 
 namespace geode
 {

@@ -25,9 +25,9 @@
 
 #include <memory>
 
-#include <geode/model/common.h>
-
 #include <geode/mesh/core/mesh_type.h>
+
+#include <geode/model/common.h>
 
 namespace geode
 {

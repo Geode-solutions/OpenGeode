@@ -26,6 +26,7 @@
 #include <memory>
 
 #include <geode/basic/bitsery_archive.h>
+
 #include <geode/mesh/core/mesh_type.h>
 
 namespace geode

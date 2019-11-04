@@ -28,7 +28,6 @@
 #include <vector>
 
 #include <geode/basic/common.h>
-
 #include <geode/basic/logger.h>
 #include <geode/basic/singleton.h>
 

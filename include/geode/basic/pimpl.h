@@ -23,13 +23,13 @@
 
 #pragma once
 
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/common.h>
-
 #include <memory>
 
 #include <bitsery/bitsery.h>
 #include <bitsery/ext/std_smart_ptr.h>
+
+#include <geode/basic/bitsery_archive.h>
+#include <geode/basic/common.h>
 
 namespace geode
 {

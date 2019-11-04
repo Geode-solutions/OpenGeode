@@ -30,6 +30,7 @@
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/logger.h>
 #include <geode/basic/pimpl_impl.h>
+
 #include <geode/geometry/vector.h>
 
 #include <geode/mesh/builder/graph_builder.h>

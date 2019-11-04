@@ -24,7 +24,6 @@
 #pragma once
 
 #include <geode/model/common.h>
-
 #include <geode/model/mixin/core/relationships.h>
 
 namespace geode

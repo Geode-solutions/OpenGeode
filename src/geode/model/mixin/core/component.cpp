@@ -21,10 +21,12 @@
  *
  */
 
+#include <geode/model/mixin/core/component.h>
+
 #include <algorithm> // must be before bitsery/traits/string.h (for MacOS)
+
 #include <bitsery/traits/string.h>
 
-#include <geode/model/mixin/core/component.h>
 
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/logger.h>

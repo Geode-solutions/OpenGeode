@@ -33,14 +33,14 @@
 
 #include <geode/geometry/bitsery_archive.h>
 
-#include <geode/model/mixin/core/bitsery_archive.h>
-#include <geode/model/mixin/core/detail/uuid_to_index.h>
-
 #include <geode/mesh/builder/geode_graph_builder.h>
 #include <geode/mesh/core/bitsery_archive.h>
 #include <geode/mesh/core/geode_graph.h>
 #include <geode/mesh/io/graph_input.h>
 #include <geode/mesh/io/graph_output.h>
+
+#include <geode/model/mixin/core/bitsery_archive.h>
+#include <geode/model/mixin/core/detail/uuid_to_index.h>
 
 namespace geode
 {

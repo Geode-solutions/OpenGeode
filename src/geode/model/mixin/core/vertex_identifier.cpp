@@ -11,12 +11,6 @@
 
 #include <geode/geometry/bitsery_archive.h>
 
-#include <geode/model/mixin/core/bitsery_archive.h>
-#include <geode/model/mixin/core/block.h>
-#include <geode/model/mixin/core/corner.h>
-#include <geode/model/mixin/core/line.h>
-#include <geode/model/mixin/core/surface.h>
-
 #include <geode/mesh/builder/geode_vertex_set_builder.h>
 #include <geode/mesh/core/bitsery_archive.h>
 #include <geode/mesh/core/edged_curve.h>
@@ -24,6 +18,12 @@
 #include <geode/mesh/core/point_set.h>
 #include <geode/mesh/core/polygonal_surface.h>
 #include <geode/mesh/core/polyhedral_solid.h>
+
+#include <geode/model/mixin/core/bitsery_archive.h>
+#include <geode/model/mixin/core/block.h>
+#include <geode/model/mixin/core/corner.h>
+#include <geode/model/mixin/core/line.h>
+#include <geode/model/mixin/core/surface.h>
 
 namespace geode
 {

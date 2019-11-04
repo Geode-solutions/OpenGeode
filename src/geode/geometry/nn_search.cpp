@@ -25,10 +25,11 @@
 
 #include <numeric>
 
-#include <geode/basic/pimpl_impl.h>
-
 #include <async++.h>
 #include <nanoflann.hpp>
+
+#include <geode/basic/pimpl_impl.h>
+
 
 namespace geode
 {

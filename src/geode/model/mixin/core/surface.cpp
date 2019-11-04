@@ -26,9 +26,9 @@
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
 
-#include <geode/model/mixin/core/detail/mesh_storage.h>
-
 #include <geode/mesh/core/polygonal_surface.h>
+
+#include <geode/model/mixin/core/detail/mesh_storage.h>
 
 namespace geode
 {
