@@ -179,7 +179,7 @@ namespace geode
                     {
                         v = old2new[v];
                     }
-                    details::VertexCycle updated_cycle{ updated_vertices };
+                    detail::VertexCycle updated_cycle{ updated_vertices };
                     facet_indices_[updated_cycle] = cycle.second;
                     vertices_->modify_value(
                         cycle.second, SetValue{ updated_vertices } );
