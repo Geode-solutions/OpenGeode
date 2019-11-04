@@ -9,7 +9,7 @@ TODO
 
 ### Breaking Changes
 
-- **BRep / Section**: methods accessing iterators for internal/embeddined Components are renamed more explicitly.
+- **BRep / Section**: methods accessing iterators for internal/embedded Components are renamed more explicitly.
 
 **How to upgrade**
 
