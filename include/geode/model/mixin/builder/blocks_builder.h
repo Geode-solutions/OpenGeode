@@ -29,7 +29,6 @@
 
 #include <geode/model/common.h>
 
-
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Block );

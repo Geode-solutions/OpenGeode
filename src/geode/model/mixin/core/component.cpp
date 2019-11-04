@@ -27,7 +27,6 @@
 
 #include <bitsery/traits/string.h>
 
-
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/logger.h>
 #include <geode/basic/pimpl_impl.h>
