@@ -64,7 +64,7 @@ namespace geode
     };
 
     /*!
-     * Base class for range-based iteration on custom range.
+     * Begin and end methods for range-based iteration on custom range.
      * See derived classes for usage.
      */
     template < typename Type >
