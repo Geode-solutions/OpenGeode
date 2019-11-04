@@ -22,9 +22,10 @@
  */
 
 #include <geode/basic/assert.h>
-#include <geode/basic/logger.h>
 
 #include <cassert>
+
+#include <geode/basic/logger.h>
 
 namespace geode
 {

@@ -22,12 +22,13 @@
  */
 
 #include <geode/basic/logger.h>
-#include <geode/basic/pimpl_impl.h>
 
 // clang-format off
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 // clang-format on
+
+#include <geode/basic/pimpl_impl.h>
 
 namespace geode
 {

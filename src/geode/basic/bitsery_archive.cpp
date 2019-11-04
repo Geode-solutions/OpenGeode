@@ -26,7 +26,6 @@
 #include <bitsery/brief_syntax/array.h>
 
 #include <geode/basic/attribute_manager.h>
-#include <geode/basic/point.h>
 #include <geode/basic/uuid.h>
 
 namespace
@@ -42,10 +41,8 @@ namespace
             context );
         geode::AttributeManager::register_attribute_type< geode::index_t,
             Serializer >( context );
-        geode::AttributeManager::register_attribute_type< geode::Point2D,
-            Serializer >( context );
-        geode::AttributeManager::register_attribute_type< geode::Point3D,
-            Serializer >( context );
+        geode::AttributeManager::register_attribute_type<
+            std::vector< geode::index_t >, Serializer >( context );
         geode::AttributeManager::register_attribute_type<
             std::array< geode::index_t, 2 >, Serializer >( context );
         geode::AttributeManager::register_attribute_type<

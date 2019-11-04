@@ -49,6 +49,7 @@ install(
 #------------------------------------------------------------------------------------------------
 # Configure the OpenGeode libraries
 add_geode_library(geode/basic)
+add_geode_library(geode/geometry)
 add_geode_library(geode/mesh)
 add_geode_library(geode/model)
 

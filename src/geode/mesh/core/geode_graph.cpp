@@ -40,6 +40,17 @@ namespace geode
     private:
         friend class bitsery::Access;
         Impl() = default;
+
+        friend class bitsery::Access;
+        template < typename Archive >
+        void serialize( Archive& archive )
+        {
+            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
+                []( Archive& archive, Impl& impl ) {
+                    archive.ext(
+                        impl, bitsery::ext::BaseClass< detail::EdgesImpl >{} );
+                } );
+        }
     };
 
     OpenGeodeGraph::OpenGeodeGraph() : impl_( *this ) {}
@@ -61,8 +72,11 @@ namespace geode
     template < typename Archive >
     void OpenGeodeGraph::serialize( Archive& archive )
     {
-        archive.ext( *this, bitsery::ext::BaseClass< Graph >{} );
-        archive.object( impl_ );
+        archive.ext( *this, DefaultGrowable< Archive, OpenGeodeGraph >{},
+            []( Archive& archive, OpenGeodeGraph& graph ) {
+                archive.ext( graph, bitsery::ext::BaseClass< Graph >{} );
+                archive.object( graph.impl_ );
+            } );
     }
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, OpenGeodeGraph );

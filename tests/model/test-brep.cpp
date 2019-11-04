@@ -27,23 +27,22 @@
 #include <geode/basic/range.h>
 #include <geode/basic/uuid.h>
 
-#include <geode/model/representation/builder/brep_builder.h>
-#include <geode/model/representation/core/brep.h>
-#include <geode/model/representation/io/brep_input.h>
-#include <geode/model/representation/io/brep_output.h>
-
-#include <geode/basic/attribute_manager.h>
 #include <geode/mesh/core/geode_edged_curve.h>
 #include <geode/mesh/core/geode_point_set.h>
 #include <geode/mesh/core/geode_polygonal_surface.h>
 #include <geode/mesh/core/geode_polyhedral_solid.h>
 #include <geode/mesh/core/geode_triangulated_surface.h>
 #include <geode/mesh/core/point_set.h>
+
 #include <geode/model/mixin/core/block.h>
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/line.h>
 #include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
+#include <geode/model/representation/builder/brep_builder.h>
+#include <geode/model/representation/core/brep.h>
+#include <geode/model/representation/io/brep_input.h>
+#include <geode/model/representation/io/brep_output.h>
 
 template < typename Range >
 geode::index_t count_components( Range range )
@@ -183,46 +182,46 @@ std::vector< geode::uuid > add_model_boundaries(
     return uuids;
 }
 
-void add_corner_line_relation( const geode::BRep& model,
+void add_corner_line_boundary_relation( const geode::BRep& model,
     geode::BRepBuilder& builder,
     const std::vector< geode::uuid >& corner_uuids,
     const std::vector< geode::uuid >& line_uuids )
 {
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[0] ), model.line( line_uuids[0] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[0] ), model.line( line_uuids[5] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[0] ), model.line( line_uuids[2] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[1] ), model.line( line_uuids[0] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[1] ), model.line( line_uuids[1] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[1] ), model.line( line_uuids[3] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[2] ), model.line( line_uuids[1] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[2] ), model.line( line_uuids[2] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[2] ), model.line( line_uuids[4] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[3] ), model.line( line_uuids[5] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[3] ), model.line( line_uuids[6] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[3] ), model.line( line_uuids[8] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[4] ), model.line( line_uuids[3] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[4] ), model.line( line_uuids[6] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[4] ), model.line( line_uuids[7] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[5] ), model.line( line_uuids[4] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[5] ), model.line( line_uuids[7] ) );
-    builder.add_corner_line_relationship(
+    builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[5] ), model.line( line_uuids[8] ) );
 
     for( const auto& corner_id : corner_uuids )
@@ -249,46 +248,46 @@ void add_corner_line_relation( const geode::BRep& model,
     }
 }
 
-void add_line_surface_relation( const geode::BRep& model,
+void add_line_surface_boundary_relation( const geode::BRep& model,
     geode::BRepBuilder& builder,
     const std::vector< geode::uuid >& line_uuids,
     const std::vector< geode::uuid >& surface_uuids )
 {
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[0] ), model.surface( surface_uuids[0] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[0] ), model.surface( surface_uuids[1] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[1] ), model.surface( surface_uuids[0] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[1] ), model.surface( surface_uuids[2] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[2] ), model.surface( surface_uuids[0] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[2] ), model.surface( surface_uuids[3] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[3] ), model.surface( surface_uuids[1] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[3] ), model.surface( surface_uuids[2] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[4] ), model.surface( surface_uuids[2] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[4] ), model.surface( surface_uuids[3] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[5] ), model.surface( surface_uuids[1] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[5] ), model.surface( surface_uuids[3] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[6] ), model.surface( surface_uuids[1] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[6] ), model.surface( surface_uuids[4] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[7] ), model.surface( surface_uuids[2] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[7] ), model.surface( surface_uuids[4] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[8] ), model.surface( surface_uuids[3] ) );
-    builder.add_line_surface_relationship(
+    builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[8] ), model.surface( surface_uuids[4] ) );
 
     for( const auto& line_id : line_uuids )
@@ -311,7 +310,7 @@ void add_surface_block_relation( const geode::BRep& model,
 {
     for( const auto& surface_id : surface_uuids )
     {
-        builder.add_surface_block_relationship(
+        builder.add_surface_block_boundary_relationship(
             model.surface( surface_id ), model.block( block_uuids.front() ) );
     }
 
@@ -356,7 +355,75 @@ void add_surfaces_in_model_boundaries( const geode::BRep& model,
     }
 }
 
-void add_internal_relations( const geode::BRep& model,
+void add_internal_corner_relations( const geode::BRep& model,
+    geode::BRepBuilder& builder,
+    const std::vector< geode::uuid >& corner_uuids,
+    const std::vector< geode::uuid >& surface_uuids,
+    const std::vector< geode::uuid >& block_uuids )
+{
+    for( const auto& corner_id : corner_uuids )
+    {
+        builder.add_corner_surface_internal_relationship(
+            model.corner( corner_id ), model.surface( surface_uuids.front() ) );
+        builder.add_corner_block_internal_relationship(
+            model.corner( corner_id ), model.block( block_uuids.front() ) );
+    }
+
+    for( const auto& corner_id : corner_uuids )
+    {
+        for( const auto& embedding :
+            model.embedded_surfaces( model.corner( corner_id ) ) )
+        {
+            OPENGEODE_EXCEPTION(
+                geode::contain( surface_uuids, embedding.id() ),
+                "[Test] All Corners embedded surfaces should be Surfaces" );
+        }
+        for( const auto& embedding :
+            model.embedded_blocks( model.corner( corner_id ) ) )
+        {
+            OPENGEODE_EXCEPTION( geode::contain( block_uuids, embedding.id() ),
+                "[Test] All Corners embedded blocks should be Blocks" );
+        }
+        OPENGEODE_EXCEPTION( model.nb_embeddings( corner_id ) == 2,
+            "[Test] All Corners should be embedded to 1 Block and 1 Surface" );
+    }
+}
+
+void add_internal_line_relations( const geode::BRep& model,
+    geode::BRepBuilder& builder,
+    const std::vector< geode::uuid >& line_uuids,
+    const std::vector< geode::uuid >& surface_uuids,
+    const std::vector< geode::uuid >& block_uuids )
+{
+    for( const auto& line_id : line_uuids )
+    {
+        builder.add_line_surface_internal_relationship(
+            model.line( line_id ), model.surface( surface_uuids.front() ) );
+        builder.add_line_block_internal_relationship(
+            model.line( line_id ), model.block( block_uuids.front() ) );
+    }
+
+    for( const auto& line_id : line_uuids )
+    {
+        for( const auto& embedding :
+            model.embedded_surfaces( model.line( line_id ) ) )
+        {
+            OPENGEODE_EXCEPTION(
+                geode::contain( surface_uuids, embedding.id() ),
+                "[Test] All Line embedded surfaces should be Surfaces" );
+        }
+        for( const auto& embedding :
+            model.embedded_blocks( model.line( line_id ) ) )
+        {
+            OPENGEODE_EXCEPTION( geode::contain( block_uuids, embedding.id() ),
+                "[Test] All Lines embedded blocks should be Blocks" );
+        }
+        OPENGEODE_EXCEPTION( model.nb_embeddings( line_id ) == 2,
+            "[Test] All Surfaces should be embedded to 1 Block and 1 Surface" );
+    }
+}
+
+void add_internal_surface_relations( const geode::BRep& model,
     geode::BRepBuilder& builder,
     const std::vector< geode::uuid >& surface_uuids,
     const std::vector< geode::uuid >& block_uuids )
@@ -370,7 +437,7 @@ void add_internal_relations( const geode::BRep& model,
     for( const auto& surface_id : surface_uuids )
     {
         for( const auto& embedding :
-            model.embeddings( model.surface( surface_id ) ) )
+            model.embedded_blocks( model.surface( surface_id ) ) )
         {
             OPENGEODE_EXCEPTION( geode::contain( block_uuids, embedding.id() ),
                 "[Test] All Surfaces embeddings should be Blocks" );
@@ -378,11 +445,6 @@ void add_internal_relations( const geode::BRep& model,
         OPENGEODE_EXCEPTION( model.nb_embeddings( surface_id ) == 1,
             "[Test] All Surfaces should be embedded to 1 Block" );
     }
-
-    OPENGEODE_EXCEPTION(
-        model.nb_internals( block_uuids.front() ) == surface_uuids.size(),
-        "[Test] The Block should embed all Surfaces (that are internal to the "
-        "Block)" );
 }
 
 void test_boundary_ranges( const geode::BRep& model,
@@ -399,10 +461,10 @@ void test_boundary_ranges( const geode::BRep& model,
         line_boundary_count++;
         OPENGEODE_EXCEPTION( line_boundary.id() == corner_uuids[0]
                                  || line_boundary.id() == corner_uuids[1],
-            "[Test] LineBoundaryRange iteration result is not correct" );
+            "[Test] BoundaryCornerRange iteration result is not correct" );
     }
     OPENGEODE_EXCEPTION( line_boundary_count == 2,
-        "[Test] LineBoundaryRange should iterates on 2 Corners" );
+        "[Test] BoundaryCornerRange should iterates on 2 Corners" );
 
     const auto& surface_boundaries =
         model.boundaries( model.surface( surface_uuids[0] ) );
@@ -413,10 +475,10 @@ void test_boundary_ranges( const geode::BRep& model,
         OPENGEODE_EXCEPTION( surface_boundary.id() == line_uuids[0]
                                  || surface_boundary.id() == line_uuids[1]
                                  || surface_boundary.id() == line_uuids[2],
-            "[Test] SurfaceBoundaryRange iteration result is not correct" );
+            "[Test] BoundaryLineRange iteration result is not correct" );
     }
     OPENGEODE_EXCEPTION( surface_boundary_count == 3,
-        "[Test] SurfaceBoundaryRange should iterates on 3 Lines" );
+        "[Test] BoundaryLineRange should iterates on 3 Lines" );
 
     const auto& block_boundaries =
         model.boundaries( model.block( block_uuids[0] ) );
@@ -429,10 +491,10 @@ void test_boundary_ranges( const geode::BRep& model,
                                  || block_boundary.id() == surface_uuids[2]
                                  || block_boundary.id() == surface_uuids[3]
                                  || block_boundary.id() == surface_uuids[4],
-            "[Test] BlockBoundaryRange iteration result is not correct" );
+            "[Test] BoundarySurfaceRange iteration result is not correct" );
     }
     OPENGEODE_EXCEPTION( block_boundary_count == 5,
-        "[Test] BlockBoundaryRange should iterates on 5 Surfaces" );
+        "[Test] BoundarySurfaceRange should iterates on 5 Surfaces" );
 }
 
 void test_incidence_ranges( const geode::BRep& model,
@@ -450,10 +512,10 @@ void test_incidence_ranges( const geode::BRep& model,
         OPENGEODE_EXCEPTION( corner_incidence.id() == line_uuids[0]
                                  || corner_incidence.id() == line_uuids[2]
                                  || corner_incidence.id() == line_uuids[5],
-            "[Test] CornerIncidenceRange iteration result is not correct" );
+            "[Test] IncidentLineRange iteration result is not correct" );
     }
     OPENGEODE_EXCEPTION( corner_incidence_count == 3,
-        "[Test] CornerIncidenceRange should iterates on 3 Lines" );
+        "[Test] IncidentLineRange should iterates on 3 Lines" );
 
     const auto& line_incidences =
         model.incidences( model.line( line_uuids[0] ) );
@@ -463,10 +525,10 @@ void test_incidence_ranges( const geode::BRep& model,
         line_incidence_count++;
         OPENGEODE_EXCEPTION( line_incidence.id() == surface_uuids[0]
                                  || line_incidence.id() == surface_uuids[1],
-            "[Test] LineIncidenceRange iteration result is not correct" );
+            "[Test] IncidentSurfaceRange iteration result is not correct" );
     }
     OPENGEODE_EXCEPTION( line_incidence_count == 2,
-        "[Test] LineIncidenceRange should iterates on 2 Surfaces" );
+        "[Test] IncidentSurfaceRange should iterates on 2 Surfaces" );
 
     const auto& surface_incidences =
         model.incidences( model.surface( surface_uuids[0] ) );
@@ -475,10 +537,10 @@ void test_incidence_ranges( const geode::BRep& model,
     {
         surface_incidence_count++;
         OPENGEODE_EXCEPTION( surface_incidence.id() == block_uuids[0],
-            "[Test] SurfaceIncidenceRange iteration result is not correct" );
+            "[Test] IncidentBlockRange iteration result is not correct" );
     }
     OPENGEODE_EXCEPTION( surface_incidence_count == 1,
-        "[Test] SurfaceIncidenceRange should iterates on 1 Block" );
+        "[Test] IncidentBlockRange should iterates on 1 Block" );
 }
 
 void test_item_ranges( const geode::BRep& model,
@@ -494,10 +556,10 @@ void test_item_ranges( const geode::BRep& model,
         OPENGEODE_EXCEPTION( boundary_item.id() == surface_uuids[1]
                                  || boundary_item.id() == surface_uuids[2]
                                  || boundary_item.id() == surface_uuids[3],
-            "[Test] ModelBoundaryItemRange iteration result is not correct" );
+            "[Test] ItemSurfaceRange iteration result is not correct" );
     }
     OPENGEODE_EXCEPTION( boundary_item_count == 3,
-        "[Test] CornerIncidenceRange should iterates "
+        "[Test] IncidentLineRange should iterates "
         "on 3 Surfaces (Boundary 1)" );
 }
 
@@ -637,13 +699,26 @@ int main()
         auto block_uuids = add_blocks( model, builder );
         auto model_boundary_uuids = add_model_boundaries( model, builder );
 
-        add_corner_line_relation( model, builder, corner_uuids, line_uuids );
-        add_line_surface_relation( model, builder, line_uuids, surface_uuids );
+        add_corner_line_boundary_relation(
+            model, builder, corner_uuids, line_uuids );
+        add_line_surface_boundary_relation(
+            model, builder, line_uuids, surface_uuids );
         add_surface_block_relation(
             model, builder, surface_uuids, block_uuids );
         add_surfaces_in_model_boundaries(
             model, builder, surface_uuids, model_boundary_uuids );
-        add_internal_relations( model, builder, surface_uuids, block_uuids );
+        add_internal_corner_relations(
+            model, builder, corner_uuids, surface_uuids, block_uuids );
+        add_internal_line_relations(
+            model, builder, line_uuids, surface_uuids, block_uuids );
+        add_internal_surface_relations(
+            model, builder, surface_uuids, block_uuids );
+        OPENGEODE_EXCEPTION( model.nb_internals( block_uuids.front() )
+                                 == corner_uuids.size() + line_uuids.size()
+                                        + surface_uuids.size(),
+            "[Test] The Block should embed all Corners & Lines & Surfaces "
+            "(that are internal to the "
+            "Block)" );
         test_boundary_ranges(
             model, corner_uuids, line_uuids, surface_uuids, block_uuids );
         test_incidence_ranges(

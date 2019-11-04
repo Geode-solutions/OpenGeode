@@ -26,7 +26,6 @@
 #include <mutex>
 
 #include <geode/model/common.h>
-
 #include <geode/model/mixin/core/relationships.h>
 #include <geode/model/mixin/core/vertex_identifier.h>
 

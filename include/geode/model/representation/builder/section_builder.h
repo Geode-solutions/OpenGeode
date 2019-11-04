@@ -23,12 +23,12 @@
 
 #pragma once
 
-#include <geode/model/common.h>
-
 #include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/core/mesh_type.h>
 #include <geode/mesh/core/point_set.h>
 #include <geode/mesh/core/polygonal_surface.h>
 
+#include <geode/model/common.h>
 #include <geode/model/mixin/builder/add_components_builders.h>
 #include <geode/model/mixin/builder/blocks_builder.h>
 #include <geode/model/mixin/builder/corners_builder.h>
@@ -42,8 +42,6 @@
 #include <geode/model/mixin/core/model_boundaries.h>
 #include <geode/model/mixin/core/surfaces.h>
 #include <geode/model/mixin/core/topology.h>
-
-#include <geode/mesh/core/mesh_type.h>
 
 namespace geode
 {
@@ -125,11 +123,14 @@ namespace geode
 
         void remove_model_boundary( const ModelBoundary2D& boundary );
 
-        void add_corner_line_relationship(
+        void add_corner_line_boundary_relationship(
             const Corner2D& corner, const Line2D& line );
 
-        void add_line_surface_relationship(
+        void add_line_surface_boundary_relationship(
             const Line2D& line, const Surface2D& surface );
+
+        void add_corner_surface_internal_relationship(
+            const Corner2D& corner, const Surface2D& surface );
 
         void add_line_surface_internal_relationship(
             const Line2D& line, const Surface2D& surface );

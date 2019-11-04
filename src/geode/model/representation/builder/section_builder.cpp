@@ -31,6 +31,17 @@
 #include <geode/model/representation/builder/detail/copy.h>
 #include <geode/model/representation/core/section.h>
 
+namespace
+{
+    template < typename Component >
+    void register_new_component(
+        geode::SectionBuilder& builder, const Component& component )
+    {
+        builder.register_component( component.component_id() );
+        builder.register_mesh_component( component );
+    }
+} // namespace
+
 namespace geode
 {
     SectionBuilder::SectionBuilder( Section& section )
@@ -68,6 +79,8 @@ namespace geode
     {
         detail::copy_corner_line_relationships(
             section, section_, *this, mapping.corners, mapping.lines );
+        detail::copy_corner_surface_relationships(
+            section, section_, *this, mapping.corners, mapping.surfaces );
         detail::copy_line_surface_relationships(
             section, section_, *this, mapping.lines, mapping.surfaces );
         for( const auto& model_boundary : section.model_boundaries() )
@@ -103,55 +116,49 @@ namespace geode
     const uuid& SectionBuilder::add_corner()
     {
         const auto& id = create_corner();
-        register_component( id );
-        register_mesh_component( section_.corner( id ) );
+        register_new_component( *this, section_.corner( id ) );
         return id;
     }
 
     const uuid& SectionBuilder::add_corner( const MeshType& type )
     {
         const auto& id = create_corner( type );
-        register_component( id );
-        register_mesh_component( section_.corner( id ) );
+        register_new_component( *this, section_.corner( id ) );
         return id;
     }
 
     const uuid& SectionBuilder::add_line()
     {
         const auto& id = create_line();
-        register_component( id );
-        register_mesh_component( section_.line( id ) );
+        register_new_component( *this, section_.line( id ) );
         return id;
     }
 
     const uuid& SectionBuilder::add_line( const MeshType& type )
     {
         const auto& id = create_line( type );
-        register_component( id );
-        register_mesh_component( section_.line( id ) );
+        register_new_component( *this, section_.line( id ) );
         return id;
     }
 
     const uuid& SectionBuilder::add_surface()
     {
         const auto& id = create_surface();
-        register_component( id );
-        register_mesh_component( section_.surface( id ) );
+        register_new_component( *this, section_.surface( id ) );
         return id;
     }
 
     const uuid& SectionBuilder::add_surface( const MeshType& type )
     {
         const auto& id = create_surface( type );
-        register_component( id );
-        register_mesh_component( section_.surface( id ) );
+        register_new_component( *this, section_.surface( id ) );
         return id;
     }
 
     const uuid& SectionBuilder::add_model_boundary()
     {
         const auto& id = create_model_boundary();
-        register_component( id );
+        register_component( section_.model_boundary( id ).component_id() );
         return id;
     }
 
@@ -207,16 +214,22 @@ namespace geode
         delete_model_boundary( boundary );
     }
 
-    void SectionBuilder::add_corner_line_relationship(
+    void SectionBuilder::add_corner_line_boundary_relationship(
         const Corner2D& corner, const Line2D& line )
     {
         add_boundary_relation( corner.id(), line.id() );
     }
 
-    void SectionBuilder::add_line_surface_relationship(
+    void SectionBuilder::add_line_surface_boundary_relationship(
         const Line2D& line, const Surface2D& surface )
     {
         add_boundary_relation( line.id(), surface.id() );
+    }
+
+    void SectionBuilder::add_corner_surface_internal_relationship(
+        const Corner2D& corner, const Surface2D& surface )
+    {
+        add_internal_relation( corner.id(), surface.id() );
     }
 
     void SectionBuilder::add_line_surface_internal_relationship(

@@ -26,15 +26,15 @@
 #include <geode/basic/pimpl_impl.h>
 #include <geode/basic/range.h>
 
-#include <geode/model/mixin/core/detail/components_storage.h>
-#include <geode/model/mixin/core/surface.h>
-
 #include <geode/mesh/core/polygonal_surface.h>
 #include <geode/mesh/core/triangulated_surface.h>
 #include <geode/mesh/io/polygonal_surface_input.h>
 #include <geode/mesh/io/polygonal_surface_output.h>
 #include <geode/mesh/io/triangulated_surface_input.h>
 #include <geode/mesh/io/triangulated_surface_output.h>
+
+#include <geode/model/mixin/core/detail/components_storage.h>
+#include <geode/model/mixin/core/surface.h>
 
 namespace geode
 {
@@ -228,7 +228,7 @@ namespace geode
     template < index_t dimension >
     Surfaces< dimension >::SurfaceRange::SurfaceRange(
         const Surfaces& surfaces )
-        : SurfaceRangeBase( surfaces )
+        : SurfaceRangeBase( surfaces ), BeginEnd< SurfaceRange >( *this )
     {
     }
 
@@ -242,7 +242,8 @@ namespace geode
     template < index_t dimension >
     Surfaces< dimension >::ModifiableSurfaceRange::ModifiableSurfaceRange(
         const Surfaces& surfaces )
-        : SurfaceRangeBase( surfaces )
+        : SurfaceRangeBase( surfaces ),
+          BeginEnd< ModifiableSurfaceRange >( *this )
     {
     }
 

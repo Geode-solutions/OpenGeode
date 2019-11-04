@@ -31,7 +31,6 @@
 #include <geode/mesh/builder/geode_tetrahedral_solid_builder.h>
 #include <geode/mesh/builder/geode_triangulated_surface_builder.h>
 #include <geode/mesh/builder/geode_vertex_set_builder.h>
-
 #include <geode/mesh/core/geode_edged_curve.h>
 #include <geode/mesh/core/geode_graph.h>
 #include <geode/mesh/core/geode_point_set.h>

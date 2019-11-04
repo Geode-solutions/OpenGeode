@@ -23,9 +23,10 @@
 
 #pragma once
 
-#include <geode/basic/common.h>
-#include <geode/basic/point.h>
 #include <geode/basic/range.h>
+
+#include <geode/geometry/common.h>
+#include <geode/geometry/point.h>
 
 namespace geode
 {

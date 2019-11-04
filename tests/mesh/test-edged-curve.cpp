@@ -24,7 +24,8 @@
 #include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/logger.h>
-#include <geode/basic/point.h>
+
+#include <geode/geometry/point.h>
 
 #include <geode/mesh/builder/geode_edged_curve_builder.h>
 #include <geode/mesh/core/geode_edged_curve.h>
@@ -164,7 +165,7 @@ void test_clone( const geode::EdgedCurve3D& edged_curve )
         edged_curve.edge_attribute_manager()
             .find_or_create_attribute< geode::VariableAttribute, int >(
                 "test" );
-    attribute->value( 0 ) = 42;
+    attribute->set_value( 0, 42 );
 
     auto edged_curve2 = edged_curve.clone();
     OPENGEODE_EXCEPTION( edged_curve2->nb_vertices() == 3,

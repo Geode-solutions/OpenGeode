@@ -21,10 +21,11 @@
  *
  */
 
-#include <algorithm> // must be before bitsery/traits/string.h (for MacOS)
-#include <bitsery/traits/string.h>
-
 #include <geode/model/mixin/core/component.h>
+
+#include <algorithm> // must be before bitsery/traits/string.h (for MacOS)
+
+#include <bitsery/traits/string.h>
 
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/logger.h>
@@ -57,8 +58,11 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.text1b( name_, name_.max_size() );
-            archive.object( id_ );
+            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
+                []( Archive& archive, Impl& impl ) {
+                    archive.text1b( impl.name_, impl.name_.max_size() );
+                    archive.object( impl.id_ );
+                } );
         }
 
     private:
@@ -98,7 +102,10 @@ namespace geode
     template < typename Archive >
     void Component< dimension >::serialize( Archive& archive )
     {
-        archive.object( impl_ );
+        archive.ext( *this, DefaultGrowable< Archive, Component >{},
+            []( Archive& archive, Component& component ) {
+                archive.object( component.impl_ );
+            } );
     }
 
     template class opengeode_model_api Component< 2 >;

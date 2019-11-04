@@ -23,11 +23,11 @@
 
 #pragma once
 
-#include <geode/basic/common.h>
-#include <geode/basic/range.h>
-
 #include <algorithm>
 #include <vector>
+
+#include <geode/basic/common.h>
+#include <geode/basic/range.h>
 
 namespace geode
 {

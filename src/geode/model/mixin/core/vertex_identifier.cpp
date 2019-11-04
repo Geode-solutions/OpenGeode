@@ -9,11 +9,7 @@
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
 
-#include <geode/model/mixin/core/bitsery_archive.h>
-#include <geode/model/mixin/core/block.h>
-#include <geode/model/mixin/core/corner.h>
-#include <geode/model/mixin/core/line.h>
-#include <geode/model/mixin/core/surface.h>
+#include <geode/geometry/bitsery_archive.h>
 
 #include <geode/mesh/builder/geode_vertex_set_builder.h>
 #include <geode/mesh/core/bitsery_archive.h>
@@ -22,6 +18,12 @@
 #include <geode/mesh/core/point_set.h>
 #include <geode/mesh/core/polygonal_surface.h>
 #include <geode/mesh/core/polyhedral_solid.h>
+
+#include <geode/model/mixin/core/bitsery_archive.h>
+#include <geode/model/mixin/core/block.h>
+#include <geode/model/mixin/core/corner.h>
+#include <geode/model/mixin/core/line.h>
+#include <geode/model/mixin/core/surface.h>
 
 namespace geode
 {
@@ -83,7 +85,7 @@ namespace geode
                 {
                     for( auto v : Range{ mesh.nb_vertices() } )
                     {
-                        attribute->value( v ) = it->second->value( v );
+                        attribute->set_value( v, it->second->value( v ) );
                     }
                 }
                 catch( const std::out_of_range& )
@@ -120,7 +122,7 @@ namespace geode
         void set_unique_vertex(
             MeshComponentVertex component_vertex_id, index_t unique_vertex_id )
         {
-            auto& old_unique_id =
+            const auto& old_unique_id =
                 vertex2unique_vertex_
                     .at( component_vertex_id.component_id.id() )
                     ->value( component_vertex_id.vertex );
@@ -131,19 +133,29 @@ namespace geode
 
             if( old_unique_id != NO_ID )
             {
-                auto& old_vertices =
+                const auto& old_vertices =
                     component_vertices_->value( old_unique_id );
                 auto it = find( old_vertices, component_vertex_id );
                 if( it != NO_ID )
                 {
-                    old_vertices.erase( old_vertices.begin() + it );
+                    component_vertices_->modify_value( old_unique_id,
+                        [&it]( std::vector< MeshComponentVertex >& vertices ) {
+                            vertices.erase( vertices.begin() + it );
+                        } );
                 }
             }
-            old_unique_id = unique_vertex_id;
-            auto& vertices = component_vertices_->value( unique_vertex_id );
+            vertex2unique_vertex_.at( component_vertex_id.component_id.id() )
+                ->set_value( component_vertex_id.vertex, unique_vertex_id );
+            const auto& vertices =
+                component_vertices_->value( unique_vertex_id );
             if( !contain( vertices, component_vertex_id ) )
             {
-                vertices.emplace_back( std::move( component_vertex_id ) );
+                component_vertices_->modify_value( unique_vertex_id,
+                    [&component_vertex_id](
+                        std::vector< MeshComponentVertex >& vertices ) {
+                        vertices.emplace_back( component_vertex_id );
+                    } );
+                ;
             }
         }
 
@@ -153,6 +165,7 @@ namespace geode
             std::ofstream file{ filename, std::ofstream::binary };
             TContext context{};
             register_basic_serialize_pcontext( std::get< 0 >( context ) );
+            register_geometry_serialize_pcontext( std::get< 0 >( context ) );
             register_mesh_serialize_pcontext( std::get< 0 >( context ) );
             register_model_serialize_pcontext( std::get< 0 >( context ) );
             Serializer archive{ context, file };
@@ -170,6 +183,7 @@ namespace geode
             std::ifstream file{ filename, std::ifstream::binary };
             TContext context{};
             register_basic_deserialize_pcontext( std::get< 0 >( context ) );
+            register_geometry_deserialize_pcontext( std::get< 0 >( context ) );
             register_mesh_deserialize_pcontext( std::get< 0 >( context ) );
             register_model_deserialize_pcontext( std::get< 0 >( context ) );
             Deserializer archive{ context, file };
@@ -188,15 +202,21 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.object( unique_vertices_ );
-            archive.ext( component_vertices_, bitsery::ext::StdSmartPtr{} );
-            archive.ext( vertex2unique_vertex_,
-                bitsery::ext::StdMap{ vertex2unique_vertex_.max_size() },
-                []( Archive& archive, uuid& id,
-                    std::shared_ptr< VariableAttribute< index_t > >&
-                        attribute ) {
-                    archive.object( id );
-                    archive.ext( attribute, bitsery::ext::StdSmartPtr{} );
+            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
+                []( Archive& archive, Impl& impl ) {
+                    archive.object( impl.unique_vertices_ );
+                    archive.ext(
+                        impl.component_vertices_, bitsery::ext::StdSmartPtr{} );
+                    archive.ext( impl.vertex2unique_vertex_,
+                        bitsery::ext::StdMap{
+                            impl.vertex2unique_vertex_.max_size() },
+                        []( Archive& archive, uuid& id,
+                            std::shared_ptr< VariableAttribute< index_t > >&
+                                attribute ) {
+                            archive.object( id );
+                            archive.ext(
+                                attribute, bitsery::ext::StdSmartPtr{} );
+                        } );
                 } );
         }
 
@@ -204,7 +224,7 @@ namespace geode
         {
             for( auto uv_id : Range{ nb_unique_vertices() } )
             {
-                auto& mesh_component_vertices =
+                const auto& mesh_component_vertices =
                     component_vertices_->value( uv_id );
 
                 std::vector< bool > to_keep(
@@ -219,8 +239,9 @@ namespace geode
                 }
                 if( contain( to_keep, false ) )
                 {
-                    mesh_component_vertices = extract_vector_elements(
-                        to_keep, mesh_component_vertices );
+                    component_vertices_->set_value(
+                        uv_id, extract_vector_elements(
+                                   to_keep, mesh_component_vertices ) );
                 }
             }
         }

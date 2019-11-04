@@ -23,20 +23,18 @@
 
 #include <geode/basic/assert.h>
 #include <geode/basic/logger.h>
-#include <geode/basic/point.h>
+#include <geode/geometry/point.h>
 
-#include <geode/model/mixin/core/vertex_identifier.h>
+#include <geode/mesh/builder/point_set_builder.h>
 
 #include <geode/model/mixin/builder/add_components_builders.h>
 #include <geode/model/mixin/builder/corners_builder.h>
 #include <geode/model/mixin/builder/topology_builder.h>
-
 #include <geode/model/mixin/core/add_components.h>
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/corners.h>
 #include <geode/model/mixin/core/topology.h>
-
-#include <geode/mesh/builder/point_set_builder.h>
+#include <geode/model/mixin/core/vertex_identifier.h>
 
 class CornerProvider : public geode::Topology,
                        public geode::AddComponents< 2, geode::Corners >

@@ -25,7 +25,9 @@
 
 #include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>
-#include <geode/basic/point.h>
+#include <geode/basic/bitsery_archive.h>
+
+#include <geode/geometry/point.h>
 
 #include <geode/mesh/core/vertex_set.h>
 
@@ -53,7 +55,7 @@ namespace geode
 
             void set_point( index_t vertex_id, const Point< dimension >& point )
             {
-                points_->value( vertex_id ) = point;
+                points_->set_value( vertex_id, point );
             }
 
         private:
@@ -61,7 +63,11 @@ namespace geode
             template < typename Archive >
             void serialize( Archive& archive )
             {
-                archive.ext( points_, bitsery::ext::StdSmartPtr{} );
+                archive.ext( *this, DefaultGrowable< Archive, PointsImpl >{},
+                    []( Archive& archive, PointsImpl& impl ) {
+                        archive.ext(
+                            impl.points_, bitsery::ext::StdSmartPtr{} );
+                    } );
             }
 
         protected:

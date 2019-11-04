@@ -23,13 +23,13 @@
 
 #include <geode/model/mixin/builder/blocks_builder.h>
 
-#include <geode/model/mixin/core/block.h>
-#include <geode/model/mixin/core/blocks.h>
-
 #include <geode/mesh/builder/polyhedral_solid_builder.h>
 #include <geode/mesh/builder/tetrahedral_solid_builder.h>
 #include <geode/mesh/core/polyhedral_solid.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
+
+#include <geode/model/mixin/core/block.h>
+#include <geode/model/mixin/core/blocks.h>
 
 namespace geode
 {

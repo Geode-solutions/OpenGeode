@@ -24,7 +24,6 @@
 #pragma once
 
 #include <geode/model/common.h>
-
 #include <geode/model/mixin/core/relationships.h>
 
 namespace geode
@@ -40,9 +39,9 @@ namespace geode
         /*!
          * Add a component in the set of components registered by the
          * Relationships
-         * @param[in] id Unique index of the component to add
+         * @param[in] id The component identifier to add
          */
-        void register_component( const uuid& id );
+        void register_component( const ComponentID& id );
 
         /*!
          * Remove a component from the set of components registered by the

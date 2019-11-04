@@ -22,34 +22,34 @@
  */
 
 #include <geode/basic/logger.h>
-#include <geode/basic/vector.h>
 
-void test_length()
+#include <geode/geometry/point.h>
+
+void test_comparison()
 {
-    geode::Vector3D p{ { 1, 2, 4 } };
-    OPENGEODE_EXCEPTION(
-        p.length() == std::sqrt( 1 + 4 + 16 ), "[Test] Wrong vector length" );
+    geode::Point3D p{ { 2, 1.0, 2.6 } };
+    geode::Point3D p2 = p;
 
-    auto p_normalized = p.normalize();
-    OPENGEODE_EXCEPTION(
-        p_normalized.length() == 1, "[Test] Wrong vector length" );
+    OPENGEODE_EXCEPTION( p == p2, "[Test] Points should be equal" );
+    geode::Point2D P{ { 15, 2.6 } };
+    geode::Point2D P2{ { 16, 2.6 } };
+    OPENGEODE_EXCEPTION( P != P2, "[Test] Points should be different" );
+
+    geode::Point3D p_epsilon{ { 2.0000000001, 1, 2.6 } };
+    OPENGEODE_EXCEPTION( p.inexact_equal( p_epsilon, 0.0001 ),
+        "[Test] Points should be almost equal" );
 }
 
-void test_operations()
+void test_operators()
 {
-    geode::Vector3D unit{ { 0, 2, 0 } };
-    geode::Vector3D p{ { 1, 2, 4 } };
-    OPENGEODE_EXCEPTION( p.dot( unit ) == 4, "[Test] Wrong dot product" );
-
-    auto cross_unit =
-        geode::Vector3D{ { 1, 0, 0 } }.cross( geode::Vector3D{ { 0, 1, 0 } } );
-    geode::Vector3D answer_unit{ { 0, 0, 1 } };
+    geode::Point3D p{ { 2, 1.0, 2.6 } };
+    geode::Point3D p2 = p;
+    geode::Point3D answer{ { 4, 2, 5.2 } };
+    OPENGEODE_EXCEPTION( p + p2 == answer, "[Test] Points should be equal" );
+    OPENGEODE_EXCEPTION( p * 2 == answer, "[Test] Points should be equal" );
     OPENGEODE_EXCEPTION(
-        cross_unit == answer_unit, "[Test] Wrong unit cross product" );
-
-    geode::Vector3D answer{ { -8, 0, 2 } };
-    OPENGEODE_EXCEPTION(
-        p.cross( unit ) == answer, "[Test] Wrong cross product" );
+        p - p2 == geode::Point3D{}, "[Test] Points should be equal" );
+    OPENGEODE_EXCEPTION( answer / 2 == p, "[Test] Points should be equal" );
 }
 
 int main()
@@ -58,8 +58,8 @@ int main()
 
     try
     {
-        test_length();
-        test_operations();
+        test_comparison();
+        test_operators();
 
         Logger::info( "TEST SUCCESS" );
         return 0;

@@ -26,9 +26,9 @@
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
 
-#include <geode/model/mixin/core/detail/mesh_storage.h>
-
 #include <geode/mesh/core/point_set.h>
+
+#include <geode/model/mixin/core/detail/mesh_storage.h>
 
 namespace geode
 {
@@ -36,6 +36,18 @@ namespace geode
     class Corner< dimension >::Impl
         : public detail::MeshStorage< PointSet< dimension > >
     {
+    private:
+        friend class bitsery::Access;
+        template < typename Archive >
+        void serialize( Archive& archive )
+        {
+            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
+                []( Archive& archive, Impl& impl ) {
+                    archive.ext( impl,
+                        bitsery::ext::BaseClass<
+                            detail::MeshStorage< PointSet< dimension > > >{} );
+                } );
+        }
     };
 
     template < index_t dimension >
@@ -77,9 +89,12 @@ namespace geode
     template < typename Archive >
     void Corner< dimension >::serialize( Archive& archive )
     {
-        archive.object( impl_ );
-        archive.ext(
-            *this, bitsery::ext::BaseClass< Component< dimension > >{} );
+        archive.ext( *this, DefaultGrowable< Archive, Corner >{},
+            []( Archive& archive, Corner& corner ) {
+                archive.object( corner.impl_ );
+                archive.ext( corner,
+                    bitsery::ext::BaseClass< Component< dimension > >{} );
+            } );
     }
 
     template < index_t dimension >

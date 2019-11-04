@@ -26,15 +26,15 @@
 #include <geode/basic/pimpl_impl.h>
 #include <geode/basic/range.h>
 
-#include <geode/model/mixin/core/block.h>
-#include <geode/model/mixin/core/detail/components_storage.h>
-
 #include <geode/mesh/core/polyhedral_solid.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
 #include <geode/mesh/io/polyhedral_solid_input.h>
 #include <geode/mesh/io/polyhedral_solid_output.h>
 #include <geode/mesh/io/tetrahedral_solid_input.h>
 #include <geode/mesh/io/tetrahedral_solid_output.h>
+
+#include <geode/model/mixin/core/block.h>
+#include <geode/model/mixin/core/detail/components_storage.h>
 
 namespace geode
 {
@@ -214,7 +214,7 @@ namespace geode
 
     template < index_t dimension >
     Blocks< dimension >::BlockRange::BlockRange( const Blocks& blocks )
-        : BlockRangeBase( blocks )
+        : BlockRangeBase( blocks ), BeginEnd< BlockRange >( *this )
     {
     }
 
@@ -234,7 +234,7 @@ namespace geode
     template < index_t dimension >
     Blocks< dimension >::ModifiableBlockRange::ModifiableBlockRange(
         const Blocks& blocks )
-        : BlockRangeBase( blocks )
+        : BlockRangeBase( blocks ), BeginEnd< ModifiableBlockRange >( *this )
     {
     }
 

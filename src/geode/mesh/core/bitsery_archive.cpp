@@ -26,6 +26,7 @@
 #include <bitsery/brief_syntax/vector.h>
 
 #include <geode/basic/attribute_manager.h>
+
 #include <geode/mesh/core/geode_edged_curve.h>
 #include <geode/mesh/core/geode_graph.h>
 #include <geode/mesh/core/geode_point_set.h>

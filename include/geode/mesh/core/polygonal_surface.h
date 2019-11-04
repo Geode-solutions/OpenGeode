@@ -24,6 +24,7 @@
 #pragma once
 
 #include <geode/basic/attribute.h>
+#include <geode/basic/bitsery_archive.h>
 #include <geode/basic/factory.h>
 #include <geode/basic/pimpl.h>
 
@@ -68,8 +69,11 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.value4b( polygon_id );
-            archive.value4b( vertex_id );
+            archive.ext( *this, DefaultGrowable< Archive, PolygonVertex >{},
+                []( Archive& archive, PolygonVertex& polygon_vertex ) {
+                    archive.value4b( polygon_vertex.polygon_id );
+                    archive.value4b( polygon_vertex.vertex_id );
+                } );
         }
         index_t polygon_id{ NO_ID };
         index_t vertex_id{ NO_ID };
@@ -97,8 +101,11 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.value4b( polygon_id );
-            archive.value4b( edge_id );
+            archive.ext( *this, DefaultGrowable< Archive, PolygonEdge >{},
+                []( Archive& archive, PolygonEdge& polygon_edge ) {
+                    archive.value4b( polygon_edge.polygon_id );
+                    archive.value4b( polygon_edge.edge_id );
+                } );
         }
         index_t polygon_id{ NO_ID };
         index_t edge_id{ NO_ID };
@@ -152,6 +159,12 @@ namespace geode
          */
         index_t polygon_edge_vertex(
             const PolygonEdge& polygon_edge, index_t vertex_id ) const;
+
+        /*!
+         * Return the indices of edge vertices.
+         * @param[in] edge_id Index of an edge.
+         */
+        const std::array< index_t, 2 >& edge_vertices( index_t edge_id ) const;
 
         /*!
          * Return the next vertex in a polygon (local indexation)
@@ -227,17 +240,16 @@ namespace geode
         PolygonEdge previous_on_border( const PolygonEdge& polygon_edge ) const;
 
         /*!
-         * Return the length of a given polygon edge
-         * @param[in] polygon_edge Local index of edge in a polygon
+         * Return the length of a given edge.
+         * @param[in] edge_id Index of edge.
          */
-        double polygon_edge_length( const PolygonEdge& polygon_edge ) const;
+        double edge_length( index_t edge_id ) const;
 
         /*!
-         * Return the coordinates of the barycenter of a given polygon edge.
-         * @param[in] polygon_edge Local index of edge in a polygon.
+         * Return the coordinates of the barycenter of a given edge.
+         * @param[in] edge_id Index of edge polygon.
          */
-        Point< dimension > polygon_edge_barycenter(
-            const PolygonEdge& polygon_edge ) const;
+        Point< dimension > edge_barycenter( index_t edge_id ) const;
 
         /*!
          * Return the barycenter of a polygon
@@ -271,6 +283,13 @@ namespace geode
          */
         std::tuple< bool, PolygonEdge > polygon_edge_from_vertices(
             index_t from_vertex_id, index_t to_vertex_id ) const;
+
+        /*!
+         * Get the index of edge corresponding to given vertices
+         * @param[in] vertices Ordered vertex indices
+         */
+        index_t edge_from_vertices(
+            const std::array< index_t, 2 >& vertices ) const;
 
         /*!
          * Access to the manager of attributes associated with edges.

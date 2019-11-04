@@ -26,12 +26,12 @@
 #include <geode/basic/pimpl_impl.h>
 #include <geode/basic/range.h>
 
-#include <geode/model/mixin/core/detail/components_storage.h>
-#include <geode/model/mixin/core/line.h>
-
 #include <geode/mesh/core/edged_curve.h>
 #include <geode/mesh/io/edged_curve_input.h>
 #include <geode/mesh/io/edged_curve_output.h>
+
+#include <geode/model/mixin/core/detail/components_storage.h>
+#include <geode/model/mixin/core/line.h>
 
 namespace geode
 {
@@ -200,7 +200,7 @@ namespace geode
 
     template < index_t dimension >
     Lines< dimension >::LineRange::LineRange( const Lines& lines )
-        : LineRangeBase( lines )
+        : LineRangeBase( lines ), BeginEnd< LineRange >( *this )
     {
     }
 
@@ -213,7 +213,7 @@ namespace geode
     template < index_t dimension >
     Lines< dimension >::ModifiableLineRange::ModifiableLineRange(
         const Lines& lines )
-        : LineRangeBase( lines )
+        : LineRangeBase( lines ), BeginEnd< ModifiableLineRange >( *this )
     {
     }
 

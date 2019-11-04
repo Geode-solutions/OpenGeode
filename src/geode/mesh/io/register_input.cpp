@@ -30,7 +30,6 @@
 #include <geode/mesh/core/geode_polyhedral_solid.h>
 #include <geode/mesh/core/geode_tetrahedral_solid.h>
 #include <geode/mesh/core/geode_triangulated_surface.h>
-
 #include <geode/mesh/io/detail/geode_edged_curve_input.h>
 #include <geode/mesh/io/detail/geode_graph_input.h>
 #include <geode/mesh/io/detail/geode_point_set_input.h>

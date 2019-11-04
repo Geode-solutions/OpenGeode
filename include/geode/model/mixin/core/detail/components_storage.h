@@ -31,7 +31,10 @@
 
 #include <ghc/filesystem.hpp>
 
+#include <geode/basic/bitsery_archive.h>
 #include <geode/basic/uuid.h>
+
+#include <geode/geometry/bitsery_archive.h>
 
 #include <geode/mesh/core/bitsery_archive.h>
 #include <geode/mesh/core/mesh_type.h>
@@ -125,6 +128,8 @@ namespace geode
                 TContext& context ) const
             {
                 register_basic_serialize_pcontext( std::get< 0 >( context ) );
+                register_geometry_serialize_pcontext(
+                    std::get< 0 >( context ) );
                 register_mesh_serialize_pcontext( std::get< 0 >( context ) );
                 register_model_serialize_pcontext( std::get< 0 >( context ) );
             }
@@ -133,6 +138,8 @@ namespace geode
                 TContext& context ) const
             {
                 register_basic_deserialize_pcontext( std::get< 0 >( context ) );
+                register_geometry_deserialize_pcontext(
+                    std::get< 0 >( context ) );
                 register_mesh_deserialize_pcontext( std::get< 0 >( context ) );
                 register_model_deserialize_pcontext( std::get< 0 >( context ) );
             }
@@ -142,11 +149,18 @@ namespace geode
             template < typename Archive >
             void serialize( Archive& archive )
             {
-                archive.ext( components_,
-                    bitsery::ext::StdMap{ components_.max_size() },
-                    []( Archive& archive, uuid& id, ComponentPtr& item ) {
-                        archive.object( id );
-                        archive.ext( item, bitsery::ext::StdSmartPtr{} );
+                archive.ext( *this,
+                    DefaultGrowable< Archive, ComponentsStorage >{},
+                    []( Archive& archive, ComponentsStorage& storage ) {
+                        archive.ext( storage.components_,
+                            bitsery::ext::StdMap{
+                                storage.components_.max_size() },
+                            []( Archive& archive, uuid& id,
+                                ComponentPtr& item ) {
+                                archive.object( id );
+                                archive.ext(
+                                    item, bitsery::ext::StdSmartPtr{} );
+                            } );
                     } );
             }
 

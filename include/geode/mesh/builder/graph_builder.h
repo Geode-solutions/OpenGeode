@@ -88,6 +88,11 @@ namespace geode
          */
         void delete_edges( const std::vector< bool >& to_delete );
 
+        /*!
+         * Delete all the isolated vertices (not used as edge endpoint)
+         */
+        void delete_isolated_vertices();
+
     protected:
         GraphBuilder( Graph& graph );
 

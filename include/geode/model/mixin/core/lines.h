@@ -25,9 +25,9 @@
 
 #include <geode/basic/pimpl.h>
 
-#include <geode/model/common.h>
-
 #include <geode/mesh/core/mesh_type.h>
+
+#include <geode/model/common.h>
 
 namespace geode
 {
@@ -66,20 +66,11 @@ namespace geode
             IMPLEMENTATION_MEMBER( impl_ );
         };
 
-        class opengeode_model_api LineRange : public LineRangeBase
+        class opengeode_model_api LineRange : public LineRangeBase,
+                                              public BeginEnd< LineRange >
         {
         public:
             LineRange( const Lines& lines );
-
-            const LineRange& begin() const
-            {
-                return *this;
-            }
-
-            const LineRange& end() const
-            {
-                return *this;
-            }
 
             const Line< dimension >& operator*() const;
         };
@@ -100,20 +91,11 @@ namespace geode
         Lines();
 
     private:
-        class ModifiableLineRange : public LineRangeBase
+        class ModifiableLineRange : public LineRangeBase,
+                                    public BeginEnd< ModifiableLineRange >
         {
         public:
             ModifiableLineRange( const Lines& lines );
-
-            const ModifiableLineRange& begin() const
-            {
-                return *this;
-            }
-
-            const ModifiableLineRange& end() const
-            {
-                return *this;
-            }
 
             Line< dimension >& operator*() const;
         };

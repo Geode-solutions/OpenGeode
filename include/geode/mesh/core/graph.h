@@ -26,6 +26,7 @@
 #include <vector>
 
 #include <geode/basic/attribute.h>
+#include <geode/basic/bitsery_archive.h>
 #include <geode/basic/factory.h>
 #include <geode/basic/pimpl.h>
 
@@ -60,8 +61,11 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.value4b( edge_id );
-            archive.value4b( vertex_id );
+            archive.ext( *this, DefaultGrowable< Archive, EdgeVertex >{},
+                []( Archive& archive, EdgeVertex& edge_vertex ) {
+                    archive.value4b( edge_vertex.edge_id );
+                    archive.value4b( edge_vertex.vertex_id );
+                } );
         }
         /*!
          * Index of the edge
@@ -125,7 +129,8 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive );
 
-        std::vector< EdgeVertex >& get_edges_around_vertex( index_t vertex_id );
+        void set_edges_around_vertex(
+            index_t vertex_id, const std::vector< EdgeVertex >& edges );
 
         void associate_edge_vertex_to_vertex(
             const EdgeVertex& edge_vertex, index_t vertex_id );

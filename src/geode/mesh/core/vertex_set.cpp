@@ -46,7 +46,10 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.object( vertex_attribute_manager_ );
+            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
+                []( Archive& archive, Impl& impl ) {
+                    archive.object( impl.vertex_attribute_manager_ );
+                } );
         }
 
     private:
@@ -89,7 +92,10 @@ namespace geode
     template < typename Archive >
     void VertexSet::serialize( Archive& archive )
     {
-        archive.object( impl_ );
+        archive.ext( *this, DefaultGrowable< Archive, VertexSet >{},
+            []( Archive& archive, VertexSet& vertex_set ) {
+                archive.object( vertex_set.impl_ );
+            } );
     }
 
     std::unique_ptr< VertexSet > VertexSet::clone() const

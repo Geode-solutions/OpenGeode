@@ -23,13 +23,13 @@
 
 #pragma once
 
-#include <geode/basic/common.h>
-
 #include <algorithm>
 #include <array>
 #include <numeric>
 #include <utility>
 #include <vector>
+
+#include <geode/basic/common.h>
 
 namespace geode
 {
@@ -82,6 +82,21 @@ namespace geode
             bool operator!=( const VertexCycle& other ) const
             {
                 return !operator==( other );
+            }
+
+        private:
+            friend class bitsery::Access;
+            VertexCycle() = default;
+
+            friend class bitsery::Access;
+            template < typename Archive >
+            void serialize( Archive& archive )
+            {
+                archive.ext( *this, DefaultGrowable< Archive, VertexCycle >{},
+                    []( Archive& archive, VertexCycle& storage ) {
+                        archive.container4b(
+                            storage.vertices_, storage.vertices_.max_size() );
+                    } );
             }
 
         private:

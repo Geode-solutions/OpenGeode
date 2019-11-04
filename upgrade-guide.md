@@ -1,5 +1,104 @@
 # Upgrade Guide
 
+## Upgrading from OpenGeode v2.x.x to v3.0.0
+
+### Motivations
+
+OpenGeode evolves and will keep evolving. 
+To support this evolution, we introduce a full backward compatibility system to all our native file formats (.og_*). 
+Any file saved since v3 will be loadable in any new OpenGeode version.
+
+To increase the component relationships design flexibility, we allow relationships between any component types.
+For example, we can register a relation between a `Line` inside a `Block` representing a well path.
+
+Attribute interface has been revised to segregate read-only from write modifications.
+We provide new ways to modify in-place an attribute value.
+
+A new library named `geometry` was created to improve organization of C++ objects related to geometry concepts.
+
+
+### Breaking Changes
+
+- **Serialization**: all native file formats (.og_*) saved before v3 are no longer compatible, don't worry it will be the last time ;-)
+
+- **BRep / Section**: methods accessing iterators for internal/embedded Components are renamed more explicitly.
+
+**How to upgrade**
+
+Replace in `BRep` and `Section`:
+- `geode::BRep::internals(...)` by either `geode::BRep::internal_corners(...)` or `geode::BRep::internal_lines(...)` or `geode::BRep::internal_surfaces(...)`
+- `geode::BRep::embeddings(...)` by either `geode::BRep::embedded_surfaces(...)` or `geode::BRep::embedded_blocks(...)`
+
+- **Relationships**: replace the component registration key from uuid to ComponentID.
+
+**How to upgrade**
+
+Replace `id0` and `id1` in  `geode::RelationshipsBuilder::register_component( id0, id1 )` by their ComponentIDs.
+
+- **Solid Facets & Surface Edges**: Edge/Facet indices are used as parameters of methods like `PolygonalSurface< dimension >::edge_length`, `PolyhedralSolid< dimension >::facet_barycenter`.
+
+**How to upgrade**
+
+Example
+
+from
+
+```
+PolygonEdge polygon_edge{ 0, 0 };
+auto edge_length = surface.polygon_edge_length( polygon_edge );
+```
+
+to 
+
+```
+index_t edge_id = polygon_edge( { 0, 0 } );
+auto edge_length = surface.edge_length( edge_id );
+```
+
+- **Geometry**: new library called geometry gathering files related to geometry: bounding_box, nn_search, point and vector.
+
+**How to upgrade**
+
+Add `OpenGeode::geometry` to use this library. Update the path of OpenGeode files you include.
+
+- **Attributes**: force Attribute API for writing by removing the reference access to attribute values
+
+**How to upgrade**
+
+Example using `VariableAttribute< double >` and modifying the `index_t id` value to `double new_value`
+```
+attribute.value( id ) = new_value;
+```
+
+to 
+
+```
+attribute.set_value( id, new_value );
+```
+
+Example using `VariableAttribute< std::vector< double > >` and modifying the `index_t id` value by adding `double new_value`
+```
+attribute.value( id ).push_back( new_value );
+```
+
+to 
+
+```
+attribute.modify_value( id, [&new_value]( std::vector< double >& values ) { values.push_back( new_value ); } );
+```
+
+- **BRepBuilder / SectionBuilder**: methods adding relationships between model Components have now explicitely the relationship type in their name.
+
+**How to upgrade**
+
+Replace:
+-`geode::SectionBuilder::add_corner_line_relationship(...)` by `geode::SectionBuilder::add_corner_line_boundary_relationship(...)`
+-`geode::SectionBuilder::add_line_surface_relationship(...)` by `geode::SectionBuilder::add_line_surface_boundary_relationship(...)`
+-`geode::BRepBuilder::add_corner_line_relationship(...)` by `geode::BRepBuilder::add_corner_line_boundary_relationship(...)`
+-`geode::BRepBuilder::add_line_surface_relationship(...)` by `geode::BRepBuilder::add_line_surface_boundary_relationship(...)`
+-`geode::BRepBuilder::add_surface_block_relationship(...)` by `geode::BRepBuilder::add_surface_block_boundary_relationship(...)`
+
+
 ## Upgrading from OpenGeode v1.x.x to v2.0.0
 
 ### Motivations

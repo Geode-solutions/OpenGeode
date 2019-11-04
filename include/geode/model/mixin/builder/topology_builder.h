@@ -24,7 +24,6 @@
 #pragma once
 
 #include <geode/model/common.h>
-
 #include <geode/model/mixin/builder/relationships_builder.h>
 #include <geode/model/mixin/builder/vertex_identifier_builder.h>
 #include <geode/model/mixin/core/topology.h>

@@ -26,12 +26,12 @@
 #include <geode/basic/pimpl_impl.h>
 #include <geode/basic/range.h>
 
-#include <geode/model/mixin/core/corner.h>
-#include <geode/model/mixin/core/detail/components_storage.h>
-
 #include <geode/mesh/core/point_set.h>
 #include <geode/mesh/io/point_set_input.h>
 #include <geode/mesh/io/point_set_output.h>
+
+#include <geode/model/mixin/core/corner.h>
+#include <geode/model/mixin/core/detail/components_storage.h>
 
 namespace geode
 {
@@ -205,7 +205,7 @@ namespace geode
 
     template < index_t dimension >
     Corners< dimension >::CornerRange::CornerRange( const Corners& corners )
-        : CornerRangeBase( corners )
+        : CornerRangeBase( corners ), BeginEnd< CornerRange >( *this )
     {
     }
 
@@ -219,7 +219,7 @@ namespace geode
     template < index_t dimension >
     Corners< dimension >::ModifiableCornerRange::ModifiableCornerRange(
         const Corners& corners )
-        : CornerRangeBase( corners )
+        : CornerRangeBase( corners ), BeginEnd< ModifiableCornerRange >( *this )
     {
     }
 

@@ -35,7 +35,7 @@ namespace geode
     class BaseRange
     {
     public:
-        bool operator!=( const BaseRange & /*unused*/ ) const
+        bool operator!=( const BaseRange& /*unused*/ ) const
         {
             return iter_ != last_;
         }
@@ -64,6 +64,30 @@ namespace geode
     };
 
     /*!
+     * Begin and end methods for range-based iteration on custom range.
+     * See derived classes for usage.
+     */
+    template < typename Type >
+    class BeginEnd
+    {
+    public:
+        explicit BeginEnd( const Type& type ) : type_( type ) {}
+
+        const Type& begin() const
+        {
+            return type_;
+        }
+
+        const Type& end() const
+        {
+            return type_;
+        }
+
+    private:
+        const Type& type_;
+    };
+
+    /*!
      * This class can be used to iterate over integer loop.
      * Example:
      *              = C++98 loop =
@@ -78,27 +102,17 @@ namespace geode
      *      // do something
      *    }
      */
-    class Range : public BaseRange< index_t >
+    class Range : public BaseRange< index_t >, public BeginEnd< Range >
     {
     public:
         template < typename T1, typename T2 >
-        Range( T1 begin, T2 end ) : BaseRange( begin, end )
+        Range( T1 begin, T2 end ) : BaseRange( begin, end ), BeginEnd( *this )
         {
         }
 
         template < typename T >
         explicit Range( T end ) : Range( 0, end )
         {
-        }
-
-        const Range &begin() const
-        {
-            return *this;
-        }
-
-        const Range &end() const
-        {
-            return *this;
         }
 
         index_t operator*() const

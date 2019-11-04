@@ -32,7 +32,8 @@
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
-#include <geode/basic/point.h>
+
+#include <geode/geometry/point.h>
 
 #include <geode/mesh/core/detail/points_impl.h>
 
@@ -80,22 +81,29 @@ namespace geode
         void set_polygon_vertex(
             const PolygonVertex& polygon_vertex, index_t vertex_id )
         {
-            triangle_vertices_->value( polygon_vertex.polygon_id )
-                .at( polygon_vertex.vertex_id ) = vertex_id;
+            triangle_vertices_->modify_value( polygon_vertex.polygon_id,
+                [&polygon_vertex, vertex_id](
+                    std::array< index_t, 3 >& array ) {
+                    array.at( polygon_vertex.vertex_id ) = vertex_id;
+                } );
         }
 
         void set_polygon_adjacent(
             const PolygonEdge& polygon_edge, index_t adjacent_id )
         {
-            triangle_adjacents_->value( polygon_edge.polygon_id )
-                .at( polygon_edge.edge_id ) = adjacent_id;
+            triangle_adjacents_->modify_value(
+                polygon_edge.polygon_id, [&polygon_edge, adjacent_id](
+                                             std::array< index_t, 3 >& array ) {
+                    array.at( polygon_edge.edge_id ) = adjacent_id;
+                } );
         }
 
         void add_triangle(
             const OpenGeodeTriangulatedSurface< dimension >& surface,
             const std::array< index_t, 3 >& vertices )
         {
-            triangle_vertices_->value( surface.nb_polygons() - 1 ) = vertices;
+            triangle_vertices_->set_value(
+                surface.nb_polygons() - 1, vertices );
         }
 
     private:
@@ -106,10 +114,16 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this,
-                bitsery::ext::BaseClass< detail::PointsImpl< dimension > >{} );
-            archive.ext( triangle_vertices_, bitsery::ext::StdSmartPtr{} );
-            archive.ext( triangle_adjacents_, bitsery::ext::StdSmartPtr{} );
+            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
+                []( Archive& archive, Impl& impl ) {
+                    archive.ext(
+                        impl, bitsery::ext::BaseClass<
+                                  detail::PointsImpl< dimension > >{} );
+                    archive.ext(
+                        impl.triangle_vertices_, bitsery::ext::StdSmartPtr{} );
+                    archive.ext(
+                        impl.triangle_adjacents_, bitsery::ext::StdSmartPtr{} );
+                } );
         }
 
     private:
@@ -166,8 +180,13 @@ namespace geode
         Archive& archive )
     {
         archive.ext( *this,
-            bitsery::ext::BaseClass< TriangulatedSurface< dimension > >{} );
-        archive.object( impl_ );
+            DefaultGrowable< Archive, OpenGeodeTriangulatedSurface >{},
+            []( Archive& archive, OpenGeodeTriangulatedSurface& surface ) {
+                archive.ext(
+                    surface, bitsery::ext::BaseClass<
+                                 TriangulatedSurface< dimension > >{} );
+                archive.object( surface.impl_ );
+            } );
     }
 
     template < index_t dimension >

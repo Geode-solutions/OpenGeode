@@ -30,10 +30,13 @@ namespace geode
 {
     template < index_t dimension >
     template < typename Archive >
-    void ModelBoundary< dimension >::serialize( Archive& archive )
+    void ModelBoundary< dimension >::serialize( Archive &archive )
     {
-        archive.ext(
-            *this, bitsery::ext::BaseClass< Component< dimension > >{} );
+        archive.ext( *this, DefaultGrowable< Archive, ModelBoundary >{},
+            []( Archive &archive, ModelBoundary &model_boundary ) {
+                archive.ext( model_boundary,
+                    bitsery::ext::BaseClass< Component< dimension > >{} );
+            } );
     }
 
     template class opengeode_model_api ModelBoundary< 2 >;

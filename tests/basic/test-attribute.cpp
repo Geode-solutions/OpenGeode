@@ -27,12 +27,34 @@
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/logger.h>
 
+struct Foo
+{
+    bool operator==( const Foo& foo ) const
+    {
+        return double_ == foo.double_ || int_ == foo.int_;
+    }
+
+    bool operator!=( const Foo& foo ) const
+    {
+        return double_ != foo.double_ || int_ != foo.int_;
+    }
+
+    template < typename Archive >
+    void serialize( Archive& archive )
+    {
+        archive.value8b( double_ );
+        archive.value4b( int_ );
+    }
+    double double_{ 0 };
+    int int_{ 0 };
+};
+
 void test_constant_attribute( geode::AttributeManager& manager )
 {
     auto constant_attribute =
         manager.find_or_create_attribute< geode::ConstantAttribute, bool >(
             "bool" );
-    constant_attribute->value() = true;
+    constant_attribute->set_value( true );
 
     auto attribute = manager.find_attribute< bool >( "bool" );
     OPENGEODE_EXCEPTION(
@@ -40,9 +62,32 @@ void test_constant_attribute( geode::AttributeManager& manager )
     OPENGEODE_EXCEPTION( attribute->type() == typeid( bool ).name(),
         "[Test] Should be equal to 'b' or 'bool'" );
 
-    constant_attribute->value() = false;
+    constant_attribute->set_value( false );
     OPENGEODE_EXCEPTION(
         !attribute->value( 12 ), "[Test] Should be equal to false" );
+}
+
+void test_foo_constant_attribute( geode::AttributeManager& manager )
+{
+    auto constant_attribute =
+        manager.find_or_create_attribute< geode::ConstantAttribute, Foo >(
+            "foo_cst" );
+    constant_attribute->modify_value( []( Foo& foo ) { foo.double_ = 12.4; } );
+    OPENGEODE_EXCEPTION( constant_attribute->value().double_ == 12.4,
+        "[Test] Should be equal to 12.4" );
+}
+
+void test_foo_variable_attribute( geode::AttributeManager& manager )
+{
+    auto variable_attribute =
+        manager.find_or_create_attribute< geode::VariableAttribute, Foo >(
+            "foo_var" );
+    variable_attribute->modify_value(
+        3, []( Foo& foo ) { foo.double_ = 12.4; } );
+    OPENGEODE_EXCEPTION( variable_attribute->value( 0 ).double_ == 0,
+        "[Test] Should be equal to 0" );
+    OPENGEODE_EXCEPTION( variable_attribute->value( 3 ).double_ == 12.4,
+        "[Test] Should be equal to 12.4" );
 }
 
 void test_int_variable_attribute( geode::AttributeManager& manager )
@@ -50,7 +95,7 @@ void test_int_variable_attribute( geode::AttributeManager& manager )
     auto variable_attribute =
         manager.find_or_create_attribute< geode::VariableAttribute, int >(
             "int", 12 );
-    variable_attribute->value( 3 ) = 3;
+    variable_attribute->set_value( 3, 3 );
 
     auto attribute = manager.find_attribute< int >( "int" );
     OPENGEODE_EXCEPTION(
@@ -58,9 +103,21 @@ void test_int_variable_attribute( geode::AttributeManager& manager )
     OPENGEODE_EXCEPTION(
         attribute->value( 6 ) == 12, "[Test] Should be equal to 12" );
 
-    variable_attribute->value( 3 ) = 5;
+    variable_attribute->set_value( 3, 5 );
     OPENGEODE_EXCEPTION(
         attribute->value( 3 ) == 5, "[Test] Should be equal to 5" );
+}
+
+void test_foo_sparse_attribute( geode::AttributeManager& manager )
+{
+    auto sparse_attribute =
+        manager.find_or_create_attribute< geode::SparseAttribute, Foo >(
+            "foo_spr" );
+    sparse_attribute->modify_value( 3, []( Foo& foo ) { foo.double_ = 12.4; } );
+    OPENGEODE_EXCEPTION( sparse_attribute->value( 0 ).double_ == 0,
+        "[Test] Should be equal to 0" );
+    OPENGEODE_EXCEPTION( sparse_attribute->value( 3 ).double_ == 12.4,
+        "[Test] Should be equal to 12.4" );
 }
 
 void test_double_sparse_attribute( geode::AttributeManager& manager )
@@ -86,13 +143,13 @@ void test_bool_variable_attribute( geode::AttributeManager& manager )
     auto variable_attribute =
         manager.find_or_create_attribute< geode::VariableAttribute, bool >(
             "bool_var", false );
-    variable_attribute->value( 3 ) = true;
+    variable_attribute->set_value( 3, true );
 
     auto attribute = manager.find_attribute< bool >( "bool_var" );
     OPENGEODE_EXCEPTION(
         attribute->value( 3 ), "[Test] Should be equal to true" );
 
-    variable_attribute->value( 3 ) = false;
+    variable_attribute->set_value( 3, false );
     OPENGEODE_EXCEPTION(
         !attribute->value( 3 ), "[Test] Should be equal to false" );
 }
@@ -148,6 +205,9 @@ void check_attribute_values( geode::AttributeManager& manager,
     check_one_attribute_values< int >( manager, reloaded_manager, "int" );
     check_one_attribute_values< double >( manager, reloaded_manager, "double" );
     check_one_attribute_values< bool >( manager, reloaded_manager, "bool_var" );
+    check_one_attribute_values< Foo >( manager, reloaded_manager, "foo_cst" );
+    check_one_attribute_values< Foo >( manager, reloaded_manager, "foo_var" );
+    check_one_attribute_values< Foo >( manager, reloaded_manager, "foo_spr" );
 }
 
 void test_serialize_manager( geode::AttributeManager& manager )
@@ -156,6 +216,8 @@ void test_serialize_manager( geode::AttributeManager& manager )
     std::ofstream file{ filename, std::ofstream::binary };
     geode::TContext context{};
     geode::register_basic_serialize_pcontext( std::get< 0 >( context ) );
+    geode::AttributeManager::register_attribute_type< Foo, geode::Serializer >(
+        std::get< 0 >( context ) );
     geode::Serializer archive{ context, file };
     archive.object( manager );
     archive.adapter().flush();
@@ -167,6 +229,8 @@ void test_serialize_manager( geode::AttributeManager& manager )
     geode::TContext reload_context{};
     geode::register_basic_deserialize_pcontext(
         std::get< 0 >( reload_context ) );
+    geode::AttributeManager::register_attribute_type< Foo,
+        geode::Deserializer >( std::get< 0 >( reload_context ) );
     geode::Deserializer unarchive{ reload_context, infile };
     unarchive.object( reloaded_manager );
     auto& adapter = unarchive.adapter();
@@ -226,19 +290,22 @@ int main()
         OPENGEODE_EXCEPTION( manager.nb_elements() == 10,
             "[Test] Manager should have 10 elements" );
         test_constant_attribute( manager );
+        test_foo_constant_attribute( manager );
         test_int_variable_attribute( manager );
-        test_double_sparse_attribute( manager );
         test_bool_variable_attribute( manager );
+        test_foo_variable_attribute( manager );
+        test_double_sparse_attribute( manager );
+        test_foo_sparse_attribute( manager );
         test_delete_attribute_elements( manager );
 
         test_serialize_manager( manager );
 
         test_attribute_types( manager );
-        test_number_of_attributes( manager, 4 );
+        test_number_of_attributes( manager, 7 );
         manager.delete_attribute( "bool" );
-        test_number_of_attributes( manager, 3 );
+        test_number_of_attributes( manager, 6 );
         manager.clear_attributes();
-        test_number_of_attributes( manager, 3 );
+        test_number_of_attributes( manager, 6 );
         manager.resize( 10 );
         OPENGEODE_EXCEPTION( manager.nb_elements() == 10,
             "[Test] Manager should have 10 elements" );

@@ -26,7 +26,8 @@
 #include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/logger.h>
-#include <geode/basic/point.h>
+
+#include <geode/geometry/point.h>
 
 #include <geode/mesh/builder/geode_point_set_builder.h>
 #include <geode/mesh/core/geode_point_set.h>
@@ -57,7 +58,7 @@ void test_create_vertex_attribute( const geode::PointSet3D& point_set )
         point_set.vertex_attribute_manager()
             .find_or_create_attribute< geode::ConstantAttribute, bool >(
                 "test" );
-    attribute->value() = true;
+    attribute->set_value( true );
     OPENGEODE_EXCEPTION( attribute->value() == true,
         "[Test] PointSet attribute value should be true" );
 }

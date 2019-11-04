@@ -29,8 +29,10 @@
 
 #include <bitsery/bitsery.h>
 
-#include <geode/basic/common.h>
 #include <geode/basic/range.h>
+
+#include <geode/geometry/bitsery_archive.h>
+#include <geode/geometry/common.h>
 
 namespace geode
 {
@@ -137,7 +139,10 @@ namespace geode
         template < typename Archive >
         void serialize( Archive &archive )
         {
-            archive.container8b( values_ );
+            archive.ext( *this, DefaultGrowable< Archive, Point >{},
+                []( Archive &archive, Point &point ) {
+                    archive.container8b( point.values_ );
+                } );
         }
 
     private:

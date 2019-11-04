@@ -25,8 +25,9 @@
 #include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/logger.h>
-#include <geode/basic/point.h>
-#include <geode/basic/vector.h>
+
+#include <geode/geometry/point.h>
+#include <geode/geometry/vector.h>
 
 #include <geode/mesh/builder/geode_polygonal_surface_builder.h>
 #include <geode/mesh/core/geode_polygonal_surface.h>
@@ -51,13 +52,14 @@ void test_create_vertices( const geode::PolygonalSurface3D& polygonal_surface,
 void test_create_vertex_attribute(
     const geode::PolygonalSurface3D& polygonal_surface )
 {
-    auto attribute =
-        polygonal_surface.vertex_attribute_manager()
-            .find_or_create_attribute< geode::VariableAttribute, double >(
-                "test" );
+    auto attribute = polygonal_surface.vertex_attribute_manager()
+                         .find_or_create_attribute< geode::VariableAttribute,
+                             geode::PolygonEdge >( "test" );
     for( auto v : geode::Range{ polygonal_surface.nb_vertices() } )
     {
-        attribute->value( v ) = v;
+        attribute->set_value( v, geode::PolygonEdge{ v, v } );
+        OPENGEODE_EXCEPTION( geode::PolygonVertex{} != attribute->value( v ),
+            "[Test] PolygonalSurface attribute assignation is not correct" );
     }
 }
 
@@ -116,7 +118,7 @@ void test_create_edge_attribute(
                              geode::index_t >( "test" );
     for( auto e : geode::Range{ polygonal_surface.nb_edges() } )
     {
-        attribute->value( e ) = e;
+        attribute->set_value( e, e );
     }
 }
 
@@ -175,10 +177,10 @@ void test_previous_next_on_border(
 void test_polygon_edge_requests(
     const geode::PolygonalSurface3D& polygonal_surface )
 {
-    OPENGEODE_EXCEPTION( polygonal_surface.polygon_edge_length( { 0, 0 } )
+    OPENGEODE_EXCEPTION( polygonal_surface.edge_length( 0 )
                              == std::sqrt( 2 * 2 + 9.2 * 9.2 + 6.4 * 6.4 ),
         "[Test] Polygon edge length is not correct" );
-    OPENGEODE_EXCEPTION( polygonal_surface.polygon_edge_barycenter( { 0, 0 } )
+    OPENGEODE_EXCEPTION( polygonal_surface.edge_barycenter( 0 )
                              == geode::Point3D( { 1.1, 4.8, 3.5 } ),
         "[Test] Polygon edge barycenter is not correct" );
     OPENGEODE_EXCEPTION(
@@ -322,6 +324,24 @@ void test_io( const geode::PolygonalSurface3D& polygonal_surface,
     auto new_polygonal_surface = geode::PolygonalSurface3D::create(
         geode::OpenGeodePolygonalSurface3D::type_name_static() );
     load_polygonal_surface( *new_polygonal_surface, filename );
+
+    OPENGEODE_EXCEPTION( new_polygonal_surface->nb_vertices() == 7,
+        "[Test] Reloaded PolygonalSurface should have 7 vertices" );
+    OPENGEODE_EXCEPTION( new_polygonal_surface->nb_edges() == 9,
+        "[Test] Reloaded PolygonalSurface should have 9 edges" );
+    OPENGEODE_EXCEPTION( new_polygonal_surface->nb_polygons() == 3,
+        "[Test] Reloaded PolygonalSurface should have 3 polygons" );
+    OPENGEODE_EXCEPTION( new_polygonal_surface->polygon_edge( { 1, 0 } )
+                             == polygonal_surface.polygon_edge( { 1, 0 } ),
+        "[Test] Reloaded PolygonalSurface has wrong polygon edge index" );
+    auto attribute = new_polygonal_surface->edge_attribute_manager()
+                         .find_attribute< geode::index_t >( "test" );
+    for( auto e : geode::Range{ new_polygonal_surface->nb_edges() } )
+    {
+        OPENGEODE_EXCEPTION( attribute->value( e ) == e,
+            "[Test] Reloaded PolygonalSurface has "
+            "wrong attributes on its edges" );
+    }
 }
 
 void test_clone( const geode::PolygonalSurface3D& polygonal_surface )
@@ -334,14 +354,15 @@ void test_clone( const geode::PolygonalSurface3D& polygonal_surface )
     OPENGEODE_EXCEPTION( polygonal_surface2->nb_polygons() == 1,
         "[Test] PolygonalSurface2 should have 1 polygon" );
 
-    auto attribute2 =
-        polygonal_surface2->vertex_attribute_manager().find_attribute< double >(
-            "test" );
+    auto attribute2 = polygonal_surface2->vertex_attribute_manager()
+                          .find_attribute< geode::PolygonEdge >( "test" );
     for( auto v : geode::Range{ polygonal_surface2->nb_vertices() } )
     {
-        OPENGEODE_EXCEPTION( attribute2->value( v ) == v + 1,
-            "[Test] PolygonalSurface2 attribute should be "
-                + std::to_string( v + 1 ) );
+        geode::PolygonEdge answer{ v + 1, v + 1 };
+        OPENGEODE_EXCEPTION( attribute2->value( v ) != geode::PolygonEdge{},
+            "[Test] PolygonalSurface2 attribute is not correct" );
+        OPENGEODE_EXCEPTION( attribute2->value( v ) == answer,
+            "[Test] PolygonalSurface2 attribute is not correct" );
     }
 }
 
@@ -352,6 +373,10 @@ void test_set_polygon_vertex(
     builder.set_polygon_vertex( { 0, 2 }, 1 );
     OPENGEODE_EXCEPTION( polygonal_surface.polygon_vertex( { 0, 2 } ) == 1,
         "[Test] PolygonVertex after set_polygon_vertex is wrong" );
+
+    auto vertices = polygonal_surface.edge_vertices( 3 );
+    OPENGEODE_EXCEPTION( vertices[0] == 1 && vertices[1] == 4,
+        "[Test] Edge vertices after set_polygon_vertex is wrong" );
 }
 
 void test_delete_all( const geode::PolygonalSurface3D& polygonal_surface,
@@ -367,6 +392,10 @@ void test_delete_all( const geode::PolygonalSurface3D& polygonal_surface,
         "[Test] PolygonalSurface should have 0 polygon" );
     OPENGEODE_EXCEPTION( polygonal_surface.polygons_around_vertex( 0 ).empty(),
         "[Test] No more polygon around vertices" );
+
+    builder.delete_isolated_vertices();
+    OPENGEODE_EXCEPTION( polygonal_surface.nb_vertices() == 0,
+        "[Test] PolygonalSurface should have 0 vertex" );
 }
 
 int main()

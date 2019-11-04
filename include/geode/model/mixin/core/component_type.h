@@ -25,6 +25,7 @@
 
 #include <bitsery/brief_syntax/string.h>
 
+#include <geode/basic/bitsery_archive.h>
 #include <geode/basic/named_type.h>
 #include <geode/basic/uuid.h>
 
@@ -42,6 +43,8 @@ namespace geode
     class ComponentID
     {
     public:
+        ComponentID() : ComponentID( ComponentType{ "undefined" }, uuid{} ) {}
+
         ComponentID( ComponentType component_type, uuid id )
             : type_( std::move( component_type ) ), id_( std::move( id ) )
         {
@@ -76,14 +79,14 @@ namespace geode
 
     private:
         friend class bitsery::Access;
-        ComponentID() : type_( bitsery::Access::create< ComponentType >() ) {}
-
-        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.object( type_ );
-            archive.object( id_ );
+            archive.ext( *this, DefaultGrowable< Archive, ComponentID >{},
+                []( Archive& archive, ComponentID& component_id ) {
+                    archive.object( component_id.type_ );
+                    archive.object( component_id.id_ );
+                } );
         }
 
     private:

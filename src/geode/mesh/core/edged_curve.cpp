@@ -24,7 +24,8 @@
 #include <geode/mesh/core/edged_curve.h>
 
 #include <geode/basic/bitsery_archive.h>
-#include <geode/basic/vector.h>
+
+#include <geode/geometry/vector.h>
 
 #include <geode/mesh/builder/edged_curve_builder.h>
 #include <geode/mesh/core/geode_edged_curve.h>
@@ -85,7 +86,10 @@ namespace geode
     template < typename Archive >
     void EdgedCurve< dimension >::serialize( Archive& archive )
     {
-        archive.ext( *this, bitsery::ext::BaseClass< Graph >{} );
+        archive.ext( *this, DefaultGrowable< Archive, EdgedCurve >{},
+            []( Archive& archive, EdgedCurve& edged_curve ) {
+                archive.ext( edged_curve, bitsery::ext::BaseClass< Graph >{} );
+            } );
     }
 
     template < index_t dimension >

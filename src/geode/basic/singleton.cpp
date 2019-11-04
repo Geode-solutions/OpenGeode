@@ -23,9 +23,9 @@
 
 #include <geode/basic/singleton.h>
 
-#include <geode/basic/pimpl_impl.h>
-
 #include <map>
+
+#include <geode/basic/pimpl_impl.h>
 
 namespace geode
 {

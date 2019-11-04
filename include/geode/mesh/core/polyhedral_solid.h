@@ -26,6 +26,7 @@
 #include <vector>
 
 #include <geode/basic/attribute.h>
+#include <geode/basic/bitsery_archive.h>
 #include <geode/basic/factory.h>
 #include <geode/basic/pimpl.h>
 
@@ -64,8 +65,11 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.value4b( polyhedron_id );
-            archive.value4b( vertex_id );
+            archive.ext( *this, DefaultGrowable< Archive, PolyhedronVertex >{},
+                []( Archive& archive, PolyhedronVertex& polyhedron_vertex ) {
+                    archive.value4b( polyhedron_vertex.polyhedron_id );
+                    archive.value4b( polyhedron_vertex.vertex_id );
+                } );
         }
         index_t polyhedron_id{ NO_ID };
         index_t vertex_id{ NO_ID };
@@ -93,8 +97,11 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.value4b( polyhedron_id );
-            archive.value4b( facet_id );
+            archive.ext( *this, DefaultGrowable< Archive, PolyhedronFacet >{},
+                []( Archive& archive, PolyhedronFacet& polyhedron_facet ) {
+                    archive.value4b( polyhedron_facet.polyhedron_id );
+                    archive.value4b( polyhedron_facet.facet_id );
+                } );
         }
         index_t polyhedron_id{ NO_ID };
         index_t facet_id{ NO_ID };
@@ -119,8 +126,13 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.object( polyhedron_facet );
-            archive.value4b( vertex_id );
+            archive.ext( *this,
+                DefaultGrowable< Archive, PolyhedronFacetVertex >{},
+                []( Archive& archive,
+                    PolyhedronFacetVertex& polyhedron_facet_vertex ) {
+                    archive.object( polyhedron_facet_vertex.polyhedron_facet );
+                    archive.value4b( polyhedron_facet_vertex.vertex_id );
+                } );
         }
         PolyhedronFacet polyhedron_facet;
         index_t vertex_id{ NO_ID };
@@ -200,6 +212,19 @@ namespace geode
             const PolyhedronFacetVertex& polyhedron_facet_vertex ) const;
 
         /*!
+         * Return the indices of facet vertices.
+         * @param[in] edge_id Index of an edge.
+         */
+        const std::vector< index_t >& facet_vertices( index_t facet_id ) const;
+
+        /*!
+         * Get the index of facet corresponding to given vertices
+         * @param[in] vertices Ordered vertex indices
+         */
+        index_t facet_from_vertices(
+            const std::vector< index_t >& vertices ) const;
+
+        /*!
          * Return the index of the polyhedron adjacent through a facet.
          * @param[in] polyhedron_facet Local index of facet in polyhedron.
          * @return NO_ID if the polyhedron facet is on border, else the index of
@@ -241,12 +266,11 @@ namespace geode
         double polyhedron_volume( index_t polyhedron_id ) const;
 
         /*!
-         * Return the area of a polyhedron facet.
-         * @param[in] polyhedron_facet Local index of facet in polyhedron.
+         * Return the area of a facet.
+         * @param[in] facet_id Index of facet.
          * @warning Not implemented yet.
          */
-        double polyhedron_facet_area(
-            const PolyhedronFacet& polyhedron_facet ) const;
+        double facet_area( index_t facet_id ) const;
 
         /*!
          * Return the barycenter of a polyhedron
@@ -255,11 +279,10 @@ namespace geode
         Point< dimension > polyhedron_barycenter( index_t polyhedron_id ) const;
 
         /*!
-         * Return the barycenter coordinates of a given polyhedron facet.
-         * @param[in] polyhedron_facet Local index of facet in a polyhedron.
+         * Return the barycenter coordinates of a given facet.
+         * @param[in] facet_id Index of facet.
          */
-        Point< dimension > polyhedron_facet_barycenter(
-            const PolyhedronFacet& polyhedron_facet ) const;
+        Point< dimension > facet_barycenter( index_t facet_id ) const;
 
         /*!
          * Get all the polyhedra with one of the vertices matching given vertex.

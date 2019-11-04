@@ -30,7 +30,8 @@
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
-#include <geode/basic/point.h>
+
+#include <geode/geometry/point.h>
 
 #include <geode/mesh/core/detail/points_impl.h>
 
@@ -204,20 +205,24 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.container4b(
-                polyhedron_vertices_, polyhedron_vertices_.max_size() );
-            archive.container4b(
-                polyhedron_vertex_ptr_, polyhedron_vertex_ptr_.max_size() );
-            archive.container4b(
-                polyhedron_facets_, polyhedron_facets_.max_size() );
-            archive.container4b(
-                polyhedron_facet_ptr_, polyhedron_facet_ptr_.max_size() );
-            archive.container4b(
-                polyhedron_adjacents_, polyhedron_adjacents_.max_size() );
-            archive.container4b(
-                polyhedron_adjacent_ptr_, polyhedron_adjacent_ptr_.max_size() );
-            archive.ext( *this,
-                bitsery::ext::BaseClass< detail::PointsImpl< dimension > >{} );
+            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
+                []( Archive& archive, Impl& impl ) {
+                    archive.container4b( impl.polyhedron_vertices_,
+                        impl.polyhedron_vertices_.max_size() );
+                    archive.container4b( impl.polyhedron_vertex_ptr_,
+                        impl.polyhedron_vertex_ptr_.max_size() );
+                    archive.container4b( impl.polyhedron_facets_,
+                        impl.polyhedron_facets_.max_size() );
+                    archive.container4b( impl.polyhedron_facet_ptr_,
+                        impl.polyhedron_facet_ptr_.max_size() );
+                    archive.container4b( impl.polyhedron_adjacents_,
+                        impl.polyhedron_adjacents_.max_size() );
+                    archive.container4b( impl.polyhedron_adjacent_ptr_,
+                        impl.polyhedron_adjacent_ptr_.max_size() );
+                    archive.ext(
+                        impl, bitsery::ext::BaseClass<
+                                  detail::PointsImpl< dimension > >{} );
+                } );
         }
 
         index_t starting_vertex_index( index_t polyhedron ) const
@@ -366,9 +371,13 @@ namespace geode
     template < typename Archive >
     void OpenGeodePolyhedralSolid< dimension >::serialize( Archive& archive )
     {
-        archive.ext(
-            *this, bitsery::ext::BaseClass< PolyhedralSolid< dimension > >{} );
-        archive.object( impl_ );
+        archive.ext( *this,
+            DefaultGrowable< Archive, OpenGeodePolyhedralSolid >{},
+            []( Archive& archive, OpenGeodePolyhedralSolid& solid ) {
+                archive.ext( solid,
+                    bitsery::ext::BaseClass< PolyhedralSolid< dimension > >{} );
+                archive.object( solid.impl_ );
+            } );
     }
 
     template class opengeode_mesh_api OpenGeodePolyhedralSolid< 3 >;

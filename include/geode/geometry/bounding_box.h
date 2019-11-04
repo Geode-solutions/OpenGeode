@@ -23,8 +23,9 @@
 
 #pragma once
 
-#include <geode/basic/common.h>
 #include <geode/basic/pimpl.h>
+
+#include <geode/geometry/common.h>
 
 namespace geode
 {
