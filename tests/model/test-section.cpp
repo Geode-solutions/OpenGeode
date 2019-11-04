@@ -27,17 +27,16 @@
 #include <geode/basic/range.h>
 #include <geode/basic/uuid.h>
 
-#include <geode/model/representation/builder/section_builder.h>
-#include <geode/model/representation/core/section.h>
-#include <geode/model/representation/io/section_input.h>
-#include <geode/model/representation/io/section_output.h>
-
-#include <geode/basic/attribute_manager.h>
 #include <geode/mesh/core/geode_edged_curve.h>
 #include <geode/mesh/core/geode_point_set.h>
 #include <geode/mesh/core/geode_polygonal_surface.h>
 #include <geode/mesh/core/geode_polyhedral_solid.h>
 #include <geode/mesh/core/point_set.h>
+
+#include <geode/model/representation/builder/section_builder.h>
+#include <geode/model/representation/core/section.h>
+#include <geode/model/representation/io/section_input.h>
+#include <geode/model/representation/io/section_output.h>
 #include <geode/model/mixin/core/block.h>
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/line.h>
