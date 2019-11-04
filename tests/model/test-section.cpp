@@ -33,15 +33,15 @@
 #include <geode/mesh/core/geode_polyhedral_solid.h>
 #include <geode/mesh/core/point_set.h>
 
-#include <geode/model/representation/builder/section_builder.h>
-#include <geode/model/representation/core/section.h>
-#include <geode/model/representation/io/section_input.h>
-#include <geode/model/representation/io/section_output.h>
 #include <geode/model/mixin/core/block.h>
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/line.h>
 #include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
+#include <geode/model/representation/builder/section_builder.h>
+#include <geode/model/representation/core/section.h>
+#include <geode/model/representation/io/section_input.h>
+#include <geode/model/representation/io/section_output.h>
 
 template < typename Range >
 geode::index_t count_components( Range range )

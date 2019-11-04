@@ -34,15 +34,15 @@
 #include <geode/mesh/core/geode_triangulated_surface.h>
 #include <geode/mesh/core/point_set.h>
 
-#include <geode/model/representation/builder/brep_builder.h>
-#include <geode/model/representation/core/brep.h>
-#include <geode/model/representation/io/brep_input.h>
-#include <geode/model/representation/io/brep_output.h>
 #include <geode/model/mixin/core/block.h>
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/line.h>
 #include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
+#include <geode/model/representation/builder/brep_builder.h>
+#include <geode/model/representation/core/brep.h>
+#include <geode/model/representation/io/brep_input.h>
+#include <geode/model/representation/io/brep_output.h>
 
 template < typename Range >
 geode::index_t count_components( Range range )
