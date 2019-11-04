@@ -147,8 +147,17 @@ namespace geode
         void add_surface_block_boundary_relationship(
             const Surface3D& surface, const Block3D& block );
 
+        void add_corner_surface_internal_relationship(
+            const Corner3D& corner, const Surface3D& surface );
+
         void add_line_surface_internal_relationship(
             const Line3D& line, const Surface3D& surface );
+
+        void add_corner_block_internal_relationship(
+            const Corner3D& corner, const Block3D& block );
+
+        void add_line_block_internal_relationship(
+            const Line3D& line, const Block3D& block );
 
         void add_surface_block_internal_relationship(
             const Surface3D& surface, const Block3D& block );

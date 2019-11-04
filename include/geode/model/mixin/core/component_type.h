@@ -43,6 +43,8 @@ namespace geode
     class ComponentID
     {
     public:
+        ComponentID() : ComponentID( ComponentType{ "undefined" }, uuid{} ) {}
+
         ComponentID( ComponentType component_type, uuid id )
             : type_( std::move( component_type ) ), id_( std::move( id ) )
         {
@@ -76,9 +78,6 @@ namespace geode
         }
 
     private:
-        friend class bitsery::Access;
-        ComponentID() : type_( bitsery::Access::create< ComponentType >() ) {}
-
         friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive )

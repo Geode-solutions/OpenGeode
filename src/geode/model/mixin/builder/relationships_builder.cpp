@@ -30,7 +30,7 @@ namespace geode
     {
     }
 
-    void RelationshipsBuilder::register_component( const uuid& id )
+    void RelationshipsBuilder::register_component( const ComponentID& id )
     {
         relationships_.register_component( id );
     }

@@ -214,7 +214,7 @@ namespace geode
 
     template < index_t dimension >
     Blocks< dimension >::BlockRange::BlockRange( const Blocks& blocks )
-        : BlockRangeBase( blocks )
+        : BlockRangeBase( blocks ), BeginEnd< BlockRange >( *this )
     {
     }
 
@@ -234,7 +234,7 @@ namespace geode
     template < index_t dimension >
     Blocks< dimension >::ModifiableBlockRange::ModifiableBlockRange(
         const Blocks& blocks )
-        : BlockRangeBase( blocks )
+        : BlockRangeBase( blocks ), BeginEnd< ModifiableBlockRange >( *this )
     {
     }
 

@@ -67,20 +67,11 @@ namespace geode
         };
 
         class opengeode_model_api ModelBoundaryRange
-            : public ModelBoundaryRangeBase
+            : public ModelBoundaryRangeBase,
+              public BeginEnd< ModelBoundaryRange >
         {
         public:
             ModelBoundaryRange( const ModelBoundaries& boundaries );
-
-            const ModelBoundaryRange& begin() const
-            {
-                return *this;
-            }
-
-            const ModelBoundaryRange& end() const
-            {
-                return *this;
-            }
 
             const ModelBoundary< dimension >& operator*() const;
         };
@@ -102,20 +93,12 @@ namespace geode
         ModelBoundaries();
 
     private:
-        class ModifiableModelBoundaryRange : public ModelBoundaryRangeBase
+        class ModifiableModelBoundaryRange
+            : public ModelBoundaryRangeBase,
+              public BeginEnd< ModifiableModelBoundaryRange >
         {
         public:
             ModifiableModelBoundaryRange( const ModelBoundaries& boundaries );
-
-            const ModifiableModelBoundaryRange& begin() const
-            {
-                return *this;
-            }
-
-            const ModifiableModelBoundaryRange& end() const
-            {
-                return *this;
-            }
 
             ModelBoundary< dimension >& operator*() const;
         };

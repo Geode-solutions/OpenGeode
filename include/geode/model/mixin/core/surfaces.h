@@ -66,20 +66,11 @@ namespace geode
             IMPLEMENTATION_MEMBER( impl_ );
         };
 
-        class opengeode_model_api SurfaceRange : public SurfaceRangeBase
+        class opengeode_model_api SurfaceRange : public SurfaceRangeBase,
+                                                 public BeginEnd< SurfaceRange >
         {
         public:
             SurfaceRange( const Surfaces& surfaces );
-
-            const SurfaceRange& begin() const
-            {
-                return *this;
-            }
-
-            const SurfaceRange& end() const
-            {
-                return *this;
-            }
 
             const Surface< dimension >& operator*() const;
         };
@@ -100,20 +91,11 @@ namespace geode
         Surfaces();
 
     private:
-        class ModifiableSurfaceRange : public SurfaceRangeBase
+        class ModifiableSurfaceRange : public SurfaceRangeBase,
+                                       public BeginEnd< ModifiableSurfaceRange >
         {
         public:
             ModifiableSurfaceRange( const Surfaces& surfaces );
-
-            const ModifiableSurfaceRange& begin() const
-            {
-                return *this;
-            }
-
-            const ModifiableSurfaceRange& end() const
-            {
-                return *this;
-            }
 
             Surface< dimension >& operator*() const;
         };

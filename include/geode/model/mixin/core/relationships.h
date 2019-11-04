@@ -26,6 +26,7 @@
 #include <geode/basic/pimpl.h>
 
 #include <geode/model/common.h>
+#include <geode/model/mixin/core/component_type.h>
 
 namespace geode
 {
@@ -49,190 +50,200 @@ namespace geode
         /*!
          * Range to iterates on all boundaries of one component
          */
-        class opengeode_model_api BoundaryRange
+        class opengeode_model_api BoundaryRangeIterator
         {
         public:
-            BoundaryRange( const Relationships& relationships, const uuid& id );
-            BoundaryRange( BoundaryRange&& other ) noexcept;
-            BoundaryRange( const BoundaryRange& other );
-            ~BoundaryRange();
+            BoundaryRangeIterator(
+                const Relationships& relationships, const uuid& id );
+            BoundaryRangeIterator( BoundaryRangeIterator&& other ) noexcept;
+            BoundaryRangeIterator( const BoundaryRangeIterator& other );
+            ~BoundaryRangeIterator();
 
-            const BoundaryRange& begin() const
-            {
-                return *this;
-            }
-
-            const BoundaryRange& end() const
-            {
-                return *this;
-            }
-
-            bool operator!=( const BoundaryRange& /*unused*/ ) const;
+            bool operator!=( const BoundaryRangeIterator& /*unused*/ ) const;
 
             void operator++();
 
-            const uuid& operator*() const;
+            const ComponentID& operator*() const;
 
         private:
             IMPLEMENTATION_MEMBER( impl_ );
+        };
+
+        class opengeode_model_api BoundaryRange
+            : public BoundaryRangeIterator,
+              public BeginEnd< BoundaryRange >
+        {
+        public:
+            BoundaryRange( const Relationships& relationships, const uuid& id )
+                : BoundaryRangeIterator( relationships, id ), BeginEnd( *this )
+            {
+            }
         };
 
         /*!
          * Range to iterates on all incidences of one component
          */
-        class opengeode_model_api IncidenceRange
+        class opengeode_model_api IncidenceRangeIterator
         {
         public:
-            IncidenceRange(
+            IncidenceRangeIterator(
                 const Relationships& relationships, const uuid& id );
-            IncidenceRange( IncidenceRange&& other ) noexcept;
-            IncidenceRange( const IncidenceRange& other );
-            ~IncidenceRange();
+            IncidenceRangeIterator( IncidenceRangeIterator&& other ) noexcept;
+            IncidenceRangeIterator( const IncidenceRangeIterator& other );
+            ~IncidenceRangeIterator();
 
-            const IncidenceRange& begin() const
-            {
-                return *this;
-            }
-
-            const IncidenceRange& end() const
-            {
-                return *this;
-            }
-
-            bool operator!=( const IncidenceRange& /*unused*/ ) const;
+            bool operator!=( const IncidenceRangeIterator& /*unused*/ ) const;
 
             void operator++();
 
-            const uuid& operator*() const;
+            const ComponentID& operator*() const;
 
         private:
             IMPLEMENTATION_MEMBER( impl_ );
+        };
+
+        class opengeode_model_api IncidenceRange
+            : public IncidenceRangeIterator,
+              public BeginEnd< IncidenceRange >
+        {
+        public:
+            IncidenceRange( const Relationships& relationships, const uuid& id )
+                : IncidenceRangeIterator( relationships, id ), BeginEnd( *this )
+            {
+            }
         };
 
         /*!
          * Range to iterates on all internal components of one component
          */
-        class opengeode_model_api InternalRange
+        class opengeode_model_api InternalRangeIterator
         {
         public:
-            InternalRange( const Relationships& relationships, const uuid& id );
-            InternalRange( InternalRange&& other ) noexcept;
-            InternalRange( const InternalRange& other );
-            ~InternalRange();
+            InternalRangeIterator(
+                const Relationships& relationships, const uuid& id );
+            InternalRangeIterator( InternalRangeIterator&& other ) noexcept;
+            InternalRangeIterator( const InternalRangeIterator& other );
+            ~InternalRangeIterator();
 
-            const InternalRange& begin() const
-            {
-                return *this;
-            }
-
-            const InternalRange& end() const
-            {
-                return *this;
-            }
-
-            bool operator!=( const InternalRange& /*unused*/ ) const;
+            bool operator!=( const InternalRangeIterator& /*unused*/ ) const;
 
             void operator++();
 
-            const uuid& operator*() const;
+            const ComponentID& operator*() const;
 
         private:
             IMPLEMENTATION_MEMBER( impl_ );
+        };
+
+        class opengeode_model_api InternalRange
+            : public InternalRangeIterator,
+              public BeginEnd< InternalRange >
+        {
+        public:
+            InternalRange( const Relationships& relationships, const uuid& id )
+                : InternalRangeIterator( relationships, id ), BeginEnd( *this )
+            {
+            }
         };
 
         /*!
          * Range to iterates on all embeddings of one component
          */
-        class opengeode_model_api EmbeddingRange
+        class opengeode_model_api EmbeddingRangeIterator
         {
         public:
-            EmbeddingRange(
+            EmbeddingRangeIterator(
                 const Relationships& relationships, const uuid& id );
-            EmbeddingRange( EmbeddingRange&& other ) noexcept;
-            EmbeddingRange( const EmbeddingRange& other );
-            ~EmbeddingRange();
+            EmbeddingRangeIterator( EmbeddingRangeIterator&& other ) noexcept;
+            EmbeddingRangeIterator( const EmbeddingRangeIterator& other );
+            ~EmbeddingRangeIterator();
 
-            const EmbeddingRange& begin() const
-            {
-                return *this;
-            }
-
-            const EmbeddingRange& end() const
-            {
-                return *this;
-            }
-
-            bool operator!=( const EmbeddingRange& /*unused*/ ) const;
+            bool operator!=( const EmbeddingRangeIterator& /*unused*/ ) const;
 
             void operator++();
 
-            const uuid& operator*() const;
+            const ComponentID& operator*() const;
 
         private:
             IMPLEMENTATION_MEMBER( impl_ );
+        };
+
+        class opengeode_model_api EmbeddingRange
+            : public EmbeddingRangeIterator,
+              public BeginEnd< EmbeddingRange >
+        {
+        public:
+            EmbeddingRange( const Relationships& relationships, const uuid& id )
+                : EmbeddingRangeIterator( relationships, id ), BeginEnd( *this )
+            {
+            }
         };
 
         /*!
          * Range to iterates on all items of one component
          */
-        class opengeode_model_api ItemRange
+        class opengeode_model_api ItemRangeIterator
         {
         public:
-            ItemRange( const Relationships& relationships, const uuid& id );
-            ItemRange( ItemRange&& other ) noexcept;
-            ItemRange( const ItemRange& other );
-            ~ItemRange();
+            ItemRangeIterator(
+                const Relationships& relationships, const uuid& id );
+            ItemRangeIterator( ItemRangeIterator&& other ) noexcept;
+            ItemRangeIterator( const ItemRangeIterator& other );
+            ~ItemRangeIterator();
 
-            const ItemRange& begin() const
-            {
-                return *this;
-            }
-
-            const ItemRange& end() const
-            {
-                return *this;
-            }
-
-            bool operator!=( const ItemRange& /*unused*/ ) const;
+            bool operator!=( const ItemRangeIterator& /*unused*/ ) const;
 
             void operator++();
 
-            const uuid& operator*() const;
+            const ComponentID& operator*() const;
 
         private:
             IMPLEMENTATION_MEMBER( impl_ );
         };
 
+        class opengeode_model_api ItemRange : public ItemRangeIterator,
+                                              public BeginEnd< ItemRange >
+        {
+        public:
+            ItemRange( const Relationships& relationships, const uuid& id )
+                : ItemRangeIterator( relationships, id ), BeginEnd( *this )
+            {
+            }
+        };
+
         /*!
          * Range to iterates on all collections of one component
          */
-        class opengeode_model_api CollectionRange
+        class opengeode_model_api CollectionRangeIterator
         {
         public:
-            CollectionRange(
+            CollectionRangeIterator(
                 const Relationships& relationships, const uuid& id );
-            CollectionRange( CollectionRange&& other ) noexcept;
-            CollectionRange( const CollectionRange& other );
-            ~CollectionRange();
+            CollectionRangeIterator( CollectionRangeIterator&& other ) noexcept;
+            CollectionRangeIterator( const CollectionRangeIterator& other );
+            ~CollectionRangeIterator();
 
-            const CollectionRange& begin() const
-            {
-                return *this;
-            }
-
-            const CollectionRange& end() const
-            {
-                return *this;
-            }
-
-            bool operator!=( const CollectionRange& /*unused*/ ) const;
+            bool operator!=( const CollectionRangeIterator& /*unused*/ ) const;
 
             void operator++();
 
-            const uuid& operator*() const;
+            const ComponentID& operator*() const;
 
         private:
             IMPLEMENTATION_MEMBER( impl_ );
+        };
+
+        class opengeode_model_api CollectionRange
+            : public CollectionRangeIterator,
+              public BeginEnd< CollectionRange >
+        {
+        public:
+            CollectionRange(
+                const Relationships& relationships, const uuid& id )
+                : CollectionRangeIterator( relationships, id ),
+                  BeginEnd( *this )
+            {
+            }
         };
 
     public:
@@ -269,9 +280,9 @@ namespace geode
         /*!
          * Add a component in the set of components registered by the
          * Relationships
-         * @param[in] id Unique index of the component to add
+         * @param[in] id The component identifier to add
          */
-        void register_component( const uuid& id );
+        void register_component( const ComponentID& id );
 
         /*!
          * Remove a component from the set of components registered by the

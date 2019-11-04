@@ -75,20 +75,11 @@ namespace geode
         /*!
          * Class for range-based iteration on unmodifiable Corners
          */
-        class opengeode_model_api CornerRange : public CornerRangeBase
+        class opengeode_model_api CornerRange : public CornerRangeBase,
+                                                public BeginEnd< CornerRange >
         {
         public:
             CornerRange( const Corners& corners );
-
-            const CornerRange& begin() const
-            {
-                return *this;
-            }
-
-            const CornerRange& end() const
-            {
-                return *this;
-            }
 
             const Corner< dimension >& operator*() const;
         };
@@ -116,20 +107,11 @@ namespace geode
         Corners();
 
     private:
-        class ModifiableCornerRange : public CornerRangeBase
+        class ModifiableCornerRange : public CornerRangeBase,
+                                      public BeginEnd< ModifiableCornerRange >
         {
         public:
             ModifiableCornerRange( const Corners& corners );
-
-            const ModifiableCornerRange& begin() const
-            {
-                return *this;
-            }
-
-            const ModifiableCornerRange& end() const
-            {
-                return *this;
-            }
 
             Corner< dimension >& operator*() const;
         };

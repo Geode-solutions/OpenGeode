@@ -228,7 +228,7 @@ namespace geode
     template < index_t dimension >
     Surfaces< dimension >::SurfaceRange::SurfaceRange(
         const Surfaces& surfaces )
-        : SurfaceRangeBase( surfaces )
+        : SurfaceRangeBase( surfaces ), BeginEnd< SurfaceRange >( *this )
     {
     }
 
@@ -242,7 +242,8 @@ namespace geode
     template < index_t dimension >
     Surfaces< dimension >::ModifiableSurfaceRange::ModifiableSurfaceRange(
         const Surfaces& surfaces )
-        : SurfaceRangeBase( surfaces )
+        : SurfaceRangeBase( surfaces ),
+          BeginEnd< ModifiableSurfaceRange >( *this )
     {
     }
 

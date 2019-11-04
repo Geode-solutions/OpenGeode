@@ -9,6 +9,20 @@ TODO
 
 ### Breaking Changes
 
+- **BRep / Section**: methods accessing iterators for internal/embedded Components are renamed more explicitly.
+
+**How to upgrade**
+
+Replace in `BRep` and `Section`:
+- `geode::BRep::internals(...)` by either `geode::BRep::internal_corners(...)` or `geode::BRep::internal_lines(...)` or `geode::BRep::internal_surfaces(...)`
+- `geode::BRep::embeddings(...)` by either `geode::BRep::embedded_surfaces(...)` or `geode::BRep::embedded_blocks(...)`
+
+- **Relationships**: replace the component registration key from uuid to ComponentID.
+
+**How to upgrade**
+
+Replace `id0` and `id1` in  `geode::RelationshipsBuilder::register_component( id0, id1 )` by their ComponentIDs.
+
 - **Solid Facets & Surface Edges**: Edge/Facet indices are used as parameters of methods like `PolygonalSurface< dimension >::edge_length`, `PolyhedralSolid< dimension >::facet_barycenter`.
 
 **How to upgrade**
