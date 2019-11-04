@@ -23,11 +23,57 @@ Replace in `BRep` and `Section`:
 
 Replace `id0` and `id1` in  `geode::RelationshipsBuilder::register_component( id0, id1 )` by their ComponentIDs.
 
+- **Solid Facets & Surface Edges**: Edge/Facet indices are used as parameters of methods like `PolygonalSurface< dimension >::edge_length`, `PolyhedralSolid< dimension >::facet_barycenter`.
+
+**How to upgrade**
+
+Example
+
+from
+
+```
+PolygonEdge polygon_edge{ 0, 0 };
+auto edge_length = surface.polygon_edge_length( polygon_edge );
+```
+
+to 
+
+```
+index_t edge_id = polygon_edge( { 0, 0 } );
+auto edge_length = surface.edge_length( edge_id );
+```
+
 - **Geometry**: new library called geometry gathering files related to geometry: bounding_box, nn_search, point and vector.
 
 **How to upgrade**
 
 Add `OpenGeode::geometry` to use this library. Update the path of OpenGeode files you include.
+
+- **Attributes**: force Attribute API for writing by removing the reference access to attribute values
+
+**How to upgrade**
+
+Example using `VariableAttribute< double >` and modifying the `index_t id` value to `double new_value`
+```
+attribute.value( id ) = new_value;
+```
+
+to 
+
+```
+attribute.set_value( id, new_value );
+```
+
+Example using `VariableAttribute< std::vector< double > >` and modifying the `index_t id` value by adding `double new_value`
+```
+attribute.value( id ).push_back( new_value );
+```
+
+to 
+
+```
+attribute.modify_value( id, [&new_value]( std::vector< double >& values ) { values.push_back( new_value ); } );
+```
 
 - **BRepBuilder / SectionBuilder**: methods adding relationships between model Components have now explicitely the relationship type in their name.
 

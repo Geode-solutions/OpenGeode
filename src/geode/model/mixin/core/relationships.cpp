@@ -120,7 +120,7 @@ namespace geode
         {
             auto index = OpenGeodeGraphBuilder{ graph_ }.create_vertex();
             uuid2index_.set_new_mapping( id.id(), index );
-            ids_->value( index ) = id;
+            ids_->set_value( index, id );
         }
 
         void unregister_component( const uuid& id )
@@ -165,7 +165,7 @@ namespace geode
             auto index = OpenGeodeGraphBuilder{ graph_ }.create_edge(
                 vertex_id( from ), vertex_id( to ) );
 
-            relation_type_->value( index ) = type;
+            relation_type_->set_value( index, type );
         }
 
         std::string save( const std::string& directory ) const

@@ -63,9 +63,10 @@ namespace geode
             return edges_around_vertex_->value( vertex_id );
         }
 
-        std::vector< EdgeVertex >& get_edges_around_vertex( index_t vertex_id )
+        void set_edges_around_vertex(
+            index_t vertex_id, const std::vector< EdgeVertex >& edges ) const
         {
-            return edges_around_vertex_->value( vertex_id );
+            edges_around_vertex_->set_value( vertex_id, edges );
         }
 
         void associate_edge_vertex_to_vertex( const Graph& graph,
@@ -79,14 +80,20 @@ namespace geode
                 auto it = std::find( edges.begin(), edges.end(), edge_vertex );
                 if( it != edges.end() )
                 {
-                    edges.erase( it );
+                    edges_around_vertex_->modify_value( previous_vertex,
+                        [&it]( std::vector< EdgeVertex >& edges ) {
+                            edges.erase( it );
+                        } );
                 }
             }
             auto& edges = edges_around_vertex_->value( vertex_id );
             auto it = std::find( edges.begin(), edges.end(), edge_vertex );
             if( it == edges.end() )
             {
-                edges.push_back( edge_vertex );
+                edges_around_vertex_->modify_value( vertex_id,
+                    [&edge_vertex]( std::vector< EdgeVertex >& edges ) {
+                        edges.push_back( edge_vertex );
+                    } );
             }
         }
 
@@ -158,12 +165,12 @@ namespace geode
         return impl_->edges_around_vertex( vertex_id );
     }
 
-    std::vector< EdgeVertex >& Graph::get_edges_around_vertex(
-        index_t vertex_id )
+    void Graph::set_edges_around_vertex(
+        index_t vertex_id, const std::vector< EdgeVertex >& edges )
     {
         OPENGEODE_EXCEPTION( vertex_id < this->nb_vertices(),
             "[Graph::get_edges_around_vertex] Accessing an invalid vertex" );
-        return impl_->get_edges_around_vertex( vertex_id );
+        return impl_->set_edges_around_vertex( vertex_id, edges );
     }
 
     void Graph::associate_edge_vertex_to_vertex(

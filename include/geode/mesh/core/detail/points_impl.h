@@ -54,7 +54,7 @@ namespace geode
 
             void set_point( index_t vertex_id, const Point< dimension >& point )
             {
-                points_->value( vertex_id ) = point;
+                points_->set_value( vertex_id, point );
             }
 
         private:

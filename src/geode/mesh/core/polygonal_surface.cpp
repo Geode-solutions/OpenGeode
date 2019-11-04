@@ -26,6 +26,8 @@
 #include <algorithm>
 #include <stack>
 
+#include <bitsery/brief_syntax/array.h>
+
 #include <geode/basic/algorithm.h>
 #include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>
@@ -102,7 +104,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    class PolygonalSurfaceBase< dimension >::Impl : public detail::FacetStorage
+    class PolygonalSurfaceBase< dimension >::Impl
+        : public detail::FacetStorage< std::array< index_t, 2 > >
     {
     public:
         explicit Impl( PolygonalSurfaceBase& surface )
@@ -122,7 +125,7 @@ namespace geode
         void associate_polygon_vertex_to_vertex(
             const PolygonVertex& polygon_vertex, index_t vertex_id )
         {
-            polygon_around_vertex_->value( vertex_id ) = polygon_vertex;
+            polygon_around_vertex_->set_value( vertex_id, polygon_vertex );
         }
 
         index_t find_edge( const std::array< index_t, 2 >& edge_vertices ) const
@@ -134,6 +137,12 @@ namespace geode
             const std::array< index_t, 2 >& edge_vertices )
         {
             return this->add_facet( edge_vertices );
+        }
+
+        const std::array< index_t, 2 >& get_edge_vertices(
+            index_t edge_id ) const
+        {
+            return this->get_facet_vertices( edge_id );
         }
 
         void update_edge_vertex( const std::array< index_t, 2 >& edge_vertices,
@@ -185,8 +194,9 @@ namespace geode
         {
             archive.ext( *this, DefaultGrowable< Archive, Impl >{},
                 []( Archive& archive, Impl& impl ) {
-                    archive.ext( impl,
-                        bitsery::ext::BaseClass< detail::FacetStorage >{} );
+                    archive.ext(
+                        impl, bitsery::ext::BaseClass< detail::FacetStorage<
+                                  std::array< index_t, 2 > > >{} );
                     archive.object( impl.polygon_attribute_manager_ );
                     archive.ext( impl.polygon_around_vertex_,
                         bitsery::ext::StdSmartPtr{} );
@@ -246,6 +256,14 @@ namespace geode
         const std::array< index_t, 2 >& edge_vertices )
     {
         return impl_->find_or_create_edge( edge_vertices );
+    }
+
+    template < index_t dimension >
+    const std::array< index_t, 2 >&
+        PolygonalSurfaceBase< dimension >::edge_vertices(
+            index_t edge_id ) const
+    {
+        return impl_->get_edge_vertices( edge_id );
     }
 
     template < index_t dimension >
@@ -446,23 +464,21 @@ namespace geode
     }
 
     template < index_t dimension >
-    double PolygonalSurfaceBase< dimension >::polygon_edge_length(
-        const PolygonEdge& polygon_edge ) const
+    double PolygonalSurfaceBase< dimension >::edge_length(
+        index_t edge_id ) const
     {
-        auto v0 = polygon_edge_vertex( polygon_edge, 0 );
-        auto v1 = polygon_edge_vertex( polygon_edge, 1 );
-        return Vector< dimension >{ this->point( v0 ), this->point( v1 ) }
+        auto vertices = edge_vertices( edge_id );
+        return Vector< dimension >{ this->point( vertices[0] ),
+            this->point( vertices[1] ) }
             .length();
     }
 
     template < index_t dimension >
-    Point< dimension >
-        PolygonalSurfaceBase< dimension >::polygon_edge_barycenter(
-            const PolygonEdge& polygon_edge ) const
+    Point< dimension > PolygonalSurfaceBase< dimension >::edge_barycenter(
+        index_t edge_id ) const
     {
-        auto v0 = polygon_edge_vertex( polygon_edge, 0 );
-        auto v1 = polygon_edge_vertex( polygon_edge, 1 );
-        return ( this->point( v0 ) + this->point( v1 ) ) / 2;
+        auto vertices = edge_vertices( edge_id );
+        return ( this->point( vertices[0] ) + this->point( vertices[1] ) ) / 2;
     }
 
     template < index_t dimension >
@@ -574,6 +590,12 @@ namespace geode
             }
         }
         return std::make_tuple( false, PolygonEdge{} );
+    }
+    template < index_t dimension >
+    index_t PolygonalSurfaceBase< dimension >::edge_from_vertices(
+        const std::array< index_t, 2 >& vertices ) const
+    {
+        return impl_->find_edge( vertices );
     }
 
     template < index_t dimension >

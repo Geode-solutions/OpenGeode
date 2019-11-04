@@ -42,6 +42,8 @@ namespace
         geode::AttributeManager::register_attribute_type< geode::index_t,
             Serializer >( context );
         geode::AttributeManager::register_attribute_type<
+            std::vector< geode::index_t >, Serializer >( context );
+        geode::AttributeManager::register_attribute_type<
             std::array< geode::index_t, 2 >, Serializer >( context );
         geode::AttributeManager::register_attribute_type<
             std::array< geode::index_t, 3 >, Serializer >( context );

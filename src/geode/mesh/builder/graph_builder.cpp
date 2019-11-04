@@ -144,18 +144,18 @@ namespace geode
 
         for( auto v : Range{ graph_.nb_vertices() } )
         {
-            auto& edges = graph_.get_edges_around_vertex( v );
+            const auto& edges = graph_.edges_around_vertex( v );
             std::vector< EdgeVertex > new_edges;
             new_edges.reserve( edges.size() );
-            for( auto&& edge : edges )
+            for( const auto& edge : edges )
             {
-                edge.edge_id = old2new[edge.edge_id];
-                if( edge.edge_id != NO_ID )
+                auto edge_id = old2new[edge.edge_id];
+                if( edge_id != NO_ID )
                 {
-                    new_edges.emplace_back( edge );
+                    new_edges.emplace_back( edge_id, edge.vertex_id );
                 }
             }
-            edges = std::move( new_edges );
+            graph_.set_edges_around_vertex( v, new_edges );
         }
 
         graph_.edge_attribute_manager().delete_elements( to_delete );
