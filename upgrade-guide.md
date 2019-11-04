@@ -4,10 +4,22 @@
 
 ### Motivations
 
-TODO
+OpenGeode evolves and will keep evolving. 
+To support this evolution, we introduce a full backward compatibility system to all our native file formats (.og_*). 
+Any file saved since v3 will be loadable in any new OpenGeode version.
+
+To increase the component relationships design flexibility, we allow relationships between any component types.
+For example, we can register a relation between a `Line` inside a `Block` representing a well path.
+
+Attribute interface has been revised to segregate read-only from write modifications.
+We provide new ways to modify in-place an attribute value.
+
+A new library named `geometry` was created to improve organization of C++ objects related to geometry concepts.
 
 
 ### Breaking Changes
+
+- **Serialization**: all native file formats (.og_*) saved before v3 are no longer compatible, don't worry it will be the last time ;-)
 
 - **BRep / Section**: methods accessing iterators for internal/embedded Components are renamed more explicitly.
 
