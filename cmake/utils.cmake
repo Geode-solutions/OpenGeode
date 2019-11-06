@@ -66,6 +66,20 @@ if(EXISTS ${PROJECT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in)
     )
 endif()
 
+if(EXISTS ${PROJECT_SOURCE_DIR}/LICENSE)
+    install(
+        FILES ${PROJECT_SOURCE_DIR}/LICENSE
+        DESTINATION .
+    )
+endif()
+
+if(EXISTS ${PROJECT_SOURCE_DIR}/COPYLEFT)
+    install(
+        FILES ${PROJECT_SOURCE_DIR}/COPYLEFT
+        DESTINATION .
+    )
+endif()
+
 find_package(Doxygen QUIET)
 if(DOXYGEN_FOUND AND EXISTS ${PROJECT_SOURCE_DIR}/cmake/Doxyfile.in)
     # set input and output files
