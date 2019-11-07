@@ -53,6 +53,8 @@ namespace geode
             using ComponentsStore = std::unordered_map< uuid, ComponentPtr >;
             using Iterator = typename ComponentsStore::const_iterator;
 
+            virtual ~ComponentsStorage() = default;
+
             index_t nb_components() const
             {
                 return components_.size();
@@ -83,7 +85,7 @@ namespace geode
                 components_.emplace( component->id(), std::move( component ) );
             }
 
-            virtual void save_components( const std::string& filename ) const
+            void save_components( const std::string& filename ) const
             {
                 std::ofstream file{ filename, std::ofstream::binary };
                 TContext context{};

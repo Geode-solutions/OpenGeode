@@ -74,7 +74,7 @@ namespace geode
             const std::array< index_t, 4 >& vertices ) override;
 
         std::vector< std::vector< index_t > > get_polyhedron_facet_vertices(
-            const std::array< index_t, 4 >& vertices ) const;
+            const std::array< index_t, 4 >& vertices ) const override;
 
         void do_delete_polyhedra(
             const std::vector< bool >& to_delete ) override;
