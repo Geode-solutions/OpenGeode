@@ -37,13 +37,6 @@ std::vector< bool > create_bool_vector()
 std::vector< double > create_double_vector()
 {
     std::vector< double > out{ 0.0, 1.1, 2.2, 3.3 };
-    std::iota( out.begin(), out.end(), 0. );
-    std::transform( out.begin(), out.end(), out.begin(),
-        std::bind1st( std::multiplies< double >(), 1.1 ) );
-    DEBUG( out[0] );
-    DEBUG( out[1] );
-    DEBUG( out[2] );
-    DEBUG( out[3] );
     return out;
 }
 
