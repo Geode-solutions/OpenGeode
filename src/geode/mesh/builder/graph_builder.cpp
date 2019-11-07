@@ -28,7 +28,7 @@
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/logger.h>
 
-#include <geode/mesh/builder/detail/mapping_after_deletion.h>
+#include <geode/basic/detail/mapping_after_deletion.h>
 #include <geode/mesh/core/graph.h>
 
 namespace
@@ -133,14 +133,14 @@ namespace geode
     void GraphBuilder::do_delete_vertices(
         const std::vector< bool >& to_delete )
     {
-        auto old2new = mapping_after_deletion( to_delete );
+        auto old2new = detail::mapping_after_deletion( to_delete );
         update_edge_vertices( graph_, *this, old2new );
         do_delete_curve_vertices( to_delete );
     }
 
     void GraphBuilder::delete_edges( const std::vector< bool >& to_delete )
     {
-        auto old2new = mapping_after_deletion( to_delete );
+        auto old2new = detail::mapping_after_deletion( to_delete );
 
         for( auto v : Range{ graph_.nb_vertices() } )
         {

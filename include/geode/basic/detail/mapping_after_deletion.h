@@ -27,22 +27,23 @@
 
 #include <geode/basic/range.h>
 
-namespace
+namespace geode
 {
-    using geode::index_t;
-
-    std::vector< index_t > mapping_after_deletion(
-        const std::vector< bool >& to_delete )
+    namespace detail
     {
-        std::vector< index_t > old2new( to_delete.size(), geode::NO_ID );
-        index_t current_id{ 0 };
-        for( auto i : geode::Range{ to_delete.size() } )
+        std::vector< index_t > mapping_after_deletion(
+            const std::vector< bool >& to_delete )
         {
-            if( !to_delete[i] )
+            std::vector< index_t > old2new( to_delete.size(), NO_ID );
+            index_t current_id{ 0 };
+            for( auto i : Range{ to_delete.size() } )
             {
-                old2new[i] = current_id++;
+                if( !to_delete[i] )
+                {
+                    old2new[i] = current_id++;
+                }
             }
+            return old2new;
         }
-        return old2new;
-    }
-} // namespace
+    } // namespace detail
+} // namespace geode
