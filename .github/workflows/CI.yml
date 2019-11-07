@@ -69,7 +69,7 @@ jobs:
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       
   build-mac:
-    runs-on: macOS-10.15
+    runs-on: macos-latest
     needs: format
     strategy:
       matrix:
@@ -95,7 +95,7 @@ jobs:
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} 
       
   build-mac-xcode:
-    runs-on: macOS-10.14
+    runs-on: macos-latest
     needs: format
     strategy:
       matrix:
