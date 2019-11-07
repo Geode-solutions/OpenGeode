@@ -36,10 +36,7 @@ std::vector< bool > create_bool_vector()
 
 std::vector< double > create_double_vector()
 {
-    std::vector< double > out( 4, 0. );
-    std::iota( out.begin(), out.end(), 0. );
-    std::transform( out.begin(), out.end(), out.begin(),
-        std::bind1st( std::multiplies< double >(), 1.1 ) );
+    std::vector< double > out{ 0, 1.1, 2.2, 3.3 }; 
     return out;
 }
 
