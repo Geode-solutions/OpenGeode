@@ -31,7 +31,7 @@ namespace geode
 {
     namespace detail
     {
-        std::vector< index_t > mapping_after_deletion(
+        inline std::vector< index_t > mapping_after_deletion(
             const std::vector< bool >& to_delete )
         {
             std::vector< index_t > old2new( to_delete.size(), NO_ID );
