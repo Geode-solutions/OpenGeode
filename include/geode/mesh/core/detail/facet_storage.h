@@ -28,8 +28,8 @@
 #include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/common.h>
-#include <geode/basic/range.h>
 #include <geode/basic/detail/mapping_after_deletion.h>
+#include <geode/basic/range.h>
 
 #include <geode/mesh/core/detail/vertex_cycle.h>
 

@@ -26,8 +26,8 @@
 #include <type_traits>
 
 #include <geode/basic/attribute_manager.h>
-#include <geode/basic/logger.h>
 #include <geode/basic/detail/mapping_after_deletion.h>
+#include <geode/basic/logger.h>
 
 #include <geode/mesh/core/graph.h>
 
