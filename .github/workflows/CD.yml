@@ -32,9 +32,17 @@ jobs:
       run: curl -s https://raw.githubusercontent.com/Geode-solutions/actions/master/doc/doc.sh | bash -s -- ${GITHUB_WORKSPACE}/build/opengeode
       env:
         GITHUB_TOKEN: ${{ secrets.TOKEN }}
+    - name: Notify slack
+      if: failure()
+      uses: 8398a7/action-slack@v2
+      with:
+        status: failure
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       
   release-mac:
-    runs-on: macOS-10.14
+    runs-on: macOS-10.15
 
     steps:
     - uses: actions/checkout@v1
@@ -55,6 +63,14 @@ jobs:
         files: "build/opengeode/OpenGeode-${{ steps.package.outputs.version }}-Darwin.tar.gz"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Notify slack
+      if: failure()
+      uses: 8398a7/action-slack@v2
+      with:
+        status: failure
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       
   release-windows:
     runs-on: windows-2016
@@ -78,4 +94,12 @@ jobs:
       with:
         files: "build/opengeode/OpenGeode-${{ steps.package.outputs.version }}-win64.zip"
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Notify slack
+      if: failure()
+      uses: 8398a7/action-slack@v2
+      with:
+        status: failure
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
