@@ -33,7 +33,7 @@ OpenGeode is supported and continuously tested on several platforms:
 
 * Windows - Visual Studio 2017
 * Ubuntu 18.04
-* macOS X Mojave (10.14)
+* macOS X Catalina (10.15)
 
 Pre-compiled binaries on these three platforms are also provided. \link opengeode_where_to_get_binaries This page\endlink describes where to download these binaries.
 
@@ -44,7 +44,7 @@ OpenGeode comes with a CMake configuration file. You can modified two items:
 * `CMAKE_BUILD_TYPE`: choose build configuration (Release, Debug). By default Release.
 * `OPENGEODE_WITH_TESTS`: switch on/off the OpenGeode test environment
 
-Your version of CMake should be at least 3.7.2 (3.11 for MacOS Mojave and above users).
+Your version of CMake should be at least 3.7.2 (3.11 for MacOS Catalina and above users).
 
 ## Compiler
 
