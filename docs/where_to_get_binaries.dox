@@ -31,8 +31,8 @@ We provide three pre-compiled binaries for OpenGeode. They are automatically gen
 
 `https://github.com/Geode-solutions/OpenGeode/releases`
 
-* `OpenGeode-X.Y.Z-Darwin.tar.gz` corresponds to the package generated on macOS X High Sierra (10.13) for OpenGeode X.Y.Z. release;
-* `OpenGeode-X.Y.Z-Linux.tar.gz` corresponds to the package generated on Ubuntu 16.04 for OpenGeode X.Y.Z. release;
+* `OpenGeode-X.Y.Z-Darwin.tar.gz` corresponds to the package generated on macOS Catalina (10.15) for OpenGeode X.Y.Z. release;
+* `OpenGeode-X.Y.Z-Linux.tar.gz` corresponds to the package generated on Ubuntu 18.04 for OpenGeode X.Y.Z. release;
 * `OpenGeode-X.Y.Z-win64.zip` corresponds to the package generated on Windows Visual Studio 15 2017 for OpenGeode X.Y.Z. release;
 
 Select the one that fits your platform and needs. You can now use these pre-compiled binaries for your own projects.
