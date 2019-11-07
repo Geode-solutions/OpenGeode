@@ -147,10 +147,6 @@ namespace geode
                 {
                     facet_indices_.erase( key );
                 }
-                // for( auto& cycle : facet_indices_ )
-                // {
-                // }
-                DEBUG( "call facet att manag -> delete_el" );
                 facet_attribute_manager_.delete_elements( to_delete );
             }
 

@@ -126,12 +126,15 @@ void test_double_sparse_attribute( geode::AttributeManager& manager )
         manager.find_or_create_attribute< geode::SparseAttribute, double >(
             "double", 12 );
     sparse_attribute->value( 3 ) = 3;
+    sparse_attribute->value( 7 ) = 7;
 
     auto attribute = manager.find_attribute< double >( "double" );
     OPENGEODE_EXCEPTION(
         attribute->value( 3 ) == 3, "[Test] Should be equal to 3" );
     OPENGEODE_EXCEPTION(
         attribute->value( 6 ) == 12, "[Test] Should be equal to 12" );
+    OPENGEODE_EXCEPTION(
+        attribute->value( 7 ) == 7, "[Test] Should be equal to 7" );
 
     sparse_attribute->value( 3 ) = 5;
     OPENGEODE_EXCEPTION(
@@ -279,6 +282,20 @@ void test_delete_attribute_elements( geode::AttributeManager& manager )
         "[Test] Two attribute elements should have being removed" );
 }
 
+void test_sparse_attribute_after_element_deletion(
+    geode::AttributeManager& manager )
+{
+    auto sparse_attribute = manager.find_attribute< double >( "double" );
+    OPENGEODE_EXCEPTION( sparse_attribute->value( 0 ) == 12,
+        "Element 0 of sparse attribute should be 12 " );
+    OPENGEODE_EXCEPTION( sparse_attribute->value( 3 ) == 12,
+        "Element 3 of sparse attribute should be 12 " );
+    OPENGEODE_EXCEPTION( sparse_attribute->value( 5 ) == 7,
+        "Element 5 of sparse attribute should be 7 " );
+    OPENGEODE_EXCEPTION( sparse_attribute->value( 7 ) == 12,
+        "Element 7 of sparse attribute should be 12 " );
+}
+
 int main()
 {
     using namespace geode;
@@ -297,6 +314,7 @@ int main()
         test_double_sparse_attribute( manager );
         test_foo_sparse_attribute( manager );
         test_delete_attribute_elements( manager );
+        test_sparse_attribute_after_element_deletion( manager );
 
         test_serialize_manager( manager );
 
