@@ -394,6 +394,11 @@ namespace geode
         template < typename Modifier >
         void modify_value( index_t element, Modifier&& modifier )
         {
+            auto it = values_.find( element );
+            if( it == values_.end() )
+            {
+                values_.emplace( element, default_value_ );
+            }
             modifier( values_[element] );
         }
 
