@@ -412,6 +412,16 @@ int main()
         test_create_vertex_attribute( *polygonal_surface );
         test_create_polygons( *polygonal_surface, *builder );
         test_create_edge_attribute( *polygonal_surface );
+
+            DEBUG("test 1");
+            auto nb_e = polygonal_surface->edge_attribute_manager().nb_elements();
+            DEBUG(nb_e);
+            auto attribute = polygonal_surface->edge_attribute_manager()
+                         .find_attribute< index_t >( "test" );
+            for( auto i : Range{nb_e}){
+                DEBUG(attribute->value(i));
+            }
+
         test_polygon_adjacencies( *polygonal_surface, *builder );
         test_polygon_edges_on_borders( *polygonal_surface );
         test_previous_next_on_border( *polygonal_surface );
@@ -425,10 +435,42 @@ int main()
         test_io( *polygonal_surface, base_file );
 
         test_delete_vertex( *polygonal_surface, *builder );
+
+            DEBUG("test 2");
+            nb_e = polygonal_surface->edge_attribute_manager().nb_elements();
+            DEBUG(nb_e);
+            attribute = polygonal_surface->edge_attribute_manager()
+                         .find_attribute< index_t >( "test" );
+            for( auto i : Range{nb_e}){
+                DEBUG(attribute->value(i));
+            }
+
+
         test_delete_polygon( *polygonal_surface, *builder );
+
+
+            DEBUG("test 3");
+            nb_e = polygonal_surface->edge_attribute_manager().nb_elements();
+            DEBUG(nb_e);
+            attribute = polygonal_surface->edge_attribute_manager()
+                         .find_attribute< index_t >( "test" );
+            for( auto i : Range{nb_e}){
+                DEBUG(attribute->value(i));
+            }
+
         test_clone( *polygonal_surface );
         test_set_polygon_vertex( *polygonal_surface, *builder );
         test_delete_all( *polygonal_surface, *builder );
+
+
+            DEBUG("test 4");
+            nb_e = polygonal_surface->edge_attribute_manager().nb_elements();
+            DEBUG(nb_e);
+            attribute = polygonal_surface->edge_attribute_manager()
+                         .find_attribute< index_t >( "test" );
+            for( auto i : Range{nb_e}){
+                DEBUG(attribute->value(i));
+            }
 
         Logger::info( "TEST SUCCESS" );
         return 0;

@@ -30,7 +30,7 @@
 #include <geode/basic/common.h>
 #include <geode/basic/range.h>
 
-#include <geode/mesh/builder/detail/mapping_after_deletion.h>
+#include <geode/basic/detail/mapping_after_deletion.h>
 #include <geode/mesh/core/detail/vertex_cycle.h>
 
 namespace geode
@@ -67,9 +67,9 @@ namespace geode
             friend class bitsery::Access;
             FacetStorage()
                 : counter_(
-                    facet_attribute_manager_
-                        .template find_or_create_attribute< VariableAttribute,
-                            index_t >( "counter", 1 ) ),
+                      facet_attribute_manager_
+                          .template find_or_create_attribute< VariableAttribute,
+                              index_t >( "counter", 1 ) ),
                   vertices_(
                       facet_attribute_manager_
                           .template find_or_create_attribute< VariableAttribute,
@@ -114,10 +114,9 @@ namespace geode
                 OPENGEODE_ASSERT( id != NO_ID,
                     "[FacetStorage::remove_facet] Cannot "
                     "find facet from given vertices" );
-                if( counter_ > 0 )
-                {
-                    counter_->set_value( id, counter_->value( id ) - 1 );
-                }
+                auto old_count = counter_->value( id );
+                auto new_count = std::max( 1u, old_count ) - 1;
+                counter_->set_value( id, new_count );
             }
 
             void clean_facets()
@@ -126,34 +125,32 @@ namespace geode
                     facet_attribute_manager_.nb_elements(), false );
                 for( auto e : Range{ facet_attribute_manager_.nb_elements() } )
                 {
-                    if( counter_->value( e ) == 0 )
-                    {
-                        to_delete[e] = true;
-                    }
+                    to_delete[e] = !counter_->value( e );
                 }
                 delete_facets( to_delete );
             }
 
             void delete_facets( const std::vector< bool >& to_delete )
             {
-                auto old2new = mapping_after_deletion( to_delete );
+                auto old2new = detail::mapping_after_deletion( to_delete );
                 std::vector< VertexCycle > key_to_erase;
                 key_to_erase.reserve( old2new.size() );
-                for( const auto& cycle : facet_indices_ )
+                for( auto& cycle : facet_indices_ )
                 {
                     if( old2new[cycle.second] == NO_ID )
                     {
                         key_to_erase.emplace_back( cycle.first );
                     }
+                    cycle.second = old2new[cycle.second];
                 }
                 for( const auto& key : key_to_erase )
                 {
                     facet_indices_.erase( key );
                 }
-                for( auto& cycle : facet_indices_ )
-                {
-                    cycle.second = old2new[cycle.second];
-                }
+                // for( auto& cycle : facet_indices_ )
+                // {
+                // }
+                DEBUG( "call facet att manag -> delete_el" );
                 facet_attribute_manager_.delete_elements( to_delete );
             }
 

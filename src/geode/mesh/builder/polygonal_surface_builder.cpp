@@ -27,7 +27,7 @@
 
 #include <geode/basic/attribute_manager.h>
 
-#include <geode/mesh/builder/detail/mapping_after_deletion.h>
+#include <geode/basic/detail/mapping_after_deletion.h>
 #include <geode/mesh/builder/triangulated_surface_builder.h>
 #include <geode/mesh/core/polygonal_surface.h>
 #include <geode/mesh/core/triangulated_surface.h>
@@ -271,7 +271,7 @@ namespace geode
     void PolygonalSurfaceBuilder< dimension >::do_delete_vertices(
         const std::vector< bool >& to_delete )
     {
-        auto old2new = mapping_after_deletion( to_delete );
+        auto old2new = detail::mapping_after_deletion( to_delete );
         update_polygon_vertices( old2new );
         update_edge_vertices( old2new );
         do_delete_surface_vertices( to_delete );
@@ -376,9 +376,11 @@ namespace geode
                 }
             }
         }
+        DEBUG(polygonal_surface_.nb_edges());
         polygonal_surface_.remove_isolated_edges();
+        DEBUG(polygonal_surface_.nb_edges());
 
-        auto old2new = mapping_after_deletion( to_delete );
+        auto old2new = detail::mapping_after_deletion( to_delete );
 
         for( auto v : Range{ polygonal_surface_.nb_vertices() } )
         {

@@ -27,7 +27,7 @@
 
 #include <geode/basic/attribute_manager.h>
 
-#include <geode/mesh/builder/detail/mapping_after_deletion.h>
+#include <geode/basic/detail/mapping_after_deletion.h>
 #include <geode/mesh/builder/tetrahedral_solid_builder.h>
 #include <geode/mesh/core/polyhedral_solid.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
@@ -304,7 +304,7 @@ namespace geode
     void PolyhedralSolidBuilder< dimension >::do_delete_vertices(
         const std::vector< bool >& to_delete )
     {
-        auto old2new = mapping_after_deletion( to_delete );
+        auto old2new = detail::mapping_after_deletion( to_delete );
         update_polyhedron_vertices( old2new );
         update_facet_vertices( old2new );
         do_delete_solid_vertices( to_delete );
@@ -449,7 +449,7 @@ namespace geode
         }
         polyhedral_solid_.remove_isolated_facets();
 
-        auto old2new = mapping_after_deletion( to_delete );
+        auto old2new = detail::mapping_after_deletion( to_delete );
 
         for( auto v : Range{ polyhedral_solid_.nb_vertices() } )
         {

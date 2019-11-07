@@ -36,6 +36,7 @@
 #include <geode/basic/algorithm.h>
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/common.h>
+#include <geode/basic/detail/mapping_after_deletion.h>
 
 namespace geode
 {
@@ -461,18 +462,16 @@ namespace geode
 
         void delete_elements( const std::vector< bool >& to_delete ) override
         {
-            std::vector< index_t > index_to_delete;
-            index_to_delete.reserve( values_.size() );
-            for( auto& it : values_ )
+            auto old2new = detail::mapping_after_deletion( to_delete );
+            auto old_values = values_;
+            values_.clear();
+            values_.reserve( old_values.size() );
+            for( const auto& value : old_values )
             {
-                if( to_delete[it.first] )
+                if( !to_delete[value.first] && value.second != default_value_ )
                 {
-                    index_to_delete.push_back( it.first );
+                    values_.emplace( old2new[value.first], value.second );
                 }
-            }
-            for( auto index : index_to_delete )
-            {
-                values_.erase( index );
             }
         }
 

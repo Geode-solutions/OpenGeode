@@ -26,6 +26,10 @@ set(public_headers
     "${lib_include_dir}/uuid.h"
     "${lib_include_dir}/zip_file.h"
 )
+set(advanced_headers
+    "${lib_include_dir}/detail/mapping_after_deletion.h"
+)
+
 target_link_libraries(${target_name}
     PUBLIC
         Bitsery::bitsery

@@ -36,7 +36,7 @@
 
 #include <geode/geometry/vector.h>
 
-#include <geode/mesh/builder/detail/mapping_after_deletion.h>
+#include <geode/basic/detail/mapping_after_deletion.h>
 #include <geode/mesh/builder/polygonal_surface_builder.h>
 #include <geode/mesh/core/detail/facet_storage.h>
 #include <geode/mesh/core/geode_polygonal_surface.h>
