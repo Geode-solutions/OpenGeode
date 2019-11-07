@@ -26,8 +26,8 @@
 #include <numeric>
 
 #include <geode/basic/attribute_manager.h>
-
 #include <geode/basic/detail/mapping_after_deletion.h>
+
 #include <geode/mesh/builder/triangulated_surface_builder.h>
 #include <geode/mesh/core/polygonal_surface.h>
 #include <geode/mesh/core/triangulated_surface.h>

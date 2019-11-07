@@ -26,8 +26,8 @@
 #include <numeric>
 
 #include <geode/basic/attribute_manager.h>
-
 #include <geode/basic/detail/mapping_after_deletion.h>
+
 #include <geode/mesh/builder/tetrahedral_solid_builder.h>
 #include <geode/mesh/core/polyhedral_solid.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
