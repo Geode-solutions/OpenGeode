@@ -36,7 +36,14 @@ std::vector< bool > create_bool_vector()
 
 std::vector< double > create_double_vector()
 {
-    std::vector< double > out{ 0, 1.1, 2.2, 3.3 };
+    std::vector< double > out{ 0.0, 1.1, 2.2, 3.3 };
+    std::iota( out.begin(), out.end(), 0. );
+    std::transform( out.begin(), out.end(), out.begin(),
+        std::bind1st( std::multiplies< double >(), 1.1 ) );
+    DEBUG( out[0] );
+    DEBUG( out[1] );
+    DEBUG( out[2] );
+    DEBUG( out[3] );
     return out;
 }
 
@@ -84,9 +91,9 @@ void test_delete_vector_elements()
     geode::delete_vector_elements( to_delete, double_vector, true );
     OPENGEODE_EXCEPTION( double_vector.size() == 3,
         "[Test] Delete elements result (size) for double is not correct" );
-    OPENGEODE_EXCEPTION( ( double_vector[0] == 0. )
-                             & ( double_vector[1] == 2 * 1.1 )
-                             & ( double_vector[2] == 3 * 1.1 ),
+    OPENGEODE_EXCEPTION( ( double_vector[0] == 0.0 )
+                             && ( double_vector[1] == 2.2 )
+                             && ( double_vector[2] == 3.3 ),
         "[Test] Delete elements result (values) for double is not correct" );
 }
 
