@@ -121,10 +121,12 @@ namespace geode
 
         void delete_elements( const std::vector< bool > &to_delete )
         {
-            DEBUG("delete_elements");
-            for( auto k : Range{to_delete.size()}){
-                if( to_delete[k] ){
-                    DEBUG(k);
+            DEBUG( "delete_elements" );
+            for( auto k : Range{ to_delete.size() } )
+            {
+                if( to_delete[k] )
+                {
+                    DEBUG( k );
                 }
             }
             for( auto &it : attributes_ )

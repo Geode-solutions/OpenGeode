@@ -376,9 +376,9 @@ namespace geode
                 }
             }
         }
-        DEBUG(polygonal_surface_.nb_edges());
+        DEBUG( polygonal_surface_.nb_edges() );
         polygonal_surface_.remove_isolated_edges();
-        DEBUG(polygonal_surface_.nb_edges());
+        DEBUG( polygonal_surface_.nb_edges() );
 
         auto old2new = detail::mapping_after_deletion( to_delete );
 
