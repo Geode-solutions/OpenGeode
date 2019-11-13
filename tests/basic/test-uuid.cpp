@@ -32,6 +32,7 @@ int main()
     {
         for( auto i : Range{ 100 } )
         {
+            geode_unused( i );
             uuid id;
             Logger::info( id.string() );
             uuid id2;
