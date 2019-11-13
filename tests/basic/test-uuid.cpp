@@ -30,13 +30,17 @@ int main()
 
     try
     {
-        uuid id;
-        Logger::info( id.string() );
-        uuid id2;
-        Logger::info( id2 );
-        OPENGEODE_EXCEPTION( id2 != id, "[Test] UUIDs should be different" );
-        OPENGEODE_EXCEPTION(
-            id2 < id || id < id2, "[Test] UUIDs should be different" );
+        for( auto i : Range{ 100 } )
+        {
+            uuid id;
+            Logger::info( id.string() );
+            uuid id2;
+            Logger::info( id2 );
+            OPENGEODE_EXCEPTION(
+                id2 != id, "[Test] UUIDs should be different" );
+            OPENGEODE_EXCEPTION(
+                id2 < id || id < id2, "[Test] UUIDs should be different" );
+        }
 
         Logger::info( "TEST SUCCESS" );
         return 0;
