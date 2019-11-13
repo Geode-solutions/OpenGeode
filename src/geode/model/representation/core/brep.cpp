@@ -30,6 +30,7 @@
 
 #include <geode/model/mixin/core/block.h>
 #include <geode/model/mixin/core/corner.h>
+#include <geode/model/mixin/core/detail/count_relationships.h>
 #include <geode/model/mixin/core/line.h>
 #include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
@@ -405,4 +406,65 @@ namespace geode
     {
         return { *this, boundary };
     }
+
+    index_t BRep::nb_internal_corners( const Surface3D& surface ) const
+    {
+        return detail::count_relationships( internal_corners( surface ) );
+    }
+
+    index_t BRep::nb_internal_lines( const Surface3D& surface ) const
+    {
+        return detail::count_relationships( internal_lines( surface ) );
+    }
+
+    index_t BRep::nb_internal_corners( const Block3D& block ) const
+    {
+        return detail::count_relationships( internal_corners( block ) );
+    }
+
+    index_t BRep::nb_internal_lines( const Block3D& block ) const
+    {
+        return detail::count_relationships( internal_lines( block ) );
+    }
+
+    index_t BRep::nb_internal_surfaces( const Block3D& block ) const
+    {
+        return detail::count_relationships( internal_surfaces( block ) );
+    }
+
+    index_t BRep::nb_embedded_surfaces( const Corner3D& corner ) const
+    {
+        return detail::count_relationships( embedded_surfaces( corner ) );
+    }
+
+    index_t BRep::nb_embedded_surfaces( const Line3D& line ) const
+    {
+        return detail::count_relationships( embedded_surfaces( line ) );
+    }
+
+    index_t BRep::nb_embedded_blocks( const Corner3D& corner ) const
+    {
+        return detail::count_relationships( embedded_blocks( corner ) );
+    }
+
+    index_t BRep::nb_embedded_blocks( const Line3D& line ) const
+    {
+        return detail::count_relationships( embedded_blocks( line ) );
+    }
+
+    index_t BRep::nb_embedded_blocks( const Surface3D& surface ) const
+    {
+        return detail::count_relationships( embedded_blocks( surface ) );
+    }
+
+    bool BRep::is_closed( const Line3D& line ) const
+    {
+        return nb_boundaries( line.id() ) < 2;
+    }
+
+    bool BRep::is_closed( const Surface3D& surface ) const
+    {
+        return nb_boundaries( surface.id() ) == 0;
+    }
+
 } // namespace geode

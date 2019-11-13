@@ -179,15 +179,25 @@ namespace geode
 
         IncidentSurfaceRange incidences( const Line2D& line ) const;
 
+        index_t nb_internal_corners( const Surface2D& surface ) const;
+
         InternalCornerRange internal_corners( const Surface2D& surface ) const;
+
+        index_t nb_internal_lines( const Surface2D& surface ) const;
 
         InternalLineRange internal_lines( const Surface2D& surface ) const;
 
+        index_t nb_embedded_surfaces( const Corner2D& corner ) const;
+
         EmbeddedSurfaceRange embeddings( const Corner2D& corner ) const;
+
+        index_t nb_embedded_surfaces( const Line2D& line ) const;
 
         EmbeddedSurfaceRange embeddings( const Line2D& line ) const;
 
         ItemLineRange items( const ModelBoundary2D& boundary ) const;
+
+        bool is_closed( const Line2D& line ) const;
 
         static std::string native_extension_static()
         {
