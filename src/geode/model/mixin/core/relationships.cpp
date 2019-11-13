@@ -40,6 +40,7 @@
 #include <geode/mesh/io/graph_output.h>
 
 #include <geode/model/mixin/core/bitsery_archive.h>
+#include <geode/model/mixin/core/detail/count_relationships.h>
 #include <geode/model/mixin/core/detail/uuid_to_index.h>
 
 namespace geode
@@ -246,13 +247,7 @@ namespace geode
 
     index_t Relationships::nb_boundaries( const uuid& id ) const
     {
-        index_t nb{ 0 };
-        for( const auto& unused : boundaries( id ) )
-        {
-            geode_unused( unused );
-            nb++;
-        }
-        return nb;
+        return detail::count_relationships( boundaries( id ) );
     }
 
     Relationships::BoundaryRange Relationships::boundaries(
@@ -263,13 +258,7 @@ namespace geode
 
     index_t Relationships::nb_incidences( const uuid& id ) const
     {
-        index_t nb{ 0 };
-        for( const auto& unused : incidences( id ) )
-        {
-            geode_unused( unused );
-            nb++;
-        }
-        return nb;
+        return detail::count_relationships( incidences( id ) );
     }
 
     Relationships::IncidenceRange Relationships::incidences(
@@ -287,13 +276,7 @@ namespace geode
 
     index_t Relationships::nb_internals( const uuid& id ) const
     {
-        index_t nb{ 0 };
-        for( const auto& unused : internals( id ) )
-        {
-            geode_unused( unused );
-            nb++;
-        }
-        return nb;
+        return detail::count_relationships( internals( id ) );
     }
 
     Relationships::InternalRange Relationships::internals(
@@ -304,13 +287,7 @@ namespace geode
 
     index_t Relationships::nb_embeddings( const uuid& id ) const
     {
-        index_t nb{ 0 };
-        for( const auto& unused : embeddings( id ) )
-        {
-            geode_unused( unused );
-            nb++;
-        }
-        return nb;
+        return detail::count_relationships( embeddings( id ) );
     }
 
     Relationships::EmbeddingRange Relationships::embeddings(
@@ -328,13 +305,7 @@ namespace geode
 
     index_t Relationships::nb_items( const uuid& id ) const
     {
-        index_t nb{ 0 };
-        for( const auto& unused : items( id ) )
-        {
-            geode_unused( unused );
-            nb++;
-        }
-        return nb;
+        return detail::count_relationships( items( id ) );
     }
 
     Relationships::ItemRange Relationships::items( const uuid& id ) const
@@ -344,13 +315,7 @@ namespace geode
 
     index_t Relationships::nb_collections( const uuid& id ) const
     {
-        index_t nb{ 0 };
-        for( const auto& unused : collections( id ) )
-        {
-            geode_unused( unused );
-            nb++;
-        }
-        return nb;
+        return detail::count_relationships( collections( id ) );
     }
 
     Relationships::CollectionRange Relationships::collections(

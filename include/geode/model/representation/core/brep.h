@@ -248,27 +248,51 @@ namespace geode
 
         IncidentBlockRange incidences( const Surface3D& surface ) const;
 
+        index_t nb_internal_corners( const Surface3D& surface ) const;
+
         InternalCornerRange internal_corners( const Surface3D& surface ) const;
+
+        index_t nb_internal_lines( const Surface3D& surface ) const;
 
         InternalLineRange internal_lines( const Surface3D& surface ) const;
 
+        index_t nb_internal_corners( const Block3D& block ) const;
+
         InternalCornerRange internal_corners( const Block3D& block ) const;
+
+        index_t nb_internal_lines( const Block3D& block ) const;
 
         InternalLineRange internal_lines( const Block3D& block ) const;
 
+        index_t nb_internal_surfaces( const Block3D& block ) const;
+
         InternalSurfaceRange internal_surfaces( const Block3D& block ) const;
+
+        index_t nb_embedded_surfaces( const Corner3D& corner ) const;
 
         EmbeddedSurfaceRange embedded_surfaces( const Corner3D& corner ) const;
 
+        index_t nb_embedded_surfaces( const Line3D& line ) const;
+
         EmbeddedSurfaceRange embedded_surfaces( const Line3D& line ) const;
+
+        index_t nb_embedded_blocks( const Corner3D& corner ) const;
 
         EmbeddedBlockRange embedded_blocks( const Corner3D& corner ) const;
 
+        index_t nb_embedded_blocks( const Line3D& line ) const;
+
         EmbeddedBlockRange embedded_blocks( const Line3D& line ) const;
+
+        index_t nb_embedded_blocks( const Surface3D& surface ) const;
 
         EmbeddedBlockRange embedded_blocks( const Surface3D& surface ) const;
 
         ItemSurfaceRange items( const ModelBoundary3D& boundary ) const;
+
+        bool is_closed( const Line3D& line ) const;
+
+        bool is_closed( const Surface3D& surface ) const;
 
         static std::string native_extension_static()
         {

@@ -68,6 +68,7 @@ set(public_headers
 )
 set(advanced_headers
     "${lib_include_dir}/mixin/core/detail/components_storage.h"
+    "${lib_include_dir}/mixin/core/detail/count_relationships.h"
     "${lib_include_dir}/mixin/core/detail/mesh_storage.h"
     "${lib_include_dir}/mixin/core/detail/uuid_to_index.h"
     "${lib_include_dir}/representation/builder/detail/copy.h"
