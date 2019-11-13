@@ -386,6 +386,10 @@ void add_internal_corner_relations( const geode::BRep& model,
         }
         OPENGEODE_EXCEPTION( model.nb_embeddings( corner_id ) == 2,
             "[Test] All Corners should be embedded to 1 Block and 1 Surface" );
+        OPENGEODE_EXCEPTION( model.nb_embedded_surfaces( model.corner( corner_id ) ) == 1,
+            "[Test] All Corners should be embedded to 1 Surface" );
+        OPENGEODE_EXCEPTION( model.nb_embedded_blocks( model.corner( corner_id ) ) == 1,
+            "[Test] All Corners should be embedded to 1 Block" );
     }
 }
 
@@ -420,6 +424,10 @@ void add_internal_line_relations( const geode::BRep& model,
         }
         OPENGEODE_EXCEPTION( model.nb_embeddings( line_id ) == 2,
             "[Test] All Surfaces should be embedded to 1 Block and 1 Surface" );
+        OPENGEODE_EXCEPTION( model.nb_embedded_surfaces(  model.line( line_id ) ) == 1,
+            "[Test] All Surfaces should be embedded to 1 Surface" );
+        OPENGEODE_EXCEPTION( model.nb_embedded_blocks(  model.line( line_id ) ) == 1,
+            "[Test] All Surfaces should be embedded to 1 Block" );
     }
 }
 
@@ -443,6 +451,8 @@ void add_internal_surface_relations( const geode::BRep& model,
                 "[Test] All Surfaces embeddings should be Blocks" );
         }
         OPENGEODE_EXCEPTION( model.nb_embeddings( surface_id ) == 1,
+            "[Test] All Surfaces should be embedded to 1 Block" );
+        OPENGEODE_EXCEPTION( model.nb_embedded_blocks( model.surface( surface_id ) ) == 1,
             "[Test] All Surfaces should be embedded to 1 Block" );
     }
 }
