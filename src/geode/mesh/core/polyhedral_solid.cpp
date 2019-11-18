@@ -79,7 +79,7 @@ namespace
         const geode::index_t vertex_id )
     {
         OPENGEODE_EXCEPTION( vertex_id < solid.nb_polyhedron_facet_vertices(
-                                 { polyhedron_id, facet_id } ),
+                                             { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -95,10 +95,10 @@ namespace geode
     public:
         explicit Impl( PolyhedralSolid& solid )
             : polyhedron_around_vertex_(
-                solid.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolyhedronVertex >(
-                        "polyhedron_around_vertex", PolyhedronVertex{} ) )
+                  solid.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolyhedronVertex >(
+                          "polyhedron_around_vertex", PolyhedronVertex{} ) )
         {
         }
 
@@ -327,8 +327,7 @@ namespace geode
     {
         OPENGEODE_EXCEPTION( vertex_id < this->nb_vertices(),
             "[PolyhedralSolid::polyhedra_around_vertex] Accessing an "
-            "invalid "
-            "vertex" );
+            "invalid vertex" );
         std::vector< PolyhedronVertex > polyhedra;
         const auto& first_polyhedron =
             impl_->polyhedron_around_vertex( vertex_id );
@@ -338,8 +337,7 @@ namespace geode
         }
         OPENGEODE_ASSERT( polyhedron_vertex( first_polyhedron ) == vertex_id,
             "[PolyhedralSolid::polyhedra_around_vertex] Wrong "
-            "polyhedron "
-            "around vertex" );
+            "polyhedron around vertex" );
         std::vector< index_t > polyhedra_visited;
         polyhedra_visited.reserve( 10 );
         std::stack< PolyhedronVertex > S;
@@ -400,8 +398,7 @@ namespace geode
     {
         OPENGEODE_EXCEPTION( vertex_id < this->nb_vertices(),
             "[PolyhedralSolid::polyhedron_around_vertex] Accessing an "
-            "invalid "
-            "vertex" );
+            "invalid vertex" );
         return impl_->polyhedron_around_vertex( vertex_id );
     }
 
