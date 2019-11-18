@@ -34,7 +34,7 @@ namespace geode
     /*!
      * OpenGeode exception class.
      * Example:
-     *       throw OpenGeodeException{ "Error while loading the BRep" );
+     *       throw OpenGeodeException{ "Error while loading the BRep" };
      *
      *       try {
      *          ...

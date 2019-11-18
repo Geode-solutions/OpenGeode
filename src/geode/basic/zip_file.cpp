@@ -78,7 +78,7 @@ namespace geode
 
         void archive_file( const std::string& file ) const
         {
-            ghc::filesystem::path file_path{ file };
+            const ghc::filesystem::path file_path{ file };
             const auto status = mz_zip_writer_add_path(
                 writer_, file_path.c_str(), NULL, 0, 1 );
             OPENGEODE_EXCEPTION( status == MZ_OK,
