@@ -115,7 +115,7 @@ namespace geode
                 register_librairies_in_deserialize_pcontext( context );
                 Deserializer archive{ context, file };
                 archive.object( *this );
-                auto& adapter = archive.adapter();
+                const auto& adapter = archive.adapter();
                 OPENGEODE_EXCEPTION(
                     adapter.error() == bitsery::ReaderError::NoError
                         && adapter.isCompletedSuccessfully()

@@ -32,7 +32,7 @@ int main()
     {
         try
         {
-            throw OpenGeodeException( "try ", "some ", "concatenation" );
+            throw OpenGeodeException{ "try ", "some ", "concatenation" };
         }
         catch( ... )
         {
@@ -41,7 +41,7 @@ int main()
 
         try
         {
-            throw std::runtime_error( "try std exception" );
+            throw std::runtime_error{ "try std exception" };
         }
         catch( ... )
         {
@@ -50,7 +50,7 @@ int main()
 
         try
         {
-            throw std::runtime_error( "test" );
+            throw std::runtime_error{ "test" };
         }
         catch( ... )
         {

@@ -29,16 +29,16 @@
 
 void test_vertex_cycle()
 {
-    geode::detail::VertexCycle cycle1{ { 0, 1, 2, 3 } };
-    geode::detail::VertexCycle cycle2{ { 2, 3, 0, 1 } };
-    geode::detail::VertexCycle cycle3{ { 2, 3, 1, 0 } };
-    geode::detail::VertexCycle cycle4{ { 1, 0, 3, 2 } };
+    const geode::detail::VertexCycle cycle1{ { 0, 1, 2, 3 } };
+    const geode::detail::VertexCycle cycle2{ { 2, 3, 0, 1 } };
+    const geode::detail::VertexCycle cycle3{ { 2, 3, 1, 0 } };
+    const geode::detail::VertexCycle cycle4{ { 1, 0, 3, 2 } };
 
-    geode::detail::VertexCycle cycle5{ std::array< geode::index_t, 2 >{
+    const geode::detail::VertexCycle cycle5{ std::array< geode::index_t, 2 >{
         2, 3 } };
-    geode::detail::VertexCycle cycle6{ std::array< geode::index_t, 2 >{
+    const geode::detail::VertexCycle cycle6{ std::array< geode::index_t, 2 >{
         3, 2 } };
-    geode::detail::VertexCycle cycle7{ std::array< geode::index_t, 2 >{
+    const geode::detail::VertexCycle cycle7{ std::array< geode::index_t, 2 >{
         3, 1 } };
 
     OPENGEODE_EXCEPTION( cycle1 == cycle2,

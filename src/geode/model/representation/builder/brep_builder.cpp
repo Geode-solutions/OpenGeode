@@ -58,7 +58,7 @@ namespace geode
 
     void BRepBuilder::copy( const BRep& brep )
     {
-        auto mapping = copy_components( brep );
+        const auto mapping = copy_components( brep );
         copy_component_relationships( mapping, brep );
         copy_component_geometry( mapping, brep );
     }

@@ -30,12 +30,12 @@ int main()
 
     try
     {
-        for( auto i : Range{ 100 } )
+        for( const auto i : Range{ 100 } )
         {
             geode_unused( i );
-            uuid id;
+            const uuid id;
             Logger::info( id.string() );
-            uuid id2;
+            const uuid id2;
             Logger::info( id2 );
             OPENGEODE_EXCEPTION(
                 id2 != id, "[Test] UUIDs should be different" );

@@ -37,7 +37,7 @@ namespace geode
         Logger::error( "File: ", file );
         Logger::error( "Line: ", line );
         Logger::error( "Info: ", message );
-        throw OpenGeodeException( "Assertion failed: ", condition );
+        throw OpenGeodeException{ "Assertion failed: ", condition };
     }
 
     int geode_lippincott()

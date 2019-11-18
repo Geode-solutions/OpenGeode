@@ -49,7 +49,7 @@ namespace geode
             mz_zip_writer_create( &writer_ );
             mz_zip_writer_set_compress_method(
                 writer_, MZ_COMPRESS_METHOD_STORE );
-            auto status =
+            const auto status =
                 mz_zip_writer_open_file( writer_, file.c_str(), 0, 0 );
             if( status != MZ_OK )
             {
@@ -60,7 +60,7 @@ namespace geode
         ~Impl()
         {
             ghc::filesystem::remove( directory_ );
-            auto status = mz_zip_writer_close( writer_ );
+            const auto status = mz_zip_writer_close( writer_ );
             if( status != MZ_OK )
             {
                 Logger::error( "Error closing zip for writing" );
@@ -79,7 +79,7 @@ namespace geode
         void archive_file( const std::string& file ) const
         {
             ghc::filesystem::path file_path{ file };
-            auto status = mz_zip_writer_add_path(
+            const auto status = mz_zip_writer_add_path(
                 writer_, file_path.c_str(), NULL, 0, 1 );
             OPENGEODE_EXCEPTION( status == MZ_OK,
                 "[ZipFile::archive_file] Error adding path to zip" );
@@ -129,7 +129,8 @@ namespace geode
                 ghc::filesystem::current_path() / unarchive_temp_filename;
             ghc::filesystem::create_directory( directory_ );
             mz_zip_reader_create( &reader_ );
-            auto status = mz_zip_reader_open_file( reader_, file.c_str() );
+            const auto status =
+                mz_zip_reader_open_file( reader_, file.c_str() );
             if( status != MZ_OK )
             {
                 Logger::error( "Error opening zip for writing" );

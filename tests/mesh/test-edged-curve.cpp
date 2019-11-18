@@ -54,7 +54,7 @@ void test_delete_vertex( const geode::EdgedCurve3D& edged_curve,
     builder.delete_vertices( to_delete );
     OPENGEODE_EXCEPTION( edged_curve.nb_vertices() == 3,
         "[Test] EdgedCurve should have 3 vertices" );
-    geode::Point3D answer{ { 2.1, 9.4, 6.7 } };
+    const geode::Point3D answer{ { 2.1, 9.4, 6.7 } };
     OPENGEODE_EXCEPTION( edged_curve.point( 0 ) == answer,
         "[Test] EdgedCurve vertex coordinates are not correct" );
     OPENGEODE_EXCEPTION(
@@ -141,7 +141,7 @@ void test_io(
     const geode::EdgedCurve3D& edged_curve, const std::string& filename )
 {
     save_edged_curve( edged_curve, filename );
-    auto new_edged_curve = geode::EdgedCurve3D::create(
+    const auto new_edged_curve = geode::EdgedCurve3D::create(
         geode::OpenGeodeEdgedCurve3D::type_name_static() );
     load_edged_curve( *new_edged_curve, filename );
 }
@@ -152,8 +152,8 @@ void test_edge_requests( const geode::EdgedCurve3D& edged_curve,
     OPENGEODE_EXCEPTION( edged_curve.edge_barycenter( 0 ).inexact_equal(
                              geode::Point3D( { 4.8, 7.3, 6.5 } ), 1e-15 ),
         "[Test] Edge barycenter is not correct" );
-    auto p0 = builder.create_point( { { 1, 1, 1 } } );
-    auto p1 = builder.create_point( { { 1, 4, -3 } } );
+    const auto p0 = builder.create_point( { { 1, 1, 1 } } );
+    const auto p1 = builder.create_point( { { 1, 4, -3 } } );
     OPENGEODE_EXCEPTION(
         edged_curve.edge_length( builder.create_edge( p0, p1 ) ) == 5,
         "[Test] Edge length is not correct" );
@@ -167,13 +167,13 @@ void test_clone( const geode::EdgedCurve3D& edged_curve )
                 "test" );
     attribute->set_value( 0, 42 );
 
-    auto edged_curve2 = edged_curve.clone();
+    const auto edged_curve2 = edged_curve.clone();
     OPENGEODE_EXCEPTION( edged_curve2->nb_vertices() == 3,
         "[Test] EdgedCurve2 should have 3 vertices" );
     OPENGEODE_EXCEPTION( edged_curve2->nb_edges() == 1,
         "[Test] EdgedCurve2 should have 1 edge" );
 
-    auto attribute2 =
+    const auto attribute2 =
         edged_curve2->edge_attribute_manager().find_attribute< int >( "test" );
     OPENGEODE_EXCEPTION( attribute2->value( 0 ) == 42,
         "[Test] EdgedCurve2 attribute should be 42" );
@@ -191,8 +191,7 @@ int main()
 
         test_create_vertices( *edged_curve, *builder );
         test_create_edges( *edged_curve, *builder );
-        std::string base_file = "test." + edged_curve->native_extension();
-        test_io( *edged_curve, base_file );
+        test_io( *edged_curve, "test." + edged_curve->native_extension() );
 
         test_delete_vertex( *edged_curve, *builder );
         test_delete_edge( *edged_curve, *builder );

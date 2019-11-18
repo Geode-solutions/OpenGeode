@@ -32,15 +32,15 @@ namespace geode
     {
         try
         {
-            auto output = VertexSetOutputFactory::create(
+            const auto output = VertexSetOutputFactory::create(
                 extension_from_filename( filename ), vertex_set, filename );
             output->write();
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            throw OpenGeodeException(
-                "Cannot save VertexSet in file: ", filename );
+            throw OpenGeodeException{ "Cannot save VertexSet in file: ",
+                filename };
         }
     }
 

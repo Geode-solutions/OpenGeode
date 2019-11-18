@@ -122,7 +122,7 @@ void test_io(
 
 void test_clone( const geode::TetrahedralSolid3D& solid )
 {
-    auto solid2 = solid.clone();
+    const auto solid2 = solid.clone();
     OPENGEODE_EXCEPTION( solid2->nb_vertices() == 5,
         "[Test] TetrahedralSolid2 should have 5 vertices" );
     OPENGEODE_EXCEPTION( solid2->nb_facets() == 4,
@@ -171,8 +171,7 @@ int main()
         test_create_vertices( *solid, *builder );
         test_create_tetrahedra( *solid, *builder );
         test_polyhedron_adjacencies( *solid, *builder );
-        auto base_file = "test." + solid->native_extension();
-        test_io( *solid, base_file );
+        test_io( *solid, "test." + solid->native_extension() );
 
         test_delete_vertex( *solid, *builder );
         test_delete_polyhedron( *solid, *builder );

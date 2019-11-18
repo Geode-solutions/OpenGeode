@@ -85,7 +85,7 @@ namespace geode
             files.emplace_back( directory + "/" + surface.component_type().get()
                                 + surface.id().string() + "."
                                 + mesh.native_extension() );
-            auto* triangulated =
+            const auto* triangulated =
                 dynamic_cast< const TriangulatedSurface< dimension >* >(
                     &mesh );
             if( triangulated )
@@ -110,8 +110,9 @@ namespace geode
         {
             surface.ensure_mesh_type();
             auto& mesh = surface.modifiable_mesh();
-            auto file = directory + "/" + surface.component_type().get()
-                        + surface.id().string() + "." + mesh.native_extension();
+            const auto file = directory + "/" + surface.component_type().get()
+                              + surface.id().string() + "."
+                              + mesh.native_extension();
             auto* triangulated =
                 dynamic_cast< TriangulatedSurface< dimension >* >( &mesh );
             if( triangulated )

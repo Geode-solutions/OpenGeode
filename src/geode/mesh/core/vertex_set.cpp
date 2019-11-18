@@ -74,8 +74,9 @@ namespace geode
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            throw OpenGeodeException(
-                "Could not create VertexSet data structure: ", type.get() );
+            throw OpenGeodeException{
+                "Could not create VertexSet data structure: ", type.get()
+            };
         }
     }
 

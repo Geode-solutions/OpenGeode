@@ -74,8 +74,8 @@ namespace geode
         {
             return PolyhedralSolidBuilder< dimension >::create( mesh );
         }
-        throw OpenGeodeException(
-            "Unknown mesh type: ", mesh.type_name().get() );
+        throw OpenGeodeException{ "Unknown mesh type: ",
+            mesh.type_name().get() };
     }
 
     template < index_t dimension >

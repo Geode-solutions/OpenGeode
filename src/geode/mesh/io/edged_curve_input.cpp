@@ -40,8 +40,8 @@ namespace geode
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            throw OpenGeodeException(
-                "Cannot load EdgedCurve from file: ", filename );
+            throw OpenGeodeException{ "Cannot load EdgedCurve from file: ",
+                filename };
         }
     }
 

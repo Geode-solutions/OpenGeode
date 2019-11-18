@@ -31,14 +31,14 @@ namespace geode
     {
         try
         {
-            auto output = BRepOutputFactory::create(
+            const auto output = BRepOutputFactory::create(
                 extension_from_filename( filename ), brep, filename.c_str() );
             output->write();
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            throw OpenGeodeException( "Cannot save BRep in file: ", filename );
+            throw OpenGeodeException{ "Cannot save BRep in file: ", filename };
         }
     }
 

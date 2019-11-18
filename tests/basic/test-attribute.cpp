@@ -97,7 +97,7 @@ void test_int_variable_attribute( geode::AttributeManager& manager )
             "int", 12 );
     variable_attribute->set_value( 3, 3 );
 
-    auto attribute = manager.find_attribute< int >( "int" );
+    const auto attribute = manager.find_attribute< int >( "int" );
     OPENGEODE_EXCEPTION(
         attribute->value( 3 ) == 3, "[Test] Should be equal to 3" );
     OPENGEODE_EXCEPTION(
@@ -125,8 +125,8 @@ void test_double_sparse_attribute( geode::AttributeManager& manager )
     auto sparse_attribute =
         manager.find_or_create_attribute< geode::SparseAttribute, double >(
             "double", 12 );
-    sparse_attribute->value( 3 ) = 3;
-    sparse_attribute->value( 7 ) = 7;
+    sparse_attribute->set_value( 3, 3 );
+    sparse_attribute->set_value( 7, 7 );
 
     auto attribute = manager.find_attribute< double >( "double" );
     OPENGEODE_EXCEPTION(
@@ -136,7 +136,7 @@ void test_double_sparse_attribute( geode::AttributeManager& manager )
     OPENGEODE_EXCEPTION(
         attribute->value( 7 ) == 7, "[Test] Should be equal to 7" );
 
-    sparse_attribute->value( 3 ) = 5;
+    sparse_attribute->set_value( 3, 5 );
     OPENGEODE_EXCEPTION(
         attribute->value( 3 ) == 5, "[Test] Should be equal to 5" );
 }
@@ -148,7 +148,7 @@ void test_bool_variable_attribute( geode::AttributeManager& manager )
             "bool_var", false );
     variable_attribute->set_value( 3, true );
 
-    auto attribute = manager.find_attribute< bool >( "bool_var" );
+    const auto attribute = manager.find_attribute< bool >( "bool_var" );
     OPENGEODE_EXCEPTION(
         attribute->value( 3 ), "[Test] Should be equal to true" );
 
@@ -191,8 +191,8 @@ void check_one_attribute_values( geode::AttributeManager& manager,
     geode::AttributeManager& reloaded_manager,
     const std::string& name )
 {
-    auto in_att = manager.find_attribute< T >( name );
-    auto out_att = reloaded_manager.find_attribute< T >( name );
+    const auto in_att = manager.find_attribute< T >( name );
+    const auto out_att = reloaded_manager.find_attribute< T >( name );
     for( auto i : geode::Range{ manager.nb_elements() } )
     {
         OPENGEODE_EXCEPTION( in_att->value( i ) == out_att->value( i ),
@@ -215,7 +215,7 @@ void check_attribute_values( geode::AttributeManager& manager,
 
 void test_serialize_manager( geode::AttributeManager& manager )
 {
-    std::string filename = "manager.out";
+    const std::string filename = "manager.out";
     std::ofstream file{ filename, std::ofstream::binary };
     geode::TContext context{};
     geode::register_basic_serialize_pcontext( std::get< 0 >( context ) );
@@ -236,7 +236,7 @@ void test_serialize_manager( geode::AttributeManager& manager )
         geode::Deserializer >( std::get< 0 >( reload_context ) );
     geode::Deserializer unarchive{ reload_context, infile };
     unarchive.object( reloaded_manager );
-    auto& adapter = unarchive.adapter();
+    const auto& adapter = unarchive.adapter();
     OPENGEODE_EXCEPTION( adapter.error() == bitsery::ReaderError::NoError
                              && adapter.isCompletedSuccessfully()
                              && std::get< 1 >( context ).isValid(),
@@ -285,7 +285,7 @@ void test_delete_attribute_elements( geode::AttributeManager& manager )
 void test_sparse_attribute_after_element_deletion(
     geode::AttributeManager& manager )
 {
-    auto sparse_attribute = manager.find_attribute< double >( "double" );
+    const auto sparse_attribute = manager.find_attribute< double >( "double" );
     OPENGEODE_EXCEPTION( sparse_attribute->value( 0 ) == 12,
         "Element 0 of sparse attribute should be 12 " );
     OPENGEODE_EXCEPTION( sparse_attribute->value( 3 ) == 12,

@@ -71,10 +71,10 @@ namespace geode
         std::stringstream ss;
         ss << std::hex << std::nouppercase << std::setfill( '0' );
 
-        uint32_t a = ( ab >> 32u );
-        uint32_t b = ( ab & 0xFFFFFFFFu );
-        uint32_t c = ( cd >> 32u );
-        uint32_t d = ( cd & 0xFFFFFFFFu );
+        const uint32_t a = ( ab >> 32u );
+        const uint32_t b = ( ab & 0xFFFFFFFFu );
+        const uint32_t c = ( cd >> 32u );
+        const uint32_t d = ( cd & 0xFFFFFFFFu );
 
         ss << std::setw( 8 ) << ( a ) << '-';
         ss << std::setw( 4 ) << ( b >> 16u ) << '-';

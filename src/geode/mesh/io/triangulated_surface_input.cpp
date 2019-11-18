@@ -43,8 +43,9 @@ namespace geode
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            throw OpenGeodeException(
-                "Cannot load TriangulatedSurface from file: ", filename );
+            throw OpenGeodeException{
+                "Cannot load TriangulatedSurface from file: ", filename
+            };
         }
     }
 
@@ -53,7 +54,7 @@ namespace geode
         TriangulatedSurface< dimension >& triangulated_surface,
         std::string filename )
         : PolygonalSurfaceInput< dimension >(
-            triangulated_surface, std::move( filename ) ),
+              triangulated_surface, std::move( filename ) ),
           triangulated_surface_( triangulated_surface )
     {
     }

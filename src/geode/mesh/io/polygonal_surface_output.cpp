@@ -34,16 +34,17 @@ namespace geode
     {
         try
         {
-            auto output = PolygonalSurfaceOutputFactory< dimension >::create(
-                extension_from_filename( filename ), polygonal_surface,
-                filename );
+            const auto output =
+                PolygonalSurfaceOutputFactory< dimension >::create(
+                    extension_from_filename( filename ), polygonal_surface,
+                    filename );
             output->write();
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            throw OpenGeodeException(
-                "Cannot save PolygonalSurface in file: ", filename );
+            throw OpenGeodeException{ "Cannot save PolygonalSurface in file: ",
+                filename };
         }
     }
 

@@ -75,8 +75,8 @@ namespace geode
         static std::unique_ptr< BaseClass > create(
             const Key &key, Args... args )
         {
-            auto &store = get_store();
-            auto creator = store.find( key );
+            const auto &store = get_store();
+            const auto creator = store.find( key );
             OPENGEODE_EXCEPTION( creator != store.end(),
                 "[Factory::create] Factory does not "
                 "contain the requested key" );
@@ -85,7 +85,7 @@ namespace geode
 
         static std::vector< Key > list_creators()
         {
-            auto &store = get_store();
+            const auto &store = get_store();
             std::vector< Key > creators;
             creators.reserve( store.size() );
             for( const auto &creator : store )
@@ -97,7 +97,7 @@ namespace geode
 
         static bool has_creator( const Key &key )
         {
-            auto &store = get_store();
+            const auto &store = get_store();
             return store.find( key ) != store.end();
         }
 

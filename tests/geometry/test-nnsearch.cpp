@@ -31,7 +31,7 @@ int main()
 
     try
     {
-        NNSearch2D search{ { { { 0.1, 4.2 } }, { { 5.9, 7.3 } },
+        const NNSearch2D search{ { { { 0.1, 4.2 } }, { { 5.9, 7.3 } },
             { { 1.8, -5 } }, { { -7.3, -1.6 } } } };
 
         OPENGEODE_EXCEPTION( search.closest_neighbor( { { 0, 0 } } ) == 0,
@@ -39,29 +39,29 @@ int main()
         OPENGEODE_EXCEPTION( search.closest_neighbor( { { 1, -4 } } ) == 2,
             "[Test] Error in closest neighbor" );
 
-        std::vector< index_t > answer_radius{ 0, 2 };
+        const std::vector< index_t > answer_radius{ 0, 2 };
         OPENGEODE_EXCEPTION(
             search.radius_neighbors( { { 0, 0 } }, 5.4 ) == answer_radius,
             "[Test] Error in radius neighbors" );
 
-        std::vector< index_t > answer_neighbors{ 2, 0 };
+        const std::vector< index_t > answer_neighbors{ 2, 0 };
         OPENGEODE_EXCEPTION(
             search.neighbors( { { -1, -1 } }, 2 ) == answer_neighbors,
             "[Test] Error in neighbors" );
 
-        Point3D p0{ { 0.1, 2.9, 5.4 } };
-        Point3D p1{ { 2.4, 8.1, 7.6 } };
-        Point3D p2{ { 8.1, 4.2, 3.8 } };
-        Point3D p3{ { 3.1, 9.4, 9.7 } };
-        NNSearch3D colocator( { p0, p0, p1, p0, p2, p1, p3 } );
+        const Point3D p0{ { 0.1, 2.9, 5.4 } };
+        const Point3D p1{ { 2.4, 8.1, 7.6 } };
+        const Point3D p2{ { 8.1, 4.2, 3.8 } };
+        const Point3D p3{ { 3.1, 9.4, 9.7 } };
+        const NNSearch3D colocator( { p0, p0, p1, p0, p2, p1, p3 } );
 
-        auto colocated_info = colocator.colocated_index_mapping( 1e-8 );
+        const auto colocated_info = colocator.colocated_index_mapping( 1e-8 );
         OPENGEODE_EXCEPTION( colocated_info.nb_colocated_points() == 3,
             "[Test] Should be 3 colocated points" );
-        std::vector< index_t > mapping_answer{ 0, 0, 1, 0, 2, 1, 3 };
+        const std::vector< index_t > mapping_answer{ 0, 0, 1, 0, 2, 1, 3 };
         OPENGEODE_EXCEPTION( colocated_info.colocated_mapping == mapping_answer,
             "[Test] Error in colocated mapping" );
-        std::vector< Point3D > points_answer{ p0, p1, p2, p3 };
+        const std::vector< Point3D > points_answer{ p0, p1, p2, p3 };
         OPENGEODE_EXCEPTION( colocated_info.unique_points == points_answer,
             "[Test] Error in unique points" );
 

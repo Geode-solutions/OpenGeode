@@ -42,7 +42,7 @@ namespace geode
             nn_tree_.buildIndex();
         }
 
-        const Point< dimension >& point( index_t index ) const
+        const Point< dimension >& point( const index_t index ) const
         {
             return cloud_.points.at( index );
         }
@@ -53,10 +53,11 @@ namespace geode
         }
 
         std::vector< index_t > radius_neighbors(
-            Point< dimension > point, double threshold_distance ) const
+            const Point< dimension >& point,
+            const double threshold_distance ) const
         {
             std::vector< std::pair< index_t, double > > results;
-            auto nb_results = nn_tree_.radiusSearch( &copy( point )[0],
+            const auto nb_results = nn_tree_.radiusSearch( &copy( point )[0],
                 threshold_distance * threshold_distance, results, {} );
             std::vector< index_t > indices;
             indices.reserve( nb_results );
@@ -68,13 +69,13 @@ namespace geode
         }
 
         std::vector< index_t > neighbors(
-            Point< dimension > point, index_t nb_neighbors ) const
+            const Point< dimension >& point, const index_t nb_neighbors ) const
         {
             std::vector< index_t > results( nb_neighbors );
             std::vector< double > distances( nb_neighbors );
-            nb_neighbors = nn_tree_.knnSearch(
+            const auto new_nb_neighbors = nn_tree_.knnSearch(
                 &copy( point )[0], nb_neighbors, &results[0], &distances[0] );
-            results.resize( nb_neighbors );
+            results.resize( new_nb_neighbors );
             return results;
         }
 
@@ -83,7 +84,7 @@ namespace geode
             const Point< dimension >& point ) const
         {
             std::array< double, dimension > result;
-            for( auto i : Range{ dimension } )
+            for( const auto i : Range{ dimension } )
             {
                 result[i] = point.value( i );
             }
@@ -181,10 +182,11 @@ namespace geode
             [&epsilon, &mapping, this]( index_t p ) {
                 if( mapping[p] == p )
                 {
-                    auto vertices = radius_neighbors( point( p ), epsilon );
-                    auto min_index =
+                    const auto vertices =
+                        radius_neighbors( point( p ), epsilon );
+                    const auto min_index =
                         *std::min_element( vertices.begin(), vertices.end() );
-                    for( auto id : vertices )
+                    for( const auto id : vertices )
                     {
                         mapping[id] = min_index;
                     }
@@ -192,7 +194,7 @@ namespace geode
             } );
         index_t nb_colocated{ 0 };
         std::vector< Point< dimension > > unique_points;
-        for( auto p : Range{ nb_points() } )
+        for( const auto p : Range{ nb_points() } )
         {
             if( mapping[p] == p )
             {

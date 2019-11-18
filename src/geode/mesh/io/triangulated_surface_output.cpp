@@ -34,16 +34,18 @@ namespace geode
     {
         try
         {
-            auto output = TriangulatedSurfaceOutputFactory< dimension >::create(
-                extension_from_filename( filename ), triangulated_surface,
-                filename );
+            const auto output =
+                TriangulatedSurfaceOutputFactory< dimension >::create(
+                    extension_from_filename( filename ), triangulated_surface,
+                    filename );
             output->write();
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            throw OpenGeodeException(
-                "Cannot save TriangulatedSurface in file: ", filename );
+            throw OpenGeodeException{
+                "Cannot save TriangulatedSurface in file: ", filename
+            };
         }
     }
 
@@ -52,7 +54,7 @@ namespace geode
         const TriangulatedSurface< dimension >& triangulated_surface,
         std::string filename )
         : PolygonalSurfaceOutput< dimension >(
-            triangulated_surface, std::move( filename ) ),
+              triangulated_surface, std::move( filename ) ),
           triangulated_surface_( triangulated_surface )
     {
     }

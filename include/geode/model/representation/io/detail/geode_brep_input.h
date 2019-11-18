@@ -47,7 +47,7 @@ namespace geode
         void read() final
         {
             BRepBuilder builder( brep() );
-            UnzipFile zip_reader{ filename(), uuid{}.string() };
+            const UnzipFile zip_reader{ filename(), uuid{}.string() };
             zip_reader.extract_all();
 
             builder.load_corners( zip_reader.directory() );

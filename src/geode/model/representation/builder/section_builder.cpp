@@ -54,7 +54,7 @@ namespace geode
 
     void SectionBuilder::copy( const Section& section )
     {
-        auto mapping = copy_components( section );
+        const auto mapping = copy_components( section );
         copy_component_relationships( mapping, section );
         copy_component_geometry( mapping, section );
     }

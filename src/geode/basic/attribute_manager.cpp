@@ -41,7 +41,7 @@ namespace geode
         std::shared_ptr< AttributeBase > find_attribute_base(
             const std::string &name )
         {
-            auto it = attributes_.find( name );
+            const auto it = attributes_.find( name );
             if( it == attributes_.end() )
             {
                 return nullptr;
@@ -87,7 +87,7 @@ namespace geode
 
         void delete_attribute( const std::string &name )
         {
-            auto it = attributes_.find( name );
+            const auto it = attributes_.find( name );
             if( it != attributes_.end() )
             {
                 attributes_.erase( it );
@@ -96,7 +96,7 @@ namespace geode
 
         std::string attribute_type( const std::string &name ) const
         {
-            auto it = attributes_.find( name );
+            const auto it = attributes_.find( name );
             if( it == attributes_.end() )
             {
                 return "undefined";
@@ -139,7 +139,7 @@ namespace geode
             nb_elements_ = attribute_manager.nb_elements_;
             for( const auto &attribute : attribute_manager.attributes_ )
             {
-                auto it = attributes_.find( attribute.first );
+                const auto it = attributes_.find( attribute.first );
                 if( it != attributes_.end() )
                 {
                     try

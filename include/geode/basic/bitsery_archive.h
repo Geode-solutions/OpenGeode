@@ -71,7 +71,7 @@ namespace geode
         template < typename Fnc >
         void serialize( Archive &ser, const T &obj, Fnc &&fnc ) const
         {
-            index_t FIRST_VERSION{ 1 };
+            constexpr index_t FIRST_VERSION{ 1 };
             ser.ext4b( FIRST_VERSION, bitsery::ext::CompactValue{} );
             fnc( ser, const_cast< T & >( obj ) );
         }
@@ -120,7 +120,7 @@ namespace geode
             }
             else
             {
-                for( auto f : serializers_ )
+                for( const auto f : serializers_ )
                 {
                     f( ser, const_cast< T & >( obj ) );
                 }
@@ -138,13 +138,13 @@ namespace geode
             }
             else
             {
-                for( auto i : Range{ current_version } )
+                for( const auto i : Range{ current_version } )
                 {
                     serializers_.at( i )( des, obj );
                 }
                 if( !initializers_.empty() )
                 {
-                    for( auto i : Range{ current_version, version_ } )
+                    for( const auto i : Range{ current_version, version_ } )
                     {
                         initializers_.at( i - 1 )( obj );
                     }

@@ -32,13 +32,13 @@
 
 std::vector< geode::uuid > create_uuids( geode::Relationships& relationships )
 {
-    geode::index_t nb{ 6 };
+    const geode::index_t nb{ 6 };
     std::vector< geode::uuid > uuids;
     geode::RelationshipsBuilder builder{ relationships };
-    for( auto unused : geode::Range{ nb } )
+    for( const auto unused : geode::Range{ nb } )
     {
         geode_unused( unused );
-        geode::uuid cur_uuid;
+        const geode::uuid cur_uuid;
         builder.register_component(
             geode::ComponentID{ geode::ComponentType{ "dummy" }, cur_uuid } );
         uuids.push_back( cur_uuid );
@@ -97,37 +97,38 @@ void test_uuid( const geode::Relationships& relations,
     geode::index_t nb_items,
     geode::index_t nb_collections )
 {
-    std::string message_boundary = "[Test] " + uuid.string() + " should have "
-                                   + std::to_string( nb_boundaries )
-                                   + " boundary(ies)";
+    const std::string message_boundary =
+        "[Test] " + uuid.string() + " should have "
+        + std::to_string( nb_boundaries ) + " boundary(ies)";
     OPENGEODE_EXCEPTION(
         relations.nb_boundaries( uuid ) == nb_boundaries, message_boundary );
 
-    std::string message_incidence = "[Test] " + uuid.string() + " should have "
-                                    + std::to_string( nb_incidences )
-                                    + " incidence(s)";
+    const std::string message_incidence =
+        "[Test] " + uuid.string() + " should have "
+        + std::to_string( nb_incidences ) + " incidence(s)";
     OPENGEODE_EXCEPTION(
         relations.nb_incidences( uuid ) == nb_incidences, message_incidence );
 
-    std::string message_internal = "[Test] " + uuid.string() + " should have "
-                                   + std::to_string( nb_internals )
-                                   + " internal component(s)";
+    const std::string message_internal =
+        "[Test] " + uuid.string() + " should have "
+        + std::to_string( nb_internals ) + " internal component(s)";
     OPENGEODE_EXCEPTION(
         relations.nb_internals( uuid ) == nb_internals, message_internal );
 
-    std::string message_embedding = "[Test] " + uuid.string() + " should have "
-                                    + std::to_string( nb_embeddings )
-                                    + " embedding(s)";
+    const std::string message_embedding =
+        "[Test] " + uuid.string() + " should have "
+        + std::to_string( nb_embeddings ) + " embedding(s)";
     OPENGEODE_EXCEPTION(
         relations.nb_embeddings( uuid ) == nb_embeddings, message_embedding );
 
-    std::string message_item = "[Test] " + uuid.string() + " should have "
-                               + std::to_string( nb_boundaries ) + " item(s)";
+    const std::string message_item = "[Test] " + uuid.string() + " should have "
+                                     + std::to_string( nb_boundaries )
+                                     + " item(s)";
     OPENGEODE_EXCEPTION( relations.nb_items( uuid ) == nb_items, message_item );
 
-    std::string message_collection = "[Test] " + uuid.string() + " should have "
-                                     + std::to_string( nb_collections )
-                                     + " collection(s)";
+    const std::string message_collection =
+        "[Test] " + uuid.string() + " should have "
+        + std::to_string( nb_collections ) + " collection(s)";
     OPENGEODE_EXCEPTION( relations.nb_collections( uuid ) == nb_collections,
         message_collection );
 }
@@ -150,7 +151,7 @@ int main()
     try
     {
         Relationships relationships;
-        auto uuids = create_uuids( relationships );
+        const auto uuids = create_uuids( relationships );
 
         // This Relationships do not represent anything.
         add_boundary_relations( relationships, uuids );

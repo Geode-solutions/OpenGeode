@@ -67,9 +67,9 @@ namespace geode
             friend class bitsery::Access;
             FacetStorage()
                 : counter_(
-                    facet_attribute_manager_
-                        .template find_or_create_attribute< VariableAttribute,
-                            index_t >( "counter", 1 ) ),
+                      facet_attribute_manager_
+                          .template find_or_create_attribute< VariableAttribute,
+                              index_t >( "counter", 1 ) ),
                   vertices_(
                       facet_attribute_manager_
                           .template find_or_create_attribute< VariableAttribute,
@@ -84,7 +84,7 @@ namespace geode
 
             index_t find_facet( const VertexCycle& vertices ) const
             {
-                auto itr = facet_indices_.find( vertices );
+                const auto itr = facet_indices_.find( vertices );
                 if( itr != facet_indices_.end() )
                 {
                     return facet_indices_.at( vertices );
@@ -94,13 +94,13 @@ namespace geode
 
             index_t add_facet( const VertexCycle& vertices )
             {
-                auto id = find_facet( vertices );
+                const auto id = find_facet( vertices );
                 if( id != NO_ID )
                 {
                     counter_->set_value( id, counter_->value( id ) + 1 );
                     return id;
                 }
-                auto size = facet_indices_.size();
+                const auto size = facet_indices_.size();
                 facet_indices_[vertices] = size;
                 facet_attribute_manager_.resize( size + 1 );
                 vertices_->modify_value(
@@ -110,12 +110,12 @@ namespace geode
 
             void remove_facet( const VertexCycle& vertices )
             {
-                auto id = find_facet( vertices );
+                const auto id = find_facet( vertices );
                 OPENGEODE_ASSERT( id != NO_ID,
                     "[FacetStorage::remove_facet] Cannot "
                     "find facet from given vertices" );
-                auto old_count = counter_->value( id );
-                auto new_count = std::max( 1u, old_count ) - 1;
+                const auto old_count = counter_->value( id );
+                const auto new_count = std::max( 1u, old_count ) - 1;
                 counter_->set_value( id, new_count );
             }
 
@@ -123,7 +123,8 @@ namespace geode
             {
                 std::vector< bool > to_delete(
                     facet_attribute_manager_.nb_elements(), false );
-                for( auto e : Range{ facet_attribute_manager_.nb_elements() } )
+                for( const auto e :
+                    Range{ facet_attribute_manager_.nb_elements() } )
                 {
                     to_delete[e] = !counter_->value( e );
                 }
@@ -132,7 +133,8 @@ namespace geode
 
             void delete_facets( const std::vector< bool >& to_delete )
             {
-                auto old2new = detail::mapping_after_deletion( to_delete );
+                const auto old2new =
+                    detail::mapping_after_deletion( to_delete );
                 std::vector< VertexCycle > key_to_erase;
                 key_to_erase.reserve( old2new.size() );
                 for( auto& cycle : facet_indices_ )
@@ -152,7 +154,7 @@ namespace geode
 
             void update_facet_vertices( const std::vector< index_t >& old2new )
             {
-                auto old_facet_indices = facet_indices_;
+                const auto old_facet_indices = facet_indices_;
                 facet_indices_.clear();
                 facet_indices_.reserve( old_facet_indices.size() );
                 for( const auto& cycle : old_facet_indices )
@@ -162,7 +164,7 @@ namespace geode
                     {
                         v = old2new[v];
                     }
-                    VertexCycle updated_cycle{ updated_vertices };
+                    const VertexCycle updated_cycle{ updated_vertices };
                     facet_indices_[updated_cycle] = cycle.second;
                     vertices_->modify_value(
                         cycle.second, SetValue{ updated_vertices } );

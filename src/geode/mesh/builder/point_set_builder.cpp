@@ -41,9 +41,10 @@ namespace geode
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            throw OpenGeodeException(
+            throw OpenGeodeException{
                 "Could not create PointSet builder of data structure: ",
-                mesh.type_name().get() );
+                mesh.type_name().get()
+            };
         }
     }
 
@@ -61,7 +62,7 @@ namespace geode
     index_t PointSetBuilder< dimension >::create_point(
         const Point< dimension >& point )
     {
-        auto added_vertex = point_set_.nb_vertices();
+        const auto added_vertex = point_set_.nb_vertices();
         create_vertex();
         set_point( added_vertex, point );
         return added_vertex;

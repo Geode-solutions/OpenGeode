@@ -51,8 +51,9 @@ namespace geode
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            throw OpenGeodeException(
-                "Could not create EdgedCurve data structure: ", type.get() );
+            throw OpenGeodeException{
+                "Could not create EdgedCurve data structure: ", type.get()
+            };
         }
     }
 
@@ -70,7 +71,7 @@ namespace geode
     {
         const auto& e0 = this->point( edge_vertex( { edge_id, 0 } ) );
         const auto& e1 = this->point( edge_vertex( { edge_id, 1 } ) );
-        return ( e0 + e1 ) / 2;
+        return ( e0 + e1 ) / 2.;
     }
 
     template < index_t dimension >

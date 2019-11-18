@@ -40,13 +40,10 @@ namespace geode
         public:
             EdgesImpl( Graph& graph )
                 : edges_(
-                    graph.edge_attribute_manager()
-                        .template find_or_create_attribute< VariableAttribute,
-                            std::array< index_t, 2 > >( "edges", [] {
-                            std::array< index_t, 2 > edge;
-                            edge.fill( NO_ID );
-                            return edge;
-                        }() ) )
+                      graph.edge_attribute_manager()
+                          .template find_or_create_attribute< VariableAttribute,
+                              std::array< index_t, 2 > >( "edges",
+                              std::array< index_t, 2 >{ NO_ID, NO_ID } ) )
             {
             }
 
@@ -57,7 +54,7 @@ namespace geode
             }
 
             void set_edge_vertex(
-                const EdgeVertex& edge_vertex, index_t vertex_id )
+                const EdgeVertex& edge_vertex, const index_t vertex_id )
             {
                 edges_->modify_value(
                     edge_vertex.edge_id, [&edge_vertex, vertex_id](
@@ -71,11 +68,8 @@ namespace geode
                 edges_ =
                     graph.edge_attribute_manager()
                         .template find_or_create_attribute< VariableAttribute,
-                            std::array< index_t, 2 > >( "edges", [] {
-                            std::array< index_t, 2 > edge;
-                            edge.fill( NO_ID );
-                            return edge;
-                        }() );
+                            std::array< index_t, 2 > >(
+                            "edges", std::array< index_t, 2 >{ NO_ID, NO_ID } );
             }
 
         protected:

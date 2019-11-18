@@ -82,7 +82,7 @@ void test_delete_vertex( const geode::TriangulatedSurface3D& surface,
     builder.delete_vertices( to_delete );
     OPENGEODE_EXCEPTION( surface.nb_vertices() == 4,
         "[Test] TriangulatedSurface should have 4 vertices" );
-    geode::Point3D answer{ { 2.1, 9.4, 6.7 } };
+    const geode::Point3D answer{ { 2.1, 9.4, 6.7 } };
     OPENGEODE_EXCEPTION( surface.point( 0 ) == answer,
         "[Test] TriangulatedSurface vertex coordinates are not correct" );
     OPENGEODE_EXCEPTION( surface.nb_polygons() == 2,
@@ -172,8 +172,7 @@ int main()
         test_create_vertices( *surface, *builder );
         test_create_polygons( *surface, *builder );
         test_polygon_adjacencies( *surface, *builder );
-        auto base_file = "test." + surface->native_extension();
-        test_io( *surface, base_file );
+        test_io( *surface, "test." + surface->native_extension() );
 
         test_delete_vertex( *surface, *builder );
         test_delete_polygon( *surface, *builder );

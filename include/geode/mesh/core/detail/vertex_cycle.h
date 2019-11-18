@@ -41,17 +41,13 @@ namespace geode
             VertexCycle( std::vector< index_t > vertices )
                 : vertices_( std::move( vertices ) )
             {
-                auto min_itr =
-                    std::min_element( vertices_.begin(), vertices_.end() );
-                std::rotate( vertices_.begin(), min_itr, vertices_.end() );
+                rotate();
             }
 
             VertexCycle( const std::array< index_t, 2 >& vertices )
                 : vertices_{ vertices[0], vertices[1] }
             {
-                auto min_itr =
-                    std::min_element( vertices_.begin(), vertices_.end() );
-                std::rotate( vertices_.begin(), min_itr, vertices_.end() );
+                rotate();
             }
 
             const std::vector< index_t >& vertices() const
@@ -61,7 +57,7 @@ namespace geode
 
             bool operator==( const VertexCycle& other ) const
             {
-                auto other_vertices = other.vertices();
+                const auto& other_vertices = other.vertices();
                 if( other_vertices.size() != this->vertices_.size() )
                 {
                     return false;
@@ -74,9 +70,10 @@ namespace geode
                 {
                     return true;
                 }
+                auto reverse_vertices = other.vertices();
                 std::reverse(
-                    other_vertices.begin() + 1, other_vertices.end() );
-                return this->vertices() == other_vertices;
+                    reverse_vertices.begin() + 1, reverse_vertices.end() );
+                return this->vertices() == reverse_vertices;
             }
 
             bool operator!=( const VertexCycle& other ) const
@@ -97,6 +94,13 @@ namespace geode
                         archive.container4b(
                             storage.vertices_, storage.vertices_.max_size() );
                     } );
+            }
+
+            void rotate()
+            {
+                const auto min_itr =
+                    std::min_element( vertices_.begin(), vertices_.end() );
+                std::rotate( vertices_.begin(), min_itr, vertices_.end() );
             }
 
         private:

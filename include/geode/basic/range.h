@@ -97,7 +97,7 @@ namespace geode
      *    }
      *
      *            = C++11-like loop =
-     *    for( auto i : Range{ n } )
+     *    for( const auto i : Range{ n } )
      *    {
      *      // do something
      *    }

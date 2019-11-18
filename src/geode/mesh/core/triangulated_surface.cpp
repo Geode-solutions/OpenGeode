@@ -48,9 +48,10 @@ namespace geode
         catch( const OpenGeodeException &e )
         {
             Logger::error( e.what() );
-            throw OpenGeodeException(
+            throw OpenGeodeException{
                 "Could not create TriangulatedSurface data structure: ",
-                type.get() );
+                type.get()
+            };
         }
     }
 

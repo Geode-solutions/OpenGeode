@@ -31,14 +31,14 @@ namespace geode
     {
         try
         {
-            auto output = GraphOutputFactory::create(
+            const auto output = GraphOutputFactory::create(
                 extension_from_filename( filename ), graph, filename );
             output->write();
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            throw OpenGeodeException( "Cannot save Graph in file: ", filename );
+            throw OpenGeodeException{ "Cannot save Graph in file: ", filename };
         }
     }
 

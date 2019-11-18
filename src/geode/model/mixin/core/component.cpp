@@ -23,7 +23,7 @@
 
 #include <geode/model/mixin/core/component.h>
 
-#include <algorithm> // must be before bitsery/traits/string.h (for MacOS)
+#include <algorithm>
 
 #include <bitsery/traits/string.h>
 

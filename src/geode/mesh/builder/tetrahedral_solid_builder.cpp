@@ -44,9 +44,10 @@ namespace geode
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            throw OpenGeodeException(
+            throw OpenGeodeException{
                 "Could not create TetrahedralSolid builder of data structure: ",
-                mesh.type_name().get() );
+                mesh.type_name().get()
+            };
         }
     }
 
@@ -87,7 +88,7 @@ namespace geode
     index_t TetrahedralSolidBuilder< dimension >::create_tetrahedron(
         const std::array< index_t, 4 >& vertices )
     {
-        auto added_tetra = tetrahedral_solid_.nb_polyhedra();
+        const auto added_tetra = tetrahedral_solid_.nb_polyhedra();
         tetrahedral_solid_.polyhedron_attribute_manager().resize(
             added_tetra + 1 );
         index_t vertex_id{ 0 };
@@ -97,10 +98,10 @@ namespace geode
                 { added_tetra, vertex_id++ }, vertex );
         }
         do_create_tetrahedron( vertices );
-        for( auto f : Range{ 4 } )
+        for( const auto f : Range{ 4 } )
         {
             std::vector< index_t > facet_vertices( 3 );
-            for( auto v : Range{ 3 } )
+            for( const auto v : Range{ 3 } )
             {
                 facet_vertices[v] = tetrahedral_solid_.polyhedron_facet_vertex(
                     { { added_tetra, f }, v } );

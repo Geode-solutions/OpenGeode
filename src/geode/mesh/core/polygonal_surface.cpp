@@ -47,7 +47,7 @@ namespace
     template < geode::index_t dimension >
     void check_polygon_id(
         const geode::PolygonalSurfaceBase< dimension >& surface,
-        geode::index_t polygon_id )
+        const geode::index_t polygon_id )
     {
         OPENGEODE_EXCEPTION( polygon_id < surface.nb_polygons(),
             "[check_polygon_id] Trying to access an invalid polygon" );
@@ -56,8 +56,8 @@ namespace
     template < geode::index_t dimension >
     void check_polygon_vertex_id(
         const geode::PolygonalSurfaceBase< dimension >& surface,
-        geode::index_t polygon_id,
-        geode::index_t vertex_id )
+        const geode::index_t polygon_id,
+        const geode::index_t vertex_id )
     {
         OPENGEODE_EXCEPTION(
             vertex_id < surface.nb_polygon_vertices( polygon_id ),
@@ -68,8 +68,8 @@ namespace
     template < geode::index_t dimension >
     void check_polygon_edge_id(
         const geode::PolygonalSurfaceBase< dimension >& surface,
-        geode::index_t polygon_id,
-        geode::index_t edge_id )
+        const geode::index_t polygon_id,
+        const geode::index_t edge_id )
     {
         OPENGEODE_EXCEPTION( edge_id < surface.nb_polygon_edges( polygon_id ),
             "[check_polygon_edge_id] Trying to access an invalid polygon local "
@@ -82,10 +82,10 @@ namespace
         const geode::Point< dimension >& p2 )
     {
         // Heron's formula
-        auto l0 = geode::Vector< dimension >{ p0, p1 }.length();
-        auto l1 = geode::Vector< dimension >{ p1, p2 }.length();
-        auto l2 = geode::Vector< dimension >{ p2, p0 }.length();
-        auto p = ( l0 + l1 + l2 ) / 2;
+        const auto l0 = geode::Vector< dimension >{ p0, p1 }.length();
+        const auto l1 = geode::Vector< dimension >{ p1, p2 }.length();
+        const auto l2 = geode::Vector< dimension >{ p2, p0 }.length();
+        const auto p = ( l0 + l1 + l2 ) / 2;
         return std::sqrt( p * ( p - l0 ) * ( p - l1 ) * ( p - l2 ) );
     }
 } // namespace
@@ -111,20 +111,21 @@ namespace geode
     public:
         explicit Impl( PolygonalSurfaceBase& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) )
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
-        const PolygonVertex& polygon_around_vertex( index_t vertex_id ) const
+        const PolygonVertex& polygon_around_vertex(
+            const index_t vertex_id ) const
         {
             return polygon_around_vertex_->value( vertex_id );
         }
 
         void associate_polygon_vertex_to_vertex(
-            const PolygonVertex& polygon_vertex, index_t vertex_id )
+            const PolygonVertex& polygon_vertex, const index_t vertex_id )
         {
             polygon_around_vertex_->set_value( vertex_id, polygon_vertex );
         }
@@ -141,14 +142,14 @@ namespace geode
         }
 
         const std::array< index_t, 2 >& get_edge_vertices(
-            index_t edge_id ) const
+            const index_t edge_id ) const
         {
             return this->get_facet_vertices( edge_id );
         }
 
         void update_edge_vertex( const std::array< index_t, 2 >& edge_vertices,
-            index_t edge_vertex_id,
-            index_t new_vertex_id )
+            const index_t edge_vertex_id,
+            const index_t new_vertex_id )
         {
             auto updated_edge_vertices = edge_vertices;
             updated_edge_vertices[edge_vertex_id] = new_vertex_id;
@@ -344,9 +345,9 @@ namespace geode
     PolygonVertex PolygonalSurfaceBase< dimension >::next_polygon_vertex(
         const PolygonVertex& polygon_vertex ) const
     {
-        auto vertex = polygon_vertex.vertex_id;
-        auto polygon = polygon_vertex.polygon_id;
-        auto nb_vertices = nb_polygon_vertices( polygon );
+        const auto vertex = polygon_vertex.vertex_id;
+        const auto polygon = polygon_vertex.polygon_id;
+        const auto nb_vertices = nb_polygon_vertices( polygon );
         return { polygon, ( vertex + 1 ) % nb_vertices };
     }
 
@@ -354,9 +355,9 @@ namespace geode
     PolygonVertex PolygonalSurfaceBase< dimension >::previous_polygon_vertex(
         const PolygonVertex& polygon_vertex ) const
     {
-        auto vertex = polygon_vertex.vertex_id;
-        auto polygon = polygon_vertex.polygon_id;
-        auto nb_vertices = nb_polygon_vertices( polygon );
+        const auto vertex = polygon_vertex.vertex_id;
+        const auto polygon = polygon_vertex.polygon_id;
+        const auto nb_vertices = nb_polygon_vertices( polygon );
         return { polygon, ( vertex + nb_vertices - 1 ) % nb_vertices };
     }
 
@@ -390,12 +391,12 @@ namespace geode
     {
         if( !is_edge_on_border( polygon_edge ) )
         {
-            auto v0 = polygon_edge_vertex( polygon_edge, 0 );
-            auto v1 = polygon_edge_vertex( polygon_edge, 1 );
-            auto polygon_adj = polygon_adjacent( polygon_edge );
-            for( auto e : Range{ nb_polygon_edges( polygon_adj ) } )
+            const auto v0 = polygon_edge_vertex( polygon_edge, 0 );
+            const auto v1 = polygon_edge_vertex( polygon_edge, 1 );
+            const auto polygon_adj = polygon_adjacent( polygon_edge );
+            for( const auto e : Range{ nb_polygon_edges( polygon_adj ) } )
             {
-                auto polygon = polygon_adjacent( { polygon_adj, e } );
+                const auto polygon = polygon_adjacent( { polygon_adj, e } );
                 if( polygon == polygon_edge.polygon_id
                     && polygon_edge_vertex( { polygon_adj, e }, 0 ) == v1
                     && polygon_edge_vertex( { polygon_adj, e }, 1 ) == v0 )
@@ -403,9 +404,9 @@ namespace geode
                     return { polygon_adj, e };
                 }
             }
-            throw OpenGeodeException( "[PolygonalSurfaceBase::polygon_adjacent_"
+            throw OpenGeodeException{ "[PolygonalSurfaceBase::polygon_adjacent_"
                                       "edge] Wrong adjacency with polygons: ",
-                polygon_edge.polygon_id, " and ", polygon_adj );
+                polygon_edge.polygon_id, " and ", polygon_adj };
         }
         return {};
     }
@@ -423,12 +424,12 @@ namespace geode
             index_t polygon_id ) const
     {
         std::vector< PolygonEdge > borders;
-        for( auto e : Range{ nb_polygon_edges( polygon_id ) } )
+        for( const auto e : Range{ nb_polygon_edges( polygon_id ) } )
         {
             PolygonEdge edge{ polygon_id, e };
             if( is_edge_on_border( edge ) )
             {
-                borders.emplace_back( edge );
+                borders.emplace_back( std::move( edge ) );
             }
         }
         return borders;
@@ -470,7 +471,7 @@ namespace geode
     double PolygonalSurfaceBase< dimension >::edge_length(
         index_t edge_id ) const
     {
-        auto vertices = edge_vertices( edge_id );
+        const auto vertices = edge_vertices( edge_id );
         return Vector< dimension >{ this->point( vertices[0] ),
             this->point( vertices[1] ) }
             .length();
@@ -480,8 +481,8 @@ namespace geode
     Point< dimension > PolygonalSurfaceBase< dimension >::edge_barycenter(
         index_t edge_id ) const
     {
-        auto vertices = edge_vertices( edge_id );
-        return ( this->point( vertices[0] ) + this->point( vertices[1] ) ) / 2;
+        const auto vertices = edge_vertices( edge_id );
+        return ( this->point( vertices[0] ) + this->point( vertices[1] ) ) / 2.;
     }
 
     template < index_t dimension >
@@ -503,7 +504,7 @@ namespace geode
         index_t polygon_id ) const
     {
         Point< dimension > barycenter;
-        for( auto v : Range{ nb_polygon_vertices( polygon_id ) } )
+        for( const auto v : Range{ nb_polygon_vertices( polygon_id ) } )
         {
             barycenter =
                 barycenter + this->point( polygon_vertex( { polygon_id, v } ) );
@@ -521,7 +522,7 @@ namespace geode
             return area;
         }
         const auto& p1 = this->point( polygon_vertex( { polygon_id, 0 } ) );
-        for( auto i : Range{ 1, nb_polygon_vertices( polygon_id ) - 1 } )
+        for( const auto i : Range{ 1, nb_polygon_vertices( polygon_id ) - 1 } )
         {
             const auto& p2 = this->point( polygon_vertex( { polygon_id, i } ) );
             const auto& p3 =
@@ -554,7 +555,7 @@ namespace geode
         S.push( first_polygon );
         while( !S.empty() )
         {
-            auto polygon_vertex = S.top();
+            const auto polygon_vertex = S.top();
             S.pop();
             if( contain( polygons_visited, polygon_vertex.polygon_id ) )
             {
@@ -563,16 +564,16 @@ namespace geode
             polygons_visited.push_back( polygon_vertex.polygon_id );
             polygons.push_back( polygon_vertex );
 
-            PolygonEdge polygon_edge{ polygon_vertex };
+            const PolygonEdge polygon_edge{ polygon_vertex };
             if( !is_edge_on_border( polygon_edge ) )
             {
-                auto adj_edge = polygon_adjacent_edge( polygon_edge );
+                const auto adj_edge = polygon_adjacent_edge( polygon_edge );
                 S.emplace( next_polygon_edge( adj_edge ) );
             }
-            auto prev_edge = previous_polygon_edge( polygon_vertex );
+            const auto prev_edge = previous_polygon_edge( polygon_vertex );
             if( !is_edge_on_border( prev_edge ) )
             {
-                auto adj_edge = polygon_adjacent_edge( prev_edge );
+                const auto adj_edge = polygon_adjacent_edge( prev_edge );
                 S.emplace( adj_edge );
             }
         }
@@ -584,9 +585,9 @@ namespace geode
         PolygonalSurfaceBase< dimension >::polygon_edge_from_vertices(
             index_t from_vertex_id, index_t to_vertex_id ) const
     {
-        for( auto& polygon_vertex : polygons_around_vertex( from_vertex_id ) )
+        for( auto&& polygon_vertex : polygons_around_vertex( from_vertex_id ) )
         {
-            auto next_vertex = next_polygon_vertex( polygon_vertex );
+            const auto next_vertex = next_polygon_vertex( polygon_vertex );
             if( this->polygon_vertex( next_vertex ) == to_vertex_id )
             {
                 return std::make_tuple( true, std::move( polygon_vertex ) );
@@ -638,9 +639,9 @@ namespace geode
     Vector3D PolygonalSurface< 3 >::polygon_normal( index_t polygon_id ) const
     {
         check_polygon_id( *this, polygon_id );
-        auto barycenter = polygon_barycenter( polygon_id );
+        const auto barycenter = polygon_barycenter( polygon_id );
         Vector3D normal;
-        for( index_t v = 1; v < nb_polygon_vertices( polygon_id ); v++ )
+        for( const auto v : Range{ 1, nb_polygon_vertices( polygon_id ) } )
         {
             const auto& p1 =
                 this->point( polygon_vertex( { polygon_id, v - 1 } ) );
@@ -693,9 +694,10 @@ namespace geode
             catch( const OpenGeodeException& e )
             {
                 Logger::error( e.what() );
-                throw OpenGeodeException(
+                throw OpenGeodeException{
                     "Could not create PolygonalSurface data structure: ",
-                    type.get() );
+                    type.get()
+                };
             }
         }
     }
@@ -733,9 +735,10 @@ namespace geode
             catch( const OpenGeodeException& e )
             {
                 Logger::error( e.what() );
-                throw OpenGeodeException(
+                throw OpenGeodeException{
                     "Could not create PolygonalSurface data structure: ",
-                    type.get() );
+                    type.get()
+                };
             }
         }
     }

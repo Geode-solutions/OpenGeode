@@ -378,7 +378,7 @@ namespace geode
     public:
         const T& value( index_t element ) const override
         {
-            auto it = values_.find( element );
+            const auto it = values_.find( element );
             if( it != values_.end() )
             {
                 return it->second;
@@ -394,17 +394,12 @@ namespace geode
         template < typename Modifier >
         void modify_value( index_t element, Modifier&& modifier )
         {
-            auto it = values_.find( element );
+            const auto it = values_.find( element );
             if( it == values_.end() )
             {
                 values_.emplace( element, default_value_ );
             }
             modifier( values_[element] );
-        }
-
-        T& value( index_t element )
-        {
-            return values_.emplace( element, default_value_ ).first->second;
         }
 
         std::shared_ptr< AttributeBase > clone() const override
@@ -467,8 +462,8 @@ namespace geode
 
         void delete_elements( const std::vector< bool >& to_delete ) override
         {
-            auto old2new = detail::mapping_after_deletion( to_delete );
-            auto old_values = values_;
+            const auto old2new = detail::mapping_after_deletion( to_delete );
+            const auto old_values = values_;
             values_.clear();
             values_.reserve( old_values.size() );
             for( const auto& value : old_values )

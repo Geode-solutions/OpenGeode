@@ -42,16 +42,17 @@ namespace
         geode::PolygonalSurfaceBuilder< dimension >& builder,
         const std::vector< index_t >& old2new )
     {
-        for( auto p : geode::Range{ surface.nb_polygons() } )
+        for( const auto p : geode::Range{ surface.nb_polygons() } )
         {
-            for( auto e : geode::Range{ surface.nb_polygon_edges( p ) } )
+            for( const auto e : geode::Range{ surface.nb_polygon_edges( p ) } )
             {
-                geode::PolygonEdge id{ p, e };
+                const geode::PolygonEdge id{ p, e };
                 if( surface.is_edge_on_border( id ) )
                 {
                     continue;
                 }
-                auto new_adjacent = old2new[surface.polygon_adjacent( id )];
+                const auto new_adjacent =
+                    old2new[surface.polygon_adjacent( id )];
                 builder.set_polygon_adjacent( id, new_adjacent );
             }
         }
@@ -63,11 +64,11 @@ namespace
         geode::PolygonalSurfaceBuilder< dimension >& builder,
         const std::vector< index_t >& vertices_old2new )
     {
-        for( auto v : geode::Range{ surface.nb_vertices() } )
+        for( const auto v : geode::Range{ surface.nb_vertices() } )
         {
             if( vertices_old2new[v] != geode::NO_ID )
             {
-                auto new_polygon_around =
+                const auto new_polygon_around =
                     builder.polygon_around_vertex( vertices_old2new[v] );
                 builder.associate_polygon_vertex_to_vertex(
                     new_polygon_around, v );
@@ -86,13 +87,13 @@ namespace
         const std::vector< index_t >& vertices_old2new )
     {
         std::vector< bool > polygons_to_delete( surface.nb_polygons(), false );
-
-        for( auto p : geode::Range{ surface.nb_polygons() } )
+        for( const auto p : geode::Range{ surface.nb_polygons() } )
         {
-            for( auto v : geode::Range{ surface.nb_polygon_vertices( p ) } )
+            for( const auto v :
+                geode::Range{ surface.nb_polygon_vertices( p ) } )
             {
-                geode::PolygonVertex id{ p, v };
-                auto new_vertex =
+                const geode::PolygonVertex id{ p, v };
+                const auto new_vertex =
                     vertices_old2new[surface.polygon_vertex( id )];
                 if( new_vertex == geode::NO_ID )
                 {
@@ -126,15 +127,15 @@ namespace geode
             catch( const std::bad_cast& e )
             {
                 Logger::error( e.what() );
-                throw OpenGeodeException( "Could not cast PolygonalSurface "
-                                          "to TriangulatedSurface" );
+                throw OpenGeodeException{ "Could not cast PolygonalSurface "
+                                          "to TriangulatedSurface" };
             }
             catch( const OpenGeodeException& e )
             {
                 Logger::error( e.what() );
-                throw OpenGeodeException( "Could not create PolygonalSurface "
+                throw OpenGeodeException{ "Could not create PolygonalSurface "
                                           "builder of data structure: ",
-                    mesh.type_name().get() );
+                    mesh.type_name().get() };
             }
         }
     }
@@ -143,15 +144,15 @@ namespace geode
     index_t PolygonalSurfaceBuilder< dimension >::create_polygon(
         const std::vector< index_t >& vertices )
     {
-        auto added_polygon = polygonal_surface_.nb_polygons();
+        const auto added_polygon = polygonal_surface_.nb_polygons();
         polygonal_surface_.polygon_attribute_manager().resize(
             added_polygon + 1 );
-        for( auto v : Range{ vertices.size() } )
+        for( const auto v : Range{ vertices.size() } )
         {
             associate_polygon_vertex_to_vertex(
                 { added_polygon, v }, vertices[v] );
         }
-        for( auto e : Range{ vertices.size() - 1 } )
+        for( const auto e : Range{ vertices.size() - 1 } )
         {
             this->find_or_create_edge( { vertices[e], vertices[e + 1] } );
         }
@@ -188,18 +189,18 @@ namespace geode
     void PolygonalSurfaceBuilder< dimension >::set_polygon_vertex(
         const PolygonVertex& polygon_vertex, index_t vertex_id )
     {
-        auto polygon_vertex_id =
+        const auto polygon_vertex_id =
             polygonal_surface_.polygon_vertex( polygon_vertex );
-        auto previous_id = polygonal_surface_.polygon_vertex(
+        const auto previous_id = polygonal_surface_.polygon_vertex(
             polygonal_surface_.previous_polygon_vertex( polygon_vertex ) );
-        auto next_id = polygonal_surface_.polygon_vertex(
+        const auto next_id = polygonal_surface_.polygon_vertex(
             polygonal_surface_.next_polygon_edge( polygon_vertex ) );
 
-        auto polygon_around =
+        const auto polygon_around =
             polygonal_surface_.polygon_around_vertex( polygon_vertex_id );
         if( polygon_around == polygon_vertex )
         {
-            auto polygons_around =
+            const auto polygons_around =
                 polygonal_surface_.polygons_around_vertex( polygon_vertex_id );
             if( polygons_around.size() < 2 )
             {
@@ -226,17 +227,17 @@ namespace geode
         const std::vector< index_t >& old2new )
     {
         update_polygon_around_vertices( polygonal_surface_, *this, old2new );
-
-        auto polygons_to_delete =
+        const auto polygons_to_delete =
             find_polygons_to_delete( polygonal_surface_, old2new );
         delete_polygons( polygons_to_delete );
 
-        for( auto p : Range{ polygonal_surface_.nb_polygons() } )
+        for( const auto p : Range{ polygonal_surface_.nb_polygons() } )
         {
-            for( auto v : Range{ polygonal_surface_.nb_polygon_vertices( p ) } )
+            for( const auto v :
+                Range{ polygonal_surface_.nb_polygon_vertices( p ) } )
             {
-                PolygonVertex id{ p, v };
-                auto new_vertex =
+                const PolygonVertex id{ p, v };
+                const auto new_vertex =
                     old2new[polygonal_surface_.polygon_vertex( id )];
                 OPENGEODE_ASSERT( new_vertex != NO_ID,
                     "[PolygonalSurfaceBuilder::update_polygon_vertices] No "
@@ -257,7 +258,7 @@ namespace geode
             "polygon that does not exist" );
         OPENGEODE_EXCEPTION(
             polygon_vertex.vertex_id < polygonal_surface_.nb_polygon_vertices(
-                polygon_vertex.polygon_id ),
+                                           polygon_vertex.polygon_id ),
             "[PolygonalSurfaceBuilder::update_polygon_vertex] Accessing an "
             "invalid polygon vertex" );
         OPENGEODE_EXCEPTION( vertex_id < polygonal_surface_.nb_vertices(),
@@ -271,7 +272,7 @@ namespace geode
     void PolygonalSurfaceBuilder< dimension >::do_delete_vertices(
         const std::vector< bool >& to_delete )
     {
-        auto old2new = detail::mapping_after_deletion( to_delete );
+        const auto old2new = detail::mapping_after_deletion( to_delete );
         update_polygon_vertices( old2new );
         update_edge_vertices( old2new );
         do_delete_surface_vertices( to_delete );
@@ -287,7 +288,7 @@ namespace geode
             "polygon that does not exist" );
         OPENGEODE_EXCEPTION(
             polygon_edge.edge_id < polygonal_surface_.nb_polygon_edges(
-                polygon_edge.polygon_id ),
+                                       polygon_edge.polygon_id ),
             "[PolygonalSurfaceBuilder::set_polygon_adjacent] Accessing an "
             "invalid polygon vertex" );
         OPENGEODE_EXCEPTION( adjacent_id < polygonal_surface_.nb_polygons()
@@ -312,29 +313,31 @@ namespace geode
     {
         std::vector< std::vector< PolygonVertex > > polygon_vertices(
             polygonal_surface_.nb_vertices() );
-        for( auto polygon : polygons_to_connect )
+        for( const auto polygon : polygons_to_connect )
         {
-            for( auto v :
+            for( const auto v :
                 Range{ polygonal_surface_.nb_polygon_vertices( polygon ) } )
             {
-                PolygonVertex vertex_id{ polygon, v };
-                auto vertex = polygonal_surface_.polygon_vertex( vertex_id );
+                const PolygonVertex vertex_id{ polygon, v };
+                const auto vertex =
+                    polygonal_surface_.polygon_vertex( vertex_id );
                 polygon_vertices[vertex].emplace_back( vertex_id );
             }
         }
 
-        for( auto polygon : polygons_to_connect )
+        for( const auto polygon : polygons_to_connect )
         {
-            for( auto v :
+            for( const auto v :
                 Range{ polygonal_surface_.nb_polygon_vertices( polygon ) } )
             {
                 if( !polygonal_surface_.is_edge_on_border( { polygon, v } ) )
                 {
                     continue;
                 }
-                PolygonVertex vertex_id{ polygon, v };
-                auto vertex = polygonal_surface_.polygon_vertex( vertex_id );
-                auto next_vertex = polygonal_surface_.polygon_vertex(
+                const PolygonVertex vertex_id{ polygon, v };
+                const auto vertex =
+                    polygonal_surface_.polygon_vertex( vertex_id );
+                const auto next_vertex = polygonal_surface_.polygon_vertex(
                     polygonal_surface_.next_polygon_vertex( vertex_id ) );
                 for( const auto& vertex2 : polygon_vertices[vertex] )
                 {
@@ -342,9 +345,9 @@ namespace geode
                     {
                         continue;
                     }
-                    auto prev_vertex_id =
+                    const auto prev_vertex_id =
                         polygonal_surface_.previous_polygon_vertex( vertex2 );
-                    auto prev_vertex =
+                    const auto prev_vertex =
                         polygonal_surface_.polygon_vertex( prev_vertex_id );
                     if( next_vertex == prev_vertex )
                     {
@@ -362,11 +365,11 @@ namespace geode
     void PolygonalSurfaceBuilder< dimension >::delete_polygons(
         const std::vector< bool >& to_delete )
     {
-        for( auto p : Range{ polygonal_surface_.nb_polygons() } )
+        for( const auto p : Range{ polygonal_surface_.nb_polygons() } )
         {
             if( to_delete[p] )
             {
-                for( auto e :
+                for( const auto e :
                     Range{ polygonal_surface_.nb_polygon_edges( p ) } )
                 {
                     polygonal_surface_.remove_edge(
@@ -378,9 +381,8 @@ namespace geode
         }
         polygonal_surface_.remove_isolated_edges();
 
-        auto old2new = detail::mapping_after_deletion( to_delete );
-
-        for( auto v : Range{ polygonal_surface_.nb_vertices() } )
+        const auto old2new = detail::mapping_after_deletion( to_delete );
+        for( const auto v : Range{ polygonal_surface_.nb_vertices() } )
         {
             const auto& polygon_vertex =
                 polygonal_surface_.polygon_around_vertex( v );
@@ -405,9 +407,7 @@ namespace geode
             }
             associate_polygon_vertex_to_vertex( new_polygon_vertex, v );
         }
-
         update_polygon_adjacencies( polygonal_surface_, *this, old2new );
-
         polygonal_surface_.polygon_attribute_manager().delete_elements(
             to_delete );
         do_delete_polygons( to_delete );
@@ -418,7 +418,7 @@ namespace geode
     {
         std::vector< bool > to_delete(
             polygonal_surface_.nb_vertices(), false );
-        for( auto v : Range{ polygonal_surface_.nb_vertices() } )
+        for( const auto v : Range{ polygonal_surface_.nb_vertices() } )
         {
             const auto& polygon_vertex =
                 polygonal_surface_.polygon_around_vertex( v );
@@ -471,7 +471,7 @@ namespace geode
     index_t PolygonalSurfaceBuilder< dimension >::create_point(
         const Point< dimension >& point )
     {
-        auto added_vertex = polygonal_surface_.nb_vertices();
+        const auto added_vertex = polygonal_surface_.nb_vertices();
         create_vertex();
         set_point( added_vertex, point );
         return added_vertex;
