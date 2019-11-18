@@ -83,7 +83,7 @@ namespace geode
             files.emplace_back( directory + "/" + block.component_type().get()
                                 + block.id().string() + "."
                                 + mesh.native_extension() );
-            auto* tetra =
+            const auto* tetra =
                 dynamic_cast< const TetrahedralSolid< dimension >* >( &mesh );
             if( tetra )
             {
@@ -107,8 +107,9 @@ namespace geode
         {
             block.ensure_mesh_type();
             auto& mesh = block.modifiable_mesh();
-            auto file = directory + "/" + block.component_type().get()
-                        + block.id().string() + "." + mesh.native_extension();
+            const auto file = directory + "/" + block.component_type().get()
+                              + block.id().string() + "."
+                              + mesh.native_extension();
             auto* tetra =
                 dynamic_cast< TetrahedralSolid< dimension >* >( &mesh );
             if( tetra )

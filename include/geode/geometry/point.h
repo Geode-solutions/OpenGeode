@@ -65,7 +65,7 @@ namespace geode
 
         bool operator==( const Point &other ) const
         {
-            for( auto i : Range{ dimension } )
+            for( const auto i : Range{ dimension } )
             {
                 if( value( i ) != other.value( i ) )
                 {
@@ -83,7 +83,7 @@ namespace geode
         Point operator*( double multiplier ) const
         {
             Point result{ *this };
-            for( auto i : Range{ dimension } )
+            for( const auto i : Range{ dimension } )
             {
                 result.set_value( i, result.value( i ) * multiplier );
             }
@@ -96,7 +96,7 @@ namespace geode
                 "[Point::operator/] Cannot divide Point by something close to "
                 "zero" );
             Point result{ *this };
-            for( auto i : Range{ dimension } )
+            for( const auto i : Range{ dimension } )
             {
                 result.set_value( i, result.value( i ) / divider );
             }
@@ -106,7 +106,7 @@ namespace geode
         Point operator+( const Point &other ) const
         {
             Point result{ *this };
-            for( auto i : Range{ dimension } )
+            for( const auto i : Range{ dimension } )
             {
                 result.set_value( i, result.value( i ) + other.value( i ) );
             }
@@ -116,7 +116,7 @@ namespace geode
         Point operator-( const Point &other ) const
         {
             Point result{ *this };
-            for( auto i : Range{ dimension } )
+            for( const auto i : Range{ dimension } )
             {
                 result.set_value( i, result.value( i ) - other.value( i ) );
             }
@@ -126,9 +126,9 @@ namespace geode
         bool inexact_equal( const Point &other, double epsilon ) const
         {
             double square_length{ 0 };
-            for( auto i : Range{ dimension } )
+            for( const auto i : Range{ dimension } )
             {
-                double diff{ other.value( i ) - this->value( i ) };
+                const double diff{ other.value( i ) - this->value( i ) };
                 square_length += diff * diff;
             }
             return square_length < epsilon * epsilon;
@@ -155,7 +155,7 @@ namespace geode
         std::ostream &out, const Point< dimension > &point )
     {
         const char *sep = "";
-        for( auto i : Range{ dimension } )
+        for( const auto i : Range{ dimension } )
         {
             out << sep << point.value( i );
             sep = " ";

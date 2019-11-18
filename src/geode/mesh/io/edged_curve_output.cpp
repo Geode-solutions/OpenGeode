@@ -33,15 +33,15 @@ namespace geode
     {
         try
         {
-            auto output = EdgedCurveOutputFactory< dimension >::create(
+            const auto output = EdgedCurveOutputFactory< dimension >::create(
                 extension_from_filename( filename ), edged_curve, filename );
             output->write();
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            throw OpenGeodeException(
-                "Cannot save EdgedCurve in file: ", filename );
+            throw OpenGeodeException{ "Cannot save EdgedCurve in file: ",
+                filename };
         }
     }
 

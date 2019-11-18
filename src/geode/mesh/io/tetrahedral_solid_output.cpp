@@ -34,16 +34,17 @@ namespace geode
     {
         try
         {
-            auto output = TetrahedralSolidOutputFactory< dimension >::create(
-                extension_from_filename( filename ), tetrahedral_solid,
-                filename );
+            const auto output =
+                TetrahedralSolidOutputFactory< dimension >::create(
+                    extension_from_filename( filename ), tetrahedral_solid,
+                    filename );
             output->write();
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            throw OpenGeodeException(
-                "Cannot save TetrahedralSolid in file: ", filename );
+            throw OpenGeodeException{ "Cannot save TetrahedralSolid in file: ",
+                filename };
         }
     }
 
@@ -52,7 +53,7 @@ namespace geode
         const TetrahedralSolid< dimension >& tetrahedral_solid,
         std::string filename )
         : PolyhedralSolidOutput< dimension >(
-            tetrahedral_solid, std::move( filename ) ),
+              tetrahedral_solid, std::move( filename ) ),
           tetrahedral_solid_( tetrahedral_solid )
     {
     }

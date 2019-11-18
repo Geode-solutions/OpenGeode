@@ -39,7 +39,7 @@ namespace geode
 
         Singleton *instance( const std::type_info &type )
         {
-            auto iter = singletons_.find( type.name() );
+            const auto iter = singletons_.find( type.name() );
             if( iter == singletons_.end() )
             {
                 return nullptr;

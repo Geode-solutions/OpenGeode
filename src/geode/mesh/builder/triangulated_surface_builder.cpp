@@ -44,9 +44,9 @@ namespace geode
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            throw OpenGeodeException( "Could not create TriangulatedSurface "
+            throw OpenGeodeException{ "Could not create TriangulatedSurface "
                                       "builder of data structure: ",
-                mesh.type_name().get() );
+                mesh.type_name().get() };
         }
     }
 
@@ -66,7 +66,7 @@ namespace geode
     index_t TriangulatedSurfaceBuilder< dimension >::create_triangle(
         const std::array< index_t, 3 >& vertices )
     {
-        auto added_triangle = triangulated_surface_.nb_polygons();
+        const auto added_triangle = triangulated_surface_.nb_polygons();
         triangulated_surface_.polygon_attribute_manager().resize(
             added_triangle + 1 );
         index_t vertex_id{ 0 };
@@ -75,7 +75,7 @@ namespace geode
             this->associate_polygon_vertex_to_vertex(
                 { added_triangle, vertex_id++ }, vertex );
         }
-        for( auto e : Range{ vertices.size() - 1 } )
+        for( const auto e : Range{ vertices.size() - 1 } )
         {
             this->find_or_create_edge( { vertices[e], vertices[e + 1] } );
         }

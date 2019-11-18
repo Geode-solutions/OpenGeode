@@ -50,7 +50,7 @@ namespace geode
         {
         }
 
-        uuid id() const
+        const uuid& id() const
         {
             return id_;
         }

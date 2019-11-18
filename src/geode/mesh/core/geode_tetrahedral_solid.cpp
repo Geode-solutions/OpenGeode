@@ -39,7 +39,7 @@
 
 namespace
 {
-    static const std::array< std::array< geode::index_t, 3 >, 4 >
+    static constexpr std::array< std::array< geode::index_t, 3 >, 4 >
         tetrahedron_facet_vertices{ { { 1, 3, 2 }, { 0, 2, 3 }, { 3, 1, 0 },
             { 0, 1, 2 } } };
 } // namespace
@@ -57,20 +57,14 @@ namespace geode
                   mesh.polyhedron_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
                           std::array< index_t, 4 > >( "tetrahedron_vertices",
-                          [] {
-                              std::array< index_t, 4 > tetrahedron{};
-                              tetrahedron.fill( NO_ID );
-                              return tetrahedron;
-                          }() ) ),
+                          std::array< index_t, 4 >{
+                              NO_ID, NO_ID, NO_ID, NO_ID } ) ),
               tetrahedron_adjacents_(
                   mesh.polyhedron_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
-                          std::array< index_t, 4 > >(
-                          "tetrahedron_adjacents", [] {
-                              std::array< index_t, 4 > tetrahedron{};
-                              tetrahedron.fill( NO_ID );
-                              return tetrahedron;
-                          }() ) )
+                          std::array< index_t, 4 > >( "tetrahedron_adjacents",
+                          std::array< index_t, 4 >{
+                              NO_ID, NO_ID, NO_ID, NO_ID } ) )
         {
         }
 
@@ -85,7 +79,7 @@ namespace geode
         index_t get_polyhedron_facet_vertex(
             const PolyhedronFacetVertex& polyhedron_facet_vertex ) const
         {
-            auto vertex_id = tetrahedron_facet_vertices.at(
+            const auto vertex_id = tetrahedron_facet_vertices.at(
                 polyhedron_facet_vertex.polyhedron_facet
                     .facet_id )[polyhedron_facet_vertex.vertex_id];
             return get_polyhedron_vertex(
@@ -102,7 +96,7 @@ namespace geode
         }
 
         void set_polyhedron_vertex(
-            const PolyhedronVertex& polyhedron_vertex, index_t vertex_id )
+            const PolyhedronVertex& polyhedron_vertex, const index_t vertex_id )
         {
             tetrahedron_vertices_->modify_value(
                 polyhedron_vertex.polyhedron_id,
@@ -113,7 +107,7 @@ namespace geode
         }
 
         void set_polyhedron_adjacent(
-            const PolyhedronFacet& polyhedron_facet, index_t adjacent_id )
+            const PolyhedronFacet& polyhedron_facet, const index_t adjacent_id )
         {
             tetrahedron_adjacents_->modify_value(
                 polyhedron_facet.polyhedron_id,
@@ -134,10 +128,10 @@ namespace geode
             const std::array< index_t, 4 >& vertices ) const
         {
             std::vector< std::vector< index_t > > facet_vertices( 4 );
-            for( auto f : Range{ 4 } )
+            for( const auto f : Range{ 4 } )
             {
                 facet_vertices[f].resize( 3 );
-                for( auto v : Range{ 3 } )
+                for( const auto v : Range{ 3 } )
                 {
                     facet_vertices[f][v] =
                         vertices[tetrahedron_facet_vertices[f][v]];

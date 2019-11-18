@@ -39,7 +39,7 @@
         register_mesh_deserialize_pcontext( std::get< 0 >( context ) );        \
         Deserializer archive{ context, file };                                 \
         archive.object( mesh_ );                                               \
-        auto& adapter = archive.adapter();                                     \
+        const auto& adapter = archive.adapter();                               \
         OPENGEODE_EXCEPTION( adapter.error() == bitsery::ReaderError::NoError  \
                                  && adapter.isCompletedSuccessfully()          \
                                  && std::get< 1 >( context ).isValid(),        \

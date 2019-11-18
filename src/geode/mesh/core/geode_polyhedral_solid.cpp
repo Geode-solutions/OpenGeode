@@ -55,13 +55,13 @@ namespace geode
                                         + polyhedron_vertex.vertex_id];
         }
 
-        index_t get_nb_polyhedron_vertices( index_t polyhedron_id ) const
+        index_t get_nb_polyhedron_vertices( const index_t polyhedron_id ) const
         {
             return starting_vertex_index( polyhedron_id + 1 )
                    - starting_vertex_index( polyhedron_id );
         }
 
-        index_t get_nb_polyhedron_facets( index_t polyhedron_id ) const
+        index_t get_nb_polyhedron_facets( const index_t polyhedron_id ) const
         {
             return starting_adjacent_index( polyhedron_id + 1 )
                    - starting_adjacent_index( polyhedron_id );
@@ -70,7 +70,7 @@ namespace geode
         index_t get_nb_polyhedron_facet_vertices(
             const PolyhedronFacet& polyhedron_facet ) const
         {
-            auto facet_id = get_facet_id( polyhedron_facet );
+            const auto facet_id = get_facet_id( polyhedron_facet );
             return starting_facet_index( facet_id + 1 )
                    - starting_facet_index( facet_id );
         }
@@ -84,7 +84,7 @@ namespace geode
         }
 
         void set_polyhedron_vertex(
-            const PolyhedronVertex& polyhedron_vertex, index_t vertex_id )
+            const PolyhedronVertex& polyhedron_vertex, const index_t vertex_id )
         {
             polyhedron_vertices_[starting_vertex_index(
                                      polyhedron_vertex.polyhedron_id )
@@ -92,7 +92,7 @@ namespace geode
         }
 
         void set_polyhedron_adjacent(
-            const PolyhedronFacet& polyhedron_facet, index_t adjacent_id )
+            const PolyhedronFacet& polyhedron_facet, const index_t adjacent_id )
         {
             polyhedron_adjacents_[starting_adjacent_index(
                                       polyhedron_facet.polyhedron_id )
@@ -134,7 +134,7 @@ namespace geode
             index_t vertex_index{ 0 };
             index_t facet_index{ 0 };
             index_t adjacent_index{ 0 };
-            for( auto p : Range{ to_delete.size() } )
+            for( const auto p : Range{ to_delete.size() } )
             {
                 if( to_delete[p] )
                 {
@@ -142,8 +142,8 @@ namespace geode
                 }
                 else
                 {
-                    auto nb_vertices = get_nb_polyhedron_vertices( p );
-                    for( auto v : Range{ nb_vertices } )
+                    const auto nb_vertices = get_nb_polyhedron_vertices( p );
+                    for( const auto v : Range{ nb_vertices } )
                     {
                         polyhedron_vertices_[vertex_index] =
                             get_polyhedron_vertex( { p, v } );
@@ -152,13 +152,13 @@ namespace geode
                     polyhedron_vertex_ptr_[p - offset + 1] =
                         polyhedron_vertex_ptr_[p - offset] + nb_vertices;
 
-                    auto nb_facets = get_nb_polyhedron_facets( p );
-                    for( auto f : Range{ nb_facets } )
+                    const auto nb_facets = get_nb_polyhedron_facets( p );
+                    for( const auto f : Range{ nb_facets } )
                     {
                         PolyhedronFacet facet{ p, f };
                         auto nb_facet_vertices =
                             get_nb_polyhedron_facet_vertices( facet );
-                        for( auto v : Range{ nb_facet_vertices } )
+                        for( const auto v : Range{ nb_facet_vertices } )
                         {
                             polyhedron_facets_[facet_index] =
                                 get_polyhedron_facet_vertex_id( { facet, v } )
@@ -225,17 +225,17 @@ namespace geode
                 } );
         }
 
-        index_t starting_vertex_index( index_t polyhedron ) const
+        index_t starting_vertex_index( const index_t polyhedron ) const
         {
             return polyhedron_vertex_ptr_[polyhedron];
         }
 
-        index_t starting_facet_index( index_t polyhedron ) const
+        index_t starting_facet_index( const index_t polyhedron ) const
         {
             return polyhedron_facet_ptr_[polyhedron];
         }
 
-        index_t starting_adjacent_index( index_t polyhedron ) const
+        index_t starting_adjacent_index( const index_t polyhedron ) const
         {
             return polyhedron_adjacent_ptr_[polyhedron];
         }
@@ -249,11 +249,11 @@ namespace geode
         PolyhedronVertex get_polyhedron_facet_vertex_id(
             const PolyhedronFacetVertex& polyhedron_facet_vertex ) const
         {
-            auto facet_id =
+            const auto facet_id =
                 get_facet_id( polyhedron_facet_vertex.polyhedron_facet );
-            auto polyhedron_id =
+            const auto polyhedron_id =
                 polyhedron_facet_vertex.polyhedron_facet.polyhedron_id;
-            auto vertex_id =
+            const auto vertex_id =
                 polyhedron_facets_[starting_facet_index( facet_id )
                                    + polyhedron_facet_vertex.vertex_id];
             return { polyhedron_id, vertex_id };

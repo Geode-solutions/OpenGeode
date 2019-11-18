@@ -60,7 +60,7 @@ int main()
         BoundingBox2D box_inter3;
         std::tie( std::ignore, box_inter3 ) = box3.box_intersection( box );
 
-        auto box_union = box2.box_union( box );
+        const auto box_union = box2.box_union( box );
         OPENGEODE_EXCEPTION( box_union.min() == Point2D( { -2, -2 } ),
             "[Test] Error in BoundingBox union computation" );
         OPENGEODE_EXCEPTION( box_union.max() == Point2D( { 1, 1 } ),
@@ -71,9 +71,9 @@ int main()
         OPENGEODE_EXCEPTION( !box_union.contains( { { 10, 0 } } ),
             "[Test] BBox should not contain this point" );
 
-        box = box2;
-        OPENGEODE_EXCEPTION( box.min() == Point2D( { -2, -2 } )
-                                 && box.max() == Point2D( { 1, 1 } ),
+        const BoundingBox2D copy_box = box2;
+        OPENGEODE_EXCEPTION( copy_box.min() == Point2D( { -2, -2 } )
+                                 && copy_box.max() == Point2D( { 1, 1 } ),
             "[Test] Copied BBox has wrong extension" );
 
         Logger::info( "TEST SUCCESS" );

@@ -33,11 +33,11 @@
 
 void test_default_vertex_set( const geode::VertexSet& vertex_set )
 {
-    auto type_static = geode::OpenGeodeVertexSet::type_name_static();
+    const auto type_static = geode::OpenGeodeVertexSet::type_name_static();
     OPENGEODE_EXCEPTION( vertex_set.type_name() == type_static,
         "[Test] VertexSet type name is not correct" );
 
-    auto extension_static =
+    const auto extension_static =
         geode::OpenGeodeVertexSet::native_extension_static();
     OPENGEODE_EXCEPTION( vertex_set.native_extension() == extension_static,
         "[Test] VertexSet native extension is not correct" );
@@ -69,7 +69,7 @@ void test_delete_vertex(
 
 void test_clone( const geode::VertexSet& vertex_set )
 {
-    auto vertex_set2 = vertex_set.clone();
+    const auto vertex_set2 = vertex_set.clone();
     OPENGEODE_EXCEPTION( vertex_set2->nb_vertices() == 5,
         "[Test] VertexSet2 should have 5 vertices" );
 }

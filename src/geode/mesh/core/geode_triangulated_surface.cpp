@@ -50,19 +50,12 @@ namespace geode
                   mesh.polygon_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
                           std::array< index_t, 3 > >( "triangle_vertices",
-                          [] {
-                              std::array< index_t, 3 > triangle{};
-                              triangle.fill( NO_ID );
-                              return triangle;
-                          }() ) ),
+                          std::array< index_t, 3 >{ NO_ID, NO_ID, NO_ID } ) ),
               triangle_adjacents_(
                   mesh.polygon_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
-                          std::array< index_t, 3 > >( "triangle_adjacents", [] {
-                          std::array< index_t, 3 > triangle{};
-                          triangle.fill( NO_ID );
-                          return triangle;
-                      }() ) )
+                          std::array< index_t, 3 > >( "triangle_adjacents",
+                          std::array< index_t, 3 >{ NO_ID, NO_ID, NO_ID } ) )
         {
         }
 
@@ -79,7 +72,7 @@ namespace geode
         }
 
         void set_polygon_vertex(
-            const PolygonVertex& polygon_vertex, index_t vertex_id )
+            const PolygonVertex& polygon_vertex, const index_t vertex_id )
         {
             triangle_vertices_->modify_value( polygon_vertex.polygon_id,
                 [&polygon_vertex, vertex_id](
@@ -89,7 +82,7 @@ namespace geode
         }
 
         void set_polygon_adjacent(
-            const PolygonEdge& polygon_edge, index_t adjacent_id )
+            const PolygonEdge& polygon_edge, const index_t adjacent_id )
         {
             triangle_adjacents_->modify_value(
                 polygon_edge.polygon_id, [&polygon_edge, adjacent_id](

@@ -25,13 +25,13 @@
 
 namespace geode
 {
-    static const double global_epsilon = 1E-8;
-    static const double global_epsilon2 = global_epsilon * global_epsilon;
-    static const double global_epsilon3 = global_epsilon2 * global_epsilon;
+    static constexpr double global_epsilon{ 1E-8 };
+    static constexpr double global_epsilon2{ global_epsilon * global_epsilon };
+    static constexpr double global_epsilon3{ global_epsilon2 * global_epsilon };
 
     using index_t = unsigned int;
     using signed_index_t = int;
 
     /// Value used for a invalid index
-    static const index_t NO_ID = index_t( -1 );
+    static constexpr index_t NO_ID = index_t( -1 );
 } // namespace geode

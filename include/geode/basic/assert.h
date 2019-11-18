@@ -34,7 +34,7 @@ namespace geode
     /*!
      * OpenGeode exception class.
      * Example:
-     *       throw OpenGeodeException( "Error while loading the BRep" );
+     *       throw OpenGeodeException{ "Error while loading the BRep" );
      *
      *       try {
      *          ...
@@ -49,7 +49,7 @@ namespace geode
     public:
         template < typename... Args >
         explicit OpenGeodeException( const Args &... message )
-            : std::runtime_error( string_concatener( message... ) )
+            : std::runtime_error{ string_concatener( message... ) }
         {
         }
         virtual ~OpenGeodeException() noexcept {}
@@ -98,4 +98,7 @@ namespace geode
 
 #define OPENGEODE_EXCEPTION( condition, message )                              \
     if( !( condition ) )                                                       \
-    throw geode::OpenGeodeException( message )
+        throw geode::OpenGeodeException                                        \
+        {                                                                      \
+            message                                                            \
+        }

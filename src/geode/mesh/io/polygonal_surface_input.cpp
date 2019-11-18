@@ -43,8 +43,9 @@ namespace geode
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            throw OpenGeodeException(
-                "Cannot load PolygonalSurface from file: ", filename );
+            throw OpenGeodeException{
+                "Cannot load PolygonalSurface from file: ", filename
+            };
         }
     }
 

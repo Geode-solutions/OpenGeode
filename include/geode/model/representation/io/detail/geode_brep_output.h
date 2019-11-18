@@ -64,7 +64,7 @@ namespace geode
 
         void write() const final
         {
-            ZipFile zip_writer{ filename(), uuid{}.string() };
+            const ZipFile zip_writer{ filename(), uuid{}.string() };
             archive_brep_files( zip_writer );
         }
     };

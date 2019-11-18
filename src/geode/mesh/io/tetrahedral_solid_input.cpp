@@ -42,8 +42,9 @@ namespace geode
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            throw OpenGeodeException(
-                "Cannot load TetrahedralSolid from file: ", filename );
+            throw OpenGeodeException{
+                "Cannot load TetrahedralSolid from file: ", filename
+            };
         }
     }
 
@@ -51,7 +52,7 @@ namespace geode
     TetrahedralSolidInput< dimension >::TetrahedralSolidInput(
         TetrahedralSolid< dimension >& tetrahedral_solid, std::string filename )
         : PolyhedralSolidInput< dimension >(
-            tetrahedral_solid, std::move( filename ) ),
+              tetrahedral_solid, std::move( filename ) ),
           tetrahedral_solid_( tetrahedral_solid )
     {
     }

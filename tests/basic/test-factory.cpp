@@ -68,8 +68,8 @@ void verdict( bool is_instantiated, const std::string &name )
 {
     if( !is_instantiated )
     {
-        throw geode::OpenGeodeException(
-            "TEST Failed to instantiate the ", name, " class" );
+        throw geode::OpenGeodeException{ "TEST Failed to instantiate the ",
+            name, " class" };
     }
 }
 
@@ -82,7 +82,7 @@ int main()
         using factory = Factory< std::string, Base, A &, B & >;
         factory::register_creator< Derived >( "Derived" );
 
-        auto creators = factory::list_creators();
+        const auto creators = factory::list_creators();
         factory::register_creator< Derived >( "Derived" );
         OPENGEODE_EXCEPTION( factory::list_creators().size() == creators.size(),
             "[Test] Key registered twice" );
@@ -91,7 +91,7 @@ int main()
         B b;
         OPENGEODE_EXCEPTION( factory::has_creator( "Derived" ),
             "[Test] Key has not been registered" );
-        auto d = factory::create( "Derived", a, b );
+        const auto d = factory::create( "Derived", a, b );
         verdict( d != nullptr, "Derived" );
 
         Logger::info( "TEST SUCCESS" );

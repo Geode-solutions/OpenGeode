@@ -53,7 +53,7 @@ namespace geode
                                      + polygon_vertex.vertex_id];
         }
 
-        index_t get_nb_polygon_vertices( index_t polygon_id ) const
+        index_t get_nb_polygon_vertices( const index_t polygon_id ) const
         {
             return starting_index( polygon_id + 1 )
                    - starting_index( polygon_id );
@@ -66,14 +66,14 @@ namespace geode
         }
 
         void set_polygon_vertex(
-            const PolygonVertex& polygon_vertex, index_t vertex_id )
+            const PolygonVertex& polygon_vertex, const index_t vertex_id )
         {
             polygon_vertices_[starting_index( polygon_vertex.polygon_id )
                               + polygon_vertex.vertex_id] = vertex_id;
         }
 
         void set_polygon_adjacent(
-            const PolygonEdge& polygon_edge, index_t adjacent_id )
+            const PolygonEdge& polygon_edge, const index_t adjacent_id )
         {
             polygon_adjacents_[starting_index( polygon_edge.polygon_id )
                                + polygon_edge.edge_id] = adjacent_id;
@@ -91,7 +91,7 @@ namespace geode
         {
             index_t offset{ 0 };
             index_t index{ 0 };
-            for( auto p : Range{ to_delete.size() } )
+            for( const auto p : Range{ to_delete.size() } )
             {
                 if( to_delete[p] )
                 {
@@ -99,8 +99,8 @@ namespace geode
                 }
                 else
                 {
-                    auto nb_vertices = get_nb_polygon_vertices( p );
-                    for( auto v : Range{ nb_vertices } )
+                    const auto nb_vertices = get_nb_polygon_vertices( p );
+                    for( const auto v : Range{ nb_vertices } )
                     {
                         polygon_vertices_[index] =
                             get_polygon_vertex( { p, v } );
@@ -142,7 +142,7 @@ namespace geode
                 } );
         }
 
-        index_t starting_index( index_t polygon ) const
+        index_t starting_index( const index_t polygon ) const
         {
             return polygon_ptr_[polygon];
         }

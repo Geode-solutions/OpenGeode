@@ -38,7 +38,7 @@ namespace geode
     public:
         Impl()
         {
-            for( auto i : Range{ dimension } )
+            for( const auto i : Range{ dimension } )
             {
                 min_.set_value( i, std::numeric_limits< double >::max() );
                 max_.set_value( i, std::numeric_limits< double >::min() );
@@ -57,7 +57,7 @@ namespace geode
 
         void add_point( const Point< dimension >& point )
         {
-            for( auto i : Range{ dimension } )
+            for( const auto i : Range{ dimension } )
             {
                 min_.set_value(
                     i, std::min( min_.value( i ), point.value( i ) ) );
@@ -126,7 +126,7 @@ namespace geode
     template < index_t dimension >
     Point< dimension > BoundingBox< dimension >::center() const
     {
-        return ( min() + max() ) * 0.5;
+        return ( min() + max() ) / 2.;
     }
 
     template < index_t dimension >
@@ -147,7 +147,7 @@ namespace geode
     bool BoundingBox< dimension >::boxes_overlap(
         const BoundingBox< dimension >& box ) const
     {
-        for( auto i : Range{ dimension } )
+        for( const auto i : Range{ dimension } )
         {
             if( max().value( i ) < box.min().value( i ) )
             {
@@ -182,7 +182,7 @@ namespace geode
 
         Point< dimension > minimal_max;
         Point< dimension > maximal_min;
-        for( auto c : Range{ dimension } )
+        for( const auto c : Range{ dimension } )
         {
             minimal_max.set_value(
                 c, std::min( this->max().value( c ), box.max().value( c ) ) );
@@ -199,7 +199,7 @@ namespace geode
     bool BoundingBox< dimension >::contains(
         const Point< dimension >& point ) const
     {
-        for( auto i : Range{ dimension } )
+        for( const auto i : Range{ dimension } )
         {
             if( point.value( i ) < min().value( i ) )
             {

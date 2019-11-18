@@ -52,12 +52,12 @@ namespace geode
                 uuid2index_.erase( id );
             }
 
-            void set_new_mapping( const uuid& id, index_t index )
+            void set_new_mapping( const uuid& id, const index_t index )
             {
                 uuid2index_[id] = index;
             }
 
-            void decrement_indices_larger_than( index_t index )
+            void decrement_indices_larger_than( const index_t index )
             {
                 for( auto& it : uuid2index_ )
                 {

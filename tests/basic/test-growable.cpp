@@ -103,7 +103,7 @@ Out test_growable( const T &foo )
     geode::Deserializer deserializer{ context_input, input };
     Out new_foo;
     deserializer.object( new_foo );
-    auto &adapter = deserializer.adapter();
+    const auto &adapter = deserializer.adapter();
     OPENGEODE_EXCEPTION( adapter.error() == bitsery::ReaderError::NoError
                              && adapter.isCompletedSuccessfully(),
         "[Test] Error while reading file" );

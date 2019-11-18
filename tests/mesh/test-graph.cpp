@@ -144,7 +144,7 @@ void test_io( const geode::Graph& graph, const std::string& filename )
 
 void test_clone( const geode::Graph& graph )
 {
-    auto graph2 = graph.clone();
+    const auto graph2 = graph.clone();
     OPENGEODE_EXCEPTION(
         graph2->nb_vertices() == 3, "[Test] Graph2 should have 3 vertices" );
     OPENGEODE_EXCEPTION(
@@ -172,15 +172,14 @@ int main()
 
         test_create_vertices( *graph, *builder );
         test_create_edges( *graph, *builder );
-        auto base_file = "test." + graph->native_extension();
-        test_io( *graph, base_file );
+        test_io( *graph, "test." + graph->native_extension() );
 
         test_delete_vertex( *graph, *builder );
         test_delete_edge( *graph, *builder );
         test_clone( *graph );
         test_delete_isolated_vertices( *graph, *builder );
 
-        auto default_graph = Graph::create();
+        const auto default_graph = Graph::create();
         OPENGEODE_EXCEPTION(
             default_graph->type_name() == OpenGeodeGraph::type_name_static(),
             "[Test] Default type for Graph should be OpenGeodeGraph" );

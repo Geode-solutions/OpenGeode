@@ -52,7 +52,8 @@ namespace geode
             mapping.reserve( from.nb_corners() );
             for( const auto& corner : from.corners() )
             {
-                auto id = builder_to.add_corner( corner.mesh().type_name() );
+                const auto id =
+                    builder_to.add_corner( corner.mesh().type_name() );
                 mapping.emplace( corner.id(), id );
                 builder_to.register_mesh_component( to.corner( id ) );
             }
@@ -67,7 +68,7 @@ namespace geode
             mapping.reserve( from.nb_lines() );
             for( const auto& line : from.lines() )
             {
-                auto id = builder_to.add_line( line.mesh().type_name() );
+                const auto id = builder_to.add_line( line.mesh().type_name() );
                 mapping.emplace( line.id(), id );
                 builder_to.register_mesh_component( to.line( id ) );
             }
@@ -82,7 +83,8 @@ namespace geode
             mapping.reserve( from.nb_surfaces() );
             for( const auto& surface : from.surfaces() )
             {
-                auto id = builder_to.add_surface( surface.mesh().type_name() );
+                const auto id =
+                    builder_to.add_surface( surface.mesh().type_name() );
                 mapping.emplace( surface.id(), id );
                 builder_to.register_mesh_component( to.surface( id ) );
             }
@@ -97,7 +99,8 @@ namespace geode
             mapping.reserve( from.nb_blocks() );
             for( const auto& block : from.blocks() )
             {
-                auto id = builder_to.add_block( block.mesh().type_name() );
+                const auto id =
+                    builder_to.add_block( block.mesh().type_name() );
                 mapping.emplace( block.id(), id );
                 builder_to.register_mesh_component( to.block( id ) );
             }
@@ -311,9 +314,9 @@ namespace geode
             const ComponentType& type,
             const Mapping& mapping )
         {
-            for( auto v : Range{ from.nb_unique_vertices() } )
+            for( const auto v : Range{ from.nb_unique_vertices() } )
             {
-                auto vertices = from.mesh_component_vertices( v, type );
+                const auto vertices = from.mesh_component_vertices( v, type );
                 for( const auto& mesh_vertex : vertices )
                 {
                     builder_to.set_unique_vertex(

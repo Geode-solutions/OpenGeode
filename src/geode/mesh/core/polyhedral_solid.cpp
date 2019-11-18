@@ -41,7 +41,7 @@ namespace
 {
     template < geode::index_t dimension >
     void check_polyhedron_id( const geode::PolyhedralSolid< dimension >& solid,
-        geode::index_t polyhedron_id )
+        const geode::index_t polyhedron_id )
     {
         OPENGEODE_EXCEPTION( polyhedron_id < solid.nb_polyhedra(),
             "[check_polyhedron_id] Trying to access an invalid polyhedron" );
@@ -50,8 +50,8 @@ namespace
     template < geode::index_t dimension >
     void check_polyhedron_vertex_id(
         const geode::PolyhedralSolid< dimension >& solid,
-        geode::index_t polyhedron_id,
-        geode::index_t vertex_id )
+        const geode::index_t polyhedron_id,
+        const geode::index_t vertex_id )
     {
         OPENGEODE_EXCEPTION(
             vertex_id < solid.nb_polyhedron_vertices( polyhedron_id ),
@@ -62,8 +62,8 @@ namespace
     template < geode::index_t dimension >
     void check_polyhedron_facet_id(
         const geode::PolyhedralSolid< dimension >& solid,
-        geode::index_t polyhedron_id,
-        geode::index_t facet_id )
+        const geode::index_t polyhedron_id,
+        const geode::index_t facet_id )
     {
         OPENGEODE_EXCEPTION(
             facet_id < solid.nb_polyhedron_facets( polyhedron_id ),
@@ -74,12 +74,12 @@ namespace
     template < geode::index_t dimension >
     void check_polyhedron_facet_vertex_id(
         const geode::PolyhedralSolid< dimension >& solid,
-        geode::index_t polyhedron_id,
-        geode::index_t facet_id,
-        geode::index_t vertex_id )
+        const geode::index_t polyhedron_id,
+        const geode::index_t facet_id,
+        const geode::index_t vertex_id )
     {
         OPENGEODE_EXCEPTION( vertex_id < solid.nb_polyhedron_facet_vertices(
-                                 { polyhedron_id, facet_id } ),
+                                             { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -95,21 +95,21 @@ namespace geode
     public:
         explicit Impl( PolyhedralSolid& solid )
             : polyhedron_around_vertex_(
-                solid.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolyhedronVertex >(
-                        "polyhedron_around_vertex", PolyhedronVertex{} ) )
+                  solid.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolyhedronVertex >(
+                          "polyhedron_around_vertex", PolyhedronVertex{} ) )
         {
         }
 
         const PolyhedronVertex& polyhedron_around_vertex(
-            index_t vertex_id ) const
+            const index_t vertex_id ) const
         {
             return polyhedron_around_vertex_->value( vertex_id );
         }
 
         void associate_polyhedron_vertex_to_vertex(
-            const PolyhedronVertex& polyhedron_vertex, index_t vertex_id )
+            const PolyhedronVertex& polyhedron_vertex, const index_t vertex_id )
         {
             polyhedron_around_vertex_->set_value(
                 vertex_id, polyhedron_vertex );
@@ -127,14 +127,14 @@ namespace geode
         }
 
         const std::vector< index_t >& get_facet_vertices(
-            index_t facet_id ) const
+            const index_t facet_id ) const
         {
             return FacetStorage::get_facet_vertices( facet_id );
         }
 
         void update_facet_vertex( const std::vector< index_t >& facet_vertices,
-            index_t facet_vertex_id,
-            index_t new_vertex_id )
+            const index_t facet_vertex_id,
+            const index_t new_vertex_id )
         {
             auto updated_facet_vertices = facet_vertices;
             updated_facet_vertices[facet_vertex_id] = new_vertex_id;
@@ -234,9 +234,10 @@ namespace geode
             catch( const OpenGeodeException& e )
             {
                 Logger::error( e.what() );
-                throw OpenGeodeException(
+                throw OpenGeodeException{
                     "Could not create PolyhedralSolid data structure: ",
-                    type.get() );
+                    type.get()
+                };
             }
         }
     }
@@ -245,14 +246,14 @@ namespace geode
     double PolyhedralSolid< dimension >::polyhedron_volume(
         index_t /*unused*/ ) const
     {
-        throw OpenGeodeException( "polyhedron_volume not implemented yet" );
+        throw OpenGeodeException{ "polyhedron_volume not implemented yet" };
         return 0;
     }
 
     template < index_t dimension >
     double PolyhedralSolid< dimension >::facet_area( index_t /*unused*/ ) const
     {
-        throw OpenGeodeException( "facet_area not implemented yet" );
+        throw OpenGeodeException{ "facet_area not implemented yet" };
         return 0;
     }
 
@@ -275,7 +276,7 @@ namespace geode
             *this, polyhedron_facet.polyhedron_id, polyhedron_facet.facet_id );
         std::vector< index_t > facet_vertices(
             nb_polyhedron_facet_vertices( polyhedron_facet ) );
-        for( auto v : Range{ facet_vertices.size() } )
+        for( const auto v : Range{ facet_vertices.size() } )
         {
             facet_vertices[v] =
                 polyhedron_facet_vertex( { polyhedron_facet, v } );
@@ -288,7 +289,7 @@ namespace geode
         index_t polyhedron_id ) const
     {
         Point< dimension > barycenter;
-        for( auto v : Range{ nb_polyhedron_vertices( polyhedron_id ) } )
+        for( const auto v : Range{ nb_polyhedron_vertices( polyhedron_id ) } )
         {
             barycenter =
                 barycenter
@@ -302,11 +303,11 @@ namespace geode
         index_t facet_id ) const
     {
         Point< dimension > barycenter;
-        auto vertices = facet_vertices( facet_id );
+        const auto vertices = facet_vertices( facet_id );
         OPENGEODE_ASSERT( !vertices.empty(),
             "[PolyhedralSolid::facet_barycenter] Facet "
             "vertices should not be empty" );
-        for( auto v : vertices )
+        for( const auto v : vertices )
         {
             barycenter = barycenter + this->point( v );
         }
@@ -325,7 +326,8 @@ namespace geode
             index_t vertex_id ) const
     {
         OPENGEODE_EXCEPTION( vertex_id < this->nb_vertices(),
-            "[PolyhedralSolid::polyhedra_around_vertex] Accessing an invalid "
+            "[PolyhedralSolid::polyhedra_around_vertex] Accessing an "
+            "invalid "
             "vertex" );
         std::vector< PolyhedronVertex > polyhedra;
         const auto& first_polyhedron =
@@ -335,7 +337,8 @@ namespace geode
             return polyhedra;
         }
         OPENGEODE_ASSERT( polyhedron_vertex( first_polyhedron ) == vertex_id,
-            "[PolyhedralSolid::polyhedra_around_vertex] Wrong polyhedron "
+            "[PolyhedralSolid::polyhedra_around_vertex] Wrong "
+            "polyhedron "
             "around vertex" );
         std::vector< index_t > polyhedra_visited;
         polyhedra_visited.reserve( 10 );
@@ -343,9 +346,9 @@ namespace geode
         S.push( first_polyhedron );
         while( !S.empty() )
         {
-            auto polyhedron_vertex_id = S.top();
+            const auto polyhedron_vertex_id = S.top();
             S.pop();
-            auto p = polyhedron_vertex_id.polyhedron_id;
+            const auto p = polyhedron_vertex_id.polyhedron_id;
             if( contain( polyhedra_visited, p ) )
             {
                 continue;
@@ -353,10 +356,10 @@ namespace geode
             polyhedra_visited.push_back( p );
             polyhedra.push_back( polyhedron_vertex_id );
 
-            for( auto f : Range{ nb_polyhedron_facets( p ) } )
+            for( const auto f : Range{ nb_polyhedron_facets( p ) } )
             {
-                PolyhedronFacet polyhedron_facet{ p, f };
-                for( auto v :
+                const PolyhedronFacet polyhedron_facet{ p, f };
+                for( const auto v :
                     Range{ nb_polyhedron_facet_vertices( polyhedron_facet ) } )
                 {
                     if( polyhedron_facet_vertex( { polyhedron_facet, v } )
@@ -364,12 +367,13 @@ namespace geode
                     {
                         if( !is_polyhedron_facet_on_border( polyhedron_facet ) )
                         {
-                            auto adj_polyhedron =
+                            const auto adj_polyhedron =
                                 polyhedron_adjacent( polyhedron_facet );
                             PolyhedronVertex adj_vertex{ adj_polyhedron,
                                 NO_ID };
-                            for( auto v_adj : Range{ nb_polyhedron_vertices(
-                                     adj_polyhedron ) } )
+                            for( const auto v_adj :
+                                Range{
+                                    nb_polyhedron_vertices( adj_polyhedron ) } )
                             {
                                 if( polyhedron_vertex(
                                         { adj_polyhedron, v_adj } )
@@ -395,7 +399,8 @@ namespace geode
             index_t vertex_id ) const
     {
         OPENGEODE_EXCEPTION( vertex_id < this->nb_vertices(),
-            "[PolyhedralSolid::polyhedron_around_vertex] Accessing an invalid "
+            "[PolyhedralSolid::polyhedron_around_vertex] Accessing an "
+            "invalid "
             "vertex" );
         return impl_->polyhedron_around_vertex( vertex_id );
     }
@@ -532,19 +537,21 @@ namespace geode
         {
             std::vector< index_t > vertices(
                 nb_polyhedron_facet_vertices( polyhedron_facet ) );
-            for( auto v : Range{ vertices.size() } )
+            for( const auto v : Range{ vertices.size() } )
             {
                 vertices[v] =
                     polyhedron_facet_vertex( { polyhedron_facet, v } );
             }
-            auto polyhedron_adj = polyhedron_adjacent( polyhedron_facet );
-            for( auto f : Range{ nb_polyhedron_facets( polyhedron_adj ) } )
+            const auto polyhedron_adj = polyhedron_adjacent( polyhedron_facet );
+            for( const auto f :
+                Range{ nb_polyhedron_facets( polyhedron_adj ) } )
             {
-                auto polyhedron = polyhedron_adjacent( { polyhedron_adj, f } );
+                const auto polyhedron =
+                    polyhedron_adjacent( { polyhedron_adj, f } );
                 if( polyhedron == polyhedron_facet.polyhedron_id )
                 {
                     bool all_contained{ true };
-                    for( auto v : Range{ nb_polyhedron_facet_vertices(
+                    for( const auto v : Range{ nb_polyhedron_facet_vertices(
                              { polyhedron_adj, f } ) } )
                     {
                         if( !contain(
@@ -561,9 +568,9 @@ namespace geode
                     }
                 }
             }
-            throw OpenGeodeException( "[PolyhedralSolid::polyhedron_adjacent_"
+            throw OpenGeodeException{ "[PolyhedralSolid::polyhedron_adjacent_"
                                       "facet] Wrong adjacency with polyhedra: ",
-                polyhedron_facet.polyhedron_id, " and ", polyhedron_adj );
+                polyhedron_facet.polyhedron_id, " and ", polyhedron_adj };
         }
         return {};
     }
@@ -582,9 +589,9 @@ namespace geode
     {
         check_polyhedron_id( *this, polyhedron_id );
         std::vector< PolyhedronFacet > borders;
-        for( auto f : Range{ nb_polyhedron_facets( polyhedron_id ) } )
+        for( const auto f : Range{ nb_polyhedron_facets( polyhedron_id ) } )
         {
-            PolyhedronFacet facet{ polyhedron_id, f };
+            const PolyhedronFacet facet{ polyhedron_id, f };
             if( is_polyhedron_facet_on_border( facet ) )
             {
                 borders.emplace_back( facet );
@@ -612,7 +619,8 @@ namespace geode
         index_t vertex_id ) const
     {
         OPENGEODE_EXCEPTION( vertex_id < nb_vertices(),
-            "[PolyhedralSolid::point] Trying to access an invalid point" );
+            "[PolyhedralSolid::point] Trying to access an invalid "
+            "point" );
         return get_point( vertex_id );
     }
 

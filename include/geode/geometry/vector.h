@@ -72,9 +72,9 @@ namespace geode
         Vector operator*( double s ) const
         {
             Vector< dimension > result{ *this };
-            for( auto d : Range{ dimension } )
+            for( auto i : Range{ dimension } )
             {
-                result.set_value( d, s * result.value( d ) );
+                result.set_value( i, s * result.value( i ) );
             }
             return result;
         }
@@ -82,7 +82,7 @@ namespace geode
         double dot( const Vector &other ) const
         {
             double result{ 0 };
-            for( auto i : Range{ dimension } )
+            for( const auto i : Range{ dimension } )
             {
                 result += this->value( i ) * other.value( i );
             }

@@ -86,16 +86,16 @@ void test_io( const geode::PointSet3D& point_set, const std::string& filename )
 
 void test_clone( const geode::PointSet3D& point_set )
 {
-    auto point_set2 = point_set.clone();
+    const auto point_set2 = point_set.clone();
     OPENGEODE_EXCEPTION( point_set2->nb_vertices() == 3,
         "[Test] PointSet2 should have 3 vertices" );
 
-    auto attribute =
+    const auto attribute =
         point_set2->vertex_attribute_manager().find_attribute< bool >( "test" );
     OPENGEODE_EXCEPTION( attribute->value( 0 ) == true,
         "[Test] PointSet2 attribute value should be true" );
 
-    geode::Point3D answer{ { 2.1, 9.4, 6.7 } };
+    const geode::Point3D answer{ { 2.1, 9.4, 6.7 } };
     OPENGEODE_EXCEPTION( point_set2->point( 0 ) == answer,
         "[Test] PointSet2 vertex coordinates are not correct" );
 }
@@ -111,8 +111,7 @@ int main()
         auto builder = PointSetBuilder3D::create( *point_set );
         test_create_vertices( *point_set, *builder );
         test_create_vertex_attribute( *point_set );
-        auto base_file = "test." + point_set->native_extension();
-        test_io( *point_set, base_file );
+        test_io( *point_set, "test." + point_set->native_extension() );
         test_delete_vertex( *point_set, *builder );
         test_clone( *point_set );
 

@@ -43,13 +43,14 @@ namespace geode
     public:
         explicit Impl( Graph& graph )
             : edges_around_vertex_(
-                graph.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        std::vector< EdgeVertex > >( "edges_around_vertex", [] {
-                        std::vector< EdgeVertex > edges;
-                        edges.reserve( 2 );
-                        return edges;
-                    }() ) )
+                  graph.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          std::vector< EdgeVertex > >(
+                          "edges_around_vertex", [] {
+                              std::vector< EdgeVertex > edges;
+                              edges.reserve( 2 );
+                              return edges;
+                          }() ) )
         {
         }
 
@@ -59,26 +60,28 @@ namespace geode
         }
 
         const std::vector< EdgeVertex >& edges_around_vertex(
-            index_t vertex_id ) const
+            const index_t vertex_id ) const
         {
             return edges_around_vertex_->value( vertex_id );
         }
 
-        void set_edges_around_vertex(
-            index_t vertex_id, const std::vector< EdgeVertex >& edges ) const
+        void set_edges_around_vertex( const index_t vertex_id,
+            const std::vector< EdgeVertex >& edges ) const
         {
             edges_around_vertex_->set_value( vertex_id, edges );
         }
 
         void associate_edge_vertex_to_vertex( const Graph& graph,
             const EdgeVertex& edge_vertex,
-            index_t vertex_id )
+            const index_t vertex_id )
         {
-            auto previous_vertex = graph.edge_vertex( edge_vertex );
+            const auto previous_vertex = graph.edge_vertex( edge_vertex );
             if( previous_vertex < graph.nb_vertices() )
             {
-                auto& edges = edges_around_vertex_->value( previous_vertex );
-                auto it = std::find( edges.begin(), edges.end(), edge_vertex );
+                const auto& edges =
+                    edges_around_vertex_->value( previous_vertex );
+                const auto it =
+                    std::find( edges.begin(), edges.end(), edge_vertex );
                 if( it != edges.end() )
                 {
                     edges_around_vertex_->modify_value( previous_vertex,
@@ -87,8 +90,9 @@ namespace geode
                         } );
                 }
             }
-            auto& edges = edges_around_vertex_->value( vertex_id );
-            auto it = std::find( edges.begin(), edges.end(), edge_vertex );
+            const auto& edges = edges_around_vertex_->value( vertex_id );
+            const auto it =
+                std::find( edges.begin(), edges.end(), edge_vertex );
             if( it == edges.end() )
             {
                 edges_around_vertex_->modify_value( vertex_id,
@@ -138,8 +142,8 @@ namespace geode
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            throw OpenGeodeException(
-                "Could not create Graph data structure: ", type.get() );
+            throw OpenGeodeException{ "Could not create Graph data structure: ",
+                type.get() };
         }
     }
 

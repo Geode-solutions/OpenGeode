@@ -35,6 +35,7 @@
 
 #include <geode/model/mixin/core/block.h>
 #include <geode/model/mixin/core/corner.h>
+#include <geode/model/mixin/core/detail/count_relationships.h>
 #include <geode/model/mixin/core/line.h>
 #include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
@@ -43,24 +44,12 @@
 #include <geode/model/representation/io/section_input.h>
 #include <geode/model/representation/io/section_output.h>
 
-template < typename Range >
-geode::index_t count_components( Range range )
-{
-    geode::index_t count{ 0 };
-    for( const auto& unused : range )
-    {
-        geode_unused( unused );
-        count++;
-    }
-    return count;
-}
-
 std::vector< geode::uuid > add_corners(
     const geode::Section& model, geode::SectionBuilder& builder )
 {
-    geode::index_t nb{ 5 };
+    const geode::index_t nb{ 5 };
     std::vector< geode::uuid > uuids;
-    for( auto unused : geode::Range{ nb } )
+    for( const auto unused : geode::Range{ nb } )
     {
         geode_unused( unused );
         uuids.push_back( builder.add_corner() );
@@ -68,17 +57,18 @@ std::vector< geode::uuid > add_corners(
     const auto& temp_corner = model.corner(
         builder.add_corner( geode::OpenGeodePointSet2D::type_name_static() ) );
     builder.remove_corner( temp_corner );
-    auto message =
+    const auto message =
         "[Test] Section should have " + std::to_string( nb ) + " corners";
     OPENGEODE_EXCEPTION( model.nb_corners() == nb, message );
-    OPENGEODE_EXCEPTION( count_components( model.corners() ) == nb, message );
+    OPENGEODE_EXCEPTION(
+        geode::detail::count_relationships( model.corners() ) == nb, message );
     return uuids;
 }
 
 std::vector< geode::uuid > add_lines(
     const geode::Section& model, geode::SectionBuilder& builder )
 {
-    geode::index_t nb{ 6 };
+    const geode::index_t nb{ 6 };
     std::vector< geode::uuid > uuids;
     for( auto unused : geode::Range{ nb } )
     {
@@ -88,19 +78,20 @@ std::vector< geode::uuid > add_lines(
     const auto& temp_line = model.line(
         builder.add_line( geode::OpenGeodeEdgedCurve2D::type_name_static() ) );
     builder.remove_line( temp_line );
-    auto message =
+    const auto message =
         "[Test] Section should have " + std::to_string( nb ) + " lines";
     OPENGEODE_EXCEPTION( model.nb_lines() == nb, message );
-    OPENGEODE_EXCEPTION( count_components( model.lines() ) == nb, message );
+    OPENGEODE_EXCEPTION(
+        geode::detail::count_relationships( model.lines() ) == nb, message );
     return uuids;
 }
 
 std::vector< geode::uuid > add_surfaces(
     const geode::Section& model, geode::SectionBuilder& builder )
 {
-    geode::index_t nb{ 2 };
+    const geode::index_t nb{ 2 };
     std::vector< geode::uuid > uuids;
-    for( auto unused : geode::Range{ nb } )
+    for( const auto unused : geode::Range{ nb } )
     {
         geode_unused( unused );
         uuids.push_back( builder.add_surface() );
@@ -108,17 +99,18 @@ std::vector< geode::uuid > add_surfaces(
     const auto& temp_surface = model.surface( builder.add_surface(
         geode::OpenGeodePolygonalSurface2D::type_name_static() ) );
     builder.remove_surface( temp_surface );
-    auto message =
+    const auto message =
         "[Test] Section should have " + std::to_string( nb ) + " surfaces";
     OPENGEODE_EXCEPTION( model.nb_surfaces() == nb, message );
-    OPENGEODE_EXCEPTION( count_components( model.surfaces() ) == nb, message );
+    OPENGEODE_EXCEPTION(
+        geode::detail::count_relationships( model.surfaces() ) == nb, message );
     return uuids;
 }
 
 std::vector< geode::uuid > add_model_boundaries(
     const geode::Section& section, geode::SectionBuilder& builder )
 {
-    geode::index_t nb{ 2 };
+    const geode::index_t nb{ 2 };
     std::vector< geode::uuid > uuids;
     for( auto unused : geode::Range{ nb } )
     {
@@ -130,11 +122,12 @@ std::vector< geode::uuid > add_model_boundaries(
     const auto& temp_boundary =
         section.model_boundary( builder.add_model_boundary() );
     builder.remove_model_boundary( temp_boundary );
-    auto message = "[Test] Section should have " + std::to_string( nb )
-                   + " model boundaries";
+    const auto message = "[Test] Section should have " + std::to_string( nb )
+                         + " model boundaries";
     OPENGEODE_EXCEPTION( section.nb_model_boundaries() == nb, message );
     OPENGEODE_EXCEPTION(
-        count_components( section.model_boundaries() ) == nb, message );
+        geode::detail::count_relationships( section.model_boundaries() ) == nb,
+        message );
     OPENGEODE_EXCEPTION(
         section.model_boundary( uuids[0] ).name() == "boundary1",
         "[Test] Wrong ModelBoundary name" );
@@ -233,13 +226,13 @@ void add_lines_in_model_boundaries( const geode::Section& model,
 {
     builder.add_line_in_model_boundary( model.line( line_uuids[0] ),
         model.model_boundary( boundary_uuids[0] ) );
-    for( auto i : geode::Range{ 1, 3 } )
+    for( const auto i : geode::Range{ 1, 3 } )
     {
         builder.add_line_in_model_boundary( model.line( line_uuids[i] ),
             model.model_boundary( boundary_uuids[1] ) );
     }
 
-    for( auto i : geode::Range{ 3 } )
+    for( const auto i : geode::Range{ 3 } )
     {
         OPENGEODE_EXCEPTION( model.nb_collections( line_uuids[i] ) == 1,
             "[Test] This Line should be in 1 collection (of type Boundary)" );
@@ -405,7 +398,7 @@ void test_clone( const geode::Section& section )
     OPENGEODE_EXCEPTION( section2.nb_model_boundaries() == 2,
         "[Test] Section should have 2 model boundaries" );
 
-    auto mapping = builder.copy_components( section );
+    const auto mapping = builder.copy_components( section );
     builder.copy_component_relationships( mapping, section );
     OPENGEODE_EXCEPTION(
         section2.nb_corners() == 10, "[Test] Section should have 10 corners" );
@@ -485,10 +478,11 @@ int main()
 
         // This Section represents a house (with one triangle and one square as
         // in children sketches)
-        auto corner_uuids = add_corners( model, builder );
-        auto line_uuids = add_lines( model, builder );
-        auto surface_uuids = add_surfaces( model, builder );
-        auto model_boundary_uuids = add_model_boundaries( model, builder );
+        const auto corner_uuids = add_corners( model, builder );
+        const auto line_uuids = add_lines( model, builder );
+        const auto surface_uuids = add_surfaces( model, builder );
+        const auto model_boundary_uuids =
+            add_model_boundaries( model, builder );
 
         add_corner_line_boundary_relation(
             model, builder, corner_uuids, line_uuids );

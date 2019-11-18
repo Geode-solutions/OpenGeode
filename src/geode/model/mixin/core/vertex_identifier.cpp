@@ -32,11 +32,11 @@ namespace geode
     public:
         Impl()
             : component_vertices_(
-                unique_vertices_.vertex_attribute_manager()
-                    .find_or_create_attribute< VariableAttribute,
-                        std::vector< MeshComponentVertex > >(
-                        "component vertices",
-                        std::vector< MeshComponentVertex >{} ) )
+                  unique_vertices_.vertex_attribute_manager()
+                      .find_or_create_attribute< VariableAttribute,
+                          std::vector< MeshComponentVertex > >(
+                          "component vertices",
+                          std::vector< MeshComponentVertex >{} ) )
         {
         }
 
@@ -52,7 +52,7 @@ namespace geode
         }
 
         index_t unique_vertex(
-            const uuid& component_id, index_t vertex_id ) const
+            const uuid& component_id, const index_t vertex_id ) const
         {
             return vertex2unique_vertex_.at( component_id )->value( vertex_id );
         }
@@ -83,7 +83,7 @@ namespace geode
                             index_t >( "unique vertices", NO_ID );
                 try
                 {
-                    for( auto v : Range{ mesh.nb_vertices() } )
+                    for( const auto v : Range{ mesh.nb_vertices() } )
                     {
                         attribute->set_value( v, it->second->value( v ) );
                     }
@@ -113,14 +113,14 @@ namespace geode
                 .create_vertex();
         }
 
-        index_t create_unique_vertices( index_t nb )
+        index_t create_unique_vertices( const index_t nb )
         {
             return OpenGeodeVertexSetBuilder{ unique_vertices_ }
                 .create_vertices( nb );
         }
 
-        void set_unique_vertex(
-            MeshComponentVertex component_vertex_id, index_t unique_vertex_id )
+        void set_unique_vertex( MeshComponentVertex component_vertex_id,
+            const index_t unique_vertex_id )
         {
             const auto& old_unique_id =
                 vertex2unique_vertex_
@@ -135,7 +135,7 @@ namespace geode
             {
                 const auto& old_vertices =
                     component_vertices_->value( old_unique_id );
-                auto it = find( old_vertices, component_vertex_id );
+                const auto it = find( old_vertices, component_vertex_id );
                 if( it != NO_ID )
                 {
                     component_vertices_->modify_value( old_unique_id,
@@ -153,7 +153,8 @@ namespace geode
                 component_vertices_->modify_value( unique_vertex_id,
                     [&component_vertex_id](
                         std::vector< MeshComponentVertex >& vertices ) {
-                        vertices.emplace_back( component_vertex_id );
+                        vertices.emplace_back(
+                            std::move( component_vertex_id ) );
                     } );
                 ;
             }
@@ -161,7 +162,7 @@ namespace geode
 
         std::string save( const std::string& directory ) const
         {
-            auto filename = directory + "/vertices";
+            const auto filename = directory + "/vertices";
             std::ofstream file{ filename, std::ofstream::binary };
             TContext context{};
             register_basic_serialize_pcontext( std::get< 0 >( context ) );
@@ -179,7 +180,7 @@ namespace geode
 
         void load( const std::string& directory )
         {
-            auto filename = directory + "/vertices";
+            const auto filename = directory + "/vertices";
             std::ifstream file{ filename, std::ifstream::binary };
             TContext context{};
             register_basic_deserialize_pcontext( std::get< 0 >( context ) );
@@ -188,7 +189,7 @@ namespace geode
             register_model_deserialize_pcontext( std::get< 0 >( context ) );
             Deserializer archive{ context, file };
             archive.object( *this );
-            auto& adapter = archive.adapter();
+            const auto& adapter = archive.adapter();
             OPENGEODE_EXCEPTION(
                 adapter.error() == bitsery::ReaderError::NoError
                     && adapter.isCompletedSuccessfully()
@@ -222,14 +223,13 @@ namespace geode
 
         void filter_component_vertices( const uuid& component_id )
         {
-            for( auto uv_id : Range{ nb_unique_vertices() } )
+            for( const auto uv_id : Range{ nb_unique_vertices() } )
             {
                 const auto& mesh_component_vertices =
                     component_vertices_->value( uv_id );
-
                 std::vector< bool > to_keep(
                     mesh_component_vertices.size(), true );
-                for( auto i : Range{ mesh_component_vertices.size() } )
+                for( const auto i : Range{ mesh_component_vertices.size() } )
                 {
                     if( mesh_component_vertices[i].component_id.id()
                         == component_id )

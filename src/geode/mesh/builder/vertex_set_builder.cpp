@@ -39,9 +39,10 @@ namespace geode
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            throw OpenGeodeException(
+            throw OpenGeodeException{
                 "Could not create VertexSet builder of data structure: ",
-                mesh.type_name().get() );
+                mesh.type_name().get()
+            };
         }
     }
 
@@ -54,7 +55,7 @@ namespace geode
 
     index_t VertexSetBuilder::create_vertex()
     {
-        auto added_vertex = vertex_set_.nb_vertices();
+        const auto added_vertex = vertex_set_.nb_vertices();
         vertex_set_.vertex_attribute_manager().resize( added_vertex + 1 );
         do_create_vertex();
         return added_vertex;
@@ -62,7 +63,7 @@ namespace geode
 
     index_t VertexSetBuilder::create_vertices( index_t nb )
     {
-        auto first_added_vertex = vertex_set_.nb_vertices();
+        const auto first_added_vertex = vertex_set_.nb_vertices();
         vertex_set_.vertex_attribute_manager().resize(
             first_added_vertex + nb );
         do_create_vertices( nb );

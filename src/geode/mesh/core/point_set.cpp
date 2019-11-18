@@ -51,8 +51,9 @@ namespace geode
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            throw OpenGeodeException(
-                "Could not create PointSet data structure: ", type.get() );
+            throw OpenGeodeException{
+                "Could not create PointSet data structure: ", type.get()
+            };
         }
     }
 

@@ -42,7 +42,7 @@ namespace geode
     template < typename T, typename container >
     index_t find( const container& in, const T& value )
     {
-        auto it = std::find( in.begin(), in.end(), value );
+        const auto it = std::find( in.begin(), in.end(), value );
         if( it == in.end() )
         {
             return NO_ID;
@@ -91,7 +91,7 @@ namespace geode
         {
             return 0;
         }
-        for( auto i : Range{ to_delete.size() } )
+        for( const auto i : Range{ to_delete.size() } )
         {
             if( to_delete[i] )
             {
@@ -131,7 +131,7 @@ namespace geode
         std::vector< T > out_values;
         out_values.reserve(
             std::count( to_keep.begin(), to_keep.end(), true ) );
-        for( auto i : Range{ to_keep.size() } )
+        for( const auto i : Range{ to_keep.size() } )
         {
             if( to_keep[i] )
             {
