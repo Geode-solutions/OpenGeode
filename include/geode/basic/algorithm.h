@@ -147,7 +147,7 @@ namespace geode
      * @param[in] in container in which perform the search.
      */
     template < typename Container >
-    void unique( Container& in )
+    void sort_unique( Container& in )
     {
         std::sort( in.begin(), in.end() );
         const auto last = std::unique( in.begin(), in.end() );

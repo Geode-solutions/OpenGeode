@@ -115,10 +115,10 @@ void test_extract_vector_elements()
         "[Test] Extract elements result (keep_all) for double is not correct" );
 }
 
-void test_unique()
+void test_sort_unique()
 {
     std::vector< int > data{ 1, 2, 3, 1, 2, 3, 3, 4, 5, 4, 5, 6, 7 };
-    geode::unique( data );
+    geode::sort_unique( data );
 
     const std::vector< int > answer{ 1, 2, 3, 4, 5, 6, 7 };
     OPENGEODE_EXCEPTION(
@@ -135,7 +135,7 @@ int main()
         test_contain();
         test_delete_vector_elements();
         test_extract_vector_elements();
-        test_unique();
+        test_sort_unique();
 
         Logger::info( "TEST SUCCESS" );
         return 0;
