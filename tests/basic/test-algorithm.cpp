@@ -122,7 +122,7 @@ void test_sort_unique()
 
     const std::vector< int > answer{ 1, 2, 3, 4, 5, 6, 7 };
     OPENGEODE_EXCEPTION(
-        data == answer, "Vectors are not identical after unique()" );
+        data == answer, "[Test] Vectors are not identical after sort_unique()" );
 }
 
 int main()
