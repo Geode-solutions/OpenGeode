@@ -121,8 +121,8 @@ void test_sort_unique()
     geode::sort_unique( data );
 
     const std::vector< int > answer{ 1, 2, 3, 4, 5, 6, 7 };
-    OPENGEODE_EXCEPTION(
-        data == answer, "[Test] Vectors are not identical after sort_unique()" );
+    OPENGEODE_EXCEPTION( data == answer,
+        "[Test] Vectors are not identical after sort_unique()" );
 }
 
 int main()
