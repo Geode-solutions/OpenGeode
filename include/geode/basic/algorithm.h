@@ -34,13 +34,13 @@ namespace geode
     /*
      * Return the index of the first occurence of a given value in a container.
      * @tparam T Type of the container elements.
-     * @tparam container Type of container.
+     * @tparam Container Type of container.
      * @param[in] in Container in which perform the search.
      * @param[in] value Value to find.
      * @return The index of the first occurence of value, NO_ID if not found
      */
-    template < typename T, typename container >
-    index_t find( const container& in, const T& value )
+    template < typename T, typename Container >
+    index_t find( const Container& in, const T& value )
     {
         const auto it = std::find( in.begin(), in.end(), value );
         if( it == in.end() )
@@ -56,12 +56,12 @@ namespace geode
     /*
      * Return true if a given value exists in a container.
      * @tparam T Type of the container elements.
-     * @tparam container Type of container.
+     * @tparam Container Type of container.
      * @param[in] in Container in which perform the search.
      * @param[in] value Value to find
      */
-    template < typename T, typename container >
-    bool contain( const container& in, const T& value )
+    template < typename T, typename Container >
+    bool contain( const Container& in, const T& value )
     {
         return find( in, value ) != NO_ID;
     }
@@ -139,6 +139,19 @@ namespace geode
             }
         }
         return out_values;
+    }
+
+    /*
+     * Modify the container by removing every duplicated values inside
+     * @tparam Container Type of container.
+     * @param[in] in container in which perform the search.
+     */
+    template < typename Container >
+    void unique( Container& in )
+    {
+        std::sort( in.begin(), in.end() );
+        const auto last = std::unique( in.begin(), in.end() );
+        in.erase( last, in.end() );
     }
 
 } // namespace geode
