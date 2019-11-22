@@ -45,6 +45,8 @@
 #include <geode/model/representation/io/brep_input.h>
 #include <geode/model/representation/io/brep_output.h>
 
+#include <geode/tests/common.h>
+
 std::vector< geode::uuid > add_corners(
     const geode::BRep& model, geode::BRepBuilder& builder )
 {
@@ -708,62 +710,50 @@ void test_clone( const geode::BRep& brep )
     }
 }
 
-int main()
+void test()
 {
-    using namespace geode;
+    geode::BRep model;
+    geode::BRepBuilder builder( model );
 
-    try
-    {
-        BRep model;
-        BRepBuilder builder( model );
+    // This BRep represents a prism
+    const auto corner_uuids = add_corners( model, builder );
+    const auto line_uuids = add_lines( model, builder );
+    const auto surface_uuids = add_surfaces( model, builder );
+    const auto block_uuids = add_blocks( model, builder );
+    const auto model_boundary_uuids = add_model_boundaries( model, builder );
 
-        // This BRep represents a prism
-        const auto corner_uuids = add_corners( model, builder );
-        const auto line_uuids = add_lines( model, builder );
-        const auto surface_uuids = add_surfaces( model, builder );
-        const auto block_uuids = add_blocks( model, builder );
-        const auto model_boundary_uuids =
-            add_model_boundaries( model, builder );
+    add_corner_line_boundary_relation(
+        model, builder, corner_uuids, line_uuids );
+    add_line_surface_boundary_relation(
+        model, builder, line_uuids, surface_uuids );
+    add_surface_block_relation( model, builder, surface_uuids, block_uuids );
+    add_surfaces_in_model_boundaries(
+        model, builder, surface_uuids, model_boundary_uuids );
+    add_internal_corner_relations(
+        model, builder, corner_uuids, surface_uuids, block_uuids );
+    add_internal_line_relations(
+        model, builder, line_uuids, surface_uuids, block_uuids );
+    add_internal_surface_relations(
+        model, builder, surface_uuids, block_uuids );
+    OPENGEODE_EXCEPTION(
+        model.nb_internals( block_uuids.front() )
+            == corner_uuids.size() + line_uuids.size() + surface_uuids.size(),
+        "[Test] The Block should embed all Corners & Lines & Surfaces "
+        "(that are internal to the "
+        "Block)" );
+    test_boundary_ranges(
+        model, corner_uuids, line_uuids, surface_uuids, block_uuids );
+    test_incidence_ranges(
+        model, corner_uuids, line_uuids, surface_uuids, block_uuids );
+    test_item_ranges( model, surface_uuids, model_boundary_uuids );
+    test_clone( model );
 
-        add_corner_line_boundary_relation(
-            model, builder, corner_uuids, line_uuids );
-        add_line_surface_boundary_relation(
-            model, builder, line_uuids, surface_uuids );
-        add_surface_block_relation(
-            model, builder, surface_uuids, block_uuids );
-        add_surfaces_in_model_boundaries(
-            model, builder, surface_uuids, model_boundary_uuids );
-        add_internal_corner_relations(
-            model, builder, corner_uuids, surface_uuids, block_uuids );
-        add_internal_line_relations(
-            model, builder, line_uuids, surface_uuids, block_uuids );
-        add_internal_surface_relations(
-            model, builder, surface_uuids, block_uuids );
-        OPENGEODE_EXCEPTION( model.nb_internals( block_uuids.front() )
-                                 == corner_uuids.size() + line_uuids.size()
-                                        + surface_uuids.size(),
-            "[Test] The Block should embed all Corners & Lines & Surfaces "
-            "(that are internal to the "
-            "Block)" );
-        test_boundary_ranges(
-            model, corner_uuids, line_uuids, surface_uuids, block_uuids );
-        test_incidence_ranges(
-            model, corner_uuids, line_uuids, surface_uuids, block_uuids );
-        test_item_ranges( model, surface_uuids, model_boundary_uuids );
-        test_clone( model );
+    const std::string file_io{ "test." + model.native_extension() };
+    geode::save_brep( model, file_io );
 
-        const std::string file_io{ "test." + model.native_extension() };
-        save_brep( model, file_io );
-
-        BRep model2;
-        load_brep( model2, file_io );
-        test_reloaded_brep( model2 );
-
-        Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode_lippincott();
-    }
+    geode::BRep model2;
+    geode::load_brep( model2, file_io );
+    test_reloaded_brep( model2 );
 }
+
+OPENGEODE_TEST( "brep" )

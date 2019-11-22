@@ -32,6 +32,8 @@
 #include <geode/mesh/io/polyhedral_solid_input.h>
 #include <geode/mesh/io/polyhedral_solid_output.h>
 
+#include <geode/tests/common.h>
+
 void test_create_vertices( const geode::PolyhedralSolid3D& polyhedral_solid,
     geode::PolyhedralSolidBuilder3D& builder )
 {
@@ -273,37 +275,27 @@ void test_delete_all( const geode::PolyhedralSolid3D& polyhedral_solid,
         "[Test]PolyhedralSolid should have 0 vertex" );
 }
 
-int main()
+void test()
 {
-    using namespace geode;
+    auto polyhedral_solid = geode::PolyhedralSolid3D::create(
+        geode::OpenGeodePolyhedralSolid3D::type_name_static() );
+    auto builder = geode::PolyhedralSolidBuilder3D::create( *polyhedral_solid );
 
-    try
-    {
-        auto polyhedral_solid = PolyhedralSolid3D::create(
-            OpenGeodePolyhedralSolid3D::type_name_static() );
-        auto builder = PolyhedralSolidBuilder3D::create( *polyhedral_solid );
+    test_create_vertices( *polyhedral_solid, *builder );
+    test_create_vertex_attribute( *polyhedral_solid );
+    test_create_polyhedra( *polyhedral_solid, *builder );
+    test_create_facet_attribute( *polyhedral_solid );
+    test_polyhedron_adjacencies( *polyhedral_solid, *builder );
+    test_io(
+        *polyhedral_solid, "test." + polyhedral_solid->native_extension() );
 
-        test_create_vertices( *polyhedral_solid, *builder );
-        test_create_vertex_attribute( *polyhedral_solid );
-        test_create_polyhedra( *polyhedral_solid, *builder );
-        test_create_facet_attribute( *polyhedral_solid );
-        test_polyhedron_adjacencies( *polyhedral_solid, *builder );
-        test_io(
-            *polyhedral_solid, "test." + polyhedral_solid->native_extension() );
+    test_delete_vertex( *polyhedral_solid, *builder );
+    test_delete_polyhedra( *polyhedral_solid, *builder );
+    test_clone( *polyhedral_solid );
+    test_set_polyhedron_vertex( *polyhedral_solid, *builder );
+    test_delete_all( *polyhedral_solid, *builder );
 
-        test_delete_vertex( *polyhedral_solid, *builder );
-        test_delete_polyhedra( *polyhedral_solid, *builder );
-        test_clone( *polyhedral_solid );
-        test_set_polyhedron_vertex( *polyhedral_solid, *builder );
-        test_delete_all( *polyhedral_solid, *builder );
-
-        test_barycenters();
-
-        Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode_lippincott();
-    }
+    test_barycenters();
 }
+
+OPENGEODE_TEST( "polyhedral-solid" )

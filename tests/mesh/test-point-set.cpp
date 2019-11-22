@@ -34,6 +34,8 @@
 #include <geode/mesh/io/point_set_input.h>
 #include <geode/mesh/io/point_set_output.h>
 
+#include <geode/tests/common.h>
+
 void test_create_vertices(
     const geode::PointSet3D& point_set, geode::PointSetBuilder3D& builder )
 {
@@ -100,26 +102,16 @@ void test_clone( const geode::PointSet3D& point_set )
         "[Test] PointSet2 vertex coordinates are not correct" );
 }
 
-int main()
+void test()
 {
-    using namespace geode;
-
-    try
-    {
-        auto point_set =
-            PointSet3D::create( OpenGeodePointSet3D::type_name_static() );
-        auto builder = PointSetBuilder3D::create( *point_set );
-        test_create_vertices( *point_set, *builder );
-        test_create_vertex_attribute( *point_set );
-        test_io( *point_set, "test." + point_set->native_extension() );
-        test_delete_vertex( *point_set, *builder );
-        test_clone( *point_set );
-
-        Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode_lippincott();
-    }
+    auto point_set = geode::PointSet3D::create(
+        geode::OpenGeodePointSet3D::type_name_static() );
+    auto builder = geode::PointSetBuilder3D::create( *point_set );
+    test_create_vertices( *point_set, *builder );
+    test_create_vertex_attribute( *point_set );
+    test_io( *point_set, "test." + point_set->native_extension() );
+    test_delete_vertex( *point_set, *builder );
+    test_clone( *point_set );
 }
+
+OPENGEODE_TEST( "point-set" )

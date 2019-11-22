@@ -27,6 +27,8 @@
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/logger.h>
 
+#include <geode/tests/common.h>
+
 struct Foo
 {
     bool operator==( const Foo& foo ) const
@@ -296,45 +298,35 @@ void test_sparse_attribute_after_element_deletion(
         "Element 7 of sparse attribute should be 12 " );
 }
 
-int main()
+void test()
 {
-    using namespace geode;
+    geode::AttributeManager manager;
+    manager.resize( 10 );
+    OPENGEODE_EXCEPTION(
+        manager.nb_elements() == 10, "[Test] Manager should have 10 elements" );
+    test_constant_attribute( manager );
+    test_foo_constant_attribute( manager );
+    test_int_variable_attribute( manager );
+    test_bool_variable_attribute( manager );
+    test_foo_variable_attribute( manager );
+    test_double_sparse_attribute( manager );
+    test_foo_sparse_attribute( manager );
+    test_delete_attribute_elements( manager );
+    test_sparse_attribute_after_element_deletion( manager );
 
-    try
-    {
-        AttributeManager manager;
-        manager.resize( 10 );
-        OPENGEODE_EXCEPTION( manager.nb_elements() == 10,
-            "[Test] Manager should have 10 elements" );
-        test_constant_attribute( manager );
-        test_foo_constant_attribute( manager );
-        test_int_variable_attribute( manager );
-        test_bool_variable_attribute( manager );
-        test_foo_variable_attribute( manager );
-        test_double_sparse_attribute( manager );
-        test_foo_sparse_attribute( manager );
-        test_delete_attribute_elements( manager );
-        test_sparse_attribute_after_element_deletion( manager );
+    test_serialize_manager( manager );
 
-        test_serialize_manager( manager );
-
-        test_attribute_types( manager );
-        test_number_of_attributes( manager, 7 );
-        manager.delete_attribute( "bool" );
-        test_number_of_attributes( manager, 6 );
-        manager.clear_attributes();
-        test_number_of_attributes( manager, 6 );
-        manager.resize( 10 );
-        OPENGEODE_EXCEPTION( manager.nb_elements() == 10,
-            "[Test] Manager should have 10 elements" );
-        manager.clear();
-        test_number_of_attributes( manager, 0 );
-
-        Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode_lippincott();
-    }
+    test_attribute_types( manager );
+    test_number_of_attributes( manager, 7 );
+    manager.delete_attribute( "bool" );
+    test_number_of_attributes( manager, 6 );
+    manager.clear_attributes();
+    test_number_of_attributes( manager, 6 );
+    manager.resize( 10 );
+    OPENGEODE_EXCEPTION(
+        manager.nb_elements() == 10, "[Test] Manager should have 10 elements" );
+    manager.clear();
+    test_number_of_attributes( manager, 0 );
 }
+
+OPENGEODE_TEST( "attribute" )

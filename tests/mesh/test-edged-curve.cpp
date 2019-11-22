@@ -32,6 +32,8 @@
 #include <geode/mesh/io/edged_curve_input.h>
 #include <geode/mesh/io/edged_curve_output.h>
 
+#include <geode/tests/common.h>
+
 void test_create_vertices( const geode::EdgedCurve3D& edged_curve,
     geode::EdgedCurveBuilder3D& builder )
 {
@@ -179,31 +181,21 @@ void test_clone( const geode::EdgedCurve3D& edged_curve )
         "[Test] EdgedCurve2 attribute should be 42" );
 }
 
-int main()
+void test()
 {
-    using namespace geode;
+    auto edged_curve = geode::EdgedCurve3D::create(
+        geode::OpenGeodeEdgedCurve3D::type_name_static() );
+    auto builder = geode::EdgedCurveBuilder3D::create( *edged_curve );
 
-    try
-    {
-        auto edged_curve =
-            EdgedCurve3D::create( OpenGeodeEdgedCurve3D::type_name_static() );
-        auto builder = EdgedCurveBuilder3D::create( *edged_curve );
+    test_create_vertices( *edged_curve, *builder );
+    test_create_edges( *edged_curve, *builder );
+    test_io( *edged_curve, "test." + edged_curve->native_extension() );
 
-        test_create_vertices( *edged_curve, *builder );
-        test_create_edges( *edged_curve, *builder );
-        test_io( *edged_curve, "test." + edged_curve->native_extension() );
+    test_delete_vertex( *edged_curve, *builder );
+    test_delete_edge( *edged_curve, *builder );
+    test_clone( *edged_curve );
 
-        test_delete_vertex( *edged_curve, *builder );
-        test_delete_edge( *edged_curve, *builder );
-        test_clone( *edged_curve );
-
-        test_edge_requests( *edged_curve, *builder );
-
-        Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode_lippincott();
-    }
+    test_edge_requests( *edged_curve, *builder );
 }
+
+OPENGEODE_TEST( "edged-curve" )

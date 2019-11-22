@@ -30,6 +30,8 @@
 #include <geode/mesh/io/tetrahedral_solid_input.h>
 #include <geode/mesh/io/tetrahedral_solid_output.h>
 
+#include <geode/tests/common.h>
+
 void test_create_vertices( const geode::TetrahedralSolid3D& solid,
     geode::TetrahedralSolidBuilder3D& builder )
 {
@@ -158,30 +160,20 @@ void test_delete_all( const geode::TetrahedralSolid3D& solid,
         "[Test]TetrahedralSolid should have 0 vertex" );
 }
 
-int main()
+void test()
 {
-    using namespace geode;
+    auto solid = geode::TetrahedralSolid3D::create(
+        geode::OpenGeodeTetrahedralSolid3D::type_name_static() );
+    auto builder = geode::TetrahedralSolidBuilder3D::create( *solid );
 
-    try
-    {
-        auto solid = TetrahedralSolid3D::create(
-            OpenGeodeTetrahedralSolid3D::type_name_static() );
-        auto builder = TetrahedralSolidBuilder3D::create( *solid );
+    test_create_vertices( *solid, *builder );
+    test_create_tetrahedra( *solid, *builder );
+    test_polyhedron_adjacencies( *solid, *builder );
+    test_io( *solid, "test." + solid->native_extension() );
 
-        test_create_vertices( *solid, *builder );
-        test_create_tetrahedra( *solid, *builder );
-        test_polyhedron_adjacencies( *solid, *builder );
-        test_io( *solid, "test." + solid->native_extension() );
-
-        test_delete_vertex( *solid, *builder );
-        test_delete_polyhedron( *solid, *builder );
-        test_clone( *solid );
-
-        Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode_lippincott();
-    }
+    test_delete_vertex( *solid, *builder );
+    test_delete_polyhedron( *solid, *builder );
+    test_clone( *solid );
 }
+
+OPENGEODE_TEST( "tetrahedral-solid" )

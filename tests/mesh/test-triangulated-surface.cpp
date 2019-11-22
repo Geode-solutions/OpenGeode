@@ -30,6 +30,8 @@
 #include <geode/mesh/io/triangulated_surface_input.h>
 #include <geode/mesh/io/triangulated_surface_output.h>
 
+#include <geode/tests/common.h>
+
 void test_create_vertices( const geode::TriangulatedSurface3D& surface,
     geode::TriangulatedSurfaceBuilder3D& builder )
 {
@@ -159,30 +161,20 @@ void test_delete_all( const geode::TriangulatedSurface3D& triangulated_surface,
         "[Test]TriangulatedSurface should have 0 vertex" );
 }
 
-int main()
+void test()
 {
-    using namespace geode;
+    auto surface = geode::TriangulatedSurface3D::create(
+        geode::OpenGeodeTriangulatedSurface3D::type_name_static() );
+    auto builder = geode::TriangulatedSurfaceBuilder3D::create( *surface );
 
-    try
-    {
-        auto surface = TriangulatedSurface3D::create(
-            OpenGeodeTriangulatedSurface3D::type_name_static() );
-        auto builder = TriangulatedSurfaceBuilder3D::create( *surface );
+    test_create_vertices( *surface, *builder );
+    test_create_polygons( *surface, *builder );
+    test_polygon_adjacencies( *surface, *builder );
+    test_io( *surface, "test." + surface->native_extension() );
 
-        test_create_vertices( *surface, *builder );
-        test_create_polygons( *surface, *builder );
-        test_polygon_adjacencies( *surface, *builder );
-        test_io( *surface, "test." + surface->native_extension() );
-
-        test_delete_vertex( *surface, *builder );
-        test_delete_polygon( *surface, *builder );
-        test_clone( *surface );
-
-        Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode_lippincott();
-    }
+    test_delete_vertex( *surface, *builder );
+    test_delete_polygon( *surface, *builder );
+    test_clone( *surface );
 }
+
+OPENGEODE_TEST( "triangulated-surface" )

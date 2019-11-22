@@ -26,6 +26,8 @@
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/logger.h>
 
+#include <geode/tests/common.h>
+
 #define CHECK( arg, value )                                                    \
     OPENGEODE_EXCEPTION( arg == value, "[Test] Wrong value for " #arg );
 
@@ -110,37 +112,27 @@ Out test_growable( const T &foo )
     return new_foo;
 }
 
-int main()
+void test()
 {
-    using namespace geode;
+    Foo foo;
+    foo.double_ = 42.5;
+    foo.unsigned_int_ = 42;
+    auto foo2 = test_growable< Foo2 >( foo );
+    CHECK( foo2.double_, 42.5 );
+    CHECK( foo2.unsigned_int_, 42 );
+    CHECK( foo2.bool_, false );
 
-    try
-    {
-        Foo foo;
-        foo.double_ = 42.5;
-        foo.unsigned_int_ = 42;
-        auto foo2 = test_growable< Foo2 >( foo );
-        CHECK( foo2.double_, 42.5 );
-        CHECK( foo2.unsigned_int_, 42 );
-        CHECK( foo2.bool_, false );
+    foo2.bool_ = true;
+    auto foo3 = test_growable< Foo2 >( foo2 );
+    CHECK( foo3.double_, 42.5 );
+    CHECK( foo3.unsigned_int_, 42 );
+    CHECK( foo3.bool_, true );
 
-        foo2.bool_ = true;
-        auto foo3 = test_growable< Foo2 >( foo2 );
-        CHECK( foo3.double_, 42.5 );
-        CHECK( foo3.unsigned_int_, 42 );
-        CHECK( foo3.bool_, true );
-
-        auto foo4 = test_growable< Foo3 >( foo );
-        CHECK( foo4.double_, 42.5 );
-        CHECK( foo4.unsigned_int_, 42 );
-        CHECK( foo4.bool_, true );
-        CHECK( foo4.int_, -52 );
-
-        Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode_lippincott();
-    }
+    auto foo4 = test_growable< Foo3 >( foo );
+    CHECK( foo4.double_, 42.5 );
+    CHECK( foo4.unsigned_int_, 42 );
+    CHECK( foo4.bool_, true );
+    CHECK( foo4.int_, -52 );
 }
+
+OPENGEODE_TEST( "growable" )
