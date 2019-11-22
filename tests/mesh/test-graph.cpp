@@ -28,6 +28,8 @@
 #include <geode/mesh/io/graph_input.h>
 #include <geode/mesh/io/graph_output.h>
 
+#include <geode/tests/common.h>
+
 void test_create_vertices(
     const geode::Graph& graph, geode::GraphBuilder& builder )
 {
@@ -161,34 +163,25 @@ void test_delete_isolated_vertices(
         graph.nb_edges() == 1, "[Test] Graph2 should have 1 edge" );
 }
 
-int main()
+void test()
 {
-    using namespace geode;
+    auto graph =
+        geode::Graph::create( geode::OpenGeodeGraph::type_name_static() );
+    auto builder = geode::GraphBuilder::create( *graph );
 
-    try
-    {
-        auto graph = Graph::create( OpenGeodeGraph::type_name_static() );
-        auto builder = GraphBuilder::create( *graph );
+    test_create_vertices( *graph, *builder );
+    test_create_edges( *graph, *builder );
+    test_io( *graph, "test." + graph->native_extension() );
 
-        test_create_vertices( *graph, *builder );
-        test_create_edges( *graph, *builder );
-        test_io( *graph, "test." + graph->native_extension() );
+    test_delete_vertex( *graph, *builder );
+    test_delete_edge( *graph, *builder );
+    test_clone( *graph );
+    test_delete_isolated_vertices( *graph, *builder );
 
-        test_delete_vertex( *graph, *builder );
-        test_delete_edge( *graph, *builder );
-        test_clone( *graph );
-        test_delete_isolated_vertices( *graph, *builder );
-
-        const auto default_graph = Graph::create();
-        OPENGEODE_EXCEPTION(
-            default_graph->type_name() == OpenGeodeGraph::type_name_static(),
-            "[Test] Default type for Graph should be OpenGeodeGraph" );
-
-        Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode_lippincott();
-    }
+    const auto default_graph = geode::Graph::create();
+    OPENGEODE_EXCEPTION(
+        default_graph->type_name() == geode::OpenGeodeGraph::type_name_static(),
+        "[Test] Default type for Graph should be OpenGeodeGraph" );
 }
+
+OPENGEODE_TEST( "graph" )

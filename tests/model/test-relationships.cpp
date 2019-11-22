@@ -30,6 +30,8 @@
 #include <geode/model/mixin/builder/relationships_builder.h>
 #include <geode/model/mixin/core/relationships.h>
 
+#include <geode/tests/common.h>
+
 std::vector< geode::uuid > create_uuids( geode::Relationships& relationships )
 {
     const geode::index_t nb{ 6 };
@@ -144,32 +146,22 @@ void test_relations( const geode::Relationships& relations,
     test_uuid( relations, uuids[5], 1, 1, 1, 0, 3, 1 );
 }
 
-int main()
+void test()
 {
-    using namespace geode;
+    geode::Relationships relationships;
+    const auto uuids = create_uuids( relationships );
 
-    try
-    {
-        Relationships relationships;
-        const auto uuids = create_uuids( relationships );
+    // This Relationships do not represent anything.
+    add_boundary_relations( relationships, uuids );
+    add_internal_relations( relationships, uuids );
+    add_items_in_collections( relationships, uuids );
+    test_relations( relationships, uuids );
 
-        // This Relationships do not represent anything.
-        add_boundary_relations( relationships, uuids );
-        add_internal_relations( relationships, uuids );
-        add_items_in_collections( relationships, uuids );
-        test_relations( relationships, uuids );
-
-        relationships.save_relationships( "." );
-        Relationships reloaded_relationships;
-        RelationshipsBuilder reloader{ reloaded_relationships };
-        reloader.load_relationships( "." );
-        test_relations( reloaded_relationships, uuids );
-
-        Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode_lippincott();
-    }
+    relationships.save_relationships( "." );
+    geode::Relationships reloaded_relationships;
+    geode::RelationshipsBuilder reloader{ reloaded_relationships };
+    reloader.load_relationships( "." );
+    test_relations( reloaded_relationships, uuids );
 }
+
+OPENGEODE_TEST( "relationships" )

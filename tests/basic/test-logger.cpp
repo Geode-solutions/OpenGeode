@@ -23,6 +23,8 @@
 
 #include <geode/basic/logger.h>
 
+#include <geode/tests/common.h>
+
 void test_logger()
 {
     geode::Logger::trace( "test ", "trace" );
@@ -33,20 +35,11 @@ void test_logger()
     geode::Logger::critical( "test ", "critial" );
 }
 
-int main()
+void test()
 {
-    using namespace geode;
-
-    try
-    {
-        test_logger();
-        Logger::set_level( Logger::Level::trace );
-        test_logger();
-        Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode_lippincott();
-    }
+    test_logger();
+    geode::Logger::set_level( geode::Logger::Level::trace );
+    test_logger();
 }
+
+OPENGEODE_TEST( "logger" )

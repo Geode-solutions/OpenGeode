@@ -44,6 +44,8 @@
 #include <geode/model/representation/io/section_input.h>
 #include <geode/model/representation/io/section_output.h>
 
+#include <geode/tests/common.h>
+
 std::vector< geode::uuid > add_corners(
     const geode::Section& model, geode::SectionBuilder& builder )
 {
@@ -467,54 +469,42 @@ void test_clone( const geode::Section& section )
     }
 }
 
-int main()
+void test()
 {
-    using namespace geode;
+    geode::Section model;
+    geode::SectionBuilder builder( model );
 
-    try
-    {
-        Section model;
-        SectionBuilder builder( model );
+    // This Section represents a house (with one triangle and one square as
+    // in children sketches)
+    const auto corner_uuids = add_corners( model, builder );
+    const auto line_uuids = add_lines( model, builder );
+    const auto surface_uuids = add_surfaces( model, builder );
+    const auto model_boundary_uuids = add_model_boundaries( model, builder );
 
-        // This Section represents a house (with one triangle and one square as
-        // in children sketches)
-        const auto corner_uuids = add_corners( model, builder );
-        const auto line_uuids = add_lines( model, builder );
-        const auto surface_uuids = add_surfaces( model, builder );
-        const auto model_boundary_uuids =
-            add_model_boundaries( model, builder );
+    add_corner_line_boundary_relation(
+        model, builder, corner_uuids, line_uuids );
+    add_line_surface_boundary_relation(
+        model, builder, line_uuids, surface_uuids );
+    add_lines_in_model_boundaries(
+        model, builder, line_uuids, model_boundary_uuids );
+    add_internal_corner_relations(
+        model, builder, corner_uuids, surface_uuids );
+    add_internal_line_relations( model, builder, line_uuids, surface_uuids );
+    OPENGEODE_EXCEPTION( model.nb_internals( surface_uuids.front() )
+                             == corner_uuids.size() + line_uuids.size(),
+        "[Test] The Surface should embed all Corners & Lines (that are "
+        "internal to the "
+        "Surface)" );
+    test_boundary_ranges( model, corner_uuids, line_uuids, surface_uuids );
+    test_incidence_ranges( model, corner_uuids, line_uuids, surface_uuids );
+    test_item_ranges( model, line_uuids, model_boundary_uuids );
+    test_clone( model );
 
-        add_corner_line_boundary_relation(
-            model, builder, corner_uuids, line_uuids );
-        add_line_surface_boundary_relation(
-            model, builder, line_uuids, surface_uuids );
-        add_lines_in_model_boundaries(
-            model, builder, line_uuids, model_boundary_uuids );
-        add_internal_corner_relations(
-            model, builder, corner_uuids, surface_uuids );
-        add_internal_line_relations(
-            model, builder, line_uuids, surface_uuids );
-        OPENGEODE_EXCEPTION( model.nb_internals( surface_uuids.front() )
-                                 == corner_uuids.size() + line_uuids.size(),
-            "[Test] The Surface should embed all Corners & Lines (that are "
-            "internal to the "
-            "Surface)" );
-        test_boundary_ranges( model, corner_uuids, line_uuids, surface_uuids );
-        test_incidence_ranges( model, corner_uuids, line_uuids, surface_uuids );
-        test_item_ranges( model, line_uuids, model_boundary_uuids );
-        test_clone( model );
+    std::string file_io{ "test." + model.native_extension() };
+    geode::save_section( model, file_io );
 
-        std::string file_io{ "test." + model.native_extension() };
-        save_section( model, file_io );
-
-        Section model2;
-        load_section( model2, file_io );
-
-        Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode_lippincott();
-    }
+    geode::Section model2;
+    geode::load_section( model2, file_io );
 }
+
+OPENGEODE_TEST( "section" )

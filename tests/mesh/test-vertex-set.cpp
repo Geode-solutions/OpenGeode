@@ -31,6 +31,8 @@
 #include <geode/mesh/builder/vertex_set_builder.h>
 #include <geode/mesh/core/geode_vertex_set.h>
 
+#include <geode/tests/common.h>
+
 void test_default_vertex_set( const geode::VertexSet& vertex_set )
 {
     const auto type_static = geode::OpenGeodeVertexSet::type_name_static();
@@ -74,24 +76,14 @@ void test_clone( const geode::VertexSet& vertex_set )
         "[Test] VertexSet2 should have 5 vertices" );
 }
 
-int main()
+void test()
 {
-    using namespace geode;
-
-    try
-    {
-        OpenGeodeVertexSet vertex_set;
-        test_default_vertex_set( vertex_set );
-        OpenGeodeVertexSetBuilder builder( vertex_set );
-        test_create_vertices( vertex_set, builder );
-        test_delete_vertex( vertex_set, builder );
-        test_clone( vertex_set );
-
-        Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode_lippincott();
-    }
+    geode::OpenGeodeVertexSet vertex_set;
+    test_default_vertex_set( vertex_set );
+    geode::OpenGeodeVertexSetBuilder builder( vertex_set );
+    test_create_vertices( vertex_set, builder );
+    test_delete_vertex( vertex_set, builder );
+    test_clone( vertex_set );
 }
+
+OPENGEODE_TEST( "vertex-set" )

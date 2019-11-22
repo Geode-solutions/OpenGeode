@@ -39,6 +39,8 @@
 #include <geode/mesh/io/detail/geode_triangulated_surface_input.h>
 #include <geode/mesh/io/detail/register_input.h>
 
+#include <geode/tests/common.h>
+
 template < typename GeodeFactory >
 void check_register( const std::string& extension )
 {
@@ -46,44 +48,34 @@ void check_register( const std::string& extension )
         "[Test] No creator for extension " + extension + " is not correct" );
 }
 
-int main()
+void test()
 {
-    using namespace geode;
+    /* To initialize the mesh library */
+    geode::register_geode_mesh_input();
 
-    try
-    {
-        /* To initialize the mesh library */
-        register_geode_mesh_input();
-
-        /* Run checks */
-        check_register< GraphInputFactory >(
-            OpenGeodeGraph::native_extension_static() );
-        check_register< PointSetInputFactory2D >(
-            OpenGeodePointSet2D::native_extension_static() );
-        check_register< PointSetInputFactory3D >(
-            OpenGeodePointSet3D::native_extension_static() );
-        check_register< EdgedCurveInputFactory2D >(
-            OpenGeodeEdgedCurve2D::native_extension_static() );
-        check_register< EdgedCurveInputFactory3D >(
-            OpenGeodeEdgedCurve3D::native_extension_static() );
-        check_register< PolygonalSurfaceInputFactory2D >(
-            OpenGeodePolygonalSurface2D::native_extension_static() );
-        check_register< PolygonalSurfaceInputFactory3D >(
-            OpenGeodePolygonalSurface3D::native_extension_static() );
-        check_register< TriangulatedSurfaceInputFactory2D >(
-            OpenGeodeTriangulatedSurface2D::native_extension_static() );
-        check_register< TriangulatedSurfaceInputFactory3D >(
-            OpenGeodeTriangulatedSurface3D::native_extension_static() );
-        check_register< PolyhedralSolidInputFactory3D >(
-            OpenGeodePolyhedralSolid3D::native_extension_static() );
-        check_register< TetrahedralSolidInputFactory3D >(
-            OpenGeodeTetrahedralSolid3D::native_extension_static() );
-
-        Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode_lippincott();
-    }
+    /* Run checks */
+    check_register< geode::GraphInputFactory >(
+        geode::OpenGeodeGraph::native_extension_static() );
+    check_register< geode::PointSetInputFactory2D >(
+        geode::OpenGeodePointSet2D::native_extension_static() );
+    check_register< geode::PointSetInputFactory3D >(
+        geode::OpenGeodePointSet3D::native_extension_static() );
+    check_register< geode::EdgedCurveInputFactory2D >(
+        geode::OpenGeodeEdgedCurve2D::native_extension_static() );
+    check_register< geode::EdgedCurveInputFactory3D >(
+        geode::OpenGeodeEdgedCurve3D::native_extension_static() );
+    check_register< geode::PolygonalSurfaceInputFactory2D >(
+        geode::OpenGeodePolygonalSurface2D::native_extension_static() );
+    check_register< geode::PolygonalSurfaceInputFactory3D >(
+        geode::OpenGeodePolygonalSurface3D::native_extension_static() );
+    check_register< geode::TriangulatedSurfaceInputFactory2D >(
+        geode::OpenGeodeTriangulatedSurface2D::native_extension_static() );
+    check_register< geode::TriangulatedSurfaceInputFactory3D >(
+        geode::OpenGeodeTriangulatedSurface3D::native_extension_static() );
+    check_register< geode::PolyhedralSolidInputFactory3D >(
+        geode::OpenGeodePolyhedralSolid3D::native_extension_static() );
+    check_register< geode::TetrahedralSolidInputFactory3D >(
+        geode::OpenGeodeTetrahedralSolid3D::native_extension_static() );
 }
+
+OPENGEODE_TEST( "register-input" )

@@ -27,6 +27,8 @@
 #include <geode/basic/algorithm.h>
 #include <geode/basic/logger.h>
 
+#include <geode/tests/common.h>
+
 std::vector< bool > create_bool_vector()
 {
     std::vector< bool > out( 4, false );
@@ -125,23 +127,13 @@ void test_sort_unique()
         "[Test] Vectors are not identical after sort_unique()" );
 }
 
-int main()
+void test()
 {
-    using namespace geode;
-
-    try
-    {
-        test_find();
-        test_contain();
-        test_delete_vector_elements();
-        test_extract_vector_elements();
-        test_sort_unique();
-
-        Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode_lippincott();
-    }
+    test_find();
+    test_contain();
+    test_delete_vector_elements();
+    test_extract_vector_elements();
+    test_sort_unique();
 }
+
+OPENGEODE_TEST( "algorithm" )

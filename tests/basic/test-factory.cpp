@@ -25,6 +25,8 @@
 
 #include <geode/basic/factory.h>
 
+#include <geode/tests/common.h>
+
 class A
 {
     OPENGEODE_DISABLE_COPY_AND_MOVE( A );
@@ -73,32 +75,22 @@ void verdict( bool is_instantiated, const std::string &name )
     }
 }
 
-int main()
+void test()
 {
-    using namespace geode;
+    using factory = geode::Factory< std::string, Base, A &, B & >;
+    factory::register_creator< Derived >( "Derived" );
 
-    try
-    {
-        using factory = Factory< std::string, Base, A &, B & >;
-        factory::register_creator< Derived >( "Derived" );
+    const auto creators = factory::list_creators();
+    factory::register_creator< Derived >( "Derived" );
+    OPENGEODE_EXCEPTION( factory::list_creators().size() == creators.size(),
+        "[Test] Key registered twice" );
 
-        const auto creators = factory::list_creators();
-        factory::register_creator< Derived >( "Derived" );
-        OPENGEODE_EXCEPTION( factory::list_creators().size() == creators.size(),
-            "[Test] Key registered twice" );
-
-        A a;
-        B b;
-        OPENGEODE_EXCEPTION( factory::has_creator( "Derived" ),
-            "[Test] Key has not been registered" );
-        const auto d = factory::create( "Derived", a, b );
-        verdict( d != nullptr, "Derived" );
-
-        Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode_lippincott();
-    }
+    A a;
+    B b;
+    OPENGEODE_EXCEPTION( factory::has_creator( "Derived" ),
+        "[Test] Key has not been registered" );
+    const auto d = factory::create( "Derived", a, b );
+    verdict( d != nullptr, "Derived" );
 }
+
+OPENGEODE_TEST( "factory" )

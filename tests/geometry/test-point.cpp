@@ -25,6 +25,8 @@
 
 #include <geode/geometry/point.h>
 
+#include <geode/tests/common.h>
+
 void test_comparison()
 {
     const geode::Point3D p{ { 2, 1.0, 2.6 } };
@@ -52,20 +54,10 @@ void test_operators()
     OPENGEODE_EXCEPTION( answer / 2 == p, "[Test] Points should be equal" );
 }
 
-int main()
+void test()
 {
-    using namespace geode;
-
-    try
-    {
-        test_comparison();
-        test_operators();
-
-        Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode_lippincott();
-    }
+    test_comparison();
+    test_operators();
 }
+
+OPENGEODE_TEST( "point" )

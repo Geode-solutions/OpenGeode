@@ -35,6 +35,8 @@
 #include <geode/mesh/io/polygonal_surface_input.h>
 #include <geode/mesh/io/polygonal_surface_output.h>
 
+#include <geode/tests/common.h>
+
 void test_create_vertices( const geode::PolygonalSurface3D& polygonal_surface,
     geode::PolygonalSurfaceBuilder3D& builder )
 {
@@ -395,43 +397,34 @@ void test_delete_all( const geode::PolygonalSurface3D& polygonal_surface,
         "[Test] PolygonalSurface should have 0 vertex" );
 }
 
-int main()
+void test()
 {
-    using namespace geode;
+    auto polygonal_surface = geode::PolygonalSurface3D::create(
+        geode::OpenGeodePolygonalSurface3D::type_name_static() );
+    auto builder =
+        geode::PolygonalSurfaceBuilder3D::create( *polygonal_surface );
 
-    try
-    {
-        auto polygonal_surface = PolygonalSurface3D::create(
-            OpenGeodePolygonalSurface3D::type_name_static() );
-        auto builder = PolygonalSurfaceBuilder3D::create( *polygonal_surface );
+    test_create_vertices( *polygonal_surface, *builder );
+    test_create_vertex_attribute( *polygonal_surface );
+    test_create_polygons( *polygonal_surface, *builder );
+    test_create_edge_attribute( *polygonal_surface );
+    test_polygon_adjacencies( *polygonal_surface, *builder );
+    test_polygon_edges_on_borders( *polygonal_surface );
+    test_previous_next_on_border( *polygonal_surface );
+    test_polygon_edge_requests( *polygonal_surface );
+    test_polygon_barycenter( *polygonal_surface );
+    test_polygon_area();
+    test_polygon_normal();
+    test_polygon_vertex_normal();
 
-        test_create_vertices( *polygonal_surface, *builder );
-        test_create_vertex_attribute( *polygonal_surface );
-        test_create_polygons( *polygonal_surface, *builder );
-        test_create_edge_attribute( *polygonal_surface );
-        test_polygon_adjacencies( *polygonal_surface, *builder );
-        test_polygon_edges_on_borders( *polygonal_surface );
-        test_previous_next_on_border( *polygonal_surface );
-        test_polygon_edge_requests( *polygonal_surface );
-        test_polygon_barycenter( *polygonal_surface );
-        test_polygon_area();
-        test_polygon_normal();
-        test_polygon_vertex_normal();
+    test_io(
+        *polygonal_surface, "test." + polygonal_surface->native_extension() );
 
-        test_io( *polygonal_surface,
-            "test." + polygonal_surface->native_extension() );
-
-        test_delete_vertex( *polygonal_surface, *builder );
-        test_delete_polygon( *polygonal_surface, *builder );
-        test_clone( *polygonal_surface );
-        test_set_polygon_vertex( *polygonal_surface, *builder );
-        test_delete_all( *polygonal_surface, *builder );
-
-        Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode_lippincott();
-    }
+    test_delete_vertex( *polygonal_surface, *builder );
+    test_delete_polygon( *polygonal_surface, *builder );
+    test_clone( *polygonal_surface );
+    test_set_polygon_vertex( *polygonal_surface, *builder );
+    test_delete_all( *polygonal_surface, *builder );
 }
+
+OPENGEODE_TEST( "polygonal-surface" )

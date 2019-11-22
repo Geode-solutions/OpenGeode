@@ -36,6 +36,8 @@
 #include <geode/model/mixin/core/topology.h>
 #include <geode/model/mixin/core/vertex_identifier.h>
 
+#include <geode/tests/common.h>
+
 class CornerProvider : public geode::Topology,
                        public geode::AddComponents< 2, geode::Corners >
 {
@@ -165,55 +167,41 @@ void test_save_and_load_unique_vertices(
     }
 }
 
-int main()
+void test()
 {
-    using namespace geode;
+    geode::VertexIdentifier vertex_identifier;
+    OPENGEODE_EXCEPTION( vertex_identifier.nb_unique_vertices() == 0,
+        "[Test] Initialization of VertexIdentifier is not correct" );
 
-    try
-    {
-        VertexIdentifier vertex_identifier;
-        OPENGEODE_EXCEPTION( vertex_identifier.nb_unique_vertices() == 0,
-            "[Test] Initialization of VertexIdentifier is not correct" );
+    CornerProvider provider;
+    CornerProviderBuilder builder( provider );
 
-        CornerProvider provider;
-        CornerProviderBuilder builder( provider );
+    const auto& corner0_id = builder.add_corner();
+    const auto& corner1_id = builder.add_corner();
+    const auto& corner2_id = builder.add_corner();
+    const auto& corner3_id = builder.add_corner();
+    builder.corner_mesh_builder( corner0_id )
+        ->create_point( geode::Point2D{ { 0.1, 2.3 } } );
+    builder.corner_mesh_builder( corner1_id )
+        ->create_point( geode::Point2D{ { 1.1, 4.3 } } );
+    builder.corner_mesh_builder( corner2_id )
+        ->create_point( geode::Point2D{ { 0.9, -3.7 } } );
+    builder.corner_mesh_builder( corner3_id )
+        ->create_point( geode::Point2D{ { 0.1, 2.3 } } );
 
-        const auto& corner0_id = builder.add_corner();
-        const auto& corner1_id = builder.add_corner();
-        const auto& corner2_id = builder.add_corner();
-        const auto& corner3_id = builder.add_corner();
-        builder.corner_mesh_builder( corner0_id )
-            ->create_point( geode::Point2D{ { 0.1, 2.3 } } );
-        builder.corner_mesh_builder( corner1_id )
-            ->create_point( geode::Point2D{ { 1.1, 4.3 } } );
-        builder.corner_mesh_builder( corner2_id )
-            ->create_point( geode::Point2D{ { 0.9, -3.7 } } );
-        builder.corner_mesh_builder( corner3_id )
-            ->create_point( geode::Point2D{ { 0.1, 2.3 } } );
+    geode::VertexIdentifierBuilder vertex_id_builder{ vertex_identifier };
+    vertex_id_builder.register_mesh_component( provider.corner( corner0_id ) );
+    vertex_id_builder.register_mesh_component( provider.corner( corner1_id ) );
+    vertex_id_builder.register_mesh_component( provider.corner( corner2_id ) );
+    vertex_id_builder.register_mesh_component( provider.corner( corner3_id ) );
 
-        VertexIdentifierBuilder vertex_id_builder{ vertex_identifier };
-        vertex_id_builder.register_mesh_component(
-            provider.corner( corner0_id ) );
-        vertex_id_builder.register_mesh_component(
-            provider.corner( corner1_id ) );
-        vertex_id_builder.register_mesh_component(
-            provider.corner( corner2_id ) );
-        vertex_id_builder.register_mesh_component(
-            provider.corner( corner3_id ) );
+    test_create_unique_vertices( vertex_identifier );
+    test_set_unique_vertices( vertex_identifier, provider );
+    test_modify_unique_vertices( vertex_identifier );
+    test_save_and_load_unique_vertices( vertex_identifier );
 
-        test_create_unique_vertices( vertex_identifier );
-        test_set_unique_vertices( vertex_identifier, provider );
-        test_modify_unique_vertices( vertex_identifier );
-        test_save_and_load_unique_vertices( vertex_identifier );
-
-        builder.unregister_mesh_component( provider.corner( corner2_id ) );
-        builder.register_mesh_component( provider.corner( corner2_id ) );
-
-        Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode_lippincott();
-    }
+    builder.unregister_mesh_component( provider.corner( corner2_id ) );
+    builder.register_mesh_component( provider.corner( corner2_id ) );
 }
+
+OPENGEODE_TEST( "vertex-identifier" )

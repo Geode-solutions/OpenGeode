@@ -24,30 +24,21 @@
 #include <geode/basic/logger.h>
 #include <geode/basic/uuid.h>
 
-int main()
+#include <geode/tests/common.h>
+
+void test()
 {
-    using namespace geode;
-
-    try
+    for( const auto i : geode::Range{ 100 } )
     {
-        for( const auto i : Range{ 100 } )
-        {
-            geode_unused( i );
-            const uuid id;
-            Logger::info( id.string() );
-            const uuid id2;
-            Logger::info( id2 );
-            OPENGEODE_EXCEPTION(
-                id2 != id, "[Test] UUIDs should be different" );
-            OPENGEODE_EXCEPTION(
-                id2 < id || id < id2, "[Test] UUIDs should be different" );
-        }
-
-        Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode_lippincott();
+        geode_unused( i );
+        const geode::uuid id;
+        geode::Logger::info( id.string() );
+        const geode::uuid id2;
+        geode::Logger::info( id2 );
+        OPENGEODE_EXCEPTION( id2 != id, "[Test] UUIDs should be different" );
+        OPENGEODE_EXCEPTION(
+            id2 < id || id < id2, "[Test] UUIDs should be different" );
     }
 }
+
+OPENGEODE_TEST( "uuid" )

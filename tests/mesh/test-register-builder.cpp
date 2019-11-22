@@ -39,6 +39,8 @@
 #include <geode/mesh/core/geode_tetrahedral_solid.h>
 #include <geode/mesh/core/geode_triangulated_surface.h>
 
+#include <geode/tests/common.h>
+
 template < typename GeodeFactory >
 void check_register( const geode::MeshType& key )
 {
@@ -46,44 +48,34 @@ void check_register( const geode::MeshType& key )
         "[Test] No creator for " + key.get() + " is not correct" );
 }
 
-int main()
+void test()
 {
-    using namespace geode;
+    /* To initialize the mesh library */
+    geode::register_geode_builder();
 
-    try
-    {
-        /* To initialize the mesh library */
-        register_geode_builder();
-
-        /* Run checks */
-        check_register< GraphBuilderFactory >(
-            OpenGeodeGraph::type_name_static() );
-        check_register< PointSetBuilderFactory2D >(
-            OpenGeodePointSet2D::type_name_static() );
-        check_register< PointSetBuilderFactory3D >(
-            OpenGeodePointSet3D::type_name_static() );
-        check_register< EdgedCurveBuilderFactory2D >(
-            OpenGeodeEdgedCurve2D::type_name_static() );
-        check_register< EdgedCurveBuilderFactory3D >(
-            OpenGeodeEdgedCurve3D::type_name_static() );
-        check_register< PolygonalSurfaceBuilderFactory2D >(
-            OpenGeodePolygonalSurface2D::type_name_static() );
-        check_register< PolygonalSurfaceBuilderFactory3D >(
-            OpenGeodePolygonalSurface3D::type_name_static() );
-        check_register< TriangulatedSurfaceBuilderFactory2D >(
-            OpenGeodeTriangulatedSurface2D::type_name_static() );
-        check_register< TriangulatedSurfaceBuilderFactory3D >(
-            OpenGeodeTriangulatedSurface3D::type_name_static() );
-        check_register< PolyhedralSolidBuilderFactory3D >(
-            OpenGeodePolyhedralSolid3D::type_name_static() );
-        check_register< TetrahedralSolidBuilderFactory3D >(
-            OpenGeodeTetrahedralSolid3D::type_name_static() );
-
-        Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode_lippincott();
-    }
+    /* Run checks */
+    check_register< geode::GraphBuilderFactory >(
+        geode::OpenGeodeGraph::type_name_static() );
+    check_register< geode::PointSetBuilderFactory2D >(
+        geode::OpenGeodePointSet2D::type_name_static() );
+    check_register< geode::PointSetBuilderFactory3D >(
+        geode::OpenGeodePointSet3D::type_name_static() );
+    check_register< geode::EdgedCurveBuilderFactory2D >(
+        geode::OpenGeodeEdgedCurve2D::type_name_static() );
+    check_register< geode::EdgedCurveBuilderFactory3D >(
+        geode::OpenGeodeEdgedCurve3D::type_name_static() );
+    check_register< geode::PolygonalSurfaceBuilderFactory2D >(
+        geode::OpenGeodePolygonalSurface2D::type_name_static() );
+    check_register< geode::PolygonalSurfaceBuilderFactory3D >(
+        geode::OpenGeodePolygonalSurface3D::type_name_static() );
+    check_register< geode::TriangulatedSurfaceBuilderFactory2D >(
+        geode::OpenGeodeTriangulatedSurface2D::type_name_static() );
+    check_register< geode::TriangulatedSurfaceBuilderFactory3D >(
+        geode::OpenGeodeTriangulatedSurface3D::type_name_static() );
+    check_register< geode::PolyhedralSolidBuilderFactory3D >(
+        geode::OpenGeodePolyhedralSolid3D::type_name_static() );
+    check_register< geode::TetrahedralSolidBuilderFactory3D >(
+        geode::OpenGeodeTetrahedralSolid3D::type_name_static() );
 }
+
+OPENGEODE_TEST( "register-builder" )
