@@ -22,10 +22,10 @@ jobs:
     strategy:
       matrix:
         config:
-        - {cc: gcc, cxx: g++, cmake_args: "-DCMAKE_BUILD_TYPE=Debug", coverage: true, benchmark: false}
-        - {cc: gcc, cxx: g++, cmake_args: "-DCMAKE_BUILD_TYPE=Release -DUSE_BENCHMARK=ON", coverage: false, benchmark: true}
-        - {cc: clang, cxx: clang++, cmake_args: "-DCMAKE_BUILD_TYPE=Debug", coverage: false, benchmark: false}
-        - {cc: clang, cxx: clang++, cmake_args: "-DCMAKE_BUILD_TYPE=Release", coverage: false, benchmark: false}
+        - {cc: gcc, cxx: g++, cmake_args: "-DCMAKE_BUILD_TYPE=Debug", coverage: yes, benchmark: no}
+        - {cc: gcc, cxx: g++, cmake_args: "-DCMAKE_BUILD_TYPE=Release -DUSE_BENCHMARK=ON", coverage: no, benchmark: yes}
+        - {cc: clang, cxx: clang++, cmake_args: "-DCMAKE_BUILD_TYPE=Debug", coverage: no, benchmark: no}
+        - {cc: clang, cxx: clang++, cmake_args: "-DCMAKE_BUILD_TYPE=Release", coverage: no, benchmark: no}
 
     steps:
     - uses: actions/checkout@v1
@@ -50,9 +50,9 @@ jobs:
         CXX: ${{ matrix.config.cxx }}
     - name: Kcov
       run: curl -s https://raw.githubusercontent.com/Geode-solutions/actions/master/kcov.sh | bash -s -- ${GITHUB_WORKSPACE}/build/opengeode/bin
-      if: matrix.config.coverage == true && (github.event_name == 'pull_request' || github.ref == 'refs/heads/master')
+      if: matrix.config.coverage == 'yes' && (github.event_name == 'pull_request' || github.ref == 'refs/heads/master')
     - uses: codecov/codecov-action@v1.0.2
-      if: matrix.config.coverage == true && (github.event_name == 'pull_request' || github.ref == 'refs/heads/master')
+      if: matrix.config.coverage == 'yes' && (github.event_name == 'pull_request' || github.ref == 'refs/heads/master')
       with: 
         token: ${{ secrets.CODECOV_TOKEN }}
         file: kcov/kcov-merged/cobertura.xml
