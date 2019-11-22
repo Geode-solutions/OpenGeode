@@ -21,14 +21,10 @@ jobs:
     needs: format
     strategy:
       matrix:
-        cc: [gcc, clang]
-        cxx: [g++, clang++]
-        config: [Debug, Release]
-        exclude:
-          - cc: gcc
-            cxx: clang++
-          - cc: clang
-            cxx: g++
+        - {cc: gcc, cxx: g++, cmake_args: "-DCMAKE_BUILD_TYPE=Debug", coverage: true, benchmark: false}
+        - {cc: gcc, cxx: g++, cmake_args: "-DCMAKE_BUILD_TYPE=Release -DUSE_BENCHMARK=ON", coverage: false, benchmark: true}
+        - {cc: clang, cxx: clang++, cmake_args: "-DCMAKE_BUILD_TYPE=Debug", coverage: false, benchmark: false}
+        - {cc: clang, cxx: clang++, cmake_args: "-DCMAKE_BUILD_TYPE=Release", coverage: false, benchmark: false}
 
     steps:
     - uses: actions/checkout@v1
@@ -36,7 +32,7 @@ jobs:
       run: |
         mkdir -p build
         cd build
-        cmake -DCMAKE_BUILD_TYPE=${{ matrix.config }} ..
+        cmake ${{ matrix.cmake_args }} ..
         cmake --build . -- -j2
       env:
         CC: ${{ matrix.cc }}
@@ -45,7 +41,7 @@ jobs:
       run: |
         mkdir -p test
         cd test
-        cmake -DCMAKE_BUILD_TYPE=${{ matrix.config }} -DCMAKE_PREFIX_PATH:PATH=$GITHUB_WORKSPACE/build/opengeode/install ../tests
+        cmake ${{ matrix.cmake_args }} -DCMAKE_PREFIX_PATH:PATH=$GITHUB_WORKSPACE/build/opengeode/install ../tests
         cmake --build . -- -j2
         ctest --output-on-failure
       env:
@@ -53,9 +49,9 @@ jobs:
         CXX: ${{ matrix.cxx }}
     - name: Kcov
       run: curl -s https://raw.githubusercontent.com/Geode-solutions/actions/master/kcov.sh | bash -s -- ${GITHUB_WORKSPACE}/build/opengeode/bin
-      if: matrix.cc == 'gcc' && (github.event_name == 'pull_request' || github.ref == 'refs/heads/master') && matrix.config == 'Debug'
+      if: matrix.coverage && (github.event_name == 'pull_request' || github.ref == 'refs/heads/master')
     - uses: codecov/codecov-action@v1.0.2
-      if: matrix.cc == 'gcc' && (github.event_name == 'pull_request' || github.ref == 'refs/heads/master') && matrix.config == 'Debug'
+      if: matrix.coverage && (github.event_name == 'pull_request' || github.ref == 'refs/heads/master')
       with: 
         token: ${{ secrets.CODECOV_TOKEN }}
         file: kcov/kcov-merged/cobertura.xml
