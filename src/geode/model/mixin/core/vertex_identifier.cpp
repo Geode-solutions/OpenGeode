@@ -3,7 +3,6 @@
 #include <fstream>
 #include <unordered_map>
 
-#include <geode/basic/algorithm.h>
 #include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/bitsery_archive.h>
@@ -32,11 +31,11 @@ namespace geode
     public:
         Impl()
             : component_vertices_(
-                unique_vertices_.vertex_attribute_manager()
-                    .find_or_create_attribute< VariableAttribute,
-                        std::vector< MeshComponentVertex > >(
-                        "component vertices",
-                        std::vector< MeshComponentVertex >{} ) )
+                  unique_vertices_.vertex_attribute_manager()
+                      .find_or_create_attribute< VariableAttribute,
+                          std::vector< MeshComponentVertex > >(
+                          "component vertices",
+                          std::vector< MeshComponentVertex >{} ) )
         {
         }
 
@@ -135,12 +134,13 @@ namespace geode
             {
                 const auto& old_vertices =
                     component_vertices_->value( old_unique_id );
-                const auto it = find( old_vertices, component_vertex_id );
-                if( it != NO_ID )
+                const auto it = std::find( old_vertices.begin(),
+                    old_vertices.end(), component_vertex_id );
+                if( it != old_vertices.end() )
                 {
                     component_vertices_->modify_value( old_unique_id,
                         [&it]( std::vector< MeshComponentVertex >& vertices ) {
-                            vertices.erase( vertices.begin() + it );
+                            vertices.erase( it );
                         } );
                 }
             }
@@ -148,7 +148,9 @@ namespace geode
                 ->set_value( component_vertex_id.vertex, unique_vertex_id );
             const auto& vertices =
                 component_vertices_->value( unique_vertex_id );
-            if( !contain( vertices, component_vertex_id ) )
+            if( std::find(
+                    vertices.begin(), vertices.end(), component_vertex_id )
+                == vertices.end() )
             {
                 component_vertices_->modify_value( unique_vertex_id,
                     [&component_vertex_id](
@@ -229,15 +231,17 @@ namespace geode
                     component_vertices_->value( uv_id );
                 std::vector< bool > to_keep(
                     mesh_component_vertices.size(), true );
+                bool update{ false };
                 for( const auto i : Range{ mesh_component_vertices.size() } )
                 {
                     if( mesh_component_vertices[i].component_id.id()
                         == component_id )
                     {
                         to_keep[i] = false;
+                        update = true;
                     }
                 }
-                if( contain( to_keep, false ) )
+                if( update )
                 {
                     component_vertices_->set_value(
                         uv_id, extract_vector_elements(

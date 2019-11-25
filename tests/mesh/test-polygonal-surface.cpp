@@ -21,7 +21,6 @@
  *
  */
 
-#include <geode/basic/algorithm.h>
 #include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/logger.h>
@@ -158,8 +157,12 @@ void test_polygon_edges_on_borders(
     const auto result = polygonal_surface.polygon_edges_on_border( 0 );
     OPENGEODE_EXCEPTION( result.size() == 2,
         "[Test] Number of polygon edges on border index is not correct" );
-    OPENGEODE_EXCEPTION( contain( result, geode::PolygonEdge( 0, 0 ) )
-                             && contain( result, geode::PolygonEdge( 0, 2 ) ),
+    OPENGEODE_EXCEPTION(
+        std::find( result.begin(), result.end(), geode::PolygonEdge( 0, 0 ) )
+                != result.end()
+            && std::find(
+                   result.begin(), result.end(), geode::PolygonEdge( 0, 2 ) )
+                   != result.end(),
         "[Test] Polygon edge indices on border index is not correct" );
 }
 

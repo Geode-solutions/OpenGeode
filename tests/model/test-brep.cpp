@@ -21,7 +21,6 @@
  *
  */
 
-#include <geode/basic/algorithm.h>
 #include <geode/basic/assert.h>
 #include <geode/basic/logger.h>
 #include <geode/basic/range.h>
@@ -224,7 +223,9 @@ void add_corner_line_boundary_relation( const geode::BRep& model,
         for( const auto& incidence :
             model.incidences( model.corner( corner_id ) ) )
         {
-            OPENGEODE_EXCEPTION( geode::contain( line_uuids, incidence.id() ),
+            OPENGEODE_EXCEPTION( std::find( line_uuids.begin(),
+                                     line_uuids.end(), incidence.id() )
+                                     != line_uuids.end(),
                 "[Test] All Corners incidences should be Lines" );
         }
         OPENGEODE_EXCEPTION( model.nb_incidences( corner_id ) == 3,
@@ -235,7 +236,9 @@ void add_corner_line_boundary_relation( const geode::BRep& model,
     {
         for( const auto& boundary : model.boundaries( model.line( line_id ) ) )
         {
-            OPENGEODE_EXCEPTION( geode::contain( corner_uuids, boundary.id() ),
+            OPENGEODE_EXCEPTION( std::find( corner_uuids.begin(),
+                                     corner_uuids.end(), boundary.id() )
+                                     != corner_uuids.end(),
                 "[Test] All Lines incidences should be Corners" );
         }
         OPENGEODE_EXCEPTION( model.nb_boundaries( line_id ) == 2,
@@ -289,8 +292,9 @@ void add_line_surface_boundary_relation( const geode::BRep& model,
     {
         for( const auto& incidence : model.incidences( model.line( line_id ) ) )
         {
-            OPENGEODE_EXCEPTION(
-                geode::contain( surface_uuids, incidence.id() ),
+            OPENGEODE_EXCEPTION( std::find( surface_uuids.begin(),
+                                     surface_uuids.end(), incidence.id() )
+                                     != surface_uuids.end(),
                 "[Test] All Lines incidences should be Surfaces" );
         }
         OPENGEODE_EXCEPTION( model.nb_incidences( line_id ) == 2,
@@ -314,7 +318,7 @@ void add_surface_block_relation( const geode::BRep& model,
         for( const auto& incidence :
             model.incidences( model.surface( surface_id ) ) )
         {
-            OPENGEODE_EXCEPTION( geode::contain( block_uuids, incidence.id() ),
+            OPENGEODE_EXCEPTION( block_uuids.front() == incidence.id(),
                 "[Test] All Surfaces incidences should be Blocks" );
         }
         OPENGEODE_EXCEPTION( model.nb_incidences( surface_id ) == 1,
@@ -369,8 +373,7 @@ void add_internal_corner_relations( const geode::BRep& model,
         for( const auto& embedding :
             model.embedded_surfaces( model.corner( corner_id ) ) )
         {
-            OPENGEODE_EXCEPTION(
-                geode::contain( surface_uuids, embedding.id() ),
+            OPENGEODE_EXCEPTION( surface_uuids.front() == embedding.id(),
                 "[Test] All Corners embedded surfaces should be Surfaces" );
             OPENGEODE_EXCEPTION(
                 model.nb_internal_corners( embedding ) == corner_uuids.size(),
@@ -379,7 +382,7 @@ void add_internal_corner_relations( const geode::BRep& model,
         for( const auto& embedding :
             model.embedded_blocks( model.corner( corner_id ) ) )
         {
-            OPENGEODE_EXCEPTION( geode::contain( block_uuids, embedding.id() ),
+            OPENGEODE_EXCEPTION( block_uuids.front() == embedding.id(),
                 "[Test] All Corners embedded blocks should be Blocks" );
             OPENGEODE_EXCEPTION(
                 model.nb_internal_corners( embedding ) == corner_uuids.size(),
@@ -415,8 +418,7 @@ void add_internal_line_relations( const geode::BRep& model,
         for( const auto& embedding :
             model.embedded_surfaces( model.line( line_id ) ) )
         {
-            OPENGEODE_EXCEPTION(
-                geode::contain( surface_uuids, embedding.id() ),
+            OPENGEODE_EXCEPTION( surface_uuids.front() == embedding.id(),
                 "[Test] All Line embedded surfaces should be Surfaces" );
             OPENGEODE_EXCEPTION(
                 model.nb_internal_lines( embedding ) == line_uuids.size(),
@@ -425,7 +427,7 @@ void add_internal_line_relations( const geode::BRep& model,
         for( const auto& embedding :
             model.embedded_blocks( model.line( line_id ) ) )
         {
-            OPENGEODE_EXCEPTION( geode::contain( block_uuids, embedding.id() ),
+            OPENGEODE_EXCEPTION( block_uuids.front() == embedding.id(),
                 "[Test] All Lines embedded blocks should be Blocks" );
             OPENGEODE_EXCEPTION(
                 model.nb_internal_lines( embedding ) == line_uuids.size(),
@@ -461,7 +463,7 @@ void add_internal_surface_relations( const geode::BRep& model,
             OPENGEODE_EXCEPTION(
                 model.nb_internal_surfaces( embedding ) == surface_uuids.size(),
                 "[Test] Block should embed all Surfaces" );
-            OPENGEODE_EXCEPTION( geode::contain( block_uuids, embedding.id() ),
+            OPENGEODE_EXCEPTION( block_uuids.front() == embedding.id(),
                 "[Test] All Surfaces embeddings should be Blocks" );
         }
         OPENGEODE_EXCEPTION( model.nb_embeddings( surface_id ) == 1,

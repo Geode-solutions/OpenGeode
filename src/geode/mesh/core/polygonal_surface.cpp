@@ -28,7 +28,6 @@
 
 #include <bitsery/brief_syntax/array.h>
 
-#include <geode/basic/algorithm.h>
 #include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/bitsery_archive.h>
@@ -111,10 +110,10 @@ namespace geode
     public:
         explicit Impl( PolygonalSurfaceBase& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) )
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
@@ -557,7 +556,9 @@ namespace geode
         {
             const auto polygon_vertex = S.top();
             S.pop();
-            if( contain( polygons_visited, polygon_vertex.polygon_id ) )
+            if( std::find( polygons_visited.begin(), polygons_visited.end(),
+                    polygon_vertex.polygon_id )
+                != polygons_visited.end() )
             {
                 continue;
             }

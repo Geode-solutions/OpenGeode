@@ -21,12 +21,6 @@
  *
  */
 
-/*
- * Modified from RINGMesh https://github.com/ringmesh/RINGMesh
- * Copyright (c) 2012-2018, Association Scientifique pour la Geologie et ses
- * Applications (ASGA)
- */
-
 #pragma once
 
 #include <algorithm>
@@ -37,41 +31,6 @@
 
 namespace geode
 {
-    /*
-     * Return the index of the first occurence of a given value in a container.
-     * @tparam T Type of the container elements.
-     * @tparam Container Type of container.
-     * @param[in] in Container in which perform the search.
-     * @param[in] value Value to find.
-     * @return The index of the first occurence of value, NO_ID if not found
-     */
-    template < typename T, typename Container >
-    index_t find( const Container& in, const T& value )
-    {
-        const auto it = std::find( in.begin(), in.end(), value );
-        if( it == in.end() )
-        {
-            return NO_ID;
-        }
-        else
-        {
-            return static_cast< index_t >( it - in.begin() );
-        }
-    }
-
-    /*
-     * Return true if a given value exists in a container.
-     * @tparam T Type of the container elements.
-     * @tparam Container Type of container.
-     * @param[in] in Container in which perform the search.
-     * @param[in] value Value to find
-     */
-    template < typename T, typename Container >
-    bool contain( const Container& in, const T& value )
-    {
-        return find( in, value ) != NO_ID;
-    }
-
     /*
      * Delete some elements from a given vector.
      * @tparam T Type of the vector elements.
@@ -93,7 +52,8 @@ namespace geode
             "[delete_vector_elements] Number of elements in the two vectors "
             "should match" );
         index_t nb_removed_elements{ 0 };
-        if( !contain( to_delete, true ) )
+        if( std::find( to_delete.begin(), to_delete.end(), true )
+            == to_delete.end() )
         {
             return 0;
         }
@@ -130,7 +90,8 @@ namespace geode
         OPENGEODE_EXCEPTION( to_keep.size() == in_values.size(),
             "[extract_vector_elements] Number of elements in the two vectors "
             "should match" );
-        if( !contain( to_keep, false ) )
+        if( std::find( to_keep.begin(), to_keep.end(), false )
+            == to_keep.end() )
         {
             return in_values;
         }

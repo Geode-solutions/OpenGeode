@@ -21,7 +21,6 @@
  *
  */
 
-#include <geode/basic/algorithm.h>
 #include <geode/basic/assert.h>
 #include <geode/basic/logger.h>
 #include <geode/basic/range.h>
