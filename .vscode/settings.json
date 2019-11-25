@@ -12,6 +12,5 @@
     ],
     "files.watcherExclude": {
         "${workspaceFolder}/build/**": true
-    },
-    "C_Cpp.dimInactiveRegions": false
+    }
 }
