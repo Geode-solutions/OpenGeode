@@ -25,6 +25,8 @@
 
 #include <geode/geometry/vector.h>
 
+#include <geode/tests/common.h>
+
 void test_length()
 {
     const geode::Vector3D p{ { 1, 2, 4 } };
@@ -53,20 +55,10 @@ void test_operations()
         p.cross( unit ) == answer, "[Test] Wrong cross product" );
 }
 
-int main()
+void test()
 {
-    using namespace geode;
-
-    try
-    {
-        test_length();
-        test_operations();
-
-        Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode_lippincott();
-    }
+    test_length();
+    test_operations();
 }
+
+OPENGEODE_TEST( "vector" )

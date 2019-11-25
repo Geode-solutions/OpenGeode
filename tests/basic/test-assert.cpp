@@ -24,54 +24,46 @@
 #include <geode/basic/assert.h>
 #include <geode/basic/logger.h>
 
-int main()
-{
-    using namespace geode;
+#include <geode/tests/common.h>
 
+void test()
+{
     try
     {
-        try
-        {
-            throw OpenGeodeException{ "try ", "some ", "concatenation" };
-        }
-        catch( ... )
-        {
-            geode_lippincott();
-        }
-
-        try
-        {
-            throw std::runtime_error{ "try std exception" };
-        }
-        catch( ... )
-        {
-            geode_lippincott();
-        }
-
-        try
-        {
-            throw std::runtime_error{ "test" };
-        }
-        catch( ... )
-        {
-            geode_lippincott();
-        }
-
-        try
-        {
-            geode_assertion_failed(
-                "0 == 1", "0 is never equal to 1.", "this file", 109 );
-        }
-        catch( ... )
-        {
-            geode_lippincott();
-        }
-
-        Logger::info( "TEST SUCCESS" );
-        return 0;
+        throw geode::OpenGeodeException{ "try ", "some ", "concatenation" };
     }
     catch( ... )
     {
-        return geode_lippincott();
+        geode::geode_lippincott();
+    }
+
+    try
+    {
+        throw std::runtime_error{ "try std exception" };
+    }
+    catch( ... )
+    {
+        geode::geode_lippincott();
+    }
+
+    try
+    {
+        throw std::runtime_error{ "test" };
+    }
+    catch( ... )
+    {
+        geode::geode_lippincott();
+    }
+
+    try
+    {
+        geode::geode_assertion_failed(
+            "0 == 1", "0 is never equal to 1.", "this file", 109 );
+    }
+    catch( ... )
+    {
+        geode::geode_lippincott();
     }
 }
+
+OPENGEODE_TEST( "assert" )

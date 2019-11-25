@@ -26,24 +26,22 @@
 #include <geode/geometry/bounding_box.h>
 #include <geode/geometry/point.h>
 
-int main()
-{
-    using namespace geode;
+#include <geode/tests/common.h>
 
-    try
-    {
-        BoundingBox2D box;
+void test()
+{
+        geode::BoundingBox2D box;
         box.add_point( { { -1, -1 } } );
         box.add_point( { { 1, 1 } } );
 
-        BoundingBox2D box2{ box };
+        geode::BoundingBox2D box2{ box };
         box2.add_point( { { -2, -2 } } );
         box2.add_point( { { 0, 0 } } );
 
         box2.add_box( box );
-        OPENGEODE_EXCEPTION( box2.min() == Point2D( { -2, -2 } ),
+        OPENGEODE_EXCEPTION( box2.min() == geode::Point2D( { -2, -2 } ),
             "[Test] Error in BoundingBox union computation" );
-        OPENGEODE_EXCEPTION( box2.max() == Point2D( { 1, 1 } ),
+        OPENGEODE_EXCEPTION( box2.max() == geode::Point2D( { 1, 1 } ),
             "[Test] Error in BoundingBox union computation" );
 
         OPENGEODE_EXCEPTION( box2.contains( { { 0, 0 } } ),
@@ -51,16 +49,15 @@ int main()
         OPENGEODE_EXCEPTION( !box2.contains( { { 10, 0 } } ),
             "[Test] BBox should not contain this point" );
 
-        const BoundingBox2D copy_box = box2;
-        OPENGEODE_EXCEPTION( copy_box.min() == Point2D( { -2, -2 } )
-                                 && copy_box.max() == Point2D( { 1, 1 } ),
-            "[Test] Copied BBox has wrong extension" );
+    OPENGEODE_EXCEPTION( box_union.contains( { { 0, 0 } } ),
+        "[Test] BBox should contain this point" );
+    OPENGEODE_EXCEPTION( !box_union.contains( { { 10, 0 } } ),
+        "[Test] BBox should not contain this point" );
 
-        Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode_lippincott();
-    }
+    const geode::BoundingBox2D copy_box = box2;
+    OPENGEODE_EXCEPTION( copy_box.min() == geode::Point2D( { -2, -2 } )
+                             && copy_box.max() == geode::Point2D( { 1, 1 } ),
+        "[Test] Copied BBox has wrong extension" );
 }
+
+OPENGEODE_TEST( "bounding-box" )

@@ -185,9 +185,13 @@ function(add_geode_binary bin_path)
     install(TARGETS ${exe_name} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 endfunction()
 
+option(USE_BENCHMARK "Toggle benchmarking of tests" OFF)
 function(add_geode_test cpp_file_path)
     add_geode_executable(${cpp_file_path} "Tests" ${ARGN})
     add_test(NAME ${exe_name} COMMAND ${exe_name})
+    if(USE_BENCHMARK)
+        target_compile_definitions(${exe_name} PRIVATE OPENGEODE_BENCHMARK)
+    endif()
 endfunction()
 
 function(copy_windows_binaries dependency)

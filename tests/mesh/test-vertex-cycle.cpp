@@ -27,6 +27,8 @@
 
 #include <geode/mesh/core/detail/vertex_cycle.h>
 
+#include <geode/tests/common.h>
+
 void test_vertex_cycle()
 {
     const geode::detail::VertexCycle cycle1{ { 0, 1, 2, 3 } };
@@ -55,19 +57,9 @@ void test_vertex_cycle()
         "[Test] Wrong result for operator== with cycle5 and cycle7" );
 }
 
-int main()
+void test()
 {
-    using namespace geode;
-
-    try
-    {
-        test_vertex_cycle();
-
-        Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode_lippincott();
-    }
+    test_vertex_cycle();
 }
+
+OPENGEODE_TEST( "vertex-cycle" )
