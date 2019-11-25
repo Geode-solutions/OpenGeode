@@ -21,12 +21,6 @@
  *
  */
 
-/*
- * Modified from RINGMesh https://github.com/ringmesh/RINGMesh
- * Copyright (c) 2012-2018, Association Scientifique pour la Geologie et ses
- * Applications (ASGA)
- */
-
 #pragma once
 
 #include <geode/basic/pimpl.h>
@@ -63,8 +57,6 @@ namespace geode
         const Point< dimension >& min() const;
 
         const Point< dimension >& max() const;
-
-        Point< dimension > center() const;
 
         /*!
          * Check if another BoundingBox overlaps this one.

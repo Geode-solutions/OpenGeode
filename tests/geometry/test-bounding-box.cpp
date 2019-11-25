@@ -35,8 +35,6 @@ int main()
         BoundingBox2D box;
         box.add_point( { { -1, -1 } } );
         box.add_point( { { 1, 1 } } );
-        OPENGEODE_EXCEPTION( box.center() == Point2D( { 0, 0 } ),
-            "[Test] Error in BoundingBox center computation" );
 
         BoundingBox2D box2{ box };
         box2.add_point( { { -2, -2 } } );

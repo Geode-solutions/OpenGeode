@@ -124,12 +124,6 @@ namespace geode
     }
 
     template < index_t dimension >
-    Point< dimension > BoundingBox< dimension >::center() const
-    {
-        return ( min() + max() ) / 2.;
-    }
-
-    template < index_t dimension >
     void BoundingBox< dimension >::add_point( const Point< dimension >& point )
     {
         impl_->add_point( point );
