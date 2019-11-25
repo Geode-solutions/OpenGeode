@@ -226,7 +226,7 @@ namespace geode
             "polyhedron that does not exist" );
         OPENGEODE_EXCEPTION( polyhedron_vertex.vertex_id
                                  < polyhedral_solid_.nb_polyhedron_vertices(
-                                       polyhedron_vertex.polyhedron_id ),
+                                     polyhedron_vertex.polyhedron_id ),
             "[PolyhedralSolidBuilder::update_polyhedron_vertex] Accessing an "
             "invalid polyhedron vertex" );
         OPENGEODE_EXCEPTION( vertex_id < polyhedral_solid_.nb_vertices(),
@@ -324,7 +324,7 @@ namespace geode
             "polyhedron that does not exist" );
         OPENGEODE_EXCEPTION(
             polyhedron_facet.facet_id < polyhedral_solid_.nb_polyhedron_facets(
-                                            polyhedron_facet.polyhedron_id ),
+                polyhedron_facet.polyhedron_id ),
             "[PolyhedralSolidBuilder::set_polyhedron_adjacent] Accessing an "
             "invalid polyhedron vertex" );
         OPENGEODE_EXCEPTION( adjacent_id < polyhedral_solid_.nb_polyhedra()
