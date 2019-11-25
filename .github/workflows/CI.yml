@@ -22,10 +22,10 @@ jobs:
     strategy:
       matrix:
         config:
-        - {cc: gcc, cxx: g++, cmake_args: "-DCMAKE_BUILD_TYPE=Debug", coverage: yes, benchmark: no}
-        - {cc: gcc, cxx: g++, cmake_args: "-DCMAKE_BUILD_TYPE=Release -DUSE_BENCHMARK=ON", coverage: no, benchmark: yes}
-        - {cc: clang, cxx: clang++, cmake_args: "-DCMAKE_BUILD_TYPE=Debug", coverage: no, benchmark: no}
-        - {cc: clang, cxx: clang++, cmake_args: "-DCMAKE_BUILD_TYPE=Release", coverage: no, benchmark: no}
+        - {cc: gcc, cxx: g++, cmake_args: "-DCMAKE_BUILD_TYPE=Debug", coverage: 'yes', benchmark: 'no'}
+        - {cc: gcc, cxx: g++, cmake_args: "-DCMAKE_BUILD_TYPE=Release -DUSE_BENCHMARK=ON", coverage: 'no', benchmark: 'yes'}
+        - {cc: clang, cxx: clang++, cmake_args: "-DCMAKE_BUILD_TYPE=Debug", coverage: 'no', benchmark: 'no'}
+        - {cc: clang, cxx: clang++, cmake_args: "-DCMAKE_BUILD_TYPE=Release", coverage: 'no', benchmark: 'no'}
 
     steps:
     - uses: actions/checkout@v1
