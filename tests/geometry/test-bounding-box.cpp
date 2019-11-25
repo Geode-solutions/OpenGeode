@@ -30,24 +30,24 @@
 
 void test()
 {
-        geode::BoundingBox2D box;
-        box.add_point( { { -1, -1 } } );
-        box.add_point( { { 1, 1 } } );
+    geode::BoundingBox2D box;
+    box.add_point( { { -1, -1 } } );
+    box.add_point( { { 1, 1 } } );
 
-        geode::BoundingBox2D box2{ box };
-        box2.add_point( { { -2, -2 } } );
-        box2.add_point( { { 0, 0 } } );
+    geode::BoundingBox2D box2{ box };
+    box2.add_point( { { -2, -2 } } );
+    box2.add_point( { { 0, 0 } } );
 
-        box2.add_box( box );
-        OPENGEODE_EXCEPTION( box2.min() == geode::Point2D( { -2, -2 } ),
-            "[Test] Error in BoundingBox union computation" );
-        OPENGEODE_EXCEPTION( box2.max() == geode::Point2D( { 1, 1 } ),
-            "[Test] Error in BoundingBox union computation" );
+    box2.add_box( box );
+    OPENGEODE_EXCEPTION( box2.min() == geode::Point2D( { -2, -2 } ),
+        "[Test] Error in BoundingBox union computation" );
+    OPENGEODE_EXCEPTION( box2.max() == geode::Point2D( { 1, 1 } ),
+        "[Test] Error in BoundingBox union computation" );
 
-        OPENGEODE_EXCEPTION( box2.contains( { { 0, 0 } } ),
-            "[Test] BBox should contain this point" );
-        OPENGEODE_EXCEPTION( !box2.contains( { { 10, 0 } } ),
-            "[Test] BBox should not contain this point" );
+    OPENGEODE_EXCEPTION( box2.contains( { { 0, 0 } } ),
+        "[Test] BBox should contain this point" );
+    OPENGEODE_EXCEPTION( !box2.contains( { { 10, 0 } } ),
+        "[Test] BBox should not contain this point" );
 
     OPENGEODE_EXCEPTION( box_union.contains( { { 0, 0 } } ),
         "[Test] BBox should contain this point" );
