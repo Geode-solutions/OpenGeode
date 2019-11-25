@@ -49,9 +49,9 @@ void test()
     OPENGEODE_EXCEPTION( !box2.contains( { { 10, 0 } } ),
         "[Test] BBox should not contain this point" );
 
-    OPENGEODE_EXCEPTION( box_union.contains( { { 0, 0 } } ),
+    OPENGEODE_EXCEPTION( box2.contains( { { 0, 0 } } ),
         "[Test] BBox should contain this point" );
-    OPENGEODE_EXCEPTION( !box_union.contains( { { 10, 0 } } ),
+    OPENGEODE_EXCEPTION( !box2.contains( { { 10, 0 } } ),
         "[Test] BBox should not contain this point" );
 
     const geode::BoundingBox2D copy_box = box2;
