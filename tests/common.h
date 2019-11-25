@@ -25,6 +25,12 @@
 
 #include <geode/basic/common.h>
 
+/*!
+ * The OPENGEODE_TEST macro takes a name as input and also use a function
+ * named "test" that takes no argument. This function should be accessible
+ * from the context in which OPENGEODE_TEST is called.
+ */
+
 #ifdef OPENGEODE_BENCHMARK
 #define CATCH_CONFIG_MAIN
 #define CATCH_CONFIG_PREFIX_ALL
