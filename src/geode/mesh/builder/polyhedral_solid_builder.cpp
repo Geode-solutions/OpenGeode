@@ -178,11 +178,13 @@ namespace geode
                 facet_vertices[v] =
                     polyhedral_solid_.polyhedron_facet_vertex( { id, v } );
             }
-            const auto position = find( facet_vertices, polyhedron_vertex_id );
-            if( position != NO_ID )
+            const auto position_it = std::find( facet_vertices.begin(),
+                facet_vertices.end(), polyhedron_vertex_id );
+            if( position_it != facet_vertices.end() )
             {
-                polyhedral_solid_.update_facet_vertex(
-                    facet_vertices, position, vertex_id );
+                polyhedral_solid_.update_facet_vertex( facet_vertices,
+                    std::distance( facet_vertices.begin(), position_it ),
+                    vertex_id );
             }
         }
         polyhedral_solid_.remove_isolated_facets();
@@ -580,12 +582,13 @@ namespace geode
                     Range{ polyhedral_solid.nb_polyhedron_facet_vertices(
                         { p, f } ) } )
                 {
-                    facet[v] = find(
-                        vertices, polyhedral_solid.polyhedron_facet_vertex(
-                                      { { p, f }, v } ) );
-                    OPENGEODE_ASSERT( facet[v] != NO_ID,
+                    const auto it = std::find( vertices.begin(), vertices.end(),
+                        polyhedral_solid.polyhedron_facet_vertex(
+                            { { p, f }, v } ) );
+                    OPENGEODE_ASSERT( it != vertices.end(),
                         "[PolyhedralSolidBuilder::copy] Wrong indexing between "
                         "polyhedron_vertex and polyhedron_facet_vertex" );
+                    facet[v] = std::distance( vertices.begin(), it );
                 }
             }
             create_polyhedron( vertices, facets );

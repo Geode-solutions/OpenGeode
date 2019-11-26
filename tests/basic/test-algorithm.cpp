@@ -42,36 +42,6 @@ std::vector< double > create_double_vector()
     return out;
 }
 
-void test_find()
-{
-    const auto bool_vector = create_bool_vector();
-    OPENGEODE_EXCEPTION( geode::find( bool_vector, true ) == 1,
-        "[Test] Find result for bool true is not correct" );
-    OPENGEODE_EXCEPTION( geode::find( bool_vector, false ) == 0,
-        "[Test] Find result for bool false is not correct" );
-
-    const auto double_vector = create_double_vector();
-    OPENGEODE_EXCEPTION( geode::find( double_vector, 2.2 ) == 2,
-        "[Test] Find result for double 2.2 is not correct" );
-    OPENGEODE_EXCEPTION( geode::find( double_vector, 1.3 ) == geode::NO_ID,
-        "[Test] Find result for double 1.3 true is not correct" );
-}
-
-void test_contain()
-{
-    const auto bool_vector = create_bool_vector();
-    OPENGEODE_EXCEPTION( geode::contain( bool_vector, true ),
-        "[Test] Contain result for bool true is not correct" );
-    OPENGEODE_EXCEPTION( geode::contain( bool_vector, false ),
-        "[Test] Contain result for bool false is not correct" );
-
-    const auto double_vector = create_double_vector();
-    OPENGEODE_EXCEPTION( geode::contain( double_vector, 2.2 ),
-        "[Test] Contain result for double 2.2 is not correct" );
-    OPENGEODE_EXCEPTION( !geode::contain( double_vector, 1.3 ),
-        "[Test] Contain result for double 1.3 is not correct" );
-}
-
 void test_delete_vector_elements()
 {
     auto bool_vector = create_bool_vector();
@@ -129,8 +99,6 @@ void test_sort_unique()
 
 void test()
 {
-    test_find();
-    test_contain();
     test_delete_vector_elements();
     test_extract_vector_elements();
     test_sort_unique();

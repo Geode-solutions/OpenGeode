@@ -23,7 +23,6 @@
 
 #include <geode/mesh/core/polyhedral_solid.h>
 
-#include <geode/basic/algorithm.h>
 #include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/bitsery_archive.h>
@@ -347,7 +346,9 @@ namespace geode
             const auto polyhedron_vertex_id = S.top();
             S.pop();
             const auto p = polyhedron_vertex_id.polyhedron_id;
-            if( contain( polyhedra_visited, p ) )
+            if( std::find(
+                    polyhedra_visited.begin(), polyhedra_visited.end(), p )
+                != polyhedra_visited.end() )
             {
                 continue;
             }
@@ -551,9 +552,10 @@ namespace geode
                     for( const auto v : Range{ nb_polyhedron_facet_vertices(
                              { polyhedron_adj, f } ) } )
                     {
-                        if( !contain(
-                                vertices, polyhedron_facet_vertex(
-                                              { { polyhedron_adj, f }, v } ) ) )
+                        if( std::find( vertices.begin(), vertices.end(),
+                                polyhedron_facet_vertex(
+                                    { { polyhedron_adj, f }, v } ) )
+                            == vertices.end() )
                         {
                             all_contained = false;
                             break;

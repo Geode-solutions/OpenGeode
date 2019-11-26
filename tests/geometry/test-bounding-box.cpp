@@ -33,40 +33,25 @@ void test()
     geode::BoundingBox2D box;
     box.add_point( { { -1, -1 } } );
     box.add_point( { { 1, 1 } } );
-    OPENGEODE_EXCEPTION( box.center() == geode::Point2D( { 0, 0 } ),
-        "[Test] Error in BoundingBox center computation" );
 
     geode::BoundingBox2D box2{ box };
     box2.add_point( { { -2, -2 } } );
     box2.add_point( { { 0, 0 } } );
-    OPENGEODE_EXCEPTION(
-        box.boxes_overlap( box2 ), "[Test] BBox should overlap" );
 
-    geode::BoundingBox2D box3;
-    box3.add_point( { { 2, 2 } } );
-    box3.add_point( { { 3, 3 } } );
-    OPENGEODE_EXCEPTION(
-        !box.boxes_overlap( box3 ), "[Test] BBox should not overlap" );
-
-    geode::BoundingBox2D box_inter;
-    std::tie( std::ignore, box_inter ) = box2.box_intersection( box );
-    OPENGEODE_EXCEPTION( box_inter.min() == geode::Point2D( { -1, -1 } ),
-        "[Test] Error in BoundingBox intersection computation" );
-    OPENGEODE_EXCEPTION( box_inter.max() == geode::Point2D( { 1, 1 } ),
-        "[Test] Error in BoundingBox intersection computation" );
-
-    geode::BoundingBox2D box_inter3;
-    std::tie( std::ignore, box_inter3 ) = box3.box_intersection( box );
-
-    const auto box_union = box2.box_union( box );
-    OPENGEODE_EXCEPTION( box_union.min() == geode::Point2D( { -2, -2 } ),
+    box2.add_box( box );
+    OPENGEODE_EXCEPTION( box2.min() == geode::Point2D( { -2, -2 } ),
         "[Test] Error in BoundingBox union computation" );
-    OPENGEODE_EXCEPTION( box_union.max() == geode::Point2D( { 1, 1 } ),
+    OPENGEODE_EXCEPTION( box2.max() == geode::Point2D( { 1, 1 } ),
         "[Test] Error in BoundingBox union computation" );
 
-    OPENGEODE_EXCEPTION( box_union.contains( { { 0, 0 } } ),
+    OPENGEODE_EXCEPTION( box2.contains( { { 0, 0 } } ),
         "[Test] BBox should contain this point" );
-    OPENGEODE_EXCEPTION( !box_union.contains( { { 10, 0 } } ),
+    OPENGEODE_EXCEPTION( !box2.contains( { { 10, 0 } } ),
+        "[Test] BBox should not contain this point" );
+
+    OPENGEODE_EXCEPTION( box2.contains( { { 0, 0 } } ),
+        "[Test] BBox should contain this point" );
+    OPENGEODE_EXCEPTION( !box2.contains( { { 10, 0 } } ),
         "[Test] BBox should not contain this point" );
 
     const geode::BoundingBox2D copy_box = box2;

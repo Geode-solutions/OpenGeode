@@ -124,12 +124,6 @@ namespace geode
     }
 
     template < index_t dimension >
-    Point< dimension > BoundingBox< dimension >::center() const
-    {
-        return ( min() + max() ) / 2.;
-    }
-
-    template < index_t dimension >
     void BoundingBox< dimension >::add_point( const Point< dimension >& point )
     {
         impl_->add_point( point );
@@ -141,58 +135,6 @@ namespace geode
     {
         add_point( box.min() );
         add_point( box.max() );
-    }
-
-    template < index_t dimension >
-    bool BoundingBox< dimension >::boxes_overlap(
-        const BoundingBox< dimension >& box ) const
-    {
-        for( const auto i : Range{ dimension } )
-        {
-            if( max().value( i ) < box.min().value( i ) )
-            {
-                return false;
-            }
-            if( min().value( i ) > box.max().value( i ) )
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    template < index_t dimension >
-    BoundingBox< dimension > BoundingBox< dimension >::box_union(
-        const BoundingBox< dimension >& box ) const
-    {
-        BoundingBox< dimension > result{ *this };
-        result.add_box( box );
-        return result;
-    }
-
-    template < index_t dimension >
-    std::tuple< bool, BoundingBox< dimension > >
-        BoundingBox< dimension >::box_intersection(
-            const BoundingBox< dimension >& box ) const
-    {
-        if( !boxes_overlap( box ) )
-        {
-            return std::make_tuple( false, BoundingBox() );
-        }
-
-        Point< dimension > minimal_max;
-        Point< dimension > maximal_min;
-        for( const auto c : Range{ dimension } )
-        {
-            minimal_max.set_value(
-                c, std::min( this->max().value( c ), box.max().value( c ) ) );
-            maximal_min.set_value(
-                c, std::max( this->min().value( c ), box.min().value( c ) ) );
-        }
-        BoundingBox< dimension > result;
-        result.add_point( maximal_min );
-        result.add_point( minimal_max );
-        return std::make_tuple( true, result );
     }
 
     template < index_t dimension >

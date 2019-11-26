@@ -58,33 +58,6 @@ namespace geode
 
         const Point< dimension >& max() const;
 
-        Point< dimension > center() const;
-
-        /*!
-         * Check if another BoundingBox overlaps this one.
-         * @param[in] box The other BoundingBox to test
-         * @return true if there is an overlap
-         */
-        bool boxes_overlap( const BoundingBox< dimension >& box ) const;
-
-        /*!
-         * Compute the union with another BoundingBox
-         * @param[in] box The other BoundingBox to use
-         * @return The BoundingBox representing the union of the two other
-         * boxes.
-         */
-        BoundingBox< dimension > box_union(
-            const BoundingBox< dimension >& box ) const;
-
-        /*!
-         * Compute the intersection with another BoundingBox
-         * @param[in] box The other BoundingBox to use
-         * @return 1) true if there is an intersection, 2) The BoundingBox
-         * representing the intersection of the two other boxes.
-         */
-        std::tuple< bool, BoundingBox< dimension > > box_intersection(
-            const BoundingBox< dimension >& box ) const;
-
     private:
         IMPLEMENTATION_MEMBER( impl_ );
     };
