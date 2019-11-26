@@ -56,6 +56,12 @@ jobs:
       with: 
         token: ${{ secrets.CODECOV_TOKEN }}
         file: kcov/kcov-merged/cobertura.xml
+    - uses: Geode-solutions/actions/benchmark@master
+      if: matrix.config.benchmark && github.ref == 'refs/heads/master'
+      with:
+        repository: OpenGeode
+        directory: ${GITHUB_WORKSPACE}/test
+        token: ${{ secrets.TOKEN }}
     - name: Notify slack
       if: failure() && github.ref == 'refs/heads/master'
       uses: 8398a7/action-slack@v2
