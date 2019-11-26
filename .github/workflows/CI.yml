@@ -60,7 +60,7 @@ jobs:
       if: matrix.config.benchmark && github.ref == 'refs/heads/master'
       with:
         repository: OpenGeode
-        directory: test
+        directory: test/bin
         token: ${{ secrets.TOKEN }}
     - name: Notify slack
       if: failure() && github.ref == 'refs/heads/master'
