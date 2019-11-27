@@ -244,6 +244,7 @@ void test_set_polyhedron_vertex(
 {
     const auto facet_id = polyhedral_solid.polyhedron_facet( { 0, 1 } );
     builder.set_polyhedron_vertex( { 0, 2 }, 1 );
+    builder.delete_isolated_facets();
 
     OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_vertex( { 0, 2 } ) == 1,
         "[Test] PolyhedronVertex after set_polyhedron_vertex is wrong" );

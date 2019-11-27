@@ -86,13 +86,13 @@ namespace geode
     void GraphBuilder::set_edge_vertex(
         const EdgeVertex& edge_vertex, index_t vertex_id )
     {
-        OPENGEODE_EXCEPTION( edge_vertex.edge_id < graph_.nb_edges(),
+        OPENGEODE_ASSERT( edge_vertex.edge_id < graph_.nb_edges(),
             "[GraphBuilder::set_edge_vertex] Accessing an edge that does not "
             "exist" );
-        OPENGEODE_EXCEPTION( edge_vertex.vertex_id < 2,
+        OPENGEODE_ASSERT( edge_vertex.vertex_id < 2,
             "[GraphBuilder::set_edge_vertex] Trying to access an invalid edge "
             "local vertex" );
-        OPENGEODE_EXCEPTION( vertex_id < graph_.nb_vertices(),
+        OPENGEODE_ASSERT( vertex_id < graph_.nb_vertices(),
             "[GraphBuilder::set_edge_vertex] Accessing a vertex that does not "
             "exist" );
         if( graph_.edge_vertex( edge_vertex ) == vertex_id )
@@ -113,9 +113,9 @@ namespace geode
 
     index_t GraphBuilder::create_edge( index_t v0_id, index_t v1_id )
     {
-        OPENGEODE_EXCEPTION( v0_id != v1_id, "[GraphBuilder::create_edge] "
-                                             "Trying to create an edge with "
-                                             "same extremities" );
+        OPENGEODE_ASSERT( v0_id != v1_id, "[GraphBuilder::create_edge] "
+                                          "Trying to create an edge with "
+                                          "same extremities" );
         const auto added_edge = graph_.nb_edges();
         create_edge();
         set_edge_vertex( { added_edge, 0 }, v0_id );

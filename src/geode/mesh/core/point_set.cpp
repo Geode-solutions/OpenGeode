@@ -61,7 +61,7 @@ namespace geode
     const Point< dimension >& PointSet< dimension >::point(
         index_t vertex_id ) const
     {
-        OPENGEODE_EXCEPTION( vertex_id < nb_vertices(),
+        OPENGEODE_ASSERT( vertex_id < nb_vertices(),
             "[PointSet::point] Trying to access an invalid point" );
         return get_point( vertex_id );
     }

@@ -121,6 +121,11 @@ namespace geode
         void delete_isolated_vertices();
 
         /*!
+         * Delete all the isolated edges (not used as polygon edges)
+         */
+        void delete_isolated_edges();
+
+        /*!
          * Return one polygon with one of the vertices matching given vertex.
          * @param[in] vertex_id Index of the vertex.
          * @detail If vertex is isolated (no incident polygon), default

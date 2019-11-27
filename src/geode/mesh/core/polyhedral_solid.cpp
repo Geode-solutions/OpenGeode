@@ -42,7 +42,9 @@ namespace
     void check_polyhedron_id( const geode::PolyhedralSolid< dimension >& solid,
         const geode::index_t polyhedron_id )
     {
-        OPENGEODE_EXCEPTION( polyhedron_id < solid.nb_polyhedra(),
+        geode_unused( solid );
+        geode_unused( polyhedron_id );
+        OPENGEODE_ASSERT( polyhedron_id < solid.nb_polyhedra(),
             "[check_polyhedron_id] Trying to access an invalid polyhedron" );
     }
 
@@ -52,7 +54,10 @@ namespace
         const geode::index_t polyhedron_id,
         const geode::index_t vertex_id )
     {
-        OPENGEODE_EXCEPTION(
+        geode_unused( solid );
+        geode_unused( polyhedron_id );
+        geode_unused( vertex_id );
+        OPENGEODE_ASSERT(
             vertex_id < solid.nb_polyhedron_vertices( polyhedron_id ),
             "[check_polyhedron_vertex_id] Trying to access an invalid "
             "polyhedron vertex" );
@@ -64,7 +69,10 @@ namespace
         const geode::index_t polyhedron_id,
         const geode::index_t facet_id )
     {
-        OPENGEODE_EXCEPTION(
+        geode_unused( solid );
+        geode_unused( polyhedron_id );
+        geode_unused( facet_id );
+        OPENGEODE_ASSERT(
             facet_id < solid.nb_polyhedron_facets( polyhedron_id ),
             "[check_polyhedron_facet_id] Trying to access an invalid "
             "polyhedron facet" );
@@ -77,8 +85,12 @@ namespace
         const geode::index_t facet_id,
         const geode::index_t vertex_id )
     {
-        OPENGEODE_EXCEPTION( vertex_id < solid.nb_polyhedron_facet_vertices(
-                                 { polyhedron_id, facet_id } ),
+        geode_unused( solid );
+        geode_unused( polyhedron_id );
+        geode_unused( facet_id );
+        geode_unused( vertex_id );
+        OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -94,10 +106,10 @@ namespace geode
     public:
         explicit Impl( PolyhedralSolid& solid )
             : polyhedron_around_vertex_(
-                solid.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolyhedronVertex >(
-                        "polyhedron_around_vertex", PolyhedronVertex{} ) )
+                  solid.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolyhedronVertex >(
+                          "polyhedron_around_vertex", PolyhedronVertex{} ) )
         {
         }
 
@@ -139,7 +151,6 @@ namespace geode
             updated_facet_vertices[facet_vertex_id] = new_vertex_id;
             this->add_facet( updated_facet_vertices );
             this->remove_facet( facet_vertices );
-            this->clean_facets();
         }
 
         void update_facet_vertices( const std::vector< index_t >& old2new )
@@ -324,7 +335,7 @@ namespace geode
         PolyhedralSolid< dimension >::polyhedra_around_vertex(
             index_t vertex_id ) const
     {
-        OPENGEODE_EXCEPTION( vertex_id < this->nb_vertices(),
+        OPENGEODE_ASSERT( vertex_id < this->nb_vertices(),
             "[PolyhedralSolid::polyhedra_around_vertex] Accessing an "
             "invalid vertex" );
         std::vector< PolyhedronVertex > polyhedra;
@@ -397,7 +408,7 @@ namespace geode
         PolyhedralSolid< dimension >::polyhedron_around_vertex(
             index_t vertex_id ) const
     {
-        OPENGEODE_EXCEPTION( vertex_id < this->nb_vertices(),
+        OPENGEODE_ASSERT( vertex_id < this->nb_vertices(),
             "[PolyhedralSolid::polyhedron_around_vertex] Accessing an "
             "invalid vertex" );
         return impl_->polyhedron_around_vertex( vertex_id );
@@ -617,7 +628,7 @@ namespace geode
     const Point< dimension >& PolyhedralSolid< dimension >::point(
         index_t vertex_id ) const
     {
-        OPENGEODE_EXCEPTION( vertex_id < nb_vertices(),
+        OPENGEODE_ASSERT( vertex_id < nb_vertices(),
             "[PolyhedralSolid::point] Trying to access an invalid "
             "point" );
         return get_point( vertex_id );

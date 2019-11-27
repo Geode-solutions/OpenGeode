@@ -240,7 +240,7 @@ namespace geode
         if( std::find( to_delete.begin(), to_delete.end(), true )
             != to_delete.end() )
         {
-            OPENGEODE_EXCEPTION( to_delete.size() == nb_elements(),
+            OPENGEODE_ASSERT( to_delete.size() == nb_elements(),
                 "[AttributeManager::delete_elements] Vector to_delete should "
                 "have the same size as the number of "
                 "elements" );

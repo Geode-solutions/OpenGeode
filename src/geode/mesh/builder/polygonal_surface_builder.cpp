@@ -34,13 +34,50 @@
 
 namespace
 {
-    using geode::index_t;
+    template < geode::index_t dimension >
+    void check_polygon_id(
+        const geode::PolygonalSurfaceBase< dimension >& surface,
+        const geode::index_t polygon_id )
+    {
+        geode_unused( surface );
+        geode_unused( polygon_id );
+        OPENGEODE_ASSERT( polygon_id < surface.nb_polygons(),
+            "[check_polygon_id] Trying to access an invalid polygon" );
+    }
 
-    template < index_t dimension >
+    template < geode::index_t dimension >
+    void check_polygon_vertex_id(
+        const geode::PolygonalSurfaceBase< dimension >& surface,
+        const geode::index_t polygon_id,
+        const geode::index_t vertex_id )
+    {
+        geode_unused( surface );
+        geode_unused( polygon_id );
+        geode_unused( vertex_id );
+        OPENGEODE_ASSERT( vertex_id < surface.nb_polygon_vertices( polygon_id ),
+            "[check_polygon_vertex_id] Trying to access an invalid polygon "
+            "local vertex" );
+    }
+
+    template < geode::index_t dimension >
+    void check_polygon_edge_id(
+        const geode::PolygonalSurfaceBase< dimension >& surface,
+        const geode::index_t polygon_id,
+        const geode::index_t edge_id )
+    {
+        geode_unused( surface );
+        geode_unused( polygon_id );
+        geode_unused( edge_id );
+        OPENGEODE_ASSERT( edge_id < surface.nb_polygon_edges( polygon_id ),
+            "[check_polygon_edge_id] Trying to access an invalid polygon local "
+            "edge" );
+    }
+
+    template < geode::index_t dimension >
     void update_polygon_adjacencies(
         const geode::PolygonalSurface< dimension >& surface,
         geode::PolygonalSurfaceBuilder< dimension >& builder,
-        const std::vector< index_t >& old2new )
+        const std::vector< geode::index_t >& old2new )
     {
         for( const auto p : geode::Range{ surface.nb_polygons() } )
         {
@@ -58,11 +95,11 @@ namespace
         }
     }
 
-    template < index_t dimension >
+    template < geode::index_t dimension >
     void update_polygon_around_vertices(
         const geode::PolygonalSurface< dimension >& surface,
         geode::PolygonalSurfaceBuilder< dimension >& builder,
-        const std::vector< index_t >& vertices_old2new )
+        const std::vector< geode::index_t >& vertices_old2new )
     {
         for( const auto v : geode::Range{ surface.nb_vertices() } )
         {
@@ -81,10 +118,10 @@ namespace
         }
     }
 
-    template < index_t dimension >
+    template < geode::index_t dimension >
     std::vector< bool > find_polygons_to_delete(
         const geode::PolygonalSurface< dimension >& surface,
-        const std::vector< index_t >& vertices_old2new )
+        const std::vector< geode::index_t >& vertices_old2new )
     {
         std::vector< bool > polygons_to_delete( surface.nb_polygons(), false );
         for( const auto p : geode::Range{ surface.nb_polygons() } )
@@ -218,7 +255,6 @@ namespace geode
             { polygon_vertex_id, next_id }, 0, vertex_id );
         polygonal_surface_.update_edge_vertex(
             { previous_id, polygon_vertex_id }, 1, vertex_id );
-        polygonal_surface_.remove_isolated_edges();
         update_polygon_vertex( polygon_vertex, vertex_id );
     }
 
@@ -252,16 +288,10 @@ namespace geode
     void PolygonalSurfaceBuilder< dimension >::update_polygon_vertex(
         const PolygonVertex& polygon_vertex, index_t vertex_id )
     {
-        OPENGEODE_EXCEPTION(
-            polygon_vertex.polygon_id < polygonal_surface_.nb_polygons(),
-            "[PolygonalSurfaceBuilder::update_polygon_vertex] Accessing a "
-            "polygon that does not exist" );
-        OPENGEODE_EXCEPTION(
-            polygon_vertex.vertex_id < polygonal_surface_.nb_polygon_vertices(
-                polygon_vertex.polygon_id ),
-            "[PolygonalSurfaceBuilder::update_polygon_vertex] Accessing an "
-            "invalid polygon vertex" );
-        OPENGEODE_EXCEPTION( vertex_id < polygonal_surface_.nb_vertices(),
+        check_polygon_id( polygonal_surface_, polygon_vertex.polygon_id );
+        check_polygon_vertex_id( polygonal_surface_, polygon_vertex.polygon_id,
+            polygon_vertex.vertex_id );
+        OPENGEODE_ASSERT( vertex_id < polygonal_surface_.nb_vertices(),
             "[PolygonalSurfaceBuilder::update_polygon_vertex] Accessing a "
             "vertex that does not exist" );
         associate_polygon_vertex_to_vertex( polygon_vertex, vertex_id );
@@ -282,17 +312,11 @@ namespace geode
     void PolygonalSurfaceBuilder< dimension >::set_polygon_adjacent(
         const PolygonEdge& polygon_edge, index_t adjacent_id )
     {
-        OPENGEODE_EXCEPTION(
-            polygon_edge.polygon_id < polygonal_surface_.nb_polygons(),
-            "[PolygonalSurfaceBuilder::set_polygon_adjacent] Accessing a "
-            "polygon that does not exist" );
-        OPENGEODE_EXCEPTION(
-            polygon_edge.edge_id < polygonal_surface_.nb_polygon_edges(
-                polygon_edge.polygon_id ),
-            "[PolygonalSurfaceBuilder::set_polygon_adjacent] Accessing an "
-            "invalid polygon vertex" );
-        OPENGEODE_EXCEPTION( adjacent_id < polygonal_surface_.nb_polygons()
-                                 || adjacent_id == NO_ID,
+        check_polygon_id( polygonal_surface_, polygon_edge.polygon_id );
+        check_polygon_edge_id(
+            polygonal_surface_, polygon_edge.polygon_id, polygon_edge.edge_id );
+        OPENGEODE_ASSERT( adjacent_id < polygonal_surface_.nb_polygons()
+                              || adjacent_id == NO_ID,
             "[PolygonalSurfaceBuilder::set_polygon_adjacent] Accessing a "
             "polygon that does not exist" );
         do_set_polygon_adjacent( polygon_edge, adjacent_id );
@@ -431,6 +455,12 @@ namespace geode
     }
 
     template < index_t dimension >
+    void PolygonalSurfaceBuilder< dimension >::delete_isolated_edges()
+    {
+        polygonal_surface_.remove_isolated_edges();
+    }
+
+    template < index_t dimension >
     void PolygonalSurfaceBuilder< dimension >::update_edge_vertices(
         const std::vector< index_t >& old2new )
     {
@@ -443,7 +473,7 @@ namespace geode
         index_t edge_vertex_id,
         index_t new_vertex_id )
     {
-        OPENGEODE_EXCEPTION( edge_vertex_id < 2,
+        OPENGEODE_ASSERT( edge_vertex_id < 2,
             "[PolygonalSurfaceBuilder::update_edge_vertex] "
             "Accessing an invalid vertex in edge" );
         polygonal_surface_.update_edge_vertex(
@@ -461,7 +491,7 @@ namespace geode
     void PolygonalSurfaceBuilder< dimension >::set_point(
         index_t vertex_id, const Point< dimension >& point )
     {
-        OPENGEODE_EXCEPTION( vertex_id < polygonal_surface_.nb_vertices(),
+        OPENGEODE_ASSERT( vertex_id < polygonal_surface_.nb_vertices(),
             "[PolygonalSurfaceBuilder::set_point] Accessing a vertex that does "
             "not exist" );
         do_set_point( vertex_id, point );
