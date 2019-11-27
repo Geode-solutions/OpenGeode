@@ -48,7 +48,9 @@ namespace
         const geode::PolygonalSurfaceBase< dimension >& surface,
         const geode::index_t polygon_id )
     {
-        OPENGEODE_EXCEPTION( polygon_id < surface.nb_polygons(),
+        geode_unused( surface );
+        geode_unused( polygon_id );
+        OPENGEODE_ASSERT( polygon_id < surface.nb_polygons(),
             "[check_polygon_id] Trying to access an invalid polygon" );
     }
 
@@ -58,8 +60,10 @@ namespace
         const geode::index_t polygon_id,
         const geode::index_t vertex_id )
     {
-        OPENGEODE_EXCEPTION(
-            vertex_id < surface.nb_polygon_vertices( polygon_id ),
+        geode_unused( surface );
+        geode_unused( polygon_id );
+        geode_unused( vertex_id );
+        OPENGEODE_ASSERT( vertex_id < surface.nb_polygon_vertices( polygon_id ),
             "[check_polygon_vertex_id] Trying to access an invalid polygon "
             "local vertex" );
     }
@@ -70,7 +74,10 @@ namespace
         const geode::index_t polygon_id,
         const geode::index_t edge_id )
     {
-        OPENGEODE_EXCEPTION( edge_id < surface.nb_polygon_edges( polygon_id ),
+        geode_unused( surface );
+        geode_unused( polygon_id );
+        geode_unused( edge_id );
+        OPENGEODE_ASSERT( edge_id < surface.nb_polygon_edges( polygon_id ),
             "[check_polygon_edge_id] Trying to access an invalid polygon local "
             "edge" );
     }
@@ -110,10 +117,10 @@ namespace geode
     public:
         explicit Impl( PolygonalSurfaceBase& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) )
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
@@ -154,7 +161,6 @@ namespace geode
             updated_edge_vertices[edge_vertex_id] = new_vertex_id;
             this->add_facet( updated_edge_vertices );
             this->remove_facet( edge_vertices );
-            this->clean_facets();
         }
 
         void update_edge_vertices( const std::vector< index_t >& old2new )
@@ -248,7 +254,7 @@ namespace geode
         PolygonalSurfaceBase< dimension >::polygon_around_vertex(
             index_t vertex_id ) const
     {
-        OPENGEODE_EXCEPTION( vertex_id < this->nb_vertices(),
+        OPENGEODE_ASSERT( vertex_id < this->nb_vertices(),
             "[PolygonalSurfaceBase::polygon_around_vertex] Accessing an "
             "invalid vertex" );
         return impl_->polygon_around_vertex( vertex_id );
@@ -438,7 +444,7 @@ namespace geode
     PolygonEdge PolygonalSurfaceBase< dimension >::next_on_border(
         const PolygonEdge& polygon_edge ) const
     {
-        OPENGEODE_EXCEPTION( is_edge_on_border( polygon_edge ),
+        OPENGEODE_ASSERT( is_edge_on_border( polygon_edge ),
             "[PolygonalSurfaceBase::next_on_border] Polygon edge should be on "
             "border" );
         auto next_border = next_polygon_edge( polygon_edge );
@@ -454,7 +460,7 @@ namespace geode
     PolygonEdge PolygonalSurfaceBase< dimension >::previous_on_border(
         const PolygonEdge& polygon_edge ) const
     {
-        OPENGEODE_EXCEPTION( is_edge_on_border( polygon_edge ),
+        OPENGEODE_ASSERT( is_edge_on_border( polygon_edge ),
             "[PolygonalSurfaceBase::previous_on_border] Polygon edge should be "
             "on border" );
         auto previous_border = previous_polygon_edge( polygon_edge );
@@ -488,14 +494,14 @@ namespace geode
     index_t PolygonalSurfaceBase< dimension >::polygon_edge_vertex(
         const PolygonEdge& polygon_edge, index_t vertex_id ) const
     {
-        OPENGEODE_EXCEPTION( vertex_id < 2, "[PolygonalSurfaceBase::polygon_"
-                                            "edge_vertex] vertex_id should be "
-                                            "0 or 1" );
-        if( vertex_id == 0 )
-        {
-            return polygon_vertex( polygon_edge );
-        }
-        return polygon_vertex( next_polygon_edge( polygon_edge ) );
+        OPENGEODE_ASSERT( vertex_id < 2, "[PolygonalSurfaceBase::polygon_"
+                                         "edge_vertex] vertex_id should be "
+                                         "0 or 1" );
+        const auto vertex = polygon_edge.edge_id;
+        const auto polygon = polygon_edge.polygon_id;
+        const auto nb_vertices = nb_polygon_vertices( polygon );
+        return polygon_vertex(
+            { polygon, ( vertex + vertex_id ) % nb_vertices } );
     }
 
     template < index_t dimension >
@@ -536,7 +542,7 @@ namespace geode
         PolygonalSurfaceBase< dimension >::polygons_around_vertex(
             index_t vertex_id ) const
     {
-        OPENGEODE_EXCEPTION( vertex_id < this->nb_vertices(),
+        OPENGEODE_ASSERT( vertex_id < this->nb_vertices(),
             "[PolygonalSurfaceBase::polygons_around_vertex] Accessing an "
             "invalid vertex" );
         std::vector< PolygonVertex > polygons;
@@ -621,7 +627,7 @@ namespace geode
     const Point< dimension >& PolygonalSurfaceBase< dimension >::point(
         index_t vertex_id ) const
     {
-        OPENGEODE_EXCEPTION( vertex_id < nb_vertices(),
+        OPENGEODE_ASSERT( vertex_id < nb_vertices(),
             "[PolygonalSurfaceBase::point] Trying to access an invalid point" );
         return get_point( vertex_id );
     }

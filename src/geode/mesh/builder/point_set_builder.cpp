@@ -52,7 +52,7 @@ namespace geode
     void PointSetBuilder< dimension >::set_point(
         index_t vertex_id, const Point< dimension >& point )
     {
-        OPENGEODE_EXCEPTION( vertex_id < point_set_.nb_vertices(),
+        OPENGEODE_ASSERT( vertex_id < point_set_.nb_vertices(),
             "[PointSetBuilder::set_point] Accessing a vertex that does not "
             "exist" );
         do_set_point( vertex_id, point );

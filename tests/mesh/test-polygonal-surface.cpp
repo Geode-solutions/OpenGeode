@@ -373,6 +373,7 @@ void test_set_polygon_vertex(
     geode::PolygonalSurfaceBuilder3D& builder )
 {
     builder.set_polygon_vertex( { 0, 2 }, 1 );
+    builder.delete_isolated_edges();
     OPENGEODE_EXCEPTION( polygonal_surface.polygon_vertex( { 0, 2 } ) == 1,
         "[Test] PolygonVertex after set_polygon_vertex is wrong" );
 

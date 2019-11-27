@@ -56,12 +56,13 @@ namespace geode
         const std::vector< index_t >& vertices,
         const std::vector< std::vector< index_t > >& facets )
     {
-        OPENGEODE_EXCEPTION( vertices.size() == 4, "[TetrahedralSolidBuilder::"
-                                                   "do_create_polyhedron] Only "
-                                                   "tetrahedra are handled" );
-        OPENGEODE_EXCEPTION( facets.size() == 4, "[TetrahedralSolidBuilder::do_"
-                                                 "create_polyhedron] Only "
-                                                 "tetrahedra are handled" );
+        geode_unused( facets );
+        OPENGEODE_ASSERT( vertices.size() == 4, "[TetrahedralSolidBuilder::"
+                                                "do_create_polyhedron] Only "
+                                                "tetrahedra are handled" );
+        OPENGEODE_ASSERT( facets.size() == 4, "[TetrahedralSolidBuilder::do_"
+                                              "create_polyhedron] Only "
+                                              "tetrahedra are handled" );
         std::array< index_t, 4 > tetra_vertices{};
         std::copy_n( vertices.begin(), 4, tetra_vertices.begin() );
         do_create_tetrahedron( tetra_vertices );
@@ -73,12 +74,13 @@ namespace geode
             const std::vector< index_t >& vertices,
             const std::vector< std::vector< index_t > >& facets ) const
     {
-        OPENGEODE_EXCEPTION( vertices.size() == 4, "[TetrahedralSolidBuilder::"
-                                                   "do_create_polyhedron] Only "
-                                                   "tetrahedra are handled" );
-        OPENGEODE_EXCEPTION( facets.size() == 4, "[TetrahedralSolidBuilder::do_"
-                                                 "create_polyhedron] Only "
-                                                 "tetrahedra are handled" );
+        geode_unused( facets );
+        OPENGEODE_ASSERT( vertices.size() == 4, "[TetrahedralSolidBuilder::"
+                                                "do_create_polyhedron] Only "
+                                                "tetrahedra are handled" );
+        OPENGEODE_ASSERT( facets.size() == 4, "[TetrahedralSolidBuilder::do_"
+                                              "create_polyhedron] Only "
+                                              "tetrahedra are handled" );
         std::array< index_t, 4 > tetra_vertices{};
         std::copy_n( vertices.begin(), 4, tetra_vertices.begin() );
         return get_polyhedron_facet_vertices( tetra_vertices );
