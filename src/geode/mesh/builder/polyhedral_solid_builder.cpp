@@ -86,7 +86,7 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -304,6 +304,12 @@ namespace geode
         {
             this->find_or_create_facet( facet_vertices );
         }
+        const auto polyhedron_edge_vertices =
+            get_polyhedron_edge_vertices( vertices, facets );
+        for( const auto& edge_vertices : polyhedron_edge_vertices )
+        {
+            this->find_or_create_edge( edge_vertices );
+        }
         do_create_polyhedron( vertices, facets );
         return added_polyhedron;
     }
@@ -330,6 +336,28 @@ namespace geode
     }
 
     template < index_t dimension >
+    std::vector< std::array< index_t, 2 > >
+        PolyhedralSolidBuilder< dimension >::get_polyhedron_edge_vertices(
+            const std::vector< index_t >& vertices,
+            const std::vector< std::vector< index_t > >& facets ) const
+    {
+        std::vector< std::array< index_t, 2 > > polyhedron_edge_vertices;
+        polyhedron_edge_vertices.reserve( 3 * facets.size() );
+        for( const auto f : Range{ facets.size() } )
+        {
+            for( const auto v : Range{ facets[f].size() } )
+            {
+                OPENGEODE_ASSERT( facets[f][v] < vertices.size(),
+                    "[PolyhedralSolidBuilder::get_polyhedron_edge_vertices] "
+                    "Wrong facet definition" );
+                polyhedron_edge_vertices.push_back( { vertices[facets[f][v]],
+                    vertices[facets[f][( v + 1 ) % facets[f].size()]] } );
+            }
+        }
+        return polyhedron_edge_vertices;
+    }
+
+    template < index_t dimension >
     void PolyhedralSolidBuilder< dimension >::
         associate_polyhedron_vertex_to_vertex(
             const PolyhedronVertex& polyhedron_vertex, index_t vertex_id )
@@ -343,6 +371,13 @@ namespace geode
         const std::vector< index_t >& facet_vertices )
     {
         return polyhedral_solid_.find_or_create_facet( facet_vertices );
+    }
+
+    template < index_t dimension >
+    index_t PolyhedralSolidBuilder< dimension >::find_or_create_edge(
+        const std::array< index_t, 2 >& edge_vertices )
+    {
+        return polyhedral_solid_.find_or_create_edge( edge_vertices );
     }
 
     template < index_t dimension >

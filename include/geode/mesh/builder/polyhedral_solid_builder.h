@@ -156,6 +156,9 @@ namespace geode
         index_t find_or_create_facet(
             const std::vector< index_t >& facet_vertices );
 
+        index_t find_or_create_edge(
+            const std::array< index_t, 2 >& edge_vertices );
+
         friend class PolyhedralSolid< dimension >;
         void copy( const PolyhedralSolid< dimension >& polyhedral_solid );
 
@@ -203,6 +206,11 @@ namespace geode
 
         virtual std::vector< std::vector< index_t > >
             get_polyhedron_facet_vertices(
+                const std::vector< index_t >& vertices,
+                const std::vector< std::vector< index_t > >& facets ) const;
+
+        virtual std::vector< std::array< index_t, 2 > >
+            get_polyhedron_edge_vertices(
                 const std::vector< index_t >& vertices,
                 const std::vector< std::vector< index_t > >& facets ) const;
 

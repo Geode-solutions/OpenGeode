@@ -63,6 +63,9 @@ void test_create_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
         "[Test] PolyhedralSolid should have 3 polyhedra" );
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_facets() == 11,
         "[Test] PolyhedralSolid should have 11 facets" );
+    DEBUG( polyhedral_solid.nb_edges() );
+    OPENGEODE_EXCEPTION( polyhedral_solid.nb_edges() == 15,
+        "[Test] PolyhedralSolid should have 15 edges" );
 }
 
 void test_create_facet_attribute(
