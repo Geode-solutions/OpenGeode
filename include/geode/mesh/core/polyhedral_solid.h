@@ -168,9 +168,11 @@ namespace geode
 
         const Point< dimension >& point( index_t vertex_id ) const;
 
+        index_t nb_polyhedra() const;
+
         index_t nb_facets() const;
 
-        index_t nb_polyhedra() const;
+        index_t nb_edges() const;
 
         /*!
          * Return the number of vertices in a polyhedron.
@@ -218,11 +220,24 @@ namespace geode
         const std::vector< index_t >& facet_vertices( index_t facet_id ) const;
 
         /*!
+         * Return the indices of edge vertices.
+         * @param[in] edge_id Index of an edge.
+         */
+        const std::array< index_t, 2 >& edge_vertices( index_t edge_id ) const;
+
+        /*!
          * Get the index of facet corresponding to given vertices
          * @param[in] vertices Ordered vertex indices
          */
         index_t facet_from_vertices(
             const std::vector< index_t >& vertices ) const;
+
+        /*!
+         * Get the index of edge corresponding to given vertices
+         * @param[in] vertices Ordered vertex indices
+         */
+        index_t edge_from_vertices(
+            const std::array< index_t, 2 >& vertices ) const;
 
         /*!
          * Return the index of the polyhedron adjacent through a facet.
@@ -273,6 +288,12 @@ namespace geode
         double facet_area( index_t facet_id ) const;
 
         /*!
+         * Return the length of a given edge.
+         * @param[in] edge_id Index of edge.
+         */
+        double edge_length( index_t edge_id ) const;
+
+        /*!
          * Return the barycenter of a polyhedron
          * @param[in] polyhedron_id Index of a polyhedron
          */
@@ -285,11 +306,23 @@ namespace geode
         Point< dimension > facet_barycenter( index_t facet_id ) const;
 
         /*!
+         * Return the coordinates of the barycenter of a given edge.
+         * @param[in] edge_id Index of edge.
+         */
+        Point< dimension > edge_barycenter( index_t edge_id ) const;
+
+        /*!
          * Get all the polyhedra with one of the vertices matching given vertex.
          * @param[in] vertex_id Index of the vertex
          */
         std::vector< PolyhedronVertex > polyhedra_around_vertex(
             index_t vertex_id ) const;
+
+        /*!
+         * Get all the polyhedra with both edge vertices.
+         * @param[in] edge_id Index of the edge
+         */
+        std::vector< index_t > polyhedra_around_edge( index_t edge_id ) const;
 
         /*!
          * Access to the manager of attributes associated with polyhedra.
@@ -301,11 +334,19 @@ namespace geode
          */
         AttributeManager& facet_attribute_manager() const;
 
+        /*!
+         * Access to the manager of attributes associated with edges.
+         */
+        AttributeManager& edge_attribute_manager() const;
+
     protected:
         PolyhedralSolid();
 
         index_t find_or_create_facet(
             const std::vector< index_t >& facet_vertices );
+
+        index_t find_or_create_edge(
+            const std::array< index_t, 2 > edge_vertices );
 
     private:
         friend class bitsery::Access;
