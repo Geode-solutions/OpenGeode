@@ -56,6 +56,8 @@ void test_create_tetrahedra( const geode::TetrahedralSolid3D& solid,
         "[Test] TetrahedralSolid should have 3 tetrahedra" );
     OPENGEODE_EXCEPTION( solid.nb_facets() == 10,
         "[Test] PolyhedralSolid should have 10 facets" );
+    OPENGEODE_EXCEPTION(
+        solid.nb_edges() == 12, "[Test] PolyhedralSolid should have 12 edges" );
 }
 
 void test_polyhedron_adjacencies( const geode::TetrahedralSolid3D& solid,
@@ -90,9 +92,13 @@ void test_delete_vertex( const geode::TetrahedralSolid3D& solid,
     OPENGEODE_EXCEPTION( solid.point( 0 ) == answer,
         "[Test] TetrahedralSolid vertex coordinates are not correct" );
     OPENGEODE_EXCEPTION( solid.nb_polyhedra() == 2,
-        "[Test] TetrahedralSolid should have 2 ttrahedra" );
+        "[Test] TetrahedralSolid should have 2 tetrahedra" );
     OPENGEODE_EXCEPTION( solid.polyhedron_adjacent( { 1, 3 } ) == 0,
         "[Test] TetrahedralSolid adjacent index is not correct" );
+    OPENGEODE_EXCEPTION(
+        solid.nb_facets() == 7, "[Test] PolyhedralSolid should have 7 facets" );
+    OPENGEODE_EXCEPTION(
+        solid.nb_edges() == 9, "[Test] PolyhedralSolid should have 9 edges" );
 }
 
 void test_delete_polyhedron( const geode::TetrahedralSolid3D& solid,
@@ -120,6 +126,29 @@ void test_io(
     auto new_solid = geode::TetrahedralSolid3D::create(
         geode::OpenGeodeTetrahedralSolid3D::type_name_static() );
     load_tetrahedral_solid( *new_solid, filename );
+    OPENGEODE_EXCEPTION( new_solid->nb_vertices() == 6,
+        "[Test] Reloaded TetrahedralSolid should have 6 vertices" );
+    OPENGEODE_EXCEPTION( new_solid->nb_facets() == 10,
+        "[Test] Reloaded TetrahedralSolid should have 10 facets" );
+    OPENGEODE_EXCEPTION( new_solid->nb_edges() == 12,
+        "[Test] Reloaded TetrahedralSolid should have 12 edges" );
+    OPENGEODE_EXCEPTION( new_solid->nb_polyhedra() == 3,
+        "[Test] Reloaded TetrahedralSolid should have 3 polyhedra" );
+}
+
+void test_backward_io( const std::string& filename )
+{
+    auto new_solid = geode::TetrahedralSolid3D::create(
+        geode::OpenGeodeTetrahedralSolid3D::type_name_static() );
+    load_tetrahedral_solid( *new_solid, filename );
+    OPENGEODE_EXCEPTION( new_solid->nb_vertices() == 6,
+        "[Test] Reloaded TetrahedralSolid should have 6 vertices" );
+    OPENGEODE_EXCEPTION( new_solid->nb_facets() == 10,
+        "[Test] Reloaded TetrahedralSolid should have 10 facets" );
+    OPENGEODE_EXCEPTION( new_solid->nb_edges() == 12,
+        "[Test] Reloaded TetrahedralSolid should have 12 edges" );
+    OPENGEODE_EXCEPTION( new_solid->nb_polyhedra() == 3,
+        "[Test] Reloaded TetrahedralSolid should have 3 polyhedra" );
 }
 
 void test_clone( const geode::TetrahedralSolid3D& solid )
@@ -170,6 +199,8 @@ void test()
     test_create_tetrahedra( *solid, *builder );
     test_polyhedron_adjacencies( *solid, *builder );
     test_io( *solid, "test." + solid->native_extension() );
+    test_backward_io(
+        geode::test_path + "mesh/data/test_v1." + solid->native_extension() );
 
     test_delete_vertex( *solid, *builder );
     test_delete_polyhedron( *solid, *builder );

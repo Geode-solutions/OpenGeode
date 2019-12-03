@@ -52,6 +52,34 @@ namespace geode
     }
 
     template < index_t dimension >
+    void TetrahedralSolidBuilder< dimension >::do_create_facets(
+        const std::vector< index_t >& vertices,
+        const std::vector< std::vector< index_t > >& facets )
+    {
+        geode_unused( facets );
+        OPENGEODE_ASSERT( vertices.size() == 4, "[TetrahedralSolidBuilder::"
+                                                "do_create_facets] Only "
+                                                "tetrahedra are handled" );
+        std::array< index_t, 4 > tetra_vertices{};
+        std::copy_n( vertices.begin(), 4, tetra_vertices.begin() );
+        do_create_facets( tetra_vertices );
+    }
+
+    template < index_t dimension >
+    void TetrahedralSolidBuilder< dimension >::do_create_edges(
+        const std::vector< index_t >& vertices,
+        const std::vector< std::vector< index_t > >& facets )
+    {
+        geode_unused( facets );
+        OPENGEODE_ASSERT( vertices.size() == 4, "[TetrahedralSolidBuilder::"
+                                                "do_create_edges] Only "
+                                                "tetrahedra are handled" );
+        std::array< index_t, 4 > tetra_vertices{};
+        std::copy_n( vertices.begin(), 4, tetra_vertices.begin() );
+        do_create_edges( tetra_vertices );
+    }
+
+    template < index_t dimension >
     void TetrahedralSolidBuilder< dimension >::do_create_polyhedron(
         const std::vector< index_t >& vertices,
         const std::vector< std::vector< index_t > >& facets )
@@ -60,9 +88,6 @@ namespace geode
         OPENGEODE_ASSERT( vertices.size() == 4, "[TetrahedralSolidBuilder::"
                                                 "do_create_polyhedron] Only "
                                                 "tetrahedra are handled" );
-        OPENGEODE_ASSERT( facets.size() == 4, "[TetrahedralSolidBuilder::do_"
-                                              "create_polyhedron] Only "
-                                              "tetrahedra are handled" );
         std::array< index_t, 4 > tetra_vertices{};
         std::copy_n( vertices.begin(), 4, tetra_vertices.begin() );
         do_create_tetrahedron( tetra_vertices );
@@ -102,11 +127,18 @@ namespace geode
         do_create_tetrahedron( vertices );
         for( const auto f : Range{ 4 } )
         {
+            PolyhedronFacet facet{ added_tetra, f };
             std::vector< index_t > facet_vertices( 3 );
             for( const auto v : Range{ 3 } )
             {
-                facet_vertices[v] = tetrahedral_solid_.polyhedron_facet_vertex(
-                    { { added_tetra, f }, v } );
+                facet_vertices[v] =
+                    tetrahedral_solid_.polyhedron_facet_vertex( { facet, v } );
+                std::array< index_t, 2 > edge_vertices{
+                    tetrahedral_solid_.polyhedron_facet_vertex( { facet, v } ),
+                    tetrahedral_solid_.polyhedron_facet_vertex(
+                        { facet, ( v + 1 ) % 3 } )
+                };
+                this->find_or_create_edge( edge_vertices );
             }
             this->find_or_create_facet( facet_vertices );
         }

@@ -42,6 +42,10 @@ namespace
     static constexpr std::array< std::array< geode::index_t, 3 >, 4 >
         tetrahedron_facet_vertices{ { { 1, 3, 2 }, { 0, 2, 3 }, { 3, 1, 0 },
             { 0, 1, 2 } } };
+
+    static constexpr std::array< std::array< geode::index_t, 2 >, 6 >
+        tetrahedron_edge_vertices{ { { 0, 1 }, { 0, 2 }, { 0, 3 }, { 1, 2 },
+            { 1, 3 }, { 2, 3 } } };
 } // namespace
 
 namespace geode
@@ -138,6 +142,21 @@ namespace geode
                 }
             }
             return facet_vertices;
+        }
+
+        std::vector< std::array< index_t, 2 > > get_polyhedron_edge_vertices(
+            const std::array< index_t, 4 >& vertices ) const
+        {
+            std::vector< std::array< index_t, 2 > > edge_vertices( 6 );
+            for( const auto e : Range{ 6 } )
+            {
+                for( const auto v : Range{ 2 } )
+                {
+                    edge_vertices[e][v] =
+                        vertices[tetrahedron_edge_vertices[e][v]];
+                }
+            }
+            return edge_vertices;
         }
 
     private:
@@ -240,12 +259,21 @@ namespace geode
     {
         impl_->add_tetrahedron( *this, vertices );
     }
+
     template < index_t dimension >
     std::vector< std::vector< index_t > >
         OpenGeodeTetrahedralSolid< dimension >::get_polyhedron_facet_vertices(
             const std::array< index_t, 4 >& vertices ) const
     {
         return impl_->get_polyhedron_facet_vertices( vertices );
+    }
+
+    template < index_t dimension >
+    std::vector< std::array< index_t, 2 > >
+        OpenGeodeTetrahedralSolid< dimension >::get_polyhedron_edge_vertices(
+            const std::array< index_t, 4 >& vertices ) const
+    {
+        return impl_->get_polyhedron_edge_vertices( vertices );
     }
 
     template < index_t dimension >

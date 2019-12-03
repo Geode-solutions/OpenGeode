@@ -180,6 +180,12 @@ namespace geode
         virtual void do_set_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex, index_t vertex_id ) = 0;
 
+        virtual void do_create_facets( const std::vector< index_t >& vertices,
+            const std::vector< std::vector< index_t > >& facets );
+
+        virtual void do_create_edges( const std::vector< index_t >& vertices,
+            const std::vector< std::vector< index_t > >& facets );
+
         virtual void do_create_polyhedron(
             const std::vector< index_t >& vertices,
             const std::vector< std::vector< index_t > >& facets ) = 0;

@@ -99,7 +99,8 @@ namespace geode
               serializers_( std::move( serializers ) )
         {
             OPENGEODE_EXCEPTION( version_ > FIRST_VERSION,
-                "Provide at least 2 serializers or use DefaultGrowable" );
+                "[Growable] Provide at least 2 serializers or use "
+                "DefaultGrowable" );
         }
         Growable(
             std::vector< std::function< void( Archive &, T & ) > > serializers,
@@ -109,11 +110,11 @@ namespace geode
               initializers_( std::move( initializers ) )
         {
             OPENGEODE_EXCEPTION( version_ > FIRST_VERSION,
-                "Provide at least 2 serializers or use DefaultGrowable" );
+                "[Growable] Provide at least 2 serializers or use "
+                "DefaultGrowable" );
             OPENGEODE_EXCEPTION( initializers_.size() == version_ - 1,
-                "Should have as many initializers than the version number "
-                "minus "
-                "one" );
+                "[Growable] Should have as many initializers than the version "
+                "number minus one" );
         }
 
         template < typename Fnc >
