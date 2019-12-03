@@ -115,15 +115,20 @@ void test_polyhedron_adjacencies(
         "[Test] PolyhedralSolid adjacent index is not correct" );
     OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_adjacent( { 2, 3 } ) == 1,
         "[Test] PolyhedralSolid adjacent index is not correct" );
-
     OPENGEODE_EXCEPTION(
         polyhedral_solid.polyhedra_around_vertex( 4 ).size() == 3,
         "[Test] PolyhedralSolid should have 3 polyhedra around this vertex" );
-
     OPENGEODE_EXCEPTION(
         polyhedral_solid.polyhedron_facets_on_border( 0 ).size() == 4,
         "[Test] First polyhedron of PolyhedralSolid should have 4 facets on "
         "border" );
+
+    auto edge_id = polyhedral_solid.edge_from_vertices( { 5, 4 } );
+    OPENGEODE_EXCEPTION(
+        edge_id == 4, "[Test] Wrong edge index from vertices" );
+    OPENGEODE_EXCEPTION(
+        polyhedral_solid.polyhedra_around_vertex( edge_id ).size() == 3,
+        "[Test] PolyhedralSolid should have 3 polyhedra around this edge" );
 }
 
 void test_delete_vertex( const geode::PolyhedralSolid3D& polyhedral_solid,

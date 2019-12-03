@@ -94,24 +94,6 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< std::vector< index_t > >
-        TetrahedralSolidBuilder< dimension >::get_polyhedron_facet_vertices(
-            const std::vector< index_t >& vertices,
-            const std::vector< std::vector< index_t > >& facets ) const
-    {
-        geode_unused( facets );
-        OPENGEODE_ASSERT( vertices.size() == 4, "[TetrahedralSolidBuilder::"
-                                                "do_create_polyhedron] Only "
-                                                "tetrahedra are handled" );
-        OPENGEODE_ASSERT( facets.size() == 4, "[TetrahedralSolidBuilder::do_"
-                                              "create_polyhedron] Only "
-                                              "tetrahedra are handled" );
-        std::array< index_t, 4 > tetra_vertices{};
-        std::copy_n( vertices.begin(), 4, tetra_vertices.begin() );
-        return get_polyhedron_facet_vertices( tetra_vertices );
-    }
-
-    template < index_t dimension >
     index_t TetrahedralSolidBuilder< dimension >::create_tetrahedron(
         const std::array< index_t, 4 >& vertices )
     {
