@@ -23,6 +23,8 @@
 
 #include <geode/mesh/core/polyhedral_solid.h>
 
+#include <bitsery/brief_syntax/array.h>
+
 #include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/bitsery_archive.h>
@@ -90,7 +92,7 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -131,10 +133,10 @@ namespace geode
     public:
         explicit Impl( PolyhedralSolid& solid )
             : polyhedron_around_vertex_(
-                solid.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolyhedronVertex >(
-                        "polyhedron_around_vertex", PolyhedronVertex{} ) )
+                  solid.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolyhedronVertex >(
+                          "polyhedron_around_vertex", PolyhedronVertex{} ) )
         {
         }
 
@@ -195,9 +197,24 @@ namespace geode
             Facets::remove_facet( facet_vertices );
         }
 
+        void update_edge_vertex( const std::array< index_t, 2 >& edge_vertices,
+            const index_t edge_vertex_id,
+            const index_t new_vertex_id )
+        {
+            auto updated_edge_vertices = edge_vertices;
+            updated_edge_vertices[edge_vertex_id] = new_vertex_id;
+            Edges::add_facet( updated_edge_vertices );
+            Edges::remove_facet( edge_vertices );
+        }
+
         void update_facet_vertices( const std::vector< index_t >& old2new )
         {
             Facets::update_facet_vertices( old2new );
+        }
+
+        void update_edge_vertices( const std::vector< index_t >& old2new )
+        {
+            Edges::update_facet_vertices( old2new );
         }
 
         void remove_facet( const std::vector< index_t >& facet_vertices )
@@ -205,14 +222,29 @@ namespace geode
             Facets::remove_facet( facet_vertices );
         }
 
+        void remove_edge( const std::array< index_t, 2 >& edge_vertices )
+        {
+            Edges::remove_facet( edge_vertices );
+        }
+
         void delete_facets( const std::vector< bool >& to_delete )
         {
             Facets::delete_facets( to_delete );
         }
 
+        void delete_edges( const std::vector< bool >& to_delete )
+        {
+            Edges::delete_facets( to_delete );
+        }
+
         void remove_isolated_facets()
         {
             Facets::clean_facets();
+        }
+
+        void remove_isolated_edges()
+        {
+            Edges::clean_facets();
         }
 
         AttributeManager& polyhedron_attribute_manager() const
@@ -231,6 +263,23 @@ namespace geode
         }
 
     private:
+        void initialize_edges_from_facets()
+        {
+            for( const auto f :
+                Range{ facet_attribute_manager().nb_elements() } )
+            {
+                const auto& facet_vertices = get_facet_vertices( f );
+                const auto nb_facet_vertices = facet_vertices.size();
+                for( const auto v : Range{ nb_facet_vertices } )
+                {
+                    std::array< index_t, 2 > edge_vertices{ facet_vertices[v],
+                        facet_vertices[( v + 1 ) % nb_facet_vertices] };
+                    Edges::add_facet( edge_vertices );
+                }
+            }
+        }
+
+    private:
         friend class bitsery::Access;
         Impl() = default;
 
@@ -238,15 +287,23 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& archive, Impl& impl ) {
-                    archive.ext(
-                        impl, bitsery::ext::BaseClass< detail::FacetStorage<
-                                  std::vector< index_t > > >{} );
-                    archive.object( impl.polyhedron_attribute_manager_ );
-                    archive.ext( impl.polyhedron_around_vertex_,
-                        bitsery::ext::StdSmartPtr{} );
-                } );
+            Growable< Archive, Impl > tt{
+                { []( Archive& archive, Impl& impl ) {
+                     archive.ext(
+                         impl, bitsery::ext::BaseClass< detail::FacetStorage<
+                                   std::vector< index_t > > >{} );
+                     archive.object( impl.polyhedron_attribute_manager_ );
+                     archive.ext( impl.polyhedron_around_vertex_,
+                         bitsery::ext::StdSmartPtr{} );
+                 },
+                    []( Archive& archive, Impl& impl ) {
+                        archive.ext(
+                            impl, bitsery::ext::BaseClass< detail::FacetStorage<
+                                      std::array< index_t, 2 > > >{} );
+                    } },
+                { []( Impl& impl ) { impl.initialize_edges_from_facets(); } }
+            };
+            archive.ext( *this, tt );
         }
 
     private:
@@ -543,6 +600,13 @@ namespace geode
     }
 
     template < index_t dimension >
+    void PolyhedralSolid< dimension >::update_edge_vertices(
+        const std::vector< index_t >& old2new )
+    {
+        impl_->update_edge_vertices( old2new );
+    }
+
+    template < index_t dimension >
     void PolyhedralSolid< dimension >::update_facet_vertex(
         const std::vector< index_t >& facet_vertices,
         index_t facet_vertex_id,
@@ -553,10 +617,27 @@ namespace geode
     }
 
     template < index_t dimension >
+    void PolyhedralSolid< dimension >::update_edge_vertex(
+        const std::array< index_t, 2 >& edge_vertices,
+        index_t edge_vertex_id,
+        index_t new_vertex_id )
+    {
+        impl_->update_edge_vertex(
+            edge_vertices, edge_vertex_id, new_vertex_id );
+    }
+
+    template < index_t dimension >
     void PolyhedralSolid< dimension >::remove_facet(
         const std::vector< index_t >& facet_vertices )
     {
         impl_->remove_facet( facet_vertices );
+    }
+
+    template < index_t dimension >
+    void PolyhedralSolid< dimension >::remove_edge(
+        const std::array< index_t, 2 >& edge_vertices )
+    {
+        impl_->remove_edge( edge_vertices );
     }
 
     template < index_t dimension >
@@ -566,10 +647,23 @@ namespace geode
     }
 
     template < index_t dimension >
+    void PolyhedralSolid< dimension >::remove_isolated_edges()
+    {
+        impl_->remove_isolated_edges();
+    }
+
+    template < index_t dimension >
     void PolyhedralSolid< dimension >::delete_facets(
         const std::vector< bool >& to_delete )
     {
         impl_->delete_facets( to_delete );
+    }
+
+    template < index_t dimension >
+    void PolyhedralSolid< dimension >::delete_edges(
+        const std::vector< bool >& to_delete )
+    {
+        impl_->delete_edges( to_delete );
     }
 
     template < index_t dimension >

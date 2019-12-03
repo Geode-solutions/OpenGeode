@@ -23,7 +23,15 @@
 
 #pragma once
 
+#include <string>
+
 #include <geode/basic/common.h>
+
+namespace geode
+{
+    /* Absolute path to test source directory */
+    static const std::string test_path = "@TEST_DIRECTORY@/";
+} // namespace geode
 
 /*!
  * The OPENGEODE_TEST macro takes a name as input and also use a function

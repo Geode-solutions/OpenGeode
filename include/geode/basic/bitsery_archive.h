@@ -25,6 +25,8 @@
 
 #include <functional>
 
+#include <iostream>
+
 #include <bitsery/adapter/stream.h>
 #include <bitsery/bitsery.h>
 #include <bitsery/ext/compact_value.h>
@@ -96,6 +98,8 @@ namespace geode
             : version_( serializers.size() ),
               serializers_( std::move( serializers ) )
         {
+            OPENGEODE_EXCEPTION( version_ > FIRST_VERSION,
+                "Provide at least 2 serializers or use DefaultGrowable" );
         }
         Growable(
             std::vector< std::function< void( Archive &, T & ) > > serializers,
@@ -104,6 +108,8 @@ namespace geode
               serializers_( std::move( serializers ) ),
               initializers_( std::move( initializers ) )
         {
+            OPENGEODE_EXCEPTION( version_ > FIRST_VERSION,
+                "Provide at least 2 serializers or use DefaultGrowable" );
             OPENGEODE_EXCEPTION( initializers_.size() == version_ - 1,
                 "Should have as many initializers than the version number "
                 "minus "
@@ -130,24 +136,18 @@ namespace geode
         template < typename Fnc >
         void deserialize( Archive &des, T &obj, Fnc &&fnc ) const
         {
+            geode_unused( fnc );
             index_t current_version;
             des.ext4b( current_version, bitsery::ext::CompactValue{} );
-            if( version_ == FIRST_VERSION )
+            for( const auto i : Range{ current_version } )
             {
-                fnc( des, obj );
+                serializers_.at( i )( des, obj );
             }
-            else
+            if( !initializers_.empty() )
             {
-                for( const auto i : Range{ current_version } )
+                for( const auto i : Range{ current_version, version_ } )
                 {
-                    serializers_.at( i )( des, obj );
-                }
-                if( !initializers_.empty() )
-                {
-                    for( const auto i : Range{ current_version, version_ } )
-                    {
-                        initializers_.at( i - 1 )( obj );
-                    }
+                    initializers_.at( i - 1 )( obj );
                 }
             }
         }

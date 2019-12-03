@@ -28,6 +28,7 @@ endif()
 
 set(CTEST_OUTPUT_ON_FAILURE ON)
 
+set(TEST_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
 set(test_common_file_in ${CMAKE_CURRENT_LIST_DIR}/common.h)
 set(test_common_file ${PROJECT_BINARY_DIR}/geode/tests/common.h)
 configure_file(${test_common_file_in} ${test_common_file})

@@ -63,7 +63,6 @@ void test_create_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
         "[Test] PolyhedralSolid should have 3 polyhedra" );
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_facets() == 11,
         "[Test] PolyhedralSolid should have 11 facets" );
-    DEBUG( polyhedral_solid.nb_edges() );
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_edges() == 15,
         "[Test] PolyhedralSolid should have 15 edges" );
 }
@@ -74,10 +73,27 @@ void test_create_facet_attribute(
     auto attribute = polyhedral_solid.facet_attribute_manager()
                          .find_or_create_attribute< geode::VariableAttribute,
                              geode::index_t >( "test" );
-    for( const auto e : geode::Range{ polyhedral_solid.nb_facets() } )
+    for( const auto f : geode::Range{ polyhedral_solid.nb_facets() } )
     {
-        attribute->set_value( e, e );
+        attribute->set_value( f, f );
     }
+}
+
+void test_create_edge_attribute(
+    const geode::PolyhedralSolid3D& polyhedral_solid )
+{
+    auto attribute = polyhedral_solid.edge_attribute_manager()
+                         .find_or_create_attribute< geode::VariableAttribute,
+                             geode::index_t >( "test" );
+    for( const auto e : geode::Range{ polyhedral_solid.nb_edges() } )
+    {
+        const auto& vertices = polyhedral_solid.edge_vertices( e );
+        attribute->set_value( e, vertices[0] + vertices[1] );
+    }
+    OPENGEODE_EXCEPTION( attribute->value( 0 ) == 1,
+        "[Test] Wrong value for attribute on edge 0" );
+    OPENGEODE_EXCEPTION( attribute->value( 1 ) == 3,
+        "[Test] Wrong value for attribute on edge 1" );
 }
 
 void test_polyhedron_adjacencies(
@@ -127,6 +143,14 @@ void test_delete_vertex( const geode::PolyhedralSolid3D& polyhedral_solid,
         "[Test] PolyhedralSolid adjacent index is not correct" );
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_facets() == 7,
         "[Test] PolyhedralSolid should have 7 facets" );
+    OPENGEODE_EXCEPTION( polyhedral_solid.nb_edges() == 9,
+        "[Test] PolyhedralSolid should have 9 edges" );
+    auto attribute = polyhedral_solid.edge_attribute_manager()
+                         .find_attribute< geode::index_t >( "test" );
+    OPENGEODE_EXCEPTION( attribute->value( 0 ) == 8,
+        "[Test] Wrong value for attribute on edge 0 after vertex deletion" );
+    OPENGEODE_EXCEPTION( attribute->value( 1 ) == 9,
+        "[Test] Wrong value for attribute on edge 1 after vertex deletion" );
 }
 
 void test_delete_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
@@ -147,6 +171,14 @@ void test_delete_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
         "[Test] PolyhedralSolid vertex index is not correct" );
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_facets() == 4,
         "[Test] PolyhedralSolid should have 4 facets" );
+    OPENGEODE_EXCEPTION( polyhedral_solid.nb_edges() == 6,
+        "[Test] PolyhedralSolid should have 6 edges" );
+    auto attribute = polyhedral_solid.edge_attribute_manager()
+                         .find_attribute< geode::index_t >( "test" );
+    OPENGEODE_EXCEPTION( attribute->value( 0 ) == 9,
+        "[Test] Wrong value for attribute on edge 0 after vertex deletion" );
+    OPENGEODE_EXCEPTION( attribute->value( 1 ) == 10,
+        "[Test] Wrong value for attribute on edge 1 after vertex deletion" );
 }
 
 void test_io( const geode::PolyhedralSolid3D& polyhedral_solid,
@@ -161,6 +193,8 @@ void test_io( const geode::PolyhedralSolid3D& polyhedral_solid,
         "[Test] Reloaded PolyhedralSolid should have 8 vertices" );
     OPENGEODE_EXCEPTION( new_polyhedral_solid->nb_facets() == 11,
         "[Test] Reloaded PolyhedralSolid should have 11 facets" );
+    OPENGEODE_EXCEPTION( new_polyhedral_solid->nb_edges() == 15,
+        "[Test] Reloaded PolyhedralSolid should have 15 edges" );
     OPENGEODE_EXCEPTION( new_polyhedral_solid->nb_polyhedra() == 3,
         "[Test] Reloaded PolyhedralSolid should have 3 polyhedra" );
     OPENGEODE_EXCEPTION( new_polyhedral_solid->polyhedron_facet( { 1, 0 } )
@@ -168,9 +202,27 @@ void test_io( const geode::PolyhedralSolid3D& polyhedral_solid,
         "[Test] Reloaded PolyhedralSolid has wrong polyhedron facet index" );
     auto attribute = new_polyhedral_solid->facet_attribute_manager()
                          .find_attribute< geode::index_t >( "test" );
+    for( auto f : geode::Range{ new_polyhedral_solid->nb_facets() } )
+    {
+        OPENGEODE_EXCEPTION( attribute->value( f ) == f,
+            "[Test] Reloaded PolyhedralSolid has "
+            "wrong attributes on its facets" );
+    }
+}
+
+void test_backward_io( const std::string& filename )
+{
+    auto new_polyhedral_solid = geode::PolyhedralSolid3D::create(
+        geode::OpenGeodePolyhedralSolid3D::type_name_static() );
+    load_polyhedral_solid( *new_polyhedral_solid, filename );
+
+    OPENGEODE_EXCEPTION( new_polyhedral_solid->nb_edges() == 15,
+        "[Test] Reloaded PolyhedralSolid should have 15 edges" );
+    auto facet_attribute = new_polyhedral_solid->facet_attribute_manager()
+                               .find_attribute< geode::index_t >( "test" );
     for( auto e : geode::Range{ new_polyhedral_solid->nb_facets() } )
     {
-        OPENGEODE_EXCEPTION( attribute->value( e ) == e,
+        OPENGEODE_EXCEPTION( facet_attribute->value( e ) == e,
             "[Test] Reloaded PolyhedralSolid has "
             "wrong attributes on its facets" );
     }
@@ -269,6 +321,8 @@ void test_delete_all( const geode::PolyhedralSolid3D& polyhedral_solid,
         "[Test] PolyhedralSolid should have 7 vertices" );
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_facets() == 0,
         "[Test] PolyhedralSolid should have 0 facet" );
+    OPENGEODE_EXCEPTION( polyhedral_solid.nb_edges() == 0,
+        "[Test] PolyhedralSolid should have 0 edge" );
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_polyhedra() == 0,
         "[Test] PolyhedralSolid should have 0 polyhedron" );
     OPENGEODE_EXCEPTION( polyhedral_solid.polyhedra_around_vertex( 0 ).empty(),
@@ -289,9 +343,12 @@ void test()
     test_create_vertex_attribute( *polyhedral_solid );
     test_create_polyhedra( *polyhedral_solid, *builder );
     test_create_facet_attribute( *polyhedral_solid );
+    test_create_edge_attribute( *polyhedral_solid );
     test_polyhedron_adjacencies( *polyhedral_solid, *builder );
     test_io(
         *polyhedral_solid, "test." + polyhedral_solid->native_extension() );
+    test_backward_io( geode::test_path + "mesh/data/test_v1."
+                      + polyhedral_solid->native_extension() );
 
     test_delete_vertex( *polyhedral_solid, *builder );
     test_delete_polyhedra( *polyhedral_solid, *builder );
