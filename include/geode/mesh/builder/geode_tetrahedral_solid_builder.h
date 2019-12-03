@@ -57,40 +57,37 @@ namespace geode
 
     private:
         void do_set_point(
-            index_t vertex_id, const Point< dimension >& point ) override;
+            index_t vertex_id, const Point< dimension >& point ) final;
 
-        void do_create_vertex() override;
+        void do_create_vertex() final;
 
-        void do_create_vertices( index_t nb ) override;
+        void do_create_vertices( index_t nb ) final;
 
         void do_delete_solid_vertices(
-            const std::vector< bool >& to_delete ) override;
+            const std::vector< bool >& to_delete ) final;
 
         void do_set_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex,
-            index_t vertex_id ) override;
+            index_t vertex_id ) final;
 
-        void do_create_facets(
-            const std::array< index_t, 4 >& vertices ) override;
+        void do_create_facets( const std::array< index_t, 4 >& vertices ) final;
 
-        void do_create_edges(
-            const std::array< index_t, 4 >& vertices ) override;
+        void do_create_edges( const std::array< index_t, 4 >& vertices ) final;
 
         void do_create_tetrahedron(
-            const std::array< index_t, 4 >& vertices ) override;
+            const std::array< index_t, 4 >& vertices ) final;
 
         std::vector< std::vector< index_t > > get_polyhedron_facet_vertices(
-            const std::array< index_t, 4 >& vertices ) const override;
+            const std::array< index_t, 4 >& vertices ) const final;
 
         std::vector< std::array< index_t, 2 > > get_polyhedron_edge_vertices(
-            const std::array< index_t, 4 >& vertices ) const override;
+            const std::array< index_t, 4 >& vertices ) const final;
 
-        void do_delete_polyhedra(
-            const std::vector< bool >& to_delete ) override;
+        void do_delete_polyhedra( const std::vector< bool >& to_delete ) final;
 
         void do_set_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet,
-            index_t adjacent_id ) override;
+            index_t adjacent_id ) final;
 
     private:
         OpenGeodeTetrahedralSolid< dimension >& geode_tetrahedral_solid_;

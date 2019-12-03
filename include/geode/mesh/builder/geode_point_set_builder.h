@@ -52,14 +52,13 @@ namespace geode
 
     private:
         void do_set_point(
-            index_t vertex_id, const Point< dimension >& point ) override;
+            index_t vertex_id, const Point< dimension >& point ) final;
 
-        void do_create_vertex() override;
+        void do_create_vertex() final;
 
-        void do_create_vertices( index_t nb ) override;
+        void do_create_vertices( index_t nb ) final;
 
-        void do_delete_vertices(
-            const std::vector< bool >& to_delete ) override;
+        void do_delete_vertices( const std::vector< bool >& to_delete ) final;
 
     private:
         OpenGeodePointSet< dimension >& geode_point_set_;

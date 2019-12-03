@@ -56,26 +56,25 @@ namespace geode
 
     private:
         void do_set_point(
-            index_t vertex_id, const Point< dimension >& point ) override;
+            index_t vertex_id, const Point< dimension >& point ) final;
 
-        void do_create_vertex() override;
+        void do_create_vertex() final;
 
-        void do_create_vertices( index_t nb ) override;
+        void do_create_vertices( index_t nb ) final;
 
         void do_delete_surface_vertices(
-            const std::vector< bool >& to_delete ) override;
+            const std::vector< bool >& to_delete ) final;
 
         void do_set_polygon_vertex(
-            const PolygonVertex& polygon_vertex, index_t vertex_id ) override;
+            const PolygonVertex& polygon_vertex, index_t vertex_id ) final;
 
         void do_create_triangle(
-            const std::array< index_t, 3 >& vertices ) override;
+            const std::array< index_t, 3 >& vertices ) final;
 
-        void do_delete_polygons(
-            const std::vector< bool >& to_delete ) override;
+        void do_delete_polygons( const std::vector< bool >& to_delete ) final;
 
         void do_set_polygon_adjacent(
-            const PolygonEdge& polygon_edge, index_t adjacent_id ) override;
+            const PolygonEdge& polygon_edge, index_t adjacent_id ) final;
 
     private:
         OpenGeodeTriangulatedSurface< dimension >& geode_triangulated_surface_;
