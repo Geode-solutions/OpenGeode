@@ -92,7 +92,7 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -133,10 +133,10 @@ namespace geode
     public:
         explicit Impl( PolyhedralSolid& solid )
             : polyhedron_around_vertex_(
-                solid.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolyhedronVertex >(
-                        "polyhedron_around_vertex", PolyhedronVertex{} ) )
+                  solid.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolyhedronVertex >(
+                          "polyhedron_around_vertex", PolyhedronVertex{} ) )
         {
         }
 
@@ -287,23 +287,24 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            Growable< Archive, Impl > tt{
-                { []( Archive& archive, Impl& impl ) {
-                     archive.ext(
-                         impl, bitsery::ext::BaseClass< detail::FacetStorage<
-                                   std::vector< index_t > > >{} );
-                     archive.object( impl.polyhedron_attribute_manager_ );
-                     archive.ext( impl.polyhedron_around_vertex_,
-                         bitsery::ext::StdSmartPtr{} );
-                 },
-                    []( Archive& archive, Impl& impl ) {
-                        archive.ext(
-                            impl, bitsery::ext::BaseClass< detail::FacetStorage<
-                                      std::array< index_t, 2 > > >{} );
-                    } },
-                { []( Impl& impl ) { impl.initialize_edges_from_facets(); } }
-            };
-            archive.ext( *this, tt );
+            archive.ext( *this,
+                Growable< Archive, Impl >{
+                    { []( Archive& archive, Impl& impl ) {
+                         archive.ext( impl,
+                             bitsery::ext::BaseClass< detail::FacetStorage<
+                                 std::vector< index_t > > >{} );
+                         archive.object( impl.polyhedron_attribute_manager_ );
+                         archive.ext( impl.polyhedron_around_vertex_,
+                             bitsery::ext::StdSmartPtr{} );
+                     },
+                        []( Archive& archive, Impl& impl ) {
+                            archive.ext( impl,
+                                bitsery::ext::BaseClass< detail::FacetStorage<
+                                    std::array< index_t, 2 > > >{} );
+                        } },
+                    { []( Impl& impl ) {
+                        impl.initialize_edges_from_facets();
+                    } } } );
         }
 
     private:

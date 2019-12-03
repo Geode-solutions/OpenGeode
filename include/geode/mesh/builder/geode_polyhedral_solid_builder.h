@@ -58,28 +58,27 @@ namespace geode
 
     private:
         void do_set_point(
-            index_t vertex_id, const Point< dimension >& point ) override;
+            index_t vertex_id, const Point< dimension >& point ) final;
 
-        void do_create_vertex() override;
+        void do_create_vertex() final;
 
-        void do_create_vertices( index_t nb ) override;
+        void do_create_vertices( index_t nb ) final;
 
         void do_delete_solid_vertices(
-            const std::vector< bool >& to_delete ) override;
+            const std::vector< bool >& to_delete ) final;
 
         void do_set_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex,
-            index_t vertex_id ) override;
+            index_t vertex_id ) final;
 
         void do_create_polyhedron( const std::vector< index_t >& vertices,
-            const std::vector< std::vector< index_t > >& facets ) override;
+            const std::vector< std::vector< index_t > >& facets ) final;
 
-        void do_delete_polyhedra(
-            const std::vector< bool >& to_delete ) override;
+        void do_delete_polyhedra( const std::vector< bool >& to_delete ) final;
 
         void do_set_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet,
-            index_t adjacent_id ) override;
+            index_t adjacent_id ) final;
 
     private:
         OpenGeodePolyhedralSolid< dimension >& geode_polyhedral_solid_;
