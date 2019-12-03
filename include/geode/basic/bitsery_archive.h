@@ -25,7 +25,6 @@
 
 #include <functional>
 
-
 #include <bitsery/adapter/stream.h>
 #include <bitsery/bitsery.h>
 #include <bitsery/ext/compact_value.h>
