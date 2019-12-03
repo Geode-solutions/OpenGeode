@@ -25,7 +25,6 @@
 
 #include <functional>
 
-#include <iostream>
 
 #include <bitsery/adapter/stream.h>
 #include <bitsery/bitsery.h>
