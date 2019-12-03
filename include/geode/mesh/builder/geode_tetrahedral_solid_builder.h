@@ -70,10 +70,19 @@ namespace geode
             const PolyhedronVertex& polyhedron_vertex,
             index_t vertex_id ) override;
 
+        void do_create_facets(
+            const std::array< index_t, 4 >& vertices ) override;
+
+        void do_create_edges(
+            const std::array< index_t, 4 >& vertices ) override;
+
         void do_create_tetrahedron(
             const std::array< index_t, 4 >& vertices ) override;
 
         std::vector< std::vector< index_t > > get_polyhedron_facet_vertices(
+            const std::array< index_t, 4 >& vertices ) const override;
+
+        std::vector< std::array< index_t, 2 > > get_polyhedron_edge_vertices(
             const std::array< index_t, 4 >& vertices ) const override;
 
         void do_delete_polyhedra(

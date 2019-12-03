@@ -322,21 +322,38 @@ namespace geode
             associate_polyhedron_vertex_to_vertex(
                 { added_polyhedron, v }, vertices[v] );
         }
+        do_create_facets( vertices, facets );
+        do_create_edges( vertices, facets );
+        do_create_polyhedron( vertices, facets );
+        return added_polyhedron;
+    }
+
+    template < index_t dimension >
+    void PolyhedralSolidBuilder< dimension >::do_create_facets(
+        const std::vector< index_t >& vertices,
+        const std::vector< std::vector< index_t > >& facets )
+    {
         const auto polyhedron_facet_vertices =
             get_polyhedron_facet_vertices( vertices, facets );
         for( const auto& facet_vertices : polyhedron_facet_vertices )
         {
             this->find_or_create_facet( facet_vertices );
         }
+    }
+
+    template < index_t dimension >
+    void PolyhedralSolidBuilder< dimension >::do_create_edges(
+        const std::vector< index_t >& vertices,
+        const std::vector< std::vector< index_t > >& facets )
+    {
         const auto polyhedron_edge_vertices =
             get_polyhedron_edge_vertices( vertices, facets );
         for( const auto& edge_vertices : polyhedron_edge_vertices )
         {
             this->find_or_create_edge( edge_vertices );
         }
-        do_create_polyhedron( vertices, facets );
-        return added_polyhedron;
     }
+
     template < index_t dimension >
     std::vector< std::vector< index_t > >
         PolyhedralSolidBuilder< dimension >::get_polyhedron_facet_vertices(
