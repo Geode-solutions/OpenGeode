@@ -68,10 +68,6 @@ namespace geode
         void do_create_polyhedron( const std::vector< index_t >& vertices,
             const std::vector< std::vector< index_t > >& facets ) final;
 
-        std::vector< std::vector< index_t > > get_polyhedron_facet_vertices(
-            const std::vector< index_t >& vertices,
-            const std::vector< std::vector< index_t > >& facets ) const final;
-
         virtual void do_create_facets(
             const std::array< index_t, 4 >& vertices ) = 0;
 
