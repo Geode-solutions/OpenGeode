@@ -559,7 +559,7 @@ namespace geode
 
     template < index_t dimension >
     index_t PolyhedralSolid< dimension >::find_or_create_edge(
-        const std::array< index_t, 2 > edge_vertices )
+        const std::array< index_t, 2 >& edge_vertices )
     {
         return impl_->find_or_create_edge( edge_vertices );
     }
