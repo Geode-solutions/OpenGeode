@@ -114,10 +114,12 @@ function(add_geode_library folder_path)
         "${advanced_headers}"
     )
     target_sources(${target_name} PRIVATE "${all_sources}")
+    string(TOLOWER ${PROJECT_NAME} project-name)
+    string(REPLACE "-" "_" project_name ${project-name})
     set_target_properties(${target_name}
         PROPERTIES
             OUTPUT_NAME ${PROJECT_NAME}_${target_name}
-            DEFINE_SYMBOL ${PROJECT_NAME}_${target_name}_EXPORTS
+            DEFINE_SYMBOL ${project_name}_${target_name}_EXPORTS
             CMAKE_CXX_VISIBILITY_PRESET hidden
             CMAKE_VISIBILITY_INLINES_HIDDEN ON
             FOLDER "Libraries"
@@ -136,7 +138,6 @@ function(add_geode_library folder_path)
         NAMESPACE ${PROJECT_NAME}::
         FILE ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}_${target_name}_target.cmake
     )
-    string(TOLOWER ${PROJECT_NAME} project_name)
     generate_export_header(${target_name}
         EXPORT_MACRO_NAME ${project_name}_${target_name}_api
         EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/${folder_path}/${project_name}_${target_name}_export.h
