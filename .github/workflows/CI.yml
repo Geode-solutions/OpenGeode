@@ -57,7 +57,7 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
         file: kcov/kcov-merged/cobertura.xml
     - uses: Geode-solutions/actions/benchmark@master
-      if: matrix.config.benchmark && github.ref == 'refs/heads/master'
+      if: matrix.config.benchmark && github.ref == 'refs/heads/master' && github.event_name == 'push'
       with:
         repository: OpenGeode
         directory: test/bin
