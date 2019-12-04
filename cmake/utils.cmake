@@ -198,7 +198,7 @@ endfunction()
 function(copy_windows_binaries dependency)
     if(WIN32)
         get_target_property(release_location ${dependency} IMPORTED_LOCATION_RELEASE)
-        if(release_location)
+        if(release_location AND EXISTS ${release_location})
             get_filename_component(release_location_directory ${release_location} DIRECTORY)
             add_custom_command(TARGET windows_post_compilation POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_directory 
@@ -207,7 +207,7 @@ function(copy_windows_binaries dependency)
 			)
         endif()
         get_target_property(debug_location ${dependency} IMPORTED_LOCATION_DEBUG)
-        if(debug_location)
+        if(debug_location AND EXISTS ${debug_location})
             get_filename_component(debug_location_directory ${debug_location} DIRECTORY)
             add_custom_command(TARGET windows_post_compilation POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_directory 
