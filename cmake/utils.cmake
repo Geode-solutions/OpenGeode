@@ -115,7 +115,7 @@ function(add_geode_library folder_path)
     )
     target_sources(${target_name} PRIVATE "${all_sources}")
     string(TOLOWER ${PROJECT_NAME} project-name)
-    string(REPLACE "-" "_" project_name ${project-name})
+    string(REGEX REPLACE "-" "_" project_name ${project-name})
     set_target_properties(${target_name}
         PROPERTIES
             OUTPUT_NAME ${PROJECT_NAME}_${target_name}
