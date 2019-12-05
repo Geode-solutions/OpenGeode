@@ -65,6 +65,17 @@ namespace
             iterator.geode::Relationships::EmbeddingRangeIterator::operator++();
         }
     }
+
+    template < typename MeshComponentRange >
+    geode::BoundingBox3D meshes_bounding_box( MeshComponentRange range )
+    {
+        geode::BoundingBox3D box;
+        for( const auto& component : range )
+        {
+            box.add_box( component.mesh().bounding_box() );
+        }
+        return box;
+    }
 } // namespace
 
 namespace geode
@@ -472,36 +483,18 @@ namespace geode
 
     BoundingBox3D BRep::bounding_box() const
     {
-        BoundingBox3D box;
-        for( const auto& surface : surfaces() )
-        {
-            box.add_box( surface.mesh().bounding_box() );
-        }
         if( nb_surfaces() > 0 )
         {
-            return box;
-        }
-        for( const auto& block : blocks() )
-        {
-            box.add_box( block.mesh().bounding_box() );
+            return meshes_bounding_box( surfaces() );
         }
         if( nb_blocks() > 0 )
         {
-            return box;
-        }
-        for( const auto& line : lines() )
-        {
-            box.add_box( line.mesh().bounding_box() );
+            return meshes_bounding_box( blocks() );
         }
         if( nb_lines() > 0 )
         {
-            return box;
+            return meshes_bounding_box( lines() );
         }
-        for( const auto& corner : corners() )
-        {
-            box.add_box( corner.mesh().bounding_box() );
-        }
-        return box;
+        return meshes_bounding_box( corners() );
     }
-
 } // namespace geode
