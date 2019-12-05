@@ -114,10 +114,12 @@ function(add_geode_library folder_path)
         "${advanced_headers}"
     )
     target_sources(${target_name} PRIVATE "${all_sources}")
+    string(TOLOWER ${PROJECT_NAME} project-name)
+    string(REGEX REPLACE "-" "_" project_name ${project-name})
     set_target_properties(${target_name}
         PROPERTIES
             OUTPUT_NAME ${PROJECT_NAME}_${target_name}
-            DEFINE_SYMBOL ${PROJECT_NAME}_${target_name}_EXPORTS
+            DEFINE_SYMBOL ${project_name}_${target_name}_EXPORTS
             CMAKE_CXX_VISIBILITY_PRESET hidden
             CMAKE_VISIBILITY_INLINES_HIDDEN ON
             FOLDER "Libraries"
@@ -136,7 +138,6 @@ function(add_geode_library folder_path)
         NAMESPACE ${PROJECT_NAME}::
         FILE ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}_${target_name}_target.cmake
     )
-    string(TOLOWER ${PROJECT_NAME} project_name)
     generate_export_header(${target_name}
         EXPORT_MACRO_NAME ${project_name}_${target_name}_api
         EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/${folder_path}/${project_name}_${target_name}_export.h
@@ -197,7 +198,7 @@ endfunction()
 function(copy_windows_binaries dependency)
     if(WIN32)
         get_target_property(release_location ${dependency} IMPORTED_LOCATION_RELEASE)
-        if(release_location)
+        if(release_location AND EXISTS ${release_location})
             get_filename_component(release_location_directory ${release_location} DIRECTORY)
             add_custom_command(TARGET windows_post_compilation POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_directory 
@@ -206,7 +207,7 @@ function(copy_windows_binaries dependency)
 			)
         endif()
         get_target_property(debug_location ${dependency} IMPORTED_LOCATION_DEBUG)
-        if(debug_location)
+        if(debug_location AND EXISTS ${debug_location})
             get_filename_component(debug_location_directory ${debug_location} DIRECTORY)
             add_custom_command(TARGET windows_post_compilation POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_directory 
