@@ -25,6 +25,7 @@
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/logger.h>
 
+#include <geode/geometry/bounding_box.h>
 #include <geode/geometry/point.h>
 
 #include <geode/mesh/builder/geode_edged_curve_builder.h>
@@ -46,6 +47,16 @@ void test_create_vertices( const geode::EdgedCurve3D& edged_curve,
     builder.set_point( 3, { { 8.7, 1.4, 4.7 } } );
     OPENGEODE_EXCEPTION( edged_curve.nb_vertices() == 4,
         "[Test] EdgedCurve should have 4 vertices" );
+}
+
+void test_bounding_box( const geode::EdgedCurve3D& edged_curve )
+{
+    geode::Point3D answer_min{ { 0.1, 0.2, 0.3 } };
+    geode::Point3D answer_max{ { 8.7, 9.4, 6.7 } };
+    OPENGEODE_EXCEPTION( edged_curve.bounding_box().min() == answer_min,
+        "[Test] Wrong computation of bounding box (min)" );
+    OPENGEODE_EXCEPTION( edged_curve.bounding_box().max() == answer_max,
+        "[Test] Wrong computation of bounding box (max)" );
 }
 
 void test_delete_vertex( const geode::EdgedCurve3D& edged_curve,
@@ -189,6 +200,7 @@ void test()
 
     test_create_vertices( *edged_curve, *builder );
     test_create_edges( *edged_curve, *builder );
+    test_bounding_box( *edged_curve );
     test_io( *edged_curve, "test." + edged_curve->native_extension() );
 
     test_delete_vertex( *edged_curve, *builder );

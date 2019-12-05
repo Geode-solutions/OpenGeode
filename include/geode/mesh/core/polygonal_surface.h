@@ -35,6 +35,7 @@ namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
     FORWARD_DECLARATION_DIMENSION_CLASS( Vector );
+    FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
     FORWARD_DECLARATION_DIMENSION_CLASS( PolygonalSurfaceBuilder );
 
     ALIAS_2D_AND_3D( Vector );
@@ -300,6 +301,11 @@ namespace geode
          * Access to the manager of attributes associated with polygons.
          */
         AttributeManager& polygon_attribute_manager() const;
+
+        /*!
+         * Compute the bounding box from mesh vertices
+         */
+        BoundingBox< dimension > bounding_box() const;
 
     protected:
         PolygonalSurfaceBase();

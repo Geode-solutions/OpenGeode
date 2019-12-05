@@ -26,7 +26,10 @@
 #include <geode/geometry/bounding_box.h>
 #include <geode/geometry/vector.h>
 
+#include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/core/point_set.h>
 #include <geode/mesh/core/polygonal_surface.h>
+#include <geode/mesh/core/polyhedral_solid.h>
 
 #include <geode/model/mixin/core/block.h>
 #include <geode/model/mixin/core/corner.h>
@@ -465,6 +468,40 @@ namespace geode
     bool BRep::is_closed( const Surface3D& surface ) const
     {
         return nb_boundaries( surface.id() ) == 0;
+    }
+
+    BoundingBox3D BRep::bounding_box() const
+    {
+        BoundingBox3D box;
+        for( const auto& surface : surfaces() )
+        {
+            box.add_box( surface.mesh().bounding_box() );
+        }
+        if( nb_surfaces() > 0 )
+        {
+            return box;
+        }
+        for( const auto& block : blocks() )
+        {
+            box.add_box( block.mesh().bounding_box() );
+        }
+        if( nb_blocks() > 0 )
+        {
+            return box;
+        }
+        for( const auto& line : lines() )
+        {
+            box.add_box( line.mesh().bounding_box() );
+        }
+        if( nb_lines() > 0 )
+        {
+            return box;
+        }
+        for( const auto& corner : corners() )
+        {
+            box.add_box( corner.mesh().bounding_box() );
+        }
+        return box;
     }
 
 } // namespace geode
