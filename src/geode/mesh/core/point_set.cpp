@@ -26,7 +26,9 @@
 #include <geode/mesh/core/point_set.h>
 
 #include <geode/basic/bitsery_archive.h>
+
 #include <geode/geometry/bounding_box.h>
+
 #include <geode/mesh/builder/point_set_builder.h>
 #include <geode/mesh/core/geode_point_set.h>
 
