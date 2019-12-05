@@ -34,6 +34,7 @@
 #include <geode/basic/detail/mapping_after_deletion.h>
 #include <geode/basic/pimpl_impl.h>
 
+#include <geode/geometry/bounding_box.h>
 #include <geode/geometry/vector.h>
 
 #include <geode/mesh/builder/polygonal_surface_builder.h>
@@ -117,10 +118,10 @@ namespace geode
     public:
         explicit Impl( PolygonalSurfaceBase& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) )
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
@@ -641,6 +642,18 @@ namespace geode
                 archive.ext( surface, bitsery::ext::BaseClass< VertexSet >{} );
                 archive.object( surface.impl_ );
             } );
+    }
+
+    template < index_t dimension >
+    BoundingBox< dimension >
+        PolygonalSurfaceBase< dimension >::bounding_box() const
+    {
+        BoundingBox< dimension > box;
+        for( const auto p : Range{ nb_vertices() } )
+        {
+            box.add_point( point( p ) );
+        }
+        return box;
     }
 
     Vector3D PolygonalSurface< 3 >::polygon_normal( index_t polygon_id ) const

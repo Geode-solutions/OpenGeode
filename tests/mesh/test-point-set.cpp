@@ -27,6 +27,7 @@
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/logger.h>
 
+#include <geode/geometry/bounding_box.h>
 #include <geode/geometry/point.h>
 
 #include <geode/mesh/builder/geode_point_set_builder.h>
@@ -52,6 +53,16 @@ void test_create_vertices(
     OPENGEODE_EXCEPTION(
         point_set.point( 2 ) == geode::Point3D( { 2.3, 5.0, -1.2 } ),
         "[Test] Point coordinates have not been correctly set" );
+}
+
+void test_bounding_box( const geode::PointSet3D& point_set )
+{
+    geode::Point3D answer_min{ { 0.0, 0.0, -1.2 } };
+    geode::Point3D answer_max{ { 2.3, 9.4, 6.7 } };
+    OPENGEODE_EXCEPTION( point_set.bounding_box().min() == answer_min,
+        "[Test] Wrong computation of bounding box (min)" );
+    OPENGEODE_EXCEPTION( point_set.bounding_box().max() == answer_max,
+        "[Test] Wrong computation of bounding box (max)" );
 }
 
 void test_create_vertex_attribute( const geode::PointSet3D& point_set )
@@ -108,6 +119,7 @@ void test()
         geode::OpenGeodePointSet3D::type_name_static() );
     auto builder = geode::PointSetBuilder3D::create( *point_set );
     test_create_vertices( *point_set, *builder );
+    test_bounding_box( *point_set );
     test_create_vertex_attribute( *point_set );
     test_io( *point_set, "test." + point_set->native_extension() );
     test_delete_vertex( *point_set, *builder );

@@ -25,6 +25,7 @@
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/logger.h>
 
+#include <geode/geometry/bounding_box.h>
 #include <geode/geometry/point.h>
 #include <geode/geometry/vector.h>
 
@@ -48,6 +49,16 @@ void test_create_vertices( const geode::PolygonalSurface3D& polygonal_surface,
     builder.create_point( { { 7.5, 4.2, 2.8 } } );
     OPENGEODE_EXCEPTION( polygonal_surface.nb_vertices() == 7,
         "[Test] PolygonalSurface should have 7 vertices" );
+}
+
+void test_bounding_box( const geode::PolygonalSurface3D& polygonal_surface )
+{
+    geode::Point3D answer_min{ { 0.1, 0.2, 0.3 } };
+    geode::Point3D answer_max{ { 9.3, 9.4, 6.7 } };
+    OPENGEODE_EXCEPTION( polygonal_surface.bounding_box().min() == answer_min,
+        "[Test] Wrong computation of bounding box (min)" );
+    OPENGEODE_EXCEPTION( polygonal_surface.bounding_box().max() == answer_max,
+        "[Test] Wrong computation of bounding box (max)" );
 }
 
 void test_create_vertex_attribute(
@@ -409,6 +420,7 @@ void test()
         geode::PolygonalSurfaceBuilder3D::create( *polygonal_surface );
 
     test_create_vertices( *polygonal_surface, *builder );
+    test_bounding_box( *polygonal_surface );
     test_create_vertex_attribute( *polygonal_surface );
     test_create_polygons( *polygonal_surface, *builder );
     test_create_edge_attribute( *polygonal_surface );

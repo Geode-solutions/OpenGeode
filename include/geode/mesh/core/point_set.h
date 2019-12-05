@@ -31,6 +31,7 @@
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+    FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
 
     class AttributeManager;
 } // namespace geode
@@ -62,6 +63,11 @@ namespace geode
         std::unique_ptr< PointSet< dimension > > clone() const;
 
         const Point< dimension >& point( index_t vertex_id ) const;
+
+        /*!
+         * Compute the bounding box from mesh vertices
+         */
+        BoundingBox< dimension > bounding_box() const;
 
     protected:
         PointSet() = default;

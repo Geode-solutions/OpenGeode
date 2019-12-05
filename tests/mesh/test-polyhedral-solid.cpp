@@ -25,6 +25,7 @@
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/logger.h>
 
+#include <geode/geometry/bounding_box.h>
 #include <geode/geometry/point.h>
 
 #include <geode/mesh/builder/geode_polyhedral_solid_builder.h>
@@ -47,6 +48,16 @@ void test_create_vertices( const geode::PolyhedralSolid3D& polyhedral_solid,
     builder.create_point( { { 2.2, 3.3, 4.4 } } );
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_vertices() == 8,
         "[Test] PolyhedralSolid should have 8 vertices" );
+}
+
+void test_bounding_box( const geode::PolyhedralSolid3D& polyhedral_solid )
+{
+    geode::Point3D answer_min{ { 0.1, 0.2, 0.3 } };
+    geode::Point3D answer_max{ { 9.3, 9.4, 6.7 } };
+    OPENGEODE_EXCEPTION( polyhedral_solid.bounding_box().min() == answer_min,
+        "[Test] Wrong computation of bounding box (min)" );
+    OPENGEODE_EXCEPTION( polyhedral_solid.bounding_box().max() == answer_max,
+        "[Test] Wrong computation of bounding box (max)" );
 }
 
 void test_create_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,

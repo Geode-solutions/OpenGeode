@@ -25,6 +25,7 @@
 
 #include <geode/basic/bitsery_archive.h>
 
+#include <geode/geometry/bounding_box.h>
 #include <geode/geometry/vector.h>
 
 #include <geode/mesh/builder/edged_curve_builder.h>
@@ -101,6 +102,17 @@ namespace geode
         auto builder = EdgedCurveBuilder< dimension >::create( *clone );
         builder->copy( *this );
         return clone;
+    }
+
+    template < index_t dimension >
+    BoundingBox< dimension > EdgedCurve< dimension >::bounding_box() const
+    {
+        BoundingBox< dimension > box;
+        for( const auto p : Range{ nb_vertices() } )
+        {
+            box.add_point( point( p ) );
+        }
+        return box;
     }
 
     template class opengeode_mesh_api EdgedCurve< 2 >;

@@ -38,6 +38,8 @@ namespace geode
     ALIAS_2D( Line );
     ALIAS_2D( Surface );
     ALIAS_2D( ModelBoundary );
+    FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
+    ALIAS_2D( BoundingBox );
 } // namespace geode
 
 namespace geode
@@ -198,6 +200,11 @@ namespace geode
         ItemLineRange items( const ModelBoundary2D& boundary ) const;
 
         bool is_closed( const Line2D& line ) const;
+
+        /*!
+         * Compute the bounding box from component meshes
+         */
+        BoundingBox2D bounding_box() const;
 
         static std::string native_extension_static()
         {

@@ -36,6 +36,7 @@
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+    FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
     FORWARD_DECLARATION_DIMENSION_CLASS( PolyhedralSolidBuilder );
 
     class AttributeManager;
@@ -338,6 +339,11 @@ namespace geode
          * Access to the manager of attributes associated with edges.
          */
         AttributeManager& edge_attribute_manager() const;
+
+        /*!
+         * Compute the bounding box from mesh vertices
+         */
+        BoundingBox< dimension > bounding_box() const;
 
     protected:
         PolyhedralSolid();

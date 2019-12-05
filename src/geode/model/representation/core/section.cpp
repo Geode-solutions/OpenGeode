@@ -26,6 +26,8 @@
 #include <geode/geometry/bounding_box.h>
 #include <geode/geometry/vector.h>
 
+#include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/core/point_set.h>
 #include <geode/mesh/core/polygonal_surface.h>
 
 #include <geode/model/mixin/core/corner.h>
@@ -283,6 +285,32 @@ namespace geode
     bool Section::is_closed( const Line2D& line ) const
     {
         return nb_boundaries( line.id() ) < 2;
+    }
+
+    BoundingBox2D Section::bounding_box() const
+    {
+        BoundingBox2D box;
+        for( const auto& line : lines() )
+        {
+            box.add_box( line.mesh().bounding_box() );
+        }
+        if( nb_lines() > 0 )
+        {
+            return box;
+        }
+        for( const auto& surface : surfaces() )
+        {
+            box.add_box( surface.mesh().bounding_box() );
+        }
+        if( nb_surfaces() > 0 )
+        {
+            return box;
+        }
+        for( const auto& corner : corners() )
+        {
+            box.add_box( corner.mesh().bounding_box() );
+        }
+        return box;
     }
 
 } // namespace geode

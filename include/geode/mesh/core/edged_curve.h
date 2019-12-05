@@ -29,6 +29,7 @@
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+    FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
     FORWARD_DECLARATION_DIMENSION_CLASS( EdgedCurveBuilder );
 } // namespace geode
 
@@ -52,6 +53,11 @@ namespace geode
         double edge_length( index_t edge_id ) const;
 
         Point< dimension > edge_barycenter( index_t edge_id ) const;
+
+        /*!
+         * Compute the bounding box from mesh vertices
+         */
+        BoundingBox< dimension > bounding_box() const;
 
     protected:
         EdgedCurve() = default;
