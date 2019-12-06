@@ -30,6 +30,7 @@
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
 
+#include <geode/geometry/bounding_box.h>
 #include <geode/geometry/vector.h>
 
 #include <geode/basic/detail/mapping_after_deletion.h>
@@ -861,6 +862,17 @@ namespace geode
         auto builder = PolyhedralSolidBuilder< dimension >::create( *clone );
         builder->copy( *this );
         return clone;
+    }
+
+    template < index_t dimension >
+    BoundingBox< dimension > PolyhedralSolid< dimension >::bounding_box() const
+    {
+        BoundingBox< dimension > box;
+        for( const auto p : Range{ nb_vertices() } )
+        {
+            box.add_point( point( p ) );
+        }
+        return box;
     }
 
     template class opengeode_mesh_api PolyhedralSolid< 3 >;

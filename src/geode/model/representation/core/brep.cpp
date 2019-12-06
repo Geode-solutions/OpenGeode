@@ -26,7 +26,10 @@
 #include <geode/geometry/bounding_box.h>
 #include <geode/geometry/vector.h>
 
+#include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/core/point_set.h>
 #include <geode/mesh/core/polygonal_surface.h>
+#include <geode/mesh/core/polyhedral_solid.h>
 
 #include <geode/model/mixin/core/block.h>
 #include <geode/model/mixin/core/corner.h>
@@ -61,6 +64,17 @@ namespace
         {
             iterator.geode::Relationships::EmbeddingRangeIterator::operator++();
         }
+    }
+
+    template < typename MeshComponentRange >
+    geode::BoundingBox3D meshes_bounding_box( MeshComponentRange range )
+    {
+        geode::BoundingBox3D box;
+        for( const auto& component : range )
+        {
+            box.add_box( component.mesh().bounding_box() );
+        }
+        return box;
     }
 } // namespace
 
@@ -467,4 +481,20 @@ namespace geode
         return nb_boundaries( surface.id() ) == 0;
     }
 
+    BoundingBox3D BRep::bounding_box() const
+    {
+        if( nb_surfaces() > 0 )
+        {
+            return meshes_bounding_box( surfaces() );
+        }
+        if( nb_blocks() > 0 )
+        {
+            return meshes_bounding_box( blocks() );
+        }
+        if( nb_lines() > 0 )
+        {
+            return meshes_bounding_box( lines() );
+        }
+        return meshes_bounding_box( corners() );
+    }
 } // namespace geode

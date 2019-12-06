@@ -39,6 +39,8 @@ namespace geode
     ALIAS_3D( Corner );
     ALIAS_3D( Line );
     ALIAS_3D( Surface );
+    FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
+    ALIAS_3D( BoundingBox );
 } // namespace geode
 
 namespace geode
@@ -293,6 +295,11 @@ namespace geode
         bool is_closed( const Line3D& line ) const;
 
         bool is_closed( const Surface3D& surface ) const;
+
+        /*!
+         * Compute the bounding box from component meshes
+         */
+        BoundingBox3D bounding_box() const;
 
         static std::string native_extension_static()
         {

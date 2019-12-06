@@ -27,6 +27,8 @@
 
 #include <geode/basic/bitsery_archive.h>
 
+#include <geode/geometry/bounding_box.h>
+
 #include <geode/mesh/builder/point_set_builder.h>
 #include <geode/mesh/core/geode_point_set.h>
 
@@ -85,6 +87,17 @@ namespace geode
         auto builder = PointSetBuilder< dimension >::create( *clone );
         builder->copy( *this );
         return clone;
+    }
+
+    template < index_t dimension >
+    BoundingBox< dimension > PointSet< dimension >::bounding_box() const
+    {
+        BoundingBox< dimension > box;
+        for( const auto p : Range{ nb_vertices() } )
+        {
+            box.add_point( point( p ) );
+        }
+        return box;
     }
 
     template class opengeode_mesh_api PointSet< 2 >;
