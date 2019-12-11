@@ -326,6 +326,12 @@ namespace geode
         std::vector< index_t > polyhedra_around_edge( index_t edge_id ) const;
 
         /*!
+         * Return all polyhedra made with the given facet.
+         * @param[in] facet_id Index of the facet
+         */
+        std::vector< index_t > polyhedra_from_facet( index_t facet_id ) const;
+
+        /*!
          * Access to the manager of attributes associated with polyhedra.
          */
         AttributeManager& polyhedron_attribute_manager() const;
