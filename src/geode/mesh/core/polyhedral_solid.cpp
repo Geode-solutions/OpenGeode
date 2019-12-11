@@ -93,30 +93,61 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
 
     std::vector< geode::index_t > common_polyhedra_around(
-        const std::vector< geode::PolyhedronVertex >& v0,
-        const std::vector< geode::PolyhedronVertex >& v1 )
+        const std::vector< std::vector< geode::PolyhedronVertex > >&
+            polyhedra_around )
     {
         std::vector< geode::index_t > result;
-        result.reserve( v0.size() );
-        for( const auto& polyhedron_vertex : v0 )
+        if( polyhedra_around.empty() )
         {
-            if( std::find_if( v1.begin(), v1.end(),
-                    [&polyhedron_vertex]( const geode::PolyhedronVertex& pv ) {
-                        return pv.polyhedron_id
-                               == polyhedron_vertex.polyhedron_id;
-                    } )
-                != v1.end() )
+            return result;
+        }
+        const auto& potential_polyhedron = polyhedra_around.front();
+        result.reserve( potential_polyhedron.size() );
+        for( const auto& polyhedron_vertex : potential_polyhedron )
+        {
+            bool add{ true };
+            for( const auto& polyhedron_around : polyhedra_around )
+            {
+                if( std::find_if( polyhedron_around.begin(),
+                        polyhedron_around.end(),
+                        [&polyhedron_vertex](
+                            const geode::PolyhedronVertex& pv ) {
+                            return pv.polyhedron_id
+                                   == polyhedron_vertex.polyhedron_id;
+                        } )
+                    == polyhedron_around.end() )
+                {
+                    add = false;
+                    break;
+                }
+            }
+
+            if( add )
             {
                 result.push_back( polyhedron_vertex.polyhedron_id );
             }
         }
         return result;
+    }
+
+    template < geode::index_t dimension, typename Container >
+    std::vector< geode::index_t > polyhedra_around(
+        const geode::PolyhedralSolid< dimension >& solid,
+        const Container& vertices )
+    {
+        std::vector< std::vector< geode::PolyhedronVertex > > polyhedra_around;
+        polyhedra_around.reserve( vertices.size() );
+        for( const auto v : vertices )
+        {
+            polyhedra_around.push_back( solid.polyhedra_around_vertex( v ) );
+        }
+        return common_polyhedra_around( polyhedra_around );
     }
 
 } // namespace
@@ -134,10 +165,10 @@ namespace geode
     public:
         explicit Impl( PolyhedralSolid& solid )
             : polyhedron_around_vertex_(
-                solid.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolyhedronVertex >(
-                        "polyhedron_around_vertex", PolyhedronVertex{} ) )
+                  solid.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolyhedronVertex >(
+                          "polyhedron_around_vertex", PolyhedronVertex{} ) )
         {
         }
 
@@ -534,11 +565,18 @@ namespace geode
             "[PolyhedralSolid::polyhedra_around_edge] Accessing an "
             "invalid edge" );
         const auto& vertices = edge_vertices( edge_id );
+        return polyhedra_around( *this, vertices );
+    }
 
-        const auto polyhedra_around_v0 = polyhedra_around_vertex( vertices[0] );
-        const auto polyhedra_around_v1 = polyhedra_around_vertex( vertices[1] );
-        return common_polyhedra_around(
-            polyhedra_around_v0, polyhedra_around_v1 );
+    template < index_t dimension >
+    std::vector< index_t > PolyhedralSolid< dimension >::polyhedra_from_facet(
+        index_t facet_id ) const
+    {
+        OPENGEODE_ASSERT( facet_id < this->nb_facets(),
+            "[PolyhedralSolid::polyhedron_from_facet] Accessing an "
+            "invalid facet" );
+        const auto& vertices = facet_vertices( facet_id );
+        return polyhedra_around( *this, vertices );
     }
 
     template < index_t dimension >
