@@ -140,6 +140,16 @@ void test_polyhedron_adjacencies(
     OPENGEODE_EXCEPTION(
         polyhedral_solid.polyhedra_around_vertex( edge_id ).size() == 3,
         "[Test] PolyhedralSolid should have 3 polyhedra around this edge" );
+    const auto facet_id = polyhedral_solid.polyhedron_facet( { 1, 0 } );
+    const auto& polyhedra = polyhedral_solid.polyhedra_from_facet( facet_id );
+    OPENGEODE_EXCEPTION(
+        polyhedra.size() == 2, "[Test] Wrong number of polyhedra from facet" );
+    OPENGEODE_EXCEPTION(
+        std::find( polyhedra.begin(), polyhedra.end(), 1 ) != polyhedra.end(),
+        "[Test] Polyhedra from facet should contain 1" );
+    OPENGEODE_EXCEPTION(
+        std::find( polyhedra.begin(), polyhedra.end(), 2 ) != polyhedra.end(),
+        "[Test] Polyhedra from facet should contain 2" );
 }
 
 void test_delete_vertex( const geode::PolyhedralSolid3D& polyhedral_solid,
