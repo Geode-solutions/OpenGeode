@@ -41,25 +41,7 @@ namespace geode
         {
             index_t id{ NO_ID };
         };
-    } // namespace detail
-} // namespace geode
 
-namespace std
-{
-    template <>
-    struct hash< geode::detail::FacetId >
-    {
-        std::size_t operator()( const geode::detail::FacetId& f ) const
-        {
-            return std::hash< geode::index_t >{}( f.id );
-        }
-    };
-} // namespace std
-
-namespace geode
-{
-    namespace detail
-    {
         struct SetValue
         {
             SetValue( const std::vector< index_t >& values ) : values_( values )
@@ -90,9 +72,9 @@ namespace geode
             friend class bitsery::Access;
             FacetStorage()
                 : counter_(
-                    facet_attribute_manager_
-                        .template find_or_create_attribute< VariableAttribute,
-                            index_t >( "counter", 1 ) ),
+                      facet_attribute_manager_
+                          .template find_or_create_attribute< VariableAttribute,
+                              index_t >( "counter", 1 ) ),
                   vertices_(
                       facet_attribute_manager_
                           .template find_or_create_attribute< VariableAttribute,
@@ -124,10 +106,10 @@ namespace geode
                     return id;
                 }
                 const auto size = facet_indices_.size();
-                id = size;
-                facet_attribute_manager_.resize( size + 1 );
+                id = size - 1;
+                facet_attribute_manager_.resize( size );
                 vertices_->modify_value( id, SetValue{ vertices.vertices() } );
-                return size;
+                return id;
             }
 
             void remove_facet( const VertexCycle& vertices )
