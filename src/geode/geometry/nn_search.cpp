@@ -118,7 +118,7 @@ namespace geode
         };
 
     private:
-        PointCloud cloud_;
+        const PointCloud cloud_;
         nanoflann::KDTreeSingleIndexAdaptor<
             nanoflann::L2_Simple_Adaptor< double, PointCloud >,
             PointCloud,
