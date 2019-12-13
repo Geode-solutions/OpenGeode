@@ -126,8 +126,7 @@ namespace geode
                 const auto size = facet_indices_.size();
                 id = size;
                 facet_attribute_manager_.resize( size + 1 );
-                vertices_->modify_value(
-                     id, SetValue{ vertices.vertices() } );
+                vertices_->modify_value( id, SetValue{ vertices.vertices() } );
                 return size;
             }
 
