@@ -209,9 +209,10 @@ namespace geode
 
     template < index_t dimension >
     index_t PolygonalSurfaceBuilder< dimension >::find_or_create_edge(
-        const std::array< index_t, 2 >& edge_vertices )
+        std::array< index_t, 2 > edge_vertices )
     {
-        return polygonal_surface_.find_or_create_edge( edge_vertices );
+        return polygonal_surface_.find_or_create_edge(
+            std::move( edge_vertices ) );
     }
 
     template < index_t dimension >
@@ -469,7 +470,7 @@ namespace geode
 
     template < index_t dimension >
     void PolygonalSurfaceBuilder< dimension >::update_edge_vertex(
-        const std::array< index_t, 2 >& edge_vertices,
+        std::array< index_t, 2 > edge_vertices,
         index_t edge_vertex_id,
         index_t new_vertex_id )
     {
@@ -477,7 +478,7 @@ namespace geode
             "[PolygonalSurfaceBuilder::update_edge_vertex] "
             "Accessing an invalid vertex in edge" );
         polygonal_surface_.update_edge_vertex(
-            edge_vertices, edge_vertex_id, new_vertex_id );
+            std::move( edge_vertices ), edge_vertex_id, new_vertex_id );
     }
 
     template < index_t dimension >

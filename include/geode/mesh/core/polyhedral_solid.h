@@ -354,11 +354,9 @@ namespace geode
     protected:
         PolyhedralSolid();
 
-        index_t find_or_create_facet(
-            const std::vector< index_t >& facet_vertices );
+        index_t find_or_create_facet( std::vector< index_t > facet_vertices );
 
-        index_t find_or_create_edge(
-            const std::array< index_t, 2 >& edge_vertices );
+        index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices );
 
     private:
         friend class bitsery::Access;
@@ -378,17 +376,17 @@ namespace geode
 
         void update_edge_vertices( const std::vector< index_t >& old2new );
 
-        void update_facet_vertex( const std::vector< index_t >& facet_vertices,
+        void update_facet_vertex( std::vector< index_t > facet_vertices,
             index_t facet_vertex_id,
             index_t new_vertex_id );
 
-        void update_edge_vertex( const std::array< index_t, 2 >& edge_vertices,
+        void update_edge_vertex( std::array< index_t, 2 > edge_vertices,
             index_t edge_vertex_id,
             index_t new_vertex_id );
 
-        void remove_facet( const std::vector< index_t >& facet_vertices );
+        void remove_facet( std::vector< index_t > facet_vertices );
 
-        void remove_edge( const std::array< index_t, 2 >& edge_vertices );
+        void remove_edge( std::array< index_t, 2 > edge_vertices );
 
         void delete_facets( const std::vector< bool >& to_delete );
 

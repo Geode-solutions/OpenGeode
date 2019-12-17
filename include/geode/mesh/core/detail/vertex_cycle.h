@@ -29,28 +29,27 @@
 #include <utility>
 #include <vector>
 
+#include <bitsery/brief_syntax.h>
+#include <bitsery/brief_syntax/array.h>
+#include <bitsery/brief_syntax/vector.h>
+
 #include <geode/basic/common.h>
 
 namespace geode
 {
     namespace detail
     {
+        template < typename Container >
         class VertexCycle
         {
         public:
-            VertexCycle( std::vector< index_t > vertices )
+            VertexCycle( Container vertices )
                 : vertices_( std::move( vertices ) )
             {
-                rotate();
+                rotate( vertices_ );
             }
 
-            VertexCycle( const std::array< index_t, 2 >& vertices )
-                : vertices_{ vertices[0], vertices[1] }
-            {
-                rotate();
-            }
-
-            const std::vector< index_t >& vertices() const
+            const Container& vertices() const
             {
                 return vertices_;
             }
@@ -58,7 +57,8 @@ namespace geode
             bool operator==( const VertexCycle& other ) const
             {
                 const auto& other_vertices = other.vertices();
-                if( other_vertices.size() != this->vertices_.size() )
+                const auto size = this->vertices_.size();
+                if( other_vertices.size() != size )
                 {
                     return false;
                 }
@@ -70,10 +70,14 @@ namespace geode
                 {
                     return true;
                 }
-                auto reverse_vertices = other.vertices();
-                std::reverse(
-                    reverse_vertices.begin() + 1, reverse_vertices.end() );
-                return this->vertices() == reverse_vertices;
+                for( const auto i : Range{ 1, size } )
+                {
+                    if( this->vertices()[i] != other_vertices[size - i] )
+                    {
+                        return false;
+                    }
+                }
+                return true;
             }
 
             bool operator!=( const VertexCycle& other ) const
@@ -91,20 +95,27 @@ namespace geode
             {
                 archive.ext( *this, DefaultGrowable< Archive, VertexCycle >{},
                     []( Archive& archive, VertexCycle& storage ) {
-                        archive.container4b(
-                            storage.vertices_, storage.vertices_.max_size() );
+                        archive( storage.vertices_ );
                     } );
             }
 
-            void rotate()
+            static void rotate( std::vector< index_t >& vertices )
             {
                 const auto min_itr =
-                    std::min_element( vertices_.begin(), vertices_.end() );
-                std::rotate( vertices_.begin(), min_itr, vertices_.end() );
+                    std::min_element( vertices.begin(), vertices.end() );
+                std::rotate( vertices.begin(), min_itr, vertices.end() );
             }
 
-        private:
-            std::vector< index_t > vertices_;
+            static void rotate( std::array< index_t, 2 >& vertices )
+            {
+                if( vertices.front() > vertices.back() )
+                {
+                    std::swap( vertices.front(), vertices.back() );
+                }
+            }
+
+        public:
+            Container vertices_;
         };
     } // namespace detail
 } // namespace geode
@@ -112,12 +123,25 @@ namespace geode
 namespace std
 {
     template <>
-    struct hash< geode::detail::VertexCycle >
+    struct hash< geode::detail::VertexCycle< std::vector< geode::index_t > > >
     {
-        std::size_t operator()( const geode::detail::VertexCycle& cycle ) const
+        std::size_t operator()(
+            const geode::detail::VertexCycle< std::vector< geode::index_t > >&
+                cycle ) const
         {
             return std::accumulate(
                 cycle.vertices().begin(), cycle.vertices().end(), 0 );
+        }
+    };
+
+    template <>
+    struct hash< geode::detail::VertexCycle< std::array< geode::index_t, 2 > > >
+    {
+        std::size_t operator()(
+            const geode::detail::VertexCycle< std::array< geode::index_t, 2 > >&
+                cycle ) const
+        {
+            return cycle.vertices().front() + cycle.vertices().back();
         }
     };
 } // namespace std

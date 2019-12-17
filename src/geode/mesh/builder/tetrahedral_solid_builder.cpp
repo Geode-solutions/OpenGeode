@@ -120,9 +120,12 @@ namespace geode
                     tetrahedral_solid_.polyhedron_facet_vertex(
                         { facet, ( v + 1 ) % 3 } )
                 };
-                this->find_or_create_edge( edge_vertices );
+                if( edge_vertices.front() < edge_vertices.back() )
+                {
+                    this->find_or_create_edge( std::move( edge_vertices ) );
+                }
             }
-            this->find_or_create_facet( facet_vertices );
+            this->find_or_create_facet( std::move( facet_vertices ) );
         }
         return added_tetra;
     }
