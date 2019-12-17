@@ -129,6 +129,11 @@ namespace geode
         void delete_isolated_facets();
 
         /*!
+         * Delete all the isolated edges (not used as polyhedron edges)
+         */
+        void delete_isolated_edges();
+
+        /*!
          * Return one polyhedron with one of the vertices matching given vertex.
          * @param[in] vertex_id Index of the vertex.
          * @detail If vertex is isolated (no incident polyhedron), default
