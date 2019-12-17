@@ -158,11 +158,9 @@ namespace geode
         {
         }
 
-        index_t find_or_create_facet(
-            const std::vector< index_t >& facet_vertices );
+        index_t find_or_create_facet( std::vector< index_t > facet_vertices );
 
-        index_t find_or_create_edge(
-            const std::array< index_t, 2 >& edge_vertices );
+        index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices );
 
         friend class PolyhedralSolid< dimension >;
         void copy( const PolyhedralSolid< dimension >& polyhedral_solid );
@@ -213,7 +211,7 @@ namespace geode
 
         void delete_facets( const std::vector< bool >& to_delete );
 
-        void update_facet_vertex( const std::vector< index_t >& facet_vertices,
+        void update_facet_vertex(  std::vector< index_t > facet_vertices,
             index_t facet_vertex_id,
             index_t new_vertex_id );
 

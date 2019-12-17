@@ -93,7 +93,7 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -165,10 +165,10 @@ namespace geode
     public:
         explicit Impl( PolyhedralSolid& solid )
             : polyhedron_around_vertex_(
-                solid.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolyhedronVertex >(
-                        "polyhedron_around_vertex", PolyhedronVertex{} ) )
+                  solid.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolyhedronVertex >(
+                          "polyhedron_around_vertex", PolyhedronVertex{} ) )
         {
         }
 
@@ -195,16 +195,14 @@ namespace geode
             return Edges::find_facet( edge_vertices );
         }
 
-        index_t find_or_create_facet(
-            const std::vector< index_t >& facet_vertices )
+        index_t find_or_create_facet( std::vector< index_t > facet_vertices )
         {
-            return Facets::add_facet( facet_vertices );
+            return Facets::add_facet( std::move( facet_vertices ) );
         }
 
-        index_t find_or_create_edge(
-            const std::array< index_t, 2 >& edge_vertices )
+        index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices )
         {
-            return Edges::add_facet( edge_vertices );
+            return Edges::add_facet( std::move( edge_vertices ) );
         }
 
         const std::vector< index_t >& get_facet_vertices(
@@ -219,24 +217,24 @@ namespace geode
             return Edges::get_facet_vertices( edge_id );
         }
 
-        void update_facet_vertex( const std::vector< index_t >& facet_vertices,
+        void update_facet_vertex( std::vector< index_t > facet_vertices,
             const index_t facet_vertex_id,
             const index_t new_vertex_id )
         {
             auto updated_facet_vertices = facet_vertices;
             updated_facet_vertices[facet_vertex_id] = new_vertex_id;
-            Facets::add_facet( updated_facet_vertices );
-            Facets::remove_facet( facet_vertices );
+            Facets::add_facet( std::move( updated_facet_vertices ) );
+            Facets::remove_facet( std::move( facet_vertices ) );
         }
 
-        void update_edge_vertex( const std::array< index_t, 2 >& edge_vertices,
+        void update_edge_vertex( std::array< index_t, 2 > edge_vertices,
             const index_t edge_vertex_id,
             const index_t new_vertex_id )
         {
             auto updated_edge_vertices = edge_vertices;
             updated_edge_vertices[edge_vertex_id] = new_vertex_id;
-            Edges::add_facet( updated_edge_vertices );
-            Edges::remove_facet( edge_vertices );
+            Edges::add_facet( std::move( updated_edge_vertices ) );
+            Edges::remove_facet( std::move( edge_vertices ) );
         }
 
         void update_facet_vertices( const std::vector< index_t >& old2new )
@@ -249,14 +247,14 @@ namespace geode
             Edges::update_facet_vertices( old2new );
         }
 
-        void remove_facet( const std::vector< index_t >& facet_vertices )
+        void remove_facet( std::vector< index_t > facet_vertices )
         {
-            Facets::remove_facet( facet_vertices );
+            Facets::remove_facet( std::move( facet_vertices ) );
         }
 
-        void remove_edge( const std::array< index_t, 2 >& edge_vertices )
+        void remove_edge( std::array< index_t, 2 > edge_vertices )
         {
-            Edges::remove_facet( edge_vertices );
+            Edges::remove_facet( std::move( edge_vertices ) );
         }
 
         void delete_facets( const std::vector< bool >& to_delete )
@@ -306,7 +304,7 @@ namespace geode
                 {
                     std::array< index_t, 2 > edge_vertices{ facet_vertices[v],
                         facet_vertices[( v + 1 ) % nb_facet_vertices] };
-                    Edges::add_facet( edge_vertices );
+                    Edges::add_facet( std::move( edge_vertices ) );
                 }
             }
         }
@@ -592,16 +590,16 @@ namespace geode
 
     template < index_t dimension >
     index_t PolyhedralSolid< dimension >::find_or_create_facet(
-        const std::vector< index_t >& facet_vertices )
+        std::vector< index_t > facet_vertices )
     {
-        return impl_->find_or_create_facet( facet_vertices );
+        return impl_->find_or_create_facet( std::move( facet_vertices ) );
     }
 
     template < index_t dimension >
     index_t PolyhedralSolid< dimension >::find_or_create_edge(
-        const std::array< index_t, 2 >& edge_vertices )
+        std::array< index_t, 2 > edge_vertices )
     {
-        return impl_->find_or_create_edge( edge_vertices );
+        return impl_->find_or_create_edge( std::move( edge_vertices ) );
     }
 
     template < index_t dimension >
@@ -648,36 +646,36 @@ namespace geode
 
     template < index_t dimension >
     void PolyhedralSolid< dimension >::update_facet_vertex(
-        const std::vector< index_t >& facet_vertices,
+        std::vector< index_t > facet_vertices,
         index_t facet_vertex_id,
         index_t new_vertex_id )
     {
         impl_->update_facet_vertex(
-            facet_vertices, facet_vertex_id, new_vertex_id );
+            std::move( facet_vertices ), facet_vertex_id, new_vertex_id );
     }
 
     template < index_t dimension >
     void PolyhedralSolid< dimension >::update_edge_vertex(
-        const std::array< index_t, 2 >& edge_vertices,
+        std::array< index_t, 2 > edge_vertices,
         index_t edge_vertex_id,
         index_t new_vertex_id )
     {
         impl_->update_edge_vertex(
-            edge_vertices, edge_vertex_id, new_vertex_id );
+            std::move( edge_vertices ), edge_vertex_id, new_vertex_id );
     }
 
     template < index_t dimension >
     void PolyhedralSolid< dimension >::remove_facet(
-        const std::vector< index_t >& facet_vertices )
+        std::vector< index_t > facet_vertices )
     {
-        impl_->remove_facet( facet_vertices );
+        impl_->remove_facet( std::move( facet_vertices ) );
     }
 
     template < index_t dimension >
     void PolyhedralSolid< dimension >::remove_edge(
-        const std::array< index_t, 2 >& edge_vertices )
+        std::array< index_t, 2 > edge_vertices )
     {
-        impl_->remove_edge( edge_vertices );
+        impl_->remove_edge( std::move( edge_vertices ) );
     }
 
     template < index_t dimension >

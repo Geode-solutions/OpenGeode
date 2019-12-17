@@ -310,8 +310,7 @@ namespace geode
     protected:
         PolygonalSurfaceBase();
 
-        index_t find_or_create_edge(
-            const std::array< index_t, 2 >& edge_vertices );
+        index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices );
 
     private:
         friend class bitsery::Access;
@@ -328,11 +327,11 @@ namespace geode
 
         void update_edge_vertices( const std::vector< index_t >& old2new );
 
-        void update_edge_vertex( const std::array< index_t, 2 >& edge_vertices,
+        void update_edge_vertex( std::array< index_t, 2 > edge_vertices,
             index_t edge_vertex_id,
             index_t new_vertex_id );
 
-        void remove_edge( const std::array< index_t, 2 >& edge_vertices );
+        void remove_edge( std::array< index_t, 2 > edge_vertices );
 
         void delete_edges( const std::vector< bool >& to_delete );
 
