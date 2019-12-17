@@ -211,7 +211,7 @@ namespace geode
 
         void delete_facets( const std::vector< bool >& to_delete );
 
-        void update_facet_vertex(  std::vector< index_t > facet_vertices,
+        void update_facet_vertex( std::vector< index_t > facet_vertices,
             index_t facet_vertex_id,
             index_t new_vertex_id );
 
