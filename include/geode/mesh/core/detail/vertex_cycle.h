@@ -129,8 +129,12 @@ namespace std
             const geode::detail::VertexCycle< std::vector< geode::index_t > >&
                 cycle ) const
         {
-            return std::accumulate(
-                cycle.vertices().begin(), cycle.vertices().end(), 0 );
+            std::size_t hash{ 0 };
+            for( const auto v : cycle.vertices() )
+            {
+                hash = hash ^ std::hash< geode::index_t >()( v );
+            }
+            return hash;
         }
     };
 
@@ -141,7 +145,8 @@ namespace std
             const geode::detail::VertexCycle< std::array< geode::index_t, 2 > >&
                 cycle ) const
         {
-            return cycle.vertices().front() + cycle.vertices().back();
+            return std::hash< geode::index_t >()( cycle.vertices().front() )
+                   ^ std::hash< geode::index_t >()( cycle.vertices().back() );
         }
     };
 } // namespace std
