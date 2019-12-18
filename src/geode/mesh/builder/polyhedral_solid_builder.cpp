@@ -86,7 +86,7 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -257,14 +257,17 @@ namespace geode
                     polyhedral_solid_.polyhedron_facet_vertex(
                         { id, ( v + 1 ) % nb_facet_vertices } )
                 };
-                const auto position_it = std::find( edge_vertices.begin(),
-                    edge_vertices.end(), polyhedron_vertex_id );
-                if( position_it != edge_vertices.end() )
+                if( edge_vertices[0] < edge_vertices[1] )
                 {
-                    const auto it =
-                        std::distance( edge_vertices.begin(), position_it );
-                    polyhedral_solid_.update_edge_vertex(
-                        std::move( edge_vertices ), it, vertex_id );
+                    const auto position_it = std::find( edge_vertices.begin(),
+                        edge_vertices.end(), polyhedron_vertex_id );
+                    if( position_it != edge_vertices.end() )
+                    {
+                        const auto it =
+                            std::distance( edge_vertices.begin(), position_it );
+                        polyhedral_solid_.update_edge_vertex(
+                            std::move( edge_vertices ), it, vertex_id );
+                    }
                 }
             }
         }
@@ -640,15 +643,21 @@ namespace geode
                         polyhedral_solid_.nb_polyhedron_facet_vertices( id );
                     for( const auto v : Range{ nb_facet_vertices } )
                     {
-                        polyhedral_solid_.remove_edge(
-                            { polyhedral_solid_.polyhedron_facet_vertex(
-                                  { id, v } ),
-                                polyhedral_solid_.polyhedron_facet_vertex(
-                                    { id, ( v + 1 ) % nb_facet_vertices } ) } );
+                        const auto v0 =
+                            polyhedral_solid_.polyhedron_facet_vertex(
+                                { id, v } );
+                        const auto v1 =
+                            polyhedral_solid_.polyhedron_facet_vertex(
+                                { id, ( v + 1 ) % nb_facet_vertices } );
+                        if( v0 < v1 )
+                        {
+                            polyhedral_solid_.remove_edge( { v0, v1 } );
+                        }
                     }
                 }
             }
         }
+
         polyhedral_solid_.remove_isolated_edges();
     }
 

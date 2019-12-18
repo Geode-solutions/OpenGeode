@@ -262,7 +262,7 @@ namespace geode
         {
             while( values_.size() < size )
             {
-                values_.push_back( default_value_ );
+                values_.emplace_back( default_value_ );
             }
             values_.resize( size );
         }
