@@ -79,10 +79,11 @@ set(advanced_headers
 )
 target_link_libraries(${target_name}
     PUBLIC
+        absl::flat_hash_map
+        Bitsery::bitsery
+        ghcFilesystem::ghc_filesystem
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
         ${PROJECT_NAME}::mesh
-        Bitsery::bitsery
-        ghcFilesystem::ghc_filesystem
 )
 

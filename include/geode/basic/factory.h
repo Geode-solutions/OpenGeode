@@ -30,8 +30,9 @@
 #pragma once
 
 #include <memory>
-#include <unordered_map>
 #include <vector>
+
+#include <absl/container/flat_hash_map.h>
 
 #include <geode/basic/common.h>
 #include <geode/basic/logger.h>
@@ -109,7 +110,7 @@ namespace geode
 
         using Creator = typename std::add_pointer< std::unique_ptr< BaseClass >(
             Args... ) >::type;
-        using FactoryStore = std::unordered_map< Key, Creator >;
+        using FactoryStore = absl::flat_hash_map< Key, Creator >;
 
     private:
         template < typename DerivedClass >

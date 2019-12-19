@@ -25,7 +25,8 @@
 
 #include <memory>
 #include <typeinfo>
-#include <unordered_map>
+
+#include <absl/container/flat_hash_map.h>
 
 #include <bitsery/bitsery.h>
 #include <bitsery/brief_syntax.h>
@@ -481,6 +482,6 @@ namespace geode
 
     private:
         T default_value_;
-        std::unordered_map< index_t, T > values_;
+        absl::flat_hash_map< index_t, T > values_;
     };
 } // namespace geode
