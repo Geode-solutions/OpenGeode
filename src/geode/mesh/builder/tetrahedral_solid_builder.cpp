@@ -110,7 +110,7 @@ namespace geode
         for( const auto f : Range{ 4 } )
         {
             PolyhedronFacet facet{ added_tetra, f };
-            std::vector< index_t > facet_vertices( 3 );
+            absl::InlinedVector< index_t, 3 > facet_vertices( 3 );
             for( const auto v : Range{ 3 } )
             {
                 facet_vertices[v] =

@@ -29,6 +29,8 @@
 #include <utility>
 #include <vector>
 
+#include <absl/container/inlined_vector.h>
+
 #include <bitsery/brief_syntax.h>
 #include <bitsery/brief_syntax/array.h>
 #include <bitsery/brief_syntax/vector.h>
@@ -39,6 +41,23 @@ namespace geode
 {
     namespace detail
     {
+        template < typename Container >
+        inline void rotate( Container& vertices )
+        {
+            const auto min_itr =
+                std::min_element( vertices.begin(), vertices.end() );
+            std::rotate( vertices.begin(), min_itr, vertices.end() );
+        }
+
+        template <>
+        inline void rotate( std::array< index_t, 2 >& vertices )
+        {
+            if( vertices.front() > vertices.back() )
+            {
+                std::swap( vertices.front(), vertices.back() );
+            }
+        }
+
         template < typename Container >
         class VertexCycle
         {
@@ -99,21 +118,6 @@ namespace geode
                     } );
             }
 
-            static void rotate( std::vector< index_t >& vertices )
-            {
-                const auto min_itr =
-                    std::min_element( vertices.begin(), vertices.end() );
-                std::rotate( vertices.begin(), min_itr, vertices.end() );
-            }
-
-            static void rotate( std::array< index_t, 2 >& vertices )
-            {
-                if( vertices.front() > vertices.back() )
-                {
-                    std::swap( vertices.front(), vertices.back() );
-                }
-            }
-
         public:
             Container vertices_;
         };
@@ -122,12 +126,12 @@ namespace geode
 
 namespace std
 {
+    using VectorVertexCycle =
+        geode::detail::VertexCycle< absl::InlinedVector< geode::index_t, 3 > >;
     template <>
-    struct hash< geode::detail::VertexCycle< std::vector< geode::index_t > > >
+    struct hash< VectorVertexCycle >
     {
-        std::size_t operator()(
-            const geode::detail::VertexCycle< std::vector< geode::index_t > >&
-                cycle ) const
+        std::size_t operator()( const VectorVertexCycle& cycle ) const
         {
             std::size_t hash{ 0 };
             for( const auto v : cycle.vertices() )
@@ -138,12 +142,12 @@ namespace std
         }
     };
 
+    using ArrayVertexCycle =
+        geode::detail::VertexCycle< std::array< geode::index_t, 2 > >;
     template <>
-    struct hash< geode::detail::VertexCycle< std::array< geode::index_t, 2 > > >
+    struct hash< ArrayVertexCycle >
     {
-        std::size_t operator()(
-            const geode::detail::VertexCycle< std::array< geode::index_t, 2 > >&
-                cycle ) const
+        std::size_t operator()( const ArrayVertexCycle& cycle ) const
         {
             return std::hash< geode::index_t >()( cycle.vertices().front() )
                    ^ std::hash< geode::index_t >()( cycle.vertices().back() );

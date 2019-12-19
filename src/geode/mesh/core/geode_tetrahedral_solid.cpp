@@ -128,10 +128,12 @@ namespace geode
                 surface.nb_polyhedra() - 1, vertices );
         }
 
-        std::vector< std::vector< index_t > > get_polyhedron_facet_vertices(
-            const std::array< index_t, 4 >& vertices ) const
+        std::vector< absl::InlinedVector< index_t, 3 > >
+            get_polyhedron_facet_vertices(
+                const std::array< index_t, 4 >& vertices ) const
         {
-            std::vector< std::vector< index_t > > facet_vertices( 4 );
+            std::vector< absl::InlinedVector< index_t, 3 > > facet_vertices(
+                4 );
             for( const auto f : Range{ 4 } )
             {
                 facet_vertices[f].resize( 3 );
@@ -261,7 +263,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< std::vector< index_t > >
+    std::vector< absl::InlinedVector< index_t, 3 > >
         OpenGeodeTetrahedralSolid< dimension >::get_polyhedron_facet_vertices(
             const std::array< index_t, 4 >& vertices ) const
     {
