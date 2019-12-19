@@ -23,7 +23,10 @@
 
 #pragma once
 
+#include <absl/container/inlined_vector.h>
+
 #include <geode/basic/bitsery_archive.h>
+#include <geode/basic/logger.h>
 
 #include <geode/mesh/common.h>
 
@@ -46,4 +49,24 @@ namespace geode
      */
     void opengeode_mesh_api register_mesh_deserialize_pcontext(
         PContext& context );
+
 } // namespace geode
+
+namespace bitsery
+{
+    namespace traits
+    {
+        template < typename T, size_t N >
+        struct ContainerTraits< absl::InlinedVector< T, N > >
+            : public StdContainer< absl::InlinedVector< T, N >, true, true >
+        {
+        };
+    } // namespace traits
+
+    template < typename Serializer, typename T, size_t N >
+    void serialize( Serializer& s, absl::InlinedVector< T, N >& obj )
+    {
+        s.container( obj, obj.max_size() );
+        DEBUG( obj.size() );
+    }
+} // namespace bitsery

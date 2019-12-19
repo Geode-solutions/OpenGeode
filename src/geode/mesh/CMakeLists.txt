@@ -138,7 +138,8 @@ set(advanced_headers
 )
 target_link_libraries(${target_name} 
     PUBLIC 
+        absl::flat_hash_map
+        Bitsery::bitsery
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
-        Bitsery::bitsery
 )

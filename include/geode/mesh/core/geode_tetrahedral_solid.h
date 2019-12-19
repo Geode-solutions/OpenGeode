@@ -96,8 +96,9 @@ namespace geode
 
         void add_tetrahedron( const std::array< index_t, 4 >& vertices );
 
-        std::vector< std::vector< index_t > > get_polyhedron_facet_vertices(
-            const std::array< index_t, 4 >& vertices ) const;
+        std::vector< absl::InlinedVector< index_t, 3 > >
+            get_polyhedron_facet_vertices(
+                const std::array< index_t, 4 >& vertices ) const;
 
         std::vector< std::array< index_t, 2 > > get_polyhedron_edge_vertices(
             const std::array< index_t, 4 >& vertices ) const;

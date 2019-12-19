@@ -86,7 +86,7 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -225,7 +225,7 @@ namespace geode
                  polyhedron_vertex.polyhedron_id ) } )
         {
             const PolyhedronFacet id{ polyhedron_vertex.polyhedron_id, f };
-            std::vector< index_t > facet_vertices(
+            absl::InlinedVector< index_t, 3 > facet_vertices(
                 polyhedral_solid_.nb_polyhedron_facet_vertices( id ) );
             for( const auto v :
                 Range{ polyhedral_solid_.nb_polyhedron_facet_vertices( id ) } )
@@ -361,13 +361,13 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< std::vector< index_t > >
+    std::vector< absl::InlinedVector< index_t, 3 > >
         PolyhedralSolidBuilder< dimension >::get_polyhedron_facet_vertices(
             const std::vector< index_t >& vertices,
             const std::vector< std::vector< index_t > >& facets ) const
     {
-        std::vector< std::vector< index_t > > polyhedron_facet_vertices(
-            facets.size() );
+        std::vector< absl::InlinedVector< index_t, 3 > >
+            polyhedron_facet_vertices( facets.size() );
         for( const auto f : Range{ facets.size() } )
         {
             polyhedron_facet_vertices[f].resize( facets[f].size() );
@@ -415,7 +415,7 @@ namespace geode
 
     template < index_t dimension >
     index_t PolyhedralSolidBuilder< dimension >::find_or_create_facet(
-        std::vector< index_t > facet_vertices )
+        absl::InlinedVector< index_t, 3 > facet_vertices )
     {
         return polyhedral_solid_.find_or_create_facet(
             std::move( facet_vertices ) );
@@ -609,7 +609,7 @@ namespace geode
                     Range{ polyhedral_solid_.nb_polyhedron_facets( p ) } )
                 {
                     const PolyhedronFacet id{ p, f };
-                    std::vector< index_t > facet_vertices(
+                    absl::InlinedVector< index_t, 3 > facet_vertices(
                         polyhedral_solid_.nb_polyhedron_facet_vertices( id ) );
                     for( const auto v :
                         Range{ polyhedral_solid_.nb_polyhedron_facet_vertices(
@@ -699,7 +699,7 @@ namespace geode
 
     template < index_t dimension >
     void PolyhedralSolidBuilder< dimension >::update_facet_vertex(
-        std::vector< index_t > facet_vertices,
+        absl::InlinedVector< index_t, 3 > facet_vertices,
         index_t facet_vertex_id,
         index_t new_vertex_id )
     {

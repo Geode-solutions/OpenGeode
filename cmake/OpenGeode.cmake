@@ -26,6 +26,7 @@ file(READ "${UTILS_FILE}" OPENGEODE_UTILS)
 include("${UTILS_FILE}")
 
 # Get OpenGeode dependencies
+find_package(absl REQUIRED CONFIG NO_DEFAULT_PATH PATHS ${ABSEIL_INSTALL_PREFIX})
 find_package(Async++ REQUIRED CONFIG NO_DEFAULT_PATH PATHS ${ASYNCPLUSPLUS_INSTALL_PREFIX})
 find_package(Bitsery REQUIRED CONFIG NO_DEFAULT_PATH PATHS ${BITSERY_INSTALL_PREFIX})
 find_package(ghcFilesystem REQUIRED CONFIG NO_DEFAULT_PATH PATHS ${FILESYSTEM_INSTALL_PREFIX})
@@ -34,11 +35,13 @@ find_package(nanoflann REQUIRED CONFIG NO_DEFAULT_PATH PATHS ${NANOFLANN_INSTALL
 find_package(spdlog REQUIRED CONFIG NO_DEFAULT_PATH PATHS ${SPDLOG_INSTALL_PREFIX})
 find_package(Threads REQUIRED)
 
+copy_windows_binaries(absl)
 copy_windows_binaries(Async++)
 
 # Install OpenGeode third-parties
 install(
     DIRECTORY
+        ${ABSEIL_INSTALL_PREFIX}/
         ${ASYNCPLUSPLUS_INSTALL_PREFIX}/
         ${BITSERY_INSTALL_PREFIX}/
         ${FILESYSTEM_INSTALL_PREFIX}/

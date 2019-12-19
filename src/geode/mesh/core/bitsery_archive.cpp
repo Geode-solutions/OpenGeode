@@ -141,6 +141,8 @@ namespace
             geode::PolyhedronFacetVertex, Serializer >( context );
         geode::AttributeManager::register_attribute_type<
             geode::PolyhedronVertex, Serializer >( context );
+        geode::AttributeManager::register_attribute_type<
+            absl::InlinedVector< geode::index_t, 3 >, Serializer >( context );
         context.registerBasesList< Serializer >(
             bitsery::ext::PolymorphicClassesList< geode::VertexSet >{} );
     }
