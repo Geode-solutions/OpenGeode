@@ -23,8 +23,6 @@
 
 #pragma once
 
-#include <unordered_map>
-
 #include <absl/container/flat_hash_map.h>
 
 #include <geode/basic/attribute.h>
@@ -48,9 +46,9 @@ namespace geode
             friend class bitsery::Access;
             FacetStorage()
                 : counter_(
-                    facet_attribute_manager_
-                        .template find_or_create_attribute< VariableAttribute,
-                            index_t >( "counter", 1 ) ),
+                      facet_attribute_manager_
+                          .template find_or_create_attribute< VariableAttribute,
+                              index_t >( "counter", 1 ) ),
                   vertices_(
                       facet_attribute_manager_
                           .template find_or_create_attribute< VariableAttribute,

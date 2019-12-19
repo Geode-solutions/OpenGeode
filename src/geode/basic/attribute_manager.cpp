@@ -24,7 +24,8 @@
 #include <geode/basic/attribute_manager.h>
 
 #include <algorithm>
-#include <unordered_map>
+
+#include <absl/container/flat_hash_map.h>
 
 #include <bitsery/traits/string.h>
 
@@ -179,7 +180,7 @@ namespace geode
 
     private:
         index_t nb_elements_{ 0 };
-        std::unordered_map< std::string, std::shared_ptr< AttributeBase > >
+        absl::flat_hash_map< std::string, std::shared_ptr< AttributeBase > >
             attributes_;
     };
 
