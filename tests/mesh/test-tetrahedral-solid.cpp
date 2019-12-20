@@ -35,14 +35,28 @@
 void test_create_vertices( const geode::TetrahedralSolid3D& solid,
     geode::TetrahedralSolidBuilder3D& builder )
 {
-    builder.create_point( { { 0.1, 0.2, 0.3 } } );
-    builder.create_point( { { 2.1, 9.4, 6.7 } } );
-    builder.create_point( { { 7.5, 5.2, 6.3 } } );
-    builder.create_point( { { 8.1, 1.4, 4.7 } } );
-    builder.create_point( { { 4.7, 2.1, 1.3 } } );
-    builder.create_point( { { 1.6, 8.7, 6.1 } } );
-    OPENGEODE_EXCEPTION( solid.nb_vertices() == 6,
-        "[Test] TetrahedralSolid should have 6 vertices" );
+    // builder.create_point( { { 0.1, 0.2, 0.3 } } );
+    // builder.create_point( { { 2.1, 9.4, 6.7 } } );
+    // builder.create_point( { { 7.5, 5.2, 6.3 } } );
+    // builder.create_point( { { 8.1, 1.4, 4.7 } } );
+    // builder.create_point( { { 4.7, 2.1, 1.3 } } );
+    // builder.create_point( { { 1.6, 8.7, 6.1 } } );
+    // OPENGEODE_EXCEPTION( solid.nb_vertices() == 6,
+    //     "[Test] TetrahedralSolid should have 6 vertices" );
+    geode::index_t nb = 20000;
+    builder.create_vertices( nb + 3 );
+    for( const auto& t : geode::Range{ nb } )
+    {
+        if( t % ( nb / 20 ) == 0 )
+        {
+            DEBUG( t );
+        }
+        builder.create_tetrahedron( { { t, t + 1, t + 2, t + 3 } } );
+    }
+    DEBUG( solid.nb_vertices() );
+    DEBUG( solid.nb_polyhedra() );
+    DEBUG( solid.nb_facets() );
+    DEBUG( solid.nb_edges() );
 }
 
 void test_create_tetrahedra( const geode::TetrahedralSolid3D& solid,
@@ -196,15 +210,16 @@ void test()
     auto builder = geode::TetrahedralSolidBuilder3D::create( *solid );
 
     test_create_vertices( *solid, *builder );
-    test_create_tetrahedra( *solid, *builder );
-    test_polyhedron_adjacencies( *solid, *builder );
-    test_io( *solid, "test." + solid->native_extension() );
-    test_backward_io(
-        geode::test_path + "mesh/data/test_v1." + solid->native_extension() );
+    // test_create_tetrahedra( *solid, *builder );
+    // test_polyhedron_adjacencies( *solid, *builder );
+    // test_io( *solid, "test." + solid->native_extension() );
+    // test_backward_io(
+    //     geode::test_path + "mesh/data/test_v1." + solid->native_extension()
+    //     );
 
-    test_delete_vertex( *solid, *builder );
-    test_delete_polyhedron( *solid, *builder );
-    test_clone( *solid );
+    // test_delete_vertex( *solid, *builder );
+    // test_delete_polyhedron( *solid, *builder );
+    // test_clone( *solid );
 }
 
 OPENGEODE_TEST( "tetrahedral-solid" )
