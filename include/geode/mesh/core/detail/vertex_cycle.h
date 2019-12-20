@@ -30,6 +30,7 @@
 #include <vector>
 
 #include <absl/container/inlined_vector.h>
+#include <absl/hash/hash.h>
 
 #include <bitsery/brief_syntax.h>
 #include <bitsery/brief_syntax/array.h>
@@ -136,7 +137,7 @@ namespace std
             std::size_t hash{ 0 };
             for( const auto v : cycle.vertices() )
             {
-                hash = hash ^ std::hash< geode::index_t >()( v );
+                hash = hash ^ absl::Hash< geode::index_t >()( v );
             }
             return hash;
         }
@@ -149,8 +150,8 @@ namespace std
     {
         std::size_t operator()( const ArrayVertexCycle& cycle ) const
         {
-            return std::hash< geode::index_t >()( cycle.vertices().front() )
-                   ^ std::hash< geode::index_t >()( cycle.vertices().back() );
+            return absl::Hash< geode::index_t >()( cycle.vertices().front() )
+                   ^ absl::Hash< geode::index_t >()( cycle.vertices().back() );
         }
     };
 } // namespace std
