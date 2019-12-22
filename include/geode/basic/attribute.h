@@ -358,7 +358,11 @@ namespace geode
 
         void resize( index_t size ) override
         {
-            values_.resize( size, default_value_ );
+            while( values_.size() < size )
+            {
+                values_.emplace_back( default_value_ );
+            }
+            values_.resize( size );
         }
 
         void delete_elements( const std::vector< bool >& to_delete ) override

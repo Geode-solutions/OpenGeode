@@ -58,6 +58,8 @@ struct Foo2
                                      archive.value4b( foo.unsigned_int_ );
                                  },
                                     []( Archive &archive, Foo2 &foo ) {
+                                        archive.value8b( foo.double_ );
+                                        archive.value4b( foo.unsigned_int_ );
                                         archive.value1b( foo.bool_ );
                                     } } } );
     }
@@ -77,13 +79,21 @@ struct Foo3
                                      archive.value4b( foo.unsigned_int_ );
                                  },
                                     []( Archive &archive, Foo3 &foo ) {
+                                        archive.value8b( foo.double_ );
+                                        archive.value4b( foo.unsigned_int_ );
                                         archive.value1b( foo.bool_ );
                                     },
                                     []( Archive &archive, Foo3 &foo ) {
+                                        archive.value8b( foo.double_ );
+                                        archive.value4b( foo.unsigned_int_ );
+                                        archive.value1b( foo.bool_ );
                                         archive.value4b( foo.int_ );
                                     } },
-                                { []( Foo3 &foo ) { foo.bool_ = true; },
-                                    []( Foo3 &foo ) { foo.int_ = -52; } } } );
+                                { []( Foo3 &foo ) {
+                                     foo.bool_ = true;
+                                     foo.int_ = -52;
+                                 },
+                                    []( Foo3 &foo ) { foo.int_ = true; } } } );
     }
     double double_{ 10 };
     unsigned int unsigned_int_{ 10 };

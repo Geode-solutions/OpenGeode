@@ -67,6 +67,5 @@ namespace bitsery
     void serialize( Serializer& s, absl::InlinedVector< T, N >& obj )
     {
         s.container( obj, obj.max_size() );
-        DEBUG( obj.size() );
     }
 } // namespace bitsery

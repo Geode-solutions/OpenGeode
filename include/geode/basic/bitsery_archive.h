@@ -118,18 +118,9 @@ namespace geode
         template < typename Fnc >
         void serialize( Archive &ser, const T &obj, Fnc &&fnc ) const
         {
+            geode_unused( fnc );
             ser.ext4b( version_, bitsery::ext::CompactValue{} );
-            if( serializers_.empty() )
-            {
-                fnc( ser, const_cast< T & >( obj ) );
-            }
-            else
-            {
-                for( const auto f : serializers_ )
-                {
-                    f( ser, const_cast< T & >( obj ) );
-                }
-            }
+            serializers_.back()( ser, const_cast< T & >( obj ) );
         }
 
         template < typename Fnc >
@@ -138,16 +129,10 @@ namespace geode
             geode_unused( fnc );
             index_t current_version;
             des.ext4b( current_version, bitsery::ext::CompactValue{} );
-            for( const auto i : Range{ current_version } )
+            serializers_.at( current_version - 1 )( des, obj );
+            if( !initializers_.empty() && current_version < version_ )
             {
-                serializers_.at( i )( des, obj );
-            }
-            if( !initializers_.empty() )
-            {
-                for( const auto i : Range{ current_version, version_ } )
-                {
-                    initializers_.at( i - 1 )( obj );
-                }
+                initializers_.at( current_version - 1 )( obj );
             }
         }
 
@@ -155,7 +140,7 @@ namespace geode
         index_t version_{ FIRST_VERSION };
         std::vector< std::function< void( Archive &, T & ) > > serializers_;
         std::vector< std::function< void( T & ) > > initializers_;
-    };
+    }; // namespace geode
 } // namespace geode
 
 namespace bitsery
