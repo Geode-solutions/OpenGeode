@@ -80,10 +80,10 @@ namespace geode
             const std::array< index_t, 4 >& vertices ) final;
 
         std::vector< absl::InlinedVector< index_t, 3 > >
-            get_polyhedron_facet_vertices(
+            get_tetrahedron_facet_vertices(
                 const std::array< index_t, 4 >& vertices ) const final;
 
-        std::vector< std::array< index_t, 2 > > get_polyhedron_edge_vertices(
+        std::vector< std::array< index_t, 2 > > get_tetrahedron_edge_vertices(
             const std::array< index_t, 4 >& vertices ) const final;
 
         void do_delete_polyhedra( const std::vector< bool >& to_delete ) final;
