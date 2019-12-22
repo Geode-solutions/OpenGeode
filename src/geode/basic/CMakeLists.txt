@@ -33,10 +33,10 @@ set(advanced_headers
 target_link_libraries(${target_name}
     PUBLIC
         absl::flat_hash_map
+        ghcFilesystem::ghc_filesystem
         Bitsery::bitsery
     PRIVATE
         spdlog::spdlog_header_only
-        ghcFilesystem::ghc_filesystem
         MINIZIP::minizip
 )
 if(WIN32)
