@@ -46,13 +46,13 @@ namespace geode
             friend class bitsery::Access;
             FacetStorage()
                 : counter_(
-                    facet_attribute_manager_
-                        .template find_or_create_attribute< VariableAttribute,
-                            index_t >( "counter", 1 ) ),
+                      facet_attribute_manager_
+                          .template find_or_create_attribute< VariableAttribute,
+                              index_t >( "counter", 1 ) ),
                   vertices_(
                       facet_attribute_manager_
                           .template find_or_create_attribute< VariableAttribute,
-                              VertexContainer >( "facet_vertices" ) )
+                              VertexContainer >( attribute_name() ) )
             {
             }
 
@@ -157,6 +157,20 @@ namespace geode
             const VertexContainer& get_facet_vertices( index_t facet_id ) const
             {
                 return vertices_->value( facet_id );
+            }
+
+        protected:
+            static std::string attribute_name()
+            {
+                return "facet_vertices";
+            }
+
+            void update_attribute()
+            {
+                vertices_ =
+                    facet_attribute_manager_.template find_or_create_attribute<
+                        VariableAttribute, VertexContainer >(
+                        attribute_name() );
             }
 
         private:

@@ -94,7 +94,7 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -167,10 +167,10 @@ namespace geode
     public:
         explicit Impl( PolyhedralSolid& solid )
             : polyhedron_around_vertex_(
-                solid.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolyhedronVertex >(
-                        "polyhedron_around_vertex", PolyhedronVertex{} ) )
+                  solid.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolyhedronVertex >(
+                          "polyhedron_around_vertex", PolyhedronVertex{} ) )
         {
         }
 
@@ -298,6 +298,34 @@ namespace geode
         }
 
     private:
+        void convert_attribute_to_abseil()
+        {
+            const auto attribute_name = Facets::attribute_name();
+            auto old_vertices =
+                facet_attribute_manager()
+                    .template find_or_create_attribute< VariableAttribute,
+                        std::vector< index_t > >( attribute_name );
+            facet_attribute_manager().delete_attribute( attribute_name );
+            auto new_vertices =
+                facet_attribute_manager()
+                    .template find_or_create_attribute< VariableAttribute,
+                        absl::InlinedVector< index_t, 3 > >( attribute_name );
+
+            for( const auto f :
+                Range{ facet_attribute_manager().nb_elements() } )
+            {
+                const auto& old_values = old_vertices->value( f );
+                new_vertices->modify_value( f,
+                    [&old_values]( absl::InlinedVector< index_t, 3 >& value ) {
+                        for( const auto& old_value : old_values )
+                        {
+                            value.push_back( old_value );
+                        }
+                    } );
+            }
+            Facets::update_attribute();
+        }
+
         void initialize_edges_from_facets()
         {
             for( const auto f :
@@ -327,7 +355,8 @@ namespace geode
                     { []( Archive& archive, Impl& impl ) {
                          archive.ext( impl,
                              bitsery::ext::BaseClass< detail::FacetStorage<
-                                 absl::InlinedVector< index_t, 3 > > >{} );
+                                 absl::InlinedVector< index_t,
+                                     3 > > >{} ); // should be std::vector
                          archive.object( impl.polyhedron_attribute_manager_ );
                          archive.ext( impl.polyhedron_around_vertex_,
                              bitsery::ext::StdSmartPtr{} );
@@ -335,11 +364,35 @@ namespace geode
                         []( Archive& archive, Impl& impl ) {
                             archive.ext( impl,
                                 bitsery::ext::BaseClass< detail::FacetStorage<
+                                    absl::InlinedVector< index_t,
+                                        3 > > >{} ); // should be std::vector
+                            archive.object(
+                                impl.polyhedron_attribute_manager_ );
+                            archive.ext( impl.polyhedron_around_vertex_,
+                                bitsery::ext::StdSmartPtr{} );
+                            archive.ext( impl,
+                                bitsery::ext::BaseClass< detail::FacetStorage<
+                                    std::array< index_t, 2 > > >{} );
+                        },
+                        []( Archive& archive, Impl& impl ) {
+                            archive.ext( impl,
+                                bitsery::ext::BaseClass< detail::FacetStorage<
+                                    absl::InlinedVector< index_t, 3 > > >{} );
+                            archive.object(
+                                impl.polyhedron_attribute_manager_ );
+                            archive.ext( impl.polyhedron_around_vertex_,
+                                bitsery::ext::StdSmartPtr{} );
+                            archive.ext( impl,
+                                bitsery::ext::BaseClass< detail::FacetStorage<
                                     std::array< index_t, 2 > > >{} );
                         } },
                     { []( Impl& impl ) {
-                        impl.initialize_edges_from_facets();
-                    } } } );
+                         impl.convert_attribute_to_abseil();
+                         impl.initialize_edges_from_facets();
+                     },
+                        []( Impl& impl ) {
+                            impl.convert_attribute_to_abseil();
+                        } } } );
         }
 
     private:
