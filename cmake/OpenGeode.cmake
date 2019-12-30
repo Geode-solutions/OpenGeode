@@ -35,7 +35,7 @@ find_package(nanoflann REQUIRED CONFIG NO_DEFAULT_PATH PATHS ${NANOFLANN_INSTALL
 find_package(spdlog REQUIRED CONFIG NO_DEFAULT_PATH PATHS ${SPDLOG_INSTALL_PREFIX})
 find_package(Threads REQUIRED)
 
-copy_windows_binaries(absl)
+copy_windows_binaries(absl::base)
 copy_windows_binaries(Async++)
 
 # Install OpenGeode third-parties
