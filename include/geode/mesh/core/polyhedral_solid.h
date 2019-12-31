@@ -141,6 +141,8 @@ namespace geode
         index_t vertex_id{ NO_ID };
     };
 
+    using PolyhedronFacetVertices = typename absl::InlinedVector< index_t, 4 >;
+
     /*!
      * This class represents a 3D Solid made up with polyhedra and provides mesh
      * functionnalities.
@@ -220,8 +222,7 @@ namespace geode
          * Return the indices of facet vertices.
          * @param[in] edge_id Index of an edge.
          */
-        const absl::InlinedVector< index_t, 4 >& facet_vertices(
-            index_t facet_id ) const;
+        const PolyhedronFacetVertices& facet_vertices( index_t facet_id ) const;
 
         /*!
          * Return the indices of edge vertices.
@@ -234,7 +235,7 @@ namespace geode
          * @param[in] vertices Ordered vertex indices
          */
         index_t facet_from_vertices(
-            const absl::InlinedVector< index_t, 4 >& vertices ) const;
+            const PolyhedronFacetVertices& vertices ) const;
 
         /*!
          * Get the index of edge corresponding to given vertices
@@ -357,8 +358,7 @@ namespace geode
     protected:
         PolyhedralSolid();
 
-        index_t find_or_create_facet(
-            absl::InlinedVector< index_t, 4 > facet_vertices );
+        index_t find_or_create_facet( PolyhedronFacetVertices facet_vertices );
 
         index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices );
 
@@ -380,8 +380,7 @@ namespace geode
 
         void update_edge_vertices( const std::vector< index_t >& old2new );
 
-        void update_facet_vertex(
-            absl::InlinedVector< index_t, 4 > facet_vertices,
+        void update_facet_vertex( PolyhedronFacetVertices facet_vertices,
             index_t facet_vertex_id,
             index_t new_vertex_id );
 
@@ -389,7 +388,7 @@ namespace geode
             index_t edge_vertex_id,
             index_t new_vertex_id );
 
-        void remove_facet( absl::InlinedVector< index_t, 4 > facet_vertices );
+        void remove_facet( PolyhedronFacetVertices facet_vertices );
 
         void remove_edge( std::array< index_t, 2 > edge_vertices );
 
