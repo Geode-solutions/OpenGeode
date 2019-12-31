@@ -225,7 +225,7 @@ namespace geode
                  polyhedron_vertex.polyhedron_id ) } )
         {
             const PolyhedronFacet id{ polyhedron_vertex.polyhedron_id, f };
-            absl::InlinedVector< index_t, 4 > facet_vertices(
+            PolyhedronFacetVertices facet_vertices(
                 polyhedral_solid_.nb_polyhedron_facet_vertices( id ) );
             for( const auto v :
                 Range{ polyhedral_solid_.nb_polyhedron_facet_vertices( id ) } )
@@ -361,13 +361,13 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< absl::InlinedVector< index_t, 4 > >
+    std::vector< PolyhedronFacetVertices >
         PolyhedralSolidBuilder< dimension >::get_polyhedron_facet_vertices(
             const std::vector< index_t >& vertices,
             const std::vector< std::vector< index_t > >& facets ) const
     {
-        std::vector< absl::InlinedVector< index_t, 4 > >
-            polyhedron_facet_vertices( facets.size() );
+        std::vector< PolyhedronFacetVertices > polyhedron_facet_vertices(
+            facets.size() );
         for( const auto f : Range{ facets.size() } )
         {
             polyhedron_facet_vertices[f].resize( facets[f].size() );
@@ -415,7 +415,7 @@ namespace geode
 
     template < index_t dimension >
     index_t PolyhedralSolidBuilder< dimension >::find_or_create_facet(
-        absl::InlinedVector< index_t, 4 > facet_vertices )
+        PolyhedronFacetVertices facet_vertices )
     {
         return polyhedral_solid_.find_or_create_facet(
             std::move( facet_vertices ) );
@@ -609,7 +609,7 @@ namespace geode
                     Range{ polyhedral_solid_.nb_polyhedron_facets( p ) } )
                 {
                     const PolyhedronFacet id{ p, f };
-                    absl::InlinedVector< index_t, 4 > facet_vertices(
+                    PolyhedronFacetVertices facet_vertices(
                         polyhedral_solid_.nb_polyhedron_facet_vertices( id ) );
                     for( const auto v :
                         Range{ polyhedral_solid_.nb_polyhedron_facet_vertices(
@@ -699,7 +699,7 @@ namespace geode
 
     template < index_t dimension >
     void PolyhedralSolidBuilder< dimension >::update_facet_vertex(
-        absl::InlinedVector< index_t, 4 > facet_vertices,
+        PolyhedronFacetVertices facet_vertices,
         index_t facet_vertex_id,
         index_t new_vertex_id )
     {
