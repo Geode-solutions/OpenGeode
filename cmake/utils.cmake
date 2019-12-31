@@ -98,64 +98,67 @@ if(DOXYGEN_FOUND AND EXISTS ${PROJECT_SOURCE_DIR}/cmake/Doxyfile.in)
         VERBATIM )
 endif()
 
-function(add_geode_library folder_path)
-    get_filename_component(target_name ${folder_path} NAME)
-    set(lib_source_dir ${PROJECT_SOURCE_DIR}/src/${folder_path})
-    set(lib_include_dir ${PROJECT_SOURCE_DIR}/include/${folder_path})
-    add_library(${target_name} SHARED "${lib_source_dir}/common.cpp")
-    add_library(${PROJECT_NAME}::${target_name} ALIAS ${target_name})
-    if(WIN32)
-        add_dependencies(windows_post_compilation ${target_name})
-    endif()
-    include(${lib_source_dir}/CMakeLists.txt)
-    set(all_sources
-        "${sources}"
-        "${public_headers}"
-        "${advanced_headers}"
+function(add_geode_library)
+    cmake_parse_arguments(GEODE_LIB
+        ""
+        "NAME;FOLDER"
+        "PUBLIC_HEADERS;ADVANCED_HEADERS;SOURCES;PUBLIC_DEPENDENCIES;PRIVATE_DEPENDENCIES"
+        ${ARGN}
     )
-    target_sources(${target_name} PRIVATE "${all_sources}")
+    add_library(${GEODE_LIB_NAME} SHARED  
+        "${GEODE_LIB_SOURCES}"
+        "${GEODE_LIB_PUBLIC_HEADERS}"
+        "${GEODE_LIB_ADVANCED_HEADERS}"
+    )
+    add_library(${PROJECT_NAME}::${GEODE_LIB_NAME} ALIAS ${GEODE_LIB_NAME})
+    if(WIN32)
+        add_dependencies(windows_post_compilation ${GEODE_LIB_NAME})
+    endif()
     string(TOLOWER ${PROJECT_NAME} project-name)
     string(REGEX REPLACE "-" "_" project_name ${project-name})
-    set_target_properties(${target_name}
+    set_target_properties(${GEODE_LIB_NAME}
         PROPERTIES
-            OUTPUT_NAME ${PROJECT_NAME}_${target_name}
-            DEFINE_SYMBOL ${project_name}_${target_name}_EXPORTS
+            OUTPUT_NAME ${PROJECT_NAME}_${GEODE_LIB_NAME}
+            DEFINE_SYMBOL ${project_name}_${GEODE_LIB_NAME}_EXPORTS
             CMAKE_CXX_VISIBILITY_PRESET hidden
             CMAKE_VISIBILITY_INLINES_HIDDEN ON
             FOLDER "Libraries"
     )
-    # TODO: Use TREE keyword when we change to cmake 3.8
-    source_group("Public Header Files" FILES ${public_headers})
-    source_group("Advanced Header Files" FILES ${advanced_headers})
-    source_group("Source Files" FILES ${sources})
-    target_include_directories(${target_name}
+    source_group("Public Header Files" FILES "${GEODE_LIB_PUBLIC_HEADERS}")
+    source_group("Advanced Header Files" FILES "${GEODE_LIB_ADVANCED_HEADERS}")
+    source_group("Source Files" FILES "${GEODE_LIB_SOURCES}")
+    target_include_directories(${GEODE_LIB_NAME}
         PUBLIC
             $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
             $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
             $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
     )
-    export(TARGETS ${target_name}
+    target_link_libraries(${GEODE_LIB_NAME}
+        PUBLIC ${GEODE_LIB_PUBLIC_DEPENDENCIES}
+        PRIVATE ${GEODE_LIB_PRIVATE_DEPENDENCIES}
+    )
+    export(TARGETS ${GEODE_LIB_NAME}
         NAMESPACE ${PROJECT_NAME}::
-        FILE ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}_${target_name}_target.cmake
+        FILE ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}_${GEODE_LIB_NAME}_target.cmake
     )
-    generate_export_header(${target_name}
-        EXPORT_MACRO_NAME ${project_name}_${target_name}_api
-        EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/${folder_path}/${project_name}_${target_name}_export.h
+    generate_export_header(${GEODE_LIB_NAME}
+        EXPORT_MACRO_NAME ${project_name}_${GEODE_LIB_NAME}_api
+        EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/${GEODE_LIB_FOLDER}/${project_name}_${GEODE_LIB_NAME}_export.h
     )
-    install(FILES ${PROJECT_BINARY_DIR}/${folder_path}/${project_name}_${target_name}_export.h
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${folder_path}
+    install(FILES ${PROJECT_BINARY_DIR}/${GEODE_LIB_FOLDER}/${project_name}_${GEODE_LIB_NAME}_export.h
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${GEODE_LIB_FOLDER}
     )
     install(DIRECTORY ${lib_include_dir}/
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${folder_path}
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${GEODE_LIB_FOLDER}
     )
-    install(TARGETS ${target_name}
-        EXPORT ${target_name}
+    install(TARGETS ${GEODE_LIB_NAME}
+        EXPORT ${GEODE_LIB_NAME}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     )
-    install(EXPORT ${target_name}
-        FILE ${PROJECT_NAME}_${target_name}_target.cmake
+    install(EXPORT ${GEODE_LIB_NAME}
+        FILE ${PROJECT_NAME}_${GEODE_LIB_NAME}_target.cmake
         NAMESPACE ${PROJECT_NAME}::
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
     )
