@@ -26,7 +26,6 @@
 #include <absl/container/inlined_vector.h>
 
 #include <geode/basic/bitsery_archive.h>
-#include <geode/basic/logger.h>
 
 #include <geode/mesh/common.h>
 

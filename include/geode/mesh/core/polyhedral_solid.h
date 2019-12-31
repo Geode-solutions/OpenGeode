@@ -220,7 +220,7 @@ namespace geode
          * Return the indices of facet vertices.
          * @param[in] edge_id Index of an edge.
          */
-        const absl::InlinedVector< index_t, 3 >& facet_vertices(
+        const absl::InlinedVector< index_t, 4 >& facet_vertices(
             index_t facet_id ) const;
 
         /*!
@@ -234,7 +234,7 @@ namespace geode
          * @param[in] vertices Ordered vertex indices
          */
         index_t facet_from_vertices(
-            const absl::InlinedVector< index_t, 3 >& vertices ) const;
+            const absl::InlinedVector< index_t, 4 >& vertices ) const;
 
         /*!
          * Get the index of edge corresponding to given vertices
@@ -358,7 +358,7 @@ namespace geode
         PolyhedralSolid();
 
         index_t find_or_create_facet(
-            absl::InlinedVector< index_t, 3 > facet_vertices );
+            absl::InlinedVector< index_t, 4 > facet_vertices );
 
         index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices );
 
@@ -381,7 +381,7 @@ namespace geode
         void update_edge_vertices( const std::vector< index_t >& old2new );
 
         void update_facet_vertex(
-            absl::InlinedVector< index_t, 3 > facet_vertices,
+            absl::InlinedVector< index_t, 4 > facet_vertices,
             index_t facet_vertex_id,
             index_t new_vertex_id );
 
@@ -389,7 +389,7 @@ namespace geode
             index_t edge_vertex_id,
             index_t new_vertex_id );
 
-        void remove_facet( absl::InlinedVector< index_t, 3 > facet_vertices );
+        void remove_facet( absl::InlinedVector< index_t, 4 > facet_vertices );
 
         void remove_edge( std::array< index_t, 2 > edge_vertices );
 

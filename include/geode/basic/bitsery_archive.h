@@ -140,7 +140,7 @@ namespace geode
         index_t version_{ FIRST_VERSION };
         std::vector< std::function< void( Archive &, T & ) > > serializers_;
         std::vector< std::function< void( T & ) > > initializers_;
-    }; // namespace geode
+    };
 } // namespace geode
 
 namespace bitsery
