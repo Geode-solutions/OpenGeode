@@ -81,7 +81,7 @@ namespace geode
         {
             this->find_or_create_edge( edge_vertices );
         }
-    } // namespace geode
+    }
 
     template < index_t dimension >
     void OpenGeodeTetrahedralSolidBuilder< dimension >::do_create_tetrahedron(
@@ -91,7 +91,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< absl::InlinedVector< index_t, 3 > >
+    std::vector< absl::InlinedVector< index_t, 4 > >
         OpenGeodeTetrahedralSolidBuilder< dimension >::
             get_tetrahedron_facet_vertices(
                 const std::array< index_t, 4 >& vertices ) const

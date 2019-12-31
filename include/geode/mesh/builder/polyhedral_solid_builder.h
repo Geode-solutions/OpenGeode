@@ -161,7 +161,7 @@ namespace geode
         }
 
         index_t find_or_create_facet(
-            absl::InlinedVector< index_t, 3 > facet_vertices );
+            absl::InlinedVector< index_t, 4 > facet_vertices );
 
         index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices );
 
@@ -215,7 +215,7 @@ namespace geode
         void delete_facets( const std::vector< bool >& to_delete );
 
         void update_facet_vertex(
-            absl::InlinedVector< index_t, 3 > facet_vertices,
+            absl::InlinedVector< index_t, 4 > facet_vertices,
             index_t facet_vertex_id,
             index_t new_vertex_id );
 
@@ -223,7 +223,7 @@ namespace geode
 
         void update_edge_vertices( const std::vector< index_t >& old2new );
 
-        virtual std::vector< absl::InlinedVector< index_t, 3 > >
+        virtual std::vector< absl::InlinedVector< index_t, 4 > >
             get_polyhedron_facet_vertices(
                 const std::vector< index_t >& vertices,
                 const std::vector< std::vector< index_t > >& facets ) const;

@@ -128,7 +128,7 @@ namespace geode
 namespace std
 {
     using VectorVertexCycle =
-        geode::detail::VertexCycle< absl::InlinedVector< geode::index_t, 3 > >;
+        geode::detail::VertexCycle< absl::InlinedVector< geode::index_t, 4 > >;
     template <>
     struct hash< VectorVertexCycle >
     {

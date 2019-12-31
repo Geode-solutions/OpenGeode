@@ -79,7 +79,7 @@ namespace geode
         void do_create_tetrahedron(
             const std::array< index_t, 4 >& vertices ) final;
 
-        std::vector< absl::InlinedVector< index_t, 3 > >
+        std::vector< absl::InlinedVector< index_t, 4 > >
             get_tetrahedron_facet_vertices(
                 const std::array< index_t, 4 >& vertices ) const final;
 
