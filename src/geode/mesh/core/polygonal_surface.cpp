@@ -118,10 +118,10 @@ namespace geode
     public:
         explicit Impl( PolygonalSurfaceBase& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) )
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
@@ -588,7 +588,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::tuple< bool, PolygonEdge >
+    absl::optional< PolygonEdge >
         PolygonalSurfaceBase< dimension >::polygon_edge_from_vertices(
             index_t from_vertex_id, index_t to_vertex_id ) const
     {
@@ -597,10 +597,10 @@ namespace geode
             const auto next_vertex = next_polygon_vertex( polygon_vertex );
             if( this->polygon_vertex( next_vertex ) == to_vertex_id )
             {
-                return std::make_tuple( true, std::move( polygon_vertex ) );
+                return polygon_vertex;
             }
         }
-        return std::make_tuple( false, PolygonEdge{} );
+        return {};
     }
     template < index_t dimension >
     index_t PolygonalSurfaceBase< dimension >::edge_from_vertices(
