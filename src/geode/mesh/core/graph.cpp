@@ -43,14 +43,13 @@ namespace geode
     public:
         explicit Impl( Graph& graph )
             : edges_around_vertex_(
-                  graph.vertex_attribute_manager()
-                      .template find_or_create_attribute< VariableAttribute,
-                          std::vector< EdgeVertex > >(
-                          "edges_around_vertex", [] {
-                              std::vector< EdgeVertex > edges;
-                              edges.reserve( 2 );
-                              return edges;
-                          }() ) )
+                graph.vertex_attribute_manager()
+                    .template find_or_create_attribute< VariableAttribute,
+                        std::vector< EdgeVertex > >( "edges_around_vertex", [] {
+                        std::vector< EdgeVertex > edges;
+                        edges.reserve( 2 );
+                        return edges;
+                    }() ) )
         {
         }
 
