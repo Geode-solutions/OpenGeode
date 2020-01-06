@@ -18,41 +18,37 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-set(folder "geode/basic")
-set(lib_source_dir ${PROJECT_SOURCE_DIR}/src/${folder})
-set(lib_include_dir ${PROJECT_SOURCE_DIR}/include/${folder})
-
 add_geode_library(
     NAME basic
-    FOLDER "${folder}"
+    FOLDER "geode/basic"
     SOURCES
-        "${lib_source_dir}/assert.cpp"
-        "${lib_source_dir}/attribute_manager.cpp"
-        "${lib_source_dir}/bitsery_archive.cpp"
-        "${lib_source_dir}/common.cpp"
-        "${lib_source_dir}/logger.cpp"
-        "${lib_source_dir}/singleton.cpp"
-        "${lib_source_dir}/uuid.cpp"
-        "${lib_source_dir}/zip_file.cpp"
+        "assert.cpp"
+        "attribute_manager.cpp"
+        "bitsery_archive.cpp"
+        "common.cpp"
+        "logger.cpp"
+        "singleton.cpp"
+        "uuid.cpp"
+        "zip_file.cpp"
     PUBLIC_HEADERS
-        "${lib_include_dir}/algorithm.h"
-        "${lib_include_dir}/assert.h"
-        "${lib_include_dir}/attribute_manager.h"
-        "${lib_include_dir}/attribute.h"
-        "${lib_include_dir}/bitsery_archive.h"
-        "${lib_include_dir}/common.h"
-        "${lib_include_dir}/factory.h"
-        "${lib_include_dir}/logger.h"
-        "${lib_include_dir}/named_type.h"
-        "${lib_include_dir}/pimpl.h"
-        "${lib_include_dir}/pimpl_impl.h"
-        "${lib_include_dir}/range.h"
-        "${lib_include_dir}/singleton.h"
-        "${lib_include_dir}/types.h"
-        "${lib_include_dir}/uuid.h"
-        "${lib_include_dir}/zip_file.h"
+        "algorithm.h"
+        "assert.h"
+        "attribute_manager.h"
+        "attribute.h"
+        "bitsery_archive.h"
+        "common.h"
+        "factory.h"
+        "logger.h"
+        "named_type.h"
+        "pimpl.h"
+        "pimpl_impl.h"
+        "range.h"
+        "singleton.h"
+        "types.h"
+        "uuid.h"
+        "zip_file.h"
     ADVANCED_HEADERS
-        "${lib_include_dir}/detail/mapping_after_deletion.h"
+        "detail/mapping_after_deletion.h"
     PUBLIC_DEPENDENCIES
         Bitsery::bitsery
     PRIVATE_DEPENDENCIES

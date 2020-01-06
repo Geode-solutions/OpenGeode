@@ -18,25 +18,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-set(folder "geode/geometry")
-set(lib_source_dir ${PROJECT_SOURCE_DIR}/src/${folder})
-set(lib_include_dir ${PROJECT_SOURCE_DIR}/include/${folder})
-
 add_geode_library(
     NAME geometry
-    FOLDER "${folder}"
+    FOLDER "geode/geometry"
     SOURCES
-        "${lib_source_dir}/bitsery_archive.cpp"
-        "${lib_source_dir}/bounding_box.cpp"
-        "${lib_source_dir}/common.cpp"
-        "${lib_source_dir}/nn_search.cpp"
+        "bitsery_archive.cpp"
+        "bounding_box.cpp"
+        "common.cpp"
+        "nn_search.cpp"
     PUBLIC_HEADERS
-        "${lib_include_dir}/bitsery_archive.h"
-        "${lib_include_dir}/bounding_box.h"
-        "${lib_include_dir}/common.h"
-        "${lib_include_dir}/nn_search.h"
-        "${lib_include_dir}/point.h"
-        "${lib_include_dir}/vector.h"
+        "bitsery_archive.h"
+        "bounding_box.h"
+        "common.h"
+        "nn_search.h"
+        "point.h"
+        "vector.h"
     PUBLIC_DEPENDENCIES
         Bitsery::bitsery
         Threads::Threads

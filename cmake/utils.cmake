@@ -105,10 +105,25 @@ function(add_geode_library)
         "PUBLIC_HEADERS;ADVANCED_HEADERS;SOURCES;PUBLIC_DEPENDENCIES;PRIVATE_DEPENDENCIES"
         ${ARGN}
     )
+    foreach(file ${GEODE_LIB_SOURCES})
+        list(APPEND ABSOLUTE_GEODE_LIB_SOURCES 
+            "${PROJECT_SOURCE_DIR}/src/${GEODE_LIB_FOLDER}/${file}"
+        )
+    endforeach()
+    foreach(file ${GEODE_LIB_PUBLIC_HEADERS})
+        list(APPEND ABSOLUTE_GEODE_LIB_PUBLIC_HEADERS
+            "${PROJECT_SOURCE_DIR}/include/${GEODE_LIB_FOLDER}/${file}"
+        )
+    endforeach()
+    foreach(file ${GEODE_LIB_ADVANCED_HEADERS})
+        list(APPEND ABSOLUTE_GEODE_LIB_ADVANCED_HEADERS
+            "${PROJECT_SOURCE_DIR}/include/${GEODE_LIB_FOLDER}/${file}"
+        )
+    endforeach()
     add_library(${GEODE_LIB_NAME} SHARED  
-        "${GEODE_LIB_SOURCES}"
-        "${GEODE_LIB_PUBLIC_HEADERS}"
-        "${GEODE_LIB_ADVANCED_HEADERS}"
+        "${ABSOLUTE_GEODE_LIB_SOURCES}"
+        "${ABSOLUTE_GEODE_LIB_PUBLIC_HEADERS}"
+        "${ABSOLUTE_GEODE_LIB_ADVANCED_HEADERS}"
     )
     add_library(${PROJECT_NAME}::${GEODE_LIB_NAME} ALIAS ${GEODE_LIB_NAME})
     if(WIN32)
@@ -124,9 +139,9 @@ function(add_geode_library)
             CMAKE_VISIBILITY_INLINES_HIDDEN ON
             FOLDER "Libraries"
     )
-    source_group("Public Header Files" FILES "${GEODE_LIB_PUBLIC_HEADERS}")
-    source_group("Advanced Header Files" FILES "${GEODE_LIB_ADVANCED_HEADERS}")
-    source_group("Source Files" FILES "${GEODE_LIB_SOURCES}")
+    source_group("Public Header Files" FILES "${ABSOLUTE_GEODE_LIB_PUBLIC_HEADERS}")
+    source_group("Advanced Header Files" FILES "${ABSOLUTE_GEODE_LIB_ADVANCED_HEADERS}")
+    source_group("Source Files" FILES "${ABSOLUTE_GEODE_LIB_SOURCES}")
     target_include_directories(${GEODE_LIB_NAME}
         PUBLIC
             $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
@@ -148,7 +163,7 @@ function(add_geode_library)
     install(FILES ${PROJECT_BINARY_DIR}/${GEODE_LIB_FOLDER}/${project_name}_${GEODE_LIB_NAME}_export.h
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${GEODE_LIB_FOLDER}
     )
-    install(DIRECTORY ${lib_include_dir}/
+    install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/${GEODE_LIB_FOLDER}/
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${GEODE_LIB_FOLDER}
     )
     install(TARGETS ${GEODE_LIB_NAME}
