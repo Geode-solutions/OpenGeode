@@ -126,7 +126,7 @@ namespace geode
             {
                 it.second->delete_elements( to_delete );
             }
-            nb_elements_ -= static_cast< index_t >(
+            nb_elements_ -= absl::implicit_cast< index_t >(
                 std::count( to_delete.begin(), to_delete.end(), true ) );
         }
 
