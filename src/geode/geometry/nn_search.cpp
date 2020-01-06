@@ -25,7 +25,10 @@
 
 #include <numeric>
 
+#include <absl/algorithm/container.h>
+
 #include <async++.h>
+
 #include <nanoflann.hpp>
 
 #include <geode/basic/pimpl_impl.h>
@@ -177,15 +180,14 @@ namespace geode
         NNSearch< dimension >::colocated_index_mapping( double epsilon ) const
     {
         std::vector< index_t > mapping( nb_points() );
-        std::iota( mapping.begin(), mapping.end(), 0 );
+        absl::c_iota( mapping, 0 );
         async::parallel_for( async::irange( index_t{ 0 }, nb_points() ),
             [&epsilon, &mapping, this]( index_t p ) {
                 if( mapping[p] == p )
                 {
                     const auto vertices =
                         radius_neighbors( point( p ), epsilon );
-                    const auto min_index =
-                        *std::min_element( vertices.begin(), vertices.end() );
+                    const auto min_index = *absl::c_min_element( vertices );
                     for( const auto id : vertices )
                     {
                         mapping[id] = min_index;

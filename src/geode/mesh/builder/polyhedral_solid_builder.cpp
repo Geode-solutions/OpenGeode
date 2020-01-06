@@ -86,7 +86,7 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -233,8 +233,8 @@ namespace geode
                 facet_vertices[v] =
                     polyhedral_solid_.polyhedron_facet_vertex( { id, v } );
             }
-            const auto position_it = std::find( facet_vertices.begin(),
-                facet_vertices.end(), polyhedron_vertex_id );
+            const auto position_it =
+                absl::c_find( facet_vertices, polyhedron_vertex_id );
             if( position_it != facet_vertices.end() )
             {
                 const auto it =
@@ -259,8 +259,8 @@ namespace geode
                 };
                 if( edge_vertices[0] < edge_vertices[1] )
                 {
-                    const auto position_it = std::find( edge_vertices.begin(),
-                        edge_vertices.end(), polyhedron_vertex_id );
+                    const auto position_it =
+                        absl::c_find( edge_vertices, polyhedron_vertex_id );
                     if( position_it != edge_vertices.end() )
                     {
                         const auto it =
@@ -468,8 +468,7 @@ namespace geode
     {
         std::vector< index_t > polyhedra_to_connect(
             polyhedral_solid_.nb_polyhedra() );
-        std::iota(
-            polyhedra_to_connect.begin(), polyhedra_to_connect.end(), 0 );
+        absl::c_iota( polyhedra_to_connect, 0 );
         compute_polyhedron_adjacencies( polyhedra_to_connect );
     }
 
@@ -773,9 +772,9 @@ namespace geode
                     Range{ polyhedral_solid.nb_polyhedron_facet_vertices(
                         { p, f } ) } )
                 {
-                    const auto it = std::find( vertices.begin(), vertices.end(),
-                        polyhedral_solid.polyhedron_facet_vertex(
-                            { { p, f }, v } ) );
+                    const auto it = absl::c_find(
+                        vertices, polyhedral_solid.polyhedron_facet_vertex(
+                                      { { p, f }, v } ) );
                     OPENGEODE_ASSERT( it != vertices.end(),
                         "[PolyhedralSolidBuilder::copy] Wrong indexing between "
                         "polyhedron_vertex and polyhedron_facet_vertex" );

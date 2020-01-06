@@ -61,7 +61,7 @@ namespace geode
                                                 "do_create_facets] Only "
                                                 "tetrahedra are handled" );
         std::array< index_t, 4 > tetra_vertices{};
-        std::copy_n( vertices.begin(), 4, tetra_vertices.begin() );
+        absl::c_copy_n( vertices, 4, tetra_vertices.begin() );
         do_create_facets( tetra_vertices );
     }
 
@@ -75,7 +75,7 @@ namespace geode
                                                 "do_create_edges] Only "
                                                 "tetrahedra are handled" );
         std::array< index_t, 4 > tetra_vertices{};
-        std::copy_n( vertices.begin(), 4, tetra_vertices.begin() );
+        absl::c_copy_n( vertices, 4, tetra_vertices.begin() );
         do_create_edges( tetra_vertices );
     }
 
@@ -89,7 +89,7 @@ namespace geode
                                                 "do_create_polyhedron] Only "
                                                 "tetrahedra are handled" );
         std::array< index_t, 4 > tetra_vertices{};
-        std::copy_n( vertices.begin(), 4, tetra_vertices.begin() );
+        absl::c_copy_n( vertices, 4, tetra_vertices.begin() );
         do_create_tetrahedron( tetra_vertices );
     }
 

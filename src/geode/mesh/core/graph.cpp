@@ -43,13 +43,14 @@ namespace geode
     public:
         explicit Impl( Graph& graph )
             : edges_around_vertex_(
-                graph.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        std::vector< EdgeVertex > >( "edges_around_vertex", [] {
-                        std::vector< EdgeVertex > edges;
-                        edges.reserve( 2 );
-                        return edges;
-                    }() ) )
+                  graph.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          std::vector< EdgeVertex > >(
+                          "edges_around_vertex", [] {
+                              std::vector< EdgeVertex > edges;
+                              edges.reserve( 2 );
+                              return edges;
+                          }() ) )
         {
         }
 
@@ -79,8 +80,7 @@ namespace geode
             {
                 const auto& edges =
                     edges_around_vertex_->value( previous_vertex );
-                const auto it =
-                    std::find( edges.begin(), edges.end(), edge_vertex );
+                const auto it = absl::c_find( edges, edge_vertex );
                 if( it != edges.end() )
                 {
                     edges_around_vertex_->modify_value( previous_vertex,
@@ -90,8 +90,7 @@ namespace geode
                 }
             }
             const auto& edges = edges_around_vertex_->value( vertex_id );
-            const auto it =
-                std::find( edges.begin(), edges.end(), edge_vertex );
+            const auto it = absl::c_find( edges, edge_vertex );
             if( it == edges.end() )
             {
                 edges_around_vertex_->modify_value( vertex_id,

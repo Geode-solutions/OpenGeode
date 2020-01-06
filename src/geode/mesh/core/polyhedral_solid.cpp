@@ -94,7 +94,7 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -115,8 +115,7 @@ namespace
             bool add{ true };
             for( const auto& polyhedron_around : polyhedra_around )
             {
-                if( std::find_if( polyhedron_around.begin(),
-                        polyhedron_around.end(),
+                if( absl::c_find_if( polyhedron_around,
                         [&polyhedron_vertex](
                             const geode::PolyhedronVertex& pv ) {
                             return pv.polyhedron_id
@@ -166,10 +165,10 @@ namespace geode
     public:
         explicit Impl( PolyhedralSolid& solid )
             : polyhedron_around_vertex_(
-                solid.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolyhedronVertex >(
-                        "polyhedron_around_vertex", PolyhedronVertex{} ) )
+                  solid.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolyhedronVertex >(
+                          "polyhedron_around_vertex", PolyhedronVertex{} ) )
         {
         }
 
@@ -565,8 +564,7 @@ namespace geode
             const auto polyhedron_vertex_id = S.top();
             S.pop();
             const auto p = polyhedron_vertex_id.polyhedron_id;
-            if( std::find(
-                    polyhedra_visited.begin(), polyhedra_visited.end(), p )
+            if( absl::c_find( polyhedra_visited, p )
                 != polyhedra_visited.end() )
             {
                 continue;
@@ -857,9 +855,9 @@ namespace geode
                     for( const auto v : Range{ nb_polyhedron_facet_vertices(
                              { polyhedron_adj, f } ) } )
                     {
-                        if( std::find( vertices.begin(), vertices.end(),
-                                polyhedron_facet_vertex(
-                                    { { polyhedron_adj, f }, v } ) )
+                        if( absl::c_find(
+                                vertices, polyhedron_facet_vertex(
+                                              { { polyhedron_adj, f }, v } ) )
                             == vertices.end() )
                         {
                             all_contained = false;

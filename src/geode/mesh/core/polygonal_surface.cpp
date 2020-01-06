@@ -118,10 +118,10 @@ namespace geode
     public:
         explicit Impl( PolygonalSurfaceBase& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) )
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
@@ -562,8 +562,7 @@ namespace geode
         {
             const auto polygon_vertex = S.top();
             S.pop();
-            if( std::find( polygons_visited.begin(), polygons_visited.end(),
-                    polygon_vertex.polygon_id )
+            if( absl::c_find( polygons_visited, polygon_vertex.polygon_id )
                 != polygons_visited.end() )
             {
                 continue;

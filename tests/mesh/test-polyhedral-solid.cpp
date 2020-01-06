@@ -144,11 +144,9 @@ void test_polyhedron_adjacencies(
     const auto& polyhedra = polyhedral_solid.polyhedra_from_facet( facet_id );
     OPENGEODE_EXCEPTION(
         polyhedra.size() == 2, "[Test] Wrong number of polyhedra from facet" );
-    OPENGEODE_EXCEPTION(
-        std::find( polyhedra.begin(), polyhedra.end(), 1 ) != polyhedra.end(),
+    OPENGEODE_EXCEPTION( absl::c_find( polyhedra, 1 ) != polyhedra.end(),
         "[Test] Polyhedra from facet should contain 1" );
-    OPENGEODE_EXCEPTION(
-        std::find( polyhedra.begin(), polyhedra.end(), 2 ) != polyhedra.end(),
+    OPENGEODE_EXCEPTION( absl::c_find( polyhedra, 2 ) != polyhedra.end(),
         "[Test] Polyhedra from facet should contain 2" );
 }
 

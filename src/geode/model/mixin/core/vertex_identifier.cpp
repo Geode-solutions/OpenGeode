@@ -32,11 +32,11 @@ namespace geode
     public:
         Impl()
             : component_vertices_(
-                unique_vertices_.vertex_attribute_manager()
-                    .find_or_create_attribute< VariableAttribute,
-                        std::vector< MeshComponentVertex > >(
-                        "component vertices",
-                        std::vector< MeshComponentVertex >{} ) )
+                  unique_vertices_.vertex_attribute_manager()
+                      .find_or_create_attribute< VariableAttribute,
+                          std::vector< MeshComponentVertex > >(
+                          "component vertices",
+                          std::vector< MeshComponentVertex >{} ) )
         {
         }
 
@@ -135,8 +135,8 @@ namespace geode
             {
                 const auto& old_vertices =
                     component_vertices_->value( old_unique_id );
-                const auto it = std::find( old_vertices.begin(),
-                    old_vertices.end(), component_vertex_id );
+                const auto it =
+                    absl::c_find( old_vertices, component_vertex_id );
                 if( it != old_vertices.end() )
                 {
                     component_vertices_->modify_value( old_unique_id,
@@ -149,8 +149,7 @@ namespace geode
                 ->set_value( component_vertex_id.vertex, unique_vertex_id );
             const auto& vertices =
                 component_vertices_->value( unique_vertex_id );
-            if( std::find(
-                    vertices.begin(), vertices.end(), component_vertex_id )
+            if( absl::c_find( vertices, component_vertex_id )
                 == vertices.end() )
             {
                 component_vertices_->modify_value( unique_vertex_id,
