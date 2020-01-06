@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <absl/types/optional.h>
+
 #include <geode/basic/attribute.h>
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/factory.h>
@@ -279,10 +281,9 @@ namespace geode
          * @param[in] from_vertex_id Index of the vertex from which starts the
          * edge
          * @param[in] to_vertex_id Index of the vertex to which ends the edge
-         * @return 1) true if such an edge exists, 2) Local index of the found
-         * edge.
+         * @return Local index if the edge is found.
          */
-        std::tuple< bool, PolygonEdge > polygon_edge_from_vertices(
+        absl::optional< PolygonEdge > polygon_edge_from_vertices(
             index_t from_vertex_id, index_t to_vertex_id ) const;
 
         /*!
