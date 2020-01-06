@@ -72,7 +72,7 @@ namespace geode
     public:
         struct ComponentMapping
         {
-            using Mapping = std::unordered_map< uuid, uuid >;
+            using Mapping = absl::flat_hash_map< uuid, uuid >;
             Mapping corners;
             Mapping lines;
             Mapping surfaces;

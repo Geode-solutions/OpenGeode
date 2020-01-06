@@ -99,6 +99,7 @@ add_geode_library(
         "representation/io/detail/geode_brep_output.h"
         "representation/io/detail/geode_section_output.h"
     PUBLIC_DEPENDENCIES
+        absl::flat_hash_map
         Bitsery::bitsery
         ghcFilesystem::ghc_filesystem
         ${PROJECT_NAME}::basic

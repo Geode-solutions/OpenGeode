@@ -42,6 +42,7 @@ project(SuperBuild NONE)
 # Additional cmake modules
 include(ExternalProject)
 
+include(${PROJECT_SOURCE_DIR}/cmake/ConfigureAbseil.cmake)
 include(${PROJECT_SOURCE_DIR}/cmake/ConfigureAsync++.cmake)
 include(${PROJECT_SOURCE_DIR}/cmake/ConfigureBitsery.cmake)
 include(${PROJECT_SOURCE_DIR}/cmake/ConfigureFilesystem.cmake)

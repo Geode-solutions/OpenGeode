@@ -25,7 +25,8 @@
 
 #include <fstream>
 #include <memory>
-#include <unordered_map>
+
+#include <absl/container/flat_hash_map.h>
 
 #include <bitsery/ext/std_map.h>
 
@@ -50,7 +51,7 @@ namespace geode
         {
         public:
             using ComponentPtr = std::unique_ptr< Component >;
-            using ComponentsStore = std::unordered_map< uuid, ComponentPtr >;
+            using ComponentsStore = absl::flat_hash_map< uuid, ComponentPtr >;
             using Iterator = typename ComponentsStore::const_iterator;
 
             virtual ~ComponentsStorage() = default;

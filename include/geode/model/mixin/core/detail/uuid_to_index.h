@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <unordered_map>
+#include <absl/container/flat_hash_map.h>
 
 #include <bitsery/ext/std_map.h>
 
@@ -86,7 +86,7 @@ namespace geode
             }
 
         private:
-            std::unordered_map< uuid, index_t > uuid2index_;
+            absl::flat_hash_map< uuid, index_t > uuid2index_;
         };
     } // namespace detail
 } // namespace geode

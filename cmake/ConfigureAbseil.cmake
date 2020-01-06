@@ -18,48 +18,20 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-add_geode_library(
-    NAME basic
-    FOLDER "geode/basic"
-    SOURCES
-        "assert.cpp"
-        "attribute_manager.cpp"
-        "bitsery_archive.cpp"
-        "common.cpp"
-        "logger.cpp"
-        "singleton.cpp"
-        "uuid.cpp"
-        "zip_file.cpp"
-    PUBLIC_HEADERS
-        "algorithm.h"
-        "assert.h"
-        "attribute_manager.h"
-        "attribute.h"
-        "bitsery_archive.h"
-        "common.h"
-        "factory.h"
-        "logger.h"
-        "named_type.h"
-        "pimpl.h"
-        "pimpl_impl.h"
-        "range.h"
-        "singleton.h"
-        "types.h"
-        "uuid.h"
-        "zip_file.h"
-    ADVANCED_HEADERS
-        "detail/mapping_after_deletion.h"
-    PUBLIC_DEPENDENCIES
-        absl::flat_hash_map
-        ghcFilesystem::ghc_filesystem
-        Bitsery::bitsery
-    PRIVATE_DEPENDENCIES
-        spdlog::spdlog_header_only
-        MINIZIP::minizip
+set(ABSEIL_PATH ${PROJECT_BINARY_DIR}/third_party/abseil)
+set(ABSEIL_INSTALL_PREFIX ${ABSEIL_PATH}/install)
+ExternalProject_Add(abseil
+    PREFIX ${ABSEIL_PATH}
+    GIT_REPOSITORY https://github.com/Geode-solutions/abseil-cpp
+    GIT_TAG 7c5ecb43402b919c6d7289902ae8072b0f7e28e1
+    CMAKE_GENERATOR ${CMAKE_GENERATOR}
+    CMAKE_GENERATOR_PLATFORM ${CMAKE_GENERATOR_PLATFORM}
+    CMAKE_ARGS
+        -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        -DCMAKE_INSTALL_MESSAGE=LAZY
+        -DBUILD_SHARED_LIBS=ON
+        -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON
+    CMAKE_CACHE_ARGS
+        -DCMAKE_INSTALL_PREFIX:PATH=${ABSEIL_INSTALL_PREFIX}
 )
-if(WIN32)
-    set_target_properties(basic
-        PROPERTIES
-            LINK_FLAGS_DEBUG "/NODEFAULTLIB:MSVCRTD"
-    )
-endif()

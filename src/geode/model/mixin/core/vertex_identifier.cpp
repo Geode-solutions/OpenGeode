@@ -1,7 +1,8 @@
 #include <geode/model/mixin/core/vertex_identifier.h>
 
 #include <fstream>
-#include <unordered_map>
+
+#include <absl/container/flat_hash_map.h>
 
 #include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>
@@ -255,7 +256,7 @@ namespace geode
         std::shared_ptr<
             VariableAttribute< std::vector< MeshComponentVertex > > >
             component_vertices_;
-        std::unordered_map< uuid,
+        absl::flat_hash_map< uuid,
             std::shared_ptr< VariableAttribute< index_t > > >
             vertex2unique_vertex_;
     };

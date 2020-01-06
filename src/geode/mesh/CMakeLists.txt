@@ -158,6 +158,7 @@ add_geode_library(
         "io/detail/register_input.h"
         "io/detail/register_output.h"
     PUBLIC_DEPENDENCIES
+        absl::flat_hash_map
         Bitsery::bitsery
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry

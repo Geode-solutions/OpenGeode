@@ -137,15 +137,14 @@ namespace geode
             polygon_around_vertex_->set_value( vertex_id, polygon_vertex );
         }
 
-        index_t find_edge( const std::array< index_t, 2 >& edge_vertices ) const
+        index_t find_edge( std::array< index_t, 2 > edge_vertices ) const
         {
-            return this->find_facet( edge_vertices );
+            return this->find_facet( std::move( edge_vertices ) );
         }
 
-        index_t find_or_create_edge(
-            const std::array< index_t, 2 >& edge_vertices )
+        index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices )
         {
-            return this->add_facet( edge_vertices );
+            return this->add_facet( std::move( edge_vertices ) );
         }
 
         const std::array< index_t, 2 >& get_edge_vertices(
@@ -154,14 +153,14 @@ namespace geode
             return this->get_facet_vertices( edge_id );
         }
 
-        void update_edge_vertex( const std::array< index_t, 2 >& edge_vertices,
+        void update_edge_vertex( std::array< index_t, 2 > edge_vertices,
             const index_t edge_vertex_id,
             const index_t new_vertex_id )
         {
             auto updated_edge_vertices = edge_vertices;
             updated_edge_vertices[edge_vertex_id] = new_vertex_id;
-            this->add_facet( updated_edge_vertices );
-            this->remove_facet( edge_vertices );
+            this->add_facet( std::move( updated_edge_vertices ) );
+            this->remove_facet( std::move( edge_vertices ) );
         }
 
         void update_edge_vertices( const std::vector< index_t >& old2new )
@@ -169,9 +168,9 @@ namespace geode
             this->update_facet_vertices( old2new );
         }
 
-        void remove_edge( const std::array< index_t, 2 >& edge_vertices )
+        void remove_edge( std::array< index_t, 2 > edge_vertices )
         {
-            this->remove_facet( edge_vertices );
+            this->remove_facet( std::move( edge_vertices ) );
         }
 
         void delete_edges( const std::vector< bool >& to_delete )
@@ -263,9 +262,9 @@ namespace geode
 
     template < index_t dimension >
     index_t PolygonalSurfaceBase< dimension >::find_or_create_edge(
-        const std::array< index_t, 2 >& edge_vertices )
+        std::array< index_t, 2 > edge_vertices )
     {
-        return impl_->find_or_create_edge( edge_vertices );
+        return impl_->find_or_create_edge( std::move( edge_vertices ) );
     }
 
     template < index_t dimension >
@@ -285,19 +284,19 @@ namespace geode
 
     template < index_t dimension >
     void PolygonalSurfaceBase< dimension >::update_edge_vertex(
-        const std::array< index_t, 2 >& edge_vertices,
+        std::array< index_t, 2 > edge_vertices,
         index_t edge_vertex_id,
         index_t new_vertex_id )
     {
         impl_->update_edge_vertex(
-            edge_vertices, edge_vertex_id, new_vertex_id );
+            std::move( edge_vertices ), edge_vertex_id, new_vertex_id );
     }
 
     template < index_t dimension >
     void PolygonalSurfaceBase< dimension >::remove_edge(
-        const std::array< index_t, 2 >& edge_vertices )
+        std::array< index_t, 2 > edge_vertices )
     {
-        impl_->remove_edge( edge_vertices );
+        impl_->remove_edge( std::move( edge_vertices ) );
     }
 
     template < index_t dimension >

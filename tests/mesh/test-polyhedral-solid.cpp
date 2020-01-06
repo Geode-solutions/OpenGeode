@@ -136,9 +136,9 @@ void test_polyhedron_adjacencies(
 
     auto edge_id = polyhedral_solid.edge_from_vertices( { 5, 4 } );
     OPENGEODE_EXCEPTION(
-        edge_id == 4, "[Test] Wrong edge index from vertices" );
+        edge_id == 8, "[Test] Wrong edge index from vertices" );
     OPENGEODE_EXCEPTION(
-        polyhedral_solid.polyhedra_around_vertex( edge_id ).size() == 3,
+        polyhedral_solid.polyhedra_around_edge( edge_id ).size() == 3,
         "[Test] PolyhedralSolid should have 3 polyhedra around this edge" );
     const auto facet_id = polyhedral_solid.polyhedron_facet( { 1, 0 } );
     const auto& polyhedra = polyhedral_solid.polyhedra_from_facet( facet_id );
@@ -175,7 +175,7 @@ void test_delete_vertex( const geode::PolyhedralSolid3D& polyhedral_solid,
                          .find_attribute< geode::index_t >( "test" );
     OPENGEODE_EXCEPTION( attribute->value( 0 ) == 8,
         "[Test] Wrong value for attribute on edge 0 after vertex deletion" );
-    OPENGEODE_EXCEPTION( attribute->value( 1 ) == 9,
+    OPENGEODE_EXCEPTION( attribute->value( 1 ) == 7,
         "[Test] Wrong value for attribute on edge 1 after vertex deletion" );
 }
 

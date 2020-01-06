@@ -65,9 +65,8 @@ namespace geode
     void OpenGeodeTetrahedralSolidBuilder< dimension >::do_create_facets(
         const std::array< index_t, 4 >& vertices )
     {
-        const auto polyhedron_facet_vertices =
-            get_polyhedron_facet_vertices( vertices );
-        for( const auto& facet_vertices : polyhedron_facet_vertices )
+        for( auto&& facet_vertices :
+            get_tetrahedron_facet_vertices( vertices ) )
         {
             this->find_or_create_facet( facet_vertices );
         }
@@ -77,9 +76,8 @@ namespace geode
     void OpenGeodeTetrahedralSolidBuilder< dimension >::do_create_edges(
         const std::array< index_t, 4 >& vertices )
     {
-        const auto polyhedron_edge_vertices =
-            get_polyhedron_edge_vertices( vertices );
-        for( const auto& edge_vertices : polyhedron_edge_vertices )
+        for( auto&& edge_vertices :
+            this->get_tetrahedron_edge_vertices( vertices ) )
         {
             this->find_or_create_edge( edge_vertices );
         }
@@ -93,9 +91,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< std::vector< index_t > >
+    std::array< PolyhedronFacetVertices, 4 >
         OpenGeodeTetrahedralSolidBuilder< dimension >::
-            get_polyhedron_facet_vertices(
+            get_tetrahedron_facet_vertices(
                 const std::array< index_t, 4 >& vertices ) const
     {
         return geode_tetrahedral_solid_.get_polyhedron_facet_vertices(
@@ -105,7 +103,7 @@ namespace geode
     template < index_t dimension >
     std::vector< std::array< index_t, 2 > >
         OpenGeodeTetrahedralSolidBuilder< dimension >::
-            get_polyhedron_edge_vertices(
+            get_tetrahedron_edge_vertices(
                 const std::array< index_t, 4 >& vertices ) const
     {
         return geode_tetrahedral_solid_.get_polyhedron_edge_vertices(
