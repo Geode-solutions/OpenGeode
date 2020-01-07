@@ -46,9 +46,9 @@ namespace geode
     public:
         explicit Impl( Graph& graph )
             : edges_around_vertex_(
-                  graph.vertex_attribute_manager()
-                      .template find_or_create_attribute< VariableAttribute,
-                          EdgesAround >( attribute_name, EdgesAround{} ) )
+                graph.vertex_attribute_manager()
+                    .template find_or_create_attribute< VariableAttribute,
+                        EdgesAround >( attribute_name, EdgesAround{} ) )
         {
         }
 
