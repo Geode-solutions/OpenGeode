@@ -145,7 +145,7 @@ namespace geode
         for( const auto v : Range{ graph_.nb_vertices() } )
         {
             const auto& edges = graph_.edges_around_vertex( v );
-            EdgesAround new_edges;
+            EdgesAroundVertex new_edges;
             new_edges.reserve( edges.size() );
             for( const auto& edge : edges )
             {
