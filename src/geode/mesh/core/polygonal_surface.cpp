@@ -562,8 +562,7 @@ namespace geode
         {
             const auto polygon_vertex = S.top();
             S.pop();
-            if( std::find( polygons_visited.begin(), polygons_visited.end(),
-                    polygon_vertex.polygon_id )
+            if( absl::c_find( polygons_visited, polygon_vertex.polygon_id )
                 != polygons_visited.end() )
             {
                 continue;

@@ -328,7 +328,7 @@ namespace geode
     {
         std::vector< index_t > polygons_to_connect(
             polygonal_surface_.nb_polygons() );
-        std::iota( polygons_to_connect.begin(), polygons_to_connect.end(), 0 );
+        absl::c_iota( polygons_to_connect, 0 );
         compute_polygon_adjacencies( polygons_to_connect );
     }
 

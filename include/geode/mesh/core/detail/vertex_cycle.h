@@ -29,6 +29,7 @@
 #include <utility>
 #include <vector>
 
+#include <absl/algorithm/container.h>
 #include <absl/container/inlined_vector.h>
 #include <absl/hash/hash.h>
 
@@ -45,9 +46,8 @@ namespace geode
         template < typename Container >
         inline void rotate( Container& vertices )
         {
-            const auto min_itr =
-                std::min_element( vertices.begin(), vertices.end() );
-            std::rotate( vertices.begin(), min_itr, vertices.end() );
+            const auto min_itr = absl::c_min_element( vertices );
+            absl::c_rotate( vertices, min_itr );
         }
 
         template <>

@@ -58,7 +58,7 @@ namespace geode
                                                 "::do_create_polygon] Only "
                                                 "triangles are handled" );
         std::array< index_t, 3 > triangle_vertices{};
-        std::copy_n( vertices.begin(), 3, triangle_vertices.begin() );
+        absl::c_copy_n( vertices, 3, triangle_vertices.begin() );
         do_create_triangle( triangle_vertices );
     }
 

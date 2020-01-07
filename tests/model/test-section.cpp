@@ -170,9 +170,8 @@ void add_corner_line_boundary_relation( const geode::Section& model,
         for( const auto& incidence :
             model.incidences( model.corner( corner_id ) ) )
         {
-            OPENGEODE_EXCEPTION( std::find( line_uuids.begin(),
-                                     line_uuids.end(), incidence.id() )
-                                     != line_uuids.end(),
+            OPENGEODE_EXCEPTION(
+                absl::c_find( line_uuids, incidence.id() ) != line_uuids.end(),
                 "[Test] All Corners incidences should be Lines" );
         }
     }
@@ -181,8 +180,7 @@ void add_corner_line_boundary_relation( const geode::Section& model,
     {
         for( const auto& boundary : model.boundaries( model.line( line_id ) ) )
         {
-            OPENGEODE_EXCEPTION( std::find( corner_uuids.begin(),
-                                     corner_uuids.end(), boundary.id() )
+            OPENGEODE_EXCEPTION( absl::c_find( corner_uuids, boundary.id() )
                                      != corner_uuids.end(),
                 "[Test] All Lines incidences should be Corners" );
         }

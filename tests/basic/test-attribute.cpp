@@ -170,8 +170,7 @@ bool managers_have_same_attributes( const geode::AttributeManager& manager,
     }
     for( const auto& att : attribute_names )
     {
-        if( std::find( reloaded_attribute_names.begin(),
-                reloaded_attribute_names.end(), att )
+        if( absl::c_find( reloaded_attribute_names, att )
             == reloaded_attribute_names.end() )
         {
             return false;
@@ -179,8 +178,7 @@ bool managers_have_same_attributes( const geode::AttributeManager& manager,
     }
     for( const auto& att : reloaded_attribute_names )
     {
-        if( std::find( attribute_names.begin(), attribute_names.end(), att )
-            == attribute_names.end() )
+        if( absl::c_find( attribute_names, att ) == attribute_names.end() )
         {
             return false;
         }

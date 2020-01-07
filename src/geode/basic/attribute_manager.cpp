@@ -127,7 +127,7 @@ namespace geode
                 it.second->delete_elements( to_delete );
             }
             nb_elements_ -= absl::implicit_cast< index_t >(
-                std::count( to_delete.begin(), to_delete.end(), true ) );
+                absl::c_count( to_delete, true ) );
         }
 
         index_t nb_elements() const
@@ -238,8 +238,7 @@ namespace geode
     void AttributeManager::delete_elements(
         const std::vector< bool > &to_delete )
     {
-        if( std::find( to_delete.begin(), to_delete.end(), true )
-            != to_delete.end() )
+        if( absl::c_find( to_delete, true ) != to_delete.end() )
         {
             OPENGEODE_ASSERT( to_delete.size() == nb_elements(),
                 "[AttributeManager::delete_elements] Vector to_delete should "

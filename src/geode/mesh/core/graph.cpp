@@ -79,8 +79,7 @@ namespace geode
             {
                 const auto& edges =
                     edges_around_vertex_->value( previous_vertex );
-                const auto it =
-                    std::find( edges.begin(), edges.end(), edge_vertex );
+                const auto it = absl::c_find( edges, edge_vertex );
                 if( it != edges.end() )
                 {
                     edges_around_vertex_->modify_value( previous_vertex,
@@ -90,8 +89,7 @@ namespace geode
                 }
             }
             const auto& edges = edges_around_vertex_->value( vertex_id );
-            const auto it =
-                std::find( edges.begin(), edges.end(), edge_vertex );
+            const auto it = absl::c_find( edges, edge_vertex );
             if( it == edges.end() )
             {
                 edges_around_vertex_->modify_value( vertex_id,

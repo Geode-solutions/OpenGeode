@@ -171,10 +171,8 @@ void test_polygon_edges_on_borders(
     OPENGEODE_EXCEPTION( result.size() == 2,
         "[Test] Number of polygon edges on border index is not correct" );
     OPENGEODE_EXCEPTION(
-        std::find( result.begin(), result.end(), geode::PolygonEdge( 0, 0 ) )
-                != result.end()
-            && std::find(
-                   result.begin(), result.end(), geode::PolygonEdge( 0, 2 ) )
+        absl::c_find( result, geode::PolygonEdge( 0, 0 ) ) != result.end()
+            && absl::c_find( result, geode::PolygonEdge( 0, 2 ) )
                    != result.end(),
         "[Test] Polygon edge indices on border index is not correct" );
 }
