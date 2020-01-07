@@ -90,14 +90,14 @@ namespace geode
             return creator->second( std::forward< Args >( args )... );
         }
 
-        static std::vector< Key > list_creators()
+        static absl::FixedArray< Key > list_creators()
         {
             const auto &store = get_store();
-            std::vector< Key > creators;
-            creators.reserve( store.size() );
+            absl::FixedArray< Key > creators( store.size() );
+            index_t count{ 0 };
             for( const auto &creator : store )
             {
-                creators.emplace_back( creator.first );
+                creators[count++] = creator.first;
             }
             return creators;
         }

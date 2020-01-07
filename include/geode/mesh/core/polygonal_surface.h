@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <absl/container/inlined_vector.h>
 #include <absl/types/optional.h>
 
 #include <geode/basic/attribute.h>
@@ -113,6 +114,10 @@ namespace geode
         index_t polygon_id{ NO_ID };
         index_t edge_id{ NO_ID };
     };
+
+    using PolygonEdgesOnBorder = absl::InlinedVector< PolygonEdge, 3 >;
+
+    using PolygonsAroundVertex = absl::InlinedVector< PolygonEdge, 10 >;
 
     /*!
      * This class represents a Surface made up with polygons (triangles, quads,
@@ -225,7 +230,7 @@ namespace geode
          * Return all the edges of a polygon that are on border
          * @param[in] polygon_id Index of a polygon
          */
-        std::vector< PolygonEdge > polygon_edges_on_border(
+        PolygonEdgesOnBorder polygon_edges_on_border(
             index_t polygon_id ) const;
 
         /*!
@@ -272,8 +277,7 @@ namespace geode
          * @param[in] vertex_id Index of the vertex.
          * @pre This function needs that polygon adjacencies are computed
          */
-        std::vector< PolygonVertex > polygons_around_vertex(
-            index_t vertex_id ) const;
+        PolygonsAroundVertex polygons_around_vertex( index_t vertex_id ) const;
 
         /*!
          * Find the polygon edge corresponding to an ordered pair of vertex

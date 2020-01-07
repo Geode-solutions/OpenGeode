@@ -56,10 +56,11 @@ void test()
     const auto colocated_info = colocator.colocated_index_mapping( 1e-8 );
     OPENGEODE_EXCEPTION( colocated_info.nb_colocated_points() == 3,
         "[Test] Should be 3 colocated points" );
-    const std::vector< geode::index_t > mapping_answer{ 0, 0, 1, 0, 2, 1, 3 };
+    const absl::FixedArray< geode::index_t > mapping_answer{ 0, 0, 1, 0, 2, 1,
+        3 };
     OPENGEODE_EXCEPTION( colocated_info.colocated_mapping == mapping_answer,
         "[Test] Error in colocated mapping" );
-    const std::vector< geode::Point3D > points_answer{ p0, p1, p2, p3 };
+    const absl::FixedArray< geode::Point3D > points_answer{ p0, p1, p2, p3 };
     OPENGEODE_EXCEPTION( colocated_info.unique_points == points_answer,
         "[Test] Error in unique points" );
 }

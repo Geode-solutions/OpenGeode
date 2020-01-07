@@ -26,6 +26,8 @@
 #include <memory>
 #include <string>
 
+#include <absl/container/fixed_array.h>
+
 #include <bitsery/bitsery.h>
 
 #include <geode/basic/attribute.h>
@@ -113,7 +115,7 @@ namespace geode
         /*!
          * Get all the associated attribute names
          */
-        std::vector< std::string > attribute_names() const;
+        absl::FixedArray< std::string > attribute_names() const;
 
         /*!
          * Return true if an attribute matching the given name.

@@ -118,10 +118,10 @@ namespace geode
     public:
         explicit Impl( PolygonalSurfaceBase& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) )
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
@@ -424,11 +424,11 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< PolygonEdge >
+    PolygonEdgesOnBorder
         PolygonalSurfaceBase< dimension >::polygon_edges_on_border(
             index_t polygon_id ) const
     {
-        std::vector< PolygonEdge > borders;
+        PolygonEdgesOnBorder borders;
         for( const auto e : Range{ nb_polygon_edges( polygon_id ) } )
         {
             PolygonEdge edge{ polygon_id, e };
@@ -538,14 +538,14 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< PolygonVertex >
+    PolygonsAroundVertex
         PolygonalSurfaceBase< dimension >::polygons_around_vertex(
             index_t vertex_id ) const
     {
         OPENGEODE_ASSERT( vertex_id < this->nb_vertices(),
             "[PolygonalSurfaceBase::polygons_around_vertex] Accessing an "
             "invalid vertex" );
-        std::vector< PolygonVertex > polygons;
+        PolygonsAroundVertex polygons;
         const auto& first_polygon = impl_->polygon_around_vertex( vertex_id );
         if( first_polygon.polygon_id == NO_ID )
         {
@@ -554,8 +554,7 @@ namespace geode
         OPENGEODE_ASSERT( polygon_vertex( first_polygon ) == vertex_id,
             "[PolygonalSurfaceBase::polygons_around_vertex] Wrong polygon "
             "around vertex" );
-        std::vector< index_t > polygons_visited;
-        polygons_visited.reserve( 10 );
+        absl::InlinedVector< index_t, 10 > polygons_visited;
         std::stack< PolygonVertex > S;
         S.push( first_polygon );
         while( !S.empty() )

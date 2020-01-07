@@ -70,13 +70,13 @@ namespace geode
             }
         }
 
-        std::vector< std::string > attribute_names() const
+        absl::FixedArray< std::string > attribute_names() const
         {
-            std::vector< std::string > names;
-            names.reserve( attributes_.size() );
+            absl::FixedArray< std::string > names( attributes_.size() );
+            index_t count{ 0 };
             for( const auto &it : attributes_ )
             {
-                names.push_back( it.first );
+                names[count++] = it.first;
             }
             return names;
         }
@@ -204,7 +204,7 @@ namespace geode
         impl_->resize( size );
     }
 
-    std::vector< std::string > AttributeManager::attribute_names() const
+    absl::FixedArray< std::string > AttributeManager::attribute_names() const
     {
         return impl_->attribute_names();
     }

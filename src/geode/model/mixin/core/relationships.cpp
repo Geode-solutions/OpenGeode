@@ -48,7 +48,7 @@ namespace geode
     class Relationships::Impl
     {
     public:
-        using Iterator = typename std::vector< EdgeVertex >::const_iterator;
+        using Iterator = typename EdgesAround::const_iterator;
         using RelationType = index_t;
         static constexpr index_t BOUNDARY_RELATION = index_t( 0 );
         static constexpr index_t INTERNAL_RELATION = index_t( 1 );
@@ -62,9 +62,9 @@ namespace geode
 
         Impl()
             : relation_type_(
-                graph_.edge_attribute_manager()
-                    .find_or_create_attribute< VariableAttribute,
-                        RelationType >( "relation_type", NO_ID ) ),
+                  graph_.edge_attribute_manager()
+                      .find_or_create_attribute< VariableAttribute,
+                          RelationType >( "relation_type", NO_ID ) ),
               ids_( graph_.vertex_attribute_manager()
                         .find_or_create_attribute< VariableAttribute,
                             ComponentID >( "id" ) )
@@ -381,7 +381,7 @@ namespace geode
             while( this->operator!=( *this )
                    && ( !relationships_.is_boundary_relation(
                             this->current()->edge_id )
-                        || is_boundary_edge_vertex() ) )
+                          || is_boundary_edge_vertex() ) )
             {
                 this->operator++();
             }
@@ -394,8 +394,8 @@ namespace geode
     Relationships::BoundaryRangeIterator::BoundaryRangeIterator(
         const Relationships& relationships, const uuid& id )
         : impl_( *relationships.impl_,
-            relationships.impl_->begin_edge( id ),
-            relationships.impl_->end_edge( id ) )
+              relationships.impl_->begin_edge( id ),
+              relationships.impl_->end_edge( id ) )
     {
     }
 
@@ -469,7 +469,7 @@ namespace geode
             while( this->operator!=( *this )
                    && ( !relationships_.is_boundary_relation(
                             this->current()->edge_id )
-                        || is_incident_edge_vertex() ) )
+                          || is_incident_edge_vertex() ) )
             {
                 this->operator++();
             }
@@ -482,8 +482,8 @@ namespace geode
     Relationships::IncidenceRangeIterator::IncidenceRangeIterator(
         const Relationships& relationships, const uuid& id )
         : impl_( *relationships.impl_,
-            relationships.impl_->begin_edge( id ),
-            relationships.impl_->end_edge( id ) )
+              relationships.impl_->begin_edge( id ),
+              relationships.impl_->end_edge( id ) )
     {
     }
 
@@ -558,7 +558,7 @@ namespace geode
             while( this->operator!=( *this )
                    && ( !relationships_.is_internal_relation(
                             this->current()->edge_id )
-                        || is_internal_edge_vertex() ) )
+                          || is_internal_edge_vertex() ) )
             {
                 this->operator++();
             }
@@ -571,8 +571,8 @@ namespace geode
     Relationships::InternalRangeIterator::InternalRangeIterator(
         const Relationships& relationships, const uuid& id )
         : impl_( *relationships.impl_,
-            relationships.impl_->begin_edge( id ),
-            relationships.impl_->end_edge( id ) )
+              relationships.impl_->begin_edge( id ),
+              relationships.impl_->end_edge( id ) )
     {
     }
 
@@ -646,7 +646,7 @@ namespace geode
             while( this->operator!=( *this )
                    && ( !relationships_.is_internal_relation(
                             this->current()->edge_id )
-                        || is_embedding_edge_vertex() ) )
+                          || is_embedding_edge_vertex() ) )
             {
                 this->operator++();
             }
@@ -659,8 +659,8 @@ namespace geode
     Relationships::EmbeddingRangeIterator::EmbeddingRangeIterator(
         const Relationships& relationships, const uuid& id )
         : impl_( *relationships.impl_,
-            relationships.impl_->begin_edge( id ),
-            relationships.impl_->end_edge( id ) )
+              relationships.impl_->begin_edge( id ),
+              relationships.impl_->end_edge( id ) )
     {
     }
 
@@ -735,7 +735,7 @@ namespace geode
             while( this->operator!=( *this )
                    && ( !relationships_.is_item_relation(
                             this->current()->edge_id )
-                        || is_item_edge_vertex() ) )
+                          || is_item_edge_vertex() ) )
             {
                 this->operator++();
             }
@@ -748,8 +748,8 @@ namespace geode
     Relationships::ItemRangeIterator::ItemRangeIterator(
         const Relationships& relationships, const uuid& id )
         : impl_( *relationships.impl_,
-            relationships.impl_->begin_edge( id ),
-            relationships.impl_->end_edge( id ) )
+              relationships.impl_->begin_edge( id ),
+              relationships.impl_->end_edge( id ) )
     {
     }
 
@@ -823,7 +823,7 @@ namespace geode
             while( this->operator!=( *this )
                    && ( !relationships_.is_item_relation(
                             this->current()->edge_id )
-                        || is_collection_edge_vertex() ) )
+                          || is_collection_edge_vertex() ) )
             {
                 this->operator++();
             }
@@ -836,8 +836,8 @@ namespace geode
     Relationships::CollectionRangeIterator::CollectionRangeIterator(
         const Relationships& relationships, const uuid& id )
         : impl_( *relationships.impl_,
-            relationships.impl_->begin_edge( id ),
-            relationships.impl_->end_edge( id ) )
+              relationships.impl_->begin_edge( id ),
+              relationships.impl_->end_edge( id ) )
     {
     }
 

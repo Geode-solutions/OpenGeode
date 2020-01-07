@@ -145,7 +145,6 @@ namespace geode
 
         void extract_all() const
         {
-            std::vector< ghc::filesystem::path > files;
             auto status = mz_zip_reader_goto_first_entry( reader_ );
             while( status == MZ_OK )
             {
@@ -155,9 +154,8 @@ namespace geode
                                                       " Error getting entry "
                                                       "info in zip file" );
 
-                files.emplace_back( directory_ / file_info->filename );
-                status = mz_zip_reader_entry_save_file(
-                    reader_, files.back().c_str() );
+                auto file = directory_ / file_info->filename;
+                status = mz_zip_reader_entry_save_file( reader_, file.c_str() );
                 OPENGEODE_EXCEPTION( status == MZ_OK,
                     "[UnzipFile::extract_all] Error extracting entry file" );
                 status = mz_zip_reader_goto_next_entry( reader_ );

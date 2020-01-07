@@ -179,7 +179,7 @@ namespace geode
     typename NNSearch< dimension >::ColocatedInfo
         NNSearch< dimension >::colocated_index_mapping( double epsilon ) const
     {
-        std::vector< index_t > mapping( nb_points() );
+        absl::FixedArray< index_t > mapping( nb_points() );
         absl::c_iota( mapping, 0 );
         async::parallel_for( async::irange( index_t{ 0 }, nb_points() ),
             [&epsilon, &mapping, this]( index_t p ) {
@@ -194,14 +194,24 @@ namespace geode
                     }
                 }
             } );
+        index_t nb_unique_points{ 0 };
+        for( const auto p : Range{ nb_points() } )
+        {
+            if( mapping[p] == p )
+            {
+                nb_unique_points++;
+            }
+        }
         index_t nb_colocated{ 0 };
-        std::vector< Point< dimension > > unique_points;
+        index_t count{ 0 };
+        absl::FixedArray< Point< dimension > > unique_points(
+            nb_unique_points );
         for( const auto p : Range{ nb_points() } )
         {
             if( mapping[p] == p )
             {
                 mapping[p] -= nb_colocated;
-                unique_points.push_back( point( p ) );
+                unique_points[count++] = point( p );
             }
             else
             {
@@ -209,7 +219,7 @@ namespace geode
                 mapping[p] = mapping[mapping[p]];
             }
         }
-        return { mapping, unique_points };
+        return { std::move( mapping ), std::move( unique_points ) };
     }
 
     template class opengeode_geometry_api NNSearch< 2 >;
