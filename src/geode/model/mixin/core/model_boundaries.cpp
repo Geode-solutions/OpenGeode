@@ -69,14 +69,10 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< std::string >
-        ModelBoundaries< dimension >::save_model_boundaries(
-            const std::string& directory ) const
+    void ModelBoundaries< dimension >::save_model_boundaries(
+        const std::string& directory ) const
     {
-        std::vector< std::string > files;
-        files.emplace_back( directory + "/model_boundaries" );
-        impl_->save_components( files.back() );
-        return files;
+        impl_->save_components( directory + "/model_boundaries" );
     }
 
     template < index_t dimension >

@@ -75,31 +75,27 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< std::string > Surfaces< dimension >::save_surfaces(
+    void Surfaces< dimension >::save_surfaces(
         const std::string& directory ) const
     {
-        std::vector< std::string > files;
         for( const auto& surface : surfaces() )
         {
             const auto& mesh = surface.mesh();
-            files.emplace_back( directory + "/" + surface.component_type().get()
-                                + surface.id().string() + "."
-                                + mesh.native_extension() );
+            auto file = directory + "/" + surface.component_type().get()
+                        + surface.id().string() + "." + mesh.native_extension();
             const auto* triangulated =
                 dynamic_cast< const TriangulatedSurface< dimension >* >(
                     &mesh );
             if( triangulated )
             {
-                save_triangulated_surface( *triangulated, files.back() );
+                save_triangulated_surface( *triangulated, file );
             }
             else
             {
-                save_polygonal_surface( mesh, files.back() );
+                save_polygonal_surface( mesh, file );
             }
         }
-        files.emplace_back( directory + "/surfaces" );
-        impl_->save_components( files.back() );
-        return files;
+        impl_->save_components( directory + "/surfaces" );
     }
 
     template < index_t dimension >

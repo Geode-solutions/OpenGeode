@@ -84,8 +84,7 @@ namespace geode
 
         LineRange lines() const;
 
-        std::vector< std::string > save_lines(
-            const std::string& directory ) const;
+        void save_lines( const std::string& directory ) const;
 
     protected:
         Lines();

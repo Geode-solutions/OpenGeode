@@ -97,9 +97,8 @@ namespace geode
         /*!
          * Save the VertexIdentifier into a file.
          * @param[in] directory Folder in which create the file.
-         * @return the filename.
          */
-        std::string save_unique_vertices( const std::string& directory ) const;
+        void save_unique_vertices( const std::string& directory ) const;
 
     private:
         /*!

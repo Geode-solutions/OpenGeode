@@ -99,10 +99,8 @@ namespace geode
 
         /*!
          * Save each Block in a file located in the specified directory
-         * @return the list of filenames
          */
-        std::vector< std::string > save_blocks(
-            const std::string& directory ) const;
+        void save_blocks( const std::string& directory ) const;
 
     protected:
         Blocks();

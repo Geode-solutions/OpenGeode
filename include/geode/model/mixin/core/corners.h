@@ -98,10 +98,8 @@ namespace geode
 
         /*!
          * Save each Corner in a file located in the specified directory
-         * @return the list of filenames
          */
-        std::vector< std::string > save_corners(
-            const std::string& directory ) const;
+        void save_corners( const std::string& directory ) const;
 
     protected:
         Corners();

@@ -84,8 +84,7 @@ namespace geode
 
         SurfaceRange surfaces() const;
 
-        std::vector< std::string > save_surfaces(
-            const std::string& directory ) const;
+        void save_surfaces( const std::string& directory ) const;
 
     protected:
         Surfaces();
