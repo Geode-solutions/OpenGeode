@@ -72,21 +72,17 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< std::string > Corners< dimension >::save_corners(
+    void Corners< dimension >::save_corners(
         const std::string& directory ) const
     {
-        std::vector< std::string > files;
         for( const auto& corner : corners() )
         {
             const auto& mesh = corner.mesh();
-            files.emplace_back( directory + "/" + corner.component_type().get()
-                                + corner.id().string() + "."
-                                + mesh.native_extension() );
-            save_point_set( mesh, files.back() );
+            auto file = directory + "/" + corner.component_type().get()
+                        + corner.id().string() + "." + mesh.native_extension();
+            save_point_set( mesh, file );
         }
-        files.emplace_back( directory + "/corners" );
-        impl_->save_components( files.back() );
-        return files;
+        impl_->save_components( directory + "/corners" );
     }
 
     template < index_t dimension >

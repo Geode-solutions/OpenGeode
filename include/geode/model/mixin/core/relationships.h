@@ -274,7 +274,7 @@ namespace geode
 
         CollectionRange collections( const uuid& id ) const;
 
-        std::string save_relationships( const std::string& directory ) const;
+        void save_relationships( const std::string& directory ) const;
 
     private:
         /*!

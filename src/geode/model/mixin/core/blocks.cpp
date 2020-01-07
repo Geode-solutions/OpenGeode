@@ -73,30 +73,25 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< std::string > Blocks< dimension >::save_blocks(
-        const std::string& directory ) const
+    void Blocks< dimension >::save_blocks( const std::string& directory ) const
     {
-        std::vector< std::string > files;
         for( const auto& block : blocks() )
         {
             const auto& mesh = block.mesh();
-            files.emplace_back( directory + "/" + block.component_type().get()
-                                + block.id().string() + "."
-                                + mesh.native_extension() );
+            auto file = directory + "/" + block.component_type().get()
+                        + block.id().string() + "." + mesh.native_extension();
             const auto* tetra =
                 dynamic_cast< const TetrahedralSolid< dimension >* >( &mesh );
             if( tetra )
             {
-                save_tetrahedral_solid( *tetra, files.back() );
+                save_tetrahedral_solid( *tetra, file );
             }
             else
             {
-                save_polyhedral_solid( mesh, files.back() );
+                save_polyhedral_solid( mesh, file );
             }
         }
-        files.emplace_back( directory + "/blocks" );
-        impl_->save_components( files.back() );
-        return files;
+        impl_->save_components( directory + "/blocks" );
     }
 
     template < index_t dimension >

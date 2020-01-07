@@ -70,21 +70,16 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< std::string > Lines< dimension >::save_lines(
-        const std::string& directory ) const
+    void Lines< dimension >::save_lines( const std::string& directory ) const
     {
-        std::vector< std::string > files;
         for( const auto& line : lines() )
         {
             const auto& mesh = line.mesh();
-            files.emplace_back( directory + "/" + line.component_type().get()
-                                + line.id().string() + "."
-                                + mesh.native_extension() );
-            save_edged_curve( mesh, files.back() );
+            auto file = directory + "/" + line.component_type().get()
+                        + line.id().string() + "." + mesh.native_extension();
+            save_edged_curve( mesh, file );
         }
-        files.emplace_back( directory + "/lines" );
-        impl_->save_components( files.back() );
-        return files;
+        impl_->save_components( directory + "/lines" );
     }
 
     template < index_t dimension >

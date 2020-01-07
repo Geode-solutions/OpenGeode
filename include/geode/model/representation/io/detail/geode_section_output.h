@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <ghc/filesystem.hpp>
+
 #include <geode/basic/uuid.h>
 #include <geode/basic/zip_file.h>
 
@@ -45,23 +47,28 @@ namespace geode
             return Section::native_extension_static();
         }
 
+        void save_section_files( const std::string& directory ) const
+        {
+            section().save_relationships( directory );
+            section().save_unique_vertices( directory );
+            section().save_corners( directory );
+            section().save_lines( directory );
+            section().save_surfaces( directory );
+        }
+
         void archive_section_files( const ZipFile& zip_writer ) const
         {
-            zip_writer.archive_file(
-                section().save_relationships( zip_writer.directory() ) );
-            zip_writer.archive_file(
-                section().save_unique_vertices( zip_writer.directory() ) );
-            zip_writer.archive_files(
-                section().save_corners( zip_writer.directory() ) );
-            zip_writer.archive_files(
-                section().save_lines( zip_writer.directory() ) );
-            zip_writer.archive_files(
-                section().save_surfaces( zip_writer.directory() ) );
+            for( const auto& file :
+                ghc::filesystem::directory_iterator( zip_writer.directory() ) )
+            {
+                zip_writer.archive_file( file.path() );
+            }
         }
 
         void write() const final
         {
             const ZipFile zip_writer{ filename(), uuid{}.string() };
+            save_section_files( zip_writer.directory() );
             archive_section_files( zip_writer );
         }
     };

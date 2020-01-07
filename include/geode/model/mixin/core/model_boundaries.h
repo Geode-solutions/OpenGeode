@@ -86,8 +86,7 @@ namespace geode
 
         ModelBoundaryRange model_boundaries() const;
 
-        std::vector< std::string > save_model_boundaries(
-            const std::string& directory ) const;
+        void save_model_boundaries( const std::string& directory ) const;
 
     protected:
         ModelBoundaries();
