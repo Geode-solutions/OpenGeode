@@ -111,7 +111,7 @@ namespace geode
             OPENGEODE_EXCEPTION(
                 initializers_.empty() || initializers_.size() == version_ - 1,
                 "[Growable] Should have as many initializers than the version "
-                "number minus one" );
+                "number minus one (or none)" );
         }
 
         template < typename Fnc >
