@@ -309,7 +309,7 @@ namespace geode
         {
             std::shared_ptr< VariableAttribute< bool > > attribute{
                 new VariableAttribute< bool >{
-                    static_cast< bool >( default_value_ ) }
+                    absl::implicit_cast< bool >( default_value_ ) }
             };
             attribute->values_ = values_;
             return attribute;
