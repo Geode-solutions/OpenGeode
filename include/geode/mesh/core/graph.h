@@ -79,7 +79,7 @@ namespace geode
         index_t vertex_id{ NO_ID };
     };
 
-    using EdgesAround = absl::InlinedVector< EdgeVertex, 2 >;
+    using EdgesAroundVertex = absl::InlinedVector< EdgeVertex, 2 >;
 
     /*!
      * Interface class to represent a Graph.
@@ -122,7 +122,7 @@ namespace geode
          * Get all edge endpoints corresponding to a given vertex
          * @param[in] vertex_id Index of the vertex
          */
-        const EdgesAround& edges_around_vertex( index_t vertex_id ) const;
+        const EdgesAroundVertex& edges_around_vertex( index_t vertex_id ) const;
 
     protected:
         Graph();
@@ -132,7 +132,8 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive );
 
-        void set_edges_around_vertex( index_t vertex_id, EdgesAround edges );
+        void set_edges_around_vertex(
+            index_t vertex_id, EdgesAroundVertex edges );
 
         void associate_edge_vertex_to_vertex(
             const EdgeVertex& edge_vertex, index_t vertex_id );

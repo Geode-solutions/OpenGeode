@@ -129,8 +129,8 @@ namespace
     template < typename Serializer >
     void register_pcontext( geode::PContext& context )
     {
-        geode::AttributeManager::register_attribute_type< geode::EdgesAround,
-            Serializer >( context );
+        geode::AttributeManager::register_attribute_type<
+            geode::EdgesAroundVertex, Serializer >( context );
         geode::AttributeManager::register_attribute_type< geode::PolygonVertex,
             Serializer >( context );
         geode::AttributeManager::register_attribute_type< geode::PolygonEdge,
