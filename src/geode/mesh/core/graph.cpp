@@ -34,22 +34,21 @@
 #include <geode/geometry/vector.h>
 
 #include <geode/mesh/builder/graph_builder.h>
+#include <geode/mesh/core/bitsery_archive.h>
 #include <geode/mesh/core/geode_graph.h>
 
 namespace geode
 {
     class Graph::Impl
     {
+        static constexpr auto attribute_name = "edges_around_vertex";
+
     public:
         explicit Impl( Graph& graph )
             : edges_around_vertex_(
-                graph.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        std::vector< EdgeVertex > >( "edges_around_vertex", [] {
-                        std::vector< EdgeVertex > edges;
-                        edges.reserve( 2 );
-                        return edges;
-                    }() ) )
+                  graph.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          EdgesAround >( attribute_name, EdgesAround{} ) )
         {
         }
 
@@ -58,16 +57,15 @@ namespace geode
             return edge_attribute_manager_;
         }
 
-        const std::vector< EdgeVertex >& edges_around_vertex(
-            const index_t vertex_id ) const
+        const EdgesAround& edges_around_vertex( const index_t vertex_id ) const
         {
             return edges_around_vertex_->value( vertex_id );
         }
 
-        void set_edges_around_vertex( const index_t vertex_id,
-            const std::vector< EdgeVertex >& edges ) const
+        void set_edges_around_vertex(
+            const index_t vertex_id, EdgesAround edges ) const
         {
-            edges_around_vertex_->set_value( vertex_id, edges );
+            edges_around_vertex_->set_value( vertex_id, std::move( edges ) );
         }
 
         void associate_edge_vertex_to_vertex( const Graph& graph,
@@ -83,17 +81,15 @@ namespace geode
                 if( it != edges.end() )
                 {
                     edges_around_vertex_->modify_value( previous_vertex,
-                        [&it]( std::vector< EdgeVertex >& edges ) {
-                            edges.erase( it );
-                        } );
+                        [&it]( EdgesAround& edges ) { edges.erase( it ); } );
                 }
             }
             const auto& edges = edges_around_vertex_->value( vertex_id );
             const auto it = absl::c_find( edges, edge_vertex );
             if( it == edges.end() )
             {
-                edges_around_vertex_->modify_value( vertex_id,
-                    [&edge_vertex]( std::vector< EdgeVertex >& edges ) {
+                edges_around_vertex_->modify_value(
+                    vertex_id, [&edge_vertex]( EdgesAround& edges ) {
                         edges.push_back( edge_vertex );
                     } );
             }
@@ -107,17 +103,50 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& archive, Impl& impl ) {
-                    archive.object( impl.edge_attribute_manager_ );
-                    archive.ext( impl.edges_around_vertex_,
-                        bitsery::ext::StdSmartPtr{} );
-                } );
+            archive.ext( *this,
+                Growable< Archive, Impl >{
+                    { []( Archive& archive, Impl& impl ) {
+                         archive.object( impl.edge_attribute_manager_ );
+                         archive.ext( impl.edges_around_vertex_,
+                             bitsery::ext::StdSmartPtr{} );
+                     },
+                        []( Archive& archive, Impl& impl ) {
+                            archive.object( impl.edge_attribute_manager_ );
+                            archive.ext( impl.edges_around_vertex_,
+                                bitsery::ext::StdSmartPtr{} );
+                        } },
+                    { []( Impl& impl ) {
+                        impl.convert_attribute_to_abseil();
+                    } } } );
+        }
+
+        void convert_attribute_to_abseil()
+        {
+            auto old_edges = edge_attribute_manager_
+                                 .find_attribute< std::vector< EdgeVertex > >(
+                                     attribute_name );
+            edge_attribute_manager_.delete_attribute( attribute_name );
+            edges_around_vertex_ =
+                edge_attribute_manager_
+                    .find_or_create_attribute< VariableAttribute, EdgesAround >(
+                        attribute_name );
+
+            for( const auto e : Range{ edge_attribute_manager_.nb_elements() } )
+            {
+                const auto& old_values = old_edges->value( e );
+                edges_around_vertex_->modify_value(
+                    e, [&old_values]( EdgesAround& value ) {
+                        for( const auto& old_value : old_values )
+                        {
+                            value.push_back( old_value );
+                        }
+                    } );
+            }
         }
 
     private:
         mutable AttributeManager edge_attribute_manager_;
-        std::shared_ptr< VariableAttribute< std::vector< EdgeVertex > > >
+        std::shared_ptr< VariableAttribute< EdgesAround > >
             edges_around_vertex_;
     };
 
@@ -159,20 +188,18 @@ namespace geode
         return edge_attribute_manager().nb_elements();
     }
 
-    const std::vector< EdgeVertex >& Graph::edges_around_vertex(
-        index_t vertex_id ) const
+    const EdgesAround& Graph::edges_around_vertex( index_t vertex_id ) const
     {
         OPENGEODE_ASSERT( vertex_id < this->nb_vertices(),
             "[Graph::edges_around_vertex] Accessing an invalid vertex" );
         return impl_->edges_around_vertex( vertex_id );
     }
 
-    void Graph::set_edges_around_vertex(
-        index_t vertex_id, const std::vector< EdgeVertex >& edges )
+    void Graph::set_edges_around_vertex( index_t vertex_id, EdgesAround edges )
     {
         OPENGEODE_ASSERT( vertex_id < this->nb_vertices(),
             "[Graph::get_edges_around_vertex] Accessing an invalid vertex" );
-        return impl_->set_edges_around_vertex( vertex_id, edges );
+        return impl_->set_edges_around_vertex( vertex_id, std::move( edges ) );
     }
 
     void Graph::associate_edge_vertex_to_vertex(

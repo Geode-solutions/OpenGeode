@@ -25,6 +25,8 @@
 
 #include <functional>
 
+#include <absl/container/fixed_array.h>
+
 #include <bitsery/adapter/stream.h>
 #include <bitsery/bitsery.h>
 #include <bitsery/ext/compact_value.h>
@@ -91,18 +93,14 @@ namespace geode
         static constexpr index_t FIRST_VERSION{ 1 };
 
     public:
-        Growable(
-            std::vector< std::function< void( Archive &, T & ) > > serializers )
-            : version_( serializers.size() ),
-              serializers_( std::move( serializers ) )
+        Growable( absl::FixedArray< std::function< void( Archive &, T & ) > >
+                serializers )
+            : Growable( std::move( serializers ), {} )
         {
-            OPENGEODE_EXCEPTION( version_ > FIRST_VERSION,
-                "[Growable] Provide at least 2 serializers or use "
-                "DefaultGrowable" );
         }
-        Growable(
-            std::vector< std::function< void( Archive &, T & ) > > serializers,
-            std::vector< std::function< void( T & ) > > initializers )
+        Growable( absl::FixedArray< std::function< void( Archive &, T & ) > >
+                      serializers,
+            absl::FixedArray< std::function< void( T & ) > > initializers )
             : version_( serializers.size() ),
               serializers_( std::move( serializers ) ),
               initializers_( std::move( initializers ) )
@@ -110,7 +108,8 @@ namespace geode
             OPENGEODE_EXCEPTION( version_ > FIRST_VERSION,
                 "[Growable] Provide at least 2 serializers or use "
                 "DefaultGrowable" );
-            OPENGEODE_EXCEPTION( initializers_.size() == version_ - 1,
+            OPENGEODE_EXCEPTION(
+                initializers_.empty() || initializers_.size() == version_ - 1,
                 "[Growable] Should have as many initializers than the version "
                 "number minus one" );
         }
@@ -138,8 +137,9 @@ namespace geode
 
     private:
         index_t version_{ FIRST_VERSION };
-        std::vector< std::function< void( Archive &, T & ) > > serializers_;
-        std::vector< std::function< void( T & ) > > initializers_;
+        absl::FixedArray< std::function< void( Archive &, T & ) > >
+            serializers_;
+        absl::FixedArray< std::function< void( T & ) > > initializers_;
     };
 } // namespace geode
 

@@ -145,7 +145,7 @@ namespace geode
         for( const auto v : Range{ graph_.nb_vertices() } )
         {
             const auto& edges = graph_.edges_around_vertex( v );
-            std::vector< EdgeVertex > new_edges;
+            EdgesAround new_edges;
             new_edges.reserve( edges.size() );
             for( const auto& edge : edges )
             {
@@ -155,7 +155,7 @@ namespace geode
                     new_edges.emplace_back( edge_id, edge.vertex_id );
                 }
             }
-            graph_.set_edges_around_vertex( v, new_edges );
+            graph_.set_edges_around_vertex( v, std::move( new_edges ) );
         }
 
         graph_.edge_attribute_manager().delete_elements( to_delete );

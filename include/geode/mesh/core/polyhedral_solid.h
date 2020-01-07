@@ -141,7 +141,15 @@ namespace geode
         index_t vertex_id{ NO_ID };
     };
 
-    using PolyhedronFacetVertices = typename absl::InlinedVector< index_t, 4 >;
+    using PolyhedronFacetVertices = absl::InlinedVector< index_t, 4 >;
+
+    using PolyhedronFacetsOnBorder = absl::InlinedVector< PolyhedronFacet, 4 >;
+
+    using PolyhedraAroundVertex = absl::InlinedVector< PolyhedronVertex, 20 >;
+
+    using PolyhedraAroundEdge = absl::InlinedVector< index_t, 10 >;
+
+    using PolyhedraAroundFacet = absl::InlinedVector< index_t, 2 >;
 
     /*!
      * This class represents a 3D Solid made up with polyhedra and provides mesh
@@ -275,7 +283,7 @@ namespace geode
          * Return all the facets of a polyhedron that are on border
          * @param[in] polyhedron_id Index of a polyhedron
          */
-        std::vector< PolyhedronFacet > polyhedron_facets_on_border(
+        PolyhedronFacetsOnBorder polyhedron_facets_on_border(
             index_t polyhedron_id ) const;
 
         /*!
@@ -320,20 +328,20 @@ namespace geode
          * Get all the polyhedra with one of the vertices matching given vertex.
          * @param[in] vertex_id Index of the vertex
          */
-        std::vector< PolyhedronVertex > polyhedra_around_vertex(
+        PolyhedraAroundVertex polyhedra_around_vertex(
             index_t vertex_id ) const;
 
         /*!
          * Get all the polyhedra with both edge vertices.
          * @param[in] edge_id Index of the edge
          */
-        std::vector< index_t > polyhedra_around_edge( index_t edge_id ) const;
+        PolyhedraAroundEdge polyhedra_around_edge( index_t edge_id ) const;
 
         /*!
          * Return all polyhedra made with the given facet.
          * @param[in] facet_id Index of the facet
          */
-        std::vector< index_t > polyhedra_from_facet( index_t facet_id ) const;
+        PolyhedraAroundFacet polyhedra_from_facet( index_t facet_id ) const;
 
         /*!
          * Access to the manager of attributes associated with polyhedra.
