@@ -71,4 +71,4 @@ Detailed changes for each release are documented in the [release notes](https://
 
 [MIT](https://opensource.org/licenses/MIT)
 
-Copyright (c) 2019-present, Geode-solutions
+Copyright (c) 2019 - 2020-present, Geode-solutions
