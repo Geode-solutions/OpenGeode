@@ -211,13 +211,13 @@ namespace geode
             Relationships::InternalRangeIterator::operator*().id() );
     }
 
-    Section::EmbeddedSurfaceRange Section::embeddings(
+    Section::EmbeddedSurfaceRange Section::embedded_surfaces(
         const Corner2D& corner ) const
     {
         return { *this, corner };
     }
 
-    Section::EmbeddedSurfaceRange Section::embeddings(
+    Section::EmbeddedSurfaceRange Section::embedded_surfaces(
         const Line2D& line ) const
     {
         return { *this, line };
@@ -285,12 +285,12 @@ namespace geode
 
     index_t Section::nb_embedded_surfaces( const Corner2D& corner ) const
     {
-        return detail::count_relationships( embeddings( corner ) );
+        return detail::count_relationships( embedded_surfaces( corner ) );
     }
 
     index_t Section::nb_embedded_surfaces( const Line2D& line ) const
     {
-        return detail::count_relationships( embeddings( line ) );
+        return detail::count_relationships( embedded_surfaces( line ) );
     }
 
     bool Section::is_closed( const Line2D& line ) const

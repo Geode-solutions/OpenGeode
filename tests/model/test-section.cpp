@@ -258,7 +258,7 @@ void add_internal_corner_relations( const geode::Section& model,
     for( const auto& corner_id : corner_uuids )
     {
         for( const auto& embedding :
-            model.embeddings( model.corner( corner_id ) ) )
+            model.embedded_surfaces( model.corner( corner_id ) ) )
         {
             OPENGEODE_EXCEPTION( surface_uuids.front() == embedding.id(),
                 "[Test] All Corners embeddings should be Surfaces" );
@@ -287,7 +287,8 @@ void add_internal_line_relations( const geode::Section& model,
 
     for( const auto& line_id : line_uuids )
     {
-        for( const auto& embedding : model.embeddings( model.line( line_id ) ) )
+        for( const auto& embedding :
+            model.embedded_surfaces( model.line( line_id ) ) )
         {
             OPENGEODE_EXCEPTION( surface_uuids.front() == embedding.id(),
                 "[Test] All Lines embeddings should be Surfaces" );

@@ -191,11 +191,11 @@ namespace geode
 
         index_t nb_embedded_surfaces( const Corner2D& corner ) const;
 
-        EmbeddedSurfaceRange embeddings( const Corner2D& corner ) const;
+        EmbeddedSurfaceRange embedded_surfaces( const Corner2D& corner ) const;
 
         index_t nb_embedded_surfaces( const Line2D& line ) const;
 
-        EmbeddedSurfaceRange embeddings( const Line2D& line ) const;
+        EmbeddedSurfaceRange embedded_surfaces( const Line2D& line ) const;
 
         ItemLineRange items( const ModelBoundary2D& boundary ) const;
 
