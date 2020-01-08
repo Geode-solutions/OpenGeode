@@ -75,13 +75,13 @@ namespace geode
     template < index_t dimension >
     void Blocks< dimension >::save_blocks( absl::string_view directory ) const
     {
-        const auto prefix = 
-            static_cast<std::string>(directory)+"/"+ Block< dimension >::component_type_static().get() ;
+        const auto prefix = static_cast< std::string >( directory ) + "/"
+                            + Block< dimension >::component_type_static().get();
         for( const auto& block : blocks() )
         {
             const auto& mesh = block.mesh();
-            auto file = 
-                prefix+ block.id().string()+ "."+ mesh.native_extension().data() ;
+            auto file = prefix + block.id().string() + "."
+                        + mesh.native_extension().data();
             const auto* tetra =
                 dynamic_cast< const TetrahedralSolid< dimension >* >( &mesh );
             if( tetra )
@@ -102,15 +102,14 @@ namespace geode
     {
         impl_->load_components(
             static_cast< std::string >( directory ) + "/blocks" );
-        const auto prefix = 
-            static_cast< std::string >( directory ) + "/"
+        const auto prefix = static_cast< std::string >( directory ) + "/"
                             + Block< dimension >::component_type_static().get();
         for( auto& block : modifiable_blocks() )
         {
             block.ensure_mesh_type();
             auto& mesh = block.modifiable_mesh();
-            const auto file = 
-                prefix+ block.id().string()+ "."+ mesh.native_extension().data() ;
+            const auto file = prefix + block.id().string() + "."
+                              + mesh.native_extension().data();
             auto* tetra =
                 dynamic_cast< TetrahedralSolid< dimension >* >( &mesh );
             if( tetra )

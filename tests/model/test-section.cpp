@@ -500,8 +500,8 @@ void test()
     test_item_ranges( model, line_uuids, model_boundary_uuids );
     test_clone( model );
 
-    const auto file_io = std::string ("test.")
-                         + model.native_extension().data() ;
+    const auto file_io =
+        std::string( "test." ) + model.native_extension().data();
     geode::save_section( model, file_io );
 
     geode::Section model2;
