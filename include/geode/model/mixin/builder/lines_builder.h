@@ -45,7 +45,7 @@ namespace geode
     class LinesBuilder
     {
     public:
-        void load_lines( const std::string& directory );
+        void load_lines( absl::string_view directory );
 
         /*!
          * Get a pointer to the builder of a Line mesh
@@ -54,7 +54,7 @@ namespace geode
         std::unique_ptr< EdgedCurveBuilder< dimension > > line_mesh_builder(
             const uuid& id );
 
-        void set_line_name( const uuid& id, std::string name );
+        void set_line_name( const uuid& id, absl::string_view name );
 
     protected:
         LinesBuilder( Lines< dimension >& lines ) : lines_( lines ) {}

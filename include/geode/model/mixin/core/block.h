@@ -83,9 +83,9 @@ namespace geode
         void set_mesh( std::unique_ptr< PolyhedralSolid< dimension > > mesh );
 
         friend class BlocksBuilder< dimension >;
-        void set_block_name( std::string name )
+        void set_block_name( absl::string_view name )
         {
-            this->set_name( std::move( name ) );
+            this->set_name( name );
         }
 
         void ensure_mesh_type();

@@ -89,7 +89,7 @@ void test_delete_vertex(
         "[Test] PointSet vertex coordinates are not correct" );
 }
 
-void test_io( const geode::PointSet3D& point_set, const std::string& filename )
+void test_io( const geode::PointSet3D& point_set, absl::string_view filename )
 {
     save_point_set( point_set, filename );
     auto new_point_set = geode::PointSet3D::create(
@@ -121,7 +121,8 @@ void test()
     test_create_vertices( *point_set, *builder );
     test_bounding_box( *point_set );
     test_create_vertex_attribute( *point_set );
-    test_io( *point_set, "test." + point_set->native_extension() );
+    test_io(
+        *point_set, absl::StrCat( "test.", point_set->native_extension() ) );
     test_delete_vertex( *point_set, *builder );
     test_clone( *point_set );
 }

@@ -38,14 +38,14 @@ namespace geode
     class Component< dimension >::Impl
     {
     public:
-        const std::string& name() const
+        absl::string_view name() const
         {
             return name_;
         }
 
-        void set_name( std::string name )
+        void set_name( absl::string_view name )
         {
-            name_ = std::move( name );
+            name_ = name.data();
         }
 
         const uuid& id() const
@@ -81,7 +81,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    const std::string& Component< dimension >::name() const
+    absl::string_view Component< dimension >::name() const
     {
         return impl_->name();
     }
@@ -93,9 +93,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    void Component< dimension >::set_name( std::string name )
+    void Component< dimension >::set_name( absl::string_view name )
     {
-        impl_->set_name( std::move( name ) );
+        impl_->set_name( name );
     }
 
     template < index_t dimension >

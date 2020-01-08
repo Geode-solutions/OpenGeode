@@ -29,7 +29,7 @@
 #include <geode/tests/common.h>
 
 #define CHECK( arg, value )                                                    \
-    OPENGEODE_EXCEPTION( arg == value, "[Test] Wrong value for " #arg );
+    OPENGEODE_EXCEPTION( arg == value, "[Test] Wrong value for ", arg );
 
 struct Foo
 {

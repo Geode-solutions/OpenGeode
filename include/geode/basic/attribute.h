@@ -27,6 +27,7 @@
 #include <typeinfo>
 
 #include <absl/container/flat_hash_map.h>
+#include <absl/strings/string_view.h>
 
 #include <bitsery/bitsery.h>
 #include <bitsery/brief_syntax.h>
@@ -68,7 +69,7 @@ namespace geode
 
         virtual void resize( index_t size ) = 0;
 
-        virtual std::string type() = 0;
+        virtual absl::string_view type() = 0;
 
         virtual void delete_elements(
             const std::vector< bool >& to_delete ) = 0;
@@ -87,7 +88,7 @@ namespace geode
     public:
         virtual const T& value( index_t element ) const = 0;
 
-        std::string type() final
+        absl::string_view type() final
         {
             return typeid( T ).name();
         }

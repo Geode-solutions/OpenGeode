@@ -27,12 +27,12 @@
 
 namespace geode
 {
-    void load_brep( BRep& brep, const std::string& filename )
+    void load_brep( BRep& brep, absl::string_view filename )
     {
         try
         {
             auto input = BRepInputFactory::create(
-                extension_from_filename( filename ), brep, filename );
+                extension_from_filename( filename ).data(), brep, filename );
             input->read();
         }
         catch( const OpenGeodeException& e )
@@ -43,8 +43,8 @@ namespace geode
         }
     }
 
-    BRepInput::BRepInput( BRep& brep, std::string filename )
-        : Input( std::move( filename ) ), brep_( brep )
+    BRepInput::BRepInput( BRep& brep, absl::string_view filename )
+        : Input( filename ), brep_( brep )
     {
     }
 } // namespace geode

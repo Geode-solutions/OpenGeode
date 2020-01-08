@@ -34,6 +34,6 @@ namespace geode
         virtual void write() const = 0;
 
     protected:
-        Output( std::string filename ) : IOFile( std::move( filename ) ) {}
+        Output( absl::string_view filename ) : IOFile( filename ) {}
     };
 } // namespace geode

@@ -25,7 +25,7 @@
 
 namespace geode
 {
-    std::string extension_from_filename( const std::string& filename )
+    absl::string_view extension_from_filename( absl::string_view filename )
     {
         return filename.substr( filename.find_last_of( '.' ) + 1 );
     }

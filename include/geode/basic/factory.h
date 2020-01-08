@@ -61,7 +61,7 @@ namespace geode
 
     public:
         template < typename DerivedClass >
-        static void register_creator( const Key &key )
+        static void register_creator( Key key )
         {
             static_assert( std::is_base_of< BaseClass, DerivedClass >::value,
                 "DerivedClass is not a subclass of BaseClass" );
@@ -70,8 +70,8 @@ namespace geode
                 "DerivedClass is not constructible with Args..." );
             auto &store = get_store();
             if( !store
-                     .emplace(
-                         key, Creator( create_function_impl< DerivedClass > ) )
+                     .emplace( std::move( key ),
+                         Creator( create_function_impl< DerivedClass > ) )
                      .second )
             {
                 Logger::warn(

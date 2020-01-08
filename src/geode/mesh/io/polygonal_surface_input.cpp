@@ -31,12 +31,12 @@ namespace geode
     template < index_t dimension >
     void load_polygonal_surface(
         PolygonalSurface< dimension >& polygonal_surface,
-        const std::string& filename )
+        absl::string_view filename )
     {
         try
         {
             auto input = PolygonalSurfaceInputFactory< dimension >::create(
-                extension_from_filename( filename ), polygonal_surface,
+                extension_from_filename( filename ).data(), polygonal_surface,
                 filename );
             input->read();
         }
@@ -51,16 +51,17 @@ namespace geode
 
     template < index_t dimension >
     PolygonalSurfaceInput< dimension >::PolygonalSurfaceInput(
-        PolygonalSurface< dimension >& polygonal_surface, std::string filename )
-        : VertexSetInput( polygonal_surface, std::move( filename ) ),
+        PolygonalSurface< dimension >& polygonal_surface,
+        absl::string_view filename )
+        : VertexSetInput( polygonal_surface, filename ),
           polygonal_surface_( polygonal_surface )
     {
     }
 
     template void opengeode_mesh_api load_polygonal_surface(
-        PolygonalSurface< 2 >&, const std::string& );
+        PolygonalSurface< 2 >&, absl::string_view );
     template void opengeode_mesh_api load_polygonal_surface(
-        PolygonalSurface< 3 >&, const std::string& );
+        PolygonalSurface< 3 >&, absl::string_view );
 
     template class opengeode_mesh_api PolygonalSurfaceInput< 2 >;
     template class opengeode_mesh_api PolygonalSurfaceInput< 3 >;

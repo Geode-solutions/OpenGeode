@@ -86,7 +86,7 @@ namespace geode
 
         ModelBoundaryRange model_boundaries() const;
 
-        void save_model_boundaries( const std::string& directory ) const;
+        void save_model_boundaries( absl::string_view directory ) const;
 
     protected:
         ModelBoundaries();
@@ -108,7 +108,7 @@ namespace geode
         void delete_model_boundary(
             const ModelBoundary< dimension >& boundary );
 
-        void load_model_boundaries( const std::string& directory );
+        void load_model_boundaries( absl::string_view directory );
 
         ModifiableModelBoundaryRange modifiable_model_boundaries();
 

@@ -30,7 +30,7 @@
 namespace geode
 {
     /* Absolute path to test source directory */
-    static const std::string test_path = "@TEST_DIRECTORY@/";
+    static const auto test_path = "@TEST_DIRECTORY@/";
 } // namespace geode
 
 /*!

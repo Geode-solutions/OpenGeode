@@ -27,12 +27,12 @@
 
 namespace geode
 {
-    void load_graph( Graph& graph, const std::string& filename )
+    void load_graph( Graph& graph, absl::string_view filename )
     {
         try
         {
             auto input = GraphInputFactory::create(
-                extension_from_filename( filename ), graph, filename );
+                extension_from_filename( filename ).data(), graph, filename );
             input->read();
         }
         catch( const OpenGeodeException& e )
@@ -43,8 +43,8 @@ namespace geode
         }
     }
 
-    GraphInput::GraphInput( Graph& graph, std::string filename )
-        : VertexSetInput( graph, std::move( filename ) ), graph_( graph )
+    GraphInput::GraphInput( Graph& graph, absl::string_view filename )
+        : VertexSetInput( graph, filename ), graph_( graph )
     {
     }
 } // namespace geode

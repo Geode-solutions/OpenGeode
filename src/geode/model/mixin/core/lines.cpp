@@ -70,29 +70,33 @@ namespace geode
     }
 
     template < index_t dimension >
-    void Lines< dimension >::save_lines( const std::string& directory ) const
+    void Lines< dimension >::save_lines( absl::string_view directory ) const
     {
+        const auto prefix = absl::StrCat(
+            directory, "/", Line< dimension >::component_type_static().get() );
         for( const auto& line : lines() )
         {
             const auto& mesh = line.mesh();
-            auto file = directory + "/" + line.component_type().get()
-                        + line.id().string() + "." + mesh.native_extension();
+            auto file = absl::StrCat(
+                prefix, line.id().string(), ".", mesh.native_extension() );
             save_edged_curve( mesh, file );
         }
-        impl_->save_components( directory + "/lines" );
+        impl_->save_components( absl::StrCat( directory, "/lines" ) );
     }
 
     template < index_t dimension >
-    void Lines< dimension >::load_lines( const std::string& directory )
+    void Lines< dimension >::load_lines( absl::string_view directory )
     {
-        impl_->load_components( directory + "/lines" );
+        impl_->load_components( absl::StrCat( directory, "/lines" ) );
+        const auto prefix = absl::StrCat(
+            directory, "/", Line< dimension >::component_type_static().get() );
         for( auto& line : modifiable_lines() )
         {
             line.ensure_mesh_type();
             auto& mesh = line.modifiable_mesh();
-            load_edged_curve( mesh,
-                directory + "/" + line.component_type().get()
-                    + line.id().string() + "." + mesh.native_extension() );
+            auto file = absl::StrCat(
+                prefix, line.id().string(), ".", mesh.native_extension() );
+            load_edged_curve( mesh, file );
         }
     }
 

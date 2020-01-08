@@ -59,7 +59,7 @@ namespace geode
 
         virtual ~VertexSet();
 
-        virtual std::string native_extension() const = 0;
+        virtual absl::string_view native_extension() const = 0;
 
         index_t nb_vertices() const;
 

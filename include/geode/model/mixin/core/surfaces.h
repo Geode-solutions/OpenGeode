@@ -84,7 +84,7 @@ namespace geode
 
         SurfaceRange surfaces() const;
 
-        void save_surfaces( const std::string& directory ) const;
+        void save_surfaces( absl::string_view directory ) const;
 
     protected:
         Surfaces();
@@ -106,7 +106,7 @@ namespace geode
 
         void delete_surface( const Surface< dimension >& surface );
 
-        void load_surfaces( const std::string& directory );
+        void load_surfaces( absl::string_view directory );
 
         ModifiableSurfaceRange modifiable_surfaces();
 

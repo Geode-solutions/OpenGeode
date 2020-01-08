@@ -76,13 +76,15 @@ namespace geode
 
     template < index_t dimension >
     void Surfaces< dimension >::save_surfaces(
-        const std::string& directory ) const
+        absl::string_view directory ) const
     {
+        const auto prefix = absl::StrCat( directory, "/",
+            Surface< dimension >::component_type_static().get() );
         for( const auto& surface : surfaces() )
         {
             const auto& mesh = surface.mesh();
-            auto file = directory + "/" + surface.component_type().get()
-                        + surface.id().string() + "." + mesh.native_extension();
+            auto file = absl::StrCat(
+                prefix, surface.id().string(), ".", mesh.native_extension() );
             const auto* triangulated =
                 dynamic_cast< const TriangulatedSurface< dimension >* >(
                     &mesh );
@@ -95,20 +97,21 @@ namespace geode
                 save_polygonal_surface( mesh, file );
             }
         }
-        impl_->save_components( directory + "/surfaces" );
+        impl_->save_components( absl::StrCat( directory, "/surfaces" ) );
     }
 
     template < index_t dimension >
-    void Surfaces< dimension >::load_surfaces( const std::string& directory )
+    void Surfaces< dimension >::load_surfaces( absl::string_view directory )
     {
-        impl_->load_components( directory + "/surfaces" );
+        impl_->load_components( absl::StrCat( directory, "/surfaces" ) );
+        const auto prefix = absl::StrCat( directory, "/",
+            Surface< dimension >::component_type_static().get() );
         for( auto& surface : modifiable_surfaces() )
         {
             surface.ensure_mesh_type();
             auto& mesh = surface.modifiable_mesh();
-            const auto file = directory + "/" + surface.component_type().get()
-                              + surface.id().string() + "."
-                              + mesh.native_extension();
+            auto file = absl::StrCat(
+                prefix, surface.id().string(), ".", mesh.native_extension() );
             auto* triangulated =
                 dynamic_cast< TriangulatedSurface< dimension >* >( &mesh );
             if( triangulated )

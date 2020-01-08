@@ -301,12 +301,13 @@ namespace geode
          */
         BoundingBox3D bounding_box() const;
 
-        static std::string native_extension_static()
+        static absl::string_view native_extension_static()
         {
-            return "og_brep";
+            static const auto extension = "og_brep";
+            return extension;
         }
 
-        std::string native_extension() const
+        absl::string_view native_extension() const
         {
             return native_extension_static();
         }

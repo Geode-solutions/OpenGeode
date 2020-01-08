@@ -30,12 +30,12 @@ namespace geode
     template < index_t dimension >
     void load_tetrahedral_solid(
         TetrahedralSolid< dimension >& tetrahedral_solid,
-        const std::string& filename )
+        absl::string_view filename )
     {
         try
         {
             auto input = TetrahedralSolidInputFactory< dimension >::create(
-                extension_from_filename( filename ), tetrahedral_solid,
+                extension_from_filename( filename ).data(), tetrahedral_solid,
                 filename );
             input->read();
         }
@@ -50,15 +50,15 @@ namespace geode
 
     template < index_t dimension >
     TetrahedralSolidInput< dimension >::TetrahedralSolidInput(
-        TetrahedralSolid< dimension >& tetrahedral_solid, std::string filename )
-        : PolyhedralSolidInput< dimension >(
-            tetrahedral_solid, std::move( filename ) ),
+        TetrahedralSolid< dimension >& tetrahedral_solid,
+        absl::string_view filename )
+        : PolyhedralSolidInput< dimension >( tetrahedral_solid, filename ),
           tetrahedral_solid_( tetrahedral_solid )
     {
     }
 
     template void opengeode_mesh_api load_tetrahedral_solid(
-        TetrahedralSolid< 3 >&, const std::string& );
+        TetrahedralSolid< 3 >&, absl::string_view );
 
     template class opengeode_mesh_api TetrahedralSolidInput< 3 >;
 } // namespace geode

@@ -33,14 +33,15 @@ namespace geode
     {
     public:
         ZipFile(
-            const std::string& file, const std::string& archive_temp_filename );
+            absl::string_view file, absl::string_view archive_temp_filename );
         ~ZipFile();
 
-        void archive_files( const std::vector< std::string >& files ) const;
+        void archive_files(
+            const std::vector< absl::string_view >& files ) const;
 
-        void archive_file( const std::string& file ) const;
+        void archive_file( absl::string_view file ) const;
 
-        std::string directory() const;
+        absl::string_view directory() const;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );
@@ -50,12 +51,12 @@ namespace geode
     {
     public:
         UnzipFile(
-            const std::string& file, std::string unarchive_temp_filename );
+            absl::string_view file, absl::string_view unarchive_temp_filename );
         ~UnzipFile();
 
         void extract_all() const;
 
-        std::string directory() const;
+        absl::string_view directory() const;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

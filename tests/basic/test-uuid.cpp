@@ -34,7 +34,6 @@ void test()
         const geode::uuid id;
         geode::Logger::info( id.string() );
         const geode::uuid id2;
-        geode::Logger::info( id2 );
         OPENGEODE_EXCEPTION( id2 != id, "[Test] UUIDs should be different" );
         OPENGEODE_EXCEPTION(
             id2 < id || id < id2, "[Test] UUIDs should be different" );

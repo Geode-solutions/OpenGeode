@@ -32,11 +32,11 @@ namespace geode
     public:
         Impl()
             : component_vertices_(
-                unique_vertices_.vertex_attribute_manager()
-                    .find_or_create_attribute< VariableAttribute,
-                        std::vector< MeshComponentVertex > >(
-                        "component vertices",
-                        std::vector< MeshComponentVertex >{} ) )
+                  unique_vertices_.vertex_attribute_manager()
+                      .find_or_create_attribute< VariableAttribute,
+                          std::vector< MeshComponentVertex > >(
+                          "component vertices",
+                          std::vector< MeshComponentVertex >{} ) )
         {
         }
 
@@ -90,7 +90,8 @@ namespace geode
                 }
                 catch( const std::out_of_range& )
                 {
-                    Logger::warn( "Registering MeshComponent: ", component.id(),
+                    Logger::warn(
+                        "Registering MeshComponent: ", component.id().string(),
                         " in VertexIdentifier, wrong number of vertices." );
                 }
                 it->second = std::move( attribute );
@@ -162,9 +163,9 @@ namespace geode
             }
         }
 
-        std::string save( const std::string& directory ) const
+        void save( absl::string_view directory ) const
         {
-            const auto filename = directory + "/vertices";
+            const auto filename = absl::StrCat( directory, "/vertices" );
             std::ofstream file{ filename, std::ofstream::binary };
             TContext context{};
             register_basic_serialize_pcontext( std::get< 0 >( context ) );
@@ -175,14 +176,13 @@ namespace geode
             archive.object( *this );
             archive.adapter().flush();
             OPENGEODE_EXCEPTION( std::get< 1 >( context ).isValid(),
-                "[VertexIdentifier::save] Error while writing file: "
-                    + filename );
-            return filename;
+                "[VertexIdentifier::save] Error while writing file: ",
+                filename );
         }
 
-        void load( const std::string& directory )
+        void load( absl::string_view directory )
         {
-            const auto filename = directory + "/vertices";
+            const auto filename = absl::StrCat( directory, "/vertices" );
             std::ifstream file{ filename, std::ifstream::binary };
             TContext context{};
             register_basic_deserialize_pcontext( std::get< 0 >( context ) );
@@ -196,8 +196,8 @@ namespace geode
                 adapter.error() == bitsery::ReaderError::NoError
                     && adapter.isCompletedSuccessfully()
                     && std::get< 1 >( context ).isValid(),
-                "[VertexIdentifier::load] Error while reading file: "
-                    + filename );
+                "[VertexIdentifier::load] Error while reading file: ",
+                filename );
         }
 
     private:
@@ -350,12 +350,12 @@ namespace geode
     }
 
     void VertexIdentifier::save_unique_vertices(
-        const std::string& directory ) const
+        absl::string_view directory ) const
     {
         impl_->save( directory );
     }
 
-    void VertexIdentifier::load_unique_vertices( const std::string& directory )
+    void VertexIdentifier::load_unique_vertices( absl::string_view directory )
     {
         return impl_->load( directory );
     }

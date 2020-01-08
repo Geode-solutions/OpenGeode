@@ -62,9 +62,9 @@ namespace geode
 
         Impl()
             : relation_type_(
-                graph_.edge_attribute_manager()
-                    .find_or_create_attribute< VariableAttribute,
-                        RelationType >( "relation_type", NO_ID ) ),
+                  graph_.edge_attribute_manager()
+                      .find_or_create_attribute< VariableAttribute,
+                          RelationType >( "relation_type", NO_ID ) ),
               ids_( graph_.vertex_attribute_manager()
                         .find_or_create_attribute< VariableAttribute,
                             ComponentID >( "id" ) )
@@ -168,9 +168,9 @@ namespace geode
             relation_type_->set_value( index, type );
         }
 
-        std::string save( const std::string& directory ) const
+        void save( absl::string_view directory ) const
         {
-            const auto filename = directory + "/relationships";
+            const auto filename = absl::StrCat( directory, "/relationships" );
             std::ofstream file{ filename, std::ofstream::binary };
             TContext context{};
             register_basic_serialize_pcontext( std::get< 0 >( context ) );
@@ -181,13 +181,12 @@ namespace geode
             archive.object( *this );
             archive.adapter().flush();
             OPENGEODE_EXCEPTION( std::get< 1 >( context ).isValid(),
-                "[Relationships::save] Error while writing file: " + filename );
-            return filename;
+                "[Relationships::save] Error while writing file: ", filename );
         }
 
-        void load( const std::string& directory )
+        void load( absl::string_view directory )
         {
-            const auto filename = directory + "/relationships";
+            const auto filename = absl::StrCat( directory, "/relationships" );
             std::ifstream file{ filename, std::ifstream::binary };
             TContext context{};
             register_basic_deserialize_pcontext( std::get< 0 >( context ) );
@@ -201,7 +200,7 @@ namespace geode
                 adapter.error() == bitsery::ReaderError::NoError
                     && adapter.isCompletedSuccessfully()
                     && std::get< 1 >( context ).isValid(),
-                "[Relationships::load] Error while reading file: " + filename );
+                "[Relationships::load] Error while reading file: ", filename );
         }
 
     private:
@@ -330,12 +329,12 @@ namespace geode
             item, collection, Relationships::Impl::ITEM_RELATION );
     }
 
-    void Relationships::save_relationships( const std::string& directory ) const
+    void Relationships::save_relationships( absl::string_view directory ) const
     {
         impl_->save( directory );
     }
 
-    void Relationships::load_relationships( const std::string& directory )
+    void Relationships::load_relationships( absl::string_view directory )
     {
         return impl_->load( directory );
     }
@@ -380,7 +379,7 @@ namespace geode
             while( this->operator!=( *this )
                    && ( !relationships_.is_boundary_relation(
                             this->current()->edge_id )
-                        || is_boundary_edge_vertex() ) )
+                          || is_boundary_edge_vertex() ) )
             {
                 this->operator++();
             }
@@ -393,8 +392,8 @@ namespace geode
     Relationships::BoundaryRangeIterator::BoundaryRangeIterator(
         const Relationships& relationships, const uuid& id )
         : impl_( *relationships.impl_,
-            relationships.impl_->begin_edge( id ),
-            relationships.impl_->end_edge( id ) )
+              relationships.impl_->begin_edge( id ),
+              relationships.impl_->end_edge( id ) )
     {
     }
 
@@ -468,7 +467,7 @@ namespace geode
             while( this->operator!=( *this )
                    && ( !relationships_.is_boundary_relation(
                             this->current()->edge_id )
-                        || is_incident_edge_vertex() ) )
+                          || is_incident_edge_vertex() ) )
             {
                 this->operator++();
             }
@@ -481,8 +480,8 @@ namespace geode
     Relationships::IncidenceRangeIterator::IncidenceRangeIterator(
         const Relationships& relationships, const uuid& id )
         : impl_( *relationships.impl_,
-            relationships.impl_->begin_edge( id ),
-            relationships.impl_->end_edge( id ) )
+              relationships.impl_->begin_edge( id ),
+              relationships.impl_->end_edge( id ) )
     {
     }
 
@@ -557,7 +556,7 @@ namespace geode
             while( this->operator!=( *this )
                    && ( !relationships_.is_internal_relation(
                             this->current()->edge_id )
-                        || is_internal_edge_vertex() ) )
+                          || is_internal_edge_vertex() ) )
             {
                 this->operator++();
             }
@@ -570,8 +569,8 @@ namespace geode
     Relationships::InternalRangeIterator::InternalRangeIterator(
         const Relationships& relationships, const uuid& id )
         : impl_( *relationships.impl_,
-            relationships.impl_->begin_edge( id ),
-            relationships.impl_->end_edge( id ) )
+              relationships.impl_->begin_edge( id ),
+              relationships.impl_->end_edge( id ) )
     {
     }
 
@@ -645,7 +644,7 @@ namespace geode
             while( this->operator!=( *this )
                    && ( !relationships_.is_internal_relation(
                             this->current()->edge_id )
-                        || is_embedding_edge_vertex() ) )
+                          || is_embedding_edge_vertex() ) )
             {
                 this->operator++();
             }
@@ -658,8 +657,8 @@ namespace geode
     Relationships::EmbeddingRangeIterator::EmbeddingRangeIterator(
         const Relationships& relationships, const uuid& id )
         : impl_( *relationships.impl_,
-            relationships.impl_->begin_edge( id ),
-            relationships.impl_->end_edge( id ) )
+              relationships.impl_->begin_edge( id ),
+              relationships.impl_->end_edge( id ) )
     {
     }
 
@@ -734,7 +733,7 @@ namespace geode
             while( this->operator!=( *this )
                    && ( !relationships_.is_item_relation(
                             this->current()->edge_id )
-                        || is_item_edge_vertex() ) )
+                          || is_item_edge_vertex() ) )
             {
                 this->operator++();
             }
@@ -747,8 +746,8 @@ namespace geode
     Relationships::ItemRangeIterator::ItemRangeIterator(
         const Relationships& relationships, const uuid& id )
         : impl_( *relationships.impl_,
-            relationships.impl_->begin_edge( id ),
-            relationships.impl_->end_edge( id ) )
+              relationships.impl_->begin_edge( id ),
+              relationships.impl_->end_edge( id ) )
     {
     }
 
@@ -822,7 +821,7 @@ namespace geode
             while( this->operator!=( *this )
                    && ( !relationships_.is_item_relation(
                             this->current()->edge_id )
-                        || is_collection_edge_vertex() ) )
+                          || is_collection_edge_vertex() ) )
             {
                 this->operator++();
             }
@@ -835,8 +834,8 @@ namespace geode
     Relationships::CollectionRangeIterator::CollectionRangeIterator(
         const Relationships& relationships, const uuid& id )
         : impl_( *relationships.impl_,
-            relationships.impl_->begin_edge( id ),
-            relationships.impl_->end_edge( id ) )
+              relationships.impl_->begin_edge( id ),
+              relationships.impl_->end_edge( id ) )
     {
     }
 

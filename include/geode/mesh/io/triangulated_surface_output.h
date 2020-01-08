@@ -44,7 +44,7 @@ namespace geode
     template < index_t dimension >
     void save_triangulated_surface(
         const TriangulatedSurface< dimension >& triangulated_surface,
-        const std::string& filename );
+        absl::string_view filename );
 
     template < index_t dimension >
     class TriangulatedSurfaceOutput : public PolygonalSurfaceOutput< dimension >
@@ -54,7 +54,7 @@ namespace geode
     protected:
         TriangulatedSurfaceOutput(
             const TriangulatedSurface< dimension >& triangulated_surface,
-            std::string filename );
+            absl::string_view filename );
 
         const TriangulatedSurface< dimension >& triangulated_surface() const
         {
@@ -69,6 +69,6 @@ namespace geode
     using TriangulatedSurfaceOutputFactory = Factory< std::string,
         TriangulatedSurfaceOutput< dimension >,
         const TriangulatedSurface< dimension >&,
-        std::string >;
+        absl::string_view >;
     ALIAS_2D_AND_3D( TriangulatedSurfaceOutputFactory );
 } // namespace geode

@@ -120,7 +120,7 @@ void test_delete_polyhedron( const geode::TetrahedralSolid3D& solid,
 }
 
 void test_io(
-    const geode::TetrahedralSolid3D& solid, const std::string& filename )
+    const geode::TetrahedralSolid3D& solid, absl::string_view filename )
 {
     save_tetrahedral_solid( solid, filename );
     auto new_solid = geode::TetrahedralSolid3D::create(
@@ -136,7 +136,7 @@ void test_io(
         "[Test] Reloaded TetrahedralSolid should have 3 polyhedra" );
 }
 
-void test_backward_io( const std::string& filename )
+void test_backward_io( absl::string_view filename )
 {
     auto new_solid = geode::TetrahedralSolid3D::create(
         geode::OpenGeodeTetrahedralSolid3D::type_name_static() );
@@ -198,9 +198,9 @@ void test()
     test_create_vertices( *solid, *builder );
     test_create_tetrahedra( *solid, *builder );
     test_polyhedron_adjacencies( *solid, *builder );
-    test_io( *solid, "test." + solid->native_extension() );
-    test_backward_io(
-        geode::test_path + "mesh/data/test_v1." + solid->native_extension() );
+    test_io( *solid, absl::StrCat( "test.", solid->native_extension() ) );
+    test_backward_io( absl::StrCat(
+        geode::test_path, "mesh/data/test_v1.", solid->native_extension() ) );
 
     test_delete_vertex( *solid, *builder );
     test_delete_polyhedron( *solid, *builder );

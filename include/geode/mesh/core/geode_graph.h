@@ -48,12 +48,13 @@ namespace geode
             return type_name_static();
         }
 
-        static std::string native_extension_static()
+        static absl::string_view native_extension_static()
         {
-            return "og_grp";
+            static const auto extension = "og_grp";
+            return extension;
         }
 
-        std::string native_extension() const override
+        absl::string_view native_extension() const override
         {
             return native_extension_static();
         }

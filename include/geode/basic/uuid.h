@@ -110,12 +110,6 @@ namespace geode
 
         std::string string() const;
 
-        template < typename ostream >
-        inline friend ostream &operator<<( ostream &os, const uuid &self )
-        {
-            return os << self.string(), os;
-        }
-
         uint64_t ab;
         uint64_t cd;
 

@@ -82,9 +82,9 @@ namespace geode
         void set_mesh( std::unique_ptr< PolygonalSurface< dimension > > mesh );
 
         friend class SurfacesBuilder< dimension >;
-        void set_surface_name( std::string name )
+        void set_surface_name( absl::string_view name )
         {
-            this->set_name( std::move( name ) );
+            this->set_name( name );
         }
 
         void ensure_mesh_type();

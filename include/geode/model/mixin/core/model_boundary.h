@@ -68,9 +68,9 @@ namespace geode
         ModelBoundary() = default;
 
         friend class ModelBoundariesBuilder< dimension >;
-        void set_model_boundary_name( std::string name )
+        void set_model_boundary_name( absl::string_view name )
         {
-            this->set_name( std::move( name ) );
+            this->set_name( name );
         }
 
         friend class bitsery::Access;

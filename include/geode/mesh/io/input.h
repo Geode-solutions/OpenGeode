@@ -34,6 +34,6 @@ namespace geode
         virtual void read() = 0;
 
     protected:
-        Input( std::string filename ) : IOFile( std::move( filename ) ) {}
+        Input( absl::string_view filename ) : IOFile( filename ) {}
     };
 } // namespace geode

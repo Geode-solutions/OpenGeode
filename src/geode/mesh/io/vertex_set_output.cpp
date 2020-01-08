@@ -28,12 +28,13 @@
 namespace geode
 {
     void save_vertex_set(
-        const VertexSet& vertex_set, const std::string& filename )
+        const VertexSet& vertex_set, absl::string_view filename )
     {
         try
         {
             const auto output = VertexSetOutputFactory::create(
-                extension_from_filename( filename ), vertex_set, filename );
+                extension_from_filename( filename ).data(), vertex_set,
+                filename );
             output->write();
         }
         catch( const OpenGeodeException& e )
@@ -45,8 +46,8 @@ namespace geode
     }
 
     VertexSetOutput::VertexSetOutput(
-        const VertexSet& vertex_set, std::string filename )
-        : Output( std::move( filename ) ), vertex_set_( vertex_set )
+        const VertexSet& vertex_set, absl::string_view filename )
+        : Output( filename ), vertex_set_( vertex_set )
     {
     }
 } // namespace geode

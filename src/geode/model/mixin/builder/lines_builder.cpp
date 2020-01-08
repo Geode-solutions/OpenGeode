@@ -50,7 +50,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    void LinesBuilder< dimension >::load_lines( const std::string& directory )
+    void LinesBuilder< dimension >::load_lines( absl::string_view directory )
     {
         return lines_.load_lines( directory );
     }
@@ -65,9 +65,9 @@ namespace geode
 
     template < index_t dimension >
     void LinesBuilder< dimension >::set_line_name(
-        const uuid& id, std::string name )
+        const uuid& id, absl::string_view name )
     {
-        lines_.modifiable_line( id ).set_line_name( std::move( name ) );
+        lines_.modifiable_line( id ).set_line_name( name );
     }
 
     template < index_t dimension >

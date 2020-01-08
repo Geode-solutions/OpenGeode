@@ -27,12 +27,12 @@
 
 namespace geode
 {
-    void save_brep( const BRep& brep, const std::string& filename )
+    void save_brep( const BRep& brep, absl::string_view filename )
     {
         try
         {
             const auto output = BRepOutputFactory::create(
-                extension_from_filename( filename ), brep, filename.c_str() );
+                extension_from_filename( filename ).data(), brep, filename );
             output->write();
         }
         catch( const OpenGeodeException& e )
@@ -42,8 +42,8 @@ namespace geode
         }
     }
 
-    BRepOutput::BRepOutput( const BRep& brep, std::string filename )
-        : Output( std::move( filename ) ), brep_( brep )
+    BRepOutput::BRepOutput( const BRep& brep, absl::string_view filename )
+        : Output( filename ), brep_( brep )
     {
     }
 } // namespace geode
