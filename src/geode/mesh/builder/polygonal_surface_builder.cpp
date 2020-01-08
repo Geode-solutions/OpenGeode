@@ -233,21 +233,25 @@ namespace geode
         const auto next_id = polygonal_surface_.polygon_vertex(
             polygonal_surface_.next_polygon_edge( polygon_vertex ) );
 
-        const auto polygon_around =
-            polygonal_surface_.polygon_around_vertex( polygon_vertex_id );
-        if( polygon_around == polygon_vertex )
+        if( polygon_vertex_id != NO_ID )
         {
-            const auto polygons_around =
-                polygonal_surface_.polygons_around_vertex( polygon_vertex_id );
-            if( polygons_around.size() < 2 )
+            const auto polygon_around =
+                polygonal_surface_.polygon_around_vertex( polygon_vertex_id );
+            if( polygon_around == polygon_vertex )
             {
-                associate_polygon_vertex_to_vertex(
-                    PolygonVertex{}, polygon_vertex_id );
-            }
-            else
-            {
-                associate_polygon_vertex_to_vertex(
-                    polygons_around[1], polygon_vertex_id );
+                const auto polygons_around =
+                    polygonal_surface_.polygons_around_vertex(
+                        polygon_vertex_id );
+                if( polygons_around.size() < 2 )
+                {
+                    associate_polygon_vertex_to_vertex(
+                        PolygonVertex{}, polygon_vertex_id );
+                }
+                else
+                {
+                    associate_polygon_vertex_to_vertex(
+                        polygons_around[1], polygon_vertex_id );
+                }
             }
         }
 
