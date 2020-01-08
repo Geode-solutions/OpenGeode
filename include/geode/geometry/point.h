@@ -140,7 +140,7 @@ namespace geode
             const auto *sep = "";
             for( const auto i : Range{ dimension } )
             {
-                absl::StrAppend( &result, value( i ), sep );
+                result += sep + std::to_string(value( i ));
                 sep = " ";
             }
             return result;

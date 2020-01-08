@@ -55,40 +55,55 @@ namespace geode
         template < typename... Args >
         static void trace( const Args &... args )
         {
-            log_trace( absl::StrCat( args... ) );
+            log_trace( string_concatener( args... ) );
         }
 
         template < typename... Args >
         static void debug( const Args &... args )
         {
-            log_debug( absl::StrCat( args... ) );
+            log_debug( string_concatener( args... ) );
         }
 
         template < typename... Args >
         static void info( const Args &... args )
         {
-            log_info( absl::StrCat( args... ) );
+            log_info( string_concatener( args... ) );
         }
 
         template < typename... Args >
         static void warn( const Args &... args )
         {
-            log_warn( absl::StrCat( args... ) );
+            log_warn( string_concatener( args... ) );
         }
 
         template < typename... Args >
         static void error( const Args &... args )
         {
-            log_error( absl::StrCat( args... ) );
+            log_error( string_concatener( args... ) );
         }
 
         template < typename... Args >
         static void critical( const Args &... args )
         {
-            log_critical( absl::StrCat( args... ) );
+            log_critical( string_concatener( args... ) );
         }
 
     private:
+        template < typename A0 >
+        static std::string string_concatener( const A0 &a0 )
+        {
+            std::ostringstream out;
+            out << a0;
+            return out.str();
+        }
+
+        template < typename A0, typename... Args >
+        static std::string string_concatener(
+            const A0 &a0, const Args &... args )
+        {
+            return string_concatener( a0 ) + string_concatener( args... );
+        }
+
         Logger();
         ~Logger();
 
@@ -107,4 +122,3 @@ namespace geode
 } // namespace geode
 
 #define DEBUG( a ) geode::Logger::debug( #a, " = ", a )
-#define SDEBUG( a ) geode::Logger::debug( #a, " = ", a.string() )

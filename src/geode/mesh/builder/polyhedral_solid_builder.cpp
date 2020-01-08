@@ -173,7 +173,7 @@ namespace geode
             return PolyhedralSolidBuilderFactory< dimension >::create(
                 mesh.type_name(), mesh );
         }
-        catch( const OpenGeodeException& e )
+        catch( const OpenGeodeException&  )
         {
             try
             {

@@ -702,7 +702,7 @@ namespace geode
         {
             return PolygonalSurfaceFactory< dimension >::create( type );
         }
-        catch( const OpenGeodeException& e )
+        catch( const OpenGeodeException&  )
         {
             try
             {
@@ -743,7 +743,7 @@ namespace geode
         {
             return PolygonalSurfaceFactory< 3 >::create( type );
         }
-        catch( const OpenGeodeException& e )
+        catch( const OpenGeodeException&  )
         {
             try
             {

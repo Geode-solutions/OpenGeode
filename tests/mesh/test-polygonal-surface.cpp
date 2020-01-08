@@ -324,7 +324,7 @@ void test_polygon_vertex_normal()
 }
 
 void test_io( const geode::PolygonalSurface3D& polygonal_surface,
-    absl::string_view filename )
+    const std::string& filename )
 {
     save_polygonal_surface( polygonal_surface, filename );
     auto new_polygonal_surface = geode::PolygonalSurface3D::create(
@@ -427,7 +427,7 @@ void test()
     test_polygon_vertex_normal();
 
     test_io( *polygonal_surface,
-        absl::StrCat( "test.", polygonal_surface->native_extension() ) );
+        std::string( "test." ) + polygonal_surface->native_extension().data() );
 
     test_delete_vertex( *polygonal_surface, *builder );
     test_delete_polygon( *polygonal_surface, *builder );

@@ -206,7 +206,7 @@ void test_delete_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
 }
 
 void test_io( const geode::PolyhedralSolid3D& polyhedral_solid,
-    absl::string_view filename )
+    const std::string& filename )
 {
     save_polyhedral_solid( polyhedral_solid, filename );
     auto new_polyhedral_solid = geode::PolyhedralSolid3D::create(
@@ -234,7 +234,7 @@ void test_io( const geode::PolyhedralSolid3D& polyhedral_solid,
     }
 }
 
-void test_backward_io( absl::string_view filename )
+void test_backward_io( const std::string& filename )
 {
     auto new_polyhedral_solid = geode::PolyhedralSolid3D::create(
         geode::OpenGeodePolyhedralSolid3D::type_name_static() );
@@ -370,9 +370,9 @@ void test()
     test_create_edge_attribute( *polyhedral_solid );
     test_polyhedron_adjacencies( *polyhedral_solid, *builder );
     test_io( *polyhedral_solid,
-        absl::StrCat( "test.", polyhedral_solid->native_extension() ) );
-    test_backward_io( absl::StrCat( geode::test_path, "mesh/data/test_v1.",
-        polyhedral_solid->native_extension() ) );
+        std::string( "test." ) + polyhedral_solid->native_extension().data() );
+    test_backward_io( geode::test_path + std::string("mesh/data/test_v1.")
+                      + polyhedral_solid->native_extension().data() );
 
     test_delete_vertex( *polyhedral_solid, *builder );
     test_delete_polyhedra( *polyhedral_solid, *builder );

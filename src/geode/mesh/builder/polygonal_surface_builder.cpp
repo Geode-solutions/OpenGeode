@@ -154,7 +154,7 @@ namespace geode
             return PolygonalSurfaceBuilderFactory< dimension >::create(
                 mesh.type_name(), mesh );
         }
-        catch( const OpenGeodeException& e )
+        catch( const OpenGeodeException& )
         {
             try
             {
