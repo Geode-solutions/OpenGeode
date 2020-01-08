@@ -76,13 +76,12 @@ namespace geode
     {
         const auto prefix =
             static_cast< std::string >( directory ) + "/"
-            +
-            Corner< dimension >::component_type_static().get() ;
+            + Corner< dimension >::component_type_static().get();
         for( const auto& corner : corners() )
         {
             const auto& mesh = corner.mesh();
-            auto file = 
-                prefix+ corner.id().string()+ "."+ mesh.native_extension().data() ;
+            auto file = prefix + corner.id().string() + "."
+                        + mesh.native_extension().data();
             save_point_set( mesh, file );
         }
         impl_->save_components(
@@ -96,14 +95,13 @@ namespace geode
             static_cast< std::string >( directory ) + "/corners" );
         const auto prefix =
             static_cast< std::string >( directory ) + "/"
-            +
-            Corner< dimension >::component_type_static().get() ;
+            + Corner< dimension >::component_type_static().get();
         for( auto& corner : modifiable_corners() )
         {
             corner.ensure_mesh_type();
             auto& mesh = corner.modifiable_mesh();
-            auto file = 
-                prefix+ corner.id().string()+ "."+ mesh.native_extension().data() ;
+            auto file = prefix + corner.id().string() + "."
+                        + mesh.native_extension().data();
             load_point_set( mesh, file );
         }
     }

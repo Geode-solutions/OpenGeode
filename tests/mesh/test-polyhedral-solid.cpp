@@ -371,7 +371,7 @@ void test()
     test_polyhedron_adjacencies( *polyhedral_solid, *builder );
     test_io( *polyhedral_solid,
         std::string( "test." ) + polyhedral_solid->native_extension().data() );
-    test_backward_io( geode::test_path + std::string("mesh/data/test_v1.")
+    test_backward_io( geode::test_path + std::string( "mesh/data/test_v1." )
                       + polyhedral_solid->native_extension().data() );
 
     test_delete_vertex( *polyhedral_solid, *builder );

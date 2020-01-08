@@ -171,7 +171,8 @@ void test()
 
     test_create_vertices( *graph, *builder );
     test_create_edges( *graph, *builder );
-    test_io( *graph, std::string( "test." ) + graph->native_extension().data() );
+    test_io(
+        *graph, std::string( "test." ) + graph->native_extension().data() );
 
     test_delete_vertex( *graph, *builder );
     test_delete_edge( *graph, *builder );
