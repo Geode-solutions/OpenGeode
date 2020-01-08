@@ -59,6 +59,13 @@ namespace geode
          */
         index_t create_triangle( const std::array< index_t, 3 >& vertices );
 
+        /*!
+         * Create new triangles.
+         * @param[in] nb Number of triangles to create
+         * @return the index of the first created triangle
+         */
+        index_t create_triangles( index_t nb );
+
     protected:
         TriangulatedSurfaceBuilder(
             TriangulatedSurface< dimension >& triangulated_surface )
@@ -76,6 +83,8 @@ namespace geode
 
         virtual void do_create_triangle(
             const std::array< index_t, 3 >& vertices ) = 0;
+
+        virtual void do_create_triangles( index_t nb ) = 0;
 
     private:
         TriangulatedSurface< dimension >& triangulated_surface_;
