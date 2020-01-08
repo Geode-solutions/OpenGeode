@@ -53,7 +53,7 @@ namespace geode
 
     template < index_t dimension >
     void CornersBuilder< dimension >::load_corners(
-        const std::string& directory )
+        absl::string_view directory )
     {
         return corners_.load_corners( directory );
     }
@@ -68,9 +68,9 @@ namespace geode
 
     template < index_t dimension >
     void CornersBuilder< dimension >::set_corner_name(
-        const uuid& id, std::string name )
+        const uuid& id, absl::string_view name )
     {
-        corners_.modifiable_corner( id ).set_corner_name( std::move( name ) );
+        corners_.modifiable_corner( id ).set_corner_name( name );
     }
 
     template < index_t dimension >

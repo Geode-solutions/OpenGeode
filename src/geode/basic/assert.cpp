@@ -29,9 +29,9 @@
 
 namespace geode
 {
-    void geode_assertion_failed( const std::string &condition,
-        const std::string &message,
-        const std::string &file,
+    void geode_assertion_failed( absl::string_view condition,
+        absl::string_view message,
+        absl::string_view file,
         int line )
     {
         Logger::error( "File: ", file );

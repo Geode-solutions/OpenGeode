@@ -40,7 +40,7 @@ namespace geode
     {
     public:
         std::shared_ptr< AttributeBase > find_attribute_base(
-            const std::string &name )
+            absl::string_view name )
         {
             const auto it = attributes_.find( name );
             if( it == attributes_.end() )
@@ -51,10 +51,10 @@ namespace geode
         }
 
         void register_attribute( std::shared_ptr< AttributeBase > &attribute,
-            const std::string &name )
+            absl::string_view name )
         {
             attribute->resize( nb_elements_ );
-            attributes_[name] = attribute;
+            attributes_.emplace( name, attribute );
         }
 
         void resize( index_t size )
@@ -70,9 +70,9 @@ namespace geode
             }
         }
 
-        absl::FixedArray< std::string > attribute_names() const
+        absl::FixedArray< absl::string_view > attribute_names() const
         {
-            absl::FixedArray< std::string > names( attributes_.size() );
+            absl::FixedArray< absl::string_view > names( attributes_.size() );
             index_t count{ 0 };
             for( const auto &it : attributes_ )
             {
@@ -81,12 +81,12 @@ namespace geode
             return names;
         }
 
-        bool attribute_exists( const std::string &name ) const
+        bool attribute_exists( absl::string_view name ) const
         {
             return attributes_.find( name ) != attributes_.end();
         }
 
-        void delete_attribute( const std::string &name )
+        void delete_attribute( absl::string_view name )
         {
             const auto it = attributes_.find( name );
             if( it != attributes_.end() )
@@ -95,12 +95,13 @@ namespace geode
             }
         }
 
-        std::string attribute_type( const std::string &name ) const
+        absl::string_view attribute_type( absl::string_view name ) const
         {
             const auto it = attributes_.find( name );
             if( it == attributes_.end() )
             {
-                return "undefined";
+                static constexpr auto undefined = "undefined";
+                return undefined;
             }
             return it->second->type();
         }
@@ -188,13 +189,13 @@ namespace geode
     AttributeManager::~AttributeManager() {} // NOLINT
 
     std::shared_ptr< AttributeBase > AttributeManager::find_attribute_base(
-        const std::string &name )
+        absl::string_view name )
     {
         return impl_->find_attribute_base( name );
     }
 
     void AttributeManager::register_attribute(
-        std::shared_ptr< AttributeBase > attribute, const std::string &name )
+        std::shared_ptr< AttributeBase > attribute, absl::string_view name )
     {
         return impl_->register_attribute( attribute, name );
     }
@@ -204,23 +205,24 @@ namespace geode
         impl_->resize( size );
     }
 
-    absl::FixedArray< std::string > AttributeManager::attribute_names() const
+    absl::FixedArray< absl::string_view >
+        AttributeManager::attribute_names() const
     {
         return impl_->attribute_names();
     }
 
-    bool AttributeManager::attribute_exists( const std::string &name ) const
+    bool AttributeManager::attribute_exists( absl::string_view name ) const
     {
         return impl_->attribute_exists( name );
     }
 
-    void AttributeManager::delete_attribute( const std::string &name )
+    void AttributeManager::delete_attribute( absl::string_view name )
     {
         impl_->delete_attribute( name );
     }
 
-    std::string AttributeManager::attribute_type(
-        const std::string &name ) const
+    absl::string_view AttributeManager::attribute_type(
+        absl::string_view name ) const
     {
         return impl_->attribute_type( name );
     }

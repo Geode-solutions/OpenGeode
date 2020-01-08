@@ -99,7 +99,7 @@ namespace geode
         /*!
          * Save each Corner in a file located in the specified directory
          */
-        void save_corners( const std::string& directory ) const;
+        void save_corners( absl::string_view directory ) const;
 
     protected:
         Corners();
@@ -121,7 +121,7 @@ namespace geode
 
         void delete_corner( const Corner< dimension >& corner );
 
-        void load_corners( const std::string& directory );
+        void load_corners( absl::string_view directory );
 
         ModifiableCornerRange modifiable_corners();
 

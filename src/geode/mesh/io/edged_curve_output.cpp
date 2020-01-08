@@ -28,13 +28,14 @@
 namespace geode
 {
     template < index_t dimension >
-    void save_edged_curve( const EdgedCurve< dimension >& edged_curve,
-        const std::string& filename )
+    void save_edged_curve(
+        const EdgedCurve< dimension >& edged_curve, absl::string_view filename )
     {
         try
         {
             const auto output = EdgedCurveOutputFactory< dimension >::create(
-                extension_from_filename( filename ), edged_curve, filename );
+                extension_from_filename( filename ).data(), edged_curve,
+                filename );
             output->write();
         }
         catch( const OpenGeodeException& e )
@@ -47,16 +48,15 @@ namespace geode
 
     template < index_t dimension >
     EdgedCurveOutput< dimension >::EdgedCurveOutput(
-        const EdgedCurve< dimension >& edged_curve, std::string filename )
-        : GraphOutput( edged_curve, std::move( filename ) ),
-          edged_curve_( edged_curve )
+        const EdgedCurve< dimension >& edged_curve, absl::string_view filename )
+        : GraphOutput( edged_curve, filename ), edged_curve_( edged_curve )
     {
     }
 
     template void opengeode_mesh_api save_edged_curve(
-        const EdgedCurve< 2 >&, const std::string& );
+        const EdgedCurve< 2 >&, absl::string_view );
     template void opengeode_mesh_api save_edged_curve(
-        const EdgedCurve< 3 >&, const std::string& );
+        const EdgedCurve< 3 >&, absl::string_view );
 
     template class opengeode_mesh_api EdgedCurveOutput< 2 >;
     template class opengeode_mesh_api EdgedCurveOutput< 3 >;

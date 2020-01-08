@@ -41,12 +41,12 @@
 #define BITSERY_INPUT_MESH_REGISTER_2D( Mesh )                                 \
     geode::Mesh##InputFactory2D::register_creator<                             \
         geode::OpenGeode##Mesh##Input2D >(                                     \
-        geode::OpenGeode##Mesh##2D ::native_extension_static() )
+        geode::OpenGeode##Mesh##2D ::native_extension_static().data() )
 
 #define BITSERY_INPUT_MESH_REGISTER_3D( Mesh )                                 \
     geode::Mesh##InputFactory3D::register_creator<                             \
         geode::OpenGeode##Mesh##Input3D >(                                     \
-        geode::OpenGeode##Mesh##3D ::native_extension_static() )
+        geode::OpenGeode##Mesh##3D ::native_extension_static().data() )
 
 #define BITSERY_INPUT_MESH_REGISTER_2D_3D( Mesh )                              \
     BITSERY_INPUT_MESH_REGISTER_2D( Mesh );                                    \
@@ -57,7 +57,7 @@ namespace geode
     void register_geode_mesh_input()
     {
         GraphInputFactory::register_creator< OpenGeodeGraphInput >(
-            OpenGeodeGraph::native_extension_static() );
+            OpenGeodeGraph::native_extension_static().data() );
 
         BITSERY_INPUT_MESH_REGISTER_2D_3D( PointSet );
         BITSERY_INPUT_MESH_REGISTER_2D_3D( EdgedCurve );

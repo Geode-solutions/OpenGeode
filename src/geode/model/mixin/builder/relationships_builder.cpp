@@ -58,8 +58,7 @@ namespace geode
         relationships_.add_item_in_collection( item, collection );
     }
 
-    void RelationshipsBuilder::load_relationships(
-        const std::string& directory )
+    void RelationshipsBuilder::load_relationships( absl::string_view directory )
     {
         relationships_.load_relationships( directory );
     }

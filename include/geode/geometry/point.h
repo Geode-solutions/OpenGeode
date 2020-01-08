@@ -134,6 +134,18 @@ namespace geode
             return square_length < epsilon * epsilon;
         }
 
+        std::string string() const
+        {
+            std::string result;
+            const auto *sep = "";
+            for( const auto i : Range{ dimension } )
+            {
+                absl::StrAppend( &result, value( i ), sep );
+                sep = " ";
+            }
+            return result;
+        }
+
     private:
         friend class bitsery::Access;
         template < typename Archive >
@@ -149,17 +161,4 @@ namespace geode
         std::array< double, dimension > values_;
     };
     ALIAS_2D_AND_3D( Point );
-
-    template < index_t dimension >
-    std::ostream &operator<<(
-        std::ostream &out, const Point< dimension > &point )
-    {
-        const char *sep = "";
-        for( const auto i : Range{ dimension } )
-        {
-            out << sep << point.value( i );
-            sep = " ";
-        }
-        return out;
-    }
 } // namespace geode

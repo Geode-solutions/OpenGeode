@@ -32,7 +32,7 @@
 #define BITSERY_WRITE()                                                        \
     void write() const final                                                   \
     {                                                                          \
-        std::ofstream file{ this->filename(), std::ofstream::binary };         \
+        std::ofstream file{ this->filename().data(), std::ofstream::binary };  \
         TContext context{};                                                    \
         register_basic_serialize_pcontext( std::get< 0 >( context ) );         \
         register_geometry_serialize_pcontext( std::get< 0 >( context ) );      \
@@ -41,8 +41,7 @@
         archive.object( mesh_ );                                               \
         archive.adapter().flush();                                             \
         OPENGEODE_EXCEPTION( std::get< 1 >( context ).isValid(),               \
-            "[Bitsery::write] Error while writing file: "                      \
-                + this->filename() );                                          \
+            "[Bitsery::write] Error while writing file: ", this->filename() ); \
     }
 
 #define BITSERY_OUTPUT_MESH_DIMENSION( Mesh )                                  \
@@ -51,8 +50,8 @@
     {                                                                          \
     public:                                                                    \
         OpenGeode##Mesh##Output(                                               \
-            const Mesh< dimension >& mesh, std::string filename )              \
-            : Mesh##Output< dimension >( mesh, std::move( filename ) ),        \
+            const Mesh< dimension >& mesh, absl::string_view filename )        \
+            : Mesh##Output< dimension >( mesh, filename ),                     \
               mesh_( dynamic_cast< const OpenGeode##Mesh< dimension >& >(      \
                   mesh ) )                                                     \
         {                                                                      \
@@ -69,8 +68,9 @@
     class OpenGeode##Mesh##Output : public Mesh##Output                        \
     {                                                                          \
     public:                                                                    \
-        OpenGeode##Mesh##Output( const Mesh& mesh, std::string filename )      \
-            : Mesh##Output( mesh, std::move( filename ) ),                     \
+        OpenGeode##Mesh##Output(                                               \
+            const Mesh& mesh, absl::string_view filename )                     \
+            : Mesh##Output( mesh, filename ),                                  \
               mesh_( dynamic_cast< const OpenGeode##Mesh& >( mesh ) )          \
         {                                                                      \
         }                                                                      \

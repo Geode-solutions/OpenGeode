@@ -43,7 +43,7 @@ namespace geode
      */
     template < index_t dimension >
     void load_edged_curve(
-        EdgedCurve< dimension >& edged_curve, const std::string& filename );
+        EdgedCurve< dimension >& edged_curve, absl::string_view filename );
 
     template < index_t dimension >
     class EdgedCurveInput : public GraphInput
@@ -52,7 +52,7 @@ namespace geode
 
     protected:
         EdgedCurveInput(
-            EdgedCurve< dimension >& edged_curve, std::string filename );
+            EdgedCurve< dimension >& edged_curve, absl::string_view filename );
 
         EdgedCurve< dimension >& edged_curve()
         {
@@ -67,6 +67,6 @@ namespace geode
     using EdgedCurveInputFactory = Factory< std::string,
         EdgedCurveInput< dimension >,
         EdgedCurve< dimension >&,
-        std::string >;
+        absl::string_view >;
     ALIAS_2D_AND_3D( EdgedCurveInputFactory );
 } // namespace geode

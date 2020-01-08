@@ -30,14 +30,14 @@ namespace geode
     template < index_t dimension >
     void save_triangulated_surface(
         const TriangulatedSurface< dimension >& triangulated_surface,
-        const std::string& filename )
+        absl::string_view filename )
     {
         try
         {
             const auto output =
                 TriangulatedSurfaceOutputFactory< dimension >::create(
-                    extension_from_filename( filename ), triangulated_surface,
-                    filename );
+                    extension_from_filename( filename ).data(),
+                    triangulated_surface, filename );
             output->write();
         }
         catch( const OpenGeodeException& e )
@@ -52,17 +52,16 @@ namespace geode
     template < index_t dimension >
     TriangulatedSurfaceOutput< dimension >::TriangulatedSurfaceOutput(
         const TriangulatedSurface< dimension >& triangulated_surface,
-        std::string filename )
-        : PolygonalSurfaceOutput< dimension >(
-            triangulated_surface, std::move( filename ) ),
+        absl::string_view filename )
+        : PolygonalSurfaceOutput< dimension >( triangulated_surface, filename ),
           triangulated_surface_( triangulated_surface )
     {
     }
 
     template void opengeode_mesh_api save_triangulated_surface(
-        const TriangulatedSurface< 2 >&, const std::string& );
+        const TriangulatedSurface< 2 >&, absl::string_view );
     template void opengeode_mesh_api save_triangulated_surface(
-        const TriangulatedSurface< 3 >&, const std::string& );
+        const TriangulatedSurface< 3 >&, absl::string_view );
 
     template class opengeode_mesh_api TriangulatedSurfaceOutput< 2 >;
     template class opengeode_mesh_api TriangulatedSurfaceOutput< 3 >;

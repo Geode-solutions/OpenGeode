@@ -75,7 +75,7 @@ namespace geode
          */
         void add_item_in_collection( const uuid& item, const uuid& collection );
 
-        void load_relationships( const std::string& directory );
+        void load_relationships( absl::string_view directory );
 
     private:
         Relationships& relationships_;

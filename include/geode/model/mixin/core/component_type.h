@@ -70,11 +70,9 @@ namespace geode
             return type_.get() == other.type_.get() && id_ == other.id_;
         }
 
-        friend std::ostream& operator<<(
-            std::ostream& os, const ComponentID& in )
+        std::string string() const
         {
-            os << in.type_.get() << " " << in.id_;
-            return os;
+            return absl::StrCat( type_.get(), " ", id_.string() );
         }
 
     private:

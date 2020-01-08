@@ -189,15 +189,15 @@ bool managers_have_same_attributes( const geode::AttributeManager& manager,
 template < typename T >
 void check_one_attribute_values( geode::AttributeManager& manager,
     geode::AttributeManager& reloaded_manager,
-    const std::string& name )
+    absl::string_view name )
 {
     const auto in_att = manager.find_attribute< T >( name );
     const auto out_att = reloaded_manager.find_attribute< T >( name );
     for( auto i : geode::Range{ manager.nb_elements() } )
     {
         OPENGEODE_EXCEPTION( in_att->value( i ) == out_att->value( i ),
-            "[Test] At least one value of Attribute " + name
-                + " is not correct after reloading" );
+            "[Test] At least one value of Attribute ", name,
+            " is not correct after reloading" );
     }
 }
 
@@ -215,7 +215,7 @@ void check_attribute_values( geode::AttributeManager& manager,
 
 void test_serialize_manager( geode::AttributeManager& manager )
 {
-    const std::string filename = "manager.out";
+    const auto filename = "manager.out";
     std::ofstream file{ filename, std::ofstream::binary };
     geode::TContext context{};
     geode::register_basic_serialize_pcontext( std::get< 0 >( context ) );
@@ -225,7 +225,7 @@ void test_serialize_manager( geode::AttributeManager& manager )
     archive.object( manager );
     archive.adapter().flush();
     OPENGEODE_EXCEPTION( std::get< 1 >( context ).isValid(),
-        "[Test] Error while writing file: " + filename );
+        "[Test] Error while writing file: ", filename );
 
     std::ifstream infile{ filename, std::ifstream::binary };
     geode::AttributeManager reloaded_manager;
@@ -240,7 +240,7 @@ void test_serialize_manager( geode::AttributeManager& manager )
     OPENGEODE_EXCEPTION( adapter.error() == bitsery::ReaderError::NoError
                              && adapter.isCompletedSuccessfully()
                              && std::get< 1 >( context ).isValid(),
-        "[Test] Error while reading file: " + filename );
+        "[Test] Error while reading file: ", filename );
 
     OPENGEODE_EXCEPTION(
         reloaded_manager.nb_elements() == manager.nb_elements(),
@@ -249,8 +249,7 @@ void test_serialize_manager( geode::AttributeManager& manager )
     OPENGEODE_EXCEPTION(
         managers_have_same_attributes( manager, reloaded_manager ),
         "[Test] Number and names of attributes in reloaded AttributeManager "
-        "are not "
-        "correct" );
+        "are not correct" );
     check_attribute_values( manager, reloaded_manager );
 }
 
@@ -268,8 +267,7 @@ void test_number_of_attributes(
     geode::AttributeManager& manager, geode::index_t nb )
 {
     OPENGEODE_EXCEPTION( manager.attribute_names().size() == nb,
-        "[Test] Should have " + std::to_string( nb )
-            + " attributes in the manager" );
+        "[Test] Should have ", nb, " attributes in the manager" );
 }
 
 void test_delete_attribute_elements( geode::AttributeManager& manager )

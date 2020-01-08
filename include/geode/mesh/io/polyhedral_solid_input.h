@@ -43,7 +43,7 @@ namespace geode
      */
     template < index_t dimension >
     void load_polyhedral_solid( PolyhedralSolid< dimension >& polyhedral_solid,
-        const std::string& filename );
+        absl::string_view filename );
 
     template < index_t dimension >
     class PolyhedralSolidInput : public VertexSetInput
@@ -53,7 +53,7 @@ namespace geode
 
     protected:
         PolyhedralSolidInput( PolyhedralSolid< dimension >& polyhedral_solid,
-            std::string filename );
+            absl::string_view filename );
 
         PolyhedralSolid< dimension >& polyhedral_solid()
         {
@@ -68,6 +68,6 @@ namespace geode
     using PolyhedralSolidInputFactory = Factory< std::string,
         PolyhedralSolidInput< dimension >,
         PolyhedralSolid< dimension >&,
-        std::string >;
+        absl::string_view >;
     ALIAS_3D( PolyhedralSolidInputFactory );
 } // namespace geode

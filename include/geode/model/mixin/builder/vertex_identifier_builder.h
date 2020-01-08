@@ -80,7 +80,7 @@ namespace geode
          * @param[in] directory Folder containing the file that stores
          * VertexIdentifier information.
          */
-        void load_unique_vertices( const std::string& directory );
+        void load_unique_vertices( absl::string_view directory );
 
     private:
         VertexIdentifier& vertex_identifier_;

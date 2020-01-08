@@ -274,7 +274,7 @@ namespace geode
 
         CollectionRange collections( const uuid& id ) const;
 
-        void save_relationships( const std::string& directory ) const;
+        void save_relationships( absl::string_view directory ) const;
 
     private:
         /*!
@@ -316,7 +316,7 @@ namespace geode
          */
         void add_item_in_collection( const uuid& item, const uuid& collection );
 
-        void load_relationships( const std::string& directory );
+        void load_relationships( absl::string_view directory );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

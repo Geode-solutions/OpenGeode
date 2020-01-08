@@ -27,6 +27,8 @@
 #include <stdexcept>
 #include <string>
 
+#include <absl/strings/str_cat.h>
+
 #include <geode/basic/opengeode_basic_export.h>
 
 namespace geode
@@ -49,32 +51,16 @@ namespace geode
     public:
         template < typename... Args >
         explicit OpenGeodeException( const Args &... message )
-            : std::runtime_error{ string_concatener( message... ) }
+            : std::runtime_error{ absl::StrCat( message... ) }
         {
         }
         virtual ~OpenGeodeException() noexcept {}
-
-    private:
-        template < typename A0 >
-        std::string string_concatener( const A0 &a0 )
-        {
-            std::ostringstream out;
-            out << a0;
-            return out.str();
-        }
-
-        template < typename A0, typename A1, typename... Args >
-        std::string string_concatener(
-            const A0 &a0, const A1 &a1, const Args &... args )
-        {
-            return string_concatener( a0 ) + string_concatener( a1, args... );
-        }
     };
 
     void opengeode_basic_api geode_assertion_failed(
-        const std::string &condition,
-        const std::string &message,
-        const std::string &file,
+        absl::string_view condition,
+        absl::string_view message,
+        absl::string_view file,
         int line );
 
     /*!
@@ -96,9 +82,9 @@ namespace geode
 #define OPENGEODE_ASSERT_NOT_REACHED( message )
 #endif
 
-#define OPENGEODE_EXCEPTION( condition, message )                              \
+#define OPENGEODE_EXCEPTION( condition, ... )                                  \
     if( !( condition ) )                                                       \
         throw geode::OpenGeodeException                                        \
         {                                                                      \
-            message                                                            \
+            __VA_ARGS__                                                        \
         }

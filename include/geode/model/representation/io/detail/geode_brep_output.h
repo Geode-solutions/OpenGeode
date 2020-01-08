@@ -36,26 +36,26 @@ namespace geode
     class opengeode_model_api OpenGeodeBRepOutput final : public BRepOutput
     {
     public:
-        OpenGeodeBRepOutput( const BRep& brep, std::string filename )
-            : BRepOutput( brep, std::move( filename ) )
+        OpenGeodeBRepOutput( const BRep& brep, absl::string_view filename )
+            : BRepOutput( brep, filename )
         {
         }
 
-        static std::string extension()
+        static absl::string_view extension()
         {
             return BRep::native_extension_static();
         }
 
         void archive_brep_files( const ZipFile& zip_writer ) const
         {
-            for( const auto& file :
-                ghc::filesystem::directory_iterator( zip_writer.directory() ) )
+            for( const auto& file : ghc::filesystem::directory_iterator(
+                     zip_writer.directory().data() ) )
             {
-                zip_writer.archive_file( file.path() );
+                zip_writer.archive_file( file.path().native() );
             }
         }
 
-        void save_brep_files( const std::string& directory ) const
+        void save_brep_files( absl::string_view directory ) const
         {
             brep().save_relationships( directory );
             brep().save_unique_vertices( directory );

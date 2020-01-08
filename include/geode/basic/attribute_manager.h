@@ -57,7 +57,7 @@ namespace geode
          */
         template < typename T >
         std::shared_ptr< ReadOnlyAttribute< T > > find_attribute(
-            const std::string& name )
+            absl::string_view name )
         {
             auto attribute =
                 std::dynamic_pointer_cast< ReadOnlyAttribute< T > >(
@@ -87,7 +87,7 @@ namespace geode
             typename T,
             typename... Args >
         std::shared_ptr< Attribute< T > > find_or_create_attribute(
-            const std::string& name, const Args&... args )
+            absl::string_view name, const Args&... args )
         {
             auto attribute = find_attribute_base( name );
             auto typed_attribute =
@@ -115,26 +115,26 @@ namespace geode
         /*!
          * Get all the associated attribute names
          */
-        absl::FixedArray< std::string > attribute_names() const;
+        absl::FixedArray< absl::string_view > attribute_names() const;
 
         /*!
          * Return true if an attribute matching the given name.
          * @param[in] name The attribute name to use
          */
-        bool attribute_exists( const std::string& name ) const;
+        bool attribute_exists( absl::string_view name ) const;
 
         /*!
          * Delete the attribute matching the given name.
          * Do nothing if the name does not exist.
          * @param[in] name The attribute name to delete
          */
-        void delete_attribute( const std::string& name );
+        void delete_attribute( absl::string_view name );
 
         /*!
          * Get the typeid name of the attribute type
          * @param[in] name The attribute name to use
          */
-        std::string attribute_type( const std::string& name ) const;
+        absl::string_view attribute_type( absl::string_view name ) const;
 
         /*!
          * Remove all the attributes in the manager
@@ -197,7 +197,7 @@ namespace geode
          * the shared pointer is empty.
          */
         std::shared_ptr< AttributeBase > find_attribute_base(
-            const std::string& name );
+            absl::string_view name );
 
         /*!
          * Register an Attribute to the given name.
@@ -207,7 +207,7 @@ namespace geode
          * @param[in] name The associated name to the store
          */
         void register_attribute( std::shared_ptr< AttributeBase > attribute,
-            const std::string& name );
+            absl::string_view name );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

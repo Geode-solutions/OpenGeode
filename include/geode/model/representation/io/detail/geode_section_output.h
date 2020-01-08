@@ -37,17 +37,18 @@ namespace geode
         : public SectionOutput
     {
     public:
-        OpenGeodeSectionOutput( const Section& section, std::string filename )
-            : SectionOutput( section, std::move( filename ) )
+        OpenGeodeSectionOutput(
+            const Section& section, absl::string_view filename )
+            : SectionOutput( section, filename )
         {
         }
 
-        static std::string extension()
+        static absl::string_view extension()
         {
             return Section::native_extension_static();
         }
 
-        void save_section_files( const std::string& directory ) const
+        void save_section_files( absl::string_view directory ) const
         {
             section().save_relationships( directory );
             section().save_unique_vertices( directory );
@@ -58,17 +59,17 @@ namespace geode
 
         void archive_section_files( const ZipFile& zip_writer ) const
         {
-            for( const auto& file :
-                ghc::filesystem::directory_iterator( zip_writer.directory() ) )
+            for( const auto& file : ghc::filesystem::directory_iterator(
+                     zip_writer.directory().data() ) )
             {
-                zip_writer.archive_file( file.path() );
+                zip_writer.archive_file( file.path().native() );
             }
         }
 
         void write() const final
         {
             const ZipFile zip_writer{ filename(), uuid{}.string() };
-            save_section_files( zip_writer.directory() );
+            save_section_files( zip_writer.directory().data() );
             archive_section_files( zip_writer );
         }
     };

@@ -41,14 +41,15 @@ namespace geode
         class FacetStorage
         {
             using TypedVertexCycle = VertexCycle< VertexContainer >;
+            static constexpr auto ATTRIBUTE_NAME = "facet_vertices";
 
         protected:
             friend class bitsery::Access;
             FacetStorage()
                 : counter_(
-                    facet_attribute_manager_
-                        .template find_or_create_attribute< VariableAttribute,
-                            index_t >( "counter", 1 ) ),
+                      facet_attribute_manager_
+                          .template find_or_create_attribute< VariableAttribute,
+                              index_t >( "counter", 1 ) ),
                   vertices_(
                       facet_attribute_manager_
                           .template find_or_create_attribute< VariableAttribute,
@@ -160,9 +161,9 @@ namespace geode
             }
 
         protected:
-            static std::string attribute_name()
+            static constexpr absl::string_view attribute_name()
             {
-                return "facet_vertices";
+                return ATTRIBUTE_NAME;
             }
 
             void update_attribute()

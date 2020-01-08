@@ -84,7 +84,7 @@ namespace geode
 
         LineRange lines() const;
 
-        void save_lines( const std::string& directory ) const;
+        void save_lines( absl::string_view directory ) const;
 
     protected:
         Lines();
@@ -106,7 +106,7 @@ namespace geode
 
         void delete_line( const Line< dimension >& line );
 
-        void load_lines( const std::string& directory );
+        void load_lines( absl::string_view directory );
 
         ModifiableLineRange modifiable_lines();
 

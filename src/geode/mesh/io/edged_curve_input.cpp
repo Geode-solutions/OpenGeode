@@ -29,12 +29,13 @@ namespace geode
 {
     template < index_t dimension >
     void load_edged_curve(
-        EdgedCurve< dimension >& edged_curve, const std::string& filename )
+        EdgedCurve< dimension >& edged_curve, absl::string_view filename )
     {
         try
         {
             auto input = EdgedCurveInputFactory< dimension >::create(
-                extension_from_filename( filename ), edged_curve, filename );
+                extension_from_filename( filename ).data(), edged_curve,
+                filename );
             input->read();
         }
         catch( const OpenGeodeException& e )
@@ -47,16 +48,15 @@ namespace geode
 
     template < index_t dimension >
     EdgedCurveInput< dimension >::EdgedCurveInput(
-        EdgedCurve< dimension >& edged_curve, std::string filename )
-        : GraphInput( edged_curve, std::move( filename ) ),
-          edged_curve_( edged_curve )
+        EdgedCurve< dimension >& edged_curve, absl::string_view filename )
+        : GraphInput( edged_curve, filename ), edged_curve_( edged_curve )
     {
     }
 
     template void opengeode_mesh_api load_edged_curve(
-        EdgedCurve< 2 >&, const std::string& );
+        EdgedCurve< 2 >&, absl::string_view );
     template void opengeode_mesh_api load_edged_curve(
-        EdgedCurve< 3 >&, const std::string& );
+        EdgedCurve< 3 >&, absl::string_view );
 
     template class opengeode_mesh_api EdgedCurveInput< 2 >;
     template class opengeode_mesh_api EdgedCurveInput< 3 >;

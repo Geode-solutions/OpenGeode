@@ -73,13 +73,15 @@ namespace geode
     }
 
     template < index_t dimension >
-    void Blocks< dimension >::save_blocks( const std::string& directory ) const
+    void Blocks< dimension >::save_blocks( absl::string_view directory ) const
     {
+        const auto prefix = absl::StrCat(
+            directory, "/", Block< dimension >::component_type_static().get() );
         for( const auto& block : blocks() )
         {
             const auto& mesh = block.mesh();
-            auto file = directory + "/" + block.component_type().get()
-                        + block.id().string() + "." + mesh.native_extension();
+            auto file = absl::StrCat(
+                prefix, block.id().string(), ".", mesh.native_extension() );
             const auto* tetra =
                 dynamic_cast< const TetrahedralSolid< dimension >* >( &mesh );
             if( tetra )
@@ -91,20 +93,21 @@ namespace geode
                 save_polyhedral_solid( mesh, file );
             }
         }
-        impl_->save_components( directory + "/blocks" );
+        impl_->save_components( absl::StrCat( directory, "/blocks" ) );
     }
 
     template < index_t dimension >
-    void Blocks< dimension >::load_blocks( const std::string& directory )
+    void Blocks< dimension >::load_blocks( absl::string_view directory )
     {
-        impl_->load_components( directory + "/blocks" );
+        impl_->load_components( absl::StrCat( directory, "/blocks" ) );
+        const auto prefix = absl::StrCat(
+            directory, "/", Block< dimension >::component_type_static().get() );
         for( auto& block : modifiable_blocks() )
         {
             block.ensure_mesh_type();
             auto& mesh = block.modifiable_mesh();
-            const auto file = directory + "/" + block.component_type().get()
-                              + block.id().string() + "."
-                              + mesh.native_extension();
+            const auto file = absl::StrCat(
+                prefix, block.id().string(), ".", mesh.native_extension() );
             auto* tetra =
                 dynamic_cast< TetrahedralSolid< dimension >* >( &mesh );
             if( tetra )

@@ -34,12 +34,12 @@ namespace geode
     class opengeode_model_api OpenGeodeSectionInput final : public SectionInput
     {
     public:
-        OpenGeodeSectionInput( Section& section, std::string filename )
-            : SectionInput( section, std::move( filename ) )
+        OpenGeodeSectionInput( Section& section, absl::string_view filename )
+            : SectionInput( section, filename )
         {
         }
 
-        static std::string extension()
+        static absl::string_view extension()
         {
             return Section::native_extension_static();
         }
@@ -50,11 +50,11 @@ namespace geode
             const UnzipFile zip_reader{ filename(), uuid{}.string() };
             zip_reader.extract_all();
 
-            builder.load_corners( zip_reader.directory() );
-            builder.load_lines( zip_reader.directory() );
-            builder.load_surfaces( zip_reader.directory() );
-            builder.load_relationships( zip_reader.directory() );
-            builder.load_unique_vertices( zip_reader.directory() );
+            builder.load_corners( zip_reader.directory().data() );
+            builder.load_lines( zip_reader.directory().data() );
+            builder.load_surfaces( zip_reader.directory().data() );
+            builder.load_relationships( zip_reader.directory().data() );
+            builder.load_unique_vertices( zip_reader.directory().data() );
 
             for( const auto& corner : section().corners() )
             {

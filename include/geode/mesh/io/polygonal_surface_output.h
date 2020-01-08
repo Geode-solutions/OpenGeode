@@ -45,7 +45,7 @@ namespace geode
     template < index_t dimension >
     void save_polygonal_surface(
         const PolygonalSurface< dimension >& polygonal_surface,
-        const std::string& filename );
+        absl::string_view filename );
 
     template < index_t dimension >
     class PolygonalSurfaceOutput : public VertexSetOutput
@@ -55,7 +55,7 @@ namespace geode
     protected:
         PolygonalSurfaceOutput(
             const PolygonalSurface< dimension >& polygonal_surface,
-            std::string filename );
+            absl::string_view filename );
 
         const PolygonalSurface< dimension >& polygonal_surface() const
         {
@@ -70,6 +70,6 @@ namespace geode
     using PolygonalSurfaceOutputFactory = Factory< std::string,
         PolygonalSurfaceOutput< dimension >,
         const PolygonalSurface< dimension >&,
-        std::string >;
+        absl::string_view >;
     ALIAS_2D_AND_3D( PolygonalSurfaceOutputFactory );
 } // namespace geode

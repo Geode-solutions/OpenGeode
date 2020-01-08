@@ -47,7 +47,7 @@ namespace geode
     public:
         virtual ~Component();
 
-        const std::string& name() const;
+        absl::string_view name() const;
 
         const uuid& id() const;
 
@@ -57,7 +57,7 @@ namespace geode
         friend class bitsery::Access;
         Component();
 
-        void set_name( std::string name );
+        void set_name( absl::string_view name );
 
     private:
         friend class bitsery::Access;

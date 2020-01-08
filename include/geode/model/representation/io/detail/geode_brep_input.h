@@ -34,12 +34,12 @@ namespace geode
     class opengeode_model_api OpenGeodeBRepInput final : public BRepInput
     {
     public:
-        OpenGeodeBRepInput( BRep& brep, std::string filename )
-            : BRepInput( brep, std::move( filename ) )
+        OpenGeodeBRepInput( BRep& brep, absl::string_view filename )
+            : BRepInput( brep, filename )
         {
         }
 
-        static std::string extension()
+        static absl::string_view extension()
         {
             return BRep::native_extension_static();
         }
@@ -50,13 +50,13 @@ namespace geode
             const UnzipFile zip_reader{ filename(), uuid{}.string() };
             zip_reader.extract_all();
 
-            builder.load_corners( zip_reader.directory() );
-            builder.load_lines( zip_reader.directory() );
-            builder.load_surfaces( zip_reader.directory() );
-            builder.load_blocks( zip_reader.directory() );
-            builder.load_model_boundaries( zip_reader.directory() );
-            builder.load_relationships( zip_reader.directory() );
-            builder.load_unique_vertices( zip_reader.directory() );
+            builder.load_corners( zip_reader.directory().data() );
+            builder.load_lines( zip_reader.directory().data() );
+            builder.load_surfaces( zip_reader.directory().data() );
+            builder.load_blocks( zip_reader.directory().data() );
+            builder.load_model_boundaries( zip_reader.directory().data() );
+            builder.load_relationships( zip_reader.directory().data() );
+            builder.load_unique_vertices( zip_reader.directory().data() );
 
             for( const auto& corner : brep().corners() )
             {

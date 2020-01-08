@@ -70,16 +70,18 @@ namespace geode
 
     template < index_t dimension >
     void ModelBoundaries< dimension >::save_model_boundaries(
-        const std::string& directory ) const
+        absl::string_view directory ) const
     {
-        impl_->save_components( directory + "/model_boundaries" );
+        impl_->save_components(
+            absl::StrCat( directory, "/model_boundaries" ) );
     }
 
     template < index_t dimension >
     void ModelBoundaries< dimension >::load_model_boundaries(
-        const std::string& directory )
+        absl::string_view directory )
     {
-        impl_->load_components( directory + "/model_boundaries" );
+        impl_->load_components(
+            absl::StrCat( directory, "/model_boundaries" ) );
     }
 
     template < index_t dimension >
