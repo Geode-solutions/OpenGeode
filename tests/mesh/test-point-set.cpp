@@ -122,7 +122,7 @@ void test()
     test_bounding_box( *point_set );
     test_create_vertex_attribute( *point_set );
     test_io(
-        *point_set, absl::StrCat( "test.", point_set->native_extension() ) );
+        *point_set, std::string( "test." ) + point_set->native_extension().data() );
     test_delete_vertex( *point_set, *builder );
     test_clone( *point_set );
 }

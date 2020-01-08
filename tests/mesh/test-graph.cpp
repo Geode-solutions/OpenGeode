@@ -136,7 +136,7 @@ void test_delete_edge( const geode::Graph& graph, geode::GraphBuilder& builder )
         "[Test] Graph edge vertex index is not correct (0, 1)" );
 }
 
-void test_io( const geode::Graph& graph, absl::string_view filename )
+void test_io( const geode::Graph& graph, const std::string& filename )
 {
     save_graph( graph, filename );
     auto new_graph =
@@ -171,7 +171,7 @@ void test()
 
     test_create_vertices( *graph, *builder );
     test_create_edges( *graph, *builder );
-    test_io( *graph, absl::StrCat( "test.", graph->native_extension() ) );
+    test_io( *graph, std::string( "test." ) + graph->native_extension().data() );
 
     test_delete_vertex( *graph, *builder );
     test_delete_edge( *graph, *builder );

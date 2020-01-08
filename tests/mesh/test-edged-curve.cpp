@@ -151,7 +151,7 @@ void test_delete_edge( const geode::EdgedCurve3D& edged_curve,
 }
 
 void test_io(
-    const geode::EdgedCurve3D& edged_curve, absl::string_view filename )
+    const geode::EdgedCurve3D& edged_curve, const std::string& filename )
 {
     save_edged_curve( edged_curve, filename );
     const auto new_edged_curve = geode::EdgedCurve3D::create(
@@ -202,7 +202,7 @@ void test()
     test_create_edges( *edged_curve, *builder );
     test_bounding_box( *edged_curve );
     test_io( *edged_curve,
-        absl::StrCat( "test.", edged_curve->native_extension() ) );
+        std::string( "test." ) + edged_curve->native_extension().data() );
 
     test_delete_vertex( *edged_curve, *builder );
     test_delete_edge( *edged_curve, *builder );

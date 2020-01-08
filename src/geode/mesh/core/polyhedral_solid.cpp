@@ -429,7 +429,7 @@ namespace geode
         {
             return PolyhedralSolidFactory< dimension >::create( type );
         }
-        catch( const OpenGeodeException& e )
+        catch( const OpenGeodeException&  )
         {
             try
             {

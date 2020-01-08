@@ -74,30 +74,36 @@ namespace geode
     template < index_t dimension >
     void Corners< dimension >::save_corners( absl::string_view directory ) const
     {
-        const auto prefix = absl::StrCat( directory, "/",
-            Corner< dimension >::component_type_static().get() );
+        const auto prefix =
+            static_cast< std::string >( directory ) + "/"
+            +
+            Corner< dimension >::component_type_static().get() ;
         for( const auto& corner : corners() )
         {
             const auto& mesh = corner.mesh();
-            auto file = absl::StrCat(
-                prefix, corner.id().string(), ".", mesh.native_extension() );
+            auto file = 
+                prefix+ corner.id().string()+ "."+ mesh.native_extension().data() ;
             save_point_set( mesh, file );
         }
-        impl_->save_components( absl::StrCat( directory, "/corners" ) );
+        impl_->save_components(
+            static_cast< std::string >( directory ) + "/corners" );
     }
 
     template < index_t dimension >
     void Corners< dimension >::load_corners( absl::string_view directory )
     {
-        impl_->load_components( absl::StrCat( directory, "/corners" ) );
-        const auto prefix = absl::StrCat( directory, "/",
-            Corner< dimension >::component_type_static().get() );
+        impl_->load_components(
+            static_cast< std::string >( directory ) + "/corners" );
+        const auto prefix =
+            static_cast< std::string >( directory ) + "/"
+            +
+            Corner< dimension >::component_type_static().get() ;
         for( auto& corner : modifiable_corners() )
         {
             corner.ensure_mesh_type();
             auto& mesh = corner.modifiable_mesh();
-            auto file = absl::StrCat(
-                prefix, corner.id().string(), ".", mesh.native_extension() );
+            auto file = 
+                prefix+ corner.id().string()+ "."+ mesh.native_extension().data() ;
             load_point_set( mesh, file );
         }
     }

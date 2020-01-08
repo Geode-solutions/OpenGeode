@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <iostream>
+
 #include <geode/basic/pimpl.h>
 
 #include <geode/mesh/common.h>
@@ -48,8 +50,7 @@ namespace geode
 
         static MeshType type_name_static()
         {
-            return MeshType{ absl::StrCat(
-                "OpenGeodePointSet", dimension, "D" ) };
+            return MeshType{ "OpenGeodePointSet" + std::to_string( dimension )  + "D" };
         }
 
         MeshType type_name() const override
@@ -60,7 +61,7 @@ namespace geode
         static absl::string_view native_extension_static()
         {
             static const auto extension =
-                absl::StrCat( "og_pts", dimension, "d" );
+                "og_pts" + std::to_string( dimension)+ "d" ;
             return extension;
         }
 
