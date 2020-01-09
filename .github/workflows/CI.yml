@@ -32,6 +32,7 @@ jobs:
     - uses: actions/checkout@v1
     - name: Compile
       run: |
+        ${{ matrix.config.package }} update
         ${{ matrix.config.package }} install cmake
         mkdir -p build
         cd build
