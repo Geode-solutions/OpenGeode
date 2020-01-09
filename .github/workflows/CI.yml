@@ -33,7 +33,7 @@ jobs:
     - name: Compile
       run: |
         ${{ matrix.config.package }} update
-        ${{ matrix.config.package }} install cmake
+        ${{ matrix.config.package }} install -y cmake
         mkdir -p build
         cd build
         cmake ${{ matrix.config.cmake_args }} ..
