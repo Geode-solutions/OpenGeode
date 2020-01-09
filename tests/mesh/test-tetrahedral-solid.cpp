@@ -53,8 +53,6 @@ void test_create_tetrahedra( const geode::TetrahedralSolid3D& solid,
         { { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 } } );
     OPENGEODE_EXCEPTION( solid.nb_polyhedra() == 3,
         "[Test] TetrahedralSolid should have 3 tetrahedra" );
-    // builder.create_tetrahedron( { 0, 1, 2, 3 } );
-    // builder.create_tetrahedron( { 1, 2, 3, 4 } );
     builder.set_polyhedron_vertex( { 0, 0 }, 0 );
     builder.set_polyhedron_vertex( { 0, 1 }, 1 );
     builder.set_polyhedron_vertex( { 0, 2 }, 2 );
@@ -63,12 +61,8 @@ void test_create_tetrahedra( const geode::TetrahedralSolid3D& solid,
     builder.set_polyhedron_vertex( { 1, 1 }, 2 );
     builder.set_polyhedron_vertex( { 1, 2 }, 3 );
     builder.set_polyhedron_vertex( { 1, 3 }, 4 );
-    DEBUG( solid.nb_edges() );
-    DEBUG( solid.nb_facets() );
     builder.delete_isolated_edges();
     builder.delete_isolated_facets();
-    DEBUG( solid.nb_edges() );
-    DEBUG( solid.nb_facets() );
     OPENGEODE_EXCEPTION( solid.nb_facets() == 10,
         "[Test] TetrahedralSolid should have 10 facets" );
     OPENGEODE_EXCEPTION( solid.nb_edges() == 12,
@@ -98,16 +92,6 @@ void test_polyhedron_adjacencies( const geode::TetrahedralSolid3D& solid,
 void test_delete_vertex( const geode::TetrahedralSolid3D& solid,
     geode::TetrahedralSolidBuilder3D& builder )
 {
-    DEBUG( solid.nb_facets() );
-    DEBUG( solid.nb_edges() );
-    for( const auto f : geode::Range{ solid.nb_facets() } )
-    {
-        DEBUG( solid.facet_vertices( f )[0] );
-        DEBUG( solid.facet_vertices( f )[1] );
-        DEBUG( solid.facet_vertices( f )[2] );
-        DEBUG( "-" );
-    }
-    DEBUG( "========================================" );
     std::vector< bool > to_delete( solid.nb_vertices(), false );
     to_delete.front() = true;
     builder.delete_vertices( to_delete );
@@ -120,19 +104,8 @@ void test_delete_vertex( const geode::TetrahedralSolid3D& solid,
         "[Test] TetrahedralSolid should have 2 tetrahedra" );
     OPENGEODE_EXCEPTION( solid.polyhedron_adjacent( { 1, 3 } ) == 0,
         "[Test] TetrahedralSolid adjacent index is not correct" );
-    DEBUG( solid.nb_facets() );
-    DEBUG( solid.nb_edges() );
-    for( const auto f : geode::Range{ solid.nb_facets() } )
-    {
-        DEBUG( solid.facet_vertices( f )[0] );
-        DEBUG( solid.facet_vertices( f )[1] );
-        DEBUG( solid.facet_vertices( f )[2] );
-        DEBUG( "-" );
-    }
     builder.delete_isolated_edges();
     builder.delete_isolated_facets();
-    DEBUG( solid.nb_facets() );
-    DEBUG( solid.nb_edges() );
     OPENGEODE_EXCEPTION( solid.nb_facets() == 7,
         "[Test] TetrahedralSolid should have 7 facets" );
     OPENGEODE_EXCEPTION(

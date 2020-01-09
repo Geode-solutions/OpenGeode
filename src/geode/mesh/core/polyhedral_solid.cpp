@@ -93,7 +93,7 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -165,10 +165,10 @@ namespace geode
     public:
         explicit Impl( PolyhedralSolid& solid )
             : polyhedron_around_vertex_(
-                solid.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolyhedronVertex >(
-                        "polyhedron_around_vertex", PolyhedronVertex{} ) )
+                  solid.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolyhedronVertex >(
+                          "polyhedron_around_vertex", PolyhedronVertex{} ) )
         {
         }
 
@@ -225,12 +225,6 @@ namespace geode
         {
             auto updated_facet_vertices = facet_vertices;
             updated_facet_vertices[facet_vertex_id] = new_vertex_id;
-            DEBUG( facet_vertices[0] );
-            DEBUG( facet_vertices[1] );
-            DEBUG( facet_vertices[2] );
-            DEBUG( updated_facet_vertices[0] );
-            DEBUG( updated_facet_vertices[1] );
-            DEBUG( updated_facet_vertices[2] );
             Facets::add_facet( updated_facet_vertices );
             Facets::remove_facet( facet_vertices );
         }
@@ -283,6 +277,21 @@ namespace geode
         void remove_isolated_edges()
         {
             Edges::clean_facets();
+        }
+
+        bool isolated_vertex( index_t vertex_id ) const
+        {
+            return polyhedron_around_vertex( vertex_id ) == PolyhedronVertex{};
+        }
+
+        bool isolated_edge( index_t edge_id ) const
+        {
+            return Edges::get_counter( edge_id ) == 0;
+        }
+
+        bool isolated_facet( index_t facet_id ) const
+        {
+            return Facets::get_counter( facet_id ) == 0;
         }
 
         AttributeManager& polyhedron_attribute_manager() const
@@ -488,6 +497,25 @@ namespace geode
     index_t PolyhedralSolid< dimension >::nb_polyhedra() const
     {
         return polyhedron_attribute_manager().nb_elements();
+    }
+
+    template < index_t dimension >
+    bool PolyhedralSolid< dimension >::isolated_vertex(
+        index_t vertex_id ) const
+    {
+        return impl_->isolated_vertex( vertex_id );
+    }
+
+    template < index_t dimension >
+    bool PolyhedralSolid< dimension >::isolated_edge( index_t edge_id ) const
+    {
+        return impl_->isolated_edge( edge_id );
+    }
+
+    template < index_t dimension >
+    bool PolyhedralSolid< dimension >::isolated_facet( index_t facet_id ) const
+    {
+        return impl_->isolated_facet( facet_id );
     }
 
     template < index_t dimension >

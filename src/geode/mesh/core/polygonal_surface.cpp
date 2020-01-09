@@ -118,10 +118,10 @@ namespace geode
     public:
         explicit Impl( PolygonalSurfaceBase& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) )
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
@@ -182,6 +182,16 @@ namespace geode
         void remove_isolated_edges()
         {
             this->clean_facets();
+        }
+
+        bool isolated_vertex( index_t vertex_id ) const
+        {
+            return polygon_around_vertex( vertex_id ) == PolygonVertex{};
+        }
+
+        bool isolated_edge( index_t edge_id ) const
+        {
+            return this->get_counter( edge_id ) == 0;
         }
 
         AttributeManager& polygon_attribute_manager() const
@@ -330,6 +340,20 @@ namespace geode
     index_t PolygonalSurfaceBase< dimension >::nb_polygons() const
     {
         return polygon_attribute_manager().nb_elements();
+    }
+
+    template < index_t dimension >
+    bool PolygonalSurfaceBase< dimension >::isolated_vertex(
+        index_t vertex_id ) const
+    {
+        return impl_->isolated_vertex( vertex_id );
+    }
+
+    template < index_t dimension >
+    bool PolygonalSurfaceBase< dimension >::isolated_edge(
+        index_t edge_id ) const
+    {
+        return impl_->isolated_edge( edge_id );
     }
 
     template < index_t dimension >

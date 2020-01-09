@@ -131,6 +131,10 @@ namespace geode
 
         index_t nb_polygons() const;
 
+        bool isolated_vertex( index_t vertex_id ) const;
+
+        bool isolated_edge( index_t edge_id ) const;
+
         /*!
          * Return the number of vertices in a polygon
          */
