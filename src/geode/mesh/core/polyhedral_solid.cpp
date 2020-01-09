@@ -93,7 +93,7 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -165,10 +165,10 @@ namespace geode
     public:
         explicit Impl( PolyhedralSolid& solid )
             : polyhedron_around_vertex_(
-                solid.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolyhedronVertex >(
-                        "polyhedron_around_vertex", PolyhedronVertex{} ) )
+                  solid.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolyhedronVertex >(
+                          "polyhedron_around_vertex", PolyhedronVertex{} ) )
         {
         }
 
@@ -225,6 +225,12 @@ namespace geode
         {
             auto updated_facet_vertices = facet_vertices;
             updated_facet_vertices[facet_vertex_id] = new_vertex_id;
+            DEBUG( facet_vertices[0] );
+            DEBUG( facet_vertices[1] );
+            DEBUG( facet_vertices[2] );
+            DEBUG( updated_facet_vertices[0] );
+            DEBUG( updated_facet_vertices[1] );
+            DEBUG( updated_facet_vertices[2] );
             Facets::add_facet( updated_facet_vertices );
             Facets::remove_facet( facet_vertices );
         }
