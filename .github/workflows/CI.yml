@@ -23,17 +23,16 @@ jobs:
     strategy:
       matrix:
         config:
-        - {container: "ubuntu:18.04", package: apt, cmake_args: "-DCMAKE_BUILD_TYPE=Debug", coverage: true, benchmark: false}
-        - {container: "ubuntu:18.04", package: apt, cmake_args: "-DCMAKE_BUILD_TYPE=Release -DUSE_BENCHMARK=ON", coverage: false, benchmark: true}
-        - {container: "centos:7", package: yum, cmake_args: "-DCMAKE_BUILD_TYPE=Debug", coverage: false, benchmark: false}
-        - {container: "centos:7", package: yum, cmake_args: "-DCMAKE_BUILD_TYPE=Release", coverage: false, benchmark: false}
+        - {container: "ubuntu:18.04", package: "apt update && apt install -y", cmake_args: "-DCMAKE_BUILD_TYPE=Debug", coverage: true, benchmark: false}
+        - {container: "ubuntu:18.04", package: "apt update && apt install -y", cmake_args: "-DCMAKE_BUILD_TYPE=Release -DUSE_BENCHMARK=ON", coverage: false, benchmark: true}
+        - {container: "centos:7", package: "yum install", cmake_args: "-DCMAKE_BUILD_TYPE=Debug", coverage: false, benchmark: false}
+        - {container: "centos:7", package: "yum install", cmake_args: "-DCMAKE_BUILD_TYPE=Release", coverage: false, benchmark: false}
 
     steps:
     - uses: actions/checkout@v1
     - name: Compile
       run: |
-        ${{ matrix.config.package }} update
-        ${{ matrix.config.package }} install -y cmake
+        ${{ matrix.config.package }} cmake
         mkdir -p build
         cd build
         cmake ${{ matrix.config.cmake_args }} ..
