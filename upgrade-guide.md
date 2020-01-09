@@ -1,10 +1,10 @@
 # Upgrade Guide
 
-## Upgrading from OpenGeode v3.x.x to v4.0.00
+## Upgrading from OpenGeode v3.x.x to v4.0.0
 
 ### Motivations
 
-This new release is about improving efficiency.
+This new release is about improving performance.
 After many profiling, we decided to introduce Abseil (https://abseil.io) as one of our dependency.
 This project (maintained and used by Google) has an important focus on performance.
 By adding it to OpenGeode, we allow us to use tailored containers and algorithms to improve our efficiency.
