@@ -412,7 +412,7 @@ namespace geode
 
         virtual index_t get_polyhedron_facet_vertex(
             const PolyhedronFacetVertex& polyhedron_facet_vertex ) const = 0;
-        
+
         virtual PolyhedronVertex get_polyhedron_facet_vertex_id(
             const PolyhedronFacetVertex& polyhedron_facet_vertex ) const = 0;
 
