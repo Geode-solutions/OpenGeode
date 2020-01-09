@@ -86,7 +86,7 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -229,10 +229,10 @@ namespace geode
                  polyhedron_vertex.polyhedron_id ) } )
         {
             const PolyhedronFacet id{ polyhedron_vertex.polyhedron_id, f };
-            std::vector< PolyhedronVertex > facet_vertices(
-                polyhedral_solid_.nb_polyhedron_facet_vertices( id ) );
-            for( const auto v :
-                Range{ polyhedral_solid_.nb_polyhedron_facet_vertices( id ) } )
+            const auto nb_facet_vertices =
+                polyhedral_solid_.nb_polyhedron_facet_vertices( id );
+            std::vector< PolyhedronVertex > facet_vertices( nb_facet_vertices );
+            for( const auto v : Range{ nb_facet_vertices } )
             {
                 facet_vertices[v] =
                     polyhedral_solid_.get_polyhedron_facet_vertex_id(
@@ -243,7 +243,7 @@ namespace geode
             if( position_it != facet_vertices.end() )
             {
                 std::vector< index_t > facet_vertices_id;
-                facet_vertices_id.reserve( facet_vertices.size() );
+                facet_vertices_id.reserve( nb_facet_vertices );
                 for( const auto& v : facet_vertices )
                 {
                     facet_vertices_id.emplace_back(
@@ -257,14 +257,13 @@ namespace geode
 
                 std::array< index_t, 2 > next_edge_vertices{
                     facet_vertices_id[position],
-                    facet_vertices_id[( position + 1 )
-                                      % facet_vertices_id.size()]
+                    facet_vertices_id[( position + 1 ) % nb_facet_vertices]
                 };
                 polyhedral_solid_.update_edge_vertex(
                     next_edge_vertices, 0, vertex_id );
                 std::array< index_t, 2 > previous_edge_vertices{
-                    position == 0 ? facet_vertices_id.back()
-                                  : facet_vertices_id[position - 1],
+                    facet_vertices_id[( position + nb_facet_vertices - 1 )
+                                      % nb_facet_vertices],
                     facet_vertices_id[position]
                 };
                 polyhedral_solid_.update_edge_vertex(
@@ -272,7 +271,7 @@ namespace geode
             }
         }
         update_polyhedron_vertex( polyhedron_vertex, vertex_id );
-    } // namespace geode
+    }
 
     template < index_t dimension >
     void PolyhedralSolidBuilder< dimension >::update_polyhedron_vertices(
