@@ -77,6 +77,8 @@ namespace geode
         void do_create_tetrahedron(
             const std::array< index_t, 4 >& vertices ) final;
 
+        void do_create_tetrahedra( index_t nb ) final;
+
         std::vector< std::vector< index_t > > get_polyhedron_facet_vertices(
             const std::array< index_t, 4 >& vertices ) const final;
 

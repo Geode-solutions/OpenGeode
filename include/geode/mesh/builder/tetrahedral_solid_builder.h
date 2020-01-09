@@ -45,7 +45,20 @@ namespace geode
         static std::unique_ptr< TetrahedralSolidBuilder< dimension > > create(
             TetrahedralSolid< dimension >& mesh );
 
+        /*!
+         * Create a new tetrahedron from four vertices.
+         * @param[in] vertices The four vertices defining the tetrahedron to
+         * create
+         * @return the index of the created tetrahedron
+         */
         index_t create_tetrahedron( const std::array< index_t, 4 >& vertices );
+
+        /*!
+         * Create new tetrahedra.
+         * @param[in] nb Number of tetrahedra to create
+         * @return the index of the first created tetrahedron
+         */
+        index_t create_tetrahedra( index_t nb );
 
     protected:
         TetrahedralSolidBuilder(
@@ -76,6 +89,8 @@ namespace geode
 
         virtual void do_create_tetrahedron(
             const std::array< index_t, 4 >& vertices ) = 0;
+
+        virtual void do_create_tetrahedra( index_t nb ) = 0;
 
         virtual std::vector< std::vector< index_t > >
             get_polyhedron_facet_vertices(

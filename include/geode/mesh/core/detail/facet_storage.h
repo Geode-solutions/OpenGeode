@@ -99,16 +99,19 @@ namespace geode
 
             index_t add_facet( const VertexCycle& vertices )
             {
+                DEBUG( "add f" );
                 auto& id = facet_indices_[vertices].id;
                 if( id != NO_ID )
                 {
                     counter_->set_value( id, counter_->value( id ) + 1 );
+                    DEBUG( counter_->value( id ) );
                     return id;
                 }
                 const auto size = facet_indices_.size();
                 id = size - 1;
                 facet_attribute_manager_.resize( size );
                 vertices_->modify_value( id, SetValue{ vertices.vertices() } );
+                DEBUG( "counter = 1" );
                 return id;
             }
 
@@ -124,6 +127,7 @@ namespace geode
                     "find facet from given vertices" );
                 const auto old_count = counter_->value( id );
                 const auto new_count = std::max( 1u, old_count ) - 1;
+                DEBUG( new_count );
                 counter_->set_value( id, new_count );
             }
 
@@ -162,6 +166,7 @@ namespace geode
 
             void update_facet_vertices( const std::vector< index_t >& old2new )
             {
+                DEBUG( "update_facet_vertices" );
                 const auto old_facet_indices = facet_indices_;
                 facet_indices_.clear();
                 facet_indices_.reserve( old_facet_indices.size() );
@@ -171,6 +176,7 @@ namespace geode
                     for( auto& v : updated_vertices )
                     {
                         v = old2new[v];
+                        DEBUG( v );
                     }
                     const VertexCycle updated_cycle{ updated_vertices };
                     facet_indices_[updated_cycle] = cycle.second;

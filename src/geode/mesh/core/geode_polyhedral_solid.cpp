@@ -106,6 +106,19 @@ namespace geode
                 get_polyhedron_facet_vertex_id( polyhedron_facet_vertex ) );
         }
 
+        PolyhedronVertex get_polyhedron_facet_vertex_id(
+            const PolyhedronFacetVertex& polyhedron_facet_vertex ) const
+        {
+            const auto facet_id =
+                get_facet_id( polyhedron_facet_vertex.polyhedron_facet );
+            const auto polyhedron_id =
+                polyhedron_facet_vertex.polyhedron_facet.polyhedron_id;
+            const auto vertex_id =
+                polyhedron_facets_[starting_facet_index( facet_id )
+                                   + polyhedron_facet_vertex.vertex_id];
+            return { polyhedron_id, vertex_id };
+        }
+
         void add_polyhedron( const std::vector< index_t >& vertices,
             const std::vector< std::vector< index_t > >& facets )
         {
@@ -246,19 +259,6 @@ namespace geode
                    + polyhedron_facet.facet_id;
         }
 
-        PolyhedronVertex get_polyhedron_facet_vertex_id(
-            const PolyhedronFacetVertex& polyhedron_facet_vertex ) const
-        {
-            const auto facet_id =
-                get_facet_id( polyhedron_facet_vertex.polyhedron_facet );
-            const auto polyhedron_id =
-                polyhedron_facet_vertex.polyhedron_facet.polyhedron_id;
-            const auto vertex_id =
-                polyhedron_facets_[starting_facet_index( facet_id )
-                                   + polyhedron_facet_vertex.vertex_id];
-            return { polyhedron_id, vertex_id };
-        }
-
     private:
         std::vector< index_t > polyhedron_vertices_;
         std::vector< index_t > polyhedron_vertex_ptr_{ 0 };
@@ -336,6 +336,14 @@ namespace geode
         const PolyhedronFacetVertex& polyhedron_facet_vertex ) const
     {
         return impl_->get_polyhedron_facet_vertex( polyhedron_facet_vertex );
+    }
+
+    template < index_t dimension >
+    PolyhedronVertex
+        OpenGeodePolyhedralSolid< dimension >::get_polyhedron_facet_vertex_id(
+            const PolyhedronFacetVertex& polyhedron_facet_vertex ) const
+    {
+        return impl_->get_polyhedron_facet_vertex_id( polyhedron_facet_vertex );
     }
 
     template < index_t dimension >
