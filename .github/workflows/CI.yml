@@ -23,15 +23,16 @@ jobs:
     strategy:
       matrix:
         config:
-        - {container: "ubuntu:18.04", cc: gcc, cxx: g++, cmake_args: "-DCMAKE_BUILD_TYPE=Debug", coverage: true, benchmark: false}
-        - {container: "ubuntu:18.04", cc: gcc, cxx: g++, cmake_args: "-DCMAKE_BUILD_TYPE=Release -DUSE_BENCHMARK=ON", coverage: false, benchmark: true}
-        - {container: "centos:7", cc: gcc, cxx: g++, cmake_args: "-DCMAKE_BUILD_TYPE=Debug", coverage: false, benchmark: false}
-        - {container: "centos:7", cc: gcc, cxx: g++, cmake_args: "-DCMAKE_BUILD_TYPE=Release", coverage: false, benchmark: false}
+        - {container: "ubuntu:18.04", package: apt, cmake_args: "-DCMAKE_BUILD_TYPE=Debug", coverage: true, benchmark: false}
+        - {container: "ubuntu:18.04" ,package: apt, cmake_args: "-DCMAKE_BUILD_TYPE=Release -DUSE_BENCHMARK=ON", coverage: false, benchmark: true}
+        - {container: "centos:7", package: yum, cmake_args: "-DCMAKE_BUILD_TYPE=Debug", coverage: false, benchmark: false}
+        - {container: "centos:7", package: yum, cmake_args: "-DCMAKE_BUILD_TYPE=Release", coverage: false, benchmark: false}
 
     steps:
     - uses: actions/checkout@v1
     - name: Compile
       run: |
+        ${{ matrix.config.cmake_args } cmake
         mkdir -p build
         cd build
         cmake ${{ matrix.config.cmake_args }} ..
@@ -46,9 +47,6 @@ jobs:
         cmake ${{ matrix.config.cmake_args }} -DCMAKE_PREFIX_PATH:PATH=$GITHUB_WORKSPACE/build/opengeode/install ../tests
         cmake --build . -- -j2
         ctest --output-on-failure
-      env:
-        CC: ${{ matrix.config.cc }}
-        CXX: ${{ matrix.config.cxx }}
     - name: Kcov
       run: curl -s https://raw.githubusercontent.com/Geode-solutions/actions/master/kcov.sh | bash -s -- ${GITHUB_WORKSPACE}/build/opengeode/bin
       if: matrix.config.coverage && (github.event_name == 'pull_request' || github.ref == 'refs/heads/master')
