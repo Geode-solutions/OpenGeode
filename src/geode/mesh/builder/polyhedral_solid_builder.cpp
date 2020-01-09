@@ -86,7 +86,7 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -200,7 +200,6 @@ namespace geode
     void PolyhedralSolidBuilder< dimension >::set_polyhedron_vertex(
         const PolyhedronVertex& polyhedron_vertex, index_t vertex_id )
     {
-        DEBUG( "set_polyhedron_vertex" );
         const auto polyhedron_vertex_id =
             polyhedral_solid_.polyhedron_vertex( polyhedron_vertex );
         if( polyhedron_vertex_id != NO_ID )
@@ -279,13 +278,10 @@ namespace geode
     void PolyhedralSolidBuilder< dimension >::update_polyhedron_vertices(
         const std::vector< index_t >& old2new )
     {
-        DEBUG( "update_polyhedron_vertices" );
         update_polyhedron_around_vertices( polyhedral_solid_, *this, old2new );
         const auto polyhedra_to_delete =
             find_polyhedra_to_delete( polyhedral_solid_, old2new );
-        DEBUG( polyhedral_solid_.nb_facets() );
         delete_polyhedra( polyhedra_to_delete );
-        DEBUG( polyhedral_solid_.nb_facets() );
         for( const auto p : Range{ polyhedral_solid_.nb_polyhedra() } )
         {
             for( const auto v :
@@ -444,9 +440,7 @@ namespace geode
     {
         const auto old2new = detail::mapping_after_deletion( to_delete );
         update_polyhedron_vertices( old2new );
-        DEBUG( "facet" );
         update_facet_vertices( old2new );
-        DEBUG( "edge" );
         update_edge_vertices( old2new );
         do_delete_solid_vertices( to_delete );
     }
@@ -621,7 +615,6 @@ namespace geode
                         facet_vertices[v] =
                             polyhedral_solid_.polyhedron_facet_vertex(
                                 { id, v } );
-                        DEBUG( facet_vertices[v] );
                     }
                     polyhedral_solid_.remove_facet( facet_vertices );
                 }

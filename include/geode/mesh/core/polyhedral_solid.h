@@ -175,6 +175,12 @@ namespace geode
 
         index_t nb_edges() const;
 
+        bool isolated_vertex( index_t vertex_id ) const;
+
+        bool isolated_edge( index_t edge_id ) const;
+
+        bool isolated_facet( index_t facet_id ) const;
+
         /*!
          * Return the number of vertices in a polyhedron.
          */
