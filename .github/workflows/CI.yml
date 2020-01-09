@@ -32,7 +32,7 @@ jobs:
     - uses: actions/checkout@v1
     - name: Compile
       run: |
-        ${{ matrix.config.package }} cmake
+        ${{ matrix.config.package }} install cmake
         mkdir -p build
         cd build
         cmake ${{ matrix.config.cmake_args }} ..
