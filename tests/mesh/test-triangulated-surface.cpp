@@ -47,16 +47,14 @@ void test_create_vertices( const geode::TriangulatedSurface3D& surface,
 void test_create_polygons( const geode::TriangulatedSurface3D& surface,
     geode::TriangulatedSurfaceBuilder3D& builder )
 {
-    builder.create_triangles( 2 );
+    builder.create_triangles( 1 );
+    builder.create_triangle( { 1, 3, 2 } );
     builder.create_polygon( { 3, 4, 2 } );
     OPENGEODE_EXCEPTION( surface.nb_polygons() == 3,
         "[Test] TriangulatedSurface should have 3 triangles" );
     builder.set_polygon_vertex( { 0, 0 }, 0 );
     builder.set_polygon_vertex( { 0, 1 }, 1 );
     builder.set_polygon_vertex( { 0, 2 }, 2 );
-    builder.set_polygon_vertex( { 1, 0 }, 1 );
-    builder.set_polygon_vertex( { 1, 1 }, 3 );
-    builder.set_polygon_vertex( { 1, 2 }, 2 );
     builder.delete_isolated_edges();
     OPENGEODE_EXCEPTION( surface.nb_edges() == 7,
         "[Test] TriangulatedSurface should have 7 edges" );

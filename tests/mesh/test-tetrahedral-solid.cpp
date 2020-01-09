@@ -48,7 +48,8 @@ void test_create_vertices( const geode::TetrahedralSolid3D& solid,
 void test_create_tetrahedra( const geode::TetrahedralSolid3D& solid,
     geode::TetrahedralSolidBuilder3D& builder )
 {
-    builder.create_tetrahedra( 2 );
+    builder.create_tetrahedra( 1 );
+    builder.create_tetrahedron( { 1, 2, 3, 4 } );
     builder.create_polyhedron( { 1, 4, 3, 5 },
         { { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 } } );
     OPENGEODE_EXCEPTION( solid.nb_polyhedra() == 3,
@@ -57,10 +58,6 @@ void test_create_tetrahedra( const geode::TetrahedralSolid3D& solid,
     builder.set_polyhedron_vertex( { 0, 1 }, 1 );
     builder.set_polyhedron_vertex( { 0, 2 }, 2 );
     builder.set_polyhedron_vertex( { 0, 3 }, 3 );
-    builder.set_polyhedron_vertex( { 1, 0 }, 1 );
-    builder.set_polyhedron_vertex( { 1, 1 }, 2 );
-    builder.set_polyhedron_vertex( { 1, 2 }, 3 );
-    builder.set_polyhedron_vertex( { 1, 3 }, 4 );
     builder.delete_isolated_edges();
     builder.delete_isolated_facets();
     OPENGEODE_EXCEPTION( solid.nb_facets() == 10,
