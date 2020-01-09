@@ -118,10 +118,10 @@ namespace geode
     public:
         explicit Impl( PolygonalSurfaceBase& surface )
             : polygon_around_vertex_(
-                  surface.vertex_attribute_manager()
-                      .template find_or_create_attribute< VariableAttribute,
-                          PolygonVertex >(
-                          "polygon_around_vertex", PolygonVertex{} ) )
+                surface.vertex_attribute_manager()
+                    .template find_or_create_attribute< VariableAttribute,
+                        PolygonVertex >(
+                        "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
