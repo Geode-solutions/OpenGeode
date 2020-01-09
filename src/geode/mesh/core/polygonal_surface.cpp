@@ -598,7 +598,7 @@ namespace geode
                 return polygon_vertex;
             }
         }
-        return absl::nullopt_t;
+        return absl::nullopt;
     }
     template < index_t dimension >
     index_t PolygonalSurfaceBase< dimension >::edge_from_vertices(
