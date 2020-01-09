@@ -24,7 +24,7 @@ jobs:
       matrix:
         config:
         - {container: "ubuntu:18.04", package: apt, cmake_args: "-DCMAKE_BUILD_TYPE=Debug", coverage: true, benchmark: false}
-        - {container: "ubuntu:18.04" ,package: apt, cmake_args: "-DCMAKE_BUILD_TYPE=Release -DUSE_BENCHMARK=ON", coverage: false, benchmark: true}
+        - {container: "ubuntu:18.04", package: apt, cmake_args: "-DCMAKE_BUILD_TYPE=Release -DUSE_BENCHMARK=ON", coverage: false, benchmark: true}
         - {container: "centos:7", package: yum, cmake_args: "-DCMAKE_BUILD_TYPE=Debug", coverage: false, benchmark: false}
         - {container: "centos:7", package: yum, cmake_args: "-DCMAKE_BUILD_TYPE=Release", coverage: false, benchmark: false}
 
@@ -32,7 +32,7 @@ jobs:
     - uses: actions/checkout@v1
     - name: Compile
       run: |
-        ${{ matrix.config.cmake_args } cmake
+        ${{ matrix.config.package }} cmake
         mkdir -p build
         cd build
         cmake ${{ matrix.config.cmake_args }} ..
