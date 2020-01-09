@@ -118,10 +118,10 @@ namespace geode
     public:
         explicit Impl( PolygonalSurfaceBase& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) )
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
@@ -598,7 +598,7 @@ namespace geode
                 return polygon_vertex;
             }
         }
-        return {};
+        return absl::nullopt_t;
     }
     template < index_t dimension >
     index_t PolygonalSurfaceBase< dimension >::edge_from_vertices(
