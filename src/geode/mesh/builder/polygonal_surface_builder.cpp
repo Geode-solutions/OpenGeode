@@ -390,8 +390,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    void PolygonalSurfaceBuilder< dimension >::delete_polygons(
-        const std::vector< bool >& to_delete )
+    std::vector< index_t >
+        PolygonalSurfaceBuilder< dimension >::delete_polygons(
+            const std::vector< bool >& to_delete )
     {
         for( const auto p : Range{ polygonal_surface_.nb_polygons() } )
         {
@@ -439,10 +440,12 @@ namespace geode
         polygonal_surface_.polygon_attribute_manager().delete_elements(
             to_delete );
         do_delete_polygons( to_delete );
+        return old2new;
     }
 
     template < index_t dimension >
-    void PolygonalSurfaceBuilder< dimension >::delete_isolated_vertices()
+    std::vector< index_t >
+        PolygonalSurfaceBuilder< dimension >::delete_isolated_vertices()
     {
         std::vector< bool > to_delete(
             polygonal_surface_.nb_vertices(), false );
@@ -455,13 +458,14 @@ namespace geode
                 to_delete[v] = true;
             }
         }
-        delete_vertices( to_delete );
+        return delete_vertices( to_delete );
     }
 
     template < index_t dimension >
-    void PolygonalSurfaceBuilder< dimension >::delete_isolated_edges()
+    std::vector< index_t >
+        PolygonalSurfaceBuilder< dimension >::delete_isolated_edges()
     {
-        polygonal_surface_.remove_isolated_edges();
+        return polygonal_surface_.remove_isolated_edges();
     }
 
     template < index_t dimension >
@@ -485,10 +489,10 @@ namespace geode
     }
 
     template < index_t dimension >
-    void PolygonalSurfaceBuilder< dimension >::delete_edges(
+    std::vector< index_t > PolygonalSurfaceBuilder< dimension >::delete_edges(
         const std::vector< bool >& to_delete )
     {
-        polygonal_surface_.delete_edges( to_delete );
+        return polygonal_surface_.delete_edges( to_delete );
     }
 
     template < index_t dimension >

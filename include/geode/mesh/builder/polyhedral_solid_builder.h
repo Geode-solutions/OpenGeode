@@ -115,23 +115,32 @@ namespace geode
          * @param[in] to_delete Vector of size polyhedral_solid_.nb_polyhedra().
          * If to_delete[i] is true the polyhedra of index i is deleted, else it
          * is kept.
+         * @return the mapping between old polyhedron indices to new ones.
+         * Deleted polyhedra new index is NO_ID
          */
-        void delete_polyhedra( const std::vector< bool >& to_delete );
+        std::vector< index_t > delete_polyhedra(
+            const std::vector< bool >& to_delete );
 
         /*!
          * Delete all the isolated vertices (not used as polyhedron vertices)
+         * @return the mapping between old vertex indices to new ones.
+         * Deleted vertices new index is NO_ID
          */
-        void delete_isolated_vertices();
+        std::vector< index_t > delete_isolated_vertices();
 
         /*!
          * Delete all the isolated facets (not used as polyhedron facets)
+         * @return the mapping between old facet indices to new ones.
+         * Deleted facets new index is NO_ID
          */
-        void delete_isolated_facets();
+        std::vector< index_t > delete_isolated_facets();
 
         /*!
          * Delete all the isolated edges (not used as polyhedron edges)
+         * @return the mapping between old edge indices to new ones.
+         * Deleted edges new index is NO_ID
          */
-        void delete_isolated_edges();
+        std::vector< index_t > delete_isolated_edges();
 
         /*!
          * Return one polyhedron with one of the vertices matching given vertex.
@@ -211,7 +220,8 @@ namespace geode
 
         void remove_polyhedra_edges( const std::vector< bool >& to_delete );
 
-        void delete_facets( const std::vector< bool >& to_delete );
+        std::vector< index_t > delete_facets(
+            const std::vector< bool >& to_delete );
 
         void update_facet_vertex( const std::vector< index_t >& facet_vertices,
             index_t facet_vertex_id,

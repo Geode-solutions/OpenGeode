@@ -72,9 +72,9 @@ namespace geode
             friend class bitsery::Access;
             FacetStorage()
                 : counter_(
-                    facet_attribute_manager_
-                        .template find_or_create_attribute< VariableAttribute,
-                            index_t >( "counter", 1 ) ),
+                      facet_attribute_manager_
+                          .template find_or_create_attribute< VariableAttribute,
+                              index_t >( "counter", 1 ) ),
                   vertices_(
                       facet_attribute_manager_
                           .template find_or_create_attribute< VariableAttribute,
@@ -128,7 +128,7 @@ namespace geode
                 counter_->set_value( id, new_count );
             }
 
-            void clean_facets()
+            std::vector< index_t > clean_facets()
             {
                 std::vector< bool > to_delete(
                     facet_attribute_manager_.nb_elements(), false );
@@ -137,10 +137,11 @@ namespace geode
                 {
                     to_delete[e] = !counter_->value( e );
                 }
-                delete_facets( to_delete );
+                return delete_facets( to_delete );
             }
 
-            void delete_facets( const std::vector< bool >& to_delete )
+            std::vector< index_t > delete_facets(
+                const std::vector< bool >& to_delete )
             {
                 const auto old2new =
                     detail::mapping_after_deletion( to_delete );
@@ -159,6 +160,7 @@ namespace geode
                     facet_indices_.erase( key );
                 }
                 facet_attribute_manager_.delete_elements( to_delete );
+                return old2new;
             }
 
             void update_facet_vertices( const std::vector< index_t >& old2new )

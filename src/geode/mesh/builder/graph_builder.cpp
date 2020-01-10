@@ -139,7 +139,8 @@ namespace geode
         do_delete_curve_vertices( to_delete );
     }
 
-    void GraphBuilder::delete_edges( const std::vector< bool >& to_delete )
+    std::vector< index_t > GraphBuilder::delete_edges(
+        const std::vector< bool >& to_delete )
     {
         const auto old2new = detail::mapping_after_deletion( to_delete );
         for( const auto v : Range{ graph_.nb_vertices() } )
@@ -160,9 +161,10 @@ namespace geode
 
         graph_.edge_attribute_manager().delete_elements( to_delete );
         do_delete_edges( to_delete );
+        return old2new;
     }
 
-    void GraphBuilder::delete_isolated_vertices()
+    std::vector< index_t > GraphBuilder::delete_isolated_vertices()
     {
         std::vector< bool > to_delete( graph_.nb_vertices(), false );
         for( const auto v : Range{ graph_.nb_vertices() } )
@@ -173,7 +175,7 @@ namespace geode
                 to_delete[v] = true;
             }
         }
-        delete_vertices( to_delete );
+        return delete_vertices( to_delete );
     }
 
     void GraphBuilder::copy( const Graph& graph )
