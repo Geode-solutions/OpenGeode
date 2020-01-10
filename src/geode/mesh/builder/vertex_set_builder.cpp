@@ -70,10 +70,11 @@ namespace geode
         return first_added_vertex;
     }
 
-    void VertexSetBuilder::delete_vertices(
+    std::vector< index_t > VertexSetBuilder::delete_vertices(
         const std::vector< bool >& to_delete )
     {
         vertex_set_.vertex_attribute_manager().delete_elements( to_delete );
         do_delete_vertices( to_delete );
+        return detail::mapping_after_deletion( to_delete );
     }
 } // namespace geode

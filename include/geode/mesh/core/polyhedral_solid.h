@@ -396,13 +396,15 @@ namespace geode
 
         void remove_edge( const std::array< index_t, 2 >& edge_vertices );
 
-        void delete_facets( const std::vector< bool >& to_delete );
+        std::vector< index_t > delete_facets(
+            const std::vector< bool >& to_delete );
 
-        void delete_edges( const std::vector< bool >& to_delete );
+        std::vector< index_t > delete_edges(
+            const std::vector< bool >& to_delete );
 
-        void remove_isolated_facets();
+        std::vector< index_t > remove_isolated_facets();
 
-        void remove_isolated_edges();
+        std::vector< index_t > remove_isolated_edges();
 
         virtual index_t get_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex ) const = 0;

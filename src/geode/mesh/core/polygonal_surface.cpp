@@ -118,10 +118,10 @@ namespace geode
     public:
         explicit Impl( PolygonalSurfaceBase& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) )
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
@@ -174,14 +174,15 @@ namespace geode
             this->remove_facet( edge_vertices );
         }
 
-        void delete_edges( const std::vector< bool >& to_delete )
+        std::vector< index_t > delete_edges(
+            const std::vector< bool >& to_delete )
         {
-            this->delete_facets( to_delete );
+            return this->delete_facets( to_delete );
         }
 
-        void remove_isolated_edges()
+        std::vector< index_t > remove_isolated_edges()
         {
-            this->clean_facets();
+            return this->clean_facets();
         }
 
         bool isolated_vertex( index_t vertex_id ) const
@@ -311,16 +312,17 @@ namespace geode
     }
 
     template < index_t dimension >
-    void PolygonalSurfaceBase< dimension >::delete_edges(
+    std::vector< index_t > PolygonalSurfaceBase< dimension >::delete_edges(
         const std::vector< bool >& to_delete )
     {
-        impl_->delete_edges( to_delete );
+        return impl_->delete_edges( to_delete );
     }
 
     template < index_t dimension >
-    void PolygonalSurfaceBase< dimension >::remove_isolated_edges()
+    std::vector< index_t >
+        PolygonalSurfaceBase< dimension >::remove_isolated_edges()
     {
-        impl_->remove_isolated_edges();
+        return impl_->remove_isolated_edges();
     }
 
     template < index_t dimension >

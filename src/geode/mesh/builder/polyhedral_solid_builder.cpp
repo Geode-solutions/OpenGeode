@@ -86,7 +86,7 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -552,8 +552,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    void PolyhedralSolidBuilder< dimension >::delete_polyhedra(
-        const std::vector< bool >& to_delete )
+    std::vector< index_t >
+        PolyhedralSolidBuilder< dimension >::delete_polyhedra(
+            const std::vector< bool >& to_delete )
     {
         remove_polyhedra_facets( to_delete );
         remove_polyhedra_edges( to_delete );
@@ -591,6 +592,7 @@ namespace geode
         polyhedral_solid_.polyhedron_attribute_manager().delete_elements(
             to_delete );
         do_delete_polyhedra( to_delete );
+        return old2new;
     }
 
     template < index_t dimension >
@@ -651,7 +653,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    void PolyhedralSolidBuilder< dimension >::delete_isolated_vertices()
+    std::vector< index_t >
+        PolyhedralSolidBuilder< dimension >::delete_isolated_vertices()
     {
         std::vector< bool > to_delete( polyhedral_solid_.nb_vertices(), false );
         for( const auto v : Range{ polyhedral_solid_.nb_vertices() } )
@@ -663,19 +666,21 @@ namespace geode
                 to_delete[v] = true;
             }
         }
-        delete_vertices( to_delete );
+        return delete_vertices( to_delete );
     }
 
     template < index_t dimension >
-    void PolyhedralSolidBuilder< dimension >::delete_isolated_facets()
+    std::vector< index_t >
+        PolyhedralSolidBuilder< dimension >::delete_isolated_facets()
     {
-        polyhedral_solid_.remove_isolated_facets();
+        return polyhedral_solid_.remove_isolated_facets();
     }
 
     template < index_t dimension >
-    void PolyhedralSolidBuilder< dimension >::delete_isolated_edges()
+    std::vector< index_t >
+        PolyhedralSolidBuilder< dimension >::delete_isolated_edges()
     {
-        polyhedral_solid_.remove_isolated_edges();
+        return polyhedral_solid_.remove_isolated_edges();
     }
 
     template < index_t dimension >
@@ -706,10 +711,10 @@ namespace geode
     }
 
     template < index_t dimension >
-    void PolyhedralSolidBuilder< dimension >::delete_facets(
+    std::vector< index_t > PolyhedralSolidBuilder< dimension >::delete_facets(
         const std::vector< bool >& to_delete )
     {
-        polyhedral_solid_.delete_facets( to_delete );
+        return polyhedral_solid_.delete_facets( to_delete );
     }
 
     template < index_t dimension >
