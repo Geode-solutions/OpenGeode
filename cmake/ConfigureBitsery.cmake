@@ -22,8 +22,8 @@ set(BITSERY_PATH ${PROJECT_BINARY_DIR}/third_party/bitsery)
 set(BITSERY_INSTALL_PREFIX ${BITSERY_PATH}/install)
 ExternalProject_Add(bitsery
     PREFIX ${BITSERY_PATH}
-    GIT_REPOSITORY https://github.com/fraillt/bitsery
-    GIT_TAG c555088aa39f555341a0b20f12379eb9c1120ae4
+    GIT_REPOSITORY https://github.com/Geode-solutions/bitsery
+    GIT_TAG 17b0c25aefcd42e0b814bd17a080197f302d7984
     CMAKE_GENERATOR ${CMAKE_GENERATOR}
     CMAKE_GENERATOR_PLATFORM ${CMAKE_GENERATOR_PLATFORM}
     CMAKE_ARGS
