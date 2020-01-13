@@ -150,7 +150,7 @@ namespace geode
     private:
         std::vector< index_t > polygon_vertices_;
         std::vector< index_t > polygon_adjacents_;
-        std::vector< index_t > polygon_ptr_{{ 0 }};
+        std::vector< index_t > polygon_ptr_{ { 0 } };
     };
 
     template < index_t dimension >
