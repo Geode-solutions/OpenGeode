@@ -34,14 +34,14 @@ namespace geode
 {
     class OpenGeodeGraph::Impl : public detail::EdgesImpl
     {
+        friend class bitsery::Access;
+
     public:
         explicit Impl( OpenGeodeGraph& mesh ) : detail::EdgesImpl( mesh ) {}
 
     private:
-        friend class bitsery::Access;
         Impl() = default;
 
-        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive )
         {

@@ -43,6 +43,7 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( Component );
         OPENGEODE_TEMPLATE_ASSERT_2D_OR_3D( dimension );
+        friend class bitsery::Access;
 
     public:
         virtual ~Component();
@@ -54,13 +55,11 @@ namespace geode
         virtual ComponentType component_type() const = 0;
 
     protected:
-        friend class bitsery::Access;
         Component();
 
         void set_name( absl::string_view name );
 
     private:
-        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive );
 

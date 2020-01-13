@@ -43,6 +43,8 @@ namespace geode
     template < typename Type, typename Tag >
     class NamedType
     {
+        friend class bitsery::Access;
+
     public:
         explicit NamedType( Type value ) : value_( std::move( value ) ) {}
 
@@ -62,10 +64,8 @@ namespace geode
         }
 
     private:
-        friend class bitsery::Access;
         NamedType() = default;
 
-        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive )
         {

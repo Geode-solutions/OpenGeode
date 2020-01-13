@@ -37,7 +37,7 @@ namespace geode
         class MeshStorage
         {
         public:
-            MeshStorage() = default;
+            MeshStorage() : mesh_type_{ "" } {}
 
             void set_mesh( std::unique_ptr< Mesh > mesh )
             {
@@ -74,7 +74,7 @@ namespace geode
 
         private:
             std::unique_ptr< Mesh > mesh_;
-            MeshType mesh_type_{ "" };
+            MeshType mesh_type_;
         };
     } // namespace detail
 } // namespace geode

@@ -43,6 +43,8 @@ namespace geode
     class OpenGeodeTriangulatedSurface< dimension >::Impl
         : public detail::PointsImpl< dimension >
     {
+        friend class bitsery::Access;
+
     public:
         explicit Impl( OpenGeodeTriangulatedSurface< dimension >& mesh )
             : detail::PointsImpl< dimension >( mesh ),
@@ -100,10 +102,8 @@ namespace geode
         }
 
     private:
-        friend class bitsery::Access;
         Impl() = default;
 
-        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive )
         {
