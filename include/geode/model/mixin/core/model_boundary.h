@@ -44,6 +44,7 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( ModelBoundary );
         friend class ModelBoundaries< dimension >;
+        friend class bitsery::Access;
 
     public:
         ~ModelBoundary() = default;
@@ -64,7 +65,6 @@ namespace geode
         };
 
     private:
-        friend class bitsery::Access;
         ModelBoundary() = default;
 
         friend class ModelBoundariesBuilder< dimension >;
@@ -73,7 +73,6 @@ namespace geode
             this->set_name( name );
         }
 
-        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive );
     };

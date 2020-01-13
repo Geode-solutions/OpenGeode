@@ -42,14 +42,15 @@ namespace geode
     class Graph::Impl
     {
         static constexpr auto attribute_name = "edges_around_vertex";
+        friend class bitsery::Access;
 
     public:
         explicit Impl( Graph& graph )
             : edges_around_vertex_(
-                graph.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        EdgesAroundVertex >(
-                        attribute_name, EdgesAroundVertex{} ) )
+                  graph.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          EdgesAroundVertex >(
+                          attribute_name, EdgesAroundVertex{} ) )
         {
         }
 
@@ -100,10 +101,8 @@ namespace geode
         }
 
     private:
-        friend class bitsery::Access;
         Impl() = default;
 
-        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive )
         {

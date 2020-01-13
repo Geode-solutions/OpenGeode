@@ -42,6 +42,7 @@ namespace geode
     class opengeode_mesh_api VertexSet
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( VertexSet );
+        friend class bitsery::Access;
 
     public:
         /*!
@@ -72,11 +73,9 @@ namespace geode
         virtual MeshType type_name() const = 0;
 
     protected:
-        friend class bitsery::Access;
         VertexSet();
 
     private:
-        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive );
 

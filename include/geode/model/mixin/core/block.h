@@ -49,6 +49,7 @@ namespace geode
         OPENGEODE_DISABLE_COPY_AND_MOVE( Block );
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
         friend class Blocks< dimension >;
+        friend class bitsery::Access;
 
     public:
         ~Block();
@@ -71,7 +72,6 @@ namespace geode
         const PolyhedralSolid< dimension >& mesh() const;
 
     private:
-        friend class bitsery::Access;
         Block();
 
         explicit Block( const MeshType& type );
@@ -90,7 +90,6 @@ namespace geode
 
         void ensure_mesh_type();
 
-        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive );
 

@@ -42,14 +42,14 @@ namespace geode
         {
             using TypedVertexCycle = VertexCycle< VertexContainer >;
             static constexpr auto ATTRIBUTE_NAME = "facet_vertices";
+            friend class bitsery::Access;
 
         protected:
-            friend class bitsery::Access;
             FacetStorage()
                 : counter_(
-                    facet_attribute_manager_
-                        .template find_or_create_attribute< VariableAttribute,
-                            index_t >( "counter", 1 ) ),
+                      facet_attribute_manager_
+                          .template find_or_create_attribute< VariableAttribute,
+                              index_t >( "counter", 1 ) ),
                   vertices_(
                       facet_attribute_manager_
                           .template find_or_create_attribute< VariableAttribute,
@@ -175,7 +175,6 @@ namespace geode
             }
 
         private:
-            friend class bitsery::Access;
             template < typename Archive >
             void serialize( Archive& archive )
             {

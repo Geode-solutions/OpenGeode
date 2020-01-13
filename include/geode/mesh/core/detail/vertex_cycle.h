@@ -62,6 +62,8 @@ namespace geode
         template < typename Container >
         class VertexCycle
         {
+            friend class bitsery::Access;
+
         public:
             VertexCycle( Container vertices )
                 : vertices_( std::move( vertices ) )
@@ -106,10 +108,8 @@ namespace geode
             }
 
         private:
-            friend class bitsery::Access;
             VertexCycle() = default;
 
-            friend class bitsery::Access;
             template < typename Archive >
             void serialize( Archive& archive )
             {

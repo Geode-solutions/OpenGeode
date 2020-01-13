@@ -41,6 +41,8 @@ namespace geode
     class OpenGeodePolyhedralSolid< dimension >::Impl
         : public detail::PointsImpl< dimension >
     {
+        friend class bitsery::Access;
+
     public:
         explicit Impl( OpenGeodePolyhedralSolid< dimension >& mesh )
             : detail::PointsImpl< dimension >( mesh )
@@ -199,13 +201,11 @@ namespace geode
         }
 
     private:
-        friend class bitsery::Access;
         Impl()
         {
             init_ptr();
         }
 
-        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive )
         {

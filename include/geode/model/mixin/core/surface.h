@@ -48,6 +48,7 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( Surface );
         friend class Surfaces< dimension >;
+        friend class bitsery::Access;
 
     public:
         ~Surface();
@@ -70,7 +71,6 @@ namespace geode
         const PolygonalSurface< dimension >& mesh() const;
 
     private:
-        friend class bitsery::Access;
         Surface();
 
         explicit Surface( const MeshType& type );
@@ -89,7 +89,6 @@ namespace geode
 
         void ensure_mesh_type();
 
-        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive );
 
