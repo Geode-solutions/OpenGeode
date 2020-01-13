@@ -47,7 +47,7 @@ namespace geode
         explicit Impl( OpenGeodePolygonalSurface< dimension >& mesh )
             : detail::PointsImpl< dimension >( mesh )
         {
-            init_ptr();
+            polygon_ptr_.emplace_back( 0 );
         }
 
         index_t get_polygon_vertex( const PolygonVertex& polygon_vertex ) const
@@ -124,15 +124,7 @@ namespace geode
         }
 
     private:
-        Impl()
-        {
-            init_ptr();
-        }
-
-        void init_ptr()
-        {
-            polygon_ptr_.emplace_back( 0 );
-        }
+        Impl() = default;
 
         template < typename Archive >
         void serialize( Archive& archive )

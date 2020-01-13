@@ -47,7 +47,9 @@ namespace geode
         explicit Impl( OpenGeodePolyhedralSolid< dimension >& mesh )
             : detail::PointsImpl< dimension >( mesh )
         {
-            init_ptr();
+            polyhedron_vertex_ptr_.emplace_back( 0 );
+            polyhedron_facet_ptr_.emplace_back( 0 );
+            polyhedron_adjacent_ptr_.emplace_back( 0 );
         }
 
         index_t get_polyhedron_vertex(
@@ -201,10 +203,7 @@ namespace geode
         }
 
     private:
-        Impl()
-        {
-            init_ptr();
-        }
+        Impl() = default;
 
         template < typename Archive >
         void serialize( Archive& archive )
@@ -261,13 +260,6 @@ namespace geode
                 polyhedron_facets_[starting_facet_index( facet_id )
                                    + polyhedron_facet_vertex.vertex_id];
             return { polyhedron_id, vertex_id };
-        }
-
-        void init_ptr()
-        {
-            polyhedron_vertex_ptr_.emplace_back( 0 );
-            polyhedron_facet_ptr_.emplace_back( 0 );
-            polyhedron_adjacent_ptr_.emplace_back( 0 );
         }
 
     private:
