@@ -60,7 +60,7 @@ namespace geode
         OPENGEODE_ASSERT( vertices.size() == 4, "[TetrahedralSolidBuilder::"
                                                 "do_create_facets] Only "
                                                 "tetrahedra are handled" );
-        std::array< index_t, 4 > tetra_vertices{};
+        std::array< index_t, 4 > tetra_vertices;
         absl::c_copy_n( vertices, 4, tetra_vertices.begin() );
         do_create_facets( tetra_vertices );
     }
@@ -74,7 +74,7 @@ namespace geode
         OPENGEODE_ASSERT( vertices.size() == 4, "[TetrahedralSolidBuilder::"
                                                 "do_create_edges] Only "
                                                 "tetrahedra are handled" );
-        std::array< index_t, 4 > tetra_vertices{};
+        std::array< index_t, 4 > tetra_vertices;
         absl::c_copy_n( vertices, 4, tetra_vertices.begin() );
         do_create_edges( tetra_vertices );
     }
@@ -88,7 +88,7 @@ namespace geode
         OPENGEODE_ASSERT( vertices.size() == 4, "[TetrahedralSolidBuilder::"
                                                 "do_create_polyhedron] Only "
                                                 "tetrahedra are handled" );
-        std::array< index_t, 4 > tetra_vertices{};
+        std::array< index_t, 4 > tetra_vertices;
         absl::c_copy_n( vertices, 4, tetra_vertices.begin() );
         do_create_tetrahedron( tetra_vertices );
     }

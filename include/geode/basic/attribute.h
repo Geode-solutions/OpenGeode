@@ -49,6 +49,7 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY( AttributeBase );
         friend class AttributeManager;
+        friend class bitsery::Access;
 
     public:
         virtual ~AttributeBase() = default;
@@ -59,7 +60,6 @@ namespace geode
             const AttributeBase& attribute, index_t nb_elements ) = 0;
 
     private:
-        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive )
         {
@@ -85,6 +85,8 @@ namespace geode
     template < typename T >
     class ReadOnlyAttribute : public AttributeBase
     {
+        friend class bitsery::Access;
+
     public:
         virtual const T& value( index_t element ) const = 0;
 
@@ -97,7 +99,6 @@ namespace geode
         ReadOnlyAttribute() = default;
 
     private:
-        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive )
         {
@@ -116,6 +117,8 @@ namespace geode
     template < typename T >
     class ConstantAttribute : public ReadOnlyAttribute< T >
     {
+        friend class bitsery::Access;
+
     public:
         const T& value( index_t /*unused*/ ) const override
         {
@@ -159,11 +162,9 @@ namespace geode
         }
 
     private:
-        friend class bitsery::Access;
         friend class AttributeManager;
         ConstantAttribute() = default;
 
-        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive )
         {
@@ -192,6 +193,8 @@ namespace geode
     template < typename T >
     class VariableAttribute : public ReadOnlyAttribute< T >
     {
+        friend class bitsery::Access;
+
     public:
         const T& value( index_t element ) const override
         {
@@ -241,10 +244,8 @@ namespace geode
         {
         }
 
-        friend class bitsery::Access;
         VariableAttribute() = default;
 
-        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive )
         {
@@ -289,6 +290,8 @@ namespace geode
     template <>
     class VariableAttribute< bool > : public ReadOnlyAttribute< bool >
     {
+        friend class bitsery::Access;
+
     public:
         const bool& value( index_t element ) const override
         {
@@ -339,10 +342,8 @@ namespace geode
         {
         }
 
-        friend class bitsery::Access;
         VariableAttribute() = default;
 
-        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive )
         {
@@ -385,6 +386,8 @@ namespace geode
     template < typename T >
     class SparseAttribute : public ReadOnlyAttribute< T >
     {
+        friend class bitsery::Access;
+
     public:
         const T& value( index_t element ) const override
         {
@@ -446,10 +449,8 @@ namespace geode
         {
         }
 
-        friend class bitsery::Access;
         SparseAttribute() = default;
 
-        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive )
         {

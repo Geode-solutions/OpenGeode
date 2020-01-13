@@ -45,6 +45,7 @@ namespace geode
         explicit Impl( OpenGeodePolygonalSurface< dimension >& mesh )
             : detail::PointsImpl< dimension >( mesh )
         {
+            init_ptr();
         }
 
         index_t get_polygon_vertex( const PolygonVertex& polygon_vertex ) const
@@ -122,7 +123,15 @@ namespace geode
 
     private:
         friend class bitsery::Access;
-        Impl() = default;
+        Impl()
+        {
+            init_ptr();
+        }
+
+        void init_ptr()
+        {
+            polygon_ptr_.emplace_back( 0 );
+        }
 
         friend class bitsery::Access;
         template < typename Archive >
@@ -150,7 +159,7 @@ namespace geode
     private:
         std::vector< index_t > polygon_vertices_;
         std::vector< index_t > polygon_adjacents_;
-        std::vector< index_t > polygon_ptr_ = { 0 };
+        std::vector< index_t > polygon_ptr_;
     };
 
     template < index_t dimension >
