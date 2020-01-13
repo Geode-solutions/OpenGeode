@@ -48,6 +48,7 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( Line );
         friend class Lines< dimension >;
+        friend class LinesBuilder< dimension >;
         friend class bitsery::Access;
 
     public:
@@ -75,10 +76,8 @@ namespace geode
 
         explicit Line( const MeshType& type );
 
-        friend class LinesBuilder< dimension >;
         EdgedCurve< dimension >& modifiable_mesh();
 
-        friend class LinesBuilder< dimension >;
         void set_mesh( std::unique_ptr< EdgedCurve< dimension > > mesh );
 
         friend class LinesBuilder< dimension >;
