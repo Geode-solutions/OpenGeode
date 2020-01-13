@@ -49,6 +49,7 @@ namespace geode
         OPENGEODE_DISABLE_COPY_AND_MOVE( Block );
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
         friend class Blocks< dimension >;
+        friend class BlocksBuilder< dimension >;
         friend class bitsery::Access;
 
     public:
@@ -76,10 +77,8 @@ namespace geode
 
         explicit Block( const MeshType& type );
 
-        friend class BlocksBuilder< dimension >;
         PolyhedralSolid< dimension >& modifiable_mesh();
 
-        friend class BlocksBuilder< dimension >;
         void set_mesh( std::unique_ptr< PolyhedralSolid< dimension > > mesh );
 
         friend class BlocksBuilder< dimension >;

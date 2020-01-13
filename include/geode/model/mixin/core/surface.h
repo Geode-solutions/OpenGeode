@@ -48,6 +48,7 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( Surface );
         friend class Surfaces< dimension >;
+        friend class SurfacesBuilder< dimension >;
         friend class bitsery::Access;
 
     public:
@@ -75,10 +76,8 @@ namespace geode
 
         explicit Surface( const MeshType& type );
 
-        friend class SurfacesBuilder< dimension >;
         PolygonalSurface< dimension >& modifiable_mesh();
 
-        friend class SurfacesBuilder< dimension >;
         void set_mesh( std::unique_ptr< PolygonalSurface< dimension > > mesh );
 
         friend class SurfacesBuilder< dimension >;

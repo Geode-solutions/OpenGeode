@@ -48,6 +48,7 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( Corner );
         friend class Corners< dimension >;
+        friend class CornersBuilder< dimension >;
         friend class bitsery::Access;
 
     public:
@@ -75,10 +76,8 @@ namespace geode
 
         explicit Corner( const MeshType& type );
 
-        friend class CornersBuilder< dimension >;
         PointSet< dimension >& modifiable_mesh();
 
-        friend class CornersBuilder< dimension >;
         void set_mesh( std::unique_ptr< PointSet< dimension > > mesh );
 
         friend class CornersBuilder< dimension >;
