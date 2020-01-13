@@ -7,7 +7,14 @@ on:
 jobs:      
   release-ubuntu:
     runs-on: ubuntu-18.04
-
+    container: ${{ matrix.config.container }}
+    needs: format
+    strategy:
+      matrix:
+        config:
+        - {container: "geodesolutions/ubuntu", system: "ubuntu"}
+        - {container: "geodesolutions/centos", system: "RHEL"}
+        
     steps:
     - uses: actions/checkout@v1
     - name: Generate package
@@ -18,14 +25,14 @@ jobs:
         cd build
         version="${GITHUB_REF##*/*/}"
         echo ::set-output name=version::$version
-        cmake -DCMAKE_BUILD_TYPE=Release -DOPENGEODE_WITH_TESTS:BOOL=OFF -DCPACK_PACKAGE_VERSION:STRING=$version ..
+        cmake -DCMAKE_BUILD_TYPE=Release -DOPENGEODE_WITH_TESTS:BOOL=OFF -DCPACK_PACKAGE_VERSION:STRING=$version -DCPACK_SYSTEM_NAME:STRING=${{ matrix.config.system }} ..
         cmake --build . -- -j2
         cd opengeode
         cmake --build . --target package
     - name: Upload
       uses: softprops/action-gh-release@v1
       with:
-        files: "build/opengeode/OpenGeode-${{ steps.package.outputs.version }}-Linux.tar.gz"
+        files: "build/opengeode/OpenGeode-${{ steps.package.outputs.version }}-${{ matrix.config.system }}.tar.gz"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Doc
