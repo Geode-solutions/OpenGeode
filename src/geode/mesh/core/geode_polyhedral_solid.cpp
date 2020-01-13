@@ -45,6 +45,7 @@ namespace geode
         explicit Impl( OpenGeodePolyhedralSolid< dimension >& mesh )
             : detail::PointsImpl< dimension >( mesh )
         {
+            init_ptr();
         }
 
         index_t get_polyhedron_vertex(
@@ -199,7 +200,10 @@ namespace geode
 
     private:
         friend class bitsery::Access;
-        Impl() = default;
+        Impl()
+        {
+            init_ptr();
+        }
 
         friend class bitsery::Access;
         template < typename Archive >
@@ -259,15 +263,22 @@ namespace geode
             return { polyhedron_id, vertex_id };
         }
 
+        void init_ptr()
+        {
+            polyhedron_vertex_ptr_.emplace_back( 0 );
+            polyhedron_facet_ptr_.emplace_back( 0 );
+            polyhedron_adjacent_ptr_.emplace_back( 0 );
+        }
+
     private:
         std::vector< index_t > polyhedron_vertices_;
-        std::vector< index_t > polyhedron_vertex_ptr_{ 0 };
+        std::vector< index_t > polyhedron_vertex_ptr_;
 
         std::vector< index_t > polyhedron_facets_;
-        std::vector< index_t > polyhedron_facet_ptr_{ 0 };
+        std::vector< index_t > polyhedron_facet_ptr_;
 
         std::vector< index_t > polyhedron_adjacents_;
-        std::vector< index_t > polyhedron_adjacent_ptr_{ 0 };
+        std::vector< index_t > polyhedron_adjacent_ptr_;
     };
 
     template < index_t dimension >

@@ -57,7 +57,7 @@ namespace geode
         OPENGEODE_ASSERT( vertices.size() == 3, "[TriangulatedSurfaceBuilder"
                                                 "::do_create_polygon] Only "
                                                 "triangles are handled" );
-        std::array< index_t, 3 > triangle_vertices{};
+        std::array< index_t, 3 > triangle_vertices;
         absl::c_copy_n( vertices, 3, triangle_vertices.begin() );
         do_create_triangle( triangle_vertices );
     }
