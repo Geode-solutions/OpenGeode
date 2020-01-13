@@ -80,7 +80,6 @@ namespace geode
 
         void set_mesh( std::unique_ptr< PointSet< dimension > > mesh );
 
-        friend class CornersBuilder< dimension >;
         void set_corner_name( absl::string_view name )
         {
             this->set_name( name );

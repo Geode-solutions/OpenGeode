@@ -134,14 +134,17 @@ namespace geode
 
             if( old_unique_id != NO_ID )
             {
-                auto& old_vertices =
+                const auto& old_vertices =
                     component_vertices_->value( old_unique_id );
-                auto it = absl::c_find( old_vertices, component_vertex_id );
+                const auto it =
+                    absl::c_find( old_vertices, component_vertex_id );
                 if( it != old_vertices.end() )
                 {
                     component_vertices_->modify_value( old_unique_id,
                         [&it]( std::vector< MeshComponentVertex >& vertices ) {
-                            vertices.erase( it );
+                            vertices.erase(
+                                // workaround for gcc < 4.9
+                                vertices.begin() + ( it - vertices.cbegin() ) );
                         } );
                 }
             }

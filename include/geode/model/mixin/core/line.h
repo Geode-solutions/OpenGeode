@@ -80,7 +80,6 @@ namespace geode
 
         void set_mesh( std::unique_ptr< EdgedCurve< dimension > > mesh );
 
-        friend class LinesBuilder< dimension >;
         void set_line_name( absl::string_view name )
         {
             this->set_name( name );
