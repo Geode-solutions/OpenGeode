@@ -223,6 +223,27 @@ namespace geode
     }
 
     template < index_t dimension >
+    void PolygonalSurfaceBuilder< dimension >::replace_vertex(
+        index_t old_vertex_id, index_t new_vertex_id )
+    {
+        const auto polygons_around =
+            polygonal_surface_.polygons_around_vertex( old_vertex_id );
+        associate_polygon_vertex_to_vertex( PolygonVertex{}, old_vertex_id );
+        for( const auto& polygon_around : polygons_around )
+        {
+            const auto previous_id = polygonal_surface_.polygon_vertex(
+                polygonal_surface_.previous_polygon_vertex( polygon_around ) );
+            const auto next_id = polygonal_surface_.polygon_vertex(
+                polygonal_surface_.next_polygon_edge( polygon_around ) );
+            polygonal_surface_.update_edge_vertex(
+                { old_vertex_id, next_id }, 0, new_vertex_id );
+            polygonal_surface_.update_edge_vertex(
+                { previous_id, old_vertex_id }, 1, new_vertex_id );
+            update_polygon_vertex( polygon_around, new_vertex_id );
+        }
+    }
+
+    template < index_t dimension >
     void PolygonalSurfaceBuilder< dimension >::set_polygon_vertex(
         const PolygonVertex& polygon_vertex, index_t vertex_id )
     {
