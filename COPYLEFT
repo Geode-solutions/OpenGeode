@@ -1,5 +1,6 @@
 ## Dependencies
 
+Abseil: Apache-2.0
 Async++: MIT
 Bitsery: MIT
 Filesystem: BSD-3-Clause
