@@ -48,6 +48,20 @@ namespace geode
             component_vertex_id, unique_vertex_id );
     }
 
+    void VertexIdentifierBuilder::unset_unique_vertex(
+        const MeshComponentVertex& component_vertex_id,
+        index_t unique_vertex_id )
+    {
+        vertex_identifier_.unset_unique_vertex(
+            component_vertex_id, unique_vertex_id );
+    }
+
+    void VertexIdentifierBuilder::update_unique_vertices(
+        const ComponentID& component_id, const std::vector< index_t >& old2new )
+    {
+        vertex_identifier_.update_unique_vertices( component_id, old2new );
+    }
+
     void VertexIdentifierBuilder::load_unique_vertices(
         const std::string& directory )
     {

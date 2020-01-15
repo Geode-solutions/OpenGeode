@@ -136,6 +136,25 @@ namespace geode
             MeshComponentVertex component_vertex_id, index_t unique_vertex_id );
 
         /*!
+         * Remove a component vertex to its unique vertex index.
+         * @param[in] component_vertex_id Index of the vertex in the component.
+         * @param[in] unique_vertex_id Unique vertex index.
+         */
+        void unset_unique_vertex(
+            const MeshComponentVertex& component_vertex_id,
+            index_t unique_vertex_id );
+
+        /*!
+         * Remove a component vertex to its unique vertex index.
+         * @param[in] component_id Component unique index used to filter
+         * returned vertices.
+         * @param[in] old2new Mapping between mesh component old vertex indices
+         * to new ones. Deleted vertices new index is NO_ID.
+         */
+        void update_unique_vertices( const ComponentID& component_id,
+            const std::vector< index_t >& old2new );
+
+        /*!
          * Load the VertexIdentifier from a file.
          * @param[in] directory Folder containing the file that stores
          * VertexIdentifier information.
