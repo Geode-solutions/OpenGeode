@@ -87,6 +87,14 @@ namespace geode
             const PolygonVertex& polygon_vertex, index_t vertex_id );
 
         /*!
+         * Replace old polygon vertices from a given vertex to another.
+         * @param[in] old_vertex_id Index of the initial mesh vertex to modify
+         * @param[in] new_vertex_id Index of the target mesh vertex to set as
+         * polygon vertex
+         */
+        void replace_vertex( index_t old_vertex_id, index_t new_vertex_id );
+
+        /*!
          * Set a polygon adjacent through an edge.
          * @param[in] polygon_edge The index of the polygon edge
          * @param[in] adjacent_id Index of the adjacent polygon
