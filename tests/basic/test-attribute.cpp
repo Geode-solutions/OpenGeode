@@ -136,6 +136,7 @@ void test_double_sparse_attribute( geode::AttributeManager& manager )
         attribute->value( 2 ) == 3, "[Test] Should be equal to 3" );
     OPENGEODE_EXCEPTION(
         attribute->value( 3 ) == 3, "[Test] Should be equal to 3" );
+    DEBUG( attribute->value( 4 ) );
     OPENGEODE_EXCEPTION(
         std::fabs( attribute->value( 4 ) - 8.1 ) < geode::global_epsilon,
         "[Test] Should be equal to 8.1" );
