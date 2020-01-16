@@ -31,11 +31,11 @@ namespace geode
     public:
         Impl()
             : component_vertices_(
-                unique_vertices_.vertex_attribute_manager()
-                    .find_or_create_attribute< VariableAttribute,
-                        std::vector< MeshComponentVertex > >(
-                        "component vertices",
-                        std::vector< MeshComponentVertex >{} ) )
+                  unique_vertices_.vertex_attribute_manager()
+                      .find_or_create_attribute< VariableAttribute,
+                          std::vector< MeshComponentVertex > >(
+                          "component vertices",
+                          std::vector< MeshComponentVertex >{} ) )
         {
         }
 
@@ -206,8 +206,6 @@ namespace geode
         void update_unique_vertices( const ComponentID& component_id,
             const std::vector< index_t >& old2new )
         {
-            const auto unique_vertices_map =
-                vertex2unique_vertex_.at( component_id.id() );
             const auto unique_vertices =
                 component_unique_vertices( component_id.id() );
             for( const auto uv : unique_vertices )
@@ -238,7 +236,7 @@ namespace geode
                         component_vertices_->modify_value( uv,
                             [&it, &new_id](
                                 std::vector< MeshComponentVertex >& vertices ) {
-                                const index_t pos =
+                                const auto pos =
                                     std::distance( vertices.cbegin(), it );
                                 vertices[pos].vertex = new_id;
                             } );
