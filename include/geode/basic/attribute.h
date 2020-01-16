@@ -160,6 +160,7 @@ namespace geode
     class ConstantAttribute : public ReadOnlyAttribute< T >
     {
         friend class bitsery::Access;
+        friend class AttributeManager;
 
     public:
         const T& value( index_t /*unused*/ ) const override
@@ -216,7 +217,16 @@ namespace geode
         }
 
     private:
-        friend class AttributeManager;
+        static ConstantAttribute* create( T value )
+        {
+            return new ConstantAttribute{ std::move( value ) };
+        }
+
+        ConstantAttribute( T value )
+        {
+            set_value( std::move( value ) );
+        }
+
         ConstantAttribute() = default;
 
         template < typename Archive >
@@ -250,6 +260,7 @@ namespace geode
     class VariableAttribute : public ReadOnlyAttribute< T >
     {
         friend class bitsery::Access;
+        friend class AttributeManager;
 
     public:
         const T& value( index_t element ) const override
@@ -310,10 +321,15 @@ namespace geode
         }
 
     protected:
-        friend class AttributeManager;
+        static VariableAttribute* create( T default_value )
+        {
+            return new VariableAttribute{ std::move( default_value ) };
+        }
+
         VariableAttribute( T default_value )
             : default_value_( std::move( default_value ) )
         {
+            reserve( 10 );
         }
 
         VariableAttribute() = default;
@@ -336,10 +352,7 @@ namespace geode
         void resize( index_t size ) override
         {
             const auto capacity = values_.capacity();
-            if( size > capacity )
-            {
-                values_.reserve( std::ceil( size / capacity ) * capacity );
-            }
+            values_.reserve( std::ceil( size / capacity ) * capacity );
             values_.resize( size, default_value_ );
         }
 
@@ -369,6 +382,7 @@ namespace geode
     class VariableAttribute< bool > : public ReadOnlyAttribute< bool >
     {
         friend class bitsery::Access;
+        friend class AttributeManager;
 
     public:
         const bool& value( index_t element ) const override
@@ -430,10 +444,15 @@ namespace geode
         }
 
     protected:
-        friend class AttributeManager;
+        static VariableAttribute* create( bool default_value )
+        {
+            return new VariableAttribute{ std::move( default_value ) };
+        }
+
         VariableAttribute( bool default_value )
             : default_value_( default_value )
         {
+            reserve( 10 );
         }
 
         VariableAttribute() = default;
@@ -455,10 +474,7 @@ namespace geode
         void resize( index_t size ) override
         {
             const auto capacity = values_.capacity();
-            if( size > capacity )
-            {
-                values_.reserve( std::ceil( size / capacity ) * capacity );
-            }
+            values_.reserve( std::ceil( size / capacity ) * capacity );
             values_.resize( size, default_value_ );
         }
 
@@ -487,6 +503,7 @@ namespace geode
     class SparseAttribute : public ReadOnlyAttribute< T >
     {
         friend class bitsery::Access;
+        friend class AttributeManager;
 
     public:
         const T& value( index_t element ) const override
@@ -559,10 +576,15 @@ namespace geode
         }
 
     private:
-        friend class AttributeManager;
+        static SparseAttribute* create( T default_value )
+        {
+            return new SparseAttribute{ std::move( default_value ) };
+        }
+
         SparseAttribute( T default_value )
             : default_value_( std::move( default_value ) )
         {
+            reserve( 10 );
         }
 
         SparseAttribute() = default;
