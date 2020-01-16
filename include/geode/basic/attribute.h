@@ -49,13 +49,16 @@ namespace geode
             absl::FixedArray< double > lambdas )
             : indices_( std::move( indices ) ), lambdas_( std::move( lambdas ) )
         {
+            OPENGEODE_EXCEPTION( indices_.size() == lambdas_.size(),
+                "[AttributeLinearInterpolation] Both arrays should have the "
+                "same size" );
         }
 
         template < template < typename > class Attribute, typename T >
         typename std::enable_if< std::is_floating_point< T >::value, T >::type
             compute_value( const Attribute< T >& attribute ) const
         {
-            T result;
+            T result{ 0 };
             for( auto i : Range{ indices_.size() } )
             {
                 result += lambdas_[i] * attribute.value( indices_[i] );
