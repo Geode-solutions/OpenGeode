@@ -34,7 +34,7 @@ jobs:
       run: |
         mkdir -p build
         cd build
-        cmake ${{ matrix.config.cmake_args }} ..
+        cmake ${{ matrix.config.cmake_args }} -DOPENGEODE_WITH_PYTHON:BOOL=ON ..
         cmake --build . -- -j2
     - name: Test
       run: |
@@ -79,7 +79,7 @@ jobs:
       run: |
         mkdir -p build
         cd build
-        cmake -G "Xcode" ..
+        cmake -G "Xcode"  -DOPENGEODE_WITH_PYTHON:BOOL=ON ..
         cmake --build . --config ${{ matrix.config }}
         cd opengeode
         ctest -C ${{ matrix.config }} --output-on-failure
@@ -105,7 +105,7 @@ jobs:
       run: |
         mkdir -p build
         cd build
-        cmake -G "Visual Studio 15 2017 Win64" ..
+        cmake -G "Visual Studio 15 2017 Win64" -DOPENGEODE_WITH_PYTHON:BOOL=ON ..
         cmake --build . --config ${{ matrix.config }}
         cd opengeode
         ctest -C ${{ matrix.config }} --output-on-failure

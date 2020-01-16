@@ -179,7 +179,9 @@ function(add_geode_library)
     )
 endfunction()
 
-macro(add_geode_executable target_name exe_path folder_name)
+macro(add_geode_executable exe_path folder_name)
+    get_filename_component(target_name ${exe_path} NAME_WE)  
+
     # Set the target as an executable
     add_executable(${target_name} ${exe_path})
     if(WIN32)
@@ -198,18 +200,16 @@ macro(add_geode_executable target_name exe_path folder_name)
 endmacro()
 
 function(add_geode_binary bin_path)
-    get_filename_component(exe_name ${bin_path} NAME_WE)
-    add_geode_executable(${exe_name} ${bin_path} "Utilities" ${ARGN})
-    install(TARGETS ${exe_name} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+    add_geode_executable(${bin_path} "Utilities" ${ARGN})
+    install(TARGETS ${target_name} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 endfunction()
 
 option(USE_BENCHMARK "Toggle benchmarking of tests" OFF)
 function(add_geode_test exe_path)
-    get_filename_component(exe_name ${exe_path} NAME_WE)
-    add_geode_executable(${exe_name} ${exe_path} "Tests" ${ARGN})
-    add_test(NAME ${exe_name} COMMAND ${exe_name})
+    add_geode_executable(${exe_path} "Tests" ${ARGN})
+    add_test(NAME ${target_name} COMMAND ${target_name})
     if(USE_BENCHMARK)
-        target_compile_definitions(${exe_name} PRIVATE OPENGEODE_BENCHMARK)
+        target_compile_definitions(${target_name} PRIVATE OPENGEODE_BENCHMARK)
     endif()
 endfunction()
 
@@ -254,8 +254,11 @@ function(add_geode_python_binding)
 endfunction()
 
 function(add_geode_python_test exe_path)
-    get_filename_component(exe_name ${exe_path} NAME_WE)
-    string(APPEND target_name ${exe_name} "_py")
-    add_geode_executable(${target_name} ${exe_path} "Tests" ${ARGN})
-    add_test(NAME ${target_name} COMMAND ${PYTHON_EXECUTABLE} ${exe_path})
+    get_filename_component(target_name ${exe_path} NAME_WE)
+    get_filename_component(full_path ${exe_path} ABSOLUTE)
+    add_test(NAME ${target_name} COMMAND ${PYTHON_EXECUTABLE} ${full_path})
+    set_tests_properties(${target_name} 
+        PROPERTIES
+            ENVIRONMENT PYTHONPATH=${CMAKE_LIBRARY_OUTPUT_DIRECTORY}:$ENV{PYTHONPATH}
+    )
 endfunction()
