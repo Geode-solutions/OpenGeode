@@ -21,22 +21,27 @@
  *
  */
 
-#include <geode/geometry/vector.h>
+#include <geode/geometry/bounding_box.h>
 
 #include <pybind11/pybind11.h>
 
-#define GENEPI_VECTOR( dimension )                                             \
-    GENEPI_CLASS( Vector##dimension##D )                                       \
-    {                                                                          \
-        GENEPI_INHERIT( Point##dimension##D );                                 \
-        GENEPI_CONSTRUCTOR();                                                  \
-        GENEPI_METHOD( length );                                               \
-        GENEPI_METHOD( normalize );                                            \
-        GENEPI_METHOD( dot );                                                  \
-    }
+#define PYTHON_BOUNDING_BOX( dimension )                                       \
+    const auto name##dimension =                                               \
+        "BoundingBox" + std::to_string( dimension ) + "D";                     \
+    pybind11::class_< BoundingBox##dimension##D >(                             \
+        module, name##dimension.c_str() )                                      \
+        .def( pybind11::init<>() )                                             \
+        .def( "add_box", &BoundingBox##dimension##D::add_box )                 \
+        .def( "add_point", &BoundingBox##dimension##D::add_point )             \
+        .def( "contains", &BoundingBox##dimension##D::contains )               \
+        .def( "min", &BoundingBox##dimension##D::min )                         \
+        .def( "max", &BoundingBox##dimension##D::max )
 
 namespace geode
 {
-    GENEPI_VECTOR( 2 )
-    GENEPI_VECTOR( 3 )
+    void define_bounding_box( pybind11::module& module )
+    {
+        PYTHON_BOUNDING_BOX( 2 );
+        PYTHON_BOUNDING_BOX( 3 );
+    }
 } // namespace geode

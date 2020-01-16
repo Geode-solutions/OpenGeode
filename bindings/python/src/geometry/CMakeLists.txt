@@ -18,5 +18,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-add_subdirectory(basic)
-add_subdirectory(geometry)
+add_geode_python_binding(
+    NAME OpenGeode_py_geometry
+    SOURCES
+        "geometry.cpp"
+        "bounding_box.h"
+        "point.h"
+        "vector.h"
+    DEPENDENCIES
+        ${PROJECT_NAME}::geometry
+)
