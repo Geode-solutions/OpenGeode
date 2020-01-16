@@ -399,6 +399,30 @@ void test_set_polygon_vertex(
         "[Test] Edge vertices after set_polygon_vertex is wrong" );
 }
 
+void test_replace_vertex( const geode::PolygonalSurface3D& polygonal_surface,
+    geode::PolygonalSurfaceBuilder3D& builder )
+{
+    const auto new_id = builder.create_vertex();
+    const auto polygons_around = polygonal_surface.polygons_around_vertex( 1 );
+    builder.replace_vertex( 1, new_id );
+    for( const auto& pv : polygons_around )
+    {
+        OPENGEODE_EXCEPTION( polygonal_surface.polygon_vertex( pv ) == new_id,
+            "[Test] PolygonVertex after replace_vertex is wrong" );
+    }
+    OPENGEODE_EXCEPTION( polygonal_surface.isolated_vertex( 1 ),
+        "[Test] Isolated vertex after replace_vertex is wrong" );
+    builder.replace_vertex( new_id, 1 );
+    for( const auto& pv : polygons_around )
+    {
+        OPENGEODE_EXCEPTION( polygonal_surface.polygon_vertex( pv ) == 1,
+            "[Test] PolygonVertex after second replace_vertex is wrong" );
+    }
+    builder.delete_isolated_vertices();
+    OPENGEODE_EXCEPTION( polygonal_surface.nb_vertices() == new_id,
+        "[Test] Revert after replace_vertex is wrong" );
+}
+
 void test_delete_all( const geode::PolygonalSurface3D& polygonal_surface,
     geode::PolygonalSurfaceBuilder3D& builder )
 {
@@ -442,6 +466,7 @@ void test()
     test_io(
         *polygonal_surface, "test." + polygonal_surface->native_extension() );
 
+    test_replace_vertex( *polygonal_surface, *builder );
     test_delete_vertex( *polygonal_surface, *builder );
     test_delete_polygon( *polygonal_surface, *builder );
     test_clone( *polygonal_surface );
