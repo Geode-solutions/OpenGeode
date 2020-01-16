@@ -67,7 +67,7 @@ namespace geode
                         RelationType >( "relation_type", NO_ID ) ),
               ids_( graph_.vertex_attribute_manager()
                         .find_or_create_attribute< VariableAttribute,
-                            ComponentID >( "id" ) )
+                            ComponentID >( "id", ComponentID{} ) )
         {
         }
 

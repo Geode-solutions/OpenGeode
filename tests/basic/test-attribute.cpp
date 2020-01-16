@@ -55,8 +55,7 @@ void test_constant_attribute( geode::AttributeManager& manager )
 {
     auto constant_attribute =
         manager.find_or_create_attribute< geode::ConstantAttribute, bool >(
-            "bool" );
-    constant_attribute->set_value( true );
+            "bool", true );
 
     auto attribute = manager.find_attribute< bool >( "bool" );
     OPENGEODE_EXCEPTION(
@@ -73,7 +72,7 @@ void test_foo_constant_attribute( geode::AttributeManager& manager )
 {
     auto constant_attribute =
         manager.find_or_create_attribute< geode::ConstantAttribute, Foo >(
-            "foo_cst" );
+            "foo_cst", Foo{} );
     constant_attribute->modify_value( []( Foo& foo ) { foo.double_ = 12.4; } );
     OPENGEODE_EXCEPTION( constant_attribute->value().double_ == 12.4,
         "[Test] Should be equal to 12.4" );
@@ -83,7 +82,7 @@ void test_foo_variable_attribute( geode::AttributeManager& manager )
 {
     auto variable_attribute =
         manager.find_or_create_attribute< geode::VariableAttribute, Foo >(
-            "foo_var" );
+            "foo_var", Foo{} );
     variable_attribute->modify_value(
         3, []( Foo& foo ) { foo.double_ = 12.4; } );
     OPENGEODE_EXCEPTION( variable_attribute->value( 0 ).double_ == 0,
@@ -114,7 +113,7 @@ void test_foo_sparse_attribute( geode::AttributeManager& manager )
 {
     auto sparse_attribute =
         manager.find_or_create_attribute< geode::SparseAttribute, Foo >(
-            "foo_spr" );
+            "foo_spr", Foo{} );
     sparse_attribute->modify_value( 3, []( Foo& foo ) { foo.double_ = 12.4; } );
     OPENGEODE_EXCEPTION( sparse_attribute->value( 0 ).double_ == 0,
         "[Test] Should be equal to 0" );
@@ -129,10 +128,16 @@ void test_double_sparse_attribute( geode::AttributeManager& manager )
             "double", 12 );
     sparse_attribute->set_value( 3, 3 );
     sparse_attribute->set_value( 7, 7 );
+    manager.assign_attribute_value( 3, 2 );
+    manager.interpolate_attribute_value( { { 1, 7 }, { 0.5, 0.3 } }, 4 );
 
     auto attribute = manager.find_attribute< double >( "double" );
     OPENGEODE_EXCEPTION(
+        attribute->value( 2 ) == 3, "[Test] Should be equal to 3" );
+    OPENGEODE_EXCEPTION(
         attribute->value( 3 ) == 3, "[Test] Should be equal to 3" );
+    OPENGEODE_EXCEPTION(
+        attribute->value( 4 ) == 8.1, "[Test] Should be equal to 8.1" );
     OPENGEODE_EXCEPTION(
         attribute->value( 6 ) == 12, "[Test] Should be equal to 12" );
     OPENGEODE_EXCEPTION(
@@ -286,8 +291,8 @@ void test_sparse_attribute_after_element_deletion(
     const auto sparse_attribute = manager.find_attribute< double >( "double" );
     OPENGEODE_EXCEPTION( sparse_attribute->value( 0 ) == 12,
         "Element 0 of sparse attribute should be 12 " );
-    OPENGEODE_EXCEPTION( sparse_attribute->value( 3 ) == 12,
-        "Element 3 of sparse attribute should be 12 " );
+    OPENGEODE_EXCEPTION( sparse_attribute->value( 3 ) == 8.1,
+        "Element 3 of sparse attribute should be 8.1 " );
     OPENGEODE_EXCEPTION( sparse_attribute->value( 5 ) == 7,
         "Element 5 of sparse attribute should be 7 " );
     OPENGEODE_EXCEPTION( sparse_attribute->value( 7 ) == 12,

@@ -310,7 +310,8 @@ namespace geode
             auto new_vertices =
                 facet_attribute_manager()
                     .template find_or_create_attribute< VariableAttribute,
-                        PolyhedronFacetVertices >( attribute_name );
+                        PolyhedronFacetVertices >(
+                        attribute_name, PolyhedronFacetVertices{} );
 
             for( const auto f :
                 Range{ facet_attribute_manager().nb_elements() } )

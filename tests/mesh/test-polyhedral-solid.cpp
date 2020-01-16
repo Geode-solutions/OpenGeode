@@ -83,7 +83,7 @@ void test_create_facet_attribute(
 {
     auto attribute = polyhedral_solid.facet_attribute_manager()
                          .find_or_create_attribute< geode::VariableAttribute,
-                             geode::index_t >( "test" );
+                             geode::index_t >( "test", geode::NO_ID );
     for( const auto f : geode::Range{ polyhedral_solid.nb_facets() } )
     {
         attribute->set_value( f, f );
@@ -95,7 +95,7 @@ void test_create_edge_attribute(
 {
     auto attribute = polyhedral_solid.edge_attribute_manager()
                          .find_or_create_attribute< geode::VariableAttribute,
-                             geode::index_t >( "test" );
+                             geode::index_t >( "test", geode::NO_ID );
     for( const auto e : geode::Range{ polyhedral_solid.nb_edges() } )
     {
         const auto& vertices = polyhedral_solid.edge_vertices( e );
@@ -286,7 +286,8 @@ void test_create_vertex_attribute(
 {
     auto attribute = polyhedral_solid.vertex_attribute_manager()
                          .find_or_create_attribute< geode::VariableAttribute,
-                             geode::PolyhedronFacetVertex >( "test" );
+                             geode::PolyhedronFacetVertex >(
+                             "test", geode::PolyhedronFacetVertex{} );
     for( const auto v : geode::Range{ polyhedral_solid.nb_vertices() } )
     {
         attribute->set_value( v, geode::PolyhedronFacetVertex{ { v, v }, v } );

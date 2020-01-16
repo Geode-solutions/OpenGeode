@@ -100,7 +100,7 @@ namespace geode
                     "if an instantiated attribute of the same name "
                     "with different storage already exists." );
 
-                typed_attribute.reset( new Attribute< T >( args... ) );
+                typed_attribute.reset( Attribute< T >::create( args... ) );
                 register_attribute( typed_attribute, name );
             }
             return typed_attribute;
@@ -111,6 +111,28 @@ namespace geode
          * @param[in] size The new attribute size
          */
         void resize( index_t size );
+
+        /*!
+         * Reserve all the attributes to the given capacity
+         * @param[in] size The new attribute capacity
+         */
+        void reserve( index_t capacity );
+
+        /*!
+         * Assign attribute value from other value in the same attribute
+         * @param[in] from_element Attribute value to assign
+         * @param[in] to_element Where the value is assign
+         */
+        void assign_attribute_value( index_t from_element, index_t to_element );
+
+        /*!
+         * Interpolate attribute value from other values in the same attribute
+         * @param[in] interpolation Attribute interpolator
+         * @param[in] to_element Where the value is assign
+         */
+        void interpolate_attribute_value(
+            const AttributeLinearInterpolation& interpolation,
+            index_t to_element );
 
         /*!
          * Get all the associated attribute names

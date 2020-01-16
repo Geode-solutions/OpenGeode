@@ -131,7 +131,8 @@ namespace geode
             edge_attribute_manager_.delete_attribute( attribute_name );
             edges_around_vertex_ =
                 edge_attribute_manager_.find_or_create_attribute<
-                    VariableAttribute, EdgesAroundVertex >( attribute_name );
+                    VariableAttribute, EdgesAroundVertex >(
+                    attribute_name, EdgesAroundVertex{} );
 
             for( const auto e : Range{ edge_attribute_manager_.nb_elements() } )
             {

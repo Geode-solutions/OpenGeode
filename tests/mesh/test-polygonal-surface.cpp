@@ -64,9 +64,10 @@ void test_bounding_box( const geode::PolygonalSurface3D& polygonal_surface )
 void test_create_vertex_attribute(
     const geode::PolygonalSurface3D& polygonal_surface )
 {
-    auto attribute = polygonal_surface.vertex_attribute_manager()
-                         .find_or_create_attribute< geode::VariableAttribute,
-                             geode::PolygonEdge >( "test" );
+    auto attribute =
+        polygonal_surface.vertex_attribute_manager()
+            .find_or_create_attribute< geode::VariableAttribute,
+                geode::PolygonEdge >( "test", geode::PolygonEdge{} );
     for( const auto v : geode::Range{ polygonal_surface.nb_vertices() } )
     {
         attribute->set_value( v, geode::PolygonEdge{ v, v } );
@@ -127,7 +128,7 @@ void test_create_edge_attribute(
 {
     auto attribute = polygonal_surface.edge_attribute_manager()
                          .find_or_create_attribute< geode::VariableAttribute,
-                             geode::index_t >( "test" );
+                             geode::index_t >( "test", geode::NO_ID );
     for( const auto e : geode::Range{ polygonal_surface.nb_edges() } )
     {
         attribute->set_value( e, e );
