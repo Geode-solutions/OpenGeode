@@ -26,13 +26,17 @@
 #include <geode/geometry/point.h>
 
 #include <geode/mesh/builder/point_set_builder.h>
+#include <geode/mesh/builder/polygonal_surface_builder.h>
 
 #include <geode/model/mixin/builder/add_components_builders.h>
 #include <geode/model/mixin/builder/corners_builder.h>
+#include <geode/model/mixin/builder/surfaces_builder.h>
 #include <geode/model/mixin/builder/topology_builder.h>
 #include <geode/model/mixin/core/add_components.h>
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/corners.h>
+#include <geode/model/mixin/core/surface.h>
+#include <geode/model/mixin/core/surfaces.h>
 #include <geode/model/mixin/core/topology.h>
 #include <geode/model/mixin/core/vertex_identifier.h>
 
@@ -66,6 +70,36 @@ public:
 
 private:
     CornerProvider& corner_provider_;
+};
+
+class SurfaceProvider : public geode::Topology,
+                        public geode::AddComponents< 2, geode::Surfaces >
+{
+public:
+    SurfaceProvider() = default;
+};
+
+class SurfaceProviderBuilder
+    : public geode::TopologyBuilder,
+      public geode::AddComponentsBuilders< 2, geode::Surfaces >
+{
+public:
+    SurfaceProviderBuilder( SurfaceProvider& surface_provider )
+        : TopologyBuilder( surface_provider ),
+          AddComponentsBuilders< 2, geode::Surfaces >( surface_provider ),
+          surface_provider_( surface_provider )
+    {
+    }
+
+    const geode::uuid& add_surface()
+    {
+        const auto& id = create_surface();
+        register_mesh_component( surface_provider_.surface( id ) );
+        return id;
+    }
+
+private:
+    SurfaceProvider& surface_provider_;
 };
 
 void test_create_unique_vertices( geode::VertexIdentifier& vertex_identifier )
@@ -167,6 +201,46 @@ void test_save_and_load_unique_vertices(
     }
 }
 
+void test_update_unique_vertices()
+{
+    SurfaceProvider provider;
+    SurfaceProviderBuilder builder( provider );
+
+    const auto& surface_id = builder.add_surface();
+    auto surf_builder = builder.surface_mesh_builder( surface_id );
+    const auto surface_cid = provider.surface( surface_id ).component_id();
+    builder.create_unique_vertices( 5 );
+    for( const auto i : geode::Range{ 10 } )
+    {
+        surf_builder->create_vertex();
+        builder.set_unique_vertex( { surface_cid, i }, std::floor( i / 2 ) );
+    }
+
+    OPENGEODE_EXCEPTION( provider.nb_unique_vertices() == 5,
+        "[Test] Initialization of VertexIdentifier is not correct (nb)" );
+    OPENGEODE_EXCEPTION( provider.mesh_component_vertices( 0 ).size() == 2,
+        "[Test] Initialization of VertexIdentifier is not correct (uid 0)" );
+    builder.unset_unique_vertex( { surface_cid, 0 }, 0 );
+    OPENGEODE_EXCEPTION( provider.mesh_component_vertices( 0 ).size() == 1,
+        "[Test] VertexIdentifier after unset mesh component 0 is not correct "
+        "(size)" );
+    OPENGEODE_EXCEPTION(
+        provider.mesh_component_vertices( 0 ).front().vertex == 1,
+        "[Test] VertexIdentifier after unset mesh component 0 is not correct "
+        "(id)" );
+    std::vector< bool > to_delete{ true, false, true, false, true, false, true,
+        false, true, false };
+    const auto old2new = surf_builder->delete_vertices( to_delete );
+    builder.update_unique_vertices( surface_cid, old2new );
+    for( const auto uid : geode::Range{ 5 } )
+    {
+        OPENGEODE_EXCEPTION(
+            provider.mesh_component_vertices( uid ).size() == 1,
+            "[Test] VertexIdentifier after update_unique_vertices is not "
+            "correct (size)" );
+    }
+}
+
 void test()
 {
     geode::VertexIdentifier vertex_identifier;
@@ -199,6 +273,8 @@ void test()
     test_set_unique_vertices( vertex_identifier, provider );
     test_modify_unique_vertices( vertex_identifier );
     test_save_and_load_unique_vertices( vertex_identifier );
+
+    test_update_unique_vertices();
 
     builder.unregister_mesh_component( provider.corner( corner2_id ) );
     builder.register_mesh_component( provider.corner( corner2_id ) );
