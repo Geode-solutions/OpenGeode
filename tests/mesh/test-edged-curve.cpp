@@ -177,7 +177,7 @@ void test_clone( const geode::EdgedCurve3D& edged_curve )
     auto attribute =
         edged_curve.edge_attribute_manager()
             .find_or_create_attribute< geode::VariableAttribute, int >(
-                "test" );
+                "test", 0 );
     attribute->set_value( 0, 42 );
 
     const auto edged_curve2 = edged_curve.clone();
