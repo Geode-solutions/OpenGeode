@@ -70,6 +70,36 @@ namespace geode
             }
         }
 
+        void reserve( index_t capacity )
+        {
+            if( capacity <= nb_elements_ )
+            {
+                return;
+            }
+            for( auto &it : attributes_ )
+            {
+                it.second->reserve( capacity );
+            }
+        }
+
+        void assign_attribute_value( index_t from_element, index_t to_element )
+        {
+            for( auto &it : attributes_ )
+            {
+                it.second->compute_value( from_element, to_element );
+            }
+        }
+
+        void interpolate_attribute_value(
+            const AttributeLinearInterpolation &interpolation,
+            index_t to_element )
+        {
+            for( auto &it : attributes_ )
+            {
+                it.second->compute_value( interpolation, to_element );
+            }
+        }
+
         absl::FixedArray< absl::string_view > attribute_names() const
         {
             absl::FixedArray< absl::string_view > names( attributes_.size() );
@@ -203,6 +233,23 @@ namespace geode
     void AttributeManager::resize( index_t size )
     {
         impl_->resize( size );
+    }
+
+    void AttributeManager::reserve( index_t capacity )
+    {
+        impl_->reserve( capacity );
+    }
+
+    void AttributeManager::assign_attribute_value(
+        index_t from_element, index_t to_element )
+    {
+        impl_->assign_attribute_value( from_element, to_element );
+    }
+
+    void AttributeManager::interpolate_attribute_value(
+        const AttributeLinearInterpolation &interpolation, index_t to_element )
+    {
+        impl_->interpolate_attribute_value( interpolation, to_element );
     }
 
     absl::FixedArray< absl::string_view >
