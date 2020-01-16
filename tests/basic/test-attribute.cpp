@@ -137,7 +137,8 @@ void test_double_sparse_attribute( geode::AttributeManager& manager )
     OPENGEODE_EXCEPTION(
         attribute->value( 3 ) == 3, "[Test] Should be equal to 3" );
     OPENGEODE_EXCEPTION(
-        attribute->value( 4 ) == 8.1, "[Test] Should be equal to 8.1" );
+        std::fabs( attribute->value( 4 ) - 8.1 ) < geode::global_epsilon,
+        "[Test] Should be equal to 8.1" );
     OPENGEODE_EXCEPTION(
         attribute->value( 6 ) == 12, "[Test] Should be equal to 12" );
     OPENGEODE_EXCEPTION(
@@ -291,7 +292,8 @@ void test_sparse_attribute_after_element_deletion(
     const auto sparse_attribute = manager.find_attribute< double >( "double" );
     OPENGEODE_EXCEPTION( sparse_attribute->value( 0 ) == 12,
         "Element 0 of sparse attribute should be 12 " );
-    OPENGEODE_EXCEPTION( sparse_attribute->value( 3 ) == 8.1,
+    OPENGEODE_EXCEPTION(
+        std::fabs( sparse_attribute->value( 3 ) - 8.1 ) < geode::global_epsilon,
         "Element 3 of sparse attribute should be 8.1 " );
     OPENGEODE_EXCEPTION( sparse_attribute->value( 5 ) == 7,
         "Element 5 of sparse attribute should be 7 " );
