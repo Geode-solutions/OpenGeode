@@ -23,8 +23,6 @@
 
 #include <geode/geometry/bounding_box.h>
 
-#include <pybind11/pybind11.h>
-
 #define PYTHON_BOUNDING_BOX( dimension )                                       \
     const auto name##dimension =                                               \
         "BoundingBox" + std::to_string( dimension ) + "D";                     \

@@ -23,8 +23,6 @@
 
 #include <geode/basic/attribute.h>
 
-#include <pybind11/pybind11.h>
-
 #define PYTHON_ATTRIBUTE_CLASS( type, name )                                   \
     pybind11::class_< ReadOnlyAttribute< type > >( module, name )              \
         .def( "value", &ReadOnlyAttribute< type >::value )

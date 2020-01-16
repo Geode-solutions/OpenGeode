@@ -24,8 +24,6 @@
 #include <geode/basic/attribute_manager.h>
 #include <typeinfo>
 
-#include <pybind11/pybind11.h>
-
 #define PYTHON_ATTRIBUTE_TYPE( type )                                          \
     typeid( type ).name(), &AttributeManager::find_attribute< type >
 

@@ -23,8 +23,6 @@
 
 #include <geode/basic/uuid.h>
 
-#include <pybind11/pybind11.h>
-
 namespace geode
 {
     void define_uuid( pybind11::module& module )

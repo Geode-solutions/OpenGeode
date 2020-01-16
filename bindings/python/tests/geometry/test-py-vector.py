@@ -18,5 +18,33 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-add_subdirectory(basic)
-add_subdirectory(geometry)
+import math
+
+import OpenGeode_py_geometry as geom
+
+def test_length():
+    p = geom.Vector3D( [1, 2, 4] )
+    if p.length() != math.sqrt( 1 + 4 + 16 ):
+        raise ValueError( "[Test] Wrong vector length" )
+
+    p_normalized = p.normalize()
+    if p_normalized.length() != 1:
+        raise ValueError( "[Test] Wrong vector length" )
+
+def test_operations():
+    unit = geom.Vector3D( [0, 2, 0] )
+    p = geom.Vector3D( [1, 2, 4] )
+    if p.dot( unit ) != 4:
+        raise ValueError( "[Test] Wrong dot product" )
+
+    cross_unit = geom.Vector3D( [1, 0, 0] ).cross( geom.Vector3D( [0, 1, 0] ) )
+    answer_unit = geom.Vector3D( [0, 0, 1] )
+    if cross_unit.different( answer_unit ):
+        raise ValueError( "[Test] Wrong unit cross product" )
+
+    answer = geom.Vector3D( [-8, 0, 2] )
+    if p.cross( unit ).different( answer ):
+        raise ValueError( "[Test] Wrong cross product" )
+
+test_length()
+test_operations()

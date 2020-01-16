@@ -23,8 +23,6 @@
 
 #include <geode/geometry/nn_search.h>
 
-#include <pybind11/pybind11.h>
-
 #define PYTHON_NN_SEARCH( dimension )                                          \
     const auto name##dimension =                                               \
         "NNSearch" + std::to_string( dimension ) + "D";                        \

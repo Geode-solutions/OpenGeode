@@ -23,13 +23,12 @@
 
 #include <geode/geometry/vector.h>
 
-#include <pybind11/pybind11.h>
-
 #define PYTHON_VECTOR( dimension )                                             \
     const auto name##dimension = "Vector" + std::to_string( dimension ) + "D"; \
     pybind11::class_< Vector##dimension##D, Point##dimension##D >(             \
         module, name##dimension.c_str() )                                      \
         .def( pybind11::init<>() )                                             \
+        .def( pybind11::init< std::array< double, dimension > >() )            \
         .def( "length", &Vector##dimension##D::length )                        \
         .def( "length2", &Vector##dimension##D::length2 )                      \
         .def( "normalize", &Vector##dimension##D::normalize )                  \

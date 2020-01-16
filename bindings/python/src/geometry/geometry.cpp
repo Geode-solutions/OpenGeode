@@ -22,11 +22,24 @@
  */
 
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
 #include "bounding_box.h"
 #include "nn_search.h"
 #include "point.h"
 #include "vector.h"
+
+namespace pybind11
+{
+    namespace detail
+    {
+        template < typename Type >
+        struct type_caster< absl::FixedArray< Type > >
+            : list_caster< absl::FixedArray< Type >, Type >
+        {
+        };
+    } // namespace detail
+} // namespace pybind11
 
 PYBIND11_MODULE( OpenGeode_py_geometry, module )
 {
