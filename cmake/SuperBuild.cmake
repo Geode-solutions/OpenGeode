@@ -26,6 +26,7 @@ set(OPENGEODE_EXTRA_ARGS
     -DCPACK_PACKAGE_VERSION:STRING=${CPACK_PACKAGE_VERSION}
     -DCPACK_SYSTEM_NAME:STRING=${CPACK_SYSTEM_NAME}
     -DOPENGEODE_WITH_TESTS:BOOL=${OPENGEODE_WITH_TESTS}
+    -DOPENGEODE_WITH_PYTHON:BOOL=${OPENGEODE_WITH_PYTHON}
 )
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -50,4 +51,9 @@ include(${PROJECT_SOURCE_DIR}/cmake/ConfigureFilesystem.cmake)
 include(${PROJECT_SOURCE_DIR}/cmake/ConfigureMinizip.cmake)
 include(${PROJECT_SOURCE_DIR}/cmake/ConfigureNanoflann.cmake)
 include(${PROJECT_SOURCE_DIR}/cmake/ConfigureSpdlog.cmake)
+
+if(OPENGEODE_WITH_PYTHON)
+    include(${PROJECT_SOURCE_DIR}/cmake/ConfigurePybind11.cmake)
+endif()
+
 include(${PROJECT_SOURCE_DIR}/cmake/ConfigureOpenGeode.cmake)

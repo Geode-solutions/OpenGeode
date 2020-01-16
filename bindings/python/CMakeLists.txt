@@ -18,26 +18,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.11)
+find_package(pybind11 REQUIRED CONFIG NO_DEFAULT_PATH PATHS ${PYBIND11_INSTALL_PREFIX})
 
-#-------------------------------------------------------------------------------
-# Project options
+add_subdirectory(src)
 
-# Optional components
-option(OPENGEODE_WITH_TESTS "Compile test projects" ON)
-option(OPENGEODE_WITH_PYTHON "Compile Python bindings" OFF)
-
-# Internal options
-option(USE_SUPERBUILD "Whether or not a superbuild should be invoked" ON)
-mark_as_advanced(USE_SUPERBUILD)
-
-#-------------------------------------------------------------------------------
-# When CMake is called, a main project (super build project) is generated.
-# This main project is responsible to create third party cmake projects including
-# the one of OpenGeode. This is done during compilation, i.e., OpenGeode.cmake is
-# called (USE_SUPERBUILD = OFF) when the super build project is compiled.
-if(USE_SUPERBUILD)
-    include(cmake/SuperBuild.cmake)
-else()
-    include(cmake/OpenGeode.cmake)
+if(OPENGEODE_WITH_TESTS)
+    add_subdirectory(tests)
 endif()

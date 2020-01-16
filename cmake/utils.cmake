@@ -179,20 +179,18 @@ function(add_geode_library)
     )
 endfunction()
 
-macro(add_geode_executable exe_path folder_name)
-    get_filename_component(exe_name ${exe_path} NAME_WE)
-
+macro(add_geode_executable target_name exe_path folder_name)
     # Set the target as an executable
-    add_executable(${exe_name} ${exe_path})
+    add_executable(${target_name} ${exe_path})
     if(WIN32)
-        add_dependencies(windows_post_compilation ${exe_name})
+        add_dependencies(windows_post_compilation ${target_name})
     endif()
     foreach(dependency ${ARGN})
-        target_link_libraries(${exe_name} PRIVATE ${dependency})
+        target_link_libraries(${target_name} PRIVATE ${dependency})
     endforeach()
     
     # Add the project to a folder of projects for the tests
-    set_target_properties(${exe_name}
+    set_target_properties(${target_name}
         PROPERTIES
             FOLDER ${folder_name}
             INSTALL_RPATH "${OS_RPATH}/../${CMAKE_INSTALL_LIBDIR}"
@@ -200,13 +198,15 @@ macro(add_geode_executable exe_path folder_name)
 endmacro()
 
 function(add_geode_binary bin_path)
-    add_geode_executable(${bin_path} "Utilities" ${ARGN})
+    get_filename_component(exe_name ${bin_path} NAME_WE)
+    add_geode_executable(${exe_name} ${bin_path} "Utilities" ${ARGN})
     install(TARGETS ${exe_name} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 endfunction()
 
 option(USE_BENCHMARK "Toggle benchmarking of tests" OFF)
-function(add_geode_test cpp_file_path)
-    add_geode_executable(${cpp_file_path} "Tests" ${ARGN})
+function(add_geode_test exe_path)
+    get_filename_component(exe_name ${exe_path} NAME_WE)
+    add_geode_executable(${exe_name} ${exe_path} "Tests" ${ARGN})
     add_test(NAME ${exe_name} COMMAND ${exe_name})
     if(USE_BENCHMARK)
         target_compile_definitions(${exe_name} PRIVATE OPENGEODE_BENCHMARK)
@@ -234,4 +234,28 @@ function(copy_windows_binaries dependency)
 			)
         endif()
     endif()
+endfunction()
+
+function(add_geode_python_binding)
+    cmake_parse_arguments(GEODE_BINDING
+        ""
+        "NAME"
+        "SOURCES;DEPENDENCIES"
+        ${ARGN}
+    )
+    pybind11_add_module(${GEODE_BINDING_NAME} SYSTEM "${GEODE_BINDING_SOURCES}")
+    target_link_libraries(${GEODE_BINDING_NAME} PRIVATE "${GEODE_BINDING_DEPENDENCIES}")
+    install(TARGETS ${GEODE_BINDING_NAME}
+        EXPORT ${GEODE_BINDING_NAME}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    )
+endfunction()
+
+function(add_geode_python_test exe_path)
+    get_filename_component(exe_name ${exe_path} NAME_WE)
+    string(APPEND target_name ${exe_name} "_py")
+    add_geode_executable(${target_name} ${exe_path} "Tests" ${ARGN})
+    add_test(NAME ${target_name} COMMAND ${PYTHON_EXECUTABLE} ${exe_path})
 endfunction()

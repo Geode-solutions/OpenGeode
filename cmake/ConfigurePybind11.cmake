@@ -1,4 +1,4 @@
-# Copyright (c) 2019 - 2020 Geode-solutions
+# Copyright (c) 2019 Geode-solutions
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,26 +18,24 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.11)
-
-#-------------------------------------------------------------------------------
-# Project options
-
-# Optional components
-option(OPENGEODE_WITH_TESTS "Compile test projects" ON)
-option(OPENGEODE_WITH_PYTHON "Compile Python bindings" OFF)
-
-# Internal options
-option(USE_SUPERBUILD "Whether or not a superbuild should be invoked" ON)
-mark_as_advanced(USE_SUPERBUILD)
-
-#-------------------------------------------------------------------------------
-# When CMake is called, a main project (super build project) is generated.
-# This main project is responsible to create third party cmake projects including
-# the one of OpenGeode. This is done during compilation, i.e., OpenGeode.cmake is
-# called (USE_SUPERBUILD = OFF) when the super build project is compiled.
-if(USE_SUPERBUILD)
-    include(cmake/SuperBuild.cmake)
-else()
-    include(cmake/OpenGeode.cmake)
-endif()
+set(PYBIND11_PATH ${PROJECT_BINARY_DIR}/third_party/pybind11)
+set(PYBIND11_INSTALL_PREFIX ${PYBIND11_PATH}/install)
+string(REPLACE "/MDd" "/MD" NEW_FLAGS ${CMAKE_CXX_FLAGS_DEBUG})
+ExternalProject_Add(pybind11
+    PREFIX ${PYBIND11_PATH}
+    GIT_REPOSITORY https://github.com/pybind/pybind11
+    GIT_PROGRESS ON
+    GIT_TAG 07e225932235ccb0db5271b0874d00f086f28423
+    CMAKE_GENERATOR ${CMAKE_GENERATOR}
+    CMAKE_GENERATOR_PLATFORM ${CMAKE_GENERATOR_PLATFORM}
+    CMAKE_ARGS
+        -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+        -DCMAKE_INSTALL_MESSAGE=LAZY
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+    CMAKE_CACHE_ARGS
+        -DCMAKE_C_FLAGS_DEBUG:INTERNAL=${NEW_FLAGS}
+        -DCMAKE_CXX_FLAGS_DEBUG:INTERNAL=${NEW_FLAGS}
+        -DPYBIND11_INSTALL:BOOL=ON
+        -DPYBIND11_TEST:BOOL=OFF
+        -DCMAKE_INSTALL_PREFIX:PATH=${PYBIND11_INSTALL_PREFIX}
+)
