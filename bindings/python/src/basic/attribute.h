@@ -24,17 +24,38 @@
 #include <geode/basic/attribute.h>
 
 #define PYTHON_ATTRIBUTE_CLASS( type, name )                                   \
-    pybind11::class_< ReadOnlyAttribute< type > >( module, name )              \
-        .def( "value", &ReadOnlyAttribute< type >::value )
+    const auto read##name = std::string{ "ReadOnlyAttribute" } + #name;        \
+    pybind11::class_< ReadOnlyAttribute< type >,                               \
+        std::shared_ptr< ReadOnlyAttribute< type > > >(                        \
+        module, read##name.c_str() )                                           \
+        .def( "value", &ReadOnlyAttribute< type >::value );                    \
+    const auto constant##name = std::string{ "ConstantAttribute" } + #name;    \
+    pybind11::class_< ConstantAttribute< type >, ReadOnlyAttribute< type >,    \
+        std::shared_ptr< ConstantAttribute< type > > >(                        \
+        module, constant##name.c_str() )                                       \
+        .def( "set_value", &ConstantAttribute< type >::set_value )             \
+        .def( "default_value", &ConstantAttribute< type >::default_value );    \
+    const auto variable##name = std::string{ "VariableAttribute" } + #name;    \
+    pybind11::class_< VariableAttribute< type >, ReadOnlyAttribute< type >,    \
+        std::shared_ptr< VariableAttribute< type > > >(                        \
+        module, variable##name.c_str() )                                       \
+        .def( "set_value", &VariableAttribute< type >::set_value )             \
+        .def( "default_value", &VariableAttribute< type >::default_value );    \
+    const auto sparse##name = std::string{ "SparseAttribute" } + #name;        \
+    pybind11::class_< SparseAttribute< type >, ReadOnlyAttribute< type >,      \
+        std::shared_ptr< SparseAttribute< type > > >(                          \
+        module, sparse##name.c_str() )                                         \
+        .def( "set_value", &SparseAttribute< type >::set_value )               \
+        .def( "default_value", &SparseAttribute< type >::default_value )
 
 namespace geode
 {
     void define_attributes( pybind11::module& module )
     {
-        PYTHON_ATTRIBUTE_CLASS( bool, "AttributeBool" );
-        PYTHON_ATTRIBUTE_CLASS( int, "AttributeInt" );
-        PYTHON_ATTRIBUTE_CLASS( unsigned int, "AttributeUInt" );
-        PYTHON_ATTRIBUTE_CLASS( float, "AttributeFloat" );
-        PYTHON_ATTRIBUTE_CLASS( double, "AttributeDouble" );
+        PYTHON_ATTRIBUTE_CLASS( bool, Bool );
+        PYTHON_ATTRIBUTE_CLASS( int, Int );
+        PYTHON_ATTRIBUTE_CLASS( unsigned int, UInt );
+        PYTHON_ATTRIBUTE_CLASS( float, Float );
+        PYTHON_ATTRIBUTE_CLASS( double, Double );
     }
 } // namespace geode

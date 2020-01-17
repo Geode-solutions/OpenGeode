@@ -24,22 +24,47 @@
 #include <geode/basic/attribute_manager.h>
 #include <typeinfo>
 
-#define PYTHON_ATTRIBUTE_TYPE( type )                                          \
-    typeid( type ).name(), &AttributeManager::find_attribute< type >
+#define PYTHON_ATTRIBUTE_TYPE( type, suffix )                                  \
+    const auto read##suffix = std::string{ "find_attribute_" } + #suffix;      \
+    manager.def(                                                               \
+        read##suffix.c_str(), &AttributeManager::find_attribute< type > );     \
+    const auto constant##suffix =                                              \
+        std::string{ "find_or_create_attribute_constant_" } + #suffix;         \
+    manager.def( constant##suffix.c_str(),                                     \
+        &AttributeManager::find_or_create_attribute< ConstantAttribute, type,  \
+            type > );                                                          \
+    const auto variable##suffix =                                              \
+        std::string{ "find_or_create_attribute_variable_" } + #suffix;         \
+    manager.def( variable##suffix.c_str(),                                     \
+        &AttributeManager::find_or_create_attribute< VariableAttribute, type,  \
+            type > );                                                          \
+    const auto sparse##suffix =                                                \
+        std::string{ "find_or_create_attribute_sparse_" } + #suffix;           \
+    manager.def( sparse##suffix.c_str(),                                       \
+        &AttributeManager::find_or_create_attribute< SparseAttribute, type,    \
+            type > )
 
 namespace geode
 {
     void define_attribute_manager( pybind11::module& module )
     {
-        pybind11::class_< AttributeManager >( module, "AttributeManager" )
+        pybind11::class_< AttributeManager > manager(
+            module, "AttributeManager" );
+        manager.def( pybind11::init<>() )
             .def( "attribute_names", &AttributeManager::attribute_names )
             .def( "attribute_type", &AttributeManager::attribute_type )
             .def( "attribute_exists", &AttributeManager::attribute_exists )
             .def( "nb_elements", &AttributeManager::nb_elements )
-            .def( PYTHON_ATTRIBUTE_TYPE( bool ) )
-            .def( PYTHON_ATTRIBUTE_TYPE( int ) )
-            .def( PYTHON_ATTRIBUTE_TYPE( unsigned int ) )
-            .def( PYTHON_ATTRIBUTE_TYPE( float ) )
-            .def( PYTHON_ATTRIBUTE_TYPE( double ) );
+            .def( "reserve", &AttributeManager::reserve )
+            .def( "resize", &AttributeManager::resize )
+            .def( "clear", &AttributeManager::clear )
+            .def( "clear_attributes", &AttributeManager::clear_attributes )
+            .def( "delete_attribute", &AttributeManager::delete_attribute )
+            .def( "delete_elements", &AttributeManager::delete_elements );
+        PYTHON_ATTRIBUTE_TYPE( bool, bool );
+        PYTHON_ATTRIBUTE_TYPE( int, int );
+        PYTHON_ATTRIBUTE_TYPE( unsigned int, uint );
+        PYTHON_ATTRIBUTE_TYPE( float, float );
+        PYTHON_ATTRIBUTE_TYPE( double, double );
     }
 } // namespace geode

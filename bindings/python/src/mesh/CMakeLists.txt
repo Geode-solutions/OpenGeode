@@ -18,5 +18,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-add_geode_python_test(test-py-attribute.py)
-add_geode_python_test(test-py-uuid.py)
+add_geode_python_binding(
+    NAME OpenGeode_py_mesh
+    SOURCES
+        "mesh.cpp"
+        # "core/vertex_set.h"
+    DEPENDENCIES
+        ${PROJECT_NAME}::mesh
+)
