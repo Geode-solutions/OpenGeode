@@ -36,6 +36,8 @@ jobs:
         cd build
         cmake ${{ matrix.config.cmake_args }} -DOPENGEODE_WITH_PYTHON:BOOL=ON ..
         cmake --build . -- -j2
+        cd opengeode        
+        ctest --output-on-failure
     - name: Test
       run: |
         mkdir -p test
