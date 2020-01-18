@@ -273,8 +273,4 @@ function(add_geode_python_test exe_path python_lib)
         COMMAND ${PYTHON_EXECUTABLE} ${exe_path}
         WORKING_DIRECTORY $<TARGET_FILE_DIR:${python_lib}>
     )
-    set_tests_properties(${target_name}
-        PROPERTIES
-            ENVIRONMENT "PYTHONPATH=$<TARGET_FILE_DIR:${python_lib}>:$ENV{PYTHONPATH}"
-    )
 endfunction()
