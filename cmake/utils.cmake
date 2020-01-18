@@ -29,12 +29,12 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}
 #------------------------------------------------------------------------------------------------
 # Platform dependent settings
 add_compile_options(
-	$<$<CXX_COMPILER_ID:MSVC>:/bigobj>
-	$<$<CXX_COMPILER_ID:MSVC>:/DNOMINMAX>
-	$<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wall>
-	$<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wextra>
-	$<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wpedantic>
-	$<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wno-attributes>
+    $<$<CXX_COMPILER_ID:MSVC>:/bigobj>
+    $<$<CXX_COMPILER_ID:MSVC>:/DNOMINMAX>
+    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wall>
+    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wextra>
+    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wpedantic>
+    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wno-attributes>
 )
 
 #------------------------------------------------------------------------------------------------
@@ -222,7 +222,7 @@ function(copy_windows_binaries dependency)
                 COMMAND ${CMAKE_COMMAND} -E copy_directory 
                     "${release_location_directory}"
                     "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}"
-			)
+            )
         endif()
         get_target_property(debug_location ${dependency} IMPORTED_LOCATION_DEBUG)
         if(debug_location AND EXISTS ${debug_location})
@@ -231,7 +231,7 @@ function(copy_windows_binaries dependency)
                 COMMAND ${CMAKE_COMMAND} -E copy_directory 
                     "${debug_location_directory}"
                     "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}"
-			)
+            )
         endif()
     endif()
 endfunction()
@@ -243,8 +243,12 @@ function(add_geode_python_binding)
         "SOURCES;DEPENDENCIES"
         ${ARGN}
     )
-    pybind11_add_module(${GEODE_BINDING_NAME} SYSTEM "${GEODE_BINDING_SOURCES}")
+    pybind11_add_module(${GEODE_BINDING_NAME} SHARED SYSTEM "${GEODE_BINDING_SOURCES}")
     target_link_libraries(${GEODE_BINDING_NAME} PRIVATE "${GEODE_BINDING_DEPENDENCIES}")
+    set_target_properties(${GEODE_BINDING_NAME}
+        PROPERTIES
+            FOLDER "Bindings/Python"
+    )
     install(TARGETS ${GEODE_BINDING_NAME}
         EXPORT ${GEODE_BINDING_NAME}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
@@ -253,12 +257,24 @@ function(add_geode_python_binding)
     )
 endfunction()
 
-function(add_geode_python_test exe_path)
+function(add_geode_python_test exe_path python_lib)
     get_filename_component(target_name ${exe_path} NAME_WE)
     get_filename_component(full_path ${exe_path} ABSOLUTE)
-    add_test(NAME ${target_name} COMMAND ${PYTHON_EXECUTABLE} ${full_path})
-    set_tests_properties(${target_name} 
+    add_custom_target(${target_name} ALL 
+        SOURCES ${exe_path}
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${full_path} $<TARGET_FILE_DIR:${python_lib}>
+    )
+    set_target_properties(${target_name}
         PROPERTIES
-            ENVIRONMENT PYTHONPATH=${CMAKE_LIBRARY_OUTPUT_DIRECTORY}:$ENV{PYTHONPATH}
+            FOLDER "Bindings/Python/Tests"
+    )
+    add_test(NAME ${target_name} 
+        COMMAND ${PYTHON_EXECUTABLE} ${exe_path}
+        WORKING_DIRECTORY $<TARGET_FILE_DIR:${python_lib}>
+    )
+    set_tests_properties(${target_name}
+        PROPERTIES
+            ENVIRONMENT "PYTHONPATH=$<TARGET_FILE_DIR:${python_lib}>:$ENV{PYTHONPATH}"
     )
 endfunction()
