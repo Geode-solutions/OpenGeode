@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+# -*- coding: utf-8 -*-
+
 import OpenGeode_py_basic as basic
 
 def test_constant_attribute( manager ):
