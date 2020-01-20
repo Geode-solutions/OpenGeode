@@ -55,7 +55,7 @@ OpenGeode is an open source platform for representing and manipulating geometric
 ## Documentation
 
 Code and API are fully documented inside the code itself.
-To check out our live documentation, visit [docs.geode-solutions.com/opengeode](https://docs.geode-solutions.com/opengeode).
+To check out our live documentation, visit [docs.geode-solutions.com](https://docs.geode-solutions.com).
 
 
 ## Questions
