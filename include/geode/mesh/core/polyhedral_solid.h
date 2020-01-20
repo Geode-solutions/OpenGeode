@@ -139,6 +139,37 @@ namespace geode
         index_t vertex_id{ NO_ID };
     };
 
+    struct opengeode_mesh_api PolyhedronFacetEdge
+    {
+        PolyhedronFacetEdge() = default;
+        PolyhedronFacetEdge( PolyhedronFacet facet, index_t edge_id )
+            : polyhedron_facet( std::move( facet ) ), edge_id( edge_id )
+        {
+        }
+        bool operator==( const PolyhedronFacetEdge& other ) const
+        {
+            return polyhedron_facet == other.polyhedron_facet
+                   && edge_id == other.edge_id;
+        }
+        bool operator!=( const PolyhedronFacetEdge& other ) const
+        {
+            return !( *this == other );
+        }
+        template < typename Archive >
+        void serialize( Archive& archive )
+        {
+            archive.ext( *this,
+                DefaultGrowable< Archive, PolyhedronFacetEdge >{},
+                []( Archive& archive,
+                    PolyhedronFacetEdge& polyhedron_facet_edge ) {
+                    archive.object( polyhedron_facet_edge.polyhedron_facet );
+                    archive.value4b( polyhedron_facet_edge.edge_id );
+                } );
+        }
+        PolyhedronFacet polyhedron_facet;
+        index_t edge_id{ NO_ID };
+    };
+
     /*!
      * This class represents a 3D Solid made up with polyhedra and provides mesh
      * functionnalities.
@@ -219,6 +250,14 @@ namespace geode
          */
         index_t polyhedron_facet_vertex(
             const PolyhedronFacetVertex& polyhedron_facet_vertex ) const;
+
+        /*!
+         * Return the index in the mesh of a given polyhedron facet edge.
+         * @param[in] polyhedron_facet_edge Local index of the edge in the
+         * facet of a polyhedron.
+         */
+        index_t polyhedron_facet_edge(
+            const PolyhedronFacetEdge& polyhedron_facet_edge ) const;
 
         /*!
          * Return the indices of facet vertices.
