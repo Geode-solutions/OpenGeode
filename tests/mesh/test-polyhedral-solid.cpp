@@ -80,6 +80,9 @@ void test_create_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
         "[Test] PolyhedralSolid should have 15 edges" );
     OPENGEODE_EXCEPTION( !polyhedral_solid.isolated_vertex( 0 ),
         "[Test] Vertices should not be isolated after polyhedra creation" );
+    OPENGEODE_EXCEPTION(
+        polyhedral_solid.polyhedron_facet_edge( { { 0, 1 }, 2 } ) == 5,
+        "[Test] Wrong edge index get from PolyhedronFacetEdge" );
 }
 
 void test_create_facet_attribute(
