@@ -41,7 +41,40 @@
 namespace geode
 {
     /*!
-     * Base classe defining the virtual API used by the AttributeManager.
+     * Helper struct to convert an Attribute value to generic float.
+     * This struct may be customized for a given type.
+     * Example:
+     * template <>
+     * struct GenericAttributeConversion< MyType >
+     * {
+     *      static float converted_value( const MyType& value )
+     *      {
+     *          return value.get_a_float();
+     *      }
+     * };
+     */
+    template < typename AttributeType >
+    struct GenericAttributeConversion
+    {
+        template < typename T = AttributeType >
+        static typename std::enable_if< std::is_arithmetic< T >::value,
+            float >::type
+            converted_value( const T& value )
+        {
+            return value;
+        }
+
+        template < typename T = AttributeType >
+        static typename std::enable_if< !std::is_arithmetic< T >::value,
+            float >::type
+            converted_value( const T& /*unused*/ )
+        {
+            return 0.;
+        }
+    };
+
+    /*!
+     * Base class defining the virtual API used by the AttributeManager.
      */
     class AttributeBase
     {
@@ -55,6 +88,8 @@ namespace geode
 
         virtual void copy(
             const AttributeBase& attribute, index_t nb_elements ) = 0;
+
+        virtual float generic_value( index_t element ) const = 0;
 
     private:
         friend class bitsery::Access;
@@ -89,6 +124,12 @@ namespace geode
         std::string type() final
         {
             return typeid( T ).name();
+        }
+
+        float generic_value( index_t element ) const final
+        {
+            return GenericAttributeConversion< T >::converted_value(
+                value( element ) );
         }
 
     protected:
