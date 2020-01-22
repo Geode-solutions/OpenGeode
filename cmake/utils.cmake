@@ -190,6 +190,23 @@ option(USE_BENCHMARK "Toggle benchmarking of tests" OFF)
 function(add_geode_test cpp_file_path)
     add_geode_executable(${cpp_file_path} "Tests" ${ARGN})
     add_test(NAME ${exe_name} COMMAND ${exe_name})
+    foreach(dependency ${ARGN})
+        if(WIN32)
+            set_property(
+                TEST ${exe_name}
+                APPEND
+                PROPERTY
+                    ENVIRONMENT "PATH=$<TARGET_FILE_DIR:${dependency}>:$ENV{PATH}"
+            )
+        else()
+            set_property(
+                TEST ${exe_name}
+                APPEND
+                PROPERTY
+                    ENVIRONMENT "LD_LIBRARY_PATH=$<TARGET_FILE_DIR:${dependency}>:$ENV{LD_LIBRARY_PATH}"
+            )
+        endif()
+    endforeach()
     if(USE_BENCHMARK)
         target_compile_definitions(${exe_name} PRIVATE OPENGEODE_BENCHMARK)
     endif()
