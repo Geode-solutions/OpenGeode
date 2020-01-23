@@ -193,7 +193,6 @@ function(add_geode_test cpp_file_path)
     foreach(dependency ${ARGN})
        list(APPEND directories $<TARGET_FILE_DIR:${dependency}>)
     endforeach()
-    add_test(NAME ${exe_name} COMMAND ${exe_name})
     if(WIN32)
         list(JOIN directories "\\;" directories)
         set_tests_properties(${exe_name}
