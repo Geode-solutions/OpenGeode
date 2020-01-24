@@ -9,7 +9,7 @@ After many profiling, we decided to introduce Abseil (https://abseil.io) as one 
 This project (maintained and used by Google) has an important focus on performance.
 By adding it to OpenGeode, we allow us to use tailored containers and algorithms to improve our efficiency.
 
-Our CMake function `add_geode_library` was using unconventional design, this has been rewritten for easier usage.
+CMake minimum required version is bumped to 3.11 to ease third parties integration. Moreover, our CMake function `add_geode_library` was using unconventional design, this has been rewritten for easier usage.
 
 ### Breaking Changes
 
@@ -122,6 +122,14 @@ add_geode_library(
         MINIZIP::minizip	       
 )
 ```
+
+- **CMake**: remove `copy_windows_binaries` function
+
+**How to upgrade**
+
+For testing, there is nothing to upgrade, just run CTest or RUN_TESTS on Visual Studio as usual.
+
+For running a single executable, add the environment variables correponding to your operating system (e.g. PATH, LD_LIBRARY_PATH...).
 
 
 ## Upgrading from OpenGeode v2.x.x to v3.0.0
