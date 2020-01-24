@@ -50,8 +50,8 @@ namespace geode
 
         static MeshType type_name_static()
         {
-            return MeshType{  absl::StrCat("OpenGeodeTriangulatedSurface"
-                             , dimension , "D" )};
+            return MeshType{ absl::StrCat(
+                "OpenGeodeTriangulatedSurface", dimension, "D" ) };
         }
 
         MeshType type_name() const override
@@ -62,7 +62,7 @@ namespace geode
         static absl::string_view native_extension_static()
         {
             static const auto extension =
-                absl::StrCat( "og_tsf" , dimension, "d");
+                absl::StrCat( "og_tsf", dimension, "d" );
             return extension;
         }
 

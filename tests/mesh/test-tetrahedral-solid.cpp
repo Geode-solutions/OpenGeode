@@ -198,10 +198,9 @@ void test()
     test_create_vertices( *solid, *builder );
     test_create_tetrahedra( *solid, *builder );
     test_polyhedron_adjacencies( *solid, *builder );
-    test_io(
-        *solid, absl::StrCat( "test." , solid->native_extension()) );
-    test_backward_io( absl::StrCat( geode::test_path , std::string( "mesh/data/test_v1." )
-                      , solid->native_extension()) );
+    test_io( *solid, absl::StrCat( "test.", solid->native_extension() ) );
+    test_backward_io( absl::StrCat( geode::test_path,
+        std::string( "mesh/data/test_v1." ), solid->native_extension() ) );
 
     test_delete_vertex( *solid, *builder );
     test_delete_polyhedron( *solid, *builder );

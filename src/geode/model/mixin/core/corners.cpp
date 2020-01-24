@@ -74,18 +74,16 @@ namespace geode
     template < index_t dimension >
     void Corners< dimension >::save_corners( absl::string_view directory ) const
     {
-        const auto prefix =
-            absl::StrCat( directory , "/"
-            , Corner< dimension >::component_type_static().get());
+        const auto prefix = absl::StrCat( directory, "/",
+            Corner< dimension >::component_type_static().get() );
         for( const auto& corner : corners() )
         {
             const auto& mesh = corner.mesh();
-            const auto file = absl::StrCat( prefix , corner.id().string(), "."
-                        , mesh.native_extension());
+            const auto file = absl::StrCat(
+                prefix, corner.id().string(), ".", mesh.native_extension() );
             save_point_set( mesh, file );
         }
-        impl_->save_components(
-            absl::StrCat(directory  ,"/corners" ));
+        impl_->save_components( absl::StrCat( directory, "/corners" ) );
     }
 
     template < index_t dimension >

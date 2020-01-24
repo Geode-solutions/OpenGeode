@@ -237,8 +237,8 @@ namespace geode
                 absl::c_find( facet_vertices, polyhedron_vertex_id );
             if( position_it != facet_vertices.end() )
             {
-                const auto it = static_cast < index_t >(std::distance(
-                                    facet_vertices.begin(), position_it ));
+                const auto it = static_cast< index_t >(
+                    std::distance( facet_vertices.begin(), position_it ) );
                 polyhedral_solid_.update_facet_vertex(
                     std::move( facet_vertices ), it, vertex_id );
             }
@@ -263,8 +263,8 @@ namespace geode
                         absl::c_find( edge_vertices, polyhedron_vertex_id );
                     if( position_it != edge_vertices.end() )
                     {
-                        const auto it = static_cast< index_t >(
-                            std::distance( edge_vertices.begin(), position_it ));
+                        const auto it = static_cast< index_t >( std::distance(
+                            edge_vertices.begin(), position_it ) );
                         polyhedral_solid_.update_edge_vertex(
                             std::move( edge_vertices ), it, vertex_id );
                     }
@@ -778,7 +778,8 @@ namespace geode
                     OPENGEODE_ASSERT( it != vertices.end(),
                         "[PolyhedralSolidBuilder::copy] Wrong indexing between "
                         "polyhedron_vertex and polyhedron_facet_vertex" );
-                    facet[v] = static_cast< index_t >(std::distance( vertices.begin(), it ));
+                    facet[v] = static_cast< index_t >(
+                        std::distance( vertices.begin(), it ) );
                 }
             }
             create_polyhedron( vertices, facets );

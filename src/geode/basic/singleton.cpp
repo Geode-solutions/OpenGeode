@@ -48,7 +48,8 @@ namespace geode
         }
 
     private:
-        absl::flat_hash_map< std::string, std::unique_ptr< Singleton > > singletons_;
+        absl::flat_hash_map< std::string, std::unique_ptr< Singleton > >
+            singletons_;
     };
 
     Singleton::Singleton() {} // NOLINT

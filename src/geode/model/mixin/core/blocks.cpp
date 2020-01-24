@@ -75,13 +75,13 @@ namespace geode
     template < index_t dimension >
     void Blocks< dimension >::save_blocks( absl::string_view directory ) const
     {
-        const auto prefix = absl::StrCat( directory ,"/"
-                            , Block< dimension >::component_type_static().get() );
+        const auto prefix = absl::StrCat(
+            directory, "/", Block< dimension >::component_type_static().get() );
         for( const auto& block : blocks() )
         {
             const auto& mesh = block.mesh();
-            const auto file = absl::StrCat(prefix , block.id().string() , ".",
-                         mesh.native_extension());
+            const auto file = absl::StrCat(
+                prefix, block.id().string(), ".", mesh.native_extension() );
             const auto* tetra =
                 dynamic_cast< const TetrahedralSolid< dimension >* >( &mesh );
             if( tetra )
@@ -93,8 +93,7 @@ namespace geode
                 save_polyhedral_solid( mesh, file );
             }
         }
-        impl_->save_components(
-            absl::StrCat( directory, "/blocks" ));
+        impl_->save_components( absl::StrCat( directory, "/blocks" ) );
     }
 
     template < index_t dimension >
