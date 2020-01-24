@@ -75,13 +75,13 @@ namespace geode
     template < index_t dimension >
     void Blocks< dimension >::save_blocks( absl::string_view directory ) const
     {
-        const auto prefix = static_cast< std::string >( directory ) + "/"
-                            + Block< dimension >::component_type_static().get();
+        const auto prefix = absl::StrCat( directory ,"/"
+                            , Block< dimension >::component_type_static().get() );
         for( const auto& block : blocks() )
         {
             const auto& mesh = block.mesh();
-            auto file = prefix + block.id().string() + "."
-                        + mesh.native_extension().data();
+            const auto file = absl::StrCat(prefix , block.id().string() , ".",
+                         mesh.native_extension());
             const auto* tetra =
                 dynamic_cast< const TetrahedralSolid< dimension >* >( &mesh );
             if( tetra )
@@ -94,22 +94,21 @@ namespace geode
             }
         }
         impl_->save_components(
-            static_cast< std::string >( directory ) + "/blocks" );
+            absl::StrCat( directory, "/blocks" ));
     }
 
     template < index_t dimension >
     void Blocks< dimension >::load_blocks( absl::string_view directory )
     {
-        impl_->load_components(
-            static_cast< std::string >( directory ) + "/blocks" );
-        const auto prefix = static_cast< std::string >( directory ) + "/"
-                            + Block< dimension >::component_type_static().get();
+        impl_->load_components( absl::StrCat( directory, "/blocks" ) );
+        const auto prefix = absl::StrCat(
+            directory, "/", Block< dimension >::component_type_static().get() );
         for( auto& block : modifiable_blocks() )
         {
             block.ensure_mesh_type();
             auto& mesh = block.modifiable_mesh();
-            const auto file = prefix + block.id().string() + "."
-                              + mesh.native_extension().data();
+            const auto file = absl::StrCat(
+                prefix, block.id().string(), ".", mesh.native_extension() );
             auto* tetra =
                 dynamic_cast< TetrahedralSolid< dimension >* >( &mesh );
             if( tetra )

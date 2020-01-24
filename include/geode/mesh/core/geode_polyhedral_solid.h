@@ -48,8 +48,8 @@ namespace geode
 
         static MeshType type_name_static()
         {
-            return MeshType{ "OpenGeodePolyhedralSolid"
-                             + std::to_string( dimension ) + "D" };
+            return MeshType{ absl::StrCat( "OpenGeodePolyhedralSolid"
+                             , dimension , "D" )};
         }
 
         MeshType type_name() const override
@@ -60,7 +60,7 @@ namespace geode
         static absl::string_view native_extension_static()
         {
             static const auto extension =
-                "og_pso" + std::to_string( dimension ) + "d";
+                 absl::StrCat("og_pso" , dimension , "d");
             return extension;
         }
 

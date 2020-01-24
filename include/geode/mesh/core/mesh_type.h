@@ -24,7 +24,8 @@
 #pragma once
 
 #include <string>
-#include <utility>
+
+#include <absl/hash/hash.h>
 
 #include <bitsery/brief_syntax/string.h>
 
@@ -48,7 +49,7 @@ namespace std
     {
         std::size_t operator()( const geode::MeshType& f ) const
         {
-            return std::hash< std::string >{}( f.get() );
+            return absl::Hash< std::string >{}( f.get() );
         }
     };
 } // namespace std

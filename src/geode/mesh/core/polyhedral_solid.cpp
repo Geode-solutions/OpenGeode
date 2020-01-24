@@ -524,7 +524,7 @@ namespace geode
         {
             barycenter = barycenter + this->point( v );
         }
-        return barycenter / vertices.size();
+        return barycenter / static_cast< double >( vertices.size() );
     }
 
     template < index_t dimension >
