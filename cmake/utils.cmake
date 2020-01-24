@@ -132,8 +132,6 @@ function(add_geode_library)
         PROPERTIES
             OUTPUT_NAME ${PROJECT_NAME}_${GEODE_LIB_NAME}
             DEFINE_SYMBOL ${project_name}_${GEODE_LIB_NAME}_EXPORTS
-            CXX_VISIBILITY_PRESET hidden
-            VISIBILITY_INLINES_HIDDEN ON
             FOLDER "Libraries"
     )
     source_group("Public Header Files" FILES "${ABSOLUTE_GEODE_LIB_PUBLIC_HEADERS}")
