@@ -72,23 +72,22 @@ namespace geode
     template < index_t dimension >
     void Lines< dimension >::save_lines( absl::string_view directory ) const
     {
-        const auto prefix = absl::StrCat( directory , "/"
-                            , Line< dimension >::component_type_static().get());
+        const auto prefix = absl::StrCat(
+            directory, "/", Line< dimension >::component_type_static().get() );
         for( const auto& line : lines() )
         {
             const auto& mesh = line.mesh();
-            const auto file = absl::StrCat(prefix , line.id().string() , "."
-                        , mesh.native_extension());
+            const auto file = absl::StrCat(
+                prefix, line.id().string(), ".", mesh.native_extension() );
             save_edged_curve( mesh, file );
         }
-        impl_->save_components(
-           absl::StrCat(directory , "/lines" ));
+        impl_->save_components( absl::StrCat( directory, "/lines" ) );
     }
 
     template < index_t dimension >
     void Lines< dimension >::load_lines( absl::string_view directory )
     {
-        impl_->load_components(absl::StrCat(directory , "/lines" )) ;
+        impl_->load_components( absl::StrCat( directory, "/lines" ) );
         const auto prefix = absl::StrCat(
             directory, "/", Line< dimension >::component_type_static().get() );
         for( auto& line : modifiable_lines() )

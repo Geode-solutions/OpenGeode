@@ -72,7 +72,7 @@ namespace geode
 
         std::string string() const
         {
-            return  absl::StrCat(type_.get() , " " , id_.string());
+            return absl::StrCat( type_.get(), " ", id_.string() );
         }
 
     private:

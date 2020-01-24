@@ -356,7 +356,8 @@ namespace geode
         {
             const auto capacity = values_.capacity();
             values_.reserve(
-                static_cast< size_t>(std::ceil( size / capacity ) )* capacity );
+                static_cast< size_t >( std::ceil( size / capacity ) )
+                * capacity );
             values_.resize( size, default_value_ );
         }
 
@@ -478,7 +479,9 @@ namespace geode
         void resize( index_t size ) override
         {
             const auto capacity = values_.capacity();
-            values_.reserve( static_cast< size_t >(std::ceil( size / capacity )) * capacity );
+            values_.reserve(
+                static_cast< size_t >( std::ceil( size / capacity ) )
+                * capacity );
             values_.resize( size, default_value_ );
         }
 

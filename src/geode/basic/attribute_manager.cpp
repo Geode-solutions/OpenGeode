@@ -157,8 +157,8 @@ namespace geode
             {
                 it.second->delete_elements( to_delete );
             }
-            nb_elements_ -= static_cast< index_t >(
-                absl::c_count( to_delete, true ) );
+            nb_elements_ -=
+                static_cast< index_t >( absl::c_count( to_delete, true ) );
         }
 
         index_t nb_elements() const
