@@ -51,26 +51,10 @@ namespace geode
     public:
         template < typename... Args >
         explicit OpenGeodeException( const Args &... message )
-            : std::runtime_error{ string_concatener( message... ) }
+            : std::runtime_error{ absl::StrCat( message... ) }
         {
         }
         virtual ~OpenGeodeException() noexcept {}
-
-    private:
-        template < typename A0 >
-        std::string string_concatener( const A0 &a0 )
-        {
-            std::ostringstream out;
-            out << a0;
-            return out.str();
-        }
-
-        template < typename A0, typename A1, typename... Args >
-        std::string string_concatener(
-            const A0 &a0, const A1 &a1, const Args &... args )
-        {
-            return string_concatener( a0 ) + string_concatener( a1, args... );
-        }
     };
 
     void opengeode_basic_api geode_assertion_failed(

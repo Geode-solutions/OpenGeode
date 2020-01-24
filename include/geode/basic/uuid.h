@@ -87,6 +87,8 @@
 
 #include <string>
 
+#include <absl/hash/hash.h>
+
 #include <bitsery/bitsery.h>
 
 #include <geode/basic/bitsery_archive.h>
@@ -135,7 +137,8 @@ namespace std
     public:
         size_t operator()( const geode::uuid &uuid ) const
         {
-            return size_t( uuid.ab ^ uuid.cd );
+            return absl::Hash< uint64_t >()( uuid.ab )
+                   ^ absl::Hash< uint64_t >()( uuid.cd );
         }
     };
 } // namespace std

@@ -50,11 +50,11 @@ namespace geode
             const UnzipFile zip_reader{ filename(), uuid{}.string() };
             zip_reader.extract_all();
 
-            builder.load_corners( zip_reader.directory().data() );
-            builder.load_lines( zip_reader.directory().data() );
-            builder.load_surfaces( zip_reader.directory().data() );
-            builder.load_relationships( zip_reader.directory().data() );
-            builder.load_unique_vertices( zip_reader.directory().data() );
+            builder.load_corners( zip_reader.directory() );
+            builder.load_lines( zip_reader.directory() );
+            builder.load_surfaces( zip_reader.directory() );
+            builder.load_relationships( zip_reader.directory() );
+            builder.load_unique_vertices( zip_reader.directory() );
 
             for( const auto& corner : section().corners() )
             {

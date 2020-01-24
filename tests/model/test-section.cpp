@@ -59,7 +59,7 @@ std::vector< geode::uuid > add_corners(
         builder.add_corner( geode::OpenGeodePointSet2D::type_name_static() ) );
     builder.remove_corner( temp_corner );
     const auto message =
-        "[Test] Section should have " + std::to_string( nb ) + " corners";
+         absl::StrCat("[Test] Section should have " , nb , " corners");
     OPENGEODE_EXCEPTION( model.nb_corners() == nb, message );
     OPENGEODE_EXCEPTION(
         geode::detail::count_relationships( model.corners() ) == nb, message );
@@ -80,7 +80,7 @@ std::vector< geode::uuid > add_lines(
         builder.add_line( geode::OpenGeodeEdgedCurve2D::type_name_static() ) );
     builder.remove_line( temp_line );
     const auto message =
-        "[Test] Section should have " + std::to_string( nb ) + " lines";
+         absl::StrCat("[Test] Section should have " ,nb , " lines");
     OPENGEODE_EXCEPTION( model.nb_lines() == nb, message );
     OPENGEODE_EXCEPTION(
         geode::detail::count_relationships( model.lines() ) == nb, message );
@@ -101,7 +101,7 @@ std::vector< geode::uuid > add_surfaces(
         geode::OpenGeodePolygonalSurface2D::type_name_static() ) );
     builder.remove_surface( temp_surface );
     const auto message =
-        "[Test] Section should have " + std::to_string( nb ) + " surfaces";
+         absl::StrCat("[Test] Section should have " , nb , " surfaces");
     OPENGEODE_EXCEPTION( model.nb_surfaces() == nb, message );
     OPENGEODE_EXCEPTION(
         geode::detail::count_relationships( model.surfaces() ) == nb, message );
@@ -118,13 +118,13 @@ std::vector< geode::uuid > add_model_boundaries(
         geode_unused( unused );
         uuids.push_back( builder.add_model_boundary() );
         builder.set_model_boundary_name(
-            uuids.back(), "boundary" + std::to_string( uuids.size() ) );
+            uuids.back(),  absl::StrCat("boundary" , uuids.size() ) );
     }
     const auto& temp_boundary =
         section.model_boundary( builder.add_model_boundary() );
     builder.remove_model_boundary( temp_boundary );
-    const auto message = "[Test] Section should have " + std::to_string( nb )
-                         + " model boundaries";
+    const auto message =  absl::StrCat("[Test] Section should have " , nb ,
+                          " model boundaries");
     OPENGEODE_EXCEPTION( section.nb_model_boundaries() == nb, message );
     OPENGEODE_EXCEPTION(
         geode::detail::count_relationships( section.model_boundaries() ) == nb,
@@ -501,7 +501,7 @@ void test()
     test_clone( model );
 
     const auto file_io =
-        std::string( "test." ) + model.native_extension().data();
+        absl::StrCat( "test." , model.native_extension());
     geode::save_section( model, file_io );
 
     geode::Section model2;

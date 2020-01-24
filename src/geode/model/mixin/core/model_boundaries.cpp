@@ -73,7 +73,7 @@ namespace geode
         absl::string_view directory ) const
     {
         impl_->save_components(
-            static_cast< std::string >( directory ) + "/model_boundaries" );
+            absl::StrCat( directory , "/model_boundaries") );
     }
 
     template < index_t dimension >
@@ -81,7 +81,7 @@ namespace geode
         absl::string_view directory )
     {
         impl_->load_components(
-            static_cast< std::string >( directory ) + "/model_boundaries" );
+            absl::StrCat( directory , "/model_boundaries") );
     }
 
     template < index_t dimension >

@@ -18,11 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-find_package(Iconv QUIET)
-if(NOT Iconv_FOUND)
-    cmake_minimum_required(VERSION 3.11)
-endif()
-
 set(MINIZIP_PATH ${PROJECT_BINARY_DIR}/third_party/minizip)
 set(MINIZIP_INSTALL_PREFIX ${MINIZIP_PATH}/install)
 ExternalProject_Add(minizip

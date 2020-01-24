@@ -23,7 +23,7 @@
 
 #include <geode/basic/singleton.h>
 
-#include <map>
+#include <absl/container/flat_hash_map.h>
 
 #include <geode/basic/pimpl_impl.h>
 
@@ -48,7 +48,7 @@ namespace geode
         }
 
     private:
-        std::map< std::string, std::unique_ptr< Singleton > > singletons_;
+        absl::flat_hash_map< std::string, std::unique_ptr< Singleton > > singletons_;
     };
 
     Singleton::Singleton() {} // NOLINT
