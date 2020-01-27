@@ -44,7 +44,7 @@
         .def( "compute_polyhedron_adjacencies",                                \
             ( void ( PolyhedralSolidBuilder##dimension##D::* )() )             \
                 & PolyhedralSolidBuilder##dimension##D::                       \
-                      compute_polyhedron_adjacencies )                         \
+                    compute_polyhedron_adjacencies )                           \
         .def( "delete_polyhedra",                                              \
             &PolyhedralSolidBuilder##dimension##D::delete_polyhedra )          \
         .def( "delete_isolated_vertices",                                      \
