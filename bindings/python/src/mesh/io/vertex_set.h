@@ -21,36 +21,14 @@
  *
  */
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <geode/mesh/io/vertex_set_input.h>
+#include <geode/mesh/io/vertex_set_output.h>
 
-#include "attribute.h"
-#include "attribute_manager.h"
-#include "uuid.h"
-
-namespace pybind11
+namespace geode
 {
-    namespace detail
+    void define_vertex_set_io( pybind11::module& module )
     {
-        template < typename Type >
-        struct type_caster< absl::FixedArray< Type > >
-            : list_caster< absl::FixedArray< Type >, Type >
-        {
-        };
-
-        template <>
-        struct type_caster< absl::string_view >
-            : string_caster< absl::string_view, true >
-        {
-        };
-    } // namespace detail
-} // namespace pybind11
-
-PYBIND11_MODULE( OpenGeode_py_basic, module )
-{
-    module.doc() = "OpenGeode Python binding for basic";
-    module.attr( "NO_ID" ) = geode::NO_ID;
-    geode::define_uuid( module );
-    geode::define_attributes( module );
-    geode::define_attribute_manager( module );
-}
+        module.def( "save_vertex_set", &save_vertex_set );
+        module.def( "load_vertex_set", &load_vertex_set );
+    }
+} // namespace geode

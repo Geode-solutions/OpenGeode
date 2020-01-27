@@ -21,36 +21,32 @@
  *
  */
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <pybind11/operators.h>
 
-#include "attribute.h"
-#include "attribute_manager.h"
-#include "uuid.h"
+#include <geode/basic/attribute_manager.h>
 
-namespace pybind11
+#include <geode/mesh/core/graph.h>
+
+namespace geode
 {
-    namespace detail
+    void define_graph( pybind11::module& module )
     {
-        template < typename Type >
-        struct type_caster< absl::FixedArray< Type > >
-            : list_caster< absl::FixedArray< Type >, Type >
-        {
-        };
+        pybind11::class_< Graph, VertexSet >( module, "Graph" )
+            .def(
+                "create", ( std::unique_ptr< Graph >( * )() ) & Graph::create )
+            .def( "clone", &Graph::clone )
+            .def( "edge_vertex", &Graph::edge_vertex )
+            .def( "nb_edges", &Graph::nb_edges )
+            .def( "edge_attribute_manager", &Graph::edge_attribute_manager,
+                pybind11::return_value_policy::reference )
+            .def( "edges_around_vertex", &Graph::edges_around_vertex );
 
-        template <>
-        struct type_caster< absl::string_view >
-            : string_caster< absl::string_view, true >
-        {
-        };
-    } // namespace detail
-} // namespace pybind11
-
-PYBIND11_MODULE( OpenGeode_py_basic, module )
-{
-    module.doc() = "OpenGeode Python binding for basic";
-    module.attr( "NO_ID" ) = geode::NO_ID;
-    geode::define_uuid( module );
-    geode::define_attributes( module );
-    geode::define_attribute_manager( module );
-}
+        pybind11::class_< EdgeVertex >( module, "EdgeVertex" )
+            .def( pybind11::init<>() )
+            .def( pybind11::init< index_t, index_t >() )
+            .def( pybind11::self == pybind11::self )
+            .def( pybind11::self != pybind11::self )
+            .def_readwrite( "edge_id", &EdgeVertex::edge_id )
+            .def_readwrite( "vertex_id", &EdgeVertex::vertex_id );
+    }
+} // namespace geode

@@ -21,27 +21,25 @@
  *
  */
 
-#include <pybind11/operators.h>
+#include <geode/mesh/builder/tetrahedral_solid_builder.h>
 
-#include <geode/geometry/vector.h>
-
-#define PYTHON_VECTOR( dimension )                                             \
-    const auto name##dimension = "Vector" + std::to_string( dimension ) + "D"; \
-    pybind11::class_< Vector##dimension##D, Point##dimension##D >(             \
+#define PYTHON_TETRAHEDRAL_SOLID_BUILDER( dimension )                          \
+    const auto name##dimension =                                               \
+        "TetrahedralSolidBuilder" + std::to_string( dimension ) + "D";         \
+    pybind11::class_< TetrahedralSolidBuilder##dimension##D,                   \
+        PolyhedralSolidBuilder##dimension##D >(                                \
         module, name##dimension.c_str() )                                      \
-        .def( pybind11::init<>() )                                             \
-        .def( pybind11::init< std::array< double, dimension > >() )            \
-        .def( "length", &Vector##dimension##D::length )                        \
-        .def( "length2", &Vector##dimension##D::length2 )                      \
-        .def( "normalize", &Vector##dimension##D::normalize )                  \
-        .def( pybind11::self* double() )                                       \
-        .def( "dot", &Vector##dimension##D::dot )
+        .def( "create",                                                        \
+            ( std::unique_ptr< TetrahedralSolidBuilder##dimension##D >( * )(   \
+                TetrahedralSolid< dimension >& ) )                             \
+                & TetrahedralSolidBuilder##dimension##D::create )              \
+        .def( "create_tetrahedron",                                            \
+            &TetrahedralSolidBuilder##dimension##D::create_tetrahedron )
 
 namespace geode
 {
-    void define_vector( pybind11::module& module )
+    void define_tetrahedral_solid_builder( pybind11::module& module )
     {
-        PYTHON_VECTOR( 2 );
-        PYTHON_VECTOR( 3 ).def( "cross", &Vector3D::cross );
+        PYTHON_TETRAHEDRAL_SOLID_BUILDER( 3 );
     }
 } // namespace geode

@@ -40,11 +40,11 @@ def test_operations():
 
     cross_unit = geom.Vector3D( [1, 0, 0] ).cross( geom.Vector3D( [0, 1, 0] ) )
     answer_unit = geom.Vector3D( [0, 0, 1] )
-    if cross_unit.different( answer_unit ):
+    if cross_unit != answer_unit:
         raise ValueError( "[Test] Wrong unit cross product" )
 
     answer = geom.Vector3D( [-8, 0, 2] )
-    if p.cross( unit ).different( answer ):
+    if p.cross( unit ) != answer:
         raise ValueError( "[Test] Wrong cross product" )
 
 test_length()

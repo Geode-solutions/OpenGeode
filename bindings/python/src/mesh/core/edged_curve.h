@@ -21,27 +21,26 @@
  *
  */
 
-#include <pybind11/operators.h>
+#include <geode/mesh/core/edged_curve.h>
 
-#include <geode/geometry/vector.h>
-
-#define PYTHON_VECTOR( dimension )                                             \
-    const auto name##dimension = "Vector" + std::to_string( dimension ) + "D"; \
-    pybind11::class_< Vector##dimension##D, Point##dimension##D >(             \
+#define PYTHON_EDGED_CURVE( dimension )                                        \
+    const auto name##dimension =                                               \
+        "EdgedCurve" + std::to_string( dimension ) + "D";                      \
+    pybind11::class_< EdgedCurve##dimension##D, Graph >(                       \
         module, name##dimension.c_str() )                                      \
-        .def( pybind11::init<>() )                                             \
-        .def( pybind11::init< std::array< double, dimension > >() )            \
-        .def( "length", &Vector##dimension##D::length )                        \
-        .def( "length2", &Vector##dimension##D::length2 )                      \
-        .def( "normalize", &Vector##dimension##D::normalize )                  \
-        .def( pybind11::self* double() )                                       \
-        .def( "dot", &Vector##dimension##D::dot )
+        .def( "create", ( std::unique_ptr< EdgedCurve##dimension##D >( * )() ) \
+                            & EdgedCurve##dimension##D::create )               \
+        .def( "clone", &EdgedCurve##dimension##D::clone )                      \
+        .def( "point", &EdgedCurve##dimension##D::point )                      \
+        .def( "edge_length", &EdgedCurve##dimension##D::edge_length )          \
+        .def( "edge_barycenter", &EdgedCurve##dimension##D::edge_barycenter )  \
+        .def( "bounding_box", &EdgedCurve##dimension##D::bounding_box )
 
 namespace geode
 {
-    void define_vector( pybind11::module& module )
+    void define_edged_curve( pybind11::module& module )
     {
-        PYTHON_VECTOR( 2 );
-        PYTHON_VECTOR( 3 ).def( "cross", &Vector3D::cross );
+        PYTHON_EDGED_CURVE( 2 );
+        PYTHON_EDGED_CURVE( 3 );
     }
 } // namespace geode

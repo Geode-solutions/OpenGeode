@@ -21,36 +21,18 @@
  *
  */
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <geode/mesh/builder/vertex_set_builder.h>
 
-#include "attribute.h"
-#include "attribute_manager.h"
-#include "uuid.h"
-
-namespace pybind11
+namespace geode
 {
-    namespace detail
+    void define_vertex_set_builder( pybind11::module& module )
     {
-        template < typename Type >
-        struct type_caster< absl::FixedArray< Type > >
-            : list_caster< absl::FixedArray< Type >, Type >
-        {
-        };
-
-        template <>
-        struct type_caster< absl::string_view >
-            : string_caster< absl::string_view, true >
-        {
-        };
-    } // namespace detail
-} // namespace pybind11
-
-PYBIND11_MODULE( OpenGeode_py_basic, module )
-{
-    module.doc() = "OpenGeode Python binding for basic";
-    module.attr( "NO_ID" ) = geode::NO_ID;
-    geode::define_uuid( module );
-    geode::define_attributes( module );
-    geode::define_attribute_manager( module );
-}
+        pybind11::class_< VertexSetBuilder >( module, "VertexSetBuilder" )
+            .def( "create",
+                ( std::unique_ptr< VertexSetBuilder >( * )( VertexSet& ) )
+                    & VertexSetBuilder::create )
+            .def( "create_vertex", &VertexSetBuilder::create_vertex )
+            .def( "create_vertices", &VertexSetBuilder::create_vertices )
+            .def( "delete_vertices", &VertexSetBuilder::delete_vertices );
+    }
+} // namespace geode

@@ -21,6 +21,8 @@
  *
  */
 
+#include <pybind11/operators.h>
+
 #include <geode/geometry/point.h>
 
 #define PYTHON_POINT( dimension )                                              \
@@ -29,12 +31,12 @@
         .def( pybind11::init<>() )                                             \
         .def( pybind11::init< std::array< double, dimension > >() )            \
         .def( "inexact_equal", &Point##dimension##D::inexact_equal )           \
-        .def( "equal", &Point##dimension##D::operator==)                       \
-        .def( "different", &Point##dimension##D::operator!=)                   \
-        .def( "multiply", &Point##dimension##D::operator*)                     \
-        .def( "divide", &Point##dimension##D::operator/)                       \
-        .def( "add", &Point##dimension##D::operator+)                          \
-        .def( "subtract", &Point##dimension##D::operator-)                     \
+        .def( pybind11::self == pybind11::self )                               \
+        .def( pybind11::self != pybind11::self )                               \
+        .def( pybind11::self* double() )                                       \
+        .def( pybind11::self / double() )                                      \
+        .def( pybind11::self + pybind11::self )                                \
+        .def( pybind11::self - pybind11::self )                                \
         .def( "value", &Point##dimension##D::value )                           \
         .def( "set_value", &Point##dimension##D::set_value )
 

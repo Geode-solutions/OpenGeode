@@ -21,27 +21,27 @@
  *
  */
 
-#include <pybind11/operators.h>
+#include <geode/mesh/builder/triangulated_surface_builder.h>
 
-#include <geode/geometry/vector.h>
-
-#define PYTHON_VECTOR( dimension )                                             \
-    const auto name##dimension = "Vector" + std::to_string( dimension ) + "D"; \
-    pybind11::class_< Vector##dimension##D, Point##dimension##D >(             \
+#define PYTHON_TRIANGULATED_SURFACE_BUILDER( dimension )                       \
+    const auto name##dimension =                                               \
+        "TriangulatedSurfaceBuilder" + std::to_string( dimension ) + "D";      \
+    pybind11::class_< TriangulatedSurfaceBuilder##dimension##D,                \
+        PolygonalSurfaceBuilder##dimension##D >(                               \
         module, name##dimension.c_str() )                                      \
-        .def( pybind11::init<>() )                                             \
-        .def( pybind11::init< std::array< double, dimension > >() )            \
-        .def( "length", &Vector##dimension##D::length )                        \
-        .def( "length2", &Vector##dimension##D::length2 )                      \
-        .def( "normalize", &Vector##dimension##D::normalize )                  \
-        .def( pybind11::self* double() )                                       \
-        .def( "dot", &Vector##dimension##D::dot )
+        .def(                                                                  \
+            "create", ( std::unique_ptr<                                       \
+                          TriangulatedSurfaceBuilder##dimension##D >( * )(     \
+                          TriangulatedSurface< dimension >& ) )                \
+                          & TriangulatedSurfaceBuilder##dimension##D::create ) \
+        .def( "create_triangle",                                               \
+            &TriangulatedSurfaceBuilder##dimension##D::create_triangle )
 
 namespace geode
 {
-    void define_vector( pybind11::module& module )
+    void define_triangulated_surface_builder( pybind11::module& module )
     {
-        PYTHON_VECTOR( 2 );
-        PYTHON_VECTOR( 3 ).def( "cross", &Vector3D::cross );
+        PYTHON_TRIANGULATED_SURFACE_BUILDER( 2 );
+        PYTHON_TRIANGULATED_SURFACE_BUILDER( 3 );
     }
 } // namespace geode

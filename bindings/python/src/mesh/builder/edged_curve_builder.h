@@ -21,36 +21,25 @@
  *
  */
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <geode/mesh/builder/edged_curve_builder.h>
 
-#include "attribute.h"
-#include "attribute_manager.h"
-#include "uuid.h"
+#define PYTHON_EDGED_CURVE_BUILDER( dimension )                                \
+    const auto name##dimension =                                               \
+        "EdgedCurveBuilder" + std::to_string( dimension ) + "D";               \
+    pybind11::class_< EdgedCurveBuilder##dimension##D, GraphBuilder >(         \
+        module, name##dimension.c_str() )                                      \
+        .def( "create",                                                        \
+            ( std::unique_ptr< EdgedCurveBuilder##dimension##D >( * )(         \
+                EdgedCurve< dimension >& ) )                                   \
+                & EdgedCurveBuilder##dimension##D::create )                    \
+        .def( "set_point", &EdgedCurveBuilder##dimension##D::set_point )       \
+        .def( "create_point", &EdgedCurveBuilder##dimension##D::create_point )
 
-namespace pybind11
+namespace geode
 {
-    namespace detail
+    void define_edged_curve_builder( pybind11::module& module )
     {
-        template < typename Type >
-        struct type_caster< absl::FixedArray< Type > >
-            : list_caster< absl::FixedArray< Type >, Type >
-        {
-        };
-
-        template <>
-        struct type_caster< absl::string_view >
-            : string_caster< absl::string_view, true >
-        {
-        };
-    } // namespace detail
-} // namespace pybind11
-
-PYBIND11_MODULE( OpenGeode_py_basic, module )
-{
-    module.doc() = "OpenGeode Python binding for basic";
-    module.attr( "NO_ID" ) = geode::NO_ID;
-    geode::define_uuid( module );
-    geode::define_attributes( module );
-    geode::define_attribute_manager( module );
-}
+        PYTHON_EDGED_CURVE_BUILDER( 2 );
+        PYTHON_EDGED_CURVE_BUILDER( 3 );
+    }
+} // namespace geode

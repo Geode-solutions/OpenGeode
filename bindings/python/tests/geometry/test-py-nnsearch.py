@@ -50,5 +50,5 @@ if colocated_info.colocated_mapping != mapping_answer:
     raise ValueError( "[Test] Error in colocated mapping" )
 points_answer = [p0, p1, p2, p3]
 for p in range( 4 ):
-    if colocated_info.unique_points[p].different( points_answer[p] ):
+    if colocated_info.unique_points[p] != points_answer[p]:
         raise ValueError( "[Test] Error in unique points" )

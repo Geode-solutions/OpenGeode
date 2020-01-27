@@ -21,36 +21,22 @@
  *
  */
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <geode/mesh/io/tetrahedral_solid_input.h>
+#include <geode/mesh/io/tetrahedral_solid_output.h>
 
-#include "attribute.h"
-#include "attribute_manager.h"
-#include "uuid.h"
+#define PYTHON_TETRAHEDRAL_SOLID_IO( dimension )                               \
+    const auto save##dimension =                                               \
+        "save_tetrahedral_solid" + std::to_string( dimension ) + "D";          \
+    module.def(                                                                \
+        save##dimension.c_str(), &save_tetrahedral_solid< dimension > );       \
+    const auto load##dimension =                                               \
+        "load_tetrahedral_solid" + std::to_string( dimension ) + "D";          \
+    module.def( load##dimension.c_str(), &load_tetrahedral_solid< dimension > )
 
-namespace pybind11
+namespace geode
 {
-    namespace detail
+    void define_tetrahedral_solid_io( pybind11::module& module )
     {
-        template < typename Type >
-        struct type_caster< absl::FixedArray< Type > >
-            : list_caster< absl::FixedArray< Type >, Type >
-        {
-        };
-
-        template <>
-        struct type_caster< absl::string_view >
-            : string_caster< absl::string_view, true >
-        {
-        };
-    } // namespace detail
-} // namespace pybind11
-
-PYBIND11_MODULE( OpenGeode_py_basic, module )
-{
-    module.doc() = "OpenGeode Python binding for basic";
-    module.attr( "NO_ID" ) = geode::NO_ID;
-    geode::define_uuid( module );
-    geode::define_attributes( module );
-    geode::define_attribute_manager( module );
-}
+        PYTHON_TETRAHEDRAL_SOLID_IO( 3 );
+    }
+} // namespace geode

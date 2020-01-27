@@ -22,7 +22,30 @@ add_geode_python_binding(
     NAME OpenGeode_py_mesh
     SOURCES
         "mesh.cpp"
-        # "core/vertex_set.h"
+        "builder/edged_curve_builder.h"
+        "builder/graph_builder.h"
+        "builder/point_set_builder.h"
+        "builder/polygonal_surface_builder.h"
+        "builder/polyhedral_solid_builder.h"
+        "builder/tetrahedral_solid_builder.h"
+        "builder/triangulated_surface_builder.h"
+        "builder/vertex_set_builder.h"
+        "core/edged_curve.h"
+        "core/graph.h"
+        "core/point_set.h"
+        "core/polygonal_surface.h"
+        "core/polyhedral_solid.h"
+        "core/tetrahedral_solid.h"
+        "core/triangulated_surface.h"
+        "core/vertex_set.h"
+        "io/edged_curve.h"
+        "io/graph.h"
+        "io/point_set.h"
+        "io/polygonal_surface.h"
+        "io/polyhedral_solid.h"
+        "io/tetrahedral_solid.h"
+        "io/triangulated_surface.h"
+        "io/vertex_set.h"
     DEPENDENCIES
         ${PROJECT_NAME}::mesh
 )

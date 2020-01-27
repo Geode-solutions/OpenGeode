@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2019 - 2020 Geode-solutions
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -19,38 +18,30 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import OpenGeode_py_geometry as geom
+import OpenGeode_py_mesh as mesh
 
-def test_comparison():
-    p = geom.Point3D( [2, 1.0, 2.6] )
-    p2 = p
-    if p != p2:
-        raise ValueError( "[Test] Points should be equal" )
-    
-    P = geom.Point2D( [15, 2.6] )
-    P2 = geom.Point2D( [16, 2.6] )
-    if P == P2:
-        raise ValueError( "[Test] Points should be different" )
+def test_create_vertices( vertex_set, builder ):
+    builder.create_vertex()
+    if vertex_set.nb_vertices() != 1:
+        raise ValueError( "[Test] VertexSet should have 1 vertex" )
+    builder.create_vertices( 5 )
+    if vertex_set.nb_vertices() != 6:
+        raise ValueError( "[Test] VertexSet should have 6 vertices" )
 
-    p_epsilon = geom.Point3D( [2.0000000001, 1, 2.6] )
-    if not p.inexact_equal( p_epsilon, 0.0001 ):
-        raise ValueError( "[Test] Points should be almost equal" )
+def test_delete_vertex( vertex_set, builder ):
+    to_delete = [False] * vertex_set.nb_vertices()
+    to_delete[0] = True
+    builder.delete_vertices( to_delete )
+    if vertex_set.nb_vertices() != 5:
+        raise ValueError( "[Test] VertexSet should have 5 vertices" )
 
-def test_operators():
-    p = geom.Point3D()
-    p.set_value( 0, 2 )
-    p.set_value( 1, 1 )
-    p.set_value( 2, 2.6 )
-    p2 = p
-    answer = geom.Point3D( [4, 2, 5.2] )
-    if p + p2 != answer:
-        raise ValueError( "[Test] Points should be equal" )
-    if p * 2 != answer:
-        raise ValueError( "[Test] Points should be equal" )
-    if p - p2 != geom.Point3D():
-        raise ValueError( "[Test] Points should be equal" )
-    if answer / 2 != p:
-        raise ValueError( "[Test] Points should be equal" )
+def test_clone( vertex_set ):
+    vertex_set2 = vertex_set.clone()
+    if vertex_set2.nb_vertices() != 5:
+        raise ValueError( "[Test] VertexSet2 should have 5 vertices" )
 
-test_comparison()
-test_operators()
+vertex_set = mesh.VertexSet.create()
+builder = mesh.VertexSetBuilder.create( vertex_set )
+test_create_vertices( vertex_set, builder )
+test_delete_vertex( vertex_set, builder )
+test_clone( vertex_set )

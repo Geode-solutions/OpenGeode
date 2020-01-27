@@ -21,36 +21,25 @@
  *
  */
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <geode/mesh/builder/point_set_builder.h>
 
-#include "attribute.h"
-#include "attribute_manager.h"
-#include "uuid.h"
+#define PYTHON_POINT_SET_BUILDER( dimension )                                  \
+    const auto name##dimension =                                               \
+        "PointSetBuilder" + std::to_string( dimension ) + "D";                 \
+    pybind11::class_< PointSetBuilder##dimension##D, VertexSetBuilder >(       \
+        module, name##dimension.c_str() )                                      \
+        .def(                                                                  \
+            "create", ( std::unique_ptr< PointSetBuilder##dimension##D >( * )( \
+                          PointSet< dimension >& ) )                           \
+                          & PointSetBuilder##dimension##D::create )            \
+        .def( "set_point", &PointSetBuilder##dimension##D::set_point )         \
+        .def( "create_point", &PointSetBuilder##dimension##D::create_point )
 
-namespace pybind11
+namespace geode
 {
-    namespace detail
+    void define_point_set_builder( pybind11::module& module )
     {
-        template < typename Type >
-        struct type_caster< absl::FixedArray< Type > >
-            : list_caster< absl::FixedArray< Type >, Type >
-        {
-        };
-
-        template <>
-        struct type_caster< absl::string_view >
-            : string_caster< absl::string_view, true >
-        {
-        };
-    } // namespace detail
-} // namespace pybind11
-
-PYBIND11_MODULE( OpenGeode_py_basic, module )
-{
-    module.doc() = "OpenGeode Python binding for basic";
-    module.attr( "NO_ID" ) = geode::NO_ID;
-    geode::define_uuid( module );
-    geode::define_attributes( module );
-    geode::define_attribute_manager( module );
-}
+        PYTHON_POINT_SET_BUILDER( 2 );
+        PYTHON_POINT_SET_BUILDER( 3 );
+    }
+} // namespace geode

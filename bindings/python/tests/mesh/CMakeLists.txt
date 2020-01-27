@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2019 - 2020 Geode-solutions
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -19,38 +18,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import OpenGeode_py_geometry as geom
-
-def test_comparison():
-    p = geom.Point3D( [2, 1.0, 2.6] )
-    p2 = p
-    if p != p2:
-        raise ValueError( "[Test] Points should be equal" )
-    
-    P = geom.Point2D( [15, 2.6] )
-    P2 = geom.Point2D( [16, 2.6] )
-    if P == P2:
-        raise ValueError( "[Test] Points should be different" )
-
-    p_epsilon = geom.Point3D( [2.0000000001, 1, 2.6] )
-    if not p.inexact_equal( p_epsilon, 0.0001 ):
-        raise ValueError( "[Test] Points should be almost equal" )
-
-def test_operators():
-    p = geom.Point3D()
-    p.set_value( 0, 2 )
-    p.set_value( 1, 1 )
-    p.set_value( 2, 2.6 )
-    p2 = p
-    answer = geom.Point3D( [4, 2, 5.2] )
-    if p + p2 != answer:
-        raise ValueError( "[Test] Points should be equal" )
-    if p * 2 != answer:
-        raise ValueError( "[Test] Points should be equal" )
-    if p - p2 != geom.Point3D():
-        raise ValueError( "[Test] Points should be equal" )
-    if answer / 2 != p:
-        raise ValueError( "[Test] Points should be equal" )
-
-test_comparison()
-test_operators()
+add_geode_python_test(test-py-vertex-set.py OpenGeode_py_mesh)
+add_geode_python_test(test-py-graph.py OpenGeode_py_mesh)
+add_geode_python_test(test-py-edged-curve.py OpenGeode_py_mesh)
+add_geode_python_test(test-py-point-set.py OpenGeode_py_mesh)
+add_geode_python_test(test-py-polygonal-surface.py OpenGeode_py_mesh)
+add_geode_python_test(test-py-triangulated-surface.py OpenGeode_py_mesh)
+add_geode_python_test(test-py-polyhedral-solid.py OpenGeode_py_mesh)
+add_geode_python_test(test-py-tetrahedral-solid.py OpenGeode_py_mesh)

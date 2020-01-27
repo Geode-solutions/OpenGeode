@@ -33,6 +33,9 @@
     pybind11::class_< ConstantAttribute< type >, ReadOnlyAttribute< type >,    \
         std::shared_ptr< ConstantAttribute< type > > >(                        \
         module, constant##name.c_str() )                                       \
+        .def( "constant_value",                                                \
+            ( const type& (ConstantAttribute< type >::*) () const )            \
+                & ConstantAttribute< type >::value )                           \
         .def( "set_value", &ConstantAttribute< type >::set_value )             \
         .def( "default_value", &ConstantAttribute< type >::default_value );    \
     const auto variable##name = std::string{ "VariableAttribute" } + #name;    \

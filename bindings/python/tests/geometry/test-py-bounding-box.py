@@ -30,9 +30,9 @@ box2.add_point( geom.Point2D( [-2, -2] ) )
 box2.add_point( geom.Point2D( [0, 0] ) )
 
 box2.add_box( box )
-if box2.min().different( geom.Point2D( [-2, -2] ) ):
+if box2.min() != geom.Point2D( [-2, -2] ):
     raise ValueError( "[Test] Error in BoundingBox union computation" )
-if box2.max().different( geom.Point2D( [1, 1] ) ):
+if box2.max() != geom.Point2D( [1, 1] ):
     raise ValueError( "[Test] Error in BoundingBox union computation" )
 
 if not box2.contains( geom.Point2D( [0, 0] ) ):

@@ -21,36 +21,23 @@
  *
  */
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <geode/basic/attribute_manager.h>
 
-#include "attribute.h"
-#include "attribute_manager.h"
-#include "uuid.h"
+#include <geode/mesh/core/vertex_set.h>
 
-namespace pybind11
+namespace geode
 {
-    namespace detail
+    void define_vertex_set( pybind11::module& module )
     {
-        template < typename Type >
-        struct type_caster< absl::FixedArray< Type > >
-            : list_caster< absl::FixedArray< Type >, Type >
-        {
-        };
-
-        template <>
-        struct type_caster< absl::string_view >
-            : string_caster< absl::string_view, true >
-        {
-        };
-    } // namespace detail
-} // namespace pybind11
-
-PYBIND11_MODULE( OpenGeode_py_basic, module )
-{
-    module.doc() = "OpenGeode Python binding for basic";
-    module.attr( "NO_ID" ) = geode::NO_ID;
-    geode::define_uuid( module );
-    geode::define_attributes( module );
-    geode::define_attribute_manager( module );
-}
+        pybind11::class_< VertexSet >( module, "VertexSet" )
+            .def( "create",
+                ( std::unique_ptr< VertexSet >( * )() ) & VertexSet::create )
+            .def( "clone", &VertexSet::clone )
+            .def( "native_extension", &VertexSet::native_extension )
+            .def( "nb_vertices", &VertexSet::nb_vertices )
+            .def( "vertex_attribute_manager",
+                &VertexSet::vertex_attribute_manager,
+                pybind11::return_value_policy::reference )
+            .def( "type_name", &VertexSet::type_name );
+    }
+} // namespace geode

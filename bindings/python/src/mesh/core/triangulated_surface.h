@@ -21,36 +21,23 @@
  *
  */
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <geode/mesh/core/triangulated_surface.h>
 
-#include "attribute.h"
-#include "attribute_manager.h"
-#include "uuid.h"
+#define PYTHON_TRIANGULATED_SURFACE( dimension )                               \
+    const auto name##dimension =                                               \
+        "TriangulatedSurface" + std::to_string( dimension ) + "D";             \
+    pybind11::class_< TriangulatedSurface##dimension##D,                       \
+        PolygonalSurface##dimension##D >( module, name##dimension.c_str() )    \
+        .def( "create",                                                        \
+            ( std::unique_ptr< TriangulatedSurface##dimension##D >( * )() )    \
+                & TriangulatedSurface##dimension##D::create )                  \
+        .def( "clone", &TriangulatedSurface##dimension##D::clone )
 
-namespace pybind11
+namespace geode
 {
-    namespace detail
+    void define_triangulated_surface( pybind11::module& module )
     {
-        template < typename Type >
-        struct type_caster< absl::FixedArray< Type > >
-            : list_caster< absl::FixedArray< Type >, Type >
-        {
-        };
-
-        template <>
-        struct type_caster< absl::string_view >
-            : string_caster< absl::string_view, true >
-        {
-        };
-    } // namespace detail
-} // namespace pybind11
-
-PYBIND11_MODULE( OpenGeode_py_basic, module )
-{
-    module.doc() = "OpenGeode Python binding for basic";
-    module.attr( "NO_ID" ) = geode::NO_ID;
-    geode::define_uuid( module );
-    geode::define_attributes( module );
-    geode::define_attribute_manager( module );
-}
+        PYTHON_TRIANGULATED_SURFACE( 2 );
+        PYTHON_TRIANGULATED_SURFACE( 3 );
+    }
+} // namespace geode

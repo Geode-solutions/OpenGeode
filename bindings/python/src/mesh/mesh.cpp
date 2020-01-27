@@ -24,10 +24,78 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-// #include "core/vertex_set.h"
+#include "builder/edged_curve_builder.h"
+#include "builder/graph_builder.h"
+#include "builder/point_set_builder.h"
+#include "builder/polygonal_surface_builder.h"
+#include "builder/polyhedral_solid_builder.h"
+#include "builder/tetrahedral_solid_builder.h"
+#include "builder/triangulated_surface_builder.h"
+#include "builder/vertex_set_builder.h"
+
+#include "core/edged_curve.h"
+#include "core/graph.h"
+#include "core/point_set.h"
+#include "core/polygonal_surface.h"
+#include "core/polyhedral_solid.h"
+#include "core/tetrahedral_solid.h"
+#include "core/triangulated_surface.h"
+#include "core/vertex_set.h"
+
+#include "io/edged_curve.h"
+#include "io/graph.h"
+#include "io/point_set.h"
+#include "io/polygonal_surface.h"
+#include "io/polyhedral_solid.h"
+#include "io/tetrahedral_solid.h"
+#include "io/triangulated_surface.h"
+#include "io/vertex_set.h"
+
+namespace pybind11
+{
+    namespace detail
+    {
+        template < typename Type, size_t dimension >
+        struct type_caster< absl::InlinedVector< Type, dimension > >
+            : list_caster< absl::InlinedVector< Type, dimension >, Type >
+        {
+        };
+
+        template <>
+        struct type_caster< absl::string_view >
+            : string_caster< absl::string_view, true >
+        {
+        };
+    } // namespace detail
+} // namespace pybind11
 
 PYBIND11_MODULE( OpenGeode_py_mesh, module )
 {
     module.doc() = "OpenGeode Python binding for mesh";
-    // geode::define_point( module );
+    geode::define_vertex_set( module );
+    geode::define_graph( module );
+    geode::define_edged_curve( module );
+    geode::define_point_set( module );
+    geode::define_polygonal_surface( module );
+    geode::define_triangulated_surface( module );
+    geode::define_polyhedral_solid( module );
+    geode::define_tetrahedral_solid( module );
+
+    geode::define_vertex_set_builder( module );
+    geode::define_graph_builder( module );
+    geode::define_edged_curve_builder( module );
+    geode::define_point_set_builder( module );
+    geode::define_polygonal_surface_builder( module );
+    geode::define_triangulated_surface_builder( module );
+    geode::define_polyhedral_solid_builder( module );
+    geode::define_tetrahedral_solid_builder( module );
+
+    geode::define_vertex_set_io( module );
+    geode::define_graph_io( module );
+    geode::define_edged_curve_io( module );
+    geode::define_point_set_io( module );
+    geode::define_polygonal_surface_io( module );
+    geode::define_triangulated_surface_io( module );
+    geode::define_polyhedral_solid_io( module );
+    geode::define_tetrahedral_solid_io( module );
 }
