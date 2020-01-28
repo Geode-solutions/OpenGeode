@@ -236,7 +236,6 @@ function(_add_dependency_directories test_name)
     list(REMOVE_DUPLICATES directories)
     if(WIN32)
         list(JOIN directories "\\;" directories)
-        message(STATUS "${directories}")
         set_tests_properties(${test_name}
             PROPERTIES
                 ENVIRONMENT "Path=${directories}\\;$ENV{Path}"
