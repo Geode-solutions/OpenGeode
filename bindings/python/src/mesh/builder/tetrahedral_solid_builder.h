@@ -29,7 +29,7 @@
     pybind11::class_< TetrahedralSolidBuilder##dimension##D,                   \
         PolyhedralSolidBuilder##dimension##D >(                                \
         module, name##dimension.c_str() )                                      \
-        .def( "create",                                                        \
+        .def_static( "create",                                                 \
             ( std::unique_ptr< TetrahedralSolidBuilder##dimension##D >( * )(   \
                 TetrahedralSolid< dimension >& ) )                             \
                 & TetrahedralSolidBuilder##dimension##D::create )              \

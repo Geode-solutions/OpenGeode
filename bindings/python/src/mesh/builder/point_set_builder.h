@@ -28,7 +28,7 @@
         "PointSetBuilder" + std::to_string( dimension ) + "D";                 \
     pybind11::class_< PointSetBuilder##dimension##D, VertexSetBuilder >(       \
         module, name##dimension.c_str() )                                      \
-        .def(                                                                  \
+        .def_static(                                                           \
             "create", ( std::unique_ptr< PointSetBuilder##dimension##D >( * )( \
                           PointSet< dimension >& ) )                           \
                           & PointSetBuilder##dimension##D::create )            \

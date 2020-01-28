@@ -28,7 +28,7 @@ namespace geode
     void define_vertex_set_builder( pybind11::module& module )
     {
         pybind11::class_< VertexSetBuilder >( module, "VertexSetBuilder" )
-            .def( "create",
+            .def_static( "create",
                 ( std::unique_ptr< VertexSetBuilder >( * )( VertexSet& ) )
                     & VertexSetBuilder::create )
             .def( "create_vertex", &VertexSetBuilder::create_vertex )

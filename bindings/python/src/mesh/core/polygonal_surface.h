@@ -94,7 +94,7 @@
     pybind11::class_< PolygonalSurface##dimension##D,                          \
         PolygonalSurfaceBase##dimension##D >(                                  \
         module, name##dimension.c_str() )                                      \
-        .def( "create",                                                        \
+        .def_static( "create",                                                 \
             ( std::unique_ptr< PolygonalSurface##dimension##D >( * )() )       \
                 & PolygonalSurface##dimension##D::create )                     \
         .def( "clone", &PolygonalSurface##dimension##D::clone )

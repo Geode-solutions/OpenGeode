@@ -31,8 +31,9 @@
         "PointSet" + std::to_string( dimension ) + "D";                        \
     pybind11::class_< PointSet##dimension##D, VertexSet >(                     \
         module, name##dimension.c_str() )                                      \
-        .def( "create", ( std::unique_ptr< PointSet##dimension##D >( * )() )   \
-                            & PointSet##dimension##D::create )                 \
+        .def_static(                                                           \
+            "create", ( std::unique_ptr< PointSet##dimension##D >( * )() )     \
+                          & PointSet##dimension##D::create )                   \
         .def( "clone", &PointSet##dimension##D::clone )                        \
         .def( "point", &PointSet##dimension##D::point )                        \
         .def( "bounding_box", &PointSet##dimension##D::bounding_box )

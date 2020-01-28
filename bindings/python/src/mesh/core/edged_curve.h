@@ -28,8 +28,9 @@
         "EdgedCurve" + std::to_string( dimension ) + "D";                      \
     pybind11::class_< EdgedCurve##dimension##D, Graph >(                       \
         module, name##dimension.c_str() )                                      \
-        .def( "create", ( std::unique_ptr< EdgedCurve##dimension##D >( * )() ) \
-                            & EdgedCurve##dimension##D::create )               \
+        .def_static(                                                           \
+            "create", ( std::unique_ptr< EdgedCurve##dimension##D >( * )() )   \
+                          & EdgedCurve##dimension##D::create )                 \
         .def( "clone", &EdgedCurve##dimension##D::clone )                      \
         .def( "point", &EdgedCurve##dimension##D::point )                      \
         .def( "edge_length", &EdgedCurve##dimension##D::edge_length )          \

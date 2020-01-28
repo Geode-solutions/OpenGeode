@@ -29,7 +29,7 @@
     pybind11::class_< TriangulatedSurfaceBuilder##dimension##D,                \
         PolygonalSurfaceBuilder##dimension##D >(                               \
         module, name##dimension.c_str() )                                      \
-        .def(                                                                  \
+        .def_static(                                                           \
             "create", ( std::unique_ptr<                                       \
                           TriangulatedSurfaceBuilder##dimension##D >( * )(     \
                           TriangulatedSurface< dimension >& ) )                \

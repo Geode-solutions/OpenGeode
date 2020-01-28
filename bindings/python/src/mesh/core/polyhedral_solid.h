@@ -28,7 +28,7 @@
         "PolyhedralSolid" + std::to_string( dimension ) + "D";                 \
     pybind11::class_< PolyhedralSolid##dimension##D, VertexSet >(              \
         module, name##dimension.c_str() )                                      \
-        .def( "create",                                                        \
+        .def_static( "create",                                                 \
             ( std::unique_ptr< PolyhedralSolid##dimension##D >( * )() )        \
                 & PolyhedralSolid##dimension##D::create )                      \
         .def( "clone", &PolyhedralSolid##dimension##D::clone )                 \

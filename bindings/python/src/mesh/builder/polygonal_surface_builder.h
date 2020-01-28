@@ -30,7 +30,7 @@
         "PolygonalSurfaceBuilder" + std::to_string( dimension ) + "D";         \
     pybind11::class_< PolygonalSurfaceBuilder##dimension##D,                   \
         VertexSetBuilder >( module, name##dimension.c_str() )                  \
-        .def( "create",                                                        \
+        .def_static( "create",                                                 \
             ( std::unique_ptr< PolygonalSurfaceBuilder##dimension##D >( * )(   \
                 PolygonalSurface< dimension >& ) )                             \
                 & PolygonalSurfaceBuilder##dimension##D::create )              \
@@ -46,7 +46,7 @@
         .def( "compute_polygon_adjacencies",                                   \
             ( void ( PolygonalSurfaceBuilder##dimension##D::* )() )            \
                 & PolygonalSurfaceBuilder##dimension##D::                      \
-                    compute_polygon_adjacencies )                              \
+                      compute_polygon_adjacencies )                            \
         .def( "delete_polygons",                                               \
             &PolygonalSurfaceBuilder##dimension##D::delete_polygons )          \
         .def( "delete_isolated_vertices",                                      \

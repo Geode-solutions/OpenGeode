@@ -98,7 +98,7 @@ if(DOXYGEN_FOUND AND EXISTS ${PROJECT_SOURCE_DIR}/cmake/Doxyfile.in)
         VERBATIM )
 endif()
 
-macro(_export_library library_name)
+function(_export_library library_name)
     export(TARGETS ${library_name}
         NAMESPACE ${PROJECT_NAME}::
         FILE ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}_${library_name}_target.cmake
@@ -114,7 +114,7 @@ macro(_export_library library_name)
         NAMESPACE ${PROJECT_NAME}::
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
     )
-endmacro()
+endfunction()
 
 function(add_geode_library)
     cmake_parse_arguments(GEODE_LIB
@@ -186,7 +186,7 @@ function(add_geode_library)
     )
 endfunction()
 
-macro(_add_geode_executable exe_path folder_name)
+function(_add_geode_executable exe_path folder_name)
     get_filename_component(target_name ${exe_path} NAME_WE)
 
     # Set the target as an executable
@@ -201,7 +201,8 @@ macro(_add_geode_executable exe_path folder_name)
             FOLDER ${folder_name}
             INSTALL_RPATH "${OS_RPATH}/../${CMAKE_INSTALL_LIBDIR}"
     )
-endmacro()
+    set(target_name ${target_name} PARENT_SCOPE)
+endfunction()
 
 function(add_geode_binary)
     cmake_parse_arguments(GEODE_BINARY
@@ -214,12 +215,11 @@ function(add_geode_binary)
     install(TARGETS ${target_name} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 endfunction()
 
-macro(_find_dependency_directories directories)
+function(_find_dependency_directories directories)
     foreach(dependency ${ARGN})
         if(NOT TARGET ${dependency})
             continue()
         endif()
-        message(STATUS "dependency = ${dependency}")
         get_target_property(TARGET_TYPE ${dependency} TYPE)
         if(TARGET_TYPE STREQUAL "SHARED_LIBRARY")
             list(APPEND directories $<TARGET_FILE_DIR:${dependency}>)
@@ -229,7 +229,8 @@ macro(_find_dependency_directories directories)
             endif()
         endif()
     endforeach()
-endmacro()
+    set(directories ${directories} PARENT_SCOPE)
+endfunction()
 
 function(_add_dependency_directories test_name)
     _find_dependency_directories(directories ${ARGN})
@@ -282,6 +283,7 @@ function(add_geode_python_binding)
     set_target_properties(${GEODE_BINDING_NAME}
         PROPERTIES
             OUTPUT_NAME ${PROJECT_NAME}_${GEODE_BINDING_NAME}
+            CXX_VISIBILITY_PRESET "default"
             FOLDER "Bindings/Python"
     )
     _export_library(${GEODE_BINDING_NAME})

@@ -28,7 +28,7 @@
         "PolyhedralSolidBuilder" + std::to_string( dimension ) + "D";          \
     pybind11::class_< PolyhedralSolidBuilder##dimension##D,                    \
         VertexSetBuilder >( module, name##dimension.c_str() )                  \
-        .def( "create",                                                        \
+        .def_static( "create",                                                 \
             ( std::unique_ptr< PolyhedralSolidBuilder##dimension##D >( * )(    \
                 PolyhedralSolid< dimension >& ) )                              \
                 & PolyhedralSolidBuilder##dimension##D::create )               \
@@ -44,7 +44,7 @@
         .def( "compute_polyhedron_adjacencies",                                \
             ( void ( PolyhedralSolidBuilder##dimension##D::* )() )             \
                 & PolyhedralSolidBuilder##dimension##D::                       \
-                    compute_polyhedron_adjacencies )                           \
+                      compute_polyhedron_adjacencies )                         \
         .def( "delete_polyhedra",                                              \
             &PolyhedralSolidBuilder##dimension##D::delete_polyhedra )          \
         .def( "delete_isolated_vertices",                                      \

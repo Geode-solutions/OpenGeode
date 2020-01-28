@@ -28,7 +28,7 @@
         "EdgedCurveBuilder" + std::to_string( dimension ) + "D";               \
     pybind11::class_< EdgedCurveBuilder##dimension##D, GraphBuilder >(         \
         module, name##dimension.c_str() )                                      \
-        .def( "create",                                                        \
+        .def_static( "create",                                                 \
             ( std::unique_ptr< EdgedCurveBuilder##dimension##D >( * )(         \
                 EdgedCurve< dimension >& ) )                                   \
                 & EdgedCurveBuilder##dimension##D::create )                    \

@@ -28,7 +28,7 @@
         "TetrahedralSolid" + std::to_string( dimension ) + "D";                \
     pybind11::class_< TetrahedralSolid##dimension##D,                          \
         PolyhedralSolid##dimension##D >( module, name##dimension.c_str() )     \
-        .def( "create",                                                        \
+        .def_static( "create",                                                 \
             ( std::unique_ptr< TetrahedralSolid##dimension##D >( * )() )       \
                 & TetrahedralSolid##dimension##D::create )                     \
         .def( "clone", &TetrahedralSolid##dimension##D::clone )
