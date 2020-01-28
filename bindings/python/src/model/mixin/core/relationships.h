@@ -21,43 +21,25 @@
  *
  */
 
-#pragma once
-
-#include <memory>
-
-#include <geode/model/common.h>
+#include <geode/model/mixin/core/relationships.h>
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( ModelBoundary );
-    FORWARD_DECLARATION_DIMENSION_CLASS( ModelBoundaries );
-
-    struct uuid;
-} // namespace geode
-
-namespace geode
-{
-    template < index_t dimension >
-    class ModelBoundariesBuilder
+    void define_relationships( pybind11::module& module )
     {
-    public:
-        void load_model_boundaries( absl::string_view directory );
-
-        void set_model_boundary_name( const uuid& id, absl::string_view name );
-
-    protected:
-        ModelBoundariesBuilder( ModelBoundaries< dimension >& boundaries )
-            : model_boundaries_( boundaries )
-        {
-        }
-
-        const uuid& create_model_boundary();
-
-        void delete_model_boundary(
-            const ModelBoundary< dimension >& boundary );
-
-    private:
-        ModelBoundaries< dimension >& model_boundaries_;
-    };
-    ALIAS_2D_AND_3D( ModelBoundariesBuilder );
+        pybind11::class_< Relationships >( module, "Relationships" )
+            .def( pybind11::init<>() )
+            .def( "nb_boundaries", &Relationships::nb_boundaries )
+            .def( "boundaries", &Relationships::boundaries )
+            .def( "nb_incidences", &Relationships::nb_incidences )
+            .def( "incidences", &Relationships::incidences )
+            .def( "nb_internals", &Relationships::nb_internals )
+            .def( "internals", &Relationships::internals )
+            .def( "nb_embeddings", &Relationships::nb_embeddings )
+            .def( "embeddings", &Relationships::embeddings )
+            .def( "nb_items", &Relationships::nb_items )
+            .def( "items", &Relationships::items )
+            .def( "nb_collections", &Relationships::nb_collections )
+            .def( "collections", &Relationships::collections );
+    }
 } // namespace geode

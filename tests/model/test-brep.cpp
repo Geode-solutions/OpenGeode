@@ -479,10 +479,9 @@ void test_boundary_ranges( const geode::BRep& model,
     const std::vector< geode::uuid >& surface_uuids,
     const std::vector< geode::uuid >& block_uuids )
 {
-    const auto& line_boundaries =
-        model.boundaries( model.line( line_uuids[0] ) );
     geode::index_t line_boundary_count{ 0 };
-    for( const auto& line_boundary : line_boundaries )
+    for( const auto& line_boundary :
+        model.boundaries( model.line( line_uuids[0] ) ) )
     {
         line_boundary_count++;
         OPENGEODE_EXCEPTION( line_boundary.id() == corner_uuids[0]
@@ -492,10 +491,9 @@ void test_boundary_ranges( const geode::BRep& model,
     OPENGEODE_EXCEPTION( line_boundary_count == 2,
         "[Test] BoundaryCornerRange should iterates on 2 Corners" );
 
-    const auto& surface_boundaries =
-        model.boundaries( model.surface( surface_uuids[0] ) );
     geode::index_t surface_boundary_count{ 0 };
-    for( const auto& surface_boundary : surface_boundaries )
+    for( const auto& surface_boundary :
+        model.boundaries( model.surface( surface_uuids[0] ) ) )
     {
         surface_boundary_count++;
         OPENGEODE_EXCEPTION( surface_boundary.id() == line_uuids[0]
@@ -506,10 +504,9 @@ void test_boundary_ranges( const geode::BRep& model,
     OPENGEODE_EXCEPTION( surface_boundary_count == 3,
         "[Test] BoundaryLineRange should iterates on 3 Lines" );
 
-    const auto& block_boundaries =
-        model.boundaries( model.block( block_uuids[0] ) );
     geode::index_t block_boundary_count{ 0 };
-    for( const auto& block_boundary : block_boundaries )
+    for( const auto& block_boundary :
+        model.boundaries( model.block( block_uuids[0] ) ) )
     {
         block_boundary_count++;
         OPENGEODE_EXCEPTION( block_boundary.id() == surface_uuids[0]
@@ -529,10 +526,9 @@ void test_incidence_ranges( const geode::BRep& model,
     const std::vector< geode::uuid >& surface_uuids,
     const std::vector< geode::uuid >& block_uuids )
 {
-    const auto& corner_incidences =
-        model.incidences( model.corner( corner_uuids[0] ) );
     geode::index_t corner_incidence_count{ 0 };
-    for( const auto& corner_incidence : corner_incidences )
+    for( const auto& corner_incidence :
+        model.incidences( model.corner( corner_uuids[0] ) ) )
     {
         corner_incidence_count++;
         OPENGEODE_EXCEPTION( corner_incidence.id() == line_uuids[0]
@@ -543,10 +539,9 @@ void test_incidence_ranges( const geode::BRep& model,
     OPENGEODE_EXCEPTION( corner_incidence_count == 3,
         "[Test] IncidentLineRange should iterates on 3 Lines" );
 
-    const auto& line_incidences =
-        model.incidences( model.line( line_uuids[0] ) );
     geode::index_t line_incidence_count{ 0 };
-    for( const auto& line_incidence : line_incidences )
+    for( const auto& line_incidence :
+        model.incidences( model.line( line_uuids[0] ) ) )
     {
         line_incidence_count++;
         OPENGEODE_EXCEPTION( line_incidence.id() == surface_uuids[0]

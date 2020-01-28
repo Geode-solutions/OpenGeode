@@ -21,43 +21,23 @@
  *
  */
 
-#pragma once
+#include <geode/model/mixin/core/surface.h>
+#include <geode/model/mixin/core/surfaces.h>
 
-#include <memory>
-
-#include <geode/model/common.h>
-
-namespace geode
-{
-    FORWARD_DECLARATION_DIMENSION_CLASS( ModelBoundary );
-    FORWARD_DECLARATION_DIMENSION_CLASS( ModelBoundaries );
-
-    struct uuid;
-} // namespace geode
+#define PYTHON_SURFACES( dimension )                                           \
+    const auto name##dimension =                                               \
+        "Surfaces" + std::to_string( dimension ) + "D";                        \
+    pybind11::class_< Surfaces##dimension##D >(                                \
+        module, name##dimension.c_str() )                                      \
+        .def( "nb_surfaces", &Surfaces##dimension##D::nb_surfaces )            \
+        .def( "surface", &Surfaces##dimension##D::surface,                     \
+            pybind11::return_value_policy::reference )
 
 namespace geode
 {
-    template < index_t dimension >
-    class ModelBoundariesBuilder
+    void define_surfaces( pybind11::module& module )
     {
-    public:
-        void load_model_boundaries( absl::string_view directory );
-
-        void set_model_boundary_name( const uuid& id, absl::string_view name );
-
-    protected:
-        ModelBoundariesBuilder( ModelBoundaries< dimension >& boundaries )
-            : model_boundaries_( boundaries )
-        {
-        }
-
-        const uuid& create_model_boundary();
-
-        void delete_model_boundary(
-            const ModelBoundary< dimension >& boundary );
-
-    private:
-        ModelBoundaries< dimension >& model_boundaries_;
-    };
-    ALIAS_2D_AND_3D( ModelBoundariesBuilder );
+        PYTHON_SURFACES( 2 );
+        PYTHON_SURFACES( 3 );
+    }
 } // namespace geode

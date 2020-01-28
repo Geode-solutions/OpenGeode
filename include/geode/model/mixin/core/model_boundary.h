@@ -54,7 +54,7 @@ namespace geode
             return ComponentType{ "ModelBoundary" };
         }
 
-        ComponentType component_type() const
+        ComponentType component_type() const override
         {
             return component_type_static();
         }

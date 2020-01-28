@@ -21,43 +21,21 @@
  *
  */
 
-#pragma once
+#include <pybind11/operators.h>
 
-#include <memory>
-
-#include <geode/model/common.h>
+#include <geode/model/mixin/core/component_type.h>
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( ModelBoundary );
-    FORWARD_DECLARATION_DIMENSION_CLASS( ModelBoundaries );
-
-    struct uuid;
-} // namespace geode
-
-namespace geode
-{
-    template < index_t dimension >
-    class ModelBoundariesBuilder
+    void define_component_type( pybind11::module& module )
     {
-    public:
-        void load_model_boundaries( absl::string_view directory );
-
-        void set_model_boundary_name( const uuid& id, absl::string_view name );
-
-    protected:
-        ModelBoundariesBuilder( ModelBoundaries< dimension >& boundaries )
-            : model_boundaries_( boundaries )
-        {
-        }
-
-        const uuid& create_model_boundary();
-
-        void delete_model_boundary(
-            const ModelBoundary< dimension >& boundary );
-
-    private:
-        ModelBoundaries< dimension >& model_boundaries_;
-    };
-    ALIAS_2D_AND_3D( ModelBoundariesBuilder );
+        pybind11::class_< ComponentID >( module, "ComponentID" )
+            .def( pybind11::init<>() )
+            .def( pybind11::init< ComponentType, uuid >() )
+            .def( "id", &ComponentID::id )
+            .def( "type", &ComponentID::type )
+            .def( "string", &ComponentID::string )
+            .def( pybind11::self == pybind11::self )
+            .def( pybind11::self != pybind11::self );
+    }
 } // namespace geode

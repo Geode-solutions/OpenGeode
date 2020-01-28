@@ -21,43 +21,23 @@
  *
  */
 
-#pragma once
+#include <geode/mesh/core/edged_curve.h>
 
-#include <memory>
+#include <geode/model/mixin/core/line.h>
 
-#include <geode/model/common.h>
-
-namespace geode
-{
-    FORWARD_DECLARATION_DIMENSION_CLASS( ModelBoundary );
-    FORWARD_DECLARATION_DIMENSION_CLASS( ModelBoundaries );
-
-    struct uuid;
-} // namespace geode
+#define PYTHON_LINE( dimension )                                               \
+    const auto name##dimension = "Line" + std::to_string( dimension ) + "D";   \
+    pybind11::class_< Line##dimension##D, Component##dimension##D >(           \
+        module, name##dimension.c_str() )                                      \
+        .def( "mesh", &Line##dimension##D::mesh,                               \
+            pybind11::return_value_policy::reference )                         \
+        .def( "component_id", &Line##dimension##D::component_id )
 
 namespace geode
 {
-    template < index_t dimension >
-    class ModelBoundariesBuilder
+    void define_line( pybind11::module& module )
     {
-    public:
-        void load_model_boundaries( absl::string_view directory );
-
-        void set_model_boundary_name( const uuid& id, absl::string_view name );
-
-    protected:
-        ModelBoundariesBuilder( ModelBoundaries< dimension >& boundaries )
-            : model_boundaries_( boundaries )
-        {
-        }
-
-        const uuid& create_model_boundary();
-
-        void delete_model_boundary(
-            const ModelBoundary< dimension >& boundary );
-
-    private:
-        ModelBoundaries< dimension >& model_boundaries_;
-    };
-    ALIAS_2D_AND_3D( ModelBoundariesBuilder );
+        PYTHON_LINE( 2 );
+        PYTHON_LINE( 3 );
+    }
 } // namespace geode

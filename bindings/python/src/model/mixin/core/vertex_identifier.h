@@ -21,43 +21,27 @@
  *
  */
 
-#pragma once
-
-#include <memory>
-
-#include <geode/model/common.h>
+#include <geode/model/mixin/core/vertex_identifier.h>
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( ModelBoundary );
-    FORWARD_DECLARATION_DIMENSION_CLASS( ModelBoundaries );
-
-    struct uuid;
-} // namespace geode
-
-namespace geode
-{
-    template < index_t dimension >
-    class ModelBoundariesBuilder
+    void define_vertex_identifier( pybind11::module& module )
     {
-    public:
-        void load_model_boundaries( absl::string_view directory );
-
-        void set_model_boundary_name( const uuid& id, absl::string_view name );
-
-    protected:
-        ModelBoundariesBuilder( ModelBoundaries< dimension >& boundaries )
-            : model_boundaries_( boundaries )
-        {
-        }
-
-        const uuid& create_model_boundary();
-
-        void delete_model_boundary(
-            const ModelBoundary< dimension >& boundary );
-
-    private:
-        ModelBoundaries< dimension >& model_boundaries_;
-    };
-    ALIAS_2D_AND_3D( ModelBoundariesBuilder );
+        pybind11::class_< VertexIdentifier >( module, "VertexIdentifier" )
+            .def( pybind11::init<>() )
+            .def( "nb_unique_vertices", &VertexIdentifier::nb_unique_vertices )
+            .def( "mesh_component_vertices",
+                ( const std::vector< MeshComponentVertex >& (
+                    VertexIdentifier::*) ( index_t ) const )
+                    & VertexIdentifier::mesh_component_vertices )
+            .def( "filtered_mesh_component_vertices_by_type",
+                ( std::vector< MeshComponentVertex >( VertexIdentifier::* )(
+                    index_t, const ComponentType& ) const )
+                    & VertexIdentifier::mesh_component_vertices )
+            .def( "filtered_mesh_component_vertices_by_id",
+                ( std::vector< index_t >( VertexIdentifier::* )(
+                    index_t, const uuid& ) const )
+                    & VertexIdentifier::mesh_component_vertices )
+            .def( "unique_vertex", &VertexIdentifier::unique_vertex );
+    }
 } // namespace geode

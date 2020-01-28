@@ -21,43 +21,13 @@
  *
  */
 
-#pragma once
-
-#include <memory>
-
-#include <geode/model/common.h>
+#include <geode/model/mixin/builder/topology_builder.h>
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( ModelBoundary );
-    FORWARD_DECLARATION_DIMENSION_CLASS( ModelBoundaries );
-
-    struct uuid;
-} // namespace geode
-
-namespace geode
-{
-    template < index_t dimension >
-    class ModelBoundariesBuilder
+    void define_topology_builder( pybind11::module& module )
     {
-    public:
-        void load_model_boundaries( absl::string_view directory );
-
-        void set_model_boundary_name( const uuid& id, absl::string_view name );
-
-    protected:
-        ModelBoundariesBuilder( ModelBoundaries< dimension >& boundaries )
-            : model_boundaries_( boundaries )
-        {
-        }
-
-        const uuid& create_model_boundary();
-
-        void delete_model_boundary(
-            const ModelBoundary< dimension >& boundary );
-
-    private:
-        ModelBoundaries< dimension >& model_boundaries_;
-    };
-    ALIAS_2D_AND_3D( ModelBoundariesBuilder );
+        pybind11::class_< TopologyBuilder, RelationshipsBuilder,
+            VertexIdentifierBuilder >( module, "TopologyBuilder" );
+    }
 } // namespace geode

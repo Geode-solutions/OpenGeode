@@ -21,43 +21,21 @@
  *
  */
 
-#pragma once
+#include <geode/model/mixin/builder/model_boundaries_builder.h>
 
-#include <memory>
-
-#include <geode/model/common.h>
-
-namespace geode
-{
-    FORWARD_DECLARATION_DIMENSION_CLASS( ModelBoundary );
-    FORWARD_DECLARATION_DIMENSION_CLASS( ModelBoundaries );
-
-    struct uuid;
-} // namespace geode
+#define PYTHON_MODEL_BOUNDARIES_BUILDER( dimension )                           \
+    const auto name##dimension =                                               \
+        "ModelBoundariesBuilder" + std::to_string( dimension ) + "D";          \
+    pybind11::class_< ModelBoundariesBuilder##dimension##D >(                  \
+        module, name##dimension.c_str() )                                      \
+        .def( "set_model_boundary_name",                                       \
+            &ModelBoundariesBuilder##dimension##D::set_model_boundary_name )
 
 namespace geode
 {
-    template < index_t dimension >
-    class ModelBoundariesBuilder
+    void define_model_boundaries_builder( pybind11::module& module )
     {
-    public:
-        void load_model_boundaries( absl::string_view directory );
-
-        void set_model_boundary_name( const uuid& id, absl::string_view name );
-
-    protected:
-        ModelBoundariesBuilder( ModelBoundaries< dimension >& boundaries )
-            : model_boundaries_( boundaries )
-        {
-        }
-
-        const uuid& create_model_boundary();
-
-        void delete_model_boundary(
-            const ModelBoundary< dimension >& boundary );
-
-    private:
-        ModelBoundaries< dimension >& model_boundaries_;
-    };
-    ALIAS_2D_AND_3D( ModelBoundariesBuilder );
+        PYTHON_MODEL_BOUNDARIES_BUILDER( 2 );
+        PYTHON_MODEL_BOUNDARIES_BUILDER( 3 );
+    }
 } // namespace geode

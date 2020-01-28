@@ -309,10 +309,9 @@ void test_boundary_ranges( const geode::Section& model,
     const std::vector< geode::uuid >& line_uuids,
     const std::vector< geode::uuid >& surface_uuids )
 {
-    const auto& line_boundaries =
-        model.boundaries( model.line( line_uuids[0] ) );
     geode::index_t line_boundary_count{ 0 };
-    for( const auto& line_boundary : line_boundaries )
+    for( const auto& line_boundary :
+        model.boundaries( model.line( line_uuids[0] ) ) )
     {
         line_boundary_count++;
         OPENGEODE_EXCEPTION( line_boundary.id() == corner_uuids[0]
@@ -322,10 +321,9 @@ void test_boundary_ranges( const geode::Section& model,
     OPENGEODE_EXCEPTION( line_boundary_count == 2,
         "[Test] BoundaryCornerRange should iterates on 2 Corners" );
 
-    const auto& surface_boundaries =
-        model.boundaries( model.surface( surface_uuids[0] ) );
     geode::index_t surface_boundary_count{ 0 };
-    for( const auto& surface_boundary : surface_boundaries )
+    for( const auto& surface_boundary :
+        model.boundaries( model.surface( surface_uuids[0] ) ) )
     {
         surface_boundary_count++;
         OPENGEODE_EXCEPTION( surface_boundary.id() == line_uuids[0]
@@ -342,10 +340,9 @@ void test_incidence_ranges( const geode::Section& model,
     const std::vector< geode::uuid >& line_uuids,
     const std::vector< geode::uuid >& surface_uuids )
 {
-    const auto& corner_incidences =
-        model.incidences( model.corner( corner_uuids[0] ) );
     geode::index_t corner_incidence_count{ 0 };
-    for( const auto& corner_incidence : corner_incidences )
+    for( const auto& corner_incidence :
+        model.incidences( model.corner( corner_uuids[0] ) ) )
     {
         corner_incidence_count++;
         OPENGEODE_EXCEPTION( corner_incidence.id() == line_uuids[0]
@@ -355,10 +352,9 @@ void test_incidence_ranges( const geode::Section& model,
     OPENGEODE_EXCEPTION( corner_incidence_count == 2,
         "[Test] IncidentLineRange should iterates on 2 Lines" );
 
-    const auto& line_incidences =
-        model.incidences( model.line( line_uuids[0] ) );
     geode::index_t line_incidence_count{ 0 };
-    for( const auto& line_incidence : line_incidences )
+    for( const auto& line_incidence :
+        model.incidences( model.line( line_uuids[0] ) ) )
     {
         line_incidence_count++;
         OPENGEODE_EXCEPTION( line_incidence.id() == surface_uuids[0],
@@ -372,10 +368,9 @@ void test_item_ranges( const geode::Section& model,
     const std::vector< geode::uuid >& line_uuids,
     const std::vector< geode::uuid >& boundary_uuids )
 {
-    const auto& boundary_items =
-        model.items( model.model_boundary( boundary_uuids[1] ) );
     geode::index_t boundary_item_count{ 0 };
-    for( const auto& boundary_item : boundary_items )
+    for( const auto& boundary_item :
+        model.items( model.model_boundary( boundary_uuids[1] ) ) )
     {
         boundary_item_count++;
         OPENGEODE_EXCEPTION( boundary_item.id() == line_uuids[1]

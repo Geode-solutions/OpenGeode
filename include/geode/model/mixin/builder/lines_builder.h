@@ -71,4 +71,5 @@ namespace geode
     private:
         Lines< dimension >& lines_;
     };
+    ALIAS_2D_AND_3D( LinesBuilder );
 } // namespace geode
