@@ -37,10 +37,10 @@
         .def( "colocated_index_mapping",                                       \
             &NNSearch##dimension##D::colocated_index_mapping );                \
                                                                                \
-    const auto info##dimension =                                              \
+    const auto info##dimension =                                               \
         "ColocatedInfo" + std::to_string( dimension ) + "D";                   \
     pybind11::class_< NNSearch##dimension##D::ColocatedInfo >(                 \
-        module, info##dimension.c_str() )                                     \
+        module, info##dimension.c_str() )                                      \
         .def_readonly( "colocated_mapping",                                    \
             &NNSearch##dimension##D::ColocatedInfo::colocated_mapping )        \
         .def_readonly( "unique_points",                                        \
