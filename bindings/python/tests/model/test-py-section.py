@@ -218,29 +218,31 @@ def test_clone( section ):
     if section2.nb_model_boundaries() != 2:
         raise ValueError( "[Test] Section should have 2 model boundaries" )
 
-section = model.Section()
-builder = model.SectionBuilder( section )
-
-# This Section represents a house (with one triangle and one square as in children sketches)
-corner_uuids = add_corners( section, builder )
-line_uuids = add_lines( section, builder )
-surface_uuids = add_surfaces( section, builder )
-model_boundary_uuids = add_model_boundaries( section, builder )
-
-add_corner_line_boundary_relation( section, builder, corner_uuids, line_uuids )
-add_line_surface_boundary_relation( section, builder, line_uuids, surface_uuids )
-add_lines_in_model_boundaries( section, builder, line_uuids, model_boundary_uuids )
-add_internal_corner_relations( section, builder, corner_uuids, surface_uuids )
-add_internal_line_relations( section, builder, line_uuids, surface_uuids )
-if section.nb_internals( surface_uuids[0] ) != len( corner_uuids ) + len( line_uuids ):
-    raise ValueError( "[Test] The Surface should embed all Corners & Lines (that are internal to the Surface)" )
-test_boundary_ranges( section, corner_uuids, line_uuids, surface_uuids )
-test_incidence_ranges( section, corner_uuids, line_uuids, surface_uuids )
-test_item_ranges( section, line_uuids, model_boundary_uuids )
-test_clone( section )
-
-file_io = "test." + section.native_extension()
-model.save_section( section, file_io )
-
-section2 = model.Section()
-model.load_section( section2, file_io )
+if __name__ == '__main__':
+    section = model.Section()
+    builder = model.SectionBuilder( section )
+    
+    # This Section represents a house (with one triangle and one square as in children sketches)
+    corner_uuids = add_corners( section, builder )
+    line_uuids = add_lines( section, builder )
+    surface_uuids = add_surfaces( section, builder )
+    model_boundary_uuids = add_model_boundaries( section, builder )
+    
+    add_corner_line_boundary_relation( section, builder, corner_uuids, line_uuids )
+    add_line_surface_boundary_relation( section, builder, line_uuids, surface_uuids )
+    add_lines_in_model_boundaries( section, builder, line_uuids, model_boundary_uuids )
+    add_internal_corner_relations( section, builder, corner_uuids, surface_uuids )
+    add_internal_line_relations( section, builder, line_uuids, surface_uuids )
+    if section.nb_internals( surface_uuids[0] ) != len( corner_uuids ) + len( line_uuids ):
+        raise ValueError( "[Test] The Surface should embed all Corners & Lines (that are internal to the Surface)" )
+    test_boundary_ranges( section, corner_uuids, line_uuids, surface_uuids )
+    test_incidence_ranges( section, corner_uuids, line_uuids, surface_uuids )
+    test_item_ranges( section, line_uuids, model_boundary_uuids )
+    test_clone( section )
+    
+    file_io = "test." + section.native_extension()
+    model.save_section( section, file_io )
+    
+    section2 = model.Section()
+    model.load_section( section2, file_io )
+    

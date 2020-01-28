@@ -34,7 +34,6 @@
         .def( "length", &Vector##dimension##D::length )                        \
         .def( "length2", &Vector##dimension##D::length2 )                      \
         .def( "normalize", &Vector##dimension##D::normalize )                  \
-        .def( pybind11::self* double() )                                       \
         .def( "dot", &Vector##dimension##D::dot )
 
 namespace geode

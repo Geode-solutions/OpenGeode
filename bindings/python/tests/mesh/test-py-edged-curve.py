@@ -151,16 +151,17 @@ def test_clone( edged_curve ):
     if attribute2.value( 0 ) != 42:
         raise ValueError( "[Test] EdgedCurve2 attribute should be 42" )
 
-edged_curve = mesh.EdgedCurve3D.create()
-builder = mesh.EdgedCurveBuilder3D.create( edged_curve )
-
-test_create_vertices( edged_curve, builder )
-test_create_edges( edged_curve, builder )
-test_bounding_box( edged_curve )
-test_io( edged_curve, "test." + edged_curve.native_extension() )
-
-test_delete_vertex( edged_curve, builder )
-test_delete_edge( edged_curve, builder )
-test_clone( edged_curve )
-
-test_edge_requests( edged_curve, builder )
+if __name__ == '__main__':
+    edged_curve = mesh.EdgedCurve3D.create()
+    builder = mesh.EdgedCurveBuilder3D.create( edged_curve )
+    
+    test_create_vertices( edged_curve, builder )
+    test_create_edges( edged_curve, builder )
+    test_bounding_box( edged_curve )
+    test_io( edged_curve, "test." + edged_curve.native_extension() )
+    
+    test_delete_vertex( edged_curve, builder )
+    test_delete_edge( edged_curve, builder )
+    test_clone( edged_curve )
+    
+    test_edge_requests( edged_curve, builder )

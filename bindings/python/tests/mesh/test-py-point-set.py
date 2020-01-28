@@ -79,11 +79,12 @@ def test_clone( point_set ):
     if point_set2.point( 0 ) != answer:
         raise ValueError( "[Test] PointSet2 vertex coordinates are not correct" )
 
-point_set = mesh.PointSet3D.create()
-builder = mesh.PointSetBuilder3D.create( point_set )
-test_create_vertices( point_set, builder )
-test_bounding_box( point_set )
-test_create_vertex_attribute( point_set )
-test_io( point_set, "test." + point_set.native_extension() )
-test_delete_vertex( point_set, builder )
-test_clone( point_set )
+if __name__ == '__main__':
+    point_set = mesh.PointSet3D.create()
+    builder = mesh.PointSetBuilder3D.create( point_set )
+    test_create_vertices( point_set, builder )
+    test_bounding_box( point_set )
+    test_create_vertex_attribute( point_set )
+    test_io( point_set, "test." + point_set.native_extension() )
+    test_delete_vertex( point_set, builder )
+    test_clone( point_set )

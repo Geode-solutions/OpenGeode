@@ -47,5 +47,6 @@ def test_operations():
     if p.cross( unit ) != answer:
         raise ValueError( "[Test] Wrong cross product" )
 
-test_length()
-test_operations()
+if __name__ == '__main__':
+    test_length()
+    test_operations()

@@ -282,7 +282,7 @@ void test_delete_attribute_elements( geode::AttributeManager& manager )
     to_delete[5] = true;
     manager.delete_elements( to_delete );
     OPENGEODE_EXCEPTION( manager.nb_elements() == to_delete.size() - 2,
-        "[Test] Two attribute elements should have being removed" );
+        "[Test] Two attribute elements should have been removed" );
 }
 
 void test_sparse_attribute_after_element_deletion(

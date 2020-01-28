@@ -126,14 +126,15 @@ def test_delete_all( triangulated_surface, builder ):
     if triangulated_surface.nb_vertices() != 0:
         raise ValueError( "[Test]TriangulatedSurface should have 0 vertex" )
 
-surface = mesh.TriangulatedSurface3D.create()
-builder = mesh.TriangulatedSurfaceBuilder3D.create( surface )
-
-test_create_vertices( surface, builder )
-test_create_polygons( surface, builder )
-test_polygon_adjacencies( surface, builder )
-test_io( surface, "test." + surface.native_extension() )
-
-test_delete_vertex( surface, builder )
-test_delete_polygon( surface, builder )
-test_clone( surface )
+if __name__ == '__main__':
+    surface = mesh.TriangulatedSurface3D.create()
+    builder = mesh.TriangulatedSurfaceBuilder3D.create( surface )
+    
+    test_create_vertices( surface, builder )
+    test_create_polygons( surface, builder )
+    test_polygon_adjacencies( surface, builder )
+    test_io( surface, "test." + surface.native_extension() )
+    
+    test_delete_vertex( surface, builder )
+    test_delete_polygon( surface, builder )
+    test_clone( surface )

@@ -73,7 +73,7 @@ def test_delete_attribute_elements( manager ):
     to_delete[5] = True
     manager.delete_elements( to_delete )
     if manager.nb_elements() != len(to_delete) - 2:
-        raise ValueError( "[Test] Two attribute elements should have being removed" )
+        raise ValueError( "[Test] Two attribute elements should have been removed" )
 
 def test_sparse_attribute_after_element_deletion( manager ):
     sparse_attribute = manager.find_attribute_double( "double" )
@@ -84,23 +84,24 @@ def test_sparse_attribute_after_element_deletion( manager ):
     if sparse_attribute.value( 7 ) != 12:
         raise ValueError( "Element 7 of sparse attribute should be 12 " )
 
-manager = basic.AttributeManager()
-manager.resize( 10 )
-if manager.nb_elements() != 10:
-    raise ValueError( "[Test] Manager should have 10 elements" )
-test_constant_attribute( manager )
-test_int_variable_attribute( manager )
-test_double_sparse_attribute( manager )
-test_double_sparse_attribute( manager )
-test_delete_attribute_elements( manager )
-test_sparse_attribute_after_element_deletion( manager )
-test_number_of_attributes( manager, 3 )
-manager.delete_attribute( "bool" )
-test_number_of_attributes( manager, 2 )
-manager.clear_attributes()
-test_number_of_attributes( manager, 2 )
-manager.resize( 10 )
-if manager.nb_elements() != 10:
-    raise ValueError( "[Test] Manager should have 10 elements" )
-manager.clear()
-test_number_of_attributes( manager, 0 )
+if __name__ == '__main__':
+    manager = basic.AttributeManager()
+    manager.resize( 10 )
+    if manager.nb_elements() != 10:
+        raise ValueError( "[Test] Manager should have 10 elements" )
+    test_constant_attribute( manager )
+    test_int_variable_attribute( manager )
+    test_double_sparse_attribute( manager )
+    test_double_sparse_attribute( manager )
+    test_delete_attribute_elements( manager )
+    test_sparse_attribute_after_element_deletion( manager )
+    test_number_of_attributes( manager, 3 )
+    manager.delete_attribute( "bool" )
+    test_number_of_attributes( manager, 2 )
+    manager.clear_attributes()
+    test_number_of_attributes( manager, 2 )
+    manager.resize( 10 )
+    if manager.nb_elements() != 10:
+        raise ValueError( "[Test] Manager should have 10 elements" )
+    manager.clear()
+    test_number_of_attributes( manager, 0 )

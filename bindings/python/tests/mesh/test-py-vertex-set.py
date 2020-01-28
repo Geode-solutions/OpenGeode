@@ -41,8 +41,9 @@ def test_clone( vertex_set ):
     if vertex_set2.nb_vertices() != 5:
         raise ValueError( "[Test] VertexSet2 should have 5 vertices" )
 
-vertex_set = mesh.VertexSet.create()
-builder = mesh.VertexSetBuilder.create( vertex_set )
-test_create_vertices( vertex_set, builder )
-test_delete_vertex( vertex_set, builder )
-test_clone( vertex_set )
+if __name__ == '__main__':
+    vertex_set = mesh.VertexSet.create()
+    builder = mesh.VertexSetBuilder.create( vertex_set )
+    test_create_vertices( vertex_set, builder )
+    test_delete_vertex( vertex_set, builder )
+    test_clone( vertex_set )

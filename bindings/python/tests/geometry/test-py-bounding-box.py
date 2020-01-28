@@ -21,21 +21,22 @@
 
 import OpenGeode_py_geometry as geom
 
-box = geom.BoundingBox2D()
-box.add_point( geom.Point2D( [-1, -1] ) )
-box.add_point( geom.Point2D( [1, 1] ) )
-
-box2 = box
-box2.add_point( geom.Point2D( [-2, -2] ) )
-box2.add_point( geom.Point2D( [0, 0] ) )
-
-box2.add_box( box )
-if box2.min() != geom.Point2D( [-2, -2] ):
-    raise ValueError( "[Test] Error in BoundingBox union computation" )
-if box2.max() != geom.Point2D( [1, 1] ):
-    raise ValueError( "[Test] Error in BoundingBox union computation" )
-
-if not box2.contains( geom.Point2D( [0, 0] ) ):
-    raise ValueError( "[Test] BBox should contain this point" )
-if box2.contains( geom.Point2D( [10, 0] ) ):
-    raise ValueError( "[Test] BBox should not contain this point" )
+if __name__ == '__main__':
+    box = geom.BoundingBox2D()
+    box.add_point( geom.Point2D( [-1, -1] ) )
+    box.add_point( geom.Point2D( [1, 1] ) )
+    
+    box2 = box
+    box2.add_point( geom.Point2D( [-2, -2] ) )
+    box2.add_point( geom.Point2D( [0, 0] ) )
+    
+    box2.add_box( box )
+    if box2.min() != geom.Point2D( [-2, -2] ):
+        raise ValueError( "[Test] Error in BoundingBox union computation" )
+    if box2.max() != geom.Point2D( [1, 1] ):
+        raise ValueError( "[Test] Error in BoundingBox union computation" )
+    
+    if not box2.contains( geom.Point2D( [0, 0] ) ):
+        raise ValueError( "[Test] BBox should contain this point" )
+    if box2.contains( geom.Point2D( [10, 0] ) ):
+        raise ValueError( "[Test] BBox should not contain this point" )

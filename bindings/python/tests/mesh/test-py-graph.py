@@ -135,14 +135,15 @@ def test_delete_isolated_vertices( graph, builder ):
     if graph.nb_edges() != 1:
         raise ValueError( "[Test] Graph2 should have 1 edge" )
 
-graph = mesh.Graph.create()
-builder = mesh.GraphBuilder.create( graph )
-
-test_create_vertices( graph, builder )
-test_create_edges( graph, builder )
-test_io( graph,  "test."  + graph.native_extension() )
-
-test_delete_vertex( graph, builder )
-test_delete_edge( graph, builder )
-test_clone( graph )
-test_delete_isolated_vertices( graph, builder )
+if __name__ == '__main__':
+    graph = mesh.Graph.create()
+    builder = mesh.GraphBuilder.create( graph )
+    
+    test_create_vertices( graph, builder )
+    test_create_edges( graph, builder )
+    test_io( graph,  "test."  + graph.native_extension() )
+    
+    test_delete_vertex( graph, builder )
+    test_delete_edge( graph, builder )
+    test_clone( graph )
+    test_delete_isolated_vertices( graph, builder )

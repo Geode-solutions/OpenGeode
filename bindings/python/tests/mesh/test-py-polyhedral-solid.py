@@ -230,20 +230,21 @@ def test_delete_all( polyhedral_solid, builder ):
     if polyhedral_solid.nb_vertices() != 0:
         raise ValueError( "[Test]PolyhedralSolid should have 0 vertex" )
 
-polyhedral_solid = mesh.PolyhedralSolid3D.create()
-builder = mesh.PolyhedralSolidBuilder3D.create( polyhedral_solid )
-
-test_create_vertices( polyhedral_solid, builder )
-test_create_polyhedra( polyhedral_solid, builder )
-test_create_facet_attribute( polyhedral_solid )
-test_create_edge_attribute( polyhedral_solid )
-test_polyhedron_adjacencies( polyhedral_solid, builder )
-test_io( polyhedral_solid, "test." + polyhedral_solid.native_extension() )
-
-test_delete_vertex( polyhedral_solid, builder )
-test_delete_polyhedra( polyhedral_solid, builder )
-test_clone( polyhedral_solid )
-test_set_polyhedron_vertex( polyhedral_solid, builder )
-test_delete_all( polyhedral_solid, builder )
-
-test_barycenters()
+if __name__ == '__main__':
+    polyhedral_solid = mesh.PolyhedralSolid3D.create()
+    builder = mesh.PolyhedralSolidBuilder3D.create( polyhedral_solid )
+    
+    test_create_vertices( polyhedral_solid, builder )
+    test_create_polyhedra( polyhedral_solid, builder )
+    test_create_facet_attribute( polyhedral_solid )
+    test_create_edge_attribute( polyhedral_solid )
+    test_polyhedron_adjacencies( polyhedral_solid, builder )
+    test_io( polyhedral_solid, "test." + polyhedral_solid.native_extension() )
+    
+    test_delete_vertex( polyhedral_solid, builder )
+    test_delete_polyhedra( polyhedral_solid, builder )
+    test_clone( polyhedral_solid )
+    test_set_polyhedron_vertex( polyhedral_solid, builder )
+    test_delete_all( polyhedral_solid, builder )
+    
+    test_barycenters()

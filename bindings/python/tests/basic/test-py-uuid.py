@@ -21,5 +21,6 @@
 
 import OpenGeode_py_basic as basic
 
-id = basic.uuid()
-print(id.string())
+if __name__ == '__main__':
+    id = basic.uuid()
+    print(id.string())

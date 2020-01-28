@@ -52,5 +52,6 @@ def test_operators():
     if answer / 2 != p:
         raise ValueError( "[Test] Points should be equal" )
 
-test_comparison()
-test_operators()
+if __name__ == '__main__':
+    test_comparison()
+    test_operators()

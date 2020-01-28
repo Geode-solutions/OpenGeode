@@ -62,12 +62,6 @@ namespace pybind11
 {
     namespace detail
     {
-        // template < typename Type, size_t dimension >
-        // struct type_caster< absl::InlinedVector< Type, dimension > >
-        //     : list_caster< absl::InlinedVector< Type, dimension >, Type >
-        // {
-        // };
-
         template <>
         struct type_caster< absl::string_view >
             : string_caster< absl::string_view, true >

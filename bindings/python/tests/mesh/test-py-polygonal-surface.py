@@ -261,25 +261,26 @@ def test_delete_all( polygonal_surface, builder ):
     if polygonal_surface.nb_vertices() != 0:
         raise ValueError( "[Test] PolygonalSurface should have 0 vertex" )
 
-polygonal_surface = mesh.PolygonalSurface3D.create()
-builder = mesh.PolygonalSurfaceBuilder3D.create( polygonal_surface )
-
-test_create_vertices( polygonal_surface, builder )
-test_bounding_box( polygonal_surface )
-test_create_polygons( polygonal_surface, builder )
-test_create_edge_attribute( polygonal_surface )
-test_polygon_adjacencies( polygonal_surface, builder )
-test_polygon_edges_on_borders( polygonal_surface )
-test_previous_next_on_border( polygonal_surface )
-test_polygon_barycenter( polygonal_surface )
-test_polygon_area()
-test_polygon_normal()
-test_polygon_vertex_normal()
-
-test_io( polygonal_surface, "test." + polygonal_surface.native_extension() )
-
-test_delete_vertex( polygonal_surface, builder )
-test_delete_polygon( polygonal_surface, builder )
-test_clone( polygonal_surface )
-test_set_polygon_vertex( polygonal_surface, builder )
-test_delete_all( polygonal_surface, builder )
+if __name__ == '__main__':
+    polygonal_surface = mesh.PolygonalSurface3D.create()
+    builder = mesh.PolygonalSurfaceBuilder3D.create( polygonal_surface )
+    
+    test_create_vertices( polygonal_surface, builder )
+    test_bounding_box( polygonal_surface )
+    test_create_polygons( polygonal_surface, builder )
+    test_create_edge_attribute( polygonal_surface )
+    test_polygon_adjacencies( polygonal_surface, builder )
+    test_polygon_edges_on_borders( polygonal_surface )
+    test_previous_next_on_border( polygonal_surface )
+    test_polygon_barycenter( polygonal_surface )
+    test_polygon_area()
+    test_polygon_normal()
+    test_polygon_vertex_normal()
+    
+    test_io( polygonal_surface, "test." + polygonal_surface.native_extension() )
+    
+    test_delete_vertex( polygonal_surface, builder )
+    test_delete_polygon( polygonal_surface, builder )
+    test_clone( polygonal_surface )
+    test_set_polygon_vertex( polygonal_surface, builder )
+    test_delete_all( polygonal_surface, builder )

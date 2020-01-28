@@ -139,14 +139,15 @@ def test_delete_all( solid, builder ):
     if solid.nb_vertices() != 0:
         raise ValueError( "[Test]TetrahedralSolid should have 0 vertex" )
 
-solid = mesh.TetrahedralSolid3D.create()
-builder = mesh.TetrahedralSolidBuilder3D.create( solid )
-
-test_create_vertices( solid, builder )
-test_create_tetrahedra( solid, builder )
-test_polyhedron_adjacencies( solid, builder )
-test_io( solid, "test." + solid.native_extension() )
-
-test_delete_vertex( solid, builder )
-test_delete_polyhedron( solid, builder )
-test_clone( solid )
+if __name__ == '__main__':
+    solid = mesh.TetrahedralSolid3D.create()
+    builder = mesh.TetrahedralSolidBuilder3D.create( solid )
+    
+    test_create_vertices( solid, builder )
+    test_create_tetrahedra( solid, builder )
+    test_polyhedron_adjacencies( solid, builder )
+    test_io( solid, "test." + solid.native_extension() )
+    
+    test_delete_vertex( solid, builder )
+    test_delete_polyhedron( solid, builder )
+    test_clone( solid )

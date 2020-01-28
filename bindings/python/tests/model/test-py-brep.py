@@ -336,33 +336,34 @@ def test_clone( brep ):
     if brep2.nb_model_boundaries() != 3:
         raise ValueError( "[Test] BRep should have 3 model boundaries" )
 
-brep = model.BRep()
-builder = model.BRepBuilder( brep )
-
-# This BRep represents a prism
-corner_uuids = add_corners( brep, builder )
-line_uuids = add_lines( brep, builder )
-surface_uuids = add_surfaces( brep, builder )
-block_uuids = add_blocks( brep, builder )
-model_boundary_uuids = add_model_boundaries( brep, builder )
-
-add_corner_line_boundary_relation( brep, builder, corner_uuids, line_uuids )
-add_line_surface_boundary_relation( brep, builder, line_uuids, surface_uuids )
-add_surface_block_relation(brep, builder, surface_uuids, block_uuids )
-add_surfaces_in_model_boundaries( brep, builder, surface_uuids, model_boundary_uuids )
-add_internal_corner_relations( brep, builder, corner_uuids, surface_uuids, block_uuids )
-add_internal_line_relations( brep, builder, line_uuids, surface_uuids, block_uuids )
-add_internal_surface_relations( brep, builder, surface_uuids, block_uuids )
-if brep.nb_internals( block_uuids[0] ) != len( corner_uuids ) + len( line_uuids ) + len( surface_uuids ):
-    raise ValueError( "[Test] The Block should embed all Corners & Lines & Surfaces (that are internal to the Block)" )
-test_boundary_ranges( brep, corner_uuids, line_uuids, surface_uuids, block_uuids )
-test_incidence_ranges( brep, corner_uuids, line_uuids, surface_uuids, block_uuids )
-test_item_ranges( brep, surface_uuids, model_boundary_uuids )
-test_clone( brep )
-
-file_io = "test." + brep.native_extension()
-model.save_brep( brep, file_io )
-
-brep2 = model.BRep()
-model.load_brep( brep2, file_io )
-test_reloaded_brep( brep2 )
+if __name__ == '__main__':
+    brep = model.BRep()
+    builder = model.BRepBuilder( brep )
+    
+    # This BRep represents a prism
+    corner_uuids = add_corners( brep, builder )
+    line_uuids = add_lines( brep, builder )
+    surface_uuids = add_surfaces( brep, builder )
+    block_uuids = add_blocks( brep, builder )
+    model_boundary_uuids = add_model_boundaries( brep, builder )
+    
+    add_corner_line_boundary_relation( brep, builder, corner_uuids, line_uuids )
+    add_line_surface_boundary_relation( brep, builder, line_uuids, surface_uuids )
+    add_surface_block_relation(brep, builder, surface_uuids, block_uuids )
+    add_surfaces_in_model_boundaries( brep, builder, surface_uuids, model_boundary_uuids )
+    add_internal_corner_relations( brep, builder, corner_uuids, surface_uuids, block_uuids )
+    add_internal_line_relations( brep, builder, line_uuids, surface_uuids, block_uuids )
+    add_internal_surface_relations( brep, builder, surface_uuids, block_uuids )
+    if brep.nb_internals( block_uuids[0] ) != len( corner_uuids ) + len( line_uuids ) + len( surface_uuids ):
+        raise ValueError( "[Test] The Block should embed all Corners & Lines & Surfaces (that are internal to the Block)" )
+    test_boundary_ranges( brep, corner_uuids, line_uuids, surface_uuids, block_uuids )
+    test_incidence_ranges( brep, corner_uuids, line_uuids, surface_uuids, block_uuids )
+    test_item_ranges( brep, surface_uuids, model_boundary_uuids )
+    test_clone( brep )
+    
+    file_io = "test." + brep.native_extension()
+    model.save_brep( brep, file_io )
+    
+    brep2 = model.BRep()
+    model.load_brep( brep2, file_io )
+    test_reloaded_brep( brep2 )
