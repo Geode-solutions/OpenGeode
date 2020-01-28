@@ -87,6 +87,14 @@ namespace geode
             const PolygonVertex& polygon_vertex, index_t vertex_id );
 
         /*!
+         * Replace old polygon vertices from a given vertex to another.
+         * @param[in] old_vertex_id Index of the initial mesh vertex to modify
+         * @param[in] new_vertex_id Index of the target mesh vertex to set as
+         * polygon vertex
+         */
+        void replace_vertex( index_t old_vertex_id, index_t new_vertex_id );
+
+        /*!
          * Set a polygon adjacent through an edge.
          * @param[in] polygon_edge The index of the polygon edge
          * @param[in] adjacent_id Index of the adjacent polygon
@@ -112,18 +120,25 @@ namespace geode
          * @param[in] to_delete Vector of size polygonal_surface_.nb_polygons().
          * If to_delete[i] is true the polygon of index i is deleted, else it is
          * kept.
+         * @return the mapping between old polygon indices to new ones.
+         * Deleted polygons new index is NO_ID
          */
-        void delete_polygons( const std::vector< bool >& to_delete );
+        std::vector< index_t > delete_polygons(
+            const std::vector< bool >& to_delete );
 
         /*!
          * Delete all the isolated vertices (not used as polygon vertices)
+         * @return the mapping between old vertex indices to new ones.
+         * Deleted vertices new index is NO_ID
          */
-        void delete_isolated_vertices();
+        std::vector< index_t > delete_isolated_vertices();
 
         /*!
          * Delete all the isolated edges (not used as polygon edges)
+         * @return the mapping between old edge indices to new ones.
+         * Deleted edges new index is NO_ID
          */
-        void delete_isolated_edges();
+        std::vector< index_t > delete_isolated_edges();
 
         /*!
          * Return one polygon with one of the vertices matching given vertex.
@@ -175,7 +190,8 @@ namespace geode
         virtual void do_set_polygon_adjacent(
             const PolygonEdge& polygon_edge, index_t adjacent_id ) = 0;
 
-        void delete_edges( const std::vector< bool >& to_delete );
+        std::vector< index_t > delete_edges(
+            const std::vector< bool >& to_delete );
 
         void update_polygon_vertex(
             const PolygonVertex& polygon_vertex, index_t vertex_id );

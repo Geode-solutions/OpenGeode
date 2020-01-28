@@ -131,6 +131,17 @@ namespace geode
     }
 
     template < index_t dimension >
+    index_t TetrahedralSolidBuilder< dimension >::create_tetrahedra(
+        index_t nb )
+    {
+        const auto added_tetra = tetrahedral_solid_.nb_polyhedra();
+        tetrahedral_solid_.polyhedron_attribute_manager().resize(
+            added_tetra + nb );
+        do_create_tetrahedra( nb );
+        return added_tetra;
+    }
+
+    template < index_t dimension >
     void TetrahedralSolidBuilder< dimension >::copy(
         const TetrahedralSolid< dimension >& tetrahedral_solid )
     {

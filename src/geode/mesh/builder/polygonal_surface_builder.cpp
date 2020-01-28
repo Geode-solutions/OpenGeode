@@ -224,6 +224,27 @@ namespace geode
     }
 
     template < index_t dimension >
+    void PolygonalSurfaceBuilder< dimension >::replace_vertex(
+        index_t old_vertex_id, index_t new_vertex_id )
+    {
+        const auto polygons_around =
+            polygonal_surface_.polygons_around_vertex( old_vertex_id );
+        associate_polygon_vertex_to_vertex( PolygonVertex{}, old_vertex_id );
+        for( const auto& polygon_around : polygons_around )
+        {
+            const auto previous_id = polygonal_surface_.polygon_vertex(
+                polygonal_surface_.previous_polygon_vertex( polygon_around ) );
+            const auto next_id = polygonal_surface_.polygon_vertex(
+                polygonal_surface_.next_polygon_edge( polygon_around ) );
+            polygonal_surface_.update_edge_vertex(
+                { old_vertex_id, next_id }, 0, new_vertex_id );
+            polygonal_surface_.update_edge_vertex(
+                { previous_id, old_vertex_id }, 1, new_vertex_id );
+            update_polygon_vertex( polygon_around, new_vertex_id );
+        }
+    }
+
+    template < index_t dimension >
     void PolygonalSurfaceBuilder< dimension >::set_polygon_vertex(
         const PolygonVertex& polygon_vertex, index_t vertex_id )
     {
@@ -234,21 +255,25 @@ namespace geode
         const auto next_id = polygonal_surface_.polygon_vertex(
             polygonal_surface_.next_polygon_edge( polygon_vertex ) );
 
-        const auto polygon_around =
-            polygonal_surface_.polygon_around_vertex( polygon_vertex_id );
-        if( polygon_around == polygon_vertex )
+        if( polygon_vertex_id != NO_ID )
         {
-            const auto polygons_around =
-                polygonal_surface_.polygons_around_vertex( polygon_vertex_id );
-            if( polygons_around.size() < 2 )
+            const auto polygon_around =
+                polygonal_surface_.polygon_around_vertex( polygon_vertex_id );
+            if( polygon_around == polygon_vertex )
             {
-                associate_polygon_vertex_to_vertex(
-                    PolygonVertex{}, polygon_vertex_id );
-            }
-            else
-            {
-                associate_polygon_vertex_to_vertex(
-                    polygons_around[1], polygon_vertex_id );
+                const auto polygons_around =
+                    polygonal_surface_.polygons_around_vertex(
+                        polygon_vertex_id );
+                if( polygons_around.size() < 2 )
+                {
+                    associate_polygon_vertex_to_vertex(
+                        PolygonVertex{}, polygon_vertex_id );
+                }
+                else
+                {
+                    associate_polygon_vertex_to_vertex(
+                        polygons_around[1], polygon_vertex_id );
+                }
             }
         }
 
@@ -387,8 +412,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    void PolygonalSurfaceBuilder< dimension >::delete_polygons(
-        const std::vector< bool >& to_delete )
+    std::vector< index_t >
+        PolygonalSurfaceBuilder< dimension >::delete_polygons(
+            const std::vector< bool >& to_delete )
     {
         for( const auto p : Range{ polygonal_surface_.nb_polygons() } )
         {
@@ -436,10 +462,12 @@ namespace geode
         polygonal_surface_.polygon_attribute_manager().delete_elements(
             to_delete );
         do_delete_polygons( to_delete );
+        return old2new;
     }
 
     template < index_t dimension >
-    void PolygonalSurfaceBuilder< dimension >::delete_isolated_vertices()
+    std::vector< index_t >
+        PolygonalSurfaceBuilder< dimension >::delete_isolated_vertices()
     {
         std::vector< bool > to_delete(
             polygonal_surface_.nb_vertices(), false );
@@ -452,13 +480,14 @@ namespace geode
                 to_delete[v] = true;
             }
         }
-        delete_vertices( to_delete );
+        return delete_vertices( to_delete );
     }
 
     template < index_t dimension >
-    void PolygonalSurfaceBuilder< dimension >::delete_isolated_edges()
+    std::vector< index_t >
+        PolygonalSurfaceBuilder< dimension >::delete_isolated_edges()
     {
-        polygonal_surface_.remove_isolated_edges();
+        return polygonal_surface_.remove_isolated_edges();
     }
 
     template < index_t dimension >
@@ -482,10 +511,10 @@ namespace geode
     }
 
     template < index_t dimension >
-    void PolygonalSurfaceBuilder< dimension >::delete_edges(
+    std::vector< index_t > PolygonalSurfaceBuilder< dimension >::delete_edges(
         const std::vector< bool >& to_delete )
     {
-        polygonal_surface_.delete_edges( to_delete );
+        return polygonal_surface_.delete_edges( to_delete );
     }
 
     template < index_t dimension >

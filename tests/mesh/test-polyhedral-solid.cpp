@@ -46,6 +46,8 @@ void test_create_vertices( const geode::PolyhedralSolid3D& polyhedral_solid,
     builder.create_point( { { 9.3, 5.3, 6.7 } } );
     builder.create_point( { { 7.5, 4.2, 2.8 } } );
     builder.create_point( { { 2.2, 3.3, 4.4 } } );
+    OPENGEODE_EXCEPTION( polyhedral_solid.isolated_vertex( 0 ),
+        "[Test] Vertices should be isolated before polyhedra creation" );
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_vertices() == 8,
         "[Test] PolyhedralSolid should have 8 vertices" );
 }
@@ -76,6 +78,11 @@ void test_create_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
         "[Test] PolyhedralSolid should have 11 facets" );
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_edges() == 15,
         "[Test] PolyhedralSolid should have 15 edges" );
+    OPENGEODE_EXCEPTION( !polyhedral_solid.isolated_vertex( 0 ),
+        "[Test] Vertices should not be isolated after polyhedra creation" );
+    OPENGEODE_EXCEPTION(
+        polyhedral_solid.polyhedron_facet_edge( { { 0, 1 }, 2 } ) == 4,
+        "[Test] Wrong edge index get from PolyhedronFacetEdge" );
 }
 
 void test_create_facet_attribute(
@@ -128,10 +135,12 @@ void test_polyhedron_adjacencies(
         "[Test] PolyhedralSolid adjacent index is not correct" );
     OPENGEODE_EXCEPTION(
         polyhedral_solid.polyhedra_around_vertex( 4 ).size() == 3,
-        "[Test] PolyhedralSolid should have 3 polyhedra around this vertex" );
+        "[Test] PolyhedralSolid should have 3 polyhedra around this "
+        "vertex" );
     OPENGEODE_EXCEPTION(
         polyhedral_solid.polyhedron_facets_on_border( 0 ).size() == 4,
-        "[Test] First polyhedron of PolyhedralSolid should have 4 facets on "
+        "[Test] First polyhedron of PolyhedralSolid should have 4 facets "
+        "on "
         "border" );
 
     auto edge_id = polyhedral_solid.edge_from_vertices( { 5, 4 } );
@@ -172,9 +181,11 @@ void test_delete_vertex( const geode::PolyhedralSolid3D& polyhedral_solid,
     auto attribute = polyhedral_solid.edge_attribute_manager()
                          .find_attribute< geode::index_t >( "test" );
     OPENGEODE_EXCEPTION( attribute->value( 0 ) == 8,
-        "[Test] Wrong value for attribute on edge 0 after vertex deletion" );
+        "[Test] Wrong value for attribute on "
+        "edge 0 after vertex deletion" );
     OPENGEODE_EXCEPTION( attribute->value( 1 ) == 7,
-        "[Test] Wrong value for attribute on edge 1 after vertex deletion" );
+        "[Test] Wrong value for attribute on "
+        "edge 1 after vertex deletion" );
 }
 
 void test_delete_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
@@ -200,9 +211,11 @@ void test_delete_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
     auto attribute = polyhedral_solid.edge_attribute_manager()
                          .find_attribute< geode::index_t >( "test" );
     OPENGEODE_EXCEPTION( attribute->value( 0 ) == 9,
-        "[Test] Wrong value for attribute on edge 0 after vertex deletion" );
+        "[Test] Wrong value for attribute on "
+        "edge 0 after vertex deletion" );
     OPENGEODE_EXCEPTION( attribute->value( 1 ) == 10,
-        "[Test] Wrong value for attribute on edge 1 after vertex deletion" );
+        "[Test] Wrong value for attribute on "
+        "edge 1 after vertex deletion" );
 }
 
 void test_io( const geode::PolyhedralSolid3D& polyhedral_solid,
@@ -223,7 +236,8 @@ void test_io( const geode::PolyhedralSolid3D& polyhedral_solid,
         "[Test] Reloaded PolyhedralSolid should have 3 polyhedra" );
     OPENGEODE_EXCEPTION( new_polyhedral_solid->polyhedron_facet( { 1, 0 } )
                              == polyhedral_solid.polyhedron_facet( { 1, 0 } ),
-        "[Test] Reloaded PolyhedralSolid has wrong polyhedron facet index" );
+        "[Test] Reloaded PolyhedralSolid has wrong polyhedron facet "
+        "index" );
     auto attribute = new_polyhedral_solid->facet_attribute_manager()
                          .find_attribute< geode::index_t >( "test" );
     for( auto f : geode::Range{ new_polyhedral_solid->nb_facets() } )
@@ -324,13 +338,23 @@ void test_set_polyhedron_vertex(
 {
     const auto facet_id = polyhedral_solid.polyhedron_facet( { 0, 1 } );
     builder.set_polyhedron_vertex( { 0, 2 }, 1 );
+    OPENGEODE_EXCEPTION( polyhedral_solid.isolated_facet( 0 ),
+        "[Test] Facet should be isolated before clean" );
+    OPENGEODE_EXCEPTION( polyhedral_solid.isolated_edge( 1 ),
+        "[Test] Edge should be isolated before clean" );
     builder.delete_isolated_facets();
+    builder.delete_isolated_edges();
+    OPENGEODE_EXCEPTION( !polyhedral_solid.isolated_facet( 0 ),
+        "[Test] Edge should not be isolated after clean" );
+    OPENGEODE_EXCEPTION( !polyhedral_solid.isolated_edge( 1 ),
+        "[Test] Edge should not be isolated after clean" );
 
     OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_vertex( { 0, 2 } ) == 1,
         "[Test] PolyhedronVertex after set_polyhedron_vertex is wrong" );
     OPENGEODE_EXCEPTION(
         polyhedral_solid.polyhedron_facet_vertex( { { 0, 1 }, 1 } ) == 1,
-        "[Test] PolyhedronFacetVertex after set_polyhedron_vertex is wrong" );
+        "[Test] PolyhedronFacetVertex after set_polyhedron_vertex is "
+        "wrong" );
     OPENGEODE_EXCEPTION(
         polyhedral_solid.polyhedron_facet( { 0, 1 } ) == facet_id,
         "[Test] Polyhedron facet id after set_polyhedron_vertex is wrong" );
@@ -344,8 +368,11 @@ void test_delete_all( const geode::PolyhedralSolid3D& polyhedral_solid,
 
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_vertices() == 7,
         "[Test] PolyhedralSolid should have 7 vertices" );
+    OPENGEODE_EXCEPTION( polyhedral_solid.isolated_vertex( 0 ),
+        "[Test] Vertices should be isolated after polyhedra deletion" );
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_facets() == 0,
         "[Test] PolyhedralSolid should have 0 facet" );
+    DEBUG( polyhedral_solid.nb_edges() );
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_edges() == 0,
         "[Test] PolyhedralSolid should have 0 edge" );
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_polyhedra() == 0,

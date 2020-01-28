@@ -47,6 +47,8 @@ void test_create_vertices( const geode::PolygonalSurface3D& polygonal_surface,
     builder.create_point( { { 4.7, 2.1, 1.3 } } );
     builder.create_point( { { 9.3, 5.3, 6.7 } } );
     builder.create_point( { { 7.5, 4.2, 2.8 } } );
+    OPENGEODE_EXCEPTION( polygonal_surface.isolated_vertex( 0 ),
+        "[Test] Vertices should be isolated before polygons creation" );
     OPENGEODE_EXCEPTION( polygonal_surface.nb_vertices() == 7,
         "[Test] PolygonalSurface should have 7 vertices" );
 }
@@ -117,6 +119,8 @@ void test_create_polygons( const geode::PolygonalSurface3D& polygonal_surface,
     builder.create_polygon( { 0, 1, 2 } );
     builder.create_polygon( { 1, 3, 4, 2 } );
     builder.create_polygon( { 1, 5, 6, 3 } );
+    OPENGEODE_EXCEPTION( !polygonal_surface.isolated_vertex( 0 ),
+        "[Test] Vertices should not be isolated after polygons creation" );
     OPENGEODE_EXCEPTION( polygonal_surface.nb_polygons() == 3,
         "[Test] PolygonalSurface should have 3 polygons" );
     OPENGEODE_EXCEPTION( polygonal_surface.nb_edges() == 9,
@@ -232,6 +236,8 @@ void test_delete_polygon( const geode::PolygonalSurface3D& polygonal_surface,
         "[Test] PolygonalSurface edge vertex index is not correct" );
     OPENGEODE_EXCEPTION( polygonal_surface.nb_edges() == 4,
         "[Test] PolygonalSurface should have 4 edges" );
+    OPENGEODE_EXCEPTION( !polygonal_surface.isolated_edge( 0 ),
+        "[Test] Edge should not be isolated after polygon deletion" );
 
     const auto attribute = polygonal_surface.edge_attribute_manager()
                                .find_attribute< geode::index_t >( "test" );
@@ -387,6 +393,30 @@ void test_set_polygon_vertex(
         "[Test] Edge vertices after set_polygon_vertex is wrong" );
 }
 
+void test_replace_vertex( const geode::PolygonalSurface3D& polygonal_surface,
+    geode::PolygonalSurfaceBuilder3D& builder )
+{
+    const auto new_id = builder.create_vertex();
+    const auto polygons_around = polygonal_surface.polygons_around_vertex( 1 );
+    builder.replace_vertex( 1, new_id );
+    for( const auto& pv : polygons_around )
+    {
+        OPENGEODE_EXCEPTION( polygonal_surface.polygon_vertex( pv ) == new_id,
+            "[Test] PolygonVertex after replace_vertex is wrong" );
+    }
+    OPENGEODE_EXCEPTION( polygonal_surface.isolated_vertex( 1 ),
+        "[Test] Isolated vertex after replace_vertex is wrong" );
+    builder.replace_vertex( new_id, 1 );
+    for( const auto& pv : polygons_around )
+    {
+        OPENGEODE_EXCEPTION( polygonal_surface.polygon_vertex( pv ) == 1,
+            "[Test] PolygonVertex after second replace_vertex is wrong" );
+    }
+    builder.delete_isolated_vertices();
+    OPENGEODE_EXCEPTION( polygonal_surface.nb_vertices() == new_id,
+        "[Test] Revert after replace_vertex is wrong" );
+}
+
 void test_delete_all( const geode::PolygonalSurface3D& polygonal_surface,
     geode::PolygonalSurfaceBuilder3D& builder )
 {
@@ -430,6 +460,7 @@ void test()
     test_io( *polygonal_surface,
         absl::StrCat( "test.", polygonal_surface->native_extension() ) );
 
+    test_replace_vertex( *polygonal_surface, *builder );
     test_delete_vertex( *polygonal_surface, *builder );
     test_delete_polygon( *polygonal_surface, *builder );
     test_clone( *polygonal_surface );
