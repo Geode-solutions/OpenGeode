@@ -170,8 +170,7 @@ void test()
     test_create_vertices( *surface, *builder );
     test_create_polygons( *surface, *builder );
     test_polygon_adjacencies( *surface, *builder );
-    test_io(
-        *surface, std::string( "test." ) + surface->native_extension().data() );
+    test_io( *surface, absl::StrCat( "test.", surface->native_extension() ) );
 
     test_delete_vertex( *surface, *builder );
     test_delete_polygon( *surface, *builder );

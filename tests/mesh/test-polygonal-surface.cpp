@@ -428,7 +428,7 @@ void test()
     test_polygon_vertex_normal();
 
     test_io( *polygonal_surface,
-        std::string( "test." ) + polygonal_surface->native_extension().data() );
+        absl::StrCat( "test.", polygonal_surface->native_extension() ) );
 
     test_delete_vertex( *polygonal_surface, *builder );
     test_delete_polygon( *polygonal_surface, *builder );

@@ -170,8 +170,7 @@ namespace geode
 
         void save( absl::string_view directory ) const
         {
-            const auto filename =
-                static_cast< std::string >( directory ) + "/relationships";
+            const auto filename = absl::StrCat( directory, "/relationships" );
             std::ofstream file{ filename, std::ofstream::binary };
             TContext context{};
             register_basic_serialize_pcontext( std::get< 0 >( context ) );
@@ -187,8 +186,7 @@ namespace geode
 
         void load( absl::string_view directory )
         {
-            const auto filename =
-                static_cast< std::string >( directory ) + "/relationships";
+            const auto filename = absl::StrCat( directory, "/relationships" );
             std::ifstream file{ filename, std::ifstream::binary };
             TContext context{};
             register_basic_deserialize_pcontext( std::get< 0 >( context ) );

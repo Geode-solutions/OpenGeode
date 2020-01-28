@@ -56,13 +56,13 @@ std::vector< geode::uuid > add_corners(
         geode_unused( unused );
         uuids.push_back( builder.add_corner() );
         builder.set_corner_name(
-            uuids.back(), "corner" + std::to_string( uuids.size() ) );
+            uuids.back(), absl::StrCat( "corner", uuids.size() ) );
     }
     const auto& temp_corner = model.corner(
         builder.add_corner( geode::OpenGeodePointSet3D::type_name_static() ) );
     builder.remove_corner( temp_corner );
     const auto message =
-        "[Test] BRep should have " + std::to_string( nb ) + " corners";
+        absl::StrCat( "[Test] BRep should have ", nb, " corners" );
     OPENGEODE_EXCEPTION( model.nb_corners() == nb, message );
     OPENGEODE_EXCEPTION(
         geode::detail::count_relationships( model.corners() ) == nb, message );
@@ -81,13 +81,13 @@ std::vector< geode::uuid > add_lines(
         geode_unused( unused );
         uuids.push_back( builder.add_line() );
         builder.set_line_name(
-            uuids.back(), "line" + std::to_string( uuids.size() ) );
+            uuids.back(), absl::StrCat( "line", uuids.size() ) );
     }
     const auto& temp_line = model.line(
         builder.add_line( geode::OpenGeodeEdgedCurve3D::type_name_static() ) );
     builder.remove_line( temp_line );
     const auto message =
-        "[Test] BRep should have " + std::to_string( nb ) + " lines";
+        absl::StrCat( "[Test] BRep should have ", nb, " lines" );
     OPENGEODE_EXCEPTION( model.nb_lines() == nb, message );
     OPENGEODE_EXCEPTION(
         geode::detail::count_relationships( model.lines() ) == nb, message );
@@ -107,7 +107,7 @@ std::vector< geode::uuid > add_surfaces(
         uuids.push_back( builder.add_surface(
             geode::OpenGeodeTriangulatedSurface3D::type_name_static() ) );
         builder.set_surface_name(
-            uuids.back(), "surface" + std::to_string( uuids.size() ) );
+            uuids.back(), absl::StrCat( "surface", uuids.size() ) );
     }
     for( const auto unused : geode::Range{ 2, nb } )
     {
@@ -118,7 +118,7 @@ std::vector< geode::uuid > add_surfaces(
     const auto& temp_surface = model.surface( builder.add_surface() );
     builder.remove_surface( temp_surface );
     const auto message =
-        "[Test] BRep should have " + std::to_string( nb ) + " surfaces";
+        absl::StrCat( "[Test] BRep should have ", nb, " surfaces" );
     OPENGEODE_EXCEPTION( model.nb_surfaces() == nb, message );
     OPENGEODE_EXCEPTION(
         geode::detail::count_relationships( model.surfaces() ) == nb, message );
@@ -137,13 +137,13 @@ std::vector< geode::uuid > add_blocks(
         geode_unused( unused );
         uuids.push_back( builder.add_block() );
         builder.set_block_name(
-            uuids.back(), "block" + std::to_string( uuids.size() ) );
+            uuids.back(), absl::StrCat( "block", uuids.size() ) );
     }
     const auto& temp_block = model.block( builder.add_block(
         geode::OpenGeodePolyhedralSolid3D::type_name_static() ) );
     builder.remove_block( temp_block );
     const auto message =
-        "[Test] BRep should have " + std::to_string( nb ) + " blocks";
+        absl::StrCat( "[Test] BRep should have ", nb, " blocks" );
     OPENGEODE_EXCEPTION( model.nb_blocks() == nb, message );
     OPENGEODE_EXCEPTION(
         geode::detail::count_relationships( model.blocks() ) == nb, message );
@@ -162,13 +162,13 @@ std::vector< geode::uuid > add_model_boundaries(
         geode_unused( unused );
         uuids.push_back( builder.add_model_boundary() );
         builder.set_model_boundary_name(
-            uuids.back(), "boundary" + std::to_string( uuids.size() ) );
+            uuids.back(), absl::StrCat( "boundary", uuids.size() ) );
     }
     const auto& temp_boundary =
         model.model_boundary( builder.add_model_boundary() );
     builder.remove_model_boundary( temp_boundary );
     const auto message =
-        "[Test] BRep should have " + std::to_string( nb ) + " model boundaries";
+        absl::StrCat( "[Test] BRep should have ", nb, " model boundaries" );
     OPENGEODE_EXCEPTION( model.nb_model_boundaries() == nb, message );
     OPENGEODE_EXCEPTION(
         geode::detail::count_relationships( model.model_boundaries() ) == nb,
@@ -742,8 +742,7 @@ void test()
     test_item_ranges( model, surface_uuids, model_boundary_uuids );
     test_clone( model );
 
-    const std::string file_io{ std::string( "test." )
-                               + model.native_extension().data() };
+    const auto file_io = absl::StrCat( "test.", model.native_extension() );
     geode::save_brep( model, file_io );
 
     geode::BRep model2;

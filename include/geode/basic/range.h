@@ -55,8 +55,8 @@ namespace geode
     protected:
         template < typename T1, typename T2 >
         BaseRange( T1 begin, T2 end )
-            : iter_( absl::implicit_cast< Type >( begin ) ),
-              last_( absl::implicit_cast< Type >( end ) )
+            : iter_( static_cast< Type >( begin ) ),
+              last_( static_cast< Type >( end ) )
         {
         }
 

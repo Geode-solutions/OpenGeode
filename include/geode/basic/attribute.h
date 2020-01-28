@@ -355,7 +355,9 @@ namespace geode
         void resize( index_t size ) override
         {
             const auto capacity = values_.capacity();
-            values_.reserve( std::ceil( size / capacity ) * capacity );
+            values_.reserve(
+                static_cast< size_t >( std::ceil( size / capacity ) )
+                * capacity );
             values_.resize( size, default_value_ );
         }
 
@@ -424,7 +426,7 @@ namespace geode
         {
             std::shared_ptr< VariableAttribute< bool > > attribute{
                 new VariableAttribute< bool >{
-                    absl::implicit_cast< bool >( default_value_ ) }
+                    static_cast< bool >( default_value_ ) }
             };
             attribute->values_ = values_;
             return attribute;
@@ -477,7 +479,9 @@ namespace geode
         void resize( index_t size ) override
         {
             const auto capacity = values_.capacity();
-            values_.reserve( std::ceil( size / capacity ) * capacity );
+            values_.reserve(
+                static_cast< size_t >( std::ceil( size / capacity ) )
+                * capacity );
             values_.resize( size, default_value_ );
         }
 

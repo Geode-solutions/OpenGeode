@@ -72,32 +72,30 @@ namespace geode
     template < index_t dimension >
     void Lines< dimension >::save_lines( absl::string_view directory ) const
     {
-        const auto prefix = static_cast< std::string >( directory ) + "/"
-                            + Line< dimension >::component_type_static().get();
+        const auto prefix = absl::StrCat(
+            directory, "/", Line< dimension >::component_type_static().get() );
         for( const auto& line : lines() )
         {
             const auto& mesh = line.mesh();
-            auto file = prefix + line.id().string() + "."
-                        + mesh.native_extension().data();
+            const auto file = absl::StrCat(
+                prefix, line.id().string(), ".", mesh.native_extension() );
             save_edged_curve( mesh, file );
         }
-        impl_->save_components(
-            static_cast< std::string >( directory ) + "/lines" );
+        impl_->save_components( absl::StrCat( directory, "/lines" ) );
     }
 
     template < index_t dimension >
     void Lines< dimension >::load_lines( absl::string_view directory )
     {
-        impl_->load_components(
-            static_cast< std::string >( directory ) + "/lines" );
-        const auto prefix = static_cast< std::string >( directory ) + "/"
-                            + Line< dimension >::component_type_static().get();
+        impl_->load_components( absl::StrCat( directory, "/lines" ) );
+        const auto prefix = absl::StrCat(
+            directory, "/", Line< dimension >::component_type_static().get() );
         for( auto& line : modifiable_lines() )
         {
             line.ensure_mesh_type();
             auto& mesh = line.modifiable_mesh();
-            auto file = prefix + line.id().string() + "."
-                        + mesh.native_extension().data();
+            const auto file = absl::StrCat(
+                prefix, line.id().string(), ".", mesh.native_extension() );
             load_edged_curve( mesh, file );
         }
     }

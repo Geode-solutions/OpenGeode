@@ -202,7 +202,7 @@ void test()
     test_create_edges( *edged_curve, *builder );
     test_bounding_box( *edged_curve );
     test_io( *edged_curve,
-        std::string( "test." ) + edged_curve->native_extension().data() );
+        absl::StrCat( "test.", edged_curve->native_extension() ) );
 
     test_delete_vertex( *edged_curve, *builder );
     test_delete_edge( *edged_curve, *builder );
