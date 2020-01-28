@@ -46,7 +46,7 @@
         .def( "compute_polygon_adjacencies",                                   \
             ( void ( PolygonalSurfaceBuilder##dimension##D::* )() )            \
                 & PolygonalSurfaceBuilder##dimension##D::                      \
-                      compute_polygon_adjacencies )                            \
+                    compute_polygon_adjacencies )                              \
         .def( "delete_polygons",                                               \
             &PolygonalSurfaceBuilder##dimension##D::delete_polygons )          \
         .def( "delete_isolated_vertices",                                      \
