@@ -18,5 +18,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-add_geode_python_test(test-py-brep.py OpenGeode_py_model)
-add_geode_python_test(test-py-section.py OpenGeode_py_model)
+add_geode_python_test(
+    SOURCE "test-py-brep.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_model
+)
+add_geode_python_test(
+    SOURCE "test-py-section.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_model
+)

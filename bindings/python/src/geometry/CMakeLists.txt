@@ -19,7 +19,7 @@
 # SOFTWARE.
 
 add_geode_python_binding(
-    NAME OpenGeode_py_geometry
+    NAME "py_geometry"
     SOURCES
         "geometry.cpp"
         "bounding_box.h"

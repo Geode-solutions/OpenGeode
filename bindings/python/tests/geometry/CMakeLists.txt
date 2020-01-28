@@ -18,7 +18,23 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-add_geode_python_test(test-py-bounding-box.py OpenGeode_py_geometry)
-add_geode_python_test(test-py-nnsearch.py OpenGeode_py_geometry)
-add_geode_python_test(test-py-point.py OpenGeode_py_geometry)
-add_geode_python_test(test-py-vector.py OpenGeode_py_geometry)
+add_geode_python_test(
+    SOURCE "test-py-bounding-box.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_geometry
+)
+add_geode_python_test(
+    SOURCE "test-py-nnsearch.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_geometry
+)
+add_geode_python_test(
+    SOURCE "test-py-point.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_geometry
+)
+add_geode_python_test(
+    SOURCE "test-py-vector.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_geometry
+)

@@ -19,7 +19,7 @@
 # SOFTWARE.
 
 add_geode_python_binding(
-    NAME OpenGeode_py_mesh
+    NAME "py_mesh"
     SOURCES
         "mesh.cpp"
         "builder/edged_curve_builder.h"

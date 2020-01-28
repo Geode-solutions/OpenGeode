@@ -19,7 +19,7 @@
 # SOFTWARE.
 
 add_geode_python_binding(
-    NAME OpenGeode_py_model
+    NAME "py_model"
     SOURCES
         "model.cpp"
         "mixin/builder/blocks_builder.h"

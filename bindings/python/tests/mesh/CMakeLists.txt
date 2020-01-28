@@ -18,11 +18,55 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-add_geode_python_test(test-py-vertex-set.py OpenGeode_py_mesh)
-add_geode_python_test(test-py-graph.py OpenGeode_py_mesh)
-add_geode_python_test(test-py-edged-curve.py OpenGeode_py_mesh)
-add_geode_python_test(test-py-point-set.py OpenGeode_py_mesh)
-add_geode_python_test(test-py-polygonal-surface.py OpenGeode_py_mesh)
-add_geode_python_test(test-py-triangulated-surface.py OpenGeode_py_mesh)
-add_geode_python_test(test-py-polyhedral-solid.py OpenGeode_py_mesh)
-add_geode_python_test(test-py-tetrahedral-solid.py OpenGeode_py_mesh)
+add_geode_python_test(
+    SOURCE "test-py-vertex-set.py"
+    DEPENDENCIES 
+        ${PROJECT_NAME}::py_mesh
+)
+add_geode_python_test(
+    SOURCE "test-py-graph.py"
+    DEPENDENCIES 
+        ${PROJECT_NAME}::py_mesh
+)
+add_geode_python_test(
+    SOURCE "test-py-edged-curve.py"
+    DEPENDENCIES 
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_geometry
+        ${PROJECT_NAME}::py_mesh
+)
+add_geode_python_test(
+    SOURCE "test-py-point-set.py"
+    DEPENDENCIES 
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_geometry
+        ${PROJECT_NAME}::py_mesh
+)
+add_geode_python_test(
+    SOURCE "test-py-polygonal-surface.py"
+    DEPENDENCIES 
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_geometry
+        ${PROJECT_NAME}::py_mesh
+)
+add_geode_python_test(
+    SOURCE "test-py-triangulated-surface.py"
+    DEPENDENCIES 
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_geometry
+        ${PROJECT_NAME}::py_mesh
+)
+add_geode_python_test(
+    SOURCE "test-py-polyhedral-solid.py"
+    DEPENDENCIES 
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_geometry
+        ${PROJECT_NAME}::py_mesh
+)
+add_geode_python_test(
+    SOURCE "test-py-tetrahedral-solid.py"
+    DEPENDENCIES 
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_geometry
+        ${PROJECT_NAME}::py_mesh
+)

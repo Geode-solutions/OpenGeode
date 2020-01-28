@@ -18,5 +18,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-add_geode_python_test(test-py-attribute.py OpenGeode_py_basic)
-add_geode_python_test(test-py-uuid.py OpenGeode_py_basic)
+add_geode_python_test(
+    SOURCE "test-py-attribute.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+)
+add_geode_python_test(
+    SOURCE "test-py-uuid.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+)

@@ -19,7 +19,7 @@
 # SOFTWARE.
 
 add_geode_python_binding(
-    NAME OpenGeode_py_basic
+    NAME "py_basic"
     SOURCES
         "basic.cpp"
         "attribute.h"

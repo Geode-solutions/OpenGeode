@@ -19,7 +19,6 @@
 # SOFTWARE.
 
 import OpenGeode_py_basic as basic
-import OpenGeode_py_mesh as mesh
 import OpenGeode_py_model as model
 
 def find_uuid_in_list( uuids, uuid ):

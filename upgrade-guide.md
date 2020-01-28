@@ -9,7 +9,7 @@ After many profiling, we decided to introduce Abseil (https://abseil.io) as one 
 This project (maintained and used by Google) has an important focus on performance.
 By adding it to OpenGeode, we allow us to use tailored containers and algorithms to improve our efficiency.
 
-CMake minimum required version is bumped to 3.11 to ease third parties integration. Moreover, our CMake function `add_geode_library` was using unconventional design, this has been rewritten for easier usage.
+CMake minimum required version is bumped to 3.11 to ease third parties integration. Moreover, our CMake functions were using unconventional design, they have been rewritten for easier usage.
 
 ### Breaking Changes
 
@@ -120,6 +120,28 @@ add_geode_library(
         spdlog::spdlog_header_only	 
         ghcFilesystem::ghc_filesystem
         MINIZIP::minizip	       
+)
+```
+
+- **CMake**: redesign of CMake function `add_geode_test`
+
+**How to upgrade**
+
+Example
+
+from
+
+```
+add_geode_test(test-algorithm.cpp ${PROJECT_NAME}::basic)
+```
+
+to 
+
+```
+add_geode_test(
+    SOURCE "test-algorithm.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
 )
 ```
 
