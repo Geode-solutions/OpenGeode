@@ -23,6 +23,8 @@
 
 #include <fstream>
 
+#include <bitsery/brief_syntax/array.h>
+
 #include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/logger.h>
@@ -41,6 +43,11 @@ struct Foo
         return double_ != foo.double_ || int_ != foo.int_;
     }
 
+    float generic_value() const
+    {
+        return double_ + int_;
+    }
+
     template < typename Archive >
     void serialize( Archive& archive )
     {
@@ -50,6 +57,18 @@ struct Foo
     double double_{ 0 };
     int int_{ 0 };
 };
+
+namespace geode
+{
+    template <>
+    struct GenericAttributeConversion< Foo >
+    {
+        static float converted_value( const Foo& value )
+        {
+            return value.generic_value();
+        }
+    };
+} // namespace geode
 
 void test_constant_attribute( geode::AttributeManager& manager )
 {
@@ -115,10 +134,13 @@ void test_foo_sparse_attribute( geode::AttributeManager& manager )
         manager.find_or_create_attribute< geode::SparseAttribute, Foo >(
             "foo_spr", Foo{} );
     sparse_attribute->modify_value( 3, []( Foo& foo ) { foo.double_ = 12.4; } );
+    sparse_attribute->modify_value( 3, []( Foo& foo ) { foo.int_ = 3; } );
     OPENGEODE_EXCEPTION( sparse_attribute->value( 0 ).double_ == 0,
         "[Test] Should be equal to 0" );
     OPENGEODE_EXCEPTION( sparse_attribute->value( 3 ).double_ == 12.4,
         "[Test] Should be equal to 12.4" );
+    OPENGEODE_EXCEPTION(
+        sparse_attribute->value( 3 ).int_ == 3, "[Test] Should be equal to 3" );
 }
 
 void test_double_sparse_attribute( geode::AttributeManager& manager )
@@ -226,6 +248,8 @@ void test_serialize_manager( geode::AttributeManager& manager )
     geode::register_basic_serialize_pcontext( std::get< 0 >( context ) );
     geode::AttributeManager::register_attribute_type< Foo, geode::Serializer >(
         std::get< 0 >( context ) );
+    geode::AttributeManager::register_attribute_type< std::array< double, 3 >,
+        geode::Serializer >( std::get< 0 >( context ) );
     geode::Serializer archive{ context, file };
     archive.object( manager );
     archive.adapter().flush();
@@ -238,6 +262,8 @@ void test_serialize_manager( geode::AttributeManager& manager )
     geode::register_basic_deserialize_pcontext(
         std::get< 0 >( reload_context ) );
     geode::AttributeManager::register_attribute_type< Foo,
+        geode::Deserializer >( std::get< 0 >( reload_context ) );
+    geode::AttributeManager::register_attribute_type< std::array< double, 3 >,
         geode::Deserializer >( std::get< 0 >( reload_context ) );
     geode::Deserializer unarchive{ reload_context, infile };
     unarchive.object( reloaded_manager );
@@ -299,6 +325,25 @@ void test_sparse_attribute_after_element_deletion(
         "Element 7 of sparse attribute should be 12 " );
 }
 
+void test_generic_value( geode::AttributeManager& manager )
+{
+    const auto& foo_attr = manager.find_attribute< Foo >( "foo_spr" );
+    OPENGEODE_EXCEPTION( foo_attr->generic_value( 3 ) == 15.4f,
+        "Generic value for element 3 of foo sparse attribute should be 15.4" );
+
+    const auto& double_attr = manager.find_attribute< double >( "double" );
+    OPENGEODE_EXCEPTION( double_attr->generic_value( 7 ) == 7,
+        "Generic value for element 7 of double attribute should be 7" );
+
+    auto array_attr =
+        manager.find_or_create_attribute< geode::VariableAttribute,
+            std::array< double, 3 > >(
+            "array_double", std::array< double, 3 >{} );
+    array_attr->set_value( 2, { 3.1, 1.3 } );
+    OPENGEODE_EXCEPTION( array_attr->generic_value( 2 ) == 0.,
+        "Generic value for element 2 of array attribute should be 0." );
+}
+
 void test()
 {
     geode::AttributeManager manager;
@@ -312,17 +357,18 @@ void test()
     test_foo_variable_attribute( manager );
     test_double_sparse_attribute( manager );
     test_foo_sparse_attribute( manager );
+    test_generic_value( manager );
     test_delete_attribute_elements( manager );
     test_sparse_attribute_after_element_deletion( manager );
 
     test_serialize_manager( manager );
 
     test_attribute_types( manager );
-    test_number_of_attributes( manager, 7 );
+    test_number_of_attributes( manager, 8 );
     manager.delete_attribute( "bool" );
-    test_number_of_attributes( manager, 6 );
+    test_number_of_attributes( manager, 7 );
     manager.clear_attributes();
-    test_number_of_attributes( manager, 6 );
+    test_number_of_attributes( manager, 7 );
     manager.resize( 10 );
     OPENGEODE_EXCEPTION(
         manager.nb_elements() == 10, "[Test] Manager should have 10 elements" );

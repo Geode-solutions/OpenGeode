@@ -141,6 +141,37 @@ namespace geode
         index_t vertex_id{ NO_ID };
     };
 
+    struct opengeode_mesh_api PolyhedronFacetEdge
+    {
+        PolyhedronFacetEdge() = default;
+        PolyhedronFacetEdge( PolyhedronFacet facet, index_t edge_id )
+            : polyhedron_facet( std::move( facet ) ), edge_id( edge_id )
+        {
+        }
+        bool operator==( const PolyhedronFacetEdge& other ) const
+        {
+            return polyhedron_facet == other.polyhedron_facet
+                   && edge_id == other.edge_id;
+        }
+        bool operator!=( const PolyhedronFacetEdge& other ) const
+        {
+            return !( *this == other );
+        }
+        template < typename Archive >
+        void serialize( Archive& archive )
+        {
+            archive.ext( *this,
+                DefaultGrowable< Archive, PolyhedronFacetEdge >{},
+                []( Archive& archive,
+                    PolyhedronFacetEdge& polyhedron_facet_edge ) {
+                    archive.object( polyhedron_facet_edge.polyhedron_facet );
+                    archive.value4b( polyhedron_facet_edge.edge_id );
+                } );
+        }
+        PolyhedronFacet polyhedron_facet;
+        index_t edge_id{ NO_ID };
+    };
+
     using PolyhedronFacetVertices = absl::InlinedVector< index_t, 4 >;
 
     using PolyhedronFacetsOnBorder = absl::InlinedVector< PolyhedronFacet, 4 >;
@@ -187,6 +218,12 @@ namespace geode
 
         index_t nb_edges() const;
 
+        bool isolated_vertex( index_t vertex_id ) const;
+
+        bool isolated_edge( index_t edge_id ) const;
+
+        bool isolated_facet( index_t facet_id ) const;
+
         /*!
          * Return the number of vertices in a polyhedron.
          */
@@ -225,6 +262,14 @@ namespace geode
          */
         index_t polyhedron_facet_vertex(
             const PolyhedronFacetVertex& polyhedron_facet_vertex ) const;
+
+        /*!
+         * Return the index in the mesh of a given polyhedron facet edge.
+         * @param[in] polyhedron_facet_edge Local index of the edge in the
+         * facet of a polyhedron.
+         */
+        index_t polyhedron_facet_edge(
+            const PolyhedronFacetEdge& polyhedron_facet_edge ) const;
 
         /*!
          * Return the indices of facet vertices.
@@ -400,13 +445,15 @@ namespace geode
 
         void remove_edge( std::array< index_t, 2 > edge_vertices );
 
-        void delete_facets( const std::vector< bool >& to_delete );
+        std::vector< index_t > delete_facets(
+            const std::vector< bool >& to_delete );
 
-        void delete_edges( const std::vector< bool >& to_delete );
+        std::vector< index_t > delete_edges(
+            const std::vector< bool >& to_delete );
 
-        void remove_isolated_facets();
+        std::vector< index_t > remove_isolated_facets();
 
-        void remove_isolated_edges();
+        std::vector< index_t > remove_isolated_edges();
 
         virtual index_t get_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex ) const = 0;
@@ -421,6 +468,9 @@ namespace geode
             const PolyhedronFacet& polyhedron_facet ) const = 0;
 
         virtual index_t get_polyhedron_facet_vertex(
+            const PolyhedronFacetVertex& polyhedron_facet_vertex ) const = 0;
+
+        virtual PolyhedronVertex get_polyhedron_facet_vertex_id(
             const PolyhedronFacetVertex& polyhedron_facet_vertex ) const = 0;
 
         virtual index_t get_polyhedron_adjacent(

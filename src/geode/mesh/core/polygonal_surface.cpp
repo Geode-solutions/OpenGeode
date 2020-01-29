@@ -175,14 +175,25 @@ namespace geode
             this->remove_facet( std::move( edge_vertices ) );
         }
 
-        void delete_edges( const std::vector< bool >& to_delete )
+        std::vector< index_t > delete_edges(
+            const std::vector< bool >& to_delete )
         {
-            this->delete_facets( to_delete );
+            return this->delete_facets( to_delete );
         }
 
-        void remove_isolated_edges()
+        std::vector< index_t > remove_isolated_edges()
         {
-            this->clean_facets();
+            return this->clean_facets();
+        }
+
+        bool isolated_vertex( index_t vertex_id ) const
+        {
+            return polygon_around_vertex( vertex_id ) == PolygonVertex{};
+        }
+
+        bool isolated_edge( index_t edge_id ) const
+        {
+            return this->get_counter( edge_id ) == 0;
         }
 
         AttributeManager& polygon_attribute_manager() const
@@ -300,16 +311,17 @@ namespace geode
     }
 
     template < index_t dimension >
-    void PolygonalSurfaceBase< dimension >::delete_edges(
+    std::vector< index_t > PolygonalSurfaceBase< dimension >::delete_edges(
         const std::vector< bool >& to_delete )
     {
-        impl_->delete_edges( to_delete );
+        return impl_->delete_edges( to_delete );
     }
 
     template < index_t dimension >
-    void PolygonalSurfaceBase< dimension >::remove_isolated_edges()
+    std::vector< index_t >
+        PolygonalSurfaceBase< dimension >::remove_isolated_edges()
     {
-        impl_->remove_isolated_edges();
+        return impl_->remove_isolated_edges();
     }
 
     template < index_t dimension >
@@ -329,6 +341,20 @@ namespace geode
     index_t PolygonalSurfaceBase< dimension >::nb_polygons() const
     {
         return polygon_attribute_manager().nb_elements();
+    }
+
+    template < index_t dimension >
+    bool PolygonalSurfaceBase< dimension >::isolated_vertex(
+        index_t vertex_id ) const
+    {
+        return impl_->isolated_vertex( vertex_id );
+    }
+
+    template < index_t dimension >
+    bool PolygonalSurfaceBase< dimension >::isolated_edge(
+        index_t edge_id ) const
+    {
+        return impl_->isolated_edge( edge_id );
     }
 
     template < index_t dimension >
