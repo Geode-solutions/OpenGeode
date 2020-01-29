@@ -25,6 +25,7 @@ cmake_minimum_required(VERSION 3.11)
 
 # Optional components
 option(OPENGEODE_WITH_TESTS "Compile test projects" ON)
+option(OPENGEODE_WITH_PYTHON "Compile Python bindings" OFF)
 
 # Internal options
 option(USE_SUPERBUILD "Whether or not a superbuild should be invoked" ON)

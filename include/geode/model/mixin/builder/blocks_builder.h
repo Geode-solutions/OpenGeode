@@ -71,4 +71,5 @@ namespace geode
     private:
         Blocks< dimension >& blocks_;
     };
+    ALIAS_2D_AND_3D( BlocksBuilder );
 } // namespace geode

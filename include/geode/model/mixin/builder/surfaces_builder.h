@@ -74,4 +74,5 @@ namespace geode
     private:
         Surfaces< dimension >& surfaces_;
     };
+    ALIAS_2D_AND_3D( SurfacesBuilder );
 } // namespace geode

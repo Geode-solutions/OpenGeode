@@ -18,10 +18,38 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-add_geode_test(test-algorithm.cpp ${PROJECT_NAME}::basic)
-add_geode_test(test-assert.cpp ${PROJECT_NAME}::basic)
-add_geode_test(test-attribute.cpp ${PROJECT_NAME}::basic)
-add_geode_test(test-factory.cpp ${PROJECT_NAME}::basic)
-add_geode_test(test-growable.cpp ${PROJECT_NAME}::basic)
-add_geode_test(test-logger.cpp ${PROJECT_NAME}::basic)
-add_geode_test(test-uuid.cpp ${PROJECT_NAME}::basic)
+add_geode_test(
+    SOURCE "test-algorithm.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+)
+add_geode_test(
+    SOURCE "test-assert.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+)
+add_geode_test(
+    SOURCE "test-attribute.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+)
+add_geode_test(
+    SOURCE "test-factory.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+)
+add_geode_test(
+    SOURCE "test-growable.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+)
+add_geode_test(
+    SOURCE "test-logger.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+)
+add_geode_test(
+    SOURCE "test-uuid.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+)

@@ -18,6 +18,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+if(OPENGEODE_WITH_PYTHON)
+    list(APPEND bindings pybind11)
+endif()
+
 set(OpenGeode_PATH_BIN ${PROJECT_BINARY_DIR}/opengeode)
 ExternalProject_Add(opengeode
     PREFIX ${OpenGeode_PATH_BIN}
@@ -38,6 +42,7 @@ ExternalProject_Add(opengeode
         -DNANOFLANN_INSTALL_PREFIX:PATH=${NANOFLANN_INSTALL_PREFIX}
         -DSPDLOG_INSTALL_PREFIX:PATH=${SPDLOG_INSTALL_PREFIX}
         -DABSEIL_INSTALL_PREFIX:PATH=${ABSEIL_INSTALL_PREFIX}
+        -DPYBIND11_INSTALL_PREFIX:PATH=${PYBIND11_INSTALL_PREFIX}
         -DCMAKE_INSTALL_PREFIX:PATH=${OpenGeode_PATH_BIN}/install    
     BINARY_DIR ${OpenGeode_PATH_BIN}
     DEPENDS
@@ -48,4 +53,5 @@ ExternalProject_Add(opengeode
         minizip
         nanoflann
         spdlog
+        ${bindings}
 )

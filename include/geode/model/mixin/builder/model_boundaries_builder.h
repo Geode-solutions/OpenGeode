@@ -59,4 +59,5 @@ namespace geode
     private:
         ModelBoundaries< dimension >& model_boundaries_;
     };
+    ALIAS_2D_AND_3D( ModelBoundariesBuilder );
 } // namespace geode

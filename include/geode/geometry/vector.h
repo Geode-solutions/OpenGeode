@@ -69,16 +69,6 @@ namespace geode
             return *this / length();
         }
 
-        Vector operator*( double s ) const
-        {
-            Vector< dimension > result{ *this };
-            for( auto i : Range{ dimension } )
-            {
-                result.set_value( i, s * result.value( i ) );
-            }
-            return result;
-        }
-
         double dot( const Vector &other ) const
         {
             double result{ 0 };
