@@ -76,6 +76,8 @@ namespace geode
                                                 "tetrahedra are handled" );
         std::array< index_t, 4 > tetra_vertices;
         absl::c_copy_n( vertices, 4, tetra_vertices.begin() );
+        // sort !!!
+        absl::c_sort( tetra_vertices );
         do_create_edges( tetra_vertices );
     }
 
@@ -120,13 +122,21 @@ namespace geode
                     tetrahedral_solid_.polyhedron_facet_vertex(
                         { facet, ( v + 1 ) % 3 } )
                 };
-                if( edge_vertices.front() < edge_vertices.back() )
-                {
-                    this->find_or_create_edge( std::move( edge_vertices ) );
-                }
+                this->find_or_create_edge( std::move( edge_vertices ) );
             }
             this->find_or_create_facet( std::move( facet_vertices ) );
         }
+        return added_tetra;
+    }
+
+    template < index_t dimension >
+    index_t TetrahedralSolidBuilder< dimension >::create_tetrahedra(
+        index_t nb )
+    {
+        const auto added_tetra = tetrahedral_solid_.nb_polyhedra();
+        tetrahedral_solid_.polyhedron_attribute_manager().resize(
+            added_tetra + nb );
+        do_create_tetrahedra( nb );
         return added_tetra;
     }
 

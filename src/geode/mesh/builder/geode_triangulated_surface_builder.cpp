@@ -68,6 +68,12 @@ namespace geode
     }
 
     template < index_t dimension >
+    void OpenGeodeTriangulatedSurfaceBuilder< dimension >::do_create_triangles(
+        index_t /*unused*/ )
+    {
+    }
+
+    template < index_t dimension >
     void OpenGeodeTriangulatedSurfaceBuilder<
         dimension >::do_set_polygon_adjacent( const PolygonEdge& polygon_edge,
         index_t adjacent_id )

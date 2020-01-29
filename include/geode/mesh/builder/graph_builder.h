@@ -85,13 +85,18 @@ namespace geode
          * @param[in] to_delete Vector of size graph_.nb_edges(). If
          * to_delete[i] is true the edge of index i is deleted, else the edge is
          * kept.
+         * @return the mapping between old edge indices to new ones.
+         * Deleted edges new index is NO_ID
          */
-        void delete_edges( const std::vector< bool >& to_delete );
+        std::vector< index_t > delete_edges(
+            const std::vector< bool >& to_delete );
 
         /*!
          * Delete all the isolated vertices (not used as edge endpoint)
+         * @return the mapping between old vertex indices to new ones.
+         * Deleted vertices new index is NO_ID
          */
-        void delete_isolated_vertices();
+        std::vector< index_t > delete_isolated_vertices();
 
     protected:
         GraphBuilder( Graph& graph );

@@ -138,6 +138,10 @@ namespace geode
 
         index_t nb_polygons() const;
 
+        bool isolated_vertex( index_t vertex_id ) const;
+
+        bool isolated_edge( index_t edge_id ) const;
+
         /*!
          * Return the number of vertices in a polygon
          */
@@ -338,9 +342,10 @@ namespace geode
 
         void remove_edge( std::array< index_t, 2 > edge_vertices );
 
-        void delete_edges( const std::vector< bool >& to_delete );
+        std::vector< index_t > delete_edges(
+            const std::vector< bool >& to_delete );
 
-        void remove_isolated_edges();
+        std::vector< index_t > remove_isolated_edges();
 
         virtual index_t get_polygon_vertex(
             const PolygonVertex& polygon_vertex ) const = 0;
