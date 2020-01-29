@@ -91,6 +91,12 @@ namespace geode
     }
 
     template < index_t dimension >
+    void OpenGeodeTetrahedralSolidBuilder< dimension >::do_create_tetrahedra(
+        index_t /*unused*/ )
+    {
+    }
+
+    template < index_t dimension >
     std::array< PolyhedronFacetVertices, 4 >
         OpenGeodeTetrahedralSolidBuilder< dimension >::
             get_tetrahedron_facet_vertices(

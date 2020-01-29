@@ -27,6 +27,7 @@
 #include <stdexcept>
 #include <string>
 
+#include <absl/base/optimization.h>
 #include <absl/strings/str_cat.h>
 
 #include <geode/basic/opengeode_basic_export.h>
@@ -72,7 +73,7 @@ namespace geode
 
 #ifdef OPENGEODE_DEBUG
 #define OPENGEODE_ASSERT( condition, message )                                 \
-    if( !( condition ) )                                                       \
+    if( ABSL_PREDICT_FALSE( !( condition ) ) )                                 \
     geode::geode_assertion_failed( #condition, message, __FILE__, __LINE__ )
 #define OPENGEODE_ASSERT_NOT_REACHED( message )                                \
     geode::geode_assertion_failed(                                             \
@@ -81,9 +82,8 @@ namespace geode
 #define OPENGEODE_ASSERT( x, message )
 #define OPENGEODE_ASSERT_NOT_REACHED( message )
 #endif
-
 #define OPENGEODE_EXCEPTION( condition, ... )                                  \
-    if( !( condition ) )                                                       \
+    if( ABSL_PREDICT_FALSE( !( condition ) ) )                                 \
         throw geode::OpenGeodeException                                        \
         {                                                                      \
             __VA_ARGS__                                                        \

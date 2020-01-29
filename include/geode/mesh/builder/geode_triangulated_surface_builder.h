@@ -71,6 +71,8 @@ namespace geode
         void do_create_triangle(
             const std::array< index_t, 3 >& vertices ) final;
 
+        void do_create_triangles( index_t nb ) final;
+
         void do_delete_polygons( const std::vector< bool >& to_delete ) final;
 
         void do_set_polygon_adjacent(
