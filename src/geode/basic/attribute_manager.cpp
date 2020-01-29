@@ -40,7 +40,7 @@ namespace geode
     {
     public:
         std::shared_ptr< AttributeBase > find_attribute_base(
-            absl::string_view name )
+            absl::string_view name ) const
         {
             const auto it = attributes_.find( name );
             if( it == attributes_.end() )
@@ -219,7 +219,7 @@ namespace geode
     AttributeManager::~AttributeManager() {} // NOLINT
 
     std::shared_ptr< AttributeBase > AttributeManager::find_attribute_base(
-        absl::string_view name )
+        absl::string_view name ) const
     {
         return impl_->find_attribute_base( name );
     }
