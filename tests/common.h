@@ -30,7 +30,7 @@
 namespace geode
 {
     /* Absolute path to test source directory */
-    static const auto test_path = "@TEST_DIRECTORY@/";
+    static constexpr auto data_path = "@DATA_DIRECTORY@/";
 } // namespace geode
 
 /*!

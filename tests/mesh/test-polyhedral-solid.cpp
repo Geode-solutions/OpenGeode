@@ -391,9 +391,8 @@ void test()
     test_polyhedron_adjacencies( *polyhedral_solid, *builder );
     test_io( *polyhedral_solid,
         absl::StrCat( "test.", polyhedral_solid->native_extension() ) );
-    test_backward_io(
-        absl::StrCat( geode::test_path, std::string( "mesh/data/test_v1." ),
-            polyhedral_solid->native_extension() ) );
+    test_backward_io( absl::StrCat(
+        geode::data_path, "/test_v1.", polyhedral_solid->native_extension() ) );
 
     test_delete_vertex( *polyhedral_solid, *builder );
     test_delete_polyhedra( *polyhedral_solid, *builder );
