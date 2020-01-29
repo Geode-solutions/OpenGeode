@@ -78,7 +78,8 @@ namespace geode
         absl::FixedArray< double > lambdas_;
     };
 
-    /*!     * Helper struct to convert an Attribute value to generic float.
+    /*!
+     * Helper struct to convert an Attribute value to generic float.
      * This struct may be customized for a given type.
      * Example:
      * template <>
@@ -174,6 +175,12 @@ namespace geode
             return typeid( T ).name();
         }
 
+        float generic_value( index_t element ) const final
+        {
+            return GenericAttributeConversion< T >::converted_value(
+                value( element ) );
+        }
+
     protected:
         ReadOnlyAttribute() = default;
 
@@ -187,12 +194,6 @@ namespace geode
                     archive.ext(
                         attribute, bitsery::ext::BaseClass< AttributeBase >{} );
                 } );
-        }
-
-        float generic_value( index_t element ) const final
-        {
-            return GenericAttributeConversion< T >::converted_value(
-                value( element ) );
         }
     };
 
