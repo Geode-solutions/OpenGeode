@@ -32,11 +32,11 @@ namespace geode
     public:
         Impl()
             : component_vertices_(
-                unique_vertices_.vertex_attribute_manager()
-                    .find_or_create_attribute< VariableAttribute,
-                        std::vector< MeshComponentVertex > >(
-                        "component vertices",
-                        std::vector< MeshComponentVertex >{} ) )
+                  unique_vertices_.vertex_attribute_manager()
+                      .find_or_create_attribute< VariableAttribute,
+                          std::vector< MeshComponentVertex > >(
+                          "component vertices",
+                          std::vector< MeshComponentVertex >{} ) )
         {
         }
 
@@ -229,7 +229,10 @@ namespace geode
                         component_vertices_->modify_value( uv,
                             [&it](
                                 std::vector< MeshComponentVertex >& vertices ) {
-                                vertices.erase( it );
+                                vertices.erase(
+                                    // workaround for gcc < 4.9
+                                    vertices.begin()
+                                    + ( it - vertices.cbegin() ) );
                             } );
                     }
                     else
