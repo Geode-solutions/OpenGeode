@@ -364,6 +364,12 @@ void test_delete_all( const geode::PolyhedralSolid3D& polyhedral_solid,
     geode::PolyhedralSolidBuilder3D& builder )
 {
     std::vector< bool > to_delete( polyhedral_solid.nb_polyhedra(), true );
+    for( const auto e : geode::Range{ polyhedral_solid.nb_edges() } )
+    {
+        DEBUG( polyhedral_solid.edge_vertices( e ).front() );
+        DEBUG( polyhedral_solid.edge_vertices( e ).back() );
+    }
+    DEBUG( polyhedral_solid.nb_edges() );
     builder.delete_polyhedra( to_delete );
 
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_vertices() == 7,
@@ -372,6 +378,11 @@ void test_delete_all( const geode::PolyhedralSolid3D& polyhedral_solid,
         "[Test] Vertices should be isolated after polyhedra deletion" );
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_facets() == 0,
         "[Test] PolyhedralSolid should have 0 facet" );
+    for( const auto e : geode::Range{ polyhedral_solid.nb_edges() } )
+    {
+        DEBUG( polyhedral_solid.edge_vertices( e ).front() );
+        DEBUG( polyhedral_solid.edge_vertices( e ).back() );
+    }
     DEBUG( polyhedral_solid.nb_edges() );
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_edges() == 0,
         "[Test] PolyhedralSolid should have 0 edge" );

@@ -47,9 +47,9 @@ namespace geode
         protected:
             FacetStorage()
                 : counter_(
-                    facet_attribute_manager_
-                        .template find_or_create_attribute< VariableAttribute,
-                            index_t >( "counter", 1 ) ),
+                      facet_attribute_manager_
+                          .template find_or_create_attribute< VariableAttribute,
+                              index_t >( "counter", 1 ) ),
                   vertices_(
                       facet_attribute_manager_
                           .template find_or_create_attribute< VariableAttribute,
@@ -75,6 +75,11 @@ namespace geode
 
             index_t add_facet( TypedVertexCycle vertices )
             {
+                DEBUG( "ADD" );
+                for( const auto v : vertices.vertices() )
+                {
+                    DEBUG( v );
+                }
                 const auto id = facet_indices_.size();
                 bool inserted;
                 typename absl::flat_hash_map< TypedVertexCycle,
@@ -95,9 +100,15 @@ namespace geode
 
             void remove_facet( TypedVertexCycle vertices )
             {
+                DEBUG( "REMOVE" );
+                for( const auto v : vertices.vertices() )
+                {
+                    DEBUG( v );
+                }
                 const auto it = facet_indices_.find( vertices );
                 if( it == facet_indices_.end() )
                 {
+                    DEBUG( "not found" );
                     return;
                 }
                 const auto id = it->second;
@@ -106,6 +117,7 @@ namespace geode
                     "find facet from given vertices" );
                 const auto old_count = counter_->value( id );
                 const auto new_count = std::max( 1u, old_count ) - 1;
+                DEBUG( new_count );
                 counter_->set_value( id, new_count );
             }
 
