@@ -8,7 +8,6 @@ jobs:
   release-ubuntu:
     runs-on: ubuntu-18.04
     container: ${{ matrix.config.container }}
-    needs: format
     strategy:
       matrix:
         config:
