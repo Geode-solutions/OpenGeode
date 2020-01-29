@@ -50,6 +50,19 @@ namespace geode
         ~AttributeManager();
 
         /*!
+         * Recover the non-typed/generic Attribute from the attribute
+         * name. This can be used when attribute type is not known in a
+         * context.
+         * @param[in] name The associated attribute name to look for.
+         * @return nullptr if no attribute matches the given name.
+         */
+        std::shared_ptr< AttributeBase > find_generic_attribute(
+            const std::string& name ) const
+        {
+            return find_attribute_base( name );
+        }
+
+        /*!
          * Recover the typed Attribute from the attribute name
          * @param[in] name The associated attribute name to look for
          * @tparam T The type to of the ReadOnlyAttribute element
@@ -57,7 +70,7 @@ namespace geode
          */
         template < typename T >
         std::shared_ptr< ReadOnlyAttribute< T > > find_attribute(
-            absl::string_view name )
+            absl::string_view name ) const
         {
             auto attribute =
                 std::dynamic_pointer_cast< ReadOnlyAttribute< T > >(
@@ -219,7 +232,7 @@ namespace geode
          * the shared pointer is empty.
          */
         std::shared_ptr< AttributeBase > find_attribute_base(
-            absl::string_view name );
+            absl::string_view name ) const;
 
         /*!
          * Register an Attribute to the given name.
