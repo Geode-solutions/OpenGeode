@@ -26,7 +26,7 @@ if(NOT TARGET OpenGeode::basic)
     enable_testing()
 endif()
 
-set(TEST_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+set(DATA_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/data)
 set(test_common_file_in ${CMAKE_CURRENT_LIST_DIR}/common.h)
 set(test_common_file ${PROJECT_BINARY_DIR}/geode/tests/common.h)
 configure_file(${test_common_file_in} ${test_common_file})
