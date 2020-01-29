@@ -71,8 +71,11 @@ namespace geode
          * @param[in] to_delete Vector of size vertex_set_.nb_vertices(). If
          * to_delete[i] is true the vertex of index i is deleted, else it is
          * kept.
+         * @return the mapping between old vertex indices to new ones.
+         * Deleted vertices new index is NO_ID
          */
-        void delete_vertices( const std::vector< bool >& to_delete );
+        std::vector< index_t > delete_vertices(
+            const std::vector< bool >& to_delete );
 
     protected:
         VertexSetBuilder( VertexSet& vertex_set ) : vertex_set_( vertex_set ) {}

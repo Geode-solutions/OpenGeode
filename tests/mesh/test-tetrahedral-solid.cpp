@@ -48,16 +48,22 @@ void test_create_vertices( const geode::TetrahedralSolid3D& solid,
 void test_create_tetrahedra( const geode::TetrahedralSolid3D& solid,
     geode::TetrahedralSolidBuilder3D& builder )
 {
-    builder.create_tetrahedron( { 0, 1, 2, 3 } );
+    builder.create_tetrahedra( 1 );
     builder.create_tetrahedron( { 1, 2, 3, 4 } );
     builder.create_polyhedron( { 1, 4, 3, 5 },
         { { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 } } );
     OPENGEODE_EXCEPTION( solid.nb_polyhedra() == 3,
         "[Test] TetrahedralSolid should have 3 tetrahedra" );
+    builder.set_polyhedron_vertex( { 0, 0 }, 0 );
+    builder.set_polyhedron_vertex( { 0, 1 }, 1 );
+    builder.set_polyhedron_vertex( { 0, 2 }, 2 );
+    builder.set_polyhedron_vertex( { 0, 3 }, 3 );
+    builder.delete_isolated_edges();
+    builder.delete_isolated_facets();
     OPENGEODE_EXCEPTION( solid.nb_facets() == 10,
-        "[Test] PolyhedralSolid should have 10 facets" );
-    OPENGEODE_EXCEPTION(
-        solid.nb_edges() == 12, "[Test] PolyhedralSolid should have 12 edges" );
+        "[Test] TetrahedralSolid should have 10 facets" );
+    OPENGEODE_EXCEPTION( solid.nb_edges() == 12,
+        "[Test] TetrahedralSolid should have 12 edges" );
 }
 
 void test_polyhedron_adjacencies( const geode::TetrahedralSolid3D& solid,
@@ -95,10 +101,12 @@ void test_delete_vertex( const geode::TetrahedralSolid3D& solid,
         "[Test] TetrahedralSolid should have 2 tetrahedra" );
     OPENGEODE_EXCEPTION( solid.polyhedron_adjacent( { 1, 3 } ) == 0,
         "[Test] TetrahedralSolid adjacent index is not correct" );
+    builder.delete_isolated_edges();
+    builder.delete_isolated_facets();
+    OPENGEODE_EXCEPTION( solid.nb_facets() == 7,
+        "[Test] TetrahedralSolid should have 7 facets" );
     OPENGEODE_EXCEPTION(
-        solid.nb_facets() == 7, "[Test] PolyhedralSolid should have 7 facets" );
-    OPENGEODE_EXCEPTION(
-        solid.nb_edges() == 9, "[Test] PolyhedralSolid should have 9 edges" );
+        solid.nb_edges() == 9, "[Test] TetrahedralSolid should have 9 edges" );
 }
 
 void test_delete_polyhedron( const geode::TetrahedralSolid3D& solid,
