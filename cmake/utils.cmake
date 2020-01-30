@@ -38,7 +38,9 @@ add_compile_options(
 )
 
 if(WIN32)
-    string(REPLACE "/MDd" "/MD" CMAKE_C_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
+    if(CMAKE_C_FLAGS_DEBUG)
+        string(REPLACE "/MDd" "/MD" CMAKE_C_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
+     endif()
     string(REPLACE "/MDd" "/MD" CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
 endif()
 
@@ -154,7 +156,6 @@ function(add_geode_library)
     string(REGEX REPLACE "-" "_" project_name ${project-name})
     set_target_properties(${GEODE_LIB_NAME}
         PROPERTIES
-            OUTPUT_NAME ${PROJECT_NAME}_${GEODE_LIB_NAME}
             DEFINE_SYMBOL ${project_name}_${GEODE_LIB_NAME}_EXPORTS
             FOLDER "Libraries"
     )
@@ -174,6 +175,7 @@ function(add_geode_library)
     )
     _export_library(${GEODE_LIB_NAME})
     generate_export_header(${GEODE_LIB_NAME}
+        BASE_NAME ${project_name}_${GEODE_LIB_NAME}
         EXPORT_MACRO_NAME ${project_name}_${GEODE_LIB_NAME}_api
         EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/${GEODE_LIB_FOLDER}/${project_name}_${GEODE_LIB_NAME}_export.h
     )
