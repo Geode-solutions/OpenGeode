@@ -101,7 +101,7 @@ endif()
 function(_export_library library_name)
     export(TARGETS ${library_name}
         NAMESPACE ${PROJECT_NAME}::
-        FILE ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}_${library_name}_target.cmake
+        FILE ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}_${library_name}_target.cmake
     )
     install(TARGETS ${library_name}
         EXPORT ${library_name}
