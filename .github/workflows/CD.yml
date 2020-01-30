@@ -5,14 +5,14 @@ on:
     tags: 'v*'
 
 jobs:      
-  release-ubuntu:
+  release-linux:
     runs-on: ubuntu-18.04
     container: ${{ matrix.config.container }}
     strategy:
       matrix:
         config:
         - {container: "geodesolutions/ubuntu", system: "ubuntu", doc: true}
-        - {container: "geodesolutions/centos", system: "RHEL", doc: false}
+        - {container: "geodesolutions/centos", system: "rhel", doc: false}
         
     steps:
     - uses: actions/checkout@v1
@@ -59,14 +59,14 @@ jobs:
         cd build
         version="${GITHUB_REF##*/*/}"
         echo ::set-output name=version::$version
-        cmake -G "Xcode" -DCMAKE_BUILD_TYPE=Release -DOPENGEODE_WITH_PYTHON:BOOL=ON -DOPENGEODE_WITH_TESTS:BOOL=OFF -DCPACK_PACKAGE_VERSION:STRING=$version ..
+        cmake -G "Xcode" -DCMAKE_BUILD_TYPE=Release -DOPENGEODE_WITH_PYTHON:BOOL=ON -DOPENGEODE_WITH_TESTS:BOOL=OFF -DCPACK_PACKAGE_VERSION:STRING=$version -DCPACK_SYSTEM_NAME:STRING=darwin..
         cmake --build . --config Release
         cd opengeode
         cmake --build . --target package --config Release
     - name: Upload
       uses: softprops/action-gh-release@v1
       with:
-        files: "build/opengeode/OpenGeode-${{ steps.package.outputs.version }}-Darwin.tar.gz"
+        files: "build/opengeode/OpenGeode-${{ steps.package.outputs.version }}-darwin.tar.gz"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Notify slack
@@ -90,7 +90,7 @@ jobs:
         cd build
         version="${GITHUB_REF##*/*/}"
         echo ::set-output name=version::$version
-        cmake -G "Visual Studio 15 2017 Win64" -DOPENGEODE_WITH_PYTHON:BOOL=ON -DOPENGEODE_WITH_TESTS:BOOL=OFF -DCPACK_PACKAGE_VERSION:STRING=$version ..
+        cmake -G "Visual Studio 15 2017 Win64" -DOPENGEODE_WITH_PYTHON:BOOL=ON -DOPENGEODE_WITH_TESTS:BOOL=OFF -DCPACK_PACKAGE_VERSION:STRING=$version -DCPACK_SYSTEM_NAME:STRING=win64..
         cmake --build . --config Release
         cd opengeode
         cmake --build . --target PACKAGE --config Release

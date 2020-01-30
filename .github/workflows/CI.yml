@@ -16,7 +16,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
       
-  build-ubuntu:
+  build-linux:
     runs-on: ubuntu-18.04
     container: ${{ matrix.config.container }}
     needs: format
@@ -142,7 +142,7 @@ jobs:
         
   semantic-release:
     runs-on: ubuntu-18.04
-    needs: [build-ubuntu, coverage, build-mac-xcode, build-windows]
+    needs: [build-linux, coverage, build-mac-xcode, build-windows]
     steps:
     - uses: actions/checkout@v1
     - run: npx semantic-release
