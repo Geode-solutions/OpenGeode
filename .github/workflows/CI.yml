@@ -23,10 +23,10 @@ jobs:
     strategy:
       matrix:
         config:
-        - {container: "geodesolutions/ubuntu", cmake_args: "-DCMAKE_BUILD_TYPE=Debug", coverage: true, benchmark: false}
-        - {container: "geodesolutions/ubuntu", cmake_args: "-DCMAKE_BUILD_TYPE=Release -DUSE_BENCHMARK=ON", coverage: false, benchmark: true}
-        - {container: "geodesolutions/centos", cmake_args: "-DCMAKE_BUILD_TYPE=Debug", coverage: false, benchmark: false}
-        - {container: "geodesolutions/centos", cmake_args: "-DCMAKE_BUILD_TYPE=Release", coverage: false, benchmark: false}
+        - {container: "geodesolutions/ubuntu", cmake_args: "-DCMAKE_BUILD_TYPE=Debug", benchmark: false}
+        - {container: "geodesolutions/ubuntu", cmake_args: "-DCMAKE_BUILD_TYPE=Release -DUSE_BENCHMARK=ON", benchmark: true}
+        - {container: "geodesolutions/centos", cmake_args: "-DCMAKE_BUILD_TYPE=Debug", benchmark: false}
+        - {container: "geodesolutions/centos", cmake_args: "-DCMAKE_BUILD_TYPE=Release", benchmark: false}
 
     steps:
     - uses: actions/checkout@v1
@@ -45,20 +45,40 @@ jobs:
         cmake ${{ matrix.config.cmake_args }} -DCMAKE_PREFIX_PATH:PATH=$GITHUB_WORKSPACE/build/opengeode/install ../tests
         cmake --build . -- -j2
         ctest --output-on-failure
-    - name: Kcov
-      run: curl -s https://raw.githubusercontent.com/Geode-solutions/actions/master/kcov.sh | bash -s -- ${GITHUB_WORKSPACE}/build/opengeode/bin
-      if: matrix.config.coverage && (github.event_name == 'pull_request' || github.ref == 'refs/heads/master')
-    - uses: codecov/codecov-action@v1.0.2
-      if: matrix.config.coverage && (github.event_name == 'pull_request' || github.ref == 'refs/heads/master')
-      with: 
-        token: ${{ secrets.CODECOV_TOKEN }}
-        file: kcov/kcov-merged/cobertura.xml
     - uses: Geode-solutions/actions/benchmark@master
       if: matrix.config.benchmark && github.ref == 'refs/heads/master' && github.event_name == 'push'
       with:
         repository: OpenGeode
         directory: test/bin
         token: ${{ secrets.TOKEN }}
+    - name: Notify slack
+      if: failure() && github.ref == 'refs/heads/master'
+      uses: 8398a7/action-slack@v2
+      with:
+        status: failure
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      
+  coverage:
+    runs-on: ubuntu-18.04
+    needs: format
+    if: (github.event_name == 'pull_request' || github.ref == 'refs/heads/master')
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Compile
+      run: |
+        mkdir -p build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=Debug ..
+        cmake --build . -- -j2
+    - name: Kcov
+      run: curl -s https://raw.githubusercontent.com/Geode-solutions/actions/master/kcov.sh | bash -s -- ${GITHUB_WORKSPACE}/build/opengeode/bin
+    - uses: codecov/codecov-action@v1.0.2
+      with: 
+        token: ${{ secrets.CODECOV_TOKEN }}
+        file: kcov/kcov-merged/cobertura.xml
     - name: Notify slack
       if: failure() && github.ref == 'refs/heads/master'
       uses: 8398a7/action-slack@v2
@@ -122,7 +142,7 @@ jobs:
         
   semantic-release:
     runs-on: ubuntu-18.04
-    needs: [build-ubuntu, build-mac-xcode, build-windows]
+    needs: [build-ubuntu, coverage, build-mac-xcode, build-windows]
     steps:
     - uses: actions/checkout@v1
     - run: npx semantic-release
