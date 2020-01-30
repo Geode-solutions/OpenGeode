@@ -156,6 +156,7 @@ function(add_geode_library)
     string(REGEX REPLACE "-" "_" project_name ${project-name})
     set_target_properties(${GEODE_LIB_NAME}
         PROPERTIES
+            OUTPUT_NAME ${PROJECT_NAME}_${GEODE_LIB_NAME}
             DEFINE_SYMBOL ${project_name}_${GEODE_LIB_NAME}_EXPORTS
             FOLDER "Libraries"
     )
