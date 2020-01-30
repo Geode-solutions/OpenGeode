@@ -10,7 +10,8 @@
 
 <p align="center">
   <img src="https://img.shields.io/static/v1?label=Windows&logo=windows&logoColor=white&message=support&color=success" alt="Windows support">
-  <img src="https://img.shields.io/static/v1?label=Linux&logo=linux&logoColor=white&message=support&color=success" alt="Linux support">
+  <img src="https://img.shields.io/static/v1?label=Ubuntu&logo=Ubuntu&logoColor=white&message=support&color=success" alt="Ubuntu support">
+  <img src="https://img.shields.io/static/v1?label=Red%20Hat&logo=Red-Hat&logoColor=white&message=support&color=success" alt="Red Hat support">
   <img src="https://img.shields.io/static/v1?label=macOS&logo=apple&logoColor=white&message=support&color=success" alt="macOS support">
 </p>
 
@@ -71,4 +72,4 @@ Detailed changes for each release are documented in the [release notes](https://
 
 [MIT](https://opensource.org/licenses/MIT)
 
-Copyright (c) 2019-present, Geode-solutions
+Copyright (c) 2019 - 2020-present, Geode-solutions

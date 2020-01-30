@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,8 @@
 
 #include <array>
 #include <vector>
+
+#include <absl/container/inlined_vector.h>
 
 #include <geode/mesh/builder/tetrahedral_solid_builder.h>
 #include <geode/mesh/common.h>
@@ -79,10 +81,10 @@ namespace geode
 
         void do_create_tetrahedra( index_t nb ) final;
 
-        std::vector< std::vector< index_t > > get_polyhedron_facet_vertices(
+        std::array< PolyhedronFacetVertices, 4 > get_tetrahedron_facet_vertices(
             const std::array< index_t, 4 >& vertices ) const final;
 
-        std::vector< std::array< index_t, 2 > > get_polyhedron_edge_vertices(
+        std::vector< std::array< index_t, 2 > > get_tetrahedron_edge_vertices(
             const std::array< index_t, 4 >& vertices ) const final;
 
         void do_delete_polyhedra( const std::vector< bool >& to_delete ) final;

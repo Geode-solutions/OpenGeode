@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -45,12 +45,13 @@ namespace geode
             return type_name_static();
         }
 
-        static std::string native_extension_static()
+        static absl::string_view native_extension_static()
         {
-            return "og_vts";
+            static const auto extension = "og_vts";
+            return extension;
         }
 
-        std::string native_extension() const override
+        absl::string_view native_extension() const override
         {
             return native_extension_static();
         }

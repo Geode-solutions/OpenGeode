@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -206,9 +206,9 @@ void test()
     test_create_vertices( *solid, *builder );
     test_create_tetrahedra( *solid, *builder );
     test_polyhedron_adjacencies( *solid, *builder );
-    test_io( *solid, "test." + solid->native_extension() );
-    test_backward_io(
-        geode::test_path + "mesh/data/test_v1." + solid->native_extension() );
+    test_io( *solid, absl::StrCat( "test.", solid->native_extension() ) );
+    test_backward_io( absl::StrCat(
+        geode::data_path, "/test_v1.", solid->native_extension() ) );
 
     test_delete_vertex( *solid, *builder );
     test_delete_polyhedron( *solid, *builder );

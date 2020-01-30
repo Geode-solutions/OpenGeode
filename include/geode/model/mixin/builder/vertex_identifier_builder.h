@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -99,7 +99,7 @@ namespace geode
          * @param[in] directory Folder containing the file that stores
          * VertexIdentifier information.
          */
-        void load_unique_vertices( const std::string& directory );
+        void load_unique_vertices( absl::string_view directory );
 
     private:
         VertexIdentifier& vertex_identifier_;

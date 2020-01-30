@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -45,12 +45,12 @@ namespace geode
      * @param[in] filename Path to the file to load.
      */
     void opengeode_model_api load_section(
-        Section& section, const std::string& filename );
+        Section& section, absl::string_view filename );
 
     class opengeode_model_api SectionInput : public Input
     {
     protected:
-        SectionInput( Section& section, std::string filename );
+        SectionInput( Section& section, absl::string_view filename );
 
         Section& section()
         {
@@ -62,5 +62,5 @@ namespace geode
     };
 
     using SectionInputFactory =
-        Factory< std::string, SectionInput, Section&, std::string >;
+        Factory< std::string, SectionInput, Section&, absl::string_view >;
 } // namespace geode

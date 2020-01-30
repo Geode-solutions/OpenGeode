@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,12 +29,13 @@ namespace geode
 {
     template < index_t dimension >
     void save_point_set(
-        const PointSet< dimension >& point_set, const std::string& filename )
+        const PointSet< dimension >& point_set, absl::string_view filename )
     {
         try
         {
             const auto output = PointSetOutputFactory< dimension >::create(
-                extension_from_filename( filename ), point_set, filename );
+                extension_from_filename( filename ).data(), point_set,
+                filename );
             output->write();
         }
         catch( const OpenGeodeException& e )
@@ -47,16 +48,15 @@ namespace geode
 
     template < index_t dimension >
     PointSetOutput< dimension >::PointSetOutput(
-        const PointSet< dimension >& point_set, std::string filename )
-        : VertexSetOutput( point_set, std::move( filename ) ),
-          point_set_( point_set )
+        const PointSet< dimension >& point_set, absl::string_view filename )
+        : VertexSetOutput( point_set, filename ), point_set_( point_set )
     {
     }
 
     template void opengeode_mesh_api save_point_set(
-        const PointSet< 2 >&, const std::string& );
+        const PointSet< 2 >&, absl::string_view );
     template void opengeode_mesh_api save_point_set(
-        const PointSet< 3 >&, const std::string& );
+        const PointSet< 3 >&, absl::string_view );
 
     template class opengeode_mesh_api PointSetOutput< 2 >;
     template class opengeode_mesh_api PointSetOutput< 3 >;

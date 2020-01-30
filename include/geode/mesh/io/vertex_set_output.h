@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -42,14 +42,15 @@ namespace geode
      * @param[in] filename Path to the file where save the VertexSet.
      */
     void opengeode_mesh_api save_vertex_set(
-        const VertexSet& vertex_set, const std::string& filename );
+        const VertexSet& vertex_set, absl::string_view filename );
 
     class opengeode_mesh_api VertexSetOutput : public Output
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( VertexSetOutput );
 
     protected:
-        VertexSetOutput( const VertexSet& vertex_set, std::string filename );
+        VertexSetOutput(
+            const VertexSet& vertex_set, absl::string_view filename );
 
         const VertexSet& vertex_set() const
         {
@@ -60,6 +61,8 @@ namespace geode
         const VertexSet& vertex_set_;
     };
 
-    using VertexSetOutputFactory =
-        Factory< std::string, VertexSetOutput, const VertexSet&, std::string >;
+    using VertexSetOutputFactory = Factory< std::string,
+        VertexSetOutput,
+        const VertexSet&,
+        absl::string_view >;
 } // namespace geode

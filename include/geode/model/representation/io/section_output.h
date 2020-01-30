@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -43,12 +43,12 @@ namespace geode
      * @param[in] filename Path to the file where save the section.
      */
     void opengeode_model_api save_section(
-        const Section& section, const std::string& filename );
+        const Section& section, absl::string_view filename );
 
     class opengeode_model_api SectionOutput : public Output
     {
     protected:
-        SectionOutput( const Section& section, std::string filename );
+        SectionOutput( const Section& section, absl::string_view filename );
 
         const Section& section() const
         {
@@ -59,6 +59,8 @@ namespace geode
         const Section& section_;
     };
 
-    using SectionOutputFactory =
-        Factory< std::string, SectionOutput, const Section&, std::string >;
+    using SectionOutputFactory = Factory< std::string,
+        SectionOutput,
+        const Section&,
+        absl::string_view >;
 } // namespace geode

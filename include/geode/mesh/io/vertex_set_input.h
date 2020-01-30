@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -42,7 +42,7 @@ namespace geode
      * @param[in] filename Path to the file to load.
      */
     void opengeode_mesh_api load_vertex_set(
-        VertexSet& vertex_set, const std::string& filename );
+        VertexSet& vertex_set, absl::string_view filename );
 
     class opengeode_mesh_api VertexSetInput : public Input
     {
@@ -51,7 +51,7 @@ namespace geode
         void read() final;
 
     protected:
-        VertexSetInput( VertexSet& vertex_set, std::string filename );
+        VertexSetInput( VertexSet& vertex_set, absl::string_view filename );
 
         VertexSet& vertex_set()
         {
@@ -68,5 +68,5 @@ namespace geode
     };
 
     using VertexSetInputFactory =
-        Factory< std::string, VertexSetInput, VertexSet&, std::string >;
+        Factory< std::string, VertexSetInput, VertexSet&, absl::string_view >;
 } // namespace geode

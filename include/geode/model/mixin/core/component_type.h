@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -70,11 +70,9 @@ namespace geode
             return type_.get() == other.type_.get() && id_ == other.id_;
         }
 
-        friend std::ostream& operator<<(
-            std::ostream& os, const ComponentID& in )
+        std::string string() const
         {
-            os << in.type_.get() << " " << in.id_;
-            return os;
+            return absl::StrCat( type_.get(), " ", id_.string() );
         }
 
     private:

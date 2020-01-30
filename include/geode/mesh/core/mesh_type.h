@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,8 @@
 #pragma once
 
 #include <string>
-#include <utility>
+
+#include <absl/hash/hash.h>
 
 #include <bitsery/brief_syntax/string.h>
 
@@ -48,7 +49,7 @@ namespace std
     {
         std::size_t operator()( const geode::MeshType& f ) const
         {
-            return std::hash< std::string >{}( f.get() );
+            return absl::Hash< std::string >{}( f.get() );
         }
     };
 } // namespace std

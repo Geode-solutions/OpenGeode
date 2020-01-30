@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -44,6 +44,7 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( ModelBoundary );
         friend class ModelBoundaries< dimension >;
+        friend class bitsery::Access;
 
     public:
         ~ModelBoundary() = default;
@@ -53,7 +54,7 @@ namespace geode
             return ComponentType{ "ModelBoundary" };
         }
 
-        ComponentType component_type() const
+        ComponentType component_type() const override
         {
             return component_type_static();
         }
@@ -64,16 +65,14 @@ namespace geode
         };
 
     private:
-        friend class bitsery::Access;
         ModelBoundary() = default;
 
         friend class ModelBoundariesBuilder< dimension >;
-        void set_model_boundary_name( std::string name )
+        void set_model_boundary_name( absl::string_view name )
         {
-            this->set_name( std::move( name ) );
+            this->set_name( name );
         }
 
-        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive );
     };

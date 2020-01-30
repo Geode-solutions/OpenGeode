@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -177,7 +177,7 @@ void test_clone( const geode::EdgedCurve3D& edged_curve )
     auto attribute =
         edged_curve.edge_attribute_manager()
             .find_or_create_attribute< geode::VariableAttribute, int >(
-                "test" );
+                "test", 0 );
     attribute->set_value( 0, 42 );
 
     const auto edged_curve2 = edged_curve.clone();
@@ -201,7 +201,8 @@ void test()
     test_create_vertices( *edged_curve, *builder );
     test_create_edges( *edged_curve, *builder );
     test_bounding_box( *edged_curve );
-    test_io( *edged_curve, "test." + edged_curve->native_extension() );
+    test_io( *edged_curve,
+        absl::StrCat( "test.", edged_curve->native_extension() ) );
 
     test_delete_vertex( *edged_curve, *builder );
     test_delete_edge( *edged_curve, *builder );

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -84,8 +84,7 @@ namespace geode
 
         SurfaceRange surfaces() const;
 
-        std::vector< std::string > save_surfaces(
-            const std::string& directory ) const;
+        void save_surfaces( absl::string_view directory ) const;
 
     protected:
         Surfaces();
@@ -107,7 +106,7 @@ namespace geode
 
         void delete_surface( const Surface< dimension >& surface );
 
-        void load_surfaces( const std::string& directory );
+        void load_surfaces( absl::string_view directory );
 
         ModifiableSurfaceRange modifiable_surfaces();
 

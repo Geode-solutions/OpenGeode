@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,17 +31,28 @@
 
 void test_vertex_cycle()
 {
-    const geode::detail::VertexCycle cycle1{ { 0, 1, 2, 3 } };
-    const geode::detail::VertexCycle cycle2{ { 2, 3, 0, 1 } };
-    const geode::detail::VertexCycle cycle3{ { 2, 3, 1, 0 } };
-    const geode::detail::VertexCycle cycle4{ { 1, 0, 3, 2 } };
+    const geode::detail::VertexCycle< std::vector< geode::index_t > > cycle1{
+        { 0, 1, 2, 3 }
+    };
+    const geode::detail::VertexCycle< std::vector< geode::index_t > > cycle2{
+        { 2, 3, 0, 1 }
+    };
+    const geode::detail::VertexCycle< std::vector< geode::index_t > > cycle3{
+        { 2, 3, 1, 0 }
+    };
+    const geode::detail::VertexCycle< std::vector< geode::index_t > > cycle4{
+        { 1, 0, 3, 2 }
+    };
 
-    const geode::detail::VertexCycle cycle5{ std::array< geode::index_t, 2 >{
-        2, 3 } };
-    const geode::detail::VertexCycle cycle6{ std::array< geode::index_t, 2 >{
-        3, 2 } };
-    const geode::detail::VertexCycle cycle7{ std::array< geode::index_t, 2 >{
-        3, 1 } };
+    const geode::detail::VertexCycle< std::array< geode::index_t, 2 > > cycle5{
+        { 2, 3 }
+    };
+    const geode::detail::VertexCycle< std::array< geode::index_t, 2 > > cycle6{
+        { 3, 2 }
+    };
+    const geode::detail::VertexCycle< std::array< geode::index_t, 2 > > cycle7{
+        { 3, 1 }
+    };
 
     OPENGEODE_EXCEPTION( cycle1 == cycle2,
         "[Test] Wrong result for operator== with cycle1 and cycle2" );
@@ -49,8 +60,6 @@ void test_vertex_cycle()
         "[Test] Wrong result for operator== with cycle1 and cycle3" );
     OPENGEODE_EXCEPTION( cycle1 == cycle4,
         "[Test] Wrong result for operator== with cycle1 and cycle4" );
-    OPENGEODE_EXCEPTION( cycle1 != cycle5,
-        "[Test] Wrong result for operator== with cycle1 and cycle5" );
     OPENGEODE_EXCEPTION( cycle5 == cycle6,
         "[Test] Wrong result for operator== with cycle5 and cycle6" );
     OPENGEODE_EXCEPTION( cycle5 != cycle7,

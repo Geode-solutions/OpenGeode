@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -134,6 +134,18 @@ namespace geode
             return square_length < epsilon * epsilon;
         }
 
+        std::string string() const
+        {
+            std::string result;
+            const auto *sep = "";
+            for( const auto i : Range{ dimension } )
+            {
+                absl::StrAppend( &result, sep, value( i ) );
+                sep = " ";
+            }
+            return result;
+        }
+
     private:
         friend class bitsery::Access;
         template < typename Archive >
@@ -149,17 +161,4 @@ namespace geode
         std::array< double, dimension > values_;
     };
     ALIAS_2D_AND_3D( Point );
-
-    template < index_t dimension >
-    std::ostream &operator<<(
-        std::ostream &out, const Point< dimension > &point )
-    {
-        const char *sep = "";
-        for( const auto i : Range{ dimension } )
-        {
-            out << sep << point.value( i );
-            sep = " ";
-        }
-        return out;
-    }
 } // namespace geode

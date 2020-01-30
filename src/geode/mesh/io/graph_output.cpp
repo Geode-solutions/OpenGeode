@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,12 +27,12 @@
 
 namespace geode
 {
-    void save_graph( const Graph& graph, const std::string& filename )
+    void save_graph( const Graph& graph, absl::string_view filename )
     {
         try
         {
             const auto output = GraphOutputFactory::create(
-                extension_from_filename( filename ), graph, filename );
+                extension_from_filename( filename ).data(), graph, filename );
             output->write();
         }
         catch( const OpenGeodeException& e )
@@ -42,8 +42,8 @@ namespace geode
         }
     }
 
-    GraphOutput::GraphOutput( const Graph& graph, std::string filename )
-        : VertexSetOutput( graph, std::move( filename ) ), graph_( graph )
+    GraphOutput::GraphOutput( const Graph& graph, absl::string_view filename )
+        : VertexSetOutput( graph, filename ), graph_( graph )
     {
     }
 } // namespace geode

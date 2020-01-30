@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -45,12 +45,12 @@ namespace geode
      * @param[in] filename Path to the file to load.
      */
     void opengeode_model_api load_brep(
-        BRep& brep, const std::string& filename );
+        BRep& brep, absl::string_view filename );
 
     class opengeode_model_api BRepInput : public Input
     {
     protected:
-        BRepInput( BRep& brep, std::string filename );
+        BRepInput( BRep& brep, absl::string_view filename );
 
         BRep& brep()
         {
@@ -62,5 +62,5 @@ namespace geode
     };
 
     using BRepInputFactory =
-        Factory< std::string, BRepInput, BRep&, std::string >;
+        Factory< std::string, BRepInput, BRep&, absl::string_view >;
 } // namespace geode

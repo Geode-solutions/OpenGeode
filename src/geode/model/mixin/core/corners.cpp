@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -72,34 +72,34 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< std::string > Corners< dimension >::save_corners(
-        const std::string& directory ) const
+    void Corners< dimension >::save_corners( absl::string_view directory ) const
     {
-        std::vector< std::string > files;
+        const auto prefix = absl::StrCat( directory, "/",
+            Corner< dimension >::component_type_static().get() );
         for( const auto& corner : corners() )
         {
             const auto& mesh = corner.mesh();
-            files.emplace_back( directory + "/" + corner.component_type().get()
-                                + corner.id().string() + "."
-                                + mesh.native_extension() );
-            save_point_set( mesh, files.back() );
+            const auto file = absl::StrCat(
+                prefix, corner.id().string(), ".", mesh.native_extension() );
+            save_point_set( mesh, file );
         }
-        files.emplace_back( directory + "/corners" );
-        impl_->save_components( files.back() );
-        return files;
+        impl_->save_components( absl::StrCat( directory, "/corners" ) );
     }
 
     template < index_t dimension >
-    void Corners< dimension >::load_corners( const std::string& directory )
+    void Corners< dimension >::load_corners( absl::string_view directory )
     {
-        impl_->load_components( directory + "/corners" );
+        impl_->load_components( absl::StrCat( directory, "/corners" ) );
+
+        const auto prefix = absl::StrCat( directory, "/",
+            Corner< dimension >::component_type_static().get() );
         for( auto& corner : modifiable_corners() )
         {
             corner.ensure_mesh_type();
             auto& mesh = corner.modifiable_mesh();
-            load_point_set( mesh,
-                directory + "/" + corner.component_type().get()
-                    + corner.id().string() + "." + mesh.native_extension() );
+            const auto file = absl::StrCat(
+                prefix, corner.id().string(), ".", mesh.native_extension() );
+            load_point_set( mesh, file );
         }
     }
 

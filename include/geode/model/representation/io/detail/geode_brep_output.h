@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <ghc/filesystem.hpp>
+
 #include <geode/basic/uuid.h>
 #include <geode/basic/zip_file.h>
 
@@ -34,37 +36,40 @@ namespace geode
     class opengeode_model_api OpenGeodeBRepOutput final : public BRepOutput
     {
     public:
-        OpenGeodeBRepOutput( const BRep& brep, std::string filename )
-            : BRepOutput( brep, std::move( filename ) )
+        OpenGeodeBRepOutput( const BRep& brep, absl::string_view filename )
+            : BRepOutput( brep, filename )
         {
         }
 
-        static std::string extension()
+        static absl::string_view extension()
         {
             return BRep::native_extension_static();
         }
 
         void archive_brep_files( const ZipFile& zip_writer ) const
         {
-            zip_writer.archive_file(
-                brep().save_relationships( zip_writer.directory() ) );
-            zip_writer.archive_file(
-                brep().save_unique_vertices( zip_writer.directory() ) );
-            zip_writer.archive_files(
-                brep().save_corners( zip_writer.directory() ) );
-            zip_writer.archive_files(
-                brep().save_lines( zip_writer.directory() ) );
-            zip_writer.archive_files(
-                brep().save_surfaces( zip_writer.directory() ) );
-            zip_writer.archive_files(
-                brep().save_blocks( zip_writer.directory() ) );
-            zip_writer.archive_files(
-                brep().save_model_boundaries( zip_writer.directory() ) );
+            for( const auto& file : ghc::filesystem::directory_iterator(
+                     zip_writer.directory().data() ) )
+            {
+                zip_writer.archive_file( file.path().native() );
+            }
+        }
+
+        void save_brep_files( absl::string_view directory ) const
+        {
+            brep().save_relationships( directory );
+            brep().save_unique_vertices( directory );
+            brep().save_corners( directory );
+            brep().save_lines( directory );
+            brep().save_surfaces( directory );
+            brep().save_blocks( directory );
+            brep().save_model_boundaries( directory );
         }
 
         void write() const final
         {
             const ZipFile zip_writer{ filename(), uuid{}.string() };
+            save_brep_files( zip_writer.directory() );
             archive_brep_files( zip_writer );
         }
     };

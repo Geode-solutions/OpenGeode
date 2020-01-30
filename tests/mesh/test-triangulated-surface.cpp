@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -118,7 +118,7 @@ void test_delete_polygon( const geode::TriangulatedSurface3D& surface,
 }
 
 void test_io(
-    const geode::TriangulatedSurface3D& surface, const std::string& filename )
+    const geode::TriangulatedSurface3D& surface, absl::string_view filename )
 {
     save_triangulated_surface( surface, filename );
     auto new_surface = geode::TriangulatedSurface3D::create(
@@ -174,7 +174,7 @@ void test()
     test_create_vertices( *surface, *builder );
     test_create_polygons( *surface, *builder );
     test_polygon_adjacencies( *surface, *builder );
-    test_io( *surface, "test." + surface->native_extension() );
+    test_io( *surface, absl::StrCat( "test.", surface->native_extension() ) );
 
     test_delete_vertex( *surface, *builder );
     test_delete_polygon( *surface, *builder );

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -75,44 +75,43 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< std::string > Surfaces< dimension >::save_surfaces(
-        const std::string& directory ) const
+    void Surfaces< dimension >::save_surfaces(
+        absl::string_view directory ) const
     {
-        std::vector< std::string > files;
+        const auto prefix = absl::StrCat( directory, "/",
+            Surface< dimension >::component_type_static().get() );
         for( const auto& surface : surfaces() )
         {
             const auto& mesh = surface.mesh();
-            files.emplace_back( directory + "/" + surface.component_type().get()
-                                + surface.id().string() + "."
-                                + mesh.native_extension() );
+            const auto file = absl::StrCat(
+                prefix, surface.id().string(), ".", mesh.native_extension() );
             const auto* triangulated =
                 dynamic_cast< const TriangulatedSurface< dimension >* >(
                     &mesh );
             if( triangulated )
             {
-                save_triangulated_surface( *triangulated, files.back() );
+                save_triangulated_surface( *triangulated, file );
             }
             else
             {
-                save_polygonal_surface( mesh, files.back() );
+                save_polygonal_surface( mesh, file );
             }
         }
-        files.emplace_back( directory + "/surfaces" );
-        impl_->save_components( files.back() );
-        return files;
+        impl_->save_components( absl::StrCat( directory, "/surfaces" ) );
     }
 
     template < index_t dimension >
-    void Surfaces< dimension >::load_surfaces( const std::string& directory )
+    void Surfaces< dimension >::load_surfaces( absl::string_view directory )
     {
-        impl_->load_components( directory + "/surfaces" );
+        impl_->load_components( absl::StrCat( directory, "/surfaces" ) );
+        const auto prefix = absl::StrCat( directory, "/",
+            Surface< dimension >::component_type_static().get() );
         for( auto& surface : modifiable_surfaces() )
         {
             surface.ensure_mesh_type();
             auto& mesh = surface.modifiable_mesh();
-            const auto file = directory + "/" + surface.component_type().get()
-                              + surface.id().string() + "."
-                              + mesh.native_extension();
+            const auto file = absl::StrCat(
+                prefix, surface.id().string(), ".", mesh.native_extension() );
             auto* triangulated =
                 dynamic_cast< TriangulatedSurface< dimension >* >( &mesh );
             if( triangulated )

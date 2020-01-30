@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,8 @@
 
 #include <algorithm>
 #include <vector>
+
+#include <absl/algorithm/container.h>
 
 #include <geode/basic/common.h>
 #include <geode/basic/range.h>
@@ -52,8 +54,7 @@ namespace geode
             "[delete_vector_elements] Number of elements in the two vectors "
             "should match" );
         index_t nb_removed_elements{ 0 };
-        if( std::find( to_delete.begin(), to_delete.end(), true )
-            == to_delete.end() )
+        if( absl::c_find( to_delete, true ) == to_delete.end() )
         {
             return 0;
         }
@@ -90,14 +91,12 @@ namespace geode
         OPENGEODE_ASSERT( to_keep.size() == in_values.size(),
             "[extract_vector_elements] Number of elements in the two vectors "
             "should match" );
-        if( std::find( to_keep.begin(), to_keep.end(), false )
-            == to_keep.end() )
+        if( absl::c_find( to_keep, false ) == to_keep.end() )
         {
             return in_values;
         }
         std::vector< T > out_values;
-        out_values.reserve(
-            std::count( to_keep.begin(), to_keep.end(), true ) );
+        out_values.reserve( absl::c_count( to_keep, true ) );
         for( const auto i : Range{ to_keep.size() } )
         {
             if( to_keep[i] )
@@ -116,7 +115,7 @@ namespace geode
     template < typename Container >
     void sort_unique( Container& in )
     {
-        std::sort( in.begin(), in.end() );
+        absl::c_sort( in );
         const auto last = std::unique( in.begin(), in.end() );
         in.erase( last, in.end() );
     }

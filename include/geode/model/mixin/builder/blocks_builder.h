@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -45,7 +45,7 @@ namespace geode
     class BlocksBuilder
     {
     public:
-        void load_blocks( const std::string& directory );
+        void load_blocks( absl::string_view directory );
 
         /*!
          * Get a pointer to the builder of a Block mesh
@@ -54,7 +54,7 @@ namespace geode
         std::unique_ptr< PolyhedralSolidBuilder< dimension > >
             block_mesh_builder( const uuid& id );
 
-        void set_block_name( const uuid& id, std::string name );
+        void set_block_name( const uuid& id, absl::string_view name );
 
     protected:
         BlocksBuilder( Blocks< dimension >& blocks ) : blocks_( blocks ) {}
@@ -71,4 +71,5 @@ namespace geode
     private:
         Blocks< dimension >& blocks_;
     };
+    ALIAS_2D_AND_3D( BlocksBuilder );
 } // namespace geode

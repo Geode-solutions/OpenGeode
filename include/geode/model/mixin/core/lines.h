@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -84,8 +84,7 @@ namespace geode
 
         LineRange lines() const;
 
-        std::vector< std::string > save_lines(
-            const std::string& directory ) const;
+        void save_lines( absl::string_view directory ) const;
 
     protected:
         Lines();
@@ -107,7 +106,7 @@ namespace geode
 
         void delete_line( const Line< dimension >& line );
 
-        void load_lines( const std::string& directory );
+        void load_lines( absl::string_view directory );
 
         ModifiableLineRange modifiable_lines();
 

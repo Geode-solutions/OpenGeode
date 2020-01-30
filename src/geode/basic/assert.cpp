@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,9 +29,9 @@
 
 namespace geode
 {
-    void geode_assertion_failed( const std::string &condition,
-        const std::string &message,
-        const std::string &file,
+    void geode_assertion_failed( absl::string_view condition,
+        absl::string_view message,
+        absl::string_view file,
         int line )
     {
         Logger::error( "File: ", file );

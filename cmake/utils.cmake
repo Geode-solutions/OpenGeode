@@ -29,13 +29,18 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}
 #------------------------------------------------------------------------------------------------
 # Platform dependent settings
 add_compile_options(
-	$<$<CXX_COMPILER_ID:MSVC>:/bigobj>
-	$<$<CXX_COMPILER_ID:MSVC>:/DNOMINMAX>
-	$<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wall>
-	$<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wextra>
-	$<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wpedantic>
-	$<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wno-attributes>
+    $<$<CXX_COMPILER_ID:MSVC>:/bigobj>
+    $<$<CXX_COMPILER_ID:MSVC>:/DNOMINMAX>
+    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wall>
+    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wextra>
+    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wpedantic>
+    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wno-attributes>
 )
+
+if(WIN32)
+    string(REPLACE "/MDd" "/MD" CMAKE_C_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
+    string(REPLACE "/MDd" "/MD" CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
+endif()
 
 #------------------------------------------------------------------------------------------------
 # Install configuration    
@@ -47,11 +52,6 @@ endif()
 set(CMAKE_MACOSX_RPATH ON)
 set(CMAKE_INSTALL_RPATH "${OS_RPATH}")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
-
-if(WIN32)
-    add_custom_target(windows_post_compilation ALL)
-    string(REPLACE "/MDd" "/MD" CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
-endif()
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in)
     set(OUTPUT_CONFIG_FILE ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}Config.cmake)
@@ -98,138 +98,227 @@ if(DOXYGEN_FOUND AND EXISTS ${PROJECT_SOURCE_DIR}/cmake/Doxyfile.in)
         VERBATIM )
 endif()
 
-function(add_geode_library folder_path)
-    get_filename_component(target_name ${folder_path} NAME)
-    set(lib_source_dir ${PROJECT_SOURCE_DIR}/src/${folder_path})
-    set(lib_include_dir ${PROJECT_SOURCE_DIR}/include/${folder_path})
-    add_library(${target_name} SHARED "${lib_source_dir}/common.cpp")
-    add_library(${PROJECT_NAME}::${target_name} ALIAS ${target_name})
-    if(WIN32)
-        add_dependencies(windows_post_compilation ${target_name})
-    endif()
-    include(${lib_source_dir}/CMakeLists.txt)
-    set(all_sources
-        "${sources}"
-        "${public_headers}"
-        "${advanced_headers}"
-    )
-    target_sources(${target_name} PRIVATE "${all_sources}")
-    string(TOLOWER ${PROJECT_NAME} project-name)
-    string(REGEX REPLACE "-" "_" project_name ${project-name})
-    set_target_properties(${target_name}
-        PROPERTIES
-            OUTPUT_NAME ${PROJECT_NAME}_${target_name}
-            DEFINE_SYMBOL ${project_name}_${target_name}_EXPORTS
-            CMAKE_CXX_VISIBILITY_PRESET hidden
-            CMAKE_VISIBILITY_INLINES_HIDDEN ON
-            FOLDER "Libraries"
-    )
-    # TODO: Use TREE keyword when we change to cmake 3.8
-    source_group("Public Header Files" FILES ${public_headers})
-    source_group("Advanced Header Files" FILES ${advanced_headers})
-    source_group("Source Files" FILES ${sources})
-    target_include_directories(${target_name}
-        PUBLIC
-            $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-            $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
-            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-    )
-    export(TARGETS ${target_name}
+function(_export_library library_name)
+    export(TARGETS ${library_name}
         NAMESPACE ${PROJECT_NAME}::
-        FILE ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}_${target_name}_target.cmake
+        FILE ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}_${library_name}_target.cmake
     )
-    generate_export_header(${target_name}
-        EXPORT_MACRO_NAME ${project_name}_${target_name}_api
-        EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/${folder_path}/${project_name}_${target_name}_export.h
-    )
-    install(FILES ${PROJECT_BINARY_DIR}/${folder_path}/${project_name}_${target_name}_export.h
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${folder_path}
-    )
-    install(DIRECTORY ${lib_include_dir}/
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${folder_path}
-    )
-    install(TARGETS ${target_name}
-        EXPORT ${target_name}
+    install(TARGETS ${library_name}
+        EXPORT ${library_name}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     )
-    install(EXPORT ${target_name}
-        FILE ${PROJECT_NAME}_${target_name}_target.cmake
+    install(EXPORT ${library_name}
+        FILE ${PROJECT_NAME}_${library_name}_target.cmake
         NAMESPACE ${PROJECT_NAME}::
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
     )
 endfunction()
 
-macro(add_geode_executable exe_path folder_name)
-    get_filename_component(exe_name ${exe_path} NAME_WE)
+function(add_geode_library)
+    cmake_parse_arguments(GEODE_LIB
+        ""
+        "NAME;FOLDER"
+        "PUBLIC_HEADERS;ADVANCED_HEADERS;PRIVATE_HEADERS;SOURCES;PUBLIC_DEPENDENCIES;PRIVATE_DEPENDENCIES"
+        ${ARGN}
+    )
+    foreach(file ${GEODE_LIB_SOURCES})
+        list(APPEND ABSOLUTE_GEODE_LIB_SOURCES 
+            "${PROJECT_SOURCE_DIR}/src/${GEODE_LIB_FOLDER}/${file}"
+        )
+    endforeach()
+    foreach(file ${GEODE_LIB_PUBLIC_HEADERS})
+        list(APPEND ABSOLUTE_GEODE_LIB_PUBLIC_HEADERS
+            "${PROJECT_SOURCE_DIR}/include/${GEODE_LIB_FOLDER}/${file}"
+        )
+    endforeach()
+    foreach(file ${GEODE_LIB_ADVANCED_HEADERS})
+        list(APPEND ABSOLUTE_GEODE_LIB_ADVANCED_HEADERS
+            "${PROJECT_SOURCE_DIR}/include/${GEODE_LIB_FOLDER}/${file}"
+        )
+    endforeach()
+    foreach(file ${GEODE_LIB_PRIVATE_HEADERS})
+        list(APPEND ABSOLUTE_GEODE_LIB_PRIVATE_HEADERS
+            "${PROJECT_SOURCE_DIR}/include/${GEODE_LIB_FOLDER}/${file}"
+        )
+    endforeach()
+    add_library(${GEODE_LIB_NAME} SHARED  
+        "${ABSOLUTE_GEODE_LIB_SOURCES}"
+        "${ABSOLUTE_GEODE_LIB_PUBLIC_HEADERS}"
+        "${ABSOLUTE_GEODE_LIB_ADVANCED_HEADERS}"
+        "${ABSOLUTE_GEODE_LIB_PRIVATE_HEADERS}"
+    )
+    add_library(${PROJECT_NAME}::${GEODE_LIB_NAME} ALIAS ${GEODE_LIB_NAME})
+    string(TOLOWER ${PROJECT_NAME} project-name)
+    string(REGEX REPLACE "-" "_" project_name ${project-name})
+    set_target_properties(${GEODE_LIB_NAME}
+        PROPERTIES
+            OUTPUT_NAME ${PROJECT_NAME}_${GEODE_LIB_NAME}
+            DEFINE_SYMBOL ${project_name}_${GEODE_LIB_NAME}_EXPORTS
+            FOLDER "Libraries"
+    )
+    source_group("Public Header Files" FILES "${ABSOLUTE_GEODE_LIB_PUBLIC_HEADERS}")
+    source_group("Advanced Header Files" FILES "${ABSOLUTE_GEODE_LIB_ADVANCED_HEADERS}")
+    source_group("Private Header Files" FILES "${ABSOLUTE_GEODE_LIB_PRIVATE_HEADERS}")
+    source_group("Source Files" FILES "${ABSOLUTE_GEODE_LIB_SOURCES}")
+    target_include_directories(${GEODE_LIB_NAME}
+        PUBLIC
+            $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+            $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+    )
+    target_link_libraries(${GEODE_LIB_NAME}
+        PUBLIC ${GEODE_LIB_PUBLIC_DEPENDENCIES}
+        PRIVATE ${GEODE_LIB_PRIVATE_DEPENDENCIES}
+    )
+    _export_library(${GEODE_LIB_NAME})
+    generate_export_header(${GEODE_LIB_NAME}
+        EXPORT_MACRO_NAME ${project_name}_${GEODE_LIB_NAME}_api
+        EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/${GEODE_LIB_FOLDER}/${project_name}_${GEODE_LIB_NAME}_export.h
+    )
+    install(FILES ${PROJECT_BINARY_DIR}/${GEODE_LIB_FOLDER}/${project_name}_${GEODE_LIB_NAME}_export.h
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${GEODE_LIB_FOLDER}
+    )
+    install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/${GEODE_LIB_FOLDER}/
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${GEODE_LIB_FOLDER}
+        PATTERN "*/private" EXCLUDE
+    )
+endfunction()
+
+function(_add_geode_executable exe_path folder_name)
+    get_filename_component(target_name ${exe_path} NAME_WE)
 
     # Set the target as an executable
-    add_executable(${exe_name} ${exe_path})
-    if(WIN32)
-        add_dependencies(windows_post_compilation ${exe_name})
-    endif()
+    add_executable(${target_name} ${exe_path})
     foreach(dependency ${ARGN})
-        target_link_libraries(${exe_name} PRIVATE ${dependency})
+        target_link_libraries(${target_name} PRIVATE ${dependency})
     endforeach()
     
     # Add the project to a folder of projects for the tests
-    set_target_properties(${exe_name}
+    set_target_properties(${target_name}
         PROPERTIES
             FOLDER ${folder_name}
             INSTALL_RPATH "${OS_RPATH}/../${CMAKE_INSTALL_LIBDIR}"
     )
-endmacro()
-
-function(add_geode_binary bin_path)
-    add_geode_executable(${bin_path} "Utilities" ${ARGN})
-    install(TARGETS ${exe_name} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+    set(target_name ${target_name} PARENT_SCOPE)
 endfunction()
 
-option(USE_BENCHMARK "Toggle benchmarking of tests" OFF)
-function(add_geode_test cpp_file_path)
-    add_geode_executable(${cpp_file_path} "Tests" ${ARGN})
-    add_test(NAME ${exe_name} COMMAND ${exe_name})
+function(add_geode_binary)
+    cmake_parse_arguments(GEODE_BINARY
+        ""
+        "SOURCE"
+        "DEPENDENCIES"
+        ${ARGN}
+    )
+    _add_geode_executable(${GEODE_BINARY_SOURCE} "Utilities" ${GEODE_BINARY_DEPENDENCIES})
+    install(TARGETS ${target_name} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+endfunction()
+
+macro(_find_dependency_directories directories)
     foreach(dependency ${ARGN})
-       list(APPEND directories $<TARGET_FILE_DIR:${dependency}>)
+        if(NOT TARGET ${dependency})
+            continue()
+        endif()
+        get_target_property(TARGET_TYPE ${dependency} TYPE)
+        if(TARGET_TYPE STREQUAL "SHARED_LIBRARY")
+            list(APPEND directories $<TARGET_FILE_DIR:${dependency}>)
+            get_target_property(dependencies ${dependency} LINK_LIBRARIES)
+            if(dependencies)
+                _find_dependency_directories(directories ${dependencies})
+            endif()
+        endif()
     endforeach()
+endmacro()
+
+function(_add_dependency_directories test_name)
+    _find_dependency_directories(directories ${ARGN})
+    list(REMOVE_DUPLICATES directories)
     if(WIN32)
         list(JOIN directories "\\;" directories)
-        set_tests_properties(${exe_name}
+        set_tests_properties(${test_name}
             PROPERTIES
                 ENVIRONMENT "Path=${directories}\\;$ENV{Path}"
         )
     else()
         list(JOIN directories ":" directories)
-        set_tests_properties(${exe_name}
+        set_tests_properties(${test_name}
             PROPERTIES
                 ENVIRONMENT "LD_LIBRARY_PATH=${directories}:$ENV{LD_LIBRARY_PATH}"
         )
     endif()
+endfunction()
+
+option(USE_BENCHMARK "Toggle benchmarking of tests" OFF)
+function(add_geode_test)
+    cmake_parse_arguments(GEODE_TEST
+        ""
+        "SOURCE"
+        "DEPENDENCIES"
+        ${ARGN}
+    )
+    _add_geode_executable(${GEODE_TEST_SOURCE} "Tests" ${GEODE_TEST_DEPENDENCIES})
+    add_test(NAME ${target_name} COMMAND ${target_name})
+    _add_dependency_directories(${target_name} ${GEODE_TEST_DEPENDENCIES})
     if(USE_BENCHMARK)
-        target_compile_definitions(${exe_name} PRIVATE OPENGEODE_BENCHMARK)
+        target_compile_definitions(${target_name} PRIVATE OPENGEODE_BENCHMARK)
     endif()
 endfunction()
 
-function(copy_windows_binaries dependency)
+function(add_geode_python_binding)
+    cmake_parse_arguments(GEODE_BINDING
+        ""
+        "NAME"
+        "SOURCES;DEPENDENCIES"
+        ${ARGN}
+    )
+    pybind11_add_module(${GEODE_BINDING_NAME} 
+        SHARED SYSTEM "${GEODE_BINDING_SOURCES}"
+    )
+    add_library(${PROJECT_NAME}::${GEODE_BINDING_NAME} ALIAS ${GEODE_BINDING_NAME})
+    target_link_libraries(${GEODE_BINDING_NAME} 
+        PRIVATE "${GEODE_BINDING_DEPENDENCIES}"
+    )
+    set_target_properties(${GEODE_BINDING_NAME}
+        PROPERTIES
+            OUTPUT_NAME ${PROJECT_NAME}_${GEODE_BINDING_NAME}
+            CXX_VISIBILITY_PRESET "default"
+            FOLDER "Bindings/Python"
+    )
+    _export_library(${GEODE_BINDING_NAME})
+endfunction()
+
+function(add_geode_python_test)
+    cmake_parse_arguments(GEODE_TEST
+        ""
+        "SOURCE"
+        "DEPENDENCIES"
+        ${ARGN}
+    )
+    get_filename_component(absolute_path ${GEODE_TEST_SOURCE} ABSOLUTE)
+    get_filename_component(test_name ${GEODE_TEST_SOURCE} NAME_WE)
+    add_test(NAME ${test_name} COMMAND ${PYTHON_EXECUTABLE} ${absolute_path})
+    _add_dependency_directories(${test_name} ${GEODE_TEST_DEPENDENCIES})
+    foreach(dependency ${GEODE_TEST_DEPENDENCIES})
+        list(APPEND directories $<TARGET_FILE_DIR:${dependency}>)
+    endforeach()
     if(WIN32)
-        get_target_property(release_location ${dependency} IMPORTED_LOCATION_RELEASE)
-        if(release_location AND EXISTS ${release_location})
-            get_filename_component(release_location_directory ${release_location} DIRECTORY)
-            add_custom_command(TARGET windows_post_compilation POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_directory 
-                    "${release_location_directory}"
-                    "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}"
-			)
-        endif()
-        get_target_property(debug_location ${dependency} IMPORTED_LOCATION_DEBUG)
-        if(debug_location AND EXISTS ${debug_location})
-            get_filename_component(debug_location_directory ${debug_location} DIRECTORY)
-            add_custom_command(TARGET windows_post_compilation POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_directory 
-                    "${debug_location_directory}"
-                    "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}"
-			)
-        endif()
+        list(JOIN directories "\\;" directories)
+        set_property(
+            TEST
+                ${test_name}
+            APPEND
+            PROPERTY
+                ENVIRONMENT "PYTHONPATH=${directories}\\;$ENV{PYTHONPATH}"
+        )
+    else()
+        list(JOIN directories ":" directories)
+        set_property(
+            TEST
+                ${test_name}
+            APPEND
+            PROPERTY
+                ENVIRONMENT "PYTHONPATH=${directories}:$ENV{PYTHONPATH}"
+        )
     endif()
 endfunction()

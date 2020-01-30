@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,18 +25,17 @@
 
 #include <vector>
 
+#include <absl/container/inlined_vector.h>
+
 #include <geode/basic/factory.h>
 
 #include <geode/mesh/builder/vertex_set_builder.h>
 #include <geode/mesh/common.h>
+#include <geode/mesh/core/polyhedral_solid.h>
 
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
-    FORWARD_DECLARATION_DIMENSION_CLASS( PolyhedralSolid );
-
-    struct PolyhedronFacet;
-    struct PolyhedronVertex;
 } // namespace geode
 
 namespace geode
@@ -167,11 +166,9 @@ namespace geode
         {
         }
 
-        index_t find_or_create_facet(
-            const std::vector< index_t >& facet_vertices );
+        index_t find_or_create_facet( PolyhedronFacetVertices facet_vertices );
 
-        index_t find_or_create_edge(
-            const std::array< index_t, 2 >& edge_vertices );
+        index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices );
 
         friend class PolyhedralSolid< dimension >;
         void copy( const PolyhedralSolid< dimension >& polyhedral_solid );
@@ -223,7 +220,7 @@ namespace geode
         std::vector< index_t > delete_facets(
             const std::vector< bool >& to_delete );
 
-        void update_facet_vertex( const std::vector< index_t >& facet_vertices,
+        void update_facet_vertex( PolyhedronFacetVertices facet_vertices,
             index_t facet_vertex_id,
             index_t new_vertex_id );
 
@@ -231,7 +228,7 @@ namespace geode
 
         void update_edge_vertices( const std::vector< index_t >& old2new );
 
-        virtual std::vector< std::vector< index_t > >
+        virtual std::vector< PolyhedronFacetVertices >
             get_polyhedron_facet_vertices(
                 const std::vector< index_t >& vertices,
                 const std::vector< std::vector< index_t > >& facets ) const;

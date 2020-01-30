@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,9 +41,9 @@ namespace geode
     class ModelBoundariesBuilder
     {
     public:
-        void load_model_boundaries( const std::string& directory );
+        void load_model_boundaries( absl::string_view directory );
 
-        void set_model_boundary_name( const uuid& id, std::string name );
+        void set_model_boundary_name( const uuid& id, absl::string_view name );
 
     protected:
         ModelBoundariesBuilder( ModelBoundaries< dimension >& boundaries )
@@ -59,4 +59,5 @@ namespace geode
     private:
         ModelBoundaries< dimension >& model_boundaries_;
     };
+    ALIAS_2D_AND_3D( ModelBoundariesBuilder );
 } // namespace geode

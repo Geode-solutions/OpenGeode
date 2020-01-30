@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -99,10 +99,8 @@ namespace geode
 
         /*!
          * Save each Block in a file located in the specified directory
-         * @return the list of filenames
          */
-        std::vector< std::string > save_blocks(
-            const std::string& directory ) const;
+        void save_blocks( absl::string_view directory ) const;
 
     protected:
         Blocks();
@@ -124,7 +122,7 @@ namespace geode
 
         void delete_block( const Block< dimension >& block );
 
-        void load_blocks( const std::string& directory );
+        void load_blocks( absl::string_view directory );
 
         ModifiableBlockRange modifiable_blocks();
 

@@ -1,4 +1,4 @@
-# Copyright (c) 2019 Geode-solutions
+# Copyright (c) 2019 - 2020 Geode-solutions
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,6 +21,7 @@
 @PACKAGE_INIT@ 
 
 include(CMakeFindDependencyMacro)
+find_dependency(absl)
 find_dependency(Bitsery)
 find_dependency(ghcFilesystem)
 find_dependency(Threads)
@@ -30,6 +31,13 @@ include(${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@_basic_target.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@_geometry_target.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@_mesh_target.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@_model_target.cmake)
+
+if(@OPENGEODE_WITH_PYTHON@)
+    include(${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@_py_basic_target.cmake)
+    include(${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@_py_geometry_target.cmake)
+    include(${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@_py_mesh_target.cmake)
+    include(${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@_py_model_target.cmake)
+endif()
 
 if(NOT COMMAND add_geode_library)
 @OPENGEODE_UTILS@

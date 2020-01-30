@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -98,40 +98,28 @@ void test_uuid( const geode::Relationships& relations,
     geode::index_t nb_items,
     geode::index_t nb_collections )
 {
-    const std::string message_boundary =
-        "[Test] " + uuid.string() + " should have "
-        + std::to_string( nb_boundaries ) + " boundary(ies)";
-    OPENGEODE_EXCEPTION(
-        relations.nb_boundaries( uuid ) == nb_boundaries, message_boundary );
+    OPENGEODE_EXCEPTION( relations.nb_boundaries( uuid ) == nb_boundaries,
+        "[Test] ", uuid.string(), " should have ", nb_boundaries,
+        " boundary(ies)" );
 
-    const std::string message_incidence =
-        "[Test] " + uuid.string() + " should have "
-        + std::to_string( nb_incidences ) + " incidence(s)";
-    OPENGEODE_EXCEPTION(
-        relations.nb_incidences( uuid ) == nb_incidences, message_incidence );
+    OPENGEODE_EXCEPTION( relations.nb_incidences( uuid ) == nb_incidences,
+        "[Test] ", uuid.string(), " should have ", nb_incidences,
+        " incidence(s)" );
 
-    const std::string message_internal =
-        "[Test] " + uuid.string() + " should have "
-        + std::to_string( nb_internals ) + " internal component(s)";
-    OPENGEODE_EXCEPTION(
-        relations.nb_internals( uuid ) == nb_internals, message_internal );
+    OPENGEODE_EXCEPTION( relations.nb_internals( uuid ) == nb_internals,
+        "[Test] ", uuid.string(), " should have ", nb_internals,
+        " internal component(s)" );
 
-    const std::string message_embedding =
-        "[Test] " + uuid.string() + " should have "
-        + std::to_string( nb_embeddings ) + " embedding(s)";
-    OPENGEODE_EXCEPTION(
-        relations.nb_embeddings( uuid ) == nb_embeddings, message_embedding );
+    OPENGEODE_EXCEPTION( relations.nb_embeddings( uuid ) == nb_embeddings,
+        "[Test] ", uuid.string(), " should have ", nb_embeddings,
+        " embedding(s)" );
 
-    const std::string message_item = "[Test] " + uuid.string() + " should have "
-                                     + std::to_string( nb_boundaries )
-                                     + " item(s)";
-    OPENGEODE_EXCEPTION( relations.nb_items( uuid ) == nb_items, message_item );
+    OPENGEODE_EXCEPTION( relations.nb_items( uuid ) == nb_items, "[Test] ",
+        uuid.string(), " should have ", nb_boundaries, " item(s)" );
 
-    const std::string message_collection =
-        "[Test] " + uuid.string() + " should have "
-        + std::to_string( nb_collections ) + " collection(s)";
     OPENGEODE_EXCEPTION( relations.nb_collections( uuid ) == nb_collections,
-        message_collection );
+        "[Test] ", uuid.string(), " should have ", nb_collections,
+        " collection(s)" );
 }
 
 void test_relations( const geode::Relationships& relations,

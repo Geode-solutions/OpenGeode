@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -48,6 +48,8 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( Surface );
         friend class Surfaces< dimension >;
+        friend class SurfacesBuilder< dimension >;
+        friend class bitsery::Access;
 
     public:
         ~Surface();
@@ -70,26 +72,21 @@ namespace geode
         const PolygonalSurface< dimension >& mesh() const;
 
     private:
-        friend class bitsery::Access;
         Surface();
 
         explicit Surface( const MeshType& type );
 
-        friend class SurfacesBuilder< dimension >;
         PolygonalSurface< dimension >& modifiable_mesh();
 
-        friend class SurfacesBuilder< dimension >;
         void set_mesh( std::unique_ptr< PolygonalSurface< dimension > > mesh );
 
-        friend class SurfacesBuilder< dimension >;
-        void set_surface_name( std::string name )
+        void set_surface_name( absl::string_view name )
         {
-            this->set_name( std::move( name ) );
+            this->set_name( name );
         }
 
         void ensure_mesh_type();
 
-        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive );
 

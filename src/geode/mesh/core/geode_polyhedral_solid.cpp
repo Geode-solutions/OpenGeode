@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,10 +41,15 @@ namespace geode
     class OpenGeodePolyhedralSolid< dimension >::Impl
         : public detail::PointsImpl< dimension >
     {
+        friend class bitsery::Access;
+
     public:
         explicit Impl( OpenGeodePolyhedralSolid< dimension >& mesh )
             : detail::PointsImpl< dimension >( mesh )
         {
+            polyhedron_vertex_ptr_.emplace_back( 0 );
+            polyhedron_facet_ptr_.emplace_back( 0 );
+            polyhedron_adjacent_ptr_.emplace_back( 0 );
         }
 
         index_t get_polyhedron_vertex(
@@ -211,10 +216,8 @@ namespace geode
         }
 
     private:
-        friend class bitsery::Access;
         Impl() = default;
 
-        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive )
         {
@@ -261,13 +264,13 @@ namespace geode
 
     private:
         std::vector< index_t > polyhedron_vertices_;
-        std::vector< index_t > polyhedron_vertex_ptr_{ 0 };
+        std::vector< index_t > polyhedron_vertex_ptr_;
 
         std::vector< index_t > polyhedron_facets_;
-        std::vector< index_t > polyhedron_facet_ptr_{ 0 };
+        std::vector< index_t > polyhedron_facet_ptr_;
 
         std::vector< index_t > polyhedron_adjacents_;
-        std::vector< index_t > polyhedron_adjacent_ptr_{ 0 };
+        std::vector< index_t > polyhedron_adjacent_ptr_;
     };
 
     template < index_t dimension >

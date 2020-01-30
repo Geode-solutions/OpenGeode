@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -87,6 +87,8 @@
 
 #include <string>
 
+#include <absl/hash/hash.h>
+
 #include <bitsery/bitsery.h>
 
 #include <geode/basic/bitsery_archive.h>
@@ -109,12 +111,6 @@ namespace geode
         bool operator<( const uuid &other ) const;
 
         std::string string() const;
-
-        template < typename ostream >
-        inline friend ostream &operator<<( ostream &os, const uuid &self )
-        {
-            return os << self.string(), os;
-        }
 
         uint64_t ab;
         uint64_t cd;
@@ -141,7 +137,8 @@ namespace std
     public:
         size_t operator()( const geode::uuid &uuid ) const
         {
-            return size_t( uuid.ab ^ uuid.cd );
+            return absl::Hash< uint64_t >()( uuid.ab )
+                   ^ absl::Hash< uint64_t >()( uuid.cd );
         }
     };
 } // namespace std

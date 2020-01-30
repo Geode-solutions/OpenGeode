@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -43,17 +43,17 @@ namespace geode
 
     template < index_t dimension >
     void ModelBoundariesBuilder< dimension >::load_model_boundaries(
-        const std::string& directory )
+        absl::string_view directory )
     {
         return model_boundaries_.load_model_boundaries( directory );
     }
 
     template < index_t dimension >
     void ModelBoundariesBuilder< dimension >::set_model_boundary_name(
-        const uuid& id, std::string name )
+        const uuid& id, absl::string_view name )
     {
         model_boundaries_.modifiable_model_boundary( id )
-            .set_model_boundary_name( std::move( name ) );
+            .set_model_boundary_name( name );
     }
 
     template class opengeode_model_api ModelBoundariesBuilder< 2 >;

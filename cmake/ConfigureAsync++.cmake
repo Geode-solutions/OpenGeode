@@ -1,4 +1,4 @@
-# Copyright (c) 2019 Geode-solutions
+# Copyright (c) 2019 - 2020 Geode-solutions
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,13 +23,15 @@ set(ASYNCPLUSPLUS_INSTALL_PREFIX ${ASYNCPLUSPLUS_PATH}/install)
 ExternalProject_Add(asyncplusplus
     PREFIX ${ASYNCPLUSPLUS_PATH}
     GIT_REPOSITORY https://github.com/Amanieu/asyncplusplus
-    GIT_TAG b78d0c28bb04eeba4b62bbb7133022256167b809
+    GIT_TAG 2016e431ff2b78770c53ddee1daa670945796980
     CMAKE_GENERATOR ${CMAKE_GENERATOR}
     CMAKE_GENERATOR_PLATFORM ${CMAKE_GENERATOR_PLATFORM}
     CMAKE_ARGS
         -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
         -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
         -DCMAKE_INSTALL_MESSAGE=LAZY
+        -DCMAKE_C_FLAGS_DEBUG=${CMAKE_C_FLAGS_DEBUG}
+        -DCMAKE_CXX_FLAGS_DEBUG=${CMAKE_CXX_FLAGS_DEBUG}
     CMAKE_CACHE_ARGS
         -DCMAKE_INSTALL_PREFIX:PATH=${ASYNCPLUSPLUS_INSTALL_PREFIX}
 )

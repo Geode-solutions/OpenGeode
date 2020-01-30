@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,7 @@ namespace geode
      */
     template < index_t dimension >
     void load_point_set(
-        PointSet< dimension >& point_set, const std::string& filename );
+        PointSet< dimension >& point_set, absl::string_view filename );
 
     template < index_t dimension >
     class PointSetInput : public VertexSetInput
@@ -51,7 +51,8 @@ namespace geode
         OPENGEODE_DISABLE_COPY_AND_MOVE( PointSetInput );
 
     protected:
-        PointSetInput( PointSet< dimension >& point_set, std::string filename );
+        PointSetInput(
+            PointSet< dimension >& point_set, absl::string_view filename );
 
         PointSet< dimension >& point_set()
         {
@@ -66,6 +67,6 @@ namespace geode
     using PointSetInputFactory = Factory< std::string,
         PointSetInput< dimension >,
         PointSet< dimension >&,
-        std::string >;
+        absl::string_view >;
     ALIAS_2D_AND_3D( PointSetInputFactory );
 } // namespace geode

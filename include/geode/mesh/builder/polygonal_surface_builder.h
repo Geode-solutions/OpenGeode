@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -164,8 +164,7 @@ namespace geode
         {
         }
 
-        index_t find_or_create_edge(
-            const std::array< index_t, 2 >& edge_vertices );
+        index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices );
 
         friend class PolygonalSurface< dimension >;
         void copy( const PolygonalSurface< dimension >& polygonal_surface );
@@ -201,7 +200,7 @@ namespace geode
 
         void update_edge_vertices( const std::vector< index_t >& old2new );
 
-        void update_edge_vertex( const std::array< index_t, 2 >& edge_vertices,
+        void update_edge_vertex( std::array< index_t, 2 > edge_vertices,
             index_t edge_vertex_id,
             index_t new_vertex_id );
 

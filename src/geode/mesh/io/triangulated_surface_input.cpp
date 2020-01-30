@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,13 +31,13 @@ namespace geode
     template < index_t dimension >
     void load_triangulated_surface(
         TriangulatedSurface< dimension >& triangulated_surface,
-        const std::string& filename )
+        absl::string_view filename )
     {
         try
         {
             auto input = TriangulatedSurfaceInputFactory< dimension >::create(
-                extension_from_filename( filename ), triangulated_surface,
-                filename );
+                extension_from_filename( filename ).data(),
+                triangulated_surface, filename );
             input->read();
         }
         catch( const OpenGeodeException& e )
@@ -52,17 +52,16 @@ namespace geode
     template < index_t dimension >
     TriangulatedSurfaceInput< dimension >::TriangulatedSurfaceInput(
         TriangulatedSurface< dimension >& triangulated_surface,
-        std::string filename )
-        : PolygonalSurfaceInput< dimension >(
-            triangulated_surface, std::move( filename ) ),
+        absl::string_view filename )
+        : PolygonalSurfaceInput< dimension >( triangulated_surface, filename ),
           triangulated_surface_( triangulated_surface )
     {
     }
 
     template void opengeode_mesh_api load_triangulated_surface(
-        TriangulatedSurface< 2 >&, const std::string& );
+        TriangulatedSurface< 2 >&, absl::string_view );
     template void opengeode_mesh_api load_triangulated_surface(
-        TriangulatedSurface< 3 >&, const std::string& );
+        TriangulatedSurface< 3 >&, absl::string_view );
 
     template class opengeode_mesh_api TriangulatedSurfaceInput< 2 >;
     template class opengeode_mesh_api TriangulatedSurfaceInput< 3 >;

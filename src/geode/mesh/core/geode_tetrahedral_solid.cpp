@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -54,6 +54,8 @@ namespace geode
     class OpenGeodeTetrahedralSolid< dimension >::Impl
         : public detail::PointsImpl< dimension >
     {
+        friend class bitsery::Access;
+
     public:
         explicit Impl( OpenGeodeTetrahedralSolid< dimension >& mesh )
             : detail::PointsImpl< dimension >( mesh ),
@@ -134,10 +136,10 @@ namespace geode
                 surface.nb_polyhedra() - 1, vertices );
         }
 
-        std::vector< std::vector< index_t > > get_polyhedron_facet_vertices(
+        std::array< PolyhedronFacetVertices, 4 > get_polyhedron_facet_vertices(
             const std::array< index_t, 4 >& vertices ) const
         {
-            std::vector< std::vector< index_t > > facet_vertices( 4 );
+            std::array< PolyhedronFacetVertices, 4 > facet_vertices;
             for( const auto f : Range{ 4 } )
             {
                 facet_vertices[f].resize( 3 );
@@ -166,10 +168,8 @@ namespace geode
         }
 
     private:
-        friend class bitsery::Access;
         Impl() = default;
 
-        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive )
         {
@@ -275,7 +275,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< std::vector< index_t > >
+    std::array< PolyhedronFacetVertices, 4 >
         OpenGeodeTetrahedralSolid< dimension >::get_polyhedron_facet_vertices(
             const std::array< index_t, 4 >& vertices ) const
     {

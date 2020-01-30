@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <unordered_map>
+#include <absl/container/flat_hash_map.h>
 
 #include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>
@@ -37,39 +37,14 @@ namespace geode
 {
     namespace detail
     {
-        struct FacetId
-        {
-            index_t id{ NO_ID };
-        };
-
-        struct SetValue
-        {
-            SetValue( const std::vector< index_t >& values ) : values_( values )
-            {
-            }
-
-            void operator()( std::vector< index_t >& to )
-            {
-                to = values_;
-            }
-
-            void operator()( std::array< index_t, 2 >& to )
-            {
-                OPENGEODE_ASSERT( values_.size() == 2,
-                    "[SetValue::operator()] Size of "
-                    "vector values should be 2" );
-                to[0] = values_[0];
-                to[1] = values_[1];
-            }
-
-            const std::vector< index_t >& values_;
-        };
-
         template < typename VertexContainer >
         class FacetStorage
         {
-        protected:
+            using TypedVertexCycle = VertexCycle< VertexContainer >;
+            static constexpr auto ATTRIBUTE_NAME = "facet_vertices";
             friend class bitsery::Access;
+
+        protected:
             FacetStorage()
                 : counter_(
                     facet_attribute_manager_
@@ -78,7 +53,8 @@ namespace geode
                   vertices_(
                       facet_attribute_manager_
                           .template find_or_create_attribute< VariableAttribute,
-                              VertexContainer >( "facet_vertices" ) )
+                              VertexContainer >(
+                              attribute_name(), VertexContainer{} ) )
             {
             }
 
@@ -87,39 +63,44 @@ namespace geode
                 return facet_attribute_manager_;
             }
 
-            index_t find_facet( const VertexCycle& vertices ) const
+            index_t find_facet( TypedVertexCycle vertices ) const
             {
                 const auto itr = facet_indices_.find( vertices );
                 if( itr != facet_indices_.end() )
                 {
-                    return itr->second.id;
+                    return itr->second;
                 }
                 return NO_ID;
             }
 
-            index_t add_facet( const VertexCycle& vertices )
+            index_t add_facet( TypedVertexCycle vertices )
             {
-                auto& id = facet_indices_[vertices].id;
-                if( id != NO_ID )
+                const auto id = facet_indices_.size();
+                bool inserted;
+                typename absl::flat_hash_map< TypedVertexCycle,
+                    index_t >::iterator it;
+                std::tie( it, inserted ) =
+                    facet_indices_.try_emplace( std::move( vertices ), id );
+                if( !inserted )
                 {
-                    counter_->set_value( id, counter_->value( id ) + 1 );
-                    return id;
+                    const auto old_id = it->second;
+                    counter_->set_value(
+                        old_id, counter_->value( old_id ) + 1 );
+                    return old_id;
                 }
-                const auto size = facet_indices_.size();
-                id = size - 1;
-                facet_attribute_manager_.resize( size );
-                vertices_->modify_value( id, SetValue{ vertices.vertices() } );
+                facet_attribute_manager_.resize( id + 1 );
+                vertices_->set_value( id, it->first.vertices() );
                 return id;
             }
 
-            void remove_facet( const VertexCycle& vertices )
+            void remove_facet( TypedVertexCycle vertices )
             {
                 const auto it = facet_indices_.find( vertices );
                 if( it == facet_indices_.end() )
                 {
                     return;
                 }
-                const auto id = it->second.id;
+                const auto id = it->second;
                 OPENGEODE_ASSERT( id != NO_ID,
                     "[FacetStorage::remove_facet] Cannot "
                     "find facet from given vertices" );
@@ -145,15 +126,15 @@ namespace geode
             {
                 const auto old2new =
                     detail::mapping_after_deletion( to_delete );
-                std::vector< VertexCycle > key_to_erase;
+                std::vector< TypedVertexCycle > key_to_erase;
                 key_to_erase.reserve( old2new.size() );
                 for( auto& cycle : facet_indices_ )
                 {
-                    if( old2new[cycle.second.id] == NO_ID )
+                    if( old2new[cycle.second] == NO_ID )
                     {
                         key_to_erase.emplace_back( cycle.first );
                     }
-                    cycle.second.id = old2new[cycle.second.id];
+                    cycle.second = old2new[cycle.second];
                 }
                 for( const auto& key : key_to_erase )
                 {
@@ -175,10 +156,10 @@ namespace geode
                     {
                         v = old2new[v];
                     }
-                    const VertexCycle updated_cycle{ updated_vertices };
-                    facet_indices_[updated_cycle] = cycle.second;
-                    vertices_->modify_value(
-                        cycle.second.id, SetValue{ updated_vertices } );
+                    auto it = std::get< 0 >( facet_indices_.emplace(
+                        TypedVertexCycle{ std::move( updated_vertices ) },
+                        cycle.second ) );
+                    vertices_->set_value( cycle.second, it->first.vertices() );
                 }
             }
 
@@ -187,13 +168,26 @@ namespace geode
                 return vertices_->value( facet_id );
             }
 
+        protected:
+            static constexpr absl::string_view attribute_name()
+            {
+                return ATTRIBUTE_NAME;
+            }
+
+            void update_attribute()
+            {
+                vertices_ =
+                    facet_attribute_manager_.template find_or_create_attribute<
+                        VariableAttribute, VertexContainer >(
+                        attribute_name(), VertexContainer{} );
+            }
+
             index_t get_counter( index_t facet_id ) const
             {
                 return counter_->value( facet_id );
             }
 
         private:
-            friend class bitsery::Access;
             template < typename Archive >
             void serialize( Archive& archive )
             {
@@ -206,10 +200,10 @@ namespace geode
                         archive.ext( storage.facet_indices_,
                             bitsery::ext::StdMap{
                                 storage.facet_indices_.max_size() },
-                            []( Archive& archive, VertexCycle& cycle,
-                                FacetId& attribute ) {
+                            []( Archive& archive, TypedVertexCycle& cycle,
+                                index_t& attribute ) {
                                 archive.object( cycle );
-                                archive.value4b( attribute.id );
+                                archive.value4b( attribute );
                             } );
                         archive.ext(
                             storage.counter_, bitsery::ext::StdSmartPtr{} );
@@ -220,7 +214,7 @@ namespace geode
 
         private:
             mutable AttributeManager facet_attribute_manager_;
-            std::unordered_map< VertexCycle, FacetId > facet_indices_;
+            absl::flat_hash_map< TypedVertexCycle, index_t > facet_indices_;
             std::shared_ptr< VariableAttribute< index_t > > counter_;
             std::shared_ptr< VariableAttribute< VertexContainer > > vertices_;
         };

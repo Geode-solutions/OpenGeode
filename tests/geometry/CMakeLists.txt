@@ -1,4 +1,4 @@
-# Copyright (c) 2019 Geode-solutions
+# Copyright (c) 2019 - 2020 Geode-solutions
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,7 +18,27 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-add_geode_test(test-bounding-box.cpp ${PROJECT_NAME}::geometry)
-add_geode_test(test-nnsearch.cpp ${PROJECT_NAME}::geometry)
-add_geode_test(test-point.cpp ${PROJECT_NAME}::geometry)
-add_geode_test(test-vector.cpp ${PROJECT_NAME}::geometry)
+add_geode_test(
+    SOURCE test-bounding-box.cpp 
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+)
+add_geode_test(
+    SOURCE test-nnsearch.cpp 
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+)
+add_geode_test(
+    SOURCE test-point.cpp 
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+)
+add_geode_test(
+    SOURCE test-vector.cpp 
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+)

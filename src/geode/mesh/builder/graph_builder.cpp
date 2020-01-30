@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -146,7 +146,7 @@ namespace geode
         for( const auto v : Range{ graph_.nb_vertices() } )
         {
             const auto& edges = graph_.edges_around_vertex( v );
-            std::vector< EdgeVertex > new_edges;
+            EdgesAroundVertex new_edges;
             new_edges.reserve( edges.size() );
             for( const auto& edge : edges )
             {
@@ -156,7 +156,7 @@ namespace geode
                     new_edges.emplace_back( edge_id, edge.vertex_id );
                 }
             }
-            graph_.set_edges_around_vertex( v, new_edges );
+            graph_.set_edges_around_vertex( v, std::move( new_edges ) );
         }
 
         graph_.edge_attribute_manager().delete_elements( to_delete );

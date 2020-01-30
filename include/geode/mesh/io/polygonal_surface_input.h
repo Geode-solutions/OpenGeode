@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -44,7 +44,7 @@ namespace geode
     template < index_t dimension >
     void load_polygonal_surface(
         PolygonalSurface< dimension >& polygonal_surface,
-        const std::string& filename );
+        absl::string_view filename );
 
     template < index_t dimension >
     class PolygonalSurfaceInput : public VertexSetInput
@@ -53,7 +53,7 @@ namespace geode
 
     protected:
         PolygonalSurfaceInput( PolygonalSurface< dimension >& polygonal_surface,
-            std::string filename );
+            absl::string_view filename );
 
         PolygonalSurface< dimension >& polygonal_surface()
         {
@@ -68,6 +68,6 @@ namespace geode
     using PolygonalSurfaceInputFactory = Factory< std::string,
         PolygonalSurfaceInput< dimension >,
         PolygonalSurface< dimension >&,
-        std::string >;
+        absl::string_view >;
     ALIAS_2D_AND_3D( PolygonalSurfaceInputFactory );
 } // namespace geode

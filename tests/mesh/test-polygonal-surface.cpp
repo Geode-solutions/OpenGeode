@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -66,9 +66,10 @@ void test_bounding_box( const geode::PolygonalSurface3D& polygonal_surface )
 void test_create_vertex_attribute(
     const geode::PolygonalSurface3D& polygonal_surface )
 {
-    auto attribute = polygonal_surface.vertex_attribute_manager()
-                         .find_or_create_attribute< geode::VariableAttribute,
-                             geode::PolygonEdge >( "test" );
+    auto attribute =
+        polygonal_surface.vertex_attribute_manager()
+            .find_or_create_attribute< geode::VariableAttribute,
+                geode::PolygonEdge >( "test", geode::PolygonEdge{} );
     for( const auto v : geode::Range{ polygonal_surface.nb_vertices() } )
     {
         attribute->set_value( v, geode::PolygonEdge{ v, v } );
@@ -131,7 +132,7 @@ void test_create_edge_attribute(
 {
     auto attribute = polygonal_surface.edge_attribute_manager()
                          .find_or_create_attribute< geode::VariableAttribute,
-                             geode::index_t >( "test" );
+                             geode::index_t >( "test", geode::NO_ID );
     for( const auto e : geode::Range{ polygonal_surface.nb_edges() } )
     {
         attribute->set_value( e, e );
@@ -175,10 +176,8 @@ void test_polygon_edges_on_borders(
     OPENGEODE_EXCEPTION( result.size() == 2,
         "[Test] Number of polygon edges on border index is not correct" );
     OPENGEODE_EXCEPTION(
-        std::find( result.begin(), result.end(), geode::PolygonEdge( 0, 0 ) )
-                != result.end()
-            && std::find(
-                   result.begin(), result.end(), geode::PolygonEdge( 0, 2 ) )
+        absl::c_find( result, geode::PolygonEdge( 0, 0 ) ) != result.end()
+            && absl::c_find( result, geode::PolygonEdge( 0, 2 ) )
                    != result.end(),
         "[Test] Polygon edge indices on border index is not correct" );
 }
@@ -206,22 +205,17 @@ void test_polygon_edge_requests(
     OPENGEODE_EXCEPTION(
         polygonal_surface.polygon_edge_vertex( { 0, 0 }, 1 ) == 1,
         "[Test] Polygon edge vertex index is not correct" );
-    bool found;
-    geode::PolygonEdge polygon_edge;
-    std::tie( found, std::ignore ) =
-        polygonal_surface.polygon_edge_from_vertices( 3, 5 );
+    auto polygon_edge = polygonal_surface.polygon_edge_from_vertices( 3, 5 );
     OPENGEODE_EXCEPTION(
-        !found, "[Test] Polygon edge from vertices is not correct" );
-    std::tie( found, polygon_edge ) =
-        polygonal_surface.polygon_edge_from_vertices( 0, 1 );
+        !polygon_edge, "[Test] Polygon edge from vertices is not correct" );
+    polygon_edge = polygonal_surface.polygon_edge_from_vertices( 0, 1 );
     OPENGEODE_EXCEPTION(
-        found, "[Test] Polygon edge from vertices is not correct" );
+        polygon_edge, "[Test] Polygon edge from vertices is not correct" );
     OPENGEODE_EXCEPTION( polygon_edge == geode::PolygonEdge( 0, 0 ),
         "[Test] Polygon edge from vertices is not correct" );
-    std::tie( found, std::ignore ) =
-        polygonal_surface.polygon_edge_from_vertices( 1, 0 );
+    polygon_edge = polygonal_surface.polygon_edge_from_vertices( 1, 0 );
     OPENGEODE_EXCEPTION(
-        !found, "[Test] Polygon edge from vertices is not correct" );
+        !polygon_edge, "[Test] Polygon edge from vertices is not correct" );
 }
 
 void test_delete_polygon( const geode::PolygonalSurface3D& polygonal_surface,
@@ -463,8 +457,8 @@ void test()
     test_polygon_normal();
     test_polygon_vertex_normal();
 
-    test_io(
-        *polygonal_surface, "test." + polygonal_surface->native_extension() );
+    test_io( *polygonal_surface,
+        absl::StrCat( "test.", polygonal_surface->native_extension() ) );
 
     test_replace_vertex( *polygonal_surface, *builder );
     test_delete_vertex( *polygonal_surface, *builder );

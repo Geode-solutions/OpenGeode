@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,8 @@
 
 #include <fstream>
 #include <memory>
-#include <unordered_map>
+
+#include <absl/container/flat_hash_map.h>
 
 #include <bitsery/ext/std_map.h>
 
@@ -50,7 +51,7 @@ namespace geode
         {
         public:
             using ComponentPtr = std::unique_ptr< Component >;
-            using ComponentsStore = std::unordered_map< uuid, ComponentPtr >;
+            using ComponentsStore = absl::flat_hash_map< uuid, ComponentPtr >;
             using Iterator = typename ComponentsStore::const_iterator;
 
             virtual ~ComponentsStorage() = default;
@@ -85,9 +86,9 @@ namespace geode
                 components_.emplace( component->id(), std::move( component ) );
             }
 
-            void save_components( const std::string& filename ) const
+            void save_components( absl::string_view filename ) const
             {
-                std::ofstream file{ filename, std::ofstream::binary };
+                std::ofstream file{ filename.data(), std::ofstream::binary };
                 TContext context{};
                 register_librairies_in_serialize_pcontext( context );
                 Serializer archive{ context, file };
@@ -95,8 +96,8 @@ namespace geode
                 archive.adapter().flush();
                 OPENGEODE_EXCEPTION( std::get< 1 >( context ).isValid(),
                     "[ComponentsStorage::save_components] Error while writing "
-                    "file: "
-                        + filename );
+                    "file: ",
+                    filename );
             }
 
             void delete_component( const uuid& id )
@@ -104,13 +105,13 @@ namespace geode
                 components_.erase( components_.find( id ) );
             }
 
-            void load_components( const std::string& filename )
+            void load_components( absl::string_view filename )
             {
-                if( !ghc::filesystem::exists( filename ) )
+                if( !ghc::filesystem::exists( filename.data() ) )
                 {
                     return;
                 }
-                std::ifstream file{ filename, std::ifstream::binary };
+                std::ifstream file{ filename.data(), std::ifstream::binary };
                 TContext context{};
                 register_librairies_in_deserialize_pcontext( context );
                 Deserializer archive{ context, file };
@@ -121,8 +122,8 @@ namespace geode
                         && adapter.isCompletedSuccessfully()
                         && std::get< 1 >( context ).isValid(),
                     "[ComponentsStorage::load_components] Error while reading "
-                    "file: "
-                        + filename );
+                    "file: ",
+                    filename );
             }
 
         protected:

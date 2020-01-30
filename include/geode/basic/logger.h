@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -55,55 +55,40 @@ namespace geode
         template < typename... Args >
         static void trace( const Args &... args )
         {
-            log_trace( string_concatener( args... ) );
+            log_trace( absl::StrCat( args... ) );
         }
 
         template < typename... Args >
         static void debug( const Args &... args )
         {
-            log_debug( string_concatener( args... ) );
+            log_debug( absl::StrCat( args... ) );
         }
 
         template < typename... Args >
         static void info( const Args &... args )
         {
-            log_info( string_concatener( args... ) );
+            log_info( absl::StrCat( args... ) );
         }
 
         template < typename... Args >
         static void warn( const Args &... args )
         {
-            log_warn( string_concatener( args... ) );
+            log_warn( absl::StrCat( args... ) );
         }
 
         template < typename... Args >
         static void error( const Args &... args )
         {
-            log_error( string_concatener( args... ) );
+            log_error( absl::StrCat( args... ) );
         }
 
         template < typename... Args >
         static void critical( const Args &... args )
         {
-            log_critical( string_concatener( args... ) );
+            log_critical( absl::StrCat( args... ) );
         }
 
     private:
-        template < typename A0 >
-        static std::string string_concatener( const A0 &a0 )
-        {
-            std::ostringstream out;
-            out << a0;
-            return out.str();
-        }
-
-        template < typename A0, typename... Args >
-        static std::string string_concatener(
-            const A0 &a0, const Args &... args )
-        {
-            return string_concatener( a0 ) + string_concatener( args... );
-        }
-
         Logger();
         ~Logger();
 

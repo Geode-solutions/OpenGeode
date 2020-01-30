@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,7 @@ namespace geode
      */
     template < index_t dimension >
     void save_edged_curve( const EdgedCurve< dimension >& edged_curve,
-        const std::string& filename );
+        absl::string_view filename );
 
     template < index_t dimension >
     class EdgedCurveOutput : public GraphOutput
@@ -56,8 +56,8 @@ namespace geode
         }
 
     protected:
-        EdgedCurveOutput(
-            const EdgedCurve< dimension >& edged_curve, std::string filename );
+        EdgedCurveOutput( const EdgedCurve< dimension >& edged_curve,
+            absl::string_view filename );
 
     private:
         const EdgedCurve< dimension >& edged_curve_;
@@ -67,6 +67,6 @@ namespace geode
     using EdgedCurveOutputFactory = Factory< std::string,
         EdgedCurveOutput< dimension >,
         const EdgedCurve< dimension >&,
-        std::string >;
+        absl::string_view >;
     ALIAS_2D_AND_3D( EdgedCurveOutputFactory );
 } // namespace geode

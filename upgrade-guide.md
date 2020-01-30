@@ -1,5 +1,159 @@
 # Upgrade Guide
 
+## Upgrading from OpenGeode v3.x.x to v4.0.0
+
+### Motivations
+
+This new release is about improving performance.
+After many profiling, we decided to introduce Abseil (https://abseil.io) as one of our dependency.
+This project (maintained and used by Google) has an important focus on performance.
+By adding it to OpenGeode, we allow us to use tailored containers and algorithms to improve our efficiency.
+
+CMake minimum required version is bumped to 3.11 to ease third parties integration. Moreover, our CMake functions were using unconventional design, they have been rewritten for easier usage.
+
+### Breaking Changes
+
+- **absl::optional**: equivalent of std::optional (c++17) provided by Abseil and used for return values that may not always return a value
+
+**How to upgrade**
+
+Follow reference guide on how to use `optional` https://en.cppreference.com/w/cpp/utility/optional.
+
+Example
+
+from
+
+```
+bool found;	    
+geode::PolygonEdge polygon_edge;	
+std::tie( found, polygon_edge ) = polygonal_surface.polygon_edge_from_vertices( 3, 5 );
+if( found )
+{
+    // do something with polygon_edge
+}
+```
+
+to 
+
+```
+auto polygon_edge = polygonal_surface.polygon_edge_from_vertices( 3, 5 );
+if( polygon_edge )
+{
+    // do something with polygon_edge.value() or polygon_edge->XXX
+}
+```
+
+- **absl::InlinedVector**: advanced container to be used like a `std::vector`
+
+- **absl::FixedArray**: advanced container to be used like a `std::array` with size known at runtime
+
+- **absl::string_view**: equivalent of std::string_view (c++17) provided by Abseil and used as replacement for a reference to a `std::string` or `char*`.
+
+**How to upgrade**
+
+Follow reference guide on how to use `string_view` https://en.cppreference.com/w/cpp/string/basic_string_view.
+Be careful on the lifetime of the `std::string` or `char*` you referenced in the `string_view`.
+
+- **Section**: methods accessing iterators for embedded Components are renamed more explicitly.
+
+**How to upgrade**
+
+Replace in `Section`: `geode::Section::embeddings(...)` by `geode::Section::embedded_surfaces(...)` 
+
+- **CMake**: redesign of CMake function `add_geode_library`
+
+**How to upgrade**
+
+Example
+
+from
+
+```
+add_geode_library(geode/basic)
+// with a CMakeLists.txt in src/geode/basic defining some variables and the dependencies
+set(sources
+    "${lib_source_dir}/assert.cpp"
+    "${lib_source_dir}/attribute_manager.cpp"
+    ...
+)
+set(public_headers
+    "${lib_include_dir}/algorithm.h"
+    "${lib_include_dir}/assert.h"
+    ...
+)
+set(advanced_headers
+    "${lib_include_dir}/detail/mapping_after_deletion.h"
+    ...
+)
+target_link_libraries(${target_name}
+    PUBLIC	    
+        Bitsery::bitsery	       
+    PRIVATE	   
+        spdlog::spdlog_header_only	     
+        ghcFilesystem::ghc_filesystem	
+        MINIZIP::minizip	       
+)
+```
+
+to 
+
+```
+add_subdirectory(src/geode/basic)
+// with a CMakeLists.txt in src/geode/basic defining the library
+add_geode_library(
+    NAME basic
+    FOLDER "geode/basic"
+    SOURCES
+        "assert.cpp"
+        "attribute_manager.cpp"
+        ...
+    PUBLIC_HEADERS
+        "algorithm.h"
+        "assert.h"
+        ...
+    ADVANCED_HEADERS
+        "detail/mapping_after_deletion.h"
+        ...
+    PUBLIC_DEPENDENCIES
+        Bitsery::bitsery	       
+    PRIVATE_DEPENDENCIES
+        spdlog::spdlog_header_only	 
+        ghcFilesystem::ghc_filesystem
+        MINIZIP::minizip	       
+)
+```
+
+- **CMake**: redesign of CMake function `add_geode_test`
+
+**How to upgrade**
+
+Example
+
+from
+
+```
+add_geode_test(test-algorithm.cpp ${PROJECT_NAME}::basic)
+```
+
+to 
+
+```
+add_geode_test(
+    SOURCE "test-algorithm.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+)
+```
+
+- **CMake**: remove `copy_windows_binaries` function
+
+**How to upgrade**
+
+For testing, there is nothing to upgrade, just run CTest or RUN_TESTS on Visual Studio as usual.
+
+For running a single executable, add the environment variables correponding to your operating system (e.g. PATH, LD_LIBRARY_PATH...).
+
+
 ## Upgrading from OpenGeode v2.x.x to v3.0.0
 
 ### Motivations

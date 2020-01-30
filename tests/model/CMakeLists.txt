@@ -1,4 +1,4 @@
-# Copyright (c) 2019 Geode-solutions
+# Copyright (c) 2019 - 2020 Geode-solutions
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,7 +18,27 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-add_geode_test(test-brep.cpp ${PROJECT_NAME}::model)
-add_geode_test(test-section.cpp ${PROJECT_NAME}::model)
-add_geode_test(test-relationships.cpp ${PROJECT_NAME}::model)
-add_geode_test(test-vertex-identifier.cpp ${PROJECT_NAME}::model)
+add_geode_test(
+    SOURCE "test-brep.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::model
+)
+add_geode_test(
+    SOURCE "test-section.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::model
+)
+add_geode_test(
+    SOURCE "test-relationships.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::model
+)
+add_geode_test(
+    SOURCE "test-vertex-identifier.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::model
+)

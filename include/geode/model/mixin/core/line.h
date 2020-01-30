@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -48,6 +48,8 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( Line );
         friend class Lines< dimension >;
+        friend class LinesBuilder< dimension >;
+        friend class bitsery::Access;
 
     public:
         ~Line();
@@ -70,26 +72,21 @@ namespace geode
         const EdgedCurve< dimension >& mesh() const;
 
     private:
-        friend class bitsery::Access;
         Line();
 
         explicit Line( const MeshType& type );
 
-        friend class LinesBuilder< dimension >;
         EdgedCurve< dimension >& modifiable_mesh();
 
-        friend class LinesBuilder< dimension >;
         void set_mesh( std::unique_ptr< EdgedCurve< dimension > > mesh );
 
-        friend class LinesBuilder< dimension >;
-        void set_line_name( std::string name )
+        void set_line_name( absl::string_view name )
         {
-            this->set_name( std::move( name ) );
+            this->set_name( name );
         }
 
         void ensure_mesh_type();
 
-        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive );
 

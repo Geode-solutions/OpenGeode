@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -53,7 +53,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    void BlocksBuilder< dimension >::load_blocks( const std::string& directory )
+    void BlocksBuilder< dimension >::load_blocks( absl::string_view directory )
     {
         return blocks_.load_blocks( directory );
     }
@@ -80,9 +80,9 @@ namespace geode
 
     template < index_t dimension >
     void BlocksBuilder< dimension >::set_block_name(
-        const uuid& id, std::string name )
+        const uuid& id, absl::string_view name )
     {
-        blocks_.modifiable_block( id ).set_block_name( std::move( name ) );
+        blocks_.modifiable_block( id ).set_block_name( name );
     }
 
     template < index_t dimension >

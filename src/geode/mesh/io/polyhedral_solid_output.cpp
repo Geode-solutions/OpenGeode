@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,14 +30,14 @@ namespace geode
     template < index_t dimension >
     void save_polyhedral_solid(
         const PolyhedralSolid< dimension >& polyhedral_solid,
-        const std::string& filename )
+        absl::string_view filename )
     {
         try
         {
             const auto output =
                 PolyhedralSolidOutputFactory< dimension >::create(
-                    extension_from_filename( filename ), polyhedral_solid,
-                    filename );
+                    extension_from_filename( filename ).data(),
+                    polyhedral_solid, filename );
             output->write();
         }
         catch( const OpenGeodeException& e )
@@ -51,14 +51,14 @@ namespace geode
     template < index_t dimension >
     PolyhedralSolidOutput< dimension >::PolyhedralSolidOutput(
         const PolyhedralSolid< dimension >& polyhedral_solid,
-        std::string filename )
-        : VertexSetOutput( polyhedral_solid, std::move( filename ) ),
+        absl::string_view filename )
+        : VertexSetOutput( polyhedral_solid, filename ),
           polyhedral_solid_( polyhedral_solid )
     {
     }
 
     template void opengeode_mesh_api save_polyhedral_solid(
-        const PolyhedralSolid< 3 >&, const std::string& );
+        const PolyhedralSolid< 3 >&, absl::string_view );
 
     template class opengeode_mesh_api PolyhedralSolidOutput< 3 >;
 } // namespace geode

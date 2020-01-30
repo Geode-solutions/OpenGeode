@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
 
 #include <geode/basic/singleton.h>
 
-#include <map>
+#include <absl/container/flat_hash_map.h>
 
 #include <geode/basic/pimpl_impl.h>
 
@@ -48,7 +48,8 @@ namespace geode
         }
 
     private:
-        std::map< std::string, std::unique_ptr< Singleton > > singletons_;
+        absl::flat_hash_map< std::string, std::unique_ptr< Singleton > >
+            singletons_;
     };
 
     Singleton::Singleton() {} // NOLINT

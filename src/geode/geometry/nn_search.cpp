@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,10 @@
 
 #include <numeric>
 
+#include <absl/algorithm/container.h>
+
 #include <async++.h>
+
 #include <nanoflann.hpp>
 
 #include <geode/basic/pimpl_impl.h>
@@ -176,30 +179,39 @@ namespace geode
     typename NNSearch< dimension >::ColocatedInfo
         NNSearch< dimension >::colocated_index_mapping( double epsilon ) const
     {
-        std::vector< index_t > mapping( nb_points() );
-        std::iota( mapping.begin(), mapping.end(), 0 );
+        absl::FixedArray< index_t > mapping( nb_points() );
+        absl::c_iota( mapping, 0 );
         async::parallel_for( async::irange( index_t{ 0 }, nb_points() ),
             [&epsilon, &mapping, this]( index_t p ) {
                 if( mapping[p] == p )
                 {
                     const auto vertices =
                         radius_neighbors( point( p ), epsilon );
-                    const auto min_index =
-                        *std::min_element( vertices.begin(), vertices.end() );
+                    const auto min_index = *absl::c_min_element( vertices );
                     for( const auto id : vertices )
                     {
                         mapping[id] = min_index;
                     }
                 }
             } );
+        index_t nb_unique_points{ 0 };
+        for( const auto p : Range{ nb_points() } )
+        {
+            if( mapping[p] == p )
+            {
+                nb_unique_points++;
+            }
+        }
         index_t nb_colocated{ 0 };
-        std::vector< Point< dimension > > unique_points;
+        index_t count{ 0 };
+        absl::FixedArray< Point< dimension > > unique_points(
+            nb_unique_points );
         for( const auto p : Range{ nb_points() } )
         {
             if( mapping[p] == p )
             {
                 mapping[p] -= nb_colocated;
-                unique_points.push_back( point( p ) );
+                unique_points[count++] = point( p );
             }
             else
             {
@@ -207,7 +219,7 @@ namespace geode
                 mapping[p] = mapping[mapping[p]];
             }
         }
-        return { mapping, unique_points };
+        return { std::move( mapping ), std::move( unique_points ) };
     }
 
     template class opengeode_geometry_api NNSearch< 2 >;

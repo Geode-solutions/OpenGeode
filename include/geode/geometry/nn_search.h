@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -55,8 +55,8 @@ namespace geode
              * Each index is pointing to its new unique point stored in the
              * unique_points vector.
              */
-            std::vector< index_t > colocated_mapping;
-            std::vector< Point< dimension > > unique_points;
+            absl::FixedArray< index_t > colocated_mapping;
+            absl::FixedArray< Point< dimension > > unique_points;
         };
 
     public:

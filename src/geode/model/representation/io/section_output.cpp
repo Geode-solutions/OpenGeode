@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,13 +27,12 @@
 
 namespace geode
 {
-    void save_section( const Section& section, const std::string& filename )
+    void save_section( const Section& section, absl::string_view filename )
     {
         try
         {
             const auto output = SectionOutputFactory::create(
-                extension_from_filename( filename ), section,
-                filename.c_str() );
+                extension_from_filename( filename ).data(), section, filename );
             output->write();
         }
         catch( const OpenGeodeException& e )
@@ -44,8 +43,9 @@ namespace geode
         }
     }
 
-    SectionOutput::SectionOutput( const Section& section, std::string filename )
-        : Output( std::move( filename ) ), section_( section )
+    SectionOutput::SectionOutput(
+        const Section& section, absl::string_view filename )
+        : Output( filename ), section_( section )
     {
     }
 } // namespace geode

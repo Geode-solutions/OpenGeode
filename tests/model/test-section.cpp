@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -59,7 +59,7 @@ std::vector< geode::uuid > add_corners(
         builder.add_corner( geode::OpenGeodePointSet2D::type_name_static() ) );
     builder.remove_corner( temp_corner );
     const auto message =
-        "[Test] Section should have " + std::to_string( nb ) + " corners";
+        absl::StrCat( "[Test] Section should have ", nb, " corners" );
     OPENGEODE_EXCEPTION( model.nb_corners() == nb, message );
     OPENGEODE_EXCEPTION(
         geode::detail::count_relationships( model.corners() ) == nb, message );
@@ -80,7 +80,7 @@ std::vector< geode::uuid > add_lines(
         builder.add_line( geode::OpenGeodeEdgedCurve2D::type_name_static() ) );
     builder.remove_line( temp_line );
     const auto message =
-        "[Test] Section should have " + std::to_string( nb ) + " lines";
+        absl::StrCat( "[Test] Section should have ", nb, " lines" );
     OPENGEODE_EXCEPTION( model.nb_lines() == nb, message );
     OPENGEODE_EXCEPTION(
         geode::detail::count_relationships( model.lines() ) == nb, message );
@@ -101,7 +101,7 @@ std::vector< geode::uuid > add_surfaces(
         geode::OpenGeodePolygonalSurface2D::type_name_static() ) );
     builder.remove_surface( temp_surface );
     const auto message =
-        "[Test] Section should have " + std::to_string( nb ) + " surfaces";
+        absl::StrCat( "[Test] Section should have ", nb, " surfaces" );
     OPENGEODE_EXCEPTION( model.nb_surfaces() == nb, message );
     OPENGEODE_EXCEPTION(
         geode::detail::count_relationships( model.surfaces() ) == nb, message );
@@ -118,13 +118,13 @@ std::vector< geode::uuid > add_model_boundaries(
         geode_unused( unused );
         uuids.push_back( builder.add_model_boundary() );
         builder.set_model_boundary_name(
-            uuids.back(), "boundary" + std::to_string( uuids.size() ) );
+            uuids.back(), absl::StrCat( "boundary", uuids.size() ) );
     }
     const auto& temp_boundary =
         section.model_boundary( builder.add_model_boundary() );
     builder.remove_model_boundary( temp_boundary );
-    const auto message = "[Test] Section should have " + std::to_string( nb )
-                         + " model boundaries";
+    const auto message =
+        absl::StrCat( "[Test] Section should have ", nb, " model boundaries" );
     OPENGEODE_EXCEPTION( section.nb_model_boundaries() == nb, message );
     OPENGEODE_EXCEPTION(
         geode::detail::count_relationships( section.model_boundaries() ) == nb,
@@ -170,9 +170,8 @@ void add_corner_line_boundary_relation( const geode::Section& model,
         for( const auto& incidence :
             model.incidences( model.corner( corner_id ) ) )
         {
-            OPENGEODE_EXCEPTION( std::find( line_uuids.begin(),
-                                     line_uuids.end(), incidence.id() )
-                                     != line_uuids.end(),
+            OPENGEODE_EXCEPTION(
+                absl::c_find( line_uuids, incidence.id() ) != line_uuids.end(),
                 "[Test] All Corners incidences should be Lines" );
         }
     }
@@ -181,8 +180,7 @@ void add_corner_line_boundary_relation( const geode::Section& model,
     {
         for( const auto& boundary : model.boundaries( model.line( line_id ) ) )
         {
-            OPENGEODE_EXCEPTION( std::find( corner_uuids.begin(),
-                                     corner_uuids.end(), boundary.id() )
+            OPENGEODE_EXCEPTION( absl::c_find( corner_uuids, boundary.id() )
                                      != corner_uuids.end(),
                 "[Test] All Lines incidences should be Corners" );
         }
@@ -260,7 +258,7 @@ void add_internal_corner_relations( const geode::Section& model,
     for( const auto& corner_id : corner_uuids )
     {
         for( const auto& embedding :
-            model.embeddings( model.corner( corner_id ) ) )
+            model.embedded_surfaces( model.corner( corner_id ) ) )
         {
             OPENGEODE_EXCEPTION( surface_uuids.front() == embedding.id(),
                 "[Test] All Corners embeddings should be Surfaces" );
@@ -289,7 +287,8 @@ void add_internal_line_relations( const geode::Section& model,
 
     for( const auto& line_id : line_uuids )
     {
-        for( const auto& embedding : model.embeddings( model.line( line_id ) ) )
+        for( const auto& embedding :
+            model.embedded_surfaces( model.line( line_id ) ) )
         {
             OPENGEODE_EXCEPTION( surface_uuids.front() == embedding.id(),
                 "[Test] All Lines embeddings should be Surfaces" );
@@ -310,10 +309,9 @@ void test_boundary_ranges( const geode::Section& model,
     const std::vector< geode::uuid >& line_uuids,
     const std::vector< geode::uuid >& surface_uuids )
 {
-    const auto& line_boundaries =
-        model.boundaries( model.line( line_uuids[0] ) );
     geode::index_t line_boundary_count{ 0 };
-    for( const auto& line_boundary : line_boundaries )
+    for( const auto& line_boundary :
+        model.boundaries( model.line( line_uuids[0] ) ) )
     {
         line_boundary_count++;
         OPENGEODE_EXCEPTION( line_boundary.id() == corner_uuids[0]
@@ -323,10 +321,9 @@ void test_boundary_ranges( const geode::Section& model,
     OPENGEODE_EXCEPTION( line_boundary_count == 2,
         "[Test] BoundaryCornerRange should iterates on 2 Corners" );
 
-    const auto& surface_boundaries =
-        model.boundaries( model.surface( surface_uuids[0] ) );
     geode::index_t surface_boundary_count{ 0 };
-    for( const auto& surface_boundary : surface_boundaries )
+    for( const auto& surface_boundary :
+        model.boundaries( model.surface( surface_uuids[0] ) ) )
     {
         surface_boundary_count++;
         OPENGEODE_EXCEPTION( surface_boundary.id() == line_uuids[0]
@@ -343,10 +340,9 @@ void test_incidence_ranges( const geode::Section& model,
     const std::vector< geode::uuid >& line_uuids,
     const std::vector< geode::uuid >& surface_uuids )
 {
-    const auto& corner_incidences =
-        model.incidences( model.corner( corner_uuids[0] ) );
     geode::index_t corner_incidence_count{ 0 };
-    for( const auto& corner_incidence : corner_incidences )
+    for( const auto& corner_incidence :
+        model.incidences( model.corner( corner_uuids[0] ) ) )
     {
         corner_incidence_count++;
         OPENGEODE_EXCEPTION( corner_incidence.id() == line_uuids[0]
@@ -356,10 +352,9 @@ void test_incidence_ranges( const geode::Section& model,
     OPENGEODE_EXCEPTION( corner_incidence_count == 2,
         "[Test] IncidentLineRange should iterates on 2 Lines" );
 
-    const auto& line_incidences =
-        model.incidences( model.line( line_uuids[0] ) );
     geode::index_t line_incidence_count{ 0 };
-    for( const auto& line_incidence : line_incidences )
+    for( const auto& line_incidence :
+        model.incidences( model.line( line_uuids[0] ) ) )
     {
         line_incidence_count++;
         OPENGEODE_EXCEPTION( line_incidence.id() == surface_uuids[0],
@@ -373,10 +368,9 @@ void test_item_ranges( const geode::Section& model,
     const std::vector< geode::uuid >& line_uuids,
     const std::vector< geode::uuid >& boundary_uuids )
 {
-    const auto& boundary_items =
-        model.items( model.model_boundary( boundary_uuids[1] ) );
     geode::index_t boundary_item_count{ 0 };
-    for( const auto& boundary_item : boundary_items )
+    for( const auto& boundary_item :
+        model.items( model.model_boundary( boundary_uuids[1] ) ) )
     {
         boundary_item_count++;
         OPENGEODE_EXCEPTION( boundary_item.id() == line_uuids[1]
@@ -501,7 +495,7 @@ void test()
     test_item_ranges( model, line_uuids, model_boundary_uuids );
     test_clone( model );
 
-    std::string file_io{ "test." + model.native_extension() };
+    const auto file_io = absl::StrCat( "test.", model.native_extension() );
     geode::save_section( model, file_io );
 
     geode::Section model2;

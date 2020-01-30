@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,8 @@
 #pragma once
 
 #include <functional>
+
+#include <absl/container/fixed_array.h>
 
 #include <bitsery/adapter/stream.h>
 #include <bitsery/bitsery.h>
@@ -91,18 +93,14 @@ namespace geode
         static constexpr index_t FIRST_VERSION{ 1 };
 
     public:
-        Growable(
-            std::vector< std::function< void( Archive &, T & ) > > serializers )
-            : version_( serializers.size() ),
-              serializers_( std::move( serializers ) )
+        Growable( absl::FixedArray< std::function< void( Archive &, T & ) > >
+                serializers )
+            : Growable( std::move( serializers ), {} )
         {
-            OPENGEODE_EXCEPTION( version_ > FIRST_VERSION,
-                "[Growable] Provide at least 2 serializers or use "
-                "DefaultGrowable" );
         }
-        Growable(
-            std::vector< std::function< void( Archive &, T & ) > > serializers,
-            std::vector< std::function< void( T & ) > > initializers )
+        Growable( absl::FixedArray< std::function< void( Archive &, T & ) > >
+                      serializers,
+            absl::FixedArray< std::function< void( T & ) > > initializers )
             : version_( serializers.size() ),
               serializers_( std::move( serializers ) ),
               initializers_( std::move( initializers ) )
@@ -110,26 +108,18 @@ namespace geode
             OPENGEODE_EXCEPTION( version_ > FIRST_VERSION,
                 "[Growable] Provide at least 2 serializers or use "
                 "DefaultGrowable" );
-            OPENGEODE_EXCEPTION( initializers_.size() == version_ - 1,
+            OPENGEODE_EXCEPTION(
+                initializers_.empty() || initializers_.size() == version_ - 1,
                 "[Growable] Should have as many initializers than the version "
-                "number minus one" );
+                "number minus one (or none)" );
         }
 
         template < typename Fnc >
         void serialize( Archive &ser, const T &obj, Fnc &&fnc ) const
         {
+            geode_unused( fnc );
             ser.ext4b( version_, bitsery::ext::CompactValue{} );
-            if( serializers_.empty() )
-            {
-                fnc( ser, const_cast< T & >( obj ) );
-            }
-            else
-            {
-                for( const auto f : serializers_ )
-                {
-                    f( ser, const_cast< T & >( obj ) );
-                }
-            }
+            serializers_.back()( ser, const_cast< T & >( obj ) );
         }
 
         template < typename Fnc >
@@ -138,23 +128,18 @@ namespace geode
             geode_unused( fnc );
             index_t current_version;
             des.ext4b( current_version, bitsery::ext::CompactValue{} );
-            for( const auto i : Range{ current_version } )
+            serializers_.at( current_version - 1 )( des, obj );
+            if( !initializers_.empty() && current_version < version_ )
             {
-                serializers_.at( i )( des, obj );
-            }
-            if( !initializers_.empty() )
-            {
-                for( const auto i : Range{ current_version, version_ } )
-                {
-                    initializers_.at( i - 1 )( obj );
-                }
+                initializers_.at( current_version - 1 )( obj );
             }
         }
 
     private:
         index_t version_{ FIRST_VERSION };
-        std::vector< std::function< void( Archive &, T & ) > > serializers_;
-        std::vector< std::function< void( T & ) > > initializers_;
+        absl::FixedArray< std::function< void( Archive &, T & ) > >
+            serializers_;
+        absl::FixedArray< std::function< void( T & ) > > initializers_;
     };
 } // namespace geode
 

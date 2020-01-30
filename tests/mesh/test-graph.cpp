@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -171,7 +171,7 @@ void test()
 
     test_create_vertices( *graph, *builder );
     test_create_edges( *graph, *builder );
-    test_io( *graph, "test." + graph->native_extension() );
+    test_io( *graph, absl::StrCat( "test.", graph->native_extension() ) );
 
     test_delete_vertex( *graph, *builder );
     test_delete_edge( *graph, *builder );

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,10 +41,13 @@ namespace geode
     class OpenGeodePolygonalSurface< dimension >::Impl
         : public detail::PointsImpl< dimension >
     {
+        friend class bitsery::Access;
+
     public:
         explicit Impl( OpenGeodePolygonalSurface< dimension >& mesh )
             : detail::PointsImpl< dimension >( mesh )
         {
+            polygon_ptr_.emplace_back( 0 );
         }
 
         index_t get_polygon_vertex( const PolygonVertex& polygon_vertex ) const
@@ -121,10 +124,8 @@ namespace geode
         }
 
     private:
-        friend class bitsery::Access;
         Impl() = default;
 
-        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive )
         {
@@ -150,7 +151,7 @@ namespace geode
     private:
         std::vector< index_t > polygon_vertices_;
         std::vector< index_t > polygon_adjacents_;
-        std::vector< index_t > polygon_ptr_{ 0 };
+        std::vector< index_t > polygon_ptr_;
     };
 
     template < index_t dimension >

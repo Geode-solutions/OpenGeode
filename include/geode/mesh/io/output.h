@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,6 +34,6 @@ namespace geode
         virtual void write() const = 0;
 
     protected:
-        Output( std::string filename ) : IOFile( std::move( filename ) ) {}
+        Output( absl::string_view filename ) : IOFile( filename ) {}
     };
 } // namespace geode

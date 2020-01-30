@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -98,10 +98,8 @@ namespace geode
 
         /*!
          * Save each Corner in a file located in the specified directory
-         * @return the list of filenames
          */
-        std::vector< std::string > save_corners(
-            const std::string& directory ) const;
+        void save_corners( absl::string_view directory ) const;
 
     protected:
         Corners();
@@ -123,7 +121,7 @@ namespace geode
 
         void delete_corner( const Corner< dimension >& corner );
 
-        void load_corners( const std::string& directory );
+        void load_corners( absl::string_view directory );
 
         ModifiableCornerRange modifiable_corners();
 

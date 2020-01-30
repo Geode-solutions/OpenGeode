@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@
 #include <geode/tests/common.h>
 
 #define CHECK( arg, value )                                                    \
-    OPENGEODE_EXCEPTION( arg == value, "[Test] Wrong value for " #arg );
+    OPENGEODE_EXCEPTION( arg == value, "[Test] Wrong value for ", arg );
 
 struct Foo
 {
@@ -58,6 +58,8 @@ struct Foo2
                                      archive.value4b( foo.unsigned_int_ );
                                  },
                                     []( Archive &archive, Foo2 &foo ) {
+                                        archive.value8b( foo.double_ );
+                                        archive.value4b( foo.unsigned_int_ );
                                         archive.value1b( foo.bool_ );
                                     } } } );
     }
@@ -77,13 +79,21 @@ struct Foo3
                                      archive.value4b( foo.unsigned_int_ );
                                  },
                                     []( Archive &archive, Foo3 &foo ) {
+                                        archive.value8b( foo.double_ );
+                                        archive.value4b( foo.unsigned_int_ );
                                         archive.value1b( foo.bool_ );
                                     },
                                     []( Archive &archive, Foo3 &foo ) {
+                                        archive.value8b( foo.double_ );
+                                        archive.value4b( foo.unsigned_int_ );
+                                        archive.value1b( foo.bool_ );
                                         archive.value4b( foo.int_ );
                                     } },
-                                { []( Foo3 &foo ) { foo.bool_ = true; },
-                                    []( Foo3 &foo ) { foo.int_ = -52; } } } );
+                                { []( Foo3 &foo ) {
+                                     foo.bool_ = true;
+                                     foo.int_ = -52;
+                                 },
+                                    []( Foo3 &foo ) { foo.int_ = true; } } } );
     }
     double double_{ 10 };
     unsigned int unsigned_int_{ 10 };

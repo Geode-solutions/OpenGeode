@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -115,6 +115,8 @@ namespace geode
     class PolygonalSurfaceBase< dimension >::Impl
         : public detail::FacetStorage< std::array< index_t, 2 > >
     {
+        friend class bitsery::Access;
+
     public:
         explicit Impl( PolygonalSurfaceBase& surface )
             : polygon_around_vertex_(
@@ -137,15 +139,14 @@ namespace geode
             polygon_around_vertex_->set_value( vertex_id, polygon_vertex );
         }
 
-        index_t find_edge( const std::array< index_t, 2 >& edge_vertices ) const
+        index_t find_edge( std::array< index_t, 2 > edge_vertices ) const
         {
-            return this->find_facet( edge_vertices );
+            return this->find_facet( std::move( edge_vertices ) );
         }
 
-        index_t find_or_create_edge(
-            const std::array< index_t, 2 >& edge_vertices )
+        index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices )
         {
-            return this->add_facet( edge_vertices );
+            return this->add_facet( std::move( edge_vertices ) );
         }
 
         const std::array< index_t, 2 >& get_edge_vertices(
@@ -154,14 +155,14 @@ namespace geode
             return this->get_facet_vertices( edge_id );
         }
 
-        void update_edge_vertex( const std::array< index_t, 2 >& edge_vertices,
+        void update_edge_vertex( std::array< index_t, 2 > edge_vertices,
             const index_t edge_vertex_id,
             const index_t new_vertex_id )
         {
             auto updated_edge_vertices = edge_vertices;
             updated_edge_vertices[edge_vertex_id] = new_vertex_id;
-            this->add_facet( updated_edge_vertices );
-            this->remove_facet( edge_vertices );
+            this->add_facet( std::move( updated_edge_vertices ) );
+            this->remove_facet( std::move( edge_vertices ) );
         }
 
         void update_edge_vertices( const std::vector< index_t >& old2new )
@@ -169,9 +170,9 @@ namespace geode
             this->update_facet_vertices( old2new );
         }
 
-        void remove_edge( const std::array< index_t, 2 >& edge_vertices )
+        void remove_edge( std::array< index_t, 2 > edge_vertices )
         {
-            this->remove_facet( edge_vertices );
+            this->remove_facet( std::move( edge_vertices ) );
         }
 
         std::vector< index_t > delete_edges(
@@ -206,10 +207,8 @@ namespace geode
         }
 
     private:
-        friend class bitsery::Access;
         Impl() = default;
 
-        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive )
         {
@@ -274,9 +273,9 @@ namespace geode
 
     template < index_t dimension >
     index_t PolygonalSurfaceBase< dimension >::find_or_create_edge(
-        const std::array< index_t, 2 >& edge_vertices )
+        std::array< index_t, 2 > edge_vertices )
     {
-        return impl_->find_or_create_edge( edge_vertices );
+        return impl_->find_or_create_edge( std::move( edge_vertices ) );
     }
 
     template < index_t dimension >
@@ -296,19 +295,19 @@ namespace geode
 
     template < index_t dimension >
     void PolygonalSurfaceBase< dimension >::update_edge_vertex(
-        const std::array< index_t, 2 >& edge_vertices,
+        std::array< index_t, 2 > edge_vertices,
         index_t edge_vertex_id,
         index_t new_vertex_id )
     {
         impl_->update_edge_vertex(
-            edge_vertices, edge_vertex_id, new_vertex_id );
+            std::move( edge_vertices ), edge_vertex_id, new_vertex_id );
     }
 
     template < index_t dimension >
     void PolygonalSurfaceBase< dimension >::remove_edge(
-        const std::array< index_t, 2 >& edge_vertices )
+        std::array< index_t, 2 > edge_vertices )
     {
-        impl_->remove_edge( edge_vertices );
+        impl_->remove_edge( std::move( edge_vertices ) );
     }
 
     template < index_t dimension >
@@ -451,11 +450,11 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< PolygonEdge >
+    PolygonEdgesOnBorder
         PolygonalSurfaceBase< dimension >::polygon_edges_on_border(
             index_t polygon_id ) const
     {
-        std::vector< PolygonEdge > borders;
+        PolygonEdgesOnBorder borders;
         for( const auto e : Range{ nb_polygon_edges( polygon_id ) } )
         {
             PolygonEdge edge{ polygon_id, e };
@@ -565,14 +564,14 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< PolygonVertex >
+    PolygonsAroundVertex
         PolygonalSurfaceBase< dimension >::polygons_around_vertex(
             index_t vertex_id ) const
     {
         OPENGEODE_ASSERT( vertex_id < this->nb_vertices(),
             "[PolygonalSurfaceBase::polygons_around_vertex] Accessing an "
             "invalid vertex" );
-        std::vector< PolygonVertex > polygons;
+        PolygonsAroundVertex polygons;
         const auto& first_polygon = impl_->polygon_around_vertex( vertex_id );
         if( first_polygon.polygon_id == NO_ID )
         {
@@ -581,16 +580,14 @@ namespace geode
         OPENGEODE_ASSERT( polygon_vertex( first_polygon ) == vertex_id,
             "[PolygonalSurfaceBase::polygons_around_vertex] Wrong polygon "
             "around vertex" );
-        std::vector< index_t > polygons_visited;
-        polygons_visited.reserve( 10 );
+        absl::InlinedVector< index_t, 10 > polygons_visited;
         std::stack< PolygonVertex > S;
         S.push( first_polygon );
         while( !S.empty() )
         {
             const auto polygon_vertex = S.top();
             S.pop();
-            if( std::find( polygons_visited.begin(), polygons_visited.end(),
-                    polygon_vertex.polygon_id )
+            if( absl::c_find( polygons_visited, polygon_vertex.polygon_id )
                 != polygons_visited.end() )
             {
                 continue;
@@ -615,7 +612,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::tuple< bool, PolygonEdge >
+    absl::optional< PolygonEdge >
         PolygonalSurfaceBase< dimension >::polygon_edge_from_vertices(
             index_t from_vertex_id, index_t to_vertex_id ) const
     {
@@ -624,10 +621,10 @@ namespace geode
             const auto next_vertex = next_polygon_vertex( polygon_vertex );
             if( this->polygon_vertex( next_vertex ) == to_vertex_id )
             {
-                return std::make_tuple( true, std::move( polygon_vertex ) );
+                return polygon_vertex;
             }
         }
-        return std::make_tuple( false, PolygonEdge{} );
+        return absl::nullopt;
     }
     template < index_t dimension >
     index_t PolygonalSurfaceBase< dimension >::edge_from_vertices(
@@ -731,7 +728,7 @@ namespace geode
         {
             return PolygonalSurfaceFactory< dimension >::create( type );
         }
-        catch( const OpenGeodeException& e )
+        catch( const OpenGeodeException& )
         {
             try
             {
@@ -772,7 +769,7 @@ namespace geode
         {
             return PolygonalSurfaceFactory< 3 >::create( type );
         }
-        catch( const OpenGeodeException& e )
+        catch( const OpenGeodeException& )
         {
             try
             {

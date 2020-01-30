@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -72,7 +72,7 @@ namespace geode
     public:
         struct ComponentMapping
         {
-            using Mapping = std::unordered_map< uuid, uuid >;
+            using Mapping = absl::flat_hash_map< uuid, uuid >;
             Mapping corners;
             Mapping lines;
             Mapping surfaces;

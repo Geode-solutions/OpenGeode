@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,8 +30,9 @@
 #pragma once
 
 #include <memory>
-#include <unordered_map>
 #include <vector>
+
+#include <absl/container/flat_hash_map.h>
 
 #include <geode/basic/common.h>
 #include <geode/basic/logger.h>
@@ -60,7 +61,7 @@ namespace geode
 
     public:
         template < typename DerivedClass >
-        static void register_creator( const Key &key )
+        static void register_creator( Key key )
         {
             static_assert( std::is_base_of< BaseClass, DerivedClass >::value,
                 "DerivedClass is not a subclass of BaseClass" );
@@ -69,8 +70,8 @@ namespace geode
                 "DerivedClass is not constructible with Args..." );
             auto &store = get_store();
             if( !store
-                     .emplace(
-                         key, Creator( create_function_impl< DerivedClass > ) )
+                     .emplace( std::move( key ),
+                         Creator( create_function_impl< DerivedClass > ) )
                      .second )
             {
                 Logger::warn(
@@ -89,14 +90,14 @@ namespace geode
             return creator->second( std::forward< Args >( args )... );
         }
 
-        static std::vector< Key > list_creators()
+        static absl::FixedArray< Key > list_creators()
         {
             const auto &store = get_store();
-            std::vector< Key > creators;
-            creators.reserve( store.size() );
+            absl::FixedArray< Key > creators( store.size() );
+            index_t count{ 0 };
             for( const auto &creator : store )
             {
-                creators.emplace_back( creator.first );
+                creators[count++] = creator.first;
             }
             return creators;
         }
@@ -109,7 +110,7 @@ namespace geode
 
         using Creator = typename std::add_pointer< std::unique_ptr< BaseClass >(
             Args... ) >::type;
-        using FactoryStore = std::unordered_map< Key, Creator >;
+        using FactoryStore = absl::flat_hash_map< Key, Creator >;
 
     private:
         template < typename DerivedClass >

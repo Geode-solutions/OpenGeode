@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,9 @@
  */
 
 #pragma once
+
+#include <absl/container/inlined_vector.h>
+#include <absl/types/optional.h>
 
 #include <geode/basic/attribute.h>
 #include <geode/basic/bitsery_archive.h>
@@ -111,6 +114,10 @@ namespace geode
         index_t polygon_id{ NO_ID };
         index_t edge_id{ NO_ID };
     };
+
+    using PolygonEdgesOnBorder = absl::InlinedVector< PolygonEdge, 3 >;
+
+    using PolygonsAroundVertex = absl::InlinedVector< PolygonEdge, 10 >;
 
     /*!
      * This class represents a Surface made up with polygons (triangles, quads,
@@ -227,7 +234,7 @@ namespace geode
          * Return all the edges of a polygon that are on border
          * @param[in] polygon_id Index of a polygon
          */
-        std::vector< PolygonEdge > polygon_edges_on_border(
+        PolygonEdgesOnBorder polygon_edges_on_border(
             index_t polygon_id ) const;
 
         /*!
@@ -274,8 +281,7 @@ namespace geode
          * @param[in] vertex_id Index of the vertex.
          * @pre This function needs that polygon adjacencies are computed
          */
-        std::vector< PolygonVertex > polygons_around_vertex(
-            index_t vertex_id ) const;
+        PolygonsAroundVertex polygons_around_vertex( index_t vertex_id ) const;
 
         /*!
          * Find the polygon edge corresponding to an ordered pair of vertex
@@ -283,10 +289,9 @@ namespace geode
          * @param[in] from_vertex_id Index of the vertex from which starts the
          * edge
          * @param[in] to_vertex_id Index of the vertex to which ends the edge
-         * @return 1) true if such an edge exists, 2) Local index of the found
-         * edge.
+         * @return Local index if the edge is found.
          */
-        std::tuple< bool, PolygonEdge > polygon_edge_from_vertices(
+        absl::optional< PolygonEdge > polygon_edge_from_vertices(
             index_t from_vertex_id, index_t to_vertex_id ) const;
 
         /*!
@@ -314,8 +319,7 @@ namespace geode
     protected:
         PolygonalSurfaceBase();
 
-        index_t find_or_create_edge(
-            const std::array< index_t, 2 >& edge_vertices );
+        index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices );
 
     private:
         friend class bitsery::Access;
@@ -332,11 +336,11 @@ namespace geode
 
         void update_edge_vertices( const std::vector< index_t >& old2new );
 
-        void update_edge_vertex( const std::array< index_t, 2 >& edge_vertices,
+        void update_edge_vertex( std::array< index_t, 2 > edge_vertices,
             index_t edge_vertex_id,
             index_t new_vertex_id );
 
-        void remove_edge( const std::array< index_t, 2 >& edge_vertices );
+        void remove_edge( std::array< index_t, 2 > edge_vertices );
 
         std::vector< index_t > delete_edges(
             const std::vector< bool >& to_delete );

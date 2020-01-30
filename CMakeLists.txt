@@ -1,4 +1,4 @@
-# Copyright (c) 2019 Geode-solutions
+# Copyright (c) 2019 - 2020 Geode-solutions
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,13 +18,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.7.2)
+cmake_minimum_required(VERSION 3.11)
 
 #-------------------------------------------------------------------------------
 # Project options
 
 # Optional components
 option(OPENGEODE_WITH_TESTS "Compile test projects" ON)
+option(OPENGEODE_WITH_PYTHON "Compile Python bindings" OFF)
 
 # Internal options
 option(USE_SUPERBUILD "Whether or not a superbuild should be invoked" ON)

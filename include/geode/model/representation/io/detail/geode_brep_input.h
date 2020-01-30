@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,12 +34,12 @@ namespace geode
     class opengeode_model_api OpenGeodeBRepInput final : public BRepInput
     {
     public:
-        OpenGeodeBRepInput( BRep& brep, std::string filename )
-            : BRepInput( brep, std::move( filename ) )
+        OpenGeodeBRepInput( BRep& brep, absl::string_view filename )
+            : BRepInput( brep, filename )
         {
         }
 
-        static std::string extension()
+        static absl::string_view extension()
         {
             return BRep::native_extension_static();
         }

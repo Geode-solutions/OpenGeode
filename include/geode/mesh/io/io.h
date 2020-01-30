@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,23 +27,23 @@
 
 namespace geode
 {
-    std::string opengeode_mesh_api extension_from_filename(
-        const std::string& filename );
+    absl::string_view opengeode_mesh_api extension_from_filename(
+        absl::string_view filename );
 
     class opengeode_mesh_api IOFile
     {
     public:
         virtual ~IOFile() = default;
 
-        const std::string& filename() const
+        absl::string_view filename() const
         {
             return filename_;
         }
 
     protected:
-        IOFile( std::string filename ) : filename_( std::move( filename ) ) {}
+        IOFile( absl::string_view filename ) : filename_( filename ) {}
 
     private:
-        std::string filename_;
+        absl::string_view filename_;
     };
 } // namespace geode

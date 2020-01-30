@@ -1,4 +1,4 @@
-# Copyright (c) 2019 Geode-solutions
+# Copyright (c) 2019 - 2020 Geode-solutions
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.7.2)
+cmake_minimum_required(VERSION 3.11)
     
 if(NOT TARGET OpenGeode::basic)
     project(OpenGeode CXX)
@@ -26,14 +26,12 @@ if(NOT TARGET OpenGeode::basic)
     enable_testing()
 endif()
 
-set(CTEST_OUTPUT_ON_FAILURE ON)
-
-set(TEST_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+set(DATA_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/data)
 set(test_common_file_in ${CMAKE_CURRENT_LIST_DIR}/common.h)
 set(test_common_file ${PROJECT_BINARY_DIR}/geode/tests/common.h)
 configure_file(${test_common_file_in} ${test_common_file})
 
-if( NOT EXISTS ${PROJECT_BINARY_DIR}/geode/tests/catch2.h)
+if(NOT EXISTS ${PROJECT_BINARY_DIR}/geode/tests/catch2.h)
     file(DOWNLOAD 
         https://github.com/catchorg/Catch2/releases/download/v2.11.0/catch.hpp
         ${PROJECT_BINARY_DIR}/geode/tests/catch2.h

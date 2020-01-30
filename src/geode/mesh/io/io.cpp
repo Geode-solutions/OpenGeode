@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@
 
 namespace geode
 {
-    std::string extension_from_filename( const std::string& filename )
+    absl::string_view extension_from_filename( absl::string_view filename )
     {
         return filename.substr( filename.find_last_of( '.' ) + 1 );
     }

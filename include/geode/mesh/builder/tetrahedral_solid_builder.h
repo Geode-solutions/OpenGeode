@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -92,12 +92,12 @@ namespace geode
 
         virtual void do_create_tetrahedra( index_t nb ) = 0;
 
-        virtual std::vector< std::vector< index_t > >
-            get_polyhedron_facet_vertices(
+        virtual std::array< PolyhedronFacetVertices, 4 >
+            get_tetrahedron_facet_vertices(
                 const std::array< index_t, 4 >& vertices ) const = 0;
 
         virtual std::vector< std::array< index_t, 2 > >
-            get_polyhedron_edge_vertices(
+            get_tetrahedron_edge_vertices(
                 const std::array< index_t, 4 >& vertices ) const = 0;
 
     private:

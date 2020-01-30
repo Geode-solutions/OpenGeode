@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,6 @@ void test()
         const geode::uuid id;
         geode::Logger::info( id.string() );
         const geode::uuid id2;
-        geode::Logger::info( id2 );
         OPENGEODE_EXCEPTION( id2 != id, "[Test] UUIDs should be different" );
         OPENGEODE_EXCEPTION(
             id2 < id || id < id2, "[Test] UUIDs should be different" );

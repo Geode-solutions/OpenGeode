@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -43,6 +43,8 @@ namespace geode
     template < typename Type, typename Tag >
     class NamedType
     {
+        friend class bitsery::Access;
+
     public:
         explicit NamedType( Type value ) : value_( std::move( value ) ) {}
 
@@ -62,10 +64,8 @@ namespace geode
         }
 
     private:
-        friend class bitsery::Access;
         NamedType() = default;
 
-        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive )
         {

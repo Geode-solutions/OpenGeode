@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -191,11 +191,11 @@ namespace geode
 
         index_t nb_embedded_surfaces( const Corner2D& corner ) const;
 
-        EmbeddedSurfaceRange embeddings( const Corner2D& corner ) const;
+        EmbeddedSurfaceRange embedded_surfaces( const Corner2D& corner ) const;
 
         index_t nb_embedded_surfaces( const Line2D& line ) const;
 
-        EmbeddedSurfaceRange embeddings( const Line2D& line ) const;
+        EmbeddedSurfaceRange embedded_surfaces( const Line2D& line ) const;
 
         ItemLineRange items( const ModelBoundary2D& boundary ) const;
 
@@ -206,12 +206,13 @@ namespace geode
          */
         BoundingBox2D bounding_box() const;
 
-        static std::string native_extension_static()
+        static absl::string_view native_extension_static()
         {
-            return "og_sctn";
+            static const auto extension = "og_sctn";
+            return extension;
         }
 
-        std::string native_extension() const
+        absl::string_view native_extension() const
         {
             return native_extension_static();
         }

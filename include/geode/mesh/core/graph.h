@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,8 @@
 #pragma once
 
 #include <vector>
+
+#include <absl/container/inlined_vector.h>
 
 #include <geode/basic/attribute.h>
 #include <geode/basic/bitsery_archive.h>
@@ -77,6 +79,8 @@ namespace geode
         index_t vertex_id{ NO_ID };
     };
 
+    using EdgesAroundVertex = absl::InlinedVector< EdgeVertex, 2 >;
+
     /*!
      * Interface class to represent a Graph.
      * A graph is a set of vertices linked by edges
@@ -118,8 +122,7 @@ namespace geode
          * Get all edge endpoints corresponding to a given vertex
          * @param[in] vertex_id Index of the vertex
          */
-        const std::vector< EdgeVertex >& edges_around_vertex(
-            index_t vertex_id ) const;
+        const EdgesAroundVertex& edges_around_vertex( index_t vertex_id ) const;
 
     protected:
         Graph();
@@ -130,7 +133,7 @@ namespace geode
         void serialize( Archive& archive );
 
         void set_edges_around_vertex(
-            index_t vertex_id, const std::vector< EdgeVertex >& edges );
+            index_t vertex_id, EdgesAroundVertex edges );
 
         void associate_edge_vertex_to_vertex(
             const EdgeVertex& edge_vertex, index_t vertex_id );

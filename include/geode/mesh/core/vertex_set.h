@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -42,6 +42,7 @@ namespace geode
     class opengeode_mesh_api VertexSet
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( VertexSet );
+        friend class bitsery::Access;
 
     public:
         /*!
@@ -59,7 +60,7 @@ namespace geode
 
         virtual ~VertexSet();
 
-        virtual std::string native_extension() const = 0;
+        virtual absl::string_view native_extension() const = 0;
 
         index_t nb_vertices() const;
 
@@ -72,11 +73,9 @@ namespace geode
         virtual MeshType type_name() const = 0;
 
     protected:
-        friend class bitsery::Access;
         VertexSet();
 
     private:
-        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive );
 

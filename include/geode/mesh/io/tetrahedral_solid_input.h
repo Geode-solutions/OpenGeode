@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -44,7 +44,7 @@ namespace geode
     template < index_t dimension >
     void load_tetrahedral_solid(
         TetrahedralSolid< dimension >& tetrahedral_solid,
-        const std::string& filename );
+        absl::string_view filename );
 
     template < index_t dimension >
     class TetrahedralSolidInput : public PolyhedralSolidInput< dimension >
@@ -54,7 +54,7 @@ namespace geode
 
     protected:
         TetrahedralSolidInput( TetrahedralSolid< dimension >& tetrahedral_solid,
-            std::string filename );
+            absl::string_view filename );
 
         TetrahedralSolid< dimension >& tetrahedral_solid()
         {
@@ -69,6 +69,6 @@ namespace geode
     using TetrahedralSolidInputFactory = Factory< std::string,
         TetrahedralSolidInput< dimension >,
         TetrahedralSolid< dimension >&,
-        std::string >;
+        absl::string_view >;
     ALIAS_3D( TetrahedralSolidInputFactory );
 } // namespace geode

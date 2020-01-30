@@ -1,7 +1,8 @@
 #include <geode/model/mixin/core/vertex_identifier.h>
 
 #include <fstream>
-#include <unordered_map>
+
+#include <absl/container/flat_hash_map.h>
 
 #include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>
@@ -123,7 +124,8 @@ namespace geode
                 }
                 catch( const std::out_of_range& )
                 {
-                    Logger::warn( "Registering MeshComponent: ", component.id(),
+                    Logger::warn(
+                        "Registering MeshComponent: ", component.id().string(),
                         " in VertexIdentifier, wrong number of vertices." );
                 }
                 it->second = std::move( attribute );
@@ -172,8 +174,7 @@ namespace geode
                 ->set_value( component_vertex_id.vertex, unique_vertex_id );
             const auto& vertices =
                 component_vertices_->value( unique_vertex_id );
-            if( std::find(
-                    vertices.begin(), vertices.end(), component_vertex_id )
+            if( absl::c_find( vertices, component_vertex_id )
                 == vertices.end() )
             {
                 component_vertices_->modify_value( unique_vertex_id,
@@ -192,14 +193,15 @@ namespace geode
         {
             const auto& vertices =
                 component_vertices_->value( unique_vertex_id );
-            const auto it = std::find(
-                vertices.begin(), vertices.end(), component_vertex_id );
+            const auto it = absl::c_find( vertices, component_vertex_id );
             OPENGEODE_EXCEPTION( it != vertices.end(),
                 "[VertexIdentifier::unset_unique_vertex] Unique vertex to "
                 "unset is not correct" );
             component_vertices_->modify_value( unique_vertex_id,
                 [&it]( std::vector< MeshComponentVertex >& vertices ) {
-                    vertices.erase( it );
+                    vertices.erase(
+                        // workaround for gcc < 4.9
+                        vertices.begin() + ( it - vertices.cbegin() ) );
                 } );
         }
 
@@ -215,9 +217,8 @@ namespace geode
                 for( const auto old_id : old_vertices )
                 {
                     const auto& all_vertices = component_vertices_->value( uv );
-                    const auto it =
-                        std::find( all_vertices.begin(), all_vertices.end(),
-                            MeshComponentVertex{ component_id, old_id } );
+                    const auto it = absl::c_find( all_vertices,
+                        MeshComponentVertex{ component_id, old_id } );
                     OPENGEODE_EXCEPTION( it != all_vertices.end(),
                         "[VertexIdentifier::update_unique_vertices] Old mesh "
                         "component vertex should be found in unique "
@@ -228,7 +229,10 @@ namespace geode
                         component_vertices_->modify_value( uv,
                             [&it](
                                 std::vector< MeshComponentVertex >& vertices ) {
-                                vertices.erase( it );
+                                vertices.erase(
+                                    // workaround for gcc < 4.9
+                                    vertices.begin()
+                                    + ( it - vertices.cbegin() ) );
                             } );
                     }
                     else
@@ -245,9 +249,9 @@ namespace geode
             }
         }
 
-        std::string save( const std::string& directory ) const
+        void save( absl::string_view directory ) const
         {
-            const auto filename = directory + "/vertices";
+            const auto filename = absl::StrCat( directory, "/vertices" );
             std::ofstream file{ filename, std::ofstream::binary };
             TContext context{};
             register_basic_serialize_pcontext( std::get< 0 >( context ) );
@@ -258,14 +262,13 @@ namespace geode
             archive.object( *this );
             archive.adapter().flush();
             OPENGEODE_EXCEPTION( std::get< 1 >( context ).isValid(),
-                "[VertexIdentifier::save] Error while writing file: "
-                    + filename );
-            return filename;
+                "[VertexIdentifier::save] Error while writing file: ",
+                filename );
         }
 
-        void load( const std::string& directory )
+        void load( absl::string_view directory )
         {
-            const auto filename = directory + "/vertices";
+            const auto filename = absl::StrCat( directory, "/vertices" );
             std::ifstream file{ filename, std::ifstream::binary };
             TContext context{};
             register_basic_deserialize_pcontext( std::get< 0 >( context ) );
@@ -279,8 +282,8 @@ namespace geode
                 adapter.error() == bitsery::ReaderError::NoError
                     && adapter.isCompletedSuccessfully()
                     && std::get< 1 >( context ).isValid(),
-                "[VertexIdentifier::load] Error while reading file: "
-                    + filename );
+                "[VertexIdentifier::load] Error while reading file: ",
+                filename );
         }
 
     private:
@@ -353,7 +356,7 @@ namespace geode
         std::shared_ptr<
             VariableAttribute< std::vector< MeshComponentVertex > > >
             component_vertices_;
-        std::unordered_map< uuid,
+        absl::flat_hash_map< uuid,
             std::shared_ptr< VariableAttribute< index_t > > >
             vertex2unique_vertex_;
     };
@@ -438,13 +441,13 @@ namespace geode
         impl_->update_unique_vertices( component_id, old2new );
     }
 
-    std::string VertexIdentifier::save_unique_vertices(
-        const std::string& directory ) const
+    void VertexIdentifier::save_unique_vertices(
+        absl::string_view directory ) const
     {
-        return impl_->save( directory );
+        impl_->save( directory );
     }
 
-    void VertexIdentifier::load_unique_vertices( const std::string& directory )
+    void VertexIdentifier::load_unique_vertices( absl::string_view directory )
     {
         return impl_->load( directory );
     }

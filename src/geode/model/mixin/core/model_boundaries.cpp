@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -69,21 +69,19 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< std::string >
-        ModelBoundaries< dimension >::save_model_boundaries(
-            const std::string& directory ) const
+    void ModelBoundaries< dimension >::save_model_boundaries(
+        absl::string_view directory ) const
     {
-        std::vector< std::string > files;
-        files.emplace_back( directory + "/model_boundaries" );
-        impl_->save_components( files.back() );
-        return files;
+        impl_->save_components(
+            absl::StrCat( directory, "/model_boundaries" ) );
     }
 
     template < index_t dimension >
     void ModelBoundaries< dimension >::load_model_boundaries(
-        const std::string& directory )
+        absl::string_view directory )
     {
-        impl_->load_components( directory + "/model_boundaries" );
+        impl_->load_components(
+            absl::StrCat( directory, "/model_boundaries" ) );
     }
 
     template < index_t dimension >

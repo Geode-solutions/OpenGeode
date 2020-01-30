@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,8 @@
 #include <memory>
 #include <string>
 
+#include <absl/container/fixed_array.h>
+
 #include <bitsery/bitsery.h>
 
 #include <geode/basic/attribute.h>
@@ -48,6 +50,19 @@ namespace geode
         ~AttributeManager();
 
         /*!
+         * Recover the non-typed/generic Attribute from the attribute
+         * name. This can be used when attribute type is not known in a
+         * context.
+         * @param[in] name The associated attribute name to look for.
+         * @return nullptr if no attribute matches the given name.
+         */
+        std::shared_ptr< AttributeBase > find_generic_attribute(
+            const std::string& name ) const
+        {
+            return find_attribute_base( name );
+        }
+
+        /*!
          * Recover the typed Attribute from the attribute name
          * @param[in] name The associated attribute name to look for
          * @tparam T The type to of the ReadOnlyAttribute element
@@ -55,7 +70,7 @@ namespace geode
          */
         template < typename T >
         std::shared_ptr< ReadOnlyAttribute< T > > find_attribute(
-            const std::string& name )
+            absl::string_view name ) const
         {
             auto attribute =
                 std::dynamic_pointer_cast< ReadOnlyAttribute< T > >(
@@ -85,7 +100,7 @@ namespace geode
             typename T,
             typename... Args >
         std::shared_ptr< Attribute< T > > find_or_create_attribute(
-            const std::string& name, const Args&... args )
+            absl::string_view name, const Args&... args )
         {
             auto attribute = find_attribute_base( name );
             auto typed_attribute =
@@ -98,7 +113,7 @@ namespace geode
                     "if an instantiated attribute of the same name "
                     "with different storage already exists." );
 
-                typed_attribute.reset( new Attribute< T >( args... ) );
+                typed_attribute.reset( Attribute< T >::create( args... ) );
                 register_attribute( typed_attribute, name );
             }
             return typed_attribute;
@@ -111,28 +126,50 @@ namespace geode
         void resize( index_t size );
 
         /*!
+         * Reserve all the attributes to the given capacity
+         * @param[in] size The new attribute capacity
+         */
+        void reserve( index_t capacity );
+
+        /*!
+         * Assign attribute value from other value in the same attribute
+         * @param[in] from_element Attribute value to assign
+         * @param[in] to_element Where the value is assign
+         */
+        void assign_attribute_value( index_t from_element, index_t to_element );
+
+        /*!
+         * Interpolate attribute value from other values in the same attribute
+         * @param[in] interpolation Attribute interpolator
+         * @param[in] to_element Where the value is assign
+         */
+        void interpolate_attribute_value(
+            const AttributeLinearInterpolation& interpolation,
+            index_t to_element );
+
+        /*!
          * Get all the associated attribute names
          */
-        std::vector< std::string > attribute_names() const;
+        absl::FixedArray< absl::string_view > attribute_names() const;
 
         /*!
          * Return true if an attribute matching the given name.
          * @param[in] name The attribute name to use
          */
-        bool attribute_exists( const std::string& name ) const;
+        bool attribute_exists( absl::string_view name ) const;
 
         /*!
          * Delete the attribute matching the given name.
          * Do nothing if the name does not exist.
          * @param[in] name The attribute name to delete
          */
-        void delete_attribute( const std::string& name );
+        void delete_attribute( absl::string_view name );
 
         /*!
          * Get the typeid name of the attribute type
          * @param[in] name The attribute name to use
          */
-        std::string attribute_type( const std::string& name ) const;
+        absl::string_view attribute_type( absl::string_view name ) const;
 
         /*!
          * Remove all the attributes in the manager
@@ -195,7 +232,7 @@ namespace geode
          * the shared pointer is empty.
          */
         std::shared_ptr< AttributeBase > find_attribute_base(
-            const std::string& name );
+            absl::string_view name ) const;
 
         /*!
          * Register an Attribute to the given name.
@@ -205,7 +242,7 @@ namespace geode
          * @param[in] name The associated name to the store
          */
         void register_attribute( std::shared_ptr< AttributeBase > attribute,
-            const std::string& name );
+            absl::string_view name );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

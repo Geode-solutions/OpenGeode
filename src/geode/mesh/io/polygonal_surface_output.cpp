@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,14 +30,14 @@ namespace geode
     template < index_t dimension >
     void save_polygonal_surface(
         const PolygonalSurface< dimension >& polygonal_surface,
-        const std::string& filename )
+        absl::string_view filename )
     {
         try
         {
             const auto output =
                 PolygonalSurfaceOutputFactory< dimension >::create(
-                    extension_from_filename( filename ), polygonal_surface,
-                    filename );
+                    extension_from_filename( filename ).data(),
+                    polygonal_surface, filename );
             output->write();
         }
         catch( const OpenGeodeException& e )
@@ -51,16 +51,16 @@ namespace geode
     template < index_t dimension >
     PolygonalSurfaceOutput< dimension >::PolygonalSurfaceOutput(
         const PolygonalSurface< dimension >& polygonal_surface,
-        std::string filename )
-        : VertexSetOutput( polygonal_surface, std::move( filename ) ),
+        absl::string_view filename )
+        : VertexSetOutput( polygonal_surface, filename ),
           polygonal_surface_( polygonal_surface )
     {
     }
 
     template void opengeode_mesh_api save_polygonal_surface(
-        const PolygonalSurface< 2 >&, const std::string& );
+        const PolygonalSurface< 2 >&, absl::string_view );
     template void opengeode_mesh_api save_polygonal_surface(
-        const PolygonalSurface< 3 >&, const std::string& );
+        const PolygonalSurface< 3 >&, absl::string_view );
 
     template class opengeode_mesh_api PolygonalSurfaceOutput< 2 >;
     template class opengeode_mesh_api PolygonalSurfaceOutput< 3 >;

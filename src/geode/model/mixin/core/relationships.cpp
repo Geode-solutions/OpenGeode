@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -48,7 +48,7 @@ namespace geode
     class Relationships::Impl
     {
     public:
-        using Iterator = typename std::vector< EdgeVertex >::const_iterator;
+        using Iterator = typename EdgesAroundVertex::const_iterator;
         using RelationType = index_t;
         static constexpr index_t BOUNDARY_RELATION = index_t( 0 );
         static constexpr index_t INTERNAL_RELATION = index_t( 1 );
@@ -67,7 +67,7 @@ namespace geode
                         RelationType >( "relation_type", NO_ID ) ),
               ids_( graph_.vertex_attribute_manager()
                         .find_or_create_attribute< VariableAttribute,
-                            ComponentID >( "id" ) )
+                            ComponentID >( "id", ComponentID{} ) )
         {
         }
 
@@ -168,9 +168,9 @@ namespace geode
             relation_type_->set_value( index, type );
         }
 
-        std::string save( const std::string& directory ) const
+        void save( absl::string_view directory ) const
         {
-            const auto filename = directory + "/relationships";
+            const auto filename = absl::StrCat( directory, "/relationships" );
             std::ofstream file{ filename, std::ofstream::binary };
             TContext context{};
             register_basic_serialize_pcontext( std::get< 0 >( context ) );
@@ -181,13 +181,12 @@ namespace geode
             archive.object( *this );
             archive.adapter().flush();
             OPENGEODE_EXCEPTION( std::get< 1 >( context ).isValid(),
-                "[Relationships::save] Error while writing file: " + filename );
-            return filename;
+                "[Relationships::save] Error while writing file: ", filename );
         }
 
-        void load( const std::string& directory )
+        void load( absl::string_view directory )
         {
-            const auto filename = directory + "/relationships";
+            const auto filename = absl::StrCat( directory, "/relationships" );
             std::ifstream file{ filename, std::ifstream::binary };
             TContext context{};
             register_basic_deserialize_pcontext( std::get< 0 >( context ) );
@@ -201,7 +200,7 @@ namespace geode
                 adapter.error() == bitsery::ReaderError::NoError
                     && adapter.isCompletedSuccessfully()
                     && std::get< 1 >( context ).isValid(),
-                "[Relationships::load] Error while reading file: " + filename );
+                "[Relationships::load] Error while reading file: ", filename );
         }
 
     private:
@@ -330,13 +329,12 @@ namespace geode
             item, collection, Relationships::Impl::ITEM_RELATION );
     }
 
-    std::string Relationships::save_relationships(
-        const std::string& directory ) const
+    void Relationships::save_relationships( absl::string_view directory ) const
     {
-        return impl_->save( directory );
+        impl_->save( directory );
     }
 
-    void Relationships::load_relationships( const std::string& directory )
+    void Relationships::load_relationships( absl::string_view directory )
     {
         return impl_->load( directory );
     }

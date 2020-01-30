@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -45,7 +45,7 @@ std::vector< double > create_double_vector()
 void test_delete_vector_elements()
 {
     auto bool_vector = create_bool_vector();
-    const auto to_delete{ bool_vector };
+    const auto to_delete = bool_vector;
     geode::delete_vector_elements( to_delete, bool_vector, false );
     OPENGEODE_EXCEPTION( bool_vector.size() == 4,
         "[Test] Delete elements result (size) for bool is not correct" );
@@ -65,7 +65,7 @@ void test_delete_vector_elements()
 void test_extract_vector_elements()
 {
     const auto bool_vector = create_bool_vector();
-    const auto to_keep{ bool_vector };
+    const auto to_keep = bool_vector;
     const auto bool_result =
         geode::extract_vector_elements( to_keep, bool_vector );
     OPENGEODE_EXCEPTION( bool_result.size() == 1,

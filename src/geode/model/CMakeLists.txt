@@ -1,88 +1,109 @@
-set(sources
-    "${lib_source_dir}/mixin/builder/blocks_builder.cpp"
-    "${lib_source_dir}/mixin/builder/corners_builder.cpp"
-    "${lib_source_dir}/mixin/builder/lines_builder.cpp"
-    "${lib_source_dir}/mixin/builder/model_boundaries_builder.cpp"
-    "${lib_source_dir}/mixin/builder/surfaces_builder.cpp"
-    "${lib_source_dir}/mixin/builder/relationships_builder.cpp"
-    "${lib_source_dir}/mixin/builder/vertex_identifier_builder.cpp"
-    "${lib_source_dir}/mixin/core/bitsery_archive.cpp"
-    "${lib_source_dir}/mixin/core/block.cpp"
-    "${lib_source_dir}/mixin/core/blocks.cpp"
-    "${lib_source_dir}/mixin/core/component.cpp"
-    "${lib_source_dir}/mixin/core/corner.cpp"
-    "${lib_source_dir}/mixin/core/corners.cpp"
-    "${lib_source_dir}/mixin/core/line.cpp"
-    "${lib_source_dir}/mixin/core/lines.cpp"
-    "${lib_source_dir}/mixin/core/model_boundaries.cpp"
-    "${lib_source_dir}/mixin/core/model_boundary.cpp"
-    "${lib_source_dir}/mixin/core/relationships.cpp"
-    "${lib_source_dir}/mixin/core/surface.cpp"
-    "${lib_source_dir}/mixin/core/surfaces.cpp"
-    "${lib_source_dir}/mixin/core/vertex_identifier.cpp"
-    "${lib_source_dir}/representation/builder/brep_builder.cpp"
-    "${lib_source_dir}/representation/builder/section_builder.cpp"
-    "${lib_source_dir}/representation/core/brep.cpp"
-    "${lib_source_dir}/representation/core/section.cpp"
-    "${lib_source_dir}/representation/io/brep_input.cpp"
-    "${lib_source_dir}/representation/io/section_input.cpp"
-    "${lib_source_dir}/representation/io/brep_output.cpp"
-    "${lib_source_dir}/representation/io/section_output.cpp"
-)
-set(public_headers
-    "${lib_include_dir}/common.h"
-    "${lib_include_dir}/mixin/builder/add_components_builders.h"
-    "${lib_include_dir}/mixin/builder/blocks_builder.h"
-    "${lib_include_dir}/mixin/builder/corners_builder.h"
-    "${lib_include_dir}/mixin/builder/lines_builder.h"
-    "${lib_include_dir}/mixin/builder/model_boundaries_builder.h"
-    "${lib_include_dir}/mixin/builder/surfaces_builder.h"
-    "${lib_include_dir}/mixin/builder/relationships_builder.h"
-    "${lib_include_dir}/mixin/builder/topology_builder.h"
-    "${lib_include_dir}/mixin/builder/vertex_identifier_builder.h"
-    "${lib_include_dir}/mixin/core/add_components.h"
-    "${lib_include_dir}/mixin/core/bitsery_archive.h"
-    "${lib_include_dir}/mixin/core/block.h"
-    "${lib_include_dir}/mixin/core/blocks.h"
-    "${lib_include_dir}/mixin/core/component.h"
-    "${lib_include_dir}/mixin/core/component_type.h"
-    "${lib_include_dir}/mixin/core/corner.h"
-    "${lib_include_dir}/mixin/core/corners.h"
-    "${lib_include_dir}/mixin/core/line.h"
-    "${lib_include_dir}/mixin/core/lines.h"
-    "${lib_include_dir}/mixin/core/model_boundary.h"
-    "${lib_include_dir}/mixin/core/model_boundaries.h"
-    "${lib_include_dir}/mixin/core/relationships.h"
-    "${lib_include_dir}/mixin/core/surface.h"
-    "${lib_include_dir}/mixin/core/surfaces.h"
-    "${lib_include_dir}/mixin/core/topology.h"
-    "${lib_include_dir}/mixin/core/vertex_identifier.h"
-    "${lib_include_dir}/representation/builder/brep_builder.h"
-    "${lib_include_dir}/representation/builder/section_builder.h"
-    "${lib_include_dir}/representation/core/brep.h"
-    "${lib_include_dir}/representation/core/section.h"
-    "${lib_include_dir}/representation/io/brep_input.h"
-    "${lib_include_dir}/representation/io/section_input.h"
-    "${lib_include_dir}/representation/io/brep_output.h"
-    "${lib_include_dir}/representation/io/section_output.h"
-)
-set(advanced_headers
-    "${lib_include_dir}/mixin/core/detail/components_storage.h"
-    "${lib_include_dir}/mixin/core/detail/count_relationships.h"
-    "${lib_include_dir}/mixin/core/detail/mesh_storage.h"
-    "${lib_include_dir}/mixin/core/detail/uuid_to_index.h"
-    "${lib_include_dir}/representation/builder/detail/copy.h"
-    "${lib_include_dir}/representation/io/detail/geode_brep_input.h"
-    "${lib_include_dir}/representation/io/detail/geode_section_input.h"
-    "${lib_include_dir}/representation/io/detail/geode_brep_output.h"
-    "${lib_include_dir}/representation/io/detail/geode_section_output.h"
-)
-target_link_libraries(${target_name}
-    PUBLIC
+# Copyright (c) 2019 - 2020 Geode-solutions
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+add_geode_library(
+    NAME model
+    FOLDER "geode/model"
+    SOURCES
+        "common.cpp"
+        "mixin/builder/blocks_builder.cpp"
+        "mixin/builder/corners_builder.cpp"
+        "mixin/builder/lines_builder.cpp"
+        "mixin/builder/model_boundaries_builder.cpp"
+        "mixin/builder/surfaces_builder.cpp"
+        "mixin/builder/relationships_builder.cpp"
+        "mixin/builder/vertex_identifier_builder.cpp"
+        "mixin/core/bitsery_archive.cpp"
+        "mixin/core/block.cpp"
+        "mixin/core/blocks.cpp"
+        "mixin/core/component.cpp"
+        "mixin/core/corner.cpp"
+        "mixin/core/corners.cpp"
+        "mixin/core/line.cpp"
+        "mixin/core/lines.cpp"
+        "mixin/core/model_boundaries.cpp"
+        "mixin/core/model_boundary.cpp"
+        "mixin/core/relationships.cpp"
+        "mixin/core/surface.cpp"
+        "mixin/core/surfaces.cpp"
+        "mixin/core/vertex_identifier.cpp"
+        "representation/builder/brep_builder.cpp"
+        "representation/builder/section_builder.cpp"
+        "representation/core/brep.cpp"
+        "representation/core/section.cpp"
+        "representation/io/brep_input.cpp"
+        "representation/io/section_input.cpp"
+        "representation/io/brep_output.cpp"
+        "representation/io/section_output.cpp"
+    PUBLIC_HEADERS
+        "common.h"
+        "mixin/builder/add_components_builders.h"
+        "mixin/builder/blocks_builder.h"
+        "mixin/builder/corners_builder.h"
+        "mixin/builder/lines_builder.h"
+        "mixin/builder/model_boundaries_builder.h"
+        "mixin/builder/surfaces_builder.h"
+        "mixin/builder/relationships_builder.h"
+        "mixin/builder/topology_builder.h"
+        "mixin/builder/vertex_identifier_builder.h"
+        "mixin/core/add_components.h"
+        "mixin/core/bitsery_archive.h"
+        "mixin/core/block.h"
+        "mixin/core/blocks.h"
+        "mixin/core/component.h"
+        "mixin/core/component_type.h"
+        "mixin/core/corner.h"
+        "mixin/core/corners.h"
+        "mixin/core/line.h"
+        "mixin/core/lines.h"
+        "mixin/core/model_boundary.h"
+        "mixin/core/model_boundaries.h"
+        "mixin/core/relationships.h"
+        "mixin/core/surface.h"
+        "mixin/core/surfaces.h"
+        "mixin/core/topology.h"
+        "mixin/core/vertex_identifier.h"
+        "representation/builder/brep_builder.h"
+        "representation/builder/section_builder.h"
+        "representation/core/brep.h"
+        "representation/core/section.h"
+        "representation/io/brep_input.h"
+        "representation/io/section_input.h"
+        "representation/io/brep_output.h"
+        "representation/io/section_output.h"
+    ADVANCED_HEADERS
+        "mixin/core/detail/components_storage.h"
+        "mixin/core/detail/count_relationships.h"
+        "mixin/core/detail/mesh_storage.h"
+        "mixin/core/detail/uuid_to_index.h"
+        "representation/builder/detail/copy.h"
+        "representation/io/detail/geode_brep_input.h"
+        "representation/io/detail/geode_section_input.h"
+        "representation/io/detail/geode_brep_output.h"
+        "representation/io/detail/geode_section_output.h"
+    PUBLIC_DEPENDENCIES
+        absl::flat_hash_map
+        Bitsery::bitsery
+        ghcFilesystem::ghc_filesystem
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
         ${PROJECT_NAME}::mesh
-        Bitsery::bitsery
-        ghcFilesystem::ghc_filesystem
 )
 

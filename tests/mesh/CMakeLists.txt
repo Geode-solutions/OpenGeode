@@ -1,4 +1,4 @@
-# Copyright (c) 2019 Geode-solutions
+# Copyright (c) 2019 - 2020 Geode-solutions
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,16 +18,87 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-add_geode_test(test-edged-curve.cpp ${PROJECT_NAME}::mesh)
-add_geode_test(test-graph.cpp ${PROJECT_NAME}::mesh)
-add_geode_test(test-point-set.cpp ${PROJECT_NAME}::mesh)
-add_geode_test(test-polygonal-surface.cpp ${PROJECT_NAME}::mesh)
-add_geode_test(test-polyhedral-solid.cpp ${PROJECT_NAME}::mesh)
-add_geode_test(test-register-builder.cpp ${PROJECT_NAME}::mesh)
-add_geode_test(test-register-input.cpp ${PROJECT_NAME}::mesh)
-add_geode_test(test-register-mesh.cpp ${PROJECT_NAME}::mesh)
-add_geode_test(test-register-output.cpp ${PROJECT_NAME}::mesh)
-add_geode_test(test-tetrahedral-solid.cpp ${PROJECT_NAME}::mesh)
-add_geode_test(test-triangulated-surface.cpp ${PROJECT_NAME}::mesh)
-add_geode_test(test-vertex-cycle.cpp ${PROJECT_NAME}::mesh)
-add_geode_test(test-vertex-set.cpp ${PROJECT_NAME}::mesh)
+add_geode_test(
+    SOURCE "test-edged-curve.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
+    SOURCE "test-graph.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
+    SOURCE "test-point-set.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
+    SOURCE "test-polygonal-surface.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
+    SOURCE "test-polyhedral-solid.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
+    SOURCE "test-register-builder.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
+    SOURCE "test-register-input.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
+    SOURCE "test-register-mesh.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
+    SOURCE "test-register-output.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
+    SOURCE "test-tetrahedral-solid.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
+    SOURCE "test-triangulated-surface.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
+    SOURCE "test-vertex-cycle.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
+    SOURCE "test-vertex-set.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::mesh
+)

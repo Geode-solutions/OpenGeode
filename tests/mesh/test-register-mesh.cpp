@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,7 @@ template < typename GeodeFactory >
 void check_register( const geode::MeshType& key )
 {
     OPENGEODE_EXCEPTION( GeodeFactory::has_creator( key ),
-        "[Test] No creator for " + key.get() + " is not correct" );
+        "[Test] No creator for ", key.get(), " is not correct" );
 }
 
 void test()

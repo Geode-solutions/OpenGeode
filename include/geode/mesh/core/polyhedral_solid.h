@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,8 @@
 #pragma once
 
 #include <vector>
+
+#include <absl/container/inlined_vector.h>
 
 #include <geode/basic/attribute.h>
 #include <geode/basic/bitsery_archive.h>
@@ -170,6 +172,16 @@ namespace geode
         index_t edge_id{ NO_ID };
     };
 
+    using PolyhedronFacetVertices = absl::InlinedVector< index_t, 4 >;
+
+    using PolyhedronFacetsOnBorder = absl::InlinedVector< PolyhedronFacet, 4 >;
+
+    using PolyhedraAroundVertex = absl::InlinedVector< PolyhedronVertex, 20 >;
+
+    using PolyhedraAroundEdge = absl::InlinedVector< index_t, 10 >;
+
+    using PolyhedraAroundFacet = absl::InlinedVector< index_t, 2 >;
+
     /*!
      * This class represents a 3D Solid made up with polyhedra and provides mesh
      * functionnalities.
@@ -263,7 +275,7 @@ namespace geode
          * Return the indices of facet vertices.
          * @param[in] edge_id Index of an edge.
          */
-        const std::vector< index_t >& facet_vertices( index_t facet_id ) const;
+        const PolyhedronFacetVertices& facet_vertices( index_t facet_id ) const;
 
         /*!
          * Return the indices of edge vertices.
@@ -276,7 +288,7 @@ namespace geode
          * @param[in] vertices Ordered vertex indices
          */
         index_t facet_from_vertices(
-            const std::vector< index_t >& vertices ) const;
+            const PolyhedronFacetVertices& vertices ) const;
 
         /*!
          * Get the index of edge corresponding to given vertices
@@ -316,7 +328,7 @@ namespace geode
          * Return all the facets of a polyhedron that are on border
          * @param[in] polyhedron_id Index of a polyhedron
          */
-        std::vector< PolyhedronFacet > polyhedron_facets_on_border(
+        PolyhedronFacetsOnBorder polyhedron_facets_on_border(
             index_t polyhedron_id ) const;
 
         /*!
@@ -361,20 +373,20 @@ namespace geode
          * Get all the polyhedra with one of the vertices matching given vertex.
          * @param[in] vertex_id Index of the vertex
          */
-        std::vector< PolyhedronVertex > polyhedra_around_vertex(
+        PolyhedraAroundVertex polyhedra_around_vertex(
             index_t vertex_id ) const;
 
         /*!
          * Get all the polyhedra with both edge vertices.
          * @param[in] edge_id Index of the edge
          */
-        std::vector< index_t > polyhedra_around_edge( index_t edge_id ) const;
+        PolyhedraAroundEdge polyhedra_around_edge( index_t edge_id ) const;
 
         /*!
          * Return all polyhedra made with the given facet.
          * @param[in] facet_id Index of the facet
          */
-        std::vector< index_t > polyhedra_from_facet( index_t facet_id ) const;
+        PolyhedraAroundFacet polyhedra_from_facet( index_t facet_id ) const;
 
         /*!
          * Access to the manager of attributes associated with polyhedra.
@@ -399,11 +411,9 @@ namespace geode
     protected:
         PolyhedralSolid();
 
-        index_t find_or_create_facet(
-            const std::vector< index_t >& facet_vertices );
+        index_t find_or_create_facet( PolyhedronFacetVertices facet_vertices );
 
-        index_t find_or_create_edge(
-            const std::array< index_t, 2 >& edge_vertices );
+        index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices );
 
     private:
         friend class bitsery::Access;
@@ -423,17 +433,17 @@ namespace geode
 
         void update_edge_vertices( const std::vector< index_t >& old2new );
 
-        void update_facet_vertex( const std::vector< index_t >& facet_vertices,
+        void update_facet_vertex( PolyhedronFacetVertices facet_vertices,
             index_t facet_vertex_id,
             index_t new_vertex_id );
 
-        void update_edge_vertex( const std::array< index_t, 2 >& edge_vertices,
+        void update_edge_vertex( std::array< index_t, 2 > edge_vertices,
             index_t edge_vertex_id,
             index_t new_vertex_id );
 
-        void remove_facet( const std::vector< index_t >& facet_vertices );
+        void remove_facet( PolyhedronFacetVertices facet_vertices );
 
-        void remove_edge( const std::array< index_t, 2 >& edge_vertices );
+        void remove_edge( std::array< index_t, 2 > edge_vertices );
 
         std::vector< index_t > delete_facets(
             const std::vector< bool >& to_delete );

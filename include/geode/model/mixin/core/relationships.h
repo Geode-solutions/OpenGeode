@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -274,7 +274,7 @@ namespace geode
 
         CollectionRange collections( const uuid& id ) const;
 
-        std::string save_relationships( const std::string& directory ) const;
+        void save_relationships( absl::string_view directory ) const;
 
     private:
         /*!
@@ -316,7 +316,7 @@ namespace geode
          */
         void add_item_in_collection( const uuid& item, const uuid& collection );
 
-        void load_relationships( const std::string& directory );
+        void load_relationships( absl::string_view directory );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

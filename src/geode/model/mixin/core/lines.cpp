@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -70,34 +70,33 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< std::string > Lines< dimension >::save_lines(
-        const std::string& directory ) const
+    void Lines< dimension >::save_lines( absl::string_view directory ) const
     {
-        std::vector< std::string > files;
+        const auto prefix = absl::StrCat(
+            directory, "/", Line< dimension >::component_type_static().get() );
         for( const auto& line : lines() )
         {
             const auto& mesh = line.mesh();
-            files.emplace_back( directory + "/" + line.component_type().get()
-                                + line.id().string() + "."
-                                + mesh.native_extension() );
-            save_edged_curve( mesh, files.back() );
+            const auto file = absl::StrCat(
+                prefix, line.id().string(), ".", mesh.native_extension() );
+            save_edged_curve( mesh, file );
         }
-        files.emplace_back( directory + "/lines" );
-        impl_->save_components( files.back() );
-        return files;
+        impl_->save_components( absl::StrCat( directory, "/lines" ) );
     }
 
     template < index_t dimension >
-    void Lines< dimension >::load_lines( const std::string& directory )
+    void Lines< dimension >::load_lines( absl::string_view directory )
     {
-        impl_->load_components( directory + "/lines" );
+        impl_->load_components( absl::StrCat( directory, "/lines" ) );
+        const auto prefix = absl::StrCat(
+            directory, "/", Line< dimension >::component_type_static().get() );
         for( auto& line : modifiable_lines() )
         {
             line.ensure_mesh_type();
             auto& mesh = line.modifiable_mesh();
-            load_edged_curve( mesh,
-                directory + "/" + line.component_type().get()
-                    + line.id().string() + "." + mesh.native_extension() );
+            const auto file = absl::StrCat(
+                prefix, line.id().string(), ".", mesh.native_extension() );
+            load_edged_curve( mesh, file );
         }
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <unordered_map>
+#include <absl/container/flat_hash_map.h>
 
 #include <bitsery/ext/std_map.h>
 
@@ -86,7 +86,7 @@ namespace geode
             }
 
         private:
-            std::unordered_map< uuid, index_t > uuid2index_;
+            absl::flat_hash_map< uuid, index_t > uuid2index_;
         };
     } // namespace detail
 } // namespace geode

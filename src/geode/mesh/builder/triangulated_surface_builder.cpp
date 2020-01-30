@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -57,8 +57,8 @@ namespace geode
         OPENGEODE_ASSERT( vertices.size() == 3, "[TriangulatedSurfaceBuilder"
                                                 "::do_create_polygon] Only "
                                                 "triangles are handled" );
-        std::array< index_t, 3 > triangle_vertices{};
-        std::copy_n( vertices.begin(), 3, triangle_vertices.begin() );
+        std::array< index_t, 3 > triangle_vertices;
+        absl::c_copy_n( vertices, 3, triangle_vertices.begin() );
         do_create_triangle( triangle_vertices );
     }
 

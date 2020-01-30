@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,12 +34,12 @@ namespace geode
     class opengeode_model_api OpenGeodeSectionInput final : public SectionInput
     {
     public:
-        OpenGeodeSectionInput( Section& section, std::string filename )
-            : SectionInput( section, std::move( filename ) )
+        OpenGeodeSectionInput( Section& section, absl::string_view filename )
+            : SectionInput( section, filename )
         {
         }
 
-        static std::string extension()
+        static absl::string_view extension()
         {
             return Section::native_extension_static();
         }

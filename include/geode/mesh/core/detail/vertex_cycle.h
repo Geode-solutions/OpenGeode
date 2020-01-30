@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,28 +29,49 @@
 #include <utility>
 #include <vector>
 
+#include <absl/algorithm/container.h>
+#include <absl/container/inlined_vector.h>
+#include <absl/hash/hash.h>
+
+#include <bitsery/brief_syntax.h>
+#include <bitsery/brief_syntax/array.h>
+#include <bitsery/brief_syntax/vector.h>
+
 #include <geode/basic/common.h>
 
 namespace geode
 {
     namespace detail
     {
+        template < typename Container >
+        inline void rotate( Container& vertices )
+        {
+            const auto min_itr = absl::c_min_element( vertices );
+            absl::c_rotate( vertices, min_itr );
+        }
+
+        template <>
+        inline void rotate( std::array< index_t, 2 >& vertices )
+        {
+            if( vertices.front() > vertices.back() )
+            {
+                std::swap( vertices.front(), vertices.back() );
+            }
+        }
+
+        template < typename Container >
         class VertexCycle
         {
+            friend class bitsery::Access;
+
         public:
-            VertexCycle( std::vector< index_t > vertices )
+            VertexCycle( Container vertices )
                 : vertices_( std::move( vertices ) )
             {
-                rotate();
+                rotate( vertices_ );
             }
 
-            VertexCycle( const std::array< index_t, 2 >& vertices )
-                : vertices_{ vertices[0], vertices[1] }
-            {
-                rotate();
-            }
-
-            const std::vector< index_t >& vertices() const
+            const Container& vertices() const
             {
                 return vertices_;
             }
@@ -58,7 +79,8 @@ namespace geode
             bool operator==( const VertexCycle& other ) const
             {
                 const auto& other_vertices = other.vertices();
-                if( other_vertices.size() != this->vertices_.size() )
+                const auto size = this->vertices_.size();
+                if( other_vertices.size() != size )
                 {
                     return false;
                 }
@@ -70,10 +92,14 @@ namespace geode
                 {
                     return true;
                 }
-                auto reverse_vertices = other.vertices();
-                std::reverse(
-                    reverse_vertices.begin() + 1, reverse_vertices.end() );
-                return this->vertices() == reverse_vertices;
+                for( const auto i : Range{ 1, size } )
+                {
+                    if( this->vertices()[i] != other_vertices[size - i] )
+                    {
+                        return false;
+                    }
+                }
+                return true;
             }
 
             bool operator!=( const VertexCycle& other ) const
@@ -82,42 +108,50 @@ namespace geode
             }
 
         private:
-            friend class bitsery::Access;
             VertexCycle() = default;
 
-            friend class bitsery::Access;
             template < typename Archive >
             void serialize( Archive& archive )
             {
                 archive.ext( *this, DefaultGrowable< Archive, VertexCycle >{},
                     []( Archive& archive, VertexCycle& storage ) {
-                        archive.container4b(
-                            storage.vertices_, storage.vertices_.max_size() );
+                        archive( storage.vertices_ );
                     } );
             }
 
-            void rotate()
-            {
-                const auto min_itr =
-                    std::min_element( vertices_.begin(), vertices_.end() );
-                std::rotate( vertices_.begin(), min_itr, vertices_.end() );
-            }
-
-        private:
-            std::vector< index_t > vertices_;
+        public:
+            Container vertices_;
         };
     } // namespace detail
 } // namespace geode
 
 namespace std
 {
+    using VectorVertexCycle =
+        geode::detail::VertexCycle< absl::InlinedVector< geode::index_t, 4 > >;
     template <>
-    struct hash< geode::detail::VertexCycle >
+    struct hash< VectorVertexCycle >
     {
-        std::size_t operator()( const geode::detail::VertexCycle& cycle ) const
+        std::size_t operator()( const VectorVertexCycle& cycle ) const
         {
-            return std::accumulate(
-                cycle.vertices().begin(), cycle.vertices().end(), 0 );
+            std::size_t hash{ 0 };
+            for( const auto v : cycle.vertices() )
+            {
+                hash = hash ^ absl::Hash< geode::index_t >()( v );
+            }
+            return hash;
+        }
+    };
+
+    using ArrayVertexCycle =
+        geode::detail::VertexCycle< std::array< geode::index_t, 2 > >;
+    template <>
+    struct hash< ArrayVertexCycle >
+    {
+        std::size_t operator()( const ArrayVertexCycle& cycle ) const
+        {
+            return absl::Hash< geode::index_t >()( cycle.vertices().front() )
+                   ^ absl::Hash< geode::index_t >()( cycle.vertices().back() );
         }
     };
 } // namespace std

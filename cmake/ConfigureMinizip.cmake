@@ -1,4 +1,4 @@
-# Copyright (c) 2019 Geode-solutions
+# Copyright (c) 2019 - 2020 Geode-solutions
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -17,11 +17,6 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
-find_package(Iconv QUIET)
-if(NOT Iconv_FOUND)
-    cmake_minimum_required(VERSION 3.11)
-endif()
 
 set(MINIZIP_PATH ${PROJECT_BINARY_DIR}/third_party/minizip)
 set(MINIZIP_INSTALL_PREFIX ${MINIZIP_PATH}/install)

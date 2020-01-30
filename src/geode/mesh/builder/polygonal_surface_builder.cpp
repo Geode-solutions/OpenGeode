@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -154,7 +154,7 @@ namespace geode
             return PolygonalSurfaceBuilderFactory< dimension >::create(
                 mesh.type_name(), mesh );
         }
-        catch( const OpenGeodeException& e )
+        catch( const OpenGeodeException& )
         {
             try
             {
@@ -209,9 +209,10 @@ namespace geode
 
     template < index_t dimension >
     index_t PolygonalSurfaceBuilder< dimension >::find_or_create_edge(
-        const std::array< index_t, 2 >& edge_vertices )
+        std::array< index_t, 2 > edge_vertices )
     {
-        return polygonal_surface_.find_or_create_edge( edge_vertices );
+        return polygonal_surface_.find_or_create_edge(
+            std::move( edge_vertices ) );
     }
 
     template < index_t dimension >
@@ -352,7 +353,7 @@ namespace geode
     {
         std::vector< index_t > polygons_to_connect(
             polygonal_surface_.nb_polygons() );
-        std::iota( polygons_to_connect.begin(), polygons_to_connect.end(), 0 );
+        absl::c_iota( polygons_to_connect, 0 );
         compute_polygon_adjacencies( polygons_to_connect );
     }
 
@@ -498,7 +499,7 @@ namespace geode
 
     template < index_t dimension >
     void PolygonalSurfaceBuilder< dimension >::update_edge_vertex(
-        const std::array< index_t, 2 >& edge_vertices,
+        std::array< index_t, 2 > edge_vertices,
         index_t edge_vertex_id,
         index_t new_vertex_id )
     {
@@ -506,7 +507,7 @@ namespace geode
             "[PolygonalSurfaceBuilder::update_edge_vertex] "
             "Accessing an invalid vertex in edge" );
         polygonal_surface_.update_edge_vertex(
-            edge_vertices, edge_vertex_id, new_vertex_id );
+            std::move( edge_vertices ), edge_vertex_id, new_vertex_id );
     }
 
     template < index_t dimension >

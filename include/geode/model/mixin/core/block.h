@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -49,6 +49,8 @@ namespace geode
         OPENGEODE_DISABLE_COPY_AND_MOVE( Block );
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
         friend class Blocks< dimension >;
+        friend class BlocksBuilder< dimension >;
+        friend class bitsery::Access;
 
     public:
         ~Block();
@@ -71,26 +73,21 @@ namespace geode
         const PolyhedralSolid< dimension >& mesh() const;
 
     private:
-        friend class bitsery::Access;
         Block();
 
         explicit Block( const MeshType& type );
 
-        friend class BlocksBuilder< dimension >;
         PolyhedralSolid< dimension >& modifiable_mesh();
 
-        friend class BlocksBuilder< dimension >;
         void set_mesh( std::unique_ptr< PolyhedralSolid< dimension > > mesh );
 
-        friend class BlocksBuilder< dimension >;
-        void set_block_name( std::string name )
+        void set_block_name( absl::string_view name )
         {
-            this->set_name( std::move( name ) );
+            this->set_name( name );
         }
 
         void ensure_mesh_type();
 
-        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive );
 

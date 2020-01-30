@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -66,7 +66,7 @@ public:
     Derived( A &a, B &b ) : Base( a, b ) {}
 };
 
-void verdict( bool is_instantiated, const std::string &name )
+void verdict( bool is_instantiated, absl::string_view name )
 {
     if( !is_instantiated )
     {

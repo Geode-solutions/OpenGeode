@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -70,8 +70,7 @@ void test_create_vertex_attribute( const geode::PointSet3D& point_set )
     auto attribute =
         point_set.vertex_attribute_manager()
             .find_or_create_attribute< geode::ConstantAttribute, bool >(
-                "test" );
-    attribute->set_value( true );
+                "test", true );
     OPENGEODE_EXCEPTION( attribute->value() == true,
         "[Test] PointSet attribute value should be true" );
 }
@@ -89,7 +88,7 @@ void test_delete_vertex(
         "[Test] PointSet vertex coordinates are not correct" );
 }
 
-void test_io( const geode::PointSet3D& point_set, const std::string& filename )
+void test_io( const geode::PointSet3D& point_set, absl::string_view filename )
 {
     save_point_set( point_set, filename );
     auto new_point_set = geode::PointSet3D::create(
@@ -121,7 +120,8 @@ void test()
     test_create_vertices( *point_set, *builder );
     test_bounding_box( *point_set );
     test_create_vertex_attribute( *point_set );
-    test_io( *point_set, "test." + point_set->native_extension() );
+    test_io(
+        *point_set, absl::StrCat( "test.", point_set->native_extension() ) );
     test_delete_vertex( *point_set, *builder );
     test_clone( *point_set );
 }

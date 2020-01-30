@@ -18,14 +18,15 @@ jobs:
       
   build-ubuntu:
     runs-on: ubuntu-18.04
+    container: ${{ matrix.config.container }}
     needs: format
     strategy:
       matrix:
         config:
-        - {cc: gcc, cxx: g++, cmake_args: "-DCMAKE_BUILD_TYPE=Debug", coverage: true, benchmark: false}
-        - {cc: gcc, cxx: g++, cmake_args: "-DCMAKE_BUILD_TYPE=Release -DUSE_BENCHMARK=ON", coverage: false, benchmark: true}
-        - {cc: clang, cxx: clang++, cmake_args: "-DCMAKE_BUILD_TYPE=Debug", coverage: false, benchmark: false}
-        - {cc: clang, cxx: clang++, cmake_args: "-DCMAKE_BUILD_TYPE=Release", coverage: false, benchmark: false}
+        - {container: "geodesolutions/ubuntu", cmake_args: "-DCMAKE_BUILD_TYPE=Debug", benchmark: false}
+        - {container: "geodesolutions/ubuntu", cmake_args: "-DCMAKE_BUILD_TYPE=Release -DUSE_BENCHMARK=ON", benchmark: true}
+        - {container: "geodesolutions/centos", cmake_args: "-DCMAKE_BUILD_TYPE=Debug", benchmark: false}
+        - {container: "geodesolutions/centos", cmake_args: "-DCMAKE_BUILD_TYPE=Release", benchmark: false}
 
     steps:
     - uses: actions/checkout@v1
@@ -33,11 +34,10 @@ jobs:
       run: |
         mkdir -p build
         cd build
-        cmake ${{ matrix.config.cmake_args }} ..
+        cmake ${{ matrix.config.cmake_args }} -DOPENGEODE_WITH_PYTHON:BOOL=ON ..
         cmake --build . -- -j2
-      env:
-        CC: ${{ matrix.config.cc }}
-        CXX: ${{ matrix.config.cxx }}
+        cd opengeode        
+        ctest --output-on-failure
     - name: Test
       run: |
         mkdir -p test
@@ -45,17 +45,6 @@ jobs:
         cmake ${{ matrix.config.cmake_args }} -DCMAKE_PREFIX_PATH:PATH=$GITHUB_WORKSPACE/build/opengeode/install ../tests
         cmake --build . -- -j2
         ctest --output-on-failure
-      env:
-        CC: ${{ matrix.config.cc }}
-        CXX: ${{ matrix.config.cxx }}
-    - name: Kcov
-      run: curl -s https://raw.githubusercontent.com/Geode-solutions/actions/master/kcov.sh | bash -s -- ${GITHUB_WORKSPACE}/build/opengeode/bin
-      if: matrix.config.coverage && (github.event_name == 'pull_request' || github.ref == 'refs/heads/master')
-    - uses: codecov/codecov-action@v1.0.2
-      if: matrix.config.coverage && (github.event_name == 'pull_request' || github.ref == 'refs/heads/master')
-      with: 
-        token: ${{ secrets.CODECOV_TOKEN }}
-        file: kcov/kcov-merged/cobertura.xml
     - uses: Geode-solutions/actions/benchmark@master
       if: matrix.config.benchmark && github.ref == 'refs/heads/master' && github.event_name == 'push'
       with:
@@ -71,23 +60,25 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       
-  build-mac:
-    runs-on: macos-latest
+  coverage:
+    runs-on: ubuntu-18.04
     needs: format
-    strategy:
-      matrix:
-        config: [Debug, Release]
+    if: (github.event_name == 'pull_request' || github.ref == 'refs/heads/master')
 
     steps:
     - uses: actions/checkout@v1
-    - name: Compile & Test
+    - name: Compile
       run: |
         mkdir -p build
         cd build
-        cmake -DCMAKE_BUILD_TYPE=${{ matrix.config }} ..
-        cmake --build .
-        cd opengeode
-        ctest --output-on-failure
+        cmake -DCMAKE_BUILD_TYPE=Debug ..
+        cmake --build . -- -j2
+    - name: Kcov
+      run: curl -s https://raw.githubusercontent.com/Geode-solutions/actions/master/kcov.sh | bash -s -- ${GITHUB_WORKSPACE}/build/opengeode/bin
+    - uses: codecov/codecov-action@v1.0.2
+      with: 
+        token: ${{ secrets.CODECOV_TOKEN }}
+        file: kcov/kcov-merged/cobertura.xml
     - name: Notify slack
       if: failure() && github.ref == 'refs/heads/master'
       uses: 8398a7/action-slack@v2
@@ -95,7 +86,7 @@ jobs:
         status: failure
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} 
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       
   build-mac-xcode:
     runs-on: macos-latest
@@ -110,7 +101,7 @@ jobs:
       run: |
         mkdir -p build
         cd build
-        cmake -G "Xcode" ..
+        cmake -G "Xcode"  -DOPENGEODE_WITH_PYTHON:BOOL=ON ..
         cmake --build . --config ${{ matrix.config }}
         cd opengeode
         ctest -C ${{ matrix.config }} --output-on-failure
@@ -136,7 +127,7 @@ jobs:
       run: |
         mkdir -p build
         cd build
-        cmake -G "Visual Studio 15 2017 Win64" ..
+        cmake -G "Visual Studio 15 2017 Win64" -DOPENGEODE_WITH_PYTHON:BOOL=ON ..
         cmake --build . --config ${{ matrix.config }}
         cd opengeode
         ctest -C ${{ matrix.config }} --output-on-failure
@@ -151,7 +142,7 @@ jobs:
         
   semantic-release:
     runs-on: ubuntu-18.04
-    needs: [build-ubuntu, build-mac, build-mac-xcode, build-windows]
+    needs: [build-ubuntu, coverage, build-mac-xcode, build-windows]
     steps:
     - uses: actions/checkout@v1
     - run: npx semantic-release

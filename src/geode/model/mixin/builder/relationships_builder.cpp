@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -58,8 +58,7 @@ namespace geode
         relationships_.add_item_in_collection( item, collection );
     }
 
-    void RelationshipsBuilder::load_relationships(
-        const std::string& directory )
+    void RelationshipsBuilder::load_relationships( absl::string_view directory )
     {
         relationships_.load_relationships( directory );
     }

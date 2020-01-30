@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,9 @@
 #include <stdexcept>
 #include <string>
 
+#include <absl/base/optimization.h>
+#include <absl/strings/str_cat.h>
+
 #include <geode/basic/opengeode_basic_export.h>
 
 namespace geode
@@ -49,32 +52,16 @@ namespace geode
     public:
         template < typename... Args >
         explicit OpenGeodeException( const Args &... message )
-            : std::runtime_error{ string_concatener( message... ) }
+            : std::runtime_error{ absl::StrCat( message... ) }
         {
         }
         virtual ~OpenGeodeException() noexcept {}
-
-    private:
-        template < typename A0 >
-        std::string string_concatener( const A0 &a0 )
-        {
-            std::ostringstream out;
-            out << a0;
-            return out.str();
-        }
-
-        template < typename A0, typename A1, typename... Args >
-        std::string string_concatener(
-            const A0 &a0, const A1 &a1, const Args &... args )
-        {
-            return string_concatener( a0 ) + string_concatener( a1, args... );
-        }
     };
 
     void opengeode_basic_api geode_assertion_failed(
-        const std::string &condition,
-        const std::string &message,
-        const std::string &file,
+        absl::string_view condition,
+        absl::string_view message,
+        absl::string_view file,
         int line );
 
     /*!
@@ -86,7 +73,7 @@ namespace geode
 
 #ifdef OPENGEODE_DEBUG
 #define OPENGEODE_ASSERT( condition, message )                                 \
-    if( !( condition ) )                                                       \
+    if( ABSL_PREDICT_FALSE( !( condition ) ) )                                 \
     geode::geode_assertion_failed( #condition, message, __FILE__, __LINE__ )
 #define OPENGEODE_ASSERT_NOT_REACHED( message )                                \
     geode::geode_assertion_failed(                                             \
@@ -95,10 +82,9 @@ namespace geode
 #define OPENGEODE_ASSERT( x, message )
 #define OPENGEODE_ASSERT_NOT_REACHED( message )
 #endif
-
-#define OPENGEODE_EXCEPTION( condition, message )                              \
-    if( !( condition ) )                                                       \
+#define OPENGEODE_EXCEPTION( condition, ... )                                  \
+    if( ABSL_PREDICT_FALSE( !( condition ) ) )                                 \
         throw geode::OpenGeodeException                                        \
         {                                                                      \
-            message                                                            \
+            __VA_ARGS__                                                        \
         }

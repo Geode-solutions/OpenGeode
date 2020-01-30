@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -67,16 +67,6 @@ namespace geode
         Vector normalize() const
         {
             return *this / length();
-        }
-
-        Vector operator*( double s ) const
-        {
-            Vector< dimension > result{ *this };
-            for( auto i : Range{ dimension } )
-            {
-                result.set_value( i, s * result.value( i ) );
-            }
-            return result;
         }
 
         double dot( const Vector &other ) const

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
  *
  */
 
-#include <unordered_map>
+#include <absl/container/flat_hash_map.h>
 
 #include <geode/basic/range.h>
 #include <geode/basic/uuid.h>
@@ -42,7 +42,7 @@ namespace geode
 {
     namespace detail
     {
-        using Mapping = std::unordered_map< uuid, uuid >;
+        using Mapping = absl::flat_hash_map< uuid, uuid >;
 
         template < typename ModelFrom, typename ModelTo, typename BuilderTo >
         Mapping copy_corner_components(

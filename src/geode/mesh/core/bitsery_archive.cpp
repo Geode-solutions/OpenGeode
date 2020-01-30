@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -130,7 +130,7 @@ namespace
     void register_pcontext( geode::PContext& context )
     {
         geode::AttributeManager::register_attribute_type<
-            std::vector< geode::EdgeVertex >, Serializer >( context );
+            geode::EdgesAroundVertex, Serializer >( context );
         geode::AttributeManager::register_attribute_type< geode::PolygonVertex,
             Serializer >( context );
         geode::AttributeManager::register_attribute_type< geode::PolygonEdge,
@@ -141,6 +141,8 @@ namespace
             geode::PolyhedronFacetVertex, Serializer >( context );
         geode::AttributeManager::register_attribute_type<
             geode::PolyhedronVertex, Serializer >( context );
+        geode::AttributeManager::register_attribute_type<
+            absl::InlinedVector< geode::index_t, 4 >, Serializer >( context );
         context.registerBasesList< Serializer >(
             bitsery::ext::PolymorphicClassesList< geode::VertexSet >{} );
     }

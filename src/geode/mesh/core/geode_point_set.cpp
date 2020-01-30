@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -39,6 +39,8 @@ namespace geode
     class OpenGeodePointSet< dimension >::Impl
         : public detail::PointsImpl< dimension >
     {
+        friend class bitsery::Access;
+
     public:
         explicit Impl( OpenGeodePointSet< dimension >& mesh )
             : detail::PointsImpl< dimension >( mesh )
@@ -46,10 +48,8 @@ namespace geode
         }
 
     private:
-        friend class bitsery::Access;
         Impl() = default;
 
-        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive )
         {

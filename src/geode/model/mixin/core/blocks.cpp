@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -73,43 +73,41 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< std::string > Blocks< dimension >::save_blocks(
-        const std::string& directory ) const
+    void Blocks< dimension >::save_blocks( absl::string_view directory ) const
     {
-        std::vector< std::string > files;
+        const auto prefix = absl::StrCat(
+            directory, "/", Block< dimension >::component_type_static().get() );
         for( const auto& block : blocks() )
         {
             const auto& mesh = block.mesh();
-            files.emplace_back( directory + "/" + block.component_type().get()
-                                + block.id().string() + "."
-                                + mesh.native_extension() );
+            const auto file = absl::StrCat(
+                prefix, block.id().string(), ".", mesh.native_extension() );
             const auto* tetra =
                 dynamic_cast< const TetrahedralSolid< dimension >* >( &mesh );
             if( tetra )
             {
-                save_tetrahedral_solid( *tetra, files.back() );
+                save_tetrahedral_solid( *tetra, file );
             }
             else
             {
-                save_polyhedral_solid( mesh, files.back() );
+                save_polyhedral_solid( mesh, file );
             }
         }
-        files.emplace_back( directory + "/blocks" );
-        impl_->save_components( files.back() );
-        return files;
+        impl_->save_components( absl::StrCat( directory, "/blocks" ) );
     }
 
     template < index_t dimension >
-    void Blocks< dimension >::load_blocks( const std::string& directory )
+    void Blocks< dimension >::load_blocks( absl::string_view directory )
     {
-        impl_->load_components( directory + "/blocks" );
+        impl_->load_components( absl::StrCat( directory, "/blocks" ) );
+        const auto prefix = absl::StrCat(
+            directory, "/", Block< dimension >::component_type_static().get() );
         for( auto& block : modifiable_blocks() )
         {
             block.ensure_mesh_type();
             auto& mesh = block.modifiable_mesh();
-            const auto file = directory + "/" + block.component_type().get()
-                              + block.id().string() + "."
-                              + mesh.native_extension();
+            const auto file = absl::StrCat(
+                prefix, block.id().string(), ".", mesh.native_extension() );
             auto* tetra =
                 dynamic_cast< TetrahedralSolid< dimension >* >( &mesh );
             if( tetra )

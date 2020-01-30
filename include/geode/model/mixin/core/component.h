@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -43,24 +43,23 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( Component );
         OPENGEODE_TEMPLATE_ASSERT_2D_OR_3D( dimension );
+        friend class bitsery::Access;
 
     public:
         virtual ~Component();
 
-        const std::string& name() const;
+        absl::string_view name() const;
 
         const uuid& id() const;
 
         virtual ComponentType component_type() const = 0;
 
     protected:
-        friend class bitsery::Access;
         Component();
 
-        void set_name( std::string name );
+        void set_name( absl::string_view name );
 
     private:
-        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive );
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -55,7 +55,7 @@ namespace geode
 
     template < index_t dimension >
     void SurfacesBuilder< dimension >::load_surfaces(
-        const std::string& directory )
+        absl::string_view directory )
     {
         return surfaces_.load_surfaces( directory );
     }
@@ -82,10 +82,9 @@ namespace geode
 
     template < index_t dimension >
     void SurfacesBuilder< dimension >::set_surface_name(
-        const uuid& id, std::string name )
+        const uuid& id, absl::string_view name )
     {
-        surfaces_.modifiable_surface( id ).set_surface_name(
-            std::move( name ) );
+        surfaces_.modifiable_surface( id ).set_surface_name( name );
     }
 
     template < index_t dimension >
