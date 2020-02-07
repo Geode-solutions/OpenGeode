@@ -62,6 +62,6 @@ namespace geode
 
 #define IMPLEMENTATION_MEMBER( impl )                                          \
     class Impl;                                                                \
-    PImpl< Impl > impl
+    geode::PImpl< Impl > impl
 
 } // namespace geode
