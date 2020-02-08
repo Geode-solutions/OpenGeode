@@ -88,13 +88,12 @@ jobs:
       run: |
         mkdir -p build
         cd build
-        version="${GITHUB_REF##*/*/}"
+        $version = ${env:GITHUB_REF} -replace 'refs\/tags\/', ''
         echo ::set-output name=version::$version
         cmake -G "Visual Studio 15 2017 Win64" -DOPENGEODE_WITH_PYTHON:BOOL=ON -DOPENGEODE_WITH_TESTS:BOOL=OFF -DCPACK_PACKAGE_VERSION:STRING=$version -DCPACK_SYSTEM_NAME:STRING=win64 ..
         cmake --build . --config Release
         cd opengeode
         cmake --build . --target PACKAGE --config Release
-      shell: bash
     - name: Upload
       uses: softprops/action-gh-release@v1
       with:
