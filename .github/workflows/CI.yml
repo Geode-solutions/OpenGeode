@@ -125,8 +125,6 @@ jobs:
     - uses: actions/checkout@v1
     - name: Compile & Test
       run: |
-        $version = ${env:GITHUB_REF} -replace 'refs\/tags\/', ''
-        echo ::set-output name=version::$version
         mkdir -p build
         cd build
         cmake -G "Visual Studio 15 2017 Win64" -DOPENGEODE_WITH_PYTHON:BOOL=ON ..
