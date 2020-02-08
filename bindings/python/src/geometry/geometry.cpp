@@ -41,7 +41,7 @@ namespace pybind11
     } // namespace detail
 } // namespace pybind11
 
-PYBIND11_MODULE( OpenGeode_py_geometry, module )
+PYBIND11_MODULE( opengeode_py_geometry, module )
 {
     module.doc() = "OpenGeode Python binding for geometry";
     geode::define_point( module );

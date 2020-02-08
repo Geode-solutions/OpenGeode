@@ -20,6 +20,12 @@
 
 find_package(pybind11 REQUIRED CONFIG NO_DEFAULT_PATH PATHS ${PYBIND11_INSTALL_PREFIX})
 
+install(
+    DIRECTORY
+        ${PYBIND11_INSTALL_PREFIX}/
+    DESTINATION
+        .
+)
 add_subdirectory(src)
 
 if(OPENGEODE_WITH_TESTS)

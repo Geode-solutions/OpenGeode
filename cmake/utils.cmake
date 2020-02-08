@@ -269,6 +269,7 @@ function(add_geode_test)
 endfunction()
 
 function(add_geode_python_binding)
+    find_package(pybind11 REQUIRED)
     cmake_parse_arguments(GEODE_BINDING
         ""
         "NAME"
@@ -282,9 +283,11 @@ function(add_geode_python_binding)
     target_link_libraries(${GEODE_BINDING_NAME} 
         PRIVATE "${GEODE_BINDING_DEPENDENCIES}"
     )
+    string(TOLOWER ${PROJECT_NAME} project-name)
+    string(REGEX REPLACE "-" "_" project_name ${project-name})
     set_target_properties(${GEODE_BINDING_NAME}
         PROPERTIES
-            OUTPUT_NAME ${PROJECT_NAME}_${GEODE_BINDING_NAME}
+            OUTPUT_NAME ${project_name}_${GEODE_BINDING_NAME}
             CXX_VISIBILITY_PRESET "default"
             FOLDER "Bindings/Python"
     )

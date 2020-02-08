@@ -19,7 +19,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import OpenGeode_py_geometry as geom
+import opengeode_py_geometry as geom
 
 if __name__ == '__main__':
     search = geom.NNSearch2D( [geom.Point2D( [0.1, 4.2] ), geom.Point2D( [5.9, 7.3] ), geom.Point2D( [1.8, -5] ), geom.Point2D( [ -7.3, -1.6] )] )

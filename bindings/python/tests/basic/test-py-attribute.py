@@ -19,7 +19,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import OpenGeode_py_basic as basic
+import opengeode_py_basic as basic
 
 def test_constant_attribute( manager ):
     constant_attribute = manager.find_or_create_attribute_constant_bool( "bool", True )

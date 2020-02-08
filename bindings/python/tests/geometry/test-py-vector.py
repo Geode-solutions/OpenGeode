@@ -21,7 +21,7 @@
 
 import math
 
-import OpenGeode_py_geometry as geom
+import opengeode_py_geometry as geom
 
 def test_length():
     p = geom.Vector3D( [1, 2, 4] )

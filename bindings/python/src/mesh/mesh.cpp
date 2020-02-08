@@ -69,7 +69,7 @@ namespace pybind11
     } // namespace detail
 } // namespace pybind11
 
-PYBIND11_MODULE( OpenGeode_py_mesh, module )
+PYBIND11_MODULE( opengeode_py_mesh, module )
 {
     module.doc() = "OpenGeode Python binding for mesh";
     geode::define_vertex_set( module );
