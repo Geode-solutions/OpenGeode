@@ -19,9 +19,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import OpenGeode_py_basic as basic
-import OpenGeode_py_geometry as geom
-import OpenGeode_py_mesh as mesh
+import opengeode_py_basic as basic
+import opengeode_py_geometry as geom
+import opengeode_py_mesh as mesh
 
 def test_create_vertices( polyhedral_solid, builder ):
     builder.create_point( geom.Point3D( [ 0.1, 0.2, 0.3 ] ) )

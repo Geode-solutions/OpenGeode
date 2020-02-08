@@ -19,7 +19,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import OpenGeode_py_geometry as geom
+import opengeode_py_geometry as geom
 
 if __name__ == '__main__':
     box = geom.BoundingBox2D()

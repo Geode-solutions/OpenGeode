@@ -19,7 +19,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import OpenGeode_py_basic as basic
+import opengeode_py_basic as basic
 
 if __name__ == '__main__':
     id = basic.uuid()

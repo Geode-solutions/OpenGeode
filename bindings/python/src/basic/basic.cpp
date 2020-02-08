@@ -46,7 +46,7 @@ namespace pybind11
     } // namespace detail
 } // namespace pybind11
 
-PYBIND11_MODULE( OpenGeode_py_basic, module )
+PYBIND11_MODULE( opengeode_py_basic, module )
 {
     module.doc() = "OpenGeode Python binding for basic";
     module.attr( "NO_ID" ) = geode::NO_ID;

@@ -19,7 +19,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import OpenGeode_py_mesh as mesh
+import opengeode_py_mesh as mesh
 
 def test_create_vertices( graph, builder ):
     builder.create_vertex()

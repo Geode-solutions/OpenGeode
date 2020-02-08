@@ -19,8 +19,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import OpenGeode_py_basic as basic
-import OpenGeode_py_model as model
+import opengeode_py_basic as basic
+import opengeode_py_model as model
 
 def find_uuid_in_list( uuids, uuid ):
     for cur_uuid in uuids:

@@ -19,7 +19,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import OpenGeode_py_geometry as geom
+import opengeode_py_geometry as geom
 
 def test_comparison():
     p = geom.Point3D( [2, 1.0, 2.6] )
