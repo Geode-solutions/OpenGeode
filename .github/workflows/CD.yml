@@ -89,7 +89,7 @@ jobs:
         mkdir -p build
         cd build
         $version = ${env:GITHUB_REF} -replace 'refs\/tags\/', ''
-        echo ::set-output name=version::$version
+        echo "::set-output name=version::$version"
         cmake -G "Visual Studio 15 2017 Win64" -DOPENGEODE_WITH_PYTHON:BOOL=ON -DOPENGEODE_WITH_TESTS:BOOL=OFF -DCPACK_PACKAGE_VERSION:STRING=$version -DCPACK_SYSTEM_NAME:STRING=win64 ..
         cmake --build . --config Release
         cd opengeode
