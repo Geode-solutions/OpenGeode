@@ -285,7 +285,7 @@ jobs:
         key: spdlog-win64-${{ matrix.config }}-${{ hashFiles('cmake/ConfigureSpdlog.cmake') }}
     - name: Compile & Test
       run: |
-        if not exist build (mkdir build)
+        if(!(test-path build)) { mkdir build }
         cd build
         cmake -G "Visual Studio 15 2017 Win64" -DOPENGEODE_WITH_PYTHON:BOOL=ON ..
         cmake --build . --config ${{ matrix.config }}
