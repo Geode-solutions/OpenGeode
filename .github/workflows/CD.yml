@@ -17,42 +17,42 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Cache Abseil
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/abseil
         key: abseil-${{ matrix.config.system }}-Release-${{ hashFiles('cmake/ConfigureAbseil.cmake') }}
     - name: Cache Async++
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/asyncplusplus
         key: asyncplusplus-${{ matrix.config.system }}-Release-${{ hashFiles('cmake/ConfigureAsync++.cmake') }}
     - name: Cache Bitsery
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/bitsery
         key: bitsery-${{ matrix.config.system }}-Release-${{ hashFiles('cmake/ConfigureBitsery.cmake') }}
     - name: Cache Filesystem
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/ghcFilesystem
         key: ghcFilesystem-${{ matrix.config.system }}-Release-${{ hashFiles('cmake/ConfigureFilesystem.cmake') }}
     - name: Cache Minizip
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/minizip
         key: minizip-${{ matrix.config.system }}-Release-${{ hashFiles('cmake/ConfigureMinizip.cmake') }}
     - name: Cache Nanoflann
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/nanoflann
         key: nanoflann-${{ matrix.config.system }}-Release-${{ hashFiles('cmake/ConfigureNanoflann.cmake') }}
     - name: Cache Pybind11
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/pybind11
         key: pybind11-${{ matrix.config.system }}-Release-${{ hashFiles('cmake/ConfigurePybind11.cmake') }}
     - name: Cache Spdlog
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/spdlog
         key: spdlog-${{ matrix.config.system }}-Release-${{ hashFiles('cmake/ConfigureSpdlog.cmake') }}
@@ -93,42 +93,42 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Cache Abseil
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/abseil
         key: abseil-darwin-Release-${{ hashFiles('cmake/ConfigureAbseil.cmake') }}
     - name: Cache Async++
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/asyncplusplus
         key: asyncplusplus-darwin-Release-${{ hashFiles('cmake/ConfigureAsync++.cmake') }}
     - name: Cache Bitsery
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/bitsery
         key: bitsery-darwin-Release-${{ hashFiles('cmake/ConfigureBitsery.cmake') }}
     - name: Cache Filesystem
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/ghcFilesystem
         key: ghcFilesystem-darwin-Release-${{ hashFiles('cmake/ConfigureFilesystem.cmake') }}
     - name: Cache Minizip
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/minizip
         key: minizip-darwin-Release-${{ hashFiles('cmake/ConfigureMinizip.cmake') }}
     - name: Cache Nanoflann
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/nanoflann
         key: nanoflann-darwin-Release-${{ hashFiles('cmake/ConfigureNanoflann.cmake') }}
     - name: Cache Pybind11
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/pybind11
         key: pybind11-darwin-Release-${{ hashFiles('cmake/ConfigurePybind11.cmake') }}
     - name: Cache Spdlog
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/spdlog
         key: spdlog-darwin-Release-${{ hashFiles('cmake/ConfigureSpdlog.cmake') }}
@@ -159,47 +159,47 @@ jobs:
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       
   release-windows:
-    runs-on: windows-2016
+    runs-on: windows-2019
 
     steps:
     - uses: actions/checkout@v1
     - name: Cache Abseil
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/abseil
         key: abseil-win64-Release-${{ hashFiles('cmake/ConfigureAbseil.cmake') }}
     - name: Cache Async++
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/asyncplusplus
         key: asyncplusplus-win64-Release-${{ hashFiles('cmake/ConfigureAsync++.cmake') }}
     - name: Cache Bitsery
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/bitsery
         key: bitsery-win64-Release-${{ hashFiles('cmake/ConfigureBitsery.cmake') }}
     - name: Cache Filesystem
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/ghcFilesystem
         key: ghcFilesystem-win64-Release-${{ hashFiles('cmake/ConfigureFilesystem.cmake') }}
     - name: Cache Minizip
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/minizip
         key: minizip-win64-Release-${{ hashFiles('cmake/ConfigureMinizip.cmake') }}
     - name: Cache Nanoflann
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/nanoflann
         key: nanoflann-win64-Release-${{ hashFiles('cmake/ConfigureNanoflann.cmake') }}
     - name: Cache Pybind11
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/pybind11
         key: pybind11-win64-Release-${{ hashFiles('cmake/ConfigurePybind11.cmake') }}
     - name: Cache Spdlog
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/spdlog
         key: spdlog-win64-Release-${{ hashFiles('cmake/ConfigureSpdlog.cmake') }}
