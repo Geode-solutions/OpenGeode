@@ -41,7 +41,7 @@ namespace geode
             for( const auto i : Range{ dimension } )
             {
                 min_.set_value( i, std::numeric_limits< double >::max() );
-                max_.set_value( i, std::numeric_limits< double >::min() );
+                max_.set_value( i, std::numeric_limits< double >::lowest() );
             }
         }
 
