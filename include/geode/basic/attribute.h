@@ -412,6 +412,7 @@ namespace geode
             std::vector< bool > to_keep( to_delete );
             to_keep.flip();
             values_ = extract_vector_elements( to_keep, values_ );
+            reserve( 10 );
         }
 
     private:
@@ -536,6 +537,7 @@ namespace geode
             std::vector< bool > to_keep( to_delete );
             to_keep.flip();
             values_ = extract_vector_elements( to_keep, values_ );
+            reserve( 10 );
         }
 
     private:
