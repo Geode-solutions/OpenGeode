@@ -31,42 +31,42 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Cache Abseil
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/abseil
         key: abseil-${{ matrix.config.system }}-${{ matrix.config.build_type }}-${{ hashFiles('cmake/ConfigureAbseil.cmake') }}
     - name: Cache Async++
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/asyncplusplus
         key: asyncplusplus-${{ matrix.config.system }}-${{ matrix.config.build_type }}-${{ hashFiles('cmake/ConfigureAsync++.cmake') }}
     - name: Cache Bitsery
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/bitsery
         key: bitsery-${{ matrix.config.system }}-${{ matrix.config.build_type }}-${{ hashFiles('cmake/ConfigureBitsery.cmake') }}
     - name: Cache Filesystem
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/ghcFilesystem
         key: ghcFilesystem-${{ matrix.config.system }}-${{ matrix.config.build_type }}-${{ hashFiles('cmake/ConfigureFilesystem.cmake') }}
     - name: Cache Minizip
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/minizip
         key: minizip-${{ matrix.config.system }}-${{ matrix.config.build_type }}-${{ hashFiles('cmake/ConfigureMinizip.cmake') }}
     - name: Cache Nanoflann
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/nanoflann
         key: nanoflann-${{ matrix.config.system }}-${{ matrix.config.build_type }}-${{ hashFiles('cmake/ConfigureNanoflann.cmake') }}
     - name: Cache Pybind11
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/pybind11
         key: pybind11-${{ matrix.config.system }}-${{ matrix.config.build_type }}-${{ hashFiles('cmake/ConfigurePybind11.cmake') }}
     - name: Cache Spdlog
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/spdlog
         key: spdlog-${{ matrix.config.system }}-${{ matrix.config.build_type }}-${{ hashFiles('cmake/ConfigureSpdlog.cmake') }}
@@ -108,42 +108,42 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Cache Abseil
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/abseil
         key: abseil-ubuntu-Debug-${{ hashFiles('cmake/ConfigureAbseil.cmake') }}
     - name: Cache Async++
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/asyncplusplus
         key: asyncplusplus-ubuntu-Debug-${{ hashFiles('cmake/ConfigureAsync++.cmake') }}
     - name: Cache Bitsery
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/bitsery
         key: bitsery-ubuntu-Debug-${{ hashFiles('cmake/ConfigureBitsery.cmake') }}
     - name: Cache Filesystem
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/ghcFilesystem
         key: ghcFilesystem-ubuntu-Debug-${{ hashFiles('cmake/ConfigureFilesystem.cmake') }}
     - name: Cache Minizip
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/minizip
         key: minizip-ubuntu-Debug-${{ hashFiles('cmake/ConfigureMinizip.cmake') }}
     - name: Cache Nanoflann
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/nanoflann
         key: nanoflann-ubuntu-Debug-${{ hashFiles('cmake/ConfigureNanoflann.cmake') }}
     - name: Cache Pybind11
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/pybind11
         key: pybind11-ubuntu-Debug-${{ hashFiles('cmake/ConfigurePybind11.cmake') }}
     - name: Cache Spdlog
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/spdlog
         key: spdlog-ubuntu-Debug-${{ hashFiles('cmake/ConfigureSpdlog.cmake') }}
@@ -178,42 +178,42 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Cache Abseil
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/abseil
         key: abseil-darwin-${{ matrix.config }}-${{ hashFiles('cmake/ConfigureAbseil.cmake') }}
     - name: Cache Async++
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/asyncplusplus
         key: asyncplusplus-darwin-${{ matrix.config }}-${{ hashFiles('cmake/ConfigureAsync++.cmake') }}
     - name: Cache Bitsery
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/bitsery
         key: bitsery-darwin-${{ matrix.config }}-${{ hashFiles('cmake/ConfigureBitsery.cmake') }}
     - name: Cache Filesystem
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/ghcFilesystem
         key: ghcFilesystem-darwin-${{ matrix.config }}-${{ hashFiles('cmake/ConfigureFilesystem.cmake') }}
     - name: Cache Minizip
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/minizip
         key: minizip-darwin-${{ matrix.config }}-${{ hashFiles('cmake/ConfigureMinizip.cmake') }}
     - name: Cache Nanoflann
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/nanoflann
         key: nanoflann-darwin-${{ matrix.config }}-${{ hashFiles('cmake/ConfigureNanoflann.cmake') }}
     - name: Cache Pybind11
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/pybind11
         key: pybind11-darwin-${{ matrix.config }}-${{ hashFiles('cmake/ConfigurePybind11.cmake') }}
     - name: Cache Spdlog
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/spdlog
         key: spdlog-darwin-${{ matrix.config }}-${{ hashFiles('cmake/ConfigureSpdlog.cmake') }}
@@ -235,7 +235,7 @@ jobs:
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
   build-windows:
-    runs-on: windows-2016
+    runs-on: windows-2019
     needs: format
     strategy:
       matrix:
@@ -244,42 +244,42 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Cache Abseil
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/abseil
         key: abseil-win64-${{ matrix.config }}-${{ hashFiles('cmake/ConfigureAbseil.cmake') }}
     - name: Cache Async++
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/asyncplusplus
         key: asyncplusplus-win64-${{ matrix.config }}-${{ hashFiles('cmake/ConfigureAsync++.cmake') }}
     - name: Cache Bitsery
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/bitsery
         key: bitsery-win64-${{ matrix.config }}-${{ hashFiles('cmake/ConfigureBitsery.cmake') }}
     - name: Cache Filesystem
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/ghcFilesystem
         key: ghcFilesystem-win64-${{ matrix.config }}-${{ hashFiles('cmake/ConfigureFilesystem.cmake') }}
     - name: Cache Minizip
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/minizip
         key: minizip-win64-${{ matrix.config }}-${{ hashFiles('cmake/ConfigureMinizip.cmake') }}
     - name: Cache Nanoflann
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/nanoflann
         key: nanoflann-win64-${{ matrix.config }}-${{ hashFiles('cmake/ConfigureNanoflann.cmake') }}
     - name: Cache Pybind11
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/pybind11
         key: pybind11-win64-${{ matrix.config }}-${{ hashFiles('cmake/ConfigurePybind11.cmake') }}
     - name: Cache Spdlog
-      uses: actions/cache@v1.0.3
+      uses: actions/cache@v1
       with:
         path: build/third_party/spdlog
         key: spdlog-win64-${{ matrix.config }}-${{ hashFiles('cmake/ConfigureSpdlog.cmake') }}
