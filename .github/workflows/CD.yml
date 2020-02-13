@@ -206,7 +206,7 @@ jobs:
     - name: Generate package
       id: package
       run: |
-        mkdir -p build
+        if not exist build mkdir build
         cd build
         $version = ${env:GITHUB_REF} -replace 'refs\/tags\/', ''
         echo "::set-output name=version::$version"
