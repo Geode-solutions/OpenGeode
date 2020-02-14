@@ -65,7 +65,6 @@ namespace geode
 
         void operator++()
         {
-            // ++iter_;
             next_operator_( iter_ );
         }
 
