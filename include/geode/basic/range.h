@@ -29,11 +29,32 @@
 
 namespace geode
 {
+    template < typename Type >
+    class IncrementOperator
+    {
+    public:
+        void operator()( Type& value ) const
+        {
+            value++;
+        }
+    };
+
+    template < typename Type >
+    class DecrementOperator
+    {
+    public:
+        void operator()( Type& value ) const
+        {
+            value--;
+        }
+    };
+
     /*!
      * Base class for range-based iteration on custom range.
      * See derived classes for usage.
      */
-    template < typename Type >
+    template < typename Type,
+        typename NextOperator = IncrementOperator< Type > >
     class BaseRange
     {
     public:
@@ -44,7 +65,8 @@ namespace geode
 
         void operator++()
         {
-            ++iter_;
+            // ++iter_;
+            next_operator_( iter_ );
         }
 
         Type current() const
@@ -63,6 +85,7 @@ namespace geode
     private:
         Type iter_;
         Type last_;
+        NextOperator next_operator_;
     };
 
     /*!
@@ -104,7 +127,8 @@ namespace geode
      *      // do something
      *    }
      */
-    class Range : public BaseRange< index_t >, public BeginEnd< Range >
+    class Range : public BaseRange< index_t, IncrementOperator< index_t > >,
+                  public BeginEnd< Range >
     {
     public:
         template < typename T1, typename T2 >
@@ -114,6 +138,28 @@ namespace geode
 
         template < typename T >
         explicit Range( T end ) : Range( 0, end )
+        {
+        }
+
+        index_t operator*() const
+        {
+            return current();
+        }
+    };
+
+    class ReverseRange
+        : public BaseRange< index_t, DecrementOperator< index_t > >,
+          public BeginEnd< ReverseRange >
+    {
+    public:
+        template < typename T1, typename T2 >
+        ReverseRange( T1 begin, T2 end )
+            : BaseRange( begin - 1, end - 1 ), BeginEnd( *this )
+        {
+        }
+
+        template < typename T >
+        explicit ReverseRange( T begin ) : ReverseRange( begin, 0 )
         {
         }
 
