@@ -22,9 +22,10 @@ set(BITSERY_PATH ${PROJECT_BINARY_DIR}/third_party/bitsery)
 set(BITSERY_INSTALL_PREFIX ${BITSERY_PATH}/install)
 ExternalProject_Add(bitsery
     PREFIX ${BITSERY_PATH}
-    GIT_REPOSITORY https://github.com/Geode-solutions/bitsery
-    GIT_TAG 12b6807cb1fa40a5cff18ecf59a7b05d35573d30
+    GIT_REPOSITORY https://github.com/fraillt/bitsery
+    GIT_TAG d24dfe14f5a756c0f8ad3d56ae6949ecc2c99b2e
     GIT_PROGRESS ON
+    PATCH_COMMAND git apply ${BITSERY_PATH}/src/patches/centos7_gcc4.8.2.diff
     CMAKE_GENERATOR ${CMAKE_GENERATOR}
     CMAKE_GENERATOR_PLATFORM ${CMAKE_GENERATOR_PLATFORM}
     CMAKE_ARGS
