@@ -54,6 +54,8 @@ namespace geode
 
         bool contains( const Point< dimension >& point ) const;
 
+        bool intersects( const BoundingBox< dimension >& bbox ) const;
+
         const Point< dimension >& min() const;
 
         const Point< dimension >& max() const;
