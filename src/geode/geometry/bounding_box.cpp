@@ -155,6 +155,24 @@ namespace geode
         return true;
     }
 
+    template < index_t dimension >
+    bool BoundingBox< dimension >::intersects(
+        const BoundingBox< dimension >& box ) const
+    {
+        for( const auto i : Range{ dimension } )
+        {
+            if( max().value( i ) < box.min().value( i ) )
+            {
+                return false;
+            }
+            if( min().value( i ) > box.max().value( i ) )
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
     template class opengeode_geometry_api BoundingBox< 2 >;
     template class opengeode_geometry_api BoundingBox< 3 >;
 } // namespace geode

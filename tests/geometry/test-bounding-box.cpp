@@ -50,16 +50,13 @@ void test()
         "[Test] Error in BoundingBox union computation" );
 
     geode::BoundingBox2D box3{ box };
-    box3.add_point( { { -2, -2 } } );
-    box3.add_point( { { -1, -1 } } );
-    OPENGEODE_EXCEPTION( box3.min() == geode::Point2D( { -2, -2 } ),
-        "[Test] Error in BoundingBox initialization and point additions" );
-    OPENGEODE_EXCEPTION( box3.max() == geode::Point2D( { 1, 1 } ),
-        "[Test] Error in BoundingBox initialization and point additions" );
-
-    OPENGEODE_EXCEPTION( box2.contains( { { 0, 0 } } ),
+    box3.add_point( { { 2, 2 } } );
+    box3.add_point( { { 3, 3 } } );
+    OPENGEODE_EXCEPTION(
+        !box.intersects( box3 ), "[Test] BBox should not overlap" );
+    OPENGEODE_EXCEPTION( box3.contains( { { 0, 0 } } ),
         "[Test] BBox should contain this point" );
-    OPENGEODE_EXCEPTION( !box2.contains( { { 10, 0 } } ),
+    OPENGEODE_EXCEPTION( !box3.contains( { { 10, 0 } } ),
         "[Test] BBox should not contain this point" );
 
     const geode::BoundingBox2D copy_box = box2;
