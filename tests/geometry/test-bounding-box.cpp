@@ -54,7 +54,7 @@ void test()
     box3.add_point( { { 3, 3 } } );
     OPENGEODE_EXCEPTION(
         !box.intersects( box3 ), "[Test] BBox should not overlap" );
-    OPENGEODE_EXCEPTION( box3.contains( { { 0, 0 } } ),
+    OPENGEODE_EXCEPTION( box3.contains( { { 2.5, 2.5 } } ),
         "[Test] BBox should contain this point" );
     OPENGEODE_EXCEPTION( !box3.contains( { { 10, 0 } } ),
         "[Test] BBox should not contain this point" );
