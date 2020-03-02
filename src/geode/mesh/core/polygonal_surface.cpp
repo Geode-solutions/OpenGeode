@@ -470,7 +470,7 @@ namespace geode
     PolygonEdge PolygonalSurfaceBase< dimension >::next_on_border(
         const PolygonEdge& polygon_edge ) const
     {
-        OPENGEODE_ASSERT( is_edge_on_border( polygon_edge ),
+        OPENGEODE_EXCEPTION( is_edge_on_border( polygon_edge ),
             "[PolygonalSurfaceBase::next_on_border] Polygon edge should be on "
             "border" );
         auto next_border = next_polygon_edge( polygon_edge );
@@ -486,7 +486,7 @@ namespace geode
     PolygonEdge PolygonalSurfaceBase< dimension >::previous_on_border(
         const PolygonEdge& polygon_edge ) const
     {
-        OPENGEODE_ASSERT( is_edge_on_border( polygon_edge ),
+        OPENGEODE_EXCEPTION( is_edge_on_border( polygon_edge ),
             "[PolygonalSurfaceBase::previous_on_border] Polygon edge should be "
             "on border" );
         auto previous_border = previous_polygon_edge( polygon_edge );
