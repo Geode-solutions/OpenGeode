@@ -31,6 +31,8 @@
         module, name##dimension.c_str() )                                      \
         .def( pybind11::init<>() )                                             \
         .def( pybind11::init< std::array< double, dimension > >() )            \
+        .def( pybind11::init< const Point##dimension##D&,                      \
+            const Point##dimension##D& >() )                                   \
         .def( "length", &Vector##dimension##D::length )                        \
         .def( "length2", &Vector##dimension##D::length2 )                      \
         .def( "normalize", &Vector##dimension##D::normalize )                  \
