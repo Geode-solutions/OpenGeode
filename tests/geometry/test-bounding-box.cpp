@@ -60,8 +60,8 @@ void test()
         "[Test] BBox should not contain this point" );
 
     geode::BoundingBox2D box_negative;
-    box3.add_point( { { -2, -2 } } );
-    box3.add_point( { { -1, -1 } } );
+    box_negative.add_point( { { -2, -2 } } );
+    box_negative.add_point( { { -1, -1 } } );
     OPENGEODE_EXCEPTION( box_negative.min() == geode::Point2D( { -2, -2 } ),
         "[Test] Error in BoundingBox initialization and point additions" );
     OPENGEODE_EXCEPTION( box_negative.max() == geode::Point2D( { -1, -1 } ),
