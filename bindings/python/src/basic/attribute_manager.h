@@ -51,6 +51,8 @@ namespace geode
         pybind11::class_< AttributeManager > manager(
             module, "AttributeManager" );
         manager.def( pybind11::init<>() )
+            .def( "find_generic_attribute",
+                &AttributeManager::find_generic_attribute )
             .def( "attribute_names", &AttributeManager::attribute_names )
             .def( "attribute_type", &AttributeManager::attribute_type )
             .def( "attribute_exists", &AttributeManager::attribute_exists )
