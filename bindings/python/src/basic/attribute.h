@@ -25,7 +25,7 @@
 
 #define PYTHON_ATTRIBUTE_CLASS( type, name )                                   \
     const auto read##name = std::string{ "ReadOnlyAttribute" } + #name;        \
-    pybind11::class_< ReadOnlyAttribute< type >,                               \
+    pybind11::class_< ReadOnlyAttribute< type >, AttributeBase,                \
         std::shared_ptr< ReadOnlyAttribute< type > > >(                        \
         module, read##name.c_str() )                                           \
         .def( "value", &ReadOnlyAttribute< type >::value );                    \
@@ -55,6 +55,9 @@ namespace geode
 {
     void define_attributes( pybind11::module& module )
     {
+        pybind11::class_< AttributeBase, std::shared_ptr< AttributeBase > >(
+            module, "AttributeBase" )
+            .def( "generic_value", &AttributeBase::generic_value );
         PYTHON_ATTRIBUTE_CLASS( bool, Bool );
         PYTHON_ATTRIBUTE_CLASS( int, Int );
         PYTHON_ATTRIBUTE_CLASS( unsigned int, UInt );
