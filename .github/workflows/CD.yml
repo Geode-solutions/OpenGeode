@@ -26,11 +26,6 @@ jobs:
       with:
         path: build/third_party/asyncplusplus
         key: asyncplusplus-${{ matrix.config.system }}-Release-${{ hashFiles('cmake/ConfigureAsync++.cmake') }}
-    - name: Cache Bitsery
-      uses: actions/cache@v1.0.3
-      with:
-        path: build/third_party/bitsery
-        key: bitsery-${{ matrix.config.system }}-Release-${{ hashFiles('cmake/ConfigureBitsery.cmake') }}
     - name: Cache Filesystem
       uses: actions/cache@v1.0.3
       with:
@@ -102,11 +97,6 @@ jobs:
       with:
         path: build/third_party/asyncplusplus
         key: asyncplusplus-darwin-Release-${{ hashFiles('cmake/ConfigureAsync++.cmake') }}
-    - name: Cache Bitsery
-      uses: actions/cache@v1.0.3
-      with:
-        path: build/third_party/bitsery
-        key: bitsery-darwin-Release-${{ hashFiles('cmake/ConfigureBitsery.cmake') }}
     - name: Cache Filesystem
       uses: actions/cache@v1.0.3
       with:
@@ -173,11 +163,6 @@ jobs:
       with:
         path: build/third_party/asyncplusplus
         key: asyncplusplus-win64-Release-${{ hashFiles('cmake/ConfigureAsync++.cmake') }}
-    - name: Cache Bitsery
-      uses: actions/cache@v1.0.3
-      with:
-        path: build/third_party/bitsery
-        key: bitsery-win64-Release-${{ hashFiles('cmake/ConfigureBitsery.cmake') }}
     - name: Cache Filesystem
       uses: actions/cache@v1.0.3
       with:
