@@ -39,6 +39,12 @@
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/common.h>
 #include <geode/basic/detail/mapping_after_deletion.h>
+#include <geode/basic/passkey.h>
+
+namespace geode
+{
+    class AttributeManager;
+} // namespace geode
 
 namespace geode
 {
@@ -117,8 +123,10 @@ namespace geode
     class AttributeBase
     {
         OPENGEODE_DISABLE_COPY( AttributeBase );
-        friend class AttributeManager;
         friend class bitsery::Access;
+
+    public:
+        PASSKEY( AttributeManager, AttributeKey );
 
     public:
         virtual ~AttributeBase() = default;
@@ -130,6 +138,24 @@ namespace geode
 
         virtual float generic_value( index_t element ) const = 0;
 
+        virtual absl::string_view type() = 0;
+
+        virtual void resize( index_t size, AttributeKey /*unused*/ ) = 0;
+
+        virtual void reserve( index_t capacity, AttributeKey /*unused*/ ) = 0;
+
+        virtual void delete_elements(
+            const std::vector< bool >& to_delete, AttributeKey /*unused*/ ) = 0;
+
+        virtual void compute_value( index_t from_element,
+            index_t to_element,
+            AttributeKey /*unused*/ ) = 0;
+
+        virtual void compute_value(
+            const AttributeLinearInterpolation& interpolation,
+            index_t to_element,
+            AttributeKey /*unused*/ ) = 0;
+
     private:
         template < typename Archive >
         void serialize( Archive& archive )
@@ -137,22 +163,6 @@ namespace geode
             archive.ext( *this, DefaultGrowable< Archive, AttributeBase >{},
                 []( Archive& /*unused*/, AttributeBase& /*unused*/ ) {} );
         }
-
-        virtual void resize( index_t size ) = 0;
-
-        virtual void reserve( index_t capacity ) = 0;
-
-        virtual absl::string_view type() = 0;
-
-        virtual void delete_elements(
-            const std::vector< bool >& to_delete ) = 0;
-
-        virtual void compute_value(
-            index_t from_element, index_t to_element ) = 0;
-
-        virtual void compute_value(
-            const AttributeLinearInterpolation& interpolation,
-            index_t to_element ) = 0;
 
     protected:
         AttributeBase() = default;
@@ -204,9 +214,13 @@ namespace geode
     class ConstantAttribute : public ReadOnlyAttribute< T >
     {
         friend class bitsery::Access;
-        friend class AttributeManager;
 
     public:
+        ConstantAttribute( T value, AttributeBase::AttributeKey /*unused*/ )
+            : ConstantAttribute( std::move( value ) )
+        {
+        }
+
         const T& value( index_t /*unused*/ ) const override
         {
             return value_;
@@ -233,10 +247,15 @@ namespace geode
             modifier( value_ );
         }
 
-        void compute_value( index_t /*unused*/, index_t /*unused*/ ) override {}
+        void compute_value( index_t /*unused*/,
+            index_t /*unused*/,
+            AttributeBase::AttributeKey /*unused*/ ) override
+        {
+        }
 
         void compute_value( const AttributeLinearInterpolation& /*unused*/,
-            index_t /*unused*/ ) override
+            index_t /*unused*/,
+            AttributeBase::AttributeKey /*unused*/ ) override
         {
         }
 
@@ -261,11 +280,6 @@ namespace geode
         }
 
     private:
-        static ConstantAttribute* create( T value )
-        {
-            return new ConstantAttribute{ std::move( value ) };
-        }
-
         ConstantAttribute( T value )
         {
             set_value( std::move( value ) );
@@ -285,11 +299,18 @@ namespace geode
                 } );
         }
 
-        void resize( index_t /*unused*/ ) override {}
+        void resize( index_t /*unused*/,
+            AttributeBase::AttributeKey /*unused*/ ) override
+        {
+        }
 
-        void reserve( index_t /*unused*/ ) override {}
+        void reserve( index_t /*unused*/,
+            AttributeBase::AttributeKey /*unused*/ ) override
+        {
+        }
 
-        void delete_elements( const std::vector< bool >& /*unused*/ ) override
+        void delete_elements( const std::vector< bool >& /*unused*/,
+            AttributeBase::AttributeKey /*unused*/ ) override
         {
         }
 
@@ -304,9 +325,14 @@ namespace geode
     class VariableAttribute : public ReadOnlyAttribute< T >
     {
         friend class bitsery::Access;
-        friend class AttributeManager;
 
     public:
+        VariableAttribute(
+            T default_value, AttributeBase::AttributeKey /*unused*/ )
+            : VariableAttribute( std::move( default_value ) )
+        {
+        }
+
         const T& value( index_t element ) const override
         {
             return values_.at( element );
@@ -328,13 +354,16 @@ namespace geode
             modifier( values_.at( element ) );
         }
 
-        void compute_value( index_t from_element, index_t to_element ) override
+        void compute_value( index_t from_element,
+            index_t to_element,
+            AttributeBase::AttributeKey /*unused*/ ) override
         {
             set_value( to_element, value( from_element ) );
         }
 
         void compute_value( const AttributeLinearInterpolation& interpolation,
-            index_t to_element ) override
+            index_t to_element,
+            AttributeBase::AttributeKey /*unused*/ ) override
         {
             set_value( to_element, interpolation.compute_value( *this ) );
         }
@@ -365,15 +394,10 @@ namespace geode
         }
 
     protected:
-        static VariableAttribute* create( T default_value )
-        {
-            return new VariableAttribute{ std::move( default_value ) };
-        }
-
         VariableAttribute( T default_value )
             : default_value_( std::move( default_value ) )
         {
-            reserve( 10 );
+            values_.reserve( 10 );
         }
 
         VariableAttribute() = default;
@@ -393,7 +417,8 @@ namespace geode
                 } );
         }
 
-        void resize( index_t size ) override
+        void resize(
+            index_t size, AttributeBase::AttributeKey /*unused*/ ) override
         {
             const auto capacity = values_.capacity();
             values_.reserve(
@@ -402,17 +427,19 @@ namespace geode
             values_.resize( size, default_value_ );
         }
 
-        void reserve( index_t capacity ) override
+        void reserve(
+            index_t capacity, AttributeBase::AttributeKey /*unused*/ ) override
         {
             values_.reserve( capacity );
         }
 
-        void delete_elements( const std::vector< bool >& to_delete ) override
+        void delete_elements( const std::vector< bool >& to_delete,
+            AttributeBase::AttributeKey /*unused*/ ) override
         {
             std::vector< bool > to_keep( to_delete );
             to_keep.flip();
             values_ = extract_vector_elements( to_keep, values_ );
-            reserve( 10 );
+            values_.reserve( 10 );
         }
 
     private:
@@ -429,9 +456,14 @@ namespace geode
     class VariableAttribute< bool > : public ReadOnlyAttribute< bool >
     {
         friend class bitsery::Access;
-        friend class AttributeManager;
 
     public:
+        VariableAttribute(
+            bool default_value, AttributeBase::AttributeKey /*unused*/ )
+            : VariableAttribute( default_value )
+        {
+        }
+
         const bool& value( index_t element ) const override
         {
             return reinterpret_cast< const bool& >( values_.at( element ) );
@@ -453,13 +485,16 @@ namespace geode
             modifier( reinterpret_cast< bool& >( values_.at( element ) ) );
         }
 
-        void compute_value( index_t from_element, index_t to_element ) override
+        void compute_value( index_t from_element,
+            index_t to_element,
+            AttributeBase::AttributeKey /*unused*/ ) override
         {
             set_value( to_element, value( from_element ) );
         }
 
         void compute_value( const AttributeLinearInterpolation& interpolation,
-            index_t to_element ) override
+            index_t to_element,
+            AttributeBase::AttributeKey /*unused*/ ) override
         {
             set_value( to_element, interpolation.compute_value( *this ) );
         }
@@ -491,15 +526,10 @@ namespace geode
         }
 
     protected:
-        static VariableAttribute* create( bool default_value )
-        {
-            return new VariableAttribute{ std::move( default_value ) };
-        }
-
         VariableAttribute( bool default_value )
             : default_value_( default_value )
         {
-            reserve( 10 );
+            values_.reserve( 10 );
         }
 
         VariableAttribute() = default;
@@ -518,7 +548,8 @@ namespace geode
                 } );
         }
 
-        void resize( index_t size ) override
+        void resize(
+            index_t size, AttributeBase::AttributeKey /*unused*/ ) override
         {
             const auto capacity = values_.capacity();
             values_.reserve(
@@ -527,17 +558,19 @@ namespace geode
             values_.resize( size, default_value_ );
         }
 
-        void reserve( index_t capacity ) override
+        void reserve(
+            index_t capacity, AttributeBase::AttributeKey /*unused*/ ) override
         {
             values_.reserve( capacity );
         }
 
-        void delete_elements( const std::vector< bool >& to_delete ) override
+        void delete_elements( const std::vector< bool >& to_delete,
+            AttributeBase::AttributeKey /*unused*/ ) override
         {
             std::vector< bool > to_keep( to_delete );
             to_keep.flip();
             values_ = extract_vector_elements( to_keep, values_ );
-            reserve( 10 );
+            values_.reserve( 10 );
         }
 
     private:
@@ -553,9 +586,14 @@ namespace geode
     class SparseAttribute : public ReadOnlyAttribute< T >
     {
         friend class bitsery::Access;
-        friend class AttributeManager;
 
     public:
+        SparseAttribute(
+            T default_value, AttributeBase::AttributeKey /*unused*/ )
+            : SparseAttribute( std::move( default_value ) )
+        {
+        }
+
         const T& value( index_t element ) const override
         {
             const auto it = values_.find( element );
@@ -587,13 +625,16 @@ namespace geode
             modifier( values_[element] );
         }
 
-        void compute_value( index_t from_element, index_t to_element ) override
+        void compute_value( index_t from_element,
+            index_t to_element,
+            AttributeBase::AttributeKey /*unused*/ ) override
         {
             set_value( to_element, value( from_element ) );
         }
 
         void compute_value( const AttributeLinearInterpolation& interpolation,
-            index_t to_element ) override
+            index_t to_element,
+            AttributeBase::AttributeKey /*unused*/ ) override
         {
             set_value( to_element, interpolation.compute_value( *this ) );
         }
@@ -626,15 +667,10 @@ namespace geode
         }
 
     private:
-        static SparseAttribute* create( T default_value )
-        {
-            return new SparseAttribute{ std::move( default_value ) };
-        }
-
         SparseAttribute( T default_value )
             : default_value_( std::move( default_value ) )
         {
-            reserve( 10 );
+            values_.reserve( 10 );
         }
 
         SparseAttribute() = default;
@@ -657,14 +693,19 @@ namespace geode
                 } );
         }
 
-        void resize( index_t /*unused*/ ) override {}
+        void resize( index_t /*unused*/,
+            AttributeBase::AttributeKey /*unused*/ ) override
+        {
+        }
 
-        void reserve( index_t capacity ) override
+        void reserve(
+            index_t capacity, AttributeBase::AttributeKey /*unused*/ ) override
         {
             values_.reserve( capacity );
         }
 
-        void delete_elements( const std::vector< bool >& to_delete ) override
+        void delete_elements( const std::vector< bool >& to_delete,
+            AttributeBase::AttributeKey /*unused*/ ) override
         {
             const auto old2new = detail::mapping_after_deletion( to_delete );
             const auto old_values = values_;

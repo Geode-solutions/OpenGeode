@@ -40,6 +40,7 @@ add_geode_library(
         "factory.h"
         "logger.h"
         "named_type.h"
+        "passkey.h"
         "pimpl.h"
         "pimpl_impl.h"
         "range.h"
