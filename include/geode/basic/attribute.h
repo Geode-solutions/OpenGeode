@@ -140,21 +140,20 @@ namespace geode
 
         virtual absl::string_view type() = 0;
 
-        virtual void resize( index_t size, AttributeKey /*unused*/ ) = 0;
+        virtual void resize( index_t size, AttributeKey ) = 0;
 
-        virtual void reserve( index_t capacity, AttributeKey /*unused*/ ) = 0;
+        virtual void reserve( index_t capacity, AttributeKey ) = 0;
 
         virtual void delete_elements(
-            const std::vector< bool >& to_delete, AttributeKey /*unused*/ ) = 0;
+            const std::vector< bool >& to_delete, AttributeKey ) = 0;
 
-        virtual void compute_value( index_t from_element,
-            index_t to_element,
-            AttributeKey /*unused*/ ) = 0;
+        virtual void compute_value(
+            index_t from_element, index_t to_element, AttributeKey ) = 0;
 
         virtual void compute_value(
             const AttributeLinearInterpolation& interpolation,
             index_t to_element,
-            AttributeKey /*unused*/ ) = 0;
+            AttributeKey ) = 0;
 
     private:
         template < typename Archive >
@@ -216,7 +215,7 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        ConstantAttribute( T value, AttributeBase::AttributeKey /*unused*/ )
+        ConstantAttribute( T value, AttributeBase::AttributeKey )
             : ConstantAttribute( std::move( value ) )
         {
         }
@@ -249,13 +248,13 @@ namespace geode
 
         void compute_value( index_t /*unused*/,
             index_t /*unused*/,
-            AttributeBase::AttributeKey /*unused*/ ) override
+            AttributeBase::AttributeKey ) override
         {
         }
 
         void compute_value( const AttributeLinearInterpolation& /*unused*/,
             index_t /*unused*/,
-            AttributeBase::AttributeKey /*unused*/ ) override
+            AttributeBase::AttributeKey ) override
         {
         }
 
@@ -299,18 +298,16 @@ namespace geode
                 } );
         }
 
-        void resize( index_t /*unused*/,
-            AttributeBase::AttributeKey /*unused*/ ) override
+        void resize( index_t /*unused*/, AttributeBase::AttributeKey ) override
         {
         }
 
-        void reserve( index_t /*unused*/,
-            AttributeBase::AttributeKey /*unused*/ ) override
+        void reserve( index_t /*unused*/, AttributeBase::AttributeKey ) override
         {
         }
 
         void delete_elements( const std::vector< bool >& /*unused*/,
-            AttributeBase::AttributeKey /*unused*/ ) override
+            AttributeBase::AttributeKey ) override
         {
         }
 
@@ -327,8 +324,7 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        VariableAttribute(
-            T default_value, AttributeBase::AttributeKey /*unused*/ )
+        VariableAttribute( T default_value, AttributeBase::AttributeKey )
             : VariableAttribute( std::move( default_value ) )
         {
         }
@@ -356,14 +352,14 @@ namespace geode
 
         void compute_value( index_t from_element,
             index_t to_element,
-            AttributeBase::AttributeKey /*unused*/ ) override
+            AttributeBase::AttributeKey ) override
         {
             set_value( to_element, value( from_element ) );
         }
 
         void compute_value( const AttributeLinearInterpolation& interpolation,
             index_t to_element,
-            AttributeBase::AttributeKey /*unused*/ ) override
+            AttributeBase::AttributeKey ) override
         {
             set_value( to_element, interpolation.compute_value( *this ) );
         }
@@ -417,8 +413,7 @@ namespace geode
                 } );
         }
 
-        void resize(
-            index_t size, AttributeBase::AttributeKey /*unused*/ ) override
+        void resize( index_t size, AttributeBase::AttributeKey ) override
         {
             const auto capacity = values_.capacity();
             values_.reserve(
@@ -427,14 +422,13 @@ namespace geode
             values_.resize( size, default_value_ );
         }
 
-        void reserve(
-            index_t capacity, AttributeBase::AttributeKey /*unused*/ ) override
+        void reserve( index_t capacity, AttributeBase::AttributeKey ) override
         {
             values_.reserve( capacity );
         }
 
         void delete_elements( const std::vector< bool >& to_delete,
-            AttributeBase::AttributeKey /*unused*/ ) override
+            AttributeBase::AttributeKey ) override
         {
             std::vector< bool > to_keep( to_delete );
             to_keep.flip();
@@ -458,8 +452,7 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        VariableAttribute(
-            bool default_value, AttributeBase::AttributeKey /*unused*/ )
+        VariableAttribute( bool default_value, AttributeBase::AttributeKey )
             : VariableAttribute( default_value )
         {
         }
@@ -487,14 +480,14 @@ namespace geode
 
         void compute_value( index_t from_element,
             index_t to_element,
-            AttributeBase::AttributeKey /*unused*/ ) override
+            AttributeBase::AttributeKey ) override
         {
             set_value( to_element, value( from_element ) );
         }
 
         void compute_value( const AttributeLinearInterpolation& interpolation,
             index_t to_element,
-            AttributeBase::AttributeKey /*unused*/ ) override
+            AttributeBase::AttributeKey ) override
         {
             set_value( to_element, interpolation.compute_value( *this ) );
         }
@@ -548,8 +541,7 @@ namespace geode
                 } );
         }
 
-        void resize(
-            index_t size, AttributeBase::AttributeKey /*unused*/ ) override
+        void resize( index_t size, AttributeBase::AttributeKey ) override
         {
             const auto capacity = values_.capacity();
             values_.reserve(
@@ -558,14 +550,13 @@ namespace geode
             values_.resize( size, default_value_ );
         }
 
-        void reserve(
-            index_t capacity, AttributeBase::AttributeKey /*unused*/ ) override
+        void reserve( index_t capacity, AttributeBase::AttributeKey ) override
         {
             values_.reserve( capacity );
         }
 
         void delete_elements( const std::vector< bool >& to_delete,
-            AttributeBase::AttributeKey /*unused*/ ) override
+            AttributeBase::AttributeKey ) override
         {
             std::vector< bool > to_keep( to_delete );
             to_keep.flip();
@@ -588,8 +579,7 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        SparseAttribute(
-            T default_value, AttributeBase::AttributeKey /*unused*/ )
+        SparseAttribute( T default_value, AttributeBase::AttributeKey )
             : SparseAttribute( std::move( default_value ) )
         {
         }
@@ -627,14 +617,14 @@ namespace geode
 
         void compute_value( index_t from_element,
             index_t to_element,
-            AttributeBase::AttributeKey /*unused*/ ) override
+            AttributeBase::AttributeKey ) override
         {
             set_value( to_element, value( from_element ) );
         }
 
         void compute_value( const AttributeLinearInterpolation& interpolation,
             index_t to_element,
-            AttributeBase::AttributeKey /*unused*/ ) override
+            AttributeBase::AttributeKey ) override
         {
             set_value( to_element, interpolation.compute_value( *this ) );
         }
@@ -693,19 +683,17 @@ namespace geode
                 } );
         }
 
-        void resize( index_t /*unused*/,
-            AttributeBase::AttributeKey /*unused*/ ) override
+        void resize( index_t /*unused*/, AttributeBase::AttributeKey ) override
         {
         }
 
-        void reserve(
-            index_t capacity, AttributeBase::AttributeKey /*unused*/ ) override
+        void reserve( index_t capacity, AttributeBase::AttributeKey ) override
         {
             values_.reserve( capacity );
         }
 
         void delete_elements( const std::vector< bool >& to_delete,
-            AttributeBase::AttributeKey /*unused*/ ) override
+            AttributeBase::AttributeKey ) override
         {
             const auto old2new = detail::mapping_after_deletion( to_delete );
             const auto old_values = values_;
