@@ -113,7 +113,7 @@ namespace geode
                     "if an instantiated attribute of the same name "
                     "with different storage already exists." );
 
-                typed_attribute.reset( Attribute< T >::create( args... ) );
+                typed_attribute.reset( new Attribute< T >{ args..., {} } );
                 register_attribute( typed_attribute, name );
             }
             return typed_attribute;

@@ -147,7 +147,7 @@ void test_double_sparse_attribute( geode::AttributeManager& manager )
 {
     auto sparse_attribute =
         manager.find_or_create_attribute< geode::SparseAttribute, double >(
-            "double", 12 );
+            "double", 12. );
     sparse_attribute->set_value( 3, 3 );
     sparse_attribute->set_value( 7, 7 );
     manager.assign_attribute_value( 3, 2 );

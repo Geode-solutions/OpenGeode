@@ -51,13 +51,14 @@ namespace geode
         }
 
         void register_attribute( std::shared_ptr< AttributeBase > &attribute,
-            absl::string_view name )
+            absl::string_view name,
+            AttributeBase::AttributeKey key )
         {
-            attribute->resize( nb_elements_ );
+            attribute->resize( nb_elements_, key );
             attributes_.emplace( name, attribute );
         }
 
-        void resize( index_t size )
+        void resize( index_t size, AttributeBase::AttributeKey key )
         {
             if( size == nb_elements_ )
             {
@@ -66,11 +67,11 @@ namespace geode
             nb_elements_ = size;
             for( auto &it : attributes_ )
             {
-                it.second->resize( size );
+                it.second->resize( size, key );
             }
         }
 
-        void reserve( index_t capacity )
+        void reserve( index_t capacity, AttributeBase::AttributeKey key )
         {
             if( capacity <= nb_elements_ )
             {
@@ -78,25 +79,28 @@ namespace geode
             }
             for( auto &it : attributes_ )
             {
-                it.second->reserve( capacity );
+                it.second->reserve( capacity, key );
             }
         }
 
-        void assign_attribute_value( index_t from_element, index_t to_element )
+        void assign_attribute_value( index_t from_element,
+            index_t to_element,
+            AttributeBase::AttributeKey key )
         {
             for( auto &it : attributes_ )
             {
-                it.second->compute_value( from_element, to_element );
+                it.second->compute_value( from_element, to_element, key );
             }
         }
 
         void interpolate_attribute_value(
             const AttributeLinearInterpolation &interpolation,
-            index_t to_element )
+            index_t to_element,
+            AttributeBase::AttributeKey key )
         {
             for( auto &it : attributes_ )
             {
-                it.second->compute_value( interpolation, to_element );
+                it.second->compute_value( interpolation, to_element, key );
             }
         }
 
@@ -142,20 +146,21 @@ namespace geode
             nb_elements_ = 0;
         }
 
-        void clear_attributes()
+        void clear_attributes( AttributeBase::AttributeKey key )
         {
             for( auto &it : attributes_ )
             {
-                it.second->resize( 0 );
+                it.second->resize( 0, key );
             }
             nb_elements_ = 0;
         }
 
-        void delete_elements( const std::vector< bool > &to_delete )
+        void delete_elements( const std::vector< bool > &to_delete,
+            AttributeBase::AttributeKey key )
         {
             for( auto &it : attributes_ )
             {
-                it.second->delete_elements( to_delete );
+                it.second->delete_elements( to_delete, key );
             }
             nb_elements_ -=
                 static_cast< index_t >( absl::c_count( to_delete, true ) );
@@ -227,29 +232,29 @@ namespace geode
     void AttributeManager::register_attribute(
         std::shared_ptr< AttributeBase > attribute, absl::string_view name )
     {
-        return impl_->register_attribute( attribute, name );
+        return impl_->register_attribute( attribute, name, {} );
     }
 
     void AttributeManager::resize( index_t size )
     {
-        impl_->resize( size );
+        impl_->resize( size, {} );
     }
 
     void AttributeManager::reserve( index_t capacity )
     {
-        impl_->reserve( capacity );
+        impl_->reserve( capacity, {} );
     }
 
     void AttributeManager::assign_attribute_value(
         index_t from_element, index_t to_element )
     {
-        impl_->assign_attribute_value( from_element, to_element );
+        impl_->assign_attribute_value( from_element, to_element, {} );
     }
 
     void AttributeManager::interpolate_attribute_value(
         const AttributeLinearInterpolation &interpolation, index_t to_element )
     {
-        impl_->interpolate_attribute_value( interpolation, to_element );
+        impl_->interpolate_attribute_value( interpolation, to_element, {} );
     }
 
     absl::FixedArray< absl::string_view >
@@ -281,7 +286,7 @@ namespace geode
 
     void AttributeManager::clear_attributes()
     {
-        impl_->clear_attributes();
+        impl_->clear_attributes( {} );
     }
 
     void AttributeManager::delete_elements(
@@ -293,7 +298,7 @@ namespace geode
                 "[AttributeManager::delete_elements] Vector to_delete should "
                 "have the same size as the number of "
                 "elements" );
-            impl_->delete_elements( to_delete );
+            impl_->delete_elements( to_delete, {} );
         }
     }
 
