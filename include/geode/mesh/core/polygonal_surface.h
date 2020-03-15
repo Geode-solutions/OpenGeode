@@ -29,6 +29,7 @@
 #include <geode/basic/attribute.h>
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/factory.h>
+#include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
 #include <geode/mesh/common.h>
@@ -127,7 +128,7 @@ namespace geode
     class opengeode_mesh_api PolygonalSurfaceBase : public VertexSet
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( PolygonalSurfaceBase );
-        friend class PolygonalSurfaceBuilder< dimension >;
+        PASSKEY( PolygonalSurfaceBuilder< dimension >, PolygonalSurfaceKey );
 
     public:
         ~PolygonalSurfaceBase();
@@ -316,6 +317,36 @@ namespace geode
          */
         BoundingBox< dimension > bounding_box() const;
 
+        const PolygonVertex& polygon_around_vertex(
+            index_t vertex_id, PolygonalSurfaceKey ) const;
+
+        void associate_polygon_vertex_to_vertex(
+            const PolygonVertex& polygon_vertex,
+            index_t vertex_id,
+            PolygonalSurfaceKey );
+
+        void update_edge_vertices(
+            const std::vector< index_t >& old2new, PolygonalSurfaceKey );
+
+        void update_edge_vertex( std::array< index_t, 2 > edge_vertices,
+            index_t edge_vertex_id,
+            index_t new_vertex_id,
+            PolygonalSurfaceKey );
+
+        void remove_edge(
+            std::array< index_t, 2 > edge_vertices, PolygonalSurfaceKey );
+
+        std::vector< index_t > delete_edges(
+            const std::vector< bool >& to_delete, PolygonalSurfaceKey );
+
+        std::vector< index_t > remove_isolated_edges( PolygonalSurfaceKey );
+
+        index_t find_or_create_edge(
+            std::array< index_t, 2 > edge_vertices, PolygonalSurfaceKey )
+        {
+            return find_or_create_edge( std::move( edge_vertices ) );
+        }
+
     protected:
         PolygonalSurfaceBase();
 
@@ -328,24 +359,6 @@ namespace geode
 
         virtual const Point< dimension >& get_point(
             index_t vertex_id ) const = 0;
-
-        const PolygonVertex& polygon_around_vertex( index_t vertex_id ) const;
-
-        void associate_polygon_vertex_to_vertex(
-            const PolygonVertex& polygon_vertex, index_t vertex_id );
-
-        void update_edge_vertices( const std::vector< index_t >& old2new );
-
-        void update_edge_vertex( std::array< index_t, 2 > edge_vertices,
-            index_t edge_vertex_id,
-            index_t new_vertex_id );
-
-        void remove_edge( std::array< index_t, 2 > edge_vertices );
-
-        std::vector< index_t > delete_edges(
-            const std::vector< bool >& to_delete );
-
-        std::vector< index_t > remove_isolated_edges();
 
         virtual index_t get_polygon_vertex(
             const PolygonVertex& polygon_vertex ) const = 0;

@@ -32,35 +32,35 @@ namespace geode
 
     void RelationshipsBuilder::register_component( const ComponentID& id )
     {
-        relationships_.register_component( id );
+        relationships_.register_component( id, {} );
     }
 
     void RelationshipsBuilder::unregister_component( const uuid& id )
     {
-        relationships_.unregister_component( id );
+        relationships_.unregister_component( id, {} );
     }
 
     void RelationshipsBuilder::add_boundary_relation(
         const uuid& boundary, const uuid& incidence )
     {
-        relationships_.add_boundary_relation( boundary, incidence );
+        relationships_.add_boundary_relation( boundary, incidence, {} );
     }
 
     void RelationshipsBuilder::add_internal_relation(
         const uuid& internal, const uuid& embedding )
     {
-        relationships_.add_internal_relation( internal, embedding );
+        relationships_.add_internal_relation( internal, embedding, {} );
     }
 
     void RelationshipsBuilder::add_item_in_collection(
         const uuid& item, const uuid& collection )
     {
-        relationships_.add_item_in_collection( item, collection );
+        relationships_.add_item_in_collection( item, collection, {} );
     }
 
     void RelationshipsBuilder::load_relationships( absl::string_view directory )
     {
-        relationships_.load_relationships( directory );
+        relationships_.load_relationships( directory, {} );
     }
 
 } // namespace geode

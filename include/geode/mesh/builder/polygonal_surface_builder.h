@@ -26,6 +26,7 @@
 #include <vector>
 
 #include <geode/basic/factory.h>
+#include <geode/basic/passkey.h>
 
 #include <geode/mesh/builder/vertex_set_builder.h>
 #include <geode/mesh/common.h>
@@ -47,6 +48,8 @@ namespace geode
     template < index_t dimension >
     class PolygonalSurfaceBuilder : public VertexSetBuilder
     {
+        PASSKEY( PolygonalSurface< dimension >, BuilderKey );
+
     public:
         /*!
          * Create the builder associated with a PolygonalSurface.
@@ -156,6 +159,12 @@ namespace geode
         void associate_polygon_vertex_to_vertex(
             const PolygonVertex& polygon_vertex, index_t vertex_id );
 
+        void copy(
+            const PolygonalSurface< dimension >& polygonal_surface, BuilderKey )
+        {
+            copy( polygonal_surface );
+        }
+
     protected:
         PolygonalSurfaceBuilder(
             PolygonalSurface< dimension >& polygonal_surface )
@@ -166,7 +175,6 @@ namespace geode
 
         index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices );
 
-        friend class PolygonalSurface< dimension >;
         void copy( const PolygonalSurface< dimension >& polygonal_surface );
 
     private:

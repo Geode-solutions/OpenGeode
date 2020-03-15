@@ -62,7 +62,7 @@ namespace geode
         auto clone = create( this->type_name() );
         auto builder =
             TriangulatedSurfaceBuilder< dimension >::create( *clone );
-        builder->copy( *this );
+        builder->copy( *this, {} );
         return clone;
     }
 

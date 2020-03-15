@@ -80,7 +80,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    void Line< dimension >::ensure_mesh_type()
+    void Line< dimension >::ensure_mesh_type( LinesKey )
     {
         return impl_->ensure_mesh_type();
     }
@@ -99,7 +99,7 @@ namespace geode
 
     template < index_t dimension >
     void Line< dimension >::set_mesh(
-        std::unique_ptr< EdgedCurve< dimension > > mesh )
+        std::unique_ptr< EdgedCurve< dimension > > mesh, LinesBuilderKey )
     {
         impl_->set_mesh( std::move( mesh ) );
     }

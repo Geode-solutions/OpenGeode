@@ -86,7 +86,7 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -235,8 +235,8 @@ namespace geode
             for( const auto v : Range{ nb_facet_vertices } )
             {
                 facet_vertices[v] =
-                    polyhedral_solid_.get_polyhedron_facet_vertex_id(
-                        { id, v } );
+                    polyhedral_solid_.polyhedron_facet_vertex_id(
+                        { id, v }, {} );
             }
             const auto position_it =
                 absl::c_find( facet_vertices, polyhedron_vertex );
@@ -253,21 +253,21 @@ namespace geode
                 const auto position =
                     std::distance( facet_vertices.begin(), position_it );
                 polyhedral_solid_.update_facet_vertex(
-                    facet_vertices_id, position, vertex_id );
+                    facet_vertices_id, position, vertex_id, {} );
 
                 std::array< index_t, 2 > next_edge_vertices{
                     facet_vertices_id[position],
                     facet_vertices_id[( position + 1 ) % nb_facet_vertices]
                 };
                 polyhedral_solid_.update_edge_vertex(
-                    next_edge_vertices, 0, vertex_id );
+                    next_edge_vertices, 0, vertex_id, {} );
                 std::array< index_t, 2 > previous_edge_vertices{
                     facet_vertices_id[( position + nb_facet_vertices - 1 )
                                       % nb_facet_vertices],
                     facet_vertices_id[position]
                 };
                 polyhedral_solid_.update_edge_vertex(
-                    previous_edge_vertices, 1, vertex_id );
+                    previous_edge_vertices, 1, vertex_id, {} );
             }
         }
         update_polyhedron_vertex( polyhedron_vertex, vertex_id );
@@ -406,7 +406,7 @@ namespace geode
             const PolyhedronVertex& polyhedron_vertex, index_t vertex_id )
     {
         polyhedral_solid_.associate_polyhedron_vertex_to_vertex(
-            polyhedron_vertex, vertex_id );
+            polyhedron_vertex, vertex_id, {} );
     }
 
     template < index_t dimension >
@@ -414,7 +414,7 @@ namespace geode
         PolyhedronFacetVertices facet_vertices )
     {
         return polyhedral_solid_.find_or_create_facet(
-            std::move( facet_vertices ) );
+            std::move( facet_vertices ), {} );
     }
 
     template < index_t dimension >
@@ -422,7 +422,7 @@ namespace geode
         std::array< index_t, 2 > edge_vertices )
     {
         return polyhedral_solid_.find_or_create_edge(
-            std::move( edge_vertices ) );
+            std::move( edge_vertices ), {} );
     }
 
     template < index_t dimension >
@@ -617,11 +617,11 @@ namespace geode
                                 { id, v } );
                     }
                     polyhedral_solid_.remove_facet(
-                        std::move( facet_vertices ) );
+                        std::move( facet_vertices ), {} );
                 }
             }
         }
-        polyhedral_solid_.remove_isolated_facets();
+        polyhedral_solid_.remove_isolated_facets( {} );
     }
 
     template < index_t dimension >
@@ -646,13 +646,13 @@ namespace geode
                         const auto v1 =
                             polyhedral_solid_.polyhedron_facet_vertex(
                                 { id, ( v + 1 ) % nb_facet_vertices } );
-                        polyhedral_solid_.remove_edge( { v0, v1 } );
+                        polyhedral_solid_.remove_edge( { v0, v1 }, {} );
                     }
                 }
             }
         }
 
-        polyhedral_solid_.remove_isolated_edges();
+        polyhedral_solid_.remove_isolated_edges( {} );
     }
 
     template < index_t dimension >
@@ -676,28 +676,28 @@ namespace geode
     std::vector< index_t >
         PolyhedralSolidBuilder< dimension >::delete_isolated_facets()
     {
-        return polyhedral_solid_.remove_isolated_facets();
+        return polyhedral_solid_.remove_isolated_facets( {} );
     }
 
     template < index_t dimension >
     std::vector< index_t >
         PolyhedralSolidBuilder< dimension >::delete_isolated_edges()
     {
-        return polyhedral_solid_.remove_isolated_edges();
+        return polyhedral_solid_.remove_isolated_edges( {} );
     }
 
     template < index_t dimension >
     void PolyhedralSolidBuilder< dimension >::update_facet_vertices(
         const std::vector< index_t >& old2new )
     {
-        polyhedral_solid_.update_facet_vertices( old2new );
+        polyhedral_solid_.update_facet_vertices( old2new, {} );
     }
 
     template < index_t dimension >
     void PolyhedralSolidBuilder< dimension >::update_edge_vertices(
         const std::vector< index_t >& old2new )
     {
-        polyhedral_solid_.update_edge_vertices( old2new );
+        polyhedral_solid_.update_edge_vertices( old2new, {} );
     }
 
     template < index_t dimension >
@@ -710,14 +710,14 @@ namespace geode
             "[PolyhedralSolidBuilder::update_facet_vertex] "
             "Accessing an invalid vertex in facet" );
         polyhedral_solid_.update_facet_vertex(
-            std::move( facet_vertices ), facet_vertex_id, new_vertex_id );
+            std::move( facet_vertices ), facet_vertex_id, new_vertex_id, {} );
     }
 
     template < index_t dimension >
     std::vector< index_t > PolyhedralSolidBuilder< dimension >::delete_facets(
         const std::vector< bool >& to_delete )
     {
-        return polyhedral_solid_.delete_facets( to_delete );
+        return polyhedral_solid_.delete_facets( to_delete, {} );
     }
 
     template < index_t dimension >

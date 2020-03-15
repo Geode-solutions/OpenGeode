@@ -26,6 +26,8 @@
 #include <array>
 #include <vector>
 
+#include <geode/basic/passkey.h>
+
 #include <geode/mesh/builder/polygonal_surface_builder.h>
 #include <geode/mesh/common.h>
 
@@ -43,6 +45,8 @@ namespace geode
     class TriangulatedSurfaceBuilder
         : public PolygonalSurfaceBuilder< dimension >
     {
+        PASSKEY( TriangulatedSurface< dimension >, BuilderKey );
+
     public:
         /*!
          * Create the builder associated with a TriangulatedSurface.
@@ -66,6 +70,12 @@ namespace geode
          */
         index_t create_triangles( index_t nb );
 
+        void copy( const TriangulatedSurface< dimension >& triangulated_surface,
+            BuilderKey )
+        {
+            copy( triangulated_surface );
+        }
+
     protected:
         TriangulatedSurfaceBuilder(
             TriangulatedSurface< dimension >& triangulated_surface )
@@ -74,7 +84,6 @@ namespace geode
         {
         }
 
-        friend class TriangulatedSurface< dimension >;
         void copy(
             const TriangulatedSurface< dimension >& triangulated_surface );
 

@@ -31,7 +31,7 @@ namespace geode
     void OpenGeodePointSetBuilder< dimension >::do_set_point(
         index_t vertex_id, const Point< dimension >& point )
     {
-        geode_point_set_.set_vertex( vertex_id, point );
+        geode_point_set_.set_vertex( vertex_id, point, {} );
     }
 
     template < index_t dimension >

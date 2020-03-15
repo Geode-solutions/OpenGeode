@@ -31,7 +31,7 @@ namespace geode
     void OpenGeodeTriangulatedSurfaceBuilder< dimension >::do_set_point(
         index_t vertex_id, const Point< dimension >& point )
     {
-        geode_triangulated_surface_.set_vertex( vertex_id, point );
+        geode_triangulated_surface_.set_vertex( vertex_id, point, {} );
     }
 
     template < index_t dimension >
@@ -57,14 +57,14 @@ namespace geode
             const PolygonVertex& polygon_vertex, index_t vertex_id )
     {
         geode_triangulated_surface_.set_polygon_vertex(
-            polygon_vertex, vertex_id );
+            polygon_vertex, vertex_id, {} );
     }
 
     template < index_t dimension >
     void OpenGeodeTriangulatedSurfaceBuilder< dimension >::do_create_triangle(
         const std::array< index_t, 3 >& vertices )
     {
-        geode_triangulated_surface_.add_triangle( vertices );
+        geode_triangulated_surface_.add_triangle( vertices, {} );
     }
 
     template < index_t dimension >
@@ -79,7 +79,7 @@ namespace geode
         index_t adjacent_id )
     {
         geode_triangulated_surface_.set_polygon_adjacent(
-            polygon_edge, adjacent_id );
+            polygon_edge, adjacent_id, {} );
     }
 
     template < index_t dimension >

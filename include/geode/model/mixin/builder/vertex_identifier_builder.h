@@ -42,7 +42,7 @@ namespace geode
         template < typename MeshComponent >
         void register_mesh_component( const MeshComponent& component )
         {
-            vertex_identifier_.register_mesh_component( component );
+            vertex_identifier_.register_mesh_component( component, {} );
         }
 
         /*!
@@ -52,7 +52,7 @@ namespace geode
         template < typename MeshComponent >
         void unregister_mesh_component( const MeshComponent& component )
         {
-            vertex_identifier_.unregister_mesh_component( component );
+            vertex_identifier_.unregister_mesh_component( component, {} );
         }
 
         /*!

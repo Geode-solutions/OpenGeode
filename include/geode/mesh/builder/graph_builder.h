@@ -26,6 +26,7 @@
 #include <vector>
 
 #include <geode/basic/factory.h>
+#include <geode/basic/passkey.h>
 
 #include <geode/mesh/builder/vertex_set_builder.h>
 #include <geode/mesh/common.h>
@@ -44,6 +45,8 @@ namespace geode
      */
     class opengeode_mesh_api GraphBuilder : public VertexSetBuilder
     {
+        PASSKEY( Graph, BuilderKey );
+
     public:
         /*!
          * Create the builder associated with a Graph.
@@ -98,10 +101,14 @@ namespace geode
          */
         std::vector< index_t > delete_isolated_vertices();
 
+        void copy( const Graph& graph, BuilderKey )
+        {
+            copy( graph );
+        }
+
     protected:
         GraphBuilder( Graph& graph );
 
-        friend class Graph;
         void copy( const Graph& graph );
 
     private:

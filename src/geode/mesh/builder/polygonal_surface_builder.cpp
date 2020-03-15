@@ -204,7 +204,7 @@ namespace geode
             const PolygonVertex& polygon_vertex, index_t vertex_id )
     {
         polygonal_surface_.associate_polygon_vertex_to_vertex(
-            polygon_vertex, vertex_id );
+            polygon_vertex, vertex_id, {} );
     }
 
     template < index_t dimension >
@@ -212,7 +212,7 @@ namespace geode
         std::array< index_t, 2 > edge_vertices )
     {
         return polygonal_surface_.find_or_create_edge(
-            std::move( edge_vertices ) );
+            std::move( edge_vertices ), {} );
     }
 
     template < index_t dimension >
@@ -220,7 +220,7 @@ namespace geode
         PolygonalSurfaceBuilder< dimension >::polygon_around_vertex(
             index_t vertex_id ) const
     {
-        return polygonal_surface_.polygon_around_vertex( vertex_id );
+        return polygonal_surface_.polygon_around_vertex( vertex_id, {} );
     }
 
     template < index_t dimension >
@@ -237,9 +237,9 @@ namespace geode
             const auto next_id = polygonal_surface_.polygon_vertex(
                 polygonal_surface_.next_polygon_edge( polygon_around ) );
             polygonal_surface_.update_edge_vertex(
-                { old_vertex_id, next_id }, 0, new_vertex_id );
+                { old_vertex_id, next_id }, 0, new_vertex_id, {} );
             polygonal_surface_.update_edge_vertex(
-                { previous_id, old_vertex_id }, 1, new_vertex_id );
+                { previous_id, old_vertex_id }, 1, new_vertex_id, {} );
             update_polygon_vertex( polygon_around, new_vertex_id );
         }
     }
@@ -258,7 +258,8 @@ namespace geode
         if( polygon_vertex_id != NO_ID )
         {
             const auto polygon_around =
-                polygonal_surface_.polygon_around_vertex( polygon_vertex_id );
+                polygonal_surface_.polygon_around_vertex(
+                    polygon_vertex_id, {} );
             if( polygon_around == polygon_vertex )
             {
                 const auto polygons_around =
@@ -278,9 +279,9 @@ namespace geode
         }
 
         polygonal_surface_.update_edge_vertex(
-            { polygon_vertex_id, next_id }, 0, vertex_id );
+            { polygon_vertex_id, next_id }, 0, vertex_id, {} );
         polygonal_surface_.update_edge_vertex(
-            { previous_id, polygon_vertex_id }, 1, vertex_id );
+            { previous_id, polygon_vertex_id }, 1, vertex_id, {} );
         update_polygon_vertex( polygon_vertex, vertex_id );
     }
 
@@ -426,17 +427,18 @@ namespace geode
                     polygonal_surface_.remove_edge(
                         { polygonal_surface_.polygon_edge_vertex( { p, e }, 0 ),
                             polygonal_surface_.polygon_edge_vertex(
-                                { p, e }, 1 ) } );
+                                { p, e }, 1 ) },
+                        {} );
                 }
             }
         }
-        polygonal_surface_.remove_isolated_edges();
+        polygonal_surface_.remove_isolated_edges( {} );
 
         const auto old2new = detail::mapping_after_deletion( to_delete );
         for( const auto v : Range{ polygonal_surface_.nb_vertices() } )
         {
             const auto& polygon_vertex =
-                polygonal_surface_.polygon_around_vertex( v );
+                polygonal_surface_.polygon_around_vertex( v, {} );
             if( polygon_vertex.polygon_id == NO_ID )
             {
                 continue;
@@ -474,7 +476,7 @@ namespace geode
         for( const auto v : Range{ polygonal_surface_.nb_vertices() } )
         {
             const auto& polygon_vertex =
-                polygonal_surface_.polygon_around_vertex( v );
+                polygonal_surface_.polygon_around_vertex( v, {} );
             if( polygon_vertex.polygon_id == NO_ID )
             {
                 to_delete[v] = true;
@@ -487,14 +489,14 @@ namespace geode
     std::vector< index_t >
         PolygonalSurfaceBuilder< dimension >::delete_isolated_edges()
     {
-        return polygonal_surface_.remove_isolated_edges();
+        return polygonal_surface_.remove_isolated_edges( {} );
     }
 
     template < index_t dimension >
     void PolygonalSurfaceBuilder< dimension >::update_edge_vertices(
         const std::vector< index_t >& old2new )
     {
-        polygonal_surface_.update_edge_vertices( old2new );
+        polygonal_surface_.update_edge_vertices( old2new, {} );
     }
 
     template < index_t dimension >
@@ -507,14 +509,14 @@ namespace geode
             "[PolygonalSurfaceBuilder::update_edge_vertex] "
             "Accessing an invalid vertex in edge" );
         polygonal_surface_.update_edge_vertex(
-            std::move( edge_vertices ), edge_vertex_id, new_vertex_id );
+            std::move( edge_vertices ), edge_vertex_id, new_vertex_id, {} );
     }
 
     template < index_t dimension >
     std::vector< index_t > PolygonalSurfaceBuilder< dimension >::delete_edges(
         const std::vector< bool >& to_delete )
     {
-        return polygonal_surface_.delete_edges( to_delete );
+        return polygonal_surface_.delete_edges( to_delete, {} );
     }
 
     template < index_t dimension >

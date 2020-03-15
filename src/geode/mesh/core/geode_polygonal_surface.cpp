@@ -174,8 +174,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    void OpenGeodePolygonalSurface< dimension >::set_vertex(
-        index_t vertex_id, const Point< dimension >& point )
+    void OpenGeodePolygonalSurface< dimension >::set_vertex( index_t vertex_id,
+        const Point< dimension >& point,
+        OGPolygonalSurfaceKey )
     {
         impl_->set_point( vertex_id, point );
     }
@@ -216,28 +217,32 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodePolygonalSurface< dimension >::set_polygon_vertex(
-        const PolygonVertex& polygon_vertex, index_t vertex_id )
+        const PolygonVertex& polygon_vertex,
+        index_t vertex_id,
+        OGPolygonalSurfaceKey )
     {
         impl_->set_polygon_vertex( polygon_vertex, vertex_id );
     }
 
     template < index_t dimension >
     void OpenGeodePolygonalSurface< dimension >::add_polygon(
-        const std::vector< index_t >& vertices )
+        const std::vector< index_t >& vertices, OGPolygonalSurfaceKey )
     {
         impl_->add_polygon( vertices );
     }
 
     template < index_t dimension >
     void OpenGeodePolygonalSurface< dimension >::remove_polygons(
-        const std::vector< bool >& to_delete )
+        const std::vector< bool >& to_delete, OGPolygonalSurfaceKey )
     {
         impl_->remove_polygons( to_delete );
     }
 
     template < index_t dimension >
     void OpenGeodePolygonalSurface< dimension >::set_polygon_adjacent(
-        const PolygonEdge& polygon_edge, index_t adjacent_id )
+        const PolygonEdge& polygon_edge,
+        index_t adjacent_id,
+        OGPolygonalSurfaceKey )
     {
         impl_->set_polygon_adjacent( polygon_edge, adjacent_id );
     }

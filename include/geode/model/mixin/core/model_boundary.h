@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
 #include <geode/model/common.h>
@@ -43,7 +44,9 @@ namespace geode
     class ModelBoundary : public Component< dimension >
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( ModelBoundary );
-        friend class ModelBoundaries< dimension >;
+        PASSKEY( ModelBoundaries< dimension >, ModelBoundariesKey );
+        PASSKEY(
+            ModelBoundariesBuilder< dimension >, ModelBoundariesBuilderKey );
         friend class bitsery::Access;
 
     public:
@@ -64,14 +67,16 @@ namespace geode
             return { this->component_type_static(), this->id() };
         };
 
-    private:
-        ModelBoundary() = default;
+        ModelBoundary( ModelBoundariesKey ) : ModelBoundary() {}
 
-        friend class ModelBoundariesBuilder< dimension >;
-        void set_model_boundary_name( absl::string_view name )
+        void set_model_boundary_name(
+            absl::string_view name, ModelBoundariesBuilderKey )
         {
             this->set_name( name );
         }
+
+    private:
+        ModelBoundary() = default;
 
         template < typename Archive >
         void serialize( Archive& archive );

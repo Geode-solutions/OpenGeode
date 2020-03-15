@@ -60,21 +60,22 @@ namespace geode
         LinesBuilder< dimension >::line_mesh_builder( const uuid& id )
     {
         return EdgedCurveBuilder< dimension >::create(
-            lines_.modifiable_line( id ).modifiable_mesh() );
+            lines_.modifiable_line( id ).modifiable_mesh(
+                typename Line< dimension >::LinesBuilderKey{} ) );
     }
 
     template < index_t dimension >
     void LinesBuilder< dimension >::set_line_name(
         const uuid& id, absl::string_view name )
     {
-        lines_.modifiable_line( id ).set_line_name( name );
+        lines_.modifiable_line( id ).set_line_name( name, {} );
     }
 
     template < index_t dimension >
     void LinesBuilder< dimension >::set_line_mesh(
         const uuid& id, std::unique_ptr< EdgedCurve< dimension > > mesh )
     {
-        lines_.modifiable_line( id ).set_mesh( std::move( mesh ) );
+        lines_.modifiable_line( id ).set_mesh( std::move( mesh ), {} );
     }
 
     template class opengeode_model_api LinesBuilder< 2 >;

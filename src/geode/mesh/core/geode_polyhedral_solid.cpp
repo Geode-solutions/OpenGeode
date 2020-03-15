@@ -292,8 +292,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    void OpenGeodePolyhedralSolid< dimension >::set_vertex(
-        index_t vertex_id, const Point< dimension >& point )
+    void OpenGeodePolyhedralSolid< dimension >::set_vertex( index_t vertex_id,
+        const Point< dimension >& point,
+        OGPolyhedralSolidKey )
     {
         impl_->set_point( vertex_id, point );
     }
@@ -351,21 +352,25 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodePolyhedralSolid< dimension >::set_polyhedron_vertex(
-        const PolyhedronVertex& polyhedron_vertex, index_t vertex_id )
+        const PolyhedronVertex& polyhedron_vertex,
+        index_t vertex_id,
+        OGPolyhedralSolidKey )
     {
         impl_->set_polyhedron_vertex( polyhedron_vertex, vertex_id );
     }
 
     template < index_t dimension >
     void OpenGeodePolyhedralSolid< dimension >::set_polyhedron_adjacent(
-        const PolyhedronFacet& polyhedron_facet, index_t adjacent_id )
+        const PolyhedronFacet& polyhedron_facet,
+        index_t adjacent_id,
+        OGPolyhedralSolidKey )
     {
         impl_->set_polyhedron_adjacent( polyhedron_facet, adjacent_id );
     }
 
     template < index_t dimension >
     void OpenGeodePolyhedralSolid< dimension >::remove_polyhedra(
-        const std::vector< bool >& to_delete )
+        const std::vector< bool >& to_delete, OGPolyhedralSolidKey )
     {
         impl_->remove_polyhedra( to_delete );
     }
@@ -373,7 +378,8 @@ namespace geode
     template < index_t dimension >
     void OpenGeodePolyhedralSolid< dimension >::add_polyhedron(
         const std::vector< index_t >& vertices,
-        const std::vector< std::vector< index_t > >& facets )
+        const std::vector< std::vector< index_t > >& facets,
+        OGPolyhedralSolidKey )
     {
         impl_->add_polyhedron( vertices, facets );
     }

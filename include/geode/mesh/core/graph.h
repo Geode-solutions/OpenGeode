@@ -38,6 +38,7 @@
 namespace geode
 {
     class AttributeManager;
+    class GraphBuilder;
 } // namespace geode
 
 namespace geode
@@ -87,7 +88,7 @@ namespace geode
      */
     class opengeode_mesh_api Graph : public VertexSet
     {
-        friend class GraphBuilder;
+        PASSKEY( GraphBuilder, GraphKey );
 
     public:
         /*!
@@ -124,6 +125,12 @@ namespace geode
          */
         const EdgesAroundVertex& edges_around_vertex( index_t vertex_id ) const;
 
+        void set_edges_around_vertex(
+            index_t vertex_id, EdgesAroundVertex edges, GraphKey );
+
+        void associate_edge_vertex_to_vertex(
+            const EdgeVertex& edge_vertex, index_t vertex_id, GraphKey );
+
     protected:
         Graph();
 
@@ -131,13 +138,6 @@ namespace geode
         friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive );
-
-        void set_edges_around_vertex(
-            index_t vertex_id, EdgesAroundVertex edges );
-
-        void associate_edge_vertex_to_vertex(
-            const EdgeVertex& edge_vertex, index_t vertex_id );
-
         virtual index_t get_edge_vertex(
             const EdgeVertex& edge_vertex ) const = 0;
 

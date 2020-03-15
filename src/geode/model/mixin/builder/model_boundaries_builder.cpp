@@ -53,7 +53,7 @@ namespace geode
         const uuid& id, absl::string_view name )
     {
         model_boundaries_.modifiable_model_boundary( id )
-            .set_model_boundary_name( name );
+            .set_model_boundary_name( name, {} );
     }
 
     template class opengeode_model_api ModelBoundariesBuilder< 2 >;

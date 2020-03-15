@@ -80,7 +80,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    void Corner< dimension >::ensure_mesh_type()
+    void Corner< dimension >::ensure_mesh_type( CornersKey )
     {
         return impl_->ensure_mesh_type();
     }
@@ -99,7 +99,7 @@ namespace geode
 
     template < index_t dimension >
     void Corner< dimension >::set_mesh(
-        std::unique_ptr< PointSet< dimension > > mesh )
+        std::unique_ptr< PointSet< dimension > > mesh, CornersBuilderKey )
     {
         impl_->set_mesh( std::move( mesh ) );
     }

@@ -80,7 +80,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    void Block< dimension >::ensure_mesh_type()
+    void Block< dimension >::ensure_mesh_type( BlocksKey )
     {
         return impl_->ensure_mesh_type();
     }
@@ -99,7 +99,7 @@ namespace geode
 
     template < index_t dimension >
     void Block< dimension >::set_mesh(
-        std::unique_ptr< PolyhedralSolid< dimension > > mesh )
+        std::unique_ptr< PolyhedralSolid< dimension > > mesh, BlocksBuilderKey )
     {
         impl_->set_mesh( std::move( mesh ) );
     }

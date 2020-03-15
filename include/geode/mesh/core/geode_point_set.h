@@ -25,6 +25,7 @@
 
 #include <iostream>
 
+#include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
 #include <geode/mesh/common.h>
@@ -42,7 +43,7 @@ namespace geode
     class OpenGeodePointSet : public PointSet< dimension >
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( OpenGeodePointSet );
-        friend class OpenGeodePointSetBuilder< dimension >;
+        PASSKEY( OpenGeodePointSetBuilder< dimension >, OGPointSetKey );
 
     public:
         OpenGeodePointSet();
@@ -71,14 +72,15 @@ namespace geode
             return native_extension_static();
         }
 
+        void set_vertex(
+            index_t vertex_id, const Point< dimension >& point, OGPointSetKey );
+
     private:
         friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive );
 
         const Point< dimension >& get_point( index_t vertex_id ) const override;
-
-        void set_vertex( index_t vertex_id, const Point< dimension >& point );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

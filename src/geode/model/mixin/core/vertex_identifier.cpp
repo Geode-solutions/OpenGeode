@@ -32,11 +32,11 @@ namespace geode
     public:
         Impl()
             : component_vertices_(
-                unique_vertices_.vertex_attribute_manager()
-                    .find_or_create_attribute< VariableAttribute,
-                        std::vector< MeshComponentVertex > >(
-                        "component vertices",
-                        std::vector< MeshComponentVertex >{} ) )
+                  unique_vertices_.vertex_attribute_manager()
+                      .find_or_create_attribute< VariableAttribute,
+                          std::vector< MeshComponentVertex > >(
+                          "component vertices",
+                          std::vector< MeshComponentVertex >{} ) )
         {
         }
 
@@ -399,30 +399,32 @@ namespace geode
 
     template < typename MeshComponent >
     void VertexIdentifier::register_mesh_component(
-        const MeshComponent& component )
+        const MeshComponent& component, BuilderKey )
     {
         impl_->register_component( component );
     }
 
     template < typename MeshComponent >
     void VertexIdentifier::unregister_mesh_component(
-        const MeshComponent& component )
+        const MeshComponent& component, BuilderKey )
     {
         impl_->unregister_component( component );
     }
 
-    index_t VertexIdentifier::create_unique_vertex()
+    index_t VertexIdentifier::create_unique_vertex( BuilderKey )
     {
         return impl_->create_unique_vertex();
     }
 
-    index_t VertexIdentifier::create_unique_vertices( index_t nb )
+    index_t VertexIdentifier::create_unique_vertices( index_t nb, BuilderKey )
     {
         return impl_->create_unique_vertices( nb );
     }
 
     void VertexIdentifier::set_unique_vertex(
-        MeshComponentVertex component_vertex_id, index_t unique_vertex_id )
+        MeshComponentVertex component_vertex_id,
+        index_t unique_vertex_id,
+        BuilderKey )
     {
         impl_->set_unique_vertex(
             std::move( component_vertex_id ), unique_vertex_id );
@@ -430,13 +432,16 @@ namespace geode
 
     void VertexIdentifier::unset_unique_vertex(
         const MeshComponentVertex& component_vertex_id,
-        index_t unique_vertex_id )
+        index_t unique_vertex_id,
+        BuilderKey )
     {
         impl_->unset_unique_vertex( component_vertex_id, unique_vertex_id );
     }
 
     void VertexIdentifier::update_unique_vertices(
-        const ComponentID& component_id, const std::vector< index_t >& old2new )
+        const ComponentID& component_id,
+        const std::vector< index_t >& old2new,
+        BuilderKey )
     {
         impl_->update_unique_vertices( component_id, old2new );
     }
@@ -447,38 +452,46 @@ namespace geode
         impl_->save( directory );
     }
 
-    void VertexIdentifier::load_unique_vertices( absl::string_view directory )
+    void VertexIdentifier::load_unique_vertices(
+        absl::string_view directory, BuilderKey )
     {
         return impl_->load( directory );
     }
 
     template void opengeode_model_api VertexIdentifier::register_mesh_component(
-        const Corner2D& );
+        const Corner2D&, BuilderKey );
     template void opengeode_model_api VertexIdentifier::register_mesh_component(
-        const Corner3D& );
+        const Corner3D&, BuilderKey );
     template void opengeode_model_api VertexIdentifier::register_mesh_component(
-        const Line2D& );
+        const Line2D&, BuilderKey );
     template void opengeode_model_api VertexIdentifier::register_mesh_component(
-        const Line3D& );
+        const Line3D&, BuilderKey );
     template void opengeode_model_api VertexIdentifier::register_mesh_component(
-        const Surface2D& );
+        const Surface2D&, BuilderKey );
     template void opengeode_model_api VertexIdentifier::register_mesh_component(
-        const Surface3D& );
+        const Surface3D&, BuilderKey );
     template void opengeode_model_api VertexIdentifier::register_mesh_component(
-        const Block3D& );
+        const Block3D&, BuilderKey );
 
     template void opengeode_model_api
-        VertexIdentifier::unregister_mesh_component( const Corner2D& );
+        VertexIdentifier::unregister_mesh_component(
+            const Corner2D&, BuilderKey );
     template void opengeode_model_api
-        VertexIdentifier::unregister_mesh_component( const Corner3D& );
+        VertexIdentifier::unregister_mesh_component(
+            const Corner3D&, BuilderKey );
     template void opengeode_model_api
-        VertexIdentifier::unregister_mesh_component( const Line2D& );
+        VertexIdentifier::unregister_mesh_component(
+            const Line2D&, BuilderKey );
     template void opengeode_model_api
-        VertexIdentifier::unregister_mesh_component( const Line3D& );
+        VertexIdentifier::unregister_mesh_component(
+            const Line3D&, BuilderKey );
     template void opengeode_model_api
-        VertexIdentifier::unregister_mesh_component( const Surface2D& );
+        VertexIdentifier::unregister_mesh_component(
+            const Surface2D&, BuilderKey );
     template void opengeode_model_api
-        VertexIdentifier::unregister_mesh_component( const Surface3D& );
+        VertexIdentifier::unregister_mesh_component(
+            const Surface3D&, BuilderKey );
     template void opengeode_model_api
-        VertexIdentifier::unregister_mesh_component( const Block3D& );
+        VertexIdentifier::unregister_mesh_component(
+            const Block3D&, BuilderKey );
 } // namespace geode

@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
 #include <geode/mesh/common.h>
@@ -40,7 +41,8 @@ namespace geode
     class OpenGeodePolyhedralSolid : public PolyhedralSolid< dimension >
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( OpenGeodePolyhedralSolid );
-        friend class OpenGeodePolyhedralSolidBuilder< dimension >;
+        PASSKEY( OpenGeodePolyhedralSolidBuilder< dimension >,
+            OGPolyhedralSolidKey );
 
     public:
         OpenGeodePolyhedralSolid();
@@ -69,6 +71,25 @@ namespace geode
             return native_extension_static();
         }
 
+        void set_vertex( index_t vertex_id,
+            const Point< dimension >& point,
+            OGPolyhedralSolidKey );
+
+        void add_polyhedron( const std::vector< index_t >& vertices,
+            const std::vector< std::vector< index_t > >& facets,
+            OGPolyhedralSolidKey );
+
+        void remove_polyhedra(
+            const std::vector< bool >& to_delete, OGPolyhedralSolidKey );
+
+        void set_polyhedron_adjacent( const PolyhedronFacet& polyhedron_facet,
+            index_t adjacent_id,
+            OGPolyhedralSolidKey );
+
+        void set_polyhedron_vertex( const PolyhedronVertex& polyhedron_vertex,
+            index_t vertex_id,
+            OGPolyhedralSolidKey );
+
     private:
         friend class bitsery::Access;
         template < typename Archive >
@@ -76,13 +97,8 @@ namespace geode
 
         const Point< dimension >& get_point( index_t vertex_id ) const override;
 
-        void set_vertex( index_t vertex_id, const Point< dimension >& point );
-
         index_t get_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex ) const override;
-
-        void set_polyhedron_vertex(
-            const PolyhedronVertex& polyhedron_vertex, index_t vertex_id );
 
         index_t get_nb_polyhedron_vertices(
             index_t polyhedron_id ) const override;
@@ -103,14 +119,6 @@ namespace geode
 
         index_t get_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet ) const override;
-
-        void add_polyhedron( const std::vector< index_t >& vertices,
-            const std::vector< std::vector< index_t > >& facets );
-
-        void remove_polyhedra( const std::vector< bool >& to_delete );
-
-        void set_polyhedron_adjacent(
-            const PolyhedronFacet& polyhedron_facet, index_t adjacent_id );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

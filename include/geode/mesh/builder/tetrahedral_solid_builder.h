@@ -40,6 +40,7 @@ namespace geode
     class TetrahedralSolidBuilder : public PolyhedralSolidBuilder< dimension >
     {
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
+        PASSKEY( TetrahedralSolid< dimension >, BuilderKey );
 
     public:
         static std::unique_ptr< TetrahedralSolidBuilder< dimension > > create(
@@ -60,6 +61,12 @@ namespace geode
          */
         index_t create_tetrahedra( index_t nb );
 
+        void copy(
+            const TetrahedralSolid< dimension >& tetrahedral_solid, BuilderKey )
+        {
+            copy( tetrahedral_solid );
+        }
+
     protected:
         TetrahedralSolidBuilder(
             TetrahedralSolid< dimension >& tetrahedral_solid )
@@ -68,7 +75,6 @@ namespace geode
         {
         }
 
-        friend class TetrahedralSolid< dimension >;
         void copy( const TetrahedralSolid< dimension >& tetrahedral_solid );
 
     private:

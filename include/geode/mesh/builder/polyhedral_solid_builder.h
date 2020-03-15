@@ -28,6 +28,7 @@
 #include <absl/container/inlined_vector.h>
 
 #include <geode/basic/factory.h>
+#include <geode/basic/passkey.h>
 
 #include <geode/mesh/builder/vertex_set_builder.h>
 #include <geode/mesh/common.h>
@@ -46,6 +47,8 @@ namespace geode
     template < index_t dimension >
     class PolyhedralSolidBuilder : public VertexSetBuilder
     {
+        PASSKEY( PolyhedralSolid< dimension >, BuilderKey );
+
     public:
         /*!
          * Create the builder associated with a PolyhedralSolid.
@@ -159,6 +162,12 @@ namespace geode
         void associate_polyhedron_vertex_to_vertex(
             const PolyhedronVertex& polyhedron_vertex, index_t vertex_id );
 
+        void copy(
+            const PolyhedralSolid< dimension >& polyhedral_solid, BuilderKey )
+        {
+            copy( polyhedral_solid );
+        }
+
     protected:
         PolyhedralSolidBuilder( PolyhedralSolid< dimension >& polyhedral_solid )
             : VertexSetBuilder( polyhedral_solid ),
@@ -170,7 +179,6 @@ namespace geode
 
         index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices );
 
-        friend class PolyhedralSolid< dimension >;
         void copy( const PolyhedralSolid< dimension >& polyhedral_solid );
 
     private:

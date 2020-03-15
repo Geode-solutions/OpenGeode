@@ -81,7 +81,7 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodePointSet< dimension >::set_vertex(
-        index_t vertex_id, const Point< dimension >& point )
+        index_t vertex_id, const Point< dimension >& point, OGPointSetKey )
     {
         impl_->set_point( vertex_id, point );
     }

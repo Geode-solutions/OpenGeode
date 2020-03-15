@@ -64,7 +64,8 @@ namespace geode
     std::unique_ptr< PolygonalSurfaceBuilder< dimension > >
         SurfacesBuilder< dimension >::surface_mesh_builder( const uuid& id )
     {
-        auto& mesh = surfaces_.modifiable_surface( id ).modifiable_mesh();
+        auto& mesh = surfaces_.modifiable_surface( id ).modifiable_mesh(
+            typename Surface< dimension >::SurfacesBuilderKey{} );
         if( TriangulatedSurfaceBuilderFactory< dimension >::has_creator(
                 mesh.type_name() ) )
         {
@@ -84,14 +85,14 @@ namespace geode
     void SurfacesBuilder< dimension >::set_surface_name(
         const uuid& id, absl::string_view name )
     {
-        surfaces_.modifiable_surface( id ).set_surface_name( name );
+        surfaces_.modifiable_surface( id ).set_surface_name( name, {} );
     }
 
     template < index_t dimension >
     void SurfacesBuilder< dimension >::set_surface_mesh(
         const uuid& id, std::unique_ptr< PolygonalSurface< dimension > > mesh )
     {
-        surfaces_.modifiable_surface( id ).set_mesh( std::move( mesh ) );
+        surfaces_.modifiable_surface( id ).set_mesh( std::move( mesh ), {} );
     }
 
     template class opengeode_model_api SurfacesBuilder< 2 >;

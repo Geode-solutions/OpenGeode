@@ -99,7 +99,7 @@ namespace geode
         {
             return;
         }
-        graph_.associate_edge_vertex_to_vertex( edge_vertex, vertex_id );
+        graph_.associate_edge_vertex_to_vertex( edge_vertex, vertex_id, {} );
         do_set_edge_vertex( edge_vertex, vertex_id );
     }
 
@@ -156,7 +156,7 @@ namespace geode
                     new_edges.emplace_back( edge_id, edge.vertex_id );
                 }
             }
-            graph_.set_edges_around_vertex( v, std::move( new_edges ) );
+            graph_.set_edges_around_vertex( v, std::move( new_edges ), {} );
         }
 
         graph_.edge_attribute_manager().delete_elements( to_delete );

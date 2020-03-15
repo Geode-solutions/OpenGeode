@@ -95,8 +95,9 @@ namespace geode
             Corner< dimension >::component_type_static().get() );
         for( auto& corner : modifiable_corners() )
         {
-            corner.ensure_mesh_type();
-            auto& mesh = corner.modifiable_mesh();
+            corner.ensure_mesh_type( {} );
+            auto& mesh = corner.modifiable_mesh(
+                typename Corner< dimension >::CornersKey{} );
             const auto file = absl::StrCat(
                 prefix, corner.id().string(), ".", mesh.native_extension() );
             load_point_set( mesh, file );
@@ -121,7 +122,8 @@ namespace geode
     const uuid& Corners< dimension >::create_corner()
     {
         typename Corners< dimension >::Impl::ComponentPtr corner{
-            new Corner< dimension >
+            new Corner< dimension >{
+                typename Corner< dimension >::CornersKey{} }
         };
         const auto& id = corner->id();
         impl_->add_component( std::move( corner ) );
@@ -132,7 +134,8 @@ namespace geode
     const uuid& Corners< dimension >::create_corner( const MeshType& type )
     {
         typename Corners< dimension >::Impl::ComponentPtr corner{
-            new Corner< dimension >{ type }
+            new Corner< dimension >{
+                type, typename Corner< dimension >::CornersKey{} }
         };
         const auto& id = corner->id();
         impl_->add_component( std::move( corner ) );

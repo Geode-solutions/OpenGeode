@@ -26,6 +26,7 @@
 #include <vector>
 
 #include <geode/basic/factory.h>
+#include <geode/basic/passkey.h>
 
 #include <geode/mesh/builder/vertex_set_builder.h>
 #include <geode/mesh/common.h>
@@ -45,6 +46,7 @@ namespace geode
     class PointSetBuilder : public VertexSetBuilder
     {
         OPENGEODE_TEMPLATE_ASSERT_2D_OR_3D( dimension );
+        PASSKEY( PointSet< dimension >, BuilderKey );
 
     public:
         /*!
@@ -68,13 +70,17 @@ namespace geode
          */
         index_t create_point( const Point< dimension >& point );
 
+        void copy( const PointSet< dimension >& point_set, BuilderKey )
+        {
+            copy( point_set );
+        }
+
     protected:
         PointSetBuilder( PointSet< dimension >& point_set )
             : VertexSetBuilder( point_set ), point_set_( point_set )
         {
         }
 
-        friend class PointSet< dimension >;
         void copy( const PointSet< dimension >& point_set );
 
     private:

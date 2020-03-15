@@ -31,7 +31,7 @@ namespace geode
     void OpenGeodeTetrahedralSolidBuilder< dimension >::do_set_point(
         index_t vertex_id, const Point< dimension >& point )
     {
-        geode_tetrahedral_solid_.set_vertex( vertex_id, point );
+        geode_tetrahedral_solid_.set_vertex( vertex_id, point, {} );
     }
 
     template < index_t dimension >
@@ -58,7 +58,7 @@ namespace geode
             const PolyhedronVertex& polyhedron_vertex, index_t vertex_id )
     {
         geode_tetrahedral_solid_.set_polyhedron_vertex(
-            polyhedron_vertex, vertex_id );
+            polyhedron_vertex, vertex_id, {} );
     }
 
     template < index_t dimension >
@@ -87,7 +87,7 @@ namespace geode
     void OpenGeodeTetrahedralSolidBuilder< dimension >::do_create_tetrahedron(
         const std::array< index_t, 4 >& vertices )
     {
-        geode_tetrahedral_solid_.add_tetrahedron( vertices );
+        geode_tetrahedral_solid_.add_tetrahedron( vertices, {} );
     }
 
     template < index_t dimension >
@@ -103,7 +103,7 @@ namespace geode
                 const std::array< index_t, 4 >& vertices ) const
     {
         return geode_tetrahedral_solid_.get_polyhedron_facet_vertices(
-            vertices );
+            vertices, {} );
     }
 
     template < index_t dimension >
@@ -113,7 +113,7 @@ namespace geode
                 const std::array< index_t, 4 >& vertices ) const
     {
         return geode_tetrahedral_solid_.get_polyhedron_edge_vertices(
-            vertices );
+            vertices, {} );
     }
 
     template < index_t dimension >
@@ -122,7 +122,7 @@ namespace geode
             const PolyhedronFacet& polyhedron_facet, index_t adjacent_id )
     {
         geode_tetrahedral_solid_.set_polyhedron_adjacent(
-            polyhedron_facet, adjacent_id );
+            polyhedron_facet, adjacent_id, {} );
     }
 
     template < index_t dimension >

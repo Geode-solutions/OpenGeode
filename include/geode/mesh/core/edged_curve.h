@@ -38,8 +38,6 @@ namespace geode
     template < index_t dimension >
     class EdgedCurve : public Graph
     {
-        friend class EdgedCurveBuilder< dimension >;
-
     public:
         static std::unique_ptr< EdgedCurve< dimension > > create();
 

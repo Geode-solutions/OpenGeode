@@ -100,7 +100,7 @@ namespace geode
     {
         auto clone = create( type_name() );
         auto builder = EdgedCurveBuilder< dimension >::create( *clone );
-        builder->copy( *this );
+        builder->copy( *this, {} );
         return clone;
     }
 

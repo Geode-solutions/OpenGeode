@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
 #include <geode/mesh/core/mesh_type.h>
@@ -47,8 +48,8 @@ namespace geode
     class Corner final : public Component< dimension >
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( Corner );
-        friend class Corners< dimension >;
-        friend class CornersBuilder< dimension >;
+        PASSKEY( Corners< dimension >, CornersKey );
+        PASSKEY( CornersBuilder< dimension >, CornersBuilderKey );
         friend class bitsery::Access;
 
     public:
@@ -71,21 +72,36 @@ namespace geode
 
         const PointSet< dimension >& mesh() const;
 
+        PointSet< dimension >& modifiable_mesh( CornersKey )
+        {
+            return modifiable_mesh();
+        }
+
+        void ensure_mesh_type( CornersKey );
+
+        Corner( CornersKey ) : Corner() {}
+
+        Corner( const MeshType& type, CornersKey ) : Corner( type ) {}
+
+        void set_mesh(
+            std::unique_ptr< PointSet< dimension > > mesh, CornersBuilderKey );
+
+        void set_corner_name( absl::string_view name, CornersBuilderKey )
+        {
+            this->set_name( name );
+        }
+
+        PointSet< dimension >& modifiable_mesh( CornersBuilderKey )
+        {
+            return modifiable_mesh();
+        }
+
     private:
         Corner();
 
         explicit Corner( const MeshType& type );
 
         PointSet< dimension >& modifiable_mesh();
-
-        void set_mesh( std::unique_ptr< PointSet< dimension > > mesh );
-
-        void set_corner_name( absl::string_view name )
-        {
-            this->set_name( name );
-        }
-
-        void ensure_mesh_type();
 
         template < typename Archive >
         void serialize( Archive& archive );
