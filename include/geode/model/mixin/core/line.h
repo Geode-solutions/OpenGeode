@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
 #include <geode/mesh/core/mesh_type.h>
@@ -47,8 +48,8 @@ namespace geode
     class Line final : public Component< dimension >
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( Line );
-        friend class Lines< dimension >;
-        friend class LinesBuilder< dimension >;
+        PASSKEY( Lines< dimension >, LinesKey );
+        PASSKEY( LinesBuilder< dimension >, LinesBuilderKey );
         friend class bitsery::Access;
 
     public:
@@ -71,21 +72,36 @@ namespace geode
 
         const EdgedCurve< dimension >& mesh() const;
 
+        void ensure_mesh_type( LinesKey );
+
+        EdgedCurve< dimension >& modifiable_mesh( LinesKey )
+        {
+            return modifiable_mesh();
+        }
+
+        Line( LinesKey ) : Line() {}
+
+        Line( const MeshType& type, LinesKey ) : Line( type ) {}
+
+        void set_mesh(
+            std::unique_ptr< EdgedCurve< dimension > > mesh, LinesBuilderKey );
+
+        void set_line_name( absl::string_view name, LinesBuilderKey )
+        {
+            this->set_name( name );
+        }
+
+        EdgedCurve< dimension >& modifiable_mesh( LinesBuilderKey )
+        {
+            return modifiable_mesh();
+        }
+
     private:
         Line();
 
         explicit Line( const MeshType& type );
 
         EdgedCurve< dimension >& modifiable_mesh();
-
-        void set_mesh( std::unique_ptr< EdgedCurve< dimension > > mesh );
-
-        void set_line_name( absl::string_view name )
-        {
-            this->set_name( name );
-        }
-
-        void ensure_mesh_type();
 
         template < typename Archive >
         void serialize( Archive& archive );

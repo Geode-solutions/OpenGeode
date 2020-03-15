@@ -212,8 +212,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    void OpenGeodeTetrahedralSolid< dimension >::set_vertex(
-        index_t vertex_id, const Point< dimension >& point )
+    void OpenGeodeTetrahedralSolid< dimension >::set_vertex( index_t vertex_id,
+        const Point< dimension >& point,
+        OGTetrahedralSolidKey )
     {
         impl_->set_point( vertex_id, point );
     }
@@ -262,14 +263,16 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodeTetrahedralSolid< dimension >::set_polyhedron_vertex(
-        const PolyhedronVertex& polyhedron_vertex, index_t vertex_id )
+        const PolyhedronVertex& polyhedron_vertex,
+        index_t vertex_id,
+        OGTetrahedralSolidKey )
     {
         impl_->set_polyhedron_vertex( polyhedron_vertex, vertex_id );
     }
 
     template < index_t dimension >
     void OpenGeodeTetrahedralSolid< dimension >::add_tetrahedron(
-        const std::array< index_t, 4 >& vertices )
+        const std::array< index_t, 4 >& vertices, OGTetrahedralSolidKey )
     {
         impl_->add_tetrahedron( *this, vertices );
     }
@@ -277,7 +280,8 @@ namespace geode
     template < index_t dimension >
     std::array< PolyhedronFacetVertices, 4 >
         OpenGeodeTetrahedralSolid< dimension >::get_polyhedron_facet_vertices(
-            const std::array< index_t, 4 >& vertices ) const
+            const std::array< index_t, 4 >& vertices,
+            OGTetrahedralSolidKey ) const
     {
         return impl_->get_polyhedron_facet_vertices( vertices );
     }
@@ -285,14 +289,17 @@ namespace geode
     template < index_t dimension >
     std::vector< std::array< index_t, 2 > >
         OpenGeodeTetrahedralSolid< dimension >::get_polyhedron_edge_vertices(
-            const std::array< index_t, 4 >& vertices ) const
+            const std::array< index_t, 4 >& vertices,
+            OGTetrahedralSolidKey ) const
     {
         return impl_->get_polyhedron_edge_vertices( vertices );
     }
 
     template < index_t dimension >
     void OpenGeodeTetrahedralSolid< dimension >::set_polyhedron_adjacent(
-        const PolyhedronFacet& polyhedron_facet, index_t adjacent_id )
+        const PolyhedronFacet& polyhedron_facet,
+        index_t adjacent_id,
+        OGTetrahedralSolidKey )
     {
         impl_->set_polyhedron_adjacent( polyhedron_facet, adjacent_id );
     }

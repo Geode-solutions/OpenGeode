@@ -148,7 +148,9 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodeTriangulatedSurface< dimension >::set_vertex(
-        index_t vertex_id, const Point< dimension >& point )
+        index_t vertex_id,
+        const Point< dimension >& point,
+        OGTriangulatedSurfaceKey )
     {
         impl_->set_point( vertex_id, point );
     }
@@ -184,21 +186,25 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodeTriangulatedSurface< dimension >::set_polygon_vertex(
-        const PolygonVertex& polygon_vertex, index_t vertex_id )
+        const PolygonVertex& polygon_vertex,
+        index_t vertex_id,
+        OGTriangulatedSurfaceKey )
     {
         impl_->set_polygon_vertex( polygon_vertex, vertex_id );
     }
 
     template < index_t dimension >
     void OpenGeodeTriangulatedSurface< dimension >::add_triangle(
-        const std::array< index_t, 3 >& vertices )
+        const std::array< index_t, 3 >& vertices, OGTriangulatedSurfaceKey )
     {
         impl_->add_triangle( *this, vertices );
     }
 
     template < index_t dimension >
     void OpenGeodeTriangulatedSurface< dimension >::set_polygon_adjacent(
-        const PolygonEdge& polygon_edge, index_t adjacent_id )
+        const PolygonEdge& polygon_edge,
+        index_t adjacent_id,
+        OGTriangulatedSurfaceKey )
     {
         impl_->set_polygon_adjacent( polygon_edge, adjacent_id );
     }

@@ -87,7 +87,7 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodeEdgedCurve< dimension >::set_vertex(
-        index_t vertex_id, const Point< dimension >& point )
+        index_t vertex_id, const Point< dimension >& point, OGEdgedCurveKey )
     {
         impl_->set_point( vertex_id, point );
     }
@@ -101,7 +101,7 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodeEdgedCurve< dimension >::set_edge_vertex(
-        const EdgeVertex& edge_vertex, index_t vertex_id )
+        const EdgeVertex& edge_vertex, index_t vertex_id, OGEdgedCurveKey )
     {
         impl_->set_edge_vertex( edge_vertex, vertex_id );
     }

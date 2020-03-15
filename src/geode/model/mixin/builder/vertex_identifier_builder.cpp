@@ -33,19 +33,19 @@ namespace geode
 
     index_t VertexIdentifierBuilder::create_unique_vertex()
     {
-        return vertex_identifier_.create_unique_vertex();
+        return vertex_identifier_.create_unique_vertex( {} );
     }
 
     index_t VertexIdentifierBuilder::create_unique_vertices( index_t nb )
     {
-        return vertex_identifier_.create_unique_vertices( nb );
+        return vertex_identifier_.create_unique_vertices( nb, {} );
     }
 
     void VertexIdentifierBuilder::set_unique_vertex(
         MeshComponentVertex component_vertex_id, index_t unique_vertex_id )
     {
         vertex_identifier_.set_unique_vertex(
-            component_vertex_id, unique_vertex_id );
+            component_vertex_id, unique_vertex_id, {} );
     }
 
     void VertexIdentifierBuilder::unset_unique_vertex(
@@ -53,18 +53,18 @@ namespace geode
         index_t unique_vertex_id )
     {
         vertex_identifier_.unset_unique_vertex(
-            component_vertex_id, unique_vertex_id );
+            component_vertex_id, unique_vertex_id, {} );
     }
 
     void VertexIdentifierBuilder::update_unique_vertices(
         const ComponentID& component_id, const std::vector< index_t >& old2new )
     {
-        vertex_identifier_.update_unique_vertices( component_id, old2new );
+        vertex_identifier_.update_unique_vertices( component_id, old2new, {} );
     }
 
     void VertexIdentifierBuilder::load_unique_vertices(
         absl::string_view directory )
     {
-        vertex_identifier_.load_unique_vertices( directory );
+        vertex_identifier_.load_unique_vertices( directory, {} );
     }
 } // namespace geode

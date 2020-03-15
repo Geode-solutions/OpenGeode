@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
 #include <geode/model/common.h>
@@ -30,6 +31,7 @@
 
 namespace geode
 {
+    class RelationshipsBuilder;
     struct uuid;
 } // namespace geode
 
@@ -44,7 +46,7 @@ namespace geode
      */
     class opengeode_model_api Relationships
     {
-        friend class RelationshipsBuilder;
+        PASSKEY( RelationshipsBuilder, RelationshipsBuilderKey );
 
     public:
         /*!
@@ -276,20 +278,20 @@ namespace geode
 
         void save_relationships( absl::string_view directory ) const;
 
-    private:
         /*!
          * Add a component in the set of components registered by the
          * Relationships
          * @param[in] id The component identifier to add
          */
-        void register_component( const ComponentID& id );
+        void register_component(
+            const ComponentID& id, RelationshipsBuilderKey );
 
         /*!
          * Remove a component from the set of components registered by the
          * Relationships and all its associated relationships
          * @param[in] id Unique index of the component to remove
          */
-        void unregister_component( const uuid& id );
+        void unregister_component( const uuid& id, RelationshipsBuilderKey );
 
         /*!
          * Add a new relationship of type boundary-incidence between two
@@ -297,8 +299,9 @@ namespace geode
          * @param[in] boundary Unique index of the boundary component
          * @param[in] incidence Unique index of the incidence component
          */
-        void add_boundary_relation(
-            const uuid& boundary, const uuid& incidence );
+        void add_boundary_relation( const uuid& boundary,
+            const uuid& incidence,
+            RelationshipsBuilderKey );
 
         /*!
          * Add a new relationship of type internal-embedding between two
@@ -306,17 +309,20 @@ namespace geode
          * @param[in] internal Unique index of the internal component
          * @param[in] embedding Unique index of the embedding component
          */
-        void add_internal_relation(
-            const uuid& internal, const uuid& embedding );
+        void add_internal_relation( const uuid& internal,
+            const uuid& embedding,
+            RelationshipsBuilderKey );
 
         /*!
          * Add a new relationship of type item-collection between two components
          * @param[in] item Unique index of the item component
          * @param[in] collection Unique index of the collection component
          */
-        void add_item_in_collection( const uuid& item, const uuid& collection );
+        void add_item_in_collection(
+            const uuid& item, const uuid& collection, RelationshipsBuilderKey );
 
-        void load_relationships( absl::string_view directory );
+        void load_relationships(
+            absl::string_view directory, RelationshipsBuilderKey );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

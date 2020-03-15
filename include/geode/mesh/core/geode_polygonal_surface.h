@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
 #include <geode/mesh/common.h>
@@ -40,7 +41,8 @@ namespace geode
     class OpenGeodePolygonalSurface : public PolygonalSurface< dimension >
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( OpenGeodePolygonalSurface );
-        friend class OpenGeodePolygonalSurfaceBuilder< dimension >;
+        PASSKEY( OpenGeodePolygonalSurfaceBuilder< dimension >,
+            OGPolygonalSurfaceKey );
 
     public:
         OpenGeodePolygonalSurface();
@@ -69,14 +71,30 @@ namespace geode
             return native_extension_static();
         }
 
+        void set_vertex( index_t vertex_id,
+            const Point< dimension >& point,
+            OGPolygonalSurfaceKey );
+
+        void set_polygon_vertex( const PolygonVertex& polygon_vertex,
+            index_t vertex_id,
+            OGPolygonalSurfaceKey );
+
+        void set_polygon_adjacent( const PolygonEdge& polygon_edge,
+            index_t adjacent_id,
+            OGPolygonalSurfaceKey );
+
+        void add_polygon(
+            const std::vector< index_t >& vertices, OGPolygonalSurfaceKey );
+
+        void remove_polygons(
+            const std::vector< bool >& to_delete, OGPolygonalSurfaceKey );
+
     private:
         friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive );
 
         const Point< dimension >& get_point( index_t vertex_id ) const override;
-
-        void set_vertex( index_t vertex_id, const Point< dimension >& point );
 
         index_t get_polygon_vertex(
             const PolygonVertex& polygon_vertex ) const override;
@@ -85,16 +103,6 @@ namespace geode
 
         index_t get_polygon_adjacent(
             const PolygonEdge& polygon_edge ) const override;
-
-        void set_polygon_vertex(
-            const PolygonVertex& polygon_vertex, index_t vertex_id );
-
-        void set_polygon_adjacent(
-            const PolygonEdge& polygon_edge, index_t adjacent_id );
-
-        void add_polygon( const std::vector< index_t >& vertices );
-
-        void remove_polygons( const std::vector< bool >& to_delete );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

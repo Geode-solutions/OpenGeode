@@ -47,10 +47,10 @@ namespace geode
     public:
         explicit Impl( Graph& graph )
             : edges_around_vertex_(
-                graph.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        EdgesAroundVertex >(
-                        attribute_name, EdgesAroundVertex{} ) )
+                  graph.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          EdgesAroundVertex >(
+                          attribute_name, EdgesAroundVertex{} ) )
         {
         }
 
@@ -200,7 +200,7 @@ namespace geode
     }
 
     void Graph::set_edges_around_vertex(
-        index_t vertex_id, EdgesAroundVertex edges )
+        index_t vertex_id, EdgesAroundVertex edges, GraphKey )
     {
         OPENGEODE_ASSERT( vertex_id < this->nb_vertices(),
             "[Graph::get_edges_around_vertex] Accessing an invalid vertex" );
@@ -208,7 +208,7 @@ namespace geode
     }
 
     void Graph::associate_edge_vertex_to_vertex(
-        const EdgeVertex& edge_vertex, index_t vertex_id )
+        const EdgeVertex& edge_vertex, index_t vertex_id, GraphKey )
     {
         impl_->associate_edge_vertex_to_vertex( *this, edge_vertex, vertex_id );
     }
@@ -232,7 +232,7 @@ namespace geode
     {
         auto clone = create( type_name() );
         auto builder = GraphBuilder::create( *clone );
-        builder->copy( *this );
+        builder->copy( *this, {} );
         return clone;
     }
 

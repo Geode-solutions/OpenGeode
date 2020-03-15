@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
 #include <geode/mesh/common.h>
@@ -40,7 +41,7 @@ namespace geode
     class OpenGeodeEdgedCurve : public EdgedCurve< dimension >
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( OpenGeodeEdgedCurve );
-        friend class OpenGeodeEdgedCurveBuilder< dimension >;
+        PASSKEY( OpenGeodeEdgedCurveBuilder< dimension >, OGEdgedCurveKey );
 
     public:
         OpenGeodeEdgedCurve();
@@ -69,6 +70,13 @@ namespace geode
             return native_extension_static();
         }
 
+        void set_vertex( index_t vertex_id,
+            const Point< dimension >& point,
+            OGEdgedCurveKey );
+
+        void set_edge_vertex(
+            const EdgeVertex& edge_vertex, index_t vertex_id, OGEdgedCurveKey );
+
     private:
         friend class bitsery::Access;
         template < typename Archive >
@@ -76,12 +84,7 @@ namespace geode
 
         const Point< dimension >& get_point( index_t vertex_id ) const override;
 
-        void set_vertex( index_t vertex_id, const Point< dimension >& point );
-
         index_t get_edge_vertex( const EdgeVertex& edge_vertex ) const override;
-
-        void set_edge_vertex(
-            const EdgeVertex& edge_vertex, index_t vertex_id );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

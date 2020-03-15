@@ -80,7 +80,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    void Surface< dimension >::ensure_mesh_type()
+    void Surface< dimension >::ensure_mesh_type( SurfacesKey )
     {
         return impl_->ensure_mesh_type();
     }
@@ -99,7 +99,8 @@ namespace geode
 
     template < index_t dimension >
     void Surface< dimension >::set_mesh(
-        std::unique_ptr< PolygonalSurface< dimension > > mesh )
+        std::unique_ptr< PolygonalSurface< dimension > > mesh,
+        SurfacesBuilderKey )
     {
         impl_->set_mesh( std::move( mesh ) );
     }

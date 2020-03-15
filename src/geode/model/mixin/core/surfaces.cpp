@@ -108,8 +108,9 @@ namespace geode
             Surface< dimension >::component_type_static().get() );
         for( auto& surface : modifiable_surfaces() )
         {
-            surface.ensure_mesh_type();
-            auto& mesh = surface.modifiable_mesh();
+            surface.ensure_mesh_type( {} );
+            auto& mesh = surface.modifiable_mesh(
+                typename Surface< dimension >::SurfacesKey{} );
             const auto file = absl::StrCat(
                 prefix, surface.id().string(), ".", mesh.native_extension() );
             auto* triangulated =
@@ -143,7 +144,8 @@ namespace geode
     const uuid& Surfaces< dimension >::create_surface()
     {
         typename Surfaces< dimension >::Impl::ComponentPtr surface{
-            new Surface< dimension >
+            new Surface< dimension >{
+                typename Surface< dimension >::SurfacesKey{} }
         };
         const auto& id = surface->id();
         impl_->add_component( std::move( surface ) );
@@ -154,7 +156,8 @@ namespace geode
     const uuid& Surfaces< dimension >::create_surface( const MeshType& type )
     {
         typename Surfaces< dimension >::Impl::ComponentPtr surface{
-            new Surface< dimension >{ type }
+            new Surface< dimension >{
+                type, typename Surface< dimension >::SurfacesKey{} }
         };
         const auto& id = surface->id();
         impl_->add_component( std::move( surface ) );

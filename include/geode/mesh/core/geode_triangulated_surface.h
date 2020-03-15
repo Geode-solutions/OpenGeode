@@ -25,6 +25,7 @@
 
 #include <array>
 
+#include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
 #include <geode/mesh/common.h>
@@ -42,7 +43,8 @@ namespace geode
     class OpenGeodeTriangulatedSurface : public TriangulatedSurface< dimension >
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( OpenGeodeTriangulatedSurface );
-        friend class OpenGeodeTriangulatedSurfaceBuilder< dimension >;
+        PASSKEY( OpenGeodeTriangulatedSurfaceBuilder< dimension >,
+            OGTriangulatedSurfaceKey );
 
     public:
         OpenGeodeTriangulatedSurface();
@@ -71,6 +73,21 @@ namespace geode
             return native_extension_static();
         }
 
+        void set_vertex( index_t vertex_id,
+            const Point< dimension >& point,
+            OGTriangulatedSurfaceKey );
+
+        void set_polygon_vertex( const PolygonVertex& polygon_vertex,
+            index_t vertex_id,
+            OGTriangulatedSurfaceKey );
+
+        void set_polygon_adjacent( const PolygonEdge& polygon_edge,
+            index_t adjacent_id,
+            OGTriangulatedSurfaceKey );
+
+        void add_triangle( const std::array< index_t, 3 >& vertices,
+            OGTriangulatedSurfaceKey );
+
     private:
         friend class bitsery::Access;
         template < typename Archive >
@@ -78,21 +95,11 @@ namespace geode
 
         const Point< dimension >& get_point( index_t vertex_id ) const override;
 
-        void set_vertex( index_t vertex_id, const Point< dimension >& point );
-
         index_t get_polygon_vertex(
             const PolygonVertex& polygon_vertex ) const override;
 
         index_t get_polygon_adjacent(
             const PolygonEdge& polygon_edge ) const override;
-
-        void set_polygon_vertex(
-            const PolygonVertex& polygon_vertex, index_t vertex_id );
-
-        void set_polygon_adjacent(
-            const PolygonEdge& polygon_edge, index_t adjacent_id );
-
-        void add_triangle( const std::array< index_t, 3 >& vertices );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

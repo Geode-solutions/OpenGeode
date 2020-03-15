@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
 #include <geode/mesh/common.h>
@@ -30,9 +31,14 @@
 
 namespace geode
 {
+    class OpenGeodeGraphBuilder;
+} // namespace geode
+
+namespace geode
+{
     class opengeode_mesh_api OpenGeodeGraph : public Graph
     {
-        friend class OpenGeodeGraphBuilder;
+        PASSKEY( OpenGeodeGraphBuilder, OGGraphKey );
 
     public:
         OpenGeodeGraph();
@@ -59,15 +65,15 @@ namespace geode
             return native_extension_static();
         }
 
+        void set_edge_vertex(
+            const EdgeVertex& edge_vertex, index_t vertex_id, OGGraphKey );
+
     private:
         friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive );
 
         index_t get_edge_vertex( const EdgeVertex& edge_vertex ) const override;
-
-        void set_edge_vertex(
-            const EdgeVertex& edge_vertex, index_t vertex_id );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

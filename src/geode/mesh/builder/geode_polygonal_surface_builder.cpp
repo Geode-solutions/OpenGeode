@@ -31,7 +31,7 @@ namespace geode
     void OpenGeodePolygonalSurfaceBuilder< dimension >::do_set_point(
         index_t vertex_id, const Point< dimension >& point )
     {
-        geode_polygonal_surface_.set_vertex( vertex_id, point );
+        geode_polygonal_surface_.set_vertex( vertex_id, point, {} );
     }
 
     template < index_t dimension >
@@ -56,14 +56,14 @@ namespace geode
         const PolygonVertex& polygon_vertex, index_t vertex_id )
     {
         geode_polygonal_surface_.set_polygon_vertex(
-            polygon_vertex, vertex_id );
+            polygon_vertex, vertex_id, {} );
     }
 
     template < index_t dimension >
     void OpenGeodePolygonalSurfaceBuilder< dimension >::do_create_polygon(
         const std::vector< index_t >& vertices )
     {
-        geode_polygonal_surface_.add_polygon( vertices );
+        geode_polygonal_surface_.add_polygon( vertices, {} );
     }
 
     template < index_t dimension >
@@ -71,14 +71,14 @@ namespace geode
         const PolygonEdge& polygon_edge, index_t adjacent_id )
     {
         geode_polygonal_surface_.set_polygon_adjacent(
-            polygon_edge, adjacent_id );
+            polygon_edge, adjacent_id, {} );
     }
 
     template < index_t dimension >
     void OpenGeodePolygonalSurfaceBuilder< dimension >::do_delete_polygons(
         const std::vector< bool >& to_delete )
     {
-        geode_polygonal_surface_.remove_polygons( to_delete );
+        geode_polygonal_surface_.remove_polygons( to_delete, {} );
     }
 
     template class opengeode_mesh_api OpenGeodePolygonalSurfaceBuilder< 2 >;

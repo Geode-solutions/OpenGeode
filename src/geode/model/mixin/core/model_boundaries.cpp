@@ -102,7 +102,8 @@ namespace geode
     const uuid& ModelBoundaries< dimension >::create_model_boundary()
     {
         typename ModelBoundaries< dimension >::Impl::ComponentPtr boundary{
-            new ModelBoundary< dimension >
+            new ModelBoundary< dimension >{
+                typename ModelBoundary< dimension >::ModelBoundariesKey{} }
         };
         const auto& id = boundary->id();
         impl_->add_component( std::move( boundary ) );

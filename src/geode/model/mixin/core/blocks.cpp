@@ -104,8 +104,9 @@ namespace geode
             directory, "/", Block< dimension >::component_type_static().get() );
         for( auto& block : modifiable_blocks() )
         {
-            block.ensure_mesh_type();
-            auto& mesh = block.modifiable_mesh();
+            block.ensure_mesh_type( {} );
+            auto& mesh = block.modifiable_mesh(
+                typename Block< dimension >::BlocksKey{} );
             const auto file = absl::StrCat(
                 prefix, block.id().string(), ".", mesh.native_extension() );
             auto* tetra =
@@ -125,7 +126,7 @@ namespace geode
     const uuid& Blocks< dimension >::create_block()
     {
         typename Blocks< dimension >::Impl::ComponentPtr block{
-            new Block< dimension >
+            new Block< dimension >{ typename Block< dimension >::BlocksKey() }
         };
         const auto& id = block->id();
         impl_->add_component( std::move( block ) );
@@ -136,7 +137,7 @@ namespace geode
     const uuid& Blocks< dimension >::create_block( const MeshType& type )
     {
         typename Blocks< dimension >::Impl::ComponentPtr block{
-            new Block< dimension >{ type }
+            new Block< dimension >{ type, {} }
         };
         const auto& id = block->id();
         impl_->add_component( std::move( block ) );

@@ -1,10 +1,16 @@
 #pragma once
 
 #include <geode/basic/bitsery_archive.h>
+#include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
 #include <geode/model/common.h>
 #include <geode/model/mixin/core/component_type.h>
+
+namespace geode
+{
+    class VertexIdentifierBuilder;
+}
 
 namespace geode
 {
@@ -53,7 +59,7 @@ namespace geode
      */
     class opengeode_model_api VertexIdentifier
     {
-        friend class VertexIdentifierBuilder;
+        PASSKEY( VertexIdentifierBuilder, BuilderKey );
 
     public:
         VertexIdentifier();
@@ -100,39 +106,41 @@ namespace geode
          */
         void save_unique_vertices( absl::string_view directory ) const;
 
-    private:
         /*!
          * Add a component in the VertexIdentifier
          */
         template < typename MeshComponent >
-        void register_mesh_component( const MeshComponent& component );
+        void register_mesh_component(
+            const MeshComponent& component, BuilderKey );
 
         /*!
          * Remove a component from the VertexIdentifier and delete corresponding
          * information (i.e. the attribute on component mesh).
          */
         template < typename MeshComponent >
-        void unregister_mesh_component( const MeshComponent& component );
+        void unregister_mesh_component(
+            const MeshComponent& component, BuilderKey );
 
         /*!
          * Create an empty unique vertex.
          * @return Index of the created unique vertex.
          */
-        index_t create_unique_vertex();
+        index_t create_unique_vertex( BuilderKey );
 
         /*!
          * Create several empty unique vertices
          * @return Index of the first created unique vertex
          */
-        index_t create_unique_vertices( index_t nb );
+        index_t create_unique_vertices( index_t nb, BuilderKey );
 
         /*!
          * Identify a component vertex to an existing unique vertex index.
          * @param[in] component_vertex_id Index of the vertex in the component.
          * @param[in] unique_vertex_id Unique vertex index.
          */
-        void set_unique_vertex(
-            MeshComponentVertex component_vertex_id, index_t unique_vertex_id );
+        void set_unique_vertex( MeshComponentVertex component_vertex_id,
+            index_t unique_vertex_id,
+            BuilderKey );
 
         /*!
          * Remove a component vertex to its unique vertex index.
@@ -141,7 +149,8 @@ namespace geode
          */
         void unset_unique_vertex(
             const MeshComponentVertex& component_vertex_id,
-            index_t unique_vertex_id );
+            index_t unique_vertex_id,
+            BuilderKey );
 
         /*!
          * Remove a component vertex to its unique vertex index.
@@ -151,14 +160,15 @@ namespace geode
          * to new ones. Deleted vertices new index is NO_ID.
          */
         void update_unique_vertices( const ComponentID& component_id,
-            const std::vector< index_t >& old2new );
+            const std::vector< index_t >& old2new,
+            BuilderKey );
 
         /*!
          * Load the VertexIdentifier from a file.
          * @param[in] directory Folder containing the file that stores
          * VertexIdentifier information.
          */
-        void load_unique_vertices( absl::string_view directory );
+        void load_unique_vertices( absl::string_view directory, BuilderKey );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

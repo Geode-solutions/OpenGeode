@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <geode/basic/passkey.h>
+
 #include <geode/mesh/builder/graph_builder.h>
 #include <geode/mesh/common.h>
 
@@ -40,6 +42,8 @@ namespace geode
     template < index_t dimension >
     class EdgedCurveBuilder : public GraphBuilder
     {
+        PASSKEY( EdgedCurve< dimension >, BuilderKey );
+
     public:
         /*!
          * Create the builder associated with an EdgedCurve.
@@ -62,13 +66,17 @@ namespace geode
          */
         index_t create_point( const Point< dimension >& point );
 
+        void copy( const EdgedCurve< dimension >& edged_curve, BuilderKey )
+        {
+            copy( edged_curve );
+        }
+
     protected:
         EdgedCurveBuilder( EdgedCurve< dimension >& edged_curve )
             : GraphBuilder( edged_curve ), edged_curve_( edged_curve )
         {
         }
 
-        friend class EdgedCurve< dimension >;
         void copy( const EdgedCurve< dimension >& edged_curve );
 
     private:

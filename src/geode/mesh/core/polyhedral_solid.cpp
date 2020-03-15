@@ -94,7 +94,7 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -170,10 +170,10 @@ namespace geode
     public:
         explicit Impl( PolyhedralSolid& solid )
             : polyhedron_around_vertex_(
-                solid.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolyhedronVertex >(
-                        "polyhedron_around_vertex", PolyhedronVertex{} ) )
+                  solid.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolyhedronVertex >(
+                          "polyhedron_around_vertex", PolyhedronVertex{} ) )
         {
         }
 
@@ -734,14 +734,14 @@ namespace geode
 
     template < index_t dimension >
     void PolyhedralSolid< dimension >::update_facet_vertices(
-        const std::vector< index_t >& old2new )
+        const std::vector< index_t >& old2new, PolyhedralSolidKey )
     {
         impl_->update_facet_vertices( old2new );
     }
 
     template < index_t dimension >
     void PolyhedralSolid< dimension >::update_edge_vertices(
-        const std::vector< index_t >& old2new )
+        const std::vector< index_t >& old2new, PolyhedralSolidKey )
     {
         impl_->update_edge_vertices( old2new );
     }
@@ -750,7 +750,8 @@ namespace geode
     void PolyhedralSolid< dimension >::update_facet_vertex(
         PolyhedronFacetVertices facet_vertices,
         index_t facet_vertex_id,
-        index_t new_vertex_id )
+        index_t new_vertex_id,
+        PolyhedralSolidKey )
     {
         impl_->update_facet_vertex(
             std::move( facet_vertices ), facet_vertex_id, new_vertex_id );
@@ -760,7 +761,8 @@ namespace geode
     void PolyhedralSolid< dimension >::update_edge_vertex(
         std::array< index_t, 2 > edge_vertices,
         index_t edge_vertex_id,
-        index_t new_vertex_id )
+        index_t new_vertex_id,
+        PolyhedralSolidKey )
     {
         impl_->update_edge_vertex(
             std::move( edge_vertices ), edge_vertex_id, new_vertex_id );
@@ -768,48 +770,51 @@ namespace geode
 
     template < index_t dimension >
     void PolyhedralSolid< dimension >::remove_facet(
-        PolyhedronFacetVertices facet_vertices )
+        PolyhedronFacetVertices facet_vertices, PolyhedralSolidKey )
     {
         impl_->remove_facet( std::move( facet_vertices ) );
     }
 
     template < index_t dimension >
     void PolyhedralSolid< dimension >::remove_edge(
-        std::array< index_t, 2 > edge_vertices )
+        std::array< index_t, 2 > edge_vertices, PolyhedralSolidKey )
     {
         impl_->remove_edge( std::move( edge_vertices ) );
     }
 
     template < index_t dimension >
-    std::vector< index_t >
-        PolyhedralSolid< dimension >::remove_isolated_facets()
+    std::vector< index_t > PolyhedralSolid< dimension >::remove_isolated_facets(
+        PolyhedralSolidKey )
     {
         return impl_->remove_isolated_facets();
     }
 
     template < index_t dimension >
-    std::vector< index_t > PolyhedralSolid< dimension >::remove_isolated_edges()
+    std::vector< index_t > PolyhedralSolid< dimension >::remove_isolated_edges(
+        PolyhedralSolidKey )
     {
         return impl_->remove_isolated_edges();
     }
 
     template < index_t dimension >
     std::vector< index_t > PolyhedralSolid< dimension >::delete_facets(
-        const std::vector< bool >& to_delete )
+        const std::vector< bool >& to_delete, PolyhedralSolidKey )
     {
         return impl_->delete_facets( to_delete );
     }
 
     template < index_t dimension >
     std::vector< index_t > PolyhedralSolid< dimension >::delete_edges(
-        const std::vector< bool >& to_delete )
+        const std::vector< bool >& to_delete, PolyhedralSolidKey )
     {
         return impl_->delete_edges( to_delete );
     }
 
     template < index_t dimension >
     void PolyhedralSolid< dimension >::associate_polyhedron_vertex_to_vertex(
-        const PolyhedronVertex& polyhedron_vertex, index_t vertex_id )
+        const PolyhedronVertex& polyhedron_vertex,
+        index_t vertex_id,
+        PolyhedralSolidKey )
     {
         impl_->associate_polyhedron_vertex_to_vertex(
             polyhedron_vertex, vertex_id );
@@ -879,7 +884,7 @@ namespace geode
             polyhedron_facet_vertex( { polyhedron_facet_edge.polyhedron_facet,
                 ( polyhedron_facet_edge.edge_id + 1 )
                     % nb_polyhedron_facet_vertices(
-                        polyhedron_facet_edge.polyhedron_facet ) } );
+                          polyhedron_facet_edge.polyhedron_facet ) } );
         return edge_from_vertices( { v0, v1 } );
     }
 
@@ -1023,7 +1028,7 @@ namespace geode
     {
         auto clone = create( this->type_name() );
         auto builder = PolyhedralSolidBuilder< dimension >::create( *clone );
-        builder->copy( *this );
+        builder->copy( *this, {} );
         return clone;
     }
 

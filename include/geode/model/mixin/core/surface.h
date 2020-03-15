@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
 #include <geode/mesh/core/mesh_type.h>
@@ -47,8 +48,8 @@ namespace geode
     class Surface final : public Component< dimension >
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( Surface );
-        friend class Surfaces< dimension >;
-        friend class SurfacesBuilder< dimension >;
+        PASSKEY( Surfaces< dimension >, SurfacesKey );
+        PASSKEY( SurfacesBuilder< dimension >, SurfacesBuilderKey );
         friend class bitsery::Access;
 
     public:
@@ -71,21 +72,36 @@ namespace geode
 
         const PolygonalSurface< dimension >& mesh() const;
 
+        Surface( SurfacesKey ) : Surface() {}
+
+        Surface( const MeshType& type, SurfacesKey ) : Surface( type ){};
+
+        PolygonalSurface< dimension >& modifiable_mesh( SurfacesKey )
+        {
+            return modifiable_mesh();
+        }
+
+        void ensure_mesh_type( SurfacesKey );
+
+        void set_mesh( std::unique_ptr< PolygonalSurface< dimension > > mesh,
+            SurfacesBuilderKey );
+
+        void set_surface_name( absl::string_view name, SurfacesBuilderKey )
+        {
+            this->set_name( name );
+        }
+
+        PolygonalSurface< dimension >& modifiable_mesh( SurfacesBuilderKey )
+        {
+            return modifiable_mesh();
+        }
+
     private:
         Surface();
 
         explicit Surface( const MeshType& type );
 
         PolygonalSurface< dimension >& modifiable_mesh();
-
-        void set_mesh( std::unique_ptr< PolygonalSurface< dimension > > mesh );
-
-        void set_surface_name( absl::string_view name )
-        {
-            this->set_name( name );
-        }
-
-        void ensure_mesh_type();
 
         template < typename Archive >
         void serialize( Archive& archive );

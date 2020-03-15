@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
 #include <geode/mesh/core/mesh_type.h>
@@ -48,8 +49,8 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( Block );
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
-        friend class Blocks< dimension >;
-        friend class BlocksBuilder< dimension >;
+        PASSKEY( Blocks< dimension >, BlocksKey );
+        PASSKEY( BlocksBuilder< dimension >, BlocksBuilderKey );
         friend class bitsery::Access;
 
     public:
@@ -72,21 +73,36 @@ namespace geode
 
         const PolyhedralSolid< dimension >& mesh() const;
 
+        void ensure_mesh_type( BlocksKey );
+
+        PolyhedralSolid< dimension >& modifiable_mesh( BlocksKey )
+        {
+            return modifiable_mesh();
+        }
+
+        Block( BlocksKey ) : Block() {}
+
+        Block( const MeshType& type, BlocksKey ) : Block( type ) {}
+
+        void set_mesh( std::unique_ptr< PolyhedralSolid< dimension > > mesh,
+            BlocksBuilderKey );
+
+        PolyhedralSolid< dimension >& modifiable_mesh( BlocksBuilderKey )
+        {
+            return modifiable_mesh();
+        }
+
+        void set_block_name( absl::string_view name, BlocksBuilderKey )
+        {
+            this->set_name( name );
+        }
+
     private:
         Block();
 
         explicit Block( const MeshType& type );
 
         PolyhedralSolid< dimension >& modifiable_mesh();
-
-        void set_mesh( std::unique_ptr< PolyhedralSolid< dimension > > mesh );
-
-        void set_block_name( absl::string_view name )
-        {
-            this->set_name( name );
-        }
-
-        void ensure_mesh_type();
 
         template < typename Archive >
         void serialize( Archive& archive );

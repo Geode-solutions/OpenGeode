@@ -92,8 +92,9 @@ namespace geode
             directory, "/", Line< dimension >::component_type_static().get() );
         for( auto& line : modifiable_lines() )
         {
-            line.ensure_mesh_type();
-            auto& mesh = line.modifiable_mesh();
+            line.ensure_mesh_type( {} );
+            auto& mesh =
+                line.modifiable_mesh( typename Line< dimension >::LinesKey{} );
             const auto file = absl::StrCat(
                 prefix, line.id().string(), ".", mesh.native_extension() );
             load_edged_curve( mesh, file );
@@ -117,7 +118,7 @@ namespace geode
     const uuid& Lines< dimension >::create_line()
     {
         typename Lines< dimension >::Impl::ComponentPtr line{
-            new Line< dimension >
+            new Line< dimension >{ typename Line< dimension >::LinesKey{} }
         };
         const auto& id = line->id();
         impl_->add_component( std::move( line ) );
@@ -128,7 +129,8 @@ namespace geode
     const uuid& Lines< dimension >::create_line( const MeshType& type )
     {
         typename Lines< dimension >::Impl::ComponentPtr line{
-            new Line< dimension >{ type }
+            new Line< dimension >{
+                type, typename Line< dimension >::LinesKey{} }
         };
         const auto& id = line->id();
         impl_->add_component( std::move( line ) );

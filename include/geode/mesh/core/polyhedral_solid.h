@@ -30,6 +30,7 @@
 #include <geode/basic/attribute.h>
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/factory.h>
+#include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
 #include <geode/mesh/common.h>
@@ -191,7 +192,7 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( PolyhedralSolid );
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
-        friend class PolyhedralSolidBuilder< dimension >;
+        PASSKEY( PolyhedralSolidBuilder< dimension >, PolyhedralSolidKey );
 
     public:
         /*!
@@ -407,6 +408,64 @@ namespace geode
          * Compute the bounding box from mesh vertices
          */
         BoundingBox< dimension > bounding_box() const;
+        const PolyhedronVertex& polyhedron_around_vertex(
+            index_t vertex_id ) const;
+
+        void associate_polyhedron_vertex_to_vertex(
+            const PolyhedronVertex& polyhedron_vertex,
+            index_t vertex_id,
+            PolyhedralSolidKey );
+
+        void update_facet_vertices(
+            const std::vector< index_t >& old2new, PolyhedralSolidKey );
+
+        void update_edge_vertices(
+            const std::vector< index_t >& old2new, PolyhedralSolidKey );
+
+        void update_facet_vertex( PolyhedronFacetVertices facet_vertices,
+            index_t facet_vertex_id,
+            index_t new_vertex_id,
+            PolyhedralSolidKey );
+
+        void update_edge_vertex( std::array< index_t, 2 > edge_vertices,
+            index_t edge_vertex_id,
+            index_t new_vertex_id,
+            PolyhedralSolidKey );
+
+        void remove_facet(
+            PolyhedronFacetVertices facet_vertices, PolyhedralSolidKey );
+
+        void remove_edge(
+            std::array< index_t, 2 > edge_vertices, PolyhedralSolidKey );
+
+        std::vector< index_t > delete_facets(
+            const std::vector< bool >& to_delete, PolyhedralSolidKey );
+
+        std::vector< index_t > delete_edges(
+            const std::vector< bool >& to_delete, PolyhedralSolidKey );
+
+        std::vector< index_t > remove_isolated_facets( PolyhedralSolidKey );
+
+        std::vector< index_t > remove_isolated_edges( PolyhedralSolidKey );
+
+        index_t find_or_create_facet(
+            PolyhedronFacetVertices facet_vertices, PolyhedralSolidKey )
+        {
+            return find_or_create_facet( facet_vertices );
+        }
+
+        index_t find_or_create_edge(
+            std::array< index_t, 2 > edge_vertices, PolyhedralSolidKey )
+        {
+            return find_or_create_edge( edge_vertices );
+        }
+
+        PolyhedronVertex polyhedron_facet_vertex_id(
+            const PolyhedronFacetVertex& polyhedron_facet_vertex,
+            PolyhedralSolidKey ) const
+        {
+            return get_polyhedron_facet_vertex_id( polyhedron_facet_vertex );
+        }
 
     protected:
         PolyhedralSolid();
@@ -422,38 +481,6 @@ namespace geode
 
         virtual const Point< dimension >& get_point(
             index_t vertex_id ) const = 0;
-
-        const PolyhedronVertex& polyhedron_around_vertex(
-            index_t vertex_id ) const;
-
-        void associate_polyhedron_vertex_to_vertex(
-            const PolyhedronVertex& polyhedron_vertex, index_t vertex_id );
-
-        void update_facet_vertices( const std::vector< index_t >& old2new );
-
-        void update_edge_vertices( const std::vector< index_t >& old2new );
-
-        void update_facet_vertex( PolyhedronFacetVertices facet_vertices,
-            index_t facet_vertex_id,
-            index_t new_vertex_id );
-
-        void update_edge_vertex( std::array< index_t, 2 > edge_vertices,
-            index_t edge_vertex_id,
-            index_t new_vertex_id );
-
-        void remove_facet( PolyhedronFacetVertices facet_vertices );
-
-        void remove_edge( std::array< index_t, 2 > edge_vertices );
-
-        std::vector< index_t > delete_facets(
-            const std::vector< bool >& to_delete );
-
-        std::vector< index_t > delete_edges(
-            const std::vector< bool >& to_delete );
-
-        std::vector< index_t > remove_isolated_facets();
-
-        std::vector< index_t > remove_isolated_edges();
 
         virtual index_t get_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex ) const = 0;

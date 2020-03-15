@@ -120,10 +120,10 @@ namespace geode
     public:
         explicit Impl( PolygonalSurfaceBase& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) )
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
@@ -263,7 +263,7 @@ namespace geode
     template < index_t dimension >
     const PolygonVertex&
         PolygonalSurfaceBase< dimension >::polygon_around_vertex(
-            index_t vertex_id ) const
+            index_t vertex_id, PolygonalSurfaceKey ) const
     {
         OPENGEODE_ASSERT( vertex_id < this->nb_vertices(),
             "[PolygonalSurfaceBase::polygon_around_vertex] Accessing an "
@@ -288,7 +288,7 @@ namespace geode
 
     template < index_t dimension >
     void PolygonalSurfaceBase< dimension >::update_edge_vertices(
-        const std::vector< index_t >& old2new )
+        const std::vector< index_t >& old2new, PolygonalSurfaceKey )
     {
         impl_->update_edge_vertices( old2new );
     }
@@ -297,7 +297,8 @@ namespace geode
     void PolygonalSurfaceBase< dimension >::update_edge_vertex(
         std::array< index_t, 2 > edge_vertices,
         index_t edge_vertex_id,
-        index_t new_vertex_id )
+        index_t new_vertex_id,
+        PolygonalSurfaceKey )
     {
         impl_->update_edge_vertex(
             std::move( edge_vertices ), edge_vertex_id, new_vertex_id );
@@ -305,28 +306,31 @@ namespace geode
 
     template < index_t dimension >
     void PolygonalSurfaceBase< dimension >::remove_edge(
-        std::array< index_t, 2 > edge_vertices )
+        std::array< index_t, 2 > edge_vertices, PolygonalSurfaceKey )
     {
         impl_->remove_edge( std::move( edge_vertices ) );
     }
 
     template < index_t dimension >
     std::vector< index_t > PolygonalSurfaceBase< dimension >::delete_edges(
-        const std::vector< bool >& to_delete )
+        const std::vector< bool >& to_delete, PolygonalSurfaceKey )
     {
         return impl_->delete_edges( to_delete );
     }
 
     template < index_t dimension >
     std::vector< index_t >
-        PolygonalSurfaceBase< dimension >::remove_isolated_edges()
+        PolygonalSurfaceBase< dimension >::remove_isolated_edges(
+            PolygonalSurfaceKey )
     {
         return impl_->remove_isolated_edges();
     }
 
     template < index_t dimension >
     void PolygonalSurfaceBase< dimension >::associate_polygon_vertex_to_vertex(
-        const PolygonVertex& polygon_vertex, index_t vertex_id )
+        const PolygonVertex& polygon_vertex,
+        index_t vertex_id,
+        PolygonalSurfaceKey )
     {
         impl_->associate_polygon_vertex_to_vertex( polygon_vertex, vertex_id );
     }
@@ -751,7 +755,7 @@ namespace geode
     {
         auto clone = create( this->type_name() );
         auto builder = PolygonalSurfaceBuilder< dimension >::create( *clone );
-        builder->copy( *this );
+        builder->copy( *this, {} );
         return clone;
     }
 
@@ -791,7 +795,7 @@ namespace geode
     {
         auto clone = create( type_name() );
         auto builder = PolygonalSurfaceBuilder< 3 >::create( *clone );
-        builder->copy( *this );
+        builder->copy( *this, {} );
         return clone;
     }
 
