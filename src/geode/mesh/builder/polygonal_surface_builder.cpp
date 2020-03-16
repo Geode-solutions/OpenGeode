@@ -361,8 +361,8 @@ namespace geode
     void PolygonalSurfaceBuilder< dimension >::compute_polygon_adjacencies(
         const std::vector< index_t >& polygons_to_connect )
     {
-        std::vector< std::vector< PolygonVertex > > polygon_vertices(
-            polygonal_surface_.nb_vertices() );
+        absl::FixedArray< absl::InlinedVector< PolygonVertex, 4 > >
+            polygon_vertices( polygonal_surface_.nb_vertices() );
         for( const auto polygon : polygons_to_connect )
         {
             for( const auto v :

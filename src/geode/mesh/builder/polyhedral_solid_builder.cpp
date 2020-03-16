@@ -86,7 +86,7 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -472,7 +472,7 @@ namespace geode
     void PolyhedralSolidBuilder< dimension >::compute_polyhedron_adjacencies(
         const std::vector< index_t >& polyhedra_to_connect )
     {
-        std::vector< std::vector< PolyhedronFacet > >
+        absl::FixedArray< absl::InlinedVector< PolyhedronFacet, 4 > >
             polyhedron_facet_around_vertex( polyhedral_solid_.nb_vertices() );
         for( const auto polyhedron : polyhedra_to_connect )
         {
