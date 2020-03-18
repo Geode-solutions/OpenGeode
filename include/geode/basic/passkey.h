@@ -46,8 +46,8 @@ namespace geode
      *     public:
      *          void run( A& a )
      *          {
-     *              // the {} will implicitly creates a KeyForB
-     *              a.restrictive_method({});
+     *              // the {} will implicitly create a KeyForB
+     *              a.restrictive_method( {} );
      *          }
      *     };
      */
