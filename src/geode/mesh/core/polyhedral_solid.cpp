@@ -640,14 +640,11 @@ namespace geode
                         {
                             continue;
                         }
-                        PolyhedronVertex adj_vertex{ adj_polyhedron,
-                            NO_ID };
+                        PolyhedronVertex adj_vertex{ adj_polyhedron, NO_ID };
                         for( const auto v_adj :
-                            Range{
-                                nb_polyhedron_vertices( adj_polyhedron ) } )
+                            Range{ nb_polyhedron_vertices( adj_polyhedron ) } )
                         {
-                            if( polyhedron_vertex(
-                                    { adj_polyhedron, v_adj } )
+                            if( polyhedron_vertex( { adj_polyhedron, v_adj } )
                                 == vertex_id )
                             {
                                 adj_vertex.vertex_id = v_adj;
@@ -685,7 +682,7 @@ namespace geode
             "[PolyhedralSolid::polyhedron_from_facet] Accessing an "
             "invalid facet" );
         const auto& vertices = facet_vertices( facet_id );
-                const auto& polyhedron_vertices =
+        const auto& polyhedron_vertices =
             polyhedra_around_vertex( vertices[0] );
         for( const auto& polyhedron_vertex : polyhedron_vertices )
         {
