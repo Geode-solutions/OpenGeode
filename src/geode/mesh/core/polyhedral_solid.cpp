@@ -615,12 +615,6 @@ namespace geode
             const auto polyhedron_vertex_id = S.top();
             S.pop();
             const auto p = polyhedron_vertex_id.polyhedron_id;
-            if( absl::c_find( polyhedra_visited, p )
-                != polyhedra_visited.end() )
-            {
-                continue;
-            }
-            polyhedra_visited.insert( p );
             polyhedra.push_back( polyhedron_vertex_id );
 
             for( const auto f : Range{ nb_polyhedron_facets( p ) } )
