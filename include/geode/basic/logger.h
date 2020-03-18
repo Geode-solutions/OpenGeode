@@ -107,3 +107,4 @@ namespace geode
 } // namespace geode
 
 #define DEBUG( a ) geode::Logger::debug( #a, " = ", a )
+#define SDEBUG( a ) geode::Logger::debug( #a, " = ", a.string() )
