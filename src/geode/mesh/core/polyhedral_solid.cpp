@@ -116,7 +116,8 @@ namespace
         for( const auto& polyhedron_vertex : potential_polyhedra )
         {
             bool add{ true };
-            for( const auto& polyhedra_around_vertex : polyhedra_around_vertices )
+            for( const auto& polyhedra_around_vertex :
+                polyhedra_around_vertices )
             {
                 if( absl::c_find_if( polyhedra_around_vertex,
                         [&polyhedron_vertex](
