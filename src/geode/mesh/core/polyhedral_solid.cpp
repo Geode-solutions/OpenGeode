@@ -23,6 +23,8 @@
 
 #include <geode/mesh/core/polyhedral_solid.h>
 
+#include <absl/container/flat_hash_set.h>
+
 #include <bitsery/brief_syntax/array.h>
 
 #include <geode/basic/attribute.h>
@@ -114,7 +116,7 @@ namespace
         for( const auto& polyhedron_vertex : potential_polyhedra )
         {
             bool add{ true };
-            for( const auto& polyhedron_around : polyhedra_around_vertices )
+            for( const auto& polyhedra_around_vertex : polyhedra_around_vertices )
             {
                 if( absl::c_find_if( polyhedra_around_vertex,
                         [&polyhedron_vertex](
