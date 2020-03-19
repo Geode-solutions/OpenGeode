@@ -179,7 +179,7 @@ namespace geode
 
     template < index_t dimension >
     index_t PolygonalSurfaceBuilder< dimension >::create_polygon(
-        const std::vector< index_t >& vertices )
+        absl::Span< const index_t > vertices )
     {
         const auto added_polygon = polygonal_surface_.nb_polygons();
         polygonal_surface_.polygon_attribute_manager().resize(
@@ -550,7 +550,7 @@ namespace geode
         }
         for( const auto p : Range{ polygonal_surface.nb_polygons() } )
         {
-            std::vector< index_t > vertices(
+            absl::FixedArray< index_t > vertices(
                 polygonal_surface.nb_polygon_vertices( p ) );
             for( const auto v :
                 Range{ polygonal_surface.nb_polygon_vertices( p ) } )

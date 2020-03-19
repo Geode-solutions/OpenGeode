@@ -61,7 +61,7 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodePolygonalSurfaceBuilder< dimension >::do_create_polygon(
-        const std::vector< index_t >& vertices )
+        absl::Span< const index_t > vertices )
     {
         geode_polygonal_surface_.add_polygon( vertices, {} );
     }

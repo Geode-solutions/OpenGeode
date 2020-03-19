@@ -82,7 +82,7 @@ namespace geode
                                + polygon_edge.edge_id] = adjacent_id;
         }
 
-        void add_polygon( const std::vector< index_t >& vertices )
+        void add_polygon( absl::Span< const index_t > vertices )
         {
             polygon_vertices_.insert(
                 polygon_vertices_.end(), vertices.begin(), vertices.end() );
@@ -226,7 +226,7 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodePolygonalSurface< dimension >::add_polygon(
-        const std::vector< index_t >& vertices, OGPolygonalSurfaceKey )
+        absl::Span< const index_t > vertices, OGPolygonalSurfaceKey )
     {
         impl_->add_polygon( vertices );
     }

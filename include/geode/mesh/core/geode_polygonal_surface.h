@@ -84,7 +84,7 @@ namespace geode
             OGPolygonalSurfaceKey );
 
         void add_polygon(
-            const std::vector< index_t >& vertices, OGPolygonalSurfaceKey );
+            absl::Span< const index_t > vertices, OGPolygonalSurfaceKey );
 
         void remove_polygons(
             const std::vector< bool >& to_delete, OGPolygonalSurfaceKey );
