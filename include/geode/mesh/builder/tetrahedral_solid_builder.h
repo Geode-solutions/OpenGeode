@@ -78,14 +78,14 @@ namespace geode
         void copy( const TetrahedralSolid< dimension >& tetrahedral_solid );
 
     private:
-        void do_create_facets( const std::vector< index_t >& vertices,
-            const std::vector< std::vector< index_t > >& facets ) final;
+        void do_create_facets( absl::Span< const index_t > vertices,
+            absl::Span< const std::vector< index_t > > facets ) final;
 
-        void do_create_edges( const std::vector< index_t >& vertices,
-            const std::vector< std::vector< index_t > >& facets ) final;
+        void do_create_edges( absl::Span< const index_t > vertices,
+            absl::Span< const std::vector< index_t > > facets ) final;
 
-        void do_create_polyhedron( const std::vector< index_t >& vertices,
-            const std::vector< std::vector< index_t > >& facets ) final;
+        void do_create_polyhedron( absl::Span< const index_t > vertices,
+            absl::Span< const std::vector< index_t > > facets ) final;
 
         virtual void do_create_facets(
             const std::array< index_t, 4 >& vertices ) = 0;

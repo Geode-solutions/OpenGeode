@@ -47,9 +47,9 @@ namespace geode
         protected:
             FacetStorage()
                 : counter_(
-                    facet_attribute_manager_
-                        .template find_or_create_attribute< VariableAttribute,
-                            index_t >( "counter", 1u ) ),
+                      facet_attribute_manager_
+                          .template find_or_create_attribute< VariableAttribute,
+                              index_t >( "counter", 1u ) ),
                   vertices_(
                       facet_attribute_manager_
                           .template find_or_create_attribute< VariableAttribute,
@@ -144,7 +144,7 @@ namespace geode
                 return old2new;
             }
 
-            void update_facet_vertices( const std::vector< index_t >& old2new )
+            void update_facet_vertices( absl::Span< const index_t > old2new )
             {
                 const auto old_facet_indices = facet_indices_;
                 facet_indices_.clear();

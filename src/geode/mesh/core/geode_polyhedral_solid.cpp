@@ -124,8 +124,8 @@ namespace geode
             return { polyhedron_id, vertex_id };
         }
 
-        void add_polyhedron( const std::vector< index_t >& vertices,
-            const std::vector< std::vector< index_t > >& facets )
+        void add_polyhedron( absl::Span< const index_t > vertices,
+            absl::Span< const std::vector< index_t > > facets )
         {
             polyhedron_vertices_.insert(
                 polyhedron_vertices_.end(), vertices.begin(), vertices.end() );
@@ -377,8 +377,8 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodePolyhedralSolid< dimension >::add_polyhedron(
-        const std::vector< index_t >& vertices,
-        const std::vector< std::vector< index_t > >& facets,
+        absl::Span< const index_t > vertices,
+        absl::Span< const std::vector< index_t > > facets,
         OGPolyhedralSolidKey )
     {
         impl_->add_polyhedron( vertices, facets );

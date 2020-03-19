@@ -86,7 +86,7 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -118,7 +118,7 @@ namespace
     void update_polyhedron_around_vertices(
         const geode::PolyhedralSolid< dimension >& solid,
         geode::PolyhedralSolidBuilder< dimension >& builder,
-        const std::vector< geode::index_t >& vertices_old2new )
+        absl::Span< const geode::index_t > vertices_old2new )
     {
         for( const auto v : geode::Range{ solid.nb_vertices() } )
         {
@@ -140,7 +140,7 @@ namespace
     template < geode::index_t dimension >
     std::vector< bool > find_polyhedra_to_delete(
         const geode::PolyhedralSolid< dimension >& solid,
-        const std::vector< geode::index_t >& vertices_old2new )
+        absl::Span< const geode::index_t > vertices_old2new )
     {
         std::vector< bool > polyhedra_to_delete( solid.nb_polyhedra(), false );
         for( const auto p : geode::Range{ solid.nb_polyhedra() } )
@@ -275,7 +275,7 @@ namespace geode
 
     template < index_t dimension >
     void PolyhedralSolidBuilder< dimension >::update_polyhedron_vertices(
-        const std::vector< index_t >& old2new )
+        absl::Span< const index_t > old2new )
     {
         update_polyhedron_around_vertices( polyhedral_solid_, *this, old2new );
         const auto polyhedra_to_delete =
@@ -315,8 +315,8 @@ namespace geode
 
     template < index_t dimension >
     index_t PolyhedralSolidBuilder< dimension >::create_polyhedron(
-        const std::vector< index_t >& vertices,
-        const std::vector< std::vector< index_t > >& facets )
+        absl::Span< const index_t > vertices,
+        absl::Span< const std::vector< index_t > > facets )
     {
         const auto added_polyhedron = polyhedral_solid_.nb_polyhedra();
         polyhedral_solid_.polyhedron_attribute_manager().resize(
@@ -334,8 +334,8 @@ namespace geode
 
     template < index_t dimension >
     void PolyhedralSolidBuilder< dimension >::do_create_facets(
-        const std::vector< index_t >& vertices,
-        const std::vector< std::vector< index_t > >& facets )
+        absl::Span< const index_t > vertices,
+        absl::Span< const std::vector< index_t > > facets )
     {
         for( auto&& facet_vertices :
             get_polyhedron_facet_vertices( vertices, facets ) )
@@ -346,8 +346,8 @@ namespace geode
 
     template < index_t dimension >
     void PolyhedralSolidBuilder< dimension >::do_create_edges(
-        const std::vector< index_t >& vertices,
-        const std::vector< std::vector< index_t > >& facets )
+        absl::Span< const index_t > vertices,
+        absl::Span< const std::vector< index_t > > facets )
     {
         for( auto&& edge_vertices :
             get_polyhedron_edge_vertices( vertices, facets ) )
@@ -359,8 +359,8 @@ namespace geode
     template < index_t dimension >
     std::vector< PolyhedronFacetVertices >
         PolyhedralSolidBuilder< dimension >::get_polyhedron_facet_vertices(
-            const std::vector< index_t >& vertices,
-            const std::vector< std::vector< index_t > >& facets ) const
+            absl::Span< const index_t > vertices,
+            absl::Span< const std::vector< index_t > > facets ) const
     {
         std::vector< PolyhedronFacetVertices > polyhedron_facet_vertices(
             facets.size() );
@@ -381,8 +381,8 @@ namespace geode
     template < index_t dimension >
     std::vector< std::array< index_t, 2 > >
         PolyhedralSolidBuilder< dimension >::get_polyhedron_edge_vertices(
-            const std::vector< index_t >& vertices,
-            const std::vector< std::vector< index_t > >& facets ) const
+            absl::Span< const index_t > vertices,
+            absl::Span< const std::vector< index_t > > facets ) const
     {
         std::vector< std::array< index_t, 2 > > polyhedron_edge_vertices;
         polyhedron_edge_vertices.reserve( 3 * facets.size() );
@@ -470,7 +470,7 @@ namespace geode
 
     template < index_t dimension >
     void PolyhedralSolidBuilder< dimension >::compute_polyhedron_adjacencies(
-        const std::vector< index_t >& polyhedra_to_connect )
+        absl::Span< const index_t > polyhedra_to_connect )
     {
         absl::FixedArray< absl::InlinedVector< PolyhedronFacet, 4 > >
             polyhedron_facet_around_vertex( polyhedral_solid_.nb_vertices() );
@@ -688,14 +688,14 @@ namespace geode
 
     template < index_t dimension >
     void PolyhedralSolidBuilder< dimension >::update_facet_vertices(
-        const std::vector< index_t >& old2new )
+        absl::Span< const index_t > old2new )
     {
         polyhedral_solid_.update_facet_vertices( old2new, {} );
     }
 
     template < index_t dimension >
     void PolyhedralSolidBuilder< dimension >::update_edge_vertices(
-        const std::vector< index_t >& old2new )
+        absl::Span< const index_t > old2new )
     {
         polyhedral_solid_.update_edge_vertices( old2new, {} );
     }
@@ -751,7 +751,7 @@ namespace geode
         }
         for( const auto p : Range{ polyhedral_solid.nb_polyhedra() } )
         {
-            std::vector< index_t > vertices(
+            absl::FixedArray< index_t > vertices(
                 polyhedral_solid.nb_polyhedron_vertices( p ) );
             for( const auto v :
                 Range{ polyhedral_solid.nb_polyhedron_vertices( p ) } )

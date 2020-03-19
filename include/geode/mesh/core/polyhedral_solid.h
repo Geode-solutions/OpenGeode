@@ -417,10 +417,10 @@ namespace geode
             PolyhedralSolidKey );
 
         void update_facet_vertices(
-            const std::vector< index_t >& old2new, PolyhedralSolidKey );
+            absl::Span< const index_t > old2new, PolyhedralSolidKey );
 
         void update_edge_vertices(
-            const std::vector< index_t >& old2new, PolyhedralSolidKey );
+            absl::Span< const index_t > old2new, PolyhedralSolidKey );
 
         void update_facet_vertex( PolyhedronFacetVertices facet_vertices,
             index_t facet_vertex_id,

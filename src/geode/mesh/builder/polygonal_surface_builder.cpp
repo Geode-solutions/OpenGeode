@@ -99,7 +99,7 @@ namespace
     void update_polygon_around_vertices(
         const geode::PolygonalSurface< dimension >& surface,
         geode::PolygonalSurfaceBuilder< dimension >& builder,
-        const std::vector< geode::index_t >& vertices_old2new )
+        absl::Span< const geode::index_t > vertices_old2new )
     {
         for( const auto v : geode::Range{ surface.nb_vertices() } )
         {
@@ -121,7 +121,7 @@ namespace
     template < geode::index_t dimension >
     std::vector< bool > find_polygons_to_delete(
         const geode::PolygonalSurface< dimension >& surface,
-        const std::vector< geode::index_t >& vertices_old2new )
+        absl::Span< const geode::index_t > vertices_old2new )
     {
         std::vector< bool > polygons_to_delete( surface.nb_polygons(), false );
         for( const auto p : geode::Range{ surface.nb_polygons() } )
@@ -287,7 +287,7 @@ namespace geode
 
     template < index_t dimension >
     void PolygonalSurfaceBuilder< dimension >::update_polygon_vertices(
-        const std::vector< index_t >& old2new )
+        absl::Span< const index_t > old2new )
     {
         update_polygon_around_vertices( polygonal_surface_, *this, old2new );
         const auto polygons_to_delete =
@@ -360,7 +360,7 @@ namespace geode
 
     template < index_t dimension >
     void PolygonalSurfaceBuilder< dimension >::compute_polygon_adjacencies(
-        const std::vector< index_t >& polygons_to_connect )
+        absl::Span< const index_t > polygons_to_connect )
     {
         absl::FixedArray< absl::InlinedVector< PolygonVertex, 4 > >
             polygon_vertices( polygonal_surface_.nb_vertices() );
@@ -494,7 +494,7 @@ namespace geode
 
     template < index_t dimension >
     void PolygonalSurfaceBuilder< dimension >::update_edge_vertices(
-        const std::vector< index_t >& old2new )
+        absl::Span< const index_t > old2new )
     {
         polygonal_surface_.update_edge_vertices( old2new, {} );
     }

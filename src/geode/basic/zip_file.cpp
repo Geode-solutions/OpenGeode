@@ -67,8 +67,7 @@ namespace geode
             mz_zip_writer_delete( &writer_ );
         }
 
-        void archive_files(
-            const std::vector< absl::string_view >& files ) const
+        void archive_files( absl::Span< const absl::string_view >& files ) const
         {
             for( const auto& file : files )
             {
@@ -110,7 +109,7 @@ namespace geode
     }
 
     void ZipFile::archive_files(
-        const std::vector< absl::string_view >& files ) const
+        absl::Span< const absl::string_view >& files ) const
     {
         impl_->archive_files( files );
     }
