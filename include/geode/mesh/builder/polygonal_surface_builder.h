@@ -118,7 +118,7 @@ namespace geode
          * adjacencies
          */
         void compute_polygon_adjacencies(
-            const std::vector< index_t >& polygons_to_connect );
+            absl::Span< const index_t > polygons_to_connect );
 
         /*!
          * Delete a set of surface polygons
@@ -206,9 +206,9 @@ namespace geode
         void update_polygon_vertex(
             const PolygonVertex& polygon_vertex, index_t vertex_id );
 
-        void update_polygon_vertices( const std::vector< index_t >& old2new );
+        void update_polygon_vertices( absl::Span< const index_t > old2new );
 
-        void update_edge_vertices( const std::vector< index_t >& old2new );
+        void update_edge_vertices( absl::Span< const index_t > old2new );
 
         void update_edge_vertex( std::array< index_t, 2 > edge_vertices,
             index_t edge_vertex_id,

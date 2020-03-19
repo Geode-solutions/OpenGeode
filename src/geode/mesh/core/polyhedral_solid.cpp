@@ -96,7 +96,7 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -163,10 +163,10 @@ namespace geode
     public:
         explicit Impl( PolyhedralSolid& solid )
             : polyhedron_around_vertex_(
-                solid.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolyhedronVertex >(
-                        "polyhedron_around_vertex", PolyhedronVertex{} ) )
+                  solid.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolyhedronVertex >(
+                          "polyhedron_around_vertex", PolyhedronVertex{} ) )
         {
         }
 
@@ -243,12 +243,12 @@ namespace geode
             }
         }
 
-        void update_facet_vertices( const std::vector< index_t >& old2new )
+        void update_facet_vertices( absl::Span< const index_t > old2new )
         {
             Facets::update_facet_vertices( old2new );
         }
 
-        void update_edge_vertices( const std::vector< index_t >& old2new )
+        void update_edge_vertices( absl::Span< const index_t > old2new )
         {
             Edges::update_facet_vertices( old2new );
         }
@@ -767,14 +767,14 @@ namespace geode
 
     template < index_t dimension >
     void PolyhedralSolid< dimension >::update_facet_vertices(
-        const std::vector< index_t >& old2new, PolyhedralSolidKey )
+        absl::Span< const index_t > old2new, PolyhedralSolidKey )
     {
         impl_->update_facet_vertices( old2new );
     }
 
     template < index_t dimension >
     void PolyhedralSolid< dimension >::update_edge_vertices(
-        const std::vector< index_t >& old2new, PolyhedralSolidKey )
+        absl::Span< const index_t > old2new, PolyhedralSolidKey )
     {
         impl_->update_edge_vertices( old2new );
     }
@@ -917,7 +917,7 @@ namespace geode
             polyhedron_facet_vertex( { polyhedron_facet_edge.polyhedron_facet,
                 ( polyhedron_facet_edge.edge_id + 1 )
                     % nb_polyhedron_facet_vertices(
-                        polyhedron_facet_edge.polyhedron_facet ) } );
+                          polyhedron_facet_edge.polyhedron_facet ) } );
         return edge_from_vertices( { v0, v1 } );
     }
 

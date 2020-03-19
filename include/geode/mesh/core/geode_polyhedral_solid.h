@@ -75,8 +75,8 @@ namespace geode
             const Point< dimension >& point,
             OGPolyhedralSolidKey );
 
-        void add_polyhedron( const std::vector< index_t >& vertices,
-            const std::vector< std::vector< index_t > >& facets,
+        void add_polyhedron( absl::Span< const index_t > vertices,
+            absl::Span< const std::vector< index_t > > facets,
             OGPolyhedralSolidKey );
 
         void remove_polyhedra(

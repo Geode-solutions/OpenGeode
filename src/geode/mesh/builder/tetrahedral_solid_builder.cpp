@@ -53,8 +53,8 @@ namespace geode
 
     template < index_t dimension >
     void TetrahedralSolidBuilder< dimension >::do_create_facets(
-        const std::vector< index_t >& vertices,
-        const std::vector< std::vector< index_t > >& facets )
+        absl::Span< const index_t > vertices,
+        absl::Span< const std::vector< index_t > > facets )
     {
         geode_unused( facets );
         OPENGEODE_ASSERT( vertices.size() == 4, "[TetrahedralSolidBuilder::"
@@ -67,8 +67,8 @@ namespace geode
 
     template < index_t dimension >
     void TetrahedralSolidBuilder< dimension >::do_create_edges(
-        const std::vector< index_t >& vertices,
-        const std::vector< std::vector< index_t > >& facets )
+        absl::Span< const index_t > vertices,
+        absl::Span< const std::vector< index_t > > facets )
     {
         geode_unused( facets );
         OPENGEODE_ASSERT( vertices.size() == 4, "[TetrahedralSolidBuilder::"
@@ -83,8 +83,8 @@ namespace geode
 
     template < index_t dimension >
     void TetrahedralSolidBuilder< dimension >::do_create_polyhedron(
-        const std::vector< index_t >& vertices,
-        const std::vector< std::vector< index_t > >& facets )
+        absl::Span< const index_t > vertices,
+        absl::Span< const std::vector< index_t > > facets )
     {
         geode_unused( facets );
         OPENGEODE_ASSERT( vertices.size() == 4, "[TetrahedralSolidBuilder::"

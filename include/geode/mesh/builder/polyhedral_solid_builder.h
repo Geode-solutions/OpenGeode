@@ -78,8 +78,8 @@ namespace geode
          * facets of the polyhedron
          * @return the index of the created polyhedron
          */
-        index_t create_polyhedron( const std::vector< index_t >& vertices,
-            const std::vector< std::vector< index_t > >& facets );
+        index_t create_polyhedron( absl::Span< const index_t > vertices,
+            absl::Span< const std::vector< index_t > > facets );
 
         /*!
          * Modify a polyhedron vertex.
@@ -110,7 +110,7 @@ namespace geode
          * adjacencies
          */
         void compute_polyhedron_adjacencies(
-            const std::vector< index_t >& polyhedra_to_connect );
+            absl::Span< const index_t > polyhedra_to_connect );
 
         /*!
          * Delete a set of solid polyhedra
@@ -199,15 +199,14 @@ namespace geode
         virtual void do_set_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex, index_t vertex_id ) = 0;
 
-        virtual void do_create_facets( const std::vector< index_t >& vertices,
-            const std::vector< std::vector< index_t > >& facets );
+        virtual void do_create_facets( absl::Span< const index_t > vertices,
+            absl::Span< const std::vector< index_t > > facets );
 
-        virtual void do_create_edges( const std::vector< index_t >& vertices,
-            const std::vector< std::vector< index_t > >& facets );
+        virtual void do_create_edges( absl::Span< const index_t > vertices,
+            absl::Span< const std::vector< index_t > > facets );
 
-        virtual void do_create_polyhedron(
-            const std::vector< index_t >& vertices,
-            const std::vector< std::vector< index_t > >& facets ) = 0;
+        virtual void do_create_polyhedron( absl::Span< const index_t > vertices,
+            absl::Span< const std::vector< index_t > > facets ) = 0;
 
         virtual void do_delete_polyhedra(
             const std::vector< bool >& to_delete ) = 0;
@@ -218,8 +217,7 @@ namespace geode
         void update_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex, index_t vertex_id );
 
-        void update_polyhedron_vertices(
-            const std::vector< index_t >& old2new );
+        void update_polyhedron_vertices( absl::Span< const index_t > old2new );
 
         void remove_polyhedra_facets( const std::vector< bool >& to_delete );
 
@@ -232,19 +230,17 @@ namespace geode
             index_t facet_vertex_id,
             index_t new_vertex_id );
 
-        void update_facet_vertices( const std::vector< index_t >& old2new );
+        void update_facet_vertices( absl::Span< const index_t > old2new );
 
-        void update_edge_vertices( const std::vector< index_t >& old2new );
+        void update_edge_vertices( absl::Span< const index_t > old2new );
 
         virtual std::vector< PolyhedronFacetVertices >
-            get_polyhedron_facet_vertices(
-                const std::vector< index_t >& vertices,
-                const std::vector< std::vector< index_t > >& facets ) const;
+            get_polyhedron_facet_vertices( absl::Span< const index_t > vertices,
+                absl::Span< const std::vector< index_t > > facets ) const;
 
         virtual std::vector< std::array< index_t, 2 > >
-            get_polyhedron_edge_vertices(
-                const std::vector< index_t >& vertices,
-                const std::vector< std::vector< index_t > >& facets ) const;
+            get_polyhedron_edge_vertices( absl::Span< const index_t > vertices,
+                absl::Span< const std::vector< index_t > > facets ) const;
 
     private:
         PolyhedralSolid< dimension >& polyhedral_solid_;

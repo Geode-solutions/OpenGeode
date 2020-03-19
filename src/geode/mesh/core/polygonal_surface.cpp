@@ -120,10 +120,10 @@ namespace geode
     public:
         explicit Impl( PolygonalSurfaceBase& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) )
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
@@ -165,7 +165,7 @@ namespace geode
             this->remove_facet( std::move( edge_vertices ) );
         }
 
-        void update_edge_vertices( const std::vector< index_t >& old2new )
+        void update_edge_vertices( absl::Span< const index_t > old2new )
         {
             this->update_facet_vertices( old2new );
         }
@@ -288,7 +288,7 @@ namespace geode
 
     template < index_t dimension >
     void PolygonalSurfaceBase< dimension >::update_edge_vertices(
-        const std::vector< index_t >& old2new, PolygonalSurfaceKey )
+        absl::Span< const index_t > old2new, PolygonalSurfaceKey )
     {
         impl_->update_edge_vertices( old2new );
     }

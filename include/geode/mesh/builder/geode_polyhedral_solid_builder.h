@@ -71,8 +71,8 @@ namespace geode
             const PolyhedronVertex& polyhedron_vertex,
             index_t vertex_id ) final;
 
-        void do_create_polyhedron( const std::vector< index_t >& vertices,
-            const std::vector< std::vector< index_t > >& facets ) final;
+        void do_create_polyhedron( absl::Span< const index_t > vertices,
+            absl::Span< const std::vector< index_t > > facets ) final;
 
         void do_delete_polyhedra( const std::vector< bool >& to_delete ) final;
 

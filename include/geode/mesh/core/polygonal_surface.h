@@ -326,7 +326,7 @@ namespace geode
             PolygonalSurfaceKey );
 
         void update_edge_vertices(
-            const std::vector< index_t >& old2new, PolygonalSurfaceKey );
+            absl::Span< const index_t > old2new, PolygonalSurfaceKey );
 
         void update_edge_vertex( std::array< index_t, 2 > edge_vertices,
             index_t edge_vertex_id,

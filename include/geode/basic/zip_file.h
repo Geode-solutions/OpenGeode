@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <absl/types/span.h>
+
 #include <geode/basic/common.h>
 
 #include <geode/basic/pimpl.h>
@@ -37,7 +39,7 @@ namespace geode
         ~ZipFile();
 
         void archive_files(
-            const std::vector< absl::string_view >& files ) const;
+            absl::Span< const absl::string_view >& files ) const;
 
         void archive_file( absl::string_view file ) const;
 
