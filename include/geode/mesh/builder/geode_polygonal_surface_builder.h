@@ -68,7 +68,7 @@ namespace geode
         void do_set_polygon_vertex(
             const PolygonVertex& polygon_vertex, index_t vertex_id ) final;
 
-        void do_create_polygon( const std::vector< index_t >& vertices ) final;
+        void do_create_polygon( absl::Span< const index_t > vertices ) final;
 
         void do_delete_polygons( const std::vector< bool >& to_delete ) final;
 

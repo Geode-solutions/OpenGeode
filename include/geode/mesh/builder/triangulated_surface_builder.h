@@ -88,7 +88,7 @@ namespace geode
             const TriangulatedSurface< dimension >& triangulated_surface );
 
     private:
-        void do_create_polygon( const std::vector< index_t >& vertices ) final;
+        void do_create_polygon( absl::Span< const index_t > vertices ) final;
 
         virtual void do_create_triangle(
             const std::array< index_t, 3 >& vertices ) = 0;

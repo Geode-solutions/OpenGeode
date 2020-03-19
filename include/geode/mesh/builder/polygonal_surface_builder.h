@@ -25,6 +25,8 @@
 
 #include <vector>
 
+#include <absl/types/span.h>
+
 #include <geode/basic/factory.h>
 #include <geode/basic/passkey.h>
 
@@ -78,7 +80,7 @@ namespace geode
          * create
          * @return the index of the created polygon
          */
-        index_t create_polygon( const std::vector< index_t >& vertices );
+        index_t create_polygon( absl::Span< const index_t > vertices );
 
         /*!
          * Modify a polygon vertex.
@@ -190,7 +192,7 @@ namespace geode
             const PolygonVertex& polygon_vertex, index_t vertex_id ) = 0;
 
         virtual void do_create_polygon(
-            const std::vector< index_t >& vertices ) = 0;
+            absl::Span< const index_t > vertices ) = 0;
 
         virtual void do_delete_polygons(
             const std::vector< bool >& to_delete ) = 0;
