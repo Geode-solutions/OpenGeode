@@ -53,8 +53,7 @@ std::array< geode::uuid, 6 > add_corners(
     for( const auto c : geode::Range{ 6 } )
     {
         uuids[c] = builder.add_corner();
-        builder.set_corner_name(
-            uuids.back(), absl::StrCat( "corner", uuids.size() ) );
+        builder.set_corner_name( uuids[c], absl::StrCat( "corner", c + 1 ) );
     }
     const auto& temp_corner = model.corner(
         builder.add_corner( geode::OpenGeodePointSet3D::type_name_static() ) );
@@ -76,8 +75,7 @@ std::array< geode::uuid, 9 > add_lines(
     for( const auto l : geode::Range{ 9 } )
     {
         uuids[l] = builder.add_line();
-        builder.set_line_name(
-            uuids.back(), absl::StrCat( "line", uuids.size() ) );
+        builder.set_line_name( uuids[l], absl::StrCat( "line", l + 1 ) );
     }
     const auto& temp_line = model.line(
         builder.add_line( geode::OpenGeodeEdgedCurve3D::type_name_static() ) );
@@ -100,8 +98,7 @@ std::array< geode::uuid, 5 > add_surfaces(
     {
         uuids[s] = builder.add_surface(
             geode::OpenGeodeTriangulatedSurface3D::type_name_static() );
-        builder.set_surface_name(
-            uuids.back(), absl::StrCat( "surface", uuids.size() ) );
+        builder.set_surface_name( uuids[s], absl::StrCat( "surface", s + 1 ) );
     }
     for( const auto s : geode::Range{ 2, 5 } )
     {
@@ -127,8 +124,7 @@ std::array< geode::uuid, 1 > add_blocks(
     for( const auto b : geode::Range{ 1 } )
     {
         uuids[b] = builder.add_block();
-        builder.set_block_name(
-            uuids.back(), absl::StrCat( "block", uuids.size() ) );
+        builder.set_block_name( uuids[b], absl::StrCat( "block", b + 1 ) );
     }
     const auto& temp_block = model.block( builder.add_block(
         geode::OpenGeodePolyhedralSolid3D::type_name_static() ) );
@@ -151,7 +147,7 @@ std::array< geode::uuid, 3 > add_model_boundaries(
     {
         uuids[mb] = builder.add_model_boundary();
         builder.set_model_boundary_name(
-            uuids.back(), absl::StrCat( "boundary", uuids.size() ) );
+            uuids[mb], absl::StrCat( "boundary", mb + 1 ) );
     }
     const auto& temp_boundary =
         model.model_boundary( builder.add_model_boundary() );
