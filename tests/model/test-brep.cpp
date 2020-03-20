@@ -46,15 +46,13 @@
 
 #include <geode/tests/common.h>
 
-std::vector< geode::uuid > add_corners(
+std::array< geode::uuid, 6 > add_corners(
     const geode::BRep& model, geode::BRepBuilder& builder )
 {
-    const geode::index_t nb{ 6 };
-    std::vector< geode::uuid > uuids;
-    for( const auto unused : geode::Range{ nb } )
+    std::array< geode::uuid, 6 > uuids;
+    for( const auto c : geode::Range{ 6 } )
     {
-        geode_unused( unused );
-        uuids.push_back( builder.add_corner() );
+        uuids[c] = builder.add_corner();
         builder.set_corner_name(
             uuids.back(), absl::StrCat( "corner", uuids.size() ) );
     }
@@ -62,24 +60,22 @@ std::vector< geode::uuid > add_corners(
         builder.add_corner( geode::OpenGeodePointSet3D::type_name_static() ) );
     builder.remove_corner( temp_corner );
     const auto message =
-        absl::StrCat( "[Test] BRep should have ", nb, " corners" );
-    OPENGEODE_EXCEPTION( model.nb_corners() == nb, message );
+        absl::StrCat( "[Test] BRep should have ", 6, " corners" );
+    OPENGEODE_EXCEPTION( model.nb_corners() == 6, message );
     OPENGEODE_EXCEPTION(
-        geode::detail::count_relationships( model.corners() ) == nb, message );
+        geode::detail::count_relationships( model.corners() ) == 6, message );
     OPENGEODE_EXCEPTION( model.corner( uuids[3] ).name() == "corner4",
         "[Test] Wrong Corner name" );
     return uuids;
 }
 
-std::vector< geode::uuid > add_lines(
+std::array< geode::uuid, 9 > add_lines(
     const geode::BRep& model, geode::BRepBuilder& builder )
 {
-    const geode::index_t nb{ 9 };
-    std::vector< geode::uuid > uuids;
-    for( const auto unused : geode::Range{ nb } )
+    std::array< geode::uuid, 9 > uuids;
+    for( const auto l : geode::Range{ 9 } )
     {
-        geode_unused( unused );
-        uuids.push_back( builder.add_line() );
+        uuids[l] = builder.add_line();
         builder.set_line_name(
             uuids.back(), absl::StrCat( "line", uuids.size() ) );
     }
@@ -87,55 +83,50 @@ std::vector< geode::uuid > add_lines(
         builder.add_line( geode::OpenGeodeEdgedCurve3D::type_name_static() ) );
     builder.remove_line( temp_line );
     const auto message =
-        absl::StrCat( "[Test] BRep should have ", nb, " lines" );
-    OPENGEODE_EXCEPTION( model.nb_lines() == nb, message );
+        absl::StrCat( "[Test] BRep should have ", 9, " lines" );
+    OPENGEODE_EXCEPTION( model.nb_lines() == 9, message );
     OPENGEODE_EXCEPTION(
-        geode::detail::count_relationships( model.lines() ) == nb, message );
+        geode::detail::count_relationships( model.lines() ) == 9, message );
     OPENGEODE_EXCEPTION(
         model.line( uuids[3] ).name() == "line4", "[Test] Wrong Line name" );
     return uuids;
 }
 
-std::vector< geode::uuid > add_surfaces(
+std::array< geode::uuid, 5 > add_surfaces(
     const geode::BRep& model, geode::BRepBuilder& builder )
 {
-    const geode::index_t nb{ 5 };
-    std::vector< geode::uuid > uuids;
-    for( const auto unused : geode::Range{ 2 } )
+    std::array< geode::uuid, 5 > uuids;
+    for( const auto s : geode::Range{ 2 } )
     {
-        geode_unused( unused );
-        uuids.push_back( builder.add_surface(
-            geode::OpenGeodeTriangulatedSurface3D::type_name_static() ) );
+        uuids[s] = builder.add_surface(
+            geode::OpenGeodeTriangulatedSurface3D::type_name_static() );
         builder.set_surface_name(
             uuids.back(), absl::StrCat( "surface", uuids.size() ) );
     }
-    for( const auto unused : geode::Range{ 2, nb } )
+    for( const auto s : geode::Range{ 2, 5 } )
     {
-        geode_unused( unused );
-        uuids.push_back( builder.add_surface(
-            geode::OpenGeodePolygonalSurface3D::type_name_static() ) );
+        uuids[s] = builder.add_surface(
+            geode::OpenGeodePolygonalSurface3D::type_name_static() );
     }
     const auto& temp_surface = model.surface( builder.add_surface() );
     builder.remove_surface( temp_surface );
     const auto message =
-        absl::StrCat( "[Test] BRep should have ", nb, " surfaces" );
-    OPENGEODE_EXCEPTION( model.nb_surfaces() == nb, message );
+        absl::StrCat( "[Test] BRep should have ", 5, " surfaces" );
+    OPENGEODE_EXCEPTION( model.nb_surfaces() == 5, message );
     OPENGEODE_EXCEPTION(
-        geode::detail::count_relationships( model.surfaces() ) == nb, message );
+        geode::detail::count_relationships( model.surfaces() ) == 5, message );
     OPENGEODE_EXCEPTION( model.surface( uuids[1] ).name() == "surface2",
         "[Test] Wrong Surface name" );
     return uuids;
 }
 
-std::vector< geode::uuid > add_blocks(
+std::array< geode::uuid, 1 > add_blocks(
     const geode::BRep& model, geode::BRepBuilder& builder )
 {
-    const geode::index_t nb{ 1 };
-    std::vector< geode::uuid > uuids;
-    for( const auto unused : geode::Range{ nb } )
+    std::array< geode::uuid, 1 > uuids;
+    for( const auto b : geode::Range{ 1 } )
     {
-        geode_unused( unused );
-        uuids.push_back( builder.add_block() );
+        uuids[b] = builder.add_block();
         builder.set_block_name(
             uuids.back(), absl::StrCat( "block", uuids.size() ) );
     }
@@ -143,24 +134,22 @@ std::vector< geode::uuid > add_blocks(
         geode::OpenGeodePolyhedralSolid3D::type_name_static() ) );
     builder.remove_block( temp_block );
     const auto message =
-        absl::StrCat( "[Test] BRep should have ", nb, " blocks" );
-    OPENGEODE_EXCEPTION( model.nb_blocks() == nb, message );
+        absl::StrCat( "[Test] BRep should have ", 1, " block" );
+    OPENGEODE_EXCEPTION( model.nb_blocks() == 1, message );
     OPENGEODE_EXCEPTION(
-        geode::detail::count_relationships( model.blocks() ) == nb, message );
+        geode::detail::count_relationships( model.blocks() ) == 1, message );
     OPENGEODE_EXCEPTION(
         model.block( uuids[0] ).name() == "block1", "[Test] Wrong Block name" );
     return uuids;
 }
 
-std::vector< geode::uuid > add_model_boundaries(
+std::array< geode::uuid, 3 > add_model_boundaries(
     const geode::BRep& model, geode::BRepBuilder& builder )
 {
-    const geode::index_t nb{ 3 };
-    std::vector< geode::uuid > uuids;
-    for( const auto unused : geode::Range{ nb } )
+    std::array< geode::uuid, 3 > uuids;
+    for( const auto mb : geode::Range{ 3 } )
     {
-        geode_unused( unused );
-        uuids.push_back( builder.add_model_boundary() );
+        uuids[mb] = builder.add_model_boundary();
         builder.set_model_boundary_name(
             uuids.back(), absl::StrCat( "boundary", uuids.size() ) );
     }
@@ -168,10 +157,10 @@ std::vector< geode::uuid > add_model_boundaries(
         model.model_boundary( builder.add_model_boundary() );
     builder.remove_model_boundary( temp_boundary );
     const auto message =
-        absl::StrCat( "[Test] BRep should have ", nb, " model boundaries" );
-    OPENGEODE_EXCEPTION( model.nb_model_boundaries() == nb, message );
+        absl::StrCat( "[Test] BRep should have ", 3, " model boundaries" );
+    OPENGEODE_EXCEPTION( model.nb_model_boundaries() == 3, message );
     OPENGEODE_EXCEPTION(
-        geode::detail::count_relationships( model.model_boundaries() ) == nb,
+        geode::detail::count_relationships( model.model_boundaries() ) == 3,
         message );
     OPENGEODE_EXCEPTION( model.model_boundary( uuids[0] ).name() == "boundary1",
         "[Test] Wrong ModelBoundary name" );
@@ -180,8 +169,8 @@ std::vector< geode::uuid > add_model_boundaries(
 
 void add_corner_line_boundary_relation( const geode::BRep& model,
     geode::BRepBuilder& builder,
-    const std::vector< geode::uuid >& corner_uuids,
-    const std::vector< geode::uuid >& line_uuids )
+    absl::Span< const geode::uuid > corner_uuids,
+    absl::Span< const geode::uuid > line_uuids )
 {
     builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[0] ), model.line( line_uuids[0] ) );
@@ -248,8 +237,8 @@ void add_corner_line_boundary_relation( const geode::BRep& model,
 
 void add_line_surface_boundary_relation( const geode::BRep& model,
     geode::BRepBuilder& builder,
-    const std::vector< geode::uuid >& line_uuids,
-    const std::vector< geode::uuid >& surface_uuids )
+    absl::Span< const geode::uuid > line_uuids,
+    absl::Span< const geode::uuid > surface_uuids )
 {
     builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[0] ), model.surface( surface_uuids[0] ) );
@@ -303,8 +292,8 @@ void add_line_surface_boundary_relation( const geode::BRep& model,
 
 void add_surface_block_relation( const geode::BRep& model,
     geode::BRepBuilder& builder,
-    const std::vector< geode::uuid >& surface_uuids,
-    const std::vector< geode::uuid >& block_uuids )
+    absl::Span< const geode::uuid > surface_uuids,
+    absl::Span< const geode::uuid > block_uuids )
 {
     for( const auto& surface_id : surface_uuids )
     {
@@ -331,8 +320,8 @@ void add_surface_block_relation( const geode::BRep& model,
 
 void add_surfaces_in_model_boundaries( const geode::BRep& model,
     geode::BRepBuilder& builder,
-    const std::vector< geode::uuid >& surface_uuids,
-    const std::vector< geode::uuid >& boundary_uuids )
+    absl::Span< const geode::uuid > surface_uuids,
+    absl::Span< const geode::uuid > boundary_uuids )
 {
     builder.add_surface_in_model_boundary( model.surface( surface_uuids[0] ),
         model.model_boundary( boundary_uuids[0] ) );
@@ -355,9 +344,9 @@ void add_surfaces_in_model_boundaries( const geode::BRep& model,
 
 void add_internal_corner_relations( const geode::BRep& model,
     geode::BRepBuilder& builder,
-    const std::vector< geode::uuid >& corner_uuids,
-    const std::vector< geode::uuid >& surface_uuids,
-    const std::vector< geode::uuid >& block_uuids )
+    absl::Span< const geode::uuid > corner_uuids,
+    absl::Span< const geode::uuid > surface_uuids,
+    absl::Span< const geode::uuid > block_uuids )
 {
     for( const auto& corner_id : corner_uuids )
     {
@@ -400,9 +389,9 @@ void add_internal_corner_relations( const geode::BRep& model,
 
 void add_internal_line_relations( const geode::BRep& model,
     geode::BRepBuilder& builder,
-    const std::vector< geode::uuid >& line_uuids,
-    const std::vector< geode::uuid >& surface_uuids,
-    const std::vector< geode::uuid >& block_uuids )
+    absl::Span< const geode::uuid > line_uuids,
+    absl::Span< const geode::uuid > surface_uuids,
+    absl::Span< const geode::uuid > block_uuids )
 {
     for( const auto& line_id : line_uuids )
     {
@@ -445,8 +434,8 @@ void add_internal_line_relations( const geode::BRep& model,
 
 void add_internal_surface_relations( const geode::BRep& model,
     geode::BRepBuilder& builder,
-    const std::vector< geode::uuid >& surface_uuids,
-    const std::vector< geode::uuid >& block_uuids )
+    absl::Span< const geode::uuid > surface_uuids,
+    absl::Span< const geode::uuid > block_uuids )
 {
     for( const auto& surface_id : surface_uuids )
     {
@@ -474,10 +463,10 @@ void add_internal_surface_relations( const geode::BRep& model,
 }
 
 void test_boundary_ranges( const geode::BRep& model,
-    const std::vector< geode::uuid >& corner_uuids,
-    const std::vector< geode::uuid >& line_uuids,
-    const std::vector< geode::uuid >& surface_uuids,
-    const std::vector< geode::uuid >& block_uuids )
+    absl::Span< const geode::uuid > corner_uuids,
+    absl::Span< const geode::uuid > line_uuids,
+    absl::Span< const geode::uuid > surface_uuids,
+    absl::Span< const geode::uuid > block_uuids )
 {
     geode::index_t line_boundary_count{ 0 };
     for( const auto& line_boundary :
@@ -521,10 +510,10 @@ void test_boundary_ranges( const geode::BRep& model,
 }
 
 void test_incidence_ranges( const geode::BRep& model,
-    const std::vector< geode::uuid >& corner_uuids,
-    const std::vector< geode::uuid >& line_uuids,
-    const std::vector< geode::uuid >& surface_uuids,
-    const std::vector< geode::uuid >& block_uuids )
+    absl::Span< const geode::uuid > corner_uuids,
+    absl::Span< const geode::uuid > line_uuids,
+    absl::Span< const geode::uuid > surface_uuids,
+    absl::Span< const geode::uuid > block_uuids )
 {
     geode::index_t corner_incidence_count{ 0 };
     for( const auto& corner_incidence :
@@ -565,8 +554,8 @@ void test_incidence_ranges( const geode::BRep& model,
 }
 
 void test_item_ranges( const geode::BRep& model,
-    const std::vector< geode::uuid >& surface_uuids,
-    const std::vector< geode::uuid >& boundary_uuids )
+    absl::Span< const geode::uuid > surface_uuids,
+    absl::Span< const geode::uuid > boundary_uuids )
 {
     const auto& boundary_items =
         model.items( model.model_boundary( boundary_uuids[1] ) );

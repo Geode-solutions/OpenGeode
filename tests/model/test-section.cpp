@@ -45,78 +45,70 @@
 
 #include <geode/tests/common.h>
 
-std::vector< geode::uuid > add_corners(
+std::array< geode::uuid, 5 > add_corners(
     const geode::Section& model, geode::SectionBuilder& builder )
 {
-    const geode::index_t nb{ 5 };
-    std::vector< geode::uuid > uuids;
-    for( const auto unused : geode::Range{ nb } )
+    std::array< geode::uuid, 5 > uuids;
+    for( const auto c : geode::Range{ 5 } )
     {
-        geode_unused( unused );
-        uuids.push_back( builder.add_corner() );
+        uuids[c] = builder.add_corner();
     }
     const auto& temp_corner = model.corner(
         builder.add_corner( geode::OpenGeodePointSet2D::type_name_static() ) );
     builder.remove_corner( temp_corner );
     const auto message =
-        absl::StrCat( "[Test] Section should have ", nb, " corners" );
-    OPENGEODE_EXCEPTION( model.nb_corners() == nb, message );
+        absl::StrCat( "[Test] Section should have ", 5, " corners" );
+    OPENGEODE_EXCEPTION( model.nb_corners() == 5, message );
     OPENGEODE_EXCEPTION(
-        geode::detail::count_relationships( model.corners() ) == nb, message );
+        geode::detail::count_relationships( model.corners() ) == 5, message );
     return uuids;
 }
 
-std::vector< geode::uuid > add_lines(
+std::array< geode::uuid, 6 > add_lines(
     const geode::Section& model, geode::SectionBuilder& builder )
 {
-    const geode::index_t nb{ 6 };
-    std::vector< geode::uuid > uuids;
-    for( auto unused : geode::Range{ nb } )
+    std::array< geode::uuid, 6 > uuids;
+    for( auto l : geode::Range{ 6 } )
     {
-        geode_unused( unused );
-        uuids.push_back( builder.add_line() );
+        uuids[l] = builder.add_line();
     }
     const auto& temp_line = model.line(
         builder.add_line( geode::OpenGeodeEdgedCurve2D::type_name_static() ) );
     builder.remove_line( temp_line );
     const auto message =
-        absl::StrCat( "[Test] Section should have ", nb, " lines" );
-    OPENGEODE_EXCEPTION( model.nb_lines() == nb, message );
+        absl::StrCat( "[Test] Section should have ", 6, " lines" );
+    OPENGEODE_EXCEPTION( model.nb_lines() == 6, message );
     OPENGEODE_EXCEPTION(
-        geode::detail::count_relationships( model.lines() ) == nb, message );
+        geode::detail::count_relationships( model.lines() ) == 6, message );
     return uuids;
 }
 
-std::vector< geode::uuid > add_surfaces(
+std::array< geode::uuid, 2 > add_surfaces(
     const geode::Section& model, geode::SectionBuilder& builder )
 {
-    const geode::index_t nb{ 2 };
-    std::vector< geode::uuid > uuids;
-    for( const auto unused : geode::Range{ nb } )
+    std::array< geode::uuid, 2 > uuids;
+    for( const auto s : geode::Range{ 2 } )
     {
-        geode_unused( unused );
-        uuids.push_back( builder.add_surface() );
+        uuids[s] = builder.add_surface();
     }
     const auto& temp_surface = model.surface( builder.add_surface(
         geode::OpenGeodePolygonalSurface2D::type_name_static() ) );
     builder.remove_surface( temp_surface );
     const auto message =
-        absl::StrCat( "[Test] Section should have ", nb, " surfaces" );
-    OPENGEODE_EXCEPTION( model.nb_surfaces() == nb, message );
+        absl::StrCat( "[Test] Section should have ", 2, " surfaces" );
+    OPENGEODE_EXCEPTION( model.nb_surfaces() == 2, message );
     OPENGEODE_EXCEPTION(
-        geode::detail::count_relationships( model.surfaces() ) == nb, message );
+        geode::detail::count_relationships( model.surfaces() ) == 2, message );
     return uuids;
 }
 
-std::vector< geode::uuid > add_model_boundaries(
+std::array< geode::uuid, 2 > add_model_boundaries(
     const geode::Section& section, geode::SectionBuilder& builder )
 {
-    const geode::index_t nb{ 2 };
-    std::vector< geode::uuid > uuids;
-    for( auto unused : geode::Range{ nb } )
+    std::array< geode::uuid, 2 > uuids;
+    for( auto mb : geode::Range{ 2 } )
     {
-        geode_unused( unused );
-        uuids.push_back( builder.add_model_boundary() );
+        uuids[mb] = builder.add_model_boundary();
         builder.set_model_boundary_name(
             uuids.back(), absl::StrCat( "boundary", uuids.size() ) );
     }
@@ -124,10 +116,10 @@ std::vector< geode::uuid > add_model_boundaries(
         section.model_boundary( builder.add_model_boundary() );
     builder.remove_model_boundary( temp_boundary );
     const auto message =
-        absl::StrCat( "[Test] Section should have ", nb, " model boundaries" );
-    OPENGEODE_EXCEPTION( section.nb_model_boundaries() == nb, message );
+        absl::StrCat( "[Test] Section should have ", 2, " model boundaries" );
+    OPENGEODE_EXCEPTION( section.nb_model_boundaries() == 2, message );
     OPENGEODE_EXCEPTION(
-        geode::detail::count_relationships( section.model_boundaries() ) == nb,
+        geode::detail::count_relationships( section.model_boundaries() ) == 2,
         message );
     OPENGEODE_EXCEPTION(
         section.model_boundary( uuids[0] ).name() == "boundary1",
@@ -137,8 +129,8 @@ std::vector< geode::uuid > add_model_boundaries(
 
 void add_corner_line_boundary_relation( const geode::Section& model,
     geode::SectionBuilder& builder,
-    const std::vector< geode::uuid >& corner_uuids,
-    const std::vector< geode::uuid >& line_uuids )
+    absl::Span< const geode::uuid > corner_uuids,
+    absl::Span< const geode::uuid > line_uuids )
 {
     builder.add_corner_line_boundary_relationship(
         model.corner( corner_uuids[0] ), model.line( line_uuids[0] ) );
@@ -189,8 +181,8 @@ void add_corner_line_boundary_relation( const geode::Section& model,
 
 void add_line_surface_boundary_relation( const geode::Section& model,
     geode::SectionBuilder& builder,
-    const std::vector< geode::uuid >& line_uuids,
-    const std::vector< geode::uuid >& surface_uuids )
+    absl::Span< const geode::uuid > line_uuids,
+    absl::Span< const geode::uuid > surface_uuids )
 {
     builder.add_line_surface_boundary_relationship(
         model.line( line_uuids[0] ), model.surface( surface_uuids[0] ) );
@@ -224,8 +216,8 @@ void add_line_surface_boundary_relation( const geode::Section& model,
 
 void add_lines_in_model_boundaries( const geode::Section& model,
     geode::SectionBuilder& builder,
-    const std::vector< geode::uuid >& line_uuids,
-    const std::vector< geode::uuid >& boundary_uuids )
+    absl::Span< const geode::uuid > line_uuids,
+    absl::Span< const geode::uuid > boundary_uuids )
 {
     builder.add_line_in_model_boundary( model.line( line_uuids[0] ),
         model.model_boundary( boundary_uuids[0] ) );
@@ -246,8 +238,8 @@ void add_lines_in_model_boundaries( const geode::Section& model,
 
 void add_internal_corner_relations( const geode::Section& model,
     geode::SectionBuilder& builder,
-    const std::vector< geode::uuid >& corner_uuids,
-    const std::vector< geode::uuid >& surface_uuids )
+    absl::Span< const geode::uuid > corner_uuids,
+    absl::Span< const geode::uuid > surface_uuids )
 {
     for( const auto& corner_id : corner_uuids )
     {
@@ -276,8 +268,8 @@ void add_internal_corner_relations( const geode::Section& model,
 
 void add_internal_line_relations( const geode::Section& model,
     geode::SectionBuilder& builder,
-    const std::vector< geode::uuid >& line_uuids,
-    const std::vector< geode::uuid >& surface_uuids )
+    absl::Span< const geode::uuid > line_uuids,
+    absl::Span< const geode::uuid > surface_uuids )
 {
     for( const auto& line_id : line_uuids )
     {
@@ -305,9 +297,9 @@ void add_internal_line_relations( const geode::Section& model,
 }
 
 void test_boundary_ranges( const geode::Section& model,
-    const std::vector< geode::uuid >& corner_uuids,
-    const std::vector< geode::uuid >& line_uuids,
-    const std::vector< geode::uuid >& surface_uuids )
+    absl::Span< const geode::uuid > corner_uuids,
+    absl::Span< const geode::uuid > line_uuids,
+    absl::Span< const geode::uuid > surface_uuids )
 {
     geode::index_t line_boundary_count{ 0 };
     for( const auto& line_boundary :
@@ -336,9 +328,9 @@ void test_boundary_ranges( const geode::Section& model,
 }
 
 void test_incidence_ranges( const geode::Section& model,
-    const std::vector< geode::uuid >& corner_uuids,
-    const std::vector< geode::uuid >& line_uuids,
-    const std::vector< geode::uuid >& surface_uuids )
+    absl::Span< const geode::uuid > corner_uuids,
+    absl::Span< const geode::uuid > line_uuids,
+    absl::Span< const geode::uuid > surface_uuids )
 {
     geode::index_t corner_incidence_count{ 0 };
     for( const auto& corner_incidence :
@@ -365,8 +357,8 @@ void test_incidence_ranges( const geode::Section& model,
 }
 
 void test_item_ranges( const geode::Section& model,
-    const std::vector< geode::uuid >& line_uuids,
-    const std::vector< geode::uuid >& boundary_uuids )
+    absl::Span< const geode::uuid > line_uuids,
+    absl::Span< const geode::uuid > boundary_uuids )
 {
     geode::index_t boundary_item_count{ 0 };
     for( const auto& boundary_item :

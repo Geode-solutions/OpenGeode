@@ -21,6 +21,8 @@
  *
  */
 
+#include <absl/types/span.h>
+
 #include <geode/basic/assert.h>
 #include <geode/basic/logger.h>
 #include <geode/basic/range.h>
@@ -31,24 +33,22 @@
 
 #include <geode/tests/common.h>
 
-std::vector< geode::uuid > create_uuids( geode::Relationships& relationships )
+std::array< geode::uuid, 6 > create_uuids( geode::Relationships& relationships )
 {
-    const geode::index_t nb{ 6 };
-    std::vector< geode::uuid > uuids;
+    std::array< geode::uuid, 6 > uuids;
     geode::RelationshipsBuilder builder{ relationships };
-    for( const auto unused : geode::Range{ nb } )
+    for( const auto c : geode::Range{ 6 } )
     {
-        geode_unused( unused );
         const geode::uuid cur_uuid;
         builder.register_component(
             geode::ComponentID{ geode::ComponentType{ "dummy" }, cur_uuid } );
-        uuids.push_back( cur_uuid );
+        uuids[c] = cur_uuid;
     }
     return uuids;
 }
 
-void add_boundary_relations( geode::Relationships& relationships,
-    const std::vector< geode::uuid >& uuids )
+void add_boundary_relations(
+    geode::Relationships& relationships, absl::Span< const geode::uuid > uuids )
 {
     geode::RelationshipsBuilder builder{ relationships };
     builder.add_boundary_relation( uuids[0], uuids[1] );
@@ -64,8 +64,8 @@ void add_boundary_relations( geode::Relationships& relationships,
     builder.add_boundary_relation( uuids[5], uuids[0] );
 }
 
-void add_internal_relations( geode::Relationships& relationships,
-    const std::vector< geode::uuid >& uuids )
+void add_internal_relations(
+    geode::Relationships& relationships, absl::Span< const geode::uuid > uuids )
 {
     geode::RelationshipsBuilder builder{ relationships };
     builder.add_internal_relation( uuids[0], uuids[1] );
@@ -76,8 +76,8 @@ void add_internal_relations( geode::Relationships& relationships,
     builder.add_internal_relation( uuids[4], uuids[0] );
 }
 
-void add_items_in_collections( geode::Relationships& relationships,
-    const std::vector< geode::uuid >& uuids )
+void add_items_in_collections(
+    geode::Relationships& relationships, absl::Span< const geode::uuid > uuids )
 {
     geode::RelationshipsBuilder builder{ relationships };
     builder.add_item_in_collection( uuids[1], uuids[5] );
@@ -123,7 +123,7 @@ void test_uuid( const geode::Relationships& relations,
 }
 
 void test_relations( const geode::Relationships& relations,
-    const std::vector< geode::uuid >& uuids )
+    absl::Span< const geode::uuid > uuids )
 {
     test_uuid( relations, uuids[0], 2, 3, 1, 1, 0, 1 );
     test_uuid( relations, uuids[1], 1, 2, 1, 0, 0, 1 );

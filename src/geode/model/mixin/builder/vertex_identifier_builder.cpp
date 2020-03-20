@@ -57,7 +57,7 @@ namespace geode
     }
 
     void VertexIdentifierBuilder::update_unique_vertices(
-        const ComponentID& component_id, const std::vector< index_t >& old2new )
+        const ComponentID& component_id, absl::Span< const index_t > old2new )
     {
         vertex_identifier_.update_unique_vertices( component_id, old2new, {} );
     }

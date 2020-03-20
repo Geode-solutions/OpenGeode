@@ -32,11 +32,11 @@ namespace geode
     public:
         Impl()
             : component_vertices_(
-                unique_vertices_.vertex_attribute_manager()
-                    .find_or_create_attribute< VariableAttribute,
-                        std::vector< MeshComponentVertex > >(
-                        "component vertices",
-                        std::vector< MeshComponentVertex >{} ) )
+                  unique_vertices_.vertex_attribute_manager()
+                      .find_or_create_attribute< VariableAttribute,
+                          std::vector< MeshComponentVertex > >(
+                          "component vertices",
+                          std::vector< MeshComponentVertex >{} ) )
         {
         }
 
@@ -206,7 +206,7 @@ namespace geode
         }
 
         void update_unique_vertices( const ComponentID& component_id,
-            const std::vector< index_t >& old2new )
+            absl::Span< const index_t > old2new )
         {
             const auto unique_vertices =
                 component_unique_vertices( component_id.id() );
@@ -440,7 +440,7 @@ namespace geode
 
     void VertexIdentifier::update_unique_vertices(
         const ComponentID& component_id,
-        const std::vector< index_t >& old2new,
+        absl::Span< const index_t > old2new,
         BuilderKey )
     {
         impl_->update_unique_vertices( component_id, old2new );

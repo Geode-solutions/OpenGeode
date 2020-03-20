@@ -37,7 +37,7 @@ namespace
 
     void update_edge_vertices( const geode::Graph& graph,
         geode::GraphBuilder& builder,
-        const std::vector< index_t >& old2new )
+        absl::Span< const index_t > old2new )
     {
         std::vector< bool > edges_to_delete( graph.nb_edges(), false );
         for( const auto e : geode::Range{ graph.nb_edges() } )

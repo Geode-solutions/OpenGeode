@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <absl/types/span.h>
+
 #include <geode/model/common.h>
 #include <geode/model/mixin/core/vertex_identifier.h>
 
@@ -92,7 +94,7 @@ namespace geode
          * to new ones. Deleted vertices new index is NO_ID.
          */
         void update_unique_vertices( const ComponentID& component_id,
-            const std::vector< index_t >& old2new );
+            absl::Span< const index_t > old2new );
 
         /*!
          * Load the VertexIdentifier from a file.
