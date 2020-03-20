@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.13)
+
 include(GNUInstallDirs)
 include(GenerateExportHeader)
 include(CMakePackageConfigHelpers)
@@ -189,16 +191,40 @@ function(add_geode_library)
     )
 endfunction()
 
+macro(_find_dependency_directories directories)
+    foreach(dependency ${ARGN})
+        if(NOT TARGET ${dependency})
+            continue()
+        endif()
+        get_target_property(TARGET_TYPE ${dependency} TYPE)
+        if(TARGET_TYPE STREQUAL "SHARED_LIBRARY")
+            list(APPEND directories $<TARGET_FILE_DIR:${dependency}>)
+            get_target_property(dependencies ${dependency} LINK_LIBRARIES)
+            if(dependencies)
+                _find_dependency_directories(directories ${dependencies})
+            endif()
+        endif()
+    endforeach()
+endmacro()
+
 function(_add_geode_executable exe_path folder_name)
     get_filename_component(target_name ${exe_path} NAME_WE)
 
-    # Set the target as an executable
     add_executable(${target_name} ${exe_path})
     foreach(dependency ${ARGN})
         target_link_libraries(${target_name} PRIVATE ${dependency})
     endforeach()
     
-    # Add the project to a folder of projects for the tests
+    if(WIN32)
+        _find_dependency_directories(directories ${ARGN})
+        list(REMOVE_DUPLICATES directories)
+        list(JOIN directories "\\;" directories)
+        set_target_properties(${target_name}
+            PROPERTIES
+                VS_DEBUGGER_ENVIRONMENT "PATH=${directories}\\;$ENV{Path}"
+        )
+    endif()
+	
     set_target_properties(${target_name}
         PROPERTIES
             FOLDER ${folder_name}
@@ -217,22 +243,6 @@ function(add_geode_binary)
     _add_geode_executable(${GEODE_BINARY_SOURCE} "Utilities" ${GEODE_BINARY_DEPENDENCIES})
     install(TARGETS ${target_name} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 endfunction()
-
-macro(_find_dependency_directories directories)
-    foreach(dependency ${ARGN})
-        if(NOT TARGET ${dependency})
-            continue()
-        endif()
-        get_target_property(TARGET_TYPE ${dependency} TYPE)
-        if(TARGET_TYPE STREQUAL "SHARED_LIBRARY")
-            list(APPEND directories $<TARGET_FILE_DIR:${dependency}>)
-            get_target_property(dependencies ${dependency} LINK_LIBRARIES)
-            if(dependencies)
-                _find_dependency_directories(directories ${dependencies})
-            endif()
-        endif()
-    endforeach()
-endmacro()
 
 function(_add_dependency_directories test_name)
     _find_dependency_directories(directories ${ARGN})
