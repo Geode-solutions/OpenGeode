@@ -77,7 +77,7 @@ namespace
     void update_polygon_adjacencies(
         const geode::PolygonalSurface< dimension >& surface,
         geode::PolygonalSurfaceBuilder< dimension >& builder,
-        const std::vector< geode::index_t >& old2new )
+        absl::Span< const geode::index_t > old2new )
     {
         for( const auto p : geode::Range{ surface.nb_polygons() } )
         {
