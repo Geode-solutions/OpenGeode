@@ -110,7 +110,7 @@ std::array< geode::uuid, 2 > add_model_boundaries(
     {
         uuids[mb] = builder.add_model_boundary();
         builder.set_model_boundary_name(
-            uuids.back(), absl::StrCat( "boundary", uuids.size() ) );
+            uuids[mb], absl::StrCat( "boundary", mb + 1 ) );
     }
     const auto& temp_boundary =
         section.model_boundary( builder.add_model_boundary() );
