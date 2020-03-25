@@ -67,7 +67,7 @@ namespace geode
                                                    Surfaces,
                                                    ModelBoundaries >
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( SectionBuilder );
+        OPENGEODE_DISABLE_COPY( SectionBuilder );
 
     public:
         struct ComponentMapping
@@ -81,6 +81,7 @@ namespace geode
 
     public:
         SectionBuilder( Section& section );
+        SectionBuilder( SectionBuilder&& ) = default;
 
         void copy( const Section& section );
 

@@ -70,7 +70,7 @@ namespace geode
                                                 Blocks,
                                                 ModelBoundaries >
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( BRepBuilder );
+        OPENGEODE_DISABLE_COPY( BRepBuilder );
 
     public:
         struct ComponentMapping
@@ -85,6 +85,7 @@ namespace geode
 
     public:
         BRepBuilder( BRep& brep );
+        BRepBuilder( BRepBuilder&& ) = default;
 
         void copy( const BRep& brep );
 
