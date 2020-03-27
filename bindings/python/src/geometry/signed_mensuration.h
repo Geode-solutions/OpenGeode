@@ -21,43 +21,24 @@
  *
  */
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <geode/geometry/signed_mensuration.h>
 
-#include "barycentric_coordinates.h"
-#include "basic_objects.h"
-#include "bounding_box.h"
-#include "distance.h"
-#include "nn_search.h"
-#include "perpendicular.h"
-#include "point.h"
-#include "projection.h"
-#include "signed_mensuration.h"
-#include "vector.h"
+#define PYTHON_MENSURATION( dimension )                                        \
+    const auto triangle_area##dimension =                                      \
+        "triangle_area" + std::to_string( dimension ) + "D";                   \
+    module.def( triangle_area##dimension.c_str(), &triangle_area< dimension > )
 
-namespace pybind11
+namespace geode
 {
-    namespace detail
+    void define_mensuration( pybind11::module& module )
     {
-        template < typename Type >
-        struct type_caster< absl::FixedArray< Type > >
-            : list_caster< absl::FixedArray< Type >, Type >
-        {
-        };
-    } // namespace detail
-} // namespace pybind11
-
-PYBIND11_MODULE( opengeode_py_geometry, module )
-{
-    module.doc() = "OpenGeode Python binding for geometry";
-    geode::define_point( module );
-    geode::define_vector( module );
-    geode::define_bounding_box( module );
-    geode::define_nn_search( module );
-    geode::define_basic_objects( module );
-    geode::define_distance( module );
-    geode::define_perpendicular( module );
-    geode::define_projection( module );
-    geode::define_mensuration( module );
-    geode::define_barycentric( module );
-}
+        PYTHON_MENSURATION( 2 );
+        PYTHON_MENSURATION( 3 );
+        module.def( "triangle_signed_area2D",
+            ( double ( * )( const Triangle2D& ) ) & triangle_signed_area );
+        module.def( "triangle_signed_area3D",
+            ( double ( * )( const Triangle3D&, const Vector3D& ) )
+                & triangle_signed_area );
+        module.def( "tetra_signed_volume", &tetra_signed_volume );
+    }
+} // namespace geode
