@@ -21,43 +21,13 @@
  *
  */
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <geode/geometry/perpendicular.h>
 
-#include "barycentric_coordinates.h"
-#include "basic_objects.h"
-#include "bounding_box.h"
-#include "distance.h"
-#include "nn_search.h"
-#include "perpendicular.h"
-#include "point.h"
-#include "projection.h"
-#include "signed_mensuration.h"
-#include "vector.h"
-
-namespace pybind11
+namespace geode
 {
-    namespace detail
+    void define_perpendicular( pybind11::module& module )
     {
-        template < typename Type >
-        struct type_caster< absl::FixedArray< Type > >
-            : list_caster< absl::FixedArray< Type >, Type >
-        {
-        };
-    } // namespace detail
-} // namespace pybind11
-
-PYBIND11_MODULE( opengeode_py_geometry, module )
-{
-    module.doc() = "OpenGeode Python binding for geometry";
-    geode::define_point( module );
-    geode::define_vector( module );
-    geode::define_bounding_box( module );
-    geode::define_nn_search( module );
-    geode::define_basic_objects( module );
-    geode::define_distance( module );
-    geode::define_perpendicular( module );
-    geode::define_projection( module );
-    geode::define_mensuration( module );
-    geode::define_barycentric( module );
-}
+        module.def( "perpendicular", &perpendicular );
+        module.def( "dot_perpendicular", &dot_perpendicular );
+    }
+} // namespace geode

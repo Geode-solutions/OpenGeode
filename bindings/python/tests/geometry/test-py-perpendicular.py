@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright (c) 2019 - 2020 Geode-solutions
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,19 +19,27 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-add_geode_python_binding(
-    NAME "py_geometry"
-    SOURCES
-        "geometry.cpp"
-        "barycentric_coordinates.h"
-        "basic_objects.h"
-        "bounding_box.h"
-        "distance.h"
-        "perpendicular.h"
-        "point.h"
-        "projection.h"
-        "signed_mensuration.h"
-        "vector.h"
-    DEPENDENCIES
-        ${PROJECT_NAME}::geometry
-)
+import opengeode_py_geometry as geom
+
+def test_perpendicular():
+    v = geom.Vector2D( [1.578, 1e-10] )
+    perp = geom.perpendicular( v ).normalize()
+
+    dot_product = v.value( 0 ) * perp.value( 0 ) + v.value( 1 ) * perp.value( 1 )
+
+    if perp.length() != 1 or dot_product != 0.:
+        raise ValueError( "[Test] Wrong result for normalized_perpendicular" )
+
+def test_dot_perpendicular():
+    v1 = geom.Vector2D( [0, 1] )
+    v2 = geom.Vector2D( [1, 0] )
+    dot_perp = geom.dot_perpendicular( v1, v2 )
+    dot = geom.dot_perpendicular( geom.perpendicular( v1 ), v2 )
+
+    if dot_perp != -1 or dot != 0:
+        raise ValueError( "[Test] Wrong result for dot_perpendicular" )
+
+if __name__ == '__main__':
+    test_perpendicular()
+    test_dot_perpendicular()
+    
