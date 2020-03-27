@@ -19,26 +19,56 @@
 # SOFTWARE.
 
 add_geode_test(
-    SOURCE test-bounding-box.cpp 
+    SOURCE "test-bounding-box.cpp" 
     DEPENDENCIES
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
 )
 add_geode_test(
-    SOURCE test-nnsearch.cpp 
+    SOURCE "test-nnsearch.cpp" 
     DEPENDENCIES
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
 )
 add_geode_test(
-    SOURCE test-point.cpp 
+    SOURCE "test-point.cpp" 
     DEPENDENCIES
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
 )
 add_geode_test(
-    SOURCE test-vector.cpp 
+    SOURCE "test-vector.cpp" 
     DEPENDENCIES
         ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+)
+add_geode_test(
+    SOURCE "test-barycentric-coordinates.cpp"
+    DEPENDENCIES
+        OpenGeode::basic
+        ${PROJECT_NAME}::geometry
+)
+add_geode_test(
+    SOURCE "test-distance.cpp"
+    DEPENDENCIES
+        OpenGeode::basic
+        ${PROJECT_NAME}::geometry
+)
+add_geode_test(
+    SOURCE "test-perpendicular.cpp"
+    DEPENDENCIES
+        OpenGeode::basic
+        ${PROJECT_NAME}::geometry
+)
+add_geode_test(
+    SOURCE "test-projection.cpp"
+    DEPENDENCIES
+        OpenGeode::basic
+        ${PROJECT_NAME}::geometry
+)
+add_geode_test(
+    SOURCE "test-signed-mensuration.cpp"
+    DEPENDENCIES
+        OpenGeode::basic
         ${PROJECT_NAME}::geometry
 )

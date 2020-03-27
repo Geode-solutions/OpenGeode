@@ -22,16 +22,28 @@ add_geode_library(
     NAME geometry
     FOLDER "geode/geometry"
     SOURCES
+        "barycentric_coordinates.cpp"
+        "basic_objects.cpp"
         "bitsery_archive.cpp"
         "bounding_box.cpp"
         "common.cpp"
+        "distance.cpp"
         "nn_search.cpp"
+        "perpendicular.cpp"
+        "projection.cpp"
+        "signed_mensuration.cpp"
     PUBLIC_HEADERS
+        "barycentric_coordinates.h"
+        "basic_objects.h"
         "bitsery_archive.h"
         "bounding_box.h"
         "common.h"
+        "distance.h"
         "nn_search.h"
+        "perpendicular.h"
         "point.h"
+        "projection.h"
+        "signed_mensuration.h"
         "vector.h"
     PUBLIC_DEPENDENCIES
         Bitsery::bitsery
