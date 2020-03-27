@@ -23,10 +23,20 @@
 
 #pragma once
 
-#include <geode/geometry/point.h>
-
-#include <geode/geometry/basic_objects.h>
 #include <geode/geometry/common.h>
+
+namespace geode
+{
+    FORWARD_DECLARATION_DIMENSION_CLASS( InfiniteLine );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Segment );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Triangle );
+    ALIAS_3D( Point );
+    ALIAS_2D_AND_3D( Triangle );
+
+    class Plane;
+    class Tetra;
+} // namespace geode
 
 namespace geode
 {

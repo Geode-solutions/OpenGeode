@@ -23,11 +23,9 @@
 
 #include <geode/geometry/projection.h>
 
-#include <geode/basic/logger.h>
-
-#include <geode/geometry/vector.h>
-
+#include <geode/geometry/basic_objects.h>
 #include <geode/geometry/distance.h>
+#include <geode/geometry/vector.h>
 
 namespace geode
 {
