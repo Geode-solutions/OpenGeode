@@ -48,6 +48,9 @@ void test_create_vertices( const geode::TetrahedralSolid3D& solid,
 void test_create_tetrahedra( const geode::TetrahedralSolid3D& solid,
     geode::TetrahedralSolidBuilder3D& builder )
 {
+    builder.reserve_tetrahedra( 3 );
+    OPENGEODE_EXCEPTION( solid.nb_polyhedra() == 0,
+        "[Test] TetrahedralSolid should have no tetrahedron" );
     builder.create_tetrahedra( 1 );
     builder.create_tetrahedron( { 1, 2, 3, 4 } );
     builder.create_polyhedron( { 1, 4, 3, 5 },

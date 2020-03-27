@@ -76,8 +76,6 @@ namespace geode
                                                 "tetrahedra are handled" );
         std::array< index_t, 4 > tetra_vertices;
         absl::c_copy_n( vertices, 4, tetra_vertices.begin() );
-        // sort !!!
-        absl::c_sort( tetra_vertices );
         do_create_edges( tetra_vertices );
     }
 
@@ -109,24 +107,39 @@ namespace geode
                 { added_tetra, vertex_id++ }, vertex );
         }
         do_create_tetrahedron( vertices );
-        for( const auto f : Range{ 4 } )
-        {
-            PolyhedronFacet facet{ added_tetra, f };
-            PolyhedronFacetVertices facet_vertices( 3 );
-            for( const auto v : Range{ 3 } )
-            {
-                facet_vertices[v] =
-                    tetrahedral_solid_.polyhedron_facet_vertex( { facet, v } );
-                std::array< index_t, 2 > edge_vertices{
-                    tetrahedral_solid_.polyhedron_facet_vertex( { facet, v } ),
-                    tetrahedral_solid_.polyhedron_facet_vertex(
-                        { facet, ( v + 1 ) % 3 } )
-                };
-                this->find_or_create_edge( std::move( edge_vertices ) );
-            }
-            this->find_or_create_facet( std::move( facet_vertices ) );
-        }
+        do_create_facets( vertices );
+        do_create_edges( vertices );
+        // for( const auto f : Range{ 4 } )
+        // {
+        //     PolyhedronFacet facet{ added_tetra, f };
+        //     PolyhedronFacetVertices facet_vertices( 3 );
+        //     for( const auto v : Range{ 3 } )
+        //     {
+        //         facet_vertices[v] =
+        //             tetrahedral_solid_.polyhedron_facet_vertex( { facet, v }
+        //             );
+        //         std::array< index_t, 2 > edge_vertices{
+        //             tetrahedral_solid_.polyhedron_facet_vertex( { facet, v }
+        //             ), tetrahedral_solid_.polyhedron_facet_vertex(
+        //                 { facet, ( v + 1 ) % 3 } )
+        //         };
+        //         // this->find_or_create_edge( std::move( edge_vertices ) );
+        //     }
+        //     // this->find_or_create_facet( std::move( facet_vertices ) );
+        // }
         return added_tetra;
+    }
+
+    template < index_t dimension >
+    void TetrahedralSolidBuilder< dimension >::reserve_tetrahedra( index_t nb )
+    {
+        const auto nb_tet = tetrahedral_solid_.nb_polyhedra();
+        tetrahedral_solid_.polyhedron_attribute_manager().reserve(
+            nb_tet + nb );
+        tetrahedral_solid_.facet_attribute_manager().reserve(
+            4 * ( nb_tet + nb ) );
+        tetrahedral_solid_.edge_attribute_manager().reserve(
+            6 * ( nb_tet + nb ) );
     }
 
     template < index_t dimension >

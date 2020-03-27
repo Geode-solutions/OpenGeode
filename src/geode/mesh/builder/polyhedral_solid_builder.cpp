@@ -86,7 +86,7 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -353,7 +353,10 @@ namespace geode
         for( auto&& edge_vertices :
             get_polyhedron_edge_vertices( vertices, facets ) )
         {
-            this->find_or_create_edge( edge_vertices );
+            if( edge_vertices[0] < edge_vertices[1] )
+            {
+                this->find_or_create_edge( edge_vertices );
+            }
         }
     }
 

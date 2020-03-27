@@ -61,6 +61,12 @@ namespace geode
          */
         index_t create_tetrahedra( index_t nb );
 
+        /*!
+         * Reserve storage for new tetrahedra without creating them.
+         * @param[in] nb Number of tetrahedra to reserve
+         */
+        void reserve_tetrahedra( index_t nb );
+
         void copy(
             const TetrahedralSolid< dimension >& tetrahedral_solid, BuilderKey )
         {

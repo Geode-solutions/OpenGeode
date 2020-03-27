@@ -96,6 +96,15 @@ namespace geode
     }
 
     template < index_t dimension >
+    void TriangulatedSurfaceBuilder< dimension >::reserve_triangles(
+        index_t nb )
+    {
+        const auto nb_triangles = triangulated_surface_.nb_polygons();
+        triangulated_surface_.polygon_attribute_manager().reserve(
+            nb_triangles + nb );
+    }
+
+    template < index_t dimension >
     void TriangulatedSurfaceBuilder< dimension >::copy(
         const TriangulatedSurface< dimension >& triangulated_surface )
     {

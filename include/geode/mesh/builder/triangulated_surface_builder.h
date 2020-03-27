@@ -70,6 +70,12 @@ namespace geode
          */
         index_t create_triangles( index_t nb );
 
+        /*!
+         * Reserve storage for new triangles without creating them.
+         * @param[in] nb Number of triangles to reserve
+         */
+        void reserve_triangles( index_t nb );
+
         void copy( const TriangulatedSurface< dimension >& triangulated_surface,
             BuilderKey )
         {
