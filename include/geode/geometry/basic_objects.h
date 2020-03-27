@@ -84,7 +84,7 @@ namespace geode
         }
         explicit InfiniteLine( const Segment< dimension >& segment )
             : InfiniteLine(
-                  segment.normalized_direction(), segment.vertices()[0] )
+                segment.normalized_direction(), segment.vertices()[0] )
         {
         }
         const Point< dimension >& origin() const
