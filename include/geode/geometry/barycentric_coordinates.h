@@ -23,12 +23,17 @@
 
 #pragma once
 
-#include <geode/geometry/basic_objects.h>
 #include <geode/geometry/common.h>
-#include <geode/geometry/point.h>
-#include <geode/geometry/vector.h>
 
-#include <array>
+namespace geode
+{
+    FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Segment );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Triangle );
+    ALIAS_3D( Point );
+
+    class Tetra;
+} // namespace geode
 
 namespace geode
 {

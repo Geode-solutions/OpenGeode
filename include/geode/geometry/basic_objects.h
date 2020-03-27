@@ -23,10 +23,14 @@
 
 #pragma once
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/common.h>
 #include <geode/geometry/vector.h>
 
-#include <geode/geometry/common.h>
+namespace geode
+{
+    FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+    ALIAS_3D( Point );
+} // namespace geode
 
 namespace geode
 {
@@ -84,7 +88,7 @@ namespace geode
         }
         explicit InfiniteLine( const Segment< dimension >& segment )
             : InfiniteLine(
-                segment.normalized_direction(), segment.vertices()[0] )
+                  segment.normalized_direction(), segment.vertices()[0] )
         {
         }
         const Point< dimension >& origin() const

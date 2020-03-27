@@ -24,9 +24,9 @@
 #include <geode/basic/assert.h>
 #include <geode/basic/logger.h>
 
-#include <geode/geometry/point.h>
-
 #include <geode/geometry/perpendicular.h>
+#include <geode/geometry/point.h>
+#include <geode/geometry/vector.h>
 
 void test_perpendicular()
 {

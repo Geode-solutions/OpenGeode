@@ -23,9 +23,13 @@
 
 #pragma once
 
-#include <geode/geometry/vector.h>
-
 #include <geode/geometry/common.h>
+
+namespace geode
+{
+    FORWARD_DECLARATION_DIMENSION_CLASS( Vector );
+    ALIAS_2D( Vector );
+} // namespace geode
 
 namespace geode
 {

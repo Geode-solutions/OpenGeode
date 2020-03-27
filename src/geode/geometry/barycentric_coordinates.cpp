@@ -25,6 +25,7 @@
 
 #include <geode/basic/logger.h>
 
+#include <geode/geometry/basic_objects.h>
 #include <geode/geometry/signed_mensuration.h>
 
 namespace geode

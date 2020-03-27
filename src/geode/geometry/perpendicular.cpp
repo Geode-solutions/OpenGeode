@@ -23,6 +23,8 @@
 
 #include <geode/geometry/perpendicular.h>
 
+#include <geode/geometry/vector.h>
+
 namespace geode
 {
     Vector2D perpendicular( const Vector2D& v )
