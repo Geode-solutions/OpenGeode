@@ -134,6 +134,8 @@ namespace geode
     void TetrahedralSolidBuilder< dimension >::reserve_tetrahedra( index_t nb )
     {
         const auto nb_tet = tetrahedral_solid_.nb_polyhedra();
+        DEBUG( nb_tet );
+        DEBUG( nb );
         tetrahedral_solid_.polyhedron_attribute_manager().reserve(
             nb_tet + nb );
         tetrahedral_solid_.facet_attribute_manager().reserve(
