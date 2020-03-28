@@ -103,17 +103,17 @@ namespace geode
     std::array< double, 2 > segment_barycentric_coordinates(
         const Point< dimension >& point, const Segment< dimension >& segment )
     {
-        const auto length0 =
-            Vector< dimension >{ segment.vertices()[1], point }.length();
-        const auto length1 =
-            Vector< dimension >{ segment.vertices()[0], point }.length();
-
-        const auto total_length = length0 + length1;
-        OPENGEODE_EXCEPTION( std::fabs( total_length ) > global_epsilon,
+        const auto dir = segment.direction();
+        const Vector< dimension > v0p{ segment.vertices()[0], point };
+        const auto dot0 = v0p.dot( dir );
+        const Vector< dimension > v1p{ segment.vertices()[1], point };
+        const auto dot1 = -v1p.dot( dir );
+        const auto sum = dot0 + dot1;
+        OPENGEODE_EXCEPTION( std::fabs( sum ) > global_epsilon,
             "[segment_barycentric_coordinates] Length of input segment too "
             "small" );
-        const auto lambda0 = length0 / total_length;
-        const auto lambda1 = length1 / total_length;
+        const auto lambda0 = dot1 / sum;
+        const auto lambda1 = dot0 / sum;
         return { { lambda0, lambda1 } };
     }
 
