@@ -30,10 +30,12 @@
 #include <geode/geometry/barycentric_coordinates.h>
 #include <geode/geometry/basic_objects.h>
 
-bool check_triangle_bary_coords( const std::array< double, 3 >& result,
-    const std::array< double, 3 >& answer )
+template < geode::index_t nb_coords >
+bool check_bary_coords( const std::array< double, nb_coords >& result,
+    const std::array< double, nb_coords >& answer )
 {
-    for( const auto i : geode::Range{ 3 } )
+    double sum{ 0 };
+    for( const auto i : geode::Range{ nb_coords } )
     {
         if( result[i] != answer[i] )
         {
@@ -42,14 +44,48 @@ bool check_triangle_bary_coords( const std::array< double, 3 >& result,
                 "Result = ", result[i], " - Answer = ", answer[i] );
             return false;
         }
+        sum += result[i];
     }
-    if( std::fabs( result[0] + result[1] + result[2] - 1 )
-        > geode::global_epsilon )
+    if( std::fabs( sum - 1 ) > geode::global_epsilon )
     {
         geode::Logger::error( "Sum of all lambdas are different of 1" );
         return false;
     }
     return true;
+}
+
+void test_segment_barycentric_coordinates()
+{
+    const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
+    const geode::Point3D b{ { 1.0, 2.0, 3.0 } };
+    const geode::Segment3D segment{ a, b };
+
+    OPENGEODE_EXCEPTION(
+        check_bary_coords< 2 >(
+            geode::segment_barycentric_coordinates( a, segment ), { 1, 0 } ),
+        "[Test] Wrong result for segment_barycentric_coordinates "
+        "with query point a" );
+
+    OPENGEODE_EXCEPTION(
+        check_bary_coords< 2 >(
+            geode::segment_barycentric_coordinates( b, segment ), { 0, 1 } ),
+        "[Test] Wrong result for segment_barycentric_coordinates "
+        "with query point b" );
+
+    const geode::Point3D q1{ { 0.25, 0.50, 0.75 } };
+    OPENGEODE_EXCEPTION(
+        check_bary_coords< 2 >(
+            geode::segment_barycentric_coordinates( q1, segment ),
+            { 0.75, 0.25 } ),
+        "[Test] Wrong result for segment_barycentric_coordinates "
+        "with query point q1" );
+
+    const geode::Point3D q2{ { 2.0, 4.0, 6.0 } };
+    OPENGEODE_EXCEPTION(
+        check_bary_coords< 2 >(
+            geode::segment_barycentric_coordinates( q2, segment ), { -1, 2 } ),
+        "[Test] Wrong result for segment_barycentric_coordinates "
+        "with query point q2" );
 }
 
 void test_triangle_barycentric_coordinates()
@@ -61,21 +97,21 @@ void test_triangle_barycentric_coordinates()
     const geode::Triangle2D triangle2D{ a, b, c };
 
     OPENGEODE_EXCEPTION(
-        check_triangle_bary_coords(
+        check_bary_coords< 3 >(
             geode::triangle_barycentric_coordinates( a, triangle2D ),
             { 1, 0, 0 } ),
         "[Test] Wrong result for triangle_barycentric_coordinates "
         "with query point a" );
 
     OPENGEODE_EXCEPTION(
-        check_triangle_bary_coords(
+        check_bary_coords< 3 >(
             geode::triangle_barycentric_coordinates( b, triangle2D ),
             { 0, 1, 0 } ),
         "[Test] Wrong result for triangle_barycentric_coordinates "
         "with query point b" );
 
     OPENGEODE_EXCEPTION(
-        check_triangle_bary_coords(
+        check_bary_coords< 3 >(
             geode::triangle_barycentric_coordinates( c, triangle2D ),
             { 0, 0, 1 } ),
         "[Test] Wrong result for triangle_barycentric_coordinates "
@@ -83,7 +119,7 @@ void test_triangle_barycentric_coordinates()
 
     const geode::Point2D q1{ { 0.25, 0.0 } };
     OPENGEODE_EXCEPTION(
-        check_triangle_bary_coords(
+        check_bary_coords< 3 >(
             geode::triangle_barycentric_coordinates( q1, triangle2D ),
             { 0.75, 0.25, 0 } ),
         "[Test] Wrong result for triangle_barycentric_coordinates "
@@ -91,7 +127,7 @@ void test_triangle_barycentric_coordinates()
 
     const geode::Point2D q2{ { 0.5, 0.25 } };
     OPENGEODE_EXCEPTION(
-        check_triangle_bary_coords(
+        check_bary_coords< 3 >(
             geode::triangle_barycentric_coordinates( q2, triangle2D ),
             { 0.5, 0.25, 0.25 } ),
         "[Test] Wrong result for triangle_barycentric_coordinates "
@@ -99,7 +135,7 @@ void test_triangle_barycentric_coordinates()
 
     const geode::Point2D q3{ { 0.0, 1.0 } };
     OPENGEODE_EXCEPTION(
-        check_triangle_bary_coords(
+        check_bary_coords< 3 >(
             geode::triangle_barycentric_coordinates( q3, triangle2D ),
             { 1, -1, 1 } ),
         "[Test] Wrong result for triangle_barycentric_coordinates "
@@ -117,6 +153,7 @@ int main()
 {
     try
     {
+        test_segment_barycentric_coordinates();
         test_triangle_barycentric_coordinates();
         test_tetra_barycentric_coordinates();
 
