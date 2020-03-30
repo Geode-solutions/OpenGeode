@@ -29,9 +29,8 @@
 #include <geode/geometry/basic_objects.h>
 #include <geode/geometry/signed_mensuration.h>
 
-void test_triangle_area()
+void test_triangle_area_2d()
 {
-    // Test cases in 2D
     const geode::Point2D a{ { 0.0, 0.0 } };
     const geode::Point2D b{ { 1.0, 0.0 } };
     const geode::Point2D c{ { 1.0, 1.0 } };
@@ -45,13 +44,33 @@ void test_triangle_area()
     const auto area2 = geode::triangle_area( triangle2D_2 );
     OPENGEODE_EXCEPTION( area2 == 0.0, "[Test] Wrong result for triangle_area "
                                        "with query triangle triangle2D_2" );
-
-    // TODO: Test cases in 3D
 }
 
-void test_triangle_signed_area()
+void test_triangle_area_3d()
 {
-    // Test cases in 2D
+    const geode::Point3D a{ { 0.0, 0., 0.0 } };
+    const geode::Point3D b{ { 1.0, 0.0, 0.0 } };
+    const geode::Point3D c{ { 1.0, 1.0, 0.0 } };
+
+    const geode::Triangle3D triangle3D_1{ a, b, c };
+    const auto area1 = geode::triangle_area( triangle3D_1 );
+    OPENGEODE_EXCEPTION( area1 == 0.5, "[Test] Wrong result for triangle_area "
+                                       "with query triangle triangle3D_1" );
+
+    const geode::Triangle3D triangle3D_2{ a, b, a };
+    const auto area2 = geode::triangle_area( triangle3D_2 );
+    OPENGEODE_EXCEPTION( area2 == 0.0, "[Test] Wrong result for triangle_area "
+                                       "with query triangle triangle3D_2" );
+}
+
+void test_triangle_area()
+{
+    test_triangle_area_2d();
+    test_triangle_area_3d();
+}
+
+void test_triangle_signed_area_2d()
+{
     const geode::Point2D a{ { 0.0, 0.0 } };
     const geode::Point2D b{ { 1.0, 0.0 } };
     const geode::Point2D c{ { 1.0, 1.0 } };
@@ -69,17 +88,61 @@ void test_triangle_signed_area()
         "with query triangle triangle2D_2" );
 
     const geode::Triangle2D triangle2D_3{ a, b, a };
-    const auto area3 = geode::triangle_area( triangle2D_3 );
+    const auto area3 = geode::triangle_signed_area( triangle2D_3 );
     OPENGEODE_EXCEPTION( area3 == 0.0,
         "[Test] Wrong result for triangle_signed_area "
         "with query triangle triangle2D_3" );
+}
 
-    // TODO: Test cases in 3D
+void test_triangle_signed_area_3d()
+{
+    const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
+    const geode::Point3D b{ { 1.0, 0.0, 0.0 } };
+    const geode::Point3D c{ { 1.0, 1.0, 0.0 } };
+    const geode::Vector3D upward{ { { 0.0, 0.0, 0.0 } },
+        { { 0.0, 0.0, 1.0 } } };
+
+    const geode::Triangle3D triangle3D_1{ a, b, c };
+    const auto area1 = geode::triangle_signed_area( triangle3D_1, upward );
+    OPENGEODE_EXCEPTION( area1 == 0.5,
+        "[Test] Wrong result for triangle_signed_area "
+        "with query triangle triangle3D_1" );
+
+    const geode::Triangle3D triangle3D_2{ a, c, b };
+    const auto area2 = geode::triangle_signed_area( triangle3D_2, upward );
+    OPENGEODE_EXCEPTION( area2 == -0.5,
+        "[Test] Wrong result for triangle_signed_area "
+        "with query triangle triangle3D_2" );
+
+    const geode::Triangle3D triangle3D_3{ a, b, a };
+    const auto area3 = geode::triangle_signed_area( triangle3D_3, upward );
+    OPENGEODE_EXCEPTION( area3 == 0.0,
+        "[Test] Wrong result for triangle_signed_area "
+        "with query triangle triangle3D_3" );
+}
+
+void test_triangle_signed_area()
+{
+    test_triangle_signed_area_2d();
+    test_triangle_signed_area_3d();
 }
 
 void test_tetra_signed_area()
 {
-    // TODO 3D
+    const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
+    const geode::Point3D b{ { 1.0, 0.0, 0.0 } };
+    const geode::Point3D c{ { 0.0, 1.0, 0.0 } };
+    const geode::Point3D d{ { 0.0, 0.0, 1.0 } };
+
+    const geode::Tetra tetra1{ a, b, c, d };
+    const auto area1 = geode::tetra_signed_volume( tetra1 );
+    OPENGEODE_EXCEPTION( area1 == 1. / 6.,
+        "[Test] Wrong result for tetra_signed_volume with query tetra tetra1" );
+
+    const geode::Tetra tetra2{ a, b, d, c };
+    const auto area2 = geode::tetra_signed_volume( tetra2 );
+    OPENGEODE_EXCEPTION( area2 == -1. / 6.,
+        "[Test] Wrong result for tetra_signed_volume with query tetra tetra2" );
 }
 
 int main()
