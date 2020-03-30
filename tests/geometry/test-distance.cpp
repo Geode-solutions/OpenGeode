@@ -29,6 +29,8 @@
 #include <geode/geometry/basic_objects.h>
 #include <geode/geometry/distance.h>
 
+#include <geode/tests/common.h>
+
 void test_point_segment_distance_2d()
 {
     const geode::Point2D a{ { 1.0, 5.0 } };
@@ -565,21 +567,13 @@ void test_point_tetra_distance()
         "q3" );
 }
 
-int main()
+void test()
 {
-    try
-    {
-        test_point_segment_distance();
-        test_point_line_distance();
-        test_point_triangle_distance();
-        test_point_tetra_distance();
-        test_point_plane_distance();
-
-        geode::Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode::geode_lippincott();
-    }
+    test_point_segment_distance();
+    test_point_line_distance();
+    test_point_triangle_distance();
+    test_point_tetra_distance();
+    test_point_plane_distance();
 }
+
+OPENGEODE_TEST( "distance" )

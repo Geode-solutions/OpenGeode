@@ -29,6 +29,8 @@
 #include <geode/geometry/basic_objects.h>
 #include <geode/geometry/signed_mensuration.h>
 
+#include <geode/tests/common.h>
+
 void test_triangle_area_2d()
 {
     const geode::Point2D a{ { 0.0, 0.0 } };
@@ -145,19 +147,11 @@ void test_tetra_signed_area()
         "[Test] Wrong result for tetra_signed_volume with query tetra tetra2" );
 }
 
-int main()
+void test()
 {
-    try
-    {
-        test_triangle_area();
-        test_triangle_signed_area();
-        test_tetra_signed_area();
-
-        geode::Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode::geode_lippincott();
-    }
+    test_triangle_area();
+    test_triangle_signed_area();
+    test_tetra_signed_area();
 }
+
+OPENGEODE_TEST( "signed-mensuration" )

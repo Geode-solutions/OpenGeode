@@ -30,6 +30,8 @@
 #include <geode/geometry/barycentric_coordinates.h>
 #include <geode/geometry/basic_objects.h>
 
+#include <geode/tests/common.h>
+
 template < geode::index_t nb_coords >
 bool check_bary_coords( const std::array< double, nb_coords >& result,
     const std::array< double, nb_coords >& answer )
@@ -247,19 +249,11 @@ void test_tetra_barycentric_coordinates()
         "with query point q2" );
 }
 
-int main()
+void test()
 {
-    try
-    {
-        test_segment_barycentric_coordinates();
-        test_triangle_barycentric_coordinates();
-        test_tetra_barycentric_coordinates();
-
-        geode::Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode::geode_lippincott();
-    }
+    test_segment_barycentric_coordinates();
+    test_triangle_barycentric_coordinates();
+    test_tetra_barycentric_coordinates();
 }
+
+OPENGEODE_TEST( "barycentric-coordinates" )
