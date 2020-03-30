@@ -34,6 +34,7 @@ namespace geode
             const auto output = BRepOutputFactory::create(
                 extension_from_filename( filename ).data(), brep, filename );
             output->write();
+            Logger::info( "BRep saved in ", filename );
         }
         catch( const OpenGeodeException& e )
         {
