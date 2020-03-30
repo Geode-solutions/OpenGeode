@@ -66,11 +66,22 @@ namespace geode
      * @return a tuple containing:
      * - the smallest distance.
      * - the closest point on the triangle.
+     * @details the sign is given by the triangle normal (positive if in the
+     * same plane).
      */
     template < index_t dimension >
     std::tuple< double, Point< dimension > > point_triangle_distance(
         const Point< dimension >& point,
         const Triangle< dimension >& triangle );
+
+    /*!
+     * Compute the signed distance between a point and a triangle
+     * @return a tuple containing:
+     * - the smallest distance.
+     * - the closest point on the triangle.
+     */
+    std::tuple< double, Point3D > point_triangle_signed_distance(
+        const Point3D& point, const Triangle3D& triangle );
 
     /*!
      * Compute the distance between a point and a tetrahedron

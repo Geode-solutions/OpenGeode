@@ -343,21 +343,45 @@ namespace geode
     {
         auto dist = MAX_DOUBLE;
         Point3D nearest_p;
+        bool inside{ true };
         for( const auto f : Range{ 4 } )
         {
             auto distance = MAX_DOUBLE;
             Point3D cur_p;
-            std::tie( distance, cur_p ) = point_triangle_distance( point,
+            std::tie( distance, cur_p ) = point_triangle_signed_distance( point,
                 Triangle3D{ tetra.vertices()[Tetra::tetra_facet_vertex[f][0]],
                     tetra.vertices()[Tetra::tetra_facet_vertex[f][1]],
                     tetra.vertices()[Tetra::tetra_facet_vertex[f][2]] } );
-            if( distance < dist )
+            if( distance > 0 )
+            {
+                inside = false;
+            }
+            if( distance < dist && distance >= 0 )
             {
                 dist = distance;
                 nearest_p = cur_p;
             }
         }
+        if( inside )
+        {
+            nearest_p = point;
+            return std::make_tuple( 0.0, nearest_p );
+        }
         return std::make_tuple( dist, nearest_p );
+    }
+
+    std::tuple< double, Point3D > point_triangle_signed_distance(
+        const Point3D& point, const Triangle3D& triangle )
+    {
+        Point3D nearest_point;
+        double distance;
+        std::tie( distance, nearest_point ) =
+            point_triangle_distance( point, triangle );
+        const Vector3D proj2point{ nearest_point, point };
+        // Tetra facet normals point towards inside
+        const auto signed_distance =
+            proj2point.dot( triangle.normal() ) <= 0 ? distance : -distance;
+        return std::make_tuple( signed_distance, nearest_point );
     }
 
     std::tuple< double, Point3D > point_plane_signed_distance(
