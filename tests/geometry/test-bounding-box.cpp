@@ -48,6 +48,7 @@ void test()
         "[Test] Error in BoundingBox union computation" );
     OPENGEODE_EXCEPTION( box2.max() == geode::Point2D( { 1, 1 } ),
         "[Test] Error in BoundingBox union computation" );
+    OPENGEODE_EXCEPTION( box.intersects( box2 ), "[Test] BBox should overlap" );
 
     geode::BoundingBox2D box3;
     box3.add_point( { { 2, 2 } } );
@@ -58,19 +59,35 @@ void test()
         "[Test] BBox should contain this point" );
     OPENGEODE_EXCEPTION( !box3.contains( { { 10, 0 } } ),
         "[Test] BBox should not contain this point" );
+    OPENGEODE_EXCEPTION( !box3.contains( { { 0, 0 } } ),
+        "[Test] BBox should not contain that point" );
 
     geode::BoundingBox2D box_negative;
     box_negative.add_point( { { -2, -2 } } );
-    box_negative.add_point( { { -1, -1 } } );
+    box_negative.add_point( { { -1.5, -1.5 } } );
     OPENGEODE_EXCEPTION( box_negative.min() == geode::Point2D( { -2, -2 } ),
         "[Test] Error in BoundingBox initialization and point additions" );
-    OPENGEODE_EXCEPTION( box_negative.max() == geode::Point2D( { -1, -1 } ),
+    OPENGEODE_EXCEPTION( box_negative.max() == geode::Point2D( { -1.5, -1.5 } ),
         "[Test] Error in BoundingBox initialization and point additions" );
+    OPENGEODE_EXCEPTION( !box.intersects( box_negative ),
+        "[Test] BBox should not overlap box_negative" );
 
     const geode::BoundingBox2D copy_box = box2;
     OPENGEODE_EXCEPTION( copy_box.min() == geode::Point2D( { -2, -2 } )
                              && copy_box.max() == geode::Point2D( { 1, 1 } ),
         "[Test] Copied BBox has wrong extension" );
+
+    const auto box_neg2 = std::move( box_negative );
+    OPENGEODE_EXCEPTION( box_neg2.min() == geode::Point2D( { -2, -2 } ),
+        "[Test] Error in BoundingBox move" );
+    OPENGEODE_EXCEPTION( box_neg2.max() == geode::Point2D( { -1.5, -1.5 } ),
+        "[Test] Error in BoundingBox move" );
+
+    const geode::BoundingBox2D box_neg3( std::move( box_neg2 ) );
+    OPENGEODE_EXCEPTION( box_neg3.min() == geode::Point2D( { -2, -2 } ),
+        "[Test] Error in BoundingBox move constructor" );
+    OPENGEODE_EXCEPTION( box_neg3.max() == geode::Point2D( { -1.5, -1.5 } ),
+        "[Test] Error in BoundingBox move constructor" );
 }
 
 OPENGEODE_TEST( "bounding-box" )
