@@ -34,6 +34,10 @@ namespace geode
             auto input = SectionInputFactory::create(
                 extension_from_filename( filename ).data(), section, filename );
             input->read();
+            Logger::info( "Section loaded from ", filename );
+            Logger::info( "Section has: ", section.nb_surfaces(), " Surfaces, ",
+                section.nb_lines(), " Lines and ", section.nb_corners(),
+                " Corners" );
         }
         catch( const OpenGeodeException& e )
         {

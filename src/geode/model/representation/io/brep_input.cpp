@@ -34,6 +34,10 @@ namespace geode
             auto input = BRepInputFactory::create(
                 extension_from_filename( filename ).data(), brep, filename );
             input->read();
+            Logger::info( "BRep loaded from ", filename );
+            Logger::info( "BRep has: ", brep.nb_blocks(), " Blocks, ",
+                brep.nb_surfaces(), " Surfaces, ", brep.nb_lines(),
+                " Lines and ", brep.nb_corners(), " Corners" );
         }
         catch( const OpenGeodeException& e )
         {
