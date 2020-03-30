@@ -29,55 +29,108 @@
 #include <geode/geometry/basic_objects.h>
 #include <geode/geometry/projection.h>
 
+void point_segment_projection_2d()
+{
+    const geode::Point2D a{ { 1.0, 5.0 } };
+    const geode::Point2D b{ { -1.0, -5.0 } };
+    const geode::Segment2D segment2D{ a, b };
+
+    geode::Point2D closest_point;
+
+    closest_point = geode::point_segment_projection( a, segment2D );
+    OPENGEODE_EXCEPTION( closest_point == a,
+        "[Test] Wrong result for point_segment_projection with query Point2D "
+        "a" );
+
+    closest_point = geode::point_segment_projection( b, segment2D );
+    OPENGEODE_EXCEPTION( closest_point == b,
+        "[Test] Wrong result for point_segment_projection with query Point2D "
+        "b" );
+
+    const geode::Point2D q1{ { 0.0, 0.0 } };
+    closest_point = geode::point_segment_projection( q1, segment2D );
+    OPENGEODE_EXCEPTION( closest_point == q1,
+        "[Test] Wrong result for point_segment_projection with query Point2D "
+        "q1" );
+
+    const geode::Point2D q2{ { 10.0, 10.0 } };
+    closest_point = geode::point_segment_projection( q2, segment2D );
+    OPENGEODE_EXCEPTION( closest_point == a,
+        "[Test] Wrong result for point_segment_projection with query Point2D "
+        "q2" );
+
+    const geode::Point2D q3{ { 5.0, -1.0 } };
+    closest_point = geode::point_segment_projection( q3, segment2D );
+    const geode::Point2D result_q3{ { 0.0, 0.0 } };
+    OPENGEODE_EXCEPTION( closest_point == result_q3,
+        "[Test] Wrong result for point_segment_projection with query Point2D "
+        "q3" );
+
+    const geode::Point2D q4{ { 5.5, 1.5 } };
+    closest_point = geode::point_segment_projection( q4, segment2D );
+    const geode::Point2D result_q4{ { 0.5, 2.5 } };
+    OPENGEODE_EXCEPTION( closest_point == result_q4,
+        "[Test] Wrong result for point_segment_projection with query Point2D "
+        "q4" );
+}
+
+void point_segment_projection_3d()
+{
+    const geode::Point3D a{ { 1.0, 5.0, 2.0 } };
+    const geode::Point3D b{ { -1.0, -5.0, -2.0 } };
+    const geode::Segment3D segment3D{ a, b };
+
+    geode::Point3D closest_point;
+
+    closest_point = geode::point_segment_projection( a, segment3D );
+    OPENGEODE_EXCEPTION(
+        closest_point.inexact_equal( a, geode::global_epsilon ),
+        "[Test] Wrong result for point_segment_projection with query Point3D "
+        "a" );
+
+    closest_point = geode::point_segment_projection( b, segment3D );
+    OPENGEODE_EXCEPTION(
+        closest_point.inexact_equal( b, geode::global_epsilon ),
+        "[Test] Wrong result for point_segment_projection with query Point3D "
+        "b" );
+
+    const geode::Point3D q1{ { 0.0, 0.0, 0.0 } };
+    closest_point = geode::point_segment_projection( q1, segment3D );
+    OPENGEODE_EXCEPTION(
+        closest_point.inexact_equal( q1, geode::global_epsilon ),
+        "[Test] Wrong result for point_segment_projection with query Point3D "
+        "q1" );
+
+    const geode::Point3D q2{ { 10.0, 10.0, 10.0 } };
+    closest_point = geode::point_segment_projection( q2, segment3D );
+    OPENGEODE_EXCEPTION(
+        closest_point.inexact_equal( a, geode::global_epsilon ),
+        "[Test] Wrong result for point_segment_projection with query Point3D "
+        "q2" );
+
+    const geode::Point3D q3{ { 5.0, -1.0, 0.0 } };
+    closest_point = geode::point_segment_projection( q3, segment3D );
+    const geode::Point3D result_q3{ { 0.0, 0.0, 0.0 } };
+    OPENGEODE_EXCEPTION(
+        closest_point.inexact_equal( result_q3, geode::global_epsilon ),
+        "[Test] Wrong result for point_segment_projection with query Point3D "
+        "q3" );
+
+    const geode::Point3D q4{ { 5.5, 1.5, 0.25 } };
+    closest_point = geode::point_segment_projection( q4, segment3D );
+    const geode::Point3D result_q4{ { 0.45, 2.25, 0.9 } };
+    OPENGEODE_EXCEPTION(
+        closest_point.inexact_equal( result_q4, geode::global_epsilon ),
+        "[Test] Wrong result for point_segment_projection with query Point3D "
+        "q4" );
+}
+
 int main()
 {
     try
     {
-        // Tests for 2D cases
-        const geode::Point2D a{ { 1.0, 5.0 } };
-        const geode::Point2D b{ { -1.0, -5.0 } };
-        const geode::Segment2D segment2D{ a, b };
-
-        geode::Point2D closest_point;
-
-        closest_point = geode::point_segment_projection( a, segment2D );
-        OPENGEODE_EXCEPTION( closest_point == a,
-            "[Test] Wrong result for point_segment_projection with query point "
-            "a" );
-
-        closest_point = geode::point_segment_projection( b, segment2D );
-        OPENGEODE_EXCEPTION( closest_point == b,
-            "[Test] Wrong result for point_segment_projection with query point "
-            "b" );
-
-        const geode::Point2D q1{ { 0.0, 0.0 } };
-        closest_point = geode::point_segment_projection( q1, segment2D );
-        OPENGEODE_EXCEPTION( closest_point == q1,
-            "[Test] Wrong result for point_segment_projection with query point "
-            "q1" );
-
-        const geode::Point2D q2{ { 10.0, 10.0 } };
-        closest_point = geode::point_segment_projection( q2, segment2D );
-        OPENGEODE_EXCEPTION( closest_point == a,
-            "[Test] Wrong result for point_segment_projection with query point "
-            "q2" );
-
-        const geode::Point2D q3{ { 5.0, -1.0 } };
-        closest_point = geode::point_segment_projection( q3, segment2D );
-        const geode::Point2D result_q3{ { 0.0, 0.0 } };
-        OPENGEODE_EXCEPTION( closest_point == result_q3,
-            "[Test] Wrong result for point_segment_projection with query point "
-            "q3" );
-
-        const geode::Point2D q4{ { 5.5, 1.5 } };
-        closest_point = geode::point_segment_projection( q4, segment2D );
-        const geode::Point2D result_q4{ { 0.5, 2.5 } };
-        OPENGEODE_EXCEPTION( closest_point == result_q4,
-            "[Test] Wrong result for point_segment_projection with query point "
-            "q3" );
-
-        // Tests for 3D cases
-        // TODO
+        point_segment_projection_2d();
+        point_segment_projection_3d();
 
         geode::Logger::info( "TEST SUCCESS" );
         return 0;
