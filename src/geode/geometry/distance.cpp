@@ -70,6 +70,13 @@ namespace geode
         auto det = std::fabs( a00 * a11 - a01 * a01 );
         auto s = a01 * b1 - a11 * b0;
         auto t = a01 * b0 - a00 * b1;
+        DEBUG( a00 );
+        DEBUG( a01 );
+        DEBUG( a11 );
+        DEBUG( b0 );
+        DEBUG( b1 );
+        DEBUG( c );
+        DEBUG( det );
         double sqrDistance;
 
         if( s + t <= det )
