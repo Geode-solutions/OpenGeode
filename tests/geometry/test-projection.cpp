@@ -29,6 +29,8 @@
 #include <geode/geometry/basic_objects.h>
 #include <geode/geometry/projection.h>
 
+#include <geode/tests/common.h>
+
 void point_segment_projection_2d()
 {
     const geode::Point2D a{ { 1.0, 5.0 } };
@@ -148,19 +150,11 @@ void point_triangle_projection_3d()
         "a" );
 }
 
-int main()
+void test()
 {
-    try
-    {
-        point_segment_projection_2d();
-        point_segment_projection_3d();
-        point_triangle_projection_3d();
-
-        geode::Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode::geode_lippincott();
-    }
+    point_segment_projection_2d();
+    point_segment_projection_3d();
+    point_triangle_projection_3d();
 }
+
+OPENGEODE_TEST( "projection" )

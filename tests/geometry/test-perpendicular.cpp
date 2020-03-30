@@ -28,6 +28,8 @@
 #include <geode/geometry/point.h>
 #include <geode/geometry/vector.h>
 
+#include <geode/tests/common.h>
+
 void test_perpendicular()
 {
     geode::Vector2D v{ { 1.578, 1e-10 } };
@@ -51,17 +53,10 @@ void test_dot_perpendicular()
         "[Test] Wrong result for dot_perpendicular" );
 }
 
-int main()
+void test()
 {
-    try
-    {
-        test_perpendicular();
-        test_dot_perpendicular();
-        geode::Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode::geode_lippincott();
-    }
+    test_perpendicular();
+    test_dot_perpendicular();
 }
+
+OPENGEODE_TEST( "perpendicular" )
