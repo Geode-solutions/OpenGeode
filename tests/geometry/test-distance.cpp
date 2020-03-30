@@ -278,6 +278,26 @@ void test_point_triangle_distance_3d()
     OPENGEODE_EXCEPTION( distance == std::sqrt( 6 ) && closest_point == c,
         "[Test] Wrong result for point_triangle_distance with query Point3D "
         "q7" );
+
+    const geode::Point3D q8{ { 0.5, -3.0, 1.0 } };
+    std::tie( distance, closest_point ) =
+        geode::point_triangle_distance( q8, triangle3D );
+    const geode::Point3D result_q8{ { 0.5, 0.0, 0.0 } };
+    OPENGEODE_EXCEPTION(
+        distance == std::sqrt( 10 ) && closest_point == result_q8,
+        "[Test] Wrong result for point_triangle_distance with query Point3D "
+        "q8" );
+
+    const geode::Point3D q9{ { 0.5, -0.2, 0.0 } };
+    std::tie( distance, closest_point ) =
+        geode::point_triangle_distance( q9, triangle3D );
+    SDEBUG( closest_point );
+    DEBUG( distance );
+    const geode::Point3D result_q9{ { 0.5, 0.0, 0.0 } };
+    OPENGEODE_EXCEPTION( std::fabs( distance - 0.2 ) < geode::global_epsilon
+                             && closest_point == result_q9,
+        "[Test] Wrong result for point_triangle_distance with query Point3D "
+        "q9" );
 }
 
 void test_point_triangle_distance()
