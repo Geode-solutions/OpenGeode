@@ -24,7 +24,8 @@
 #pragma once
 
 #include <array>
-#include <cmath>
+// #define _USE_MATH_DEFINES
+// #include <cmath>
 #include <iostream>
 
 #include <bitsery/bitsery.h>
