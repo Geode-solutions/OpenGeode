@@ -21,34 +21,26 @@
  *
  */
 
-#include <geode/model/representation/io/brep_input.h>
+#include <geode/geometry/barycentric_coordinates.h>
 
-#include <geode/model/representation/core/brep.h>
+#define PYTHON_BARYCENTRIC( dimension )                                        \
+    const auto triangle_barycentric_coordinates##dimension =                   \
+        "triangle_barycentric_coordinates" + std::to_string( dimension )       \
+        + "D";                                                                 \
+    module.def( triangle_barycentric_coordinates##dimension.c_str(),           \
+        &triangle_barycentric_coordinates< dimension > );                      \
+    const auto segment_barycentric_coordinates##dimension =                    \
+        "segment_barycentric_coordinates" + std::to_string( dimension ) + "D"; \
+    module.def( segment_barycentric_coordinates##dimension.c_str(),            \
+        &segment_barycentric_coordinates< dimension > )
 
 namespace geode
 {
-    void load_brep( BRep& brep, absl::string_view filename )
+    void define_barycentric( pybind11::module& module )
     {
-        try
-        {
-            auto input = BRepInputFactory::create(
-                extension_from_filename( filename ).data(), brep, filename );
-            input->read();
-            Logger::info( "BRep loaded from ", filename );
-            Logger::info( "BRep has: ", brep.nb_blocks(), " Blocks, ",
-                brep.nb_surfaces(), " Surfaces, ", brep.nb_lines(),
-                " Lines and ", brep.nb_corners(), " Corners" );
-        }
-        catch( const OpenGeodeException& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeException{ "Cannot load BRep from file: ",
-                filename };
-        }
-    }
-
-    BRepInput::BRepInput( BRep& brep, absl::string_view filename )
-        : Input( filename ), brep_( brep )
-    {
+        PYTHON_BARYCENTRIC( 2 );
+        PYTHON_BARYCENTRIC( 3 );
+        module.def(
+            "tetra_barycentric_coordinates", &tetra_barycentric_coordinates );
     }
 } // namespace geode

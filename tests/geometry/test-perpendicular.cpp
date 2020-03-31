@@ -21,34 +21,42 @@
  *
  */
 
-#include <geode/model/representation/io/brep_input.h>
+#include <geode/basic/assert.h>
+#include <geode/basic/logger.h>
 
-#include <geode/model/representation/core/brep.h>
+#include <geode/geometry/perpendicular.h>
+#include <geode/geometry/point.h>
+#include <geode/geometry/vector.h>
 
-namespace geode
+#include <geode/tests/common.h>
+
+void test_perpendicular()
 {
-    void load_brep( BRep& brep, absl::string_view filename )
-    {
-        try
-        {
-            auto input = BRepInputFactory::create(
-                extension_from_filename( filename ).data(), brep, filename );
-            input->read();
-            Logger::info( "BRep loaded from ", filename );
-            Logger::info( "BRep has: ", brep.nb_blocks(), " Blocks, ",
-                brep.nb_surfaces(), " Surfaces, ", brep.nb_lines(),
-                " Lines and ", brep.nb_corners(), " Corners" );
-        }
-        catch( const OpenGeodeException& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeException{ "Cannot load BRep from file: ",
-                filename };
-        }
-    }
+    geode::Vector2D v{ { 1.578, 1e-10 } };
+    const auto perp = geode::perpendicular( v ).normalize();
 
-    BRepInput::BRepInput( BRep& brep, absl::string_view filename )
-        : Input( filename ), brep_( brep )
-    {
-    }
-} // namespace geode
+    const auto dot_product =
+        v.value( 0 ) * perp.value( 0 ) + v.value( 1 ) * perp.value( 1 );
+
+    OPENGEODE_EXCEPTION( perp.length() == 1 && dot_product == 0.,
+        "[Test] Wrong result for normalized_perpendicular" );
+}
+
+void test_dot_perpendicular()
+{
+    const geode::Vector2D v1{ { 0, 1 } };
+    const geode::Vector2D v2{ { 1, 0 } };
+    const auto dot_perp = geode::dot_perpendicular( v1, v2 );
+    const auto dot = geode::dot_perpendicular( geode::perpendicular( v1 ), v2 );
+
+    OPENGEODE_EXCEPTION( dot_perp == -1 && dot == 0,
+        "[Test] Wrong result for dot_perpendicular" );
+}
+
+void test()
+{
+    test_perpendicular();
+    test_dot_perpendicular();
+}
+
+OPENGEODE_TEST( "perpendicular" )

@@ -21,34 +21,13 @@
  *
  */
 
-#include <geode/model/representation/io/brep_input.h>
-
-#include <geode/model/representation/core/brep.h>
+#include <geode/geometry/perpendicular.h>
 
 namespace geode
 {
-    void load_brep( BRep& brep, absl::string_view filename )
+    void define_perpendicular( pybind11::module& module )
     {
-        try
-        {
-            auto input = BRepInputFactory::create(
-                extension_from_filename( filename ).data(), brep, filename );
-            input->read();
-            Logger::info( "BRep loaded from ", filename );
-            Logger::info( "BRep has: ", brep.nb_blocks(), " Blocks, ",
-                brep.nb_surfaces(), " Surfaces, ", brep.nb_lines(),
-                " Lines and ", brep.nb_corners(), " Corners" );
-        }
-        catch( const OpenGeodeException& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeException{ "Cannot load BRep from file: ",
-                filename };
-        }
-    }
-
-    BRepInput::BRepInput( BRep& brep, absl::string_view filename )
-        : Input( filename ), brep_( brep )
-    {
+        module.def( "perpendicular", &perpendicular );
+        module.def( "dot_perpendicular", &dot_perpendicular );
     }
 } // namespace geode

@@ -21,34 +21,27 @@
  *
  */
 
-#include <geode/model/representation/io/brep_input.h>
+#include <geode/geometry/projection.h>
 
-#include <geode/model/representation/core/brep.h>
+#define PYTHON_PROJECTION( dimension )                                         \
+    const auto point_segment_projection##dimension =                           \
+        "point_segment_projection" + std::to_string( dimension ) + "D";        \
+    module.def( point_segment_projection##dimension.c_str(),                   \
+        &point_segment_projection< dimension > );                              \
+    const auto point_line_projection##dimension =                              \
+        "point_line_projection" + std::to_string( dimension ) + "D";           \
+    module.def( point_line_projection##dimension.c_str(),                      \
+        &point_line_projection< dimension > );                                 \
+    const auto point_triangle_projection##dimension =                          \
+        "point_triangle_projection" + std::to_string( dimension ) + "D";       \
+    module.def( point_triangle_projection##dimension.c_str(),                  \
+        &point_triangle_projection< dimension > )
 
 namespace geode
 {
-    void load_brep( BRep& brep, absl::string_view filename )
+    void define_projection( pybind11::module& module )
     {
-        try
-        {
-            auto input = BRepInputFactory::create(
-                extension_from_filename( filename ).data(), brep, filename );
-            input->read();
-            Logger::info( "BRep loaded from ", filename );
-            Logger::info( "BRep has: ", brep.nb_blocks(), " Blocks, ",
-                brep.nb_surfaces(), " Surfaces, ", brep.nb_lines(),
-                " Lines and ", brep.nb_corners(), " Corners" );
-        }
-        catch( const OpenGeodeException& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeException{ "Cannot load BRep from file: ",
-                filename };
-        }
-    }
-
-    BRepInput::BRepInput( BRep& brep, absl::string_view filename )
-        : Input( filename ), brep_( brep )
-    {
+        PYTHON_PROJECTION( 2 );
+        PYTHON_PROJECTION( 3 );
     }
 } // namespace geode

@@ -21,34 +21,27 @@
  *
  */
 
-#include <geode/model/representation/io/brep_input.h>
+#pragma once
 
-#include <geode/model/representation/core/brep.h>
+#include <geode/geometry/common.h>
 
 namespace geode
 {
-    void load_brep( BRep& brep, absl::string_view filename )
-    {
-        try
-        {
-            auto input = BRepInputFactory::create(
-                extension_from_filename( filename ).data(), brep, filename );
-            input->read();
-            Logger::info( "BRep loaded from ", filename );
-            Logger::info( "BRep has: ", brep.nb_blocks(), " Blocks, ",
-                brep.nb_surfaces(), " Surfaces, ", brep.nb_lines(),
-                " Lines and ", brep.nb_corners(), " Corners" );
-        }
-        catch( const OpenGeodeException& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeException{ "Cannot load BRep from file: ",
-                filename };
-        }
-    }
+    FORWARD_DECLARATION_DIMENSION_CLASS( Vector );
+    ALIAS_2D( Vector );
+} // namespace geode
 
-    BRepInput::BRepInput( BRep& brep, absl::string_view filename )
-        : Input( filename ), brep_( brep )
-    {
-    }
+namespace geode
+{
+    /*!
+     * Return a 2D vector perpendicular to the given one
+     */
+    Vector2D opengeode_geometry_api perpendicular( const Vector2D& v );
+
+    /*!
+     * compute the dot product between two 2D vectors
+     */
+    double opengeode_geometry_api dot_perpendicular(
+        const Vector2D& v0, const Vector2D& v1 );
+
 } // namespace geode

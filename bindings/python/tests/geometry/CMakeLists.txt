@@ -38,3 +38,28 @@ add_geode_python_test(
     DEPENDENCIES
         ${PROJECT_NAME}::py_geometry
 )
+add_geode_python_test(
+    SOURCE "test-py-barycentric-coordinates.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_geometry
+)
+add_geode_python_test(
+    SOURCE "test-py-signed-mensuration.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_geometry
+)
+add_geode_python_test(
+    SOURCE "test-py-perpendicular.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_geometry
+)
+add_geode_python_test(
+    SOURCE "test-py-projection.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_geometry
+)
+add_geode_python_test(
+    SOURCE "test-py-distance.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_geometry
+)

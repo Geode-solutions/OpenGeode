@@ -24,9 +24,15 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+#include "barycentric_coordinates.h"
+#include "basic_objects.h"
 #include "bounding_box.h"
+#include "distance.h"
 #include "nn_search.h"
+#include "perpendicular.h"
 #include "point.h"
+#include "projection.h"
+#include "signed_mensuration.h"
 #include "vector.h"
 
 namespace pybind11
@@ -48,4 +54,10 @@ PYBIND11_MODULE( opengeode_py_geometry, module )
     geode::define_vector( module );
     geode::define_bounding_box( module );
     geode::define_nn_search( module );
+    geode::define_basic_objects( module );
+    geode::define_distance( module );
+    geode::define_perpendicular( module );
+    geode::define_projection( module );
+    geode::define_mensuration( module );
+    geode::define_barycentric( module );
 }

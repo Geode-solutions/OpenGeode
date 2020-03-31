@@ -34,6 +34,7 @@ namespace geode
             const auto output = SectionOutputFactory::create(
                 extension_from_filename( filename ).data(), section, filename );
             output->write();
+            Logger::info( "Section saved in ", filename );
         }
         catch( const OpenGeodeException& e )
         {

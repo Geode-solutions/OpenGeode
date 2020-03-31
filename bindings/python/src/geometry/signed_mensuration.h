@@ -21,34 +21,24 @@
  *
  */
 
-#include <geode/model/representation/io/brep_input.h>
+#include <geode/geometry/signed_mensuration.h>
 
-#include <geode/model/representation/core/brep.h>
+#define PYTHON_MENSURATION( dimension )                                        \
+    const auto triangle_area##dimension =                                      \
+        "triangle_area" + std::to_string( dimension ) + "D";                   \
+    module.def( triangle_area##dimension.c_str(), &triangle_area< dimension > )
 
 namespace geode
 {
-    void load_brep( BRep& brep, absl::string_view filename )
+    void define_mensuration( pybind11::module& module )
     {
-        try
-        {
-            auto input = BRepInputFactory::create(
-                extension_from_filename( filename ).data(), brep, filename );
-            input->read();
-            Logger::info( "BRep loaded from ", filename );
-            Logger::info( "BRep has: ", brep.nb_blocks(), " Blocks, ",
-                brep.nb_surfaces(), " Surfaces, ", brep.nb_lines(),
-                " Lines and ", brep.nb_corners(), " Corners" );
-        }
-        catch( const OpenGeodeException& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeException{ "Cannot load BRep from file: ",
-                filename };
-        }
-    }
-
-    BRepInput::BRepInput( BRep& brep, absl::string_view filename )
-        : Input( filename ), brep_( brep )
-    {
+        PYTHON_MENSURATION( 2 );
+        PYTHON_MENSURATION( 3 );
+        module.def( "triangle_signed_area2D",
+            ( double ( * )( const Triangle2D& ) ) & triangle_signed_area );
+        module.def( "triangle_signed_area3D",
+            ( double ( * )( const Triangle3D&, const Vector3D& ) )
+                & triangle_signed_area );
+        module.def( "tetra_signed_volume", &tetra_signed_volume );
     }
 } // namespace geode

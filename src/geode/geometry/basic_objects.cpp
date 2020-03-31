@@ -21,34 +21,10 @@
  *
  */
 
-#include <geode/model/representation/io/brep_input.h>
-
-#include <geode/model/representation/core/brep.h>
+#include <geode/geometry/basic_objects.h>
 
 namespace geode
 {
-    void load_brep( BRep& brep, absl::string_view filename )
-    {
-        try
-        {
-            auto input = BRepInputFactory::create(
-                extension_from_filename( filename ).data(), brep, filename );
-            input->read();
-            Logger::info( "BRep loaded from ", filename );
-            Logger::info( "BRep has: ", brep.nb_blocks(), " Blocks, ",
-                brep.nb_surfaces(), " Surfaces, ", brep.nb_lines(),
-                " Lines and ", brep.nb_corners(), " Corners" );
-        }
-        catch( const OpenGeodeException& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeException{ "Cannot load BRep from file: ",
-                filename };
-        }
-    }
-
-    BRepInput::BRepInput( BRep& brep, absl::string_view filename )
-        : Input( filename ), brep_( brep )
-    {
-    }
+    constexpr std::array< std::array< index_t, 3 >, 4 >
+        Tetra::tetra_facet_vertex;
 } // namespace geode
