@@ -24,7 +24,6 @@
 #pragma once
 
 #include <array>
-#include <cmath>
 #include <iostream>
 
 #include <bitsery/bitsery.h>

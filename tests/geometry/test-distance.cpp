@@ -302,8 +302,6 @@ void test_point_triangle_distance_3d()
     const geode::Point3D q10{ { 0.75, 0.25, 10.0 } };
     std::tie( distance, closest_point ) =
         geode::point_triangle_distance( q10, triangle3D );
-    SDEBUG( closest_point );
-    DEBUG( distance );
     const geode::Point3D result_q10{ { 0.75, 0.25, 0.0 } };
     OPENGEODE_EXCEPTION( std::fabs( distance - 10 ) < geode::global_epsilon
                              && closest_point == result_q10,
@@ -313,54 +311,38 @@ void test_point_triangle_distance_3d()
     const geode::Point3D q11{ { 2.0, 0.5, 0.0 } };
     std::tie( distance, closest_point ) =
         geode::point_triangle_distance( q11, triangle3D );
-    SDEBUG( closest_point );
-    DEBUG( distance );
     const geode::Point3D result_q11{ { 1.0, 0.5, 0.0 } };
     OPENGEODE_EXCEPTION( std::fabs( distance - 1 ) < geode::global_epsilon
                              && closest_point == result_q11,
         "[Test] Wrong result for point_triangle_distance with query Point3D "
         "q11" );
 
-    DEBUG( "======" );
     const geode::Point3D q12{ { -1.0, 2.0, 0.0 } };
     std::tie( distance, closest_point ) =
         geode::point_triangle_distance( q12, triangle3D );
-    SDEBUG( closest_point );
-    DEBUG( distance );
-    DEBUG( std::sqrt( 1.5 * 1.5 * 2 ) );
     const geode::Point3D result_q12{ { 0.5, 0.5, 0.0 } };
     OPENGEODE_EXCEPTION(
         distance == std::sqrt( 1.5 * 1.5 * 2 ) && closest_point == result_q12,
         "[Test] Wrong result for point_triangle_distance with query Point3D "
         "q12" );
 
-    DEBUG( "======" );
     const geode::Point3D q13{ { -2.0, 1.0, 0.0 } };
     std::tie( distance, closest_point ) =
         geode::point_triangle_distance( q13, triangle3D );
-    SDEBUG( closest_point );
-    DEBUG( distance );
-    // const geode::Point3D result_q12{ { 1.0, 0.5, 0.0 } };
     OPENGEODE_EXCEPTION(
         std::fabs( distance - std::sqrt( 5 ) ) < geode::global_epsilon
             && closest_point == a,
         "[Test] Wrong result for point_triangle_distance with query Point3D "
         "q13" );
 
-    DEBUG( "=====" );
     const geode::Point3D q14{ { 0.5, 2.0, 0.0 } };
     std::tie( distance, closest_point ) =
         geode::point_triangle_distance( q14, triangle3D );
-    SDEBUG( closest_point );
-    DEBUG( distance );
-    // const geode::Point3D result_q12{ { 1.0, 0.5, 0.0 } };
     OPENGEODE_EXCEPTION(
         std::fabs( distance - std::sqrt( 1.25 ) ) < geode::global_epsilon
             && closest_point == c,
         "[Test] Wrong result for point_triangle_distance with query Point3D "
         "q13" );
-
-    // exit( 1 );
 }
 
 void test_point_triangle_distance()
