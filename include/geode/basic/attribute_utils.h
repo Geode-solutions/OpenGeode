@@ -72,6 +72,23 @@ namespace geode
         bool interpolable{ false };
     };
 
+    /*!
+     * Helper struct to interpolate an Attribute value.
+     * This struct may be customized for a given type.
+     * Example:
+     * template <>
+     * struct AttributeLinearInterpolationImpl< MyType >
+     * {
+     *     template < template < typename > class Attribute >
+     *     static MyType compute(
+     *         const AttributeLinearInterpolation& interpolator,
+     *         const Attribute< MyType >& attribute )
+     *     {
+     *         // Interpolate using data from the interpolator
+     *         return interpolated_value;
+     *     }
+     * };
+     */
     template < typename AttributeType >
     struct AttributeLinearInterpolationImpl
     {
