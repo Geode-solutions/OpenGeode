@@ -36,6 +36,7 @@
 #include <bitsery/ext/std_map.h>
 
 #include <geode/basic/algorithm.h>
+#include <geode/basic/attribute_utils.h>
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/common.h>
 #include <geode/basic/detail/mapping_after_deletion.h>
@@ -48,75 +49,6 @@ namespace geode
 
 namespace geode
 {
-    class AttributeLinearInterpolation
-    {
-    public:
-        AttributeLinearInterpolation( absl::FixedArray< index_t > indices,
-            absl::FixedArray< double > lambdas )
-            : indices_( std::move( indices ) ), lambdas_( std::move( lambdas ) )
-        {
-            OPENGEODE_EXCEPTION( indices_.size() == lambdas_.size(),
-                "[AttributeLinearInterpolation] Both arrays should have the "
-                "same size" );
-        }
-
-        template < template < typename > class Attribute, typename T >
-        typename std::enable_if< std::is_floating_point< T >::value, T >::type
-            compute_value( const Attribute< T >& attribute ) const
-        {
-            T result{ 0 };
-            for( auto i : Range{ indices_.size() } )
-            {
-                result += lambdas_[i] * attribute.value( indices_[i] );
-            }
-            return result;
-        }
-
-        template < template < typename > class Attribute, typename T >
-        typename std::enable_if< !std::is_floating_point< T >::value, T >::type
-            compute_value( const Attribute< T >& attribute ) const
-        {
-            return attribute.default_value();
-        }
-
-    private:
-        absl::FixedArray< index_t > indices_;
-        absl::FixedArray< double > lambdas_;
-    };
-
-    /*!
-     * Helper struct to convert an Attribute value to generic float.
-     * This struct may be customized for a given type.
-     * Example:
-     * template <>
-     * struct GenericAttributeConversion< MyType >
-     * {
-     *      static float converted_value( const MyType& value )
-     *      {
-     *          return value.get_a_float();
-     *      }
-     * };
-     */
-    template < typename AttributeType >
-    struct GenericAttributeConversion
-    {
-        template < typename T = AttributeType >
-        static typename std::enable_if< std::is_arithmetic< T >::value,
-            float >::type
-            converted_value( const T& value )
-        {
-            return value;
-        }
-
-        template < typename T = AttributeType >
-        static typename std::enable_if< !std::is_arithmetic< T >::value,
-            float >::type
-            converted_value( const T& /*unused*/ )
-        {
-            return 0.;
-        }
-    };
-
     /*!
      * Base class defining the virtual API used by the AttributeManager.
      */
@@ -155,16 +87,33 @@ namespace geode
             index_t to_element,
             AttributeKey ) = 0;
 
+        const AttributeProperties& properties() const
+        {
+            return properties_;
+        }
+
     private:
+        AttributeBase() = default;
+
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, DefaultGrowable< Archive, AttributeBase >{},
-                []( Archive& /*unused*/, AttributeBase& /*unused*/ ) {} );
+            archive.ext( *this,
+                Growable< Archive, AttributeBase >{
+                    { []( Archive& /*unused*/, AttributeBase& /*unused*/ ) {},
+                        []( Archive& archive, AttributeBase& attribute ) {
+                            archive.object( attribute.properties_ );
+                        } } } );
         }
 
     protected:
-        AttributeBase() = default;
+        AttributeBase( AttributeProperties properties )
+            : properties_( std::move( properties ) )
+        {
+        }
+
+    private:
+        AttributeProperties properties_;
     };
 
     /*!
@@ -191,9 +140,14 @@ namespace geode
         }
 
     protected:
-        ReadOnlyAttribute() = default;
+        ReadOnlyAttribute( AttributeProperties properties )
+            : AttributeBase( std::move( properties ) )
+        {
+        }
 
     private:
+        ReadOnlyAttribute() = default;
+
         template < typename Archive >
         void serialize( Archive& archive )
         {
@@ -215,8 +169,10 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        ConstantAttribute( T value, AttributeBase::AttributeKey )
-            : ConstantAttribute( std::move( value ) )
+        ConstantAttribute( T value,
+            AttributeProperties properties,
+            AttributeBase::AttributeKey )
+            : ConstantAttribute( std::move( value ), std::move( properties ) )
         {
         }
 
@@ -261,9 +217,8 @@ namespace geode
         std::shared_ptr< AttributeBase > clone() const override
         {
             std::shared_ptr< ConstantAttribute< T > > attribute{
-                new ConstantAttribute< T >{}
+                new ConstantAttribute< T >{ value_, this->properties() }
             };
-            attribute->value_ = value_;
             return attribute;
         }
 
@@ -279,12 +234,13 @@ namespace geode
         }
 
     private:
-        ConstantAttribute( T value )
+        ConstantAttribute( T value, AttributeProperties properties )
+            : ReadOnlyAttribute< T >( std::move( properties ) )
         {
             set_value( std::move( value ) );
         }
 
-        ConstantAttribute() = default;
+        ConstantAttribute() : ReadOnlyAttribute< T >( AttributeProperties{} ){};
 
         template < typename Archive >
         void serialize( Archive& archive )
@@ -324,8 +280,11 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        VariableAttribute( T default_value, AttributeBase::AttributeKey )
-            : VariableAttribute( std::move( default_value ) )
+        VariableAttribute( T default_value,
+            AttributeProperties properties,
+            AttributeBase::AttributeKey )
+            : VariableAttribute(
+                  std::move( default_value ), std::move( properties ) )
         {
         }
 
@@ -367,7 +326,7 @@ namespace geode
         std::shared_ptr< AttributeBase > clone() const override
         {
             std::shared_ptr< VariableAttribute< T > > attribute{
-                new VariableAttribute< T >{ default_value_ }
+                new VariableAttribute< T >{ default_value_, this->properties() }
             };
             attribute->values_ = values_;
             return attribute;
@@ -390,13 +349,14 @@ namespace geode
         }
 
     protected:
-        VariableAttribute( T default_value )
-            : default_value_( std::move( default_value ) )
+        VariableAttribute( T default_value, AttributeProperties properties )
+            : ReadOnlyAttribute< T >( std::move( properties ) ),
+              default_value_( std::move( default_value ) )
         {
             values_.reserve( 10 );
         }
 
-        VariableAttribute() = default;
+        VariableAttribute() : ReadOnlyAttribute< T >( AttributeProperties{} ){};
 
         template < typename Archive >
         void serialize( Archive& archive )
@@ -452,8 +412,10 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        VariableAttribute( bool default_value, AttributeBase::AttributeKey )
-            : VariableAttribute( default_value )
+        VariableAttribute( bool default_value,
+            AttributeProperties properties,
+            AttributeBase::AttributeKey )
+            : VariableAttribute( default_value, std::move( properties ) )
         {
         }
 
@@ -496,7 +458,7 @@ namespace geode
         {
             std::shared_ptr< VariableAttribute< bool > > attribute{
                 new VariableAttribute< bool >{
-                    static_cast< bool >( default_value_ ) }
+                    static_cast< bool >( default_value_ ), this->properties() }
             };
             attribute->values_ = values_;
             return attribute;
@@ -519,13 +481,15 @@ namespace geode
         }
 
     protected:
-        VariableAttribute( bool default_value )
-            : default_value_( default_value )
+        VariableAttribute( bool default_value, AttributeProperties properties )
+            : ReadOnlyAttribute< bool >( std::move( properties ) ),
+              default_value_( default_value )
         {
             values_.reserve( 10 );
         }
 
-        VariableAttribute() = default;
+        VariableAttribute()
+            : ReadOnlyAttribute< bool >( AttributeProperties{} ){};
 
         template < typename Archive >
         void serialize( Archive& archive )
@@ -579,8 +543,11 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        SparseAttribute( T default_value, AttributeBase::AttributeKey )
-            : SparseAttribute( std::move( default_value ) )
+        SparseAttribute( T default_value,
+            AttributeProperties properties,
+            AttributeBase::AttributeKey )
+            : SparseAttribute(
+                  std::move( default_value ), std::move( properties ) )
         {
         }
 
@@ -632,7 +599,7 @@ namespace geode
         std::shared_ptr< AttributeBase > clone() const override
         {
             std::shared_ptr< SparseAttribute< T > > attribute{
-                new SparseAttribute< T >{ default_value_ }
+                new SparseAttribute< T >{ default_value_, this->properties() }
             };
             attribute->values_ = values_;
             return attribute;
@@ -657,13 +624,14 @@ namespace geode
         }
 
     private:
-        SparseAttribute( T default_value )
-            : default_value_( std::move( default_value ) )
+        SparseAttribute( T default_value, AttributeProperties properties )
+            : ReadOnlyAttribute< T >( std::move( properties ) ),
+              default_value_( std::move( default_value ) )
         {
             values_.reserve( 10 );
         }
 
-        SparseAttribute() = default;
+        SparseAttribute() : ReadOnlyAttribute< T >( AttributeProperties{} ){};
 
         template < typename Archive >
         void serialize( Archive& archive )
