@@ -92,7 +92,8 @@ namespace geode
          * @param[in] name The associated attribute name to look for
          * @param[in] default_value The default value to use when new attribute
          * element are created
-         * @param[in] properties The AttributeProperties to use
+         * @param[in] properties The AttributeProperties to set the attribute
+         * flags for future modifications
          * @tparam Attribute The attribute type to look for,
          * such as ConstantAttribute
          * @tparam T The type of the Attribute element
