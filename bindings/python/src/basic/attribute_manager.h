@@ -34,21 +34,21 @@
         ( std::shared_ptr< ConstantAttribute< type > >( AttributeManager::* )( \
             absl::string_view, type ) )                                        \
             & AttributeManager::find_or_create_attribute< ConstantAttribute,   \
-                  type > );                                                    \
+                type > );                                                      \
     const auto variable##suffix =                                              \
         std::string{ "find_or_create_attribute_variable_" } + #suffix;         \
     manager.def( variable##suffix.c_str(),                                     \
         ( std::shared_ptr< VariableAttribute< type > >( AttributeManager::* )( \
             absl::string_view, type ) )                                        \
             & AttributeManager::find_or_create_attribute< VariableAttribute,   \
-                  type > );                                                    \
+                type > );                                                      \
     const auto sparse##suffix =                                                \
         std::string{ "find_or_create_attribute_sparse_" } + #suffix;           \
     manager.def( sparse##suffix.c_str(),                                       \
         ( std::shared_ptr< SparseAttribute< type > >( AttributeManager::* )(   \
             absl::string_view, type ) )                                        \
             & AttributeManager::find_or_create_attribute< SparseAttribute,     \
-                  type > )
+                type > )
 
 namespace geode
 {
