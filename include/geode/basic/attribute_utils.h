@@ -48,6 +48,10 @@ namespace geode
 
 namespace geode
 {
+    /*!
+     * Struct holding Attribute flags used by the AttributeManager for
+     * updating/computing attribute values
+     */
     struct AttributeProperties
     {
         AttributeProperties() = default;
