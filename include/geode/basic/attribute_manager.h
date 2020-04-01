@@ -146,6 +146,8 @@ namespace geode
          * Assign attribute value from other value in the same attribute
          * @param[in] from_element Attribute value to assign
          * @param[in] to_element Where the value is assign
+         * @warning Only affect Attributes created with its AttributeProperties
+         * assignable flag set to true
          */
         void assign_attribute_value( index_t from_element, index_t to_element );
 
@@ -153,6 +155,8 @@ namespace geode
          * Interpolate attribute value from other values in the same attribute
          * @param[in] interpolation Attribute interpolator
          * @param[in] to_element Where the value is assign
+         * @warning Only affect Attributes created with its AttributeProperties
+         * interpolable flag set to true
          */
         void interpolate_attribute_value(
             const AttributeLinearInterpolation& interpolation,
