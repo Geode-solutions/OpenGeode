@@ -31,18 +31,24 @@
     const auto constant##suffix =                                              \
         std::string{ "find_or_create_attribute_constant_" } + #suffix;         \
     manager.def( constant##suffix.c_str(),                                     \
-        &AttributeManager::find_or_create_attribute< ConstantAttribute, type,  \
-            type > );                                                          \
+        ( std::shared_ptr< ConstantAttribute< type > >( AttributeManager::* )( \
+            absl::string_view, type ) )                                        \
+            & AttributeManager::find_or_create_attribute< ConstantAttribute,   \
+                  type > );                                                    \
     const auto variable##suffix =                                              \
         std::string{ "find_or_create_attribute_variable_" } + #suffix;         \
     manager.def( variable##suffix.c_str(),                                     \
-        &AttributeManager::find_or_create_attribute< VariableAttribute, type,  \
-            type > );                                                          \
+        ( std::shared_ptr< VariableAttribute< type > >( AttributeManager::* )( \
+            absl::string_view, type ) )                                        \
+            & AttributeManager::find_or_create_attribute< VariableAttribute,   \
+                  type > );                                                    \
     const auto sparse##suffix =                                                \
         std::string{ "find_or_create_attribute_sparse_" } + #suffix;           \
     manager.def( sparse##suffix.c_str(),                                       \
-        &AttributeManager::find_or_create_attribute< SparseAttribute, type,    \
-            type > )
+        ( std::shared_ptr< SparseAttribute< type > >( AttributeManager::* )(   \
+            absl::string_view, type ) )                                        \
+            & AttributeManager::find_or_create_attribute< SparseAttribute,     \
+                  type > )
 
 namespace geode
 {
