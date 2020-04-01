@@ -52,8 +52,8 @@ namespace geode
     {
         AttributeProperties() = default;
 
-        AttributeProperties( bool assignable_in, bool interpolable_in )
-            : assignable( assignable_in ), interpolable( interpolable_in )
+        AttributeProperties( bool is_assignable, bool is_interpolable )
+            : assignable( is_assignable ), interpolable( is_interpolable )
         {
         }
 
