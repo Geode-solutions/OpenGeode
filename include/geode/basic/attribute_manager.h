@@ -90,17 +90,19 @@ namespace geode
          * attribute, it replaces it by the Attribute corresponding to the
          * attribute.
          * @param[in] name The associated attribute name to look for
+         * @param[in] default_value The default value to use when new attribute
+         * element are created
+         * @param[in] properties The AttributeProperties to use
          * @tparam Attribute The attribute type to look for,
          * such as ConstantAttribute
          * @tparam T The type of the Attribute element
-         * @tparam Args The optional arguments to construct the Attribute
          * @exception OpenGeodeException if the Attribute replacement failed
          */
-        template < template < typename > class Attribute,
-            typename T,
-            typename... Args >
+        template < template < typename > class Attribute, typename T >
         std::shared_ptr< Attribute< T > > find_or_create_attribute(
-            absl::string_view name, const Args&... args )
+            absl::string_view name,
+            T default_value,
+            AttributeProperties properties )
         {
             auto attribute = find_attribute_base( name );
             auto typed_attribute =
@@ -113,10 +115,19 @@ namespace geode
                     "if an instantiated attribute of the same name "
                     "with different storage already exists." );
 
-                typed_attribute.reset( new Attribute< T >{ args..., {} } );
+                typed_attribute.reset( new Attribute< T >{
+                    std::move( default_value ), std::move( properties ), {} } );
                 register_attribute( typed_attribute, name );
             }
             return typed_attribute;
+        }
+
+        template < template < typename > class Attribute, typename T >
+        std::shared_ptr< Attribute< T > > find_or_create_attribute(
+            absl::string_view name, T default_value )
+        {
+            return find_or_create_attribute< Attribute, T >(
+                name, std::move( default_value ), AttributeProperties{} );
         }
 
         /*!

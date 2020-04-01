@@ -68,6 +68,24 @@ namespace geode
             return value.generic_value();
         }
     };
+
+    template <>
+    struct AttributeLinearInterpolationImpl< Foo >
+    {
+        template < template < typename > class Attribute >
+        static Foo compute( const AttributeLinearInterpolation& interpolator,
+            const Attribute< Foo >& attribute )
+        {
+            Foo result;
+            for( auto i : Range{ interpolator.indices_.size() } )
+            {
+                result.double_ +=
+                    interpolator.lambdas_[i]
+                    * attribute.value( interpolator.indices_[i] ).double_;
+            }
+            return result;
+        }
+    };
 } // namespace geode
 
 void test_constant_attribute( geode::AttributeManager& manager )
@@ -147,7 +165,7 @@ void test_double_sparse_attribute( geode::AttributeManager& manager )
 {
     auto sparse_attribute =
         manager.find_or_create_attribute< geode::SparseAttribute, double >(
-            "double", 12. );
+            "double", 12., { true, true } );
     sparse_attribute->set_value( 3, 3 );
     sparse_attribute->set_value( 7, 7 );
     manager.assign_attribute_value( 3, 2 );

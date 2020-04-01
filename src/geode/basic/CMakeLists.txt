@@ -34,6 +34,7 @@ add_geode_library(
         "algorithm.h"
         "assert.h"
         "attribute_manager.h"
+        "attribute_utils.h"
         "attribute.h"
         "bitsery_archive.h"
         "common.h"
