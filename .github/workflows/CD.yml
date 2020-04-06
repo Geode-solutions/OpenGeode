@@ -97,11 +97,11 @@ jobs:
       with:
         path: build/third_party/asyncplusplus
         key: asyncplusplus-darwin-Release-${{ hashFiles('cmake/ConfigureAsync++.cmake') }}
-    - name: Cache Filesystem
-      uses: actions/cache@v1.0.3
-      with:
-        path: build/third_party/ghcFilesystem
-        key: ghcFilesystem-darwin-Release-${{ hashFiles('cmake/ConfigureFilesystem.cmake') }}
+    # - name: Cache Filesystem
+    #   uses: actions/cache@v1.0.3
+    #   with:
+    #     path: build/third_party/ghcFilesystem
+    #     key: ghcFilesystem-darwin-Release-${{ hashFiles('cmake/ConfigureFilesystem.cmake') }}
     - name: Cache Minizip
       uses: actions/cache@v1.0.3
       with:
