@@ -91,6 +91,36 @@ namespace geode
             return vertex2unique_vertex_.at( component_id )->value( vertex_id );
         }
 
+        bool has_mesh_component_vertices(
+            index_t unique_vertex_id, const ComponentType& type ) const
+        {
+            const auto& component_vertices =
+                mesh_component_vertices( unique_vertex_id );
+            for( const auto& component_vertex : component_vertices )
+            {
+                if( component_vertex.component_id.type() == type )
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        bool has_mesh_component_vertices(
+            index_t unique_vertex_id, const uuid& component_id ) const
+        {
+            const auto& component_vertices =
+                mesh_component_vertices( unique_vertex_id );
+            for( const auto& component_vertex : component_vertices )
+            {
+                if( component_vertex.component_id.id() == component_id )
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         template < typename MeshComponent >
         void register_component( const MeshComponent& component )
         {
@@ -395,6 +425,19 @@ namespace geode
     {
         return impl_->unique_vertex( mesh_component_vertex.component_id.id(),
             mesh_component_vertex.vertex );
+    }
+
+    bool VertexIdentifier::has_mesh_component_vertices(
+        index_t unique_vertex_id, const ComponentType& type ) const
+    {
+        return impl_->has_mesh_component_vertices( unique_vertex_id, type );
+    }
+
+    bool VertexIdentifier::has_mesh_component_vertices(
+        index_t unique_vertex_id, const uuid& component_id ) const
+    {
+        return impl_->has_mesh_component_vertices(
+            unique_vertex_id, component_id );
     }
 
     template < typename MeshComponent >
