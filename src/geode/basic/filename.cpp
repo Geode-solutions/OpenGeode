@@ -27,15 +27,15 @@
 
 namespace geode
 {
-    std::string filename_from_path(
-        absl::string_view path, bool with_extension )
+    std::string filename_with_extension( absl::string_view path )
     {
         ghc::filesystem::path filepath{ path.data() };
-        if( !with_extension )
-        {
-            filepath.replace_extension( "" );
-        }
         return filepath.filename().string();
     }
 
+    std::string filename_without_extension( absl::string_view path )
+    {
+        ghc::filesystem::path filepath{ path.data() };
+        return filepath.filename().replace_extension( "" ).string();
+    }
 } // namespace geode

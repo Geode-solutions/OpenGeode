@@ -27,6 +27,9 @@
 
 namespace geode
 {
-    std::string opengeode_basic_api filename_from_path(
-        absl::string_view path, bool with_extension );
+    std::string opengeode_basic_api filename_with_extension(
+        absl::string_view path );
+
+    std::string opengeode_basic_api filename_without_extension(
+        absl::string_view path );
 } // namespace geode

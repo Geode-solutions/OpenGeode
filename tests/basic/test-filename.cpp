@@ -31,22 +31,22 @@
 void test()
 {
     std::string path1 = "/where/is/file.ext";
-    OPENGEODE_EXCEPTION( geode::filename_from_path( path1, true ) == "file.ext",
+    OPENGEODE_EXCEPTION( geode::filename_with_extension( path1 ) == "file.ext",
         "[Test] Wrong result for path1 with extension" );
-    OPENGEODE_EXCEPTION( geode::filename_from_path( path1, false ) == "file",
-        "[Test] Wrong result for path1 with extension" );
+    OPENGEODE_EXCEPTION( geode::filename_without_extension( path1 ) == "file",
+        "[Test] Wrong result for path1 without extension" );
 
     std::string path2 = "file.ext";
-    OPENGEODE_EXCEPTION( geode::filename_from_path( path2, true ) == "file.ext",
+    OPENGEODE_EXCEPTION( geode::filename_with_extension( path2 ) == "file.ext",
         "[Test] Wrong result for path2 with extension" );
-    OPENGEODE_EXCEPTION( geode::filename_from_path( path2, false ) == "file",
-        "[Test] Wrong result for path2 with extension" );
+    OPENGEODE_EXCEPTION( geode::filename_without_extension( path2 ) == "file",
+        "[Test] Wrong result for path2 without extension" );
 
     std::string path3 = "C:/where/is/file.ext";
-    OPENGEODE_EXCEPTION( geode::filename_from_path( path3, true ) == "file.ext",
+    OPENGEODE_EXCEPTION( geode::filename_with_extension( path3 ) == "file.ext",
         "[Test] Wrong result for path3 with extension" );
-    OPENGEODE_EXCEPTION( geode::filename_from_path( path3, false ) == "file",
-        "[Test] Wrong result for path3 with extension" );
+    OPENGEODE_EXCEPTION( geode::filename_without_extension( path3 ) == "file",
+        "[Test] Wrong result for path3 without extension" );
 }
 
 OPENGEODE_TEST( "filename" )
