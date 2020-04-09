@@ -39,6 +39,11 @@ add_geode_test(
         ${PROJECT_NAME}::basic
 )
 add_geode_test(
+    SOURCE "test-filename.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+)
+add_geode_test(
     SOURCE "test-growable.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
