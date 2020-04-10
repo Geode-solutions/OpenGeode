@@ -504,7 +504,8 @@ namespace geode
     index_t PolyhedralSolid< dimension >::vertex_in_polyhedron(
         index_t polyhedron_id, index_t vertex_id ) const
     {
-        for( const auto& v : Range{ nb_polyhedron_vertices( polyhedron_id ) } )
+        for( const auto v : Range{ nb_polyhedron_vertices( polyhedron_id ) } )
+
         {
             if( polyhedron_vertex( { polyhedron_id, v } ) == vertex_id )
             {
