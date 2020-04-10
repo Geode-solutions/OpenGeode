@@ -52,7 +52,7 @@ namespace geode
      *      // Registration
      *      MyFactory::register_creator< B >( "key_value_for_B" );
      *      MyFactory::register_creator< C >( "key_value_for_C" );
-     *      // B and C constructor takes an int and a double
+     *      // B and C constructors take an int and a double
      *
      *      // Creation
      *      auto c = MyFactory::create( "key_value_for_C", 2, 8.6 );
