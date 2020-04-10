@@ -50,6 +50,18 @@ namespace geode
 
         std::unique_ptr< TetrahedralSolid< dimension > > clone() const;
 
+        /*!
+         * Return the local indices of the two facets incident to the opposite
+         * edge in tetrahedron.
+         * @param[in] tetrahedron_id Index of tetrahedron.
+         * @param[in] edge_vertices Indices of the two vertices of an edge.
+         * @warn throw an exception if edge_vertices are not tetrahedron
+         * vertices.
+         */
+        std::array< PolyhedronFacet, 2 > opposite_edge_incident_facets(
+            index_t tetrahedron_id,
+            const std::array< index_t, 2 >& edge_vertices ) const;
+
     protected:
         TetrahedralSolid() = default;
 

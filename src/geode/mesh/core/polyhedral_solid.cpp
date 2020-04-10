@@ -501,6 +501,20 @@ namespace geode
     }
 
     template < index_t dimension >
+    index_t PolyhedralSolid< dimension >::vertex_in_polyhedron(
+        index_t polyhedron_id, index_t vertex_id ) const
+    {
+        for( const auto& v : Range{ nb_polyhedron_vertices( polyhedron_id ) } )
+        {
+            if( polyhedron_vertex( { polyhedron_id, v } ) == vertex_id )
+            {
+                return v;
+            }
+        }
+        return NO_ID;
+    }
+
+    template < index_t dimension >
     index_t PolyhedralSolid< dimension >::polyhedron_facet(
         const PolyhedronFacet& polyhedron_facet ) const
     {

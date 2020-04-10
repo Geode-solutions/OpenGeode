@@ -64,5 +64,31 @@ namespace geode
         return clone;
     }
 
+    template < index_t dimension >
+    std::array< PolyhedronFacet, 2 >
+        TetrahedralSolid< dimension >::opposite_edge_incident_facets(
+            index_t tetrahedron_id,
+            const std::array< index_t, 2 >& edge_vertices ) const
+    {
+        std::array< PolyhedronFacet, 2 > opposite_facets{};
+        for( const auto v : Range{ 4 } )
+        {
+            const PolyhedronVertex vertex{ tetrahedron_id, v };
+            if( this->polyhedron_vertex( vertex ) == edge_vertices[0] )
+            {
+                opposite_facets[0] = { vertex.polyhedron_id, vertex.vertex_id };
+            }
+            else if( this->polyhedron_vertex( vertex ) == edge_vertices[1] )
+            {
+                opposite_facets[1] = { vertex.polyhedron_id, vertex.vertex_id };
+            }
+        }
+        OPENGEODE_EXCEPTION( opposite_facets[0].facet_id != NO_ID
+                                 && opposite_facets[1].facet_id != NO_ID,
+            "[TetrahedralSolid::opposite_edge_incident_facets] Given edge "
+            "vertices are not vertices of given tetrahedron" );
+        return opposite_facets;
+    }
+
     template class opengeode_mesh_api TetrahedralSolid< 3 >;
 } // namespace geode
