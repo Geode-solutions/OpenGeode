@@ -45,13 +45,18 @@ namespace geode
      * Example of use with A the base class and B, C derived classes
      *      // Instantiation
      *      using MyFactory = Factory< std::string, A, int, double >;
+     *      // where: - std::string is the Key type
+     *      //        - int and double are the constructor arguments required by
+     *      //        the derived classes B and C
+     *
      *      // Registration
-     *      MyFactory::register_creator< B >( "B" );   // B constructor takes an
-     * int and a double
-     *      MyFactory::register_creator< C >( "C" );   // C constructor takes an
-     * int and a double
+     *      MyFactory::register_creator< B >( "key_value_for_B" );
+     *      MyFactory::register_creator< C >( "key_value_for_C" );
+     *      // B and C constructor takes an int and a double
+     *
      *      // Creation
-     *      std::unique_ptr< A > c = MyFactory::create( "C", 2, 8.6 );
+     *      auto c = MyFactory::create( "key_value_for_C", 2, 8.6 );
+     *      // where c is a std::unique_ptr< A >
      */
     template < typename Key, typename BaseClass, typename... Args >
     class Factory : public Singleton
