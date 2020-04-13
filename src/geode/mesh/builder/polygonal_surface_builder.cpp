@@ -154,24 +154,6 @@ namespace
         }
         return vertices_id;
     }
-    template < geode::index_t dimension >
-    void set_adjacencies( geode::PolygonalSurfaceBuilder< dimension >& builder,
-        const geode::PolygonalSurface< dimension >& surface,
-        const absl::FixedArray< absl::InlinedVector< geode::PolygonEdge, 2 > >&
-            polygon_edges,
-        geode::index_t first_vertex,
-        geode::index_t second_vertex )
-    {
-        const auto edge_id =
-            surface.edge_from_vertices( { first_vertex, second_vertex } );
-        const auto& edges = polygon_edges[edge_id];
-        if( polygon_edges[edge_id].size() != 2 )
-        {
-            return;
-        }
-        builder.set_polygon_adjacent( edges[0], edges[1].polygon_id );
-        builder.set_polygon_adjacent( edges[1], edges[0].polygon_id );
-    }
 } // namespace
 
 namespace geode
