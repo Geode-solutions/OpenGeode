@@ -362,53 +362,72 @@ namespace geode
     void PolygonalSurfaceBuilder< dimension >::compute_polygon_adjacencies(
         absl::Span< const index_t > polygons_to_connect )
     {
-        absl::FixedArray< absl::InlinedVector< PolygonVertex, 4 > >
-            polygon_vertices( polygonal_surface_.nb_vertices() );
+        absl::FixedArray< absl::InlinedVector< PolygonEdge, 3 > > polygon_edges(
+            polygonal_surface_.nb_edges() );
+        absl::FixedArray< absl::InlinedVector< index_t, 4 > > polygon_vertices(
+            polygonal_surface_.nb_polygons() );
+
         for( const auto polygon : polygons_to_connect )
         {
-            for( const auto v :
-                Range{ polygonal_surface_.nb_polygon_vertices( polygon ) } )
+            const auto nb_vertices =
+                polygonal_surface_.nb_polygon_vertices( polygon );
+            for( const auto v : Range{ nb_vertices } )
             {
-                const PolygonVertex vertex_id{ polygon, v };
-                const auto vertex =
-                    polygonal_surface_.polygon_vertex( vertex_id );
-                polygon_vertices[vertex].emplace_back( vertex_id );
+                polygon_vertices[polygon].push_back(
+                    polygonal_surface_.polygon_vertex( { polygon, v } ) );
             }
+            for( const auto e : Range{ nb_vertices - 1 } )
+            {
+                const PolygonEdge edge{ polygon, e };
+                const auto edge_id = polygonal_surface_.edge_from_vertices(
+                    { polygon_vertices[polygon][e],
+                        polygon_vertices[polygon][e + 1] } );
+                polygon_edges[edge_id].emplace_back( edge );
+            }
+            const PolygonEdge edge{ polygon, nb_vertices - 1 };
+            const auto edge_id = polygonal_surface_.edge_from_vertices(
+                { polygon_vertices[polygon].back(),
+                    polygon_vertices[polygon].front() } );
+            polygon_edges[edge_id].emplace_back( edge );
         }
 
         for( const auto polygon : polygons_to_connect )
         {
-            for( const auto v :
-                Range{ polygonal_surface_.nb_polygon_vertices( polygon ) } )
+            const auto nb_edges =
+                polygonal_surface_.nb_polygon_vertices( polygon );
+            for( const auto e : Range{ nb_edges - 1 } )
             {
-                if( !polygonal_surface_.is_edge_on_border( { polygon, v } ) )
+                const PolygonEdge edge{ polygon, e };
+                if( !polygonal_surface_.is_edge_on_border( edge ) )
                 {
                     continue;
                 }
-                const PolygonVertex vertex_id{ polygon, v };
-                const auto vertex =
-                    polygonal_surface_.polygon_vertex( vertex_id );
-                const auto next_vertex = polygonal_surface_.polygon_vertex(
-                    polygonal_surface_.next_polygon_vertex( vertex_id ) );
-                for( const auto& vertex2 : polygon_vertices[vertex] )
+                const auto edge_id = polygonal_surface_.edge_from_vertices(
+                    { polygon_vertices[polygon][e],
+                        polygon_vertices[polygon][e + 1] } );
+                const auto& edges = polygon_edges[edge_id];
+                if( polygon_edges[edge_id].size() != 2 )
                 {
-                    if( vertex2.polygon_id == polygon )
-                    {
-                        continue;
-                    }
-                    const auto prev_vertex_id =
-                        polygonal_surface_.previous_polygon_vertex( vertex2 );
-                    const auto prev_vertex =
-                        polygonal_surface_.polygon_vertex( prev_vertex_id );
-                    if( next_vertex == prev_vertex )
-                    {
-                        do_set_polygon_adjacent(
-                            vertex_id, vertex2.polygon_id );
-                        do_set_polygon_adjacent( prev_vertex_id, polygon );
-                        break;
-                    }
+                    continue;
                 }
+                do_set_polygon_adjacent( edges[0], edges[1].polygon_id );
+                do_set_polygon_adjacent( edges[1], edges[0].polygon_id );
             }
+            const PolygonEdge edge{ polygon, nb_edges };
+            if( !polygonal_surface_.is_edge_on_border( edge ) )
+            {
+                continue;
+            }
+            const auto edge_id = polygonal_surface_.edge_from_vertices(
+                { polygon_vertices[polygon][nb_edges],
+                    polygon_vertices[polygon][0] } );
+            const auto& edges = polygon_edges[edge_id];
+            if( polygon_edges[edge_id].size() != 2 )
+            {
+                continue;
+            }
+            do_set_polygon_adjacent( edges[0], edges[1].polygon_id );
+            do_set_polygon_adjacent( edges[1], edges[0].polygon_id );
         }
     }
 
