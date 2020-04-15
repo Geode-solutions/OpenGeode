@@ -433,10 +433,8 @@ namespace geode
             for( const auto e : Range{ nb_polygon_edges( polygon_adj ) } )
             {
                 const auto polygon = polygon_adjacent( { polygon_adj, e } );
-                const auto adj_edge_id =
-                    this->polygon_edge( { polygon_adj, e } );
                 if( polygon == polygon_edge.polygon_id
-                    && adj_edge_id == edge_id )
+                    && this->polygon_edge( { polygon_adj, e } ) == edge_id )
                 {
                     return { polygon_adj, e };
                 }
