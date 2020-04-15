@@ -103,6 +103,20 @@ namespace geode
             const MeshComponentVertex& component_vertex ) const;
 
         /*!
+         * Return true if given unique vertex has at least one mesh component
+         * vertex of given component type
+         */
+        bool has_mesh_component_vertices(
+            index_t unique_vertex_id, const ComponentType& type ) const;
+
+        /*!
+         * Return true if given unique vertex has at least one mesh component
+         * vertex of given component
+         */
+        bool has_mesh_component_vertices(
+            index_t unique_vertex_id, const uuid& component_id ) const;
+
+        /*!
          * Save the VertexIdentifier into a file.
          * @param[in] directory Folder in which create the file.
          */

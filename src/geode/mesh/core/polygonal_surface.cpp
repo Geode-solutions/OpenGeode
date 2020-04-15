@@ -256,7 +256,7 @@ namespace geode
         check_polygon_id( *this, polygon_edge.polygon_id );
         check_polygon_edge_id(
             *this, polygon_edge.polygon_id, polygon_edge.edge_id );
-        return impl_->find_edge( { polygon_edge_vertex( polygon_edge, 0 ),
+        return impl_->find_edge( { polygon_vertex( polygon_edge ),
             polygon_edge_vertex( polygon_edge, 1 ) } );
     }
 

@@ -89,7 +89,10 @@ namespace geode
         {
             for( auto &it : attributes_ )
             {
-                it.second->compute_value( from_element, to_element, key );
+                if( it.second->properties().assignable )
+                {
+                    it.second->compute_value( from_element, to_element, key );
+                }
             }
         }
 
@@ -100,7 +103,10 @@ namespace geode
         {
             for( auto &it : attributes_ )
             {
-                it.second->compute_value( interpolation, to_element, key );
+                if( it.second->properties().interpolable )
+                {
+                    it.second->compute_value( interpolation, to_element, key );
+                }
             }
         }
 

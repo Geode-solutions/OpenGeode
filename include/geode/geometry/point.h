@@ -24,11 +24,11 @@
 #pragma once
 
 #include <array>
-#include <cmath>
 #include <iostream>
 
 #include <bitsery/bitsery.h>
 
+#include <geode/basic/attribute_utils.h>
 #include <geode/basic/range.h>
 
 #include <geode/geometry/bitsery_archive.h>
@@ -161,4 +161,23 @@ namespace geode
         std::array< double, dimension > values_;
     };
     ALIAS_2D_AND_3D( Point );
+
+    template < index_t dimension >
+    struct AttributeLinearInterpolationImpl< Point< dimension > >
+    {
+        template < template < typename > class Attribute >
+        static Point< dimension > compute(
+            const AttributeLinearInterpolation &interpolator,
+            const Attribute< Point< dimension > > &attribute )
+        {
+            Point< dimension > result;
+            for( auto i : Range{ interpolator.indices_.size() } )
+            {
+                result = result
+                         + attribute.value( interpolator.indices_[i] )
+                               * interpolator.lambdas_[i];
+            }
+            return result;
+        }
+    };
 } // namespace geode

@@ -250,6 +250,16 @@ namespace geode
             const PolyhedronVertex& polyhedron_vertex ) const;
 
         /*!
+         * Return the local index in the tetrahedron of a vertex in the mesh.
+         * @param[in] polyhedron_id Index of polyhedron.
+         * @param[in] vertex_id Index of a vertex in the mesh.
+         * @return Index in [0,nb_polyhedron_vertices()[ if polyhedron is around
+         * the given vertex, else NO_ID
+         */
+        index_t vertex_in_polyhedron(
+            index_t polyhedron_id, index_t vertex_id ) const;
+
+        /*!
          * Return the index in the mesh of a local facet in a polyhedron.
          * @param[in] polyhedron_facet Local index of facet in polyhedron.
          */
