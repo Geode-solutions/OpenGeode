@@ -21,6 +21,8 @@
  *
  */
 
+#include <cmath>
+
 #include <geode/geometry/rotation.h>
 
 namespace
