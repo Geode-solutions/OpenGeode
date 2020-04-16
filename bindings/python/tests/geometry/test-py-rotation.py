@@ -31,3 +31,13 @@ if __name__ == '__main__':
     answer1 = geom.Vector3D( [0.0, -3.0, 0.0] )
     if not result1.inexact_equal( answer1, geode.global_epsilon ):
         raise ValueError( "[Test] Wrong result for configuration 1" )
+
+    result2 = geom.rotate( input, axis, -math.pi / 2.0 )
+    answer2 = geom.Vector3D( [0.0, 3.0, 0.0] )
+    if not result2.inexact_equal( answer2, geode.global_epsilon ):
+        raise ValueError( "[Test] Wrong result for configuration 2" )
+
+    result3 = geom.rotate( input, axis, 5*math.pi / 2.0 )
+    answer3 = geom.Vector3D( [0.0, -3.0, 0.0] )
+    if not result3.inexact_equal( answer3, geode.global_epsilon ):
+        raise ValueError( "[Test] Wrong result for configuration 3" )
