@@ -23,6 +23,10 @@
 
 #pragma once
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 namespace geode
 {
     static constexpr double global_epsilon{ 1E-8 };
