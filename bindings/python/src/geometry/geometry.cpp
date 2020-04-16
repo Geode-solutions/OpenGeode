@@ -32,6 +32,7 @@
 #include "perpendicular.h"
 #include "point.h"
 #include "projection.h"
+#include "rotation.h"
 #include "signed_mensuration.h"
 #include "vector.h"
 
@@ -58,6 +59,7 @@ PYBIND11_MODULE( opengeode_py_geometry, module )
     geode::define_distance( module );
     geode::define_perpendicular( module );
     geode::define_projection( module );
+    geode::define_rotation( module );
     geode::define_mensuration( module );
     geode::define_barycentric( module );
 }

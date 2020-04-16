@@ -67,6 +67,12 @@ add_geode_test(
         ${PROJECT_NAME}::geometry
 )
 add_geode_test(
+    SOURCE "test-rotation.cpp"
+    DEPENDENCIES
+        OpenGeode::basic
+        ${PROJECT_NAME}::geometry
+)
+add_geode_test(
     SOURCE "test-signed-mensuration.cpp"
     DEPENDENCIES
         OpenGeode::basic

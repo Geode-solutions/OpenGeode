@@ -23,19 +23,18 @@
 
 #pragma once
 
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
+#include <geode/geometry/common.h>
+#include <geode/geometry/vector.h>
 
 namespace geode
 {
-    static constexpr double global_epsilon{ 1E-8 };
-    static constexpr double global_epsilon2{ global_epsilon * global_epsilon };
-    static constexpr double global_epsilon3{ global_epsilon2 * global_epsilon };
-
-    using index_t = unsigned int;
-    using signed_index_t = int;
-
-    /// Value used for a invalid index
-    static constexpr index_t NO_ID = index_t( -1 );
+    /*!
+     * Rotate a Point3D by an angle around an axis
+     * @param[in] point The point to rotate.
+     * @param[in] axis Axis for the rotation (not null but not necessary
+     * normalized).
+     * @param[in] angle Rotation angle expresses in radians.
+     */
+    Point3D opengeode_geometry_api rotate(
+        const Point3D& point, const Vector3D& axis, double angle );
 } // namespace geode
