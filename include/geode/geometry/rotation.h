@@ -26,8 +26,6 @@
 #include <geode/geometry/common.h>
 #include <geode/geometry/vector.h>
 
-#define _USE_MATH_DEFINES
-
 namespace geode
 {
     /*!

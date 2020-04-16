@@ -21,6 +21,7 @@
  *
  */
 
+#define _USE_MATH_DEFINES
 #include <cmath>
 
 #include <geode/geometry/rotation.h>
