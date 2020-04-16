@@ -34,19 +34,19 @@ void test()
 {
     const geode::Vector3D input( { 0., 0., 3. } );
     const geode::Vector3D axis( { 2., 0., 0. } );
-    const auto result1 = geode::rotate( input, axis, M_PI_2 );
+    const auto result1 = geode::rotate( input, axis, M_PI / 2.0 );
     const geode::Vector3D answer1( { 0., -3., 0. } );
     OPENGEODE_EXCEPTION(
         result1.inexact_equal( answer1, geode::global_epsilon ),
         "[Test] Wrong result for configuration 1" );
 
-    const auto result2 = geode::rotate( input, axis, -M_PI_2 );
+    const auto result2 = geode::rotate( input, axis, -M_PI / 2.0 );
     const geode::Vector3D answer2( { 0., 3., 0. } );
     OPENGEODE_EXCEPTION(
         result2.inexact_equal( answer2, geode::global_epsilon ),
         "[Test] Wrong result for configuration 2" );
 
-    const auto result3 = geode::rotate( input, axis, 5 * M_PI_2 );
+    const auto result3 = geode::rotate( input, axis, 5 * M_PI / 2.0 );
     const geode::Vector3D answer3( { 0., -3., 0. } );
     OPENGEODE_EXCEPTION(
         result3.inexact_equal( answer3, geode::global_epsilon ),

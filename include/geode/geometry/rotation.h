@@ -29,12 +29,12 @@
 namespace geode
 {
     /*!
-     * Return the rotated vector of a vector around an axis by an angle
-     * @param[in] vector The vector to rotate.
+     * Rotate a Point3D by an angle around an axis
+     * @param[in] point The point to rotate.
      * @param[in] axis Axis for the rotation (not null but not necessary
      * normalized).
      * @param[in] angle Rotation angle expresses in radians.
      */
-    Vector3D opengeode_geometry_api rotate(
-        const Vector3D& vector, const Vector3D& axis, double angle );
+    Point3D opengeode_geometry_api rotate(
+        const Point3D& point, const Vector3D& axis, double angle );
 } // namespace geode
