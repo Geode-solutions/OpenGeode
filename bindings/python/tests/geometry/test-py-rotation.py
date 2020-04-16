@@ -20,6 +20,7 @@
 #SOFTWARE.
 
 import opengeode_py_geometry as geom
+import opengeode_py_basic as geode
 import math
 
 if __name__ == '__main__':
@@ -28,5 +29,5 @@ if __name__ == '__main__':
 
     result1 = geom.rotate( input, axis, math.pi / 2.0 )
     answer1 = geom.Vector3D( [0.0, -3.0, 0.0] )
-    if result1.inexact_equal( answer1) > global_epsilon:
+    if not result1.inexact_equal( answer1, geode.global_epsilon ):
         raise ValueError( "[Test] Wrong result for configuration 1" )

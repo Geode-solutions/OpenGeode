@@ -62,6 +62,7 @@ add_geode_python_test(
     SOURCE "test-py-rotation.py"
     DEPENDENCIES
         ${PROJECT_NAME}::py_geometry
+        ${PROJECT_NAME}::py_basic
 )
 add_geode_python_test(
     SOURCE "test-py-distance.py"
