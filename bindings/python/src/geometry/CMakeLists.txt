@@ -29,6 +29,7 @@ add_geode_python_binding(
         "perpendicular.h"
         "point.h"
         "projection.h"
+        "rotation.h"
         "signed_mensuration.h"
         "vector.h"
     DEPENDENCIES

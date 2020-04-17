@@ -31,6 +31,7 @@ add_geode_library(
         "nn_search.cpp"
         "perpendicular.cpp"
         "projection.cpp"
+        "rotation.cpp"
         "signed_mensuration.cpp"
     PUBLIC_HEADERS
         "barycentric_coordinates.h"
@@ -43,6 +44,7 @@ add_geode_library(
         "perpendicular.h"
         "point.h"
         "projection.h"
+        "rotation.h"
         "signed_mensuration.h"
         "vector.h"
     PUBLIC_DEPENDENCIES

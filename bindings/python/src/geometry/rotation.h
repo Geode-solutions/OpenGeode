@@ -21,21 +21,12 @@
  *
  */
 
-#pragma once
-
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
+#include <geode/geometry/rotation.h>
 
 namespace geode
 {
-    static constexpr double global_epsilon{ 1E-8 };
-    static constexpr double global_epsilon2{ global_epsilon * global_epsilon };
-    static constexpr double global_epsilon3{ global_epsilon2 * global_epsilon };
-
-    using index_t = unsigned int;
-    using signed_index_t = int;
-
-    /// Value used for a invalid index
-    static constexpr index_t NO_ID = index_t( -1 );
+    void define_rotation( pybind11::module& module )
+    {
+        module.def( "rotate", &rotate );
+    }
 } // namespace geode
