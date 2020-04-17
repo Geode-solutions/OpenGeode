@@ -29,6 +29,16 @@
     pybind11::class_< Lines##dimension##D >( module, name##dimension.c_str() ) \
         .def( "nb_lines", &Lines##dimension##D::nb_lines )                     \
         .def( "line", &Lines##dimension##D::line,                              \
+            pybind11::return_value_policy::reference )                         \
+        .def( "lines",                                                         \
+            []( const Lines##dimension##D& self ) {                            \
+                std::vector< const Line##dimension##D* > components;           \
+                for( const auto& component : self.lines() )                    \
+                {                                                              \
+                    components.push_back( &component );                        \
+                }                                                              \
+                return components;                                             \
+            },                                                                 \
             pybind11::return_value_policy::reference )
 
 namespace geode
