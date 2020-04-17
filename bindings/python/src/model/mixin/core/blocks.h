@@ -30,6 +30,16 @@
         module, name##dimension.c_str() )                                      \
         .def( "nb_blocks", &Blocks##dimension##D::nb_blocks )                  \
         .def( "block", &Blocks##dimension##D::block,                           \
+            pybind11::return_value_policy::reference )                         \
+        .def( "blocks",                                                        \
+            []( const Blocks##dimension##D& self ) {                           \
+                std::vector< const Block##dimension##D* > components;          \
+                for( const auto& component : self.blocks() )                   \
+                {                                                              \
+                    components.push_back( &component );                        \
+                }                                                              \
+                return components;                                             \
+            },                                                                 \
             pybind11::return_value_policy::reference )
 
 namespace geode
