@@ -201,11 +201,7 @@ namespace geode
 
         index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices )
         {
-            if( edge_vertices[0] < edge_vertices[1] )
-            {
-                return Edges::add_facet( std::move( edge_vertices ) );
-            }
-            return find_edge( edge_vertices );
+            return Edges::add_facet( std::move( edge_vertices ) );
         }
 
         const PolyhedronFacetVertices& get_facet_vertices(
