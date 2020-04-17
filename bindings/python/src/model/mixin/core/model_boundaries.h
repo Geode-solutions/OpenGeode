@@ -34,7 +34,8 @@
         .def( "model_boundary",                                                \
             &ModelBoundaries##dimension##D::model_boundary,                    \
             pybind11::return_value_policy::reference )                         \
-        .def( "model_boundaries",                                              \
+        .def(                                                                  \
+            "model_boundaries",                                                \
             []( const ModelBoundaries##dimension##D& self ) {                  \
                 std::vector< const ModelBoundary##dimension##D* > components;  \
                 for( const auto& component : self.model_boundaries() )         \

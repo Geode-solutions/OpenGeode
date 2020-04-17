@@ -31,7 +31,8 @@
         .def( "nb_blocks", &Blocks##dimension##D::nb_blocks )                  \
         .def( "block", &Blocks##dimension##D::block,                           \
             pybind11::return_value_policy::reference )                         \
-        .def( "blocks",                                                        \
+        .def(                                                                  \
+            "blocks",                                                          \
             []( const Blocks##dimension##D& self ) {                           \
                 std::vector< const Block##dimension##D* > components;          \
                 for( const auto& component : self.blocks() )                   \

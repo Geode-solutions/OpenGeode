@@ -32,7 +32,8 @@
         .def( "nb_surfaces", &Surfaces##dimension##D::nb_surfaces )            \
         .def( "surface", &Surfaces##dimension##D::surface,                     \
             pybind11::return_value_policy::reference )                         \
-        .def( "surfaces",                                                      \
+        .def(                                                                  \
+            "surfaces",                                                        \
             []( const Surfaces##dimension##D& self ) {                         \
                 std::vector< const Surface##dimension##D* > components;        \
                 for( const auto& component : self.surfaces() )                 \
