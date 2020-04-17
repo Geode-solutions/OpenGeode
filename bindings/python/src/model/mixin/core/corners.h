@@ -32,7 +32,8 @@
         .def( "nb_corners", &Corners##dimension##D::nb_corners )               \
         .def( "corner", &Corners##dimension##D::corner,                        \
             pybind11::return_value_policy::reference )                         \
-        .def( "corners",                                                       \
+        .def(                                                                  \
+            "corners",                                                         \
             []( const Corners##dimension##D& self ) {                          \
                 std::vector< const Corner##dimension##D* > components;         \
                 for( const auto& component : self.corners() )                  \
