@@ -22,6 +22,7 @@ add_geode_library(
     NAME geometry
     FOLDER "geode/geometry"
     SOURCES
+        "aabb.cpp"
         "barycentric_coordinates.cpp"
         "basic_objects.cpp"
         "bitsery_archive.cpp"
@@ -34,6 +35,7 @@ add_geode_library(
         "rotation.cpp"
         "signed_mensuration.cpp"
     PUBLIC_HEADERS
+        "aabb.h"
         "barycentric_coordinates.h"
         "basic_objects.h"
         "bitsery_archive.h"
