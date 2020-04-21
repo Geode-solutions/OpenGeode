@@ -135,7 +135,7 @@ namespace geode
         }
 
         bool check_relation_exists(
-            const uuid& from, const uuid& to, const RelationType type )
+            const uuid& from, const uuid& to, const RelationType type ) const
         {
             const auto& edges_around =
                 graph_.edges_around_vertex( vertex_id( from ) );
@@ -328,6 +328,27 @@ namespace geode
         const uuid& item, const uuid& collection, RelationshipsBuilderKey )
     {
         impl_->add_relation(
+            item, collection, Relationships::Impl::ITEM_RELATION );
+    }
+
+    bool Relationships::is_boundary(
+        const uuid& boundary, const uuid& incidence ) const
+    {
+        return impl_->check_relation_exists(
+            boundary, incidence, Relationships::Impl::BOUNDARY_RELATION );
+    }
+
+    bool Relationships::is_internal(
+        const uuid& internal, const uuid& embedding ) const
+    {
+        return impl_->check_relation_exists(
+            internal, embedding, Relationships::Impl::INTERNAL_RELATION );
+    }
+
+    bool Relationships::is_item(
+        const uuid& item, const uuid& collection ) const
+    {
+        return impl_->check_relation_exists(
             item, collection, Relationships::Impl::ITEM_RELATION );
     }
 

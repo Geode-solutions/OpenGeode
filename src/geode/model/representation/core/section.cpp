@@ -298,6 +298,36 @@ namespace geode
         return nb_boundaries( line.id() ) < 2;
     }
 
+    bool Section::is_boundary(
+        const Corner2D& corner, const Line2D& line ) const
+    {
+        return Relationships::is_boundary( corner.id(), line.id() );
+    }
+
+    bool Section::is_boundary(
+        const Line2D& line, const Surface2D& surface ) const
+    {
+        return Relationships::is_boundary( line.id(), surface.id() );
+    }
+
+    bool Section::is_internal(
+        const Corner2D& corner, const Surface2D& surface ) const
+    {
+        return Relationships::is_internal( corner.id(), surface.id() );
+    }
+
+    bool Section::is_internal(
+        const Line2D& line, const Surface2D& surface ) const
+    {
+        return Relationships::is_internal( line.id(), surface.id() );
+    }
+
+    bool Section::is_item(
+        const Line2D& line, const ModelBoundary2D& boundary ) const
+    {
+        return Relationships::is_item( line.id(), boundary.id() );
+    }
+
     BoundingBox2D Section::bounding_box() const
     {
         if( nb_lines() > 0 )

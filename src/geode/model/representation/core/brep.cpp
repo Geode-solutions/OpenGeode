@@ -481,6 +481,55 @@ namespace geode
         return nb_boundaries( surface.id() ) == 0;
     }
 
+    bool BRep::is_boundary( const Corner3D& corner, const Line3D& line ) const
+    {
+        return Relationships::is_boundary( corner.id(), line.id() );
+    }
+
+    bool BRep::is_boundary( const Line3D& line, const Surface3D& surface ) const
+    {
+        return Relationships::is_boundary( line.id(), surface.id() );
+    }
+
+    bool BRep::is_boundary(
+        const Surface3D& surface, const Block3D& block ) const
+    {
+        return Relationships::is_boundary( surface.id(), block.id() );
+    }
+
+    bool BRep::is_internal(
+        const Corner3D& corner, const Surface3D& surface ) const
+    {
+        return Relationships::is_internal( corner.id(), surface.id() );
+    }
+
+    bool BRep::is_internal( const Line3D& line, const Surface3D& surface ) const
+    {
+        return Relationships::is_internal( line.id(), surface.id() );
+    }
+
+    bool BRep::is_internal( const Corner3D& corner, const Block3D& block ) const
+    {
+        return Relationships::is_internal( corner.id(), block.id() );
+    }
+
+    bool BRep::is_internal( const Line3D& line, const Block3D& block ) const
+    {
+        return Relationships::is_internal( line.id(), block.id() );
+    }
+
+    bool BRep::is_internal(
+        const Surface3D& surface, const Block3D& block ) const
+    {
+        return Relationships::is_internal( surface.id(), block.id() );
+    }
+
+    bool BRep::is_item(
+        const Surface3D& surface, const ModelBoundary3D& boundary ) const
+    {
+        return Relationships::is_item( surface.id(), boundary.id() );
+    }
+
     BoundingBox3D BRep::bounding_box() const
     {
         if( nb_surfaces() > 0 )

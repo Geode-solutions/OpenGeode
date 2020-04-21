@@ -296,6 +296,28 @@ namespace geode
 
         bool is_closed( const Surface3D& surface ) const;
 
+        bool is_boundary( const Corner3D& corner, const Line3D& line ) const;
+
+        bool is_boundary( const Line3D& line, const Surface3D& surface ) const;
+
+        bool is_boundary(
+            const Surface3D& surface, const Block3D& block ) const;
+
+        bool is_internal(
+            const Corner3D& corner, const Surface3D& surface ) const;
+
+        bool is_internal( const Line3D& line, const Surface3D& surface ) const;
+
+        bool is_internal( const Corner3D& corner, const Block3D& block ) const;
+
+        bool is_internal( const Line3D& line, const Block3D& block ) const;
+
+        bool is_internal(
+            const Surface3D& surface, const Block3D& block ) const;
+
+        bool is_item(
+            const Surface3D& surface, const ModelBoundary3D& boundary ) const;
+
         /*!
          * Compute the bounding box from component meshes
          */

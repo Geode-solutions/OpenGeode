@@ -40,6 +40,9 @@ namespace geode
             .def( "nb_items", &Relationships::nb_items )
             .def( "items", &Relationships::items )
             .def( "nb_collections", &Relationships::nb_collections )
-            .def( "collections", &Relationships::collections );
+            .def( "collections", &Relationships::collections )
+            .def( "is_boundary", &Relationships::is_boundary )
+            .def( "is_internal", &Relationships::is_internal )
+            .def( "is_item", &Relationships::is_item );
     }
 } // namespace geode
