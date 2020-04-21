@@ -255,6 +255,8 @@ def test_boundary_ranges( model, corner_uuids, line_uuids, surface_uuids, block_
         line_boundary_count += 1
         if line_boundary.id().string() != corner_uuids[0].string() and line_boundary.id().string() != corner_uuids[1].string():
             raise ValueError( "[Test] BoundaryCornerRange iteration result is not correct" )
+        if not model.is_line_boundary( line_boundary, model.line( line_uuids[0] ) ):
+            raise ValueError( "[Test] Corner should be boundary of Line" )
     if line_boundary_count != 2:
         raise ValueError( "[Test] BoundaryCornerRange should iterates on 2 Corners" )
 
@@ -263,6 +265,8 @@ def test_boundary_ranges( model, corner_uuids, line_uuids, surface_uuids, block_
         surface_boundary_count += 1
         if surface_boundary.id().string() != line_uuids[0].string() and surface_boundary.id().string() != line_uuids[1].string() and surface_boundary.id().string() != line_uuids[2].string():
             raise ValueError( "[Test] BoundaryLineRange iteration result is not correct" )
+        if not model.is_surface_boundary( surface_boundary, model.surface( surface_uuids[0] ) ):
+            raise ValueError( "[Test] Line should be boundary of Surface" )
     if surface_boundary_count != 3:
         raise ValueError( "[Test] BoundaryLineRange should iterates on 3 Lines" )
 
@@ -271,6 +275,8 @@ def test_boundary_ranges( model, corner_uuids, line_uuids, surface_uuids, block_
         block_boundary_count += 1
         if block_boundary.id().string() != surface_uuids[0].string() and block_boundary.id().string() != surface_uuids[1].string() and block_boundary.id().string() != surface_uuids[2].string() and block_boundary.id().string() != surface_uuids[3].string() and block_boundary.id().string() != surface_uuids[4].string():
             raise ValueError( "[Test] BoundarySurfaceRange iteration result is not correct" )
+        if not model.is_block_boundary( block_boundary, model.block( block_uuids[0] ) ):
+            raise ValueError( "[Test] Surface should be boundary of Block" )
     if block_boundary_count != 5:
         raise ValueError( "[Test] BoundarySurfaceRange should iterates on 5 Surfaces" )
 
@@ -305,6 +311,8 @@ def test_item_ranges( model, surface_uuids, boundary_uuids ):
         boundary_item_count += 1
         if boundary_item.id().string() != surface_uuids[1].string() and boundary_item.id().string() != surface_uuids[2].string() and boundary_item.id().string() != surface_uuids[3].string():
             raise ValueError( "[Test] ItemSurfaceRange iteration result is not correct" )
+        if not model.is_model_boundary_item( boundary_item, model.model_boundary( boundary_uuids[1] ) ):
+            raise ValueError( "[Test] Surface should be item of ModelBoundary" )
     if boundary_item_count != 3:
         raise ValueError( "[Test] IncidentLineRange should iterates "
         "on 3 Surfaces (Boundary 1)" )

@@ -276,6 +276,12 @@ namespace geode
 
         CollectionRange collections( const uuid& id ) const;
 
+        bool is_boundary( const uuid& boundary, const uuid& incidence ) const;
+
+        bool is_internal( const uuid& internal, const uuid& embedding ) const;
+
+        bool is_item( const uuid& item, const uuid& collection ) const;
+
         void save_relationships( absl::string_view directory ) const;
 
         /*!

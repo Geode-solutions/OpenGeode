@@ -309,6 +309,9 @@ void test_boundary_ranges( const geode::Section& model,
         OPENGEODE_EXCEPTION( line_boundary.id() == corner_uuids[0]
                                  || line_boundary.id() == corner_uuids[1],
             "[Test] BoundaryCornerRange iteration result is not correct" );
+        OPENGEODE_EXCEPTION(
+            model.is_boundary( line_boundary, model.line( line_uuids[0] ) ),
+            "[Test] Corner should be boundary of Line" );
     }
     OPENGEODE_EXCEPTION( line_boundary_count == 2,
         "[Test] BoundaryCornerRange should iterates on 2 Corners" );
@@ -322,6 +325,9 @@ void test_boundary_ranges( const geode::Section& model,
                                  || surface_boundary.id() == line_uuids[1]
                                  || surface_boundary.id() == line_uuids[2],
             "[Test] BoundaryLineRange iteration result is not correct" );
+        OPENGEODE_EXCEPTION( model.is_boundary( surface_boundary,
+                                 model.surface( surface_uuids[0] ) ),
+            "[Test] Line should be boundary of Surface" );
     }
     OPENGEODE_EXCEPTION( surface_boundary_count == 3,
         "[Test] BoundaryLineRange should iterates on 3 Lines" );
@@ -368,6 +374,9 @@ void test_item_ranges( const geode::Section& model,
         OPENGEODE_EXCEPTION( boundary_item.id() == line_uuids[1]
                                  || boundary_item.id() == line_uuids[2],
             "[Test] ItemLineRange iteration result is not correct" );
+        OPENGEODE_EXCEPTION( model.is_item( boundary_item,
+                                 model.model_boundary( boundary_uuids[1] ) ),
+            "[Test] Line should be item of ModelBoundary" );
     }
     OPENGEODE_EXCEPTION( boundary_item_count == 2,
         "[Test] IncidentLineRange should iterates on 2 Lines (Boundary 1)" );

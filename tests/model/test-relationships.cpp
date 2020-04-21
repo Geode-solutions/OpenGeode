@@ -131,6 +131,12 @@ void test_relations( const geode::Relationships& relations,
     test_uuid( relations, uuids[3], 3, 0, 1, 0, 0, 1 );
     test_uuid( relations, uuids[4], 0, 2, 0, 2, 2, 0 );
     test_uuid( relations, uuids[5], 1, 1, 1, 0, 3, 1 );
+    OPENGEODE_EXCEPTION( relations.is_boundary( uuids[0], uuids[1] ),
+        "[Test] uuids[0] should be boundary of uuids[1]" );
+    OPENGEODE_EXCEPTION( relations.is_internal( uuids[0], uuids[1] ),
+        "[Test] uuids[0] should be internal of uuids[1]" );
+    OPENGEODE_EXCEPTION( relations.is_item( uuids[0], uuids[4] ),
+        "[Test] uuids[0] should be item of uuids[4]" );
 }
 
 void test()
