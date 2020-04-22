@@ -65,6 +65,7 @@ namespace geode
      * @extends LinesBuilder
      * @extends SurfacesBuilder
      * @extends BlocksBuilder
+     * @extends ModelBoundariesBuilder
      */
     class opengeode_model_api BRepBuilder : public TopologyBuilder,
                                             public AddComponentsBuilders< 3,

@@ -49,6 +49,10 @@ namespace geode
      * Corners, Lines, and Surfaces.
      * This class provides classes for range-based iteration on Component
      * boundaries and incidences.
+     * @extends Corners
+     * @extends Lines
+     * @extends Surfaces
+     * @extends ModelBoundaries
      */
     class opengeode_model_api Section
         : public Topology,
