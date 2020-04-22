@@ -59,6 +59,7 @@ namespace geode
 {
     /*!
      * Class managing modification of a Section
+     * @extends CornersBuilder LinesBuilder
      */
     class opengeode_model_api SectionBuilder : public TopologyBuilder,
                                                public AddComponentsBuilders< 2,
