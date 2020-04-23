@@ -1,42 +1,38 @@
 /*
+ * Copyright (c) 2019 - 2020 Geode-solutions
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ */
+
+/*
+ * Modified from RINGMesh https://github.com/ringmesh/RINGMesh
  * Copyright (c) 2012-2018, Association Scientifique pour la Geologie et ses
- * Applications (ASGA). All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of ASGA nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL ASGA BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *     http://www.ring-team.org
- *
- *     RING Project
- *     Ecole Nationale Superieure de Geologie - GeoRessources
- *     2 Rue du Doyen Marcel Roubault - TSA 70605
- *     54518 VANDOEUVRE-LES-NANCY
- *     FRANCE
+ * Applications (ASGA)
  */
 
 #pragma once
 
-#include <geode/basic/common.h>
+#include <absl/types/span.h>
+
 #include <geode/geometry/bounding_box.h>
+#include <geode/geometry/common.h>
 
 namespace geode
 {
@@ -57,10 +53,11 @@ namespace geode
         OPENGEODE_DISABLE_COPY_AND_MOVE( AABBTree );
         OPENGEODE_TEMPLATE_ASSERT_2D_OR_3D( dimension );
 
+        static constexpr index_t ROOT_INDEX{ 1 };
+
     public:
-        /// The index where to store the root. It starts to one for algorithm
-        /// trick.
-        static const index_t ROOT_INDEX = 1;
+        AABBTree( absl::Span< const BoundingBox< dimension > > bboxes );
+        virtual ~AABBTree() = default;
 
         index_t nb_bboxes() const
         {
@@ -92,7 +89,7 @@ namespace geode
         std::tuple< index_t, Point< dimension >, double > closest_element_box(
             const Point< dimension >& query, const EvalDistance& action ) const
         {
-            index_t nearest_box = NO_ID;
+            index_t nearest_box;
             Point< dimension > nearest_point;
             double distance;
             std::tie( nearest_box, nearest_point, distance ) =
@@ -102,6 +99,7 @@ namespace geode
             OPENGEODE_ASSERT( nearest_box != NO_ID, "No box found" );
             return std::make_tuple( nearest_box, nearest_point, distance );
         }
+
         /*
          * @brief Computes the intersections between a given
          * box and the element boxes.
@@ -122,6 +120,7 @@ namespace geode
             bbox_intersect_recursive< EvalIntersection >(
                 box, ROOT_INDEX, 0, nb_bboxes(), action );
         }
+
         /*
          * @brief Computes the self intersections of the element boxes.
          * @param[in] action The functor to run when two boxes intersect
@@ -140,22 +139,11 @@ namespace geode
         }
 
     protected:
-        AABBTree() = default;
-        virtual ~AABBTree() = default;
-
-        /*!
-         * @brief Builds the tree
-         * @details Comptes the morton order and build the tree
-         * using the ordered bboxes
-         * @param[in] bboxes the set of unordered bboxes
-         */
-        void initialize_tree(
-            const std::vector< BoundingBox< dimension > >& bboxes );
-
         bool is_leaf( index_t box_begin, index_t box_end ) const
         {
             return box_begin + 1 == box_end;
         }
+
         void get_recursive_iterators( index_t node_index,
             index_t box_begin,
             index_t box_end,
@@ -170,27 +158,33 @@ namespace geode
 
         const BoundingBox< dimension >& node( index_t i ) const
         {
-            OPENGEODE_ASSERT( i < tree_.size(), "querry out of tree" );
-            return tree_[i];
-        }
-
-        BoundingBox< dimension >& node( index_t i )
-        {
-            OPENGEODE_ASSERT( i < tree_.size(), "querry out of tree" );
+            OPENGEODE_ASSERT( i < tree_.size(), "query out of tree" );
             return tree_[i];
         }
 
     private:
+        void set_node( index_t i, const BoundingBox< dimension >& box )
+        {
+            OPENGEODE_ASSERT( i < tree_.size(), "query out of tree" );
+            tree_[i] = box;
+        }
+
+        void add_box( index_t i, const BoundingBox< dimension >& box )
+        {
+            OPENGEODE_ASSERT( i < tree_.size(), "query out of tree" );
+            tree_[i].add_box( box );
+        }
+
         /*!
          * @brief Gets the number of nodes in the tree subset
          */
         index_t max_node_index(
-            index_t node_index, index_t box_begin, index_t box_end );
+            index_t node_index, index_t box_begin, index_t box_end ) const;
         /*!
          * @brief The recursive instruction used in initialize_tree()
          */
         void initialize_tree_recursive(
-            const std::vector< BoundingBox< dimension > >& bboxes,
+            absl::Span< const BoundingBox< dimension > > bboxes,
             index_t node_index,
             index_t element_begin,
             index_t element_end );
@@ -247,8 +241,14 @@ namespace geode
                 index_t child_right;
                 get_recursive_iterators( node_index, box_begin, box_end,
                     box_middle, child_left, child_right );
-                if( eval_distance( node( child_left ).center(), query )
-                    < eval_distance( node( child_right ).center(), query ) )
+                if( eval_distance(
+                        ( node( child_left ).min() + node( child_left ).max() )
+                            / 2.,
+                        query )
+                    < eval_distance( ( node( child_right ).min()
+                                         + node( child_right ).max() )
+                                         / 2.,
+                          query ) )
                 {
                     box_end = box_middle;
                     node_index = child_left;
@@ -260,10 +260,10 @@ namespace geode
                 }
             }
 
-            auto nearest_box = mapping_morton_[box_begin];
-            Point< dimension > nearest_point =
+            const auto nearest_box = mapping_morton_[box_begin];
+            const auto nearest_point =
                 get_point_hint_from_box( tree_[box_begin], nearest_box );
-            auto distance = eval_distance( query, nearest_point );
+            const auto distance = eval_distance( query, nearest_point );
             return std::make_tuple( nearest_box, nearest_point, distance );
         }
         /*!
@@ -272,39 +272,21 @@ namespace geode
          * box
          */
         virtual Point< dimension > get_point_hint_from_box(
-            const BoundingBox< dimension >& box, index_t element_id ) const = 0;
-
-    protected:
-        std::vector< BoundingBox< dimension > > tree_{};
-        std::vector< index_t > mapping_morton_{};
-    };
-
-    template < index_t dimension >
-    class opengeode_geometry_api BoxAABBTree : public AABBTree< dimension >
-    {
-    public:
-        explicit BoxAABBTree(
-            const std::vector< BoundingBox< dimension > >& bboxes );
+            const BoundingBox< dimension >& box, index_t element_id ) const
+        {
+            geode_unused( element_id );
+            return ( box.min() + box.max() ) / 2.;
+        }
 
     private:
-        /*!
-         * @brief Gets an element point from its box
-         * @details In this case, the point is the barycenter of the box
-         */
-        Point< dimension > get_point_hint_from_box(
-            const BoundingBox< dimension >& box,
-            index_t element_id ) const override;
+        std::vector< BoundingBox< dimension > > tree_;
+        std::vector< index_t > mapping_morton_;
     };
-
-    ALIAS_2D_AND_3D( BoxAABBTree );
-
-    template < index_t dimension >
-    double inner_point_box_distance(
-        const Point< dimension >& p, const BoundingBox< dimension >& B );
+    ALIAS_2D_AND_3D( AABBTree );
 
     template < index_t dimension >
     double point_box_signed_distance(
-        const Point< dimension >& p, const BoundingBox< dimension >& B );
+        const Point< dimension >& point, const BoundingBox< dimension >& box );
 
     template < index_t dimension >
     template < typename ACTION >
@@ -318,14 +300,15 @@ namespace geode
         index_t box_end,
         const ACTION& action ) const
     {
-        OPENGEODE_ASSERT( node_index < tree_.size(), "node out of tree range" );
-        OPENGEODE_ASSERT( box_begin != box_end, "" );
+        OPENGEODE_ASSERT( node_index < tree_.size(), "node out of tree" );
+        OPENGEODE_ASSERT(
+            box_begin != box_end, "Begin and End indices should be different" );
 
         // If node is a leaf: compute point-element distance
         // and replace current if nearer
         if( is_leaf( box_begin, box_end ) )
         {
-            index_t cur_box = mapping_morton_[box_begin];
+            const auto cur_box = mapping_morton_[box_begin];
             Point< dimension > cur_nearest_point;
             double cur_distance;
             std::tie( cur_distance, cur_nearest_point ) =
@@ -342,9 +325,9 @@ namespace geode
         get_recursive_iterators( node_index, box_begin, box_end, box_middle,
             child_left, child_right );
 
-        double distance_left =
+        const auto distance_left =
             point_box_signed_distance( query, node( child_left ) );
-        double distance_right =
+        const auto distance_right =
             point_box_signed_distance( query, node( child_right ) );
 
         // Traverse the "nearest" child first, so that it has more chances
@@ -403,8 +386,7 @@ namespace geode
         if( is_leaf( element_begin, element_end ) )
         {
             // @todo Check if the box is not intersecting itself
-            index_t cur_box = mapping_morton_[element_begin];
-            action( cur_box );
+            action( mapping_morton_[element_begin] );
             return;
         }
 
