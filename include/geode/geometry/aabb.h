@@ -99,7 +99,7 @@ namespace geode
                 get_nearest_element_box_hint( query, action );
             closest_element_box_recursive< EvalDistance >( query, nearest_box,
                 nearest_point, distance, ROOT_INDEX, 0, nb_bboxes(), action );
-            ringmesh_assert( nearest_box != NO_ID );
+            OPENGEODE_ASSERT( nearest_box != NO_ID, "No box found" );
             return std::make_tuple( nearest_box, nearest_point, distance );
         }
         /*
@@ -318,8 +318,8 @@ namespace geode
         index_t box_end,
         const ACTION& action ) const
     {
-        ringmesh_assert( node_index < tree_.size() );
-        ringmesh_assert( box_begin != box_end );
+        OPENGEODE_ASSERT( node_index < tree_.size(), "node out of tree range" );
+        OPENGEODE_ASSERT( box_begin != box_end, "" );
 
         // If node is a leaf: compute point-element distance
         // and replace current if nearer
@@ -390,8 +390,8 @@ namespace geode
         index_t element_end,
         ACTION& action ) const
     {
-        ringmesh_assert( node_index < tree_.size() );
-        ringmesh_assert( element_begin != element_end );
+        OPENGEODE_ASSERT( node_index < tree_.size(), "Node out of tree range" );
+        OPENGEODE_ASSERT( element_begin != element_end, "" );
 
         // Prune sub-tree that does not have intersection
         if( !box.bboxes_overlap( node( node_index ) ) )
@@ -428,8 +428,8 @@ namespace geode
         index_t element_end2,
         ACTION& action ) const
     {
-        ringmesh_assert( element_end1 != element_begin1 );
-        ringmesh_assert( element_end2 != element_begin2 );
+        OPENGEODE_ASSERT( element_end1 != element_begin1, "" );
+        OPENGEODE_ASSERT( element_end2 != element_begin2, "" );
 
         // Since we are intersecting the AABBTree with *itself*,
         // we can prune half of the cases by skipping the test
