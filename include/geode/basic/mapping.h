@@ -58,6 +58,16 @@ namespace geode
             return out2in_.at( out );
         }
 
+        const absl::flat_hash_map< T, T >& get() const
+        {
+            return in2out_;
+        }
+
+        const absl::flat_hash_map< T, T >& get_inverse() const
+        {
+            return out2in_;
+        }
+
     private:
         absl::flat_hash_map< T, T > in2out_;
         absl::flat_hash_map< T, T > out2in_;
