@@ -120,10 +120,10 @@ namespace geode
     public:
         explicit Impl( PolygonalSurfaceBase& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) )
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
@@ -426,8 +426,6 @@ namespace geode
     {
         if( !is_edge_on_border( polygon_edge ) )
         {
-            const auto v0 = polygon_edge_vertex( polygon_edge, 0 );
-            const auto v1 = polygon_edge_vertex( polygon_edge, 1 );
             const auto polygon_adj = polygon_adjacent( polygon_edge );
             const auto edge_id = this->polygon_edge( polygon_edge );
             for( const auto e : Range{ nb_polygon_edges( polygon_adj ) } )

@@ -77,6 +77,11 @@ namespace geode
             tree_[i].add_box( box );
         }
 
+        index_t mapping_morton( index_t i )
+        {
+            return mapping_morton_[i];
+        }
+
         /*!
          * @brief Gets the number of nodes in the tree subset
          */
@@ -121,55 +126,6 @@ namespace geode
             index_t element_end2,
             ACTION& action ) const;
 
-        /*!
-         * @brief Gets an hint of the result
-         * @details Compute the result by approximating each bbox to its
-         * barycenter (using given distance evaluator).
-         * This result is then used to speed-up the computation by minimizing
-         * the distance computation between \p query and the real elements
-         * inside the bboxes
-         */
-        template < class EvalDistance >
-        std::tuple< index_t, Point< dimension >, double >
-            get_nearest_element_box_hint( const Point< dimension >& query,
-                const EvalDistance& eval_distance ) const
-        {
-            index_t box_begin{ 0 };
-            index_t box_end{ nb_bboxes() };
-            index_t node_index{ ROOT_INDEX };
-            while( !is_leaf( box_begin, box_end ) )
-            {
-                index_t box_middle;
-                index_t child_left;
-                index_t child_right;
-                get_recursive_iterators( node_index, box_begin, box_end,
-                    box_middle, child_left, child_right );
-                if( eval_distance(
-                        ( node( child_left ).min() + node( child_left ).max() )
-                            / 2.,
-                        query )
-                    < eval_distance( ( node( child_right ).min()
-                                         + node( child_right ).max() )
-                                         / 2.,
-                          query ) )
-                {
-                    box_end = box_middle;
-                    node_index = child_left;
-                }
-                else
-                {
-                    box_begin = box_middle;
-                    node_index = child_right;
-                }
-            }
-
-            const auto nearest_box = mapping_morton_[box_begin];
-            const auto nearest_point =
-                get_point_hint_from_box( tree_[box_begin], nearest_box );
-            const auto distance = eval_distance( query, nearest_point );
-            return std::make_tuple( nearest_box, nearest_point, distance );
-        }
-
     private:
         std::vector< BoundingBox< dimension > > tree_;
         std::vector< index_t > mapping_morton_;
@@ -194,11 +150,39 @@ namespace geode
         AABBTree< dimension >::closest_element_box(
             const Point< dimension >& query, const EvalDistance& action ) const
     {
-        index_t nearest_box;
-        Point< dimension > nearest_point;
-        double distance;
-        std::tie( nearest_box, nearest_point, distance ) =
-            get_nearest_element_box_hint( query, action );
+        index_t box_begin{ 0 };
+        index_t box_end{ nb_bboxes() };
+        index_t node_index{ Impl::ROOT_INDEX };
+        while( !is_leaf( box_begin, box_end ) )
+        {
+            index_t box_middle;
+            index_t child_left;
+            index_t child_right;
+            get_recursive_iterators( node_index, box_begin, box_end, box_middle,
+                child_left, child_right );
+            if( action( ( node( child_left ).min() + node( child_left ).max() )
+                            / 2.,
+                    query )
+                < action(
+                      ( node( child_right ).min() + node( child_right ).max() )
+                          / 2.,
+                      query ) )
+            {
+                box_end = box_middle;
+                node_index = child_left;
+            }
+            else
+            {
+                box_begin = box_middle;
+                node_index = child_right;
+            }
+        }
+
+        const auto nearest_box = impl_->mapping_morton( box_begin );
+        const auto nearest_point =
+            get_point_hint_from_box( node( box_begin ), nearest_box );
+        const auto distance = action( query, nearest_point );
+
         impl_->closest_element_box_recursive( query, nearest_box, nearest_point,
             distance, Impl::ROOT_INDEX, 0, nb_bboxes(), action );
         OPENGEODE_ASSERT( nearest_box != NO_ID, "No box found" );
