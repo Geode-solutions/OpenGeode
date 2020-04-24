@@ -627,13 +627,13 @@ void test_clone( const geode::BRep& brep )
     for( const auto& corner : brep.corners() )
     {
         const auto& new_corner =
-            brep2.corner( mapping.corners.at( corner.id() ) );
+            brep2.corner( mapping.corners.in2out( corner.id() ) );
         for( const auto& line : brep.incidences( corner ) )
         {
             bool found{ false };
             for( const auto& new_line : brep2.incidences( new_corner ) )
             {
-                if( mapping.lines.at( line.id() ) == new_line.id() )
+                if( mapping.lines.in2out( line.id() ) == new_line.id() )
                 {
                     found = true;
                     break;
@@ -645,13 +645,14 @@ void test_clone( const geode::BRep& brep )
     }
     for( const auto& line : brep.lines() )
     {
-        const auto& new_line = brep2.line( mapping.lines.at( line.id() ) );
+        const auto& new_line = brep2.line( mapping.lines.in2out( line.id() ) );
         for( const auto& surface : brep.incidences( line ) )
         {
             bool found = { false };
             for( const auto& new_surface : brep2.incidences( new_line ) )
             {
-                if( mapping.surfaces.at( surface.id() ) == new_surface.id() )
+                if( mapping.surfaces.in2out( surface.id() )
+                    == new_surface.id() )
                 {
                     found = true;
                     break;
@@ -664,13 +665,13 @@ void test_clone( const geode::BRep& brep )
     for( const auto& surface : brep.surfaces() )
     {
         const auto& new_surface =
-            brep2.surface( mapping.surfaces.at( surface.id() ) );
+            brep2.surface( mapping.surfaces.in2out( surface.id() ) );
         for( const auto& block : brep.incidences( surface ) )
         {
             bool found = { false };
             for( const auto& new_block : brep2.incidences( new_surface ) )
             {
-                if( mapping.blocks.at( block.id() ) == new_block.id() )
+                if( mapping.blocks.in2out( block.id() ) == new_block.id() )
                 {
                     found = true;
                     break;
@@ -683,13 +684,14 @@ void test_clone( const geode::BRep& brep )
     for( const auto& model_boundary : brep.model_boundaries() )
     {
         const auto& new_model_boundary = brep2.model_boundary(
-            mapping.model_boundaries.at( model_boundary.id() ) );
+            mapping.collections.in2out( model_boundary.id() ) );
         for( const auto& surface : brep.items( model_boundary ) )
         {
             bool found = { false };
             for( const auto& new_surface : brep2.items( new_model_boundary ) )
             {
-                if( mapping.surfaces.at( surface.id() ) == new_surface.id() )
+                if( mapping.surfaces.in2out( surface.id() )
+                    == new_surface.id() )
                 {
                     found = true;
                     break;

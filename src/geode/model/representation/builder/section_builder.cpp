@@ -69,7 +69,7 @@ namespace geode
             detail::copy_line_components( section, section_, *this );
         mapping.surfaces =
             detail::copy_surface_components( section, section_, *this );
-        mapping.model_boundaries =
+        mapping.collections =
             detail::copy_model_boundary_components( section, *this );
         return mapping;
     }
@@ -86,11 +86,11 @@ namespace geode
         for( const auto& model_boundary : section.model_boundaries() )
         {
             const auto& new_model_boundary = section_.model_boundary(
-                mapping.model_boundaries.at( model_boundary.id() ) );
+                mapping.collections.in2out( model_boundary.id() ) );
             for( const auto& line : section.items( model_boundary ) )
             {
                 const auto& new_line =
-                    section_.line( mapping.lines.at( line.id() ) );
+                    section_.line( mapping.lines.in2out( line.id() ) );
                 add_line_in_model_boundary( new_line, new_model_boundary );
             }
         }

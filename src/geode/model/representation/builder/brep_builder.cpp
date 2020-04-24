@@ -72,7 +72,7 @@ namespace geode
         mapping.surfaces =
             detail::copy_surface_components( brep, brep_, *this );
         mapping.blocks = detail::copy_block_components( brep, brep_, *this );
-        mapping.model_boundaries =
+        mapping.collections =
             detail::copy_model_boundary_components( brep, *this );
         return mapping;
     }
@@ -95,11 +95,11 @@ namespace geode
         for( const auto& model_boundary : brep.model_boundaries() )
         {
             const auto& new_model_boundary = brep_.model_boundary(
-                mapping.model_boundaries.at( model_boundary.id() ) );
+                mapping.collections.in2out( model_boundary.id() ) );
             for( const auto& surface : brep.items( model_boundary ) )
             {
                 const auto& new_surface =
-                    brep_.surface( mapping.surfaces.at( surface.id() ) );
+                    brep_.surface( mapping.surfaces.in2out( surface.id() ) );
                 add_surface_in_model_boundary(
                     new_surface, new_model_boundary );
             }

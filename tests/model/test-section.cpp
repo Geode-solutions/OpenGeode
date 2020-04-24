@@ -410,13 +410,13 @@ void test_clone( const geode::Section& section )
     for( const auto& corner : section.corners() )
     {
         const auto& new_corner =
-            section2.corner( mapping.corners.at( corner.id() ) );
+            section2.corner( mapping.corners.in2out( corner.id() ) );
         for( const auto& line : section.incidences( corner ) )
         {
             bool found = { false };
             for( const auto& new_line : section2.incidences( new_corner ) )
             {
-                if( mapping.lines.at( line.id() ) == new_line.id() )
+                if( mapping.lines.in2out( line.id() ) == new_line.id() )
                 {
                     found = true;
                     break;
@@ -428,13 +428,15 @@ void test_clone( const geode::Section& section )
     }
     for( const auto& line : section.lines() )
     {
-        const auto& new_line = section2.line( mapping.lines.at( line.id() ) );
+        const auto& new_line =
+            section2.line( mapping.lines.in2out( line.id() ) );
         for( const auto& surface : section.incidences( line ) )
         {
             bool found = { false };
             for( const auto& new_surface : section2.incidences( new_line ) )
             {
-                if( mapping.surfaces.at( surface.id() ) == new_surface.id() )
+                if( mapping.surfaces.in2out( surface.id() )
+                    == new_surface.id() )
                 {
                     found = true;
                     break;
@@ -447,13 +449,13 @@ void test_clone( const geode::Section& section )
     for( const auto& model_boundary : section.model_boundaries() )
     {
         const auto& new_model_boundary = section2.model_boundary(
-            mapping.model_boundaries.at( model_boundary.id() ) );
+            mapping.collections.in2out( model_boundary.id() ) );
         for( const auto& line : section.items( model_boundary ) )
         {
             bool found = { false };
             for( const auto& new_line : section2.items( new_model_boundary ) )
             {
-                if( mapping.lines.at( line.id() ) == new_line.id() )
+                if( mapping.lines.in2out( line.id() ) == new_line.id() )
                 {
                     found = true;
                     break;

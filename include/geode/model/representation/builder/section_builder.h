@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <geode/basic/mapping.h>
+
 #include <geode/mesh/core/edged_curve.h>
 #include <geode/mesh/core/mesh_type.h>
 #include <geode/mesh/core/point_set.h>
@@ -76,11 +78,11 @@ namespace geode
     public:
         struct ComponentMapping
         {
-            using Mapping = absl::flat_hash_map< uuid, uuid >;
-            Mapping corners;
-            Mapping lines;
-            Mapping surfaces;
-            Mapping model_boundaries;
+            using UUIDMapping = BijectiveMapping< uuid >;
+            UUIDMapping corners;
+            UUIDMapping lines;
+            UUIDMapping surfaces;
+            UUIDMapping collections;
         };
 
     public:
