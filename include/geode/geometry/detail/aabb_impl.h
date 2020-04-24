@@ -151,7 +151,7 @@ namespace geode
                     < eval_distance( ( node( child_right ).min()
                                          + node( child_right ).max() )
                                          / 2.,
-                          query ) )
+                        query ) )
                 {
                     box_end = box_middle;
                     node_index = child_left;
