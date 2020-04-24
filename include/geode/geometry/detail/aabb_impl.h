@@ -49,9 +49,9 @@ namespace geode
     template < index_t dimension >
     class AABBTree< dimension >::Impl
     {
+    public:
         static constexpr index_t ROOT_INDEX{ 1 };
 
-    public:
         Impl( absl::Span< const BoundingBox< dimension > > bboxes );
 
         index_t nb_bboxes() const
@@ -65,39 +65,6 @@ namespace geode
             return tree_[i];
         }
 
-        template < typename EvalDistance >
-        std::tuple< index_t, Point< dimension >, double > closest_element_box(
-            const Point< dimension >& query, const EvalDistance& action ) const
-        {
-            index_t nearest_box;
-            Point< dimension > nearest_point;
-            double distance;
-            std::tie( nearest_box, nearest_point, distance ) =
-                get_nearest_element_box_hint( query, action );
-            closest_element_box_recursive< EvalDistance >( query, nearest_box,
-                nearest_point, distance, ROOT_INDEX, 0, nb_bboxes(), action );
-            OPENGEODE_ASSERT( nearest_box != NO_ID, "No box found" );
-            return std::make_tuple( nearest_box, nearest_point, distance );
-        }
-
-        template < class EvalIntersection >
-        void compute_bbox_element_bbox_intersections(
-            const BoundingBox< dimension >& box,
-            EvalIntersection& action ) const
-        {
-            bbox_intersect_recursive< EvalIntersection >(
-                box, ROOT_INDEX, 0, nb_bboxes(), action );
-        }
-
-        template < class EvalIntersection >
-        void compute_self_element_bbox_intersections(
-            EvalIntersection& action ) const
-        {
-            self_intersect_recursive< EvalIntersection >( ROOT_INDEX, 0,
-                nb_bboxes(), ROOT_INDEX, 0, nb_bboxes(), action );
-        }
-
-    private:
         void set_node( index_t i, const BoundingBox< dimension >& box )
         {
             OPENGEODE_ASSERT( i < tree_.size(), "query out of tree" );
@@ -184,7 +151,7 @@ namespace geode
                     < eval_distance( ( node( child_right ).min()
                                          + node( child_right ).max() )
                                          / 2.,
-                        query ) )
+                          query ) )
                 {
                     box_end = box_middle;
                     node_index = child_left;
@@ -227,7 +194,15 @@ namespace geode
         AABBTree< dimension >::closest_element_box(
             const Point< dimension >& query, const EvalDistance& action ) const
     {
-        return impl_->closest_element_box( query, action );
+        index_t nearest_box;
+        Point< dimension > nearest_point;
+        double distance;
+        std::tie( nearest_box, nearest_point, distance ) =
+            get_nearest_element_box_hint( query, action );
+        impl_->closest_element_box_recursive( query, nearest_box, nearest_point,
+            distance, Impl::ROOT_INDEX, 0, nb_bboxes(), action );
+        OPENGEODE_ASSERT( nearest_box != NO_ID, "No box found" );
+        return std::make_tuple( nearest_box, nearest_point, distance );
     }
 
     template < index_t dimension >
@@ -235,7 +210,8 @@ namespace geode
     void AABBTree< dimension >::compute_bbox_element_bbox_intersections(
         const BoundingBox< dimension >& box, EvalIntersection& action ) const
     {
-        impl_->compute_bbox_element_bbox_intersections( box, action );
+        impl_->bbox_intersect_recursive(
+            box, Impl::ROOT_INDEX, 0, nb_bboxes(), action );
     }
 
     template < index_t dimension >
@@ -243,7 +219,8 @@ namespace geode
     void AABBTree< dimension >::compute_self_element_bbox_intersections(
         EvalIntersection& action ) const
     {
-        impl_->compute_self_element_bbox_intersections( action );
+        impl_->self_intersect_recursive( Impl::ROOT_INDEX, 0, nb_bboxes(),
+            Impl::ROOT_INDEX, 0, nb_bboxes(), action );
     }
 
     template < index_t dimension >
