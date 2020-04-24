@@ -164,9 +164,9 @@ namespace geode
                             / 2.,
                     query )
                 < action(
-                      ( node( child_right ).min() + node( child_right ).max() )
-                          / 2.,
-                      query ) )
+                    ( node( child_right ).min() + node( child_right ).max() )
+                        / 2.,
+                    query ) )
             {
                 box_end = box_middle;
                 node_index = child_left;
