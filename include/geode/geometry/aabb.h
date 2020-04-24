@@ -31,6 +31,8 @@
 
 #include <absl/types/span.h>
 
+#include <geode/basic/pimpl.h>
+
 #include <geode/geometry/bounding_box.h>
 #include <geode/geometry/common.h>
 
@@ -44,7 +46,7 @@ namespace geode
 
     public:
         AABBTree( absl::Span< const BoundingBox< dimension > > bboxes );
-        virtual ~AABBTree() = default;
+        virtual ~AABBTree();
 
         index_t nb_bboxes() const;
 

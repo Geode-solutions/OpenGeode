@@ -203,6 +203,11 @@ namespace geode
     }
 
     template < index_t dimension >
+    AABBTree< dimension >::~AABBTree() // NOLINT
+    {
+    }
+
+    template < index_t dimension >
     index_t AABBTree< dimension >::Impl::max_node_index(
         index_t node_index, index_t box_begin, index_t box_end ) const
     {
