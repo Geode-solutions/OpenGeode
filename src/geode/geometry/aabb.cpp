@@ -186,7 +186,7 @@ namespace
 namespace geode
 {
     template < index_t dimension >
-    AABBTree< dimension >::AABBTree(
+    AABBTree< dimension >::Impl::Impl(
         absl::Span< const BoundingBox< dimension > > bboxes )
     {
         mapping_morton_ = morton_sort( bboxes );
@@ -196,7 +196,14 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t AABBTree< dimension >::max_node_index(
+    AABBTree< dimension >::AABBTree(
+        absl::Span< const BoundingBox< dimension > > bboxes )
+        : impl_{ bboxes }
+    {
+    }
+
+    template < index_t dimension >
+    index_t AABBTree< dimension >::Impl::max_node_index(
         index_t node_index, index_t box_begin, index_t box_end ) const
     {
         OPENGEODE_ASSERT( box_end > box_begin,
@@ -225,7 +232,7 @@ namespace geode
      * bboxes
      */
     template < index_t dimension >
-    void AABBTree< dimension >::initialize_tree_recursive(
+    void AABBTree< dimension >::Impl::initialize_tree_recursive(
         absl::Span< const BoundingBox< dimension > > bboxes,
         index_t node_index,
         index_t element_begin,

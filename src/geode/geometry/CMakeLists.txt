@@ -49,6 +49,8 @@ add_geode_library(
         "rotation.h"
         "signed_mensuration.h"
         "vector.h"
+    ADVANCED_HEADERS
+        "detail/aabb_impl.h"
     PUBLIC_DEPENDENCIES
         Bitsery::bitsery
         Threads::Threads
