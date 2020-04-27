@@ -32,7 +32,6 @@
 #include <geode/mesh/core/geode_polyhedral_solid.h>
 #include <geode/mesh/core/point_set.h>
 
-#include <geode/model/mixin/core/block.h>
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/detail/count_relationships.h>
 #include <geode/model/mixin/core/line.h>

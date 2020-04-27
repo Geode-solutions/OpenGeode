@@ -41,10 +41,6 @@
 #include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
 
-namespace
-{
-}
-
 namespace geode
 {
     namespace detail
