@@ -65,6 +65,10 @@ namespace geode
          *  std::tuple< double, Point< dimension > > operator()(
          *      const Point< dimension >& query,
          *      index_t cur_box ) const ;
+         * @tparam EvalDistance should also have an operator () defined like
+         * this to compute the distance betwenn two point: double operator()
+         * const (const Point< dimension >& pt1,const Point< dimension >& pt2)
+         * to compute
          * where query is the same than \p query, cur_box is the element box
          * index
          */

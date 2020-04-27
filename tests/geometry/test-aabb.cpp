@@ -25,10 +25,84 @@
 
 #include <geode/geometry/aabb.h>
 #include <geode/geometry/point.h>
+#include <geode/geometry/vector.h>
 
 #include <geode/tests/common.h>
 
 using namespace geode;
+
+template < index_t dimension >
+class BoxAABBEvalDistance
+{
+public:
+    BoxAABBEvalDistance(
+        const std::vector< geode::BoundingBox< dimension > >& bounding_boxes )
+        : bounding_boxes_( bounding_boxes )
+    {
+    }
+    ~BoxAABBEvalDistance() = default;
+
+    // EvalDistance
+    std::tuple< double, Point< dimension > > operator()(
+        const Point< dimension >& query, index_t cur_box ) const
+    {
+        Vector vec( box_center, query );
+        Point< dimension > box_center = bounding_boxes_[cur_box].center();
+        return std::tuple< double, Point< dimension > >{ vec.length,
+            box_center };
+    }
+    double operator()(
+        const Point< dimension >& pt1, const Point< dimension >& pt2 ) const
+    {
+        Vector vec( pt1, pt2 );
+        return vec.length();
+    }
+
+private:
+    const std::vector< geode::BoundingBox< dimension > >& bounding_boxes_;
+};
+
+template < index_t dimension >
+class BoxAABBEvalBoxIntersection
+{
+public:
+    // EvalInteserction
+    void operator()( index_t cur_box ){ intersections.push_back( cur_box ) }
+
+    std::set< index_t > get_intersected_box()
+    {
+        return intersections;
+    }
+
+    // EvalInteserction
+    void operator()( index_t box1, index_t box2 ) {}
+
+private:
+    std::set< index_t > intersections;
+};
+
+template < index_t dimension >
+class BoxAABBEvalIntersection
+{
+public:
+    BoxAABBEvalIntersection(
+        const std::vector< geode::BoundingBox< dimension > >& bounding_boxes )
+        : bounding_boxes_( bounding_boxes )
+    {
+    }
+    ~BoxAABBEvalIntersection() = default;
+
+    // EvalInteserction
+    void operator()( index_t box1, index_t box2 )
+    {
+        bounding_boxes_[box1].min();
+        bounding_boxes_[box2].max();
+    }
+
+private:
+    const std::vector< geode::BoundingBox< dimension > >& bounding_boxes_;
+    std::set< index_t > intersections;
+};
 
 template < index_t dimension >
 BoundingBox< dimension > create_bounding_box(
@@ -70,12 +144,27 @@ std::vector< geode::BoundingBox< dimension > > create_box_vector(
 template < index_t dimension >
 void do_test()
 {
-    std::vector< geode::BoundingBox< dimension > > box_vector =
-        create_box_vector< dimension >( 10, 0.5 );
-    geode::AABBTree< dimension > aabb( box_vector );
+    std::vector< std::pair< index_t, double > > param_to_test(
+        { { 10, 0.25 }, { 10, 0.5 }, { 10, 0.75 } } );
+    for( auto param : param_to_test )
+    {
+        // build aabb
+        std::vector< geode::BoundingBox< dimension > > box_vector =
+            create_box_vector< dimension >( param.first, param.second );
+        geode::AABBTree< dimension > aabb( box_vector );
 
-    OPENGEODE_EXCEPTION( aabb.nb_bboxes() == box_vector.size(),
-        "[Test] Error ... wrong number of box in the aabb tree" );
+        // build aabb
+        OPENGEODE_EXCEPTION( aabb.nb_bboxes() == box_vector.size(),
+            "[Test] Error ... wrong number of box in the aabb tree" );
+        BoxAABBEvalDistance< dimension > disteval =
+            BoxAABBEvalDistance< dimension >( box_vector );
+        Point< dimension > query;
+        for( auto c : Range( dimension ) )
+        {
+            query.set_value( c, 0.1 );
+        }
+        aabb.closest_element_box( query, disteval );
+    }
 }
 
 void test()
