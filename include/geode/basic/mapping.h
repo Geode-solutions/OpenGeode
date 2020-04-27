@@ -61,7 +61,7 @@ namespace geode
     };
 
     template < typename T, index_t Capacity >
-    class Mapping
+    class GenericMapping
     {
     public:
         void map( const T& in, const T& out )
