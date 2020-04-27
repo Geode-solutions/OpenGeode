@@ -32,13 +32,11 @@
 
 #include <geode/model/common.h>
 #include <geode/model/mixin/builder/add_components_builders.h>
-#include <geode/model/mixin/builder/blocks_builder.h>
 #include <geode/model/mixin/builder/corners_builder.h>
 #include <geode/model/mixin/builder/lines_builder.h>
 #include <geode/model/mixin/builder/model_boundaries_builder.h>
 #include <geode/model/mixin/builder/surfaces_builder.h>
 #include <geode/model/mixin/builder/topology_builder.h>
-#include <geode/model/mixin/core/blocks.h>
 #include <geode/model/mixin/core/corners.h>
 #include <geode/model/mixin/core/lines.h>
 #include <geode/model/mixin/core/model_boundaries.h>
@@ -56,7 +54,7 @@ namespace geode
 
     namespace detail
     {
-        struct ModelCopyMapping;
+        class ModelCopyMapping;
     } // namespace detail
 } // namespace geode
 

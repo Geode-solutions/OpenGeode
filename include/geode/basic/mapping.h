@@ -55,16 +55,6 @@ namespace geode
             return out2in_.at( out );
         }
 
-        const absl::flat_hash_map< T, T >& get() const
-        {
-            return in2out_;
-        }
-
-        const absl::flat_hash_map< T, T >& get_inverse() const
-        {
-            return out2in_;
-        }
-
     private:
         absl::flat_hash_map< T, T > in2out_;
         absl::flat_hash_map< T, T > out2in_;
@@ -80,11 +70,11 @@ namespace geode
             out2in_[out].push_back( in );
         }
 
-        // void reserve( index_t capacity )
-        // {
-        //     in2out_.reserve( capacity );
-        //     out2in_.reserve( capacity );
-        // }
+        void reserve( index_t capacity )
+        {
+            in2out_.reserve( capacity );
+            out2in_.reserve( capacity );
+        }
 
         const absl::InlinedVector< T, Capacity >& in2out( const T& in ) const
         {

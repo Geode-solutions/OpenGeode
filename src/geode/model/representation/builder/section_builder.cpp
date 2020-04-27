@@ -23,7 +23,6 @@
 
 #include <geode/model/representation/builder/section_builder.h>
 
-#include <geode/model/mixin/core/block.h>
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/line.h>
 #include <geode/model/mixin/core/model_boundary.h>

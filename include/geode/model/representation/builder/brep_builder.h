@@ -58,7 +58,7 @@ namespace geode
 
     namespace detail
     {
-        struct ModelCopyMapping;
+        class ModelCopyMapping;
     } // namespace detail
 } // namespace geode
 
