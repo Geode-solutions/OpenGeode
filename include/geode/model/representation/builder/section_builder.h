@@ -51,10 +51,13 @@ namespace geode
     ALIAS_2D( Line );
     ALIAS_2D( ModelBoundary );
     ALIAS_2D( Surface );
-
     class Section;
-
     struct uuid;
+
+    namespace detail
+    {
+        struct ModelCopyMapping;
+    } // namespace detail
 } // namespace geode
 
 namespace geode
@@ -76,28 +79,18 @@ namespace geode
         OPENGEODE_DISABLE_COPY( SectionBuilder );
 
     public:
-        struct ComponentMapping
-        {
-            using UUIDMapping = BijectiveMapping< uuid >;
-            UUIDMapping corners;
-            UUIDMapping lines;
-            UUIDMapping surfaces;
-            UUIDMapping collections;
-        };
-
-    public:
         SectionBuilder( Section& section );
         SectionBuilder( SectionBuilder&& ) = default;
 
         void copy( const Section& section );
 
-        ComponentMapping copy_components( const Section& section );
+        detail::ModelCopyMapping copy_components( const Section& section );
 
         void copy_component_relationships(
-            const ComponentMapping& mapping, const Section& section );
+            const detail::ModelCopyMapping& mapping, const Section& section );
 
         void copy_component_geometry(
-            const ComponentMapping& mapping, const Section& section );
+            const detail::ModelCopyMapping& mapping, const Section& section );
 
         const uuid& add_corner();
 

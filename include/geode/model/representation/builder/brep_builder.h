@@ -53,10 +53,13 @@ namespace geode
     ALIAS_3D( Line );
     ALIAS_3D( ModelBoundary );
     ALIAS_3D( Surface );
-
     class BRep;
-
     struct uuid;
+
+    namespace detail
+    {
+        struct ModelCopyMapping;
+    } // namespace detail
 } // namespace geode
 
 namespace geode
@@ -80,29 +83,18 @@ namespace geode
         OPENGEODE_DISABLE_COPY( BRepBuilder );
 
     public:
-        struct ComponentMapping
-        {
-            using UUIDMapping = BijectiveMapping< uuid >;
-            UUIDMapping corners;
-            UUIDMapping lines;
-            UUIDMapping surfaces;
-            UUIDMapping blocks;
-            UUIDMapping collections;
-        };
-
-    public:
         BRepBuilder( BRep& brep );
         BRepBuilder( BRepBuilder&& ) = default;
 
         void copy( const BRep& brep );
 
-        ComponentMapping copy_components( const BRep& brep );
+        detail::ModelCopyMapping copy_components( const BRep& brep );
 
         void copy_component_relationships(
-            const ComponentMapping& mapping, const BRep& brep );
+            const detail::ModelCopyMapping& mapping, const BRep& brep );
 
         void copy_component_geometry(
-            const ComponentMapping& mapping, const BRep& brep );
+            const detail::ModelCopyMapping& mapping, const BRep& brep );
 
         const uuid& add_corner();
 

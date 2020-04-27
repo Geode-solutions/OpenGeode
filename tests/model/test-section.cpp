@@ -38,6 +38,7 @@
 #include <geode/model/mixin/core/line.h>
 #include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
+#include <geode/model/representation/builder/detail/copy.h>
 #include <geode/model/representation/builder/section_builder.h>
 #include <geode/model/representation/core/section.h>
 #include <geode/model/representation/io/section_input.h>
@@ -396,8 +397,8 @@ void test_clone( const geode::Section& section )
     OPENGEODE_EXCEPTION( section2.nb_model_boundaries() == 2,
         "[Test] Section should have 2 model boundaries" );
 
-    const auto mapping = builder.copy_components( section );
-    builder.copy_component_relationships( mapping, section );
+    const auto mappings = builder.copy_components( section );
+    builder.copy_component_relationships( mappings, section );
     OPENGEODE_EXCEPTION(
         section2.nb_corners() == 10, "[Test] Section should have 10 corners" );
     OPENGEODE_EXCEPTION(
@@ -409,14 +410,17 @@ void test_clone( const geode::Section& section )
 
     for( const auto& corner : section.corners() )
     {
-        const auto& new_corner =
-            section2.corner( mapping.corners.in2out( corner.id() ) );
+        const auto& new_corner = section2.corner(
+            mappings.at( geode::Corner2D::component_type_static() )
+                .in2out( corner.id() ) );
         for( const auto& line : section.incidences( corner ) )
         {
             bool found = { false };
             for( const auto& new_line : section2.incidences( new_corner ) )
             {
-                if( mapping.lines.in2out( line.id() ) == new_line.id() )
+                if( mappings.at( geode::Line2D::component_type_static() )
+                        .in2out( line.id() )
+                    == new_line.id() )
                 {
                     found = true;
                     break;
@@ -429,13 +433,15 @@ void test_clone( const geode::Section& section )
     for( const auto& line : section.lines() )
     {
         const auto& new_line =
-            section2.line( mapping.lines.in2out( line.id() ) );
+            section2.line( mappings.at( geode::Line2D::component_type_static() )
+                               .in2out( line.id() ) );
         for( const auto& surface : section.incidences( line ) )
         {
             bool found = { false };
             for( const auto& new_surface : section2.incidences( new_line ) )
             {
-                if( mapping.surfaces.in2out( surface.id() )
+                if( mappings.at( geode::Surface2D::component_type_static() )
+                        .in2out( surface.id() )
                     == new_surface.id() )
                 {
                     found = true;
@@ -449,13 +455,16 @@ void test_clone( const geode::Section& section )
     for( const auto& model_boundary : section.model_boundaries() )
     {
         const auto& new_model_boundary = section2.model_boundary(
-            mapping.collections.in2out( model_boundary.id() ) );
+            mappings.at( geode::ModelBoundary2D::component_type_static() )
+                .in2out( model_boundary.id() ) );
         for( const auto& line : section.items( model_boundary ) )
         {
             bool found = { false };
             for( const auto& new_line : section2.items( new_model_boundary ) )
             {
-                if( mapping.lines.in2out( line.id() ) == new_line.id() )
+                if( mappings.at( geode::Line2D::component_type_static() )
+                        .in2out( line.id() )
+                    == new_line.id() )
                 {
                     found = true;
                     break;

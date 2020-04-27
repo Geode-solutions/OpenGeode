@@ -34,9 +34,6 @@ namespace geode
     class BijectiveMapping
     {
     public:
-        BijectiveMapping() = default;
-
-    public:
         void map( const T& in, const T& out )
         {
             in2out_.emplace( in, out );
@@ -76,9 +73,6 @@ namespace geode
     template < typename T, index_t Capacity >
     class Mapping
     {
-    public:
-        Mapping() = default;
-
     public:
         void map( const T& in, const T& out )
         {

@@ -41,17 +41,43 @@
 #include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
 
+namespace
+{
+}
+
 namespace geode
 {
     namespace detail
     {
-        using UUIDMapping = BijectiveMapping< uuid >;
+        using Mapping = BijectiveMapping< uuid >;
+
+        class ModelCopyMapping
+        {
+        public:
+            Mapping& at( const ComponentType& type )
+            {
+                return mappings.at( type );
+            }
+
+            const Mapping& at( const ComponentType& type ) const
+            {
+                return mappings.at( type );
+            }
+
+            void emplace( const ComponentType& type, Mapping mapping )
+            {
+                mappings.emplace( type, std::move( mapping ) );
+            }
+
+        private:
+            absl::flat_hash_map< ComponentType, Mapping > mappings;
+        };
 
         template < typename ModelFrom, typename ModelTo, typename BuilderTo >
-        UUIDMapping copy_corner_components(
+        Mapping copy_corner_components(
             const ModelFrom& from, const ModelTo& to, BuilderTo& builder_to )
         {
-            UUIDMapping mapping;
+            Mapping mapping;
             mapping.reserve( from.nb_corners() );
             for( const auto& corner : from.corners() )
             {
@@ -64,10 +90,10 @@ namespace geode
         }
 
         template < typename ModelFrom, typename ModelTo, typename BuilderTo >
-        UUIDMapping copy_line_components(
+        Mapping copy_line_components(
             const ModelFrom& from, const ModelTo& to, BuilderTo& builder_to )
         {
-            UUIDMapping mapping;
+            Mapping mapping;
             mapping.reserve( from.nb_lines() );
             for( const auto& line : from.lines() )
             {
@@ -79,10 +105,10 @@ namespace geode
         }
 
         template < typename ModelFrom, typename ModelTo, typename BuilderTo >
-        UUIDMapping copy_surface_components(
+        Mapping copy_surface_components(
             const ModelFrom& from, const ModelTo& to, BuilderTo& builder_to )
         {
-            UUIDMapping mapping;
+            Mapping mapping;
             mapping.reserve( from.nb_surfaces() );
             for( const auto& surface : from.surfaces() )
             {
@@ -95,10 +121,10 @@ namespace geode
         }
 
         template < typename ModelFrom, typename ModelTo, typename BuilderTo >
-        UUIDMapping copy_block_components(
+        Mapping copy_block_components(
             const ModelFrom& from, const ModelTo& to, BuilderTo& builder_to )
         {
-            UUIDMapping mapping;
+            Mapping mapping;
             mapping.reserve( from.nb_blocks() );
             for( const auto& block : from.blocks() )
             {
@@ -111,10 +137,10 @@ namespace geode
         }
 
         template < typename Model, typename BuilderTo >
-        UUIDMapping copy_model_boundary_components(
+        Mapping copy_model_boundary_components(
             const Model& from, BuilderTo& builder_to )
         {
-            UUIDMapping mapping;
+            Mapping mapping;
             mapping.reserve( from.nb_model_boundaries() );
             for( const auto& model_boundary : from.model_boundaries() )
             {
@@ -128,8 +154,8 @@ namespace geode
         void copy_corner_line_relationships( const ModelFrom& from,
             const ModelTo& to,
             BuilderTo& builder_to,
-            const UUIDMapping& corners,
-            const UUIDMapping& lines )
+            const Mapping& corners,
+            const Mapping& lines )
         {
             for( const auto& line : from.lines() )
             {
@@ -148,8 +174,8 @@ namespace geode
         void copy_corner_surface_relationships( const ModelFrom& from,
             const ModelTo& to,
             BuilderTo& builder_to,
-            const UUIDMapping& corners,
-            const UUIDMapping& surfaces )
+            const Mapping& corners,
+            const Mapping& surfaces )
         {
             for( const auto& surface : from.surfaces() )
             {
@@ -169,8 +195,8 @@ namespace geode
         void copy_line_surface_relationships( const ModelFrom& from,
             const ModelTo& to,
             BuilderTo& builder_to,
-            const UUIDMapping& lines,
-            const UUIDMapping& surfaces )
+            const Mapping& lines,
+            const Mapping& surfaces )
         {
             for( const auto& surface : from.surfaces() )
             {
@@ -195,8 +221,8 @@ namespace geode
         void copy_corner_block_relationships( const ModelFrom& from,
             const ModelTo& to,
             BuilderTo& builder_to,
-            const UUIDMapping& corners,
-            const UUIDMapping& blocks )
+            const Mapping& corners,
+            const Mapping& blocks )
         {
             for( const auto& block : from.blocks() )
             {
@@ -215,8 +241,8 @@ namespace geode
         void copy_line_block_relationships( const ModelFrom& from,
             const ModelTo& to,
             BuilderTo& builder_to,
-            const UUIDMapping& lines,
-            const UUIDMapping& blocks )
+            const Mapping& lines,
+            const Mapping& blocks )
         {
             for( const auto& block : from.blocks() )
             {
@@ -234,8 +260,8 @@ namespace geode
         void copy_surface_block_relationships( const ModelFrom& from,
             const ModelTo& to,
             BuilderTo& builder_to,
-            const UUIDMapping& surfaces,
-            const UUIDMapping& blocks )
+            const Mapping& surfaces,
+            const Mapping& blocks )
         {
             for( const auto& block : from.blocks() )
             {
@@ -261,7 +287,7 @@ namespace geode
         void copy_corner_geometry( const ModelFrom& from,
             const ModelTo& to,
             BuilderTo& builder_to,
-            const UUIDMapping& corners )
+            const Mapping& corners )
         {
             for( const auto& corner : from.corners() )
             {
@@ -275,7 +301,7 @@ namespace geode
         void copy_line_geometry( const ModelFrom& from,
             const ModelTo& to,
             BuilderTo& builder_to,
-            const UUIDMapping& lines )
+            const Mapping& lines )
         {
             for( const auto& line : from.lines() )
             {
@@ -288,7 +314,7 @@ namespace geode
         void copy_surface_geometry( const ModelFrom& from,
             const ModelTo& to,
             BuilderTo& builder_to,
-            const UUIDMapping& surfaces )
+            const Mapping& surfaces )
         {
             for( const auto& surface : from.surfaces() )
             {
@@ -302,7 +328,7 @@ namespace geode
         void copy_block_geometry( const ModelFrom& from,
             const ModelTo& to,
             BuilderTo& builder_to,
-            const UUIDMapping& blocks )
+            const Mapping& blocks )
         {
             for( const auto& block : from.blocks() )
             {
@@ -316,7 +342,7 @@ namespace geode
         void copy_vertex_identifier_components( const Model& from,
             BuilderTo& builder_to,
             const ComponentType& type,
-            const UUIDMapping& mapping )
+            const Mapping& mapping )
         {
             for( const auto v : Range{ from.nb_unique_vertices() } )
             {

@@ -40,6 +40,7 @@
 #include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
 #include <geode/model/representation/builder/brep_builder.h>
+#include <geode/model/representation/builder/detail/copy.h>
 #include <geode/model/representation/core/brep.h>
 #include <geode/model/representation/io/brep_input.h>
 #include <geode/model/representation/io/brep_output.h>
@@ -611,8 +612,8 @@ void test_clone( const geode::BRep& brep )
     OPENGEODE_EXCEPTION( brep2.nb_model_boundaries() == 3,
         "[Test] BRep should have 3 model boundaries" );
 
-    const auto mapping = builder.copy_components( brep );
-    builder.copy_component_relationships( mapping, brep );
+    const auto mappings = builder.copy_components( brep );
+    builder.copy_component_relationships( mappings, brep );
     OPENGEODE_EXCEPTION(
         brep2.nb_corners() == 12, "[Test] BRep should have 12 corners" );
     OPENGEODE_EXCEPTION(
@@ -626,14 +627,17 @@ void test_clone( const geode::BRep& brep )
 
     for( const auto& corner : brep.corners() )
     {
-        const auto& new_corner =
-            brep2.corner( mapping.corners.in2out( corner.id() ) );
+        const auto& new_corner = brep2.corner(
+            mappings.at( geode::Corner3D::component_type_static() )
+                .in2out( corner.id() ) );
         for( const auto& line : brep.incidences( corner ) )
         {
             bool found{ false };
             for( const auto& new_line : brep2.incidences( new_corner ) )
             {
-                if( mapping.lines.in2out( line.id() ) == new_line.id() )
+                if( mappings.at( geode::Line3D::component_type_static() )
+                        .in2out( line.id() )
+                    == new_line.id() )
                 {
                     found = true;
                     break;
@@ -645,13 +649,16 @@ void test_clone( const geode::BRep& brep )
     }
     for( const auto& line : brep.lines() )
     {
-        const auto& new_line = brep2.line( mapping.lines.in2out( line.id() ) );
+        const auto& new_line =
+            brep2.line( mappings.at( geode::Line3D::component_type_static() )
+                            .in2out( line.id() ) );
         for( const auto& surface : brep.incidences( line ) )
         {
             bool found = { false };
             for( const auto& new_surface : brep2.incidences( new_line ) )
             {
-                if( mapping.surfaces.in2out( surface.id() )
+                if( mappings.at( geode::Surface3D::component_type_static() )
+                        .in2out( surface.id() )
                     == new_surface.id() )
                 {
                     found = true;
@@ -664,14 +671,17 @@ void test_clone( const geode::BRep& brep )
     }
     for( const auto& surface : brep.surfaces() )
     {
-        const auto& new_surface =
-            brep2.surface( mapping.surfaces.in2out( surface.id() ) );
+        const auto& new_surface = brep2.surface(
+            mappings.at( geode::Surface3D::component_type_static() )
+                .in2out( surface.id() ) );
         for( const auto& block : brep.incidences( surface ) )
         {
             bool found = { false };
             for( const auto& new_block : brep2.incidences( new_surface ) )
             {
-                if( mapping.blocks.in2out( block.id() ) == new_block.id() )
+                if( mappings.at( geode::Block3D::component_type_static() )
+                        .in2out( block.id() )
+                    == new_block.id() )
                 {
                     found = true;
                     break;
@@ -684,13 +694,15 @@ void test_clone( const geode::BRep& brep )
     for( const auto& model_boundary : brep.model_boundaries() )
     {
         const auto& new_model_boundary = brep2.model_boundary(
-            mapping.collections.in2out( model_boundary.id() ) );
+            mappings.at( geode::ModelBoundary3D::component_type_static() )
+                .in2out( model_boundary.id() ) );
         for( const auto& surface : brep.items( model_boundary ) )
         {
             bool found = { false };
             for( const auto& new_surface : brep2.items( new_model_boundary ) )
             {
-                if( mapping.surfaces.in2out( surface.id() )
+                if( mappings.at( geode::Surface3D::component_type_static() )
+                        .in2out( surface.id() )
                     == new_surface.id() )
                 {
                     found = true;
