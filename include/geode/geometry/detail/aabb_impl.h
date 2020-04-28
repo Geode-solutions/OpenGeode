@@ -77,7 +77,7 @@ namespace geode
             tree_[i].add_box( box );
         }
 
-        index_t mapping_morton( index_t i )
+        index_t mapping_morton( index_t i ) const
         {
             return mapping_morton_[i];
         }
@@ -160,13 +160,8 @@ namespace geode
             index_t child_right;
             get_recursive_iterators( node_index, box_begin, box_end, box_middle,
                 child_left, child_right );
-            if( action( ( node( child_left ).min() + node( child_left ).max() )
-                            / 2.,
-                    query )
-                < action(
-                    ( node( child_right ).min() + node( child_right ).max() )
-                        / 2.,
-                    query ) )
+            if( point_box_signed_distance( query, node( child_left ) )
+                < point_box_signed_distance( query, node( child_right ) ) )
             {
                 box_end = box_middle;
                 node_index = child_left;
@@ -178,10 +173,10 @@ namespace geode
             }
         }
 
-        const auto nearest_box = impl_->mapping_morton( box_begin );
-        const auto nearest_point =
-            get_point_hint_from_box( node( box_begin ), nearest_box );
-        const auto distance = action( query, nearest_point );
+        auto nearest_box = impl_->mapping_morton( box_begin );
+        double distance;
+        Point< dimension > nearest_point;
+        std::tie( distance, nearest_point ) = action( query, nearest_box );
 
         impl_->closest_element_box_recursive( query, nearest_box, nearest_point,
             distance, Impl::ROOT_INDEX, 0, nb_bboxes(), action );
@@ -300,7 +295,7 @@ namespace geode
         OPENGEODE_ASSERT( element_begin != element_end, "" );
 
         // Prune sub-tree that does not have intersection
-        if( !box.bboxes_overlap( node( node_index ) ) )
+        if( !box.intersects( node( node_index ) ) )
         {
             return;
         }
@@ -347,7 +342,7 @@ namespace geode
         }
 
         // The acceleration is here:
-        if( !node( node_index1 ).bboxes_overlap( node( node_index2 ) ) )
+        if( !node( node_index1 ).intersects( node( node_index2 ) ) )
         {
             return;
         }

@@ -45,40 +45,59 @@ namespace geode
         OPENGEODE_TEMPLATE_ASSERT_2D_OR_3D( dimension );
 
     public:
+        /*!
+         * AABB tree structure implementation
+         * The tree is store in s single vector following this example:
+         *                          ROOT
+         *                        /      \
+         *                      A1        A2
+         *                    /    \     /   \
+         *                  B1     B2   B3    B4
+         *  where B* are the input bboxes
+         *  Storage: |empty|ROOT|A1|A2|B1|B2|B3|B4|
+         *
+         *  The lower level of the tree reference each object in its bounding
+         * box. In the example B1, B2, B3 and B4 are boxes which idex match the
+         * index of objects in the initial container.
+         */
         AABBTree( absl::Span< const BoundingBox< dimension > > bboxes );
-        virtual ~AABBTree();
+        ~AABBTree();
 
+        /*!
+         * @brief Gets the nuber of boxes in the lower level of the aabb tree.
+         * @note This value should match the initial size of the container that
+         * store all objects to organize the the aabb tree.
+         */
         index_t nb_bboxes() const;
 
         /*!
-         * @brief Gets the closest element box to a point
+         * @brief Gets the closest element to a point
          * @param[in] query the point to test
          * @param[in] action the functor to compute the distance between
-         * the \p query and the tree element boxes
+         * the \p query and the tree element in boxes
          * @return a tuple containing:
-         * - the index of the closest element box.
-         * - the nearest point on the element box.
-         * - the distance between the \p query.
-         * and \p nearest_point.
+         * - the index of the closest element/box.
+         * - the nearest point on the element in box.
+         * - the distance between the \p query and \p nearest_point.
+         *
          * @tparam EvalDistance this functor should have an operator() defined
          * like this:
          *  std::tuple< double, Point< dimension > > operator()(
          *      const Point< dimension >& query,
-         *      index_t cur_box ) const ;
-         * @tparam EvalDistance should also have an operator () defined like
-         * this to compute the distance betwenn two point: double operator()
-         * const (const Point< dimension >& pt1,const Point< dimension >& pt2)
-         * to compute
-         * where query is the same than \p query, cur_box is the element box
-         * index
+         *      index_t curent_element_box ) const ;
+         * the output tuple contain
+         * - a double to store the distance between the point \p query and the
+         * element stored in the \p curent_element_box.
+         * - a Point< dimension > to store the nearest point from \p query on
+         * the object stored in the \p curent_element_box.
          */
         template < typename EvalDistance >
         std::tuple< index_t, Point< dimension >, double > closest_element_box(
             const Point< dimension >& query, const EvalDistance& action ) const;
 
-        /*
+        /*!
          * @brief Computes the intersections between a given
-         * box and the element boxes.
+         * box and the all element boxes.
          * @param[in] box the box to test
          * @param[in] action The functor to run when an element box intersects
          * \p box
@@ -123,19 +142,6 @@ namespace geode
         }
 
         const BoundingBox< dimension >& node( index_t i ) const;
-
-    private:
-        /*!
-         * @brief Gets an element point from its box
-         * @details This function is used to get a result from the selected hint
-         * box
-         */
-        virtual Point< dimension > get_point_hint_from_box(
-            const BoundingBox< dimension >& box, index_t element_id ) const
-        {
-            geode_unused( element_id );
-            return ( box.min() + box.max() ) / 2.;
-        }
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );
