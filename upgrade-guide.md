@@ -1,5 +1,37 @@
 # Upgrade Guide
 
+## Upgrading from OpenGeode v4.x.x to v5.0.0
+
+### Motivations
+
+TODO
+
+### Breaking Changes
+
+- **Model copy**: mappings between model components have been modified to open design to arbitrary collections. It means that you can add additional information to these mappings for your own copy functions.
+
+**How to upgrade**
+
+`ComponentMapping` has been moved out from `geode::BRep` and `geode::Section` and renamed `geode::detail::ModelCopyMapping` declares and defined in `include/geode/model/representation/builder/detail/copy.h`. 
+
+`geode::detail::ModelCopyMapping` works at a map whose keys are `geode::ComponentType`. It implies to get access to a specific mapping using for example:
+
+```
+const auto& corner_mapping = mappings.at( Corner3D::component_type_static() );
+```
+
+To add a mapping between two components, use:
+```
+auto& corner_mapping = mappings.at( Corner3D::component_type_static() );
+corner_mapping.emplace( uuid1, uuid2 );
+```
+
+To get a mapping between two components, use:
+```
+const auto& corner_mapping = mappings.at( Corner3D::component_type_static() );
+corner_mapping.in2out( uuid1 );
+```
+
 ## Upgrading from OpenGeode v3.x.x to v4.0.0
 
 ### Motivations
