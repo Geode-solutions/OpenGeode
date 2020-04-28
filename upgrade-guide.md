@@ -14,7 +14,7 @@ TODO
 
 `ComponentMapping` has been moved out from `geode::BRep` and `geode::Section` and renamed `geode::detail::ModelCopyMapping` declares and defined in `include/geode/model/representation/builder/detail/copy.h`. 
 
-`geode::detail::ModelCopyMapping` works at a map whose keys are `geode::ComponentType`. It implies to get access to a specific mapping using for example:
+`geode::detail::ModelCopyMapping` works as a map whose keys are `geode::ComponentType`. It implies to get access to a specific mapping using for example:
 
 ```
 const auto& corner_mapping = mappings.at( Corner3D::component_type_static() );
@@ -358,4 +358,3 @@ vertex_identifier.remove_component( line.id() );
 const geode::Line3D& line = get_a_line();
 vertex_identifier.remove_component( line );
 ```
-
