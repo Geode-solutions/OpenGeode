@@ -21,8 +21,11 @@
  *
  */
 
+#pragma once
+
 #include <absl/container/flat_hash_map.h>
 
+#include <geode/basic/mapping.h>
 #include <geode/basic/range.h>
 #include <geode/basic/uuid.h>
 
@@ -42,7 +45,29 @@ namespace geode
 {
     namespace detail
     {
-        using Mapping = absl::flat_hash_map< uuid, uuid >;
+        using Mapping = BijectiveMapping< uuid >;
+
+        class ModelCopyMapping
+        {
+        public:
+            Mapping& at( const ComponentType& type )
+            {
+                return mappings.at( type );
+            }
+
+            const Mapping& at( const ComponentType& type ) const
+            {
+                return mappings.at( type );
+            }
+
+            void emplace( const ComponentType& type, Mapping mapping )
+            {
+                mappings.emplace( type, std::move( mapping ) );
+            }
+
+        private:
+            absl::flat_hash_map< ComponentType, Mapping > mappings;
+        };
 
         template < typename ModelFrom, typename ModelTo, typename BuilderTo >
         Mapping copy_corner_components(
@@ -54,7 +79,7 @@ namespace geode
             {
                 const auto id =
                     builder_to.add_corner( corner.mesh().type_name() );
-                mapping.emplace( corner.id(), id );
+                mapping.map( corner.id(), id );
                 builder_to.register_mesh_component( to.corner( id ) );
             }
             return mapping;
@@ -69,7 +94,7 @@ namespace geode
             for( const auto& line : from.lines() )
             {
                 const auto id = builder_to.add_line( line.mesh().type_name() );
-                mapping.emplace( line.id(), id );
+                mapping.map( line.id(), id );
                 builder_to.register_mesh_component( to.line( id ) );
             }
             return mapping;
@@ -85,7 +110,7 @@ namespace geode
             {
                 const auto id =
                     builder_to.add_surface( surface.mesh().type_name() );
-                mapping.emplace( surface.id(), id );
+                mapping.map( surface.id(), id );
                 builder_to.register_mesh_component( to.surface( id ) );
             }
             return mapping;
@@ -101,7 +126,7 @@ namespace geode
             {
                 const auto id =
                     builder_to.add_block( block.mesh().type_name() );
-                mapping.emplace( block.id(), id );
+                mapping.map( block.id(), id );
                 builder_to.register_mesh_component( to.block( id ) );
             }
             return mapping;
@@ -115,7 +140,7 @@ namespace geode
             mapping.reserve( from.nb_model_boundaries() );
             for( const auto& model_boundary : from.model_boundaries() )
             {
-                mapping.emplace(
+                mapping.map(
                     model_boundary.id(), builder_to.add_model_boundary() );
             }
             return mapping;
@@ -130,11 +155,11 @@ namespace geode
         {
             for( const auto& line : from.lines() )
             {
-                const auto& new_line = to.line( lines.at( line.id() ) );
+                const auto& new_line = to.line( lines.in2out( line.id() ) );
                 for( const auto& corner : from.boundaries( line ) )
                 {
                     const auto& new_corner =
-                        to.corner( corners.at( corner.id() ) );
+                        to.corner( corners.in2out( corner.id() ) );
                     builder_to.add_corner_line_boundary_relationship(
                         new_corner, new_line );
                 }
@@ -151,11 +176,11 @@ namespace geode
             for( const auto& surface : from.surfaces() )
             {
                 const auto& new_surface =
-                    to.surface( surfaces.at( surface.id() ) );
+                    to.surface( surfaces.in2out( surface.id() ) );
                 for( const auto& corner : from.internal_corners( surface ) )
                 {
                     const auto& new_corner =
-                        to.corner( corners.at( corner.id() ) );
+                        to.corner( corners.in2out( corner.id() ) );
                     builder_to.add_corner_surface_internal_relationship(
                         new_corner, new_surface );
                 }
@@ -172,16 +197,16 @@ namespace geode
             for( const auto& surface : from.surfaces() )
             {
                 const auto& new_surface =
-                    to.surface( surfaces.at( surface.id() ) );
+                    to.surface( surfaces.in2out( surface.id() ) );
                 for( const auto& line : from.boundaries( surface ) )
                 {
-                    const auto& new_line = to.line( lines.at( line.id() ) );
+                    const auto& new_line = to.line( lines.in2out( line.id() ) );
                     builder_to.add_line_surface_boundary_relationship(
                         new_line, new_surface );
                 }
                 for( const auto& line : from.internal_lines( surface ) )
                 {
-                    const auto& new_line = to.line( lines.at( line.id() ) );
+                    const auto& new_line = to.line( lines.in2out( line.id() ) );
                     builder_to.add_line_surface_internal_relationship(
                         new_line, new_surface );
                 }
@@ -197,11 +222,11 @@ namespace geode
         {
             for( const auto& block : from.blocks() )
             {
-                const auto& new_block = to.block( blocks.at( block.id() ) );
+                const auto& new_block = to.block( blocks.in2out( block.id() ) );
                 for( const auto& corner : from.internal_corners( block ) )
                 {
                     const auto& new_corner =
-                        to.corner( corners.at( corner.id() ) );
+                        to.corner( corners.in2out( corner.id() ) );
                     builder_to.add_corner_block_internal_relationship(
                         new_corner, new_block );
                 }
@@ -217,10 +242,10 @@ namespace geode
         {
             for( const auto& block : from.blocks() )
             {
-                const auto& new_block = to.block( blocks.at( block.id() ) );
+                const auto& new_block = to.block( blocks.in2out( block.id() ) );
                 for( const auto& line : from.internal_lines( block ) )
                 {
-                    const auto& new_line = to.line( lines.at( line.id() ) );
+                    const auto& new_line = to.line( lines.in2out( line.id() ) );
                     builder_to.add_line_block_internal_relationship(
                         new_line, new_block );
                 }
@@ -236,18 +261,18 @@ namespace geode
         {
             for( const auto& block : from.blocks() )
             {
-                const auto& new_block = to.block( blocks.at( block.id() ) );
+                const auto& new_block = to.block( blocks.in2out( block.id() ) );
                 for( const auto& surface : from.boundaries( block ) )
                 {
                     const auto& new_surface =
-                        to.surface( surfaces.at( surface.id() ) );
+                        to.surface( surfaces.in2out( surface.id() ) );
                     builder_to.add_surface_block_boundary_relationship(
                         new_surface, new_block );
                 }
                 for( const auto& surface : from.internal_surfaces( block ) )
                 {
                     const auto& new_surface =
-                        to.surface( surfaces.at( surface.id() ) );
+                        to.surface( surfaces.in2out( surface.id() ) );
                     builder_to.add_surface_block_internal_relationship(
                         new_surface, new_block );
                 }
@@ -263,7 +288,7 @@ namespace geode
             for( const auto& corner : from.corners() )
             {
                 builder_to.update_corner_mesh(
-                    to.corner( corners.at( corner.id() ) ),
+                    to.corner( corners.in2out( corner.id() ) ),
                     corner.mesh().clone() );
             }
         }
@@ -277,7 +302,7 @@ namespace geode
             for( const auto& line : from.lines() )
             {
                 builder_to.update_line_mesh(
-                    to.line( lines.at( line.id() ) ), line.mesh().clone() );
+                    to.line( lines.in2out( line.id() ) ), line.mesh().clone() );
             }
         }
 
@@ -290,7 +315,7 @@ namespace geode
             for( const auto& surface : from.surfaces() )
             {
                 builder_to.update_surface_mesh(
-                    to.surface( surfaces.at( surface.id() ) ),
+                    to.surface( surfaces.in2out( surface.id() ) ),
                     surface.mesh().clone() );
             }
         }
@@ -304,7 +329,8 @@ namespace geode
             for( const auto& block : from.blocks() )
             {
                 builder_to.update_block_mesh(
-                    to.block( blocks.at( block.id() ) ), block.mesh().clone() );
+                    to.block( blocks.in2out( block.id() ) ),
+                    block.mesh().clone() );
             }
         }
 
@@ -320,7 +346,8 @@ namespace geode
                 for( const auto& mesh_vertex : vertices )
                 {
                     builder_to.set_unique_vertex(
-                        { { type, mapping.at( mesh_vertex.component_id.id() ) },
+                        { { type,
+                              mapping.in2out( mesh_vertex.component_id.id() ) },
                             mesh_vertex.vertex },
                         v );
                 }

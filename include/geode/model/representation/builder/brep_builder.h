@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <geode/basic/mapping.h>
+
 #include <geode/mesh/core/edged_curve.h>
 #include <geode/mesh/core/mesh_type.h>
 #include <geode/mesh/core/point_set.h>
@@ -51,10 +53,13 @@ namespace geode
     ALIAS_3D( Line );
     ALIAS_3D( ModelBoundary );
     ALIAS_3D( Surface );
-
     class BRep;
-
     struct uuid;
+
+    namespace detail
+    {
+        class ModelCopyMapping;
+    } // namespace detail
 } // namespace geode
 
 namespace geode
@@ -78,29 +83,18 @@ namespace geode
         OPENGEODE_DISABLE_COPY( BRepBuilder );
 
     public:
-        struct ComponentMapping
-        {
-            using Mapping = absl::flat_hash_map< uuid, uuid >;
-            Mapping corners;
-            Mapping lines;
-            Mapping surfaces;
-            Mapping blocks;
-            Mapping model_boundaries;
-        };
-
-    public:
         BRepBuilder( BRep& brep );
         BRepBuilder( BRepBuilder&& ) = default;
 
         void copy( const BRep& brep );
 
-        ComponentMapping copy_components( const BRep& brep );
+        detail::ModelCopyMapping copy_components( const BRep& brep );
 
         void copy_component_relationships(
-            const ComponentMapping& mapping, const BRep& brep );
+            const detail::ModelCopyMapping& mapping, const BRep& brep );
 
         void copy_component_geometry(
-            const ComponentMapping& mapping, const BRep& brep );
+            const detail::ModelCopyMapping& mapping, const BRep& brep );
 
         const uuid& add_corner();
 
