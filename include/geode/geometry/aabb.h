@@ -90,6 +90,9 @@ namespace geode
          * element stored in the \p curent_element_box.
          * - a Point< dimension > to store the nearest point from \p query on
          * the object stored in the \p curent_element_box.
+         *
+         * @note if several elements box cannot be discriminate by the distance
+         * computation one of them will be randomly retuned.
          */
         template < typename EvalDistance >
         std::tuple< index_t, Point< dimension >, double > closest_element_box(
@@ -101,23 +104,33 @@ namespace geode
          * @param[in] box the box to test
          * @param[in] action The functor to run when an element box intersects
          * \p box
+         *
          * @tparam EvalIntersection this functor should have an operator()
          * defined like this:
-         * void operator()( index_t cur_box ) ;
-         * where cur_box is the element box index
+         * void operator()( index_t cur_element_box ) ;
+         *
+         * @note where cur_element_box is the element box index
+         * that is intersected by \p box.
+         * @note A posibility is to define this operator to add \p
+         * cur_element_box to a set and build a set of tree element that
+         * intersect the \p box.
          */
         template < class EvalIntersection >
         void compute_bbox_element_bbox_intersections(
             const BoundingBox< dimension >& box,
             EvalIntersection& action ) const;
 
-        /*
+        /*!
          * @brief Computes the self intersections of the element boxes.
          * @param[in] action The functor to run when two boxes intersect
          * @tparam EvalIntersection this functor should have an operator()
          * defined like this:
-         * void operator()( index_t box1, index_t box2 ) ;
-         * where box1 and box2 are the element box indices
+         * void operator()( index_t cur_element_box1, index_t cur_element_box2 )
+         * ;
+         * @note cur_element_box1 and cur_element_box2 are the element box
+         * indices that intersect.
+         * @note the operator can be defined to test real intersection between
+         * element in boxes and store the result.
          */
         template < class EvalIntersection >
         void compute_self_element_bbox_intersections(

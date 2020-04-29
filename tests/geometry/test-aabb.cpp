@@ -71,10 +71,13 @@ index_t global_box_index( index_t i, index_t j, index_t size )
 }
 
 template < index_t dimension >
-void test_build_aabb( index_t nb_box, double box_size )
+void test_build_aabb()
 {
+    index_t nb_boxes = 100;
+    double box_size = 0.25;
+    // create a grid of separate boxes
     std::vector< geode::BoundingBox< dimension > > box_vector =
-        create_box_vector< dimension >( nb_box, box_size );
+        create_box_vector< dimension >( nb_boxes, box_size );
     AABBTree< dimension > aabb( box_vector );
 
     // check number of box
@@ -112,8 +115,11 @@ private:
 };
 
 template < index_t dimension >
-void test_nearest_neighbor_search( index_t nb_boxes, double box_size )
+void test_nearest_neighbor_search()
 {
+    index_t nb_boxes = 10;
+    double box_size = 0.75;
+    // create a grid of boxes that intersect
     std::vector< geode::BoundingBox< dimension > > box_vector =
         create_box_vector< dimension >( nb_boxes, box_size );
     AABBTree< dimension > aabb( box_vector );
@@ -130,9 +136,9 @@ void test_nearest_neighbor_search( index_t nb_boxes, double box_size )
             box_center.set_value( 1, (double) j );
 
             Point< dimension > query;
+            // query point is in the up right corner of each box.
             query.set_value( 0, (double) i + box_size / 2. );
             query.set_value( 1, (double) j + box_size / 2. );
-
             index_t box_id;
             Point< dimension > neatest_point;
             double distance;
@@ -161,25 +167,25 @@ public:
     }
     ~BoxAABBEvalIntersection() = default;
 
-    // Evaluate potential inclusion
     void operator()( index_t cur_box )
     {
         box_intersections_.emplace( cur_box );
     }
-    bool box1_include_box2( index_t box1, index_t box2 )
+
+    // test box strict inclusion
+    bool box_contains_box( index_t box1, index_t box2 )
     {
         return (
             bounding_boxes_[box1].contains( bounding_boxes_[box2].min() )
             && bounding_boxes_[box1].contains( bounding_boxes_[box2].max() ) );
     }
-    // Evaluate real inclusion
     void operator()( index_t box1, index_t box2 )
     {
-        if( box1_include_box2( box1, box2 ) )
+        if( box_contains_box( box1, box2 ) )
         {
             included_box_.push_back( { box1, box2 } );
         }
-        if( box1_include_box2( box2, box1 ) )
+        if( box_contains_box( box2, box1 ) )
         {
             included_box_.push_back( { box2, box1 } );
         }
@@ -198,6 +204,7 @@ void test_intersections_with_query_box()
 {
     index_t nb_boxes = 10;
     double box_size = 0.5;
+    // create a grid of tangent boxes
     std::vector< BoundingBox< dimension > > box_vector =
         create_box_vector< dimension >( nb_boxes, box_size );
     AABBTree< dimension > aabb( box_vector );
@@ -210,6 +217,7 @@ void test_intersections_with_query_box()
         for( index_t j : Range( nb_boxes - 1 ) )
         {
             Point< dimension > query;
+            // query boxes will be at internal corner grid
             query.set_value( 0, (double) i + box_size );
             query.set_value( 1, (double) j + box_size );
             BoundingBox< dimension > box_query =
@@ -233,8 +241,8 @@ void test_intersections_with_query_box()
                 "[Test] Error ... wrong intersected set of box" );
         }
     }
-    // test up right corner
     Point< dimension > query;
+    // query box will be at top right corner grid
     query.set_value( 0, (double) nb_boxes - 1 + box_size );
     query.set_value( 1, (double) nb_boxes - 1 + box_size );
     BoundingBox< dimension > box_query = create_bounding_box( query, box_size );
@@ -257,17 +265,19 @@ template < index_t dimension >
 void test_self_intersections()
 {
     index_t nb_boxes = 10;
-    double box_size = 0.5;
+    // create a grid of intersected boxes
     std::vector< BoundingBox< dimension > > box_vector =
-        create_box_vector< dimension >( nb_boxes, box_size );
+        create_box_vector< dimension >( nb_boxes, 0.75 );
+    // create a grid of tangent boxes included in previous boxes
     std::vector< BoundingBox< dimension > > box_vector2 =
-        create_box_vector< dimension >( nb_boxes, box_size / 2. );
+        create_box_vector< dimension >( nb_boxes, 0.50 );
     box_vector.insert(
         box_vector.end(), box_vector2.begin(), box_vector2.end() );
 
     AABBTree< dimension > aabb( box_vector );
     BoxAABBEvalIntersection< dimension > eval_intersection =
         BoxAABBEvalIntersection< dimension >( box_vector );
+    // investigate box inclusions
     eval_intersection.included_box_.clear();
     aabb.compute_self_element_bbox_intersections( eval_intersection );
 
@@ -287,16 +297,8 @@ void test_self_intersections()
 template < index_t dimension >
 void do_test()
 {
-    std::vector< std::pair< index_t, double > > param_to_test(
-        { { 10, 0.25 }, { 10, 0.5 }, { 10, 0.75 } } );
-    for( auto param : param_to_test )
-    {
-        // build aabb
-        test_build_aabb< dimension >( param.first, param.second );
-        // check nearest neighbor evaluation
-        test_nearest_neighbor_search< dimension >( param.first, param.second );
-    }
-    // check box intersections
+    test_build_aabb< dimension >();
+    test_nearest_neighbor_search< dimension >();
     test_intersections_with_query_box< dimension >();
     test_self_intersections< dimension >();
 }
