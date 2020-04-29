@@ -46,19 +46,11 @@ namespace geode
 
     public:
         /*!
-         * AABB tree structure implementation
-         * The tree is store in s single vector following this example:
-         *                          ROOT
-         *                        /      \
-         *                      A1        A2
-         *                    /    \     /   \
-         *                  B1     B2   B3    B4
-         *  where B* are the input bboxes
-         *  Storage: |empty|ROOT|A1|A2|B1|B2|B3|B4|
-         *
-         *  The lower level of the tree reference each object in its bounding
-         * box. In the example B1, B2, B3 and B4 are boxes which idex match the
-         * index of objects in the initial container.
+         * @brief AABB is a search tree for fast spatial request using the
+         * bounding box organisation of elements stored in a single container.
+         * @param bboxes container containing elements bounding boxes.
+         * Each element can then be access using the index of its box in the
+         * tree which should match the index in its initial container.
          */
         AABBTree( absl::Span< const BoundingBox< dimension > > bboxes );
         ~AABBTree();

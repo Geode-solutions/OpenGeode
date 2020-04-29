@@ -292,7 +292,8 @@ namespace geode
         ACTION& action ) const
     {
         OPENGEODE_ASSERT( node_index < tree_.size(), "Node out of tree range" );
-        OPENGEODE_ASSERT( element_begin != element_end, "" );
+        OPENGEODE_ASSERT(
+            element_begin != element_end, "No iteration allowed start == end" );
 
         // Prune sub-tree that does not have intersection
         if( !box.intersects( node( node_index ) ) )
@@ -329,8 +330,10 @@ namespace geode
         index_t element_end2,
         ACTION& action ) const
     {
-        OPENGEODE_ASSERT( element_end1 != element_begin1, "" );
-        OPENGEODE_ASSERT( element_end2 != element_begin2, "" );
+        OPENGEODE_ASSERT( element_end1 != element_begin1,
+            "No iteration allowed start == end" );
+        OPENGEODE_ASSERT( element_end2 != element_begin2,
+            "No iteration allowed start == end" );
 
         // Since we are intersecting the AABBTree with *itself*,
         // we can prune half of the cases by skipping the test

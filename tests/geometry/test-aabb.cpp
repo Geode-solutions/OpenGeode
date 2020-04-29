@@ -157,7 +157,7 @@ void test_nearest_neighbor_search()
 }
 
 template < index_t dimension >
-class BoxAABBEvalIntersection
+class BoxAABBIntersection
 {
 public:
     BoxAABBEvalIntersection(
