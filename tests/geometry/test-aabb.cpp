@@ -51,7 +51,8 @@ template < index_t dimension >
 std::vector< BoundingBox< dimension > > create_box_vector(
     index_t nb_box_range, double box_size )
 {
-    absl::FixedArray< BoundingBox< dimension > > box_vector(nb_box_range * nb_box_range);
+    absl::FixedArray< BoundingBox< dimension > > box_vector(
+        nb_box_range * nb_box_range );
     for( const index_t i : Range( nb_box_range ) )
     {
         for( const index_t j : Range( nb_box_range ) )
@@ -59,7 +60,8 @@ std::vector< BoundingBox< dimension > > create_box_vector(
             Point< dimension > point;
             point.set_value( 0, (double) i );
             point.set_value( 1, (double) j );
-            box_vector[nb_box_range * i + j] =create_bounding_box( point, box_size );
+            box_vector[nb_box_range * i + j] =
+                create_bounding_box( point, box_size );
         }
     }
     return box_vector;
@@ -75,9 +77,9 @@ void test_build_aabb()
 {
     const index_t nb_boxes{ 100 };
     const double box_size{ 0.25 };
-    
+
     // Create a grid of non overlapping boxes
-   const auto box_vector =
+    const auto box_vector =
         create_box_vector< dimension >( nb_boxes, box_size );
     AABBTree< dimension > aabb( box_vector );
 
@@ -117,7 +119,7 @@ template < index_t dimension >
 void test_nearest_neighbor_search()
 {
     const index_t nb_boxes{ 10 };
-    const double box_size{ 0.75};
+    const double box_size{ 0.75 };
     const auto box_vector =
         create_box_vector< dimension >( nb_boxes, box_size );
     AABBTree< dimension > aabb( box_vector );
@@ -148,8 +150,8 @@ void test_nearest_neighbor_search()
             OPENGEODE_EXCEPTION( nearest_point == box_center,
                 "[Test] Wrong nearest box center " );
             const Vector< dimension > vec{ box_center, query };
-            OPENGEODE_EXCEPTION(
-                distance == vec.length(), "[Test] Wrong distance to nearest box center" );
+            OPENGEODE_EXCEPTION( distance == vec.length(),
+                "[Test] Wrong distance to nearest box center" );
         }
     }
 }
