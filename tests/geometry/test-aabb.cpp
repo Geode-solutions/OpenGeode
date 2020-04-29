@@ -29,6 +29,8 @@
 
 #include <geode/tests/common.h>
 
+#include <absl/container/flat_hash_set.h>
+
 using namespace geode;
 
 template < index_t dimension >
@@ -51,15 +53,15 @@ template < index_t dimension >
 std::vector< BoundingBox< dimension > > create_box_vector(
     index_t nb_box_range, double box_size )
 {
-    absl::FixedArray< BoundingBox< dimension > > box_vector(
+    std::vector< BoundingBox< dimension > > box_vector(
         nb_box_range * nb_box_range );
     for( const index_t i : Range( nb_box_range ) )
     {
         for( const index_t j : Range( nb_box_range ) )
         {
             Point< dimension > point;
-            point.set_value( 0, (double) i );
-            point.set_value( 1, (double) j );
+            point.set_value( 0, i );
+            point.set_value( 1, j );
             box_vector[nb_box_range * i + j] =
                 create_bounding_box( point, box_size );
         }
@@ -132,13 +134,13 @@ void test_nearest_neighbor_search()
         for( const index_t j : Range( nb_boxes ) )
         {
             Point< dimension > box_center;
-            box_center.set_value( 0, (double) i );
-            box_center.set_value( 1, (double) j );
+            box_center.set_value( 0, i );
+            box_center.set_value( 1, j );
 
             Point< dimension > query;
             // query point is in the up right corner of each box.
-            query.set_value( 0, (double) i + box_size / 2. );
-            query.set_value( 1, (double) j + box_size / 2. );
+            query.set_value( 0, i + box_size / 2. );
+            query.set_value( 1, j + box_size / 2. );
             index_t box_id;
             Point< dimension > nearest_point;
             double distance;
@@ -160,12 +162,12 @@ template < index_t dimension >
 class BoxAABBIntersection
 {
 public:
-    BoxAABBEvalIntersection(
+    BoxAABBIntersection(
         const std::vector< BoundingBox< dimension > >& bounding_boxes )
         : bounding_boxes_( bounding_boxes )
     {
     }
-    ~BoxAABBEvalIntersection() = default;
+    ~BoxAABBIntersection() = default;
 
     void operator()( index_t cur_box )
     {
@@ -208,8 +210,8 @@ void test_intersections_with_query_box()
         create_box_vector< dimension >( nb_boxes, box_size );
     AABBTree< dimension > aabb( box_vector );
 
-    BoxAABBEvalIntersection< dimension > eval_intersection =
-        BoxAABBEvalIntersection< dimension >( box_vector );
+    BoxAABBIntersection< dimension > eval_intersection =
+        BoxAABBIntersection< dimension >( box_vector );
 
     for( const index_t i : Range( nb_boxes - 1 ) )
     {
@@ -217,8 +219,8 @@ void test_intersections_with_query_box()
         {
             Point< dimension > query;
             // query boxes will be at internal corner grid
-            query.set_value( 0, (double) i + box_size );
-            query.set_value( 1, (double) j + box_size );
+            query.set_value( 0, i + box_size );
+            query.set_value( 1, j + box_size );
             const auto box_query = create_bounding_box( query, box_size );
 
             eval_intersection.box_intersections_.clear();
@@ -241,8 +243,8 @@ void test_intersections_with_query_box()
     }
     Point< dimension > query;
     // query box will be at top right corner grid
-    query.set_value( 0, (double) nb_boxes - 1 + box_size );
-    query.set_value( 1, (double) nb_boxes - 1 + box_size );
+    query.set_value( 0, nb_boxes - 1 + box_size );
+    query.set_value( 1, nb_boxes - 1 + box_size );
     const auto box_query = create_bounding_box( query, box_size );
 
     eval_intersection.box_intersections_.clear();
@@ -271,7 +273,7 @@ void test_self_intersections()
         box_vector.end(), box_vector2.begin(), box_vector2.end() );
 
     AABBTree< dimension > aabb( box_vector );
-    BoxAABBEvalIntersection< dimension > eval_intersection{ box_vector };
+    BoxAABBIntersection< dimension > eval_intersection{ box_vector };
     // investigate box inclusions
     eval_intersection.included_box_.clear();
     aabb.compute_self_element_bbox_intersections( eval_intersection );
