@@ -176,7 +176,7 @@ namespace geode
     {                                                                          \
         static float converted_value( const Type& value )                      \
         {                                                                      \
-            return value;                                                      \
+            return static_cast< float >( value );                              \
         }                                                                      \
     }
 
