@@ -36,7 +36,7 @@ BoundingBox< dimension > create_bounding_box(
     const Point< dimension >& center, double box_size )
 {
     Point< dimension > temp;
-    for( index_t c : Range( dimension ) )
+    for( const index_t c : Range( dimension ) )
     {
         temp.set_value( c, box_size );
     }
