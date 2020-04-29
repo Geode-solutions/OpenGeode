@@ -118,7 +118,7 @@ namespace geode
 
     using PolygonEdgesOnBorder = absl::InlinedVector< PolygonEdge, 3 >;
 
-    using PolygonsAroundVertex = absl::InlinedVector< PolygonEdge, 10 >;
+    using PolygonsAroundVertex = absl::InlinedVector< PolygonVertex, 10 >;
 
     /*!
      * This class represents a Surface made up with polygons (triangles, quads,
