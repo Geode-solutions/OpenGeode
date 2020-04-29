@@ -211,15 +211,15 @@ void test_intersections_with_query_box()
     BoxAABBEvalIntersection< dimension > eval_intersection =
         BoxAABBEvalIntersection< dimension >( box_vector );
 
-    for( geode::index_t i : Range( nb_boxes - 1 ) )
+    for( const index_t i : Range( nb_boxes - 1 ) )
     {
-        for( index_t j : Range( nb_boxes - 1 ) )
+        for( const index_t j : Range( nb_boxes - 1 ) )
         {
             Point< dimension > query;
             // query boxes will be at internal corner grid
             query.set_value( 0, (double) i + box_size );
             query.set_value( 1, (double) j + box_size );
-            BoundingBox< dimension > box_query =
+            const auto box_query =
                 create_bounding_box( query, box_size );
 
             eval_intersection.box_intersections_.clear();
@@ -228,68 +228,67 @@ void test_intersections_with_query_box()
 
             OPENGEODE_EXCEPTION(
                 eval_intersection.box_intersections_.size() == 4,
-                "[Test] Error ... wrong number of intersected boxes" );
+                "[Test] Wrong number of intersected boxes" );
 
-            std::set< index_t > expected_set;
+            absl::flat_hash_set< index_t > expected_set;
             expected_set.emplace( global_box_index( i, j, nb_boxes ) );
             expected_set.emplace( global_box_index( i, j + 1, nb_boxes ) );
             expected_set.emplace( global_box_index( i + 1, j, nb_boxes ) );
             expected_set.emplace( global_box_index( i + 1, j + 1, nb_boxes ) );
             OPENGEODE_EXCEPTION(
                 eval_intersection.box_intersections_ == expected_set,
-                "[Test] Error ... wrong intersected set of box" );
+                "[Test] Wrong intersected set of boxes" );
         }
     }
     Point< dimension > query;
     // query box will be at top right corner grid
     query.set_value( 0, (double) nb_boxes - 1 + box_size );
     query.set_value( 1, (double) nb_boxes - 1 + box_size );
-    BoundingBox< dimension > box_query = create_bounding_box( query, box_size );
+    const auto box_query = create_bounding_box( query, box_size );
 
     eval_intersection.box_intersections_.clear();
     aabb.compute_bbox_element_bbox_intersections(
         box_query, eval_intersection );
 
     OPENGEODE_EXCEPTION( eval_intersection.box_intersections_.size() == 1,
-        "[Test] Error ... wrong number of intersected boxes" );
+        "[Test] Wrong number of intersected boxes" );
 
-    std::set< index_t > expected_set;
+    absl::flat_hash_set< index_t > expected_set;
     expected_set.emplace(
         global_box_index( nb_boxes - 1, nb_boxes - 1, nb_boxes ) );
     OPENGEODE_EXCEPTION( eval_intersection.box_intersections_ == expected_set,
-        "[Test] Error ... wrong intersected set of box" );
+        "[Test] Wrong intersected set of boxes" );
 }
 
 template < index_t dimension >
 void test_self_intersections()
 {
-    index_t nb_boxes = 10;
-    // create a grid of intersected boxes
-    std::vector< BoundingBox< dimension > > box_vector =
+    const index_t nb_boxes{ 10 };
+    // Create a grid of intersecting boxes
+    auto box_vector =
         create_box_vector< dimension >( nb_boxes, 0.75 );
-    // create a grid of tangent boxes included in previous boxes
-    std::vector< BoundingBox< dimension > > box_vector2 =
+    // Create a grid of tangent boxes included in previous boxes
+    const auto box_vector2 =
         create_box_vector< dimension >( nb_boxes, 0.50 );
     box_vector.insert(
         box_vector.end(), box_vector2.begin(), box_vector2.end() );
 
     AABBTree< dimension > aabb( box_vector );
-    BoxAABBEvalIntersection< dimension > eval_intersection =
-        BoxAABBEvalIntersection< dimension >( box_vector );
+    BoxAABBEvalIntersection< dimension > eval_intersection{ box_vector };
     // investigate box inclusions
     eval_intersection.included_box_.clear();
     aabb.compute_self_element_bbox_intersections( eval_intersection );
 
     OPENGEODE_EXCEPTION(
         eval_intersection.included_box_.size() == nb_boxes * nb_boxes,
-        "[Test] Error ... every box should have on box inside" );
+        "[Test] Every box should have one box inside" );
 
-    for( geode::index_t i : Range( eval_intersection.included_box_.size() ) )
+    for( index_t i : Range( eval_intersection.included_box_.size() ) )
     {
         OPENGEODE_EXCEPTION( eval_intersection.included_box_[i].first
                                  == eval_intersection.included_box_[i].second
                                         - ( nb_boxes * nb_boxes ),
-            "[Test] Error ... wrong box inclusion" );
+            "[Test] Wrong box inclusion result" );
     }
 }
 
