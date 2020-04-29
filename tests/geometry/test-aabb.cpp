@@ -219,8 +219,7 @@ void test_intersections_with_query_box()
             // query boxes will be at internal corner grid
             query.set_value( 0, (double) i + box_size );
             query.set_value( 1, (double) j + box_size );
-            const auto box_query =
-                create_bounding_box( query, box_size );
+            const auto box_query = create_bounding_box( query, box_size );
 
             eval_intersection.box_intersections_.clear();
             aabb.compute_bbox_element_bbox_intersections(
@@ -265,11 +264,9 @@ void test_self_intersections()
 {
     const index_t nb_boxes{ 10 };
     // Create a grid of intersecting boxes
-    auto box_vector =
-        create_box_vector< dimension >( nb_boxes, 0.75 );
+    auto box_vector = create_box_vector< dimension >( nb_boxes, 0.75 );
     // Create a grid of tangent boxes included in previous boxes
-    const auto box_vector2 =
-        create_box_vector< dimension >( nb_boxes, 0.50 );
+    const auto box_vector2 = create_box_vector< dimension >( nb_boxes, 0.50 );
     box_vector.insert(
         box_vector.end(), box_vector2.begin(), box_vector2.end() );
 
