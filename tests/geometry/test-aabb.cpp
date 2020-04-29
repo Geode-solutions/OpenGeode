@@ -48,18 +48,18 @@ BoundingBox< dimension > create_bounding_box(
 }
 
 template < index_t dimension >
-std::vector< geode::BoundingBox< dimension > > create_box_vector(
+std::vector< BoundingBox< dimension > > create_box_vector(
     index_t nb_box_range, double box_size )
 {
-    std::vector< geode::BoundingBox< dimension > > box_vector;
-    for( geode::index_t i : Range( nb_box_range ) )
+    absl::FixedArray< BoundingBox< dimension > > box_vector(nb_box_range * nb_box_range);
+    for( const index_t i : Range( nb_box_range ) )
     {
-        for( index_t j : Range( nb_box_range ) )
+        for( const index_t j : Range( nb_box_range ) )
         {
             Point< dimension > point;
             point.set_value( 0, (double) i );
             point.set_value( 1, (double) j );
-            box_vector.push_back( create_bounding_box( point, box_size ) );
+            box_vector[nb_box_range * i + j] =create_bounding_box( point, box_size );
         }
     }
     return box_vector;
@@ -73,16 +73,16 @@ index_t global_box_index( index_t i, index_t j, index_t size )
 template < index_t dimension >
 void test_build_aabb()
 {
-    index_t nb_boxes = 100;
-    double box_size = 0.25;
-    // create a grid of separate boxes
-    std::vector< geode::BoundingBox< dimension > > box_vector =
+    const index_t nb_boxes{ 100 };
+    const double box_size{ 0.25 };
+    
+    // Create a grid of non overlapping boxes
+   const auto box_vector =
         create_box_vector< dimension >( nb_boxes, box_size );
     AABBTree< dimension > aabb( box_vector );
 
-    // check number of box
     OPENGEODE_EXCEPTION( aabb.nb_bboxes() == box_vector.size(),
-        "[Test] Error ... wrong number of box in the aabb tree" );
+        "[Test] Wrong number of boxes in the AABB tree" );
     return;
 }
 
@@ -91,45 +91,43 @@ class BoxAABBEvalDistance
 {
 public:
     BoxAABBEvalDistance(
-        const std::vector< geode::BoundingBox< dimension > >& bounding_boxes )
+        const std::vector< BoundingBox< dimension > >& bounding_boxes )
         : bounding_boxes_( bounding_boxes )
     {
     }
     ~BoxAABBEvalDistance() = default;
 
-    // EvalDistance
     std::tuple< double, Point< dimension > > operator()(
-        const Point< dimension >& query, index_t curent_element_box ) const
+        const Point< dimension >& query, index_t current_element_box ) const
     {
-        Point< dimension > box_center =
-            ( bounding_boxes_[curent_element_box].min()
-                + bounding_boxes_[curent_element_box].max() )
+        const auto box_center =
+            ( bounding_boxes_[current_element_box].min()
+                + bounding_boxes_[current_element_box].max() )
             / 2.;
-        Vector< dimension > vec( box_center, query );
+        const Vector< dimension > vec{ box_center, query };
         return std::tuple< double, Point< dimension > >{ vec.length(),
             box_center };
     }
 
 private:
-    const std::vector< geode::BoundingBox< dimension > >& bounding_boxes_;
+    const std::vector< BoundingBox< dimension > >& bounding_boxes_;
 };
 
 template < index_t dimension >
 void test_nearest_neighbor_search()
 {
-    index_t nb_boxes = 10;
-    double box_size = 0.75;
-    // create a grid of boxes that intersect
-    std::vector< geode::BoundingBox< dimension > > box_vector =
+    const index_t nb_boxes{ 10 };
+    const double box_size{ 0.75};
+    const auto box_vector =
         create_box_vector< dimension >( nb_boxes, box_size );
     AABBTree< dimension > aabb( box_vector );
 
     BoxAABBEvalDistance< dimension > disteval =
         BoxAABBEvalDistance< dimension >( box_vector );
 
-    for( geode::index_t i : Range( nb_boxes ) )
+    for( const index_t i : Range( nb_boxes ) )
     {
-        for( index_t j : Range( nb_boxes ) )
+        for( const index_t j : Range( nb_boxes ) )
         {
             Point< dimension > box_center;
             box_center.set_value( 0, (double) i );
@@ -140,18 +138,18 @@ void test_nearest_neighbor_search()
             query.set_value( 0, (double) i + box_size / 2. );
             query.set_value( 1, (double) j + box_size / 2. );
             index_t box_id;
-            Point< dimension > neatest_point;
+            Point< dimension > nearest_point;
             double distance;
-            std::tie( box_id, neatest_point, distance ) =
+            std::tie( box_id, nearest_point, distance ) =
                 aabb.closest_element_box( query, disteval );
 
             OPENGEODE_EXCEPTION( box_id == global_box_index( i, j, nb_boxes ),
-                "[Test] Error ... wrong nearest box index" );
-            OPENGEODE_EXCEPTION( neatest_point == box_center,
-                "[Test] Error ... wrong nearest point " );
-            Vector< dimension > vec( box_center, query );
+                "[Test] Wrong nearest box index" );
+            OPENGEODE_EXCEPTION( nearest_point == box_center,
+                "[Test] Wrong nearest box center " );
+            const Vector< dimension > vec{ box_center, query };
             OPENGEODE_EXCEPTION(
-                distance == vec.length(), "[Test] Error ... wrong distance " );
+                distance == vec.length(), "[Test] Wrong distance to nearest box center" );
         }
     }
 }
@@ -161,7 +159,7 @@ class BoxAABBEvalIntersection
 {
 public:
     BoxAABBEvalIntersection(
-        const std::vector< geode::BoundingBox< dimension > >& bounding_boxes )
+        const std::vector< BoundingBox< dimension > >& bounding_boxes )
         : bounding_boxes_( bounding_boxes )
     {
     }
@@ -185,18 +183,18 @@ public:
         {
             included_box_.push_back( { box1, box2 } );
         }
-        if( box_contains_box( box2, box1 ) )
+        else if( box_contains_box( box2, box1 ) )
         {
             included_box_.push_back( { box2, box1 } );
         }
     }
 
 public:
-    std::set< index_t > box_intersections_;
+    absl::flat_hash_set< index_t > box_intersections_;
     std::vector< std::pair< index_t, index_t > > included_box_;
 
 private:
-    const std::vector< geode::BoundingBox< dimension > >& bounding_boxes_;
+    const std::vector< BoundingBox< dimension > >& bounding_boxes_;
 };
 
 template < index_t dimension >
