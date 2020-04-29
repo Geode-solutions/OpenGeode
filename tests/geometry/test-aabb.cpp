@@ -202,10 +202,9 @@ private:
 template < index_t dimension >
 void test_intersections_with_query_box()
 {
-    index_t nb_boxes = 10;
-    double box_size = 0.5;
-    // create a grid of tangent boxes
-    std::vector< BoundingBox< dimension > > box_vector =
+    const index_t nb_boxes{ 10 };
+    const double box_size{ 0.5 };
+    const auto box_vector =
         create_box_vector< dimension >( nb_boxes, box_size );
     AABBTree< dimension > aabb( box_vector );
 
