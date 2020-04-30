@@ -49,14 +49,14 @@ namespace geode
          * @brief AABB is a search tree for fast spatial request using the
          * bounding box organisation of elements stored in a single container.
          * @param bboxes container containing elements bounding boxes.
-         * Each element can then be access using the index of its box in the
+         * Each element can then be accessed using the index of its box in the
          * tree which should match the index in its initial container.
          */
         AABBTree( absl::Span< const BoundingBox< dimension > > bboxes );
         ~AABBTree();
 
         /*!
-         * @brief Gets the nuber of boxes in the lower level of the aabb tree.
+         * @brief Gets the number of boxes in the lower level of the aabb tree.
          * @note This value should match the initial size of the container that
          * store all objects to organize the the aabb tree.
          */
