@@ -46,14 +46,14 @@ namespace geode
             mesh.nb_polygons() );
         for( auto p : Range( mesh.nb_polygons() ) )
         {
-            for( auto v : Range( mesh.nb_polygon_vertices( p) ) )
+            for( auto v : Range( mesh.nb_polygon_vertices( p ) ) )
             {
                 box_vector[p].add_point(
                     mesh.point( mesh.polygon_vertex( { p, v } ) ) );
             }
         }
-        return std::unique_ptr< AABBTree< dimension > > (new AABBTree< dimension >(
-            box_vector ));
+        return std::unique_ptr< AABBTree< dimension > >(
+            new AABBTree< dimension >( box_vector ) );
     }
     template opengeode_mesh_api std::unique_ptr< AABBTree2D > get_aabb< 2 >(
         const TriangulatedSurface2D& );
@@ -61,9 +61,8 @@ namespace geode
         const TriangulatedSurface3D& );
 
     template < index_t dimension >
-    std::tuple< double, Point< dimension > >
-        DistanceToTriangle< dimension >::operator()(
-            const Point< dimension >& query, index_t cur_box ) const
+    std::tuple< double, Point< dimension > > DistanceToTriangle< dimension >::
+        operator()( const Point< dimension >& query, index_t cur_box ) const
     {
         const auto& v0 = mesh_.point( mesh_.polygon_vertex( { cur_box, 0 } ) );
         const auto& v1 = mesh_.point( mesh_.polygon_vertex( { cur_box, 1 } ) );
