@@ -31,6 +31,8 @@
 
 #include <geode/mesh/core/aabb_helpers.h>
 
+#include <geode/tests/common.h>
+
 void test()
 {
     OPENGEODE_EXCEPTION( 0 == 0, "[Test] LINE to remove" );

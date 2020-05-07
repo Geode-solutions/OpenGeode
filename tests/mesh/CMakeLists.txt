@@ -19,7 +19,7 @@
 # SOFTWARE.
 
 add_geode_test(
-    SOURCE "test-aabb-helper.cpp"
+    SOURCE "test-aabb-helpers.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
