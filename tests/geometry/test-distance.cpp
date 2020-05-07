@@ -158,8 +158,8 @@ void test_point_segment_distance()
 void test_point_triangle_distance_2d()
 {
     const geode::Point2D a{ { 0.0, 0.0 } };
-    const geode::Point2D b{ { 1.0, 0.0 } };
-    const geode::Point2D c{ { 1.0, 1.0 } };
+    const geode::Point2D b{ { 1.0, 1.0 } };
+    const geode::Point2D c{ { 1.0, 0.0 } };
     const geode::Triangle2D triangle2D{ a, b, c };
 
     double distance;
