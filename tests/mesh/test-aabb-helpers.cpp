@@ -132,8 +132,7 @@ void check_tree( const AABBTree< dimension >& tree,
 template < index_t dimension >
 void test_SurfaceAABB()
 {
-    Logger::info(
-        "TEST", "Test TriangulatedSurface AABB Helper", dimension, "D" );
+    Logger::info( "TEST", " TriangulatedSurface AABB Helper", dimension, "D" );
 
     auto t_surf = TriangulatedSurface< dimension >::create();
     auto t_surf_builder =
