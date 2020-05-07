@@ -28,7 +28,58 @@
  */
 
 #include <geode/mesh/core/aabb_helpers.h>
+#include <geode/mesh/core/triangulated_surface.h>
 
-namespace
+#include <geode/geometry/basic_objects.h>
+#include <geode/geometry/distance.h>
+#include <geode/geometry/vector.h>
+
+#include <memory>
+
+namespace geode
 {
-}
+    template < index_t dimension >
+    std::unique_ptr< AABBTree< dimension > > get_aabb(
+        const TriangulatedSurface< dimension >& mesh )
+    {
+        std::vector< BoundingBox< dimension > > box_vector(
+            mesh.nb_polygons() );
+        for( auto p : Range( mesh.nb_polygons() ) )
+        {
+            for( auto v : Range( mesh.nb_polygon_vertices( p) ) )
+            {
+                box_vector[p].add_point(
+                    mesh.point( mesh.polygon_vertex( { p, v } ) ) );
+            }
+        }
+        return std::unique_ptr< AABBTree< dimension > > (new AABBTree< dimension >(
+            box_vector ));
+    }
+    template opengeode_mesh_api std::unique_ptr< AABBTree2D > get_aabb< 2 >(
+        const TriangulatedSurface2D& );
+    template opengeode_mesh_api std::unique_ptr< AABBTree3D > get_aabb< 3 >(
+        const TriangulatedSurface3D& );
+
+    template < index_t dimension >
+    std::tuple< double, Point< dimension > >
+        DistanceToTriangle< dimension >::operator()(
+            const Point< dimension >& query, index_t cur_box ) const
+    {
+        const auto& v0 = mesh_.point( mesh_.polygon_vertex( { cur_box, 0 } ) );
+        const auto& v1 = mesh_.point( mesh_.polygon_vertex( { cur_box, 1 } ) );
+        const auto& v2 = mesh_.point( mesh_.polygon_vertex( { cur_box, 2 } ) );
+        return point_triangle_distance(
+            query, Triangle< dimension >{ v0, v1, v2 } );
+    }
+
+    template < index_t dimension >
+    double DistanceToTriangle< dimension >::operator()(
+        const Point< dimension >& pt1, const Point< dimension >& pt2 ) const
+    {
+        const Vector< dimension > vec{ pt1, pt2 };
+        return vec.length();
+    }
+    template class opengeode_mesh_api DistanceToTriangle< 2 >;
+    template class opengeode_mesh_api DistanceToTriangle< 3 >;
+
+} // namespace geode

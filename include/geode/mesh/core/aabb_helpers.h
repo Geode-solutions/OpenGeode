@@ -32,8 +32,38 @@
 #include <geode/basic/pimpl.h>
 
 #include <geode/geometry/aabb.h>
+#include <geode/geometry/point.h>
+
 #include <geode/mesh/common.h>
 
 namespace geode
 {
-}
+    FORWARD_DECLARATION_DIMENSION_CLASS( TriangulatedSurface );
+} // namespace geode
+
+namespace geode
+{
+    template < index_t dimension >
+    std::unique_ptr< AABBTree< dimension > > get_aabb(
+        const TriangulatedSurface< dimension >& mesh );
+
+    template < index_t dimension >
+    class DistanceToTriangle
+    {
+    public:
+        explicit DistanceToTriangle(
+            const TriangulatedSurface< dimension >& mesh )
+            : mesh_( mesh )
+        {
+        }
+
+        std::tuple< double, Point< dimension > > operator()(
+            const Point< dimension >& query, index_t cur_box ) const;
+        double operator()( const Point< dimension >& pt1,
+            const Point< dimension >& pt2 ) const;
+
+    private:
+        const TriangulatedSurface< dimension >& mesh_;
+    };
+
+} // namespace geode
