@@ -35,7 +35,6 @@ namespace geode
     ALIAS_2D_AND_3D( Triangle );
     ALIAS_2D( Segment );
 
-
     class Plane;
     class Tetra;
 } // namespace geode
