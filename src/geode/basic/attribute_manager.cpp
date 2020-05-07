@@ -227,6 +227,10 @@ namespace geode
     };
 
     AttributeManager::AttributeManager() {} // NOLINT
+    AttributeManager::AttributeManager( AttributeManager &&other )
+        : impl_( std::move( *other.impl_ ) )
+    {
+    }
     AttributeManager::~AttributeManager() {} // NOLINT
 
     std::shared_ptr< AttributeBase > AttributeManager::find_attribute_base(

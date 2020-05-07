@@ -41,11 +41,12 @@ namespace geode
     template < index_t dimension >
     class Component
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( Component );
+        OPENGEODE_DISABLE_COPY( Component );
         OPENGEODE_TEMPLATE_ASSERT_2D_OR_3D( dimension );
         friend class bitsery::Access;
 
     public:
+        Component( Component&& );
         virtual ~Component();
 
         absl::string_view name() const;

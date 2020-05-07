@@ -47,12 +47,13 @@ namespace geode
     template < index_t dimension >
     class Corner final : public Component< dimension >
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( Corner );
+        OPENGEODE_DISABLE_COPY( Corner );
         PASSKEY( Corners< dimension >, CornersKey );
         PASSKEY( CornersBuilder< dimension >, CornersBuilderKey );
         friend class bitsery::Access;
 
     public:
+        Corner( Corner&& );
         ~Corner();
 
         static ComponentType component_type_static()

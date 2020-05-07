@@ -47,13 +47,14 @@ namespace geode
     template < index_t dimension >
     class Block final : public Component< dimension >
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( Block );
+        OPENGEODE_DISABLE_COPY( Block );
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
         PASSKEY( Blocks< dimension >, BlocksKey );
         PASSKEY( BlocksBuilder< dimension >, BlocksBuilderKey );
         friend class bitsery::Access;
 
     public:
+        Block( Block&& );
         ~Block();
 
         static ComponentType component_type_static()

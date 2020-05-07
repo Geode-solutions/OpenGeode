@@ -57,6 +57,12 @@ namespace geode
     }
 
     template < index_t dimension >
+    Block< dimension >::Block( Block&& other )
+        : impl_( std::move( *other.impl_ ) )
+    {
+    }
+
+    template < index_t dimension >
     Block< dimension >::Block( const MeshType& type )
     {
         impl_->set_mesh( PolyhedralSolid< dimension >::create( type ) );

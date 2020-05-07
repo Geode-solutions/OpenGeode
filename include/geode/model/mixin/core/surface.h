@@ -47,12 +47,13 @@ namespace geode
     template < index_t dimension >
     class Surface final : public Component< dimension >
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( Surface );
+        OPENGEODE_DISABLE_COPY( Surface );
         PASSKEY( Surfaces< dimension >, SurfacesKey );
         PASSKEY( SurfacesBuilder< dimension >, SurfacesBuilderKey );
         friend class bitsery::Access;
 
     public:
+        Surface( Surface&& );
         ~Surface();
 
         static ComponentType component_type_static()

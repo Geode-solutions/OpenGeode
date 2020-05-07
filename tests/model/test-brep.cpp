@@ -759,6 +759,8 @@ void test()
     geode::BRep model2;
     geode::load_brep( model2, file_io );
     test_reloaded_brep( model2 );
+
+    geode::BRep model3{ std::move( model2 ) };
 }
 
 OPENGEODE_TEST( "brep" )

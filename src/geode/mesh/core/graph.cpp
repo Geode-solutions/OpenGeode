@@ -54,6 +54,8 @@ namespace geode
         {
         }
 
+        Impl( Impl&& other ) = default;
+
         AttributeManager& edge_attribute_manager() const
         {
             return edge_attribute_manager_;
@@ -154,6 +156,8 @@ namespace geode
     };
 
     Graph::Graph() : impl_( *this ) {}
+
+    Graph::Graph( Graph&& other ) : impl_( std::move( *other.impl_ ) ) {}
 
     Graph::~Graph() {} // NOLINT
 

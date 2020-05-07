@@ -43,10 +43,11 @@ namespace geode
      */
     class opengeode_basic_api AttributeManager
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( AttributeManager );
+        OPENGEODE_DISABLE_COPY( AttributeManager );
 
     public:
         AttributeManager();
+        AttributeManager( AttributeManager&& );
         ~AttributeManager();
 
         /*!

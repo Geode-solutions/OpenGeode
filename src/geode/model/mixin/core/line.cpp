@@ -62,6 +62,11 @@ namespace geode
     }
 
     template < index_t dimension >
+    Line< dimension >::Line( Line&& other ) : impl_( std::move( *other.impl_ ) )
+    {
+    }
+
+    template < index_t dimension >
     Line< dimension >::Line( const MeshType& type )
     {
         impl_->set_mesh( EdgedCurve< dimension >::create( type ) );

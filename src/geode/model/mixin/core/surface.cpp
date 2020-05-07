@@ -56,6 +56,12 @@ namespace geode
     }
 
     template < index_t dimension >
+    Surface< dimension >::Surface( Surface< dimension >&& other )
+        : impl_( std::move( *other.impl_ ) )
+    {
+    }
+
+    template < index_t dimension >
     Surface< dimension >::Surface()
     {
         impl_->set_mesh( PolygonalSurface< dimension >::create() );

@@ -62,6 +62,12 @@ namespace geode
     }
 
     template < index_t dimension >
+    Corner< dimension >::Corner( Corner&& other )
+        : impl_( std::move( *other.impl_ ) )
+    {
+    }
+
+    template < index_t dimension >
     Corner< dimension >::Corner( const MeshType& type )
     {
         impl_->set_mesh( PointSet< dimension >::create( type ) );

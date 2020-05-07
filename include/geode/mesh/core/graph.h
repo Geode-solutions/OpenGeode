@@ -133,6 +133,7 @@ namespace geode
 
     protected:
         Graph();
+        Graph( Graph&& );
 
     private:
         friend class bitsery::Access;

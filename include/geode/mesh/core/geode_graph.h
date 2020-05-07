@@ -42,6 +42,7 @@ namespace geode
 
     public:
         OpenGeodeGraph();
+        OpenGeodeGraph( OpenGeodeGraph&& );
         ~OpenGeodeGraph();
 
         static MeshType type_name_static()

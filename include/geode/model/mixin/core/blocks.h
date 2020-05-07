@@ -45,7 +45,7 @@ namespace geode
     template < index_t dimension >
     class opengeode_model_api Blocks
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( Blocks );
+        OPENGEODE_DISABLE_COPY( Blocks );
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
 
     public:
@@ -104,6 +104,7 @@ namespace geode
 
     protected:
         Blocks();
+        Blocks( Blocks&& ) = default;
 
     private:
         class ModifiableBlockRange : public BlockRangeBase,
