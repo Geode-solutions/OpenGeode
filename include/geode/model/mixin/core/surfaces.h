@@ -42,7 +42,7 @@ namespace geode
     template < index_t dimension >
     class opengeode_model_api Surfaces
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( Surfaces );
+        OPENGEODE_DISABLE_COPY( Surfaces );
 
     public:
         using Builder = SurfacesBuilder< dimension >;
@@ -88,6 +88,7 @@ namespace geode
 
     protected:
         Surfaces();
+        Surfaces( Surfaces&& );
 
     private:
         class ModifiableSurfaceRange : public SurfaceRangeBase,

@@ -186,6 +186,9 @@ namespace geode
          */
         void load_unique_vertices( absl::string_view directory, BuilderKey );
 
+    protected:
+        VertexIdentifier( VertexIdentifier&& );
+
     private:
         IMPLEMENTATION_MEMBER( impl_ );
     };

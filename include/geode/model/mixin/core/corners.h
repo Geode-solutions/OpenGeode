@@ -45,7 +45,7 @@ namespace geode
     template < index_t dimension >
     class opengeode_model_api Corners
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( Corners );
+        OPENGEODE_DISABLE_COPY( Corners );
 
     public:
         using Builder = CornersBuilder< dimension >;
@@ -103,6 +103,7 @@ namespace geode
 
     protected:
         Corners();
+        Corners( Corners&& ) = default;
 
     private:
         class ModifiableCornerRange : public CornerRangeBase,

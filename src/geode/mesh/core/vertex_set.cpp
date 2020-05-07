@@ -58,6 +58,11 @@ namespace geode
 
     VertexSet::VertexSet() {} // NOLINT
 
+    VertexSet::VertexSet( VertexSet&& other )
+        : impl_( std::move( *other.impl_ ) )
+    {
+    }
+
     VertexSet::~VertexSet() {} // NOLINT
 
     std::unique_ptr< VertexSet > VertexSet::create()

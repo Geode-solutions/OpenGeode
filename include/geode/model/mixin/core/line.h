@@ -47,12 +47,13 @@ namespace geode
     template < index_t dimension >
     class Line final : public Component< dimension >
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( Line );
+        OPENGEODE_DISABLE_COPY( Line );
         PASSKEY( Lines< dimension >, LinesKey );
         PASSKEY( LinesBuilder< dimension >, LinesBuilderKey );
         friend class bitsery::Access;
 
     public:
+        Line( Line&& );
         ~Line();
 
         static ComponentType component_type_static()

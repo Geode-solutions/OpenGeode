@@ -231,6 +231,10 @@ namespace geode
     };
 
     Relationships::Relationships() {} // NOLINT
+    Relationships::Relationships( Relationships&& other )
+        : impl_( std::move( *other.impl_ ) )
+    {
+    }
     Relationships::~Relationships() {} // NOLINT
 
     void Relationships::register_component(
