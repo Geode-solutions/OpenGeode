@@ -203,7 +203,7 @@ void test_point_triangle_distance_2d()
     const geode::Point2D q3{ { 2.0, 1.0 } };
     std::tie( distance, closest_point ) =
         geode::point_triangle_distance( q3, triangle2D );
-    OPENGEODE_EXCEPTION( distance == 1 && closest_point == c,
+    OPENGEODE_EXCEPTION( distance == 1 && closest_point == b,
         "[Test] Wrong result for point_triangle_distance with query point "
         "q3" );
 
