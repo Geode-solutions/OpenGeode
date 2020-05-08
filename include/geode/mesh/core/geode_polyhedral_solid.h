@@ -40,7 +40,7 @@ namespace geode
     template < index_t dimension >
     class OpenGeodePolyhedralSolid : public PolyhedralSolid< dimension >
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( OpenGeodePolyhedralSolid );
+        OPENGEODE_DISABLE_COPY( OpenGeodePolyhedralSolid );
         PASSKEY( OpenGeodePolyhedralSolidBuilder< dimension >,
             OGPolyhedralSolidKey );
 

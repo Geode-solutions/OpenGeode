@@ -190,7 +190,7 @@ namespace geode
     template < index_t dimension >
     class PolyhedralSolid : public VertexSet
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( PolyhedralSolid );
+        OPENGEODE_DISABLE_COPY( PolyhedralSolid );
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
         PASSKEY( PolyhedralSolidBuilder< dimension >, PolyhedralSolidKey );
 

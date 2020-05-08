@@ -42,7 +42,7 @@ namespace geode
     template < index_t dimension >
     class OpenGeodePointSet : public PointSet< dimension >
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( OpenGeodePointSet );
+        OPENGEODE_DISABLE_COPY( OpenGeodePointSet );
         PASSKEY( OpenGeodePointSetBuilder< dimension >, OGPointSetKey );
 
     public:

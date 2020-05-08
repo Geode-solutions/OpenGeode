@@ -42,7 +42,7 @@ namespace geode
     template < index_t dimension >
     class OpenGeodeTriangulatedSurface : public TriangulatedSurface< dimension >
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( OpenGeodeTriangulatedSurface );
+        OPENGEODE_DISABLE_COPY( OpenGeodeTriangulatedSurface );
         PASSKEY( OpenGeodeTriangulatedSurfaceBuilder< dimension >,
             OGTriangulatedSurfaceKey );
 

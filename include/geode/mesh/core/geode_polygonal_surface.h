@@ -40,7 +40,7 @@ namespace geode
     template < index_t dimension >
     class OpenGeodePolygonalSurface : public PolygonalSurface< dimension >
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( OpenGeodePolygonalSurface );
+        OPENGEODE_DISABLE_COPY( OpenGeodePolygonalSurface );
         PASSKEY( OpenGeodePolygonalSurfaceBuilder< dimension >,
             OGPolygonalSurfaceKey );
 
