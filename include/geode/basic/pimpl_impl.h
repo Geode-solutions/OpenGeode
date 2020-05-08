@@ -33,6 +33,12 @@ namespace geode
     }
 
     template < typename T >
+    PImpl< T >::PImpl( PImpl< T >&& other )
+        : pimpl_{ std::move( other.pimpl_ ) }
+    {
+    }
+
+    template < typename T >
     PImpl< T >::~PImpl()
     {
     }
