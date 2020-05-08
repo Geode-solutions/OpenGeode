@@ -63,7 +63,7 @@ namespace geode
 
     template < index_t dimension >
     Corner< dimension >::Corner( Corner&& other )
-        : impl_( std::move( *other.impl_ ) )
+        : impl_( std::move( other.impl_ ) )
     {
     }
 

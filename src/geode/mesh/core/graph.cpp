@@ -47,10 +47,10 @@ namespace geode
     public:
         explicit Impl( Graph& graph )
             : edges_around_vertex_(
-                graph.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        EdgesAroundVertex >(
-                        attribute_name, EdgesAroundVertex{} ) )
+                  graph.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          EdgesAroundVertex >(
+                          attribute_name, EdgesAroundVertex{} ) )
         {
         }
 
@@ -157,7 +157,7 @@ namespace geode
 
     Graph::Graph() : impl_( *this ) {}
 
-    Graph::Graph( Graph&& other ) : impl_( std::move( *other.impl_ ) ) {}
+    Graph::Graph( Graph&& other ) : impl_( std::move( other.impl_ ) ) {}
 
     Graph::~Graph() {} // NOLINT
 

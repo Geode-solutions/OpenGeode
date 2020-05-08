@@ -47,6 +47,12 @@ namespace geode
     }
 
     template < index_t dimension >
+    Lines< dimension >::Lines( Lines&& other )
+        : impl_( std::move( other.impl_ ) )
+    {
+    }
+
+    template < index_t dimension >
     Lines< dimension >::~Lines() // NOLINT
     {
     }
@@ -170,7 +176,7 @@ namespace geode
     template < index_t dimension >
     Lines< dimension >::LineRangeBase::LineRangeBase(
         LineRangeBase&& other ) noexcept
-        : impl_( std::move( *other.impl_ ) )
+        : impl_( std::move( other.impl_ ) )
     {
     }
 

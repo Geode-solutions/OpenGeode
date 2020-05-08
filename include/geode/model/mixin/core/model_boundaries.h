@@ -90,7 +90,7 @@ namespace geode
 
     protected:
         ModelBoundaries();
-        ModelBoundaries( ModelBoundaries&& ) = default;
+        ModelBoundaries( ModelBoundaries&& );
 
     private:
         class ModifiableModelBoundaryRange

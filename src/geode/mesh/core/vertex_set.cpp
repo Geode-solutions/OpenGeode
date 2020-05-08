@@ -59,7 +59,7 @@ namespace geode
     VertexSet::VertexSet() {} // NOLINT
 
     VertexSet::VertexSet( VertexSet&& other )
-        : impl_( std::move( *other.impl_ ) )
+        : impl_( std::move( other.impl_ ) )
     {
     }
 

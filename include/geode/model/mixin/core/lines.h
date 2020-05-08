@@ -88,7 +88,7 @@ namespace geode
 
     protected:
         Lines();
-        Lines( Lines&& ) = default;
+        Lines( Lines&& );
 
     private:
         class ModifiableLineRange : public LineRangeBase,

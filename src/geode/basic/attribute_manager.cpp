@@ -228,7 +228,7 @@ namespace geode
 
     AttributeManager::AttributeManager() {} // NOLINT
     AttributeManager::AttributeManager( AttributeManager &&other )
-        : impl_( std::move( *other.impl_ ) )
+        : impl_( std::move( other.impl_ ) )
     {
     }
     AttributeManager::~AttributeManager() {} // NOLINT
