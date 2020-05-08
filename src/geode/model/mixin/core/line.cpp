@@ -62,7 +62,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    Line< dimension >::Line( Line&& other ) : impl_( std::move( *other.impl_ ) )
+    Line< dimension >::Line( Line&& other ) : impl_( std::move( other.impl_ ) )
     {
     }
 

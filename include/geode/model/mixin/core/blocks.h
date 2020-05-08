@@ -104,7 +104,7 @@ namespace geode
 
     protected:
         Blocks();
-        Blocks( Blocks&& ) = default;
+        Blocks( Blocks&& );
 
     private:
         class ModifiableBlockRange : public BlockRangeBase,

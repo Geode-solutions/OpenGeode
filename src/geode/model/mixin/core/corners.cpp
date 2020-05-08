@@ -47,6 +47,12 @@ namespace geode
     }
 
     template < index_t dimension >
+    Corners< dimension >::Corners( Corners&& other )
+        : impl_( std::move( other.impl_ ) )
+    {
+    }
+
+    template < index_t dimension >
     Corners< dimension >::~Corners() // NOLINT
     {
     }
@@ -177,7 +183,7 @@ namespace geode
     template < index_t dimension >
     Corners< dimension >::CornerRangeBase::CornerRangeBase(
         CornerRangeBase&& other ) noexcept
-        : impl_( std::move( *other.impl_ ) )
+        : impl_( std::move( other.impl_ ) )
     {
     }
 

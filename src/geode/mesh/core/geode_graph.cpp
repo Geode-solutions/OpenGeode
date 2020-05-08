@@ -56,7 +56,7 @@ namespace geode
     OpenGeodeGraph::OpenGeodeGraph() : impl_( *this ) {}
 
     OpenGeodeGraph::OpenGeodeGraph( OpenGeodeGraph&& other )
-        : impl_( std::move( *other.impl_ ) )
+        : impl_( std::move( other.impl_ ) )
     {
     }
 

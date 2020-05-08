@@ -49,11 +49,11 @@ namespace geode
     {
     }
 
-    // template < index_t dimension >
-    // Blocks< dimension >::Blocks( Blocks&& other )
-    //     : impl_( std::move( *other.impl_ ) )
-    // {
-    // }
+    template < index_t dimension >
+    Blocks< dimension >::Blocks( Blocks&& other )
+        : impl_( std::move( other.impl_ ) )
+    {
+    }
 
     template < index_t dimension >
     Blocks< dimension >::~Blocks() // NOLINT
@@ -189,7 +189,7 @@ namespace geode
     template < index_t dimension >
     Blocks< dimension >::BlockRangeBase::BlockRangeBase(
         BlockRangeBase&& other ) noexcept
-        : impl_( std::move( *other.impl_ ) )
+        : impl_( std::move( other.impl_ ) )
     {
     }
 

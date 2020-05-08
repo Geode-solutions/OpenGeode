@@ -103,7 +103,7 @@ namespace geode
 
     protected:
         Corners();
-        Corners( Corners&& ) = default;
+        Corners( Corners&& );
 
     private:
         class ModifiableCornerRange : public CornerRangeBase,
