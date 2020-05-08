@@ -46,6 +46,14 @@ namespace geode
     // {
     // }
 
+    // uuid::uuid( const uuid &other ) : ab( other.ab ), cd( other.cd ) {}
+
+    // uuid &uuid::operator=( const uuid &other )
+    // {
+    //     ab = other.ab;
+    //     cd = other.cd;
+    // }
+
     bool uuid::operator==( const uuid &other ) const
     {
         return ab == other.ab && cd == other.cd;

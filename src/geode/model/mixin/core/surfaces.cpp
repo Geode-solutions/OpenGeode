@@ -42,6 +42,9 @@ namespace geode
     class Surfaces< dimension >::Impl
         : public detail::ComponentsStorage< Surface< dimension > >
     {
+    public:
+        Impl() = default;
+        Impl( Impl&& other ) = default;
     };
 
     template < index_t dimension >
@@ -242,8 +245,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    const Surface< dimension >& Surfaces< dimension >::SurfaceRange::
-        operator*() const
+    const Surface< dimension >&
+        Surfaces< dimension >::SurfaceRange::operator*() const
     {
         return this->impl_->surface();
     }
@@ -257,8 +260,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    Surface< dimension >& Surfaces< dimension >::ModifiableSurfaceRange::
-        operator*() const
+    Surface< dimension >&
+        Surfaces< dimension >::ModifiableSurfaceRange::operator*() const
     {
         return this->impl_->surface();
     }
