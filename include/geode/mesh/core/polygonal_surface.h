@@ -127,7 +127,7 @@ namespace geode
     template < index_t dimension >
     class opengeode_mesh_api PolygonalSurfaceBase : public VertexSet
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( PolygonalSurfaceBase );
+        OPENGEODE_DISABLE_COPY( PolygonalSurfaceBase );
         PASSKEY( PolygonalSurfaceBuilder< dimension >, PolygonalSurfaceKey );
 
     public:

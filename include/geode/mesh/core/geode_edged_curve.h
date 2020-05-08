@@ -40,7 +40,7 @@ namespace geode
     template < index_t dimension >
     class OpenGeodeEdgedCurve : public EdgedCurve< dimension >
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( OpenGeodeEdgedCurve );
+        OPENGEODE_DISABLE_COPY( OpenGeodeEdgedCurve );
         PASSKEY( OpenGeodeEdgedCurveBuilder< dimension >, OGEdgedCurveKey );
 
     public:

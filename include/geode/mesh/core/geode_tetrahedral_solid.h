@@ -42,7 +42,7 @@ namespace geode
     template < index_t dimension >
     class OpenGeodeTetrahedralSolid : public TetrahedralSolid< dimension >
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( OpenGeodeTetrahedralSolid );
+        OPENGEODE_DISABLE_COPY( OpenGeodeTetrahedralSolid );
         PASSKEY( OpenGeodeTetrahedralSolidBuilder< dimension >,
             OGTetrahedralSolidKey );
 
