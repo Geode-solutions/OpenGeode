@@ -475,6 +475,30 @@ void test_clone( const geode::Section& section )
     }
 }
 
+void test_reloaded_section( const geode::Section& model )
+{
+    OPENGEODE_EXCEPTION( model.nb_corners() == 5,
+        "[Test] Number of Corners in reloaded Section should be 5" );
+    OPENGEODE_EXCEPTION( model.nb_lines() == 6,
+        "[Test] Number of Lines in reloaded Section should be 6" );
+    OPENGEODE_EXCEPTION( model.nb_surfaces() == 2,
+        "[Test] Number of Surfaces in reloaded Section should be 2" );
+    OPENGEODE_EXCEPTION( model.nb_model_boundaries() == 2,
+        "[Test] Number of Boundaries in reloaded Section should be 2" );
+}
+
+void test_moved_section( const geode::Section& model )
+{
+    OPENGEODE_EXCEPTION( model.nb_corners() == 5,
+        "[Test] Number of Corners in moved Section should be 5" );
+    OPENGEODE_EXCEPTION( model.nb_lines() == 6,
+        "[Test] Number of Lines in moved Section should be 6" );
+    OPENGEODE_EXCEPTION( model.nb_surfaces() == 2,
+        "[Test] Number of Surfaces in moved Section should be 2" );
+    OPENGEODE_EXCEPTION( model.nb_model_boundaries() == 2,
+        "[Test] Number of Boundaries in moved Section should be 2" );
+}
+
 void test()
 {
     geode::Section model;
@@ -511,6 +535,10 @@ void test()
 
     geode::Section model2;
     geode::load_section( model2, file_io );
+    test_reloaded_section( model2 );
+
+    geode::Section model3{ std::move( model2 ) };
+    test_moved_section( model3 );
 }
 
 OPENGEODE_TEST( "section" )
