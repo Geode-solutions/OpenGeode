@@ -77,7 +77,6 @@ namespace geode
 
     private:
         ModelBoundary() = default;
-        ModelBoundary( ModelBoundary&& ) = default;
 
         template < typename Archive >
         void serialize( Archive& archive );
