@@ -68,7 +68,7 @@ void add_triangles(
 {
     builder.create_triangles( ( size - 1 ) * ( size - 1 ) * 2 );
     index_t id = 0;
-    for( index_t i : Range( size - 1 ) )
+    for( const auto i : Range{ size - 1 } )
     {
         for( index_t j : Range( size - 1 ) )
         {
@@ -89,7 +89,7 @@ void check_tree( const AABBTree< dimension >& tree,
     const DistanceToTriangle< dimension >& distance_action,
     index_t size )
 {
-    double offset = 0.2;
+    constexpr auto offset = 0.2;
     index_t id = 0;
     for( index_t i : Range( size - 1 ) )
     {

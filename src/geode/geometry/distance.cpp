@@ -321,7 +321,7 @@ namespace geode
         bool inside{ true };
         for( const auto s : Range{ 3 } )
         {
-            auto distance = MAX_DOUBLE;
+            double distance;
             Point2D cur_p;
             std::tie( distance, cur_p ) = point_segment_signed_distance(
                 point, Segment2D{ triangle.vertices()[s],
@@ -338,8 +338,7 @@ namespace geode
         }
         if( inside )
         {
-            nearest_p = point;
-            return std::make_tuple( 0.0, nearest_p );
+            return std::make_tuple( 0.0, point );
         }
         return std::make_tuple( dist, nearest_p );
     }

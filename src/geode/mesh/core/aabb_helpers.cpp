@@ -42,11 +42,11 @@ namespace geode
     std::unique_ptr< AABBTree< dimension > > get_aabb(
         const TriangulatedSurface< dimension >& mesh )
     {
-        std::vector< BoundingBox< dimension > > box_vector(
+        absl::FixedArray< BoundingBox< dimension > > box_vector(
             mesh.nb_polygons() );
-        for( auto p : Range( mesh.nb_polygons() ) )
+        for( const auto p : Range{ mesh.nb_polygons() } )
         {
-            for( auto v : Range( mesh.nb_polygon_vertices( p ) ) )
+            for( const auto v : Range{ mesh.nb_polygon_vertices( p ) } )
             {
                 box_vector[p].add_point(
                     mesh.point( mesh.polygon_vertex( { p, v } ) ) );
@@ -75,8 +75,7 @@ namespace geode
     double DistanceToTriangle< dimension >::operator()(
         const Point< dimension >& pt1, const Point< dimension >& pt2 ) const
     {
-        const Vector< dimension > vec{ pt1, pt2 };
-        return vec.length();
+        return Vector< dimension >{ pt1, pt2 }.length();
     }
     template class opengeode_mesh_api DistanceToTriangle< 2 >;
     template class opengeode_mesh_api DistanceToTriangle< 3 >;
