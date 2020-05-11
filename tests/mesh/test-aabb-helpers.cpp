@@ -72,7 +72,8 @@ void add_triangles( geode::TriangulatedSurfaceBuilder< dimension >& builder,
     {
         for( const auto j : geode::Range{ size - 1 } )
         {
-            builder.create_triangle( { i * size + j, i * size + j + 1, ( i + 1 ) * size + j });
+            builder.create_triangle(
+                { i * size + j, i * size + j + 1, ( i + 1 ) * size + j } );
             id++;
             builder.create_triangle( { i * size + j + 1,
                 ( i + 1 ) * size + j + 1, ( i + 1 ) * size + j } );
