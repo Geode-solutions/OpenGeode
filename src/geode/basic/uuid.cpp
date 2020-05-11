@@ -41,19 +41,6 @@ namespace geode
         cd = ( cd & 0x3FFFFFFFFFFFFFFFULL ) | 0x8000000000000000ULL;
     }
 
-    // uuid::uuid( uuid &&other )
-    //     : ab( std::move( other.ab ) ), cd( std::move( other.cd ) )
-    // {
-    // }
-
-    // uuid::uuid( const uuid &other ) : ab( other.ab ), cd( other.cd ) {}
-
-    // uuid &uuid::operator=( const uuid &other )
-    // {
-    //     ab = other.ab;
-    //     cd = other.cd;
-    // }
-
     bool uuid::operator==( const uuid &other ) const
     {
         return ab == other.ab && cd == other.cd;

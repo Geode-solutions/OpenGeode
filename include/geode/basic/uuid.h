@@ -103,9 +103,6 @@ namespace geode
     {
     public:
         uuid();
-        // uuid( uuid && );
-        // uuid( const uuid & );
-        // uuid &operator=( const uuid & );
 
         bool operator==( const uuid &other ) const;
 

@@ -44,7 +44,8 @@ namespace geode
     class opengeode_model_api Topology : public Relationships,
                                          public VertexIdentifier
     {
-        // protected:
-        //     Topology() = default;
+        protected:
+            Topology() = default;
+            Topology( Topology&& ) = default;
     };
 } // namespace geode
