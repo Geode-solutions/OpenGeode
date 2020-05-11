@@ -31,6 +31,7 @@
 
 #include <memory>
 
+#include <geode/mesh/core/edged_curve.h>
 #include <geode/mesh/core/triangulated_surface.h>
 
 #include <geode/geometry/aabb.h>
@@ -41,6 +42,40 @@
 
 namespace geode
 {
+    template < index_t dimension >
+    AABBTree< dimension > create_aabb_tree(
+        const EdgedCurve< dimension >& mesh )
+    {
+        absl::FixedArray< BoundingBox< dimension > > box_vector(
+            mesh.nb_edges() );
+        for( const auto e : Range{ mesh.nb_edges() } )
+        {
+            box_vector[e].add_point(
+                mesh.point( mesh.edge_vertex( { e, 0 } ) ) );
+            box_vector[e].add_point(
+                mesh.point( mesh.edge_vertex( { e, 1 } ) ) );
+        }
+        return AABBTree< dimension >( box_vector );
+    }
+
+    template < index_t dimension >
+    std::tuple< double, Point< dimension > >
+        DistanceToEdge< dimension >::operator()(
+            const Point< dimension >& query, index_t cur_box ) const
+    {
+        const auto& v0 = mesh_.point( mesh_.edge_vertex( { cur_box, 0 } ) );
+        const auto& v1 = mesh_.point( mesh_.edge_vertex( { cur_box, 1 } ) );
+        return point_segment_distance( query, Segment< dimension >{ v0, v1 } );
+    }
+
+    template < index_t dimension >
+    double DistanceToEdge< dimension >::operator()(
+        const Point< dimension >& point1,
+        const Point< dimension >& point2 ) const
+    {
+        return Vector< dimension >{ point1, point2 }.length();
+    }
+
     template < index_t dimension >
     AABBTree< dimension > create_aabb_tree(
         const TriangulatedSurface< dimension >& mesh )
@@ -59,8 +94,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::tuple< double, Point< dimension > > DistanceToTriangle< dimension >::
-        operator()( const Point< dimension >& query, index_t cur_box ) const
+    std::tuple< double, Point< dimension > >
+        DistanceToTriangle< dimension >::operator()(
+            const Point< dimension >& query, index_t cur_box ) const
     {
         const auto& v0 = mesh_.point( mesh_.polygon_vertex( { cur_box, 0 } ) );
         const auto& v1 = mesh_.point( mesh_.polygon_vertex( { cur_box, 1 } ) );
@@ -78,9 +114,17 @@ namespace geode
     }
 
     template opengeode_mesh_api AABBTree2D create_aabb_tree< 2 >(
+        const EdgedCurve2D& );
+    template opengeode_mesh_api AABBTree3D create_aabb_tree< 3 >(
+        const EdgedCurve3D& );
+
+    template opengeode_mesh_api AABBTree2D create_aabb_tree< 2 >(
         const TriangulatedSurface2D& );
     template opengeode_mesh_api AABBTree3D create_aabb_tree< 3 >(
         const TriangulatedSurface3D& );
+
+    template class opengeode_mesh_api DistanceToEdge< 2 >;
+    template class opengeode_mesh_api DistanceToEdge< 3 >;
 
     template class opengeode_mesh_api DistanceToTriangle< 2 >;
     template class opengeode_mesh_api DistanceToTriangle< 3 >;
