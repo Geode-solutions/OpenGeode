@@ -596,6 +596,20 @@ void test_reloaded_brep( const geode::BRep& model )
         "[Test] Number of Boundaries in reloaded BRep should be 3" );
 }
 
+void test_moved_brep( const geode::BRep& model )
+{
+    OPENGEODE_EXCEPTION( model.nb_corners() == 6,
+        "[Test] Number of Corners in moved BRep should be 6" );
+    OPENGEODE_EXCEPTION( model.nb_lines() == 9,
+        "[Test] Number of Lines in moved BRep should be 9" );
+    OPENGEODE_EXCEPTION( model.nb_surfaces() == 5,
+        "[Test] Number of Surfaces in moved BRep should be 5" );
+    OPENGEODE_EXCEPTION( model.nb_blocks() == 1,
+        "[Test] Number of Blocks in moved BRep should be 1" );
+    OPENGEODE_EXCEPTION( model.nb_model_boundaries() == 3,
+        "[Test] Number of Boundaries in moved BRep should be 3" );
+}
+
 void test_clone( const geode::BRep& brep )
 {
     geode::BRep brep2;
@@ -761,6 +775,7 @@ void test()
     test_reloaded_brep( model2 );
 
     geode::BRep model3{ std::move( model2 ) };
+    test_moved_brep( model3 );
 }
 
 OPENGEODE_TEST( "brep" )

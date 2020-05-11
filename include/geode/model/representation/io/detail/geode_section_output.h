@@ -55,6 +55,7 @@ namespace geode
             section().save_corners( directory );
             section().save_lines( directory );
             section().save_surfaces( directory );
+            section().save_model_boundaries( directory );
         }
 
         void archive_section_files( const ZipFile& zip_writer ) const
