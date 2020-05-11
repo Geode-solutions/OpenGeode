@@ -28,18 +28,21 @@
  */
 
 #include <geode/mesh/core/aabb_helpers.h>
-#include <geode/mesh/core/triangulated_surface.h>
-
-#include <geode/geometry/basic_objects.h>
-#include <geode/geometry/distance.h>
-#include <geode/geometry/vector.h>
 
 #include <memory>
+
+#include <geode/mesh/core/triangulated_surface.h>
+
+#include <geode/geometry/aabb.h>
+#include <geode/geometry/basic_objects.h>
+#include <geode/geometry/distance.h>
+#include <geode/geometry/point.h>
+#include <geode/geometry/vector.h>
 
 namespace geode
 {
     template < index_t dimension >
-    std::unique_ptr< AABBTree< dimension > > get_aabb(
+    AABBTree< dimension > create_aabb_tree(
         const TriangulatedSurface< dimension >& mesh )
     {
         absl::FixedArray< BoundingBox< dimension > > box_vector(
@@ -52,17 +55,13 @@ namespace geode
                     mesh.point( mesh.polygon_vertex( { p, v } ) ) );
             }
         }
-        return std::unique_ptr< AABBTree< dimension > >(
-            new AABBTree< dimension >( box_vector ) );
+        return AABBTree< dimension >( box_vector );
     }
-    template opengeode_mesh_api std::unique_ptr< AABBTree2D > get_aabb< 2 >(
-        const TriangulatedSurface2D& );
-    template opengeode_mesh_api std::unique_ptr< AABBTree3D > get_aabb< 3 >(
-        const TriangulatedSurface3D& );
 
     template < index_t dimension >
-    std::tuple< double, Point< dimension > > DistanceToTriangle< dimension >::
-        operator()( const Point< dimension >& query, index_t cur_box ) const
+    std::tuple< double, Point< dimension > >
+        DistanceToTriangle< dimension >::operator()(
+            const Point< dimension >& query, index_t cur_box ) const
     {
         const auto& v0 = mesh_.point( mesh_.polygon_vertex( { cur_box, 0 } ) );
         const auto& v1 = mesh_.point( mesh_.polygon_vertex( { cur_box, 1 } ) );
@@ -73,10 +72,17 @@ namespace geode
 
     template < index_t dimension >
     double DistanceToTriangle< dimension >::operator()(
-        const Point< dimension >& pt1, const Point< dimension >& pt2 ) const
+        const Point< dimension >& point1,
+        const Point< dimension >& point2 ) const
     {
-        return Vector< dimension >{ pt1, pt2 }.length();
+        return Vector< dimension >{ point1, point2 }.length();
     }
+
+    template opengeode_mesh_api AABBTree2D create_aabb_tree< 2 >(
+        const TriangulatedSurface2D& );
+    template opengeode_mesh_api AABBTree3D create_aabb_tree< 3 >(
+        const TriangulatedSurface3D& );
+
     template class opengeode_mesh_api DistanceToTriangle< 2 >;
     template class opengeode_mesh_api DistanceToTriangle< 3 >;
 

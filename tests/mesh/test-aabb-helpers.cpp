@@ -32,45 +32,45 @@
 #include <geode/mesh/builder/triangulated_surface_builder.h>
 #include <geode/mesh/core/triangulated_surface.h>
 
+#include <geode/geometry/aabb.h>
+#include <geode/geometry/point.h>
 #include <geode/mesh/core/aabb_helpers.h>
 
 #include <geode/tests/common.h>
 
-using namespace geode;
-
-template < index_t dimension >
-Point< dimension > create_vertex( double i, double j )
+template < geode::index_t dimension >
+geode::Point< dimension > create_vertex( double i, double j )
 {
-    Point< dimension > point;
+    geode::Point< dimension > point;
     point.set_value( 0, i );
     point.set_value( 1, j );
     return point;
 }
 
-template < index_t dimension >
-void add_vertices(
-    TriangulatedSurfaceBuilder< dimension >& builder, index_t size )
+template < geode::index_t dimension >
+void add_vertices( geode::TriangulatedSurfaceBuilder< dimension >& builder,
+    geode::index_t size )
 {
     builder.create_vertices( size * size );
-    index_t id = 0;
-    for( index_t i : Range( size ) )
+    geode::index_t id = 0;
+    for( const auto i : geode::Range{ size } )
     {
-        for( index_t j : Range( size ) )
+        for( const auto j : geode::Range{ size } )
         {
             builder.set_point( id++, create_vertex< dimension >( i, j ) );
         }
     }
 }
 
-template < index_t dimension >
-void add_triangles(
-    TriangulatedSurfaceBuilder< dimension >& builder, index_t size )
+template < geode::index_t dimension >
+void add_triangles( geode::TriangulatedSurfaceBuilder< dimension >& builder,
+    geode::index_t size )
 {
-    builder.create_triangles( ( size - 1 ) * ( size - 1 ) * 2 );
-    index_t id = 0;
-    for( const auto i : Range{ size - 1 } )
+    builder.reserve_triangles( ( size - 1 ) * ( size - 1 ) * 2 );
+    geode::index_t id = 0;
+    for( const auto i : geode::Range{ size - 1 } )
     {
-        for( index_t j : Range( size - 1 ) )
+        for( const auto j : geode::Range{ size - 1 } )
         {
             builder.set_polygon_vertex( { id, 0 }, i * size + j );
             builder.set_polygon_vertex( { id, 1 }, i * size + j + 1 );
@@ -84,21 +84,21 @@ void add_triangles(
     }
 }
 
-template < index_t dimension >
-void check_tree( const AABBTree< dimension >& tree,
-    const DistanceToTriangle< dimension >& distance_action,
-    index_t size )
+template < geode::index_t dimension >
+void check_tree( const geode::AABBTree< dimension >& tree,
+    const geode::DistanceToTriangle< dimension >& distance_action,
+    geode::index_t size )
 {
     constexpr auto offset = 0.2;
-    index_t id = 0;
-    for( index_t i : Range( size - 1 ) )
+    geode::index_t id = 0;
+    for( const auto i : geode::Range{ size - 1 } )
     {
-        for( index_t j : Range( size - 1 ) )
+        for( const auto j : geode::Range{ size - 1 } )
         {
-            Point< dimension > query1 =
+            const auto query1 =
                 create_vertex< dimension >( i + offset, j + offset );
-            index_t triangle1 = NO_ID;
-            Point< dimension > nearest_point1;
+            geode::index_t triangle1;
+            geode::Point< dimension > nearest_point1;
             std::tie( triangle1, nearest_point1, std::ignore ) =
                 tree.closest_element_box( query1, distance_action );
             OPENGEODE_EXCEPTION(
@@ -106,10 +106,10 @@ void check_tree( const AABBTree< dimension >& tree,
             OPENGEODE_EXCEPTION(
                 nearest_point1 == query1, "[TEST] Wrong nearest point found" );
 
-            Point< dimension > query2 =
+            const auto query2 =
                 create_vertex< dimension >( i + 1 - offset, j + 1 - offset );
-            index_t triangle2 = NO_ID;
-            Point< dimension > nearest_point2;
+            geode::index_t triangle2;
+            geode::Point< dimension > nearest_point2;
             std::tie( triangle2, nearest_point2, std::ignore ) =
                 tree.closest_element_box( query2, distance_action );
             OPENGEODE_EXCEPTION(
@@ -119,35 +119,36 @@ void check_tree( const AABBTree< dimension >& tree,
         }
     }
 
-    Point< dimension > query;
-    index_t triangle = NO_ID;
-    Point< dimension > nearest_point;
+    geode::Point< dimension > query;
+    geode::index_t triangle;
+    geode::Point< dimension > nearest_point;
     std::tie( triangle, nearest_point, std::ignore ) =
         tree.closest_element_box( query, distance_action );
     OPENGEODE_EXCEPTION( triangle == 0, "[TEST] Wrong triangle found" );
-    OPENGEODE_EXCEPTION( nearest_point == Point< dimension >(),
+    OPENGEODE_EXCEPTION( nearest_point == geode::Point< dimension >(),
         "[TEST] Wrong nearest point found" );
 }
 
-template < index_t dimension >
+template < geode::index_t dimension >
 void test_SurfaceAABB()
 {
-    Logger::info( "TEST", " TriangulatedSurface AABB Helper", dimension, "D" );
+    geode::Logger::info(
+        "TEST", " TriangulatedSurface AABB Helper", dimension, "D" );
 
-    auto t_surf = TriangulatedSurface< dimension >::create();
+    auto t_surf = geode::TriangulatedSurface< dimension >::create();
     auto t_surf_builder =
-        TriangulatedSurfaceBuilder< dimension >::create( *t_surf );
+        geode::TriangulatedSurfaceBuilder< dimension >::create( *t_surf );
 
-    index_t size = 10;
+    geode::index_t size = 10;
     add_vertices( *t_surf_builder, size );
     add_triangles( *t_surf_builder, size );
 
-    auto aabb_tree = get_aabb( *t_surf );
-    DistanceToTriangle< dimension > distance_action( *t_surf );
+    auto aabb_tree = create_aabb_tree( *t_surf );
+    geode::DistanceToTriangle< dimension > distance_action( *t_surf );
 
-    check_tree< dimension >( *aabb_tree, distance_action, size );
+    check_tree< dimension >( aabb_tree, distance_action, size );
 }
-template < index_t dimension >
+template < geode::index_t dimension >
 void do_test()
 {
     test_SurfaceAABB< dimension >();

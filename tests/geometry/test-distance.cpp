@@ -158,8 +158,8 @@ void test_point_segment_distance()
 void test_point_triangle_distance_2d()
 {
     const geode::Point2D a{ { 0.0, 0.0 } };
-    const geode::Point2D b{ { 1.0, 1.0 } };
-    const geode::Point2D c{ { 1.0, 0.0 } };
+    const geode::Point2D b{ { 1.0, 0.0 } };
+    const geode::Point2D c{ { 1.0, 1.0 } };
     const geode::Triangle2D triangle2D{ a, b, c };
 
     double distance;
@@ -176,13 +176,6 @@ void test_point_triangle_distance_2d()
     OPENGEODE_EXCEPTION( distance == 0 && closest_point == b,
         "[Test] Wrong result for point_triangle_distance with query point "
         "b" );
-
-    const geode::Point2D q0{ { 0.8, 0.2 } };
-    std::tie( distance, closest_point ) =
-        geode::point_triangle_distance( q0, triangle2D );
-    OPENGEODE_EXCEPTION( distance == 0 && closest_point == q0,
-        "[Test] Wrong result for point_triangle_distance with query point "
-        "q0" );
 
     const geode::Point2D q1{ { 0.5, 0.5 } };
     std::tie( distance, closest_point ) =
@@ -203,11 +196,11 @@ void test_point_triangle_distance_2d()
     const geode::Point2D q3{ { 2.0, 1.0 } };
     std::tie( distance, closest_point ) =
         geode::point_triangle_distance( q3, triangle2D );
-    OPENGEODE_EXCEPTION( distance == 1 && closest_point == b,
+    OPENGEODE_EXCEPTION( distance == 1 && closest_point == c,
         "[Test] Wrong result for point_triangle_distance with query point "
         "q3" );
 
-    const geode::Point2D q4{ { 0.5, 0.5 } };
+    const geode::Point2D q4{ { 0.8, 0.2 } };
     std::tie( distance, closest_point ) =
         geode::point_triangle_distance( q4, triangle2D );
     OPENGEODE_EXCEPTION( distance == 0 && closest_point == q4,
