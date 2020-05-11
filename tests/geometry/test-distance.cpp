@@ -84,6 +84,65 @@ void test_point_segment_distance_2d()
         "[Test] Wrong result for point_segment_distance with query Point2D "
         "q4" );
 }
+void test_point_segment_signed_distance_2d()
+{
+    const geode::Point2D a{ { 1.0, 5.0 } };
+    const geode::Point2D b{ { -1.0, -5.0 } };
+    const geode::Segment2D segment2D{ a, b };
+
+    double distance;
+    geode::Point2D closest_point;
+
+    std::tie( distance, closest_point ) =
+        geode::point_segment_signed_distance( a, segment2D );
+    OPENGEODE_EXCEPTION( distance == 0 && closest_point == a,
+        "[Test] Wrong result for point_segment_signed_distance with query "
+        "Point2D "
+        "a" );
+
+    std::tie( distance, closest_point ) =
+        geode::point_segment_signed_distance( b, segment2D );
+    OPENGEODE_EXCEPTION( distance == 0 && closest_point == b,
+        "[Test] Wrong result for point_segment_signed_distance with query "
+        "Point2D "
+        "b" );
+
+    const geode::Point2D q1{ { 0.0, 0.0 } };
+    std::tie( distance, closest_point ) =
+        geode::point_segment_signed_distance( q1, segment2D );
+    OPENGEODE_EXCEPTION( distance == 0 && closest_point == q1,
+        "[Test] Wrong result for point_segment_signed_distance with query "
+        "Point2D "
+        "q1" );
+
+    const geode::Point2D q2{ { 10.0, 10.0 } };
+    std::tie( distance, closest_point ) =
+        geode::point_segment_signed_distance( q2, segment2D );
+    OPENGEODE_EXCEPTION( distance == -std::sqrt( 106 ) && closest_point == a,
+        "[Test] Wrong result for point_segment_signed_distance with query "
+        "Point2D "
+        "q2" );
+
+    const geode::Point2D q3{ { 5.0, -1.0 } };
+    std::tie( distance, closest_point ) =
+        geode::point_segment_signed_distance( q3, segment2D );
+    const geode::Point2D result_q3{ { 0.0, 0.0 } };
+    OPENGEODE_EXCEPTION(
+        distance == std::sqrt( 26 ) && closest_point == result_q3,
+        "[Test] Wrong result for point_segment_signed_distance with query "
+        "Point2D "
+        "q3" );
+
+    const geode::Point2D q4{ { 5.5, 1.5 } };
+    std::tie( distance, closest_point ) =
+        geode::point_segment_signed_distance( q4, segment2D );
+    const geode::Point2D result_q4{ { 0.5, 2.5 } };
+    OPENGEODE_EXCEPTION(
+        distance == -std::sqrt( 26 ) && closest_point == result_q4,
+        "[Test] Wrong result for point_segment_signed_distance with query "
+        "Point2D "
+        "q4" );
+}
 
 void test_point_segment_distance_3d()
 {
@@ -152,6 +211,7 @@ void test_point_segment_distance_3d()
 void test_point_segment_distance()
 {
     test_point_segment_distance_2d();
+    test_point_segment_signed_distance_2d();
     test_point_segment_distance_3d();
 }
 
