@@ -33,7 +33,7 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( Triangle );
     ALIAS_2D_AND_3D( Point );
     ALIAS_2D_AND_3D( Triangle );
-    ALIAS_2D( Segment );
+    ALIAS_2D( InfiniteLine );
 
     class Plane;
     class Tetra;
@@ -50,14 +50,6 @@ namespace geode
     template < index_t dimension >
     std::tuple< double, Point< dimension > > point_segment_distance(
         const Point< dimension >& point, const Segment< dimension >& segment );
-    /*!
-     * Compute the smallest signed distance between a point and a segment in 2D
-     * @return a tuple containing:
-     * - the smallest signed distance.
-     * - the closest point on the segment.
-     */
-    std::tuple< double, Point2D > point_segment_signed_distance(
-        const Point2D& point, const Segment2D& segment );
 
     /*!
      * Compute the smallest distance between a point and an infinite line
@@ -69,6 +61,17 @@ namespace geode
     std::tuple< double, Point< dimension > > point_line_distance(
         const Point< dimension >& point,
         const InfiniteLine< dimension >& line );
+
+    /*!
+     * Compute the smallest signed distance between a point and an infinite line
+     * in 2D
+     * @return a tuple containing:
+     * - the smallest signed distance.
+     * - the closest point on the line.
+     */
+    std::tuple< double, Point2D >
+        opengeode_geometry_api point_line_signed_distance(
+            const Point2D& point, const InfiniteLine2D& line );
 
     /*!
      * Compute the smallest distance between a point and a triangle

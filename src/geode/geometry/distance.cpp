@@ -63,21 +63,6 @@ namespace geode
             Vector< dimension >{ point, nearest_p }.length(), nearest_p );
     }
 
-    std::tuple< double, Point2D > point_segment_signed_distance(
-        const Point2D& point, const Segment2D& segment )
-    {
-        Point2D nearest_point;
-        double distance;
-        std::tie( distance, nearest_point ) =
-            point_segment_distance< 2 >( point, segment );
-        const Vector2D proj2point{ nearest_point, point };
-        const auto signed_distance =
-            dot_perpendicular( proj2point, segment.direction() ) <= 0
-                ? distance
-                : -distance;
-        return std::make_tuple( signed_distance, nearest_point );
-    }
-
     template < index_t dimension >
     std::tuple< double, Point< dimension > > point_line_distance(
         const Point< dimension >& point, const InfiniteLine< dimension >& line )
@@ -85,6 +70,20 @@ namespace geode
         const auto nearest_p = point_line_projection( point, line );
         return std::make_tuple(
             Vector< dimension >{ point, nearest_p }.length(), nearest_p );
+    }
+
+    std::tuple< double, Point2D > point_line_signed_distance(
+        const Point2D& point, const InfiniteLine2D& line )
+    {
+        Point2D nearest_point;
+        double distance;
+        std::tie( distance, nearest_point ) =
+            point_line_distance< 2 >( point, line );
+        const Vector2D proj2point{ nearest_point, point };
+        const auto signed_distance =
+            dot_perpendicular( proj2point, line.direction() ) <= 0 ? distance
+                                                                   : -distance;
+        return std::make_tuple( signed_distance, nearest_point );
     }
 
     template <>
