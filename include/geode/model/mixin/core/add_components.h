@@ -41,7 +41,8 @@ namespace geode
     template < index_t dimension, template < index_t > class... Components >
     class AddComponents : public Components< dimension >...
     {
-        // protected:
-        //     AddComponents() = default;
+        protected:
+            AddComponents() = default;
+            AddComponents( AddComponents&& ) = default;
     };
 } // namespace geode
