@@ -55,8 +55,6 @@ namespace geode
 
         std::tuple< double, Point< dimension > > operator()(
             const Point< dimension >& query, index_t cur_box ) const;
-        double operator()( const Point< dimension >& point1,
-            const Point< dimension >& point2 ) const;
 
     private:
         const EdgedCurve< dimension >& mesh_;

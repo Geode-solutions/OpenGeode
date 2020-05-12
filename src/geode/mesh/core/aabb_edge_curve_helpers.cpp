@@ -29,8 +29,6 @@
 
 #include <geode/mesh/core/aabb_edge_curve_helpers.h>
 
-#include <memory>
-
 #include <geode/geometry/aabb.h>
 #include <geode/geometry/basic_objects.h>
 #include <geode/geometry/distance.h>
@@ -57,20 +55,13 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::tuple< double, Point< dimension > > DistanceToEdge< dimension >::
-        operator()( const Point< dimension >& query, index_t cur_box ) const
+    std::tuple< double, Point< dimension > >
+        DistanceToEdge< dimension >::operator()(
+            const Point< dimension >& query, index_t cur_box ) const
     {
         const auto& v0 = mesh_.point( mesh_.edge_vertex( { cur_box, 0 } ) );
         const auto& v1 = mesh_.point( mesh_.edge_vertex( { cur_box, 1 } ) );
         return point_segment_distance( query, Segment< dimension >{ v0, v1 } );
-    }
-
-    template < index_t dimension >
-    double DistanceToEdge< dimension >::operator()(
-        const Point< dimension >& point1,
-        const Point< dimension >& point2 ) const
-    {
-        return Vector< dimension >{ point1, point2 }.length();
     }
 
     template opengeode_mesh_api AABBTree2D create_aabb_tree< 2 >(

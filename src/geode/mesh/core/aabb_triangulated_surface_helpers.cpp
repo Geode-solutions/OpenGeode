@@ -29,8 +29,6 @@
 
 #include <geode/mesh/core/aabb_triangulated_surface_helpers.h>
 
-#include <memory>
-
 #include <geode/mesh/core/triangulated_surface.h>
 
 #include <geode/geometry/aabb.h>
@@ -59,22 +57,15 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::tuple< double, Point< dimension > > DistanceToTriangle< dimension >::
-        operator()( const Point< dimension >& query, index_t cur_box ) const
+    std::tuple< double, Point< dimension > >
+        DistanceToTriangle< dimension >::operator()(
+            const Point< dimension >& query, index_t cur_box ) const
     {
         const auto& v0 = mesh_.point( mesh_.polygon_vertex( { cur_box, 0 } ) );
         const auto& v1 = mesh_.point( mesh_.polygon_vertex( { cur_box, 1 } ) );
         const auto& v2 = mesh_.point( mesh_.polygon_vertex( { cur_box, 2 } ) );
         return point_triangle_distance(
             query, Triangle< dimension >{ v0, v1, v2 } );
-    }
-
-    template < index_t dimension >
-    double DistanceToTriangle< dimension >::operator()(
-        const Point< dimension >& point1,
-        const Point< dimension >& point2 ) const
-    {
-        return Vector< dimension >{ point1, point2 }.length();
     }
 
     template opengeode_mesh_api AABBTree2D create_aabb_tree< 2 >(
