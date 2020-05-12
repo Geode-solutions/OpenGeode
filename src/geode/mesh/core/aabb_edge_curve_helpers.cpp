@@ -38,7 +38,6 @@
 #include <geode/geometry/vector.h>
 #include <geode/mesh/core/edged_curve.h>
 
-
 namespace geode
 {
     template < index_t dimension >
@@ -59,9 +58,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::tuple< double, Point< dimension > >
-        DistanceToEdge< dimension >::operator()(
-            const Point< dimension >& query, index_t cur_box ) const
+    std::tuple< double, Point< dimension > > DistanceToEdge< dimension >::
+        operator()( const Point< dimension >& query, index_t cur_box ) const
     {
         const auto& v0 = mesh_.point( mesh_.edge_vertex( { cur_box, 0 } ) );
         const auto& v1 = mesh_.point( mesh_.edge_vertex( { cur_box, 1 } ) );
