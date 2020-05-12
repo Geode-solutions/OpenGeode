@@ -35,12 +35,7 @@ namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
     FORWARD_DECLARATION_DIMENSION_CLASS( AABBTree );
-} // namespace geode
-
-namespace geode
-{
     FORWARD_DECLARATION_DIMENSION_CLASS( EdgedCurve );
-    FORWARD_DECLARATION_DIMENSION_CLASS( TriangulatedSurface );
 } // namespace geode
 
 namespace geode
@@ -65,29 +60,6 @@ namespace geode
 
     private:
         const EdgedCurve< dimension >& mesh_;
-    };
-
-    template < index_t dimension >
-    AABBTree< dimension > create_aabb_tree(
-        const TriangulatedSurface< dimension >& mesh );
-
-    template < index_t dimension >
-    class DistanceToTriangle
-    {
-    public:
-        explicit DistanceToTriangle(
-            const TriangulatedSurface< dimension >& mesh )
-            : mesh_( mesh )
-        {
-        }
-
-        std::tuple< double, Point< dimension > > operator()(
-            const Point< dimension >& query, index_t cur_box ) const;
-        double operator()( const Point< dimension >& point1,
-            const Point< dimension >& point2 ) const;
-
-    private:
-        const TriangulatedSurface< dimension >& mesh_;
     };
 
 } // namespace geode

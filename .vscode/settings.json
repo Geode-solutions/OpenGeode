@@ -13,8 +13,7 @@
         "${workspaceFolder}/build/third_party/spdlog/install/include"
     ],
     "files.watcherExclude": {
-        "${workspaceFolder}/build/**": true
-    },
+        "${workspaceFolder}/build/**": true},
     "files.associations": {
         "forward_list": "cpp",
         "list": "cpp",
