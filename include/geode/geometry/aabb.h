@@ -33,6 +33,7 @@
 
 #include <geode/basic/pimpl.h>
 
+#include <geode/geometry/basic_objects.h>
 #include <geode/geometry/bounding_box.h>
 #include <geode/geometry/common.h>
 
@@ -126,6 +127,27 @@ namespace geode
          */
         template < class EvalIntersection >
         void compute_self_element_bbox_intersections(
+            EvalIntersection& action ) const;
+
+        /*!
+         * @brief Computes the intersections between a given ray trace and all
+         * element boxes.
+         * @param[in] ray The ray trace to test.
+         * @param[in] action The functor to run when a box is intersected by the
+         * ray trace.
+         *
+         * @tparam EvalIntersection this functor should have an operator()
+         * defined like this:
+         * void operator()( index_t cur_element_box ) ;
+         *
+         * @note cur_element_box1 and cur_element_box2 are the element box
+         * indices that intersect.
+         * @note the operator can be defined to test real intersection between
+         * element in boxes and store the result.
+         */
+        template < class EvalIntersection >
+        void compute_ray_trace_element_bbox_intersections(
+            const InfiniteLine< dimension >& ray,
             EvalIntersection& action ) const;
 
     protected:

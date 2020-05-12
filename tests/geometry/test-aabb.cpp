@@ -262,6 +262,95 @@ void test_intersections_with_query_box()
 }
 
 template < index_t dimension >
+class RayAABBIntersection
+{
+public:
+    RayAABBIntersection(
+        const std::vector< BoundingBox< dimension > >& bounding_boxes )
+        : bounding_boxes_( bounding_boxes )
+    {
+    }
+    ~RayAABBIntersection() = default;
+
+    void operator()( index_t cur_box )
+    {
+        box_intersections_.emplace( cur_box );
+    }
+
+public:
+    absl::flat_hash_set< index_t > box_intersections_;
+
+private:
+    const std::vector< BoundingBox< dimension > >& bounding_boxes_;
+};
+
+template < index_t dimension >
+void test_intersections_with_ray_trace()
+{
+    const index_t nb_boxes{ 10 };
+    const double box_size{ 0.5 };
+    const auto box_vector =
+        create_box_vector< dimension >( nb_boxes, box_size );
+    AABBTree< dimension > aabb( box_vector );
+
+    RayAABBIntersection< dimension > eval_intersection{ box_vector };
+
+    Vector< dimension > ray_direction;
+    ray_direction.set_value( 1, 1.0 );
+
+    for( const index_t i : Range( nb_boxes ) )
+    {
+        Point< dimension > ray_origin;
+        ray_origin.set_value( 0, i );
+        ray_origin.set_value( 1, i );
+
+        InfiniteLine< dimension > query{ ray_direction, ray_origin };
+
+        eval_intersection.box_intersections_.clear();
+        aabb.compute_ray_trace_element_bbox_intersections(
+            query, eval_intersection );
+
+        OPENGEODE_EXCEPTION(
+            eval_intersection.box_intersections_.size() == nb_boxes - i,
+            "[Test] Wrong number of boxes intersected by the ray " );
+
+        absl::flat_hash_set< index_t > expected_set;
+        for( const index_t c : Range( nb_boxes - i ) )
+        {
+            expected_set.emplace( global_box_index( i, c + i, nb_boxes ) );
+        }
+
+        OPENGEODE_EXCEPTION(
+            eval_intersection.box_intersections_ == expected_set,
+            "[Test] Wrong box intersected by the ray" );
+    }
+
+    Point< dimension > ray_origin;
+    ray_origin.set_value( 0, box_size );
+    ray_origin.set_value( 1, box_size + 0.1 );
+
+    InfiniteLine< dimension > query{ ray_direction, ray_origin };
+
+    eval_intersection.box_intersections_.clear();
+    aabb.compute_ray_trace_element_bbox_intersections(
+        query, eval_intersection );
+
+    OPENGEODE_EXCEPTION(
+        eval_intersection.box_intersections_.size() == 2 * ( nb_boxes - 1 ),
+        "[Test] Wrong number of boxes intersected by the ray " );
+
+    absl::flat_hash_set< index_t > expected_set;
+    for( const index_t c : Range( nb_boxes - 1 ) )
+    {
+        expected_set.emplace( global_box_index( 0, c + 1, nb_boxes ) );
+        expected_set.emplace( global_box_index( 1, c + 1, nb_boxes ) );
+    }
+
+    OPENGEODE_EXCEPTION( eval_intersection.box_intersections_ == expected_set,
+        "[Test] Wrong box intersected by the ray" );
+}
+
+template < index_t dimension >
 void test_self_intersections()
 {
     const index_t nb_boxes{ 10 };
@@ -294,10 +383,11 @@ void test_self_intersections()
 template < index_t dimension >
 void do_test()
 {
-    test_build_aabb< dimension >();
-    test_nearest_neighbor_search< dimension >();
-    test_intersections_with_query_box< dimension >();
-    test_self_intersections< dimension >();
+    // test_build_aabb< dimension >();
+    // test_nearest_neighbor_search< dimension >();
+    // test_intersections_with_query_box< dimension >();
+    test_intersections_with_ray_trace< dimension >();
+    // test_self_intersections< dimension >();
 }
 
 void test()
