@@ -44,9 +44,8 @@ namespace geode
     AABBTree< dimension > create_aabb_tree(
         const EdgedCurve< dimension >& mesh )
     {
-        absl::FixedArray< BoundingBox< dimension > > box_vector{
-            mesh.nb_edges()
-        };
+        absl::FixedArray< BoundingBox< dimension > > box_vector(
+            mesh.nb_edges() );
         for( const auto e : Range{ mesh.nb_edges() } )
         {
             box_vector[e].add_point(
@@ -58,8 +57,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::tuple< double, Point< dimension > > DistanceToEdge< dimension >::
-        operator()( const Point< dimension >& query, index_t cur_box ) const
+    std::tuple< double, Point< dimension > >
+        DistanceToEdge< dimension >::operator()(
+            const Point< dimension >& query, index_t cur_box ) const
     {
         const auto& v0 = mesh_.point( mesh_.edge_vertex( { cur_box, 0 } ) );
         const auto& v1 = mesh_.point( mesh_.edge_vertex( { cur_box, 1 } ) );

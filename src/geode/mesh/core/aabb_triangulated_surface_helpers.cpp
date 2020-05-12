@@ -45,9 +45,8 @@ namespace geode
     AABBTree< dimension > create_aabb_tree(
         const TriangulatedSurface< dimension >& mesh )
     {
-        absl::FixedArray< BoundingBox< dimension > > box_vector{
-            mesh.nb_polygons()
-        };
+        absl::FixedArray< BoundingBox< dimension > > box_vector(
+            mesh.nb_polygons() );
         for( const auto p : Range{ mesh.nb_polygons() } )
         {
             for( const auto v : Range{ mesh.nb_polygon_vertices( p ) } )
@@ -60,8 +59,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::tuple< double, Point< dimension > > DistanceToTriangle< dimension >::
-        operator()( const Point< dimension >& query, index_t cur_box ) const
+    std::tuple< double, Point< dimension > >
+        DistanceToTriangle< dimension >::operator()(
+            const Point< dimension >& query, index_t cur_box ) const
     {
         const auto& v0 = mesh_.point( mesh_.polygon_vertex( { cur_box, 0 } ) );
         const auto& v1 = mesh_.point( mesh_.polygon_vertex( { cur_box, 1 } ) );

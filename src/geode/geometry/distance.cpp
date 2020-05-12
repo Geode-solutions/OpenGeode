@@ -38,12 +38,15 @@ namespace
     bool point_is_in_triangle(
         const geode::Point2D& point, const geode::Triangle2D& triangle )
     {
-        double signed_area_1 = geode::triangle_signed_area( geode::Triangle2D{
-            triangle.vertices()[0], triangle.vertices()[1], point } );
-        double signed_area_2 = geode::triangle_signed_area( geode::Triangle2D{
-            triangle.vertices()[1], triangle.vertices()[2], point } );
-        double signed_area_3 = geode::triangle_signed_area( geode::Triangle2D{
-            triangle.vertices()[2], triangle.vertices()[0], point } );
+        const auto signed_area_1 =
+            geode::triangle_signed_area( geode::Triangle2D{
+                triangle.vertices()[0], triangle.vertices()[1], point } );
+        const auto signed_area_2 =
+            geode::triangle_signed_area( geode::Triangle2D{
+                triangle.vertices()[1], triangle.vertices()[2], point } );
+        const auto signed_area_3 =
+            geode::triangle_signed_area( geode::Triangle2D{
+                triangle.vertices()[2], triangle.vertices()[0], point } );
 
         return ( signed_area_1 <= 0. && signed_area_2 <= 0.
                    && signed_area_3 <= 0 )
