@@ -38,7 +38,7 @@ namespace
     /*
      * This function test if the point is in the triangle by computing signed
      * areas
-     * @warning This is not robust in any cases!
+     * @warning This is not robust in edge cases!
      */
     bool may_point_is_in_triangle(
         const geode::Point2D& point, const geode::Triangle2D& triangle )
