@@ -30,11 +30,11 @@
 
 namespace
 {
-    void load(
-        geode::VertexSet& vertex_set, absl::string_view filename )
+    void load( geode::VertexSet& vertex_set, absl::string_view filename )
     {
         auto input = geode::VertexSetInputFactory::create(
-            geode::extension_from_filename( filename ).data(), vertex_set, filename );
+            geode::extension_from_filename( filename ).data(), vertex_set,
+            filename );
         input->read();
     }
 } // namespace

@@ -32,7 +32,8 @@ namespace
         geode::PointSet< dimension >& point_set, absl::string_view filename )
     {
         auto input = geode::PointSetInputFactory< dimension >::create(
-            geode::extension_from_filename( filename ).data(), point_set, filename );
+            geode::extension_from_filename( filename ).data(), point_set,
+            filename );
         input->read();
     }
 } // namespace
@@ -59,11 +60,11 @@ namespace geode
 
     template < index_t dimension >
     std::unique_ptr< PointSet< dimension > > load_point_set(
-         absl::string_view filename )
+        absl::string_view filename )
     {
         try
         {
-            auto point_set = PointSet< dimension >::create(  );
+            auto point_set = PointSet< dimension >::create();
             load( *point_set, filename );
             return point_set;
         }
@@ -88,9 +89,9 @@ namespace geode
         const MeshType&, absl::string_view );
 
     template std::unique_ptr< PointSet< 2 > > opengeode_mesh_api load_point_set(
-         absl::string_view );
+        absl::string_view );
     template std::unique_ptr< PointSet< 3 > > opengeode_mesh_api load_point_set(
-         absl::string_view );
+        absl::string_view );
 
     template class opengeode_mesh_api PointSetInput< 2 >;
     template class opengeode_mesh_api PointSetInput< 3 >;

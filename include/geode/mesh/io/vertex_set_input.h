@@ -26,8 +26,8 @@
 #include <geode/basic/factory.h>
 
 #include <geode/mesh/common.h>
-#include <geode/mesh/io/input.h>
 #include <geode/mesh/core/mesh_type.h>
+#include <geode/mesh/io/input.h>
 
 namespace geode
 {
