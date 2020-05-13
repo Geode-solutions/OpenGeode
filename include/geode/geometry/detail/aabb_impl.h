@@ -128,8 +128,7 @@ namespace geode
             ACTION& action ) const;
 
         template < class ACTION >
-        void ray_trace_intersect_recursive(
-            const InfiniteLine< dimension >& ray,
+        void ray_trace_intersect_recursive( const Ray< dimension >& ray,
             index_t node_index,
             index_t element_begin,
             index_t element_end,
@@ -214,7 +213,7 @@ namespace geode
     template < index_t dimension >
     template < class EvalIntersection >
     void AABBTree< dimension >::compute_ray_trace_element_bbox_intersections(
-        const InfiniteLine< dimension >& ray, EvalIntersection& action ) const
+        const Ray< dimension >& ray, EvalIntersection& action ) const
     {
         impl_->ray_trace_intersect_recursive(
             ray, Impl::ROOT_INDEX, 0, nb_bboxes(), action );
@@ -413,7 +412,7 @@ namespace geode
     template < index_t dimension >
     template < typename ACTION >
     void AABBTree< dimension >::Impl::ray_trace_intersect_recursive(
-        const InfiniteLine< dimension >& ray,
+        const Ray< dimension >& ray,
         index_t node_index,
         index_t element_begin,
         index_t element_end,
@@ -432,7 +431,6 @@ namespace geode
         // Leaf case
         if( is_leaf( element_begin, element_end ) )
         {
-            // @todo Check if the box is not intersecting itself
             action( mapping_morton_[element_begin] );
             return;
         }
@@ -448,59 +446,59 @@ namespace geode
     }
 
     template < index_t dimension >
-    bool ray_box_intersection( const InfiniteLine< dimension >& ray,
-        const BoundingBox< dimension >& box )
+    bool ray_box_intersection(
+        const Ray< dimension >& ray, const BoundingBox< dimension >& box )
     {
         const auto box_center = ( box.min() + box.max() ) / 2.;
-        const auto box_extent = ( box.max() - box.min() ) / 2.;
+        const auto box_half_extent = ( box.max() - box.min() ) / 2.;
 
         // Transform the ray to the aligned-box coordinate system.
         const auto ray_origin = ray.origin() - box_center;
-        const auto rayDirection = ray.direction();
 
         for( const auto i : geode::Range{ dimension } )
         {
-            if( std::fabs( ray_origin.value( i ) ) > box_extent.value( i )
-                && ray_origin.value( i ) * rayDirection.value( i ) >= 0. )
+            if( std::fabs( ray_origin.value( i ) ) > box_half_extent.value( i )
+                && ray_origin.value( i ) * ray.direction().value( i ) >= 0. )
             {
                 return false;
             }
         }
-        return line_box_intersection( ray_origin, rayDirection, box_extent );
+        return line_box_intersection(
+            ray_origin, ray.direction(), box_half_extent );
     }
 
     template < index_t dimension >
     bool line_box_intersection( const Point< dimension >& ray_origin,
-        const geode::Vector< dimension >& rayDirection,
-        const Point< dimension >& box_extent );
-
+        const geode::Vector< dimension >& ray_direction,
+        const Point< dimension >& box_half_extent );
     template <>
     bool line_box_intersection( const Point3D& ray_origin,
-        const geode::Vector3D& rayDirection,
-        const Point3D& box_extent )
+        const geode::Vector3D& ray_direction,
+        const Point3D& box_half_extent )
     {
-        const auto WxD = geode::Vector3D{ rayDirection }.cross( ray_origin );
-        absl::FixedArray< double > absWdU{ std::fabs( rayDirection.value( 0 ) ),
-            std::fabs( rayDirection.value( 1 ) ),
-            std::fabs( rayDirection.value( 2 ) ) };
+        const auto orign_x_direction = ray_direction.cross( ray_origin );
+        geode::Point3D abs_ray_direction = { { std::fabs(
+                                                   ray_direction.value( 0 ) ),
+            std::fabs( ray_direction.value( 1 ) ),
+            std::fabs( ray_direction.value( 2 ) ) } };
 
-        if( std::fabs( WxD.value( 0 ) )
-            > box_extent.value( 1 ) * absWdU[2]
-                  + box_extent.value( 2 ) * absWdU[1] )
+        if( std::fabs( orign_x_direction.value( 0 ) )
+            > box_half_extent.value( 1 ) * abs_ray_direction.value( 2 )
+                  + box_half_extent.value( 2 ) * abs_ray_direction.value( 1 ) )
         {
             return false;
         }
 
-        if( std::fabs( WxD.value( 1 ) )
-            > box_extent.value( 0 ) * absWdU[2]
-                  + box_extent.value( 2 ) * absWdU[0] )
+        if( std::fabs( orign_x_direction.value( 1 ) )
+            > box_half_extent.value( 0 ) * abs_ray_direction.value( 2 )
+                  + box_half_extent.value( 2 ) * abs_ray_direction.value( 0 ) )
         {
             return false;
         }
 
-        if( std::fabs( WxD.value( 2 ) )
-            > box_extent.value( 0 ) * absWdU[1]
-                  + box_extent.value( 1 ) * absWdU[0] )
+        if( std::fabs( orign_x_direction.value( 2 ) )
+            > box_half_extent.value( 0 ) * abs_ray_direction.value( 1 )
+                  + box_half_extent.value( 1 ) * abs_ray_direction.value( 0 ) )
         {
             return false;
         }
@@ -509,14 +507,16 @@ namespace geode
     }
     template <>
     bool line_box_intersection( const Point2D& ray_origin,
-        const geode::Vector2D& rayDirection,
-        const Point2D& box_extent )
+        const geode::Vector2D& ray_direction,
+        const Point2D& box_half_extent )
     {
         const auto lhs =
-            std::fabs( geode::dot_perpendicular( rayDirection, ray_origin ) );
+            std::fabs( geode::dot_perpendicular( ray_direction, ray_origin ) );
         const auto rhs =
-            box_extent.value( 0 ) * std::fabs( rayDirection.value( 1 ) )
-            + box_extent.value( 1 ) * std::fabs( rayDirection.value( 0 ) );
-        return ( lhs <= rhs );
+            box_half_extent.value( 0 ) * std::fabs( ray_direction.value( 1 ) )
+            + box_half_extent.value( 1 )
+                  * std::fabs( ray_direction.value( 0 ) );
+        return lhs <= rhs;
     }
+
 } // namespace geode

@@ -39,6 +39,12 @@
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( InfiniteLine );
+    template < index_t dimension >
+    using Ray = InfiniteLine< dimension >;
+} // namespace geode
+namespace geode
+{
     template < index_t dimension >
     class AABBTree
     {
@@ -102,11 +108,8 @@ namespace geode
          * defined like this:
          * void operator()( index_t cur_element_box ) ;
          *
-         * @note where cur_element_box is the element box index
-         * that is intersected by \p box.
-         * @note A posibility is to define this operator to add \p
-         * cur_element_box to a set and build a set of tree element that
-         * intersect the \p box.
+         * @note the operator define what to do with the box \p cur_element_box
+         * if it is intersected by the \p box.
          */
         template < class EvalIntersection >
         void compute_bbox_element_bbox_intersections(
@@ -122,8 +125,10 @@ namespace geode
          * ;
          * @note cur_element_box1 and cur_element_box2 are the element box
          * indices that intersect.
-         * @note the operator can be defined to test real intersection between
-         * element in boxes and store the result.
+         * @note the operator defines what to do when two boxes of the
+         * tree ( \p cur_element_box1 and \p cur_element_box2 ) intesect each
+         * other (for example: test real intersection between each element in
+         * boxes and store the result.)
          */
         template < class EvalIntersection >
         void compute_self_element_bbox_intersections(
@@ -135,20 +140,15 @@ namespace geode
          * @param[in] ray The ray trace to test.
          * @param[in] action The functor to run when a box is intersected by the
          * ray trace.
-         *
          * @tparam EvalIntersection this functor should have an operator()
          * defined like this:
          * void operator()( index_t cur_element_box ) ;
-         *
-         * @note cur_element_box1 and cur_element_box2 are the element box
-         * indices that intersect.
-         * @note the operator can be defined to test real intersection between
-         * element in boxes and store the result.
+         * @note the operator define what to do with the box \p cur_element_box
+         * if it is intersected by the \p ray.
          */
         template < class EvalIntersection >
         void compute_ray_trace_element_bbox_intersections(
-            const InfiniteLine< dimension >& ray,
-            EvalIntersection& action ) const;
+            const Ray< dimension >& ray, EvalIntersection& action ) const;
 
     protected:
         static bool is_leaf( index_t box_begin, index_t box_end )
