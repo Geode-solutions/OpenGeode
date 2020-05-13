@@ -28,16 +28,43 @@
 #include <geode/mesh/core/bitsery_archive.h>
 #include <geode/mesh/core/vertex_set.h>
 
+namespace
+{
+    void load(
+        geode::VertexSet& vertex_set, absl::string_view filename )
+    {
+        auto input = geode::VertexSetInputFactory::create(
+            geode::extension_from_filename( filename ).data(), vertex_set, filename );
+        input->read();
+    }
+} // namespace
+
 namespace geode
 {
-    void load_vertex_set( VertexSet& vertex_set, absl::string_view filename )
+    std::unique_ptr< VertexSet > load_vertex_set( absl::string_view filename )
     {
         try
         {
-            auto input = VertexSetInputFactory::create(
-                extension_from_filename( filename ).data(), vertex_set,
-                filename );
-            input->read();
+            auto vertex_set = VertexSet::create();
+            load( *vertex_set, filename );
+            return vertex_set;
+        }
+        catch( const OpenGeodeException& e )
+        {
+            Logger::error( e.what() );
+            throw OpenGeodeException{ "Cannot load VertexSet from file: ",
+                filename };
+        }
+    }
+
+    std::unique_ptr< VertexSet > load_vertex_set(
+        const MeshType& type, absl::string_view filename )
+    {
+        try
+        {
+            auto vertex_set = VertexSet::create( type );
+            load( *vertex_set, filename );
+            return vertex_set;
         }
         catch( const OpenGeodeException& e )
         {
