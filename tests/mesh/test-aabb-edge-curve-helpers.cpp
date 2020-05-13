@@ -73,7 +73,7 @@ void add_edges(
 template < geode::index_t dimension >
 void check_edgecurve_tree( const geode::EdgedCurve< dimension >& edge_curve )
 {
-    auto aabb_tree = geode::create_aabb_tree< dimension >( edge_curve );
+    const auto aabb_tree = geode::create_aabb_tree< dimension >( edge_curve );
     geode::DistanceToEdge< dimension > distance_action( edge_curve );
 
     for( const auto e : geode::Range{ edge_curve.nb_edges() } )

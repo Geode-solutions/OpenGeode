@@ -52,7 +52,6 @@ void add_vertices( geode::TriangulatedSurfaceBuilder< dimension >& builder,
     geode::index_t size )
 {
     builder.create_vertices( size * size );
-    geode::index_t id = 0;
     for( const auto i : geode::Range{ size } )
     {
         for( const auto j : geode::Range{ size } )
@@ -141,7 +140,7 @@ void test_SurfaceAABB()
     add_vertices( *t_surf_builder, size );
     add_triangles( *t_surf_builder, size );
 
-    auto aabb_tree = create_aabb_tree( *t_surf );
+    const auto aabb_tree = create_aabb_tree( *t_surf );
     geode::DistanceToTriangle< dimension > distance_action( *t_surf );
 
     check_surface_tree< dimension >( aabb_tree, distance_action, size );
