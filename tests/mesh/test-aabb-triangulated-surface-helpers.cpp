@@ -52,6 +52,7 @@ void add_vertices( geode::TriangulatedSurfaceBuilder< dimension >& builder,
     geode::index_t size )
 {
     builder.create_vertices( size * size );
+    geode::index_t id = 0;
     for( const auto i : geode::Range{ size } )
     {
         for( const auto j : geode::Range{ size } )
@@ -66,17 +67,14 @@ void add_triangles( geode::TriangulatedSurfaceBuilder< dimension >& builder,
     geode::index_t size )
 {
     builder.reserve_triangles( ( size - 1 ) * ( size - 1 ) * 2 );
-    geode::index_t id = 0;
     for( const auto i : geode::Range{ size - 1 } )
     {
         for( const auto j : geode::Range{ size - 1 } )
         {
             builder.create_triangle(
                 { i * size + j, i * size + j + 1, ( i + 1 ) * size + j } );
-            id++;
             builder.create_triangle( { i * size + j + 1,
                 ( i + 1 ) * size + j + 1, ( i + 1 ) * size + j } );
-            id++;
         }
     }
 }
