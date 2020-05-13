@@ -26,8 +26,8 @@
 #include <geode/basic/factory.h>
 
 #include <geode/mesh/common.h>
-#include <geode/mesh/io/vertex_set_input.h>
 #include <geode/mesh/core/mesh_type.h>
+#include <geode/mesh/io/vertex_set_input.h>
 
 namespace geode
 {
@@ -43,12 +43,12 @@ namespace geode
      * @param[in] filename Path to the file to load.
      */
     template < index_t dimension >
-        std::unique_ptr < PointSet< dimension > > load_point_set(
-        const MeshType & type, absl::string_view filename );
+    std::unique_ptr< PointSet< dimension > > load_point_set(
+        const MeshType& type, absl::string_view filename );
 
     template < index_t dimension >
     std::unique_ptr< PointSet< dimension > > load_point_set(
-         absl::string_view filename );
+        absl::string_view filename );
 
     template < index_t dimension >
     class PointSetInput : public VertexSetInput

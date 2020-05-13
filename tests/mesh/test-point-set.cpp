@@ -91,7 +91,8 @@ void test_delete_vertex(
 void test_io( const geode::PointSet3D& point_set, absl::string_view filename )
 {
     geode::save_point_set( point_set, filename );
-    geode::load_point_set< 3 >( geode::OpenGeodePointSet3D::type_name_static(), filename );
+    geode::load_point_set< 3 >(
+        geode::OpenGeodePointSet3D::type_name_static(), filename );
 }
 
 void test_clone( const geode::PointSet3D& point_set )
