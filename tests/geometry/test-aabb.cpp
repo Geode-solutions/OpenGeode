@@ -298,7 +298,7 @@ void test_intersections_with_ray_trace()
     geode::Logger::info(
         "TEST", " Box-Ray intersection AABB ", dimension, "D" );
 
-    const index_t nb_boxes{ 4 };
+    const index_t nb_boxes{ 10 };
     const double box_size{ 0.5 };
     const auto box_vector =
         create_box_vector< dimension >( nb_boxes, box_size );
