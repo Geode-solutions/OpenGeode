@@ -33,7 +33,6 @@
 #include <geode/mesh/core/triangulated_surface.h>
 #include <geode/mesh/helpers/aabb_triangulated_surface_helpers.h>
 
-
 #include <geode/geometry/aabb.h>
 #include <geode/geometry/point.h>
 

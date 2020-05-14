@@ -33,7 +33,6 @@
 #include <geode/mesh/core/edged_curve.h>
 #include <geode/mesh/helpers/aabb_edge_curve_helpers.h>
 
-
 #include <geode/geometry/aabb.h>
 #include <geode/geometry/point.h>
 
