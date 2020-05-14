@@ -318,9 +318,10 @@ void test_intersections_with_ray_trace()
         Ray< dimension > query{ ray_direction, ray_origin };
 
         eval_intersection.box_intersections_.clear();
-        aabb.compute_ray_trace_element_bbox_intersections(
+        aabb.compute_ray_element_bbox_intersections(
             query, eval_intersection );
-
+        std::cout << eval_intersection.box_intersections_.size() << "  "
+                  << nb_boxes - i << std::endl;
         OPENGEODE_EXCEPTION(
             eval_intersection.box_intersections_.size() == nb_boxes - i,
             "[Test] Box-Ray intersection - Wrong number of boxes intersected "
@@ -344,7 +345,7 @@ void test_intersections_with_ray_trace()
     Ray< dimension > query{ ray_direction, ray_origin };
 
     eval_intersection.box_intersections_.clear();
-    aabb.compute_ray_trace_element_bbox_intersections(
+    aabb.compute_ray_element_bbox_intersections(
         query, eval_intersection );
 
     OPENGEODE_EXCEPTION( eval_intersection.box_intersections_.size() == 0,
@@ -361,7 +362,7 @@ void test_intersections_with_ray_trace()
     Ray< dimension > query2{ ray_direction, ray_origin };
 
     eval_intersection.box_intersections_.clear();
-    aabb.compute_ray_trace_element_bbox_intersections(
+    aabb.compute_ray_element_bbox_intersections(
         query2, eval_intersection );
 
     OPENGEODE_EXCEPTION(

@@ -39,12 +39,6 @@
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( InfiniteLine );
-    template < index_t dimension >
-    using Ray = InfiniteLine< dimension >;
-} // namespace geode
-namespace geode
-{
     template < index_t dimension >
     class AABBTree
     {
@@ -135,11 +129,11 @@ namespace geode
             EvalIntersection& action ) const;
 
         /*!
-         * @brief Computes the intersections between a given ray trace and all
+         * @brief Computes the intersections between a given ray and all
          * element boxes.
-         * @param[in] ray The ray trace to test.
+         * @param[in] ray The ray to test.
          * @param[in] action The functor to run when a box is intersected by the
-         * ray trace.
+         * ray.
          * @tparam EvalIntersection this functor should have an operator()
          * defined like this:
          * void operator()( index_t cur_element_box ) ;
@@ -147,7 +141,7 @@ namespace geode
          * if it is intersected by the \p ray.
          */
         template < class EvalIntersection >
-        void compute_ray_trace_element_bbox_intersections(
+        void compute_ray_element_bbox_intersections(
             const Ray< dimension >& ray, EvalIntersection& action ) const;
 
     protected:
