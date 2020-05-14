@@ -30,8 +30,9 @@
 #include <geode/basic/logger.h>
 
 #include <geode/mesh/builder/triangulated_surface_builder.h>
-#include <geode/mesh/core/aabb_triangulated_surface_helpers.h>
 #include <geode/mesh/core/triangulated_surface.h>
+#include <geode/mesh/helpers/aabb_triangulated_surface_helpers.h>
+
 
 #include <geode/geometry/aabb.h>
 #include <geode/geometry/point.h>

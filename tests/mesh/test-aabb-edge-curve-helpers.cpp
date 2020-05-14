@@ -30,8 +30,9 @@
 #include <geode/basic/logger.h>
 
 #include <geode/mesh/builder/edged_curve_builder.h>
-#include <geode/mesh/core/aabb_edge_curve_helpers.h>
 #include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/helpers/aabb_edge_curve_helpers.h>
+
 
 #include <geode/geometry/aabb.h>
 #include <geode/geometry/point.h>
