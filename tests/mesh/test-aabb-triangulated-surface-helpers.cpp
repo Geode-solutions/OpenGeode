@@ -85,7 +85,7 @@ void check_surface_tree( const geode::AABBTree< dimension >& tree,
     geode::index_t size )
 {
     constexpr auto offset = 0.2;
-    geode::index_t id = 0;
+    geode::index_t id{ 0 };
     for( const auto i : geode::Range{ size - 1 } )
     {
         for( const auto j : geode::Range{ size - 1 } )
@@ -134,7 +134,7 @@ void test_SurfaceAABB()
     auto t_surf_builder =
         geode::TriangulatedSurfaceBuilder< dimension >::create( *t_surf );
 
-    geode::index_t size = 10;
+    geode::index_t size{ 10 };
     add_vertices( *t_surf_builder, size );
     add_triangles( *t_surf_builder, size );
 
