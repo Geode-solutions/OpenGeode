@@ -298,8 +298,8 @@ void test_intersections_with_ray_trace()
     geode::Logger::info(
         "TEST", " Box-Ray intersection AABB ", dimension, "D" );
 
-    const index_t nb_boxes{ 10 };
-    const double box_size{ 0.4 };
+    const index_t nb_boxes{ 4 };
+    const double box_size{ 0.5 };
     const auto box_vector =
         create_box_vector< dimension >( nb_boxes, box_size );
     AABBTree< dimension > aabb( box_vector );
@@ -318,10 +318,8 @@ void test_intersections_with_ray_trace()
         Ray< dimension > query{ ray_direction, ray_origin };
 
         eval_intersection.box_intersections_.clear();
-        aabb.compute_ray_element_bbox_intersections(
-            query, eval_intersection );
-        std::cout << eval_intersection.box_intersections_.size() << "  "
-                  << nb_boxes - i << std::endl;
+        aabb.compute_ray_element_bbox_intersections( query, eval_intersection );
+
         OPENGEODE_EXCEPTION(
             eval_intersection.box_intersections_.size() == nb_boxes - i,
             "[Test] Box-Ray intersection - Wrong number of boxes intersected "
@@ -339,44 +337,57 @@ void test_intersections_with_ray_trace()
     }
     // ray between two boxes
     Point< dimension > ray_origin;
-    ray_origin.set_value( 0, box_size + 0.1 );
-    ray_origin.set_value( 1, box_size + 0.1 );
+    ray_origin.set_value( 0, box_size );
+    ray_origin.set_value( 1, box_size );
 
     Ray< dimension > query{ ray_direction, ray_origin };
 
     eval_intersection.box_intersections_.clear();
-    aabb.compute_ray_element_bbox_intersections(
-        query, eval_intersection );
+    aabb.compute_ray_element_bbox_intersections( query, eval_intersection );
 
-    OPENGEODE_EXCEPTION( eval_intersection.box_intersections_.size() == 0,
+    OPENGEODE_EXCEPTION(
+        eval_intersection.box_intersections_.size() == 2 * nb_boxes,
         "[Test] Box-Ray intersection - Wrong number of boxes intersected by "
         "the ray " );
+    absl::flat_hash_set< index_t > expected_set;
+    for( const index_t c : Range( nb_boxes ) )
+    {
+        expected_set.emplace( global_box_index( 0, c, nb_boxes ) );
+        expected_set.emplace( global_box_index( 1, c, nb_boxes ) );
+    }
+    OPENGEODE_EXCEPTION( eval_intersection.box_intersections_ == expected_set,
+        "[Test] Box-Ray intersection - Wrong set of boxes" );
 
     // oblique ray
     ray_direction.set_value( 0, 1.0 );
     ray_direction.set_value( 1, 1.0 );
 
-    ray_origin.set_value( 0, -1.0 );
-    ray_origin.set_value( 1, -1.0 );
+    ray_origin.set_value( 0, box_size );
+    ray_origin.set_value( 1, box_size );
 
     Ray< dimension > query2{ ray_direction, ray_origin };
 
     eval_intersection.box_intersections_.clear();
-    aabb.compute_ray_element_bbox_intersections(
-        query2, eval_intersection );
+    aabb.compute_ray_element_bbox_intersections( query2, eval_intersection );
 
     OPENGEODE_EXCEPTION(
-        eval_intersection.box_intersections_.size() == nb_boxes,
+        eval_intersection.box_intersections_.size() == 3 * ( nb_boxes - 1 ) + 1,
         "[Test] Box-Ray intersection - Wrong number of boxes intersected by "
         "the ray " );
 
-    absl::flat_hash_set< index_t > expected_set;
-    for( const index_t c : Range( nb_boxes ) )
+    expected_set.clear();
+    expected_set.emplace( global_box_index( 0, 0, nb_boxes ) );
+    expected_set.emplace( global_box_index( 1, 0, nb_boxes ) );
+    for( const index_t c : Range( nb_boxes - 2 ) )
     {
-        expected_set.emplace( global_box_index( c, c, nb_boxes ) );
-        expected_set.emplace( global_box_index( c, c, nb_boxes ) );
+        expected_set.emplace( global_box_index( c, c + 1, nb_boxes ) );
+        expected_set.emplace( global_box_index( c + 1, c + 1, nb_boxes ) );
+        expected_set.emplace( global_box_index( c + 2, c + 1, nb_boxes ) );
     }
-
+    expected_set.emplace(
+        global_box_index( nb_boxes - 2, nb_boxes - 1, nb_boxes ) );
+    expected_set.emplace(
+        global_box_index( nb_boxes - 1, nb_boxes - 1, nb_boxes ) );
     OPENGEODE_EXCEPTION( eval_intersection.box_intersections_ == expected_set,
         "[Test] Box-Ray intersection - Wrong set of boxes" );
 }
@@ -403,7 +414,8 @@ void test_self_intersections()
 
     OPENGEODE_EXCEPTION(
         eval_intersection.included_box_.size() == nb_boxes * nb_boxes,
-        "[Test] Box self intersection - Every box should have one box inside" );
+        "[Test] Box self intersection - Every box should have one box "
+        "inside" );
 
     for( index_t i : Range( eval_intersection.included_box_.size() ) )
     {

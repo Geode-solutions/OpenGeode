@@ -457,10 +457,11 @@ namespace geode
 
         for( const auto i : geode::Range{ dimension } )
         {
-            if( std::fabs( ray_translated_origin.value( i ) )
-                    > box_half_extent.value( i )
+            if( ( std::fabs( ray_translated_origin.value( i ) )
+                    - box_half_extent.value( i ) )
+                    > global_epsilon
                 && ray_translated_origin.value( i ) * ray.direction().value( i )
-                       >= 0. )
+                       >= global_epsilon )
             {
                 return false;
             }
@@ -489,23 +490,29 @@ namespace geode
                 std::fabs( line.direction().value( 2 ) ) }
         };
 
-        if( std::fabs( orign_cross_direction.value( 0 ) )
-            > box_half_extent.value( 1 ) * abs_line_direction.value( 2 )
-                  + box_half_extent.value( 2 ) * abs_line_direction.value( 1 ) )
+        if( ( std::fabs( orign_cross_direction.value( 0 ) )
+                - ( box_half_extent.value( 1 ) * abs_line_direction.value( 2 )
+                    + box_half_extent.value( 2 )
+                          * abs_line_direction.value( 1 ) ) )
+            > global_epsilon )
         {
             return false;
         }
 
-        if( std::fabs( orign_cross_direction.value( 1 ) )
-            > box_half_extent.value( 0 ) * abs_line_direction.value( 2 )
-                  + box_half_extent.value( 2 ) * abs_line_direction.value( 0 ) )
+        if( ( std::fabs( orign_cross_direction.value( 1 ) )
+                - ( box_half_extent.value( 0 ) * abs_line_direction.value( 2 )
+                    + box_half_extent.value( 2 )
+                          * abs_line_direction.value( 0 ) ) )
+            > global_epsilon )
         {
             return false;
         }
 
-        if( std::fabs( orign_cross_direction.value( 2 ) )
-            > box_half_extent.value( 0 ) * abs_line_direction.value( 1 )
-                  + box_half_extent.value( 1 ) * abs_line_direction.value( 0 ) )
+        if( ( std::fabs( orign_cross_direction.value( 2 ) )
+                - ( box_half_extent.value( 0 ) * abs_line_direction.value( 1 )
+                    + box_half_extent.value( 1 )
+                          * abs_line_direction.value( 0 ) ) )
+            > global_epsilon )
         {
             return false;
         }
@@ -527,6 +534,6 @@ namespace geode
                              * std::fabs( line.direction().value( 1 ) )
                          + box_half_extent.value( 1 )
                                * std::fabs( line.direction().value( 0 ) );
-        return lhs <= rhs;
+        return ( lhs - rhs ) <= global_epsilon;
     }
 } // namespace geode
