@@ -19,7 +19,7 @@
 # SOFTWARE.
 
 add_geode_test(
-    SOURCE "test-aabb-edge-curve-helpers.cpp"
+    SOURCE "test-aabb-edged-curve-helpers.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry

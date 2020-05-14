@@ -31,7 +31,7 @@
 
 #include <geode/mesh/builder/edged_curve_builder.h>
 #include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/helpers/aabb_edge_curve_helpers.h>
+#include <geode/mesh/helpers/aabb_edged_curve_helpers.h>
 
 #include <geode/geometry/aabb.h>
 #include <geode/geometry/point.h>
@@ -90,7 +90,7 @@ void check_edgecurve_tree( const geode::EdgedCurve< dimension >& edge_curve )
 template < geode::index_t dimension >
 void test_EdgeCurveAABB()
 {
-    geode::Logger::info( "TEST", " EdgeCurve AABB ", dimension, "D" );
+    geode::Logger::info( "TEST", " EdgedCurve AABB ", dimension, "D" );
     auto edge_curve = geode::EdgedCurve< dimension >::create();
     auto edge_curve_builder =
         geode::EdgedCurveBuilder< dimension >::create( *edge_curve );
@@ -108,4 +108,4 @@ void test()
     test_EdgeCurveAABB< 3 >();
 }
 
-OPENGEODE_TEST( "aabb-edge-curve-helpers" )
+OPENGEODE_TEST( "aabb-edged-curve-helpers" )

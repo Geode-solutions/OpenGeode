@@ -27,7 +27,7 @@
  * Applications (ASGA)
  */
 
-#include <geode/mesh/helpers/aabb_edge_curve_helpers.h>
+#include <geode/mesh/helpers/aabb_edged_curve_helpers.h>
 
 #include <geode/geometry/aabb.h>
 #include <geode/geometry/basic_objects.h>
@@ -55,8 +55,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::tuple< double, Point< dimension > > DistanceToEdge< dimension >::
-        operator()( const Point< dimension >& query, index_t cur_box ) const
+    std::tuple< double, Point< dimension > >
+        DistanceToEdge< dimension >::operator()(
+            const Point< dimension >& query, index_t cur_box ) const
     {
         const auto& v0 = mesh_.point( mesh_.edge_vertex( { cur_box, 0 } ) );
         const auto& v1 = mesh_.point( mesh_.edge_vertex( { cur_box, 1 } ) );
