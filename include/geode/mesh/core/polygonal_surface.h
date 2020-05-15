@@ -347,6 +347,9 @@ namespace geode
             return find_or_create_edge( std::move( edge_vertices ) );
         }
 
+        void overwrite_edges( const PolygonalSurfaceBase< dimension >& from,
+            PolygonalSurfaceKey );
+
     protected:
         PolygonalSurfaceBase();
 

@@ -555,6 +555,7 @@ namespace geode
         }
         polygonal_surface_.polygon_attribute_manager().copy(
             polygonal_surface.polygon_attribute_manager() );
+        polygonal_surface_.overwrite_edges( polygonal_surface, {} );
     }
 
     template class opengeode_mesh_api PolygonalSurfaceBuilder< 2 >;

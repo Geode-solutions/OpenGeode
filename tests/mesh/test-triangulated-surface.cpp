@@ -21,6 +21,8 @@
  *
  */
 
+#include <geode/basic/attribute.h>
+#include <geode/basic/attribute_manager.h>
 #include <geode/basic/logger.h>
 
 #include <geode/geometry/point.h>
@@ -128,6 +130,13 @@ void test_io(
 
 void test_clone( const geode::TriangulatedSurface3D& surface )
 {
+    auto attr_from = surface.edge_attribute_manager()
+                         .find_or_create_attribute< geode::VariableAttribute,
+                             geode::index_t >( "edge_id", 0 );
+    for( const auto e : geode::Range{ surface.nb_edges() } )
+    {
+        attr_from->set_value( e, e );
+    }
     auto surface2 = surface.clone();
     OPENGEODE_EXCEPTION( surface2->nb_vertices() == 4,
         "[Test] TriangulatedSurface2 should have 4 vertices" );
@@ -135,6 +144,14 @@ void test_clone( const geode::TriangulatedSurface3D& surface )
         "[Test] TriangulatedSurface2 should have 3 edges" );
     OPENGEODE_EXCEPTION( surface2->nb_polygons() == 1,
         "[Test] TriangulatedSurface2 should have 1 polygon" );
+    auto attr_to =
+        surface2->edge_attribute_manager().find_attribute< geode::index_t >(
+            "edge_id" );
+    for( const auto e : geode::Range{ surface.nb_edges() } )
+    {
+        OPENGEODE_EXCEPTION( attr_from->value( e ) == attr_to->value( e ),
+            "[Test] Error in edge attribute transfer during cloning" );
+    }
 }
 
 void test_delete_all( const geode::TriangulatedSurface3D& triangulated_surface,

@@ -173,6 +173,14 @@ void test_clone( const geode::TetrahedralSolid3D& solid )
     {
         attr_from->set_value( f, f );
     }
+    auto attr_edge_from =
+        solid.edge_attribute_manager()
+            .find_or_create_attribute< geode::VariableAttribute,
+                geode::index_t >( "edge_id", 0 );
+    for( const auto e : geode::Range{ solid.nb_edges() } )
+    {
+        attr_edge_from->set_value( e, e );
+    }
     const auto solid2 = solid.clone();
     const auto attr_to =
         solid2->facet_attribute_manager().find_attribute< geode::index_t >(
@@ -181,6 +189,15 @@ void test_clone( const geode::TetrahedralSolid3D& solid )
     {
         OPENGEODE_EXCEPTION( attr_from->value( f ) == attr_to->value( f ),
             "[Test] Error in facet attribute transfer during cloning" );
+    }
+    const auto attr_edge_to =
+        solid2->edge_attribute_manager().find_attribute< geode::index_t >(
+            "edge_id" );
+    for( const auto e : geode::Range{ solid.nb_edges() } )
+    {
+        OPENGEODE_EXCEPTION(
+            attr_edge_from->value( e ) == attr_edge_to->value( e ),
+            "[Test] Error in edge attribute transfer during cloning" );
     }
     OPENGEODE_EXCEPTION( solid2->nb_vertices() == 5,
         "[Test] TetrahedralSolid2 should have 5 vertices" );
