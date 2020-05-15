@@ -71,14 +71,14 @@ void add_edges(
 }
 
 template < geode::index_t dimension >
-void check_edgecurve_tree( const geode::EdgedCurve< dimension >& edge_curve )
+void check_edgedcurve_tree( const geode::EdgedCurve< dimension >& edged_curve )
 {
-    const auto aabb_tree = geode::create_aabb_tree< dimension >( edge_curve );
-    geode::DistanceToEdge< dimension > distance_action( edge_curve );
+    const auto aabb_tree = geode::create_aabb_tree< dimension >( edged_curve );
+    geode::DistanceToEdge< dimension > distance_action( edged_curve );
 
-    for( const auto e : geode::Range{ edge_curve.nb_edges() } )
+    for( const auto e : geode::Range{ edged_curve.nb_edges() } )
     {
-        const auto barycenter = edge_curve.edge_barycenter( e );
+        const auto barycenter = edged_curve.edge_barycenter( e );
         geode::index_t closest_edge;
         std::tie( closest_edge, std::ignore, std::ignore ) =
             aabb_tree.closest_element_box( barycenter, distance_action );
@@ -88,24 +88,24 @@ void check_edgecurve_tree( const geode::EdgedCurve< dimension >& edge_curve )
 }
 
 template < geode::index_t dimension >
-void test_EdgeCurveAABB()
+void test_EdgedCurveAABB()
 {
     geode::Logger::info( "TEST", " EdgedCurve AABB ", dimension, "D" );
-    auto edge_curve = geode::EdgedCurve< dimension >::create();
-    auto edge_curve_builder =
-        geode::EdgedCurveBuilder< dimension >::create( *edge_curve );
+    auto edged_curve = geode::EdgedCurve< dimension >::create();
+    auto edged_curve_builder =
+        geode::EdgedCurveBuilder< dimension >::create( *edged_curve );
 
     geode::index_t size = 10;
-    add_vertices( *edge_curve_builder, size );
-    add_edges( *edge_curve_builder, size );
+    add_vertices( *edged_curve_builder, size );
+    add_edges( *edged_curve_builder, size );
 
-    check_edgecurve_tree< dimension >( *edge_curve );
+    check_edgedcurve_tree< dimension >( *edged_curve );
 }
 
 void test()
 {
-    test_EdgeCurveAABB< 2 >();
-    test_EdgeCurveAABB< 3 >();
+    test_EdgedCurveAABB< 2 >();
+    test_EdgedCurveAABB< 3 >();
 }
 
 OPENGEODE_TEST( "aabb-edged-curve-helpers" )
