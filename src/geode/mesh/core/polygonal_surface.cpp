@@ -206,6 +206,12 @@ namespace geode
             return facet_attribute_manager();
         }
 
+        void overwrite_edges(
+            const detail::FacetStorage< std::array< index_t, 2 > >& from )
+        {
+            this->overwrite( from );
+        }
+
     private:
         Impl() = default;
 
@@ -333,6 +339,13 @@ namespace geode
         PolygonalSurfaceKey )
     {
         impl_->associate_polygon_vertex_to_vertex( polygon_vertex, vertex_id );
+    }
+
+    template < index_t dimension >
+    void PolygonalSurfaceBase< dimension >::overwrite_edges(
+        const PolygonalSurfaceBase< dimension >& from, PolygonalSurfaceKey )
+    {
+        impl_->overwrite_edges( *from.impl_ );
     }
 
     template < index_t dimension >
