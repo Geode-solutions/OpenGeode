@@ -314,6 +314,16 @@ namespace geode
             return Edges::facet_attribute_manager();
         }
 
+        void overwrite_facets( const Facets& from )
+        {
+            Facets::overwrite( from );
+        }
+
+        void overwrite_edges( const Edges& from )
+        {
+            Edges::overwrite( from );
+        }
+
     private:
         void convert_attribute_to_abseil()
         {
@@ -862,6 +872,20 @@ namespace geode
     {
         impl_->associate_polyhedron_vertex_to_vertex(
             polyhedron_vertex, vertex_id );
+    }
+
+    template < index_t dimension >
+    void PolyhedralSolid< dimension >::overwrite_facets(
+        const PolyhedralSolid< dimension >& from, PolyhedralSolidKey )
+    {
+        impl_->overwrite_facets( *from.impl_ );
+    }
+
+    template < index_t dimension >
+    void PolyhedralSolid< dimension >::overwrite_edges(
+        const PolyhedralSolid< dimension >& from, PolyhedralSolidKey )
+    {
+        impl_->overwrite_edges( *from.impl_ );
     }
 
     template < index_t dimension >

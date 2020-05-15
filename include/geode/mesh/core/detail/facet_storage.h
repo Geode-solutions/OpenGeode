@@ -187,6 +187,11 @@ namespace geode
                 return counter_->value( facet_id );
             }
 
+            void overwrite( const FacetStorage< VertexContainer >& from )
+            {
+                facet_attribute_manager_.copy( from.facet_attribute_manager() );
+            }
+
         private:
             template < typename Archive >
             void serialize( Archive& archive )

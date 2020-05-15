@@ -21,6 +21,8 @@
  *
  */
 
+#include <geode/basic/attribute.h>
+#include <geode/basic/attribute_manager.h>
 #include <geode/basic/logger.h>
 
 #include <geode/geometry/point.h>
@@ -164,7 +166,22 @@ void test_backward_io( const std::string& filename )
 
 void test_clone( const geode::TetrahedralSolid3D& solid )
 {
+    auto attr_from = solid.facet_attribute_manager()
+                         .find_or_create_attribute< geode::VariableAttribute,
+                             geode::index_t >( "facet_id", 0 );
+    for( const auto f : geode::Range{ solid.nb_facets() } )
+    {
+        attr_from->set_value( f, f );
+    }
     const auto solid2 = solid.clone();
+    const auto attr_to =
+        solid2->facet_attribute_manager().find_attribute< geode::index_t >(
+            "facet_id" );
+    for( const auto f : geode::Range{ solid.nb_facets() } )
+    {
+        OPENGEODE_EXCEPTION( attr_from->value( f ) == attr_to->value( f ),
+            "[Test] Error in facet attribute transfer during cloning" );
+    }
     OPENGEODE_EXCEPTION( solid2->nb_vertices() == 5,
         "[Test] TetrahedralSolid2 should have 5 vertices" );
     OPENGEODE_EXCEPTION( solid2->nb_facets() == 4,
