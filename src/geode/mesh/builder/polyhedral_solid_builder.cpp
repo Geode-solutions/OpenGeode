@@ -788,6 +788,8 @@ namespace geode
         }
         polyhedral_solid_.polyhedron_attribute_manager().copy(
             polyhedral_solid.polyhedron_attribute_manager() );
+        polyhedral_solid_.overwrite_facets( polyhedral_solid, {} );
+        polyhedral_solid_.overwrite_edges( polyhedral_solid, {} );
     }
 
     template class opengeode_mesh_api PolyhedralSolidBuilder< 3 >;

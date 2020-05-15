@@ -477,6 +477,12 @@ namespace geode
             return get_polyhedron_facet_vertex_id( polyhedron_facet_vertex );
         }
 
+        void overwrite_facets(
+            const PolyhedralSolid< dimension >& from, PolyhedralSolidKey );
+
+        void overwrite_edges(
+            const PolyhedralSolid< dimension >& from, PolyhedralSolidKey );
+
     protected:
         PolyhedralSolid();
 
