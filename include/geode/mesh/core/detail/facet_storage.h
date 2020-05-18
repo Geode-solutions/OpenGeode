@@ -190,6 +190,14 @@ namespace geode
             void overwrite( const FacetStorage< VertexContainer >& from )
             {
                 facet_attribute_manager_.copy( from.facet_attribute_manager() );
+                facet_indices_ = from.facet_indices_;
+                counter_ =
+                    facet_attribute_manager_
+                        .find_or_create_attribute< VariableAttribute, index_t >(
+                            "counter", 1u );
+                vertices_ = facet_attribute_manager_.find_or_create_attribute<
+                    VariableAttribute, VertexContainer >(
+                    attribute_name(), VertexContainer{} );
             }
 
         private:

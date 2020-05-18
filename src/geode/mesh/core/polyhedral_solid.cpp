@@ -534,6 +534,7 @@ namespace geode
         {
             facet_vertices[v] =
                 polyhedron_facet_vertex( { polyhedron_facet, v } );
+            DEBUG( facet_vertices[v] );
         }
         return impl_->find_facet( facet_vertices );
     }
