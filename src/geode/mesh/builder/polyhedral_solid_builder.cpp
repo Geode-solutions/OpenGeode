@@ -625,7 +625,12 @@ namespace geode
                 }
             }
         }
-        polyhedral_solid_.remove_isolated_facets( {} );
+        DEBUG( polyhedral_solid_.nb_facets() );
+        const auto toto = polyhedral_solid_.remove_isolated_facets( {} );
+        DEBUG( toto[1084] );
+        DEBUG( toto[1078] );
+        DEBUG( toto[1076] );
+        DEBUG( polyhedral_solid_.nb_facets() );
     }
 
     template < index_t dimension >
@@ -786,9 +791,15 @@ namespace geode
             }
             create_polyhedron( vertices, facets );
         }
+        DEBUG( polyhedral_solid_.nb_facets() );
+        DEBUG( polyhedral_solid.nb_facets() );
+        DEBUG( polyhedral_solid_.polyhedron_facet( { 476, 0 } ) );
+        DEBUG( polyhedral_solid.polyhedron_facet( { 476, 0 } ) );
         polyhedral_solid_.polyhedron_attribute_manager().copy(
             polyhedral_solid.polyhedron_attribute_manager() );
         polyhedral_solid_.overwrite_facets( polyhedral_solid, {} );
+        DEBUG( polyhedral_solid_.nb_facets() );
+        DEBUG( polyhedral_solid_.polyhedron_facet( { 476, 0 } ) );
         polyhedral_solid_.overwrite_edges( polyhedral_solid, {} );
     }
 
