@@ -625,7 +625,7 @@ namespace geode
                 }
             }
         }
-        const auto toto = polyhedral_solid_.remove_isolated_facets( {} );
+        polyhedral_solid_.remove_isolated_facets( {} );
     }
 
     template < index_t dimension >
