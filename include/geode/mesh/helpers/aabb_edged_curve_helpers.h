@@ -21,49 +21,43 @@
  *
  */
 
+/*
+ * Modified from RINGMesh https://github.com/ringmesh/RINGMesh
+ * Copyright (c) 2012-2018, Association Scientifique pour la Geologie et ses
+ * Applications (ASGA)
+ */
+
 #pragma once
+
+#include <geode/mesh/common.h>
 
 namespace geode
 {
-    template < typename T >
-    template < typename... Args >
-    PImpl< T >::PImpl( Args&&... args )
-        : pimpl_{ new T{ std::forward< Args >( args )... } }
-    {
-    }
+    FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+    FORWARD_DECLARATION_DIMENSION_CLASS( AABBTree );
+    FORWARD_DECLARATION_DIMENSION_CLASS( EdgedCurve );
+} // namespace geode
 
-    template < typename T >
-    PImpl< T >::PImpl( PImpl< T >&& other )
-        : pimpl_{ std::move( other.pimpl_ ) }
-    {
-    }
+namespace geode
+{
+    template < index_t dimension >
+    AABBTree< dimension > create_aabb_tree(
+        const EdgedCurve< dimension >& mesh );
 
-    template < typename T >
-    PImpl< T >::~PImpl()
+    template < index_t dimension >
+    class DistanceToEdge
     {
-    }
+    public:
+        explicit DistanceToEdge( const EdgedCurve< dimension >& mesh )
+            : mesh_( mesh )
+        {
+        }
 
-    template < typename T >
-    const T* PImpl< T >::operator->() const
-    {
-        return pimpl_.get();
-    }
+        std::tuple< double, Point< dimension > > operator()(
+            const Point< dimension >& query, index_t cur_box ) const;
 
-    template < typename T >
-    T* PImpl< T >::operator->()
-    {
-        return pimpl_.get();
-    }
+    private:
+        const EdgedCurve< dimension >& mesh_;
+    };
 
-    template < typename T >
-    T& PImpl< T >::operator*()
-    {
-        return *pimpl_.get();
-    }
-
-    template < typename T >
-    const T& PImpl< T >::operator*() const
-    {
-        return *pimpl_.get();
-    }
 } // namespace geode

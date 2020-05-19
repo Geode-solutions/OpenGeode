@@ -39,7 +39,8 @@ namespace geode
     Vector2D opengeode_geometry_api perpendicular( const Vector2D& v );
 
     /*!
-     * compute the dot product between two 2D vectors
+     * Compute the dot product between a 2D vector \p v0 and another 2D vector
+     * perpendicular to \p v1.
      */
     double opengeode_geometry_api dot_perpendicular(
         const Vector2D& v0, const Vector2D& v1 );

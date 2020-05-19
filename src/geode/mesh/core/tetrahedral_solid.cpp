@@ -70,7 +70,7 @@ namespace geode
             index_t tetrahedron_id,
             const std::array< index_t, 2 >& edge_vertices ) const
     {
-        std::array< PolyhedronFacet, 2 > opposite_facets{};
+        std::array< PolyhedronFacet, 2 > opposite_facets;
         for( const auto v : Range{ 4 } )
         {
             const PolyhedronVertex vertex{ tetrahedron_id, v };

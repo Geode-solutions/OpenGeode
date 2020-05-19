@@ -42,7 +42,7 @@ namespace geode
     template < index_t dimension >
     class AABBTree
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( AABBTree );
+        OPENGEODE_DISABLE_COPY( AABBTree );
         OPENGEODE_TEMPLATE_ASSERT_2D_OR_3D( dimension );
 
     public:
@@ -54,6 +54,7 @@ namespace geode
          * tree which should match the index in its initial container.
          */
         AABBTree( absl::Span< const BoundingBox< dimension > > bboxes );
+        AABBTree( AABBTree&& ) = default;
         ~AABBTree();
 
         /*!
