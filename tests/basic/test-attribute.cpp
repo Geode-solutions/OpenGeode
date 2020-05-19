@@ -45,7 +45,7 @@ struct Foo
 
     float generic_value() const
     {
-        return double_ + int_;
+        return static_cast< float >( double_ + int_ );
     }
 
     template < typename Archive >

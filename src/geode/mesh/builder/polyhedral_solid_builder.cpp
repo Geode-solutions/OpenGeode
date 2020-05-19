@@ -252,9 +252,9 @@ namespace geode
                 }
 
                 const auto position =
-                    std::distance( facet_vertices.begin(), position_it );
+                     static_cast< index_t >(std::distance( facet_vertices.begin(), position_it );
                 polyhedral_solid_.update_facet_vertex(
-                    facet_vertices_id, position, vertex_id, {} );
+                    facet_vertices_id, position, vertex_id, {} ));
 
                 std::array< index_t, 2 > next_edge_vertices{
                     facet_vertices_id[position],

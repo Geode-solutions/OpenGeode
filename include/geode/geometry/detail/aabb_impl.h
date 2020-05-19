@@ -472,8 +472,9 @@ namespace geode
     template < index_t dimension >
     bool line_box_intersection( const InfiniteLine< dimension >& line,
         const BoundingBox< dimension >& box );
+
     template <>
-    bool line_box_intersection(
+    inline bool line_box_intersection(
         const InfiniteLine3D& line, const BoundingBox3D& box )
     {
         const auto box_center = ( box.min() + box.max() ) / 2.;
@@ -520,7 +521,7 @@ namespace geode
         return true;
     }
     template <>
-    bool line_box_intersection(
+    inline bool line_box_intersection(
         const InfiniteLine2D& line, const BoundingBox2D& box )
     {
         const auto box_center = ( box.min() + box.max() ) / 2.;
