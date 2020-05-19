@@ -33,6 +33,7 @@
 
 #include <geode/basic/pimpl.h>
 
+#include <geode/geometry/basic_objects.h>
 #include <geode/geometry/bounding_box.h>
 #include <geode/geometry/common.h>
 
@@ -102,11 +103,8 @@ namespace geode
          * defined like this:
          * void operator()( index_t cur_element_box ) ;
          *
-         * @note where cur_element_box is the element box index
-         * that is intersected by \p box.
-         * @note A posibility is to define this operator to add \p
-         * cur_element_box to a set and build a set of tree element that
-         * intersect the \p box.
+         * @note the operator define what to do with the box \p cur_element_box
+         * if it is intersected by the \p box.
          */
         template < class EvalIntersection >
         void compute_bbox_element_bbox_intersections(
@@ -122,12 +120,30 @@ namespace geode
          * ;
          * @note cur_element_box1 and cur_element_box2 are the element box
          * indices that intersect.
-         * @note the operator can be defined to test real intersection between
-         * element in boxes and store the result.
+         * @note the operator defines what to do when two boxes of the
+         * tree ( \p cur_element_box1 and \p cur_element_box2 ) intesect each
+         * other (for example: test real intersection between each element in
+         * boxes and store the result.)
          */
         template < class EvalIntersection >
         void compute_self_element_bbox_intersections(
             EvalIntersection& action ) const;
+
+        /*!
+         * @brief Computes the intersections between a given ray and all
+         * element boxes.
+         * @param[in] ray The ray to test.
+         * @param[in] action The functor to run when a box is intersected by the
+         * ray.
+         * @tparam EvalIntersection this functor should have an operator()
+         * defined like this:
+         * void operator()( index_t cur_element_box ) ;
+         * @note the operator define what to do with the box \p cur_element_box
+         * if it is intersected by the \p ray.
+         */
+        template < class EvalIntersection >
+        void compute_ray_element_bbox_intersections(
+            const Ray< dimension >& ray, EvalIntersection& action ) const;
 
     protected:
         static bool is_leaf( index_t box_begin, index_t box_end )

@@ -32,6 +32,7 @@
 #include <geode/basic/pimpl_impl.h>
 
 #include <geode/geometry/aabb.h>
+#include <geode/geometry/perpendicular.h>
 
 namespace geode
 {
@@ -126,6 +127,13 @@ namespace geode
             index_t element_end2,
             ACTION& action ) const;
 
+        template < class ACTION >
+        void ray_intersect_recursive( const Ray< dimension >& ray,
+            index_t node_index,
+            index_t element_begin,
+            index_t element_end,
+            ACTION& action ) const;
+
     private:
         std::vector< BoundingBox< dimension > > tree_;
         std::vector< index_t > mapping_morton_;
@@ -200,6 +208,15 @@ namespace geode
     {
         impl_->self_intersect_recursive( Impl::ROOT_INDEX, 0, nb_bboxes(),
             Impl::ROOT_INDEX, 0, nb_bboxes(), action );
+    }
+
+    template < index_t dimension >
+    template < class EvalIntersection >
+    void AABBTree< dimension >::compute_ray_element_bbox_intersections(
+        const Ray< dimension >& ray, EvalIntersection& action ) const
+    {
+        impl_->ray_intersect_recursive(
+            ray, Impl::ROOT_INDEX, 0, nb_bboxes(), action );
     }
 
     template < index_t dimension >
@@ -390,5 +407,133 @@ namespace geode
                 element_end1, node_index2, element_begin2, element_end2,
                 action );
         }
+    }
+
+    template < index_t dimension >
+    template < typename ACTION >
+    void AABBTree< dimension >::Impl::ray_intersect_recursive(
+        const Ray< dimension >& ray,
+        index_t node_index,
+        index_t element_begin,
+        index_t element_end,
+        ACTION& action ) const
+    {
+        OPENGEODE_ASSERT( node_index < tree_.size(), "Node out of tree range" );
+        OPENGEODE_ASSERT(
+            element_begin != element_end, "No iteration allowed start == end" );
+
+        // Prune sub-tree that does not have intersection
+        if( !ray_box_intersection( ray, node( node_index ) ) )
+        {
+            return;
+        }
+
+        // Leaf case
+        if( is_leaf( element_begin, element_end ) )
+        {
+            action( mapping_morton_[element_begin] );
+            return;
+        }
+
+        index_t box_middle, child_left, child_right;
+        get_recursive_iterators( node_index, element_begin, element_end,
+            box_middle, child_left, child_right );
+
+        ray_intersect_recursive< ACTION >(
+            ray, child_left, element_begin, box_middle, action );
+        ray_intersect_recursive< ACTION >(
+            ray, child_right, box_middle, element_end, action );
+    }
+
+    template < index_t dimension >
+    bool ray_box_intersection(
+        const Ray< dimension >& ray, const BoundingBox< dimension >& box )
+    {
+        const auto box_center = ( box.min() + box.max() ) / 2.;
+        const auto box_half_extent = ( box.max() - box.min() ) / 2.;
+
+        // Transform the ray to the aligned-box coordinate system.
+        const auto ray_translated_origin = ray.origin() - box_center;
+
+        for( const auto i : geode::Range{ dimension } )
+        {
+            if( ( std::fabs( ray_translated_origin.value( i ) )
+                    - box_half_extent.value( i ) )
+                    > global_epsilon
+                && ray_translated_origin.value( i ) * ray.direction().value( i )
+                       >= global_epsilon )
+            {
+                return false;
+            }
+        }
+        return line_box_intersection( ray, box );
+    }
+
+    template < index_t dimension >
+    bool line_box_intersection( const InfiniteLine< dimension >& line,
+        const BoundingBox< dimension >& box );
+    template <>
+    bool line_box_intersection(
+        const InfiniteLine3D& line, const BoundingBox3D& box )
+    {
+        const auto box_center = ( box.min() + box.max() ) / 2.;
+        const auto box_half_extent = ( box.max() - box.min() ) / 2.;
+
+        // Transform the ray to the aligned-box coordinate system.
+        const auto line_translated_origin = line.origin() - box_center;
+
+        const auto orign_cross_direction =
+            line.direction().cross( line_translated_origin );
+        geode::Point3D abs_line_direction = {
+            { std::fabs( line.direction().value( 0 ) ),
+                std::fabs( line.direction().value( 1 ) ),
+                std::fabs( line.direction().value( 2 ) ) }
+        };
+
+        if( ( std::fabs( orign_cross_direction.value( 0 ) )
+                - ( box_half_extent.value( 1 ) * abs_line_direction.value( 2 )
+                    + box_half_extent.value( 2 )
+                          * abs_line_direction.value( 1 ) ) )
+            > global_epsilon )
+        {
+            return false;
+        }
+
+        if( ( std::fabs( orign_cross_direction.value( 1 ) )
+                - ( box_half_extent.value( 0 ) * abs_line_direction.value( 2 )
+                    + box_half_extent.value( 2 )
+                          * abs_line_direction.value( 0 ) ) )
+            > global_epsilon )
+        {
+            return false;
+        }
+
+        if( ( std::fabs( orign_cross_direction.value( 2 ) )
+                - ( box_half_extent.value( 0 ) * abs_line_direction.value( 1 )
+                    + box_half_extent.value( 1 )
+                          * abs_line_direction.value( 0 ) ) )
+            > global_epsilon )
+        {
+            return false;
+        }
+
+        return true;
+    }
+    template <>
+    bool line_box_intersection(
+        const InfiniteLine2D& line, const BoundingBox2D& box )
+    {
+        const auto box_center = ( box.min() + box.max() ) / 2.;
+        const auto box_half_extent = ( box.max() - box.min() ) / 2.;
+        // Transform the ray to the aligned-box coordinate system.
+        const auto line_translated_origin = line.origin() - box_center;
+
+        const auto lhs = std::fabs( geode::dot_perpendicular(
+            line.direction(), line_translated_origin ) );
+        const auto rhs = box_half_extent.value( 0 )
+                             * std::fabs( line.direction().value( 1 ) )
+                         + box_half_extent.value( 1 )
+                               * std::fabs( line.direction().value( 0 ) );
+        return ( lhs - rhs ) <= global_epsilon;
     }
 } // namespace geode
