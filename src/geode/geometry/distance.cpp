@@ -35,7 +35,12 @@ namespace
 {
     constexpr double MAX_DOUBLE = std::numeric_limits< double >::max();
 
-    bool point_is_in_triangle(
+    /*
+     * This function tests if the point is in the triangle by computing signed
+     * areas
+     * @warning This is not robust in edge cases!
+     */
+    bool may_point_be_in_triangle(
         const geode::Point2D& point, const geode::Triangle2D& triangle )
     {
         const auto signed_area_1 =
@@ -334,7 +339,7 @@ namespace geode
     std::tuple< double, Point2D > point_triangle_distance(
         const Point2D& point, const Triangle2D& triangle )
     {
-        if( point_is_in_triangle( point, triangle ) )
+        if( may_point_be_in_triangle( point, triangle ) )
         {
             return std::make_tuple( 0.0, point );
         }

@@ -30,8 +30,8 @@
 #include <geode/basic/logger.h>
 
 #include <geode/mesh/builder/triangulated_surface_builder.h>
-#include <geode/mesh/core/aabb_triangulated_surface_helpers.h>
 #include <geode/mesh/core/triangulated_surface.h>
+#include <geode/mesh/helpers/aabb_triangulated_surface_helpers.h>
 
 #include <geode/geometry/aabb.h>
 #include <geode/geometry/point.h>
@@ -67,17 +67,14 @@ void add_triangles( geode::TriangulatedSurfaceBuilder< dimension >& builder,
     geode::index_t size )
 {
     builder.reserve_triangles( ( size - 1 ) * ( size - 1 ) * 2 );
-    geode::index_t id = 0;
     for( const auto i : geode::Range{ size - 1 } )
     {
         for( const auto j : geode::Range{ size - 1 } )
         {
             builder.create_triangle(
                 { i * size + j, i * size + j + 1, ( i + 1 ) * size + j } );
-            id++;
             builder.create_triangle( { i * size + j + 1,
                 ( i + 1 ) * size + j + 1, ( i + 1 ) * size + j } );
-            id++;
         }
     }
 }
@@ -88,7 +85,7 @@ void check_surface_tree( const geode::AABBTree< dimension >& tree,
     geode::index_t size )
 {
     constexpr auto offset = 0.2;
-    geode::index_t id = 0;
+    geode::index_t id{ 0 };
     for( const auto i : geode::Range{ size - 1 } )
     {
         for( const auto j : geode::Range{ size - 1 } )
@@ -137,11 +134,11 @@ void test_SurfaceAABB()
     auto t_surf_builder =
         geode::TriangulatedSurfaceBuilder< dimension >::create( *t_surf );
 
-    geode::index_t size = 10;
+    geode::index_t size{ 10 };
     add_vertices( *t_surf_builder, size );
     add_triangles( *t_surf_builder, size );
 
-    auto aabb_tree = create_aabb_tree( *t_surf );
+    const auto aabb_tree = create_aabb_tree( *t_surf );
     geode::DistanceToTriangle< dimension > distance_action( *t_surf );
 
     check_surface_tree< dimension >( aabb_tree, distance_action, size );
