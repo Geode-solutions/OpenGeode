@@ -356,7 +356,7 @@ void test_generic_value( geode::AttributeManager& manager )
     auto array_attr =
         manager.find_or_create_attribute< geode::VariableAttribute,
             std::array< double, 3 > >(
-            "array_double", std::array< double, 3 >{} );
+            "array_double", std::array< double, 3 >() );
     array_attr->set_value( 2, { 3.1, 1.3 } );
     OPENGEODE_EXCEPTION( array_attr->generic_value( 2 ) == 0.,
         "Generic value for element 2 of array attribute should be 0." );
