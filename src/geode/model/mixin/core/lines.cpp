@@ -219,8 +219,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    Line< dimension >& Lines< dimension >::ModifiableLineRange::
-        operator*() const
+    Line< dimension >&
+        Lines< dimension >::ModifiableLineRange::operator*() const
     {
         return this->impl_->line();
     }
