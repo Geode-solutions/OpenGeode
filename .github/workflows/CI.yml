@@ -238,7 +238,7 @@ jobs:
     strategy:
       matrix:
         config: [Debug, Release]
-        python: [3.6, 3.7, 3.8]
+        python: [3.6, 3.7]
 
     steps:
     - uses: actions/checkout@v1
@@ -283,8 +283,6 @@ jobs:
         key: spdlog-win64-${{ matrix.config }}-${{ hashFiles('cmake/ConfigureSpdlog.cmake') }}
     - name: Compile & Test
       run: |
-        echo "::add-path::$Env:pythonLocation"
-        echo $Env:Path
         if(!(test-path build)) { mkdir build }
         cd build
         cmake -G "Visual Studio 15 2017 Win64" -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.config.python }} ..
