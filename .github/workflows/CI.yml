@@ -217,7 +217,7 @@ jobs:
         key: spdlog-darwin-${{ matrix.config }}-${{ hashFiles('cmake/ConfigureSpdlog.cmake') }}
     - name: Compile & Test
       run: |
-        ls /Users/runner/hostedtoolcache/Python
+        ls /Users/runner/hostedtoolcache/Python/3.6.10/x64
         mkdir -p build
         cd build
         cmake -G "Xcode"  -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.config.python }} ..
@@ -284,6 +284,7 @@ jobs:
         key: spdlog-win64-${{ matrix.config }}-${{ hashFiles('cmake/ConfigureSpdlog.cmake') }}
     - name: Compile & Test
       run: |
+        dir C:\hostedtoolcache\windows\Python\3.8.3\x64
         if(!(test-path build)) { mkdir build }
         cd build
         cmake -G "Visual Studio 15 2017 Win64" -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.config.python }} ..
