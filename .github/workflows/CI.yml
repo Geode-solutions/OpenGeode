@@ -217,6 +217,7 @@ jobs:
         key: spdlog-darwin-${{ matrix.config }}-${{ hashFiles('cmake/ConfigureSpdlog.cmake') }}
     - name: Compile & Test
       run: |
+        ls /Users/runner/hostedtoolcache/Python
         mkdir -p build
         cd build
         cmake -G "Xcode"  -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.config.python }} ..
