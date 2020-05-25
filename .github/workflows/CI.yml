@@ -63,11 +63,6 @@ jobs:
       with:
         path: build/third_party/nanoflann
         key: nanoflann-${{ matrix.config.system }}-${{ matrix.config.build_type }}-${{ hashFiles('cmake/ConfigureNanoflann.cmake') }}
-    - name: Cache Pybind11
-      uses: actions/cache@v1.2.0
-      with:
-        path: build/third_party/pybind11
-        key: pybind11-${{ matrix.config.system }}-${{ matrix.config.python }}-${{ matrix.config.build_type }}-${{ hashFiles('cmake/ConfigurePybind11.cmake') }}
     - name: Cache Spdlog
       uses: actions/cache@v1.2.0
       with:
@@ -135,11 +130,6 @@ jobs:
       with:
         path: build/third_party/nanoflann
         key: nanoflann-coverage-Debug-${{ hashFiles('cmake/ConfigureNanoflann.cmake') }}
-    - name: Cache Pybind11
-      uses: actions/cache@v1.2.0
-      with:
-        path: build/third_party/pybind11
-        key: pybind11-coverage-Debug-${{ hashFiles('cmake/ConfigurePybind11.cmake') }}
     - name: Cache Spdlog
       uses: actions/cache@v1.2.0
       with:
@@ -172,7 +162,7 @@ jobs:
     strategy:
       matrix:
         config: [Debug, Release]
-        python: [3.7, 3.8]
+        python: [3.6, 3.7, 3.8]
 
     steps:
     - uses: actions/checkout@v1
@@ -205,11 +195,6 @@ jobs:
       with:
         path: build/third_party/nanoflann
         key: nanoflann-darwin-${{ matrix.config }}-${{ hashFiles('cmake/ConfigureNanoflann.cmake') }}
-    - name: Cache Pybind11
-      uses: actions/cache@v1.2.0
-      with:
-        path: build/third_party/pybind11
-        key: pybind11-darwin-${{ matrix.config }}-${{ matrix.python }}-${{ hashFiles('cmake/ConfigurePybind11.cmake') }}
     - name: Cache Spdlog
       uses: actions/cache@v1.2.0
       with:
@@ -219,7 +204,7 @@ jobs:
       run: |
         mkdir -p build
         cd build
-        cmake -G "Xcode"  -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.config.python }} ..
+        cmake -G "Xcode"  -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.python }} ..
         cmake --build . --config ${{ matrix.config }}
         cd opengeode
         ctest -C ${{ matrix.config }} --output-on-failure
@@ -271,11 +256,6 @@ jobs:
       with:
         path: build/third_party/nanoflann
         key: nanoflann-win64-${{ matrix.config }}-${{ hashFiles('cmake/ConfigureNanoflann.cmake') }}
-    - name: Cache Pybind11
-      uses: actions/cache@v1.2.0
-      with:
-        path: build/third_party/pybind11
-        key: pybind11-win64-${{ matrix.config }}-${{ matrix.python }}-${{ hashFiles('cmake/ConfigurePybind11.cmake') }}
     - name: Cache Spdlog
       uses: actions/cache@v1.2.0
       with:
@@ -285,7 +265,7 @@ jobs:
       run: |
         if(!(test-path build)) { mkdir build }
         cd build
-        cmake -G "Visual Studio 15 2017 Win64" -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.config.python }} ..
+        cmake -G "Visual Studio 15 2017 Win64" -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.python }} ..
         cmake --build . --config ${{ matrix.config }}
         cd opengeode
         ctest -C ${{ matrix.config }} --output-on-failure
