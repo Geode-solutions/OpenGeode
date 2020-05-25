@@ -77,7 +77,7 @@ jobs:
       run: |
         mkdir -p build
         cd build
-        cmake -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} -DOPENGEODE_WITH_PYTHON:BOOL=ON ..
+        cmake -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.config.python }} ..
         cmake --build . -- -j2
         cd opengeode        
         ctest --output-on-failure
@@ -219,7 +219,7 @@ jobs:
       run: |
         mkdir -p build
         cd build
-        cmake -G "Xcode"  -DOPENGEODE_WITH_PYTHON:BOOL=ON ..
+        cmake -G "Xcode"  -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.config.python }} ..
         cmake --build . --config ${{ matrix.config }}
         cd opengeode
         ctest -C ${{ matrix.config }} --output-on-failure
@@ -285,7 +285,7 @@ jobs:
       run: |
         if(!(test-path build)) { mkdir build }
         cd build
-        cmake -G "Visual Studio 15 2017 Win64" -DOPENGEODE_WITH_PYTHON:BOOL=ON ..
+        cmake -G "Visual Studio 15 2017 Win64" -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.config.python }} ..
         cmake --build . --config ${{ matrix.config }}
         cd opengeode
         ctest -C ${{ matrix.config }} --output-on-failure

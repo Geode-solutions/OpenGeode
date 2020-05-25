@@ -26,6 +26,9 @@ cmake_minimum_required(VERSION 3.13)
 # Optional components
 option(OPENGEODE_WITH_TESTS "Compile test projects" ON)
 option(OPENGEODE_WITH_PYTHON "Compile Python bindings" OFF)
+if(OPENGEODE_WITH_PYTHON)
+    set(PYTHON_VERSION "" CACHE STRING "Python version to use for compiling modules")
+endif()
 
 # Internal options
 option(USE_SUPERBUILD "Whether or not a superbuild should be invoked" ON)

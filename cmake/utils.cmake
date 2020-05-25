@@ -279,6 +279,8 @@ function(add_geode_test)
 endfunction()
 
 function(add_geode_python_binding)
+    set(PYTHON_VERSION "" CACHE STRING "Python version to use for compiling modules")
+    set(PYBIND11_PYTHON_VERSION ${PYTHON_VERSION})
     find_package(pybind11 REQUIRED)
     cmake_parse_arguments(GEODE_BINDING
         ""
