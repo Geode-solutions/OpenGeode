@@ -37,9 +37,7 @@ namespace geode
     template < index_t dimension >
     std::unique_ptr< PointSet< dimension > > PointSet< dimension >::create()
     {
-        return std::unique_ptr< PointSet< dimension > >{
-            new OpenGeodePointSet< dimension >
-        };
+        return create( default_type() );
     }
 
     template < index_t dimension >
@@ -57,6 +55,12 @@ namespace geode
                 "Could not create PointSet data structure: ", type.get()
             };
         }
+    }
+
+    template < index_t dimension >
+    MeshType PointSet< dimension >::default_type()
+    {
+        return OpenGeodePointSet< dimension >::type_name_static();
     }
 
     template < index_t dimension >

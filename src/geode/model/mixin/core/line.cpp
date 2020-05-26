@@ -56,9 +56,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    Line< dimension >::Line()
+    Line< dimension >::Line() : Line( EdgedCurve< dimension >::default_type() )
     {
-        impl_->set_mesh( EdgedCurve< dimension >::create() );
     }
 
     template < index_t dimension >

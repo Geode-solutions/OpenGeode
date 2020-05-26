@@ -56,6 +56,8 @@ namespace geode
          */
         static std::unique_ptr< VertexSet > create( const MeshType& type );
 
+        static MeshType default_type();
+
         std::unique_ptr< VertexSet > clone() const;
 
         virtual ~VertexSet();

@@ -396,6 +396,8 @@ namespace geode
         static std::unique_ptr< PolygonalSurface< dimension > > create(
             const MeshType& type );
 
+        static MeshType default_type();
+
         std::unique_ptr< PolygonalSurface< dimension > > clone() const;
 
     protected:
@@ -414,6 +416,8 @@ namespace geode
 
         static std::unique_ptr< PolygonalSurface< 3 > > create(
             const MeshType& type );
+
+        static MeshType default_type();
 
         std::unique_ptr< PolygonalSurface< 3 > > clone() const;
 

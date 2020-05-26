@@ -32,9 +32,7 @@ namespace geode
     std::unique_ptr< TetrahedralSolid< dimension > >
         TetrahedralSolid< dimension >::create()
     {
-        return std::unique_ptr< TetrahedralSolid< dimension > >{
-            new OpenGeodeTetrahedralSolid< dimension >
-        };
+        return create( default_type() );
     }
 
     template < index_t dimension >
@@ -52,6 +50,12 @@ namespace geode
                 "Could not create TetrahedralSolid data structure: ", type.get()
             };
         }
+    }
+
+    template < index_t dimension >
+    MeshType TetrahedralSolid< dimension >::default_type()
+    {
+        return OpenGeodeTetrahedralSolid< dimension >::type_name_static();
     }
 
     template < index_t dimension >

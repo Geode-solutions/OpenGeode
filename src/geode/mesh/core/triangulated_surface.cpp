@@ -32,9 +32,7 @@ namespace geode
     std::unique_ptr< TriangulatedSurface< dimension > >
         TriangulatedSurface< dimension >::create()
     {
-        return std::unique_ptr< TriangulatedSurface< dimension > >{
-            new OpenGeodeTriangulatedSurface< dimension >
-        };
+        return create( default_type() );
     }
 
     template < index_t dimension >
@@ -53,6 +51,12 @@ namespace geode
                 type.get()
             };
         }
+    }
+
+    template < index_t dimension >
+    MeshType TriangulatedSurface< dimension >::default_type()
+    {
+        return OpenGeodeTriangulatedSurface< dimension >::type_name_static();
     }
 
     template < index_t dimension >

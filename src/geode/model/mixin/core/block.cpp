@@ -52,8 +52,8 @@ namespace geode
 
     template < index_t dimension >
     Block< dimension >::Block()
+        : Block( PolyhedralSolid< dimension >::default_type() )
     {
-        impl_->set_mesh( PolyhedralSolid< dimension >::create() );
     }
 
     template < index_t dimension >

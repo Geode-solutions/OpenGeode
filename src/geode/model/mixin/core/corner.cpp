@@ -57,8 +57,8 @@ namespace geode
 
     template < index_t dimension >
     Corner< dimension >::Corner()
+        : Corner( PointSet< dimension >::default_type() )
     {
-        impl_->set_mesh( PointSet< dimension >::create() );
     }
 
     template < index_t dimension >

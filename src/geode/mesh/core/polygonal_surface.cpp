@@ -120,10 +120,10 @@ namespace geode
     public:
         explicit Impl( PolygonalSurfaceBase& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) )
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
@@ -727,12 +727,16 @@ namespace geode
     }
 
     template < index_t dimension >
+    MeshType PolygonalSurface< dimension >::default_type()
+    {
+        return OpenGeodePolygonalSurface< dimension >::type_name_static();
+    }
+
+    template < index_t dimension >
     std::unique_ptr< PolygonalSurface< dimension > >
         PolygonalSurface< dimension >::create()
     {
-        return std::unique_ptr< PolygonalSurface< dimension > >{
-            new OpenGeodePolygonalSurface< dimension >
-        };
+        return create( default_type() );
     }
 
     template < index_t dimension >
@@ -770,11 +774,14 @@ namespace geode
         return clone;
     }
 
+    MeshType PolygonalSurface< 3 >::default_type()
+    {
+        return OpenGeodePolygonalSurface< 3 >::type_name_static();
+    }
+
     std::unique_ptr< PolygonalSurface< 3 > > PolygonalSurface< 3 >::create()
     {
-        return std::unique_ptr< PolygonalSurface< 3 > >{
-            new OpenGeodePolygonalSurface< 3 >
-        };
+        return create( default_type() );
     }
 
     std::unique_ptr< PolygonalSurface< 3 > > PolygonalSurface< 3 >::create(

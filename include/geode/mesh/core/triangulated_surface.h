@@ -50,6 +50,8 @@ namespace geode
         static std::unique_ptr< TriangulatedSurface< dimension > > create(
             const MeshType& type );
 
+        static MeshType default_type();
+
         std::unique_ptr< TriangulatedSurface< dimension > > clone() const;
 
     protected:

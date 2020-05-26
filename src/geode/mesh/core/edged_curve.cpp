@@ -36,9 +36,7 @@ namespace geode
     template < index_t dimension >
     std::unique_ptr< EdgedCurve< dimension > > EdgedCurve< dimension >::create()
     {
-        return std::unique_ptr< EdgedCurve< dimension > >{
-            new OpenGeodeEdgedCurve< dimension >
-        };
+        return create( default_type() );
     }
 
     template < index_t dimension >
@@ -56,6 +54,12 @@ namespace geode
                 "Could not create EdgedCurve data structure: ", type.get()
             };
         }
+    }
+
+    template < index_t dimension >
+    MeshType EdgedCurve< dimension >::default_type()
+    {
+        return OpenGeodeEdgedCurve< dimension >::type_name_static();
     }
 
     template < index_t dimension >
