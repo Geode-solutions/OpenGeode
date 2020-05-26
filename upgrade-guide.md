@@ -10,11 +10,9 @@ TODO
 
 - **Model copy**: mappings between model components have been modified to open design to arbitrary collections. It means that you can add additional information to these mappings for your own copy functions.
 
-- **Mesh loading**: mesh loading functions are now returning the mesh loaded from the filename.
-
 **How to upgrade**
 
-- **Model copy**: `ComponentMapping` has been moved out from `geode::BRep` and `geode::Section` and renamed `geode::detail::ModelCopyMapping` declares and defined in `include/geode/model/representation/builder/detail/copy.h`. 
+`ComponentMapping` has been moved out from `geode::BRep` and `geode::Section` and renamed `geode::detail::ModelCopyMapping` declares and defined in `include/geode/model/representation/builder/detail/copy.h`. 
 
 `geode::detail::ModelCopyMapping` works as a map whose keys are `geode::ComponentType`. It implies to get access to a specific mapping using for example:
 
@@ -36,7 +34,15 @@ corner_mapping.in2out( uuid1 );
 
 - **PolygonsAroundVertex**: use PolygonVertex instead of PolygonEdge: `using PolygonsAroundVertex = absl::InlinedVector< PolygonVertex, 10 >`
 
-- **Mesh loading**: remove the mesh parameter and get the retrun value
+**How to upgrade**
+
+When using element of `PolygonsAroundVertex` (before `PolygonEdge`, now `PolygonVertex`), use `vertex_id` instead of `edge_id`.
+
+- **Mesh loading**: mesh loading functions are now returning the mesh loaded from the filename.
+
+**How to upgrade**
+
+Remove the mesh parameter and get the retrun value
 
 Example
 
@@ -46,6 +52,7 @@ from
 auto new_edged_curve = geode::EdgedCurve3D::create();
 or
 auto new_edged_curve = geode::EdgedCurve3D::create( geode::OpenGeodeEdgedCurve3D::type_name_static() );
+
 load_edged_curve( *new_edged_curve, filename );
 ```
 
@@ -56,10 +63,6 @@ auto new_edged_curve = geode::load_edged_curve< 3 >( filename );
 or
 auto new_edged_curve = geode::load_edged_curve< 3 >( geode::OpenGeodeEdgedCurve3D::type_name_static(), filename );
 ```
-
-**How to upgrade**
-
-When using element of `PolygonsAroundVertex` (before `PolygonEdge`, now `PolygonVertex`), use `vertex_id` instead of `edge_id`.
 
 ## Upgrading from OpenGeode v3.x.x to v4.0.0
 

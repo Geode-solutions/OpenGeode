@@ -28,6 +28,8 @@
 #include <geode/mesh/builder/geode_vertex_set_builder.h>
 #include <geode/mesh/builder/vertex_set_builder.h>
 #include <geode/mesh/core/geode_vertex_set.h>
+#include <geode/mesh/io/vertex_set_input.h>
+#include <geode/mesh/io/vertex_set_output.h>
 
 #include <geode/tests/common.h>
 
@@ -67,6 +69,14 @@ void test_delete_vertex(
         "[Test] VertexSet should have 5 vertices" );
 }
 
+void test_io( const geode::VertexSet& vertex_set, absl::string_view filename )
+{
+    geode::save_vertex_set( vertex_set, filename );
+    geode::load_vertex_set( filename );
+    geode::load_vertex_set(
+        geode::OpenGeodeVertexSet::type_name_static(), filename );
+}
+
 void test_clone( const geode::VertexSet& vertex_set )
 {
     const auto vertex_set2 = vertex_set.clone();
@@ -80,6 +90,8 @@ void test()
     test_default_vertex_set( vertex_set );
     geode::OpenGeodeVertexSetBuilder builder( vertex_set );
     test_create_vertices( vertex_set, builder );
+    test_io(
+        vertex_set, absl::StrCat( "test.", vertex_set.native_extension() ) );
     test_delete_vertex( vertex_set, builder );
     test_clone( vertex_set );
 }

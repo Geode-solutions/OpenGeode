@@ -134,6 +134,7 @@ void test_io(
     const geode::TetrahedralSolid3D& solid, const std::string& filename )
 {
     geode::save_tetrahedral_solid( solid, filename );
+    geode::load_tetrahedral_solid< 3 >( filename );
     const auto new_solid = geode::load_tetrahedral_solid< 3 >(
         geode::OpenGeodeTetrahedralSolid3D::type_name_static(), filename );
     OPENGEODE_EXCEPTION( new_solid->nb_vertices() == 6,

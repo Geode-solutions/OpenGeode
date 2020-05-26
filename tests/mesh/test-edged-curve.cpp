@@ -154,7 +154,8 @@ void test_io(
     const geode::EdgedCurve3D& edged_curve, const std::string& filename )
 {
     geode::save_edged_curve( edged_curve, filename );
-    const auto new_edged_curve = geode::load_edged_curve< 3 >(
+    geode::load_edged_curve< 3 >( filename );
+    geode::load_edged_curve< 3 >(
         geode::OpenGeodeEdgedCurve3D::type_name_static(), filename );
 }
 
