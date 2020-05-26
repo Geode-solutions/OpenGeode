@@ -356,7 +356,7 @@ void add_internal_corner_relations( const geode::BRep& model,
     for( const auto& corner_id : corner_uuids )
     {
         for( const auto& embedding :
-            model.embedded_surfaces( model.corner( corner_id ) ) )
+            model.embedding_surfaces( model.corner( corner_id ) ) )
         {
             OPENGEODE_EXCEPTION( surface_uuids.front() == embedding.id(),
                 "[Test] All Corners embedded surfaces should be Surfaces" );
@@ -365,7 +365,7 @@ void add_internal_corner_relations( const geode::BRep& model,
                 "[Test] Surface should embed all Lines" );
         }
         for( const auto& embedding :
-            model.embedded_blocks( model.corner( corner_id ) ) )
+            model.embedding_blocks( model.corner( corner_id ) ) )
         {
             OPENGEODE_EXCEPTION( block_uuids.front() == embedding.id(),
                 "[Test] All Corners embedded blocks should be Blocks" );
@@ -376,10 +376,10 @@ void add_internal_corner_relations( const geode::BRep& model,
         OPENGEODE_EXCEPTION( model.nb_embeddings( corner_id ) == 2,
             "[Test] All Corners should be embedded to 1 Block and 1 Surface" );
         OPENGEODE_EXCEPTION(
-            model.nb_embedded_surfaces( model.corner( corner_id ) ) == 1,
+            model.nb_embedding_surfaces( model.corner( corner_id ) ) == 1,
             "[Test] All Corners should be embedded to 1 Surface" );
         OPENGEODE_EXCEPTION(
-            model.nb_embedded_blocks( model.corner( corner_id ) ) == 1,
+            model.nb_embedding_blocks( model.corner( corner_id ) ) == 1,
             "[Test] All Corners should be embedded to 1 Block" );
     }
 }
@@ -401,7 +401,7 @@ void add_internal_line_relations( const geode::BRep& model,
     for( const auto& line_id : line_uuids )
     {
         for( const auto& embedding :
-            model.embedded_surfaces( model.line( line_id ) ) )
+            model.embedding_surfaces( model.line( line_id ) ) )
         {
             OPENGEODE_EXCEPTION( surface_uuids.front() == embedding.id(),
                 "[Test] All Line embedded surfaces should be Surfaces" );
@@ -410,7 +410,7 @@ void add_internal_line_relations( const geode::BRep& model,
                 "[Test] Surface should embed all Lines" );
         }
         for( const auto& embedding :
-            model.embedded_blocks( model.line( line_id ) ) )
+            model.embedding_blocks( model.line( line_id ) ) )
         {
             OPENGEODE_EXCEPTION( block_uuids.front() == embedding.id(),
                 "[Test] All Lines embedded blocks should be Blocks" );
@@ -421,10 +421,10 @@ void add_internal_line_relations( const geode::BRep& model,
         OPENGEODE_EXCEPTION( model.nb_embeddings( line_id ) == 2,
             "[Test] All Surfaces should be embedded to 1 Block and 1 Surface" );
         OPENGEODE_EXCEPTION(
-            model.nb_embedded_surfaces( model.line( line_id ) ) == 1,
+            model.nb_embedding_surfaces( model.line( line_id ) ) == 1,
             "[Test] All Surfaces should be embedded to 1 Surface" );
         OPENGEODE_EXCEPTION(
-            model.nb_embedded_blocks( model.line( line_id ) ) == 1,
+            model.nb_embedding_blocks( model.line( line_id ) ) == 1,
             "[Test] All Surfaces should be embedded to 1 Block" );
     }
 }
@@ -443,7 +443,7 @@ void add_internal_surface_relations( const geode::BRep& model,
     for( const auto& surface_id : surface_uuids )
     {
         for( const auto& embedding :
-            model.embedded_blocks( model.surface( surface_id ) ) )
+            model.embedding_blocks( model.surface( surface_id ) ) )
         {
             OPENGEODE_EXCEPTION(
                 model.nb_internal_surfaces( embedding ) == surface_uuids.size(),
@@ -454,7 +454,7 @@ void add_internal_surface_relations( const geode::BRep& model,
         OPENGEODE_EXCEPTION( model.nb_embeddings( surface_id ) == 1,
             "[Test] All Surfaces should be embedded to 1 Block" );
         OPENGEODE_EXCEPTION(
-            model.nb_embedded_blocks( model.surface( surface_id ) ) == 1,
+            model.nb_embedding_blocks( model.surface( surface_id ) ) == 1,
             "[Test] All Surfaces should be embedded to 1 Block" );
     }
 }

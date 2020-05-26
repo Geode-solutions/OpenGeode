@@ -192,14 +192,14 @@ namespace geode
             const BRep& brep_;
         };
 
-        class opengeode_model_api EmbeddedSurfaceRange
+        class opengeode_model_api EmbeddingSurfaceRange
             : public Relationships::EmbeddingRangeIterator,
-              public BeginEnd< EmbeddedSurfaceRange >
+              public BeginEnd< EmbeddingSurfaceRange >
         {
         public:
-            EmbeddedSurfaceRange( const BRep& brep, const Corner3D& corner );
+            EmbeddingSurfaceRange( const BRep& brep, const Corner3D& corner );
 
-            EmbeddedSurfaceRange( const BRep& brep, const Line3D& line );
+            EmbeddingSurfaceRange( const BRep& brep, const Line3D& line );
 
             void operator++();
 
@@ -209,16 +209,16 @@ namespace geode
             const BRep& brep_;
         };
 
-        class opengeode_model_api EmbeddedBlockRange
+        class opengeode_model_api EmbeddingBlockRange
             : public Relationships::EmbeddingRangeIterator,
-              public BeginEnd< EmbeddedBlockRange >
+              public BeginEnd< EmbeddingBlockRange >
         {
         public:
-            EmbeddedBlockRange( const BRep& brep, const Corner3D& corner );
+            EmbeddingBlockRange( const BRep& brep, const Corner3D& corner );
 
-            EmbeddedBlockRange( const BRep& brep, const Line3D& line );
+            EmbeddingBlockRange( const BRep& brep, const Line3D& line );
 
-            EmbeddedBlockRange( const BRep& brep, const Surface3D& surface );
+            EmbeddingBlockRange( const BRep& brep, const Surface3D& surface );
 
             void operator++();
 
@@ -275,25 +275,26 @@ namespace geode
 
         InternalSurfaceRange internal_surfaces( const Block3D& block ) const;
 
-        index_t nb_embedded_surfaces( const Corner3D& corner ) const;
+        index_t nb_embedding_surfaces( const Corner3D& corner ) const;
 
-        EmbeddedSurfaceRange embedded_surfaces( const Corner3D& corner ) const;
+        EmbeddingSurfaceRange embedding_surfaces(
+            const Corner3D& corner ) const;
 
-        index_t nb_embedded_surfaces( const Line3D& line ) const;
+        index_t nb_embedding_surfaces( const Line3D& line ) const;
 
-        EmbeddedSurfaceRange embedded_surfaces( const Line3D& line ) const;
+        EmbeddingSurfaceRange embedding_surfaces( const Line3D& line ) const;
 
-        index_t nb_embedded_blocks( const Corner3D& corner ) const;
+        index_t nb_embedding_blocks( const Corner3D& corner ) const;
 
-        EmbeddedBlockRange embedded_blocks( const Corner3D& corner ) const;
+        EmbeddingBlockRange embedding_blocks( const Corner3D& corner ) const;
 
-        index_t nb_embedded_blocks( const Line3D& line ) const;
+        index_t nb_embedding_blocks( const Line3D& line ) const;
 
-        EmbeddedBlockRange embedded_blocks( const Line3D& line ) const;
+        EmbeddingBlockRange embedding_blocks( const Line3D& line ) const;
 
-        index_t nb_embedded_blocks( const Surface3D& surface ) const;
+        index_t nb_embedding_blocks( const Surface3D& surface ) const;
 
-        EmbeddedBlockRange embedded_blocks( const Surface3D& surface ) const;
+        EmbeddingBlockRange embedding_blocks( const Surface3D& surface ) const;
 
         ItemSurfaceRange items( const ModelBoundary3D& boundary ) const;
 

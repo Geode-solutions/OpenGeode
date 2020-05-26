@@ -32,8 +32,7 @@ namespace geode
         pybind11::class_< BRep, Topology, Corners3D, Lines3D, Surfaces3D,
             Blocks3D, ModelBoundaries3D >( module, "BRep" )
             .def( pybind11::init<>() )
-            .def(
-                "boundary_corners",
+            .def( "boundary_corners",
                 []( const BRep& brep, const Line3D& line ) {
                     std::vector< const Corner3D* > components;
                     for( const auto& component : brep.boundaries( line ) )
@@ -43,8 +42,7 @@ namespace geode
                     return components;
                 },
                 pybind11::return_value_policy::reference )
-            .def(
-                "boundary_lines",
+            .def( "boundary_lines",
                 []( const BRep& brep, const Surface3D& surface ) {
                     std::vector< const Line3D* > components;
                     for( const auto& component : brep.boundaries( surface ) )
@@ -54,8 +52,7 @@ namespace geode
                     return components;
                 },
                 pybind11::return_value_policy::reference )
-            .def(
-                "boundary_surfaces",
+            .def( "boundary_surfaces",
                 []( const BRep& brep, const Block3D& block ) {
                     std::vector< const Surface3D* > components;
                     for( const auto& component : brep.boundaries( block ) )
@@ -65,8 +62,7 @@ namespace geode
                     return components;
                 },
                 pybind11::return_value_policy::reference )
-            .def(
-                "incident_lines",
+            .def( "incident_lines",
                 []( const BRep& brep, const Corner3D& corner ) {
                     std::vector< const Line3D* > components;
                     for( const auto& component : brep.incidences( corner ) )
@@ -76,8 +72,7 @@ namespace geode
                     return components;
                 },
                 pybind11::return_value_policy::reference )
-            .def(
-                "incident_surfaces",
+            .def( "incident_surfaces",
                 []( const BRep& brep, const Line3D& line ) {
                     std::vector< const Surface3D* > components;
                     for( const auto& component : brep.incidences( line ) )
@@ -87,8 +82,7 @@ namespace geode
                     return components;
                 },
                 pybind11::return_value_policy::reference )
-            .def(
-                "incident_blocks",
+            .def( "incident_blocks",
                 []( const BRep& brep, const Surface3D& surface ) {
                     std::vector< const Block3D* > components;
                     for( const auto& component : brep.incidences( surface ) )
@@ -101,8 +95,7 @@ namespace geode
             .def( "nb_internal_surface_corners",
                 ( index_t( BRep::* )( const Surface3D& ) const )
                     & BRep::nb_internal_corners )
-            .def(
-                "internal_surface_corners",
+            .def( "internal_surface_corners",
                 []( const BRep& brep, const Surface3D& surface ) {
                     std::vector< const Corner3D* > components;
                     for( const auto& component :
@@ -116,8 +109,7 @@ namespace geode
             .def( "nb_internal_surface_lines",
                 ( index_t( BRep::* )( const Surface3D& ) const )
                     & BRep::nb_internal_lines )
-            .def(
-                "internal_surface_lines",
+            .def( "internal_surface_lines",
                 []( const BRep& brep, const Surface3D& surface ) {
                     std::vector< const Line3D* > components;
                     for( const auto& component :
@@ -131,8 +123,7 @@ namespace geode
             .def( "nb_internal_block_corners",
                 ( index_t( BRep::* )( const Block3D& ) const )
                     & BRep::nb_internal_corners )
-            .def(
-                "internal_block_corners",
+            .def( "internal_block_corners",
                 []( const BRep& brep, const Block3D& block ) {
                     std::vector< const Corner3D* > components;
                     for( const auto& component :
@@ -146,8 +137,7 @@ namespace geode
             .def( "nb_internal_block_lines",
                 ( index_t( BRep::* )( const Block3D& ) const )
                     & BRep::nb_internal_lines )
-            .def(
-                "internal_block_lines",
+            .def( "internal_block_lines",
                 []( const BRep& brep, const Block3D& block ) {
                     std::vector< const Line3D* > components;
                     for( const auto& component : brep.internal_lines( block ) )
@@ -160,8 +150,7 @@ namespace geode
             .def( "nb_internal_block_surfaces",
                 ( index_t( BRep::* )( const Block3D& ) const )
                     & BRep::nb_internal_surfaces )
-            .def(
-                "internal_block_surfaces",
+            .def( "internal_block_surfaces",
                 []( const BRep& brep, const Block3D& block ) {
                     std::vector< const Surface3D* > components;
                     for( const auto& component :
@@ -172,82 +161,76 @@ namespace geode
                     return components;
                 },
                 pybind11::return_value_policy::reference )
-            .def( "nb_embedded_corner_surfaces",
+            .def( "nb_embedding_corner_surfaces",
                 ( index_t( BRep::* )( const Corner3D& ) const )
-                    & BRep::nb_embedded_surfaces )
-            .def(
-                "embedded_corner_surfaces",
+                    & BRep::nb_embedding_surfaces )
+            .def( "embedding_corner_surfaces",
                 []( const BRep& brep, const Corner3D& corner ) {
                     std::vector< const Surface3D* > components;
                     for( const auto& component :
-                        brep.embedded_surfaces( corner ) )
+                        brep.embedding_surfaces( corner ) )
                     {
                         components.push_back( &component );
                     }
                     return components;
                 },
                 pybind11::return_value_policy::reference )
-            .def( "nb_embedded_line_surfaces",
+            .def( "nb_embedding_line_surfaces",
                 ( index_t( BRep::* )( const Line3D& ) const )
-                    & BRep::nb_embedded_surfaces )
-            .def(
-                "embedded_line_surfaces",
+                    & BRep::nb_embedding_surfaces )
+            .def( "embedding_line_surfaces",
                 []( const BRep& brep, const Line3D& line ) {
                     std::vector< const Surface3D* > components;
                     for( const auto& component :
-                        brep.embedded_surfaces( line ) )
+                        brep.embedding_surfaces( line ) )
                     {
                         components.push_back( &component );
                     }
                     return components;
                 },
                 pybind11::return_value_policy::reference )
-            .def( "nb_embedded_corner_blocks",
+            .def( "nb_embedding_corner_blocks",
                 ( index_t( BRep::* )( const Corner3D& ) const )
-                    & BRep::nb_embedded_blocks )
-            .def(
-                "embedded_corner_blocks",
+                    & BRep::nb_embedding_blocks )
+            .def( "embedding_corner_blocks",
                 []( const BRep& brep, const Corner3D& corner ) {
                     std::vector< const Block3D* > components;
                     for( const auto& component :
-                        brep.embedded_blocks( corner ) )
+                        brep.embedding_blocks( corner ) )
                     {
                         components.push_back( &component );
                     }
                     return components;
                 },
                 pybind11::return_value_policy::reference )
-            .def( "nb_embedded_line_blocks",
+            .def( "nb_embedding_line_blocks",
                 ( index_t( BRep::* )( const Line3D& ) const )
-                    & BRep::nb_embedded_blocks )
-            .def(
-                "embedded_line_blocks",
+                    & BRep::nb_embedding_blocks )
+            .def( "embedding_line_blocks",
                 []( const BRep& brep, const Line3D& line ) {
                     std::vector< const Block3D* > components;
-                    for( const auto& component : brep.embedded_blocks( line ) )
+                    for( const auto& component : brep.embedding_blocks( line ) )
                     {
                         components.push_back( &component );
                     }
                     return components;
                 },
                 pybind11::return_value_policy::reference )
-            .def( "nb_embedded_surface_blocks",
+            .def( "nb_embedding_surface_blocks",
                 ( index_t( BRep::* )( const Surface3D& ) const )
-                    & BRep::nb_embedded_blocks )
-            .def(
-                "embedded_surface_blocks",
+                    & BRep::nb_embedding_blocks )
+            .def( "embedding_surface_blocks",
                 []( const BRep& brep, const Surface3D& surface ) {
                     std::vector< const Block3D* > components;
                     for( const auto& component :
-                        brep.embedded_blocks( surface ) )
+                        brep.embedding_blocks( surface ) )
                     {
                         components.push_back( &component );
                     }
                     return components;
                 },
                 pybind11::return_value_policy::reference )
-            .def(
-                "items",
+            .def( "items",
                 []( const BRep& brep, const ModelBoundary3D& boundary ) {
                     std::vector< const Surface3D* > components;
                     for( const auto& component : brep.items( boundary ) )

@@ -304,99 +304,99 @@ namespace geode
             Relationships::InternalRangeIterator::operator*().id() );
     }
 
-    BRep::EmbeddedSurfaceRange BRep::embedded_surfaces(
+    BRep::EmbeddingSurfaceRange BRep::embedding_surfaces(
         const Corner3D& corner ) const
     {
         return { *this, corner };
     }
 
-    BRep::EmbeddedSurfaceRange::EmbeddedSurfaceRange(
+    BRep::EmbeddingSurfaceRange::EmbeddingSurfaceRange(
         const BRep& brep, const Corner3D& corner )
         : Relationships::EmbeddingRangeIterator( brep, corner.id() ),
-          BeginEnd< EmbeddedSurfaceRange >( *this ),
+          BeginEnd< EmbeddingSurfaceRange >( *this ),
           brep_( brep )
     {
         next_filtered_embedding_iterator< Surface3D >( *this );
     }
 
-    BRep::EmbeddedSurfaceRange BRep::embedded_surfaces(
+    BRep::EmbeddingSurfaceRange BRep::embedding_surfaces(
         const Line3D& line ) const
     {
         return { *this, line };
     }
 
-    BRep::EmbeddedSurfaceRange::EmbeddedSurfaceRange(
+    BRep::EmbeddingSurfaceRange::EmbeddingSurfaceRange(
         const BRep& brep, const Line3D& line )
         : Relationships::EmbeddingRangeIterator( brep, line.id() ),
-          BeginEnd< EmbeddedSurfaceRange >( *this ),
+          BeginEnd< EmbeddingSurfaceRange >( *this ),
           brep_( brep )
     {
         next_filtered_embedding_iterator< Surface3D >( *this );
     }
 
-    void BRep::EmbeddedSurfaceRange::operator++()
+    void BRep::EmbeddingSurfaceRange::operator++()
     {
         Relationships::EmbeddingRangeIterator::operator++();
         next_filtered_embedding_iterator< Surface3D >( *this );
     }
 
-    const Surface3D& BRep::EmbeddedSurfaceRange::operator*() const
+    const Surface3D& BRep::EmbeddingSurfaceRange::operator*() const
     {
         return brep_.surface(
             Relationships::EmbeddingRangeIterator::operator*().id() );
     }
 
-    BRep::EmbeddedBlockRange BRep::embedded_blocks(
+    BRep::EmbeddingBlockRange BRep::embedding_blocks(
         const Corner3D& corner ) const
     {
         return { *this, corner };
     }
 
-    BRep::EmbeddedBlockRange::EmbeddedBlockRange(
+    BRep::EmbeddingBlockRange::EmbeddingBlockRange(
         const BRep& brep, const Corner3D& corner )
         : Relationships::EmbeddingRangeIterator( brep, corner.id() ),
-          BeginEnd< EmbeddedBlockRange >( *this ),
+          BeginEnd< EmbeddingBlockRange >( *this ),
           brep_( brep )
     {
         next_filtered_embedding_iterator< Block3D >( *this );
     }
 
-    BRep::EmbeddedBlockRange BRep::embedded_blocks( const Line3D& line ) const
+    BRep::EmbeddingBlockRange BRep::embedding_blocks( const Line3D& line ) const
     {
         return { *this, line };
     }
 
-    BRep::EmbeddedBlockRange::EmbeddedBlockRange(
+    BRep::EmbeddingBlockRange::EmbeddingBlockRange(
         const BRep& brep, const Line3D& line )
         : Relationships::EmbeddingRangeIterator( brep, line.id() ),
-          BeginEnd< EmbeddedBlockRange >( *this ),
+          BeginEnd< EmbeddingBlockRange >( *this ),
           brep_( brep )
     {
         next_filtered_embedding_iterator< Block3D >( *this );
     }
 
-    BRep::EmbeddedBlockRange BRep::embedded_blocks(
+    BRep::EmbeddingBlockRange BRep::embedding_blocks(
         const Surface3D& surface ) const
     {
         return { *this, surface };
     }
 
-    BRep::EmbeddedBlockRange::EmbeddedBlockRange(
+    BRep::EmbeddingBlockRange::EmbeddingBlockRange(
         const BRep& brep, const Surface3D& surface )
         : Relationships::EmbeddingRangeIterator( brep, surface.id() ),
-          BeginEnd< EmbeddedBlockRange >( *this ),
+          BeginEnd< EmbeddingBlockRange >( *this ),
           brep_( brep )
     {
         next_filtered_embedding_iterator< Block3D >( *this );
     }
 
-    void BRep::EmbeddedBlockRange::operator++()
+    void BRep::EmbeddingBlockRange::operator++()
     {
         Relationships::EmbeddingRangeIterator::operator++();
         next_filtered_embedding_iterator< Block3D >( *this );
     }
 
-    const Block3D& BRep::EmbeddedBlockRange::operator*() const
+    const Block3D& BRep::EmbeddingBlockRange::operator*() const
     {
         return brep_.block(
             Relationships::EmbeddingRangeIterator::operator*().id() );
@@ -446,29 +446,29 @@ namespace geode
         return detail::count_relationships( internal_surfaces( block ) );
     }
 
-    index_t BRep::nb_embedded_surfaces( const Corner3D& corner ) const
+    index_t BRep::nb_embedding_surfaces( const Corner3D& corner ) const
     {
-        return detail::count_relationships( embedded_surfaces( corner ) );
+        return detail::count_relationships( embedding_surfaces( corner ) );
     }
 
-    index_t BRep::nb_embedded_surfaces( const Line3D& line ) const
+    index_t BRep::nb_embedding_surfaces( const Line3D& line ) const
     {
-        return detail::count_relationships( embedded_surfaces( line ) );
+        return detail::count_relationships( embedding_surfaces( line ) );
     }
 
-    index_t BRep::nb_embedded_blocks( const Corner3D& corner ) const
+    index_t BRep::nb_embedding_blocks( const Corner3D& corner ) const
     {
-        return detail::count_relationships( embedded_blocks( corner ) );
+        return detail::count_relationships( embedding_blocks( corner ) );
     }
 
-    index_t BRep::nb_embedded_blocks( const Line3D& line ) const
+    index_t BRep::nb_embedding_blocks( const Line3D& line ) const
     {
-        return detail::count_relationships( embedded_blocks( line ) );
+        return detail::count_relationships( embedding_blocks( line ) );
     }
 
-    index_t BRep::nb_embedded_blocks( const Surface3D& surface ) const
+    index_t BRep::nb_embedding_blocks( const Surface3D& surface ) const
     {
-        return detail::count_relationships( embedded_blocks( surface ) );
+        return detail::count_relationships( embedding_blocks( surface ) );
     }
 
     bool BRep::is_closed( const Line3D& line ) const

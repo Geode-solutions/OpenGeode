@@ -211,43 +211,43 @@ namespace geode
             Relationships::InternalRangeIterator::operator*().id() );
     }
 
-    Section::EmbeddedSurfaceRange Section::embedded_surfaces(
+    Section::EmbeddingSurfaceRange Section::embedding_surfaces(
         const Corner2D& corner ) const
     {
         return { *this, corner };
     }
 
-    Section::EmbeddedSurfaceRange Section::embedded_surfaces(
+    Section::EmbeddingSurfaceRange Section::embedding_surfaces(
         const Line2D& line ) const
     {
         return { *this, line };
     }
 
-    Section::EmbeddedSurfaceRange::EmbeddedSurfaceRange(
+    Section::EmbeddingSurfaceRange::EmbeddingSurfaceRange(
         const Section& section, const Line2D& line )
         : Relationships::EmbeddingRangeIterator( section, line.id() ),
-          BeginEnd< EmbeddedSurfaceRange >( *this ),
+          BeginEnd< EmbeddingSurfaceRange >( *this ),
           section_( section )
     {
         next_filtered_embedding_iterator< Surface2D >( *this );
     }
 
-    Section::EmbeddedSurfaceRange::EmbeddedSurfaceRange(
+    Section::EmbeddingSurfaceRange::EmbeddingSurfaceRange(
         const Section& section, const Corner2D& corner )
         : Relationships::EmbeddingRangeIterator( section, corner.id() ),
-          BeginEnd< EmbeddedSurfaceRange >( *this ),
+          BeginEnd< EmbeddingSurfaceRange >( *this ),
           section_( section )
     {
         next_filtered_embedding_iterator< Surface2D >( *this );
     }
 
-    void Section::EmbeddedSurfaceRange::operator++()
+    void Section::EmbeddingSurfaceRange::operator++()
     {
         Relationships::EmbeddingRangeIterator::operator++();
         next_filtered_embedding_iterator< Surface2D >( *this );
     }
 
-    const Surface2D& Section::EmbeddedSurfaceRange::operator*() const
+    const Surface2D& Section::EmbeddingSurfaceRange::operator*() const
     {
         return section_.surface(
             Relationships::EmbeddingRangeIterator::operator*().id() );
@@ -283,14 +283,14 @@ namespace geode
         return detail::count_relationships( internal_lines( surface ) );
     }
 
-    index_t Section::nb_embedded_surfaces( const Corner2D& corner ) const
+    index_t Section::nb_embedding_surfaces( const Corner2D& corner ) const
     {
-        return detail::count_relationships( embedded_surfaces( corner ) );
+        return detail::count_relationships( embedding_surfaces( corner ) );
     }
 
-    index_t Section::nb_embedded_surfaces( const Line2D& line ) const
+    index_t Section::nb_embedding_surfaces( const Line2D& line ) const
     {
-        return detail::count_relationships( embedded_surfaces( line ) );
+        return detail::count_relationships( embedding_surfaces( line ) );
     }
 
     bool Section::is_closed( const Line2D& line ) const

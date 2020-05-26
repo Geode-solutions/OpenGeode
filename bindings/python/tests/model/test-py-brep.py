@@ -194,21 +194,21 @@ def add_internal_corner_relations( model, builder, corner_uuids, surface_uuids, 
         builder.add_corner_block_internal_relationship( model.corner( corner_id ), model.block( block_uuids[0] ) )
 
     for corner_id in corner_uuids:
-        for embedding in model.embedded_corner_surfaces( model.corner( corner_id ) ):
+        for embedding in model.embedding_corner_surfaces( model.corner( corner_id ) ):
             if surface_uuids[0].string() != embedding.id().string():
                 raise ValueError( "[Test] All Corners embedded surfaces should be Surfaces" )
             if model.nb_internal_surface_corners( embedding ) != len( corner_uuids ):
                 raise ValueError( "[Test] Surface should embed all Lines" )
-        for embedding in model.embedded_corner_blocks( model.corner( corner_id ) ):
+        for embedding in model.embedding_corner_blocks( model.corner( corner_id ) ):
             if block_uuids[0].string() != embedding.id().string():
                 raise ValueError( "[Test] All Corners embedded blocks should be Blocks" )
             if model.nb_internal_block_corners( embedding ) != len( corner_uuids ):
                 raise ValueError( "[Test] Block should embed all Lines" )
         if model.nb_embeddings( corner_id ) != 2:
             raise ValueError( "[Test] All Corners should be embedded to 1 Block and 1 Surface" )
-        if model.nb_embedded_corner_surfaces( model.corner( corner_id ) ) != 1:
+        if model.nb_embedding_corner_surfaces( model.corner( corner_id ) ) != 1:
             raise ValueError( "[Test] All Corners should be embedded to 1 Surface" )
-        if model.nb_embedded_corner_blocks( model.corner( corner_id ) ) != 1:
+        if model.nb_embedding_corner_blocks( model.corner( corner_id ) ) != 1:
             raise ValueError( "[Test] All Corners should be embedded to 1 Block" )
 
 def add_internal_line_relations( model, builder, line_uuids, surface_uuids, block_uuids ):
@@ -217,21 +217,21 @@ def add_internal_line_relations( model, builder, line_uuids, surface_uuids, bloc
         builder.add_line_block_internal_relationship( model.line( line_id ), model.block( block_uuids[0] ) )
 
     for line_id in line_uuids:
-        for embedding in model.embedded_line_surfaces( model.line( line_id ) ):
+        for embedding in model.embedding_line_surfaces( model.line( line_id ) ):
             if surface_uuids[0].string() != embedding.id().string():
                 raise ValueError( "[Test] All Line embedded surfaces should be Surfaces" )
             if model.nb_internal_surface_lines( embedding ) != len( line_uuids ):
                 raise ValueError( "[Test] Surface should embed all Lines" )
-        for embedding in model.embedded_line_blocks( model.line( line_id ) ):
+        for embedding in model.embedding_line_blocks( model.line( line_id ) ):
             if block_uuids[0].string() != embedding.id().string():
                 raise ValueError( "[Test] All Lines embedded blocks should be Blocks" )
             if model.nb_internal_block_lines( embedding ) != len( line_uuids ):
                 raise ValueError( "[Test] Block should embed all Lines" )
         if model.nb_embeddings( line_id ) != 2:
             raise ValueError( "[Test] All Surfaces should be embedded to 1 Block and 1 Surface" )
-        if model.nb_embedded_line_surfaces( model.line( line_id ) ) != 1:
+        if model.nb_embedding_line_surfaces( model.line( line_id ) ) != 1:
             raise ValueError( "[Test] All Surfaces should be embedded to 1 Surface" )
-        if model.nb_embedded_line_blocks( model.line( line_id ) ) != 1:
+        if model.nb_embedding_line_blocks( model.line( line_id ) ) != 1:
             raise ValueError( "[Test] All Surfaces should be embedded to 1 Block" )
 
 def add_internal_surface_relations( model, builder, surface_uuids, block_uuids ):
@@ -239,14 +239,14 @@ def add_internal_surface_relations( model, builder, surface_uuids, block_uuids )
         builder.add_surface_block_internal_relationship( model.surface( surface_id ), model.block( block_uuids[0] ) )
 
     for surface_id in surface_uuids:
-        for embedding in model.embedded_surface_blocks( model.surface( surface_id ) ):
+        for embedding in model.embedding_surface_blocks( model.surface( surface_id ) ):
             if model.nb_internal_block_surfaces( embedding ) != len( surface_uuids ):
                 raise ValueError( "[Test] Block should embed all Surfaces" )
             if block_uuids[0].string() != embedding.id().string():
                 raise ValueError( "[Test] All Surfaces embeddings should be Blocks" )
         if model.nb_embeddings( surface_id ) != 1:
             raise ValueError( "[Test] All Surfaces should be embedded to 1 Block" )
-        if model.nb_embedded_surface_blocks( model.surface( surface_id ) ) != 1:
+        if model.nb_embedding_surface_blocks( model.surface( surface_id ) ) != 1:
             raise ValueError( "[Test] All Surfaces should be embedded to 1 Block" )
 
 def test_boundary_ranges( model, corner_uuids, line_uuids, surface_uuids, block_uuids ):
