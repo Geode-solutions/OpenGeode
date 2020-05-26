@@ -45,6 +45,12 @@ namespace geode
     std::unique_ptr< EdgedCurve< dimension > > load_edged_curve(
         const MeshType& type, absl::string_view filename );
 
+    /*!
+     * API function for loading an EdgedCurve.
+     * The adequate loader is called depending on the filename extension.
+     * Default data structure type is used.
+     * @param[in] filename Path to the file to load.
+     */
     template < index_t dimension >
     std::unique_ptr< EdgedCurve< dimension > > load_edged_curve(
         absl::string_view filename );

@@ -45,6 +45,12 @@ namespace geode
     std::unique_ptr< VertexSet > opengeode_mesh_api load_vertex_set(
         const MeshType& type, absl::string_view filename );
 
+    /*!
+     * API function for loading an VertexSet.
+     * The adequate loader is called depending on the filename extension.
+     * Default data structure type is used.
+     * @param[in] filename Path to the file to load.
+     */
     std::unique_ptr< VertexSet > opengeode_mesh_api load_vertex_set(
         absl::string_view filename );
 
