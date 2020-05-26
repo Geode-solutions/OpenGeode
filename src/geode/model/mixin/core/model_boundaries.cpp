@@ -207,8 +207,8 @@ namespace geode
 
     template < index_t dimension >
     ModelBoundary< dimension >&
-        ModelBoundaries< dimension >::ModifiableModelBoundaryRange::
-            operator*() const
+        ModelBoundaries< dimension >::ModifiableModelBoundaryRange::operator*()
+            const
     {
         return this->impl_->model_boundary();
     }
