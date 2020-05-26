@@ -151,8 +151,7 @@ def test_delete_polyhedra( polyhedral_solid, builder ):
 
 def test_io( polyhedral_solid, filename ):
     mesh.save_polyhedral_solid3D( polyhedral_solid, filename )
-    new_polyhedral_solid = mesh.PolyhedralSolid3D.create()
-    mesh.load_polyhedral_solid3D( new_polyhedral_solid, filename )
+    new_polyhedral_solid = mesh.load_polyhedral_solid3D( filename )
 
     if new_polyhedral_solid.nb_vertices() != 8:
         raise ValueError( "[Test] Reloaded PolyhedralSolid should have 8 vertices" )

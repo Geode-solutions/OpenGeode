@@ -90,8 +90,7 @@ def test_delete_polygon( surface, builder ):
 
 def test_io( surface, filename ):
     mesh.save_triangulated_surface3D( surface, filename )
-    new_surface = mesh.TriangulatedSurface3D.create()
-    mesh.load_triangulated_surface3D( new_surface, filename )
+    new_surface = mesh.load_triangulated_surface3D( filename )
 
 def test_clone( surface ):
     surface2 = surface.clone()

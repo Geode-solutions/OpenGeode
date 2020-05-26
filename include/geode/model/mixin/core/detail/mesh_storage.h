@@ -55,12 +55,9 @@ namespace geode
                 return *mesh_;
             }
 
-            void ensure_mesh_type()
+            const MeshType& mesh_type() const
             {
-                if( !mesh_ || mesh_->type_name() != mesh_type_ )
-                {
-                    set_mesh( Mesh::create( mesh_type_ ) );
-                }
+                return mesh_type_;
             }
 
             template < typename Archive >

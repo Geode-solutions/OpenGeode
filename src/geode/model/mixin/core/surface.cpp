@@ -86,9 +86,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    void Surface< dimension >::ensure_mesh_type( SurfacesKey )
+    const MeshType& Surface< dimension >::mesh_type() const
     {
-        return impl_->ensure_mesh_type();
+        return impl_->mesh_type();
     }
 
     template < index_t dimension >
@@ -101,6 +101,13 @@ namespace geode
                 archive.ext( surface,
                     bitsery::ext::BaseClass< Component< dimension > >{} );
             } );
+    }
+
+    template < index_t dimension >
+    void Surface< dimension >::set_mesh(
+        std::unique_ptr< PolygonalSurface< dimension > > mesh, SurfacesKey )
+    {
+        impl_->set_mesh( std::move( mesh ) );
     }
 
     template < index_t dimension >

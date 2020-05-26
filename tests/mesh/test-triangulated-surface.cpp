@@ -120,10 +120,9 @@ void test_delete_polygon( const geode::TriangulatedSurface3D& surface,
 void test_io(
     const geode::TriangulatedSurface3D& surface, absl::string_view filename )
 {
-    save_triangulated_surface( surface, filename );
-    auto new_surface = geode::TriangulatedSurface3D::create(
-        geode::OpenGeodeTriangulatedSurface3D::type_name_static() );
-    load_triangulated_surface( *new_surface, filename );
+    geode::save_triangulated_surface( surface, filename );
+    const auto new_surface = geode::load_triangulated_surface< 3 >(
+        geode::OpenGeodeTriangulatedSurface3D::type_name_static(), filename );
 }
 
 void test_clone( const geode::TriangulatedSurface3D& surface )

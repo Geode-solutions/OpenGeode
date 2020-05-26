@@ -94,16 +94,13 @@ namespace geode
     void Lines< dimension >::load_lines( absl::string_view directory )
     {
         impl_->load_components( absl::StrCat( directory, "/lines" ) );
-        const auto prefix = absl::StrCat(
-            directory, "/", Line< dimension >::component_type_static().get() );
         for( auto& line : modifiable_lines() )
         {
-            line.ensure_mesh_type( {} );
-            auto& mesh =
-                line.modifiable_mesh( typename Line< dimension >::LinesKey{} );
-            const auto file = absl::StrCat(
-                prefix, line.id().string(), ".", mesh.native_extension() );
-            load_edged_curve( mesh, file );
+            const auto file =
+                impl_->find_file( directory, line.component_id() );
+            line.set_mesh(
+                load_edged_curve< dimension >( line.mesh_type(), file ),
+                typename Line< dimension >::LinesKey{} );
         }
     }
 

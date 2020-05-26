@@ -216,10 +216,9 @@ void test_delete_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
 void test_io( const geode::PolyhedralSolid3D& polyhedral_solid,
     const std::string& filename )
 {
-    save_polyhedral_solid( polyhedral_solid, filename );
-    auto new_polyhedral_solid = geode::PolyhedralSolid3D::create(
-        geode::OpenGeodePolyhedralSolid3D::type_name_static() );
-    load_polyhedral_solid( *new_polyhedral_solid, filename );
+    geode::save_polyhedral_solid( polyhedral_solid, filename );
+    const auto new_polyhedral_solid = geode::load_polyhedral_solid< 3 >(
+        geode::OpenGeodePolyhedralSolid3D::type_name_static(), filename );
 
     OPENGEODE_EXCEPTION( new_polyhedral_solid->nb_vertices() == 8,
         "[Test] Reloaded PolyhedralSolid should have 8 vertices" );
@@ -244,9 +243,8 @@ void test_io( const geode::PolyhedralSolid3D& polyhedral_solid,
 
 void test_backward_io( const std::string& filename )
 {
-    auto new_polyhedral_solid = geode::PolyhedralSolid3D::create(
-        geode::OpenGeodePolyhedralSolid3D::type_name_static() );
-    load_polyhedral_solid( *new_polyhedral_solid, filename );
+    const auto new_polyhedral_solid = geode::load_polyhedral_solid< 3 >(
+        geode::OpenGeodePolyhedralSolid3D::type_name_static(), filename );
 
     OPENGEODE_EXCEPTION( new_polyhedral_solid->nb_edges() == 15,
         "[Test] Reloaded PolyhedralSolid should have 15 edges" );

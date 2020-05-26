@@ -106,24 +106,22 @@ namespace geode
     void Blocks< dimension >::load_blocks( absl::string_view directory )
     {
         impl_->load_components( absl::StrCat( directory, "/blocks" ) );
-        const auto prefix = absl::StrCat(
-            directory, "/", Block< dimension >::component_type_static().get() );
         for( auto& block : modifiable_blocks() )
         {
-            block.ensure_mesh_type( {} );
-            auto& mesh = block.modifiable_mesh(
-                typename Block< dimension >::BlocksKey{} );
-            const auto file = absl::StrCat(
-                prefix, block.id().string(), ".", mesh.native_extension() );
-            auto* tetra =
-                dynamic_cast< TetrahedralSolid< dimension >* >( &mesh );
-            if( tetra )
+            const auto file =
+                impl_->find_file( directory, block.component_id() );
+            if( TetrahedralSolidFactory< dimension >::has_creator(
+                    block.mesh_type() ) )
             {
-                load_tetrahedral_solid( *tetra, file );
+                block.set_mesh( load_tetrahedral_solid< dimension >(
+                                    block.mesh_type(), file ),
+                    typename Block< dimension >::BlocksKey{} );
             }
             else
             {
-                load_polyhedral_solid( mesh, file );
+                block.set_mesh( load_polyhedral_solid< dimension >(
+                                    block.mesh_type(), file ),
+                    typename Block< dimension >::BlocksKey{} );
             }
         }
     }
