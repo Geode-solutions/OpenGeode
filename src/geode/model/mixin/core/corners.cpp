@@ -215,8 +215,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    const Corner< dimension >& Corners< dimension >::CornerRange::
-        operator*() const
+    const Corner< dimension >&
+        Corners< dimension >::CornerRange::operator*() const
     {
         return this->impl_->corner();
     }
@@ -229,8 +229,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    Corner< dimension >& Corners< dimension >::ModifiableCornerRange::
-        operator*() const
+    Corner< dimension >&
+        Corners< dimension >::ModifiableCornerRange::operator*() const
     {
         return this->impl_->corner();
     }
