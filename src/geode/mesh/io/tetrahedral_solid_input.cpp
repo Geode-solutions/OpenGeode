@@ -25,19 +25,6 @@
 
 #include <geode/mesh/core/tetrahedral_solid.h>
 
-namespace
-{
-    template < geode::index_t dimension >
-    void load( geode::TetrahedralSolid< dimension >& tetrahedral_solid,
-        absl::string_view filename )
-    {
-        auto input = geode::TetrahedralSolidInputFactory< dimension >::create(
-            geode::extension_from_filename( filename ).data(),
-            tetrahedral_solid, filename );
-        input->read();
-    }
-} // namespace
-
 namespace geode
 {
     template < index_t dimension >
@@ -48,7 +35,10 @@ namespace geode
         {
             auto tetrahedral_solid =
                 TetrahedralSolid< dimension >::create( type );
-            load( *tetrahedral_solid, filename );
+            auto input = TetrahedralSolidInputFactory< dimension >::create(
+                extension_from_filename( filename ).data(), *tetrahedral_solid,
+                filename );
+            input->read();
             return tetrahedral_solid;
         }
         catch( const OpenGeodeException& e )
@@ -64,19 +54,8 @@ namespace geode
     std::unique_ptr< TetrahedralSolid< dimension > > load_tetrahedral_solid(
         absl::string_view filename )
     {
-        try
-        {
-            auto tetrahedral_solid = TetrahedralSolid< dimension >::create();
-            load( *tetrahedral_solid, filename );
-            return tetrahedral_solid;
-        }
-        catch( const OpenGeodeException& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeException{
-                "Cannot load TetrahedralSolid from file: ", filename
-            };
-        }
+        return load_tetrahedral_solid< dimension >(
+            TetrahedralSolid< dimension >::default_type(), filename );
     }
 
     template < index_t dimension >

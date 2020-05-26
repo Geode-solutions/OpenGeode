@@ -25,19 +25,6 @@
 
 #include <geode/mesh/core/edged_curve.h>
 
-namespace
-{
-    template < geode::index_t dimension >
-    void load( geode::EdgedCurve< dimension >& edged_curve,
-        absl::string_view filename )
-    {
-        auto input = geode::EdgedCurveInputFactory< dimension >::create(
-            geode::extension_from_filename( filename ).data(), edged_curve,
-            filename );
-        input->read();
-    }
-} // namespace
-
 namespace geode
 {
     template < index_t dimension >
@@ -47,7 +34,10 @@ namespace geode
         try
         {
             auto edged_curve = EdgedCurve< dimension >::create( type );
-            load( *edged_curve, filename );
+            auto input = EdgedCurveInputFactory< dimension >::create(
+                extension_from_filename( filename ).data(), *edged_curve,
+                filename );
+            input->read();
             return edged_curve;
         }
         catch( const OpenGeodeException& e )
@@ -62,18 +52,8 @@ namespace geode
     std::unique_ptr< EdgedCurve< dimension > > load_edged_curve(
         absl::string_view filename )
     {
-        try
-        {
-            auto edged_curve = EdgedCurve< dimension >::create();
-            load( *edged_curve, filename );
-            return edged_curve;
-        }
-        catch( const OpenGeodeException& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeException{ "Cannot load EdgedCurve from file: ",
-                filename };
-        }
+        return load_edged_curve< dimension >(
+            EdgedCurve< dimension >::default_type(), filename );
     }
 
     template < index_t dimension >

@@ -25,19 +25,6 @@
 
 #include <geode/mesh/core/polyhedral_solid.h>
 
-namespace
-{
-    template < geode::index_t dimension >
-    void load( geode::PolyhedralSolid< dimension >& polyhedral_solid,
-        absl::string_view filename )
-    {
-        auto input = geode::PolyhedralSolidInputFactory< dimension >::create(
-            geode::extension_from_filename( filename ).data(), polyhedral_solid,
-            filename );
-        input->read();
-    }
-} // namespace
-
 namespace geode
 {
     template < index_t dimension >
@@ -48,7 +35,10 @@ namespace geode
         {
             auto polyhedral_solid =
                 PolyhedralSolid< dimension >::create( type );
-            load( *polyhedral_solid, filename );
+            auto input = PolyhedralSolidInputFactory< dimension >::create(
+                extension_from_filename( filename ).data(), *polyhedral_solid,
+                filename );
+            input->read();
             return polyhedral_solid;
         }
         catch( const OpenGeodeException& e )
@@ -63,18 +53,8 @@ namespace geode
     std::unique_ptr< PolyhedralSolid< dimension > > load_polyhedral_solid(
         absl::string_view filename )
     {
-        try
-        {
-            auto polyhedral_solid = PolyhedralSolid< dimension >::create();
-            load( *polyhedral_solid, filename );
-            return polyhedral_solid;
-        }
-        catch( const OpenGeodeException& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeException{ "Cannot load PolyhedralSolid from file: ",
-                filename };
-        }
+        return load_polyhedral_solid< dimension >(
+            PolyhedralSolid< dimension >::default_type(), filename );
     }
 
     template < index_t dimension >

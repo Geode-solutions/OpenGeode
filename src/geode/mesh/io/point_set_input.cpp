@@ -25,19 +25,6 @@
 
 #include <geode/mesh/core/point_set.h>
 
-namespace
-{
-    template < geode::index_t dimension >
-    void load(
-        geode::PointSet< dimension >& point_set, absl::string_view filename )
-    {
-        auto input = geode::PointSetInputFactory< dimension >::create(
-            geode::extension_from_filename( filename ).data(), point_set,
-            filename );
-        input->read();
-    }
-} // namespace
-
 namespace geode
 {
     template < index_t dimension >
@@ -47,7 +34,10 @@ namespace geode
         try
         {
             auto point_set = PointSet< dimension >::create( type );
-            load( *point_set, filename );
+            auto input = PointSetInputFactory< dimension >::create(
+                extension_from_filename( filename ).data(), *point_set,
+                filename );
+            input->read();
             return point_set;
         }
         catch( const OpenGeodeException& e )
@@ -62,18 +52,8 @@ namespace geode
     std::unique_ptr< PointSet< dimension > > load_point_set(
         absl::string_view filename )
     {
-        try
-        {
-            auto point_set = PointSet< dimension >::create();
-            load( *point_set, filename );
-            return point_set;
-        }
-        catch( const OpenGeodeException& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeException{ "Cannot load PointSet from file: ",
-                filename };
-        }
+        return load_point_set< dimension >(
+            PointSet< dimension >::default_type(), filename );
     }
 
     template < index_t dimension >
