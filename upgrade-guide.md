@@ -42,7 +42,7 @@ When using element of `PolygonsAroundVertex` (before `PolygonEdge`, now `Polygon
 
 **How to upgrade**
 
-Remove the mesh parameter and get the retrun value
+Remove the mesh parameter and get the return value. You can still use the MeshType to select which data structure to instanciate.
 
 Example
 

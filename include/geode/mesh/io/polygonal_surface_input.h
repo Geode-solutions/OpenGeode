@@ -45,6 +45,12 @@ namespace geode
     std::unique_ptr< PolygonalSurface< dimension > > load_polygonal_surface(
         const MeshType& type, absl::string_view filename );
 
+    /*!
+     * API function for loading an PolygonalSurface.
+     * The adequate loader is called depending on the filename extension.
+     * Default data structure type is used.
+     * @param[in] filename Path to the file to load.
+     */
     template < index_t dimension >
     std::unique_ptr< PolygonalSurface< dimension > > load_polygonal_surface(
         absl::string_view filename );

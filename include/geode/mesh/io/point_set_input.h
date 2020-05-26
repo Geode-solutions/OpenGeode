@@ -46,6 +46,12 @@ namespace geode
     std::unique_ptr< PointSet< dimension > > load_point_set(
         const MeshType& type, absl::string_view filename );
 
+    /*!
+     * API function for loading an PointSet.
+     * The adequate loader is called depending on the filename extension.
+     * Default data structure type is used.
+     * @param[in] filename Path to the file to load.
+     */
     template < index_t dimension >
     std::unique_ptr< PointSet< dimension > > load_point_set(
         absl::string_view filename );

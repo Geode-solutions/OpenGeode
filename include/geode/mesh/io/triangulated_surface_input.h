@@ -46,6 +46,12 @@ namespace geode
         load_triangulated_surface(
             const MeshType& type, absl::string_view filename );
 
+    /*!
+     * API function for loading an TriangulatedSurface.
+     * The adequate loader is called depending on the filename extension.
+     * Default data structure type is used.
+     * @param[in] filename Path to the file to load.
+     */
     template < index_t dimension >
     std::unique_ptr< TriangulatedSurface< dimension > >
         load_triangulated_surface( absl::string_view filename );
