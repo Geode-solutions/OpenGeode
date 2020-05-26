@@ -33,7 +33,7 @@
 #include <ghc/filesystem.hpp>
 
 #include <geode/basic/bitsery_archive.h>
-#include <geode/basic/uuid.h>
+#include <geode/basic/filename.h>
 
 #include <geode/geometry/bitsery_archive.h>
 
@@ -41,6 +41,7 @@
 #include <geode/mesh/core/mesh_type.h>
 
 #include <geode/model/mixin/core/bitsery_archive.h>
+#include <geode/model/mixin/core/component_type.h>
 
 namespace geode
 {
@@ -124,6 +125,24 @@ namespace geode
                     "[ComponentsStorage::load_components] Error while reading "
                     "file: ",
                     filename );
+            }
+
+            std::string find_file(
+                absl::string_view directory, const ComponentID& id ) const
+            {
+                const auto name =
+                    absl::StrCat( id.type().get(), id.id().string() );
+                for( const auto& file :
+                    ghc::filesystem::directory_iterator( directory.data() ) )
+                {
+                    const auto filename = file.path().native();
+                    if( name == filename_without_extension( filename ) )
+                    {
+                        return filename;
+                    }
+                }
+                throw OpenGeodeException( "[ComponentsStorage::find_file] File "
+                                          "not found in archive" );
             }
 
         protected:

@@ -333,10 +333,10 @@ void test_polygon_vertex_normal()
 void test_io( const geode::PolygonalSurface3D& polygonal_surface,
     const std::string& filename )
 {
-    save_polygonal_surface( polygonal_surface, filename );
-    auto new_polygonal_surface = geode::PolygonalSurface3D::create(
-        geode::OpenGeodePolygonalSurface3D::type_name_static() );
-    load_polygonal_surface( *new_polygonal_surface, filename );
+    geode::save_polygonal_surface( polygonal_surface, filename );
+    geode::load_polygonal_surface< 3 >( filename );
+    auto new_polygonal_surface = geode::load_polygonal_surface< 3 >(
+        geode::OpenGeodePolygonalSurface3D::type_name_static(), filename );
 
     OPENGEODE_EXCEPTION( new_polygonal_surface->nb_vertices() == 7,
         "[Test] Reloaded PolygonalSurface should have 7 vertices" );

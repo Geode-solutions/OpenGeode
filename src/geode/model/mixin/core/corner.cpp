@@ -86,9 +86,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    void Corner< dimension >::ensure_mesh_type( CornersKey )
+    const MeshType& Corner< dimension >::mesh_type() const
     {
-        return impl_->ensure_mesh_type();
+        return impl_->mesh_type();
     }
 
     template < index_t dimension >
@@ -101,6 +101,13 @@ namespace geode
                 archive.ext( corner,
                     bitsery::ext::BaseClass< Component< dimension > >{} );
             } );
+    }
+
+    template < index_t dimension >
+    void Corner< dimension >::set_mesh(
+        std::unique_ptr< PointSet< dimension > > mesh, CornersKey )
+    {
+        impl_->set_mesh( std::move( mesh ) );
     }
 
     template < index_t dimension >

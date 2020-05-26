@@ -29,6 +29,8 @@ namespace geode
     void define_vertex_set_io( pybind11::module& module )
     {
         module.def( "save_vertex_set", &save_vertex_set );
-        module.def( "load_vertex_set", &load_vertex_set );
+        module.def( "load_vertex_set",
+            ( std::unique_ptr< VertexSet >( * )( absl::string_view ) )
+                & load_vertex_set );
     }
 } // namespace geode

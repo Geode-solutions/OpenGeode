@@ -38,6 +38,32 @@ corner_mapping.in2out( uuid1 );
 
 When using element of `PolygonsAroundVertex` (before `PolygonEdge`, now `PolygonVertex`), use `vertex_id` instead of `edge_id`.
 
+- **Mesh loading**: mesh loading functions are now returning the mesh loaded from the filename.
+
+**How to upgrade**
+
+Remove the mesh parameter and get the return value. You can still use the MeshType to select which data structure to instanciate.
+
+Example
+
+from
+
+```
+auto new_edged_curve = geode::EdgedCurve3D::create();
+or
+auto new_edged_curve = geode::EdgedCurve3D::create( geode::OpenGeodeEdgedCurve3D::type_name_static() );
+
+load_edged_curve( *new_edged_curve, filename );
+```
+
+to 
+
+```
+auto new_edged_curve = geode::load_edged_curve< 3 >( filename );
+or
+auto new_edged_curve = geode::load_edged_curve< 3 >( geode::OpenGeodeEdgedCurve3D::type_name_static(), filename );
+```
+
 ## Upgrading from OpenGeode v3.x.x to v4.0.0
 
 ### Motivations

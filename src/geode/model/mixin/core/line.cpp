@@ -84,9 +84,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    void Line< dimension >::ensure_mesh_type( LinesKey )
+    const MeshType& Line< dimension >::mesh_type() const
     {
-        return impl_->ensure_mesh_type();
+        return impl_->mesh_type();
     }
 
     template < index_t dimension >
@@ -99,6 +99,13 @@ namespace geode
                 archive.ext(
                     line, bitsery::ext::BaseClass< Component< dimension > >{} );
             } );
+    }
+
+    template < index_t dimension >
+    void Line< dimension >::set_mesh(
+        std::unique_ptr< EdgedCurve< dimension > > mesh, LinesKey )
+    {
+        impl_->set_mesh( std::move( mesh ) );
     }
 
     template < index_t dimension >

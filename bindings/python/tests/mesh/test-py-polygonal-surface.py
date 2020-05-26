@@ -210,8 +210,7 @@ def test_polygon_vertex_normal():
 
 def test_io( polygonal_surface, filename ):
     mesh.save_polygonal_surface3D( polygonal_surface, filename )
-    new_polygonal_surface = mesh.PolygonalSurface3D.create()
-    mesh.load_polygonal_surface3D( new_polygonal_surface, filename )
+    new_polygonal_surface = mesh.load_polygonal_surface3D( filename )
 
     if new_polygonal_surface.nb_vertices() != 7:
         raise ValueError( "[Test] Reloaded PolygonalSurface should have 7 vertices" )

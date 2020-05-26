@@ -30,7 +30,9 @@
     module.def( save##dimension.c_str(), &save_point_set< dimension > );       \
     const auto load##dimension =                                               \
         "load_point_set" + std::to_string( dimension ) + "D";                  \
-    module.def( load##dimension.c_str(), &load_point_set< dimension > )
+    module.def( load##dimension.c_str(),                                       \
+        ( std::unique_ptr< PointSet< dimension > >( * )( absl::string_view ) ) \
+            & load_point_set< dimension > )
 
 namespace geode
 {

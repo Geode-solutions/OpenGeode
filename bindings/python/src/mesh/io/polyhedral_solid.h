@@ -31,7 +31,10 @@
         save##dimension.c_str(), &save_polyhedral_solid< dimension > );        \
     const auto load##dimension =                                               \
         "load_polyhedral_solid" + std::to_string( dimension ) + "D";           \
-    module.def( load##dimension.c_str(), &load_polyhedral_solid< dimension > )
+    module.def( load##dimension.c_str(),                                       \
+        ( std::unique_ptr< PolyhedralSolid< dimension > >( * )(                \
+            absl::string_view ) )                                              \
+            & load_polyhedral_solid< dimension > )
 
 namespace geode
 {

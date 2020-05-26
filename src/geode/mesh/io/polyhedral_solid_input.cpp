@@ -25,18 +25,49 @@
 
 #include <geode/mesh/core/polyhedral_solid.h>
 
+namespace
+{
+    template < geode::index_t dimension >
+    void load( geode::PolyhedralSolid< dimension >& polyhedral_solid,
+        absl::string_view filename )
+    {
+        auto input = geode::PolyhedralSolidInputFactory< dimension >::create(
+            geode::extension_from_filename( filename ).data(), polyhedral_solid,
+            filename );
+        input->read();
+    }
+} // namespace
+
 namespace geode
 {
     template < index_t dimension >
-    void load_polyhedral_solid( PolyhedralSolid< dimension >& polyhedral_solid,
+    std::unique_ptr< PolyhedralSolid< dimension > > load_polyhedral_solid(
+        const MeshType& type, absl::string_view filename )
+    {
+        try
+        {
+            auto polyhedral_solid =
+                PolyhedralSolid< dimension >::create( type );
+            load( *polyhedral_solid, filename );
+            return polyhedral_solid;
+        }
+        catch( const OpenGeodeException& e )
+        {
+            Logger::error( e.what() );
+            throw OpenGeodeException{ "Cannot load PolyhedralSolid from file: ",
+                filename };
+        }
+    }
+
+    template < index_t dimension >
+    std::unique_ptr< PolyhedralSolid< dimension > > load_polyhedral_solid(
         absl::string_view filename )
     {
         try
         {
-            auto input = PolyhedralSolidInputFactory< dimension >::create(
-                extension_from_filename( filename ).data(), polyhedral_solid,
-                filename );
-            input->read();
+            auto polyhedral_solid = PolyhedralSolid< dimension >::create();
+            load( *polyhedral_solid, filename );
+            return polyhedral_solid;
         }
         catch( const OpenGeodeException& e )
         {
@@ -55,8 +86,11 @@ namespace geode
     {
     }
 
-    template void opengeode_mesh_api load_polyhedral_solid(
-        PolyhedralSolid< 3 >&, absl::string_view );
+    template std::unique_ptr< PolyhedralSolid< 3 > > opengeode_mesh_api
+        load_polyhedral_solid( const MeshType&, absl::string_view );
+
+    template std::unique_ptr< PolyhedralSolid< 3 > >
+        opengeode_mesh_api load_polyhedral_solid( absl::string_view );
 
     template class opengeode_mesh_api PolyhedralSolidInput< 3 >;
 } // namespace geode

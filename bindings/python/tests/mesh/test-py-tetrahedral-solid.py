@@ -95,8 +95,7 @@ def test_delete_polyhedron( solid, builder ):
 
 def test_io( solid, filename ):
     mesh.save_tetrahedral_solid3D( solid, filename )
-    new_solid = mesh.TetrahedralSolid3D.create()
-    mesh.load_tetrahedral_solid3D( new_solid, filename )
+    new_solid = mesh.load_tetrahedral_solid3D( filename )
     if new_solid.nb_vertices() != 6:
         raise ValueError( "[Test] Reloaded TetrahedralSolid should have 6 vertices" )
     if new_solid.nb_facets() != 10:

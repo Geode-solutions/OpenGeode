@@ -78,11 +78,14 @@ namespace geode
             return modifiable_mesh();
         }
 
-        void ensure_mesh_type( CornersKey );
+        const MeshType& mesh_type() const;
 
         Corner( CornersKey ) : Corner() {}
 
         Corner( const MeshType& type, CornersKey ) : Corner( type ) {}
+
+        void set_mesh(
+            std::unique_ptr< PointSet< dimension > > mesh, CornersKey );
 
         void set_mesh(
             std::unique_ptr< PointSet< dimension > > mesh, CornersBuilderKey );

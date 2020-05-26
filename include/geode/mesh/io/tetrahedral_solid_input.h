@@ -38,12 +38,21 @@ namespace geode
     /*!
      * API function for loading an TetrahedralSolid.
      * The adequate loader is called depending on the filename extension.
-     * @param[out] tetrahedral_solid Loaded TetrahedralSolid.
+     * @param[in] type Data structure type.
      * @param[in] filename Path to the file to load.
      */
     template < index_t dimension >
-    void load_tetrahedral_solid(
-        TetrahedralSolid< dimension >& tetrahedral_solid,
+    std::unique_ptr< TetrahedralSolid< dimension > > load_tetrahedral_solid(
+        const MeshType& type, absl::string_view filename );
+
+    /*!
+     * API function for loading an TetrahedralSolid.
+     * The adequate loader is called depending on the filename extension.
+     * Default data structure type is used.
+     * @param[in] filename Path to the file to load.
+     */
+    template < index_t dimension >
+    std::unique_ptr< TetrahedralSolid< dimension > > load_tetrahedral_solid(
         absl::string_view filename );
 
     template < index_t dimension >
