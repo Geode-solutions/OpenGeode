@@ -30,6 +30,7 @@
 #include <geode/mesh/core/geode_polyhedral_solid.h>
 #include <geode/mesh/core/geode_tetrahedral_solid.h>
 #include <geode/mesh/core/geode_triangulated_surface.h>
+#include <geode/mesh/core/geode_vertex_set.h>
 #include <geode/mesh/io/detail/geode_edged_curve_output.h>
 #include <geode/mesh/io/detail/geode_graph_output.h>
 #include <geode/mesh/io/detail/geode_point_set_output.h>
@@ -37,6 +38,7 @@
 #include <geode/mesh/io/detail/geode_polyhedral_solid_output.h>
 #include <geode/mesh/io/detail/geode_tetrahedral_solid_output.h>
 #include <geode/mesh/io/detail/geode_triangulated_surface_output.h>
+#include <geode/mesh/io/detail/geode_vertex_set_output.h>
 
 #define BITSERY_OUTPUT_MESH_REGISTER_2D( Mesh )                                \
     geode::Mesh##OutputFactory2D::register_creator<                            \
@@ -56,6 +58,8 @@ namespace geode
 {
     void register_geode_mesh_output()
     {
+        VertexSetOutputFactory::register_creator< OpenGeodeVertexSetOutput >(
+            OpenGeodeVertexSet::native_extension_static().data() );
         GraphOutputFactory::register_creator< OpenGeodeGraphOutput >(
             OpenGeodeGraph::native_extension_static().data() );
 

@@ -334,6 +334,7 @@ void test_io( const geode::PolygonalSurface3D& polygonal_surface,
     const std::string& filename )
 {
     geode::save_polygonal_surface( polygonal_surface, filename );
+    geode::load_polygonal_surface< 3 >( filename );
     auto new_polygonal_surface = geode::load_polygonal_surface< 3 >(
         geode::OpenGeodePolygonalSurface3D::type_name_static(), filename );
 

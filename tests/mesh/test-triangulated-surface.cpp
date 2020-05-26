@@ -123,7 +123,8 @@ void test_io(
     const geode::TriangulatedSurface3D& surface, absl::string_view filename )
 {
     geode::save_triangulated_surface( surface, filename );
-    const auto new_surface = geode::load_triangulated_surface< 3 >(
+    geode::load_triangulated_surface< 3 >( filename );
+    geode::load_triangulated_surface< 3 >(
         geode::OpenGeodeTriangulatedSurface3D::type_name_static(), filename );
 }
 

@@ -30,6 +30,7 @@
 #include <geode/mesh/core/geode_polyhedral_solid.h>
 #include <geode/mesh/core/geode_tetrahedral_solid.h>
 #include <geode/mesh/core/geode_triangulated_surface.h>
+#include <geode/mesh/core/geode_vertex_set.h>
 #include <geode/mesh/io/detail/geode_edged_curve_input.h>
 #include <geode/mesh/io/detail/geode_graph_input.h>
 #include <geode/mesh/io/detail/geode_point_set_input.h>
@@ -37,6 +38,7 @@
 #include <geode/mesh/io/detail/geode_polyhedral_solid_input.h>
 #include <geode/mesh/io/detail/geode_tetrahedral_solid_input.h>
 #include <geode/mesh/io/detail/geode_triangulated_surface_input.h>
+#include <geode/mesh/io/detail/geode_vertex_set_input.h>
 
 #define BITSERY_INPUT_MESH_REGISTER_2D( Mesh )                                 \
     geode::Mesh##InputFactory2D::register_creator<                             \
@@ -56,6 +58,8 @@ namespace geode
 {
     void register_geode_mesh_input()
     {
+        VertexSetInputFactory::register_creator< OpenGeodeVertexSetInput >(
+            OpenGeodeVertexSet::native_extension_static().data() );
         GraphInputFactory::register_creator< OpenGeodeGraphInput >(
             OpenGeodeGraph::native_extension_static().data() );
 
