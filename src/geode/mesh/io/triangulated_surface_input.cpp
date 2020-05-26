@@ -26,20 +26,6 @@
 #include <geode/mesh/builder/triangulated_surface_builder.h>
 #include <geode/mesh/core/triangulated_surface.h>
 
-namespace
-{
-    template < geode::index_t dimension >
-    void load( geode::TriangulatedSurface< dimension >& triangulated_surface,
-        absl::string_view filename )
-    {
-        auto input =
-            geode::TriangulatedSurfaceInputFactory< dimension >::create(
-                geode::extension_from_filename( filename ).data(),
-                triangulated_surface, filename );
-        input->read();
-    }
-} // namespace
-
 namespace geode
 {
     template < index_t dimension >
@@ -51,7 +37,10 @@ namespace geode
         {
             auto triangulated_surface =
                 TriangulatedSurface< dimension >::create( type );
-            load( *triangulated_surface, filename );
+            auto input = TriangulatedSurfaceInputFactory< dimension >::create(
+                extension_from_filename( filename ).data(),
+                *triangulated_surface, filename );
+            input->read();
             return triangulated_surface;
         }
         catch( const OpenGeodeException& e )
@@ -67,20 +56,8 @@ namespace geode
     std::unique_ptr< TriangulatedSurface< dimension > >
         load_triangulated_surface( absl::string_view filename )
     {
-        try
-        {
-            auto triangulated_surface =
-                TriangulatedSurface< dimension >::create();
-            load( *triangulated_surface, filename );
-            return triangulated_surface;
-        }
-        catch( const OpenGeodeException& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeException{
-                "Cannot load TriangulatedSurface from file: ", filename
-            };
-        }
+        return load_triangulated_surface< dimension >(
+            TriangulatedSurface< dimension >::default_type(), filename );
     }
 
     template < index_t dimension >

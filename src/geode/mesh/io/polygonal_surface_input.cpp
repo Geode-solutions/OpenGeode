@@ -26,19 +26,6 @@
 #include <geode/mesh/builder/polygonal_surface_builder.h>
 #include <geode/mesh/core/polygonal_surface.h>
 
-namespace
-{
-    template < geode::index_t dimension >
-    void load( geode::PolygonalSurface< dimension >& polygonal_surface,
-        absl::string_view filename )
-    {
-        auto input = geode::PolygonalSurfaceInputFactory< dimension >::create(
-            geode::extension_from_filename( filename ).data(),
-            polygonal_surface, filename );
-        input->read();
-    }
-} // namespace
-
 namespace geode
 {
     template < index_t dimension >
@@ -49,7 +36,10 @@ namespace geode
         {
             auto polygonal_surface =
                 PolygonalSurface< dimension >::create( type );
-            load( *polygonal_surface, filename );
+            auto input = PolygonalSurfaceInputFactory< dimension >::create(
+                extension_from_filename( filename ).data(), *polygonal_surface,
+                filename );
+            input->read();
             return polygonal_surface;
         }
         catch( const OpenGeodeException& e )
@@ -65,19 +55,8 @@ namespace geode
     std::unique_ptr< PolygonalSurface< dimension > > load_polygonal_surface(
         absl::string_view filename )
     {
-        try
-        {
-            auto polygonal_surface = PolygonalSurface< dimension >::create();
-            load( *polygonal_surface, filename );
-            return polygonal_surface;
-        }
-        catch( const OpenGeodeException& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeException{
-                "Cannot load PolygonalSurface from file: ", filename
-            };
-        }
+        return load_polygonal_surface< dimension >(
+            PolygonalSurface< dimension >::default_type(), filename );
     }
 
     template < index_t dimension >
