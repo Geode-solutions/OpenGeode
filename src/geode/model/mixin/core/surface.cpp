@@ -63,8 +63,8 @@ namespace geode
 
     template < index_t dimension >
     Surface< dimension >::Surface()
+        : Surface( PolygonalSurface< dimension >::default_type() )
     {
-        impl_->set_mesh( PolygonalSurface< dimension >::create() );
     }
 
     template < index_t dimension >

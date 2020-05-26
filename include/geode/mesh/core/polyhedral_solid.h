@@ -207,6 +207,8 @@ namespace geode
         static std::unique_ptr< PolyhedralSolid< dimension > > create(
             const MeshType& type );
 
+        static MeshType default_type();
+
         std::unique_ptr< PolyhedralSolid< dimension > > clone() const;
 
         ~PolyhedralSolid();

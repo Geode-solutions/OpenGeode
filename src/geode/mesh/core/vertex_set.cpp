@@ -67,7 +67,7 @@ namespace geode
 
     std::unique_ptr< VertexSet > VertexSet::create()
     {
-        return std::unique_ptr< VertexSet >{ new OpenGeodeVertexSet };
+        return create( default_type() );
     }
 
     std::unique_ptr< VertexSet > VertexSet::create( const MeshType& type )
@@ -83,6 +83,11 @@ namespace geode
                 "Could not create VertexSet data structure: ", type.get()
             };
         }
+    }
+
+    MeshType VertexSet::default_type()
+    {
+        return OpenGeodeVertexSet::type_name_static();
     }
 
     index_t VertexSet::nb_vertices() const

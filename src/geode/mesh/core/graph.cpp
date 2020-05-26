@@ -47,10 +47,10 @@ namespace geode
     public:
         explicit Impl( Graph& graph )
             : edges_around_vertex_(
-                graph.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        EdgesAroundVertex >(
-                        attribute_name, EdgesAroundVertex{} ) )
+                  graph.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          EdgesAroundVertex >(
+                          attribute_name, EdgesAroundVertex{} ) )
         {
         }
 
@@ -163,7 +163,7 @@ namespace geode
 
     std::unique_ptr< Graph > Graph::create()
     {
-        return std::unique_ptr< Graph >{ new OpenGeodeGraph };
+        return create( default_type() );
     }
 
     std::unique_ptr< Graph > Graph::create( const MeshType& type )
@@ -178,6 +178,11 @@ namespace geode
             throw OpenGeodeException{ "Could not create Graph data structure: ",
                 type.get() };
         }
+    }
+
+    MeshType Graph::default_type()
+    {
+        return OpenGeodeGraph::type_name_static();
     }
 
     index_t Graph::edge_vertex( const EdgeVertex& edge_vertex ) const
