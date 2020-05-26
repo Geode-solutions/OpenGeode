@@ -101,7 +101,7 @@ namespace geode
 
         index_t get_nb_polygon_vertices( index_t polygon_id ) const override;
 
-        index_t get_polygon_adjacent(
+        absl::optional< index_t > get_polygon_adjacent(
             const PolygonEdge& polygon_edge ) const override;
 
     private:

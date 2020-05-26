@@ -163,7 +163,8 @@ namespace geode
          * Return the index in the mesh of a local edge in a polygon
          * @param[in] polygon_edge Local index of edge in polygon
          */
-        index_t polygon_edge( const PolygonEdge& polygon_edge ) const;
+        absl::optional< index_t > polygon_edge(
+            const PolygonEdge& polygon_edge ) const;
 
         /*!
          * Return the index in the mesh of a given polygon edge vertex.
@@ -209,19 +210,18 @@ namespace geode
         /*!
          * Return the index of the polygon adjacent through an edge.
          * @param[in] polygon_edge Local index of edge in polygon.
-         * @return NO_ID if the polygon edge is on border, else the index of the
-         * adjacent polygon.
+         * @return the index of the adjacent polygon if it exists.
          */
-        index_t polygon_adjacent( const PolygonEdge& polygon_edge ) const;
+        absl::optional< index_t > polygon_adjacent(
+            const PolygonEdge& polygon_edge ) const;
 
         /*!
          * Return the index of the edge of the adjacent polygon through which
          * polygons are adjacent.
          * @param[in] polygon_edge Local index of edge in polygon.
-         * @return Undefined PolygonEdge if the polygon edge is on border, else
-         * the index of the adjacent polygon edge.
+         * @return the index of the adjacent polygon edge if it exists.
          */
-        PolygonEdge polygon_adjacent_edge(
+        absl::optional< PolygonEdge > polygon_adjacent_edge(
             const PolygonEdge& polygon_edge ) const;
 
         /*!
@@ -299,7 +299,7 @@ namespace geode
          * Get the index of edge corresponding to given vertices
          * @param[in] vertices Ordered vertex indices
          */
-        index_t edge_from_vertices(
+        absl::optional< index_t > edge_from_vertices(
             const std::array< index_t, 2 >& vertices ) const;
 
         /*!
@@ -368,7 +368,7 @@ namespace geode
 
         virtual index_t get_nb_polygon_vertices( index_t polygon_id ) const = 0;
 
-        virtual index_t get_polygon_adjacent(
+        virtual absl::optional< index_t > get_polygon_adjacent(
             const PolygonEdge& polygon_edge ) const = 0;
 
     private:

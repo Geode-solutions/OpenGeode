@@ -86,7 +86,7 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -103,13 +103,12 @@ namespace
                 geode::Range{ solid.nb_polyhedron_facets( p ) } )
             {
                 const geode::PolyhedronFacet id{ p, f };
-                if( solid.is_polyhedron_facet_on_border( id ) )
+                const auto adj = solid.polyhedron_adjacent( id );
+                if( adj )
                 {
-                    continue;
+                    const auto new_adjacent = old2new[adj.value()];
+                    builder.set_polyhedron_adjacent( id, new_adjacent );
                 }
-                const auto new_adjacent =
-                    old2new[solid.polyhedron_adjacent( id )];
-                builder.set_polyhedron_adjacent( id, new_adjacent );
             }
         }
     }
