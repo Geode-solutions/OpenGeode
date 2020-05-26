@@ -63,8 +63,7 @@ def test_delete_vertex( point_set, builder ):
 
 def test_io( point_set, filename ):
     mesh.save_point_set3D( point_set, filename )
-    new_point_set = mesh.PointSet3D.create()
-    mesh.load_point_set3D( new_point_set, filename )
+    new_point_set = mesh.load_point_set3D( filename )
 
 def test_clone( point_set ):
     point_set2 = point_set.clone()

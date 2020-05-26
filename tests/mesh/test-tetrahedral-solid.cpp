@@ -135,10 +135,9 @@ void test_delete_polyhedron( const geode::TetrahedralSolid3D& solid,
 void test_io(
     const geode::TetrahedralSolid3D& solid, const std::string& filename )
 {
-    save_tetrahedral_solid( solid, filename );
-    auto new_solid = geode::TetrahedralSolid3D::create(
-        geode::OpenGeodeTetrahedralSolid3D::type_name_static() );
-    load_tetrahedral_solid( *new_solid, filename );
+    geode::save_tetrahedral_solid( solid, filename );
+    const auto new_solid = geode::load_tetrahedral_solid< 3 >(
+        geode::OpenGeodeTetrahedralSolid3D::type_name_static(), filename );
     OPENGEODE_EXCEPTION( new_solid->nb_vertices() == 6,
         "[Test] Reloaded TetrahedralSolid should have 6 vertices" );
     OPENGEODE_EXCEPTION( new_solid->nb_facets() == 10,
@@ -151,9 +150,8 @@ void test_io(
 
 void test_backward_io( const std::string& filename )
 {
-    auto new_solid = geode::TetrahedralSolid3D::create(
-        geode::OpenGeodeTetrahedralSolid3D::type_name_static() );
-    load_tetrahedral_solid( *new_solid, filename );
+    const auto new_solid = geode::load_tetrahedral_solid< 3 >(
+        geode::OpenGeodeTetrahedralSolid3D::type_name_static(), filename );
     OPENGEODE_EXCEPTION( new_solid->nb_vertices() == 6,
         "[Test] Reloaded TetrahedralSolid should have 6 vertices" );
     OPENGEODE_EXCEPTION( new_solid->nb_facets() == 10,

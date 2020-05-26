@@ -86,9 +86,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    void Block< dimension >::ensure_mesh_type( BlocksKey )
+    const MeshType& Block< dimension >::mesh_type() const
     {
-        return impl_->ensure_mesh_type();
+        return impl_->mesh_type();
     }
 
     template < index_t dimension >
@@ -101,6 +101,13 @@ namespace geode
                 archive.ext( block,
                     bitsery::ext::BaseClass< Component< dimension > >{} );
             } );
+    }
+
+    template < index_t dimension >
+    void Block< dimension >::set_mesh(
+        std::unique_ptr< PolyhedralSolid< dimension > > mesh, BlocksKey )
+    {
+        impl_->set_mesh( std::move( mesh ) );
     }
 
     template < index_t dimension >

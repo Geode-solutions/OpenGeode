@@ -74,7 +74,7 @@ namespace geode
 
         const PolyhedralSolid< dimension >& mesh() const;
 
-        void ensure_mesh_type( BlocksKey );
+        const MeshType& mesh_type() const;
 
         PolyhedralSolid< dimension >& modifiable_mesh( BlocksKey )
         {
@@ -84,6 +84,9 @@ namespace geode
         Block( BlocksKey ) : Block() {}
 
         Block( const MeshType& type, BlocksKey ) : Block( type ) {}
+
+        void set_mesh(
+            std::unique_ptr< PolyhedralSolid< dimension > > mesh, BlocksKey );
 
         void set_mesh( std::unique_ptr< PolyhedralSolid< dimension > > mesh,
             BlocksBuilderKey );

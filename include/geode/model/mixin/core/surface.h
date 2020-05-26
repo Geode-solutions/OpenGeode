@@ -82,7 +82,10 @@ namespace geode
             return modifiable_mesh();
         }
 
-        void ensure_mesh_type( SurfacesKey );
+        const MeshType& mesh_type() const;
+
+        void set_mesh( std::unique_ptr< PolygonalSurface< dimension > > mesh,
+            SurfacesKey );
 
         void set_mesh( std::unique_ptr< PolygonalSurface< dimension > > mesh,
             SurfacesBuilderKey );

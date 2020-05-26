@@ -117,20 +117,20 @@ namespace geode
             Surface< dimension >::component_type_static().get() );
         for( auto& surface : modifiable_surfaces() )
         {
-            surface.ensure_mesh_type( {} );
-            auto& mesh = surface.modifiable_mesh(
-                typename Surface< dimension >::SurfacesKey{} );
-            const auto file = absl::StrCat(
-                prefix, surface.id().string(), ".", mesh.native_extension() );
-            auto* triangulated =
-                dynamic_cast< TriangulatedSurface< dimension >* >( &mesh );
-            if( triangulated )
+            const auto file =
+                impl_->find_file( directory, surface.component_id() );
+            if( TriangulatedSurfaceFactory< dimension >::has_creator(
+                    surface.mesh_type() ) )
             {
-                load_triangulated_surface( *triangulated, file );
+                surface.set_mesh( load_triangulated_surface< dimension >(
+                                      surface.mesh_type(), file ),
+                    typename Surface< dimension >::SurfacesKey{} );
             }
             else
             {
-                load_polygonal_surface( mesh, file );
+                surface.set_mesh( load_polygonal_surface< dimension >(
+                                      surface.mesh_type(), file ),
+                    typename Surface< dimension >::SurfacesKey{} );
             }
         }
     }
