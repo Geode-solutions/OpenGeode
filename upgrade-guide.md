@@ -64,6 +64,12 @@ or
 auto new_edged_curve = geode::load_edged_curve< 3 >( geode::OpenGeodeEdgedCurve3D::type_name_static(), filename );
 ```
 
+- **Embedding relationship**: renaming embedded relationship to embedding relationship for better meaning
+
+**How to upgrade**
+
+For example, replace in `Section` and `BRep`: `geode::Section::embedded_surfaces(...)` by `geode::Section::embedding_surfaces(...)` 
+
 ## Upgrading from OpenGeode v3.x.x to v4.0.0
 
 ### Motivations
