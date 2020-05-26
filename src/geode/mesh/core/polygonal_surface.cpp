@@ -120,10 +120,10 @@ namespace geode
     public:
         explicit Impl( PolygonalSurfaceBase& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) )
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
@@ -139,7 +139,8 @@ namespace geode
             polygon_around_vertex_->set_value( vertex_id, polygon_vertex );
         }
 
-        index_t find_edge( std::array< index_t, 2 > edge_vertices ) const
+        absl::optional< index_t > find_edge(
+            std::array< index_t, 2 > edge_vertices ) const
         {
             return this->find_facet( std::move( edge_vertices ) );
         }
@@ -256,7 +257,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t PolygonalSurfaceBase< dimension >::polygon_edge(
+    absl::optional< index_t > PolygonalSurfaceBase< dimension >::polygon_edge(
         const PolygonEdge& polygon_edge ) const
     {
         check_polygon_id( *this, polygon_edge.polygon_id );
@@ -424,8 +425,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t PolygonalSurfaceBase< dimension >::polygon_adjacent(
-        const PolygonEdge& polygon_edge ) const
+    absl::optional< index_t >
+        PolygonalSurfaceBase< dimension >::polygon_adjacent(
+            const PolygonEdge& polygon_edge ) const
     {
         check_polygon_id( *this, polygon_edge.polygon_id );
         check_polygon_edge_id(
@@ -434,34 +436,40 @@ namespace geode
     }
 
     template < index_t dimension >
-    PolygonEdge PolygonalSurfaceBase< dimension >::polygon_adjacent_edge(
-        const PolygonEdge& polygon_edge ) const
+    absl::optional< PolygonEdge >
+        PolygonalSurfaceBase< dimension >::polygon_adjacent_edge(
+            const PolygonEdge& polygon_edge ) const
     {
-        if( !is_edge_on_border( polygon_edge ) )
+        const auto polygon_adj = polygon_adjacent( polygon_edge );
+        if( polygon_adj )
         {
-            const auto polygon_adj = polygon_adjacent( polygon_edge );
+            const auto polygon_adj_id = polygon_adj.value();
             const auto edge_id = this->polygon_edge( polygon_edge );
-            for( const auto e : Range{ nb_polygon_edges( polygon_adj ) } )
+            for( const auto e : Range{ nb_polygon_edges( polygon_adj_id ) } )
             {
-                const auto polygon = polygon_adjacent( { polygon_adj, e } );
-                if( polygon == polygon_edge.polygon_id
-                    && this->polygon_edge( { polygon_adj, e } ) == edge_id )
+                const auto polygon = polygon_adjacent( { polygon_adj_id, e } );
+                if( polygon && polygon.value() == polygon_edge.polygon_id )
                 {
-                    return { polygon_adj, e };
+                    const auto adjacent_edge =
+                        this->polygon_edge( { polygon_adj_id, e } );
+                    if( adjacent_edge && adjacent_edge.value() == edge_id )
+                    {
+                        return PolygonEdge{ polygon_adj_id, e };
+                    }
                 }
             }
             throw OpenGeodeException{ "[PolygonalSurfaceBase::polygon_adjacent_"
                                       "edge] Wrong adjacency with polygons: ",
-                polygon_edge.polygon_id, " and ", polygon_adj };
+                polygon_edge.polygon_id, " and ", polygon_adj_id };
         }
-        return {};
+        return absl::nullopt;
     }
 
     template < index_t dimension >
     bool PolygonalSurfaceBase< dimension >::is_edge_on_border(
         const PolygonEdge& polygon_edge ) const
     {
-        return polygon_adjacent( polygon_edge ) == NO_ID;
+        return polygon_adjacent( polygon_edge ).has_value();
     }
 
     template < index_t dimension >
@@ -491,8 +499,8 @@ namespace geode
         auto next_border = next_polygon_edge( polygon_edge );
         while( !is_edge_on_border( next_border ) )
         {
-            next_border = polygon_adjacent_edge( next_border );
-            next_border = next_polygon_edge( next_border );
+            next_border = next_polygon_edge(
+                polygon_adjacent_edge( next_border ).value() );
         }
         return next_border;
     }
@@ -507,8 +515,8 @@ namespace geode
         auto previous_border = previous_polygon_edge( polygon_edge );
         while( !is_edge_on_border( previous_border ) )
         {
-            previous_border = polygon_adjacent_edge( previous_border );
-            previous_border = previous_polygon_edge( previous_border );
+            previous_border = previous_polygon_edge(
+                polygon_adjacent_edge( previous_border ).value() );
         }
         return previous_border;
     }
@@ -610,17 +618,16 @@ namespace geode
             polygons_visited.push_back( polygon_vertex.polygon_id );
             polygons.push_back( polygon_vertex );
 
-            const PolygonEdge polygon_edge{ polygon_vertex };
-            if( !is_edge_on_border( polygon_edge ) )
+            const auto adj_edge = polygon_adjacent_edge( { polygon_vertex } );
+            if( adj_edge )
             {
-                const auto adj_edge = polygon_adjacent_edge( polygon_edge );
-                S.emplace( next_polygon_edge( adj_edge ) );
+                S.emplace( next_polygon_edge( adj_edge.value() ) );
             }
             const auto prev_edge = previous_polygon_edge( polygon_vertex );
-            if( !is_edge_on_border( prev_edge ) )
+            const auto prev_adj_edge = polygon_adjacent_edge( prev_edge );
+            if( prev_adj_edge )
             {
-                const auto adj_edge = polygon_adjacent_edge( prev_edge );
-                S.emplace( adj_edge );
+                S.emplace( prev_adj_edge.value() );
             }
         }
         return polygons;
@@ -642,8 +649,9 @@ namespace geode
         return absl::nullopt;
     }
     template < index_t dimension >
-    index_t PolygonalSurfaceBase< dimension >::edge_from_vertices(
-        const std::array< index_t, 2 >& vertices ) const
+    absl::optional< index_t >
+        PolygonalSurfaceBase< dimension >::edge_from_vertices(
+            const std::array< index_t, 2 >& vertices ) const
     {
         return impl_->find_edge( vertices );
     }

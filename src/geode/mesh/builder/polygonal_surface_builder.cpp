@@ -84,13 +84,12 @@ namespace
             for( const auto e : geode::Range{ surface.nb_polygon_edges( p ) } )
             {
                 const geode::PolygonEdge id{ p, e };
-                if( surface.is_edge_on_border( id ) )
+                const auto adj = surface.polygon_adjacent( id );
+                if( adj )
                 {
-                    continue;
+                    const auto new_adjacent = old2new[adj.value()];
+                    builder.set_polygon_adjacent( id, new_adjacent );
                 }
-                const auto new_adjacent =
-                    old2new[surface.polygon_adjacent( id )];
-                builder.set_polygon_adjacent( id, new_adjacent );
             }
         }
     }
@@ -388,12 +387,13 @@ namespace geode
                 PolygonEdge edge{ polygon, e };
                 const auto edge_id = polygonal_surface_.edge_from_vertices(
                     { vertices_id[e], vertices_id[e + 1] } );
-                polygon_edges[edge_id].emplace_back( std::move( edge ) );
+                polygon_edges[edge_id.value()].emplace_back(
+                    std::move( edge ) );
             }
             PolygonEdge edge{ polygon, nb_vertices - 1 };
             const auto edge_id = polygonal_surface_.edge_from_vertices(
                 { vertices_id.back(), vertices_id.front() } );
-            polygon_edges[edge_id].emplace_back( std::move( edge ) );
+            polygon_edges[edge_id.value()].emplace_back( std::move( edge ) );
         }
         for( const auto& edges : polygon_edges )
         {

@@ -96,7 +96,7 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -163,10 +163,10 @@ namespace geode
     public:
         explicit Impl( PolyhedralSolid& solid )
             : polyhedron_around_vertex_(
-                solid.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolyhedronVertex >(
-                        "polyhedron_around_vertex", PolyhedronVertex{} ) )
+                  solid.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolyhedronVertex >(
+                          "polyhedron_around_vertex", PolyhedronVertex{} ) )
         {
         }
 
@@ -183,13 +183,14 @@ namespace geode
                 vertex_id, polyhedron_vertex );
         }
 
-        index_t find_facet(
+        absl::optional< index_t > find_facet(
             const PolyhedronFacetVertices& facet_vertices ) const
         {
             return Facets::find_facet( facet_vertices );
         }
 
-        index_t find_edge( const std::array< index_t, 2 >& edge_vertices ) const
+        absl::optional< index_t > find_edge(
+            const std::array< index_t, 2 >& edge_vertices ) const
         {
             return Edges::find_facet( edge_vertices );
         }
@@ -507,8 +508,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t PolyhedralSolid< dimension >::vertex_in_polyhedron(
-        index_t polyhedron_id, index_t vertex_id ) const
+    absl::optional< index_t >
+        PolyhedralSolid< dimension >::vertex_in_polyhedron(
+            index_t polyhedron_id, index_t vertex_id ) const
     {
         for( const auto v : Range{ nb_polyhedron_vertices( polyhedron_id ) } )
 
@@ -518,11 +520,11 @@ namespace geode
                 return v;
             }
         }
-        return NO_ID;
+        return absl::nullopt;
     }
 
     template < index_t dimension >
-    index_t PolyhedralSolid< dimension >::polyhedron_facet(
+    absl::optional< index_t > PolyhedralSolid< dimension >::polyhedron_facet(
         const PolyhedronFacet& polyhedron_facet ) const
     {
         check_polyhedron_id( *this, polyhedron_facet.polyhedron_id );
@@ -643,7 +645,7 @@ namespace geode
                     if( !is_polyhedron_facet_on_border( polyhedron_facet ) )
                     {
                         const auto adj_polyhedron =
-                            polyhedron_adjacent( polyhedron_facet );
+                            polyhedron_adjacent( polyhedron_facet ).value();
                         if( !polyhedra_visited.insert( adj_polyhedron ).second )
                         {
                             continue;
@@ -700,8 +702,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    PolyhedraAroundFacet PolyhedralSolid< dimension >::polyhedra_from_facet(
-        index_t facet_id ) const
+    absl::optional< PolyhedraAroundFacet >
+        PolyhedralSolid< dimension >::polyhedra_from_facet(
+            index_t facet_id ) const
     {
         OPENGEODE_ASSERT( facet_id < this->nb_facets(),
             "[PolyhedralSolid::polyhedron_from_facet] Accessing an "
@@ -719,18 +722,22 @@ namespace geode
                 if( polyhedron_facet( facet ) == facet_id )
                 {
                     const auto adjacent = polyhedron_adjacent( facet );
-                    if( adjacent != NO_ID )
+                    if( adjacent )
                     {
-                        return { polyhedron_vertex.polyhedron_id, adjacent };
+                        return PolyhedraAroundFacet{
+                            polyhedron_vertex.polyhedron_id, adjacent.value()
+                        };
                     }
                     else
                     {
-                        return { polyhedron_vertex.polyhedron_id };
+                        return PolyhedraAroundFacet{
+                            polyhedron_vertex.polyhedron_id
+                        };
                     }
                 }
             }
         }
-        return {};
+        return absl::nullopt;
     }
 
     template < index_t dimension >
@@ -773,14 +780,14 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t PolyhedralSolid< dimension >::facet_from_vertices(
+    absl::optional< index_t > PolyhedralSolid< dimension >::facet_from_vertices(
         const PolyhedronFacetVertices& vertices ) const
     {
         return impl_->find_facet( vertices );
     }
 
     template < index_t dimension >
-    index_t PolyhedralSolid< dimension >::edge_from_vertices(
+    absl::optional< index_t > PolyhedralSolid< dimension >::edge_from_vertices(
         const std::array< index_t, 2 >& vertices ) const
     {
         return impl_->find_edge( vertices );
@@ -933,8 +940,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t PolyhedralSolid< dimension >::polyhedron_facet_edge(
-        const PolyhedronFacetEdge& polyhedron_facet_edge ) const
+    absl::optional< index_t >
+        PolyhedralSolid< dimension >::polyhedron_facet_edge(
+            const PolyhedronFacetEdge& polyhedron_facet_edge ) const
     {
         check_polyhedron_id(
             *this, polyhedron_facet_edge.polyhedron_facet.polyhedron_id );
@@ -952,7 +960,7 @@ namespace geode
             polyhedron_facet_vertex( { polyhedron_facet_edge.polyhedron_facet,
                 ( polyhedron_facet_edge.edge_id + 1 )
                     % nb_polyhedron_facet_vertices(
-                        polyhedron_facet_edge.polyhedron_facet ) } );
+                          polyhedron_facet_edge.polyhedron_facet ) } );
         return edge_from_vertices( { v0, v1 } );
     }
 
@@ -967,7 +975,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t PolyhedralSolid< dimension >::polyhedron_adjacent(
+    absl::optional< index_t > PolyhedralSolid< dimension >::polyhedron_adjacent(
         const PolyhedronFacet& polyhedron_facet ) const
     {
         check_polyhedron_id( *this, polyhedron_facet.polyhedron_id );
@@ -977,8 +985,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    PolyhedronFacet PolyhedralSolid< dimension >::polyhedron_adjacent_facet(
-        const PolyhedronFacet& polyhedron_facet ) const
+    absl::optional< PolyhedronFacet >
+        PolyhedralSolid< dimension >::polyhedron_adjacent_facet(
+            const PolyhedronFacet& polyhedron_facet ) const
     {
         if( !is_polyhedron_facet_on_border( polyhedron_facet ) )
         {
@@ -989,7 +998,8 @@ namespace geode
                 vertices[v] =
                     polyhedron_facet_vertex( { polyhedron_facet, v } );
             }
-            const auto polyhedron_adj = polyhedron_adjacent( polyhedron_facet );
+            const auto polyhedron_adj =
+                polyhedron_adjacent( polyhedron_facet ).value();
             for( const auto f :
                 Range{ nb_polyhedron_facets( polyhedron_adj ) } )
             {
@@ -1012,7 +1022,7 @@ namespace geode
                     }
                     if( all_contained )
                     {
-                        return { polyhedron_adj, f };
+                        return PolyhedronFacet{ polyhedron_adj, f };
                     }
                 }
             }
@@ -1020,7 +1030,7 @@ namespace geode
                                       "facet] Wrong adjacency with polyhedra: ",
                 polyhedron_facet.polyhedron_id, " and ", polyhedron_adj };
         }
-        return {};
+        return absl::nullopt;
     }
 
     template < index_t dimension >

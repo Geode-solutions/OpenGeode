@@ -67,10 +67,17 @@ namespace geode
                 .at( polygon_vertex.vertex_id );
         }
 
-        index_t get_polygon_adjacent( const PolygonEdge& polygon_edge ) const
+        absl::optional< index_t > get_polygon_adjacent(
+            const PolygonEdge& polygon_edge ) const
         {
-            return triangle_adjacents_->value( polygon_edge.polygon_id )
-                .at( polygon_edge.edge_id );
+            const auto adj =
+                triangle_adjacents_->value( polygon_edge.polygon_id )
+                    .at( polygon_edge.edge_id );
+            if( adj == NO_ID )
+            {
+                return absl::nullopt;
+            }
+            return adj;
         }
 
         void set_polygon_vertex(
@@ -163,8 +170,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t OpenGeodeTriangulatedSurface< dimension >::get_polygon_adjacent(
-        const PolygonEdge& polygon_edge ) const
+    absl::optional< index_t >
+        OpenGeodeTriangulatedSurface< dimension >::get_polygon_adjacent(
+            const PolygonEdge& polygon_edge ) const
     {
         return impl_->get_polygon_adjacent( polygon_edge );
     }

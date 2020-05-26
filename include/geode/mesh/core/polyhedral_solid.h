@@ -254,16 +254,16 @@ namespace geode
          * @param[in] polyhedron_id Index of polyhedron.
          * @param[in] vertex_id Index of a vertex in the mesh.
          * @return Index in [0,nb_polyhedron_vertices()[ if polyhedron is around
-         * the given vertex, else NO_ID
+         * the given vertex
          */
-        index_t vertex_in_polyhedron(
+        absl::optional< index_t > vertex_in_polyhedron(
             index_t polyhedron_id, index_t vertex_id ) const;
 
         /*!
          * Return the index in the mesh of a local facet in a polyhedron.
          * @param[in] polyhedron_facet Local index of facet in polyhedron.
          */
-        index_t polyhedron_facet(
+        absl::optional< index_t > polyhedron_facet(
             const PolyhedronFacet& polyhedron_facet ) const;
 
         /*!
@@ -279,7 +279,7 @@ namespace geode
          * @param[in] polyhedron_facet_edge Local index of the edge in the
          * facet of a polyhedron.
          */
-        index_t polyhedron_facet_edge(
+        absl::optional< index_t > polyhedron_facet_edge(
             const PolyhedronFacetEdge& polyhedron_facet_edge ) const;
 
         /*!
@@ -298,33 +298,31 @@ namespace geode
          * Get the index of facet corresponding to given vertices
          * @param[in] vertices Ordered vertex indices
          */
-        index_t facet_from_vertices(
+        absl::optional< index_t > facet_from_vertices(
             const PolyhedronFacetVertices& vertices ) const;
 
         /*!
          * Get the index of edge corresponding to given vertices
          * @param[in] vertices Ordered vertex indices
          */
-        index_t edge_from_vertices(
+        absl::optional< index_t > edge_from_vertices(
             const std::array< index_t, 2 >& vertices ) const;
 
         /*!
          * Return the index of the polyhedron adjacent through a facet.
          * @param[in] polyhedron_facet Local index of facet in polyhedron.
-         * @return NO_ID if the polyhedron facet is on border, else the index of
-         * the adjacent polyhedron.
+         * @return the index of the adjacent polyhedron if it exists.
          */
-        index_t polyhedron_adjacent(
+        absl::optional< index_t > polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet ) const;
 
         /*!
          * Return the index of the facet of the adjacent polyhedron through
          * which polyhedra are adjacent.
          * @param[in] polyhedron_facet Local index of facet in polyhedron.
-         * @return Undefined PolyhedronFacet if the polyhedron facet is on
-         * border, else the index of the adjacent polyhedron facet.
+         * @return the index of the adjacent polyhedron facet if it exists.
          */
-        PolyhedronFacet polyhedron_adjacent_facet(
+        absl::optional< PolyhedronFacet > polyhedron_adjacent_facet(
             const PolyhedronFacet& polyhedron_facet ) const;
 
         /*!
@@ -397,7 +395,8 @@ namespace geode
          * Return all polyhedra made with the given facet.
          * @param[in] facet_id Index of the facet
          */
-        PolyhedraAroundFacet polyhedra_from_facet( index_t facet_id ) const;
+        absl::optional< PolyhedraAroundFacet > polyhedra_from_facet(
+            index_t facet_id ) const;
 
         /*!
          * Access to the manager of attributes associated with polyhedra.
@@ -516,7 +515,7 @@ namespace geode
         virtual PolyhedronVertex get_polyhedron_facet_vertex_id(
             const PolyhedronFacetVertex& polyhedron_facet_vertex ) const = 0;
 
-        virtual index_t get_polyhedron_adjacent(
+        virtual absl::optional< index_t > get_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet ) const = 0;
 
     private:

@@ -142,14 +142,15 @@ void test_polyhedron_adjacencies(
         "[Test] First polyhedron of PolyhedralSolid should have 4 facets on "
         "border" );
 
-    auto edge_id = polyhedral_solid.edge_from_vertices( { 5, 4 } );
+    auto edge_id = polyhedral_solid.edge_from_vertices( { 5, 4 } ).value();
     OPENGEODE_EXCEPTION(
         edge_id == 8, "[Test] Wrong edge index from vertices" );
     OPENGEODE_EXCEPTION(
         polyhedral_solid.polyhedra_around_edge( edge_id ).size() == 3,
         "[Test] PolyhedralSolid should have 3 polyhedra around this edge" );
-    const auto facet_id = polyhedral_solid.polyhedron_facet( { 1, 0 } );
-    const auto& polyhedra = polyhedral_solid.polyhedra_from_facet( facet_id );
+    const auto facet_id = polyhedral_solid.polyhedron_facet( { 1, 0 } ).value();
+    const auto& polyhedra =
+        polyhedral_solid.polyhedra_from_facet( facet_id ).value();
     OPENGEODE_EXCEPTION(
         polyhedra.size() == 2, "[Test] Wrong number of polyhedra from facet" );
     OPENGEODE_EXCEPTION( absl::c_find( polyhedra, 1 ) != polyhedra.end(),
