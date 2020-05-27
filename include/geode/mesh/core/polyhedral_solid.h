@@ -265,7 +265,7 @@ namespace geode
          * Return the index in the mesh of a local facet in a polyhedron.
          * @param[in] polyhedron_facet Local index of facet in polyhedron.
          */
-        absl::optional< index_t > polyhedron_facet(
+        index_t polyhedron_facet(
             const PolyhedronFacet& polyhedron_facet ) const;
 
         /*!
@@ -397,8 +397,7 @@ namespace geode
          * Return all polyhedra made with the given facet.
          * @param[in] facet_id Index of the facet
          */
-        absl::optional< PolyhedraAroundFacet > polyhedra_from_facet(
-            index_t facet_id ) const;
+        PolyhedraAroundFacet polyhedra_from_facet( index_t facet_id ) const;
 
         /*!
          * Access to the manager of attributes associated with polyhedra.
