@@ -137,14 +137,14 @@ def add_internal_corner_relations( model, builder, corner_uuids, surface_uuids )
         builder.add_corner_surface_internal_relationship( model.corner( corner_id ), model.surface( surface_uuids[0] ) )
 
     for corner_id in corner_uuids:
-        for embedding in model.embedding_corner_surfaces( model.corner( corner_id ) ):
+        for embedding in model.embedding_surfaces_of_corner( model.corner( corner_id ) ):
             if surface_uuids[0].string() != embedding.id().string():
                 raise ValueError( "[Test] All Corners embeddings should be Surfaces" )
-            if model.nb_internal_surface_corners( embedding ) != len( corner_uuids ):
+            if model.nb_internal_corners_of_surface( embedding ) != len( corner_uuids ):
                 raise ValueError( "[Test] Surface should embed all Corners" )
         if model.nb_embeddings( corner_id ) != 1:
             raise ValueError( "[Test] All Corners should be embedded to 1 Surface" )
-        if model.nb_embedding_corner_surfaces( model.corner( corner_id ) ) != 1:
+        if model.nb_embedding_surfaces_of_corner( model.corner( corner_id ) ) != 1:
             raise ValueError( "[Test] All Corners should be embedded to 1 Surface" )
 
 def add_internal_line_relations( model, builder, line_uuids, surface_uuids ):
@@ -152,14 +152,14 @@ def add_internal_line_relations( model, builder, line_uuids, surface_uuids ):
         builder.add_line_surface_internal_relationship( model.line( line_id ), model.surface( surface_uuids[0] ) )
 
     for line_id in line_uuids:
-        for embedding in model.embedding_line_surfaces( model.line( line_id ) ):
+        for embedding in model.embedding_surfaces_of_line( model.line( line_id ) ):
             if surface_uuids[0].string() != embedding.id().string():
                 raise ValueError( "[Test] All Lines embeddings should be Surfaces" )
-            if model.nb_internal_surface_lines( embedding ) != len( line_uuids ):
+            if model.nb_internal_lines_of_surface( embedding ) != len( line_uuids ):
                 raise ValueError( "[Test] Surface should embed all Lines" )
         if model.nb_embeddings( line_id ) != 1:
             raise ValueError( "[Test] All Lines should be embedded to 1 Surface" )
-        if model.nb_embedding_line_surfaces( model.line( line_id ) ) != 1:
+        if model.nb_embedding_surfaces_of_line( model.line( line_id ) ) != 1:
             raise ValueError( "[Test] All Lines should be embedded to 1 Surface" )
 
 def test_boundary_ranges( model, corner_uuids, line_uuids, surface_uuids ):
