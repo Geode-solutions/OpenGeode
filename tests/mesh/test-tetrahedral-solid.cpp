@@ -77,7 +77,7 @@ void test_polyhedron_adjacencies( const geode::TetrahedralSolid3D& solid,
     builder.compute_polyhedron_adjacencies();
     OPENGEODE_EXCEPTION( solid.polyhedron_adjacent( { 0, 0 } ) == 1,
         "[Test] TetrahedralSolid adjacent index is not correct" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_adjacent( { 0, 1 } ) == geode::NO_ID,
+    OPENGEODE_EXCEPTION( !solid.polyhedron_adjacent( { 0, 1 } ),
         "[Test] TetrahedralSolid adjacent index is not correct" );
     OPENGEODE_EXCEPTION( solid.polyhedron_adjacent( { 1, 3 } ) == 0,
         "[Test] TetrahedralSolid adjacent index is not correct" );
@@ -87,7 +87,7 @@ void test_polyhedron_adjacencies( const geode::TetrahedralSolid3D& solid,
 
     OPENGEODE_EXCEPTION( solid.polyhedron_adjacent( { 2, 3 } ) == 1,
         "[Test] TetrahedralSolid adjacent index is not correct" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_adjacent( { 2, 0 } ) == geode::NO_ID,
+    OPENGEODE_EXCEPTION( !solid.polyhedron_adjacent( { 2, 0 } ),
         "[Test] TetrahedralSolid adjacent index is not correct" );
 }
 

@@ -48,7 +48,7 @@ def test_polyhedron_adjacencies( solid, builder ):
     builder.compute_polyhedron_adjacencies()
     if solid.polyhedron_adjacent( mesh.PolyhedronFacet( 0, 0 ) ) != 1:
         raise ValueError( "[Test] TetrahedralSolid adjacent index is not correct" )
-    if solid.polyhedron_adjacent( mesh.PolyhedronFacet( 0, 1 ) ) != basic.NO_ID:
+    if solid.polyhedron_adjacent( mesh.PolyhedronFacet( 0, 1 ) ):
         raise ValueError( "[Test] TetrahedralSolid adjacent index is not correct" )
     if solid.polyhedron_adjacent( mesh.PolyhedronFacet( 1, 3 ) ) != 0:
         raise ValueError( "[Test] TetrahedralSolid adjacent index is not correct" )
@@ -57,7 +57,7 @@ def test_polyhedron_adjacencies( solid, builder ):
 
     if solid.polyhedron_adjacent( mesh.PolyhedronFacet( 2, 3 ) ) != 1:
         raise ValueError( "[Test] TetrahedralSolid adjacent index is not correct" )
-    if solid.polyhedron_adjacent( mesh.PolyhedronFacet( 2, 0 ) ) != basic.NO_ID:
+    if solid.polyhedron_adjacent( mesh.PolyhedronFacet( 2, 0 ) ):
         raise ValueError( "[Test] TetrahedralSolid adjacent index is not correct" )
 
 def test_delete_vertex( solid, builder ):

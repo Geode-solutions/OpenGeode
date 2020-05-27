@@ -83,10 +83,7 @@ namespace geode
         absl::optional< index_t > get_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet ) const
         {
-            const auto adj =
-                polyhedron_adjacents_[starting_adjacent_index(
-                                          polyhedron_facet.polyhedron_id )
-                                      + polyhedron_facet.facet_id];
+            const auto adj = get_polyhedron_adjacent_impl( polyhedron_facet );
             if( adj == NO_ID )
             {
                 return absl::nullopt;
@@ -158,7 +155,6 @@ namespace geode
             index_t vertex_index{ 0 };
             index_t facet_index{ 0 };
             index_t adjacent_index{ 0 };
-            absl::c_fill( polyhedron_adjacents_, NO_ID );
             for( const auto p : Range{ to_delete.size() } )
             {
                 if( to_delete[p] )
@@ -194,11 +190,8 @@ namespace geode
                             polyhedron_facet_ptr_[adjacent_index]
                             + nb_facet_vertices;
 
-                        const auto adj = get_polyhedron_adjacent( facet );
-                        if( adj )
-                        {
-                            polyhedron_adjacents_[adjacent_index] = adj.value();
-                        }
+                        polyhedron_adjacents_[adjacent_index] =
+                            get_polyhedron_adjacent_impl( facet );
                         adjacent_index++;
                     }
                     polyhedron_adjacent_ptr_[p - offset + 1] =
@@ -249,6 +242,14 @@ namespace geode
                         impl, bitsery::ext::BaseClass<
                                   detail::PointsImpl< dimension > >{} );
                 } );
+        }
+
+        index_t get_polyhedron_adjacent_impl(
+            const PolyhedronFacet& polyhedron_facet ) const
+        {
+            return polyhedron_adjacents_[starting_adjacent_index(
+                                             polyhedron_facet.polyhedron_id )
+                                         + polyhedron_facet.facet_id];
         }
 
         index_t starting_vertex_index( const index_t polyhedron ) const

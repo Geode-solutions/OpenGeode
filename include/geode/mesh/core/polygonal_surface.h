@@ -163,8 +163,7 @@ namespace geode
          * Return the index in the mesh of a local edge in a polygon
          * @param[in] polygon_edge Local index of edge in polygon
          */
-        absl::optional< index_t > polygon_edge(
-            const PolygonEdge& polygon_edge ) const;
+        index_t polygon_edge( const PolygonEdge& polygon_edge ) const;
 
         /*!
          * Return the index in the mesh of a given polygon edge vertex.

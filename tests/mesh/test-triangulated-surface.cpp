@@ -66,7 +66,7 @@ void test_polygon_adjacencies( const geode::TriangulatedSurface3D& surface,
     geode::TriangulatedSurfaceBuilder3D& builder )
 {
     builder.compute_polygon_adjacencies();
-    OPENGEODE_EXCEPTION( surface.polygon_adjacent( { 0, 0 } ) == geode::NO_ID,
+    OPENGEODE_EXCEPTION( !surface.polygon_adjacent( { 0, 0 } ),
         "[Test] TriangulatedSurface adjacent index is not correct" );
     OPENGEODE_EXCEPTION( surface.polygon_adjacent( { 0, 1 } ) == 1,
         "[Test] TriangulatedSurface adjacent index is not correct" );
@@ -78,7 +78,7 @@ void test_polygon_adjacencies( const geode::TriangulatedSurface3D& surface,
 
     OPENGEODE_EXCEPTION( surface.polygon_adjacent( { 2, 2 } ) == 1,
         "[Test] TriangulatedSurface adjacent index is not correct" );
-    OPENGEODE_EXCEPTION( surface.polygon_adjacent( { 2, 0 } ) == geode::NO_ID,
+    OPENGEODE_EXCEPTION( !surface.polygon_adjacent( { 2, 0 } ),
         "[Test] TriangulatedSurface adjacent index is not correct" );
 }
 

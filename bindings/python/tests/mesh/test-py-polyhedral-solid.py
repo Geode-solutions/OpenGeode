@@ -71,11 +71,11 @@ def test_create_edge_attribute( polyhedral_solid ):
 
 def test_polyhedron_adjacencies( polyhedral_solid, builder ):
     builder.compute_polyhedron_adjacencies()
-    if polyhedral_solid.polyhedron_adjacent( mesh.PolyhedronFacet( 0, 0 ) ) != basic.NO_ID:
+    if polyhedral_solid.polyhedron_adjacent( mesh.PolyhedronFacet( 0, 0 ) ):
         raise ValueError( "[Test] PolyhedralSolid adjacent index is not correct" )
     if polyhedral_solid.polyhedron_adjacent( mesh.PolyhedronFacet( 0, 1 ) ) != 1:
         raise ValueError( "[Test] PolyhedralSolid adjacent index is not correct" )
-    if polyhedral_solid.polyhedron_adjacent( mesh.PolyhedronFacet( 0, 2 ) ) != basic.NO_ID:
+    if polyhedral_solid.polyhedron_adjacent( mesh.PolyhedronFacet( 0, 2 ) ):
         raise ValueError( "[Test] PolyhedralSolid adjacent index is not correct" )
     if polyhedral_solid.polyhedron_adjacent( mesh.PolyhedronFacet( 1, 0 ) ) != 2:
         raise ValueError( "[Test] PolyhedralSolid adjacent index is not correct" )
