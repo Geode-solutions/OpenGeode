@@ -91,6 +91,12 @@ namespace pybind11
             : string_caster< absl::string_view, true >
         {
         };
+
+        template < typename T >
+        struct type_caster< absl::optional< T > >
+            : public optional_caster< absl::optional< T > >
+        {
+        };
     } // namespace detail
 } // namespace pybind11
 

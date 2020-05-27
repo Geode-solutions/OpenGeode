@@ -65,9 +65,7 @@ namespace geode
         absl::optional< index_t > get_polygon_adjacent(
             const PolygonEdge& polygon_edge ) const
         {
-            const auto adj =
-                polygon_adjacents_[starting_index( polygon_edge.polygon_id )
-                                   + polygon_edge.edge_id];
+            const auto adj = get_polygon_adjacent_impl( polygon_edge );
             if( adj == NO_ID )
             {
                 return absl::nullopt;
@@ -101,7 +99,6 @@ namespace geode
         {
             index_t offset{ 0 };
             index_t index{ 0 };
-            absl::c_fill( polygon_adjacents_, NO_ID );
             for( const auto p : Range{ to_delete.size() } )
             {
                 if( to_delete[p] )
@@ -115,11 +112,8 @@ namespace geode
                     {
                         polygon_vertices_[index] =
                             get_polygon_vertex( { p, v } );
-                        const auto adj = get_polygon_adjacent( { p, v } );
-                        if( adj )
-                        {
-                            polygon_adjacents_[index] = adj.value();
-                        }
+                        polygon_adjacents_[index] =
+                            get_polygon_adjacent_impl( { p, v } );
                         index++;
                     }
                     polygon_ptr_[p - offset + 1] =
@@ -152,6 +146,13 @@ namespace geode
                         impl, bitsery::ext::BaseClass<
                                   detail::PointsImpl< dimension > >{} );
                 } );
+        }
+
+        index_t get_polygon_adjacent_impl(
+            const PolygonEdge& polygon_edge ) const
+        {
+            return polygon_adjacents_[starting_index( polygon_edge.polygon_id )
+                                      + polygon_edge.edge_id];
         }
 
         index_t starting_index( const index_t polygon ) const

@@ -120,13 +120,11 @@ void test_polyhedron_adjacencies(
     geode::PolyhedralSolidBuilder3D& builder )
 {
     builder.compute_polyhedron_adjacencies();
-    OPENGEODE_EXCEPTION(
-        polyhedral_solid.polyhedron_adjacent( { 0, 0 } ) == geode::NO_ID,
+    OPENGEODE_EXCEPTION( !polyhedral_solid.polyhedron_adjacent( { 0, 0 } ),
         "[Test] PolyhedralSolid adjacent index is not correct" );
     OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_adjacent( { 0, 1 } ) == 1,
         "[Test] PolyhedralSolid adjacent index is not correct" );
-    OPENGEODE_EXCEPTION(
-        polyhedral_solid.polyhedron_adjacent( { 0, 2 } ) == geode::NO_ID,
+    OPENGEODE_EXCEPTION( !polyhedral_solid.polyhedron_adjacent( { 0, 2 } ),
         "[Test] PolyhedralSolid adjacent index is not correct" );
     OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_adjacent( { 1, 0 } ) == 2,
         "[Test] PolyhedralSolid adjacent index is not correct" );

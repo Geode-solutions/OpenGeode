@@ -91,7 +91,8 @@ void test_delete_vertex( const geode::PolygonalSurface3D& polygonal_surface,
         "[Test] PolygonalSurface vertex coordinates are not correct" );
     OPENGEODE_EXCEPTION( polygonal_surface.nb_polygons() == 2,
         "[Test] PolygonalSurface should have 2 polygons" );
-    OPENGEODE_EXCEPTION( polygonal_surface.polygon_adjacent( { 1, 3 } ) == 0,
+    OPENGEODE_EXCEPTION(
+        polygonal_surface.polygon_adjacent( { 1, 3 } ).value() == 0,
         "[Test] PolygonalSurface adjacent index is not correct" );
     OPENGEODE_EXCEPTION( polygonal_surface.nb_edges() == 7,
         "[Test] PolygonalSurface should have 7 edges" );
@@ -144,8 +145,7 @@ void test_polygon_adjacencies(
     geode::PolygonalSurfaceBuilder3D& builder )
 {
     builder.compute_polygon_adjacencies();
-    OPENGEODE_EXCEPTION(
-        polygonal_surface.polygon_adjacent( { 0, 0 } ) == geode::NO_ID,
+    OPENGEODE_EXCEPTION( !polygonal_surface.polygon_adjacent( { 0, 0 } ),
         "[Test] PolygonalSurface adjacent index is not correct" );
     OPENGEODE_EXCEPTION( polygonal_surface.polygon_adjacent( { 0, 1 } ) == 1,
         "[Test] PolygonalSurface adjacent index is not correct" );
@@ -158,8 +158,7 @@ void test_polygon_adjacencies(
                              == polygonal_surface.polygon_edge( { 1, 3 } ),
         "[Test] PolygonalSurface edge indices is not correct" );
 
-    OPENGEODE_EXCEPTION(
-        polygonal_surface.polygon_adjacent( { 2, 0 } ) == geode::NO_ID,
+    OPENGEODE_EXCEPTION( !polygonal_surface.polygon_adjacent( { 2, 0 } ),
         "[Test] PolygonalSurface adjacent index is not correct" );
     OPENGEODE_EXCEPTION( polygonal_surface.polygon_adjacent( { 2, 3 } ) == 1,
         "[Test] PolygonalSurface adjacent index is not correct" );

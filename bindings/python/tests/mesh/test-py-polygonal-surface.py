@@ -89,7 +89,7 @@ def test_create_edge_attribute( polygonal_surface ):
 
 def test_polygon_adjacencies( polygonal_surface, builder ):
     builder.compute_polygon_adjacencies()
-    if polygonal_surface.polygon_adjacent( mesh.PolygonEdge( 0, 0 ) ) != basic.NO_ID:
+    if polygonal_surface.polygon_adjacent( mesh.PolygonEdge( 0, 0 ) ):
         raise ValueError( "[Test] PolygonalSurface adjacent index is not correct" )
     if polygonal_surface.polygon_adjacent( mesh.PolygonEdge( 0, 1 ) ) != 1:
         raise ValueError( "[Test] PolygonalSurface adjacent index is not correct" )
@@ -100,7 +100,7 @@ def test_polygon_adjacencies( polygonal_surface, builder ):
     if polygonal_surface.polygon_edge( mesh.PolygonEdge( 0, 1 ) ) != polygonal_surface.polygon_edge( mesh.PolygonEdge( 1, 3 ) ):
         raise ValueError( "[Test] PolygonalSurface edge indices is not correct" )
 
-    if polygonal_surface.polygon_adjacent( mesh.PolygonEdge( 2, 0 ) ) != basic.NO_ID:
+    if polygonal_surface.polygon_adjacent( mesh.PolygonEdge( 2, 0 ) ):
         raise ValueError( "[Test] PolygonalSurface adjacent index is not correct" )
     if polygonal_surface.polygon_adjacent( mesh.PolygonEdge( 2, 3 ) ) != 1:
         raise ValueError( "[Test] PolygonalSurface adjacent index is not correct" )

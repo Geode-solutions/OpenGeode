@@ -120,10 +120,10 @@ namespace geode
     public:
         explicit Impl( PolygonalSurfaceBase& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) )
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
@@ -257,14 +257,16 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::optional< index_t > PolygonalSurfaceBase< dimension >::polygon_edge(
+    index_t PolygonalSurfaceBase< dimension >::polygon_edge(
         const PolygonEdge& polygon_edge ) const
     {
         check_polygon_id( *this, polygon_edge.polygon_id );
         check_polygon_edge_id(
             *this, polygon_edge.polygon_id, polygon_edge.edge_id );
-        return impl_->find_edge( { polygon_vertex( polygon_edge ),
-            polygon_edge_vertex( polygon_edge, 1 ) } );
+        return impl_
+            ->find_edge( { polygon_vertex( polygon_edge ),
+                polygon_edge_vertex( polygon_edge, 1 ) } )
+            .value();
     }
 
     template < index_t dimension >
@@ -447,14 +449,13 @@ namespace geode
             const auto edge_id = this->polygon_edge( polygon_edge );
             for( const auto e : Range{ nb_polygon_edges( polygon_adj_id ) } )
             {
-                const auto polygon = polygon_adjacent( { polygon_adj_id, e } );
+                const PolygonEdge adj_edge{ polygon_adj_id, e };
+                const auto polygon = polygon_adjacent( adj_edge );
                 if( polygon && polygon.value() == polygon_edge.polygon_id )
                 {
-                    const auto adjacent_edge =
-                        this->polygon_edge( { polygon_adj_id, e } );
-                    if( adjacent_edge && adjacent_edge.value() == edge_id )
+                    if( this->polygon_edge( adj_edge ) == edge_id )
                     {
-                        return PolygonEdge{ polygon_adj_id, e };
+                        return adj_edge;
                     }
                 }
             }
@@ -469,7 +470,7 @@ namespace geode
     bool PolygonalSurfaceBase< dimension >::is_edge_on_border(
         const PolygonEdge& polygon_edge ) const
     {
-        return polygon_adjacent( polygon_edge ).has_value();
+        return !polygon_adjacent( polygon_edge ).has_value();
     }
 
     template < index_t dimension >
