@@ -120,10 +120,10 @@ namespace geode
     public:
         explicit Impl( PolygonalSurfaceBase& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) )
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
@@ -470,7 +470,7 @@ namespace geode
     bool PolygonalSurfaceBase< dimension >::is_edge_on_border(
         const PolygonEdge& polygon_edge ) const
     {
-        return !polygon_adjacent( polygon_edge ).has_value();
+        return !polygon_adjacent( polygon_edge );
     }
 
     template < index_t dimension >
