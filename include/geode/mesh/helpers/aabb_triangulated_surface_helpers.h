@@ -21,28 +21,44 @@
  *
  */
 
+/*
+ * Modified from RINGMesh https://github.com/ringmesh/RINGMesh
+ * Copyright (c) 2012-2018, Association Scientifique pour la Geologie et ses
+ * Applications (ASGA)
+ */
+
 #pragma once
 
-#include <geode/geometry/common.h>
+#include <geode/mesh/common.h>
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( Vector );
-    ALIAS_2D( Vector );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+    FORWARD_DECLARATION_DIMENSION_CLASS( AABBTree );
+    FORWARD_DECLARATION_DIMENSION_CLASS( TriangulatedSurface );
 } // namespace geode
 
 namespace geode
 {
-    /*!
-     * Return a 2D vector perpendicular to the given one
-     */
-    Vector2D opengeode_geometry_api perpendicular( const Vector2D& v );
+    template < index_t dimension >
+    AABBTree< dimension > create_aabb_tree(
+        const TriangulatedSurface< dimension >& mesh );
 
-    /*!
-     * Compute the dot product between a 2D vector \p v0 and another 2D vector
-     * perpendicular to \p v1.
-     */
-    double opengeode_geometry_api dot_perpendicular(
-        const Vector2D& v0, const Vector2D& v1 );
+    template < index_t dimension >
+    class DistanceToTriangle
+    {
+    public:
+        explicit DistanceToTriangle(
+            const TriangulatedSurface< dimension >& mesh )
+            : mesh_( mesh )
+        {
+        }
+
+        std::tuple< double, Point< dimension > > operator()(
+            const Point< dimension >& query, index_t cur_box ) const;
+
+    private:
+        const TriangulatedSurface< dimension >& mesh_;
+    };
 
 } // namespace geode

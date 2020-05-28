@@ -26,12 +26,38 @@
 #include <geode/basic/logger.h>
 
 #include <geode/geometry/basic_objects.h>
+#include <geode/geometry/perpendicular.h>
 #include <geode/geometry/projection.h>
+#include <geode/geometry/signed_mensuration.h>
 #include <geode/geometry/vector.h>
 
 namespace
 {
     constexpr double MAX_DOUBLE = std::numeric_limits< double >::max();
+
+    /*
+     * This function tests if the point is in the triangle by computing signed
+     * areas
+     * @warning This is not robust in edge cases!
+     */
+    bool may_point_be_in_triangle(
+        const geode::Point2D& point, const geode::Triangle2D& triangle )
+    {
+        const auto signed_area_1 =
+            geode::triangle_signed_area( geode::Triangle2D{
+                triangle.vertices()[0], triangle.vertices()[1], point } );
+        const auto signed_area_2 =
+            geode::triangle_signed_area( geode::Triangle2D{
+                triangle.vertices()[1], triangle.vertices()[2], point } );
+        const auto signed_area_3 =
+            geode::triangle_signed_area( geode::Triangle2D{
+                triangle.vertices()[2], triangle.vertices()[0], point } );
+
+        return ( signed_area_1 <= 0. && signed_area_2 <= 0.
+                   && signed_area_3 <= 0 )
+               || ( signed_area_1 >= 0. && signed_area_2 >= 0.
+                    && signed_area_3 >= 0 );
+    }
 } // namespace
 
 namespace geode
@@ -52,6 +78,20 @@ namespace geode
         const auto nearest_p = point_line_projection( point, line );
         return std::make_tuple(
             Vector< dimension >{ point, nearest_p }.length(), nearest_p );
+    }
+
+    std::tuple< double, Point2D > point_line_signed_distance(
+        const Point2D& point, const InfiniteLine2D& line )
+    {
+        Point2D nearest_point;
+        double distance;
+        std::tie( distance, nearest_point ) =
+            point_line_distance< 2 >( point, line );
+        const Vector2D proj2point{ nearest_point, point };
+        const auto signed_distance =
+            dot_perpendicular( proj2point, line.direction() ) <= 0 ? distance
+                                                                   : -distance;
+        return std::make_tuple( signed_distance, nearest_point );
     }
 
     template <>
@@ -299,6 +339,10 @@ namespace geode
     std::tuple< double, Point2D > point_triangle_distance(
         const Point2D& point, const Triangle2D& triangle )
     {
+        if( may_point_be_in_triangle( point, triangle ) )
+        {
+            return std::make_tuple( 0.0, point );
+        }
         std::array< Point2D, 3 > closest;
         std::array< double, 3 > distance;
         std::tie( distance[0], closest[0] ) = point_segment_distance( point,
@@ -341,12 +385,12 @@ namespace geode
     std::tuple< double, Point3D > point_tetra_distance(
         const Point3D& point, const Tetra& tetra )
     {
-        auto dist = MAX_DOUBLE;
+        auto max_distance = MAX_DOUBLE;
         Point3D nearest_p;
         bool inside{ true };
         for( const auto f : Range{ 4 } )
         {
-            auto distance = MAX_DOUBLE;
+            double distance;
             Point3D cur_p;
             std::tie( distance, cur_p ) = point_triangle_signed_distance( point,
                 Triangle3D{ tetra.vertices()[Tetra::tetra_facet_vertex[f][0]],
@@ -356,18 +400,17 @@ namespace geode
             {
                 inside = false;
             }
-            if( distance < dist && distance >= 0 )
+            if( distance < max_distance && distance >= 0 )
             {
-                dist = distance;
+                max_distance = distance;
                 nearest_p = cur_p;
             }
         }
         if( inside )
         {
-            nearest_p = point;
-            return std::make_tuple( 0.0, nearest_p );
+            return std::make_tuple( 0.0, point );
         }
-        return std::make_tuple( dist, nearest_p );
+        return std::make_tuple( max_distance, nearest_p );
     }
 
     std::tuple< double, Point3D > point_triangle_signed_distance(

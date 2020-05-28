@@ -200,7 +200,7 @@ void test_point_triangle_distance_2d()
         "[Test] Wrong result for point_triangle_distance with query point "
         "q3" );
 
-    const geode::Point2D q4{ { 0.5, 0.5 } };
+    const geode::Point2D q4{ { 0.8, 0.2 } };
     std::tie( distance, closest_point ) =
         geode::point_triangle_distance( q4, triangle2D );
     OPENGEODE_EXCEPTION( distance == 0 && closest_point == q4,
@@ -437,6 +437,71 @@ void test_point_line_distance_2d()
         "q2" );
 }
 
+void test_point_line_signed_distance_2d()
+{
+    const geode::Point2D a{ { 1.0, 5.0 } };
+    const geode::Point2D b{ { -1.0, -5.0 } };
+    const geode::Segment2D segment2D{ a, b };
+    const geode::InfiniteLine2D line2D{ segment2D };
+
+    double distance;
+    geode::Point2D closest_point;
+
+    std::tie( distance, closest_point ) =
+        geode::point_line_signed_distance( a, line2D );
+    OPENGEODE_EXCEPTION(
+        distance < geode::global_epsilon
+            && closest_point.inexact_equal( a, geode::global_epsilon ),
+        "[Test] Wrong result for point_line_signed_distance with query Point2D "
+        "a" );
+
+    std::tie( distance, closest_point ) =
+        geode::point_line_signed_distance( b, line2D );
+    OPENGEODE_EXCEPTION(
+        distance < geode::global_epsilon
+            && closest_point.inexact_equal( b, geode::global_epsilon ),
+        "[Test] Wrong result for point_line_signed_distance with query Point2D "
+        "b" );
+
+    const geode::Point2D q1{ { 0.0, 0.0 } };
+    std::tie( distance, closest_point ) =
+        geode::point_line_signed_distance( q1, line2D );
+    OPENGEODE_EXCEPTION(
+        distance < geode::global_epsilon
+            && closest_point.inexact_equal( q1, geode::global_epsilon ),
+        "[Test] Wrong result for point_line_signed_distance with query Point2D "
+        "q1" );
+
+    const geode::Point2D q2{ { 2.0, 10.0 } };
+    std::tie( distance, closest_point ) =
+        geode::point_line_signed_distance( q2, line2D );
+    OPENGEODE_EXCEPTION(
+        distance < geode::global_epsilon
+            && closest_point.inexact_equal( q2, geode::global_epsilon ),
+        "[Test] Wrong result for point_line_signed_distance with query Point2D "
+        "q2" );
+
+    const geode::Point2D q3{ { 5.0, -1.0 } };
+    std::tie( distance, closest_point ) =
+        geode::point_line_signed_distance( q3, line2D );
+    const geode::Point2D result_q3{ { 0.0, 0.0 } };
+    OPENGEODE_EXCEPTION(
+        distance == std::sqrt( 26 )
+            && closest_point.inexact_equal( result_q3, geode::global_epsilon ),
+        "[Test] Wrong result for point_line_signed_distance with query Point2D "
+        "q3" );
+
+    const geode::Point2D q4{ { -5.0, 1.0 } };
+    std::tie( distance, closest_point ) =
+        geode::point_line_signed_distance( q4, line2D );
+    const geode::Point2D result_q4{ { 0.0, 0.0 } };
+    OPENGEODE_EXCEPTION(
+        distance == -std::sqrt( 26 )
+            && closest_point.inexact_equal( result_q3, geode::global_epsilon ),
+        "[Test] Wrong result for point_line_signed_distance with query Point2D "
+        "q3" );
+}
+
 void test_point_line_distance_3d()
 {
     const geode::Point3D a{ { 1.0, 5.0, 2.0 } };
@@ -486,6 +551,7 @@ void test_point_line_distance_3d()
 void test_point_line_distance()
 {
     test_point_line_distance_2d();
+    test_point_line_signed_distance_2d();
     test_point_line_distance_3d();
 }
 

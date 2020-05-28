@@ -104,7 +104,12 @@ namespace geode
         const Point< dimension >& origin_;
         Vector< dimension > direction_;
     };
+
+    template < index_t dimension >
+    using Ray = InfiniteLine< dimension >;
+
     ALIAS_2D_AND_3D( InfiniteLine );
+    ALIAS_2D_AND_3D( Ray );
 
     class Plane
     {

@@ -54,7 +54,7 @@ namespace geode
                       facet_attribute_manager_
                           .template find_or_create_attribute< VariableAttribute,
                               VertexContainer >(
-                              attribute_name(), VertexContainer{} ) )
+                              attribute_name(), VertexContainer() ) )
             {
             }
 

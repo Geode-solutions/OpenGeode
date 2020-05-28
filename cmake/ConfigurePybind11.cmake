@@ -1,4 +1,4 @@
-# Copyright (c) 2019 Geode-solutions
+# Copyright (c) 2019 - 2020 Geode-solutions
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -35,6 +35,7 @@ ExternalProject_Add(pybind11
     CMAKE_CACHE_ARGS
         -DCMAKE_C_FLAGS_DEBUG:INTERNAL=${NEW_FLAGS}
         -DCMAKE_CXX_FLAGS_DEBUG:INTERNAL=${NEW_FLAGS}
+        -DPYBIND11_PYTHON_VERSION:STRING=${PYTHON_VERSION}
         -DPYBIND11_INSTALL:BOOL=ON
         -DPYBIND11_TEST:BOOL=OFF
         -DCMAKE_INSTALL_PREFIX:PATH=${PYBIND11_INSTALL_PREFIX}
