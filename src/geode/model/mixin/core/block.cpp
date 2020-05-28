@@ -54,7 +54,7 @@ namespace geode
     template < index_t dimension >
     Block< dimension >::Block()
         : Block( MeshFactory::default_mesh(
-              PolyhedralSolid< dimension >::kind_name_static() ) )
+            PolyhedralSolid< dimension >::kind_name_static() ) )
     {
     }
 

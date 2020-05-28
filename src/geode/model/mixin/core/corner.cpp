@@ -59,7 +59,7 @@ namespace geode
     template < index_t dimension >
     Corner< dimension >::Corner()
         : Corner( MeshFactory::default_mesh(
-              PointSet< dimension >::kind_name_static() ) )
+            PointSet< dimension >::kind_name_static() ) )
     {
     }
 
