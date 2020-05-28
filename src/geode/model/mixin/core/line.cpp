@@ -27,6 +27,7 @@
 #include <geode/basic/pimpl_impl.h>
 
 #include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/core/mesh_factory.h>
 
 #include <geode/model/mixin/core/detail/mesh_storage.h>
 
@@ -56,7 +57,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    Line< dimension >::Line() : Line( EdgedCurve< dimension >::default_type() )
+    Line< dimension >::Line()
+        : Line( MeshFactory::default_mesh(
+              EdgedCurve< dimension >::kind_name_static() ) )
     {
     }
 

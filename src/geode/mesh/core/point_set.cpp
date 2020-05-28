@@ -30,37 +30,22 @@
 #include <geode/geometry/bounding_box.h>
 
 #include <geode/mesh/builder/point_set_builder.h>
-#include <geode/mesh/core/geode_point_set.h>
+#include <geode/mesh/core/mesh_factory.h>
 
 namespace geode
 {
     template < index_t dimension >
     std::unique_ptr< PointSet< dimension > > PointSet< dimension >::create()
     {
-        return create( default_type() );
+        return MeshFactory::create_default_mesh< PointSet< dimension > >(
+            PointSet< dimension >::kind_name_static() );
     }
 
     template < index_t dimension >
     std::unique_ptr< PointSet< dimension > > PointSet< dimension >::create(
         const MeshType& type )
     {
-        try
-        {
-            return PointSetFactory< dimension >::create( type );
-        }
-        catch( const OpenGeodeException& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeException{
-                "Could not create PointSet data structure: ", type.get()
-            };
-        }
-    }
-
-    template < index_t dimension >
-    MeshType PointSet< dimension >::default_type()
-    {
-        return OpenGeodePointSet< dimension >::type_name_static();
+        return MeshFactory::create_mesh< PointSet< dimension > >( type );
     }
 
     template < index_t dimension >

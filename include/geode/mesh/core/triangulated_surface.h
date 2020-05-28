@@ -50,7 +50,11 @@ namespace geode
         static std::unique_ptr< TriangulatedSurface< dimension > > create(
             const MeshType& type );
 
-        static MeshType default_type();
+        static MeshKind kind_name_static()
+        {
+            return MeshKind{ absl::StrCat(
+                "TriangulatedSurface", dimension, "D" ) };
+        }
 
         std::unique_ptr< TriangulatedSurface< dimension > > clone() const;
 
@@ -78,9 +82,4 @@ namespace geode
         }
     };
     ALIAS_2D_AND_3D( TriangulatedSurface );
-
-    template < index_t dimension >
-    using TriangulatedSurfaceFactory =
-        Factory< MeshType, TriangulatedSurface< dimension > >;
-    ALIAS_2D_AND_3D( TriangulatedSurfaceFactory );
 } // namespace geode

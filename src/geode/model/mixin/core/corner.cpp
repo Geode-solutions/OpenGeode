@@ -26,6 +26,7 @@
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
 
+#include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/point_set.h>
 
 #include <geode/model/mixin/core/detail/mesh_storage.h>
@@ -57,7 +58,8 @@ namespace geode
 
     template < index_t dimension >
     Corner< dimension >::Corner()
-        : Corner( PointSet< dimension >::default_type() )
+        : Corner( MeshFactory::default_mesh(
+              PointSet< dimension >::kind_name_static() ) )
     {
     }
 

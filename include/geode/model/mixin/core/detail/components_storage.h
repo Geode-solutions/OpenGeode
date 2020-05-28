@@ -38,7 +38,7 @@
 #include <geode/geometry/bitsery_archive.h>
 
 #include <geode/mesh/core/bitsery_archive.h>
-#include <geode/mesh/core/mesh_type.h>
+#include <geode/mesh/core/mesh_id.h>
 
 #include <geode/model/mixin/core/bitsery_archive.h>
 #include <geode/model/mixin/core/component_type.h>

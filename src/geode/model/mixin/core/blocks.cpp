@@ -26,6 +26,7 @@
 #include <geode/basic/pimpl_impl.h>
 #include <geode/basic/range.h>
 
+#include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polyhedral_solid.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
 #include <geode/mesh/io/polyhedral_solid_input.h>
@@ -110,8 +111,8 @@ namespace geode
         {
             const auto file =
                 impl_->find_file( directory, block.component_id() );
-            if( TetrahedralSolidFactory< dimension >::has_creator(
-                    block.mesh_type() ) )
+            if( MeshFactory::kind( block.mesh_type() )
+                == TetrahedralSolid< dimension >::kind_name_static() )
             {
                 block.set_mesh( load_tetrahedral_solid< dimension >(
                                     block.mesh_type(), file ),
@@ -243,8 +244,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    Block< dimension >&
-        Blocks< dimension >::ModifiableBlockRange::operator*() const
+    Block< dimension >& Blocks< dimension >::ModifiableBlockRange::
+        operator*() const
     {
         return this->impl_->block();
     }

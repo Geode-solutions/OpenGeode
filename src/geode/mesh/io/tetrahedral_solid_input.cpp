@@ -23,6 +23,7 @@
 
 #include <geode/mesh/io/tetrahedral_solid_input.h>
 
+#include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
 
 namespace geode
@@ -55,7 +56,9 @@ namespace geode
         absl::string_view filename )
     {
         return load_tetrahedral_solid< dimension >(
-            TetrahedralSolid< dimension >::default_type(), filename );
+            MeshFactory::default_mesh(
+                TetrahedralSolid< dimension >::kind_name_static() ),
+            filename );
     }
 
     template < index_t dimension >

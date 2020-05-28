@@ -25,7 +25,7 @@
 
 #include <memory>
 
-#include <geode/mesh/core/mesh_type.h>
+#include <geode/mesh/core/mesh_id.h>
 
 #include <geode/model/common.h>
 

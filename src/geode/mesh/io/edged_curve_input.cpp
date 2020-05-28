@@ -24,6 +24,7 @@
 #include <geode/mesh/io/edged_curve_input.h>
 
 #include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/core/mesh_factory.h>
 
 namespace geode
 {
@@ -53,7 +54,9 @@ namespace geode
         absl::string_view filename )
     {
         return load_edged_curve< dimension >(
-            EdgedCurve< dimension >::default_type(), filename );
+            MeshFactory::default_mesh(
+                EdgedCurve< dimension >::kind_name_static() ),
+            filename );
     }
 
     template < index_t dimension >

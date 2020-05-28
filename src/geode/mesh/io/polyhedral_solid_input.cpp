@@ -23,6 +23,7 @@
 
 #include <geode/mesh/io/polyhedral_solid_input.h>
 
+#include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polyhedral_solid.h>
 
 namespace geode
@@ -54,7 +55,9 @@ namespace geode
         absl::string_view filename )
     {
         return load_polyhedral_solid< dimension >(
-            PolyhedralSolid< dimension >::default_type(), filename );
+            MeshFactory::default_mesh(
+                PolyhedralSolid< dimension >::kind_name_static() ),
+            filename );
     }
 
     template < index_t dimension >

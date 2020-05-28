@@ -29,37 +29,22 @@
 #include <geode/geometry/vector.h>
 
 #include <geode/mesh/builder/edged_curve_builder.h>
-#include <geode/mesh/core/geode_edged_curve.h>
+#include <geode/mesh/core/mesh_factory.h>
 
 namespace geode
 {
     template < index_t dimension >
     std::unique_ptr< EdgedCurve< dimension > > EdgedCurve< dimension >::create()
     {
-        return create( default_type() );
+        return MeshFactory::create_default_mesh< EdgedCurve< dimension > >(
+            EdgedCurve< dimension >::kind_name_static() );
     }
 
     template < index_t dimension >
     std::unique_ptr< EdgedCurve< dimension > > EdgedCurve< dimension >::create(
         const MeshType& type )
     {
-        try
-        {
-            return EdgedCurveFactory< dimension >::create( type );
-        }
-        catch( const OpenGeodeException& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeException{
-                "Could not create EdgedCurve data structure: ", type.get()
-            };
-        }
-    }
-
-    template < index_t dimension >
-    MeshType EdgedCurve< dimension >::default_type()
-    {
-        return OpenGeodeEdgedCurve< dimension >::type_name_static();
+        return MeshFactory::create_mesh< EdgedCurve< dimension > >( type );
     }
 
     template < index_t dimension >

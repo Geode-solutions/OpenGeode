@@ -26,7 +26,7 @@
 #include <geode/basic/mapping.h>
 
 #include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/core/mesh_type.h>
+#include <geode/mesh/core/mesh_id.h>
 #include <geode/mesh/core/point_set.h>
 #include <geode/mesh/core/polygonal_surface.h>
 

@@ -39,8 +39,7 @@
 
 #include <geode/mesh/builder/polygonal_surface_builder.h>
 #include <geode/mesh/core/detail/facet_storage.h>
-#include <geode/mesh/core/geode_polygonal_surface.h>
-#include <geode/mesh/core/triangulated_surface.h>
+#include <geode/mesh/core/mesh_factory.h>
 
 namespace
 {
@@ -120,10 +119,10 @@ namespace geode
     public:
         explicit Impl( PolygonalSurfaceBase& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) )
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
@@ -736,41 +735,20 @@ namespace geode
     }
 
     template < index_t dimension >
-    MeshType PolygonalSurface< dimension >::default_type()
-    {
-        return OpenGeodePolygonalSurface< dimension >::type_name_static();
-    }
-
-    template < index_t dimension >
     std::unique_ptr< PolygonalSurface< dimension > >
         PolygonalSurface< dimension >::create()
     {
-        return create( default_type() );
+        return MeshFactory::create_default_mesh<
+            PolygonalSurface< dimension > >(
+            PolygonalSurface< dimension >::kind_name_static() );
     }
 
     template < index_t dimension >
     std::unique_ptr< PolygonalSurface< dimension > >
         PolygonalSurface< dimension >::create( const MeshType& type )
     {
-        try
-        {
-            return PolygonalSurfaceFactory< dimension >::create( type );
-        }
-        catch( const OpenGeodeException& )
-        {
-            try
-            {
-                return TriangulatedSurface< dimension >::create( type );
-            }
-            catch( const OpenGeodeException& e )
-            {
-                Logger::error( e.what() );
-                throw OpenGeodeException{
-                    "Could not create PolygonalSurface data structure: ",
-                    type.get()
-                };
-            }
-        }
+        return MeshFactory::create_mesh< PolygonalSurface< dimension > >(
+            type );
     }
 
     template < index_t dimension >
@@ -783,38 +761,16 @@ namespace geode
         return clone;
     }
 
-    MeshType PolygonalSurface< 3 >::default_type()
-    {
-        return OpenGeodePolygonalSurface< 3 >::type_name_static();
-    }
-
     std::unique_ptr< PolygonalSurface< 3 > > PolygonalSurface< 3 >::create()
     {
-        return create( default_type() );
+        return MeshFactory::create_default_mesh< PolygonalSurface< 3 > >(
+            PolygonalSurface< 3 >::kind_name_static() );
     }
 
     std::unique_ptr< PolygonalSurface< 3 > > PolygonalSurface< 3 >::create(
         const MeshType& type )
     {
-        try
-        {
-            return PolygonalSurfaceFactory< 3 >::create( type );
-        }
-        catch( const OpenGeodeException& )
-        {
-            try
-            {
-                return TriangulatedSurfaceFactory< 3 >::create( type );
-            }
-            catch( const OpenGeodeException& e )
-            {
-                Logger::error( e.what() );
-                throw OpenGeodeException{
-                    "Could not create PolygonalSurface data structure: ",
-                    type.get()
-                };
-            }
-        }
+        return MeshFactory::create_mesh< PolygonalSurface< 3 > >( type );
     }
 
     std::unique_ptr< PolygonalSurface< 3 > >

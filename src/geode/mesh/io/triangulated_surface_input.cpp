@@ -23,7 +23,7 @@
 
 #include <geode/mesh/io/triangulated_surface_input.h>
 
-#include <geode/mesh/builder/triangulated_surface_builder.h>
+#include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/triangulated_surface.h>
 
 namespace geode
@@ -57,7 +57,9 @@ namespace geode
         load_triangulated_surface( absl::string_view filename )
     {
         return load_triangulated_surface< dimension >(
-            TriangulatedSurface< dimension >::default_type(), filename );
+            MeshFactory::default_mesh(
+                TriangulatedSurface< dimension >::kind_name_static() ),
+            filename );
     }
 
     template < index_t dimension >

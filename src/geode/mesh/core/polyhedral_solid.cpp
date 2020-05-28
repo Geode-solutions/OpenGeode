@@ -39,8 +39,7 @@
 #include <geode/mesh/builder/polyhedral_solid_builder.h>
 #include <geode/mesh/core/bitsery_archive.h>
 #include <geode/mesh/core/detail/facet_storage.h>
-#include <geode/mesh/core/geode_polyhedral_solid.h>
-#include <geode/mesh/core/tetrahedral_solid.h>
+#include <geode/mesh/core/mesh_factory.h>
 
 namespace
 {
@@ -96,7 +95,7 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -163,10 +162,10 @@ namespace geode
     public:
         explicit Impl( PolyhedralSolid& solid )
             : polyhedron_around_vertex_(
-                solid.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolyhedronVertex >(
-                        "polyhedron_around_vertex", PolyhedronVertex{} ) )
+                  solid.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolyhedronVertex >(
+                          "polyhedron_around_vertex", PolyhedronVertex{} ) )
         {
         }
 
@@ -443,38 +442,15 @@ namespace geode
     std::unique_ptr< PolyhedralSolid< dimension > >
         PolyhedralSolid< dimension >::create()
     {
-        return create( default_type() );
+        return MeshFactory::create_default_mesh< PolyhedralSolid< dimension > >(
+            PolyhedralSolid< dimension >::kind_name_static() );
     }
 
     template < index_t dimension >
     std::unique_ptr< PolyhedralSolid< dimension > >
         PolyhedralSolid< dimension >::create( const MeshType& type )
     {
-        try
-        {
-            return PolyhedralSolidFactory< dimension >::create( type );
-        }
-        catch( const OpenGeodeException& )
-        {
-            try
-            {
-                return TetrahedralSolid< dimension >::create( type );
-            }
-            catch( const OpenGeodeException& e )
-            {
-                Logger::error( e.what() );
-                throw OpenGeodeException{
-                    "Could not create PolyhedralSolid data structure: ",
-                    type.get()
-                };
-            }
-        }
-    }
-
-    template < index_t dimension >
-    MeshType PolyhedralSolid< dimension >::default_type()
-    {
-        return OpenGeodePolyhedralSolid< dimension >::type_name_static();
+        return MeshFactory::create_mesh< PolyhedralSolid< dimension > >( type );
     }
 
     template < index_t dimension >
@@ -960,7 +936,7 @@ namespace geode
             polyhedron_facet_vertex( { polyhedron_facet_edge.polyhedron_facet,
                 ( polyhedron_facet_edge.edge_id + 1 )
                     % nb_polyhedron_facet_vertices(
-                        polyhedron_facet_edge.polyhedron_facet ) } );
+                          polyhedron_facet_edge.polyhedron_facet ) } );
         return edge_from_vertices( { v0, v1 } );
     }
 

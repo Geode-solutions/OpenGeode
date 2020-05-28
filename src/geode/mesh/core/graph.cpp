@@ -35,7 +35,7 @@
 
 #include <geode/mesh/builder/graph_builder.h>
 #include <geode/mesh/core/bitsery_archive.h>
-#include <geode/mesh/core/geode_graph.h>
+#include <geode/mesh/core/mesh_factory.h>
 
 namespace geode
 {
@@ -47,10 +47,10 @@ namespace geode
     public:
         explicit Impl( Graph& graph )
             : edges_around_vertex_(
-                graph.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        EdgesAroundVertex >(
-                        attribute_name, EdgesAroundVertex{} ) )
+                  graph.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          EdgesAroundVertex >(
+                          attribute_name, EdgesAroundVertex{} ) )
         {
         }
 
@@ -163,26 +163,13 @@ namespace geode
 
     std::unique_ptr< Graph > Graph::create()
     {
-        return create( default_type() );
+        return MeshFactory::create_default_mesh< Graph >(
+            Graph::kind_name_static() );
     }
 
     std::unique_ptr< Graph > Graph::create( const MeshType& type )
     {
-        try
-        {
-            return GraphFactory::create( type );
-        }
-        catch( const OpenGeodeException& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeException{ "Could not create Graph data structure: ",
-                type.get() };
-        }
-    }
-
-    MeshType Graph::default_type()
-    {
-        return OpenGeodeGraph::type_name_static();
+        return MeshFactory::create_mesh< Graph >( type );
     }
 
     index_t Graph::edge_vertex( const EdgeVertex& edge_vertex ) const

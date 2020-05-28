@@ -29,7 +29,7 @@
 #include <geode/basic/pimpl_impl.h>
 
 #include <geode/mesh/builder/vertex_set_builder.h>
-#include <geode/mesh/core/geode_vertex_set.h>
+#include <geode/mesh/core/mesh_factory.h>
 
 namespace geode
 {
@@ -67,27 +67,13 @@ namespace geode
 
     std::unique_ptr< VertexSet > VertexSet::create()
     {
-        return create( default_type() );
+        return MeshFactory::create_default_mesh< VertexSet >(
+            VertexSet::kind_name_static() );
     }
 
     std::unique_ptr< VertexSet > VertexSet::create( const MeshType& type )
     {
-        try
-        {
-            return VertexSetFactory::create( type );
-        }
-        catch( const OpenGeodeException& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeException{
-                "Could not create VertexSet data structure: ", type.get()
-            };
-        }
-    }
-
-    MeshType VertexSet::default_type()
-    {
-        return OpenGeodeVertexSet::type_name_static();
+        return MeshFactory::create_mesh< VertexSet >( type );
     }
 
     index_t VertexSet::nb_vertices() const

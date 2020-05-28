@@ -27,7 +27,7 @@
 #include <geode/basic/pimpl.h>
 
 #include <geode/mesh/common.h>
-#include <geode/mesh/core/mesh_type.h>
+#include <geode/mesh/core/mesh_id.h>
 
 namespace geode
 {
@@ -56,7 +56,10 @@ namespace geode
          */
         static std::unique_ptr< VertexSet > create( const MeshType& type );
 
-        static MeshType default_type();
+        static MeshKind kind_name_static()
+        {
+            return MeshKind{ "VertexSet" };
+        }
 
         std::unique_ptr< VertexSet > clone() const;
 
@@ -74,6 +77,8 @@ namespace geode
 
         virtual MeshType type_name() const = 0;
 
+        virtual MeshKind kind_name() const = 0;
+
     protected:
         VertexSet();
         VertexSet( VertexSet&& );
@@ -85,6 +90,4 @@ namespace geode
     private:
         IMPLEMENTATION_MEMBER( impl_ );
     };
-
-    using VertexSetFactory = Factory< MeshType, VertexSet >;
 } // namespace geode

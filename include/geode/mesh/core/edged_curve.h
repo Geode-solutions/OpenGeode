@@ -44,7 +44,10 @@ namespace geode
         static std::unique_ptr< EdgedCurve< dimension > > create(
             const MeshType& type );
 
-        static MeshType default_type();
+        static MeshKind kind_name_static()
+        {
+            return MeshKind{ absl::StrCat( "EdgedCurve", dimension, "D" ) };
+        }
 
         std::unique_ptr< EdgedCurve< dimension > > clone() const;
 
@@ -71,8 +74,4 @@ namespace geode
             index_t vertex_id ) const = 0;
     };
     ALIAS_2D_AND_3D( EdgedCurve );
-
-    template < index_t dimension >
-    using EdgedCurveFactory = Factory< MeshType, EdgedCurve< dimension > >;
-    ALIAS_2D_AND_3D( EdgedCurveFactory );
 } // namespace geode

@@ -26,6 +26,7 @@
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
 
+#include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polyhedral_solid.h>
 
 #include <geode/model/mixin/core/detail/mesh_storage.h>
@@ -52,7 +53,8 @@ namespace geode
 
     template < index_t dimension >
     Block< dimension >::Block()
-        : Block( PolyhedralSolid< dimension >::default_type() )
+        : Block( MeshFactory::default_mesh(
+              PolyhedralSolid< dimension >::kind_name_static() ) )
     {
     }
 

@@ -21,35 +21,44 @@
  *
  */
 
-#pragma once
+#include <geode/basic/logger.h>
 
-#include <string>
+#include <geode/mesh/core/mesh_factory.h>
 
-#include <absl/hash/hash.h>
+#include <geode/tests/common.h>
 
-#include <bitsery/brief_syntax/string.h>
-
-#include <geode/basic/named_type.h>
-
-namespace geode
+class MeshTest : public geode::VertexSet
 {
-    struct MeshTag
-    {
-    };
-    /*!
-     * Strong type for a mesh data structure
-     */
-    using MeshType = NamedType< std::string, MeshTag >;
-} // namespace geode
+public:
+    MeshTest() = default;
 
-namespace std
-{
-    template <>
-    struct hash< geode::MeshType >
+    absl::string_view native_extension() const override
     {
-        std::size_t operator()( const geode::MeshType& f ) const
-        {
-            return absl::Hash< std::string >{}( f.get() );
-        }
-    };
-} // namespace std
+        static auto ext = "ext";
+        return ext;
+    }
+
+    geode::MeshType type_name() const override
+    {
+        return geode::MeshType{ "type" };
+    }
+
+    geode::MeshKind kind_name() const override
+    {
+        return geode::MeshKind{ "kind" };
+    }
+};
+
+void test()
+{
+    geode::MeshType type{ "type" };
+    geode::MeshKind kind{ "kind" };
+    geode::MeshFactory::register_mesh< MeshTest >( kind, type );
+
+    OPENGEODE_EXCEPTION(
+        geode::MeshFactory::kind( type ) == kind, "Wrong kind" );
+
+    geode::MeshFactory::create_mesh< MeshTest >( type );
+}
+
+OPENGEODE_TEST( "mesh-factory" )

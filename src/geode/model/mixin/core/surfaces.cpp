@@ -26,6 +26,7 @@
 #include <geode/basic/pimpl_impl.h>
 #include <geode/basic/range.h>
 
+#include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polygonal_surface.h>
 #include <geode/mesh/core/triangulated_surface.h>
 #include <geode/mesh/io/polygonal_surface_input.h>
@@ -119,8 +120,8 @@ namespace geode
         {
             const auto file =
                 impl_->find_file( directory, surface.component_id() );
-            if( TriangulatedSurfaceFactory< dimension >::has_creator(
-                    surface.mesh_type() ) )
+            if( MeshFactory::kind( surface.mesh_type() )
+                == TriangulatedSurface< dimension >::kind_name_static() )
             {
                 surface.set_mesh( load_triangulated_surface< dimension >(
                                       surface.mesh_type(), file ),
@@ -245,8 +246,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    const Surface< dimension >&
-        Surfaces< dimension >::SurfaceRange::operator*() const
+    const Surface< dimension >& Surfaces< dimension >::SurfaceRange::
+        operator*() const
     {
         return this->impl_->surface();
     }
@@ -260,8 +261,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    Surface< dimension >&
-        Surfaces< dimension >::ModifiableSurfaceRange::operator*() const
+    Surface< dimension >& Surfaces< dimension >::ModifiableSurfaceRange::
+        operator*() const
     {
         return this->impl_->surface();
     }

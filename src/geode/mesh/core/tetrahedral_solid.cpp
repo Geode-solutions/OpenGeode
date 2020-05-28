@@ -24,7 +24,7 @@
 #include <geode/mesh/core/tetrahedral_solid.h>
 
 #include <geode/mesh/builder/tetrahedral_solid_builder.h>
-#include <geode/mesh/core/geode_tetrahedral_solid.h>
+#include <geode/mesh/core/mesh_factory.h>
 
 namespace geode
 {
@@ -32,30 +32,17 @@ namespace geode
     std::unique_ptr< TetrahedralSolid< dimension > >
         TetrahedralSolid< dimension >::create()
     {
-        return create( default_type() );
+        return MeshFactory::create_default_mesh<
+            TetrahedralSolid< dimension > >(
+            TetrahedralSolid< dimension >::kind_name_static() );
     }
 
     template < index_t dimension >
     std::unique_ptr< TetrahedralSolid< dimension > >
         TetrahedralSolid< dimension >::create( const MeshType& type )
     {
-        try
-        {
-            return TetrahedralSolidFactory< dimension >::create( type );
-        }
-        catch( const OpenGeodeException& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeException{
-                "Could not create TetrahedralSolid data structure: ", type.get()
-            };
-        }
-    }
-
-    template < index_t dimension >
-    MeshType TetrahedralSolid< dimension >::default_type()
-    {
-        return OpenGeodeTetrahedralSolid< dimension >::type_name_static();
+        return MeshFactory::create_mesh< TetrahedralSolid< dimension > >(
+            type );
     }
 
     template < index_t dimension >

@@ -23,6 +23,7 @@
 
 #include <geode/mesh/io/point_set_input.h>
 
+#include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/point_set.h>
 
 namespace geode
@@ -53,7 +54,9 @@ namespace geode
         absl::string_view filename )
     {
         return load_point_set< dimension >(
-            PointSet< dimension >::default_type(), filename );
+            MeshFactory::default_mesh(
+                PointSet< dimension >::kind_name_static() ),
+            filename );
     }
 
     template < index_t dimension >

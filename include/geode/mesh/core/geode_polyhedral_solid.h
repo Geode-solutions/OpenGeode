@@ -59,6 +59,11 @@ namespace geode
             return type_name_static();
         }
 
+        MeshKind kind_name() const override
+        {
+            return PolyhedralSolid< dimension >::kind_name_static();
+        }
+
         static absl::string_view native_extension_static()
         {
             static const auto extension =

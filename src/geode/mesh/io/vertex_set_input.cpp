@@ -26,13 +26,16 @@
 #include <fstream>
 
 #include <geode/mesh/core/bitsery_archive.h>
+#include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/vertex_set.h>
 
 namespace geode
 {
     std::unique_ptr< VertexSet > load_vertex_set( absl::string_view filename )
     {
-        return load_vertex_set( VertexSet::default_type(), filename );
+        return load_vertex_set(
+            MeshFactory::default_mesh( VertexSet::kind_name_static() ),
+            filename );
     }
 
     std::unique_ptr< VertexSet > load_vertex_set(

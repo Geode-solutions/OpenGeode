@@ -60,7 +60,10 @@ namespace geode
         static std::unique_ptr< PointSet< dimension > > create(
             const MeshType& type );
 
-        static MeshType default_type();
+        static MeshKind kind_name_static()
+        {
+            return MeshKind{ absl::StrCat( "PointSet", dimension, "D" ) };
+        }
 
         std::unique_ptr< PointSet< dimension > > clone() const;
 
@@ -83,8 +86,4 @@ namespace geode
             index_t vertex_id ) const = 0;
     };
     ALIAS_2D_AND_3D( PointSet );
-
-    template < index_t dimension >
-    using PointSetFactory = Factory< MeshType, PointSet< dimension > >;
-    ALIAS_2D_AND_3D( PointSetFactory );
 } // namespace geode

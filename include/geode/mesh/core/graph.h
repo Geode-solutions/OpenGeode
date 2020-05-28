@@ -102,7 +102,10 @@ namespace geode
          */
         static std::unique_ptr< Graph > create( const MeshType& type );
 
-        static MeshType default_type();
+        static MeshKind kind_name_static()
+        {
+            return MeshKind{ "Graph" };
+        }
 
         std::unique_ptr< Graph > clone() const;
 
@@ -147,6 +150,4 @@ namespace geode
     private:
         IMPLEMENTATION_MEMBER( impl_ );
     };
-
-    using GraphFactory = Factory< MeshType, Graph >;
 } // namespace geode

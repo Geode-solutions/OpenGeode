@@ -23,7 +23,7 @@
 
 #include <geode/mesh/io/polygonal_surface_input.h>
 
-#include <geode/mesh/builder/polygonal_surface_builder.h>
+#include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polygonal_surface.h>
 
 namespace geode
@@ -56,7 +56,9 @@ namespace geode
         absl::string_view filename )
     {
         return load_polygonal_surface< dimension >(
-            PolygonalSurface< dimension >::default_type(), filename );
+            MeshFactory::default_mesh(
+                PolygonalSurface< dimension >::kind_name_static() ),
+            filename );
     }
 
     template < index_t dimension >

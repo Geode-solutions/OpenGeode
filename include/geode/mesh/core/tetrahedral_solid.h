@@ -48,7 +48,11 @@ namespace geode
         static std::unique_ptr< TetrahedralSolid< dimension > > create(
             const MeshType& type );
 
-        static MeshType default_type();
+        static MeshKind kind_name_static()
+        {
+            return MeshKind{ absl::StrCat(
+                "TetrahedralSolid", dimension, "D" ) };
+        }
 
         std::unique_ptr< TetrahedralSolid< dimension > > clone() const;
 
@@ -97,9 +101,4 @@ namespace geode
         }
     };
     ALIAS_3D( TetrahedralSolid );
-
-    template < index_t dimension >
-    using TetrahedralSolidFactory =
-        Factory< MeshType, TetrahedralSolid< dimension > >;
-    ALIAS_3D( TetrahedralSolidFactory );
 } // namespace geode
