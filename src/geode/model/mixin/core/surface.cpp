@@ -65,7 +65,7 @@ namespace geode
     template < index_t dimension >
     Surface< dimension >::Surface()
         : Surface( MeshFactory::default_impl(
-              PolygonalSurface< dimension >::type_name_static() ) )
+            PolygonalSurface< dimension >::type_name_static() ) )
     {
     }
 
