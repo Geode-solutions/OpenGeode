@@ -98,7 +98,7 @@ namespace geode
 
         /*!
          * Create a new Graph using a specified data structure.
-         * @param[in] type Data structure type
+         * @param[in] impl Data structure implementation
          */
         static std::unique_ptr< Graph > create( const MeshImpl& impl );
 

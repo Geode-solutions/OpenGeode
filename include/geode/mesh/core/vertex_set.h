@@ -52,7 +52,7 @@ namespace geode
 
         /*!
          * Create a new VertexSet using a specified data structure.
-         * @param[in] type Data structure type
+         * @param[in] impl Data structure implementation
          */
         static std::unique_ptr< VertexSet > create( const MeshImpl& impl );
 

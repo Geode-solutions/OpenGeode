@@ -45,7 +45,7 @@ namespace geode
 
         /*!
          * Create a new TriangulatedSurface using a specified data structure.
-         * @param[in] type Data structure type
+         * @param[in] impl Data structure implementation
          */
         static std::unique_ptr< TriangulatedSurface< dimension > > create(
             const MeshImpl& impl );

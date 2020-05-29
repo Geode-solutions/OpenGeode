@@ -390,7 +390,7 @@ namespace geode
 
         /*!
          * Create a new PolygonalSurface using a specified data structure.
-         * @param[in] type Data structure type
+         * @param[in] impl Data structure implementation
          */
         static std::unique_ptr< PolygonalSurface< dimension > > create(
             const MeshImpl& impl );

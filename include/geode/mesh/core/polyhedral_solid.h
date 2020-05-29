@@ -202,7 +202,7 @@ namespace geode
 
         /*!
          * Create a new PolyhedralSolid using a specified data structure.
-         * @param[in] type Data structure type.
+         * @param[in] impl Data structure implementation.
          */
         static std::unique_ptr< PolyhedralSolid< dimension > > create(
             const MeshImpl& impl );

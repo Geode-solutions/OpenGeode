@@ -39,7 +39,7 @@ namespace geode
     /*!
      * API function for loading an PointSet.
      * The adequate loader is called depending on the filename extension.
-     * @param[in] type Data structure type.
+     * @param[in] impl Data structure implementation.
      * @param[in] filename Path to the file to load.
      */
     template < index_t dimension >
@@ -49,7 +49,7 @@ namespace geode
     /*!
      * API function for loading an PointSet.
      * The adequate loader is called depending on the filename extension.
-     * Default data structure type is used.
+     * Default data structure implémentation is used.
      * @param[in] filename Path to the file to load.
      */
     template < index_t dimension >
