@@ -246,8 +246,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    const Surface< dimension >& Surfaces< dimension >::SurfaceRange::
-        operator*() const
+    const Surface< dimension >&
+        Surfaces< dimension >::SurfaceRange::operator*() const
     {
         return this->impl_->surface();
     }
@@ -261,8 +261,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    Surface< dimension >& Surfaces< dimension >::ModifiableSurfaceRange::
-        operator*() const
+    Surface< dimension >&
+        Surfaces< dimension >::ModifiableSurfaceRange::operator*() const
     {
         return this->impl_->surface();
     }

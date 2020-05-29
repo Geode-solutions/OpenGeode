@@ -59,7 +59,7 @@ namespace geode
     template < index_t dimension >
     Line< dimension >::Line()
         : Line( MeshFactory::default_impl(
-              EdgedCurve< dimension >::type_name_static() ) )
+            EdgedCurve< dimension >::type_name_static() ) )
     {
     }
 
