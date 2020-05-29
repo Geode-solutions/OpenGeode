@@ -39,8 +39,7 @@
 #include <geode/mesh/builder/polyhedral_solid_builder.h>
 #include <geode/mesh/core/bitsery_archive.h>
 #include <geode/mesh/core/detail/facet_storage.h>
-#include <geode/mesh/core/geode_polyhedral_solid.h>
-#include <geode/mesh/core/tetrahedral_solid.h>
+#include <geode/mesh/core/mesh_factory.h>
 
 namespace
 {
@@ -443,38 +442,15 @@ namespace geode
     std::unique_ptr< PolyhedralSolid< dimension > >
         PolyhedralSolid< dimension >::create()
     {
-        return create( default_type() );
+        return MeshFactory::create_default_mesh< PolyhedralSolid< dimension > >(
+            PolyhedralSolid< dimension >::type_name_static() );
     }
 
     template < index_t dimension >
     std::unique_ptr< PolyhedralSolid< dimension > >
-        PolyhedralSolid< dimension >::create( const MeshType& type )
+        PolyhedralSolid< dimension >::create( const MeshImpl& impl )
     {
-        try
-        {
-            return PolyhedralSolidFactory< dimension >::create( type );
-        }
-        catch( const OpenGeodeException& )
-        {
-            try
-            {
-                return TetrahedralSolid< dimension >::create( type );
-            }
-            catch( const OpenGeodeException& e )
-            {
-                Logger::error( e.what() );
-                throw OpenGeodeException{
-                    "Could not create PolyhedralSolid data structure: ",
-                    type.get()
-                };
-            }
-        }
-    }
-
-    template < index_t dimension >
-    MeshType PolyhedralSolid< dimension >::default_type()
-    {
-        return OpenGeodePolyhedralSolid< dimension >::type_name_static();
+        return MeshFactory::create_mesh< PolyhedralSolid< dimension > >( impl );
     }
 
     template < index_t dimension >
@@ -1104,7 +1080,7 @@ namespace geode
     std::unique_ptr< PolyhedralSolid< dimension > >
         PolyhedralSolid< dimension >::clone() const
     {
-        auto clone = create( this->type_name() );
+        auto clone = create( this->impl_name() );
         auto builder = PolyhedralSolidBuilder< dimension >::create( *clone );
         builder->copy( *this, {} );
         return clone;

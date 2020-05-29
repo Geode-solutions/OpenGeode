@@ -41,9 +41,9 @@ namespace geode
 
     template < index_t dimension >
     const uuid& SurfacesBuilder< dimension >::create_surface(
-        const MeshType& type )
+        const MeshImpl& impl )
     {
-        return surfaces_.create_surface( type );
+        return surfaces_.create_surface( impl );
     }
 
     template < index_t dimension >
@@ -67,18 +67,18 @@ namespace geode
         auto& mesh = surfaces_.modifiable_surface( id ).modifiable_mesh(
             typename Surface< dimension >::SurfacesBuilderKey{} );
         if( TriangulatedSurfaceBuilderFactory< dimension >::has_creator(
-                mesh.type_name() ) )
+                mesh.impl_name() ) )
         {
             return TriangulatedSurfaceBuilder< dimension >::create(
                 dynamic_cast< TriangulatedSurface< dimension >& >( mesh ) );
         }
         if( PolygonalSurfaceBuilderFactory< dimension >::has_creator(
-                mesh.type_name() ) )
+                mesh.impl_name() ) )
         {
             return PolygonalSurfaceBuilder< dimension >::create( mesh );
         }
         throw OpenGeodeException{ "Unknown mesh type: ",
-            mesh.type_name().get() };
+            mesh.impl_name().get() };
     }
 
     template < index_t dimension >

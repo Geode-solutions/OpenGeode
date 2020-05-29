@@ -390,12 +390,16 @@ namespace geode
 
         /*!
          * Create a new PolygonalSurface using a specified data structure.
-         * @param[in] type Data structure type
+         * @param[in] impl Data structure implementation
          */
         static std::unique_ptr< PolygonalSurface< dimension > > create(
-            const MeshType& type );
+            const MeshImpl& impl );
 
-        static MeshType default_type();
+        static MeshType type_name_static()
+        {
+            return MeshType{ absl::StrCat(
+                "PolygonalSurface", dimension, "D" ) };
+        }
 
         std::unique_ptr< PolygonalSurface< dimension > > clone() const;
 
@@ -414,9 +418,12 @@ namespace geode
         static std::unique_ptr< PolygonalSurface< 3 > > create();
 
         static std::unique_ptr< PolygonalSurface< 3 > > create(
-            const MeshType& type );
+            const MeshImpl& impl );
 
-        static MeshType default_type();
+        static MeshType type_name_static()
+        {
+            return MeshType{ absl::StrCat( "PolygonalSurface3D" ) };
+        }
 
         std::unique_ptr< PolygonalSurface< 3 > > clone() const;
 
@@ -434,9 +441,4 @@ namespace geode
         PolygonalSurface() = default;
     };
     ALIAS_2D_AND_3D( PolygonalSurface );
-
-    template < index_t dimension >
-    using PolygonalSurfaceFactory =
-        Factory< MeshType, PolygonalSurface< dimension > >;
-    ALIAS_2D_AND_3D( PolygonalSurfaceFactory );
 } // namespace geode

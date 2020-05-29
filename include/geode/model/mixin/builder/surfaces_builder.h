@@ -25,7 +25,7 @@
 
 #include <memory>
 
-#include <geode/mesh/core/mesh_type.h>
+#include <geode/mesh/core/mesh_id.h>
 
 #include <geode/model/common.h>
 
@@ -64,7 +64,7 @@ namespace geode
 
         const uuid& create_surface();
 
-        const uuid& create_surface( const MeshType& type );
+        const uuid& create_surface( const MeshImpl& impl );
 
         void delete_surface( const Surface< dimension >& surface );
 

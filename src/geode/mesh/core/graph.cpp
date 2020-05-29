@@ -35,7 +35,7 @@
 
 #include <geode/mesh/builder/graph_builder.h>
 #include <geode/mesh/core/bitsery_archive.h>
-#include <geode/mesh/core/geode_graph.h>
+#include <geode/mesh/core/mesh_factory.h>
 
 namespace geode
 {
@@ -163,26 +163,13 @@ namespace geode
 
     std::unique_ptr< Graph > Graph::create()
     {
-        return create( default_type() );
+        return MeshFactory::create_default_mesh< Graph >(
+            Graph::type_name_static() );
     }
 
-    std::unique_ptr< Graph > Graph::create( const MeshType& type )
+    std::unique_ptr< Graph > Graph::create( const MeshImpl& impl )
     {
-        try
-        {
-            return GraphFactory::create( type );
-        }
-        catch( const OpenGeodeException& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeException{ "Could not create Graph data structure: ",
-                type.get() };
-        }
-    }
-
-    MeshType Graph::default_type()
-    {
-        return OpenGeodeGraph::type_name_static();
+        return MeshFactory::create_mesh< Graph >( impl );
     }
 
     index_t Graph::edge_vertex( const EdgeVertex& edge_vertex ) const
@@ -239,7 +226,7 @@ namespace geode
 
     std::unique_ptr< Graph > Graph::clone() const
     {
-        auto clone = create( type_name() );
+        auto clone = create( impl_name() );
         auto builder = GraphBuilder::create( *clone );
         builder->copy( *this, {} );
         return clone;

@@ -25,7 +25,7 @@
 
 #include <geode/basic/pimpl.h>
 
-#include <geode/mesh/core/mesh_type.h>
+#include <geode/mesh/core/mesh_id.h>
 
 #include <geode/model/common.h>
 
@@ -119,7 +119,7 @@ namespace geode
     private:
         const uuid& create_block();
 
-        const uuid& create_block( const MeshType& type );
+        const uuid& create_block( const MeshImpl& impl );
 
         void delete_block( const Block< dimension >& block );
 

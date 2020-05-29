@@ -93,7 +93,7 @@ namespace geode
     ALIAS_2D_AND_3D( PointSetBuilder );
 
     template < index_t dimension >
-    using PointSetBuilderFactory = Factory< MeshType,
+    using PointSetBuilderFactory = Factory< MeshImpl,
         PointSetBuilder< dimension >,
         PointSet< dimension >& >;
     ALIAS_2D_AND_3D( PointSetBuilderFactory );

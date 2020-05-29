@@ -170,7 +170,7 @@ namespace geode
         try
         {
             return PolyhedralSolidBuilderFactory< dimension >::create(
-                mesh.type_name(), mesh );
+                mesh.impl_name(), mesh );
         }
         catch( const OpenGeodeException& )
         {
@@ -190,7 +190,7 @@ namespace geode
                 Logger::error( e.what() );
                 throw OpenGeodeException{ "Could not create PolyhedralSolid "
                                           "builder of data structure: ",
-                    mesh.type_name().get() };
+                    mesh.impl_name().get() };
             }
         }
     }

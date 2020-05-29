@@ -151,9 +151,9 @@ namespace geode
         return id;
     }
 
-    const uuid& BRepBuilder::add_corner( const MeshType& type )
+    const uuid& BRepBuilder::add_corner( const MeshImpl& impl )
     {
-        const auto& id = create_corner( type );
+        const auto& id = create_corner( impl );
         register_new_component( *this, brep_.corner( id ) );
         return id;
     }
@@ -165,9 +165,9 @@ namespace geode
         return id;
     }
 
-    const uuid& BRepBuilder::add_line( const MeshType& type )
+    const uuid& BRepBuilder::add_line( const MeshImpl& impl )
     {
-        const auto& id = create_line( type );
+        const auto& id = create_line( impl );
         register_new_component( *this, brep_.line( id ) );
         return id;
     }
@@ -179,9 +179,9 @@ namespace geode
         return id;
     }
 
-    const uuid& BRepBuilder::add_surface( const MeshType& type )
+    const uuid& BRepBuilder::add_surface( const MeshImpl& impl )
     {
-        const auto& id = create_surface( type );
+        const auto& id = create_surface( impl );
         register_new_component( *this, brep_.surface( id ) );
         return id;
     }
@@ -193,9 +193,9 @@ namespace geode
         return id;
     }
 
-    const uuid& BRepBuilder::add_block( const MeshType& type )
+    const uuid& BRepBuilder::add_block( const MeshImpl& impl )
     {
-        const auto& id = create_block( type );
+        const auto& id = create_block( impl );
         register_new_component( *this, brep_.block( id ) );
         return id;
     }

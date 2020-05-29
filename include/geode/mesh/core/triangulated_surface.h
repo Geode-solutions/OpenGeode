@@ -45,12 +45,16 @@ namespace geode
 
         /*!
          * Create a new TriangulatedSurface using a specified data structure.
-         * @param[in] type Data structure type
+         * @param[in] impl Data structure implementation
          */
         static std::unique_ptr< TriangulatedSurface< dimension > > create(
-            const MeshType& type );
+            const MeshImpl& impl );
 
-        static MeshType default_type();
+        static MeshType type_name_static()
+        {
+            return MeshType{ absl::StrCat(
+                "TriangulatedSurface", dimension, "D" ) };
+        }
 
         std::unique_ptr< TriangulatedSurface< dimension > > clone() const;
 
@@ -78,9 +82,4 @@ namespace geode
         }
     };
     ALIAS_2D_AND_3D( TriangulatedSurface );
-
-    template < index_t dimension >
-    using TriangulatedSurfaceFactory =
-        Factory< MeshType, TriangulatedSurface< dimension > >;
-    ALIAS_2D_AND_3D( TriangulatedSurfaceFactory );
 } // namespace geode

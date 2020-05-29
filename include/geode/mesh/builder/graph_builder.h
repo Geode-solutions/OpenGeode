@@ -131,5 +131,5 @@ namespace geode
         Graph& graph_;
     };
 
-    using GraphBuilderFactory = Factory< MeshType, GraphBuilder, Graph& >;
+    using GraphBuilderFactory = Factory< MeshImpl, GraphBuilder, Graph& >;
 } // namespace geode

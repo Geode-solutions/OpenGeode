@@ -27,7 +27,7 @@
 #include <geode/basic/pimpl.h>
 
 #include <geode/mesh/common.h>
-#include <geode/mesh/core/mesh_type.h>
+#include <geode/mesh/core/mesh_id.h>
 
 namespace geode
 {
@@ -52,11 +52,14 @@ namespace geode
 
         /*!
          * Create a new VertexSet using a specified data structure.
-         * @param[in] type Data structure type
+         * @param[in] impl Data structure implementation
          */
-        static std::unique_ptr< VertexSet > create( const MeshType& type );
+        static std::unique_ptr< VertexSet > create( const MeshImpl& impl );
 
-        static MeshType default_type();
+        static MeshType type_name_static()
+        {
+            return MeshType{ "VertexSet" };
+        }
 
         std::unique_ptr< VertexSet > clone() const;
 
@@ -72,6 +75,8 @@ namespace geode
          */
         AttributeManager& vertex_attribute_manager() const;
 
+        virtual MeshImpl impl_name() const = 0;
+
         virtual MeshType type_name() const = 0;
 
     protected:
@@ -85,6 +90,4 @@ namespace geode
     private:
         IMPLEMENTATION_MEMBER( impl_ );
     };
-
-    using VertexSetFactory = Factory< MeshType, VertexSet >;
 } // namespace geode

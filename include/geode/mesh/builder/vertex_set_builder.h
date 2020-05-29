@@ -28,7 +28,7 @@
 #include <geode/basic/factory.h>
 
 #include <geode/mesh/common.h>
-#include <geode/mesh/core/mesh_type.h>
+#include <geode/mesh/core/mesh_id.h>
 
 namespace geode
 {
@@ -96,5 +96,5 @@ namespace geode
     };
 
     using VertexSetBuilderFactory =
-        Factory< MeshType, VertexSetBuilder, VertexSet& >;
+        Factory< MeshImpl, VertexSetBuilder, VertexSet& >;
 } // namespace geode

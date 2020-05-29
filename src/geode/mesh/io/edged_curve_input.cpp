@@ -24,16 +24,17 @@
 #include <geode/mesh/io/edged_curve_input.h>
 
 #include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/core/mesh_factory.h>
 
 namespace geode
 {
     template < index_t dimension >
     std::unique_ptr< EdgedCurve< dimension > > load_edged_curve(
-        const MeshType& type, absl::string_view filename )
+        const MeshImpl& impl, absl::string_view filename )
     {
         try
         {
-            auto edged_curve = EdgedCurve< dimension >::create( type );
+            auto edged_curve = EdgedCurve< dimension >::create( impl );
             auto input = EdgedCurveInputFactory< dimension >::create(
                 extension_from_filename( filename ).data(), *edged_curve,
                 filename );
@@ -53,7 +54,9 @@ namespace geode
         absl::string_view filename )
     {
         return load_edged_curve< dimension >(
-            EdgedCurve< dimension >::default_type(), filename );
+            MeshFactory::default_impl(
+                EdgedCurve< dimension >::type_name_static() ),
+            filename );
     }
 
     template < index_t dimension >
@@ -64,9 +67,9 @@ namespace geode
     }
 
     template std::unique_ptr< EdgedCurve< 2 > > opengeode_mesh_api
-        load_edged_curve( const MeshType&, absl::string_view );
+        load_edged_curve( const MeshImpl&, absl::string_view );
     template std::unique_ptr< EdgedCurve< 3 > > opengeode_mesh_api
-        load_edged_curve( const MeshType&, absl::string_view );
+        load_edged_curve( const MeshImpl&, absl::string_view );
 
     template std::unique_ptr< EdgedCurve< 2 > >
         opengeode_mesh_api load_edged_curve( absl::string_view );

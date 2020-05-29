@@ -45,45 +45,45 @@ namespace geode
     void register_geode_builder()
     {
         VertexSetBuilderFactory::register_creator< OpenGeodeVertexSetBuilder >(
-            OpenGeodeVertexSet::type_name_static() );
+            OpenGeodeVertexSet::impl_name_static() );
 
         GraphBuilderFactory::register_creator< OpenGeodeGraphBuilder >(
-            OpenGeodeGraph::type_name_static() );
+            OpenGeodeGraph::impl_name_static() );
 
         PointSetBuilderFactory2D::register_creator<
             OpenGeodePointSetBuilder2D >(
-            OpenGeodePointSet2D::type_name_static() );
+            OpenGeodePointSet2D::impl_name_static() );
         PointSetBuilderFactory3D::register_creator<
             OpenGeodePointSetBuilder3D >(
-            OpenGeodePointSet3D::type_name_static() );
+            OpenGeodePointSet3D::impl_name_static() );
 
         EdgedCurveBuilderFactory2D::register_creator<
             OpenGeodeEdgedCurveBuilder2D >(
-            OpenGeodeEdgedCurve2D::type_name_static() );
+            OpenGeodeEdgedCurve2D::impl_name_static() );
         EdgedCurveBuilderFactory3D::register_creator<
             OpenGeodeEdgedCurveBuilder3D >(
-            OpenGeodeEdgedCurve3D::type_name_static() );
+            OpenGeodeEdgedCurve3D::impl_name_static() );
 
         PolygonalSurfaceBuilderFactory2D::register_creator<
             OpenGeodePolygonalSurfaceBuilder2D >(
-            OpenGeodePolygonalSurface2D::type_name_static() );
+            OpenGeodePolygonalSurface2D::impl_name_static() );
         PolygonalSurfaceBuilderFactory3D::register_creator<
             OpenGeodePolygonalSurfaceBuilder3D >(
-            OpenGeodePolygonalSurface3D::type_name_static() );
+            OpenGeodePolygonalSurface3D::impl_name_static() );
 
         TriangulatedSurfaceBuilderFactory2D::register_creator<
             OpenGeodeTriangulatedSurfaceBuilder2D >(
-            OpenGeodeTriangulatedSurface2D::type_name_static() );
+            OpenGeodeTriangulatedSurface2D::impl_name_static() );
         TriangulatedSurfaceBuilderFactory3D::register_creator<
             OpenGeodeTriangulatedSurfaceBuilder3D >(
-            OpenGeodeTriangulatedSurface3D::type_name_static() );
+            OpenGeodeTriangulatedSurface3D::impl_name_static() );
 
         PolyhedralSolidBuilderFactory3D::register_creator<
             OpenGeodePolyhedralSolidBuilder3D >(
-            OpenGeodePolyhedralSolid3D::type_name_static() );
+            OpenGeodePolyhedralSolid3D::impl_name_static() );
 
         TetrahedralSolidBuilderFactory3D::register_creator<
             OpenGeodeTetrahedralSolidBuilder3D >(
-            OpenGeodeTetrahedralSolid3D::type_name_static() );
+            OpenGeodeTetrahedralSolid3D::impl_name_static() );
     }
 } // namespace geode

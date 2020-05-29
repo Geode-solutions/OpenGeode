@@ -26,7 +26,7 @@
 #include <geode/basic/mapping.h>
 
 #include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/core/mesh_type.h>
+#include <geode/mesh/core/mesh_id.h>
 #include <geode/mesh/core/point_set.h>
 #include <geode/mesh/core/polygonal_surface.h>
 
@@ -92,15 +92,15 @@ namespace geode
 
         const uuid& add_corner();
 
-        const uuid& add_corner( const MeshType& type );
+        const uuid& add_corner( const MeshImpl& impl );
 
         const uuid& add_line();
 
-        const uuid& add_line( const MeshType& type );
+        const uuid& add_line( const MeshImpl& impl );
 
         const uuid& add_surface();
 
-        const uuid& add_surface( const MeshType& type );
+        const uuid& add_surface( const MeshImpl& impl );
 
         const uuid& add_model_boundary();
 

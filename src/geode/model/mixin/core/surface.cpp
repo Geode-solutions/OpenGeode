@@ -26,6 +26,7 @@
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
 
+#include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polygonal_surface.h>
 
 #include <geode/model/mixin/core/detail/mesh_storage.h>
@@ -63,14 +64,15 @@ namespace geode
 
     template < index_t dimension >
     Surface< dimension >::Surface()
-        : Surface( PolygonalSurface< dimension >::default_type() )
+        : Surface( MeshFactory::default_impl(
+            PolygonalSurface< dimension >::type_name_static() ) )
     {
     }
 
     template < index_t dimension >
-    Surface< dimension >::Surface( const MeshType& type )
+    Surface< dimension >::Surface( const MeshImpl& impl )
     {
-        impl_->set_mesh( PolygonalSurface< dimension >::create( type ) );
+        impl_->set_mesh( PolygonalSurface< dimension >::create( impl ) );
     }
 
     template < index_t dimension >
@@ -86,7 +88,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    const MeshType& Surface< dimension >::mesh_type() const
+    const MeshImpl& Surface< dimension >::mesh_type() const
     {
         return impl_->mesh_type();
     }

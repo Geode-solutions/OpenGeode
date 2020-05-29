@@ -46,6 +46,12 @@ add_geode_test(
         ${PROJECT_NAME}::mesh
 )
 add_geode_test(
+    SOURCE "test-mesh-factory.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
     SOURCE "test-point-set.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic

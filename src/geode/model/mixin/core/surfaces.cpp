@@ -26,6 +26,7 @@
 #include <geode/basic/pimpl_impl.h>
 #include <geode/basic/range.h>
 
+#include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polygonal_surface.h>
 #include <geode/mesh/core/triangulated_surface.h>
 #include <geode/mesh/io/polygonal_surface_input.h>
@@ -119,8 +120,8 @@ namespace geode
         {
             const auto file =
                 impl_->find_file( directory, surface.component_id() );
-            if( TriangulatedSurfaceFactory< dimension >::has_creator(
-                    surface.mesh_type() ) )
+            if( MeshFactory::type( surface.mesh_type() )
+                == TriangulatedSurface< dimension >::type_name_static() )
             {
                 surface.set_mesh( load_triangulated_surface< dimension >(
                                       surface.mesh_type(), file ),
@@ -162,11 +163,11 @@ namespace geode
     }
 
     template < index_t dimension >
-    const uuid& Surfaces< dimension >::create_surface( const MeshType& type )
+    const uuid& Surfaces< dimension >::create_surface( const MeshImpl& impl )
     {
         typename Surfaces< dimension >::Impl::ComponentPtr surface{
             new Surface< dimension >{
-                type, typename Surface< dimension >::SurfacesKey{} }
+                impl, typename Surface< dimension >::SurfacesKey{} }
         };
         const auto& id = surface->id();
         impl_->add_component( std::move( surface ) );

@@ -26,7 +26,7 @@
 #include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
-#include <geode/mesh/core/mesh_type.h>
+#include <geode/mesh/core/mesh_id.h>
 
 #include <geode/model/common.h>
 #include <geode/model/mixin/core/component.h>
@@ -75,14 +75,14 @@ namespace geode
 
         Surface( SurfacesKey ) : Surface() {}
 
-        Surface( const MeshType& type, SurfacesKey ) : Surface( type ){};
+        Surface( const MeshImpl& impl, SurfacesKey ) : Surface( impl ){};
 
         PolygonalSurface< dimension >& modifiable_mesh( SurfacesKey )
         {
             return modifiable_mesh();
         }
 
-        const MeshType& mesh_type() const;
+        const MeshImpl& mesh_type() const;
 
         void set_mesh( std::unique_ptr< PolygonalSurface< dimension > > mesh,
             SurfacesKey );
@@ -103,7 +103,7 @@ namespace geode
     private:
         Surface();
 
-        explicit Surface( const MeshType& type );
+        explicit Surface( const MeshImpl& impl );
 
         PolygonalSurface< dimension >& modifiable_mesh();
 

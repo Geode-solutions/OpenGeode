@@ -220,7 +220,7 @@ namespace geode
     ALIAS_2D_AND_3D( PolygonalSurfaceBuilder );
 
     template < index_t dimension >
-    using PolygonalSurfaceBuilderFactory = Factory< MeshType,
+    using PolygonalSurfaceBuilderFactory = Factory< MeshImpl,
         PolygonalSurfaceBuilder< dimension >,
         PolygonalSurface< dimension >& >;
     ALIAS_2D_AND_3D( PolygonalSurfaceBuilderFactory );

@@ -107,7 +107,7 @@ namespace geode
     ALIAS_2D_AND_3D( TriangulatedSurfaceBuilder );
 
     template < index_t dimension >
-    using TriangulatedSurfaceBuilderFactory = Factory< MeshType,
+    using TriangulatedSurfaceBuilderFactory = Factory< MeshImpl,
         TriangulatedSurfaceBuilder< dimension >,
         TriangulatedSurface< dimension >& >;
     ALIAS_2D_AND_3D( TriangulatedSurfaceBuilderFactory );
