@@ -119,10 +119,10 @@ namespace geode
     public:
         explicit Impl( PolygonalSurfaceBase& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) )
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
@@ -740,22 +740,22 @@ namespace geode
     {
         return MeshFactory::create_default_mesh<
             PolygonalSurface< dimension > >(
-            PolygonalSurface< dimension >::kind_name_static() );
+            PolygonalSurface< dimension >::type_name_static() );
     }
 
     template < index_t dimension >
     std::unique_ptr< PolygonalSurface< dimension > >
-        PolygonalSurface< dimension >::create( const MeshType& type )
+        PolygonalSurface< dimension >::create( const MeshImpl& impl )
     {
         return MeshFactory::create_mesh< PolygonalSurface< dimension > >(
-            type );
+            impl );
     }
 
     template < index_t dimension >
     std::unique_ptr< PolygonalSurface< dimension > >
         PolygonalSurface< dimension >::clone() const
     {
-        auto clone = create( this->type_name() );
+        auto clone = create( this->impl_name() );
         auto builder = PolygonalSurfaceBuilder< dimension >::create( *clone );
         builder->copy( *this, {} );
         return clone;
@@ -764,19 +764,19 @@ namespace geode
     std::unique_ptr< PolygonalSurface< 3 > > PolygonalSurface< 3 >::create()
     {
         return MeshFactory::create_default_mesh< PolygonalSurface< 3 > >(
-            PolygonalSurface< 3 >::kind_name_static() );
+            PolygonalSurface< 3 >::type_name_static() );
     }
 
     std::unique_ptr< PolygonalSurface< 3 > > PolygonalSurface< 3 >::create(
-        const MeshType& type )
+        const MeshImpl& impl )
     {
-        return MeshFactory::create_mesh< PolygonalSurface< 3 > >( type );
+        return MeshFactory::create_mesh< PolygonalSurface< 3 > >( impl );
     }
 
     std::unique_ptr< PolygonalSurface< 3 > >
         PolygonalSurface< 3 >::clone() const
     {
-        auto clone = create( type_name() );
+        auto clone = create( impl_name() );
         auto builder = PolygonalSurfaceBuilder< 3 >::create( *clone );
         builder->copy( *this, {} );
         return clone;

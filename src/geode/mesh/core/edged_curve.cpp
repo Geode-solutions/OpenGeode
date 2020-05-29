@@ -37,14 +37,14 @@ namespace geode
     std::unique_ptr< EdgedCurve< dimension > > EdgedCurve< dimension >::create()
     {
         return MeshFactory::create_default_mesh< EdgedCurve< dimension > >(
-            EdgedCurve< dimension >::kind_name_static() );
+            EdgedCurve< dimension >::type_name_static() );
     }
 
     template < index_t dimension >
     std::unique_ptr< EdgedCurve< dimension > > EdgedCurve< dimension >::create(
-        const MeshType& type )
+        const MeshImpl& impl )
     {
-        return MeshFactory::create_mesh< EdgedCurve< dimension > >( type );
+        return MeshFactory::create_mesh< EdgedCurve< dimension > >( impl );
     }
 
     template < index_t dimension >
@@ -87,7 +87,7 @@ namespace geode
     std::unique_ptr< EdgedCurve< dimension > >
         EdgedCurve< dimension >::clone() const
     {
-        auto clone = create( type_name() );
+        auto clone = create( impl_name() );
         auto builder = EdgedCurveBuilder< dimension >::create( *clone );
         builder->copy( *this, {} );
         return clone;

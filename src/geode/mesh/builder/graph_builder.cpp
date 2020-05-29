@@ -71,14 +71,14 @@ namespace geode
     {
         try
         {
-            return GraphBuilderFactory::create( mesh.type_name(), mesh );
+            return GraphBuilderFactory::create( mesh.impl_name(), mesh );
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
             throw OpenGeodeException{
                 "Could not create Graph builder of data structure: ",
-                mesh.type_name().get()
+                mesh.impl_name().get()
             };
         }
     }

@@ -46,11 +46,11 @@ namespace geode
          * @param[in] type Data structure type
          */
         static std::unique_ptr< TetrahedralSolid< dimension > > create(
-            const MeshType& type );
+            const MeshImpl& impl );
 
-        static MeshKind kind_name_static()
+        static MeshType type_name_static()
         {
-            return MeshKind{ absl::StrCat(
+            return MeshType{ absl::StrCat(
                 "TetrahedralSolid", dimension, "D" ) };
         }
 

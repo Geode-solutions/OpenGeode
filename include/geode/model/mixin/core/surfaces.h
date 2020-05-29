@@ -103,7 +103,7 @@ namespace geode
     private:
         const uuid& create_surface();
 
-        const uuid& create_surface( const MeshType& type );
+        const uuid& create_surface( const MeshImpl& impl );
 
         void delete_surface( const Surface< dimension >& surface );
 

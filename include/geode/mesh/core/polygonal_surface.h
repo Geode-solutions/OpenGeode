@@ -393,11 +393,11 @@ namespace geode
          * @param[in] type Data structure type
          */
         static std::unique_ptr< PolygonalSurface< dimension > > create(
-            const MeshType& type );
+            const MeshImpl& impl );
 
-        static MeshKind kind_name_static()
+        static MeshType type_name_static()
         {
-            return MeshKind{ absl::StrCat(
+            return MeshType{ absl::StrCat(
                 "PolygonalSurface", dimension, "D" ) };
         }
 
@@ -418,11 +418,11 @@ namespace geode
         static std::unique_ptr< PolygonalSurface< 3 > > create();
 
         static std::unique_ptr< PolygonalSurface< 3 > > create(
-            const MeshType& type );
+            const MeshImpl& impl );
 
-        static MeshKind kind_name_static()
+        static MeshType type_name_static()
         {
-            return MeshKind{ absl::StrCat( "PolygonalSurface3D" ) };
+            return MeshType{ absl::StrCat( "PolygonalSurface3D" ) };
         }
 
         std::unique_ptr< PolygonalSurface< 3 > > clone() const;

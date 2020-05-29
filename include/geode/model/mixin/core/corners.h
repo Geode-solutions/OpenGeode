@@ -118,7 +118,7 @@ namespace geode
     private:
         const uuid& create_corner();
 
-        const uuid& create_corner( const MeshType& type );
+        const uuid& create_corner( const MeshImpl& impl );
 
         void delete_corner( const Corner< dimension >& corner );
 

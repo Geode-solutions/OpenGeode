@@ -30,11 +30,11 @@ namespace geode
 {
     template < index_t dimension >
     std::unique_ptr< PointSet< dimension > > load_point_set(
-        const MeshType& type, absl::string_view filename )
+        const MeshImpl& impl, absl::string_view filename )
     {
         try
         {
-            auto point_set = PointSet< dimension >::create( type );
+            auto point_set = PointSet< dimension >::create( impl );
             auto input = PointSetInputFactory< dimension >::create(
                 extension_from_filename( filename ).data(), *point_set,
                 filename );
@@ -54,8 +54,8 @@ namespace geode
         absl::string_view filename )
     {
         return load_point_set< dimension >(
-            MeshFactory::default_mesh(
-                PointSet< dimension >::kind_name_static() ),
+            MeshFactory::default_impl(
+                PointSet< dimension >::type_name_static() ),
             filename );
     }
 
@@ -67,9 +67,9 @@ namespace geode
     }
 
     template std::unique_ptr< PointSet< 2 > > opengeode_mesh_api load_point_set(
-        const MeshType&, absl::string_view );
+        const MeshImpl&, absl::string_view );
     template std::unique_ptr< PointSet< 3 > > opengeode_mesh_api load_point_set(
-        const MeshType&, absl::string_view );
+        const MeshImpl&, absl::string_view );
 
     template std::unique_ptr< PointSet< 2 > > opengeode_mesh_api load_point_set(
         absl::string_view );

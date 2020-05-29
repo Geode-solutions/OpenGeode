@@ -248,7 +248,7 @@ namespace geode
     ALIAS_3D( PolyhedralSolidBuilder );
 
     template < index_t dimension >
-    using PolyhedralSolidBuilderFactory = Factory< MeshType,
+    using PolyhedralSolidBuilderFactory = Factory< MeshImpl,
         PolyhedralSolidBuilder< dimension >,
         PolyhedralSolid< dimension >& >;
     ALIAS_3D( PolyhedralSolidBuilderFactory );

@@ -53,8 +53,8 @@ namespace geode
 
     template < index_t dimension >
     Block< dimension >::Block()
-        : Block( MeshFactory::default_mesh(
-            PolyhedralSolid< dimension >::kind_name_static() ) )
+        : Block( MeshFactory::default_impl(
+              PolyhedralSolid< dimension >::type_name_static() ) )
     {
     }
 
@@ -65,9 +65,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    Block< dimension >::Block( const MeshType& type )
+    Block< dimension >::Block( const MeshImpl& impl )
     {
-        impl_->set_mesh( PolyhedralSolid< dimension >::create( type ) );
+        impl_->set_mesh( PolyhedralSolid< dimension >::create( impl ) );
     }
 
     template < index_t dimension >
@@ -88,7 +88,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    const MeshType& Block< dimension >::mesh_type() const
+    const MeshImpl& Block< dimension >::mesh_type() const
     {
         return impl_->mesh_type();
     }

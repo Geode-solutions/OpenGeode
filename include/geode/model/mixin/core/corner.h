@@ -78,11 +78,11 @@ namespace geode
             return modifiable_mesh();
         }
 
-        const MeshType& mesh_type() const;
+        const MeshImpl& mesh_type() const;
 
         Corner( CornersKey ) : Corner() {}
 
-        Corner( const MeshType& type, CornersKey ) : Corner( type ) {}
+        Corner( const MeshImpl& impl, CornersKey ) : Corner( impl ) {}
 
         void set_mesh(
             std::unique_ptr< PointSet< dimension > > mesh, CornersKey );
@@ -103,7 +103,7 @@ namespace geode
     private:
         Corner();
 
-        explicit Corner( const MeshType& type );
+        explicit Corner( const MeshImpl& impl );
 
         PointSet< dimension >& modifiable_mesh();
 

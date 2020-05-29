@@ -34,14 +34,14 @@ namespace geode
     {
         try
         {
-            return VertexSetBuilderFactory::create( mesh.type_name(), mesh );
+            return VertexSetBuilderFactory::create( mesh.impl_name(), mesh );
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
             throw OpenGeodeException{
                 "Could not create VertexSet builder of data structure: ",
-                mesh.type_name().get()
+                mesh.impl_name().get()
             };
         }
     }

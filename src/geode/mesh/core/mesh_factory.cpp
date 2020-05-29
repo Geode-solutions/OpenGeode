@@ -30,29 +30,29 @@ namespace geode
     class MeshFactory::Impl
     {
     public:
-        void register_kind( MeshKind kind, MeshType key )
+        void register_type( MeshType type, MeshImpl key )
         {
-            kinds_.emplace( std::move( key ), std::move( kind ) );
+            types_.emplace( std::move( key ), std::move( type ) );
         }
 
-        void register_default( MeshKind kind, MeshType key )
+        void register_default( MeshType type, MeshImpl key )
         {
-            defaults_.emplace( std::move( kind ), std::move( key ) );
+            defaults_.emplace( std::move( type ), std::move( key ) );
         }
 
-        const MeshKind& kind( const MeshType& key ) const
+        const MeshType& type( const MeshImpl& key ) const
         {
-            return kinds_.at( key );
+            return types_.at( key );
         }
 
-        const MeshType& default_mesh( const MeshKind& kind ) const
+        const MeshImpl& default_impl( const MeshType& type ) const
         {
-            return defaults_.at( kind );
+            return defaults_.at( type );
         }
 
     private:
-        absl::flat_hash_map< MeshType, MeshKind > kinds_;
-        absl::flat_hash_map< MeshKind, MeshType > defaults_;
+        absl::flat_hash_map< MeshImpl, MeshType > types_;
+        absl::flat_hash_map< MeshType, MeshImpl > defaults_;
     };
 
     MeshFactory::MeshFactory() {}
@@ -65,25 +65,25 @@ namespace geode
         return mesh_factory;
     }
 
-    void MeshFactory::register_kind( MeshKind kind, MeshType key )
+    void MeshFactory::register_type( MeshType type, MeshImpl key )
     {
-        instance().impl_->register_kind( std::move( kind ), std::move( key ) );
+        instance().impl_->register_type( std::move( type ), std::move( key ) );
     }
 
-    const MeshKind& MeshFactory::kind( const MeshType& key )
+    const MeshType& MeshFactory::type( const MeshImpl& key )
     {
-        return instance().impl_->kind( key );
+        return instance().impl_->type( key );
     }
 
-    const MeshType& MeshFactory::default_mesh( const MeshKind& kind )
+    const MeshImpl& MeshFactory::default_impl( const MeshType& type )
     {
-        return instance().impl_->default_mesh( kind );
+        return instance().impl_->default_impl( type );
     }
 
-    void MeshFactory::register_default( MeshKind kind, MeshType key )
+    void MeshFactory::register_default( MeshType type, MeshImpl key )
     {
         instance().impl_->register_default(
-            std::move( kind ), std::move( key ) );
+            std::move( type ), std::move( key ) );
     }
 
 } // namespace geode

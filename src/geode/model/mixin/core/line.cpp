@@ -58,8 +58,8 @@ namespace geode
 
     template < index_t dimension >
     Line< dimension >::Line()
-        : Line( MeshFactory::default_mesh(
-            EdgedCurve< dimension >::kind_name_static() ) )
+        : Line( MeshFactory::default_impl(
+              EdgedCurve< dimension >::type_name_static() ) )
     {
     }
 
@@ -69,9 +69,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    Line< dimension >::Line( const MeshType& type )
+    Line< dimension >::Line( const MeshImpl& impl )
     {
-        impl_->set_mesh( EdgedCurve< dimension >::create( type ) );
+        impl_->set_mesh( EdgedCurve< dimension >::create( impl ) );
     }
 
     template < index_t dimension >
@@ -87,7 +87,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    const MeshType& Line< dimension >::mesh_type() const
+    const MeshImpl& Line< dimension >::mesh_type() const
     {
         return impl_->mesh_type();
     }

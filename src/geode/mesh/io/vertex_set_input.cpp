@@ -34,16 +34,16 @@ namespace geode
     std::unique_ptr< VertexSet > load_vertex_set( absl::string_view filename )
     {
         return load_vertex_set(
-            MeshFactory::default_mesh( VertexSet::kind_name_static() ),
+            MeshFactory::default_impl( VertexSet::type_name_static() ),
             filename );
     }
 
     std::unique_ptr< VertexSet > load_vertex_set(
-        const MeshType& type, absl::string_view filename )
+        const MeshImpl& impl, absl::string_view filename )
     {
         try
         {
-            auto vertex_set = VertexSet::create( type );
+            auto vertex_set = VertexSet::create( impl );
             auto input = VertexSetInputFactory::create(
                 extension_from_filename( filename ).data(), *vertex_set,
                 filename );

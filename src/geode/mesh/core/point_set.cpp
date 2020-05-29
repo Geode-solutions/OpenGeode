@@ -38,14 +38,14 @@ namespace geode
     std::unique_ptr< PointSet< dimension > > PointSet< dimension >::create()
     {
         return MeshFactory::create_default_mesh< PointSet< dimension > >(
-            PointSet< dimension >::kind_name_static() );
+            PointSet< dimension >::type_name_static() );
     }
 
     template < index_t dimension >
     std::unique_ptr< PointSet< dimension > > PointSet< dimension >::create(
-        const MeshType& type )
+        const MeshImpl& impl )
     {
-        return MeshFactory::create_mesh< PointSet< dimension > >( type );
+        return MeshFactory::create_mesh< PointSet< dimension > >( impl );
     }
 
     template < index_t dimension >
@@ -72,7 +72,7 @@ namespace geode
     std::unique_ptr< PointSet< dimension > >
         PointSet< dimension >::clone() const
     {
-        auto clone = create( type_name() );
+        auto clone = create( impl_name() );
         auto builder = PointSetBuilder< dimension >::create( *clone );
         builder->copy( *this, {} );
         return clone;

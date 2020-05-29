@@ -34,12 +34,12 @@ namespace geode
     {
         return MeshFactory::create_default_mesh<
             TriangulatedSurface< dimension > >(
-            TriangulatedSurface< dimension >::kind_name_static() );
+            TriangulatedSurface< dimension >::type_name_static() );
     }
 
     template < index_t dimension >
     std::unique_ptr< TriangulatedSurface< dimension > >
-        TriangulatedSurface< dimension >::create( const MeshType &type )
+        TriangulatedSurface< dimension >::create( const MeshImpl &type )
     {
         return MeshFactory::create_mesh< TriangulatedSurface< dimension > >(
             type );
@@ -49,7 +49,7 @@ namespace geode
     std::unique_ptr< TriangulatedSurface< dimension > >
         TriangulatedSurface< dimension >::clone() const
     {
-        auto clone = create( this->type_name() );
+        auto clone = create( this->impl_name() );
         auto builder =
             TriangulatedSurfaceBuilder< dimension >::create( *clone );
         builder->copy( *this, {} );

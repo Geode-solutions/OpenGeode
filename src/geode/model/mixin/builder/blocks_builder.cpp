@@ -40,9 +40,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    const uuid& BlocksBuilder< dimension >::create_block( const MeshType& type )
+    const uuid& BlocksBuilder< dimension >::create_block( const MeshImpl& impl )
     {
-        return blocks_.create_block( type );
+        return blocks_.create_block( impl );
     }
 
     template < index_t dimension >
@@ -65,18 +65,18 @@ namespace geode
         auto& mesh = blocks_.modifiable_block( id ).modifiable_mesh(
             typename Block< dimension >::BlocksBuilderKey{} );
         if( TetrahedralSolidBuilderFactory< dimension >::has_creator(
-                mesh.type_name() ) )
+                mesh.impl_name() ) )
         {
             return TetrahedralSolidBuilder< dimension >::create(
                 dynamic_cast< TetrahedralSolid< dimension >& >( mesh ) );
         }
         if( PolyhedralSolidBuilderFactory< dimension >::has_creator(
-                mesh.type_name() ) )
+                mesh.impl_name() ) )
         {
             return PolyhedralSolidBuilder< dimension >::create( mesh );
         }
         throw OpenGeodeException{ "Unknown mesh type: ",
-            mesh.type_name().get() };
+            mesh.impl_name().get() };
     }
 
     template < index_t dimension >

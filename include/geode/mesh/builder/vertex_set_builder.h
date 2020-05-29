@@ -96,5 +96,5 @@ namespace geode
     };
 
     using VertexSetBuilderFactory =
-        Factory< MeshType, VertexSetBuilder, VertexSet& >;
+        Factory< MeshImpl, VertexSetBuilder, VertexSet& >;
 } // namespace geode

@@ -35,19 +35,19 @@ namespace geode
     class opengeode_mesh_api OpenGeodeVertexSet : public VertexSet
     {
     public:
-        static MeshType type_name_static()
+        static MeshImpl impl_name_static()
         {
-            return MeshType{ "OpenGeodeVertexSet" };
+            return MeshImpl{ "OpenGeodeVertexSet" };
+        }
+
+        MeshImpl impl_name() const override
+        {
+            return impl_name_static();
         }
 
         MeshType type_name() const override
         {
-            return type_name_static();
-        }
-
-        MeshKind kind_name() const override
-        {
-            return VertexSet::kind_name_static();
+            return VertexSet::type_name_static();
         }
 
         static absl::string_view native_extension_static()

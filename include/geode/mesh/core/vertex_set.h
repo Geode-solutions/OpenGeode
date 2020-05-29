@@ -54,11 +54,11 @@ namespace geode
          * Create a new VertexSet using a specified data structure.
          * @param[in] type Data structure type
          */
-        static std::unique_ptr< VertexSet > create( const MeshType& type );
+        static std::unique_ptr< VertexSet > create( const MeshImpl& impl );
 
-        static MeshKind kind_name_static()
+        static MeshType type_name_static()
         {
-            return MeshKind{ "VertexSet" };
+            return MeshType{ "VertexSet" };
         }
 
         std::unique_ptr< VertexSet > clone() const;
@@ -75,9 +75,9 @@ namespace geode
          */
         AttributeManager& vertex_attribute_manager() const;
 
-        virtual MeshType type_name() const = 0;
+        virtual MeshImpl impl_name() const = 0;
 
-        virtual MeshKind kind_name() const = 0;
+        virtual MeshType type_name() const = 0;
 
     protected:
         VertexSet();

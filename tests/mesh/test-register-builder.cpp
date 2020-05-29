@@ -42,7 +42,7 @@
 #include <geode/tests/common.h>
 
 template < typename GeodeFactory >
-void check_register( const geode::MeshType& key )
+void check_register( const geode::MeshImpl& key )
 {
     OPENGEODE_EXCEPTION( GeodeFactory::has_creator( key ),
         "[Test] No creator for ", key.get(), " is not correct" );
@@ -55,27 +55,27 @@ void test()
 
     /* Run checks */
     check_register< geode::GraphBuilderFactory >(
-        geode::OpenGeodeGraph::type_name_static() );
+        geode::OpenGeodeGraph::impl_name_static() );
     check_register< geode::PointSetBuilderFactory2D >(
-        geode::OpenGeodePointSet2D::type_name_static() );
+        geode::OpenGeodePointSet2D::impl_name_static() );
     check_register< geode::PointSetBuilderFactory3D >(
-        geode::OpenGeodePointSet3D::type_name_static() );
+        geode::OpenGeodePointSet3D::impl_name_static() );
     check_register< geode::EdgedCurveBuilderFactory2D >(
-        geode::OpenGeodeEdgedCurve2D::type_name_static() );
+        geode::OpenGeodeEdgedCurve2D::impl_name_static() );
     check_register< geode::EdgedCurveBuilderFactory3D >(
-        geode::OpenGeodeEdgedCurve3D::type_name_static() );
+        geode::OpenGeodeEdgedCurve3D::impl_name_static() );
     check_register< geode::PolygonalSurfaceBuilderFactory2D >(
-        geode::OpenGeodePolygonalSurface2D::type_name_static() );
+        geode::OpenGeodePolygonalSurface2D::impl_name_static() );
     check_register< geode::PolygonalSurfaceBuilderFactory3D >(
-        geode::OpenGeodePolygonalSurface3D::type_name_static() );
+        geode::OpenGeodePolygonalSurface3D::impl_name_static() );
     check_register< geode::TriangulatedSurfaceBuilderFactory2D >(
-        geode::OpenGeodeTriangulatedSurface2D::type_name_static() );
+        geode::OpenGeodeTriangulatedSurface2D::impl_name_static() );
     check_register< geode::TriangulatedSurfaceBuilderFactory3D >(
-        geode::OpenGeodeTriangulatedSurface3D::type_name_static() );
+        geode::OpenGeodeTriangulatedSurface3D::impl_name_static() );
     check_register< geode::PolyhedralSolidBuilderFactory3D >(
-        geode::OpenGeodePolyhedralSolid3D::type_name_static() );
+        geode::OpenGeodePolyhedralSolid3D::impl_name_static() );
     check_register< geode::TetrahedralSolidBuilderFactory3D >(
-        geode::OpenGeodeTetrahedralSolid3D::type_name_static() );
+        geode::OpenGeodeTetrahedralSolid3D::impl_name_static() );
 }
 
 OPENGEODE_TEST( "register-builder" )

@@ -89,7 +89,7 @@ namespace geode
     ALIAS_2D_AND_3D( EdgedCurveBuilder );
 
     template < index_t dimension >
-    using EdgedCurveBuilderFactory = Factory< MeshType,
+    using EdgedCurveBuilderFactory = Factory< MeshImpl,
         EdgedCurveBuilder< dimension >,
         EdgedCurve< dimension >& >;
     ALIAS_2D_AND_3D( EdgedCurveBuilderFactory );

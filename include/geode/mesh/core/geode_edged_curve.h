@@ -47,20 +47,20 @@ namespace geode
         OpenGeodeEdgedCurve();
         ~OpenGeodeEdgedCurve();
 
-        static MeshType type_name_static()
+        static MeshImpl impl_name_static()
         {
-            return MeshType{ absl::StrCat(
+            return MeshImpl{ absl::StrCat(
                 "OpenGeodeEdgedCurve", dimension, "D" ) };
+        }
+
+        MeshImpl impl_name() const override
+        {
+            return impl_name_static();
         }
 
         MeshType type_name() const override
         {
-            return type_name_static();
-        }
-
-        MeshKind kind_name() const override
-        {
-            return EdgedCurve< dimension >::kind_name_static();
+            return EdgedCurve< dimension >::type_name_static();
         }
 
         static absl::string_view native_extension_static()

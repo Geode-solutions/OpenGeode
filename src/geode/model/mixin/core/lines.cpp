@@ -129,11 +129,11 @@ namespace geode
     }
 
     template < index_t dimension >
-    const uuid& Lines< dimension >::create_line( const MeshType& type )
+    const uuid& Lines< dimension >::create_line( const MeshImpl& impl )
     {
         typename Lines< dimension >::Impl::ComponentPtr line{
             new Line< dimension >{
-                type, typename Line< dimension >::LinesKey{} }
+                impl, typename Line< dimension >::LinesKey{} }
         };
         const auto& id = line->id();
         impl_->add_component( std::move( line ) );
@@ -222,8 +222,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    Line< dimension >&
-        Lines< dimension >::ModifiableLineRange::operator*() const
+    Line< dimension >& Lines< dimension >::ModifiableLineRange::
+        operator*() const
     {
         return this->impl_->line();
     }

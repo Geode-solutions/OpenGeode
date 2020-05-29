@@ -33,38 +33,38 @@
 
 namespace geode
 {
-    struct MeshTypeTag
+    struct MeshImplTag
     {
     };
     /*!
      * Strong type for a mesh data structure
      */
-    using MeshType = NamedType< std::string, MeshTypeTag >;
+    using MeshImpl = NamedType< std::string, MeshImplTag >;
 
-    struct MeshKindTag
+    struct MeshTypeTag
     {
     };
     /*!
-     * Strong type for a mesh kind
+     * Strong type for a mesh type
      */
-    using MeshKind = NamedType< std::string, MeshKindTag >;
+    using MeshType = NamedType< std::string, MeshTypeTag >;
 } // namespace geode
 
 namespace std
 {
     template <>
-    struct hash< geode::MeshType >
+    struct hash< geode::MeshImpl >
     {
-        std::size_t operator()( const geode::MeshType& f ) const
+        std::size_t operator()( const geode::MeshImpl& f ) const
         {
             return absl::Hash< std::string >{}( f.get() );
         }
     };
 
     template <>
-    struct hash< geode::MeshKind >
+    struct hash< geode::MeshType >
     {
-        std::size_t operator()( const geode::MeshKind& f ) const
+        std::size_t operator()( const geode::MeshType& f ) const
         {
             return absl::Hash< std::string >{}( f.get() );
         }

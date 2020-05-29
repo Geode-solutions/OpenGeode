@@ -58,11 +58,11 @@ namespace geode
          * @param[in] type Data structure type
          */
         static std::unique_ptr< PointSet< dimension > > create(
-            const MeshType& type );
+            const MeshImpl& impl );
 
-        static MeshKind kind_name_static()
+        static MeshType type_name_static()
         {
-            return MeshKind{ absl::StrCat( "PointSet", dimension, "D" ) };
+            return MeshType{ absl::StrCat( "PointSet", dimension, "D" ) };
         }
 
         std::unique_ptr< PointSet< dimension > > clone() const;

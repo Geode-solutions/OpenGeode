@@ -120,8 +120,8 @@ namespace geode
         {
             const auto file =
                 impl_->find_file( directory, surface.component_id() );
-            if( MeshFactory::kind( surface.mesh_type() )
-                == TriangulatedSurface< dimension >::kind_name_static() )
+            if( MeshFactory::type( surface.mesh_type() )
+                == TriangulatedSurface< dimension >::type_name_static() )
             {
                 surface.set_mesh( load_triangulated_surface< dimension >(
                                       surface.mesh_type(), file ),
@@ -163,11 +163,11 @@ namespace geode
     }
 
     template < index_t dimension >
-    const uuid& Surfaces< dimension >::create_surface( const MeshType& type )
+    const uuid& Surfaces< dimension >::create_surface( const MeshImpl& impl )
     {
         typename Surfaces< dimension >::Impl::ComponentPtr surface{
             new Surface< dimension >{
-                type, typename Surface< dimension >::SurfacesKey{} }
+                impl, typename Surface< dimension >::SurfacesKey{} }
         };
         const auto& id = surface->id();
         impl_->add_component( std::move( surface ) );
@@ -246,8 +246,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    const Surface< dimension >&
-        Surfaces< dimension >::SurfaceRange::operator*() const
+    const Surface< dimension >& Surfaces< dimension >::SurfaceRange::
+        operator*() const
     {
         return this->impl_->surface();
     }
@@ -261,8 +261,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    Surface< dimension >&
-        Surfaces< dimension >::ModifiableSurfaceRange::operator*() const
+    Surface< dimension >& Surfaces< dimension >::ModifiableSurfaceRange::
+        operator*() const
     {
         return this->impl_->surface();
     }

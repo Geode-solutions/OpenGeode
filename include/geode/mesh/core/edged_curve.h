@@ -42,11 +42,11 @@ namespace geode
         static std::unique_ptr< EdgedCurve< dimension > > create();
 
         static std::unique_ptr< EdgedCurve< dimension > > create(
-            const MeshType& type );
+            const MeshImpl& impl );
 
-        static MeshKind kind_name_static()
+        static MeshType type_name_static()
         {
-            return MeshKind{ absl::StrCat( "EdgedCurve", dimension, "D" ) };
+            return MeshType{ absl::StrCat( "EdgedCurve", dimension, "D" ) };
         }
 
         std::unique_ptr< EdgedCurve< dimension > > clone() const;

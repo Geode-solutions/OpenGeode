@@ -111,8 +111,8 @@ namespace geode
         {
             const auto file =
                 impl_->find_file( directory, block.component_id() );
-            if( MeshFactory::kind( block.mesh_type() )
-                == TetrahedralSolid< dimension >::kind_name_static() )
+            if( MeshFactory::type( block.mesh_type() )
+                == TetrahedralSolid< dimension >::type_name_static() )
             {
                 block.set_mesh( load_tetrahedral_solid< dimension >(
                                     block.mesh_type(), file ),
@@ -139,10 +139,10 @@ namespace geode
     }
 
     template < index_t dimension >
-    const uuid& Blocks< dimension >::create_block( const MeshType& type )
+    const uuid& Blocks< dimension >::create_block( const MeshImpl& impl )
     {
         typename Blocks< dimension >::Impl::ComponentPtr block{
-            new Block< dimension >{ type, {} }
+            new Block< dimension >{ impl, {} }
         };
         const auto& id = block->id();
         impl_->add_component( std::move( block ) );
@@ -244,8 +244,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    Block< dimension >&
-        Blocks< dimension >::ModifiableBlockRange::operator*() const
+    Block< dimension >& Blocks< dimension >::ModifiableBlockRange::
+        operator*() const
     {
         return this->impl_->block();
     }

@@ -217,7 +217,7 @@ void test_io( const geode::PolyhedralSolid3D& polyhedral_solid,
     geode::save_polyhedral_solid( polyhedral_solid, filename );
     geode::load_polyhedral_solid< 3 >( filename );
     const auto new_polyhedral_solid = geode::load_polyhedral_solid< 3 >(
-        geode::OpenGeodePolyhedralSolid3D::type_name_static(), filename );
+        geode::OpenGeodePolyhedralSolid3D::impl_name_static(), filename );
 
     OPENGEODE_EXCEPTION( new_polyhedral_solid->nb_vertices() == 8,
         "[Test] Reloaded PolyhedralSolid should have 8 vertices" );
@@ -243,7 +243,7 @@ void test_io( const geode::PolyhedralSolid3D& polyhedral_solid,
 void test_backward_io( const std::string& filename )
 {
     const auto new_polyhedral_solid = geode::load_polyhedral_solid< 3 >(
-        geode::OpenGeodePolyhedralSolid3D::type_name_static(), filename );
+        geode::OpenGeodePolyhedralSolid3D::impl_name_static(), filename );
 
     OPENGEODE_EXCEPTION( new_polyhedral_solid->nb_edges() == 15,
         "[Test] Reloaded PolyhedralSolid should have 15 edges" );
@@ -260,7 +260,7 @@ void test_backward_io( const std::string& filename )
 void test_barycenters()
 {
     auto polyhedral_solid = geode::PolyhedralSolid3D::create(
-        geode::OpenGeodePolyhedralSolid3D::type_name_static() );
+        geode::OpenGeodePolyhedralSolid3D::impl_name_static() );
     auto builder = geode::PolyhedralSolidBuilder3D::create( *polyhedral_solid );
     const double o{ 0.0 };
     const double a{ 0.6 };
@@ -377,7 +377,7 @@ void test_delete_all( const geode::PolyhedralSolid3D& polyhedral_solid,
 void test()
 {
     auto polyhedral_solid = geode::PolyhedralSolid3D::create(
-        geode::OpenGeodePolyhedralSolid3D::type_name_static() );
+        geode::OpenGeodePolyhedralSolid3D::impl_name_static() );
     auto builder = geode::PolyhedralSolidBuilder3D::create( *polyhedral_solid );
 
     test_create_vertices( *polyhedral_solid, *builder );

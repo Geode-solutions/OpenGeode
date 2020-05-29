@@ -73,7 +73,7 @@ namespace geode
 
         const EdgedCurve< dimension >& mesh() const;
 
-        const MeshType& mesh_type() const;
+        const MeshImpl& mesh_type() const;
 
         EdgedCurve< dimension >& modifiable_mesh( LinesKey )
         {
@@ -82,7 +82,7 @@ namespace geode
 
         Line( LinesKey ) : Line() {}
 
-        Line( const MeshType& type, LinesKey ) : Line( type ) {}
+        Line( const MeshImpl& impl, LinesKey ) : Line( impl ) {}
 
         void set_mesh(
             std::unique_ptr< EdgedCurve< dimension > > mesh, LinesKey );
@@ -103,7 +103,7 @@ namespace geode
     private:
         Line();
 
-        explicit Line( const MeshType& type );
+        explicit Line( const MeshImpl& impl );
 
         EdgedCurve< dimension >& modifiable_mesh();
 

@@ -119,7 +119,7 @@ namespace geode
     private:
         const uuid& create_block();
 
-        const uuid& create_block( const MeshType& type );
+        const uuid& create_block( const MeshImpl& impl );
 
         void delete_block( const Block< dimension >& block );
 

@@ -34,22 +34,22 @@ namespace geode
     {
         return MeshFactory::create_default_mesh<
             TetrahedralSolid< dimension > >(
-            TetrahedralSolid< dimension >::kind_name_static() );
+            TetrahedralSolid< dimension >::type_name_static() );
     }
 
     template < index_t dimension >
     std::unique_ptr< TetrahedralSolid< dimension > >
-        TetrahedralSolid< dimension >::create( const MeshType& type )
+        TetrahedralSolid< dimension >::create( const MeshImpl& impl )
     {
         return MeshFactory::create_mesh< TetrahedralSolid< dimension > >(
-            type );
+            impl );
     }
 
     template < index_t dimension >
     std::unique_ptr< TetrahedralSolid< dimension > >
         TetrahedralSolid< dimension >::clone() const
     {
-        auto clone = create( this->type_name() );
+        auto clone = create( this->impl_name() );
         auto builder = TetrahedralSolidBuilder< dimension >::create( *clone );
         builder->copy( *this, {} );
         return clone;

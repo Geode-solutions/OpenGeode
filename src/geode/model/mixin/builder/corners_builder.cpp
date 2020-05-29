@@ -39,9 +39,9 @@ namespace geode
 
     template < index_t dimension >
     const uuid& CornersBuilder< dimension >::create_corner(
-        const MeshType& type )
+        const MeshImpl& impl )
     {
-        return corners_.create_corner( type );
+        return corners_.create_corner( impl );
     }
 
     template < index_t dimension >

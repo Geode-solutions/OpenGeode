@@ -100,11 +100,11 @@ namespace geode
          * Create a new Graph using a specified data structure.
          * @param[in] type Data structure type
          */
-        static std::unique_ptr< Graph > create( const MeshType& type );
+        static std::unique_ptr< Graph > create( const MeshImpl& impl );
 
-        static MeshKind kind_name_static()
+        static MeshType type_name_static()
         {
-            return MeshKind{ "Graph" };
+            return MeshType{ "Graph" };
         }
 
         std::unique_ptr< Graph > clone() const;

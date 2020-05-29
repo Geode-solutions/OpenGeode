@@ -35,8 +35,8 @@
 
 void test_default_vertex_set( const geode::VertexSet& vertex_set )
 {
-    const auto type_static = geode::OpenGeodeVertexSet::type_name_static();
-    OPENGEODE_EXCEPTION( vertex_set.type_name() == type_static,
+    const auto type_static = geode::OpenGeodeVertexSet::impl_name_static();
+    OPENGEODE_EXCEPTION( vertex_set.impl_name() == type_static,
         "[Test] VertexSet type name is not correct" );
 
     const auto extension_static =
@@ -74,7 +74,7 @@ void test_io( const geode::VertexSet& vertex_set, absl::string_view filename )
     geode::save_vertex_set( vertex_set, filename );
     geode::load_vertex_set( filename );
     geode::load_vertex_set(
-        geode::OpenGeodeVertexSet::type_name_static(), filename );
+        geode::OpenGeodeVertexSet::impl_name_static(), filename );
 }
 
 void test_clone( const geode::VertexSet& vertex_set )

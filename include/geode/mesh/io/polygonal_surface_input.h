@@ -43,7 +43,7 @@ namespace geode
      */
     template < index_t dimension >
     std::unique_ptr< PolygonalSurface< dimension > > load_polygonal_surface(
-        const MeshType& type, absl::string_view filename );
+        const MeshImpl& impl, absl::string_view filename );
 
     /*!
      * API function for loading an PolygonalSurface.

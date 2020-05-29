@@ -32,29 +32,29 @@
 
 namespace geode
 {
-    class opengeode_mesh_api MeshFactory : public Factory< MeshType, VertexSet >
+    class opengeode_mesh_api MeshFactory : public Factory< MeshImpl, VertexSet >
     {
     public:
         template < typename Mesh >
-        static void register_mesh( MeshKind kind, MeshType key )
+        static void register_mesh( MeshType type, MeshImpl key )
         {
-            register_kind( std::move( kind ), key );
+            register_type( std::move( type ), key );
             register_creator< Mesh >( std::move( key ) );
         }
 
         template < typename Mesh >
-        static void register_default_mesh( MeshKind kind, MeshType key )
+        static void register_default_mesh( MeshType type, MeshImpl key )
         {
-            register_mesh< Mesh >( kind, key );
-            register_default( kind, key );
+            register_mesh< Mesh >( type, key );
+            register_default( type, key );
         }
 
-        static const MeshKind& kind( const MeshType& key );
+        static const MeshType& type( const MeshImpl& key );
 
-        static const MeshType& default_mesh( const MeshKind& kind );
+        static const MeshImpl& default_impl( const MeshType& type );
 
         template < typename Mesh >
-        static std::unique_ptr< Mesh > create_mesh( const MeshType& key )
+        static std::unique_ptr< Mesh > create_mesh( const MeshImpl& key )
         {
             auto* mesh = dynamic_cast< Mesh* >( create( key ).release() );
             OPENGEODE_EXCEPTION(
@@ -64,9 +64,9 @@ namespace geode
 
         template < typename Mesh >
         static std::unique_ptr< Mesh > create_default_mesh(
-            const MeshKind& kind )
+            const MeshType& type )
         {
-            return create_mesh< Mesh >( default_mesh( kind ) );
+            return create_mesh< Mesh >( default_impl( type ) );
         }
 
     private:
@@ -75,9 +75,9 @@ namespace geode
 
         static MeshFactory& instance();
 
-        static void register_kind( MeshKind kind, MeshType key );
+        static void register_type( MeshType type, MeshImpl key );
 
-        static void register_default( MeshKind kind, MeshType key );
+        static void register_default( MeshType type, MeshImpl key );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

@@ -38,27 +38,27 @@ public:
         return ext;
     }
 
+    geode::MeshImpl impl_name() const override
+    {
+        return geode::MeshImpl{ "type" };
+    }
+
     geode::MeshType type_name() const override
     {
         return geode::MeshType{ "type" };
-    }
-
-    geode::MeshKind kind_name() const override
-    {
-        return geode::MeshKind{ "kind" };
     }
 };
 
 void test()
 {
+    geode::MeshImpl impl{ "impl" };
     geode::MeshType type{ "type" };
-    geode::MeshKind kind{ "kind" };
-    geode::MeshFactory::register_mesh< MeshTest >( kind, type );
+    geode::MeshFactory::register_mesh< MeshTest >( type, impl );
 
     OPENGEODE_EXCEPTION(
-        geode::MeshFactory::kind( type ) == kind, "Wrong kind" );
+        geode::MeshFactory::type( impl ) == type, "Wrong type" );
 
-    geode::MeshFactory::create_mesh< MeshTest >( type );
+    geode::MeshFactory::create_mesh< MeshTest >( impl );
 }
 
 OPENGEODE_TEST( "mesh-factory" )

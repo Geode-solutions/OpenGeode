@@ -31,12 +31,12 @@ namespace geode
     template < index_t dimension >
     std::unique_ptr< TriangulatedSurface< dimension > >
         load_triangulated_surface(
-            const MeshType& type, absl::string_view filename )
+            const MeshImpl& impl, absl::string_view filename )
     {
         try
         {
             auto triangulated_surface =
-                TriangulatedSurface< dimension >::create( type );
+                TriangulatedSurface< dimension >::create( impl );
             auto input = TriangulatedSurfaceInputFactory< dimension >::create(
                 extension_from_filename( filename ).data(),
                 *triangulated_surface, filename );
@@ -57,8 +57,8 @@ namespace geode
         load_triangulated_surface( absl::string_view filename )
     {
         return load_triangulated_surface< dimension >(
-            MeshFactory::default_mesh(
-                TriangulatedSurface< dimension >::kind_name_static() ),
+            MeshFactory::default_impl(
+                TriangulatedSurface< dimension >::type_name_static() ),
             filename );
     }
 
@@ -72,9 +72,9 @@ namespace geode
     }
 
     template std::unique_ptr< TriangulatedSurface< 2 > > opengeode_mesh_api
-        load_triangulated_surface( const MeshType&, absl::string_view );
+        load_triangulated_surface( const MeshImpl&, absl::string_view );
     template std::unique_ptr< TriangulatedSurface< 3 > > opengeode_mesh_api
-        load_triangulated_surface( const MeshType&, absl::string_view );
+        load_triangulated_surface( const MeshImpl&, absl::string_view );
 
     template std::unique_ptr< TriangulatedSurface< 2 > >
         opengeode_mesh_api load_triangulated_surface( absl::string_view );

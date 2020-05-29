@@ -30,12 +30,12 @@ namespace geode
 {
     template < index_t dimension >
     std::unique_ptr< PolygonalSurface< dimension > > load_polygonal_surface(
-        const MeshType& type, absl::string_view filename )
+        const MeshImpl& impl, absl::string_view filename )
     {
         try
         {
             auto polygonal_surface =
-                PolygonalSurface< dimension >::create( type );
+                PolygonalSurface< dimension >::create( impl );
             auto input = PolygonalSurfaceInputFactory< dimension >::create(
                 extension_from_filename( filename ).data(), *polygonal_surface,
                 filename );
@@ -56,8 +56,8 @@ namespace geode
         absl::string_view filename )
     {
         return load_polygonal_surface< dimension >(
-            MeshFactory::default_mesh(
-                PolygonalSurface< dimension >::kind_name_static() ),
+            MeshFactory::default_impl(
+                PolygonalSurface< dimension >::type_name_static() ),
             filename );
     }
 
@@ -71,9 +71,9 @@ namespace geode
     }
 
     template std::unique_ptr< PolygonalSurface< 2 > > opengeode_mesh_api
-        load_polygonal_surface( const MeshType&, absl::string_view );
+        load_polygonal_surface( const MeshImpl&, absl::string_view );
     template std::unique_ptr< PolygonalSurface< 3 > > opengeode_mesh_api
-        load_polygonal_surface( const MeshType&, absl::string_view );
+        load_polygonal_surface( const MeshImpl&, absl::string_view );
 
     template std::unique_ptr< PolygonalSurface< 2 > >
         opengeode_mesh_api load_polygonal_surface( absl::string_view );

@@ -35,7 +35,7 @@
 
 #include <geode/tests/common.h>
 
-void check_register( const geode::MeshType& key )
+void check_register( const geode::MeshImpl& key )
 {
     OPENGEODE_EXCEPTION( geode::MeshFactory::has_creator( key ),
         "[Test] No creator for ", key.get(), " is not correct" );
@@ -47,17 +47,17 @@ void test()
     geode::register_geode_mesh();
 
     /* Run checks */
-    check_register( geode::OpenGeodeGraph::type_name_static() );
-    check_register( geode::OpenGeodePointSet2D::type_name_static() );
-    check_register( geode::OpenGeodePointSet3D::type_name_static() );
-    check_register( geode::OpenGeodeEdgedCurve2D::type_name_static() );
-    check_register( geode::OpenGeodeEdgedCurve3D::type_name_static() );
-    check_register( geode::OpenGeodePolygonalSurface2D::type_name_static() );
-    check_register( geode::OpenGeodePolygonalSurface3D::type_name_static() );
-    check_register( geode::OpenGeodeTriangulatedSurface2D::type_name_static() );
-    check_register( geode::OpenGeodeTriangulatedSurface3D::type_name_static() );
-    check_register( geode::OpenGeodePolyhedralSolid3D::type_name_static() );
-    check_register( geode::OpenGeodeTetrahedralSolid3D::type_name_static() );
+    check_register( geode::OpenGeodeGraph::impl_name_static() );
+    check_register( geode::OpenGeodePointSet2D::impl_name_static() );
+    check_register( geode::OpenGeodePointSet3D::impl_name_static() );
+    check_register( geode::OpenGeodeEdgedCurve2D::impl_name_static() );
+    check_register( geode::OpenGeodeEdgedCurve3D::impl_name_static() );
+    check_register( geode::OpenGeodePolygonalSurface2D::impl_name_static() );
+    check_register( geode::OpenGeodePolygonalSurface3D::impl_name_static() );
+    check_register( geode::OpenGeodeTriangulatedSurface2D::impl_name_static() );
+    check_register( geode::OpenGeodeTriangulatedSurface3D::impl_name_static() );
+    check_register( geode::OpenGeodePolyhedralSolid3D::impl_name_static() );
+    check_register( geode::OpenGeodeTetrahedralSolid3D::impl_name_static() );
 }
 
 OPENGEODE_TEST( "register-mesh" )

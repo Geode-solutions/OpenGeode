@@ -130,9 +130,9 @@ namespace geode
         return id;
     }
 
-    const uuid& SectionBuilder::add_corner( const MeshType& type )
+    const uuid& SectionBuilder::add_corner( const MeshImpl& impl )
     {
-        const auto& id = create_corner( type );
+        const auto& id = create_corner( impl );
         register_new_component( *this, section_.corner( id ) );
         return id;
     }
@@ -144,9 +144,9 @@ namespace geode
         return id;
     }
 
-    const uuid& SectionBuilder::add_line( const MeshType& type )
+    const uuid& SectionBuilder::add_line( const MeshImpl& impl )
     {
-        const auto& id = create_line( type );
+        const auto& id = create_line( impl );
         register_new_component( *this, section_.line( id ) );
         return id;
     }
@@ -158,9 +158,9 @@ namespace geode
         return id;
     }
 
-    const uuid& SectionBuilder::add_surface( const MeshType& type )
+    const uuid& SectionBuilder::add_surface( const MeshImpl& impl )
     {
-        const auto& id = create_surface( type );
+        const auto& id = create_surface( impl );
         register_new_component( *this, section_.surface( id ) );
         return id;
     }

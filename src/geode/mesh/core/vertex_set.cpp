@@ -68,12 +68,12 @@ namespace geode
     std::unique_ptr< VertexSet > VertexSet::create()
     {
         return MeshFactory::create_default_mesh< VertexSet >(
-            VertexSet::kind_name_static() );
+            VertexSet::type_name_static() );
     }
 
-    std::unique_ptr< VertexSet > VertexSet::create( const MeshType& type )
+    std::unique_ptr< VertexSet > VertexSet::create( const MeshImpl& impl )
     {
-        return MeshFactory::create_mesh< VertexSet >( type );
+        return MeshFactory::create_mesh< VertexSet >( impl );
     }
 
     index_t VertexSet::nb_vertices() const
@@ -97,7 +97,7 @@ namespace geode
 
     std::unique_ptr< VertexSet > VertexSet::clone() const
     {
-        auto clone = create( type_name() );
+        auto clone = create( impl_name() );
         auto builder = VertexSetBuilder::create( *clone );
         builder->copy( *this );
         return clone;
