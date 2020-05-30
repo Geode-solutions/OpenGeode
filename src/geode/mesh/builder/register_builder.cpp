@@ -31,6 +31,7 @@
 #include <geode/mesh/builder/geode_tetrahedral_solid_builder.h>
 #include <geode/mesh/builder/geode_triangulated_surface_builder.h>
 #include <geode/mesh/builder/geode_vertex_set_builder.h>
+#include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/core/geode_edged_curve.h>
 #include <geode/mesh/core/geode_graph.h>
 #include <geode/mesh/core/geode_point_set.h>
@@ -44,45 +45,43 @@ namespace geode
 {
     void register_geode_builder()
     {
-        VertexSetBuilderFactory::register_creator< OpenGeodeVertexSetBuilder >(
+        MeshBuilderFactory::register_mesh_builder< OpenGeodeVertexSetBuilder >(
             OpenGeodeVertexSet::impl_name_static() );
 
-        GraphBuilderFactory::register_creator< OpenGeodeGraphBuilder >(
+        MeshBuilderFactory::register_mesh_builder< OpenGeodeGraphBuilder >(
             OpenGeodeGraph::impl_name_static() );
 
-        PointSetBuilderFactory2D::register_creator<
-            OpenGeodePointSetBuilder2D >(
+        MeshBuilderFactory::register_mesh_builder< OpenGeodePointSetBuilder2D >(
             OpenGeodePointSet2D::impl_name_static() );
-        PointSetBuilderFactory3D::register_creator<
-            OpenGeodePointSetBuilder3D >(
+        MeshBuilderFactory::register_mesh_builder< OpenGeodePointSetBuilder3D >(
             OpenGeodePointSet3D::impl_name_static() );
 
-        EdgedCurveBuilderFactory2D::register_creator<
+        MeshBuilderFactory::register_mesh_builder<
             OpenGeodeEdgedCurveBuilder2D >(
             OpenGeodeEdgedCurve2D::impl_name_static() );
-        EdgedCurveBuilderFactory3D::register_creator<
+        MeshBuilderFactory::register_mesh_builder<
             OpenGeodeEdgedCurveBuilder3D >(
             OpenGeodeEdgedCurve3D::impl_name_static() );
 
-        PolygonalSurfaceBuilderFactory2D::register_creator<
+        MeshBuilderFactory::register_mesh_builder<
             OpenGeodePolygonalSurfaceBuilder2D >(
             OpenGeodePolygonalSurface2D::impl_name_static() );
-        PolygonalSurfaceBuilderFactory3D::register_creator<
+        MeshBuilderFactory::register_mesh_builder<
             OpenGeodePolygonalSurfaceBuilder3D >(
             OpenGeodePolygonalSurface3D::impl_name_static() );
 
-        TriangulatedSurfaceBuilderFactory2D::register_creator<
+        MeshBuilderFactory::register_mesh_builder<
             OpenGeodeTriangulatedSurfaceBuilder2D >(
             OpenGeodeTriangulatedSurface2D::impl_name_static() );
-        TriangulatedSurfaceBuilderFactory3D::register_creator<
+        MeshBuilderFactory::register_mesh_builder<
             OpenGeodeTriangulatedSurfaceBuilder3D >(
             OpenGeodeTriangulatedSurface3D::impl_name_static() );
 
-        PolyhedralSolidBuilderFactory3D::register_creator<
+        MeshBuilderFactory::register_mesh_builder<
             OpenGeodePolyhedralSolidBuilder3D >(
             OpenGeodePolyhedralSolid3D::impl_name_static() );
 
-        TetrahedralSolidBuilderFactory3D::register_creator<
+        MeshBuilderFactory::register_mesh_builder<
             OpenGeodeTetrahedralSolidBuilder3D >(
             OpenGeodeTetrahedralSolid3D::impl_name_static() );
     }

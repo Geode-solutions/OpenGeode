@@ -23,6 +23,7 @@
 
 #include <geode/mesh/builder/edged_curve_builder.h>
 
+#include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/core/edged_curve.h>
 
 namespace geode
@@ -31,26 +32,23 @@ namespace geode
     std::unique_ptr< EdgedCurveBuilder< dimension > >
         EdgedCurveBuilder< dimension >::create( EdgedCurve< dimension >& mesh )
     {
-        try
-        {
-            return EdgedCurveBuilderFactory< dimension >::create(
-                mesh.impl_name(), mesh );
-        }
-        catch( const OpenGeodeException& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeException{
-                "Could not create EdgedCurve builder of data structure: ",
-                mesh.impl_name().get()
-            };
-        }
+        return MeshBuilderFactory::create_mesh_builder<
+            EdgedCurveBuilder< dimension > >( mesh );
+    }
+
+    template < index_t dimension >
+    void EdgedCurveBuilder< dimension >::set_mesh(
+        EdgedCurve< dimension >& mesh, MeshBuilderFactoryKey key )
+    {
+        edged_curve_ = &mesh;
+        GraphBuilder::set_mesh( mesh, key );
     }
 
     template < index_t dimension >
     void EdgedCurveBuilder< dimension >::set_point(
         index_t vertex_id, const Point< dimension >& point )
     {
-        OPENGEODE_ASSERT( vertex_id < edged_curve_.nb_vertices(),
+        OPENGEODE_ASSERT( vertex_id < edged_curve_->nb_vertices(),
             "[EdgedCurveBuilder::set_point] Accessing a vertex that does not "
             "exist" );
         do_set_point( vertex_id, point );
@@ -60,7 +58,7 @@ namespace geode
     index_t EdgedCurveBuilder< dimension >::create_point(
         const Point< dimension >& point )
     {
-        const auto added_vertex = edged_curve_.nb_vertices();
+        const auto added_vertex = edged_curve_->nb_vertices();
         create_vertex();
         set_point( added_vertex, point );
         return added_vertex;

@@ -88,11 +88,11 @@ void test()
 {
     geode::OpenGeodeVertexSet vertex_set;
     test_default_vertex_set( vertex_set );
-    geode::OpenGeodeVertexSetBuilder builder( vertex_set );
-    test_create_vertices( vertex_set, builder );
+    auto builder = geode::VertexSetBuilder::create( vertex_set );
+    test_create_vertices( vertex_set, *builder );
     test_io(
         vertex_set, absl::StrCat( "test.", vertex_set.native_extension() ) );
-    test_delete_vertex( vertex_set, builder );
+    test_delete_vertex( vertex_set, *builder );
     test_clone( vertex_set );
 }
 

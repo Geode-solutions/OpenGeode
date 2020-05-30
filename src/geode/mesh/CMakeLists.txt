@@ -91,6 +91,7 @@ add_geode_library(
         "builder/geode_triangulated_surface_builder.h"
         "builder/geode_vertex_set_builder.h"
         "builder/graph_builder.h"
+        "builder/mesh_builder_factory.h"
         "builder/point_set_builder.h"
         "builder/polygonal_surface_builder.h"
         "builder/polyhedral_solid_builder.h"

@@ -27,11 +27,9 @@
 
 namespace geode
 {
-    OpenGeodeVertexSetBuilder::OpenGeodeVertexSetBuilder(
-        VertexSet& vertex_set )
-        : VertexSetBuilder( vertex_set ),
-          geode_vertex_set_( dynamic_cast< OpenGeodeVertexSet& >( vertex_set ) )
+    void OpenGeodeVertexSetBuilder::do_set_mesh( VertexSet& mesh )
     {
+        geode_vertex_set_ = &dynamic_cast< OpenGeodeVertexSet& >( mesh );
     }
 
     void OpenGeodeVertexSetBuilder::do_create_vertex() {}

@@ -47,17 +47,9 @@ namespace geode
     class OpenGeodeTetrahedralSolidBuilder
         : public TetrahedralSolidBuilder< dimension >
     {
-    public:
-        OpenGeodeTetrahedralSolidBuilder(
-            TetrahedralSolid< dimension >& tetrahedral_solid )
-            : TetrahedralSolidBuilder< dimension >( tetrahedral_solid ),
-              geode_tetrahedral_solid_(
-                  dynamic_cast< OpenGeodeTetrahedralSolid< dimension >& >(
-                      tetrahedral_solid ) )
-        {
-        }
-
     private:
+        void do_set_mesh( VertexSet& mesh ) final;
+
         void do_set_point(
             index_t vertex_id, const Point< dimension >& point ) final;
 
@@ -94,7 +86,7 @@ namespace geode
             index_t adjacent_id ) final;
 
     private:
-        OpenGeodeTetrahedralSolid< dimension >& geode_tetrahedral_solid_;
+        OpenGeodeTetrahedralSolid< dimension >* geode_tetrahedral_solid_;
     };
     ALIAS_3D( OpenGeodeTetrahedralSolidBuilder );
 } // namespace geode

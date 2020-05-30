@@ -23,10 +23,9 @@
 
 #include <geode/model/mixin/builder/blocks_builder.h>
 
+#include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/builder/polyhedral_solid_builder.h>
-#include <geode/mesh/builder/tetrahedral_solid_builder.h>
 #include <geode/mesh/core/polyhedral_solid.h>
-#include <geode/mesh/core/tetrahedral_solid.h>
 
 #include <geode/model/mixin/core/block.h>
 #include <geode/model/mixin/core/blocks.h>
@@ -64,19 +63,8 @@ namespace geode
     {
         auto& mesh = blocks_.modifiable_block( id ).modifiable_mesh(
             typename Block< dimension >::BlocksBuilderKey{} );
-        if( TetrahedralSolidBuilderFactory< dimension >::has_creator(
-                mesh.impl_name() ) )
-        {
-            return TetrahedralSolidBuilder< dimension >::create(
-                dynamic_cast< TetrahedralSolid< dimension >& >( mesh ) );
-        }
-        if( PolyhedralSolidBuilderFactory< dimension >::has_creator(
-                mesh.impl_name() ) )
-        {
-            return PolyhedralSolidBuilder< dimension >::create( mesh );
-        }
-        throw OpenGeodeException{ "Unknown mesh type: ",
-            mesh.impl_name().get() };
+        return MeshBuilderFactory::create_mesh_builder<
+            PolyhedralSolidBuilder< dimension > >( mesh );
     }
 
     template < index_t dimension >
