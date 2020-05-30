@@ -28,10 +28,18 @@
 namespace geode
 {
     template < index_t dimension >
+    void OpenGeodeTetrahedralSolidBuilder< dimension >::do_set_mesh(
+        VertexSet& mesh )
+    {
+        geode_tetrahedral_solid_ =
+            &dynamic_cast< OpenGeodeTetrahedralSolid< dimension >& >( mesh );
+    }
+
+    template < index_t dimension >
     void OpenGeodeTetrahedralSolidBuilder< dimension >::do_set_point(
         index_t vertex_id, const Point< dimension >& point )
     {
-        geode_tetrahedral_solid_.set_vertex( vertex_id, point, {} );
+        geode_tetrahedral_solid_->set_vertex( vertex_id, point, {} );
     }
 
     template < index_t dimension >
@@ -57,7 +65,7 @@ namespace geode
         OpenGeodeTetrahedralSolidBuilder< dimension >::do_set_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex, index_t vertex_id )
     {
-        geode_tetrahedral_solid_.set_polyhedron_vertex(
+        geode_tetrahedral_solid_->set_polyhedron_vertex(
             polyhedron_vertex, vertex_id, {} );
     }
 
@@ -87,7 +95,7 @@ namespace geode
     void OpenGeodeTetrahedralSolidBuilder< dimension >::do_create_tetrahedron(
         const std::array< index_t, 4 >& vertices )
     {
-        geode_tetrahedral_solid_.add_tetrahedron( vertices, {} );
+        geode_tetrahedral_solid_->add_tetrahedron( vertices, {} );
     }
 
     template < index_t dimension >
@@ -102,7 +110,7 @@ namespace geode
             get_tetrahedron_facet_vertices(
                 const std::array< index_t, 4 >& vertices ) const
     {
-        return geode_tetrahedral_solid_.get_polyhedron_facet_vertices(
+        return geode_tetrahedral_solid_->get_polyhedron_facet_vertices(
             vertices, {} );
     }
 
@@ -112,7 +120,7 @@ namespace geode
             get_tetrahedron_edge_vertices(
                 const std::array< index_t, 4 >& vertices ) const
     {
-        return geode_tetrahedral_solid_.get_polyhedron_edge_vertices(
+        return geode_tetrahedral_solid_->get_polyhedron_edge_vertices(
             vertices, {} );
     }
 
@@ -121,7 +129,7 @@ namespace geode
         do_set_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet, index_t adjacent_id )
     {
-        geode_tetrahedral_solid_.set_polyhedron_adjacent(
+        geode_tetrahedral_solid_->set_polyhedron_adjacent(
             polyhedron_facet, adjacent_id, {} );
     }
 

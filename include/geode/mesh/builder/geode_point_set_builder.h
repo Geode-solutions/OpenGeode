@@ -42,15 +42,9 @@ namespace geode
     template < index_t dimension >
     class OpenGeodePointSetBuilder : public PointSetBuilder< dimension >
     {
-    public:
-        OpenGeodePointSetBuilder( PointSet< dimension >& point_set )
-            : PointSetBuilder< dimension >( point_set ),
-              geode_point_set_(
-                  dynamic_cast< OpenGeodePointSet< dimension >& >( point_set ) )
-        {
-        }
-
     private:
+        void do_set_mesh( VertexSet& mesh ) final;
+
         void do_set_point(
             index_t vertex_id, const Point< dimension >& point ) final;
 
@@ -61,7 +55,7 @@ namespace geode
         void do_delete_vertices( const std::vector< bool >& to_delete ) final;
 
     private:
-        OpenGeodePointSet< dimension >& geode_point_set_;
+        OpenGeodePointSet< dimension >* geode_point_set_;
     };
     ALIAS_2D_AND_3D( OpenGeodePointSetBuilder );
 } // namespace geode

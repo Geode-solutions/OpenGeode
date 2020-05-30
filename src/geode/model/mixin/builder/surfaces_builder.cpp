@@ -23,10 +23,9 @@
 
 #include <geode/model/mixin/builder/surfaces_builder.h>
 
+#include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/builder/polygonal_surface_builder.h>
-#include <geode/mesh/builder/triangulated_surface_builder.h>
 #include <geode/mesh/core/polygonal_surface.h>
-#include <geode/mesh/core/triangulated_surface.h>
 
 #include <geode/model/mixin/core/surface.h>
 #include <geode/model/mixin/core/surfaces.h>
@@ -66,19 +65,8 @@ namespace geode
     {
         auto& mesh = surfaces_.modifiable_surface( id ).modifiable_mesh(
             typename Surface< dimension >::SurfacesBuilderKey{} );
-        if( TriangulatedSurfaceBuilderFactory< dimension >::has_creator(
-                mesh.impl_name() ) )
-        {
-            return TriangulatedSurfaceBuilder< dimension >::create(
-                dynamic_cast< TriangulatedSurface< dimension >& >( mesh ) );
-        }
-        if( PolygonalSurfaceBuilderFactory< dimension >::has_creator(
-                mesh.impl_name() ) )
-        {
-            return PolygonalSurfaceBuilder< dimension >::create( mesh );
-        }
-        throw OpenGeodeException{ "Unknown mesh type: ",
-            mesh.impl_name().get() };
+        return MeshBuilderFactory::create_mesh_builder<
+            PolygonalSurfaceBuilder< dimension > >( mesh );
     }
 
     template < index_t dimension >

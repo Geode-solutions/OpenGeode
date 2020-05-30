@@ -40,10 +40,9 @@ namespace geode
      */
     class opengeode_mesh_api OpenGeodeGraphBuilder : public GraphBuilder
     {
-    public:
-        OpenGeodeGraphBuilder( Graph& graph );
-
     private:
+        void do_set_mesh( VertexSet& mesh ) final;
+
         void do_create_vertex() final;
 
         void do_create_vertices( index_t nb ) final;
@@ -61,6 +60,6 @@ namespace geode
         void do_delete_edges( const std::vector< bool >& to_delete ) final;
 
     private:
-        OpenGeodeGraph& geode_graph_;
+        OpenGeodeGraph* geode_graph_;
     };
 } // namespace geode

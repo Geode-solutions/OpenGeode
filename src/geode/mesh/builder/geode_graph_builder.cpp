@@ -27,10 +27,9 @@
 
 namespace geode
 {
-    OpenGeodeGraphBuilder::OpenGeodeGraphBuilder( Graph& graph )
-        : GraphBuilder( graph ),
-          geode_graph_( dynamic_cast< OpenGeodeGraph& >( graph ) )
+    void OpenGeodeGraphBuilder::do_set_mesh( VertexSet& mesh )
     {
+        geode_graph_ = &dynamic_cast< OpenGeodeGraph& >( mesh );
     }
 
     void OpenGeodeGraphBuilder::do_create_vertex() {}
@@ -45,7 +44,7 @@ namespace geode
     void OpenGeodeGraphBuilder::do_set_edge_vertex(
         const EdgeVertex& edge_vertex, index_t vertex_id )
     {
-        geode_graph_.set_edge_vertex( edge_vertex, vertex_id, {} );
+        geode_graph_->set_edge_vertex( edge_vertex, vertex_id, {} );
     }
 
     void OpenGeodeGraphBuilder::do_create_edge() {}

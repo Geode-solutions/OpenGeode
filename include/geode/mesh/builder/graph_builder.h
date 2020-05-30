@@ -106,8 +106,10 @@ namespace geode
             copy( graph );
         }
 
+        void set_mesh( Graph& mesh, MeshBuilderFactoryKey key );
+
     protected:
-        GraphBuilder( Graph& graph );
+        GraphBuilder() = default;
 
         void copy( const Graph& graph );
 
@@ -128,8 +130,6 @@ namespace geode
             const std::vector< bool >& to_delete ) = 0;
 
     private:
-        Graph& graph_;
+        Graph* graph_;
     };
-
-    using GraphBuilderFactory = Factory< MeshImpl, GraphBuilder, Graph& >;
 } // namespace geode

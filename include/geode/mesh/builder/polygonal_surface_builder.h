@@ -167,13 +167,11 @@ namespace geode
             copy( polygonal_surface );
         }
 
+        void set_mesh(
+            PolygonalSurface< dimension >& mesh, MeshBuilderFactoryKey key );
+
     protected:
-        PolygonalSurfaceBuilder(
-            PolygonalSurface< dimension >& polygonal_surface )
-            : VertexSetBuilder( polygonal_surface ),
-              polygonal_surface_( polygonal_surface )
-        {
-        }
+        PolygonalSurfaceBuilder() = default;
 
         index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices );
 
@@ -215,13 +213,7 @@ namespace geode
             index_t new_vertex_id );
 
     private:
-        PolygonalSurface< dimension >& polygonal_surface_;
+        PolygonalSurface< dimension >* polygonal_surface_;
     };
     ALIAS_2D_AND_3D( PolygonalSurfaceBuilder );
-
-    template < index_t dimension >
-    using PolygonalSurfaceBuilderFactory = Factory< MeshImpl,
-        PolygonalSurfaceBuilder< dimension >,
-        PolygonalSurface< dimension >& >;
-    ALIAS_2D_AND_3D( PolygonalSurfaceBuilderFactory );
 } // namespace geode

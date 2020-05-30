@@ -82,13 +82,11 @@ namespace geode
             copy( triangulated_surface );
         }
 
+        void set_mesh(
+            TriangulatedSurface< dimension >& mesh, MeshBuilderFactoryKey key );
+
     protected:
-        TriangulatedSurfaceBuilder(
-            TriangulatedSurface< dimension >& triangulated_surface )
-            : PolygonalSurfaceBuilder< dimension >( triangulated_surface ),
-              triangulated_surface_( triangulated_surface )
-        {
-        }
+        TriangulatedSurfaceBuilder() = default;
 
         void copy(
             const TriangulatedSurface< dimension >& triangulated_surface );
@@ -102,13 +100,7 @@ namespace geode
         virtual void do_create_triangles( index_t nb ) = 0;
 
     private:
-        TriangulatedSurface< dimension >& triangulated_surface_;
+        TriangulatedSurface< dimension >* triangulated_surface_;
     };
     ALIAS_2D_AND_3D( TriangulatedSurfaceBuilder );
-
-    template < index_t dimension >
-    using TriangulatedSurfaceBuilderFactory = Factory< MeshImpl,
-        TriangulatedSurfaceBuilder< dimension >,
-        TriangulatedSurface< dimension >& >;
-    ALIAS_2D_AND_3D( TriangulatedSurfaceBuilderFactory );
 } // namespace geode
