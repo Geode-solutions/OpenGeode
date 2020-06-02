@@ -43,5 +43,9 @@ namespace geode
                     index_t, const uuid& ) const )
                     & VertexIdentifier::mesh_component_vertices )
             .def( "unique_vertex", &VertexIdentifier::unique_vertex );
+
+        pybind11::class_< MeshComponentVertex >( module, "MeshComponentVertex" )
+            .def_readwrite( "component_id", &MeshComponentVertex::component_id )
+            .def_readwrite( "vertex", &MeshComponentVertex::vertex );
     }
 } // namespace geode
