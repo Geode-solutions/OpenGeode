@@ -42,16 +42,9 @@ namespace geode
     template < index_t dimension >
     class OpenGeodeEdgedCurveBuilder : public EdgedCurveBuilder< dimension >
     {
-    public:
-        OpenGeodeEdgedCurveBuilder( EdgedCurve< dimension >& edged_curve )
-            : EdgedCurveBuilder< dimension >( edged_curve ),
-              geode_edged_curve_(
-                  dynamic_cast< OpenGeodeEdgedCurve< dimension >& >(
-                      edged_curve ) )
-        {
-        }
-
     private:
+        void do_set_mesh( VertexSet& mesh ) final;
+
         void do_set_point(
             index_t vertex_id, const Point< dimension >& point ) final;
 
@@ -72,7 +65,7 @@ namespace geode
         void do_delete_edges( const std::vector< bool >& to_delete ) final;
 
     private:
-        OpenGeodeEdgedCurve< dimension >& geode_edged_curve_;
+        OpenGeodeEdgedCurve< dimension >* geode_edged_curve_;
     };
     ALIAS_2D_AND_3D( OpenGeodeEdgedCurveBuilder );
 } // namespace geode

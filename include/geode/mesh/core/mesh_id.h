@@ -21,23 +21,52 @@
  *
  */
 
-#include <geode/basic/attribute_manager.h>
+#pragma once
 
-#include <geode/mesh/core/vertex_set.h>
+#include <string>
+
+#include <absl/hash/hash.h>
+
+#include <bitsery/brief_syntax/string.h>
+
+#include <geode/basic/named_type.h>
 
 namespace geode
 {
-    void define_vertex_set( pybind11::module& module )
+    struct MeshImplTag
     {
-        pybind11::class_< VertexSet >( module, "VertexSet" )
-            .def_static( "create",
-                ( std::unique_ptr< VertexSet >( * )() ) & VertexSet::create )
-            .def( "clone", &VertexSet::clone )
-            .def( "native_extension", &VertexSet::native_extension )
-            .def( "nb_vertices", &VertexSet::nb_vertices )
-            .def( "vertex_attribute_manager",
-                &VertexSet::vertex_attribute_manager,
-                pybind11::return_value_policy::reference )
-            .def( "impl_name", &VertexSet::impl_name );
-    }
+    };
+    /*!
+     * Strong type for a mesh data structure
+     */
+    using MeshImpl = NamedType< std::string, MeshImplTag >;
+
+    struct MeshTypeTag
+    {
+    };
+    /*!
+     * Strong type for a mesh type
+     */
+    using MeshType = NamedType< std::string, MeshTypeTag >;
 } // namespace geode
+
+namespace std
+{
+    template <>
+    struct hash< geode::MeshImpl >
+    {
+        std::size_t operator()( const geode::MeshImpl& f ) const
+        {
+            return absl::Hash< std::string >{}( f.get() );
+        }
+    };
+
+    template <>
+    struct hash< geode::MeshType >
+    {
+        std::size_t operator()( const geode::MeshType& f ) const
+        {
+            return absl::Hash< std::string >{}( f.get() );
+        }
+    };
+} // namespace std

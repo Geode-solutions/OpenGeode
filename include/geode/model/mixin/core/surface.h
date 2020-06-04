@@ -26,14 +26,14 @@
 #include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
-#include <geode/mesh/core/mesh_type.h>
+#include <geode/mesh/core/mesh_id.h>
 
 #include <geode/model/common.h>
 #include <geode/model/mixin/core/component.h>
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( PolygonalSurface );
+    FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMesh );
     FORWARD_DECLARATION_DIMENSION_CLASS( Surfaces );
     FORWARD_DECLARATION_DIMENSION_CLASS( SurfacesBuilder );
 } // namespace geode
@@ -71,23 +71,23 @@ namespace geode
             return { this->component_type_static(), this->id() };
         };
 
-        const PolygonalSurface< dimension >& mesh() const;
+        const SurfaceMesh< dimension >& mesh() const;
 
         Surface( SurfacesKey ) : Surface() {}
 
-        Surface( const MeshType& type, SurfacesKey ) : Surface( type ){};
+        Surface( const MeshImpl& impl, SurfacesKey ) : Surface( impl ){};
 
-        PolygonalSurface< dimension >& modifiable_mesh( SurfacesKey )
+        SurfaceMesh< dimension >& modifiable_mesh( SurfacesKey )
         {
             return modifiable_mesh();
         }
 
-        const MeshType& mesh_type() const;
+        const MeshImpl& mesh_type() const;
 
-        void set_mesh( std::unique_ptr< PolygonalSurface< dimension > > mesh,
-            SurfacesKey );
+        void set_mesh(
+            std::unique_ptr< SurfaceMesh< dimension > > mesh, SurfacesKey );
 
-        void set_mesh( std::unique_ptr< PolygonalSurface< dimension > > mesh,
+        void set_mesh( std::unique_ptr< SurfaceMesh< dimension > > mesh,
             SurfacesBuilderKey );
 
         void set_surface_name( absl::string_view name, SurfacesBuilderKey )
@@ -95,7 +95,7 @@ namespace geode
             this->set_name( name );
         }
 
-        PolygonalSurface< dimension >& modifiable_mesh( SurfacesBuilderKey )
+        SurfaceMesh< dimension >& modifiable_mesh( SurfacesBuilderKey )
         {
             return modifiable_mesh();
         }
@@ -103,9 +103,9 @@ namespace geode
     private:
         Surface();
 
-        explicit Surface( const MeshType& type );
+        explicit Surface( const MeshImpl& impl );
 
-        PolygonalSurface< dimension >& modifiable_mesh();
+        SurfaceMesh< dimension >& modifiable_mesh();
 
         template < typename Archive >
         void serialize( Archive& archive );

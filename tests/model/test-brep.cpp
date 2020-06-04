@@ -57,7 +57,7 @@ std::array< geode::uuid, 6 > add_corners(
         builder.set_corner_name( uuids[c], absl::StrCat( "corner", c + 1 ) );
     }
     const auto& temp_corner = model.corner(
-        builder.add_corner( geode::OpenGeodePointSet3D::type_name_static() ) );
+        builder.add_corner( geode::OpenGeodePointSet3D::impl_name_static() ) );
     builder.remove_corner( temp_corner );
     const auto message =
         absl::StrCat( "[Test] BRep should have ", 6, " corners" );
@@ -79,7 +79,7 @@ std::array< geode::uuid, 9 > add_lines(
         builder.set_line_name( uuids[l], absl::StrCat( "line", l + 1 ) );
     }
     const auto& temp_line = model.line(
-        builder.add_line( geode::OpenGeodeEdgedCurve3D::type_name_static() ) );
+        builder.add_line( geode::OpenGeodeEdgedCurve3D::impl_name_static() ) );
     builder.remove_line( temp_line );
     const auto message =
         absl::StrCat( "[Test] BRep should have ", 9, " lines" );
@@ -98,13 +98,13 @@ std::array< geode::uuid, 5 > add_surfaces(
     for( const auto s : geode::Range{ 2 } )
     {
         uuids[s] = builder.add_surface(
-            geode::OpenGeodeTriangulatedSurface3D::type_name_static() );
+            geode::OpenGeodeTriangulatedSurface3D::impl_name_static() );
         builder.set_surface_name( uuids[s], absl::StrCat( "surface", s + 1 ) );
     }
     for( const auto s : geode::Range{ 2, 5 } )
     {
         uuids[s] = builder.add_surface(
-            geode::OpenGeodePolygonalSurface3D::type_name_static() );
+            geode::OpenGeodePolygonalSurface3D::impl_name_static() );
     }
     const auto& temp_surface = model.surface( builder.add_surface() );
     builder.remove_surface( temp_surface );
@@ -128,7 +128,7 @@ std::array< geode::uuid, 1 > add_blocks(
         builder.set_block_name( uuids[b], absl::StrCat( "block", b + 1 ) );
     }
     const auto& temp_block = model.block( builder.add_block(
-        geode::OpenGeodePolyhedralSolid3D::type_name_static() ) );
+        geode::OpenGeodePolyhedralSolid3D::impl_name_static() ) );
     builder.remove_block( temp_block );
     const auto message =
         absl::StrCat( "[Test] BRep should have ", 1, " block" );

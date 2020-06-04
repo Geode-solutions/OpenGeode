@@ -122,7 +122,7 @@ namespace geode
 
         /*!
          * Delete a set of surface polygons
-         * @param[in] to_delete Vector of size polygonal_surface_.nb_polygons().
+         * @param[in] to_delete Vector of size surface_mesh_.nb_polygons().
          * If to_delete[i] is true the polygon of index i is deleted, else it is
          * kept.
          * @return the mapping between old polygon indices to new ones.
@@ -161,22 +161,20 @@ namespace geode
         void associate_polygon_vertex_to_vertex(
             const PolygonVertex& polygon_vertex, index_t vertex_id );
 
-        void copy(
-            const SurfaceMesh< dimension >& polygonal_surface, BuilderKey )
+        void copy( const SurfaceMesh< dimension >& surface_mesh, BuilderKey )
         {
-            copy( polygonal_surface );
+            copy( surface_mesh );
         }
 
+        void set_mesh(
+            SurfaceMesh< dimension >& mesh, MeshBuilderFactoryKey key );
+
     protected:
-        SurfaceMeshBuilder( SurfaceMesh< dimension >& polygonal_surface )
-            : VertexSetBuilder( polygonal_surface ),
-              polygonal_surface_( polygonal_surface )
-        {
-        }
+        SurfaceMeshBuilder() = default;
 
         index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices );
 
-        void copy( const SurfaceMesh< dimension >& polygonal_surface );
+        void copy( const SurfaceMesh< dimension >& surface_mesh );
 
     private:
         virtual void do_set_point(
@@ -214,13 +212,7 @@ namespace geode
             index_t new_vertex_id );
 
     private:
-        SurfaceMesh< dimension >& polygonal_surface_;
+        SurfaceMesh< dimension >* surface_mesh_;
     };
     ALIAS_2D_AND_3D( SurfaceMeshBuilder );
-
-    template < index_t dimension >
-    using SurfaceMeshBuilderFactory = Factory< MeshType,
-        SurfaceMeshBuilder< dimension >,
-        SurfaceMesh< dimension >& >;
-    ALIAS_2D_AND_3D( SurfaceMeshBuilderFactory );
 } // namespace geode

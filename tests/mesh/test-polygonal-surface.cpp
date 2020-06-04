@@ -266,7 +266,7 @@ void test_polygon_barycenter(
 void test_polygon_area()
 {
     auto polygonal_surface = geode::PolygonalSurface2D::create(
-        geode::OpenGeodePolygonalSurface2D::type_name_static() );
+        geode::OpenGeodePolygonalSurface2D::impl_name_static() );
     auto builder =
         geode::PolygonalSurfaceBuilder2D::create( *polygonal_surface );
     const double a{ 6.0 };
@@ -288,7 +288,7 @@ void test_polygon_area()
 void test_polygon_normal()
 {
     auto polygonal_surface = geode::PolygonalSurface3D::create(
-        geode::OpenGeodePolygonalSurface3D::type_name_static() );
+        geode::OpenGeodePolygonalSurface3D::impl_name_static() );
     auto builder =
         geode::PolygonalSurfaceBuilder3D::create( *polygonal_surface );
     const double a{ 6.0 };
@@ -310,7 +310,7 @@ void test_polygon_normal()
 void test_polygon_vertex_normal()
 {
     auto polygonal_surface = geode::PolygonalSurface3D::create(
-        geode::OpenGeodePolygonalSurface3D::type_name_static() );
+        geode::OpenGeodePolygonalSurface3D::impl_name_static() );
     auto builder =
         geode::PolygonalSurfaceBuilder3D::create( *polygonal_surface );
 
@@ -335,7 +335,7 @@ void test_io( const geode::PolygonalSurface3D& polygonal_surface,
     geode::save_polygonal_surface( polygonal_surface, filename );
     geode::load_polygonal_surface< 3 >( filename );
     auto new_polygonal_surface = geode::load_polygonal_surface< 3 >(
-        geode::OpenGeodePolygonalSurface3D::type_name_static(), filename );
+        geode::OpenGeodePolygonalSurface3D::impl_name_static(), filename );
 
     OPENGEODE_EXCEPTION( new_polygonal_surface->nb_vertices() == 7,
         "[Test] Reloaded PolygonalSurface should have 7 vertices" );
@@ -438,7 +438,7 @@ void test_delete_all( const geode::PolygonalSurface3D& polygonal_surface,
 void test()
 {
     auto polygonal_surface = geode::PolygonalSurface3D::create(
-        geode::OpenGeodePolygonalSurface3D::type_name_static() );
+        geode::OpenGeodePolygonalSurface3D::impl_name_static() );
     auto builder =
         geode::PolygonalSurfaceBuilder3D::create( *polygonal_surface );
 

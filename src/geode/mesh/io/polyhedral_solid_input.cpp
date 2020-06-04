@@ -23,18 +23,19 @@
 
 #include <geode/mesh/io/polyhedral_solid_input.h>
 
+#include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polyhedral_solid.h>
 
 namespace geode
 {
     template < index_t dimension >
     std::unique_ptr< PolyhedralSolid< dimension > > load_polyhedral_solid(
-        const MeshType& type, absl::string_view filename )
+        const MeshImpl& impl, absl::string_view filename )
     {
         try
         {
             auto polyhedral_solid =
-                PolyhedralSolid< dimension >::create( type );
+                PolyhedralSolid< dimension >::create( impl );
             auto input = PolyhedralSolidInputFactory< dimension >::create(
                 extension_from_filename( filename ).data(), *polyhedral_solid,
                 filename );
@@ -54,7 +55,9 @@ namespace geode
         absl::string_view filename )
     {
         return load_polyhedral_solid< dimension >(
-            PolyhedralSolid< dimension >::default_type(), filename );
+            MeshFactory::default_impl(
+                PolyhedralSolid< dimension >::type_name_static() ),
+            filename );
     }
 
     template < index_t dimension >
@@ -67,7 +70,7 @@ namespace geode
     }
 
     template std::unique_ptr< PolyhedralSolid< 3 > > opengeode_mesh_api
-        load_polyhedral_solid( const MeshType&, absl::string_view );
+        load_polyhedral_solid( const MeshImpl&, absl::string_view );
 
     template std::unique_ptr< PolyhedralSolid< 3 > >
         opengeode_mesh_api load_polyhedral_solid( absl::string_view );

@@ -29,37 +29,22 @@
 #include <geode/geometry/vector.h>
 
 #include <geode/mesh/builder/edged_curve_builder.h>
-#include <geode/mesh/core/geode_edged_curve.h>
+#include <geode/mesh/core/mesh_factory.h>
 
 namespace geode
 {
     template < index_t dimension >
     std::unique_ptr< EdgedCurve< dimension > > EdgedCurve< dimension >::create()
     {
-        return create( default_type() );
+        return MeshFactory::create_default_mesh< EdgedCurve< dimension > >(
+            EdgedCurve< dimension >::type_name_static() );
     }
 
     template < index_t dimension >
     std::unique_ptr< EdgedCurve< dimension > > EdgedCurve< dimension >::create(
-        const MeshType& type )
+        const MeshImpl& impl )
     {
-        try
-        {
-            return EdgedCurveFactory< dimension >::create( type );
-        }
-        catch( const OpenGeodeException& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeException{
-                "Could not create EdgedCurve data structure: ", type.get()
-            };
-        }
-    }
-
-    template < index_t dimension >
-    MeshType EdgedCurve< dimension >::default_type()
-    {
-        return OpenGeodeEdgedCurve< dimension >::type_name_static();
+        return MeshFactory::create_mesh< EdgedCurve< dimension > >( impl );
     }
 
     template < index_t dimension >
@@ -102,7 +87,7 @@ namespace geode
     std::unique_ptr< EdgedCurve< dimension > >
         EdgedCurve< dimension >::clone() const
     {
-        auto clone = create( type_name() );
+        auto clone = create( impl_name() );
         auto builder = EdgedCurveBuilder< dimension >::create( *clone );
         builder->copy( *this, {} );
         return clone;

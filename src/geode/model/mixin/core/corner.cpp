@@ -26,6 +26,7 @@
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
 
+#include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/point_set.h>
 
 #include <geode/model/mixin/core/detail/mesh_storage.h>
@@ -57,7 +58,8 @@ namespace geode
 
     template < index_t dimension >
     Corner< dimension >::Corner()
-        : Corner( PointSet< dimension >::default_type() )
+        : Corner( MeshFactory::default_impl(
+            PointSet< dimension >::type_name_static() ) )
     {
     }
 
@@ -68,9 +70,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    Corner< dimension >::Corner( const MeshType& type )
+    Corner< dimension >::Corner( const MeshImpl& impl )
     {
-        impl_->set_mesh( PointSet< dimension >::create( type ) );
+        impl_->set_mesh( PointSet< dimension >::create( impl ) );
     }
 
     template < index_t dimension >
@@ -86,7 +88,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    const MeshType& Corner< dimension >::mesh_type() const
+    const MeshImpl& Corner< dimension >::mesh_type() const
     {
         return impl_->mesh_type();
     }

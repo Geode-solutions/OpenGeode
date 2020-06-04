@@ -125,7 +125,7 @@ void test_io(
     geode::save_triangulated_surface( surface, filename );
     geode::load_triangulated_surface< 3 >( filename );
     geode::load_triangulated_surface< 3 >(
-        geode::OpenGeodeTriangulatedSurface3D::type_name_static(), filename );
+        geode::OpenGeodeTriangulatedSurface3D::impl_name_static(), filename );
 }
 
 void test_clone( const geode::TriangulatedSurface3D& surface )
@@ -185,7 +185,7 @@ void test_delete_all( const geode::TriangulatedSurface3D& triangulated_surface,
 void test()
 {
     auto surface = geode::TriangulatedSurface3D::create(
-        geode::OpenGeodeTriangulatedSurface3D::type_name_static() );
+        geode::OpenGeodeTriangulatedSurface3D::impl_name_static() );
     auto builder = geode::TriangulatedSurfaceBuilder3D::create( *surface );
 
     test_create_vertices( *surface, *builder );

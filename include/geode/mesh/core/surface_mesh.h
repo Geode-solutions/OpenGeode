@@ -133,6 +133,20 @@ namespace geode
     public:
         ~SurfaceMesh();
 
+        /*!
+         * Create a new SurfaceMesh using default data structure.
+         */
+        static std::unique_ptr< SurfaceMesh< dimension > > create();
+
+        /*!
+         * Create a new SurfaceMesh using a specified data structure.
+         * @param[in] impl Data structure implementation
+         */
+        static std::unique_ptr< SurfaceMesh< dimension > > create(
+            const MeshImpl& impl );
+
+        std::unique_ptr< SurfaceMesh< dimension > > clone() const;
+
         const Point< dimension >& point( index_t vertex_id ) const;
 
         index_t nb_edges() const;

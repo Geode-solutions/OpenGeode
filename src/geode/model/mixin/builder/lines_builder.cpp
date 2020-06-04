@@ -38,9 +38,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    const uuid& LinesBuilder< dimension >::create_line( const MeshType& type )
+    const uuid& LinesBuilder< dimension >::create_line( const MeshImpl& impl )
     {
-        return lines_.create_line( type );
+        return lines_.create_line( impl );
     }
 
     template < index_t dimension >

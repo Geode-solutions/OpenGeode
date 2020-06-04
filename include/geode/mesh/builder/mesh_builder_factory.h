@@ -23,53 +23,45 @@
 
 #pragma once
 
-#include <memory>
+#include <geode/basic/factory.h>
+#include <geode/basic/passkey.h>
 
+#include <geode/mesh/builder/vertex_set_builder.h>
+#include <geode/mesh/common.h>
 #include <geode/mesh/core/mesh_id.h>
 
-#include <geode/model/common.h>
-
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( Line );
-    FORWARD_DECLARATION_DIMENSION_CLASS( Lines );
-    FORWARD_DECLARATION_DIMENSION_CLASS( EdgedCurve );
-    FORWARD_DECLARATION_DIMENSION_CLASS( EdgedCurveBuilder );
-
-    struct uuid;
-} // namespace geode
-
-namespace geode
-{
-    template < index_t dimension >
-    class LinesBuilder
+    class MeshBuilderFactoryKey
     {
-    public:
-        void load_lines( absl::string_view directory );
-
-        /*!
-         * Get a pointer to the builder of a Line mesh
-         * @param[in] id Unique index of the Line
-         */
-        std::unique_ptr< EdgedCurveBuilder< dimension > > line_mesh_builder(
-            const uuid& id );
-
-        void set_line_name( const uuid& id, absl::string_view name );
-
-    protected:
-        LinesBuilder( Lines< dimension >& lines ) : lines_( lines ) {}
-
-        const uuid& create_line();
-
-        const uuid& create_line( const MeshImpl& impl );
-
-        void delete_line( const Line< dimension >& line );
-
-        void set_line_mesh(
-            const uuid& id, std::unique_ptr< EdgedCurve< dimension > > mesh );
+        friend class MeshBuilderFactory;
 
     private:
-        Lines< dimension >& lines_;
+        MeshBuilderFactoryKey() {}
     };
-    ALIAS_2D_AND_3D( LinesBuilder );
+
+    class opengeode_mesh_api MeshBuilderFactory
+        : public Factory< MeshImpl, VertexSetBuilder >
+    {
+        PASSKEY( MeshBuilderFactory, Key );
+
+    public:
+        template < typename MeshBuilder >
+        static void register_mesh_builder( MeshImpl key )
+        {
+            register_creator< MeshBuilder >( std::move( key ) );
+        }
+
+        template < typename MeshBuilder, typename Mesh >
+        static std::unique_ptr< MeshBuilder > create_mesh_builder( Mesh& mesh )
+        {
+            auto* builder = dynamic_cast< MeshBuilder* >(
+                create( mesh.impl_name() ).release() );
+            OPENGEODE_EXCEPTION( builder,
+                "Cannot create mesh builder with key: ",
+                mesh.impl_name().get() );
+            builder->set_mesh( mesh, MeshBuilderFactoryKey{} );
+            return std::unique_ptr< MeshBuilder >{ builder };
+        }
+    };
 } // namespace geode

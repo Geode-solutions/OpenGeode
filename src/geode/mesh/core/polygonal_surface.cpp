@@ -39,54 +39,32 @@
 
 #include <geode/mesh/builder/polygonal_surface_builder.h>
 #include <geode/mesh/core/detail/facet_storage.h>
-#include <geode/mesh/core/geode_polygonal_surface.h>
-#include <geode/mesh/core/triangulated_surface.h>
+#include <geode/mesh/core/mesh_factory.h>
 
 namespace geode
 {
     template < index_t dimension >
-    MeshType PolygonalSurface< dimension >::default_type()
-    {
-        return OpenGeodePolygonalSurface< dimension >::type_name_static();
-    }
-
-    template < index_t dimension >
     std::unique_ptr< PolygonalSurface< dimension > >
         PolygonalSurface< dimension >::create()
     {
-        return create( default_type() );
+        return MeshFactory::create_default_mesh<
+            PolygonalSurface< dimension > >(
+            PolygonalSurface< dimension >::type_name_static() );
     }
 
     template < index_t dimension >
     std::unique_ptr< PolygonalSurface< dimension > >
-        PolygonalSurface< dimension >::create( const MeshType& type )
+        PolygonalSurface< dimension >::create( const MeshImpl& impl )
     {
-        try
-        {
-            return PolygonalSurfaceFactory< dimension >::create( type );
-        }
-        catch( const OpenGeodeException& )
-        {
-            try
-            {
-                return TriangulatedSurface< dimension >::create( type );
-            }
-            catch( const OpenGeodeException& e )
-            {
-                Logger::error( e.what() );
-                throw OpenGeodeException{
-                    "Could not create PolygonalSurface data structure: ",
-                    type.get()
-                };
-            }
-        }
+        return MeshFactory::create_mesh< PolygonalSurface< dimension > >(
+            impl );
     }
 
     template < index_t dimension >
     std::unique_ptr< PolygonalSurface< dimension > >
         PolygonalSurface< dimension >::clone() const
     {
-        auto clone = create( this->type_name() );
+        auto clone = create( this->impl_name() );
         auto builder = PolygonalSurfaceBuilder< dimension >::create( *clone );
         builder->copy( *this, {} );
         return clone;

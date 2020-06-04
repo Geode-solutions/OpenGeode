@@ -23,7 +23,7 @@
 
 #include <geode/mesh/io/triangulated_surface_input.h>
 
-#include <geode/mesh/builder/triangulated_surface_builder.h>
+#include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/triangulated_surface.h>
 
 namespace geode
@@ -31,12 +31,12 @@ namespace geode
     template < index_t dimension >
     std::unique_ptr< TriangulatedSurface< dimension > >
         load_triangulated_surface(
-            const MeshType& type, absl::string_view filename )
+            const MeshImpl& impl, absl::string_view filename )
     {
         try
         {
             auto triangulated_surface =
-                TriangulatedSurface< dimension >::create( type );
+                TriangulatedSurface< dimension >::create( impl );
             auto input = TriangulatedSurfaceInputFactory< dimension >::create(
                 extension_from_filename( filename ).data(),
                 *triangulated_surface, filename );
@@ -57,22 +57,24 @@ namespace geode
         load_triangulated_surface( absl::string_view filename )
     {
         return load_triangulated_surface< dimension >(
-            TriangulatedSurface< dimension >::default_type(), filename );
+            MeshFactory::default_impl(
+                TriangulatedSurface< dimension >::type_name_static() ),
+            filename );
     }
 
     template < index_t dimension >
     TriangulatedSurfaceInput< dimension >::TriangulatedSurfaceInput(
         TriangulatedSurface< dimension >& triangulated_surface,
         absl::string_view filename )
-        : PolygonalSurfaceInput< dimension >( triangulated_surface, filename ),
+        : VertexSetInput( triangulated_surface, filename ),
           triangulated_surface_( triangulated_surface )
     {
     }
 
     template std::unique_ptr< TriangulatedSurface< 2 > > opengeode_mesh_api
-        load_triangulated_surface( const MeshType&, absl::string_view );
+        load_triangulated_surface( const MeshImpl&, absl::string_view );
     template std::unique_ptr< TriangulatedSurface< 3 > > opengeode_mesh_api
-        load_triangulated_surface( const MeshType&, absl::string_view );
+        load_triangulated_surface( const MeshImpl&, absl::string_view );
 
     template std::unique_ptr< TriangulatedSurface< 2 > >
         opengeode_mesh_api load_triangulated_surface( absl::string_view );

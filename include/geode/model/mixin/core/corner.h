@@ -26,7 +26,7 @@
 #include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
-#include <geode/mesh/core/mesh_type.h>
+#include <geode/mesh/core/mesh_id.h>
 
 #include <geode/model/common.h>
 #include <geode/model/mixin/core/component.h>
@@ -78,11 +78,11 @@ namespace geode
             return modifiable_mesh();
         }
 
-        const MeshType& mesh_type() const;
+        const MeshImpl& mesh_type() const;
 
         Corner( CornersKey ) : Corner() {}
 
-        Corner( const MeshType& type, CornersKey ) : Corner( type ) {}
+        Corner( const MeshImpl& impl, CornersKey ) : Corner( impl ) {}
 
         void set_mesh(
             std::unique_ptr< PointSet< dimension > > mesh, CornersKey );
@@ -103,7 +103,7 @@ namespace geode
     private:
         Corner();
 
-        explicit Corner( const MeshType& type );
+        explicit Corner( const MeshImpl& impl );
 
         PointSet< dimension >& modifiable_mesh();
 

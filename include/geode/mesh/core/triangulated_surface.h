@@ -26,7 +26,7 @@
 #include <geode/basic/bitsery_archive.h>
 
 #include <geode/mesh/common.h>
-#include <geode/mesh/core/polygonal_surface.h>
+#include <geode/mesh/core/surface_mesh.h>
 
 namespace geode
 {
@@ -35,7 +35,7 @@ namespace geode
      * only.
      */
     template < index_t dimension >
-    class TriangulatedSurface : public PolygonalSurface< dimension >
+    class TriangulatedSurface : public SurfaceMesh< dimension >
     {
     public:
         /*!
@@ -45,12 +45,16 @@ namespace geode
 
         /*!
          * Create a new TriangulatedSurface using a specified data structure.
-         * @param[in] type Data structure type
+         * @param[in] impl Data structure implementation
          */
         static std::unique_ptr< TriangulatedSurface< dimension > > create(
-            const MeshType& type );
+            const MeshImpl& impl );
 
-        static MeshType default_type();
+        static MeshType type_name_static()
+        {
+            return MeshType{ absl::StrCat(
+                "TriangulatedSurface", dimension, "D" ) };
+        }
 
         std::unique_ptr< TriangulatedSurface< dimension > > clone() const;
 
@@ -67,8 +71,7 @@ namespace geode
                 []( Archive& archive,
                     TriangulatedSurface& triangulated_surface ) {
                     archive.ext( triangulated_surface,
-                        bitsery::ext::BaseClass<
-                            PolygonalSurface< dimension > >{} );
+                        bitsery::ext::BaseClass< SurfaceMesh< dimension > >{} );
                 } );
         }
 
@@ -78,9 +81,4 @@ namespace geode
         }
     };
     ALIAS_2D_AND_3D( TriangulatedSurface );
-
-    template < index_t dimension >
-    using TriangulatedSurfaceFactory =
-        Factory< MeshType, TriangulatedSurface< dimension > >;
-    ALIAS_2D_AND_3D( TriangulatedSurfaceFactory );
 } // namespace geode

@@ -37,10 +37,10 @@
 #include <geode/geometry/bounding_box.h>
 #include <geode/geometry/vector.h>
 
-#include <geode/mesh/builder/polygonal_surface_builder.h>
+#include <geode/mesh/builder/surface_mesh_builder.h>
 #include <geode/mesh/core/detail/facet_storage.h>
-#include <geode/mesh/core/geode_polygonal_surface.h>
-#include <geode/mesh/core/triangulated_surface.h>
+#include <geode/mesh/core/mesh_factory.h>
+#include <geode/mesh/core/polygonal_surface.h>
 
 namespace
 {
@@ -242,6 +242,21 @@ namespace geode
     template < index_t dimension >
     SurfaceMesh< dimension >::~SurfaceMesh() // NOLINT
     {
+    }
+
+    template < index_t dimension >
+    std::unique_ptr< SurfaceMesh< dimension > >
+        SurfaceMesh< dimension >::create()
+    {
+        return MeshFactory::create_default_mesh< SurfaceMesh< dimension > >(
+            PolygonalSurface< dimension >::type_name_static() );
+    }
+
+    template < index_t dimension >
+    std::unique_ptr< SurfaceMesh< dimension > >
+        SurfaceMesh< dimension >::create( const MeshImpl& impl )
+    {
+        return MeshFactory::create_mesh< SurfaceMesh< dimension > >( impl );
     }
 
     template < index_t dimension >
@@ -724,8 +739,23 @@ namespace geode
         return normal.normalize();
     }
 
+    template < index_t dimension >
+    std::unique_ptr< SurfaceMesh< dimension > >
+        SurfaceMesh< dimension >::clone() const
+    {
+        auto clone = create( this->impl_name() );
+        auto builder = SurfaceMeshBuilder< dimension >::create( *clone );
+        builder->copy( *this, {} );
+        return clone;
+    }
+
     template class opengeode_mesh_api SurfaceMesh< 2 >;
     template class opengeode_mesh_api SurfaceMesh< 3 >;
+
+    template opengeode_mesh_api Vector3D SurfaceMesh< 3 >::polygon_normal(
+        index_t ) const;
+    template opengeode_mesh_api
+        Vector3D SurfaceMesh< 3 >::polygon_vertex_normal( index_t ) const;
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, SurfaceMesh< 2 > );
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, SurfaceMesh< 3 > );

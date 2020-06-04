@@ -202,12 +202,16 @@ namespace geode
 
         /*!
          * Create a new PolyhedralSolid using a specified data structure.
-         * @param[in] type Data structure type.
+         * @param[in] impl Data structure implementation.
          */
         static std::unique_ptr< PolyhedralSolid< dimension > > create(
-            const MeshType& type );
+            const MeshImpl& impl );
 
-        static MeshType default_type();
+        static MeshType type_name_static()
+        {
+            return MeshType{ absl::StrCat(
+                "PolyhedralSolid", dimension, "D" ) };
+        }
 
         std::unique_ptr< PolyhedralSolid< dimension > > clone() const;
 
@@ -523,9 +527,4 @@ namespace geode
         IMPLEMENTATION_MEMBER( impl_ );
     };
     ALIAS_3D( PolyhedralSolid );
-
-    template < index_t dimension >
-    using PolyhedralSolidFactory =
-        Factory< MeshType, PolyhedralSolid< dimension > >;
-    ALIAS_3D( PolyhedralSolidFactory );
 } // namespace geode

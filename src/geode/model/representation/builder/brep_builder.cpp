@@ -23,6 +23,12 @@
 
 #include <geode/model/representation/builder/brep_builder.h>
 
+#include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/core/mesh_id.h>
+#include <geode/mesh/core/point_set.h>
+#include <geode/mesh/core/polyhedral_solid.h>
+#include <geode/mesh/core/surface_mesh.h>
+
 #include <geode/model/mixin/core/block.h>
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/line.h>
@@ -151,9 +157,9 @@ namespace geode
         return id;
     }
 
-    const uuid& BRepBuilder::add_corner( const MeshType& type )
+    const uuid& BRepBuilder::add_corner( const MeshImpl& impl )
     {
-        const auto& id = create_corner( type );
+        const auto& id = create_corner( impl );
         register_new_component( *this, brep_.corner( id ) );
         return id;
     }
@@ -165,9 +171,9 @@ namespace geode
         return id;
     }
 
-    const uuid& BRepBuilder::add_line( const MeshType& type )
+    const uuid& BRepBuilder::add_line( const MeshImpl& impl )
     {
-        const auto& id = create_line( type );
+        const auto& id = create_line( impl );
         register_new_component( *this, brep_.line( id ) );
         return id;
     }
@@ -179,9 +185,9 @@ namespace geode
         return id;
     }
 
-    const uuid& BRepBuilder::add_surface( const MeshType& type )
+    const uuid& BRepBuilder::add_surface( const MeshImpl& impl )
     {
-        const auto& id = create_surface( type );
+        const auto& id = create_surface( impl );
         register_new_component( *this, brep_.surface( id ) );
         return id;
     }
@@ -193,9 +199,9 @@ namespace geode
         return id;
     }
 
-    const uuid& BRepBuilder::add_block( const MeshType& type )
+    const uuid& BRepBuilder::add_block( const MeshImpl& impl )
     {
-        const auto& id = create_block( type );
+        const auto& id = create_block( impl );
         register_new_component( *this, brep_.block( id ) );
         return id;
     }
@@ -224,7 +230,7 @@ namespace geode
     }
 
     void BRepBuilder::update_surface_mesh(
-        const Surface3D& surface, std::unique_ptr< PolygonalSurface3D > mesh )
+        const Surface3D& surface, std::unique_ptr< SurfaceMesh3D > mesh )
     {
         unregister_mesh_component( surface );
         set_surface_mesh( surface.id(), std::move( mesh ) );

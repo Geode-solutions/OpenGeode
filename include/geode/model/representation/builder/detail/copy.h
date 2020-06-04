@@ -31,8 +31,8 @@
 
 #include <geode/mesh/core/edged_curve.h>
 #include <geode/mesh/core/point_set.h>
-#include <geode/mesh/core/polygonal_surface.h>
 #include <geode/mesh/core/polyhedral_solid.h>
+#include <geode/mesh/core/surface_mesh.h>
 
 #include <geode/model/common.h>
 #include <geode/model/mixin/core/block.h>
@@ -78,7 +78,7 @@ namespace geode
             for( const auto& corner : from.corners() )
             {
                 const auto id =
-                    builder_to.add_corner( corner.mesh().type_name() );
+                    builder_to.add_corner( corner.mesh().impl_name() );
                 mapping.map( corner.id(), id );
                 builder_to.register_mesh_component( to.corner( id ) );
             }
@@ -93,7 +93,7 @@ namespace geode
             mapping.reserve( from.nb_lines() );
             for( const auto& line : from.lines() )
             {
-                const auto id = builder_to.add_line( line.mesh().type_name() );
+                const auto id = builder_to.add_line( line.mesh().impl_name() );
                 mapping.map( line.id(), id );
                 builder_to.register_mesh_component( to.line( id ) );
             }
@@ -109,7 +109,7 @@ namespace geode
             for( const auto& surface : from.surfaces() )
             {
                 const auto id =
-                    builder_to.add_surface( surface.mesh().type_name() );
+                    builder_to.add_surface( surface.mesh().impl_name() );
                 mapping.map( surface.id(), id );
                 builder_to.register_mesh_component( to.surface( id ) );
             }
@@ -125,7 +125,7 @@ namespace geode
             for( const auto& block : from.blocks() )
             {
                 const auto id =
-                    builder_to.add_block( block.mesh().type_name() );
+                    builder_to.add_block( block.mesh().impl_name() );
                 mapping.map( block.id(), id );
                 builder_to.register_mesh_component( to.block( id ) );
             }

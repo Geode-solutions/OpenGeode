@@ -23,6 +23,11 @@
 
 #include <geode/model/representation/builder/section_builder.h>
 
+#include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/core/mesh_id.h>
+#include <geode/mesh/core/point_set.h>
+#include <geode/mesh/core/surface_mesh.h>
+
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/line.h>
 #include <geode/model/mixin/core/model_boundary.h>
@@ -130,9 +135,9 @@ namespace geode
         return id;
     }
 
-    const uuid& SectionBuilder::add_corner( const MeshType& type )
+    const uuid& SectionBuilder::add_corner( const MeshImpl& impl )
     {
-        const auto& id = create_corner( type );
+        const auto& id = create_corner( impl );
         register_new_component( *this, section_.corner( id ) );
         return id;
     }
@@ -144,9 +149,9 @@ namespace geode
         return id;
     }
 
-    const uuid& SectionBuilder::add_line( const MeshType& type )
+    const uuid& SectionBuilder::add_line( const MeshImpl& impl )
     {
-        const auto& id = create_line( type );
+        const auto& id = create_line( impl );
         register_new_component( *this, section_.line( id ) );
         return id;
     }
@@ -158,9 +163,9 @@ namespace geode
         return id;
     }
 
-    const uuid& SectionBuilder::add_surface( const MeshType& type )
+    const uuid& SectionBuilder::add_surface( const MeshImpl& impl )
     {
-        const auto& id = create_surface( type );
+        const auto& id = create_surface( impl );
         register_new_component( *this, section_.surface( id ) );
         return id;
     }
@@ -189,7 +194,7 @@ namespace geode
     }
 
     void SectionBuilder::update_surface_mesh(
-        const Surface2D& surface, std::unique_ptr< PolygonalSurface2D > mesh )
+        const Surface2D& surface, std::unique_ptr< SurfaceMesh2D > mesh )
     {
         unregister_mesh_component( surface );
         set_surface_mesh( surface.id(), std::move( mesh ) );

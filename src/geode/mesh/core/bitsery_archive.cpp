@@ -45,8 +45,8 @@ namespace bitsery
             : PolymorphicDerivedClasses< geode::Graph,
                   geode::PointSet2D,
                   geode::PointSet3D,
-                  geode::PolygonalSurface2D,
-                  geode::PolygonalSurface3D,
+                  geode::SurfaceMesh2D,
+                  geode::SurfaceMesh3D,
                   geode::PolyhedralSolid3D >
         {
         };
@@ -85,15 +85,27 @@ namespace bitsery
 
         template <>
         struct PolymorphicBaseClass< geode::PolygonalSurface2D >
-            : PolymorphicDerivedClasses< geode::OpenGeodePolygonalSurface2D,
+            : PolymorphicDerivedClasses< geode::OpenGeodePolygonalSurface2D >
+        {
+        };
+
+        template <>
+        struct PolymorphicBaseClass< geode::SurfaceMesh2D >
+            : PolymorphicDerivedClasses< geode::PolygonalSurface2D,
                   geode::TriangulatedSurface2D >
         {
         };
 
         template <>
-        struct PolymorphicBaseClass< geode::PolygonalSurface3D >
-            : PolymorphicDerivedClasses< geode::OpenGeodePolygonalSurface3D,
+        struct PolymorphicBaseClass< geode::SurfaceMesh3D >
+            : PolymorphicDerivedClasses< geode::PolygonalSurface3D,
                   geode::TriangulatedSurface3D >
+        {
+        };
+
+        template <>
+        struct PolymorphicBaseClass< geode::PolygonalSurface3D >
+            : PolymorphicDerivedClasses< geode::OpenGeodePolygonalSurface3D >
         {
         };
 

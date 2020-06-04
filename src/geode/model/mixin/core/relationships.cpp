@@ -119,7 +119,7 @@ namespace geode
 
         void register_component( const ComponentID& id )
         {
-            const auto index = OpenGeodeGraphBuilder{ graph_ }.create_vertex();
+            const auto index = GraphBuilder::create( graph_ )->create_vertex();
             uuid2index_.set_new_mapping( id.id(), index );
             ids_->set_value( index, id );
         }
@@ -129,7 +129,7 @@ namespace geode
             const auto index = vertex_id( id );
             std::vector< bool > to_delete( graph_.nb_vertices(), false );
             to_delete[index] = true;
-            OpenGeodeGraphBuilder{ graph_ }.delete_vertices( to_delete );
+            GraphBuilder::create( graph_ )->delete_vertices( to_delete );
             uuid2index_.erase( id );
             uuid2index_.decrement_indices_larger_than( index );
         }
@@ -163,7 +163,7 @@ namespace geode
                     ids_->value( vertex_id( to ) ).type().get(), ")" );
                 return;
             }
-            const auto index = OpenGeodeGraphBuilder{ graph_ }.create_edge(
+            const auto index = GraphBuilder::create( graph_ )->create_edge(
                 vertex_id( from ), vertex_id( to ) );
             relation_type_->set_value( index, type );
         }

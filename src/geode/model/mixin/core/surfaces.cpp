@@ -26,6 +26,7 @@
 #include <geode/basic/pimpl_impl.h>
 #include <geode/basic/range.h>
 
+#include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polygonal_surface.h>
 #include <geode/mesh/core/triangulated_surface.h>
 #include <geode/mesh/io/polygonal_surface_input.h>
@@ -94,16 +95,17 @@ namespace geode
             const auto& mesh = surface.mesh();
             const auto file = absl::StrCat(
                 prefix, surface.id().string(), ".", mesh.native_extension() );
-            const auto* triangulated =
-                dynamic_cast< const TriangulatedSurface< dimension >* >(
-                    &mesh );
-            if( triangulated )
+            if( const auto* triangulated =
+                    dynamic_cast< const TriangulatedSurface< dimension >* >(
+                        &mesh ) )
             {
                 save_triangulated_surface( *triangulated, file );
             }
-            else
+            else if( const auto* polygonal =
+                         dynamic_cast< const PolygonalSurface< dimension >* >(
+                             &mesh ) )
             {
-                save_polygonal_surface( mesh, file );
+                save_polygonal_surface( *polygonal, file );
             }
         }
         impl_->save_components( absl::StrCat( directory, "/surfaces" ) );
@@ -119,8 +121,8 @@ namespace geode
         {
             const auto file =
                 impl_->find_file( directory, surface.component_id() );
-            if( TriangulatedSurfaceFactory< dimension >::has_creator(
-                    surface.mesh_type() ) )
+            if( MeshFactory::type( surface.mesh_type() )
+                == TriangulatedSurface< dimension >::type_name_static() )
             {
                 surface.set_mesh( load_triangulated_surface< dimension >(
                                       surface.mesh_type(), file ),
@@ -162,11 +164,11 @@ namespace geode
     }
 
     template < index_t dimension >
-    const uuid& Surfaces< dimension >::create_surface( const MeshType& type )
+    const uuid& Surfaces< dimension >::create_surface( const MeshImpl& impl )
     {
         typename Surfaces< dimension >::Impl::ComponentPtr surface{
             new Surface< dimension >{
-                type, typename Surface< dimension >::SurfacesKey{} }
+                impl, typename Surface< dimension >::SurfacesKey{} }
         };
         const auto& id = surface->id();
         impl_->add_component( std::move( surface ) );
@@ -245,8 +247,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    const Surface< dimension >&
-        Surfaces< dimension >::SurfaceRange::operator*() const
+    const Surface< dimension >& Surfaces< dimension >::SurfaceRange::
+        operator*() const
     {
         return this->impl_->surface();
     }
@@ -260,8 +262,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    Surface< dimension >&
-        Surfaces< dimension >::ModifiableSurfaceRange::operator*() const
+    Surface< dimension >& Surfaces< dimension >::ModifiableSurfaceRange::
+        operator*() const
     {
         return this->impl_->surface();
     }

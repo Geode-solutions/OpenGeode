@@ -46,6 +46,8 @@ namespace geode
         friend class bitsery::Access;
 
     public:
+        NamedType() = default;
+
         explicit NamedType( Type value ) : value_( std::move( value ) ) {}
 
         const Type& get() const
@@ -64,8 +66,6 @@ namespace geode
         }
 
     private:
-        NamedType() = default;
-
         template < typename Archive >
         void serialize( Archive& archive )
         {

@@ -55,12 +55,15 @@ namespace geode
 
         /*!
          * Create a new PointSet using a specified data structure.
-         * @param[in] type Data structure type
+         * @param[in] impl Data structure implementation
          */
         static std::unique_ptr< PointSet< dimension > > create(
-            const MeshType& type );
+            const MeshImpl& impl );
 
-        static MeshType default_type();
+        static MeshType type_name_static()
+        {
+            return MeshType{ absl::StrCat( "PointSet", dimension, "D" ) };
+        }
 
         std::unique_ptr< PointSet< dimension > > clone() const;
 
@@ -83,8 +86,4 @@ namespace geode
             index_t vertex_id ) const = 0;
     };
     ALIAS_2D_AND_3D( PointSet );
-
-    template < index_t dimension >
-    using PointSetFactory = Factory< MeshType, PointSet< dimension > >;
-    ALIAS_2D_AND_3D( PointSetFactory );
 } // namespace geode

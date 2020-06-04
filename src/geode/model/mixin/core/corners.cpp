@@ -133,11 +133,11 @@ namespace geode
     }
 
     template < index_t dimension >
-    const uuid& Corners< dimension >::create_corner( const MeshType& type )
+    const uuid& Corners< dimension >::create_corner( const MeshImpl& impl )
     {
         typename Corners< dimension >::Impl::ComponentPtr corner{
             new Corner< dimension >{
-                type, typename Corner< dimension >::CornersKey{} }
+                impl, typename Corner< dimension >::CornersKey{} }
         };
         const auto& id = corner->id();
         impl_->add_component( std::move( corner ) );

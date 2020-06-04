@@ -43,12 +43,16 @@ namespace geode
 
         /*!
          * Create a new TetrahedralSolid using a specified data structure.
-         * @param[in] type Data structure type
+         * @param[in] impl Data structure implementation
          */
         static std::unique_ptr< TetrahedralSolid< dimension > > create(
-            const MeshType& type );
+            const MeshImpl& impl );
 
-        static MeshType default_type();
+        static MeshType type_name_static()
+        {
+            return MeshType{ absl::StrCat(
+                "TetrahedralSolid", dimension, "D" ) };
+        }
 
         std::unique_ptr< TetrahedralSolid< dimension > > clone() const;
 
@@ -97,9 +101,4 @@ namespace geode
         }
     };
     ALIAS_3D( TetrahedralSolid );
-
-    template < index_t dimension >
-    using TetrahedralSolidFactory =
-        Factory< MeshType, TetrahedralSolid< dimension > >;
-    ALIAS_3D( TetrahedralSolidFactory );
 } // namespace geode

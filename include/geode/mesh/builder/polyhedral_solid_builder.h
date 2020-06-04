@@ -168,12 +168,11 @@ namespace geode
             copy( polyhedral_solid );
         }
 
+        void set_mesh(
+            PolyhedralSolid< dimension >& mesh, MeshBuilderFactoryKey key );
+
     protected:
-        PolyhedralSolidBuilder( PolyhedralSolid< dimension >& polyhedral_solid )
-            : VertexSetBuilder( polyhedral_solid ),
-              polyhedral_solid_( polyhedral_solid )
-        {
-        }
+        PolyhedralSolidBuilder() = default;
 
         index_t find_or_create_facet( PolyhedronFacetVertices facet_vertices );
 
@@ -243,13 +242,7 @@ namespace geode
                 absl::Span< const std::vector< index_t > > facets ) const;
 
     private:
-        PolyhedralSolid< dimension >& polyhedral_solid_;
+        PolyhedralSolid< dimension >* polyhedral_solid_;
     };
     ALIAS_3D( PolyhedralSolidBuilder );
-
-    template < index_t dimension >
-    using PolyhedralSolidBuilderFactory = Factory< MeshType,
-        PolyhedralSolidBuilder< dimension >,
-        PolyhedralSolid< dimension >& >;
-    ALIAS_3D( PolyhedralSolidBuilderFactory );
 } // namespace geode

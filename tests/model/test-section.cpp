@@ -54,7 +54,7 @@ std::array< geode::uuid, 5 > add_corners(
         uuids[c] = builder.add_corner();
     }
     const auto& temp_corner = model.corner(
-        builder.add_corner( geode::OpenGeodePointSet2D::type_name_static() ) );
+        builder.add_corner( geode::OpenGeodePointSet2D::impl_name_static() ) );
     builder.remove_corner( temp_corner );
     const auto message =
         absl::StrCat( "[Test] Section should have ", 5, " corners" );
@@ -73,7 +73,7 @@ std::array< geode::uuid, 6 > add_lines(
         uuids[l] = builder.add_line();
     }
     const auto& temp_line = model.line(
-        builder.add_line( geode::OpenGeodeEdgedCurve2D::type_name_static() ) );
+        builder.add_line( geode::OpenGeodeEdgedCurve2D::impl_name_static() ) );
     builder.remove_line( temp_line );
     const auto message =
         absl::StrCat( "[Test] Section should have ", 6, " lines" );
@@ -92,7 +92,7 @@ std::array< geode::uuid, 2 > add_surfaces(
         uuids[s] = builder.add_surface();
     }
     const auto& temp_surface = model.surface( builder.add_surface(
-        geode::OpenGeodePolygonalSurface2D::type_name_static() ) );
+        geode::OpenGeodePolygonalSurface2D::impl_name_static() ) );
     builder.remove_surface( temp_surface );
     const auto message =
         absl::StrCat( "[Test] Section should have ", 2, " surfaces" );

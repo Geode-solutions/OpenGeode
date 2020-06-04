@@ -50,15 +50,20 @@ namespace geode
         OpenGeodeTetrahedralSolid();
         ~OpenGeodeTetrahedralSolid();
 
-        static MeshType type_name_static()
+        static MeshImpl impl_name_static()
         {
-            return MeshType{ absl::StrCat(
+            return MeshImpl{ absl::StrCat(
                 "OpenGeodeTetrahedralSolid", dimension, "D" ) };
+        }
+
+        MeshImpl impl_name() const override
+        {
+            return impl_name_static();
         }
 
         MeshType type_name() const override
         {
-            return type_name_static();
+            return TetrahedralSolid< dimension >::type_name_static();
         }
 
         static absl::string_view native_extension_static()

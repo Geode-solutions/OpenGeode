@@ -73,13 +73,11 @@ namespace geode
             copy( tetrahedral_solid );
         }
 
+        void set_mesh(
+            TetrahedralSolid< dimension >& mesh, MeshBuilderFactoryKey key );
+
     protected:
-        TetrahedralSolidBuilder(
-            TetrahedralSolid< dimension >& tetrahedral_solid )
-            : PolyhedralSolidBuilder< dimension >( tetrahedral_solid ),
-              tetrahedral_solid_( tetrahedral_solid )
-        {
-        }
+        TetrahedralSolidBuilder() = default;
 
         void copy( const TetrahedralSolid< dimension >& tetrahedral_solid );
 
@@ -113,13 +111,7 @@ namespace geode
                 const std::array< index_t, 4 >& vertices ) const = 0;
 
     private:
-        TetrahedralSolid< dimension >& tetrahedral_solid_;
+        TetrahedralSolid< dimension >* tetrahedral_solid_;
     };
     ALIAS_3D( TetrahedralSolidBuilder );
-
-    template < index_t dimension >
-    using TetrahedralSolidBuilderFactory = Factory< MeshType,
-        TetrahedralSolidBuilder< dimension >,
-        TetrahedralSolid< dimension >& >;
-    ALIAS_3D( TetrahedralSolidBuilderFactory );
 } // namespace geode

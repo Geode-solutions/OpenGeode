@@ -174,14 +174,14 @@ namespace geode
 
         index_t create_unique_vertex()
         {
-            return OpenGeodeVertexSetBuilder{ unique_vertices_ }
-                .create_vertex();
+            return VertexSetBuilder::create( unique_vertices_ )
+                ->create_vertex();
         }
 
         index_t create_unique_vertices( const index_t nb )
         {
-            return OpenGeodeVertexSetBuilder{ unique_vertices_ }
-                .create_vertices( nb );
+            return VertexSetBuilder::create( unique_vertices_ )
+                ->create_vertices( nb );
         }
 
         void set_unique_vertex( MeshComponentVertex component_vertex_id,

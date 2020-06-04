@@ -50,15 +50,20 @@ namespace geode
         OpenGeodeTriangulatedSurface();
         ~OpenGeodeTriangulatedSurface();
 
-        static MeshType type_name_static()
+        static MeshImpl impl_name_static()
         {
-            return MeshType{ absl::StrCat(
+            return MeshImpl{ absl::StrCat(
                 "OpenGeodeTriangulatedSurface", dimension, "D" ) };
+        }
+
+        MeshImpl impl_name() const override
+        {
+            return impl_name_static();
         }
 
         MeshType type_name() const override
         {
-            return type_name_static();
+            return TriangulatedSurface< dimension >::type_name_static();
         }
 
         static absl::string_view native_extension_static()

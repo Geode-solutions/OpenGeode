@@ -140,7 +140,7 @@ void test_io( const geode::Graph& graph, const std::string& filename )
 {
     save_graph( graph, filename );
     auto new_graph =
-        geode::Graph::create( geode::OpenGeodeGraph::type_name_static() );
+        geode::Graph::create( geode::OpenGeodeGraph::impl_name_static() );
     load_graph( *new_graph, filename );
 }
 
@@ -166,7 +166,7 @@ void test_delete_isolated_vertices(
 void test()
 {
     auto graph =
-        geode::Graph::create( geode::OpenGeodeGraph::type_name_static() );
+        geode::Graph::create( geode::OpenGeodeGraph::impl_name_static() );
     auto builder = geode::GraphBuilder::create( *graph );
 
     test_create_vertices( *graph, *builder );
@@ -180,7 +180,7 @@ void test()
 
     const auto default_graph = geode::Graph::create();
     OPENGEODE_EXCEPTION(
-        default_graph->type_name() == geode::OpenGeodeGraph::type_name_static(),
+        default_graph->impl_name() == geode::OpenGeodeGraph::impl_name_static(),
         "[Test] Default type for Graph should be OpenGeodeGraph" );
 }
 
