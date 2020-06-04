@@ -118,10 +118,10 @@ namespace geode
     public:
         explicit Impl( SurfaceMesh& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) )
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
@@ -752,10 +752,12 @@ namespace geode
     template class opengeode_mesh_api SurfaceMesh< 2 >;
     template class opengeode_mesh_api SurfaceMesh< 3 >;
 
-    template opengeode_mesh_api Vector3D SurfaceMesh< 3 >::polygon_normal(
-        index_t ) const;
     template opengeode_mesh_api
-        Vector3D SurfaceMesh< 3 >::polygon_vertex_normal( index_t ) const;
+        typename std::enable_if< 3 == 3, Vector3D >::type
+            SurfaceMesh< 3 >::polygon_normal( index_t ) const;
+    template opengeode_mesh_api
+        typename std::enable_if< 3 == 3, Vector3D >::type
+            SurfaceMesh< 3 >::polygon_vertex_normal( index_t ) const;
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, SurfaceMesh< 2 > );
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, SurfaceMesh< 3 > );
