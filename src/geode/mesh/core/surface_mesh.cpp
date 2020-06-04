@@ -118,10 +118,10 @@ namespace geode
     public:
         explicit Impl( SurfaceMesh& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) )
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
@@ -703,7 +703,7 @@ namespace geode
 
     template < index_t dimension >
     template < index_t T >
-    typename std::enable_if< T == 3, Vector3D >::type
+    typename std::enable_if< T == 3, Vector3D >::type opengeode_mesh_api
         SurfaceMesh< dimension >::polygon_normal( index_t polygon_id ) const
     {
         check_polygon_id( *this, polygon_id );
@@ -727,7 +727,7 @@ namespace geode
 
     template < index_t dimension >
     template < index_t T >
-    typename std::enable_if< T == 3, Vector3D >::type
+    typename std::enable_if< T == 3, Vector3D >::type opengeode_mesh_api
         SurfaceMesh< dimension >::polygon_vertex_normal(
             index_t vertex_id ) const
     {
@@ -749,15 +749,15 @@ namespace geode
         return clone;
     }
 
+    // template opengeode_mesh_api
+    //     typename std::enable_if< 3 == 3, Vector3D >::type
+    //         SurfaceMesh< 3 >::polygon_normal( index_t ) const;
+    // template opengeode_mesh_api
+    //     typename std::enable_if< 3 == 3, Vector3D >::type
+    //         SurfaceMesh< 3 >::polygon_vertex_normal( index_t ) const;
+
     template class opengeode_mesh_api SurfaceMesh< 2 >;
     template class opengeode_mesh_api SurfaceMesh< 3 >;
-
-    template opengeode_mesh_api
-        typename std::enable_if< 3 == 3, Vector3D >::type
-            SurfaceMesh< 3 >::polygon_normal( index_t ) const;
-    template opengeode_mesh_api
-        typename std::enable_if< 3 == 3, Vector3D >::type
-            SurfaceMesh< 3 >::polygon_vertex_normal( index_t ) const;
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, SurfaceMesh< 2 > );
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, SurfaceMesh< 3 > );
