@@ -26,7 +26,7 @@
 #include <geode/basic/factory.h>
 
 #include <geode/mesh/common.h>
-#include <geode/mesh/io/polygonal_surface_input.h>
+#include <geode/mesh/io/vertex_set_input.h>
 
 namespace geode
 {
@@ -57,7 +57,7 @@ namespace geode
         load_triangulated_surface( absl::string_view filename );
 
     template < index_t dimension >
-    class TriangulatedSurfaceInput : public PolygonalSurfaceInput< dimension >
+    class TriangulatedSurfaceInput : public VertexSetInput
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( TriangulatedSurfaceInput );
 

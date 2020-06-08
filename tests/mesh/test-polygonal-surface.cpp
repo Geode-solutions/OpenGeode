@@ -435,6 +435,19 @@ void test_delete_all( const geode::PolygonalSurface3D& polygonal_surface,
         "[Test] PolygonalSurface should have 0 vertex" );
 }
 
+void test_backward_io( const std::string& filename )
+{
+    const auto new_polygonal_surface = geode::load_polygonal_surface< 3 >(
+        geode::OpenGeodePolygonalSurface3D::impl_name_static(), filename );
+
+    OPENGEODE_EXCEPTION( new_polygonal_surface->nb_vertices() == 7,
+        "[Test] Reloaded PolygonalSurface should have 7 vertices" );
+    OPENGEODE_EXCEPTION( new_polygonal_surface->nb_edges() == 9,
+        "[Test] Reloaded PolygonalSurface should have 9 edges" );
+    OPENGEODE_EXCEPTION( new_polygonal_surface->nb_polygons() == 3,
+        "[Test] Reloaded PolygonalSurface should have 3 polygons" );
+}
+
 void test()
 {
     auto polygonal_surface = geode::PolygonalSurface3D::create(
@@ -458,6 +471,8 @@ void test()
 
     test_io( *polygonal_surface,
         absl::StrCat( "test.", polygonal_surface->native_extension() ) );
+    test_backward_io( absl::StrCat( geode::data_path, "/test_v4.",
+        polygonal_surface->native_extension() ) );
 
     test_replace_vertex( *polygonal_surface, *builder );
     test_delete_vertex( *polygonal_surface, *builder );

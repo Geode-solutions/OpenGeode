@@ -28,7 +28,7 @@
 
 #include <geode/basic/passkey.h>
 
-#include <geode/mesh/builder/polygonal_surface_builder.h>
+#include <geode/mesh/builder/surface_mesh_builder.h>
 #include <geode/mesh/common.h>
 
 namespace geode
@@ -42,8 +42,7 @@ namespace geode
      * Interface class to represent the builder of a TriangulatedSurface
      */
     template < index_t dimension >
-    class TriangulatedSurfaceBuilder
-        : public PolygonalSurfaceBuilder< dimension >
+    class TriangulatedSurfaceBuilder : public SurfaceMeshBuilder< dimension >
     {
         PASSKEY( TriangulatedSurface< dimension >, BuilderKey );
 

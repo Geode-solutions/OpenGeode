@@ -25,11 +25,6 @@
 
 #include <geode/basic/mapping.h>
 
-#include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/core/mesh_id.h>
-#include <geode/mesh/core/point_set.h>
-#include <geode/mesh/core/polygonal_surface.h>
-
 #include <geode/model/common.h>
 #include <geode/model/mixin/builder/add_components_builders.h>
 #include <geode/model/mixin/builder/corners_builder.h>
@@ -45,10 +40,16 @@
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( EdgedCurve );
+    FORWARD_DECLARATION_DIMENSION_CLASS( PointSet );
+    FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMesh );
     ALIAS_2D( Corner );
+    ALIAS_2D( EdgedCurve );
+    ALIAS_2D( PointSet );
     ALIAS_2D( Line );
     ALIAS_2D( ModelBoundary );
     ALIAS_2D( Surface );
+    ALIAS_2D( SurfaceMesh );
     class Section;
     struct uuid;
 
@@ -110,8 +111,8 @@ namespace geode
         void update_line_mesh(
             const Line2D& line, std::unique_ptr< EdgedCurve2D > mesh );
 
-        void update_surface_mesh( const Surface2D& surface,
-            std::unique_ptr< PolygonalSurface2D > mesh );
+        void update_surface_mesh(
+            const Surface2D& surface, std::unique_ptr< SurfaceMesh2D > mesh );
 
         void remove_corner( const Corner2D& corner );
 

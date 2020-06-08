@@ -29,35 +29,11 @@
     const auto name##dimension =                                               \
         "PolygonalSurfaceBuilder" + std::to_string( dimension ) + "D";         \
     pybind11::class_< PolygonalSurfaceBuilder##dimension##D,                   \
-        VertexSetBuilder >( module, name##dimension.c_str() )                  \
+        SurfaceMeshBuilder##dimension##D >( module, name##dimension.c_str() )  \
         .def_static( "create",                                                 \
             ( std::unique_ptr< PolygonalSurfaceBuilder##dimension##D >( * )(   \
                 PolygonalSurface< dimension >& ) )                             \
-                & PolygonalSurfaceBuilder##dimension##D::create )              \
-        .def( "set_point", &PolygonalSurfaceBuilder##dimension##D::set_point ) \
-        .def( "create_point",                                                  \
-            &PolygonalSurfaceBuilder##dimension##D::create_point )             \
-        .def( "create_polygon",                                                \
-            &PolygonalSurfaceBuilder##dimension##D::create_polygon )           \
-        .def( "set_polygon_vertex",                                            \
-            &PolygonalSurfaceBuilder##dimension##D::set_polygon_vertex )       \
-        .def( "set_polygon_adjacent",                                          \
-            &PolygonalSurfaceBuilder##dimension##D::set_polygon_adjacent )     \
-        .def( "compute_polygon_adjacencies",                                   \
-            ( void ( PolygonalSurfaceBuilder##dimension##D::* )() )            \
-                & PolygonalSurfaceBuilder##dimension##D::                      \
-                    compute_polygon_adjacencies )                              \
-        .def( "delete_polygons",                                               \
-            &PolygonalSurfaceBuilder##dimension##D::delete_polygons )          \
-        .def( "delete_isolated_vertices",                                      \
-            &PolygonalSurfaceBuilder##dimension##D::delete_isolated_vertices ) \
-        .def( "delete_isolated_edges",                                         \
-            &PolygonalSurfaceBuilder##dimension##D::delete_isolated_edges )    \
-        .def( "polygon_around_vertex",                                         \
-            &PolygonalSurfaceBuilder##dimension##D::polygon_around_vertex )    \
-        .def( "associate_polygon_vertex_to_vertex",                            \
-            &PolygonalSurfaceBuilder##dimension##D::                           \
-                associate_polygon_vertex_to_vertex )
+                & PolygonalSurfaceBuilder##dimension##D::create )
 
 namespace geode
 {

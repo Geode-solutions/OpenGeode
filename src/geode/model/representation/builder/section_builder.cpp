@@ -23,6 +23,11 @@
 
 #include <geode/model/representation/builder/section_builder.h>
 
+#include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/core/mesh_id.h>
+#include <geode/mesh/core/point_set.h>
+#include <geode/mesh/core/surface_mesh.h>
+
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/line.h>
 #include <geode/model/mixin/core/model_boundary.h>
@@ -189,7 +194,7 @@ namespace geode
     }
 
     void SectionBuilder::update_surface_mesh(
-        const Surface2D& surface, std::unique_ptr< PolygonalSurface2D > mesh )
+        const Surface2D& surface, std::unique_ptr< SurfaceMesh2D > mesh )
     {
         unregister_mesh_component( surface );
         set_surface_mesh( surface.id(), std::move( mesh ) );

@@ -33,7 +33,7 @@
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( PolygonalSurface );
+    FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMesh );
     FORWARD_DECLARATION_DIMENSION_CLASS( Surfaces );
     FORWARD_DECLARATION_DIMENSION_CLASS( SurfacesBuilder );
 } // namespace geode
@@ -71,23 +71,23 @@ namespace geode
             return { this->component_type_static(), this->id() };
         };
 
-        const PolygonalSurface< dimension >& mesh() const;
+        const SurfaceMesh< dimension >& mesh() const;
 
         Surface( SurfacesKey ) : Surface() {}
 
         Surface( const MeshImpl& impl, SurfacesKey ) : Surface( impl ){};
 
-        PolygonalSurface< dimension >& modifiable_mesh( SurfacesKey )
+        SurfaceMesh< dimension >& modifiable_mesh( SurfacesKey )
         {
             return modifiable_mesh();
         }
 
         const MeshImpl& mesh_type() const;
 
-        void set_mesh( std::unique_ptr< PolygonalSurface< dimension > > mesh,
-            SurfacesKey );
+        void set_mesh(
+            std::unique_ptr< SurfaceMesh< dimension > > mesh, SurfacesKey );
 
-        void set_mesh( std::unique_ptr< PolygonalSurface< dimension > > mesh,
+        void set_mesh( std::unique_ptr< SurfaceMesh< dimension > > mesh,
             SurfacesBuilderKey );
 
         void set_surface_name( absl::string_view name, SurfacesBuilderKey )
@@ -95,7 +95,7 @@ namespace geode
             this->set_name( name );
         }
 
-        PolygonalSurface< dimension >& modifiable_mesh( SurfacesBuilderKey )
+        SurfaceMesh< dimension >& modifiable_mesh( SurfacesBuilderKey )
         {
             return modifiable_mesh();
         }
@@ -105,7 +105,7 @@ namespace geode
 
         explicit Surface( const MeshImpl& impl );
 
-        PolygonalSurface< dimension >& modifiable_mesh();
+        SurfaceMesh< dimension >& modifiable_mesh();
 
         template < typename Archive >
         void serialize( Archive& archive );

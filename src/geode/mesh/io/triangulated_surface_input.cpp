@@ -66,7 +66,7 @@ namespace geode
     TriangulatedSurfaceInput< dimension >::TriangulatedSurfaceInput(
         TriangulatedSurface< dimension >& triangulated_surface,
         absl::string_view filename )
-        : PolygonalSurfaceInput< dimension >( triangulated_surface, filename ),
+        : VertexSetInput( triangulated_surface, filename ),
           triangulated_surface_( triangulated_surface )
     {
     }

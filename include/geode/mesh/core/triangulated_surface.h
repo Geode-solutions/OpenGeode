@@ -26,7 +26,7 @@
 #include <geode/basic/bitsery_archive.h>
 
 #include <geode/mesh/common.h>
-#include <geode/mesh/core/polygonal_surface.h>
+#include <geode/mesh/core/surface_mesh.h>
 
 namespace geode
 {
@@ -35,7 +35,7 @@ namespace geode
      * only.
      */
     template < index_t dimension >
-    class TriangulatedSurface : public PolygonalSurface< dimension >
+    class TriangulatedSurface : public SurfaceMesh< dimension >
     {
     public:
         /*!
@@ -71,8 +71,7 @@ namespace geode
                 []( Archive& archive,
                     TriangulatedSurface& triangulated_surface ) {
                     archive.ext( triangulated_surface,
-                        bitsery::ext::BaseClass<
-                            PolygonalSurface< dimension > >{} );
+                        bitsery::ext::BaseClass< SurfaceMesh< dimension > >{} );
                 } );
         }
 

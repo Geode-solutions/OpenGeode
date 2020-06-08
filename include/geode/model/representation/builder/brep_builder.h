@@ -25,12 +25,6 @@
 
 #include <geode/basic/mapping.h>
 
-#include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/core/mesh_id.h>
-#include <geode/mesh/core/point_set.h>
-#include <geode/mesh/core/polygonal_surface.h>
-#include <geode/mesh/core/polyhedral_solid.h>
-
 #include <geode/model/common.h>
 #include <geode/model/mixin/builder/add_components_builders.h>
 #include <geode/model/mixin/builder/blocks_builder.h>
@@ -48,11 +42,19 @@
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( EdgedCurve );
+    FORWARD_DECLARATION_DIMENSION_CLASS( PointSet );
+    FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMesh );
+    FORWARD_DECLARATION_DIMENSION_CLASS( PolyhedralSolid );
     ALIAS_3D( Block );
     ALIAS_3D( Corner );
+    ALIAS_3D( EdgedCurve );
+    ALIAS_3D( PointSet );
+    ALIAS_3D( PolyhedralSolid );
     ALIAS_3D( Line );
     ALIAS_3D( ModelBoundary );
     ALIAS_3D( Surface );
+    ALIAS_3D( SurfaceMesh );
     class BRep;
     struct uuid;
 
@@ -120,8 +122,8 @@ namespace geode
         void update_line_mesh(
             const Line3D& line, std::unique_ptr< EdgedCurve3D > mesh );
 
-        void update_surface_mesh( const Surface3D& surface,
-            std::unique_ptr< PolygonalSurface3D > mesh );
+        void update_surface_mesh(
+            const Surface3D& surface, std::unique_ptr< SurfaceMesh3D > mesh );
 
         void update_block_mesh(
             const Block3D& block, std::unique_ptr< PolyhedralSolid3D > mesh );

@@ -24,8 +24,8 @@
 #include <geode/model/mixin/builder/surfaces_builder.h>
 
 #include <geode/mesh/builder/mesh_builder_factory.h>
-#include <geode/mesh/builder/polygonal_surface_builder.h>
-#include <geode/mesh/core/polygonal_surface.h>
+#include <geode/mesh/builder/surface_mesh_builder.h>
+#include <geode/mesh/core/surface_mesh.h>
 
 #include <geode/model/mixin/core/surface.h>
 #include <geode/model/mixin/core/surfaces.h>
@@ -60,13 +60,13 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::unique_ptr< PolygonalSurfaceBuilder< dimension > >
+    std::unique_ptr< SurfaceMeshBuilder< dimension > >
         SurfacesBuilder< dimension >::surface_mesh_builder( const uuid& id )
     {
         auto& mesh = surfaces_.modifiable_surface( id ).modifiable_mesh(
             typename Surface< dimension >::SurfacesBuilderKey{} );
         return MeshBuilderFactory::create_mesh_builder<
-            PolygonalSurfaceBuilder< dimension > >( mesh );
+            SurfaceMeshBuilder< dimension > >( mesh );
     }
 
     template < index_t dimension >
@@ -78,7 +78,7 @@ namespace geode
 
     template < index_t dimension >
     void SurfacesBuilder< dimension >::set_surface_mesh(
-        const uuid& id, std::unique_ptr< PolygonalSurface< dimension > > mesh )
+        const uuid& id, std::unique_ptr< SurfaceMesh< dimension > > mesh )
     {
         surfaces_.modifiable_surface( id ).set_mesh( std::move( mesh ),
             typename Surface< dimension >::SurfacesBuilderKey{} );

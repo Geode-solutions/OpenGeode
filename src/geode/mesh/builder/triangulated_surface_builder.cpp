@@ -46,7 +46,7 @@ namespace geode
         TriangulatedSurface< dimension >& mesh, MeshBuilderFactoryKey key )
     {
         triangulated_surface_ = &mesh;
-        PolygonalSurfaceBuilder< dimension >::set_mesh( mesh, key );
+        SurfaceMeshBuilder< dimension >::set_mesh( mesh, key );
     }
 
     template < index_t dimension >
@@ -107,7 +107,7 @@ namespace geode
     void TriangulatedSurfaceBuilder< dimension >::copy(
         const TriangulatedSurface< dimension >& triangulated_surface )
     {
-        PolygonalSurfaceBuilder< dimension >::copy( triangulated_surface );
+        SurfaceMeshBuilder< dimension >::copy( triangulated_surface );
     }
 
     template class opengeode_mesh_api TriangulatedSurfaceBuilder< 2 >;

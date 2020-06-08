@@ -23,6 +23,12 @@
 
 #include <geode/model/representation/builder/brep_builder.h>
 
+#include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/core/mesh_id.h>
+#include <geode/mesh/core/point_set.h>
+#include <geode/mesh/core/polyhedral_solid.h>
+#include <geode/mesh/core/surface_mesh.h>
+
 #include <geode/model/mixin/core/block.h>
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/line.h>
@@ -224,7 +230,7 @@ namespace geode
     }
 
     void BRepBuilder::update_surface_mesh(
-        const Surface3D& surface, std::unique_ptr< PolygonalSurface3D > mesh )
+        const Surface3D& surface, std::unique_ptr< SurfaceMesh3D > mesh )
     {
         unregister_mesh_component( surface );
         set_surface_mesh( surface.id(), std::move( mesh ) );

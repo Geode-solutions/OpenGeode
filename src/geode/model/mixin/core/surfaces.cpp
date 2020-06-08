@@ -95,16 +95,17 @@ namespace geode
             const auto& mesh = surface.mesh();
             const auto file = absl::StrCat(
                 prefix, surface.id().string(), ".", mesh.native_extension() );
-            const auto* triangulated =
-                dynamic_cast< const TriangulatedSurface< dimension >* >(
-                    &mesh );
-            if( triangulated )
+            if( const auto* triangulated =
+                    dynamic_cast< const TriangulatedSurface< dimension >* >(
+                        &mesh ) )
             {
                 save_triangulated_surface( *triangulated, file );
             }
-            else
+            else if( const auto* polygonal =
+                         dynamic_cast< const PolygonalSurface< dimension >* >(
+                             &mesh ) )
             {
-                save_polygonal_surface( mesh, file );
+                save_polygonal_surface( *polygonal, file );
             }
         }
         impl_->save_components( absl::StrCat( directory, "/surfaces" ) );
