@@ -27,8 +27,7 @@
     const auto name##dimension =                                               \
         "TetrahedralSolidBuilder" + std::to_string( dimension ) + "D";         \
     pybind11::class_< TetrahedralSolidBuilder##dimension##D,                   \
-        PolyhedralSolidBuilder##dimension##D >(                                \
-        module, name##dimension.c_str() )                                      \
+        SolidMeshBuilder##dimension##D >( module, name##dimension.c_str() )    \
         .def_static( "create",                                                 \
             ( std::unique_ptr< TetrahedralSolidBuilder##dimension##D >( * )(   \
                 TetrahedralSolid< dimension >& ) )                             \

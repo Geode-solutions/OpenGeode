@@ -65,7 +65,7 @@ namespace geode
     TetrahedralSolidInput< dimension >::TetrahedralSolidInput(
         TetrahedralSolid< dimension >& tetrahedral_solid,
         absl::string_view filename )
-        : PolyhedralSolidInput< dimension >( tetrahedral_solid, filename ),
+        : VertexSetInput( tetrahedral_solid, filename ),
           tetrahedral_solid_( tetrahedral_solid )
     {
     }

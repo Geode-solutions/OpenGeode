@@ -89,15 +89,24 @@ namespace geode
             const auto& mesh = block.mesh();
             const auto file = absl::StrCat(
                 prefix, block.id().string(), ".", mesh.native_extension() );
-            const auto* tetra =
-                dynamic_cast< const TetrahedralSolid< dimension >* >( &mesh );
-            if( tetra )
+
+            if( const auto* tetra =
+                    dynamic_cast< const TetrahedralSolid< dimension >* >(
+                        &mesh ) )
             {
                 save_tetrahedral_solid( *tetra, file );
             }
+            else if( const auto* poly =
+                         dynamic_cast< const PolyhedralSolid< dimension >* >(
+                             &mesh ) )
+            {
+                save_polyhedral_solid( *poly, file );
+            }
             else
             {
-                save_polyhedral_solid( mesh, file );
+                throw OpenGeodeException(
+                    "[Blocks::save_blocks] Cannot find the explicit "
+                    "SolidMesh type" );
             }
         }
         impl_->save_components( absl::StrCat( directory, "/blocks" ) );
@@ -244,8 +253,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    Block< dimension >&
-        Blocks< dimension >::ModifiableBlockRange::operator*() const
+    Block< dimension >& Blocks< dimension >::ModifiableBlockRange::
+        operator*() const
     {
         return this->impl_->block();
     }

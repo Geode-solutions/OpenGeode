@@ -29,6 +29,7 @@
 #include "builder/point_set_builder.h"
 #include "builder/polygonal_surface_builder.h"
 #include "builder/polyhedral_solid_builder.h"
+#include "builder/solid_mesh_builder.h"
 #include "builder/surface_mesh_builder.h"
 #include "builder/tetrahedral_solid_builder.h"
 #include "builder/triangulated_surface_builder.h"
@@ -39,6 +40,7 @@
 #include "core/point_set.h"
 #include "core/polygonal_surface.h"
 #include "core/polyhedral_solid.h"
+#include "core/solid_mesh.h"
 #include "core/surface_mesh.h"
 #include "core/tetrahedral_solid.h"
 #include "core/triangulated_surface.h"
@@ -112,6 +114,7 @@ PYBIND11_MODULE( opengeode_py_mesh, module )
     geode::define_surface_mesh( module );
     geode::define_polygonal_surface( module );
     geode::define_triangulated_surface( module );
+    geode::define_solid_mesh( module );
     geode::define_polyhedral_solid( module );
     geode::define_tetrahedral_solid( module );
 
@@ -122,6 +125,7 @@ PYBIND11_MODULE( opengeode_py_mesh, module )
     geode::define_surface_mesh_builder( module );
     geode::define_polygonal_surface_builder( module );
     geode::define_triangulated_surface_builder( module );
+    geode::define_solid_mesh_builder( module );
     geode::define_polyhedral_solid_builder( module );
     geode::define_tetrahedral_solid_builder( module );
 

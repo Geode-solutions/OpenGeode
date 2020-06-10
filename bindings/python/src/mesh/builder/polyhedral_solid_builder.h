@@ -27,37 +27,12 @@
     const auto name##dimension =                                               \
         "PolyhedralSolidBuilder" + std::to_string( dimension ) + "D";          \
     pybind11::class_< PolyhedralSolidBuilder##dimension##D,                    \
-        VertexSetBuilder >( module, name##dimension.c_str() )                  \
+        SolidMeshBuilder##dimension##D >( module, name##dimension.c_str() )    \
         .def_static( "create",                                                 \
             ( std::unique_ptr< PolyhedralSolidBuilder##dimension##D >( * )(    \
                 PolyhedralSolid< dimension >& ) )                              \
-                & PolyhedralSolidBuilder##dimension##D::create )               \
-        .def( "set_point", &PolyhedralSolidBuilder##dimension##D::set_point )  \
-        .def( "create_point",                                                  \
-            &PolyhedralSolidBuilder##dimension##D::create_point )              \
-        .def( "create_polyhedron",                                             \
-            &PolyhedralSolidBuilder##dimension##D::create_polyhedron )         \
-        .def( "set_polyhedron_vertex",                                         \
-            &PolyhedralSolidBuilder##dimension##D::set_polyhedron_vertex )     \
-        .def( "set_polyhedron_adjacent",                                       \
-            &PolyhedralSolidBuilder##dimension##D::set_polyhedron_adjacent )   \
-        .def( "compute_polyhedron_adjacencies",                                \
-            ( void ( PolyhedralSolidBuilder##dimension##D::* )() )             \
-                & PolyhedralSolidBuilder##dimension##D::                       \
-                    compute_polyhedron_adjacencies )                           \
-        .def( "delete_polyhedra",                                              \
-            &PolyhedralSolidBuilder##dimension##D::delete_polyhedra )          \
-        .def( "delete_isolated_vertices",                                      \
-            &PolyhedralSolidBuilder##dimension##D::delete_isolated_vertices )  \
-        .def( "delete_isolated_facets",                                        \
-            &PolyhedralSolidBuilder##dimension##D::delete_isolated_facets )    \
-        .def( "delete_isolated_edges",                                         \
-            &PolyhedralSolidBuilder##dimension##D::delete_isolated_edges )     \
-        .def( "polyhedron_around_vertex",                                      \
-            &PolyhedralSolidBuilder##dimension##D::polyhedron_around_vertex )  \
-        .def( "associate_polyhedron_vertex_to_vertex",                         \
-            &PolyhedralSolidBuilder##dimension##D::                            \
-                associate_polyhedron_vertex_to_vertex )
+                & PolyhedralSolidBuilder##dimension##D::create )
+
 namespace geode
 {
     void define_polyhedral_solid_builder( pybind11::module& module )

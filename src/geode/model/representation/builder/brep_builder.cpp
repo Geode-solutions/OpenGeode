@@ -238,7 +238,7 @@ namespace geode
     }
 
     void BRepBuilder::update_block_mesh(
-        const Block3D& block, std::unique_ptr< PolyhedralSolid3D > mesh )
+        const Block3D& block, std::unique_ptr< SolidMesh3D > mesh )
     {
         unregister_mesh_component( block );
         set_block_mesh( block.id(), std::move( mesh ) );

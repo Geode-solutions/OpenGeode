@@ -46,7 +46,7 @@ namespace geode
         TetrahedralSolid< dimension >& mesh, MeshBuilderFactoryKey key )
     {
         tetrahedral_solid_ = &mesh;
-        PolyhedralSolidBuilder< dimension >::set_mesh( mesh, key );
+        SolidMeshBuilder< dimension >::set_mesh( mesh, key );
     }
 
     template < index_t dimension >
@@ -136,7 +136,7 @@ namespace geode
     void TetrahedralSolidBuilder< dimension >::copy(
         const TetrahedralSolid< dimension >& tetrahedral_solid )
     {
-        PolyhedralSolidBuilder< dimension >::copy( tetrahedral_solid );
+        SolidMeshBuilder< dimension >::copy( tetrahedral_solid );
     }
 
     template class opengeode_mesh_api TetrahedralSolidBuilder< 3 >;
