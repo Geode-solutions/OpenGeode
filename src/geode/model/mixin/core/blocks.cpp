@@ -253,8 +253,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    Block< dimension >& Blocks< dimension >::ModifiableBlockRange::
-        operator*() const
+    Block< dimension >&
+        Blocks< dimension >::ModifiableBlockRange::operator*() const
     {
         return this->impl_->block();
     }
