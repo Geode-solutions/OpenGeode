@@ -52,7 +52,7 @@ namespace geode
     TetrahedralSolidOutput< dimension >::TetrahedralSolidOutput(
         const TetrahedralSolid< dimension >& tetrahedral_solid,
         absl::string_view filename )
-        : PolyhedralSolidOutput< dimension >( tetrahedral_solid, filename ),
+        : VertexSetOutput( tetrahedral_solid, filename ),
           tetrahedral_solid_( tetrahedral_solid )
     {
     }

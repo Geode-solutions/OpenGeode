@@ -26,7 +26,7 @@
 #include <array>
 #include <vector>
 
-#include <geode/mesh/builder/polyhedral_solid_builder.h>
+#include <geode/mesh/builder/solid_mesh_builder.h>
 #include <geode/mesh/common.h>
 
 namespace geode
@@ -37,7 +37,7 @@ namespace geode
 namespace geode
 {
     template < index_t dimension >
-    class TetrahedralSolidBuilder : public PolyhedralSolidBuilder< dimension >
+    class TetrahedralSolidBuilder : public SolidMeshBuilder< dimension >
     {
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
         PASSKEY( TetrahedralSolid< dimension >, BuilderKey );

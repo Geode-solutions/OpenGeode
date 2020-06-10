@@ -26,12 +26,12 @@
 #include <geode/basic/bitsery_archive.h>
 
 #include <geode/mesh/common.h>
-#include <geode/mesh/core/polyhedral_solid.h>
+#include <geode/mesh/core/solid_mesh.h>
 
 namespace geode
 {
     template < index_t dimension >
-    class TetrahedralSolid : public PolyhedralSolid< dimension >
+    class TetrahedralSolid : public SolidMesh< dimension >
     {
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
 
@@ -79,8 +79,7 @@ namespace geode
             archive.ext( *this, DefaultGrowable< Archive, TetrahedralSolid >{},
                 []( Archive& archive, TetrahedralSolid& tetrahedral_solid ) {
                     archive.ext( tetrahedral_solid,
-                        bitsery::ext::BaseClass<
-                            PolyhedralSolid< dimension > >{} );
+                        bitsery::ext::BaseClass< SolidMesh< dimension > >{} );
                 } );
         }
 
