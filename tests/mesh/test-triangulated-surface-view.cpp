@@ -92,8 +92,7 @@ void test_create_polygons( const geode::TriangulatedSurface3D& surface,
         "[Test] TriangulatedSurface should have 7 edges" );
 }
 
-void test_polygon_adjacencies( const geode::TriangulatedSurface3D& surface,
-    geode::TriangulatedSurfaceBuilder3D& builder )
+void test_polygon_adjacencies( const geode::TriangulatedSurface3D& surface )
 {
     OPENGEODE_EXCEPTION( !surface.polygon_adjacent( { 0, 0 } ),
         "[Test] TriangulatedSurfaceView adjacent index is not correct" );
@@ -128,15 +127,7 @@ void test()
 
     test_create_viewed_vertices( view, *builder );
     test_create_viewed_polygons( view, *builder );
-
-    // test_polygon_adjacencies( *surface, *builder );
-    // test_io( *surface, absl::StrCat( "test.", surface->native_extension() )
-    // ); test_backward_io( absl::StrCat(
-    //     geode::data_path, "/test_v4.", surface->native_extension() ) );
-
-    // test_delete_vertex( *surface, *builder );
-    // test_delete_polygon( *surface, *builder );
-    // test_clone( *surface );
+    test_polygon_adjacencies( view );
 }
 
-OPENGEODE_TEST( "triangulated-surface" )
+OPENGEODE_TEST( "triangulated-surface-view" )

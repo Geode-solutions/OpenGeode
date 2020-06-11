@@ -21,94 +21,86 @@
  *
  */
 
-#include <geode/mesh/builder/triangulated_surface_view_builder.h>
+#include <geode/mesh/builder/polygonal_surface_view_builder.h>
 
-#include <geode/mesh/core/triangulated_surface_view.h>
+#include <geode/mesh/core/polygonal_surface_view.h>
 
 namespace geode
 {
     template < index_t dimension >
-    void TriangulatedSurfaceViewBuilder< dimension >::do_set_mesh(
+    void PolygonalSurfaceViewBuilder< dimension >::do_set_mesh(
         VertexSet& mesh )
     {
-        triangulated_surface_view_ =
-            &dynamic_cast< TriangulatedSurfaceView< dimension >& >( mesh );
+        polygonal_surface_view_ =
+            &dynamic_cast< PolygonalSurfaceView< dimension >& >( mesh );
     }
 
     template < index_t dimension >
-    void TriangulatedSurfaceViewBuilder< dimension >::do_set_point(
+    void PolygonalSurfaceViewBuilder< dimension >::do_set_point(
         index_t /*unused*/, const Point< dimension >& /*unused*/ )
     {
-        // triangulated_surface_view_->set_vertex( vertex_id, point, {} );
+        // polygonal_surface_view_->set_vertex( vertex_id, point, {} );
     }
 
     template < index_t dimension >
-    void TriangulatedSurfaceViewBuilder< dimension >::do_create_vertex()
+    void PolygonalSurfaceViewBuilder< dimension >::do_create_vertex()
     {
     }
 
     template < index_t dimension >
-    void TriangulatedSurfaceViewBuilder< dimension >::do_create_vertices(
+    void PolygonalSurfaceViewBuilder< dimension >::do_create_vertices(
         index_t /*unused*/ )
     {
     }
 
     template < index_t dimension >
-    void
-        TriangulatedSurfaceViewBuilder< dimension >::do_delete_surface_vertices(
-            const std::vector< bool >& /*unused*/ )
-    {
-    }
-
-    template < index_t dimension >
-    void TriangulatedSurfaceViewBuilder< dimension >::do_set_polygon_vertex(
-        const PolygonVertex& /*unused*/, index_t /*unused*/ )
-    {
-        // triangulated_surface_view_->set_polygon_vertex(
-        //     polygon_vertex, vertex_id, {} );
-    }
-
-    template < index_t dimension >
-    void TriangulatedSurfaceViewBuilder< dimension >::do_create_triangle(
-        const std::array< index_t, 3 >& /*unused*/ )
-    {
-        // triangulated_surface_view_->add_triangle( vertices, {} );
-    }
-
-    template < index_t dimension >
-    void TriangulatedSurfaceViewBuilder< dimension >::do_create_triangles(
-        index_t /*unused*/ )
-    {
-    }
-
-    template < index_t dimension >
-    void TriangulatedSurfaceViewBuilder< dimension >::do_set_polygon_adjacent(
-        const PolygonEdge& /*unused*/, index_t /*unused*/ )
-    {
-        // triangulated_surface_view_->set_polygon_adjacent(
-        //     polygon_edge, adjacent_id, {} );
-    }
-
-    template < index_t dimension >
-    void TriangulatedSurfaceViewBuilder< dimension >::do_delete_polygons(
+    void PolygonalSurfaceViewBuilder< dimension >::do_delete_surface_vertices(
         const std::vector< bool >& /*unused*/ )
     {
     }
 
     template < index_t dimension >
-    void TriangulatedSurfaceViewBuilder< dimension >::add_viewed_vertex(
-        index_t vertex_id )
+    void PolygonalSurfaceViewBuilder< dimension >::do_set_polygon_vertex(
+        const PolygonVertex& /*unused*/, index_t /*unused*/ )
     {
-        triangulated_surface_view_->add_viewed_vertex( vertex_id, {} );
+        // polygonal_surface_view_->set_polygon_vertex(
+        //     polygon_vertex, vertex_id, {} );
     }
 
     template < index_t dimension >
-    void TriangulatedSurfaceViewBuilder< dimension >::add_viewed_triangle(
-        index_t triangle_id )
+    void PolygonalSurfaceViewBuilder< dimension >::do_set_polygon_adjacent(
+        const PolygonEdge& /*unused*/, index_t /*unused*/ )
     {
-        triangulated_surface_view_->add_viewed_triangle( triangle_id, {} );
+        // polygonal_surface_view_->set_polygon_adjacent(
+        //     polygon_edge, adjacent_id, {} );
     }
 
-    template class opengeode_mesh_api TriangulatedSurfaceViewBuilder< 2 >;
-    template class opengeode_mesh_api TriangulatedSurfaceViewBuilder< 3 >;
+    template < index_t dimension >
+    void PolygonalSurfaceViewBuilder< dimension >::do_create_polygon(
+        absl::Span< const unsigned int > )
+    {
+    }
+
+    template < index_t dimension >
+    void PolygonalSurfaceViewBuilder< dimension >::do_delete_polygons(
+        const std::vector< bool >& /*unused*/ )
+    {
+    }
+
+    template < index_t dimension >
+    void PolygonalSurfaceViewBuilder< dimension >::add_viewed_vertex(
+        index_t vertex_id )
+    {
+        polygonal_surface_view_->add_viewed_vertex( vertex_id, {} );
+    }
+
+    template < index_t dimension >
+    void PolygonalSurfaceViewBuilder< dimension >::add_viewed_polygon(
+        index_t polygon_id )
+    {
+        polygonal_surface_view_->add_viewed_polygon( polygon_id, {} );
+    }
+
+    template class opengeode_mesh_api PolygonalSurfaceViewBuilder< 2 >;
+    template class opengeode_mesh_api PolygonalSurfaceViewBuilder< 3 >;
 } // namespace geode
