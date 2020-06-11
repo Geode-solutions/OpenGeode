@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/mesh/core/triangulated_surface_view.h>
+#include <geode/mesh/core/polygonal_surface_view.h>
 
 #include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>
@@ -34,45 +34,45 @@
 namespace geode
 {
     template < index_t dimension >
-    class TriangulatedSurfaceView< dimension >::Impl
+    class PolygonalSurfaceView< dimension >::Impl
         : public detail::SurfaceMeshViewImpl< dimension >
     {
     public:
-        Impl( TriangulatedSurfaceView< dimension >& surface_view,
-            TriangulatedSurface< dimension >& surface )
+        Impl( PolygonalSurfaceView< dimension >& surface_view,
+            PolygonalSurface< dimension >& surface )
             : detail::SurfaceMeshViewImpl< dimension >( surface_view, surface )
         {
         }
     };
 
     template < index_t dimension >
-    TriangulatedSurfaceView< dimension >::TriangulatedSurfaceView(
-        TriangulatedSurface< dimension >& surface )
+    PolygonalSurfaceView< dimension >::PolygonalSurfaceView(
+        PolygonalSurface< dimension >& surface )
         : impl_( *this, surface )
     {
     }
 
     template < index_t dimension >
-    TriangulatedSurfaceView< dimension >::~TriangulatedSurfaceView() // NOLINT
+    PolygonalSurfaceView< dimension >::~PolygonalSurfaceView() // NOLINT
     {
     }
 
     template < index_t dimension >
-    index_t TriangulatedSurfaceView< dimension >::viewed_vertex(
+    index_t PolygonalSurfaceView< dimension >::viewed_vertex(
         index_t vertex_id ) const
     {
         return impl_->viewed_vertex( vertex_id );
     }
 
     template < index_t dimension >
-    const Point< dimension >& TriangulatedSurfaceView< dimension >::get_point(
+    const Point< dimension >& PolygonalSurfaceView< dimension >::get_point(
         index_t vertex_id ) const
     {
         return impl_->get_point( vertex_id );
     }
 
     template < index_t dimension >
-    index_t TriangulatedSurfaceView< dimension >::get_polygon_vertex(
+    index_t PolygonalSurfaceView< dimension >::get_polygon_vertex(
         const PolygonVertex& polygon_vertex ) const
     {
         return impl_->get_polygon_vertex( polygon_vertex );
@@ -80,33 +80,40 @@ namespace geode
 
     template < index_t dimension >
     absl::optional< index_t >
-        TriangulatedSurfaceView< dimension >::get_polygon_adjacent(
+        PolygonalSurfaceView< dimension >::get_polygon_adjacent(
             const PolygonEdge& polygon_edge ) const
     {
         return impl_->get_polygon_adjacent( polygon_edge );
     }
 
     template < index_t dimension >
-    void TriangulatedSurfaceView< dimension >::add_viewed_vertex(
-        index_t vertex_id, TriangulatedSurfaceViewKey )
+    void PolygonalSurfaceView< dimension >::add_viewed_vertex(
+        index_t vertex_id, PolygonalSurfaceViewKey )
     {
         impl_->add_viewed_vertex( vertex_id );
     }
 
     template < index_t dimension >
-    index_t TriangulatedSurfaceView< dimension >::viewed_triangle(
-        index_t triangle_id ) const
+    index_t PolygonalSurfaceView< dimension >::viewed_polygon(
+        index_t polygon_id ) const
     {
-        return impl_->viewed_polygon( triangle_id );
+        return impl_->viewed_polygon( polygon_id );
     }
 
     template < index_t dimension >
-    void TriangulatedSurfaceView< dimension >::add_viewed_triangle(
-        index_t triangle_id, TriangulatedSurfaceViewKey )
+    void PolygonalSurfaceView< dimension >::add_viewed_polygon(
+        index_t polygon_id, PolygonalSurfaceViewKey )
     {
-        impl_->add_viewed_polygon( triangle_id );
+        impl_->add_viewed_polygon( polygon_id );
     }
 
-    template class opengeode_mesh_api TriangulatedSurfaceView< 2 >;
-    template class opengeode_mesh_api TriangulatedSurfaceView< 3 >;
+    template < index_t dimension >
+    index_t PolygonalSurfaceView< dimension >::get_nb_polygon_vertices(
+        index_t polygon_id ) const
+    {
+        return impl_->get_nb_polygon_vertices( polygon_id );
+    }
+
+    template class opengeode_mesh_api PolygonalSurfaceView< 2 >;
+    template class opengeode_mesh_api PolygonalSurfaceView< 3 >;
 } // namespace geode

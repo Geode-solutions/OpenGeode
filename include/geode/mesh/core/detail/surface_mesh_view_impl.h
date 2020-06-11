@@ -41,7 +41,7 @@ namespace geode
             SurfaceMeshViewImpl( SurfaceMesh< dimension >& surface_view,
                 SurfaceMesh< dimension >& surface )
                 : detail::PointsViewImpl< dimension, SurfaceMesh< dimension > >(
-                    surface_view, surface ),
+                      surface_view, surface ),
                   surface_( surface ),
                   surface_view_( surface_view ),
                   view2polygons_(
@@ -56,6 +56,12 @@ namespace geode
             {
                 return this->vertex_in_view( surface_.polygon_vertex(
                     viewed_polygon_vertex( polygon_vertex ) ) );
+            }
+
+            index_t get_nb_polygon_vertices( index_t polygon_id ) const
+            {
+                return surface_.nb_polygon_vertices(
+                    viewed_polygon( polygon_id ) );
             }
 
             absl::optional< index_t > get_polygon_adjacent(
@@ -73,31 +79,31 @@ namespace geode
                 return absl::nullopt;
             }
 
-            index_t viewed_triangle( index_t triangle_id ) const
+            index_t viewed_polygon( index_t polygon_id ) const
             {
-                return view2polygons_->value( triangle_id );
+                return view2polygons_->value( polygon_id );
             }
 
-            void add_viewed_triangle( index_t triangle_id )
+            void add_viewed_polygon( index_t polygon_id )
             {
                 const auto id = surface_view_.nb_polygons();
                 surface_view_.polygon_attribute_manager().resize( id + 1 );
-                view2polygons_->set_value( id, triangle_id );
-                polygons2view_.emplace( triangle_id, id );
+                view2polygons_->set_value( id, polygon_id );
+                polygons2view_.emplace( polygon_id, id );
             }
 
         private:
             PolygonVertex viewed_polygon_vertex(
                 const PolygonVertex polygon_vertex ) const
             {
-                return { viewed_triangle( polygon_vertex.polygon_id ),
+                return { viewed_polygon( polygon_vertex.polygon_id ),
                     polygon_vertex.vertex_id };
             }
 
             PolygonEdge viewed_polygon_edge(
                 const PolygonEdge polygon_edge ) const
             {
-                return { viewed_triangle( polygon_edge.polygon_id ),
+                return { viewed_polygon( polygon_edge.polygon_id ),
                     polygon_edge.edge_id };
             }
 

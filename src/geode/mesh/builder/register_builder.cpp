@@ -32,6 +32,7 @@
 #include <geode/mesh/builder/geode_triangulated_surface_builder.h>
 #include <geode/mesh/builder/geode_vertex_set_builder.h>
 #include <geode/mesh/builder/mesh_builder_factory.h>
+#include <geode/mesh/builder/polygonal_surface_view_builder.h>
 #include <geode/mesh/builder/triangulated_surface_view_builder.h>
 #include <geode/mesh/core/geode_edged_curve.h>
 #include <geode/mesh/core/geode_graph.h>
@@ -41,6 +42,7 @@
 #include <geode/mesh/core/geode_tetrahedral_solid.h>
 #include <geode/mesh/core/geode_triangulated_surface.h>
 #include <geode/mesh/core/geode_vertex_set.h>
+#include <geode/mesh/core/polygonal_surface_view.h>
 #include <geode/mesh/core/triangulated_surface_view.h>
 
 namespace geode
@@ -71,6 +73,13 @@ namespace geode
         MeshBuilderFactory::register_mesh_builder<
             OpenGeodePolygonalSurfaceBuilder3D >(
             OpenGeodePolygonalSurface3D::impl_name_static() );
+
+        MeshBuilderFactory::register_mesh_builder<
+            PolygonalSurfaceViewBuilder2D >(
+            PolygonalSurfaceView2D::impl_name_static() );
+        MeshBuilderFactory::register_mesh_builder<
+            PolygonalSurfaceViewBuilder3D >(
+            PolygonalSurfaceView3D::impl_name_static() );
 
         MeshBuilderFactory::register_mesh_builder<
             OpenGeodeTriangulatedSurfaceBuilder2D >(
