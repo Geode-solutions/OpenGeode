@@ -32,6 +32,7 @@
 #include <geode/mesh/builder/geode_triangulated_surface_builder.h>
 #include <geode/mesh/builder/geode_vertex_set_builder.h>
 #include <geode/mesh/builder/mesh_builder_factory.h>
+#include <geode/mesh/builder/triangulated_surface_view_builder.h>
 #include <geode/mesh/core/geode_edged_curve.h>
 #include <geode/mesh/core/geode_graph.h>
 #include <geode/mesh/core/geode_point_set.h>
@@ -40,6 +41,7 @@
 #include <geode/mesh/core/geode_tetrahedral_solid.h>
 #include <geode/mesh/core/geode_triangulated_surface.h>
 #include <geode/mesh/core/geode_vertex_set.h>
+#include <geode/mesh/core/triangulated_surface_view.h>
 
 namespace geode
 {
@@ -76,6 +78,13 @@ namespace geode
         MeshBuilderFactory::register_mesh_builder<
             OpenGeodeTriangulatedSurfaceBuilder3D >(
             OpenGeodeTriangulatedSurface3D::impl_name_static() );
+
+        MeshBuilderFactory::register_mesh_builder<
+            TriangulatedSurfaceViewBuilder2D >(
+            TriangulatedSurfaceView2D::impl_name_static() );
+        MeshBuilderFactory::register_mesh_builder<
+            TriangulatedSurfaceViewBuilder3D >(
+            TriangulatedSurfaceView3D::impl_name_static() );
 
         MeshBuilderFactory::register_mesh_builder<
             OpenGeodePolyhedralSolidBuilder3D >(
