@@ -70,6 +70,8 @@ namespace geode
         void do_set_polygon_adjacent(
             const PolygonEdge& polygon_edge, index_t adjacent_id ) final;
 
+        void do_unset_polygon_adjacent( const PolygonEdge& polygon_edge ) final;
+
     private:
         OpenGeodeTriangulatedSurface< dimension >* geode_triangulated_surface_;
     };

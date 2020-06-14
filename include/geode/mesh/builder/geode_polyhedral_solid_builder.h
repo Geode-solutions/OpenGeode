@@ -72,6 +72,9 @@ namespace geode
             const PolyhedronFacet& polyhedron_facet,
             index_t adjacent_id ) final;
 
+        void do_unset_polyhedron_adjacent(
+            const PolyhedronFacet& polyhedron_facet ) final;
+
     private:
         OpenGeodePolyhedralSolid< dimension >* geode_polyhedral_solid_;
     };

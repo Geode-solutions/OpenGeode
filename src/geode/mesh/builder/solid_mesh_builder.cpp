@@ -83,7 +83,7 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -100,11 +100,17 @@ namespace
                 geode::Range{ solid.nb_polyhedron_facets( p ) } )
             {
                 const geode::PolyhedronFacet id{ p, f };
-                const auto adj = solid.polyhedron_adjacent( id );
-                if( adj )
+                if( const auto adj = solid.polyhedron_adjacent( id ) )
                 {
                     const auto new_adjacent = old2new[adj.value()];
-                    builder.set_polyhedron_adjacent( id, new_adjacent );
+                    if( new_adjacent == geode::NO_ID )
+                    {
+                        builder.unset_polyhedron_adjacent( id );
+                    }
+                    else
+                    {
+                        builder.set_polyhedron_adjacent( id, new_adjacent );
+                    }
                 }
             }
         }
@@ -430,11 +436,20 @@ namespace geode
         check_polyhedron_id( *solid_mesh_, polyhedron_facet.polyhedron_id );
         check_polyhedron_facet_id( *solid_mesh_, polyhedron_facet.polyhedron_id,
             polyhedron_facet.facet_id );
-        OPENGEODE_ASSERT(
-            adjacent_id < solid_mesh_->nb_polyhedra() || adjacent_id == NO_ID,
+        OPENGEODE_ASSERT( adjacent_id < solid_mesh_->nb_polyhedra(),
             "[SolidMeshBuilder::set_polyhedron_adjacent] Accessing a "
             "polyhedron that does not exist" );
         do_set_polyhedron_adjacent( polyhedron_facet, adjacent_id );
+    }
+
+    template < index_t dimension >
+    void SolidMeshBuilder< dimension >::unset_polyhedron_adjacent(
+        const PolyhedronFacet& polyhedron_facet )
+    {
+        check_polyhedron_id( *solid_mesh_, polyhedron_facet.polyhedron_id );
+        check_polyhedron_facet_id( *solid_mesh_, polyhedron_facet.polyhedron_id,
+            polyhedron_facet.facet_id );
+        do_unset_polyhedron_adjacent( polyhedron_facet );
     }
 
     template < index_t dimension >
