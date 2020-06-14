@@ -91,6 +91,14 @@ namespace geode
     }
 
     template < index_t dimension >
+    void OpenGeodeTriangulatedSurfaceBuilder< dimension >::
+        do_unset_polygon_adjacent( const PolygonEdge& polygon_edge )
+    {
+        geode_triangulated_surface_->set_polygon_adjacent(
+            polygon_edge, NO_ID, {} );
+    }
+
+    template < index_t dimension >
     void OpenGeodeTriangulatedSurfaceBuilder< dimension >::do_delete_polygons(
         const std::vector< bool >& /*unused*/ )
     {

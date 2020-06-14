@@ -85,6 +85,14 @@ namespace geode
     }
 
     template < index_t dimension >
+    void OpenGeodePolyhedralSolidBuilder< dimension >::
+        do_unset_polyhedron_adjacent( const PolyhedronFacet& polyhedron_facet )
+    {
+        geode_polyhedral_solid_->set_polyhedron_adjacent(
+            polyhedron_facet, NO_ID, {} );
+    }
+
+    template < index_t dimension >
     void OpenGeodePolyhedralSolidBuilder< dimension >::do_delete_polyhedra(
         const std::vector< bool >& to_delete )
     {

@@ -100,6 +100,13 @@ namespace geode
             const PolyhedronFacet& polyhedron_facet, index_t adjacent_id );
 
         /*!
+         * Unset a polyhedron adgjacency through a facet.
+         * @param[in] polygon_facet The index of the polygon facet
+         */
+        void unset_polyhedron_adjacent(
+            const PolyhedronFacet& polyhedron_facet );
+
+        /*!
          * Compute all the adjacencies between the solid polyhedra
          */
         void compute_polyhedron_adjacencies();
@@ -211,6 +218,9 @@ namespace geode
 
         virtual void do_set_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet, index_t adjacent_id ) = 0;
+
+        virtual void do_unset_polyhedron_adjacent(
+            const PolyhedronFacet& polyhedron_facet ) = 0;
 
         void update_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex, index_t vertex_id );

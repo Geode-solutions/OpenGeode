@@ -108,6 +108,12 @@ namespace geode
             const PolygonEdge& polygon_edge, index_t adjacent_id );
 
         /*!
+         * Unset a polygon adjacency through an edge.
+         * @param[in] polygon_edge The index of the polygon edge
+         */
+        void unset_polygon_adjacent( const PolygonEdge& polygon_edge );
+
+        /*!
          * Compute all the adjacencies between the surface polygons
          */
         void compute_polygon_adjacencies();
@@ -196,6 +202,9 @@ namespace geode
 
         virtual void do_set_polygon_adjacent(
             const PolygonEdge& polygon_edge, index_t adjacent_id ) = 0;
+
+        virtual void do_unset_polygon_adjacent(
+            const PolygonEdge& polygon_edge ) = 0;
 
         std::vector< index_t > delete_edges(
             const std::vector< bool >& to_delete );
