@@ -100,7 +100,8 @@ namespace geode
             const PolyhedronFacet& polyhedron_facet, index_t adjacent_id );
 
         /*!
-         * Unset a polyhedron adgjacency through a facet.
+         * Unset a polyhedron adjacency through a facet.
+
          * @param[in] polygon_facet The index of the polygon facet
          */
         void unset_polyhedron_adjacent(
