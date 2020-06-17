@@ -45,6 +45,26 @@
 namespace
 {
     template < geode::index_t dimension >
+    void check_edge_id( const geode::SurfaceMesh< dimension >& surface,
+        const geode::index_t edge_id )
+    {
+        geode_unused( surface );
+        geode_unused( edge_id );
+        OPENGEODE_ASSERT( edge_id < surface.nb_edges(),
+            "[check_edge_id] Trying to access an invalid edge" );
+    }
+
+    template < geode::index_t dimension >
+    void check_vertex_id( const geode::SurfaceMesh< dimension >& surface,
+        const geode::index_t vertex_id )
+    {
+        geode_unused( surface );
+        geode_unused( vertex_id );
+        OPENGEODE_ASSERT( vertex_id < surface.nb_vertices(),
+            "[check_vertex_id] Trying to access an invalid vertex" );
+    }
+
+    template < geode::index_t dimension >
     void check_polygon_id( const geode::SurfaceMesh< dimension >& surface,
         const geode::index_t polygon_id )
     {
@@ -118,10 +138,10 @@ namespace geode
     public:
         explicit Impl( SurfaceMesh& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) )
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
@@ -185,12 +205,7 @@ namespace geode
             return this->clean_facets();
         }
 
-        bool isolated_vertex( index_t vertex_id ) const
-        {
-            return polygon_around_vertex( vertex_id ) == PolygonVertex{};
-        }
-
-        bool isolated_edge( index_t edge_id ) const
+        bool get_isolated_edge( index_t edge_id ) const
         {
             return this->get_counter( edge_id ) == 0;
         }
@@ -276,6 +291,13 @@ namespace geode
         check_polygon_id( *this, polygon_edge.polygon_id );
         check_polygon_edge_id(
             *this, polygon_edge.polygon_id, polygon_edge.edge_id );
+        return get_polygon_edge( polygon_edge );
+    }
+
+    template < index_t dimension >
+    index_t SurfaceMesh< dimension >::get_polygon_edge(
+        const PolygonEdge& polygon_edge ) const
+    {
         return impl_
             ->find_edge( { polygon_vertex( polygon_edge ),
                 polygon_edge_vertex( polygon_edge, 1 ) } )
@@ -286,9 +308,14 @@ namespace geode
     const PolygonVertex& SurfaceMesh< dimension >::polygon_around_vertex(
         index_t vertex_id, SurfaceMeshKey ) const
     {
-        OPENGEODE_ASSERT( vertex_id < this->nb_vertices(),
-            "[SurfaceMesh::polygon_around_vertex] Accessing an "
-            "invalid vertex" );
+        check_vertex_id( *this, vertex_id );
+        return get_polygon_around_vertex( vertex_id );
+    }
+
+    template < index_t dimension >
+    const PolygonVertex& SurfaceMesh< dimension >::get_polygon_around_vertex(
+        index_t vertex_id ) const
+    {
         return impl_->polygon_around_vertex( vertex_id );
     }
 
@@ -301,6 +328,14 @@ namespace geode
 
     template < index_t dimension >
     const std::array< index_t, 2 >& SurfaceMesh< dimension >::edge_vertices(
+        index_t edge_id ) const
+    {
+        check_edge_id( *this, edge_id );
+        return get_edge_vertices( edge_id );
+    }
+
+    template < index_t dimension >
+    const std::array< index_t, 2 >& SurfaceMesh< dimension >::get_edge_vertices(
         index_t edge_id ) const
     {
         return impl_->get_edge_vertices( edge_id );
@@ -374,13 +409,21 @@ namespace geode
     template < index_t dimension >
     bool SurfaceMesh< dimension >::isolated_vertex( index_t vertex_id ) const
     {
-        return impl_->isolated_vertex( vertex_id );
+        check_vertex_id( *this, vertex_id );
+        return get_polygon_around_vertex( vertex_id ) == PolygonVertex{};
     }
 
     template < index_t dimension >
     bool SurfaceMesh< dimension >::isolated_edge( index_t edge_id ) const
     {
-        return impl_->isolated_edge( edge_id );
+        check_edge_id( *this, edge_id );
+        return get_isolated_edge( edge_id );
+    }
+
+    template < index_t dimension >
+    bool SurfaceMesh< dimension >::get_isolated_edge( index_t edge_id ) const
+    {
+        return impl_->get_isolated_edge( edge_id );
     }
 
     template < index_t dimension >
@@ -447,8 +490,7 @@ namespace geode
         SurfaceMesh< dimension >::polygon_adjacent_edge(
             const PolygonEdge& polygon_edge ) const
     {
-        const auto polygon_adj = polygon_adjacent( polygon_edge );
-        if( polygon_adj )
+        if( const auto polygon_adj = polygon_adjacent( polygon_edge ) )
         {
             const auto polygon_adj_id = polygon_adj.value();
             const auto edge_id = this->polygon_edge( polygon_edge );
@@ -456,12 +498,10 @@ namespace geode
             {
                 const PolygonEdge adj_edge{ polygon_adj_id, e };
                 const auto polygon = polygon_adjacent( adj_edge );
-                if( polygon && polygon.value() == polygon_edge.polygon_id )
+                if( polygon && polygon == polygon_edge.polygon_id
+                    && this->polygon_edge( adj_edge ) == edge_id )
                 {
-                    if( this->polygon_edge( adj_edge ) == edge_id )
-                    {
-                        return adj_edge;
-                    }
+                    return adj_edge;
                 }
             }
             throw OpenGeodeException{ "[SurfaceMesh::polygon_adjacent_"
@@ -529,7 +569,7 @@ namespace geode
     template < index_t dimension >
     double SurfaceMesh< dimension >::edge_length( index_t edge_id ) const
     {
-        const auto vertices = edge_vertices( edge_id );
+        const auto& vertices = edge_vertices( edge_id );
         return Vector< dimension >{ this->point( vertices[0] ),
             this->point( vertices[1] ) }
             .length();
@@ -539,7 +579,7 @@ namespace geode
     Point< dimension > SurfaceMesh< dimension >::edge_barycenter(
         index_t edge_id ) const
     {
-        const auto vertices = edge_vertices( edge_id );
+        const auto& vertices = edge_vertices( edge_id );
         return ( this->point( vertices[0] ) + this->point( vertices[1] ) ) / 2.;
     }
 
@@ -593,11 +633,9 @@ namespace geode
     PolygonsAroundVertex SurfaceMesh< dimension >::polygons_around_vertex(
         index_t vertex_id ) const
     {
-        OPENGEODE_ASSERT( vertex_id < this->nb_vertices(),
-            "[SurfaceMesh::polygons_around_vertex] Accessing an "
-            "invalid vertex" );
+        check_vertex_id( *this, vertex_id );
         PolygonsAroundVertex polygons;
-        const auto& first_polygon = impl_->polygon_around_vertex( vertex_id );
+        const auto& first_polygon = get_polygon_around_vertex( vertex_id );
         if( first_polygon.polygon_id == NO_ID )
         {
             return polygons;
@@ -650,8 +688,16 @@ namespace geode
         }
         return absl::nullopt;
     }
+
     template < index_t dimension >
     absl::optional< index_t > SurfaceMesh< dimension >::edge_from_vertices(
+        const std::array< index_t, 2 >& vertices ) const
+    {
+        return get_edge_from_vertices( vertices );
+    }
+
+    template < index_t dimension >
+    absl::optional< index_t > SurfaceMesh< dimension >::get_edge_from_vertices(
         const std::array< index_t, 2 >& vertices ) const
     {
         return impl_->find_edge( vertices );
@@ -674,8 +720,7 @@ namespace geode
     const Point< dimension >& SurfaceMesh< dimension >::point(
         index_t vertex_id ) const
     {
-        OPENGEODE_ASSERT( vertex_id < nb_vertices(),
-            "[SurfaceMesh::point] Trying to access an invalid point" );
+        check_vertex_id( *this, vertex_id );
         return get_point( vertex_id );
     }
 
