@@ -23,10 +23,20 @@
 
 #include <geode/mesh/builder/triangulated_surface_view_builder.h>
 
+#include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/core/triangulated_surface_view.h>
 
 namespace geode
 {
+    template < index_t dimension >
+    std::unique_ptr< TriangulatedSurfaceViewBuilder< dimension > >
+        TriangulatedSurfaceViewBuilder< dimension >::create(
+            TriangulatedSurfaceView< dimension >& mesh )
+    {
+        return MeshBuilderFactory::create_mesh_builder<
+            TriangulatedSurfaceViewBuilder< dimension > >( mesh );
+    }
+
     template < index_t dimension >
     void TriangulatedSurfaceViewBuilder< dimension >::do_set_mesh(
         VertexSet& mesh )

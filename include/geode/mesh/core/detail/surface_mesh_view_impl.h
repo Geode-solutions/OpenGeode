@@ -42,7 +42,7 @@ namespace geode
             SurfaceMeshViewImpl( SurfaceMesh< dimension >& surface_view,
                 SurfaceMesh< dimension >& surface )
                 : detail::PointsViewImpl< dimension, SurfaceMesh< dimension > >(
-                    surface_view, surface ),
+                      surface_view, surface ),
                   surface_( surface ),
                   surface_view_( surface_view ),
                   view2polygons_(
@@ -225,6 +225,13 @@ namespace geode
                     surface_view_.polygon_attribute_manager().resize(
                         polygon_view_id + 1 );
                     view2polygons_->set_value( polygon_view_id, polygon_id );
+
+                    for( const auto v :
+                        Range{ surface_.nb_polygon_vertices( polygon_id ) } )
+                    {
+                        this->add_viewed_vertex(
+                            surface_.polygon_vertex( { polygon_id, v } ) );
+                    }
 
                     for( const auto e :
                         Range{ surface_.nb_polygon_edges( polygon_id ) } )

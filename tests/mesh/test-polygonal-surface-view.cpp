@@ -57,10 +57,8 @@ void test_create_viewed_vertices( const geode::PolygonalSurfaceView3D& surface,
     builder.add_viewed_vertex( 2 );
     builder.add_viewed_vertex( 3 );
     builder.add_viewed_vertex( 4 );
-    builder.add_viewed_vertex( 5 );
-    builder.add_viewed_vertex( 6 );
-    OPENGEODE_EXCEPTION( surface.nb_vertices() == 6,
-        "[Test] PolygonalSurfaceView should have 6 vertices" );
+    OPENGEODE_EXCEPTION( surface.nb_vertices() == 4,
+        "[Test] PolygonalSurfaceView should have 4 vertices" );
     const geode::Point3D answer{ { 8.1, 1.4, 4.7 } };
     OPENGEODE_EXCEPTION( surface.point( 2 ) == answer,
         "[Test] PolygonalSurfaceView point is not correct" );
@@ -73,6 +71,8 @@ void test_create_viewed_polygons( const geode::PolygonalSurfaceView3D& surface,
     builder.add_viewed_polygon( 2 );
     OPENGEODE_EXCEPTION( surface.nb_polygons() == 2,
         "[Test] PolygonalSurfaceView should have 2 polygons" );
+    OPENGEODE_EXCEPTION( surface.nb_vertices() == 6,
+        "[Test] PolygonalSurfaceView should have 6 vertices" );
     OPENGEODE_EXCEPTION( surface.nb_edges() == 7,
         "[Test] PolygonalSurfaceView should have 7 edges" );
     OPENGEODE_EXCEPTION( surface.viewed_polygon( 0 ) == 1,
@@ -136,10 +136,7 @@ void test()
 {
     auto surface = create_surface();
     geode::PolygonalSurfaceView3D view{ *surface };
-    auto builder = std::unique_ptr< geode::PolygonalSurfaceViewBuilder3D >{
-        dynamic_cast< geode::PolygonalSurfaceViewBuilder3D* >(
-            geode::PolygonalSurfaceBuilder3D::create( view ).release() )
-    };
+    auto builder = geode::PolygonalSurfaceViewBuilder3D::create( view );
 
     test_create_viewed_vertices( view, *builder );
     test_create_viewed_polygons( view, *builder );

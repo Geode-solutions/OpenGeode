@@ -23,10 +23,20 @@
 
 #include <geode/mesh/builder/polygonal_surface_view_builder.h>
 
+#include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/core/polygonal_surface_view.h>
 
 namespace geode
 {
+    template < index_t dimension >
+    std::unique_ptr< PolygonalSurfaceViewBuilder< dimension > >
+        PolygonalSurfaceViewBuilder< dimension >::create(
+            PolygonalSurfaceView< dimension >& mesh )
+    {
+        return MeshBuilderFactory::create_mesh_builder<
+            PolygonalSurfaceViewBuilder< dimension > >( mesh );
+    }
+
     template < index_t dimension >
     void PolygonalSurfaceViewBuilder< dimension >::do_set_mesh(
         VertexSet& mesh )

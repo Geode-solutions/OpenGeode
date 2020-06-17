@@ -37,14 +37,17 @@ namespace geode
 namespace geode
 {
     /*!
-     * Implementation class for TriangulatedSurfaceBuilder using OpenGeode data
-     * structure
+     * Implementation class for TriangulatedSurfaceBuilder using
+     * TriangulatedSurfaceView data structure
      */
     template < index_t dimension >
     class TriangulatedSurfaceViewBuilder
         : public TriangulatedSurfaceBuilder< dimension >
     {
     public:
+        static std::unique_ptr< TriangulatedSurfaceViewBuilder< dimension > >
+            create( TriangulatedSurfaceView< dimension >& mesh );
+
         void add_viewed_vertex( index_t vertex_id );
 
         void add_viewed_triangle( index_t triangle_id );
