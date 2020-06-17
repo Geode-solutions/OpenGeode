@@ -45,12 +45,12 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( EdgedCurve );
     FORWARD_DECLARATION_DIMENSION_CLASS( PointSet );
     FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMesh );
-    FORWARD_DECLARATION_DIMENSION_CLASS( PolyhedralSolid );
+    FORWARD_DECLARATION_DIMENSION_CLASS( SolidMesh );
     ALIAS_3D( Block );
     ALIAS_3D( Corner );
     ALIAS_3D( EdgedCurve );
     ALIAS_3D( PointSet );
-    ALIAS_3D( PolyhedralSolid );
+    ALIAS_3D( SolidMesh );
     ALIAS_3D( Line );
     ALIAS_3D( ModelBoundary );
     ALIAS_3D( Surface );
@@ -126,7 +126,7 @@ namespace geode
             const Surface3D& surface, std::unique_ptr< SurfaceMesh3D > mesh );
 
         void update_block_mesh(
-            const Block3D& block, std::unique_ptr< PolyhedralSolid3D > mesh );
+            const Block3D& block, std::unique_ptr< SolidMesh3D > mesh );
 
         void remove_corner( const Corner3D& corner );
 

@@ -26,7 +26,7 @@
 #include <geode/basic/factory.h>
 
 #include <geode/mesh/common.h>
-#include <geode/mesh/io/polyhedral_solid_input.h>
+#include <geode/mesh/io/vertex_set_input.h>
 
 namespace geode
 {
@@ -56,7 +56,7 @@ namespace geode
         absl::string_view filename );
 
     template < index_t dimension >
-    class TetrahedralSolidInput : public PolyhedralSolidInput< dimension >
+    class TetrahedralSolidInput : public VertexSetInput
     {
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
         OPENGEODE_DISABLE_COPY_AND_MOVE( TetrahedralSolidInput );

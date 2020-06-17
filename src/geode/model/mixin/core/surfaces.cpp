@@ -107,6 +107,12 @@ namespace geode
             {
                 save_polygonal_surface( *polygonal, file );
             }
+            else
+            {
+                throw OpenGeodeException(
+                    "[Surfaces::save_surfaces] Cannot find the explicit "
+                    "SurfaceMesh type" );
+            }
         }
         impl_->save_components( absl::StrCat( directory, "/surfaces" ) );
     }

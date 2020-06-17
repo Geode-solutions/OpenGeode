@@ -33,8 +33,8 @@ namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Block );
     FORWARD_DECLARATION_DIMENSION_CLASS( Blocks );
-    FORWARD_DECLARATION_DIMENSION_CLASS( PolyhedralSolid );
-    FORWARD_DECLARATION_DIMENSION_CLASS( PolyhedralSolidBuilder );
+    FORWARD_DECLARATION_DIMENSION_CLASS( SolidMesh );
+    FORWARD_DECLARATION_DIMENSION_CLASS( SolidMeshBuilder );
 
     struct uuid;
 } // namespace geode
@@ -51,8 +51,8 @@ namespace geode
          * Get a pointer to the builder of a Block mesh
          * @param[in] id Unique index of the Block
          */
-        std::unique_ptr< PolyhedralSolidBuilder< dimension > >
-            block_mesh_builder( const uuid& id );
+        std::unique_ptr< SolidMeshBuilder< dimension > > block_mesh_builder(
+            const uuid& id );
 
         void set_block_name( const uuid& id, absl::string_view name );
 
@@ -65,8 +65,8 @@ namespace geode
 
         void delete_block( const Block< dimension >& block );
 
-        void set_block_mesh( const uuid& id,
-            std::unique_ptr< PolyhedralSolid< dimension > > mesh );
+        void set_block_mesh(
+            const uuid& id, std::unique_ptr< SolidMesh< dimension > > mesh );
 
     private:
         Blocks< dimension >& blocks_;

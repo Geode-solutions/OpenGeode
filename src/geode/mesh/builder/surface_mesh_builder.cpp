@@ -81,11 +81,17 @@ namespace
             for( const auto e : geode::Range{ surface.nb_polygon_edges( p ) } )
             {
                 const geode::PolygonEdge id{ p, e };
-                const auto adj = surface.polygon_adjacent( id );
-                if( adj )
+                if( const auto adj = surface.polygon_adjacent( id ) )
                 {
                     const auto new_adjacent = old2new[adj.value()];
-                    builder.set_polygon_adjacent( id, new_adjacent );
+                    if( new_adjacent == geode::NO_ID )
+                    {
+                        builder.unset_polygon_adjacent( id );
+                    }
+                    else
+                    {
+                        builder.set_polygon_adjacent( id, new_adjacent );
+                    }
                 }
             }
         }
@@ -331,11 +337,20 @@ namespace geode
         check_polygon_id( *surface_mesh_, polygon_edge.polygon_id );
         check_polygon_edge_id(
             *surface_mesh_, polygon_edge.polygon_id, polygon_edge.edge_id );
-        OPENGEODE_ASSERT(
-            adjacent_id < surface_mesh_->nb_polygons() || adjacent_id == NO_ID,
+        OPENGEODE_ASSERT( adjacent_id < surface_mesh_->nb_polygons(),
             "[SurfaceMeshBuilder::set_polygon_adjacent] Accessing a "
             "polygon that does not exist" );
         do_set_polygon_adjacent( polygon_edge, adjacent_id );
+    }
+
+    template < index_t dimension >
+    void SurfaceMeshBuilder< dimension >::unset_polygon_adjacent(
+        const PolygonEdge& polygon_edge )
+    {
+        check_polygon_id( *surface_mesh_, polygon_edge.polygon_id );
+        check_polygon_edge_id(
+            *surface_mesh_, polygon_edge.polygon_id, polygon_edge.edge_id );
+        do_unset_polygon_adjacent( polygon_edge );
     }
 
     template < index_t dimension >

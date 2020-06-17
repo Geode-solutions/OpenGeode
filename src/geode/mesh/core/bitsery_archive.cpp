@@ -47,7 +47,7 @@ namespace bitsery
                   geode::PointSet3D,
                   geode::SurfaceMesh2D,
                   geode::SurfaceMesh3D,
-                  geode::PolyhedralSolid3D >
+                  geode::SolidMesh3D >
         {
         };
 
@@ -123,7 +123,13 @@ namespace bitsery
 
         template <>
         struct PolymorphicBaseClass< geode::PolyhedralSolid3D >
-            : PolymorphicDerivedClasses< geode::OpenGeodePolyhedralSolid3D,
+            : PolymorphicDerivedClasses< geode::OpenGeodePolyhedralSolid3D >
+        {
+        };
+
+        template <>
+        struct PolymorphicBaseClass< geode::SolidMesh3D >
+            : PolymorphicDerivedClasses< geode::PolyhedralSolid3D,
                   geode::TetrahedralSolid3D >
         {
         };
