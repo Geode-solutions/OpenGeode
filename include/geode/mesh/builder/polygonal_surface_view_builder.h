@@ -72,6 +72,8 @@ namespace geode
         void do_set_polygon_adjacent(
             const PolygonEdge& polygon_edge, index_t adjacent_id ) final;
 
+        void do_unset_polygon_adjacent( const PolygonEdge& polygon_edge ) final;
+
     private:
         PolygonalSurfaceView< dimension >* polygonal_surface_view_;
     };
