@@ -37,14 +37,17 @@ namespace geode
 namespace geode
 {
     /*!
-     * Implementation class for PolygonalSurfaceBuilder using OpenGeode data
-     * structure
+     * Implementation class for PolygonalSurfaceBuilder using
+     * PolygonalSurfaceView data structure
      */
     template < index_t dimension >
     class PolygonalSurfaceViewBuilder
         : public PolygonalSurfaceBuilder< dimension >
     {
     public:
+        static std::unique_ptr< PolygonalSurfaceViewBuilder< dimension > >
+            create( PolygonalSurfaceView< dimension >& mesh );
+
         void add_viewed_vertex( index_t vertex_id );
 
         void add_viewed_polygon( index_t polygon_id );

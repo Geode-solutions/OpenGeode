@@ -51,9 +51,8 @@ void test_create_viewed_vertices(
     builder.add_viewed_vertex( 1 );
     builder.add_viewed_vertex( 2 );
     builder.add_viewed_vertex( 3 );
-    builder.add_viewed_vertex( 4 );
-    OPENGEODE_EXCEPTION( surface.nb_vertices() == 4,
-        "[Test] TriangulatedSurfaceView should have 4 vertices" );
+    OPENGEODE_EXCEPTION( surface.nb_vertices() == 3,
+        "[Test] TriangulatedSurfaceView should have 3 vertices" );
     const geode::Point3D answer{ { 2.1, 9.4, 6.7 } };
     OPENGEODE_EXCEPTION( surface.point( 0 ) == answer,
         "[Test] TriangulatedSurfaceView point is not correct" );
@@ -67,6 +66,10 @@ void test_create_viewed_polygons(
     builder.add_viewed_triangle( 2 );
     OPENGEODE_EXCEPTION( surface.nb_polygons() == 2,
         "[Test] TriangulatedSurfaceView should have 2 polygons" );
+    OPENGEODE_EXCEPTION( surface.nb_vertices() == 4,
+        "[Test] TriangulatedSurfaceView should have 4 vertices" );
+    OPENGEODE_EXCEPTION( surface.nb_edges() == 5,
+        "[Test] TriangulatedSurfaceView should have 5 edges" );
     OPENGEODE_EXCEPTION( surface.viewed_triangle( 0 ) == 1,
         "[Test] TriangulatedSurfaceView triangle is not correct" );
 
@@ -120,10 +123,7 @@ void test()
 {
     auto surface = create_surface();
     geode::TriangulatedSurfaceView3D view{ *surface };
-    auto builder = std::unique_ptr< geode::TriangulatedSurfaceViewBuilder3D >{
-        dynamic_cast< geode::TriangulatedSurfaceViewBuilder3D* >(
-            geode::TriangulatedSurfaceBuilder3D::create( view ).release() )
-    };
+    auto builder = geode::TriangulatedSurfaceViewBuilder3D::create( view );
 
     test_create_viewed_vertices( view, *builder );
     test_create_viewed_polygons( view, *builder );
