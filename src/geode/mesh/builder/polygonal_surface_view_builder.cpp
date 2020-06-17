@@ -76,6 +76,14 @@ namespace geode
     }
 
     template < index_t dimension >
+    void PolygonalSurfaceViewBuilder< dimension >::do_unset_polygon_adjacent(
+        const PolygonEdge& /*unused*/ )
+    {
+        // polygonal_surface_view_->set_polygon_adjacent(
+        //     polygon_edge, NO_ID, {} );
+    }
+
+    template < index_t dimension >
     void PolygonalSurfaceViewBuilder< dimension >::do_create_polygon(
         absl::Span< const unsigned int > )
     {
