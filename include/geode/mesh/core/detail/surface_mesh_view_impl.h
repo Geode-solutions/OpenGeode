@@ -47,7 +47,11 @@ namespace geode
                   view2polygons_(
                       surface_view.polygon_attribute_manager()
                           .template find_or_create_attribute< VariableAttribute,
-                              index_t >( "view2polygons", NO_ID ) )
+                              index_t >( "view2polygons", NO_ID ) ),
+                  view2edges_(
+                      surface_view.edge_attribute_manager()
+                          .template find_or_create_attribute< VariableAttribute,
+                              index_t >( "view2edges", NO_ID ) )
             {
             }
 
@@ -86,10 +90,29 @@ namespace geode
 
             void add_viewed_polygon( index_t polygon_id )
             {
-                const auto id = surface_view_.nb_polygons();
-                surface_view_.polygon_attribute_manager().resize( id + 1 );
-                view2polygons_->set_value( id, polygon_id );
-                polygons2view_.emplace( polygon_id, id );
+                const auto polygon_view_id = surface_view_.nb_polygons();
+                if( polygons2view_.emplace( polygon_id, polygon_view_id )
+                        .second )
+                {
+                    surface_view_.polygon_attribute_manager().resize(
+                        polygon_view_id + 1 );
+                    view2polygons_->set_value( polygon_view_id, polygon_id );
+
+                    for( const auto e :
+                        Range{ surface_.nb_polygon_edges( polygon_id ) } )
+                    {
+                        const auto edge_view_id = surface_view_.nb_edges();
+                        const auto edge_id =
+                            surface_.polygon_edge( { polygon_id, e } );
+                        if( edges2view_.emplace( edge_id, edge_view_id )
+                                .second )
+                        {
+                            surface_view_.edge_attribute_manager().resize(
+                                edge_view_id + 1 );
+                            view2edges_->set_value( edge_view_id, edge_id );
+                        }
+                    }
+                }
             }
 
         private:
@@ -112,6 +135,8 @@ namespace geode
             SurfaceMesh< dimension >& surface_view_;
             std::shared_ptr< VariableAttribute< index_t > > view2polygons_;
             absl::flat_hash_map< index_t, index_t > polygons2view_;
+            std::shared_ptr< VariableAttribute< index_t > > view2edges_;
+            absl::flat_hash_map< index_t, index_t > edges2view_;
         };
     } // namespace detail
 } // namespace geode

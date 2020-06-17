@@ -66,9 +66,11 @@ namespace geode
             void add_viewed_vertex( index_t vertex_id )
             {
                 const auto id = mesh_view_.nb_vertices();
-                mesh_view_.vertex_attribute_manager().resize( id + 1 );
-                view2vertices_->set_value( id, vertex_id );
-                vertices2view_.emplace( vertex_id, id );
+                if( vertices2view_.emplace( vertex_id, id ).second )
+                {
+                    mesh_view_.vertex_attribute_manager().resize( id + 1 );
+                    view2vertices_->set_value( id, vertex_id );
+                }
             }
 
         private:
