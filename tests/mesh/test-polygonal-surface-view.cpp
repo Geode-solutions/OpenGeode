@@ -73,6 +73,8 @@ void test_create_viewed_polygons( const geode::PolygonalSurfaceView3D& surface,
     builder.add_viewed_polygon( 2 );
     OPENGEODE_EXCEPTION( surface.nb_polygons() == 2,
         "[Test] PolygonalSurfaceView should have 2 polygons" );
+    OPENGEODE_EXCEPTION( surface.nb_edges() == 7,
+        "[Test] PolygonalSurfaceView should have 7 edges" );
     OPENGEODE_EXCEPTION( surface.viewed_polygon( 0 ) == 1,
         "[Test] PolygonalSurfaceView polygon is not correct" );
 
@@ -108,6 +110,15 @@ void test_polygon_adjacencies(
     OPENGEODE_EXCEPTION( polygonal_surface.polygon_adjacent_edge( { 0, 0 } )
                              == geode::PolygonEdge( 1, 3 ),
         "[Test] PolygonalSurface adjacent index is not correct" );
+
+    OPENGEODE_EXCEPTION(
+        polygonal_surface.polygons_around_vertex( 0 ).size() == 2,
+        "[Test] PolygonalSurface polygons around vertex index is not correct" );
+    const auto polys = polygonal_surface.polygons_around_vertex( 1 );
+    OPENGEODE_EXCEPTION( polys.size() == 1,
+        "[Test] PolygonalSurface polygons around vertex index is not correct" );
+    OPENGEODE_EXCEPTION( polys.front().polygon_id == 0,
+        "[Test] PolygonalSurface polygons around vertex index is not correct" );
 }
 
 std::unique_ptr< geode::PolygonalSurface3D > create_surface()

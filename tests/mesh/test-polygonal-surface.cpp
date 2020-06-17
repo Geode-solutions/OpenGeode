@@ -91,8 +91,7 @@ void test_delete_vertex( const geode::PolygonalSurface3D& polygonal_surface,
         "[Test] PolygonalSurface vertex coordinates are not correct" );
     OPENGEODE_EXCEPTION( polygonal_surface.nb_polygons() == 2,
         "[Test] PolygonalSurface should have 2 polygons" );
-    OPENGEODE_EXCEPTION(
-        polygonal_surface.polygon_adjacent( { 1, 3 } ).value() == 0,
+    OPENGEODE_EXCEPTION( polygonal_surface.polygon_adjacent( { 1, 3 } ) == 0,
         "[Test] PolygonalSurface adjacent index is not correct" );
     OPENGEODE_EXCEPTION( polygonal_surface.nb_edges() == 7,
         "[Test] PolygonalSurface should have 7 edges" );
