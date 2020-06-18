@@ -43,7 +43,7 @@ namespace geode
             SolidMeshViewImpl( SolidMesh< dimension >& solid_view,
                 SolidMesh< dimension >& solid )
                 : detail::EdgesViewImpl< dimension, SolidMesh< dimension > >(
-                      solid_view, solid ),
+                    solid_view, solid ),
                   solid_( solid ),
                   solid_view_( solid_view ),
                   view2polyhedra_(
