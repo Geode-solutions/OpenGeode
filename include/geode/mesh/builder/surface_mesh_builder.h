@@ -152,14 +152,6 @@ namespace geode
         std::vector< index_t > delete_isolated_edges();
 
         /*!
-         * Return one polygon with one of the vertices matching given vertex.
-         * @param[in] vertex_id Index of the vertex.
-         * @detail If vertex is isolated (no incident polygon), default
-         * PolygonVertex is returned.
-         */
-        const PolygonVertex& polygon_around_vertex( index_t vertex_id ) const;
-
-        /*!
          * Set a polygon vertex to a given vertex.
          * @param[in] polygon_vertex PolygonVertex corresponding to the vertex.
          * @param[in] vertex_id Index of the vertex.

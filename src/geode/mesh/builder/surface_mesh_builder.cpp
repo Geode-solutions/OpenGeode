@@ -108,7 +108,7 @@ namespace
             if( vertices_old2new[v] != geode::NO_ID )
             {
                 const auto new_polygon_around =
-                    builder.polygon_around_vertex( vertices_old2new[v] );
+                    surface.polygon_around_vertex( vertices_old2new[v] );
                 builder.associate_polygon_vertex_to_vertex(
                     new_polygon_around, v );
             }
@@ -214,13 +214,6 @@ namespace geode
     }
 
     template < index_t dimension >
-    const PolygonVertex& SurfaceMeshBuilder< dimension >::polygon_around_vertex(
-        index_t vertex_id ) const
-    {
-        return surface_mesh_->polygon_around_vertex( vertex_id, {} );
-    }
-
-    template < index_t dimension >
     void SurfaceMeshBuilder< dimension >::replace_vertex(
         index_t old_vertex_id, index_t new_vertex_id )
     {
@@ -255,7 +248,7 @@ namespace geode
         if( polygon_vertex_id != NO_ID )
         {
             const auto polygon_around =
-                surface_mesh_->polygon_around_vertex( polygon_vertex_id, {} );
+                surface_mesh_->polygon_around_vertex( polygon_vertex_id );
             if( polygon_around == polygon_vertex )
             {
                 const auto polygons_around =
@@ -421,7 +414,7 @@ namespace geode
         for( const auto v : Range{ surface_mesh_->nb_vertices() } )
         {
             const auto& polygon_vertex =
-                surface_mesh_->polygon_around_vertex( v, {} );
+                surface_mesh_->polygon_around_vertex( v );
             if( polygon_vertex.polygon_id == NO_ID )
             {
                 continue;
@@ -457,7 +450,7 @@ namespace geode
         for( const auto v : Range{ surface_mesh_->nb_vertices() } )
         {
             const auto& polygon_vertex =
-                surface_mesh_->polygon_around_vertex( v, {} );
+                surface_mesh_->polygon_around_vertex( v );
             if( polygon_vertex.polygon_id == NO_ID )
             {
                 to_delete[v] = true;

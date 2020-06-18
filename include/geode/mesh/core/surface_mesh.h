@@ -344,8 +344,13 @@ namespace geode
          */
         BoundingBox< dimension > bounding_box() const;
 
-        const PolygonVertex& polygon_around_vertex(
-            index_t vertex_id, SurfaceMeshKey ) const;
+        /*!
+         * Return one polygon with one of the vertices matching given vertex.
+         * @param[in] vertex_id Index of the vertex.
+         * @detail If vertex is isolated (no incident polygon), default
+         * PolygonVertex is returned.
+         */
+        const PolygonVertex& polygon_around_vertex( index_t vertex_id ) const;
 
         void associate_polygon_vertex_to_vertex(
             const PolygonVertex& polygon_vertex,
