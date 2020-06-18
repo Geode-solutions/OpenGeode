@@ -138,10 +138,10 @@ namespace geode
     public:
         explicit Impl( SurfaceMesh& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) )
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
@@ -306,7 +306,7 @@ namespace geode
 
     template < index_t dimension >
     const PolygonVertex& SurfaceMesh< dimension >::polygon_around_vertex(
-        index_t vertex_id, SurfaceMeshKey ) const
+        index_t vertex_id ) const
     {
         check_vertex_id( *this, vertex_id );
         return get_polygon_around_vertex( vertex_id );

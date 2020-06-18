@@ -46,15 +46,13 @@
         .def( "compute_polygon_adjacencies",                                   \
             ( void ( SurfaceMeshBuilder##dimension##D::* )() )                 \
                 & SurfaceMeshBuilder##dimension##D::                           \
-                    compute_polygon_adjacencies )                              \
+                      compute_polygon_adjacencies )                            \
         .def( "delete_polygons",                                               \
             &SurfaceMeshBuilder##dimension##D::delete_polygons )               \
         .def( "delete_isolated_vertices",                                      \
             &SurfaceMeshBuilder##dimension##D::delete_isolated_vertices )      \
         .def( "delete_isolated_edges",                                         \
             &SurfaceMeshBuilder##dimension##D::delete_isolated_edges )         \
-        .def( "polygon_around_vertex",                                         \
-            &SurfaceMeshBuilder##dimension##D::polygon_around_vertex )         \
         .def( "associate_polygon_vertex_to_vertex",                            \
             &SurfaceMeshBuilder##dimension##D::                                \
                 associate_polygon_vertex_to_vertex )

@@ -69,6 +69,8 @@
             &SolidMesh##dimension##D::polyhedron_barycenter )                  \
         .def( "facet_barycenter", &SolidMesh##dimension##D::facet_barycenter ) \
         .def( "edge_barycenter", &SolidMesh##dimension##D::edge_barycenter )   \
+        .def( "polyhedron_around_vertex",                                      \
+            &SolidMesh##dimension##D::polyhedron_around_vertex )               \
         .def( "polyhedra_around_vertex",                                       \
             &SolidMesh##dimension##D::polyhedra_around_vertex )                \
         .def( "polyhedra_around_edge",                                         \

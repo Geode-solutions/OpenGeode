@@ -23,30 +23,37 @@
 
 #pragma once
 
-#include <array>
 #include <vector>
 
-#include <absl/container/inlined_vector.h>
-
-#include <geode/mesh/builder/tetrahedral_solid_builder.h>
+#include <geode/mesh/builder/polyhedral_solid_builder.h>
 #include <geode/mesh/common.h>
 
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
-    FORWARD_DECLARATION_DIMENSION_CLASS( OpenGeodeTetrahedralSolid );
+    FORWARD_DECLARATION_DIMENSION_CLASS( PolyhedralSolidView );
 } // namespace geode
 
 namespace geode
 {
     /*!
-     * Implementation class for TetrahedralSolidBuilder using OpenGeode data
-     * structure
+     * Implementation class for PolyhedralSolidBuilder using PolyhedralSolidView
+     * data structure
      */
     template < index_t dimension >
-    class OpenGeodeTetrahedralSolidBuilder
-        : public TetrahedralSolidBuilder< dimension >
+    class PolyhedralSolidViewBuilder
+        : public PolyhedralSolidBuilder< dimension >
     {
+        OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
+
+    public:
+        static std::unique_ptr< PolyhedralSolidViewBuilder< dimension > >
+            create( PolyhedralSolidView< dimension >& mesh );
+
+        void add_viewed_vertex( index_t vertex_id );
+
+        void add_viewed_polyhedron( index_t polyhedron_id );
+
     private:
         void do_set_mesh( VertexSet& mesh ) final;
 
@@ -64,14 +71,8 @@ namespace geode
             const PolyhedronVertex& polyhedron_vertex,
             index_t vertex_id ) final;
 
-        void do_create_facets( const std::array< index_t, 4 >& vertices ) final;
-
-        void do_create_edges( const std::array< index_t, 4 >& vertices ) final;
-
-        void do_create_tetrahedron(
-            const std::array< index_t, 4 >& vertices ) final;
-
-        void do_create_tetrahedra( index_t nb ) final;
+        void do_create_polyhedron( absl::Span< const index_t > vertices,
+            absl::Span< const std::vector< index_t > > facets ) final;
 
         void do_delete_polyhedra( const std::vector< bool >& to_delete ) final;
 
@@ -83,7 +84,7 @@ namespace geode
             const PolyhedronFacet& polyhedron_facet ) final;
 
     private:
-        OpenGeodeTetrahedralSolid< dimension >* geode_tetrahedral_solid_;
+        PolyhedralSolidView< dimension >* polyhedral_solid_view_;
     };
-    ALIAS_3D( OpenGeodeTetrahedralSolidBuilder );
+    ALIAS_3D( PolyhedralSolidViewBuilder );
 } // namespace geode

@@ -107,13 +107,6 @@ namespace geode
                                   + polyhedron_facet.facet_id] = adjacent_id;
         }
 
-        index_t get_polyhedron_facet_vertex(
-            const PolyhedronFacetVertex& polyhedron_facet_vertex ) const
-        {
-            return get_polyhedron_vertex(
-                get_polyhedron_facet_vertex_id( polyhedron_facet_vertex ) );
-        }
-
         PolyhedronVertex get_polyhedron_facet_vertex_id(
             const PolyhedronFacetVertex& polyhedron_facet_vertex ) const
         {
@@ -345,13 +338,6 @@ namespace geode
             const PolyhedronFacet& polyhedron_facet ) const
     {
         return impl_->get_polyhedron_adjacent( polyhedron_facet );
-    }
-
-    template < index_t dimension >
-    index_t OpenGeodePolyhedralSolid< dimension >::get_polyhedron_facet_vertex(
-        const PolyhedronFacetVertex& polyhedron_facet_vertex ) const
-    {
-        return impl_->get_polyhedron_facet_vertex( polyhedron_facet_vertex );
     }
 
     template < index_t dimension >

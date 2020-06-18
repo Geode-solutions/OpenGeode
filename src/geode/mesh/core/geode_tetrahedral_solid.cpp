@@ -82,13 +82,6 @@ namespace geode
                 .at( polyhedron_vertex.vertex_id );
         }
 
-        index_t get_polyhedron_facet_vertex(
-            const PolyhedronFacetVertex& polyhedron_facet_vertex ) const
-        {
-            return get_polyhedron_vertex(
-                get_polyhedron_facet_vertex_id( polyhedron_facet_vertex ) );
-        }
-
         PolyhedronVertex get_polyhedron_facet_vertex_id(
             const PolyhedronFacetVertex& polyhedron_facet_vertex ) const
         {
@@ -229,13 +222,6 @@ namespace geode
         const PolyhedronVertex& polyhedron_vertex ) const
     {
         return impl_->get_polyhedron_vertex( polyhedron_vertex );
-    }
-
-    template < index_t dimension >
-    index_t OpenGeodeTetrahedralSolid< dimension >::get_polyhedron_facet_vertex(
-        const PolyhedronFacetVertex& polyhedron_facet_vertex ) const
-    {
-        return impl_->get_polyhedron_facet_vertex( polyhedron_facet_vertex );
     }
 
     template < index_t dimension >

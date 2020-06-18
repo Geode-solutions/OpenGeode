@@ -27,31 +27,31 @@
 #include <geode/basic/pimpl.h>
 
 #include <geode/mesh/common.h>
-#include <geode/mesh/core/polyhedral_solid.h>
+#include <geode/mesh/core/tetrahedral_solid.h>
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( OpenGeodePolyhedralSolidBuilder );
+    FORWARD_DECLARATION_DIMENSION_CLASS( TetrahedralSolidViewBuilder );
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
 } // namespace geode
 
 namespace geode
 {
     template < index_t dimension >
-    class OpenGeodePolyhedralSolid : public PolyhedralSolid< dimension >
+    class TetrahedralSolidView : public TetrahedralSolid< dimension >
     {
-        OPENGEODE_DISABLE_COPY( OpenGeodePolyhedralSolid );
-        PASSKEY( OpenGeodePolyhedralSolidBuilder< dimension >,
-            OGPolyhedralSolidKey );
+        OPENGEODE_DISABLE_COPY( TetrahedralSolidView );
+        PASSKEY(
+            TetrahedralSolidViewBuilder< dimension >, TetrahedralSolidViewKey );
 
     public:
-        OpenGeodePolyhedralSolid();
-        ~OpenGeodePolyhedralSolid();
+        TetrahedralSolidView( TetrahedralSolid< dimension >& solid );
+        ~TetrahedralSolidView();
 
         static MeshImpl impl_name_static()
         {
             return MeshImpl{ absl::StrCat(
-                "OpenGeodePolyhedralSolid", dimension, "D" ) };
+                "TetrahedralSolidView", dimension, "D" ) };
         }
 
         MeshImpl impl_name() const override
@@ -61,58 +61,29 @@ namespace geode
 
         MeshType type_name() const override
         {
-            return PolyhedralSolid< dimension >::type_name_static();
-        }
-
-        static absl::string_view native_extension_static()
-        {
-            static const auto extension =
-                absl::StrCat( "og_pso", dimension, "d" );
-            return extension;
+            return TetrahedralSolidView< dimension >::type_name_static();
         }
 
         absl::string_view native_extension() const override
         {
-            return native_extension_static();
+            throw OpenGeodeException( "TetrahedralSolidView cannot be saved" );
+            return "";
         }
 
-        void set_vertex( index_t vertex_id,
-            const Point< dimension >& point,
-            OGPolyhedralSolidKey );
+        index_t viewed_vertex( index_t vertex_id ) const;
 
-        void add_polyhedron( absl::Span< const index_t > vertices,
-            absl::Span< const std::vector< index_t > > facets,
-            OGPolyhedralSolidKey );
+        void add_viewed_vertex( index_t vertex_id, TetrahedralSolidViewKey );
 
-        void remove_polyhedra(
-            const std::vector< bool >& to_delete, OGPolyhedralSolidKey );
+        index_t viewed_tetrahedron( index_t tetrahedron_id ) const;
 
-        void set_polyhedron_adjacent( const PolyhedronFacet& polyhedron_facet,
-            index_t adjacent_id,
-            OGPolyhedralSolidKey );
-
-        void set_polyhedron_vertex( const PolyhedronVertex& polyhedron_vertex,
-            index_t vertex_id,
-            OGPolyhedralSolidKey );
+        void add_viewed_tetrahedron(
+            index_t tetrahedron_id, TetrahedralSolidViewKey );
 
     private:
-        friend class bitsery::Access;
-        template < typename Archive >
-        void serialize( Archive& archive );
-
         const Point< dimension >& get_point( index_t vertex_id ) const override;
 
         index_t get_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex ) const override;
-
-        index_t get_nb_polyhedron_vertices(
-            index_t polyhedron_id ) const override;
-
-        index_t get_nb_polyhedron_facets(
-            index_t polyhedron_id ) const override;
-
-        index_t get_nb_polyhedron_facet_vertices(
-            const PolyhedronFacet& polyhedron_facet ) const override;
 
         PolyhedronVertex get_polyhedron_facet_vertex_id(
             const PolyhedronFacetVertex& polyhedron_facet_vertex )
@@ -121,8 +92,30 @@ namespace geode
         absl::optional< index_t > get_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet ) const override;
 
+        index_t get_polyhedron_facet(
+            const PolyhedronFacet& polyhedron_facet ) const override;
+
+        bool get_isolated_edge( index_t edge_id ) const override;
+
+        bool get_isolated_facet( index_t facet_id ) const override;
+
+        const PolyhedronVertex& get_polyhedron_around_vertex(
+            index_t vertex_id ) const override;
+
+        const PolyhedronFacetVertices& get_facet_vertices(
+            index_t facet_id ) const override;
+
+        const std::array< index_t, 2 >& get_edge_vertices(
+            index_t edge_id ) const override;
+
+        absl::optional< index_t > get_facet_from_vertices(
+            const PolyhedronFacetVertices& vertices ) const override;
+
+        absl::optional< index_t > get_edge_from_vertices(
+            const std::array< index_t, 2 >& vertices ) const override;
+
     private:
         IMPLEMENTATION_MEMBER( impl_ );
     };
-    ALIAS_3D( OpenGeodePolyhedralSolid );
+    ALIAS_3D( TetrahedralSolidView );
 } // namespace geode

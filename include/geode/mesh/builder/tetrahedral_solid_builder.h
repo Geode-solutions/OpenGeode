@@ -102,14 +102,6 @@ namespace geode
 
         virtual void do_create_tetrahedra( index_t nb ) = 0;
 
-        virtual std::array< PolyhedronFacetVertices, 4 >
-            get_tetrahedron_facet_vertices(
-                const std::array< index_t, 4 >& vertices ) const = 0;
-
-        virtual std::vector< std::array< index_t, 2 > >
-            get_tetrahedron_edge_vertices(
-                const std::array< index_t, 4 >& vertices ) const = 0;
-
     private:
         TetrahedralSolid< dimension >* tetrahedral_solid_;
     };

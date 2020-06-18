@@ -421,6 +421,13 @@ namespace geode
          * Compute the bounding box from mesh vertices
          */
         BoundingBox< dimension > bounding_box() const;
+
+        /*!
+         * Return one polyhedron with one of the vertices matching given vertex.
+         * @param[in] vertex_id Index of the vertex.
+         * @detail If vertex is isolated (no incident polyhedron), default
+         * PolyhedronVertex is returned.
+         */
         const PolyhedronVertex& polyhedron_around_vertex(
             index_t vertex_id ) const;
 
@@ -513,14 +520,33 @@ namespace geode
         virtual index_t get_nb_polyhedron_facet_vertices(
             const PolyhedronFacet& polyhedron_facet ) const = 0;
 
-        virtual index_t get_polyhedron_facet_vertex(
-            const PolyhedronFacetVertex& polyhedron_facet_vertex ) const = 0;
-
         virtual PolyhedronVertex get_polyhedron_facet_vertex_id(
             const PolyhedronFacetVertex& polyhedron_facet_vertex ) const = 0;
 
         virtual absl::optional< index_t > get_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet ) const = 0;
+
+        virtual index_t get_polyhedron_facet(
+            const PolyhedronFacet& polyhedron_facet ) const;
+
+        virtual bool get_isolated_edge( index_t edge_id ) const;
+
+        virtual bool get_isolated_facet( index_t facet_id ) const;
+
+        virtual const PolyhedronVertex& get_polyhedron_around_vertex(
+            index_t vertex_id ) const;
+
+        virtual const PolyhedronFacetVertices& get_facet_vertices(
+            index_t facet_id ) const;
+
+        virtual const std::array< index_t, 2 >& get_edge_vertices(
+            index_t edge_id ) const;
+
+        virtual absl::optional< index_t > get_facet_from_vertices(
+            const PolyhedronFacetVertices& vertices ) const;
+
+        virtual absl::optional< index_t > get_edge_from_vertices(
+            const std::array< index_t, 2 >& vertices ) const;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

@@ -83,7 +83,7 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -127,7 +127,7 @@ namespace
             if( vertices_old2new[v] != geode::NO_ID )
             {
                 const auto new_polyhedron_around =
-                    builder.polyhedron_around_vertex( vertices_old2new[v] );
+                    solid.polyhedron_around_vertex( vertices_old2new[v] );
                 builder.associate_polyhedron_vertex_to_vertex(
                     new_polyhedron_around, v );
             }
@@ -408,14 +408,6 @@ namespace geode
     {
         return solid_mesh_->find_or_create_edge(
             std::move( edge_vertices ), {} );
-    }
-
-    template < index_t dimension >
-    const PolyhedronVertex&
-        SolidMeshBuilder< dimension >::polyhedron_around_vertex(
-            index_t vertex_id ) const
-    {
-        return solid_mesh_->polyhedron_around_vertex( vertex_id );
     }
 
     template < index_t dimension >
