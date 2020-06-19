@@ -46,7 +46,7 @@
         .def( "compute_polygon_adjacencies",                                   \
             ( void ( SurfaceMeshBuilder##dimension##D::* )() )                 \
                 & SurfaceMeshBuilder##dimension##D::                           \
-                      compute_polygon_adjacencies )                            \
+                    compute_polygon_adjacencies )                              \
         .def( "delete_polygons",                                               \
             &SurfaceMeshBuilder##dimension##D::delete_polygons )               \
         .def( "delete_isolated_vertices",                                      \
