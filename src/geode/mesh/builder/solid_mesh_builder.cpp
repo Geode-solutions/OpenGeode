@@ -83,7 +83,7 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -128,13 +128,19 @@ namespace
             {
                 const auto new_polyhedron_around =
                     solid.polyhedron_around_vertex( vertices_old2new[v] );
-                builder.associate_polyhedron_vertex_to_vertex(
-                    new_polyhedron_around, v );
+                if( new_polyhedron_around )
+                {
+                    builder.associate_polyhedron_vertex_to_vertex(
+                        new_polyhedron_around.value(), v );
+                }
+                else
+                {
+                    builder.disassociate_polyhedron_vertex_to_vertex( v );
+                }
             }
             else
             {
-                builder.associate_polyhedron_vertex_to_vertex(
-                    geode::PolyhedronVertex{}, v );
+                builder.disassociate_polyhedron_vertex_to_vertex( v );
             }
         }
     }
@@ -198,8 +204,8 @@ namespace geode
                         polyhedron_vertex_id );
                 if( polyhedra_around.size() < 2 )
                 {
-                    associate_polyhedron_vertex_to_vertex(
-                        PolyhedronVertex{}, polyhedron_vertex_id );
+                    disassociate_polyhedron_vertex_to_vertex(
+                        polyhedron_vertex_id );
                 }
                 else
                 {
@@ -390,8 +396,23 @@ namespace geode
     void SolidMeshBuilder< dimension >::associate_polyhedron_vertex_to_vertex(
         const PolyhedronVertex& polyhedron_vertex, index_t vertex_id )
     {
+        OPENGEODE_ASSERT( polyhedron_vertex.polyhedron_id != NO_ID,
+            "[SolidMeshBuilder::associate_polyhedron_vertex_to_vertex] "
+            "PolyhedronVertex invalid" );
+        OPENGEODE_ASSERT( polyhedron_vertex.vertex_id != NO_ID,
+            "[SolidMeshBuilder::associate_polyhedron_vertex_to_vertex] "
+            "PolyhedronVertex invalid" );
         solid_mesh_->associate_polyhedron_vertex_to_vertex(
             polyhedron_vertex, vertex_id, {} );
+    }
+
+    template < index_t dimension >
+    void
+        SolidMeshBuilder< dimension >::disassociate_polyhedron_vertex_to_vertex(
+            index_t vertex_id )
+    {
+        solid_mesh_->associate_polyhedron_vertex_to_vertex(
+            PolyhedronVertex{}, vertex_id, {} );
     }
 
     template < index_t dimension >
@@ -542,15 +563,16 @@ namespace geode
         const auto old2new = detail::mapping_after_deletion( to_delete );
         for( const auto v : Range{ solid_mesh_->nb_vertices() } )
         {
-            const auto& polyhedron_vertex =
+            const auto polyhedron_vertex =
                 solid_mesh_->polyhedron_around_vertex( v );
-            if( polyhedron_vertex.polyhedron_id == NO_ID )
+            if( !polyhedron_vertex )
             {
                 continue;
             }
-            PolyhedronVertex new_polyhedron_vertex{ polyhedron_vertex };
+            PolyhedronVertex new_polyhedron_vertex{ polyhedron_vertex.value() };
             new_polyhedron_vertex.polyhedron_id =
-                old2new[polyhedron_vertex.polyhedron_id];
+                old2new[polyhedron_vertex->polyhedron_id];
+            disassociate_polyhedron_vertex_to_vertex( v );
             if( new_polyhedron_vertex.polyhedron_id == NO_ID )
             {
                 for( auto&& polyhedron :
@@ -560,12 +582,11 @@ namespace geode
                         old2new[polyhedron.polyhedron_id];
                     if( polyhedron.polyhedron_id != NO_ID )
                     {
-                        new_polyhedron_vertex = std::move( polyhedron );
+                        associate_polyhedron_vertex_to_vertex( polyhedron, v );
                         break;
                     }
                 }
             }
-            associate_polyhedron_vertex_to_vertex( new_polyhedron_vertex, v );
         }
 
         update_polyhedron_adjacencies( *solid_mesh_, *this, old2new );
@@ -639,12 +660,7 @@ namespace geode
         std::vector< bool > to_delete( solid_mesh_->nb_vertices(), false );
         for( const auto v : Range{ solid_mesh_->nb_vertices() } )
         {
-            const auto& polyhedron_vertex =
-                solid_mesh_->polyhedron_around_vertex( v );
-            if( polyhedron_vertex.polyhedron_id == NO_ID )
-            {
-                to_delete[v] = true;
-            }
+            to_delete[v] = !solid_mesh_->polyhedron_around_vertex( v );
         }
         return delete_vertices( to_delete );
     }

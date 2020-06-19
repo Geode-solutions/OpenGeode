@@ -425,10 +425,8 @@ namespace geode
         /*!
          * Return one polyhedron with one of the vertices matching given vertex.
          * @param[in] vertex_id Index of the vertex.
-         * @detail If vertex is isolated (no incident polyhedron), default
-         * PolyhedronVertex is returned.
          */
-        const PolyhedronVertex& polyhedron_around_vertex(
+        absl::optional< PolyhedronVertex > polyhedron_around_vertex(
             index_t vertex_id ) const;
 
         void associate_polyhedron_vertex_to_vertex(
@@ -533,7 +531,7 @@ namespace geode
 
         virtual bool get_isolated_facet( index_t facet_id ) const;
 
-        virtual const PolyhedronVertex& get_polyhedron_around_vertex(
+        virtual absl::optional< PolyhedronVertex > get_polyhedron_around_vertex(
             index_t vertex_id ) const;
 
         virtual const PolyhedronFacetVertices& get_facet_vertices(

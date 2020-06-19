@@ -42,18 +42,13 @@ namespace geode
             SurfaceMeshViewImpl( SurfaceMesh< dimension >& surface_view,
                 SurfaceMesh< dimension >& surface )
                 : detail::EdgesViewImpl< dimension, SurfaceMesh< dimension > >(
-                    surface_view, surface ),
+                      surface_view, surface ),
                   surface_( surface ),
                   surface_view_( surface_view ),
                   view2polygons_(
                       surface_view.polygon_attribute_manager()
                           .template find_or_create_attribute< VariableAttribute,
-                              index_t >( "view2polygons", NO_ID ) ),
-                  polygon_around_(
-                      surface_view.vertex_attribute_manager()
-                          .template find_or_create_attribute< VariableAttribute,
-                              PolygonVertex >(
-                              "polygon_around_vertex", PolygonVertex{} ) )
+                              index_t >( "view2polygons", NO_ID ) )
             {
             }
 
@@ -70,45 +65,35 @@ namespace geode
                     viewed_polygon( polygon_id ) );
             }
 
-            const PolygonVertex& get_polygon_around_vertex(
+            absl::optional< PolygonVertex > get_polygon_around_vertex(
                 index_t vertex_id ) const
             {
                 const auto viewed_vertex = this->viewed_vertex( vertex_id );
-                const auto& viewed_polygon_vertex =
+                const auto viewed_polygon_vertex =
                     surface_.polygon_around_vertex( viewed_vertex );
+                if( !viewed_polygon_vertex )
+                {
+                    return absl::nullopt;
+                }
                 const auto it =
-                    polygons2view_.find( viewed_polygon_vertex.polygon_id );
+                    polygons2view_.find( viewed_polygon_vertex->polygon_id );
                 if( it != polygons2view_.end() )
                 {
-                    polygon_around_->modify_value(
-                        vertex_id, [&it, &viewed_polygon_vertex](
-                                       PolygonVertex& polygon_vertex ) {
-                            polygon_vertex.polygon_id = it->second;
-                            polygon_vertex.vertex_id =
-                                viewed_polygon_vertex.vertex_id;
-                        } );
+                    return PolygonVertex{ it->second,
+                        viewed_polygon_vertex->vertex_id };
                 }
-                else
+                for( const auto& polygon_around_vertex :
+                    surface_.polygons_around_vertex( viewed_vertex ) )
                 {
-                    for( const auto& polygon_around_vertex :
-                        surface_.polygons_around_vertex( viewed_vertex ) )
+                    const auto it2 =
+                        polygons2view_.find( polygon_around_vertex.polygon_id );
+                    if( it2 != polygons2view_.end() )
                     {
-                        const auto it2 = polygons2view_.find(
-                            polygon_around_vertex.polygon_id );
-                        if( it2 != polygons2view_.end() )
-                        {
-                            polygon_around_->modify_value(
-                                vertex_id, [&it, &polygon_around_vertex](
-                                               PolygonVertex& polygon_vertex ) {
-                                    polygon_vertex.polygon_id = it->second;
-                                    polygon_vertex.vertex_id =
-                                        polygon_around_vertex.vertex_id;
-                                } );
-                            break;
-                        }
+                        return PolygonVertex{ it2->second,
+                            polygon_around_vertex.vertex_id };
                     }
                 }
-                return polygon_around_->value( vertex_id );
+                return absl::nullopt;
             }
 
             bool get_isolated_edge( index_t edge_id ) const
@@ -213,8 +198,6 @@ namespace geode
             SurfaceMesh< dimension >& surface_view_;
             std::shared_ptr< VariableAttribute< index_t > > view2polygons_;
             absl::flat_hash_map< index_t, index_t > polygons2view_;
-            mutable std::shared_ptr< VariableAttribute< PolygonVertex > >
-                polygon_around_;
         };
     } // namespace detail
 } // namespace geode

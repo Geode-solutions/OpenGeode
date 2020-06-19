@@ -43,7 +43,7 @@ namespace geode
             SolidMeshViewImpl( SolidMesh< dimension >& solid_view,
                 SolidMesh< dimension >& solid )
                 : detail::EdgesViewImpl< dimension, SolidMesh< dimension > >(
-                    solid_view, solid ),
+                      solid_view, solid ),
                   solid_( solid ),
                   solid_view_( solid_view ),
                   view2polyhedra_(
@@ -93,46 +93,35 @@ namespace geode
                     viewed_polyhedron_facet( polyhedron_facet ) );
             }
 
-            const PolyhedronVertex& get_polyhedron_around_vertex(
+            absl::optional< PolyhedronVertex > get_polyhedron_around_vertex(
                 index_t vertex_id ) const
             {
                 const auto viewed_vertex = this->viewed_vertex( vertex_id );
-                const auto& viewed_polyhedron_vertex =
+                const auto viewed_polyhedron_vertex =
                     solid_.polyhedron_around_vertex( viewed_vertex );
+                if( !viewed_polyhedron_vertex )
+                {
+                    return absl::nullopt;
+                }
                 const auto it = polyhedra2view_.find(
-                    viewed_polyhedron_vertex.polyhedron_id );
+                    viewed_polyhedron_vertex->polyhedron_id );
                 if( it != polyhedra2view_.end() )
                 {
-                    polyhedron_around_->modify_value(
-                        vertex_id, [&it, &viewed_polyhedron_vertex](
-                                       PolyhedronVertex& polyhedron_vertex ) {
-                            polyhedron_vertex.polyhedron_id = it->second;
-                            polyhedron_vertex.vertex_id =
-                                viewed_polyhedron_vertex.vertex_id;
-                        } );
+                    return PolyhedronVertex{ it->second,
+                        viewed_polyhedron_vertex->vertex_id };
                 }
-                else
+                for( const auto& polyhedron_around_vertex :
+                    solid_.polyhedra_around_vertex( viewed_vertex ) )
                 {
-                    for( const auto& polyhedron_around_vertex :
-                        solid_.polyhedra_around_vertex( viewed_vertex ) )
+                    const auto it2 = polyhedra2view_.find(
+                        polyhedron_around_vertex.polyhedron_id );
+                    if( it2 != polyhedra2view_.end() )
                     {
-                        const auto it2 = polyhedra2view_.find(
-                            polyhedron_around_vertex.polyhedron_id );
-                        if( it2 != polyhedra2view_.end() )
-                        {
-                            polyhedron_around_->modify_value( vertex_id,
-                                [&it, &polyhedron_around_vertex](
-                                    PolyhedronVertex& polyhedron_vertex ) {
-                                    polyhedron_vertex.polyhedron_id =
-                                        it->second;
-                                    polyhedron_vertex.vertex_id =
-                                        polyhedron_around_vertex.vertex_id;
-                                } );
-                            break;
-                        }
+                        return PolyhedronVertex{ it2->second,
+                            polyhedron_around_vertex.vertex_id };
                     }
                 }
-                return polyhedron_around_->value( vertex_id );
+                return absl::nullopt;
             }
 
             bool get_isolated_edge( index_t edge_id ) const

@@ -108,7 +108,7 @@ namespace geode
 
         bool get_isolated_facet( index_t facet_id ) const override;
 
-        const PolyhedronVertex& get_polyhedron_around_vertex(
+        absl::optional< PolyhedronVertex > get_polyhedron_around_vertex(
             index_t vertex_id ) const override;
 
         const PolyhedronFacetVertices& get_facet_vertices(

@@ -123,7 +123,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    const PolyhedronVertex&
+    absl::optional< PolyhedronVertex >
         TetrahedralSolidView< dimension >::get_polyhedron_around_vertex(
             index_t vertex_id ) const
     {

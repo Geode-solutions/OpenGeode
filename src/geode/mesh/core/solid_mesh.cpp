@@ -123,7 +123,7 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -190,17 +190,22 @@ namespace geode
     public:
         explicit Impl( SolidMesh& solid )
             : polyhedron_around_vertex_(
-                solid.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolyhedronVertex >(
-                        "polyhedron_around_vertex", PolyhedronVertex{} ) )
+                  solid.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolyhedronVertex >(
+                          "polyhedron_around_vertex", PolyhedronVertex{} ) )
         {
         }
 
-        const PolyhedronVertex& polyhedron_around_vertex(
+        absl::optional< PolyhedronVertex > polyhedron_around_vertex(
             const index_t vertex_id ) const
         {
-            return polyhedron_around_vertex_->value( vertex_id );
+            const auto& value = polyhedron_around_vertex_->value( vertex_id );
+            if( value.polyhedron_id != NO_ID )
+            {
+                return value;
+            }
+            return absl::nullopt;
         }
 
         void associate_polyhedron_vertex_to_vertex(
@@ -595,7 +600,7 @@ namespace geode
     bool SolidMesh< dimension >::isolated_vertex( index_t vertex_id ) const
     {
         check_vertex_id( *this, vertex_id );
-        return polyhedron_around_vertex( vertex_id ) == PolyhedronVertex{};
+        return !get_polyhedron_around_vertex( vertex_id );
     }
 
     template < index_t dimension >
@@ -629,19 +634,20 @@ namespace geode
         index_t vertex_id ) const
     {
         check_vertex_id( *this, vertex_id );
-        PolyhedraAroundVertex polyhedra;
-        const auto& first_polyhedron = polyhedron_around_vertex( vertex_id );
-        if( first_polyhedron.polyhedron_id == NO_ID )
+        const auto first_polyhedron = polyhedron_around_vertex( vertex_id );
+        if( !first_polyhedron )
         {
-            return polyhedra;
+            return {};
         }
-        OPENGEODE_ASSERT( polyhedron_vertex( first_polyhedron ) == vertex_id,
+        OPENGEODE_ASSERT(
+            polyhedron_vertex( first_polyhedron.value() ) == vertex_id,
             "[SolidMesh::polyhedra_around_vertex] Wrong "
             "polyhedron around vertex" );
+        PolyhedraAroundVertex polyhedra;
         absl::flat_hash_set< index_t > polyhedra_visited;
         std::stack< PolyhedronVertex > S;
-        S.push( first_polyhedron );
-        polyhedra_visited.insert( first_polyhedron.polyhedron_id );
+        S.push( first_polyhedron.value() );
+        polyhedra_visited.insert( first_polyhedron->polyhedron_id );
         while( !S.empty() )
         {
             const auto polyhedron_vertex_id = S.top();
@@ -751,15 +757,16 @@ namespace geode
     }
 
     template < index_t dimension >
-    const PolyhedronVertex& SolidMesh< dimension >::polyhedron_around_vertex(
-        index_t vertex_id ) const
+    absl::optional< PolyhedronVertex >
+        SolidMesh< dimension >::polyhedron_around_vertex(
+            index_t vertex_id ) const
     {
         check_vertex_id( *this, vertex_id );
         return get_polyhedron_around_vertex( vertex_id );
     }
 
     template < index_t dimension >
-    const PolyhedronVertex&
+    absl::optional< PolyhedronVertex >
         SolidMesh< dimension >::get_polyhedron_around_vertex(
             index_t vertex_id ) const
     {
@@ -1005,7 +1012,7 @@ namespace geode
             polyhedron_facet_vertex( { polyhedron_facet_edge.polyhedron_facet,
                 ( polyhedron_facet_edge.edge_id + 1 )
                     % nb_polyhedron_facet_vertices(
-                        polyhedron_facet_edge.polyhedron_facet ) } );
+                          polyhedron_facet_edge.polyhedron_facet ) } );
         return edge_from_vertices( { v0, v1 } );
     }
 
