@@ -109,13 +109,19 @@ namespace
             {
                 const auto new_polygon_around =
                     surface.polygon_around_vertex( vertices_old2new[v] );
-                builder.associate_polygon_vertex_to_vertex(
-                    new_polygon_around, v );
+                if( new_polygon_around )
+                {
+                    builder.associate_polygon_vertex_to_vertex(
+                        new_polygon_around.value(), v );
+                }
+                else
+                {
+                    builder.disassociate_polygon_vertex_to_vertex( v );
+                }
             }
             else
             {
-                builder.associate_polygon_vertex_to_vertex(
-                    geode::PolygonVertex{}, v );
+                builder.disassociate_polygon_vertex_to_vertex( v );
             }
         }
     }
@@ -201,8 +207,22 @@ namespace geode
     void SurfaceMeshBuilder< dimension >::associate_polygon_vertex_to_vertex(
         const PolygonVertex& polygon_vertex, index_t vertex_id )
     {
+        OPENGEODE_ASSERT( polygon_vertex.polygon_id != NO_ID,
+            "[SurfaceMeshBuilder::associate_polygon_vertex_to_vertex] "
+            "PolygonVertex invalid" );
+        OPENGEODE_ASSERT( polygon_vertex.vertex_id != NO_ID,
+            "[SurfaceMeshBuilder::associate_polygon_vertex_to_vertex] "
+            "PolygonVertex invalid" );
         surface_mesh_->associate_polygon_vertex_to_vertex(
             polygon_vertex, vertex_id, {} );
+    }
+
+    template < index_t dimension >
+    void SurfaceMeshBuilder< dimension >::disassociate_polygon_vertex_to_vertex(
+        index_t vertex_id )
+    {
+        surface_mesh_->associate_polygon_vertex_to_vertex(
+            PolygonVertex{}, vertex_id, {} );
     }
 
     template < index_t dimension >
@@ -219,7 +239,7 @@ namespace geode
     {
         const auto polygons_around =
             surface_mesh_->polygons_around_vertex( old_vertex_id );
-        associate_polygon_vertex_to_vertex( PolygonVertex{}, old_vertex_id );
+        disassociate_polygon_vertex_to_vertex( old_vertex_id );
         for( const auto& polygon_around : polygons_around )
         {
             const auto previous_id = surface_mesh_->polygon_vertex(
@@ -255,8 +275,7 @@ namespace geode
                     surface_mesh_->polygons_around_vertex( polygon_vertex_id );
                 if( polygons_around.size() < 2 )
                 {
-                    associate_polygon_vertex_to_vertex(
-                        PolygonVertex{}, polygon_vertex_id );
+                    disassociate_polygon_vertex_to_vertex( polygon_vertex_id );
                 }
                 else
                 {
@@ -413,14 +432,15 @@ namespace geode
         const auto old2new = detail::mapping_after_deletion( to_delete );
         for( const auto v : Range{ surface_mesh_->nb_vertices() } )
         {
-            const auto& polygon_vertex =
+            const auto polygon_vertex =
                 surface_mesh_->polygon_around_vertex( v );
-            if( polygon_vertex.polygon_id == NO_ID )
+            if( !polygon_vertex )
             {
                 continue;
             }
-            PolygonVertex new_polygon_vertex{ polygon_vertex };
-            new_polygon_vertex.polygon_id = old2new[polygon_vertex.polygon_id];
+            PolygonVertex new_polygon_vertex{ polygon_vertex.value() };
+            new_polygon_vertex.polygon_id = old2new[polygon_vertex->polygon_id];
+            disassociate_polygon_vertex_to_vertex( v );
             if( new_polygon_vertex.polygon_id == NO_ID )
             {
                 for( auto&& polygon :
@@ -429,12 +449,11 @@ namespace geode
                     polygon.polygon_id = old2new[polygon.polygon_id];
                     if( polygon.polygon_id != NO_ID )
                     {
-                        new_polygon_vertex = std::move( polygon );
+                        associate_polygon_vertex_to_vertex( polygon, v );
                         break;
                     }
                 }
             }
-            associate_polygon_vertex_to_vertex( new_polygon_vertex, v );
         }
         update_polygon_adjacencies( *surface_mesh_, *this, old2new );
         surface_mesh_->polygon_attribute_manager().delete_elements( to_delete );
@@ -449,12 +468,7 @@ namespace geode
         std::vector< bool > to_delete( surface_mesh_->nb_vertices(), false );
         for( const auto v : Range{ surface_mesh_->nb_vertices() } )
         {
-            const auto& polygon_vertex =
-                surface_mesh_->polygon_around_vertex( v );
-            if( polygon_vertex.polygon_id == NO_ID )
-            {
-                to_delete[v] = true;
-            }
+            to_delete[v] = !surface_mesh_->polygon_around_vertex( v );
         }
         return delete_vertices( to_delete );
     }

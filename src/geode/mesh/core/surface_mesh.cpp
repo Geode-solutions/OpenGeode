@@ -138,17 +138,22 @@ namespace geode
     public:
         explicit Impl( SurfaceMesh& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) )
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
-        const PolygonVertex& polygon_around_vertex(
+        absl::optional< PolygonVertex > polygon_around_vertex(
             const index_t vertex_id ) const
         {
-            return polygon_around_vertex_->value( vertex_id );
+            const auto& value = polygon_around_vertex_->value( vertex_id );
+            if( value.polygon_id != NO_ID )
+            {
+                return value;
+            }
+            return absl::nullopt;
         }
 
         void associate_polygon_vertex_to_vertex(
@@ -305,16 +310,18 @@ namespace geode
     }
 
     template < index_t dimension >
-    const PolygonVertex& SurfaceMesh< dimension >::polygon_around_vertex(
-        index_t vertex_id ) const
+    absl::optional< PolygonVertex >
+        SurfaceMesh< dimension >::polygon_around_vertex(
+            index_t vertex_id ) const
     {
         check_vertex_id( *this, vertex_id );
         return get_polygon_around_vertex( vertex_id );
     }
 
     template < index_t dimension >
-    const PolygonVertex& SurfaceMesh< dimension >::get_polygon_around_vertex(
-        index_t vertex_id ) const
+    absl::optional< PolygonVertex >
+        SurfaceMesh< dimension >::get_polygon_around_vertex(
+            index_t vertex_id ) const
     {
         return impl_->polygon_around_vertex( vertex_id );
     }
@@ -410,7 +417,7 @@ namespace geode
     bool SurfaceMesh< dimension >::isolated_vertex( index_t vertex_id ) const
     {
         check_vertex_id( *this, vertex_id );
-        return get_polygon_around_vertex( vertex_id ) == PolygonVertex{};
+        return !get_polygon_around_vertex( vertex_id );
     }
 
     template < index_t dimension >
@@ -634,18 +641,18 @@ namespace geode
         index_t vertex_id ) const
     {
         check_vertex_id( *this, vertex_id );
-        PolygonsAroundVertex polygons;
-        const auto& first_polygon = get_polygon_around_vertex( vertex_id );
-        if( first_polygon.polygon_id == NO_ID )
+        const auto first_polygon = get_polygon_around_vertex( vertex_id );
+        if( !first_polygon )
         {
-            return polygons;
+            return {};
         }
-        OPENGEODE_ASSERT( polygon_vertex( first_polygon ) == vertex_id,
+        OPENGEODE_ASSERT( polygon_vertex( first_polygon.value() ) == vertex_id,
             "[SurfaceMesh::polygons_around_vertex] Wrong polygon "
             "around vertex" );
+        PolygonsAroundVertex polygons;
         absl::InlinedVector< index_t, 10 > polygons_visited;
         std::stack< PolygonVertex > S;
-        S.push( first_polygon );
+        S.push( first_polygon.value() );
         while( !S.empty() )
         {
             const auto polygon_vertex = S.top();

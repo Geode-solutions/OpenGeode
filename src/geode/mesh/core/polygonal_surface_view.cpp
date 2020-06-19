@@ -130,7 +130,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    const PolygonVertex&
+    absl::optional< PolygonVertex >
         PolygonalSurfaceView< dimension >::get_polygon_around_vertex(
             index_t vertex_id ) const
     {

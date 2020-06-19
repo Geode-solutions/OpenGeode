@@ -97,7 +97,7 @@ namespace geode
         const std::array< index_t, 2 >& get_edge_vertices(
             index_t edge_id ) const override;
 
-        const PolygonVertex& get_polygon_around_vertex(
+        absl::optional< PolygonVertex > get_polygon_around_vertex(
             index_t vertex_id ) const override;
 
         bool get_isolated_edge( index_t edge_id ) const override;

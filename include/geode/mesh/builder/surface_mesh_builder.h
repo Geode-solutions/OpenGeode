@@ -159,6 +159,12 @@ namespace geode
         void associate_polygon_vertex_to_vertex(
             const PolygonVertex& polygon_vertex, index_t vertex_id );
 
+        /*!
+         *Unset polygon vertex information to a given vertex.
+         * @param[in] vertex_id Index of the vertex.
+         */
+        void disassociate_polygon_vertex_to_vertex( index_t vertex_id );
+
         void copy( const SurfaceMesh< dimension >& surface_mesh, BuilderKey )
         {
             copy( surface_mesh );

@@ -347,10 +347,9 @@ namespace geode
         /*!
          * Return one polygon with one of the vertices matching given vertex.
          * @param[in] vertex_id Index of the vertex.
-         * @detail If vertex is isolated (no incident polygon), default
-         * PolygonVertex is returned.
          */
-        const PolygonVertex& polygon_around_vertex( index_t vertex_id ) const;
+        absl::optional< PolygonVertex > polygon_around_vertex(
+            index_t vertex_id ) const;
 
         void associate_polygon_vertex_to_vertex(
             const PolygonVertex& polygon_vertex,
@@ -409,7 +408,7 @@ namespace geode
         virtual const std::array< index_t, 2 >& get_edge_vertices(
             index_t edge_id ) const;
 
-        virtual const PolygonVertex& get_polygon_around_vertex(
+        virtual absl::optional< PolygonVertex > get_polygon_around_vertex(
             index_t vertex_id ) const;
 
         virtual bool get_isolated_edge( index_t edge_id ) const;

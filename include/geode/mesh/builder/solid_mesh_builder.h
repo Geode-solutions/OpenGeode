@@ -161,6 +161,12 @@ namespace geode
         void associate_polyhedron_vertex_to_vertex(
             const PolyhedronVertex& polyhedron_vertex, index_t vertex_id );
 
+        /*!
+         * Unset polyhedron vertex information to a given vertex.
+         * @param[in] vertex_id Index of the vertex.
+         */
+        void disassociate_polyhedron_vertex_to_vertex( index_t vertex_id );
+
         void copy( const SolidMesh< dimension >& solid_mesh, BuilderKey )
         {
             copy( solid_mesh );

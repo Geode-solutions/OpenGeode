@@ -46,7 +46,7 @@
         .def( "compute_polygon_adjacencies",                                   \
             ( void ( SurfaceMeshBuilder##dimension##D::* )() )                 \
                 & SurfaceMeshBuilder##dimension##D::                           \
-                    compute_polygon_adjacencies )                              \
+                      compute_polygon_adjacencies )                            \
         .def( "delete_polygons",                                               \
             &SurfaceMeshBuilder##dimension##D::delete_polygons )               \
         .def( "delete_isolated_vertices",                                      \
@@ -55,7 +55,10 @@
             &SurfaceMeshBuilder##dimension##D::delete_isolated_edges )         \
         .def( "associate_polygon_vertex_to_vertex",                            \
             &SurfaceMeshBuilder##dimension##D::                                \
-                associate_polygon_vertex_to_vertex )
+                associate_polygon_vertex_to_vertex )                           \
+        .def( "disassociate_polygon_vertex_to_vertex",                         \
+            &SurfaceMeshBuilder##dimension##D::                                \
+                disassociate_polygon_vertex_to_vertex )
 
 namespace geode
 {
