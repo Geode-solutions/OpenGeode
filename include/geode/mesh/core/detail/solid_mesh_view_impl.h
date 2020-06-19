@@ -50,11 +50,6 @@ namespace geode
                       solid_view.polyhedron_attribute_manager()
                           .template find_or_create_attribute< VariableAttribute,
                               index_t >( "view2polyhedra", NO_ID ) ),
-                  polyhedron_around_(
-                      solid_view.vertex_attribute_manager()
-                          .template find_or_create_attribute< VariableAttribute,
-                              PolyhedronVertex >( "polyhedron_around_vertex",
-                              PolyhedronVertex{} ) ),
                   view2facets_(
                       solid_view.facet_attribute_manager()
                           .template find_or_create_attribute< VariableAttribute,
@@ -366,8 +361,6 @@ namespace geode
             SolidMesh< dimension >& solid_view_;
             std::shared_ptr< VariableAttribute< index_t > > view2polyhedra_;
             absl::flat_hash_map< index_t, index_t > polyhedra2view_;
-            mutable std::shared_ptr< VariableAttribute< PolyhedronVertex > >
-                polyhedron_around_;
             std::shared_ptr< VariableAttribute< index_t > > view2facets_;
             mutable std::shared_ptr<
                 VariableAttribute< PolyhedronFacetVertices > >
