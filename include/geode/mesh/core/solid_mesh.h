@@ -346,20 +346,6 @@ namespace geode
             index_t polyhedron_id ) const;
 
         /*!
-         * Return the volume of a polyhedron.
-         * @param[in] polyhedron_id Index of a polyhedron.
-         * @warning Not implemented yet.
-         */
-        double polyhedron_volume( index_t polyhedron_id ) const;
-
-        /*!
-         * Return the area of a facet.
-         * @param[in] facet_id Index of facet.
-         * @warning Not implemented yet.
-         */
-        double facet_area( index_t facet_id ) const;
-
-        /*!
          * Return the length of a given edge.
          * @param[in] edge_id Index of edge.
          */

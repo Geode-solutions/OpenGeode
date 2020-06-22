@@ -56,10 +56,27 @@ void test_bounding_box( const geode::PolyhedralSolid3D& polyhedral_solid )
 {
     geode::Point3D answer_min{ { 0.1, 0.2, 0.3 } };
     geode::Point3D answer_max{ { 9.3, 9.4, 6.7 } };
-    OPENGEODE_EXCEPTION( polyhedral_solid.bounding_box().min() == answer_min,
+    const auto bbox = polyhedral_solid.bounding_box();
+    OPENGEODE_EXCEPTION( bbox.min() == answer_min,
         "[Test] Wrong computation of bounding box (min)" );
-    OPENGEODE_EXCEPTION( polyhedral_solid.bounding_box().max() == answer_max,
+    OPENGEODE_EXCEPTION( bbox.max() == answer_max,
         "[Test] Wrong computation of bounding box (max)" );
+}
+
+void test_facets( const geode::PolyhedralSolid3D& polyhedral_solid )
+{
+    OPENGEODE_EXCEPTION(
+        polyhedral_solid.facet_from_vertices( { 0, 1, 2 } ) == 0,
+        "[Test] Wrong facet from vertices" );
+}
+
+void test_edges( const geode::PolyhedralSolid3D& polyhedral_solid )
+{
+    geode::Point3D answer{ { 1.1, 4.8, 3.5 } };
+    OPENGEODE_EXCEPTION( polyhedral_solid.edge_barycenter( 0 ) == answer,
+        "[Test] Wrong edge barycenter" );
+    OPENGEODE_EXCEPTION( polyhedral_solid.edge_length( 0 ) - 11.3842 < 1e-6,
+        "[Test] Wrong edge length" );
 }
 
 void test_create_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
@@ -385,6 +402,8 @@ void test()
     test_create_polyhedra( *polyhedral_solid, *builder );
     test_create_facet_attribute( *polyhedral_solid );
     test_create_edge_attribute( *polyhedral_solid );
+    test_edges( *polyhedral_solid );
+    test_facets( *polyhedral_solid );
     test_polyhedron_adjacencies( *polyhedral_solid, *builder );
     test_io( *polyhedral_solid,
         absl::StrCat( "test.", polyhedral_solid->native_extension() ) );

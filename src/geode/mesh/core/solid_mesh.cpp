@@ -123,7 +123,7 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -167,11 +167,7 @@ namespace
         }
         const auto next = solid.polyhedron_facet_vertex(
             { facet, ( local_id + 1 ) % nb_facet_vertices } );
-        if( next == edge_vertices[1] )
-        {
-            return true;
-        }
-        return false;
+        return next == edge_vertices[1];
     }
 
 } // namespace
@@ -190,10 +186,10 @@ namespace geode
     public:
         explicit Impl( SolidMesh& solid )
             : polyhedron_around_vertex_(
-                solid.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolyhedronVertex >(
-                        "polyhedron_around_vertex", PolyhedronVertex{} ) )
+                  solid.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolyhedronVertex >(
+                          "polyhedron_around_vertex", PolyhedronVertex{} ) )
         {
         }
 
@@ -478,20 +474,6 @@ namespace geode
         const MeshImpl& impl )
     {
         return MeshFactory::create_mesh< SolidMesh< dimension > >( impl );
-    }
-
-    template < index_t dimension >
-    double SolidMesh< dimension >::polyhedron_volume( index_t /*unused*/ ) const
-    {
-        throw OpenGeodeException{ "polyhedron_volume not implemented yet" };
-        return 0;
-    }
-
-    template < index_t dimension >
-    double SolidMesh< dimension >::facet_area( index_t /*unused*/ ) const
-    {
-        throw OpenGeodeException{ "facet_area not implemented yet" };
-        return 0;
     }
 
     template < index_t dimension >
@@ -1012,7 +994,7 @@ namespace geode
             polyhedron_facet_vertex( { polyhedron_facet_edge.polyhedron_facet,
                 ( polyhedron_facet_edge.edge_id + 1 )
                     % nb_polyhedron_facet_vertices(
-                        polyhedron_facet_edge.polyhedron_facet ) } );
+                          polyhedron_facet_edge.polyhedron_facet ) } );
         return edge_from_vertices( { v0, v1 } );
     }
 
