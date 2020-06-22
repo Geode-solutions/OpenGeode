@@ -83,7 +83,7 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -572,7 +572,6 @@ namespace geode
             PolyhedronVertex new_polyhedron_vertex{ polyhedron_vertex.value() };
             new_polyhedron_vertex.polyhedron_id =
                 old2new[polyhedron_vertex->polyhedron_id];
-            disassociate_polyhedron_vertex_to_vertex( v );
             if( new_polyhedron_vertex.polyhedron_id == NO_ID )
             {
                 for( auto&& polyhedron :
@@ -582,10 +581,19 @@ namespace geode
                         old2new[polyhedron.polyhedron_id];
                     if( polyhedron.polyhedron_id != NO_ID )
                     {
-                        associate_polyhedron_vertex_to_vertex( polyhedron, v );
+                        new_polyhedron_vertex = std::move( polyhedron );
                         break;
                     }
                 }
+            }
+            if( new_polyhedron_vertex.polyhedron_id == NO_ID )
+            {
+                disassociate_polyhedron_vertex_to_vertex( v );
+            }
+            else
+            {
+                associate_polyhedron_vertex_to_vertex(
+                    new_polyhedron_vertex, v );
             }
         }
 
