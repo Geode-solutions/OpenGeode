@@ -440,7 +440,6 @@ namespace geode
             }
             PolygonVertex new_polygon_vertex{ polygon_vertex.value() };
             new_polygon_vertex.polygon_id = old2new[polygon_vertex->polygon_id];
-            disassociate_polygon_vertex_to_vertex( v );
             if( new_polygon_vertex.polygon_id == NO_ID )
             {
                 for( auto&& polygon :
@@ -449,10 +448,18 @@ namespace geode
                     polygon.polygon_id = old2new[polygon.polygon_id];
                     if( polygon.polygon_id != NO_ID )
                     {
-                        associate_polygon_vertex_to_vertex( polygon, v );
+                        new_polygon_vertex = std::move( polygon );
                         break;
                     }
                 }
+            }
+            if( new_polygon_vertex.polygon_id == NO_ID )
+            {
+                disassociate_polygon_vertex_to_vertex( v );
+            }
+            else
+            {
+                associate_polygon_vertex_to_vertex( new_polygon_vertex, v );
             }
         }
         update_polygon_adjacencies( *surface_mesh_, *this, old2new );
@@ -469,6 +476,8 @@ namespace geode
         for( const auto v : Range{ surface_mesh_->nb_vertices() } )
         {
             to_delete[v] = !surface_mesh_->polygon_around_vertex( v );
+            DEBUG( surface_mesh_->polygon_around_vertex( v ).has_value() );
+            DEBUG( to_delete[v] );
         }
         return delete_vertices( to_delete );
     }
