@@ -82,6 +82,9 @@ void test_create_viewed_polygons( const geode::PolygonalSurfaceView3D& surface,
         "[Test] PolygonalSurfaceView PolygonVertex is not correct" );
     OPENGEODE_EXCEPTION( surface.polygon_vertex( { 1, 1 } ) == 4,
         "[Test] PolygonalSurfaceView PolygonVertex is not correct" );
+
+    OPENGEODE_EXCEPTION( !surface.isolated_edge( 4 ),
+        "[Test]  PolygonalSurfaceView isolated edge is not correct" );
 }
 
 void test_create_polygons( const geode::PolygonalSurface3D& polygonal_surface,

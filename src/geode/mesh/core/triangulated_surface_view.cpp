@@ -87,10 +87,10 @@ namespace geode
     }
 
     template < index_t dimension >
-    void TriangulatedSurfaceView< dimension >::add_viewed_vertex(
+    index_t TriangulatedSurfaceView< dimension >::add_viewed_vertex(
         index_t vertex_id, TriangulatedSurfaceViewKey )
     {
-        impl_->add_viewed_vertex( vertex_id );
+        return impl_->add_viewed_vertex( vertex_id );
     }
 
     template < index_t dimension >
@@ -101,10 +101,10 @@ namespace geode
     }
 
     template < index_t dimension >
-    void TriangulatedSurfaceView< dimension >::add_viewed_triangle(
+    index_t TriangulatedSurfaceView< dimension >::add_viewed_triangle(
         index_t triangle_id, TriangulatedSurfaceViewKey )
     {
-        impl_->add_viewed_polygon( triangle_id );
+        return impl_->add_viewed_polygon( triangle_id );
     }
 
     template < index_t dimension >

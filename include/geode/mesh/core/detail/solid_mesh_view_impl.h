@@ -221,6 +221,7 @@ namespace geode
                 facet_vertices_->modify_value(
                     facet_id, [&viewed_vertices, this](
                                   PolyhedronFacetVertices& vertices ) {
+                        vertices.resize( viewed_vertices.size() );
                         for( const auto v : Range{ vertices.size() } )
                         {
                             vertices[v] =
@@ -240,7 +241,7 @@ namespace geode
                 return facets2view_.at( facet_id );
             }
 
-            void add_viewed_facet( index_t facet_id )
+            index_t add_viewed_facet( index_t facet_id )
             {
                 const auto id = solid_view_.nb_facets();
                 if( facets2view_.emplace( facet_id, id ).second )
@@ -248,6 +249,7 @@ namespace geode
                     solid_view_.facet_attribute_manager().resize( id + 1 );
                     view2facets_->set_value( id, facet_id );
                 }
+                return facet_in_view( facet_id );
             }
 
             absl::optional< index_t > get_polyhedron_adjacent(
@@ -301,7 +303,7 @@ namespace geode
                 return view2polyhedra_->value( polyhedron_id );
             }
 
-            void add_viewed_polyhedron( index_t polyhedron_id )
+            index_t add_viewed_polyhedron( index_t polyhedron_id )
             {
                 const auto polyhedron_view_id = solid_view_.nb_polyhedra();
                 if( polyhedra2view_.emplace( polyhedron_id, polyhedron_view_id )
@@ -339,6 +341,7 @@ namespace geode
                         }
                     }
                 }
+                return polyhedra2view_.at( polyhedron_id );
             }
 
         private:

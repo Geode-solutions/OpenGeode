@@ -61,9 +61,6 @@
             &SolidMesh##dimension##D::is_polyhedron_facet_on_border )          \
         .def( "polyhedron_facets_on_border",                                   \
             &SolidMesh##dimension##D::polyhedron_facets_on_border )            \
-        .def(                                                                  \
-            "polyhedron_volume", &SolidMesh##dimension##D::polyhedron_volume ) \
-        .def( "facet_area", &SolidMesh##dimension##D::facet_area )             \
         .def( "edge_length", &SolidMesh##dimension##D::edge_length )           \
         .def( "polyhedron_barycenter",                                         \
             &SolidMesh##dimension##D::polyhedron_barycenter )                  \

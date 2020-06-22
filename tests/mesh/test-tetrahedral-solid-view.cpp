@@ -76,6 +76,9 @@ void test_create_viewed_vertices( const geode::TetrahedralSolid3D& solid,
     builder.add_viewed_vertex( 3 );
     OPENGEODE_EXCEPTION( solid.nb_vertices() == 2,
         "[Test] TetrahedralSolidView should have 2 vertices" );
+    const geode::Point3D answer{ { 7.5, 5.2, 6.3 } };
+    OPENGEODE_EXCEPTION( solid.point( 0 ) == answer,
+        "[Test] TetrahedralSolidView point is not correct" );
 }
 
 void test_create_viewed_tetrahedra( const geode::TetrahedralSolidView3D& solid,
@@ -90,9 +93,29 @@ void test_create_viewed_tetrahedra( const geode::TetrahedralSolidView3D& solid,
     OPENGEODE_EXCEPTION( solid.nb_edges() == 9,
         "[Test] TetrahedralSolidView should have 9 edges" );
     OPENGEODE_EXCEPTION( solid.nb_facets() == 7,
-        "[Test] TetrahedralSolidView should have 7 faects" );
+        "[Test] TetrahedralSolidView should have 7 facets" );
     OPENGEODE_EXCEPTION( solid.viewed_tetrahedron( 0 ) == 1,
         "[Test] TetrahedralSolidView tetrahedron is not correct" );
+    OPENGEODE_EXCEPTION( solid.viewed_vertex( 2 ) == 1,
+        "[Test] TetrahedralSolidView vertex is not correct" );
+    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 0, 0 } ) == 2,
+        "[Test] TetrahedralSolidView polyhedron vertex is not correct" );
+    OPENGEODE_EXCEPTION( solid.polyhedron_facet( { 0, 0 } ) == 0,
+        "[Test] TetrahedralSolidView polyhedron facet is not correct" );
+}
+
+void test_isolated( const geode::TetrahedralSolid3D& solid,
+    geode::TetrahedralSolidViewBuilder3D& builder )
+{
+    OPENGEODE_EXCEPTION( !solid.isolated_vertex( 0 ),
+        "[Test] TetrahedralSolidView isolated vertex is not correct" );
+    OPENGEODE_EXCEPTION( !solid.isolated_edge( 0 ),
+        "[Test] TetrahedralSolidView isolated edge is not correct" );
+    OPENGEODE_EXCEPTION( !solid.isolated_facet( 0 ),
+        "[Test] TetrahedralSolidView isolated facet is not correct" );
+    builder.add_viewed_vertex( 0 );
+    OPENGEODE_EXCEPTION( solid.isolated_vertex( 5 ),
+        "[Test] TetrahedralSolidView isolated vertex is not correct" );
 }
 
 void test_polyhedron_adjacencies( const geode::TetrahedralSolid3D& solid )
@@ -117,12 +140,14 @@ std::unique_ptr< geode::TetrahedralSolid3D > create_solid()
 }
 void test()
 {
+    absl::flat_hash_map< geode::index_t, geode::index_t > one_map;
     auto solid = create_solid();
     geode::TetrahedralSolidView3D view{ *solid };
     auto builder = geode::TetrahedralSolidViewBuilder3D::create( view );
 
     test_create_viewed_vertices( view, *builder );
     test_create_viewed_tetrahedra( view, *builder );
+    test_isolated( view, *builder );
     test_polyhedron_adjacencies( view );
 }
 

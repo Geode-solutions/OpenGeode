@@ -177,7 +177,8 @@ namespace geode
             return nb_elements_;
         }
 
-        void copy( const AttributeManager::Impl &attribute_manager )
+        void copy( const AttributeManager::Impl &attribute_manager,
+            AttributeBase::AttributeKey key )
         {
             nb_elements_ = attribute_manager.nb_elements_;
             for( const auto &attribute : attribute_manager.attributes_ )
@@ -187,7 +188,8 @@ namespace geode
                 {
                     try
                     {
-                        it->second->copy( *attribute.second, nb_elements_ );
+                        it->second->copy(
+                            *attribute.second, nb_elements_, key );
                     }
                     catch( const std::bad_cast &e )
                     {
@@ -198,7 +200,7 @@ namespace geode
                 else
                 {
                     attributes_.emplace(
-                        attribute.first, attribute.second->clone() );
+                        attribute.first, attribute.second->clone( key ) );
                 }
             }
         }
@@ -319,7 +321,7 @@ namespace geode
 
     void AttributeManager::copy( const AttributeManager &attribute_manager )
     {
-        impl_->copy( *attribute_manager.impl_ );
+        impl_->copy( *attribute_manager.impl_, {} );
     }
 
     template < typename Archive >
