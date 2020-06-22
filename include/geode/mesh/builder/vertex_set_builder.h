@@ -28,10 +28,11 @@
 #include <geode/basic/factory.h>
 
 #include <geode/mesh/common.h>
-#include <geode/mesh/core/mesh_type.h>
+#include <geode/mesh/core/mesh_id.h>
 
 namespace geode
 {
+    class MeshBuilderFactoryKey;
     class VertexSet;
 } // namespace geode
 
@@ -77,13 +78,17 @@ namespace geode
         std::vector< index_t > delete_vertices(
             const std::vector< bool >& to_delete );
 
+        void set_mesh( VertexSet& mesh, MeshBuilderFactoryKey );
+
     protected:
-        VertexSetBuilder( VertexSet& vertex_set ) : vertex_set_( vertex_set ) {}
+        VertexSetBuilder() = default;
 
         friend class VertexSet;
         void copy( const VertexSet& vertex_set );
 
     private:
+        virtual void do_set_mesh( VertexSet& mesh ) = 0;
+
         virtual void do_create_vertex() = 0;
 
         virtual void do_create_vertices( index_t nb ) = 0;
@@ -92,9 +97,6 @@ namespace geode
             const std::vector< bool >& to_delete ) = 0;
 
     private:
-        VertexSet& vertex_set_;
+        VertexSet* vertex_set_;
     };
-
-    using VertexSetBuilderFactory =
-        Factory< MeshType, VertexSetBuilder, VertexSet& >;
 } // namespace geode

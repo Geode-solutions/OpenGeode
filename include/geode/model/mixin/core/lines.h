@@ -25,7 +25,7 @@
 
 #include <geode/basic/pimpl.h>
 
-#include <geode/mesh/core/mesh_type.h>
+#include <geode/mesh/core/mesh_id.h>
 
 #include <geode/model/common.h>
 
@@ -42,7 +42,7 @@ namespace geode
     template < index_t dimension >
     class opengeode_model_api Lines
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( Lines );
+        OPENGEODE_DISABLE_COPY( Lines );
 
     public:
         using Builder = LinesBuilder< dimension >;
@@ -88,6 +88,7 @@ namespace geode
 
     protected:
         Lines();
+        Lines( Lines&& );
 
     private:
         class ModifiableLineRange : public LineRangeBase,
@@ -102,7 +103,7 @@ namespace geode
     private:
         const uuid& create_line();
 
-        const uuid& create_line( const MeshType& type );
+        const uuid& create_line( const MeshImpl& impl );
 
         void delete_line( const Line< dimension >& line );
 

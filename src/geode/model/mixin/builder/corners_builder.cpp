@@ -39,9 +39,9 @@ namespace geode
 
     template < index_t dimension >
     const uuid& CornersBuilder< dimension >::create_corner(
-        const MeshType& type )
+        const MeshImpl& impl )
     {
-        return corners_.create_corner( type );
+        return corners_.create_corner( impl );
     }
 
     template < index_t dimension >
@@ -78,7 +78,8 @@ namespace geode
     void CornersBuilder< dimension >::set_corner_mesh(
         const uuid& id, std::unique_ptr< PointSet< dimension > > mesh )
     {
-        corners_.modifiable_corner( id ).set_mesh( std::move( mesh ), {} );
+        corners_.modifiable_corner( id ).set_mesh( std::move( mesh ),
+            typename Corner< dimension >::CornersBuilderKey{} );
     }
 
     template class opengeode_model_api CornersBuilder< 2 >;

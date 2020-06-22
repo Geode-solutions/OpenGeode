@@ -26,12 +26,12 @@
 #include <geode/basic/bitsery_archive.h>
 
 #include <geode/mesh/common.h>
-#include <geode/mesh/core/polyhedral_solid.h>
+#include <geode/mesh/core/solid_mesh.h>
 
 namespace geode
 {
     template < index_t dimension >
-    class TetrahedralSolid : public PolyhedralSolid< dimension >
+    class TetrahedralSolid : public SolidMesh< dimension >
     {
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
 
@@ -43,10 +43,16 @@ namespace geode
 
         /*!
          * Create a new TetrahedralSolid using a specified data structure.
-         * @param[in] type Data structure type
+         * @param[in] impl Data structure implementation
          */
         static std::unique_ptr< TetrahedralSolid< dimension > > create(
-            const MeshType& type );
+            const MeshImpl& impl );
+
+        static MeshType type_name_static()
+        {
+            return MeshType{ absl::StrCat(
+                "TetrahedralSolid", dimension, "D" ) };
+        }
 
         std::unique_ptr< TetrahedralSolid< dimension > > clone() const;
 
@@ -73,8 +79,7 @@ namespace geode
             archive.ext( *this, DefaultGrowable< Archive, TetrahedralSolid >{},
                 []( Archive& archive, TetrahedralSolid& tetrahedral_solid ) {
                     archive.ext( tetrahedral_solid,
-                        bitsery::ext::BaseClass<
-                            PolyhedralSolid< dimension > >{} );
+                        bitsery::ext::BaseClass< SolidMesh< dimension > >{} );
                 } );
         }
 
@@ -95,9 +100,4 @@ namespace geode
         }
     };
     ALIAS_3D( TetrahedralSolid );
-
-    template < index_t dimension >
-    using TetrahedralSolidFactory =
-        Factory< MeshType, TetrahedralSolid< dimension > >;
-    ALIAS_3D( TetrahedralSolidFactory );
 } // namespace geode

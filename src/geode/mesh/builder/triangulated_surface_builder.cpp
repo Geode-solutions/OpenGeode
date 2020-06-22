@@ -27,6 +27,7 @@
 
 #include <geode/basic/attribute_manager.h>
 
+#include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/core/triangulated_surface.h>
 
 namespace geode
@@ -36,18 +37,16 @@ namespace geode
         TriangulatedSurfaceBuilder< dimension >::create(
             TriangulatedSurface< dimension >& mesh )
     {
-        try
-        {
-            return TriangulatedSurfaceBuilderFactory< dimension >::create(
-                mesh.type_name(), mesh );
-        }
-        catch( const OpenGeodeException& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeException{ "Could not create TriangulatedSurface "
-                                      "builder of data structure: ",
-                mesh.type_name().get() };
-        }
+        return MeshBuilderFactory::create_mesh_builder<
+            TriangulatedSurfaceBuilder< dimension > >( mesh );
+    }
+
+    template < index_t dimension >
+    void TriangulatedSurfaceBuilder< dimension >::set_mesh(
+        TriangulatedSurface< dimension >& mesh, MeshBuilderFactoryKey key )
+    {
+        triangulated_surface_ = &mesh;
+        SurfaceMeshBuilder< dimension >::set_mesh( mesh, key );
     }
 
     template < index_t dimension >
@@ -66,8 +65,8 @@ namespace geode
     index_t TriangulatedSurfaceBuilder< dimension >::create_triangle(
         const std::array< index_t, 3 >& vertices )
     {
-        const auto added_triangle = triangulated_surface_.nb_polygons();
-        triangulated_surface_.polygon_attribute_manager().resize(
+        const auto added_triangle = triangulated_surface_->nb_polygons();
+        triangulated_surface_->polygon_attribute_manager().resize(
             added_triangle + 1 );
         index_t vertex_id{ 0 };
         for( const auto& vertex : vertices )
@@ -88,8 +87,8 @@ namespace geode
     index_t TriangulatedSurfaceBuilder< dimension >::create_triangles(
         index_t nb )
     {
-        const auto added_triangle = triangulated_surface_.nb_polygons();
-        triangulated_surface_.polygon_attribute_manager().resize(
+        const auto added_triangle = triangulated_surface_->nb_polygons();
+        triangulated_surface_->polygon_attribute_manager().resize(
             added_triangle + nb );
         do_create_triangles( nb );
         return added_triangle;
@@ -99,8 +98,8 @@ namespace geode
     void TriangulatedSurfaceBuilder< dimension >::reserve_triangles(
         index_t nb )
     {
-        const auto nb_triangles = triangulated_surface_.nb_polygons();
-        triangulated_surface_.polygon_attribute_manager().reserve(
+        const auto nb_triangles = triangulated_surface_->nb_polygons();
+        triangulated_surface_->polygon_attribute_manager().reserve(
             nb_triangles + nb );
     }
 
@@ -108,7 +107,7 @@ namespace geode
     void TriangulatedSurfaceBuilder< dimension >::copy(
         const TriangulatedSurface< dimension >& triangulated_surface )
     {
-        PolygonalSurfaceBuilder< dimension >::copy( triangulated_surface );
+        SurfaceMeshBuilder< dimension >::copy( triangulated_surface );
     }
 
     template class opengeode_mesh_api TriangulatedSurfaceBuilder< 2 >;

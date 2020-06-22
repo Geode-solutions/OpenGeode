@@ -25,7 +25,7 @@
 
 #include <geode/basic/pimpl.h>
 
-#include <geode/mesh/core/mesh_type.h>
+#include <geode/mesh/core/mesh_id.h>
 
 #include <geode/model/common.h>
 
@@ -45,7 +45,7 @@ namespace geode
     template < index_t dimension >
     class opengeode_model_api Corners
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( Corners );
+        OPENGEODE_DISABLE_COPY( Corners );
 
     public:
         using Builder = CornersBuilder< dimension >;
@@ -103,6 +103,7 @@ namespace geode
 
     protected:
         Corners();
+        Corners( Corners&& );
 
     private:
         class ModifiableCornerRange : public CornerRangeBase,
@@ -117,7 +118,7 @@ namespace geode
     private:
         const uuid& create_corner();
 
-        const uuid& create_corner( const MeshType& type );
+        const uuid& create_corner( const MeshImpl& impl );
 
         void delete_corner( const Corner< dimension >& corner );
 

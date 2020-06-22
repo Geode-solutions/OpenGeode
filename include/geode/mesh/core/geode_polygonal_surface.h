@@ -40,7 +40,7 @@ namespace geode
     template < index_t dimension >
     class OpenGeodePolygonalSurface : public PolygonalSurface< dimension >
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( OpenGeodePolygonalSurface );
+        OPENGEODE_DISABLE_COPY( OpenGeodePolygonalSurface );
         PASSKEY( OpenGeodePolygonalSurfaceBuilder< dimension >,
             OGPolygonalSurfaceKey );
 
@@ -48,15 +48,20 @@ namespace geode
         OpenGeodePolygonalSurface();
         ~OpenGeodePolygonalSurface();
 
-        static MeshType type_name_static()
+        static MeshImpl impl_name_static()
         {
-            return MeshType{ absl::StrCat(
+            return MeshImpl{ absl::StrCat(
                 "OpenGeodePolygonalSurface", dimension, "D" ) };
+        }
+
+        MeshImpl impl_name() const override
+        {
+            return impl_name_static();
         }
 
         MeshType type_name() const override
         {
-            return type_name_static();
+            return PolygonalSurface< dimension >::type_name_static();
         }
 
         static absl::string_view native_extension_static()
@@ -101,7 +106,7 @@ namespace geode
 
         index_t get_nb_polygon_vertices( index_t polygon_id ) const override;
 
-        index_t get_polygon_adjacent(
+        absl::optional< index_t > get_polygon_adjacent(
             const PolygonEdge& polygon_edge ) const override;
 
     private:

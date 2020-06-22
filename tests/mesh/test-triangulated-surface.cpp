@@ -21,6 +21,8 @@
  *
  */
 
+#include <geode/basic/attribute.h>
+#include <geode/basic/attribute_manager.h>
 #include <geode/basic/logger.h>
 
 #include <geode/geometry/point.h>
@@ -64,7 +66,7 @@ void test_polygon_adjacencies( const geode::TriangulatedSurface3D& surface,
     geode::TriangulatedSurfaceBuilder3D& builder )
 {
     builder.compute_polygon_adjacencies();
-    OPENGEODE_EXCEPTION( surface.polygon_adjacent( { 0, 0 } ) == geode::NO_ID,
+    OPENGEODE_EXCEPTION( !surface.polygon_adjacent( { 0, 0 } ),
         "[Test] TriangulatedSurface adjacent index is not correct" );
     OPENGEODE_EXCEPTION( surface.polygon_adjacent( { 0, 1 } ) == 1,
         "[Test] TriangulatedSurface adjacent index is not correct" );
@@ -76,7 +78,7 @@ void test_polygon_adjacencies( const geode::TriangulatedSurface3D& surface,
 
     OPENGEODE_EXCEPTION( surface.polygon_adjacent( { 2, 2 } ) == 1,
         "[Test] TriangulatedSurface adjacent index is not correct" );
-    OPENGEODE_EXCEPTION( surface.polygon_adjacent( { 2, 0 } ) == geode::NO_ID,
+    OPENGEODE_EXCEPTION( !surface.polygon_adjacent( { 2, 0 } ),
         "[Test] TriangulatedSurface adjacent index is not correct" );
 }
 
@@ -120,14 +122,21 @@ void test_delete_polygon( const geode::TriangulatedSurface3D& surface,
 void test_io(
     const geode::TriangulatedSurface3D& surface, absl::string_view filename )
 {
-    save_triangulated_surface( surface, filename );
-    auto new_surface = geode::TriangulatedSurface3D::create(
-        geode::OpenGeodeTriangulatedSurface3D::type_name_static() );
-    load_triangulated_surface( *new_surface, filename );
+    geode::save_triangulated_surface( surface, filename );
+    geode::load_triangulated_surface< 3 >( filename );
+    geode::load_triangulated_surface< 3 >(
+        geode::OpenGeodeTriangulatedSurface3D::impl_name_static(), filename );
 }
 
 void test_clone( const geode::TriangulatedSurface3D& surface )
 {
+    auto attr_from = surface.edge_attribute_manager()
+                         .find_or_create_attribute< geode::VariableAttribute,
+                             geode::index_t >( "edge_id", 0 );
+    for( const auto e : geode::Range{ surface.nb_edges() } )
+    {
+        attr_from->set_value( e, e );
+    }
     auto surface2 = surface.clone();
     OPENGEODE_EXCEPTION( surface2->nb_vertices() == 4,
         "[Test] TriangulatedSurface2 should have 4 vertices" );
@@ -135,6 +144,14 @@ void test_clone( const geode::TriangulatedSurface3D& surface )
         "[Test] TriangulatedSurface2 should have 3 edges" );
     OPENGEODE_EXCEPTION( surface2->nb_polygons() == 1,
         "[Test] TriangulatedSurface2 should have 1 polygon" );
+    auto attr_to =
+        surface2->edge_attribute_manager().find_attribute< geode::index_t >(
+            "edge_id" );
+    for( const auto e : geode::Range{ surface.nb_edges() } )
+    {
+        OPENGEODE_EXCEPTION( attr_from->value( e ) == attr_to->value( e ),
+            "[Test] Error in edge attribute transfer during cloning" );
+    }
 }
 
 void test_delete_all( const geode::TriangulatedSurface3D& triangulated_surface,
@@ -165,16 +182,31 @@ void test_delete_all( const geode::TriangulatedSurface3D& triangulated_surface,
         "[Test]TriangulatedSurface should have 0 vertex" );
 }
 
+void test_backward_io( const std::string& filename )
+{
+    const auto new_triangulated_surface = geode::load_triangulated_surface< 3 >(
+        geode::OpenGeodeTriangulatedSurface3D::impl_name_static(), filename );
+
+    OPENGEODE_EXCEPTION( new_triangulated_surface->nb_vertices() == 5,
+        "[Test] Reloaded TriangulatedSurface should have 5 vertices" );
+    OPENGEODE_EXCEPTION( new_triangulated_surface->nb_edges() == 7,
+        "[Test] Reloaded TriangulatedSurface should have 7 edges" );
+    OPENGEODE_EXCEPTION( new_triangulated_surface->nb_polygons() == 3,
+        "[Test] Reloaded TriangulatedSurface should have 3 polygons" );
+}
+
 void test()
 {
     auto surface = geode::TriangulatedSurface3D::create(
-        geode::OpenGeodeTriangulatedSurface3D::type_name_static() );
+        geode::OpenGeodeTriangulatedSurface3D::impl_name_static() );
     auto builder = geode::TriangulatedSurfaceBuilder3D::create( *surface );
 
     test_create_vertices( *surface, *builder );
     test_create_polygons( *surface, *builder );
     test_polygon_adjacencies( *surface, *builder );
     test_io( *surface, absl::StrCat( "test.", surface->native_extension() ) );
+    test_backward_io( absl::StrCat(
+        geode::data_path, "/test_v4.", surface->native_extension() ) );
 
     test_delete_vertex( *surface, *builder );
     test_delete_polygon( *surface, *builder );

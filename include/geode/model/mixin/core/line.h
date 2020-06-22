@@ -26,7 +26,7 @@
 #include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
-#include <geode/mesh/core/mesh_type.h>
+#include <geode/mesh/core/mesh_id.h>
 
 #include <geode/model/common.h>
 #include <geode/model/mixin/core/component.h>
@@ -47,12 +47,13 @@ namespace geode
     template < index_t dimension >
     class Line final : public Component< dimension >
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( Line );
+        OPENGEODE_DISABLE_COPY( Line );
         PASSKEY( Lines< dimension >, LinesKey );
         PASSKEY( LinesBuilder< dimension >, LinesBuilderKey );
         friend class bitsery::Access;
 
     public:
+        Line( Line&& );
         ~Line();
 
         static ComponentType component_type_static()
@@ -72,7 +73,7 @@ namespace geode
 
         const EdgedCurve< dimension >& mesh() const;
 
-        void ensure_mesh_type( LinesKey );
+        const MeshImpl& mesh_type() const;
 
         EdgedCurve< dimension >& modifiable_mesh( LinesKey )
         {
@@ -81,7 +82,10 @@ namespace geode
 
         Line( LinesKey ) : Line() {}
 
-        Line( const MeshType& type, LinesKey ) : Line( type ) {}
+        Line( const MeshImpl& impl, LinesKey ) : Line( impl ) {}
+
+        void set_mesh(
+            std::unique_ptr< EdgedCurve< dimension > > mesh, LinesKey );
 
         void set_mesh(
             std::unique_ptr< EdgedCurve< dimension > > mesh, LinesBuilderKey );
@@ -99,7 +103,7 @@ namespace geode
     private:
         Line();
 
-        explicit Line( const MeshType& type );
+        explicit Line( const MeshImpl& impl );
 
         EdgedCurve< dimension >& modifiable_mesh();
 

@@ -25,6 +25,8 @@
 
 #include <bitsery/brief_syntax/string.h>
 
+#include <absl/hash/hash.h>
+
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/named_type.h>
 #include <geode/basic/uuid.h>
@@ -93,3 +95,16 @@ namespace geode
     };
 
 } // namespace geode
+
+namespace std
+{
+    template <>
+    struct hash< geode::ComponentType >
+    {
+    public:
+        size_t operator()( const geode::ComponentType& type ) const
+        {
+            return absl::Hash< string >()( type.get() );
+        }
+    };
+} // namespace std

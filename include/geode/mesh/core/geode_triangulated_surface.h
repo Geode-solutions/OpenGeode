@@ -42,7 +42,7 @@ namespace geode
     template < index_t dimension >
     class OpenGeodeTriangulatedSurface : public TriangulatedSurface< dimension >
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( OpenGeodeTriangulatedSurface );
+        OPENGEODE_DISABLE_COPY( OpenGeodeTriangulatedSurface );
         PASSKEY( OpenGeodeTriangulatedSurfaceBuilder< dimension >,
             OGTriangulatedSurfaceKey );
 
@@ -50,15 +50,20 @@ namespace geode
         OpenGeodeTriangulatedSurface();
         ~OpenGeodeTriangulatedSurface();
 
-        static MeshType type_name_static()
+        static MeshImpl impl_name_static()
         {
-            return MeshType{ absl::StrCat(
+            return MeshImpl{ absl::StrCat(
                 "OpenGeodeTriangulatedSurface", dimension, "D" ) };
+        }
+
+        MeshImpl impl_name() const override
+        {
+            return impl_name_static();
         }
 
         MeshType type_name() const override
         {
-            return type_name_static();
+            return TriangulatedSurface< dimension >::type_name_static();
         }
 
         static absl::string_view native_extension_static()
@@ -98,7 +103,7 @@ namespace geode
         index_t get_polygon_vertex(
             const PolygonVertex& polygon_vertex ) const override;
 
-        index_t get_polygon_adjacent(
+        absl::optional< index_t > get_polygon_adjacent(
             const PolygonEdge& polygon_edge ) const override;
 
     private:

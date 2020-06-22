@@ -25,7 +25,7 @@
 
 #include <memory>
 
-#include <geode/mesh/core/mesh_type.h>
+#include <geode/mesh/core/mesh_id.h>
 
 #include <geode/model/common.h>
 
@@ -61,7 +61,7 @@ namespace geode
 
         const uuid& create_line();
 
-        const uuid& create_line( const MeshType& type );
+        const uuid& create_line( const MeshImpl& impl );
 
         void delete_line( const Line< dimension >& line );
 

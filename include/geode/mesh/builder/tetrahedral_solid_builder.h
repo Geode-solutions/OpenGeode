@@ -26,7 +26,7 @@
 #include <array>
 #include <vector>
 
-#include <geode/mesh/builder/polyhedral_solid_builder.h>
+#include <geode/mesh/builder/solid_mesh_builder.h>
 #include <geode/mesh/common.h>
 
 namespace geode
@@ -37,7 +37,7 @@ namespace geode
 namespace geode
 {
     template < index_t dimension >
-    class TetrahedralSolidBuilder : public PolyhedralSolidBuilder< dimension >
+    class TetrahedralSolidBuilder : public SolidMeshBuilder< dimension >
     {
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
         PASSKEY( TetrahedralSolid< dimension >, BuilderKey );
@@ -73,13 +73,11 @@ namespace geode
             copy( tetrahedral_solid );
         }
 
+        void set_mesh(
+            TetrahedralSolid< dimension >& mesh, MeshBuilderFactoryKey key );
+
     protected:
-        TetrahedralSolidBuilder(
-            TetrahedralSolid< dimension >& tetrahedral_solid )
-            : PolyhedralSolidBuilder< dimension >( tetrahedral_solid ),
-              tetrahedral_solid_( tetrahedral_solid )
-        {
-        }
+        TetrahedralSolidBuilder() = default;
 
         void copy( const TetrahedralSolid< dimension >& tetrahedral_solid );
 
@@ -93,33 +91,17 @@ namespace geode
         void do_create_polyhedron( absl::Span< const index_t > vertices,
             absl::Span< const std::vector< index_t > > facets ) final;
 
-        virtual void do_create_facets(
-            const std::array< index_t, 4 >& vertices ) = 0;
+        void do_create_facets( const std::array< index_t, 4 >& vertices );
 
-        virtual void do_create_edges(
-            const std::array< index_t, 4 >& vertices ) = 0;
+        void do_create_edges( const std::array< index_t, 4 >& vertices );
 
         virtual void do_create_tetrahedron(
             const std::array< index_t, 4 >& vertices ) = 0;
 
         virtual void do_create_tetrahedra( index_t nb ) = 0;
 
-        virtual std::array< PolyhedronFacetVertices, 4 >
-            get_tetrahedron_facet_vertices(
-                const std::array< index_t, 4 >& vertices ) const = 0;
-
-        virtual std::vector< std::array< index_t, 2 > >
-            get_tetrahedron_edge_vertices(
-                const std::array< index_t, 4 >& vertices ) const = 0;
-
     private:
-        TetrahedralSolid< dimension >& tetrahedral_solid_;
+        TetrahedralSolid< dimension >* tetrahedral_solid_;
     };
     ALIAS_3D( TetrahedralSolidBuilder );
-
-    template < index_t dimension >
-    using TetrahedralSolidBuilderFactory = Factory< MeshType,
-        TetrahedralSolidBuilder< dimension >,
-        TetrahedralSolid< dimension >& >;
-    ALIAS_3D( TetrahedralSolidBuilderFactory );
 } // namespace geode

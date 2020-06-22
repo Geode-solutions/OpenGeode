@@ -29,6 +29,7 @@
 #include <geode/basic/detail/mapping_after_deletion.h>
 #include <geode/basic/logger.h>
 
+#include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/core/graph.h>
 
 namespace
@@ -62,51 +63,41 @@ namespace
 
 namespace geode
 {
-    GraphBuilder::GraphBuilder( Graph& graph )
-        : VertexSetBuilder( graph ), graph_( graph )
+    void GraphBuilder::set_mesh( Graph& mesh, MeshBuilderFactoryKey key )
     {
+        graph_ = &mesh;
+        VertexSetBuilder::set_mesh( mesh, key );
     }
 
     std::unique_ptr< GraphBuilder > GraphBuilder::create( Graph& mesh )
     {
-        try
-        {
-            return GraphBuilderFactory::create( mesh.type_name(), mesh );
-        }
-        catch( const OpenGeodeException& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeException{
-                "Could not create Graph builder of data structure: ",
-                mesh.type_name().get()
-            };
-        }
+        return MeshBuilderFactory::create_mesh_builder< GraphBuilder >( mesh );
     }
 
     void GraphBuilder::set_edge_vertex(
         const EdgeVertex& edge_vertex, index_t vertex_id )
     {
-        OPENGEODE_ASSERT( edge_vertex.edge_id < graph_.nb_edges(),
+        OPENGEODE_ASSERT( edge_vertex.edge_id < graph_->nb_edges(),
             "[GraphBuilder::set_edge_vertex] Accessing an edge that does not "
             "exist" );
         OPENGEODE_ASSERT( edge_vertex.vertex_id < 2,
             "[GraphBuilder::set_edge_vertex] Trying to access an invalid edge "
             "local vertex" );
-        OPENGEODE_ASSERT( vertex_id < graph_.nb_vertices(),
+        OPENGEODE_ASSERT( vertex_id < graph_->nb_vertices(),
             "[GraphBuilder::set_edge_vertex] Accessing a vertex that does not "
             "exist" );
-        if( graph_.edge_vertex( edge_vertex ) == vertex_id )
+        if( graph_->edge_vertex( edge_vertex ) == vertex_id )
         {
             return;
         }
-        graph_.associate_edge_vertex_to_vertex( edge_vertex, vertex_id, {} );
+        graph_->associate_edge_vertex_to_vertex( edge_vertex, vertex_id, {} );
         do_set_edge_vertex( edge_vertex, vertex_id );
     }
 
     index_t GraphBuilder::create_edge()
     {
-        const auto added_edge = graph_.nb_edges();
-        graph_.edge_attribute_manager().resize( added_edge + 1 );
+        const auto added_edge = graph_->nb_edges();
+        graph_->edge_attribute_manager().resize( added_edge + 1 );
         do_create_edge();
         return added_edge;
     }
@@ -116,7 +107,7 @@ namespace geode
         OPENGEODE_ASSERT( v0_id != v1_id, "[GraphBuilder::create_edge] "
                                           "Trying to create an edge with "
                                           "same extremities" );
-        const auto added_edge = graph_.nb_edges();
+        const auto added_edge = graph_->nb_edges();
         create_edge();
         set_edge_vertex( { added_edge, 0 }, v0_id );
         set_edge_vertex( { added_edge, 1 }, v1_id );
@@ -125,8 +116,8 @@ namespace geode
 
     index_t GraphBuilder::create_edges( index_t nb )
     {
-        const auto first_added_edge = graph_.nb_edges();
-        graph_.edge_attribute_manager().resize( first_added_edge + nb );
+        const auto first_added_edge = graph_->nb_edges();
+        graph_->edge_attribute_manager().resize( first_added_edge + nb );
         do_create_edges( nb );
         return first_added_edge;
     }
@@ -135,7 +126,7 @@ namespace geode
         const std::vector< bool >& to_delete )
     {
         const auto old2new = detail::mapping_after_deletion( to_delete );
-        update_edge_vertices( graph_, *this, old2new );
+        update_edge_vertices( *graph_, *this, old2new );
         do_delete_curve_vertices( to_delete );
     }
 
@@ -143,9 +134,9 @@ namespace geode
         const std::vector< bool >& to_delete )
     {
         const auto old2new = detail::mapping_after_deletion( to_delete );
-        for( const auto v : Range{ graph_.nb_vertices() } )
+        for( const auto v : Range{ graph_->nb_vertices() } )
         {
-            const auto& edges = graph_.edges_around_vertex( v );
+            const auto& edges = graph_->edges_around_vertex( v );
             EdgesAroundVertex new_edges;
             new_edges.reserve( edges.size() );
             for( const auto& edge : edges )
@@ -156,20 +147,20 @@ namespace geode
                     new_edges.emplace_back( edge_id, edge.vertex_id );
                 }
             }
-            graph_.set_edges_around_vertex( v, std::move( new_edges ), {} );
+            graph_->set_edges_around_vertex( v, std::move( new_edges ), {} );
         }
 
-        graph_.edge_attribute_manager().delete_elements( to_delete );
+        graph_->edge_attribute_manager().delete_elements( to_delete );
         do_delete_edges( to_delete );
         return old2new;
     }
 
     std::vector< index_t > GraphBuilder::delete_isolated_vertices()
     {
-        std::vector< bool > to_delete( graph_.nb_vertices(), false );
-        for( const auto v : Range{ graph_.nb_vertices() } )
+        std::vector< bool > to_delete( graph_->nb_vertices(), false );
+        for( const auto v : Range{ graph_->nb_vertices() } )
         {
-            const auto& edge_vertices = graph_.edges_around_vertex( v );
+            const auto& edge_vertices = graph_->edges_around_vertex( v );
             if( edge_vertices.empty() )
             {
                 to_delete[v] = true;
@@ -182,7 +173,7 @@ namespace geode
     {
         VertexSetBuilder::copy( graph );
         create_edges( graph.nb_edges() );
-        graph_.edge_attribute_manager().copy( graph.edge_attribute_manager() );
+        graph_->edge_attribute_manager().copy( graph.edge_attribute_manager() );
         for( const auto e : Range{ graph.nb_edges() } )
         {
             for( const auto v : Range{ 2 } )

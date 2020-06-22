@@ -62,10 +62,15 @@ namespace geode
                    - starting_index( polygon_id );
         }
 
-        index_t get_polygon_adjacent( const PolygonEdge& polygon_edge ) const
+        absl::optional< index_t > get_polygon_adjacent(
+            const PolygonEdge& polygon_edge ) const
         {
-            return polygon_adjacents_[starting_index( polygon_edge.polygon_id )
-                                      + polygon_edge.edge_id];
+            const auto adj = get_polygon_adjacent_impl( polygon_edge );
+            if( adj == NO_ID )
+            {
+                return absl::nullopt;
+            }
+            return adj;
         }
 
         void set_polygon_vertex(
@@ -108,7 +113,7 @@ namespace geode
                         polygon_vertices_[index] =
                             get_polygon_vertex( { p, v } );
                         polygon_adjacents_[index] =
-                            get_polygon_adjacent( { p, v } );
+                            get_polygon_adjacent_impl( { p, v } );
                         index++;
                     }
                     polygon_ptr_[p - offset + 1] =
@@ -141,6 +146,13 @@ namespace geode
                         impl, bitsery::ext::BaseClass<
                                   detail::PointsImpl< dimension > >{} );
                 } );
+        }
+
+        index_t get_polygon_adjacent_impl(
+            const PolygonEdge& polygon_edge ) const
+        {
+            return polygon_adjacents_[starting_index( polygon_edge.polygon_id )
+                                      + polygon_edge.edge_id];
         }
 
         index_t starting_index( const index_t polygon ) const
@@ -196,8 +208,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t OpenGeodePolygonalSurface< dimension >::get_polygon_adjacent(
-        const PolygonEdge& polygon_edge ) const
+    absl::optional< index_t >
+        OpenGeodePolygonalSurface< dimension >::get_polygon_adjacent(
+            const PolygonEdge& polygon_edge ) const
     {
         return impl_->get_polygon_adjacent( polygon_edge );
     }

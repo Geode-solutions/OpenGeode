@@ -53,7 +53,7 @@ namespace geode
     TriangulatedSurfaceOutput< dimension >::TriangulatedSurfaceOutput(
         const TriangulatedSurface< dimension >& triangulated_surface,
         absl::string_view filename )
-        : PolygonalSurfaceOutput< dimension >( triangulated_surface, filename ),
+        : VertexSetOutput( triangulated_surface, filename ),
           triangulated_surface_( triangulated_surface )
     {
     }

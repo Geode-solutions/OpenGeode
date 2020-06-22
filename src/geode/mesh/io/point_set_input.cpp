@@ -23,20 +23,23 @@
 
 #include <geode/mesh/io/point_set_input.h>
 
+#include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/point_set.h>
 
 namespace geode
 {
     template < index_t dimension >
-    void load_point_set(
-        PointSet< dimension >& point_set, absl::string_view filename )
+    std::unique_ptr< PointSet< dimension > > load_point_set(
+        const MeshImpl& impl, absl::string_view filename )
     {
         try
         {
+            auto point_set = PointSet< dimension >::create( impl );
             auto input = PointSetInputFactory< dimension >::create(
-                extension_from_filename( filename ).data(), point_set,
+                extension_from_filename( filename ).data(), *point_set,
                 filename );
             input->read();
+            return point_set;
         }
         catch( const OpenGeodeException& e )
         {
@@ -47,16 +50,31 @@ namespace geode
     }
 
     template < index_t dimension >
+    std::unique_ptr< PointSet< dimension > > load_point_set(
+        absl::string_view filename )
+    {
+        return load_point_set< dimension >(
+            MeshFactory::default_impl(
+                PointSet< dimension >::type_name_static() ),
+            filename );
+    }
+
+    template < index_t dimension >
     PointSetInput< dimension >::PointSetInput(
         PointSet< dimension >& point_set, absl::string_view filename )
         : VertexSetInput( point_set, filename ), point_set_( point_set )
     {
     }
 
-    template void opengeode_mesh_api load_point_set(
-        PointSet< 2 >&, absl::string_view );
-    template void opengeode_mesh_api load_point_set(
-        PointSet< 3 >&, absl::string_view );
+    template std::unique_ptr< PointSet< 2 > > opengeode_mesh_api load_point_set(
+        const MeshImpl&, absl::string_view );
+    template std::unique_ptr< PointSet< 3 > > opengeode_mesh_api load_point_set(
+        const MeshImpl&, absl::string_view );
+
+    template std::unique_ptr< PointSet< 2 > > opengeode_mesh_api load_point_set(
+        absl::string_view );
+    template std::unique_ptr< PointSet< 3 > > opengeode_mesh_api load_point_set(
+        absl::string_view );
 
     template class opengeode_mesh_api PointSetInput< 2 >;
     template class opengeode_mesh_api PointSetInput< 3 >;

@@ -27,6 +27,7 @@
 #include <geode/basic/pimpl_impl.h>
 
 #include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/core/mesh_factory.h>
 
 #include <geode/model/mixin/core/detail/mesh_storage.h>
 
@@ -57,14 +58,20 @@ namespace geode
 
     template < index_t dimension >
     Line< dimension >::Line()
+        : Line( MeshFactory::default_impl(
+            EdgedCurve< dimension >::type_name_static() ) )
     {
-        impl_->set_mesh( EdgedCurve< dimension >::create() );
     }
 
     template < index_t dimension >
-    Line< dimension >::Line( const MeshType& type )
+    Line< dimension >::Line( Line&& other ) : impl_( std::move( other.impl_ ) )
     {
-        impl_->set_mesh( EdgedCurve< dimension >::create( type ) );
+    }
+
+    template < index_t dimension >
+    Line< dimension >::Line( const MeshImpl& impl )
+    {
+        impl_->set_mesh( EdgedCurve< dimension >::create( impl ) );
     }
 
     template < index_t dimension >
@@ -80,9 +87,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    void Line< dimension >::ensure_mesh_type( LinesKey )
+    const MeshImpl& Line< dimension >::mesh_type() const
     {
-        return impl_->ensure_mesh_type();
+        return impl_->mesh_type();
     }
 
     template < index_t dimension >
@@ -95,6 +102,13 @@ namespace geode
                 archive.ext(
                     line, bitsery::ext::BaseClass< Component< dimension > >{} );
             } );
+    }
+
+    template < index_t dimension >
+    void Line< dimension >::set_mesh(
+        std::unique_ptr< EdgedCurve< dimension > > mesh, LinesKey )
+    {
+        impl_->set_mesh( std::move( mesh ) );
     }
 
     template < index_t dimension >

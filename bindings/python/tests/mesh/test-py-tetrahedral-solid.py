@@ -48,7 +48,7 @@ def test_polyhedron_adjacencies( solid, builder ):
     builder.compute_polyhedron_adjacencies()
     if solid.polyhedron_adjacent( mesh.PolyhedronFacet( 0, 0 ) ) != 1:
         raise ValueError( "[Test] TetrahedralSolid adjacent index is not correct" )
-    if solid.polyhedron_adjacent( mesh.PolyhedronFacet( 0, 1 ) ) != basic.NO_ID:
+    if solid.polyhedron_adjacent( mesh.PolyhedronFacet( 0, 1 ) ):
         raise ValueError( "[Test] TetrahedralSolid adjacent index is not correct" )
     if solid.polyhedron_adjacent( mesh.PolyhedronFacet( 1, 3 ) ) != 0:
         raise ValueError( "[Test] TetrahedralSolid adjacent index is not correct" )
@@ -57,7 +57,7 @@ def test_polyhedron_adjacencies( solid, builder ):
 
     if solid.polyhedron_adjacent( mesh.PolyhedronFacet( 2, 3 ) ) != 1:
         raise ValueError( "[Test] TetrahedralSolid adjacent index is not correct" )
-    if solid.polyhedron_adjacent( mesh.PolyhedronFacet( 2, 0 ) ) != basic.NO_ID:
+    if solid.polyhedron_adjacent( mesh.PolyhedronFacet( 2, 0 ) ):
         raise ValueError( "[Test] TetrahedralSolid adjacent index is not correct" )
 
 def test_delete_vertex( solid, builder ):
@@ -95,8 +95,7 @@ def test_delete_polyhedron( solid, builder ):
 
 def test_io( solid, filename ):
     mesh.save_tetrahedral_solid3D( solid, filename )
-    new_solid = mesh.TetrahedralSolid3D.create()
-    mesh.load_tetrahedral_solid3D( new_solid, filename )
+    new_solid = mesh.load_tetrahedral_solid3D( filename )
     if new_solid.nb_vertices() != 6:
         raise ValueError( "[Test] Reloaded TetrahedralSolid should have 6 vertices" )
     if new_solid.nb_facets() != 10:

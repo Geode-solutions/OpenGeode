@@ -26,6 +26,7 @@
 #include <geode/basic/pimpl_impl.h>
 #include <geode/basic/range.h>
 
+#include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polyhedral_solid.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
 #include <geode/mesh/io/polyhedral_solid_input.h>
@@ -46,6 +47,12 @@ namespace geode
 
     template < index_t dimension >
     Blocks< dimension >::Blocks() // NOLINT
+    {
+    }
+
+    template < index_t dimension >
+    Blocks< dimension >::Blocks( Blocks&& other )
+        : impl_( std::move( other.impl_ ) )
     {
     }
 
@@ -82,15 +89,24 @@ namespace geode
             const auto& mesh = block.mesh();
             const auto file = absl::StrCat(
                 prefix, block.id().string(), ".", mesh.native_extension() );
-            const auto* tetra =
-                dynamic_cast< const TetrahedralSolid< dimension >* >( &mesh );
-            if( tetra )
+
+            if( const auto* tetra =
+                    dynamic_cast< const TetrahedralSolid< dimension >* >(
+                        &mesh ) )
             {
                 save_tetrahedral_solid( *tetra, file );
             }
+            else if( const auto* poly =
+                         dynamic_cast< const PolyhedralSolid< dimension >* >(
+                             &mesh ) )
+            {
+                save_polyhedral_solid( *poly, file );
+            }
             else
             {
-                save_polyhedral_solid( mesh, file );
+                throw OpenGeodeException(
+                    "[Blocks::save_blocks] Cannot find the explicit "
+                    "SolidMesh type" );
             }
         }
         impl_->save_components( absl::StrCat( directory, "/blocks" ) );
@@ -100,24 +116,22 @@ namespace geode
     void Blocks< dimension >::load_blocks( absl::string_view directory )
     {
         impl_->load_components( absl::StrCat( directory, "/blocks" ) );
-        const auto prefix = absl::StrCat(
-            directory, "/", Block< dimension >::component_type_static().get() );
         for( auto& block : modifiable_blocks() )
         {
-            block.ensure_mesh_type( {} );
-            auto& mesh = block.modifiable_mesh(
-                typename Block< dimension >::BlocksKey{} );
-            const auto file = absl::StrCat(
-                prefix, block.id().string(), ".", mesh.native_extension() );
-            auto* tetra =
-                dynamic_cast< TetrahedralSolid< dimension >* >( &mesh );
-            if( tetra )
+            const auto file =
+                impl_->find_file( directory, block.component_id() );
+            if( MeshFactory::type( block.mesh_type() )
+                == TetrahedralSolid< dimension >::type_name_static() )
             {
-                load_tetrahedral_solid( *tetra, file );
+                block.set_mesh( load_tetrahedral_solid< dimension >(
+                                    block.mesh_type(), file ),
+                    typename Block< dimension >::BlocksKey{} );
             }
             else
             {
-                load_polyhedral_solid( mesh, file );
+                block.set_mesh( load_polyhedral_solid< dimension >(
+                                    block.mesh_type(), file ),
+                    typename Block< dimension >::BlocksKey{} );
             }
         }
     }
@@ -134,10 +148,10 @@ namespace geode
     }
 
     template < index_t dimension >
-    const uuid& Blocks< dimension >::create_block( const MeshType& type )
+    const uuid& Blocks< dimension >::create_block( const MeshImpl& impl )
     {
         typename Blocks< dimension >::Impl::ComponentPtr block{
-            new Block< dimension >{ type, {} }
+            new Block< dimension >{ impl, {} }
         };
         const auto& id = block->id();
         impl_->add_component( std::move( block ) );
@@ -183,7 +197,7 @@ namespace geode
     template < index_t dimension >
     Blocks< dimension >::BlockRangeBase::BlockRangeBase(
         BlockRangeBase&& other ) noexcept
-        : impl_( std::move( *other.impl_ ) )
+        : impl_( std::move( other.impl_ ) )
     {
     }
 

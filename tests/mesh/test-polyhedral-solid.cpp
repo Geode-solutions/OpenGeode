@@ -56,10 +56,27 @@ void test_bounding_box( const geode::PolyhedralSolid3D& polyhedral_solid )
 {
     geode::Point3D answer_min{ { 0.1, 0.2, 0.3 } };
     geode::Point3D answer_max{ { 9.3, 9.4, 6.7 } };
-    OPENGEODE_EXCEPTION( polyhedral_solid.bounding_box().min() == answer_min,
+    const auto bbox = polyhedral_solid.bounding_box();
+    OPENGEODE_EXCEPTION( bbox.min() == answer_min,
         "[Test] Wrong computation of bounding box (min)" );
-    OPENGEODE_EXCEPTION( polyhedral_solid.bounding_box().max() == answer_max,
+    OPENGEODE_EXCEPTION( bbox.max() == answer_max,
         "[Test] Wrong computation of bounding box (max)" );
+}
+
+void test_facets( const geode::PolyhedralSolid3D& polyhedral_solid )
+{
+    OPENGEODE_EXCEPTION(
+        polyhedral_solid.facet_from_vertices( { 0, 1, 2 } ) == 0,
+        "[Test] Wrong facet from vertices" );
+}
+
+void test_edges( const geode::PolyhedralSolid3D& polyhedral_solid )
+{
+    geode::Point3D answer{ { 1.1, 4.8, 3.5 } };
+    OPENGEODE_EXCEPTION( polyhedral_solid.edge_barycenter( 0 ) == answer,
+        "[Test] Wrong edge barycenter" );
+    OPENGEODE_EXCEPTION( polyhedral_solid.edge_length( 0 ) - 11.3842 < 1e-6,
+        "[Test] Wrong edge length" );
 }
 
 void test_create_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
@@ -84,6 +101,10 @@ void test_create_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
     OPENGEODE_EXCEPTION(
         polyhedral_solid.polyhedron_facet_edge( { { 0, 1 }, 2 } ) == 4,
         "[Test] Wrong edge index get from PolyhedronFacetEdge" );
+    OPENGEODE_EXCEPTION( !polyhedral_solid.vertex_in_polyhedron( 0, 7 ),
+        "[Test] Wrong vertex in polyhedron" );
+    OPENGEODE_EXCEPTION( polyhedral_solid.vertex_in_polyhedron( 1, 5 ),
+        "[Test] Wrong vertex in polyhedron" );
 }
 
 void test_create_facet_attribute(
@@ -120,13 +141,11 @@ void test_polyhedron_adjacencies(
     geode::PolyhedralSolidBuilder3D& builder )
 {
     builder.compute_polyhedron_adjacencies();
-    OPENGEODE_EXCEPTION(
-        polyhedral_solid.polyhedron_adjacent( { 0, 0 } ) == geode::NO_ID,
+    OPENGEODE_EXCEPTION( !polyhedral_solid.polyhedron_adjacent( { 0, 0 } ),
         "[Test] PolyhedralSolid adjacent index is not correct" );
     OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_adjacent( { 0, 1 } ) == 1,
         "[Test] PolyhedralSolid adjacent index is not correct" );
-    OPENGEODE_EXCEPTION(
-        polyhedral_solid.polyhedron_adjacent( { 0, 2 } ) == geode::NO_ID,
+    OPENGEODE_EXCEPTION( !polyhedral_solid.polyhedron_adjacent( { 0, 2 } ),
         "[Test] PolyhedralSolid adjacent index is not correct" );
     OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_adjacent( { 1, 0 } ) == 2,
         "[Test] PolyhedralSolid adjacent index is not correct" );
@@ -142,7 +161,7 @@ void test_polyhedron_adjacencies(
         "[Test] First polyhedron of PolyhedralSolid should have 4 facets on "
         "border" );
 
-    auto edge_id = polyhedral_solid.edge_from_vertices( { 5, 4 } );
+    auto edge_id = polyhedral_solid.edge_from_vertices( { 5, 4 } ).value();
     OPENGEODE_EXCEPTION(
         edge_id == 8, "[Test] Wrong edge index from vertices" );
     OPENGEODE_EXCEPTION(
@@ -216,10 +235,10 @@ void test_delete_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
 void test_io( const geode::PolyhedralSolid3D& polyhedral_solid,
     const std::string& filename )
 {
-    save_polyhedral_solid( polyhedral_solid, filename );
-    auto new_polyhedral_solid = geode::PolyhedralSolid3D::create(
-        geode::OpenGeodePolyhedralSolid3D::type_name_static() );
-    load_polyhedral_solid( *new_polyhedral_solid, filename );
+    geode::save_polyhedral_solid( polyhedral_solid, filename );
+    geode::load_polyhedral_solid< 3 >( filename );
+    const auto new_polyhedral_solid = geode::load_polyhedral_solid< 3 >(
+        geode::OpenGeodePolyhedralSolid3D::impl_name_static(), filename );
 
     OPENGEODE_EXCEPTION( new_polyhedral_solid->nb_vertices() == 8,
         "[Test] Reloaded PolyhedralSolid should have 8 vertices" );
@@ -244,9 +263,8 @@ void test_io( const geode::PolyhedralSolid3D& polyhedral_solid,
 
 void test_backward_io( const std::string& filename )
 {
-    auto new_polyhedral_solid = geode::PolyhedralSolid3D::create(
-        geode::OpenGeodePolyhedralSolid3D::type_name_static() );
-    load_polyhedral_solid( *new_polyhedral_solid, filename );
+    const auto new_polyhedral_solid = geode::load_polyhedral_solid< 3 >(
+        geode::OpenGeodePolyhedralSolid3D::impl_name_static(), filename );
 
     OPENGEODE_EXCEPTION( new_polyhedral_solid->nb_edges() == 15,
         "[Test] Reloaded PolyhedralSolid should have 15 edges" );
@@ -263,7 +281,7 @@ void test_backward_io( const std::string& filename )
 void test_barycenters()
 {
     auto polyhedral_solid = geode::PolyhedralSolid3D::create(
-        geode::OpenGeodePolyhedralSolid3D::type_name_static() );
+        geode::OpenGeodePolyhedralSolid3D::impl_name_static() );
     auto builder = geode::PolyhedralSolidBuilder3D::create( *polyhedral_solid );
     const double o{ 0.0 };
     const double a{ 0.6 };
@@ -380,7 +398,7 @@ void test_delete_all( const geode::PolyhedralSolid3D& polyhedral_solid,
 void test()
 {
     auto polyhedral_solid = geode::PolyhedralSolid3D::create(
-        geode::OpenGeodePolyhedralSolid3D::type_name_static() );
+        geode::OpenGeodePolyhedralSolid3D::impl_name_static() );
     auto builder = geode::PolyhedralSolidBuilder3D::create( *polyhedral_solid );
 
     test_create_vertices( *polyhedral_solid, *builder );
@@ -388,6 +406,8 @@ void test()
     test_create_polyhedra( *polyhedral_solid, *builder );
     test_create_facet_attribute( *polyhedral_solid );
     test_create_edge_attribute( *polyhedral_solid );
+    test_edges( *polyhedral_solid );
+    test_facets( *polyhedral_solid );
     test_polyhedron_adjacencies( *polyhedral_solid, *builder );
     test_io( *polyhedral_solid,
         absl::StrCat( "test.", polyhedral_solid->native_extension() ) );

@@ -25,7 +25,7 @@
 
 #include <geode/basic/pimpl.h>
 
-#include <geode/mesh/core/mesh_type.h>
+#include <geode/mesh/core/mesh_id.h>
 
 #include <geode/model/common.h>
 
@@ -45,7 +45,7 @@ namespace geode
     template < index_t dimension >
     class opengeode_model_api Blocks
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( Blocks );
+        OPENGEODE_DISABLE_COPY( Blocks );
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
 
     public:
@@ -104,6 +104,7 @@ namespace geode
 
     protected:
         Blocks();
+        Blocks( Blocks&& );
 
     private:
         class ModifiableBlockRange : public BlockRangeBase,
@@ -118,7 +119,7 @@ namespace geode
     private:
         const uuid& create_block();
 
-        const uuid& create_block( const MeshType& type );
+        const uuid& create_block( const MeshImpl& impl );
 
         void delete_block( const Block< dimension >& block );
 

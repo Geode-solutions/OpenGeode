@@ -43,6 +43,12 @@ namespace geode
     }
 
     template < index_t dimension >
+    ModelBoundaries< dimension >::ModelBoundaries( ModelBoundaries&& other )
+        : impl_( std::move( other.impl_ ) )
+    {
+    }
+
+    template < index_t dimension >
     ModelBoundaries< dimension >::~ModelBoundaries() // NOLINT
     {
     }
@@ -146,7 +152,7 @@ namespace geode
     template < index_t dimension >
     ModelBoundaries< dimension >::ModelBoundaryRangeBase::
         ModelBoundaryRangeBase( ModelBoundaryRangeBase&& other ) noexcept
-        : impl_( std::move( *other.impl_ ) )
+        : impl_( std::move( other.impl_ ) )
     {
     }
 

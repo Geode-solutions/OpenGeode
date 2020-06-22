@@ -23,11 +23,7 @@
 
 #pragma once
 
-#include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/core/mesh_type.h>
-#include <geode/mesh/core/point_set.h>
-#include <geode/mesh/core/polygonal_surface.h>
-#include <geode/mesh/core/polyhedral_solid.h>
+#include <geode/basic/mapping.h>
 
 #include <geode/model/common.h>
 #include <geode/model/mixin/builder/add_components_builders.h>
@@ -46,15 +42,26 @@
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( EdgedCurve );
+    FORWARD_DECLARATION_DIMENSION_CLASS( PointSet );
+    FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMesh );
+    FORWARD_DECLARATION_DIMENSION_CLASS( SolidMesh );
     ALIAS_3D( Block );
     ALIAS_3D( Corner );
+    ALIAS_3D( EdgedCurve );
+    ALIAS_3D( PointSet );
+    ALIAS_3D( SolidMesh );
     ALIAS_3D( Line );
     ALIAS_3D( ModelBoundary );
     ALIAS_3D( Surface );
-
+    ALIAS_3D( SurfaceMesh );
     class BRep;
-
     struct uuid;
+
+    namespace detail
+    {
+        class ModelCopyMapping;
+    } // namespace detail
 } // namespace geode
 
 namespace geode
@@ -78,45 +85,34 @@ namespace geode
         OPENGEODE_DISABLE_COPY( BRepBuilder );
 
     public:
-        struct ComponentMapping
-        {
-            using Mapping = absl::flat_hash_map< uuid, uuid >;
-            Mapping corners;
-            Mapping lines;
-            Mapping surfaces;
-            Mapping blocks;
-            Mapping model_boundaries;
-        };
-
-    public:
         BRepBuilder( BRep& brep );
         BRepBuilder( BRepBuilder&& ) = default;
 
         void copy( const BRep& brep );
 
-        ComponentMapping copy_components( const BRep& brep );
+        detail::ModelCopyMapping copy_components( const BRep& brep );
 
         void copy_component_relationships(
-            const ComponentMapping& mapping, const BRep& brep );
+            const detail::ModelCopyMapping& mapping, const BRep& brep );
 
         void copy_component_geometry(
-            const ComponentMapping& mapping, const BRep& brep );
+            const detail::ModelCopyMapping& mapping, const BRep& brep );
 
         const uuid& add_corner();
 
-        const uuid& add_corner( const MeshType& type );
+        const uuid& add_corner( const MeshImpl& impl );
 
         const uuid& add_line();
 
-        const uuid& add_line( const MeshType& type );
+        const uuid& add_line( const MeshImpl& impl );
 
         const uuid& add_surface();
 
-        const uuid& add_surface( const MeshType& type );
+        const uuid& add_surface( const MeshImpl& impl );
 
         const uuid& add_block();
 
-        const uuid& add_block( const MeshType& type );
+        const uuid& add_block( const MeshImpl& impl );
 
         const uuid& add_model_boundary();
 
@@ -126,11 +122,11 @@ namespace geode
         void update_line_mesh(
             const Line3D& line, std::unique_ptr< EdgedCurve3D > mesh );
 
-        void update_surface_mesh( const Surface3D& surface,
-            std::unique_ptr< PolygonalSurface3D > mesh );
+        void update_surface_mesh(
+            const Surface3D& surface, std::unique_ptr< SurfaceMesh3D > mesh );
 
         void update_block_mesh(
-            const Block3D& block, std::unique_ptr< PolyhedralSolid3D > mesh );
+            const Block3D& block, std::unique_ptr< SolidMesh3D > mesh );
 
         void remove_corner( const Corner3D& corner );
 

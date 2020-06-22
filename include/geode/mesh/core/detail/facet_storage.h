@@ -63,14 +63,15 @@ namespace geode
                 return facet_attribute_manager_;
             }
 
-            index_t find_facet( TypedVertexCycle vertices ) const
+            absl::optional< index_t > find_facet(
+                TypedVertexCycle vertices ) const
             {
                 const auto itr = facet_indices_.find( vertices );
                 if( itr != facet_indices_.end() )
                 {
                     return itr->second;
                 }
-                return NO_ID;
+                return absl::nullopt;
             }
 
             index_t add_facet( TypedVertexCycle vertices )
@@ -185,6 +186,19 @@ namespace geode
             index_t get_counter( index_t facet_id ) const
             {
                 return counter_->value( facet_id );
+            }
+
+            void overwrite( const FacetStorage< VertexContainer >& from )
+            {
+                facet_attribute_manager_.copy( from.facet_attribute_manager() );
+                facet_indices_ = from.facet_indices_;
+                counter_ =
+                    facet_attribute_manager_
+                        .find_or_create_attribute< VariableAttribute, index_t >(
+                            "counter", 1u );
+                vertices_ = facet_attribute_manager_.find_or_create_attribute<
+                    VariableAttribute, VertexContainer >(
+                    attribute_name(), VertexContainer{} );
             }
 
         private:

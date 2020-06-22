@@ -26,7 +26,7 @@
 #include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
-#include <geode/mesh/core/mesh_type.h>
+#include <geode/mesh/core/mesh_id.h>
 
 #include <geode/model/common.h>
 #include <geode/model/mixin/core/component.h>
@@ -47,12 +47,13 @@ namespace geode
     template < index_t dimension >
     class Corner final : public Component< dimension >
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( Corner );
+        OPENGEODE_DISABLE_COPY( Corner );
         PASSKEY( Corners< dimension >, CornersKey );
         PASSKEY( CornersBuilder< dimension >, CornersBuilderKey );
         friend class bitsery::Access;
 
     public:
+        Corner( Corner&& );
         ~Corner();
 
         static ComponentType component_type_static()
@@ -77,11 +78,14 @@ namespace geode
             return modifiable_mesh();
         }
 
-        void ensure_mesh_type( CornersKey );
+        const MeshImpl& mesh_type() const;
 
         Corner( CornersKey ) : Corner() {}
 
-        Corner( const MeshType& type, CornersKey ) : Corner( type ) {}
+        Corner( const MeshImpl& impl, CornersKey ) : Corner( impl ) {}
+
+        void set_mesh(
+            std::unique_ptr< PointSet< dimension > > mesh, CornersKey );
 
         void set_mesh(
             std::unique_ptr< PointSet< dimension > > mesh, CornersBuilderKey );
@@ -99,7 +103,7 @@ namespace geode
     private:
         Corner();
 
-        explicit Corner( const MeshType& type );
+        explicit Corner( const MeshImpl& impl );
 
         PointSet< dimension >& modifiable_mesh();
 

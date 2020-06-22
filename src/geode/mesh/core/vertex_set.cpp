@@ -29,7 +29,7 @@
 #include <geode/basic/pimpl_impl.h>
 
 #include <geode/mesh/builder/vertex_set_builder.h>
-#include <geode/mesh/core/geode_vertex_set.h>
+#include <geode/mesh/core/mesh_factory.h>
 
 namespace geode
 {
@@ -58,26 +58,22 @@ namespace geode
 
     VertexSet::VertexSet() {} // NOLINT
 
+    VertexSet::VertexSet( VertexSet&& other )
+        : impl_( std::move( other.impl_ ) )
+    {
+    }
+
     VertexSet::~VertexSet() {} // NOLINT
 
     std::unique_ptr< VertexSet > VertexSet::create()
     {
-        return std::unique_ptr< VertexSet >{ new OpenGeodeVertexSet };
+        return MeshFactory::create_default_mesh< VertexSet >(
+            VertexSet::type_name_static() );
     }
 
-    std::unique_ptr< VertexSet > VertexSet::create( const MeshType& type )
+    std::unique_ptr< VertexSet > VertexSet::create( const MeshImpl& impl )
     {
-        try
-        {
-            return VertexSetFactory::create( type );
-        }
-        catch( const OpenGeodeException& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeException{
-                "Could not create VertexSet data structure: ", type.get()
-            };
-        }
+        return MeshFactory::create_mesh< VertexSet >( impl );
     }
 
     index_t VertexSet::nb_vertices() const
@@ -101,7 +97,7 @@ namespace geode
 
     std::unique_ptr< VertexSet > VertexSet::clone() const
     {
-        auto clone = create( type_name() );
+        auto clone = create( impl_name() );
         auto builder = VertexSetBuilder::create( *clone );
         builder->copy( *this );
         return clone;

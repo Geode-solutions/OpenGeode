@@ -80,12 +80,15 @@ namespace geode
                    - starting_facet_index( facet_id );
         }
 
-        index_t get_polyhedron_adjacent(
+        absl::optional< index_t > get_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet ) const
         {
-            return polyhedron_adjacents_[starting_adjacent_index(
-                                             polyhedron_facet.polyhedron_id )
-                                         + polyhedron_facet.facet_id];
+            const auto adj = get_polyhedron_adjacent_impl( polyhedron_facet );
+            if( adj == NO_ID )
+            {
+                return absl::nullopt;
+            }
+            return adj;
         }
 
         void set_polyhedron_vertex(
@@ -102,13 +105,6 @@ namespace geode
             polyhedron_adjacents_[starting_adjacent_index(
                                       polyhedron_facet.polyhedron_id )
                                   + polyhedron_facet.facet_id] = adjacent_id;
-        }
-
-        index_t get_polyhedron_facet_vertex(
-            const PolyhedronFacetVertex& polyhedron_facet_vertex ) const
-        {
-            return get_polyhedron_vertex(
-                get_polyhedron_facet_vertex_id( polyhedron_facet_vertex ) );
         }
 
         PolyhedronVertex get_polyhedron_facet_vertex_id(
@@ -188,7 +184,7 @@ namespace geode
                             + nb_facet_vertices;
 
                         polyhedron_adjacents_[adjacent_index] =
-                            get_polyhedron_adjacent( facet );
+                            get_polyhedron_adjacent_impl( facet );
                         adjacent_index++;
                     }
                     polyhedron_adjacent_ptr_[p - offset + 1] =
@@ -239,6 +235,14 @@ namespace geode
                         impl, bitsery::ext::BaseClass<
                                   detail::PointsImpl< dimension > >{} );
                 } );
+        }
+
+        index_t get_polyhedron_adjacent_impl(
+            const PolyhedronFacet& polyhedron_facet ) const
+        {
+            return polyhedron_adjacents_[starting_adjacent_index(
+                                             polyhedron_facet.polyhedron_id )
+                                         + polyhedron_facet.facet_id];
         }
 
         index_t starting_vertex_index( const index_t polyhedron ) const
@@ -329,17 +333,11 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t OpenGeodePolyhedralSolid< dimension >::get_polyhedron_adjacent(
-        const PolyhedronFacet& polyhedron_facet ) const
+    absl::optional< index_t >
+        OpenGeodePolyhedralSolid< dimension >::get_polyhedron_adjacent(
+            const PolyhedronFacet& polyhedron_facet ) const
     {
         return impl_->get_polyhedron_adjacent( polyhedron_facet );
-    }
-
-    template < index_t dimension >
-    index_t OpenGeodePolyhedralSolid< dimension >::get_polyhedron_facet_vertex(
-        const PolyhedronFacetVertex& polyhedron_facet_vertex ) const
-    {
-        return impl_->get_polyhedron_facet_vertex( polyhedron_facet_vertex );
     }
 
     template < index_t dimension >

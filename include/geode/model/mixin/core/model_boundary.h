@@ -43,7 +43,7 @@ namespace geode
     template < index_t dimension >
     class ModelBoundary : public Component< dimension >
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( ModelBoundary );
+        OPENGEODE_DISABLE_COPY( ModelBoundary );
         PASSKEY( ModelBoundaries< dimension >, ModelBoundariesKey );
         PASSKEY(
             ModelBoundariesBuilder< dimension >, ModelBoundariesBuilderKey );

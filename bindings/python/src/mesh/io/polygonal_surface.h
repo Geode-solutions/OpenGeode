@@ -31,7 +31,10 @@
         save##dimension.c_str(), &save_polygonal_surface< dimension > );       \
     const auto load##dimension =                                               \
         "load_polygonal_surface" + std::to_string( dimension ) + "D";          \
-    module.def( load##dimension.c_str(), &load_polygonal_surface< dimension > )
+    module.def( load##dimension.c_str(),                                       \
+        ( std::unique_ptr< PolygonalSurface< dimension > >( * )(               \
+            absl::string_view ) )                                              \
+            & load_polygonal_surface< dimension > )
 
 namespace geode
 {

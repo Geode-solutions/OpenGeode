@@ -55,6 +55,11 @@ namespace geode
 
     OpenGeodeGraph::OpenGeodeGraph() : impl_( *this ) {}
 
+    OpenGeodeGraph::OpenGeodeGraph( OpenGeodeGraph&& other )
+        : impl_( std::move( other.impl_ ) )
+    {
+    }
+
     OpenGeodeGraph::~OpenGeodeGraph() {} // NOLINT
 
     index_t OpenGeodeGraph::get_edge_vertex(

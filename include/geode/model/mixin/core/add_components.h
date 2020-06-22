@@ -43,5 +43,6 @@ namespace geode
     {
     protected:
         AddComponents() = default;
+        AddComponents( AddComponents&& ) = default;
     };
 } // namespace geode

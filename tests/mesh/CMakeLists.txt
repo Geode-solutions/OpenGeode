@@ -46,6 +46,12 @@ add_geode_test(
         ${PROJECT_NAME}::mesh
 )
 add_geode_test(
+    SOURCE "test-mesh-factory.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
     SOURCE "test-point-set.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
@@ -60,7 +66,21 @@ add_geode_test(
         ${PROJECT_NAME}::mesh
 )
 add_geode_test(
+    SOURCE "test-polygonal-surface-view.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
     SOURCE "test-polyhedral-solid.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
+    SOURCE "test-polyhedral-solid-view.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
@@ -98,7 +118,21 @@ add_geode_test(
         ${PROJECT_NAME}::mesh
 )
 add_geode_test(
+    SOURCE "test-tetrahedral-solid-view.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
     SOURCE "test-triangulated-surface.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
+    SOURCE "test-triangulated-surface-view.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry

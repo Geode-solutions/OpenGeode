@@ -40,22 +40,27 @@ namespace geode
     template < index_t dimension >
     class OpenGeodeEdgedCurve : public EdgedCurve< dimension >
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( OpenGeodeEdgedCurve );
+        OPENGEODE_DISABLE_COPY( OpenGeodeEdgedCurve );
         PASSKEY( OpenGeodeEdgedCurveBuilder< dimension >, OGEdgedCurveKey );
 
     public:
         OpenGeodeEdgedCurve();
         ~OpenGeodeEdgedCurve();
 
-        static MeshType type_name_static()
+        static MeshImpl impl_name_static()
         {
-            return MeshType{ absl::StrCat(
+            return MeshImpl{ absl::StrCat(
                 "OpenGeodeEdgedCurve", dimension, "D" ) };
+        }
+
+        MeshImpl impl_name() const override
+        {
+            return impl_name_static();
         }
 
         MeshType type_name() const override
         {
-            return type_name_static();
+            return EdgedCurve< dimension >::type_name_static();
         }
 
         static absl::string_view native_extension_static()

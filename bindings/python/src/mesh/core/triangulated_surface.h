@@ -27,7 +27,7 @@
     const auto name##dimension =                                               \
         "TriangulatedSurface" + std::to_string( dimension ) + "D";             \
     pybind11::class_< TriangulatedSurface##dimension##D,                       \
-        PolygonalSurface##dimension##D >( module, name##dimension.c_str() )    \
+        SurfaceMesh##dimension##D >( module, name##dimension.c_str() )         \
         .def_static( "create",                                                 \
             ( std::unique_ptr< TriangulatedSurface##dimension##D >( * )() )    \
                 & TriangulatedSurface##dimension##D::create )                  \

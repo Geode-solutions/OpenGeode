@@ -24,7 +24,7 @@
 #include <geode/mesh/core/tetrahedral_solid.h>
 
 #include <geode/mesh/builder/tetrahedral_solid_builder.h>
-#include <geode/mesh/core/geode_tetrahedral_solid.h>
+#include <geode/mesh/core/mesh_factory.h>
 
 namespace geode
 {
@@ -32,33 +32,24 @@ namespace geode
     std::unique_ptr< TetrahedralSolid< dimension > >
         TetrahedralSolid< dimension >::create()
     {
-        return std::unique_ptr< TetrahedralSolid< dimension > >{
-            new OpenGeodeTetrahedralSolid< dimension >
-        };
+        return MeshFactory::create_default_mesh<
+            TetrahedralSolid< dimension > >(
+            TetrahedralSolid< dimension >::type_name_static() );
     }
 
     template < index_t dimension >
     std::unique_ptr< TetrahedralSolid< dimension > >
-        TetrahedralSolid< dimension >::create( const MeshType& type )
+        TetrahedralSolid< dimension >::create( const MeshImpl& impl )
     {
-        try
-        {
-            return TetrahedralSolidFactory< dimension >::create( type );
-        }
-        catch( const OpenGeodeException& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeException{
-                "Could not create TetrahedralSolid data structure: ", type.get()
-            };
-        }
+        return MeshFactory::create_mesh< TetrahedralSolid< dimension > >(
+            impl );
     }
 
     template < index_t dimension >
     std::unique_ptr< TetrahedralSolid< dimension > >
         TetrahedralSolid< dimension >::clone() const
     {
-        auto clone = create( this->type_name() );
+        auto clone = create( this->impl_name() );
         auto builder = TetrahedralSolidBuilder< dimension >::create( *clone );
         builder->copy( *this, {} );
         return clone;

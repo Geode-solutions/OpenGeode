@@ -46,17 +46,9 @@ namespace geode
     {
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
 
-    public:
-        OpenGeodePolyhedralSolidBuilder(
-            PolyhedralSolid< dimension >& polyhedral_solid )
-            : PolyhedralSolidBuilder< dimension >( polyhedral_solid ),
-              geode_polyhedral_solid_(
-                  dynamic_cast< OpenGeodePolyhedralSolid< dimension >& >(
-                      polyhedral_solid ) )
-        {
-        }
-
     private:
+        void do_set_mesh( VertexSet& mesh ) final;
+
         void do_set_point(
             index_t vertex_id, const Point< dimension >& point ) final;
 
@@ -80,8 +72,11 @@ namespace geode
             const PolyhedronFacet& polyhedron_facet,
             index_t adjacent_id ) final;
 
+        void do_unset_polyhedron_adjacent(
+            const PolyhedronFacet& polyhedron_facet ) final;
+
     private:
-        OpenGeodePolyhedralSolid< dimension >& geode_polyhedral_solid_;
+        OpenGeodePolyhedralSolid< dimension >* geode_polyhedral_solid_;
     };
     ALIAS_3D( OpenGeodePolyhedralSolidBuilder );
 } // namespace geode

@@ -76,9 +76,10 @@ namespace geode
                     return components;
                 },
                 pybind11::return_value_policy::reference )
-            .def( "nb_internal_surface_corners", &Section::nb_internal_corners )
+            .def( "nb_internal_corners_of_surface",
+                &Section::nb_internal_corners )
             .def(
-                "internal_surface_corners",
+                "internal_corners_of_surface",
                 []( const Section& section, const Surface2D& surface ) {
                     std::vector< const Corner2D* > components;
                     for( const auto& component :
@@ -89,9 +90,9 @@ namespace geode
                     return components;
                 },
                 pybind11::return_value_policy::reference )
-            .def( "nb_internal_surface_lines", &Section::nb_internal_lines )
+            .def( "nb_internal_lines_of_surface", &Section::nb_internal_lines )
             .def(
-                "internal_surface_lines",
+                "internal_lines_of_surface",
                 []( const Section& section, const Surface2D& surface ) {
                     std::vector< const Line2D* > components;
                     for( const auto& component :
@@ -102,30 +103,30 @@ namespace geode
                     return components;
                 },
                 pybind11::return_value_policy::reference )
-            .def( "nb_embedded_corner_surfaces",
+            .def( "nb_embedding_surfaces_of_corner",
                 ( index_t( Section::* )( const Corner2D& ) const )
-                    & Section::nb_embedded_surfaces )
+                    & Section::nb_embedding_surfaces )
             .def(
-                "embedded_corner_surfaces",
+                "embedding_surfaces_of_corner",
                 []( const Section& section, const Corner2D& corner ) {
                     std::vector< const Surface2D* > components;
                     for( const auto& component :
-                        section.embedded_surfaces( corner ) )
+                        section.embedding_surfaces( corner ) )
                     {
                         components.push_back( &component );
                     }
                     return components;
                 },
                 pybind11::return_value_policy::reference )
-            .def( "nb_embedded_line_surfaces",
+            .def( "nb_embedding_surfaces_of_line",
                 ( index_t( Section::* )( const Line2D& ) const )
-                    & Section::nb_embedded_surfaces )
+                    & Section::nb_embedding_surfaces )
             .def(
-                "embedded_line_surfaces",
+                "embedding_surfaces_of_line",
                 []( const Section& section, const Line2D& line ) {
                     std::vector< const Surface2D* > components;
                     for( const auto& component :
-                        section.embedded_surfaces( line ) )
+                        section.embedding_surfaces( line ) )
                     {
                         components.push_back( &component );
                     }
@@ -133,10 +134,11 @@ namespace geode
                 },
                 pybind11::return_value_policy::reference )
             .def(
-                "items",
+                "model_boundary_items",
                 []( const Section& section, const ModelBoundary2D& boundary ) {
                     std::vector< const Line2D* > components;
-                    for( const auto& component : section.items( boundary ) )
+                    for( const auto& component :
+                        section.model_boundary_items( boundary ) )
                     {
                         components.push_back( &component );
                     }
@@ -157,7 +159,7 @@ namespace geode
             .def( "is_line_in_surface_internals",
                 ( bool ( Section::* )( const Line2D&, const Surface2D& ) const )
                     & Section::is_internal )
-            .def( "is_model_boundary_item", &Section::is_item )
+            .def( "is_model_boundary_item", &Section::is_model_boundary_item )
             .def( "bounding_box", &Section::bounding_box )
             .def( "native_extension", &Section::native_extension );
     }

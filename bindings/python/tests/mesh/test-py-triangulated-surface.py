@@ -43,7 +43,7 @@ def test_create_polygons(  surface, builder ):
 
 def test_polygon_adjacencies( surface, builder ):
     builder.compute_polygon_adjacencies()
-    if surface.polygon_adjacent( mesh.PolygonEdge( 0, 0 ) ) != basic.NO_ID:
+    if surface.polygon_adjacent( mesh.PolygonEdge( 0, 0 ) ):
         raise ValueError( "[Test] TriangulatedSurface adjacent index is not correct" )
     if surface.polygon_adjacent( mesh.PolygonEdge( 0, 1 ) ) != 1:
         raise ValueError( "[Test] TriangulatedSurface adjacent index is not correct" )
@@ -54,7 +54,7 @@ def test_polygon_adjacencies( surface, builder ):
 
     if surface.polygon_adjacent( mesh.PolygonEdge( 2, 2 ) ) != 1:
         raise ValueError( "[Test] TriangulatedSurface adjacent index is not correct" )
-    if surface.polygon_adjacent( mesh.PolygonEdge( 2, 0 ) ) != basic.NO_ID:
+    if surface.polygon_adjacent( mesh.PolygonEdge( 2, 0 ) ):
         raise ValueError( "[Test] TriangulatedSurface adjacent index is not correct" )
 
 def test_delete_vertex( surface, builder ):
@@ -90,8 +90,7 @@ def test_delete_polygon( surface, builder ):
 
 def test_io( surface, filename ):
     mesh.save_triangulated_surface3D( surface, filename )
-    new_surface = mesh.TriangulatedSurface3D.create()
-    mesh.load_triangulated_surface3D( new_surface, filename )
+    new_surface = mesh.load_triangulated_surface3D( filename )
 
 def test_clone( surface ):
     surface2 = surface.clone()

@@ -25,7 +25,7 @@
 
 #include <geode/basic/pimpl.h>
 
-#include <geode/mesh/core/mesh_type.h>
+#include <geode/mesh/core/mesh_id.h>
 
 #include <geode/model/common.h>
 
@@ -42,7 +42,7 @@ namespace geode
     template < index_t dimension >
     class opengeode_model_api ModelBoundaries
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( ModelBoundaries );
+        OPENGEODE_DISABLE_COPY( ModelBoundaries );
 
     public:
         using Builder = ModelBoundariesBuilder< dimension >;
@@ -90,6 +90,7 @@ namespace geode
 
     protected:
         ModelBoundaries();
+        ModelBoundaries( ModelBoundaries&& );
 
     private:
         class ModifiableModelBoundaryRange

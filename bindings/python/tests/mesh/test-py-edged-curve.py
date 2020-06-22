@@ -126,8 +126,7 @@ def test_delete_edge( edged_curve, builder ):
 
 def test_io( edged_curve, filename ):
     mesh.save_edged_curve3D( edged_curve, filename )
-    new_edged_curve = mesh.EdgedCurve3D.create()
-    mesh.load_edged_curve3D( new_edged_curve, filename )
+    new_edged_curve = mesh.load_edged_curve3D( filename )
 
 def test_edge_requests( edged_curve, builder ):
     if not edged_curve.edge_barycenter( 0 ).inexact_equal( geom.Point3D( [ 4.8, 7.3, 6.5 ] ), 1e-15 ):

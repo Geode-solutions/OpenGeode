@@ -82,13 +82,6 @@ namespace geode
                 .at( polyhedron_vertex.vertex_id );
         }
 
-        index_t get_polyhedron_facet_vertex(
-            const PolyhedronFacetVertex& polyhedron_facet_vertex ) const
-        {
-            return get_polyhedron_vertex(
-                get_polyhedron_facet_vertex_id( polyhedron_facet_vertex ) );
-        }
-
         PolyhedronVertex get_polyhedron_facet_vertex_id(
             const PolyhedronFacetVertex& polyhedron_facet_vertex ) const
         {
@@ -99,12 +92,17 @@ namespace geode
                 vertex_id };
         }
 
-        index_t get_polyhedron_adjacent(
+        absl::optional< index_t > get_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet ) const
         {
-            return tetrahedron_adjacents_
-                ->value( polyhedron_facet.polyhedron_id )
-                .at( polyhedron_facet.facet_id );
+            const auto adj =
+                tetrahedron_adjacents_->value( polyhedron_facet.polyhedron_id )
+                    .at( polyhedron_facet.facet_id );
+            if( adj == NO_ID )
+            {
+                return absl::nullopt;
+            }
+            return adj;
         }
 
         void set_polyhedron_vertex(
@@ -227,13 +225,6 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t OpenGeodeTetrahedralSolid< dimension >::get_polyhedron_facet_vertex(
-        const PolyhedronFacetVertex& polyhedron_facet_vertex ) const
-    {
-        return impl_->get_polyhedron_facet_vertex( polyhedron_facet_vertex );
-    }
-
-    template < index_t dimension >
     PolyhedronVertex
         OpenGeodeTetrahedralSolid< dimension >::get_polyhedron_facet_vertex_id(
             const PolyhedronFacetVertex& polyhedron_facet_vertex ) const
@@ -242,8 +233,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t OpenGeodeTetrahedralSolid< dimension >::get_polyhedron_adjacent(
-        const PolyhedronFacet& polyhedron_facet ) const
+    absl::optional< index_t >
+        OpenGeodeTetrahedralSolid< dimension >::get_polyhedron_adjacent(
+            const PolyhedronFacet& polyhedron_facet ) const
     {
         return impl_->get_polyhedron_adjacent( polyhedron_facet );
     }

@@ -1,5 +1,111 @@
 # Upgrade Guide
 
+## Upgrading from OpenGeode v4.x.x to v5.0.0
+
+### Motivations
+
+The main change of this release is a redesign of the Mesh class hierarchy. PolygonalSurface and TriangulatedSurface are now inherited from a new abstract class: SurfaceMesh. Same change for PolyhedralSolid and TetrahedralSolid with SolidMesh. This modification will ease addition of new mesh type classes.
+
+A second change is to remove all usage of constant expression NO_ID in the API. If a value is not supposed to be returned or initialized, we now return an optional value (e.g. polygon/polyhedron adjacent index is either the adjacent value or nothing).
+
+### Breaking Changes
+
+- **Model copy**: mappings between model components have been modified to open design to arbitrary collections. It means that you can add additional information to these mappings for your own copy functions.
+
+**How to upgrade**
+
+`ComponentMapping` has been moved out from `geode::BRep` and `geode::Section` and renamed `geode::detail::ModelCopyMapping` declares and defined in `include/geode/model/representation/builder/detail/copy.h`. 
+
+`geode::detail::ModelCopyMapping` works as a map whose keys are `geode::ComponentType`. It implies to get access to a specific mapping using for example:
+
+```
+const auto& corner_mapping = mappings.at( Corner3D::component_type_static() );
+```
+
+To add a mapping between two components, use:
+```
+auto& corner_mapping = mappings.at( Corner3D::component_type_static() );
+corner_mapping.emplace( uuid1, uuid2 );
+```
+
+To get a mapping between two components, use:
+```
+const auto& corner_mapping = mappings.at( Corner3D::component_type_static() );
+corner_mapping.in2out( uuid1 );
+```
+
+- **PolygonsAroundVertex**: use PolygonVertex instead of PolygonEdge: `using PolygonsAroundVertex = absl::InlinedVector< PolygonVertex, 10 >`
+
+**How to upgrade**
+
+When using element of `PolygonsAroundVertex` (before `PolygonEdge`, now `PolygonVertex`), use `vertex_id` instead of `edge_id`.
+
+- **Mesh loading**: mesh loading functions are now returning the mesh loaded from the filename.
+
+**How to upgrade**
+
+Remove the mesh parameter and get the return value. You can still use the MeshImpl to select which data structure to instanciate.
+
+Example
+
+from
+
+```
+auto new_edged_curve = geode::EdgedCurve3D::create();
+or
+auto new_edged_curve = geode::EdgedCurve3D::create( geode::OpenGeodeEdgedCurve3D::type_name_static() );
+
+load_edged_curve( *new_edged_curve, filename );
+```
+
+to 
+
+```
+auto new_edged_curve = geode::load_edged_curve< 3 >( filename );
+or
+auto new_edged_curve = geode::load_edged_curve< 3 >( geode::OpenGeodeEdgedCurve3D::type_name_static(), filename );
+```
+
+- **Mesh & Builder factories**: Mesh and MeshBuilder factories has been merged into one.
+
+**How to upgrade**
+
+Example for PointSet:
+
+from
+
+```
+PointSetFactory2D::register_creator< OpenGeodePointSet2D >( OpenGeodePointSet2D::type_name_static() );
+
+and
+
+PointSetBuilderFactory2D::register_creator< OpenGeodePointSetBuilder2D >( OpenGeodePointSet2D::type_name_static() );
+```
+
+to 
+
+```
+MeshFactory::register_mesh< OpenGeodePointSet2D >( PointSet2D::type_name_static(), OpenGeodePointSet2D::impl_name_static() );
+or
+MeshFactory::register_default_mesh< OpenGeodePointSet2D >( PointSet2D::type_name_static(), OpenGeodePointSet2D::impl_name_static() );
+
+and
+
+MeshBuilderFactory::register_mesh_builder< OpenGeodePointSetBuilder2D >( OpenGeodePointSet2D::impl_name_static() );
+```
+- **Embedding relationship**: renaming `BRep`and `Section` item-related methods for removing overloading of derived class method in the aim to simplify client code syntax
+
+**How to upgrade**
+
+For example, replace in `Section` and `BRep`: `geode::Section::items(...)` by `geode::Section::model_boundary_items(...)` 
+
+
+- **Embedding relationship**: renaming embedded relationship to embedding relationship for better meaning
+
+**How to upgrade**
+
+For example, replace in `Section` and `BRep`: `geode::Section::embedded_surfaces(...)` by `geode::Section::embedding_surfaces(...)` 
+
 ## Upgrading from OpenGeode v3.x.x to v4.0.0
 
 ### Motivations
@@ -326,4 +432,3 @@ vertex_identifier.remove_component( line.id() );
 const geode::Line3D& line = get_a_line();
 vertex_identifier.remove_component( line );
 ```
-

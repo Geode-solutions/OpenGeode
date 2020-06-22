@@ -28,7 +28,7 @@
 
 #include <geode/basic/passkey.h>
 
-#include <geode/mesh/builder/polygonal_surface_builder.h>
+#include <geode/mesh/builder/surface_mesh_builder.h>
 #include <geode/mesh/common.h>
 
 namespace geode
@@ -42,8 +42,7 @@ namespace geode
      * Interface class to represent the builder of a TriangulatedSurface
      */
     template < index_t dimension >
-    class TriangulatedSurfaceBuilder
-        : public PolygonalSurfaceBuilder< dimension >
+    class TriangulatedSurfaceBuilder : public SurfaceMeshBuilder< dimension >
     {
         PASSKEY( TriangulatedSurface< dimension >, BuilderKey );
 
@@ -82,13 +81,11 @@ namespace geode
             copy( triangulated_surface );
         }
 
+        void set_mesh(
+            TriangulatedSurface< dimension >& mesh, MeshBuilderFactoryKey key );
+
     protected:
-        TriangulatedSurfaceBuilder(
-            TriangulatedSurface< dimension >& triangulated_surface )
-            : PolygonalSurfaceBuilder< dimension >( triangulated_surface ),
-              triangulated_surface_( triangulated_surface )
-        {
-        }
+        TriangulatedSurfaceBuilder() = default;
 
         void copy(
             const TriangulatedSurface< dimension >& triangulated_surface );
@@ -102,13 +99,7 @@ namespace geode
         virtual void do_create_triangles( index_t nb ) = 0;
 
     private:
-        TriangulatedSurface< dimension >& triangulated_surface_;
+        TriangulatedSurface< dimension >* triangulated_surface_;
     };
     ALIAS_2D_AND_3D( TriangulatedSurfaceBuilder );
-
-    template < index_t dimension >
-    using TriangulatedSurfaceBuilderFactory = Factory< MeshType,
-        TriangulatedSurfaceBuilder< dimension >,
-        TriangulatedSurface< dimension >& >;
-    ALIAS_2D_AND_3D( TriangulatedSurfaceBuilderFactory );
 } // namespace geode

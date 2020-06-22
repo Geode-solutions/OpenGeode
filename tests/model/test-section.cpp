@@ -32,12 +32,12 @@
 #include <geode/mesh/core/geode_polyhedral_solid.h>
 #include <geode/mesh/core/point_set.h>
 
-#include <geode/model/mixin/core/block.h>
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/detail/count_relationships.h>
 #include <geode/model/mixin/core/line.h>
 #include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
+#include <geode/model/representation/builder/detail/copy.h>
 #include <geode/model/representation/builder/section_builder.h>
 #include <geode/model/representation/core/section.h>
 #include <geode/model/representation/io/section_input.h>
@@ -54,7 +54,7 @@ std::array< geode::uuid, 5 > add_corners(
         uuids[c] = builder.add_corner();
     }
     const auto& temp_corner = model.corner(
-        builder.add_corner( geode::OpenGeodePointSet2D::type_name_static() ) );
+        builder.add_corner( geode::OpenGeodePointSet2D::impl_name_static() ) );
     builder.remove_corner( temp_corner );
     const auto message =
         absl::StrCat( "[Test] Section should have ", 5, " corners" );
@@ -73,7 +73,7 @@ std::array< geode::uuid, 6 > add_lines(
         uuids[l] = builder.add_line();
     }
     const auto& temp_line = model.line(
-        builder.add_line( geode::OpenGeodeEdgedCurve2D::type_name_static() ) );
+        builder.add_line( geode::OpenGeodeEdgedCurve2D::impl_name_static() ) );
     builder.remove_line( temp_line );
     const auto message =
         absl::StrCat( "[Test] Section should have ", 6, " lines" );
@@ -92,7 +92,7 @@ std::array< geode::uuid, 2 > add_surfaces(
         uuids[s] = builder.add_surface();
     }
     const auto& temp_surface = model.surface( builder.add_surface(
-        geode::OpenGeodePolygonalSurface2D::type_name_static() ) );
+        geode::OpenGeodePolygonalSurface2D::impl_name_static() ) );
     builder.remove_surface( temp_surface );
     const auto message =
         absl::StrCat( "[Test] Section should have ", 2, " surfaces" );
@@ -250,7 +250,7 @@ void add_internal_corner_relations( const geode::Section& model,
     for( const auto& corner_id : corner_uuids )
     {
         for( const auto& embedding :
-            model.embedded_surfaces( model.corner( corner_id ) ) )
+            model.embedding_surfaces( model.corner( corner_id ) ) )
         {
             OPENGEODE_EXCEPTION( surface_uuids.front() == embedding.id(),
                 "[Test] All Corners embeddings should be Surfaces" );
@@ -261,7 +261,7 @@ void add_internal_corner_relations( const geode::Section& model,
         OPENGEODE_EXCEPTION( model.nb_embeddings( corner_id ) == 1,
             "[Test] All Corners should be embedded to 1 Surface" );
         OPENGEODE_EXCEPTION(
-            model.nb_embedded_surfaces( model.corner( corner_id ) ) == 1,
+            model.nb_embedding_surfaces( model.corner( corner_id ) ) == 1,
             "[Test] All Corners should be embedded to 1 Surface" );
     }
 }
@@ -280,7 +280,7 @@ void add_internal_line_relations( const geode::Section& model,
     for( const auto& line_id : line_uuids )
     {
         for( const auto& embedding :
-            model.embedded_surfaces( model.line( line_id ) ) )
+            model.embedding_surfaces( model.line( line_id ) ) )
         {
             OPENGEODE_EXCEPTION( surface_uuids.front() == embedding.id(),
                 "[Test] All Lines embeddings should be Surfaces" );
@@ -291,7 +291,7 @@ void add_internal_line_relations( const geode::Section& model,
         OPENGEODE_EXCEPTION( model.nb_embeddings( line_id ) == 1,
             "[Test] All Lines should be embedded to 1 Surface" );
         OPENGEODE_EXCEPTION(
-            model.nb_embedded_surfaces( model.line( line_id ) ) == 1,
+            model.nb_embedding_surfaces( model.line( line_id ) ) == 1,
             "[Test] All Lines should be embedded to 1 Surface" );
     }
 }
@@ -367,14 +367,14 @@ void test_item_ranges( const geode::Section& model,
     absl::Span< const geode::uuid > boundary_uuids )
 {
     geode::index_t boundary_item_count{ 0 };
-    for( const auto& boundary_item :
-        model.items( model.model_boundary( boundary_uuids[1] ) ) )
+    for( const auto& boundary_item : model.model_boundary_items(
+             model.model_boundary( boundary_uuids[1] ) ) )
     {
         boundary_item_count++;
         OPENGEODE_EXCEPTION( boundary_item.id() == line_uuids[1]
                                  || boundary_item.id() == line_uuids[2],
             "[Test] ItemLineRange iteration result is not correct" );
-        OPENGEODE_EXCEPTION( model.is_item( boundary_item,
+        OPENGEODE_EXCEPTION( model.is_model_boundary_item( boundary_item,
                                  model.model_boundary( boundary_uuids[1] ) ),
             "[Test] Line should be item of ModelBoundary" );
     }
@@ -396,8 +396,8 @@ void test_clone( const geode::Section& section )
     OPENGEODE_EXCEPTION( section2.nb_model_boundaries() == 2,
         "[Test] Section should have 2 model boundaries" );
 
-    const auto mapping = builder.copy_components( section );
-    builder.copy_component_relationships( mapping, section );
+    const auto mappings = builder.copy_components( section );
+    builder.copy_component_relationships( mappings, section );
     OPENGEODE_EXCEPTION(
         section2.nb_corners() == 10, "[Test] Section should have 10 corners" );
     OPENGEODE_EXCEPTION(
@@ -409,14 +409,17 @@ void test_clone( const geode::Section& section )
 
     for( const auto& corner : section.corners() )
     {
-        const auto& new_corner =
-            section2.corner( mapping.corners.at( corner.id() ) );
+        const auto& new_corner = section2.corner(
+            mappings.at( geode::Corner2D::component_type_static() )
+                .in2out( corner.id() ) );
         for( const auto& line : section.incidences( corner ) )
         {
             bool found = { false };
             for( const auto& new_line : section2.incidences( new_corner ) )
             {
-                if( mapping.lines.at( line.id() ) == new_line.id() )
+                if( mappings.at( geode::Line2D::component_type_static() )
+                        .in2out( line.id() )
+                    == new_line.id() )
                 {
                     found = true;
                     break;
@@ -428,13 +431,17 @@ void test_clone( const geode::Section& section )
     }
     for( const auto& line : section.lines() )
     {
-        const auto& new_line = section2.line( mapping.lines.at( line.id() ) );
+        const auto& new_line =
+            section2.line( mappings.at( geode::Line2D::component_type_static() )
+                               .in2out( line.id() ) );
         for( const auto& surface : section.incidences( line ) )
         {
             bool found = { false };
             for( const auto& new_surface : section2.incidences( new_line ) )
             {
-                if( mapping.surfaces.at( surface.id() ) == new_surface.id() )
+                if( mappings.at( geode::Surface2D::component_type_static() )
+                        .in2out( surface.id() )
+                    == new_surface.id() )
                 {
                     found = true;
                     break;
@@ -447,13 +454,17 @@ void test_clone( const geode::Section& section )
     for( const auto& model_boundary : section.model_boundaries() )
     {
         const auto& new_model_boundary = section2.model_boundary(
-            mapping.model_boundaries.at( model_boundary.id() ) );
-        for( const auto& line : section.items( model_boundary ) )
+            mappings.at( geode::ModelBoundary2D::component_type_static() )
+                .in2out( model_boundary.id() ) );
+        for( const auto& line : section.model_boundary_items( model_boundary ) )
         {
             bool found = { false };
-            for( const auto& new_line : section2.items( new_model_boundary ) )
+            for( const auto& new_line :
+                section2.model_boundary_items( new_model_boundary ) )
             {
-                if( mapping.lines.at( line.id() ) == new_line.id() )
+                if( mappings.at( geode::Line2D::component_type_static() )
+                        .in2out( line.id() )
+                    == new_line.id() )
                 {
                     found = true;
                     break;
@@ -463,6 +474,30 @@ void test_clone( const geode::Section& section )
                 "[Test] All ModelBoundaries incidences are not correct" );
         }
     }
+}
+
+void test_reloaded_section( const geode::Section& model )
+{
+    OPENGEODE_EXCEPTION( model.nb_corners() == 5,
+        "[Test] Number of Corners in reloaded Section should be 5" );
+    OPENGEODE_EXCEPTION( model.nb_lines() == 6,
+        "[Test] Number of Lines in reloaded Section should be 6" );
+    OPENGEODE_EXCEPTION( model.nb_surfaces() == 2,
+        "[Test] Number of Surfaces in reloaded Section should be 2" );
+    OPENGEODE_EXCEPTION( model.nb_model_boundaries() == 2,
+        "[Test] Number of Boundaries in reloaded Section should be 2" );
+}
+
+void test_moved_section( const geode::Section& model )
+{
+    OPENGEODE_EXCEPTION( model.nb_corners() == 5,
+        "[Test] Number of Corners in moved Section should be 5" );
+    OPENGEODE_EXCEPTION( model.nb_lines() == 6,
+        "[Test] Number of Lines in moved Section should be 6" );
+    OPENGEODE_EXCEPTION( model.nb_surfaces() == 2,
+        "[Test] Number of Surfaces in moved Section should be 2" );
+    OPENGEODE_EXCEPTION( model.nb_model_boundaries() == 2,
+        "[Test] Number of Boundaries in moved Section should be 2" );
 }
 
 void test()
@@ -501,6 +536,10 @@ void test()
 
     geode::Section model2;
     geode::load_section( model2, file_io );
+    test_reloaded_section( model2 );
+
+    geode::Section model3{ std::move( model2 ) };
+    test_moved_section( model3 );
 }
 
 OPENGEODE_TEST( "section" )

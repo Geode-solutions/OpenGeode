@@ -144,14 +144,14 @@ namespace geode
             const Section& section_;
         };
 
-        class opengeode_model_api EmbeddedSurfaceRange
+        class opengeode_model_api EmbeddingSurfaceRange
             : public Relationships::EmbeddingRangeIterator,
-              public BeginEnd< EmbeddedSurfaceRange >
+              public BeginEnd< EmbeddingSurfaceRange >
         {
         public:
-            EmbeddedSurfaceRange( const Section& section, const Line2D& line );
+            EmbeddingSurfaceRange( const Section& section, const Line2D& line );
 
-            EmbeddedSurfaceRange(
+            EmbeddingSurfaceRange(
                 const Section& section, const Corner2D& corner );
 
             void operator++();
@@ -193,15 +193,17 @@ namespace geode
 
         InternalLineRange internal_lines( const Surface2D& surface ) const;
 
-        index_t nb_embedded_surfaces( const Corner2D& corner ) const;
+        index_t nb_embedding_surfaces( const Corner2D& corner ) const;
 
-        EmbeddedSurfaceRange embedded_surfaces( const Corner2D& corner ) const;
+        EmbeddingSurfaceRange embedding_surfaces(
+            const Corner2D& corner ) const;
 
-        index_t nb_embedded_surfaces( const Line2D& line ) const;
+        index_t nb_embedding_surfaces( const Line2D& line ) const;
 
-        EmbeddedSurfaceRange embedded_surfaces( const Line2D& line ) const;
+        EmbeddingSurfaceRange embedding_surfaces( const Line2D& line ) const;
 
-        ItemLineRange items( const ModelBoundary2D& boundary ) const;
+        ItemLineRange model_boundary_items(
+            const ModelBoundary2D& boundary ) const;
 
         bool is_closed( const Line2D& line ) const;
 
@@ -214,7 +216,7 @@ namespace geode
 
         bool is_internal( const Line2D& line, const Surface2D& surface ) const;
 
-        bool is_item(
+        bool is_model_boundary_item(
             const Line2D& line, const ModelBoundary2D& boundary ) const;
 
         /*!

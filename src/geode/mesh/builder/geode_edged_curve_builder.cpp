@@ -28,10 +28,17 @@
 namespace geode
 {
     template < index_t dimension >
+    void OpenGeodeEdgedCurveBuilder< dimension >::do_set_mesh( VertexSet& mesh )
+    {
+        geode_edged_curve_ =
+            &dynamic_cast< OpenGeodeEdgedCurve< dimension >& >( mesh );
+    }
+
+    template < index_t dimension >
     void OpenGeodeEdgedCurveBuilder< dimension >::do_set_point(
         index_t vertex_id, const Point< dimension >& point )
     {
-        geode_edged_curve_.set_vertex( vertex_id, point, {} );
+        geode_edged_curve_->set_vertex( vertex_id, point, {} );
     }
 
     template < index_t dimension >
@@ -55,7 +62,7 @@ namespace geode
     void OpenGeodeEdgedCurveBuilder< dimension >::do_set_edge_vertex(
         const EdgeVertex& edge_vertex, index_t vertex_id )
     {
-        geode_edged_curve_.set_edge_vertex( edge_vertex, vertex_id, {} );
+        geode_edged_curve_->set_edge_vertex( edge_vertex, vertex_id, {} );
     }
 
     template < index_t dimension >

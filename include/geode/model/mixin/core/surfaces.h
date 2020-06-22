@@ -25,7 +25,7 @@
 
 #include <geode/basic/pimpl.h>
 
-#include <geode/mesh/core/mesh_type.h>
+#include <geode/mesh/core/mesh_id.h>
 
 #include <geode/model/common.h>
 
@@ -42,7 +42,7 @@ namespace geode
     template < index_t dimension >
     class opengeode_model_api Surfaces
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( Surfaces );
+        OPENGEODE_DISABLE_COPY( Surfaces );
 
     public:
         using Builder = SurfacesBuilder< dimension >;
@@ -88,6 +88,7 @@ namespace geode
 
     protected:
         Surfaces();
+        Surfaces( Surfaces&& );
 
     private:
         class ModifiableSurfaceRange : public SurfaceRangeBase,
@@ -102,7 +103,7 @@ namespace geode
     private:
         const uuid& create_surface();
 
-        const uuid& create_surface( const MeshType& type );
+        const uuid& create_surface( const MeshImpl& impl );
 
         void delete_surface( const Surface< dimension >& surface );
 

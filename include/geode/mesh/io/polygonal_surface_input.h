@@ -38,12 +38,21 @@ namespace geode
     /*!
      * API function for loading an PolygonalSurface.
      * The adequate loader is called depending on the filename extension.
-     * @param[out] polygonal_surface Loaded PolygonalSurface.
+     * @param[in] impl Data structure implementation.
      * @param[in] filename Path to the file to load.
      */
     template < index_t dimension >
-    void load_polygonal_surface(
-        PolygonalSurface< dimension >& polygonal_surface,
+    std::unique_ptr< PolygonalSurface< dimension > > load_polygonal_surface(
+        const MeshImpl& impl, absl::string_view filename );
+
+    /*!
+     * API function for loading an PolygonalSurface.
+     * The adequate loader is called depending on the filename extension.
+     * Default data structure implémentation is used.
+     * @param[in] filename Path to the file to load.
+     */
+    template < index_t dimension >
+    std::unique_ptr< PolygonalSurface< dimension > > load_polygonal_surface(
         absl::string_view filename );
 
     template < index_t dimension >

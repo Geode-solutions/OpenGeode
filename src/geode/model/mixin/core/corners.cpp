@@ -47,6 +47,12 @@ namespace geode
     }
 
     template < index_t dimension >
+    Corners< dimension >::Corners( Corners&& other )
+        : impl_( std::move( other.impl_ ) )
+    {
+    }
+
+    template < index_t dimension >
     Corners< dimension >::~Corners() // NOLINT
     {
     }
@@ -90,17 +96,13 @@ namespace geode
     void Corners< dimension >::load_corners( absl::string_view directory )
     {
         impl_->load_components( absl::StrCat( directory, "/corners" ) );
-
-        const auto prefix = absl::StrCat( directory, "/",
-            Corner< dimension >::component_type_static().get() );
         for( auto& corner : modifiable_corners() )
         {
-            corner.ensure_mesh_type( {} );
-            auto& mesh = corner.modifiable_mesh(
+            const auto file =
+                impl_->find_file( directory, corner.component_id() );
+            corner.set_mesh(
+                load_point_set< dimension >( corner.mesh_type(), file ),
                 typename Corner< dimension >::CornersKey{} );
-            const auto file = absl::StrCat(
-                prefix, corner.id().string(), ".", mesh.native_extension() );
-            load_point_set( mesh, file );
         }
     }
 
@@ -131,11 +133,11 @@ namespace geode
     }
 
     template < index_t dimension >
-    const uuid& Corners< dimension >::create_corner( const MeshType& type )
+    const uuid& Corners< dimension >::create_corner( const MeshImpl& impl )
     {
         typename Corners< dimension >::Impl::ComponentPtr corner{
             new Corner< dimension >{
-                type, typename Corner< dimension >::CornersKey{} }
+                impl, typename Corner< dimension >::CornersKey{} }
         };
         const auto& id = corner->id();
         impl_->add_component( std::move( corner ) );
@@ -177,7 +179,7 @@ namespace geode
     template < index_t dimension >
     Corners< dimension >::CornerRangeBase::CornerRangeBase(
         CornerRangeBase&& other ) noexcept
-        : impl_( std::move( *other.impl_ ) )
+        : impl_( std::move( other.impl_ ) )
     {
     }
 

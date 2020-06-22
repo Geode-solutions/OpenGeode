@@ -26,7 +26,9 @@
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
 
+#include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polygonal_surface.h>
+#include <geode/mesh/core/surface_mesh.h>
 
 #include <geode/model/mixin/core/detail/mesh_storage.h>
 
@@ -34,7 +36,7 @@ namespace geode
 {
     template < index_t dimension >
     class Surface< dimension >::Impl
-        : public detail::MeshStorage< PolygonalSurface< dimension > >
+        : public detail::MeshStorage< SurfaceMesh< dimension > >
     {
     private:
         friend class bitsery::Access;
@@ -45,7 +47,7 @@ namespace geode
                 []( Archive& archive, Impl& impl ) {
                     archive.ext(
                         impl, bitsery::ext::BaseClass< detail::MeshStorage<
-                                  PolygonalSurface< dimension > > >{} );
+                                  SurfaceMesh< dimension > > >{} );
                 } );
         }
     };
@@ -56,33 +58,40 @@ namespace geode
     }
 
     template < index_t dimension >
+    Surface< dimension >::Surface( Surface< dimension >&& other )
+        : impl_( std::move( other.impl_ ) )
+    {
+    }
+
+    template < index_t dimension >
     Surface< dimension >::Surface()
+        : Surface( MeshFactory::default_impl(
+            PolygonalSurface< dimension >::type_name_static() ) )
     {
-        impl_->set_mesh( PolygonalSurface< dimension >::create() );
     }
 
     template < index_t dimension >
-    Surface< dimension >::Surface( const MeshType& type )
+    Surface< dimension >::Surface( const MeshImpl& impl )
     {
-        impl_->set_mesh( PolygonalSurface< dimension >::create( type ) );
+        impl_->set_mesh( SurfaceMesh< dimension >::create( impl ) );
     }
 
     template < index_t dimension >
-    const PolygonalSurface< dimension >& Surface< dimension >::mesh() const
+    const SurfaceMesh< dimension >& Surface< dimension >::mesh() const
     {
         return impl_->mesh();
     }
 
     template < index_t dimension >
-    PolygonalSurface< dimension >& Surface< dimension >::modifiable_mesh()
+    SurfaceMesh< dimension >& Surface< dimension >::modifiable_mesh()
     {
         return impl_->modifiable_mesh();
     }
 
     template < index_t dimension >
-    void Surface< dimension >::ensure_mesh_type( SurfacesKey )
+    const MeshImpl& Surface< dimension >::mesh_type() const
     {
-        return impl_->ensure_mesh_type();
+        return impl_->mesh_type();
     }
 
     template < index_t dimension >
@@ -99,8 +108,14 @@ namespace geode
 
     template < index_t dimension >
     void Surface< dimension >::set_mesh(
-        std::unique_ptr< PolygonalSurface< dimension > > mesh,
-        SurfacesBuilderKey )
+        std::unique_ptr< SurfaceMesh< dimension > > mesh, SurfacesKey )
+    {
+        impl_->set_mesh( std::move( mesh ) );
+    }
+
+    template < index_t dimension >
+    void Surface< dimension >::set_mesh(
+        std::unique_ptr< SurfaceMesh< dimension > > mesh, SurfacesBuilderKey )
     {
         impl_->set_mesh( std::move( mesh ) );
     }

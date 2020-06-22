@@ -40,7 +40,7 @@ namespace geode
     template < index_t dimension >
     class OpenGeodePolyhedralSolid : public PolyhedralSolid< dimension >
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( OpenGeodePolyhedralSolid );
+        OPENGEODE_DISABLE_COPY( OpenGeodePolyhedralSolid );
         PASSKEY( OpenGeodePolyhedralSolidBuilder< dimension >,
             OGPolyhedralSolidKey );
 
@@ -48,15 +48,20 @@ namespace geode
         OpenGeodePolyhedralSolid();
         ~OpenGeodePolyhedralSolid();
 
-        static MeshType type_name_static()
+        static MeshImpl impl_name_static()
         {
-            return MeshType{ absl::StrCat(
+            return MeshImpl{ absl::StrCat(
                 "OpenGeodePolyhedralSolid", dimension, "D" ) };
+        }
+
+        MeshImpl impl_name() const override
+        {
+            return impl_name_static();
         }
 
         MeshType type_name() const override
         {
-            return type_name_static();
+            return PolyhedralSolid< dimension >::type_name_static();
         }
 
         static absl::string_view native_extension_static()
@@ -109,15 +114,11 @@ namespace geode
         index_t get_nb_polyhedron_facet_vertices(
             const PolyhedronFacet& polyhedron_facet ) const override;
 
-        index_t get_polyhedron_facet_vertex(
-            const PolyhedronFacetVertex& polyhedron_facet_vertex )
-            const override;
-
         PolyhedronVertex get_polyhedron_facet_vertex_id(
             const PolyhedronFacetVertex& polyhedron_facet_vertex )
             const override;
 
-        index_t get_polyhedron_adjacent(
+        absl::optional< index_t > get_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet ) const override;
 
     private:

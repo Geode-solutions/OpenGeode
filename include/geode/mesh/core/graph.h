@@ -98,9 +98,14 @@ namespace geode
 
         /*!
          * Create a new Graph using a specified data structure.
-         * @param[in] type Data structure type
+         * @param[in] impl Data structure implementation
          */
-        static std::unique_ptr< Graph > create( const MeshType& type );
+        static std::unique_ptr< Graph > create( const MeshImpl& impl );
+
+        static MeshType type_name_static()
+        {
+            return MeshType{ "Graph" };
+        }
 
         std::unique_ptr< Graph > clone() const;
 
@@ -133,6 +138,7 @@ namespace geode
 
     protected:
         Graph();
+        Graph( Graph&& );
 
     private:
         friend class bitsery::Access;
@@ -144,6 +150,4 @@ namespace geode
     private:
         IMPLEMENTATION_MEMBER( impl_ );
     };
-
-    using GraphFactory = Factory< MeshType, Graph >;
 } // namespace geode

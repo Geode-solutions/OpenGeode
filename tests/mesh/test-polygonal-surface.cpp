@@ -144,8 +144,7 @@ void test_polygon_adjacencies(
     geode::PolygonalSurfaceBuilder3D& builder )
 {
     builder.compute_polygon_adjacencies();
-    OPENGEODE_EXCEPTION(
-        polygonal_surface.polygon_adjacent( { 0, 0 } ) == geode::NO_ID,
+    OPENGEODE_EXCEPTION( !polygonal_surface.polygon_adjacent( { 0, 0 } ),
         "[Test] PolygonalSurface adjacent index is not correct" );
     OPENGEODE_EXCEPTION( polygonal_surface.polygon_adjacent( { 0, 1 } ) == 1,
         "[Test] PolygonalSurface adjacent index is not correct" );
@@ -158,8 +157,7 @@ void test_polygon_adjacencies(
                              == polygonal_surface.polygon_edge( { 1, 3 } ),
         "[Test] PolygonalSurface edge indices is not correct" );
 
-    OPENGEODE_EXCEPTION(
-        polygonal_surface.polygon_adjacent( { 2, 0 } ) == geode::NO_ID,
+    OPENGEODE_EXCEPTION( !polygonal_surface.polygon_adjacent( { 2, 0 } ),
         "[Test] PolygonalSurface adjacent index is not correct" );
     OPENGEODE_EXCEPTION( polygonal_surface.polygon_adjacent( { 2, 3 } ) == 1,
         "[Test] PolygonalSurface adjacent index is not correct" );
@@ -267,7 +265,7 @@ void test_polygon_barycenter(
 void test_polygon_area()
 {
     auto polygonal_surface = geode::PolygonalSurface2D::create(
-        geode::OpenGeodePolygonalSurface2D::type_name_static() );
+        geode::OpenGeodePolygonalSurface2D::impl_name_static() );
     auto builder =
         geode::PolygonalSurfaceBuilder2D::create( *polygonal_surface );
     const double a{ 6.0 };
@@ -289,7 +287,7 @@ void test_polygon_area()
 void test_polygon_normal()
 {
     auto polygonal_surface = geode::PolygonalSurface3D::create(
-        geode::OpenGeodePolygonalSurface3D::type_name_static() );
+        geode::OpenGeodePolygonalSurface3D::impl_name_static() );
     auto builder =
         geode::PolygonalSurfaceBuilder3D::create( *polygonal_surface );
     const double a{ 6.0 };
@@ -311,7 +309,7 @@ void test_polygon_normal()
 void test_polygon_vertex_normal()
 {
     auto polygonal_surface = geode::PolygonalSurface3D::create(
-        geode::OpenGeodePolygonalSurface3D::type_name_static() );
+        geode::OpenGeodePolygonalSurface3D::impl_name_static() );
     auto builder =
         geode::PolygonalSurfaceBuilder3D::create( *polygonal_surface );
 
@@ -333,10 +331,10 @@ void test_polygon_vertex_normal()
 void test_io( const geode::PolygonalSurface3D& polygonal_surface,
     const std::string& filename )
 {
-    save_polygonal_surface( polygonal_surface, filename );
-    auto new_polygonal_surface = geode::PolygonalSurface3D::create(
-        geode::OpenGeodePolygonalSurface3D::type_name_static() );
-    load_polygonal_surface( *new_polygonal_surface, filename );
+    geode::save_polygonal_surface( polygonal_surface, filename );
+    geode::load_polygonal_surface< 3 >( filename );
+    auto new_polygonal_surface = geode::load_polygonal_surface< 3 >(
+        geode::OpenGeodePolygonalSurface3D::impl_name_static(), filename );
 
     OPENGEODE_EXCEPTION( new_polygonal_surface->nb_vertices() == 7,
         "[Test] Reloaded PolygonalSurface should have 7 vertices" );
@@ -436,10 +434,23 @@ void test_delete_all( const geode::PolygonalSurface3D& polygonal_surface,
         "[Test] PolygonalSurface should have 0 vertex" );
 }
 
+void test_backward_io( const std::string& filename )
+{
+    const auto new_polygonal_surface = geode::load_polygonal_surface< 3 >(
+        geode::OpenGeodePolygonalSurface3D::impl_name_static(), filename );
+
+    OPENGEODE_EXCEPTION( new_polygonal_surface->nb_vertices() == 7,
+        "[Test] Reloaded PolygonalSurface should have 7 vertices" );
+    OPENGEODE_EXCEPTION( new_polygonal_surface->nb_edges() == 9,
+        "[Test] Reloaded PolygonalSurface should have 9 edges" );
+    OPENGEODE_EXCEPTION( new_polygonal_surface->nb_polygons() == 3,
+        "[Test] Reloaded PolygonalSurface should have 3 polygons" );
+}
+
 void test()
 {
     auto polygonal_surface = geode::PolygonalSurface3D::create(
-        geode::OpenGeodePolygonalSurface3D::type_name_static() );
+        geode::OpenGeodePolygonalSurface3D::impl_name_static() );
     auto builder =
         geode::PolygonalSurfaceBuilder3D::create( *polygonal_surface );
 
@@ -459,6 +470,8 @@ void test()
 
     test_io( *polygonal_surface,
         absl::StrCat( "test.", polygonal_surface->native_extension() ) );
+    test_backward_io( absl::StrCat( geode::data_path, "/test_v4.",
+        polygonal_surface->native_extension() ) );
 
     test_replace_vertex( *polygonal_surface, *builder );
     test_delete_vertex( *polygonal_surface, *builder );

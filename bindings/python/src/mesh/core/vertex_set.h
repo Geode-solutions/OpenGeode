@@ -38,6 +38,6 @@ namespace geode
             .def( "vertex_attribute_manager",
                 &VertexSet::vertex_attribute_manager,
                 pybind11::return_value_policy::reference )
-            .def( "type_name", &VertexSet::type_name );
+            .def( "impl_name", &VertexSet::impl_name );
     }
 } // namespace geode

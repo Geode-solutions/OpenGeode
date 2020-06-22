@@ -24,19 +24,22 @@
 #include <geode/mesh/io/edged_curve_input.h>
 
 #include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/core/mesh_factory.h>
 
 namespace geode
 {
     template < index_t dimension >
-    void load_edged_curve(
-        EdgedCurve< dimension >& edged_curve, absl::string_view filename )
+    std::unique_ptr< EdgedCurve< dimension > > load_edged_curve(
+        const MeshImpl& impl, absl::string_view filename )
     {
         try
         {
+            auto edged_curve = EdgedCurve< dimension >::create( impl );
             auto input = EdgedCurveInputFactory< dimension >::create(
-                extension_from_filename( filename ).data(), edged_curve,
+                extension_from_filename( filename ).data(), *edged_curve,
                 filename );
             input->read();
+            return edged_curve;
         }
         catch( const OpenGeodeException& e )
         {
@@ -47,16 +50,31 @@ namespace geode
     }
 
     template < index_t dimension >
+    std::unique_ptr< EdgedCurve< dimension > > load_edged_curve(
+        absl::string_view filename )
+    {
+        return load_edged_curve< dimension >(
+            MeshFactory::default_impl(
+                EdgedCurve< dimension >::type_name_static() ),
+            filename );
+    }
+
+    template < index_t dimension >
     EdgedCurveInput< dimension >::EdgedCurveInput(
         EdgedCurve< dimension >& edged_curve, absl::string_view filename )
         : GraphInput( edged_curve, filename ), edged_curve_( edged_curve )
     {
     }
 
-    template void opengeode_mesh_api load_edged_curve(
-        EdgedCurve< 2 >&, absl::string_view );
-    template void opengeode_mesh_api load_edged_curve(
-        EdgedCurve< 3 >&, absl::string_view );
+    template std::unique_ptr< EdgedCurve< 2 > > opengeode_mesh_api
+        load_edged_curve( const MeshImpl&, absl::string_view );
+    template std::unique_ptr< EdgedCurve< 3 > > opengeode_mesh_api
+        load_edged_curve( const MeshImpl&, absl::string_view );
+
+    template std::unique_ptr< EdgedCurve< 2 > >
+        opengeode_mesh_api load_edged_curve( absl::string_view );
+    template std::unique_ptr< EdgedCurve< 3 > >
+        opengeode_mesh_api load_edged_curve( absl::string_view );
 
     template class opengeode_mesh_api EdgedCurveInput< 2 >;
     template class opengeode_mesh_api EdgedCurveInput< 3 >;

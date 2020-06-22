@@ -38,9 +38,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    const uuid& LinesBuilder< dimension >::create_line( const MeshType& type )
+    const uuid& LinesBuilder< dimension >::create_line( const MeshImpl& impl )
     {
-        return lines_.create_line( type );
+        return lines_.create_line( impl );
     }
 
     template < index_t dimension >
@@ -75,7 +75,8 @@ namespace geode
     void LinesBuilder< dimension >::set_line_mesh(
         const uuid& id, std::unique_ptr< EdgedCurve< dimension > > mesh )
     {
-        lines_.modifiable_line( id ).set_mesh( std::move( mesh ), {} );
+        lines_.modifiable_line( id ).set_mesh(
+            std::move( mesh ), typename Line< dimension >::LinesBuilderKey{} );
     }
 
     template class opengeode_model_api LinesBuilder< 2 >;

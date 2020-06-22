@@ -330,6 +330,9 @@ namespace geode
         void load_relationships(
             absl::string_view directory, RelationshipsBuilderKey );
 
+    protected:
+        Relationships( Relationships&& );
+
     private:
         IMPLEMENTATION_MEMBER( impl_ );
     };

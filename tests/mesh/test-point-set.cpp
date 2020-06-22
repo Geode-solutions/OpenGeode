@@ -90,10 +90,10 @@ void test_delete_vertex(
 
 void test_io( const geode::PointSet3D& point_set, absl::string_view filename )
 {
-    save_point_set( point_set, filename );
-    auto new_point_set = geode::PointSet3D::create(
-        geode::OpenGeodePointSet3D::type_name_static() );
-    load_point_set( *new_point_set, filename );
+    geode::save_point_set( point_set, filename );
+    geode::load_point_set< 3 >( filename );
+    geode::load_point_set< 3 >(
+        geode::OpenGeodePointSet3D::impl_name_static(), filename );
 }
 
 void test_clone( const geode::PointSet3D& point_set )
@@ -115,7 +115,7 @@ void test_clone( const geode::PointSet3D& point_set )
 void test()
 {
     auto point_set = geode::PointSet3D::create(
-        geode::OpenGeodePointSet3D::type_name_static() );
+        geode::OpenGeodePointSet3D::impl_name_static() );
     auto builder = geode::PointSetBuilder3D::create( *point_set );
     test_create_vertices( *point_set, *builder );
     test_bounding_box( *point_set );

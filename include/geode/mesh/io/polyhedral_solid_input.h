@@ -38,11 +38,21 @@ namespace geode
     /*!
      * API function for loading an PolyhedralSolid.
      * The adequate loader is called depending on the filename extension.
-     * @param[out] polyhedral_solid Loaded PolyhedralSolid.
+     * @param[in] impl Data structure implementation.
      * @param[in] filename Path to the file to load.
      */
     template < index_t dimension >
-    void load_polyhedral_solid( PolyhedralSolid< dimension >& polyhedral_solid,
+    std::unique_ptr< PolyhedralSolid< dimension > > load_polyhedral_solid(
+        const MeshImpl& impl, absl::string_view filename );
+
+    /*!
+     * API function for loading an PolyhedralSolid.
+     * The adequate loader is called depending on the filename extension.
+     * Default data structure implémentation is used.
+     * @param[in] filename Path to the file to load.
+     */
+    template < index_t dimension >
+    std::unique_ptr< PolyhedralSolid< dimension > > load_polyhedral_solid(
         absl::string_view filename );
 
     template < index_t dimension >

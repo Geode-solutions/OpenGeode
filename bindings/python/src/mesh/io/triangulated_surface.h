@@ -31,8 +31,10 @@
         save##dimension.c_str(), &save_triangulated_surface< dimension > );    \
     const auto load##dimension =                                               \
         "load_triangulated_surface" + std::to_string( dimension ) + "D";       \
-    module.def(                                                                \
-        load##dimension.c_str(), &load_triangulated_surface< dimension > )
+    module.def( load##dimension.c_str(),                                       \
+        ( std::unique_ptr< TriangulatedSurface< dimension > >( * )(            \
+            absl::string_view ) )                                              \
+            & load_triangulated_surface< dimension > )
 
 namespace geode
 {

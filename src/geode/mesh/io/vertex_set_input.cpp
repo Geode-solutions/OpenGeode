@@ -26,18 +26,29 @@
 #include <fstream>
 
 #include <geode/mesh/core/bitsery_archive.h>
+#include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/vertex_set.h>
 
 namespace geode
 {
-    void load_vertex_set( VertexSet& vertex_set, absl::string_view filename )
+    std::unique_ptr< VertexSet > load_vertex_set( absl::string_view filename )
+    {
+        return load_vertex_set(
+            MeshFactory::default_impl( VertexSet::type_name_static() ),
+            filename );
+    }
+
+    std::unique_ptr< VertexSet > load_vertex_set(
+        const MeshImpl& impl, absl::string_view filename )
     {
         try
         {
+            auto vertex_set = VertexSet::create( impl );
             auto input = VertexSetInputFactory::create(
-                extension_from_filename( filename ).data(), vertex_set,
+                extension_from_filename( filename ).data(), *vertex_set,
                 filename );
             input->read();
+            return vertex_set;
         }
         catch( const OpenGeodeException& e )
         {

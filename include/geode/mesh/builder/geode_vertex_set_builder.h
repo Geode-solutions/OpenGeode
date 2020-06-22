@@ -40,10 +40,9 @@ namespace geode
      */
     class opengeode_mesh_api OpenGeodeVertexSetBuilder : public VertexSetBuilder
     {
-    public:
-        OpenGeodeVertexSetBuilder( VertexSet& vertex_set );
-
     private:
+        void do_set_mesh( VertexSet& mesh ) final;
+
         void do_create_vertex() final;
 
         void do_create_vertices( index_t nb ) final;
@@ -51,6 +50,6 @@ namespace geode
         void do_delete_vertices( const std::vector< bool >& to_delete ) final;
 
     private:
-        OpenGeodeVertexSet& geode_vertex_set_;
+        OpenGeodeVertexSet* geode_vertex_set_;
     };
 } // namespace geode

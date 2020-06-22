@@ -44,17 +44,9 @@ namespace geode
     class OpenGeodeTriangulatedSurfaceBuilder
         : public TriangulatedSurfaceBuilder< dimension >
     {
-    public:
-        OpenGeodeTriangulatedSurfaceBuilder(
-            TriangulatedSurface< dimension >& triangulated_surface )
-            : TriangulatedSurfaceBuilder< dimension >( triangulated_surface ),
-              geode_triangulated_surface_(
-                  dynamic_cast< OpenGeodeTriangulatedSurface< dimension >& >(
-                      triangulated_surface ) )
-        {
-        }
-
     private:
+        void do_set_mesh( VertexSet& mesh ) final;
+
         void do_set_point(
             index_t vertex_id, const Point< dimension >& point ) final;
 
@@ -78,8 +70,10 @@ namespace geode
         void do_set_polygon_adjacent(
             const PolygonEdge& polygon_edge, index_t adjacent_id ) final;
 
+        void do_unset_polygon_adjacent( const PolygonEdge& polygon_edge ) final;
+
     private:
-        OpenGeodeTriangulatedSurface< dimension >& geode_triangulated_surface_;
+        OpenGeodeTriangulatedSurface< dimension >* geode_triangulated_surface_;
     };
     ALIAS_2D_AND_3D( OpenGeodeTriangulatedSurfaceBuilder );
 } // namespace geode

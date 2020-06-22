@@ -71,11 +71,11 @@ def test_create_edge_attribute( polyhedral_solid ):
 
 def test_polyhedron_adjacencies( polyhedral_solid, builder ):
     builder.compute_polyhedron_adjacencies()
-    if polyhedral_solid.polyhedron_adjacent( mesh.PolyhedronFacet( 0, 0 ) ) != basic.NO_ID:
+    if polyhedral_solid.polyhedron_adjacent( mesh.PolyhedronFacet( 0, 0 ) ):
         raise ValueError( "[Test] PolyhedralSolid adjacent index is not correct" )
     if polyhedral_solid.polyhedron_adjacent( mesh.PolyhedronFacet( 0, 1 ) ) != 1:
         raise ValueError( "[Test] PolyhedralSolid adjacent index is not correct" )
-    if polyhedral_solid.polyhedron_adjacent( mesh.PolyhedronFacet( 0, 2 ) ) != basic.NO_ID:
+    if polyhedral_solid.polyhedron_adjacent( mesh.PolyhedronFacet( 0, 2 ) ):
         raise ValueError( "[Test] PolyhedralSolid adjacent index is not correct" )
     if polyhedral_solid.polyhedron_adjacent( mesh.PolyhedronFacet( 1, 0 ) ) != 2:
         raise ValueError( "[Test] PolyhedralSolid adjacent index is not correct" )
@@ -151,8 +151,7 @@ def test_delete_polyhedra( polyhedral_solid, builder ):
 
 def test_io( polyhedral_solid, filename ):
     mesh.save_polyhedral_solid3D( polyhedral_solid, filename )
-    new_polyhedral_solid = mesh.PolyhedralSolid3D.create()
-    mesh.load_polyhedral_solid3D( new_polyhedral_solid, filename )
+    new_polyhedral_solid = mesh.load_polyhedral_solid3D( filename )
 
     if new_polyhedral_solid.nb_vertices() != 8:
         raise ValueError( "[Test] Reloaded PolyhedralSolid should have 8 vertices" )

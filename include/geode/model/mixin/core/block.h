@@ -26,7 +26,7 @@
 #include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
-#include <geode/mesh/core/mesh_type.h>
+#include <geode/mesh/core/mesh_id.h>
 
 #include <geode/model/common.h>
 #include <geode/model/mixin/core/component.h>
@@ -35,7 +35,7 @@ namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Blocks );
     FORWARD_DECLARATION_DIMENSION_CLASS( BlocksBuilder );
-    FORWARD_DECLARATION_DIMENSION_CLASS( PolyhedralSolid );
+    FORWARD_DECLARATION_DIMENSION_CLASS( SolidMesh );
 } // namespace geode
 
 namespace geode
@@ -47,13 +47,14 @@ namespace geode
     template < index_t dimension >
     class Block final : public Component< dimension >
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( Block );
+        OPENGEODE_DISABLE_COPY( Block );
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
         PASSKEY( Blocks< dimension >, BlocksKey );
         PASSKEY( BlocksBuilder< dimension >, BlocksBuilderKey );
         friend class bitsery::Access;
 
     public:
+        Block( Block&& );
         ~Block();
 
         static ComponentType component_type_static()
@@ -71,23 +72,26 @@ namespace geode
             return { this->component_type_static(), this->id() };
         };
 
-        const PolyhedralSolid< dimension >& mesh() const;
+        const SolidMesh< dimension >& mesh() const;
 
-        void ensure_mesh_type( BlocksKey );
+        const MeshImpl& mesh_type() const;
 
-        PolyhedralSolid< dimension >& modifiable_mesh( BlocksKey )
+        SolidMesh< dimension >& modifiable_mesh( BlocksKey )
         {
             return modifiable_mesh();
         }
 
         Block( BlocksKey ) : Block() {}
 
-        Block( const MeshType& type, BlocksKey ) : Block( type ) {}
+        Block( const MeshImpl& impl, BlocksKey ) : Block( impl ) {}
 
-        void set_mesh( std::unique_ptr< PolyhedralSolid< dimension > > mesh,
-            BlocksBuilderKey );
+        void set_mesh(
+            std::unique_ptr< SolidMesh< dimension > > mesh, BlocksKey );
 
-        PolyhedralSolid< dimension >& modifiable_mesh( BlocksBuilderKey )
+        void set_mesh(
+            std::unique_ptr< SolidMesh< dimension > > mesh, BlocksBuilderKey );
+
+        SolidMesh< dimension >& modifiable_mesh( BlocksBuilderKey )
         {
             return modifiable_mesh();
         }
@@ -100,9 +104,9 @@ namespace geode
     private:
         Block();
 
-        explicit Block( const MeshType& type );
+        explicit Block( const MeshImpl& impl );
 
-        PolyhedralSolid< dimension >& modifiable_mesh();
+        SolidMesh< dimension >& modifiable_mesh();
 
         template < typename Archive >
         void serialize( Archive& archive );

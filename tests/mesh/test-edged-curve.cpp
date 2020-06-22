@@ -153,10 +153,10 @@ void test_delete_edge( const geode::EdgedCurve3D& edged_curve,
 void test_io(
     const geode::EdgedCurve3D& edged_curve, const std::string& filename )
 {
-    save_edged_curve( edged_curve, filename );
-    const auto new_edged_curve = geode::EdgedCurve3D::create(
-        geode::OpenGeodeEdgedCurve3D::type_name_static() );
-    load_edged_curve( *new_edged_curve, filename );
+    geode::save_edged_curve( edged_curve, filename );
+    geode::load_edged_curve< 3 >( filename );
+    geode::load_edged_curve< 3 >(
+        geode::OpenGeodeEdgedCurve3D::impl_name_static(), filename );
 }
 
 void test_edge_requests( const geode::EdgedCurve3D& edged_curve,
@@ -195,7 +195,7 @@ void test_clone( const geode::EdgedCurve3D& edged_curve )
 void test()
 {
     auto edged_curve = geode::EdgedCurve3D::create(
-        geode::OpenGeodeEdgedCurve3D::type_name_static() );
+        geode::OpenGeodeEdgedCurve3D::impl_name_static() );
     auto builder = geode::EdgedCurveBuilder3D::create( *edged_curve );
 
     test_create_vertices( *edged_curve, *builder );

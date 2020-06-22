@@ -89,7 +89,7 @@ def test_create_edge_attribute( polygonal_surface ):
 
 def test_polygon_adjacencies( polygonal_surface, builder ):
     builder.compute_polygon_adjacencies()
-    if polygonal_surface.polygon_adjacent( mesh.PolygonEdge( 0, 0 ) ) != basic.NO_ID:
+    if polygonal_surface.polygon_adjacent( mesh.PolygonEdge( 0, 0 ) ):
         raise ValueError( "[Test] PolygonalSurface adjacent index is not correct" )
     if polygonal_surface.polygon_adjacent( mesh.PolygonEdge( 0, 1 ) ) != 1:
         raise ValueError( "[Test] PolygonalSurface adjacent index is not correct" )
@@ -100,7 +100,7 @@ def test_polygon_adjacencies( polygonal_surface, builder ):
     if polygonal_surface.polygon_edge( mesh.PolygonEdge( 0, 1 ) ) != polygonal_surface.polygon_edge( mesh.PolygonEdge( 1, 3 ) ):
         raise ValueError( "[Test] PolygonalSurface edge indices is not correct" )
 
-    if polygonal_surface.polygon_adjacent( mesh.PolygonEdge( 2, 0 ) ) != basic.NO_ID:
+    if polygonal_surface.polygon_adjacent( mesh.PolygonEdge( 2, 0 ) ):
         raise ValueError( "[Test] PolygonalSurface adjacent index is not correct" )
     if polygonal_surface.polygon_adjacent( mesh.PolygonEdge( 2, 3 ) ) != 1:
         raise ValueError( "[Test] PolygonalSurface adjacent index is not correct" )
@@ -210,8 +210,7 @@ def test_polygon_vertex_normal():
 
 def test_io( polygonal_surface, filename ):
     mesh.save_polygonal_surface3D( polygonal_surface, filename )
-    new_polygonal_surface = mesh.PolygonalSurface3D.create()
-    mesh.load_polygonal_surface3D( new_polygonal_surface, filename )
+    new_polygonal_surface = mesh.load_polygonal_surface3D( filename )
 
     if new_polygonal_surface.nb_vertices() != 7:
         raise ValueError( "[Test] Reloaded PolygonalSurface should have 7 vertices" )

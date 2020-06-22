@@ -40,6 +40,7 @@
 #include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
 #include <geode/model/representation/builder/brep_builder.h>
+#include <geode/model/representation/builder/detail/copy.h>
 #include <geode/model/representation/core/brep.h>
 #include <geode/model/representation/io/brep_input.h>
 #include <geode/model/representation/io/brep_output.h>
@@ -56,7 +57,7 @@ std::array< geode::uuid, 6 > add_corners(
         builder.set_corner_name( uuids[c], absl::StrCat( "corner", c + 1 ) );
     }
     const auto& temp_corner = model.corner(
-        builder.add_corner( geode::OpenGeodePointSet3D::type_name_static() ) );
+        builder.add_corner( geode::OpenGeodePointSet3D::impl_name_static() ) );
     builder.remove_corner( temp_corner );
     const auto message =
         absl::StrCat( "[Test] BRep should have ", 6, " corners" );
@@ -78,7 +79,7 @@ std::array< geode::uuid, 9 > add_lines(
         builder.set_line_name( uuids[l], absl::StrCat( "line", l + 1 ) );
     }
     const auto& temp_line = model.line(
-        builder.add_line( geode::OpenGeodeEdgedCurve3D::type_name_static() ) );
+        builder.add_line( geode::OpenGeodeEdgedCurve3D::impl_name_static() ) );
     builder.remove_line( temp_line );
     const auto message =
         absl::StrCat( "[Test] BRep should have ", 9, " lines" );
@@ -97,13 +98,13 @@ std::array< geode::uuid, 5 > add_surfaces(
     for( const auto s : geode::Range{ 2 } )
     {
         uuids[s] = builder.add_surface(
-            geode::OpenGeodeTriangulatedSurface3D::type_name_static() );
+            geode::OpenGeodeTriangulatedSurface3D::impl_name_static() );
         builder.set_surface_name( uuids[s], absl::StrCat( "surface", s + 1 ) );
     }
     for( const auto s : geode::Range{ 2, 5 } )
     {
         uuids[s] = builder.add_surface(
-            geode::OpenGeodePolygonalSurface3D::type_name_static() );
+            geode::OpenGeodePolygonalSurface3D::impl_name_static() );
     }
     const auto& temp_surface = model.surface( builder.add_surface() );
     builder.remove_surface( temp_surface );
@@ -127,7 +128,7 @@ std::array< geode::uuid, 1 > add_blocks(
         builder.set_block_name( uuids[b], absl::StrCat( "block", b + 1 ) );
     }
     const auto& temp_block = model.block( builder.add_block(
-        geode::OpenGeodePolyhedralSolid3D::type_name_static() ) );
+        geode::OpenGeodePolyhedralSolid3D::impl_name_static() ) );
     builder.remove_block( temp_block );
     const auto message =
         absl::StrCat( "[Test] BRep should have ", 1, " block" );
@@ -355,7 +356,7 @@ void add_internal_corner_relations( const geode::BRep& model,
     for( const auto& corner_id : corner_uuids )
     {
         for( const auto& embedding :
-            model.embedded_surfaces( model.corner( corner_id ) ) )
+            model.embedding_surfaces( model.corner( corner_id ) ) )
         {
             OPENGEODE_EXCEPTION( surface_uuids.front() == embedding.id(),
                 "[Test] All Corners embedded surfaces should be Surfaces" );
@@ -364,7 +365,7 @@ void add_internal_corner_relations( const geode::BRep& model,
                 "[Test] Surface should embed all Lines" );
         }
         for( const auto& embedding :
-            model.embedded_blocks( model.corner( corner_id ) ) )
+            model.embedding_blocks( model.corner( corner_id ) ) )
         {
             OPENGEODE_EXCEPTION( block_uuids.front() == embedding.id(),
                 "[Test] All Corners embedded blocks should be Blocks" );
@@ -375,10 +376,10 @@ void add_internal_corner_relations( const geode::BRep& model,
         OPENGEODE_EXCEPTION( model.nb_embeddings( corner_id ) == 2,
             "[Test] All Corners should be embedded to 1 Block and 1 Surface" );
         OPENGEODE_EXCEPTION(
-            model.nb_embedded_surfaces( model.corner( corner_id ) ) == 1,
+            model.nb_embedding_surfaces( model.corner( corner_id ) ) == 1,
             "[Test] All Corners should be embedded to 1 Surface" );
         OPENGEODE_EXCEPTION(
-            model.nb_embedded_blocks( model.corner( corner_id ) ) == 1,
+            model.nb_embedding_blocks( model.corner( corner_id ) ) == 1,
             "[Test] All Corners should be embedded to 1 Block" );
     }
 }
@@ -400,7 +401,7 @@ void add_internal_line_relations( const geode::BRep& model,
     for( const auto& line_id : line_uuids )
     {
         for( const auto& embedding :
-            model.embedded_surfaces( model.line( line_id ) ) )
+            model.embedding_surfaces( model.line( line_id ) ) )
         {
             OPENGEODE_EXCEPTION( surface_uuids.front() == embedding.id(),
                 "[Test] All Line embedded surfaces should be Surfaces" );
@@ -409,7 +410,7 @@ void add_internal_line_relations( const geode::BRep& model,
                 "[Test] Surface should embed all Lines" );
         }
         for( const auto& embedding :
-            model.embedded_blocks( model.line( line_id ) ) )
+            model.embedding_blocks( model.line( line_id ) ) )
         {
             OPENGEODE_EXCEPTION( block_uuids.front() == embedding.id(),
                 "[Test] All Lines embedded blocks should be Blocks" );
@@ -420,10 +421,10 @@ void add_internal_line_relations( const geode::BRep& model,
         OPENGEODE_EXCEPTION( model.nb_embeddings( line_id ) == 2,
             "[Test] All Surfaces should be embedded to 1 Block and 1 Surface" );
         OPENGEODE_EXCEPTION(
-            model.nb_embedded_surfaces( model.line( line_id ) ) == 1,
+            model.nb_embedding_surfaces( model.line( line_id ) ) == 1,
             "[Test] All Surfaces should be embedded to 1 Surface" );
         OPENGEODE_EXCEPTION(
-            model.nb_embedded_blocks( model.line( line_id ) ) == 1,
+            model.nb_embedding_blocks( model.line( line_id ) ) == 1,
             "[Test] All Surfaces should be embedded to 1 Block" );
     }
 }
@@ -442,7 +443,7 @@ void add_internal_surface_relations( const geode::BRep& model,
     for( const auto& surface_id : surface_uuids )
     {
         for( const auto& embedding :
-            model.embedded_blocks( model.surface( surface_id ) ) )
+            model.embedding_blocks( model.surface( surface_id ) ) )
         {
             OPENGEODE_EXCEPTION(
                 model.nb_internal_surfaces( embedding ) == surface_uuids.size(),
@@ -453,7 +454,7 @@ void add_internal_surface_relations( const geode::BRep& model,
         OPENGEODE_EXCEPTION( model.nb_embeddings( surface_id ) == 1,
             "[Test] All Surfaces should be embedded to 1 Block" );
         OPENGEODE_EXCEPTION(
-            model.nb_embedded_blocks( model.surface( surface_id ) ) == 1,
+            model.nb_embedding_blocks( model.surface( surface_id ) ) == 1,
             "[Test] All Surfaces should be embedded to 1 Block" );
     }
 }
@@ -563,7 +564,7 @@ void test_item_ranges( const geode::BRep& model,
     absl::Span< const geode::uuid > boundary_uuids )
 {
     const auto& boundary_items =
-        model.items( model.model_boundary( boundary_uuids[1] ) );
+        model.model_boundary_items( model.model_boundary( boundary_uuids[1] ) );
     geode::index_t boundary_item_count{ 0 };
     for( const auto& boundary_item : boundary_items )
     {
@@ -572,7 +573,7 @@ void test_item_ranges( const geode::BRep& model,
                                  || boundary_item.id() == surface_uuids[2]
                                  || boundary_item.id() == surface_uuids[3],
             "[Test] ItemSurfaceRange iteration result is not correct" );
-        OPENGEODE_EXCEPTION( model.is_item( boundary_item,
+        OPENGEODE_EXCEPTION( model.is_model_boundary_item( boundary_item,
                                  model.model_boundary( boundary_uuids[1] ) ),
             "[Test] Surface should be item of ModelBoundary" );
     }
@@ -595,6 +596,20 @@ void test_reloaded_brep( const geode::BRep& model )
         "[Test] Number of Boundaries in reloaded BRep should be 3" );
 }
 
+void test_moved_brep( const geode::BRep& model )
+{
+    OPENGEODE_EXCEPTION( model.nb_corners() == 6,
+        "[Test] Number of Corners in moved BRep should be 6" );
+    OPENGEODE_EXCEPTION( model.nb_lines() == 9,
+        "[Test] Number of Lines in moved BRep should be 9" );
+    OPENGEODE_EXCEPTION( model.nb_surfaces() == 5,
+        "[Test] Number of Surfaces in moved BRep should be 5" );
+    OPENGEODE_EXCEPTION( model.nb_blocks() == 1,
+        "[Test] Number of Blocks in moved BRep should be 1" );
+    OPENGEODE_EXCEPTION( model.nb_model_boundaries() == 3,
+        "[Test] Number of Boundaries in moved BRep should be 3" );
+}
+
 void test_clone( const geode::BRep& brep )
 {
     geode::BRep brep2;
@@ -611,8 +626,8 @@ void test_clone( const geode::BRep& brep )
     OPENGEODE_EXCEPTION( brep2.nb_model_boundaries() == 3,
         "[Test] BRep should have 3 model boundaries" );
 
-    const auto mapping = builder.copy_components( brep );
-    builder.copy_component_relationships( mapping, brep );
+    const auto mappings = builder.copy_components( brep );
+    builder.copy_component_relationships( mappings, brep );
     OPENGEODE_EXCEPTION(
         brep2.nb_corners() == 12, "[Test] BRep should have 12 corners" );
     OPENGEODE_EXCEPTION(
@@ -626,14 +641,17 @@ void test_clone( const geode::BRep& brep )
 
     for( const auto& corner : brep.corners() )
     {
-        const auto& new_corner =
-            brep2.corner( mapping.corners.at( corner.id() ) );
+        const auto& new_corner = brep2.corner(
+            mappings.at( geode::Corner3D::component_type_static() )
+                .in2out( corner.id() ) );
         for( const auto& line : brep.incidences( corner ) )
         {
             bool found{ false };
             for( const auto& new_line : brep2.incidences( new_corner ) )
             {
-                if( mapping.lines.at( line.id() ) == new_line.id() )
+                if( mappings.at( geode::Line3D::component_type_static() )
+                        .in2out( line.id() )
+                    == new_line.id() )
                 {
                     found = true;
                     break;
@@ -645,13 +663,17 @@ void test_clone( const geode::BRep& brep )
     }
     for( const auto& line : brep.lines() )
     {
-        const auto& new_line = brep2.line( mapping.lines.at( line.id() ) );
+        const auto& new_line =
+            brep2.line( mappings.at( geode::Line3D::component_type_static() )
+                            .in2out( line.id() ) );
         for( const auto& surface : brep.incidences( line ) )
         {
             bool found = { false };
             for( const auto& new_surface : brep2.incidences( new_line ) )
             {
-                if( mapping.surfaces.at( surface.id() ) == new_surface.id() )
+                if( mappings.at( geode::Surface3D::component_type_static() )
+                        .in2out( surface.id() )
+                    == new_surface.id() )
                 {
                     found = true;
                     break;
@@ -663,14 +685,17 @@ void test_clone( const geode::BRep& brep )
     }
     for( const auto& surface : brep.surfaces() )
     {
-        const auto& new_surface =
-            brep2.surface( mapping.surfaces.at( surface.id() ) );
+        const auto& new_surface = brep2.surface(
+            mappings.at( geode::Surface3D::component_type_static() )
+                .in2out( surface.id() ) );
         for( const auto& block : brep.incidences( surface ) )
         {
             bool found = { false };
             for( const auto& new_block : brep2.incidences( new_surface ) )
             {
-                if( mapping.blocks.at( block.id() ) == new_block.id() )
+                if( mappings.at( geode::Block3D::component_type_static() )
+                        .in2out( block.id() )
+                    == new_block.id() )
                 {
                     found = true;
                     break;
@@ -683,13 +708,17 @@ void test_clone( const geode::BRep& brep )
     for( const auto& model_boundary : brep.model_boundaries() )
     {
         const auto& new_model_boundary = brep2.model_boundary(
-            mapping.model_boundaries.at( model_boundary.id() ) );
-        for( const auto& surface : brep.items( model_boundary ) )
+            mappings.at( geode::ModelBoundary3D::component_type_static() )
+                .in2out( model_boundary.id() ) );
+        for( const auto& surface : brep.model_boundary_items( model_boundary ) )
         {
             bool found = { false };
-            for( const auto& new_surface : brep2.items( new_model_boundary ) )
+            for( const auto& new_surface :
+                brep2.model_boundary_items( new_model_boundary ) )
             {
-                if( mapping.surfaces.at( surface.id() ) == new_surface.id() )
+                if( mappings.at( geode::Surface3D::component_type_static() )
+                        .in2out( surface.id() )
+                    == new_surface.id() )
                 {
                     found = true;
                     break;
@@ -745,6 +774,9 @@ void test()
     geode::BRep model2;
     geode::load_brep( model2, file_io );
     test_reloaded_brep( model2 );
+
+    geode::BRep model3{ std::move( model2 ) };
+    test_moved_brep( model3 );
 }
 
 OPENGEODE_TEST( "brep" )

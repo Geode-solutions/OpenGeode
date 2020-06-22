@@ -26,6 +26,7 @@
 #include <geode/basic/factory.h>
 
 #include <geode/mesh/common.h>
+#include <geode/mesh/core/mesh_id.h>
 #include <geode/mesh/io/input.h>
 
 namespace geode
@@ -38,11 +39,20 @@ namespace geode
     /*!
      * API function for loading an VertexSet.
      * The adequate loader is called depending on the filename extension.
-     * @param[out] vertex_set Loaded VertexSet.
+     * @param[in] impl Data structure implementation.
      * @param[in] filename Path to the file to load.
      */
-    void opengeode_mesh_api load_vertex_set(
-        VertexSet& vertex_set, absl::string_view filename );
+    std::unique_ptr< VertexSet > opengeode_mesh_api load_vertex_set(
+        const MeshImpl& impl, absl::string_view filename );
+
+    /*!
+     * API function for loading an VertexSet.
+     * The adequate loader is called depending on the filename extension.
+     * Default data structure implémentation is used.
+     * @param[in] filename Path to the file to load.
+     */
+    std::unique_ptr< VertexSet > opengeode_mesh_api load_vertex_set(
+        absl::string_view filename );
 
     class opengeode_mesh_api VertexSetInput : public Input
     {

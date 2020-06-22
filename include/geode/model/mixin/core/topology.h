@@ -46,5 +46,6 @@ namespace geode
     {
     protected:
         Topology() = default;
+        Topology( Topology&& ) = default;
     };
 } // namespace geode

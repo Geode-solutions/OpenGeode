@@ -42,16 +42,22 @@ namespace geode
 
     public:
         OpenGeodeGraph();
+        OpenGeodeGraph( OpenGeodeGraph&& );
         ~OpenGeodeGraph();
 
-        static MeshType type_name_static()
+        static MeshImpl impl_name_static()
         {
-            return MeshType{ "OpenGeodeGraph" };
+            return MeshImpl{ "OpenGeodeGraph" };
+        }
+
+        MeshImpl impl_name() const override
+        {
+            return impl_name_static();
         }
 
         MeshType type_name() const override
         {
-            return type_name_static();
+            return Graph::type_name_static();
         }
 
         static absl::string_view native_extension_static()

@@ -26,6 +26,7 @@
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
 
+#include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/point_set.h>
 
 #include <geode/model/mixin/core/detail/mesh_storage.h>
@@ -57,14 +58,21 @@ namespace geode
 
     template < index_t dimension >
     Corner< dimension >::Corner()
+        : Corner( MeshFactory::default_impl(
+            PointSet< dimension >::type_name_static() ) )
     {
-        impl_->set_mesh( PointSet< dimension >::create() );
     }
 
     template < index_t dimension >
-    Corner< dimension >::Corner( const MeshType& type )
+    Corner< dimension >::Corner( Corner&& other )
+        : impl_( std::move( other.impl_ ) )
     {
-        impl_->set_mesh( PointSet< dimension >::create( type ) );
+    }
+
+    template < index_t dimension >
+    Corner< dimension >::Corner( const MeshImpl& impl )
+    {
+        impl_->set_mesh( PointSet< dimension >::create( impl ) );
     }
 
     template < index_t dimension >
@@ -80,9 +88,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    void Corner< dimension >::ensure_mesh_type( CornersKey )
+    const MeshImpl& Corner< dimension >::mesh_type() const
     {
-        return impl_->ensure_mesh_type();
+        return impl_->mesh_type();
     }
 
     template < index_t dimension >
@@ -95,6 +103,13 @@ namespace geode
                 archive.ext( corner,
                     bitsery::ext::BaseClass< Component< dimension > >{} );
             } );
+    }
+
+    template < index_t dimension >
+    void Corner< dimension >::set_mesh(
+        std::unique_ptr< PointSet< dimension > > mesh, CornersKey )
+    {
+        impl_->set_mesh( std::move( mesh ) );
     }
 
     template < index_t dimension >

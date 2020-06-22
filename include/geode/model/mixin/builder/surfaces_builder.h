@@ -25,7 +25,7 @@
 
 #include <memory>
 
-#include <geode/mesh/core/mesh_type.h>
+#include <geode/mesh/core/mesh_id.h>
 
 #include <geode/model/common.h>
 
@@ -33,8 +33,8 @@ namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Surface );
     FORWARD_DECLARATION_DIMENSION_CLASS( Surfaces );
-    FORWARD_DECLARATION_DIMENSION_CLASS( PolygonalSurface );
-    FORWARD_DECLARATION_DIMENSION_CLASS( PolygonalSurfaceBuilder );
+    FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMesh );
+    FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMeshBuilder );
 
     struct uuid;
 } // namespace geode
@@ -51,8 +51,8 @@ namespace geode
          * Get a pointer to the builder of a Surface mesh
          * @param[in] id Unique index of the Surface
          */
-        std::unique_ptr< PolygonalSurfaceBuilder< dimension > >
-            surface_mesh_builder( const uuid& id );
+        std::unique_ptr< SurfaceMeshBuilder< dimension > > surface_mesh_builder(
+            const uuid& id );
 
         void set_surface_name( const uuid& id, absl::string_view name );
 
@@ -64,12 +64,12 @@ namespace geode
 
         const uuid& create_surface();
 
-        const uuid& create_surface( const MeshType& type );
+        const uuid& create_surface( const MeshImpl& impl );
 
         void delete_surface( const Surface< dimension >& surface );
 
-        void set_surface_mesh( const uuid& id,
-            std::unique_ptr< PolygonalSurface< dimension > > mesh );
+        void set_surface_mesh(
+            const uuid& id, std::unique_ptr< SurfaceMesh< dimension > > mesh );
 
     private:
         Surfaces< dimension >& surfaces_;

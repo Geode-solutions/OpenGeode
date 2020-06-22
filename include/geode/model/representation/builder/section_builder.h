@@ -23,20 +23,15 @@
 
 #pragma once
 
-#include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/core/mesh_type.h>
-#include <geode/mesh/core/point_set.h>
-#include <geode/mesh/core/polygonal_surface.h>
+#include <geode/basic/mapping.h>
 
 #include <geode/model/common.h>
 #include <geode/model/mixin/builder/add_components_builders.h>
-#include <geode/model/mixin/builder/blocks_builder.h>
 #include <geode/model/mixin/builder/corners_builder.h>
 #include <geode/model/mixin/builder/lines_builder.h>
 #include <geode/model/mixin/builder/model_boundaries_builder.h>
 #include <geode/model/mixin/builder/surfaces_builder.h>
 #include <geode/model/mixin/builder/topology_builder.h>
-#include <geode/model/mixin/core/blocks.h>
 #include <geode/model/mixin/core/corners.h>
 #include <geode/model/mixin/core/lines.h>
 #include <geode/model/mixin/core/model_boundaries.h>
@@ -45,14 +40,23 @@
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( EdgedCurve );
+    FORWARD_DECLARATION_DIMENSION_CLASS( PointSet );
+    FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMesh );
     ALIAS_2D( Corner );
+    ALIAS_2D( EdgedCurve );
+    ALIAS_2D( PointSet );
     ALIAS_2D( Line );
     ALIAS_2D( ModelBoundary );
     ALIAS_2D( Surface );
-
+    ALIAS_2D( SurfaceMesh );
     class Section;
-
     struct uuid;
+
+    namespace detail
+    {
+        class ModelCopyMapping;
+    } // namespace detail
 } // namespace geode
 
 namespace geode
@@ -74,40 +78,30 @@ namespace geode
         OPENGEODE_DISABLE_COPY( SectionBuilder );
 
     public:
-        struct ComponentMapping
-        {
-            using Mapping = absl::flat_hash_map< uuid, uuid >;
-            Mapping corners;
-            Mapping lines;
-            Mapping surfaces;
-            Mapping model_boundaries;
-        };
-
-    public:
         SectionBuilder( Section& section );
         SectionBuilder( SectionBuilder&& ) = default;
 
         void copy( const Section& section );
 
-        ComponentMapping copy_components( const Section& section );
+        detail::ModelCopyMapping copy_components( const Section& section );
 
         void copy_component_relationships(
-            const ComponentMapping& mapping, const Section& section );
+            const detail::ModelCopyMapping& mapping, const Section& section );
 
         void copy_component_geometry(
-            const ComponentMapping& mapping, const Section& section );
+            const detail::ModelCopyMapping& mapping, const Section& section );
 
         const uuid& add_corner();
 
-        const uuid& add_corner( const MeshType& type );
+        const uuid& add_corner( const MeshImpl& impl );
 
         const uuid& add_line();
 
-        const uuid& add_line( const MeshType& type );
+        const uuid& add_line( const MeshImpl& impl );
 
         const uuid& add_surface();
 
-        const uuid& add_surface( const MeshType& type );
+        const uuid& add_surface( const MeshImpl& impl );
 
         const uuid& add_model_boundary();
 
@@ -117,8 +111,8 @@ namespace geode
         void update_line_mesh(
             const Line2D& line, std::unique_ptr< EdgedCurve2D > mesh );
 
-        void update_surface_mesh( const Surface2D& surface,
-            std::unique_ptr< PolygonalSurface2D > mesh );
+        void update_surface_mesh(
+            const Surface2D& surface, std::unique_ptr< SurfaceMesh2D > mesh );
 
         void remove_corner( const Corner2D& corner );
 

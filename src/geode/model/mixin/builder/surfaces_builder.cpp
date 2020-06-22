@@ -23,10 +23,9 @@
 
 #include <geode/model/mixin/builder/surfaces_builder.h>
 
-#include <geode/mesh/builder/polygonal_surface_builder.h>
-#include <geode/mesh/builder/triangulated_surface_builder.h>
-#include <geode/mesh/core/polygonal_surface.h>
-#include <geode/mesh/core/triangulated_surface.h>
+#include <geode/mesh/builder/mesh_builder_factory.h>
+#include <geode/mesh/builder/surface_mesh_builder.h>
+#include <geode/mesh/core/surface_mesh.h>
 
 #include <geode/model/mixin/core/surface.h>
 #include <geode/model/mixin/core/surfaces.h>
@@ -41,9 +40,9 @@ namespace geode
 
     template < index_t dimension >
     const uuid& SurfacesBuilder< dimension >::create_surface(
-        const MeshType& type )
+        const MeshImpl& impl )
     {
-        return surfaces_.create_surface( type );
+        return surfaces_.create_surface( impl );
     }
 
     template < index_t dimension >
@@ -61,24 +60,13 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::unique_ptr< PolygonalSurfaceBuilder< dimension > >
+    std::unique_ptr< SurfaceMeshBuilder< dimension > >
         SurfacesBuilder< dimension >::surface_mesh_builder( const uuid& id )
     {
         auto& mesh = surfaces_.modifiable_surface( id ).modifiable_mesh(
             typename Surface< dimension >::SurfacesBuilderKey{} );
-        if( TriangulatedSurfaceBuilderFactory< dimension >::has_creator(
-                mesh.type_name() ) )
-        {
-            return TriangulatedSurfaceBuilder< dimension >::create(
-                dynamic_cast< TriangulatedSurface< dimension >& >( mesh ) );
-        }
-        if( PolygonalSurfaceBuilderFactory< dimension >::has_creator(
-                mesh.type_name() ) )
-        {
-            return PolygonalSurfaceBuilder< dimension >::create( mesh );
-        }
-        throw OpenGeodeException{ "Unknown mesh type: ",
-            mesh.type_name().get() };
+        return MeshBuilderFactory::create_mesh_builder<
+            SurfaceMeshBuilder< dimension > >( mesh );
     }
 
     template < index_t dimension >
@@ -90,9 +78,10 @@ namespace geode
 
     template < index_t dimension >
     void SurfacesBuilder< dimension >::set_surface_mesh(
-        const uuid& id, std::unique_ptr< PolygonalSurface< dimension > > mesh )
+        const uuid& id, std::unique_ptr< SurfaceMesh< dimension > > mesh )
     {
-        surfaces_.modifiable_surface( id ).set_mesh( std::move( mesh ), {} );
+        surfaces_.modifiable_surface( id ).set_mesh( std::move( mesh ),
+            typename Surface< dimension >::SurfacesBuilderKey{} );
     }
 
     template class opengeode_model_api SurfacesBuilder< 2 >;

@@ -28,13 +28,15 @@
 #include <geode/mesh/builder/geode_vertex_set_builder.h>
 #include <geode/mesh/builder/vertex_set_builder.h>
 #include <geode/mesh/core/geode_vertex_set.h>
+#include <geode/mesh/io/vertex_set_input.h>
+#include <geode/mesh/io/vertex_set_output.h>
 
 #include <geode/tests/common.h>
 
 void test_default_vertex_set( const geode::VertexSet& vertex_set )
 {
-    const auto type_static = geode::OpenGeodeVertexSet::type_name_static();
-    OPENGEODE_EXCEPTION( vertex_set.type_name() == type_static,
+    const auto type_static = geode::OpenGeodeVertexSet::impl_name_static();
+    OPENGEODE_EXCEPTION( vertex_set.impl_name() == type_static,
         "[Test] VertexSet type name is not correct" );
 
     const auto extension_static =
@@ -67,6 +69,14 @@ void test_delete_vertex(
         "[Test] VertexSet should have 5 vertices" );
 }
 
+void test_io( const geode::VertexSet& vertex_set, absl::string_view filename )
+{
+    geode::save_vertex_set( vertex_set, filename );
+    geode::load_vertex_set( filename );
+    geode::load_vertex_set(
+        geode::OpenGeodeVertexSet::impl_name_static(), filename );
+}
+
 void test_clone( const geode::VertexSet& vertex_set )
 {
     const auto vertex_set2 = vertex_set.clone();
@@ -78,9 +88,11 @@ void test()
 {
     geode::OpenGeodeVertexSet vertex_set;
     test_default_vertex_set( vertex_set );
-    geode::OpenGeodeVertexSetBuilder builder( vertex_set );
-    test_create_vertices( vertex_set, builder );
-    test_delete_vertex( vertex_set, builder );
+    auto builder = geode::VertexSetBuilder::create( vertex_set );
+    test_create_vertices( vertex_set, *builder );
+    test_io(
+        vertex_set, absl::StrCat( "test.", vertex_set.native_extension() ) );
+    test_delete_vertex( vertex_set, *builder );
     test_clone( vertex_set );
 }
 

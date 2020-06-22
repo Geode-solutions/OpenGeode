@@ -23,22 +23,24 @@
 
 #include <geode/mesh/io/polygonal_surface_input.h>
 
-#include <geode/mesh/builder/polygonal_surface_builder.h>
+#include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polygonal_surface.h>
 
 namespace geode
 {
     template < index_t dimension >
-    void load_polygonal_surface(
-        PolygonalSurface< dimension >& polygonal_surface,
-        absl::string_view filename )
+    std::unique_ptr< PolygonalSurface< dimension > > load_polygonal_surface(
+        const MeshImpl& impl, absl::string_view filename )
     {
         try
         {
+            auto polygonal_surface =
+                PolygonalSurface< dimension >::create( impl );
             auto input = PolygonalSurfaceInputFactory< dimension >::create(
-                extension_from_filename( filename ).data(), polygonal_surface,
+                extension_from_filename( filename ).data(), *polygonal_surface,
                 filename );
             input->read();
+            return polygonal_surface;
         }
         catch( const OpenGeodeException& e )
         {
@@ -50,6 +52,16 @@ namespace geode
     }
 
     template < index_t dimension >
+    std::unique_ptr< PolygonalSurface< dimension > > load_polygonal_surface(
+        absl::string_view filename )
+    {
+        return load_polygonal_surface< dimension >(
+            MeshFactory::default_impl(
+                PolygonalSurface< dimension >::type_name_static() ),
+            filename );
+    }
+
+    template < index_t dimension >
     PolygonalSurfaceInput< dimension >::PolygonalSurfaceInput(
         PolygonalSurface< dimension >& polygonal_surface,
         absl::string_view filename )
@@ -58,10 +70,15 @@ namespace geode
     {
     }
 
-    template void opengeode_mesh_api load_polygonal_surface(
-        PolygonalSurface< 2 >&, absl::string_view );
-    template void opengeode_mesh_api load_polygonal_surface(
-        PolygonalSurface< 3 >&, absl::string_view );
+    template std::unique_ptr< PolygonalSurface< 2 > > opengeode_mesh_api
+        load_polygonal_surface( const MeshImpl&, absl::string_view );
+    template std::unique_ptr< PolygonalSurface< 3 > > opengeode_mesh_api
+        load_polygonal_surface( const MeshImpl&, absl::string_view );
+
+    template std::unique_ptr< PolygonalSurface< 2 > >
+        opengeode_mesh_api load_polygonal_surface( absl::string_view );
+    template std::unique_ptr< PolygonalSurface< 3 > >
+        opengeode_mesh_api load_polygonal_surface( absl::string_view );
 
     template class opengeode_mesh_api PolygonalSurfaceInput< 2 >;
     template class opengeode_mesh_api PolygonalSurfaceInput< 3 >;

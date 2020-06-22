@@ -24,7 +24,7 @@
 #include <geode/mesh/core/triangulated_surface.h>
 
 #include <geode/mesh/builder/triangulated_surface_builder.h>
-#include <geode/mesh/core/geode_triangulated_surface.h>
+#include <geode/mesh/core/mesh_factory.h>
 
 namespace geode
 {
@@ -32,34 +32,24 @@ namespace geode
     std::unique_ptr< TriangulatedSurface< dimension > >
         TriangulatedSurface< dimension >::create()
     {
-        return std::unique_ptr< TriangulatedSurface< dimension > >{
-            new OpenGeodeTriangulatedSurface< dimension >
-        };
+        return MeshFactory::create_default_mesh<
+            TriangulatedSurface< dimension > >(
+            TriangulatedSurface< dimension >::type_name_static() );
     }
 
     template < index_t dimension >
     std::unique_ptr< TriangulatedSurface< dimension > >
-        TriangulatedSurface< dimension >::create( const MeshType &type )
+        TriangulatedSurface< dimension >::create( const MeshImpl &type )
     {
-        try
-        {
-            return TriangulatedSurfaceFactory< dimension >::create( type );
-        }
-        catch( const OpenGeodeException &e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeException{
-                "Could not create TriangulatedSurface data structure: ",
-                type.get()
-            };
-        }
+        return MeshFactory::create_mesh< TriangulatedSurface< dimension > >(
+            type );
     }
 
     template < index_t dimension >
     std::unique_ptr< TriangulatedSurface< dimension > >
         TriangulatedSurface< dimension >::clone() const
     {
-        auto clone = create( this->type_name() );
+        auto clone = create( this->impl_name() );
         auto builder =
             TriangulatedSurfaceBuilder< dimension >::create( *clone );
         builder->copy( *this, {} );

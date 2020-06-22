@@ -27,6 +27,7 @@
 
 #include <geode/basic/attribute_manager.h>
 
+#include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
 
 namespace geode
@@ -36,19 +37,16 @@ namespace geode
         TetrahedralSolidBuilder< dimension >::create(
             TetrahedralSolid< dimension >& mesh )
     {
-        try
-        {
-            return TetrahedralSolidBuilderFactory< dimension >::create(
-                mesh.type_name(), mesh );
-        }
-        catch( const OpenGeodeException& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeException{
-                "Could not create TetrahedralSolid builder of data structure: ",
-                mesh.type_name().get()
-            };
-        }
+        return MeshBuilderFactory::create_mesh_builder<
+            TetrahedralSolidBuilder< dimension > >( mesh );
+    }
+
+    template < index_t dimension >
+    void TetrahedralSolidBuilder< dimension >::set_mesh(
+        TetrahedralSolid< dimension >& mesh, MeshBuilderFactoryKey key )
+    {
+        tetrahedral_solid_ = &mesh;
+        SolidMeshBuilder< dimension >::set_mesh( mesh, key );
     }
 
     template < index_t dimension >
@@ -66,6 +64,16 @@ namespace geode
     }
 
     template < index_t dimension >
+    void TetrahedralSolidBuilder< dimension >::do_create_facets(
+        const std::array< index_t, 4 >& vertices )
+    {
+        this->find_or_create_facet( { vertices[1], vertices[3], vertices[2] } );
+        this->find_or_create_facet( { vertices[0], vertices[2], vertices[3] } );
+        this->find_or_create_facet( { vertices[3], vertices[1], vertices[0] } );
+        this->find_or_create_facet( { vertices[0], vertices[1], vertices[2] } );
+    }
+
+    template < index_t dimension >
     void TetrahedralSolidBuilder< dimension >::do_create_edges(
         absl::Span< const index_t > vertices,
         absl::Span< const std::vector< index_t > > facets )
@@ -77,6 +85,18 @@ namespace geode
         std::array< index_t, 4 > tetra_vertices;
         absl::c_copy_n( vertices, 4, tetra_vertices.begin() );
         do_create_edges( tetra_vertices );
+    }
+
+    template < index_t dimension >
+    void TetrahedralSolidBuilder< dimension >::do_create_edges(
+        const std::array< index_t, 4 >& vertices )
+    {
+        this->find_or_create_edge( { vertices[0], vertices[1] } );
+        this->find_or_create_edge( { vertices[0], vertices[2] } );
+        this->find_or_create_edge( { vertices[0], vertices[3] } );
+        this->find_or_create_edge( { vertices[1], vertices[2] } );
+        this->find_or_create_edge( { vertices[1], vertices[3] } );
+        this->find_or_create_edge( { vertices[2], vertices[3] } );
     }
 
     template < index_t dimension >
@@ -97,8 +117,8 @@ namespace geode
     index_t TetrahedralSolidBuilder< dimension >::create_tetrahedron(
         const std::array< index_t, 4 >& vertices )
     {
-        const auto added_tetra = tetrahedral_solid_.nb_polyhedra();
-        tetrahedral_solid_.polyhedron_attribute_manager().resize(
+        const auto added_tetra = tetrahedral_solid_->nb_polyhedra();
+        tetrahedral_solid_->polyhedron_attribute_manager().resize(
             added_tetra + 1 );
         index_t vertex_id{ 0 };
         for( const auto& vertex : vertices )
@@ -115,19 +135,20 @@ namespace geode
     template < index_t dimension >
     void TetrahedralSolidBuilder< dimension >::reserve_tetrahedra( index_t nb )
     {
-        const auto nb_tet = tetrahedral_solid_.nb_polyhedra();
-        tetrahedral_solid_.polyhedron_attribute_manager().reserve(
+        const auto nb_tet = tetrahedral_solid_->nb_polyhedra();
+        tetrahedral_solid_->polyhedron_attribute_manager().reserve(
             nb_tet + nb );
-        tetrahedral_solid_.facet_attribute_manager().reserve( nb_tet + 4 * nb );
-        tetrahedral_solid_.edge_attribute_manager().reserve( nb_tet + 6 * nb );
+        tetrahedral_solid_->facet_attribute_manager().reserve(
+            nb_tet + 4 * nb );
+        tetrahedral_solid_->edge_attribute_manager().reserve( nb_tet + 6 * nb );
     }
 
     template < index_t dimension >
     index_t TetrahedralSolidBuilder< dimension >::create_tetrahedra(
         index_t nb )
     {
-        const auto added_tetra = tetrahedral_solid_.nb_polyhedra();
-        tetrahedral_solid_.polyhedron_attribute_manager().resize(
+        const auto added_tetra = tetrahedral_solid_->nb_polyhedra();
+        tetrahedral_solid_->polyhedron_attribute_manager().resize(
             added_tetra + nb );
         do_create_tetrahedra( nb );
         return added_tetra;
@@ -137,7 +158,7 @@ namespace geode
     void TetrahedralSolidBuilder< dimension >::copy(
         const TetrahedralSolid< dimension >& tetrahedral_solid )
     {
-        PolyhedralSolidBuilder< dimension >::copy( tetrahedral_solid );
+        SolidMeshBuilder< dimension >::copy( tetrahedral_solid );
     }
 
     template class opengeode_mesh_api TetrahedralSolidBuilder< 3 >;

@@ -25,6 +25,7 @@
 
 #include <geode/basic/attribute_manager.h>
 
+#include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/core/vertex_set.h>
 
 namespace geode
@@ -32,39 +33,35 @@ namespace geode
     std::unique_ptr< VertexSetBuilder > VertexSetBuilder::create(
         VertexSet& mesh )
     {
-        try
-        {
-            return VertexSetBuilderFactory::create( mesh.type_name(), mesh );
-        }
-        catch( const OpenGeodeException& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeException{
-                "Could not create VertexSet builder of data structure: ",
-                mesh.type_name().get()
-            };
-        }
+        return MeshBuilderFactory::create_mesh_builder< VertexSetBuilder >(
+            mesh );
+    }
+
+    void VertexSetBuilder::set_mesh( VertexSet& mesh, MeshBuilderFactoryKey )
+    {
+        vertex_set_ = &mesh;
+        do_set_mesh( mesh );
     }
 
     void VertexSetBuilder::copy( const VertexSet& vertex_set )
     {
         create_vertices( vertex_set.nb_vertices() );
-        vertex_set_.vertex_attribute_manager().copy(
+        vertex_set_->vertex_attribute_manager().copy(
             vertex_set.vertex_attribute_manager() );
     }
 
     index_t VertexSetBuilder::create_vertex()
     {
-        const auto added_vertex = vertex_set_.nb_vertices();
-        vertex_set_.vertex_attribute_manager().resize( added_vertex + 1 );
+        const auto added_vertex = vertex_set_->nb_vertices();
+        vertex_set_->vertex_attribute_manager().resize( added_vertex + 1 );
         do_create_vertex();
         return added_vertex;
     }
 
     index_t VertexSetBuilder::create_vertices( index_t nb )
     {
-        const auto first_added_vertex = vertex_set_.nb_vertices();
-        vertex_set_.vertex_attribute_manager().resize(
+        const auto first_added_vertex = vertex_set_->nb_vertices();
+        vertex_set_->vertex_attribute_manager().resize(
             first_added_vertex + nb );
         do_create_vertices( nb );
         return first_added_vertex;
@@ -73,7 +70,7 @@ namespace geode
     std::vector< index_t > VertexSetBuilder::delete_vertices(
         const std::vector< bool >& to_delete )
     {
-        vertex_set_.vertex_attribute_manager().delete_elements( to_delete );
+        vertex_set_->vertex_attribute_manager().delete_elements( to_delete );
         do_delete_vertices( to_delete );
         return detail::mapping_after_deletion( to_delete );
     }

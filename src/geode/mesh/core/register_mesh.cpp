@@ -31,47 +31,53 @@
 #include <geode/mesh/core/geode_tetrahedral_solid.h>
 #include <geode/mesh/core/geode_triangulated_surface.h>
 #include <geode/mesh/core/geode_vertex_set.h>
+#include <geode/mesh/core/mesh_factory.h>
 
 namespace geode
 {
     void register_geode_mesh()
     {
-        VertexSetFactory::register_creator< OpenGeodeVertexSet >(
-            OpenGeodeVertexSet::type_name_static() );
+        MeshFactory::register_default_mesh< OpenGeodeVertexSet >(
+            VertexSet::type_name_static(),
+            OpenGeodeVertexSet::impl_name_static() );
 
-        GraphFactory::register_creator< OpenGeodeGraph >(
-            OpenGeodeGraph::type_name_static() );
+        MeshFactory::register_default_mesh< OpenGeodeGraph >(
+            Graph::type_name_static(), OpenGeodeGraph::impl_name_static() );
 
-        PointSetFactory2D::register_creator< OpenGeodePointSet2D >(
-            OpenGeodePointSet2D::type_name_static() );
-        PointSetFactory3D::register_creator< OpenGeodePointSet3D >(
-            OpenGeodePointSet3D::type_name_static() );
+        MeshFactory::register_default_mesh< OpenGeodePointSet2D >(
+            PointSet2D::type_name_static(),
+            OpenGeodePointSet2D::impl_name_static() );
+        MeshFactory::register_default_mesh< OpenGeodePointSet3D >(
+            PointSet3D::type_name_static(),
+            OpenGeodePointSet3D::impl_name_static() );
 
-        EdgedCurveFactory2D::register_creator< OpenGeodeEdgedCurve2D >(
-            OpenGeodeEdgedCurve2D::type_name_static() );
-        EdgedCurveFactory3D::register_creator< OpenGeodeEdgedCurve3D >(
-            OpenGeodeEdgedCurve3D::type_name_static() );
+        MeshFactory::register_default_mesh< OpenGeodeEdgedCurve2D >(
+            EdgedCurve2D::type_name_static(),
+            OpenGeodeEdgedCurve2D::impl_name_static() );
+        MeshFactory::register_default_mesh< OpenGeodeEdgedCurve3D >(
+            EdgedCurve3D::type_name_static(),
+            OpenGeodeEdgedCurve3D::impl_name_static() );
 
-        PolygonalSurfaceFactory2D::register_creator<
-            OpenGeodePolygonalSurface2D >(
-            OpenGeodePolygonalSurface2D::type_name_static() );
-        PolygonalSurfaceFactory3D::register_creator<
-            OpenGeodePolygonalSurface3D >(
-            OpenGeodePolygonalSurface3D::type_name_static() );
+        MeshFactory::register_default_mesh< OpenGeodePolygonalSurface2D >(
+            PolygonalSurface2D::type_name_static(),
+            OpenGeodePolygonalSurface2D::impl_name_static() );
+        MeshFactory::register_default_mesh< OpenGeodePolygonalSurface3D >(
+            PolygonalSurface3D::type_name_static(),
+            OpenGeodePolygonalSurface3D::impl_name_static() );
 
-        TriangulatedSurfaceFactory2D::register_creator<
-            OpenGeodeTriangulatedSurface2D >(
-            OpenGeodeTriangulatedSurface2D::type_name_static() );
-        TriangulatedSurfaceFactory3D::register_creator<
-            OpenGeodeTriangulatedSurface3D >(
-            OpenGeodeTriangulatedSurface3D::type_name_static() );
+        MeshFactory::register_default_mesh< OpenGeodeTriangulatedSurface2D >(
+            TriangulatedSurface2D::type_name_static(),
+            OpenGeodeTriangulatedSurface2D::impl_name_static() );
+        MeshFactory::register_default_mesh< OpenGeodeTriangulatedSurface3D >(
+            TriangulatedSurface3D::type_name_static(),
+            OpenGeodeTriangulatedSurface3D::impl_name_static() );
 
-        PolyhedralSolidFactory3D::register_creator<
-            OpenGeodePolyhedralSolid3D >(
-            OpenGeodePolyhedralSolid3D::type_name_static() );
+        MeshFactory::register_default_mesh< OpenGeodePolyhedralSolid3D >(
+            PolyhedralSolid3D::type_name_static(),
+            OpenGeodePolyhedralSolid3D::impl_name_static() );
 
-        TetrahedralSolidFactory3D::register_creator<
-            OpenGeodeTetrahedralSolid3D >(
-            OpenGeodeTetrahedralSolid3D::type_name_static() );
+        MeshFactory::register_default_mesh< OpenGeodeTetrahedralSolid3D >(
+            TetrahedralSolid3D::type_name_static(),
+            OpenGeodeTetrahedralSolid3D::impl_name_static() );
     }
 } // namespace geode

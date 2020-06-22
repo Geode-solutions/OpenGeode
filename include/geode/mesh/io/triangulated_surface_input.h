@@ -26,7 +26,7 @@
 #include <geode/basic/factory.h>
 
 #include <geode/mesh/common.h>
-#include <geode/mesh/io/polygonal_surface_input.h>
+#include <geode/mesh/io/vertex_set_input.h>
 
 namespace geode
 {
@@ -38,16 +38,26 @@ namespace geode
     /*!
      * API function for loading an TriangulatedSurface.
      * The adequate loader is called depending on the filename extension.
-     * @param[out] triangulated_surface Loaded TriangulatedSurface.
+     * @param[in] impl Data structure implementation.
      * @param[in] filename Path to the file to load.
      */
     template < index_t dimension >
-    void load_triangulated_surface(
-        TriangulatedSurface< dimension >& triangulated_surface,
-        absl::string_view filename );
+    std::unique_ptr< TriangulatedSurface< dimension > >
+        load_triangulated_surface(
+            const MeshImpl& impl, absl::string_view filename );
+
+    /*!
+     * API function for loading an TriangulatedSurface.
+     * The adequate loader is called depending on the filename extension.
+     * Default data structure implémentation is used.
+     * @param[in] filename Path to the file to load.
+     */
+    template < index_t dimension >
+    std::unique_ptr< TriangulatedSurface< dimension > >
+        load_triangulated_surface( absl::string_view filename );
 
     template < index_t dimension >
-    class TriangulatedSurfaceInput : public PolygonalSurfaceInput< dimension >
+    class TriangulatedSurfaceInput : public VertexSetInput
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( TriangulatedSurfaceInput );
 

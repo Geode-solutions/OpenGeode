@@ -38,12 +38,22 @@ namespace geode
     /*!
      * API function for loading an EdgedCurve.
      * The adequate loader is called depending on the filename extension.
-     * @param[out] edged_curve Loaded EdgedCurve.
+     * @param[in] impl Data structure implementation.
      * @param[in] filename Path to the file to load.
      */
     template < index_t dimension >
-    void load_edged_curve(
-        EdgedCurve< dimension >& edged_curve, absl::string_view filename );
+    std::unique_ptr< EdgedCurve< dimension > > load_edged_curve(
+        const MeshImpl& impl, absl::string_view filename );
+
+    /*!
+     * API function for loading an EdgedCurve.
+     * The adequate loader is called depending on the filename extension.
+     * Default data structure implémentation is used.
+     * @param[in] filename Path to the file to load.
+     */
+    template < index_t dimension >
+    std::unique_ptr< EdgedCurve< dimension > > load_edged_curve(
+        absl::string_view filename );
 
     template < index_t dimension >
     class EdgedCurveInput : public GraphInput

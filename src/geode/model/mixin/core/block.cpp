@@ -26,6 +26,7 @@
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
 
+#include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polyhedral_solid.h>
 
 #include <geode/model/mixin/core/detail/mesh_storage.h>
@@ -34,7 +35,7 @@ namespace geode
 {
     template < index_t dimension >
     class Block< dimension >::Impl
-        : public detail::MeshStorage< PolyhedralSolid< dimension > >
+        : public detail::MeshStorage< SolidMesh< dimension > >
     {
     private:
         friend class bitsery::Access;
@@ -43,23 +44,30 @@ namespace geode
         {
             archive.ext( *this, DefaultGrowable< Archive, Impl >{},
                 []( Archive& archive, Impl& impl ) {
-                    archive.ext(
-                        impl, bitsery::ext::BaseClass< detail::MeshStorage<
-                                  PolyhedralSolid< dimension > > >{} );
+                    archive.ext( impl,
+                        bitsery::ext::BaseClass<
+                            detail::MeshStorage< SolidMesh< dimension > > >{} );
                 } );
         }
     };
 
     template < index_t dimension >
     Block< dimension >::Block()
+        : Block( MeshFactory::default_impl(
+            PolyhedralSolid< dimension >::type_name_static() ) )
     {
-        impl_->set_mesh( PolyhedralSolid< dimension >::create() );
     }
 
     template < index_t dimension >
-    Block< dimension >::Block( const MeshType& type )
+    Block< dimension >::Block( Block&& other )
+        : impl_( std::move( other.impl_ ) )
     {
-        impl_->set_mesh( PolyhedralSolid< dimension >::create( type ) );
+    }
+
+    template < index_t dimension >
+    Block< dimension >::Block( const MeshImpl& impl )
+    {
+        impl_->set_mesh( SolidMesh< dimension >::create( impl ) );
     }
 
     template < index_t dimension >
@@ -68,21 +76,21 @@ namespace geode
     }
 
     template < index_t dimension >
-    const PolyhedralSolid< dimension >& Block< dimension >::mesh() const
+    const SolidMesh< dimension >& Block< dimension >::mesh() const
     {
         return impl_->mesh();
     }
 
     template < index_t dimension >
-    PolyhedralSolid< dimension >& Block< dimension >::modifiable_mesh()
+    SolidMesh< dimension >& Block< dimension >::modifiable_mesh()
     {
         return impl_->modifiable_mesh();
     }
 
     template < index_t dimension >
-    void Block< dimension >::ensure_mesh_type( BlocksKey )
+    const MeshImpl& Block< dimension >::mesh_type() const
     {
-        return impl_->ensure_mesh_type();
+        return impl_->mesh_type();
     }
 
     template < index_t dimension >
@@ -99,7 +107,14 @@ namespace geode
 
     template < index_t dimension >
     void Block< dimension >::set_mesh(
-        std::unique_ptr< PolyhedralSolid< dimension > > mesh, BlocksBuilderKey )
+        std::unique_ptr< SolidMesh< dimension > > mesh, BlocksKey )
+    {
+        impl_->set_mesh( std::move( mesh ) );
+    }
+
+    template < index_t dimension >
+    void Block< dimension >::set_mesh(
+        std::unique_ptr< SolidMesh< dimension > > mesh, BlocksBuilderKey )
     {
         impl_->set_mesh( std::move( mesh ) );
     }

@@ -27,7 +27,7 @@
 
 #include <geode/basic/bitsery_archive.h>
 
-#include <geode/mesh/core/mesh_type.h>
+#include <geode/mesh/core/mesh_id.h>
 
 namespace geode
 {
@@ -41,7 +41,7 @@ namespace geode
 
             void set_mesh( std::unique_ptr< Mesh > mesh )
             {
-                mesh_type_ = mesh->type_name();
+                mesh_type_ = mesh->impl_name();
                 mesh_ = std::move( mesh );
             }
 
@@ -55,12 +55,9 @@ namespace geode
                 return *mesh_;
             }
 
-            void ensure_mesh_type()
+            const MeshImpl& mesh_type() const
             {
-                if( !mesh_ || mesh_->type_name() != mesh_type_ )
-                {
-                    set_mesh( Mesh::create( mesh_type_ ) );
-                }
+                return mesh_type_;
             }
 
             template < typename Archive >
@@ -74,7 +71,7 @@ namespace geode
 
         private:
             std::unique_ptr< Mesh > mesh_;
-            MeshType mesh_type_;
+            MeshImpl mesh_type_;
         };
     } // namespace detail
 } // namespace geode

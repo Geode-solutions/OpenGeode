@@ -26,6 +26,7 @@
 #include <geode/basic/pimpl_impl.h>
 #include <geode/basic/range.h>
 
+#include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polygonal_surface.h>
 #include <geode/mesh/core/triangulated_surface.h>
 #include <geode/mesh/io/polygonal_surface_input.h>
@@ -42,10 +43,19 @@ namespace geode
     class Surfaces< dimension >::Impl
         : public detail::ComponentsStorage< Surface< dimension > >
     {
+    public:
+        Impl() = default;
+        Impl( Impl&& other ) = default;
     };
 
     template < index_t dimension >
     Surfaces< dimension >::Surfaces() // NOLINT
+    {
+    }
+
+    template < index_t dimension >
+    Surfaces< dimension >::Surfaces( Surfaces&& other )
+        : impl_( std::move( other.impl_ ) )
     {
     }
 
@@ -85,16 +95,23 @@ namespace geode
             const auto& mesh = surface.mesh();
             const auto file = absl::StrCat(
                 prefix, surface.id().string(), ".", mesh.native_extension() );
-            const auto* triangulated =
-                dynamic_cast< const TriangulatedSurface< dimension >* >(
-                    &mesh );
-            if( triangulated )
+            if( const auto* triangulated =
+                    dynamic_cast< const TriangulatedSurface< dimension >* >(
+                        &mesh ) )
             {
                 save_triangulated_surface( *triangulated, file );
             }
+            else if( const auto* polygonal =
+                         dynamic_cast< const PolygonalSurface< dimension >* >(
+                             &mesh ) )
+            {
+                save_polygonal_surface( *polygonal, file );
+            }
             else
             {
-                save_polygonal_surface( mesh, file );
+                throw OpenGeodeException(
+                    "[Surfaces::save_surfaces] Cannot find the explicit "
+                    "SurfaceMesh type" );
             }
         }
         impl_->save_components( absl::StrCat( directory, "/surfaces" ) );
@@ -108,20 +125,20 @@ namespace geode
             Surface< dimension >::component_type_static().get() );
         for( auto& surface : modifiable_surfaces() )
         {
-            surface.ensure_mesh_type( {} );
-            auto& mesh = surface.modifiable_mesh(
-                typename Surface< dimension >::SurfacesKey{} );
-            const auto file = absl::StrCat(
-                prefix, surface.id().string(), ".", mesh.native_extension() );
-            auto* triangulated =
-                dynamic_cast< TriangulatedSurface< dimension >* >( &mesh );
-            if( triangulated )
+            const auto file =
+                impl_->find_file( directory, surface.component_id() );
+            if( MeshFactory::type( surface.mesh_type() )
+                == TriangulatedSurface< dimension >::type_name_static() )
             {
-                load_triangulated_surface( *triangulated, file );
+                surface.set_mesh( load_triangulated_surface< dimension >(
+                                      surface.mesh_type(), file ),
+                    typename Surface< dimension >::SurfacesKey{} );
             }
             else
             {
-                load_polygonal_surface( mesh, file );
+                surface.set_mesh( load_polygonal_surface< dimension >(
+                                      surface.mesh_type(), file ),
+                    typename Surface< dimension >::SurfacesKey{} );
             }
         }
     }
@@ -153,11 +170,11 @@ namespace geode
     }
 
     template < index_t dimension >
-    const uuid& Surfaces< dimension >::create_surface( const MeshType& type )
+    const uuid& Surfaces< dimension >::create_surface( const MeshImpl& impl )
     {
         typename Surfaces< dimension >::Impl::ComponentPtr surface{
             new Surface< dimension >{
-                type, typename Surface< dimension >::SurfacesKey{} }
+                impl, typename Surface< dimension >::SurfacesKey{} }
         };
         const auto& id = surface->id();
         impl_->add_component( std::move( surface ) );
@@ -199,7 +216,7 @@ namespace geode
     template < index_t dimension >
     Surfaces< dimension >::SurfaceRangeBase::SurfaceRangeBase(
         SurfaceRangeBase&& other ) noexcept
-        : impl_( std::move( *other.impl_ ) )
+        : impl_( std::move( other.impl_ ) )
     {
     }
 

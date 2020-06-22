@@ -30,7 +30,10 @@
     module.def( save##dimension.c_str(), &save_edged_curve< dimension > );     \
     const auto load##dimension =                                               \
         "load_edged_curve" + std::to_string( dimension ) + "D";                \
-    module.def( load##dimension.c_str(), &load_edged_curve< dimension > )
+    module.def( load##dimension.c_str(),                                       \
+        ( std::unique_ptr< EdgedCurve< dimension > >( * )(                     \
+            absl::string_view ) )                                              \
+            & load_edged_curve< dimension > )
 
 namespace geode
 {

@@ -30,33 +30,22 @@
 #include <geode/geometry/bounding_box.h>
 
 #include <geode/mesh/builder/point_set_builder.h>
-#include <geode/mesh/core/geode_point_set.h>
+#include <geode/mesh/core/mesh_factory.h>
 
 namespace geode
 {
     template < index_t dimension >
     std::unique_ptr< PointSet< dimension > > PointSet< dimension >::create()
     {
-        return std::unique_ptr< PointSet< dimension > >{
-            new OpenGeodePointSet< dimension >
-        };
+        return MeshFactory::create_default_mesh< PointSet< dimension > >(
+            PointSet< dimension >::type_name_static() );
     }
 
     template < index_t dimension >
     std::unique_ptr< PointSet< dimension > > PointSet< dimension >::create(
-        const MeshType& type )
+        const MeshImpl& impl )
     {
-        try
-        {
-            return PointSetFactory< dimension >::create( type );
-        }
-        catch( const OpenGeodeException& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeException{
-                "Could not create PointSet data structure: ", type.get()
-            };
-        }
+        return MeshFactory::create_mesh< PointSet< dimension > >( impl );
     }
 
     template < index_t dimension >
@@ -83,7 +72,7 @@ namespace geode
     std::unique_ptr< PointSet< dimension > >
         PointSet< dimension >::clone() const
     {
-        auto clone = create( type_name() );
+        auto clone = create( impl_name() );
         auto builder = PointSetBuilder< dimension >::create( *clone );
         builder->copy( *this, {} );
         return clone;
