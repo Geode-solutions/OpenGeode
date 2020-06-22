@@ -260,7 +260,7 @@ namespace geode
         }
 
         void copy( const AttributeBase& attribute,
-            index_t nb_elements,
+            index_t /*unused*/,
             AttributeBase::AttributeKey ) override
         {
             value_ = dynamic_cast< const ConstantAttribute< T >& >( attribute )

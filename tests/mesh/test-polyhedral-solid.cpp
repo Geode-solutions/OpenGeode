@@ -101,6 +101,10 @@ void test_create_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
     OPENGEODE_EXCEPTION(
         polyhedral_solid.polyhedron_facet_edge( { { 0, 1 }, 2 } ) == 4,
         "[Test] Wrong edge index get from PolyhedronFacetEdge" );
+    OPENGEODE_EXCEPTION( !polyhedral_solid.vertex_in_polyhedron( 0, 7 ),
+        "[Test] Wrong vertex in polyhedron" );
+    OPENGEODE_EXCEPTION( polyhedral_solid.vertex_in_polyhedron( 1, 5 ),
+        "[Test] Wrong vertex in polyhedron" );
 }
 
 void test_create_facet_attribute(
