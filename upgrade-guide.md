@@ -93,6 +93,12 @@ and
 
 MeshBuilderFactory::register_mesh_builder< OpenGeodePointSetBuilder2D >( OpenGeodePointSet2D::impl_name_static() );
 ```
+- **Embedding relationship**: renaming `BRep`and `Section` item-related methods for removing overloading of derived class method in the aim to simplify client code syntax
+
+**How to upgrade**
+
+For example, replace in `Section` and `BRep`: `geode::Section::items(...)` by `geode::Section::model_boundary_items(...)` 
+
 
 - **Embedding relationship**: renaming embedded relationship to embedding relationship for better meaning
 

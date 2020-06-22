@@ -416,7 +416,8 @@ namespace geode
             Relationships::ItemRangeIterator::operator*().id() );
     }
 
-    BRep::ItemSurfaceRange BRep::items( const ModelBoundary3D& boundary ) const
+    BRep::ItemSurfaceRange BRep::model_boundary_items(
+        const ModelBoundary3D& boundary ) const
     {
         return { *this, boundary };
     }
@@ -524,7 +525,7 @@ namespace geode
         return Relationships::is_internal( surface.id(), block.id() );
     }
 
-    bool BRep::is_item(
+    bool BRep::is_model_boundary_item(
         const Surface3D& surface, const ModelBoundary3D& boundary ) const
     {
         return Relationships::is_item( surface.id(), boundary.id() );

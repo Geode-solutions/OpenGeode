@@ -97,7 +97,8 @@ namespace geode
         {
             const auto& new_model_boundary = section_.model_boundary(
                 model_boundary_mapping.in2out( model_boundary.id() ) );
-            for( const auto& line : section.items( model_boundary ) )
+            for( const auto& line :
+                section.model_boundary_items( model_boundary ) )
             {
                 const auto& new_line = section_.line(
                     mappings.at( Line2D::component_type_static() )

@@ -296,7 +296,8 @@ namespace geode
 
         EmbeddingBlockRange embedding_blocks( const Surface3D& surface ) const;
 
-        ItemSurfaceRange items( const ModelBoundary3D& boundary ) const;
+        ItemSurfaceRange model_boundary_items(
+            const ModelBoundary3D& boundary ) const;
 
         bool is_closed( const Line3D& line ) const;
 
@@ -321,7 +322,7 @@ namespace geode
         bool is_internal(
             const Surface3D& surface, const Block3D& block ) const;
 
-        bool is_item(
+        bool is_model_boundary_item(
             const Surface3D& surface, const ModelBoundary3D& boundary ) const;
 
         /*!
