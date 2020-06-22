@@ -42,7 +42,8 @@ namespace geode
      * without copying any geometry or microtopology, it only "views" the
      * selected subeset and acts like it is a complete mesh with all the API
      * from vertices to tetrahedra, attributes included.
-     * @warning Modification on the TetrahedralSolid will not be reproduce on
+     * @warning Modification on the TetrahedralSolid will not be reproduced on
+
      * the corresponding view.
      */
     template < index_t dimension >
