@@ -74,14 +74,34 @@ void test_create_viewed_polyhedra(
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_edges() == 12,
         "[Test] PolyhedralSolidView should have 12 edges" );
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_facets() == 8,
-        "[Test] PolyhedralSolidView should have 8 faects" );
+        "[Test] PolyhedralSolidView should have 8 facets" );
     OPENGEODE_EXCEPTION( polyhedral_solid.viewed_polyhedron( 1 ) == 2,
         "[Test] PolyhedralSolidView polyhedron is not correct" );
 
     OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_vertex( { 0, 2 } ) == 2,
-        "[Test] PolyhedralSolidView PolygonVertex is not correct" );
+        "[Test] PolyhedralSolidView PolyhedronVertex is not correct" );
     OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_vertex( { 1, 3 } ) == 6,
-        "[Test] PolyhedralSolidView PolygonVertex is not correct" );
+        "[Test] PolyhedralSolidView PolyhedronVertex is not correct" );
+
+    const auto facet_id = polyhedral_solid.polyhedron_facet( { 1, 3 } );
+    OPENGEODE_EXCEPTION( facet_id == 1,
+        "[Test] PolyhedralSolidView PolyhedronFacet index is not correct" );
+    const auto& facet_vertices = polyhedral_solid.facet_vertices( facet_id );
+    OPENGEODE_EXCEPTION( facet_vertices.size() == 3,
+        "[Test] PolyhedralSolidView PolyhedronVertex is not correct" );
+    OPENGEODE_EXCEPTION( facet_vertices[0] == 3 && facet_vertices[1] == 5
+                             && facet_vertices[2] == 4,
+        "[Test] PolyhedralSolidView facet vertices are not correct" );
+    OPENGEODE_EXCEPTION(
+        polyhedral_solid.facet_from_vertices( facet_vertices ) == 1,
+        "[Test] PolyhedralSolidView facet from vertices is not correct" );
+    OPENGEODE_EXCEPTION( !polyhedral_solid.facet_from_vertices( { 1, 3, 0 } ),
+        "[Test] PolyhedralSolidView facet from vertices is not correct" );
+
+    OPENGEODE_EXCEPTION( !polyhedral_solid.isolated_edge( 4 ),
+        "[Test] PolyhedralSolidView isolated edge is not correct" );
+    OPENGEODE_EXCEPTION( !polyhedral_solid.isolated_facet( 4 ),
+        "[Test] PolyhedralSolidView isolated facet is not correct" );
 }
 
 void test_create_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,

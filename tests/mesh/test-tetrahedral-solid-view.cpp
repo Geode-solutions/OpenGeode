@@ -90,7 +90,7 @@ void test_create_viewed_tetrahedra( const geode::TetrahedralSolidView3D& solid,
     OPENGEODE_EXCEPTION( solid.nb_edges() == 9,
         "[Test] TetrahedralSolidView should have 9 edges" );
     OPENGEODE_EXCEPTION( solid.nb_facets() == 7,
-        "[Test] TetrahedralSolidView should have 7 faects" );
+        "[Test] TetrahedralSolidView should have 7 facets" );
     OPENGEODE_EXCEPTION( solid.viewed_tetrahedron( 0 ) == 1,
         "[Test] TetrahedralSolidView tetrahedron is not correct" );
 }
