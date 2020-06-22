@@ -315,6 +315,11 @@ function(add_geode_python_test)
     )
     get_filename_component(absolute_path ${GEODE_TEST_SOURCE} ABSOLUTE)
     get_filename_component(test_name ${GEODE_TEST_SOURCE} NAME_WE)
+    add_custom_target(${test_name} SOURCES ${GEODE_TEST_SOURCE})
+    set_target_properties(${test_name}
+        PROPERTIES
+            FOLDER "Bindings/Python/Tests"
+    )
     add_test(NAME ${test_name} COMMAND ${PYTHON_EXECUTABLE} ${absolute_path})
     _add_dependency_directories(${test_name} ${GEODE_TEST_DEPENDENCIES})
     foreach(dependency ${GEODE_TEST_DEPENDENCIES})
