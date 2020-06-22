@@ -134,10 +134,11 @@ namespace geode
                 },
                 pybind11::return_value_policy::reference )
             .def(
-                "items",
+                "model_boundary_items",
                 []( const Section& section, const ModelBoundary2D& boundary ) {
                     std::vector< const Line2D* > components;
-                    for( const auto& component : section.items( boundary ) )
+                    for( const auto& component :
+                        section.model_boundary_items( boundary ) )
                     {
                         components.push_back( &component );
                     }
@@ -158,7 +159,7 @@ namespace geode
             .def( "is_line_in_surface_internals",
                 ( bool ( Section::* )( const Line2D&, const Surface2D& ) const )
                     & Section::is_internal )
-            .def( "is_model_boundary_item", &Section::is_item )
+            .def( "is_model_boundary_item", &Section::is_model_boundary_item )
             .def( "bounding_box", &Section::bounding_box )
             .def( "native_extension", &Section::native_extension );
     }

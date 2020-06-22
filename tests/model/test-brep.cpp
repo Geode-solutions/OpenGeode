@@ -564,7 +564,7 @@ void test_item_ranges( const geode::BRep& model,
     absl::Span< const geode::uuid > boundary_uuids )
 {
     const auto& boundary_items =
-        model.items( model.model_boundary( boundary_uuids[1] ) );
+        model.model_boundary_items( model.model_boundary( boundary_uuids[1] ) );
     geode::index_t boundary_item_count{ 0 };
     for( const auto& boundary_item : boundary_items )
     {
@@ -573,7 +573,7 @@ void test_item_ranges( const geode::BRep& model,
                                  || boundary_item.id() == surface_uuids[2]
                                  || boundary_item.id() == surface_uuids[3],
             "[Test] ItemSurfaceRange iteration result is not correct" );
-        OPENGEODE_EXCEPTION( model.is_item( boundary_item,
+        OPENGEODE_EXCEPTION( model.is_model_boundary_item( boundary_item,
                                  model.model_boundary( boundary_uuids[1] ) ),
             "[Test] Surface should be item of ModelBoundary" );
     }
@@ -710,10 +710,11 @@ void test_clone( const geode::BRep& brep )
         const auto& new_model_boundary = brep2.model_boundary(
             mappings.at( geode::ModelBoundary3D::component_type_static() )
                 .in2out( model_boundary.id() ) );
-        for( const auto& surface : brep.items( model_boundary ) )
+        for( const auto& surface : brep.model_boundary_items( model_boundary ) )
         {
             bool found = { false };
-            for( const auto& new_surface : brep2.items( new_model_boundary ) )
+            for( const auto& new_surface :
+                brep2.model_boundary_items( new_model_boundary ) )
             {
                 if( mappings.at( geode::Surface3D::component_type_static() )
                         .in2out( surface.id() )

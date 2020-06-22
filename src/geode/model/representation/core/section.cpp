@@ -267,7 +267,7 @@ namespace geode
             Relationships::ItemRangeIterator::operator*().id() );
     }
 
-    Section::ItemLineRange Section::items(
+    Section::ItemLineRange Section::model_boundary_items(
         const ModelBoundary2D& boundary ) const
     {
         return { *this, boundary };
@@ -322,7 +322,7 @@ namespace geode
         return Relationships::is_internal( line.id(), surface.id() );
     }
 
-    bool Section::is_item(
+    bool Section::is_model_boundary_item(
         const Line2D& line, const ModelBoundary2D& boundary ) const
     {
         return Relationships::is_item( line.id(), boundary.id() );

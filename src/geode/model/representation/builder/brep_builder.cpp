@@ -113,7 +113,8 @@ namespace geode
         {
             const auto& new_model_boundary = brep_.model_boundary(
                 model_boundary_mapping.in2out( model_boundary.id() ) );
-            for( const auto& surface : brep.items( model_boundary ) )
+            for( const auto& surface :
+                brep.model_boundary_items( model_boundary ) )
             {
                 const auto& new_surface = brep_.surface(
                     mappings.at( Surface3D::component_type_static() )

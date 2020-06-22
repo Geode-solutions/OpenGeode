@@ -367,14 +367,14 @@ void test_item_ranges( const geode::Section& model,
     absl::Span< const geode::uuid > boundary_uuids )
 {
     geode::index_t boundary_item_count{ 0 };
-    for( const auto& boundary_item :
-        model.items( model.model_boundary( boundary_uuids[1] ) ) )
+    for( const auto& boundary_item : model.model_boundary_items(
+             model.model_boundary( boundary_uuids[1] ) ) )
     {
         boundary_item_count++;
         OPENGEODE_EXCEPTION( boundary_item.id() == line_uuids[1]
                                  || boundary_item.id() == line_uuids[2],
             "[Test] ItemLineRange iteration result is not correct" );
-        OPENGEODE_EXCEPTION( model.is_item( boundary_item,
+        OPENGEODE_EXCEPTION( model.is_model_boundary_item( boundary_item,
                                  model.model_boundary( boundary_uuids[1] ) ),
             "[Test] Line should be item of ModelBoundary" );
     }
@@ -456,10 +456,11 @@ void test_clone( const geode::Section& section )
         const auto& new_model_boundary = section2.model_boundary(
             mappings.at( geode::ModelBoundary2D::component_type_static() )
                 .in2out( model_boundary.id() ) );
-        for( const auto& line : section.items( model_boundary ) )
+        for( const auto& line : section.model_boundary_items( model_boundary ) )
         {
             bool found = { false };
-            for( const auto& new_line : section2.items( new_model_boundary ) )
+            for( const auto& new_line :
+                section2.model_boundary_items( new_model_boundary ) )
             {
                 if( mappings.at( geode::Line2D::component_type_static() )
                         .in2out( line.id() )

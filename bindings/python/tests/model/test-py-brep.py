@@ -307,7 +307,7 @@ def test_incidence_ranges( model, corner_uuids, line_uuids, surface_uuids, block
 
 def test_item_ranges( model, surface_uuids, boundary_uuids ):
     boundary_item_count = 0
-    for boundary_item in model.items( model.model_boundary( boundary_uuids[1] ) ):
+    for boundary_item in model.model_boundary_items( model.model_boundary( boundary_uuids[1] ) ):
         boundary_item_count += 1
         if boundary_item.id().string() != surface_uuids[1].string() and boundary_item.id().string() != surface_uuids[2].string() and boundary_item.id().string() != surface_uuids[3].string():
             raise ValueError( "[Test] ItemSurfaceRange iteration result is not correct" )

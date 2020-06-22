@@ -247,10 +247,11 @@ namespace geode
                 },
                 pybind11::return_value_policy::reference )
             .def(
-                "items",
+                "model_boundary_items",
                 []( const BRep& brep, const ModelBoundary3D& boundary ) {
                     std::vector< const Surface3D* > components;
-                    for( const auto& component : brep.items( boundary ) )
+                    for( const auto& component :
+                        brep.model_boundary_items( boundary ) )
                     {
                         components.push_back( &component );
                     }
@@ -286,7 +287,7 @@ namespace geode
             .def( "is_surface_in_block_internals",
                 ( bool ( BRep::* )( const Surface3D&, const Block3D& ) const )
                     & BRep::is_internal )
-            .def( "is_model_boundary_item", &BRep::is_item )
+            .def( "is_model_boundary_item", &BRep::is_model_boundary_item )
             .def( "bounding_box", &BRep::bounding_box )
             .def( "native_extension", &BRep::native_extension );
     }
