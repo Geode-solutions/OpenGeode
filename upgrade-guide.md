@@ -6,7 +6,7 @@
 
 The main change of this release is a redesign of the Mesh class hierarchy. PolygonalSurface and TriangulatedSurface are now inherited from a new abstract class: SurfaceMesh. Same change for PolyhedralSolid and TetrahedralSolid with SolidMesh. This modification will ease addition of new mesh type classes.
 
-A second change is to remove all usage of constant expression NO_ID in the API. If a value is not supposed to be return or initialized, we now return an optional value (e.g. polygon/polyhedron adjacent index is either the adjacent value or nothing).
+A second change is to remove all usage of constant expression NO_ID in the API. If a value is not supposed to be returned or initialized, we now return an optional value (e.g. polygon/polyhedron adjacent index is either the adjacent value or nothing).
 
 ### Breaking Changes
 
@@ -66,7 +66,7 @@ or
 auto new_edged_curve = geode::load_edged_curve< 3 >( geode::OpenGeodeEdgedCurve3D::type_name_static(), filename );
 ```
 
-- **Mesh & Builder factories**: Mesh and MeshBuilder factories has been merge into one.
+- **Mesh & Builder factories**: Mesh and MeshBuilder factories has been merged into one.
 
 **How to upgrade**
 
