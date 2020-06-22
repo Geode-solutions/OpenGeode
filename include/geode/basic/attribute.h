@@ -260,15 +260,11 @@ namespace geode
         }
 
         void copy( const AttributeBase& attribute,
-            index_t nb_elements,
+            index_t /*unused*/,
             AttributeBase::AttributeKey ) override
         {
-            if( nb_elements != 0 )
-            {
-                const auto& typed_attribute =
-                    dynamic_cast< const ReadOnlyAttribute< T >& >( attribute );
-                value_ = typed_attribute.value( 0 );
-            }
+            value_ = dynamic_cast< const ConstantAttribute< T >& >( attribute )
+                         .value();
         }
 
     private:

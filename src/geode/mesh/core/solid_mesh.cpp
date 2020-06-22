@@ -167,11 +167,7 @@ namespace
         }
         const auto next = solid.polyhedron_facet_vertex(
             { facet, ( local_id + 1 ) % nb_facet_vertices } );
-        if( next == edge_vertices[1] )
-        {
-            return true;
-        }
-        return false;
+        return next == edge_vertices[1];
     }
 
 } // namespace
@@ -478,20 +474,6 @@ namespace geode
         const MeshImpl& impl )
     {
         return MeshFactory::create_mesh< SolidMesh< dimension > >( impl );
-    }
-
-    template < index_t dimension >
-    double SolidMesh< dimension >::polyhedron_volume( index_t /*unused*/ ) const
-    {
-        throw OpenGeodeException{ "polyhedron_volume not implemented yet" };
-        return 0;
-    }
-
-    template < index_t dimension >
-    double SolidMesh< dimension >::facet_area( index_t /*unused*/ ) const
-    {
-        throw OpenGeodeException{ "facet_area not implemented yet" };
-        return 0;
     }
 
     template < index_t dimension >
