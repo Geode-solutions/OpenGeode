@@ -35,6 +35,9 @@ namespace geode
     class opengeode_mesh_api MeshFactory : public Factory< MeshImpl, VertexSet >
     {
     public:
+        /*!
+         * Register a mesh implementation to a given mesh type
+         */
         template < typename Mesh >
         static void register_mesh( MeshType type, MeshImpl key )
         {
@@ -42,6 +45,11 @@ namespace geode
             register_creator< Mesh >( std::move( key ) );
         }
 
+        /*!
+         * Register the default mesh implementation to a given mesh type.
+         * This implementation will be used when no specific implementation is
+         * required.
+         */
         template < typename Mesh >
         static void register_default_mesh( MeshType type, MeshImpl key )
         {
