@@ -1,5 +1,5 @@
 <h1 align="center">OpenGeode<sup><i>by Geode-solutions</i></sup></h1>
-<h3 align="center">Open source platform for representing and manipulating geometric models</h3>
+<h3 align="center">Open source framework for representing and manipulating geometric models</h3>
 
 <p align="center">
   <img src="https://github.com/Geode-solutions/OpenGeode/workflows/CI/badge.svg" alt="Build Status">
@@ -31,7 +31,7 @@
 
 ## Introduction
 
-OpenGeode is an open source platform for representing and manipulating geometric models, from simple meshes to complex boundary representations. The platform is easy to use thanks to its readable API and its JavaScript scriptability for quick prototyping (coming 2019). It is the industrialization of a 5-year research prototype platform [RINGMesh](http://ringmesh.org).
+OpenGeode is an open source framework for representing and manipulating geometric models, from simple meshes to complex boundary representations. The framework is easy to use thanks to its readable API and its Python bindings for quick prototyping. It is the industrialization of a 5-year research prototype platform [RINGMesh](http://ringmesh.org).
 
 
 ## Ecosystem
