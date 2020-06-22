@@ -39,6 +39,14 @@ namespace geode
 
 namespace geode
 {
+    /*!
+     * A mesh view of a TriangulatedSurface meaning a subset of a
+     * TriangulatedSurface without copying any geometry or microtopology, it
+     * only "views" the selected subeset and acts like it is a complete mesh
+     * with all the API from vertices to triangles, attributes included.
+     * @warning Modification on the TriangulatedSurface will not be reproduce on
+     * the corresponding view.
+     */
     template < index_t dimension >
     class TriangulatedSurfaceView : public TriangulatedSurface< dimension >
     {

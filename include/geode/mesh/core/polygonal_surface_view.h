@@ -39,6 +39,14 @@ namespace geode
 
 namespace geode
 {
+    /*!
+     * A mesh view of a PolygonalSurface meaning a subset of a PolygonalSurface
+     * without copying any geometry or microtopology, it only "views" the
+     * selected subeset and acts like it is a complete mesh with all the API
+     * from vertices to polygons, attributes included.
+     * @warning Modification on the PolygonalSurface will not be reproduce on
+     * the corresponding view.
+     */
     template < index_t dimension >
     class PolygonalSurfaceView : public PolygonalSurface< dimension >
     {

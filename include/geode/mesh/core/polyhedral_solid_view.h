@@ -37,6 +37,14 @@ namespace geode
 
 namespace geode
 {
+    /*!
+     * A mesh view of a PolyhedralSolid meaning a subset of a PolyhedralSolid
+     * without copying any geometry or microtopology, it only "views" the
+     * selected subeset and acts like it is a complete mesh with all the API
+     * from vertices to polyhedra, attributes included.
+     * @warning Modification on the PolyhedralSolid will not be reproduce on
+     * the corresponding view.
+     */
     template < index_t dimension >
     class PolyhedralSolidView : public PolyhedralSolid< dimension >
     {
