@@ -85,11 +85,12 @@ namespace geode
 
         index_t viewed_vertex( index_t vertex_id ) const;
 
-        void add_viewed_vertex( index_t vertex_id, TriangulatedSurfaceViewKey );
+        index_t add_viewed_vertex(
+            index_t vertex_id, TriangulatedSurfaceViewKey );
 
         index_t viewed_triangle( index_t triangle_id ) const;
 
-        void add_viewed_triangle(
+        index_t add_viewed_triangle(
             index_t triangle_id, TriangulatedSurfaceViewKey );
 
     private:

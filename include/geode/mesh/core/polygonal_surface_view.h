@@ -83,11 +83,12 @@ namespace geode
 
         index_t viewed_vertex( index_t vertex_id ) const;
 
-        void add_viewed_vertex( index_t vertex_id, PolygonalSurfaceViewKey );
+        index_t add_viewed_vertex( index_t vertex_id, PolygonalSurfaceViewKey );
 
         index_t viewed_polygon( index_t polygon_id ) const;
 
-        void add_viewed_polygon( index_t polygon_id, PolygonalSurfaceViewKey );
+        index_t add_viewed_polygon(
+            index_t polygon_id, PolygonalSurfaceViewKey );
 
     private:
         const Point< dimension >& get_point( index_t vertex_id ) const override;

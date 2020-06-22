@@ -87,10 +87,10 @@ namespace geode
     }
 
     template < index_t dimension >
-    void PolygonalSurfaceView< dimension >::add_viewed_vertex(
+    index_t PolygonalSurfaceView< dimension >::add_viewed_vertex(
         index_t vertex_id, PolygonalSurfaceViewKey )
     {
-        impl_->add_viewed_vertex( vertex_id );
+        return impl_->add_viewed_vertex( vertex_id );
     }
 
     template < index_t dimension >
@@ -101,10 +101,10 @@ namespace geode
     }
 
     template < index_t dimension >
-    void PolygonalSurfaceView< dimension >::add_viewed_polygon(
+    index_t PolygonalSurfaceView< dimension >::add_viewed_polygon(
         index_t polygon_id, PolygonalSurfaceViewKey )
     {
-        impl_->add_viewed_polygon( polygon_id );
+        return impl_->add_viewed_polygon( polygon_id );
     }
 
     template < index_t dimension >

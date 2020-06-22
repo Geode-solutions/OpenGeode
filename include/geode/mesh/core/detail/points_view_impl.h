@@ -63,7 +63,7 @@ namespace geode
                 return vertices2view_.at( vertex_id );
             }
 
-            void add_viewed_vertex( index_t vertex_id )
+            index_t add_viewed_vertex( index_t vertex_id )
             {
                 const auto id = mesh_view_.nb_vertices();
                 if( vertices2view_.emplace( vertex_id, id ).second )
@@ -71,6 +71,7 @@ namespace geode
                     mesh_view_.vertex_attribute_manager().resize( id + 1 );
                     view2vertices_->set_value( id, vertex_id );
                 }
+                return vertex_in_view( vertex_id );
             }
 
         private:

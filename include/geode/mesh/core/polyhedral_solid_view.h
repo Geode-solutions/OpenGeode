@@ -81,11 +81,11 @@ namespace geode
 
         index_t viewed_vertex( index_t vertex_id ) const;
 
-        void add_viewed_vertex( index_t vertex_id, PolyhedralSolidViewKey );
+        index_t add_viewed_vertex( index_t vertex_id, PolyhedralSolidViewKey );
 
         index_t viewed_polyhedron( index_t polyhedron_id ) const;
 
-        void add_viewed_polyhedron(
+        index_t add_viewed_polyhedron(
             index_t polyhedron_id, PolyhedralSolidViewKey );
 
     private:

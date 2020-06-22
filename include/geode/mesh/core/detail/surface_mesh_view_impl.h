@@ -152,7 +152,7 @@ namespace geode
                 return view2polygons_->value( polygon_id );
             }
 
-            void add_viewed_polygon( index_t polygon_id )
+            index_t add_viewed_polygon( index_t polygon_id )
             {
                 const auto polygon_view_id = surface_view_.nb_polygons();
                 if( polygons2view_.emplace( polygon_id, polygon_view_id )
@@ -176,6 +176,7 @@ namespace geode
                             surface_.polygon_edge( { polygon_id, e } ) );
                     }
                 }
+                return polygons2view_.at( polygon_id );
             }
 
         private:

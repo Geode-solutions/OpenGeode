@@ -87,10 +87,10 @@ namespace geode
     }
 
     template < index_t dimension >
-    void TetrahedralSolidView< dimension >::add_viewed_vertex(
+    index_t TetrahedralSolidView< dimension >::add_viewed_vertex(
         index_t vertex_id, TetrahedralSolidViewKey )
     {
-        impl_->add_viewed_vertex( vertex_id );
+        return impl_->add_viewed_vertex( vertex_id );
     }
 
     template < index_t dimension >
@@ -101,10 +101,10 @@ namespace geode
     }
 
     template < index_t dimension >
-    void TetrahedralSolidView< dimension >::add_viewed_tetrahedron(
+    index_t TetrahedralSolidView< dimension >::add_viewed_tetrahedron(
         index_t polyhedron_id, TetrahedralSolidViewKey )
     {
-        impl_->add_viewed_polyhedron( polyhedron_id );
+        return impl_->add_viewed_polyhedron( polyhedron_id );
     }
 
     template < index_t dimension >
