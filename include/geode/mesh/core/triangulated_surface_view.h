@@ -44,7 +44,8 @@ namespace geode
      * TriangulatedSurface without copying any geometry or microtopology, it
      * only "views" the selected subeset and acts like it is a complete mesh
      * with all the API from vertices to triangles, attributes included.
-     * @warning Modification on the TriangulatedSurface will not be reproduced on
+     * @warning Modification on the TriangulatedSurface will not be reproduced
+     on
 
      * the corresponding view.
      */
