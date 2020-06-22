@@ -64,6 +64,16 @@ namespace geode
     }
 
     template < index_t dimension >
+    void TetrahedralSolidBuilder< dimension >::do_create_facets(
+        const std::array< index_t, 4 >& vertices )
+    {
+        this->find_or_create_facet( { vertices[1], vertices[3], vertices[2] } );
+        this->find_or_create_facet( { vertices[0], vertices[2], vertices[3] } );
+        this->find_or_create_facet( { vertices[3], vertices[1], vertices[0] } );
+        this->find_or_create_facet( { vertices[0], vertices[1], vertices[2] } );
+    }
+
+    template < index_t dimension >
     void TetrahedralSolidBuilder< dimension >::do_create_edges(
         absl::Span< const index_t > vertices,
         absl::Span< const std::vector< index_t > > facets )
@@ -75,6 +85,18 @@ namespace geode
         std::array< index_t, 4 > tetra_vertices;
         absl::c_copy_n( vertices, 4, tetra_vertices.begin() );
         do_create_edges( tetra_vertices );
+    }
+
+    template < index_t dimension >
+    void TetrahedralSolidBuilder< dimension >::do_create_edges(
+        const std::array< index_t, 4 >& vertices )
+    {
+        this->find_or_create_edge( { vertices[0], vertices[1] } );
+        this->find_or_create_edge( { vertices[0], vertices[2] } );
+        this->find_or_create_edge( { vertices[0], vertices[3] } );
+        this->find_or_create_edge( { vertices[1], vertices[2] } );
+        this->find_or_create_edge( { vertices[1], vertices[3] } );
+        this->find_or_create_edge( { vertices[2], vertices[3] } );
     }
 
     template < index_t dimension >

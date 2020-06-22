@@ -91,11 +91,9 @@ namespace geode
         void do_create_polyhedron( absl::Span< const index_t > vertices,
             absl::Span< const std::vector< index_t > > facets ) final;
 
-        virtual void do_create_facets(
-            const std::array< index_t, 4 >& vertices ) = 0;
+        void do_create_facets( const std::array< index_t, 4 >& vertices );
 
-        virtual void do_create_edges(
-            const std::array< index_t, 4 >& vertices ) = 0;
+        void do_create_edges( const std::array< index_t, 4 >& vertices );
 
         virtual void do_create_tetrahedron(
             const std::array< index_t, 4 >& vertices ) = 0;

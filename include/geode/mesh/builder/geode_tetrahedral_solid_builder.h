@@ -64,10 +64,6 @@ namespace geode
             const PolyhedronVertex& polyhedron_vertex,
             index_t vertex_id ) final;
 
-        void do_create_facets( const std::array< index_t, 4 >& vertices ) final;
-
-        void do_create_edges( const std::array< index_t, 4 >& vertices ) final;
-
         void do_create_tetrahedron(
             const std::array< index_t, 4 >& vertices ) final;
 
