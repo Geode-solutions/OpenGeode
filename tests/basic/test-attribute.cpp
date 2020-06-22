@@ -92,7 +92,7 @@ void test_constant_attribute( geode::AttributeManager& manager )
 {
     auto constant_attribute =
         manager.find_or_create_attribute< geode::ConstantAttribute, bool >(
-            "bool", true );
+            "bool", true, { true, true } );
     OPENGEODE_EXCEPTION( constant_attribute->default_value() == true,
         "[Test] Wrong default value" );
 
@@ -134,7 +134,7 @@ void test_int_variable_attribute( geode::AttributeManager& manager )
 {
     auto variable_attribute =
         manager.find_or_create_attribute< geode::VariableAttribute, int >(
-            "int", 12 );
+            "int", 12, { true, true } );
     OPENGEODE_EXCEPTION( variable_attribute->default_value() == 12,
         "[Test] Wrong default value" );
     variable_attribute->set_value( 3, 3 );
@@ -198,7 +198,9 @@ void test_bool_variable_attribute( geode::AttributeManager& manager )
 {
     auto variable_attribute =
         manager.find_or_create_attribute< geode::VariableAttribute, bool >(
-            "bool_var", false );
+            "bool_var", false, { true, true } );
+    OPENGEODE_EXCEPTION( variable_attribute->default_value() == false,
+        "[Test] Wrong default value" );
     variable_attribute->set_value( 3, true );
 
     const auto attribute = manager.find_attribute< bool >( "bool_var" );

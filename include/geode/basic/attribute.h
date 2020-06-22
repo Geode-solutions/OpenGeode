@@ -263,12 +263,8 @@ namespace geode
             index_t nb_elements,
             AttributeBase::AttributeKey ) override
         {
-            if( nb_elements != 0 )
-            {
-                const auto& typed_attribute =
-                    dynamic_cast< const ReadOnlyAttribute< T >& >( attribute );
-                value_ = typed_attribute.value( 0 );
-            }
+            value_ = dynamic_cast< const ConstantAttribute< T >& >( attribute )
+                         .value();
         }
 
     private:
@@ -288,7 +284,7 @@ namespace geode
             AttributeProperties properties,
             AttributeBase::AttributeKey )
             : VariableAttribute(
-                std::move( default_value ), std::move( properties ) )
+                  std::move( default_value ), std::move( properties ) )
         {
         }
 
@@ -555,7 +551,7 @@ namespace geode
             AttributeProperties properties,
             AttributeBase::AttributeKey )
             : SparseAttribute(
-                std::move( default_value ), std::move( properties ) )
+                  std::move( default_value ), std::move( properties ) )
         {
         }
 
