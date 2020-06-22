@@ -63,14 +63,16 @@ namespace geode
     public:
         virtual ~AttributeBase() = default;
 
-        virtual std::shared_ptr< AttributeBase > clone() const = 0;
-
-        virtual void copy(
-            const AttributeBase& attribute, index_t nb_elements ) = 0;
-
         virtual float generic_value( index_t element ) const = 0;
 
         virtual absl::string_view type() = 0;
+
+        virtual std::shared_ptr< AttributeBase > clone(
+            AttributeKey ) const = 0;
+
+        virtual void copy( const AttributeBase& attribute,
+            index_t nb_elements,
+            AttributeKey ) = 0;
 
         virtual void resize( index_t size, AttributeKey ) = 0;
 
@@ -214,25 +216,6 @@ namespace geode
         {
         }
 
-        std::shared_ptr< AttributeBase > clone() const override
-        {
-            std::shared_ptr< ConstantAttribute< T > > attribute{
-                new ConstantAttribute< T >{ value_, this->properties() }
-            };
-            return attribute;
-        }
-
-        void copy(
-            const AttributeBase& attribute, index_t nb_elements ) override
-        {
-            if( nb_elements != 0 )
-            {
-                const auto& typed_attribute =
-                    dynamic_cast< const ReadOnlyAttribute< T >& >( attribute );
-                value_ = typed_attribute.value( 0 );
-            }
-        }
-
     private:
         ConstantAttribute( T value, AttributeProperties properties )
             : ReadOnlyAttribute< T >( std::move( properties ) )
@@ -267,6 +250,27 @@ namespace geode
         {
         }
 
+        std::shared_ptr< AttributeBase > clone(
+            AttributeBase::AttributeKey ) const override
+        {
+            std::shared_ptr< ConstantAttribute< T > > attribute{
+                new ConstantAttribute< T >{ value_, this->properties() }
+            };
+            return attribute;
+        }
+
+        void copy( const AttributeBase& attribute,
+            index_t nb_elements,
+            AttributeBase::AttributeKey ) override
+        {
+            if( nb_elements != 0 )
+            {
+                const auto& typed_attribute =
+                    dynamic_cast< const ReadOnlyAttribute< T >& >( attribute );
+                value_ = typed_attribute.value( 0 );
+            }
+        }
+
     private:
         T value_;
     };
@@ -284,7 +288,7 @@ namespace geode
             AttributeProperties properties,
             AttributeBase::AttributeKey )
             : VariableAttribute(
-                std::move( default_value ), std::move( properties ) )
+                  std::move( default_value ), std::move( properties ) )
         {
         }
 
@@ -321,31 +325,6 @@ namespace geode
             AttributeBase::AttributeKey ) override
         {
             set_value( to_element, interpolation.compute_value( *this ) );
-        }
-
-        std::shared_ptr< AttributeBase > clone() const override
-        {
-            std::shared_ptr< VariableAttribute< T > > attribute{
-                new VariableAttribute< T >{ default_value_, this->properties() }
-            };
-            attribute->values_ = values_;
-            return attribute;
-        }
-
-        void copy(
-            const AttributeBase& attribute, index_t nb_elements ) override
-        {
-            const auto& typed_attribute =
-                dynamic_cast< const VariableAttribute< T >& >( attribute );
-            default_value_ = typed_attribute.default_value_;
-            if( nb_elements != 0 )
-            {
-                values_.resize( nb_elements );
-                for( const auto i : Range{ nb_elements } )
-                {
-                    values_[i] = typed_attribute.value( i );
-                }
-            }
         }
 
     protected:
@@ -394,6 +373,33 @@ namespace geode
             to_keep.flip();
             values_ = extract_vector_elements( to_keep, values_ );
             values_.reserve( 10 );
+        }
+
+        std::shared_ptr< AttributeBase > clone(
+            AttributeBase::AttributeKey ) const override
+        {
+            std::shared_ptr< VariableAttribute< T > > attribute{
+                new VariableAttribute< T >{ default_value_, this->properties() }
+            };
+            attribute->values_ = values_;
+            return attribute;
+        }
+
+        void copy( const AttributeBase& attribute,
+            index_t nb_elements,
+            AttributeBase::AttributeKey ) override
+        {
+            const auto& typed_attribute =
+                dynamic_cast< const VariableAttribute< T >& >( attribute );
+            default_value_ = typed_attribute.default_value_;
+            if( nb_elements != 0 )
+            {
+                values_.resize( nb_elements );
+                for( const auto i : Range{ nb_elements } )
+                {
+                    values_[i] = typed_attribute.value( i );
+                }
+            }
         }
 
     private:
@@ -454,32 +460,6 @@ namespace geode
             set_value( to_element, interpolation.compute_value( *this ) );
         }
 
-        std::shared_ptr< AttributeBase > clone() const override
-        {
-            std::shared_ptr< VariableAttribute< bool > > attribute{
-                new VariableAttribute< bool >{
-                    static_cast< bool >( default_value_ ), this->properties() }
-            };
-            attribute->values_ = values_;
-            return attribute;
-        }
-
-        void copy(
-            const AttributeBase& attribute, index_t nb_elements ) override
-        {
-            const auto& typed_attribute =
-                dynamic_cast< const VariableAttribute< bool >& >( attribute );
-            default_value_ = typed_attribute.default_value_;
-            if( nb_elements != 0 )
-            {
-                values_.resize( nb_elements );
-                for( const auto i : Range{ nb_elements } )
-                {
-                    values_[i] = typed_attribute.value( i );
-                }
-            }
-        }
-
     protected:
         VariableAttribute( bool default_value, AttributeProperties properties )
             : ReadOnlyAttribute< bool >( std::move( properties ) ),
@@ -528,6 +508,34 @@ namespace geode
             values_.reserve( 10 );
         }
 
+        std::shared_ptr< AttributeBase > clone(
+            AttributeBase::AttributeKey ) const override
+        {
+            std::shared_ptr< VariableAttribute< bool > > attribute{
+                new VariableAttribute< bool >{
+                    static_cast< bool >( default_value_ ), this->properties() }
+            };
+            attribute->values_ = values_;
+            return attribute;
+        }
+
+        void copy( const AttributeBase& attribute,
+            index_t nb_elements,
+            AttributeBase::AttributeKey ) override
+        {
+            const auto& typed_attribute =
+                dynamic_cast< const VariableAttribute< bool >& >( attribute );
+            default_value_ = typed_attribute.default_value_;
+            if( nb_elements != 0 )
+            {
+                values_.resize( nb_elements );
+                for( const auto i : Range{ nb_elements } )
+                {
+                    values_[i] = typed_attribute.value( i );
+                }
+            }
+        }
+
     private:
         unsigned char default_value_;
         std::vector< unsigned char > values_;
@@ -547,7 +555,7 @@ namespace geode
             AttributeProperties properties,
             AttributeBase::AttributeKey )
             : SparseAttribute(
-                std::move( default_value ), std::move( properties ) )
+                  std::move( default_value ), std::move( properties ) )
         {
         }
 
@@ -594,33 +602,6 @@ namespace geode
             AttributeBase::AttributeKey ) override
         {
             set_value( to_element, interpolation.compute_value( *this ) );
-        }
-
-        std::shared_ptr< AttributeBase > clone() const override
-        {
-            std::shared_ptr< SparseAttribute< T > > attribute{
-                new SparseAttribute< T >{ default_value_, this->properties() }
-            };
-            attribute->values_ = values_;
-            return attribute;
-        }
-
-        void copy(
-            const AttributeBase& attribute, index_t nb_elements ) override
-        {
-            const auto& typed_attribute =
-                dynamic_cast< const SparseAttribute< T >& >( attribute );
-            default_value_ = typed_attribute.default_value_;
-            if( nb_elements != 0 )
-            {
-                for( const auto i : Range{ nb_elements } )
-                {
-                    if( typed_attribute.value( i ) != default_value_ )
-                    {
-                        values_[i] = typed_attribute.value( i );
-                    }
-                }
-            }
         }
 
     private:
@@ -672,6 +653,35 @@ namespace geode
                 if( !to_delete[value.first] && value.second != default_value_ )
                 {
                     values_.emplace( old2new[value.first], value.second );
+                }
+            }
+        }
+
+        std::shared_ptr< AttributeBase > clone(
+            AttributeBase::AttributeKey ) const override
+        {
+            std::shared_ptr< SparseAttribute< T > > attribute{
+                new SparseAttribute< T >{ default_value_, this->properties() }
+            };
+            attribute->values_ = values_;
+            return attribute;
+        }
+
+        void copy( const AttributeBase& attribute,
+            index_t nb_elements,
+            AttributeBase::AttributeKey ) override
+        {
+            const auto& typed_attribute =
+                dynamic_cast< const SparseAttribute< T >& >( attribute );
+            default_value_ = typed_attribute.default_value_;
+            if( nb_elements != 0 )
+            {
+                for( const auto i : Range{ nb_elements } )
+                {
+                    if( typed_attribute.value( i ) != default_value_ )
+                    {
+                        values_[i] = typed_attribute.value( i );
+                    }
                 }
             }
         }

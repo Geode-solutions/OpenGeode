@@ -93,6 +93,8 @@ void test_constant_attribute( geode::AttributeManager& manager )
     auto constant_attribute =
         manager.find_or_create_attribute< geode::ConstantAttribute, bool >(
             "bool", true );
+    OPENGEODE_EXCEPTION( constant_attribute->default_value() == true,
+        "[Test] Wrong default value" );
 
     auto attribute = manager.find_attribute< bool >( "bool" );
     OPENGEODE_EXCEPTION(
@@ -133,6 +135,8 @@ void test_int_variable_attribute( geode::AttributeManager& manager )
     auto variable_attribute =
         manager.find_or_create_attribute< geode::VariableAttribute, int >(
             "int", 12 );
+    OPENGEODE_EXCEPTION( variable_attribute->default_value() == 12,
+        "[Test] Wrong default value" );
     variable_attribute->set_value( 3, 3 );
 
     const auto attribute = manager.find_attribute< int >( "int" );
@@ -166,6 +170,8 @@ void test_double_sparse_attribute( geode::AttributeManager& manager )
     auto sparse_attribute =
         manager.find_or_create_attribute< geode::SparseAttribute, double >(
             "double", 12., { true, true } );
+    OPENGEODE_EXCEPTION(
+        sparse_attribute->default_value() == 12, "[Test] Wrong default value" );
     sparse_attribute->set_value( 3, 3 );
     sparse_attribute->set_value( 7, 7 );
     manager.assign_attribute_value( 3, 2 );
@@ -362,6 +368,15 @@ void test_generic_value( geode::AttributeManager& manager )
         "Generic value for element 2 of array attribute should be 0." );
 }
 
+void test_copy_manager( geode::AttributeManager& manager )
+{
+    geode::AttributeManager manager2;
+    manager2.copy( manager );
+    manager2.reserve( 15 );
+    test_attribute_types( manager2 );
+    test_number_of_attributes( manager2, 8 );
+}
+
 void test()
 {
     geode::AttributeManager manager;
@@ -381,6 +396,7 @@ void test()
 
     test_serialize_manager( manager );
 
+    test_copy_manager( manager );
     test_attribute_types( manager );
     test_number_of_attributes( manager, 8 );
     manager.delete_attribute( "bool" );
