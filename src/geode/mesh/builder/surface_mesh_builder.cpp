@@ -476,8 +476,6 @@ namespace geode
         for( const auto v : Range{ surface_mesh_->nb_vertices() } )
         {
             to_delete[v] = !surface_mesh_->polygon_around_vertex( v );
-            DEBUG( surface_mesh_->polygon_around_vertex( v ).has_value() );
-            DEBUG( to_delete[v] );
         }
         return delete_vertices( to_delete );
     }
