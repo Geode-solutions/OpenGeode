@@ -39,7 +39,7 @@ namespace geode
     {
     public:
         Impl( PolygonalSurfaceView< dimension >& surface_view,
-            PolygonalSurface< dimension >& surface )
+            const PolygonalSurface< dimension >& surface )
             : detail::SurfaceMeshViewImpl< dimension >( surface_view, surface )
         {
         }
@@ -47,7 +47,7 @@ namespace geode
 
     template < index_t dimension >
     PolygonalSurfaceView< dimension >::PolygonalSurfaceView(
-        PolygonalSurface< dimension >& surface )
+        const PolygonalSurface< dimension >& surface )
         : impl_( *this, surface )
     {
     }

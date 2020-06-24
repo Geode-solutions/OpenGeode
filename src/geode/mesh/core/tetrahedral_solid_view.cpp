@@ -39,7 +39,7 @@ namespace geode
     {
     public:
         Impl( TetrahedralSolidView< dimension >& solid_view,
-            TetrahedralSolid< dimension >& solid )
+            const TetrahedralSolid< dimension >& solid )
             : detail::SolidMeshViewImpl< dimension >( solid_view, solid )
         {
         }
@@ -47,7 +47,7 @@ namespace geode
 
     template < index_t dimension >
     TetrahedralSolidView< dimension >::TetrahedralSolidView(
-        TetrahedralSolid< dimension >& solid )
+        const TetrahedralSolid< dimension >& solid )
         : impl_( *this, solid )
     {
     }
