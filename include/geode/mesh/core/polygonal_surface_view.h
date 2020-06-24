@@ -56,7 +56,7 @@ namespace geode
             PolygonalSurfaceViewBuilder< dimension >, PolygonalSurfaceViewKey );
 
     public:
-        PolygonalSurfaceView( PolygonalSurface< dimension >& surface );
+        PolygonalSurfaceView( const PolygonalSurface< dimension >& surface );
         ~PolygonalSurfaceView();
 
         static MeshImpl impl_name_static()

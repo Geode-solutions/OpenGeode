@@ -40,7 +40,7 @@ namespace geode
         {
         public:
             SurfaceMeshViewImpl( SurfaceMesh< dimension >& surface_view,
-                SurfaceMesh< dimension >& surface )
+                const SurfaceMesh< dimension >& surface )
                 : detail::EdgesViewImpl< dimension, SurfaceMesh< dimension > >(
                     surface_view, surface ),
                   surface_( surface ),
@@ -195,7 +195,7 @@ namespace geode
             }
 
         private:
-            SurfaceMesh< dimension >& surface_;
+            const SurfaceMesh< dimension >& surface_;
             SurfaceMesh< dimension >& surface_view_;
             std::shared_ptr< VariableAttribute< index_t > > view2polygons_;
             absl::flat_hash_map< index_t, index_t > polygons2view_;

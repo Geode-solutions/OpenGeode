@@ -38,7 +38,7 @@ namespace geode
         class PointsViewImpl
         {
         public:
-            PointsViewImpl( VertexSet& mesh_view, Mesh& mesh )
+            PointsViewImpl( VertexSet& mesh_view, const Mesh& mesh )
                 : mesh_( mesh ),
                   mesh_view_( mesh_view ),
                   view2vertices_(
@@ -75,7 +75,7 @@ namespace geode
             }
 
         private:
-            Mesh& mesh_;
+            const Mesh& mesh_;
             VertexSet& mesh_view_;
             std::shared_ptr< VariableAttribute< index_t > > view2vertices_;
             absl::flat_hash_map< index_t, index_t > vertices2view_;

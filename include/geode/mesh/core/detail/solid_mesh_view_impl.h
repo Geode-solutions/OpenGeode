@@ -41,7 +41,7 @@ namespace geode
         {
         public:
             SolidMeshViewImpl( SolidMesh< dimension >& solid_view,
-                SolidMesh< dimension >& solid )
+                const SolidMesh< dimension >& solid )
                 : detail::EdgesViewImpl< dimension, SolidMesh< dimension > >(
                     solid_view, solid ),
                   solid_( solid ),
@@ -360,7 +360,7 @@ namespace geode
             }
 
         private:
-            SolidMesh< dimension >& solid_;
+            const SolidMesh< dimension >& solid_;
             SolidMesh< dimension >& solid_view_;
             std::shared_ptr< VariableAttribute< index_t > > view2polyhedra_;
             absl::flat_hash_map< index_t, index_t > polyhedra2view_;
