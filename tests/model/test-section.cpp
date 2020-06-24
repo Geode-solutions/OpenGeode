@@ -26,6 +26,11 @@
 #include <geode/basic/range.h>
 #include <geode/basic/uuid.h>
 
+#include <geode/geometry/point.h>
+
+#include <geode/mesh/builder/edged_curve_builder.h>
+#include <geode/mesh/builder/point_set_builder.h>
+#include <geode/mesh/builder/surface_mesh_builder.h>
 #include <geode/mesh/core/geode_edged_curve.h>
 #include <geode/mesh/core/geode_point_set.h>
 #include <geode/mesh/core/geode_polygonal_surface.h>
@@ -212,6 +217,55 @@ void add_line_surface_boundary_relation( const geode::Section& model,
         "[Test] Surface 0 should have 3 Lines as boundaries" );
     OPENGEODE_EXCEPTION( model.nb_boundaries( surface_uuids[1] ) == 4,
         "[Test] Surface 1 should have 4 Lines as boundaries" );
+}
+
+void set_geometry( geode::SectionBuilder& builder,
+    absl::Span< const geode::uuid > corner_uuids,
+    absl::Span< const geode::uuid > line_uuids,
+    absl::Span< const geode::uuid > surface_uuids )
+{
+    std::array< geode::Point2D, 5 > points;
+    points[0] = geode::Point2D{ { 1., 2. } };
+    points[1] = geode::Point2D{ { 0., 1. } };
+    points[2] = geode::Point2D{ { 2., 1. } };
+    points[3] = geode::Point2D{ { 0., 2. } };
+    points[4] = geode::Point2D{ { 2., 2. } };
+    for( const auto i : geode::Range{ 5 } )
+    {
+        builder.corner_mesh_builder( corner_uuids[i] )
+            ->create_point( points[i] );
+    }
+    builder.line_mesh_builder( line_uuids[0] )->create_point( points[0] );
+    builder.line_mesh_builder( line_uuids[0] )->create_point( points[1] );
+    builder.line_mesh_builder( line_uuids[1] )->create_point( points[0] );
+    builder.line_mesh_builder( line_uuids[1] )->create_point( points[2] );
+    builder.line_mesh_builder( line_uuids[2] )->create_point( points[1] );
+    builder.line_mesh_builder( line_uuids[2] )->create_point( points[2] );
+    builder.line_mesh_builder( line_uuids[3] )->create_point( points[1] );
+    builder.line_mesh_builder( line_uuids[3] )->create_point( points[3] );
+    builder.line_mesh_builder( line_uuids[4] )->create_point( points[2] );
+    builder.line_mesh_builder( line_uuids[4] )->create_point( points[4] );
+    builder.line_mesh_builder( line_uuids[5] )->create_point( points[3] );
+    builder.line_mesh_builder( line_uuids[5] )->create_point( points[4] );
+    for( const auto i : geode::Range{ 6 } )
+    {
+        builder.line_mesh_builder( line_uuids[i] )->create_edge( 0, 1 );
+    }
+
+    builder.surface_mesh_builder( surface_uuids[0] )->create_point( points[0] );
+    builder.surface_mesh_builder( surface_uuids[0] )->create_point( points[1] );
+    builder.surface_mesh_builder( surface_uuids[0] )->create_point( points[2] );
+    builder.surface_mesh_builder( surface_uuids[0] )
+        ->create_polygon( { 0, 1, 2 } );
+
+    builder.surface_mesh_builder( surface_uuids[1] )->create_point( points[1] );
+    builder.surface_mesh_builder( surface_uuids[1] )->create_point( points[2] );
+    builder.surface_mesh_builder( surface_uuids[1] )->create_point( points[4] );
+    builder.surface_mesh_builder( surface_uuids[1] )->create_point( points[3] );
+    builder.surface_mesh_builder( surface_uuids[1] )
+        ->create_polygon( { 0, 1, 2 } );
+    builder.surface_mesh_builder( surface_uuids[1] )
+        ->create_polygon( { 0, 2, 3 } );
 }
 
 void add_lines_in_model_boundaries( const geode::Section& model,
@@ -511,6 +565,8 @@ void test()
     const auto line_uuids = add_lines( model, builder );
     const auto surface_uuids = add_surfaces( model, builder );
     const auto model_boundary_uuids = add_model_boundaries( model, builder );
+
+    set_geometry( builder, corner_uuids, line_uuids, surface_uuids );
 
     add_corner_line_boundary_relation(
         model, builder, corner_uuids, line_uuids );

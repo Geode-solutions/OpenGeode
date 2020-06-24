@@ -38,8 +38,7 @@ namespace
         }
     }
 
-    template < geode::index_t dimension >
-    bool all_polyhedra_are_simplex( const geode::SolidMesh< dimension >& solid )
+    bool all_polyhedra_are_simplex( const geode::SolidMesh3D& solid )
     {
         for( const auto p : geode::Range{ solid.nb_polyhedra() } )
         {
@@ -54,18 +53,15 @@ namespace
 
 namespace geode
 {
-    template < index_t dimension >
-    absl::optional< std::unique_ptr< TetrahedralSolid< dimension > > >
-        convert_solid_mesh_into_tetrahedral_solid(
-            const SolidMesh< dimension >& solid )
+    absl::optional< std::unique_ptr< TetrahedralSolid3D > >
+        convert_solid_mesh_into_tetrahedral_solid( const SolidMesh3D& solid )
     {
         if( !all_polyhedra_are_simplex( solid ) )
         {
             return absl::nullopt;
         }
-        auto tet_solid = TetrahedralSolid< dimension >::create();
-        auto builder =
-            TetrahedralSolidBuilder< dimension >::create( *tet_solid );
+        auto tet_solid = TetrahedralSolid3D::create();
+        auto builder = TetrahedralSolidBuilder3D::create( *tet_solid );
         copy_points( solid, *builder );
         builder->reserve_tetrahedra( solid.nb_polyhedra() );
         for( const auto p : Range{ solid.nb_polyhedra() } )
@@ -91,9 +87,4 @@ namespace geode
         }
         return std::move( tet_solid );
     }
-
-    template absl::optional< std::unique_ptr< TetrahedralSolid3D > >
-        opengeode_mesh_api convert_solid_mesh_into_tetrahedral_solid(
-            const SolidMesh3D& );
-
 } // namespace geode

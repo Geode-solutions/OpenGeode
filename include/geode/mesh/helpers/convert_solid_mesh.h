@@ -30,13 +30,13 @@
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( TetrahedralSolid );
+    ALIAS_3D( TetrahedralSolid );
     FORWARD_DECLARATION_DIMENSION_CLASS( SolidMesh );
+    ALIAS_3D( SolidMesh );
 } // namespace geode
 
 namespace geode
 {
-    template < index_t dimension >
-    absl::optional< std::unique_ptr< TetrahedralSolid< dimension > > >
-        convert_solid_mesh_into_tetrahedral_solid(
-            const SolidMesh< dimension >& solid );
+    absl::optional< std::unique_ptr< TetrahedralSolid3D > > opengeode_mesh_api
+        convert_solid_mesh_into_tetrahedral_solid( const SolidMesh3D& solid );
 } // namespace geode
