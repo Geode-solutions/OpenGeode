@@ -123,10 +123,4 @@ namespace geode
         BRepBuilder brep_builder{ brep };
         do_convert_blocks( brep, brep_builder );
     }
-
-    // template void opengeode_model_api
-    //     convert_surface_meshes_into_triangulated_surfaces( Section& );
-    // template void opengeode_model_api
-    //     convert_surface_meshes_into_triangulated_surfaces( BRep& );
-
 } // namespace geode
