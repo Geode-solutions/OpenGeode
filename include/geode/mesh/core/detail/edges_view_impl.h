@@ -36,7 +36,7 @@ namespace geode
         class EdgesViewImpl : public detail::PointsViewImpl< dimension, Mesh >
         {
         public:
-            EdgesViewImpl( Mesh& mesh_view, Mesh& mesh )
+            EdgesViewImpl( Mesh& mesh_view, const Mesh& mesh )
                 : detail::PointsViewImpl< dimension, Mesh >( mesh_view, mesh ),
                   mesh_( mesh ),
                   mesh_view_( mesh_view ),
@@ -107,7 +107,7 @@ namespace geode
             }
 
         private:
-            Mesh& mesh_;
+            const Mesh& mesh_;
             Mesh& mesh_view_;
             std::shared_ptr< VariableAttribute< index_t > > view2edges_;
             mutable std::shared_ptr<

@@ -39,7 +39,7 @@ namespace geode
     {
     public:
         Impl( TriangulatedSurfaceView< dimension >& surface_view,
-            TriangulatedSurface< dimension >& surface )
+            const TriangulatedSurface< dimension >& surface )
             : detail::SurfaceMeshViewImpl< dimension >( surface_view, surface )
         {
         }
@@ -47,7 +47,7 @@ namespace geode
 
     template < index_t dimension >
     TriangulatedSurfaceView< dimension >::TriangulatedSurfaceView(
-        TriangulatedSurface< dimension >& surface )
+        const TriangulatedSurface< dimension >& surface )
         : impl_( *this, surface )
     {
     }
