@@ -23,8 +23,6 @@
 
 #pragma once
 
-#include <absl/types/optional.h>
-
 #include <geode/model/common.h>
 
 namespace geode
