@@ -23,6 +23,7 @@ add_geode_library(
     FOLDER "geode/model"
     SOURCES
         "common.cpp"
+        "helpers/convert_model_meshes.cpp"
         "mixin/builder/blocks_builder.cpp"
         "mixin/builder/corners_builder.cpp"
         "mixin/builder/lines_builder.cpp"
@@ -54,6 +55,7 @@ add_geode_library(
         "representation/io/section_output.cpp"
     PUBLIC_HEADERS
         "common.h"
+        "helpers/convert_model_meshes.h"
         "mixin/builder/add_components_builders.h"
         "mixin/builder/blocks_builder.h"
         "mixin/builder/corners_builder.h"
