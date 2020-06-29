@@ -24,6 +24,8 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+#include "helpers/convert_model_meshes.h"
+
 #include "mixin/builder/blocks_builder.h"
 #include "mixin/builder/corners_builder.h"
 #include "mixin/builder/lines_builder.h"
@@ -106,4 +108,6 @@ PYBIND11_MODULE( opengeode_py_model, module )
 
     geode::define_brep_io( module );
     geode::define_section_io( module );
+
+    geode::define_convert_model_meshes( module );
 }
