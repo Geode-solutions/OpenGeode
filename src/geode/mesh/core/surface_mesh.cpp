@@ -500,13 +500,19 @@ namespace geode
         if( const auto polygon_adj = polygon_adjacent( polygon_edge ) )
         {
             const auto polygon_adj_id = polygon_adj.value();
-            const auto edge_id = this->polygon_edge( polygon_edge );
+            const auto v0 = this->polygon_vertex( polygon_edge );
+            const auto v1 = this->polygon_vertex(
+                this->next_polygon_vertex( polygon_edge ) );
             for( const auto e : Range{ nb_polygon_edges( polygon_adj_id ) } )
             {
                 const PolygonEdge adj_edge{ polygon_adj_id, e };
                 const auto polygon = polygon_adjacent( adj_edge );
+                const auto adj_v0 = this->polygon_vertex( adj_edge );
+                const auto adj_v1 = this->polygon_vertex(
+                    this->next_polygon_vertex( adj_edge ) );
                 if( polygon && polygon == polygon_edge.polygon_id
-                    && this->polygon_edge( adj_edge ) == edge_id )
+                    && ( ( v0 == adj_v1 && v1 == adj_v0 )
+                         || ( v0 == adj_v0 && v1 == adj_v1 ) ) )
                 {
                     return adj_edge;
                 }
