@@ -573,6 +573,46 @@ namespace geode
     }
 
     template < index_t dimension >
+    template < index_t T >
+    typename std::enable_if< T == 3, Vector3D >::type
+        SolidMesh< dimension >::facet_normal( index_t facet_id ) const
+    {
+        const auto barycenter = this->facet_barycenter( facet_id );
+        Vector3D normal;
+        const auto& facet_vertices = this->facet_vertices( facet_id );
+        for( const auto v : Range{ 1, facet_vertices.size() } )
+        {
+            const auto& p1 = this->point( facet_vertices[v - 1] );
+            const auto& p2 = this->point( facet_vertices[v] );
+            normal =
+                normal + Vector3D{ p1, barycenter }.cross( { p2, barycenter } );
+        }
+        const auto& p1 = this->point( facet_vertices.back() );
+        const auto& p2 = this->point( facet_vertices[0] );
+        normal =
+            normal + Vector3D{ p1, barycenter }.cross( { p2, barycenter } );
+        return normal.normalize();
+    }
+
+    template < index_t dimension >
+    template < index_t T >
+    typename std::enable_if< T == 3, Vector3D >::type
+        SolidMesh< dimension >::polyhedron_facet_normal(
+            const PolyhedronFacet& polyhedron_facet ) const
+    {
+        const auto facet_id = this->polyhedron_facet( polyhedron_facet );
+        const auto barycenter = this->facet_barycenter( facet_id );
+        const auto& p0 = this->point(
+            this->polyhedron_facet_vertex( { polyhedron_facet, 0 } ) );
+        const auto& p1 = this->point(
+            this->polyhedron_facet_vertex( { polyhedron_facet, 1 } ) );
+        const auto ref = Vector3D{ p0, barycenter }.cross( { p1, barycenter } );
+        const auto facet_normal = this->facet_normal( facet_id );
+        return facet_normal.dot( ref ) > 0. ? facet_normal
+                                            : Vector3D{ facet_normal * -1. };
+    }
+
+    template < index_t dimension >
     index_t SolidMesh< dimension >::nb_polyhedra() const
     {
         return polyhedron_attribute_manager().nb_elements();
@@ -1152,6 +1192,12 @@ namespace geode
     }
 
     template class opengeode_mesh_api SolidMesh< 3 >;
+
+    template opengeode_mesh_api Vector3D SolidMesh< 3 >::facet_normal< 3 >(
+        index_t ) const;
+    template opengeode_mesh_api Vector3D
+        SolidMesh< 3 >::polyhedron_facet_normal< 3 >(
+            const PolyhedronFacet& ) const;
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, SolidMesh< 3 > );
 } // namespace geode

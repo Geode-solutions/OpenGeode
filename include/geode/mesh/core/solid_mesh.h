@@ -39,8 +39,12 @@
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Vector );
     FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
     FORWARD_DECLARATION_DIMENSION_CLASS( SolidMeshBuilder );
+
+    ALIAS_2D_AND_3D( Vector );
+    // ALIAS_3D( Vector );
 
     class AttributeManager;
 } // namespace geode
@@ -368,6 +372,23 @@ namespace geode
          * @param[in] edge_id Index of edge.
          */
         Point< dimension > edge_barycenter( index_t edge_id ) const;
+
+        /*!
+         * Return the normal of a given facet.
+         * @param[in] facet_id Index of facet.
+         */
+        template < index_t T = dimension >
+        typename std::enable_if< T == 3, Vector3D >::type facet_normal(
+            index_t facet_id ) const;
+
+        /*!
+         * Return the normal of a given PolyhedronFacet.
+         * @param[in] polyhedron_facet Local index of facet in polyhedron.
+         */
+        template < index_t T = dimension >
+        typename std::enable_if< T == 3, Vector3D >::type
+            polyhedron_facet_normal(
+                const PolyhedronFacet& polyhedron_facet ) const;
 
         /*!
          * Get all the polyhedra with one of the vertices matching given vertex.

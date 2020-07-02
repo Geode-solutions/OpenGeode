@@ -89,7 +89,10 @@ namespace geode
 {
     void define_solid_mesh( pybind11::module& module )
     {
-        PYTHON_SOLID_MESH( 3 );
+        PYTHON_SOLID_MESH( 3 )
+            .def( "facet_normal", &SolidMesh3D::facet_normal< 3 > )
+            .def( "polyhedron_facet_normal",
+                &SolidMesh3D::polyhedron_facet_normal< 3 > );
 
         pybind11::class_< PolyhedronVertex >( module, "PolyhedronVertex" )
             .def( pybind11::init<>() )
