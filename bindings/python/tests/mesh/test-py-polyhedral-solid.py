@@ -189,6 +189,34 @@ def test_barycenters():
     if polyhedral_solid.polyhedron_barycenter( 0 ) != answer_polyhedron_barycenter:
         raise ValueError( "[Test] PolyhedralSolid polyhedron barycenter is not correct" )
 
+
+def test_normals():
+    polyhedral_solid = mesh.PolyhedralSolid3D.create()
+    builder = mesh.PolyhedralSolidBuilder3D.create( polyhedral_solid )
+    o = 0.0
+    a = 0.6
+    b = 2.4
+    c = 1.8
+    builder.create_point( geom.Point3D( [ o, b, -c ] ) )
+    builder.create_point( geom.Point3D( [ o, o, o ] ) )
+    builder.create_point( geom.Point3D( [ a, o, o ] ) )
+    builder.create_point( geom.Point3D( [ a, b, o ] ) )
+    builder.create_point( geom.Point3D( [ o, b, o ] ) )
+    builder.create_point( geom.Point3D( [ o, b, c ] ) )
+    builder.create_polyhedron( [ 0, 1, 2, 3, 4 ], [ [ 1, 2, 0 ], [ 1, 2, 3, 4 ], [ 2, 3, 0  ], [ 3, 4, 0 ], [4, 1, 0 ] ] )
+    builder.create_polyhedron( [ 5, 1, 4, 3, 2 ], [ [ 1, 2, 0 ], [ 1, 2, 3, 4 ], [ 2, 3, 0  ], [ 3, 4, 0 ], [4, 1, 0 ] ] )
+
+    answer_facet_normal = geom.Point3D( [ 0, 0, 1 ] )
+    if polyhedral_solid.facet_normal( polyhedral_solid.polyhedron_facet( mesh.PolyhedronFacet( 0, 1 ) ) ) != answer_facet_normal:
+        raise ValueError( "[Test] PolyhedralSolid facet_normal is not correct (0, 1)" )
+    if polyhedral_solid.polyhedron_facet_normal( mesh.PolyhedronFacet( 0, 1 ) ) != answer_facet_normal:
+        raise ValueError( "[Test] PolyhedralSolid polyhedron_facet_normal is not correct (0, 1)" )
+
+    if polyhedral_solid.facet_normal( polyhedral_solid.polyhedron_facet( mesh.PolyhedronFacet( 1, 1 ) ) ) != answer_facet_normal:
+        raise ValueError( "[Test] PolyhedralSolid facet_normal is not correct (1, 1)" )
+    if polyhedral_solid.polyhedron_facet_normal( mesh.PolyhedronFacet( 1, 1 ) ) != answer_facet_normal * -1.:
+        raise ValueError( "[Test] PolyhedralSolid polyhedron_facet_normal is not correct )1, 1)" )
+
 def test_clone( polyhedral_solid ):
     polyhedral_solid2 = polyhedral_solid.clone()
     if polyhedral_solid2.nb_vertices() != 7:
@@ -247,3 +275,4 @@ if __name__ == '__main__':
     test_delete_all( polyhedral_solid, builder )
     
     test_barycenters()
+    test_normals()

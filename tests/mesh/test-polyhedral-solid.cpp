@@ -27,6 +27,7 @@
 
 #include <geode/geometry/bounding_box.h>
 #include <geode/geometry/point.h>
+#include <geode/geometry/vector.h>
 
 #include <geode/mesh/builder/geode_polyhedral_solid_builder.h>
 #include <geode/mesh/core/geode_polyhedral_solid.h>
@@ -307,6 +308,50 @@ void test_barycenters()
         "[Test] PolyhedralSolid polyhedron barycenter is not correct" );
 }
 
+void test_normals()
+{
+    auto polyhedral_solid = geode::PolyhedralSolid3D::create(
+        geode::OpenGeodePolyhedralSolid3D::impl_name_static() );
+    auto builder = geode::PolyhedralSolidBuilder3D::create( *polyhedral_solid );
+    const double o{ 0.0 };
+    const double a{ 0.6 };
+    const double b{ 2.4 };
+    const double c{ 1.8 };
+    builder->create_point( { { o, b, -c } } );
+    builder->create_point( { { o, o, o } } );
+    builder->create_point( { { a, o, o } } );
+    builder->create_point( { { a, b, o } } );
+    builder->create_point( { { o, b, o } } );
+    builder->create_point( { { o, b, c } } );
+    builder->create_polyhedron(
+        { 0, 1, 2, 3, 4 }, { { 1, 2, 0 }, { 1, 2, 3, 4 }, { 2, 3, 0 },
+                               { 3, 4, 0 }, { 4, 1, 0 } } );
+    builder->create_polyhedron(
+        { 5, 1, 4, 3, 2 }, { { 1, 2, 0 }, { 1, 2, 3, 4 }, { 2, 3, 0 },
+                               { 3, 4, 0 }, { 4, 1, 0 } } );
+
+    const geode::Point3D answer_facet_normal{ { 0, 0, 1 } };
+    const auto facet_normal0 = polyhedral_solid->facet_normal(
+        polyhedral_solid->polyhedron_facet( { 0, 1 } ) );
+    OPENGEODE_EXCEPTION( facet_normal0 == answer_facet_normal,
+        "[Test] PolyhedralSolid facet_normal is not correct (0, 1)" );
+    const auto polyhedron_facet_normal0 =
+        polyhedral_solid->polyhedron_facet_normal( { 0, 1 } );
+    OPENGEODE_EXCEPTION( polyhedron_facet_normal0 == answer_facet_normal,
+        "[Test] PolyhedralSolid polyhedron_facet_normal is not correct (0, "
+        "1)" );
+
+    const auto facet_normal1 = polyhedral_solid->facet_normal(
+        polyhedral_solid->polyhedron_facet( { 1, 1 } ) );
+    OPENGEODE_EXCEPTION( facet_normal1 == answer_facet_normal,
+        "[Test] PolyhedralSolid facet_normal is not correct (1, 1)" );
+    const auto polyhedron_facet_normal1 =
+        polyhedral_solid->polyhedron_facet_normal( { 1, 1 } );
+    OPENGEODE_EXCEPTION( polyhedron_facet_normal1 == answer_facet_normal * -1.,
+        "[Test] PolyhedralSolid polyhedron_facet_normal is not correct (1, "
+        "1)" );
+}
+
 void test_create_vertex_attribute(
     const geode::PolyhedralSolid3D& polyhedral_solid )
 {
@@ -421,6 +466,7 @@ void test()
     test_delete_all( *polyhedral_solid, *builder );
 
     test_barycenters();
+    test_normals();
 }
 
 OPENGEODE_TEST( "polyhedral-solid" )
