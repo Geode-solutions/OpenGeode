@@ -44,7 +44,6 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( SolidMeshBuilder );
 
     ALIAS_2D_AND_3D( Vector );
-    // ALIAS_3D( Vector );
 
     class AttributeManager;
 } // namespace geode
