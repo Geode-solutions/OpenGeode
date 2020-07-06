@@ -53,6 +53,13 @@ namespace geode
     }
 
     template < index_t dimension >
+    TetrahedralSolidView< dimension >::TetrahedralSolidView(
+        TetrahedralSolidView&& other )
+        : impl_( std::move( other.impl_ ) )
+    {
+    }
+
+    template < index_t dimension >
     TetrahedralSolidView< dimension >::~TetrahedralSolidView() // NOLINT
     {
     }

@@ -55,6 +55,7 @@ namespace geode
 
     public:
         PolyhedralSolidView( const PolyhedralSolid< dimension >& solid );
+        PolyhedralSolidView( PolyhedralSolidView&& other );
         ~PolyhedralSolidView();
 
         static MeshImpl impl_name_static()
