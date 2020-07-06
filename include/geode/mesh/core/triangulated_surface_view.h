@@ -59,6 +59,7 @@ namespace geode
     public:
         TriangulatedSurfaceView(
             const TriangulatedSurface< dimension >& surface );
+        TriangulatedSurfaceView( TriangulatedSurfaceView&& other );
         ~TriangulatedSurfaceView();
 
         static MeshImpl impl_name_static()

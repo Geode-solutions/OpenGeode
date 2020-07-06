@@ -53,6 +53,13 @@ namespace geode
     }
 
     template < index_t dimension >
+    TriangulatedSurfaceView< dimension >::TriangulatedSurfaceView(
+        TriangulatedSurfaceView&& other )
+        : impl_( std::move( other.impl_ ) )
+    {
+    }
+
+    template < index_t dimension >
     TriangulatedSurfaceView< dimension >::~TriangulatedSurfaceView() // NOLINT
     {
     }

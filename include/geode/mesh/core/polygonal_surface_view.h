@@ -57,6 +57,7 @@ namespace geode
 
     public:
         PolygonalSurfaceView( const PolygonalSurface< dimension >& surface );
+        PolygonalSurfaceView( PolygonalSurfaceView&& other );
         ~PolygonalSurfaceView();
 
         static MeshImpl impl_name_static()
