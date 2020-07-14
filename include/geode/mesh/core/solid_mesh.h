@@ -198,6 +198,8 @@ namespace geode
         PASSKEY( SolidMeshBuilder< dimension >, SolidMeshKey );
 
     public:
+        using Builder = SolidMeshBuilder< dimension >;
+
         /*!
          * Create a new SolidMesh using default data structure.
          */

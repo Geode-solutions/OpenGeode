@@ -25,6 +25,7 @@
 
 #include <memory>
 
+#include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/core/mesh_id.h>
 
 #include <geode/model/common.h>
@@ -51,8 +52,15 @@ namespace geode
          * Get a pointer to the builder of a Surface mesh
          * @param[in] id Unique index of the Surface
          */
-        std::unique_ptr< SurfaceMeshBuilder< dimension > > surface_mesh_builder(
-            const uuid& id );
+        template < typename Mesh = SurfaceMesh< dimension > >
+        std::unique_ptr< typename Mesh::Builder > surface_mesh_builder(
+            const uuid& id )
+        {
+            auto& mesh = surfaces_.modifiable_surface( id ).modifiable_mesh(
+                typename Surface< dimension >::SurfacesBuilderKey{} );
+            return MeshBuilderFactory::create_mesh_builder<
+                typename Mesh::Builder >( dynamic_cast< Mesh& >( mesh ) );
+        }
 
         void set_surface_name( const uuid& id, absl::string_view name );
 

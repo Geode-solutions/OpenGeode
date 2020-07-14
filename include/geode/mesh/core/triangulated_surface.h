@@ -30,6 +30,11 @@
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( TriangulatedSurfaceBuilder );
+} // namespace geode
+
+namespace geode
+{
     /*!
      * Interface class for Surface of arbitrary dimension made up with triangles
      * only.
@@ -38,6 +43,8 @@ namespace geode
     class TriangulatedSurface : public SurfaceMesh< dimension >
     {
     public:
+        using Builder = TriangulatedSurfaceBuilder< dimension >;
+
         /*!
          * Create a new TriangulatedSurface using default data structure.
          */

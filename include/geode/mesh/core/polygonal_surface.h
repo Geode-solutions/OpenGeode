@@ -59,6 +59,8 @@ namespace geode
     class PolygonalSurface : public SurfaceMesh< dimension >
     {
     public:
+        using Builder = PolygonalSurfaceBuilder< dimension >;
+
         /*!
          * Create a new PolygonalSurface using default data structure.
          */

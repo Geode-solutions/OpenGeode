@@ -23,7 +23,6 @@
 
 #include <geode/model/mixin/builder/surfaces_builder.h>
 
-#include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/builder/surface_mesh_builder.h>
 #include <geode/mesh/core/surface_mesh.h>
 
@@ -57,16 +56,6 @@ namespace geode
         absl::string_view directory )
     {
         return surfaces_.load_surfaces( directory );
-    }
-
-    template < index_t dimension >
-    std::unique_ptr< SurfaceMeshBuilder< dimension > >
-        SurfacesBuilder< dimension >::surface_mesh_builder( const uuid& id )
-    {
-        auto& mesh = surfaces_.modifiable_surface( id ).modifiable_mesh(
-            typename Surface< dimension >::SurfacesBuilderKey{} );
-        return MeshBuilderFactory::create_mesh_builder<
-            SurfaceMeshBuilder< dimension > >( mesh );
     }
 
     template < index_t dimension >

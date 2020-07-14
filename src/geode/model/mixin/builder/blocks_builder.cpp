@@ -23,7 +23,6 @@
 
 #include <geode/model/mixin/builder/blocks_builder.h>
 
-#include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/builder/polyhedral_solid_builder.h>
 #include <geode/mesh/core/polyhedral_solid.h>
 
@@ -55,16 +54,6 @@ namespace geode
     void BlocksBuilder< dimension >::load_blocks( absl::string_view directory )
     {
         return blocks_.load_blocks( directory );
-    }
-
-    template < index_t dimension >
-    std::unique_ptr< SolidMeshBuilder< dimension > >
-        BlocksBuilder< dimension >::block_mesh_builder( const uuid& id )
-    {
-        auto& mesh = blocks_.modifiable_block( id ).modifiable_mesh(
-            typename Block< dimension >::BlocksBuilderKey{} );
-        return MeshBuilderFactory::create_mesh_builder<
-            SolidMeshBuilder< dimension > >( mesh );
     }
 
     template < index_t dimension >
