@@ -30,12 +30,19 @@
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( TetrahedralSolidBuilder );
+} // namespace geode
+
+namespace geode
+{
     template < index_t dimension >
     class TetrahedralSolid : public SolidMesh< dimension >
     {
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
 
     public:
+        using Builder = TetrahedralSolidBuilder< dimension >;
+
         /*!
          * Create a new TetrahedralSolid using default data structure.
          */

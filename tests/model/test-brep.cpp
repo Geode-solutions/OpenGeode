@@ -31,6 +31,7 @@
 #include <geode/mesh/builder/edged_curve_builder.h>
 #include <geode/mesh/builder/point_set_builder.h>
 #include <geode/mesh/builder/surface_mesh_builder.h>
+#include <geode/mesh/builder/triangulated_surface_builder.h>
 #include <geode/mesh/core/geode_edged_curve.h>
 #include <geode/mesh/core/geode_point_set.h>
 #include <geode/mesh/core/geode_polygonal_surface.h>
@@ -504,10 +505,21 @@ void set_geometry( geode::BRepBuilder& builder,
         builder.line_mesh_builder( line_uuids[i] )->create_edge( 0, 1 );
     }
 
-    builder.surface_mesh_builder( surface_uuids[0] )->create_point( points[0] );
-    builder.surface_mesh_builder( surface_uuids[0] )->create_point( points[1] );
-    builder.surface_mesh_builder( surface_uuids[0] )->create_point( points[2] );
-    builder.surface_mesh_builder( surface_uuids[0] )
+    builder
+        .surface_mesh_builder< geode::TriangulatedSurface3D >(
+            surface_uuids[0] )
+        ->create_point( points[0] );
+    builder
+        .surface_mesh_builder< geode::TriangulatedSurface3D >(
+            surface_uuids[0] )
+        ->create_point( points[1] );
+    builder
+        .surface_mesh_builder< geode::TriangulatedSurface3D >(
+            surface_uuids[0] )
+        ->create_point( points[2] );
+    builder
+        .surface_mesh_builder< geode::TriangulatedSurface3D >(
+            surface_uuids[0] )
         ->create_polygon( { 0, 1, 2 } );
 
     builder.surface_mesh_builder( surface_uuids[1] )->create_point( points[0] );

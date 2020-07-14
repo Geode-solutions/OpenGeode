@@ -59,6 +59,8 @@ namespace geode
         PASSKEY( PolyhedralSolidBuilder< dimension >, PolyhedralSolidKey );
 
     public:
+        using Builder = PolyhedralSolidBuilder< dimension >;
+
         /*!
          * Create a new PolyhedralSolid using default data structure.
          */

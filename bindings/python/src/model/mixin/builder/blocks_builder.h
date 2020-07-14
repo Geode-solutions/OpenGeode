@@ -21,7 +21,8 @@
  *
  */
 
-#include <geode/mesh/builder/polyhedral_solid_builder.h>
+#include <geode/mesh/builder/solid_mesh_builder.h>
+#include <geode/mesh/core/solid_mesh.h>
 
 #include <geode/model/mixin/builder/blocks_builder.h>
 
@@ -31,7 +32,8 @@
     pybind11::class_< BlocksBuilder##dimension##D >(                           \
         module, name##dimension.c_str() )                                      \
         .def( "block_mesh_builder",                                            \
-            &BlocksBuilder##dimension##D::block_mesh_builder )                 \
+            &BlocksBuilder##dimension##D::block_mesh_builder<                  \
+                SolidMesh< dimension > > )                                     \
         .def( "set_block_name", &BlocksBuilder##dimension##D::set_block_name )
 
 namespace geode

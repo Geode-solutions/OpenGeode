@@ -131,6 +131,8 @@ namespace geode
         PASSKEY( SurfaceMeshBuilder< dimension >, SurfaceMeshKey );
 
     public:
+        using Builder = SurfaceMeshBuilder< dimension >;
+
         ~SurfaceMesh();
 
         /*!

@@ -21,7 +21,8 @@
  *
  */
 
-#include <geode/mesh/builder/polygonal_surface_builder.h>
+#include <geode/mesh/builder/surface_mesh_builder.h>
+#include <geode/mesh/core/surface_mesh.h>
 
 #include <geode/model/mixin/builder/surfaces_builder.h>
 
@@ -31,7 +32,8 @@
     pybind11::class_< SurfacesBuilder##dimension##D >(                         \
         module, name##dimension.c_str() )                                      \
         .def( "surface_mesh_builder",                                          \
-            &SurfacesBuilder##dimension##D::surface_mesh_builder )             \
+            &SurfacesBuilder##dimension##D::surface_mesh_builder<              \
+                SurfaceMesh< dimension > > )                                   \
         .def( "set_surface_name",                                              \
             &SurfacesBuilder##dimension##D::set_surface_name )
 

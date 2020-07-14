@@ -26,7 +26,8 @@
 #include <geode/geometry/point.h>
 
 #include <geode/mesh/builder/point_set_builder.h>
-#include <geode/mesh/builder/polygonal_surface_builder.h>
+#include <geode/mesh/builder/surface_mesh_builder.h>
+#include <geode/mesh/core/surface_mesh.h>
 
 #include <geode/model/mixin/builder/add_components_builders.h>
 #include <geode/model/mixin/builder/corners_builder.h>
