@@ -82,7 +82,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    SolidMesh< dimension >& Block< dimension >::modifiable_mesh()
+    SolidMesh< dimension >& Block< dimension >::get_modifiable_mesh()
     {
         return impl_->modifiable_mesh();
     }

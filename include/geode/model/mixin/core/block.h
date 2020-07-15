@@ -83,7 +83,7 @@ namespace geode
         template < typename Mesh = SolidMesh< dimension > >
         Mesh& modifiable_mesh( BlocksKey )
         {
-            return dynamic_cast< Mesh& >( modifiable_mesh() );
+            return dynamic_cast< Mesh& >( get_modifiable_mesh() );
         }
 
         Block( BlocksKey ) : Block() {}
@@ -99,7 +99,7 @@ namespace geode
         template < typename Mesh = SolidMesh< dimension > >
         Mesh& modifiable_mesh( BlocksBuilderKey )
         {
-            return dynamic_cast< Mesh& >( modifiable_mesh() );
+            return dynamic_cast< Mesh& >( get_modifiable_mesh() );
         }
 
         void set_block_name( absl::string_view name, BlocksBuilderKey )
@@ -112,7 +112,7 @@ namespace geode
 
         explicit Block( const MeshImpl& impl );
 
-        SolidMesh< dimension >& modifiable_mesh();
+        SolidMesh< dimension >& get_modifiable_mesh();
 
         const SolidMesh< dimension >& get_mesh() const;
 

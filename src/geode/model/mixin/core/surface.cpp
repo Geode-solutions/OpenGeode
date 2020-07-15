@@ -83,7 +83,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    SurfaceMesh< dimension >& Surface< dimension >::modifiable_mesh()
+    SurfaceMesh< dimension >& Surface< dimension >::get_modifiable_mesh()
     {
         return impl_->modifiable_mesh();
     }
