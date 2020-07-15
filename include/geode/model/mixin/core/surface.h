@@ -84,7 +84,7 @@ namespace geode
         template < typename Mesh = SurfaceMesh< dimension > >
         Mesh& modifiable_mesh( SurfacesKey )
         {
-            return dynamic_cast< Mesh& >( modifiable_mesh() );
+            return dynamic_cast< Mesh& >( get_modifiable_mesh() );
         }
 
         const MeshImpl& mesh_type() const;
@@ -103,7 +103,7 @@ namespace geode
         template < typename Mesh = SurfaceMesh< dimension > >
         Mesh& modifiable_mesh( SurfacesBuilderKey )
         {
-            return dynamic_cast< Mesh& >( modifiable_mesh() );
+            return dynamic_cast< Mesh& >( get_modifiable_mesh() );
         }
 
     private:
@@ -111,7 +111,7 @@ namespace geode
 
         explicit Surface( const MeshImpl& impl );
 
-        SurfaceMesh< dimension >& modifiable_mesh();
+        SurfaceMesh< dimension >& get_modifiable_mesh();
 
         const SurfaceMesh< dimension >& get_mesh() const;
 
