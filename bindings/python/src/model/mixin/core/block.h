@@ -29,7 +29,7 @@
     const auto name##dimension = "Block" + std::to_string( dimension ) + "D";  \
     pybind11::class_< Block##dimension##D, Component##dimension##D >(          \
         module, name##dimension.c_str() )                                      \
-        .def( "mesh", &Block##dimension##D::mesh,                              \
+        .def( "mesh", &Block##dimension##D::mesh< SolidMesh##dimension##D >,   \
             pybind11::return_value_policy::reference )                         \
         .def( "component_id", &Block##dimension##D::component_id )
 
