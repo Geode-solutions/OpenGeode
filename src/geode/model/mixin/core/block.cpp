@@ -54,7 +54,7 @@ namespace geode
     template < index_t dimension >
     Block< dimension >::Block()
         : Block( MeshFactory::default_impl(
-            PolyhedralSolid< dimension >::type_name_static() ) )
+              PolyhedralSolid< dimension >::type_name_static() ) )
     {
     }
 
@@ -76,7 +76,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    const SolidMesh< dimension >& Block< dimension >::mesh() const
+    const SolidMesh< dimension >& Block< dimension >::get_mesh() const
     {
         return impl_->mesh();
     }

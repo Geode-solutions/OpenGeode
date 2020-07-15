@@ -72,13 +72,18 @@ namespace geode
             return { this->component_type_static(), this->id() };
         };
 
-        const SolidMesh< dimension >& mesh() const;
+        template < typename Mesh = SolidMesh< dimension > >
+        const Mesh& mesh() const
+        {
+            return dynamic_cast< const Mesh& >( get_mesh() );
+        }
 
         const MeshImpl& mesh_type() const;
 
-        SolidMesh< dimension >& modifiable_mesh( BlocksKey )
+        template < typename Mesh = SolidMesh< dimension > >
+        Mesh& modifiable_mesh( BlocksKey )
         {
-            return modifiable_mesh();
+            return dynamic_cast< Mesh& >( modifiable_mesh() );
         }
 
         Block( BlocksKey ) : Block() {}
@@ -91,9 +96,10 @@ namespace geode
         void set_mesh(
             std::unique_ptr< SolidMesh< dimension > > mesh, BlocksBuilderKey );
 
-        SolidMesh< dimension >& modifiable_mesh( BlocksBuilderKey )
+        template < typename Mesh = SolidMesh< dimension > >
+        Mesh& modifiable_mesh( BlocksBuilderKey )
         {
-            return modifiable_mesh();
+            return dynamic_cast< Mesh& >( modifiable_mesh() );
         }
 
         void set_block_name( absl::string_view name, BlocksBuilderKey )
@@ -107,6 +113,8 @@ namespace geode
         explicit Block( const MeshImpl& impl );
 
         SolidMesh< dimension >& modifiable_mesh();
+
+        const SolidMesh< dimension >& get_mesh() const;
 
         template < typename Archive >
         void serialize( Archive& archive );

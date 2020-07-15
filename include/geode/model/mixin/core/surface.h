@@ -71,15 +71,20 @@ namespace geode
             return { this->component_type_static(), this->id() };
         };
 
-        const SurfaceMesh< dimension >& mesh() const;
+        template < typename Mesh = SurfaceMesh< dimension > >
+        const Mesh& mesh() const
+        {
+            return dynamic_cast< const Mesh& >( get_mesh() );
+        }
 
         Surface( SurfacesKey ) : Surface() {}
 
         Surface( const MeshImpl& impl, SurfacesKey ) : Surface( impl ){};
 
-        SurfaceMesh< dimension >& modifiable_mesh( SurfacesKey )
+        template < typename Mesh = SurfaceMesh< dimension > >
+        Mesh& modifiable_mesh( SurfacesKey )
         {
-            return modifiable_mesh();
+            return dynamic_cast< Mesh& >( modifiable_mesh() );
         }
 
         const MeshImpl& mesh_type() const;
@@ -95,9 +100,10 @@ namespace geode
             this->set_name( name );
         }
 
-        SurfaceMesh< dimension >& modifiable_mesh( SurfacesBuilderKey )
+        template < typename Mesh = SurfaceMesh< dimension > >
+        Mesh& modifiable_mesh( SurfacesBuilderKey )
         {
-            return modifiable_mesh();
+            return dynamic_cast< Mesh& >( modifiable_mesh() );
         }
 
     private:
@@ -106,6 +112,8 @@ namespace geode
         explicit Surface( const MeshImpl& impl );
 
         SurfaceMesh< dimension >& modifiable_mesh();
+
+        const SurfaceMesh< dimension >& get_mesh() const;
 
         template < typename Archive >
         void serialize( Archive& archive );
