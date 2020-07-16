@@ -137,10 +137,10 @@ namespace geode
     public:
         explicit Impl( SurfaceMesh& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) )
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
@@ -504,15 +504,19 @@ namespace geode
                 this->next_polygon_vertex( polygon_edge ) );
             for( const auto e : Range{ nb_polygon_edges( polygon_adj_id ) } )
             {
-                const PolygonEdge adj_edge{ polygon_adj_id, e };
-                const auto polygon = polygon_adjacent( adj_edge );
+                const PolygonVertex adj_edge{ polygon_adj_id, e };
                 const auto adj_v0 = this->polygon_vertex( adj_edge );
                 const auto adj_v1 = this->polygon_vertex(
                     this->next_polygon_vertex( adj_edge ) );
-                if( polygon && polygon == polygon_edge.polygon_id
-                    && ( ( v0 == adj_v1 && v1 == adj_v0 )
-                         || ( v0 == adj_v0 && v1 == adj_v1 ) ) )
+                if( ( v0 == adj_v1 && v1 == adj_v0 )
+                    || ( v0 == adj_v0 && v1 == adj_v1 ) )
                 {
+                    OPENGEODE_ASSERT(
+                        polygon_adjacent( adj_edge ) == polygon_edge.polygon_id,
+                        absl::StrCat( "[SurfaceMesh::polygon_adjacent_"
+                                      "edge] Wrong adjacency with polygons: ",
+                            polygon_edge.polygon_id, " and ",
+                            polygon_adj_id ) );
                     return adj_edge;
                 }
             }
@@ -670,14 +674,13 @@ namespace geode
             polygons_visited.push_back( polygon_vertex.polygon_id );
             polygons.push_back( polygon_vertex );
 
-            const auto adj_edge = polygon_adjacent_edge( { polygon_vertex } );
-            if( adj_edge )
+            if( const auto adj_edge =
+                    polygon_adjacent_edge( { polygon_vertex } ) )
             {
                 S.emplace( next_polygon_edge( adj_edge.value() ) );
             }
             const auto prev_edge = previous_polygon_edge( polygon_vertex );
-            const auto prev_adj_edge = polygon_adjacent_edge( prev_edge );
-            if( prev_adj_edge )
+            if( const auto prev_adj_edge = polygon_adjacent_edge( prev_edge ) )
             {
                 S.emplace( prev_adj_edge.value() );
             }
@@ -764,21 +767,15 @@ namespace geode
         SurfaceMesh< dimension >::polygon_normal( index_t polygon_id ) const
     {
         check_polygon_id( *this, polygon_id );
-        const auto barycenter = polygon_barycenter( polygon_id );
         Vector3D normal;
-        for( const auto v : Range{ 1, nb_polygon_vertices( polygon_id ) } )
+        const auto& p0 = this->point( polygon_vertex( { polygon_id, 0 } ) );
+        for( const auto v : Range{ 2, nb_polygon_vertices( polygon_id ) } )
         {
             const auto& p1 =
                 this->point( polygon_vertex( { polygon_id, v - 1 } ) );
             const auto& p2 = this->point( polygon_vertex( { polygon_id, v } ) );
-            normal =
-                normal + Vector3D{ p1, barycenter }.cross( { p2, barycenter } );
+            normal = normal + Vector3D{ p1, p0 }.cross( { p2, p0 } );
         }
-        const auto& p1 = this->point( polygon_vertex(
-            { polygon_id, nb_polygon_vertices( polygon_id ) - 1 } ) );
-        const auto& p2 = this->point( polygon_vertex( { polygon_id, 0 } ) );
-        normal =
-            normal + Vector3D{ p1, barycenter }.cross( { p2, barycenter } );
         return normal.normalize();
     }
 
