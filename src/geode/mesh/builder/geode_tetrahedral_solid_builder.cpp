@@ -23,6 +23,8 @@
 
 #include <geode/mesh/builder/geode_tetrahedral_solid_builder.h>
 
+#include <geode/geometry/point.h>
+
 #include <geode/mesh/core/geode_tetrahedral_solid.h>
 
 namespace geode
@@ -37,9 +39,10 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodeTetrahedralSolidBuilder< dimension >::do_set_point(
-        index_t vertex_id, const Point< dimension >& point )
+        index_t vertex_id, Point< dimension > point )
     {
-        geode_tetrahedral_solid_->set_vertex( vertex_id, point, {} );
+        geode_tetrahedral_solid_->set_vertex(
+            vertex_id, std::move( point ), {} );
     }
 
     template < index_t dimension >

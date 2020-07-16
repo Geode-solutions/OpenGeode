@@ -75,9 +75,8 @@ namespace geode
             return native_extension_static();
         }
 
-        void set_vertex( index_t vertex_id,
-            const Point< dimension >& point,
-            OGEdgedCurveKey );
+        void set_vertex(
+            index_t vertex_id, Point< dimension > point, OGEdgedCurveKey );
 
         void set_edge_vertex(
             const EdgeVertex& edge_vertex, index_t vertex_id, OGEdgedCurveKey );

@@ -23,6 +23,8 @@
 
 #include <geode/mesh/builder/polyhedral_solid_view_builder.h>
 
+#include <geode/geometry/point.h>
+
 #include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/core/polyhedral_solid_view.h>
 
@@ -46,7 +48,7 @@ namespace geode
 
     template < index_t dimension >
     void PolyhedralSolidViewBuilder< dimension >::do_set_point(
-        index_t /*unused*/, const Point< dimension >& /*unused*/ )
+        index_t /*unused*/, Point< dimension > /*unused*/ )
     {
         // polyhedral_solid_view_->set_vertex( vertex_id, point, {} );
     }

@@ -23,6 +23,8 @@
 
 #include <geode/mesh/helpers/convert_solid_mesh.h>
 
+#include <geode/geometry/point.h>
+
 #include <geode/mesh/builder/tetrahedral_solid_builder.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
 

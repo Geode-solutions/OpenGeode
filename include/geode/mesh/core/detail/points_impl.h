@@ -40,10 +40,10 @@ namespace geode
         public:
             PointsImpl( VertexSet& mesh )
                 : points_(
-                    mesh.vertex_attribute_manager()
-                        .template find_or_create_attribute< VariableAttribute,
-                            Point< dimension > >(
-                            "points", Point< dimension >{} ) )
+                      mesh.vertex_attribute_manager()
+                          .template find_or_create_attribute< VariableAttribute,
+                              Point< dimension > >(
+                              "points", Point< dimension >{} ) )
             {
             }
 
@@ -52,9 +52,9 @@ namespace geode
                 return points_->value( vertex_id );
             }
 
-            void set_point( index_t vertex_id, const Point< dimension >& point )
+            void set_point( index_t vertex_id, Point< dimension > point )
             {
-                points_->set_value( vertex_id, point );
+                points_->set_value( vertex_id, std::move( point ) );
             }
 
         private:

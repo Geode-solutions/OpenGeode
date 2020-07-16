@@ -23,6 +23,8 @@
 
 #include <geode/mesh/helpers/convert_surface_mesh.h>
 
+#include <geode/geometry/point.h>
+
 #include <geode/mesh/builder/triangulated_surface_builder.h>
 #include <geode/mesh/core/triangulated_surface.h>
 

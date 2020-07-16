@@ -76,9 +76,8 @@ namespace geode
             return native_extension_static();
         }
 
-        void set_vertex( index_t vertex_id,
-            const Point< dimension >& point,
-            OGPolyhedralSolidKey );
+        void set_vertex(
+            index_t vertex_id, Point< dimension > point, OGPolyhedralSolidKey );
 
         void add_polyhedron( absl::Span< const index_t > vertices,
             absl::Span< const std::vector< index_t > > facets,

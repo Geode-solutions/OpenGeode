@@ -23,6 +23,8 @@
 
 #include <geode/mesh/builder/geode_edged_curve_builder.h>
 
+#include <geode/geometry/point.h>
+
 #include <geode/mesh/core/geode_edged_curve.h>
 
 namespace geode
@@ -36,9 +38,9 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodeEdgedCurveBuilder< dimension >::do_set_point(
-        index_t vertex_id, const Point< dimension >& point )
+        index_t vertex_id, Point< dimension > point )
     {
-        geode_edged_curve_->set_vertex( vertex_id, point, {} );
+        geode_edged_curve_->set_vertex( vertex_id, std::move( point ), {} );
     }
 
     template < index_t dimension >

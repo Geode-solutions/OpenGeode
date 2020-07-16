@@ -78,7 +78,7 @@ namespace geode
         }
 
         void set_vertex(
-            index_t vertex_id, const Point< dimension >& point, OGPointSetKey );
+            index_t vertex_id, Point< dimension > point, OGPointSetKey );
 
     private:
         friend class bitsery::Access;

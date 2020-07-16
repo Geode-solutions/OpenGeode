@@ -185,11 +185,10 @@ namespace geode
     }
 
     template < index_t dimension >
-    void OpenGeodePolygonalSurface< dimension >::set_vertex( index_t vertex_id,
-        const Point< dimension >& point,
-        OGPolygonalSurfaceKey )
+    void OpenGeodePolygonalSurface< dimension >::set_vertex(
+        index_t vertex_id, Point< dimension > point, OGPolygonalSurfaceKey )
     {
-        impl_->set_point( vertex_id, point );
+        impl_->set_point( vertex_id, std::move( point ) );
     }
 
     template < index_t dimension >
