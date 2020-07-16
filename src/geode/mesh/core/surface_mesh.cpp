@@ -137,10 +137,10 @@ namespace geode
     public:
         explicit Impl( SurfaceMesh& surface )
             : polygon_around_vertex_(
-                  surface.vertex_attribute_manager()
-                      .template find_or_create_attribute< VariableAttribute,
-                          PolygonVertex >(
-                          "polygon_around_vertex", PolygonVertex{} ) )
+                surface.vertex_attribute_manager()
+                    .template find_or_create_attribute< VariableAttribute,
+                        PolygonVertex >(
+                        "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
@@ -511,7 +511,7 @@ namespace geode
                     this->next_polygon_vertex( adj_edge ) );
                 if( polygon && polygon == polygon_edge.polygon_id
                     && ( ( v0 == adj_v1 && v1 == adj_v0 )
-                           || ( v0 == adj_v0 && v1 == adj_v1 ) ) )
+                         || ( v0 == adj_v0 && v1 == adj_v1 ) ) )
                 {
                     return adj_edge;
                 }
