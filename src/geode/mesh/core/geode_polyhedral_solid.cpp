@@ -295,11 +295,10 @@ namespace geode
     }
 
     template < index_t dimension >
-    void OpenGeodePolyhedralSolid< dimension >::set_vertex( index_t vertex_id,
-        const Point< dimension >& point,
-        OGPolyhedralSolidKey )
+    void OpenGeodePolyhedralSolid< dimension >::set_vertex(
+        index_t vertex_id, Point< dimension > point, OGPolyhedralSolidKey )
     {
-        impl_->set_point( vertex_id, point );
+        impl_->set_point( vertex_id, std::move( point ) );
     }
 
     template < index_t dimension >

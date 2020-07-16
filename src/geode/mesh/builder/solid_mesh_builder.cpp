@@ -23,10 +23,9 @@
 
 #include <geode/mesh/builder/solid_mesh_builder.h>
 
-#include <numeric>
-
 #include <geode/basic/attribute_manager.h>
-#include <geode/basic/detail/mapping_after_deletion.h>
+
+#include <geode/geometry/point.h>
 
 #include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/core/solid_mesh.h>
@@ -83,7 +82,7 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -723,21 +722,21 @@ namespace geode
 
     template < index_t dimension >
     void SolidMeshBuilder< dimension >::set_point(
-        index_t vertex_id, const Point< dimension >& point )
+        index_t vertex_id, Point< dimension > point )
     {
         OPENGEODE_ASSERT( vertex_id < solid_mesh_->nb_vertices(),
             "[SolidMeshBuilder::set_point] Accessing a vertex that does "
             "not exist" );
-        do_set_point( vertex_id, point );
+        do_set_point( vertex_id, std::move( point ) );
     }
 
     template < index_t dimension >
     index_t SolidMeshBuilder< dimension >::create_point(
-        const Point< dimension >& point )
+        Point< dimension > point )
     {
         const auto added_vertex = solid_mesh_->nb_vertices();
         create_vertex();
-        set_point( added_vertex, point );
+        set_point( added_vertex, std::move( point ) );
         return added_vertex;
     }
 

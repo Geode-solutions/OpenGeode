@@ -60,14 +60,14 @@ namespace geode
          * @param[in] vertex_id The vertex, in [0, nb_vertices()-1].
          * @param[in] point The vertex coordinates
          */
-        void set_point( index_t vertex_id, const Point< dimension >& point );
+        void set_point( index_t vertex_id, Point< dimension > point );
 
         /*!
          * Create a new point with associated coordinates.
          * @param[in] point The point to create
          * @return the index of the created point
          */
-        index_t create_point( const Point< dimension >& point );
+        index_t create_point( Point< dimension > point );
 
         void copy( const PointSet< dimension >& point_set, BuilderKey )
         {
@@ -83,7 +83,7 @@ namespace geode
 
     private:
         virtual void do_set_point(
-            index_t vertex_id, const Point< dimension >& point ) = 0;
+            index_t vertex_id, Point< dimension > point ) = 0;
 
     private:
         PointSet< dimension >* point_set_;

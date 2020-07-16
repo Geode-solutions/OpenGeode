@@ -79,7 +79,7 @@ namespace geode
         }
 
         void set_vertex( index_t vertex_id,
-            const Point< dimension >& point,
+            Point< dimension > point,
             OGTetrahedralSolidKey );
 
         void set_polyhedron_vertex( const PolyhedronVertex& polyhedron_vertex,

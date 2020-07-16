@@ -23,6 +23,8 @@
 
 #include <geode/mesh/builder/edged_curve_builder.h>
 
+#include <geode/geometry/point.h>
+
 #include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/core/edged_curve.h>
 
@@ -46,21 +48,21 @@ namespace geode
 
     template < index_t dimension >
     void EdgedCurveBuilder< dimension >::set_point(
-        index_t vertex_id, const Point< dimension >& point )
+        index_t vertex_id, Point< dimension > point )
     {
         OPENGEODE_ASSERT( vertex_id < edged_curve_->nb_vertices(),
             "[EdgedCurveBuilder::set_point] Accessing a vertex that does not "
             "exist" );
-        do_set_point( vertex_id, point );
+        do_set_point( vertex_id, std::move( point ) );
     }
 
     template < index_t dimension >
     index_t EdgedCurveBuilder< dimension >::create_point(
-        const Point< dimension >& point )
+        Point< dimension > point )
     {
         const auto added_vertex = edged_curve_->nb_vertices();
         create_vertex();
-        set_point( added_vertex, point );
+        set_point( added_vertex, std::move( point ) );
         return added_vertex;
     }
 

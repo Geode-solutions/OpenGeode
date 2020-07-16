@@ -77,7 +77,7 @@ namespace geode
         }
 
         void set_vertex( index_t vertex_id,
-            const Point< dimension >& point,
+            Point< dimension > point,
             OGPolygonalSurfaceKey );
 
         void set_polygon_vertex( const PolygonVertex& polygon_vertex,

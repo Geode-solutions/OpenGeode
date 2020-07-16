@@ -45,8 +45,7 @@ namespace geode
     private:
         void do_set_mesh( VertexSet& mesh ) final;
 
-        void do_set_point(
-            index_t vertex_id, const Point< dimension >& point ) final;
+        void do_set_point( index_t vertex_id, Point< dimension > point ) final;
 
         void do_create_vertex() final;
 
