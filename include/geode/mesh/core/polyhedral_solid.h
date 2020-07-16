@@ -27,11 +27,7 @@
 
 #include <absl/container/inlined_vector.h>
 
-#include <geode/basic/attribute.h>
 #include <geode/basic/bitsery_archive.h>
-#include <geode/basic/factory.h>
-#include <geode/basic/passkey.h>
-#include <geode/basic/pimpl.h>
 
 #include <geode/mesh/common.h>
 #include <geode/mesh/core/solid_mesh.h>

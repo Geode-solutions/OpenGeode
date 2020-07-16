@@ -25,7 +25,6 @@
 
 #include <bitsery/brief_syntax/array.h>
 
-#include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/bitsery_archive.h>
 
@@ -40,10 +39,10 @@ namespace geode
         public:
             EdgesImpl( Graph& graph )
                 : edges_(
-                    graph.edge_attribute_manager()
-                        .template find_or_create_attribute< VariableAttribute,
-                            std::array< index_t, 2 > >( "edges",
-                            std::array< index_t, 2 >{ NO_ID, NO_ID } ) )
+                      graph.edge_attribute_manager()
+                          .template find_or_create_attribute< VariableAttribute,
+                              std::array< index_t, 2 > >( "edges",
+                              std::array< index_t, 2 >{ NO_ID, NO_ID } ) )
             {
             }
 

@@ -21,7 +21,6 @@
  *
  */
 
-#include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/logger.h>
 

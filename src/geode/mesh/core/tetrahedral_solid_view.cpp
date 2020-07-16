@@ -23,7 +23,6 @@
 
 #include <geode/mesh/core/tetrahedral_solid_view.h>
 
-#include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/pimpl_impl.h>
 

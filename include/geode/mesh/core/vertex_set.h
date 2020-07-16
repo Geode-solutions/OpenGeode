@@ -23,7 +23,6 @@
 
 #pragma once
 
-#include <geode/basic/factory.h>
 #include <geode/basic/pimpl.h>
 
 #include <geode/mesh/common.h>
