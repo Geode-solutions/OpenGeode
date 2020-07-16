@@ -22,36 +22,6 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.config.python }}
-    - name: Cache Abseil
-      uses: actions/cache@v1.2.0
-      with:
-        path: build/third_party/abseil
-        key: abseil-${{ matrix.config.system }}-Release-${{ hashFiles('cmake/ConfigureAbseil.cmake') }}
-    - name: Cache Async++
-      uses: actions/cache@v1.2.0
-      with:
-        path: build/third_party/asyncplusplus
-        key: asyncplusplus-${{ matrix.config.system }}-Release-${{ hashFiles('cmake/ConfigureAsync++.cmake') }}
-    - name: Cache Filesystem
-      uses: actions/cache@v1.2.0
-      with:
-        path: build/third_party/ghcFilesystem
-        key: ghcFilesystem-${{ matrix.config.system }}-Release-${{ hashFiles('cmake/ConfigureFilesystem.cmake') }}
-    - name: Cache Minizip
-      uses: actions/cache@v1.2.0
-      with:
-        path: build/third_party/minizip
-        key: minizip-${{ matrix.config.system }}-Release-${{ hashFiles('cmake/ConfigureMinizip.cmake') }}
-    - name: Cache Nanoflann
-      uses: actions/cache@v1.2.0
-      with:
-        path: build/third_party/nanoflann
-        key: nanoflann-${{ matrix.config.system }}-Release-${{ hashFiles('cmake/ConfigureNanoflann.cmake') }}
-    - name: Cache Spdlog
-      uses: actions/cache@v1.2.0
-      with:
-        path: build/third_party/spdlog
-        key: spdlog-${{ matrix.config.system }}-Release-${{ hashFiles('cmake/ConfigureSpdlog.cmake') }}
     - name: Generate package
       id: package
       run: |
@@ -95,36 +65,6 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python }}
-    # - name: Cache Abseil
-    #   uses: actions/cache@v1.2.0
-    #   with:
-    #     path: build/third_party/abseil
-    #     key: abseil-darwin-Release-${{ hashFiles('cmake/ConfigureAbseil.cmake') }}
-    # - name: Cache Async++
-    #   uses: actions/cache@v1.2.0
-    #   with:
-    #     path: build/third_party/asyncplusplus
-    #     key: asyncplusplus-darwin-Release-${{ hashFiles('cmake/ConfigureAsync++.cmake') }}
-    # - name: Cache Filesystem
-    #   uses: actions/cache@v1.2.0
-    #   with:
-    #     path: build/third_party/ghcFilesystem
-    #     key: ghcFilesystem-darwin-Release-${{ hashFiles('cmake/ConfigureFilesystem.cmake') }}
-    # - name: Cache Minizip
-    #   uses: actions/cache@v1.2.0
-    #   with:
-    #     path: build/third_party/minizip
-    #     key: minizip-darwin-Release-${{ hashFiles('cmake/ConfigureMinizip.cmake') }}
-    # - name: Cache Nanoflann
-    #   uses: actions/cache@v1.2.0
-    #   with:
-    #     path: build/third_party/nanoflann
-    #     key: nanoflann-darwin-Release-${{ hashFiles('cmake/ConfigureNanoflann.cmake') }}
-    # - name: Cache Spdlog
-    #   uses: actions/cache@v1.2.0
-    #   with:
-    #     path: build/third_party/spdlog
-    #     key: spdlog-darwin-Release-${{ hashFiles('cmake/ConfigureSpdlog.cmake') }}
     - name: Generate package
       id: package
       run: |
@@ -163,36 +103,6 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python }}
-    - name: Cache Abseil
-      uses: actions/cache@v1.2.0
-      with:
-        path: build/third_party/abseil
-        key: abseil-win64-Release-${{ hashFiles('cmake/ConfigureAbseil.cmake') }}
-    - name: Cache Async++
-      uses: actions/cache@v1.2.0
-      with:
-        path: build/third_party/asyncplusplus
-        key: asyncplusplus-win64-Release-${{ hashFiles('cmake/ConfigureAsync++.cmake') }}
-    - name: Cache Filesystem
-      uses: actions/cache@v1.2.0
-      with:
-        path: build/third_party/ghcFilesystem
-        key: ghcFilesystem-win64-Release-${{ hashFiles('cmake/ConfigureFilesystem.cmake') }}
-    - name: Cache Minizip
-      uses: actions/cache@v1.2.0
-      with:
-        path: build/third_party/minizip
-        key: minizip-win64-Release-${{ hashFiles('cmake/ConfigureMinizip.cmake') }}
-    - name: Cache Nanoflann
-      uses: actions/cache@v1.2.0
-      with:
-        path: build/third_party/nanoflann
-        key: nanoflann-win64-Release-${{ hashFiles('cmake/ConfigureNanoflann.cmake') }}
-    - name: Cache Spdlog
-      uses: actions/cache@v1.2.0
-      with:
-        path: build/third_party/spdlog
-        key: spdlog-win64-Release-${{ hashFiles('cmake/ConfigureSpdlog.cmake') }}
     - name: Generate package
       id: package
       run: |
