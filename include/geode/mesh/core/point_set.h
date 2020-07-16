@@ -23,8 +23,6 @@
 
 #pragma once
 
-#include <geode/basic/factory.h>
-
 #include <geode/mesh/common.h>
 #include <geode/mesh/core/vertex_set.h>
 

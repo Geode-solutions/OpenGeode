@@ -23,7 +23,6 @@
 
 #pragma once
 
-#include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/bitsery_archive.h>
 
@@ -41,10 +40,10 @@ namespace geode
         public:
             PointsImpl( VertexSet& mesh )
                 : points_(
-                    mesh.vertex_attribute_manager()
-                        .template find_or_create_attribute< VariableAttribute,
-                            Point< dimension > >(
-                            "points", Point< dimension >{} ) )
+                      mesh.vertex_attribute_manager()
+                          .template find_or_create_attribute< VariableAttribute,
+                              Point< dimension > >(
+                              "points", Point< dimension >{} ) )
             {
             }
 

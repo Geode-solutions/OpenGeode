@@ -23,7 +23,6 @@
 
 #pragma once
 
-#include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>
 
 #include <geode/mesh/builder/surface_mesh_builder.h>
@@ -42,7 +41,7 @@ namespace geode
             SurfaceMeshViewImpl( SurfaceMesh< dimension >& surface_view,
                 const SurfaceMesh< dimension >& surface )
                 : detail::EdgesViewImpl< dimension, SurfaceMesh< dimension > >(
-                    surface_view, surface ),
+                      surface_view, surface ),
                   surface_( surface ),
                   surface_view_( surface_view ),
                   view2polygons_(

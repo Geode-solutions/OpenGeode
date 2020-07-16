@@ -26,7 +26,6 @@
 #include <array>
 #include <fstream>
 
-#include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>

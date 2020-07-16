@@ -28,7 +28,6 @@
 
 #include <bitsery/brief_syntax/array.h>
 
-#include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/detail/mapping_after_deletion.h>
