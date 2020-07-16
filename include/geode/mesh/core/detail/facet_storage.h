@@ -46,9 +46,9 @@ namespace geode
         protected:
             FacetStorage()
                 : counter_(
-                      facet_attribute_manager_
-                          .template find_or_create_attribute< VariableAttribute,
-                              index_t >( "counter", 1u ) ),
+                    facet_attribute_manager_
+                        .template find_or_create_attribute< VariableAttribute,
+                            index_t >( "counter", 1u ) ),
                   vertices_(
                       facet_attribute_manager_
                           .template find_or_create_attribute< VariableAttribute,
