@@ -54,7 +54,7 @@ namespace
         return ( signed_area_1 <= 0. && signed_area_2 <= 0.
                    && signed_area_3 <= 0 )
                || ( signed_area_1 >= 0. && signed_area_2 >= 0.
-                      && signed_area_3 >= 0 );
+                    && signed_area_3 >= 0 );
     }
 } // namespace
 

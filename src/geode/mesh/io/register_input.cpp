@@ -36,6 +36,7 @@
 #include <geode/mesh/io/detail/geode_point_set_input.h>
 #include <geode/mesh/io/detail/geode_polygonal_surface_input.h>
 #include <geode/mesh/io/detail/geode_polyhedral_solid_input.h>
+#include <geode/mesh/io/detail/geode_regular_grid_input.h>
 #include <geode/mesh/io/detail/geode_tetrahedral_solid_input.h>
 #include <geode/mesh/io/detail/geode_triangulated_surface_input.h>
 #include <geode/mesh/io/detail/geode_vertex_set_input.h>
@@ -69,5 +70,13 @@ namespace geode
         BITSERY_INPUT_MESH_REGISTER_2D_3D( TriangulatedSurface );
         BITSERY_INPUT_MESH_REGISTER_3D( PolyhedralSolid );
         BITSERY_INPUT_MESH_REGISTER_3D( TetrahedralSolid );
+
+        RegularGridInputFactory2D::register_creator<
+            OpenGeodeRegularGridInput2D >(
+            RegularGrid2D ::native_extension_static().data() );
+
+        RegularGridInputFactory3D::register_creator<
+            OpenGeodeRegularGridInput3D >(
+            RegularGrid3D ::native_extension_static().data() );
     }
 } // namespace geode

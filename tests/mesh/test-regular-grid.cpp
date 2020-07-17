@@ -28,6 +28,8 @@
 #include <geode/geometry/point.h>
 
 #include <geode/mesh/core/regular_grid.h>
+#include <geode/mesh/io/regular_grid_input.h>
+#include <geode/mesh/io/regular_grid_output.h>
 
 #include <geode/tests/common.h>
 
@@ -87,6 +89,12 @@ void test_cell_query( const geode::RegularGrid3D& grid )
         "[Test] Wrong query result" );
 }
 
+void test_io( const geode::RegularGrid3D& grid, absl::string_view filename )
+{
+    geode::save_regular_grid( grid, filename );
+    geode::load_regular_grid< 3 >( filename );
+}
+
 void test()
 {
     geode::RegularGrid3D grid{ { { 1.5, 0, 1 } }, { 5, 10, 15 }, { 1, 2, 3 } };
@@ -94,6 +102,7 @@ void test()
     test_cell_index( grid );
     test_cell_geometry( grid );
     test_cell_query( grid );
+    test_io( grid, absl::StrCat( "test.", grid.native_extension() ) );
 }
 
 OPENGEODE_TEST( "regular-grid" )

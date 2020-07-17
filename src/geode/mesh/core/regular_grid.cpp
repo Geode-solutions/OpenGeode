@@ -34,6 +34,8 @@ namespace geode
     class RegularGrid< dimension >::Impl
     {
     public:
+        Impl() = default;
+
         Impl( Point< dimension > origin,
             std::array< index_t, dimension > cells_number,
             std::array< double, dimension > cells_size )
@@ -112,8 +114,6 @@ namespace geode
 
     private:
         friend class bitsery::Access;
-        Impl() = default;
-
         template < typename Archive >
         void serialize( Archive& archive )
         {
@@ -153,6 +153,11 @@ namespace geode
                   size.fill( cells_size );
                   return size;
               }() )
+    {
+    }
+
+    template < index_t dimension >
+    RegularGrid< dimension >::RegularGrid()
     {
     }
 

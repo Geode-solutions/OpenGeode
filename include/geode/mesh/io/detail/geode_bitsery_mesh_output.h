@@ -44,39 +44,44 @@
             "[Bitsery::write] Error while writing file: ", this->filename() ); \
     }
 
-#define BITSERY_OUTPUT_MESH_DIMENSION( Mesh )                                  \
+#define BITSERY_OUTPUT_MESH_DIMENSION_IMPL( Mesh, MeshImpl )                   \
     template < index_t dimension >                                             \
-    class OpenGeode##Mesh##Output : public Mesh##Output< dimension >           \
+    class OpenGeode##MeshImpl##Output : public Mesh##Output< dimension >       \
     {                                                                          \
     public:                                                                    \
         OpenGeode##Mesh##Output(                                               \
             const Mesh< dimension >& mesh, absl::string_view filename )        \
             : Mesh##Output< dimension >( mesh, filename ),                     \
-              mesh_( dynamic_cast< const OpenGeode##Mesh< dimension >& >(      \
-                  mesh ) )                                                     \
+              mesh_( dynamic_cast< const MeshImpl< dimension >& >( mesh ) )    \
         {                                                                      \
         }                                                                      \
                                                                                \
         BITSERY_WRITE()                                                        \
                                                                                \
     private:                                                                   \
-        const OpenGeode##Mesh< dimension >& mesh_;                             \
+        const MeshImpl< dimension >& mesh_;                                    \
     };                                                                         \
     ALIAS_2D_AND_3D( OpenGeode##Mesh##Output )
 
-#define BITSERY_OUTPUT_MESH_NO_DIMENSION( Mesh )                               \
+#define BITSERY_OUTPUT_MESH_DIMENSION( Mesh )                                  \
+    BITSERY_OUTPUT_MESH_DIMENSION_IMPL( Mesh, Mesh )
+
+#define BITSERY_OUTPUT_MESH_NO_DIMENSION_IMPL( Mesh, MeshImpl )                \
     class OpenGeode##Mesh##Output : public Mesh##Output                        \
     {                                                                          \
     public:                                                                    \
         OpenGeode##Mesh##Output(                                               \
             const Mesh& mesh, absl::string_view filename )                     \
             : Mesh##Output( mesh, filename ),                                  \
-              mesh_( dynamic_cast< const OpenGeode##Mesh& >( mesh ) )          \
+              mesh_( dynamic_cast< const MeshImpl& >( mesh ) )                 \
         {                                                                      \
         }                                                                      \
                                                                                \
         BITSERY_WRITE()                                                        \
                                                                                \
     private:                                                                   \
-        const OpenGeode##Mesh& mesh_;                                          \
+        const MeshImpl& mesh_;                                                 \
     }
+
+#define BITSERY_OUTPUT_MESH_NO_DIMENSION( Mesh )                               \
+    BITSERY_OUTPUT_MESH_NO_DIMENSION_IMPL( Mesh, Mesh )
