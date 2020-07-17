@@ -23,8 +23,6 @@
 
 #include <geode/geometry/distance.h>
 
-#include <geode/basic/logger.h>
-
 #include <geode/geometry/basic_objects.h>
 #include <geode/geometry/perpendicular.h>
 #include <geode/geometry/projection.h>
@@ -56,7 +54,7 @@ namespace
         return ( signed_area_1 <= 0. && signed_area_2 <= 0.
                    && signed_area_3 <= 0 )
                || ( signed_area_1 >= 0. && signed_area_2 >= 0.
-                    && signed_area_3 >= 0 );
+                      && signed_area_3 >= 0 );
     }
 } // namespace
 

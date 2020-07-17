@@ -27,7 +27,6 @@
 
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/detail/mapping_after_deletion.h>
-#include <geode/basic/logger.h>
 
 #include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/core/graph.h>

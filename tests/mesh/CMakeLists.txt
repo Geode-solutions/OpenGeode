@@ -111,6 +111,12 @@ add_geode_test(
         ${PROJECT_NAME}::mesh
 )
 add_geode_test(
+    SOURCE "test-regular-grid.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
     SOURCE "test-tetrahedral-solid.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
