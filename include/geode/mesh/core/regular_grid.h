@@ -63,7 +63,12 @@ namespace geode
 
         absl::string_view native_extension() const
         {
-            static constexpr auto ext = "og_rgd";
+            return native_extension_static();
+        }
+
+        static absl::string_view native_extension_static()
+        {
+            static const auto ext = absl::StrCat( "og_rgd", dimension, "d" );
             return ext;
         }
 
@@ -82,6 +87,8 @@ namespace geode
         AttributeManager& cell_attribute_manager() const;
 
     private:
+        RegularGrid();
+
         template < typename Archive >
         void serialize( Archive& archive );
 
