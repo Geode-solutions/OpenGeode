@@ -25,7 +25,6 @@
 
 #include <limits>
 
-#include <geode/basic/logger.h>
 #include <geode/basic/pimpl_impl.h>
 
 #include <geode/geometry/point.h>
