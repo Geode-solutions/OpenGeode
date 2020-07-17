@@ -46,7 +46,7 @@
 
 #define BITSERY_OUTPUT_MESH_DIMENSION_IMPL( Mesh, MeshImpl )                   \
     template < index_t dimension >                                             \
-    class OpenGeode##MeshImpl##Output : public Mesh##Output< dimension >       \
+    class OpenGeode##Mesh##Output : public Mesh##Output< dimension >           \
     {                                                                          \
     public:                                                                    \
         OpenGeode##Mesh##Output(                                               \
@@ -64,7 +64,7 @@
     ALIAS_2D_AND_3D( OpenGeode##Mesh##Output )
 
 #define BITSERY_OUTPUT_MESH_DIMENSION( Mesh )                                  \
-    BITSERY_OUTPUT_MESH_DIMENSION_IMPL( Mesh, Mesh )
+    BITSERY_OUTPUT_MESH_DIMENSION_IMPL( Mesh, OpenGeode##Mesh )
 
 #define BITSERY_OUTPUT_MESH_NO_DIMENSION_IMPL( Mesh, MeshImpl )                \
     class OpenGeode##Mesh##Output : public Mesh##Output                        \
@@ -84,4 +84,4 @@
     }
 
 #define BITSERY_OUTPUT_MESH_NO_DIMENSION( Mesh )                               \
-    BITSERY_OUTPUT_MESH_NO_DIMENSION_IMPL( Mesh, Mesh )
+    BITSERY_OUTPUT_MESH_NO_DIMENSION_IMPL( Mesh, OpenGeode##Mesh )
