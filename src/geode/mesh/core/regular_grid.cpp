@@ -61,6 +61,11 @@ namespace geode
             return cells_number_.at( direction );
         }
 
+        double cell_size( index_t direction ) const
+        {
+            return cells_size_.at( direction );
+        }
+
         index_t cell_index( const Index& index ) const
         {
             index_t cell_id{ 0 };
@@ -139,8 +144,8 @@ namespace geode
         std::array< index_t, dimension > cells_number,
         std::array< double, dimension > cells_size )
         : impl_( std::move( origin ),
-            std::move( cells_number ),
-            std::move( cells_size ) )
+              std::move( cells_number ),
+              std::move( cells_size ) )
     {
     }
 
@@ -149,11 +154,11 @@ namespace geode
         std::array< index_t, dimension > cells_number,
         double cells_size )
         : RegularGrid(
-            std::move( origin ), std::move( cells_number ), [&cells_size]() {
-                std::array< double, dimension > size;
-                size.fill( cells_size );
-                return size;
-            }() )
+              std::move( origin ), std::move( cells_number ), [&cells_size]() {
+                  std::array< double, dimension > size;
+                  size.fill( cells_size );
+                  return size;
+              }() )
     {
     }
 
@@ -183,6 +188,12 @@ namespace geode
     index_t RegularGrid< dimension >::nb_cells( index_t direction ) const
     {
         return impl_->nb_cells( direction );
+    }
+
+    template < index_t dimension >
+    double RegularGrid< dimension >::cell_size( index_t direction ) const
+    {
+        return impl_->cell_size( direction );
     }
 
     template < index_t dimension >
