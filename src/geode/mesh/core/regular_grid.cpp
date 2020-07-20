@@ -144,8 +144,8 @@ namespace geode
         std::array< index_t, dimension > cells_number,
         std::array< double, dimension > cells_size )
         : impl_( std::move( origin ),
-            std::move( cells_number ),
-            std::move( cells_size ) )
+              std::move( cells_number ),
+              std::move( cells_size ) )
     {
     }
 
@@ -154,11 +154,11 @@ namespace geode
         std::array< index_t, dimension > cells_number,
         double cells_size )
         : RegularGrid(
-            std::move( origin ), std::move( cells_number ), [&cells_size]() {
-                std::array< double, dimension > size;
-                size.fill( cells_size );
-                return size;
-            }() )
+              std::move( origin ), std::move( cells_number ), [&cells_size]() {
+                  std::array< double, dimension > size;
+                  size.fill( cells_size );
+                  return size;
+              }() )
     {
     }
 
