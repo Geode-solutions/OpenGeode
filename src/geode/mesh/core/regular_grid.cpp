@@ -84,6 +84,49 @@ namespace geode
             return cell_id;
         }
 
+        Index cell_index( index_t index ) const
+        {
+            OPENGEODE_ASSERT( index < cell_attribute_manager().nb_elements(),
+                "[RegularGrid::cell_index] Invalid index" );
+            Index cell_id;
+            for( const auto d : Range{ dimension } )
+            {
+                index_t offset{ 1 };
+                for( const auto d2 : Range{ dimension - d - 1 } )
+                {
+                    offset *= cells_number_[d2];
+                }
+                const auto value = std::floor( index / offset );
+                cell_id[dimension - d - 1] = value;
+                index -= value * offset;
+            }
+            return cell_id;
+        }
+
+        absl::optional< Index > next_cell(
+            const Index& index, index_t direction ) const
+        {
+            if( index[direction] + 1 < nb_cells( direction ) )
+            {
+                auto next = index;
+                next[direction]++;
+                return next;
+            }
+            return absl::nullopt;
+        }
+
+        absl::optional< Index > previous_cell(
+            const Index& index, index_t direction ) const
+        {
+            if( index[direction] > 0 )
+            {
+                auto prev = index;
+                prev[direction]--;
+                return prev;
+            }
+            return absl::nullopt;
+        }
+
         Point< dimension > point( const Index& index ) const
         {
             Point< dimension > translation;
@@ -137,15 +180,15 @@ namespace geode
         Point< dimension > origin_;
         std::array< index_t, dimension > cells_number_;
         std::array< double, dimension > cells_size_;
-    };
+    }; // namespace geode
 
     template < index_t dimension >
     RegularGrid< dimension >::RegularGrid( Point< dimension > origin,
         std::array< index_t, dimension > cells_number,
         std::array< double, dimension > cells_size )
         : impl_( std::move( origin ),
-            std::move( cells_number ),
-            std::move( cells_size ) )
+              std::move( cells_number ),
+              std::move( cells_size ) )
     {
     }
 
@@ -154,11 +197,11 @@ namespace geode
         std::array< index_t, dimension > cells_number,
         double cells_size )
         : RegularGrid(
-            std::move( origin ), std::move( cells_number ), [&cells_size]() {
-                std::array< double, dimension > size;
-                size.fill( cells_size );
-                return size;
-            }() )
+              std::move( origin ), std::move( cells_number ), [&cells_size]() {
+                  std::array< double, dimension > size;
+                  size.fill( cells_size );
+                  return size;
+              }() )
     {
     }
 
@@ -200,6 +243,30 @@ namespace geode
     index_t RegularGrid< dimension >::cell_index( const Index& index ) const
     {
         return impl_->cell_index( index );
+    }
+
+    template < index_t dimension >
+    typename RegularGrid< dimension >::Index
+        RegularGrid< dimension >::cell_index( index_t index ) const
+    {
+        return impl_->cell_index( index );
+    }
+
+    template < index_t dimension >
+    absl::optional< typename RegularGrid< dimension >::Index >
+        RegularGrid< dimension >::next_cell(
+            const Index& index, index_t direction ) const
+    {
+        return impl_->next_cell( index, direction );
+    }
+
+    template < index_t dimension >
+    absl::optional< typename RegularGrid< dimension >::Index >
+        RegularGrid< dimension >::previous_cell(
+            const typename RegularGrid< dimension >::Index& index,
+            index_t direction ) const
+    {
+        return impl_->previous_cell( index, direction );
     }
 
     template < index_t dimension >
