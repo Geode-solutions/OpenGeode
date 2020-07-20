@@ -67,7 +67,8 @@ namespace geode
             for( const auto d : Range{ dimension } )
             {
                 OPENGEODE_ASSERT( index[d] < cells_number_[d],
-                    "[RegularGrid::point] Invalid index" );
+                    "[RegularGrid::cell_index] Invalid index" );
+
                 index_t offset{ 1 };
                 for( const auto d2 : Range{ d } )
                 {

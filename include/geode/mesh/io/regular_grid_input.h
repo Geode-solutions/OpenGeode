@@ -36,7 +36,7 @@ namespace geode
 namespace geode
 {
     /*!
-     * API function for loading an RegularGrid.
+     * API function for loading a RegularGrid.
      * The adequate loader is called depending on the filename extension.
      * @param[in] filename Path to the file to load.
      */
