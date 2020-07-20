@@ -89,7 +89,7 @@ namespace geode
             Point< dimension > translation;
             for( const auto d : Range{ dimension } )
             {
-                OPENGEODE_ASSERT( index[d] < cells_number_[d],
+                OPENGEODE_ASSERT( index[d] < cells_number_[d] + 1,
                     "[RegularGrid::point] Invalid index" );
                 translation.set_value( d, cells_size_[d] * index[d] );
             }
