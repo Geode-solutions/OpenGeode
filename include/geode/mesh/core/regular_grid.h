@@ -82,6 +82,14 @@ namespace geode
 
         index_t cell_index( const Index& index ) const;
 
+        Index cell_index( index_t index ) const;
+
+        absl::optional< Index > next_cell(
+            const Index& index, index_t direction ) const;
+
+        absl::optional< Index > previous_cell(
+            const Index& index, index_t direction ) const;
+
         absl::optional< Index > cell( const Point< dimension >& query ) const;
 
         Point< dimension > point( const Index& index ) const;

@@ -59,6 +59,30 @@ void test_cell_index( const geode::RegularGrid3D& grid )
         grid.cell_index( { 1, 1, 1 } ) == 56, "[Test] Wrong cell index" );
     OPENGEODE_EXCEPTION(
         grid.cell_index( { 2, 2, 2 } ) == 112, "[Test] Wrong cell index" );
+
+    OPENGEODE_EXCEPTION( grid.cell_index( grid.cell_index( 0 ) ) == 0,
+        "[Test] Wrong cell index" );
+    OPENGEODE_EXCEPTION( grid.cell_index( grid.cell_index( 1 ) ) == 1,
+        "[Test] Wrong cell index" );
+    OPENGEODE_EXCEPTION( grid.cell_index( grid.cell_index( 5 ) ) == 5,
+        "[Test] Wrong cell index" );
+    OPENGEODE_EXCEPTION( grid.cell_index( grid.cell_index( 50 ) ) == 50,
+        "[Test] Wrong cell index" );
+    OPENGEODE_EXCEPTION( grid.cell_index( grid.cell_index( 56 ) ) == 56,
+        "[Test] Wrong cell index" );
+    OPENGEODE_EXCEPTION( grid.cell_index( grid.cell_index( 112 ) ) == 112,
+        "[Test] Wrong cell index" );
+
+    OPENGEODE_EXCEPTION( grid.next_cell( { 0, 0, 0 }, 0 )
+                             == geode::RegularGrid3D::Index( { 1, 0, 0 } ),
+        "[Test] Wrong cell index" );
+    OPENGEODE_EXCEPTION(
+        !grid.next_cell( { 4, 0, 0 }, 0 ), "[Test] Wrong cell index" );
+    OPENGEODE_EXCEPTION(
+        !grid.previous_cell( { 0, 0, 0 }, 1 ), "[Test] Wrong cell index" );
+    OPENGEODE_EXCEPTION( grid.previous_cell( { 0, 0, 1 }, 2 )
+                             == geode::RegularGrid3D::Index( { 0, 0, 0 } ),
+        "[Test] Wrong cell index" );
 }
 
 void test_cell_geometry( const geode::RegularGrid3D& grid )
