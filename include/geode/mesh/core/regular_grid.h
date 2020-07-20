@@ -78,6 +78,8 @@ namespace geode
 
         index_t nb_cells( index_t direction ) const;
 
+        double cell_size( index_t direction ) const;
+
         index_t cell_index( const Index& index ) const;
 
         absl::optional< Index > cell( const Point< dimension >& query ) const;
