@@ -38,11 +38,11 @@ void test_cell_number( const geode::RegularGrid3D& grid )
     OPENGEODE_EXCEPTION(
         grid.nb_cells() == 750, "[Test] Wrong total number of cells" );
     OPENGEODE_EXCEPTION(
-        grid.nb_cells( 0 ) == 5, "[Test] Wrong total number of cells" );
-    OPENGEODE_EXCEPTION(
-        grid.nb_cells( 1 ) == 10, "[Test] Wrong total number of cells" );
-    OPENGEODE_EXCEPTION(
-        grid.nb_cells( 2 ) == 15, "[Test] Wrong total number of cells" );
+        grid.nb_cells( 0 ) == 5, "[Test] Wrong total number of cells along X" );
+    OPENGEODE_EXCEPTION( grid.nb_cells( 1 ) == 10,
+        "[Test] Wrong total number of cells along Y" );
+    OPENGEODE_EXCEPTION( grid.nb_cells( 2 ) == 15,
+        "[Test] Wrong total number of cells along Z" );
 }
 
 void test_cell_index( const geode::RegularGrid3D& grid )
