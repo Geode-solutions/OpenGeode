@@ -1,5 +1,6 @@
 {
     "description": "Open source framework for representing and manipulating geometric models",
+    "title": "OpenGeode framework",
     "license": "MIT",
-    "creators": [{"name": "Geode-solutions, SAS"}]
+    "creators": [{"name": "Geode-solutions, "}]
 }
