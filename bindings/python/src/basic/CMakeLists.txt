@@ -24,6 +24,7 @@ add_geode_python_binding(
         "basic.cpp"
         "attribute.h"
         "attribute_manager.h"
+        "mapping.h"
         "uuid.h"
     DEPENDENCIES
         ${PROJECT_NAME}::basic

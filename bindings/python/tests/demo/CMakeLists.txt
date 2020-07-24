@@ -18,8 +18,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-add_subdirectory(basic)
-add_subdirectory(geometry)
-add_subdirectory(mesh)
-add_subdirectory(model)
-add_subdirectory(demo)
+add_geode_python_test(
+    SOURCE "demo-build-model.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_geometry
+        ${PROJECT_NAME}::py_mesh
+        ${PROJECT_NAME}::py_model
+)

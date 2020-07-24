@@ -21,6 +21,8 @@
  *
  */
 
+#include <pybind11/operators.h>
+
 #include <geode/basic/uuid.h>
 
 namespace geode

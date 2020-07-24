@@ -26,6 +26,7 @@
 
 #include "attribute.h"
 #include "attribute_manager.h"
+#include "mapping.h"
 #include "uuid.h"
 
 namespace pybind11
@@ -56,4 +57,5 @@ PYBIND11_MODULE( opengeode_py_basic, module )
     geode::define_uuid( module );
     geode::define_attributes( module );
     geode::define_attribute_manager( module );
+    geode::define_mapping( module );
 }

@@ -62,11 +62,12 @@ namespace geode
     {
     }
 
-    void BRepBuilder::copy( const BRep& brep )
+    detail::ModelCopyMapping BRepBuilder::copy( const BRep& brep )
     {
         const auto mapping = copy_components( brep );
         copy_component_relationships( mapping, brep );
         copy_component_geometry( mapping, brep );
+        return mapping;
     }
 
     detail::ModelCopyMapping BRepBuilder::copy_components( const BRep& brep )

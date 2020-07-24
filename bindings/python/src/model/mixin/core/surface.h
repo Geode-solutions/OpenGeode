@@ -33,7 +33,9 @@
         .def( "mesh",                                                          \
             &Surface##dimension##D::mesh< SurfaceMesh##dimension##D >,         \
             pybind11::return_value_policy::reference )                         \
-        .def( "component_id", &Surface##dimension##D::component_id )
+        .def( "component_id", &Surface##dimension##D::component_id )           \
+        .def_static( "component_type_static",                                  \
+            &Surface##dimension##D::component_type_static )
 
 namespace geode
 {
