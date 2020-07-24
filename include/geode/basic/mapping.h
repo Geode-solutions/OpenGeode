@@ -46,6 +46,16 @@ namespace geode
             out2in_.reserve( capacity );
         }
 
+        bool has_mapping_input( const T& value ) const
+        {
+            return in2out_.contains( value );
+        }
+
+        bool has_mapping_output( const T& value ) const
+        {
+            return out2in_.contains( value );
+        }
+
         const T& in2out( const T& in ) const
         {
             return in2out_.at( in );

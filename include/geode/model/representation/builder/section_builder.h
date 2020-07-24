@@ -81,7 +81,7 @@ namespace geode
         SectionBuilder( Section& section );
         SectionBuilder( SectionBuilder&& ) = default;
 
-        void copy( const Section& section );
+        detail::ModelCopyMapping copy( const Section& section );
 
         detail::ModelCopyMapping copy_components( const Section& section );
 

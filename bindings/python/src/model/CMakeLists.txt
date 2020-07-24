@@ -47,6 +47,7 @@ add_geode_python_binding(
         "mixin/core/topology.h"
         "mixin/core/vertex_identifier.h"
         "representation/builder/brep_builder.h"
+        "representation/builder/copy.h"
         "representation/builder/section_builder.h"
         "representation/core/brep.h"
         "representation/core/section.h"

@@ -21,27 +21,19 @@
  *
  */
 
-#include <pybind11/operators.h>
-
-#include <geode/model/mixin/core/component_type.h>
+#include <geode/model/representation/builder/detail/copy.h>
 
 namespace geode
 {
-    void define_component_type( pybind11::module& module )
+    void define_copy( pybind11::module& module )
     {
-        pybind11::class_< ComponentType >( module, "ComponentType" )
+        pybind11::class_< detail::ModelCopyMapping >(
+            module, "ModelCopyMapping" )
             .def( pybind11::init<>() )
-            .def( pybind11::init< std::string >() )
-            .def( "get", &ComponentType::get )
-            .def( "matches", &ComponentType::operator==);
-
-        pybind11::class_< ComponentID >( module, "ComponentID" )
-            .def( pybind11::init<>() )
-            .def( pybind11::init< ComponentType, uuid >() )
-            .def( "id", &ComponentID::id )
-            .def( "type", &ComponentID::type )
-            .def( "string", &ComponentID::string )
-            .def( pybind11::self == pybind11::self )
-            .def( pybind11::self != pybind11::self );
+            .def( "at",
+                ( detail::Mapping
+                    & (detail::ModelCopyMapping::*) (const ComponentType&) )
+                    & detail::ModelCopyMapping::at )
+            .def( "emplace", &detail::ModelCopyMapping::emplace );
     }
 } // namespace geode

@@ -88,7 +88,7 @@ namespace geode
         BRepBuilder( BRep& brep );
         BRepBuilder( BRepBuilder&& ) = default;
 
-        void copy( const BRep& brep );
+        detail::ModelCopyMapping copy( const BRep& brep );
 
         detail::ModelCopyMapping copy_components( const BRep& brep );
 

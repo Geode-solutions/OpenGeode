@@ -31,7 +31,9 @@
         module, name##dimension.c_str() )                                      \
         .def( "mesh", &Corner##dimension##D::mesh,                             \
             pybind11::return_value_policy::reference )                         \
-        .def( "component_id", &Corner##dimension##D::component_id )
+        .def( "component_id", &Corner##dimension##D::component_id )            \
+        .def_static( "component_type_static",                                  \
+            &Corner##dimension##D::component_type_static )
 
 namespace geode
 {

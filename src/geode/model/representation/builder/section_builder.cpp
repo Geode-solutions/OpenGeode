@@ -56,11 +56,12 @@ namespace geode
     {
     }
 
-    void SectionBuilder::copy( const Section& section )
+    detail::ModelCopyMapping SectionBuilder::copy( const Section& section )
     {
         const auto mapping = copy_components( section );
         copy_component_relationships( mapping, section );
         copy_component_geometry( mapping, section );
+        return mapping;
     }
 
     detail::ModelCopyMapping SectionBuilder::copy_components(

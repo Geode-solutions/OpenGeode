@@ -21,27 +21,26 @@
  *
  */
 
-#include <pybind11/operators.h>
+#include <geode/basic/mapping.h>
+#include <geode/basic/uuid.h>
 
-#include <geode/model/mixin/core/component_type.h>
+#define PYTHON_MAPPING( type )                                                 \
+    const auto name##type = absl::StrCat( "BijectiveMapping", #type );         \
+    pybind11::class_< BijectiveMapping< type > >( module, name##type.c_str() ) \
+        .def( pybind11::init<>() )                                             \
+        .def( "map", &BijectiveMapping< type >::map )                          \
+        .def( "reserve", &BijectiveMapping< type >::reserve )                  \
+        .def( "has_mapping_input",                                             \
+            &BijectiveMapping< type >::has_mapping_input )                     \
+        .def( "has_mapping_output",                                            \
+            &BijectiveMapping< type >::has_mapping_output )                    \
+        .def( "in2out", &BijectiveMapping< type >::in2out )                    \
+        .def( "out2in", &BijectiveMapping< type >::out2in )
 
 namespace geode
 {
-    void define_component_type( pybind11::module& module )
+    void define_mapping( pybind11::module& module )
     {
-        pybind11::class_< ComponentType >( module, "ComponentType" )
-            .def( pybind11::init<>() )
-            .def( pybind11::init< std::string >() )
-            .def( "get", &ComponentType::get )
-            .def( "matches", &ComponentType::operator==);
-
-        pybind11::class_< ComponentID >( module, "ComponentID" )
-            .def( pybind11::init<>() )
-            .def( pybind11::init< ComponentType, uuid >() )
-            .def( "id", &ComponentID::id )
-            .def( "type", &ComponentID::type )
-            .def( "string", &ComponentID::string )
-            .def( pybind11::self == pybind11::self )
-            .def( pybind11::self != pybind11::self );
+        PYTHON_MAPPING( uuid );
     }
 } // namespace geode
