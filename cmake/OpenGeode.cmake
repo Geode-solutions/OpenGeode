@@ -51,6 +51,10 @@ install(
 add_subdirectory(src/geode)
 
 #------------------------------------------------------------------------------------------------
+# Configure the OpenGeode binaries
+add_subdirectory(src/bin)
+
+#------------------------------------------------------------------------------------------------
 # Optional modules configuration
 if(OPENGEODE_WITH_TESTS)
     message(STATUS "Configuring OpenGeode with tests")

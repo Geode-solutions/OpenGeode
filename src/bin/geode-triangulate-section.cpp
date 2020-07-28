@@ -21,59 +21,45 @@
  *
  */
 
+#include <absl/flags/flag.h>
+#include <absl/flags/parse.h>
+#include <absl/flags/usage.h>
+
 #include <geode/basic/assert.h>
 #include <geode/basic/logger.h>
-#include <geode/basic/range.h>
-#include <geode/basic/uuid.h>
 
 #include <geode/model/helpers/convert_model_meshes.h>
-#include <geode/model/representation/core/brep.h>
 #include <geode/model/representation/core/section.h>
-#include <geode/model/representation/io/brep_input.h>
-#include <geode/model/representation/io/brep_output.h>
 #include <geode/model/representation/io/section_input.h>
 #include <geode/model/representation/io/section_output.h>
 
-#include <geode/tests/common.h>
+ABSL_FLAG( std::string, input, "/path/my/section.og_section", "Input section" );
+ABSL_FLAG( std::string,
+    output,
+    "/path/my/remeshed_section.og_section",
+    "Output section" );
 
-void run_test_brep()
+int main( int argc, char* argv[] )
 {
-    geode::BRep model;
-    geode::load_brep(
-        model, absl::StrCat( geode::data_path, "test_v5.og_brep" ) );
+    try
+    {
+        absl::SetProgramUsageMessage(
+            absl::StrCat( "Geode Section triangulate from Geode-solutions.\n",
+                "Sample usage:\n", argv[0],
+                " --input my_section.og_section --output "
+                "remeshed_section.og_section" ) );
+        absl::ParseCommandLine( argc, argv );
 
-    geode::triangulate_surface_meshes( model );
-    geode::convert_surface_meshes_into_triangulated_surfaces( model );
-    geode::convert_block_meshes_into_tetrahedral_solids( model );
+        geode::Section section;
+        geode::load_section( section, absl::GetFlag( FLAGS_input ) );
+        geode::triangulate_surface_meshes( section );
+        geode::convert_surface_meshes_into_triangulated_surfaces( section );
+        geode::save_section( section, absl::GetFlag( FLAGS_output ) );
 
-    const auto file_io =
-        absl::StrCat( "test_triangulated_surfaces.", model.native_extension() );
-    geode::save_brep( model, file_io );
-
-    geode::BRep model2;
-    geode::load_brep( model2, file_io );
+        return 0;
+    }
+    catch( ... )
+    {
+        return geode::geode_lippincott();
+    }
 }
-
-void run_test_section()
-{
-    geode::Section model;
-    geode::load_section(
-        model, absl::StrCat( geode::data_path, "test_v5.og_sctn" ) );
-
-    geode::convert_surface_meshes_into_triangulated_surfaces( model );
-
-    const auto file_io =
-        absl::StrCat( "test_triangulated_surfaces.", model.native_extension() );
-    geode::save_section( model, file_io );
-
-    geode::Section model2;
-    geode::load_section( model2, file_io );
-}
-
-void test()
-{
-    run_test_brep();
-    run_test_section();
-}
-
-OPENGEODE_TEST( "convert-model-meshes" )

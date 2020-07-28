@@ -92,11 +92,51 @@ namespace geode
         return std::move( tri_surface );
     }
 
+    template < index_t dimension >
+    void triangulate_surface_mesh( SurfaceMesh< dimension >& surface )
+    {
+        triangulate_surface_mesh(
+            surface, *SurfaceMeshBuilder< dimension >::create( surface ) );
+    }
+
+    template < index_t dimension >
+    void triangulate_surface_mesh( const SurfaceMesh< dimension >& surface,
+        SurfaceMeshBuilder< dimension >& builder )
+    {
+        std::vector< bool > to_delete( surface.nb_polygons(), false );
+        for( const auto p : geode::Range{ surface.nb_polygons() } )
+        {
+            if( surface.nb_polygon_vertices( p ) > 3 )
+            {
+                to_delete[p] = true;
+                const auto v0 = surface.polygon_vertex( { p, 0 } );
+                for( const auto v :
+                    Range{ 2, surface.nb_polygon_vertices( p ) } )
+                {
+                    builder.create_polygon(
+                        { v0, surface.polygon_vertex( { p, v - 1 } ),
+                            surface.polygon_vertex( { p, v } ) } );
+                }
+            }
+        }
+        to_delete.resize( surface.nb_polygons(), false );
+        builder.delete_polygons( to_delete );
+        builder.compute_polygon_adjacencies();
+    }
+
     template absl::optional< std::unique_ptr< TriangulatedSurface2D > >
         opengeode_mesh_api convert_surface_mesh_into_triangulated_surface(
             const SurfaceMesh2D& );
     template absl::optional< std::unique_ptr< TriangulatedSurface3D > >
         opengeode_mesh_api convert_surface_mesh_into_triangulated_surface(
             const SurfaceMesh3D& );
+
+    template void opengeode_mesh_api triangulate_surface_mesh( SurfaceMesh2D& );
+    template void opengeode_mesh_api triangulate_surface_mesh( SurfaceMesh3D& );
+
+    template void opengeode_mesh_api triangulate_surface_mesh(
+        const SurfaceMesh2D&, SurfaceMeshBuilder2D& );
+    template void opengeode_mesh_api triangulate_surface_mesh(
+        const SurfaceMesh3D&, SurfaceMeshBuilder3D& );
 
 } // namespace geode
