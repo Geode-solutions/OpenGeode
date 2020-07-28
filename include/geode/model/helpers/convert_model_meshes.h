@@ -41,4 +41,8 @@ namespace geode
 
     void opengeode_model_api convert_block_meshes_into_tetrahedral_solids(
         BRep& brep );
+
+    void opengeode_model_api triangulate_surface_meshes( BRep& brep );
+
+    void opengeode_model_api triangulate_surface_meshes( Section& section );
 } // namespace geode

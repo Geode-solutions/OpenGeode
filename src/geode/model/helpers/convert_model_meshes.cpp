@@ -23,6 +23,7 @@
 
 #include <geode/model/helpers/convert_model_meshes.h>
 
+#include <geode/mesh/builder/surface_mesh_builder.h>
 #include <geode/mesh/core/solid_mesh.h>
 #include <geode/mesh/core/surface_mesh.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
@@ -85,6 +86,17 @@ namespace
         }
     }
 
+    template < typename Model, typename ModelBuilder >
+    void do_triangulate_surfaces( Model& model, ModelBuilder& builder )
+    {
+        for( const auto& surface : model.surfaces() )
+        {
+            const auto& mesh = surface.mesh();
+            geode::triangulate_surface_mesh(
+                mesh, *builder.surface_mesh_builder( surface.id() ) );
+        }
+    }
+
     void do_convert_blocks( geode::BRep& model, geode::BRepBuilder& builder )
     {
         for( const auto& block : model.blocks() )
@@ -122,5 +134,17 @@ namespace geode
     {
         BRepBuilder brep_builder{ brep };
         do_convert_blocks( brep, brep_builder );
+    }
+
+    void triangulate_surface_meshes( BRep& brep )
+    {
+        BRepBuilder brep_builder{ brep };
+        do_triangulate_surfaces( brep, brep_builder );
+    }
+
+    void triangulate_surface_meshes( Section& section )
+    {
+        SectionBuilder section_builder{ section };
+        do_triangulate_surfaces( section, section_builder );
     }
 } // namespace geode
