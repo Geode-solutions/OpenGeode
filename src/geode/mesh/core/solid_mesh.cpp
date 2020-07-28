@@ -39,6 +39,7 @@
 #include <geode/mesh/core/bitsery_archive.h>
 #include <geode/mesh/core/detail/facet_storage.h>
 #include <geode/mesh/core/mesh_factory.h>
+#include <geode/mesh/core/polyhedral_solid.h>
 
 namespace
 {
@@ -122,7 +123,7 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -185,10 +186,10 @@ namespace geode
     public:
         explicit Impl( SolidMesh& solid )
             : polyhedron_around_vertex_(
-                solid.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolyhedronVertex >(
-                        "polyhedron_around_vertex", PolyhedronVertex{} ) )
+                  solid.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolyhedronVertex >(
+                          "polyhedron_around_vertex", PolyhedronVertex{} ) )
         {
         }
 
@@ -465,7 +466,7 @@ namespace geode
     std::unique_ptr< SolidMesh< dimension > > SolidMesh< dimension >::create()
     {
         return MeshFactory::create_default_mesh< SolidMesh< dimension > >(
-            SolidMesh< dimension >::type_name_static() );
+            PolyhedralSolid< dimension >::type_name_static() );
     }
 
     template < index_t dimension >
@@ -1033,7 +1034,7 @@ namespace geode
             polyhedron_facet_vertex( { polyhedron_facet_edge.polyhedron_facet,
                 ( polyhedron_facet_edge.edge_id + 1 )
                     % nb_polyhedron_facet_vertices(
-                        polyhedron_facet_edge.polyhedron_facet ) } );
+                          polyhedron_facet_edge.polyhedron_facet ) } );
         return edge_from_vertices( { v0, v1 } );
     }
 
