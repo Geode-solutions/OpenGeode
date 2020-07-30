@@ -346,6 +346,7 @@ namespace geode
                         attribute.values_.max_size(),
                         []( Archive& archive, T& item ) { archive( item ); } );
                 } );
+            values_.reserve( 10 );
         }
 
         void resize( index_t size, AttributeBase::AttributeKey ) override
@@ -479,6 +480,7 @@ namespace geode
                     archive.container1b(
                         attribute.values_, attribute.values_.max_size() );
                 } );
+            values_.reserve( 10 );
         }
 
         void resize( index_t size, AttributeBase::AttributeKey ) override
@@ -626,6 +628,7 @@ namespace geode
                             archive( item );
                         } );
                 } );
+            values_.reserve( 10 );
         }
 
         void resize( index_t /*unused*/, AttributeBase::AttributeKey ) override
