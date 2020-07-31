@@ -137,10 +137,10 @@ namespace geode
     public:
         explicit Impl( SurfaceMesh& surface )
             : polygon_around_vertex_(
-                surface.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) )
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolygonVertex >(
+                          "polygon_around_vertex", PolygonVertex{} ) )
         {
         }
 
@@ -162,9 +162,9 @@ namespace geode
         }
 
         absl::optional< index_t > find_edge(
-            std::array< index_t, 2 > edge_vertices ) const
+            const std::array< index_t, 2 >& edge_vertices ) const
         {
-            return this->find_facet( std::move( edge_vertices ) );
+            return this->find_facet( edge_vertices );
         }
 
         index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices )

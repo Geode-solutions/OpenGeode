@@ -48,6 +48,10 @@ namespace geode
         {
             const auto min_itr = absl::c_min_element( vertices );
             absl::c_rotate( vertices, min_itr );
+            if( vertices[1] > vertices.back() )
+            {
+                std::reverse( vertices.begin() + 1, vertices.end() );
+            }
         }
 
         template <>
@@ -78,28 +82,7 @@ namespace geode
 
             bool operator==( const VertexCycle& other ) const
             {
-                const auto& other_vertices = other.vertices();
-                const auto size = this->vertices_.size();
-                if( other_vertices.size() != size )
-                {
-                    return false;
-                }
-                if( this->vertices().front() != other_vertices.front() )
-                {
-                    return false;
-                }
-                if( this->vertices() == other_vertices )
-                {
-                    return true;
-                }
-                for( const auto i : Range{ 1, size } )
-                {
-                    if( this->vertices()[i] != other_vertices[size - i] )
-                    {
-                        return false;
-                    }
-                }
-                return true;
+                return this->vertices() == other.vertices();
             }
 
             bool operator!=( const VertexCycle& other ) const
@@ -122,36 +105,11 @@ namespace geode
         public:
             Container vertices_;
         };
+
+        template < typename H, typename Container >
+        H AbslHashValue( H h, const VertexCycle< Container >& m )
+        {
+            return H::combine( std::move( h ), m.vertices() );
+        }
     } // namespace detail
 } // namespace geode
-
-namespace std
-{
-    using VectorVertexCycle =
-        geode::detail::VertexCycle< absl::InlinedVector< geode::index_t, 4 > >;
-    template <>
-    struct hash< VectorVertexCycle >
-    {
-        std::size_t operator()( const VectorVertexCycle& cycle ) const
-        {
-            std::size_t hash{ 0 };
-            for( const auto v : cycle.vertices() )
-            {
-                hash = hash ^ absl::Hash< geode::index_t >()( v );
-            }
-            return hash;
-        }
-    };
-
-    using ArrayVertexCycle =
-        geode::detail::VertexCycle< std::array< geode::index_t, 2 > >;
-    template <>
-    struct hash< ArrayVertexCycle >
-    {
-        std::size_t operator()( const ArrayVertexCycle& cycle ) const
-        {
-            return absl::Hash< geode::index_t >()( cycle.vertices().front() )
-                   ^ absl::Hash< geode::index_t >()( cycle.vertices().back() );
-        }
-    };
-} // namespace std
