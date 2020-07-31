@@ -89,8 +89,8 @@ void test_create_viewed_polyhedra(
     const auto& facet_vertices = polyhedral_solid.facet_vertices( facet_id );
     OPENGEODE_EXCEPTION( facet_vertices.size() == 3,
         "[Test] PolyhedralSolidView PolyhedronVertex is not correct" );
-    OPENGEODE_EXCEPTION( facet_vertices[0] == 3 && facet_vertices[1] == 5
-                             && facet_vertices[2] == 4,
+    OPENGEODE_EXCEPTION( facet_vertices[0] == 3 && facet_vertices[1] == 4
+                             && facet_vertices[2] == 5,
         "[Test] PolyhedralSolidView facet vertices are not correct" );
     OPENGEODE_EXCEPTION(
         polyhedral_solid.facet_from_vertices( facet_vertices ) == 1,
