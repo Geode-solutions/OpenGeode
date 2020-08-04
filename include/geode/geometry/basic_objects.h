@@ -88,7 +88,7 @@ namespace geode
         }
         explicit InfiniteLine( const Segment< dimension >& segment )
             : InfiniteLine(
-                segment.normalized_direction(), segment.vertices()[0] )
+                  segment.normalized_direction(), segment.vertices()[0] )
         {
         }
         const Point< dimension >& origin() const
@@ -129,7 +129,7 @@ namespace geode
         double plane_constant() const
         {
             double plane_constant{ 0.0 };
-            for( auto i : Range{ 3 } )
+            for( const auto i : Range{ 3 } )
             {
                 plane_constant -= origin_.value( i ) * normal_.value( i );
             }

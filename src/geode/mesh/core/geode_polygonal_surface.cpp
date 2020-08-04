@@ -98,7 +98,7 @@ namespace geode
         {
             index_t offset{ 0 };
             index_t index{ 0 };
-            for( const auto p : Range{ to_delete.size() } )
+            for( const auto p : Indices{ to_delete } )
             {
                 if( to_delete[p] )
                 {

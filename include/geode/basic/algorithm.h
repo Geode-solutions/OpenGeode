@@ -58,7 +58,7 @@ namespace geode
         {
             return 0;
         }
-        for( const auto i : Range{ to_delete.size() } )
+        for( const auto i : Indices{ to_delete } )
         {
             if( to_delete[i] )
             {
@@ -97,7 +97,7 @@ namespace geode
         }
         std::vector< T > out_values;
         out_values.reserve( absl::c_count( to_keep, true ) );
-        for( const auto i : Range{ to_keep.size() } )
+        for( const auto i : Indices{ to_keep } )
         {
             if( to_keep[i] )
             {

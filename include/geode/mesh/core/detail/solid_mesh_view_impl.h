@@ -42,7 +42,7 @@ namespace geode
             SolidMeshViewImpl( SolidMesh< dimension >& solid_view,
                 const SolidMesh< dimension >& solid )
                 : detail::EdgesViewImpl< dimension, SolidMesh< dimension > >(
-                    solid_view, solid ),
+                      solid_view, solid ),
                   solid_( solid ),
                   solid_view_( solid_view ),
                   view2polyhedra_(
@@ -221,7 +221,7 @@ namespace geode
                     facet_id, [&viewed_vertices, this](
                                   PolyhedronFacetVertices& vertices ) {
                         vertices.resize( viewed_vertices.size() );
-                        for( const auto v : Range{ vertices.size() } )
+                        for( const auto v : Indices{ vertices } )
                         {
                             vertices[v] =
                                 this->vertex_in_view( viewed_vertices[v] );
