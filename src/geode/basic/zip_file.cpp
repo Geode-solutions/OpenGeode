@@ -52,7 +52,7 @@ namespace geode
                 mz_zip_writer_open_file( writer_, file.data(), 0, 0 );
             if( status != MZ_OK )
             {
-                Logger::error( "Error opening zip for writing" );
+                Logger::error( "Error opening zip" );
             }
         }
 
