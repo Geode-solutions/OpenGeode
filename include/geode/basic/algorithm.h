@@ -39,16 +39,13 @@ namespace geode
      * @param[in] to_delete Vector of the same size than values. If to_delete[i]
      * is true the i-th element is deleted, else the element is kept.
      * @param[in/out] values Vector in which perform deletions.
-     * @param[in] resize If true, the size of vector values is adapt to the
-     * number of remaining elements.
      * @pre T should have default constructor (needed for call resize method on
      * vector).
      * @return The number of deleted elements
      */
     template < typename T >
-    index_t delete_vector_elements( const std::vector< bool >& to_delete,
-        std::vector< T >& values,
-        bool resize = false )
+    index_t delete_vector_elements(
+        const std::vector< bool >& to_delete, std::vector< T >& values )
     {
         OPENGEODE_ASSERT( to_delete.size() == values.size(),
             "[delete_vector_elements] Number of elements in the two vectors "
@@ -69,10 +66,7 @@ namespace geode
                 values[i - nb_removed_elements] = values[i];
             }
         }
-        if( resize )
-        {
-            values.resize( to_delete.size() - nb_removed_elements );
-        }
+        values.resize( to_delete.size() - nb_removed_elements );
         return nb_removed_elements;
     }
 
