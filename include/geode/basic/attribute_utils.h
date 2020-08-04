@@ -136,7 +136,7 @@ namespace geode
             const Attribute< Type >& attribute )                               \
         {                                                                      \
             Type result{ 0 };                                                  \
-            for( auto i : Range{ interpolator.indices_.size() } )              \
+            for( auto i : Indices{ interpolator.indices_ } )                   \
             {                                                                  \
                 result += interpolator.lambdas_[i]                             \
                           * attribute.value( interpolator.indices_[i] );       \

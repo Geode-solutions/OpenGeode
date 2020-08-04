@@ -76,7 +76,7 @@ namespace geode
             const Attribute< Foo >& attribute )
         {
             Foo result;
-            for( auto i : Range{ interpolator.indices_.size() } )
+            for( const auto i : Indices{ interpolator.indices_ } )
             {
                 result.double_ +=
                     interpolator.lambdas_[i]

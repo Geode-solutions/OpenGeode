@@ -147,7 +147,7 @@ namespace geode
             index_t vertex_index{ 0 };
             index_t facet_index{ 0 };
             index_t adjacent_index{ 0 };
-            for( const auto p : Range{ to_delete.size() } )
+            for( const auto p : Indices{ to_delete } )
             {
                 if( to_delete[p] )
                 {

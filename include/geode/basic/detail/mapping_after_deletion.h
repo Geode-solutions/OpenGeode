@@ -36,7 +36,7 @@ namespace geode
         {
             std::vector< index_t > old2new( to_delete.size(), NO_ID );
             index_t current_id{ 0 };
-            for( const auto i : Range{ to_delete.size() } )
+            for( const auto i : Indices{ to_delete } )
             {
                 if( !to_delete[i] )
                 {

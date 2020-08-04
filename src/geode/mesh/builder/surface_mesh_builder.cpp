@@ -188,7 +188,7 @@ namespace geode
     {
         const auto added_polygon = surface_mesh_->nb_polygons();
         surface_mesh_->polygon_attribute_manager().resize( added_polygon + 1 );
-        for( const auto v : Range{ vertices.size() } )
+        for( const auto v : Indices{ vertices } )
         {
             associate_polygon_vertex_to_vertex(
                 { added_polygon, v }, vertices[v] );

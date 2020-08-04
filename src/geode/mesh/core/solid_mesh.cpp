@@ -123,7 +123,7 @@ namespace
         geode_unused( facet_id );
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
+                                          { polyhedron_id, facet_id } ),
             "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
             "polyhedron facet vertex" );
     }
@@ -186,10 +186,10 @@ namespace geode
     public:
         explicit Impl( SolidMesh& solid )
             : polyhedron_around_vertex_(
-                solid.vertex_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolyhedronVertex >(
-                        "polyhedron_around_vertex", PolyhedronVertex{} ) )
+                  solid.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          PolyhedronVertex >(
+                          "polyhedron_around_vertex", PolyhedronVertex{} ) )
         {
         }
 
@@ -526,7 +526,7 @@ namespace geode
     {
         PolyhedronFacetVertices facet_vertices(
             nb_polyhedron_facet_vertices( polyhedron_facet ) );
-        for( const auto v : Range{ facet_vertices.size() } )
+        for( const auto v : Indices{ facet_vertices } )
         {
             facet_vertices[v] =
                 polyhedron_facet_vertex( { polyhedron_facet, v } );
@@ -1034,7 +1034,7 @@ namespace geode
             polyhedron_facet_vertex( { polyhedron_facet_edge.polyhedron_facet,
                 ( polyhedron_facet_edge.edge_id + 1 )
                     % nb_polyhedron_facet_vertices(
-                        polyhedron_facet_edge.polyhedron_facet ) } );
+                          polyhedron_facet_edge.polyhedron_facet ) } );
         return edge_from_vertices( { v0, v1 } );
     }
 
@@ -1067,7 +1067,7 @@ namespace geode
         {
             absl::FixedArray< index_t > vertices(
                 nb_polyhedron_facet_vertices( polyhedron_facet ) );
-            for( const auto v : Range{ vertices.size() } )
+            for( const auto v : Indices{ vertices } )
             {
                 vertices[v] =
                     polyhedron_facet_vertex( { polyhedron_facet, v } );
