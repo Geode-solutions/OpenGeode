@@ -23,6 +23,10 @@
 
 #include <geode/mesh/core/regular_grid.h>
 
+#include <absl/container/inlined_vector.h>
+
+#include <geode/basic/logger.h>
+
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
@@ -144,21 +148,55 @@ namespace geode
             return origin_;
         }
 
-        absl::optional< Index > cell( const Point< dimension >& query ) const
+        absl::optional< typename RegularGrid< dimension >::Indices > cell(
+            const Point< dimension >& query ) const
         {
-            Index index;
+            Indices indices;
+            Index min;
+            Index max;
             for( const auto d : Range{ dimension } )
             {
                 const auto value =
-                    std::floor( ( query.value( d ) - origin_.value( d ) )
-                                / cells_size_[d] );
+                    ( query.value( d ) - origin_.value( d ) ) / cells_size_[d];
                 if( value < 0 || value >= cells_number_[d] )
                 {
                     return absl::nullopt;
                 }
-                index[d] = static_cast< index_t >( value );
+                const auto floor_value =
+                    static_cast< index_t >( std::floor( value ) );
+                min[d] = floor_value;
+                max[d] = floor_value;
+                const auto remainder = std::fmod( value, 1. );
+                if( remainder < global_epsilon )
+                {
+                    if( floor_value > 0 )
+                    {
+                        min[d] = floor_value - 1;
+                    }
+                    else
+                    {
+                        min[d] = 0;
+                    }
+                }
+                else if( remainder > 1 - global_epsilon )
+                {
+                    max[d] = std::min( floor_value + 1, cells_number_[d] );
+                }
             }
-            return index;
+            indices.push_back( min );
+            for( const auto d : Range{ dimension } )
+            {
+                if( max[d] != min[d] )
+                {
+                    for( const auto i : Range{ indices.size() } )
+                    {
+                        auto cur_cell = indices[i];
+                        cur_cell[d] = max[d];
+                        indices.push_back( cur_cell );
+                    }
+                }
+            }
+            return indices;
         }
 
     private:
@@ -270,7 +308,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::optional< typename RegularGrid< dimension >::Index >
+    absl::optional< typename RegularGrid< dimension >::Indices >
         RegularGrid< dimension >::cell( const Point< dimension >& query ) const
     {
         return impl_->cell( query );
