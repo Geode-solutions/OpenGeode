@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <absl/container/inlined_vector.h>
 #include <absl/types/optional.h>
 
 #include <geode/basic/pimpl.h>
@@ -48,6 +49,7 @@ namespace geode
 
     public:
         using Index = std::array< index_t, dimension >;
+        using Indices = absl::InlinedVector< Index, dimension * dimension >;
 
         RegularGrid( Point< dimension > origin,
             std::array< index_t, dimension > cells_number,
@@ -90,7 +92,16 @@ namespace geode
         absl::optional< Index > previous_cell(
             const Index& index, index_t direction ) const;
 
-        absl::optional< Index > cell( const Point< dimension >& query ) const;
+        /*!
+         * Return the cell(s) containing the query point
+         * @param[in] query Position of point
+         * @return No, one index or several cell indices that contain the query
+         * point.
+         * @detail When query point is geometrically near to cell limit, several
+         * cell indices are returned: they correspond the potential cells that
+         * may contain the point.
+         */
+        absl::optional< Indices > cell( const Point< dimension >& query ) const;
 
         Point< dimension > point( const Index& index ) const;
 

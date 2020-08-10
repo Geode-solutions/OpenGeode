@@ -66,12 +66,17 @@ namespace
         }
     }
 
-    template < typename Model, typename ModelBuilder >
+    template < geode::index_t dimension, typename Model, typename ModelBuilder >
     void do_convert_surfaces( Model& model, ModelBuilder& builder )
     {
         for( const auto& surface : model.surfaces() )
         {
             const auto& mesh = surface.mesh();
+            if( mesh.type_name()
+                == geode::TriangulatedSurface< dimension >::type_name_static() )
+            {
+                continue;
+            }
             const auto unique_vertices =
                 save_unique_vertices( model, mesh, surface.component_id() );
             auto tri_surface =
@@ -121,13 +126,13 @@ namespace geode
     void convert_surface_meshes_into_triangulated_surfaces( BRep& brep )
     {
         BRepBuilder brep_builder{ brep };
-        do_convert_surfaces( brep, brep_builder );
+        do_convert_surfaces< 3 >( brep, brep_builder );
     }
 
     void convert_surface_meshes_into_triangulated_surfaces( Section& section )
     {
         SectionBuilder section_builder{ section };
-        do_convert_surfaces( section, section_builder );
+        do_convert_surfaces< 2 >( section, section_builder );
     }
 
     void convert_block_meshes_into_tetrahedral_solids( BRep& brep )
