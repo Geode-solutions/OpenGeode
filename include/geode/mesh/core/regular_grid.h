@@ -93,7 +93,7 @@ namespace geode
             const Index& index, index_t direction ) const;
 
         /*!
-         * Return the cell containing the query point
+         * Return the cell(s) containing the query point
          * @param[in] query Position of point
          * @return No, one index or several cell indices that contain the query
          * point.
