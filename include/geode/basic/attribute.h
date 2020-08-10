@@ -366,10 +366,7 @@ namespace geode
         void delete_elements( const std::vector< bool >& to_delete,
             AttributeBase::AttributeKey ) override
         {
-            std::vector< bool > to_keep( to_delete );
-            to_keep.flip();
-            values_ = extract_vector_elements( to_keep, values_ );
-            values_.reserve( 10 );
+            delete_vector_elements( to_delete, values_ );
         }
 
         std::shared_ptr< AttributeBase > clone(
@@ -500,10 +497,7 @@ namespace geode
         void delete_elements( const std::vector< bool >& to_delete,
             AttributeBase::AttributeKey ) override
         {
-            std::vector< bool > to_keep( to_delete );
-            to_keep.flip();
-            values_ = extract_vector_elements( to_keep, values_ );
-            values_.reserve( 10 );
+            delete_vector_elements( to_delete, values_ );
         }
 
         std::shared_ptr< AttributeBase > clone(

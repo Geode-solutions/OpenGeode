@@ -167,4 +167,20 @@ namespace geode
             return current();
         }
     };
+
+    class Indices : public BaseRange< index_t, IncrementOperator< index_t > >,
+                    public BeginEnd< Indices >
+    {
+    public:
+        template < typename Container >
+        explicit Indices( const Container& container )
+            : BaseRange( 0, container.size() ), BeginEnd( *this )
+        {
+        }
+
+        index_t operator*() const
+        {
+            return current();
+        }
+    };
 } // namespace geode

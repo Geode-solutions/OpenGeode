@@ -526,7 +526,7 @@ namespace geode
     {
         PolyhedronFacetVertices facet_vertices(
             nb_polyhedron_facet_vertices( polyhedron_facet ) );
-        for( const auto v : Range{ facet_vertices.size() } )
+        for( const auto v : Indices{ facet_vertices } )
         {
             facet_vertices[v] =
                 polyhedron_facet_vertex( { polyhedron_facet, v } );
@@ -1067,7 +1067,7 @@ namespace geode
         {
             absl::FixedArray< index_t > vertices(
                 nb_polyhedron_facet_vertices( polyhedron_facet ) );
-            for( const auto v : Range{ vertices.size() } )
+            for( const auto v : Indices{ vertices } )
             {
                 vertices[v] =
                     polyhedron_facet_vertex( { polyhedron_facet, v } );

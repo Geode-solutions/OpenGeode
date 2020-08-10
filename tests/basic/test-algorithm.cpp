@@ -31,29 +31,26 @@
 
 std::vector< bool > create_bool_vector()
 {
-    std::vector< bool > out( 4, false );
-    out[1] = true;
-    return out;
+    return { false, true, false, false };
 }
 
 std::vector< double > create_double_vector()
 {
-    std::vector< double > out{ 0.0, 1.1, 2.2, 3.3 };
-    return out;
+    return { 0.0, 1.1, 2.2, 3.3 };
 }
 
 void test_delete_vector_elements()
 {
     auto bool_vector = create_bool_vector();
     const auto to_delete = bool_vector;
-    geode::delete_vector_elements( to_delete, bool_vector, false );
-    OPENGEODE_EXCEPTION( bool_vector.size() == 4,
+    geode::delete_vector_elements( to_delete, bool_vector );
+    OPENGEODE_EXCEPTION( bool_vector.size() == 3,
         "[Test] Delete elements result (size) for bool is not correct" );
     OPENGEODE_EXCEPTION( !bool_vector[0] & !bool_vector[1] & !bool_vector[2],
         "[Test] Delete elements result (values) for bool is not correct" );
 
     auto double_vector = create_double_vector();
-    geode::delete_vector_elements( to_delete, double_vector, true );
+    geode::delete_vector_elements( to_delete, double_vector );
     OPENGEODE_EXCEPTION( double_vector.size() == 3,
         "[Test] Delete elements result (size) for double is not correct" );
     OPENGEODE_EXCEPTION( ( double_vector[0] == 0.0 )

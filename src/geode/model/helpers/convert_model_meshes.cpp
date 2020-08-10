@@ -59,7 +59,7 @@ namespace
         absl::Span< const geode::index_t > unique_vertices,
         const geode::ComponentID& component_id )
     {
-        for( const auto v : geode::Range{ unique_vertices.size() } )
+        for( const auto v : geode::Indices{ unique_vertices } )
         {
             builder.set_unique_vertex(
                 { component_id, v }, unique_vertices[v] );

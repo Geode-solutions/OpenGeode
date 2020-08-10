@@ -309,7 +309,7 @@ namespace geode
         const auto added_polyhedron = solid_mesh_->nb_polyhedra();
         solid_mesh_->polyhedron_attribute_manager().resize(
             added_polyhedron + 1 );
-        for( const auto v : Range{ vertices.size() } )
+        for( const auto v : Indices{ vertices } )
         {
             associate_polyhedron_vertex_to_vertex(
                 { added_polyhedron, v }, vertices[v] );
@@ -355,10 +355,10 @@ namespace geode
     {
         std::vector< PolyhedronFacetVertices > polyhedron_facet_vertices(
             facets.size() );
-        for( const auto f : Range{ facets.size() } )
+        for( const auto f : Indices{ facets } )
         {
             polyhedron_facet_vertices[f].resize( facets[f].size() );
-            for( const auto v : Range{ facets[f].size() } )
+            for( const auto v : Indices{ facets[f] } )
             {
                 OPENGEODE_ASSERT( facets[f][v] < vertices.size(),
                     "[SolidMeshBuilder::get_polyhedron_facet_vertices] "
@@ -377,9 +377,9 @@ namespace geode
     {
         std::vector< std::array< index_t, 2 > > polyhedron_edge_vertices;
         polyhedron_edge_vertices.reserve( 3 * facets.size() );
-        for( const auto f : Range{ facets.size() } )
+        for( const auto f : Indices{ facets } )
         {
-            for( const auto v : Range{ facets[f].size() } )
+            for( const auto v : Indices{ facets[f] } )
             {
                 OPENGEODE_ASSERT( facets[f][v] < vertices.size(),
                     "[SolidMeshBuilder::get_polyhedron_edge_vertices] "
@@ -765,7 +765,7 @@ namespace geode
                 auto& facet = facets[f];
                 facet.resize(
                     solid_mesh.nb_polyhedron_facet_vertices( { p, f } ) );
-                for( auto v : Range{
+                for( const auto v : Range{
                          solid_mesh.nb_polyhedron_facet_vertices( { p, f } ) } )
                 {
                     const auto it = absl::c_find( vertices,

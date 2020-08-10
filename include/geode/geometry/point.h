@@ -171,7 +171,7 @@ namespace geode
             const Attribute< Point< dimension > > &attribute )
         {
             Point< dimension > result;
-            for( auto i : Range{ interpolator.indices_.size() } )
+            for( const auto i : Indices{ interpolator.indices_ } )
             {
                 result = result
                          + attribute.value( interpolator.indices_[i] )

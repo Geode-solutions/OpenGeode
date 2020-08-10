@@ -221,7 +221,7 @@ namespace geode
                     facet_id, [&viewed_vertices, this](
                                   PolyhedronFacetVertices& vertices ) {
                         vertices.resize( viewed_vertices.size() );
-                        for( const auto v : Range{ vertices.size() } )
+                        for( const auto v : Indices{ vertices } )
                         {
                             vertices[v] =
                                 this->vertex_in_view( viewed_vertices[v] );
