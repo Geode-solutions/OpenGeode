@@ -186,7 +186,7 @@ namespace geode
             {
                 if( max[d] != min[d] )
                 {
-                    for( const auto i : Range{ indices.size() } )
+                    for( const auto i : Indices{ indices } )
                     {
                         auto cur_cell = indices[i];
                         cur_cell[d] = max[d];
