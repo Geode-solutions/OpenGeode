@@ -38,7 +38,6 @@
 #include <bitsery/brief_syntax/vector.h>
 
 #include <geode/basic/common.h>
-#include <geode/basic/logger.h>
 
 namespace geode
 {
