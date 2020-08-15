@@ -24,7 +24,8 @@ add_geode_library(
     SOURCES
         "assert.cpp"
         "attribute_manager.cpp"
-        "bitsery_archive.cpp"
+        "bitsery_input.cpp"
+        "bitsery_output.cpp"
         "common.cpp"
         "filename.cpp"
         "logger.cpp"
@@ -53,6 +54,7 @@ add_geode_library(
         "uuid.h"
         "zip_file.h"
     ADVANCED_HEADERS
+        "detail/bitsery_archive.h"
         "detail/mapping_after_deletion.h"
     PUBLIC_DEPENDENCIES
         absl::flat_hash_map

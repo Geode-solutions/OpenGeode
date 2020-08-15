@@ -21,33 +21,14 @@
  *
  */
 
-#include <geode/geometry/bitsery_archive.h>
+#include <geode/mesh/core/bitsery_archive.h>
 
-#include <geode/basic/attribute_manager.h>
-
-#include <geode/geometry/point.h>
-
-namespace
-{
-    template < typename Serializer >
-    void register_pcontext( geode::PContext& context )
-    {
-        geode::AttributeManager::register_attribute_type< geode::Point2D,
-            Serializer >( context );
-        geode::AttributeManager::register_attribute_type< geode::Point3D,
-            Serializer >( context );
-    }
-} // namespace
+#include <geode/mesh/core/detail/bitsery_archive.h>
 
 namespace geode
 {
-    void register_geometry_serialize_pcontext( PContext& context )
+    void register_mesh_serialize_pcontext( PContext& context )
     {
-        register_pcontext< Serializer >( context );
-    }
-
-    void register_geometry_deserialize_pcontext( PContext& context )
-    {
-        register_pcontext< Deserializer >( context );
+        detail::register_mesh_pcontext< Serializer >( context );
     }
 } // namespace geode

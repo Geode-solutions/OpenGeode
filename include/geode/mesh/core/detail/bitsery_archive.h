@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/mesh/core/bitsery_archive.h>
+#include <geode/basic/bitsery_archive.h>
 
 #include <bitsery/brief_syntax/vector.h>
 
@@ -142,39 +142,29 @@ namespace bitsery
     } // namespace ext
 } // namespace bitsery
 
-namespace
-{
-    template < typename Serializer >
-    void register_pcontext( geode::PContext& context )
-    {
-        geode::AttributeManager::register_attribute_type<
-            geode::EdgesAroundVertex, Serializer >( context );
-        geode::AttributeManager::register_attribute_type< geode::PolygonVertex,
-            Serializer >( context );
-        geode::AttributeManager::register_attribute_type< geode::PolygonEdge,
-            Serializer >( context );
-        geode::AttributeManager::register_attribute_type<
-            geode::PolyhedronFacet, Serializer >( context );
-        geode::AttributeManager::register_attribute_type<
-            geode::PolyhedronFacetVertex, Serializer >( context );
-        geode::AttributeManager::register_attribute_type<
-            geode::PolyhedronVertex, Serializer >( context );
-        geode::AttributeManager::register_attribute_type<
-            absl::InlinedVector< geode::index_t, 4 >, Serializer >( context );
-        context.registerBasesList< Serializer >(
-            bitsery::ext::PolymorphicClassesList< geode::VertexSet >{} );
-    }
-} // namespace
-
 namespace geode
 {
-    void register_mesh_serialize_pcontext( PContext& context )
+    namespace detail
     {
-        register_pcontext< Serializer >( context );
-    }
-
-    void register_mesh_deserialize_pcontext( PContext& context )
-    {
-        register_pcontext< Deserializer >( context );
-    }
+        template < typename Serializer >
+        void register_mesh_pcontext( PContext& context )
+        {
+            AttributeManager::register_attribute_type< EdgesAroundVertex,
+                Serializer >( context );
+            AttributeManager::register_attribute_type< PolygonVertex,
+                Serializer >( context );
+            AttributeManager::register_attribute_type< PolygonEdge,
+                Serializer >( context );
+            AttributeManager::register_attribute_type< PolyhedronFacet,
+                Serializer >( context );
+            AttributeManager::register_attribute_type< PolyhedronFacetVertex,
+                Serializer >( context );
+            AttributeManager::register_attribute_type< PolyhedronVertex,
+                Serializer >( context );
+            AttributeManager::register_attribute_type<
+                absl::InlinedVector< index_t, 4 >, Serializer >( context );
+            context.registerBasesList< Serializer >(
+                bitsery::ext::PolymorphicClassesList< VertexSet >{} );
+        }
+    } // namespace detail
 } // namespace geode

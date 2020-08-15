@@ -46,7 +46,8 @@ add_geode_library(
         "builder/triangulated_surface_view_builder.cpp"
         "builder/vertex_set_builder.cpp"
         "common.cpp"
-        "core/bitsery_archive.cpp"
+        "core/bitsery_input.cpp"
+        "core/bitsery_output.cpp"
         "core/edged_curve.cpp"
         "core/geode_point_set.cpp"
         "core/geode_edged_curve.cpp"
@@ -173,6 +174,7 @@ add_geode_library(
         "io/vertex_set_output.h"
     ADVANCED_HEADERS
         "builder/detail/register_builder.h"
+        "core/detail/bitsery_archive.h"
         "core/detail/edges_impl.h"
         "core/detail/facet_storage.h"
         "core/detail/points_impl.h"
