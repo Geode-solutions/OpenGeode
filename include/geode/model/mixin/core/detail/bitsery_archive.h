@@ -21,7 +21,9 @@
  *
  */
 
-#include <geode/model/mixin/core/bitsery_archive.h>
+#pragma once
+
+#include <geode/basic/bitsery_archive.h>
 
 #include <geode/basic/attribute_manager.h>
 
@@ -57,31 +59,21 @@ namespace bitsery
     } // namespace ext
 } // namespace bitsery
 
-namespace
-{
-    template < typename Serializer >
-    void register_pcontext( geode::PContext& context )
-    {
-        geode::AttributeManager::register_attribute_type<
-            std::vector< geode::MeshComponentVertex >, Serializer >( context );
-        geode::AttributeManager::register_attribute_type< geode::ComponentID,
-            Serializer >( context );
-        context.registerBasesList< Serializer >(
-            bitsery::ext::PolymorphicClassesList< geode::Component2D >{} );
-        context.registerBasesList< Serializer >(
-            bitsery::ext::PolymorphicClassesList< geode::Component3D >{} );
-    }
-} // namespace
-
 namespace geode
 {
-    void register_model_serialize_pcontext( PContext& context )
+    namespace detail
     {
-        register_pcontext< Serializer >( context );
-    }
-
-    void register_model_deserialize_pcontext( PContext& context )
-    {
-        register_pcontext< Deserializer >( context );
-    }
+        template < typename Serializer >
+        void register_model_pcontext( PContext& context )
+        {
+            AttributeManager::register_attribute_type<
+                std::vector< MeshComponentVertex >, Serializer >( context );
+            AttributeManager::register_attribute_type< ComponentID,
+                Serializer >( context );
+            context.registerBasesList< Serializer >(
+                bitsery::ext::PolymorphicClassesList< Component2D >{} );
+            context.registerBasesList< Serializer >(
+                bitsery::ext::PolymorphicClassesList< Component3D >{} );
+        }
+    } // namespace detail
 } // namespace geode

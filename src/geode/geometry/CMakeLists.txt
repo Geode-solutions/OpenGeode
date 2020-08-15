@@ -25,7 +25,8 @@ add_geode_library(
         "aabb.cpp"
         "barycentric_coordinates.cpp"
         "basic_objects.cpp"
-        "bitsery_archive.cpp"
+        "bitsery_input.cpp"
+        "bitsery_output.cpp"
         "bounding_box.cpp"
         "common.cpp"
         "distance.cpp"
@@ -51,6 +52,7 @@ add_geode_library(
         "vector.h"
     ADVANCED_HEADERS
         "detail/aabb_impl.h"
+        "detail/bitsery_archive.h"
     PUBLIC_DEPENDENCIES
         Bitsery::bitsery
         Threads::Threads
