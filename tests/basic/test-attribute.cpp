@@ -346,32 +346,37 @@ void test_sparse_attribute_after_element_deletion(
 {
     const auto sparse_attribute = manager.find_attribute< double >( "double" );
     OPENGEODE_EXCEPTION( sparse_attribute->value( 0 ) == 12,
-        "Element 0 of sparse attribute should be 12 " );
+        "[Test] Element 0 of sparse attribute should be 12 " );
     OPENGEODE_EXCEPTION( sparse_attribute->value( 3 ) == 8.1,
-        "Element 3 of sparse attribute should be 8.1 " );
+        "[Test] Element 3 of sparse attribute should be 8.1 " );
     OPENGEODE_EXCEPTION( sparse_attribute->value( 5 ) == 7,
-        "Element 5 of sparse attribute should be 7 " );
+        "[Test] Element 5 of sparse attribute should be 7 " );
     OPENGEODE_EXCEPTION( sparse_attribute->value( 7 ) == 12,
-        "Element 7 of sparse attribute should be 12 " );
+        "[Test] Element 7 of sparse attribute should be 12 " );
 }
 
 void test_generic_value( geode::AttributeManager& manager )
 {
     const auto& foo_attr = manager.find_attribute< Foo >( "foo_spr" );
+    OPENGEODE_EXCEPTION( foo_attr->is_genericable(),
+        "[Test] Foo attribute should be genericable" );
     OPENGEODE_EXCEPTION( foo_attr->generic_value( 3 ) == 15.4f,
-        "Generic value for element 3 of foo sparse attribute should be 15.4" );
+        "[Test] Generic value for element 3 of foo sparse attribute should be "
+        "15.4" );
 
     const auto& double_attr = manager.find_attribute< double >( "double" );
     OPENGEODE_EXCEPTION( double_attr->generic_value( 7 ) == 7,
-        "Generic value for element 7 of double attribute should be 7" );
+        "[Test] Generic value for element 7 of double attribute should be 7" );
 
     auto array_attr =
         manager.find_or_create_attribute< geode::VariableAttribute,
             std::array< double, 3 > >(
             "array_double", std::array< double, 3 >() );
     array_attr->set_value( 2, { 3.1, 1.3 } );
+    OPENGEODE_EXCEPTION( !array_attr->is_genericable(),
+        "[Test] Foo attribute is not genericable" );
     OPENGEODE_EXCEPTION( array_attr->generic_value( 2 ) == 0.,
-        "Generic value for element 2 of array attribute should be 0." );
+        "[Test] Generic value for element 2 of array attribute should be 0." );
 }
 
 void test_copy_manager( geode::AttributeManager& manager )
