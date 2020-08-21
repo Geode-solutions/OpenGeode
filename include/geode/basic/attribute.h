@@ -65,6 +65,8 @@ namespace geode
 
         virtual float generic_value( index_t element ) const = 0;
 
+        virtual bool is_genericable() const = 0;
+
         virtual absl::string_view type() = 0;
 
         virtual std::shared_ptr< AttributeBase > clone(
@@ -139,6 +141,11 @@ namespace geode
         {
             return GenericAttributeConversion< T >::converted_value(
                 value( element ) );
+        }
+
+        bool is_genericable() const final
+        {
+            return GenericAttributeConversion< T >::is_genericable();
         }
 
     protected:

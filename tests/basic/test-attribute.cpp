@@ -66,6 +66,11 @@ namespace geode
         {
             return value.generic_value();
         }
+
+        static bool is_genericable()
+        {
+            return true;
+        }
     };
 
     template <>
