@@ -20,7 +20,11 @@
 
 set(PYBIND11_PATH ${PROJECT_BINARY_DIR}/third_party/pybind11)
 set(PYBIND11_INSTALL_PREFIX ${PYBIND11_PATH}/install)
-string(REPLACE "/MDd" "/MD" NEW_FLAGS ${CMAKE_CXX_FLAGS_DEBUG})
+if(WIN32)
+    if(CMAKE_CXX_FLAGS_DEBUG)
+        string(REPLACE "/MDd" "/MD" NEW_FLAGS ${CMAKE_CXX_FLAGS_DEBUG})
+    endif()
+endif()
 ExternalProject_Add(pybind11
     PREFIX ${PYBIND11_PATH}
     GIT_REPOSITORY https://github.com/pybind/pybind11
