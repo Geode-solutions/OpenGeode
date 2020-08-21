@@ -57,7 +57,8 @@ namespace geode
     {
         pybind11::class_< AttributeBase, std::shared_ptr< AttributeBase > >(
             module, "AttributeBase" )
-            .def( "generic_value", &AttributeBase::generic_value );
+            .def( "generic_value", &AttributeBase::generic_value )
+            .def( "is_genericable", &AttributeBase::is_genericable );
         PYTHON_ATTRIBUTE_CLASS( bool, Bool );
         PYTHON_ATTRIBUTE_CLASS( int, Int );
         PYTHON_ATTRIBUTE_CLASS( unsigned int, UInt );

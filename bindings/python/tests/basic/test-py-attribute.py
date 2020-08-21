@@ -35,6 +35,8 @@ def test_constant_attribute( manager ):
 def test_int_variable_attribute( manager ):
     variable_attribute = manager.find_or_create_attribute_variable_int( "int", 12 )
     variable_attribute.set_value( 3, 3 )
+    if not variable_attribute.is_genericable():
+        raise ValueError( "[Test] Should be genericable" )
 
     attribute = manager.find_attribute_int( "int" )
     if attribute.value( 3 ) != 3:
