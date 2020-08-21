@@ -168,6 +168,11 @@ namespace geode
         {
             return 0.;
         }
+
+        static bool is_genericable()
+        {
+            return false;
+        }
     };
 
 #define IMPLICIT_GENERIC_ATTRIBUTE_CONVERSION( Type )                          \
@@ -177,6 +182,11 @@ namespace geode
         static float converted_value( const Type& value )                      \
         {                                                                      \
             return static_cast< float >( value );                              \
+        }                                                                      \
+                                                                               \
+        static bool is_genericable()                                           \
+        {                                                                      \
+            return true;                                                       \
         }                                                                      \
     }
 

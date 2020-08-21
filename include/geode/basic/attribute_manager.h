@@ -58,7 +58,7 @@ namespace geode
          * @return nullptr if no attribute matches the given name.
          */
         std::shared_ptr< AttributeBase > find_generic_attribute(
-            const std::string& name ) const
+            absl::string_view name ) const
         {
             return find_attribute_base( name );
         }
