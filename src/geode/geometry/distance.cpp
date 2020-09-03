@@ -29,8 +29,6 @@
 #include <geode/geometry/signed_mensuration.h>
 #include <geode/geometry/vector.h>
 
-#include <geode/basic/logger.h>
-
 namespace
 {
     constexpr double MAX_DOUBLE = std::numeric_limits< double >::max();
