@@ -57,6 +57,37 @@ def test_point_segment_distance():
     if distance != math.sqrt( 26 ) or closest_point != result_q4:
         raise ValueError( "[Test] Wrong result for point_segment_distance with query point q4" )
 
+def test_segment_segment_distance():
+    a = geom.Point3D( [0.0, 0.0, 0.0] )
+    b = geom.Point3D( [2.0, 2.0, 0.0] )
+    c = geom.Point3D( [0.0, 2.0, 1.0] )
+    d = geom.Point3D( [2.0, 0.0, 1.0] )
+    e = geom.Point3D( [0.0, 0.0, 1.0] )
+    f = geom.Point3D( [2.0, 2.0, 1.0] )
+    g = geom.Point3D( [3.0, 0.0, 1.0] )
+    h = geom.Point3D( [5.0, -2.0, 1.0] )
+    segment_ab = geom.Segment3D( a, b )
+    segment_cd = geom.Segment3D( c, d )
+    segment_ef = geom.Segment3D( e, f )
+    segment_gh = geom.Segment3D( g, h )
+
+    distance, closest_point0, closest_point1 = geom.segment_segment_distance( segment_ab, segment_cd )
+    r00 = geom.Point3D( [1.0, 1.0, 0.0] )
+    r01 = geom.Point3D( [1.0, 1.0, 1.0] )
+    if distance != 1.0 or closest_point0 != r00 or closest_point1 != r01: 
+        raise ValueError( "[Test] Wrong result for segment_segment_distance with query segment_ab and segment_cd" )
+    
+    distance, closest_point0, closest_point1 = geom.segment_segment_distance( segment_ab, segment_ef )
+    r00 = geom.Point3D( [0.0, 0.0, 0.0] )
+    r01 = geom.Point3D( [0.0, 0.0, 1.0] )
+    if distance != 1.0 or closest_point0 != r00 or closest_point1 != r01: 
+        raise ValueError( "[Test] Wrong result for segment_segment_distance with query segment_ab and segment_ef" )
+
+    distance, closest_point0, closest_point1 = geom.segment_segment_distance( segment_cd, segment_gh )
+    if distance != 1.0 or closest_point0 != d or closest_point1 != g: 
+        raise ValueError( "[Test] Wrong result for segment_segment_distance with query segment_cd and segment_gh" )
+
+
 def test_point_triangle_distance():
     a = geom.Point2D( [0.0, 0.0] )
     b = geom.Point2D( [1.0, 0.0] )
@@ -121,5 +152,6 @@ def test_point_plane_distance():
 
 if __name__ != '__main__':
     test_point_segment_distance()
+    test_segment_segment_distance()
     test_point_triangle_distance()
     test_point_plane_distance()
