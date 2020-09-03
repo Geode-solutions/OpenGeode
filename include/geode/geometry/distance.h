@@ -52,6 +52,18 @@ namespace geode
         const Point< dimension >& point, const Segment< dimension >& segment );
 
     /*!
+     * Compute the smallest distance between two segments
+     * @return a tuple containing:
+     * - the smallest distance.
+     * - the closest point on the first segment.
+     * - the closest point on the second segment.
+     */
+    template < index_t dimension >
+    std::tuple< double, Point< dimension >, Point< dimension > >
+        segment_segment_distance( const Segment< dimension >& segment0,
+            const Segment< dimension >& segment1 );
+
+    /*!
      * Compute the smallest distance between a point and an infinite line
      * @return a tuple containing:
      * - the smallest distance.

@@ -345,6 +345,99 @@ void test_point_triangle_distance_3d()
         "q13" );
 }
 
+void test_segment_segment_distance_2d()
+{
+    const geode::Point2D a{ { 0.0, 0.0 } };
+    const geode::Point2D b{ { 2.0, 2.0 } };
+    const geode::Point2D c{ { 0.0, 2.0 } };
+    const geode::Point2D d{ { 2.0, 0.0 } };
+    const geode::Point2D g{ { 3.0, 0.0 } };
+    const geode::Point2D h{ { 5.0, -2.0 } };
+    const geode::Segment2D segment_ab{ a, b };
+    const geode::Segment2D segment_dc{ d, c };
+    const geode::Segment2D segment_gh{ g, h };
+
+    double distance;
+    geode::Point2D closest_point0;
+    geode::Point2D closest_point1;
+
+    std::tie( distance, closest_point0, closest_point1 ) =
+        geode::segment_segment_distance( segment_ab, segment_dc );
+    const geode::Point2D result_t00{ { 1.0, 1.0 } };
+    const geode::Point2D result_t01{ { 1.0, 1.0 } };
+    OPENGEODE_EXCEPTION( distance == 0. && closest_point0 == result_t00
+                             && closest_point1 == result_t01,
+        "[Test] Wrong result for segment_segment_distance 2D with segment_ab "
+        "and segment_dc" );
+
+    std::tie( distance, closest_point0, closest_point1 ) =
+        geode::segment_segment_distance( segment_ab, segment_ab );
+    const geode::Point2D result_t10{ { 0.0, 0.0 } };
+    const geode::Point2D result_t11{ { 0.0, 0.0 } };
+    OPENGEODE_EXCEPTION( distance == 0. && closest_point0 == result_t10
+                             && closest_point1 == result_t11,
+        "[Test] Wrong result for segment_segment_distance 2D with segment_ab "
+        "and segment_ab" );
+
+    std::tie( distance, closest_point0, closest_point1 ) =
+        geode::segment_segment_distance( segment_dc, segment_gh );
+    OPENGEODE_EXCEPTION(
+        distance == 1. && closest_point0 == d && closest_point1 == g,
+        "[Test] Wrong result for segment_segment_distance 2D with segment_dc "
+        "and segment_gh" );
+}
+
+void test_segment_segment_distance_3d()
+{
+    const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
+    const geode::Point3D b{ { 2.0, 2.0, 0.0 } };
+    const geode::Point3D c{ { 0.0, 2.0, 1.0 } };
+    const geode::Point3D d{ { 2.0, 0.0, 1.0 } };
+    const geode::Point3D e{ { 0.0, 0.0, 1.0 } };
+    const geode::Point3D f{ { 2.0, 2.0, 1.0 } };
+    const geode::Point3D g{ { 3.0, 0.0, 1.0 } };
+    const geode::Point3D h{ { 5.0, -2.0, 1.0 } };
+    const geode::Segment3D segment_ab{ a, b };
+    const geode::Segment3D segment_cd{ c, d };
+    const geode::Segment3D segment_ef{ e, f };
+    const geode::Segment3D segment_gh{ g, h };
+
+    double distance;
+    geode::Point3D closest_point0;
+    geode::Point3D closest_point1;
+
+    std::tie( distance, closest_point0, closest_point1 ) =
+        geode::segment_segment_distance( segment_ab, segment_cd );
+    const geode::Point3D result_t00{ { 1.0, 1.0, 0.0 } };
+    const geode::Point3D result_t01{ { 1.0, 1.0, 1.0 } };
+    OPENGEODE_EXCEPTION( distance == 1. && closest_point0 == result_t00
+                             && closest_point1 == result_t01,
+        "[Test] Wrong result for segment_segment_distance with segment_ab and "
+        "segment_cd" );
+
+    std::tie( distance, closest_point0, closest_point1 ) =
+        geode::segment_segment_distance( segment_ab, segment_ef );
+    const geode::Point3D result_t10{ { 0.0, 0.0, 0.0 } };
+    const geode::Point3D result_t11{ { 0.0, 0.0, 1.0 } };
+    OPENGEODE_EXCEPTION( distance == 1. && closest_point0 == result_t10
+                             && closest_point1 == result_t11,
+        "[Test] Wrong result for segment_segment_distance with segment_ab and "
+        "segment_ef" );
+
+    std::tie( distance, closest_point0, closest_point1 ) =
+        geode::segment_segment_distance( segment_cd, segment_gh );
+    OPENGEODE_EXCEPTION(
+        distance == 1. && closest_point0 == d && closest_point1 == g,
+        "[Test] Wrong result for segment_segment_distance with segment_cd and "
+        "segment_gh" );
+}
+
+void test_segment_segment_distance()
+{
+    test_segment_segment_distance_2d();
+    test_segment_segment_distance_3d();
+}
+
 void test_point_triangle_distance()
 {
     test_point_triangle_distance_2d();
@@ -618,6 +711,7 @@ void test_point_tetra_distance()
 void test()
 {
     test_point_segment_distance();
+    test_segment_segment_distance();
     test_point_line_distance();
     test_point_triangle_distance();
     test_point_tetra_distance();

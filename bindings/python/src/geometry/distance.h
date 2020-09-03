@@ -28,6 +28,10 @@
         "point_segment_distance" + std::to_string( dimension ) + "D";          \
     module.def( point_segment_distance##dimension.c_str(),                     \
         &point_segment_distance< dimension > );                                \
+    const auto segment_segment_distance##dimension =                           \
+        "segment_segment_distance" + std::to_string( dimension ) + "D";        \
+    module.def( segment_segment_distance##dimension.c_str(),                   \
+        &segment_segment_distance< dimension > );                              \
     const auto point_line_distance##dimension =                                \
         "point_line_distance" + std::to_string( dimension ) + "D";             \
     module.def( point_line_distance##dimension.c_str(),                        \
