@@ -45,7 +45,15 @@ namespace geode
                 context );
             AttributeManager::register_attribute_type< index_t, Serializer >(
                 context );
+            AttributeManager::register_attribute_type< int8_t, Serializer >(
+                context );
+            AttributeManager::register_attribute_type< uint8_t, Serializer >(
+                context );
             AttributeManager::register_attribute_type< std::vector< index_t >,
+                Serializer >( context );
+            AttributeManager::register_attribute_type< std::vector< int8_t >,
+                Serializer >( context );
+            AttributeManager::register_attribute_type< std::vector< uint8_t >,
                 Serializer >( context );
             AttributeManager::register_attribute_type< std::array< index_t, 2 >,
                 Serializer >( context );
