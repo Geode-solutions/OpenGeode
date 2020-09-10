@@ -569,7 +569,7 @@ namespace std
             return absl::Hash< geode::index_t >()(
                        polyhedron_vertex.polyhedron_id )
                    ^ absl::Hash< geode::index_t >()(
-                         polyhedron_vertex.vertex_id );
+                       polyhedron_vertex.vertex_id );
         }
     };
 
@@ -583,7 +583,7 @@ namespace std
             return absl::Hash< geode::index_t >()(
                        polyhedron_facet.polyhedron_id )
                    ^ absl::Hash< geode::index_t >()(
-                         polyhedron_facet.facet_id );
+                       polyhedron_facet.facet_id );
         }
     };
 
@@ -597,7 +597,7 @@ namespace std
             return absl::Hash< geode::PolyhedronFacet >()(
                        polyhedron_facet_vertex.polyhedron_facet )
                    ^ absl::Hash< geode::index_t >()(
-                         polyhedron_facet_vertex.vertex_id );
+                       polyhedron_facet_vertex.vertex_id );
         }
     };
 
@@ -611,7 +611,7 @@ namespace std
             return absl::Hash< geode::PolyhedronFacet >()(
                        polyhedron_facet_edge.polyhedron_facet )
                    ^ absl::Hash< geode::index_t >()(
-                         polyhedron_facet_edge.edge_id );
+                       polyhedron_facet_edge.edge_id );
         }
     };
 } // namespace std
