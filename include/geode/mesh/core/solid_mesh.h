@@ -556,3 +556,62 @@ namespace geode
     };
     ALIAS_3D( SolidMesh );
 } // namespace geode
+
+namespace std
+{
+    template <>
+    struct hash< geode::PolyhedronVertex >
+    {
+    public:
+        size_t operator()(
+            const geode::PolyhedronVertex& polyhedron_vertex ) const
+        {
+            return absl::Hash< geode::index_t >()(
+                       polyhedron_vertex.polyhedron_id )
+                   ^ absl::Hash< geode::index_t >()(
+                         polyhedron_vertex.vertex_id );
+        }
+    };
+
+    template <>
+    struct hash< geode::PolyhedronFacet >
+    {
+    public:
+        size_t operator()(
+            const geode::PolyhedronFacet& polyhedron_facet ) const
+        {
+            return absl::Hash< geode::index_t >()(
+                       polyhedron_facet.polyhedron_id )
+                   ^ absl::Hash< geode::index_t >()(
+                         polyhedron_facet.facet_id );
+        }
+    };
+
+    template <>
+    struct hash< geode::PolyhedronFacetVertex >
+    {
+    public:
+        size_t operator()(
+            const geode::PolyhedronFacetVertex& polyhedron_facet_vertex ) const
+        {
+            return absl::Hash< geode::PolyhedronFacet >()(
+                       polyhedron_facet_vertex.polyhedron_facet )
+                   ^ absl::Hash< geode::index_t >()(
+                         polyhedron_facet_vertex.vertex_id );
+        }
+    };
+
+    template <>
+    struct hash< geode::PolyhedronFacetEdge >
+    {
+    public:
+        size_t operator()(
+            const geode::PolyhedronFacetEdge& polyhedron_facet_edge ) const
+        {
+            return absl::Hash< geode::PolyhedronFacet >()(
+                       polyhedron_facet_edge.polyhedron_facet )
+                   ^ absl::Hash< geode::index_t >()(
+                         polyhedron_facet_edge.edge_id );
+        }
+    };
+} // namespace std
