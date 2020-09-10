@@ -420,3 +420,28 @@ namespace geode
     };
     ALIAS_2D_AND_3D( SurfaceMesh );
 } // namespace geode
+
+namespace std
+{
+    template <>
+    struct hash< geode::PolygonVertex >
+    {
+    public:
+        size_t operator()( const geode::PolygonVertex& polygon_vertex ) const
+        {
+            return absl::Hash< geode::index_t >()( polygon_vertex.polygon_id )
+                   ^ absl::Hash< geode::index_t >()( polygon_vertex.vertex_id );
+        }
+    };
+
+    template <>
+    struct hash< geode::PolygonEdge >
+    {
+    public:
+        size_t operator()( const geode::PolygonEdge& polygon_edge ) const
+        {
+            return absl::Hash< geode::index_t >()( polygon_edge.polygon_id )
+                   ^ absl::Hash< geode::index_t >()( polygon_edge.edge_id );
+        }
+    };
+} // namespace std
