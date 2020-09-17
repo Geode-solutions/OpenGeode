@@ -32,7 +32,7 @@
         module, name##dimension.c_str() )                                      \
         .def_static( "create",                                                 \
             ( std::unique_ptr< SurfaceMeshBuilder##dimension##D >( * )(        \
-                PolygonalSurface< dimension >& ) )                             \
+                SurfaceMesh< dimension >& ) )                                  \
                 & SurfaceMeshBuilder##dimension##D::create )                   \
         .def( "set_point", &SurfaceMeshBuilder##dimension##D::set_point )      \
         .def(                                                                  \

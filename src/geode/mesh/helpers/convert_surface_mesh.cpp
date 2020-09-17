@@ -89,7 +89,7 @@ namespace geode
                 }
             }
         }
-        return std::move( tri_surface );
+        return { std::move( tri_surface ) };
     }
 
     template < index_t dimension >
