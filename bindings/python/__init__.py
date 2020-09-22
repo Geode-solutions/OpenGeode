@@ -18,27 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-find_package(pybind11 REQUIRED CONFIG NO_DEFAULT_PATH PATHS ${PYBIND11_INSTALL_PREFIX})
-
-install(
-    DIRECTORY
-        ${PYBIND11_INSTALL_PREFIX}/
-    DESTINATION
-        .
-)
-add_subdirectory(src)
-
-if(OPENGEODE_WITH_TESTS)
-    add_subdirectory(tests)
-endif()
-
-
-configure_file(
-    __init__.py
-    ${PROJECT_BINARY_DIR}/wheel/opengeode/__init__.py
-)
-configure_file(
-    setup.py
-    ${PROJECT_BINARY_DIR}/wheel/setup.py
-)
-install(SCRIPT "PostInstall.cmake")
+from .opengeode_py_basic import *
+from .opengeode_py_geometry import *
+from .opengeode_py_mesh import *
+from .opengeode_py_model import *

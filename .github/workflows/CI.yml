@@ -67,6 +67,36 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  build-manylinux:
+    runs-on: ubuntu-18.04
+    container: "dockcross/manylinux2014-x64"
+    needs: format
+    strategy:
+      matrix:
+        config:
+        - {python: 3.6, tag: "cp36-cp36m"}
+        - {python: 3.7, tag: "cp37-cp37m"}
+        - {python: 3.8, tag: "cp38-cp38"}
+    steps:
+    - uses: actions/checkout@v1
+    - name: Compile
+      run: |
+        export PATH=/opt/python/${{ matrix.config.tag }}/bin:$PATH
+        mkdir -p build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=Debug -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.config.python }} ..
+        cmake --build . -- -j2
+        cd opengeode/wheel
+        python setup.py bdist_wheel
+    - name: Notify slack
+      if: failure() && github.ref == 'refs/heads/master'
+      uses: 8398a7/action-slack@v2
+      with:
+        status: failure
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       
   coverage:
     runs-on: ubuntu-18.04
@@ -112,12 +142,15 @@ jobs:
         python-version: ${{ matrix.python }}
     - name: Compile & Test
       run: |
+        pip install wheel
         mkdir -p build
         cd build
         cmake -G "Xcode"  -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.python }} ..
         cmake --build . --config ${{ matrix.config }}
         cd opengeode
         ctest -C ${{ matrix.config }} --output-on-failure
+        cd wheel
+        python setup.py bdist_wheel
     - name: Notify slack
       if: failure() && github.ref == 'refs/heads/master'
       uses: 8398a7/action-slack@v2
@@ -143,12 +176,15 @@ jobs:
         python-version: ${{ matrix.python }}
     - name: Compile & Test
       run: |
+        pip install wheel
         if(!(test-path build)) { mkdir build }
         cd build
         cmake -G "Visual Studio 15 2017 Win64" -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.python }} ..
         cmake --build . --config ${{ matrix.config }}
         cd opengeode
         ctest -C ${{ matrix.config }} --output-on-failure
+        cd wheel
+        python setup.py bdist_wheel
     - name: Notify slack
       if: failure() && github.ref == 'refs/heads/master'
       uses: 8398a7/action-slack@v2
@@ -160,7 +196,7 @@ jobs:
         
   semantic-release:
     runs-on: ubuntu-18.04
-    needs: [build-linux, coverage, build-mac-xcode, build-windows]
+    needs: [build-linux, build-manylinux, coverage, build-mac-xcode, build-windows]
     steps:
     - uses: actions/checkout@v1
     - run: npx semantic-release

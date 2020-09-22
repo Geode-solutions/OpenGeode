@@ -27,7 +27,7 @@ jobs:
       run: |
         mkdir -p build
         cd build
-        version="${GITHUB_REF##*/*/}"
+        version="${GITHUB_REF##*/*/v}"
         echo ::set-output name=version::$version
         cmake -DCMAKE_BUILD_TYPE=Release -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.config.python }} -DOPENGEODE_WITH_TESTS:BOOL=OFF -DCPACK_PACKAGE_VERSION:STRING=$version-python${{ matrix.config.python }} -DCPACK_SYSTEM_NAME:STRING=${{ matrix.config.system }} ..
         cmake --build . -- -j2
@@ -53,35 +53,95 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       
+  release-manylinux:
+    runs-on: ubuntu-18.04
+    container: "dockcross/manylinux2014-x64"
+    strategy:
+      matrix:
+        config:
+        - {python: 3.6, tag: "cp36-cp36m"}
+        - {python: 3.7, tag: "cp37-cp37m"}
+        - {python: 3.8, tag: "cp38-cp38"}
+    steps:
+    - uses: actions/checkout@v1
+    - name: Compile
+      id: package
+      run: |
+        export PATH=/opt/python/${{ matrix.config.tag }}/bin:$PATH
+        mkdir -p build
+        cd build
+        version="${GITHUB_REF##*/*/v}"
+        echo ::set-output name=version::$version
+        cmake -DCMAKE_BUILD_TYPE=Release -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.config.python }} -DCMAKE_PACKAGE_VERSION:STRING=$version ..
+        cmake --build . -- -j2
+        cd opengeode/wheel
+        python setup.py bdist_wheel
+        mv dist/*.whl dist/OpenGeode-$version-${{ matrix.config.tag }}-manylinux2014_86_64.whl
+    - name: Upload
+      uses: softprops/action-gh-release@v1
+      with:
+        files: "build/opengeode/wheel/dist/OpenGeode-${{ steps.package.outputs.version }}-${{ matrix.config.tag }}-manylinux2014_86_64.whl"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: PyPI
+      uses: pypa/gh-action-pypi-publish@v1
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_TOKEN }}
+        packages_dir: "build/opengeode/wheel/dist/"
+    - name: Notify slack
+      if: failure() && github.ref == 'refs/heads/master'
+      uses: 8398a7/action-slack@v2
+      with:
+        status: failure
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      
   release-mac:
     runs-on: macos-latest
     strategy:
       matrix:
-        python: [3.6, 3.7, 3.8]
+        config:
+        - {python: 3.6, tag: "cp36-cp36m"}
+        - {python: 3.7, tag: "cp37-cp37m"}
+        - {python: 3.8, tag: "cp38-cp38"}
 
     steps:
     - uses: actions/checkout@v1
-    - name: Set up Python ${{ matrix.python }}
+    - name: Set up Python ${{ matrix.config.python }}
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python }}
+        python-version: ${{ matrix.config.python }}
     - name: Generate package
       id: package
       run: |
+        pip install wheel
         mkdir -p build
         cd build
-        version="${GITHUB_REF##*/*/}"
+        version="${GITHUB_REF##*/*/v}"
         echo ::set-output name=version::$version
-        cmake -G "Xcode" -DCMAKE_BUILD_TYPE=Release -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.python }} -DOPENGEODE_WITH_TESTS:BOOL=OFF -DCPACK_PACKAGE_VERSION:STRING=$version-python${{ matrix.python }} -DCPACK_SYSTEM_NAME:STRING=darwin ..
+        cmake -G "Xcode" -DCMAKE_BUILD_TYPE=Release -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.config.python }} -DOPENGEODE_WITH_TESTS:BOOL=OFF -DCMAKE_PACKAGE_VERSION:STRING=$version -DCPACK_PACKAGE_VERSION:STRING=$version-python${{ matrix.config.python }} -DCPACK_SYSTEM_NAME:STRING=darwin ..
         cmake --build . --config Release
         cd opengeode
         cmake --build . --target package --config Release
+        cd wheel
+        python setup.py bdist_wheel
+        mv dist/*.whl dist/OpenGeode-$version-${{ matrix.config.tag }}-macosx_10_14_x86_64.whl
     - name: Upload
       uses: softprops/action-gh-release@v1
       with:
-        files: "build/opengeode/OpenGeode-${{ steps.package.outputs.version }}-python${{ matrix.python }}-darwin.tar.gz"
+        files: |
+          "build/opengeode/OpenGeode-${{ steps.package.outputs.version }}-python${{ matrix.python }}-darwin.tar.gz"
+          "build/opengeode/wheel/dist/OpenGeode-${{ steps.package.outputs.version }}-${{ matrix.config.tag }}-macosx_10_14_x86_64.whl"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: PyPI
+      uses: pypa/gh-action-pypi-publish@v1
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_TOKEN }}
+        packages_dir: "build/opengeode/wheel/dist/"
     - name: Notify slack
       if: failure()
       uses: 8398a7/action-slack@v2
@@ -95,31 +155,45 @@ jobs:
     runs-on: windows-2016
     strategy:
       matrix:
-        python: [3.6, 3.7]
+        config:
+        - {python: 3.6, tag: "cp36-cp36m"}
+        - {python: 3.7, tag: "cp37-cp37m"}
 
     steps:
     - uses: actions/checkout@v1
-    - name: Set up Python ${{ matrix.python }}
+    - name: Set up Python ${{ matrix.config.python }}
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python }}
+        python-version: ${{ matrix.config.python }}
     - name: Generate package
       id: package
       run: |
+        pip install wheel
         if(!(test-path build)) { mkdir build }
         cd build
-        $version = ${env:GITHUB_REF} -replace 'refs\/tags\/', ''
+        $version = ${env:GITHUB_REF} -replace 'refs\/tags\/v', ''
         echo "::set-output name=version::$version"
-        cmake -G "Visual Studio 15 2017 Win64" -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.python }} -DOPENGEODE_WITH_TESTS:BOOL=OFF -DCPACK_PACKAGE_VERSION:STRING=$version-python${{ matrix.python }} -DCPACK_SYSTEM_NAME:STRING=win64 ..
+        cmake -G "Visual Studio 15 2017 Win64" -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.config.python }} -DOPENGEODE_WITH_TESTS:BOOL=OFF -DCMAKE_PACKAGE_VERSION:STRING=$version -DCPACK_PACKAGE_VERSION:STRING=$version-python${{ matrix.config.python }} -DCPACK_SYSTEM_NAME:STRING=win64 ..
         cmake --build . --config Release
         cd opengeode
         cmake --build . --target PACKAGE --config Release
+        cd wheel
+        python setup.py bdist_wheel
+        mv dist/*.whl dist/OpenGeode-$version-${{ matrix.config.tag }}-win_amd64.whl
     - name: Upload
       uses: softprops/action-gh-release@v1
       with:
-        files: "build/opengeode/OpenGeode-${{ steps.package.outputs.version }}-python${{ matrix.python }}-win64.zip"
+        files: |
+          "build/opengeode/OpenGeode-${{ steps.package.outputs.version }}-python${{ matrix.python }}-win64.zip"
+          "build/opengeode/wheel/dist/OpenGeode-${{ steps.package.outputs.version }}-${{ matrix.config.tag }}-win_amd64.whl"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: PyPI
+      uses: pypa/gh-action-pypi-publish@v1
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_TOKEN }}
+        packages_dir: "build/opengeode/wheel/dist/"
     - name: Notify slack
       if: failure()
       uses: 8398a7/action-slack@v2
