@@ -132,7 +132,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          "build/opengeode/OpenGeode-${{ steps.package.outputs.version }}-python${{ matrix.python }}-darwin.tar.gz"
+          "build/opengeode/OpenGeode-${{ steps.package.outputs.version }}-python${{ matrix.config.python }}-darwin.tar.gz"
           "build/opengeode/wheel/dist/OpenGeode-${{ steps.package.outputs.version }}-${{ matrix.config.tag }}-macosx_10_14_x86_64.whl"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -184,7 +184,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          "build/opengeode/OpenGeode-${{ steps.package.outputs.version }}-python${{ matrix.python }}-win64.zip"
+          "build/opengeode/OpenGeode-${{ steps.package.outputs.version }}-python${{ matrix.config.python }}-win64.zip"
           "build/opengeode/wheel/dist/OpenGeode-${{ steps.package.outputs.version }}-${{ matrix.config.tag }}-win_amd64.whl"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
