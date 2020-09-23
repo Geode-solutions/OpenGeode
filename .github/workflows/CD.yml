@@ -83,12 +83,12 @@ jobs:
         files: "build/opengeode/wheel/dist/OpenGeode-${{ steps.package.outputs.version }}-${{ matrix.config.tag }}-manylinux2014_86_64.whl"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: PyPI
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_TOKEN }}
-        packages_dir: "build/opengeode/wheel/dist/"
+    # - name: PyPI
+    #   uses: pypa/gh-action-pypi-publish@master
+    #   with:
+    #     user: __token__
+    #     password: ${{ secrets.PYPI_TOKEN }}
+    #     packages_dir: "build/opengeode/wheel/dist/"
     - name: Notify slack
       if: failure() && github.ref == 'refs/heads/master'
       uses: 8398a7/action-slack@v2
@@ -136,12 +136,12 @@ jobs:
           "build/opengeode/wheel/dist/OpenGeode-${{ steps.package.outputs.version }}-${{ matrix.config.tag }}-macosx_10_14_x86_64.whl"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: PyPI
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_TOKEN }}
-        packages_dir: "build/opengeode/wheel/dist/"
+    # - name: PyPI
+    #   uses: pypa/gh-action-pypi-publish@master
+    #   with:
+    #     user: __token__
+    #     password: ${{ secrets.PYPI_TOKEN }}
+    #     packages_dir: "build/opengeode/wheel/dist/"
     - name: Notify slack
       if: failure()
       uses: 8398a7/action-slack@v2
@@ -188,12 +188,12 @@ jobs:
           "build/opengeode/wheel/dist/OpenGeode-${{ steps.package.outputs.version }}-${{ matrix.config.tag }}-win_amd64.whl"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: PyPI
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_TOKEN }}
-        packages_dir: "build/opengeode/wheel/dist/"
+    # - name: PyPI
+    #   uses: pypa/gh-action-pypi-publish@master
+    #   with:
+    #     user: __token__
+    #     password: ${{ secrets.PYPI_TOKEN }}
+    #     packages_dir: "build/opengeode/wheel/dist/"
     - name: Notify slack
       if: failure()
       uses: 8398a7/action-slack@v2
