@@ -41,4 +41,11 @@ configure_file(
     setup.py
     ${PROJECT_BINARY_DIR}/wheel/setup.py
 )
-install(SCRIPT "PostInstall.cmake")
+add_custom_target(wheel
+    COMMAND ${CMAKE_COMMAND} 
+        -DSOURCE_DIR="${CMAKE_INSTALL_PREFIX}"
+        -DDEST_DIR="${CMAKE_BINARY_DIR}/wheel/opengeode"
+        -P "${CMAKE_CURRENT_LIST_DIR}/PostInstall.cmake"
+    COMMAND ${PYTHON_EXECUTABLE} setup.py bdist_wheel
+    WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/wheel
+)

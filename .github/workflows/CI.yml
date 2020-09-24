@@ -87,8 +87,8 @@ jobs:
         cd build
         cmake -DCMAKE_BUILD_TYPE=Debug -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.config.python }} ..
         cmake --build . -- -j2
-        cd opengeode/wheel
-        python setup.py bdist_wheel
+        cd opengeode
+        cmake --build . --target wheel --config Debug
     - name: Notify slack
       if: failure() && github.ref == 'refs/heads/master'
       uses: 8398a7/action-slack@v2
@@ -149,8 +149,7 @@ jobs:
         cmake --build . --config ${{ matrix.config }}
         cd opengeode
         ctest -C ${{ matrix.config }} --output-on-failure
-        cd wheel
-        python setup.py bdist_wheel
+        cmake --build . --target wheel --config ${{ matrix.config }}
     - name: Notify slack
       if: failure() && github.ref == 'refs/heads/master'
       uses: 8398a7/action-slack@v2
@@ -183,8 +182,7 @@ jobs:
         cmake --build . --config ${{ matrix.config }}
         cd opengeode
         ctest -C ${{ matrix.config }} --output-on-failure
-        cd wheel
-        python setup.py bdist_wheel
+        cmake --build . --target wheel --config ${{ matrix.config }}
     - name: Notify slack
       if: failure() && github.ref == 'refs/heads/master'
       uses: 8398a7/action-slack@v2

@@ -74,9 +74,9 @@ jobs:
         echo ::set-output name=version::$version
         cmake -DCMAKE_BUILD_TYPE=Release -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.config.python }} -DCMAKE_PACKAGE_VERSION:STRING=$version ..
         cmake --build . -- -j2
-        cd opengeode/wheel
-        python setup.py bdist_wheel
-        mv dist/*.whl dist/OpenGeode-$version-${{ matrix.config.tag }}-manylinux2014_86_64.whl
+        cd opengeode
+        cmake --build . --target wheel --config Release
+        mv wheel/dist/*.whl wheel/dist/OpenGeode-$version-${{ matrix.config.tag }}-manylinux2014_86_64.whl
     - name: Upload
       uses: softprops/action-gh-release@v1
       with:
@@ -125,9 +125,8 @@ jobs:
         cmake --build . --config Release
         cd opengeode
         cmake --build . --target package --config Release
-        cd wheel
-        python setup.py bdist_wheel
-        mv dist/*.whl dist/OpenGeode-$version-${{ matrix.config.tag }}-macosx_10_14_x86_64.whl
+        cmake --build . --target wheel --config Release
+        mv wheel/dist/*.whl wheel/dist/OpenGeode-$version-${{ matrix.config.tag }}-macosx_10_14_x86_64.whl
     - name: Upload
       uses: softprops/action-gh-release@v1
       with:
@@ -177,9 +176,8 @@ jobs:
         cmake --build . --config Release
         cd opengeode
         cmake --build . --target PACKAGE --config Release
-        cd wheel
-        python setup.py bdist_wheel
-        mv dist/*.whl dist/OpenGeode-$version-${{ matrix.config.tag }}-win_amd64.whl
+        cmake --build . --target wheel --config Release
+        mv wheel/dist/*.whl wheel/dist/OpenGeode-$version-${{ matrix.config.tag }}-win_amd64.whl
     - name: Upload
       uses: softprops/action-gh-release@v1
       with:
