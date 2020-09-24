@@ -76,19 +76,17 @@ jobs:
         cmake --build . -- -j2
         cd opengeode
         cmake --build . --target wheel --config Release
-        mv wheel/dist/*.whl wheel/dist/OpenGeode_core-$version-${{ matrix.config.tag }}-manylinux2014_86_64.whl
+        mv wheel/dist/*.whl wheel/dist/OpenGeode_core-$version-${{ matrix.config.tag }}-manylinux2014_x86_64.whl
     - name: Upload
       uses: softprops/action-gh-release@v1
       with:
-        files: "build/opengeode/wheel/dist/OpenGeode_core-${{ steps.package.outputs.version }}-${{ matrix.config.tag }}-manylinux2014_86_64.whl"
+        files: "build/opengeode/wheel/dist/OpenGeode_core-${{ steps.package.outputs.version }}-${{ matrix.config.tag }}-manylinux2014_x86_64.whl"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: PyPI
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_TOKEN }}
-        packages_dir: "build/opengeode/wheel/dist/"
+      run: |
+        pip install twine
+        twine upload -u __token__ -p ${{ secrets.PYPI_TOKEN }} build/opengeode/wheel/dist/*
     - name: Notify slack
       if: failure() && github.ref == 'refs/heads/master'
       uses: 8398a7/action-slack@v2
@@ -140,11 +138,9 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: PyPI
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_TOKEN }}
-        packages_dir: "build/opengeode/wheel/dist/"
+      run: |
+        pip install twine
+        twine upload -u __token__ -p ${{ secrets.PYPI_TOKEN }} build/opengeode/wheel/dist/*
     - name: Notify slack
       if: failure()
       uses: 8398a7/action-slack@v2
@@ -195,11 +191,9 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: PyPI
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_TOKEN }}
-        packages_dir: "build/opengeode/wheel/dist/"
+      run: |
+        pip install twine
+        twine upload -u __token__ -p ${{ secrets.PYPI_TOKEN }} build/opengeode/wheel/dist/*
     - name: Notify slack
       if: failure()
       uses: 8398a7/action-slack@v2
