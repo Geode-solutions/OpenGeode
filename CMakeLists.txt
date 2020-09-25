@@ -32,7 +32,8 @@ endif()
 
 # Internal options
 option(USE_SUPERBUILD "Whether or not a superbuild should be invoked" ON)
-mark_as_advanced(USE_SUPERBUILD)
+option(INCLUDE_PYBIND11 "Whether or not Pybind11 should be added to the release" OFF)
+mark_as_advanced(USE_SUPERBUILD INCLUDE_PYBIND11)
 
 #-------------------------------------------------------------------------------
 # When CMake is called, a main project (super build project) is generated.
