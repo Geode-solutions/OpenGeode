@@ -18,20 +18,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-find_package(pybind11 REQUIRED CONFIG NO_DEFAULT_PATH PATHS ${PYBIND11_INSTALL_PREFIX})
-
-install(
-    DIRECTORY
-        ${PYBIND11_INSTALL_PREFIX}/
-    DESTINATION
-        .
-)
 add_subdirectory(src)
 
 if(OPENGEODE_WITH_TESTS)
     add_subdirectory(tests)
 endif()
-
 
 configure_file(
     __init__.py

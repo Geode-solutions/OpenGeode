@@ -46,6 +46,16 @@ install(
         .
 )
 
+if(OPENGEODE_WITH_PYTHON OR INCLUDE_PYBIND11)
+    find_package(pybind11 REQUIRED CONFIG NO_DEFAULT_PATH PATHS ${PYBIND11_INSTALL_PREFIX})
+    install(
+        DIRECTORY
+            ${PYBIND11_INSTALL_PREFIX}/
+        DESTINATION
+            .
+    )
+endif()
+
 #------------------------------------------------------------------------------------------------
 # Configure the OpenGeode sources
 add_subdirectory(src/geode)

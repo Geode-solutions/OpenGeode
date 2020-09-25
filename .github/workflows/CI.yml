@@ -34,7 +34,7 @@ jobs:
       run: |
         mkdir -p build
         cd build
-        cmake -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ..
+        cmake -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} -DINCLUDE_PYBIND11:BOOL=ON ..
         cmake --build . -- -j2
         cd opengeode        
         ctest --output-on-failure
