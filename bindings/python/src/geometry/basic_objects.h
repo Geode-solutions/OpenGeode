@@ -98,5 +98,33 @@ namespace geode
             .def( pybind11::init< const Plane&, double >() )
             .def( "plane", &Circle::plane )
             .def( "radius", &Circle::radius );
+
+        pybind11::enum_< Side >( module, "Side" )
+            .value( "positive", Side::positive )
+            .value( "negative", Side::negative )
+            .value( "zero", Side::zero )
+            .export_values();
+
+        pybind11::enum_< Position >( module, "Position" )
+            .value( "outside", Position::outside )
+            .value( "inside", Position::inside )
+            .value( "vertex0", Position::vertex0 )
+            .value( "vertex1", Position::vertex1 )
+            .value( "vertex2", Position::vertex2 )
+            .value( "vertex3", Position::vertex3 )
+            .value( "edge0", Position::edge0 )
+            .value( "edge1", Position::edge1 )
+            .value( "edge2", Position::edge2 )
+            .value( "edge01", Position::edge01 )
+            .value( "edge02", Position::edge02 )
+            .value( "edge03", Position::edge03 )
+            .value( "edge12", Position::edge12 )
+            .value( "edge13", Position::edge13 )
+            .value( "edge23", Position::edge23 )
+            .value( "facet0", Position::facet0 )
+            .value( "facet1", Position::facet1 )
+            .value( "facet2", Position::facet2 )
+            .value( "facet3", Position::facet3 )
+            .export_values();
     }
 } // namespace geode
