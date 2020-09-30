@@ -19,6 +19,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import os, sys, platform
+if sys.version_info >= (3,8,0) and platform.system() == "Windows":
+    for path in [x.strip() for x in os.environ['PATH'].split(';') if x]:
+        os.add_dll_directory(path)
+
 import opengeode_py_basic as basic
 import opengeode_py_geometry as geom
 import opengeode_py_mesh as mesh
