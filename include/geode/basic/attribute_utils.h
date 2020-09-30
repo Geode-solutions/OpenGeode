@@ -135,13 +135,13 @@ namespace geode
         static Type compute( const AttributeLinearInterpolation& interpolator, \
             const Attribute< Type >& attribute )                               \
         {                                                                      \
-            Type result{ 0 };                                                  \
+            double result{ 0 };                                                \
             for( auto i : Indices{ interpolator.indices_ } )                   \
             {                                                                  \
                 result += interpolator.lambdas_[i]                             \
                           * attribute.value( interpolator.indices_[i] );       \
             }                                                                  \
-            return result;                                                     \
+            return static_cast< Type >( result );                              \
         }                                                                      \
     }
 

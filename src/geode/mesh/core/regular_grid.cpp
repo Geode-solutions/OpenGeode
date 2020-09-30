@@ -98,7 +98,8 @@ namespace geode
                 {
                     offset *= cells_number_[d2];
                 }
-                const auto value = std::floor( index / offset );
+                const auto value =
+                    static_cast< index_t >( std::floor( index / offset ) );
                 cell_id[dimension - d - 1] = value;
                 index -= value * offset;
             }
