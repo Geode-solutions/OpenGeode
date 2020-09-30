@@ -125,6 +125,7 @@ namespace geode
             .value( "facet1", Position::facet1 )
             .value( "facet2", Position::facet2 )
             .value( "facet3", Position::facet3 )
+            .value( "parallel", Position::parallel )
             .export_values();
     }
 } // namespace geode
