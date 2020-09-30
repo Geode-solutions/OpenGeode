@@ -1,5 +1,16 @@
 # Upgrade Guide
 
+## Upgrading from OpenGeode v5.x.x to v6.0.0
+
+### Motivations
+
+This new major release is to formalize PyPI support for OpenGeode.
+
+### Breaking Changes
+
+- **CMake**: CMake minimum requirement has been upgraded to 3.14 to ease import of PyPI modules.
+
+
 ## Upgrading from OpenGeode v4.x.x to v5.0.0
 
 ### Motivations

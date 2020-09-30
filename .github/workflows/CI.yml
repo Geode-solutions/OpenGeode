@@ -23,26 +23,18 @@ jobs:
     strategy:
       matrix:
         config:
-        - {container: "geodesolutions/ubuntu", system: "ubuntu", build_type: "Debug", benchmark: false, python: 3.6}
-        - {container: "geodesolutions/ubuntu", system: "ubuntu", build_type: "Release", cmake_args: "-DUSE_BENCHMARK=ON", benchmark: true, python: 3.6}
-        - {container: "geodesolutions/ubuntu", system: "ubuntu", build_type: "Debug", benchmark: false, python: 3.7}
-        - {container: "geodesolutions/ubuntu", system: "ubuntu", build_type: "Release", benchmark: false, python: 3.7}
-        - {container: "geodesolutions/ubuntu", system: "ubuntu", build_type: "Debug", benchmark: false, python: 3.8}
-        - {container: "geodesolutions/ubuntu", system: "ubuntu", build_type: "Release", benchmark: false, python: 3.8}
-        - {container: "geodesolutions/centos", system: "rhel", build_type: "Debug", benchmark: false, python: 2.7}
-        - {container: "geodesolutions/centos", system: "rhel", build_type: "Release", benchmark: false, python: 2.7}
+        - {container: "geodesolutions/ubuntu", system: "ubuntu", build_type: "Debug", benchmark: false}
+        - {container: "geodesolutions/ubuntu", system: "ubuntu", build_type: "Release", cmake_args: "-DUSE_BENCHMARK=ON", benchmark: true}
+        - {container: "geodesolutions/centos", system: "rhel", build_type: "Debug", benchmark: false}
+        - {container: "geodesolutions/centos", system: "rhel", build_type: "Release", benchmark: false}
 
     steps:
     - uses: actions/checkout@v1
-    - name: Set up Python ${{ matrix.config.python }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.config.python }}
     - name: Compile
       run: |
         mkdir -p build
         cd build
-        cmake -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.config.python }} ..
+        cmake -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} -DINCLUDE_PYBIND11:BOOL=ON ..
         cmake --build . -- -j2
         cd opengeode        
         ctest --output-on-failure
@@ -68,7 +60,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
-  build-manylinux:
+  build-linux-wheel:
     runs-on: ubuntu-18.04
     container: "dockcross/manylinux2014-x64"
     needs: format
@@ -88,6 +80,7 @@ jobs:
         cmake -DCMAKE_BUILD_TYPE=Debug -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.config.python }} ..
         cmake --build . -- -j2
         cd opengeode
+        ctest -C Debug --output-on-failure
         cmake --build . --target wheel --config Debug
     - name: Notify slack
       if: failure() && github.ref == 'refs/heads/master'
@@ -145,7 +138,7 @@ jobs:
         pip install wheel
         mkdir -p build
         cd build
-        cmake -G "Xcode"  -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.python }} ..
+        cmake -G "Xcode" -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.python }} ..
         cmake --build . --config ${{ matrix.config }}
         cd opengeode
         ctest -C ${{ matrix.config }} --output-on-failure
@@ -194,7 +187,7 @@ jobs:
         
   semantic-release:
     runs-on: ubuntu-18.04
-    needs: [build-linux, build-manylinux, coverage, build-mac-xcode, build-windows]
+    needs: [build-linux, build-linux-wheel, coverage, build-mac-xcode, build-windows]
     steps:
     - uses: actions/checkout@v1
     - run: npx semantic-release
