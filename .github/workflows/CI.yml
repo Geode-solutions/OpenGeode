@@ -158,7 +158,7 @@ jobs:
     strategy:
       matrix:
         config: [Debug, Release]
-        python: [3.6, 3.7]
+        python: [3.6, 3.7, 3.8]
 
     steps:
     - uses: actions/checkout@v1

@@ -19,6 +19,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import os, sys, platform
+if sys.version_info >= (3,8,0) and platform.system() == "Windows":
+    for p in [x.strip() for x in os.environ['PYTHONPATH'].split(';') if x]:
+        os.add_dll_directory(p)
+
 import opengeode_py_basic as basic
 
 if __name__ == '__main__':
