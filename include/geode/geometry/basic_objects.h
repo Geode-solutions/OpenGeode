@@ -302,6 +302,8 @@ namespace geode
         facet0,
         facet1,
         facet2,
-        facet3
+        facet3,
+        // Parallel or coplanar configuration
+        parallel
     };
 } // namespace geode
