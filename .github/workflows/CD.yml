@@ -70,11 +70,11 @@ jobs:
         cmake --build . -- -j2
         cd opengeode
         cmake --build . --target wheel --config Release
-        mv wheel/dist/*.whl wheel/dist/OpenGeode_core-$version-${{ matrix.config.tag }}-linux_x86_64.whl
+        mv wheel/dist/*.whl wheel/dist/OpenGeode_core-$version-${{ matrix.config.tag }}-manylinux2014_x86_64.whl
     - name: Upload
       uses: softprops/action-gh-release@v1
       with:
-        files: "build/opengeode/wheel/dist/OpenGeode_core-${{ steps.package.outputs.version }}-${{ matrix.config.tag }}-linux_x86_64.whl"
+        files: "build/opengeode/wheel/dist/OpenGeode_core-${{ steps.package.outputs.version }}-${{ matrix.config.tag }}-manylinux2014_x86_64.whl"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: PyPI
