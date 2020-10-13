@@ -110,6 +110,30 @@ namespace geode
             }
         }
 
+        bool has_assignable_attributes() const
+        {
+            for( auto &it : attributes_ )
+            {
+                if( it.second->properties().assignable )
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        bool has_interpolable_attributes() const
+        {
+            for( auto &it : attributes_ )
+            {
+                if( it.second->properties().interpolable )
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         absl::FixedArray< absl::string_view > attribute_names() const
         {
             absl::FixedArray< absl::string_view > names( attributes_.size() );
@@ -255,6 +279,16 @@ namespace geode
     void AttributeManager::reserve( index_t capacity )
     {
         impl_->reserve( capacity, {} );
+    }
+
+    bool AttributeManager::has_assignable_attributes() const
+    {
+        return impl_->has_assignable_attributes();
+    }
+
+    bool AttributeManager::has_interpolable_attributes() const
+    {
+        return impl_->has_interpolable_attributes();
     }
 
     void AttributeManager::assign_attribute_value(

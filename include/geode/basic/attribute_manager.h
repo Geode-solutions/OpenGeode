@@ -164,6 +164,10 @@ namespace geode
             const AttributeLinearInterpolation& interpolation,
             index_t to_element );
 
+        bool has_assignable_attributes() const;
+
+        bool has_interpolable_attributes() const;
+
         /*!
          * Get all the associated attribute names
          */
