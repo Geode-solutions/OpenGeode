@@ -112,7 +112,7 @@ namespace geode
 
         bool has_assignable_attributes() const
         {
-            for( auto &it : attributes_ )
+            for( const auto &it : attributes_ )
             {
                 if( it.second->properties().assignable )
                 {
@@ -124,7 +124,7 @@ namespace geode
 
         bool has_interpolable_attributes() const
         {
-            for( auto &it : attributes_ )
+            for( const auto &it : attributes_ )
             {
                 if( it.second->properties().interpolable )
                 {
