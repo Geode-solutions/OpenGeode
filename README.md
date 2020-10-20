@@ -62,6 +62,10 @@ OpenGeode is an open source framework for representing and manipulating geometri
 Code and API are fully documented inside the code itself.
 To check out our live documentation, visit [docs.geode-solutions.com](https://docs.geode-solutions.com).
 
+Installing OpenGeode is done:
+ * either, by compiling the C++ source. Check [this documentation page](https://docs.geode-solutions.com/how-to-compile) for more details.
+ * or, by using pip command ```pip install OpenGeode-core``` and add ```import opengeode``` in your Python script. Check [this documentation page](https://docs.geode-solutions.com/how-to-use-binding) for more details.
+
 
 ## Questions
 For questions and support please use the official [slack](https://slackin-opengeode.herokuapp.com). The issue list of this repo is exclusively for bug reports and feature requests. 
