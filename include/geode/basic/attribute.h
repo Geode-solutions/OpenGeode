@@ -102,12 +102,10 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this,
-                Growable< Archive, AttributeBase >{
-                    { []( Archive& /*unused*/, AttributeBase& /*unused*/ ) {},
-                        []( Archive& archive, AttributeBase& attribute ) {
-                            archive.object( attribute.properties_ );
-                        } } } );
+            archive.ext( *this, DefaultGrowable< Archive, AttributeBase >{},
+                []( Archive& archive, AttributeBase& attribute ) {
+                    archive.object( attribute.properties_ );
+                } );
         }
 
     protected:
