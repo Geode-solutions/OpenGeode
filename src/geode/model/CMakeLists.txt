@@ -31,8 +31,7 @@ add_geode_library(
         "mixin/builder/surfaces_builder.cpp"
         "mixin/builder/relationships_builder.cpp"
         "mixin/builder/vertex_identifier_builder.cpp"
-        "mixin/core/bitsery_input.cpp"
-        "mixin/core/bitsery_output.cpp"
+        "mixin/core/bitsery_archive.cpp"
         "mixin/core/block.cpp"
         "mixin/core/blocks.cpp"
         "mixin/core/component.cpp"
@@ -92,7 +91,6 @@ add_geode_library(
         "representation/io/brep_output.h"
         "representation/io/section_output.h"
     ADVANCED_HEADERS
-        "mixin/core/detail/bitsery_archive.h"
         "mixin/core/detail/components_storage.h"
         "mixin/core/detail/count_relationships.h"
         "mixin/core/detail/mesh_storage.h"

@@ -277,9 +277,9 @@ void test_serialize_manager( geode::AttributeManager& manager )
     geode::TContext context{};
     geode::register_basic_serialize_pcontext( std::get< 0 >( context ) );
     geode::AttributeManager::register_attribute_type< Foo, geode::Serializer >(
-        std::get< 0 >( context ) );
+        std::get< 0 >( context ), "Foo" );
     geode::AttributeManager::register_attribute_type< std::array< double, 3 >,
-        geode::Serializer >( std::get< 0 >( context ) );
+        geode::Serializer >( std::get< 0 >( context ), "array_double_3" );
     geode::Serializer archive{ context, file };
     archive.object( manager );
     archive.adapter().flush();
@@ -292,9 +292,10 @@ void test_serialize_manager( geode::AttributeManager& manager )
     geode::register_basic_deserialize_pcontext(
         std::get< 0 >( reload_context ) );
     geode::AttributeManager::register_attribute_type< Foo,
-        geode::Deserializer >( std::get< 0 >( reload_context ) );
+        geode::Deserializer >( std::get< 0 >( reload_context ), "Foo" );
     geode::AttributeManager::register_attribute_type< std::array< double, 3 >,
-        geode::Deserializer >( std::get< 0 >( reload_context ) );
+        geode::Deserializer >(
+        std::get< 0 >( reload_context ), "array_double_3" );
     geode::Deserializer unarchive{ reload_context, infile };
     unarchive.object( reloaded_manager );
     const auto& adapter = unarchive.adapter();
