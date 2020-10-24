@@ -181,19 +181,6 @@ void test_delete_all( const geode::TriangulatedSurface3D& triangulated_surface,
         "[Test]TriangulatedSurface should have 0 vertex" );
 }
 
-void test_backward_io( const std::string& filename )
-{
-    const auto new_triangulated_surface = geode::load_triangulated_surface< 3 >(
-        geode::OpenGeodeTriangulatedSurface3D::impl_name_static(), filename );
-
-    OPENGEODE_EXCEPTION( new_triangulated_surface->nb_vertices() == 5,
-        "[Test] Reloaded TriangulatedSurface should have 5 vertices" );
-    OPENGEODE_EXCEPTION( new_triangulated_surface->nb_edges() == 7,
-        "[Test] Reloaded TriangulatedSurface should have 7 edges" );
-    OPENGEODE_EXCEPTION( new_triangulated_surface->nb_polygons() == 3,
-        "[Test] Reloaded TriangulatedSurface should have 3 polygons" );
-}
-
 void test()
 {
     auto surface = geode::TriangulatedSurface3D::create(
@@ -204,8 +191,6 @@ void test()
     test_create_polygons( *surface, *builder );
     test_polygon_adjacencies( *surface, *builder );
     test_io( *surface, absl::StrCat( "test.", surface->native_extension() ) );
-    test_backward_io( absl::StrCat(
-        geode::data_path, "/test_v4.", surface->native_extension() ) );
 
     test_delete_vertex( *surface, *builder );
     test_delete_polygon( *surface, *builder );
