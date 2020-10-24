@@ -349,101 +349,23 @@ namespace geode
         }
 
     private:
-        void convert_attribute_to_abseil()
-        {
-            const auto attribute_name = Facets::attribute_name();
-            auto old_vertices =
-                facet_attribute_manager()
-                    .template find_attribute< std::vector< index_t > >(
-                        attribute_name );
-            facet_attribute_manager().delete_attribute( attribute_name );
-            auto new_vertices =
-                facet_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        PolyhedronFacetVertices >(
-                        attribute_name, PolyhedronFacetVertices{} );
-
-            for( const auto f :
-                Range{ facet_attribute_manager().nb_elements() } )
-            {
-                const auto& old_values = old_vertices->value( f );
-                new_vertices->modify_value(
-                    f, [&old_values]( PolyhedronFacetVertices& value ) {
-                        for( const auto& old_value : old_values )
-                        {
-                            value.push_back( old_value );
-                        }
-                    } );
-            }
-            Facets::update_attribute();
-        }
-
-        void initialize_edges_from_facets()
-        {
-            for( const auto f :
-                Range{ facet_attribute_manager().nb_elements() } )
-            {
-                const auto& facet_vertices = get_facet_vertices( f );
-                const auto nb_facet_vertices = facet_vertices.size();
-                for( const auto v : Range{ nb_facet_vertices } )
-                {
-                    std::array< index_t, 2 > edge_vertices{ facet_vertices[v],
-                        facet_vertices[( v + 1 ) % nb_facet_vertices] };
-                    Edges::add_facet( std::move( edge_vertices ) );
-                }
-            }
-        }
-
-    private:
         Impl() = default;
 
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this,
-                Growable< Archive, Impl >{
-                    { []( Archive& archive, Impl& impl ) {
-                         archive.ext( impl,
-                             bitsery::ext::BaseClass< detail::FacetStorage<
-                                 PolyhedronFacetVertices > >{} ); // should be
-                                                                  // std::vector
-                         archive.object( impl.polyhedron_attribute_manager_ );
-                         archive.ext( impl.polyhedron_around_vertex_,
-                             bitsery::ext::StdSmartPtr{} );
-                     },
-                        []( Archive& archive, Impl& impl ) {
-                            archive.ext( impl,
-                                bitsery::ext::BaseClass< detail::FacetStorage<
-                                    PolyhedronFacetVertices > >{} ); // should
-                                                                     // be
-                                                                     // std::vector
-                            archive.object(
-                                impl.polyhedron_attribute_manager_ );
-                            archive.ext( impl.polyhedron_around_vertex_,
-                                bitsery::ext::StdSmartPtr{} );
-                            archive.ext( impl,
-                                bitsery::ext::BaseClass< detail::FacetStorage<
-                                    std::array< index_t, 2 > > >{} );
-                        },
-                        []( Archive& archive, Impl& impl ) {
-                            archive.ext( impl,
-                                bitsery::ext::BaseClass< detail::FacetStorage<
-                                    PolyhedronFacetVertices > >{} );
-                            archive.object(
-                                impl.polyhedron_attribute_manager_ );
-                            archive.ext( impl.polyhedron_around_vertex_,
-                                bitsery::ext::StdSmartPtr{} );
-                            archive.ext( impl,
-                                bitsery::ext::BaseClass< detail::FacetStorage<
-                                    std::array< index_t, 2 > > >{} );
-                        } },
-                    { []( Impl& impl ) {
-                         impl.convert_attribute_to_abseil();
-                         impl.initialize_edges_from_facets();
-                     },
-                        []( Impl& impl ) {
-                            impl.convert_attribute_to_abseil();
-                        } } } );
+            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
+                []( Archive& archive, Impl& impl ) {
+                    archive.ext(
+                        impl, bitsery::ext::BaseClass< detail::FacetStorage<
+                                  PolyhedronFacetVertices > >{} );
+                    archive.object( impl.polyhedron_attribute_manager_ );
+                    archive.ext( impl.polyhedron_around_vertex_,
+                        bitsery::ext::StdSmartPtr{} );
+                    archive.ext(
+                        impl, bitsery::ext::BaseClass< detail::FacetStorage<
+                                  std::array< index_t, 2 > > >{} );
+                } );
         }
 
     private:

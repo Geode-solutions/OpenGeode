@@ -261,23 +261,6 @@ void test_io( const geode::PolyhedralSolid3D& polyhedral_solid,
     }
 }
 
-void test_backward_io( const std::string& filename )
-{
-    const auto new_polyhedral_solid = geode::load_polyhedral_solid< 3 >(
-        geode::OpenGeodePolyhedralSolid3D::impl_name_static(), filename );
-
-    OPENGEODE_EXCEPTION( new_polyhedral_solid->nb_edges() == 15,
-        "[Test] Reloaded PolyhedralSolid should have 15 edges" );
-    auto facet_attribute = new_polyhedral_solid->facet_attribute_manager()
-                               .find_attribute< geode::index_t >( "test" );
-    for( auto e : geode::Range{ new_polyhedral_solid->nb_facets() } )
-    {
-        OPENGEODE_EXCEPTION( facet_attribute->value( e ) == e,
-            "[Test] Reloaded PolyhedralSolid has "
-            "wrong attributes on its facets" );
-    }
-}
-
 void test_barycenters()
 {
     auto polyhedral_solid = geode::PolyhedralSolid3D::create(
@@ -455,8 +438,6 @@ void test()
     test_polyhedron_adjacencies( *polyhedral_solid, *builder );
     test_io( *polyhedral_solid,
         absl::StrCat( "test.", polyhedral_solid->native_extension() ) );
-    test_backward_io( absl::StrCat(
-        geode::data_path, "/test_v1.", polyhedral_solid->native_extension() ) );
 
     test_delete_vertex( *polyhedral_solid, *builder );
     test_delete_polyhedra( *polyhedral_solid, *builder );

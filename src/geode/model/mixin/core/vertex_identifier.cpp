@@ -348,7 +348,7 @@ namespace geode
                 std::vector< bool > to_keep(
                     mesh_component_vertices.size(), true );
                 bool update{ false };
-                for( const auto i : Range{ mesh_component_vertices.size() } )
+                for( const auto i : Indices{ mesh_component_vertices } )
                 {
                     if( mesh_component_vertices[i].component_id.id()
                         == component_id )

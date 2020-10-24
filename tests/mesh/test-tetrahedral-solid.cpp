@@ -148,20 +148,6 @@ void test_io(
         "[Test] Reloaded TetrahedralSolid should have 3 polyhedra" );
 }
 
-void test_backward_io( const std::string& filename )
-{
-    const auto new_solid = geode::load_tetrahedral_solid< 3 >(
-        geode::OpenGeodeTetrahedralSolid3D::impl_name_static(), filename );
-    OPENGEODE_EXCEPTION( new_solid->nb_vertices() == 6,
-        "[Test] Reloaded TetrahedralSolid should have 6 vertices" );
-    OPENGEODE_EXCEPTION( new_solid->nb_facets() == 10,
-        "[Test] Reloaded TetrahedralSolid should have 10 facets" );
-    OPENGEODE_EXCEPTION( new_solid->nb_edges() == 12,
-        "[Test] Reloaded TetrahedralSolid should have 12 edges" );
-    OPENGEODE_EXCEPTION( new_solid->nb_polyhedra() == 3,
-        "[Test] Reloaded TetrahedralSolid should have 3 polyhedra" );
-}
-
 void test_clone( const geode::TetrahedralSolid3D& solid )
 {
     auto attr_from = solid.facet_attribute_manager()
@@ -249,8 +235,6 @@ void test()
     test_create_tetrahedra( *solid, *builder );
     test_polyhedron_adjacencies( *solid, *builder );
     test_io( *solid, absl::StrCat( "test.", solid->native_extension() ) );
-    test_backward_io( absl::StrCat(
-        geode::data_path, "/test_v1.", solid->native_extension() ) );
 
     test_delete_vertex( *solid, *builder );
     test_delete_polyhedron( *solid, *builder );
