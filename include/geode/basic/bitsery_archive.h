@@ -171,3 +171,11 @@ namespace bitsery
         geode::Serializer & );                                                 \
     template EXPORT void TYPE::serialize< geode::Deserializer >(               \
         geode::Deserializer & )
+
+#define BITSERY_CLASS_NAME( Type, Name )                                       \
+    template <>                                                                \
+    struct PolymorphicClassName< Type >                                        \
+    {                                                                          \
+        static const char *name;                                               \
+    };                                                                         \
+    const char *PolymorphicClassName< Type >::name = Name

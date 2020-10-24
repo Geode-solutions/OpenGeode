@@ -38,23 +38,23 @@ namespace geode
         void register_basic_pcontext( PContext& context )
         {
             AttributeManager::register_attribute_type< bool, Serializer >(
-                context );
+                context, "bool" );
             AttributeManager::register_attribute_type< int, Serializer >(
-                context );
+                context, "int" );
             AttributeManager::register_attribute_type< double, Serializer >(
-                context );
+                context, "double" );
             AttributeManager::register_attribute_type< index_t, Serializer >(
-                context );
+                context, "index_t" );
             AttributeManager::register_attribute_type< std::vector< index_t >,
-                Serializer >( context );
+                Serializer >( context, "vector_index_t" );
             AttributeManager::register_attribute_type< std::array< index_t, 2 >,
-                Serializer >( context );
+                Serializer >( context, "array_index_t_2" );
             AttributeManager::register_attribute_type< std::array< index_t, 3 >,
-                Serializer >( context );
+                Serializer >( context, "array_index_t_3" );
             AttributeManager::register_attribute_type< std::array< index_t, 4 >,
-                Serializer >( context );
+                Serializer >( context, "array_index_t_4" );
             AttributeManager::register_attribute_type< uuid, Serializer >(
-                context );
+                context, "uuid" );
         }
     } // namespace detail
 } // namespace geode

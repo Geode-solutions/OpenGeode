@@ -218,26 +218,36 @@ namespace geode
         void copy( const AttributeManager& attribute_manager );
 
         template < typename Type, typename Serializer >
-        static void register_attribute_type( PContext& context )
+        static void register_attribute_type(
+            PContext& context, absl::string_view name )
         {
             context.registerSingleBaseBranch< Serializer, AttributeBase,
-                ConstantAttribute< Type > >();
+                ConstantAttribute< Type > >(
+                absl::StrCat( "ConstantAttribute", name ).c_str() );
             context.registerSingleBaseBranch< Serializer, AttributeBase,
-                VariableAttribute< Type > >();
+                VariableAttribute< Type > >(
+                absl::StrCat( "VariableAttribute", name ).c_str() );
             context.registerSingleBaseBranch< Serializer, AttributeBase,
-                SparseAttribute< Type > >();
+                SparseAttribute< Type > >(
+                absl::StrCat( "SparseAttribute", name ).c_str() );
             context.registerSingleBaseBranch< Serializer,
-                ReadOnlyAttribute< Type >, ConstantAttribute< Type > >();
+                ReadOnlyAttribute< Type >, ConstantAttribute< Type > >(
+                absl::StrCat( "ConstantAttribute", name ).c_str() );
             context.registerSingleBaseBranch< Serializer,
-                ReadOnlyAttribute< Type >, VariableAttribute< Type > >();
+                ReadOnlyAttribute< Type >, VariableAttribute< Type > >(
+                absl::StrCat( "VariableAttribute", name ).c_str() );
             context.registerSingleBaseBranch< Serializer,
-                ReadOnlyAttribute< Type >, SparseAttribute< Type > >();
+                ReadOnlyAttribute< Type >, SparseAttribute< Type > >(
+                absl::StrCat( "SparseAttribute", name ).c_str() );
             context.registerSingleBaseBranch< Serializer,
-                ConstantAttribute< Type >, ConstantAttribute< Type > >();
+                ConstantAttribute< Type >, ConstantAttribute< Type > >(
+                absl::StrCat( "ConstantAttribute", name ).c_str() );
             context.registerSingleBaseBranch< Serializer,
-                VariableAttribute< Type >, VariableAttribute< Type > >();
+                VariableAttribute< Type >, VariableAttribute< Type > >(
+                absl::StrCat( "VariableAttribute", name ).c_str() );
             context.registerSingleBaseBranch< Serializer,
-                SparseAttribute< Type >, SparseAttribute< Type > >();
+                SparseAttribute< Type >, SparseAttribute< Type > >(
+                absl::StrCat( "SparseAttribute", name ).c_str() );
         }
 
     private:
