@@ -26,6 +26,7 @@
 #include <geode/basic/uuid.h>
 #include <geode/basic/zip_file.h>
 
+#include <geode/model/representation/builder/section_builder.h>
 #include <geode/model/representation/core/section.h>
 #include <geode/model/representation/io/section_input.h>
 

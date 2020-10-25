@@ -38,9 +38,8 @@
 
 void run_test_brep()
 {
-    geode::BRep model;
-    geode::load_brep(
-        model, absl::StrCat( geode::data_path, "test_v5.og_brep" ) );
+    auto model =
+        geode::load_brep( absl::StrCat( geode::data_path, "test_v5.og_brep" ) );
 
     geode::triangulate_surface_meshes( model );
     geode::convert_surface_meshes_into_triangulated_surfaces( model );
@@ -50,15 +49,13 @@ void run_test_brep()
         absl::StrCat( "test_triangulated_surfaces.", model.native_extension() );
     geode::save_brep( model, file_io );
 
-    geode::BRep model2;
-    geode::load_brep( model2, file_io );
+    auto model2 = geode::load_brep( file_io );
 }
 
 void run_test_section()
 {
-    geode::Section model;
-    geode::load_section(
-        model, absl::StrCat( geode::data_path, "test_v5.og_sctn" ) );
+    auto model = geode::load_section(
+        absl::StrCat( geode::data_path, "test_v5.og_sctn" ) );
 
     geode::convert_surface_meshes_into_triangulated_surfaces( model );
 
@@ -66,8 +63,7 @@ void run_test_section()
         absl::StrCat( "test_triangulated_surfaces.", model.native_extension() );
     geode::save_section( model, file_io );
 
-    geode::Section model2;
-    geode::load_section( model2, file_io );
+    auto model2 = geode::load_section( file_io );
 }
 
 void test()
