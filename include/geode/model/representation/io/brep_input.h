@@ -28,11 +28,10 @@
 #include <geode/mesh/io/vertex_set_input.h>
 
 #include <geode/model/common.h>
-#include <geode/model/representation/builder/brep_builder.h>
+#include <geode/model/representation/core/brep.h>
 
 namespace geode
 {
-    class BRep;
     class BRepBuilder;
 } // namespace geode
 
@@ -41,11 +40,10 @@ namespace geode
     /*!
      * API function for loading a BoundaryRepresentation.
      * The adequate loader is called depending on the filename extension.
-     * @param[out] brep Loaded BRep.
      * @param[in] filename Path to the file to load.
+     * @return Loaded BRep.
      */
-    void opengeode_model_api load_brep(
-        BRep& brep, absl::string_view filename );
+    BRep opengeode_model_api load_brep( absl::string_view filename );
 
     class opengeode_model_api BRepInput : public Input
     {

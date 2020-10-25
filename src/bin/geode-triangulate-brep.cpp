@@ -50,8 +50,7 @@ int main( int argc, char* argv[] )
                 " --input my_brep.og_brep --output remeshed_brep.og_brep" ) );
         absl::ParseCommandLine( argc, argv );
 
-        geode::BRep brep;
-        geode::load_brep( brep, absl::GetFlag( FLAGS_input ) );
+        auto brep = geode::load_brep( absl::GetFlag( FLAGS_input ) );
         for( const auto& block : brep.blocks() )
         {
             if( block.mesh().nb_polyhedra() )

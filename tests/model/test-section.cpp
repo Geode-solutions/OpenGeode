@@ -590,8 +590,7 @@ void test()
     const auto file_io = absl::StrCat( "test.", model.native_extension() );
     geode::save_section( model, file_io );
 
-    geode::Section model2;
-    geode::load_section( model2, file_io );
+    auto model2 = geode::load_section( file_io );
     test_reloaded_section( model2 );
 
     geode::Section model3{ std::move( model2 ) };

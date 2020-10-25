@@ -28,11 +28,10 @@
 #include <geode/mesh/io/vertex_set_input.h>
 
 #include <geode/model/common.h>
-#include <geode/model/representation/builder/section_builder.h>
+#include <geode/model/representation/core/section.h>
 
 namespace geode
 {
-    class Section;
     class SectionBuilder;
 } // namespace geode
 
@@ -41,11 +40,10 @@ namespace geode
     /*!
      * API function for loading a Section.
      * The adequate loader is called depending on the filename extension.
-     * @param[out] section Loaded Section.
      * @param[in] filename Path to the file to load.
+     * @return Loaded Section.
      */
-    void opengeode_model_api load_section(
-        Section& section, absl::string_view filename );
+    Section opengeode_model_api load_section( absl::string_view filename );
 
     class opengeode_model_api SectionInput : public Input
     {

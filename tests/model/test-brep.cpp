@@ -870,8 +870,7 @@ void test()
     const auto file_io = absl::StrCat( "test.", model.native_extension() );
     geode::save_brep( model, file_io );
 
-    geode::BRep model2;
-    geode::load_brep( model2, file_io );
+    auto model2 = geode::load_brep( file_io );
     test_reloaded_brep( model2 );
 
     geode::BRep model3{ std::move( model2 ) };
