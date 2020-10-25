@@ -254,6 +254,5 @@ if __name__ == '__main__':
     file_io = "test." + section.native_extension()
     model.save_section( section, file_io )
     
-    section2 = model.Section()
-    model.load_section( section2, file_io )
+    section2 = model.load_section( file_io )
     

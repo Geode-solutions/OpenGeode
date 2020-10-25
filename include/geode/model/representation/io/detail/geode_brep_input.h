@@ -26,6 +26,7 @@
 #include <geode/basic/uuid.h>
 #include <geode/basic/zip_file.h>
 
+#include <geode/model/representation/builder/brep_builder.h>
 #include <geode/model/representation/core/brep.h>
 #include <geode/model/representation/io/brep_input.h>
 

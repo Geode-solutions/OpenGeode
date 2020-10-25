@@ -28,29 +28,25 @@ import opengeode_py_basic as basic
 import opengeode_py_model as model
 
 def run_test_brep():
-    brep = model.BRep()
     test_dir = os.path.dirname(__file__)
     data_dir = os.path.abspath(os.path.join(test_dir, "../../../../tests/data"))
-    model.load_brep(brep, os.path.join(data_dir, "test_v5.og_brep"))
+    brep = model.load_brep(os.path.join(data_dir, "test_v5.og_brep"))
     model.convert_brep_surface_meshes_into_triangulated_surfaces( brep )
     model.convert_brep_block_meshes_into_tetrahedral_solids( brep )
 
     file_io = "test_triangulated_surfaces." + brep.native_extension()
     model.save_brep(brep, file_io)
-    brep2 = model.BRep()
-    model.load_brep(brep2, file_io)
+    brep2 = model.load_brep(file_io)
 
 def run_test_section():
-    section = model.Section()
     test_dir = os.path.dirname(__file__)
     data_dir = os.path.abspath(os.path.join(test_dir, "../../../../tests/data"))
-    model.load_section(section, os.path.join(data_dir, "test_v5.og_sctn"))
+    section = model.load_section(os.path.join(data_dir, "test_v5.og_sctn"))
     model.convert_section_surface_meshes_into_triangulated_surfaces( section )
 
     file_io = "test_triangulated_surfaces." + section.native_extension()
     model.save_section(section, file_io)
-    section2 = model.Section()
-    model.load_section(section2, file_io)
+    section2 = model.load_section(file_io)
 
 if __name__ == '__main__':
     run_test_brep()

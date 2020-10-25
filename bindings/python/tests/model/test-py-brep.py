@@ -377,6 +377,5 @@ if __name__ == '__main__':
     file_io = "test." + brep.native_extension()
     model.save_brep( brep, file_io )
     
-    brep2 = model.BRep()
-    model.load_brep( brep2, file_io )
+    brep2 = model.load_brep( file_io )
     test_reloaded_brep( brep2 )

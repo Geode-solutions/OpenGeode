@@ -23,21 +23,22 @@
 
 #include <geode/model/representation/io/brep_input.h>
 
-#include <geode/model/representation/core/brep.h>
-
 namespace geode
 {
-    void load_brep( BRep& brep, absl::string_view filename )
+    BRep load_brep( absl::string_view filename )
     {
         try
         {
+            BRep brep;
             auto input = BRepInputFactory::create(
                 extension_from_filename( filename ).data(), brep, filename );
             input->read();
             Logger::info( "BRep loaded from ", filename );
             Logger::info( "BRep has: ", brep.nb_blocks(), " Blocks, ",
-                brep.nb_surfaces(), " Surfaces, ", brep.nb_lines(),
-                " Lines and ", brep.nb_corners(), " Corners" );
+                brep.nb_surfaces(), " Surfaces, ", brep.nb_lines(), " Lines, ",
+                brep.nb_corners(), " Corners, ", brep.nb_model_boundaries(),
+                " ModelBoundaries" );
+            return brep;
         }
         catch( const OpenGeodeException& e )
         {

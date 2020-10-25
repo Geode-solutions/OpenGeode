@@ -50,8 +50,7 @@ int main( int argc, char* argv[] )
                 "remeshed_section.og_section" ) );
         absl::ParseCommandLine( argc, argv );
 
-        geode::Section section;
-        geode::load_section( section, absl::GetFlag( FLAGS_input ) );
+        auto section = geode::load_section( absl::GetFlag( FLAGS_input ) );
         geode::triangulate_surface_meshes( section );
         geode::convert_surface_meshes_into_triangulated_surfaces( section );
         geode::save_section( section, absl::GetFlag( FLAGS_output ) );
