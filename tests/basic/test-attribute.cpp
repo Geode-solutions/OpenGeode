@@ -275,9 +275,9 @@ void test_serialize_manager( geode::AttributeManager& manager )
     const auto filename = "manager.out";
     std::ofstream file{ filename, std::ofstream::binary };
     geode::TContext context{};
-    geode::register_basic_serialize_pcontext( std::get< 0 >( context ) );
     geode::AttributeManager::register_attribute_type< Foo, geode::Serializer >(
         std::get< 0 >( context ), "Foo" );
+    geode::register_basic_serialize_pcontext( std::get< 0 >( context ) );
     geode::AttributeManager::register_attribute_type< std::array< double, 3 >,
         geode::Serializer >( std::get< 0 >( context ), "array_double_3" );
     geode::Serializer archive{ context, file };
@@ -289,6 +289,8 @@ void test_serialize_manager( geode::AttributeManager& manager )
     std::ifstream infile{ filename, std::ifstream::binary };
     geode::AttributeManager reloaded_manager;
     geode::TContext reload_context{};
+    geode::AttributeManager::register_attribute_type< std::array< double, 30 >,
+        geode::Serializer >( std::get< 0 >( context ), "array_double_30" );
     geode::register_basic_deserialize_pcontext(
         std::get< 0 >( reload_context ) );
     geode::AttributeManager::register_attribute_type< Foo,
