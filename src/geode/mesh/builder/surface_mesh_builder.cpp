@@ -28,6 +28,8 @@
 #include <geode/geometry/point.h>
 
 #include <geode/mesh/builder/mesh_builder_factory.h>
+#include <geode/mesh/builder/surface_edges_builder.h>
+#include <geode/mesh/core/surface_edges.h>
 #include <geode/mesh/core/surface_mesh.h>
 
 namespace
@@ -193,11 +195,15 @@ namespace geode
             associate_polygon_vertex_to_vertex(
                 { added_polygon, v }, vertices[v] );
         }
-        for( const auto e : Range{ vertices.size() - 1 } )
+        if( surface_mesh_->are_edges_enabled() )
         {
-            this->find_or_create_edge( { vertices[e], vertices[e + 1] } );
+            auto edges = edges_builder();
+            for( const auto e : Range{ vertices.size() - 1 } )
+            {
+                edges.find_or_create_edge( { vertices[e], vertices[e + 1] } );
+            }
+            edges.find_or_create_edge( { vertices.back(), vertices.front() } );
         }
-        this->find_or_create_edge( { vertices.back(), vertices.front() } );
         do_create_polygon( vertices );
         return added_polygon;
     }
@@ -225,14 +231,6 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t SurfaceMeshBuilder< dimension >::find_or_create_edge(
-        std::array< index_t, 2 > edge_vertices )
-    {
-        return surface_mesh_->find_or_create_edge(
-            std::move( edge_vertices ), {} );
-    }
-
-    template < index_t dimension >
     void SurfaceMeshBuilder< dimension >::replace_vertex(
         index_t old_vertex_id, index_t new_vertex_id )
     {
@@ -245,10 +243,14 @@ namespace geode
                 surface_mesh_->previous_polygon_vertex( polygon_around ) );
             const auto next_id = surface_mesh_->polygon_vertex(
                 surface_mesh_->next_polygon_edge( polygon_around ) );
-            surface_mesh_->update_edge_vertex(
-                { old_vertex_id, next_id }, 0, new_vertex_id, {} );
-            surface_mesh_->update_edge_vertex(
-                { previous_id, old_vertex_id }, 1, new_vertex_id, {} );
+            if( surface_mesh_->are_edges_enabled() )
+            {
+                auto edges = edges_builder();
+                edges.update_edge_vertex(
+                    { old_vertex_id, next_id }, 0, new_vertex_id );
+                edges.update_edge_vertex(
+                    { previous_id, old_vertex_id }, 1, new_vertex_id );
+            }
             update_polygon_vertex( polygon_around, new_vertex_id );
         }
     }
@@ -284,10 +286,14 @@ namespace geode
             }
         }
 
-        surface_mesh_->update_edge_vertex(
-            { polygon_vertex_id, next_id }, 0, vertex_id, {} );
-        surface_mesh_->update_edge_vertex(
-            { previous_id, polygon_vertex_id }, 1, vertex_id, {} );
+        if( surface_mesh_->are_edges_enabled() )
+        {
+            auto edges = edges_builder();
+            edges.update_edge_vertex(
+                { polygon_vertex_id, next_id }, 0, vertex_id );
+            edges.update_edge_vertex(
+                { previous_id, polygon_vertex_id }, 1, vertex_id );
+        }
         update_polygon_vertex( polygon_vertex, vertex_id );
     }
 
@@ -337,7 +343,10 @@ namespace geode
     {
         const auto old2new = detail::mapping_after_deletion( to_delete );
         update_polygon_vertices( old2new );
-        update_edge_vertices( old2new );
+        if( surface_mesh_->are_edges_enabled() )
+        {
+            edges_builder().update_edge_vertices( old2new );
+        }
         do_delete_surface_vertices( to_delete );
     }
 
@@ -377,8 +386,11 @@ namespace geode
     void SurfaceMeshBuilder< dimension >::compute_polygon_adjacencies(
         absl::Span< const index_t > polygons_to_connect )
     {
+        const auto edges_enabled = surface_mesh_->are_edges_enabled();
+        surface_mesh_->enable_edges();
+        const auto& edges = surface_mesh_->edges();
         absl::FixedArray< absl::InlinedVector< PolygonEdge, 2 > > polygon_edges(
-            surface_mesh_->nb_edges() );
+            edges.nb_edges() );
         for( const auto polygon : polygons_to_connect )
         {
             const auto vertices_id =
@@ -387,13 +399,13 @@ namespace geode
             for( const auto e : Range{ nb_vertices - 1 } )
             {
                 PolygonEdge edge{ polygon, e };
-                const auto edge_id = surface_mesh_->edge_from_vertices(
+                const auto edge_id = edges.edge_from_vertices(
                     { vertices_id[e], vertices_id[e + 1] } );
                 polygon_edges[edge_id.value()].emplace_back(
                     std::move( edge ) );
             }
             PolygonEdge edge{ polygon, nb_vertices - 1 };
-            const auto edge_id = surface_mesh_->edge_from_vertices(
+            const auto edge_id = edges.edge_from_vertices(
                 { vertices_id.back(), vertices_id.front() } );
             polygon_edges[edge_id.value()].emplace_back( std::move( edge ) );
         }
@@ -406,28 +418,40 @@ namespace geode
             do_set_polygon_adjacent( edges[0], edges[1].polygon_id );
             do_set_polygon_adjacent( edges[1], edges[0].polygon_id );
         }
+        if( !edges_enabled )
+        {
+            surface_mesh_->disable_edges();
+        }
+    }
+
+    template < index_t dimension >
+    SurfaceEdgesBuilder< dimension >
+        SurfaceMeshBuilder< dimension >::edges_builder()
+    {
+        return { surface_mesh_->edges( {} ) };
     }
 
     template < index_t dimension >
     std::vector< index_t > SurfaceMeshBuilder< dimension >::delete_polygons(
         const std::vector< bool >& to_delete )
     {
-        for( const auto p : Range{ surface_mesh_->nb_polygons() } )
+        if( surface_mesh_->are_edges_enabled() )
         {
-            if( to_delete[p] )
+            auto edges = edges_builder();
+            for( const auto p : Range{ surface_mesh_->nb_polygons() } )
             {
-                for( const auto e :
-                    Range{ surface_mesh_->nb_polygon_edges( p ) } )
+                if( to_delete[p] )
                 {
-                    surface_mesh_->remove_edge(
-                        { surface_mesh_->polygon_edge_vertex( { p, e }, 0 ),
-                            surface_mesh_->polygon_edge_vertex( { p, e }, 1 ) },
-                        {} );
+                    for( const auto e :
+                        Range{ surface_mesh_->nb_polygon_edges( p ) } )
+                    {
+                        edges.remove_edge(
+                            surface_mesh_->polygon_edge_vertices( { p, e } ) );
+                    }
                 }
             }
+            edges.remove_isolated_edges();
         }
-        surface_mesh_->remove_isolated_edges( {} );
-
         const auto old2new = detail::mapping_after_deletion( to_delete );
         for( const auto v : Range{ surface_mesh_->nb_vertices() } )
         {
@@ -480,40 +504,6 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< index_t >
-        SurfaceMeshBuilder< dimension >::delete_isolated_edges()
-    {
-        return surface_mesh_->remove_isolated_edges( {} );
-    }
-
-    template < index_t dimension >
-    void SurfaceMeshBuilder< dimension >::update_edge_vertices(
-        absl::Span< const index_t > old2new )
-    {
-        surface_mesh_->update_edge_vertices( old2new, {} );
-    }
-
-    template < index_t dimension >
-    void SurfaceMeshBuilder< dimension >::update_edge_vertex(
-        std::array< index_t, 2 > edge_vertices,
-        index_t edge_vertex_id,
-        index_t new_vertex_id )
-    {
-        OPENGEODE_ASSERT( edge_vertex_id < 2,
-            "[SurfaceMeshBuilder::update_edge_vertex] "
-            "Accessing an invalid vertex in edge" );
-        surface_mesh_->update_edge_vertex(
-            std::move( edge_vertices ), edge_vertex_id, new_vertex_id, {} );
-    }
-
-    template < index_t dimension >
-    std::vector< index_t > SurfaceMeshBuilder< dimension >::delete_edges(
-        const std::vector< bool >& to_delete )
-    {
-        return surface_mesh_->delete_edges( to_delete, {} );
-    }
-
-    template < index_t dimension >
     void SurfaceMeshBuilder< dimension >::set_point(
         index_t vertex_id, Point< dimension > point )
     {
@@ -554,7 +544,11 @@ namespace geode
         }
         surface_mesh_->polygon_attribute_manager().copy(
             surface_mesh.polygon_attribute_manager() );
-        surface_mesh_->overwrite_edges( surface_mesh, {} );
+        if( surface_mesh.are_edges_enabled() )
+        {
+            surface_mesh_->enable_edges();
+            edges_builder().copy( surface_mesh.edges(), {} );
+        }
     }
 
     template class opengeode_mesh_api SurfaceMeshBuilder< 2 >;

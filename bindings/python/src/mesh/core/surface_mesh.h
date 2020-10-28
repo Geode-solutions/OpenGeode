@@ -32,18 +32,24 @@
         "SurfaceMesh" + std::to_string( dimension ) + "D";                     \
     pybind11::class_< SurfaceMesh##dimension##D, VertexSet >(                  \
         module, name##dimension.c_str() )                                      \
+        .def( "are_edges_enabled",                                             \
+            &SurfaceMesh##dimension##D::are_edges_enabled )                    \
+        .def( "enable_edges", &SurfaceMesh##dimension##D::enable_edges )       \
+        .def( "disable_edges", &SurfaceMesh##dimension##D::disable_edges )     \
+        .def( "edges",                                                         \
+            ( const SurfaceEdges##dimension##D& (                              \
+                SurfaceMesh##dimension##D::*) () const )                       \
+                & SurfaceMesh##dimension##D::edges,                            \
+            pybind11::return_value_policy::reference )                         \
         .def( "point", &SurfaceMesh##dimension##D::point )                     \
-        .def( "nb_edges", &SurfaceMesh##dimension##D::nb_edges )               \
         .def( "nb_polygons", &SurfaceMesh##dimension##D::nb_polygons )         \
         .def( "nb_polygon_vertices",                                           \
             &SurfaceMesh##dimension##D::nb_polygon_vertices )                  \
         .def(                                                                  \
             "nb_polygon_edges", &SurfaceMesh##dimension##D::nb_polygon_edges ) \
         .def( "polygon_vertex", &SurfaceMesh##dimension##D::polygon_vertex )   \
-        .def( "polygon_edge", &SurfaceMesh##dimension##D::polygon_edge )       \
         .def( "polygon_edge_vertex",                                           \
             &SurfaceMesh##dimension##D::polygon_edge_vertex )                  \
-        .def( "edge_vertices", &SurfaceMesh##dimension##D::edge_vertices )     \
         .def( "next_polygon_vertex",                                           \
             &SurfaceMesh##dimension##D::next_polygon_vertex )                  \
         .def( "previous_polygon_vertex",                                       \
@@ -61,8 +67,21 @@
         .def( "next_on_border", &SurfaceMesh##dimension##D::next_on_border )   \
         .def( "previous_on_border",                                            \
             &SurfaceMesh##dimension##D::previous_on_border )                   \
-        .def( "edge_length", &SurfaceMesh##dimension##D::edge_length )         \
-        .def( "edge_barycenter", &SurfaceMesh##dimension##D::edge_barycenter ) \
+        .def( "polygon_edge_length",                                           \
+            ( double ( SurfaceMesh##dimension##D::* )( const PolygonEdge& )    \
+                    const )                                                    \
+                & SurfaceMesh##dimension##D::edge_length )                     \
+        .def( "edge_length", ( double ( SurfaceMesh##dimension##D::* )(        \
+                                 const std::array< index_t, 2 >& ) const )     \
+                                 & SurfaceMesh##dimension##D::edge_length )    \
+        .def( "polygon_edge_barycenter",                                       \
+            ( Point< dimension >( SurfaceMesh##dimension##D::* )(              \
+                const PolygonEdge& ) const )                                   \
+                & SurfaceMesh##dimension##D::edge_barycenter )                 \
+        .def( "edge_barycenter",                                               \
+            ( Point< dimension >( SurfaceMesh##dimension##D::* )(              \
+                const std::array< index_t, 2 >& ) const )                      \
+                & SurfaceMesh##dimension##D::edge_barycenter )                 \
         .def( "polygon_barycenter",                                            \
             &SurfaceMesh##dimension##D::polygon_barycenter )                   \
         .def( "polygon_area", &SurfaceMesh##dimension##D::polygon_area )       \
@@ -72,11 +91,6 @@
             &SurfaceMesh##dimension##D::polygons_around_vertex )               \
         .def( "polygon_edge_from_vertices",                                    \
             &SurfaceMesh##dimension##D::polygon_edge_from_vertices )           \
-        .def( "edge_from_vertices",                                            \
-            &SurfaceMesh##dimension##D::edge_from_vertices )                   \
-        .def( "edge_attribute_manager",                                        \
-            &SurfaceMesh##dimension##D::edge_attribute_manager,                \
-            pybind11::return_value_policy::reference )                         \
         .def( "polygon_attribute_manager",                                     \
             &SurfaceMesh##dimension##D::polygon_attribute_manager,             \
             pybind11::return_value_policy::reference )                         \

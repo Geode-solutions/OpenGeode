@@ -26,7 +26,7 @@
 #include <geode/basic/attribute_manager.h>
 
 #include <geode/mesh/builder/surface_mesh_builder.h>
-#include <geode/mesh/core/detail/edges_view_impl.h>
+#include <geode/mesh/core/detail/points_view_impl.h>
 #include <geode/mesh/core/surface_mesh.h>
 
 namespace geode
@@ -34,13 +34,13 @@ namespace geode
     namespace detail
     {
         template < index_t dimension >
-        class SurfaceMeshViewImpl : public detail::EdgesViewImpl< dimension,
+        class SurfaceMeshViewImpl : public detail::PointsViewImpl< dimension,
                                         SurfaceMesh< dimension > >
         {
         public:
             SurfaceMeshViewImpl( SurfaceMesh< dimension >& surface_view,
                 const SurfaceMesh< dimension >& surface )
-                : detail::EdgesViewImpl< dimension, SurfaceMesh< dimension > >(
+                : detail::PointsViewImpl< dimension, SurfaceMesh< dimension > >(
                     surface_view, surface ),
                   surface_( surface ),
                   surface_view_( surface_view ),
@@ -95,40 +95,12 @@ namespace geode
                 return absl::nullopt;
             }
 
-            bool get_isolated_edge( index_t edge_id ) const
-            {
-                const auto& vertices = surface_view_.edge_vertices( edge_id );
-                for( const auto& polygon_vertex :
-                    surface_view_.polygons_around_vertex( vertices[0] ) )
-                {
-                    const auto polygon = polygon_vertex.polygon_id;
-                    for( const auto& v :
-                        Range{ surface_view_.nb_polygon_vertices( polygon ) } )
-                    {
-                        if( surface_view_.polygon_vertex(
-                                surface_view_.next_polygon_vertex(
-                                    { polygon, v } ) )
-                            == vertices[1] )
-                        {
-                            return false;
-                        }
-                        if( surface_view_.polygon_vertex(
-                                surface_view_.previous_polygon_vertex(
-                                    { polygon, v } ) )
-                            == vertices[1] )
-                        {
-                            return false;
-                        }
-                    }
-                }
-                return true;
-            }
-
             absl::optional< index_t > get_polygon_adjacent(
                 const PolygonEdge& polygon_edge ) const
             {
                 if( const auto adj = surface_.polygon_adjacent(
-                        viewed_polygon_edge( polygon_edge ) ) )
+                        { viewed_polygon( polygon_edge.polygon_id ),
+                            polygon_edge.edge_id } ) )
                 {
                     const auto it = polygons2view_.find( adj.value() );
                     if( it != polygons2view_.end() )
@@ -137,13 +109,6 @@ namespace geode
                     }
                 }
                 return absl::nullopt;
-            }
-
-            index_t get_polygon_edge( const PolygonEdge& polygon_edge ) const
-            {
-                const auto viewed_edge = surface_.polygon_edge(
-                    viewed_polygon_edge( polygon_edge ) );
-                return this->edge_in_view( viewed_edge );
             }
 
             index_t viewed_polygon( index_t polygon_id ) const
@@ -167,13 +132,6 @@ namespace geode
                         this->add_viewed_vertex(
                             surface_.polygon_vertex( { polygon_id, v } ) );
                     }
-
-                    for( const auto e :
-                        Range{ surface_.nb_polygon_edges( polygon_id ) } )
-                    {
-                        this->add_viewed_edge(
-                            surface_.polygon_edge( { polygon_id, e } ) );
-                    }
                 }
                 return polygons2view_.at( polygon_id );
             }
@@ -184,13 +142,6 @@ namespace geode
             {
                 return { viewed_polygon( polygon_vertex.polygon_id ),
                     polygon_vertex.vertex_id };
-            }
-
-            PolygonEdge viewed_polygon_edge(
-                const PolygonEdge& polygon_edge ) const
-            {
-                return { viewed_polygon( polygon_edge.polygon_id ),
-                    polygon_edge.edge_id };
             }
 
         private:

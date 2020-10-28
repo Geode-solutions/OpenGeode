@@ -121,41 +121,11 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t PolygonalSurfaceView< dimension >::get_polygon_edge(
-        const PolygonEdge& polygon_edge ) const
-    {
-        return impl_->get_polygon_edge( polygon_edge );
-    }
-
-    template < index_t dimension >
-    const std::array< index_t, 2 >&
-        PolygonalSurfaceView< dimension >::get_edge_vertices(
-            index_t edge_id ) const
-    {
-        return impl_->get_edge_vertices( edge_id );
-    }
-
-    template < index_t dimension >
     absl::optional< PolygonVertex >
         PolygonalSurfaceView< dimension >::get_polygon_around_vertex(
             index_t vertex_id ) const
     {
         return impl_->get_polygon_around_vertex( vertex_id );
-    }
-
-    template < index_t dimension >
-    bool PolygonalSurfaceView< dimension >::get_isolated_edge(
-        index_t edge_id ) const
-    {
-        return impl_->get_isolated_edge( edge_id );
-    }
-
-    template < index_t dimension >
-    absl::optional< index_t >
-        PolygonalSurfaceView< dimension >::get_edge_from_vertices(
-            const std::array< index_t, 2 >& vertices ) const
-    {
-        return impl_->get_edge_from_vertices( vertices );
     }
 
     template class opengeode_mesh_api PolygonalSurfaceView< 2 >;

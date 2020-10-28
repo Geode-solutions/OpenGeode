@@ -51,14 +51,8 @@
             &SurfaceMeshBuilder##dimension##D::delete_polygons )               \
         .def( "delete_isolated_vertices",                                      \
             &SurfaceMeshBuilder##dimension##D::delete_isolated_vertices )      \
-        .def( "delete_isolated_edges",                                         \
-            &SurfaceMeshBuilder##dimension##D::delete_isolated_edges )         \
-        .def( "associate_polygon_vertex_to_vertex",                            \
-            &SurfaceMeshBuilder##dimension##D::                                \
-                associate_polygon_vertex_to_vertex )                           \
-        .def( "disassociate_polygon_vertex_to_vertex",                         \
-            &SurfaceMeshBuilder##dimension##D::                                \
-                disassociate_polygon_vertex_to_vertex )
+        .def( "edges_builder",                                                 \
+            &SurfaceMeshBuilder##dimension##D::edges_builder )
 
 namespace geode
 {

@@ -27,7 +27,9 @@
 #include <geode/geometry/point.h>
 
 #include <geode/mesh/builder/geode_triangulated_surface_builder.h>
+#include <geode/mesh/builder/surface_edges_builder.h>
 #include <geode/mesh/core/geode_triangulated_surface.h>
+#include <geode/mesh/core/surface_edges.h>
 #include <geode/mesh/io/triangulated_surface_input.h>
 #include <geode/mesh/io/triangulated_surface_output.h>
 
@@ -56,8 +58,8 @@ void test_create_polygons( const geode::TriangulatedSurface3D& surface,
     builder.set_polygon_vertex( { 0, 0 }, 0 );
     builder.set_polygon_vertex( { 0, 1 }, 1 );
     builder.set_polygon_vertex( { 0, 2 }, 2 );
-    builder.delete_isolated_edges();
-    OPENGEODE_EXCEPTION( surface.nb_edges() == 7,
+    builder.edges_builder().delete_isolated_edges();
+    OPENGEODE_EXCEPTION( surface.edges().nb_edges() == 7,
         "[Test] TriangulatedSurface should have 7 edges" );
 }
 
@@ -96,7 +98,7 @@ void test_delete_vertex( const geode::TriangulatedSurface3D& surface,
         "[Test] TriangulatedSurface should have 2 polygons" );
     OPENGEODE_EXCEPTION( surface.polygon_adjacent( { 1, 2 } ) == 0,
         "[Test] TriangulatedSurface adjacent index is not correct" );
-    OPENGEODE_EXCEPTION( surface.nb_edges() == 5,
+    OPENGEODE_EXCEPTION( surface.edges().nb_edges() == 5,
         "[Test] TriangulatedSurface should have 5 edges" );
 }
 
@@ -114,7 +116,7 @@ void test_delete_polygon( const geode::TriangulatedSurface3D& surface,
         "[Test] TriangulatedSurface edge vertex index is not correct" );
     OPENGEODE_EXCEPTION( surface.polygon_vertex( { 0, 2 } ) == 1,
         "[Test] TriangulatedSurface edge vertex index is not correct" );
-    OPENGEODE_EXCEPTION( surface.nb_edges() == 3,
+    OPENGEODE_EXCEPTION( surface.edges().nb_edges() == 3,
         "[Test] TriangulatedSurface should have 3 edges" );
 }
 
@@ -129,24 +131,25 @@ void test_io(
 
 void test_clone( const geode::TriangulatedSurface3D& surface )
 {
-    auto attr_from = surface.edge_attribute_manager()
+    auto attr_from = surface.edges()
+                         .edge_attribute_manager()
                          .find_or_create_attribute< geode::VariableAttribute,
                              geode::index_t >( "edge_id", 0 );
-    for( const auto e : geode::Range{ surface.nb_edges() } )
+    for( const auto e : geode::Range{ surface.edges().nb_edges() } )
     {
         attr_from->set_value( e, e );
     }
     auto surface2 = surface.clone();
     OPENGEODE_EXCEPTION( surface2->nb_vertices() == 4,
         "[Test] TriangulatedSurface2 should have 4 vertices" );
-    OPENGEODE_EXCEPTION( surface2->nb_edges() == 3,
+    OPENGEODE_EXCEPTION( surface2->edges().nb_edges() == 3,
         "[Test] TriangulatedSurface2 should have 3 edges" );
     OPENGEODE_EXCEPTION( surface2->nb_polygons() == 1,
         "[Test] TriangulatedSurface2 should have 1 polygon" );
-    auto attr_to =
-        surface2->edge_attribute_manager().find_attribute< geode::index_t >(
-            "edge_id" );
-    for( const auto e : geode::Range{ surface.nb_edges() } )
+    auto attr_to = surface2->edges()
+                       .edge_attribute_manager()
+                       .find_attribute< geode::index_t >( "edge_id" );
+    for( const auto e : geode::Range{ surface.edges().nb_edges() } )
     {
         OPENGEODE_EXCEPTION( attr_from->value( e ) == attr_to->value( e ),
             "[Test] Error in edge attribute transfer during cloning" );
@@ -159,7 +162,7 @@ void test_delete_all( const geode::TriangulatedSurface3D& triangulated_surface,
     builder.delete_isolated_vertices();
     OPENGEODE_EXCEPTION( triangulated_surface.nb_vertices() == 3,
         "[Test]TriangulatedSurface should have 3 vertices" );
-    OPENGEODE_EXCEPTION( triangulated_surface.nb_edges() == 3,
+    OPENGEODE_EXCEPTION( triangulated_surface.edges().nb_edges() == 3,
         "[Test]TriangulatedSurface should have 3 edges" );
     OPENGEODE_EXCEPTION( triangulated_surface.nb_polygons() == 1,
         "[Test]TriangulatedSurface should have 1 polygon" );
@@ -168,7 +171,7 @@ void test_delete_all( const geode::TriangulatedSurface3D& triangulated_surface,
     builder.delete_polygons( to_delete );
     OPENGEODE_EXCEPTION( triangulated_surface.nb_vertices() == 3,
         "[Test]TriangulatedSurface should have 3 vertices" );
-    OPENGEODE_EXCEPTION( triangulated_surface.nb_edges() == 0,
+    OPENGEODE_EXCEPTION( triangulated_surface.edges().nb_edges() == 0,
         "[Test]TriangulatedSurface should have 0 edge" );
     OPENGEODE_EXCEPTION( triangulated_surface.nb_polygons() == 0,
         "[Test]TriangulatedSurface should have 0 polygon" );
@@ -185,6 +188,7 @@ void test()
 {
     auto surface = geode::TriangulatedSurface3D::create(
         geode::OpenGeodeTriangulatedSurface3D::impl_name_static() );
+    surface->enable_edges();
     auto builder = geode::TriangulatedSurfaceBuilder3D::create( *surface );
 
     test_create_vertices( *surface, *builder );

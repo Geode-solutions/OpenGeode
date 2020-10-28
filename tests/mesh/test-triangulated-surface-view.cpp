@@ -67,8 +67,6 @@ void test_create_viewed_polygons(
         "[Test] TriangulatedSurfaceView should have 2 polygons" );
     OPENGEODE_EXCEPTION( surface.nb_vertices() == 4,
         "[Test] TriangulatedSurfaceView should have 4 vertices" );
-    OPENGEODE_EXCEPTION( surface.nb_edges() == 5,
-        "[Test] TriangulatedSurfaceView should have 5 edges" );
     OPENGEODE_EXCEPTION( surface.viewed_triangle( 0 ) == 1,
         "[Test] TriangulatedSurfaceView triangle is not correct" );
 
@@ -89,9 +87,6 @@ void test_create_polygons( const geode::TriangulatedSurface3D& surface,
     builder.set_polygon_vertex( { 0, 0 }, 0 );
     builder.set_polygon_vertex( { 0, 1 }, 1 );
     builder.set_polygon_vertex( { 0, 2 }, 2 );
-    builder.delete_isolated_edges();
-    OPENGEODE_EXCEPTION( surface.nb_edges() == 7,
-        "[Test] TriangulatedSurface should have 7 edges" );
 }
 
 void test_polygon_adjacencies( const geode::TriangulatedSurface3D& surface )

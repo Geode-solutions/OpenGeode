@@ -26,7 +26,7 @@
 #include <geode/basic/attribute_manager.h>
 
 #include <geode/mesh/builder/solid_mesh_builder.h>
-#include <geode/mesh/core/detail/edges_view_impl.h>
+#include <geode/mesh/core/detail/points_view_impl.h>
 #include <geode/mesh/core/detail/vertex_cycle.h>
 #include <geode/mesh/core/solid_mesh.h>
 
@@ -36,12 +36,12 @@ namespace geode
     {
         template < index_t dimension >
         class SolidMeshViewImpl
-            : public detail::EdgesViewImpl< dimension, SolidMesh< dimension > >
+            : public detail::PointsViewImpl< dimension, SolidMesh< dimension > >
         {
         public:
             SolidMeshViewImpl( SolidMesh< dimension >& solid_view,
                 const SolidMesh< dimension >& solid )
-                : detail::EdgesViewImpl< dimension, SolidMesh< dimension > >(
+                : detail::PointsViewImpl< dimension, SolidMesh< dimension > >(
                     solid_view, solid ),
                   solid_( solid ),
                   solid_view_( solid_view ),
@@ -318,26 +318,6 @@ namespace geode
                     {
                         this->add_viewed_vertex(
                             solid_.polyhedron_vertex( { polyhedron_id, v } ) );
-                    }
-
-                    for( const auto f :
-                        Range{ solid_.nb_polyhedron_facets( polyhedron_id ) } )
-                    {
-                        PolyhedronFacet facet{ polyhedron_id, f };
-                        this->add_viewed_facet(
-                            solid_.polyhedron_facet( facet ) );
-                        const auto nb_vertices =
-                            solid_.nb_polyhedron_facet_vertices( facet );
-                        for( const auto v : Range{ nb_vertices } )
-                        {
-                            const auto v0 =
-                                solid_.polyhedron_facet_vertex( { facet, v } );
-                            const auto v1 = solid_.polyhedron_facet_vertex(
-                                { facet, ( v + 1 ) % nb_vertices } );
-                            this->add_viewed_edge(
-                                solid_.edge_from_vertices( { { v0, v1 } } )
-                                    .value() );
-                        }
                     }
                 }
                 return polyhedra2view_.at( polyhedron_id );
