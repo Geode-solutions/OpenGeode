@@ -450,7 +450,7 @@ namespace geode
                     }
                 }
             }
-            edges.remove_isolated_edges();
+            edges.delete_isolated_edges();
         }
         const auto old2new = detail::mapping_after_deletion( to_delete );
         for( const auto v : Range{ surface_mesh_->nb_vertices() } )
