@@ -102,19 +102,8 @@ namespace geode
         absl::optional< index_t > get_polygon_adjacent(
             const PolygonEdge& polygon_edge ) const override;
 
-        index_t get_polygon_edge(
-            const PolygonEdge& polygon_edge ) const override;
-
-        const std::array< index_t, 2 >& get_edge_vertices(
-            index_t edge_id ) const override;
-
         absl::optional< PolygonVertex > get_polygon_around_vertex(
             index_t vertex_id ) const override;
-
-        bool get_isolated_edge( index_t edge_id ) const override;
-
-        absl::optional< index_t > get_edge_from_vertices(
-            const std::array< index_t, 2 >& vertices ) const override;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

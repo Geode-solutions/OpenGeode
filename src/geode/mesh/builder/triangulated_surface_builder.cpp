@@ -28,6 +28,7 @@
 #include <geode/basic/attribute_manager.h>
 
 #include <geode/mesh/builder/mesh_builder_factory.h>
+#include <geode/mesh/builder/surface_edges_builder.h>
 #include <geode/mesh/core/triangulated_surface.h>
 
 namespace geode
@@ -74,11 +75,15 @@ namespace geode
             this->associate_polygon_vertex_to_vertex(
                 { added_triangle, vertex_id++ }, vertex );
         }
-        for( const auto e : Range{ vertices.size() - 1 } )
+        if( triangulated_surface_->are_edges_enabled() )
         {
-            this->find_or_create_edge( { vertices[e], vertices[e + 1] } );
+            auto edges = this->edges_builder();
+            for( const auto e : Range{ vertices.size() - 1 } )
+            {
+                edges.find_or_create_edge( { vertices[e], vertices[e + 1] } );
+            }
+            edges.find_or_create_edge( { vertices.back(), vertices.front() } );
         }
-        this->find_or_create_edge( { vertices.back(), vertices.front() } );
         do_create_triangle( vertices );
         return added_triangle;
     }
