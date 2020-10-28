@@ -70,16 +70,8 @@ namespace geode
             {
                 for( const auto e : Range{ surface.nb_polygon_edges( p ) } )
                 {
-                    const PolygonEdge edge{ p, e };
-                    auto vertices = surface.polygon_edge_vertices( edge );
-                    if( surface.is_edge_on_border( edge ) )
-                    {
-                        find_or_create_edge( std::move( vertices ) );
-                    }
-                    else if( vertices.front() < vertices.back() )
-                    {
-                        find_or_create_edge( std::move( vertices ) );
-                    }
+                    find_or_create_edge(
+                        surface.polygon_edge_vertices( { p, e } ) );
                 }
             }
         }

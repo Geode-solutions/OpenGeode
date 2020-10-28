@@ -58,9 +58,6 @@ void test_create_polygons( const geode::TriangulatedSurface3D& surface,
     builder.set_polygon_vertex( { 0, 0 }, 0 );
     builder.set_polygon_vertex( { 0, 1 }, 1 );
     builder.set_polygon_vertex( { 0, 2 }, 2 );
-    builder.edges_builder().delete_isolated_edges();
-    OPENGEODE_EXCEPTION( surface.edges().nb_edges() == 7,
-        "[Test] TriangulatedSurface should have 7 edges" );
 }
 
 void test_polygon_adjacencies( const geode::TriangulatedSurface3D& surface,
@@ -81,6 +78,10 @@ void test_polygon_adjacencies( const geode::TriangulatedSurface3D& surface,
         "[Test] TriangulatedSurface adjacent index is not correct" );
     OPENGEODE_EXCEPTION( !surface.polygon_adjacent( { 2, 0 } ),
         "[Test] TriangulatedSurface adjacent index is not correct" );
+
+    surface.enable_edges();
+    OPENGEODE_EXCEPTION( surface.edges().nb_edges() == 7,
+        "[Test] TriangulatedSurface should have 7 edges" );
 }
 
 void test_delete_vertex( const geode::TriangulatedSurface3D& surface,
@@ -188,7 +189,6 @@ void test()
 {
     auto surface = geode::TriangulatedSurface3D::create(
         geode::OpenGeodeTriangulatedSurface3D::impl_name_static() );
-    surface->enable_edges();
     auto builder = geode::TriangulatedSurfaceBuilder3D::create( *surface );
 
     test_create_vertices( *surface, *builder );
