@@ -60,12 +60,6 @@ void test_create_tetrahedra( const geode::TetrahedralSolid3D& solid,
     builder.set_polyhedron_vertex( { 0, 1 }, 1 );
     builder.set_polyhedron_vertex( { 0, 2 }, 2 );
     builder.set_polyhedron_vertex( { 0, 3 }, 3 );
-    builder.delete_isolated_edges();
-    builder.delete_isolated_facets();
-    OPENGEODE_EXCEPTION( solid.nb_facets() == 10,
-        "[Test] TetrahedralSolid should have 10 facets" );
-    OPENGEODE_EXCEPTION( solid.nb_edges() == 12,
-        "[Test] TetrahedralSolid should have 12 edges" );
 }
 
 void test_create_viewed_vertices( const geode::TetrahedralSolid3D& solid,
@@ -89,18 +83,12 @@ void test_create_viewed_tetrahedra( const geode::TetrahedralSolidView3D& solid,
         "[Test] TetrahedralSolidView should have 2 polyhedra" );
     OPENGEODE_EXCEPTION( solid.nb_vertices() == 5,
         "[Test] TetrahedralSolidView should have 5 vertices" );
-    OPENGEODE_EXCEPTION( solid.nb_edges() == 9,
-        "[Test] TetrahedralSolidView should have 9 edges" );
-    OPENGEODE_EXCEPTION( solid.nb_facets() == 7,
-        "[Test] TetrahedralSolidView should have 7 facets" );
     OPENGEODE_EXCEPTION( solid.viewed_tetrahedron( 0 ) == 1,
         "[Test] TetrahedralSolidView tetrahedron is not correct" );
     OPENGEODE_EXCEPTION( solid.viewed_vertex( 2 ) == 1,
         "[Test] TetrahedralSolidView vertex is not correct" );
     OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 0, 0 } ) == 2,
         "[Test] TetrahedralSolidView polyhedron vertex is not correct" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_facet( { 0, 0 } ) == 0,
-        "[Test] TetrahedralSolidView polyhedron facet is not correct" );
 }
 
 void test_isolated( const geode::TetrahedralSolid3D& solid,
@@ -108,10 +96,6 @@ void test_isolated( const geode::TetrahedralSolid3D& solid,
 {
     OPENGEODE_EXCEPTION( !solid.isolated_vertex( 0 ),
         "[Test] TetrahedralSolidView isolated vertex is not correct" );
-    OPENGEODE_EXCEPTION( !solid.isolated_edge( 0 ),
-        "[Test] TetrahedralSolidView isolated edge is not correct" );
-    OPENGEODE_EXCEPTION( !solid.isolated_facet( 0 ),
-        "[Test] TetrahedralSolidView isolated facet is not correct" );
     builder.add_viewed_vertex( 0 );
     OPENGEODE_EXCEPTION( solid.isolated_vertex( 5 ),
         "[Test] TetrahedralSolidView isolated vertex is not correct" );

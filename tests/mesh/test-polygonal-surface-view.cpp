@@ -72,8 +72,6 @@ void test_create_viewed_polygons( const geode::PolygonalSurfaceView3D& surface,
         "[Test] PolygonalSurfaceView should have 2 polygons" );
     OPENGEODE_EXCEPTION( surface.nb_vertices() == 6,
         "[Test] PolygonalSurfaceView should have 6 vertices" );
-    OPENGEODE_EXCEPTION( surface.nb_edges() == 7,
-        "[Test] PolygonalSurfaceView should have 7 edges" );
     OPENGEODE_EXCEPTION( surface.viewed_polygon( 0 ) == 1,
         "[Test] PolygonalSurfaceView polygon is not correct" );
 
@@ -81,9 +79,6 @@ void test_create_viewed_polygons( const geode::PolygonalSurfaceView3D& surface,
         "[Test] PolygonalSurfaceView PolygonVertex is not correct" );
     OPENGEODE_EXCEPTION( surface.polygon_vertex( { 1, 1 } ) == 4,
         "[Test] PolygonalSurfaceView PolygonVertex is not correct" );
-
-    OPENGEODE_EXCEPTION( !surface.isolated_edge( 4 ),
-        "[Test]  PolygonalSurfaceView isolated edge is not correct" );
 }
 
 void test_create_polygons( const geode::PolygonalSurface3D& polygonal_surface,
@@ -96,8 +91,6 @@ void test_create_polygons( const geode::PolygonalSurface3D& polygonal_surface,
         "[Test] Vertices should not be isolated after polygons creation" );
     OPENGEODE_EXCEPTION( polygonal_surface.nb_polygons() == 3,
         "[Test] PolygonalSurface should have 3 polygons" );
-    OPENGEODE_EXCEPTION( polygonal_surface.nb_edges() == 9,
-        "[Test] PolygonalSurface should have 9 edges" );
 }
 
 void test_polygon_adjacencies(

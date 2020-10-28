@@ -124,14 +124,8 @@ namespace geode
         const PolyhedronFacetVertices& get_facet_vertices(
             index_t facet_id ) const override;
 
-        const std::array< index_t, 2 >& get_edge_vertices(
-            index_t edge_id ) const override;
-
         absl::optional< index_t > get_facet_from_vertices(
             const PolyhedronFacetVertices& vertices ) const override;
-
-        absl::optional< index_t > get_edge_from_vertices(
-            const std::array< index_t, 2 >& vertices ) const override;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

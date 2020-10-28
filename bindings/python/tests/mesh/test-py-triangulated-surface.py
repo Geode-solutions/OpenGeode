@@ -43,7 +43,7 @@ def test_create_polygons(  surface, builder ):
     builder.create_polygon( [ 3, 4, 2 ] )
     if surface.nb_polygons() != 3:
         raise ValueError( "[Test] TriangulatedSurface should have 3 triangles" )
-    if surface.nb_edges() != 7:
+    if surface.edges().nb_edges() != 7:
         raise ValueError( "[Test] TriangulatedSurface should have 7 edges" )
 
 def test_polygon_adjacencies( surface, builder ):
@@ -75,7 +75,7 @@ def test_delete_vertex( surface, builder ):
         raise ValueError( "[Test] TriangulatedSurface should have 2 polygons" )
     if surface.polygon_adjacent( mesh.PolygonEdge( 1, 2 ) ) != 0:
         raise ValueError( "[Test] TriangulatedSurface adjacent index is not correct" )
-    if surface.nb_edges() != 5:
+    if surface.edges().nb_edges() != 5:
         raise ValueError( "[Test] TriangulatedSurface should have 5 edges" )
 
 def test_delete_polygon( surface, builder ):
@@ -90,7 +90,7 @@ def test_delete_polygon( surface, builder ):
         raise ValueError( "[Test] TriangulatedSurface edge vertex index is not correct" )
     if surface.polygon_vertex( mesh.PolygonVertex( 0, 2 ) ) != 1:
         raise ValueError( "[Test] TriangulatedSurface edge vertex index is not correct" )
-    if surface.nb_edges() != 3:
+    if surface.edges().nb_edges() != 3:
         raise ValueError( "[Test] TriangulatedSurface should have 3 edges" )
 
 def test_io( surface, filename ):
@@ -101,7 +101,7 @@ def test_clone( surface ):
     surface2 = surface.clone()
     if surface2.nb_vertices() != 4:
         raise ValueError( "[Test] TriangulatedSurface2 should have 4 vertices" )
-    if surface2.nb_edges() != 3:
+    if surface2.edges().nb_edges() != 3:
         raise ValueError( "[Test] TriangulatedSurface2 should have 3 edges" )
     if surface2.nb_polygons() != 1:
         raise ValueError( "[Test] TriangulatedSurface2 should have 1 polygon" )
@@ -110,7 +110,7 @@ def test_delete_all( triangulated_surface, builder ):
     builder.delete_isolated_vertices()
     if triangulated_surface.nb_vertices() != 3:
         raise ValueError( "[Test]TriangulatedSurface should have 3 vertices" )
-    if triangulated_surface.nb_edges() != 3:
+    if triangulated_surface.edges().nb_edges() != 3:
         raise ValueError( "[Test]TriangulatedSurface should have 3 edges" )
     if triangulated_surface.nb_polygons() != 1:
         raise ValueError( "[Test]TriangulatedSurface should have 1 polygon" )
@@ -119,7 +119,7 @@ def test_delete_all( triangulated_surface, builder ):
     builder.delete_polygons( to_delete )
     if triangulated_surface.nb_vertices() != 3:
         raise ValueError( "[Test]TriangulatedSurface should have 3 vertices" )
-    if triangulated_surface.nb_edges() != 0:
+    if triangulated_surface.edges().nb_edges() != 0:
         raise ValueError( "[Test]TriangulatedSurface should have 0 edge" )
     if triangulated_surface.nb_polygons() != 0:
         raise ValueError( "[Test]TriangulatedSurface should have 0 polygon" )
@@ -132,6 +132,7 @@ def test_delete_all( triangulated_surface, builder ):
 
 if __name__ == '__main__':
     surface = mesh.TriangulatedSurface3D.create()
+    surface.enable_edges()
     builder = mesh.TriangulatedSurfaceBuilder3D.create( surface )
     
     test_create_vertices( surface, builder )

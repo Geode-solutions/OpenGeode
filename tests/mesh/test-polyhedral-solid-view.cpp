@@ -71,10 +71,6 @@ void test_create_viewed_polyhedra(
         "[Test] PolyhedralSolidView should have 2 polyhedra" );
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_vertices() == 7,
         "[Test] PolyhedralSolidView should have 7 vertices" );
-    OPENGEODE_EXCEPTION( polyhedral_solid.nb_edges() == 12,
-        "[Test] PolyhedralSolidView should have 12 edges" );
-    OPENGEODE_EXCEPTION( polyhedral_solid.nb_facets() == 8,
-        "[Test] PolyhedralSolidView should have 8 facets" );
     OPENGEODE_EXCEPTION( polyhedral_solid.viewed_polyhedron( 1 ) == 2,
         "[Test] PolyhedralSolidView polyhedron is not correct" );
 
@@ -82,26 +78,6 @@ void test_create_viewed_polyhedra(
         "[Test] PolyhedralSolidView PolyhedronVertex is not correct" );
     OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_vertex( { 1, 3 } ) == 6,
         "[Test] PolyhedralSolidView PolyhedronVertex is not correct" );
-
-    const auto facet_id = polyhedral_solid.polyhedron_facet( { 1, 3 } );
-    OPENGEODE_EXCEPTION( facet_id == 1,
-        "[Test] PolyhedralSolidView PolyhedronFacet index is not correct" );
-    const auto& facet_vertices = polyhedral_solid.facet_vertices( facet_id );
-    OPENGEODE_EXCEPTION( facet_vertices.size() == 3,
-        "[Test] PolyhedralSolidView PolyhedronVertex is not correct" );
-    OPENGEODE_EXCEPTION( facet_vertices[0] == 3 && facet_vertices[1] == 4
-                             && facet_vertices[2] == 5,
-        "[Test] PolyhedralSolidView facet vertices are not correct" );
-    OPENGEODE_EXCEPTION(
-        polyhedral_solid.facet_from_vertices( facet_vertices ) == 1,
-        "[Test] PolyhedralSolidView facet from vertices is not correct" );
-    OPENGEODE_EXCEPTION( !polyhedral_solid.facet_from_vertices( { 1, 3, 0 } ),
-        "[Test] PolyhedralSolidView facet from vertices is not correct" );
-
-    OPENGEODE_EXCEPTION( !polyhedral_solid.isolated_edge( 4 ),
-        "[Test] PolyhedralSolidView isolated edge is not correct" );
-    OPENGEODE_EXCEPTION( !polyhedral_solid.isolated_facet( 4 ),
-        "[Test] PolyhedralSolidView isolated facet is not correct" );
 }
 
 void test_create_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
@@ -116,16 +92,8 @@ void test_create_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
         { { 1, 3, 2 }, { 0, 2, 3 }, { 3, 1, 0 }, { 0, 1, 2 } } );
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_polyhedra() == 3,
         "[Test] PolyhedralSolid should have 3 polyhedra" );
-    OPENGEODE_EXCEPTION( polyhedral_solid.nb_facets() == 11,
-        "[Test] PolyhedralSolid should have 11 facets" );
-    OPENGEODE_EXCEPTION( polyhedral_solid.nb_edges() == 15,
-        "[Test] PolyhedralSolid should have 15 edges" );
     OPENGEODE_EXCEPTION( !polyhedral_solid.isolated_vertex( 0 ),
         "[Test] Vertices should not be isolated after polyhedra creation" );
-
-    OPENGEODE_EXCEPTION(
-        polyhedral_solid.polyhedron_facet_edge( { { 0, 1 }, 2 } ) == 4,
-        "[Test] Wrong edge index get from PolyhedronFacetEdge" );
 }
 
 void test_polyhedron_adjacencies(

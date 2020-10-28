@@ -37,6 +37,7 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
     FORWARD_DECLARATION_DIMENSION_CLASS( Vector );
     FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
+    FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceEdges );
     FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMeshBuilder );
 
     ALIAS_2D_AND_3D( Vector );
@@ -148,13 +149,9 @@ namespace geode
 
         const Point< dimension >& point( index_t vertex_id ) const;
 
-        index_t nb_edges() const;
-
         index_t nb_polygons() const;
 
         bool isolated_vertex( index_t vertex_id ) const;
-
-        bool isolated_edge( index_t edge_id ) const;
 
         /*!
          * Return the number of vertices in a polygon
@@ -173,12 +170,6 @@ namespace geode
         index_t polygon_vertex( const PolygonVertex& polygon_vertex ) const;
 
         /*!
-         * Return the index in the mesh of a local edge in a polygon
-         * @param[in] polygon_edge Local index of edge in polygon
-         */
-        index_t polygon_edge( const PolygonEdge& polygon_edge ) const;
-
-        /*!
          * Return the index in the mesh of a given polygon edge vertex.
          * @param[in] polygon_edge Local index of edge in a polygon.
          * @param[in] vertex_id Local index of vertex in the edge (0 or 1).
@@ -187,10 +178,11 @@ namespace geode
             const PolygonEdge& polygon_edge, index_t vertex_id ) const;
 
         /*!
-         * Return the indices of edge vertices.
-         * @param[in] edge_id Index of an edge.
+         * Return the indices in the mesh of the two polygon edge vertices.
+         * @param[in] polygon_edge Local index of edge in a polygon.
          */
-        const std::array< index_t, 2 >& edge_vertices( index_t edge_id ) const;
+        std::array< index_t, 2 > polygon_edge_vertices(
+            const PolygonEdge& polygon_edge ) const;
 
         /*!
          * Return the next vertex in a polygon (local indexation)
@@ -266,15 +258,20 @@ namespace geode
 
         /*!
          * Return the length of a given edge.
-         * @param[in] edge_id Index of edge.
+         * @param[in] polygon_edge Local index of edge in a polygon.
          */
-        double edge_length( index_t edge_id ) const;
+        double edge_length( const PolygonEdge& polygon_edge ) const;
+        double edge_length(
+            const std::array< index_t, 2 >& polygon_edge_vertices ) const;
 
         /*!
          * Return the coordinates of the barycenter of a given edge.
-         * @param[in] edge_id Index of edge.
+         * @param[in] polygon_edge Local index of edge in a polygon.
          */
-        Point< dimension > edge_barycenter( index_t edge_id ) const;
+        Point< dimension > edge_barycenter(
+            const PolygonEdge& polygon_edge ) const;
+        Point< dimension > edge_barycenter(
+            const std::array< index_t, 2 >& polygon_edge_vertices ) const;
 
         /*!
          * Return the barycenter of a polygon
@@ -321,17 +318,13 @@ namespace geode
         absl::optional< PolygonEdge > polygon_edge_from_vertices(
             index_t from_vertex_id, index_t to_vertex_id ) const;
 
-        /*!
-         * Get the index of edge corresponding to given vertices
-         * @param[in] vertices Ordered vertex indices
-         */
-        absl::optional< index_t > edge_from_vertices(
-            const std::array< index_t, 2 >& vertices ) const;
+        bool are_edges_enabled() const;
 
-        /*!
-         * Access to the manager of attributes associated with edges.
-         */
-        AttributeManager& edge_attribute_manager() const;
+        void enable_edges() const;
+
+        void disable_edges() const;
+
+        const SurfaceEdges< dimension >& edges() const;
 
         /*!
          * Access to the manager of attributes associated with polygons.
@@ -355,35 +348,10 @@ namespace geode
             index_t vertex_id,
             SurfaceMeshKey );
 
-        void update_edge_vertices(
-            absl::Span< const index_t > old2new, SurfaceMeshKey );
-
-        void update_edge_vertex( std::array< index_t, 2 > edge_vertices,
-            index_t edge_vertex_id,
-            index_t new_vertex_id,
-            SurfaceMeshKey );
-
-        void remove_edge(
-            std::array< index_t, 2 > edge_vertices, SurfaceMeshKey );
-
-        std::vector< index_t > delete_edges(
-            const std::vector< bool >& to_delete, SurfaceMeshKey );
-
-        std::vector< index_t > remove_isolated_edges( SurfaceMeshKey );
-
-        index_t find_or_create_edge(
-            std::array< index_t, 2 > edge_vertices, SurfaceMeshKey )
-        {
-            return find_or_create_edge( std::move( edge_vertices ) );
-        }
-
-        void overwrite_edges(
-            const SurfaceMesh< dimension >& from, SurfaceMeshKey );
+        SurfaceEdges< dimension >& edges( SurfaceMeshKey );
 
     protected:
         SurfaceMesh();
-
-        index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices );
 
     private:
         friend class bitsery::Access;
@@ -401,19 +369,8 @@ namespace geode
         virtual absl::optional< index_t > get_polygon_adjacent(
             const PolygonEdge& polygon_edge ) const = 0;
 
-        virtual index_t get_polygon_edge(
-            const PolygonEdge& polygon_edge ) const;
-
-        virtual const std::array< index_t, 2 >& get_edge_vertices(
-            index_t edge_id ) const;
-
         virtual absl::optional< PolygonVertex > get_polygon_around_vertex(
             index_t vertex_id ) const;
-
-        virtual bool get_isolated_edge( index_t edge_id ) const;
-
-        virtual absl::optional< index_t > get_edge_from_vertices(
-            const std::array< index_t, 2 >& vertices ) const;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

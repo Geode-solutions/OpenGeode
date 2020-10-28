@@ -36,6 +36,7 @@ namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
     FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMesh );
+    FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceEdgesBuilder );
 
     struct PolygonEdge;
     struct PolygonVertex;
@@ -58,6 +59,8 @@ namespace geode
          */
         static std::unique_ptr< SurfaceMeshBuilder< dimension > > create(
             SurfaceMesh< dimension >& mesh );
+
+        SurfaceEdgesBuilder< dimension > edges_builder();
 
         /*!
          * Set coordinates to a vertex. This vertex should be created before.
@@ -144,13 +147,6 @@ namespace geode
         std::vector< index_t > delete_isolated_vertices();
 
         /*!
-         * Delete all the isolated edges (not used as polygon edges)
-         * @return the mapping between old edge indices to new ones.
-         * Deleted edges new index is NO_ID
-         */
-        std::vector< index_t > delete_isolated_edges();
-
-        /*!
          * Set a polygon vertex to a given vertex.
          * @param[in] polygon_vertex PolygonVertex corresponding to the vertex.
          * @param[in] vertex_id Index of the vertex.
@@ -174,8 +170,6 @@ namespace geode
 
     protected:
         SurfaceMeshBuilder() = default;
-
-        index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices );
 
         void copy( const SurfaceMesh< dimension >& surface_mesh );
 
@@ -203,19 +197,10 @@ namespace geode
         virtual void do_unset_polygon_adjacent(
             const PolygonEdge& polygon_edge ) = 0;
 
-        std::vector< index_t > delete_edges(
-            const std::vector< bool >& to_delete );
-
         void update_polygon_vertex(
             const PolygonVertex& polygon_vertex, index_t vertex_id );
 
         void update_polygon_vertices( absl::Span< const index_t > old2new );
-
-        void update_edge_vertices( absl::Span< const index_t > old2new );
-
-        void update_edge_vertex( std::array< index_t, 2 > edge_vertices,
-            index_t edge_vertex_id,
-            index_t new_vertex_id );
 
     private:
         SurfaceMesh< dimension >* surface_mesh_;

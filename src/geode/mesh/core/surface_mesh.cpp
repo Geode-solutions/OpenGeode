@@ -40,6 +40,7 @@
 #include <geode/mesh/core/detail/facet_storage.h>
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polygonal_surface.h>
+#include <geode/mesh/core/surface_edges.h>
 
 namespace
 {
@@ -130,7 +131,6 @@ namespace geode
 
     template < index_t dimension >
     class SurfaceMesh< dimension >::Impl
-        : public detail::FacetStorage< std::array< index_t, 2 > >
     {
         friend class bitsery::Access;
 
@@ -161,73 +161,38 @@ namespace geode
             polygon_around_vertex_->set_value( vertex_id, polygon_vertex );
         }
 
-        absl::optional< index_t > find_edge(
-            const std::array< index_t, 2 >& edge_vertices ) const
+        bool are_edges_enabled() const
         {
-            return this->find_facet( edge_vertices );
+            return edges_.get() != nullptr;
         }
 
-        index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices )
+        void enable_edges( const SurfaceMesh< dimension >& surface ) const
         {
-            return this->add_facet( std::move( edge_vertices ) );
+            edges_.reset( new SurfaceEdges< dimension >{ surface } );
         }
 
-        const std::array< index_t, 2 >& get_edge_vertices(
-            const index_t edge_id ) const
+        void disable_edges() const
         {
-            return this->get_facet_vertices( edge_id );
+            edges_.reset();
         }
 
-        void update_edge_vertex( std::array< index_t, 2 > edge_vertices,
-            const index_t edge_vertex_id,
-            const index_t new_vertex_id )
+        const SurfaceEdges< dimension >& edges() const
         {
-            auto updated_edge_vertices = edge_vertices;
-            updated_edge_vertices[edge_vertex_id] = new_vertex_id;
-            this->add_facet( std::move( updated_edge_vertices ) );
-            this->remove_facet( std::move( edge_vertices ) );
+            OPENGEODE_EXCEPTION( are_edges_enabled(),
+                "[SurfaceMesh] Edges should be enabled before accessing them" );
+            return *edges_;
         }
 
-        void update_edge_vertices( absl::Span< const index_t > old2new )
+        SurfaceEdges< dimension >& edges()
         {
-            this->update_facet_vertices( old2new );
-        }
-
-        void remove_edge( std::array< index_t, 2 > edge_vertices )
-        {
-            this->remove_facet( std::move( edge_vertices ) );
-        }
-
-        std::vector< index_t > delete_edges(
-            const std::vector< bool >& to_delete )
-        {
-            return this->delete_facets( to_delete );
-        }
-
-        std::vector< index_t > remove_isolated_edges()
-        {
-            return this->clean_facets();
-        }
-
-        bool get_isolated_edge( index_t edge_id ) const
-        {
-            return this->get_counter( edge_id ) == 0;
+            OPENGEODE_EXCEPTION( are_edges_enabled(),
+                "[SurfaceMesh] Edges should be enabled before accessing them" );
+            return *edges_;
         }
 
         AttributeManager& polygon_attribute_manager() const
         {
             return polygon_attribute_manager_;
-        }
-
-        AttributeManager& edge_attribute_manager() const
-        {
-            return facet_attribute_manager();
-        }
-
-        void overwrite_edges(
-            const detail::FacetStorage< std::array< index_t, 2 > >& from )
-        {
-            this->overwrite( from );
         }
 
     private:
@@ -238,12 +203,10 @@ namespace geode
         {
             archive.ext( *this, DefaultGrowable< Archive, Impl >{},
                 []( Archive& archive, Impl& impl ) {
-                    archive.ext(
-                        impl, bitsery::ext::BaseClass< detail::FacetStorage<
-                                  std::array< index_t, 2 > > >{} );
                     archive.object( impl.polygon_attribute_manager_ );
                     archive.ext( impl.polygon_around_vertex_,
                         bitsery::ext::StdSmartPtr{} );
+                    archive.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
                 } );
         }
 
@@ -251,6 +214,7 @@ namespace geode
         mutable AttributeManager polygon_attribute_manager_;
         std::shared_ptr< VariableAttribute< PolygonVertex > >
             polygon_around_vertex_;
+        mutable std::unique_ptr< SurfaceEdges< dimension > > edges_;
     };
 
     template < index_t dimension >
@@ -289,26 +253,6 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t SurfaceMesh< dimension >::polygon_edge(
-        const PolygonEdge& polygon_edge ) const
-    {
-        check_polygon_id( *this, polygon_edge.polygon_id );
-        check_polygon_edge_id(
-            *this, polygon_edge.polygon_id, polygon_edge.edge_id );
-        return get_polygon_edge( polygon_edge );
-    }
-
-    template < index_t dimension >
-    index_t SurfaceMesh< dimension >::get_polygon_edge(
-        const PolygonEdge& polygon_edge ) const
-    {
-        return impl_
-            ->find_edge( { polygon_vertex( polygon_edge ),
-                polygon_edge_vertex( polygon_edge, 1 ) } )
-            .value();
-    }
-
-    template < index_t dimension >
     absl::optional< PolygonVertex >
         SurfaceMesh< dimension >::polygon_around_vertex(
             index_t vertex_id ) const
@@ -326,67 +270,6 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t SurfaceMesh< dimension >::find_or_create_edge(
-        std::array< index_t, 2 > edge_vertices )
-    {
-        return impl_->find_or_create_edge( std::move( edge_vertices ) );
-    }
-
-    template < index_t dimension >
-    const std::array< index_t, 2 >& SurfaceMesh< dimension >::edge_vertices(
-        index_t edge_id ) const
-    {
-        check_edge_id( *this, edge_id );
-        return get_edge_vertices( edge_id );
-    }
-
-    template < index_t dimension >
-    const std::array< index_t, 2 >& SurfaceMesh< dimension >::get_edge_vertices(
-        index_t edge_id ) const
-    {
-        return impl_->get_edge_vertices( edge_id );
-    }
-
-    template < index_t dimension >
-    void SurfaceMesh< dimension >::update_edge_vertices(
-        absl::Span< const index_t > old2new, SurfaceMeshKey )
-    {
-        impl_->update_edge_vertices( old2new );
-    }
-
-    template < index_t dimension >
-    void SurfaceMesh< dimension >::update_edge_vertex(
-        std::array< index_t, 2 > edge_vertices,
-        index_t edge_vertex_id,
-        index_t new_vertex_id,
-        SurfaceMeshKey )
-    {
-        impl_->update_edge_vertex(
-            std::move( edge_vertices ), edge_vertex_id, new_vertex_id );
-    }
-
-    template < index_t dimension >
-    void SurfaceMesh< dimension >::remove_edge(
-        std::array< index_t, 2 > edge_vertices, SurfaceMeshKey )
-    {
-        impl_->remove_edge( std::move( edge_vertices ) );
-    }
-
-    template < index_t dimension >
-    std::vector< index_t > SurfaceMesh< dimension >::delete_edges(
-        const std::vector< bool >& to_delete, SurfaceMeshKey )
-    {
-        return impl_->delete_edges( to_delete );
-    }
-
-    template < index_t dimension >
-    std::vector< index_t > SurfaceMesh< dimension >::remove_isolated_edges(
-        SurfaceMeshKey )
-    {
-        return impl_->remove_isolated_edges();
-    }
-
-    template < index_t dimension >
     void SurfaceMesh< dimension >::associate_polygon_vertex_to_vertex(
         const PolygonVertex& polygon_vertex, index_t vertex_id, SurfaceMeshKey )
     {
@@ -394,16 +277,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    void SurfaceMesh< dimension >::overwrite_edges(
-        const SurfaceMesh< dimension >& from, SurfaceMeshKey )
+    SurfaceEdges< dimension >& SurfaceMesh< dimension >::edges( SurfaceMeshKey )
     {
-        impl_->overwrite_edges( *from.impl_ );
-    }
-
-    template < index_t dimension >
-    index_t SurfaceMesh< dimension >::nb_edges() const
-    {
-        return edge_attribute_manager().nb_elements();
+        return impl_->edges();
     }
 
     template < index_t dimension >
@@ -417,19 +293,6 @@ namespace geode
     {
         check_vertex_id( *this, vertex_id );
         return !get_polygon_around_vertex( vertex_id );
-    }
-
-    template < index_t dimension >
-    bool SurfaceMesh< dimension >::isolated_edge( index_t edge_id ) const
-    {
-        check_edge_id( *this, edge_id );
-        return get_isolated_edge( edge_id );
-    }
-
-    template < index_t dimension >
-    bool SurfaceMesh< dimension >::get_isolated_edge( index_t edge_id ) const
-    {
-        return impl_->get_isolated_edge( edge_id );
     }
 
     template < index_t dimension >
@@ -583,20 +446,35 @@ namespace geode
     }
 
     template < index_t dimension >
-    double SurfaceMesh< dimension >::edge_length( index_t edge_id ) const
+    double SurfaceMesh< dimension >::edge_length(
+        const PolygonEdge& polygon_edge ) const
     {
-        const auto& vertices = edge_vertices( edge_id );
-        return Vector< dimension >{ this->point( vertices[0] ),
-            this->point( vertices[1] ) }
+        return edge_length( polygon_edge_vertices( polygon_edge ) );
+    }
+
+    template < index_t dimension >
+    double SurfaceMesh< dimension >::edge_length(
+        const std::array< index_t, 2 >& polygon_edge_vertices ) const
+    {
+        return Vector< dimension >{ this->point( polygon_edge_vertices[0] ),
+            this->point( polygon_edge_vertices[1] ) }
             .length();
     }
 
     template < index_t dimension >
     Point< dimension > SurfaceMesh< dimension >::edge_barycenter(
-        index_t edge_id ) const
+        const PolygonEdge& polygon_edge ) const
     {
-        const auto& vertices = edge_vertices( edge_id );
-        return ( this->point( vertices[0] ) + this->point( vertices[1] ) ) / 2.;
+        return edge_barycenter( polygon_edge_vertices( polygon_edge ) );
+    }
+
+    template < index_t dimension >
+    Point< dimension > SurfaceMesh< dimension >::edge_barycenter(
+        const std::array< index_t, 2 >& polygon_edge_vertices ) const
+    {
+        return ( this->point( polygon_edge_vertices[0] )
+                   + this->point( polygon_edge_vertices[1] ) )
+               / 2.;
     }
 
     template < index_t dimension >
@@ -611,6 +489,14 @@ namespace geode
         const auto nb_vertices = nb_polygon_vertices( polygon );
         return polygon_vertex(
             { polygon, ( vertex + vertex_id ) % nb_vertices } );
+    }
+
+    template < index_t dimension >
+    std::array< index_t, 2 > SurfaceMesh< dimension >::polygon_edge_vertices(
+        const PolygonEdge& polygon_edge ) const
+    {
+        return { polygon_vertex( polygon_edge ),
+            polygon_edge_vertex( polygon_edge, 1 ) };
     }
 
     template < index_t dimension >
@@ -705,23 +591,33 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::optional< index_t > SurfaceMesh< dimension >::edge_from_vertices(
-        const std::array< index_t, 2 >& vertices ) const
+    bool SurfaceMesh< dimension >::are_edges_enabled() const
     {
-        return get_edge_from_vertices( vertices );
+        return impl_->are_edges_enabled();
     }
 
     template < index_t dimension >
-    absl::optional< index_t > SurfaceMesh< dimension >::get_edge_from_vertices(
-        const std::array< index_t, 2 >& vertices ) const
+    void SurfaceMesh< dimension >::enable_edges() const
     {
-        return impl_->find_edge( vertices );
+        if( !are_edges_enabled() )
+        {
+            impl_->enable_edges( *this );
+        }
     }
 
     template < index_t dimension >
-    AttributeManager& SurfaceMesh< dimension >::edge_attribute_manager() const
+    void SurfaceMesh< dimension >::disable_edges() const
     {
-        return impl_->edge_attribute_manager();
+        if( are_edges_enabled() )
+        {
+            impl_->disable_edges();
+        }
+    }
+
+    template < index_t dimension >
+    const SurfaceEdges< dimension >& SurfaceMesh< dimension >::edges() const
+    {
+        return impl_->edges();
     }
 
     template < index_t dimension >
