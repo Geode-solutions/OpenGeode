@@ -63,8 +63,6 @@ namespace geode
 
         void remove_edge( std::array< index_t, 2 > edge_vertices );
 
-        std::vector< index_t > remove_isolated_edges();
-
         void update_edge_vertices( absl::Span< const index_t > old2new );
 
         void update_edge_vertex( std::array< index_t, 2 > edge_vertices,

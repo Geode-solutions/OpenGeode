@@ -83,13 +83,6 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< index_t >
-        SurfaceEdgesBuilder< dimension >::remove_isolated_edges()
-    {
-        return edges_->remove_isolated_edges( {} );
-    }
-
-    template < index_t dimension >
     index_t SurfaceEdgesBuilder< dimension >::find_or_create_edge(
         std::array< index_t, 2 > edge_vertices )
     {
