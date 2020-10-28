@@ -35,9 +35,9 @@ namespace geode
         void register_geometry_pcontext( PContext& context )
         {
             AttributeManager::register_attribute_type< Point2D, Serializer >(
-                context );
+                context, "Point2D" );
             AttributeManager::register_attribute_type< Point3D, Serializer >(
-                context );
+                context, "Point3D" );
         }
     } // namespace detail
 } // namespace geode

@@ -106,45 +106,12 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this,
-                Growable< Archive, Impl >{
-                    { []( Archive& archive, Impl& impl ) {
-                         archive.object( impl.edge_attribute_manager_ );
-                         archive.ext( impl.edges_around_vertex_,
-                             bitsery::ext::StdSmartPtr{} );
-                     },
-                        []( Archive& archive, Impl& impl ) {
-                            archive.object( impl.edge_attribute_manager_ );
-                            archive.ext( impl.edges_around_vertex_,
-                                bitsery::ext::StdSmartPtr{} );
-                        } },
-                    { []( Impl& impl ) {
-                        impl.convert_attribute_to_abseil();
-                    } } } );
-        }
-
-        void convert_attribute_to_abseil()
-        {
-            auto old_edges = edge_attribute_manager_
-                                 .find_attribute< std::vector< EdgeVertex > >(
-                                     attribute_name );
-            edge_attribute_manager_.delete_attribute( attribute_name );
-            edges_around_vertex_ =
-                edge_attribute_manager_.find_or_create_attribute<
-                    VariableAttribute, EdgesAroundVertex >(
-                    attribute_name, EdgesAroundVertex{} );
-
-            for( const auto e : Range{ edge_attribute_manager_.nb_elements() } )
-            {
-                const auto& old_values = old_edges->value( e );
-                edges_around_vertex_->modify_value(
-                    e, [&old_values]( EdgesAroundVertex& value ) {
-                        for( const auto& old_value : old_values )
-                        {
-                            value.push_back( old_value );
-                        }
-                    } );
-            }
+            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
+                []( Archive& archive, Impl& impl ) {
+                    archive.object( impl.edge_attribute_manager_ );
+                    archive.ext( impl.edges_around_vertex_,
+                        bitsery::ext::StdSmartPtr{} );
+                } );
         }
 
     private:

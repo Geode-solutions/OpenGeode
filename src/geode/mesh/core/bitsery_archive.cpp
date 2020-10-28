@@ -21,11 +21,12 @@
  *
  */
 
-#include <geode/basic/bitsery_archive.h>
+#include <geode/mesh/core/bitsery_archive.h>
 
 #include <bitsery/brief_syntax/vector.h>
 
 #include <geode/basic/attribute_manager.h>
+#include <geode/basic/bitsery_archive.h>
 
 #include <geode/mesh/core/geode_edged_curve.h>
 #include <geode/mesh/core/geode_graph.h>
@@ -139,32 +140,83 @@ namespace bitsery
             : PolymorphicDerivedClasses< geode::OpenGeodeTetrahedralSolid3D >
         {
         };
+
+        BITSERY_CLASS_NAME( geode::VertexSet, "VertexSet" );
+        BITSERY_CLASS_NAME( geode::Graph, "Graph" );
+        BITSERY_CLASS_NAME( geode::OpenGeodeGraph, "OpenGeodeGraph" );
+        BITSERY_CLASS_NAME( geode::EdgedCurve2D, "EdgedCurve2D" );
+        BITSERY_CLASS_NAME(
+            geode::OpenGeodeEdgedCurve2D, "OpenGeodeEdgedCurve2D" );
+        BITSERY_CLASS_NAME( geode::EdgedCurve3D, "EdgedCurve3D" );
+        BITSERY_CLASS_NAME(
+            geode::OpenGeodeEdgedCurve3D, "OpenGeodeEdgedCurve3D" );
+        BITSERY_CLASS_NAME( geode::PointSet2D, "PointSet2D" );
+        BITSERY_CLASS_NAME( geode::OpenGeodePointSet2D, "OpenGeodePointSet2D" );
+        BITSERY_CLASS_NAME( geode::PointSet3D, "PointSet3D" );
+        BITSERY_CLASS_NAME( geode::OpenGeodePointSet3D, "OpenGeodePointSet3D" );
+        BITSERY_CLASS_NAME( geode::SurfaceMesh2D, "SurfaceMesh2D" );
+        BITSERY_CLASS_NAME( geode::SurfaceMesh3D, "SurfaceMesh3D" );
+        BITSERY_CLASS_NAME( geode::PolygonalSurface2D, "PolygonalSurface2D" );
+        BITSERY_CLASS_NAME(
+            geode::OpenGeodePolygonalSurface2D, "OpenGeodePolygonalSurface2D" );
+        BITSERY_CLASS_NAME( geode::PolygonalSurface3D, "PolygonalSurface3D" );
+        BITSERY_CLASS_NAME(
+            geode::OpenGeodePolygonalSurface3D, "OpenGeodePolygonalSurface3D" );
+        BITSERY_CLASS_NAME(
+            geode::TriangulatedSurface2D, "TriangulatedSurface2D" );
+        BITSERY_CLASS_NAME( geode::OpenGeodeTriangulatedSurface2D,
+            "OpenGeodeTriangulatedSurface2D" );
+        BITSERY_CLASS_NAME(
+            geode::TriangulatedSurface3D, "TriangulatedSurface3D" );
+        BITSERY_CLASS_NAME( geode::OpenGeodeTriangulatedSurface3D,
+            "OpenGeodeTriangulatedSurface3D" );
+        BITSERY_CLASS_NAME( geode::SolidMesh3D, "SolidMesh3D" );
+        BITSERY_CLASS_NAME( geode::PolyhedralSolid3D, "PolyhedralSolid3D" );
+        BITSERY_CLASS_NAME(
+            geode::OpenGeodePolyhedralSolid3D, "OpenGeodePolyhedralSolid3D" );
+        BITSERY_CLASS_NAME( geode::TetrahedralSolid3D, "TetrahedralSolid3D" );
+        BITSERY_CLASS_NAME(
+            geode::OpenGeodeTetrahedralSolid3D, "OpenGeodeTetrahedralSolid3D" );
     } // namespace ext
 } // namespace bitsery
 
+namespace
+{
+    template < typename Serializer >
+    void register_mesh_pcontext( geode::PContext& context )
+    {
+        geode::AttributeManager::register_attribute_type<
+            geode::EdgesAroundVertex, Serializer >(
+            context, "EdgesAroundVertex" );
+        geode::AttributeManager::register_attribute_type< geode::PolygonVertex,
+            Serializer >( context, "PolygonVertex" );
+        geode::AttributeManager::register_attribute_type< geode::PolygonEdge,
+            Serializer >( context, "PolygonEdge" );
+        geode::AttributeManager::register_attribute_type<
+            geode::PolyhedronFacet, Serializer >( context, "PolyhedronFacet" );
+        geode::AttributeManager::register_attribute_type<
+            geode::PolyhedronFacetVertex, Serializer >(
+            context, "PolyhedronFacetVertex" );
+        geode::AttributeManager::register_attribute_type<
+            geode::PolyhedronVertex, Serializer >(
+            context, "PolyhedronVertex" );
+        geode::AttributeManager::register_attribute_type<
+            absl::InlinedVector< geode::index_t, 4 >, Serializer >(
+            context, "InlinedVector_index_t_4" );
+        context.registerBasesList< Serializer >(
+            bitsery::ext::PolymorphicClassesList< geode::VertexSet >{} );
+    } // namespace )
+} // namespace
+
 namespace geode
 {
-    namespace detail
+    void register_mesh_deserialize_pcontext( PContext& context )
     {
-        template < typename Serializer >
-        void register_mesh_pcontext( PContext& context )
-        {
-            AttributeManager::register_attribute_type< EdgesAroundVertex,
-                Serializer >( context );
-            AttributeManager::register_attribute_type< PolygonVertex,
-                Serializer >( context );
-            AttributeManager::register_attribute_type< PolygonEdge,
-                Serializer >( context );
-            AttributeManager::register_attribute_type< PolyhedronFacet,
-                Serializer >( context );
-            AttributeManager::register_attribute_type< PolyhedronFacetVertex,
-                Serializer >( context );
-            AttributeManager::register_attribute_type< PolyhedronVertex,
-                Serializer >( context );
-            AttributeManager::register_attribute_type<
-                absl::InlinedVector< index_t, 4 >, Serializer >( context );
-            context.registerBasesList< Serializer >(
-                bitsery::ext::PolymorphicClassesList< VertexSet >{} );
-        }
-    } // namespace detail
+        register_mesh_pcontext< Deserializer >( context );
+    }
+
+    void register_mesh_serialize_pcontext( PContext& context )
+    {
+        register_mesh_pcontext< Serializer >( context );
+    }
 } // namespace geode

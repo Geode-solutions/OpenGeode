@@ -96,17 +96,10 @@ namespace geode
             template < typename Archive >
             void serialize( Archive& archive )
             {
-                archive.ext( *this,
-                    Growable< Archive, VertexCycle >{
-                        { []( Archive& archive, VertexCycle& storage ) {
-                             archive( storage.vertices_ );
-                         },
-                            []( Archive& archive, VertexCycle& storage ) {
-                                archive( storage.vertices_ );
-                            } },
-                        { []( VertexCycle& storage ) {
-                            rotate( storage.vertices_ );
-                        } } } );
+                archive.ext( *this, DefaultGrowable< Archive, VertexCycle >{},
+                    []( Archive& archive, VertexCycle& storage ) {
+                        archive( storage.vertices_ );
+                    } );
             }
 
         public:
