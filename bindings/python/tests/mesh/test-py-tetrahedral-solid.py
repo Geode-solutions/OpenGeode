@@ -46,7 +46,7 @@ def test_create_tetrahedra( solid, builder ):
         raise ValueError( "[Test] TetrahedralSolid should have 3 tetrahedra" )
     if solid.nb_facets() != 10:
         raise ValueError( "[Test] PolyhedralSolid should have 10 facets" )
-    if solid.nb_edges() != 12:
+    if solid.edges().nb_edges() != 12:
         raise ValueError( "[Test] PolyhedralSolid should have 12 edges" )
 
 def test_polyhedron_adjacencies( solid, builder ):
@@ -80,7 +80,7 @@ def test_delete_vertex( solid, builder ):
         raise ValueError( "[Test] TetrahedralSolid adjacent index is not correct" )
     if solid.nb_facets() != 7:
         raise ValueError( "[Test] PolyhedralSolid should have 7 facets" )
-    if solid.nb_edges() != 9:
+    if solid.edges().nb_edges() != 9:
         raise ValueError( "[Test] PolyhedralSolid should have 9 edges" )
 
 def test_delete_polyhedron( solid, builder ):
@@ -105,7 +105,7 @@ def test_io( solid, filename ):
         raise ValueError( "[Test] Reloaded TetrahedralSolid should have 6 vertices" )
     if new_solid.nb_facets() != 10:
         raise ValueError( "[Test] Reloaded TetrahedralSolid should have 10 facets" )
-    if new_solid.nb_edges() != 12:
+    if new_solid.edges().nb_edges() != 12:
         raise ValueError( "[Test] Reloaded TetrahedralSolid should have 12 edges" )
     if new_solid.nb_polyhedra() != 3:
         raise ValueError( "[Test] Reloaded TetrahedralSolid should have 3 polyhedra" )
@@ -145,6 +145,7 @@ def test_delete_all( solid, builder ):
 
 if __name__ == '__main__':
     solid = mesh.TetrahedralSolid3D.create()
+    solid.enable_edges()
     builder = mesh.TetrahedralSolidBuilder3D.create( solid )
     
     test_create_vertices( solid, builder )

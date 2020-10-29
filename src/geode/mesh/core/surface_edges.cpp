@@ -37,7 +37,7 @@
 #include <geode/geometry/vector.h>
 
 #include <geode/mesh/builder/surface_mesh_builder.h>
-#include <geode/mesh/core/detail/facet_storage.h>
+#include <geode/mesh/core/detail/facet_edges_impl.h>
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polygonal_surface.h>
 
@@ -58,7 +58,7 @@ namespace geode
 {
     template < index_t dimension >
     class SurfaceEdges< dimension >::Impl
-        : public detail::FacetStorage< std::array< index_t, 2 > >
+        : public detail::FacetEdgesImpl< dimension >
     {
         friend class bitsery::Access;
 
@@ -70,74 +70,10 @@ namespace geode
             {
                 for( const auto e : Range{ surface.nb_polygon_edges( p ) } )
                 {
-                    find_or_create_edge(
+                    this->find_or_create_edge(
                         surface.polygon_edge_vertices( { p, e } ) );
                 }
             }
-        }
-
-        absl::optional< index_t > find_edge(
-            const std::array< index_t, 2 >& edge_vertices ) const
-        {
-            return this->find_facet( edge_vertices );
-        }
-
-        index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices )
-        {
-            return this->add_facet( std::move( edge_vertices ) );
-        }
-
-        const std::array< index_t, 2 >& edge_vertices(
-            const index_t edge_id ) const
-        {
-            return this->get_facet_vertices( edge_id );
-        }
-
-        void update_edge_vertex( std::array< index_t, 2 > edge_vertices,
-            const index_t edge_vertex_id,
-            const index_t new_vertex_id )
-        {
-            auto updated_edge_vertices = edge_vertices;
-            updated_edge_vertices[edge_vertex_id] = new_vertex_id;
-            this->add_facet( std::move( updated_edge_vertices ) );
-            this->remove_facet( std::move( edge_vertices ) );
-        }
-
-        void update_edge_vertices( absl::Span< const index_t > old2new )
-        {
-            this->update_facet_vertices( old2new );
-        }
-
-        void remove_edge( std::array< index_t, 2 > edge_vertices )
-        {
-            this->remove_facet( std::move( edge_vertices ) );
-        }
-
-        std::vector< index_t > delete_edges(
-            const std::vector< bool >& to_delete )
-        {
-            return this->delete_facets( to_delete );
-        }
-
-        std::vector< index_t > remove_isolated_edges()
-        {
-            return this->clean_facets();
-        }
-
-        bool get_isolated_edge( index_t edge_id ) const
-        {
-            return this->get_counter( edge_id ) == 0;
-        }
-
-        AttributeManager& edge_attribute_manager() const
-        {
-            return facet_attribute_manager();
-        }
-
-        void overwrite_edges(
-            const detail::FacetStorage< std::array< index_t, 2 > >& from )
-        {
-            this->overwrite( from );
         }
 
     private:
@@ -147,8 +83,8 @@ namespace geode
             archive.ext( *this, DefaultGrowable< Archive, Impl >{},
                 []( Archive& archive, Impl& impl ) {
                     archive.ext(
-                        impl, bitsery::ext::BaseClass< detail::FacetStorage<
-                                  std::array< index_t, 2 > > >{} );
+                        impl, bitsery::ext::BaseClass<
+                                  detail::FacetEdgesImpl< dimension > >{} );
                 } );
         }
     };
@@ -241,7 +177,7 @@ namespace geode
     bool SurfaceEdges< dimension >::isolated_edge( index_t edge_id ) const
     {
         check_edge_id( *this, edge_id );
-        return impl_->get_isolated_edge( edge_id );
+        return impl_->isolated_edge( edge_id );
     }
 
     template < index_t dimension >

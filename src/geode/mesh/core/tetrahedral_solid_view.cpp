@@ -129,13 +129,6 @@ namespace geode
     }
 
     template < index_t dimension >
-    bool TetrahedralSolidView< dimension >::get_isolated_edge(
-        index_t edge_id ) const
-    {
-        return impl_->get_isolated_edge( edge_id );
-    }
-
-    template < index_t dimension >
     bool TetrahedralSolidView< dimension >::get_isolated_facet(
         index_t facet_id ) const
     {

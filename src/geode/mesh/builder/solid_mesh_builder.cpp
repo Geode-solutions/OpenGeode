@@ -28,6 +28,8 @@
 #include <geode/geometry/point.h>
 
 #include <geode/mesh/builder/mesh_builder_factory.h>
+#include <geode/mesh/builder/solid_edges_builder.h>
+#include <geode/mesh/core/solid_edges.h>
 #include <geode/mesh/core/solid_mesh.h>
 
 namespace
@@ -214,49 +216,65 @@ namespace geode
             }
         }
 
-        for( const auto f : Range{ solid_mesh_->nb_polyhedron_facets(
-                 polyhedron_vertex.polyhedron_id ) } )
+        if( solid_mesh_->are_edges_enabled() || true )
         {
-            const PolyhedronFacet id{ polyhedron_vertex.polyhedron_id, f };
-            const auto nb_facet_vertices =
-                solid_mesh_->nb_polyhedron_facet_vertices( id );
-            absl::FixedArray< PolyhedronVertex > facet_vertices(
-                nb_facet_vertices );
-            for( const auto v : Range{ nb_facet_vertices } )
+            for( const auto f : Range{ solid_mesh_->nb_polyhedron_facets(
+                     polyhedron_vertex.polyhedron_id ) } )
             {
-                facet_vertices[v] =
-                    solid_mesh_->polyhedron_facet_vertex_id( { id, v }, {} );
-            }
-            const auto position_it =
-                absl::c_find( facet_vertices, polyhedron_vertex );
-            if( position_it != facet_vertices.end() )
-            {
-                PolyhedronFacetVertices facet_vertices_id;
-                facet_vertices_id.reserve( nb_facet_vertices );
-                for( const auto& v : facet_vertices )
+                const PolyhedronFacet id{ polyhedron_vertex.polyhedron_id, f };
+                const auto nb_facet_vertices =
+                    solid_mesh_->nb_polyhedron_facet_vertices( id );
+                absl::FixedArray< PolyhedronVertex > facet_vertices(
+                    nb_facet_vertices );
+                for( const auto v : Range{ nb_facet_vertices } )
                 {
-                    facet_vertices_id.emplace_back(
-                        solid_mesh_->polyhedron_vertex( v ) );
+                    facet_vertices[v] = solid_mesh_->polyhedron_facet_vertex_id(
+                        { id, v }, {} );
                 }
+                const auto position_it =
+                    absl::c_find( facet_vertices, polyhedron_vertex );
+                if( position_it != facet_vertices.end() )
+                {
+                    PolyhedronFacetVertices facet_vertices_id;
+                    facet_vertices_id.reserve( nb_facet_vertices );
+                    for( const auto& v : facet_vertices )
+                    {
+                        facet_vertices_id.emplace_back(
+                            solid_mesh_->polyhedron_vertex( v ) );
+                    }
 
-                const auto position = static_cast< index_t >(
-                    std::distance( facet_vertices.begin(), position_it ) );
-                solid_mesh_->update_facet_vertex(
-                    facet_vertices_id, position, vertex_id, {} );
+                    const auto position = static_cast< index_t >(
+                        std::distance( facet_vertices.begin(), position_it ) );
+                    solid_mesh_->update_facet_vertex(
+                        facet_vertices_id, position, vertex_id, {} );
 
-                std::array< index_t, 2 > next_edge_vertices{
-                    facet_vertices_id[position],
-                    facet_vertices_id[( position + 1 ) % nb_facet_vertices]
-                };
-                solid_mesh_->update_edge_vertex(
-                    next_edge_vertices, 0, vertex_id, {} );
-                std::array< index_t, 2 > previous_edge_vertices{
-                    facet_vertices_id[( position + nb_facet_vertices - 1 )
-                                      % nb_facet_vertices],
-                    facet_vertices_id[position]
-                };
-                solid_mesh_->update_edge_vertex(
-                    previous_edge_vertices, 1, vertex_id, {} );
+                    if( solid_mesh_->are_edges_enabled() )
+                    {
+                        auto edges = edges_builder();
+                        std::array< index_t, 2 > next_edge_vertices{
+                            facet_vertices_id[position],
+                            facet_vertices_id[( position + 1 )
+                                              % nb_facet_vertices]
+                        };
+                        if( next_edge_vertices[0] < next_edge_vertices[1] )
+                        {
+                            edges.update_edge_vertex(
+                                next_edge_vertices, 0, vertex_id );
+                        }
+                        std::array< index_t, 2 > previous_edge_vertices{
+                            facet_vertices_id[( position + nb_facet_vertices
+                                                  - 1 )
+                                              % nb_facet_vertices],
+                            facet_vertices_id[position]
+                        };
+                        if( previous_edge_vertices[0]
+                            < previous_edge_vertices[1] )
+                        {
+                            edges.update_edge_vertex(
+                                previous_edge_vertices, 1, vertex_id );
+                        }
+                    }
+                }
             }
         }
         update_polyhedron_vertex( polyhedron_vertex, vertex_id );
@@ -314,9 +332,20 @@ namespace geode
             associate_polyhedron_vertex_to_vertex(
                 { added_polyhedron, v }, vertices[v] );
         }
-        do_create_facets( vertices, facets );
-        do_create_edges( vertices, facets );
         do_create_polyhedron( vertices, facets );
+        if( solid_mesh_->are_edges_enabled() )
+        {
+            auto edges = edges_builder();
+            for( auto&& edge_vertices :
+                solid_mesh_->polyhedron_edges_vertices( added_polyhedron ) )
+            {
+                if( edge_vertices[0] < edge_vertices[1] )
+                {
+                    edges.find_or_create_edge( std::move( edge_vertices ) );
+                }
+            }
+        }
+        do_create_facets( vertices, facets );
         return added_polyhedron;
     }
 
@@ -329,21 +358,6 @@ namespace geode
             get_polyhedron_facet_vertices( vertices, facets ) )
         {
             this->find_or_create_facet( facet_vertices );
-        }
-    }
-
-    template < index_t dimension >
-    void SolidMeshBuilder< dimension >::do_create_edges(
-        absl::Span< const index_t > vertices,
-        absl::Span< const std::vector< index_t > > facets )
-    {
-        for( auto&& edge_vertices :
-            get_polyhedron_edge_vertices( vertices, facets ) )
-        {
-            if( edge_vertices[0] < edge_vertices[1] )
-            {
-                this->find_or_create_edge( edge_vertices );
-            }
         }
     }
 
@@ -367,28 +381,6 @@ namespace geode
             }
         }
         return polyhedron_facet_vertices;
-    }
-
-    template < index_t dimension >
-    std::vector< std::array< index_t, 2 > >
-        SolidMeshBuilder< dimension >::get_polyhedron_edge_vertices(
-            absl::Span< const index_t > vertices,
-            absl::Span< const std::vector< index_t > > facets ) const
-    {
-        std::vector< std::array< index_t, 2 > > polyhedron_edge_vertices;
-        polyhedron_edge_vertices.reserve( 3 * facets.size() );
-        for( const auto f : Indices{ facets } )
-        {
-            for( const auto v : Indices{ facets[f] } )
-            {
-                OPENGEODE_ASSERT( facets[f][v] < vertices.size(),
-                    "[SolidMeshBuilder::get_polyhedron_edge_vertices] "
-                    "Wrong facet definition" );
-                polyhedron_edge_vertices.push_back( { vertices[facets[f][v]],
-                    vertices[facets[f][( v + 1 ) % facets[f].size()]] } );
-            }
-        }
-        return polyhedron_edge_vertices;
     }
 
     template < index_t dimension >
@@ -423,21 +415,16 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t SolidMeshBuilder< dimension >::find_or_create_edge(
-        std::array< index_t, 2 > edge_vertices )
-    {
-        return solid_mesh_->find_or_create_edge(
-            std::move( edge_vertices ), {} );
-    }
-
-    template < index_t dimension >
     void SolidMeshBuilder< dimension >::do_delete_vertices(
         const std::vector< bool >& to_delete )
     {
         const auto old2new = detail::mapping_after_deletion( to_delete );
         update_polyhedron_vertices( old2new );
         update_facet_vertices( old2new );
-        update_edge_vertices( old2new );
+        if( solid_mesh_->are_edges_enabled() )
+        {
+            edges_builder().update_edge_vertices( old2new );
+        }
         do_delete_solid_vertices( to_delete );
     }
 
@@ -553,11 +540,52 @@ namespace geode
     }
 
     template < index_t dimension >
+    void SolidMeshBuilder< dimension >::remove_polyhedra_edges(
+        const std::vector< bool >& to_delete )
+    {
+        auto edges = edges_builder();
+        for( const auto p : Range{ solid_mesh_->nb_polyhedra() } )
+        {
+            if( !to_delete[p] )
+            {
+                continue;
+            }
+            for( const auto f :
+                Range{ solid_mesh_->nb_polyhedron_facets( p ) } )
+            {
+                const PolyhedronFacet id{ p, f };
+                for( const auto v :
+                    Range{ solid_mesh_->nb_polyhedron_facet_vertices( id ) } )
+                {
+                    auto vertices = solid_mesh_->polyhedron_facet_edge_vertices(
+                        { id, v } );
+                    if( vertices[0] < vertices[1] )
+                    {
+                        edges.remove_edge( std::move( vertices ) );
+                    }
+                }
+            }
+        }
+
+        edges.delete_isolated_edges();
+    }
+
+    template < index_t dimension >
+    SolidEdgesBuilder< dimension >
+        SolidMeshBuilder< dimension >::edges_builder()
+    {
+        return { solid_mesh_->edges( {} ) };
+    }
+
+    template < index_t dimension >
     std::vector< index_t > SolidMeshBuilder< dimension >::delete_polyhedra(
         const std::vector< bool >& to_delete )
     {
         remove_polyhedra_facets( to_delete );
-        remove_polyhedra_edges( to_delete );
+        if( solid_mesh_->are_edges_enabled() )
+        {
+            remove_polyhedra_edges( to_delete );
+        }
 
         const auto old2new = detail::mapping_after_deletion( to_delete );
         for( const auto v : Range{ solid_mesh_->nb_vertices() } )
@@ -632,35 +660,6 @@ namespace geode
     }
 
     template < index_t dimension >
-    void SolidMeshBuilder< dimension >::remove_polyhedra_edges(
-        const std::vector< bool >& to_delete )
-    {
-        for( const auto p : Range{ solid_mesh_->nb_polyhedra() } )
-        {
-            if( to_delete[p] )
-            {
-                for( const auto f :
-                    Range{ solid_mesh_->nb_polyhedron_facets( p ) } )
-                {
-                    const PolyhedronFacet id{ p, f };
-                    const auto nb_facet_vertices =
-                        solid_mesh_->nb_polyhedron_facet_vertices( id );
-                    for( const auto v : Range{ nb_facet_vertices } )
-                    {
-                        const auto v0 =
-                            solid_mesh_->polyhedron_facet_vertex( { id, v } );
-                        const auto v1 = solid_mesh_->polyhedron_facet_vertex(
-                            { id, ( v + 1 ) % nb_facet_vertices } );
-                        solid_mesh_->remove_edge( { v0, v1 }, {} );
-                    }
-                }
-            }
-        }
-
-        solid_mesh_->remove_isolated_edges( {} );
-    }
-
-    template < index_t dimension >
     std::vector< index_t >
         SolidMeshBuilder< dimension >::delete_isolated_vertices()
     {
@@ -680,24 +679,10 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< index_t >
-        SolidMeshBuilder< dimension >::delete_isolated_edges()
-    {
-        return solid_mesh_->remove_isolated_edges( {} );
-    }
-
-    template < index_t dimension >
     void SolidMeshBuilder< dimension >::update_facet_vertices(
         absl::Span< const index_t > old2new )
     {
         solid_mesh_->update_facet_vertices( old2new, {} );
-    }
-
-    template < index_t dimension >
-    void SolidMeshBuilder< dimension >::update_edge_vertices(
-        absl::Span< const index_t > old2new )
-    {
-        solid_mesh_->update_edge_vertices( old2new, {} );
     }
 
     template < index_t dimension >
@@ -782,7 +767,11 @@ namespace geode
         solid_mesh_->polyhedron_attribute_manager().copy(
             solid_mesh.polyhedron_attribute_manager() );
         solid_mesh_->overwrite_facets( solid_mesh, {} );
-        solid_mesh_->overwrite_edges( solid_mesh, {} );
+        if( solid_mesh.are_edges_enabled() )
+        {
+            solid_mesh_->enable_edges();
+            edges_builder().copy( solid_mesh.edges(), {} );
+        }
     }
 
     template class opengeode_mesh_api SolidMeshBuilder< 3 >;

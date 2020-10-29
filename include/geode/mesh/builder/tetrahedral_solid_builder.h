@@ -85,9 +85,6 @@ namespace geode
         void do_create_facets( absl::Span< const index_t > vertices,
             absl::Span< const std::vector< index_t > > facets ) final;
 
-        void do_create_edges( absl::Span< const index_t > vertices,
-            absl::Span< const std::vector< index_t > > facets ) final;
-
         void do_create_polyhedron( absl::Span< const index_t > vertices,
             absl::Span< const std::vector< index_t > > facets ) final;
 

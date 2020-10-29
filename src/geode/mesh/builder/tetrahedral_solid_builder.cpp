@@ -28,6 +28,8 @@
 #include <geode/basic/attribute_manager.h>
 
 #include <geode/mesh/builder/mesh_builder_factory.h>
+#include <geode/mesh/builder/solid_edges_builder.h>
+#include <geode/mesh/core/solid_edges.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
 
 namespace geode
@@ -74,32 +76,6 @@ namespace geode
     }
 
     template < index_t dimension >
-    void TetrahedralSolidBuilder< dimension >::do_create_edges(
-        absl::Span< const index_t > vertices,
-        absl::Span< const std::vector< index_t > > facets )
-    {
-        geode_unused( facets );
-        OPENGEODE_ASSERT( vertices.size() == 4, "[TetrahedralSolidBuilder::"
-                                                "do_create_edges] Only "
-                                                "tetrahedra are handled" );
-        std::array< index_t, 4 > tetra_vertices;
-        absl::c_copy_n( vertices, 4, tetra_vertices.begin() );
-        do_create_edges( tetra_vertices );
-    }
-
-    template < index_t dimension >
-    void TetrahedralSolidBuilder< dimension >::do_create_edges(
-        const std::array< index_t, 4 >& vertices )
-    {
-        this->find_or_create_edge( { vertices[0], vertices[1] } );
-        this->find_or_create_edge( { vertices[0], vertices[2] } );
-        this->find_or_create_edge( { vertices[0], vertices[3] } );
-        this->find_or_create_edge( { vertices[1], vertices[2] } );
-        this->find_or_create_edge( { vertices[1], vertices[3] } );
-        this->find_or_create_edge( { vertices[2], vertices[3] } );
-    }
-
-    template < index_t dimension >
     void TetrahedralSolidBuilder< dimension >::do_create_polyhedron(
         absl::Span< const index_t > vertices,
         absl::Span< const std::vector< index_t > > facets )
@@ -128,7 +104,16 @@ namespace geode
         }
         do_create_tetrahedron( vertices );
         do_create_facets( vertices );
-        do_create_edges( vertices );
+        if( tetrahedral_solid_->are_edges_enabled() )
+        {
+            auto edges = this->edges_builder();
+            edges.find_or_create_edge( { vertices[0], vertices[1] } );
+            edges.find_or_create_edge( { vertices[0], vertices[2] } );
+            edges.find_or_create_edge( { vertices[0], vertices[3] } );
+            edges.find_or_create_edge( { vertices[1], vertices[2] } );
+            edges.find_or_create_edge( { vertices[1], vertices[3] } );
+            edges.find_or_create_edge( { vertices[2], vertices[3] } );
+        }
         return added_tetra;
     }
 
@@ -140,7 +125,11 @@ namespace geode
             nb_tet + nb );
         tetrahedral_solid_->facet_attribute_manager().reserve(
             nb_tet + 4 * nb );
-        tetrahedral_solid_->edge_attribute_manager().reserve( nb_tet + 6 * nb );
+        if( tetrahedral_solid_->are_edges_enabled() )
+        {
+            tetrahedral_solid_->edges().edge_attribute_manager().reserve(
+                nb_tet + 6 * nb );
+        }
     }
 
     template < index_t dimension >

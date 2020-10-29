@@ -36,6 +36,7 @@
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+    FORWARD_DECLARATION_DIMENSION_CLASS( SolidEdgesBuilder );
 } // namespace geode
 
 namespace geode
@@ -55,6 +56,8 @@ namespace geode
          */
         static std::unique_ptr< SolidMeshBuilder< dimension > > create(
             SolidMesh< dimension >& mesh );
+
+        SolidEdgesBuilder< dimension > edges_builder();
 
         /*!
          * Set coordinates to a vertex. This vertex should be created before.
@@ -145,13 +148,6 @@ namespace geode
         std::vector< index_t > delete_isolated_facets();
 
         /*!
-         * Delete all the isolated edges (not used as polyhedron edges)
-         * @return the mapping between old edge indices to new ones.
-         * Deleted edges new index is NO_ID
-         */
-        std::vector< index_t > delete_isolated_edges();
-
-        /*!
          * Set a polyhedron vertex to a given vertex.
          * @param[in] polyhedron_vertex PolyhedronVertex corresponding to the
          * vertex.
@@ -179,8 +175,6 @@ namespace geode
 
         index_t find_or_create_facet( PolyhedronFacetVertices facet_vertices );
 
-        index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices );
-
         void copy( const SolidMesh< dimension >& solid_mesh );
 
     private:
@@ -202,9 +196,6 @@ namespace geode
             const PolyhedronVertex& polyhedron_vertex, index_t vertex_id ) = 0;
 
         virtual void do_create_facets( absl::Span< const index_t > vertices,
-            absl::Span< const std::vector< index_t > > facets );
-
-        virtual void do_create_edges( absl::Span< const index_t > vertices,
             absl::Span< const std::vector< index_t > > facets );
 
         virtual void do_create_polyhedron( absl::Span< const index_t > vertices,
@@ -237,14 +228,8 @@ namespace geode
 
         void update_facet_vertices( absl::Span< const index_t > old2new );
 
-        void update_edge_vertices( absl::Span< const index_t > old2new );
-
         virtual std::vector< PolyhedronFacetVertices >
             get_polyhedron_facet_vertices( absl::Span< const index_t > vertices,
-                absl::Span< const std::vector< index_t > > facets ) const;
-
-        virtual std::vector< std::array< index_t, 2 > >
-            get_polyhedron_edge_vertices( absl::Span< const index_t > vertices,
                 absl::Span< const std::vector< index_t > > facets ) const;
 
     private:
