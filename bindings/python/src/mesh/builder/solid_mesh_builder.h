@@ -21,6 +21,7 @@
  *
  */
 
+#include <geode/mesh/builder/solid_edges_builder.h>
 #include <geode/mesh/builder/solid_mesh_builder.h>
 
 #define PYTHON_SOLID_MESH_BUILDER( dimension )                                 \
@@ -50,8 +51,8 @@
             &SolidMeshBuilder##dimension##D::delete_isolated_vertices )        \
         .def( "delete_isolated_facets",                                        \
             &SolidMeshBuilder##dimension##D::delete_isolated_facets )          \
-        .def( "delete_isolated_edges",                                         \
-            &SolidMeshBuilder##dimension##D::delete_isolated_edges )           \
+        .def(                                                                  \
+            "edges_builder", &SolidMeshBuilder##dimension##D::edges_builder )  \
         .def( "associate_polyhedron_vertex_to_vertex",                         \
             &SolidMeshBuilder##dimension##D::                                  \
                 associate_polyhedron_vertex_to_vertex )

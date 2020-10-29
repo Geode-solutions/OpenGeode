@@ -40,6 +40,7 @@
 #include <geode/mesh/core/detail/facet_storage.h>
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polyhedral_solid.h>
+#include <geode/mesh/core/solid_edges.h>
 
 namespace
 {
@@ -51,16 +52,6 @@ namespace
         geode_unused( vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid.nb_vertices(),
             "[check_vertex_id] Trying to access an invalid vertex" );
-    }
-
-    template < geode::index_t dimension >
-    void check_edge_id( const geode::SolidMesh< dimension >& solid,
-        const geode::index_t edge_id )
-    {
-        geode_unused( solid );
-        geode_unused( edge_id );
-        OPENGEODE_ASSERT( edge_id < solid.nb_edges(),
-            "[check_edge_id] Trying to access an invalid edge" );
     }
 
     template < geode::index_t dimension >
@@ -176,11 +167,9 @@ namespace geode
 {
     template < index_t dimension >
     class SolidMesh< dimension >::Impl
-        : public detail::FacetStorage< PolyhedronFacetVertices >,
-          public detail::FacetStorage< std::array< index_t, 2 > >
+        : public detail::FacetStorage< PolyhedronFacetVertices >
     {
         using Facets = detail::FacetStorage< PolyhedronFacetVertices >;
-        using Edges = detail::FacetStorage< std::array< index_t, 2 > >;
         friend class bitsery::Access;
 
     public:
@@ -217,32 +206,15 @@ namespace geode
             return Facets::find_facet( facet_vertices );
         }
 
-        absl::optional< index_t > find_edge(
-            const std::array< index_t, 2 >& edge_vertices ) const
-        {
-            return Edges::find_facet( edge_vertices );
-        }
-
         index_t find_or_create_facet( PolyhedronFacetVertices facet_vertices )
         {
             return Facets::add_facet( std::move( facet_vertices ) );
-        }
-
-        index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices )
-        {
-            return Edges::add_facet( std::move( edge_vertices ) );
         }
 
         const PolyhedronFacetVertices& get_facet_vertices(
             const index_t facet_id ) const
         {
             return Facets::get_facet_vertices( facet_id );
-        }
-
-        const std::array< index_t, 2 >& get_edge_vertices(
-            const index_t edge_id ) const
-        {
-            return Edges::get_facet_vertices( edge_id );
         }
 
         void update_facet_vertex( PolyhedronFacetVertices facet_vertices,
@@ -255,40 +227,14 @@ namespace geode
             Facets::remove_facet( std::move( facet_vertices ) );
         }
 
-        void update_edge_vertex( std::array< index_t, 2 > edge_vertices,
-            const index_t edge_vertex_id,
-            const index_t new_vertex_id )
-        {
-            auto updated_edge_vertices = edge_vertices;
-            updated_edge_vertices[edge_vertex_id] = new_vertex_id;
-            if( edge_vertices[0] < edge_vertices[1] )
-            {
-                Edges::add_facet( std::move( updated_edge_vertices ) );
-                Edges::remove_facet( std::move( edge_vertices ) );
-            }
-        }
-
         void update_facet_vertices( absl::Span< const index_t > old2new )
         {
             Facets::update_facet_vertices( old2new );
         }
 
-        void update_edge_vertices( absl::Span< const index_t > old2new )
-        {
-            Edges::update_facet_vertices( old2new );
-        }
-
         void remove_facet( PolyhedronFacetVertices facet_vertices )
         {
             Facets::remove_facet( std::move( facet_vertices ) );
-        }
-
-        void remove_edge( std::array< index_t, 2 > edge_vertices )
-        {
-            if( edge_vertices[0] < edge_vertices[1] )
-            {
-                Edges::remove_facet( std::move( edge_vertices ) );
-            }
         }
 
         std::vector< index_t > delete_facets(
@@ -297,25 +243,9 @@ namespace geode
             return Facets::delete_facets( to_delete );
         }
 
-        std::vector< index_t > delete_edges(
-            const std::vector< bool >& to_delete )
-        {
-            return Edges::delete_facets( to_delete );
-        }
-
         std::vector< index_t > remove_isolated_facets()
         {
             return Facets::clean_facets();
-        }
-
-        std::vector< index_t > remove_isolated_edges()
-        {
-            return Edges::clean_facets();
-        }
-
-        bool isolated_edge( index_t edge_id ) const
-        {
-            return Edges::get_counter( edge_id ) == 0;
         }
 
         bool isolated_facet( index_t facet_id ) const
@@ -333,19 +263,38 @@ namespace geode
             return Facets::facet_attribute_manager();
         }
 
-        AttributeManager& edge_attribute_manager() const
-        {
-            return Edges::facet_attribute_manager();
-        }
-
         void overwrite_facets( const Facets& from )
         {
             Facets::overwrite( from );
         }
 
-        void overwrite_edges( const Edges& from )
+        bool are_edges_enabled() const
         {
-            Edges::overwrite( from );
+            return edges_.get() != nullptr;
+        }
+
+        void enable_edges( const SolidMesh< dimension >& solid ) const
+        {
+            edges_.reset( new SolidEdges< dimension >{ solid } );
+        }
+
+        void disable_edges() const
+        {
+            edges_.reset();
+        }
+
+        const SolidEdges< dimension >& edges() const
+        {
+            OPENGEODE_EXCEPTION( are_edges_enabled(),
+                "[SolidMesh] Edges should be enabled before accessing them" );
+            return *edges_;
+        }
+
+        SolidEdges< dimension >& edges()
+        {
+            OPENGEODE_EXCEPTION( are_edges_enabled(),
+                "[SolidMesh] Edges should be enabled before accessing them" );
+            return *edges_;
         }
 
     private:
@@ -362,9 +311,7 @@ namespace geode
                     archive.object( impl.polyhedron_attribute_manager_ );
                     archive.ext( impl.polyhedron_around_vertex_,
                         bitsery::ext::StdSmartPtr{} );
-                    archive.ext(
-                        impl, bitsery::ext::BaseClass< detail::FacetStorage<
-                                  std::array< index_t, 2 > > >{} );
+                    archive.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
                 } );
         }
 
@@ -372,6 +319,7 @@ namespace geode
         mutable AttributeManager polyhedron_attribute_manager_;
         std::shared_ptr< VariableAttribute< PolyhedronVertex > >
             polyhedron_around_vertex_;
+        mutable std::unique_ptr< SolidEdges< dimension > > edges_;
     };
 
     template < index_t dimension >
@@ -399,11 +347,11 @@ namespace geode
     }
 
     template < index_t dimension >
-    double SolidMesh< dimension >::edge_length( index_t edge_id ) const
+    double SolidMesh< dimension >::edge_length(
+        const std::array< index_t, 2 >& edge_vertices ) const
     {
-        const auto& vertices = edge_vertices( edge_id );
-        return Vector< dimension >{ this->point( vertices[0] ),
-            this->point( vertices[1] ) }
+        return Vector< dimension >{ this->point( edge_vertices[0] ),
+            this->point( edge_vertices[1] ) }
             .length();
     }
 
@@ -488,10 +436,11 @@ namespace geode
 
     template < index_t dimension >
     Point< dimension > SolidMesh< dimension >::edge_barycenter(
-        index_t edge_id ) const
+        const std::array< index_t, 2 >& edge_vertices ) const
     {
-        const auto& vertices = edge_vertices( edge_id );
-        return ( this->point( vertices[0] ) + this->point( vertices[1] ) ) / 2.;
+        return ( this->point( edge_vertices[0] )
+                   + this->point( edge_vertices[1] ) )
+               / 2.;
     }
 
     template < index_t dimension >
@@ -548,23 +497,10 @@ namespace geode
     }
 
     template < index_t dimension >
-    bool SolidMesh< dimension >::isolated_edge( index_t edge_id ) const
-    {
-        check_edge_id( *this, edge_id );
-        return get_isolated_edge( edge_id );
-    }
-
-    template < index_t dimension >
     bool SolidMesh< dimension >::isolated_facet( index_t facet_id ) const
     {
         check_facet_id( *this, facet_id );
         return get_isolated_facet( facet_id );
-    }
-
-    template < index_t dimension >
-    bool SolidMesh< dimension >::get_isolated_edge( index_t edge_id ) const
-    {
-        return impl_->isolated_edge( edge_id );
     }
 
     template < index_t dimension >
@@ -643,11 +579,9 @@ namespace geode
 
     template < index_t dimension >
     PolyhedraAroundEdge SolidMesh< dimension >::polyhedra_around_edge(
-        index_t edge_id ) const
+        const std::array< index_t, 2 >& vertices ) const
     {
-        check_edge_id( *this, edge_id );
         PolyhedraAroundEdge result;
-        const auto& vertices = edge_vertices( edge_id );
         const auto& polyhedron_vertices =
             polyhedra_around_vertex( vertices[0] );
         for( const auto& polyhedron_vertex : polyhedron_vertices )
@@ -665,6 +599,25 @@ namespace geode
             }
         }
         return result;
+    }
+
+    template < index_t dimension >
+    std::vector< std::array< index_t, 2 > >
+        SolidMesh< dimension >::polyhedron_edges_vertices(
+            index_t polyhedron ) const
+    {
+        std::vector< std::array< index_t, 2 > > edge_vertices;
+        edge_vertices.reserve( 3 * nb_polyhedron_facets( polyhedron ) );
+        for( const auto f : Range{ nb_polyhedron_facets( polyhedron ) } )
+        {
+            const PolyhedronFacet facet{ polyhedron, f };
+            for( const auto v : Range{ nb_polyhedron_facet_vertices( facet ) } )
+            {
+                edge_vertices.emplace_back(
+                    polyhedron_facet_edge_vertices( { facet, v } ) );
+            }
+        }
+        return edge_vertices;
     }
 
     template < index_t dimension >
@@ -725,13 +678,6 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t SolidMesh< dimension >::find_or_create_edge(
-        std::array< index_t, 2 > edge_vertices )
-    {
-        return impl_->find_or_create_edge( std::move( edge_vertices ) );
-    }
-
-    template < index_t dimension >
     const PolyhedronFacetVertices& SolidMesh< dimension >::facet_vertices(
         index_t facet_id ) const
     {
@@ -744,21 +690,6 @@ namespace geode
         index_t facet_id ) const
     {
         return impl_->get_facet_vertices( facet_id );
-    }
-
-    template < index_t dimension >
-    const std::array< index_t, 2 >& SolidMesh< dimension >::edge_vertices(
-        index_t edge_id ) const
-    {
-        check_edge_id( *this, edge_id );
-        return get_edge_vertices( edge_id );
-    }
-
-    template < index_t dimension >
-    const std::array< index_t, 2 >& SolidMesh< dimension >::get_edge_vertices(
-        index_t edge_id ) const
-    {
-        return impl_->get_edge_vertices( edge_id );
     }
 
     template < index_t dimension >
@@ -776,31 +707,10 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::optional< index_t > SolidMesh< dimension >::edge_from_vertices(
-        const std::array< index_t, 2 >& vertices ) const
-    {
-        return get_edge_from_vertices( vertices );
-    }
-
-    template < index_t dimension >
-    absl::optional< index_t > SolidMesh< dimension >::get_edge_from_vertices(
-        const std::array< index_t, 2 >& vertices ) const
-    {
-        return impl_->find_edge( vertices );
-    }
-
-    template < index_t dimension >
     void SolidMesh< dimension >::update_facet_vertices(
         absl::Span< const index_t > old2new, SolidMeshKey )
     {
         impl_->update_facet_vertices( old2new );
-    }
-
-    template < index_t dimension >
-    void SolidMesh< dimension >::update_edge_vertices(
-        absl::Span< const index_t > old2new, SolidMeshKey )
-    {
-        impl_->update_edge_vertices( old2new );
     }
 
     template < index_t dimension >
@@ -815,28 +725,10 @@ namespace geode
     }
 
     template < index_t dimension >
-    void SolidMesh< dimension >::update_edge_vertex(
-        std::array< index_t, 2 > edge_vertices,
-        index_t edge_vertex_id,
-        index_t new_vertex_id,
-        SolidMeshKey )
-    {
-        impl_->update_edge_vertex(
-            std::move( edge_vertices ), edge_vertex_id, new_vertex_id );
-    }
-
-    template < index_t dimension >
     void SolidMesh< dimension >::remove_facet(
         PolyhedronFacetVertices facet_vertices, SolidMeshKey )
     {
         impl_->remove_facet( std::move( facet_vertices ) );
-    }
-
-    template < index_t dimension >
-    void SolidMesh< dimension >::remove_edge(
-        std::array< index_t, 2 > edge_vertices, SolidMeshKey )
-    {
-        impl_->remove_edge( std::move( edge_vertices ) );
     }
 
     template < index_t dimension >
@@ -847,24 +739,10 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< index_t > SolidMesh< dimension >::remove_isolated_edges(
-        SolidMeshKey )
-    {
-        return impl_->remove_isolated_edges();
-    }
-
-    template < index_t dimension >
     std::vector< index_t > SolidMesh< dimension >::delete_facets(
         const std::vector< bool >& to_delete, SolidMeshKey )
     {
         return impl_->delete_facets( to_delete );
-    }
-
-    template < index_t dimension >
-    std::vector< index_t > SolidMesh< dimension >::delete_edges(
-        const std::vector< bool >& to_delete, SolidMeshKey )
-    {
-        return impl_->delete_edges( to_delete );
     }
 
     template < index_t dimension >
@@ -885,22 +763,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    void SolidMesh< dimension >::overwrite_edges(
-        const SolidMesh< dimension >& from, SolidMeshKey )
-    {
-        impl_->overwrite_edges( *from.impl_ );
-    }
-
-    template < index_t dimension >
     index_t SolidMesh< dimension >::nb_facets() const
     {
         return facet_attribute_manager().nb_elements();
-    }
-
-    template < index_t dimension >
-    index_t SolidMesh< dimension >::nb_edges() const
-    {
-        return edge_attribute_manager().nb_elements();
     }
 
     template < index_t dimension >
@@ -937,8 +802,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::optional< index_t > SolidMesh< dimension >::polyhedron_facet_edge(
-        const PolyhedronFacetEdge& polyhedron_facet_edge ) const
+    std::array< index_t, 2 >
+        SolidMesh< dimension >::polyhedron_facet_edge_vertices(
+            const PolyhedronFacetEdge& polyhedron_facet_edge ) const
     {
         check_polyhedron_id(
             *this, polyhedron_facet_edge.polyhedron_facet.polyhedron_id );
@@ -957,7 +823,7 @@ namespace geode
                 ( polyhedron_facet_edge.edge_id + 1 )
                     % nb_polyhedron_facet_vertices(
                         polyhedron_facet_edge.polyhedron_facet ) } );
-        return edge_from_vertices( { v0, v1 } );
+        return { v0, v1 };
     }
 
     template < index_t dimension >
@@ -1061,16 +927,46 @@ namespace geode
     }
 
     template < index_t dimension >
-    AttributeManager& SolidMesh< dimension >::edge_attribute_manager() const
-    {
-        return impl_->edge_attribute_manager();
-    }
-
-    template < index_t dimension >
     AttributeManager&
         SolidMesh< dimension >::polyhedron_attribute_manager() const
     {
         return impl_->polyhedron_attribute_manager();
+    }
+
+    template < index_t dimension >
+    bool SolidMesh< dimension >::are_edges_enabled() const
+    {
+        return impl_->are_edges_enabled();
+    }
+
+    template < index_t dimension >
+    void SolidMesh< dimension >::enable_edges() const
+    {
+        if( !are_edges_enabled() )
+        {
+            impl_->enable_edges( *this );
+        }
+    }
+
+    template < index_t dimension >
+    void SolidMesh< dimension >::disable_edges() const
+    {
+        if( are_edges_enabled() )
+        {
+            impl_->disable_edges();
+        }
+    }
+
+    template < index_t dimension >
+    const SolidEdges< dimension >& SolidMesh< dimension >::edges() const
+    {
+        return impl_->edges();
+    }
+
+    template < index_t dimension >
+    SolidEdges< dimension >& SolidMesh< dimension >::edges( SolidMeshKey )
+    {
+        return impl_->edges();
     }
 
     template < index_t dimension >
