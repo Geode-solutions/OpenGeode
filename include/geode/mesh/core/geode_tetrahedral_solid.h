@@ -97,10 +97,6 @@ namespace geode
             const std::array< index_t, 4 >& vertices,
             OGTetrahedralSolidKey ) const;
 
-        std::vector< std::array< index_t, 2 > > get_polyhedron_edge_vertices(
-            const std::array< index_t, 4 >& vertices,
-            OGTetrahedralSolidKey ) const;
-
     private:
         friend class bitsery::Access;
         template < typename Archive >
