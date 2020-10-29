@@ -21,6 +21,7 @@
  *
  */
 
+#include <geode/mesh/core/solid_edges.h>
 #include <geode/mesh/core/solid_mesh.h>
 
 #define PYTHON_SOLID_MESH( dimension )                                         \
@@ -35,7 +36,15 @@
         .def( "point", &SolidMesh##dimension##D::point )                       \
         .def( "nb_polyhedra", &SolidMesh##dimension##D::nb_polyhedra )         \
         .def( "nb_facets", &SolidMesh##dimension##D::nb_facets )               \
-        .def( "nb_edges", &SolidMesh##dimension##D::nb_edges )                 \
+        .def(                                                                  \
+            "are_edges_enabled", &SolidMesh##dimension##D::are_edges_enabled ) \
+        .def( "enable_edges", &SolidMesh##dimension##D::enable_edges )         \
+        .def( "disable_edges", &SolidMesh##dimension##D::disable_edges )       \
+        .def( "edges",                                                         \
+            ( const SolidEdges##dimension##D& (SolidMesh##dimension##D::*) ()  \
+                    const )                                                    \
+                & SolidMesh##dimension##D::edges,                              \
+            pybind11::return_value_policy::reference )                         \
         .def( "nb_polyhedron_vertices",                                        \
             &SolidMesh##dimension##D::nb_polyhedron_vertices )                 \
         .def( "nb_polyhedron_facets",                                          \
@@ -48,11 +57,8 @@
         .def( "polyhedron_facet_vertex",                                       \
             &SolidMesh##dimension##D::polyhedron_facet_vertex )                \
         .def( "facet_vertices", &SolidMesh##dimension##D::facet_vertices )     \
-        .def( "edge_vertices", &SolidMesh##dimension##D::edge_vertices )       \
         .def( "facet_from_vertices",                                           \
             &SolidMesh##dimension##D::facet_from_vertices )                    \
-        .def( "edge_from_vertices",                                            \
-            &SolidMesh##dimension##D::edge_from_vertices )                     \
         .def( "polyhedron_adjacent",                                           \
             &SolidMesh##dimension##D::polyhedron_adjacent )                    \
         .def( "polyhedron_adjacent_facet",                                     \
@@ -79,9 +85,6 @@
             pybind11::return_value_policy::reference )                         \
         .def( "facet_attribute_manager",                                       \
             &SolidMesh##dimension##D::facet_attribute_manager,                 \
-            pybind11::return_value_policy::reference )                         \
-        .def( "edge_attribute_manager",                                        \
-            &SolidMesh##dimension##D::edge_attribute_manager,                  \
             pybind11::return_value_policy::reference )                         \
         .def( "bounding_box", &SolidMesh##dimension##D::bounding_box )
 
