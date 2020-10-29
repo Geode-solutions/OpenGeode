@@ -79,6 +79,18 @@ namespace geode
 
     protected:
         PolyhedralSolid() = default;
+
+    private:
+        friend class bitsery::Access;
+        template < typename Archive >
+        void serialize( Archive& archive )
+        {
+            archive.ext( *this, DefaultGrowable< Archive, PolyhedralSolid >{},
+                []( Archive& archive, PolyhedralSolid& solid ) {
+                    archive.ext( solid,
+                        bitsery::ext::BaseClass< SolidMesh< dimension > >{} );
+                } );
+        }
     };
     ALIAS_3D( PolyhedralSolid );
 } // namespace geode
