@@ -79,10 +79,6 @@ namespace geode
         void do_unset_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet ) final;
 
-        void do_create_facets( const std::array< index_t, 4 >& vertices );
-
-        void do_create_edges( const std::array< index_t, 4 >& vertices );
-
         void do_create_tetrahedron(
             const std::array< index_t, 4 >& vertices ) final;
 
