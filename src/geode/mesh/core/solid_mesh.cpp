@@ -266,9 +266,9 @@ namespace geode
 
         SolidFacets< dimension >& facets()
         {
-            OPENGEODE_EXCEPTION(
-                are_facets_enabled(), "[SolidMesh::facets] Facets should be "
-                                      "enabled before accessing them" );
+            OPENGEODE_EXCEPTION( are_facets_enabled(),
+                "[SolidMesh::facets] Facets should be "
+                "enabled before accessing them" );
             return *facets_;
         }
 
