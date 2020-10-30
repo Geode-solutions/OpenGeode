@@ -28,8 +28,10 @@
 
 #include <geode/mesh/builder/geode_tetrahedral_solid_builder.h>
 #include <geode/mesh/builder/solid_edges_builder.h>
+#include <geode/mesh/builder/solid_facets_builder.h>
 #include <geode/mesh/core/geode_tetrahedral_solid.h>
 #include <geode/mesh/core/solid_edges.h>
+#include <geode/mesh/core/solid_facets.h>
 #include <geode/mesh/io/tetrahedral_solid_input.h>
 #include <geode/mesh/io/tetrahedral_solid_output.h>
 
@@ -64,9 +66,6 @@ void test_create_tetrahedra( const geode::TetrahedralSolid3D& solid,
     builder.set_polyhedron_vertex( { 0, 1 }, 1 );
     builder.set_polyhedron_vertex( { 0, 2 }, 2 );
     builder.set_polyhedron_vertex( { 0, 3 }, 3 );
-    builder.delete_isolated_facets();
-    OPENGEODE_EXCEPTION( solid.nb_facets() == 10,
-        "[Test] TetrahedralSolid should have 10 facets" );
 }
 
 void test_polyhedron_adjacencies( const geode::TetrahedralSolid3D& solid,
@@ -89,6 +88,9 @@ void test_polyhedron_adjacencies( const geode::TetrahedralSolid3D& solid,
         "[Test] TetrahedralSolid adjacent index is not correct" );
 
     solid.enable_edges();
+    solid.enable_facets();
+    OPENGEODE_EXCEPTION( solid.facets().nb_facets() == 10,
+        "[Test] TetrahedralSolid should have 10 facets" );
     OPENGEODE_EXCEPTION( solid.edges().nb_edges() == 12,
         "[Test] TetrahedralSolid should have 12 edges" );
 }
@@ -109,8 +111,8 @@ void test_delete_vertex( const geode::TetrahedralSolid3D& solid,
     OPENGEODE_EXCEPTION( solid.polyhedron_adjacent( { 1, 3 } ) == 0,
         "[Test] TetrahedralSolid adjacent index is not correct" );
     builder.edges_builder().delete_isolated_edges();
-    builder.delete_isolated_facets();
-    OPENGEODE_EXCEPTION( solid.nb_facets() == 7,
+    builder.facets_builder().delete_isolated_facets();
+    OPENGEODE_EXCEPTION( solid.facets().nb_facets() == 7,
         "[Test] TetrahedralSolid should have 7 facets" );
     OPENGEODE_EXCEPTION( solid.edges().nb_edges() == 9,
         "[Test] TetrahedralSolid should have 9 edges" );
@@ -143,7 +145,7 @@ void test_io(
         geode::OpenGeodeTetrahedralSolid3D::impl_name_static(), filename );
     OPENGEODE_EXCEPTION( new_solid->nb_vertices() == 6,
         "[Test] Reloaded TetrahedralSolid should have 6 vertices" );
-    OPENGEODE_EXCEPTION( new_solid->nb_facets() == 10,
+    OPENGEODE_EXCEPTION( new_solid->facets().nb_facets() == 10,
         "[Test] Reloaded TetrahedralSolid should have 10 facets" );
     OPENGEODE_EXCEPTION( new_solid->edges().nb_edges() == 12,
         "[Test] Reloaded TetrahedralSolid should have 12 edges" );
@@ -153,10 +155,11 @@ void test_io(
 
 void test_clone( const geode::TetrahedralSolid3D& solid )
 {
-    auto attr_from = solid.facet_attribute_manager()
+    auto attr_from = solid.facets()
+                         .facet_attribute_manager()
                          .find_or_create_attribute< geode::VariableAttribute,
                              geode::index_t >( "facet_id", 0 );
-    for( const auto f : geode::Range{ solid.nb_facets() } )
+    for( const auto f : geode::Range{ solid.facets().nb_facets() } )
     {
         attr_from->set_value( f, f );
     }
@@ -170,15 +173,15 @@ void test_clone( const geode::TetrahedralSolid3D& solid )
         attr_edge_from->set_value( e, e );
     }
     const auto solid2 = solid.clone();
-    const auto attr_to =
-        solid2->facet_attribute_manager().find_attribute< geode::index_t >(
-            "facet_id" );
-    for( const auto f : geode::Range{ solid.nb_facets() } )
+    const auto attr_to = solid2->facets()
+                             .facet_attribute_manager()
+                             .find_attribute< geode::index_t >( "facet_id" );
+    for( const auto f : geode::Range{ solid.facets().nb_facets() } )
     {
         OPENGEODE_EXCEPTION( attr_from->value( f ) == attr_to->value( f ),
             "[Test] Error in facet attribute transfer during cloning" );
-        const auto from_vertices = solid.facet_vertices( f );
-        const auto to_vertices = solid2->facet_vertices( f );
+        const auto from_vertices = solid.facets().facet_vertices( f );
+        const auto to_vertices = solid2->facets().facet_vertices( f );
         for( const auto v : geode::Indices{ from_vertices } )
         {
             OPENGEODE_EXCEPTION( from_vertices[v] == to_vertices[v],
@@ -197,7 +200,7 @@ void test_clone( const geode::TetrahedralSolid3D& solid )
     }
     OPENGEODE_EXCEPTION( solid2->nb_vertices() == 5,
         "[Test] TetrahedralSolid2 should have 5 vertices" );
-    OPENGEODE_EXCEPTION( solid2->nb_facets() == 4,
+    OPENGEODE_EXCEPTION( solid2->facets().nb_facets() == 4,
         "[Test] TetrahedralSolid2 should have 4 facets" );
     OPENGEODE_EXCEPTION( solid2->nb_polyhedra() == 1,
         "[Test] TetrahedralSolid2 should have 1 polyhedron" );
@@ -209,8 +212,8 @@ void test_delete_all( const geode::TetrahedralSolid3D& solid,
     builder.delete_isolated_vertices();
     OPENGEODE_EXCEPTION( solid.nb_vertices() == 5,
         "[Test]TetrahedralSolid should have 5 vertices" );
-    OPENGEODE_EXCEPTION(
-        solid.nb_facets() == 4, "[Test]TetrahedralSolid should have 4 facets" );
+    OPENGEODE_EXCEPTION( solid.facets().nb_facets() == 4,
+        "[Test]TetrahedralSolid should have 4 facets" );
     OPENGEODE_EXCEPTION( solid.nb_polyhedra() == 1,
         "[Test]TetrahedralSolid should have 1 polyhedron" );
 
@@ -218,8 +221,8 @@ void test_delete_all( const geode::TetrahedralSolid3D& solid,
     builder.delete_polyhedra( to_delete );
     OPENGEODE_EXCEPTION( solid.nb_vertices() == 5,
         "[Test]TetrahedralSolid should have 5 vertices" );
-    OPENGEODE_EXCEPTION(
-        solid.nb_facets() == 0, "[Test]TetrahedralSolid should have 0 facet" );
+    OPENGEODE_EXCEPTION( solid.facets().nb_facets() == 0,
+        "[Test]TetrahedralSolid should have 0 facet" );
     OPENGEODE_EXCEPTION( solid.nb_polyhedra() == 0,
         "[Test]TetrahedralSolid should have 0 polyhedron" );
     OPENGEODE_EXCEPTION( solid.polyhedra_around_vertex( 0 ).empty(),

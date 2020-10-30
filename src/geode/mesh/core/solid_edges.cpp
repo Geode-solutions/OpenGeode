@@ -44,16 +44,6 @@
 namespace
 {
     template < geode::index_t dimension >
-    void check_vertex_id( const geode::SolidEdges< dimension >& solid,
-        const geode::index_t vertex_id )
-    {
-        geode_unused( solid );
-        geode_unused( vertex_id );
-        OPENGEODE_ASSERT( vertex_id < solid.nb_vertices(),
-            "[check_vertex_id] Trying to access an invalid vertex" );
-    }
-
-    template < geode::index_t dimension >
     void check_edge_id( const geode::SolidEdges< dimension >& solid,
         const geode::index_t edge_id )
     {
@@ -61,114 +51,6 @@ namespace
         geode_unused( edge_id );
         OPENGEODE_ASSERT( edge_id < solid.nb_edges(),
             "[check_edge_id] Trying to access an invalid edge" );
-    }
-
-    template < geode::index_t dimension >
-    void check_facet_id( const geode::SolidEdges< dimension >& solid,
-        const geode::index_t facet_id )
-    {
-        geode_unused( solid );
-        geode_unused( facet_id );
-        OPENGEODE_ASSERT( facet_id < solid.nb_facets(),
-            "[check_facet_id] Trying to access an invalid facet" );
-    }
-
-    template < geode::index_t dimension >
-    void check_polyhedron_id( const geode::SolidEdges< dimension >& solid,
-        const geode::index_t polyhedron_id )
-    {
-        geode_unused( solid );
-        geode_unused( polyhedron_id );
-        OPENGEODE_ASSERT( polyhedron_id < solid.nb_polyhedra(),
-            "[check_polyhedron_id] Trying to access an invalid polyhedron" );
-    }
-
-    template < geode::index_t dimension >
-    void check_polyhedron_vertex_id(
-        const geode::SolidEdges< dimension >& solid,
-        const geode::index_t polyhedron_id,
-        const geode::index_t vertex_id )
-    {
-        geode_unused( solid );
-        geode_unused( polyhedron_id );
-        geode_unused( vertex_id );
-        OPENGEODE_ASSERT(
-            vertex_id < solid.nb_polyhedron_vertices( polyhedron_id ),
-            "[check_polyhedron_vertex_id] Trying to access an invalid "
-            "polyhedron vertex" );
-    }
-
-    template < geode::index_t dimension >
-    void check_polyhedron_facet_id( const geode::SolidEdges< dimension >& solid,
-        const geode::index_t polyhedron_id,
-        const geode::index_t facet_id )
-    {
-        geode_unused( solid );
-        geode_unused( polyhedron_id );
-        geode_unused( facet_id );
-        OPENGEODE_ASSERT(
-            facet_id < solid.nb_polyhedron_facets( polyhedron_id ),
-            "[check_polyhedron_facet_id] Trying to access an invalid "
-            "polyhedron facet" );
-    }
-
-    template < geode::index_t dimension >
-    void check_polyhedron_facet_vertex_id(
-        const geode::SolidEdges< dimension >& solid,
-        const geode::index_t polyhedron_id,
-        const geode::index_t facet_id,
-        const geode::index_t vertex_id )
-    {
-        geode_unused( solid );
-        geode_unused( polyhedron_id );
-        geode_unused( facet_id );
-        geode_unused( vertex_id );
-        OPENGEODE_ASSERT( vertex_id < solid.nb_polyhedron_facet_vertices(
-                              { polyhedron_id, facet_id } ),
-            "[check_polyhedron_facet_vertex_id] Trying to access an invalid "
-            "polyhedron facet vertex" );
-    }
-
-    template < geode::index_t dimension >
-    geode::index_t get_vertex_id_in_polyhedron_facet(
-        const geode::SolidEdges< dimension >& solid,
-        const geode::PolyhedronFacet& facet,
-        geode::index_t vertex_id )
-    {
-        for( const auto v :
-            geode::Range{ solid.nb_polyhedron_facet_vertices( facet ) } )
-        {
-            if( solid.polyhedron_facet_vertex( { facet, v } ) == vertex_id )
-            {
-                return v;
-            }
-        }
-        return geode::NO_ID;
-    }
-
-    template < geode::index_t dimension >
-    bool is_edge_in_polyhedron_facet(
-        const geode::SolidEdges< dimension >& solid,
-        const geode::PolyhedronFacet& facet,
-        const std::array< geode::index_t, 2 >& edge_vertices )
-    {
-        const auto nb_facet_vertices =
-            solid.nb_polyhedron_facet_vertices( facet );
-        const auto local_id =
-            get_vertex_id_in_polyhedron_facet( solid, facet, edge_vertices[0] );
-        if( local_id == geode::NO_ID )
-        {
-            return false;
-        }
-        const auto previous = solid.polyhedron_facet_vertex( { facet,
-            ( local_id + nb_facet_vertices - 1 ) % nb_facet_vertices } );
-        if( previous == edge_vertices[1] )
-        {
-            return true;
-        }
-        const auto next = solid.polyhedron_facet_vertex(
-            { facet, ( local_id + 1 ) % nb_facet_vertices } );
-        return next == edge_vertices[1];
     }
 
 } // namespace

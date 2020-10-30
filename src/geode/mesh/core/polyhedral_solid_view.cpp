@@ -121,41 +121,11 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t PolyhedralSolidView< dimension >::get_polyhedron_facet(
-        const PolyhedronFacet& polyhedron_facet ) const
-    {
-        return impl_->get_polyhedron_facet( polyhedron_facet );
-    }
-
-    template < index_t dimension >
     absl::optional< PolyhedronVertex >
         PolyhedralSolidView< dimension >::get_polyhedron_around_vertex(
             index_t vertex_id ) const
     {
         return impl_->get_polyhedron_around_vertex( vertex_id );
-    }
-
-    template < index_t dimension >
-    bool PolyhedralSolidView< dimension >::get_isolated_facet(
-        index_t facet_id ) const
-    {
-        return impl_->get_isolated_facet( facet_id );
-    }
-
-    template < index_t dimension >
-    const PolyhedronFacetVertices&
-        PolyhedralSolidView< dimension >::get_facet_vertices(
-            index_t facet_id ) const
-    {
-        return impl_->get_facet_vertices( facet_id );
-    }
-
-    template < index_t dimension >
-    absl::optional< index_t >
-        PolyhedralSolidView< dimension >::get_facet_from_vertices(
-            const PolyhedronFacetVertices& vertices ) const
-    {
-        return impl_->get_facet_from_vertices( vertices );
     }
 
     template < index_t dimension >
