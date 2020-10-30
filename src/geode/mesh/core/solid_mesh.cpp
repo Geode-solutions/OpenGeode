@@ -275,7 +275,10 @@ namespace geode
 
         void enable_edges( const SolidMesh< dimension >& solid ) const
         {
-            edges_.reset( new SolidEdges< dimension >{ solid } );
+            if( !are_edges_enabled() )
+            {
+                edges_.reset( new SolidEdges< dimension >{ solid } );
+            }
         }
 
         void disable_edges() const
@@ -286,7 +289,8 @@ namespace geode
         const SolidEdges< dimension >& edges() const
         {
             OPENGEODE_EXCEPTION( are_edges_enabled(),
-                "[SolidMesh] Edges should be enabled before accessing them" );
+                "[SolidMesh::edges] Edges should be "
+                "enabled before accessing them" );
             return *edges_;
         }
 
@@ -942,19 +946,13 @@ namespace geode
     template < index_t dimension >
     void SolidMesh< dimension >::enable_edges() const
     {
-        if( !are_edges_enabled() )
-        {
-            impl_->enable_edges( *this );
-        }
+        impl_->enable_edges( *this );
     }
 
     template < index_t dimension >
     void SolidMesh< dimension >::disable_edges() const
     {
-        if( are_edges_enabled() )
-        {
-            impl_->disable_edges();
-        }
+        impl_->disable_edges();
     }
 
     template < index_t dimension >
