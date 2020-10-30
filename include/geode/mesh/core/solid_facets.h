@@ -23,8 +23,6 @@
 
 #pragma once
 
-#include <vector>
-
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/passkey.h>
 
@@ -33,79 +31,75 @@
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( SolidEdgesBuilder );
+    FORWARD_DECLARATION_DIMENSION_CLASS( SolidFacetsBuilder );
 
     class AttributeManager;
 } // namespace geode
 
 namespace geode
 {
-    /*!
-     * This class represents a 3D Solid made up with polyhedra and provides mesh
-     * functionnalities.
-     */
     template < index_t dimension >
-    class SolidEdges
+    class SolidFacets
     {
-        OPENGEODE_DISABLE_COPY( SolidEdges );
+        OPENGEODE_DISABLE_COPY( SolidFacets );
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
-        PASSKEY( SolidEdgesBuilder< dimension >, SolidEdgesKey );
+        PASSKEY( SolidFacetsBuilder< dimension >, SolidFacetsKey );
 
     public:
-        SolidEdges( const SolidMesh< dimension >& solid );
-        ~SolidEdges();
+        SolidFacets( const SolidMesh< dimension >& solid );
+        ~SolidFacets();
 
-        index_t nb_edges() const;
+        index_t nb_facets() const;
 
-        bool isolated_edge( index_t edge_id ) const;
+        bool isolated_facet( index_t facet_id ) const;
 
         /*!
-         * Return the indices of edge vertices.
+         * Return the indices of facet vertices.
          * @param[in] edge_id Index of an edge.
          */
-        const std::array< index_t, 2 >& edge_vertices( index_t edge_id ) const;
+        const PolyhedronFacetVertices& facet_vertices( index_t facet_id ) const;
 
         /*!
-         * Get the index of edge corresponding to given vertices
+         * Get the index of facet corresponding to given vertices
          * @param[in] vertices Ordered vertex indices
          */
-        absl::optional< index_t > edge_from_vertices(
-            const std::array< index_t, 2 >& vertices ) const;
+        absl::optional< index_t > facet_from_vertices(
+            const PolyhedronFacetVertices& vertices ) const;
 
         /*!
-         * Access to the manager of attributes associated with edges.
+         * Access to the manager of attributes associated with facets.
          */
-        AttributeManager& edge_attribute_manager() const;
+        AttributeManager& facet_attribute_manager() const;
 
-        void update_edge_vertices(
-            absl::Span< const index_t > old2new, SolidEdgesKey );
+        void update_facet_vertices(
+            absl::Span< const index_t > old2new, SolidFacetsKey );
 
-        void update_edge_vertex( std::array< index_t, 2 > edge_vertices,
-            index_t edge_vertex_id,
+        void update_facet_vertex( PolyhedronFacetVertices facet_vertices,
+            index_t facet_vertex_id,
             index_t new_vertex_id,
-            SolidEdgesKey );
+            SolidFacetsKey );
 
-        void remove_edge(
-            std::array< index_t, 2 > edge_vertices, SolidEdgesKey );
+        void remove_facet(
+            PolyhedronFacetVertices facet_vertices, SolidFacetsKey );
 
-        std::vector< index_t > delete_edges(
-            const std::vector< bool >& to_delete, SolidEdgesKey );
+        std::vector< index_t > delete_facets(
+            const std::vector< bool >& to_delete, SolidFacetsKey );
 
-        std::vector< index_t > remove_isolated_edges( SolidEdgesKey );
+        std::vector< index_t > remove_isolated_facets( SolidFacetsKey );
 
-        index_t find_or_create_edge(
-            std::array< index_t, 2 > edge_vertices, SolidEdgesKey )
+        index_t find_or_create_facet(
+            PolyhedronFacetVertices facet_vertices, SolidFacetsKey )
         {
-            return find_or_create_edge( std::move( edge_vertices ) );
+            return find_or_create_facet( facet_vertices );
         }
 
-        void overwrite_edges(
-            const SolidEdges< dimension >& from, SolidEdgesKey );
+        void overwrite_facets(
+            const SolidFacets< dimension >& from, SolidFacetsKey );
 
     private:
-        SolidEdges();
+        SolidFacets();
 
-        index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices );
+        index_t find_or_create_facet( PolyhedronFacetVertices facet_vertices );
 
         friend class bitsery::Access;
         template < typename Archive >
@@ -114,5 +108,5 @@ namespace geode
     private:
         IMPLEMENTATION_MEMBER( impl_ );
     };
-    ALIAS_3D( SolidEdges );
+    ALIAS_3D( SolidFacets );
 } // namespace geode

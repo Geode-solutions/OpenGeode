@@ -39,6 +39,7 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( Vector );
     FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
     FORWARD_DECLARATION_DIMENSION_CLASS( SolidEdges );
+    FORWARD_DECLARATION_DIMENSION_CLASS( SolidFacets );
     FORWARD_DECLARATION_DIMENSION_CLASS( SolidMeshBuilder );
 
     ALIAS_2D_AND_3D( Vector );
@@ -223,11 +224,7 @@ namespace geode
 
         index_t nb_polyhedra() const;
 
-        index_t nb_facets() const;
-
         bool isolated_vertex( index_t vertex_id ) const;
-
-        bool isolated_facet( index_t facet_id ) const;
 
         /*!
          * Return the number of vertices in a polyhedron.
@@ -264,13 +261,6 @@ namespace geode
             index_t polyhedron_id, index_t vertex_id ) const;
 
         /*!
-         * Return the index in the mesh of a local facet in a polyhedron.
-         * @param[in] polyhedron_facet Local index of facet in polyhedron.
-         */
-        index_t polyhedron_facet(
-            const PolyhedronFacet& polyhedron_facet ) const;
-
-        /*!
          * Return the index in the mesh of a given polyhedron facet vertex.
          * @param[in] polyhedron_facet_vertex Local index of the vertex in the
          * facet of a polyhedron.
@@ -288,18 +278,11 @@ namespace geode
         virtual std::vector< std::array< index_t, 2 > >
             polyhedron_edges_vertices( index_t polyhedron ) const;
 
-        /*!
-         * Return the indices of facet vertices.
-         * @param[in] edge_id Index of an edge.
-         */
-        const PolyhedronFacetVertices& facet_vertices( index_t facet_id ) const;
+        PolyhedronFacetVertices polyhedron_facet_vertices(
+            const PolyhedronFacet& polyhedron_facet ) const;
 
-        /*!
-         * Get the index of facet corresponding to given vertices
-         * @param[in] vertices Ordered vertex indices
-         */
-        absl::optional< index_t > facet_from_vertices(
-            const PolyhedronFacetVertices& vertices ) const;
+        virtual std::vector< PolyhedronFacetVertices >
+            polyhedron_facets_vertices( index_t polyhedron ) const;
 
         /*!
          * Return the index of the polyhedron adjacent through a facet.
@@ -348,9 +331,10 @@ namespace geode
 
         /*!
          * Return the barycenter coordinates of a given facet.
-         * @param[in] facet_id Index of facet.
+         * @param[in] facet_vertices Vertex indices of the facet.
          */
-        Point< dimension > facet_barycenter( index_t facet_id ) const;
+        Point< dimension > facet_barycenter(
+            const PolyhedronFacetVertices& facet_vertices ) const;
 
         /*!
          * Return the coordinates of the barycenter of a given edge.
@@ -358,14 +342,6 @@ namespace geode
          */
         Point< dimension > edge_barycenter(
             const std::array< index_t, 2 >& polygon_edge_vertices ) const;
-
-        /*!
-         * Return the normal of a given facet.
-         * @param[in] facet_id Index of facet.
-         */
-        template < index_t T = dimension >
-        typename std::enable_if< T == 3, Vector3D >::type facet_normal(
-            index_t facet_id ) const;
 
         /*!
          * Return the normal of a given PolyhedronFacet.
@@ -392,9 +368,10 @@ namespace geode
 
         /*!
          * Return all polyhedra made with the given facet.
-         * @param[in] facet_id Index of the facet
+         * @param[in] facet_vertices Vertex indices of the facet.
          */
-        PolyhedraAroundFacet polyhedra_from_facet( index_t facet_id ) const;
+        PolyhedraAroundFacet polyhedra_from_facet(
+            const PolyhedronFacetVertices& facet_vertices ) const;
 
         bool are_edges_enabled() const;
 
@@ -404,15 +381,18 @@ namespace geode
 
         const SolidEdges< dimension >& edges() const;
 
+        bool are_facets_enabled() const;
+
+        void enable_facets() const;
+
+        void disable_facets() const;
+
+        const SolidFacets< dimension >& facets() const;
+
         /*!
          * Access to the manager of attributes associated with polyhedra.
          */
         AttributeManager& polyhedron_attribute_manager() const;
-
-        /*!
-         * Access to the manager of attributes associated with facets.
-         */
-        AttributeManager& facet_attribute_manager() const;
 
         /*!
          * Compute the bounding box from mesh vertices
@@ -431,28 +411,6 @@ namespace geode
             index_t vertex_id,
             SolidMeshKey );
 
-        void update_facet_vertices(
-            absl::Span< const index_t > old2new, SolidMeshKey );
-
-        void update_facet_vertex( PolyhedronFacetVertices facet_vertices,
-            index_t facet_vertex_id,
-            index_t new_vertex_id,
-            SolidMeshKey );
-
-        void remove_facet(
-            PolyhedronFacetVertices facet_vertices, SolidMeshKey );
-
-        std::vector< index_t > delete_facets(
-            const std::vector< bool >& to_delete, SolidMeshKey );
-
-        std::vector< index_t > remove_isolated_facets( SolidMeshKey );
-
-        index_t find_or_create_facet(
-            PolyhedronFacetVertices facet_vertices, SolidMeshKey )
-        {
-            return find_or_create_facet( facet_vertices );
-        }
-
         PolyhedronVertex polyhedron_facet_vertex_id(
             const PolyhedronFacetVertex& polyhedron_facet_vertex,
             SolidMeshKey ) const
@@ -460,15 +418,12 @@ namespace geode
             return get_polyhedron_facet_vertex_id( polyhedron_facet_vertex );
         }
 
-        void overwrite_facets(
-            const SolidMesh< dimension >& from, SolidMeshKey );
-
         SolidEdges< dimension >& edges( SolidMeshKey );
+
+        SolidFacets< dimension >& facets( SolidMeshKey );
 
     protected:
         SolidMesh();
-
-        index_t find_or_create_facet( PolyhedronFacetVertices facet_vertices );
 
     private:
         friend class bitsery::Access;
@@ -496,19 +451,8 @@ namespace geode
         virtual absl::optional< index_t > get_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet ) const = 0;
 
-        virtual index_t get_polyhedron_facet(
-            const PolyhedronFacet& polyhedron_facet ) const;
-
-        virtual bool get_isolated_facet( index_t facet_id ) const;
-
         virtual absl::optional< PolyhedronVertex > get_polyhedron_around_vertex(
             index_t vertex_id ) const;
-
-        virtual const PolyhedronFacetVertices& get_facet_vertices(
-            index_t facet_id ) const;
-
-        virtual absl::optional< index_t > get_facet_from_vertices(
-            const PolyhedronFacetVertices& vertices ) const;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

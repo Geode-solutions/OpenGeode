@@ -111,19 +111,8 @@ namespace geode
         absl::optional< index_t > get_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet ) const override;
 
-        index_t get_polyhedron_facet(
-            const PolyhedronFacet& polyhedron_facet ) const override;
-
-        bool get_isolated_facet( index_t facet_id ) const override;
-
         absl::optional< PolyhedronVertex > get_polyhedron_around_vertex(
             index_t vertex_id ) const override;
-
-        const PolyhedronFacetVertices& get_facet_vertices(
-            index_t facet_id ) const override;
-
-        absl::optional< index_t > get_facet_from_vertices(
-            const PolyhedronFacetVertices& vertices ) const override;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

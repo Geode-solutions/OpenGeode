@@ -29,7 +29,9 @@
 
 #include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/builder/solid_edges_builder.h>
+#include <geode/mesh/builder/solid_facets_builder.h>
 #include <geode/mesh/core/solid_edges.h>
+#include <geode/mesh/core/solid_facets.h>
 #include <geode/mesh/core/solid_mesh.h>
 
 namespace
@@ -216,7 +218,8 @@ namespace geode
             }
         }
 
-        if( solid_mesh_->are_edges_enabled() || true )
+        if( solid_mesh_->are_edges_enabled()
+            || solid_mesh_->are_facets_enabled() )
         {
             for( const auto f : Range{ solid_mesh_->nb_polyhedron_facets(
                      polyhedron_vertex.polyhedron_id ) } )
@@ -245,8 +248,13 @@ namespace geode
 
                     const auto position = static_cast< index_t >(
                         std::distance( facet_vertices.begin(), position_it ) );
-                    solid_mesh_->update_facet_vertex(
-                        facet_vertices_id, position, vertex_id, {} );
+
+                    if( solid_mesh_->are_facets_enabled() )
+                    {
+                        auto facets = facets_builder();
+                        facets.update_facet_vertex(
+                            facet_vertices_id, position, vertex_id );
+                    }
 
                     if( solid_mesh_->are_edges_enabled() )
                     {
@@ -345,20 +353,16 @@ namespace geode
                 }
             }
         }
-        do_create_facets( vertices, facets );
-        return added_polyhedron;
-    }
-
-    template < index_t dimension >
-    void SolidMeshBuilder< dimension >::do_create_facets(
-        absl::Span< const index_t > vertices,
-        absl::Span< const std::vector< index_t > > facets )
-    {
-        for( auto&& facet_vertices :
-            get_polyhedron_facet_vertices( vertices, facets ) )
+        if( solid_mesh_->are_facets_enabled() )
         {
-            this->find_or_create_facet( facet_vertices );
+            auto facets = facets_builder();
+            for( auto&& facet_vertices :
+                solid_mesh_->polyhedron_facets_vertices( added_polyhedron ) )
+            {
+                facets.find_or_create_facet( std::move( facet_vertices ) );
+            }
         }
+        return added_polyhedron;
     }
 
     template < index_t dimension >
@@ -407,20 +411,15 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t SolidMeshBuilder< dimension >::find_or_create_facet(
-        PolyhedronFacetVertices facet_vertices )
-    {
-        return solid_mesh_->find_or_create_facet(
-            std::move( facet_vertices ), {} );
-    }
-
-    template < index_t dimension >
     void SolidMeshBuilder< dimension >::do_delete_vertices(
         const std::vector< bool >& to_delete )
     {
         const auto old2new = detail::mapping_after_deletion( to_delete );
         update_polyhedron_vertices( old2new );
-        update_facet_vertices( old2new );
+        if( solid_mesh_->are_facets_enabled() )
+        {
+            facets_builder().update_facet_vertices( old2new );
+        }
         if( solid_mesh_->are_edges_enabled() )
         {
             edges_builder().update_edge_vertices( old2new );
@@ -581,7 +580,10 @@ namespace geode
     std::vector< index_t > SolidMeshBuilder< dimension >::delete_polyhedra(
         const std::vector< bool >& to_delete )
     {
-        remove_polyhedra_facets( to_delete );
+        if( solid_mesh_->are_facets_enabled() )
+        {
+            remove_polyhedra_facets( to_delete );
+        }
         if( solid_mesh_->are_edges_enabled() )
         {
             remove_polyhedra_edges( to_delete );
@@ -635,6 +637,7 @@ namespace geode
     void SolidMeshBuilder< dimension >::remove_polyhedra_facets(
         const std::vector< bool >& to_delete )
     {
+        auto facets = facets_builder();
         for( const auto p : Range{ solid_mesh_->nb_polyhedra() } )
         {
             if( to_delete[p] )
@@ -651,12 +654,18 @@ namespace geode
                         facet_vertices[v] =
                             solid_mesh_->polyhedron_facet_vertex( { id, v } );
                     }
-                    solid_mesh_->remove_facet(
-                        std::move( facet_vertices ), {} );
+                    facets.remove_facet( std::move( facet_vertices ) );
                 }
             }
         }
-        solid_mesh_->remove_isolated_facets( {} );
+        facets.delete_isolated_facets();
+    }
+
+    template < index_t dimension >
+    SolidFacetsBuilder< dimension >
+        SolidMeshBuilder< dimension >::facets_builder()
+    {
+        return { solid_mesh_->facets( {} ) };
     }
 
     template < index_t dimension >
@@ -669,40 +678,6 @@ namespace geode
             to_delete[v] = !solid_mesh_->polyhedron_around_vertex( v );
         }
         return delete_vertices( to_delete );
-    }
-
-    template < index_t dimension >
-    std::vector< index_t >
-        SolidMeshBuilder< dimension >::delete_isolated_facets()
-    {
-        return solid_mesh_->remove_isolated_facets( {} );
-    }
-
-    template < index_t dimension >
-    void SolidMeshBuilder< dimension >::update_facet_vertices(
-        absl::Span< const index_t > old2new )
-    {
-        solid_mesh_->update_facet_vertices( old2new, {} );
-    }
-
-    template < index_t dimension >
-    void SolidMeshBuilder< dimension >::update_facet_vertex(
-        PolyhedronFacetVertices facet_vertices,
-        index_t facet_vertex_id,
-        index_t new_vertex_id )
-    {
-        OPENGEODE_ASSERT( facet_vertex_id < facet_vertices.size(),
-            "[SolidMeshBuilder::update_facet_vertex] "
-            "Accessing an invalid vertex in facet" );
-        solid_mesh_->update_facet_vertex(
-            std::move( facet_vertices ), facet_vertex_id, new_vertex_id, {} );
-    }
-
-    template < index_t dimension >
-    std::vector< index_t > SolidMeshBuilder< dimension >::delete_facets(
-        const std::vector< bool >& to_delete )
-    {
-        return solid_mesh_->delete_facets( to_delete, {} );
     }
 
     template < index_t dimension >
@@ -766,7 +741,11 @@ namespace geode
         }
         solid_mesh_->polyhedron_attribute_manager().copy(
             solid_mesh.polyhedron_attribute_manager() );
-        solid_mesh_->overwrite_facets( solid_mesh, {} );
+        if( solid_mesh.are_facets_enabled() )
+        {
+            solid_mesh_->enable_facets();
+            facets_builder().copy( solid_mesh.facets(), {} );
+        }
         if( solid_mesh.are_edges_enabled() )
         {
             solid_mesh_->enable_edges();

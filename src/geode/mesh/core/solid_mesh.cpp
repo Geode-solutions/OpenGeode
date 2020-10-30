@@ -37,10 +37,11 @@
 
 #include <geode/mesh/builder/solid_mesh_builder.h>
 #include <geode/mesh/core/bitsery_archive.h>
-#include <geode/mesh/core/detail/facet_storage.h>
+#include <geode/mesh/core/detail/vertex_cycle.h>
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polyhedral_solid.h>
 #include <geode/mesh/core/solid_edges.h>
+#include <geode/mesh/core/solid_facets.h>
 
 namespace
 {
@@ -167,9 +168,7 @@ namespace geode
 {
     template < index_t dimension >
     class SolidMesh< dimension >::Impl
-        : public detail::FacetStorage< PolyhedronFacetVertices >
     {
-        using Facets = detail::FacetStorage< PolyhedronFacetVertices >;
         friend class bitsery::Access;
 
     public:
@@ -200,72 +199,9 @@ namespace geode
                 vertex_id, polyhedron_vertex );
         }
 
-        absl::optional< index_t > find_facet(
-            const PolyhedronFacetVertices& facet_vertices ) const
-        {
-            return Facets::find_facet( facet_vertices );
-        }
-
-        index_t find_or_create_facet( PolyhedronFacetVertices facet_vertices )
-        {
-            return Facets::add_facet( std::move( facet_vertices ) );
-        }
-
-        const PolyhedronFacetVertices& get_facet_vertices(
-            const index_t facet_id ) const
-        {
-            return Facets::get_facet_vertices( facet_id );
-        }
-
-        void update_facet_vertex( PolyhedronFacetVertices facet_vertices,
-            const index_t facet_vertex_id,
-            const index_t new_vertex_id )
-        {
-            auto updated_facet_vertices = facet_vertices;
-            updated_facet_vertices[facet_vertex_id] = new_vertex_id;
-            Facets::add_facet( std::move( updated_facet_vertices ) );
-            Facets::remove_facet( std::move( facet_vertices ) );
-        }
-
-        void update_facet_vertices( absl::Span< const index_t > old2new )
-        {
-            Facets::update_facet_vertices( old2new );
-        }
-
-        void remove_facet( PolyhedronFacetVertices facet_vertices )
-        {
-            Facets::remove_facet( std::move( facet_vertices ) );
-        }
-
-        std::vector< index_t > delete_facets(
-            const std::vector< bool >& to_delete )
-        {
-            return Facets::delete_facets( to_delete );
-        }
-
-        std::vector< index_t > remove_isolated_facets()
-        {
-            return Facets::clean_facets();
-        }
-
-        bool isolated_facet( index_t facet_id ) const
-        {
-            return Facets::get_counter( facet_id ) == 0;
-        }
-
         AttributeManager& polyhedron_attribute_manager() const
         {
             return polyhedron_attribute_manager_;
-        }
-
-        AttributeManager& facet_attribute_manager() const
-        {
-            return Facets::facet_attribute_manager();
-        }
-
-        void overwrite_facets( const Facets& from )
-        {
-            Facets::overwrite( from );
         }
 
         bool are_edges_enabled() const
@@ -297,8 +233,43 @@ namespace geode
         SolidEdges< dimension >& edges()
         {
             OPENGEODE_EXCEPTION( are_edges_enabled(),
-                "[SolidMesh] Edges should be enabled before accessing them" );
+                "[SolidMesh::edges] Edges should be "
+                "enabled before accessing them" );
             return *edges_;
+        }
+
+        bool are_facets_enabled() const
+        {
+            return facets_.get() != nullptr;
+        }
+
+        void enable_facets( const SolidMesh< dimension >& solid ) const
+        {
+            if( !are_facets_enabled() )
+            {
+                facets_.reset( new SolidFacets< dimension >{ solid } );
+            }
+        }
+
+        void disable_facets() const
+        {
+            facets_.reset();
+        }
+
+        const SolidFacets< dimension >& facets() const
+        {
+            OPENGEODE_EXCEPTION( are_facets_enabled(),
+                "[SolidMesh::facets] Facets should be "
+                "enabled before accessing them" );
+            return *facets_;
+        }
+
+        SolidFacets< dimension >& facets()
+        {
+            OPENGEODE_EXCEPTION(
+                are_facets_enabled(), "[SolidMesh::facets] Facets should be "
+                                      "enabled before accessing them" );
+            return *facets_;
         }
 
     private:
@@ -309,13 +280,11 @@ namespace geode
         {
             archive.ext( *this, DefaultGrowable< Archive, Impl >{},
                 []( Archive& archive, Impl& impl ) {
-                    archive.ext(
-                        impl, bitsery::ext::BaseClass< detail::FacetStorage<
-                                  PolyhedronFacetVertices > >{} );
                     archive.object( impl.polyhedron_attribute_manager_ );
                     archive.ext( impl.polyhedron_around_vertex_,
                         bitsery::ext::StdSmartPtr{} );
                     archive.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
+                    archive.ext( impl.facets_, bitsery::ext::StdSmartPtr{} );
                 } );
         }
 
@@ -324,6 +293,7 @@ namespace geode
         std::shared_ptr< VariableAttribute< PolyhedronVertex > >
             polyhedron_around_vertex_;
         mutable std::unique_ptr< SolidEdges< dimension > > edges_;
+        mutable std::unique_ptr< SolidFacets< dimension > > facets_;
     };
 
     template < index_t dimension >
@@ -385,30 +355,6 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t SolidMesh< dimension >::polyhedron_facet(
-        const PolyhedronFacet& polyhedron_facet ) const
-    {
-        check_polyhedron_id( *this, polyhedron_facet.polyhedron_id );
-        check_polyhedron_facet_id(
-            *this, polyhedron_facet.polyhedron_id, polyhedron_facet.facet_id );
-        return get_polyhedron_facet( polyhedron_facet );
-    }
-
-    template < index_t dimension >
-    index_t SolidMesh< dimension >::get_polyhedron_facet(
-        const PolyhedronFacet& polyhedron_facet ) const
-    {
-        PolyhedronFacetVertices facet_vertices(
-            nb_polyhedron_facet_vertices( polyhedron_facet ) );
-        for( const auto v : Indices{ facet_vertices } )
-        {
-            facet_vertices[v] =
-                polyhedron_facet_vertex( { polyhedron_facet, v } );
-        }
-        return impl_->find_facet( facet_vertices ).value();
-    }
-
-    template < index_t dimension >
     Point< dimension > SolidMesh< dimension >::polyhedron_barycenter(
         index_t polyhedron_id ) const
     {
@@ -424,18 +370,14 @@ namespace geode
 
     template < index_t dimension >
     Point< dimension > SolidMesh< dimension >::facet_barycenter(
-        index_t facet_id ) const
+        const PolyhedronFacetVertices& facet_vertices ) const
     {
         Point< dimension > barycenter;
-        const auto& vertices = facet_vertices( facet_id );
-        OPENGEODE_ASSERT( !vertices.empty(),
-            "[SolidMesh::facet_barycenter] Facet "
-            "vertices should not be empty" );
-        for( const auto v : vertices )
+        for( const auto v : facet_vertices )
         {
             barycenter = barycenter + this->point( v );
         }
-        return barycenter / static_cast< double >( vertices.size() );
+        return barycenter / static_cast< double >( facet_vertices.size() );
     }
 
     template < index_t dimension >
@@ -448,25 +390,17 @@ namespace geode
     }
 
     template < index_t dimension >
-    template < index_t T >
-    typename std::enable_if< T == 3, Vector3D >::type
-        SolidMesh< dimension >::facet_normal( index_t facet_id ) const
+    PolyhedronFacetVertices SolidMesh< dimension >::polyhedron_facet_vertices(
+        const PolyhedronFacet& polyhedron_facet ) const
     {
-        const auto barycenter = this->facet_barycenter( facet_id );
-        Vector3D normal;
-        const auto& facet_vertices = this->facet_vertices( facet_id );
-        for( const auto v : Range{ 1, facet_vertices.size() } )
+        PolyhedronFacetVertices vertices;
+        for( const auto v :
+            Range{ nb_polyhedron_facet_vertices( polyhedron_facet ) } )
         {
-            const auto& p1 = this->point( facet_vertices[v - 1] );
-            const auto& p2 = this->point( facet_vertices[v] );
-            normal =
-                normal + Vector3D{ p1, barycenter }.cross( { p2, barycenter } );
+            vertices.push_back(
+                polyhedron_facet_vertex( { polyhedron_facet, v } ) );
         }
-        const auto& p1 = this->point( facet_vertices.back() );
-        const auto& p2 = this->point( facet_vertices[0] );
-        normal =
-            normal + Vector3D{ p1, barycenter }.cross( { p2, barycenter } );
-        return normal.normalize();
+        return vertices;
     }
 
     template < index_t dimension >
@@ -475,16 +409,13 @@ namespace geode
         SolidMesh< dimension >::polyhedron_facet_normal(
             const PolyhedronFacet& polyhedron_facet ) const
     {
-        const auto facet_id = this->polyhedron_facet( polyhedron_facet );
-        const auto barycenter = this->facet_barycenter( facet_id );
         const auto& p0 = this->point(
             this->polyhedron_facet_vertex( { polyhedron_facet, 0 } ) );
         const auto& p1 = this->point(
             this->polyhedron_facet_vertex( { polyhedron_facet, 1 } ) );
-        const auto ref = Vector3D{ p0, barycenter }.cross( { p1, barycenter } );
-        const auto facet_normal = this->facet_normal( facet_id );
-        return facet_normal.dot( ref ) > 0. ? facet_normal
-                                            : Vector3D{ facet_normal * -1. };
+        const auto& p2 = this->point(
+            this->polyhedron_facet_vertex( { polyhedron_facet, 2 } ) );
+        return Vector3D{ p1, p2 }.cross( { p1, p0 } ).normalize();
     }
 
     template < index_t dimension >
@@ -501,16 +432,38 @@ namespace geode
     }
 
     template < index_t dimension >
-    bool SolidMesh< dimension >::isolated_facet( index_t facet_id ) const
+    PolyhedraAroundFacet SolidMesh< dimension >::polyhedra_from_facet(
+        const PolyhedronFacetVertices& facet_vertices ) const
     {
-        check_facet_id( *this, facet_id );
-        return get_isolated_facet( facet_id );
-    }
-
-    template < index_t dimension >
-    bool SolidMesh< dimension >::get_isolated_facet( index_t facet_id ) const
-    {
-        return impl_->isolated_facet( facet_id );
+        detail::VertexCycle< absl::InlinedVector< index_t, 4 > > vertices{
+            facet_vertices
+        };
+        const auto& polyhedron_vertices =
+            polyhedra_around_vertex( facet_vertices[0] );
+        for( const auto& polyhedron_vertex : polyhedron_vertices )
+        {
+            for( const auto f : Range{
+                     nb_polyhedron_facets( polyhedron_vertex.polyhedron_id ) } )
+            {
+                const PolyhedronFacet facet{ polyhedron_vertex.polyhedron_id,
+                    f };
+                detail::VertexCycle< absl::InlinedVector< index_t, 4 > >
+                    cur_vertices{ polyhedron_facet_vertices( facet ) };
+                if( vertices == cur_vertices )
+                {
+                    if( const auto adjacent = polyhedron_adjacent( facet ) )
+                    {
+                        return { polyhedron_vertex.polyhedron_id,
+                            adjacent.value() };
+                    }
+                    else
+                    {
+                        return { polyhedron_vertex.polyhedron_id };
+                    }
+                }
+            }
+        }
+        return {};
     }
 
     template < index_t dimension >
@@ -625,36 +578,18 @@ namespace geode
     }
 
     template < index_t dimension >
-    PolyhedraAroundFacet SolidMesh< dimension >::polyhedra_from_facet(
-        index_t facet_id ) const
+    std::vector< PolyhedronFacetVertices >
+        SolidMesh< dimension >::polyhedron_facets_vertices(
+            index_t polyhedron ) const
     {
-        check_facet_id( *this, facet_id );
-        const auto& vertices = facet_vertices( facet_id );
-        const auto& polyhedron_vertices =
-            polyhedra_around_vertex( vertices[0] );
-        for( const auto& polyhedron_vertex : polyhedron_vertices )
+        std::vector< PolyhedronFacetVertices > facet_vertices;
+        facet_vertices.reserve( 3 * nb_polyhedron_facets( polyhedron ) );
+        for( const auto f : Range{ nb_polyhedron_facets( polyhedron ) } )
         {
-            for( const auto f : Range{
-                     nb_polyhedron_facets( polyhedron_vertex.polyhedron_id ) } )
-            {
-                const PolyhedronFacet facet{ polyhedron_vertex.polyhedron_id,
-                    f };
-                if( polyhedron_facet( facet ) == facet_id )
-                {
-                    const auto adjacent = polyhedron_adjacent( facet );
-                    if( adjacent )
-                    {
-                        return { polyhedron_vertex.polyhedron_id,
-                            adjacent.value() };
-                    }
-                    else
-                    {
-                        return { polyhedron_vertex.polyhedron_id };
-                    }
-                }
-            }
+            facet_vertices.emplace_back(
+                polyhedron_facet_vertices( { polyhedron, f } ) );
         }
-        return {};
+        return facet_vertices;
     }
 
     template < index_t dimension >
@@ -675,81 +610,6 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t SolidMesh< dimension >::find_or_create_facet(
-        PolyhedronFacetVertices facet_vertices )
-    {
-        return impl_->find_or_create_facet( std::move( facet_vertices ) );
-    }
-
-    template < index_t dimension >
-    const PolyhedronFacetVertices& SolidMesh< dimension >::facet_vertices(
-        index_t facet_id ) const
-    {
-        check_facet_id( *this, facet_id );
-        return get_facet_vertices( facet_id );
-    }
-
-    template < index_t dimension >
-    const PolyhedronFacetVertices& SolidMesh< dimension >::get_facet_vertices(
-        index_t facet_id ) const
-    {
-        return impl_->get_facet_vertices( facet_id );
-    }
-
-    template < index_t dimension >
-    absl::optional< index_t > SolidMesh< dimension >::facet_from_vertices(
-        const PolyhedronFacetVertices& vertices ) const
-    {
-        return get_facet_from_vertices( vertices );
-    }
-
-    template < index_t dimension >
-    absl::optional< index_t > SolidMesh< dimension >::get_facet_from_vertices(
-        const PolyhedronFacetVertices& vertices ) const
-    {
-        return impl_->find_facet( vertices );
-    }
-
-    template < index_t dimension >
-    void SolidMesh< dimension >::update_facet_vertices(
-        absl::Span< const index_t > old2new, SolidMeshKey )
-    {
-        impl_->update_facet_vertices( old2new );
-    }
-
-    template < index_t dimension >
-    void SolidMesh< dimension >::update_facet_vertex(
-        PolyhedronFacetVertices facet_vertices,
-        index_t facet_vertex_id,
-        index_t new_vertex_id,
-        SolidMeshKey )
-    {
-        impl_->update_facet_vertex(
-            std::move( facet_vertices ), facet_vertex_id, new_vertex_id );
-    }
-
-    template < index_t dimension >
-    void SolidMesh< dimension >::remove_facet(
-        PolyhedronFacetVertices facet_vertices, SolidMeshKey )
-    {
-        impl_->remove_facet( std::move( facet_vertices ) );
-    }
-
-    template < index_t dimension >
-    std::vector< index_t > SolidMesh< dimension >::remove_isolated_facets(
-        SolidMeshKey )
-    {
-        return impl_->remove_isolated_facets();
-    }
-
-    template < index_t dimension >
-    std::vector< index_t > SolidMesh< dimension >::delete_facets(
-        const std::vector< bool >& to_delete, SolidMeshKey )
-    {
-        return impl_->delete_facets( to_delete );
-    }
-
-    template < index_t dimension >
     void SolidMesh< dimension >::associate_polyhedron_vertex_to_vertex(
         const PolyhedronVertex& polyhedron_vertex,
         index_t vertex_id,
@@ -757,19 +617,6 @@ namespace geode
     {
         impl_->associate_polyhedron_vertex_to_vertex(
             polyhedron_vertex, vertex_id );
-    }
-
-    template < index_t dimension >
-    void SolidMesh< dimension >::overwrite_facets(
-        const SolidMesh< dimension >& from, SolidMeshKey )
-    {
-        impl_->overwrite_facets( *from.impl_ );
-    }
-
-    template < index_t dimension >
-    index_t SolidMesh< dimension >::nb_facets() const
-    {
-        return facet_attribute_manager().nb_elements();
     }
 
     template < index_t dimension >
@@ -925,12 +772,6 @@ namespace geode
     }
 
     template < index_t dimension >
-    AttributeManager& SolidMesh< dimension >::facet_attribute_manager() const
-    {
-        return impl_->facet_attribute_manager();
-    }
-
-    template < index_t dimension >
     AttributeManager&
         SolidMesh< dimension >::polyhedron_attribute_manager() const
     {
@@ -965,6 +806,36 @@ namespace geode
     SolidEdges< dimension >& SolidMesh< dimension >::edges( SolidMeshKey )
     {
         return impl_->edges();
+    }
+
+    template < index_t dimension >
+    bool SolidMesh< dimension >::are_facets_enabled() const
+    {
+        return impl_->are_facets_enabled();
+    }
+
+    template < index_t dimension >
+    void SolidMesh< dimension >::enable_facets() const
+    {
+        impl_->enable_facets( *this );
+    }
+
+    template < index_t dimension >
+    void SolidMesh< dimension >::disable_facets() const
+    {
+        impl_->disable_facets();
+    }
+
+    template < index_t dimension >
+    const SolidFacets< dimension >& SolidMesh< dimension >::facets() const
+    {
+        return impl_->facets();
+    }
+
+    template < index_t dimension >
+    SolidFacets< dimension >& SolidMesh< dimension >::facets( SolidMeshKey )
+    {
+        return impl_->facets();
     }
 
     template < index_t dimension >
@@ -1009,8 +880,6 @@ namespace geode
 
     template class opengeode_mesh_api SolidMesh< 3 >;
 
-    template opengeode_mesh_api Vector3D SolidMesh< 3 >::facet_normal< 3 >(
-        index_t ) const;
     template opengeode_mesh_api Vector3D
         SolidMesh< 3 >::polyhedron_facet_normal< 3 >(
             const PolyhedronFacet& ) const;

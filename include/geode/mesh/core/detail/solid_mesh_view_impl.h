@@ -48,16 +48,7 @@ namespace geode
                   view2polyhedra_(
                       solid_view.polyhedron_attribute_manager()
                           .template find_or_create_attribute< VariableAttribute,
-                              index_t >( "view2polyhedra", NO_ID ) ),
-                  view2facets_(
-                      solid_view.facet_attribute_manager()
-                          .template find_or_create_attribute< VariableAttribute,
-                              index_t >( "view2facets", NO_ID ) ),
-                  facet_vertices_(
-                      solid_view.facet_attribute_manager()
-                          .template find_or_create_attribute< VariableAttribute,
-                              PolyhedronFacetVertices >(
-                              "facet_vertices", PolyhedronFacetVertices{} ) )
+                              index_t >( "view2polyhedra", NO_ID ) )
             {
             }
 
@@ -192,65 +183,6 @@ namespace geode
                 return true;
             }
 
-            absl::optional< index_t > get_facet_from_vertices(
-                const PolyhedronFacetVertices& vertices ) const
-            {
-                PolyhedronFacetVertices viewed_vertices;
-                for( const auto v : vertices )
-                {
-                    viewed_vertices.push_back( this->viewed_vertex( v ) );
-                }
-                if( const auto viewed_facet =
-                        solid_.facet_from_vertices( viewed_vertices ) )
-                {
-                    const auto it = facets2view_.find( viewed_facet.value() );
-                    if( it != facets2view_.end() )
-                    {
-                        return it->second;
-                    }
-                }
-                return absl::nullopt;
-            }
-
-            const PolyhedronFacetVertices& get_facet_vertices(
-                index_t facet_id ) const
-            {
-                const auto& viewed_vertices =
-                    solid_.facet_vertices( viewed_facet( facet_id ) );
-                facet_vertices_->modify_value(
-                    facet_id, [&viewed_vertices, this](
-                                  PolyhedronFacetVertices& vertices ) {
-                        vertices.resize( viewed_vertices.size() );
-                        for( const auto v : Indices{ vertices } )
-                        {
-                            vertices[v] =
-                                this->vertex_in_view( viewed_vertices[v] );
-                        }
-                    } );
-                return facet_vertices_->value( facet_id );
-            }
-
-            index_t viewed_facet( index_t facet_id ) const
-            {
-                return view2facets_->value( facet_id );
-            }
-
-            index_t facet_in_view( index_t facet_id ) const
-            {
-                return facets2view_.at( facet_id );
-            }
-
-            index_t add_viewed_facet( index_t facet_id )
-            {
-                const auto id = solid_view_.nb_facets();
-                if( facets2view_.emplace( facet_id, id ).second )
-                {
-                    solid_view_.facet_attribute_manager().resize( id + 1 );
-                    view2facets_->set_value( id, facet_id );
-                }
-                return facet_in_view( facet_id );
-            }
-
             absl::optional< index_t > get_polyhedron_adjacent(
                 const PolyhedronFacet& polyhedron_facet ) const
             {
@@ -264,14 +196,6 @@ namespace geode
                     }
                 }
                 return absl::nullopt;
-            }
-
-            index_t get_polyhedron_facet(
-                const PolyhedronFacet& polyhedron_facet ) const
-            {
-                const auto viewed_facet = solid_.polyhedron_facet(
-                    viewed_polyhedron_facet( polyhedron_facet ) );
-                return this->facet_in_view( viewed_facet );
             }
 
             PolyhedronVertex get_polyhedron_facet_vertex_id(
@@ -343,11 +267,6 @@ namespace geode
             SolidMesh< dimension >& solid_view_;
             std::shared_ptr< VariableAttribute< index_t > > view2polyhedra_;
             absl::flat_hash_map< index_t, index_t > polyhedra2view_;
-            std::shared_ptr< VariableAttribute< index_t > > view2facets_;
-            mutable std::shared_ptr<
-                VariableAttribute< PolyhedronFacetVertices > >
-                facet_vertices_;
-            absl::flat_hash_map< index_t, index_t > facets2view_;
         };
     } // namespace detail
 } // namespace geode

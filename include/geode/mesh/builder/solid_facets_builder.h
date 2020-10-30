@@ -31,52 +31,52 @@
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( SolidMeshBuilder );
-    FORWARD_DECLARATION_DIMENSION_CLASS( SolidEdges );
+    FORWARD_DECLARATION_DIMENSION_CLASS( SolidEdgesBuilder );
 } // namespace geode
 
 namespace geode
 {
     /*!
-     * Interface class to represent the builder of a SolidEdges
+     * Interface class to represent the builder of a SolidFacets
      */
     template < index_t dimension >
-    class SolidEdgesBuilder
+    class SolidFacetsBuilder
     {
         PASSKEY( SolidMeshBuilder< dimension >, BuilderKey );
 
     public:
-        SolidEdgesBuilder( SolidEdges< dimension >& edges );
+        SolidFacetsBuilder( SolidFacets< dimension >& facets );
 
         /*!
-         * Delete all the isolated edges (not used as polyhedron edges)
-         * @return the mapping between old edge indices to new ones.
-         * Deleted edges new index is NO_ID
+         * Delete all the isolated facets (not used as polyhedron facets)
+         * @return the mapping between old facet indices to new ones.
+         * Deleted facets new index is NO_ID
          */
-        std::vector< index_t > delete_isolated_edges();
+        std::vector< index_t > delete_isolated_facets();
 
-        index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices );
+        index_t find_or_create_facet( PolyhedronFacetVertices facet_vertices );
 
-        std::vector< index_t > delete_edges(
+        std::vector< index_t > delete_facets(
             const std::vector< bool >& to_delete );
 
-        void remove_edge( std::array< index_t, 2 > edge_vertices );
+        void remove_facet( PolyhedronFacetVertices facet_vertices );
 
-        void update_edge_vertex( std::array< index_t, 2 > edge_vertices,
-            index_t edge_vertex_id,
+        void update_facet_vertex( PolyhedronFacetVertices facet_vertices,
+            index_t facet_vertex_id,
             index_t new_vertex_id );
 
-        void update_edge_vertices( absl::Span< const index_t > old2new );
+        void update_facet_vertices( absl::Span< const index_t > old2new );
 
-        void copy( const SolidEdges< dimension >& edges, BuilderKey )
+        void copy( const SolidFacets< dimension >& facets, BuilderKey )
         {
-            copy( edges );
+            copy( facets );
         }
 
-    protected:
-        void copy( const SolidEdges< dimension >& edges );
+    private:
+        void copy( const SolidFacets< dimension >& facets );
 
     private:
-        SolidEdges< dimension >* edges_;
+        SolidFacets< dimension >* facets_;
     };
-    ALIAS_3D( SolidEdgesBuilder );
+    ALIAS_3D( SolidFacetsBuilder );
 } // namespace geode

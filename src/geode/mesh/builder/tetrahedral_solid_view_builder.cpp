@@ -117,18 +117,6 @@ namespace geode
     }
 
     template < index_t dimension >
-    void TetrahedralSolidViewBuilder< dimension >::do_create_facets(
-        const std::array< index_t, 4 >& /*unused*/ )
-    {
-    }
-
-    template < index_t dimension >
-    void TetrahedralSolidViewBuilder< dimension >::do_create_edges(
-        const std::array< index_t, 4 >& /*unused*/ )
-    {
-    }
-
-    template < index_t dimension >
     void TetrahedralSolidViewBuilder< dimension >::do_create_tetrahedron(
         const std::array< index_t, 4 >& /*unused*/ )
     {

@@ -22,6 +22,7 @@
  */
 
 #include <geode/mesh/core/solid_edges.h>
+#include <geode/mesh/core/solid_facets.h>
 #include <geode/mesh/core/solid_mesh.h>
 
 #define PYTHON_SOLID_MESH( dimension )                                         \
@@ -35,7 +36,6 @@
         .def( "clone", &SolidMesh##dimension##D::clone )                       \
         .def( "point", &SolidMesh##dimension##D::point )                       \
         .def( "nb_polyhedra", &SolidMesh##dimension##D::nb_polyhedra )         \
-        .def( "nb_facets", &SolidMesh##dimension##D::nb_facets )               \
         .def(                                                                  \
             "are_edges_enabled", &SolidMesh##dimension##D::are_edges_enabled ) \
         .def( "enable_edges", &SolidMesh##dimension##D::enable_edges )         \
@@ -45,6 +45,15 @@
                     const )                                                    \
                 & SolidMesh##dimension##D::edges,                              \
             pybind11::return_value_policy::reference )                         \
+        .def( "are_facets_enabled",                                            \
+            &SolidMesh##dimension##D::are_facets_enabled )                     \
+        .def( "enable_facets", &SolidMesh##dimension##D::enable_facets )       \
+        .def( "disable_facets", &SolidMesh##dimension##D::disable_facets )     \
+        .def( "facets",                                                        \
+            ( const SolidFacets##dimension##D& (SolidMesh##dimension##D::*) () \
+                    const )                                                    \
+                & SolidMesh##dimension##D::facets,                             \
+            pybind11::return_value_policy::reference )                         \
         .def( "nb_polyhedron_vertices",                                        \
             &SolidMesh##dimension##D::nb_polyhedron_vertices )                 \
         .def( "nb_polyhedron_facets",                                          \
@@ -53,12 +62,10 @@
             &SolidMesh##dimension##D::nb_polyhedron_facet_vertices )           \
         .def(                                                                  \
             "polyhedron_vertex", &SolidMesh##dimension##D::polyhedron_vertex ) \
-        .def( "polyhedron_facet", &SolidMesh##dimension##D::polyhedron_facet ) \
         .def( "polyhedron_facet_vertex",                                       \
             &SolidMesh##dimension##D::polyhedron_facet_vertex )                \
-        .def( "facet_vertices", &SolidMesh##dimension##D::facet_vertices )     \
-        .def( "facet_from_vertices",                                           \
-            &SolidMesh##dimension##D::facet_from_vertices )                    \
+        .def( "polyhedron_facet_vertices",                                     \
+            &SolidMesh##dimension##D::polyhedron_facet_vertices )              \
         .def( "polyhedron_adjacent",                                           \
             &SolidMesh##dimension##D::polyhedron_adjacent )                    \
         .def( "polyhedron_adjacent_facet",                                     \
@@ -83,19 +90,14 @@
         .def( "polyhedron_attribute_manager",                                  \
             &SolidMesh##dimension##D::polyhedron_attribute_manager,            \
             pybind11::return_value_policy::reference )                         \
-        .def( "facet_attribute_manager",                                       \
-            &SolidMesh##dimension##D::facet_attribute_manager,                 \
-            pybind11::return_value_policy::reference )                         \
         .def( "bounding_box", &SolidMesh##dimension##D::bounding_box )
 
 namespace geode
 {
     void define_solid_mesh( pybind11::module& module )
     {
-        PYTHON_SOLID_MESH( 3 )
-            .def( "facet_normal", &SolidMesh3D::facet_normal< 3 > )
-            .def( "polyhedron_facet_normal",
-                &SolidMesh3D::polyhedron_facet_normal< 3 > );
+        PYTHON_SOLID_MESH( 3 ).def( "polyhedron_facet_normal",
+            &SolidMesh3D::polyhedron_facet_normal< 3 > );
 
         pybind11::class_< PolyhedronVertex >( module, "PolyhedronVertex" )
             .def( pybind11::init<>() )
