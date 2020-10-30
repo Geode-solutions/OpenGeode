@@ -409,13 +409,19 @@ namespace geode
         SolidMesh< dimension >::polyhedron_facet_normal(
             const PolyhedronFacet& polyhedron_facet ) const
     {
+        Vector3D normal;
         const auto& p0 = this->point(
             this->polyhedron_facet_vertex( { polyhedron_facet, 0 } ) );
-        const auto& p1 = this->point(
-            this->polyhedron_facet_vertex( { polyhedron_facet, 1 } ) );
-        const auto& p2 = this->point(
-            this->polyhedron_facet_vertex( { polyhedron_facet, 2 } ) );
-        return Vector3D{ p1, p2 }.cross( { p1, p0 } ).normalize();
+        for( const auto v :
+            Range{ 2, nb_polyhedron_facet_vertices( polyhedron_facet ) } )
+        {
+            const auto& p1 = this->point(
+                polyhedron_facet_vertex( { polyhedron_facet, v - 1 } ) );
+            const auto& p2 = this->point(
+                polyhedron_facet_vertex( { polyhedron_facet, v } ) );
+            normal = normal + Vector3D{ p1, p0 }.cross( { p2, p0 } );
+        }
+        return normal.normalize();
     }
 
     template < index_t dimension >
