@@ -168,9 +168,11 @@ namespace geode
 
         void enable_edges( const SurfaceMesh< dimension >& surface ) const
         {
-            edges_.reset( new SurfaceEdges< dimension >{ surface } );
+            if( !are_edges_enabled() )
+            {
+                edges_.reset( new SurfaceEdges< dimension >{ surface } );
+            }
         }
-
         void disable_edges() const
         {
             edges_.reset();
@@ -599,19 +601,13 @@ namespace geode
     template < index_t dimension >
     void SurfaceMesh< dimension >::enable_edges() const
     {
-        if( !are_edges_enabled() )
-        {
-            impl_->enable_edges( *this );
-        }
+        impl_->enable_edges( *this );
     }
 
     template < index_t dimension >
     void SurfaceMesh< dimension >::disable_edges() const
     {
-        if( are_edges_enabled() )
-        {
-            impl_->disable_edges();
-        }
+        impl_->disable_edges();
     }
 
     template < index_t dimension >
