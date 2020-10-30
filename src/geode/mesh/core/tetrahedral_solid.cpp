@@ -105,20 +105,18 @@ namespace geode
         TetrahedralSolid< dimension >::polyhedron_facets_vertices(
             index_t polyhedron ) const
     {
-        return {
-            { this->polyhedron_vertex( { polyhedron, 0 } ),
-                this->polyhedron_vertex( { polyhedron, 1 } ),
-                this->polyhedron_vertex( { polyhedron, 2 } ) },
-            { this->polyhedron_vertex( { polyhedron, 1 } ),
-                this->polyhedron_vertex( { polyhedron, 3 } ),
-                this->polyhedron_vertex( { polyhedron, 2 } ) },
+        return { { this->polyhedron_vertex( { polyhedron, 1 } ),
+                     this->polyhedron_vertex( { polyhedron, 3 } ),
+                     this->polyhedron_vertex( { polyhedron, 2 } ) },
             { this->polyhedron_vertex( { polyhedron, 0 } ),
                 this->polyhedron_vertex( { polyhedron, 2 } ),
                 this->polyhedron_vertex( { polyhedron, 3 } ) },
             { this->polyhedron_vertex( { polyhedron, 3 } ),
                 this->polyhedron_vertex( { polyhedron, 1 } ),
                 this->polyhedron_vertex( { polyhedron, 0 } ) },
-        };
+            { this->polyhedron_vertex( { polyhedron, 0 } ),
+                this->polyhedron_vertex( { polyhedron, 1 } ),
+                this->polyhedron_vertex( { polyhedron, 2 } ) } };
     }
 
     template class opengeode_mesh_api TetrahedralSolid< 3 >;
