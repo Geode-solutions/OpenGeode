@@ -438,15 +438,15 @@ namespace geode
     }
 
     template < index_t dimension >
-    PolyhedraAroundFacet SolidMesh< dimension >::polyhedra_from_facet(
-        const PolyhedronFacetVertices& facet_vertices ) const
+    absl::optional< PolyhedronFacet >
+        SolidMesh< dimension >::polyhedron_facet_from_vertices(
+            PolyhedronFacetVertices facet_vertices ) const
     {
         detail::VertexCycle< absl::InlinedVector< index_t, 4 > > vertices{
-            facet_vertices
+            std::move( facet_vertices )
         };
-        const auto& polyhedron_vertices =
-            polyhedra_around_vertex( facet_vertices[0] );
-        for( const auto& polyhedron_vertex : polyhedron_vertices )
+        for( const auto& polyhedron_vertex :
+            polyhedra_around_vertex( vertices.vertices()[0] ) )
         {
             for( const auto f : Range{
                      nb_polyhedron_facets( polyhedron_vertex.polyhedron_id ) } )
@@ -457,16 +457,27 @@ namespace geode
                     cur_vertices{ polyhedron_facet_vertices( facet ) };
                 if( vertices == cur_vertices )
                 {
-                    if( const auto adjacent = polyhedron_adjacent( facet ) )
-                    {
-                        return { polyhedron_vertex.polyhedron_id,
-                            adjacent.value() };
-                    }
-                    else
-                    {
-                        return { polyhedron_vertex.polyhedron_id };
-                    }
+                    return facet;
                 }
+            }
+        }
+        return absl::nullopt;
+    }
+
+    template < index_t dimension >
+    PolyhedraAroundFacet SolidMesh< dimension >::polyhedra_from_facet(
+        PolyhedronFacetVertices facet_vertices ) const
+    {
+        if( const auto facet =
+                polyhedron_facet_from_vertices( std::move( facet_vertices ) ) )
+        {
+            if( const auto adjacent = polyhedron_adjacent( facet.value() ) )
+            {
+                return { facet->polyhedron_id, adjacent.value() };
+            }
+            else
+            {
+                return { facet->polyhedron_id };
             }
         }
         return {};
