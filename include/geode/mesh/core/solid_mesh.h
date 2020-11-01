@@ -278,6 +278,9 @@ namespace geode
         virtual std::vector< std::array< index_t, 2 > >
             polyhedron_edges_vertices( index_t polyhedron ) const;
 
+        absl::optional< PolyhedronFacet > polyhedron_facet_from_vertices(
+            PolyhedronFacetVertices polyhedron_facet_vertices ) const;
+
         PolyhedronFacetVertices polyhedron_facet_vertices(
             const PolyhedronFacet& polyhedron_facet ) const;
 
@@ -371,7 +374,7 @@ namespace geode
          * @param[in] facet_vertices Vertex indices of the facet.
          */
         PolyhedraAroundFacet polyhedra_from_facet(
-            const PolyhedronFacetVertices& facet_vertices ) const;
+            PolyhedronFacetVertices facet_vertices ) const;
 
         bool are_edges_enabled() const;
 
