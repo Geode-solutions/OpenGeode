@@ -30,7 +30,8 @@ import opengeode_py_model as model
 def run_test_brep():
     test_dir = os.path.dirname(__file__)
     data_dir = os.path.abspath(os.path.join(test_dir, "../../../../tests/data"))
-    brep = model.load_brep(os.path.join(data_dir, "test_v5.og_brep"))
+    brep = model.load_brep(os.path.join(data_dir, "layers.og_brep"))
+    model.triangulate_brep_surface_meshes( brep )
     model.convert_brep_surface_meshes_into_triangulated_surfaces( brep )
     model.convert_brep_block_meshes_into_tetrahedral_solids( brep )
 
@@ -41,7 +42,8 @@ def run_test_brep():
 def run_test_section():
     test_dir = os.path.dirname(__file__)
     data_dir = os.path.abspath(os.path.join(test_dir, "../../../../tests/data"))
-    section = model.load_section(os.path.join(data_dir, "test_v5.og_sctn"))
+    section = model.load_section(os.path.join(data_dir, "quad.og_sctn"))
+    model.triangulate_section_surface_meshes( section )
     model.convert_section_surface_meshes_into_triangulated_surfaces( section )
 
     file_io = "test_triangulated_surfaces." + section.native_extension()

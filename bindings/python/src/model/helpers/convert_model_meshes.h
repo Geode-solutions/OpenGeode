@@ -30,6 +30,10 @@ namespace geode
     void define_convert_model_meshes( pybind11::module& module )
     {
         module
+            .def( "triangulate_section_surface_meshes",
+                ( void ( * )( Section& ) ) & triangulate_surface_meshes )
+            .def( "triangulate_brep_surface_meshes",
+                ( void ( * )( BRep& ) ) & triangulate_surface_meshes )
             .def( "convert_section_surface_meshes_into_triangulated_surfaces",
                 ( void ( * )( Section& ) )
                     & convert_surface_meshes_into_triangulated_surfaces )
