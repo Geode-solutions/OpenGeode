@@ -1,5 +1,18 @@
 # Upgrade Guide
 
+## Upgrading from OpenGeode v6.x.x to v7.0.0
+
+### Motivations
+
+There are two main goals in this new major release: 1) Simplifying the data model of SurfaceMesh and Solid by extract the edges and facets into separated, and now optional, classes; 2) Ensure backward compatibility of native OpenGeode files while allowing new custom types to be added.
+
+### Breaking Changes
+
+- **Mesh**: SurfaceMesh and SolidMesh API corresponding to edges and facets have been moved into SurfaceEdges, SolidEdges and SolidFacets classes. They can be accessed with the methods `edges()` and `facets()`. By default, edges and facets are now disabled. Accessing disabled edges or facets will raise an exception. If you want to use them, you can call `enable_edges()` and/or `enable_facets()`.
+
+- **Files**: native files saved before v7 are no longer compatible. The new serialize framework will now prevent any breaking change in the future.
+
+
 ## Upgrading from OpenGeode v5.x.x to v6.0.0
 
 ### Motivations
