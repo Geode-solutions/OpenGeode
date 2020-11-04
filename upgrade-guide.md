@@ -12,6 +12,8 @@ There are two main goals in this new major release: 1) Simplifying the data mode
 
 - **Files**: native files saved before v7 are no longer compatible. The new serialize framework will now prevent any breaking change in the future.
 
+- **Model loading**: model loading functions are now returning the model loaded from the filename.
+
 
 ## Upgrading from OpenGeode v5.x.x to v6.0.0
 
