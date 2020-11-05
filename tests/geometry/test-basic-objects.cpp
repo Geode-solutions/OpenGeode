@@ -44,7 +44,7 @@ void test_segment()
 
     geode::Segment2D segment3{ b, a };
     geode::Segment2D segment4{ b, a };
-    segment3 = segment4;
+    segment3 = segment2;
     segment4 = std::move( segment2 );
 
     OPENGEODE_EXCEPTION(
