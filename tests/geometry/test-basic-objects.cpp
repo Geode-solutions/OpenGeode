@@ -37,29 +37,23 @@ void test_segment()
     const geode::Segment2D segment{ a, b };
 
     auto segment2 = segment;
-    auto segment3 = std::move( segment );
 
     OPENGEODE_EXCEPTION(
         segment2.vertices()[0].get() == a && segment2.vertices()[1].get() == b,
         "[Test] Wrong result for segment2" );
 
+    geode::Segment2D segment3{ b, a };
+    geode::Segment2D segment4{ b, a };
+    segment3 = segment4;
+    segment4 = std::move( segment2 );
+
     OPENGEODE_EXCEPTION(
         segment3.vertices()[0].get() == a && segment3.vertices()[1].get() == b,
         "[Test] Wrong result for segment3" );
 
-    geode::Segment2D segment4{ b, a };
-    // geode::Segment2D segment5{ b, a };
-    segment4 = segment3;
-    // segment5 = std::move( segment3 );
-
     OPENGEODE_EXCEPTION(
         segment4.vertices()[0].get() == a && segment4.vertices()[1].get() == b,
         "[Test] Wrong result for segment4" );
-
-    // OPENGEODE_EXCEPTION(
-    //     segment5.vertices()[0].get() == a && segment5.vertices()[1].get() ==
-    //     b,
-    //     "[Test] Wrong result for segment5" );
 }
 
 void test()
