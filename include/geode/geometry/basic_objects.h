@@ -45,28 +45,23 @@ namespace geode
         {
         }
         Segment( const Segment< dimension >& other )
-            : vertices_{ other.vertices() }
+            : vertices_{ other.vertices_ }
         {
-            DEBUG( "0" );
         }
-        Segment< dimension >& operator=( Segment< dimension >& other )
+        Segment< dimension >& operator=( const Segment< dimension >& other )
         {
-            DEBUG( "1" );
-            vertices_ = other.vertices()[0];
-            vertices_ = other.vertices()[1];
+            vertices_ = other.vertices_;
             return *this;
         }
         Segment( Segment< dimension >&& other )
-            : vertices_{ std::move( other.vertices() ) }
+            : vertices_{ std::move( other.vertices_ ) }
         {
-            DEBUG( "2" );
         }
-        // Segment< dimension >& operator=( Segment< dimension >&& other )
-        // {
-        //     DEBUG( "3" );
-        //     vertices_ = std::move( other.vertices() );
-        //     return *this;
-        // }
+        Segment< dimension >& operator=( Segment< dimension >&& other )
+        {
+            vertices_ = std::move( other.vertices_ );
+            return *this;
+        }
         Vector< dimension > direction() const
         {
             Vector< dimension > direction{ vertices_[0], vertices_[1] };
@@ -87,8 +82,7 @@ namespace geode
             return Vector< dimension >{ vertices_[0].get(), vertices_[1].get() }
                 .length();
         }
-        const std::array<
-            const std::reference_wrapper< const Point< dimension > >,
+        const std::array< std::reference_wrapper< const Point< dimension > >,
             2 >&
             vertices() const
         {
@@ -96,9 +90,8 @@ namespace geode
         }
 
     private:
-        const std::
-            array< const std::reference_wrapper< const Point< dimension > >, 2 >
-                vertices_;
+        std::array< std::reference_wrapper< const Point< dimension > >, 2 >
+            vertices_;
     };
     ALIAS_2D_AND_3D( Segment );
 
