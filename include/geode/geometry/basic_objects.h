@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <geode/basic/logger.h>
+
 #include <geode/geometry/common.h>
 #include <geode/geometry/vector.h>
 
@@ -42,6 +44,29 @@ namespace geode
             : vertices_{ { { p0 }, { p1 } } }
         {
         }
+        Segment( const Segment< dimension >& other )
+            : vertices_{ other.vertices() }
+        {
+            DEBUG( "0" );
+        }
+        Segment< dimension >& operator=( Segment< dimension >& other )
+        {
+            DEBUG( "1" );
+            vertices_ = other.vertices()[0];
+            vertices_ = other.vertices()[1];
+            return *this;
+        }
+        Segment( Segment< dimension >&& other )
+            : vertices_{ std::move( other.vertices() ) }
+        {
+            DEBUG( "2" );
+        }
+        // Segment< dimension >& operator=( Segment< dimension >&& other )
+        // {
+        //     DEBUG( "3" );
+        //     vertices_ = std::move( other.vertices() );
+        //     return *this;
+        // }
         Vector< dimension > direction() const
         {
             Vector< dimension > direction{ vertices_[0], vertices_[1] };

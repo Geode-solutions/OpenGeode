@@ -25,6 +25,12 @@ add_geode_test(
         ${PROJECT_NAME}::geometry
 )
 add_geode_test(
+    SOURCE "test-basic-objects.cpp" 
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+)
+add_geode_test(
     SOURCE "test-nnsearch.cpp" 
     DEPENDENCIES
         ${PROJECT_NAME}::basic
