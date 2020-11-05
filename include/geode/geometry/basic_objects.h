@@ -23,8 +23,6 @@
 
 #pragma once
 
-#include <geode/basic/logger.h>
-
 #include <geode/geometry/common.h>
 #include <geode/geometry/vector.h>
 
