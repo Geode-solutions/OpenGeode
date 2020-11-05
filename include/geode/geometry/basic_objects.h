@@ -43,7 +43,7 @@ namespace geode
         {
         }
         Segment( const Segment< dimension >& other )
-            : vertices_{ other.vertices_ }
+            : vertices_( other.vertices_ )
         {
         }
         Segment< dimension >& operator=( const Segment< dimension >& other )
