@@ -52,7 +52,7 @@ namespace geode
             return *this;
         }
         Segment( Segment< dimension >&& other )
-            : vertices_{ std::move( other.vertices_ ) }
+            : vertices_( std::move( other.vertices_ ) )
         {
         }
         Segment< dimension >& operator=( Segment< dimension >&& other )
@@ -102,10 +102,33 @@ namespace geode
             : origin_( origin ), direction_( direction.normalize() )
         {
         }
-        explicit InfiniteLine( const Segment< dimension >& segment )
+        InfiniteLine( const Segment< dimension >& segment )
             : InfiniteLine(
                 segment.normalized_direction(), segment.vertices()[0] )
         {
+        }
+        InfiniteLine( const InfiniteLine< dimension >& other )
+            : origin_( other.origin_ ), direction_( other.direction_ )
+        {
+        }
+        InfiniteLine< dimension >& operator=(
+            const InfiniteLine< dimension >& other )
+        {
+            origin_ = other.origin_;
+            direction_ = other.direction_;
+            return *this;
+        }
+        InfiniteLine( InfiniteLine< dimension >&& other )
+            : origin_( std::move( other.origin_ ) ),
+              direction_( std::move( other.direction_ ) )
+        {
+        }
+        InfiniteLine< dimension >& operator=(
+            InfiniteLine< dimension >&& other )
+        {
+            origin_ = std::move( other.origin_ );
+            direction_ = std::move( other.direction_ );
+            return *this;
         }
         const Point< dimension >& origin() const
         {
@@ -117,7 +140,7 @@ namespace geode
         }
 
     private:
-        const Point< dimension >& origin_;
+        std::reference_wrapper< const Point< dimension > > origin_;
         Vector< dimension > direction_;
     };
 
@@ -134,6 +157,27 @@ namespace geode
             : normal_( normal.normalize() ), origin_( origin )
         {
         }
+        Plane( const Plane& other )
+            : normal_( other.normal_ ), origin_( other.origin_ )
+        {
+        }
+        Plane& operator=( const Plane& other )
+        {
+            normal_ = other.normal_;
+            origin_ = other.origin_;
+            return *this;
+        }
+        Plane( Plane&& other )
+            : normal_( std::move( other.normal_ ) ),
+              origin_( std::move( other.origin_ ) )
+        {
+        }
+        Plane& operator=( Plane&& other )
+        {
+            normal_ = std::move( other.normal_ );
+            origin_ = std::move( other.origin_ );
+            return *this;
+        }
         const Vector3D& normal() const
         {
             return normal_;
@@ -147,14 +191,14 @@ namespace geode
             double plane_constant{ 0.0 };
             for( const auto i : Range{ 3 } )
             {
-                plane_constant -= origin_.value( i ) * normal_.value( i );
+                plane_constant -= origin_.get().value( i ) * normal_.value( i );
             }
             return plane_constant;
         }
 
     private:
         Vector3D normal_;
-        const Point3D& origin_;
+        std::reference_wrapper< const Point3D > origin_;
     };
 
     template < index_t dimension >
@@ -167,8 +211,36 @@ namespace geode
             : vertices_{ { { p0 }, { p1 }, { p2 } } }
         {
         }
-        const std::array<
-            const std::reference_wrapper< const Point< dimension > >,
+        Triangle( const Triangle< dimension >& other )
+            : vertices_( other.vertices_ )
+        {
+        }
+        Triangle< dimension >& operator=( const Triangle< dimension >& other )
+        {
+            vertices_ = other.vertices_;
+            return *this;
+        }
+        Triangle( Triangle< dimension >&& other )
+            : vertices_( std::move( other.vertices_ ) )
+        {
+        }
+        Triangle< dimension >& operator=( Triangle< dimension >&& other )
+        {
+            vertices_ = std::move( other.vertices_ );
+            return *this;
+        }
+        template < index_t T = dimension >
+        typename std::enable_if< T == 3, Vector3D >::type normal() const
+        {
+            return Vector3D{ vertices_[0], vertices_[1] }.cross(
+                Vector3D{ vertices_[0], vertices_[2] } );
+        }
+        template < index_t T = dimension >
+        typename std::enable_if< T == 3, Plane >::type plane() const
+        {
+            return { this->normal(), vertices_[0] };
+        }
+        const std::array< std::reference_wrapper< const Point< dimension > >,
             3 >&
             vertices() const
         {
@@ -176,35 +248,7 @@ namespace geode
         }
 
     private:
-        const std::
-            array< const std::reference_wrapper< const Point< dimension > >, 3 >
-                vertices_;
-    };
-    template <>
-    class Triangle< 3 >
-    {
-    public:
-        Triangle( const Point3D& p0, const Point3D& p1, const Point3D& p2 )
-            : vertices_{ { { p0 }, { p1 }, { p2 } } }
-        {
-        }
-        Vector3D normal() const
-        {
-            return Vector3D{ vertices_[0], vertices_[1] }.cross(
-                Vector3D{ vertices_[0], vertices_[2] } );
-        }
-        Plane plane() const
-        {
-            return { this->normal(), vertices_[0] };
-        }
-        const std::array< const std::reference_wrapper< const Point3D >, 3 >&
-            vertices() const
-        {
-            return vertices_;
-        }
-
-    private:
-        const std::array< const std::reference_wrapper< const Point3D >, 3 >
+        std::array< std::reference_wrapper< const Point< dimension > >, 3 >
             vertices_;
     };
     ALIAS_2D_AND_3D( Triangle );
@@ -223,15 +267,26 @@ namespace geode
             : vertices_{ { { p0 }, { p1 }, { p2 }, { p3 } } }
         {
         }
-        const std::array< const std::reference_wrapper< const Point3D >, 4 >&
+        Tetra( const Tetra& other ) : vertices_( other.vertices_ ) {}
+        Tetra& operator=( const Tetra& other )
+        {
+            vertices_ = other.vertices_;
+            return *this;
+        }
+        Tetra( Tetra&& other ) : vertices_( std::move( other.vertices_ ) ) {}
+        Tetra& operator=( Tetra&& other )
+        {
+            vertices_ = std::move( other.vertices_ );
+            return *this;
+        }
+        const std::array< std::reference_wrapper< const Point3D >, 4 >&
             vertices() const
         {
             return vertices_;
         }
 
     private:
-        const std::array< const std::reference_wrapper< const Point3D >, 4 >
-            vertices_;
+        std::array< std::reference_wrapper< const Point3D >, 4 > vertices_;
     };
 
     template < index_t dimension >
@@ -241,6 +296,27 @@ namespace geode
         Sphere( const Point< dimension >& origin, double radius )
             : origin_( origin ), radius_( std::move( radius ) )
         {
+        }
+        Sphere( const Sphere& other )
+            : origin_( other.origin_ ), radius_( other.radius_ )
+        {
+        }
+        Sphere& operator=( const Sphere& other )
+        {
+            origin_ = other.origin_;
+            radius_ = other.radius_;
+            return *this;
+        }
+        Sphere( Sphere&& other )
+            : origin_( std::move( other.origin_ ) ),
+              radius_( std::move( other.radius_ ) )
+        {
+        }
+        Sphere& operator=( Sphere&& other )
+        {
+            origin_ = std::move( other.origin_ );
+            radius_ = std::move( other.radius_ );
+            return *this;
         }
         const Point< dimension >& origin() const
         {
@@ -252,8 +328,8 @@ namespace geode
         }
 
     private:
-        const Point< dimension >& origin_;
-        const double radius_{ 0 };
+        std::reference_wrapper< const Point< dimension > > origin_;
+        double radius_{ 0 };
     };
 
     template < index_t dimension >
@@ -269,6 +345,27 @@ namespace geode
             : plane_( plane ), radius_( std::move( radius ) )
         {
         }
+        Circle( const Circle& other )
+            : plane_( other.plane_ ), radius_( other.radius_ )
+        {
+        }
+        Circle& operator=( const Circle& other )
+        {
+            plane_ = other.plane_;
+            radius_ = other.radius_;
+            return *this;
+        }
+        Circle( Circle&& other )
+            : plane_( std::move( other.plane_ ) ),
+              radius_( std::move( other.radius_ ) )
+        {
+        }
+        Circle& operator=( Circle&& other )
+        {
+            plane_ = std::move( other.plane_ );
+            radius_ = std::move( other.radius_ );
+            return *this;
+        }
         const Plane& plane() const
         {
             return plane_;
@@ -279,8 +376,8 @@ namespace geode
         }
 
     private:
-        const Plane& plane_;
-        const double radius_{ 0 };
+        std::reference_wrapper< const Plane > plane_;
+        double radius_{ 0 };
     };
 
     using Disk = Circle;
