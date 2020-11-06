@@ -80,8 +80,10 @@ namespace geode
         PYTHON_SPHERE( 3 );
         PYTHON_TRIANGLE( 2 );
         PYTHON_TRIANGLE( 3 )
-            .def( "normal", &Triangle3D::normal )
-            .def( "plane", &Triangle3D::plane );
+            .def( "normal",
+                ( Vector3D( Triangle< 3 >::* )() const ) & Triangle3D::normal )
+            .def( "plane",
+                ( Plane( Triangle< 3 >::* )() const ) & Triangle3D::plane );
 
         pybind11::class_< Plane >( module, "Plane" )
             .def( pybind11::init< const Vector3D&, const Point3D& >() )
