@@ -23,6 +23,8 @@
 
 #include <geode/mesh/helpers/convert_surface_mesh.h>
 
+#include <geode/basic/attribute_manager.h>
+
 #include <geode/geometry/point.h>
 
 #include <geode/mesh/builder/triangulated_surface_builder.h>
@@ -70,6 +72,8 @@ namespace geode
         auto builder =
             TriangulatedSurfaceBuilder< dimension >::create( *tri_surface );
         copy_points( surface, *builder );
+        tri_surface->vertex_attribute_manager().copy(
+            surface.vertex_attribute_manager() );
         builder->reserve_triangles( surface.nb_polygons() );
         for( const auto p : Range{ surface.nb_polygons() } )
         {
@@ -89,6 +93,8 @@ namespace geode
                 }
             }
         }
+        tri_surface->polygon_attribute_manager().copy(
+            surface.polygon_attribute_manager() );
         return { std::move( tri_surface ) };
     }
 
