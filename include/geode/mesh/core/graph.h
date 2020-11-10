@@ -134,6 +134,9 @@ namespace geode
         void associate_edge_vertex_to_vertex(
             const EdgeVertex& edge_vertex, index_t vertex_id, GraphKey );
 
+        void disassociate_edge_vertex_to_vertex(
+            const EdgeVertex& edge_vertex, GraphKey );
+
     protected:
         Graph();
         Graph( Graph&& );

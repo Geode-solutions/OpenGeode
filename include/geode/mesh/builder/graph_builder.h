@@ -82,6 +82,11 @@ namespace geode
         void set_edge_vertex(
             const EdgeVertex& edge_vertex, index_t vertex_id );
 
+        void associate_edge_vertex_to_vertex(
+            const EdgeVertex& edge_vertex, index_t vertex_id );
+
+        void disassociate_edge_vertex_to_vertex(
+            const EdgeVertex& edge_vertex );
         /*!
          * Delete a set of edges
          * @param[in] to_delete Vector of size graph_.nb_edges(). If

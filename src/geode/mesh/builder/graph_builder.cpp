@@ -89,8 +89,20 @@ namespace geode
         {
             return;
         }
-        graph_->associate_edge_vertex_to_vertex( edge_vertex, vertex_id, {} );
+        associate_edge_vertex_to_vertex( edge_vertex, vertex_id );
         do_set_edge_vertex( edge_vertex, vertex_id );
+    }
+
+    void GraphBuilder::associate_edge_vertex_to_vertex(
+        const EdgeVertex& edge_vertex, index_t vertex_id )
+    {
+        graph_->associate_edge_vertex_to_vertex( edge_vertex, vertex_id, {} );
+    }
+
+    void GraphBuilder::disassociate_edge_vertex_to_vertex(
+        const EdgeVertex& edge_vertex )
+    {
+        graph_->disassociate_edge_vertex_to_vertex( edge_vertex, {} );
     }
 
     index_t GraphBuilder::create_edge()
