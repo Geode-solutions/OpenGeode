@@ -75,6 +75,21 @@ namespace geode
             const EdgeVertex& edge_vertex,
             const index_t vertex_id )
         {
+            disassociate_edge_vertex_to_vertex( graph, edge_vertex );
+            const auto& edges = edges_around_vertex_->value( vertex_id );
+            const auto it = absl::c_find( edges, edge_vertex );
+            if( it == edges.end() )
+            {
+                edges_around_vertex_->modify_value(
+                    vertex_id, [&edge_vertex]( EdgesAroundVertex& edges ) {
+                        edges.push_back( edge_vertex );
+                    } );
+            }
+        }
+
+        void disassociate_edge_vertex_to_vertex(
+            const Graph& graph, const EdgeVertex& edge_vertex )
+        {
             const auto previous_vertex = graph.edge_vertex( edge_vertex );
             if( previous_vertex < graph.nb_vertices() )
             {
@@ -88,15 +103,6 @@ namespace geode
                             edges.erase( it );
                         } );
                 }
-            }
-            const auto& edges = edges_around_vertex_->value( vertex_id );
-            const auto it = absl::c_find( edges, edge_vertex );
-            if( it == edges.end() )
-            {
-                edges_around_vertex_->modify_value(
-                    vertex_id, [&edge_vertex]( EdgesAroundVertex& edges ) {
-                        edges.push_back( edge_vertex );
-                    } );
             }
         }
 
@@ -172,6 +178,12 @@ namespace geode
         const EdgeVertex& edge_vertex, index_t vertex_id, GraphKey )
     {
         impl_->associate_edge_vertex_to_vertex( *this, edge_vertex, vertex_id );
+    }
+
+    void Graph::disassociate_edge_vertex_to_vertex(
+        const EdgeVertex& edge_vertex, GraphKey )
+    {
+        impl_->disassociate_edge_vertex_to_vertex( *this, edge_vertex );
     }
 
     AttributeManager& Graph::edge_attribute_manager() const
