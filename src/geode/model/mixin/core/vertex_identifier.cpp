@@ -233,6 +233,8 @@ namespace geode
                         // workaround for gcc < 4.9
                         vertices.begin() + ( it - vertices.cbegin() ) );
                 } );
+            vertex2unique_vertex_.at( component_vertex_id.component_id.id() )
+                ->set_value( component_vertex_id.vertex, NO_ID );
         }
 
         void update_unique_vertices( const ComponentID& component_id,
