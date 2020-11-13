@@ -94,10 +94,10 @@ namespace geode
     void Lines< dimension >::load_lines( absl::string_view directory )
     {
         impl_->load_components( absl::StrCat( directory, "/lines" ) );
+        const auto mapping = impl_->file_mapping( directory );
         for( auto& line : modifiable_lines() )
         {
-            const auto file =
-                impl_->find_file( directory, line.component_id() );
+            const auto file = mapping.at( line.component_id().id().string() );
             line.set_mesh(
                 load_edged_curve< dimension >( line.mesh_type(), file ),
                 typename Line< dimension >::LinesKey{} );

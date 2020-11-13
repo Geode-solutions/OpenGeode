@@ -45,18 +45,15 @@ namespace geode
             return Section::native_extension_static();
         }
 
-        void read() final
+        void load_section_files( absl::string_view directory )
         {
-            SectionBuilder builder( section() );
-            const UnzipFile zip_reader{ filename(), uuid{}.string() };
-            zip_reader.extract_all();
-
-            builder.load_corners( zip_reader.directory() );
-            builder.load_lines( zip_reader.directory() );
-            builder.load_surfaces( zip_reader.directory() );
-            builder.load_model_boundaries( zip_reader.directory() );
-            builder.load_relationships( zip_reader.directory() );
-            builder.load_unique_vertices( zip_reader.directory() );
+            SectionBuilder builder{ section() };
+            builder.load_corners( directory );
+            builder.load_lines( directory );
+            builder.load_surfaces( directory );
+            builder.load_model_boundaries( directory );
+            builder.load_relationships( directory );
+            builder.load_unique_vertices( directory );
 
             for( const auto& corner : section().corners() )
             {
@@ -70,6 +67,13 @@ namespace geode
             {
                 builder.register_mesh_component( surface );
             }
+        }
+
+        void read() final
+        {
+            const UnzipFile zip_reader{ filename(), uuid{}.string() };
+            zip_reader.extract_all();
+            load_section_files( zip_reader.directory() );
         }
     };
 } // namespace geode
