@@ -121,12 +121,11 @@ namespace geode
     void Surfaces< dimension >::load_surfaces( absl::string_view directory )
     {
         impl_->load_components( absl::StrCat( directory, "/surfaces" ) );
-        const auto prefix = absl::StrCat( directory, "/",
-            Surface< dimension >::component_type_static().get() );
+        const auto mapping = impl_->file_mapping( directory );
         for( auto& surface : modifiable_surfaces() )
         {
             const auto file =
-                impl_->find_file( directory, surface.component_id() );
+                mapping.at( surface.component_id().id().string() );
             if( MeshFactory::type( surface.mesh_type() )
                 == TriangulatedSurface< dimension >::type_name_static() )
             {

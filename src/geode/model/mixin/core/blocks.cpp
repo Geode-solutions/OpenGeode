@@ -116,10 +116,10 @@ namespace geode
     void Blocks< dimension >::load_blocks( absl::string_view directory )
     {
         impl_->load_components( absl::StrCat( directory, "/blocks" ) );
+        const auto mapping = impl_->file_mapping( directory );
         for( auto& block : modifiable_blocks() )
         {
-            const auto file =
-                impl_->find_file( directory, block.component_id() );
+            const auto file = mapping.at( block.component_id().id().string() );
             if( MeshFactory::type( block.mesh_type() )
                 == TetrahedralSolid< dimension >::type_name_static() )
             {

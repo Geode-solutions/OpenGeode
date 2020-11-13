@@ -27,13 +27,13 @@
 #include <memory>
 
 #include <absl/container/flat_hash_map.h>
+#include <absl/strings/match.h>
 
 #include <bitsery/ext/std_map.h>
 
 #include <ghc/filesystem.hpp>
 
 #include <geode/basic/bitsery_archive.h>
-#include <geode/basic/filename.h>
 
 #include <geode/geometry/bitsery_archive.h>
 
@@ -127,22 +127,23 @@ namespace geode
                     filename );
             }
 
-            std::string find_file(
-                absl::string_view directory, const ComponentID& id ) const
+            absl::flat_hash_map< std::string, std::string > file_mapping(
+                absl::string_view directory ) const
             {
-                const auto name =
-                    absl::StrCat( id.type().get(), id.id().string() );
+                absl::flat_hash_map< std::string, std::string > mapping;
                 for( const auto& file :
                     ghc::filesystem::directory_iterator( directory.data() ) )
                 {
-                    const auto filename = file.path().native();
-                    if( name == filename_without_extension( filename ) )
+                    auto path = file.path();
+                    auto filename = path.replace_extension( "" ).string();
+                    if( filename.size() > 36 )
                     {
-                        return filename;
+                        auto uuid = filename.substr( filename.size() - 36 );
+                        mapping.emplace(
+                            std::move( uuid ), file.path().string() );
                     }
                 }
-                throw OpenGeodeException( "[ComponentsStorage::find_file] File "
-                                          "not found in archive" );
+                return mapping;
             }
 
         protected:

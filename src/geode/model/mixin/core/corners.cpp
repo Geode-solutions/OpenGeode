@@ -96,10 +96,10 @@ namespace geode
     void Corners< dimension >::load_corners( absl::string_view directory )
     {
         impl_->load_components( absl::StrCat( directory, "/corners" ) );
+        const auto mapping = impl_->file_mapping( directory );
         for( auto& corner : modifiable_corners() )
         {
-            const auto file =
-                impl_->find_file( directory, corner.component_id() );
+            const auto file = mapping.at( corner.component_id().id().string() );
             corner.set_mesh(
                 load_point_set< dimension >( corner.mesh_type(), file ),
                 typename Corner< dimension >::CornersKey{} );
