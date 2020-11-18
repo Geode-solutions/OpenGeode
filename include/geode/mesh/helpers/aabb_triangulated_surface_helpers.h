@@ -35,6 +35,7 @@ namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
     FORWARD_DECLARATION_DIMENSION_CLASS( AABBTree );
+    FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMesh );
     FORWARD_DECLARATION_DIMENSION_CLASS( TriangulatedSurface );
 } // namespace geode
 
@@ -42,7 +43,7 @@ namespace geode
 {
     template < index_t dimension >
     AABBTree< dimension > create_aabb_tree(
-        const TriangulatedSurface< dimension >& mesh );
+        const SurfaceMesh< dimension >& mesh );
 
     template < index_t dimension >
     class DistanceToTriangle

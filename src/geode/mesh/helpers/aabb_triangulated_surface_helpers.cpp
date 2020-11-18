@@ -29,19 +29,19 @@
 
 #include <geode/mesh/helpers/aabb_triangulated_surface_helpers.h>
 
-#include <geode/mesh/core/triangulated_surface.h>
-
 #include <geode/geometry/aabb.h>
 #include <geode/geometry/basic_objects.h>
 #include <geode/geometry/distance.h>
 #include <geode/geometry/point.h>
 #include <geode/geometry/vector.h>
 
+#include <geode/mesh/core/triangulated_surface.h>
+
 namespace geode
 {
     template < index_t dimension >
     AABBTree< dimension > create_aabb_tree(
-        const TriangulatedSurface< dimension >& mesh )
+        const SurfaceMesh< dimension >& mesh )
     {
         absl::FixedArray< BoundingBox< dimension > > box_vector(
             mesh.nb_polygons() );
@@ -69,9 +69,9 @@ namespace geode
     }
 
     template opengeode_mesh_api AABBTree2D create_aabb_tree< 2 >(
-        const TriangulatedSurface2D& );
+        const SurfaceMesh2D& );
     template opengeode_mesh_api AABBTree3D create_aabb_tree< 3 >(
-        const TriangulatedSurface3D& );
+        const SurfaceMesh3D& );
 
     template class opengeode_mesh_api DistanceToTriangle< 2 >;
     template class opengeode_mesh_api DistanceToTriangle< 3 >;
