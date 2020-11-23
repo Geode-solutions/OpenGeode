@@ -540,6 +540,23 @@ namespace geode
         return std::make_tuple( std::fabs( distance ), projected_p );
     }
 
+    template < index_t dimension >
+    std::tuple< double, Point< dimension > > point_sphere_distance(
+        const Point< dimension >& point, const Sphere< dimension >& sphere )
+    {
+        Vector< dimension > center_to_point{ sphere.origin(), point };
+        if( center_to_point.length() < global_epsilon )
+        {
+            Vector< dimension > dummy_direction;
+            dummy_direction.set_value( 0, 1 );
+            return std::make_tuple( sphere.radius(),
+                sphere.origin() + dummy_direction * sphere.radius() );
+        }
+        return std::make_tuple(
+            std::fabs( center_to_point.length() - sphere.radius() ),
+            sphere.origin() + center_to_point.normalize() * sphere.radius() );
+    }
+
     template std::tuple< double, Point2D > opengeode_geometry_api
         point_segment_distance( const Point2D&, const Segment2D& );
     template std::tuple< double, Point2D, Point2D > opengeode_geometry_api
@@ -548,6 +565,8 @@ namespace geode
         point_line_distance( const Point2D&, const InfiniteLine2D& );
     template std::tuple< double, Point2D > opengeode_geometry_api
         point_triangle_distance( const Point2D&, const Triangle2D& );
+    template std::tuple< double, Point2D > opengeode_geometry_api
+        point_sphere_distance( const Point2D&, const Sphere2D& );
 
     template std::tuple< double, Point3D > opengeode_geometry_api
         point_segment_distance( const Point3D&, const Segment3D& );
@@ -557,4 +576,6 @@ namespace geode
         point_line_distance( const Point3D&, const InfiniteLine3D& );
     template std::tuple< double, Point3D > opengeode_geometry_api
         point_triangle_distance( const Point3D&, const Triangle3D& );
+    template std::tuple< double, Point3D > opengeode_geometry_api
+        point_sphere_distance( const Point3D&, const Sphere3D& );
 } // namespace geode

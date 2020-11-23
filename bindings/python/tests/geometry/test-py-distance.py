@@ -155,8 +155,35 @@ def test_point_plane_distance():
     if distance != -1.0 or closest_point != answer:
         raise ValueError( "[Test] Wrong result for point_plane_signed_distance with query point q2" )
 
+def test_point_sphere_distance():
+    a = geom.Point3D( [0.0, 0.0, 1.0] )
+    sphere = geom.Sphere3D( a, 2.0 )
+
+    q1 = geom.Point3D( [2.0, 0.0, 1.0] )
+    distance, closest_point = geom.point_sphere_distance3D( q1, sphere )
+    if distance != 0.0 or closest_point != q1:
+        raise ValueError( "[Test] Wrong result for point_sphere_distance with query point q1" )
+
+    q2 = geom.Point3D( [0.0, 3.0, 1.0] )
+    distance, closest_point = geom.point_sphere_distance3D( q2, sphere )
+    answer = geom.Point3D( [0.0, 2.0, 1.0] )
+    if distance != 1.0 or closest_point != answer:
+        raise ValueError( "[Test] Wrong result for point_sphere_distance with query point q3" )
+
+    q3 = geom.Point3D( [0.0, 1.0, 1.0] )
+    distance, closest_point = geom.point_sphere_distance3D( q3, sphere )
+    answer = geom.Point3D( [0.0, 2.0, 1.0] )
+    if distance != 1.0 or closest_point != answer:
+        raise ValueError( "[Test] Wrong result for point_sphere_distance with query point q3" )
+
+    distance, closest_point = geom.point_sphere_distance3D( a, sphere )
+    answer = geom.Point3D( [2.0, 0.0, 1.0] )
+    if distance != 2.0 or closest_point != answer:
+        raise ValueError( "[Test] Wrong result for point_sphere_distance with query point a" )
+
 if __name__ == '__main__':
     test_point_segment_distance()
     test_segment_segment_distance()
     test_point_triangle_distance()
     test_point_plane_distance()
+    test_point_sphere_distance()

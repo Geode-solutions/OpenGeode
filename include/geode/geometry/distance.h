@@ -31,6 +31,7 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
     FORWARD_DECLARATION_DIMENSION_CLASS( Segment );
     FORWARD_DECLARATION_DIMENSION_CLASS( Triangle );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Sphere );
     ALIAS_2D_AND_3D( Point );
     ALIAS_2D_AND_3D( Triangle );
     ALIAS_2D( InfiniteLine );
@@ -90,8 +91,6 @@ namespace geode
      * @return a tuple containing:
      * - the smallest distance.
      * - the closest point on the triangle.
-     * @details the sign is given by the triangle normal (positive if in the
-     * same plane).
      */
     template < index_t dimension >
     std::tuple< double, Point< dimension > > point_triangle_distance(
@@ -103,6 +102,8 @@ namespace geode
      * @return a tuple containing:
      * - the smallest distance.
      * - the closest point on the triangle.
+     * @details the sign is given by the triangle normal (positive if in the
+     * same plane).
      */
     std::tuple< double, Point3D > point_triangle_signed_distance(
         const Point3D& point, const Triangle3D& triangle );
@@ -133,4 +134,14 @@ namespace geode
      */
     std::tuple< double, Point3D > opengeode_geometry_api
         point_plane_signed_distance( const Point3D& point, const Plane& plane );
+
+    /*!
+     * Compute the smallest distance between a point and a sphere (circle in 2D)
+     * @return a tuple containing:
+     * - the smallest distance.
+     * - the closest point on the sphere.
+     */
+    template < index_t dimension >
+    std::tuple< double, Point< dimension > > point_sphere_distance(
+        const Point< dimension >& point, const Sphere< dimension >& sphere );
 } // namespace geode
