@@ -557,6 +557,35 @@ namespace geode
             sphere.origin() + center_to_point.normalize() * sphere.radius() );
     }
 
+    template < index_t dimension >
+    std::tuple< double, Point< dimension > > point_sphere_signed_distance(
+        const Point< dimension >& point, const Sphere< dimension >& sphere )
+    {
+        Vector< dimension > center_to_point{ sphere.origin(), point };
+        if( center_to_point.length() < global_epsilon )
+        {
+            Vector< dimension > dummy_direction;
+            dummy_direction.set_value( 0, 1 );
+            return std::make_tuple( -sphere.radius(),
+                sphere.origin() + dummy_direction * sphere.radius() );
+        }
+        return std::make_tuple( center_to_point.length() - sphere.radius(),
+            sphere.origin() + center_to_point.normalize() * sphere.radius() );
+    }
+
+    template < index_t dimension >
+    std::tuple< double, Point< dimension > > point_ball_distance(
+        const Point< dimension >& point, const Ball< dimension >& ball )
+    {
+        const auto signed_distance =
+            point_sphere_signed_distance( point, ball );
+        if( std::get< 0 >( signed_distance ) > 0 )
+        {
+            return signed_distance;
+        }
+        return std::make_tuple( 0, point );
+    }
+
     template std::tuple< double, Point2D > opengeode_geometry_api
         point_segment_distance( const Point2D&, const Segment2D& );
     template std::tuple< double, Point2D, Point2D > opengeode_geometry_api
@@ -567,6 +596,10 @@ namespace geode
         point_triangle_distance( const Point2D&, const Triangle2D& );
     template std::tuple< double, Point2D > opengeode_geometry_api
         point_sphere_distance( const Point2D&, const Sphere2D& );
+    template std::tuple< double, Point2D > opengeode_geometry_api
+        point_sphere_signed_distance( const Point2D&, const Sphere2D& );
+    template std::tuple< double, Point2D > opengeode_geometry_api
+        point_ball_distance( const Point2D&, const Ball2D& );
 
     template std::tuple< double, Point3D > opengeode_geometry_api
         point_segment_distance( const Point3D&, const Segment3D& );
@@ -578,4 +611,8 @@ namespace geode
         point_triangle_distance( const Point3D&, const Triangle3D& );
     template std::tuple< double, Point3D > opengeode_geometry_api
         point_sphere_distance( const Point3D&, const Sphere3D& );
+    template std::tuple< double, Point3D > opengeode_geometry_api
+        point_sphere_signed_distance( const Point3D&, const Sphere3D& );
+    template std::tuple< double, Point3D > opengeode_geometry_api
+        point_ball_distance( const Point3D&, const Ball3D& );
 } // namespace geode

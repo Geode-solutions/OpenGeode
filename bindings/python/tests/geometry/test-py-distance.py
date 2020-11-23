@@ -163,23 +163,56 @@ def test_point_sphere_distance():
     distance, closest_point = geom.point_sphere_distance3D( q1, sphere )
     if distance != 0.0 or closest_point != q1:
         raise ValueError( "[Test] Wrong result for point_sphere_distance with query point q1" )
+    q1 = geom.Point3D( [2.0, 0.0, 1.0] )
+    distance, closest_point = geom.point_sphere_signed_distance3D( q1, sphere )
+    if distance != 0.0 or closest_point != q1:
+        raise ValueError( "[Test] Wrong result for point_sphere_signed_distance with query point q1" )
+    q1 = geom.Point3D( [2.0, 0.0, 1.0] )
+    distance, closest_point = geom.point_ball_distance3D( q1, sphere )
+    if distance != 0.0 or closest_point != q1:
+        raise ValueError( "[Test] Wrong result for point_ball_distance with query point q1" )
 
     q2 = geom.Point3D( [0.0, 3.0, 1.0] )
     distance, closest_point = geom.point_sphere_distance3D( q2, sphere )
     answer = geom.Point3D( [0.0, 2.0, 1.0] )
     if distance != 1.0 or closest_point != answer:
         raise ValueError( "[Test] Wrong result for point_sphere_distance with query point q3" )
+    q2 = geom.Point3D( [0.0, 3.0, 1.0] )
+    distance, closest_point = geom.point_sphere_signed_distance3D( q2, sphere )
+    if distance != 1.0 or closest_point != answer:
+        raise ValueError( "[Test] Wrong result for point_sphere_signed_distance with query point q3" )
+    q2 = geom.Point3D( [0.0, 3.0, 1.0] )
+    distance, closest_point = geom.point_ball_distance3D( q2, sphere )
+    if distance != 1.0 or closest_point != answer:
+        raise ValueError( "[Test] Wrong result for point_ball_distance with query point q3" )
 
     q3 = geom.Point3D( [0.0, 1.0, 1.0] )
     distance, closest_point = geom.point_sphere_distance3D( q3, sphere )
     answer = geom.Point3D( [0.0, 2.0, 1.0] )
     if distance != 1.0 or closest_point != answer:
         raise ValueError( "[Test] Wrong result for point_sphere_distance with query point q3" )
+    q3 = geom.Point3D( [0.0, 1.0, 1.0] )
+    distance, closest_point = geom.point_sphere_signed_distance3D( q3, sphere )
+    answer = geom.Point3D( [0.0, 2.0, 1.0] )
+    if distance != -1.0 or closest_point != answer:
+        raise ValueError( "[Test] Wrong result for point_sphere_signed__distance with query point q3" )
+    q3 = geom.Point3D( [0.0, 1.0, 1.0] )
+    distance, closest_point = geom.point_ball_distance3D( q3, sphere )
+    if distance != 0.0 or closest_point != q3:
+        raise ValueError( "[Test] Wrong result for point_ball_distance with query point q3" )
 
     distance, closest_point = geom.point_sphere_distance3D( a, sphere )
     answer = geom.Point3D( [2.0, 0.0, 1.0] )
     if distance != 2.0 or closest_point != answer:
         raise ValueError( "[Test] Wrong result for point_sphere_distance with query point a" )
+    distance, closest_point = geom.point_sphere_signed_distance3D( a, sphere )
+    answer = geom.Point3D( [2.0, 0.0, 1.0] )
+    if distance != -2.0 or closest_point != answer:
+        raise ValueError( "[Test] Wrong result for point_sphere_signed_distance with query point a" )
+    distance, closest_point = geom.point_ball_distance3D( a, sphere )
+    answer = geom.Point3D( [2.0, 0.0, 1.0] )
+    if distance != 0.0 or closest_point != a:
+        raise ValueError( "[Test] Wrong result for point_ball_distance with query point a" )
 
 if __name__ == '__main__':
     test_point_segment_distance()
