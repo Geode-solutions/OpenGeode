@@ -43,7 +43,15 @@
     const auto point_sphere_distance##dimension =                              \
         "point_sphere_distance" + std::to_string( dimension ) + "D";           \
     module.def( point_sphere_distance##dimension.c_str(),                      \
-        &point_sphere_distance< dimension > )
+        &point_sphere_distance< dimension > );                                 \
+    const auto point_sphere_signed_distance##dimension =                       \
+        "point_sphere_signed_distance" + std::to_string( dimension ) + "D";    \
+    module.def( point_sphere_signed_distance##dimension.c_str(),               \
+        &point_sphere_signed_distance< dimension > );                          \
+    const auto point_ball_distance##dimension =                                \
+        "point_ball_distance" + std::to_string( dimension ) + "D";             \
+    module.def( point_ball_distance##dimension.c_str(),                        \
+        &point_ball_distance< dimension > )
 
 namespace geode
 {

@@ -35,9 +35,10 @@ namespace geode
     ALIAS_2D_AND_3D( Point );
     ALIAS_2D_AND_3D( Triangle );
     ALIAS_2D( InfiniteLine );
-
     class Plane;
     class Tetra;
+    template < index_t dimension >
+    using Ball = Sphere< dimension >;
 } // namespace geode
 
 namespace geode
@@ -144,4 +145,28 @@ namespace geode
     template < index_t dimension >
     std::tuple< double, Point< dimension > > point_sphere_distance(
         const Point< dimension >& point, const Sphere< dimension >& sphere );
+
+    /*!
+     * Compute the smallest signed distance between a point and a sphere (circle
+     * in 2D)
+     * @return a tuple containing:
+     * - the smallest signed distance.
+     * - the closest point on the sphere.
+     * @details the sign is positive outside the sphere, negative inside.
+     */
+    template < index_t dimension >
+    std::tuple< double, Point< dimension > > point_sphere_signed_distance(
+        const Point< dimension >& point, const Sphere< dimension >& sphere );
+
+    /*!
+     * Compute the smallest distance between a point and a ball (disk in 2D)
+     * @return a tuple containing:
+     * - the smallest distance.
+     * - the closest point on the ball.
+     * @details Result is always positive or null. If point is inside the ball,
+     * the returned distance is 0.
+     */
+    template < index_t dimension >
+    std::tuple< double, Point< dimension > > point_ball_distance(
+        const Point< dimension >& point, const Ball< dimension >& sphere );
 } // namespace geode
