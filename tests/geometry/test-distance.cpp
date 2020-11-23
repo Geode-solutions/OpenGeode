@@ -708,6 +708,55 @@ void test_point_tetra_distance()
         "q3" );
 }
 
+void test_point_sphere_distance()
+{
+    const geode::Point3D a{ { 0.0, 0.0, 1.0 } };
+    const geode::Sphere3D sphere{ a, 2 };
+
+    double distance;
+    geode::Point3D closest_point, answer;
+
+    const geode::Point3D q1{ { 2.0, 0.0, 1.0 } };
+    std::tie( distance, closest_point ) =
+        geode::point_sphere_distance( q1, sphere );
+    OPENGEODE_EXCEPTION(
+        distance == 0
+            && closest_point.inexact_equal( q1, geode::global_epsilon ),
+        "[Test] Wrong result for point_sphere_distance with query Point3D "
+        "q1" );
+
+    const geode::Point3D q2{ { 0.0, 3.0, 1.0 } };
+    std::tie( distance, closest_point ) =
+        geode::point_sphere_distance( q2, sphere );
+    answer = geode::Point3D{ { 0.0, 2.0, 1.0 } };
+    OPENGEODE_EXCEPTION(
+        distance == 1
+            && closest_point.inexact_equal( answer, geode::global_epsilon ),
+        "[Test] Wrong result for point_sphere_distance with query Point3D "
+        "q2" );
+
+    const geode::Point3D q3{ { 0.0, 1.0, 1.0 } };
+    std::tie( distance, closest_point ) =
+        geode::point_sphere_distance( q3, sphere );
+    answer = geode::Point3D{ { 0.0, 2.0, 1.0 } };
+    OPENGEODE_EXCEPTION(
+        distance == 1
+            && closest_point.inexact_equal( answer, geode::global_epsilon ),
+        "[Test] Wrong result for point_sphere_distance with query Point3D "
+        "q3" );
+
+    std::tie( distance, closest_point ) =
+        geode::point_sphere_distance( a, sphere );
+    SDEBUG( closest_point );
+    DEBUG( distance );
+    answer = geode::Point3D{ { 2.0, 0.0, 1.0 } };
+    OPENGEODE_EXCEPTION(
+        distance == 2
+            && closest_point.inexact_equal( answer, geode::global_epsilon ),
+        "[Test] Wrong result for point_sphere_distance with query Point3D "
+        "a" );
+}
+
 void test()
 {
     test_point_segment_distance();
@@ -716,6 +765,7 @@ void test()
     test_point_triangle_distance();
     test_point_tetra_distance();
     test_point_plane_distance();
+    test_point_sphere_distance();
 }
 
 OPENGEODE_TEST( "distance" )

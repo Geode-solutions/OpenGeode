@@ -39,7 +39,11 @@
     const auto point_triangle_distance##dimension =                            \
         "point_triangle_distance" + std::to_string( dimension ) + "D";         \
     module.def( point_triangle_distance##dimension.c_str(),                    \
-        &point_triangle_distance< dimension > )
+        &point_triangle_distance< dimension > );                               \
+    const auto point_sphere_distance##dimension =                              \
+        "point_sphere_distance" + std::to_string( dimension ) + "D";           \
+    module.def( point_sphere_distance##dimension.c_str(),                      \
+        &point_sphere_distance< dimension > )
 
 namespace geode
 {
