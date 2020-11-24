@@ -819,6 +819,130 @@ void test_point_sphere_distance()
         "Point3D a" );
 }
 
+void test_point_circle_distance()
+{
+    const geode::Point3D a{ { 0.0, 0.0, 1.0 } };
+    const geode::Point3D normal_x{ { -1.0, 0.0, 0.0 } };
+    const geode::Point3D normal_z{ { 0.0, 0.0, 1.0 } };
+    const geode::Plane plane_x{ normal_x, a };
+    const geode::Plane plane_z{ normal_z, a };
+    const geode::Circle circle_x{ plane_x, 2 };
+    const geode::Circle circle_z{ plane_z, 2 };
+
+    double distance;
+    geode::Point3D closest_point, answer;
+
+    const geode::Point3D q1{ { 2.0, 0.0, 1.0 } };
+    std::tie( distance, closest_point ) =
+        geode::point_circle_distance( q1, circle_x );
+    answer = geode::Point3D{ { 0.0, 2.0, 1.0 } };
+    OPENGEODE_EXCEPTION(
+        distance == sqrt( 8 )
+            && closest_point.inexact_equal( answer, geode::global_epsilon ),
+        "[Test] Wrong result for point_circle_distance with query Point3D "
+        "q1 and circle_x" );
+
+    std::tie( distance, closest_point ) =
+        geode::point_circle_distance( q1, circle_z );
+    OPENGEODE_EXCEPTION(
+        distance == 0
+            && closest_point.inexact_equal( q1, geode::global_epsilon ),
+        "[Test] Wrong result for point_circle_distance with query Point3D "
+        "q1 and circle_z" );
+
+    std::tie( distance, closest_point ) =
+        geode::point_circle_signed_distance( q1, circle_x );
+    answer = geode::Point3D{ { 0.0, 2.0, 1.0 } };
+    OPENGEODE_EXCEPTION(
+        distance == -sqrt( 8 )
+            && closest_point.inexact_equal( answer, geode::global_epsilon ),
+        "[Test] Wrong result for point_circle_signed_distance with query "
+        "Point3D "
+        "q1 and circle_x" );
+
+    std::tie( distance, closest_point ) =
+        geode::point_circle_signed_distance( q1, circle_z );
+    OPENGEODE_EXCEPTION(
+        distance == 0
+            && closest_point.inexact_equal( q1, geode::global_epsilon ),
+        "[Test] Wrong result for point_circle_signed_distance with query "
+        "Point3D "
+        "q1 and circle_z" );
+
+    std::tie( distance, closest_point ) =
+        geode::point_disk_distance( q1, circle_x );
+    answer = geode::Point3D{ { 0.0, 0.0, 1.0 } };
+    OPENGEODE_EXCEPTION(
+        distance == 2
+            && closest_point.inexact_equal( answer, geode::global_epsilon ),
+        "[Test] Wrong result for point_disk_distance with query Point3D "
+        "q1 and circle_x" );
+
+    std::tie( distance, closest_point ) =
+        geode::point_disk_distance( q1, circle_z );
+    OPENGEODE_EXCEPTION(
+        distance == 0
+            && closest_point.inexact_equal( q1, geode::global_epsilon ),
+        "[Test] Wrong result for point_disk_distance with query Point3D "
+        "q1 and circle_z" );
+
+    const geode::Point3D q2{ { 0.0, 3.0, 1.0 } };
+    std::tie( distance, closest_point ) =
+        geode::point_circle_distance( q2, circle_x );
+    answer = geode::Point3D{ { 0.0, 2.0, 1.0 } };
+    OPENGEODE_EXCEPTION(
+        distance == 1
+            && closest_point.inexact_equal( answer, geode::global_epsilon ),
+        "[Test] Wrong result for point_circle_distance with query Point3D "
+        "q2 and circle_x" );
+
+    std::tie( distance, closest_point ) =
+        geode::point_circle_signed_distance( q2, circle_x );
+    answer = geode::Point3D{ { 0.0, 2.0, 1.0 } };
+    OPENGEODE_EXCEPTION(
+        distance == 1
+            && closest_point.inexact_equal( answer, geode::global_epsilon ),
+        "[Test] Wrong result for point_circle_signed_distance with query "
+        "Point3D "
+        "q2 and circle_x" );
+
+    std::tie( distance, closest_point ) =
+        geode::point_disk_distance( q2, circle_x );
+    answer = geode::Point3D{ { 0.0, 2.0, 1.0 } };
+    OPENGEODE_EXCEPTION(
+        distance == 1
+            && closest_point.inexact_equal( answer, geode::global_epsilon ),
+        "[Test] Wrong result for point_disk_distance with query Point3D "
+        "q2 and circle_x" );
+
+    std::tie( distance, closest_point ) =
+        geode::point_circle_distance( a, circle_x );
+    answer = geode::Point3D{ { 0.0, 2.0, 1.0 } };
+    OPENGEODE_EXCEPTION(
+        distance == 2
+            && closest_point.inexact_equal( answer, geode::global_epsilon ),
+        "[Test] Wrong result for point_circle_distance with query Point3D "
+        "a and circle_x" );
+
+    std::tie( distance, closest_point ) =
+        geode::point_circle_signed_distance( a, circle_x );
+    answer = geode::Point3D{ { 0.0, 2.0, 1.0 } };
+    OPENGEODE_EXCEPTION(
+        distance == 2
+            && closest_point.inexact_equal( answer, geode::global_epsilon ),
+        "[Test] Wrong result for point_circle_signed_distance with query "
+        "Point3D "
+        "a and circle_x" );
+
+    std::tie( distance, closest_point ) =
+        geode::point_disk_distance( a, circle_x );
+    OPENGEODE_EXCEPTION(
+        distance == 0
+            && closest_point.inexact_equal( a, geode::global_epsilon ),
+        "[Test] Wrong result for point_disk_distance with query Point3D "
+        "a and circle_x" );
+}
+
 void test()
 {
     test_point_segment_distance();
@@ -828,6 +952,7 @@ void test()
     test_point_tetra_distance();
     test_point_plane_distance();
     test_point_sphere_distance();
+    test_point_circle_distance();
 }
 
 OPENGEODE_TEST( "distance" )

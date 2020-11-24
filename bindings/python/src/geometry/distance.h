@@ -63,5 +63,9 @@ namespace geode
         module.def( "point_plane_distance", &point_plane_distance );
         module.def(
             "point_plane_signed_distance", &point_plane_signed_distance );
+        module.def( "point_circle_distance", &point_circle_distance );
+        module.def(
+            "point_circle_signed_distance", &point_circle_signed_distance );
+        module.def( "point_disk_distance", &point_disk_distance );
     }
 } // namespace geode

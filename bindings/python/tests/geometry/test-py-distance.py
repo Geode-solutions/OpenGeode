@@ -21,7 +21,7 @@
 
 import os, sys, platform
 if sys.version_info >= (3,8,0) and platform.system() == "Windows":
-    for path in [x.strip() for x in os.environ['PATH'].split(';') if x]:
+    for path in [x.strip() for x in os.environ['PATH'].split('') if x]:
         os.add_dll_directory(path)
 
 import math
@@ -214,9 +214,77 @@ def test_point_sphere_distance():
     if distance != 0.0 or closest_point != a:
         raise ValueError( "[Test] Wrong result for point_ball_distance with query point a" )
 
+def test_point_circle_distance():
+    a = geom.Point3D( [ 0.0, 0.0, 1.0 ] )
+    normal_x = geom.Vector3D( [ -1.0, 0.0, 0.0 ] )
+    normal_z = geom.Vector3D( [ 0.0, 0.0, 1.0 ] )
+    plane_x = geom.Plane( normal_x, a )
+    plane_z = geom.Plane( normal_z, a )
+    circle_x = geom.Circle( plane_x, 2 )
+    circle_z = geom.Circle( plane_z, 2 )
+
+    q1 = geom.Point3D( [2.0, 0.0, 1.0] )
+    distance, closest_point = geom.point_circle_distance( q1, circle_x )
+    answer = geom.Point3D([0.0, 2.0, 1.0])
+    if distance != math.sqrt( 8 ) or closest_point != answer:
+        raise ValueError("[Test] Wrong result for point_circle_distance with query Point3D q1 and circle_x")
+
+    distance, closest_point = geom.point_circle_distance( q1, circle_z )
+    if distance != 0 or closest_point != q1:
+        raise ValueError("[Test] Wrong result for point_circle_distance with query Point3D q1 and circle_z")
+
+    distance, closest_point = geom.point_circle_signed_distance( q1, circle_x )
+    answer = geom.Point3D([0.0, 2.0, 1.0])
+    if distance != -math.sqrt( 8 ) or closest_point != answer:
+        raise ValueError("[Test] Wrong result for point_circle_signed_distance with query Point3D q1 and circle_x")
+    
+    distance, closest_point = geom.point_circle_signed_distance( q1, circle_z )
+    if distance != 0 or closest_point != q1:
+        raise ValueError("[Test] Wrong result for point_circle_signed_distance with query Point3D q1 and circle_z")
+
+    distance, closest_point = geom.point_disk_distance( q1, circle_x )
+    answer = geom.Point3D([0.0, 0.0, 1.0])
+    if distance != 2 or closest_point != answer:
+        raise ValueError("[Test] Wrong result for point_disk_distance with query Point3D q1 and circle_x")
+
+    distance, closest_point = geom.point_disk_distance( q1, circle_z )
+    if distance != 0 or closest_point != q1:
+        raise ValueError("[Test] Wrong result for point_disk_distance with query Point3D q1 and circle_z")
+
+    q2 = geom.Point3D([0.0, 3.0, 1.0])
+    distance, closest_point = geom.point_circle_distance( q2, circle_x )
+    answer = geom.Point3D([0.0, 2.0, 1.0])
+    if distance != 1 or closest_point != answer:
+        raise ValueError("[Test] Wrong result for point_circle_distance with query Point3D q2 and circle_x")
+
+    distance, closest_point = geom.point_circle_signed_distance( q2, circle_x )
+    answer = geom.Point3D([0.0, 2.0, 1.0])
+    if distance != 1 or closest_point != answer:
+        raise ValueError("[Test] Wrong result for point_circle_signed_distance with query Point3D q2 and circle_x")
+
+    distance, closest_point = geom.point_disk_distance( q2, circle_x )
+    answer = geom.Point3D([0.0, 2.0, 1.0])
+    if distance != 1 or closest_point != answer:
+        raise ValueError("[Test] Wrong result for point_disk_distance with query Point3D q2 and circle_x")
+
+    distance, closest_point = geom.point_circle_distance( a, circle_x )
+    answer = geom.Point3D([0.0, 2.0, 1.0])
+    if distance != 2 or closest_point != answer:
+        raise ValueError("[Test] Wrong result for point_circle_distance with query Point3D a and circle_x")
+
+    distance, closest_point = geom.point_circle_signed_distance( a, circle_x )
+    answer = geom.Point3D([0.0, 2.0, 1.0])
+    if distance != 2 or closest_point != answer:
+        raise ValueError("[Test] Wrong result for point_circle_signed_distance with query Point3D a and circle_x")
+
+    distance, closest_point = geom.point_disk_distance( a, circle_x )
+    if distance != 0 or closest_point != a:
+        raise ValueError("[Test] Wrong result for point_disk_distance with query Point3D a and circle_x")
+
 if __name__ == '__main__':
     test_point_segment_distance()
     test_segment_segment_distance()
     test_point_triangle_distance()
     test_point_plane_distance()
     test_point_sphere_distance()
+    test_point_circle_distance()
