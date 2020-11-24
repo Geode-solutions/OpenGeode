@@ -29,6 +29,8 @@
 #include <geode/geometry/signed_mensuration.h>
 #include <geode/geometry/vector.h>
 
+#include <geode/basic/logger.h>
+
 namespace
 {
     constexpr double MAX_DOUBLE = std::numeric_limits< double >::max();
@@ -544,7 +546,7 @@ namespace geode
     std::tuple< double, Point< dimension > > point_sphere_distance(
         const Point< dimension >& point, const Sphere< dimension >& sphere )
     {
-        Vector< dimension > center_to_point{ sphere.origin(), point };
+        const Vector< dimension > center_to_point{ sphere.origin(), point };
         if( center_to_point.length() < global_epsilon )
         {
             Vector< dimension > dummy_direction;
@@ -561,7 +563,7 @@ namespace geode
     std::tuple< double, Point< dimension > > point_sphere_signed_distance(
         const Point< dimension >& point, const Sphere< dimension >& sphere )
     {
-        Vector< dimension > center_to_point{ sphere.origin(), point };
+        const Vector< dimension > center_to_point{ sphere.origin(), point };
         if( center_to_point.length() < global_epsilon )
         {
             Vector< dimension > dummy_direction;
@@ -584,6 +586,80 @@ namespace geode
             return signed_distance;
         }
         return std::make_tuple( 0, point );
+    }
+
+    std::tuple< double, Point3D > point_circle_distance(
+        const Point3D& point, const Circle& circle )
+    {
+        const Vector3D center_to_point{ circle.plane().origin(), point };
+        const auto distance_to_plane =
+            center_to_point.dot( circle.plane().normal() );
+        const auto projected_on_plane =
+            point - circle.plane().normal() * distance_to_plane;
+        const Vector3D center_to_projected_point{ circle.plane().origin(),
+            projected_on_plane };
+        if( center_to_projected_point.length() < global_epsilon )
+        {
+            Vector3D other_direction{ { 1.0, 0.0, 0.0 } };
+            if( circle.plane().normal().inexact_equal(
+                    other_direction, global_epsilon )
+                || circle.plane().normal().inexact_equal( other_direction * -1.,
+                    global_epsilon ) ) // dummy_direction is aligned along plane
+                                       // normal
+            {
+                other_direction.set_value( 1, 1.0 );
+            }
+            OPENGEODE_ASSERT( !circle.plane().normal().inexact_equal(
+                                  other_direction, global_epsilon ),
+                "[point_circle_distance] Problem while getting circle nearest "
+                "point" );
+            const Vector3D other_projected_on_plane =
+                other_direction
+                - circle.plane().normal()
+                      * other_direction.dot( circle.plane().normal() );
+            return std::make_tuple(
+                std::sqrt( circle.radius() * circle.radius()
+                           + distance_to_plane * distance_to_plane ),
+                circle.plane().origin()
+                    + other_projected_on_plane.normalize() * circle.radius() );
+        }
+        const auto nearest_point =
+            circle.plane().origin()
+            + center_to_projected_point.normalize() * circle.radius();
+        return std::make_tuple(
+            Vector3D{ point, nearest_point }.length(), nearest_point );
+    }
+
+    std::tuple< double, Point3D > point_circle_signed_distance(
+        const Point3D& point, const Circle& circle )
+    {
+        double distance;
+        Point3D nearest_point;
+        std::tie( distance, nearest_point ) =
+            point_circle_distance( point, circle );
+        if( circle.plane().normal().dot( point ) < 0 )
+        {
+            distance = -distance;
+        }
+        return std::make_tuple( distance, nearest_point );
+    }
+
+    std::tuple< double, Point3D > point_disk_distance(
+        const Point3D& point, const Disk& disk )
+    {
+        const Vector3D center_to_point{ disk.plane().origin(), point };
+        const auto distance_to_plane =
+            center_to_point.dot( disk.plane().normal() );
+        const auto projected_on_plane =
+            point - disk.plane().normal() * distance_to_plane;
+        const auto distance_projected_center =
+            Vector3D{ disk.plane().origin(), projected_on_plane }.length();
+        if( distance_projected_center <= disk.radius() )
+        {
+            return std::make_tuple(
+                std::fabs( distance_to_plane ), projected_on_plane );
+        }
+        return point_circle_distance( point, disk );
     }
 
     template std::tuple< double, Point2D > opengeode_geometry_api

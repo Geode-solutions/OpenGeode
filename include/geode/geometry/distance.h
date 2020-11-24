@@ -37,8 +37,10 @@ namespace geode
     ALIAS_2D( InfiniteLine );
     class Plane;
     class Tetra;
+    class Circle;
     template < index_t dimension >
     using Ball = Sphere< dimension >;
+    using Disk = Circle;
 } // namespace geode
 
 namespace geode
@@ -137,7 +139,7 @@ namespace geode
         point_plane_signed_distance( const Point3D& point, const Plane& plane );
 
     /*!
-     * Compute the smallest distance between a point and a sphere (circle in 2D)
+     * Compute the smallest distance between a point and a sphere
      * @return a tuple containing:
      * - the smallest distance.
      * - the closest point on the sphere.
@@ -147,8 +149,7 @@ namespace geode
         const Point< dimension >& point, const Sphere< dimension >& sphere );
 
     /*!
-     * Compute the smallest signed distance between a point and a sphere (circle
-     * in 2D)
+     * Compute the smallest signed distance between a point and a sphere
      * @return a tuple containing:
      * - the smallest signed distance.
      * - the closest point on the sphere.
@@ -159,7 +160,7 @@ namespace geode
         const Point< dimension >& point, const Sphere< dimension >& sphere );
 
     /*!
-     * Compute the smallest distance between a point and a ball (disk in 2D)
+     * Compute the smallest distance between a point and a ball
      * @return a tuple containing:
      * - the smallest distance.
      * - the closest point on the ball.
@@ -169,4 +170,35 @@ namespace geode
     template < index_t dimension >
     std::tuple< double, Point< dimension > > point_ball_distance(
         const Point< dimension >& point, const Ball< dimension >& sphere );
+
+    /*!
+     * Compute the smallest distance between a point and a circle
+     * @return a tuple containing:
+     * - the smallest distance.
+     * - the closest point on the circle.
+     */
+    std::tuple< double, Point3D > opengeode_geometry_api point_circle_distance(
+        const Point3D& point, const Circle& circle );
+
+    /*!
+     * Compute the smallest signed distance between a point and a circle
+     * @return a tuple containing:
+     * - the smallest signed distance.
+     * - the closest point on the circle.
+     * @details the sign is positive outside the circle, negative inside.
+     */
+    std::tuple< double, Point3D >
+        opengeode_geometry_api point_circle_signed_distance(
+            const Point3D& point, const Circle& circle );
+
+    /*!
+     * Compute the smallest distance between a point and a disk
+     * @return a tuple containing:
+     * - the smallest distance.
+     * - the closest point on the disk.
+     * @details Result is always positive or null. If point is inside the disk,
+     * the returned distance is 0.
+     */
+    std::tuple< double, Point3D > opengeode_geometry_api point_disk_distance(
+        const Point3D& point, const Disk& disk );
 } // namespace geode
