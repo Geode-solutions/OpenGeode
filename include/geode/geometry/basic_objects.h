@@ -389,6 +389,8 @@ namespace geode
         zero
     };
 
+    using Sign = Side;
+
     enum struct Position
     {
         // Strictly outside
