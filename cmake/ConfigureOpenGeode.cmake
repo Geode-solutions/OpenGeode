@@ -23,6 +23,7 @@ if(OPENGEODE_WITH_PYTHON OR INCLUDE_PYBIND11)
 endif()
 
 set(OpenGeode_PATH_BIN ${PROJECT_BINARY_DIR}/opengeode)
+set(OpenGeode_PATH_INSTALL ${OpenGeode_PATH_BIN}/install)
 ExternalProject_Add(opengeode
     PREFIX ${OpenGeode_PATH_BIN}
     SOURCE_DIR ${PROJECT_SOURCE_DIR}
@@ -44,7 +45,7 @@ ExternalProject_Add(opengeode
         -DABSEIL_INSTALL_PREFIX:PATH=${ABSEIL_INSTALL_PREFIX}
         -DPYBIND11_INSTALL_PREFIX:PATH=${PYBIND11_INSTALL_PREFIX}
         -DPYBIND11_PYTHON_VERSION:STRING=${PYTHON_VERSION}
-        -DCMAKE_INSTALL_PREFIX:PATH=${OpenGeode_PATH_BIN}/install    
+        -DCMAKE_INSTALL_PREFIX:PATH=${OpenGeode_PATH_INSTALL}    
     BINARY_DIR ${OpenGeode_PATH_BIN}
     DEPENDS
         abseil
@@ -56,3 +57,4 @@ ExternalProject_Add(opengeode
         spdlog
         ${bindings}
 )
+
