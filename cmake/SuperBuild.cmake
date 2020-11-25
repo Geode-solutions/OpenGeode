@@ -24,8 +24,6 @@ endif()
 
 set(OPENGEODE_EXTRA_ARGS
     -DCMAKE_PACKAGE_VERSION:STRING=${CMAKE_PACKAGE_VERSION}
-    -DCPACK_PACKAGE_VERSION:STRING=${CPACK_PACKAGE_VERSION}
-    -DCPACK_SYSTEM_NAME:STRING=${CPACK_SYSTEM_NAME}
     -DOPENGEODE_WITH_TESTS:BOOL=${OPENGEODE_WITH_TESTS}
     -DOPENGEODE_WITH_PYTHON:BOOL=${OPENGEODE_WITH_PYTHON}
     -DINCLUDE_PYBIND11:BOOL=${INCLUDE_PYBIND11}
@@ -68,3 +66,17 @@ if(OPENGEODE_WITH_PYTHON OR INCLUDE_PYBIND11)
 endif()
 
 include(${PROJECT_SOURCE_DIR}/cmake/ConfigureOpenGeode.cmake)
+
+install(DIRECTORY ${OpenGeode_PATH_INSTALL}/ DESTINATION .)
+
+#------------------------------------------------------------------------------------------------
+# Configure CPack
+set(CPACK_PACKAGE_NAME OpenGeode)
+if(WIN32)
+    set(CPACK_GENERATOR "ZIP")
+else()
+    set(CPACK_GENERATOR "TGZ")
+endif()
+
+# This must always be last!
+include(CPack)

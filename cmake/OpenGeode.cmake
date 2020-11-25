@@ -76,14 +76,3 @@ if(OPENGEODE_WITH_PYTHON)
     message(STATUS "Configuring OpenGeode with Python bindings")
     add_subdirectory(bindings/python)
 endif()
-
-#------------------------------------------------------------------------------------------------
-# Configure CPack
-if(WIN32)
-    set(CPACK_GENERATOR "ZIP")
-else()
-    set(CPACK_GENERATOR "TGZ")
-endif()
-
-# This must always be last!
-include(CPack)
