@@ -29,6 +29,7 @@
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( PolygonalSurface );
     FORWARD_DECLARATION_DIMENSION_CLASS( TriangulatedSurface );
     FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMesh );
     FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMeshBuilder );
@@ -36,6 +37,11 @@ namespace geode
 
 namespace geode
 {
+    template < index_t dimension >
+    std::unique_ptr< PolygonalSurface< dimension > >
+        convert_surface_mesh_into_polygonal_surface(
+            const SurfaceMesh< dimension >& surface );
+
     template < index_t dimension >
     absl::optional< std::unique_ptr< TriangulatedSurface< dimension > > >
         convert_surface_mesh_into_triangulated_surface(
