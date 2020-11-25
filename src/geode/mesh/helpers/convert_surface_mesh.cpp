@@ -27,7 +27,8 @@
 
 #include <geode/geometry/point.h>
 
-#include <geode/mesh/builder/triangulated_surface_builder.h>
+#include <geode/mesh/builder/surface_mesh_builder.h>
+#include <geode/mesh/core/polygonal_surface.h>
 #include <geode/mesh/core/triangulated_surface.h>
 
 namespace
@@ -55,10 +56,52 @@ namespace
         }
         return true;
     }
+
+    template < geode::index_t dimension >
+    void convert_surface( const geode::SurfaceMesh< dimension >& input,
+        geode::SurfaceMesh< dimension >& output )
+    {
+        auto builder = geode::SurfaceMeshBuilder< dimension >::create( output );
+        copy_points( input, *builder );
+        output.vertex_attribute_manager().copy(
+            input.vertex_attribute_manager() );
+        for( const auto p : geode::Range{ input.nb_polygons() } )
+        {
+            absl::FixedArray< geode::index_t > vertices(
+                input.nb_polygon_vertices( p ) );
+            for( const auto v : geode::Range{ input.nb_polygon_vertices( p ) } )
+            {
+                vertices[v] = input.polygon_vertex( { p, v } );
+            }
+            builder->create_polygon( vertices );
+        }
+        for( const auto p : geode::Range{ input.nb_polygons() } )
+        {
+            for( const auto e : geode::Range{ input.nb_polygon_edges( p ) } )
+            {
+                if( const auto adjacent = input.polygon_adjacent( { p, e } ) )
+                {
+                    builder->set_polygon_adjacent( { p, e }, adjacent.value() );
+                }
+            }
+        }
+        output.polygon_attribute_manager().copy(
+            input.polygon_attribute_manager() );
+    }
 } // namespace
 
 namespace geode
 {
+    template < index_t dimension >
+    std::unique_ptr< PolygonalSurface< dimension > >
+        convert_surface_mesh_into_polygonal_surface(
+            const SurfaceMesh< dimension >& surface )
+    {
+        auto poly_surface = PolygonalSurface< dimension >::create();
+        convert_surface( surface, *poly_surface );
+        return poly_surface;
+    }
+
     template < index_t dimension >
     absl::optional< std::unique_ptr< TriangulatedSurface< dimension > > >
         convert_surface_mesh_into_triangulated_surface(
@@ -69,32 +112,7 @@ namespace geode
             return absl::nullopt;
         }
         auto tri_surface = TriangulatedSurface< dimension >::create();
-        auto builder =
-            TriangulatedSurfaceBuilder< dimension >::create( *tri_surface );
-        copy_points( surface, *builder );
-        tri_surface->vertex_attribute_manager().copy(
-            surface.vertex_attribute_manager() );
-        builder->reserve_triangles( surface.nb_polygons() );
-        for( const auto p : Range{ surface.nb_polygons() } )
-        {
-            const std::array< index_t, 3 > vertices{ surface.polygon_vertex(
-                                                         { p, 0 } ),
-                surface.polygon_vertex( { p, 1 } ),
-                surface.polygon_vertex( { p, 2 } ) };
-            builder->create_triangle( vertices );
-        }
-        for( const auto p : Range{ surface.nb_polygons() } )
-        {
-            for( const auto e : Range{ 3 } )
-            {
-                if( const auto adjacent = surface.polygon_adjacent( { p, e } ) )
-                {
-                    builder->set_polygon_adjacent( { p, e }, adjacent.value() );
-                }
-            }
-        }
-        tri_surface->polygon_attribute_manager().copy(
-            surface.polygon_attribute_manager() );
+        convert_surface( surface, *tri_surface );
         return { std::move( tri_surface ) };
     }
 
