@@ -24,7 +24,8 @@
 #pragma once
 
 #include <array>
-#include <iostream>
+#include <limits>
+#include <sstream>
 
 #include <bitsery/bitsery.h>
 
@@ -136,14 +137,15 @@ namespace geode
 
         std::string string() const
         {
-            std::string result;
+            std::ostringstream oss;
+            oss.precision( std::numeric_limits< double >::digits10 );
             const auto *sep = "";
             for( const auto i : Range{ dimension } )
             {
-                absl::StrAppend( &result, sep, value( i ) );
+                oss << sep << value( i );
                 sep = " ";
             }
-            return result;
+            return oss.str();
         }
 
     private:
