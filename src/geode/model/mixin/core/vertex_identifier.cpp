@@ -29,6 +29,8 @@ namespace geode
 {
     class VertexIdentifier::Impl
     {
+        const std::string unique_vertices_name = "unique vertices";
+
     public:
         Impl()
             : component_vertices_(
@@ -128,23 +130,19 @@ namespace geode
             const auto& mesh = component.mesh();
             if( it == vertex2unique_vertex_.end() )
             {
-                OPENGEODE_EXCEPTION(
-                    !mesh.vertex_attribute_manager().attribute_exists(
-                        "unique_vertices" ),
-                    "[VertexIdentifier::register_component] At component "
-                    "registration, no attribute called "
-                    "\"unique_vertices\" should exists on component mesh. " );
+                mesh.vertex_attribute_manager().delete_attribute(
+                    unique_vertices_name );
                 vertex2unique_vertex_.emplace( component.id(),
                     mesh.vertex_attribute_manager()
                         .template find_or_create_attribute< VariableAttribute,
-                            index_t >( "unique vertices", NO_ID ) );
+                            index_t >( unique_vertices_name, NO_ID ) );
             }
             else
             {
                 auto attribute =
                     mesh.vertex_attribute_manager()
                         .template find_or_create_attribute< VariableAttribute,
-                            index_t >( "unique vertices", NO_ID );
+                            index_t >( unique_vertices_name, NO_ID );
                 try
                 {
                     for( const auto v : Range{ mesh.nb_vertices() } )
