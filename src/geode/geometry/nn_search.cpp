@@ -137,6 +137,12 @@ namespace geode
     }
 
     template < index_t dimension >
+    NNSearch< dimension >::NNSearch( NNSearch&& other )
+        : impl_( std::move( other.impl_ ) )
+    {
+    }
+
+    template < index_t dimension >
     NNSearch< dimension >::~NNSearch() // NOLINT
     {
     }

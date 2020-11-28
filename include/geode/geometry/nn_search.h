@@ -36,7 +36,7 @@ namespace geode
     template < index_t dimension >
     class NNSearch
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( NNSearch );
+        OPENGEODE_DISABLE_COPY( NNSearch );
         OPENGEODE_TEMPLATE_ASSERT_2D_OR_3D( dimension );
 
     public:
@@ -60,7 +60,8 @@ namespace geode
         };
 
     public:
-        explicit NNSearch( std::vector< Point< dimension > > points );
+        NNSearch( std::vector< Point< dimension > > points );
+        NNSearch( NNSearch&& other );
         ~NNSearch();
 
         index_t nb_points() const;
