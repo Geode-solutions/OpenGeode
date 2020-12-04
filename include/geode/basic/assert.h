@@ -88,4 +88,3 @@ namespace geode
         {                                                                      \
             __VA_ARGS__                                                        \
         }
-
