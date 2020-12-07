@@ -36,6 +36,10 @@ void test_segment()
     const geode::Point2D b{ { -1.0, -5.0 } };
     const geode::Segment2D segment{ a, b };
 
+    const geode::Point2D barycenter{ { 0, 0 } };
+    OPENGEODE_EXCEPTION(
+        segment.barycenter() == barycenter, "[Test] Wrong barycenter result" );
+
     geode::Segment2D segment2{ segment };
     OPENGEODE_EXCEPTION(
         segment2.vertices()[0].get() == a && segment2.vertices()[1].get() == b,
@@ -124,6 +128,10 @@ void test_triangle()
     const geode::Point2D c{ { 1.0, -5.0 } };
     const geode::Triangle2D triangle{ a, b, c };
 
+    const geode::Point2D barycenter{ { 1.0 / 3., -5.0 / 3. } };
+    OPENGEODE_EXCEPTION(
+        triangle.barycenter() == barycenter, "[Test] Wrong barycenter result" );
+
     geode::Triangle2D triangle2{ triangle };
     OPENGEODE_EXCEPTION( triangle2.vertices()[0].get() == a
                              && triangle2.vertices()[1].get() == b
@@ -158,6 +166,10 @@ void test_tetra()
     const geode::Point3D c{ { 1.0, -5.0 } };
     const geode::Point3D d{ { -1.0, 5.0 } };
     const geode::Tetra tetra{ a, b, c, d };
+
+    const geode::Point3D barycenter{ { 0, 0 } };
+    OPENGEODE_EXCEPTION(
+        tetra.barycenter() == barycenter, "[Test] Wrong barycenter result" );
 
     geode::Tetra tetra2{ tetra };
     OPENGEODE_EXCEPTION( tetra2.vertices()[0].get() == a
