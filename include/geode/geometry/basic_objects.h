@@ -229,6 +229,12 @@ namespace geode
             vertices_ = std::move( other.vertices_ );
             return *this;
         }
+        Point< dimension > barycenter() const
+        {
+            return ( vertices_[0].get() + vertices_[1].get()
+                       + vertices_[2].get() )
+                   / 3.;
+        }
         template < index_t T = dimension >
         typename std::enable_if< T == 3, Vector3D >::type normal() const
         {
@@ -278,6 +284,12 @@ namespace geode
         {
             vertices_ = std::move( other.vertices_ );
             return *this;
+        }
+        Point3D barycenter() const
+        {
+            return ( vertices_[0].get() + vertices_[1].get()
+                       + vertices_[2].get() + vertices_[3].get() )
+                   / 4.;
         }
         const std::array< std::reference_wrapper< const Point3D >, 4 >&
             vertices() const
