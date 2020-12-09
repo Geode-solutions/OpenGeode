@@ -33,6 +33,7 @@
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+    FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
     class AttributeManager;
 } // namespace geode
 
@@ -106,6 +107,13 @@ namespace geode
         Point< dimension > point( const Index& index ) const;
 
         AttributeManager& cell_attribute_manager() const;
+
+        /*!
+         * Compute the bounding box of the grid
+         */
+        BoundingBox< dimension > bounding_box() const;
+
+        RegularGrid< dimension > clone() const;
 
     private:
         RegularGrid();
