@@ -238,8 +238,9 @@ namespace geode
         template < index_t T = dimension >
         typename std::enable_if< T == 3, Vector3D >::type normal() const
         {
-            return Vector3D{ vertices_[0], vertices_[1] }.cross(
-                Vector3D{ vertices_[0], vertices_[2] } );
+            return Vector3D{ vertices_[0], vertices_[1] }
+                .cross( Vector3D{ vertices_[0], vertices_[2] } )
+                .normalize();
         }
         template < index_t T = dimension >
         typename std::enable_if< T == 3, Plane >::type plane() const

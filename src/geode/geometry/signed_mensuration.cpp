@@ -61,8 +61,15 @@ namespace geode
         const Triangle3D& triangle, const Vector3D& direction )
     {
         const auto area = triangle_area( triangle );
-        const auto area_normal = triangle.normal();
-        return direction.dot( area_normal ) > 0 ? area : -area;
+        try
+        {
+            const auto area_normal = triangle.normal();
+            return direction.dot( area_normal ) > 0 ? area : -area;
+        }
+        catch( const OpenGeodeException& )
+        {
+            return area;
+        }
     }
 
     double triangle_signed_area( const Triangle2D& triangle )
