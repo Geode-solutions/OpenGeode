@@ -29,7 +29,9 @@
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
 
+#include <geode/geometry/bounding_box.h>
 #include <geode/geometry/point.h>
+
 namespace geode
 {
     template < index_t dimension >
@@ -330,6 +332,38 @@ namespace geode
     AttributeManager& RegularGrid< dimension >::cell_attribute_manager() const
     {
         return impl_->cell_attribute_manager();
+    }
+
+    template < index_t dimension >
+    BoundingBox< dimension > RegularGrid< dimension >::bounding_box() const
+    {
+        BoundingBox< dimension > bbox;
+        bbox.add_point( this->origin() );
+        Point< dimension > extreme_point;
+        for( const auto d : Range{ dimension } )
+        {
+            extreme_point.set_value(
+                d, this->origin().value( d )
+                       + ( this->nb_cells( d ) + 1 ) * this->cell_size( d ) );
+        }
+        bbox.add_point( extreme_point );
+        return bbox;
+    }
+
+    template < index_t dimension >
+    RegularGrid< dimension > RegularGrid< dimension >::clone() const
+    {
+        std::array< index_t, dimension > cells_number;
+        std::array< double, dimension > cells_size;
+        for( const auto d : Range{ dimension } )
+        {
+            cells_number[d] = this->nb_cells( d );
+            cells_size[d] = this->cell_size( d );
+        }
+        RegularGrid< dimension > clone{ this->origin(), cells_number,
+            cells_size };
+        clone.cell_attribute_manager().copy( this->cell_attribute_manager() );
+        return clone;
     }
 
     template < index_t dimension >
