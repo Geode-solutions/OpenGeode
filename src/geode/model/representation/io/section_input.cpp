@@ -37,7 +37,7 @@ namespace geode
             Logger::info( "Section has: ", section.nb_surfaces(), " Surfaces, ",
                 section.nb_lines(), " Lines, ", section.nb_corners(),
                 " Corners, ", section.nb_model_boundaries(),
-                " MdelBoundaries" );
+                " ModelBoundaries" );
             return section;
         }
         catch( const OpenGeodeException& e )
