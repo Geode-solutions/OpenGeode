@@ -23,8 +23,10 @@
 
 #include <fstream>
 
+#include <geode/basic/attribute_manager.h>
 #include <geode/basic/logger.h>
 
+#include <geode/geometry/bounding_box.h>
 #include <geode/geometry/point.h>
 
 #include <geode/mesh/core/regular_grid.h>
@@ -130,6 +132,43 @@ void test_cell_query( const geode::RegularGrid3D& grid )
         "[Test] Wrong query result" );
 }
 
+void test_boundary_box( const geode::RegularGrid3D& grid )
+{
+    const auto bbox = grid.bounding_box();
+    geode::Point3D min{ { 1.5, 0, 1 } };
+    geode::Point3D max{ { 7.5, 22, 49 } };
+    OPENGEODE_EXCEPTION( bbox.min() == min, "[Test] Wrong bounding box min" );
+    OPENGEODE_EXCEPTION( bbox.max() == max, "[Test] Wrong bounding box max" );
+}
+
+void test_clone( geode::RegularGrid3D& grid )
+{
+    const auto attribute_name = "int_attribute";
+    auto attribute =
+        grid.cell_attribute_manager()
+            .find_or_create_attribute< geode::VariableAttribute, int >(
+                attribute_name, 0 );
+    for( const auto c : geode::Range{ grid.nb_cells() } )
+    {
+        attribute->set_value( c, 2 * c );
+    }
+    const auto clone = grid.clone();
+    OPENGEODE_EXCEPTION(
+        clone.origin() == grid.origin(), "[Test] Wrong clone origin" );
+    OPENGEODE_EXCEPTION(
+        clone.nb_cells() == grid.nb_cells(), "[Test] Wrong clone nb_cells" );
+    OPENGEODE_EXCEPTION(
+        clone.cell_attribute_manager().attribute_exists( attribute_name ),
+        "[Test] Clone missing attribute" );
+    const auto clone_attribute =
+        clone.cell_attribute_manager().find_attribute< int >( attribute_name );
+    for( const auto c : geode::Range{ clone.nb_cells() } )
+    {
+        OPENGEODE_EXCEPTION( clone_attribute->value( c ) == 2 * c,
+            "[Test] Wrong clone attribute" );
+    }
+}
+
 void test_io( const geode::RegularGrid3D& grid, absl::string_view filename )
 {
     geode::save_regular_grid( grid, filename );
@@ -143,6 +182,8 @@ void test()
     test_cell_index( grid );
     test_cell_geometry( grid );
     test_cell_query( grid );
+    test_boundary_box( grid );
+    test_clone( grid );
     test_io( grid, absl::StrCat( "test.", grid.native_extension() ) );
 }
 
