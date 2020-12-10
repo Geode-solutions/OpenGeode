@@ -200,6 +200,16 @@ namespace geode
             return indices;
         }
 
+        const std::array< index_t, dimension >& cells_numbers() const
+        {
+            return cells_number_;
+        }
+
+        const std::array< double, dimension > cells_sizes() const
+        {
+            return cells_size_;
+        }
+
     private:
         friend class bitsery::Access;
         template < typename Archive >
@@ -353,15 +363,8 @@ namespace geode
     template < index_t dimension >
     RegularGrid< dimension > RegularGrid< dimension >::clone() const
     {
-        std::array< index_t, dimension > cells_number;
-        std::array< double, dimension > cells_size;
-        for( const auto d : Range{ dimension } )
-        {
-            cells_number[d] = this->nb_cells( d );
-            cells_size[d] = this->cell_size( d );
-        }
-        RegularGrid< dimension > clone{ this->origin(), cells_number,
-            cells_size };
+        RegularGrid< dimension > clone{ this->origin(), impl_->cells_numbers(),
+            impl_->cells_sizes() };
         clone.cell_attribute_manager().copy( this->cell_attribute_manager() );
         return clone;
     }
