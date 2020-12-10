@@ -162,7 +162,7 @@ void test_clone( geode::RegularGrid3D& grid )
         "[Test] Clone missing attribute" );
     const auto clone_attribute =
         clone.cell_attribute_manager().find_attribute< int >( attribute_name );
-    for( const auto c : geode::Range{ clone.nb_cells() } )
+    for( const auto c : geode::TRange< int >{ clone.nb_cells() } )
     {
         OPENGEODE_EXCEPTION( clone_attribute->value( c ) == 2 * c,
             "[Test] Wrong clone attribute" );

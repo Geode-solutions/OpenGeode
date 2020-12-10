@@ -55,7 +55,7 @@ namespace geode
     struct opengeode_mesh_api PolygonVertex
     {
         PolygonVertex() = default;
-        PolygonVertex( index_t polygon_id, index_t vertex_id )
+        PolygonVertex( index_t polygon_id, local_index_t vertex_id )
             : polygon_id( polygon_id ), vertex_id( vertex_id )
         {
         }
@@ -70,16 +70,10 @@ namespace geode
             return !( *this == other );
         }
         template < typename Archive >
-        void serialize( Archive& archive )
-        {
-            archive.ext( *this, DefaultGrowable< Archive, PolygonVertex >{},
-                []( Archive& archive, PolygonVertex& polygon_vertex ) {
-                    archive.value4b( polygon_vertex.polygon_id );
-                    archive.value4b( polygon_vertex.vertex_id );
-                } );
-        }
+        void serialize( Archive& archive );
+
         index_t polygon_id{ NO_ID };
-        index_t vertex_id{ NO_ID };
+        local_index_t vertex_id{ NO_LID };
     };
 
     /*!
@@ -88,7 +82,7 @@ namespace geode
     struct opengeode_mesh_api PolygonEdge
     {
         PolygonEdge() = default;
-        PolygonEdge( index_t polygon_id, index_t edge_id )
+        PolygonEdge( index_t polygon_id, local_index_t edge_id )
             : polygon_id( polygon_id ), edge_id( edge_id )
         {
         }
@@ -102,16 +96,10 @@ namespace geode
             return !( *this == other );
         }
         template < typename Archive >
-        void serialize( Archive& archive )
-        {
-            archive.ext( *this, DefaultGrowable< Archive, PolygonEdge >{},
-                []( Archive& archive, PolygonEdge& polygon_edge ) {
-                    archive.value4b( polygon_edge.polygon_id );
-                    archive.value4b( polygon_edge.edge_id );
-                } );
-        }
+        void serialize( Archive& archive );
+
         index_t polygon_id{ NO_ID };
-        index_t edge_id{ NO_ID };
+        local_index_t edge_id{ NO_LID };
     };
 
     using PolygonEdgesOnBorder = absl::InlinedVector< PolygonEdge, 3 >;
@@ -156,12 +144,12 @@ namespace geode
         /*!
          * Return the number of vertices in a polygon
          */
-        index_t nb_polygon_vertices( index_t polygon_id ) const;
+        local_index_t nb_polygon_vertices( index_t polygon_id ) const;
 
         /*!
          * Return the number of edges in a polygon
          */
-        index_t nb_polygon_edges( index_t polygon_id ) const;
+        local_index_t nb_polygon_edges( index_t polygon_id ) const;
 
         /*!
          * Return the index in the mesh of a local vertex in a polygon
@@ -175,7 +163,7 @@ namespace geode
          * @param[in] vertex_id Local index of vertex in the edge (0 or 1).
          */
         index_t polygon_edge_vertex(
-            const PolygonEdge& polygon_edge, index_t vertex_id ) const;
+            const PolygonEdge& polygon_edge, local_index_t vertex_id ) const;
 
         /*!
          * Return the indices in the mesh of the two polygon edge vertices.
@@ -364,7 +352,8 @@ namespace geode
         virtual index_t get_polygon_vertex(
             const PolygonVertex& polygon_vertex ) const = 0;
 
-        virtual index_t get_nb_polygon_vertices( index_t polygon_id ) const = 0;
+        virtual local_index_t get_nb_polygon_vertices(
+            index_t polygon_id ) const = 0;
 
         virtual absl::optional< index_t > get_polygon_adjacent(
             const PolygonEdge& polygon_edge ) const = 0;

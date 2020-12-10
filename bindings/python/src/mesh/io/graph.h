@@ -29,6 +29,8 @@ namespace geode
     void define_graph_io( pybind11::module& module )
     {
         module.def( "save_graph", &save_graph );
-        module.def( "load_graph", &load_graph );
+        module.def(
+            "load_graph", ( std::unique_ptr< Graph >( * )( absl::string_view ) )
+                              & load_graph );
     }
 } // namespace geode

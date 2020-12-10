@@ -90,17 +90,18 @@ namespace geode
                 } );
         }
 
-        index_t get_nb_polyhedron_vertices( index_t /*unused*/ ) const final
+        local_index_t get_nb_polyhedron_vertices(
+            index_t /*unused*/ ) const final
         {
             return 4;
         }
 
-        index_t get_nb_polyhedron_facets( index_t /*unused*/ ) const final
+        local_index_t get_nb_polyhedron_facets( index_t /*unused*/ ) const final
         {
             return 4;
         }
 
-        index_t get_nb_polyhedron_facet_vertices(
+        local_index_t get_nb_polyhedron_facet_vertices(
             const PolyhedronFacet& /*unused*/ ) const final
         {
             return 3;

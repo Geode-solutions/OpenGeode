@@ -129,6 +129,40 @@ namespace geode
     {
     }
 
+    template < typename Archive >
+    void PolygonVertex::serialize( Archive& archive )
+    {
+        archive.ext( *this,
+            Growable< Archive, PolygonVertex >{
+                { []( Archive& archive, PolygonVertex& polygon_vertex ) {
+                     archive.value4b( polygon_vertex.polygon_id );
+                     index_t value;
+                     archive.value4b( value );
+                     polygon_vertex.vertex_id = value;
+                 },
+                    []( Archive& archive, PolygonVertex& polygon_vertex ) {
+                        archive.value4b( polygon_vertex.polygon_id );
+                        archive.value1b( polygon_vertex.vertex_id );
+                    } } } );
+    }
+
+    template < typename Archive >
+    void PolygonEdge::serialize( Archive& archive )
+    {
+        archive.ext(
+            *this, Growable< Archive, PolygonEdge >{
+                       { []( Archive& archive, PolygonEdge& polygon_edge ) {
+                            archive.value4b( polygon_edge.polygon_id );
+                            index_t value;
+                            archive.value4b( value );
+                            polygon_edge.edge_id = value;
+                        },
+                           []( Archive& archive, PolygonEdge& polygon_edge ) {
+                               archive.value4b( polygon_edge.polygon_id );
+                               archive.value1b( polygon_edge.edge_id );
+                           } } } );
+    }
+
     template < index_t dimension >
     class SurfaceMesh< dimension >::Impl
     {
@@ -181,14 +215,16 @@ namespace geode
         const SurfaceEdges< dimension >& edges() const
         {
             OPENGEODE_EXCEPTION( are_edges_enabled(),
-                "[SurfaceMesh] Edges should be enabled before accessing them" );
+                "[SurfaceMesh] Edges should be "
+                "enabled before accessing them" );
             return *edges_;
         }
 
         SurfaceEdges< dimension >& edges()
         {
             OPENGEODE_EXCEPTION( are_edges_enabled(),
-                "[SurfaceMesh] Edges should be enabled before accessing them" );
+                "[SurfaceMesh] Edges should be "
+                "enabled before accessing them" );
             return *edges_;
         }
 
@@ -298,7 +334,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t SurfaceMesh< dimension >::nb_polygon_vertices(
+    local_index_t SurfaceMesh< dimension >::nb_polygon_vertices(
         index_t polygon_id ) const
     {
         check_polygon_id( *this, polygon_id );
@@ -306,7 +342,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t SurfaceMesh< dimension >::nb_polygon_edges(
+    local_index_t SurfaceMesh< dimension >::nb_polygon_edges(
         index_t polygon_id ) const
     {
         return nb_polygon_vertices( polygon_id );
@@ -319,7 +355,8 @@ namespace geode
         const auto vertex = polygon_vertex.vertex_id;
         const auto polygon = polygon_vertex.polygon_id;
         const auto nb_vertices = nb_polygon_vertices( polygon );
-        return { polygon, ( vertex + 1 ) % nb_vertices };
+        return { polygon,
+            static_cast< local_index_t >( ( vertex + 1 ) % nb_vertices ) };
     }
 
     template < index_t dimension >
@@ -329,7 +366,8 @@ namespace geode
         const auto vertex = polygon_vertex.vertex_id;
         const auto polygon = polygon_vertex.polygon_id;
         const auto nb_vertices = nb_polygon_vertices( polygon );
-        return { polygon, ( vertex + nb_vertices - 1 ) % nb_vertices };
+        return { polygon, static_cast< local_index_t >(
+                              ( vertex + nb_vertices - 1 ) % nb_vertices ) };
     }
 
     template < index_t dimension >
@@ -367,7 +405,7 @@ namespace geode
             const auto v0 = this->polygon_vertex( polygon_edge );
             const auto v1 = this->polygon_vertex(
                 this->next_polygon_vertex( polygon_edge ) );
-            for( const auto e : Range{ nb_polygon_edges( polygon_adj_id ) } )
+            for( const auto e : LRange{ nb_polygon_edges( polygon_adj_id ) } )
             {
                 const PolygonVertex adj_edge{ polygon_adj_id, e };
                 const auto adj_v0 = this->polygon_vertex( adj_edge );
@@ -404,7 +442,7 @@ namespace geode
         index_t polygon_id ) const
     {
         PolygonEdgesOnBorder borders;
-        for( const auto e : Range{ nb_polygon_edges( polygon_id ) } )
+        for( const auto e : LRange{ nb_polygon_edges( polygon_id ) } )
         {
             PolygonEdge edge{ polygon_id, e };
             if( is_edge_on_border( edge ) )
@@ -481,7 +519,7 @@ namespace geode
 
     template < index_t dimension >
     index_t SurfaceMesh< dimension >::polygon_edge_vertex(
-        const PolygonEdge& polygon_edge, index_t vertex_id ) const
+        const PolygonEdge& polygon_edge, local_index_t vertex_id ) const
     {
         OPENGEODE_ASSERT( vertex_id < 2, "[SurfaceMesh::polygon_"
                                          "edge_vertex] vertex_id should be "
@@ -490,7 +528,8 @@ namespace geode
         const auto polygon = polygon_edge.polygon_id;
         const auto nb_vertices = nb_polygon_vertices( polygon );
         return polygon_vertex(
-            { polygon, ( vertex + vertex_id ) % nb_vertices } );
+            { polygon, static_cast< local_index_t >(
+                           ( vertex + vertex_id ) % nb_vertices ) } );
     }
 
     template < index_t dimension >
@@ -506,7 +545,7 @@ namespace geode
         index_t polygon_id ) const
     {
         Point< dimension > barycenter;
-        for( const auto v : Range{ nb_polygon_vertices( polygon_id ) } )
+        for( const auto v : LRange{ nb_polygon_vertices( polygon_id ) } )
         {
             barycenter =
                 barycenter + this->point( polygon_vertex( { polygon_id, v } ) );
@@ -523,11 +562,11 @@ namespace geode
             return area;
         }
         const auto& p1 = this->point( polygon_vertex( { polygon_id, 0 } ) );
-        for( const auto i : Range{ 1, nb_polygon_vertices( polygon_id ) - 1 } )
+        for( const auto i : LRange{ 1, nb_polygon_vertices( polygon_id ) - 1 } )
         {
             const auto& p2 = this->point( polygon_vertex( { polygon_id, i } ) );
-            const auto& p3 =
-                this->point( polygon_vertex( { polygon_id, i + 1 } ) );
+            const auto& p3 = this->point( polygon_vertex(
+                { polygon_id, static_cast< local_index_t >( i + 1 ) } ) );
             area += triangle_area( p1, p2, p3 );
         }
         return area;
@@ -661,10 +700,10 @@ namespace geode
         check_polygon_id( *this, polygon_id );
         Vector3D normal;
         const auto& p0 = this->point( polygon_vertex( { polygon_id, 0 } ) );
-        for( const auto v : Range{ 2, nb_polygon_vertices( polygon_id ) } )
+        for( const auto v : LRange{ 2, nb_polygon_vertices( polygon_id ) } )
         {
-            const auto& p1 =
-                this->point( polygon_vertex( { polygon_id, v - 1 } ) );
+            const auto& p1 = this->point( polygon_vertex(
+                { polygon_id, static_cast< local_index_t >( v - 1 ) } ) );
             const auto& p2 = this->point( polygon_vertex( { polygon_id, v } ) );
             normal = normal + Vector3D{ p1, p0 }.cross( { p2, p0 } );
         }
@@ -702,6 +741,9 @@ namespace geode
         index_t ) const;
     template opengeode_mesh_api
         Vector3D SurfaceMesh< 3 >::polygon_vertex_normal< 3 >( index_t ) const;
+
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, PolygonVertex );
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, PolygonEdge );
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, SurfaceMesh< 2 > );
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, SurfaceMesh< 3 > );

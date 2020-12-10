@@ -77,7 +77,7 @@ namespace geode
         }
         for( const auto p : Range{ solid.nb_polyhedra() } )
         {
-            for( const auto e : Range{ 4 } )
+            for( const auto e : LRange{ 4 } )
             {
                 if( const auto adjacent =
                         solid.polyhedron_adjacent( { p, e } ) )

@@ -68,7 +68,7 @@ namespace geode
         {
             for( const auto p : Range{ surface.nb_polygons() } )
             {
-                for( const auto e : Range{ surface.nb_polygon_edges( p ) } )
+                for( const auto e : LRange{ surface.nb_polygon_edges( p ) } )
                 {
                     this->find_or_create_edge(
                         surface.polygon_edge_vertices( { p, e } ) );

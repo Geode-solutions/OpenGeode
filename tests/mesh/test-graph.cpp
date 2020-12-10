@@ -138,10 +138,16 @@ void test_delete_edge( const geode::Graph& graph, geode::GraphBuilder& builder )
 
 void test_io( const geode::Graph& graph, const std::string& filename )
 {
-    save_graph( graph, filename );
-    auto new_graph =
-        geode::Graph::create( geode::OpenGeodeGraph::impl_name_static() );
-    load_graph( *new_graph, filename );
+    geode::save_graph( graph, filename );
+    geode::load_graph( geode::OpenGeodeGraph::impl_name_static(), filename );
+}
+
+void test_backward_io( const std::string& filename )
+{
+    auto graph = geode::load_graph( filename );
+
+    OPENGEODE_EXCEPTION( graph->edges_around_vertex( 2 ).size() == 3,
+        "[Test] Backward edges_around should have 3 edges" );
 }
 
 void test_clone( const geode::Graph& graph )
@@ -172,6 +178,8 @@ void test()
     test_create_vertices( *graph, *builder );
     test_create_edges( *graph, *builder );
     test_io( *graph, absl::StrCat( "test.", graph->native_extension() ) );
+    test_backward_io( absl::StrCat(
+        geode::data_path, "test_v7.", graph->native_extension() ) );
 
     test_delete_vertex( *graph, *builder );
     test_delete_edge( *graph, *builder );

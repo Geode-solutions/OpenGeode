@@ -73,7 +73,7 @@ void test_create_vertex_attribute(
                 geode::PolygonEdge >( "test", geode::PolygonEdge{} );
     for( const auto v : geode::Range{ polygonal_surface.nb_vertices() } )
     {
-        attribute->set_value( v, geode::PolygonEdge{ v, v } );
+        attribute->set_value( v, geode::PolygonEdge{ v, 0 } );
         OPENGEODE_EXCEPTION( geode::PolygonVertex{} != attribute->value( v ),
             "[Test] PolygonalSurface attribute assignation is not correct" );
     }
@@ -379,6 +379,26 @@ void test_io( const geode::PolygonalSurface3D& polygonal_surface,
     }
 }
 
+void test_backward_io( const std::string& filename )
+{
+    const auto new_polygonal_surface = geode::load_polygonal_surface< 3 >(
+        geode::OpenGeodePolygonalSurface3D::impl_name_static(), filename );
+
+    OPENGEODE_EXCEPTION( new_polygonal_surface->nb_vertices() == 7,
+        "[Test] Reloaded PolygonalSurface should have 7 vertices" );
+    OPENGEODE_EXCEPTION( new_polygonal_surface->edges().nb_edges() == 9,
+        "[Test] Reloaded PolygonalSurface should have 9 edges" );
+    OPENGEODE_EXCEPTION( new_polygonal_surface->nb_polygons() == 3,
+        "[Test] Reloaded PolygonalSurface should have 3 polygons" );
+
+    OPENGEODE_EXCEPTION(
+        new_polygonal_surface->polygons_around_vertex( 1 ).size() == 3,
+        "[Test] Backward polygons around failed" );
+    OPENGEODE_EXCEPTION(
+        new_polygonal_surface->polygons_around_vertex( 2 ).size() == 2,
+        "[Test] Backward polygons around failed" );
+}
+
 void test_clone( const geode::PolygonalSurface3D& polygonal_surface )
 {
     const auto polygonal_surface2 = polygonal_surface.clone();
@@ -393,7 +413,7 @@ void test_clone( const geode::PolygonalSurface3D& polygonal_surface )
                                 .find_attribute< geode::PolygonEdge >( "test" );
     for( const auto v : geode::Range{ polygonal_surface2->nb_vertices() } )
     {
-        const geode::PolygonEdge answer{ v + 1, v + 1 };
+        const geode::PolygonEdge answer{ v + 1, 0 };
         OPENGEODE_EXCEPTION( attribute2->value( v ) != geode::PolygonEdge{},
             "[Test] PolygonalSurface2 attribute is not correct" );
         OPENGEODE_EXCEPTION( attribute2->value( v ) == answer,
@@ -482,6 +502,8 @@ void test()
 
     test_io( *polygonal_surface,
         absl::StrCat( "test.", polygonal_surface->native_extension() ) );
+    test_backward_io( absl::StrCat(
+        geode::data_path, "test_v7.", polygonal_surface->native_extension() ) );
 
     test_replace_vertex( *polygonal_surface, *builder );
     test_delete_vertex( *polygonal_surface, *builder );

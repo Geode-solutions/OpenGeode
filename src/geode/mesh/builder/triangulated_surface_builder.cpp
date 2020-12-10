@@ -69,7 +69,7 @@ namespace geode
         const auto added_triangle = triangulated_surface_->nb_polygons();
         triangulated_surface_->polygon_attribute_manager().resize(
             added_triangle + 1 );
-        index_t vertex_id{ 0 };
+        local_index_t vertex_id{ 0 };
         for( const auto& vertex : vertices )
         {
             this->associate_polygon_vertex_to_vertex(

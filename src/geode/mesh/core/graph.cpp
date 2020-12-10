@@ -126,6 +126,23 @@ namespace geode
             edges_around_vertex_;
     };
 
+    template < typename Archive >
+    void EdgeVertex::serialize( Archive& archive )
+    {
+        archive.ext(
+            *this, Growable< Archive, EdgeVertex >{
+                       { []( Archive& archive, EdgeVertex& edge_vertex ) {
+                            archive.value4b( edge_vertex.edge_id );
+                            index_t value;
+                            archive.value4b( value );
+                            edge_vertex.vertex_id = value;
+                        },
+                           []( Archive& archive, EdgeVertex& edge_vertex ) {
+                               archive.value4b( edge_vertex.edge_id );
+                               archive.value1b( edge_vertex.vertex_id );
+                           } } } );
+    }
+
     Graph::Graph() : impl_( *this ) {}
 
     Graph::Graph( Graph&& other ) : impl_( std::move( other.impl_ ) ) {}
@@ -208,6 +225,8 @@ namespace geode
         builder->copy( *this, {} );
         return clone;
     }
+
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, EdgeVertex );
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, Graph );
 } // namespace geode

@@ -142,7 +142,8 @@ namespace geode
             {
                 const auto& other =
                     this->vertex_component_id( { edge_vertex.edge_id,
-                        ( edge_vertex.vertex_id + 1 ) % 2 } );
+                        static_cast< local_index_t >(
+                            ( edge_vertex.vertex_id + 1 ) % 2 ) } );
                 if( to == other.id()
                     && relation_type( edge_vertex.edge_id ) == type )
                 {
@@ -391,7 +392,8 @@ namespace geode
         {
             const auto iterator = this->current();
             return relationships_.vertex_component_id(
-                { iterator->edge_id, ( iterator->vertex_id + 1 ) % 2 } );
+                { iterator->edge_id, static_cast< local_index_t >(
+                                         ( iterator->vertex_id + 1 ) % 2 ) } );
         }
 
     private:
@@ -479,7 +481,8 @@ namespace geode
         {
             const auto iterator = this->current();
             return relationships_.vertex_component_id(
-                { iterator->edge_id, ( iterator->vertex_id + 1 ) % 2 } );
+                { iterator->edge_id, static_cast< local_index_t >(
+                                         ( iterator->vertex_id + 1 ) % 2 ) } );
         }
 
     private:
@@ -568,7 +571,8 @@ namespace geode
         {
             const auto iterator = this->current();
             return relationships_.vertex_component_id(
-                { iterator->edge_id, ( iterator->vertex_id + 1 ) % 2 } );
+                { iterator->edge_id, static_cast< local_index_t >(
+                                         ( iterator->vertex_id + 1 ) % 2 ) } );
         }
 
     private:
@@ -656,7 +660,8 @@ namespace geode
         {
             const auto iterator = this->current();
             return relationships_.vertex_component_id(
-                { iterator->edge_id, ( iterator->vertex_id + 1 ) % 2 } );
+                { iterator->edge_id, static_cast< local_index_t >(
+                                         ( iterator->vertex_id + 1 ) % 2 ) } );
         }
 
     private:
@@ -745,7 +750,8 @@ namespace geode
         {
             const auto iterator = this->current();
             return relationships_.vertex_component_id(
-                { iterator->edge_id, ( iterator->vertex_id + 1 ) % 2 } );
+                { iterator->edge_id, static_cast< local_index_t >(
+                                         ( iterator->vertex_id + 1 ) % 2 ) } );
         }
 
     private:
@@ -833,7 +839,8 @@ namespace geode
         {
             const auto iterator = this->current();
             return relationships_.vertex_component_id(
-                { iterator->edge_id, ( iterator->vertex_id + 1 ) % 2 } );
+                { iterator->edge_id, static_cast< local_index_t >(
+                                         ( iterator->vertex_id + 1 ) % 2 ) } );
         }
 
     private:

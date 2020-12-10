@@ -69,7 +69,8 @@ namespace
         {
             absl::FixedArray< geode::index_t > vertices(
                 input.nb_polygon_vertices( p ) );
-            for( const auto v : geode::Range{ input.nb_polygon_vertices( p ) } )
+            for( const auto v :
+                geode::LRange{ input.nb_polygon_vertices( p ) } )
             {
                 vertices[v] = input.polygon_vertex( { p, v } );
             }
@@ -77,11 +78,12 @@ namespace
         }
         for( const auto p : geode::Range{ input.nb_polygons() } )
         {
-            for( const auto e : geode::Range{ input.nb_polygon_edges( p ) } )
+            for( const auto e : geode::LRange{ input.nb_polygon_edges( p ) } )
             {
-                if( const auto adjacent = input.polygon_adjacent( { p, e } ) )
+                const geode::PolygonEdge edge{ p, e };
+                if( const auto adjacent = input.polygon_adjacent( edge ) )
                 {
-                    builder->set_polygon_adjacent( { p, e }, adjacent.value() );
+                    builder->set_polygon_adjacent( edge, adjacent.value() );
                 }
             }
         }
@@ -135,11 +137,12 @@ namespace geode
                 to_delete[p] = true;
                 const auto v0 = surface.polygon_vertex( { p, 0 } );
                 for( const auto v :
-                    Range{ 2, surface.nb_polygon_vertices( p ) } )
+                    LRange{ 2, surface.nb_polygon_vertices( p ) } )
                 {
-                    builder.create_polygon(
-                        { v0, surface.polygon_vertex( { p, v - 1 } ),
-                            surface.polygon_vertex( { p, v } ) } );
+                    builder.create_polygon( { v0,
+                        surface.polygon_vertex(
+                            { p, static_cast< local_index_t >( v - 1 ) } ),
+                        surface.polygon_vertex( { p, v } ) } );
                 }
             }
         }

@@ -100,7 +100,7 @@ namespace
         for( const auto p : geode::Range{ solid.nb_polyhedra() } )
         {
             for( const auto f :
-                geode::Range{ solid.nb_polyhedron_facets( p ) } )
+                geode::LRange{ solid.nb_polyhedron_facets( p ) } )
             {
                 const geode::PolyhedronFacet id{ p, f };
                 if( const auto adj = solid.polyhedron_adjacent( id ) )
@@ -157,7 +157,7 @@ namespace
         for( const auto p : geode::Range{ solid.nb_polyhedra() } )
         {
             for( const auto v :
-                geode::Range{ solid.nb_polyhedron_vertices( p ) } )
+                geode::LRange{ solid.nb_polyhedron_vertices( p ) } )
             {
                 const geode::PolyhedronVertex id{ p, v };
                 const auto new_vertex =
@@ -221,7 +221,7 @@ namespace geode
         if( solid_mesh_->are_edges_enabled()
             || solid_mesh_->are_facets_enabled() )
         {
-            for( const auto f : Range{ solid_mesh_->nb_polyhedron_facets(
+            for( const auto f : LRange{ solid_mesh_->nb_polyhedron_facets(
                      polyhedron_vertex.polyhedron_id ) } )
             {
                 const PolyhedronFacet id{ polyhedron_vertex.polyhedron_id, f };
@@ -229,7 +229,7 @@ namespace geode
                     solid_mesh_->nb_polyhedron_facet_vertices( id );
                 absl::FixedArray< PolyhedronVertex > facet_vertices(
                     nb_facet_vertices );
-                for( const auto v : Range{ nb_facet_vertices } )
+                for( const auto v : LRange{ nb_facet_vertices } )
                 {
                     facet_vertices[v] = solid_mesh_->polyhedron_facet_vertex_id(
                         { id, v }, {} );
@@ -299,7 +299,7 @@ namespace geode
         for( const auto p : Range{ solid_mesh_->nb_polyhedra() } )
         {
             for( const auto v :
-                Range{ solid_mesh_->nb_polyhedron_vertices( p ) } )
+                LRange{ solid_mesh_->nb_polyhedron_vertices( p ) } )
             {
                 const PolyhedronVertex id{ p, v };
                 const auto new_vertex =
@@ -335,7 +335,7 @@ namespace geode
         const auto added_polyhedron = solid_mesh_->nb_polyhedra();
         solid_mesh_->polyhedron_attribute_manager().resize(
             added_polyhedron + 1 );
-        for( const auto v : Indices{ vertices } )
+        for( const auto v : LIndices{ vertices } )
         {
             associate_polyhedron_vertex_to_vertex(
                 { added_polyhedron, v }, vertices[v] );
@@ -471,7 +471,7 @@ namespace geode
         for( const auto polyhedron : polyhedra_to_connect )
         {
             for( const auto f :
-                Range{ solid_mesh_->nb_polyhedron_facets( polyhedron ) } )
+                LRange{ solid_mesh_->nb_polyhedron_facets( polyhedron ) } )
             {
                 PolyhedronFacet facet{ polyhedron, f };
                 const auto vertices_id =
@@ -508,11 +508,11 @@ namespace geode
                 continue;
             }
             for( const auto f :
-                Range{ solid_mesh_->nb_polyhedron_facets( p ) } )
+                LRange{ solid_mesh_->nb_polyhedron_facets( p ) } )
             {
                 const PolyhedronFacet id{ p, f };
                 for( const auto v :
-                    Range{ solid_mesh_->nb_polyhedron_facet_vertices( id ) } )
+                    LRange{ solid_mesh_->nb_polyhedron_facet_vertices( id ) } )
                 {
                     auto vertices = solid_mesh_->polyhedron_facet_edge_vertices(
                         { id, v } );
@@ -601,12 +601,12 @@ namespace geode
             if( to_delete[p] )
             {
                 for( const auto f :
-                    Range{ solid_mesh_->nb_polyhedron_facets( p ) } )
+                    LRange{ solid_mesh_->nb_polyhedron_facets( p ) } )
                 {
                     const PolyhedronFacet id{ p, f };
                     PolyhedronFacetVertices facet_vertices(
                         solid_mesh_->nb_polyhedron_facet_vertices( id ) );
-                    for( const auto v : Range{
+                    for( const auto v : LRange{
                              solid_mesh_->nb_polyhedron_facet_vertices( id ) } )
                     {
                         facet_vertices[v] =
@@ -672,18 +672,18 @@ namespace geode
             absl::FixedArray< index_t > vertices(
                 solid_mesh.nb_polyhedron_vertices( p ) );
             for( const auto v :
-                Range{ solid_mesh.nb_polyhedron_vertices( p ) } )
+                LRange{ solid_mesh.nb_polyhedron_vertices( p ) } )
             {
                 vertices[v] = solid_mesh.polyhedron_vertex( { p, v } );
             }
             std::vector< std::vector< index_t > > facets(
                 solid_mesh.nb_polyhedron_facets( p ) );
-            for( const auto f : Range{ solid_mesh.nb_polyhedron_facets( p ) } )
+            for( const auto f : LRange{ solid_mesh.nb_polyhedron_facets( p ) } )
             {
                 auto& facet = facets[f];
                 facet.resize(
                     solid_mesh.nb_polyhedron_facet_vertices( { p, f } ) );
-                for( const auto v : Range{
+                for( const auto v : LRange{
                          solid_mesh.nb_polyhedron_facet_vertices( { p, f } ) } )
                 {
                     const auto it = absl::c_find( vertices,

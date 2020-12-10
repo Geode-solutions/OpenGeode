@@ -35,7 +35,15 @@ namespace geode
 
     using index_t = unsigned int;
     using signed_index_t = int;
+    using local_index_t = unsigned char;
 
     /// Value used for a invalid index
     static constexpr index_t NO_ID = index_t( -1 );
+    static constexpr local_index_t NO_LID = local_index_t( -1 );
+
+    inline constexpr unsigned char operator"" _uc(
+        unsigned long long arg ) noexcept
+    {
+        return static_cast< unsigned char >( arg );
+    }
 } // namespace geode

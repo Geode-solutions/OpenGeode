@@ -90,7 +90,7 @@ namespace geode
         index_t find_or_create_facet(
             PolyhedronFacetVertices facet_vertices, SolidFacetsKey )
         {
-            return find_or_create_facet( facet_vertices );
+            return find_or_create_facet( std::move( facet_vertices ) );
         }
 
         void overwrite_facets(

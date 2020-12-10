@@ -114,7 +114,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t PolyhedralSolidView< dimension >::get_nb_polyhedron_vertices(
+    local_index_t PolyhedralSolidView< dimension >::get_nb_polyhedron_vertices(
         index_t polyhedron_id ) const
     {
         return impl_->get_nb_polyhedron_vertices( polyhedron_id );
@@ -129,15 +129,16 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t PolyhedralSolidView< dimension >::get_nb_polyhedron_facets(
+    local_index_t PolyhedralSolidView< dimension >::get_nb_polyhedron_facets(
         index_t polyhedron_id ) const
     {
         return impl_->get_nb_polyhedron_facets( polyhedron_id );
     }
 
     template < index_t dimension >
-    index_t PolyhedralSolidView< dimension >::get_nb_polyhedron_facet_vertices(
-        const PolyhedronFacet& polyhedron_facet ) const
+    local_index_t
+        PolyhedralSolidView< dimension >::get_nb_polyhedron_facet_vertices(
+            const PolyhedronFacet& polyhedron_facet ) const
     {
         return impl_->get_nb_polyhedron_facet_vertices( polyhedron_facet );
     }
