@@ -59,19 +59,21 @@ namespace geode
                                         + polyhedron_vertex.vertex_id];
         }
 
-        index_t get_nb_polyhedron_vertices( const index_t polyhedron_id ) const
+        local_index_t get_nb_polyhedron_vertices(
+            const index_t polyhedron_id ) const
         {
             return starting_vertex_index( polyhedron_id + 1 )
                    - starting_vertex_index( polyhedron_id );
         }
 
-        index_t get_nb_polyhedron_facets( const index_t polyhedron_id ) const
+        local_index_t get_nb_polyhedron_facets(
+            const index_t polyhedron_id ) const
         {
             return starting_adjacent_index( polyhedron_id + 1 )
                    - starting_adjacent_index( polyhedron_id );
         }
 
-        index_t get_nb_polyhedron_facet_vertices(
+        local_index_t get_nb_polyhedron_facet_vertices(
             const PolyhedronFacet& polyhedron_facet ) const
         {
             const auto facet_id = get_facet_id( polyhedron_facet );
@@ -156,7 +158,7 @@ namespace geode
                 else
                 {
                     const auto nb_vertices = get_nb_polyhedron_vertices( p );
-                    for( const auto v : Range{ nb_vertices } )
+                    for( const auto v : LRange{ nb_vertices } )
                     {
                         polyhedron_vertices_[vertex_index] =
                             get_polyhedron_vertex( { p, v } );
@@ -166,12 +168,12 @@ namespace geode
                         polyhedron_vertex_ptr_[p - offset] + nb_vertices;
 
                     const auto nb_facets = get_nb_polyhedron_facets( p );
-                    for( const auto f : Range{ nb_facets } )
+                    for( const auto f : LRange{ nb_facets } )
                     {
                         PolyhedronFacet facet{ p, f };
                         auto nb_facet_vertices =
                             get_nb_polyhedron_facet_vertices( facet );
-                        for( const auto v : Range{ nb_facet_vertices } )
+                        for( const auto v : LRange{ nb_facet_vertices } )
                         {
                             polyhedron_facets_[facet_index] =
                                 get_polyhedron_facet_vertex_id( { facet, v } )
@@ -216,24 +218,48 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& archive, Impl& impl ) {
-                    archive.container4b( impl.polyhedron_vertices_,
-                        impl.polyhedron_vertices_.max_size() );
-                    archive.container4b( impl.polyhedron_vertex_ptr_,
-                        impl.polyhedron_vertex_ptr_.max_size() );
-                    archive.container4b( impl.polyhedron_facets_,
-                        impl.polyhedron_facets_.max_size() );
-                    archive.container4b( impl.polyhedron_facet_ptr_,
-                        impl.polyhedron_facet_ptr_.max_size() );
-                    archive.container4b( impl.polyhedron_adjacents_,
-                        impl.polyhedron_adjacents_.max_size() );
-                    archive.container4b( impl.polyhedron_adjacent_ptr_,
-                        impl.polyhedron_adjacent_ptr_.max_size() );
-                    archive.ext(
-                        impl, bitsery::ext::BaseClass<
-                                  detail::PointsImpl< dimension > >{} );
-                } );
+            archive.ext( *this,
+                Growable< Archive, Impl >{
+                    { []( Archive& archive, Impl& impl ) {
+                         archive.container4b( impl.polyhedron_vertices_,
+                             impl.polyhedron_vertices_.max_size() );
+                         archive.container4b( impl.polyhedron_vertex_ptr_,
+                             impl.polyhedron_vertex_ptr_.max_size() );
+                         std::vector< index_t > facets;
+                         archive.container4b(
+                             facets, impl.polyhedron_facets_.max_size() );
+                         impl.polyhedron_facets_.reserve( facets.size() );
+                         for( const auto v : facets )
+                         {
+                             impl.polyhedron_facets_.emplace_back( v );
+                         }
+                         archive.container4b( impl.polyhedron_facet_ptr_,
+                             impl.polyhedron_facet_ptr_.max_size() );
+                         archive.container4b( impl.polyhedron_adjacents_,
+                             impl.polyhedron_adjacents_.max_size() );
+                         archive.container4b( impl.polyhedron_adjacent_ptr_,
+                             impl.polyhedron_adjacent_ptr_.max_size() );
+                         archive.ext(
+                             impl, bitsery::ext::BaseClass<
+                                       detail::PointsImpl< dimension > >{} );
+                     },
+                        []( Archive& archive, Impl& impl ) {
+                            archive.container4b( impl.polyhedron_vertices_,
+                                impl.polyhedron_vertices_.max_size() );
+                            archive.container4b( impl.polyhedron_vertex_ptr_,
+                                impl.polyhedron_vertex_ptr_.max_size() );
+                            archive.container1b( impl.polyhedron_facets_,
+                                impl.polyhedron_facets_.max_size() );
+                            archive.container4b( impl.polyhedron_facet_ptr_,
+                                impl.polyhedron_facet_ptr_.max_size() );
+                            archive.container4b( impl.polyhedron_adjacents_,
+                                impl.polyhedron_adjacents_.max_size() );
+                            archive.container4b( impl.polyhedron_adjacent_ptr_,
+                                impl.polyhedron_adjacent_ptr_.max_size() );
+                            archive.ext(
+                                impl, bitsery::ext::BaseClass<
+                                          detail::PointsImpl< dimension > >{} );
+                        } } } );
         }
 
         index_t get_polyhedron_adjacent_impl(
@@ -269,7 +295,7 @@ namespace geode
         std::vector< index_t > polyhedron_vertices_;
         std::vector< index_t > polyhedron_vertex_ptr_;
 
-        std::vector< index_t > polyhedron_facets_;
+        std::vector< local_index_t > polyhedron_facets_;
         std::vector< index_t > polyhedron_facet_ptr_;
 
         std::vector< index_t > polyhedron_adjacents_;
@@ -309,21 +335,23 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t OpenGeodePolyhedralSolid< dimension >::get_nb_polyhedron_vertices(
-        index_t polyhedron_id ) const
+    local_index_t
+        OpenGeodePolyhedralSolid< dimension >::get_nb_polyhedron_vertices(
+            index_t polyhedron_id ) const
     {
         return impl_->get_nb_polyhedron_vertices( polyhedron_id );
     }
 
     template < index_t dimension >
-    index_t OpenGeodePolyhedralSolid< dimension >::get_nb_polyhedron_facets(
-        index_t polyhedron_id ) const
+    local_index_t
+        OpenGeodePolyhedralSolid< dimension >::get_nb_polyhedron_facets(
+            index_t polyhedron_id ) const
     {
         return impl_->get_nb_polyhedron_facets( polyhedron_id );
     }
 
     template < index_t dimension >
-    index_t
+    local_index_t
         OpenGeodePolyhedralSolid< dimension >::get_nb_polyhedron_facet_vertices(
             const PolyhedronFacet& polyhedron_facet ) const
     {

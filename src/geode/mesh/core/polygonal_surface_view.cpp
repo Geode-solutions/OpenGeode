@@ -114,7 +114,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t PolygonalSurfaceView< dimension >::get_nb_polygon_vertices(
+    local_index_t PolygonalSurfaceView< dimension >::get_nb_polygon_vertices(
         index_t polygon_id ) const
     {
         return impl_->get_nb_polygon_vertices( polygon_id );

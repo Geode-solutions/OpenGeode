@@ -58,7 +58,7 @@ namespace geode
                     viewed_polygon_vertex( polygon_vertex ) ) );
             }
 
-            index_t get_nb_polygon_vertices( index_t polygon_id ) const
+            local_index_t get_nb_polygon_vertices( index_t polygon_id ) const
             {
                 return surface_.nb_polygon_vertices(
                     viewed_polygon( polygon_id ) );
@@ -127,7 +127,7 @@ namespace geode
                     view2polygons_->set_value( polygon_view_id, polygon_id );
 
                     for( const auto v :
-                        Range{ surface_.nb_polygon_vertices( polygon_id ) } )
+                        LRange{ surface_.nb_polygon_vertices( polygon_id ) } )
                     {
                         this->add_viewed_vertex(
                             surface_.polygon_vertex( { polygon_id, v } ) );

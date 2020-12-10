@@ -79,7 +79,7 @@ namespace
     {
         for( const auto p : geode::Range{ surface.nb_polygons() } )
         {
-            for( const auto e : geode::Range{ surface.nb_polygon_edges( p ) } )
+            for( const auto e : geode::LRange{ surface.nb_polygon_edges( p ) } )
             {
                 const geode::PolygonEdge id{ p, e };
                 if( const auto adj = surface.polygon_adjacent( id ) )
@@ -136,7 +136,7 @@ namespace
         for( const auto p : geode::Range{ surface.nb_polygons() } )
         {
             for( const auto v :
-                geode::Range{ surface.nb_polygon_vertices( p ) } )
+                geode::LRange{ surface.nb_polygon_vertices( p ) } )
             {
                 const geode::PolygonVertex id{ p, v };
                 const auto new_vertex =
@@ -157,7 +157,7 @@ namespace
     {
         const auto nb_vertices = surface.nb_polygon_vertices( polygon_id );
         absl::FixedArray< geode::index_t > vertices_id( nb_vertices );
-        for( const auto v : geode::Range{ nb_vertices } )
+        for( const auto v : geode::LRange{ nb_vertices } )
         {
             vertices_id[v] = surface.polygon_vertex( { polygon_id, v } );
         }
@@ -190,7 +190,7 @@ namespace geode
     {
         const auto added_polygon = surface_mesh_->nb_polygons();
         surface_mesh_->polygon_attribute_manager().resize( added_polygon + 1 );
-        for( const auto v : Indices{ vertices } )
+        for( const auto v : LIndices{ vertices } )
         {
             associate_polygon_vertex_to_vertex(
                 { added_polygon, v }, vertices[v] );
@@ -309,7 +309,7 @@ namespace geode
         for( const auto p : Range{ surface_mesh_->nb_polygons() } )
         {
             for( const auto v :
-                Range{ surface_mesh_->nb_polygon_vertices( p ) } )
+                LRange{ surface_mesh_->nb_polygon_vertices( p ) } )
             {
                 const PolygonVertex id{ p, v };
                 const auto new_vertex =
@@ -395,19 +395,15 @@ namespace geode
         {
             const auto vertices_id =
                 get_polygon_vertices( *surface_mesh_, polygon );
-            const index_t nb_vertices = vertices_id.size();
-            for( const auto e : Range{ nb_vertices - 1 } )
+            const local_index_t nb_vertices = vertices_id.size();
+            for( const auto e : LRange{ nb_vertices } )
             {
                 PolygonEdge edge{ polygon, e };
                 const auto edge_id = edges.edge_from_vertices(
-                    { vertices_id[e], vertices_id[e + 1] } );
+                    { vertices_id[e], vertices_id[( e + 1 ) % nb_vertices] } );
                 polygon_edges[edge_id.value()].emplace_back(
                     std::move( edge ) );
             }
-            PolygonEdge edge{ polygon, nb_vertices - 1 };
-            const auto edge_id = edges.edge_from_vertices(
-                { vertices_id.back(), vertices_id.front() } );
-            polygon_edges[edge_id.value()].emplace_back( std::move( edge ) );
         }
         for( const auto& edges : polygon_edges )
         {
@@ -443,7 +439,7 @@ namespace geode
                 if( to_delete[p] )
                 {
                     for( const auto e :
-                        Range{ surface_mesh_->nb_polygon_edges( p ) } )
+                        LRange{ surface_mesh_->nb_polygon_edges( p ) } )
                     {
                         edges.remove_edge(
                             surface_mesh_->polygon_edge_vertices( { p, e } ) );
@@ -536,7 +532,8 @@ namespace geode
         {
             absl::FixedArray< index_t > vertices(
                 surface_mesh.nb_polygon_vertices( p ) );
-            for( const auto v : Range{ surface_mesh.nb_polygon_vertices( p ) } )
+            for( const auto v :
+                LRange{ surface_mesh.nb_polygon_vertices( p ) } )
             {
                 vertices[v] = surface_mesh.polygon_vertex( { p, v } );
             }

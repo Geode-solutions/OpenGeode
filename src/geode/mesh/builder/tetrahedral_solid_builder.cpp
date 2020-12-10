@@ -74,7 +74,7 @@ namespace geode
         const auto added_tetra = tetrahedral_solid_->nb_polyhedra();
         tetrahedral_solid_->polyhedron_attribute_manager().resize(
             added_tetra + 1 );
-        index_t vertex_id{ 0 };
+        local_index_t vertex_id{ 0 };
         for( const auto& vertex : vertices )
         {
             this->associate_polyhedron_vertex_to_vertex(

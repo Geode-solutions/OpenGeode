@@ -280,6 +280,24 @@ void test_io( const geode::PolyhedralSolid3D& polyhedral_solid,
     }
 }
 
+void test_backward_io( const std::string& filename )
+{
+    const auto new_polyhedral_solid =
+        geode::load_polyhedral_solid< 3 >( filename );
+
+    OPENGEODE_EXCEPTION( new_polyhedral_solid->nb_vertices() == 8,
+        "[Test] Backward PolyhedralSolid should have 8 vertices" );
+    OPENGEODE_EXCEPTION( new_polyhedral_solid->facets().nb_facets() == 11,
+        "[Test] Backward PolyhedralSolid should have 11 facets" );
+    OPENGEODE_EXCEPTION( new_polyhedral_solid->edges().nb_edges() == 15,
+        "[Test] Backward PolyhedralSolid should have 15 edges" );
+    OPENGEODE_EXCEPTION( new_polyhedral_solid->nb_polyhedra() == 3,
+        "[Test] Backward PolyhedralSolid should have 3 polyhedra" );
+    OPENGEODE_EXCEPTION(
+        new_polyhedral_solid->polyhedra_around_vertex( 4 ).size() == 3,
+        "[Test] Backward PolyhedralSolid has wrong polyhedra around vertex" );
+}
+
 void test_barycenters()
 {
     auto polyhedral_solid = geode::PolyhedralSolid3D::create(
@@ -356,7 +374,7 @@ void test_create_vertex_attribute(
                              "test", geode::PolyhedronFacetVertex{} );
     for( const auto v : geode::Range{ polyhedral_solid.nb_vertices() } )
     {
-        attribute->set_value( v, geode::PolyhedronFacetVertex{ { v, v }, v } );
+        attribute->set_value( v, geode::PolyhedronFacetVertex{ { v, 0 }, 1 } );
     }
 }
 
@@ -375,7 +393,7 @@ void test_clone( const geode::PolyhedralSolid3D& polyhedral_solid )
             .find_attribute< geode::PolyhedronFacetVertex >( "test" );
     for( const auto v : geode::Range{ polyhedral_solid2->nb_vertices() } )
     {
-        const geode::PolyhedronFacetVertex answer{ { v + 1, v + 1 }, v + 1 };
+        const geode::PolyhedronFacetVertex answer{ { v + 1, 0 }, 1 };
         OPENGEODE_EXCEPTION(
             attribute2->value( v ) != geode::PolyhedronFacetVertex{},
             "[Test] PolyhedralSolid2 attribute is not correct" );
@@ -406,7 +424,8 @@ void test_set_polyhedron_vertex(
         "[Test] PolyhedronVertex after set_polyhedron_vertex is wrong" );
     OPENGEODE_EXCEPTION(
         polyhedral_solid.polyhedron_facet_vertex( { { 0, 1 }, 1 } ) == 1,
-        "[Test] PolyhedronFacetVertex after set_polyhedron_vertex is wrong" );
+        "[Test] PolyhedronFacetVertex after set_polyhedron_vertex is "
+        "wrong" );
     OPENGEODE_EXCEPTION(
         polyhedral_solid.facets().facet_from_vertices(
             polyhedral_solid.polyhedron_facet_vertices( { 0, 1 } ) )
@@ -456,6 +475,8 @@ void test()
     test_polyhedron_adjacencies( *polyhedral_solid, *builder );
     test_io( *polyhedral_solid,
         absl::StrCat( "test.", polyhedral_solid->native_extension() ) );
+    test_backward_io( absl::StrCat(
+        geode::data_path, "test_v7.", polyhedral_solid->native_extension() ) );
 
     test_delete_vertex( *polyhedral_solid, *builder );
     test_delete_polyhedra( *polyhedral_solid, *builder );

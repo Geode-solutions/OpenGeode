@@ -82,7 +82,7 @@ namespace geode
                 } );
         }
 
-        index_t get_nb_polygon_vertices( index_t /*unused*/ ) const final
+        local_index_t get_nb_polygon_vertices( index_t /*unused*/ ) const final
         {
             return 3;
         }

@@ -24,16 +24,20 @@
 #include <geode/mesh/io/graph_input.h>
 
 #include <geode/mesh/core/graph.h>
+#include <geode/mesh/core/mesh_factory.h>
 
 namespace geode
 {
-    void load_graph( Graph& graph, absl::string_view filename )
+    std::unique_ptr< Graph > load_graph(
+        const MeshImpl& impl, absl::string_view filename )
     {
         try
         {
+            auto graph = Graph::create( impl );
             auto input = GraphInputFactory::create(
-                extension_from_filename( filename ).data(), graph, filename );
+                extension_from_filename( filename ).data(), *graph, filename );
             input->read();
+            return graph;
         }
         catch( const OpenGeodeException& e )
         {
@@ -41,6 +45,12 @@ namespace geode
             throw OpenGeodeException{ "Cannot load Graph from file: ",
                 filename };
         }
+    }
+
+    std::unique_ptr< Graph > load_graph( absl::string_view filename )
+    {
+        return load_graph(
+            MeshFactory::default_impl( Graph::type_name_static() ), filename );
     }
 
     GraphInput::GraphInput( Graph& graph, absl::string_view filename )

@@ -47,7 +47,7 @@ namespace geode
     struct opengeode_mesh_api EdgeVertex
     {
         EdgeVertex() = default;
-        EdgeVertex( index_t edge_id, index_t vertex_id )
+        EdgeVertex( index_t edge_id, local_index_t vertex_id )
             : edge_id( edge_id ), vertex_id( vertex_id )
         {
         }
@@ -60,14 +60,8 @@ namespace geode
             return !( *this == other );
         }
         template < typename Archive >
-        void serialize( Archive& archive )
-        {
-            archive.ext( *this, DefaultGrowable< Archive, EdgeVertex >{},
-                []( Archive& archive, EdgeVertex& edge_vertex ) {
-                    archive.value4b( edge_vertex.edge_id );
-                    archive.value4b( edge_vertex.vertex_id );
-                } );
-        }
+        void serialize( Archive& archive );
+
         /*!
          * Index of the edge
          */
@@ -75,7 +69,7 @@ namespace geode
         /*!
          * Identification of the edge endpoint (0 or 1)
          */
-        index_t vertex_id{ NO_ID };
+        local_index_t vertex_id{ NO_LID };
     };
 
     using EdgesAroundVertex = absl::InlinedVector< EdgeVertex, 2 >;

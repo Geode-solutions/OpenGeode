@@ -123,8 +123,7 @@ def test_delete_edge( graph, builder ):
 
 def test_io( graph, filename ):
     mesh.save_graph( graph, filename )
-    new_graph = mesh.Graph.create()
-    mesh.load_graph( new_graph, filename )
+    new_graph = mesh.load_graph( filename )
 
 def test_clone( graph ):
     graph2 = graph.clone()

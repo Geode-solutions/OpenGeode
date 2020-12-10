@@ -47,7 +47,7 @@ namespace geode
             mesh.nb_polygons() );
         for( const auto p : Range{ mesh.nb_polygons() } )
         {
-            for( const auto v : Range{ mesh.nb_polygon_vertices( p ) } )
+            for( const auto v : LRange{ mesh.nb_polygon_vertices( p ) } )
             {
                 box_vector[p].add_point(
                     mesh.point( mesh.polygon_vertex( { p, v } ) ) );

@@ -54,7 +54,7 @@ namespace geode
      * See derived classes for usage.
      */
     template < typename Type,
-        typename NextOperator = IncrementOperator< Type > >
+        template < typename > class NextOperator = IncrementOperator >
     class BaseRange
     {
     public:
@@ -84,7 +84,7 @@ namespace geode
     private:
         Type iter_;
         Type last_;
-        NextOperator next_operator_;
+        NextOperator< Type > next_operator_;
     };
 
     /*!
@@ -126,61 +126,73 @@ namespace geode
      *      // do something
      *    }
      */
-    class Range : public BaseRange< index_t, IncrementOperator< index_t > >,
-                  public BeginEnd< Range >
+    template < typename Type >
+    class TRange : public BaseRange< Type, IncrementOperator >,
+                   public BeginEnd< TRange< Type > >
     {
     public:
         template < typename T1, typename T2 >
-        Range( T1 begin, T2 end ) : BaseRange( begin, end ), BeginEnd( *this )
+        TRange( T1 begin, T2 end )
+            : BaseRange< Type, IncrementOperator >( begin, end ),
+              BeginEnd< TRange< Type > >( *this )
         {
         }
 
         template < typename T >
-        explicit Range( T end ) : Range( 0, end )
+        explicit TRange( T end ) : TRange( 0, end )
         {
         }
 
-        index_t operator*() const
+        Type operator*() const
         {
-            return current();
+            return this->current();
         }
     };
+    using Range = TRange< index_t >;
+    using LRange = TRange< local_index_t >;
 
-    class ReverseRange
-        : public BaseRange< index_t, DecrementOperator< index_t > >,
-          public BeginEnd< ReverseRange >
+    template < typename Type >
+    class TReverseRange : public BaseRange< Type, DecrementOperator >,
+                          public BeginEnd< TReverseRange< Type > >
     {
     public:
         template < typename T1, typename T2 >
-        ReverseRange( T1 begin, T2 end )
-            : BaseRange( begin - 1, end - 1 ), BeginEnd( *this )
+        TReverseRange( T1 begin, T2 end )
+            : BaseRange< Type, DecrementOperator >( begin - 1, end - 1 ),
+              BeginEnd< TReverseRange< Type > >( *this )
         {
         }
 
         template < typename T >
-        explicit ReverseRange( T begin ) : ReverseRange( begin, 0 )
+        explicit TReverseRange( T begin ) : TReverseRange( begin, 0 )
         {
         }
 
-        index_t operator*() const
+        Type operator*() const
         {
-            return current();
+            return this->current();
         }
     };
+    using ReverseRange = TReverseRange< index_t >;
+    using LReverseRange = TReverseRange< local_index_t >;
 
-    class Indices : public BaseRange< index_t, IncrementOperator< index_t > >,
-                    public BeginEnd< Indices >
+    template < typename Type >
+    class TIndices : public BaseRange< Type, IncrementOperator >,
+                     public BeginEnd< TIndices< Type > >
     {
     public:
         template < typename Container >
-        explicit Indices( const Container& container )
-            : BaseRange( 0, container.size() ), BeginEnd( *this )
+        explicit TIndices( const Container& container )
+            : BaseRange< Type, IncrementOperator >( 0, container.size() ),
+              BeginEnd< TIndices< Type > >( *this )
         {
         }
 
-        index_t operator*() const
+        Type operator*() const
         {
-            return current();
+            return this->current();
         }
     };
+    using Indices = TIndices< index_t >;
+    using LIndices = TIndices< local_index_t >;
 } // namespace geode

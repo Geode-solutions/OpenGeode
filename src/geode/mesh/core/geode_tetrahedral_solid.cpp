@@ -38,11 +38,11 @@
 
 namespace
 {
-    static constexpr std::array< std::array< geode::index_t, 3 >, 4 >
+    static constexpr std::array< std::array< geode::local_index_t, 3 >, 4 >
         tetrahedron_facet_vertices{ { { 1, 3, 2 }, { 0, 2, 3 }, { 3, 1, 0 },
             { 0, 1, 2 } } };
 
-    static constexpr std::array< std::array< geode::index_t, 2 >, 6 >
+    static constexpr std::array< std::array< geode::local_index_t, 2 >, 6 >
         tetrahedron_edge_vertices{ { { 0, 1 }, { 0, 2 }, { 0, 3 }, { 1, 2 },
             { 1, 3 }, { 2, 3 } } };
 } // namespace

@@ -38,11 +38,20 @@ namespace geode
     /*!
      * API function for loading an Graph.
      * The adequate loader is called depending on the filename extension.
-     * @param[out] graph Loaded Graph.
+     * @param[in] impl Data structure implementation.
      * @param[in] filename Path to the file to load.
      */
-    void opengeode_mesh_api load_graph(
-        Graph& graph, absl::string_view filename );
+    std::unique_ptr< Graph > opengeode_mesh_api load_graph(
+        const MeshImpl& impl, absl::string_view filename );
+
+    /*!
+     * API function for loading an Graph.
+     * The adequate loader is called depending on the filename extension.
+     * Default data structure implémentation is used.
+     * @param[in] filename Path to the file to load.
+     */
+    std::unique_ptr< Graph > opengeode_mesh_api load_graph(
+        absl::string_view filename );
 
     class opengeode_mesh_api GraphInput : public VertexSetInput
     {
