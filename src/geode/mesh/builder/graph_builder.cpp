@@ -42,7 +42,7 @@ namespace
         std::vector< bool > edges_to_delete( graph.nb_edges(), false );
         for( const auto e : geode::Range{ graph.nb_edges() } )
         {
-            for( const auto v : geode::Range{ 2 } )
+            for( const auto v : geode::LRange{ 2 } )
             {
                 const geode::EdgeVertex id{ e, v };
                 const auto new_vertex = old2new[graph.edge_vertex( id )];
@@ -187,7 +187,7 @@ namespace geode
         graph_->edge_attribute_manager().copy( graph.edge_attribute_manager() );
         for( const auto e : Range{ graph.nb_edges() } )
         {
-            for( const auto v : Range{ 2 } )
+            for( const auto v : LRange{ 2 } )
             {
                 const EdgeVertex id{ e, v };
                 set_edge_vertex( id, graph.edge_vertex( id ) );

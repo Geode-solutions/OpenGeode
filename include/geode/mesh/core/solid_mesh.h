@@ -55,7 +55,7 @@ namespace geode
     struct opengeode_mesh_api PolyhedronVertex
     {
         PolyhedronVertex() = default;
-        PolyhedronVertex( index_t polyhedron_id, index_t vertex_id )
+        PolyhedronVertex( index_t polyhedron_id, local_index_t vertex_id )
             : polyhedron_id( polyhedron_id ), vertex_id( vertex_id )
         {
         }
@@ -69,16 +69,10 @@ namespace geode
             return !( *this == other );
         }
         template < typename Archive >
-        void serialize( Archive& archive )
-        {
-            archive.ext( *this, DefaultGrowable< Archive, PolyhedronVertex >{},
-                []( Archive& archive, PolyhedronVertex& polyhedron_vertex ) {
-                    archive.value4b( polyhedron_vertex.polyhedron_id );
-                    archive.value4b( polyhedron_vertex.vertex_id );
-                } );
-        }
+        void serialize( Archive& archive );
+
         index_t polyhedron_id{ NO_ID };
-        index_t vertex_id{ NO_ID };
+        local_index_t vertex_id{ NO_LID };
     };
 
     /*!
@@ -87,7 +81,7 @@ namespace geode
     struct opengeode_mesh_api PolyhedronFacet
     {
         PolyhedronFacet() = default;
-        PolyhedronFacet( index_t polyhedron_id, index_t facet_id )
+        PolyhedronFacet( index_t polyhedron_id, local_index_t facet_id )
             : polyhedron_id( polyhedron_id ), facet_id( facet_id )
         {
         }
@@ -101,22 +95,16 @@ namespace geode
             return !( *this == other );
         }
         template < typename Archive >
-        void serialize( Archive& archive )
-        {
-            archive.ext( *this, DefaultGrowable< Archive, PolyhedronFacet >{},
-                []( Archive& archive, PolyhedronFacet& polyhedron_facet ) {
-                    archive.value4b( polyhedron_facet.polyhedron_id );
-                    archive.value4b( polyhedron_facet.facet_id );
-                } );
-        }
+        void serialize( Archive& archive );
+
         index_t polyhedron_id{ NO_ID };
-        index_t facet_id{ NO_ID };
+        local_index_t facet_id{ NO_LID };
     };
 
     struct opengeode_mesh_api PolyhedronFacetVertex
     {
         PolyhedronFacetVertex() = default;
-        PolyhedronFacetVertex( PolyhedronFacet facet, index_t vertex_id )
+        PolyhedronFacetVertex( PolyhedronFacet facet, local_index_t vertex_id )
             : polyhedron_facet( std::move( facet ) ), vertex_id( vertex_id )
         {
         }
@@ -130,24 +118,16 @@ namespace geode
             return !( *this == other );
         }
         template < typename Archive >
-        void serialize( Archive& archive )
-        {
-            archive.ext( *this,
-                DefaultGrowable< Archive, PolyhedronFacetVertex >{},
-                []( Archive& archive,
-                    PolyhedronFacetVertex& polyhedron_facet_vertex ) {
-                    archive.object( polyhedron_facet_vertex.polyhedron_facet );
-                    archive.value4b( polyhedron_facet_vertex.vertex_id );
-                } );
-        }
+        void serialize( Archive& archive );
+
         PolyhedronFacet polyhedron_facet;
-        index_t vertex_id{ NO_ID };
+        local_index_t vertex_id{ NO_LID };
     };
 
     struct opengeode_mesh_api PolyhedronFacetEdge
     {
         PolyhedronFacetEdge() = default;
-        PolyhedronFacetEdge( PolyhedronFacet facet, index_t edge_id )
+        PolyhedronFacetEdge( PolyhedronFacet facet, local_index_t edge_id )
             : polyhedron_facet( std::move( facet ) ), edge_id( edge_id )
         {
         }
@@ -161,18 +141,10 @@ namespace geode
             return !( *this == other );
         }
         template < typename Archive >
-        void serialize( Archive& archive )
-        {
-            archive.ext( *this,
-                DefaultGrowable< Archive, PolyhedronFacetEdge >{},
-                []( Archive& archive,
-                    PolyhedronFacetEdge& polyhedron_facet_edge ) {
-                    archive.object( polyhedron_facet_edge.polyhedron_facet );
-                    archive.value4b( polyhedron_facet_edge.edge_id );
-                } );
-        }
+        void serialize( Archive& archive );
+
         PolyhedronFacet polyhedron_facet;
-        index_t edge_id{ NO_ID };
+        local_index_t edge_id{ NO_LID };
     };
 
     using PolyhedronFacetVertices = absl::InlinedVector< index_t, 4 >;
@@ -229,18 +201,18 @@ namespace geode
         /*!
          * Return the number of vertices in a polyhedron.
          */
-        index_t nb_polyhedron_vertices( index_t polyhedron_id ) const;
+        local_index_t nb_polyhedron_vertices( index_t polyhedron_id ) const;
 
         /*!
          * Return the number of facets in a polyhedron.
          */
-        index_t nb_polyhedron_facets( index_t polyhedron_id ) const;
+        local_index_t nb_polyhedron_facets( index_t polyhedron_id ) const;
 
         /*!
          * Return the number of vertices in polyhedron facet.
          * @param[in] polyhedron_facet Local index of the facet in polyhedron.
          */
-        index_t nb_polyhedron_facet_vertices(
+        local_index_t nb_polyhedron_facet_vertices(
             const PolyhedronFacet& polyhedron_facet ) const;
 
         /*!
@@ -257,7 +229,7 @@ namespace geode
          * @return Index in [0,nb_polyhedron_vertices()[ if polyhedron is around
          * the given vertex
          */
-        absl::optional< index_t > vertex_in_polyhedron(
+        absl::optional< local_index_t > vertex_in_polyhedron(
             index_t polyhedron_id, index_t vertex_id ) const;
 
         /*!
@@ -439,13 +411,13 @@ namespace geode
         virtual index_t get_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex ) const = 0;
 
-        virtual index_t get_nb_polyhedron_vertices(
+        virtual local_index_t get_nb_polyhedron_vertices(
             index_t polyhedron_id ) const = 0;
 
-        virtual index_t get_nb_polyhedron_facets(
+        virtual local_index_t get_nb_polyhedron_facets(
             index_t polyhedron_id ) const = 0;
 
-        virtual index_t get_nb_polyhedron_facet_vertices(
+        virtual local_index_t get_nb_polyhedron_facet_vertices(
             const PolyhedronFacet& polyhedron_facet ) const = 0;
 
         virtual PolyhedronVertex get_polyhedron_facet_vertex_id(

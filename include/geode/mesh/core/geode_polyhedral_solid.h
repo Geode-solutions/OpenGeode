@@ -104,13 +104,13 @@ namespace geode
         index_t get_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex ) const override;
 
-        index_t get_nb_polyhedron_vertices(
+        local_index_t get_nb_polyhedron_vertices(
             index_t polyhedron_id ) const override;
 
-        index_t get_nb_polyhedron_facets(
+        local_index_t get_nb_polyhedron_facets(
             index_t polyhedron_id ) const override;
 
-        index_t get_nb_polyhedron_facet_vertices(
+        local_index_t get_nb_polyhedron_facet_vertices(
             const PolyhedronFacet& polyhedron_facet ) const override;
 
         PolyhedronVertex get_polyhedron_facet_vertex_id(

@@ -62,7 +62,7 @@ namespace geode
             const std::array< index_t, 2 >& edge_vertices ) const
     {
         std::array< PolyhedronFacet, 2 > opposite_facets;
-        for( const auto v : Range{ 4 } )
+        for( const auto v : LRange{ 4 } )
         {
             const PolyhedronVertex vertex{ tetrahedron_id, v };
             if( this->polyhedron_vertex( vertex ) == edge_vertices[0] )

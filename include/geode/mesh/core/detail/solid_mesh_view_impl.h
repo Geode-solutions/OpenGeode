@@ -59,19 +59,21 @@ namespace geode
                     viewed_polyhedron_vertex( polyhedron_vertex ) ) );
             }
 
-            index_t get_nb_polyhedron_vertices( index_t polyhedron_id ) const
+            local_index_t get_nb_polyhedron_vertices(
+                index_t polyhedron_id ) const
             {
                 return solid_.nb_polyhedron_vertices(
                     viewed_polyhedron( polyhedron_id ) );
             }
 
-            index_t get_nb_polyhedron_facets( index_t polyhedron_id ) const
+            local_index_t get_nb_polyhedron_facets(
+                index_t polyhedron_id ) const
             {
                 return solid_.nb_polyhedron_facets(
                     viewed_polyhedron( polyhedron_id ) );
             }
 
-            index_t get_nb_polyhedron_facet_vertices(
+            local_index_t get_nb_polyhedron_facet_vertices(
                 const PolyhedronFacet& polyhedron_facet ) const
             {
                 return solid_.nb_polyhedron_facet_vertices(
@@ -205,7 +207,7 @@ namespace geode
                     polyhedron_facet_vertex.polyhedron_facet );
                 const auto viewed_vertex = solid_.polyhedron_facet_vertex(
                     { viewed_facet, polyhedron_facet_vertex.vertex_id } );
-                for( const auto v : Range{ solid_.nb_polyhedron_vertices(
+                for( const auto v : LRange{ solid_.nb_polyhedron_vertices(
                          viewed_facet.polyhedron_id ) } )
                 {
                     if( solid_.polyhedron_vertex(
@@ -237,7 +239,7 @@ namespace geode
                     view2polyhedra_->set_value(
                         polyhedron_view_id, polyhedron_id );
 
-                    for( const auto v : Range{
+                    for( const auto v : LRange{
                              solid_.nb_polyhedron_vertices( polyhedron_id ) } )
                     {
                         this->add_viewed_vertex(

@@ -55,7 +55,7 @@ namespace geode
                                      + polygon_vertex.vertex_id];
         }
 
-        index_t get_nb_polygon_vertices( const index_t polygon_id ) const
+        local_index_t get_nb_polygon_vertices( const index_t polygon_id ) const
         {
             return starting_index( polygon_id + 1 )
                    - starting_index( polygon_id );
@@ -107,7 +107,7 @@ namespace geode
                 else
                 {
                     const auto nb_vertices = get_nb_polygon_vertices( p );
-                    for( const auto v : Range{ nb_vertices } )
+                    for( const auto v : LRange{ nb_vertices } )
                     {
                         polygon_vertices_[index] =
                             get_polygon_vertex( { p, v } );
@@ -199,8 +199,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t OpenGeodePolygonalSurface< dimension >::get_nb_polygon_vertices(
-        index_t polygon_id ) const
+    local_index_t
+        OpenGeodePolygonalSurface< dimension >::get_nb_polygon_vertices(
+            index_t polygon_id ) const
     {
         return impl_->get_nb_polygon_vertices( polygon_id );
     }
