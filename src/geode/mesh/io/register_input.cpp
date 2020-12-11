@@ -25,6 +25,7 @@
 
 #include <geode/mesh/core/geode_edged_curve.h>
 #include <geode/mesh/core/geode_graph.h>
+#include <geode/mesh/core/geode_hybrid_solid.h>
 #include <geode/mesh/core/geode_point_set.h>
 #include <geode/mesh/core/geode_polygonal_surface.h>
 #include <geode/mesh/core/geode_polyhedral_solid.h>
@@ -33,6 +34,7 @@
 #include <geode/mesh/core/geode_vertex_set.h>
 #include <geode/mesh/io/detail/geode_edged_curve_input.h>
 #include <geode/mesh/io/detail/geode_graph_input.h>
+#include <geode/mesh/io/detail/geode_hybrid_solid_input.h>
 #include <geode/mesh/io/detail/geode_point_set_input.h>
 #include <geode/mesh/io/detail/geode_polygonal_surface_input.h>
 #include <geode/mesh/io/detail/geode_polyhedral_solid_input.h>
@@ -70,6 +72,7 @@ namespace geode
         BITSERY_INPUT_MESH_REGISTER_2D_3D( TriangulatedSurface );
         BITSERY_INPUT_MESH_REGISTER_3D( PolyhedralSolid );
         BITSERY_INPUT_MESH_REGISTER_3D( TetrahedralSolid );
+        BITSERY_INPUT_MESH_REGISTER_3D( HybridSolid );
 
         RegularGridInputFactory2D::register_creator<
             OpenGeodeRegularGridInput2D >(

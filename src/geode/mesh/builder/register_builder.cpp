@@ -25,6 +25,7 @@
 
 #include <geode/mesh/builder/geode_edged_curve_builder.h>
 #include <geode/mesh/builder/geode_graph_builder.h>
+#include <geode/mesh/builder/geode_hybrid_solid_builder.h>
 #include <geode/mesh/builder/geode_point_set_builder.h>
 #include <geode/mesh/builder/geode_polygonal_surface_builder.h>
 #include <geode/mesh/builder/geode_polyhedral_solid_builder.h>
@@ -38,6 +39,7 @@
 #include <geode/mesh/builder/triangulated_surface_view_builder.h>
 #include <geode/mesh/core/geode_edged_curve.h>
 #include <geode/mesh/core/geode_graph.h>
+#include <geode/mesh/core/geode_hybrid_solid.h>
 #include <geode/mesh/core/geode_point_set.h>
 #include <geode/mesh/core/geode_polygonal_surface.h>
 #include <geode/mesh/core/geode_polyhedral_solid.h>
@@ -114,5 +116,9 @@ namespace geode
         MeshBuilderFactory::register_mesh_builder<
             TetrahedralSolidViewBuilder3D >(
             TetrahedralSolidView3D::impl_name_static() );
+
+        MeshBuilderFactory::register_mesh_builder<
+            OpenGeodeHybridSolidBuilder3D >(
+            OpenGeodeHybridSolid3D::impl_name_static() );
     }
 } // namespace geode

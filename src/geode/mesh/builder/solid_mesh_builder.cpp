@@ -659,6 +659,37 @@ namespace geode
     }
 
     template < index_t dimension >
+    void SolidMeshBuilder< dimension >::update_polyhedron_info(
+        index_t polyhedron_id, absl::Span< const index_t > vertices )
+    {
+        local_index_t vertex_id{ 0 };
+        for( const auto& vertex : vertices )
+        {
+            this->associate_polyhedron_vertex_to_vertex(
+                { polyhedron_id, vertex_id++ }, vertex );
+        }
+        if( solid_mesh_->are_facets_enabled() )
+
+        {
+            auto facets = this->facets_builder();
+            for( auto&& facet_vertices :
+                solid_mesh_->polyhedron_facets_vertices( polyhedron_id ) )
+            {
+                facets.find_or_create_facet( facet_vertices );
+            }
+        }
+        if( solid_mesh_->are_edges_enabled() )
+        {
+            auto edges = this->edges_builder();
+            for( auto&& edge_vertices :
+                solid_mesh_->polyhedron_edges_vertices( polyhedron_id ) )
+            {
+                edges.find_or_create_edge( edge_vertices );
+            }
+        }
+    }
+
+    template < index_t dimension >
     void SolidMeshBuilder< dimension >::copy(
         const SolidMesh< dimension >& solid_mesh )
     {

@@ -74,36 +74,8 @@ namespace geode
         const auto added_tetra = tetrahedral_solid_->nb_polyhedra();
         tetrahedral_solid_->polyhedron_attribute_manager().resize(
             added_tetra + 1 );
-        local_index_t vertex_id{ 0 };
-        for( const auto& vertex : vertices )
-        {
-            this->associate_polyhedron_vertex_to_vertex(
-                { added_tetra, vertex_id++ }, vertex );
-        }
         do_create_tetrahedron( vertices );
-        if( tetrahedral_solid_->are_facets_enabled() )
-
-        {
-            auto facets = this->facets_builder();
-            facets.find_or_create_facet(
-                { vertices[1], vertices[3], vertices[2] } );
-            facets.find_or_create_facet(
-                { vertices[0], vertices[2], vertices[3] } );
-            facets.find_or_create_facet(
-                { vertices[3], vertices[1], vertices[0] } );
-            facets.find_or_create_facet(
-                { vertices[0], vertices[1], vertices[2] } );
-        }
-        if( tetrahedral_solid_->are_edges_enabled() )
-        {
-            auto edges = this->edges_builder();
-            edges.find_or_create_edge( { vertices[0], vertices[1] } );
-            edges.find_or_create_edge( { vertices[0], vertices[2] } );
-            edges.find_or_create_edge( { vertices[0], vertices[3] } );
-            edges.find_or_create_edge( { vertices[1], vertices[2] } );
-            edges.find_or_create_edge( { vertices[1], vertices[3] } );
-            edges.find_or_create_edge( { vertices[2], vertices[3] } );
-        }
+        this->update_polyhedron_info( added_tetra, vertices );
         return added_tetra;
     }
 

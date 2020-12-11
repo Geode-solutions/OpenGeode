@@ -30,6 +30,7 @@
 
 #include <geode/mesh/core/geode_edged_curve.h>
 #include <geode/mesh/core/geode_graph.h>
+#include <geode/mesh/core/geode_hybrid_solid.h>
 #include <geode/mesh/core/geode_point_set.h>
 #include <geode/mesh/core/geode_polygonal_surface.h>
 #include <geode/mesh/core/geode_polyhedral_solid.h>
@@ -131,7 +132,14 @@ namespace bitsery
         template <>
         struct PolymorphicBaseClass< geode::SolidMesh3D >
             : PolymorphicDerivedClasses< geode::PolyhedralSolid3D,
-                  geode::TetrahedralSolid3D >
+                  geode::TetrahedralSolid3D,
+                  geode::HybridSolid3D >
+        {
+        };
+
+        template <>
+        struct PolymorphicBaseClass< geode::HybridSolid3D >
+            : PolymorphicDerivedClasses< geode::OpenGeodeHybridSolid3D >
         {
         };
 
@@ -177,6 +185,9 @@ namespace bitsery
         BITSERY_CLASS_NAME( geode::TetrahedralSolid3D, "TetrahedralSolid3D" );
         BITSERY_CLASS_NAME(
             geode::OpenGeodeTetrahedralSolid3D, "OpenGeodeTetrahedralSolid3D" );
+        BITSERY_CLASS_NAME( geode::HybridSolid3D, "HybridSolid3D" );
+        BITSERY_CLASS_NAME(
+            geode::OpenGeodeHybridSolid3D, "OpenGeodeHybridSolid3D" );
     } // namespace ext
 } // namespace bitsery
 
@@ -203,6 +214,9 @@ namespace
         geode::AttributeManager::register_attribute_type<
             absl::InlinedVector< geode::index_t, 4 >, Serializer >(
             context, "InlinedVector_index_t_4" );
+        geode::AttributeManager::register_attribute_type<
+            geode::HybridSolid3D::Type, Serializer >(
+            context, "HybridSolidType" );
         context.registerBasesList< Serializer >(
             bitsery::ext::PolymorphicClassesList< geode::VertexSet >{} );
     } // namespace )

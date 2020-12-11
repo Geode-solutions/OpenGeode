@@ -24,6 +24,7 @@
 #include <geode/mesh/core/tetrahedral_solid.h>
 
 #include <geode/mesh/builder/tetrahedral_solid_builder.h>
+#include <geode/mesh/core/detail/geode_elements.h>
 #include <geode/mesh/core/mesh_factory.h>
 
 namespace geode
@@ -86,18 +87,15 @@ namespace geode
         TetrahedralSolid< dimension >::polyhedron_edges_vertices(
             index_t polyhedron ) const
     {
-        return { { this->polyhedron_vertex( { polyhedron, 0 } ),
-                     this->polyhedron_vertex( { polyhedron, 1 } ) },
-            { this->polyhedron_vertex( { polyhedron, 0 } ),
-                this->polyhedron_vertex( { polyhedron, 2 } ) },
-            { this->polyhedron_vertex( { polyhedron, 0 } ),
-                this->polyhedron_vertex( { polyhedron, 3 } ) },
-            { this->polyhedron_vertex( { polyhedron, 1 } ),
-                this->polyhedron_vertex( { polyhedron, 2 } ) },
-            { this->polyhedron_vertex( { polyhedron, 1 } ),
-                this->polyhedron_vertex( { polyhedron, 3 } ) },
-            { this->polyhedron_vertex( { polyhedron, 2 } ),
-                this->polyhedron_vertex( { polyhedron, 3 } ) } };
+        std::vector< std::array< index_t, 2 > > result;
+        result.reserve( detail::tetrahedron_edge_vertices.size() );
+        for( const auto& edge : detail::tetrahedron_edge_vertices )
+        {
+            result.emplace_back( std::array< index_t, 2 >{
+                this->polyhedron_vertex( { polyhedron, edge[0] } ),
+                this->polyhedron_vertex( { polyhedron, edge[1] } ) } );
+        }
+        return result;
     }
 
     template < index_t dimension >
@@ -105,18 +103,16 @@ namespace geode
         TetrahedralSolid< dimension >::polyhedron_facets_vertices(
             index_t polyhedron ) const
     {
-        return { { this->polyhedron_vertex( { polyhedron, 1 } ),
-                     this->polyhedron_vertex( { polyhedron, 3 } ),
-                     this->polyhedron_vertex( { polyhedron, 2 } ) },
-            { this->polyhedron_vertex( { polyhedron, 0 } ),
-                this->polyhedron_vertex( { polyhedron, 2 } ),
-                this->polyhedron_vertex( { polyhedron, 3 } ) },
-            { this->polyhedron_vertex( { polyhedron, 3 } ),
-                this->polyhedron_vertex( { polyhedron, 1 } ),
-                this->polyhedron_vertex( { polyhedron, 0 } ) },
-            { this->polyhedron_vertex( { polyhedron, 0 } ),
-                this->polyhedron_vertex( { polyhedron, 1 } ),
-                this->polyhedron_vertex( { polyhedron, 2 } ) } };
+        std::vector< PolyhedronFacetVertices > result;
+        result.reserve( detail::tetrahedron_facet_vertices.size() );
+        for( const auto& facet : detail::tetrahedron_facet_vertices )
+        {
+            result.emplace_back( PolyhedronFacetVertices{
+                this->polyhedron_vertex( { polyhedron, facet[0] } ),
+                this->polyhedron_vertex( { polyhedron, facet[1] } ),
+                this->polyhedron_vertex( { polyhedron, facet[2] } ) } );
+        }
+        return result;
     }
 
     template class opengeode_mesh_api TetrahedralSolid< 3 >;
