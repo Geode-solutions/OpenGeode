@@ -121,9 +121,9 @@ namespace geode
         void serialize( Archive &archive )
         {
             archive.ext( *this, DefaultGrowable< Archive, uuid >{},
-                []( Archive &archive, uuid &id ) {
-                    archive.value8b( id.ab );
-                    archive.value8b( id.cd );
+                []( Archive &a, uuid &id ) {
+                    a.value8b( id.ab );
+                    a.value8b( id.cd );
                 } );
         }
     };

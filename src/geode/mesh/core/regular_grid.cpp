@@ -216,11 +216,11 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& archive, Impl& impl ) {
-                    archive.object( impl.cell_attribute_manager_ );
-                    archive.object( impl.origin_ );
-                    archive.container4b( impl.cells_number_ );
-                    archive.container8b( impl.cells_size_ );
+                []( Archive& a, Impl& impl ) {
+                    a.object( impl.cell_attribute_manager_ );
+                    a.object( impl.origin_ );
+                    a.container4b( impl.cells_number_ );
+                    a.container8b( impl.cells_size_ );
                 } );
         }
 
@@ -374,8 +374,8 @@ namespace geode
     void RegularGrid< dimension >::serialize( Archive& archive )
     {
         archive.ext( *this, DefaultGrowable< Archive, RegularGrid >{},
-            []( Archive& archive, RegularGrid& regulard_grid ) {
-                archive.object( regulard_grid.impl_ );
+            []( Archive& a, RegularGrid& regulard_grid ) {
+                a.object( regulard_grid.impl_ );
             } );
     }
 

@@ -70,8 +70,8 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this, DefaultGrowable< Archive, NamedType >{},
-                []( Archive& archive, NamedType& named_type ) {
-                    archive( named_type.value_ );
+                []( Archive& a, NamedType& named_type ) {
+                    a( named_type.value_ );
                 } );
         }
 

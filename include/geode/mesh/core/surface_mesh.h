@@ -55,8 +55,8 @@ namespace geode
     struct opengeode_mesh_api PolygonVertex
     {
         PolygonVertex() = default;
-        PolygonVertex( index_t polygon_id, local_index_t vertex_id )
-            : polygon_id( polygon_id ), vertex_id( vertex_id )
+        PolygonVertex( index_t polygon_id_in, local_index_t vertex_id_in )
+            : polygon_id( polygon_id_in ), vertex_id( vertex_id_in )
         {
         }
         PolygonVertex( PolygonEdge polygon_edge );
@@ -82,8 +82,8 @@ namespace geode
     struct opengeode_mesh_api PolygonEdge
     {
         PolygonEdge() = default;
-        PolygonEdge( index_t polygon_id, local_index_t edge_id )
-            : polygon_id( polygon_id ), edge_id( edge_id )
+        PolygonEdge( index_t polygon_id_in, local_index_t edge_id_in )
+            : polygon_id( polygon_id_in ), edge_id( edge_id_in )
         {
         }
         PolygonEdge( PolygonVertex polygon_vertex );

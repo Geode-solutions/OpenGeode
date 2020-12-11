@@ -57,12 +57,11 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& archive, Impl& impl ) {
-                    archive.ext(
+                []( Archive& a, Impl& impl ) {
+                    a.ext(
                         impl, bitsery::ext::BaseClass< detail::EdgesImpl >{} );
-                    archive.ext(
-                        impl, bitsery::ext::BaseClass<
-                                  detail::PointsImpl< dimension > >{} );
+                    a.ext( impl, bitsery::ext::BaseClass<
+                                     detail::PointsImpl< dimension > >{} );
                 } );
         }
     };
@@ -110,10 +109,10 @@ namespace geode
     void OpenGeodeEdgedCurve< dimension >::serialize( Archive& archive )
     {
         archive.ext( *this, DefaultGrowable< Archive, OpenGeodeEdgedCurve >{},
-            []( Archive& archive, OpenGeodeEdgedCurve& edged_curve ) {
-                archive.ext( edged_curve,
+            []( Archive& a, OpenGeodeEdgedCurve& edged_curve ) {
+                a.ext( edged_curve,
                     bitsery::ext::BaseClass< EdgedCurve< dimension > >{} );
-                archive.object( edged_curve.impl_ );
+                a.object( edged_curve.impl_ );
             } );
     }
 

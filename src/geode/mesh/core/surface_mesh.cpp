@@ -132,18 +132,18 @@ namespace geode
     template < typename Archive >
     void PolygonVertex::serialize( Archive& archive )
     {
-        archive.ext( *this,
-            Growable< Archive, PolygonVertex >{
-                { []( Archive& archive, PolygonVertex& polygon_vertex ) {
-                     archive.value4b( polygon_vertex.polygon_id );
-                     index_t value;
-                     archive.value4b( value );
-                     polygon_vertex.vertex_id = value;
-                 },
-                    []( Archive& archive, PolygonVertex& polygon_vertex ) {
-                        archive.value4b( polygon_vertex.polygon_id );
-                        archive.value1b( polygon_vertex.vertex_id );
-                    } } } );
+        archive.ext(
+            *this, Growable< Archive, PolygonVertex >{
+                       { []( Archive& a, PolygonVertex& polygon_vertex ) {
+                            a.value4b( polygon_vertex.polygon_id );
+                            index_t value;
+                            a.value4b( value );
+                            polygon_vertex.vertex_id = value;
+                        },
+                           []( Archive& a, PolygonVertex& polygon_vertex ) {
+                               a.value4b( polygon_vertex.polygon_id );
+                               a.value1b( polygon_vertex.vertex_id );
+                           } } } );
     }
 
     template < typename Archive >
@@ -151,15 +151,15 @@ namespace geode
     {
         archive.ext(
             *this, Growable< Archive, PolygonEdge >{
-                       { []( Archive& archive, PolygonEdge& polygon_edge ) {
-                            archive.value4b( polygon_edge.polygon_id );
+                       { []( Archive& a, PolygonEdge& polygon_edge ) {
+                            a.value4b( polygon_edge.polygon_id );
                             index_t value;
-                            archive.value4b( value );
+                            a.value4b( value );
                             polygon_edge.edge_id = value;
                         },
-                           []( Archive& archive, PolygonEdge& polygon_edge ) {
-                               archive.value4b( polygon_edge.polygon_id );
-                               archive.value1b( polygon_edge.edge_id );
+                           []( Archive& a, PolygonEdge& polygon_edge ) {
+                               a.value4b( polygon_edge.polygon_id );
+                               a.value1b( polygon_edge.edge_id );
                            } } } );
     }
 
@@ -240,11 +240,11 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& archive, Impl& impl ) {
-                    archive.object( impl.polygon_attribute_manager_ );
-                    archive.ext( impl.polygon_around_vertex_,
+                []( Archive& a, Impl& impl ) {
+                    a.object( impl.polygon_attribute_manager_ );
+                    a.ext( impl.polygon_around_vertex_,
                         bitsery::ext::StdSmartPtr{} );
-                    archive.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
+                    a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
                 } );
         }
 
@@ -675,9 +675,9 @@ namespace geode
     void SurfaceMesh< dimension >::serialize( Archive& archive )
     {
         archive.ext( *this, DefaultGrowable< Archive, SurfaceMesh >{},
-            []( Archive& archive, SurfaceMesh& surface ) {
-                archive.ext( surface, bitsery::ext::BaseClass< VertexSet >{} );
-                archive.object( surface.impl_ );
+            []( Archive& a, SurfaceMesh& surface ) {
+                a.ext( surface, bitsery::ext::BaseClass< VertexSet >{} );
+                a.object( surface.impl_ );
             } );
     }
 

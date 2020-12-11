@@ -147,10 +147,9 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& archive, Impl& impl ) {
-                    archive.ext(
-                        impl, bitsery::ext::BaseClass< detail::FacetStorage<
-                                  PolyhedronFacetVertices > >{} );
+                []( Archive& a, Impl& impl ) {
+                    a.ext( impl, bitsery::ext::BaseClass< detail::FacetStorage<
+                                     PolyhedronFacetVertices > >{} );
                 } );
         }
     };
@@ -263,9 +262,7 @@ namespace geode
     void SolidFacets< dimension >::serialize( Archive& archive )
     {
         archive.ext( *this, DefaultGrowable< Archive, SolidFacets >{},
-            []( Archive& archive, SolidFacets& solid ) {
-                archive.object( solid.impl_ );
-            } );
+            []( Archive& a, SolidFacets& solid ) { a.object( solid.impl_ ); } );
     }
 
     template class opengeode_mesh_api SolidFacets< 3 >;

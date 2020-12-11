@@ -97,8 +97,8 @@ namespace geode
             void serialize( Archive& archive )
             {
                 archive.ext( *this, DefaultGrowable< Archive, VertexCycle >{},
-                    []( Archive& archive, VertexCycle& storage ) {
-                        archive( storage.vertices_ );
+                    []( Archive& a, VertexCycle& storage ) {
+                        a( storage.vertices_ );
                     } );
             }
 

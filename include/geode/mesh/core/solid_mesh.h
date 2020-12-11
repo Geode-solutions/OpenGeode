@@ -55,8 +55,8 @@ namespace geode
     struct opengeode_mesh_api PolyhedronVertex
     {
         PolyhedronVertex() = default;
-        PolyhedronVertex( index_t polyhedron_id, local_index_t vertex_id )
-            : polyhedron_id( polyhedron_id ), vertex_id( vertex_id )
+        PolyhedronVertex( index_t polyhedron_id_in, local_index_t vertex_id_in )
+            : polyhedron_id( polyhedron_id_in ), vertex_id( vertex_id_in )
         {
         }
         bool operator==( const PolyhedronVertex& other ) const
@@ -81,8 +81,8 @@ namespace geode
     struct opengeode_mesh_api PolyhedronFacet
     {
         PolyhedronFacet() = default;
-        PolyhedronFacet( index_t polyhedron_id, local_index_t facet_id )
-            : polyhedron_id( polyhedron_id ), facet_id( facet_id )
+        PolyhedronFacet( index_t polyhedron_id_in, local_index_t facet_id_in )
+            : polyhedron_id( polyhedron_id_in ), facet_id( facet_id_in )
         {
         }
         bool operator==( const PolyhedronFacet& other ) const
@@ -104,8 +104,9 @@ namespace geode
     struct opengeode_mesh_api PolyhedronFacetVertex
     {
         PolyhedronFacetVertex() = default;
-        PolyhedronFacetVertex( PolyhedronFacet facet, local_index_t vertex_id )
-            : polyhedron_facet( std::move( facet ) ), vertex_id( vertex_id )
+        PolyhedronFacetVertex(
+            PolyhedronFacet facet, local_index_t vertex_id_in )
+            : polyhedron_facet( std::move( facet ) ), vertex_id( vertex_id_in )
         {
         }
         bool operator==( const PolyhedronFacetVertex& other ) const
@@ -127,8 +128,8 @@ namespace geode
     struct opengeode_mesh_api PolyhedronFacetEdge
     {
         PolyhedronFacetEdge() = default;
-        PolyhedronFacetEdge( PolyhedronFacet facet, local_index_t edge_id )
-            : polyhedron_facet( std::move( facet ) ), edge_id( edge_id )
+        PolyhedronFacetEdge( PolyhedronFacet facet, local_index_t edge_id_in )
+            : polyhedron_facet( std::move( facet ) ), edge_id( edge_id_in )
         {
         }
         bool operator==( const PolyhedronFacetEdge& other ) const

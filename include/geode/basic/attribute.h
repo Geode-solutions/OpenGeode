@@ -103,8 +103,8 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this, DefaultGrowable< Archive, AttributeBase >{},
-                []( Archive& archive, AttributeBase& attribute ) {
-                    archive.object( attribute.properties_ );
+                []( Archive& a, AttributeBase& attribute ) {
+                    a.object( attribute.properties_ );
                 } );
         }
 
@@ -160,8 +160,8 @@ namespace geode
         {
             archive.ext( *this,
                 DefaultGrowable< Archive, ReadOnlyAttribute< T > >{},
-                []( Archive& archive, ReadOnlyAttribute< T >& attribute ) {
-                    archive.ext(
+                []( Archive& a, ReadOnlyAttribute< T >& attribute ) {
+                    a.ext(
                         attribute, bitsery::ext::BaseClass< AttributeBase >{} );
                 } );
         }
@@ -235,10 +235,10 @@ namespace geode
         {
             archive.ext( *this,
                 DefaultGrowable< Archive, ConstantAttribute< T > >{},
-                []( Archive& archive, ConstantAttribute< T >& attribute ) {
-                    archive.ext( attribute,
+                []( Archive& a, ConstantAttribute< T >& attribute ) {
+                    a.ext( attribute,
                         bitsery::ext::BaseClass< ReadOnlyAttribute< T > >{} );
-                    archive( attribute.value_ );
+                    a( attribute.value_ );
                 } );
         }
 
@@ -343,13 +343,13 @@ namespace geode
         {
             archive.ext( *this,
                 DefaultGrowable< Archive, VariableAttribute< T > >{},
-                []( Archive& archive, VariableAttribute< T >& attribute ) {
-                    archive.ext( attribute,
+                []( Archive& a, VariableAttribute< T >& attribute ) {
+                    a.ext( attribute,
                         bitsery::ext::BaseClass< ReadOnlyAttribute< T > >{} );
-                    archive( attribute.default_value_ );
-                    archive.container( attribute.values_,
+                    a( attribute.default_value_ );
+                    a.container( attribute.values_,
                         attribute.values_.max_size(),
-                        []( Archive& archive, T& item ) { archive( item ); } );
+                        []( Archive& a2, T& item ) { a2( item ); } );
                 } );
             values_.reserve( 10 );
         }
@@ -475,11 +475,11 @@ namespace geode
         {
             archive.ext( *this,
                 DefaultGrowable< Archive, VariableAttribute< bool > >{},
-                []( Archive& archive, VariableAttribute< bool >& attribute ) {
-                    archive.ext( attribute, bitsery::ext::BaseClass<
-                                                ReadOnlyAttribute< bool > >{} );
-                    archive.value1b( attribute.default_value_ );
-                    archive.container1b(
+                []( Archive& a, VariableAttribute< bool >& attribute ) {
+                    a.ext( attribute, bitsery::ext::BaseClass<
+                                          ReadOnlyAttribute< bool > >{} );
+                    a.value1b( attribute.default_value_ );
+                    a.container1b(
                         attribute.values_, attribute.values_.max_size() );
                 } );
             values_.reserve( 10 );
@@ -616,15 +616,15 @@ namespace geode
         {
             archive.ext( *this,
                 DefaultGrowable< Archive, SparseAttribute< T > >{},
-                []( Archive& archive, SparseAttribute< T >& attribute ) {
-                    archive.ext( attribute,
+                []( Archive& a, SparseAttribute< T >& attribute ) {
+                    a.ext( attribute,
                         bitsery::ext::BaseClass< ReadOnlyAttribute< T > >{} );
-                    archive( attribute.default_value_ );
-                    archive.ext( attribute.values_,
+                    a( attribute.default_value_ );
+                    a.ext( attribute.values_,
                         bitsery::ext::StdMap{ attribute.values_.max_size() },
-                        []( Archive& archive, index_t& i, T& item ) {
-                            archive.value4b( i );
-                            archive( item );
+                        []( Archive& a2, index_t& i, T& item ) {
+                            a2.value4b( i );
+                            a2( item );
                         } );
                 } );
             values_.reserve( 10 );

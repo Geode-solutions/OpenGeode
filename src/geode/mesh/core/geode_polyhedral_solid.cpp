@@ -220,43 +220,42 @@ namespace geode
         {
             archive.ext( *this,
                 Growable< Archive, Impl >{
-                    { []( Archive& archive, Impl& impl ) {
-                         archive.container4b( impl.polyhedron_vertices_,
+                    { []( Archive& a, Impl& impl ) {
+                         a.container4b( impl.polyhedron_vertices_,
                              impl.polyhedron_vertices_.max_size() );
-                         archive.container4b( impl.polyhedron_vertex_ptr_,
+                         a.container4b( impl.polyhedron_vertex_ptr_,
                              impl.polyhedron_vertex_ptr_.max_size() );
                          std::vector< index_t > facets;
-                         archive.container4b(
+                         a.container4b(
                              facets, impl.polyhedron_facets_.max_size() );
                          impl.polyhedron_facets_.reserve( facets.size() );
                          for( const auto v : facets )
                          {
                              impl.polyhedron_facets_.emplace_back( v );
                          }
-                         archive.container4b( impl.polyhedron_facet_ptr_,
+                         a.container4b( impl.polyhedron_facet_ptr_,
                              impl.polyhedron_facet_ptr_.max_size() );
-                         archive.container4b( impl.polyhedron_adjacents_,
+                         a.container4b( impl.polyhedron_adjacents_,
                              impl.polyhedron_adjacents_.max_size() );
-                         archive.container4b( impl.polyhedron_adjacent_ptr_,
+                         a.container4b( impl.polyhedron_adjacent_ptr_,
                              impl.polyhedron_adjacent_ptr_.max_size() );
-                         archive.ext(
-                             impl, bitsery::ext::BaseClass<
-                                       detail::PointsImpl< dimension > >{} );
+                         a.ext( impl, bitsery::ext::BaseClass<
+                                          detail::PointsImpl< dimension > >{} );
                      },
-                        []( Archive& archive, Impl& impl ) {
-                            archive.container4b( impl.polyhedron_vertices_,
+                        []( Archive& a, Impl& impl ) {
+                            a.container4b( impl.polyhedron_vertices_,
                                 impl.polyhedron_vertices_.max_size() );
-                            archive.container4b( impl.polyhedron_vertex_ptr_,
+                            a.container4b( impl.polyhedron_vertex_ptr_,
                                 impl.polyhedron_vertex_ptr_.max_size() );
-                            archive.container1b( impl.polyhedron_facets_,
+                            a.container1b( impl.polyhedron_facets_,
                                 impl.polyhedron_facets_.max_size() );
-                            archive.container4b( impl.polyhedron_facet_ptr_,
+                            a.container4b( impl.polyhedron_facet_ptr_,
                                 impl.polyhedron_facet_ptr_.max_size() );
-                            archive.container4b( impl.polyhedron_adjacents_,
+                            a.container4b( impl.polyhedron_adjacents_,
                                 impl.polyhedron_adjacents_.max_size() );
-                            archive.container4b( impl.polyhedron_adjacent_ptr_,
+                            a.container4b( impl.polyhedron_adjacent_ptr_,
                                 impl.polyhedron_adjacent_ptr_.max_size() );
-                            archive.ext(
+                            a.ext(
                                 impl, bitsery::ext::BaseClass<
                                           detail::PointsImpl< dimension > >{} );
                         } } } );
@@ -414,10 +413,10 @@ namespace geode
     {
         archive.ext( *this,
             DefaultGrowable< Archive, OpenGeodePolyhedralSolid >{},
-            []( Archive& archive, OpenGeodePolyhedralSolid& solid ) {
-                archive.ext( solid,
+            []( Archive& a, OpenGeodePolyhedralSolid& solid ) {
+                a.ext( solid,
                     bitsery::ext::BaseClass< PolyhedralSolid< dimension > >{} );
-                archive.object( solid.impl_ );
+                a.object( solid.impl_ );
             } );
     }
 

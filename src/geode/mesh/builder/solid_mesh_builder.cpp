@@ -355,11 +355,11 @@ namespace geode
         }
         if( solid_mesh_->are_facets_enabled() )
         {
-            auto facets = facets_builder();
+            auto builder = facets_builder();
             for( auto&& facet_vertices :
                 solid_mesh_->polyhedron_facets_vertices( added_polyhedron ) )
             {
-                facets.find_or_create_facet( std::move( facet_vertices ) );
+                builder.find_or_create_facet( std::move( facet_vertices ) );
             }
         }
         return added_polyhedron;

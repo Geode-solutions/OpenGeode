@@ -86,8 +86,8 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this, DefaultGrowable< Archive, PolyhedralSolid >{},
-                []( Archive& archive, PolyhedralSolid& solid ) {
-                    archive.ext( solid,
+                []( Archive& a, PolyhedralSolid& solid ) {
+                    a.ext( solid,
                         bitsery::ext::BaseClass< SolidMesh< dimension > >{} );
                 } );
         }

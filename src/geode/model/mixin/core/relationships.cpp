@@ -209,12 +209,11 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& archive, Impl& impl ) {
-                    archive.object( impl.graph_ );
-                    archive.object( impl.uuid2index_ );
-                    archive.ext(
-                        impl.relation_type_, bitsery::ext::StdSmartPtr{} );
-                    archive.ext( impl.ids_, bitsery::ext::StdSmartPtr{} );
+                []( Archive& a, Impl& impl ) {
+                    a.object( impl.graph_ );
+                    a.object( impl.uuid2index_ );
+                    a.ext( impl.relation_type_, bitsery::ext::StdSmartPtr{} );
+                    a.ext( impl.ids_, bitsery::ext::StdSmartPtr{} );
                 } );
         }
 
