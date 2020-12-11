@@ -80,7 +80,7 @@ namespace geode
             index_t vertex_id, Point< dimension > point, OGPolyhedralSolidKey );
 
         void add_polyhedron( absl::Span< const index_t > vertices,
-            absl::Span< const std::vector< index_t > > facets,
+            absl::Span< const std::vector< local_index_t > > facets,
             OGPolyhedralSolidKey );
 
         void remove_polyhedra(

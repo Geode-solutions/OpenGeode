@@ -81,7 +81,7 @@ namespace geode
     template < index_t dimension >
     void PolyhedralSolidViewBuilder< dimension >::do_create_polyhedron(
         absl::Span< const index_t > /*unused*/,
-        absl::Span< const std::vector< index_t > > /*unused*/ )
+        absl::Span< const std::vector< local_index_t > > /*unused*/ )
     {
         // polyhedral_solid_view_->add_polyhedron( vertices, facets, {} );
     }

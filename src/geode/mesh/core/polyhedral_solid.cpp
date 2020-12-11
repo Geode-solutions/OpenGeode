@@ -23,21 +23,7 @@
 
 #include <geode/mesh/core/polyhedral_solid.h>
 
-#include <absl/container/flat_hash_set.h>
-
-#include <bitsery/brief_syntax/array.h>
-
-#include <geode/basic/attribute_manager.h>
-#include <geode/basic/bitsery_archive.h>
-#include <geode/basic/detail/mapping_after_deletion.h>
-#include <geode/basic/pimpl_impl.h>
-
-#include <geode/geometry/bounding_box.h>
-#include <geode/geometry/vector.h>
-
 #include <geode/mesh/builder/polyhedral_solid_builder.h>
-#include <geode/mesh/core/bitsery_archive.h>
-#include <geode/mesh/core/detail/facet_storage.h>
 #include <geode/mesh/core/mesh_factory.h>
 
 namespace geode

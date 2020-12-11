@@ -84,7 +84,7 @@ namespace geode
          * @return the index of the created polyhedron
          */
         index_t create_polyhedron( absl::Span< const index_t > vertices,
-            absl::Span< const std::vector< index_t > > facets );
+            absl::Span< const std::vector< local_index_t > > facets );
 
         /*!
          * Modify a polyhedron vertex.
@@ -190,7 +190,7 @@ namespace geode
             const PolyhedronVertex& polyhedron_vertex, index_t vertex_id ) = 0;
 
         virtual void do_create_polyhedron( absl::Span< const index_t > vertices,
-            absl::Span< const std::vector< index_t > > facets ) = 0;
+            absl::Span< const std::vector< local_index_t > > facets ) = 0;
 
         virtual void do_delete_polyhedra(
             const std::vector< bool >& to_delete ) = 0;
