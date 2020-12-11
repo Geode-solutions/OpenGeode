@@ -83,7 +83,7 @@ namespace geode
 
     private:
         void do_create_polyhedron( absl::Span< const index_t > vertices,
-            absl::Span< const std::vector< index_t > > facets ) final;
+            absl::Span< const std::vector< local_index_t > > facets ) final;
 
         virtual void do_create_tetrahedron(
             const std::array< index_t, 4 >& vertices ) = 0;
