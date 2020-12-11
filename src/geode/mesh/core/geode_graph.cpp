@@ -46,8 +46,8 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& archive, Impl& impl ) {
-                    archive.ext(
+                []( Archive& a, Impl& impl ) {
+                    a.ext(
                         impl, bitsery::ext::BaseClass< detail::EdgesImpl >{} );
                 } );
         }
@@ -78,9 +78,9 @@ namespace geode
     void OpenGeodeGraph::serialize( Archive& archive )
     {
         archive.ext( *this, DefaultGrowable< Archive, OpenGeodeGraph >{},
-            []( Archive& archive, OpenGeodeGraph& graph ) {
-                archive.ext( graph, bitsery::ext::BaseClass< Graph >{} );
-                archive.object( graph.impl_ );
+            []( Archive& a, OpenGeodeGraph& graph ) {
+                a.ext( graph, bitsery::ext::BaseClass< Graph >{} );
+                a.object( graph.impl_ );
             } );
     }
 

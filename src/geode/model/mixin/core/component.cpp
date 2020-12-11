@@ -58,9 +58,9 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& archive, Impl& impl ) {
-                    archive.text1b( impl.name_, impl.name_.max_size() );
-                    archive.object( impl.id_ );
+                []( Archive& a, Impl& impl ) {
+                    a.text1b( impl.name_, impl.name_.max_size() );
+                    a.object( impl.id_ );
                 } );
         }
 
@@ -102,8 +102,8 @@ namespace geode
     void Component< dimension >::serialize( Archive& archive )
     {
         archive.ext( *this, DefaultGrowable< Archive, Component >{},
-            []( Archive& archive, Component& component ) {
-                archive.object( component.impl_ );
+            []( Archive& a, Component& component ) {
+                a.object( component.impl_ );
             } );
     }
 

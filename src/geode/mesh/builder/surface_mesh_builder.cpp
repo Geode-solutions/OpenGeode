@@ -389,8 +389,8 @@ namespace geode
         const auto edges_enabled = surface_mesh_->are_edges_enabled();
         surface_mesh_->enable_edges();
         const auto& edges = surface_mesh_->edges();
-        absl::FixedArray< absl::InlinedVector< PolygonEdge, 2 > > polygon_edges(
-            edges.nb_edges() );
+        absl::FixedArray< absl::InlinedVector< PolygonEdge, 2 > >
+            polygon_edges_around( edges.nb_edges() );
         for( const auto polygon : polygons_to_connect )
         {
             const auto vertices_id =
@@ -401,18 +401,20 @@ namespace geode
                 PolygonEdge edge{ polygon, e };
                 const auto edge_id = edges.edge_from_vertices(
                     { vertices_id[e], vertices_id[( e + 1 ) % nb_vertices] } );
-                polygon_edges[edge_id.value()].emplace_back(
+                polygon_edges_around[edge_id.value()].emplace_back(
                     std::move( edge ) );
             }
         }
-        for( const auto& edges : polygon_edges )
+        for( const auto& polygon_edges : polygon_edges_around )
         {
-            if( edges.size() != 2 )
+            if( polygon_edges.size() != 2 )
             {
                 continue;
             }
-            do_set_polygon_adjacent( edges[0], edges[1].polygon_id );
-            do_set_polygon_adjacent( edges[1], edges[0].polygon_id );
+            do_set_polygon_adjacent(
+                polygon_edges[0], polygon_edges[1].polygon_id );
+            do_set_polygon_adjacent(
+                polygon_edges[1], polygon_edges[0].polygon_id );
         }
         if( !edges_enabled )
         {

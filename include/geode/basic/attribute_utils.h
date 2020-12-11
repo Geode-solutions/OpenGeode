@@ -66,9 +66,9 @@ namespace geode
         {
             archive.ext( *this,
                 DefaultGrowable< Archive, AttributeProperties >{},
-                []( Archive& archive, AttributeProperties& properties ) {
-                    archive.value1b( properties.assignable );
-                    archive.value1b( properties.interpolable );
+                []( Archive& a, AttributeProperties& properties ) {
+                    a.value1b( properties.assignable );
+                    a.value1b( properties.interpolable );
                 } );
         }
 

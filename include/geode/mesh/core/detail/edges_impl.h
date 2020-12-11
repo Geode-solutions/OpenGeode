@@ -80,8 +80,8 @@ namespace geode
             void serialize( Archive& archive )
             {
                 archive.ext( *this, DefaultGrowable< Archive, EdgesImpl >{},
-                    []( Archive& archive, EdgesImpl& impl ) {
-                        archive.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
+                    []( Archive& a, EdgesImpl& impl ) {
+                        a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
                     } );
             }
 

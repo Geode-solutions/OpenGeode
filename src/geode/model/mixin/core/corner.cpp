@@ -43,8 +43,8 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& archive, Impl& impl ) {
-                    archive.ext( impl,
+                []( Archive& a, Impl& impl ) {
+                    a.ext( impl,
                         bitsery::ext::BaseClass<
                             detail::MeshStorage< PointSet< dimension > > >{} );
                 } );
@@ -98,9 +98,9 @@ namespace geode
     void Corner< dimension >::serialize( Archive& archive )
     {
         archive.ext( *this, DefaultGrowable< Archive, Corner >{},
-            []( Archive& archive, Corner& corner ) {
-                archive.object( corner.impl_ );
-                archive.ext( corner,
+            []( Archive& a, Corner& corner ) {
+                a.object( corner.impl_ );
+                a.ext( corner,
                     bitsery::ext::BaseClass< Component< dimension > >{} );
             } );
     }

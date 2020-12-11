@@ -207,9 +207,8 @@ namespace geode
             {
                 component_vertices_->modify_value( unique_vertex_id,
                     [&component_vertex_id](
-                        std::vector< MeshComponentVertex >& vertices ) {
-                        vertices.emplace_back(
-                            std::move( component_vertex_id ) );
+                        std::vector< MeshComponentVertex >& value ) {
+                        value.emplace_back( std::move( component_vertex_id ) );
                     } );
                 ;
             }
@@ -226,10 +225,10 @@ namespace geode
                 "[VertexIdentifier::unset_unique_vertex] Unique vertex to "
                 "unset is not correct" );
             component_vertices_->modify_value( unique_vertex_id,
-                [&it]( std::vector< MeshComponentVertex >& vertices ) {
-                    vertices.erase(
+                [&it]( std::vector< MeshComponentVertex >& value ) {
+                    value.erase(
                         // workaround for gcc < 4.9
-                        vertices.begin() + ( it - vertices.cbegin() ) );
+                        value.begin() + ( it - value.cbegin() ) );
                 } );
             vertex2unique_vertex_.at( component_vertex_id.component_id.id() )
                 ->set_value( component_vertex_id.vertex, NO_ID );
@@ -322,19 +321,18 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& archive, Impl& impl ) {
-                    archive.object( impl.unique_vertices_ );
-                    archive.ext(
+                []( Archive& a, Impl& impl ) {
+                    a.object( impl.unique_vertices_ );
+                    a.ext(
                         impl.component_vertices_, bitsery::ext::StdSmartPtr{} );
-                    archive.ext( impl.vertex2unique_vertex_,
+                    a.ext( impl.vertex2unique_vertex_,
                         bitsery::ext::StdMap{
                             impl.vertex2unique_vertex_.max_size() },
-                        []( Archive& archive, uuid& id,
+                        []( Archive& a2, uuid& id,
                             std::shared_ptr< VariableAttribute< index_t > >&
                                 attribute ) {
-                            archive.object( id );
-                            archive.ext(
-                                attribute, bitsery::ext::StdSmartPtr{} );
+                            a2.object( id );
+                            a2.ext( attribute, bitsery::ext::StdSmartPtr{} );
                         } );
                 } );
         }

@@ -81,8 +81,8 @@ namespace geode
             if( it == edges.end() )
             {
                 edges_around_vertex_->modify_value(
-                    vertex_id, [&edge_vertex]( EdgesAroundVertex& edges ) {
-                        edges.push_back( edge_vertex );
+                    vertex_id, [&edge_vertex]( EdgesAroundVertex& value ) {
+                        value.push_back( edge_vertex );
                     } );
             }
         }
@@ -99,8 +99,8 @@ namespace geode
                 if( it != edges.end() )
                 {
                     edges_around_vertex_->modify_value(
-                        previous_vertex, [&it]( EdgesAroundVertex& edges ) {
-                            edges.erase( it );
+                        previous_vertex, [&it]( EdgesAroundVertex& value ) {
+                            value.erase( it );
                         } );
                 }
             }
@@ -113,9 +113,9 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& archive, Impl& impl ) {
-                    archive.object( impl.edge_attribute_manager_ );
-                    archive.ext( impl.edges_around_vertex_,
+                []( Archive& a, Impl& impl ) {
+                    a.object( impl.edge_attribute_manager_ );
+                    a.ext( impl.edges_around_vertex_,
                         bitsery::ext::StdSmartPtr{} );
                 } );
         }
@@ -129,18 +129,17 @@ namespace geode
     template < typename Archive >
     void EdgeVertex::serialize( Archive& archive )
     {
-        archive.ext(
-            *this, Growable< Archive, EdgeVertex >{
-                       { []( Archive& archive, EdgeVertex& edge_vertex ) {
-                            archive.value4b( edge_vertex.edge_id );
-                            index_t value;
-                            archive.value4b( value );
-                            edge_vertex.vertex_id = value;
-                        },
-                           []( Archive& archive, EdgeVertex& edge_vertex ) {
-                               archive.value4b( edge_vertex.edge_id );
-                               archive.value1b( edge_vertex.vertex_id );
-                           } } } );
+        archive.ext( *this, Growable< Archive, EdgeVertex >{
+                                { []( Archive& a, EdgeVertex& edge_vertex ) {
+                                     a.value4b( edge_vertex.edge_id );
+                                     index_t value;
+                                     a.value4b( value );
+                                     edge_vertex.vertex_id = value;
+                                 },
+                                    []( Archive& a, EdgeVertex& edge_vertex ) {
+                                        a.value4b( edge_vertex.edge_id );
+                                        a.value1b( edge_vertex.vertex_id );
+                                    } } } );
     }
 
     Graph::Graph() : impl_( *this ) {}
@@ -212,9 +211,9 @@ namespace geode
     void Graph::serialize( Archive& archive )
     {
         archive.ext( *this, DefaultGrowable< Archive, Graph >{},
-            []( Archive& archive, Graph& graph ) {
-                archive.ext( graph, bitsery::ext::BaseClass< VertexSet >{} );
-                archive.object( graph.impl_ );
+            []( Archive& a, Graph& graph ) {
+                a.ext( graph, bitsery::ext::BaseClass< VertexSet >{} );
+                a.object( graph.impl_ );
             } );
     }
 

@@ -68,9 +68,8 @@ namespace geode
         {
             archive.ext( *this,
                 DefaultGrowable< Archive, OpenGeodeVertexSet >{},
-                []( Archive &archive, OpenGeodeVertexSet &vertex_set ) {
-                    archive.ext(
-                        vertex_set, bitsery::ext::BaseClass< VertexSet >{} );
+                []( Archive &a, OpenGeodeVertexSet &vertex_set ) {
+                    a.ext( vertex_set, bitsery::ext::BaseClass< VertexSet >{} );
                 } );
         }
     };

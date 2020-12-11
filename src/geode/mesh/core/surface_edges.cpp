@@ -81,10 +81,9 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& archive, Impl& impl ) {
-                    archive.ext(
-                        impl, bitsery::ext::BaseClass<
-                                  detail::FacetEdgesImpl< dimension > >{} );
+                []( Archive& a, Impl& impl ) {
+                    a.ext( impl, bitsery::ext::BaseClass<
+                                     detail::FacetEdgesImpl< dimension > >{} );
                 } );
         }
     };
@@ -198,8 +197,8 @@ namespace geode
     void SurfaceEdges< dimension >::serialize( Archive& archive )
     {
         archive.ext( *this, DefaultGrowable< Archive, SurfaceEdges >{},
-            []( Archive& archive, SurfaceEdges& edges ) {
-                archive.object( edges.impl_ );
+            []( Archive& a, SurfaceEdges& edges ) {
+                a.object( edges.impl_ );
             } );
     }
 

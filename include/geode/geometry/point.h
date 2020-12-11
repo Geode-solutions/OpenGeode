@@ -154,8 +154,8 @@ namespace geode
         void serialize( Archive &archive )
         {
             archive.ext( *this, DefaultGrowable< Archive, Point >{},
-                []( Archive &archive, Point &point ) {
-                    archive.container8b( point.values_ );
+                []( Archive &a, Point &point ) {
+                    a.container8b( point.values_ );
                 } );
         }
 

@@ -63,9 +63,8 @@ namespace geode
             void serialize( Archive& archive )
             {
                 archive.ext( *this, DefaultGrowable< Archive, PointsImpl >{},
-                    []( Archive& archive, PointsImpl& impl ) {
-                        archive.ext(
-                            impl.points_, bitsery::ext::StdSmartPtr{} );
+                    []( Archive& a, PointsImpl& impl ) {
+                        a.ext( impl.points_, bitsery::ext::StdSmartPtr{} );
                     } );
             }
 
