@@ -330,7 +330,7 @@ namespace geode
     template < index_t dimension >
     index_t SolidMeshBuilder< dimension >::create_polyhedron(
         absl::Span< const index_t > vertices,
-        absl::Span< const std::vector< index_t > > facets )
+        absl::Span< const std::vector< local_index_t > > facets )
     {
         const auto added_polyhedron = solid_mesh_->nb_polyhedra();
         solid_mesh_->polyhedron_attribute_manager().resize(
@@ -676,7 +676,7 @@ namespace geode
             {
                 vertices[v] = solid_mesh.polyhedron_vertex( { p, v } );
             }
-            std::vector< std::vector< index_t > > facets(
+            absl::FixedArray< std::vector< local_index_t > > facets(
                 solid_mesh.nb_polyhedron_facets( p ) );
             for( const auto f : LRange{ solid_mesh.nb_polyhedron_facets( p ) } )
             {
@@ -691,7 +691,7 @@ namespace geode
                     OPENGEODE_ASSERT( it != vertices.end(),
                         "[SolidMeshBuilder::copy] Wrong indexing between "
                         "polyhedron_vertex and polyhedron_facet_vertex" );
-                    facet[v] = static_cast< index_t >(
+                    facet[v] = static_cast< local_index_t >(
                         std::distance( vertices.begin(), it ) );
                 }
             }

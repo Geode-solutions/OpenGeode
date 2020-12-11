@@ -52,7 +52,6 @@ namespace geode
     {
         OPENGEODE_DISABLE_COPY( PolyhedralSolid );
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
-        PASSKEY( PolyhedralSolidBuilder< dimension >, PolyhedralSolidKey );
 
     public:
         using Builder = PolyhedralSolidBuilder< dimension >;

@@ -73,7 +73,7 @@ namespace geode
     template < index_t dimension >
     void OpenGeodePolyhedralSolidBuilder< dimension >::do_create_polyhedron(
         absl::Span< const index_t > vertices,
-        absl::Span< const std::vector< index_t > > facets )
+        absl::Span< const std::vector< local_index_t > > facets )
     {
         geode_polyhedral_solid_->add_polyhedron( vertices, facets, {} );
     }

@@ -56,7 +56,7 @@ namespace geode
     template < index_t dimension >
     void TetrahedralSolidBuilder< dimension >::do_create_polyhedron(
         absl::Span< const index_t > vertices,
-        absl::Span< const std::vector< index_t > > facets )
+        absl::Span< const std::vector< local_index_t > > facets )
     {
         geode_unused( facets );
         OPENGEODE_ASSERT( vertices.size() == 4, "[TetrahedralSolidBuilder::"
