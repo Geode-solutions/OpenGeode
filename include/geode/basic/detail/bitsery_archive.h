@@ -45,6 +45,8 @@ namespace geode
                 context, "double" );
             AttributeManager::register_attribute_type< index_t, Serializer >(
                 context, "index_t" );
+            AttributeManager::register_attribute_type< local_index_t,
+                Serializer >( context, "local_index_t" );
             AttributeManager::register_attribute_type< std::vector< index_t >,
                 Serializer >( context, "vector_index_t" );
             AttributeManager::register_attribute_type< std::array< index_t, 2 >,

@@ -34,18 +34,8 @@
 
 #include <geode/geometry/point.h>
 
+#include <geode/mesh/core/detail/geode_elements.h>
 #include <geode/mesh/core/detail/points_impl.h>
-
-namespace
-{
-    static constexpr std::array< std::array< geode::local_index_t, 3 >, 4 >
-        tetrahedron_facet_vertices{ { { 1, 3, 2 }, { 0, 2, 3 }, { 3, 1, 0 },
-            { 0, 1, 2 } } };
-
-    static constexpr std::array< std::array< geode::local_index_t, 2 >, 6 >
-        tetrahedron_edge_vertices{ { { 0, 1 }, { 0, 2 }, { 0, 3 }, { 1, 2 },
-            { 1, 3 }, { 2, 3 } } };
-} // namespace
 
 namespace geode
 {
@@ -84,7 +74,7 @@ namespace geode
         PolyhedronVertex get_polyhedron_facet_vertex_id(
             const PolyhedronFacetVertex& polyhedron_facet_vertex ) const
         {
-            const auto vertex_id = tetrahedron_facet_vertices.at(
+            const auto vertex_id = detail::tetrahedron_facet_vertices.at(
                 polyhedron_facet_vertex.polyhedron_facet
                     .facet_id )[polyhedron_facet_vertex.vertex_id];
             return { polyhedron_facet_vertex.polyhedron_facet.polyhedron_id,
@@ -126,27 +116,11 @@ namespace geode
                 } );
         }
 
-        void add_tetrahedron( const TetrahedralSolid< dimension >& surface,
+        void add_tetrahedron( const TetrahedralSolid< dimension >& solid,
             const std::array< index_t, 4 >& vertices )
         {
             tetrahedron_vertices_->set_value(
-                surface.nb_polyhedra() - 1, vertices );
-        }
-
-        std::array< PolyhedronFacetVertices, 4 > get_polyhedron_facet_vertices(
-            const std::array< index_t, 4 >& vertices ) const
-        {
-            std::array< PolyhedronFacetVertices, 4 > facet_vertices;
-            for( const auto f : Range{ 4 } )
-            {
-                facet_vertices[f].resize( 3 );
-                for( const auto v : Range{ 3 } )
-                {
-                    facet_vertices[f][v] =
-                        vertices[tetrahedron_facet_vertices[f][v]];
-                }
-            }
-            return facet_vertices;
+                solid.nb_polyhedra() - 1, vertices );
         }
 
     private:
@@ -249,15 +223,6 @@ namespace geode
         const std::array< index_t, 4 >& vertices, OGTetrahedralSolidKey )
     {
         impl_->add_tetrahedron( *this, vertices );
-    }
-
-    template < index_t dimension >
-    std::array< PolyhedronFacetVertices, 4 >
-        OpenGeodeTetrahedralSolid< dimension >::get_polyhedron_facet_vertices(
-            const std::array< index_t, 4 >& vertices,
-            OGTetrahedralSolidKey ) const
-    {
-        return impl_->get_polyhedron_facet_vertices( vertices );
     }
 
     template < index_t dimension >

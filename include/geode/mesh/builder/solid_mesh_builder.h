@@ -171,6 +171,9 @@ namespace geode
 
         void copy( const SolidMesh< dimension >& solid_mesh );
 
+        void update_polyhedron_info(
+            index_t polyhedron_id, absl::Span< const index_t > vertices );
+
     private:
         /*!
          * @brief Sets a point.

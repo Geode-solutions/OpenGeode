@@ -25,6 +25,7 @@
 
 #include <geode/mesh/core/geode_edged_curve.h>
 #include <geode/mesh/core/geode_graph.h>
+#include <geode/mesh/core/geode_hybrid_solid.h>
 #include <geode/mesh/core/geode_point_set.h>
 #include <geode/mesh/core/geode_polygonal_surface.h>
 #include <geode/mesh/core/geode_polyhedral_solid.h>
@@ -79,5 +80,9 @@ namespace geode
         MeshFactory::register_default_mesh< OpenGeodeTetrahedralSolid3D >(
             TetrahedralSolid3D::type_name_static(),
             OpenGeodeTetrahedralSolid3D::impl_name_static() );
+
+        MeshFactory::register_default_mesh< OpenGeodeHybridSolid3D >(
+            HybridSolid3D::type_name_static(),
+            OpenGeodeHybridSolid3D::impl_name_static() );
     }
 } // namespace geode
