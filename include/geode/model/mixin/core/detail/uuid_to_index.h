@@ -74,13 +74,13 @@ namespace geode
             void serialize( Archive& archive )
             {
                 archive.ext( *this, DefaultGrowable< Archive, UuidToIndex >{},
-                    []( Archive& archive, UuidToIndex& uuids ) {
-                        archive.ext( uuids.uuid2index_,
+                    []( Archive& a, UuidToIndex& uuids ) {
+                        a.ext( uuids.uuid2index_,
                             bitsery::ext::StdMap{
                                 uuids.uuid2index_.max_size() },
-                            []( Archive& archive, uuid& id, index_t& index ) {
-                                archive.object( id );
-                                archive.value4b( index );
+                            []( Archive& a2, uuid& id, index_t& index ) {
+                                a2.object( id );
+                                a2.value4b( index );
                             } );
                     } );
             }

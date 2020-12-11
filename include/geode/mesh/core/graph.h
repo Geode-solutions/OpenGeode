@@ -47,8 +47,8 @@ namespace geode
     struct opengeode_mesh_api EdgeVertex
     {
         EdgeVertex() = default;
-        EdgeVertex( index_t edge_id, local_index_t vertex_id )
-            : edge_id( edge_id ), vertex_id( vertex_id )
+        EdgeVertex( index_t edge_id_in, local_index_t vertex_id_in )
+            : edge_id( edge_id_in ), vertex_id( vertex_id_in )
         {
         }
         bool operator==( const EdgeVertex& other ) const

@@ -84,10 +84,9 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& archive, Impl& impl ) {
-                    archive.ext(
-                        impl, bitsery::ext::BaseClass<
-                                  detail::FacetEdgesImpl< dimension > >{} );
+                []( Archive& a, Impl& impl ) {
+                    a.ext( impl, bitsery::ext::BaseClass<
+                                     detail::FacetEdgesImpl< dimension > >{} );
                 } );
         }
     };
@@ -200,9 +199,7 @@ namespace geode
     void SolidEdges< dimension >::serialize( Archive& archive )
     {
         archive.ext( *this, DefaultGrowable< Archive, SolidEdges >{},
-            []( Archive& archive, SolidEdges& solid ) {
-                archive.object( solid.impl_ );
-            } );
+            []( Archive& a, SolidEdges& solid ) { a.object( solid.impl_ ); } );
     }
 
     template class opengeode_mesh_api SolidEdges< 3 >;

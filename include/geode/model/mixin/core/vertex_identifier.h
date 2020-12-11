@@ -21,8 +21,9 @@ namespace geode
      */
     struct MeshComponentVertex
     {
-        MeshComponentVertex( ComponentID component_id, index_t vertex_id )
-            : component_id( std::move( component_id ) ), vertex( vertex_id )
+        MeshComponentVertex( ComponentID component_id_in, index_t vertex_id_in )
+            : component_id( std::move( component_id_in ) ),
+              vertex( vertex_id_in )
         {
         }
 
@@ -36,10 +37,9 @@ namespace geode
         {
             archive.ext( *this,
                 DefaultGrowable< Archive, MeshComponentVertex >{},
-                []( Archive& archive,
-                    MeshComponentVertex& mesh_component_vertex ) {
-                    archive.object( mesh_component_vertex.component_id );
-                    archive.value4b( mesh_component_vertex.vertex );
+                []( Archive& a, MeshComponentVertex& mesh_component_vertex ) {
+                    a.object( mesh_component_vertex.component_id );
+                    a.value4b( mesh_component_vertex.vertex );
                 } );
         }
 

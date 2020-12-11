@@ -43,10 +43,9 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& archive, Impl& impl ) {
-                    archive.ext(
-                        impl, bitsery::ext::BaseClass< detail::MeshStorage<
-                                  EdgedCurve< dimension > > >{} );
+                []( Archive& a, Impl& impl ) {
+                    a.ext( impl, bitsery::ext::BaseClass< detail::MeshStorage<
+                                     EdgedCurve< dimension > > >{} );
                 } );
         }
     };
@@ -97,9 +96,9 @@ namespace geode
     void Line< dimension >::serialize( Archive& archive )
     {
         archive.ext( *this, DefaultGrowable< Archive, Line >{},
-            []( Archive& archive, Line& line ) {
-                archive.object( line.impl_ );
-                archive.ext(
+            []( Archive& a, Line& line ) {
+                a.object( line.impl_ );
+                a.ext(
                     line, bitsery::ext::BaseClass< Component< dimension > >{} );
             } );
     }

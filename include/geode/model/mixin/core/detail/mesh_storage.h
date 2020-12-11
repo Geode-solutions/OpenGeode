@@ -64,8 +64,8 @@ namespace geode
             void serialize( Archive& archive )
             {
                 archive.ext( *this, DefaultGrowable< Archive, MeshStorage >{},
-                    []( Archive& archive, MeshStorage& storage ) {
-                        archive.object( storage.mesh_type_ );
+                    []( Archive& a, MeshStorage& storage ) {
+                        a.object( storage.mesh_type_ );
                     } );
             }
 

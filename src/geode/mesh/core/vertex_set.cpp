@@ -46,8 +46,8 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& archive, Impl& impl ) {
-                    archive.object( impl.vertex_attribute_manager_ );
+                []( Archive& a, Impl& impl ) {
+                    a.object( impl.vertex_attribute_manager_ );
                 } );
         }
 
@@ -89,8 +89,8 @@ namespace geode
     void VertexSet::serialize( Archive& archive )
     {
         archive.ext( *this, DefaultGrowable< Archive, VertexSet >{},
-            []( Archive& archive, VertexSet& vertex_set ) {
-                archive.object( vertex_set.impl_ );
+            []( Archive& a, VertexSet& vertex_set ) {
+                a.object( vertex_set.impl_ );
             } );
     }
 

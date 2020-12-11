@@ -83,9 +83,9 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this, DefaultGrowable< Archive, ComponentID >{},
-                []( Archive& archive, ComponentID& component_id ) {
-                    archive.object( component_id.type_ );
-                    archive.object( component_id.id_ );
+                []( Archive& a, ComponentID& component_id ) {
+                    a.object( component_id.type_ );
+                    a.object( component_id.id_ );
                 } );
         }
 

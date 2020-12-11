@@ -62,9 +62,8 @@ namespace geode
     void PointSet< dimension >::serialize( Archive& archive )
     {
         archive.ext( *this, DefaultGrowable< Archive, PointSet >{},
-            []( Archive& archive, PointSet& point_set ) {
-                archive.ext(
-                    point_set, bitsery::ext::BaseClass< VertexSet >{} );
+            []( Archive& a, PointSet& point_set ) {
+                a.ext( point_set, bitsery::ext::BaseClass< VertexSet >{} );
             } );
     }
 

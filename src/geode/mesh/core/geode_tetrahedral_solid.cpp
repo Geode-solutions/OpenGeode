@@ -156,13 +156,12 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& archive, Impl& impl ) {
-                    archive.ext(
-                        impl, bitsery::ext::BaseClass<
-                                  detail::PointsImpl< dimension > >{} );
-                    archive.ext( impl.tetrahedron_vertices_,
+                []( Archive& a, Impl& impl ) {
+                    a.ext( impl, bitsery::ext::BaseClass<
+                                     detail::PointsImpl< dimension > >{} );
+                    a.ext( impl.tetrahedron_vertices_,
                         bitsery::ext::StdSmartPtr{} );
-                    archive.ext( impl.tetrahedron_adjacents_,
+                    a.ext( impl.tetrahedron_adjacents_,
                         bitsery::ext::StdSmartPtr{} );
                 } );
         }
@@ -229,10 +228,10 @@ namespace geode
     {
         archive.ext( *this,
             DefaultGrowable< Archive, OpenGeodeTetrahedralSolid >{},
-            []( Archive& archive, OpenGeodeTetrahedralSolid& solid ) {
-                archive.ext( solid, bitsery::ext::BaseClass<
-                                        TetrahedralSolid< dimension > >{} );
-                archive.object( solid.impl_ );
+            []( Archive& a, OpenGeodeTetrahedralSolid& solid ) {
+                a.ext( solid, bitsery::ext::BaseClass<
+                                  TetrahedralSolid< dimension > >{} );
+                a.object( solid.impl_ );
             } );
     }
 

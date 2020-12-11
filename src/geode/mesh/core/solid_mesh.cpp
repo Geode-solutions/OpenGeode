@@ -173,34 +173,33 @@ namespace geode
     {
         archive.ext( *this,
             Growable< Archive, PolyhedronVertex >{
-                { []( Archive& archive, PolyhedronVertex& polyhedron_vertex ) {
-                     archive.value4b( polyhedron_vertex.polyhedron_id );
+                { []( Archive& a, PolyhedronVertex& polyhedron_vertex ) {
+                     a.value4b( polyhedron_vertex.polyhedron_id );
                      index_t value;
-                     archive.value4b( value );
+                     a.value4b( value );
                      polyhedron_vertex.vertex_id = value;
                  },
-                    []( Archive& archive,
-                        PolyhedronVertex& polyhedron_vertex ) {
-                        archive.value4b( polyhedron_vertex.polyhedron_id );
-                        archive.value1b( polyhedron_vertex.vertex_id );
+                    []( Archive& a, PolyhedronVertex& polyhedron_vertex ) {
+                        a.value4b( polyhedron_vertex.polyhedron_id );
+                        a.value1b( polyhedron_vertex.vertex_id );
                     } } } );
     }
 
     template < typename Archive >
     void PolyhedronFacet::serialize( Archive& archive )
     {
-        archive.ext( *this,
-            Growable< Archive, PolyhedronFacet >{
-                { []( Archive& archive, PolyhedronFacet& polyhedron_facet ) {
-                     archive.value4b( polyhedron_facet.polyhedron_id );
-                     index_t value;
-                     archive.value4b( value );
-                     polyhedron_facet.facet_id = value;
-                 },
-                    []( Archive& archive, PolyhedronFacet& polyhedron_facet ) {
-                        archive.value4b( polyhedron_facet.polyhedron_id );
-                        archive.value1b( polyhedron_facet.facet_id );
-                    } } } );
+        archive.ext(
+            *this, Growable< Archive, PolyhedronFacet >{
+                       { []( Archive& a, PolyhedronFacet& polyhedron_facet ) {
+                            a.value4b( polyhedron_facet.polyhedron_id );
+                            index_t value;
+                            a.value4b( value );
+                            polyhedron_facet.facet_id = value;
+                        },
+                           []( Archive& a, PolyhedronFacet& polyhedron_facet ) {
+                               a.value4b( polyhedron_facet.polyhedron_id );
+                               a.value1b( polyhedron_facet.facet_id );
+                           } } } );
     }
 
     template < typename Archive >
@@ -208,18 +207,17 @@ namespace geode
     {
         archive.ext( *this,
             Growable< Archive, PolyhedronFacetVertex >{
-                { []( Archive& archive,
+                { []( Archive& a,
                       PolyhedronFacetVertex& polyhedron_facet_vertex ) {
-                     archive.object( polyhedron_facet_vertex.polyhedron_facet );
+                     a.object( polyhedron_facet_vertex.polyhedron_facet );
                      index_t value;
-                     archive.value4b( value );
+                     a.value4b( value );
                      polyhedron_facet_vertex.vertex_id = value;
                  },
-                    []( Archive& archive,
+                    []( Archive& a,
                         PolyhedronFacetVertex& polyhedron_facet_vertex ) {
-                        archive.object(
-                            polyhedron_facet_vertex.polyhedron_facet );
-                        archive.value1b( polyhedron_facet_vertex.vertex_id );
+                        a.object( polyhedron_facet_vertex.polyhedron_facet );
+                        a.value1b( polyhedron_facet_vertex.vertex_id );
                     } } } );
     }
 
@@ -228,18 +226,16 @@ namespace geode
     {
         archive.ext( *this,
             Growable< Archive, PolyhedronFacetEdge >{
-                { []( Archive& archive,
-                      PolyhedronFacetEdge& polyhedron_facet_edge ) {
-                     archive.object( polyhedron_facet_edge.polyhedron_facet );
+                { []( Archive& a, PolyhedronFacetEdge& polyhedron_facet_edge ) {
+                     a.object( polyhedron_facet_edge.polyhedron_facet );
                      index_t value;
-                     archive.value4b( value );
+                     a.value4b( value );
                      polyhedron_facet_edge.edge_id = value;
                  },
-                    []( Archive& archive,
+                    []( Archive& a,
                         PolyhedronFacetEdge& polyhedron_facet_edge ) {
-                        archive.object(
-                            polyhedron_facet_edge.polyhedron_facet );
-                        archive.value1b( polyhedron_facet_edge.edge_id );
+                        a.object( polyhedron_facet_edge.polyhedron_facet );
+                        a.value1b( polyhedron_facet_edge.edge_id );
                     } } } );
     }
 
@@ -356,12 +352,12 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& archive, Impl& impl ) {
-                    archive.object( impl.polyhedron_attribute_manager_ );
-                    archive.ext( impl.polyhedron_around_vertex_,
+                []( Archive& a, Impl& impl ) {
+                    a.object( impl.polyhedron_attribute_manager_ );
+                    a.ext( impl.polyhedron_around_vertex_,
                         bitsery::ext::StdSmartPtr{} );
-                    archive.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
-                    archive.ext( impl.facets_, bitsery::ext::StdSmartPtr{} );
+                    a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
+                    a.ext( impl.facets_, bitsery::ext::StdSmartPtr{} );
                 } );
         }
 
@@ -948,9 +944,9 @@ namespace geode
     void SolidMesh< dimension >::serialize( Archive& archive )
     {
         archive.ext( *this, DefaultGrowable< Archive, SolidMesh >{},
-            []( Archive& archive, SolidMesh& solid ) {
-                archive.ext( solid, bitsery::ext::BaseClass< VertexSet >{} );
-                archive.object( solid.impl_ );
+            []( Archive& a, SolidMesh& solid ) {
+                a.ext( solid, bitsery::ext::BaseClass< VertexSet >{} );
+                a.object( solid.impl_ );
             } );
     }
 
