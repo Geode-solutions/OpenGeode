@@ -136,7 +136,7 @@ namespace geode
             *this, Growable< Archive, PolygonVertex >{
                        { []( Archive& a, PolygonVertex& polygon_vertex ) {
                             a.value4b( polygon_vertex.polygon_id );
-                            index_t value;
+                            index_t value{ NO_ID };
                             a.value4b( value );
                             polygon_vertex.vertex_id = value;
                         },
@@ -153,7 +153,7 @@ namespace geode
             *this, Growable< Archive, PolygonEdge >{
                        { []( Archive& a, PolygonEdge& polygon_edge ) {
                             a.value4b( polygon_edge.polygon_id );
-                            index_t value;
+                            index_t value{ NO_ID };
                             a.value4b( value );
                             polygon_edge.edge_id = value;
                         },
