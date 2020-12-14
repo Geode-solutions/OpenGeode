@@ -27,7 +27,7 @@
  * Applications (ASGA)
  */
 
-#include <geode/mesh/helpers/aabb_triangulated_surface_helpers.h>
+#include <geode/mesh/helpers/aabb_surface_helpers.h>
 
 #include <geode/geometry/aabb.h>
 #include <geode/geometry/basic_objects.h>
