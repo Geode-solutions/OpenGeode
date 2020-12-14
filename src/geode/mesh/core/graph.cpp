@@ -132,7 +132,7 @@ namespace geode
         archive.ext( *this, Growable< Archive, EdgeVertex >{
                                 { []( Archive& a, EdgeVertex& edge_vertex ) {
                                      a.value4b( edge_vertex.edge_id );
-                                     index_t value;
+                                     index_t value{ NO_ID };
                                      a.value4b( value );
                                      edge_vertex.vertex_id = value;
                                  },

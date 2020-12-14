@@ -56,7 +56,7 @@ void test_create_vertices( const geode::HybridSolid3D& hybrid_solid,
     OPENGEODE_EXCEPTION( hybrid_solid.isolated_vertex( 0 ),
         "[Test] Vertices should be isolated before polyhedra creation" );
     OPENGEODE_EXCEPTION( hybrid_solid.nb_vertices() == 11,
-        "[Test] HybridSolid should have 8 vertices" );
+        "[Test] HybridSolid should have 11 vertices" );
 }
 
 void test_bounding_box( const geode::HybridSolid3D& hybrid_solid )
@@ -75,6 +75,14 @@ void test_facets( const geode::HybridSolid3D& hybrid_solid )
     OPENGEODE_EXCEPTION(
         hybrid_solid.facets().facet_from_vertices( { 0, 1, 3, 4 } ) == 0,
         "[Test] Wrong facet from vertices" );
+    OPENGEODE_EXCEPTION(
+        hybrid_solid.facets().facet_from_vertices( { 8, 6, 7 } ) == 7,
+        "[Test] Wrong facet from vertices" );
+
+    geode::Point3D answer{ { 1.5, 0.5, 0.5 } };
+    const auto vertices = hybrid_solid.facets().facet_vertices( 8 );
+    OPENGEODE_EXCEPTION( hybrid_solid.facet_barycenter( vertices ) == answer,
+        "[Test] Wrong facet barycenter" );
 }
 
 void test_edges( const geode::HybridSolid3D& hybrid_solid )
