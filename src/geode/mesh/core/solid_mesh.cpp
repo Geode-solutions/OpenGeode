@@ -175,7 +175,7 @@ namespace geode
             Growable< Archive, PolyhedronVertex >{
                 { []( Archive& a, PolyhedronVertex& polyhedron_vertex ) {
                      a.value4b( polyhedron_vertex.polyhedron_id );
-                     index_t value;
+                     index_t value{ NO_ID };
                      a.value4b( value );
                      polyhedron_vertex.vertex_id = value;
                  },
@@ -192,7 +192,7 @@ namespace geode
             *this, Growable< Archive, PolyhedronFacet >{
                        { []( Archive& a, PolyhedronFacet& polyhedron_facet ) {
                             a.value4b( polyhedron_facet.polyhedron_id );
-                            index_t value;
+                            index_t value{ NO_ID };
                             a.value4b( value );
                             polyhedron_facet.facet_id = value;
                         },
@@ -210,7 +210,7 @@ namespace geode
                 { []( Archive& a,
                       PolyhedronFacetVertex& polyhedron_facet_vertex ) {
                      a.object( polyhedron_facet_vertex.polyhedron_facet );
-                     index_t value;
+                     index_t value{ NO_ID };
                      a.value4b( value );
                      polyhedron_facet_vertex.vertex_id = value;
                  },
@@ -228,7 +228,7 @@ namespace geode
             Growable< Archive, PolyhedronFacetEdge >{
                 { []( Archive& a, PolyhedronFacetEdge& polyhedron_facet_edge ) {
                      a.object( polyhedron_facet_edge.polyhedron_facet );
-                     index_t value;
+                     index_t value{ NO_ID };
                      a.value4b( value );
                      polyhedron_facet_edge.edge_id = value;
                  },

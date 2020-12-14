@@ -26,6 +26,7 @@
 
 #include "builder/edged_curve_builder.h"
 #include "builder/graph_builder.h"
+#include "builder/hybrid_solid_builder.h"
 #include "builder/point_set_builder.h"
 #include "builder/polygonal_surface_builder.h"
 #include "builder/polyhedral_solid_builder.h"
@@ -40,6 +41,7 @@
 
 #include "core/edged_curve.h"
 #include "core/graph.h"
+#include "core/hybrid_solid.h"
 #include "core/point_set.h"
 #include "core/polygonal_surface.h"
 #include "core/polyhedral_solid.h"
@@ -57,6 +59,7 @@
 
 #include "io/edged_curve.h"
 #include "io/graph.h"
+#include "io/hybrid_solid.h"
 #include "io/point_set.h"
 #include "io/polygonal_surface.h"
 #include "io/polyhedral_solid.h"
@@ -129,6 +132,7 @@ PYBIND11_MODULE( opengeode_py_mesh, module )
     geode::define_solid_facets( module );
     geode::define_polyhedral_solid( module );
     geode::define_tetrahedral_solid( module );
+    geode::define_hybrid_solid( module );
 
     geode::define_vertex_set_builder( module );
     geode::define_graph_builder( module );
@@ -143,6 +147,7 @@ PYBIND11_MODULE( opengeode_py_mesh, module )
     geode::define_solid_facets_builder( module );
     geode::define_polyhedral_solid_builder( module );
     geode::define_tetrahedral_solid_builder( module );
+    geode::define_hybrid_solid_builder( module );
 
     geode::define_convert_surface_mesh( module );
     geode::define_convert_solid_mesh( module );
@@ -155,4 +160,5 @@ PYBIND11_MODULE( opengeode_py_mesh, module )
     geode::define_triangulated_surface_io( module );
     geode::define_polyhedral_solid_io( module );
     geode::define_tetrahedral_solid_io( module );
+    geode::define_hybrid_solid_io( module );
 }

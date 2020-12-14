@@ -26,9 +26,12 @@
 #include <geode/basic/pimpl_impl.h>
 #include <geode/basic/range.h>
 
+#include <geode/mesh/core/hybrid_solid.h>
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polyhedral_solid.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
+#include <geode/mesh/io/hybrid_solid_input.h>
+#include <geode/mesh/io/hybrid_solid_output.h>
 #include <geode/mesh/io/polyhedral_solid_input.h>
 #include <geode/mesh/io/polyhedral_solid_output.h>
 #include <geode/mesh/io/tetrahedral_solid_input.h>
@@ -96,6 +99,12 @@ namespace geode
             {
                 save_tetrahedral_solid( *tetra, file );
             }
+            else if( const auto* hybrid =
+                         dynamic_cast< const HybridSolid< dimension >* >(
+                             &mesh ) )
+            {
+                save_hybrid_solid( *hybrid, file );
+            }
             else if( const auto* poly =
                          dynamic_cast< const PolyhedralSolid< dimension >* >(
                              &mesh ) )
@@ -125,6 +134,13 @@ namespace geode
             {
                 block.set_mesh( load_tetrahedral_solid< dimension >(
                                     block.mesh_type(), file ),
+                    typename Block< dimension >::BlocksKey{} );
+            }
+            else if( MeshFactory::type( block.mesh_type() )
+                     == HybridSolid< dimension >::type_name_static() )
+            {
+                block.set_mesh(
+                    load_hybrid_solid< dimension >( block.mesh_type(), file ),
                     typename Block< dimension >::BlocksKey{} );
             }
             else

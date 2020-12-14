@@ -61,14 +61,44 @@ namespace geode
             const PolyhedronVertex& polyhedron_vertex,
             index_t vertex_id ) final;
 
+        /*!
+         *     3
+         *    /|\
+         *   / 2 \
+         *  | / \ |
+         *  0 --- 1
+         */
         void do_create_tetrahedron(
             const std::array< index_t, 4 >& vertices ) final;
 
+        /*!
+         *      7 --- 6
+         *     /|    /|
+         *   4 ---- 5 |
+         *   |  3 --- 2
+         *   | /    |/
+         *   0 ---- 1
+         */
         void do_create_hexahedron(
             const std::array< index_t, 8 >& vertices ) final;
 
+        /*!
+         *     5
+         *    /|\
+         *  3 --- 4
+         *  |  2  |
+         *  | / \ |
+         *  0 --- 1
+         */
         void do_create_prism( const std::array< index_t, 6 >& vertices ) final;
 
+        /*!
+         *       3 ---- 2
+         *      / \ /  /
+         *     /  4   /
+         *    / /  \ /
+         *   0 ---- 1
+         */
         void do_create_pyramid(
             const std::array< index_t, 5 >& vertices ) final;
 
