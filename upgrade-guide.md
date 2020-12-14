@@ -12,6 +12,8 @@ The main goal of this release is to reduce memory consumption by introducting tw
 
 - **Mesh**: The introdcution of the `local_index_t` in all the struct can imply some changes in the client code to update the new type usage.
 
+- **Mesh helpers**: The `aabb_triangulated_surface_helpers` h/cpp files are renamed `aabb_surface_helpers`.
+
 
 ## Upgrading from OpenGeode v6.x.x to v7.0.0
 
