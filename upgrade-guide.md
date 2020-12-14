@@ -1,5 +1,18 @@
 # Upgrade Guide
 
+## Upgrading from OpenGeode v7.x.x to v8.0.0
+
+### Motivations
+
+The main goal of this release is to reduce memory consumption by introducting two new features: 
+1) a new type `local_index_t` which can be used for indexing inferior to 255. This type is now used in PolygonVertex, PolygonEdge, PolyhedronVertex and all other struct similaire to these ones. 
+2) a new MeshType `HybridSolid` which can only store store tetrahedra, hexahedra, prisms and pyramids but this restriction allows several storage optimizations which highly reduces memory usage and increase prefermences.
+
+### Breaking Changes
+
+- **Mesh**: The introdcution of the `local_index_t` in all the struct can imply some changes in the client code to update the new type usage.
+
+
 ## Upgrading from OpenGeode v6.x.x to v7.0.0
 
 ### Motivations
