@@ -5,8 +5,8 @@
 ### Motivations
 
 The main goal of this release is to reduce memory consumption by introducting two new features: 
-1) a new type `local_index_t` which can be used for indexing inferior to 255. This type is now used in PolygonVertex, PolygonEdge, PolyhedronVertex and all other struct similaire to these ones. 
-2) a new MeshType `HybridSolid` which can only store store tetrahedra, hexahedra, prisms and pyramids but this restriction allows several storage optimizations which highly reduces memory usage and increase prefermences.
+1) a new type `local_index_t` which can be used for indexing inferior to 255. This type is now used in PolygonVertex, PolygonEdge, PolyhedronVertex and all other struct similar to these ones. 
+2) a new MeshType `HybridSolid` which can only stores tetrahedra, hexahedra, prisms and pyramids. This restriction allows several storage optimizations which highly reduce memory usage and increase performance.
 
 ### Breaking Changes
 
