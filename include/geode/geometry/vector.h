@@ -72,7 +72,7 @@ namespace geode
         double dot( const Vector &other ) const
         {
             double result{ 0 };
-            for( const auto i : Range{ dimension } )
+            for( const auto i : LRange{ dimension } )
             {
                 result += this->value( i ) * other.value( i );
             }

@@ -29,6 +29,7 @@
 
 #include <geode/geometry/aabb.h>
 
+#include <geode/geometry/morton.h>
 #include <geode/geometry/point.h>
 #include <geode/geometry/vector.h>
 
@@ -45,7 +46,7 @@ namespace
         const auto Pmin = point - box.min();
         const auto Pmax = point - box.max();
         auto result = std::numeric_limits< double >::max();
-        for( const auto c : geode::Range{ dimension } )
+        for( const auto c : geode::LRange{ dimension } )
         {
             const auto local_result = std::min(
                 std::abs( Pmin.value( c ) ), std::abs( Pmax.value( c ) ) );
@@ -54,132 +55,16 @@ namespace
         return result;
     }
 
-    using const_itr = const std::vector< geode::index_t >::iterator;
-
     template < geode::index_t dimension >
-    class Morton_cmp
-    {
-    public:
-        Morton_cmp( absl::Span< const geode::BoundingBox< dimension > > bboxes,
-            geode::index_t coord )
-            : bboxes_( bboxes ), coord_( coord )
-        {
-        }
-
-        bool operator()( geode::index_t box1, geode::index_t box2 ) const
-        {
-            const auto& bbox1 = bboxes_[box1];
-            const auto& bbox2 = bboxes_[box2];
-            return bbox1.min().value( coord_ ) + bbox1.max().value( coord_ )
-                   < bbox2.min().value( coord_ ) + bbox2.max().value( coord_ );
-        }
-
-    private:
-        absl::Span< const geode::BoundingBox< dimension > > bboxes_;
-        geode::index_t coord_;
-    };
-    ALIAS_2D_AND_3D( Morton_cmp );
-
-    /**
-     * \brief Splits a sequence into two ordered halves.
-     * \details The algorithm shuffles the sequence and
-     *  partitions its into two halves with the same number of elements
-     *  and such that the elements of the first half are smaller
-     *  than the elements of the second half.
-     * \param[in] begin an iterator to the first element
-     * \param[in] end an iterator one position past the last element
-     * \param[in] cmp the comparator object
-     * \return an iterator to the middle of the sequence that separates
-     *  the two halves
-     */
-    template < typename CMP >
-    const_itr split( const_itr& begin, const_itr& end, const CMP& cmp )
-    {
-        if( begin >= end )
-        {
-            return begin;
-        }
-        const_itr middle = begin + ( end - begin ) / 2;
-        std::nth_element( begin, middle, end, cmp );
-        return middle;
-    }
-
-    /**
-     * \brief Generic class for sorting arbitrary elements in Morton order.
-     * \details The implementation is inspired by:
-     *  - Christophe Delage and Olivier Devillers. Spatial Sorting.
-     *   In CGAL User and Reference Manual. CGAL Editorial Board,
-     *   3.9 edition, 2011
-     */
-    template < geode::index_t COORDX >
-    void morton_sort( absl::Span< const geode::BoundingBox3D > bboxes,
-        const_itr& begin,
-        const_itr& end )
-    {
-        if( end - begin <= 1 )
-        {
-            return;
-        }
-        constexpr auto COORDY = ( COORDX + 1 ) % 3;
-        constexpr auto COORDZ = ( COORDY + 1 ) % 3;
-
-        const Morton_cmp3D compX{ bboxes, COORDX };
-        const Morton_cmp3D compY{ bboxes, COORDY };
-        const Morton_cmp3D compZ{ bboxes, COORDZ };
-
-        const auto m0 = begin;
-        const auto m8 = end;
-        const auto m4 = split( m0, m8, compX );
-        const auto m2 = split( m0, m4, compY );
-        const auto m1 = split( m0, m2, compZ );
-        const auto m3 = split( m2, m4, compZ );
-        const auto m6 = split( m4, m8, compY );
-        const auto m5 = split( m4, m6, compZ );
-        const auto m7 = split( m6, m8, compZ );
-        morton_sort< COORDZ >( bboxes, m0, m1 );
-        morton_sort< COORDY >( bboxes, m1, m2 );
-        morton_sort< COORDY >( bboxes, m2, m3 );
-        morton_sort< COORDX >( bboxes, m3, m4 );
-        morton_sort< COORDX >( bboxes, m4, m5 );
-        morton_sort< COORDY >( bboxes, m5, m6 );
-        morton_sort< COORDY >( bboxes, m6, m7 );
-        morton_sort< COORDZ >( bboxes, m7, m8 );
-    }
-
-    template < geode::index_t COORDX >
-    void morton_sort( absl::Span< const geode::BoundingBox2D > bboxes,
-        const_itr& begin,
-        const_itr& end )
-    {
-        if( end - begin <= 1 )
-        {
-            return;
-        }
-        constexpr auto COORDY = ( COORDX + 1 ) % 2;
-
-        const Morton_cmp2D compX{ bboxes, COORDX };
-        const Morton_cmp2D compY{ bboxes, COORDY };
-
-        const auto m0 = begin;
-        const auto m4 = end;
-        const auto m2 = split( m0, m4, compX );
-        const auto m1 = split( m0, m2, compY );
-        const auto m3 = split( m2, m4, compY );
-        morton_sort< COORDY >( bboxes, m0, m1 );
-        morton_sort< COORDX >( bboxes, m1, m2 );
-        morton_sort< COORDX >( bboxes, m2, m3 );
-        morton_sort< COORDY >( bboxes, m3, m4 );
-    }
-
-    template < geode::index_t dimension >
-    std::vector< geode::index_t > morton_sort(
+    absl::FixedArray< geode::index_t > sort(
         absl::Span< const geode::BoundingBox< dimension > > bboxes )
     {
-        std::vector< geode::index_t > mapping_morton( bboxes.size() );
-        absl::c_iota( mapping_morton, 0 );
-        morton_sort< 0 >(
-            bboxes, mapping_morton.begin(), mapping_morton.end() );
-        return mapping_morton;
+        absl::FixedArray< geode::Point< dimension > > points( bboxes.size() );
+        for( const auto i : geode::Indices{ bboxes } )
+        {
+            points[i] = bboxes[i].min() + bboxes[i].max();
+        }
+        return geode::morton_sort< dimension >( points );
     }
 } // namespace
 
@@ -188,11 +73,10 @@ namespace geode
     template < index_t dimension >
     AABBTree< dimension >::Impl::Impl(
         absl::Span< const BoundingBox< dimension > > bboxes )
+        : tree_( max_node_index( ROOT_INDEX, 0, bboxes.size() ) + ROOT_INDEX ),
+          mapping_morton_( sort( bboxes ) )
     {
-        mapping_morton_ = morton_sort( bboxes );
-        const auto nb_bboxes = static_cast< index_t >( bboxes.size() );
-        tree_.resize( max_node_index( ROOT_INDEX, 0, nb_bboxes ) + ROOT_INDEX );
-        initialize_tree_recursive( bboxes, ROOT_INDEX, 0, nb_bboxes );
+        initialize_tree_recursive( bboxes, ROOT_INDEX, 0, bboxes.size() );
     }
 
     template < index_t dimension >
