@@ -30,6 +30,7 @@
 #include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/builder/solid_edges_builder.h>
 #include <geode/mesh/builder/solid_facets_builder.h>
+#include <geode/mesh/core/detail/vertex_cycle.h>
 #include <geode/mesh/core/solid_edges.h>
 #include <geode/mesh/core/solid_facets.h>
 #include <geode/mesh/core/solid_mesh.h>
@@ -463,36 +464,66 @@ namespace geode
     void SolidMeshBuilder< dimension >::compute_polyhedron_adjacencies(
         absl::Span< const index_t > polyhedra_to_connect )
     {
-        const auto facets_enabled = solid_mesh_->are_facets_enabled();
-        solid_mesh_->enable_facets();
-        const auto& facets = solid_mesh_->facets();
-        absl::FixedArray< PolyhedronFacet > polyhedron_facets(
-            facets.nb_facets() );
-        for( const auto polyhedron : polyhedra_to_connect )
+        if( solid_mesh_->are_facets_enabled() )
         {
-            for( const auto f :
-                LRange{ solid_mesh_->nb_polyhedron_facets( polyhedron ) } )
+            const auto& facets = solid_mesh_->facets();
+            absl::FixedArray< PolyhedronFacet > polyhedron_facets(
+                facets.nb_facets() );
+            for( const auto polyhedron : polyhedra_to_connect )
             {
-                PolyhedronFacet facet{ polyhedron, f };
-                const auto vertices_id =
-                    solid_mesh_->polyhedron_facet_vertices( facet );
-                const auto facet_id = facets.facet_from_vertices( vertices_id );
-                auto& adj_facet = polyhedron_facets[facet_id.value()];
-                if( adj_facet == PolyhedronFacet{} )
+                for( const auto f :
+                    LRange{ solid_mesh_->nb_polyhedron_facets( polyhedron ) } )
                 {
-                    adj_facet = std::move( facet );
-                }
-                else
-                {
-                    do_set_polyhedron_adjacent( adj_facet, polyhedron );
-                    do_set_polyhedron_adjacent(
-                        facet, adj_facet.polyhedron_id );
+                    PolyhedronFacet facet{ polyhedron, f };
+                    if( !solid_mesh_->is_polyhedron_facet_on_border( facet ) )
+                    {
+                        continue;
+                    }
+                    const auto vertices_id =
+                        solid_mesh_->polyhedron_facet_vertices( facet );
+                    const auto facet_id =
+                        facets.facet_from_vertices( vertices_id );
+                    auto& adj_facet = polyhedron_facets[facet_id.value()];
+                    if( adj_facet == PolyhedronFacet{} )
+                    {
+                        adj_facet = std::move( facet );
+                    }
+                    else
+                    {
+                        do_set_polyhedron_adjacent( adj_facet, polyhedron );
+                        do_set_polyhedron_adjacent(
+                            facet, adj_facet.polyhedron_id );
+                    }
                 }
             }
         }
-        if( !facets_enabled )
+        else
         {
-            solid_mesh_->disable_facets();
+            using Facet = detail::VertexCycle< PolyhedronFacetVertices >;
+            absl::flat_hash_map< Facet, PolyhedronFacet > facets;
+            for( const auto polyhedron : polyhedra_to_connect )
+            {
+                for( const auto f :
+                    LRange{ solid_mesh_->nb_polyhedron_facets( polyhedron ) } )
+                {
+                    PolyhedronFacet facet{ polyhedron, f };
+                    if( !solid_mesh_->is_polyhedron_facet_on_border( facet ) )
+                    {
+                        continue;
+                    }
+                    const auto output = facets.emplace(
+                        solid_mesh_->polyhedron_facet_vertices( facet ),
+                        facet );
+                    if( !output.second )
+                    {
+                        const auto it = output.first;
+                        do_set_polyhedron_adjacent( it->second, polyhedron );
+                        do_set_polyhedron_adjacent(
+                            facet, it->second.polyhedron_id );
+                        facets.erase( it );
+                    }
+                }
+            }
         }
     }
 
