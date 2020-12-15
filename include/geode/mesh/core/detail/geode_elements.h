@@ -32,7 +32,7 @@ namespace geode
     namespace detail
     {
         static constexpr std::array< std::array< geode::local_index_t, 3 >, 4 >
-            tetrahedron_facet_vertices{ { { 1, 3, 2 }, { 0, 2, 3 }, { 0, 3, 1 },
+            tetrahedron_facet_vertices{ { { 1, 3, 2 }, { 0, 2, 3 }, { 3, 1, 0 },
                 { 0, 1, 2 } } };
 
         static constexpr std::array< std::array< geode::local_index_t, 2 >, 6 >
