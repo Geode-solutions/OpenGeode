@@ -135,8 +135,8 @@ namespace geode
             ACTION& action ) const;
 
     private:
-        std::vector< BoundingBox< dimension > > tree_;
-        std::vector< index_t > mapping_morton_;
+        absl::FixedArray< BoundingBox< dimension > > tree_;
+        absl::FixedArray< index_t > mapping_morton_;
     };
 
     template < index_t dimension >
