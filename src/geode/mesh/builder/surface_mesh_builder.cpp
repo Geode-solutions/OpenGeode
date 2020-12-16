@@ -33,7 +33,6 @@
 #include <geode/mesh/core/surface_edges.h>
 #include <geode/mesh/core/surface_mesh.h>
 
-
 namespace
 {
     template < geode::index_t dimension >
@@ -423,7 +422,8 @@ namespace geode
         else
         {
             using Edge = detail::VertexCycle< std::array< index_t, 2 > >;
-            absl::flat_hash_map< Edge, PolygonEdge > edges;
+            absl::flat_hash_map< Edge, absl::InlinedVector< PolygonEdge, 2 > >
+                edges;
             for( const auto polygon : polygons_to_connect )
             {
                 for( const auto e :
@@ -434,16 +434,25 @@ namespace geode
                     {
                         continue;
                     }
-                    const auto output = edges.emplace(
-                        surface_mesh_->polygon_edge_vertices( edge ), edge );
+                    auto output = edges.emplace(
+                        surface_mesh_->polygon_edge_vertices( edge ),
+                        absl::InlinedVector< PolygonEdge, 2 >{ edge } );
                     if( !output.second )
                     {
-                        const auto it = output.first;
-                        do_set_polygon_adjacent( it->second, polygon );
-                        do_set_polygon_adjacent( edge, it->second.polygon_id );
-                        edges.erase( it );
+                        output.first->second.emplace_back( std::move( edge ) );
                     }
                 }
+            }
+            for( const auto& polygon_edges : edges )
+            {
+                if( polygon_edges.second.size() != 2 )
+                {
+                    continue;
+                }
+                do_set_polygon_adjacent( polygon_edges.second.at( 0 ),
+                    polygon_edges.second.at( 1 ).polygon_id );
+                do_set_polygon_adjacent( polygon_edges.second.at( 1 ),
+                    polygon_edges.second.at( 0 ).polygon_id );
             }
         }
     }
