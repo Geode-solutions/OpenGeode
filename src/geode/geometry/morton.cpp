@@ -93,8 +93,8 @@ namespace
         {
             return;
         }
-        constexpr auto COORDY = ( COORDX + 1 ) % 3;
-        constexpr auto COORDZ = ( COORDY + 1 ) % 3;
+        constexpr geode::local_index_t COORDY = ( COORDX + 1 ) % 3;
+        constexpr geode::local_index_t COORDZ = ( COORDY + 1 ) % 3;
 
         const Morton_cmp3D compX{ points, COORDX };
         const Morton_cmp3D compY{ points, COORDY };
@@ -128,7 +128,7 @@ namespace
         {
             return;
         }
-        constexpr auto COORDY = ( COORDX + 1 ) % 2;
+        constexpr geode::local_index_t COORDY = ( COORDX + 1 ) % 2;
 
         const Morton_cmp2D compX{ points, COORDX };
         const Morton_cmp2D compY{ points, COORDY };
@@ -154,7 +154,7 @@ namespace geode
     {
         absl::FixedArray< index_t > mapping_morton( points.size() );
         absl::c_iota( mapping_morton, 0 );
-        ::morton_sort< 0 >(
+        ::morton_sort< 0_uc >(
             points, mapping_morton.begin(), mapping_morton.end() );
         return mapping_morton;
     }
