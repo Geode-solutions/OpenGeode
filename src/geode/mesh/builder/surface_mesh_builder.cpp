@@ -29,8 +29,10 @@
 
 #include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/builder/surface_edges_builder.h>
+#include <geode/mesh/core/detail/vertex_cycle.h>
 #include <geode/mesh/core/surface_edges.h>
 #include <geode/mesh/core/surface_mesh.h>
+
 
 namespace
 {
@@ -386,39 +388,63 @@ namespace geode
     void SurfaceMeshBuilder< dimension >::compute_polygon_adjacencies(
         absl::Span< const index_t > polygons_to_connect )
     {
-        const auto edges_enabled = surface_mesh_->are_edges_enabled();
-        surface_mesh_->enable_edges();
-        const auto& edges = surface_mesh_->edges();
-        absl::FixedArray< absl::InlinedVector< PolygonEdge, 2 > >
-            polygon_edges_around( edges.nb_edges() );
-        for( const auto polygon : polygons_to_connect )
+        if( surface_mesh_->are_edges_enabled() )
         {
-            const auto vertices_id =
-                get_polygon_vertices( *surface_mesh_, polygon );
-            const local_index_t nb_vertices = vertices_id.size();
-            for( const auto e : LRange{ nb_vertices } )
+            const auto& edges = surface_mesh_->edges();
+            absl::FixedArray< absl::InlinedVector< PolygonEdge, 2 > >
+                polygon_edges_around( edges.nb_edges() );
+            for( const auto polygon : polygons_to_connect )
             {
-                PolygonEdge edge{ polygon, e };
-                const auto edge_id = edges.edge_from_vertices(
-                    { vertices_id[e], vertices_id[( e + 1 ) % nb_vertices] } );
-                polygon_edges_around[edge_id.value()].emplace_back(
-                    std::move( edge ) );
+                const auto vertices_id =
+                    get_polygon_vertices( *surface_mesh_, polygon );
+                const local_index_t nb_vertices = vertices_id.size();
+                for( const auto e : LRange{ nb_vertices } )
+                {
+                    PolygonEdge edge{ polygon, e };
+                    const auto edge_id =
+                        edges.edge_from_vertices( { vertices_id[e],
+                            vertices_id[( e + 1 ) % nb_vertices] } );
+                    polygon_edges_around[edge_id.value()].emplace_back(
+                        std::move( edge ) );
+                }
+            }
+            for( const auto& polygon_edges : polygon_edges_around )
+            {
+                if( polygon_edges.size() != 2 )
+                {
+                    continue;
+                }
+                do_set_polygon_adjacent(
+                    polygon_edges[0], polygon_edges[1].polygon_id );
+                do_set_polygon_adjacent(
+                    polygon_edges[1], polygon_edges[0].polygon_id );
             }
         }
-        for( const auto& polygon_edges : polygon_edges_around )
+        else
         {
-            if( polygon_edges.size() != 2 )
+            using Edge = detail::VertexCycle< std::array< index_t, 2 > >;
+            absl::flat_hash_map< Edge, PolygonEdge > edges;
+            for( const auto polygon : polygons_to_connect )
             {
-                continue;
+                for( const auto e :
+                    LRange{ surface_mesh_->nb_polygon_edges( polygon ) } )
+                {
+                    const PolygonEdge edge{ polygon, e };
+                    if( !surface_mesh_->is_edge_on_border( edge ) )
+                    {
+                        continue;
+                    }
+                    const auto output = edges.emplace(
+                        surface_mesh_->polygon_edge_vertices( edge ), edge );
+                    if( !output.second )
+                    {
+                        const auto it = output.first;
+                        do_set_polygon_adjacent( it->second, polygon );
+                        do_set_polygon_adjacent( edge, it->second.polygon_id );
+                        edges.erase( it );
+                    }
+                }
             }
-            do_set_polygon_adjacent(
-                polygon_edges[0], polygon_edges[1].polygon_id );
-            do_set_polygon_adjacent(
-                polygon_edges[1], polygon_edges[0].polygon_id );
-        }
-        if( !edges_enabled )
-        {
-            surface_mesh_->disable_edges();
         }
     }
 
