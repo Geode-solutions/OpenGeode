@@ -506,7 +506,7 @@ namespace geode
                 for( const auto f :
                     LRange{ solid_mesh_->nb_polyhedron_facets( polyhedron ) } )
                 {
-                    PolyhedronFacet facet{ polyhedron, f };
+                    const PolyhedronFacet facet{ polyhedron, f };
                     if( !solid_mesh_->is_polyhedron_facet_on_border( facet ) )
                     {
                         continue;
