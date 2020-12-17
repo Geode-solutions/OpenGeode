@@ -114,7 +114,9 @@ function(_export_library library_name)
     )
     install(TARGETS ${library_name}
         EXPORT ${library_name}
-        RUNTIME LIBRARY ARCHIVE 
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     )
     install(EXPORT ${library_name}
         FILE ${PROJECT_NAME}_${library_name}_target.cmake
