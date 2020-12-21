@@ -422,8 +422,7 @@ namespace geode
         else
         {
             using Edge = detail::VertexCycle< std::array< index_t, 2 > >;
-            absl::flat_hash_map< Edge, PolygonEdge >
-                edges;
+            absl::flat_hash_map< Edge, PolygonEdge > edges;
             for( const auto polygon : polygons_to_connect )
             {
                 for( const auto e :
@@ -438,14 +437,13 @@ namespace geode
                         surface_mesh_->polygon_edge_vertices( edge ), edge );
                     if( !output.second )
                     {
-			     auto& adj_edge
- = output.first->second;
-			     if(surface_mesh_->is_edge_on_border(edge)){
-                do_set_polygon_adjacent( adj_edge,
-                    polygon );}
-                do_set_polygon_adjacent( edge,
-                    adj_edge.polygon_id );
-		adj_edge=edge;
+                        auto& adj_edge = output.first->second;
+                        if( surface_mesh_->is_edge_on_border( edge ) )
+                        {
+                            do_set_polygon_adjacent( adj_edge, polygon );
+                        }
+                        do_set_polygon_adjacent( edge, adj_edge.polygon_id );
+                        adj_edge = edge;
                     }
                 }
             }
