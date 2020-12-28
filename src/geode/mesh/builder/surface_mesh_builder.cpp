@@ -164,6 +164,42 @@ namespace
         }
         return vertices_id;
     }
+
+    template < geode::index_t dimension >
+    absl::optional< geode::PolygonEdge > non_manifold_polygon_adjacent_edge(
+        const geode::SurfaceMesh< dimension >& surface,
+        const geode::PolygonEdge& polygon_edge,
+        const std::array< geode::index_t, 2 >& vertices )
+    {
+        const auto polygon_adj = surface.polygon_adjacent( polygon_edge );
+        if( !polygon_adj )
+        {
+            return absl::nullopt;
+        }
+        const auto polygon_adj_id = polygon_adj.value();
+        for( const auto e :
+            geode::LRange{ surface.nb_polygon_edges( polygon_adj_id ) } )
+        {
+            const geode::PolygonEdge adj_edge{ polygon_adj_id, e };
+            const auto adj_v0 = surface.polygon_vertex( adj_edge );
+            const auto adj_v1 = surface.polygon_edge_vertex( adj_edge, 1 );
+            if( ( vertices[0] == adj_v1 && vertices[1] == adj_v0 )
+                || ( vertices[0] == adj_v0 && vertices[1] == adj_v1 ) )
+            {
+                const auto polygon = surface.polygon_adjacent( adj_edge );
+                if( !polygon )
+                {
+                    return absl::nullopt;
+                }
+                // Non-manifold edge
+                if( polygon != polygon_edge.polygon_id )
+                {
+                    return adj_edge;
+                }
+            }
+        }
+        return absl::nullopt;
+    }
 } // namespace
 
 namespace geode
@@ -438,25 +474,29 @@ namespace geode
                     if( !output.second )
                     {
                         auto& adj_edge = output.first->second;
-                        if( surface_mesh_->is_edge_on_border( edge ) )
+                        do_set_polygon_adjacent( edge, adj_edge.polygon_id );
+                        if( surface_mesh_->is_edge_on_border( adj_edge ) )
                         {
                             do_set_polygon_adjacent( adj_edge, polygon );
                         }
-                        do_set_polygon_adjacent( edge, adj_edge.polygon_id );
+                        else
+                        {
+                            do_unset_polygon_adjacent( adj_edge );
+                        }
                         adj_edge = edge;
                     }
                 }
             }
             for( const auto& polygon_edges : edges )
             {
-                if( polygon_edges.second.size() != 2 )
+                const auto& polygon_edge = polygon_edges.second;
+                if( const auto polygon_adj =
+                        non_manifold_polygon_adjacent_edge( *surface_mesh_,
+                            polygon_edge, polygon_edges.first.vertices() ) )
                 {
-                    continue;
+                    do_unset_polygon_adjacent( polygon_edge );
+                    do_unset_polygon_adjacent( polygon_adj.value() );
                 }
-                do_set_polygon_adjacent( polygon_edges.second.at( 0 ),
-                    polygon_edges.second.at( 1 ).polygon_id );
-                do_set_polygon_adjacent( polygon_edges.second.at( 1 ),
-                    polygon_edges.second.at( 0 ).polygon_id );
             }
         }
     }

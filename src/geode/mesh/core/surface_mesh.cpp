@@ -402,15 +402,13 @@ namespace geode
         if( const auto polygon_adj = polygon_adjacent( polygon_edge ) )
         {
             const auto polygon_adj_id = polygon_adj.value();
-            const auto v0 = this->polygon_vertex( polygon_edge );
-            const auto v1 = this->polygon_vertex(
-                this->next_polygon_vertex( polygon_edge ) );
+            const auto v0 = polygon_vertex( polygon_edge );
+            const auto v1 = polygon_edge_vertex( polygon_edge, 1 );
             for( const auto e : LRange{ nb_polygon_edges( polygon_adj_id ) } )
             {
-                const PolygonVertex adj_edge{ polygon_adj_id, e };
-                const auto adj_v0 = this->polygon_vertex( adj_edge );
-                const auto adj_v1 = this->polygon_vertex(
-                    this->next_polygon_vertex( adj_edge ) );
+                const PolygonEdge adj_edge{ polygon_adj_id, e };
+                const auto adj_v0 = polygon_vertex( adj_edge );
+                const auto adj_v1 = polygon_edge_vertex( adj_edge, 1 );
                 if( ( v0 == adj_v1 && v1 == adj_v0 )
                     || ( v0 == adj_v0 && v1 == adj_v1 ) )
                 {
