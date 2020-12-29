@@ -485,7 +485,6 @@ namespace geode
                     {
                         continue;
                     }
-
                     auto output = edges.emplace(
                         surface_mesh_->polygon_edge_vertices( edge ), edge );
                     if( !output.second )
