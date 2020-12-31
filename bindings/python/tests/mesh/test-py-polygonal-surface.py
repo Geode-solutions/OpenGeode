@@ -54,11 +54,11 @@ def test_delete_vertex( polygonal_surface, builder ):
     if polygonal_surface.nb_vertices() != 6:
         raise ValueError( "[Test] PolygonalSurface should have 6 vertices" )
     answer = geom.Point3D( [ 2.1, 9.4, 6.7 ] )
-    if polygonal_surface.point( 0 ) != answer:
+    if polygonal_surface.point( 2 ) != answer:
         raise ValueError( "[Test] PolygonalSurface vertex coordinates are not correct" )
     if polygonal_surface.nb_polygons() != 2:
         raise ValueError( "[Test] PolygonalSurface should have 2 polygons" )
-    if polygonal_surface.polygon_adjacent( mesh.PolygonEdge( 1, 3 ) ) != 0:
+    if polygonal_surface.polygon_adjacent( mesh.PolygonEdge( 1, 2 ) ):
         raise ValueError( "[Test] PolygonalSurface adjacent index is not correct" )
     if polygonal_surface.edges().nb_edges() != 7:
         raise ValueError( "[Test] PolygonalSurface should have 7 edges" )
@@ -124,27 +124,25 @@ def test_delete_polygon( polygonal_surface, builder ):
     builder.delete_polygons( to_delete )
     if polygonal_surface.nb_polygons() != 1:
         raise ValueError( "[Test] PolygonalSurface should have 1 polygon" )
-    if polygonal_surface.polygon_vertex( mesh.PolygonVertex( 0, 0 ) ) != 0:
+    if polygonal_surface.polygon_vertex( mesh.PolygonVertex( 0, 0 ) ) != 4:
         raise ValueError( "[Test] PolygonalSurface edge vertex index is not correct" )
-    if polygonal_surface.polygon_vertex( mesh.PolygonVertex( 0, 1 ) ) != 4:
+    if polygonal_surface.polygon_vertex( mesh.PolygonVertex( 0, 1 ) ) != 2:
         raise ValueError( "[Test] PolygonalSurface edge vertex index is not correct" )
-    if polygonal_surface.polygon_vertex( mesh.PolygonVertex( 0, 2 ) ) != 5:
+    if polygonal_surface.polygon_vertex( mesh.PolygonVertex( 0, 2 ) ) != 0:
         raise ValueError( "[Test] PolygonalSurface edge vertex index is not correct" )
-    if polygonal_surface.polygon_vertex( mesh.PolygonVertex( 0, 3 ) ) != 2:
-        raise ValueError( "[Test] PolygonalSurface edge vertex index is not correct" )
-    if polygonal_surface.edges().nb_edges() != 4:
-        raise ValueError( "[Test] PolygonalSurface should have 4 edges" )
+    if polygonal_surface.edges().nb_edges() != 3:
+        raise ValueError( "[Test] PolygonalSurface should have 3 edges" )
 
     attribute = polygonal_surface.edges().edge_attribute_manager().find_attribute_uint( "test" )
-    if attribute.value( 1 ) != 6:
+    if attribute.value( 0 ) != 0:
         raise ValueError( "[Test] Update of edge attributes after "
-        "polygon deletion is not correct (value of 1)" )
-    if attribute.value( 2 ) != 7:
+        "polygon deletion is not correct" )
+    if attribute.value( 1 ) != 1:
         raise ValueError( "[Test] Update of edge attributes after "
-        "polygon deletion is not correct (value of 2)" )
-    if attribute.value( 3 ) != 8:
+        "polygon deletion is not correct" )
+    if attribute.value( 2 ) != 2:
         raise ValueError( "[Test] Update of edge attributes after "
-        "polygon deletion is not correct (value of 3)" )
+        "polygon deletion is not correct" )
 
 def test_polygon_barycenter( polygonal_surface ):
     answer = geom.Point3D( [ 5.6, 4.525, 4.75 ] )
@@ -222,8 +220,8 @@ def test_clone( polygonal_surface ):
     polygonal_surface2 = polygonal_surface.clone()
     if polygonal_surface2.nb_vertices() != 6:
         raise ValueError( "[Test] PolygonalSurface2 should have 6 vertices" )
-    if polygonal_surface2.edges().nb_edges() != 4:
-        raise ValueError( "[Test] PolygonalSurface2 should have 4 edges" )
+    if polygonal_surface2.edges().nb_edges() != 3:
+        raise ValueError( "[Test] PolygonalSurface2 should have 3 edges" )
     if polygonal_surface2.nb_polygons() != 1:
         raise ValueError( "[Test] PolygonalSurface2 should have 1 polygon" )
 
@@ -233,7 +231,7 @@ def test_set_polygon_vertex( polygonal_surface, builder ):
     if polygonal_surface.polygon_vertex( mesh.PolygonVertex( 0, 2 ) ) != 1:
         raise ValueError( "[Test] PolygonVertex after set_polygon_vertex is wrong" )
 
-    vertices = polygonal_surface.edges().edge_vertices( 3 )
+    vertices = polygonal_surface.edges().edge_vertices( 1 )
     if vertices[0] != 1 and vertices[1] != 4:
         raise ValueError( "[Test] Edge vertices after set_polygon_vertex is wrong" )
 
@@ -252,6 +250,92 @@ def test_delete_all( polygonal_surface, builder ):
     builder.delete_isolated_vertices()
     if polygonal_surface.nb_vertices() != 0:
         raise ValueError( "[Test] PolygonalSurface should have 0 vertex" )
+
+def test_permutation( surface, builder ):
+    builder.permute_vertices( [4, 2, 6, 1, 5, 0, 3] )
+    if surface.polygon_vertex( mesh.PolygonVertex( 0, 0 ) ) != 5:
+        raise ValueError( "[Test] Wrong PolygonVertex after vertex permute" )
+    if surface.polygon_vertex( mesh.PolygonVertex( 0, 1 ) ) != 3:
+        raise ValueError( "[Test] Wrong PolygonVertex after vertex permute" )
+    if surface.polygon_vertex( mesh.PolygonVertex( 0, 2 ) ) != 1:
+        raise ValueError( "[Test] Wrong PolygonVertex after vertex permute" )
+    if surface.polygon_vertex( mesh.PolygonVertex( 1, 0 ) ) != 3:
+        raise ValueError( "[Test] Wrong PolygonVertex after vertex permute" )
+    if surface.polygon_vertex( mesh.PolygonVertex( 1, 1 ) ) != 6:
+        raise ValueError( "[Test] Wrong PolygonVertex after vertex permute" )
+    if surface.polygon_vertex( mesh.PolygonVertex( 1, 2 ) ) != 0:
+        raise ValueError( "[Test] Wrong PolygonVertex after vertex permute" )
+    if surface.polygon_vertex( mesh.PolygonVertex( 1, 3 ) ) != 1:
+        raise ValueError( "[Test] Wrong PolygonVertex after vertex permute" )
+    if surface.polygon_vertex( mesh.PolygonVertex( 2, 0 ) ) != 3:
+        raise ValueError( "[Test] Wrong PolygonVertex after vertex permute" )
+    if surface.polygon_vertex( mesh.PolygonVertex( 2, 1 ) ) != 4:
+        raise ValueError( "[Test] Wrong PolygonVertex after vertex permute" )
+    if surface.polygon_vertex( mesh.PolygonVertex( 2, 2 ) ) != 2:
+        raise ValueError( "[Test] Wrong PolygonVertex after vertex permute" )
+    if surface.polygon_vertex( mesh.PolygonVertex( 2, 3 ) ) != 6:
+        raise ValueError( "[Test] Wrong PolygonVertex after vertex permute" )
+
+    builder.permute_polygons( [2, 0, 1] )
+    if surface.polygon_vertex( mesh.PolygonVertex( 0, 0 ) ) != 3:
+        raise ValueError( "[Test] Wrong PolygonVertex after polygon permute" )
+    if surface.polygon_vertex( mesh.PolygonVertex( 0, 1 ) ) != 4:
+        raise ValueError( "[Test] Wrong PolygonVertex after polygon permute" )
+    if surface.polygon_vertex( mesh.PolygonVertex( 0, 2 ) ) != 2:
+        raise ValueError( "[Test] Wrong PolygonVertex after polygon permute" )
+    if surface.polygon_vertex( mesh.PolygonVertex( 0, 3 ) ) != 6:
+        raise ValueError( "[Test] Wrong PolygonVertex after polygon permute" )
+    if surface.polygon_vertex( mesh.PolygonVertex( 1, 0 ) ) != 5:
+        raise ValueError( "[Test] Wrong PolygonVertex after polygon permute" )
+    if surface.polygon_vertex( mesh.PolygonVertex( 1, 1 ) ) != 3:
+        raise ValueError( "[Test] Wrong PolygonVertex after polygon permute" )
+    if surface.polygon_vertex( mesh.PolygonVertex( 1, 2 ) ) != 1:
+        raise ValueError( "[Test] Wrong PolygonVertex after polygon permute" )
+    if surface.polygon_vertex( mesh.PolygonVertex( 2, 0 ) ) != 3:
+        raise ValueError( "[Test] Wrong PolygonVertex after polygon permute" )
+    if surface.polygon_vertex( mesh.PolygonVertex( 2, 1 ) ) != 6:
+        raise ValueError( "[Test] Wrong PolygonVertex after polygon permute" )
+    if surface.polygon_vertex( mesh.PolygonVertex( 2, 2 ) ) != 0:
+        raise ValueError( "[Test] Wrong PolygonVertex after polygon permute" )
+    if surface.polygon_vertex( mesh.PolygonVertex( 2, 3 ) ) != 1:
+        raise ValueError( "[Test] Wrong PolygonVertex after polygon permute" )
+
+    if surface.polygon_adjacent( mesh.PolygonEdge( 0, 3 ) ) != 2:
+        raise ValueError( "[Test] Wrong Adjacency after polygon permute" )
+    if surface.polygon_adjacent( mesh.PolygonEdge( 2, 0 ) ) != 0:
+        raise ValueError( "[Test] Wrong Adjacency after polygon permute" )
+    if surface.polygon_adjacent( mesh.PolygonEdge( 1, 1 ) ) != 2:
+        raise ValueError( "[Test] Wrong Adjacency after polygon permute" )
+    if surface.polygon_adjacent( mesh.PolygonEdge( 1, 0 ) ):
+        raise ValueError( "[Test] Wrong Adjacency after polygon permute" )
+
+    polygons_3 = surface.polygons_around_vertex( 3 )
+    if len(polygons_3) != 3:
+        raise ValueError( "[Test] Wrong polygons_3 after polygon permute" )
+    if polygons_3[0].polygon_id != 0:
+        raise ValueError( "[Test] Wrong polygons_3 after polygon permute" )
+    if polygons_3[0].vertex_id != 0:
+        raise ValueError( "[Test] Wrong polygons_3 after polygon permute" )
+    if polygons_3[1].polygon_id != 2:
+        raise ValueError( "[Test] Wrong polygons_3 after polygon permute" )
+    if polygons_3[1].vertex_id != 0:
+        raise ValueError( "[Test] Wrong polygons_3 after polygon permute" )
+    if polygons_3[2].polygon_id != 1:
+        raise ValueError( "[Test] Wrong polygons_3 after polygon permute" )
+    if polygons_3[2].vertex_id != 1:
+        raise ValueError( "[Test] Wrong polygons_3 after polygon permute" )
+
+    polygons_6 = surface.polygons_around_vertex( 6 )
+    if len(polygons_6) != 2:
+        raise ValueError( "[Test] Wrong polygons_6 after polygon permute" )
+    if polygons_6[0].polygon_id != 0:
+        raise ValueError( "[Test] Wrong polygons_6 after polygon permute" )
+    if polygons_6[0].vertex_id != 3:
+        raise ValueError( "[Test] Wrong polygons_6 after polygon permute" )
+    if polygons_6[1].polygon_id != 2:
+        raise ValueError( "[Test] Wrong polygons_6 after polygon permute" )
+    if polygons_6[1].vertex_id != 1:
+        raise ValueError( "[Test] Wrong polygons_6 after polygon permute" )
 
 if __name__ == '__main__':
     polygonal_surface = mesh.PolygonalSurface3D.create()
@@ -272,6 +356,7 @@ if __name__ == '__main__':
     
     test_io( polygonal_surface, "test." + polygonal_surface.native_extension() )
     
+    test_permutation( polygonal_surface, builder )
     test_delete_vertex( polygonal_surface, builder )
     test_delete_polygon( polygonal_surface, builder )
     test_clone( polygonal_surface )

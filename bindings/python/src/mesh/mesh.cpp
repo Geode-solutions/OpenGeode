@@ -71,6 +71,12 @@ namespace pybind11
 {
     namespace detail
     {
+        template < typename Type >
+        struct type_caster< absl::FixedArray< Type > >
+            : list_caster< absl::FixedArray< Type >, Type >
+        {
+        };
+
         template < typename Type, size_t dimension >
         struct type_caster< absl::InlinedVector< Type, dimension > >
             : list_caster< absl::InlinedVector< Type, dimension >, Type >

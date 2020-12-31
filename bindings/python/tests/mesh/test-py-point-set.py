@@ -58,12 +58,12 @@ def test_create_vertex_attribute( point_set ):
 
 def test_delete_vertex( point_set, builder ):
     to_delete = [False] * point_set.nb_vertices()
-    to_delete[0]= True
+    to_delete[1]= True
     builder.delete_vertices( to_delete )
     if point_set.nb_vertices() != 3:
         raise ValueError( "[Test] PointSet should have 3 vertices" )
     answer = geom.Point3D( [ 2.1, 9.4, 6.7 ] )
-    if point_set.point( 0 ) != answer:
+    if point_set.point( 2 ) != answer:
         raise ValueError( "[Test] PointSet vertex coordinates are not correct" )
 
 def test_io( point_set, filename ):
@@ -80,8 +80,15 @@ def test_clone( point_set ):
         raise ValueError( "[Test] PointSet2 attribute value should be true" )
 
     answer = geom.Point3D( [ 2.1, 9.4, 6.7 ] )
-    if point_set2.point( 0 ) != answer:
+    if point_set2.point( 2 ) != answer:
         raise ValueError( "[Test] PointSet2 vertex coordinates are not correct" )
+
+def test_permutation( point_set, builder ):
+    builder.permute_vertices( [2, 0, 3, 1] )
+    if point_set.point( 2 ) != geom.Point3D():
+        raise ValueError( "[Test] Point coordinates have not been correctly permuted" )
+    if point_set.point( 0 ) != geom.Point3D( [2.3, 5.0, -1.2] ):
+        raise ValueError( "[Test] Point coordinates have not been correctly permuted" )
 
 if __name__ == '__main__':
     point_set = mesh.PointSet3D.create()
@@ -90,5 +97,7 @@ if __name__ == '__main__':
     test_bounding_box( point_set )
     test_create_vertex_attribute( point_set )
     test_io( point_set, "test." + point_set.native_extension() )
+
+    test_permutation( point_set, builder )
     test_delete_vertex( point_set, builder )
     test_clone( point_set )
