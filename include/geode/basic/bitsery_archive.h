@@ -185,7 +185,7 @@ namespace bitsery
     {
         template < typename T, size_t N >
         struct ContainerTraits< absl::FixedArray< T, N > >
-            : public StdContainer< absl::FixedArray< T, N >, true, true >
+            : public StdContainer< absl::FixedArray< T, N >, false, true >
         {
         };
     } // namespace traits

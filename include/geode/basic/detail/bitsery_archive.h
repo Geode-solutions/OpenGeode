@@ -60,8 +60,35 @@ namespace geode
             AttributeManager::register_attribute_type< uuid, Serializer >(
                 context, "uuid" );
             AttributeManager::register_attribute_type<
+                absl::InlinedVector< index_t, 1 >, Serializer >(
+                context, "InlinedVector_index_t_1" );
+            AttributeManager::register_attribute_type<
+                absl::InlinedVector< index_t, 2 >, Serializer >(
+                context, "InlinedVector_index_t_2" );
+            AttributeManager::register_attribute_type<
+                absl::InlinedVector< index_t, 3 >, Serializer >(
+                context, "InlinedVector_index_t_3" );
+            AttributeManager::register_attribute_type<
+                absl::InlinedVector< index_t, 4 >, Serializer >(
+                context, "InlinedVector_index_t_4" );
+            AttributeManager::register_attribute_type<
+                absl::InlinedVector< index_t, 5 >, Serializer >(
+                context, "InlinedVector_index_t_5" );
+            AttributeManager::register_attribute_type<
+                absl::InlinedVector< index_t, 6 >, Serializer >(
+                context, "InlinedVector_index_t_6" );
+            AttributeManager::register_attribute_type<
+                absl::InlinedVector< index_t, 7 >, Serializer >(
+                context, "InlinedVector_index_t_7" );
+            AttributeManager::register_attribute_type<
+                absl::InlinedVector< index_t, 8 >, Serializer >(
+                context, "InlinedVector_index_t_8" );
+            AttributeManager::register_attribute_type<
+                absl::InlinedVector< index_t, 9 >, Serializer >(
+                context, "InlinedVector_index_t_9" );
+            AttributeManager::register_attribute_type<
                 absl::InlinedVector< index_t, 10 >, Serializer >(
-                context, "inlined_vector_index_t_10" );
+                context, "InlinedVector_index_t_10" );
         }
     } // namespace detail
 } // namespace geode
