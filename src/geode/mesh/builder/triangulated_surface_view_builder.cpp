@@ -118,7 +118,8 @@ namespace geode
 
     template < index_t dimension >
     void TriangulatedSurfaceViewBuilder< dimension >::do_delete_polygons(
-        const std::vector< bool >& /*unused*/ )
+        const std::vector< bool >& /*unused*/,
+        absl::Span< const index_t > /*unused*/ )
     {
     }
 

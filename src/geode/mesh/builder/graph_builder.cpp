@@ -184,7 +184,7 @@ namespace geode
         }
         update_edges_around( *graph_, *this, old2new );
         graph_->edge_attribute_manager().delete_elements( to_delete );
-        do_delete_edges( to_delete );
+        do_delete_edges( to_delete, old2new );
         return old2new;
     }
 
@@ -194,7 +194,7 @@ namespace geode
         const auto old2new = old2new_permutation( permutation );
         update_edges_around( *graph_, *this, old2new );
         graph_->edge_attribute_manager().permute_elements( permutation );
-        do_permute_edges( permutation );
+        do_permute_edges( permutation, old2new );
         return old2new;
     }
 

@@ -213,8 +213,8 @@ namespace geode
         virtual void do_create_polyhedron( absl::Span< const index_t > vertices,
             absl::Span< const std::vector< local_index_t > > facets ) = 0;
 
-        virtual void do_delete_polyhedra(
-            const std::vector< bool >& to_delete ) = 0;
+        virtual void do_delete_polyhedra( const std::vector< bool >& to_delete,
+            absl::Span< const index_t > old2new ) = 0;
 
         virtual void do_permute_polyhedra(
             absl::Span< const index_t > permutation,

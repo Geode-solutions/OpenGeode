@@ -112,7 +112,8 @@ namespace geode
 
     template < index_t dimension >
     void PolyhedralSolidViewBuilder< dimension >::do_delete_polyhedra(
-        const std::vector< bool >& /*unused*/ )
+        const std::vector< bool >& /*unused*/,
+        absl::Span< const index_t > /*unused*/ )
     {
         // polyhedral_solid_view_->remove_polyhedra( to_delete, {} );
     }

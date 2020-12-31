@@ -123,7 +123,8 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodeHybridSolidBuilder< dimension >::do_delete_polyhedra(
-        const std::vector< bool >& to_delete )
+        const std::vector< bool >& to_delete,
+        absl::Span< const index_t > /*unused*/ )
     {
         geode_hybrid_solid_->remove_polyhedra( to_delete, {} );
     }

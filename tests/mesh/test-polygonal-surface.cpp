@@ -567,6 +567,28 @@ void test_delete_all( const geode::PolygonalSurface3D& polygonal_surface,
         "[Test] PolygonalSurface should have 0 vertex" );
 }
 
+void test_non_manifold_surface()
+{
+    auto surface = geode::PolygonalSurface3D::create(
+        geode::OpenGeodePolygonalSurface3D::impl_name_static() );
+    auto builder = geode::PolygonalSurfaceBuilder3D::create( *surface );
+    builder->create_vertices( 10 );
+    builder->create_polygon( { 0, 1, 2, 3 } );
+    builder->create_polygon( { 2, 3, 4, 5 } );
+    builder->create_polygon( { 7, 6, 3, 2 } );
+    builder->create_polygon( { 9, 2, 3, 8 } );
+    builder->compute_polygon_adjacencies();
+    for( const auto p : geode::Range{ surface->nb_polygons() } )
+    {
+        for( const auto e : geode::LRange{ surface->nb_polygon_edges( p ) } )
+        {
+            geode::PolygonEdge edge{ p, e };
+            OPENGEODE_EXCEPTION( surface->is_edge_on_border( edge ),
+                "[Test] Wrong adjacency computations on non-manifold surface" );
+        }
+    }
+}
+
 void test()
 {
     auto polygonal_surface = geode::PolygonalSurface3D::create(
@@ -601,6 +623,8 @@ void test()
     test_clone( *polygonal_surface );
     test_set_polygon_vertex( *polygonal_surface, *builder );
     test_delete_all( *polygonal_surface, *builder );
+
+    test_non_manifold_surface();
 }
 
 OPENGEODE_TEST( "polygonal-surface" )

@@ -209,8 +209,8 @@ namespace geode
         virtual void do_create_polygon(
             absl::Span< const index_t > vertices ) = 0;
 
-        virtual void do_delete_polygons(
-            const std::vector< bool >& to_delete ) = 0;
+        virtual void do_delete_polygons( const std::vector< bool >& to_delete,
+            absl::Span< const index_t > old2new ) = 0;
 
         virtual void do_set_polygon_adjacent(
             const PolygonEdge& polygon_edge, index_t adjacent_id ) = 0;

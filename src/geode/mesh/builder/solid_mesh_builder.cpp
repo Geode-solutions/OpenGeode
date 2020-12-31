@@ -647,7 +647,7 @@ namespace geode
         update_polyhedron_adjacencies( *solid_mesh_, *this, old2new );
         solid_mesh_->polyhedron_attribute_manager().delete_elements(
             to_delete );
-        do_delete_polyhedra( to_delete );
+        do_delete_polyhedra( to_delete, old2new );
         return old2new;
     }
 

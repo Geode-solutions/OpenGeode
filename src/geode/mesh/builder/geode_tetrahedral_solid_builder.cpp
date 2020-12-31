@@ -112,7 +112,8 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodeTetrahedralSolidBuilder< dimension >::do_delete_polyhedra(
-        const std::vector< bool >& /*unused*/ )
+        const std::vector< bool >& /*unused*/,
+        absl::Span< const index_t > /*unused*/ )
     {
     }
 

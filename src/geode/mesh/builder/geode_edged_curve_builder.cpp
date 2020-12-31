@@ -88,12 +88,14 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodeEdgedCurveBuilder< dimension >::do_delete_edges(
-        const std::vector< bool >& /*unused*/ )
+        const std::vector< bool >& /*unused*/,
+        absl::Span< const index_t > /*unused*/ )
     {
     }
 
     template < index_t dimension >
     void OpenGeodeEdgedCurveBuilder< dimension >::do_permute_edges(
+        absl::Span< const index_t > /*unused*/,
         absl::Span< const index_t > /*unused*/ )
     {
     }

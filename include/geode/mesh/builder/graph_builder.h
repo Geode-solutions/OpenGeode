@@ -138,8 +138,8 @@ namespace geode
         void do_permute_vertices( absl::Span< const index_t > permutation,
             absl::Span< const index_t > old2new ) final;
 
-        virtual void do_permute_edges(
-            absl::Span< const index_t > permutation ) = 0;
+        virtual void do_permute_edges( absl::Span< const index_t > permutation,
+            absl::Span< const index_t > old2new ) = 0;
 
         virtual void do_delete_curve_vertices(
             const std::vector< bool >& to_delete,
@@ -156,8 +156,8 @@ namespace geode
 
         virtual void do_create_edges( index_t nb ) = 0;
 
-        virtual void do_delete_edges(
-            const std::vector< bool >& to_delete ) = 0;
+        virtual void do_delete_edges( const std::vector< bool >& to_delete,
+            absl::Span< const index_t > old2new ) = 0;
 
     private:
         Graph* graph_;
