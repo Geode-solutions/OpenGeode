@@ -212,9 +212,6 @@ namespace
             geode::PolyhedronVertex, Serializer >(
             context, "PolyhedronVertex" );
         geode::AttributeManager::register_attribute_type<
-            absl::InlinedVector< geode::index_t, 4 >, Serializer >(
-            context, "InlinedVector_index_t_4" );
-        geode::AttributeManager::register_attribute_type<
             geode::HybridSolid3D::Type, Serializer >(
             context, "HybridSolidType" );
         context.registerBasesList< Serializer >(
