@@ -29,6 +29,7 @@
 
 #include <geode/mesh/builder/vertex_set_builder.h>
 #include <geode/mesh/common.h>
+#include <geode/mesh/core/graph.h>
 
 namespace geode
 {
@@ -87,6 +88,10 @@ namespace geode
 
         void disassociate_edge_vertex_to_vertex(
             const EdgeVertex& edge_vertex );
+
+        void set_edges_around_vertex(
+            index_t vertex_id, EdgesAroundVertex edges );
+
         /*!
          * Delete a set of edges
          * @param[in] to_delete Vector of size graph_.nb_edges(). If
@@ -97,6 +102,15 @@ namespace geode
          */
         std::vector< index_t > delete_edges(
             const std::vector< bool >& to_delete );
+
+        /*!
+         * Permute edges to match the given order.
+         * @param[in] permutation Vector of size graph_.nb_edges().
+         * Each value corresponds to the destination position.
+         * @return the mapping between old edge indices to new ones.
+         */
+        absl::FixedArray< index_t > permute_edges(
+            absl::Span< const index_t > permutation );
 
         /*!
          * Delete all the isolated vertices (not used as edge endpoint)
@@ -118,10 +132,22 @@ namespace geode
         void copy( const Graph& graph );
 
     private:
-        void do_delete_vertices( const std::vector< bool >& to_delete ) final;
+        void do_delete_vertices( const std::vector< bool >& to_delete,
+            absl::Span< const index_t > old2new ) final;
+
+        void do_permute_vertices( absl::Span< const index_t > permutation,
+            absl::Span< const index_t > old2new ) final;
+
+        virtual void do_permute_edges(
+            absl::Span< const index_t > permutation ) = 0;
 
         virtual void do_delete_curve_vertices(
-            const std::vector< bool >& to_delete ) = 0;
+            const std::vector< bool >& to_delete,
+            absl::Span< const index_t > old2new ) = 0;
+
+        virtual void do_permute_curve_vertices(
+            absl::Span< const index_t > permutation,
+            absl::Span< const index_t > old2new ) = 0;
 
         virtual void do_set_edge_vertex(
             const EdgeVertex& edge_vertex, index_t vertex_id ) = 0;

@@ -40,7 +40,7 @@ void test_create_vertices( const geode::TriangulatedSurface3D& surface,
     builder.create_point( { { 8.1, 1.4, 4.7 } } );
     builder.create_point( { { 4.7, 2.1, 1.3 } } );
     OPENGEODE_EXCEPTION( surface.nb_vertices() == 5,
-        "[Test] TriangulatedSurface should have 5 vertices" );
+        "[Test] TriangulatedSurface should have 5 vertices" );
 }
 
 void test_create_viewed_vertices(
@@ -51,10 +51,10 @@ void test_create_viewed_vertices(
     builder.add_viewed_vertex( 2 );
     builder.add_viewed_vertex( 3 );
     OPENGEODE_EXCEPTION( surface.nb_vertices() == 3,
-        "[Test] TriangulatedSurfaceView should have 3 vertices" );
+        "[Test] TriangulatedSurfaceView should have 3 vertices" );
     const geode::Point3D answer{ { 2.1, 9.4, 6.7 } };
     OPENGEODE_EXCEPTION( surface.point( 0 ) == answer,
-        "[Test] TriangulatedSurfaceView point is not correct" );
+        "[Test] TriangulatedSurfaceView point is not correct" );
 }
 
 void test_create_viewed_polygons(
@@ -64,16 +64,16 @@ void test_create_viewed_polygons(
     builder.add_viewed_triangle( 1 );
     builder.add_viewed_triangle( 2 );
     OPENGEODE_EXCEPTION( surface.nb_polygons() == 2,
-        "[Test] TriangulatedSurfaceView should have 2 polygons" );
+        "[Test] TriangulatedSurfaceView should have 2 polygons" );
     OPENGEODE_EXCEPTION( surface.nb_vertices() == 4,
-        "[Test] TriangulatedSurfaceView should have 4 vertices" );
+        "[Test] TriangulatedSurfaceView should have 4 vertices" );
     OPENGEODE_EXCEPTION( surface.viewed_triangle( 0 ) == 1,
-        "[Test] TriangulatedSurfaceView triangle is not correct" );
+        "[Test] TriangulatedSurfaceView triangle is not correct" );
 
     OPENGEODE_EXCEPTION( surface.polygon_vertex( { 0, 2 } ) == 1,
-        "[Test] TriangulatedSurfaceView PolygonVertex is not correct" );
+        "[Test] TriangulatedSurfaceView PolygonVertex is not correct" );
     OPENGEODE_EXCEPTION( surface.polygon_vertex( { 1, 1 } ) == 3,
-        "[Test] TriangulatedSurfaceView PolygonVertex is not correct" );
+        "[Test] TriangulatedSurfaceView PolygonVertex is not correct" );
 }
 
 void test_create_polygons( const geode::TriangulatedSurface3D& surface,
@@ -83,7 +83,7 @@ void test_create_polygons( const geode::TriangulatedSurface3D& surface,
     builder.create_triangle( { 1, 3, 2 } );
     builder.create_polygon( { 3, 4, 2 } );
     OPENGEODE_EXCEPTION( surface.nb_polygons() == 3,
-        "[Test] TriangulatedSurface should have 3 triangles" );
+        "[Test] TriangulatedSurface should have 3 triangles" );
     builder.set_polygon_vertex( { 0, 0 }, 0 );
     builder.set_polygon_vertex( { 0, 1 }, 1 );
     builder.set_polygon_vertex( { 0, 2 }, 2 );
@@ -92,14 +92,14 @@ void test_create_polygons( const geode::TriangulatedSurface3D& surface,
 void test_polygon_adjacencies( const geode::TriangulatedSurface3D& surface )
 {
     OPENGEODE_EXCEPTION( !surface.polygon_adjacent( { 0, 0 } ),
-        "[Test] TriangulatedSurfaceView adjacent index is not correct" );
+        "[Test] TriangulatedSurfaceView adjacent index is not correct" );
     OPENGEODE_EXCEPTION( surface.polygon_adjacent( { 0, 1 } ) == 1,
-        "[Test] TriangulatedSurfaceView adjacent index is not correct" );
+        "[Test] TriangulatedSurfaceView adjacent index is not correct" );
     OPENGEODE_EXCEPTION( surface.polygon_adjacent( { 1, 2 } ) == 0,
-        "[Test] TriangulatedSurfaceView adjacent index is not correct" );
+        "[Test] TriangulatedSurfaceView adjacent index is not correct" );
     OPENGEODE_EXCEPTION(
         surface.polygon_adjacent_edge( { 0, 1 } ) == geode::PolygonEdge( 1, 2 ),
-        "[Test] TriangulatedSurfaceView adjacent index is not correct" );
+        "[Test] TriangulatedSurfaceView adjacent index is not correct" );
 }
 
 std::unique_ptr< geode::TriangulatedSurface3D > create_surface()

@@ -211,6 +211,13 @@ namespace geode
         void delete_elements( const std::vector< bool >& to_delete );
 
         /*!
+         * Permute attribute elements.
+         * @param[in] permutation Vector of size @function nb_elements().
+         * Each value correponds to the destination index.
+         */
+        void permute_elements( absl::Span< const index_t > permutation );
+
+        /*!
          * Get the number of elements in each attribute
          */
         index_t nb_elements() const;

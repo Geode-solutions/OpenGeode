@@ -30,16 +30,16 @@ def test_comparison():
     p = geom.Point3D( [2, 1.0, 2.6] )
     p2 = p
     if p != p2:
-        raise ValueError( "[Test] Points should be equal" )
+        raise ValueError( "[Test] Points should be equal" )
     
     P = geom.Point2D( [15, 2.6] )
     P2 = geom.Point2D( [16, 2.6] )
     if P == P2:
-        raise ValueError( "[Test] Points should be different" )
+        raise ValueError( "[Test] Points should be different" )
 
     p_epsilon = geom.Point3D( [2.0000000001, 1, 2.6] )
     if not p.inexact_equal( p_epsilon, 0.0001 ):
-        raise ValueError( "[Test] Points should be almost equal" )
+        raise ValueError( "[Test] Points should be almost equal" )
 
 def test_operators():
     p = geom.Point3D()
@@ -49,13 +49,13 @@ def test_operators():
     p2 = p
     answer = geom.Point3D( [4, 2, 5.2] )
     if p + p2 != answer:
-        raise ValueError( "[Test] Points should be equal" )
+        raise ValueError( "[Test] Points should be equal" )
     if p * 2 != answer:
-        raise ValueError( "[Test] Points should be equal" )
+        raise ValueError( "[Test] Points should be equal" )
     if p - p2 != geom.Point3D():
-        raise ValueError( "[Test] Points should be equal" )
+        raise ValueError( "[Test] Points should be equal" )
     if answer / 2 != p:
-        raise ValueError( "[Test] Points should be equal" )
+        raise ValueError( "[Test] Points should be equal" )
 
 if __name__ == '__main__':
     test_comparison()

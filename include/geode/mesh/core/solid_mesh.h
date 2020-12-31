@@ -314,10 +314,10 @@ namespace geode
 
         /*!
          * Return the coordinates of the barycenter of a given edge.
-         * @param[in] polygon_edge_vertices Indices of edge vertices.
+         * @param[in] edge_vertices Indices of edge vertices.
          */
         Point< dimension > edge_barycenter(
-            const std::array< index_t, 2 >& polygon_edge_vertices ) const;
+            const std::array< index_t, 2 >& edge_vertices ) const;
 
         /*!
          * Return the normal of a given PolyhedronFacet.

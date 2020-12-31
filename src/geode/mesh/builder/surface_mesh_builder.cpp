@@ -200,6 +200,44 @@ namespace
         }
         return absl::nullopt;
     }
+
+    template < geode::index_t dimension >
+    void update_polygon_around( const geode::SurfaceMesh< dimension >& surface,
+        geode::SurfaceMeshBuilder< dimension >& builder,
+        absl::Span< const geode::index_t > old2new )
+    {
+        for( const auto v : geode::Range{ surface.nb_vertices() } )
+        {
+            const auto polygon_vertex = surface.polygon_around_vertex( v );
+            if( !polygon_vertex )
+            {
+                continue;
+            }
+            auto new_polygon_vertex = polygon_vertex.value();
+            new_polygon_vertex.polygon_id = old2new[polygon_vertex->polygon_id];
+            if( new_polygon_vertex.polygon_id == geode::NO_ID )
+            {
+                for( auto&& polygon : surface.polygons_around_vertex( v ) )
+                {
+                    polygon.polygon_id = old2new[polygon.polygon_id];
+                    if( polygon.polygon_id != geode::NO_ID )
+                    {
+                        new_polygon_vertex = std::move( polygon );
+                        break;
+                    }
+                }
+            }
+            if( new_polygon_vertex.polygon_id == geode::NO_ID )
+            {
+                builder.disassociate_polygon_vertex_to_vertex( v );
+            }
+            else
+            {
+                builder.associate_polygon_vertex_to_vertex(
+                    new_polygon_vertex, v );
+            }
+        }
+    }
 } // namespace
 
 namespace geode
@@ -376,15 +414,28 @@ namespace geode
 
     template < index_t dimension >
     void SurfaceMeshBuilder< dimension >::do_delete_vertices(
-        const std::vector< bool >& to_delete )
+        const std::vector< bool >& to_delete,
+        absl::Span< const index_t > old2new )
     {
-        const auto old2new = detail::mapping_after_deletion( to_delete );
         update_polygon_vertices( old2new );
         if( surface_mesh_->are_edges_enabled() )
         {
             edges_builder().update_edge_vertices( old2new );
         }
-        do_delete_surface_vertices( to_delete );
+        do_delete_surface_vertices( to_delete, old2new );
+    }
+
+    template < index_t dimension >
+    void SurfaceMeshBuilder< dimension >::do_permute_vertices(
+        absl::Span< const index_t > permutation,
+        absl::Span< const index_t > old2new )
+    {
+        update_polygon_vertices( old2new );
+        if( surface_mesh_->are_edges_enabled() )
+        {
+            edges_builder().update_edge_vertices( old2new );
+        }
+        do_permute_surface_vertices( permutation, old2new );
     }
 
     template < index_t dimension >
@@ -395,7 +446,7 @@ namespace geode
         check_polygon_edge_id(
             *surface_mesh_, polygon_edge.polygon_id, polygon_edge.edge_id );
         OPENGEODE_ASSERT( adjacent_id < surface_mesh_->nb_polygons(),
-            "[SurfaceMeshBuilder::set_polygon_adjacent] Accessing a "
+            "[SurfaceMeshBuilder::set_polygon_adjacent] Accessing a "
             "polygon that does not exist" );
         do_set_polygon_adjacent( polygon_edge, adjacent_id );
     }
@@ -512,6 +563,11 @@ namespace geode
     std::vector< index_t > SurfaceMeshBuilder< dimension >::delete_polygons(
         const std::vector< bool >& to_delete )
     {
+        const auto old2new = detail::mapping_after_deletion( to_delete );
+        if( absl::c_find( to_delete, true ) == to_delete.end() )
+        {
+            return old2new;
+        }
         if( surface_mesh_->are_edges_enabled() )
         {
             auto edges = edges_builder();
@@ -529,42 +585,24 @@ namespace geode
             }
             edges.delete_isolated_edges();
         }
-        const auto old2new = detail::mapping_after_deletion( to_delete );
-        for( const auto v : Range{ surface_mesh_->nb_vertices() } )
-        {
-            const auto polygon_vertex =
-                surface_mesh_->polygon_around_vertex( v );
-            if( !polygon_vertex )
-            {
-                continue;
-            }
-            PolygonVertex new_polygon_vertex{ polygon_vertex.value() };
-            new_polygon_vertex.polygon_id = old2new[polygon_vertex->polygon_id];
-            if( new_polygon_vertex.polygon_id == NO_ID )
-            {
-                for( auto&& polygon :
-                    surface_mesh_->polygons_around_vertex( v ) )
-                {
-                    polygon.polygon_id = old2new[polygon.polygon_id];
-                    if( polygon.polygon_id != NO_ID )
-                    {
-                        new_polygon_vertex = std::move( polygon );
-                        break;
-                    }
-                }
-            }
-            if( new_polygon_vertex.polygon_id == NO_ID )
-            {
-                disassociate_polygon_vertex_to_vertex( v );
-            }
-            else
-            {
-                associate_polygon_vertex_to_vertex( new_polygon_vertex, v );
-            }
-        }
+        update_polygon_around( *surface_mesh_, *this, old2new );
         update_polygon_adjacencies( *surface_mesh_, *this, old2new );
         surface_mesh_->polygon_attribute_manager().delete_elements( to_delete );
         do_delete_polygons( to_delete );
+        return old2new;
+    }
+
+    template < index_t dimension >
+    absl::FixedArray< index_t >
+        SurfaceMeshBuilder< dimension >::permute_polygons(
+            absl::Span< const index_t > permutation )
+    {
+        const auto old2new = old2new_permutation( permutation );
+        update_polygon_around( *surface_mesh_, *this, old2new );
+        update_polygon_adjacencies( *surface_mesh_, *this, old2new );
+        surface_mesh_->polygon_attribute_manager().permute_elements(
+            permutation );
+        do_permute_polygons( permutation, old2new );
         return old2new;
     }
 

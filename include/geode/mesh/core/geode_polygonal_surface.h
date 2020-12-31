@@ -94,6 +94,9 @@ namespace geode
         void remove_polygons(
             const std::vector< bool >& to_delete, OGPolygonalSurfaceKey );
 
+        void permute_polygons(
+            absl::Span< const index_t > permutation, OGPolygonalSurfaceKey );
+
     private:
         friend class bitsery::Access;
         template < typename Archive >

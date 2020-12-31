@@ -181,7 +181,7 @@ namespace geode
             archive.object( *this );
             archive.adapter().flush();
             OPENGEODE_EXCEPTION( std::get< 1 >( context ).isValid(),
-                "[Relationships::save] Error while writing file: ", filename );
+                "[Relationships::save] Error while writing file: ", filename );
         }
 
         void load( absl::string_view directory )

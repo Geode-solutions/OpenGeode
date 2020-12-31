@@ -67,7 +67,15 @@ namespace geode
 
     template < index_t dimension >
     void PolygonalSurfaceViewBuilder< dimension >::do_delete_surface_vertices(
-        const std::vector< bool >& /*unused*/ )
+        const std::vector< bool >& /*unused*/,
+        absl::Span< const index_t > /*unused*/ )
+    {
+    }
+
+    template < index_t dimension >
+    void PolygonalSurfaceViewBuilder< dimension >::do_permute_surface_vertices(
+        absl::Span< const index_t > /*unused*/,
+        absl::Span< const index_t > /*unused*/ )
     {
     }
 
@@ -104,6 +112,13 @@ namespace geode
     template < index_t dimension >
     void PolygonalSurfaceViewBuilder< dimension >::do_delete_polygons(
         const std::vector< bool >& /*unused*/ )
+    {
+    }
+
+    template < index_t dimension >
+    void PolygonalSurfaceViewBuilder< dimension >::do_permute_polygons(
+        absl::Span< const index_t > /*unused*/,
+        absl::Span< const index_t > /*unused*/ )
     {
     }
 

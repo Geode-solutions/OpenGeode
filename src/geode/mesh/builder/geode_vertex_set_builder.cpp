@@ -37,7 +37,14 @@ namespace geode
     void OpenGeodeVertexSetBuilder::do_create_vertices( index_t /*unused*/ ) {}
 
     void OpenGeodeVertexSetBuilder::do_delete_vertices(
-        const std::vector< bool >& /*unused*/ )
+        const std::vector< bool >& /*unused*/,
+        absl::Span< const index_t > /*unused*/ )
+    {
+    }
+
+    void OpenGeodeVertexSetBuilder::do_permute_vertices(
+        absl::Span< const index_t > /*unused*/,
+        absl::Span< const index_t > /*unused*/ )
     {
     }
 } // namespace geode

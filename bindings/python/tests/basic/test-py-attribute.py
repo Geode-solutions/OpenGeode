@@ -31,27 +31,27 @@ def test_constant_attribute( manager ):
     
     attribute = manager.find_attribute_bool( "bool" )
     if not attribute.value( 0 ):
-        raise ValueError( "[Test] Should be equal to True" )
+        raise ValueError( "[Test] Should be equal to True" )
     
     constant_attribute.set_value( False )
     if attribute.value( 12 ):
-        raise ValueError( "[Test] Should be equal to False" )
+        raise ValueError( "[Test] Should be equal to False" )
 
 def test_int_variable_attribute( manager ):
     variable_attribute = manager.find_or_create_attribute_variable_int( "int", 12 )
     variable_attribute.set_value( 3, 3 )
     if not variable_attribute.is_genericable():
-        raise ValueError( "[Test] Should be genericable" )
+        raise ValueError( "[Test] Should be genericable" )
 
     attribute = manager.find_attribute_int( "int" )
     if attribute.value( 3 ) != 3:
-        raise ValueError( "[Test] Should be equal to 3" )
+        raise ValueError( "[Test] Should be equal to 3" )
     if attribute.value( 6 ) != 12:
-        raise ValueError( "[Test] Should be equal to 12" )
+        raise ValueError( "[Test] Should be equal to 12" )
 
     variable_attribute.set_value( 3, 5 )
     if attribute.value( 3 ) != 5:
-        raise ValueError( "[Test] Should be equal to 5" )
+        raise ValueError( "[Test] Should be equal to 5" )
 
 def test_double_sparse_attribute( manager ):
     sparse_attribute = manager.find_or_create_attribute_sparse_double( "double", 12 )
@@ -60,19 +60,19 @@ def test_double_sparse_attribute( manager ):
 
     attribute = manager.find_attribute_double( "double" )
     if attribute.value( 3 ) != 3:
-        raise ValueError( "[Test] Should be equal to 3" )
+        raise ValueError( "[Test] Should be equal to 3" )
     if attribute.value( 6 ) != 12:
-        raise ValueError( "[Test] Should be equal to 12" )
+        raise ValueError( "[Test] Should be equal to 12" )
     if attribute.value( 7 ) != 7:
-        raise ValueError( "[Test] Should be equal to 7" )
+        raise ValueError( "[Test] Should be equal to 7" )
 
     sparse_attribute.set_value( 3, 5 )
     if attribute.value( 3 ) != 5:
-        raise ValueError( "[Test] Should be equal to 5" )
+        raise ValueError( "[Test] Should be equal to 5" )
 
 def test_number_of_attributes( manager, nb ):
     if len(manager.attribute_names()) != nb:
-        raise ValueError( "[Test] Not the correct number of attributes in the manager" )
+        raise ValueError( "[Test] Not the correct number of attributes in the manager" )
 
 def test_delete_attribute_elements( manager ):
     to_delete = [False] * manager.nb_elements()
@@ -80,7 +80,7 @@ def test_delete_attribute_elements( manager ):
     to_delete[5] = True
     manager.delete_elements( to_delete )
     if manager.nb_elements() != len(to_delete) - 2:
-        raise ValueError( "[Test] Two attribute elements should have been removed" )
+        raise ValueError( "[Test] Two attribute elements should have been removed" )
 
 def test_sparse_attribute_after_element_deletion( manager ):
     sparse_attribute = manager.find_attribute_double( "double" )
@@ -95,7 +95,7 @@ if __name__ == '__main__':
     manager = basic.AttributeManager()
     manager.resize( 10 )
     if manager.nb_elements() != 10:
-        raise ValueError( "[Test] Manager should have 10 elements" )
+        raise ValueError( "[Test] Manager should have 10 elements" )
     test_constant_attribute( manager )
     test_int_variable_attribute( manager )
     test_double_sparse_attribute( manager )
@@ -109,6 +109,6 @@ if __name__ == '__main__':
     test_number_of_attributes( manager, 2 )
     manager.resize( 10 )
     if manager.nb_elements() != 10:
-        raise ValueError( "[Test] Manager should have 10 elements" )
+        raise ValueError( "[Test] Manager should have 10 elements" )
     manager.clear()
     test_number_of_attributes( manager, 0 )

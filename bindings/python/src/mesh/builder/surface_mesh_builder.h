@@ -49,6 +49,8 @@
                     compute_polygon_adjacencies )                              \
         .def( "delete_polygons",                                               \
             &SurfaceMeshBuilder##dimension##D::delete_polygons )               \
+        .def( "permute_polygons",                                              \
+            &SurfaceMeshBuilder##dimension##D::permute_polygons )              \
         .def( "delete_isolated_vertices",                                      \
             &SurfaceMeshBuilder##dimension##D::delete_isolated_vertices )      \
         .def( "edges_builder",                                                 \

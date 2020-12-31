@@ -37,7 +37,14 @@ namespace geode
     void OpenGeodeGraphBuilder::do_create_vertices( index_t /*unused*/ ) {}
 
     void OpenGeodeGraphBuilder::do_delete_curve_vertices(
-        const std::vector< bool >& /*unused*/ )
+        const std::vector< bool >& /*unused*/,
+        absl::Span< const index_t > /*unused*/ )
+    {
+    }
+
+    void OpenGeodeGraphBuilder::do_permute_curve_vertices(
+        absl::Span< const index_t > /*unused*/,
+        absl::Span< const index_t > /*unused*/ )
     {
     }
 
@@ -55,4 +62,10 @@ namespace geode
         const std::vector< bool >& /*unused*/ )
     {
     }
+
+    void OpenGeodeGraphBuilder::do_permute_edges(
+        absl::Span< const index_t > /*unused*/ )
+    {
+    }
+
 } // namespace geode

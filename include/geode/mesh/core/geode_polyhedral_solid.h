@@ -86,6 +86,9 @@ namespace geode
         void remove_polyhedra(
             const std::vector< bool >& to_delete, OGPolyhedralSolidKey );
 
+        void permute_polyhedra(
+            absl::Span< const index_t > permutation, OGPolyhedralSolidKey );
+
         void set_polyhedron_adjacent( const PolyhedronFacet& polyhedron_facet,
             index_t adjacent_id,
             OGPolyhedralSolidKey );

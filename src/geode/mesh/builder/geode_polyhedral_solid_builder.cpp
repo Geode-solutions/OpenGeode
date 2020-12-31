@@ -58,7 +58,16 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodePolyhedralSolidBuilder< dimension >::do_delete_solid_vertices(
-        const std::vector< bool >& /*unused*/ )
+        const std::vector< bool >& /*unused*/,
+        absl::Span< const index_t > /*unused*/ )
+    {
+    }
+
+    template < index_t dimension >
+    void
+        OpenGeodePolyhedralSolidBuilder< dimension >::do_permute_solid_vertices(
+            absl::Span< const index_t > /*unused*/,
+            absl::Span< const index_t > /*unused*/ )
     {
     }
 
@@ -100,6 +109,14 @@ namespace geode
         const std::vector< bool >& to_delete )
     {
         geode_polyhedral_solid_->remove_polyhedra( to_delete, {} );
+    }
+
+    template < index_t dimension >
+    void OpenGeodePolyhedralSolidBuilder< dimension >::do_permute_polyhedra(
+        absl::Span< const index_t > permutation,
+        absl::Span< const index_t > /*unused*/ )
+    {
+        geode_polyhedral_solid_->permute_polyhedra( permutation, {} );
     }
 
     template class opengeode_mesh_api OpenGeodePolyhedralSolidBuilder< 3 >;

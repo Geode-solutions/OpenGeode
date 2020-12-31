@@ -37,11 +37,11 @@ if __name__ == '__main__':
     
     box2.add_box( box )
     if box2.min() != geom.Point2D( [-2, -2] ):
-        raise ValueError( "[Test] Error in BoundingBox union computation" )
+        raise ValueError( "[Test] Error in BoundingBox union computation" )
     if box2.max() != geom.Point2D( [1, 1] ):
-        raise ValueError( "[Test] Error in BoundingBox union computation" )
+        raise ValueError( "[Test] Error in BoundingBox union computation" )
     
     if not box2.contains( geom.Point2D( [0, 0] ) ):
-        raise ValueError( "[Test] BBox should contain this point" )
+        raise ValueError( "[Test] BBox should contain this point" )
     if box2.contains( geom.Point2D( [10, 0] ) ):
-        raise ValueError( "[Test] BBox should not contain this point" )
+        raise ValueError( "[Test] BBox should not contain this point" )

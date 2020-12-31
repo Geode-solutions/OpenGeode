@@ -70,8 +70,22 @@ namespace geode
     std::vector< index_t > VertexSetBuilder::delete_vertices(
         const std::vector< bool >& to_delete )
     {
+        const auto old2new = detail::mapping_after_deletion( to_delete );
+        if( absl::c_find( to_delete, true ) == to_delete.end() )
+        {
+            return old2new;
+        }
         vertex_set_->vertex_attribute_manager().delete_elements( to_delete );
-        do_delete_vertices( to_delete );
-        return detail::mapping_after_deletion( to_delete );
+        do_delete_vertices( to_delete, old2new );
+        return old2new;
+    }
+
+    absl::FixedArray< index_t > VertexSetBuilder::permute_vertices(
+        absl::Span< const index_t > permutation )
+    {
+        const auto old2new = old2new_permutation( permutation );
+        vertex_set_->vertex_attribute_manager().permute_elements( permutation );
+        do_permute_vertices( permutation, old2new );
+        return old2new;
     }
 } // namespace geode

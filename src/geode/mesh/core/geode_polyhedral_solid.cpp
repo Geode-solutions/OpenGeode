@@ -170,8 +170,8 @@ namespace geode
                     const auto nb_facets = get_nb_polyhedron_facets( p );
                     for( const auto f : LRange{ nb_facets } )
                     {
-                        PolyhedronFacet facet{ p, f };
-                        auto nb_facet_vertices =
+                        const PolyhedronFacet facet{ p, f };
+                        const auto nb_facet_vertices =
                             get_nb_polyhedron_facet_vertices( facet );
                         for( const auto v : LRange{ nb_facet_vertices } )
                         {
@@ -210,6 +210,101 @@ namespace geode
                 polyhedron_facet_ptr_.end() );
             polyhedron_facets_.erase( polyhedron_facets_.begin() + facet_index,
                 polyhedron_facets_.end() );
+        }
+
+        void permute_polyhedra( absl::Span< const index_t > permutation )
+        {
+            std::vector< index_t > new_polyhedron_vertices;
+            new_polyhedron_vertices.reserve( polyhedron_vertices_.size() );
+            for( const auto p : Indices{ permutation } )
+            {
+                const auto old_p = permutation[p];
+                const auto nb_vertices = get_nb_polyhedron_vertices( old_p );
+                for( const auto v : LRange{ nb_vertices } )
+                {
+                    new_polyhedron_vertices.push_back(
+                        get_polyhedron_vertex( { old_p, v } ) );
+                }
+            }
+            polyhedron_vertices_ = std::move( new_polyhedron_vertices );
+
+            std::vector< index_t > new_polyhedron_vertex_ptr;
+            new_polyhedron_vertex_ptr.reserve( polyhedron_vertex_ptr_.size() );
+            new_polyhedron_vertex_ptr.push_back( 0 );
+            for( const auto p : Indices{ permutation } )
+            {
+                const auto old_p = permutation[p];
+                const auto nb_vertices = get_nb_polyhedron_vertices( old_p );
+                new_polyhedron_vertex_ptr.push_back(
+                    new_polyhedron_vertex_ptr.back() + nb_vertices );
+            }
+            polyhedron_vertex_ptr_ = std::move( new_polyhedron_vertex_ptr );
+
+            std::vector< local_index_t > new_polyhedron_facets;
+            new_polyhedron_facets.reserve( polyhedron_facets_.size() );
+            for( const auto p : Indices{ permutation } )
+            {
+                const auto old_p = permutation[p];
+                const auto nb_facets = get_nb_polyhedron_facets( old_p );
+                for( const auto f : LRange{ nb_facets } )
+                {
+                    const PolyhedronFacet facet{ old_p, f };
+                    const auto nb_facet_vertices =
+                        get_nb_polyhedron_facet_vertices( facet );
+                    for( const auto v : LRange{ nb_facet_vertices } )
+                    {
+                        new_polyhedron_facets.push_back(
+                            get_polyhedron_facet_vertex_id( { facet, v } )
+                                .vertex_id );
+                    }
+                }
+            }
+            polyhedron_facets_ = std::move( new_polyhedron_facets );
+
+            std::vector< index_t > new_polyhedron_facet_ptr;
+            new_polyhedron_facet_ptr.reserve( polyhedron_facet_ptr_.size() );
+            new_polyhedron_facet_ptr.push_back( 0 );
+            for( const auto p : Indices{ permutation } )
+            {
+                const auto old_p = permutation[p];
+                const auto nb_facets = get_nb_polyhedron_facets( old_p );
+                for( const auto f : LRange{ nb_facets } )
+                {
+                    const PolyhedronFacet facet{ old_p, f };
+                    const auto nb_facet_vertices =
+                        get_nb_polyhedron_facet_vertices( facet );
+                    new_polyhedron_facet_ptr.push_back(
+                        new_polyhedron_facet_ptr.back() + nb_facet_vertices );
+                }
+            }
+            polyhedron_facet_ptr_ = std::move( new_polyhedron_facet_ptr );
+
+            std::vector< index_t > new_polyhedron_adjacents;
+            new_polyhedron_adjacents.reserve( polyhedron_adjacents_.size() );
+            for( const auto p : Indices{ permutation } )
+            {
+                const auto old_p = permutation[p];
+                const auto nb_facets = get_nb_polyhedron_facets( old_p );
+                for( const auto f : LRange{ nb_facets } )
+                {
+                    new_polyhedron_adjacents.push_back(
+                        get_polyhedron_adjacent_impl( { old_p, f } ) );
+                }
+            }
+            polyhedron_adjacents_ = std::move( new_polyhedron_adjacents );
+
+            std::vector< index_t > new_polyhedron_adjacent_ptr;
+            new_polyhedron_adjacent_ptr.reserve(
+                polyhedron_adjacent_ptr_.size() );
+            new_polyhedron_adjacent_ptr.push_back( 0 );
+            for( const auto p : Indices{ permutation } )
+            {
+                const auto old_p = permutation[p];
+                const auto nb_facets = get_nb_polyhedron_facets( old_p );
+                new_polyhedron_adjacent_ptr.push_back(
+                    new_polyhedron_adjacent_ptr.back() + nb_facets );
+            }
+            polyhedron_adjacent_ptr_ = std::move( new_polyhedron_adjacent_ptr );
         }
 
     private:
@@ -396,6 +491,13 @@ namespace geode
         const std::vector< bool >& to_delete, OGPolyhedralSolidKey )
     {
         impl_->remove_polyhedra( to_delete );
+    }
+
+    template < index_t dimension >
+    void OpenGeodePolyhedralSolid< dimension >::permute_polyhedra(
+        absl::Span< const index_t > permutation, OGPolyhedralSolidKey )
+    {
+        impl_->permute_polyhedra( permutation );
     }
 
     template < index_t dimension >

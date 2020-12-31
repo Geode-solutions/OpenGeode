@@ -60,7 +60,7 @@ namespace geode
     {
         geode_unused( facets );
         OPENGEODE_ASSERT( vertices.size() == 4, "[TetrahedralSolidBuilder::"
-                                                "do_create_polyhedron] Only "
+                                                "do_create_polyhedron] Only "
                                                 "tetrahedra are handled" );
         std::array< index_t, 4 > tetra_vertices;
         absl::c_copy_n( vertices, 4, tetra_vertices.begin() );

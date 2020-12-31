@@ -99,26 +99,26 @@ void test_uuid( const geode::Relationships& relations,
     geode::index_t nb_collections )
 {
     OPENGEODE_EXCEPTION( relations.nb_boundaries( uuid ) == nb_boundaries,
-        "[Test] ", uuid.string(), " should have ", nb_boundaries,
+        "[Test] ", uuid.string(), " should have ", nb_boundaries,
         " boundary(ies)" );
 
     OPENGEODE_EXCEPTION( relations.nb_incidences( uuid ) == nb_incidences,
-        "[Test] ", uuid.string(), " should have ", nb_incidences,
+        "[Test] ", uuid.string(), " should have ", nb_incidences,
         " incidence(s)" );
 
     OPENGEODE_EXCEPTION( relations.nb_internals( uuid ) == nb_internals,
-        "[Test] ", uuid.string(), " should have ", nb_internals,
+        "[Test] ", uuid.string(), " should have ", nb_internals,
         " internal component(s)" );
 
     OPENGEODE_EXCEPTION( relations.nb_embeddings( uuid ) == nb_embeddings,
-        "[Test] ", uuid.string(), " should have ", nb_embeddings,
+        "[Test] ", uuid.string(), " should have ", nb_embeddings,
         " embedding(s)" );
 
-    OPENGEODE_EXCEPTION( relations.nb_items( uuid ) == nb_items, "[Test] ",
+    OPENGEODE_EXCEPTION( relations.nb_items( uuid ) == nb_items, "[Test] ",
         uuid.string(), " should have ", nb_boundaries, " item(s)" );
 
     OPENGEODE_EXCEPTION( relations.nb_collections( uuid ) == nb_collections,
-        "[Test] ", uuid.string(), " should have ", nb_collections,
+        "[Test] ", uuid.string(), " should have ", nb_collections,
         " collection(s)" );
 }
 

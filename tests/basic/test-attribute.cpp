@@ -102,13 +102,13 @@ void test_constant_attribute( geode::AttributeManager& manager )
 
     auto attribute = manager.find_attribute< bool >( "bool" );
     OPENGEODE_EXCEPTION(
-        attribute->value( 0 ), "[Test] Should be equal to true" );
+        attribute->value( 0 ), "[Test] Should be equal to true" );
     OPENGEODE_EXCEPTION( attribute->type() == typeid( bool ).name(),
-        "[Test] Should be equal to 'b' or 'bool'" );
+        "[Test] Should be equal to 'b' or 'bool'" );
 
     constant_attribute->set_value( false );
     OPENGEODE_EXCEPTION(
-        !attribute->value( 12 ), "[Test] Should be equal to false" );
+        !attribute->value( 12 ), "[Test] Should be equal to false" );
 }
 
 void test_foo_constant_attribute( geode::AttributeManager& manager )
@@ -145,13 +145,13 @@ void test_int_variable_attribute( geode::AttributeManager& manager )
 
     const auto attribute = manager.find_attribute< int >( "int" );
     OPENGEODE_EXCEPTION(
-        attribute->value( 3 ) == 3, "[Test] Should be equal to 3" );
+        attribute->value( 3 ) == 3, "[Test] Should be equal to 3" );
     OPENGEODE_EXCEPTION(
-        attribute->value( 6 ) == 12, "[Test] Should be equal to 12" );
+        attribute->value( 6 ) == 12, "[Test] Should be equal to 12" );
 
     variable_attribute->set_value( 3, 5 );
     OPENGEODE_EXCEPTION(
-        attribute->value( 3 ) == 5, "[Test] Should be equal to 5" );
+        attribute->value( 3 ) == 5, "[Test] Should be equal to 5" );
 }
 
 void test_foo_sparse_attribute( geode::AttributeManager& manager )
@@ -183,19 +183,19 @@ void test_double_sparse_attribute( geode::AttributeManager& manager )
 
     auto attribute = manager.find_attribute< double >( "double" );
     OPENGEODE_EXCEPTION(
-        attribute->value( 2 ) == 3, "[Test] Should be equal to 3" );
+        attribute->value( 2 ) == 3, "[Test] Should be equal to 3" );
     OPENGEODE_EXCEPTION(
-        attribute->value( 3 ) == 3, "[Test] Should be equal to 3" );
+        attribute->value( 3 ) == 3, "[Test] Should be equal to 3" );
     OPENGEODE_EXCEPTION(
-        attribute->value( 4 ) == 8.1, "[Test] Should be equal to 8.1" );
+        attribute->value( 4 ) == 8.1, "[Test] Should be equal to 8.1" );
     OPENGEODE_EXCEPTION(
-        attribute->value( 6 ) == 12, "[Test] Should be equal to 12" );
+        attribute->value( 6 ) == 12, "[Test] Should be equal to 12" );
     OPENGEODE_EXCEPTION(
-        attribute->value( 7 ) == 7, "[Test] Should be equal to 7" );
+        attribute->value( 7 ) == 7, "[Test] Should be equal to 7" );
 
     sparse_attribute->set_value( 3, 5 );
     OPENGEODE_EXCEPTION(
-        attribute->value( 3 ) == 5, "[Test] Should be equal to 5" );
+        attribute->value( 3 ) == 5, "[Test] Should be equal to 5" );
 }
 
 void test_bool_variable_attribute( geode::AttributeManager& manager )
@@ -209,11 +209,11 @@ void test_bool_variable_attribute( geode::AttributeManager& manager )
 
     const auto attribute = manager.find_attribute< bool >( "bool_var" );
     OPENGEODE_EXCEPTION(
-        attribute->value( 3 ), "[Test] Should be equal to true" );
+        attribute->value( 3 ), "[Test] Should be equal to true" );
 
     variable_attribute->set_value( 3, false );
     OPENGEODE_EXCEPTION(
-        !attribute->value( 3 ), "[Test] Should be equal to false" );
+        !attribute->value( 3 ), "[Test] Should be equal to false" );
 }
 
 bool managers_have_same_attributes( const geode::AttributeManager& manager,
@@ -253,7 +253,7 @@ void check_one_attribute_values( geode::AttributeManager& manager,
     for( auto i : geode::Range{ manager.nb_elements() } )
     {
         OPENGEODE_EXCEPTION( in_att->value( i ) == out_att->value( i ),
-            "[Test] At least one value of Attribute ", name,
+            "[Test] At least one value of Attribute ", name,
             " is not correct after reloading" );
     }
 }
@@ -284,7 +284,7 @@ void test_serialize_manager( geode::AttributeManager& manager )
     archive.object( manager );
     archive.adapter().flush();
     OPENGEODE_EXCEPTION( std::get< 1 >( context ).isValid(),
-        "[Test] Error while writing file: ", filename );
+        "[Test] Error while writing file: ", filename );
 
     std::ifstream infile{ filename, std::ifstream::binary };
     geode::AttributeManager reloaded_manager;
@@ -304,15 +304,15 @@ void test_serialize_manager( geode::AttributeManager& manager )
     OPENGEODE_EXCEPTION( adapter.error() == bitsery::ReaderError::NoError
                              && adapter.isCompletedSuccessfully()
                              && std::get< 1 >( context ).isValid(),
-        "[Test] Error while reading file: ", filename );
+        "[Test] Error while reading file: ", filename );
 
     OPENGEODE_EXCEPTION(
         reloaded_manager.nb_elements() == manager.nb_elements(),
-        "[Test] Number of elements in reloaded AttributeManager is not "
+        "[Test] Number of elements in reloaded AttributeManager is not "
         "correct" );
     OPENGEODE_EXCEPTION(
         managers_have_same_attributes( manager, reloaded_manager ),
-        "[Test] Number and names of attributes in reloaded AttributeManager "
+        "[Test] Number and names of attributes in reloaded AttributeManager "
         "are not correct" );
     check_attribute_values( manager, reloaded_manager );
 }
@@ -321,17 +321,17 @@ void test_attribute_types( geode::AttributeManager& manager )
 {
     OPENGEODE_EXCEPTION(
         manager.attribute_type( "bool_var" ) == typeid( bool ).name(),
-        "[Test] Returned attribute type is not correct (should be bool)" );
+        "[Test] Returned attribute type is not correct (should be bool)" );
     OPENGEODE_EXCEPTION(
         manager.attribute_type( "unknown_name" ) == "undefined",
-        "[Test] Returned attribute type is not correct (should be undefined)" );
+        "[Test] Returned attribute type is not correct (should be undefined)" );
 }
 
 void test_number_of_attributes(
     geode::AttributeManager& manager, geode::index_t nb )
 {
     OPENGEODE_EXCEPTION( manager.attribute_names().size() == nb,
-        "[Test] Should have ", nb, " attributes in the manager" );
+        "[Test] Should have ", nb, " attributes in the manager" );
 }
 
 void test_delete_attribute_elements( geode::AttributeManager& manager )
@@ -341,7 +341,7 @@ void test_delete_attribute_elements( geode::AttributeManager& manager )
     to_delete[5] = true;
     manager.delete_elements( to_delete );
     OPENGEODE_EXCEPTION( manager.nb_elements() == to_delete.size() - 2,
-        "[Test] Two attribute elements should have been removed" );
+        "[Test] Two attribute elements should have been removed" );
 }
 
 void test_sparse_attribute_after_element_deletion(
@@ -349,13 +349,13 @@ void test_sparse_attribute_after_element_deletion(
 {
     const auto sparse_attribute = manager.find_attribute< double >( "double" );
     OPENGEODE_EXCEPTION( sparse_attribute->value( 0 ) == 12,
-        "[Test] Element 0 of sparse attribute should be 12 " );
-    OPENGEODE_EXCEPTION( sparse_attribute->value( 3 ) == 8.1,
-        "[Test] Element 3 of sparse attribute should be 8.1 " );
-    OPENGEODE_EXCEPTION( sparse_attribute->value( 5 ) == 7,
-        "[Test] Element 5 of sparse attribute should be 7 " );
-    OPENGEODE_EXCEPTION( sparse_attribute->value( 7 ) == 12,
-        "[Test] Element 7 of sparse attribute should be 12 " );
+        "[Test] Element 0 of sparse attribute should be 12 " );
+    OPENGEODE_EXCEPTION( sparse_attribute->value( 3 ) == 3,
+        "[Test] Element 3 of sparse attribute should be 3 " );
+    OPENGEODE_EXCEPTION( sparse_attribute->value( 5 ) == 8.1,
+        "[Test] Element 5 of sparse attribute should be 8.1 " );
+    OPENGEODE_EXCEPTION( sparse_attribute->value( 7 ) == 7,
+        "[Test] Element 7 of sparse attribute should be 7 " );
 }
 
 void test_generic_value( geode::AttributeManager& manager )
@@ -364,12 +364,12 @@ void test_generic_value( geode::AttributeManager& manager )
     OPENGEODE_EXCEPTION( foo_attr->is_genericable(),
         "[Test] Foo attribute should be genericable" );
     OPENGEODE_EXCEPTION( foo_attr->generic_value( 3 ) == 15.4f,
-        "[Test] Generic value for element 3 of foo sparse attribute should be "
+        "[Test] Generic value for element 3 of foo sparse attribute should be "
         "15.4" );
 
     const auto& double_attr = manager.find_attribute< double >( "double" );
     OPENGEODE_EXCEPTION( double_attr->generic_value( 7 ) == 7,
-        "[Test] Generic value for element 7 of double attribute should be 7" );
+        "[Test] Generic value for element 7 of double attribute should be 7" );
 
     auto array_attr =
         manager.find_or_create_attribute< geode::VariableAttribute,
@@ -379,7 +379,7 @@ void test_generic_value( geode::AttributeManager& manager )
     OPENGEODE_EXCEPTION( !array_attr->is_genericable(),
         "[Test] Foo attribute is not genericable" );
     OPENGEODE_EXCEPTION( array_attr->generic_value( 2 ) == 0.,
-        "[Test] Generic value for element 2 of array attribute should be 0." );
+        "[Test] Generic value for element 2 of array attribute should be 0." );
 }
 
 void test_copy_manager( geode::AttributeManager& manager )
@@ -391,12 +391,34 @@ void test_copy_manager( geode::AttributeManager& manager )
     test_number_of_attributes( manager2, 8 );
 }
 
+void test_permutation( geode::AttributeManager& manager )
+{
+    std::vector< geode::index_t > permutation{ 2, 1, 4, 6, 7, 8, 5, 9, 3, 0 };
+    manager.permute_elements( permutation );
+
+    const auto int_attribute = manager.find_attribute< int >( "int" );
+    OPENGEODE_EXCEPTION(
+        int_attribute->value( 3 ) == 12, "[Test] Should be equal to 12" );
+    OPENGEODE_EXCEPTION(
+        int_attribute->value( 0 ) == 5, "[Test] Should be equal to 5" );
+    OPENGEODE_EXCEPTION(
+        int_attribute->value( 8 ) == 5, "[Test] Should be equal to 5" );
+
+    auto double_attribute = manager.find_attribute< double >( "double" );
+    OPENGEODE_EXCEPTION(
+        double_attribute->value( 2 ) == 12, "[Test] Should be equal to 3" );
+    OPENGEODE_EXCEPTION(
+        double_attribute->value( 4 ) == 3, "[Test] Should be equal to 3" );
+    OPENGEODE_EXCEPTION(
+        double_attribute->value( 7 ) == 8.1, "[Test] Should be equal to 8.1" );
+}
+
 void test()
 {
     geode::AttributeManager manager;
     manager.resize( 10 );
     OPENGEODE_EXCEPTION(
-        manager.nb_elements() == 10, "[Test] Manager should have 10 elements" );
+        manager.nb_elements() == 10, "[Test] Manager should have 10 elements" );
     test_constant_attribute( manager );
     test_foo_constant_attribute( manager );
     test_int_variable_attribute( manager );
@@ -405,6 +427,7 @@ void test()
     test_double_sparse_attribute( manager );
     test_foo_sparse_attribute( manager );
     test_generic_value( manager );
+    test_permutation( manager );
     test_delete_attribute_elements( manager );
     test_sparse_attribute_after_element_deletion( manager );
 
@@ -419,7 +442,7 @@ void test()
     test_number_of_attributes( manager, 7 );
     manager.resize( 10 );
     OPENGEODE_EXCEPTION(
-        manager.nb_elements() == 10, "[Test] Manager should have 10 elements" );
+        manager.nb_elements() == 10, "[Test] Manager should have 10 elements" );
     manager.clear();
     test_number_of_attributes( manager, 0 );
 }

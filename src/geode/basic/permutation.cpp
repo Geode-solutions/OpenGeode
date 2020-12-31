@@ -21,23 +21,24 @@
  *
  */
 
-#include <geode/basic/logger.h>
-#include <geode/basic/uuid.h>
+/*
+ * Modified from Geogram
+ * http://alice.loria.fr/index.php/software/4-library/75-geogram.html
+ * Copyright (c) 2012-2014, Bruno Levy
+ */
 
-#include <geode/tests/common.h>
+#include <geode/basic/permutation.h>
 
-void test()
+namespace geode
 {
-    for( const auto i : geode::Range{ 100 } )
+    absl::FixedArray< index_t > old2new_permutation(
+        absl::Span< const index_t > permutation )
     {
-        geode_unused( i );
-        const geode::uuid id;
-        geode::Logger::info( id.string() );
-        const geode::uuid id2;
-        OPENGEODE_EXCEPTION( id2 != id, "[Test] UUIDs should be different" );
-        OPENGEODE_EXCEPTION(
-            id2 < id || id < id2, "[Test] UUIDs should be different" );
+        absl::FixedArray< index_t > old2new( permutation.size() );
+        for( const auto i : Indices{ permutation } )
+        {
+            old2new[permutation[i]] = i;
+        }
+        return old2new;
     }
-}
-
-OPENGEODE_TEST( "uuid" )
+} // namespace geode

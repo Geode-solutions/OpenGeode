@@ -21,23 +21,47 @@
  *
  */
 
-#include <geode/basic/logger.h>
-#include <geode/basic/uuid.h>
+/*
+ * Modified from Geogram
+ * http://alice.loria.fr/index.php/software/4-library/75-geogram.html
+ * Copyright (c) 2012-2014, Bruno Levy
+ */
 
-#include <geode/tests/common.h>
+#pragma once
 
-void test()
+#include <absl/container/fixed_array.h>
+#include <absl/types/span.h>
+
+#include <geode/basic/common.h>
+#include <geode/basic/range.h>
+
+namespace geode
 {
-    for( const auto i : geode::Range{ 100 } )
+    template < typename Container >
+    void permute( Container& data, absl::Span< const index_t > permutation )
     {
-        geode_unused( i );
-        const geode::uuid id;
-        geode::Logger::info( id.string() );
-        const geode::uuid id2;
-        OPENGEODE_EXCEPTION( id2 != id, "[Test] UUIDs should be different" );
-        OPENGEODE_EXCEPTION(
-            id2 < id || id < id2, "[Test] UUIDs should be different" );
+        std::vector< bool > visited( permutation.size(), false );
+        for( const auto p : Indices{ permutation } )
+        {
+            if( visited[p] )
+            {
+                continue;
+            }
+            visited[p] = true;
+            auto i = p;
+            auto temp = data[i];
+            auto j = permutation[p];
+            while( j != p )
+            {
+                data[i] = std::move( data[j] );
+                visited[j] = true;
+                i = j;
+                j = permutation[i];
+            }
+            data[i] = std::move( temp );
+        }
     }
-}
 
-OPENGEODE_TEST( "uuid" )
+    absl::FixedArray< index_t > opengeode_basic_api old2new_permutation(
+        absl::Span< const index_t > permutation );
+} // namespace geode

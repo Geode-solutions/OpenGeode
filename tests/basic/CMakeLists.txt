@@ -54,6 +54,11 @@ add_geode_test(
         ${PROJECT_NAME}::basic
 )
 add_geode_test(
+    SOURCE "test-permutation.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+)
+add_geode_test(
     SOURCE "test-range.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic

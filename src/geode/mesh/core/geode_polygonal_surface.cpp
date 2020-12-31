@@ -127,6 +127,49 @@ namespace geode
                 polygon_adjacents_.begin() + index, polygon_adjacents_.end() );
         }
 
+        void permute_polygons( absl::Span< const index_t > permutation )
+        {
+            std::vector< index_t > new_polygon_vertices;
+            new_polygon_vertices.reserve( polygon_vertices_.size() );
+            for( const auto p : Indices{ permutation } )
+            {
+                const auto old_p = permutation[p];
+                const auto nb_vertices = get_nb_polygon_vertices( old_p );
+                for( const auto v : LRange{ nb_vertices } )
+                {
+                    new_polygon_vertices.push_back(
+                        get_polygon_vertex( { old_p, v } ) );
+                }
+            }
+            polygon_vertices_ = std::move( new_polygon_vertices );
+
+            std::vector< index_t > new_polygon_adjacents;
+            new_polygon_adjacents.reserve( polygon_adjacents_.size() );
+            for( const auto p : Indices{ permutation } )
+            {
+                const auto old_p = permutation[p];
+                const auto nb_vertices = get_nb_polygon_vertices( old_p );
+                for( const auto v : LRange{ nb_vertices } )
+                {
+                    new_polygon_adjacents.push_back(
+                        get_polygon_adjacent_impl( { old_p, v } ) );
+                }
+            }
+            polygon_adjacents_ = std::move( new_polygon_adjacents );
+
+            std::vector< index_t > new_polygon_ptr;
+            new_polygon_ptr.reserve( polygon_ptr_.size() );
+            new_polygon_ptr.push_back( 0 );
+            for( const auto p : Indices{ permutation } )
+            {
+                const auto old_p = permutation[p];
+                const auto nb_vertices = get_nb_polygon_vertices( old_p );
+                new_polygon_ptr.push_back(
+                    new_polygon_ptr.back() + nb_vertices );
+            }
+            polygon_ptr_ = std::move( new_polygon_ptr );
+        }
+
     private:
         Impl() = default;
 
@@ -162,7 +205,7 @@ namespace geode
         std::vector< index_t > polygon_vertices_;
         std::vector< index_t > polygon_adjacents_;
         std::vector< index_t > polygon_ptr_;
-    };
+    }; // namespace geode
 
     template < index_t dimension >
     OpenGeodePolygonalSurface< dimension >::OpenGeodePolygonalSurface()
@@ -247,6 +290,13 @@ namespace geode
         const std::vector< bool >& to_delete, OGPolygonalSurfaceKey )
     {
         impl_->remove_polygons( to_delete );
+    }
+
+    template < index_t dimension >
+    void OpenGeodePolygonalSurface< dimension >::permute_polygons(
+        absl::Span< const index_t > permutation, OGPolygonalSurfaceKey )
+    {
+        impl_->permute_polygons( permutation );
     }
 
     template < index_t dimension >

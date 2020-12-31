@@ -40,6 +40,7 @@ namespace geode
             .def( "create_edges", &GraphBuilder::create_edges )
             .def( "set_edge_vertex", &GraphBuilder::set_edge_vertex )
             .def( "delete_edges", &GraphBuilder::delete_edges )
+            .def( "permute_edges", &GraphBuilder::permute_edges )
             .def( "delete_isolated_vertices",
                 &GraphBuilder::delete_isolated_vertices );
     }

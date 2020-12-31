@@ -45,7 +45,7 @@ template < typename GeodeFactory >
 void check_register( absl::string_view extension )
 {
     OPENGEODE_EXCEPTION( GeodeFactory::has_creator( extension.data() ),
-        "[Test] No creator for extension ", extension, " is not correct" );
+        "[Test] No creator for extension ", extension, " is not correct" );
 }
 
 void test()
