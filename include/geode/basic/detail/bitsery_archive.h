@@ -25,6 +25,8 @@
 
 #include <geode/basic/bitsery_archive.h>
 
+#include <absl/container/inlined_vector.h>
+
 #include <bitsery/brief_syntax/array.h>
 
 #include <geode/basic/attribute_manager.h>
@@ -57,6 +59,9 @@ namespace geode
                 Serializer >( context, "array_index_t_4" );
             AttributeManager::register_attribute_type< uuid, Serializer >(
                 context, "uuid" );
+            AttributeManager::register_attribute_type<
+                absl::InlinedVector< index_t, 10 >, Serializer >(
+                context, "inlined_vector_index_t_10" );
         }
     } // namespace detail
 } // namespace geode

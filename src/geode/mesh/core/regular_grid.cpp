@@ -374,8 +374,8 @@ namespace geode
     void RegularGrid< dimension >::serialize( Archive& archive )
     {
         archive.ext( *this, DefaultGrowable< Archive, RegularGrid >{},
-            []( Archive& a, RegularGrid& regulard_grid ) {
-                a.object( regulard_grid.impl_ );
+            []( Archive& a, RegularGrid& regular_grid ) {
+                a.object( regular_grid.impl_ );
             } );
     }
 

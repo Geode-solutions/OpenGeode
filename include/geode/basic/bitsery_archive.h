@@ -26,6 +26,7 @@
 #include <functional>
 
 #include <absl/container/fixed_array.h>
+#include <absl/container/inlined_vector.h>
 
 #include <bitsery/adapter/stream.h>
 #include <bitsery/bitsery.h>
@@ -164,6 +165,36 @@ namespace bitsery
             static constexpr bool SupportLambdaOverload = true;
         };
     } // namespace traits
+
+    namespace traits
+    {
+        template < typename T, size_t N >
+        struct ContainerTraits< absl::InlinedVector< T, N > >
+            : public StdContainer< absl::InlinedVector< T, N >, true, true >
+        {
+        };
+    } // namespace traits
+
+    template < typename Serializer, typename T, size_t N >
+    void serialize( Serializer &s, absl::InlinedVector< T, N > &obj )
+    {
+        s.container( obj, obj.max_size() );
+    }
+
+    namespace traits
+    {
+        template < typename T, size_t N >
+        struct ContainerTraits< absl::FixedArray< T, N > >
+            : public StdContainer< absl::FixedArray< T, N >, true, true >
+        {
+        };
+    } // namespace traits
+
+    template < typename Serializer, typename T, size_t N >
+    void serialize( Serializer &s, absl::FixedArray< T, N > &obj )
+    {
+        s.container( obj, obj.max_size() );
+    }
 } // namespace bitsery
 
 #define SERIALIZE_BITSERY_ARCHIVE( EXPORT, TYPE )                              \
