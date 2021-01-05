@@ -208,51 +208,51 @@ void test_permutation(
     std::vector< geode::index_t > polyhedron_permutation{ 3, 2, 0, 1 };
     builder.permute_polyhedra( polyhedron_permutation );
     OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 0, 0 } ) == 5,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
+        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
     OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 0, 1 } ) == 1,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
+        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
     OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 0, 2 } ) == 4,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
+        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
     OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 0, 3 } ) == 6,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
+        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
     OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 1, 0 } ) == 2,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
+        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
     OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 1, 1 } ) == 5,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
+        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
     OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 1, 2 } ) == 4,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
+        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
     OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 1, 3 } ) == 8,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
+        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
     OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 1, 4 } ) == 6,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
+        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
     OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 2, 0 } ) == 10,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
+        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
     OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 2, 1 } ) == 0,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
+        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
     OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 2, 2 } ) == 9,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
+        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
     OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 2, 3 } ) == 3,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
+        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
     OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 2, 4 } ) == 2,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
+        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
     OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 2, 5 } ) == 5,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
+        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
     OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 2, 6 } ) == 4,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
+        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
     OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 2, 7 } ) == 8,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
+        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
     OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 3, 0 } ) == 0,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
+        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
     OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 3, 1 } ) == 7,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
+        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
     OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 3, 2 } ) == 9,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
+        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
     OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 3, 3 } ) == 5,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
+        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
     OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 3, 4 } ) == 1,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
+        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
     OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 3, 5 } ) == 4,
-        "[Test] Wrong PolyhedronVertex after vertex permute" );
+        "[Test] Wrong PolyhedronVertex after polyhedron permute" );
 
     OPENGEODE_EXCEPTION( solid.polyhedron_adjacent( { 0, 1 } ) == 1,
         "[Test] Wrong Adjacency after polyhedron permute" );
