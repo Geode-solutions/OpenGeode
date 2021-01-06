@@ -25,6 +25,8 @@
 
 #include <vector>
 
+#include <absl/types/span.h>
+
 #include <geode/mesh/common.h>
 #include <geode/mesh/core/mesh_id.h>
 
@@ -76,6 +78,15 @@ namespace geode
         std::vector< index_t > delete_vertices(
             const std::vector< bool >& to_delete );
 
+        /*!
+         * Permute vertices to match the given order.
+         * @param[in] permutation Vector of size vertex_set_.nb_vertices().
+         * Each value corresponds to the destination position.
+         * @return  the mapping between old vertex indices to new ones.
+         */
+        absl::FixedArray< index_t > permute_vertices(
+            absl::Span< const index_t > permutation );
+
         void set_mesh( VertexSet& mesh, MeshBuilderFactoryKey );
 
     protected:
@@ -91,8 +102,12 @@ namespace geode
 
         virtual void do_create_vertices( index_t nb ) = 0;
 
-        virtual void do_delete_vertices(
-            const std::vector< bool >& to_delete ) = 0;
+        virtual void do_delete_vertices( const std::vector< bool >& to_delete,
+            absl::Span< const index_t > old2new ) = 0;
+
+        virtual void do_permute_vertices(
+            absl::Span< const index_t > permutation,
+            absl::Span< const index_t > old2new ) = 0;
 
     private:
         VertexSet* vertex_set_;

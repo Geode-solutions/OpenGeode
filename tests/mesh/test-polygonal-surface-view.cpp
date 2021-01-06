@@ -44,9 +44,9 @@ void test_create_vertices( const geode::PolygonalSurface3D& polygonal_surface,
     builder.create_point( { { 9.3, 5.3, 6.7 } } );
     builder.create_point( { { 7.5, 4.2, 2.8 } } );
     OPENGEODE_EXCEPTION( polygonal_surface.isolated_vertex( 0 ),
-        "[Test] Vertices should be isolated before polygons creation" );
+        "[Test] Vertices should be isolated before polygons creation" );
     OPENGEODE_EXCEPTION( polygonal_surface.nb_vertices() == 7,
-        "[Test] PolygonalSurface should have 7 vertices" );
+        "[Test] PolygonalSurface should have 7 vertices" );
 }
 
 void test_create_viewed_vertices( const geode::PolygonalSurfaceView3D& surface,
@@ -57,10 +57,10 @@ void test_create_viewed_vertices( const geode::PolygonalSurfaceView3D& surface,
     builder.add_viewed_vertex( 3 );
     builder.add_viewed_vertex( 4 );
     OPENGEODE_EXCEPTION( surface.nb_vertices() == 4,
-        "[Test] PolygonalSurfaceView should have 4 vertices" );
+        "[Test] PolygonalSurfaceView should have 4 vertices" );
     const geode::Point3D answer{ { 8.1, 1.4, 4.7 } };
     OPENGEODE_EXCEPTION( surface.point( 2 ) == answer,
-        "[Test] PolygonalSurfaceView point is not correct" );
+        "[Test] PolygonalSurfaceView point is not correct" );
 }
 
 void test_create_viewed_polygons( const geode::PolygonalSurfaceView3D& surface,
@@ -69,16 +69,16 @@ void test_create_viewed_polygons( const geode::PolygonalSurfaceView3D& surface,
     builder.add_viewed_polygon( 1 );
     builder.add_viewed_polygon( 2 );
     OPENGEODE_EXCEPTION( surface.nb_polygons() == 2,
-        "[Test] PolygonalSurfaceView should have 2 polygons" );
+        "[Test] PolygonalSurfaceView should have 2 polygons" );
     OPENGEODE_EXCEPTION( surface.nb_vertices() == 6,
-        "[Test] PolygonalSurfaceView should have 6 vertices" );
+        "[Test] PolygonalSurfaceView should have 6 vertices" );
     OPENGEODE_EXCEPTION( surface.viewed_polygon( 0 ) == 1,
-        "[Test] PolygonalSurfaceView polygon is not correct" );
+        "[Test] PolygonalSurfaceView polygon is not correct" );
 
     OPENGEODE_EXCEPTION( surface.polygon_vertex( { 0, 2 } ) == 3,
-        "[Test] PolygonalSurfaceView PolygonVertex is not correct" );
+        "[Test] PolygonalSurfaceView PolygonVertex is not correct" );
     OPENGEODE_EXCEPTION( surface.polygon_vertex( { 1, 1 } ) == 4,
-        "[Test] PolygonalSurfaceView PolygonVertex is not correct" );
+        "[Test] PolygonalSurfaceView PolygonVertex is not correct" );
 }
 
 void test_create_polygons( const geode::PolygonalSurface3D& polygonal_surface,
@@ -88,32 +88,32 @@ void test_create_polygons( const geode::PolygonalSurface3D& polygonal_surface,
     builder.create_polygon( { 1, 3, 4, 2 } );
     builder.create_polygon( { 1, 5, 6, 3 } );
     OPENGEODE_EXCEPTION( !polygonal_surface.isolated_vertex( 0 ),
-        "[Test] Vertices should not be isolated after polygons creation" );
+        "[Test] Vertices should not be isolated after polygons creation" );
     OPENGEODE_EXCEPTION( polygonal_surface.nb_polygons() == 3,
-        "[Test] PolygonalSurface should have 3 polygons" );
+        "[Test] PolygonalSurface should have 3 polygons" );
 }
 
 void test_polygon_adjacencies(
     const geode::PolygonalSurface3D& polygonal_surface )
 {
     OPENGEODE_EXCEPTION( polygonal_surface.polygon_adjacent( { 0, 0 } ) == 1,
-        "[Test] PolygonalSurface adjacent index is not correct" );
+        "[Test] PolygonalSurface adjacent index is not correct" );
     OPENGEODE_EXCEPTION( !polygonal_surface.polygon_adjacent( { 0, 1 } ),
-        "[Test] PolygonalSurface adjacent index is not correct" );
+        "[Test] PolygonalSurface adjacent index is not correct" );
     OPENGEODE_EXCEPTION( polygonal_surface.polygon_adjacent( { 1, 3 } ) == 0,
-        "[Test] PolygonalSurface adjacent index is not correct" );
+        "[Test] PolygonalSurface adjacent index is not correct" );
     OPENGEODE_EXCEPTION( polygonal_surface.polygon_adjacent_edge( { 0, 0 } )
                              == geode::PolygonEdge( 1, 3 ),
-        "[Test] PolygonalSurface adjacent index is not correct" );
+        "[Test] PolygonalSurface adjacent index is not correct" );
 
     OPENGEODE_EXCEPTION(
         polygonal_surface.polygons_around_vertex( 0 ).size() == 2,
-        "[Test] PolygonalSurface polygons around vertex index is not correct" );
+        "[Test] PolygonalSurface polygons around vertex index is not correct" );
     const auto polys = polygonal_surface.polygons_around_vertex( 1 );
     OPENGEODE_EXCEPTION( polys.size() == 1,
-        "[Test] PolygonalSurface polygons around vertex index is not correct" );
+        "[Test] PolygonalSurface polygons around vertex index is not correct" );
     OPENGEODE_EXCEPTION( polys.front().polygon_id == 0,
-        "[Test] PolygonalSurface polygons around vertex index is not correct" );
+        "[Test] PolygonalSurface polygons around vertex index is not correct" );
 }
 
 std::unique_ptr< geode::PolygonalSurface3D > create_surface()

@@ -49,9 +49,9 @@ void test_create_vertices( const geode::PolygonalSurface3D& polygonal_surface,
     builder.create_point( { { 9.3, 5.3, 6.7 } } );
     builder.create_point( { { 7.5, 4.2, 2.8 } } );
     OPENGEODE_EXCEPTION( polygonal_surface.isolated_vertex( 0 ),
-        "[Test] Vertices should be isolated before polygons creation" );
+        "[Test] Vertices should be isolated before polygons creation" );
     OPENGEODE_EXCEPTION( polygonal_surface.nb_vertices() == 7,
-        "[Test] PolygonalSurface should have 7 vertices" );
+        "[Test] PolygonalSurface should have 7 vertices" );
 }
 
 void test_bounding_box( const geode::PolygonalSurface3D& polygonal_surface )
@@ -75,8 +75,99 @@ void test_create_vertex_attribute(
     {
         attribute->set_value( v, geode::PolygonEdge{ v, 0 } );
         OPENGEODE_EXCEPTION( geode::PolygonVertex{} != attribute->value( v ),
-            "[Test] PolygonalSurface attribute assignation is not correct" );
+            "[Test] PolygonalSurface attribute assignation is not correct" );
     }
+}
+
+void test_permutation( const geode::PolygonalSurface3D& surface,
+    geode::PolygonalSurfaceBuilder3D& builder )
+{
+    std::vector< geode::index_t > vertex_permutation{ 4, 2, 6, 1, 5, 0, 3 };
+    builder.permute_vertices( vertex_permutation );
+    OPENGEODE_EXCEPTION( surface.polygon_vertex( { 0, 0 } ) == 5,
+        "[Test] Wrong PolygonVertex after vertex permute" );
+    OPENGEODE_EXCEPTION( surface.polygon_vertex( { 0, 1 } ) == 3,
+        "[Test] Wrong PolygonVertex after vertex permute" );
+    OPENGEODE_EXCEPTION( surface.polygon_vertex( { 0, 2 } ) == 1,
+        "[Test] Wrong PolygonVertex after vertex permute" );
+    OPENGEODE_EXCEPTION( surface.polygon_vertex( { 1, 0 } ) == 3,
+        "[Test] Wrong PolygonVertex after vertex permute" );
+    OPENGEODE_EXCEPTION( surface.polygon_vertex( { 1, 1 } ) == 6,
+        "[Test] Wrong PolygonVertex after vertex permute" );
+    OPENGEODE_EXCEPTION( surface.polygon_vertex( { 1, 2 } ) == 0,
+        "[Test] Wrong PolygonVertex after vertex permute" );
+    OPENGEODE_EXCEPTION( surface.polygon_vertex( { 1, 3 } ) == 1,
+        "[Test] Wrong PolygonVertex after vertex permute" );
+    OPENGEODE_EXCEPTION( surface.polygon_vertex( { 2, 0 } ) == 3,
+        "[Test] Wrong PolygonVertex after vertex permute" );
+    OPENGEODE_EXCEPTION( surface.polygon_vertex( { 2, 1 } ) == 4,
+        "[Test] Wrong PolygonVertex after vertex permute" );
+    OPENGEODE_EXCEPTION( surface.polygon_vertex( { 2, 2 } ) == 2,
+        "[Test] Wrong PolygonVertex after vertex permute" );
+    OPENGEODE_EXCEPTION( surface.polygon_vertex( { 2, 3 } ) == 6,
+        "[Test] Wrong PolygonVertex after vertex permute" );
+
+    std::vector< geode::index_t > polygon_permutation{ 2, 0, 1 };
+    builder.permute_polygons( polygon_permutation );
+    OPENGEODE_EXCEPTION( surface.polygon_vertex( { 0, 0 } ) == 3,
+        "[Test] Wrong PolygonVertex after polygon permute" );
+    OPENGEODE_EXCEPTION( surface.polygon_vertex( { 0, 1 } ) == 4,
+        "[Test] Wrong PolygonVertex after polygon permute" );
+    OPENGEODE_EXCEPTION( surface.polygon_vertex( { 0, 2 } ) == 2,
+        "[Test] Wrong PolygonVertex after polygon permute" );
+    OPENGEODE_EXCEPTION( surface.polygon_vertex( { 0, 3 } ) == 6,
+        "[Test] Wrong PolygonVertex after polygon permute" );
+    OPENGEODE_EXCEPTION( surface.polygon_vertex( { 1, 0 } ) == 5,
+        "[Test] Wrong PolygonVertex after polygon permute" );
+    OPENGEODE_EXCEPTION( surface.polygon_vertex( { 1, 1 } ) == 3,
+        "[Test] Wrong PolygonVertex after polygon permute" );
+    OPENGEODE_EXCEPTION( surface.polygon_vertex( { 1, 2 } ) == 1,
+        "[Test] Wrong PolygonVertex after polygon permute" );
+    OPENGEODE_EXCEPTION( surface.polygon_vertex( { 2, 0 } ) == 3,
+        "[Test] Wrong PolygonVertex after polygon permute" );
+    OPENGEODE_EXCEPTION( surface.polygon_vertex( { 2, 1 } ) == 6,
+        "[Test] Wrong PolygonVertex after polygon permute" );
+    OPENGEODE_EXCEPTION( surface.polygon_vertex( { 2, 2 } ) == 0,
+        "[Test] Wrong PolygonVertex after polygon permute" );
+    OPENGEODE_EXCEPTION( surface.polygon_vertex( { 2, 3 } ) == 1,
+        "[Test] Wrong PolygonVertex after polygon permute" );
+
+    OPENGEODE_EXCEPTION( surface.polygon_adjacent( { 0, 3 } ) == 2,
+        "[Test] Wrong Adjacency after polygon permute" );
+    OPENGEODE_EXCEPTION( surface.polygon_adjacent( { 2, 0 } ) == 0,
+        "[Test] Wrong Adjacency after polygon permute" );
+    OPENGEODE_EXCEPTION( surface.polygon_adjacent( { 1, 1 } ) == 2,
+        "[Test] Wrong Adjacency after polygon permute" );
+    OPENGEODE_EXCEPTION( !surface.polygon_adjacent( { 1, 0 } ),
+        "[Test] Wrong Adjacency after polygon permute" );
+
+    const auto polygons_3 = surface.polygons_around_vertex( 3 );
+    OPENGEODE_EXCEPTION( polygons_3.size() == 3,
+        "[Test] Wrong polygons_3 after polygon permute" );
+    OPENGEODE_EXCEPTION( polygons_3[0].polygon_id == 0,
+        "[Test] Wrong polygons_3 after polygon permute" );
+    OPENGEODE_EXCEPTION( polygons_3[0].vertex_id == 0,
+        "[Test] Wrong polygons_3 after polygon permute" );
+    OPENGEODE_EXCEPTION( polygons_3[1].polygon_id == 2,
+        "[Test] Wrong polygons_3 after polygon permute" );
+    OPENGEODE_EXCEPTION( polygons_3[1].vertex_id == 0,
+        "[Test] Wrong polygons_3 after polygon permute" );
+    OPENGEODE_EXCEPTION( polygons_3[2].polygon_id == 1,
+        "[Test] Wrong polygons_3 after polygon permute" );
+    OPENGEODE_EXCEPTION( polygons_3[2].vertex_id == 1,
+        "[Test] Wrong polygons_3 after polygon permute" );
+
+    const auto polygons_6 = surface.polygons_around_vertex( 6 );
+    OPENGEODE_EXCEPTION( polygons_6.size() == 2,
+        "[Test] Wrong polygons_6 after polygon permute" );
+    OPENGEODE_EXCEPTION( polygons_6[0].polygon_id == 0,
+        "[Test] Wrong polygons_6 after polygon permute" );
+    OPENGEODE_EXCEPTION( polygons_6[0].vertex_id == 3,
+        "[Test] Wrong polygons_6 after polygon permute" );
+    OPENGEODE_EXCEPTION( polygons_6[1].polygon_id == 2,
+        "[Test] Wrong polygons_6 after polygon permute" );
+    OPENGEODE_EXCEPTION( polygons_6[1].vertex_id == 1,
+        "[Test] Wrong polygons_6 after polygon permute" );
 }
 
 void test_delete_vertex( const geode::PolygonalSurface3D& polygonal_surface,
@@ -86,38 +177,38 @@ void test_delete_vertex( const geode::PolygonalSurface3D& polygonal_surface,
     to_delete.front() = true;
     builder.delete_vertices( to_delete );
     OPENGEODE_EXCEPTION( polygonal_surface.nb_vertices() == 6,
-        "[Test] PolygonalSurface should have 6 vertices" );
+        "[Test] PolygonalSurface should have 6 vertices" );
     const geode::Point3D answer{ { 2.1, 9.4, 6.7 } };
-    OPENGEODE_EXCEPTION( polygonal_surface.point( 0 ) == answer,
-        "[Test] PolygonalSurface vertex coordinates are not correct" );
+    OPENGEODE_EXCEPTION( polygonal_surface.point( 2 ) == answer,
+        "[Test] PolygonalSurface vertex coordinates are not correct" );
     OPENGEODE_EXCEPTION( polygonal_surface.nb_polygons() == 2,
-        "[Test] PolygonalSurface should have 2 polygons" );
-    OPENGEODE_EXCEPTION( polygonal_surface.polygon_adjacent( { 1, 3 } ) == 0,
-        "[Test] PolygonalSurface adjacent index is not correct" );
+        "[Test] PolygonalSurface should have 2 polygons" );
+    OPENGEODE_EXCEPTION( !polygonal_surface.polygon_adjacent( { 1, 2 } ),
+        "[Test] PolygonalSurface adjacent index is not correct" );
     OPENGEODE_EXCEPTION( polygonal_surface.edges().nb_edges() == 7,
-        "[Test] PolygonalSurface should have 7 edges" );
+        "[Test] PolygonalSurface should have 7 edges" );
 
     const auto attribute = polygonal_surface.edges()
                                .edge_attribute_manager()
                                .find_attribute< geode::index_t >( "test" );
     OPENGEODE_EXCEPTION( attribute->value( 4 ) == 6,
-        "[Test] Update of edge attributes after "
+        "[Test] Update of edge attributes after "
         "vertex deletion is not correct (value of 4)" );
     OPENGEODE_EXCEPTION( attribute->value( 5 ) == 7,
-        "[Test] Update of edge attributes after "
+        "[Test] Update of edge attributes after "
         "vertex deletion is not correct (value of 5)" );
     OPENGEODE_EXCEPTION( attribute->value( 6 ) == 8,
-        "[Test] Update of edge attributes after "
+        "[Test] Update of edge attributes after "
         "vertex deletion is not correct (value of 6)" );
     OPENGEODE_EXCEPTION(
         polygonal_surface.edges().edge_from_vertices(
             polygonal_surface.polygon_edge_vertices( { 1, 0 } ) )
-            == 4,
+            == 0,
         "[Test] Edge index for PolygonEdge( 1, 0 ) is not correct" );
     OPENGEODE_EXCEPTION(
         polygonal_surface.edges().edge_from_vertices(
-            polygonal_surface.polygon_edge_vertices( { 1, 3 } ) )
-            == 1,
+            polygonal_surface.polygon_edge_vertices( { 1, 2 } ) )
+            == 2,
         "[Test] Edge index for PolygonEdge( 1, 3 ) is not correct" );
 }
 
@@ -128,11 +219,11 @@ void test_create_polygons( const geode::PolygonalSurface3D& polygonal_surface,
     builder.create_polygon( { 1, 3, 4, 2 } );
     builder.create_polygon( { 1, 5, 6, 3 } );
     OPENGEODE_EXCEPTION( !polygonal_surface.isolated_vertex( 0 ),
-        "[Test] Vertices should not be isolated after polygons creation" );
+        "[Test] Vertices should not be isolated after polygons creation" );
     OPENGEODE_EXCEPTION( polygonal_surface.nb_polygons() == 3,
-        "[Test] PolygonalSurface should have 3 polygons" );
+        "[Test] PolygonalSurface should have 3 polygons" );
     OPENGEODE_EXCEPTION( polygonal_surface.edges().nb_edges() == 9,
-        "[Test] PolygonalSurface should have 9 edges" );
+        "[Test] PolygonalSurface should have 9 edges" );
 }
 
 void test_create_edge_attribute(
@@ -154,29 +245,29 @@ void test_polygon_adjacencies(
 {
     builder.compute_polygon_adjacencies();
     OPENGEODE_EXCEPTION( !polygonal_surface.polygon_adjacent( { 0, 0 } ),
-        "[Test] PolygonalSurface adjacent index is not correct" );
+        "[Test] PolygonalSurface adjacent index is not correct" );
     OPENGEODE_EXCEPTION( polygonal_surface.polygon_adjacent( { 0, 1 } ) == 1,
-        "[Test] PolygonalSurface adjacent index is not correct" );
+        "[Test] PolygonalSurface adjacent index is not correct" );
     OPENGEODE_EXCEPTION( polygonal_surface.polygon_adjacent( { 1, 3 } ) == 0,
-        "[Test] PolygonalSurface adjacent index is not correct" );
+        "[Test] PolygonalSurface adjacent index is not correct" );
     OPENGEODE_EXCEPTION( polygonal_surface.polygon_adjacent_edge( { 0, 1 } )
                              == geode::PolygonEdge( 1, 3 ),
-        "[Test] PolygonalSurface adjacent index is not correct" );
+        "[Test] PolygonalSurface adjacent index is not correct" );
     OPENGEODE_EXCEPTION(
         polygonal_surface.edges().edge_from_vertices(
             polygonal_surface.polygon_edge_vertices( { 0, 1 } ) )
             == polygonal_surface.edges().edge_from_vertices(
                 polygonal_surface.polygon_edge_vertices( { 1, 3 } ) ),
-        "[Test] PolygonalSurface edge indices is not correct" );
+        "[Test] PolygonalSurface edge indices is not correct" );
 
     OPENGEODE_EXCEPTION( !polygonal_surface.polygon_adjacent( { 2, 0 } ),
-        "[Test] PolygonalSurface adjacent index is not correct" );
+        "[Test] PolygonalSurface adjacent index is not correct" );
     OPENGEODE_EXCEPTION( polygonal_surface.polygon_adjacent( { 2, 3 } ) == 1,
-        "[Test] PolygonalSurface adjacent index is not correct" );
+        "[Test] PolygonalSurface adjacent index is not correct" );
 
     OPENGEODE_EXCEPTION(
         polygonal_surface.polygons_around_vertex( 1 ).size() == 3,
-        "[Test] PolygonalSurface should have 3 polygons around this vertex" );
+        "[Test] PolygonalSurface should have 3 polygons around this vertex" );
 }
 
 void test_polygon_edges_on_borders(
@@ -184,12 +275,12 @@ void test_polygon_edges_on_borders(
 {
     const auto result = polygonal_surface.polygon_edges_on_border( 0 );
     OPENGEODE_EXCEPTION( result.size() == 2,
-        "[Test] Number of polygon edges on border index is not correct" );
+        "[Test] Number of polygon edges on border index is not correct" );
     OPENGEODE_EXCEPTION(
         absl::c_find( result, geode::PolygonEdge( 0, 0 ) ) != result.end()
             && absl::c_find( result, geode::PolygonEdge( 0, 2 ) )
                    != result.end(),
-        "[Test] Polygon edge indices on border index is not correct" );
+        "[Test] Polygon edge indices on border index is not correct" );
 }
 
 void test_previous_next_on_border(
@@ -197,10 +288,10 @@ void test_previous_next_on_border(
 {
     OPENGEODE_EXCEPTION( polygonal_surface.previous_on_border( { 0, 0 } )
                              == geode::PolygonEdge( 0, 2 ),
-        "[Test] Previous edge on border index is not correct" );
+        "[Test] Previous edge on border index is not correct" );
     OPENGEODE_EXCEPTION( polygonal_surface.next_on_border( { 0, 0 } )
                              == geode::PolygonEdge( 2, 0 ),
-        "[Test] Next edge on border index is not correct" );
+        "[Test] Next edge on border index is not correct" );
 }
 
 void test_polygon_edge_requests(
@@ -209,25 +300,25 @@ void test_polygon_edge_requests(
     OPENGEODE_EXCEPTION( polygonal_surface.edge_length(
                              polygonal_surface.edges().edge_vertices( 0 ) )
                              == std::sqrt( 2 * 2 + 9.2 * 9.2 + 6.4 * 6.4 ),
-        "[Test] Polygon edge length is not correct" );
+        "[Test] Polygon edge length is not correct" );
     OPENGEODE_EXCEPTION( polygonal_surface.edge_barycenter(
                              polygonal_surface.edges().edge_vertices( 0 ) )
                              == geode::Point3D( { 1.1, 4.8, 3.5 } ),
-        "[Test] Polygon edge barycenter is not correct" );
+        "[Test] Polygon edge barycenter is not correct" );
     OPENGEODE_EXCEPTION(
         polygonal_surface.polygon_edge_vertex( { 0, 0 }, 1 ) == 1,
-        "[Test] Polygon edge vertex index is not correct" );
+        "[Test] Polygon edge vertex index is not correct" );
     auto polygon_edge = polygonal_surface.polygon_edge_from_vertices( 3, 5 );
     OPENGEODE_EXCEPTION(
-        !polygon_edge, "[Test] Polygon edge from vertices is not correct" );
+        !polygon_edge, "[Test] Polygon edge from vertices is not correct" );
     polygon_edge = polygonal_surface.polygon_edge_from_vertices( 0, 1 );
     OPENGEODE_EXCEPTION(
-        polygon_edge, "[Test] Polygon edge from vertices is not correct" );
+        polygon_edge, "[Test] Polygon edge from vertices is not correct" );
     OPENGEODE_EXCEPTION( polygon_edge == geode::PolygonEdge( 0, 0 ),
-        "[Test] Polygon edge from vertices is not correct" );
+        "[Test] Polygon edge from vertices is not correct" );
     polygon_edge = polygonal_surface.polygon_edge_from_vertices( 1, 0 );
     OPENGEODE_EXCEPTION(
-        !polygon_edge, "[Test] Polygon edge from vertices is not correct" );
+        !polygon_edge, "[Test] Polygon edge from vertices is not correct" );
 }
 
 void test_delete_polygon( const geode::PolygonalSurface3D& polygonal_surface,
@@ -237,42 +328,40 @@ void test_delete_polygon( const geode::PolygonalSurface3D& polygonal_surface,
     to_delete.front() = true;
     builder.delete_polygons( to_delete );
     OPENGEODE_EXCEPTION( polygonal_surface.nb_polygons() == 1,
-        "[Test] PolygonalSurface should have 1 polygon" );
-    OPENGEODE_EXCEPTION( polygonal_surface.polygon_vertex( { 0, 0 } ) == 0,
-        "[Test] PolygonalSurface edge vertex index is not correct" );
-    OPENGEODE_EXCEPTION( polygonal_surface.polygon_vertex( { 0, 1 } ) == 4,
-        "[Test] PolygonalSurface edge vertex index is not correct" );
-    OPENGEODE_EXCEPTION( polygonal_surface.polygon_vertex( { 0, 2 } ) == 5,
-        "[Test] PolygonalSurface edge vertex index is not correct" );
-    OPENGEODE_EXCEPTION( polygonal_surface.polygon_vertex( { 0, 3 } ) == 2,
-        "[Test] PolygonalSurface edge vertex index is not correct" );
-    OPENGEODE_EXCEPTION( polygonal_surface.edges().nb_edges() == 4,
-        "[Test] PolygonalSurface should have 4 edges" );
+        "[Test] PolygonalSurface should have 1 polygon" );
+    OPENGEODE_EXCEPTION( polygonal_surface.polygon_vertex( { 0, 0 } ) == 4,
+        "[Test] PolygonalSurface edge vertex index is not correct" );
+    OPENGEODE_EXCEPTION( polygonal_surface.polygon_vertex( { 0, 1 } ) == 2,
+        "[Test] PolygonalSurface edge vertex index is not correct" );
+    OPENGEODE_EXCEPTION( polygonal_surface.polygon_vertex( { 0, 2 } ) == 0,
+        "[Test] PolygonalSurface edge vertex index is not correct" );
+    OPENGEODE_EXCEPTION( polygonal_surface.edges().nb_edges() == 3,
+        "[Test] PolygonalSurface should have  edges" );
     OPENGEODE_EXCEPTION( !polygonal_surface.edges().isolated_edge( 0 ),
-        "[Test] Edge should not be isolated after polygon deletion" );
+        "[Test] Edge should not be isolated after polygon deletion" );
 
     const auto attribute = polygonal_surface.edges()
                                .edge_attribute_manager()
                                .find_attribute< geode::index_t >( "test" );
-    OPENGEODE_EXCEPTION( attribute->value( 1 ) == 6,
-        "[Test] Update of edge attributes after "
-        "polygon deletion is not correct (value of 1)" );
-    OPENGEODE_EXCEPTION( attribute->value( 2 ) == 7,
-        "[Test] Update of edge attributes after "
-        "polygon deletion is not correct (value of 2)" );
-    OPENGEODE_EXCEPTION( attribute->value( 3 ) == 8,
-        "[Test] Update of edge attributes after "
-        "polygon deletion is not correct (value of 3)" );
+    OPENGEODE_EXCEPTION( attribute->value( 0 ) == 0,
+        "[Test] Update of edge attributes after "
+        "polygon deletion is not correct" );
+    OPENGEODE_EXCEPTION( attribute->value( 1 ) == 1,
+        "[Test] Update of edge attributes after "
+        "polygon deletion is not correct" );
+    OPENGEODE_EXCEPTION( attribute->value( 2 ) == 2,
+        "[Test] Update of edge attributes after "
+        "polygon deletion is not correct" );
     OPENGEODE_EXCEPTION(
         polygonal_surface.edges().edge_from_vertices(
             polygonal_surface.polygon_edge_vertices( { 0, 0 } ) )
-            == 1,
+            == 0,
         "[Test] Edge index for PolygonEdge( 0, 0 ) is not correct" );
     OPENGEODE_EXCEPTION(
         polygonal_surface.edges().edge_from_vertices(
-            polygonal_surface.polygon_edge_vertices( { 0, 3 } ) )
-            == 0,
-        "[Test] Edge index for PolygonEdge( 0, 3 ) is not correct" );
+            polygonal_surface.polygon_edge_vertices( { 0, 2 } ) )
+            == 2,
+        "[Test] Edge index for PolygonEdge( 0, 2 ) is not correct" );
 }
 
 void test_polygon_barycenter(
@@ -280,7 +369,7 @@ void test_polygon_barycenter(
 {
     const geode::Point3D answer( { 5.6, 4.525, 4.75 } );
     OPENGEODE_EXCEPTION( polygonal_surface.polygon_barycenter( 1 ) == answer,
-        "[Test] PolygonalSurface polygon barycenter is not correct" );
+        "[Test] PolygonalSurface polygon barycenter is not correct" );
 }
 
 void test_polygon_area()
@@ -302,7 +391,7 @@ void test_polygon_area()
 
     const double answer{ 28. };
     OPENGEODE_EXCEPTION( polygonal_surface->polygon_area( 0 ) == answer,
-        "[Test] PolygonalSurface polygon area is not correct" );
+        "[Test] PolygonalSurface polygon area is not correct" );
 }
 
 void test_polygon_normal()
@@ -324,7 +413,7 @@ void test_polygon_normal()
 
     const geode::Vector3D answer{ { 0., 0., 1. } };
     OPENGEODE_EXCEPTION( polygonal_surface->polygon_normal( 0 ) == answer,
-        "[Test] PolygonalSurface polygon normal is not correct" );
+        "[Test] PolygonalSurface polygon normal is not correct" );
 }
 
 void test_polygon_vertex_normal()
@@ -346,7 +435,7 @@ void test_polygon_vertex_normal()
     const geode::Vector3D answer{ { 0., 0., 1. } };
     OPENGEODE_EXCEPTION(
         polygonal_surface->polygon_vertex_normal( 0 ) == answer,
-        "[Test] PolygonalSurface polygon vertex normal is not correct" );
+        "[Test] PolygonalSurface polygon vertex normal is not correct" );
 }
 
 void test_io( const geode::PolygonalSurface3D& polygonal_surface,
@@ -358,15 +447,15 @@ void test_io( const geode::PolygonalSurface3D& polygonal_surface,
         geode::OpenGeodePolygonalSurface3D::impl_name_static(), filename );
 
     OPENGEODE_EXCEPTION( new_polygonal_surface->nb_vertices() == 7,
-        "[Test] Reloaded PolygonalSurface should have 7 vertices" );
+        "[Test] Reloaded PolygonalSurface should have 7 vertices" );
     OPENGEODE_EXCEPTION( new_polygonal_surface->edges().nb_edges() == 9,
-        "[Test] Reloaded PolygonalSurface should have 9 edges" );
+        "[Test] Reloaded PolygonalSurface should have 9 edges" );
     OPENGEODE_EXCEPTION( new_polygonal_surface->nb_polygons() == 3,
-        "[Test] Reloaded PolygonalSurface should have 3 polygons" );
+        "[Test] Reloaded PolygonalSurface should have 3 polygons" );
     OPENGEODE_EXCEPTION(
         new_polygonal_surface->edges().edge_from_vertices( { 1, 0 } )
             == polygonal_surface.edges().edge_from_vertices( { 1, 0 } ),
-        "[Test] Reloaded PolygonalSurface has wrong polygon edge index" );
+        "[Test] Reloaded PolygonalSurface has wrong polygon edge index" );
     const auto attribute = new_polygonal_surface->edges()
                                .edge_attribute_manager()
                                .find_attribute< geode::index_t >( "test" );
@@ -374,7 +463,7 @@ void test_io( const geode::PolygonalSurface3D& polygonal_surface,
         geode::Range{ new_polygonal_surface->edges().nb_edges() } )
     {
         OPENGEODE_EXCEPTION( attribute->value( e ) == e,
-            "[Test] Reloaded PolygonalSurface has "
+            "[Test] Reloaded PolygonalSurface has "
             "wrong attributes on its edges" );
     }
 }
@@ -403,21 +492,21 @@ void test_clone( const geode::PolygonalSurface3D& polygonal_surface )
 {
     const auto polygonal_surface2 = polygonal_surface.clone();
     OPENGEODE_EXCEPTION( polygonal_surface2->nb_vertices() == 6,
-        "[Test] PolygonalSurface2 should have 6 vertices" );
-    OPENGEODE_EXCEPTION( polygonal_surface2->edges().nb_edges() == 4,
-        "[Test] PolygonalSurface2 should have 4 edges" );
+        "[Test] PolygonalSurface2 should have 6 vertices" );
+    OPENGEODE_EXCEPTION( polygonal_surface2->edges().nb_edges() == 3,
+        "[Test] PolygonalSurface2 should have 3 edges" );
     OPENGEODE_EXCEPTION( polygonal_surface2->nb_polygons() == 1,
-        "[Test] PolygonalSurface2 should have 1 polygon" );
+        "[Test] PolygonalSurface2 should have 1 polygon" );
 
     const auto attribute2 = polygonal_surface2->vertex_attribute_manager()
                                 .find_attribute< geode::PolygonEdge >( "test" );
+    std::vector< geode::PolygonEdge > att_answer{ { 2, 0 }, { 6, 0 }, { 1, 0 },
+        { 5, 0 }, { 0, 0 }, { 3, 0 } };
     for( const auto v : geode::Range{ polygonal_surface2->nb_vertices() } )
     {
-        const geode::PolygonEdge answer{ v + 1, 0 };
-        OPENGEODE_EXCEPTION( attribute2->value( v ) != geode::PolygonEdge{},
-            "[Test] PolygonalSurface2 attribute is not correct" );
-        OPENGEODE_EXCEPTION( attribute2->value( v ) == answer,
-            "[Test] PolygonalSurface2 attribute is not correct" );
+        const geode::PolygonEdge answer{ v, 0 };
+        OPENGEODE_EXCEPTION( attribute2->value( v ) == att_answer[v],
+            "[Test] PolygonalSurface2 attribute is not correct" );
     }
 }
 
@@ -430,7 +519,7 @@ void test_set_polygon_vertex(
     OPENGEODE_EXCEPTION( polygonal_surface.polygon_vertex( { 0, 2 } ) == 1,
         "[Test] PolygonVertex after set_polygon_vertex is wrong" );
 
-    const auto vertices = polygonal_surface.edges().edge_vertices( 3 );
+    const auto vertices = polygonal_surface.edges().edge_vertices( 1 );
     OPENGEODE_EXCEPTION( vertices[0] == 1 && vertices[1] == 4,
         "[Test] Edge vertices after set_polygon_vertex is wrong" );
 }
@@ -465,17 +554,17 @@ void test_delete_all( const geode::PolygonalSurface3D& polygonal_surface,
     std::vector< bool > to_delete( polygonal_surface.nb_polygons(), true );
     builder.delete_polygons( to_delete );
     OPENGEODE_EXCEPTION( polygonal_surface.nb_vertices() == 6,
-        "[Test] PolygonalSurface should have 6 vertices" );
+        "[Test] PolygonalSurface should have 6 vertices" );
     OPENGEODE_EXCEPTION( polygonal_surface.edges().nb_edges() == 0,
-        "[Test] PolygonalSurface should have 0 edge" );
+        "[Test] PolygonalSurface should have 0 edge" );
     OPENGEODE_EXCEPTION( polygonal_surface.nb_polygons() == 0,
-        "[Test] PolygonalSurface should have 0 polygon" );
+        "[Test] PolygonalSurface should have 0 polygon" );
     OPENGEODE_EXCEPTION( polygonal_surface.polygons_around_vertex( 0 ).empty(),
         "[Test] No more polygon around vertices" );
 
     builder.delete_isolated_vertices();
     OPENGEODE_EXCEPTION( polygonal_surface.nb_vertices() == 0,
-        "[Test] PolygonalSurface should have 0 vertex" );
+        "[Test] PolygonalSurface should have 0 vertex" );
 }
 
 void test_non_manifold_surface()
@@ -527,6 +616,7 @@ void test()
     test_backward_io( absl::StrCat(
         geode::data_path, "test_v7.", polygonal_surface->native_extension() ) );
 
+    test_permutation( *polygonal_surface, *builder );
     test_replace_vertex( *polygonal_surface, *builder );
     test_delete_vertex( *polygonal_surface, *builder );
     test_delete_polygon( *polygonal_surface, *builder );

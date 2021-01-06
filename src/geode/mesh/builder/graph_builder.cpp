@@ -29,7 +29,6 @@
 #include <geode/basic/detail/mapping_after_deletion.h>
 
 #include <geode/mesh/builder/mesh_builder_factory.h>
-#include <geode/mesh/core/graph.h>
 
 namespace
 {
@@ -57,6 +56,27 @@ namespace
             }
         }
         builder.delete_edges( edges_to_delete );
+    }
+
+    void update_edges_around( const geode::Graph& graph,
+        geode::GraphBuilder& builder,
+        absl::Span< const index_t > old2new )
+    {
+        for( const auto v : geode::Range{ graph.nb_vertices() } )
+        {
+            const auto& edges = graph.edges_around_vertex( v );
+            geode::EdgesAroundVertex new_edges;
+            new_edges.reserve( edges.size() );
+            for( const auto& edge : edges )
+            {
+                const auto edge_id = old2new[edge.edge_id];
+                if( edge_id != geode::NO_ID )
+                {
+                    new_edges.emplace_back( edge_id, edge.vertex_id );
+                }
+            }
+            builder.set_edges_around_vertex( v, std::move( new_edges ) );
+        }
     }
 } // namespace
 
@@ -133,36 +153,48 @@ namespace geode
         return first_added_edge;
     }
 
-    void GraphBuilder::do_delete_vertices(
-        const std::vector< bool >& to_delete )
+    void GraphBuilder::do_delete_vertices( const std::vector< bool >& to_delete,
+        absl::Span< const index_t > old2new )
     {
-        const auto old2new = detail::mapping_after_deletion( to_delete );
         update_edge_vertices( *graph_, *this, old2new );
-        do_delete_curve_vertices( to_delete );
+        do_delete_curve_vertices( to_delete, old2new );
+    }
+
+    void GraphBuilder::do_permute_vertices(
+        absl::Span< const index_t > permutation,
+        absl::Span< const index_t > old2new )
+    {
+        update_edge_vertices( *graph_, *this, old2new );
+        do_permute_curve_vertices( permutation, old2new );
+    }
+
+    void GraphBuilder::set_edges_around_vertex(
+        index_t vertex_id, EdgesAroundVertex edges )
+    {
+        graph_->set_edges_around_vertex( vertex_id, std::move( edges ), {} );
     }
 
     std::vector< index_t > GraphBuilder::delete_edges(
         const std::vector< bool >& to_delete )
     {
         const auto old2new = detail::mapping_after_deletion( to_delete );
-        for( const auto v : Range{ graph_->nb_vertices() } )
+        if( absl::c_find( to_delete, true ) == to_delete.end() )
         {
-            const auto& edges = graph_->edges_around_vertex( v );
-            EdgesAroundVertex new_edges;
-            new_edges.reserve( edges.size() );
-            for( const auto& edge : edges )
-            {
-                const auto edge_id = old2new[edge.edge_id];
-                if( edge_id != NO_ID )
-                {
-                    new_edges.emplace_back( edge_id, edge.vertex_id );
-                }
-            }
-            graph_->set_edges_around_vertex( v, std::move( new_edges ), {} );
+            return old2new;
         }
-
+        update_edges_around( *graph_, *this, old2new );
         graph_->edge_attribute_manager().delete_elements( to_delete );
-        do_delete_edges( to_delete );
+        do_delete_edges( to_delete, old2new );
+        return old2new;
+    }
+
+    absl::FixedArray< index_t > GraphBuilder::permute_edges(
+        absl::Span< const index_t > permutation )
+    {
+        const auto old2new = old2new_permutation( permutation );
+        update_edges_around( *graph_, *this, old2new );
+        graph_->edge_attribute_manager().permute_elements( permutation );
+        do_permute_edges( permutation, old2new );
         return old2new;
     }
 

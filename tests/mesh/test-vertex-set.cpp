@@ -37,15 +37,15 @@ void test_default_vertex_set( const geode::VertexSet& vertex_set )
 {
     const auto type_static = geode::OpenGeodeVertexSet::impl_name_static();
     OPENGEODE_EXCEPTION( vertex_set.impl_name() == type_static,
-        "[Test] VertexSet type name is not correct" );
+        "[Test] VertexSet type name is not correct" );
 
     const auto extension_static =
         geode::OpenGeodeVertexSet::native_extension_static();
     OPENGEODE_EXCEPTION( vertex_set.native_extension() == extension_static,
-        "[Test] VertexSet native extension is not correct" );
+        "[Test] VertexSet native extension is not correct" );
 
     OPENGEODE_EXCEPTION( vertex_set.nb_vertices() == 0,
-        "[Test] Default VertexSet should have no vertex" );
+        "[Test] Default VertexSet should have no vertex" );
 }
 
 void test_create_vertices(
@@ -53,10 +53,10 @@ void test_create_vertices(
 {
     builder.create_vertex();
     OPENGEODE_EXCEPTION( vertex_set.nb_vertices() == 1,
-        "[Test] VertexSet should have 1 vertex" );
+        "[Test] VertexSet should have 1 vertex" );
     builder.create_vertices( 5 );
     OPENGEODE_EXCEPTION( vertex_set.nb_vertices() == 6,
-        "[Test] VertexSet should have 6 vertices" );
+        "[Test] VertexSet should have 6 vertices" );
 }
 
 void test_delete_vertex(
@@ -66,7 +66,7 @@ void test_delete_vertex(
     to_delete.front() = true;
     builder.delete_vertices( to_delete );
     OPENGEODE_EXCEPTION( vertex_set.nb_vertices() == 5,
-        "[Test] VertexSet should have 5 vertices" );
+        "[Test] VertexSet should have 5 vertices" );
 }
 
 void test_io( const geode::VertexSet& vertex_set, absl::string_view filename )
@@ -81,7 +81,7 @@ void test_clone( const geode::VertexSet& vertex_set )
 {
     const auto vertex_set2 = vertex_set.clone();
     OPENGEODE_EXCEPTION( vertex_set2->nb_vertices() == 5,
-        "[Test] VertexSet2 should have 5 vertices" );
+        "[Test] VertexSet2 should have 5 vertices" );
 }
 
 void test()

@@ -520,7 +520,7 @@ namespace geode
         const PolygonEdge& polygon_edge, local_index_t vertex_id ) const
     {
         OPENGEODE_ASSERT( vertex_id < 2, "[SurfaceMesh::polygon_"
-                                         "edge_vertex] vertex_id should be "
+                                         "edge_vertex] vertex_id should be "
                                          "0 or 1" );
         const auto vertex = polygon_edge.edge_id;
         const auto polygon = polygon_edge.polygon_id;

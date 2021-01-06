@@ -41,7 +41,7 @@ void test_create_vertices( const geode::TetrahedralSolid3D& solid,
     builder.create_point( { { 4.7, 2.1, 1.3 } } );
     builder.create_point( { { 1.6, 8.7, 6.1 } } );
     OPENGEODE_EXCEPTION( solid.nb_vertices() == 6,
-        "[Test] TetrahedralSolid should have 6 vertices" );
+        "[Test] TetrahedralSolid should have 6 vertices" );
 }
 
 void test_create_tetrahedra( const geode::TetrahedralSolid3D& solid,
@@ -49,13 +49,13 @@ void test_create_tetrahedra( const geode::TetrahedralSolid3D& solid,
 {
     builder.reserve_tetrahedra( 3 );
     OPENGEODE_EXCEPTION( solid.nb_polyhedra() == 0,
-        "[Test] TetrahedralSolid should have no tetrahedron" );
+        "[Test] TetrahedralSolid should have no tetrahedron" );
     builder.create_tetrahedra( 1 );
     builder.create_tetrahedron( { 1, 2, 3, 4 } );
     builder.create_polyhedron( { 1, 4, 3, 5 },
         { { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 } } );
     OPENGEODE_EXCEPTION( solid.nb_polyhedra() == 3,
-        "[Test] TetrahedralSolid should have 3 tetrahedra" );
+        "[Test] TetrahedralSolid should have 3 tetrahedra" );
     builder.set_polyhedron_vertex( { 0, 0 }, 0 );
     builder.set_polyhedron_vertex( { 0, 1 }, 1 );
     builder.set_polyhedron_vertex( { 0, 2 }, 2 );
@@ -68,10 +68,10 @@ void test_create_viewed_vertices( const geode::TetrahedralSolid3D& solid,
     builder.add_viewed_vertex( 2 );
     builder.add_viewed_vertex( 3 );
     OPENGEODE_EXCEPTION( solid.nb_vertices() == 2,
-        "[Test] TetrahedralSolidView should have 2 vertices" );
+        "[Test] TetrahedralSolidView should have 2 vertices" );
     const geode::Point3D answer{ { 7.5, 5.2, 6.3 } };
     OPENGEODE_EXCEPTION( solid.point( 0 ) == answer,
-        "[Test] TetrahedralSolidView point is not correct" );
+        "[Test] TetrahedralSolidView point is not correct" );
 }
 
 void test_create_viewed_tetrahedra( const geode::TetrahedralSolidView3D& solid,
@@ -80,35 +80,35 @@ void test_create_viewed_tetrahedra( const geode::TetrahedralSolidView3D& solid,
     builder.add_viewed_tetrahedron( 1 );
     builder.add_viewed_tetrahedron( 2 );
     OPENGEODE_EXCEPTION( solid.nb_polyhedra() == 2,
-        "[Test] TetrahedralSolidView should have 2 polyhedra" );
+        "[Test] TetrahedralSolidView should have 2 polyhedra" );
     OPENGEODE_EXCEPTION( solid.nb_vertices() == 5,
-        "[Test] TetrahedralSolidView should have 5 vertices" );
+        "[Test] TetrahedralSolidView should have 5 vertices" );
     OPENGEODE_EXCEPTION( solid.viewed_tetrahedron( 0 ) == 1,
-        "[Test] TetrahedralSolidView tetrahedron is not correct" );
+        "[Test] TetrahedralSolidView tetrahedron is not correct" );
     OPENGEODE_EXCEPTION( solid.viewed_vertex( 2 ) == 1,
-        "[Test] TetrahedralSolidView vertex is not correct" );
+        "[Test] TetrahedralSolidView vertex is not correct" );
     OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 0, 0 } ) == 2,
-        "[Test] TetrahedralSolidView polyhedron vertex is not correct" );
+        "[Test] TetrahedralSolidView polyhedron vertex is not correct" );
 }
 
 void test_isolated( const geode::TetrahedralSolid3D& solid,
     geode::TetrahedralSolidViewBuilder3D& builder )
 {
     OPENGEODE_EXCEPTION( !solid.isolated_vertex( 0 ),
-        "[Test] TetrahedralSolidView isolated vertex is not correct" );
+        "[Test] TetrahedralSolidView isolated vertex is not correct" );
     builder.add_viewed_vertex( 0 );
     OPENGEODE_EXCEPTION( solid.isolated_vertex( 5 ),
-        "[Test] TetrahedralSolidView isolated vertex is not correct" );
+        "[Test] TetrahedralSolidView isolated vertex is not correct" );
 }
 
 void test_polyhedron_adjacencies( const geode::TetrahedralSolid3D& solid )
 {
     OPENGEODE_EXCEPTION( !solid.polyhedron_adjacent( { 0, 0 } ),
-        "[Test] TetrahedralSolid adjacent index is not correct" );
+        "[Test] TetrahedralSolid adjacent index is not correct" );
     OPENGEODE_EXCEPTION( solid.polyhedron_adjacent( { 0, 1 } ) == 1,
-        "[Test] TetrahedralSolid adjacent index is not correct" );
+        "[Test] TetrahedralSolid adjacent index is not correct" );
     OPENGEODE_EXCEPTION( solid.polyhedron_adjacent( { 1, 3 } ) == 0,
-        "[Test] TetrahedralSolid adjacent index is not correct" );
+        "[Test] TetrahedralSolid adjacent index is not correct" );
 }
 
 std::unique_ptr< geode::TetrahedralSolid3D > create_solid()

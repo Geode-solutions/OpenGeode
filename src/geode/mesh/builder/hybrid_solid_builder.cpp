@@ -86,7 +86,7 @@ namespace geode
         else
         {
             throw OpenGeodeException(
-                "[HybridSolidBuilder::do_create_polyhedron] Only "
+                "[HybridSolidBuilder::do_create_polyhedron] Only "
                 "tetrahedron, hexahedron, prism and pyramid are handled" );
         }
     }

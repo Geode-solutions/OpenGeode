@@ -39,15 +39,15 @@ void test()
     box2.add_point( { { -1, -1 } } );
 
     OPENGEODE_EXCEPTION( box2.min() == geode::Point2D( { -2, -2 } ),
-        "[Test] Error in BoundingBox initialization" );
+        "[Test] Error in BoundingBox initialization" );
     OPENGEODE_EXCEPTION( box2.max() == geode::Point2D( { -1, -1 } ),
-        "[Test] Error in BoundingBox initialization" );
+        "[Test] Error in BoundingBox initialization" );
 
     box2.add_box( box );
     OPENGEODE_EXCEPTION( box2.min() == geode::Point2D( { -2, -2 } ),
-        "[Test] Error in BoundingBox union computation" );
+        "[Test] Error in BoundingBox union computation" );
     OPENGEODE_EXCEPTION( box2.max() == geode::Point2D( { 1, 1 } ),
-        "[Test] Error in BoundingBox union computation" );
+        "[Test] Error in BoundingBox union computation" );
     OPENGEODE_EXCEPTION( box.intersects( box2 ), "[Test] BBox should overlap" );
 
     geode::BoundingBox2D box3;
@@ -56,11 +56,11 @@ void test()
     OPENGEODE_EXCEPTION(
         !box.intersects( box3 ), "[Test] BBox should not overlap" );
     OPENGEODE_EXCEPTION( box3.contains( { { 2.5, 2.5 } } ),
-        "[Test] BBox should contain this point" );
+        "[Test] BBox should contain this point" );
     OPENGEODE_EXCEPTION( !box3.contains( { { 10, 0 } } ),
-        "[Test] BBox should not contain this point" );
+        "[Test] BBox should not contain this point" );
     OPENGEODE_EXCEPTION( !box3.contains( { { 0, 0 } } ),
-        "[Test] BBox should not contain that point" );
+        "[Test] BBox should not contain that point" );
 
     geode::BoundingBox2D box_negative;
     box_negative.add_point( { { -2, -2 } } );
@@ -75,7 +75,7 @@ void test()
     const geode::BoundingBox2D copy_box = box2;
     OPENGEODE_EXCEPTION( copy_box.min() == geode::Point2D( { -2, -2 } )
                              && copy_box.max() == geode::Point2D( { 1, 1 } ),
-        "[Test] Copied BBox has wrong extension" );
+        "[Test] Copied BBox has wrong extension" );
 
     const auto box_neg2 = std::move( box_negative );
     OPENGEODE_EXCEPTION( box_neg2.min() == geode::Point2D( { -2, -2 } ),

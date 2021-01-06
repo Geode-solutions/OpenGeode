@@ -71,10 +71,7 @@ namespace geode
             {
                 for( auto&& e : solid.polyhedron_edges_vertices( p ) )
                 {
-                    if( e[0] < e[1] )
-                    {
-                        this->find_or_create_edge( std::move( e ) );
-                    }
+                    this->find_or_create_edge( std::move( e ) );
                 }
             }
         }

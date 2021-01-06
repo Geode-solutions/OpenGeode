@@ -138,6 +138,14 @@ namespace geode
          */
         std::vector< index_t > delete_polygons(
             const std::vector< bool >& to_delete );
+        /*!
+         * Permute polygons to match the given order.
+         * @param[in] permutation Vector of size surface_mesh_.nb_polygons().
+         * Each value corresponds to the destination position.
+         * @return the mapping between old polygon indices to new ones.
+         */
+        absl::FixedArray< index_t > permute_polygons(
+            absl::Span< const index_t > permutation );
 
         /*!
          * Delete all the isolated vertices (not used as polygon vertices)
@@ -177,10 +185,23 @@ namespace geode
         virtual void do_set_point(
             index_t vertex_id, Point< dimension > point ) = 0;
 
-        void do_delete_vertices( const std::vector< bool >& to_delete ) final;
+        void do_delete_vertices( const std::vector< bool >& to_delete,
+            absl::Span< const index_t > old2new ) final;
+
+        void do_permute_vertices( absl::Span< const index_t > permutation,
+            absl::Span< const index_t > old2new ) final;
+
+        virtual void do_permute_polygons(
+            absl::Span< const index_t > permutation,
+            absl::Span< const index_t > old2new ) = 0;
 
         virtual void do_delete_surface_vertices(
-            const std::vector< bool >& to_delete ) = 0;
+            const std::vector< bool >& to_delete,
+            absl::Span< const index_t > old2new ) = 0;
+
+        virtual void do_permute_surface_vertices(
+            absl::Span< const index_t > permutation,
+            absl::Span< const index_t > old2new ) = 0;
 
         virtual void do_set_polygon_vertex(
             const PolygonVertex& polygon_vertex, index_t vertex_id ) = 0;
@@ -188,8 +209,8 @@ namespace geode
         virtual void do_create_polygon(
             absl::Span< const index_t > vertices ) = 0;
 
-        virtual void do_delete_polygons(
-            const std::vector< bool >& to_delete ) = 0;
+        virtual void do_delete_polygons( const std::vector< bool >& to_delete,
+            absl::Span< const index_t > old2new ) = 0;
 
         virtual void do_set_polygon_adjacent(
             const PolygonEdge& polygon_edge, index_t adjacent_id ) = 0;

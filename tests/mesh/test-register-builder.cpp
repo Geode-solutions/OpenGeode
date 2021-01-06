@@ -45,7 +45,7 @@
 void check_register( const geode::MeshImpl& key )
 {
     OPENGEODE_EXCEPTION( geode::MeshBuilderFactory::has_creator( key ),
-        "[Test] No creator for ", key.get(), " is not correct" );
+        "[Test] No creator for ", key.get(), " is not correct" );
 }
 
 void test()

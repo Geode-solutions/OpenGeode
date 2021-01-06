@@ -33,6 +33,7 @@ namespace geode
                     & VertexSetBuilder::create )
             .def( "create_vertex", &VertexSetBuilder::create_vertex )
             .def( "create_vertices", &VertexSetBuilder::create_vertices )
-            .def( "delete_vertices", &VertexSetBuilder::delete_vertices );
+            .def( "delete_vertices", &VertexSetBuilder::delete_vertices )
+            .def( "permute_vertices", &VertexSetBuilder::permute_vertices );
     }
 } // namespace geode

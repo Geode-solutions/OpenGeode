@@ -103,6 +103,9 @@ namespace geode
         void remove_polyhedra(
             const std::vector< bool >& to_delete, OGHybridSolidKey );
 
+        void permute_polyhedra(
+            absl::Span< const index_t > permutation, OGHybridSolidKey );
+
     private:
         friend class bitsery::Access;
         template < typename Archive >

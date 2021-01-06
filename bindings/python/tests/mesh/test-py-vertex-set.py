@@ -29,22 +29,22 @@ import opengeode_py_mesh as mesh
 def test_create_vertices( vertex_set, builder ):
     builder.create_vertex()
     if vertex_set.nb_vertices() != 1:
-        raise ValueError( "[Test] VertexSet should have 1 vertex" )
+        raise ValueError( "[Test] VertexSet should have 1 vertex" )
     builder.create_vertices( 5 )
     if vertex_set.nb_vertices() != 6:
-        raise ValueError( "[Test] VertexSet should have 6 vertices" )
+        raise ValueError( "[Test] VertexSet should have 6 vertices" )
 
 def test_delete_vertex( vertex_set, builder ):
     to_delete = [False] * vertex_set.nb_vertices()
     to_delete[0] = True
     builder.delete_vertices( to_delete )
     if vertex_set.nb_vertices() != 5:
-        raise ValueError( "[Test] VertexSet should have 5 vertices" )
+        raise ValueError( "[Test] VertexSet should have 5 vertices" )
 
 def test_clone( vertex_set ):
     vertex_set2 = vertex_set.clone()
     if vertex_set2.nb_vertices() != 5:
-        raise ValueError( "[Test] VertexSet2 should have 5 vertices" )
+        raise ValueError( "[Test] VertexSet2 should have 5 vertices" )
 
 if __name__ == '__main__':
     vertex_set = mesh.VertexSet.create()

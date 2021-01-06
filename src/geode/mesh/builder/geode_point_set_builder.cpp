@@ -56,7 +56,15 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodePointSetBuilder< dimension >::do_delete_vertices(
-        const std::vector< bool >& /*unused*/ )
+        const std::vector< bool >& /*unused*/,
+        absl::Span< const index_t > /*unused*/ )
+    {
+    }
+
+    template < index_t dimension >
+    void OpenGeodePointSetBuilder< dimension >::do_permute_vertices(
+        absl::Span< const index_t > /*unused*/,
+        absl::Span< const index_t > /*unused*/ )
     {
     }
 

@@ -121,7 +121,7 @@ namespace
     }
 
     template < geode::index_t dimension >
-    void update_polyhedron_around_vertices(
+    void update_polyhedron_around_vertices_from_vertices(
         const geode::SolidMesh< dimension >& solid,
         geode::SolidMeshBuilder< dimension >& builder,
         absl::Span< const geode::index_t > vertices_old2new )
@@ -145,6 +145,47 @@ namespace
             else
             {
                 builder.disassociate_polyhedron_vertex_to_vertex( v );
+            }
+        }
+    }
+
+    template < geode::index_t dimension >
+    void update_polyhedron_around_vertices_from_polyhedron(
+        const geode::SolidMesh< dimension >& solid,
+        geode::SolidMeshBuilder< dimension >& builder,
+        absl::Span< const geode::index_t > old2new )
+    {
+        for( const auto v : geode::Range{ solid.nb_vertices() } )
+        {
+            const auto polyhedron_vertex = solid.polyhedron_around_vertex( v );
+            if( !polyhedron_vertex )
+            {
+                continue;
+            }
+            auto new_polyhedron_vertex = polyhedron_vertex.value();
+            new_polyhedron_vertex.polyhedron_id =
+                old2new[polyhedron_vertex->polyhedron_id];
+            if( new_polyhedron_vertex.polyhedron_id == geode::NO_ID )
+            {
+                for( auto&& polyhedron : solid.polyhedra_around_vertex( v ) )
+                {
+                    polyhedron.polyhedron_id =
+                        old2new[polyhedron.polyhedron_id];
+                    if( polyhedron.polyhedron_id != geode::NO_ID )
+                    {
+                        new_polyhedron_vertex = std::move( polyhedron );
+                        break;
+                    }
+                }
+            }
+            if( new_polyhedron_vertex.polyhedron_id == geode::NO_ID )
+            {
+                builder.disassociate_polyhedron_vertex_to_vertex( v );
+            }
+            else
+            {
+                builder.associate_polyhedron_vertex_to_vertex(
+                    new_polyhedron_vertex, v );
             }
         }
     }
@@ -197,6 +238,10 @@ namespace geode
     {
         const auto polyhedron_vertex_id =
             solid_mesh_->polyhedron_vertex( polyhedron_vertex );
+        if( polyhedron_vertex_id == vertex_id )
+        {
+            return;
+        }
         if( polyhedron_vertex_id != NO_ID )
         {
             const auto polyhedron_around =
@@ -293,7 +338,8 @@ namespace geode
     void SolidMeshBuilder< dimension >::update_polyhedron_vertices(
         absl::Span< const index_t > old2new )
     {
-        update_polyhedron_around_vertices( *solid_mesh_, *this, old2new );
+        update_polyhedron_around_vertices_from_vertices(
+            *solid_mesh_, *this, old2new );
         const auto polyhedra_to_delete =
             find_polyhedra_to_delete( *solid_mesh_, old2new );
         delete_polyhedra( polyhedra_to_delete );
@@ -322,7 +368,7 @@ namespace geode
         check_polyhedron_vertex_id( *solid_mesh_,
             polyhedron_vertex.polyhedron_id, polyhedron_vertex.vertex_id );
         OPENGEODE_ASSERT( vertex_id < solid_mesh_->nb_vertices(),
-            "[SolidMeshBuilder::update_polyhedron_vertex] Accessing a "
+            "[SolidMeshBuilder::update_polyhedron_vertex] Accessing a "
             "vertex that does not exist" );
         associate_polyhedron_vertex_to_vertex( polyhedron_vertex, vertex_id );
         do_set_polyhedron_vertex( polyhedron_vertex, vertex_id );
@@ -348,10 +394,7 @@ namespace geode
             for( auto&& edge_vertices :
                 solid_mesh_->polyhedron_edges_vertices( added_polyhedron ) )
             {
-                if( edge_vertices[0] < edge_vertices[1] )
-                {
-                    edges.find_or_create_edge( std::move( edge_vertices ) );
-                }
+                edges.find_or_create_edge( std::move( edge_vertices ) );
             }
         }
         if( solid_mesh_->are_facets_enabled() )
@@ -413,9 +456,9 @@ namespace geode
 
     template < index_t dimension >
     void SolidMeshBuilder< dimension >::do_delete_vertices(
-        const std::vector< bool >& to_delete )
+        const std::vector< bool >& to_delete,
+        absl::Span< const index_t > old2new )
     {
-        const auto old2new = detail::mapping_after_deletion( to_delete );
         update_polyhedron_vertices( old2new );
         if( solid_mesh_->are_facets_enabled() )
         {
@@ -425,7 +468,24 @@ namespace geode
         {
             edges_builder().update_edge_vertices( old2new );
         }
-        do_delete_solid_vertices( to_delete );
+        do_delete_solid_vertices( to_delete, old2new );
+    }
+
+    template < index_t dimension >
+    void SolidMeshBuilder< dimension >::do_permute_vertices(
+        absl::Span< const index_t > permutation,
+        absl::Span< const index_t > old2new )
+    {
+        update_polyhedron_vertices( old2new );
+        if( solid_mesh_->are_facets_enabled() )
+        {
+            facets_builder().update_facet_vertices( old2new );
+        }
+        if( solid_mesh_->are_edges_enabled() )
+        {
+            edges_builder().update_edge_vertices( old2new );
+        }
+        do_permute_solid_vertices( permutation, old2new );
     }
 
     template < index_t dimension >
@@ -569,6 +629,11 @@ namespace geode
     std::vector< index_t > SolidMeshBuilder< dimension >::delete_polyhedra(
         const std::vector< bool >& to_delete )
     {
+        const auto old2new = detail::mapping_after_deletion( to_delete );
+        if( absl::c_find( to_delete, true ) == to_delete.end() )
+        {
+            return old2new;
+        }
         if( solid_mesh_->are_facets_enabled() )
         {
             remove_polyhedra_facets( to_delete );
@@ -577,48 +642,27 @@ namespace geode
         {
             remove_polyhedra_edges( to_delete );
         }
-
-        const auto old2new = detail::mapping_after_deletion( to_delete );
-        for( const auto v : Range{ solid_mesh_->nb_vertices() } )
-        {
-            const auto polyhedron_vertex =
-                solid_mesh_->polyhedron_around_vertex( v );
-            if( !polyhedron_vertex )
-            {
-                continue;
-            }
-            PolyhedronVertex new_polyhedron_vertex{ polyhedron_vertex.value() };
-            new_polyhedron_vertex.polyhedron_id =
-                old2new[polyhedron_vertex->polyhedron_id];
-            if( new_polyhedron_vertex.polyhedron_id == NO_ID )
-            {
-                for( auto&& polyhedron :
-                    solid_mesh_->polyhedra_around_vertex( v ) )
-                {
-                    polyhedron.polyhedron_id =
-                        old2new[polyhedron.polyhedron_id];
-                    if( polyhedron.polyhedron_id != NO_ID )
-                    {
-                        new_polyhedron_vertex = std::move( polyhedron );
-                        break;
-                    }
-                }
-            }
-            if( new_polyhedron_vertex.polyhedron_id == NO_ID )
-            {
-                disassociate_polyhedron_vertex_to_vertex( v );
-            }
-            else
-            {
-                associate_polyhedron_vertex_to_vertex(
-                    new_polyhedron_vertex, v );
-            }
-        }
-
+        update_polyhedron_around_vertices_from_polyhedron(
+            *solid_mesh_, *this, old2new );
         update_polyhedron_adjacencies( *solid_mesh_, *this, old2new );
         solid_mesh_->polyhedron_attribute_manager().delete_elements(
             to_delete );
-        do_delete_polyhedra( to_delete );
+        do_delete_polyhedra( to_delete, old2new );
+        return old2new;
+    }
+
+    template < index_t dimension >
+    absl::FixedArray< index_t >
+        SolidMeshBuilder< dimension >::permute_polyhedra(
+            absl::Span< const index_t > permutation )
+    {
+        const auto old2new = old2new_permutation( permutation );
+        update_polyhedron_around_vertices_from_polyhedron(
+            *solid_mesh_, *this, old2new );
+        update_polyhedron_adjacencies( *solid_mesh_, *this, old2new );
+        solid_mesh_->polyhedron_attribute_manager().permute_elements(
+            permutation );
+        do_permute_polyhedra( permutation, old2new );
         return old2new;
     }
 

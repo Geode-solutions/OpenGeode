@@ -47,8 +47,11 @@ namespace geode
 
         void do_create_vertices( index_t nb ) final;
 
-        void do_delete_curve_vertices(
-            const std::vector< bool >& to_delete ) final;
+        void do_delete_curve_vertices( const std::vector< bool >& to_delete,
+            absl::Span< const index_t > old2new ) final;
+
+        void do_permute_curve_vertices( absl::Span< const index_t > permutation,
+            absl::Span< const index_t > old2new ) final;
 
         void do_set_edge_vertex(
             const EdgeVertex& edge_vertex, index_t vertex_id ) final;
@@ -57,7 +60,11 @@ namespace geode
 
         void do_create_edges( index_t nb ) final;
 
-        void do_delete_edges( const std::vector< bool >& to_delete ) final;
+        void do_delete_edges( const std::vector< bool >& to_delete,
+            absl::Span< const index_t > old2new ) final;
+
+        void do_permute_edges( absl::Span< const index_t > permutation,
+            absl::Span< const index_t > old2new ) final;
 
     private:
         OpenGeodeGraph* geode_graph_;

@@ -41,6 +41,7 @@
 #include <geode/basic/common.h>
 #include <geode/basic/detail/mapping_after_deletion.h>
 #include <geode/basic/passkey.h>
+#include <geode/basic/permutation.h>
 
 namespace geode
 {
@@ -82,6 +83,9 @@ namespace geode
 
         virtual void delete_elements(
             const std::vector< bool >& to_delete, AttributeKey ) = 0;
+
+        virtual void permute_elements(
+            absl::Span< const index_t > permutation, AttributeKey ) = 0;
 
         virtual void compute_value(
             index_t from_element, index_t to_element, AttributeKey ) = 0;
@@ -255,6 +259,11 @@ namespace geode
         {
         }
 
+        void permute_elements( absl::Span< const index_t > /*unused*/,
+            AttributeBase::AttributeKey ) override
+        {
+        }
+
         std::shared_ptr< AttributeBase > clone(
             AttributeBase::AttributeKey ) const override
         {
@@ -372,6 +381,12 @@ namespace geode
             AttributeBase::AttributeKey ) override
         {
             delete_vector_elements( to_delete, values_ );
+        }
+
+        void permute_elements( absl::Span< const index_t > permutation,
+            AttributeBase::AttributeKey ) override
+        {
+            permute( values_, permutation );
         }
 
         std::shared_ptr< AttributeBase > clone(
@@ -503,6 +518,12 @@ namespace geode
             AttributeBase::AttributeKey ) override
         {
             delete_vector_elements( to_delete, values_ );
+        }
+
+        void permute_elements( absl::Span< const index_t > permutation,
+            AttributeBase::AttributeKey ) override
+        {
+            permute( values_, permutation );
         }
 
         std::shared_ptr< AttributeBase > clone(
@@ -652,6 +673,18 @@ namespace geode
                 {
                     values_.emplace( old2new[value.first], value.second );
                 }
+            }
+        }
+
+        void permute_elements( absl::Span< const index_t > permutation,
+            AttributeBase::AttributeKey ) override
+        {
+            const auto old_values = values_;
+            values_.clear();
+            values_.reserve( old_values.size() );
+            for( const auto& value : old_values )
+            {
+                values_.emplace( permutation[value.first], value.second );
             }
         }
 

@@ -196,6 +196,15 @@ namespace geode
                 static_cast< index_t >( absl::c_count( to_delete, true ) );
         }
 
+        void permute_elements( absl::Span< const index_t > permutation,
+            AttributeBase::AttributeKey key )
+        {
+            for( auto &it : attributes_ )
+            {
+                it.second->permute_elements( permutation, key );
+            }
+        }
+
         index_t nb_elements() const
         {
             return nb_elements_;
@@ -345,6 +354,12 @@ namespace geode
                 "elements" );
             impl_->delete_elements( to_delete, {} );
         }
+    }
+
+    void AttributeManager::permute_elements(
+        absl::Span< const index_t > permutation )
+    {
+        impl_->permute_elements( permutation, {} );
     }
 
     index_t AttributeManager::nb_elements() const

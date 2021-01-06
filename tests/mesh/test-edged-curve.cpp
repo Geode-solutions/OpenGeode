@@ -40,12 +40,90 @@ void test_create_vertices( const geode::EdgedCurve3D& edged_curve,
     builder.create_point( { { 0.1, 0.2, 0.3 } } );
     builder.create_point( { { 2.1, 9.4, 6.7 } } );
     OPENGEODE_EXCEPTION( edged_curve.nb_vertices() == 2,
-        "[Test] EdgedCurve should have 2 vertices" );
+        "[Test] EdgedCurve should have 2 vertices" );
     builder.create_vertices( 2 );
     builder.set_point( 2, { { 7.5, 5.2, 6.3 } } );
     builder.set_point( 3, { { 8.7, 1.4, 4.7 } } );
     OPENGEODE_EXCEPTION( edged_curve.nb_vertices() == 4,
-        "[Test] EdgedCurve should have 4 vertices" );
+        "[Test] EdgedCurve should have 4 vertices" );
+}
+
+void test_permutation( const geode::EdgedCurve3D& edged_curve,
+    geode::EdgedCurveBuilder3D& builder )
+{
+    std::vector< geode::index_t > vertex_permutation{ 2, 0, 3, 1 };
+    builder.permute_vertices( vertex_permutation );
+    OPENGEODE_EXCEPTION(
+        edged_curve.point( 2 ) == geode::Point3D( { 8.7, 1.4, 4.7 } ),
+        "[Test] Point coordinates have not been correctly permuted" );
+    OPENGEODE_EXCEPTION(
+        edged_curve.point( 0 ) == geode::Point3D( { 7.5, 5.2, 6.3 } ),
+        "[Test] Point coordinates have not been correctly permuted" );
+
+    OPENGEODE_EXCEPTION( edged_curve.edge_vertex( { 0, 0 } ) == 1,
+        "[Test] Wrong EdgeVertex after vertex permute" );
+    OPENGEODE_EXCEPTION( edged_curve.edge_vertex( { 0, 1 } ) == 3,
+        "[Test] Wrong EdgeVertex after vertex permute" );
+    OPENGEODE_EXCEPTION( edged_curve.edge_vertex( { 1, 0 } ) == 1,
+        "[Test] Wrong EdgeVertex after vertex permute" );
+    OPENGEODE_EXCEPTION( edged_curve.edge_vertex( { 1, 1 } ) == 0,
+        "[Test] Wrong EdgeVertex after vertex permute" );
+    OPENGEODE_EXCEPTION( edged_curve.edge_vertex( { 2, 0 } ) == 2,
+        "[Test] Wrong EdgeVertex after vertex permute" );
+    OPENGEODE_EXCEPTION( edged_curve.edge_vertex( { 2, 1 } ) == 0,
+        "[Test] Wrong EdgeVertex after vertex permute" );
+    OPENGEODE_EXCEPTION( edged_curve.edge_vertex( { 3, 0 } ) == 3,
+        "[Test] Wrong EdgeVertex after vertex permute" );
+    OPENGEODE_EXCEPTION( edged_curve.edge_vertex( { 3, 1 } ) == 0,
+        "[Test] Wrong EdgeVertex after vertex permute" );
+
+    std::vector< geode::index_t > edge_permutation{ 1, 3, 0, 2 };
+    builder.permute_edges( edge_permutation );
+
+    OPENGEODE_EXCEPTION( edged_curve.edge_vertex( { 0, 0 } ) == 1,
+        "[Test] Wrong EdgeVertex after edge permute" );
+    OPENGEODE_EXCEPTION( edged_curve.edge_vertex( { 0, 1 } ) == 0,
+        "[Test] Wrong EdgeVertex after edge permute" );
+    OPENGEODE_EXCEPTION( edged_curve.edge_vertex( { 1, 0 } ) == 3,
+        "[Test] Wrong EdgeVertex after edge permute" );
+    OPENGEODE_EXCEPTION( edged_curve.edge_vertex( { 1, 1 } ) == 0,
+        "[Test] Wrong EdgeVertex after edge permute" );
+    OPENGEODE_EXCEPTION( edged_curve.edge_vertex( { 2, 0 } ) == 1,
+        "[Test] Wrong EdgeVertex after edge permute" );
+    OPENGEODE_EXCEPTION( edged_curve.edge_vertex( { 2, 1 } ) == 3,
+        "[Test] Wrong EdgeVertex after edge permute" );
+    OPENGEODE_EXCEPTION( edged_curve.edge_vertex( { 3, 0 } ) == 2,
+        "[Test] Wrong EdgeVertex after edge permute" );
+    OPENGEODE_EXCEPTION( edged_curve.edge_vertex( { 3, 1 } ) == 0,
+        "[Test] Wrong EdgeVertex after edge permute" );
+
+    const auto& edges_around_1 = edged_curve.edges_around_vertex( 1 );
+    OPENGEODE_EXCEPTION( edges_around_1.size() == 2,
+        "[Test] edges_around_1 should have 2 edges" );
+    OPENGEODE_EXCEPTION( edges_around_1[0].edge_id == 2,
+        "[Test] edges_around_1 has wrong value" );
+    OPENGEODE_EXCEPTION( edges_around_1[0].vertex_id == 0,
+        "[Test] edges_around_1 has wrong value" );
+    OPENGEODE_EXCEPTION( edges_around_1[1].edge_id == 0,
+        "[Test] edges_around_1 has wrong value" );
+    OPENGEODE_EXCEPTION( edges_around_1[1].vertex_id == 0,
+        "[Test] edges_around_1 has wrong value" );
+
+    const auto& edges_around_0 = edged_curve.edges_around_vertex( 0 );
+    OPENGEODE_EXCEPTION( edges_around_0.size() == 3,
+        "[Test] edges_around_0 should have 3 edges" );
+    OPENGEODE_EXCEPTION( edges_around_0[0].edge_id == 0,
+        "[Test] edges_around_0 has wrong value" );
+    OPENGEODE_EXCEPTION( edges_around_0[0].vertex_id == 1,
+        "[Test] edges_around_0 has wrong value" );
+    OPENGEODE_EXCEPTION( edges_around_0[1].edge_id == 3,
+        "[Test] edges_around_0 has wrong value" );
+    OPENGEODE_EXCEPTION( edges_around_0[1].vertex_id == 1,
+        "[Test] edges_around_0 has wrong value" );
+    OPENGEODE_EXCEPTION( edges_around_0[2].edge_id == 1,
+        "[Test] edges_around_0 has wrong value" );
+    OPENGEODE_EXCEPTION( edges_around_0[2].vertex_id == 1,
+        "[Test] edges_around_0 has wrong value" );
 }
 
 void test_bounding_box( const geode::EdgedCurve3D& edged_curve )
@@ -62,31 +140,35 @@ void test_delete_vertex( const geode::EdgedCurve3D& edged_curve,
     geode::EdgedCurveBuilder3D& builder )
 {
     std::vector< bool > to_delete( edged_curve.nb_vertices(), false );
-    to_delete.front() = true;
+    to_delete[1] = true;
     builder.delete_vertices( to_delete );
     OPENGEODE_EXCEPTION( edged_curve.nb_vertices() == 3,
-        "[Test] EdgedCurve should have 3 vertices" );
+        "[Test] EdgedCurve should have 3 vertices" );
     const geode::Point3D answer{ { 2.1, 9.4, 6.7 } };
-    OPENGEODE_EXCEPTION( edged_curve.point( 0 ) == answer,
-        "[Test] EdgedCurve vertex coordinates are not correct" );
+    OPENGEODE_EXCEPTION( edged_curve.point( 2 ) == answer,
+        "[Test] EdgedCurve vertex coordinates are not correct" );
     OPENGEODE_EXCEPTION(
-        edged_curve.nb_edges() == 2, "[Test] EdgedCurve should have 2 edges" );
+        edged_curve.nb_edges() == 2, "[Test] EdgedCurve should have 2 edges" );
 
     const auto& edges_around_0 = edged_curve.edges_around_vertex( 0 );
-    OPENGEODE_EXCEPTION( edges_around_0.size() == 1,
-        "[Test] edges_around_0 should have 1 edge" );
+    OPENGEODE_EXCEPTION( edges_around_0.size() == 2,
+        "[Test] edges_around_0 should have 1 edge" );
     OPENGEODE_EXCEPTION( edges_around_0[0].edge_id == 1,
-        "[Test] edges_around_0 has wrong value" );
-    OPENGEODE_EXCEPTION( edges_around_0[0].vertex_id == 0,
-        "[Test] edges_around_0 has wrong value" );
+        "[Test] edges_around_0 has wrong value" );
+    OPENGEODE_EXCEPTION( edges_around_0[0].vertex_id == 1,
+        "[Test] edges_around_0 has wrong value" );
+    OPENGEODE_EXCEPTION( edges_around_0[1].edge_id == 0,
+        "[Test] edges_around_0 has wrong value" );
+    OPENGEODE_EXCEPTION( edges_around_0[1].vertex_id == 1,
+        "[Test] edges_around_0 has wrong value" );
 
     const auto& edges_around_2 = edged_curve.edges_around_vertex( 2 );
     OPENGEODE_EXCEPTION( edges_around_2.size() == 1,
-        "[Test] edges_around_2 should have 1 edge" );
+        "[Test] edges_around_2 should have 1 edge" );
     OPENGEODE_EXCEPTION( edges_around_2[0].edge_id == 0,
-        "[Test] edges_around_2 has wrong value" );
+        "[Test] edges_around_2 has wrong value" );
     OPENGEODE_EXCEPTION( edges_around_2[0].vertex_id == 0,
-        "[Test] edges_around_2 has wrong value" );
+        "[Test] edges_around_2 has wrong value" );
 }
 
 void test_create_edges( const geode::EdgedCurve3D& edged_curve,
@@ -95,44 +177,44 @@ void test_create_edges( const geode::EdgedCurve3D& edged_curve,
     builder.create_edge( 0, 1 );
     builder.create_edge( 0, 2 );
     OPENGEODE_EXCEPTION(
-        edged_curve.nb_edges() == 2, "[Test] EdgedCurve should have 2 edges" );
+        edged_curve.nb_edges() == 2, "[Test] EdgedCurve should have 2 edges" );
     OPENGEODE_EXCEPTION( edged_curve.edge_vertex( { 0, 1 } ) == 1,
-        "[Test] EdgedCurve edge vertex is not correct" );
+        "[Test] EdgedCurve edge vertex is not correct" );
     builder.create_edges( 2 );
     builder.set_edge_vertex( { 2, 0 }, 3 );
     builder.set_edge_vertex( { 2, 1 }, 2 );
     builder.set_edge_vertex( { 3, 0 }, 1 );
     builder.set_edge_vertex( { 3, 1 }, 2 );
     OPENGEODE_EXCEPTION(
-        edged_curve.nb_edges() == 4, "[Test] EdgedCurve should have 4 edges" );
+        edged_curve.nb_edges() == 4, "[Test] EdgedCurve should have 4 edges" );
 
     const auto& edges_around_0 = edged_curve.edges_around_vertex( 0 );
     OPENGEODE_EXCEPTION( edges_around_0.size() == 2,
-        "[Test] edges_around_0 should have 2 edges" );
+        "[Test] edges_around_0 should have 2 edges" );
     OPENGEODE_EXCEPTION( edges_around_0[0].edge_id == 0,
-        "[Test] edges_around_0 has wrong value" );
+        "[Test] edges_around_0 has wrong value" );
     OPENGEODE_EXCEPTION( edges_around_0[0].vertex_id == 0,
-        "[Test] edges_around_0 has wrong value" );
+        "[Test] edges_around_0 has wrong value" );
     OPENGEODE_EXCEPTION( edges_around_0[1].edge_id == 1,
-        "[Test] edges_around_0 has wrong value" );
+        "[Test] edges_around_0 has wrong value" );
     OPENGEODE_EXCEPTION( edges_around_0[1].vertex_id == 0,
-        "[Test] edges_around_0 has wrong value" );
+        "[Test] edges_around_0 has wrong value" );
 
     const auto& edges_around_2 = edged_curve.edges_around_vertex( 2 );
     OPENGEODE_EXCEPTION( edges_around_2.size() == 3,
-        "[Test] edges_around_2 should have 3 edges" );
+        "[Test] edges_around_2 should have 3 edges" );
     OPENGEODE_EXCEPTION( edges_around_2[0].edge_id == 1,
-        "[Test] edges_around_2 has wrong value" );
+        "[Test] edges_around_2 has wrong value" );
     OPENGEODE_EXCEPTION( edges_around_2[0].vertex_id == 1,
-        "[Test] edges_around_2 has wrong value" );
+        "[Test] edges_around_2 has wrong value" );
     OPENGEODE_EXCEPTION( edges_around_2[1].edge_id == 2,
-        "[Test] edges_around_2 has wrong value" );
+        "[Test] edges_around_2 has wrong value" );
     OPENGEODE_EXCEPTION( edges_around_2[1].vertex_id == 1,
-        "[Test] edges_around_2 has wrong value" );
+        "[Test] edges_around_2 has wrong value" );
     OPENGEODE_EXCEPTION( edges_around_2[2].edge_id == 3,
-        "[Test] edges_around_2 has wrong value" );
+        "[Test] edges_around_2 has wrong value" );
     OPENGEODE_EXCEPTION( edges_around_2[2].vertex_id == 1,
-        "[Test] edges_around_2 has wrong value" );
+        "[Test] edges_around_2 has wrong value" );
 }
 
 void test_delete_edge( const geode::EdgedCurve3D& edged_curve,
@@ -142,11 +224,11 @@ void test_delete_edge( const geode::EdgedCurve3D& edged_curve,
     to_delete.front() = true;
     builder.delete_edges( to_delete );
     OPENGEODE_EXCEPTION(
-        edged_curve.nb_edges() == 1, "[Test] EdgedCurve should have 1 edges" );
-    OPENGEODE_EXCEPTION( edged_curve.edge_vertex( { 0, 0 } ) == 0,
-        "[Test] EdgedCurve edge vertex index is not correct" );
-    OPENGEODE_EXCEPTION( edged_curve.edge_vertex( { 0, 1 } ) == 1,
-        "[Test] EdgedCurve edge vertex index is not correct" );
+        edged_curve.nb_edges() == 1, "[Test] EdgedCurve should have 1 edges" );
+    OPENGEODE_EXCEPTION( edged_curve.edge_vertex( { 0, 0 } ) == 1,
+        "[Test] EdgedCurve edge vertex index is not correct" );
+    OPENGEODE_EXCEPTION( edged_curve.edge_vertex( { 0, 1 } ) == 0,
+        "[Test] EdgedCurve edge vertex index is not correct" );
 }
 
 void test_io(
@@ -162,13 +244,13 @@ void test_edge_requests( const geode::EdgedCurve3D& edged_curve,
     geode::EdgedCurveBuilder3D& builder )
 {
     OPENGEODE_EXCEPTION( edged_curve.edge_barycenter( 0 ).inexact_equal(
-                             geode::Point3D( { 4.8, 7.3, 6.5 } ), 1e-15 ),
-        "[Test] Edge barycenter is not correct" );
+                             geode::Point3D( { 8.1, 3.3, 5.5 } ), 1e-15 ),
+        "[Test] Edge barycenter is not correct" );
     const auto p0 = builder.create_point( { { 1, 1, 1 } } );
     const auto p1 = builder.create_point( { { 1, 4, -3 } } );
     OPENGEODE_EXCEPTION(
         edged_curve.edge_length( builder.create_edge( p0, p1 ) ) == 5,
-        "[Test] Edge length is not correct" );
+        "[Test] Edge length is not correct" );
 }
 
 void test_clone( const geode::EdgedCurve3D& edged_curve )
@@ -181,14 +263,14 @@ void test_clone( const geode::EdgedCurve3D& edged_curve )
 
     const auto edged_curve2 = edged_curve.clone();
     OPENGEODE_EXCEPTION( edged_curve2->nb_vertices() == 3,
-        "[Test] EdgedCurve2 should have 3 vertices" );
+        "[Test] EdgedCurve2 should have 3 vertices" );
     OPENGEODE_EXCEPTION( edged_curve2->nb_edges() == 1,
-        "[Test] EdgedCurve2 should have 1 edge" );
+        "[Test] EdgedCurve2 should have 1 edge" );
 
     const auto attribute2 =
         edged_curve2->edge_attribute_manager().find_attribute< int >( "test" );
     OPENGEODE_EXCEPTION( attribute2->value( 0 ) == 42,
-        "[Test] EdgedCurve2 attribute should be 42" );
+        "[Test] EdgedCurve2 attribute should be 42" );
 }
 
 void test()
@@ -203,6 +285,7 @@ void test()
     test_io( *edged_curve,
         absl::StrCat( "test.", edged_curve->native_extension() ) );
 
+    test_permutation( *edged_curve, *builder );
     test_delete_vertex( *edged_curve, *builder );
     test_delete_edge( *edged_curve, *builder );
     test_clone( *edged_curve );

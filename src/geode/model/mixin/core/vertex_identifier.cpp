@@ -222,7 +222,7 @@ namespace geode
                 component_vertices_->value( unique_vertex_id );
             const auto it = absl::c_find( vertices, component_vertex_id );
             OPENGEODE_EXCEPTION( it != vertices.end(),
-                "[VertexIdentifier::unset_unique_vertex] Unique vertex to "
+                "[VertexIdentifier::unset_unique_vertex] Unique vertex to "
                 "unset is not correct" );
             component_vertices_->modify_value( unique_vertex_id,
                 [&it]( std::vector< MeshComponentVertex >& value ) {
@@ -249,7 +249,7 @@ namespace geode
                     const auto it = absl::c_find( all_vertices,
                         MeshComponentVertex{ component_id, old_id } );
                     OPENGEODE_EXCEPTION( it != all_vertices.end(),
-                        "[VertexIdentifier::update_unique_vertices] Old mesh "
+                        "[VertexIdentifier::update_unique_vertices] Old mesh "
                         "component vertex should be found in unique "
                         "vertex" );
                     const auto new_id = old2new[old_id];
@@ -291,7 +291,7 @@ namespace geode
             archive.object( *this );
             archive.adapter().flush();
             OPENGEODE_EXCEPTION( std::get< 1 >( context ).isValid(),
-                "[VertexIdentifier::save] Error while writing file: ",
+                "[VertexIdentifier::save] Error while writing file: ",
                 filename );
         }
 

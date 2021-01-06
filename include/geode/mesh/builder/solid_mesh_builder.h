@@ -137,6 +137,15 @@ namespace geode
             const std::vector< bool >& to_delete );
 
         /*!
+         * Permute polyhedra to match the given order.
+         * @param[in] permutation Vector of size solid_mesh_.nb_polyhedra().
+         * Each value corresponds to the destination position.
+         * @return the mapping between old polyhedron indices to new ones.
+         */
+        absl::FixedArray< index_t > permute_polyhedra(
+            absl::Span< const index_t > permutation );
+
+        /*!
          * Delete all the isolated vertices (not used as polyhedron vertices)
          * @return the mapping between old vertex indices to new ones.
          * Deleted vertices new index is NO_ID
@@ -184,10 +193,19 @@ namespace geode
         virtual void do_set_point(
             index_t vertex_id, Point< dimension > point ) = 0;
 
-        void do_delete_vertices( const std::vector< bool >& to_delete ) final;
+        void do_delete_vertices( const std::vector< bool >& to_delete,
+            absl::Span< const index_t > old2new ) final;
+
+        void do_permute_vertices( absl::Span< const index_t > permutation,
+            absl::Span< const index_t > old2new ) final;
 
         virtual void do_delete_solid_vertices(
-            const std::vector< bool >& to_delete ) = 0;
+            const std::vector< bool >& to_delete,
+            absl::Span< const index_t > old2new ) = 0;
+
+        virtual void do_permute_solid_vertices(
+            absl::Span< const index_t > permutation,
+            absl::Span< const index_t > old2new ) = 0;
 
         virtual void do_set_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex, index_t vertex_id ) = 0;
@@ -195,8 +213,12 @@ namespace geode
         virtual void do_create_polyhedron( absl::Span< const index_t > vertices,
             absl::Span< const std::vector< local_index_t > > facets ) = 0;
 
-        virtual void do_delete_polyhedra(
-            const std::vector< bool >& to_delete ) = 0;
+        virtual void do_delete_polyhedra( const std::vector< bool >& to_delete,
+            absl::Span< const index_t > old2new ) = 0;
+
+        virtual void do_permute_polyhedra(
+            absl::Span< const index_t > permutation,
+            absl::Span< const index_t > old2new ) = 0;
 
         virtual void do_set_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet, index_t adjacent_id ) = 0;

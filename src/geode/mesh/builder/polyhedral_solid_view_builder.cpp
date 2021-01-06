@@ -66,7 +66,15 @@ namespace geode
 
     template < index_t dimension >
     void PolyhedralSolidViewBuilder< dimension >::do_delete_solid_vertices(
-        const std::vector< bool >& /*unused*/ )
+        const std::vector< bool >& /*unused*/,
+        absl::Span< const index_t > /*unused*/ )
+    {
+    }
+
+    template < index_t dimension >
+    void PolyhedralSolidViewBuilder< dimension >::do_permute_solid_vertices(
+        absl::Span< const index_t > /*unused*/,
+        absl::Span< const index_t > /*unused*/ )
     {
     }
 
@@ -104,9 +112,17 @@ namespace geode
 
     template < index_t dimension >
     void PolyhedralSolidViewBuilder< dimension >::do_delete_polyhedra(
-        const std::vector< bool >& /*unused*/ )
+        const std::vector< bool >& /*unused*/,
+        absl::Span< const index_t > /*unused*/ )
     {
         // polyhedral_solid_view_->remove_polyhedra( to_delete, {} );
+    }
+
+    template < index_t dimension >
+    void PolyhedralSolidViewBuilder< dimension >::do_permute_polyhedra(
+        absl::Span< const index_t > /*unused*/,
+        absl::Span< const index_t > /*unused*/ )
+    {
     }
 
     template < index_t dimension >

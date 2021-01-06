@@ -48,6 +48,8 @@
                     compute_polyhedron_adjacencies )                           \
         .def( "delete_polyhedra",                                              \
             &SolidMeshBuilder##dimension##D::delete_polyhedra )                \
+        .def( "permute_polyhedra",                                             \
+            &SolidMeshBuilder##dimension##D::permute_polyhedra )               \
         .def( "delete_isolated_vertices",                                      \
             &SolidMeshBuilder##dimension##D::delete_isolated_vertices )        \
         .def(                                                                  \

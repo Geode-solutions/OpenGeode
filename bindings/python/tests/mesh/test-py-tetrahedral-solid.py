@@ -36,79 +36,79 @@ def test_create_vertices( solid, builder ):
     builder.create_point( geom.Point3D( [ 4.7, 2.1, 1.3 ] ) )
     builder.create_point( geom.Point3D( [ 1.6, 8.7, 6.1 ] ) )
     if solid.nb_vertices() != 6:
-        raise ValueError( "[Test] TetrahedralSolid should have 6 vertices" )
+        raise ValueError( "[Test] TetrahedralSolid should have 6 vertices" )
 
 def test_create_tetrahedra( solid, builder ):
     builder.create_tetrahedron( [ 0, 1, 2, 3 ] )
     builder.create_tetrahedron( [ 1, 2, 3, 4 ] )
     builder.create_polyhedron( [ 1, 4, 3, 5 ], [ [ 0, 0, 0 ], [ 0, 0, 0 ], [ 0, 0, 0 ], [ 0, 0, 0 ] ] )
     if solid.nb_polyhedra() != 3:
-        raise ValueError( "[Test] TetrahedralSolid should have 3 tetrahedra" )
+        raise ValueError( "[Test] TetrahedralSolid should have 3 tetrahedra" )
     if solid.facets().nb_facets() != 10:
-        raise ValueError( "[Test] PolyhedralSolid should have 10 facets" )
+        raise ValueError( "[Test] PolyhedralSolid should have 10 facets" )
     if solid.edges().nb_edges() != 12:
-        raise ValueError( "[Test] PolyhedralSolid should have 12 edges" )
+        raise ValueError( "[Test] PolyhedralSolid should have 12 edges" )
 
 def test_polyhedron_adjacencies( solid, builder ):
     builder.compute_polyhedron_adjacencies()
     if solid.polyhedron_adjacent( mesh.PolyhedronFacet( 0, 0 ) ) != 1:
-        raise ValueError( "[Test] TetrahedralSolid adjacent index is not correct" )
+        raise ValueError( "[Test] TetrahedralSolid adjacent index is not correct" )
     if solid.polyhedron_adjacent( mesh.PolyhedronFacet( 0, 1 ) ):
-        raise ValueError( "[Test] TetrahedralSolid adjacent index is not correct" )
+        raise ValueError( "[Test] TetrahedralSolid adjacent index is not correct" )
     if solid.polyhedron_adjacent( mesh.PolyhedronFacet( 1, 3 ) ) != 0:
-        raise ValueError( "[Test] TetrahedralSolid adjacent index is not correct" )
+        raise ValueError( "[Test] TetrahedralSolid adjacent index is not correct" )
     if solid.polyhedron_adjacent_facet( mesh.PolyhedronFacet( 0, 0 ) ) != mesh.PolyhedronFacet( 1, 3 ):
-        raise ValueError( "[Test] TetrahedralSolid adjacent index is not correct" )
+        raise ValueError( "[Test] TetrahedralSolid adjacent index is not correct" )
 
     if solid.polyhedron_adjacent( mesh.PolyhedronFacet( 2, 3 ) ) != 1:
-        raise ValueError( "[Test] TetrahedralSolid adjacent index is not correct" )
+        raise ValueError( "[Test] TetrahedralSolid adjacent index is not correct" )
     if solid.polyhedron_adjacent( mesh.PolyhedronFacet( 2, 0 ) ):
-        raise ValueError( "[Test] TetrahedralSolid adjacent index is not correct" )
+        raise ValueError( "[Test] TetrahedralSolid adjacent index is not correct" )
 
 def test_delete_vertex( solid, builder ):
     to_delete = [False] * solid.nb_vertices()
-    to_delete[0] = True
+    to_delete[3] = True
     builder.delete_vertices( to_delete )
     if solid.nb_vertices() != 5:
-        raise ValueError( "[Test] TetrahedralSolid should have 5 vertices" )
+        raise ValueError( "[Test] TetrahedralSolid should have 5 vertices" )
     answer = geom.Point3D( [ 2.1, 9.4, 6.7 ] )
-    if solid.point( 0 ) != answer:
-        raise ValueError( "[Test] TetrahedralSolid vertex coordinates are not correct" )
+    if solid.point( 2 ) != answer:
+        raise ValueError( "[Test] TetrahedralSolid vertex coordinates are not correct" )
     if solid.nb_polyhedra() != 2:
-        raise ValueError( "[Test] TetrahedralSolid should have 2 tetrahedra" )
+        raise ValueError( "[Test] TetrahedralSolid should have 2 tetrahedra" )
     if solid.polyhedron_adjacent( mesh.PolyhedronFacet( 1, 3 ) ) != 0:
-        raise ValueError( "[Test] TetrahedralSolid adjacent index is not correct" )
+        raise ValueError( "[Test] TetrahedralSolid adjacent index is not correct" )
     if solid.facets().nb_facets() != 7:
-        raise ValueError( "[Test] PolyhedralSolid should have 7 facets" )
+        raise ValueError( "[Test] PolyhedralSolid should have 7 facets" )
     if solid.edges().nb_edges() != 9:
-        raise ValueError( "[Test] PolyhedralSolid should have 9 edges" )
+        raise ValueError( "[Test] PolyhedralSolid should have 9 edges" )
 
 def test_delete_polyhedron( solid, builder ):
     to_delete = [False] * solid.nb_polyhedra()
     to_delete[0] = True
     builder.delete_polyhedra( to_delete )
     if solid.nb_polyhedra() != 1:
-        raise ValueError( "[Test] TetrahedralSolid should have 1 polyhedron" )
-    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 0 ) ) != 0:
-        raise ValueError( "[Test] TetrahedralSolid facet vertex index is not correct" )
-    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 1 ) ) != 3:
-        raise ValueError( "[Test] TetrahedralSolid facet vertex index is not correct" )
-    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 2 ) ) != 2:
-        raise ValueError( "[Test] TetrahedralSolid facet vertex index is not correct" )
-    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 3 ) ) != 4:
-        raise ValueError( "[Test] TetrahedralSolid facet vertex index is not correct" )
+        raise ValueError( "[Test] TetrahedralSolid should have 1 polyhedron" )
+    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 0 ) ) != 2:
+        raise ValueError( "[Test] TetrahedralSolid facet vertex index is not correct" )
+    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 1 ) ) != 1:
+        raise ValueError( "[Test] TetrahedralSolid facet vertex index is not correct" )
+    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 2 ) ) != 4:
+        raise ValueError( "[Test] TetrahedralSolid facet vertex index is not correct" )
+    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 3 ) ) != 0:
+        raise ValueError( "[Test] TetrahedralSolid facet vertex index is not correct" )
 
 def test_io( solid, filename ):
     mesh.save_tetrahedral_solid3D( solid, filename )
     new_solid = mesh.load_tetrahedral_solid3D( filename )
     if new_solid.nb_vertices() != 6:
-        raise ValueError( "[Test] Reloaded TetrahedralSolid should have 6 vertices" )
+        raise ValueError( "[Test] Reloaded TetrahedralSolid should have 6 vertices" )
     if new_solid.facets().nb_facets() != 10:
-        raise ValueError( "[Test] Reloaded TetrahedralSolid should have 10 facets" )
+        raise ValueError( "[Test] Reloaded TetrahedralSolid should have 10 facets" )
     if new_solid.edges().nb_edges() != 12:
-        raise ValueError( "[Test] Reloaded TetrahedralSolid should have 12 edges" )
+        raise ValueError( "[Test] Reloaded TetrahedralSolid should have 12 edges" )
     if new_solid.nb_polyhedra() != 3:
-        raise ValueError( "[Test] Reloaded TetrahedralSolid should have 3 polyhedra" )
+        raise ValueError( "[Test] Reloaded TetrahedralSolid should have 3 polyhedra" )
 
 def test_clone( solid ):
     solid2 = solid.clone()
@@ -143,6 +143,84 @@ def test_delete_all( solid, builder ):
     if solid.nb_vertices() != 0:
         raise ValueError( "[Test]TetrahedralSolid should have 0 vertex" )
 
+def test_permutation( solid, builder ):
+    builder.permute_vertices( [4, 2, 1, 5, 0, 3] )
+    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 0 ) ) != 4:
+        raise ValueError( "[Test] Wrong PolyhedronVertex after vertex permute" )
+    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 1 ) ) != 2:
+        raise ValueError( "[Test] Wrong PolyhedronVertex after vertex permute" )
+    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 2 ) ) != 1:
+        raise ValueError( "[Test] Wrong PolyhedronVertex after vertex permute" )
+    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 3 ) ) != 5:
+        raise ValueError( "[Test] Wrong PolyhedronVertex after vertex permute" )
+    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 1, 0 ) ) != 2:
+        raise ValueError( "[Test] Wrong PolyhedronVertex after vertex permute" )
+    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 1, 1 ) ) != 1:
+        raise ValueError( "[Test] Wrong PolyhedronVertex after vertex permute" )
+    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 1, 2 ) ) != 5:
+        raise ValueError( "[Test] Wrong PolyhedronVertex after vertex permute" )
+    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 1, 3 ) ) != 0:
+        raise ValueError( "[Test] Wrong PolyhedronVertex after vertex permute" )
+    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 2, 0 ) ) != 2:
+        raise ValueError( "[Test] Wrong PolyhedronVertex after vertex permute" )
+    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 2, 1 ) ) != 0:
+        raise ValueError( "[Test] Wrong PolyhedronVertex after vertex permute" )
+    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 2, 2 ) ) != 5:
+        raise ValueError( "[Test] Wrong PolyhedronVertex after vertex permute" )
+    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 2, 3 ) ) != 3:
+        raise ValueError( "[Test] Wrong PolyhedronVertex after vertex permute" )
+
+    builder.permute_polyhedra( [2, 0, 1] )
+    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 0 ) ) != 2:
+        raise ValueError( "[Test] Wrong PolyhedronVertex after polyhedron permute" )
+    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 1 ) ) != 0:
+        raise ValueError( "[Test] Wrong PolyhedronVertex after polyhedron permute" )
+    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 2 ) ) != 5:
+        raise ValueError( "[Test] Wrong PolyhedronVertex after polyhedron permute" )
+    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 3 ) ) != 3:
+        raise ValueError( "[Test] Wrong PolyhedronVertex after polyhedron permute" )
+    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 1, 0 ) ) != 4:
+        raise ValueError( "[Test] Wrong PolyhedronVertex after polyhedron permute" )
+    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 1, 1 ) ) != 2:
+        raise ValueError( "[Test] Wrong PolyhedronVertex after polyhedron permute" )
+    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 1, 2 ) ) != 1:
+        raise ValueError( "[Test] Wrong PolyhedronVertex after polyhedron permute" )
+    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 1, 3 ) ) != 5:
+        raise ValueError( "[Test] Wrong PolyhedronVertex after polyhedron permute" )
+    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 2, 0 ) ) != 2:
+        raise ValueError( "[Test] Wrong PolyhedronVertex after polyhedron permute" )
+    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 2, 1 ) ) != 1:
+        raise ValueError( "[Test] Wrong PolyhedronVertex after polyhedron permute" )
+    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 2, 2 ) ) != 5:
+        raise ValueError( "[Test] Wrong PolyhedronVertex after polyhedron permute" )
+    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 2, 3 ) ) != 0:
+        raise ValueError( "[Test] Wrong PolyhedronVertex after polyhedron permute" )
+
+    if solid.polyhedron_adjacent( mesh.PolyhedronFacet( 0, 2 ) ):
+        raise ValueError( "[Test] Wrong Adjacency after polyhedron permute" )
+    if solid.polyhedron_adjacent( mesh.PolyhedronFacet( 2, 3 ) ) != 1:
+        raise ValueError( "[Test] Wrong Adjacency after polyhedron permute" )
+    if solid.polyhedron_adjacent( mesh.PolyhedronFacet( 0, 3 ) ) != 2:
+        raise ValueError( "[Test] Wrong Adjacency after polyhedron permute" )
+    if solid.polyhedron_adjacent( mesh.PolyhedronFacet( 1, 0 ) ) != 2:
+        raise ValueError( "[Test] Wrong Adjacency after polyhedron permute" )
+
+    polyhedra_5 = solid.polyhedra_around_vertex( 5 )
+    if len(polyhedra_5) != 3:
+        raise ValueError( "[Test] Wrong polyhedra_5 after polyhedron permute" )
+    if polyhedra_5[0].polyhedron_id != 0:
+        raise ValueError( "[Test] Wrong polyhedra_5 after polyhedron permute" )
+    if polyhedra_5[0].vertex_id != 2:
+        raise ValueError( "[Test] Wrong polyhedra_5 after polyhedron permute" )
+    if polyhedra_5[1].polyhedron_id != 2:
+        raise ValueError( "[Test] Wrong polyhedra_5 after polyhedron permute" )
+    if polyhedra_5[1].vertex_id != 2:
+        raise ValueError( "[Test] Wrong polyhedra_5 after polyhedron permute" )
+    if polyhedra_5[2].polyhedron_id != 1:
+        raise ValueError( "[Test] Wrong polyhedra_5 after polyhedron permute" )
+    if polyhedra_5[2].vertex_id != 3:
+        raise ValueError( "[Test] Wrong polyhedra_5 after polyhedron permute" )
+
 if __name__ == '__main__':
     solid = mesh.TetrahedralSolid3D.create()
     solid.enable_edges()
@@ -154,6 +232,7 @@ if __name__ == '__main__':
     test_polyhedron_adjacencies( solid, builder )
     test_io( solid, "test." + solid.native_extension() )
     
+    test_permutation( solid, builder )
     test_delete_vertex( solid, builder )
     test_delete_polyhedron( solid, builder )
     test_clone( solid )

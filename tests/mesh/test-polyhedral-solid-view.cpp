@@ -42,9 +42,9 @@ void test_create_vertices( const geode::PolyhedralSolid3D& polyhedral_solid,
     builder.create_point( { { 7.5, 4.2, 2.8 } } );
     builder.create_point( { { 2.2, 3.3, 4.4 } } );
     OPENGEODE_EXCEPTION( polyhedral_solid.isolated_vertex( 0 ),
-        "[Test] Vertices should be isolated before polyhedra creation" );
+        "[Test] Vertices should be isolated before polyhedra creation" );
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_vertices() == 8,
-        "[Test] PolyhedralSolid should have 8 vertices" );
+        "[Test] PolyhedralSolid should have 8 vertices" );
 }
 
 void test_create_viewed_vertices(
@@ -58,7 +58,7 @@ void test_create_viewed_vertices(
     builder.add_viewed_vertex( 4 );
     builder.add_viewed_vertex( 5 );
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_vertices() == 6,
-        "[Test] PolyhedralSolidView should have 6 vertices" );
+        "[Test] PolyhedralSolidView should have 6 vertices" );
 }
 
 void test_create_viewed_polyhedra(
@@ -68,16 +68,16 @@ void test_create_viewed_polyhedra(
     builder.add_viewed_polyhedron( 0 );
     builder.add_viewed_polyhedron( 2 );
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_polyhedra() == 2,
-        "[Test] PolyhedralSolidView should have 2 polyhedra" );
+        "[Test] PolyhedralSolidView should have 2 polyhedra" );
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_vertices() == 7,
-        "[Test] PolyhedralSolidView should have 7 vertices" );
+        "[Test] PolyhedralSolidView should have 7 vertices" );
     OPENGEODE_EXCEPTION( polyhedral_solid.viewed_polyhedron( 1 ) == 2,
-        "[Test] PolyhedralSolidView polyhedron is not correct" );
+        "[Test] PolyhedralSolidView polyhedron is not correct" );
 
     OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_vertex( { 0, 2 } ) == 2,
-        "[Test] PolyhedralSolidView PolyhedronVertex is not correct" );
+        "[Test] PolyhedralSolidView PolyhedronVertex is not correct" );
     OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_vertex( { 1, 3 } ) == 6,
-        "[Test] PolyhedralSolidView PolyhedronVertex is not correct" );
+        "[Test] PolyhedralSolidView PolyhedronVertex is not correct" );
 }
 
 void test_create_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
@@ -91,28 +91,28 @@ void test_create_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
     builder.create_polyhedron( { 3, 4, 5, 6 },
         { { 1, 3, 2 }, { 0, 2, 3 }, { 3, 1, 0 }, { 0, 1, 2 } } );
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_polyhedra() == 3,
-        "[Test] PolyhedralSolid should have 3 polyhedra" );
+        "[Test] PolyhedralSolid should have 3 polyhedra" );
     OPENGEODE_EXCEPTION( !polyhedral_solid.isolated_vertex( 0 ),
-        "[Test] Vertices should not be isolated after polyhedra creation" );
+        "[Test] Vertices should not be isolated after polyhedra creation" );
 }
 
 void test_polyhedron_adjacencies(
     const geode::PolyhedralSolid3D& polyhedral_solid )
 {
     OPENGEODE_EXCEPTION( !polyhedral_solid.polyhedron_adjacent( { 0, 0 } ),
-        "[Test] PolyhedralSolid adjacent index is not correct" );
+        "[Test] PolyhedralSolid adjacent index is not correct" );
     OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_adjacent( { 0, 1 } ) == 1,
-        "[Test] PolyhedralSolid adjacent index is not correct" );
+        "[Test] PolyhedralSolid adjacent index is not correct" );
     OPENGEODE_EXCEPTION( !polyhedral_solid.polyhedron_adjacent( { 0, 2 } ),
-        "[Test] PolyhedralSolid adjacent index is not correct" );
+        "[Test] PolyhedralSolid adjacent index is not correct" );
     OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_adjacent( { 1, 3 } ) == 0,
-        "[Test] PolyhedralSolid adjacent index is not correct" );
+        "[Test] PolyhedralSolid adjacent index is not correct" );
     OPENGEODE_EXCEPTION(
         polyhedral_solid.polyhedra_around_vertex( 4 ).size() == 2,
-        "[Test] PolyhedralSolid should have 2 polyhedra around this vertex" );
+        "[Test] PolyhedralSolid should have 2 polyhedra around this vertex" );
     OPENGEODE_EXCEPTION(
         polyhedral_solid.polyhedron_facets_on_border( 0 ).size() == 4,
-        "[Test] First polyhedron of PolyhedralSolid should have 4 facets on "
+        "[Test] First polyhedron of PolyhedralSolid should have 4 facets on "
         "border" );
 }
 

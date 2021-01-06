@@ -87,7 +87,7 @@ void test_build_aabb()
     AABBTree< dimension > aabb( box_vector );
 
     OPENGEODE_EXCEPTION( aabb.nb_bboxes() == box_vector.size(),
-        "[Test] Build AABB - Wrong number of boxes in the tree" );
+        "[Test] Build AABB - Wrong number of boxes in the tree" );
     return;
 }
 
@@ -151,13 +151,13 @@ void test_nearest_neighbor_search()
                 aabb.closest_element_box( query, disteval );
 
             OPENGEODE_EXCEPTION( box_id == global_box_index( i, j, nb_boxes ),
-                "[Test]  Nearest box to point AABB - Wrong nearest box index" );
+                "[Test]  Nearest box to point AABB - Wrong nearest box index" );
             OPENGEODE_EXCEPTION( nearest_point == box_center,
-                "[Test]  Nearest box to point AABB - Wrong nearest box "
+                "[Test]  Nearest box to point AABB - Wrong nearest box "
                 "center " );
             const Vector< dimension > vec{ box_center, query };
             OPENGEODE_EXCEPTION( distance == vec.length(),
-                "[Test]  Nearest box to point AABB - Wrong distance to nearest "
+                "[Test]  Nearest box to point AABB - Wrong distance to nearest "
                 "box center" );
         }
     }
@@ -236,7 +236,7 @@ void test_intersections_with_query_box()
 
             OPENGEODE_EXCEPTION(
                 eval_intersection.box_intersections_.size() == 4,
-                "[Test]  Box-Box intersection - Wrong number of intersected "
+                "[Test]  Box-Box intersection - Wrong number of intersected "
                 "boxes" );
 
             absl::flat_hash_set< index_t > expected_set;
@@ -246,7 +246,7 @@ void test_intersections_with_query_box()
             expected_set.emplace( global_box_index( i + 1, j + 1, nb_boxes ) );
             OPENGEODE_EXCEPTION(
                 eval_intersection.box_intersections_ == expected_set,
-                "[Test] Box-Box intersection - Wrong set of boxes" );
+                "[Test] Box-Box intersection - Wrong set of boxes" );
         }
     }
     Point< dimension > query;
@@ -266,7 +266,7 @@ void test_intersections_with_query_box()
     expected_set.emplace(
         global_box_index( nb_boxes - 1, nb_boxes - 1, nb_boxes ) );
     OPENGEODE_EXCEPTION( eval_intersection.box_intersections_ == expected_set,
-        "[Test] Box-Box intersection - Wrong set of boxes" );
+        "[Test] Box-Box intersection - Wrong set of boxes" );
 }
 
 template < index_t dimension >
@@ -333,7 +333,7 @@ void test_intersections_with_ray_trace()
 
         OPENGEODE_EXCEPTION(
             eval_intersection.box_intersections_ == expected_set,
-            "[Test] Box-Ray intersection - Wrong set of boxes" );
+            "[Test] Box-Ray intersection - Wrong set of boxes" );
     }
     // ray between two boxes
     Point< dimension > ray_origin;
@@ -356,7 +356,7 @@ void test_intersections_with_ray_trace()
         expected_set.emplace( global_box_index( 1, c, nb_boxes ) );
     }
     OPENGEODE_EXCEPTION( eval_intersection.box_intersections_ == expected_set,
-        "[Test] Box-Ray intersection - Wrong set of boxes" );
+        "[Test] Box-Ray intersection - Wrong set of boxes" );
 
     // oblique ray
     ray_direction.set_value( 0, 1.0 );
@@ -389,7 +389,7 @@ void test_intersections_with_ray_trace()
     expected_set.emplace(
         global_box_index( nb_boxes - 1, nb_boxes - 1, nb_boxes ) );
     OPENGEODE_EXCEPTION( eval_intersection.box_intersections_ == expected_set,
-        "[Test] Box-Ray intersection - Wrong set of boxes" );
+        "[Test] Box-Ray intersection - Wrong set of boxes" );
 }
 
 template < index_t dimension >
@@ -414,7 +414,7 @@ void test_self_intersections()
 
     OPENGEODE_EXCEPTION(
         eval_intersection.included_box_.size() == nb_boxes * nb_boxes,
-        "[Test] Box self intersection - Every box should have one box "
+        "[Test] Box self intersection - Every box should have one box "
         "inside" );
 
     for( index_t i : Range( eval_intersection.included_box_.size() ) )
@@ -422,7 +422,7 @@ void test_self_intersections()
         OPENGEODE_EXCEPTION( eval_intersection.included_box_[i].first
                                  == eval_intersection.included_box_[i].second
                                         - ( nb_boxes * nb_boxes ),
-            "[Test] Box self intersection - Wrong box inclusion result" );
+            "[Test] Box self intersection - Wrong box inclusion result" );
     }
 }
 

@@ -58,7 +58,15 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodePolygonalSurfaceBuilder< dimension >::
-        do_delete_surface_vertices( const std::vector< bool >& /*unused*/ )
+        do_delete_surface_vertices( const std::vector< bool >& /*unused*/,
+            absl::Span< const index_t > /*unused*/ )
+    {
+    }
+
+    template < index_t dimension >
+    void OpenGeodePolygonalSurfaceBuilder< dimension >::
+        do_permute_surface_vertices( absl::Span< const index_t > /*unused*/,
+            absl::Span< const index_t > /*unused*/ )
     {
     }
 
@@ -95,9 +103,18 @@ namespace geode
 
     template < index_t dimension >
     void OpenGeodePolygonalSurfaceBuilder< dimension >::do_delete_polygons(
-        const std::vector< bool >& to_delete )
+        const std::vector< bool >& to_delete,
+        absl::Span< const index_t > /*unused*/ )
     {
         geode_polygonal_surface_->remove_polygons( to_delete, {} );
+    }
+
+    template < index_t dimension >
+    void OpenGeodePolygonalSurfaceBuilder< dimension >::do_permute_polygons(
+        absl::Span< const index_t > permutation,
+        absl::Span< const index_t > /*unused*/ )
+    {
+        geode_polygonal_surface_->permute_polygons( permutation, {} );
     }
 
     template class opengeode_mesh_api OpenGeodePolygonalSurfaceBuilder< 2 >;

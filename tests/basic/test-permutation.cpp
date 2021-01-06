@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - 2021 Geode-solutions
+ * Copyright (c) 2019 - 2020 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,22 +22,23 @@
  */
 
 #include <geode/basic/logger.h>
-#include <geode/basic/uuid.h>
+#include <geode/basic/permutation.h>
 
 #include <geode/tests/common.h>
 
 void test()
 {
-    for( const auto i : geode::Range{ 100 } )
-    {
-        geode_unused( i );
-        const geode::uuid id;
-        geode::Logger::info( id.string() );
-        const geode::uuid id2;
-        OPENGEODE_EXCEPTION( id2 != id, "[Test] UUIDs should be different" );
-        OPENGEODE_EXCEPTION(
-            id2 < id || id < id2, "[Test] UUIDs should be different" );
-    }
+    std::vector< double > data{ 0.1, 0.2, 0.3, 0.4, 0.5 };
+    std::vector< geode::index_t > permutation{ 2, 4, 3, 0, 1 };
+
+    geode::permute( data, permutation );
+    std::vector< double > data_answer{ 0.3, 0.5, 0.4, 0.1, 0.2 };
+    OPENGEODE_EXCEPTION( data == data_answer, "[Test] Wrong permutation data" );
+
+    const auto old2new = geode::old2new_permutation( permutation );
+    absl::FixedArray< geode::index_t > answer_permutation{ 3, 4, 0, 2, 1 };
+    OPENGEODE_EXCEPTION(
+        old2new == answer_permutation, "[Test] Wrong permutation old2new" );
 }
 
-OPENGEODE_TEST( "uuid" )
+OPENGEODE_TEST( "permutation" )
