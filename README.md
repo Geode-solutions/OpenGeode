@@ -43,6 +43,7 @@ OpenGeode is an open source framework for representing and manipulating geometri
 | [OpenGeode-Geosciences]          | ![OpenGeode-Geosciences-version] | Custom objects and algorithms tailored for Geosciences |
 | [OpenGeode-GeosciencesIO]          | ![OpenGeode-GeosciencesIO-version] | Implementation of input and output formats for Geosciences |
 | [OpenGeode-ModuleTemplate]          | ![OpenGeode-ModuleTemplate-version] | Template for creating your own OpenGeode modules |
+| [Geode]          | ![Geode-version] | Open source viewer for geological objects |
 
 [OpenGeode-IO]: https://github.com/Geode-solutions/OpenGeode-IO
 [OpenGeode-IO-version]: https://img.shields.io/github/release/Geode-solutions/OpenGeode-IO.svg
@@ -55,6 +56,9 @@ OpenGeode is an open source framework for representing and manipulating geometri
 
 [OpenGeode-ModuleTemplate]: https://github.com/Geode-solutions/OpenGeode-ModuleTemplate
 [OpenGeode-ModuleTemplate-version]: https://img.shields.io/github/release/Geode-solutions/OpenGeode-ModuleTemplate.svg
+
+[Geode]: https://github.com/Geode-solutions/GeodePackage
+[Geode-version]: https://img.shields.io/github/release/Geode-solutions/GeodePackage.svg
 
 
 ## Documentation
