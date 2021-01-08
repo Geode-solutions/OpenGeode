@@ -68,7 +68,7 @@ void test()
     OPENGEODE_EXCEPTION(
         reverse_range2.back() == 3, "[Test] Wrong ReverseRange last item (2)" );
 
-	struct Foo
+    struct Foo
     {
         Foo() = delete;
         Foo( double d, int i ) : double_( d ), int_( i )
@@ -86,11 +86,11 @@ void test()
     };
     std::vector< Foo > foos;
     foos.reserve( 3 );
-	foos.emplace_back( 2.2, 1 );
+    foos.emplace_back( 2.2, 1 );
     foos.emplace_back( 3.2, 3 );
     foos.emplace_back( 7.2, 7 );
     geode::Logger::info( "start" );
-    for( const auto&& i : geode::EraserRange<Foo>{ foos } )
+    for( const auto&& i : geode::EraserRange< Foo >{ foos } )
     {
         geode::Logger::info( i.double_, " # ", i.int_ );
     }
