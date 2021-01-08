@@ -195,7 +195,7 @@ namespace geode
     };
     using Indices = TIndices< index_t >;
     using LIndices = TIndices< local_index_t >;
-	
+
     template < typename Type >
     class EraserRange : public BaseRange< index_t, DecrementOperator >,
                         public BeginEnd< EraserRange< Type > >
@@ -204,18 +204,18 @@ namespace geode
         EraserRange( std::vector< Type >& values )
             : BaseRange< index_t, DecrementOperator >( values.size() - 1, -1 ),
               BeginEnd< EraserRange< Type > >( *this ),
-              values_( values  )
+              values_( values )
         {
         }
 
-        Type&& operator*() 
+        Type&& operator*()
         {
             auto&& value = std::move( values_[this->current()] );
             values_.pop_back();
-            return std::move(value);
+            return std::move( value );
         }
 
-	private:
+    private:
         std::vector< Type >& values_;
     };
 } // namespace geode
