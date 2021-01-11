@@ -55,8 +55,8 @@ namespace geode
              * Each index is pointing to its new unique point stored in the
              * unique_points vector.
              */
-            absl::FixedArray< index_t > colocated_mapping;
-            absl::FixedArray< Point< dimension > > unique_points;
+            std::vector< index_t > colocated_mapping;
+            std::vector< Point< dimension > > unique_points;
         };
 
     public:
