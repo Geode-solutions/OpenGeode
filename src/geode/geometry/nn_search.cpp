@@ -210,8 +210,7 @@ namespace geode
         }
         index_t nb_colocated{ 0 };
         index_t count{ 0 };
-        std::vector< Point< dimension > > unique_points(
-            nb_unique_points );
+        std::vector< Point< dimension > > unique_points( nb_unique_points );
         for( const auto p : Range{ nb_points() } )
         {
             if( mapping[p] == p )
