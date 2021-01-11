@@ -185,7 +185,7 @@ namespace geode
     typename NNSearch< dimension >::ColocatedInfo
         NNSearch< dimension >::colocated_index_mapping( double epsilon ) const
     {
-        absl::FixedArray< index_t > mapping( nb_points() );
+        std::vector< index_t > mapping( nb_points() );
         absl::c_iota( mapping, 0 );
         async::parallel_for( async::irange( index_t{ 0 }, nb_points() ),
             [&epsilon, &mapping, this]( index_t p ) {
@@ -210,7 +210,7 @@ namespace geode
         }
         index_t nb_colocated{ 0 };
         index_t count{ 0 };
-        absl::FixedArray< Point< dimension > > unique_points(
+        std::vector< Point< dimension > > unique_points(
             nb_unique_points );
         for( const auto p : Range{ nb_points() } )
         {
