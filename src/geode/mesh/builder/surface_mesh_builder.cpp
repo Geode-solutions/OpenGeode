@@ -330,12 +330,12 @@ namespace geode
         disassociate_polygon_vertex_to_vertex( old_vertex_id );
         for( const auto& polygon_around : polygons_around )
         {
-            const auto previous_id = surface_mesh_->polygon_vertex(
-                surface_mesh_->previous_polygon_vertex( polygon_around ) );
-            const auto next_id = surface_mesh_->polygon_vertex(
-                surface_mesh_->next_polygon_edge( polygon_around ) );
             if( surface_mesh_->are_edges_enabled() )
             {
+                const auto previous_id = surface_mesh_->polygon_vertex(
+                    surface_mesh_->previous_polygon_vertex( polygon_around ) );
+                const auto next_id = surface_mesh_->polygon_vertex(
+                    surface_mesh_->next_polygon_edge( polygon_around ) );
                 auto edges = edges_builder();
                 edges.update_edge_vertex(
                     { old_vertex_id, next_id }, 0, new_vertex_id );
