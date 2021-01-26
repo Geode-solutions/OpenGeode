@@ -21,6 +21,7 @@
  *
  */
 
+#include <pybind11/iostream.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
@@ -49,8 +50,10 @@ namespace pybind11
 
 PYBIND11_MODULE( opengeode_py_basic, module )
 {
+    pybind11::add_ostream_redirect( module );
     module.doc() = "OpenGeode Python binding for basic";
     module.attr( "NO_ID" ) = geode::NO_ID;
+    module.attr( "NO_LID" ) = geode::NO_LID;
     module.attr( "global_epsilon" ) = geode::global_epsilon;
     module.attr( "global_epsilon2" ) = geode::global_epsilon2;
     module.attr( "global_epsilon3" ) = geode::global_epsilon3;

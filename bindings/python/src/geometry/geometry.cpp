@@ -21,6 +21,7 @@
  *
  */
 
+#include <pybind11/iostream.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
@@ -50,6 +51,7 @@ namespace pybind11
 
 PYBIND11_MODULE( opengeode_py_geometry, module )
 {
+    pybind11::add_ostream_redirect( module );
     module.doc() = "OpenGeode Python binding for geometry";
     geode::define_point( module );
     geode::define_vector( module );
