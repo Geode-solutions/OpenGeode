@@ -147,7 +147,7 @@ void test_backward_io( const std::string& filename )
     auto graph = geode::load_graph( filename );
 
     OPENGEODE_EXCEPTION( graph->edges_around_vertex( 2 ).size() == 3,
-        "[Test] Backward edges_around should have 3 edges" );
+        "[Test] Backward edges_around should have 3 edges" );
 }
 
 void test_clone( const geode::Graph& graph )
