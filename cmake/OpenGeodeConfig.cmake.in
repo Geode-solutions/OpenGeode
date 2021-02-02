@@ -39,6 +39,8 @@ if(@OPENGEODE_WITH_PYTHON@)
     include(${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@_py_model_target.cmake)
 endif()
 
+set(CMAKE_CXX_STANDARD @OPENGEODE_CXX_STANDARD@)
+
 if(NOT COMMAND add_geode_library)
 @OPENGEODE_UTILS@
 endif()
