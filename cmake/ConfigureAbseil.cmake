@@ -20,6 +20,9 @@
 
 set(ABSEIL_PATH ${PROJECT_BINARY_DIR}/third_party/abseil)
 set(ABSEIL_INSTALL_PREFIX ${ABSEIL_PATH}/install)
+if(CMAKE_CXX_STANDARD)
+    set(STANDARD -DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD})
+endif()
 ExternalProject_Add(abseil
     PREFIX ${ABSEIL_PATH}
     GIT_REPOSITORY https://github.com/Geode-solutions/abseil-cpp
