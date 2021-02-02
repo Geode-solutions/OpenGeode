@@ -24,7 +24,7 @@ project(OpenGeode CXX)
 if(NOT "${CMAKE_CXX_STANDARD}" STREQUAL "")
     set(OPENGEODE_CXX_STANDARD ${CMAKE_CXX_STANDARD})
 else()
-    set(OPENGEODE_CXX_STANDARD 11)
+    set(OPENGEODE_CXX_STANDARD "11")
 endif()
 
 set(UTILS_FILE "${PROJECT_SOURCE_DIR}/cmake/utils.cmake")
