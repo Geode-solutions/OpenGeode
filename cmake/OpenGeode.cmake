@@ -21,6 +21,12 @@
 # Define the project
 project(OpenGeode CXX)
 
+if(CMAKE_CXX_STANDARD)
+    set(OPENGEODE_CXX_STANDARD ${CMAKE_CXX_STANDARD})
+else()
+    set(OPENGEODE_CXX_STANDARD 11)
+endif()
+
 set(UTILS_FILE "${PROJECT_SOURCE_DIR}/cmake/utils.cmake")
 file(READ "${UTILS_FILE}" OPENGEODE_UTILS)
 include("${UTILS_FILE}")

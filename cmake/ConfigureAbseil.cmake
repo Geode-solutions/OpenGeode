@@ -20,6 +20,9 @@
 
 set(ABSEIL_PATH ${PROJECT_BINARY_DIR}/third_party/abseil)
 set(ABSEIL_INSTALL_PREFIX ${ABSEIL_PATH}/install)
+if(CMAKE_CXX_STANDARD)
+    set(STANDARD -DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD})
+endif()
 ExternalProject_Add(abseil
     PREFIX ${ABSEIL_PATH}
     GIT_REPOSITORY https://github.com/Geode-solutions/abseil-cpp
@@ -35,6 +38,7 @@ ExternalProject_Add(abseil
         -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON
         -DCMAKE_C_FLAGS_DEBUG=${CMAKE_C_FLAGS_DEBUG}
         -DCMAKE_CXX_FLAGS_DEBUG=${CMAKE_CXX_FLAGS_DEBUG}
+        ${STANDARD}
     CMAKE_CACHE_ARGS
         -DCMAKE_INSTALL_PREFIX:PATH=${ABSEIL_INSTALL_PREFIX}
 )
