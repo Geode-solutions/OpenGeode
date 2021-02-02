@@ -21,7 +21,7 @@
 # Define the project
 project(OpenGeode CXX)
 
-if(DEFINED ${CMAKE_CXX_STANDARD})
+if(NOT "${CMAKE_CXX_STANDARD}" STREQUAL "")
     set(OPENGEODE_CXX_STANDARD ${CMAKE_CXX_STANDARD})
 else()
     set(OPENGEODE_CXX_STANDARD 11)
