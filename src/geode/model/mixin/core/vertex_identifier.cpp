@@ -278,6 +278,40 @@ namespace geode
             }
         }
 
+        std::vector< index_t > delete_isolated_vertices()
+        {
+            std::vector< bool > to_delete(
+                unique_vertices_.nb_vertices(), false );
+            absl::flat_hash_map< uuid, std::vector< index_t > >
+                components_vertices;
+            for( const auto v : Range{ unique_vertices_.nb_vertices() } )
+            {
+                const auto& vertices = mesh_component_vertices( v );
+                if( vertices.empty() )
+                {
+                    to_delete[v] = true;
+                    continue;
+                }
+                for( const auto& mcv : vertices )
+                {
+                    components_vertices[mcv.component_id.id()].emplace_back(
+                        mcv.vertex );
+                }
+            }
+            const auto old2new = VertexSetBuilder::create( unique_vertices_ )
+                                     ->delete_vertices( to_delete );
+            for( const auto& component_vertices : components_vertices )
+            {
+                auto& attribute =
+                    vertex2unique_vertex_.at( component_vertices.first );
+                for( const auto v : component_vertices.second )
+                {
+                    attribute->set_value( v, old2new[attribute->value( v )] );
+                }
+            }
+            return old2new;
+        }
+
         void save( absl::string_view directory ) const
         {
             const auto filename = absl::StrCat( directory, "/vertices" );
@@ -500,6 +534,12 @@ namespace geode
         absl::string_view directory, BuilderKey )
     {
         return impl_->load( directory );
+    }
+
+    std::vector< index_t > VertexIdentifier::delete_isolated_vertices(
+        BuilderKey )
+    {
+        return impl_->delete_isolated_vertices();
     }
 
     template void opengeode_model_api VertexIdentifier::register_mesh_component(
