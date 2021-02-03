@@ -169,13 +169,13 @@ void test_modify_unique_vertices( geode::VertexIdentifier& vertex_identifier )
             && vertex_identifier.mesh_component_vertices( 3 ).size() == 0,
         "[Test] Reset of a unique vertex (to similar value) is not correct" );
 
-    builder.set_unique_vertex( mesh_component_vertex0, 3 );
+    builder.set_unique_vertex( mesh_component_vertex0, 4 );
     OPENGEODE_EXCEPTION(
         vertex_identifier.mesh_component_vertices( 0 ).size() == 1
-            && vertex_identifier.mesh_component_vertices( 3 ).size() == 1,
+            && vertex_identifier.mesh_component_vertices( 4 ).size() == 1,
         "[Test] Reset of a unique vertex is not correct - sizes" );
     OPENGEODE_EXCEPTION(
-        vertex_identifier.unique_vertex( mesh_component_vertex0 ) == 3,
+        vertex_identifier.unique_vertex( mesh_component_vertex0 ) == 4,
         "[Test] Reset of a unique vertex is not correct - values" );
 }
 
@@ -287,6 +287,11 @@ void test()
 
     builder.unregister_mesh_component( provider.corner( corner2_id ) );
     builder.register_mesh_component( provider.corner( corner2_id ) );
+
+    const auto mcv = vertex_identifier.mesh_component_vertices( 4 ).front();
+    vertex_id_builder.delete_isolated_vertices();
+    OPENGEODE_EXCEPTION( vertex_identifier.unique_vertex( mcv ) == 3,
+        "[Test] Wrong UID after delete_isolated_vertices" );
 }
 
 OPENGEODE_TEST( "vertex-identifier" )

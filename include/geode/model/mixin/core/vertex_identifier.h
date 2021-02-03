@@ -186,6 +186,11 @@ namespace geode
          */
         void load_unique_vertices( absl::string_view directory, BuilderKey );
 
+        /*!
+         * Delete all unique vertices not associated with any component
+         */
+        std::vector< index_t > delete_isolated_vertices( BuilderKey );
+
     protected:
         VertexIdentifier( VertexIdentifier&& );
 

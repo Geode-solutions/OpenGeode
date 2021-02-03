@@ -67,4 +67,9 @@ namespace geode
     {
         vertex_identifier_.load_unique_vertices( directory, {} );
     }
+
+    std::vector< index_t > VertexIdentifierBuilder::delete_isolated_vertices()
+    {
+        return vertex_identifier_.delete_isolated_vertices( {} );
+    }
 } // namespace geode
