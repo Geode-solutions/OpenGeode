@@ -408,17 +408,35 @@ namespace geode
             {
                 const PolygonEdge adj_edge{ polygon_adj_id, e };
                 const auto adj_v0 = polygon_vertex( adj_edge );
-                const auto adj_v1 = polygon_edge_vertex( adj_edge, 1 );
-                if( ( v0 == adj_v1 && v1 == adj_v0 )
-                    || ( v0 == adj_v0 && v1 == adj_v1 ) )
+                if( v0 == adj_v0 )
                 {
-                    OPENGEODE_ASSERT(
-                        polygon_adjacent( adj_edge ) == polygon_edge.polygon_id,
-                        absl::StrCat( "[SurfaceMesh::polygon_adjacent_"
-                                      "edge] Wrong adjacency with polygons: ",
-                            polygon_edge.polygon_id, " and ",
-                            polygon_adj_id ) );
-                    return adj_edge;
+                    const auto adj_v1 = polygon_edge_vertex( adj_edge, 1 );
+                    if( v1 == adj_v1 )
+                    {
+                        OPENGEODE_ASSERT( polygon_adjacent( adj_edge )
+                                              == polygon_edge.polygon_id,
+                            absl::StrCat(
+                                "[SurfaceMesh::polygon_adjacent_"
+                                "edge] Wrong adjacency with polygons: ",
+                                polygon_edge.polygon_id, " and ",
+                                polygon_adj_id ) );
+                        return adj_edge;
+                    }
+                }
+                else if( v1 == adj_v0 )
+                {
+                    const auto adj_v1 = polygon_edge_vertex( adj_edge, 1 );
+                    if( v0 == adj_v1 )
+                    {
+                        OPENGEODE_ASSERT( polygon_adjacent( adj_edge )
+                                              == polygon_edge.polygon_id,
+                            absl::StrCat(
+                                "[SurfaceMesh::polygon_adjacent_"
+                                "edge] Wrong adjacency with polygons: ",
+                                polygon_edge.polygon_id, " and ",
+                                polygon_adj_id ) );
+                        return adj_edge;
+                    }
                 }
             }
             throw OpenGeodeException{ "[SurfaceMesh::polygon_adjacent_"
@@ -584,30 +602,24 @@ namespace geode
             "[SurfaceMesh::polygons_around_vertex] Wrong polygon "
             "around vertex" );
         PolygonsAroundVertex polygons;
-        absl::InlinedVector< index_t, 10 > polygons_visited;
-        std::stack< PolygonVertex > S;
-        S.push( first_polygon.value() );
-        while( !S.empty() )
+        auto cur_polygon_edge = first_polygon;
+        do
         {
-            const auto polygon_vertex = S.top();
-            S.pop();
-            if( absl::c_find( polygons_visited, polygon_vertex.polygon_id )
-                != polygons_visited.end() )
-            {
-                continue;
-            }
-            polygons_visited.push_back( polygon_vertex.polygon_id );
-            polygons.push_back( polygon_vertex );
+            polygons.push_back( cur_polygon_edge.value() );
+            const auto prev_edge =
+                previous_polygon_edge( cur_polygon_edge.value() );
+            cur_polygon_edge = polygon_adjacent_edge( prev_edge );
+        } while( cur_polygon_edge && cur_polygon_edge != first_polygon );
 
-            if( const auto adj_edge =
-                    polygon_adjacent_edge( { polygon_vertex } ) )
+        if( cur_polygon_edge != first_polygon )
+        {
+            cur_polygon_edge = polygon_adjacent_edge( first_polygon.value() );
+            while( cur_polygon_edge )
             {
-                S.emplace( next_polygon_edge( adj_edge.value() ) );
-            }
-            const auto prev_edge = previous_polygon_edge( polygon_vertex );
-            if( const auto prev_adj_edge = polygon_adjacent_edge( prev_edge ) )
-            {
-                S.emplace( prev_adj_edge.value() );
+                const auto next_edge =
+                    next_polygon_edge( cur_polygon_edge.value() );
+                polygons.push_back( next_edge );
+                cur_polygon_edge = polygon_adjacent_edge( next_edge );
             }
         }
         return polygons;
