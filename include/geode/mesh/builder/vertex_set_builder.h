@@ -84,7 +84,7 @@ namespace geode
          * Each value corresponds to the destination position.
          * @return  the mapping between old vertex indices to new ones.
          */
-        absl::FixedArray< index_t > permute_vertices(
+        std::vector< index_t > permute_vertices(
             absl::Span< const index_t > permutation );
 
         void set_mesh( VertexSet& mesh, MeshBuilderFactoryKey );

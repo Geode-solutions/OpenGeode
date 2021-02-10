@@ -136,7 +136,7 @@ namespace geode
 
     private:
         absl::FixedArray< BoundingBox< dimension > > tree_;
-        absl::FixedArray< index_t > mapping_morton_;
+        std::vector< index_t > mapping_morton_;
     };
 
     template < index_t dimension >

@@ -142,7 +142,7 @@ namespace geode
          * Each value corresponds to the destination position.
          * @return the mapping between old polyhedron indices to new ones.
          */
-        absl::FixedArray< index_t > permute_polyhedra(
+        std::vector< index_t > permute_polyhedra(
             absl::Span< const index_t > permutation );
 
         /*!

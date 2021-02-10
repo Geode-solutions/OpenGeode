@@ -652,9 +652,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::FixedArray< index_t >
-        SolidMeshBuilder< dimension >::permute_polyhedra(
-            absl::Span< const index_t > permutation )
+    std::vector< index_t > SolidMeshBuilder< dimension >::permute_polyhedra(
+        absl::Span< const index_t > permutation )
     {
         const auto old2new = old2new_permutation( permutation );
         update_polyhedron_around_vertices_from_polyhedron(

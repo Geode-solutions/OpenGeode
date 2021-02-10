@@ -188,7 +188,7 @@ namespace geode
         return old2new;
     }
 
-    absl::FixedArray< index_t > GraphBuilder::permute_edges(
+    std::vector< index_t > GraphBuilder::permute_edges(
         absl::Span< const index_t > permutation )
     {
         const auto old2new = old2new_permutation( permutation );

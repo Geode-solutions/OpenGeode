@@ -29,7 +29,7 @@
 
 namespace
 {
-    using itr = absl::FixedArray< geode::index_t >::iterator;
+    using itr = std::vector< geode::index_t >::iterator;
 
     template < geode::index_t dimension >
     class Morton_cmp
@@ -149,18 +149,18 @@ namespace
 namespace geode
 {
     template < index_t dimension >
-    absl::FixedArray< index_t > morton_sort(
+    std::vector< index_t > morton_sort(
         absl::Span< const Point< dimension > > points )
     {
-        absl::FixedArray< index_t > mapping_morton( points.size() );
+        std::vector< index_t > mapping_morton( points.size() );
         absl::c_iota( mapping_morton, 0 );
         ::morton_sort< 0_uc >(
             points, mapping_morton.begin(), mapping_morton.end() );
         return mapping_morton;
     }
 
-    template absl::FixedArray< index_t > opengeode_geometry_api morton_sort(
+    template std::vector< index_t > opengeode_geometry_api morton_sort(
         absl::Span< const Point< 2 > > );
-    template absl::FixedArray< index_t > opengeode_geometry_api morton_sort(
+    template std::vector< index_t > opengeode_geometry_api morton_sort(
         absl::Span< const Point< 3 > > );
 } // namespace geode
