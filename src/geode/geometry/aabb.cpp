@@ -56,7 +56,7 @@ namespace
     }
 
     template < geode::index_t dimension >
-    absl::FixedArray< geode::index_t > sort(
+    std::vector< geode::index_t > sort(
         absl::Span< const geode::BoundingBox< dimension > > bboxes )
     {
         absl::FixedArray< geode::Point< dimension > > points( bboxes.size() );

@@ -31,10 +31,10 @@
 
 namespace geode
 {
-    absl::FixedArray< index_t > old2new_permutation(
+    std::vector< index_t > old2new_permutation(
         absl::Span< const index_t > permutation )
     {
-        absl::FixedArray< index_t > old2new( permutation.size() );
+        std::vector< index_t > old2new( permutation.size() );
         for( const auto i : Indices{ permutation } )
         {
             old2new[permutation[i]] = i;
