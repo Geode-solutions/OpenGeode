@@ -102,10 +102,11 @@ namespace geode
         const Point< dimension >& point, const Segment< dimension >& segment )
     {
         const auto dir = segment.direction();
+        const auto length = dir.length();
         const Vector< dimension > v0p{ segment.vertices()[0], point };
-        const auto dot0 = v0p.dot( dir );
+        const auto dot0 = v0p.dot( dir ) / length;
         const Vector< dimension > v1p{ segment.vertices()[1], point };
-        const auto dot1 = -v1p.dot( dir );
+        const auto dot1 = -v1p.dot( dir ) / length;
         const auto sum = dot0 + dot1;
         OPENGEODE_EXCEPTION( std::fabs( sum ) > global_epsilon,
             "[segment_barycentric_coordinates] Length of input segment too "
