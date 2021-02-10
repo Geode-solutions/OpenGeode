@@ -109,7 +109,7 @@ namespace geode
          * Each value corresponds to the destination position.
          * @return the mapping between old edge indices to new ones.
          */
-        absl::FixedArray< index_t > permute_edges(
+        std::vector< index_t > permute_edges(
             absl::Span< const index_t > permutation );
 
         /*!

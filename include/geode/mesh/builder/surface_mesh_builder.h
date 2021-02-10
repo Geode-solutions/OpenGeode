@@ -144,7 +144,7 @@ namespace geode
          * Each value corresponds to the destination position.
          * @return the mapping between old polygon indices to new ones.
          */
-        absl::FixedArray< index_t > permute_polygons(
+        std::vector< index_t > permute_polygons(
             absl::Span< const index_t > permutation );
 
         /*!

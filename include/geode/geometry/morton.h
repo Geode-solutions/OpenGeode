@@ -36,6 +36,6 @@ namespace geode
 namespace geode
 {
     template < index_t dimension >
-    absl::FixedArray< index_t > morton_sort(
+    std::vector< index_t > morton_sort(
         absl::Span< const Point< dimension > > points );
 } // namespace geode

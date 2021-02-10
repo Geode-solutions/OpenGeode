@@ -36,7 +36,7 @@ void test()
     OPENGEODE_EXCEPTION( data == data_answer, "[Test] Wrong permutation data" );
 
     const auto old2new = geode::old2new_permutation( permutation );
-    absl::FixedArray< geode::index_t > answer_permutation{ 3, 4, 0, 2, 1 };
+    std::vector< geode::index_t > answer_permutation{ 3, 4, 0, 2, 1 };
     OPENGEODE_EXCEPTION(
         old2new == answer_permutation, "[Test] Wrong permutation old2new" );
 }

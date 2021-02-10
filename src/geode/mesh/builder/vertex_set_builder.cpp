@@ -80,7 +80,7 @@ namespace geode
         return old2new;
     }
 
-    absl::FixedArray< index_t > VertexSetBuilder::permute_vertices(
+    std::vector< index_t > VertexSetBuilder::permute_vertices(
         absl::Span< const index_t > permutation )
     {
         const auto old2new = old2new_permutation( permutation );

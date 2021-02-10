@@ -614,9 +614,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::FixedArray< index_t >
-        SurfaceMeshBuilder< dimension >::permute_polygons(
-            absl::Span< const index_t > permutation )
+    std::vector< index_t > SurfaceMeshBuilder< dimension >::permute_polygons(
+        absl::Span< const index_t > permutation )
     {
         const auto old2new = old2new_permutation( permutation );
         update_polygon_around( *surface_mesh_, *this, old2new );

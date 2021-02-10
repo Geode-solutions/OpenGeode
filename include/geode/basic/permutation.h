@@ -62,6 +62,6 @@ namespace geode
         }
     }
 
-    absl::FixedArray< index_t > opengeode_basic_api old2new_permutation(
+    std::vector< index_t > opengeode_basic_api old2new_permutation(
         absl::Span< const index_t > permutation );
 } // namespace geode
