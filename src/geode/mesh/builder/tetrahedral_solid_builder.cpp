@@ -37,6 +37,13 @@
 namespace geode
 {
     template < index_t dimension >
+    TetrahedralSolidBuilder< dimension >::TetrahedralSolidBuilder(
+        VertexSet& vertex_set )
+        : SolidMeshBuilder< dimension >( vertex_set )
+    {
+    }
+
+    template < index_t dimension >
     std::unique_ptr< TetrahedralSolidBuilder< dimension > >
         TetrahedralSolidBuilder< dimension >::create(
             TetrahedralSolid< dimension >& mesh )

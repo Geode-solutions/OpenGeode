@@ -30,7 +30,8 @@ namespace geode
     {
         pybind11::class_< BRepBuilder, TopologyBuilder, CornersBuilder3D,
             LinesBuilder3D, SurfacesBuilder3D, BlocksBuilder3D,
-            ModelBoundariesBuilder3D >( module, "BRepBuilder" )
+            ModelBoundariesBuilder3D, IdentifierBuilder >(
+            module, "BRepBuilder" )
             .def( pybind11::init< BRep& >() )
             .def( "copy", &BRepBuilder::copy )
             .def( "add_corner",

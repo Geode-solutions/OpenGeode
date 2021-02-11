@@ -77,23 +77,21 @@ struct Foo3
                                 { []( Archive &a, Foo3 &foo ) {
                                      a.value8b( foo.double_ );
                                      a.value4b( foo.unsigned_int_ );
+                                     foo.bool_ = true;
+                                     foo.int_ = -52;
                                  },
                                     []( Archive &a, Foo3 &foo ) {
                                         a.value8b( foo.double_ );
                                         a.value4b( foo.unsigned_int_ );
                                         a.value1b( foo.bool_ );
+                                        foo.int_ = true;
                                     },
                                     []( Archive &a, Foo3 &foo ) {
                                         a.value8b( foo.double_ );
                                         a.value4b( foo.unsigned_int_ );
                                         a.value1b( foo.bool_ );
                                         a.value4b( foo.int_ );
-                                    } },
-                                { []( Foo3 &foo ) {
-                                     foo.bool_ = true;
-                                     foo.int_ = -52;
-                                 },
-                                    []( Foo3 &foo ) { foo.int_ = true; } } } );
+                                    } } } );
     }
     double double_{ 10 };
     unsigned int unsigned_int_{ 10 };

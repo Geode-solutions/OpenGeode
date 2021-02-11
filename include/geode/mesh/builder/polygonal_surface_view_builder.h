@@ -52,6 +52,9 @@ namespace geode
 
         void add_viewed_polygon( index_t polygon_id );
 
+        PolygonalSurfaceViewBuilder(
+            VertexSet& vertex_set, MeshBuilderFactoryKey );
+
     private:
         void do_set_mesh( VertexSet& mesh ) final;
 

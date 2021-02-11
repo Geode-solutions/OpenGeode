@@ -88,10 +88,16 @@ namespace geode
     template < typename Archive >
     void VertexSet::serialize( Archive& archive )
     {
-        archive.ext( *this, DefaultGrowable< Archive, VertexSet >{},
-            []( Archive& a, VertexSet& vertex_set ) {
-                a.object( vertex_set.impl_ );
-            } );
+        archive.ext(
+            *this, Growable< Archive, VertexSet >{
+                       { []( Archive& a, VertexSet& vertex_set ) {
+                            a.object( vertex_set.impl_ );
+                        },
+                           []( Archive& a, VertexSet& vertex_set ) {
+                               a.object( vertex_set.impl_ );
+                               a.ext( vertex_set,
+                                   bitsery::ext::BaseClass< Identifier >{} );
+                           } } } );
     }
 
     std::unique_ptr< VertexSet > VertexSet::clone() const

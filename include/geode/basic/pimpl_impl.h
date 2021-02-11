@@ -44,6 +44,12 @@ namespace geode
     }
 
     template < typename T >
+    void PImpl< T >::reset()
+    {
+        return pimpl_.reset();
+    }
+
+    template < typename T >
     const T* PImpl< T >::operator->() const
     {
         return pimpl_.get();

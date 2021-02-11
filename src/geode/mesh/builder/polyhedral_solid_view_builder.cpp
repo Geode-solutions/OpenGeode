@@ -31,6 +31,13 @@
 namespace geode
 {
     template < index_t dimension >
+    PolyhedralSolidViewBuilder< dimension >::PolyhedralSolidViewBuilder(
+        VertexSet& vertex_set, MeshBuilderFactoryKey )
+        : PolyhedralSolidBuilder< dimension >( vertex_set )
+    {
+    }
+
+    template < index_t dimension >
     std::unique_ptr< PolyhedralSolidViewBuilder< dimension > >
         PolyhedralSolidViewBuilder< dimension >::create(
             PolyhedralSolidView< dimension >& mesh )

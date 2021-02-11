@@ -40,8 +40,10 @@ namespace geode
         MeshBuilderFactoryKey() {}
     };
 
-    class opengeode_mesh_api MeshBuilderFactory
-        : public Factory< MeshImpl, VertexSetBuilder >
+    class opengeode_mesh_api MeshBuilderFactory : public Factory< MeshImpl,
+                                                      VertexSetBuilder,
+                                                      VertexSet&,
+                                                      MeshBuilderFactoryKey >
     {
         PASSKEY( MeshBuilderFactory, Key );
 
@@ -56,7 +58,7 @@ namespace geode
         static std::unique_ptr< MeshBuilder > create_mesh_builder( Mesh& mesh )
         {
             auto* builder = dynamic_cast< MeshBuilder* >(
-                create( mesh.impl_name() ).release() );
+                create( mesh.impl_name(), mesh, {} ).release() );
             OPENGEODE_EXCEPTION( builder,
                 "Cannot create mesh builder with key: ",
                 mesh.impl_name().get() );

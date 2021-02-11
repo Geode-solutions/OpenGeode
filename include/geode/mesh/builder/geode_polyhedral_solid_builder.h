@@ -32,6 +32,7 @@ namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
     FORWARD_DECLARATION_DIMENSION_CLASS( OpenGeodePolyhedralSolid );
+    class VertexSet;
 } // namespace geode
 
 namespace geode
@@ -45,6 +46,10 @@ namespace geode
         : public PolyhedralSolidBuilder< dimension >
     {
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
+
+    public:
+        OpenGeodePolyhedralSolidBuilder(
+            VertexSet& vertex_set, MeshBuilderFactoryKey );
 
     private:
         void do_set_mesh( VertexSet& mesh ) final;

@@ -82,6 +82,11 @@ namespace
 
 namespace geode
 {
+    GraphBuilder::GraphBuilder( VertexSet& vertex_set )
+        : VertexSetBuilder( vertex_set )
+    {
+    }
+
     void GraphBuilder::set_mesh( Graph& mesh, MeshBuilderFactoryKey key )
     {
         graph_ = &mesh;

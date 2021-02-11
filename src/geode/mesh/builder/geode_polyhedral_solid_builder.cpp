@@ -25,10 +25,19 @@
 
 #include <geode/geometry/point.h>
 
+#include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/core/geode_polyhedral_solid.h>
 
 namespace geode
 {
+    template < index_t dimension >
+    OpenGeodePolyhedralSolidBuilder<
+        dimension >::OpenGeodePolyhedralSolidBuilder( VertexSet& vertex_set,
+        MeshBuilderFactoryKey )
+        : PolyhedralSolidBuilder< dimension >( vertex_set )
+    {
+    }
+
     template < index_t dimension >
     void OpenGeodePolyhedralSolidBuilder< dimension >::do_set_mesh(
         VertexSet& mesh )

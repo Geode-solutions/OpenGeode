@@ -48,6 +48,11 @@ namespace geode
         void load_section_files( absl::string_view directory )
         {
             SectionBuilder builder{ section() };
+            builder.load_identifier( directory );
+            if( section().name() == Identifier::DEFAULT_NAME )
+            {
+                builder.set_name( filename_without_extension( filename() ) );
+            }
             builder.load_corners( directory );
             builder.load_lines( directory );
             builder.load_surfaces( directory );

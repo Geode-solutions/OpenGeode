@@ -85,7 +85,7 @@ namespace geode
             TriangulatedSurface< dimension >& mesh, MeshBuilderFactoryKey key );
 
     protected:
-        TriangulatedSurfaceBuilder() = default;
+        TriangulatedSurfaceBuilder( VertexSet& vertex_set );
 
         void copy(
             const TriangulatedSurface< dimension >& triangulated_surface );

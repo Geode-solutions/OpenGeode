@@ -177,7 +177,7 @@ namespace geode
             SurfaceMesh< dimension >& mesh, MeshBuilderFactoryKey key );
 
     protected:
-        SurfaceMeshBuilder() = default;
+        SurfaceMeshBuilder( VertexSet& vertex_set );
 
         void copy( const SurfaceMesh< dimension >& surface_mesh );
 

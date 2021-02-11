@@ -57,6 +57,7 @@ namespace geode
 
         void save_brep_files( absl::string_view directory ) const
         {
+            brep().save_identifier( directory );
             brep().save_relationships( directory );
             brep().save_unique_vertices( directory );
             brep().save_corners( directory );

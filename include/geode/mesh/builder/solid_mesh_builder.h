@@ -176,7 +176,7 @@ namespace geode
             SolidMesh< dimension >& mesh, MeshBuilderFactoryKey key );
 
     protected:
-        SolidMeshBuilder() = default;
+        SolidMeshBuilder( VertexSet& vertex_set );
 
         void copy( const SolidMesh< dimension >& solid_mesh );
 

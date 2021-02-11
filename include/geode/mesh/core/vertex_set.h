@@ -23,7 +23,9 @@
 
 #pragma once
 
+#include <geode/basic/identifier.h>
 #include <geode/basic/pimpl.h>
+
 
 #include <geode/mesh/common.h>
 #include <geode/mesh/core/mesh_id.h>
@@ -38,7 +40,7 @@ namespace geode
     /*!
      * Interface class to represent set of vertices.
      */
-    class opengeode_mesh_api VertexSet
+    class opengeode_mesh_api VertexSet : public Identifier
     {
         OPENGEODE_DISABLE_COPY( VertexSet );
         friend class bitsery::Access;

@@ -50,6 +50,7 @@ namespace geode
 
         void save_section_files( absl::string_view directory ) const
         {
+            section().save_identifier( directory );
             section().save_relationships( directory );
             section().save_unique_vertices( directory );
             section().save_corners( directory );

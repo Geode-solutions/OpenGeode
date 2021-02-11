@@ -31,6 +31,12 @@
 namespace geode
 {
     template < index_t dimension >
+    EdgedCurveBuilder< dimension >::EdgedCurveBuilder( VertexSet& vertex_set )
+        : GraphBuilder( vertex_set )
+    {
+    }
+
+    template < index_t dimension >
     std::unique_ptr< EdgedCurveBuilder< dimension > >
         EdgedCurveBuilder< dimension >::create( EdgedCurve< dimension >& mesh )
     {

@@ -86,7 +86,7 @@ namespace geode
             HybridSolid< dimension >& mesh, MeshBuilderFactoryKey key );
 
     protected:
-        HybridSolidBuilder() = default;
+        HybridSolidBuilder( VertexSet& vertex_set );
 
         void copy( const HybridSolid< dimension >& hybrid_solid );
 

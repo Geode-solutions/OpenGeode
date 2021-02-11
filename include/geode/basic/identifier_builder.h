@@ -21,20 +21,30 @@
  *
  */
 
-#include <geode/mesh/builder/vertex_set_builder.h>
+#pragma once
+
+#include <geode/basic/common.h>
 
 namespace geode
 {
-    void define_vertex_set_builder( pybind11::module& module )
+    class Identifier;
+    struct uuid;
+} // namespace geode
+
+namespace geode
+{
+    class opengeode_basic_api IdentifierBuilder
     {
-        pybind11::class_< VertexSetBuilder, IdentifierBuilder >(
-            module, "VertexSetBuilder" )
-            .def_static( "create",
-                ( std::unique_ptr< VertexSetBuilder >( * )( VertexSet& ) )
-                    & VertexSetBuilder::create )
-            .def( "create_vertex", &VertexSetBuilder::create_vertex )
-            .def( "create_vertices", &VertexSetBuilder::create_vertices )
-            .def( "delete_vertices", &VertexSetBuilder::delete_vertices )
-            .def( "permute_vertices", &VertexSetBuilder::permute_vertices );
-    }
+    public:
+        IdentifierBuilder( Identifier& identifier );
+
+        void set_id( uuid id );
+
+        void set_name( absl::string_view name );
+
+        void load_identifier( absl::string_view directory );
+
+    private:
+        Identifier& identifier_;
+    };
 } // namespace geode

@@ -80,31 +80,21 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::string_view Component< dimension >::name() const
-    {
-        return impl_->name();
-    }
-
-    template < index_t dimension >
-    const uuid& Component< dimension >::id() const
-    {
-        return impl_->id();
-    }
-
-    template < index_t dimension >
-    void Component< dimension >::set_name( absl::string_view name )
-    {
-        impl_->set_name( name );
-    }
-
-    template < index_t dimension >
     template < typename Archive >
     void Component< dimension >::serialize( Archive& archive )
     {
-        archive.ext( *this, DefaultGrowable< Archive, Component >{},
-            []( Archive& a, Component& component ) {
-                a.object( component.impl_ );
-            } );
+        archive.ext(
+            *this, Growable< Archive, Component >{
+                       { []( Archive& a, Component& component ) {
+                            a.object( component.impl_ );
+                            component.set_id( component.impl_->id() );
+                            component.set_name( component.impl_->name() );
+                            component.impl_.reset();
+                        },
+                           []( Archive& a, Component& component ) {
+                               a.ext( component,
+                                   bitsery::ext::BaseClass< Identifier >{} );
+                           } } } );
     }
 
     template class opengeode_model_api Component< 2 >;
