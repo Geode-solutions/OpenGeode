@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/basic/identifier_builder.h>
 #include <geode/basic/mapping.h>
 
 #include <geode/model/common.h>
@@ -73,7 +74,8 @@ namespace geode
                                                    Corners,
                                                    Lines,
                                                    Surfaces,
-                                                   ModelBoundaries >
+                                                   ModelBoundaries >,
+                                               public IdentifierBuilder
     {
         OPENGEODE_DISABLE_COPY( SectionBuilder );
 

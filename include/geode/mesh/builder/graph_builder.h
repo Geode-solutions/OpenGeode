@@ -127,7 +127,7 @@ namespace geode
         void set_mesh( Graph& mesh, MeshBuilderFactoryKey key );
 
     protected:
-        GraphBuilder() = default;
+        GraphBuilder( VertexSet& vertex_set );
 
         void copy( const Graph& graph );
 

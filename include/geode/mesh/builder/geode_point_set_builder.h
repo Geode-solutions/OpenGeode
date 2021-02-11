@@ -32,6 +32,7 @@ namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
     FORWARD_DECLARATION_DIMENSION_CLASS( OpenGeodePointSet );
+    class VertexSet;
 } // namespace geode
 
 namespace geode
@@ -42,6 +43,10 @@ namespace geode
     template < index_t dimension >
     class OpenGeodePointSetBuilder : public PointSetBuilder< dimension >
     {
+    public:
+        OpenGeodePointSetBuilder(
+            VertexSet& vertex_set, MeshBuilderFactoryKey );
+
     private:
         void do_set_mesh( VertexSet& mesh ) final;
 

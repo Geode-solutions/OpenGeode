@@ -34,6 +34,13 @@
 namespace geode
 {
     template < index_t dimension >
+    PolygonalSurfaceBuilder< dimension >::PolygonalSurfaceBuilder(
+        VertexSet& vertex_set )
+        : SurfaceMeshBuilder< dimension >( vertex_set )
+    {
+    }
+
+    template < index_t dimension >
     std::unique_ptr< PolygonalSurfaceBuilder< dimension > >
         PolygonalSurfaceBuilder< dimension >::create(
             PolygonalSurface< dimension >& mesh )

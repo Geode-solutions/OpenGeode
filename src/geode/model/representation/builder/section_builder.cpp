@@ -52,12 +52,14 @@ namespace geode
         : TopologyBuilder( section ),
           AddComponentsBuilders< 2, Corners, Lines, Surfaces, ModelBoundaries >(
               section ),
+          IdentifierBuilder( section ),
           section_( section )
     {
     }
 
     detail::ModelCopyMapping SectionBuilder::copy( const Section& section )
     {
+        set_name( section.name() );
         const auto mapping = copy_components( section );
         copy_component_relationships( mapping, section );
         copy_component_geometry( mapping, section );

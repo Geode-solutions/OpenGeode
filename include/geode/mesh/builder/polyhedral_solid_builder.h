@@ -63,7 +63,7 @@ namespace geode
             PolyhedralSolid< dimension >& mesh, MeshBuilderFactoryKey key );
 
     protected:
-        PolyhedralSolidBuilder() = default;
+        PolyhedralSolidBuilder( VertexSet& vertex_set );
 
     private:
         PolyhedralSolid< dimension >* polyhedral_solid_;

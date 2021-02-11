@@ -58,12 +58,14 @@ namespace geode
               Surfaces,
               Blocks,
               ModelBoundaries >( brep ),
+          IdentifierBuilder( brep ),
           brep_( brep )
     {
     }
 
     detail::ModelCopyMapping BRepBuilder::copy( const BRep& brep )
     {
+        set_name( brep.name() );
         const auto mapping = copy_components( brep );
         copy_component_relationships( mapping, brep );
         copy_component_geometry( mapping, brep );

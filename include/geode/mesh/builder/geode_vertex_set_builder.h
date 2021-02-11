@@ -31,7 +31,8 @@
 namespace geode
 {
     class OpenGeodeVertexSet;
-}
+    class VertexSet;
+} // namespace geode
 
 namespace geode
 {
@@ -40,6 +41,10 @@ namespace geode
      */
     class opengeode_mesh_api OpenGeodeVertexSetBuilder : public VertexSetBuilder
     {
+    public:
+        OpenGeodeVertexSetBuilder(
+            VertexSet& vertex_set, MeshBuilderFactoryKey );
+
     private:
         void do_set_mesh( VertexSet& mesh ) final;
 

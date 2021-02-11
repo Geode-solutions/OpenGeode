@@ -25,10 +25,19 @@
 
 #include <geode/geometry/point.h>
 
+#include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/core/geode_triangulated_surface.h>
 
 namespace geode
 {
+    template < index_t dimension >
+    OpenGeodeTriangulatedSurfaceBuilder<
+        dimension >::OpenGeodeTriangulatedSurfaceBuilder( VertexSet& vertex_set,
+        MeshBuilderFactoryKey )
+        : TriangulatedSurfaceBuilder< dimension >( vertex_set )
+    {
+    }
+
     template < index_t dimension >
     void OpenGeodeTriangulatedSurfaceBuilder< dimension >::do_set_mesh(
         VertexSet& mesh )

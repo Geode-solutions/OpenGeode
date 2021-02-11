@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/basic/identifier_builder.h>
 #include <geode/basic/mapping.h>
 
 #include <geode/model/common.h>
@@ -80,7 +81,8 @@ namespace geode
                                                 Lines,
                                                 Surfaces,
                                                 Blocks,
-                                                ModelBoundaries >
+                                                ModelBoundaries >,
+                                            public IdentifierBuilder
     {
         OPENGEODE_DISABLE_COPY( BRepBuilder );
 

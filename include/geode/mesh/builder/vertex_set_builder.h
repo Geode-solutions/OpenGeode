@@ -27,6 +27,8 @@
 
 #include <absl/types/span.h>
 
+#include <geode/basic/identifier_builder.h>
+
 #include <geode/mesh/common.h>
 #include <geode/mesh/core/mesh_id.h>
 
@@ -41,7 +43,7 @@ namespace geode
     /*!
      * Interface class to represent the builder of a VertexSet
      */
-    class opengeode_mesh_api VertexSetBuilder
+    class opengeode_mesh_api VertexSetBuilder : public IdentifierBuilder
     {
         OPENGEODE_DISABLE_COPY_AND_MOVE( VertexSetBuilder );
 
@@ -87,10 +89,14 @@ namespace geode
         std::vector< index_t > permute_vertices(
             absl::Span< const index_t > permutation );
 
+        void set_name( absl::string_view name );
+
+        void set_id( uuid id );
+
         void set_mesh( VertexSet& mesh, MeshBuilderFactoryKey );
 
     protected:
-        VertexSetBuilder() = default;
+        VertexSetBuilder( VertexSet& vertex_set );
 
         friend class VertexSet;
         void copy( const VertexSet& vertex_set );

@@ -54,6 +54,9 @@ namespace geode
 
         void add_viewed_tetrahedron( index_t tetrahedron_id );
 
+        TetrahedralSolidViewBuilder(
+            VertexSet& vertex_set, MeshBuilderFactoryKey );
+
     private:
         void do_set_mesh( VertexSet& mesh ) final;
 

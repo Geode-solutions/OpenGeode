@@ -259,6 +259,12 @@ namespace
 namespace geode
 {
     template < index_t dimension >
+    SurfaceMeshBuilder< dimension >::SurfaceMeshBuilder( VertexSet& vertex_set )
+        : VertexSetBuilder( vertex_set )
+    {
+    }
+
+    template < index_t dimension >
     std::unique_ptr< SurfaceMeshBuilder< dimension > >
         SurfaceMeshBuilder< dimension >::create(
             SurfaceMesh< dimension >& mesh )

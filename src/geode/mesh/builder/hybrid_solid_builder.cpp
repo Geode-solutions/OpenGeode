@@ -37,6 +37,12 @@
 namespace geode
 {
     template < index_t dimension >
+    HybridSolidBuilder< dimension >::HybridSolidBuilder( VertexSet& vertex_set )
+        : SolidMeshBuilder< dimension >( vertex_set )
+    {
+    }
+
+    template < index_t dimension >
     std::unique_ptr< HybridSolidBuilder< dimension > >
         HybridSolidBuilder< dimension >::create(
             HybridSolid< dimension >& mesh )

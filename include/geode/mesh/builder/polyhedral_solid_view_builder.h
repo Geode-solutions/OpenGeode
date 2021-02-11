@@ -32,6 +32,7 @@ namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
     FORWARD_DECLARATION_DIMENSION_CLASS( PolyhedralSolidView );
+    class VertexSet;
 } // namespace geode
 
 namespace geode
@@ -53,6 +54,9 @@ namespace geode
         void add_viewed_vertex( index_t vertex_id );
 
         void add_viewed_polyhedron( index_t polyhedron_id );
+
+        PolyhedralSolidViewBuilder(
+            VertexSet& vertex_set, MeshBuilderFactoryKey );
 
     private:
         void do_set_mesh( VertexSet& mesh ) final;

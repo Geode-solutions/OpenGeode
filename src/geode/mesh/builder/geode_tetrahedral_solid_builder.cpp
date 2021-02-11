@@ -25,10 +25,19 @@
 
 #include <geode/geometry/point.h>
 
+#include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/core/geode_tetrahedral_solid.h>
 
 namespace geode
 {
+    template < index_t dimension >
+    OpenGeodeTetrahedralSolidBuilder<
+        dimension >::OpenGeodeTetrahedralSolidBuilder( VertexSet& vertex_set,
+        MeshBuilderFactoryKey )
+        : TetrahedralSolidBuilder< dimension >( vertex_set )
+    {
+    }
+
     template < index_t dimension >
     void OpenGeodeTetrahedralSolidBuilder< dimension >::do_set_mesh(
         VertexSet& mesh )

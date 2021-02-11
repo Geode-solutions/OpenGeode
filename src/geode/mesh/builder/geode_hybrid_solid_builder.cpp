@@ -25,10 +25,18 @@
 
 #include <geode/geometry/point.h>
 
+#include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/core/geode_hybrid_solid.h>
 
 namespace geode
 {
+    template < index_t dimension >
+    OpenGeodeHybridSolidBuilder< dimension >::OpenGeodeHybridSolidBuilder(
+        VertexSet& vertex_set, MeshBuilderFactoryKey )
+        : HybridSolidBuilder< dimension >( vertex_set )
+    {
+    }
+
     template < index_t dimension >
     void OpenGeodeHybridSolidBuilder< dimension >::do_set_mesh(
         VertexSet& mesh )

@@ -30,6 +30,11 @@
 
 namespace geode
 {
+    VertexSetBuilder::VertexSetBuilder( VertexSet& vertex_set )
+        : IdentifierBuilder( vertex_set )
+    {
+    }
+
     std::unique_ptr< VertexSetBuilder > VertexSetBuilder::create(
         VertexSet& mesh )
     {
@@ -45,6 +50,7 @@ namespace geode
 
     void VertexSetBuilder::copy( const VertexSet& vertex_set )
     {
+        IdentifierBuilder::set_name( vertex_set.name() );
         create_vertices( vertex_set.nb_vertices() );
         vertex_set_->vertex_attribute_manager().copy(
             vertex_set.vertex_attribute_manager() );

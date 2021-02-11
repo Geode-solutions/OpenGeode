@@ -31,6 +31,12 @@
 namespace geode
 {
     template < index_t dimension >
+    PointSetBuilder< dimension >::PointSetBuilder( VertexSet& vertex_set )
+        : VertexSetBuilder( vertex_set )
+    {
+    }
+
+    template < index_t dimension >
     std::unique_ptr< PointSetBuilder< dimension > >
         PointSetBuilder< dimension >::create( PointSet< dimension >& mesh )
     {

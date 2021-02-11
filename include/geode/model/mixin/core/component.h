@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/basic/identifier.h>
 #include <geode/basic/pimpl.h>
 
 #include <geode/model/common.h>
@@ -39,7 +40,7 @@ namespace geode
      * This abstract class represents a component that can be used in assembly.
      */
     template < index_t dimension >
-    class Component
+    class Component : public Identifier
     {
         OPENGEODE_DISABLE_COPY( Component );
         OPENGEODE_TEMPLATE_ASSERT_2D_OR_3D( dimension );
@@ -49,16 +50,10 @@ namespace geode
         Component( Component&& );
         virtual ~Component();
 
-        absl::string_view name() const;
-
-        const uuid& id() const;
-
         virtual ComponentType component_type() const = 0;
 
     protected:
         Component();
-
-        void set_name( absl::string_view name );
 
     private:
         template < typename Archive >

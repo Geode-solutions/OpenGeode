@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/basic/filename.h>
 #include <geode/basic/uuid.h>
 #include <geode/basic/zip_file.h>
 
@@ -48,6 +49,11 @@ namespace geode
         void load_brep_files( absl::string_view directory )
         {
             BRepBuilder builder{ brep() };
+            builder.load_identifier( directory );
+            if( brep().name() == Identifier::DEFAULT_NAME )
+            {
+                builder.set_name( filename_without_extension( filename() ) );
+            }
             builder.load_corners( directory );
             builder.load_lines( directory );
             builder.load_surfaces( directory );

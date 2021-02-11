@@ -28,8 +28,8 @@ namespace geode
     void define_section_builder( pybind11::module& module )
     {
         pybind11::class_< SectionBuilder, TopologyBuilder, CornersBuilder2D,
-            LinesBuilder2D, SurfacesBuilder2D, ModelBoundariesBuilder2D >(
-            module, "SectionBuilder" )
+            LinesBuilder2D, SurfacesBuilder2D, ModelBoundariesBuilder2D,
+            IdentifierBuilder >( module, "SectionBuilder" )
             .def( pybind11::init< Section& >() )
             .def( "copy", &SectionBuilder::copy )
             .def( "add_corner", ( const uuid& (SectionBuilder::*) () )
