@@ -89,10 +89,6 @@ namespace geode
         std::vector< index_t > permute_vertices(
             absl::Span< const index_t > permutation );
 
-        void set_name( absl::string_view name );
-
-        void set_id( uuid id );
-
         void set_mesh( VertexSet& mesh, MeshBuilderFactoryKey );
 
     protected:
