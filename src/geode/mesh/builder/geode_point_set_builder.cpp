@@ -25,10 +25,18 @@
 
 #include <geode/geometry/point.h>
 
+#include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/core/geode_point_set.h>
 
 namespace geode
 {
+    template < index_t dimension >
+    OpenGeodePointSetBuilder< dimension >::OpenGeodePointSetBuilder(
+        VertexSet& vertex_set, MeshBuilderFactoryKey )
+        : PointSetBuilder< dimension >( vertex_set )
+    {
+    }
+
     template < index_t dimension >
     void OpenGeodePointSetBuilder< dimension >::do_set_mesh( VertexSet& mesh )
     {

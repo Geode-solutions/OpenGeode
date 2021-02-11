@@ -96,23 +96,12 @@ namespace geode
     public:
         Growable( absl::FixedArray< std::function< void( Archive &, T & ) > >
                 serializers )
-            : Growable( std::move( serializers ), {} )
-        {
-        }
-        Growable( absl::FixedArray< std::function< void( Archive &, T & ) > >
-                      serializers,
-            absl::FixedArray< std::function< void( T & ) > > initializers )
             : version_( serializers.size() ),
-              serializers_( std::move( serializers ) ),
-              initializers_( std::move( initializers ) )
+              serializers_( std::move( serializers ) )
         {
             OPENGEODE_EXCEPTION( version_ > FIRST_VERSION,
                 "[Growable] Provide at least 2 serializers or use "
                 "DefaultGrowable" );
-            OPENGEODE_EXCEPTION(
-                initializers_.empty() || initializers_.size() == version_ - 1,
-                "[Growable] Should have as many initializers than the version "
-                "number minus one (or none)" );
         }
 
         template < typename Fnc >
@@ -130,17 +119,12 @@ namespace geode
             index_t current_version;
             des.ext4b( current_version, bitsery::ext::CompactValue{} );
             serializers_.at( current_version - 1 )( des, obj );
-            if( !initializers_.empty() && current_version < version_ )
-            {
-                initializers_.at( current_version - 1 )( obj );
-            }
         }
 
     private:
         index_t version_{ FIRST_VERSION };
         absl::FixedArray< std::function< void( Archive &, T & ) > >
             serializers_;
-        absl::FixedArray< std::function< void( T & ) > > initializers_;
     };
 } // namespace geode
 

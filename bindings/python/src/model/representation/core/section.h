@@ -30,7 +30,7 @@ namespace geode
     void define_section( pybind11::module& module )
     {
         pybind11::class_< Section, Topology, Corners2D, Lines2D, Surfaces2D,
-            ModelBoundaries2D >( module, "Section" )
+            ModelBoundaries2D, Identifier >( module, "Section" )
             .def( pybind11::init<>() )
             .def(
                 "boundary_corners",

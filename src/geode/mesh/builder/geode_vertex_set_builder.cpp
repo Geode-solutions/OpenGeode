@@ -23,10 +23,17 @@
 
 #include <geode/mesh/builder/geode_vertex_set_builder.h>
 
+#include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/core/geode_vertex_set.h>
 
 namespace geode
 {
+    OpenGeodeVertexSetBuilder::OpenGeodeVertexSetBuilder(
+        VertexSet& vertex_set, MeshBuilderFactoryKey )
+        : VertexSetBuilder( vertex_set )
+    {
+    }
+
     void OpenGeodeVertexSetBuilder::do_set_mesh( VertexSet& mesh )
     {
         geode_vertex_set_ = &dynamic_cast< OpenGeodeVertexSet& >( mesh );

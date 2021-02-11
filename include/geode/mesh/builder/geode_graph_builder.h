@@ -31,7 +31,8 @@
 namespace geode
 {
     class OpenGeodeGraph;
-}
+    class VertexSet;
+} // namespace geode
 
 namespace geode
 {
@@ -40,6 +41,9 @@ namespace geode
      */
     class opengeode_mesh_api OpenGeodeGraphBuilder : public GraphBuilder
     {
+    public:
+        OpenGeodeGraphBuilder( VertexSet& vertex_set, MeshBuilderFactoryKey );
+
     private:
         void do_set_mesh( VertexSet& mesh ) final;
 

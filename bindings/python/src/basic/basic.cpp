@@ -27,6 +27,8 @@
 
 #include "attribute.h"
 #include "attribute_manager.h"
+#include "identifier.h"
+#include "identifier_builder.h"
 #include "mapping.h"
 #include "uuid.h"
 
@@ -61,4 +63,6 @@ PYBIND11_MODULE( opengeode_py_basic, module )
     geode::define_attributes( module );
     geode::define_attribute_manager( module );
     geode::define_mapping( module );
+    geode::define_identifier( module );
+    geode::define_identifier_builder( module );
 }

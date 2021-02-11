@@ -77,7 +77,7 @@ namespace geode
             TetrahedralSolid< dimension >& mesh, MeshBuilderFactoryKey key );
 
     protected:
-        TetrahedralSolidBuilder() = default;
+        TetrahedralSolidBuilder( VertexSet& vertex_set );
 
         void copy( const TetrahedralSolid< dimension >& tetrahedral_solid );
 

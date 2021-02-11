@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <geode/basic/identifier.h>
+
 #include <geode/model/common.h>
 #include <geode/model/mixin/core/add_components.h>
 #include <geode/model/mixin/core/blocks.h>
@@ -62,7 +64,8 @@ namespace geode
                                          Lines,
                                          Surfaces,
                                          Blocks,
-                                         ModelBoundaries >
+                                         ModelBoundaries >,
+                                     public Identifier
     {
     public:
         class opengeode_model_api BoundaryCornerRange

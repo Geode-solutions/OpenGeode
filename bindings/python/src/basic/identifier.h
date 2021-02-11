@@ -21,20 +21,16 @@
  *
  */
 
-#include <geode/mesh/builder/vertex_set_builder.h>
+#include <pybind11/operators.h>
+
+#include <geode/basic/identifier.h>
 
 namespace geode
 {
-    void define_vertex_set_builder( pybind11::module& module )
+    void define_identifier( pybind11::module& module )
     {
-        pybind11::class_< VertexSetBuilder, IdentifierBuilder >(
-            module, "VertexSetBuilder" )
-            .def_static( "create",
-                ( std::unique_ptr< VertexSetBuilder >( * )( VertexSet& ) )
-                    & VertexSetBuilder::create )
-            .def( "create_vertex", &VertexSetBuilder::create_vertex )
-            .def( "create_vertices", &VertexSetBuilder::create_vertices )
-            .def( "delete_vertices", &VertexSetBuilder::delete_vertices )
-            .def( "permute_vertices", &VertexSetBuilder::permute_vertices );
+        pybind11::class_< Identifier >( module, "Identifier" )
+            .def( "id", &Identifier::id )
+            .def( "name", &Identifier::name );
     }
 } // namespace geode

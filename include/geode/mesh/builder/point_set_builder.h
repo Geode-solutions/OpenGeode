@@ -77,7 +77,7 @@ namespace geode
         void set_mesh( PointSet< dimension >& mesh, MeshBuilderFactoryKey key );
 
     protected:
-        PointSetBuilder() = default;
+        PointSetBuilder( VertexSet& vertex_set );
 
         void copy( const PointSet< dimension >& point_set );
 

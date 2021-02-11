@@ -62,7 +62,7 @@ namespace geode
             const PolygonalSurface< dimension >& surface_mesh, BuilderKey );
 
     protected:
-        PolygonalSurfaceBuilder() = default;
+        PolygonalSurfaceBuilder( VertexSet& vertex_set );
 
     private:
         PolygonalSurface< dimension >* polygonal_surface_;

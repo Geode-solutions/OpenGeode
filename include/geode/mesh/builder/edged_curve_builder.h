@@ -75,7 +75,7 @@ namespace geode
             EdgedCurve< dimension >& mesh, MeshBuilderFactoryKey key );
 
     protected:
-        EdgedCurveBuilder() = default;
+        EdgedCurveBuilder( VertexSet& vertex_set );
 
         void copy( const EdgedCurve< dimension >& edged_curve );
 

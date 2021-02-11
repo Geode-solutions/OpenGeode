@@ -21,20 +21,55 @@
  *
  */
 
-#include <geode/mesh/builder/vertex_set_builder.h>
+#pragma once
+
+#include <geode/basic/common.h>
+#include <geode/basic/passkey.h>
+#include <geode/basic/pimpl.h>
 
 namespace geode
 {
-    void define_vertex_set_builder( pybind11::module& module )
+    class IdentifierBuilder;
+    struct uuid;
+} // namespace geode
+
+namespace geode
+{
+    class opengeode_basic_api Identifier
     {
-        pybind11::class_< VertexSetBuilder, IdentifierBuilder >(
-            module, "VertexSetBuilder" )
-            .def_static( "create",
-                ( std::unique_ptr< VertexSetBuilder >( * )( VertexSet& ) )
-                    & VertexSetBuilder::create )
-            .def( "create_vertex", &VertexSetBuilder::create_vertex )
-            .def( "create_vertices", &VertexSetBuilder::create_vertices )
-            .def( "delete_vertices", &VertexSetBuilder::delete_vertices )
-            .def( "permute_vertices", &VertexSetBuilder::permute_vertices );
-    }
+        PASSKEY( IdentifierBuilder, IdentifierKey );
+        friend class bitsery::Access;
+
+    public:
+        static constexpr auto DEFAULT_NAME = "unknown";
+
+        Identifier( Identifier&& );
+        ~Identifier();
+
+        const uuid& id() const;
+
+        absl::string_view name() const;
+
+        void save_identifier( absl::string_view directory ) const;
+
+        void set_id( uuid id, IdentifierKey );
+
+        void set_name( absl::string_view name, IdentifierKey );
+
+        void load_identifier( absl::string_view directory, IdentifierKey );
+
+    protected:
+        Identifier();
+
+        void set_id( uuid id );
+
+        void set_name( absl::string_view name );
+
+    private:
+        template < typename Archive >
+        void serialize( Archive& archive );
+
+    private:
+        IMPLEMENTATION_MEMBER( impl_ );
+    };
 } // namespace geode

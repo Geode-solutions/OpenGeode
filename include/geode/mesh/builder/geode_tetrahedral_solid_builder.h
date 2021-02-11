@@ -35,6 +35,7 @@ namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
     FORWARD_DECLARATION_DIMENSION_CLASS( OpenGeodeTetrahedralSolid );
+    class VertexSet;
 } // namespace geode
 
 namespace geode
@@ -47,6 +48,10 @@ namespace geode
     class OpenGeodeTetrahedralSolidBuilder
         : public TetrahedralSolidBuilder< dimension >
     {
+    public:
+        OpenGeodeTetrahedralSolidBuilder(
+            VertexSet& vertex_set, MeshBuilderFactoryKey );
+
     private:
         void do_set_mesh( VertexSet& mesh ) final;
 

@@ -25,10 +25,18 @@
 
 #include <geode/geometry/point.h>
 
+#include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/core/geode_edged_curve.h>
 
 namespace geode
 {
+    template < index_t dimension >
+    OpenGeodeEdgedCurveBuilder< dimension >::OpenGeodeEdgedCurveBuilder(
+        VertexSet& vertex_set, MeshBuilderFactoryKey )
+        : EdgedCurveBuilder< dimension >( vertex_set )
+    {
+    }
+
     template < index_t dimension >
     void OpenGeodeEdgedCurveBuilder< dimension >::do_set_mesh( VertexSet& mesh )
     {

@@ -31,6 +31,13 @@
 namespace geode
 {
     template < index_t dimension >
+    TriangulatedSurfaceViewBuilder< dimension >::TriangulatedSurfaceViewBuilder(
+        VertexSet& vertex_set, MeshBuilderFactoryKey )
+        : TriangulatedSurfaceBuilder< dimension >( vertex_set )
+    {
+    }
+
+    template < index_t dimension >
     std::unique_ptr< TriangulatedSurfaceViewBuilder< dimension > >
         TriangulatedSurfaceViewBuilder< dimension >::create(
             TriangulatedSurfaceView< dimension >& mesh )

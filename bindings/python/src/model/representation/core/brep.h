@@ -30,7 +30,7 @@ namespace geode
     void define_brep( pybind11::module& module )
     {
         pybind11::class_< BRep, Topology, Corners3D, Lines3D, Surfaces3D,
-            Blocks3D, ModelBoundaries3D >( module, "BRep" )
+            Blocks3D, ModelBoundaries3D, Identifier >( module, "BRep" )
             .def( pybind11::init<>() )
             .def(
                 "boundary_corners",

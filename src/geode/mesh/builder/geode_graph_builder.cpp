@@ -23,10 +23,17 @@
 
 #include <geode/mesh/builder/geode_graph_builder.h>
 
+#include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/core/geode_graph.h>
 
 namespace geode
 {
+    OpenGeodeGraphBuilder::OpenGeodeGraphBuilder(
+        VertexSet& vertex_set, MeshBuilderFactoryKey )
+        : GraphBuilder( vertex_set )
+    {
+    }
+
     void OpenGeodeGraphBuilder::do_set_mesh( VertexSet& mesh )
     {
         geode_graph_ = &dynamic_cast< OpenGeodeGraph& >( mesh );
