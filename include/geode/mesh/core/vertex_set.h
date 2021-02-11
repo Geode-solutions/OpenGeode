@@ -26,7 +26,6 @@
 #include <geode/basic/identifier.h>
 #include <geode/basic/pimpl.h>
 
-
 #include <geode/mesh/common.h>
 #include <geode/mesh/core/mesh_id.h>
 
