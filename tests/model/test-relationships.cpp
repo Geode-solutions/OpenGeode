@@ -24,6 +24,7 @@
 #include <absl/types/span.h>
 
 #include <geode/basic/assert.h>
+#include <geode/basic/attribute_manager.h>
 #include <geode/basic/logger.h>
 #include <geode/basic/range.h>
 #include <geode/basic/uuid.h>
@@ -139,6 +140,45 @@ void test_relations( const geode::Relationships& relations,
         "[Test] uuids[0] should be item of uuids[4]" );
 }
 
+void test_attributes( const geode::Relationships& relations,
+    absl::Span< const geode::uuid > uuids )
+{
+    for( const auto i : geode::Indices{ uuids } )
+    {
+        OPENGEODE_EXCEPTION( relations.component_index( uuids[i] ) == i,
+            "[Test] Wrong component index from uuid" );
+        OPENGEODE_EXCEPTION(
+            relations.component_from_index( i ).id() == uuids[i],
+            "[Test] Wrong component uuid from id" );
+    }
+    auto component_att =
+        relations.component_attribute_manager()
+            .find_or_create_attribute< geode::VariableAttribute, double >(
+                "double", 0 );
+    component_att->set_value( 2, 2 );
+    OPENGEODE_EXCEPTION(
+        component_att->value( relations.component_index( uuids[2] ) ) == 2,
+        "[Test] Wrong component attribute assignement" );
+
+    OPENGEODE_EXCEPTION( relations.relation_index( uuids[0], uuids[1] ) == 0,
+        "[Test] Wrong relation index from uuids" );
+    const auto output = relations.relation_from_index( 0 );
+    OPENGEODE_EXCEPTION( std::get< 0 >( output ).id() == uuids[0],
+        "[Test] Wrong relation uuids from index" );
+    OPENGEODE_EXCEPTION( std::get< 1 >( output ).id() == uuids[1],
+        "[Test] Wrong relation uuids from index" );
+    auto relation_att =
+        relations.relation_attribute_manager()
+            .find_or_create_attribute< geode::VariableAttribute, int >(
+                "int", 0 );
+    relation_att->set_value( 0, 1 );
+    OPENGEODE_EXCEPTION(
+        relation_att->value(
+            relations.relation_index( uuids[0], uuids[1] ).value() )
+            == 1,
+        "[Test] Wrong relation attribute assignement" );
+}
+
 void test()
 {
     geode::Relationships relationships;
@@ -149,6 +189,7 @@ void test()
     add_internal_relations( relationships, uuids );
     add_items_in_collections( relationships, uuids );
     test_relations( relationships, uuids );
+    test_attributes( relationships, uuids );
 
     relationships.save_relationships( "." );
     geode::Relationships reloaded_relationships;
