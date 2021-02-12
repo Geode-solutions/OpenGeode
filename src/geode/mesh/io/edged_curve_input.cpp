@@ -23,6 +23,9 @@
 
 #include <geode/mesh/io/edged_curve_input.h>
 
+#include <geode/basic/filename.h>
+
+#include <geode/mesh/builder/edged_curve_builder.h>
 #include <geode/mesh/core/edged_curve.h>
 #include <geode/mesh/core/mesh_factory.h>
 
@@ -39,6 +42,11 @@ namespace geode
                 extension_from_filename( filename ).data(), *edged_curve,
                 filename );
             input->read();
+            if( edged_curve->name() == Identifier::DEFAULT_NAME )
+            {
+                EdgedCurveBuilder< dimension >::create( *edged_curve )
+                    ->set_name( filename_without_extension( filename ) );
+            }
             return edged_curve;
         }
         catch( const OpenGeodeException& e )

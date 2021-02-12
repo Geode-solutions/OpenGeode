@@ -23,6 +23,9 @@
 
 #include <geode/mesh/io/hybrid_solid_input.h>
 
+#include <geode/basic/filename.h>
+
+#include <geode/mesh/builder/hybrid_solid_builder.h>
 #include <geode/mesh/core/hybrid_solid.h>
 #include <geode/mesh/core/mesh_factory.h>
 
@@ -39,6 +42,11 @@ namespace geode
                 extension_from_filename( filename ).data(), *hybrid_solid,
                 filename );
             input->read();
+            if( hybrid_solid->name() == Identifier::DEFAULT_NAME )
+            {
+                HybridSolidBuilder< dimension >::create( *hybrid_solid )
+                    ->set_name( filename_without_extension( filename ) );
+            }
             return hybrid_solid;
         }
         catch( const OpenGeodeException& e )
