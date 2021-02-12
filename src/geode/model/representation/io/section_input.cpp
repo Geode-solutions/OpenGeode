@@ -23,6 +23,10 @@
 
 #include <geode/model/representation/io/section_input.h>
 
+#include <geode/basic/filename.h>
+
+#include <geode/model/representation/builder/section_builder.h>
+
 namespace geode
 {
     Section load_section( absl::string_view filename )
@@ -33,6 +37,11 @@ namespace geode
             auto input = SectionInputFactory::create(
                 extension_from_filename( filename ).data(), section, filename );
             input->read();
+            if( section.name() == Identifier::DEFAULT_NAME )
+            {
+                SectionBuilder{ section }.set_name(
+                    filename_without_extension( filename ) );
+            }
             Logger::info( "Section loaded from ", filename );
             Logger::info( "Section has: ", section.nb_surfaces(), " Surfaces, ",
                 section.nb_lines(), " Lines, ", section.nb_corners(),

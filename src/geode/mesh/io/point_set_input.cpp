@@ -23,6 +23,9 @@
 
 #include <geode/mesh/io/point_set_input.h>
 
+#include <geode/basic/filename.h>
+
+#include <geode/mesh/builder/point_set_builder.h>
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/point_set.h>
 
@@ -39,6 +42,11 @@ namespace geode
                 extension_from_filename( filename ).data(), *point_set,
                 filename );
             input->read();
+            if( point_set->name() == Identifier::DEFAULT_NAME )
+            {
+                PointSetBuilder< dimension >::create( *point_set )
+                    ->set_name( filename_without_extension( filename ) );
+            }
             return point_set;
         }
         catch( const OpenGeodeException& e )

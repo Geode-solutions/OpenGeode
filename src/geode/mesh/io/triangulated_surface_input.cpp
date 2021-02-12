@@ -23,6 +23,9 @@
 
 #include <geode/mesh/io/triangulated_surface_input.h>
 
+#include <geode/basic/filename.h>
+
+#include <geode/mesh/builder/triangulated_surface_builder.h>
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/triangulated_surface.h>
 
@@ -41,6 +44,12 @@ namespace geode
                 extension_from_filename( filename ).data(),
                 *triangulated_surface, filename );
             input->read();
+            if( triangulated_surface->name() == Identifier::DEFAULT_NAME )
+            {
+                TriangulatedSurfaceBuilder< dimension >::create(
+                    *triangulated_surface )
+                    ->set_name( filename_without_extension( filename ) );
+            }
             return triangulated_surface;
         }
         catch( const OpenGeodeException& e )

@@ -23,6 +23,9 @@
 
 #include <geode/mesh/io/tetrahedral_solid_input.h>
 
+#include <geode/basic/filename.h>
+
+#include <geode/mesh/builder/tetrahedral_solid_builder.h>
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
 
@@ -40,6 +43,12 @@ namespace geode
                 extension_from_filename( filename ).data(), *tetrahedral_solid,
                 filename );
             input->read();
+            if( tetrahedral_solid->name() == Identifier::DEFAULT_NAME )
+            {
+                TetrahedralSolidBuilder< dimension >::create(
+                    *tetrahedral_solid )
+                    ->set_name( filename_without_extension( filename ) );
+            }
             return tetrahedral_solid;
         }
         catch( const OpenGeodeException& e )

@@ -23,9 +23,9 @@
 
 #include <geode/mesh/io/vertex_set_input.h>
 
-#include <fstream>
+#include <geode/basic/filename.h>
 
-#include <geode/mesh/core/bitsery_archive.h>
+#include <geode/mesh/builder/vertex_set_builder.h>
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/vertex_set.h>
 
@@ -48,6 +48,11 @@ namespace geode
                 extension_from_filename( filename ).data(), *vertex_set,
                 filename );
             input->read();
+            if( vertex_set->name() == Identifier::DEFAULT_NAME )
+            {
+                VertexSetBuilder::create( *vertex_set )
+                    ->set_name( filename_without_extension( filename ) );
+            }
             return vertex_set;
         }
         catch( const OpenGeodeException& e )
