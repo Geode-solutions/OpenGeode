@@ -182,6 +182,21 @@ namespace geode
         return impl_->edges_around_vertex( vertex_id );
     }
 
+    absl::optional< index_t > Graph::edge_from_vertices(
+        index_t v0, index_t v1 ) const
+    {
+        for( const auto& edge : edges_around_vertex( v0 ) )
+        {
+            const EdgeVertex opposite{ edge.edge_id,
+                static_cast< local_index_t >( ( edge.vertex_id + 1 ) % 2 ) };
+            if( edge_vertex( opposite ) == v1 )
+            {
+                return edge.edge_id;
+            }
+        }
+        return absl::nullopt;
+    }
+
     void Graph::set_edges_around_vertex(
         index_t vertex_id, EdgesAroundVertex edges, GraphKey )
     {

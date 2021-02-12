@@ -203,6 +203,43 @@ namespace geode
                 "[Relationships::load] Error while reading file: ", filename );
         }
 
+        AttributeManager& component_attribute_manager() const
+        {
+            return graph_.vertex_attribute_manager();
+        }
+
+        index_t component_index( const uuid& id ) const
+        {
+            return vertex_id( id );
+        }
+
+        const ComponentID& component_from_index( index_t id ) const
+        {
+            return ids_->value( id );
+        }
+
+        AttributeManager& relation_attribute_manager() const
+        {
+            return graph_.edge_attribute_manager();
+        }
+
+        absl::optional< index_t > relation_index(
+            const uuid& id1, const uuid& id2 ) const
+        {
+            const auto v0 = component_index( id1 );
+            const auto v1 = component_index( id2 );
+            return graph_.edge_from_vertices( v0, v1 );
+        }
+
+        std::tuple< ComponentID, ComponentID > relation_from_index(
+            index_t id ) const
+        {
+            const auto id0 = graph_.edge_vertex( { id, 0 } );
+            const auto id1 = graph_.edge_vertex( { id, 1 } );
+            return std::make_tuple(
+                component_from_index( id0 ), component_from_index( id1 ) );
+        }
+
     private:
         friend class bitsery::Access;
         template < typename Archive >
@@ -364,6 +401,38 @@ namespace geode
         absl::string_view directory, RelationshipsBuilderKey )
     {
         return impl_->load( directory );
+    }
+
+    AttributeManager& Relationships::component_attribute_manager() const
+    {
+        return impl_->component_attribute_manager();
+    }
+
+    index_t Relationships::component_index( const uuid& id ) const
+    {
+        return impl_->component_index( id );
+    }
+
+    const ComponentID& Relationships::component_from_index( index_t id ) const
+    {
+        return impl_->component_from_index( id );
+    }
+
+    AttributeManager& Relationships::relation_attribute_manager() const
+    {
+        return impl_->relation_attribute_manager();
+    }
+
+    absl::optional< index_t > Relationships::relation_index(
+        const uuid& id1, const uuid& id2 ) const
+    {
+        return impl_->relation_index( id1, id2 );
+    }
+
+    std::tuple< ComponentID, ComponentID > Relationships::relation_from_index(
+        index_t id ) const
+    {
+        return impl_->relation_from_index( id );
     }
 
     class Relationships::BoundaryRangeIterator::Impl

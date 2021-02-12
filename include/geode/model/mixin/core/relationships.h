@@ -31,6 +31,7 @@
 
 namespace geode
 {
+    class AttributeManager;
     class RelationshipsBuilder;
     struct uuid;
 } // namespace geode
@@ -281,6 +282,20 @@ namespace geode
         bool is_internal( const uuid& internal, const uuid& embedding ) const;
 
         bool is_item( const uuid& item, const uuid& collection ) const;
+
+        AttributeManager& component_attribute_manager() const;
+
+        index_t component_index( const uuid& id ) const;
+
+        const ComponentID& component_from_index( index_t id ) const;
+
+        AttributeManager& relation_attribute_manager() const;
+
+        absl::optional< index_t > relation_index(
+            const uuid& id1, const uuid& id2 ) const;
+
+        std::tuple< ComponentID, ComponentID > relation_from_index(
+            index_t id ) const;
 
         void save_relationships( absl::string_view directory ) const;
 
