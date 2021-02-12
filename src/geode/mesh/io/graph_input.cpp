@@ -23,6 +23,9 @@
 
 #include <geode/mesh/io/graph_input.h>
 
+#include <geode/basic/filename.h>
+
+#include <geode/mesh/builder/graph_builder.h>
 #include <geode/mesh/core/graph.h>
 #include <geode/mesh/core/mesh_factory.h>
 
@@ -37,6 +40,11 @@ namespace geode
             auto input = GraphInputFactory::create(
                 extension_from_filename( filename ).data(), *graph, filename );
             input->read();
+            if( graph->name() == Identifier::DEFAULT_NAME )
+            {
+                GraphBuilder::create( *graph )->set_name(
+                    filename_without_extension( filename ) );
+            }
             return graph;
         }
         catch( const OpenGeodeException& e )

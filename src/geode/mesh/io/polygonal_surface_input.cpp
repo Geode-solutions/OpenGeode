@@ -23,6 +23,9 @@
 
 #include <geode/mesh/io/polygonal_surface_input.h>
 
+#include <geode/basic/filename.h>
+
+#include <geode/mesh/builder/polygonal_surface_builder.h>
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polygonal_surface.h>
 
@@ -40,6 +43,12 @@ namespace geode
                 extension_from_filename( filename ).data(), *polygonal_surface,
                 filename );
             input->read();
+            if( polygonal_surface->name() == Identifier::DEFAULT_NAME )
+            {
+                PolygonalSurfaceBuilder< dimension >::create(
+                    *polygonal_surface )
+                    ->set_name( filename_without_extension( filename ) );
+            }
             return polygonal_surface;
         }
         catch( const OpenGeodeException& e )

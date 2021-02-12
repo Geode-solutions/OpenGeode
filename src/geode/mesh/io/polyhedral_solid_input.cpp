@@ -23,6 +23,9 @@
 
 #include <geode/mesh/io/polyhedral_solid_input.h>
 
+#include <geode/basic/filename.h>
+
+#include <geode/mesh/builder/polyhedral_solid_builder.h>
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polyhedral_solid.h>
 
@@ -40,6 +43,11 @@ namespace geode
                 extension_from_filename( filename ).data(), *polyhedral_solid,
                 filename );
             input->read();
+            if( polyhedral_solid->name() == Identifier::DEFAULT_NAME )
+            {
+                PolyhedralSolidBuilder< dimension >::create( *polyhedral_solid )
+                    ->set_name( filename_without_extension( filename ) );
+            }
             return polyhedral_solid;
         }
         catch( const OpenGeodeException& e )

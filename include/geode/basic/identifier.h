@@ -41,7 +41,7 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        static constexpr auto DEFAULT_NAME = "unknown";
+        static constexpr auto DEFAULT_NAME = "default_name";
 
         Identifier( Identifier&& );
         ~Identifier();
