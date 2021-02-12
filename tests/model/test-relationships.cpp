@@ -158,7 +158,7 @@ void test_attributes( const geode::Relationships& relations,
     component_att->set_value( 2, 2 );
     OPENGEODE_EXCEPTION(
         component_att->value( relations.component_index( uuids[2] ) ) == 2,
-        "[Test] Wrong component attribute assignement" );
+        "[Test] Wrong component attribute assignment" );
 
     OPENGEODE_EXCEPTION( relations.relation_index( uuids[0], uuids[1] ) == 0,
         "[Test] Wrong relation index from uuids" );
@@ -176,7 +176,7 @@ void test_attributes( const geode::Relationships& relations,
         relation_att->value(
             relations.relation_index( uuids[0], uuids[1] ).value() )
             == 1,
-        "[Test] Wrong relation attribute assignement" );
+        "[Test] Wrong relation attribute assignment" );
 }
 
 void test()
