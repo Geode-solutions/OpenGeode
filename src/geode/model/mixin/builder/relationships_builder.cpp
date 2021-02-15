@@ -58,6 +58,12 @@ namespace geode
         relationships_.add_item_in_collection( item, collection, {} );
     }
 
+    void RelationshipsBuilder::copy_relationships(
+        const ModelCopyMapping& mapping, const Relationships& relationships )
+    {
+        relationships_.copy_relationships( mapping, relationships, {} );
+    }
+
     void RelationshipsBuilder::load_relationships( absl::string_view directory )
     {
         relationships_.load_relationships( directory, {} );

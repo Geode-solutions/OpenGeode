@@ -23,9 +23,6 @@
 
 #pragma once
 
-#include <absl/container/flat_hash_map.h>
-
-#include <geode/basic/mapping.h>
 #include <geode/basic/range.h>
 #include <geode/basic/uuid.h>
 
@@ -40,34 +37,13 @@
 #include <geode/model/mixin/core/line.h>
 #include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
+#include <geode/model/representation/builder/copy_mapping.h>
 
 namespace geode
 {
     namespace detail
     {
-        using Mapping = BijectiveMapping< uuid >;
-
-        class ModelCopyMapping
-        {
-        public:
-            Mapping& at( const ComponentType& type )
-            {
-                return mappings.at( type );
-            }
-
-            const Mapping& at( const ComponentType& type ) const
-            {
-                return mappings.at( type );
-            }
-
-            void emplace( const ComponentType& type, Mapping mapping )
-            {
-                mappings.emplace( type, std::move( mapping ) );
-            }
-
-        private:
-            absl::flat_hash_map< ComponentType, Mapping > mappings;
-        };
+        using Mapping = ModelCopyMapping::Mapping;
 
         template < typename ModelFrom, typename ModelTo, typename BuilderTo >
         Mapping copy_corner_components(
@@ -144,139 +120,6 @@ namespace geode
                     model_boundary.id(), builder_to.add_model_boundary() );
             }
             return mapping;
-        }
-
-        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
-        void copy_corner_line_relationships( const ModelFrom& from,
-            const ModelTo& to,
-            BuilderTo& builder_to,
-            const Mapping& corners,
-            const Mapping& lines )
-        {
-            for( const auto& line : from.lines() )
-            {
-                const auto& new_line = to.line( lines.in2out( line.id() ) );
-                for( const auto& corner : from.boundaries( line ) )
-                {
-                    const auto& new_corner =
-                        to.corner( corners.in2out( corner.id() ) );
-                    builder_to.add_corner_line_boundary_relationship(
-                        new_corner, new_line );
-                }
-            }
-        }
-
-        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
-        void copy_corner_surface_relationships( const ModelFrom& from,
-            const ModelTo& to,
-            BuilderTo& builder_to,
-            const Mapping& corners,
-            const Mapping& surfaces )
-        {
-            for( const auto& surface : from.surfaces() )
-            {
-                const auto& new_surface =
-                    to.surface( surfaces.in2out( surface.id() ) );
-                for( const auto& corner : from.internal_corners( surface ) )
-                {
-                    const auto& new_corner =
-                        to.corner( corners.in2out( corner.id() ) );
-                    builder_to.add_corner_surface_internal_relationship(
-                        new_corner, new_surface );
-                }
-            }
-        }
-
-        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
-        void copy_line_surface_relationships( const ModelFrom& from,
-            const ModelTo& to,
-            BuilderTo& builder_to,
-            const Mapping& lines,
-            const Mapping& surfaces )
-        {
-            for( const auto& surface : from.surfaces() )
-            {
-                const auto& new_surface =
-                    to.surface( surfaces.in2out( surface.id() ) );
-                for( const auto& line : from.boundaries( surface ) )
-                {
-                    const auto& new_line = to.line( lines.in2out( line.id() ) );
-                    builder_to.add_line_surface_boundary_relationship(
-                        new_line, new_surface );
-                }
-                for( const auto& line : from.internal_lines( surface ) )
-                {
-                    const auto& new_line = to.line( lines.in2out( line.id() ) );
-                    builder_to.add_line_surface_internal_relationship(
-                        new_line, new_surface );
-                }
-            }
-        }
-
-        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
-        void copy_corner_block_relationships( const ModelFrom& from,
-            const ModelTo& to,
-            BuilderTo& builder_to,
-            const Mapping& corners,
-            const Mapping& blocks )
-        {
-            for( const auto& block : from.blocks() )
-            {
-                const auto& new_block = to.block( blocks.in2out( block.id() ) );
-                for( const auto& corner : from.internal_corners( block ) )
-                {
-                    const auto& new_corner =
-                        to.corner( corners.in2out( corner.id() ) );
-                    builder_to.add_corner_block_internal_relationship(
-                        new_corner, new_block );
-                }
-            }
-        }
-
-        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
-        void copy_line_block_relationships( const ModelFrom& from,
-            const ModelTo& to,
-            BuilderTo& builder_to,
-            const Mapping& lines,
-            const Mapping& blocks )
-        {
-            for( const auto& block : from.blocks() )
-            {
-                const auto& new_block = to.block( blocks.in2out( block.id() ) );
-                for( const auto& line : from.internal_lines( block ) )
-                {
-                    const auto& new_line = to.line( lines.in2out( line.id() ) );
-                    builder_to.add_line_block_internal_relationship(
-                        new_line, new_block );
-                }
-            }
-        }
-
-        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
-        void copy_surface_block_relationships( const ModelFrom& from,
-            const ModelTo& to,
-            BuilderTo& builder_to,
-            const Mapping& surfaces,
-            const Mapping& blocks )
-        {
-            for( const auto& block : from.blocks() )
-            {
-                const auto& new_block = to.block( blocks.in2out( block.id() ) );
-                for( const auto& surface : from.boundaries( block ) )
-                {
-                    const auto& new_surface =
-                        to.surface( surfaces.in2out( surface.id() ) );
-                    builder_to.add_surface_block_boundary_relationship(
-                        new_surface, new_block );
-                }
-                for( const auto& surface : from.internal_surfaces( block ) )
-                {
-                    const auto& new_surface =
-                        to.surface( surfaces.in2out( surface.id() ) );
-                    builder_to.add_surface_block_internal_relationship(
-                        new_surface, new_block );
-                }
-            }
         }
 
         template < typename ModelFrom, typename ModelTo, typename BuilderTo >

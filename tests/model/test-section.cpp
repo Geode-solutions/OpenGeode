@@ -451,7 +451,7 @@ void test_clone( const geode::Section& section )
         "[Test] Section should have 2 model boundaries" );
 
     const auto mappings = builder.copy_components( section );
-    builder.copy_component_relationships( mappings, section );
+    builder.copy_relationships( mappings, section );
     OPENGEODE_EXCEPTION(
         section2.nb_corners() == 10, "[Test] Section should have 10 corners" );
     OPENGEODE_EXCEPTION(

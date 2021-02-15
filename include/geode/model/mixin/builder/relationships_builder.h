@@ -75,6 +75,9 @@ namespace geode
          */
         void add_item_in_collection( const uuid& item, const uuid& collection );
 
+        void copy_relationships( const ModelCopyMapping& mapping,
+            const Relationships& relationships );
+
         void load_relationships( absl::string_view directory );
 
     private:
