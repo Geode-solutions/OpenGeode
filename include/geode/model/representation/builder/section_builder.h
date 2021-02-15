@@ -51,13 +51,9 @@ namespace geode
     ALIAS_2D( ModelBoundary );
     ALIAS_2D( Surface );
     ALIAS_2D( SurfaceMesh );
+    class ModelCopyMapping;
     class Section;
     struct uuid;
-
-    namespace detail
-    {
-        class ModelCopyMapping;
-    } // namespace detail
 } // namespace geode
 
 namespace geode
@@ -83,15 +79,12 @@ namespace geode
         SectionBuilder( Section& section );
         SectionBuilder( SectionBuilder&& ) = default;
 
-        detail::ModelCopyMapping copy( const Section& section );
+        ModelCopyMapping copy( const Section& section );
 
-        detail::ModelCopyMapping copy_components( const Section& section );
-
-        void copy_component_relationships(
-            const detail::ModelCopyMapping& mapping, const Section& section );
+        ModelCopyMapping copy_components( const Section& section );
 
         void copy_component_geometry(
-            const detail::ModelCopyMapping& mapping, const Section& section );
+            const ModelCopyMapping& mapping, const Section& section );
 
         const uuid& add_corner();
 
