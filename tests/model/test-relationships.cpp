@@ -121,6 +121,11 @@ void test_uuid( const geode::Relationships& relations,
     OPENGEODE_EXCEPTION( relations.nb_collections( uuid ) == nb_collections,
         "[Test] ", uuid.string(), " should have ", nb_collections,
         " collection(s)" );
+
+    const auto total = nb_boundaries + nb_incidences + nb_internals
+                       + nb_embeddings + nb_items + nb_collections;
+    OPENGEODE_EXCEPTION( relations.nb_relations( uuid ) == total, "[Test] ",
+        uuid.string(), " should have ", total, " relation(s)" );
 }
 
 void test_relations( const geode::Relationships& relations,
