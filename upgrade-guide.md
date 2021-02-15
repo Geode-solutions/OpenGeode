@@ -7,9 +7,9 @@
 This release includes a revised version of the `Relationships` model mixin.
 The goal is to provide `Attributes` to ̀`Component` level, both on each `Component` (via `component_attribute_manager`) and each relationship between two `Components` (via `relation_attribute_manager`).
 
-Another addition is the `Identifier` class holding a uuid and a name. 
+Another addition is the `Identifier` class holding a `uuid` and a name. 
 This new class is now the parent class of `VertexSet`, `Component`, `BRep` and ̀`Section`.
-All these derived classes can now be named and identified with a uuid.
+All these derived classes can now be named and identified with a `uuid`.
 
 ### Breaking Changes
 
