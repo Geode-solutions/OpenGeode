@@ -1,5 +1,23 @@
 # Upgrade Guide
 
+## Upgrading from OpenGeode v8.x.x to v9.0.0
+
+### Motivations
+
+This release includes a revised version of the `Relationships` model mixin.
+The goal is to provide `Attributes` to ̀`Component` level, both on each `Component` (via `component_attribute_manager`) and each relationship between two `Components` (via `relation_attribute_manager`).
+
+Another addition is the `Identifier` class holding a `uuid` and a name. 
+This new class is now the parent class of `VertexSet`, `Component`, `BRep` and ̀`Section`.
+All these derived classes can now be named and identified with a `uuid`.
+
+### Breaking Changes
+
+- **ModelBuilder**: The `copy_component_relationships` method in both `BRepBuilder` and `SectionBuilder` have been removed in favor of the `copy_relationships` in the new `IdentifierBuilder`.
+
+- **ModelCopyMapping**: The `ModelCopyMapping` has been move from `geode::detail` namespace to only `geode`.
+
+
 ## Upgrading from OpenGeode v7.x.x to v8.0.0
 
 ### Motivations
