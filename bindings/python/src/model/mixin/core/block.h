@@ -21,7 +21,9 @@
  *
  */
 
+#include <geode/mesh/core/hybrid_solid.h>
 #include <geode/mesh/core/polyhedral_solid.h>
+#include <geode/mesh/core/tetrahedral_solid.h>
 
 #include <geode/model/mixin/core/block.h>
 
@@ -30,6 +32,15 @@
     pybind11::class_< Block##dimension##D, Component##dimension##D >(          \
         module, name##dimension.c_str() )                                      \
         .def( "mesh", &Block##dimension##D::mesh< SolidMesh##dimension##D >,   \
+            pybind11::return_value_policy::reference )                         \
+        .def( "polyhedral_mesh",                                               \
+            &Block##dimension##D::mesh< PolyhedralSolid##dimension##D >,       \
+            pybind11::return_value_policy::reference )                         \
+        .def( "tetrahedral_mesh",                                              \
+            &Block##dimension##D::mesh< TetrahedralSolid##dimension##D >,      \
+            pybind11::return_value_policy::reference )                         \
+        .def( "hybrid_mesh",                                                   \
+            &Block##dimension##D::mesh< HybridSolid##dimension##D >,           \
             pybind11::return_value_policy::reference )                         \
         .def( "component_id", &Block##dimension##D::component_id )             \
         .def_static( "component_type_static",                                  \
