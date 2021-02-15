@@ -21,17 +21,39 @@
  *
  */
 
-#include <geode/model/representation/builder/detail/copy.h>
+#pragma once
+
+#include <absl/container/flat_hash_map.h>
+
+#include <geode/basic/mapping.h>
+#include <geode/basic/uuid.h>
+
+#include <geode/model/common.h>
+#include <geode/model/mixin/core/component_type.h>
 
 namespace geode
 {
-    void define_copy( pybind11::module& module )
+    class ModelCopyMapping
     {
-        pybind11::class_< ModelCopyMapping >( module, "ModelCopyMapping" )
-            .def( pybind11::init<>() )
-            .def( "at", ( ModelCopyMapping::Mapping
-                            & (ModelCopyMapping::*) (const ComponentType&) )
-                            & ModelCopyMapping::at )
-            .def( "emplace", &ModelCopyMapping::emplace );
-    }
+    public:
+        using Mapping = BijectiveMapping< uuid >;
+
+        Mapping& at( const ComponentType& type )
+        {
+            return mappings.at( type );
+        }
+
+        const Mapping& at( const ComponentType& type ) const
+        {
+            return mappings.at( type );
+        }
+
+        void emplace( const ComponentType& type, Mapping mapping )
+        {
+            mappings.emplace( type, std::move( mapping ) );
+        }
+
+    private:
+        absl::flat_hash_map< ComponentType, Mapping > mappings;
+    };
 } // namespace geode
