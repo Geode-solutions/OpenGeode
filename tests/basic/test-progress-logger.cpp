@@ -28,7 +28,7 @@
 
 void test()
 {
-    geode::index_t nb{ 50000 };
+    geode::index_t nb{ 30000 };
     geode::ProgressLogger logger{ "Cool message", nb };
     for( const auto i : geode::Range{ nb } )
     {

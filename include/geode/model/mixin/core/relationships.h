@@ -32,6 +32,7 @@
 namespace geode
 {
     class AttributeManager;
+    class ModelCopyMapping;
     class RelationshipsBuilder;
     struct uuid;
 } // namespace geode
@@ -341,6 +342,10 @@ namespace geode
          */
         void add_item_in_collection(
             const uuid& item, const uuid& collection, RelationshipsBuilderKey );
+
+        void copy_relationships( const ModelCopyMapping& mapping,
+            const Relationships& relationships,
+            RelationshipsBuilderKey );
 
         void load_relationships(
             absl::string_view directory, RelationshipsBuilderKey );

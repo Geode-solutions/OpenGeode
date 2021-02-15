@@ -57,19 +57,18 @@ namespace geode
     {
     }
 
-    detail::ModelCopyMapping SectionBuilder::copy( const Section& section )
+    ModelCopyMapping SectionBuilder::copy( const Section& section )
     {
         set_name( section.name() );
         const auto mapping = copy_components( section );
-        copy_component_relationships( mapping, section );
+        copy_relationships( mapping, section );
         copy_component_geometry( mapping, section );
         return mapping;
     }
 
-    detail::ModelCopyMapping SectionBuilder::copy_components(
-        const Section& section )
+    ModelCopyMapping SectionBuilder::copy_components( const Section& section )
     {
-        detail::ModelCopyMapping mappings;
+        ModelCopyMapping mappings;
         mappings.emplace( Corner2D::component_type_static(),
             detail::copy_corner_components( section, section_, *this ) );
         mappings.emplace( Line2D::component_type_static(),
@@ -81,38 +80,8 @@ namespace geode
         return mappings;
     }
 
-    void SectionBuilder::copy_component_relationships(
-        const detail::ModelCopyMapping& mappings, const Section& section )
-    {
-        detail::copy_corner_line_relationships( section, section_, *this,
-            mappings.at( Corner2D::component_type_static() ),
-            mappings.at( Line2D::component_type_static() ) );
-        detail::copy_corner_surface_relationships( section, section_, *this,
-            mappings.at( Corner2D::component_type_static() ),
-            mappings.at( Surface2D::component_type_static() ) );
-        detail::copy_line_surface_relationships( section, section_, *this,
-            mappings.at( Line2D::component_type_static() ),
-            mappings.at( Surface2D::component_type_static() ) );
-
-        const auto& model_boundary_mapping =
-            mappings.at( ModelBoundary2D::component_type_static() );
-        for( const auto& model_boundary : section.model_boundaries() )
-        {
-            const auto& new_model_boundary = section_.model_boundary(
-                model_boundary_mapping.in2out( model_boundary.id() ) );
-            for( const auto& line :
-                section.model_boundary_items( model_boundary ) )
-            {
-                const auto& new_line = section_.line(
-                    mappings.at( Line2D::component_type_static() )
-                        .in2out( line.id() ) );
-                add_line_in_model_boundary( new_line, new_model_boundary );
-            }
-        }
-    }
-
     void SectionBuilder::copy_component_geometry(
-        const detail::ModelCopyMapping& mappings, const Section& section )
+        const ModelCopyMapping& mappings, const Section& section )
     {
         detail::copy_corner_geometry( section, section_, *this,
             mappings.at( Corner2D::component_type_static() ) );

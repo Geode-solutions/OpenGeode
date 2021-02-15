@@ -57,12 +57,8 @@ namespace geode
     ALIAS_3D( Surface );
     ALIAS_3D( SurfaceMesh );
     class BRep;
+    class ModelCopyMapping;
     struct uuid;
-
-    namespace detail
-    {
-        class ModelCopyMapping;
-    } // namespace detail
 } // namespace geode
 
 namespace geode
@@ -90,15 +86,12 @@ namespace geode
         BRepBuilder( BRep& brep );
         BRepBuilder( BRepBuilder&& ) = default;
 
-        detail::ModelCopyMapping copy( const BRep& brep );
+        ModelCopyMapping copy( const BRep& brep );
 
-        detail::ModelCopyMapping copy_components( const BRep& brep );
-
-        void copy_component_relationships(
-            const detail::ModelCopyMapping& mapping, const BRep& brep );
+        ModelCopyMapping copy_components( const BRep& brep );
 
         void copy_component_geometry(
-            const detail::ModelCopyMapping& mapping, const BRep& brep );
+            const ModelCopyMapping& mapping, const BRep& brep );
 
         const uuid& add_corner();
 

@@ -63,18 +63,18 @@ namespace geode
     {
     }
 
-    detail::ModelCopyMapping BRepBuilder::copy( const BRep& brep )
+    ModelCopyMapping BRepBuilder::copy( const BRep& brep )
     {
         set_name( brep.name() );
         const auto mapping = copy_components( brep );
-        copy_component_relationships( mapping, brep );
+        copy_relationships( mapping, brep );
         copy_component_geometry( mapping, brep );
         return mapping;
     }
 
-    detail::ModelCopyMapping BRepBuilder::copy_components( const BRep& brep )
+    ModelCopyMapping BRepBuilder::copy_components( const BRep& brep )
     {
-        detail::ModelCopyMapping mappings;
+        ModelCopyMapping mappings;
         mappings.emplace( Corner3D::component_type_static(),
             detail::copy_corner_components( brep, brep_, *this ) );
         mappings.emplace( Line3D::component_type_static(),
@@ -88,48 +88,8 @@ namespace geode
         return mappings;
     }
 
-    void BRepBuilder::copy_component_relationships(
-        const detail::ModelCopyMapping& mappings, const BRep& brep )
-    {
-        detail::copy_corner_line_relationships( brep, brep_, *this,
-            mappings.at( Corner3D::component_type_static() ),
-            mappings.at( Line3D::component_type_static() ) );
-        detail::copy_corner_surface_relationships( brep, brep_, *this,
-            mappings.at( Corner3D::component_type_static() ),
-            mappings.at( Surface3D::component_type_static() ) );
-        detail::copy_line_surface_relationships( brep, brep_, *this,
-            mappings.at( Line3D::component_type_static() ),
-            mappings.at( Surface3D::component_type_static() ) );
-        detail::copy_corner_block_relationships( brep, brep_, *this,
-            mappings.at( Corner3D::component_type_static() ),
-            mappings.at( Block3D::component_type_static() ) );
-        detail::copy_line_block_relationships( brep, brep_, *this,
-            mappings.at( Line3D::component_type_static() ),
-            mappings.at( Block3D::component_type_static() ) );
-        detail::copy_surface_block_relationships( brep, brep_, *this,
-            mappings.at( Surface3D::component_type_static() ),
-            mappings.at( Block3D::component_type_static() ) );
-
-        const auto& model_boundary_mapping =
-            mappings.at( ModelBoundary3D::component_type_static() );
-        for( const auto& model_boundary : brep.model_boundaries() )
-        {
-            const auto& new_model_boundary = brep_.model_boundary(
-                model_boundary_mapping.in2out( model_boundary.id() ) );
-            for( const auto& surface :
-                brep.model_boundary_items( model_boundary ) )
-            {
-                const auto& new_surface = brep_.surface(
-                    mappings.at( Surface3D::component_type_static() )
-                        .in2out( surface.id() ) );
-                add_surface_in_model_boundary(
-                    new_surface, new_model_boundary );
-            }
-        }
-    }
-
     void BRepBuilder::copy_component_geometry(
-        const detail::ModelCopyMapping& mappings, const BRep& brep )
+        const ModelCopyMapping& mappings, const BRep& brep )
     {
         detail::copy_corner_geometry( brep, brep_, *this,
             mappings.at( Corner3D::component_type_static() ) );

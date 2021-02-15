@@ -724,7 +724,7 @@ void test_clone( const geode::BRep& brep )
         "[Test] BRep should have 3 model boundaries" );
 
     const auto mappings = builder.copy_components( brep );
-    builder.copy_component_relationships( mappings, brep );
+    builder.copy_relationships( mappings, brep );
     OPENGEODE_EXCEPTION(
         brep2.nb_corners() == 12, "[Test] BRep should have 12 corners" );
     OPENGEODE_EXCEPTION(
