@@ -22,6 +22,7 @@
  */
 
 #include <geode/mesh/core/polygonal_surface.h>
+#include <geode/mesh/core/triangulated_surface.h>
 
 #include <geode/model/mixin/core/surface.h>
 
@@ -32,6 +33,12 @@
         module, name##dimension.c_str() )                                      \
         .def( "mesh",                                                          \
             &Surface##dimension##D::mesh< SurfaceMesh##dimension##D >,         \
+            pybind11::return_value_policy::reference )                         \
+        .def( "polygonal_mesh",                                                \
+            &Surface##dimension##D::mesh< PolygonalSurface##dimension##D >,    \
+            pybind11::return_value_policy::reference )                         \
+        .def( "triangulated_mesh",                                             \
+            &Surface##dimension##D::mesh< TriangulatedSurface##dimension##D >, \
             pybind11::return_value_policy::reference )                         \
         .def( "component_id", &Surface##dimension##D::component_id )           \
         .def_static( "component_type_static",                                  \
