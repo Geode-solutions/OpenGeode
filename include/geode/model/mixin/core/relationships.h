@@ -52,6 +52,39 @@ namespace geode
 
     public:
         /*!
+         * Range to iterates on all relations of one component
+         */
+        class opengeode_model_api RelationRangeIterator
+        {
+        public:
+            RelationRangeIterator(
+                const Relationships& relationships, const uuid& id );
+            RelationRangeIterator( RelationRangeIterator&& other ) noexcept;
+            RelationRangeIterator( const RelationRangeIterator& other );
+            ~RelationRangeIterator();
+
+            bool operator!=( const RelationRangeIterator& /*unused*/ ) const;
+
+            void operator++();
+
+            const ComponentID& operator*() const;
+
+        private:
+            IMPLEMENTATION_MEMBER( impl_ );
+        };
+
+        class opengeode_model_api RelationRange
+            : public RelationRangeIterator,
+              public BeginEnd< RelationRange >
+        {
+        public:
+            RelationRange( const Relationships& relationships, const uuid& id )
+                : RelationRangeIterator( relationships, id ), BeginEnd( *this )
+            {
+            }
+        };
+
+        /*!
          * Range to iterates on all boundaries of one component
          */
         class opengeode_model_api BoundaryRangeIterator
@@ -253,6 +286,10 @@ namespace geode
     public:
         Relationships();
         ~Relationships();
+
+        index_t nb_relations( const uuid& id ) const;
+
+        RelationRange relations( const uuid& id ) const;
 
         index_t nb_boundaries( const uuid& id ) const;
 

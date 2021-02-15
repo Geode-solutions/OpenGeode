@@ -65,6 +65,11 @@ namespace geode
             initialize_attributes();
         }
 
+        index_t nb_relations( const uuid& id ) const
+        {
+            return graph_->edges_around_vertex( vertex_id( id ) ).size();
+        }
+
         RelationType relation_type( const index_t edge_id ) const
         {
             return relation_type_->value( edge_id );
@@ -335,6 +340,17 @@ namespace geode
         impl_->unregister_component( id );
     }
 
+    index_t Relationships::nb_relations( const uuid& id ) const
+    {
+        return impl_->nb_relations( id );
+    }
+
+    Relationships::RelationRange Relationships::relations(
+        const uuid& id ) const
+    {
+        return { *this, id };
+    }
+
     index_t Relationships::nb_boundaries( const uuid& id ) const
     {
         return detail::count_relationships( boundaries( id ) );
@@ -490,6 +506,75 @@ namespace geode
         index_t id ) const
     {
         return impl_->relation_from_index( id );
+    }
+
+    class Relationships::RelationRangeIterator::Impl
+        : public BaseRange< typename Relationships::Impl::Iterator >
+    {
+        using Iterator = typename Relationships::Impl::Iterator;
+
+    public:
+        Impl( const Relationships::Impl& relationships,
+            Iterator begin,
+            Iterator end )
+            : BaseRange< Iterator >( begin, end ),
+              relationships_( relationships )
+        {
+        }
+
+        void next()
+        {
+            this->operator++();
+        }
+
+        const ComponentID& vertex_component_id() const
+        {
+            const auto iterator = this->current();
+            return relationships_.vertex_component_id(
+                { iterator->edge_id, static_cast< local_index_t >(
+                                         ( iterator->vertex_id + 1 ) % 2 ) } );
+        }
+
+    private:
+        const Relationships::Impl& relationships_;
+    };
+
+    Relationships::RelationRangeIterator::RelationRangeIterator(
+        const Relationships& relationships, const uuid& id )
+        : impl_( *relationships.impl_,
+            relationships.impl_->begin_edge( id ),
+            relationships.impl_->end_edge( id ) )
+    {
+    }
+
+    Relationships::RelationRangeIterator::RelationRangeIterator(
+        RelationRangeIterator&& other ) noexcept
+        : impl_( *other.impl_ )
+    {
+    }
+
+    Relationships::RelationRangeIterator::RelationRangeIterator(
+        const RelationRangeIterator& other )
+        : impl_( *other.impl_ )
+    {
+    }
+
+    Relationships::RelationRangeIterator::~RelationRangeIterator() {} // NOLINT
+
+    bool Relationships::RelationRangeIterator::operator!=(
+        const RelationRangeIterator& /*unused*/ ) const
+    {
+        return impl_->operator!=( *impl_ );
+    }
+
+    void Relationships::RelationRangeIterator::operator++()
+    {
+        impl_->next();
+    }
+
+    const ComponentID& Relationships::RelationRangeIterator::operator*() const
+    {
+        return impl_->vertex_component_id();
     }
 
     class Relationships::BoundaryRangeIterator::Impl
