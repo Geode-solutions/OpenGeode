@@ -48,7 +48,7 @@ namespace geode
             return mappings.at( type );
         }
 
-		bool has_mapping_type( const ComponentType& type ) const
+        bool has_mapping_type( const ComponentType& type ) const
         {
             return mappings.contains( type );
         }
