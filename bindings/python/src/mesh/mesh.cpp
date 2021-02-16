@@ -125,9 +125,14 @@ namespace pybind11
 
 PYBIND11_MODULE( opengeode_py_mesh, module )
 {
-    try{
-    pybind11::module::import( "opengeode_py_basic" );
-    }catch (...){pybind11::module::import( "opengeode" );}
+    try
+    {
+        pybind11::module::import( "opengeode_py_basic" );
+    }
+    catch( ... )
+    {
+        pybind11::module::import( "opengeode" );
+    }
     pybind11::add_ostream_redirect( module );
     module.doc() = "OpenGeode Python binding for mesh";
     geode::define_vertex_set( module );
