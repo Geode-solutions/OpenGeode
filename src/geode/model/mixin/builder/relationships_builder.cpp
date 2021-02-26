@@ -40,22 +40,28 @@ namespace geode
         relationships_.unregister_component( id, {} );
     }
 
-    void RelationshipsBuilder::add_boundary_relation(
+    index_t RelationshipsBuilder::add_boundary_relation(
         const uuid& boundary, const uuid& incidence )
     {
-        relationships_.add_boundary_relation( boundary, incidence, {} );
+        return relationships_.add_boundary_relation( boundary, incidence, {} );
     }
 
-    void RelationshipsBuilder::add_internal_relation(
+    index_t RelationshipsBuilder::add_internal_relation(
         const uuid& internal, const uuid& embedding )
     {
-        relationships_.add_internal_relation( internal, embedding, {} );
+        return relationships_.add_internal_relation( internal, embedding, {} );
     }
 
-    void RelationshipsBuilder::add_item_in_collection(
+    index_t RelationshipsBuilder::add_item_in_collection(
         const uuid& item, const uuid& collection )
     {
-        relationships_.add_item_in_collection( item, collection, {} );
+        return relationships_.add_item_in_collection( item, collection, {} );
+    }
+
+    index_t RelationshipsBuilder::add_relation(
+        const uuid& id1, const uuid& id2 )
+    {
+        return relationships_.add_relation( id1, id2, {} );
     }
 
     void RelationshipsBuilder::copy_relationships(

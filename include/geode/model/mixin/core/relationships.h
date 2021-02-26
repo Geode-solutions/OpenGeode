@@ -358,7 +358,7 @@ namespace geode
          * @param[in] boundary Unique index of the boundary component
          * @param[in] incidence Unique index of the incidence component
          */
-        void add_boundary_relation( const uuid& boundary,
+        index_t add_boundary_relation( const uuid& boundary,
             const uuid& incidence,
             RelationshipsBuilderKey );
 
@@ -368,7 +368,7 @@ namespace geode
          * @param[in] internal Unique index of the internal component
          * @param[in] embedding Unique index of the embedding component
          */
-        void add_internal_relation( const uuid& internal,
+        index_t add_internal_relation( const uuid& internal,
             const uuid& embedding,
             RelationshipsBuilderKey );
 
@@ -377,8 +377,14 @@ namespace geode
          * @param[in] item Unique index of the item component
          * @param[in] collection Unique index of the collection component
          */
-        void add_item_in_collection(
+        index_t add_item_in_collection(
             const uuid& item, const uuid& collection, RelationshipsBuilderKey );
+
+        /*!
+         * Add a new relationship between two components
+         */
+        index_t add_relation(
+            const uuid& id1, const uuid& id2, RelationshipsBuilderKey );
 
         void copy_relationships( const ModelCopyMapping& mapping,
             const Relationships& relationships,
