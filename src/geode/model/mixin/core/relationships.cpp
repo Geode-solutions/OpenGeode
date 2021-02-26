@@ -133,7 +133,7 @@ namespace geode
             uuid2index_.decrement_indices_larger_than( index );
         }
 
-        bool check_relation_exists(
+        absl::optional< index_t > check_relation_exists(
             const uuid& from, const uuid& to, const RelationType type ) const
         {
             const auto& edges_around =
@@ -147,25 +147,37 @@ namespace geode
                 if( to == other.id()
                     && relation_type( edge_vertex.edge_id ) == type )
                 {
-                    return true;
+                    return edge_vertex.edge_id;
                 }
             }
-            return false;
+            return absl::nullopt;
         }
 
-        void add_relation(
+        index_t add_relation(
             const uuid& from, const uuid& to, const RelationType type )
         {
-            if( check_relation_exists( from, to, type ) )
+            if( const auto id = check_relation_exists( from, to, type ) )
             {
                 Logger::warn( "This relation already exists (",
                     ids_->value( vertex_id( from ) ).type().get(), " and ",
                     ids_->value( vertex_id( to ) ).type().get(), ")" );
-                return;
+                return id.value();
             }
-            const auto index = GraphBuilder::create( *graph_ )->create_edge(
-                vertex_id( from ), vertex_id( to ) );
+            const auto index = do_add_relation( from, to );
             relation_type_->set_value( index, type );
+            return index;
+        }
+
+        index_t add_relation( const uuid& from, const uuid& to )
+        {
+            if( const auto id = relation_index( from, to ) )
+            {
+                Logger::warn( "This relation already exists (",
+                    ids_->value( vertex_id( from ) ).type().get(), " and ",
+                    ids_->value( vertex_id( to ) ).type().get(), ")" );
+                return id.value();
+            }
+            return do_add_relation( from, to );
         }
 
         void save( absl::string_view directory ) const
@@ -298,6 +310,13 @@ namespace geode
                             a.ext( impl.ids_, bitsery::ext::StdSmartPtr{} );
                         } } } );
         }
+        
+        index_t do_add_relation( const uuid& from, const uuid& to )
+        {
+            const auto index = GraphBuilder::create( *graph_ )->create_edge(
+                vertex_id( from ), vertex_id( to ) );
+            return index;
+        }
 
         index_t vertex_id( const uuid& id ) const
         {
@@ -374,10 +393,10 @@ namespace geode
         return { *this, id };
     }
 
-    void Relationships::add_boundary_relation(
+    index_t Relationships::add_boundary_relation(
         const uuid& boundary, const uuid& incidence, RelationshipsBuilderKey )
     {
-        impl_->add_relation(
+        return impl_->add_relation(
             boundary, incidence, Relationships::Impl::BOUNDARY_RELATION );
     }
 
@@ -403,10 +422,10 @@ namespace geode
         return { *this, id };
     }
 
-    void Relationships::add_internal_relation(
+    index_t Relationships::add_internal_relation(
         const uuid& internal, const uuid& embedding, RelationshipsBuilderKey )
     {
-        impl_->add_relation(
+        return impl_->add_relation(
             internal, embedding, Relationships::Impl::INTERNAL_RELATION );
     }
 
@@ -431,32 +450,44 @@ namespace geode
         return { *this, id };
     }
 
-    void Relationships::add_item_in_collection(
+    index_t Relationships::add_item_in_collection(
         const uuid& item, const uuid& collection, RelationshipsBuilderKey )
     {
-        impl_->add_relation(
+        return impl_->add_relation(
             item, collection, Relationships::Impl::ITEM_RELATION );
+    }
+
+    index_t Relationships::add_relation(
+        const uuid& id1, const uuid& id2, RelationshipsBuilderKey )
+    {
+        return impl_->add_relation( id1, id2 );
     }
 
     bool Relationships::is_boundary(
         const uuid& boundary, const uuid& incidence ) const
     {
-        return impl_->check_relation_exists(
-            boundary, incidence, Relationships::Impl::BOUNDARY_RELATION );
+        return impl_
+            ->check_relation_exists(
+                boundary, incidence, Relationships::Impl::BOUNDARY_RELATION )
+            .has_value();
     }
 
     bool Relationships::is_internal(
         const uuid& internal, const uuid& embedding ) const
     {
-        return impl_->check_relation_exists(
-            internal, embedding, Relationships::Impl::INTERNAL_RELATION );
+        return impl_
+            ->check_relation_exists(
+                internal, embedding, Relationships::Impl::INTERNAL_RELATION )
+            .has_value();
     }
 
     bool Relationships::is_item(
         const uuid& item, const uuid& collection ) const
     {
-        return impl_->check_relation_exists(
-            item, collection, Relationships::Impl::ITEM_RELATION );
+        return impl_
+            ->check_relation_exists(
+                item, collection, Relationships::Impl::ITEM_RELATION )
+            .has_value();
     }
 
     void Relationships::save_relationships( absl::string_view directory ) const
