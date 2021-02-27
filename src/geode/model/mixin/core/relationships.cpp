@@ -310,7 +310,7 @@ namespace geode
                             a.ext( impl.ids_, bitsery::ext::StdSmartPtr{} );
                         } } } );
         }
-        
+
         index_t do_add_relation( const uuid& from, const uuid& to )
         {
             const auto index = GraphBuilder::create( *graph_ )->create_edge(
