@@ -42,7 +42,8 @@ namespace geode
                     graph.edge_attribute_manager()
                         .template find_or_create_attribute< VariableAttribute,
                             std::array< index_t, 2 > >( "edges",
-                            std::array< index_t, 2 >{ NO_ID, NO_ID } ) )
+                            std::array< index_t, 2 >{ NO_ID, NO_ID },
+                            { false, false } ) )
             {
             }
 
