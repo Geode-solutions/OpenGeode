@@ -53,13 +53,15 @@ namespace geode
                       .template find_or_create_attribute< VariableAttribute,
                           std::array< index_t, 4 > >( "tetrahedron_vertices",
                           std::array< index_t, 4 >{
-                              NO_ID, NO_ID, NO_ID, NO_ID } ) ),
+                              NO_ID, NO_ID, NO_ID, NO_ID },
+                          { false, false } ) ),
               tetrahedron_adjacents_(
                   mesh.polyhedron_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
                           std::array< index_t, 4 > >( "tetrahedron_adjacents",
                           std::array< index_t, 4 >{
-                              NO_ID, NO_ID, NO_ID, NO_ID } ) )
+                              NO_ID, NO_ID, NO_ID, NO_ID },
+                          { false, false } ) )
         {
         }
 
