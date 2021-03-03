@@ -204,7 +204,6 @@ namespace geode
         auto det = std::fabs( a00 * a11 - a01 * a01 );
         auto s = a01 * b1 - a11 * b0;
         auto t = a01 * b0 - a00 * b1;
-        double sqrDistance;
 
         if( s + t <= det )
         {
@@ -218,12 +217,10 @@ namespace geode
                         if( -b0 >= a00 )
                         {
                             s = 1.0;
-                            sqrDistance = a00 + 2.0 * b0 + c;
                         }
                         else
                         {
                             s = -b0 / a00;
-                            sqrDistance = b0 * s + c;
                         }
                     }
                     else
@@ -232,17 +229,14 @@ namespace geode
                         if( b1 >= 0.0 )
                         {
                             t = 0.0;
-                            sqrDistance = c;
                         }
                         else if( -b1 >= a11 )
                         {
                             t = 1.0;
-                            sqrDistance = a11 + 2.0 * b1 + c;
                         }
                         else
                         {
                             t = -b1 / a11;
-                            sqrDistance = b1 * t + c;
                         }
                     }
                 }
@@ -252,17 +246,14 @@ namespace geode
                     if( b1 >= 0.0 )
                     {
                         t = 0.0;
-                        sqrDistance = c;
                     }
                     else if( -b1 >= a11 )
                     {
                         t = 1.0;
-                        sqrDistance = a11 + 2.0 * b1 + c;
                     }
                     else
                     {
                         t = -b1 / a11;
-                        sqrDistance = b1 * t + c;
                     }
                 }
             }
@@ -272,17 +263,14 @@ namespace geode
                 if( b0 >= 0.0 )
                 {
                     s = 0.0;
-                    sqrDistance = c;
                 }
                 else if( -b0 >= a00 )
                 {
                     s = 1.0;
-                    sqrDistance = a00 + 2.0 * b0 + c;
                 }
                 else
                 {
                     s = -b0 / a00;
-                    sqrDistance = b0 * s + c;
                 }
             }
             else
@@ -291,8 +279,6 @@ namespace geode
                 auto invDet = 1.0 / det;
                 s *= invDet;
                 t *= invDet;
-                sqrDistance = s * ( a00 * s + a01 * t + 2.0 * b0 )
-                              + t * ( a01 * s + a11 * t + 2.0 * b1 ) + c;
             }
         }
         else
@@ -314,15 +300,11 @@ namespace geode
                     {
                         s = 1.0;
                         t = 0.0;
-                        sqrDistance = a00 + 2.0 * b0 + c;
                     }
                     else
                     {
                         s = numer / denom;
                         t = 1.0 - s;
-                        sqrDistance = s * ( a00 * s + a01 * t + 2.0 * b0 )
-                                      + t * ( a01 * s + a11 * t + 2.0 * b1 )
-                                      + c;
                     }
                 }
                 else
@@ -331,17 +313,14 @@ namespace geode
                     if( tmp1 <= 0.0 )
                     {
                         t = 1.0;
-                        sqrDistance = a11 + 2.0 * b1 + c;
                     }
                     else if( b1 >= 0.0 )
                     {
                         t = 0.0;
-                        sqrDistance = c;
                     }
                     else
                     {
                         t = -b1 / a11;
-                        sqrDistance = b1 * t + c;
                     }
                 }
             }
@@ -357,15 +336,11 @@ namespace geode
                     {
                         t = 1.0;
                         s = 0.0;
-                        sqrDistance = a11 + 2.0 * b1 + c;
                     }
                     else
                     {
                         t = numer / denom;
                         s = 1.0 - t;
-                        sqrDistance = s * ( a00 * s + a01 * t + 2.0 * b0 )
-                                      + t * ( a01 * s + a11 * t + 2.0 * b1 )
-                                      + c;
                     }
                 }
                 else
@@ -374,17 +349,14 @@ namespace geode
                     if( tmp1 <= 0.0 )
                     {
                         s = 1.0;
-                        sqrDistance = a00 + 2.0 * b0 + c;
                     }
                     else if( b0 >= 0.0 )
                     {
                         s = 0.0;
-                        sqrDistance = c;
                     }
                     else
                     {
                         s = -b0 / a00;
-                        sqrDistance = b0 * s + c;
                     }
                 }
             }
@@ -395,7 +367,6 @@ namespace geode
                 {
                     s = 0.0;
                     t = 1.0;
-                    sqrDistance = a11 + 2.0 * b1 + c;
                 }
                 else
                 {
@@ -404,29 +375,20 @@ namespace geode
                     {
                         s = 1.0;
                         t = 0.0;
-                        sqrDistance = a00 + 2.0 * b0 + c;
                     }
                     else
                     {
                         s = numer / denom;
                         t = 1.0 - s;
-                        sqrDistance = s * ( a00 * s + a01 * t + 2.0 * b0 )
-                                      + t * ( a01 * s + a11 * t + 2.0 * b1 )
-                                      + c;
                     }
                 }
             }
         }
 
-        // Account for numerical round-off error.
-        if( sqrDistance < 0.0 )
-        {
-            sqrDistance = 0.0;
-        }
-
         Point3D closest_point{ triangle.vertices()[0].get() + edge0 * s
                                + edge1 * t };
-        return std::make_tuple( std::sqrt( sqrDistance ), closest_point );
+        return std::make_tuple(
+            Vector3D{ point, closest_point }.length(), closest_point );
     }
 
     template <>
