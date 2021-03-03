@@ -299,6 +299,12 @@ void test_delete_vertex( const geode::HybridSolid3D& hybrid_solid,
         "[Test] HybridSolid should have 3 polyhedra" );
     OPENGEODE_EXCEPTION( !hybrid_solid.polyhedron_adjacent( { 1, 0 } ),
         "[Test] HybridSolid adjacent index is not correct" );
+    OPENGEODE_EXCEPTION( hybrid_solid.facets().nb_facets() == 16,
+        "[Test] PolyhedralSolid should have 16 facets" );
+    OPENGEODE_EXCEPTION( hybrid_solid.edges().nb_edges() == 22,
+        "[Test] PolyhedralSolid should have 22 edges" );
+    builder.edges_builder().delete_isolated_edges();
+    builder.facets_builder().delete_isolated_facets();
     OPENGEODE_EXCEPTION( hybrid_solid.facets().nb_facets() == 12,
         "[Test] HybridSolid should have 12 facets" );
     OPENGEODE_EXCEPTION( hybrid_solid.edges().nb_edges() == 17,
@@ -323,6 +329,8 @@ void test_delete_polyhedra( const geode::HybridSolid3D& hybrid_solid,
         "[Test] HybridSolid vertex index is not correct" );
     OPENGEODE_EXCEPTION( hybrid_solid.polyhedron_vertex( { 0, 4 } ) == 5,
         "[Test] HybridSolid vertex index is not correct" );
+    builder.edges_builder().delete_isolated_edges();
+    builder.facets_builder().delete_isolated_facets();
     OPENGEODE_EXCEPTION( hybrid_solid.facets().nb_facets() == 10,
         "[Test] HybridSolid should have 10 facets" );
     OPENGEODE_EXCEPTION( hybrid_solid.edges().nb_edges() == 16,
@@ -376,12 +384,14 @@ void test_delete_all( const geode::HybridSolid3D& hybrid_solid,
         "[Test] HybridSolid should have 10 vertices" );
     OPENGEODE_EXCEPTION( hybrid_solid.isolated_vertex( 0 ),
         "[Test] Vertices should be isolated after polyhedra deletion" );
+    OPENGEODE_EXCEPTION( hybrid_solid.nb_polyhedra() == 0,
+        "[Test] HybridSolid should have 0 polyhedron" );
+    builder.edges_builder().delete_isolated_edges();
+    builder.facets_builder().delete_isolated_facets();
     OPENGEODE_EXCEPTION( hybrid_solid.facets().nb_facets() == 0,
         "[Test] HybridSolid should have 0 facet" );
     OPENGEODE_EXCEPTION( hybrid_solid.edges().nb_edges() == 0,
         "[Test] HybridSolid should have 0 edge" );
-    OPENGEODE_EXCEPTION( hybrid_solid.nb_polyhedra() == 0,
-        "[Test] HybridSolid should have 0 polyhedron" );
     OPENGEODE_EXCEPTION( hybrid_solid.polyhedra_around_vertex( 0 ).empty(),
         "[Test] No more polyhedra around vertices" );
 

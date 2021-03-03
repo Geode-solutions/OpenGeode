@@ -45,9 +45,9 @@ def test_create_tetrahedra( solid, builder ):
     if solid.nb_polyhedra() != 3:
         raise ValueError( "[Test] TetrahedralSolid should have 3 tetrahedra" )
     if solid.facets().nb_facets() != 10:
-        raise ValueError( "[Test] PolyhedralSolid should have 10 facets" )
+        raise ValueError( "[Test] TetrahedralSolid should have 10 facets" )
     if solid.edges().nb_edges() != 12:
-        raise ValueError( "[Test] PolyhedralSolid should have 12 edges" )
+        raise ValueError( "[Test] TetrahedralSolid should have 12 edges" )
 
 def test_polyhedron_adjacencies( solid, builder ):
     builder.compute_polyhedron_adjacencies()
@@ -78,10 +78,12 @@ def test_delete_vertex( solid, builder ):
         raise ValueError( "[Test] TetrahedralSolid should have 2 tetrahedra" )
     if solid.polyhedron_adjacent( mesh.PolyhedronFacet( 1, 3 ) ) != 0:
         raise ValueError( "[Test] TetrahedralSolid adjacent index is not correct" )
+    builder.edges_builder().delete_isolated_edges()
+    builder.facets_builder().delete_isolated_facets()
     if solid.facets().nb_facets() != 7:
-        raise ValueError( "[Test] PolyhedralSolid should have 7 facets" )
+        raise ValueError( "[Test] TetrahedralSolid should have 7 facets" )
     if solid.edges().nb_edges() != 9:
-        raise ValueError( "[Test] PolyhedralSolid should have 9 edges" )
+        raise ValueError( "[Test] TetrahedralSolid should have 9 edges" )
 
 def test_delete_polyhedron( solid, builder ):
     to_delete = [False] * solid.nb_polyhedra()
@@ -114,8 +116,8 @@ def test_clone( solid ):
     solid2 = solid.clone()
     if solid2.nb_vertices() != 5:
         raise ValueError( "[Test] TetrahedralSolid2 should have 5 vertices" )
-    if solid2.facets().nb_facets() != 4:
-        raise ValueError( "[Test] TetrahedralSolid2 should have 4 facets" )
+    if solid2.facets().nb_facets() != solid.facets().nb_facets():
+        raise ValueError( "[Test] TetrahedralSolid2 should have same number of facets" )
     if solid2.nb_polyhedra() != 1:
         raise ValueError( "[Test] TetrahedralSolid2 should have 1 polyhedron" )
 

@@ -178,6 +178,7 @@ void test_delete_vertex( const geode::TriangulatedSurface3D& surface,
         "[Test] TriangulatedSurface should have 2 polygons" );
     OPENGEODE_EXCEPTION( surface.polygon_adjacent( { 1, 2 } ) == 0,
         "[Test] TriangulatedSurface adjacent index is not correct" );
+    builder.edges_builder().delete_isolated_edges();
     OPENGEODE_EXCEPTION( surface.edges().nb_edges() == 5,
         "[Test] TriangulatedSurface should have 5 edges" );
 }
@@ -196,6 +197,7 @@ void test_delete_polygon( const geode::TriangulatedSurface3D& surface,
         "[Test] TriangulatedSurface edge vertex index is not correct" );
     OPENGEODE_EXCEPTION( surface.polygon_vertex( { 0, 2 } ) == 0,
         "[Test] TriangulatedSurface edge vertex index is not correct" );
+    builder.edges_builder().delete_isolated_edges();
     OPENGEODE_EXCEPTION( surface.edges().nb_edges() == 3,
         "[Test] TriangulatedSurface should have 3 edges" );
 }
@@ -251,6 +253,7 @@ void test_delete_all( const geode::TriangulatedSurface3D& triangulated_surface,
     builder.delete_polygons( to_delete );
     OPENGEODE_EXCEPTION( triangulated_surface.nb_vertices() == 3,
         "[Test]TriangulatedSurface should have 3 vertices" );
+    builder.edges_builder().delete_isolated_edges();
     OPENGEODE_EXCEPTION( triangulated_surface.edges().nb_edges() == 0,
         "[Test]TriangulatedSurface should have 0 edge" );
     OPENGEODE_EXCEPTION( triangulated_surface.nb_polygons() == 0,

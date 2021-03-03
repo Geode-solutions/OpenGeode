@@ -283,8 +283,9 @@ void test_clone( const geode::TetrahedralSolid3D& solid )
     }
     OPENGEODE_EXCEPTION( solid2->nb_vertices() == 5,
         "[Test] TetrahedralSolid2 should have 5 vertices" );
-    OPENGEODE_EXCEPTION( solid2->facets().nb_facets() == 4,
-        "[Test] TetrahedralSolid2 should have 4 facets" );
+    OPENGEODE_EXCEPTION(
+        solid2->facets().nb_facets() == solid.facets().nb_facets(),
+        "[Test] TetrahedralSolid2 should have same number of facets" );
     OPENGEODE_EXCEPTION( solid2->nb_polyhedra() == 1,
         "[Test] TetrahedralSolid2 should have 1 polyhedron" );
 }

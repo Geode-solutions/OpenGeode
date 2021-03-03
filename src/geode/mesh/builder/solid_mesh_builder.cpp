@@ -620,8 +620,6 @@ namespace geode
                 }
             }
         }
-
-        edges.delete_isolated_edges();
     }
 
     template < index_t dimension >
@@ -696,7 +694,6 @@ namespace geode
                 }
             }
         }
-        facets.delete_isolated_facets();
     }
 
     template < index_t dimension >
