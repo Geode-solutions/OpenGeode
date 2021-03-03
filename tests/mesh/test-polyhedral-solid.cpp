@@ -296,6 +296,12 @@ void test_delete_vertex( const geode::PolyhedralSolid3D& polyhedral_solid,
         "[Test] PolyhedralSolid should have 2 polyhedra" );
     OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_adjacent( { 1, 0 } ) == 0,
         "[Test] PolyhedralSolid adjacent index is not correct" );
+    OPENGEODE_EXCEPTION( polyhedral_solid.facets().nb_facets() == 11,
+        "[Test] PolyhedralSolid should have 11 facets" );
+    OPENGEODE_EXCEPTION( polyhedral_solid.edges().nb_edges() == 15,
+        "[Test] PolyhedralSolid should have 15 edges" );
+    builder.edges_builder().delete_isolated_edges();
+    builder.facets_builder().delete_isolated_facets();
     OPENGEODE_EXCEPTION( polyhedral_solid.facets().nb_facets() == 7,
         "[Test] PolyhedralSolid should have 7 facets" );
     OPENGEODE_EXCEPTION( polyhedral_solid.edges().nb_edges() == 9,
@@ -325,6 +331,12 @@ void test_delete_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
         "[Test] PolyhedralSolid vertex index is not correct" );
     OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_vertex( { 0, 3 } ) == 1,
         "[Test] PolyhedralSolid vertex index is not correct" );
+    OPENGEODE_EXCEPTION( polyhedral_solid.facets().nb_facets() == 7,
+        "[Test] PolyhedralSolid should have 7 facets" );
+    OPENGEODE_EXCEPTION( polyhedral_solid.edges().nb_edges() == 9,
+        "[Test] PolyhedralSolid should have 9 edges" );
+    builder.edges_builder().delete_isolated_edges();
+    builder.facets_builder().delete_isolated_facets();
     OPENGEODE_EXCEPTION( polyhedral_solid.facets().nb_facets() == 4,
         "[Test] PolyhedralSolid should have 4 facets" );
     OPENGEODE_EXCEPTION( polyhedral_solid.edges().nb_edges() == 6,
@@ -532,12 +544,14 @@ void test_delete_all( const geode::PolyhedralSolid3D& polyhedral_solid,
         "[Test] PolyhedralSolid should have 7 vertices" );
     OPENGEODE_EXCEPTION( polyhedral_solid.isolated_vertex( 0 ),
         "[Test] Vertices should be isolated after polyhedra deletion" );
+    OPENGEODE_EXCEPTION( polyhedral_solid.nb_polyhedra() == 0,
+        "[Test] PolyhedralSolid should have 0 polyhedron" );
+    builder.edges_builder().delete_isolated_edges();
+    builder.facets_builder().delete_isolated_facets();
     OPENGEODE_EXCEPTION( polyhedral_solid.facets().nb_facets() == 0,
         "[Test] PolyhedralSolid should have 0 facet" );
     OPENGEODE_EXCEPTION( polyhedral_solid.edges().nb_edges() == 0,
         "[Test] PolyhedralSolid should have 0 edge" );
-    OPENGEODE_EXCEPTION( polyhedral_solid.nb_polyhedra() == 0,
-        "[Test] PolyhedralSolid should have 0 polyhedron" );
     OPENGEODE_EXCEPTION( polyhedral_solid.polyhedra_around_vertex( 0 ).empty(),
         "[Test] No more polyhedra around vertices" );
 

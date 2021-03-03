@@ -185,6 +185,7 @@ void test_delete_vertex( const geode::PolygonalSurface3D& polygonal_surface,
         "[Test] PolygonalSurface should have 2 polygons" );
     OPENGEODE_EXCEPTION( !polygonal_surface.polygon_adjacent( { 1, 2 } ),
         "[Test] PolygonalSurface adjacent index is not correct" );
+    builder.edges_builder().delete_isolated_edges();
     OPENGEODE_EXCEPTION( polygonal_surface.edges().nb_edges() == 7,
         "[Test] PolygonalSurface should have 7 edges" );
 
@@ -335,10 +336,13 @@ void test_delete_polygon( const geode::PolygonalSurface3D& polygonal_surface,
         "[Test] PolygonalSurface edge vertex index is not correct" );
     OPENGEODE_EXCEPTION( polygonal_surface.polygon_vertex( { 0, 2 } ) == 0,
         "[Test] PolygonalSurface edge vertex index is not correct" );
+    OPENGEODE_EXCEPTION( polygonal_surface.edges().isolated_edge( 0 ),
+        "[Test] Edge should be isolated after polygon deletion" );
+    builder.edges_builder().delete_isolated_edges();
     OPENGEODE_EXCEPTION( polygonal_surface.edges().nb_edges() == 3,
         "[Test] PolygonalSurface should have  edges" );
     OPENGEODE_EXCEPTION( !polygonal_surface.edges().isolated_edge( 0 ),
-        "[Test] Edge should not be isolated after polygon deletion" );
+        "[Test] Edge should not be isolated after isolated egde deletion" );
 
     const auto attribute = polygonal_surface.edges()
                                .edge_attribute_manager()
@@ -555,16 +559,17 @@ void test_delete_all( const geode::PolygonalSurface3D& polygonal_surface,
     builder.delete_polygons( to_delete );
     OPENGEODE_EXCEPTION( polygonal_surface.nb_vertices() == 6,
         "[Test] PolygonalSurface should have 6 vertices" );
-    OPENGEODE_EXCEPTION( polygonal_surface.edges().nb_edges() == 0,
-        "[Test] PolygonalSurface should have 0 edge" );
     OPENGEODE_EXCEPTION( polygonal_surface.nb_polygons() == 0,
         "[Test] PolygonalSurface should have 0 polygon" );
     OPENGEODE_EXCEPTION( polygonal_surface.polygons_around_vertex( 0 ).empty(),
         "[Test] No more polygon around vertices" );
 
     builder.delete_isolated_vertices();
+    builder.edges_builder().delete_isolated_edges();
     OPENGEODE_EXCEPTION( polygonal_surface.nb_vertices() == 0,
         "[Test] PolygonalSurface should have 0 vertex" );
+    OPENGEODE_EXCEPTION( polygonal_surface.edges().nb_edges() == 0,
+        "[Test] PolygonalSurface should have 0 edge" );
 }
 
 void test_non_manifold_surface()

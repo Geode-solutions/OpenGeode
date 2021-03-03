@@ -60,6 +60,7 @@ def test_delete_vertex( polygonal_surface, builder ):
         raise ValueError( "[Test] PolygonalSurface should have 2 polygons" )
     if polygonal_surface.polygon_adjacent( mesh.PolygonEdge( 1, 2 ) ):
         raise ValueError( "[Test] PolygonalSurface adjacent index is not correct" )
+    builder.edges_builder().delete_isolated_edges()
     if polygonal_surface.edges().nb_edges() != 7:
         raise ValueError( "[Test] PolygonalSurface should have 7 edges" )
 
@@ -130,6 +131,7 @@ def test_delete_polygon( polygonal_surface, builder ):
         raise ValueError( "[Test] PolygonalSurface edge vertex index is not correct" )
     if polygonal_surface.polygon_vertex( mesh.PolygonVertex( 0, 2 ) ) != 0:
         raise ValueError( "[Test] PolygonalSurface edge vertex index is not correct" )
+    builder.edges_builder().delete_isolated_edges()
     if polygonal_surface.edges().nb_edges() != 3:
         raise ValueError( "[Test] PolygonalSurface should have 3 edges" )
 
@@ -240,13 +242,13 @@ def test_delete_all( polygonal_surface, builder ):
     builder.delete_polygons( to_delete )
     if polygonal_surface.nb_vertices() != 6:
         raise ValueError( "[Test] PolygonalSurface should have 6 vertices" )
-    if polygonal_surface.edges().nb_edges() != 0:
-        raise ValueError( "[Test] PolygonalSurface should have 0 edge" )
     if polygonal_surface.nb_polygons() != 0:
         raise ValueError( "[Test] PolygonalSurface should have 0 polygon" )
+    builder.edges_builder().delete_isolated_edges()
+    if polygonal_surface.edges().nb_edges() != 0:
+        raise ValueError( "[Test] PolygonalSurface should have 0 edge" )
     if len( polygonal_surface.polygons_around_vertex( 0 ) ) != 0:
         raise ValueError( "[Test] No more polygon around vertices" )
-
     builder.delete_isolated_vertices()
     if polygonal_surface.nb_vertices() != 0:
         raise ValueError( "[Test] PolygonalSurface should have 0 vertex" )

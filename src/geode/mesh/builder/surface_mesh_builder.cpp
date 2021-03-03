@@ -610,7 +610,6 @@ namespace geode
                     }
                 }
             }
-            edges.delete_isolated_edges();
         }
         update_polygon_around( *surface_mesh_, *this, old2new );
         update_polygon_adjacencies( *surface_mesh_, *this, old2new );
