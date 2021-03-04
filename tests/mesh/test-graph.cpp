@@ -78,6 +78,9 @@ void test_create_edges(
     builder.create_edge( 1, 2 );
     OPENGEODE_EXCEPTION(
         graph.nb_edges() == 4, "[Test] Graph should have 4 edges" );
+    std::array< geode::index_t, 2 > answer{ 3, 2 };
+    OPENGEODE_EXCEPTION(
+        graph.edge_vertices( 2 ) == answer, "[Test] Wrong edge vertices" );
 
     const auto& edges_around_0 = graph.edges_around_vertex( 0 );
     OPENGEODE_EXCEPTION( edges_around_0.size() == 2,

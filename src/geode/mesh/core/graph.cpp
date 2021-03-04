@@ -169,6 +169,11 @@ namespace geode
         return get_edge_vertex( edge_vertex );
     }
 
+    std::array< index_t, 2 > Graph::edge_vertices( index_t edge_id ) const
+    {
+        return { edge_vertex( { edge_id, 0 } ), edge_vertex( { edge_id, 1 } ) };
+    }
+
     index_t Graph::nb_edges() const
     {
         return edge_attribute_manager().nb_elements();
