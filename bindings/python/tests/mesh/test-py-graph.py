@@ -66,6 +66,9 @@ def test_create_edges( graph, builder ):
     builder.create_edge_with_vertices( 1, 2 )
     if graph.nb_edges() != 4:
         raise ValueError( "[Test] Graph should have 4 edges" )
+    answer = [ 3, 2 ]
+    if graph.edge_vertices( 2 ) != answer:
+        raise ValueError( "[Test] Wrong edge vertices" )
 
     edges_around_0 = graph.edges_around_vertex( 0 )
     if len( edges_around_0 ) != 2:

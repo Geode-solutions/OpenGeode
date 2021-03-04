@@ -109,6 +109,12 @@ namespace geode
          */
         index_t edge_vertex( const EdgeVertex& edge_vertex ) const;
 
+        /*!
+         * Return the indices of the two edge vertices
+         * @param[in] edge_id Index of the edge
+         */
+        std::array< index_t, 2 > edge_vertices( index_t edge_id ) const;
+
         index_t nb_edges() const;
 
         /*!

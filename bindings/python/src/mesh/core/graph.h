@@ -36,6 +36,7 @@ namespace geode
                 "create", ( std::unique_ptr< Graph >( * )() ) & Graph::create )
             .def( "clone", &Graph::clone )
             .def( "edge_vertex", &Graph::edge_vertex )
+            .def( "edge_vertices", &Graph::edge_vertices )
             .def( "nb_edges", &Graph::nb_edges )
             .def( "edge_attribute_manager", &Graph::edge_attribute_manager,
                 pybind11::return_value_policy::reference )
