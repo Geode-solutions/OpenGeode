@@ -336,14 +336,13 @@ void test_delete_polygon( const geode::PolygonalSurface3D& polygonal_surface,
         "[Test] PolygonalSurface edge vertex index is not correct" );
     OPENGEODE_EXCEPTION( polygonal_surface.polygon_vertex( { 0, 2 } ) == 0,
         "[Test] PolygonalSurface edge vertex index is not correct" );
-    OPENGEODE_EXCEPTION( polygonal_surface.edges().isolated_edge( 0 ),
+    const auto isol_edge =
+        polygonal_surface.edges().edge_from_vertices( { 1, 5 } ).value();
+    OPENGEODE_EXCEPTION( polygonal_surface.edges().isolated_edge( isol_edge ),
         "[Test] Edge should be isolated after polygon deletion" );
     builder.edges_builder().delete_isolated_edges();
     OPENGEODE_EXCEPTION( polygonal_surface.edges().nb_edges() == 3,
         "[Test] PolygonalSurface should have  edges" );
-    OPENGEODE_EXCEPTION( !polygonal_surface.edges().isolated_edge( 0 ),
-        "[Test] Edge should not be isolated after isolated egde deletion" );
-
     const auto attribute = polygonal_surface.edges()
                                .edge_attribute_manager()
                                .find_attribute< geode::index_t >( "test" );
@@ -531,6 +530,9 @@ void test_set_polygon_vertex(
 void test_replace_vertex( const geode::PolygonalSurface3D& polygonal_surface,
     geode::PolygonalSurfaceBuilder3D& builder )
 {
+    const auto att = polygonal_surface.edges()
+                         .edge_attribute_manager()
+                         .find_attribute< geode::index_t >( "counter" );
     const auto new_id = builder.create_vertex();
     const auto polygons_around = polygonal_surface.polygons_around_vertex( 1 );
     builder.replace_vertex( 1, new_id );
@@ -548,6 +550,7 @@ void test_replace_vertex( const geode::PolygonalSurface3D& polygonal_surface,
             "[Test] PolygonVertex after second replace_vertex is wrong" );
     }
     builder.delete_isolated_vertices();
+    builder.edges_builder().delete_isolated_edges();
     OPENGEODE_EXCEPTION( polygonal_surface.nb_vertices() == new_id,
         "[Test] Revert after replace_vertex is wrong" );
 }
