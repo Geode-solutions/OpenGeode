@@ -155,7 +155,10 @@ namespace geode
                     auto updated_vertices = cycle.first.vertices();
                     for( auto& v : updated_vertices )
                     {
-                        v = old2new[v];
+                        if( v != NO_ID )
+                        {
+                            v = old2new[v];
+                        }
                     }
                     auto it = std::get< 0 >( facet_indices_.emplace(
                         TypedVertexCycle{ std::move( updated_vertices ) },
