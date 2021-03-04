@@ -605,6 +605,10 @@ namespace geode
         auto cur_polygon_edge = first_polygon;
         do
         {
+            OPENGEODE_ASSERT(
+                polygon_vertex( cur_polygon_edge.value() ) == vertex_id,
+                "[SurfaceMesh::polygons_around_vertex] Wrong polygon "
+                "around vertex" );
             polygons.push_back( cur_polygon_edge.value() );
             const auto prev_edge =
                 previous_polygon_edge( cur_polygon_edge.value() );
@@ -618,6 +622,9 @@ namespace geode
             {
                 const auto next_edge =
                     next_polygon_edge( cur_polygon_edge.value() );
+                OPENGEODE_ASSERT( polygon_vertex( next_edge ) == vertex_id,
+                    "[SurfaceMesh::polygons_around_vertex] Wrong polygon "
+                    "around vertex" );
                 polygons.push_back( next_edge );
                 cur_polygon_edge = polygon_adjacent_edge( next_edge );
             }
