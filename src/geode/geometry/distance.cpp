@@ -200,7 +200,6 @@ namespace geode
         auto a11 = edge1.length2();
         auto b0 = diff.dot( edge0 );
         auto b1 = diff.dot( edge1 );
-        auto c = diff.length2();
         auto det = std::fabs( a00 * a11 - a01 * a01 );
         auto s = a01 * b1 - a11 * b0;
         auto t = a01 * b0 - a00 * b1;
