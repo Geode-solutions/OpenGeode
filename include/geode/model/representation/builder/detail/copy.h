@@ -53,8 +53,9 @@ namespace geode
             mapping.reserve( from.nb_corners() );
             for( const auto& corner : from.corners() )
             {
-                const auto id =
+                const auto& id =
                     builder_to.add_corner( corner.mesh().impl_name() );
+                builder_to.set_corner_name( id, corner.name() );
                 mapping.map( corner.id(), id );
                 builder_to.register_mesh_component( to.corner( id ) );
             }
@@ -69,7 +70,8 @@ namespace geode
             mapping.reserve( from.nb_lines() );
             for( const auto& line : from.lines() )
             {
-                const auto id = builder_to.add_line( line.mesh().impl_name() );
+                const auto& id = builder_to.add_line( line.mesh().impl_name() );
+                builder_to.set_line_name( id, line.name() );
                 mapping.map( line.id(), id );
                 builder_to.register_mesh_component( to.line( id ) );
             }
@@ -84,8 +86,9 @@ namespace geode
             mapping.reserve( from.nb_surfaces() );
             for( const auto& surface : from.surfaces() )
             {
-                const auto id =
+                const auto& id =
                     builder_to.add_surface( surface.mesh().impl_name() );
+                builder_to.set_surface_name( id, surface.name() );
                 mapping.map( surface.id(), id );
                 builder_to.register_mesh_component( to.surface( id ) );
             }
@@ -100,8 +103,9 @@ namespace geode
             mapping.reserve( from.nb_blocks() );
             for( const auto& block : from.blocks() )
             {
-                const auto id =
+                const auto& id =
                     builder_to.add_block( block.mesh().impl_name() );
+                builder_to.set_block_name( id, block.name() );
                 mapping.map( block.id(), id );
                 builder_to.register_mesh_component( to.block( id ) );
             }
@@ -116,8 +120,9 @@ namespace geode
             mapping.reserve( from.nb_model_boundaries() );
             for( const auto& model_boundary : from.model_boundaries() )
             {
-                mapping.map(
-                    model_boundary.id(), builder_to.add_model_boundary() );
+                const auto& id = builder_to.add_model_boundary();
+                builder_to.set_model_boundary_name( id, model_boundary.name() );
+                mapping.map( model_boundary.id(), id );
             }
             return mapping;
         }
