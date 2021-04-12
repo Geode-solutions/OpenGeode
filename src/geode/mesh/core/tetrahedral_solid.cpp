@@ -99,6 +99,19 @@ namespace geode
     }
 
     template < index_t dimension >
+    PolyhedronFacets TetrahedralSolid< dimension >::polyhedron_vertex_facets(
+        const PolyhedronVertex& polyhedron_vertex ) const
+    {
+        PolyhedronFacets facets;
+        for( const auto facet :
+            detail::tetrahedron_facet_vertices[polyhedron_vertex.vertex_id] )
+        {
+            facets.emplace_back( polyhedron_vertex.polyhedron_id, facet );
+        }
+        return facets;
+    }
+
+    template < index_t dimension >
     std::vector< PolyhedronFacetVertices >
         TetrahedralSolid< dimension >::polyhedron_facets_vertices(
             index_t polyhedron ) const

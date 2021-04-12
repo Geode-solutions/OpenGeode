@@ -112,6 +112,9 @@ namespace geode
 
         std::vector< PolyhedronFacetVertices > polyhedron_facets_vertices(
             index_t polyhedron ) const final;
+
+        PolyhedronFacets polyhedron_vertex_facets(
+            const PolyhedronVertex& polyhedron_vertex ) const final;
     };
     ALIAS_3D( TetrahedralSolid );
 } // namespace geode
