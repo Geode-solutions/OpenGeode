@@ -63,6 +63,12 @@ namespace geode
 
         std::unique_ptr< TetrahedralSolid< dimension > > clone() const;
 
+        std::vector< std::array< index_t, 2 > > polyhedron_edges_vertices(
+            index_t polyhedron ) const final;
+
+        std::vector< PolyhedronFacetVertices > polyhedron_facets_vertices(
+            index_t polyhedron ) const final;
+
         /*!
          * Return the local indices of the two facets incident to the opposite
          * edge in tetrahedron.
@@ -106,12 +112,6 @@ namespace geode
         {
             return 3;
         }
-
-        std::vector< std::array< index_t, 2 > > polyhedron_edges_vertices(
-            index_t polyhedron ) const final;
-
-        std::vector< PolyhedronFacetVertices > polyhedron_facets_vertices(
-            index_t polyhedron ) const final;
 
         PolyhedronFacets polyhedron_vertex_facets(
             const PolyhedronVertex& polyhedron_vertex ) const final;
