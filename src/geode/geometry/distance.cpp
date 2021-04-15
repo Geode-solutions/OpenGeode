@@ -61,6 +61,13 @@ namespace
 namespace geode
 {
     template < index_t dimension >
+    double point_point_distance(
+        const Point< dimension >& point0, const Point< dimension >& point1 )
+    {
+        return Vector< dimension >{ point0, point1 }.length();
+    }
+
+    template < index_t dimension >
     std::tuple< double, Point< dimension > > point_segment_distance(
         const Point< dimension >& point, const Segment< dimension >& segment )
     {
@@ -621,6 +628,8 @@ namespace geode
         return point_circle_distance( point, disk );
     }
 
+    template double opengeode_geometry_api point_point_distance(
+        const Point2D&, const Point2D& );
     template std::tuple< double, Point2D > opengeode_geometry_api
         point_segment_distance( const Point2D&, const Segment2D& );
     template std::tuple< double, Point2D, Point2D > opengeode_geometry_api
@@ -636,6 +645,8 @@ namespace geode
     template std::tuple< double, Point2D > opengeode_geometry_api
         point_ball_distance( const Point2D&, const Ball2D& );
 
+    template double opengeode_geometry_api point_point_distance(
+        const Point3D&, const Point3D& );
     template std::tuple< double, Point3D > opengeode_geometry_api
         point_segment_distance( const Point3D&, const Segment3D& );
     template std::tuple< double, Point3D, Point3D > opengeode_geometry_api
