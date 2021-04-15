@@ -40,5 +40,6 @@ namespace geode
             ( double ( * )( const Triangle3D&, const Vector3D& ) )
                 & triangle_signed_area );
         module.def( "tetra_signed_volume", &tetra_signed_volume );
+        module.def( "tetra_volume", &tetra_volume );
     }
 } // namespace geode

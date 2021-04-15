@@ -61,11 +61,18 @@ namespace geode
         const Triangle3D& triangle, const Vector3D& direction )
     {
         const auto area = triangle_area( triangle );
-        if( const auto area_normal = triangle.new_normal() )
+        try
         {
-            return direction.dot( area_normal.value() ) > 0 ? area : -area;
+            if( const auto area_normal = triangle.new_normal() )
+            {
+                return direction.dot( area_normal.value() ) > 0 ? area : -area;
+            }
+            return area;
         }
-        return area;
+        catch( const OpenGeodeException& )
+        {
+            return area;
+        }
     }
 
     double triangle_signed_area( const Triangle2D& triangle )
@@ -82,6 +89,11 @@ namespace geode
                    Vector3D{ tetra.vertices()[0], tetra.vertices()[2] }.cross(
                        { tetra.vertices()[0], tetra.vertices()[3] } ) )
                / 6.;
+    }
+
+    double tetra_volume( const Tetra& tetra )
+    {
+        return std::fabs( tetra_signed_volume( tetra ) );
     }
 
     template double opengeode_geometry_api triangle_area( const Triangle2D& );

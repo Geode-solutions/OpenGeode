@@ -68,4 +68,9 @@ namespace geode
      * Compute the signed volume of a tetrahedron
      */
     double opengeode_geometry_api tetra_signed_volume( const Tetra& tetra );
+
+    /*!
+     * Compute the (positive) volume of a tetrahedron
+     */
+    double opengeode_geometry_api tetra_volume( const Tetra& tetra );
 } // namespace geode
