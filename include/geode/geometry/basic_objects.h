@@ -236,16 +236,46 @@ namespace geode
                    / 3.;
         }
         template < index_t T = dimension >
-        typename std::enable_if< T == 3, Vector3D >::type normal() const
+        OPENGEODE_GEOMETRY_DEPRECATED
+            typename std::enable_if< T == 3, Vector3D >::type
+            normal() const
         {
             return Vector3D{ vertices_[0], vertices_[1] }
                 .cross( Vector3D{ vertices_[0], vertices_[2] } )
                 .normalize();
         }
         template < index_t T = dimension >
-        typename std::enable_if< T == 3, Plane >::type plane() const
+        OPENGEODE_GEOMETRY_DEPRECATED
+            typename std::enable_if< T == 3, Plane >::type
+            plane() const
         {
             return { this->normal(), vertices_[0] };
+        }
+        template < index_t T = dimension >
+        typename std::enable_if< T == 3, absl::optional< Vector3D > >::type
+            new_normal() const
+        {
+            const auto edge0 =
+                Vector3D{ vertices_[0], vertices_[1] }.normalize();
+            const auto edge1 =
+                Vector3D{ vertices_[0], vertices_[2] }.normalize();
+            const auto normal = edge0.cross( edge1 );
+            const auto length = normal.length();
+            if( length < M_PI / 180 ) // 1 degree
+            {
+                return absl::nullopt;
+            }
+            return normal / length;
+        }
+        template < index_t T = dimension >
+        typename std::enable_if< T == 3, absl::optional< Plane > >::type
+            new_plane() const
+        {
+            if( const auto normal = this->new_normal() )
+            {
+                return Plane{ normal.value(), vertices_[0] };
+            }
+            return absl::nullopt;
         }
         const std::array< std::reference_wrapper< const Point< dimension > >,
             3 >&
