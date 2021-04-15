@@ -88,6 +88,11 @@ namespace geode
                / 6.;
     }
 
+    double tetra_volume( const Tetra& tetra )
+    {
+        return std::fabs( tetra_signed_volume( tetra ) );
+    }
+
     template double opengeode_geometry_api triangle_area( const Triangle2D& );
 
     template double opengeode_geometry_api triangle_area( const Triangle3D& );
