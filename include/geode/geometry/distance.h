@@ -46,6 +46,13 @@ namespace geode
 namespace geode
 {
     /*!
+     * Compute the Euclidean distance between a two points
+     */
+    template < index_t dimension >
+    double point_point_distance(
+        const Point< dimension >& point0, const Point< dimension >& point1 );
+
+    /*!
      * Compute the smallest distance between a point and a segment
      * @return a tuple containing:
      * - the smallest distance.
