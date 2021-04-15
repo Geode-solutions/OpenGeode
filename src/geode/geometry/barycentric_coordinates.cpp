@@ -55,16 +55,22 @@ namespace geode
     std::array< double, 3 > triangle_barycentric_coordinates(
         const Point3D& point, const Triangle3D& triangle )
     {
-        const auto triangle_normal = triangle.normal();
+        const auto triangle_normal = triangle.new_normal();
+        if( !triangle_normal )
+        {
+            std::array< double, 3 > result;
+            result.fill( 1. / 3. );
+            return result;
+        }
         const auto area0 = triangle_signed_area(
             { triangle.vertices()[1], triangle.vertices()[2], point },
-            triangle_normal );
+            triangle_normal.value() );
         const auto area1 = triangle_signed_area(
             { triangle.vertices()[2], triangle.vertices()[0], point },
-            triangle_normal );
+            triangle_normal.value() );
         const auto area2 = triangle_signed_area(
             { triangle.vertices()[0], triangle.vertices()[1], point },
-            triangle_normal );
+            triangle_normal.value() );
 
         const auto total_area = area0 + area1 + area2;
         OPENGEODE_EXCEPTION( std::fabs( total_area ) > global_epsilon2,
