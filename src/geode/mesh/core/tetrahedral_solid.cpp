@@ -87,13 +87,17 @@ namespace geode
         TetrahedralSolid< dimension >::polyhedron_edges_vertices(
             index_t polyhedron ) const
     {
+        absl::FixedArray< index_t > vertices( 4 );
+        for( const auto v : LRange{ 4 } )
+        {
+            vertices[v] = this->polyhedron_vertex( { polyhedron, v } );
+        }
         std::vector< std::array< index_t, 2 > > result;
         result.reserve( detail::tetrahedron_edge_vertices.size() );
         for( const auto& edge : detail::tetrahedron_edge_vertices )
         {
             result.emplace_back( std::array< index_t, 2 >{
-                this->polyhedron_vertex( { polyhedron, edge[0] } ),
-                this->polyhedron_vertex( { polyhedron, edge[1] } ) } );
+                vertices[edge[0]], vertices[edge[1]] } );
         }
         return result;
     }
@@ -116,14 +120,17 @@ namespace geode
         TetrahedralSolid< dimension >::polyhedron_facets_vertices(
             index_t polyhedron ) const
     {
+        absl::FixedArray< index_t > vertices( 4 );
+        for( const auto v : LRange{ 4 } )
+        {
+            vertices[v] = this->polyhedron_vertex( { polyhedron, v } );
+        }
         std::vector< PolyhedronFacetVertices > result;
         result.reserve( detail::tetrahedron_facet_vertices.size() );
         for( const auto& facet : detail::tetrahedron_facet_vertices )
         {
             result.emplace_back( PolyhedronFacetVertices{
-                this->polyhedron_vertex( { polyhedron, facet[0] } ),
-                this->polyhedron_vertex( { polyhedron, facet[1] } ),
-                this->polyhedron_vertex( { polyhedron, facet[2] } ) } );
+                vertices[facet[0]], vertices[facet[1]], vertices[facet[2]] } );
         }
         return result;
     }
