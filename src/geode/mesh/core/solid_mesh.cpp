@@ -42,6 +42,7 @@
 #include <geode/mesh/core/polyhedral_solid.h>
 #include <geode/mesh/core/solid_edges.h>
 #include <geode/mesh/core/solid_facets.h>
+#include <geode/mesh/core/tetrahedral_solid.h>
 
 namespace
 {
@@ -573,14 +574,15 @@ namespace geode
             "polyhedron around vertex" );
         PolyhedraAroundVertex polyhedra;
         absl::flat_hash_set< index_t > polyhedra_visited;
+        polyhedra_visited.reserve( 20 );
         std::stack< PolyhedronVertex > S;
         S.push( first_polyhedron.value() );
         polyhedra_visited.insert( first_polyhedron->polyhedron_id );
         while( !S.empty() )
         {
-            const auto polyhedron_vertex_id = S.top();
+            polyhedra.push_back( S.top() );
+            const auto& polyhedron_vertex_id = polyhedra.back();
             S.pop();
-            polyhedra.push_back( polyhedron_vertex_id );
 
             for( const auto& polyhedron_facet :
                 polyhedron_vertex_facets( polyhedron_vertex_id ) )
@@ -596,20 +598,15 @@ namespace geode
                 {
                     continue;
                 }
-                PolyhedronVertex adj_vertex{ p_adj, NO_LID };
                 for( const auto v_adj :
                     LRange{ nb_polyhedron_vertices( p_adj ) } )
                 {
                     if( polyhedron_vertex( { p_adj, v_adj } ) == vertex_id )
                     {
-                        adj_vertex.vertex_id = v_adj;
+                        S.emplace( p_adj, v_adj );
                         break;
                     }
                 }
-                OPENGEODE_ASSERT( adj_vertex.vertex_id != NO_LID,
-                    "[SolidMesh::polyhedra_around_vertex] "
-                    "Adjacency issue detected" );
-                S.emplace( std::move( adj_vertex ) );
             }
         }
         return polyhedra;
@@ -620,18 +617,29 @@ namespace geode
         const std::array< index_t, 2 >& vertices ) const
     {
         PolyhedraAroundEdge result;
-        for( const auto& polyhedron_vertex :
-            polyhedra_around_vertex( vertices[0] ) )
+        for( const auto& polyhedron : polyhedra_around_vertex( vertices[0] ) )
         {
-            for( const auto& edge_vertices :
-                polyhedron_edges_vertices( polyhedron_vertex.polyhedron_id ) )
+            if( type_name()
+                == TetrahedralSolid< dimension >::type_name_static() )
             {
-                if( vertices == edge_vertices
-                    || ( vertices[0] == edge_vertices[1]
-                         && vertices[1] == edge_vertices[0] ) )
+                if( vertex_in_polyhedron(
+                        polyhedron.polyhedron_id, vertices[1] ) )
                 {
-                    result.push_back( polyhedron_vertex.polyhedron_id );
-                    break;
+                    result.push_back( polyhedron.polyhedron_id );
+                }
+            }
+            else
+            {
+                for( const auto& edge_vertices :
+                    polyhedron_edges_vertices( polyhedron.polyhedron_id ) )
+                {
+                    if( vertices == edge_vertices
+                        || ( vertices[0] == edge_vertices[1]
+                             && vertices[1] == edge_vertices[0] ) )
+                    {
+                        result.push_back( polyhedron.polyhedron_id );
+                        break;
+                    }
                 }
             }
         }
