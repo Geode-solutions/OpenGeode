@@ -598,14 +598,10 @@ namespace geode
                 {
                     continue;
                 }
-                for( const auto v_adj :
-                    LRange{ nb_polyhedron_vertices( p_adj ) } )
+                if( const auto v_adj =
+                        vertex_in_polyhedron( p_adj, vertex_id ) )
                 {
-                    if( polyhedron_vertex( { p_adj, v_adj } ) == vertex_id )
-                    {
-                        S.emplace( p_adj, v_adj );
-                        break;
-                    }
+                    S.emplace( p_adj, v_adj.value() );
                 }
             }
         }
@@ -619,27 +615,15 @@ namespace geode
         PolyhedraAroundEdge result;
         for( const auto& polyhedron : polyhedra_around_vertex( vertices[0] ) )
         {
-            if( type_name()
-                == TetrahedralSolid< dimension >::type_name_static() )
+            for( const auto& edge_vertices :
+                polyhedron_edges_vertices( polyhedron.polyhedron_id ) )
             {
-                if( vertex_in_polyhedron(
-                        polyhedron.polyhedron_id, vertices[1] ) )
+                if( vertices == edge_vertices
+                    || ( vertices[0] == edge_vertices[1]
+                         && vertices[1] == edge_vertices[0] ) )
                 {
                     result.push_back( polyhedron.polyhedron_id );
-                }
-            }
-            else
-            {
-                for( const auto& edge_vertices :
-                    polyhedron_edges_vertices( polyhedron.polyhedron_id ) )
-                {
-                    if( vertices == edge_vertices
-                        || ( vertices[0] == edge_vertices[1]
-                             && vertices[1] == edge_vertices[0] ) )
-                    {
-                        result.push_back( polyhedron.polyhedron_id );
-                        break;
-                    }
+                    break;
                 }
             }
         }

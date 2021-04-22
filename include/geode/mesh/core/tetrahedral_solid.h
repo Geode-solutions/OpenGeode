@@ -69,6 +69,9 @@ namespace geode
         std::vector< PolyhedronFacetVertices > polyhedron_facets_vertices(
             index_t polyhedron ) const final;
 
+        PolyhedraAroundEdge polyhedra_around_edge(
+            const std::array< index_t, 2 >& vertices ) const final;
+
         /*!
          * Return the local indices of the two facets incident to the opposite
          * edge in tetrahedron.

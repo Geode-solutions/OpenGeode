@@ -344,7 +344,7 @@ namespace geode
          * Get all the polyhedra with both edge vertices.
          * @param[in] vertices Indices of edge vertices.
          */
-        PolyhedraAroundEdge polyhedra_around_edge(
+        virtual PolyhedraAroundEdge polyhedra_around_edge(
             const std::array< index_t, 2 >& vertices ) const;
 
         /*!

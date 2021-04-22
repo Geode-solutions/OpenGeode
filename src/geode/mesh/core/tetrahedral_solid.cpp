@@ -83,6 +83,23 @@ namespace geode
     }
 
     template < index_t dimension >
+    PolyhedraAroundEdge TetrahedralSolid< dimension >::polyhedra_around_edge(
+        const std::array< index_t, 2 >& vertices ) const
+    {
+        PolyhedraAroundEdge result;
+        for( const auto& polyhedron :
+            this->polyhedra_around_vertex( vertices[0] ) )
+        {
+            if( this->vertex_in_polyhedron(
+                    polyhedron.polyhedron_id, vertices[1] ) )
+            {
+                result.push_back( polyhedron.polyhedron_id );
+            }
+        }
+        return result;
+    }
+
+    template < index_t dimension >
     std::vector< std::array< index_t, 2 > >
         TetrahedralSolid< dimension >::polyhedron_edges_vertices(
             index_t polyhedron ) const
