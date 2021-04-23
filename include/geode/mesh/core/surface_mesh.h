@@ -278,15 +278,31 @@ namespace geode
          * Return the normal of a polygon
          */
         template < index_t T = dimension >
-        typename std::enable_if< T == 3, Vector3D >::type polygon_normal(
-            index_t polygon_id ) const;
+        OPENGEODE_MESH_DEPRECATED
+            typename std::enable_if< T == 3, Vector3D >::type
+            polygon_normal( index_t polygon_id ) const;
 
         /*!
          * Return the normal at a polygon vertex
          */
         template < index_t T = dimension >
-        typename std::enable_if< T == 3, Vector3D >::type polygon_vertex_normal(
-            index_t vertex_id ) const;
+        OPENGEODE_MESH_DEPRECATED
+            typename std::enable_if< T == 3, Vector3D >::type
+            polygon_vertex_normal( index_t vertex_id ) const;
+
+        /*!
+         * Return the normal of a polygon
+         */
+        template < index_t T = dimension >
+        typename std::enable_if< T == 3, absl::optional< Vector3D > >::type
+            new_polygon_normal( index_t polygon_id ) const;
+
+        /*!
+         * Return the normal at a polygon vertex
+         */
+        template < index_t T = dimension >
+        typename std::enable_if< T == 3, absl::optional< Vector3D > >::type
+            new_polygon_vertex_normal( index_t vertex_id ) const;
 
         /*!
          * Get all the polygons with one of the vertices matching given vertex.

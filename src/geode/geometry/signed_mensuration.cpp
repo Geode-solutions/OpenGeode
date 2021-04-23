@@ -63,8 +63,11 @@ namespace geode
         const auto area = triangle_area( triangle );
         try
         {
-            const auto area_normal = triangle.normal();
-            return direction.dot( area_normal ) > 0 ? area : -area;
+            if( const auto area_normal = triangle.new_normal() )
+            {
+                return direction.dot( area_normal.value() ) > 0 ? area : -area;
+            }
+            return area;
         }
         catch( const OpenGeodeException& )
         {

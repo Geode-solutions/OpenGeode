@@ -484,9 +484,13 @@ namespace geode
             point_triangle_distance( point, triangle );
         const Vector3D proj2point{ nearest_point, point };
         // Tetra facet normals point towards inside
-        const auto signed_distance =
-            proj2point.dot( triangle.normal() ) <= 0 ? distance : -distance;
-        return std::make_tuple( signed_distance, nearest_point );
+        if( const auto normal = triangle.new_normal() )
+        {
+            const auto signed_distance =
+                proj2point.dot( normal.value() ) <= 0 ? distance : -distance;
+            return std::make_tuple( signed_distance, nearest_point );
+        }
+        return std::make_tuple( distance, nearest_point );
     }
 
     std::tuple< double, Point3D > point_plane_signed_distance(
