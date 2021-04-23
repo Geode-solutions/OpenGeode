@@ -42,7 +42,6 @@
 #include <geode/mesh/core/polyhedral_solid.h>
 #include <geode/mesh/core/solid_edges.h>
 #include <geode/mesh/core/solid_facets.h>
-#include <geode/mesh/core/tetrahedral_solid.h>
 
 namespace
 {
