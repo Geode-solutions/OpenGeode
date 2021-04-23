@@ -573,53 +573,34 @@ namespace geode
             "polyhedron around vertex" );
         PolyhedraAroundVertex polyhedra;
         absl::flat_hash_set< index_t > polyhedra_visited;
+        polyhedra_visited.reserve( 20 );
         std::stack< PolyhedronVertex > S;
         S.push( first_polyhedron.value() );
         polyhedra_visited.insert( first_polyhedron->polyhedron_id );
         while( !S.empty() )
         {
-            const auto polyhedron_vertex_id = S.top();
+            polyhedra.push_back( S.top() );
+            const auto& polyhedron_vertex_id = polyhedra.back();
             S.pop();
-            const auto p = polyhedron_vertex_id.polyhedron_id;
-            polyhedra.push_back( polyhedron_vertex_id );
 
-            for( const auto f : LRange{ nb_polyhedron_facets( p ) } )
+            for( const auto& polyhedron_facet :
+                polyhedron_vertex_facets( polyhedron_vertex_id ) )
             {
-                const PolyhedronFacet polyhedron_facet{ p, f };
-                if( is_polyhedron_facet_on_border( polyhedron_facet ) )
+                const auto adj_polyhedron =
+                    polyhedron_adjacent( polyhedron_facet );
+                if( !adj_polyhedron )
                 {
                     continue;
                 }
-                for( const auto v :
-                    LRange{ nb_polyhedron_facet_vertices( polyhedron_facet ) } )
+                const auto p_adj = adj_polyhedron.value();
+                if( !polyhedra_visited.insert( p_adj ).second )
                 {
-                    if( polyhedron_facet_vertex( { polyhedron_facet, v } )
-                        != vertex_id )
-                    {
-                        continue;
-                    }
-                    const auto adj_polyhedron =
-                        polyhedron_adjacent( polyhedron_facet ).value();
-                    if( !polyhedra_visited.insert( adj_polyhedron ).second )
-                    {
-                        continue;
-                    }
-                    PolyhedronVertex adj_vertex{ adj_polyhedron, NO_LID };
-                    for( const auto v_adj :
-                        LRange{ nb_polyhedron_vertices( adj_polyhedron ) } )
-                    {
-                        if( polyhedron_vertex( { adj_polyhedron, v_adj } )
-                            == vertex_id )
-                        {
-                            adj_vertex.vertex_id = v_adj;
-                            break;
-                        }
-                    }
-                    OPENGEODE_ASSERT( adj_vertex.vertex_id != NO_LID,
-                        "[SolidMesh::polyhedra_around_vertex] "
-                        "Adjacency issue detected" );
-                    S.emplace( std::move( adj_vertex ) );
-                    break;
+                    continue;
+                }
+                if( const auto v_adj =
+                        vertex_in_polyhedron( p_adj, vertex_id ) )
+                {
+                    S.emplace( p_adj, v_adj.value() );
                 }
             }
         }
@@ -631,18 +612,16 @@ namespace geode
         const std::array< index_t, 2 >& vertices ) const
     {
         PolyhedraAroundEdge result;
-        const auto& polyhedron_vertices =
-            polyhedra_around_vertex( vertices[0] );
-        for( const auto& polyhedron_vertex : polyhedron_vertices )
+        for( const auto& polyhedron : polyhedra_around_vertex( vertices[0] ) )
         {
-            for( const auto f : LRange{
-                     nb_polyhedron_facets( polyhedron_vertex.polyhedron_id ) } )
+            for( const auto& edge_vertices :
+                polyhedron_edges_vertices( polyhedron.polyhedron_id ) )
             {
-                const PolyhedronFacet facet{ polyhedron_vertex.polyhedron_id,
-                    f };
-                if( is_edge_in_polyhedron_facet( *this, facet, vertices ) )
+                if( vertices == edge_vertices
+                    || ( vertices[0] == edge_vertices[1]
+                         && vertices[1] == edge_vertices[0] ) )
                 {
-                    result.push_back( polyhedron_vertex.polyhedron_id );
+                    result.push_back( polyhedron.polyhedron_id );
                     break;
                 }
             }
@@ -686,6 +665,31 @@ namespace geode
                 polyhedron_facet_vertices( { polyhedron, f } ) );
         }
         return facet_vertices;
+    }
+
+    template < index_t dimension >
+    PolyhedronFacets SolidMesh< dimension >::polyhedron_vertex_facets(
+        const PolyhedronVertex& polyhedron_vertex ) const
+    {
+        const auto vertex_id = this->polyhedron_vertex( polyhedron_vertex );
+        PolyhedronFacets facets;
+        for( const auto f :
+            LRange{ nb_polyhedron_facets( polyhedron_vertex.polyhedron_id ) } )
+        {
+            PolyhedronFacet polyhedron_facet{ polyhedron_vertex.polyhedron_id,
+                f };
+            for( const auto v :
+                LRange{ nb_polyhedron_facet_vertices( polyhedron_facet ) } )
+            {
+                if( polyhedron_facet_vertex( { polyhedron_facet, v } )
+                    == vertex_id )
+                {
+                    facets.emplace_back( std::move( polyhedron_facet ) );
+                    break;
+                }
+            }
+        }
+        return facets;
     }
 
     template < index_t dimension >

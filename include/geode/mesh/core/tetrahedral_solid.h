@@ -69,6 +69,9 @@ namespace geode
         std::vector< PolyhedronFacetVertices > polyhedron_facets_vertices(
             index_t polyhedron ) const final;
 
+        PolyhedraAroundEdge polyhedra_around_edge(
+            const std::array< index_t, 2 >& vertices ) const final;
+
         /*!
          * Return the local indices of the two facets incident to the opposite
          * edge in tetrahedron.
@@ -112,6 +115,9 @@ namespace geode
         {
             return 3;
         }
+
+        PolyhedronFacets polyhedron_vertex_facets(
+            const PolyhedronVertex& polyhedron_vertex ) const final;
     };
     ALIAS_3D( TetrahedralSolid );
 } // namespace geode

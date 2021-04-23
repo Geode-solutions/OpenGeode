@@ -150,7 +150,9 @@ namespace geode
 
     using PolyhedronFacetVertices = absl::InlinedVector< index_t, 4 >;
 
-    using PolyhedronFacetsOnBorder = absl::InlinedVector< PolyhedronFacet, 4 >;
+    using PolyhedronFacets = absl::InlinedVector< PolyhedronFacet, 4 >;
+
+    using PolyhedronFacetsOnBorder = PolyhedronFacets;
 
     using PolyhedraAroundVertex = absl::InlinedVector< PolyhedronVertex, 20 >;
 
@@ -260,6 +262,9 @@ namespace geode
         virtual std::vector< PolyhedronFacetVertices >
             polyhedron_facets_vertices( index_t polyhedron ) const;
 
+        virtual PolyhedronFacets polyhedron_vertex_facets(
+            const PolyhedronVertex& polyhedron_vertex ) const;
+
         /*!
          * Return the index of the polyhedron adjacent through a facet.
          * @param[in] polyhedron_facet Local index of facet in polyhedron.
@@ -339,7 +344,7 @@ namespace geode
          * Get all the polyhedra with both edge vertices.
          * @param[in] vertices Indices of edge vertices.
          */
-        PolyhedraAroundEdge polyhedra_around_edge(
+        virtual PolyhedraAroundEdge polyhedra_around_edge(
             const std::array< index_t, 2 >& vertices ) const;
 
         /*!
