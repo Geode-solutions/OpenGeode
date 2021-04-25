@@ -73,7 +73,7 @@ namespace geode
         index_t cell_index( const Index& index ) const
         {
             index_t cell_id{ 0 };
-            for( const auto d : Range{ dimension } )
+            for( const auto d : LRange{ dimension } )
             {
                 OPENGEODE_ASSERT( index[d] < cells_number_[d],
                     "[RegularGrid::cell_index] Invalid index" );
@@ -93,7 +93,7 @@ namespace geode
             OPENGEODE_ASSERT( index < cell_attribute_manager().nb_elements(),
                 "[RegularGrid::cell_index] Invalid index" );
             Index cell_id;
-            for( const auto d : Range{ dimension } )
+            for( const auto d : LRange{ dimension } )
             {
                 index_t offset{ 1 };
                 for( const auto d2 : Range{ dimension - d - 1 } )
@@ -135,7 +135,7 @@ namespace geode
         Point< dimension > point( const Index& index ) const
         {
             Point< dimension > translation;
-            for( const auto d : Range{ dimension } )
+            for( const auto d : LRange{ dimension } )
             {
                 OPENGEODE_ASSERT( index[d] < cells_number_[d] + 1,
                     "[RegularGrid::point] Invalid index" );
@@ -155,7 +155,7 @@ namespace geode
             Indices indices;
             Index min;
             Index max;
-            for( const auto d : Range{ dimension } )
+            for( const auto d : LRange{ dimension } )
             {
                 const auto value =
                     ( query.value( d ) - origin_.value( d ) ) / cells_size_[d];
@@ -163,37 +163,30 @@ namespace geode
                 {
                     return absl::nullopt;
                 }
-                const auto floor_value =
-                    static_cast< index_t >( std::floor( value ) );
-                min[d] = floor_value;
-                max[d] = floor_value;
-                const auto remainder = std::fmod( value, 1. );
+                const auto floating_floor = std::floor( value );
+                const auto integer_floor =
+                    static_cast< index_t >( floating_floor );
+                min[d] = integer_floor;
+                max[d] = integer_floor;
+                const auto remainder = value - floating_floor;
                 if( remainder < global_epsilon )
                 {
-                    if( floor_value > 0 )
-                    {
-                        min[d] = floor_value - 1;
-                    }
-                    else
-                    {
-                        min[d] = 0;
-                    }
+                    min[d] = integer_floor > 0 ? integer_floor - 1 : 0;
                 }
                 else if( remainder > 1 - global_epsilon )
                 {
-                    max[d] = std::min( floor_value + 1, cells_number_[d] );
+                    max[d] = std::min( integer_floor + 1, cells_number_[d] );
                 }
             }
             indices.push_back( min );
-            for( const auto d : Range{ dimension } )
+            for( const auto d : LRange{ dimension } )
             {
                 if( max[d] != min[d] )
                 {
-                    for( const auto i : geode::Indices{ indices } )
+                    for( const auto& index : indices )
                     {
-                        auto cur_cell = indices[i];
-                        cur_cell[d] = max[d];
-                        indices.push_back( cur_cell );
+                        indices.push_back( index );
+                        indices.back()[d] = max[d];
                     }
                 }
             }
@@ -350,7 +343,7 @@ namespace geode
         BoundingBox< dimension > bbox;
         bbox.add_point( this->origin() );
         Point< dimension > extreme_point;
-        for( const auto d : Range{ dimension } )
+        for( const auto d : LRange{ dimension } )
         {
             extreme_point.set_value(
                 d, this->origin().value( d )
