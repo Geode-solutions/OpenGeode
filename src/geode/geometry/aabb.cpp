@@ -158,7 +158,7 @@ namespace geode
     {
         bool inside{ true };
         Vector< dimension > result;
-        for( const auto c : Range{ dimension } )
+        for( const auto c : LRange{ dimension } )
         {
             if( point.value( c ) < box.min().value( c ) )
             {

@@ -87,7 +87,7 @@ namespace geode
             const Point< dimension >& point ) const
         {
             std::array< double, dimension > result;
-            for( const auto i : Range{ dimension } )
+            for( const auto i : LRange{ dimension } )
             {
                 result[i] = point.value( i );
             }

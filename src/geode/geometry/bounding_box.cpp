@@ -37,7 +37,7 @@ namespace geode
     public:
         Impl()
         {
-            for( const auto i : Range{ dimension } )
+            for( const auto i : LRange{ dimension } )
             {
                 min_.set_value( i, std::numeric_limits< double >::max() );
                 max_.set_value( i, std::numeric_limits< double >::lowest() );
@@ -56,7 +56,7 @@ namespace geode
 
         void add_point( const Point< dimension >& point )
         {
-            for( const auto i : Range{ dimension } )
+            for( const auto i : LRange{ dimension } )
             {
                 min_.set_value(
                     i, std::min( min_.value( i ), point.value( i ) ) );
@@ -140,7 +140,7 @@ namespace geode
     bool BoundingBox< dimension >::contains(
         const Point< dimension >& point ) const
     {
-        for( const auto i : Range{ dimension } )
+        for( const auto i : LRange{ dimension } )
         {
             if( point.value( i ) < min().value( i ) )
             {
@@ -158,7 +158,7 @@ namespace geode
     bool BoundingBox< dimension >::intersects(
         const BoundingBox< dimension >& box ) const
     {
-        for( const auto i : Range{ dimension } )
+        for( const auto i : LRange{ dimension } )
         {
             if( max().value( i ) < box.min().value( i ) )
             {
