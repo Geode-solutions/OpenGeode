@@ -630,6 +630,92 @@ namespace geode
     }
 
     template < index_t dimension >
+    PolyhedraAroundEdge SolidMesh< dimension >::polyhedra_around_edge(
+        const std::array< index_t, 2 >& vertices,
+        index_t first_polyhedron ) const
+    {
+        PolyhedraAroundEdge result;
+        PolyhedronFacet cur{ first_polyhedron, NO_LID };
+        bool border{ false };
+        do
+        {
+            result.push_back( cur.polyhedron_id );
+            for( const auto f : LRange{ 4 } )
+            {
+                if( cur.facet_id == f )
+                {
+                    continue;
+                }
+                const auto facet_vertices =
+                    this->polyhedron_facet_vertices( { cur.polyhedron_id, f } );
+                if( absl::c_find( facet_vertices, vertices[0] )
+                    == facet_vertices.end() )
+                {
+                    continue;
+                }
+                if( absl::c_find( facet_vertices, vertices[1] )
+                    == facet_vertices.end() )
+                {
+                    continue;
+                }
+                if( const auto adj = this->polyhedron_adjacent_facet(
+                        { cur.polyhedron_id, f } ) )
+                {
+                    cur = adj.value();
+                }
+                else
+                {
+                    border = true;
+                }
+                break;
+            }
+        } while( !border && cur.polyhedron_id != first_polyhedron );
+        if( border )
+        {
+            cur = { first_polyhedron, NO_LID };
+            do
+            {
+                for( const auto f : LRange{ 4 } )
+                {
+                    if( cur.facet_id == f )
+                    {
+                        continue;
+                    }
+                    const auto facet_vertices = this->polyhedron_facet_vertices(
+                        { cur.polyhedron_id, f } );
+                    if( absl::c_find( facet_vertices, vertices[0] )
+                        == facet_vertices.end() )
+                    {
+                        continue;
+                    }
+                    if( absl::c_find( facet_vertices, vertices[1] )
+                        == facet_vertices.end() )
+                    {
+                        continue;
+                    }
+                    if( const auto adj = this->polyhedron_adjacent_facet(
+                            { cur.polyhedron_id, f } ) )
+                    {
+                        if( result.size() > 1
+                            && result[1] == adj.value().polyhedron_id )
+                        {
+                            continue; // same order than previous loop
+                        }
+                        cur = adj.value();
+                        result.push_back( cur.polyhedron_id );
+                        border = false;
+                    }
+                    else
+                    {
+                        border = true;
+                    }
+                }
+            } while( !border && cur.polyhedron_id != first_polyhedron );
+        }
+        return result;
+    }
+
+    template < index_t dimension >
     std::vector< std::array< index_t, 2 > >
         SolidMesh< dimension >::polyhedron_edges_vertices(
             index_t polyhedron ) const

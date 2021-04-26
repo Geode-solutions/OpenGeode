@@ -348,6 +348,15 @@ namespace geode
             const std::array< index_t, 2 >& vertices ) const;
 
         /*!
+         * Get all the polyhedra with both edge vertices.
+         * @param[in] vertices Indices of edge vertices.
+         * @param[in] first_polyhedron One polyhedron index to begin research
+         */
+        PolyhedraAroundEdge polyhedra_around_edge(
+            const std::array< index_t, 2 >& vertices,
+            index_t first_polyhedron ) const;
+
+        /*!
          * Return all polyhedra made with the given facet.
          * @param[in] facet_vertices Vertex indices of the facet.
          */
