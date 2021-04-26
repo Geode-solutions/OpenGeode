@@ -199,15 +199,15 @@ namespace geode
     std::tuple< double, Point3D > point_triangle_distance(
         const Point3D& point, const Triangle3D& triangle )
     {
-        Vector3D diff{ point, triangle.vertices()[0] };
-        Vector3D edge0{ triangle.vertices()[0], triangle.vertices()[1] };
-        Vector3D edge1{ triangle.vertices()[0], triangle.vertices()[2] };
-        auto a00 = edge0.length2();
-        auto a01 = edge0.dot( edge1 );
-        auto a11 = edge1.length2();
-        auto b0 = diff.dot( edge0 );
-        auto b1 = diff.dot( edge1 );
-        auto det = std::fabs( a00 * a11 - a01 * a01 );
+        const Vector3D diff{ point, triangle.vertices()[0] };
+        const Vector3D edge0{ triangle.vertices()[0], triangle.vertices()[1] };
+        const Vector3D edge1{ triangle.vertices()[0], triangle.vertices()[2] };
+        const auto a00 = edge0.length2();
+        const auto a01 = edge0.dot( edge1 );
+        const auto a11 = edge1.length2();
+        const auto b0 = diff.dot( edge0 );
+        const auto b1 = diff.dot( edge1 );
+        const auto det = std::fabs( a00 * a11 - a01 * a01 );
         auto s = a01 * b1 - a11 * b0;
         auto t = a01 * b0 - a00 * b1;
 
@@ -281,27 +281,22 @@ namespace geode
             }
             else
             { // region 0
-                // minimum at interior point
-                auto invDet = 1.0 / det;
+              // minimum at interior point
+                const auto invDet = 1.0 / det;
                 s *= invDet;
                 t *= invDet;
             }
         }
         else
         {
-            double tmp0;
-            double tmp1;
-            double numer;
-            double denom;
-
             if( s < 0.0 )
             { // region 2
-                tmp0 = a01 + b0;
-                tmp1 = a11 + b1;
+                const auto tmp0 = a01 + b0;
+                const auto tmp1 = a11 + b1;
                 if( tmp1 > tmp0 )
                 {
-                    numer = tmp1 - tmp0;
-                    denom = a00 - 2.0 * a01 + a11;
+                    const auto numer = tmp1 - tmp0;
+                    const auto denom = a00 - 2.0 * a01 + a11;
                     if( numer >= denom )
                     {
                         s = 1.0;
@@ -332,12 +327,12 @@ namespace geode
             }
             else if( t < 0.0 )
             { // region 6
-                tmp0 = a01 + b1;
-                tmp1 = a00 + b0;
+                const auto tmp0 = a01 + b1;
+                const auto tmp1 = a00 + b0;
                 if( tmp1 > tmp0 )
                 {
-                    numer = tmp1 - tmp0;
-                    denom = a00 - 2.0 * a01 + a11;
+                    const auto numer = tmp1 - tmp0;
+                    const auto denom = a00 - 2.0 * a01 + a11;
                     if( numer >= denom )
                     {
                         t = 1.0;
@@ -368,7 +363,7 @@ namespace geode
             }
             else
             { // region 1
-                numer = a11 + b1 - a01 - b0;
+                const auto numer = a11 + b1 - a01 - b0;
                 if( numer <= 0.0 )
                 {
                     s = 0.0;
@@ -376,7 +371,7 @@ namespace geode
                 }
                 else
                 {
-                    denom = a00 - 2.0 * a01 + a11;
+                    const auto denom = a00 - 2.0 * a01 + a11;
                     if( numer >= denom )
                     {
                         s = 1.0;
@@ -393,8 +388,8 @@ namespace geode
 
         Point3D closest_point{ triangle.vertices()[0].get() + edge0 * s
                                + edge1 * t };
-        return std::make_tuple(
-            Vector3D{ point, closest_point }.length(), closest_point );
+        const auto distance = point_point_distance( point, closest_point );
+        return std::make_tuple( distance, std::move( closest_point ) );
     }
 
     template <>

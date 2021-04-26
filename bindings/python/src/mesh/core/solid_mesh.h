@@ -84,7 +84,13 @@
         .def( "polyhedra_around_vertex",                                       \
             &SolidMesh##dimension##D::polyhedra_around_vertex )                \
         .def( "polyhedra_around_edge",                                         \
-            &SolidMesh##dimension##D::polyhedra_around_edge )                  \
+            ( PolyhedraAroundEdge( SolidMesh##dimension##D::* )(               \
+                const std::array< index_t, 2 >& ) const )                      \
+                & SolidMesh##dimension##D::polyhedra_around_edge )             \
+        .def( "polyhedra_around_edge_with_hint",                               \
+            ( PolyhedraAroundEdge( SolidMesh##dimension##D::* )(               \
+                const std::array< index_t, 2 >&, index_t ) const )             \
+                & SolidMesh##dimension##D::polyhedra_around_edge )             \
         .def( "polyhedra_from_facet",                                          \
             &SolidMesh##dimension##D::polyhedra_from_facet )                   \
         .def( "polyhedron_attribute_manager",                                  \
