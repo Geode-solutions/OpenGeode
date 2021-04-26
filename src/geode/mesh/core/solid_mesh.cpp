@@ -690,14 +690,16 @@ namespace geode
         PolyhedraAroundEdge result{ first_polyhedron };
         for( const auto f : LRange{ 4 } )
         {
-            if( is_edge_in_polyhedron_facet(
+            if( !is_edge_in_polyhedron_facet(
                     *this, { first_polyhedron, f }, vertices ) )
             {
-                if( propagate_around_edge(
-                        *this, { first_polyhedron, f }, vertices, result ) )
-                {
-                    return result;
-                }
+                continue;
+            }
+            if( propagate_around_edge(
+                    *this, { first_polyhedron, f }, vertices, result ) )
+            {
+                result.pop_back();
+                return result;
             }
         }
         return result;

@@ -352,7 +352,7 @@ namespace geode
          * @param[in] vertices Indices of edge vertices.
          * @param[in] first_polyhedron One polyhedron index to begin research
          */
-        PolyhedraAroundEdge polyhedra_around_edge(
+        virtual PolyhedraAroundEdge polyhedra_around_edge(
             const std::array< index_t, 2 >& vertices,
             index_t first_polyhedron ) const;
 

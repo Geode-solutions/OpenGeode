@@ -72,9 +72,13 @@ namespace geode
         PolyhedraAroundEdge polyhedra_around_edge(
             const std::array< index_t, 2 >& vertices ) const final;
 
+        PolyhedraAroundEdge polyhedra_around_edge(
+            const std::array< index_t, 2 >& vertices,
+            index_t first_polyhedron ) const final;
+
         /*!
-         * Return the local indices of the two facets incident to the opposite
-         * edge in tetrahedron.
+         * Return the local indices of the two facets incident to the
+         * opposite edge in tetrahedron.
          * @param[in] tetrahedron_id Index of tetrahedron.
          * @param[in] edge_vertices Indices of the two vertices of an edge.
          * @warn throw an exception if edge_vertices are not tetrahedron
