@@ -143,27 +143,80 @@ namespace
         const geode::PolyhedronFacet& facet,
         const std::array< geode::index_t, 2 >& edge_vertices )
     {
-        const auto nb_facet_vertices =
-            solid.nb_polyhedron_facet_vertices( facet );
-        const auto local_id =
-            get_vertex_id_in_polyhedron_facet( solid, facet, edge_vertices[0] );
-        if( local_id == geode::NO_LID )
+        const auto facet_vertices = solid.polyhedron_facet_vertices( facet );
+        const auto it = absl::c_find( facet_vertices, edge_vertices[0] );
+        if( it == facet_vertices.end() )
         {
             return false;
         }
-        const auto previous = solid.polyhedron_facet_vertex( { facet,
-            static_cast< geode::local_index_t >(
-                ( local_id + nb_facet_vertices - 1 ) % nb_facet_vertices ) } );
-        if( previous == edge_vertices[1] )
+        const auto it_next = std::next( it );
+        if( it_next != facet_vertices.end() )
         {
-            return true;
+            if( *it_next == edge_vertices[1] )
+            {
+                return true;
+            }
         }
-        const auto next = solid.polyhedron_facet_vertex(
-            { facet, static_cast< geode::local_index_t >(
-                         ( local_id + 1 ) % nb_facet_vertices ) } );
-        return next == edge_vertices[1];
+        else
+        {
+            if( facet_vertices[0] == edge_vertices[1] )
+            {
+                return true;
+            }
+        }
+
+        if( it != facet_vertices.begin() )
+        {
+            const auto it_prev = std::prev( it );
+            if( *it_prev == edge_vertices[1] )
+            {
+                return true;
+            }
+        }
+        else
+        {
+            if( facet_vertices[facet_vertices.size() - 1] == edge_vertices[1] )
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
+    template < geode::index_t dimension >
+    bool propagate_around_edge( const geode::SolidMesh< dimension >& solid,
+        geode::PolyhedronFacet facet,
+        const std::array< geode::index_t, 2 >& edge_vertices,
+        geode::PolyhedraAroundEdge& result )
+    {
+        const auto first_polyhedron = facet.polyhedron_id;
+        do
+        {
+            if( const auto adj = solid.polyhedron_adjacent_facet( facet ) )
+            {
+                const auto adj_facet = adj.value();
+                result.push_back( adj_facet.polyhedron_id );
+                for( const auto f : geode::LRange{ 4 } )
+                {
+                    if( adj_facet.facet_id == f )
+                    {
+                        continue;
+                    }
+                    if( is_edge_in_polyhedron_facet( solid,
+                            { adj_facet.polyhedron_id, f }, edge_vertices ) )
+                    {
+                        facet = { adj_facet.polyhedron_id, f };
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                return false;
+            }
+        } while( facet.polyhedron_id != first_polyhedron );
+        return true;
+    }
 } // namespace
 
 namespace geode
@@ -634,83 +687,18 @@ namespace geode
         const std::array< index_t, 2 >& vertices,
         index_t first_polyhedron ) const
     {
-        PolyhedraAroundEdge result;
-        PolyhedronFacet cur{ first_polyhedron, NO_LID };
-        bool border{ false };
-        do
+        PolyhedraAroundEdge result{ first_polyhedron };
+        for( const auto f : LRange{ 4 } )
         {
-            result.push_back( cur.polyhedron_id );
-            for( const auto f : LRange{ 4 } )
+            if( is_edge_in_polyhedron_facet(
+                    *this, { first_polyhedron, f }, vertices ) )
             {
-                if( cur.facet_id == f )
+                if( propagate_around_edge(
+                        *this, { first_polyhedron, f }, vertices, result ) )
                 {
-                    continue;
+                    return result;
                 }
-                const auto facet_vertices =
-                    this->polyhedron_facet_vertices( { cur.polyhedron_id, f } );
-                if( absl::c_find( facet_vertices, vertices[0] )
-                    == facet_vertices.end() )
-                {
-                    continue;
-                }
-                if( absl::c_find( facet_vertices, vertices[1] )
-                    == facet_vertices.end() )
-                {
-                    continue;
-                }
-                if( const auto adj = this->polyhedron_adjacent_facet(
-                        { cur.polyhedron_id, f } ) )
-                {
-                    cur = adj.value();
-                }
-                else
-                {
-                    border = true;
-                }
-                break;
             }
-        } while( !border && cur.polyhedron_id != first_polyhedron );
-        if( border )
-        {
-            cur = { first_polyhedron, NO_LID };
-            do
-            {
-                for( const auto f : LRange{ 4 } )
-                {
-                    if( cur.facet_id == f )
-                    {
-                        continue;
-                    }
-                    const auto facet_vertices = this->polyhedron_facet_vertices(
-                        { cur.polyhedron_id, f } );
-                    if( absl::c_find( facet_vertices, vertices[0] )
-                        == facet_vertices.end() )
-                    {
-                        continue;
-                    }
-                    if( absl::c_find( facet_vertices, vertices[1] )
-                        == facet_vertices.end() )
-                    {
-                        continue;
-                    }
-                    if( const auto adj = this->polyhedron_adjacent_facet(
-                            { cur.polyhedron_id, f } ) )
-                    {
-                        if( result.size() > 1
-                            && result[1] == adj.value().polyhedron_id )
-                        {
-                            continue; // same order than previous loop
-                        }
-                        cur = adj.value();
-                        result.push_back( cur.polyhedron_id );
-                        border = false;
-                    }
-                    else
-                    {
-                        border = true;
-                    }
-                }
-            } while( !border && cur.polyhedron_id != first_polyhedron );
         }
         return result;
     }
