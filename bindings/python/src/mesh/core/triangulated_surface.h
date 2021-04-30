@@ -21,6 +21,7 @@
  *
  */
 
+#include <geode/geometry/basic_objects.h>
 #include <geode/mesh/core/triangulated_surface.h>
 
 #define PYTHON_TRIANGULATED_SURFACE( dimension )                               \
@@ -31,7 +32,8 @@
         .def_static( "create",                                                 \
             ( std::unique_ptr< TriangulatedSurface##dimension##D >( * )() )    \
                 & TriangulatedSurface##dimension##D::create )                  \
-        .def( "clone", &TriangulatedSurface##dimension##D::clone )
+        .def( "clone", &TriangulatedSurface##dimension##D::clone )             \
+        .def( "triangle", &TriangulatedSurface##dimension##D::triangle )
 
 namespace geode
 {

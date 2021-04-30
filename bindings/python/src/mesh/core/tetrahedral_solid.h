@@ -21,6 +21,7 @@
  *
  */
 
+#include <geode/geometry/basic_objects.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
 
 #define PYTHON_TETRAHEDRAL_SOLID( dimension )                                  \
@@ -31,7 +32,8 @@
         .def_static( "create",                                                 \
             ( std::unique_ptr< TetrahedralSolid##dimension##D >( * )() )       \
                 & TetrahedralSolid##dimension##D::create )                     \
-        .def( "clone", &TetrahedralSolid##dimension##D::clone )
+        .def( "clone", &TetrahedralSolid##dimension##D::clone )                \
+        .def( "tetra", &TetrahedralSolid##dimension##D::tetra )
 
 namespace geode
 {

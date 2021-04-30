@@ -30,6 +30,7 @@
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( Triangle );
     FORWARD_DECLARATION_DIMENSION_CLASS( TriangulatedSurfaceBuilder );
 } // namespace geode
 
@@ -64,6 +65,8 @@ namespace geode
         }
 
         std::unique_ptr< TriangulatedSurface< dimension > > clone() const;
+
+        Triangle< dimension > triangle( index_t triangle_id ) const;
 
     protected:
         TriangulatedSurface() = default;

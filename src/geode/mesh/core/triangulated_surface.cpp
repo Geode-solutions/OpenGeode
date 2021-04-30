@@ -23,6 +23,8 @@
 
 #include <geode/mesh/core/triangulated_surface.h>
 
+#include <geode/geometry/basic_objects.h>
+
 #include <geode/mesh/builder/triangulated_surface_builder.h>
 #include <geode/mesh/core/mesh_factory.h>
 
@@ -54,6 +56,15 @@ namespace geode
             TriangulatedSurfaceBuilder< dimension >::create( *clone );
         builder->copy( *this, {} );
         return clone;
+    }
+
+    template < index_t dimension >
+    Triangle< dimension > TriangulatedSurface< dimension >::triangle(
+        index_t triangle_id ) const
+    {
+        return { this->point( this->polygon_vertex( { triangle_id, 0 } ) ),
+            this->point( this->polygon_vertex( { triangle_id, 1 } ) ),
+            this->point( this->polygon_vertex( { triangle_id, 2 } ) ) };
     }
 
     template class opengeode_mesh_api TriangulatedSurface< 2 >;

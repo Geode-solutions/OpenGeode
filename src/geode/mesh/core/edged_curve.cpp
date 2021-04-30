@@ -25,6 +25,7 @@
 
 #include <geode/basic/bitsery_archive.h>
 
+#include <geode/geometry/basic_objects.h>
 #include <geode/geometry/bounding_box.h>
 #include <geode/geometry/vector.h>
 
@@ -102,6 +103,14 @@ namespace geode
             box.add_point( point( p ) );
         }
         return box;
+    }
+
+    template < index_t dimension >
+    Segment< dimension > EdgedCurve< dimension >::segment(
+        index_t edge_id ) const
+    {
+        return { point( edge_vertex( { edge_id, 0 } ) ),
+            point( edge_vertex( { edge_id, 1 } ) ) };
     }
 
     template class opengeode_mesh_api EdgedCurve< 2 >;

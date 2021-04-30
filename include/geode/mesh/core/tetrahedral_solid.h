@@ -31,6 +31,7 @@
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( TetrahedralSolidBuilder );
+    class Tetra;
 } // namespace geode
 
 namespace geode
@@ -87,6 +88,8 @@ namespace geode
         std::array< PolyhedronFacet, 2 > opposite_edge_incident_facets(
             index_t tetrahedron_id,
             const std::array< index_t, 2 >& edge_vertices ) const;
+
+        Tetra tetra( index_t tetrahedron_id ) const;
 
     protected:
         TetrahedralSolid() = default;
