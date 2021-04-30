@@ -23,6 +23,8 @@
 
 #include <geode/mesh/core/tetrahedral_solid.h>
 
+#include <geode/geometry/basic_objects.h>
+
 #include <geode/mesh/builder/tetrahedral_solid_builder.h>
 #include <geode/mesh/core/detail/geode_elements.h>
 #include <geode/mesh/core/mesh_factory.h>
@@ -120,6 +122,16 @@ namespace geode
             "[TetrahedralSolid::opposite_edge_incident_facets] Given edge "
             "vertices are not vertices of given tetrahedron" );
         return opposite_facets;
+    }
+
+    template < index_t dimension >
+    Tetra TetrahedralSolid< dimension >::tetra( index_t tetrahedron_id ) const
+    {
+        return { this->point(
+                     this->polyhedron_vertex( { tetrahedron_id, 0 } ) ),
+            this->point( this->polyhedron_vertex( { tetrahedron_id, 1 } ) ),
+            this->point( this->polyhedron_vertex( { tetrahedron_id, 2 } ) ),
+            this->point( this->polyhedron_vertex( { tetrahedron_id, 3 } ) ) };
     }
 
     template < index_t dimension >

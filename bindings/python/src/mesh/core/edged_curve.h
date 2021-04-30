@@ -21,6 +21,7 @@
  *
  */
 
+#include <geode/geometry/basic_objects.h>
 #include <geode/mesh/core/edged_curve.h>
 
 #define PYTHON_EDGED_CURVE( dimension )                                        \
@@ -35,7 +36,8 @@
         .def( "point", &EdgedCurve##dimension##D::point )                      \
         .def( "edge_length", &EdgedCurve##dimension##D::edge_length )          \
         .def( "edge_barycenter", &EdgedCurve##dimension##D::edge_barycenter )  \
-        .def( "bounding_box", &EdgedCurve##dimension##D::bounding_box )
+        .def( "bounding_box", &EdgedCurve##dimension##D::bounding_box )        \
+        .def( "segment", &EdgedCurve##dimension##D::segment )
 
 namespace geode
 {
