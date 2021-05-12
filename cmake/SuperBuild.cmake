@@ -47,8 +47,8 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
         "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
-if(NOT "${CMAKE_CXX_STANDARD}" STREQUAL "")
-    set(STANDARD -DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD})
+if("${CMAKE_CXX_STANDARD}" STREQUAL "")
+    set(CMAKE_CXX_STANDARD 11)
 endif()
 
 # Begin configuration of the superbuild project
