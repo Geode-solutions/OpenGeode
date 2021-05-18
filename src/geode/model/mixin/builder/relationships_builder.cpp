@@ -64,6 +64,12 @@ namespace geode
         return relationships_.add_relation( id1, id2, {} );
     }
 
+    void RelationshipsBuilder::remove_relation(
+        const uuid& id1, const uuid& id2 )
+    {
+        return relationships_.remove_relation( id1, id2, {} );
+    }
+
     void RelationshipsBuilder::copy_relationships(
         const ModelCopyMapping& mapping, const Relationships& relationships )
     {
