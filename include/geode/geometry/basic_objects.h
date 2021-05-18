@@ -236,18 +236,14 @@ namespace geode
                    / 3.;
         }
         template < index_t T = dimension >
-        OPENGEODE_GEOMETRY_DEPRECATED
-            typename std::enable_if< T == 3, Vector3D >::type
-            normal() const
+        typename std::enable_if< T == 3, Vector3D >::type normal() const
         {
             return Vector3D{ vertices_[0], vertices_[1] }
                 .cross( Vector3D{ vertices_[0], vertices_[2] } )
                 .normalize();
         }
         template < index_t T = dimension >
-        OPENGEODE_GEOMETRY_DEPRECATED
-            typename std::enable_if< T == 3, Plane >::type
-            plane() const
+        typename std::enable_if< T == 3, Plane >::type plane() const
         {
             return { this->normal(), vertices_[0] };
         }

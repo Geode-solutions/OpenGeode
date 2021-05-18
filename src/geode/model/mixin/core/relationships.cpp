@@ -180,6 +180,16 @@ namespace geode
             return do_add_relation( from, to );
         }
 
+        void remove_relation( const uuid& id1, const uuid& id2 )
+        {
+            if( const auto relation = relation_index( id1, id2 ) )
+            {
+                std::vector< bool > to_delete( graph_->nb_edges(), false );
+                to_delete[relation.value()] = true;
+                GraphBuilder::create( *graph_ )->delete_edges( to_delete );
+            }
+        }
+
         void save( absl::string_view directory ) const
         {
             const auto filename = absl::StrCat( directory, "/relationships" );
@@ -461,6 +471,12 @@ namespace geode
         const uuid& id1, const uuid& id2, RelationshipsBuilderKey )
     {
         return impl_->add_relation( id1, id2 );
+    }
+
+    void Relationships::remove_relation(
+        const uuid& id1, const uuid& id2, RelationshipsBuilderKey )
+    {
+        return impl_->remove_relation( id1, id2 );
     }
 
     bool Relationships::is_boundary(

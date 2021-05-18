@@ -386,6 +386,12 @@ namespace geode
         index_t add_relation(
             const uuid& id1, const uuid& id2, RelationshipsBuilderKey );
 
+        /*!
+         * Remove a relationship between two components
+         */
+        void remove_relation(
+            const uuid& id1, const uuid& id2, RelationshipsBuilderKey );
+
         void copy_relationships( const ModelCopyMapping& mapping,
             const Relationships& relationships,
             RelationshipsBuilderKey );
