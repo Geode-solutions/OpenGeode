@@ -43,5 +43,6 @@ namespace geode
     {
         PYTHON_PROJECTION( 2 );
         PYTHON_PROJECTION( 3 );
+        module.def( "point_plane_projection", &point_plane_projection );
     }
 } // namespace geode

@@ -141,13 +141,25 @@ void point_triangle_projection_3d()
     const geode::Point3D c{ { 0.0, 0.0, -2.0 } };
     const geode::Triangle3D triangle{ a, b, c };
 
-    geode::Point3D closest_point;
-
-    closest_point = geode::point_triangle_projection( a, triangle );
+    const auto closest_point = geode::point_triangle_projection( a, triangle );
     OPENGEODE_EXCEPTION(
         closest_point.inexact_equal( a, geode::global_epsilon ),
         "[Test] Wrong result for point_triangle_projection with query Point3D "
         "a" );
+}
+
+void point_plane_projection()
+{
+    const geode::Point3D a{ { 1.0, 5.0, 2.0 } };
+    const geode::Vector3D normal{ { 0.0, 0.0, 1.0 } };
+    const geode::Point3D O{ { 1.0, 1.0, 0.0 } };
+    const geode::Plane plane{ normal, O };
+
+    const auto closest_point = geode::point_plane_projection( a, plane );
+    const geode::Point3D answer{ { 1.0, 5.0, 0.0 } };
+    OPENGEODE_EXCEPTION(
+        closest_point.inexact_equal( answer, geode::global_epsilon ),
+        "[Test] Wrong result for point_plane_projection with query Point3D a" );
 }
 
 void test()
@@ -155,6 +167,7 @@ void test()
     point_segment_projection_2d();
     point_segment_projection_3d();
     point_triangle_projection_3d();
+    point_plane_projection();
 }
 
 OPENGEODE_TEST( "projection" )

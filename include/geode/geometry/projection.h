@@ -31,6 +31,10 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
     FORWARD_DECLARATION_DIMENSION_CLASS( Segment );
     FORWARD_DECLARATION_DIMENSION_CLASS( Triangle );
+
+    ALIAS_3D( Point );
+
+    class Plane;
 } // namespace geode
 
 namespace geode
@@ -56,11 +60,19 @@ namespace geode
     /*!
      * Return the projection of a point on a triangle
      * @param[in] point the point to project
-     * @param[in] segment the segment
+     * @param[in] triangle the triangle
      */
     template < index_t dimension >
     Point< dimension > point_triangle_projection(
         const Point< dimension >& point,
         const Triangle< dimension >& triangle );
+
+    /*!
+     * Return the projection of a point on a plane
+     * @param[in] point the point to project
+     * @param[in] plane the plane
+     */
+    Point3D opengeode_geometry_api point_plane_projection(
+        const Point3D& point, const Plane& plane );
 
 } // namespace geode
