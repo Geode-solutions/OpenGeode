@@ -63,6 +63,13 @@ namespace geode
         return std::get< 1 >( point_triangle_distance( point, triangle ) );
     }
 
+    Point3D point_plane_projection( const Point3D& point, const Plane& plane )
+    {
+        const Vector3D ori_point{ plane.origin(), point };
+        const auto distance = ori_point.dot( plane.normal() );
+        return point - plane.normal() * distance;
+    }
+
     template Point2D opengeode_geometry_api point_segment_projection(
         const Point2D&, const Segment2D& );
     template Point2D opengeode_geometry_api point_line_projection(

@@ -198,3 +198,17 @@ namespace geode
         IMPLEMENTATION_MEMBER( impl_ );
     };
 } // namespace geode
+
+namespace std
+{
+    template <>
+    struct hash< geode::MeshComponentVertex >
+    {
+    public:
+        size_t operator()( const geode::MeshComponentVertex& mcv ) const
+        {
+            return absl::Hash< geode::uuid >()( mcv.component_id.id() )
+                   ^ absl::Hash< geode::index_t >()( mcv.vertex );
+        }
+    };
+} // namespace std
