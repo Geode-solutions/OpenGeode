@@ -592,6 +592,40 @@ namespace geode
     }
 
     template < index_t dimension >
+    absl::optional< PolyhedronFacetEdge >
+        SolidMesh< dimension >::polyhedron_facet_edge_from_vertices(
+            const std::array< index_t, 2 >& edge_vertices ) const
+    {
+        for( const auto polyhedron_vertex :
+            polyhedra_around_vertex( edge_vertices[0] ) )
+        {
+            for( const auto f : LRange{
+                     nb_polyhedron_facets( polyhedron_vertex.polyhedron_id ) } )
+            {
+                const PolyhedronFacet facet{ polyhedron_vertex.polyhedron_id,
+                    f };
+                const auto vertices = polyhedron_facet_vertices( facet );
+                for( const auto v : LIndices{ vertices } )
+                {
+                    if( vertices[v] == edge_vertices[0]
+                        && vertices[( v + 1 ) % vertices.size()]
+                               == edge_vertices[1] )
+                    {
+                        return PolyhedronFacetEdge{ facet, v };
+                    }
+                    if( vertices[v] == edge_vertices[1]
+                        && vertices[( v + 1 ) % vertices.size()]
+                               == edge_vertices[0] )
+                    {
+                        return PolyhedronFacetEdge{ facet, v };
+                    }
+                }
+            }
+        }
+        return absl::nullopt;
+    }
+
+    template < index_t dimension >
     PolyhedraAroundFacet SolidMesh< dimension >::polyhedra_from_facet(
         PolyhedronFacetVertices facet_vertices ) const
     {

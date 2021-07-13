@@ -250,6 +250,10 @@ namespace geode
         std::array< index_t, 2 > polyhedron_facet_edge_vertices(
             const PolyhedronFacetEdge& polyhedron_facet_edge ) const;
 
+        absl::optional< PolyhedronFacetEdge >
+            polyhedron_facet_edge_from_vertices(
+                const std::array< index_t, 2 >& edge_vertices ) const;
+
         virtual std::vector< std::array< index_t, 2 > >
             polyhedron_edges_vertices( index_t polyhedron ) const;
 
