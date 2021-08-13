@@ -44,10 +44,16 @@ namespace geode
     namespace detail
     {
         template < typename Container >
-        inline void rotate( Container& vertices )
+        inline void polygon_sort( Container& vertices )
         {
             const auto min_itr = absl::c_min_element( vertices );
             absl::c_rotate( vertices, min_itr );
+        }
+
+        template < typename Container >
+        inline void rotate( Container& vertices )
+        {
+            polygon_sort( vertices );
             if( vertices[1] > vertices.back() )
             {
                 std::reverse( vertices.begin() + 1, vertices.end() );
