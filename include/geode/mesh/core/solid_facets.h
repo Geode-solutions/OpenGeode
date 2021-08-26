@@ -71,7 +71,7 @@ namespace geode
          */
         AttributeManager& facet_attribute_manager() const;
 
-        void update_facet_vertices(
+        std::vector< index_t > update_facet_vertices(
             absl::Span< const index_t > old2new, SolidFacetsKey );
 
         void update_facet_vertex( PolyhedronFacetVertices facet_vertices,

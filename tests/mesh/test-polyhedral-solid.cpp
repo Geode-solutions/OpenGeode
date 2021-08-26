@@ -296,10 +296,10 @@ void test_delete_vertex( const geode::PolyhedralSolid3D& polyhedral_solid,
         "[Test] PolyhedralSolid should have 2 polyhedra" );
     OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_adjacent( { 1, 0 } ) == 0,
         "[Test] PolyhedralSolid adjacent index is not correct" );
-    OPENGEODE_EXCEPTION( polyhedral_solid.facets().nb_facets() == 11,
-        "[Test] PolyhedralSolid should have 11 facets" );
-    OPENGEODE_EXCEPTION( polyhedral_solid.edges().nb_edges() == 15,
-        "[Test] PolyhedralSolid should have 15 edges" );
+    OPENGEODE_EXCEPTION( polyhedral_solid.facets().nb_facets() == 8,
+        "[Test] PolyhedralSolid should have 8 facets" );
+    OPENGEODE_EXCEPTION( polyhedral_solid.edges().nb_edges() == 12,
+        "[Test] PolyhedralSolid should have 12 edges" );
     builder.edges_builder().delete_isolated_edges();
     builder.facets_builder().delete_isolated_facets();
     OPENGEODE_EXCEPTION( polyhedral_solid.facets().nb_facets() == 7,

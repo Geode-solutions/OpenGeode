@@ -121,10 +121,10 @@ def test_delete_vertex(  polyhedral_solid, builder ):
         raise ValueError( "[Test] PolyhedralSolid should have 2 polyhedra" )
     if polyhedral_solid.polyhedron_adjacent( mesh.PolyhedronFacet( 1, 0 ) ) != 0:
         raise ValueError( "[Test] PolyhedralSolid adjacent index is not correct" )
-    if polyhedral_solid.facets().nb_facets() != 11:
-        raise ValueError( "[Test] PolyhedralSolid should have 11 facets" )
-    if polyhedral_solid.edges().nb_edges() != 15:
-        raise ValueError( "[Test] PolyhedralSolid should have 15 edges" )
+    if polyhedral_solid.facets().nb_facets() != 8:
+        raise ValueError( "[Test] PolyhedralSolid should have 8 facets" )
+    if polyhedral_solid.edges().nb_edges() != 12:
+        raise ValueError( "[Test] PolyhedralSolid should have 12 edges" )
     builder.edges_builder().delete_isolated_edges()
     builder.facets_builder().delete_isolated_facets()
     if polyhedral_solid.facets().nb_facets() != 7:
