@@ -133,7 +133,10 @@ def add_lines_in_model_boundaries( model, builder, line_uuids, boundary_uuids ):
 
     for i in range( 3 ):
         if model.nb_collections( line_uuids[i] ) != 1:
-            raise ValueError( "[Test] This Line should be in 1 collection (of type Boundary)" )
+            raise ValueError( "[Test] This Line should be in 1 collection" )
+        for collection in model.collections(line_uuids[i]):
+            if collection.type() != model.ModelBoundary2D.component_type_static():
+                            raise ValueError( "[Test] This Line should be in 1 collection of type Boundary" )
     if model.nb_collections( line_uuids[4] ) != 0:
         raise ValueError( "[Test] Last Line should be in no collection (of type Boundary)" )
 
