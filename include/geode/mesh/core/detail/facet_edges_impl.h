@@ -64,15 +64,14 @@ namespace geode
                 const index_t edge_vertex_id,
                 const index_t new_vertex_id )
             {
-                auto updated_edge_vertices = edge_vertices;
-                updated_edge_vertices[edge_vertex_id] = new_vertex_id;
-                this->add_facet( std::move( updated_edge_vertices ) );
-                this->remove_facet( std::move( edge_vertices ) );
+                this->update_facet_vertex(
+                    std::move( edge_vertices ), edge_vertex_id, new_vertex_id );
             }
 
-            void update_edge_vertices( absl::Span< const index_t > old2new )
+            std::vector< index_t > update_edge_vertices(
+                absl::Span< const index_t > old2new )
             {
-                this->update_facet_vertices( old2new );
+                return this->update_facet_vertices( old2new );
             }
 
             void remove_edge( std::array< index_t, 2 > edge_vertices )

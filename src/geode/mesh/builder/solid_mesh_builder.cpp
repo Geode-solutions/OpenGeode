@@ -604,20 +604,9 @@ namespace geode
             {
                 continue;
             }
-            for( const auto f :
-                LRange{ solid_mesh_->nb_polyhedron_facets( p ) } )
+            for( auto&& edge : solid_mesh_->polyhedron_edges_vertices( p ) )
             {
-                const PolyhedronFacet id{ p, f };
-                for( const auto v :
-                    LRange{ solid_mesh_->nb_polyhedron_facet_vertices( id ) } )
-                {
-                    auto vertices = solid_mesh_->polyhedron_facet_edge_vertices(
-                        { id, v } );
-                    if( vertices[0] < vertices[1] )
-                    {
-                        edges.remove_edge( std::move( vertices ) );
-                    }
-                }
+                edges.remove_edge( std::move( edge ) );
             }
         }
     }
@@ -678,19 +667,10 @@ namespace geode
         {
             if( to_delete[p] )
             {
-                for( const auto f :
-                    LRange{ solid_mesh_->nb_polyhedron_facets( p ) } )
+                for( auto&& facet :
+                    solid_mesh_->polyhedron_facets_vertices( p ) )
                 {
-                    const PolyhedronFacet id{ p, f };
-                    PolyhedronFacetVertices facet_vertices(
-                        solid_mesh_->nb_polyhedron_facet_vertices( id ) );
-                    for( const auto v : LRange{
-                             solid_mesh_->nb_polyhedron_facet_vertices( id ) } )
-                    {
-                        facet_vertices[v] =
-                            solid_mesh_->polyhedron_facet_vertex( { id, v } );
-                    }
-                    facets.remove_facet( std::move( facet_vertices ) );
+                    facets.remove_facet( std::move( facet ) );
                 }
             }
         }

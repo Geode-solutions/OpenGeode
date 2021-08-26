@@ -53,10 +53,11 @@ namespace geode
     }
 
     template < index_t dimension >
-    void SolidFacetsBuilder< dimension >::update_facet_vertices(
-        absl::Span< const index_t > old2new )
+    std::vector< index_t >
+        SolidFacetsBuilder< dimension >::update_facet_vertices(
+            absl::Span< const index_t > old2new )
     {
-        facets_->update_facet_vertices( old2new, {} );
+        return facets_->update_facet_vertices( old2new, {} );
     }
 
     template < index_t dimension >

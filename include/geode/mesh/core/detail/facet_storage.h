@@ -77,12 +77,10 @@ namespace geode
             index_t add_facet( TypedVertexCycle vertices )
             {
                 const auto id = facet_indices_.size();
-                bool inserted;
-                typename absl::flat_hash_map< TypedVertexCycle,
-                    index_t >::iterator it;
-                std::tie( it, inserted ) =
+                const auto output =
                     facet_indices_.try_emplace( std::move( vertices ), id );
-                if( !inserted )
+                const auto it = std::get< 0 >( output );
+                if( !std::get< 1 >( output ) )
                 {
                     const auto old_id = it->second;
                     counter_->set_value(
@@ -145,26 +143,53 @@ namespace geode
                 return old2new;
             }
 
-            void update_facet_vertices( absl::Span< const index_t > old2new )
+            void update_facet_vertex( VertexContainer facet_vertices,
+                const index_t facet_vertex_id,
+                const index_t new_vertex_id )
+            {
+                auto updated_facet_vertices = facet_vertices;
+                updated_facet_vertices[facet_vertex_id] = new_vertex_id;
+                this->add_facet( std::move( updated_facet_vertices ) );
+                this->remove_facet( std::move( facet_vertices ) );
+            }
+
+            std::vector< index_t > update_facet_vertices(
+                absl::Span< const index_t > old2new )
             {
                 const auto old_facet_indices = facet_indices_;
                 facet_indices_.clear();
                 facet_indices_.reserve( old_facet_indices.size() );
+                std::vector< bool > to_delete(
+                    old_facet_indices.size(), false );
                 for( const auto& cycle : old_facet_indices )
                 {
                     auto updated_vertices = cycle.first.vertices();
                     for( auto& v : updated_vertices )
                     {
-                        if( v != NO_ID )
+                        v = old2new[v];
+                        if( v == NO_ID )
                         {
-                            v = old2new[v];
+                            to_delete[cycle.second] = true;
+                            break;
                         }
                     }
-                    auto it = std::get< 0 >( facet_indices_.emplace(
-                        TypedVertexCycle{ std::move( updated_vertices ) },
-                        cycle.second ) );
-                    vertices_->set_value( cycle.second, it->first.vertices() );
+                    if( !to_delete[cycle.second] )
+                    {
+                        const auto it =
+                            std::get< 0 >( facet_indices_.try_emplace(
+                                std::move( updated_vertices ), cycle.second ) );
+                        vertices_->set_value(
+                            cycle.second, it->first.vertices() );
+                    }
                 }
+                facet_attribute_manager_.delete_elements( to_delete );
+                const auto cycle_old2new =
+                    detail::mapping_after_deletion( to_delete );
+                for( auto& cycle : facet_indices_ )
+                {
+                    cycle.second = cycle_old2new[cycle.second];
+                }
+                return cycle_old2new;
             }
 
             const VertexContainer& get_facet_vertices( index_t facet_id ) const

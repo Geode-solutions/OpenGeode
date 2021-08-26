@@ -65,7 +65,8 @@ namespace geode
             index_t facet_vertex_id,
             index_t new_vertex_id );
 
-        void update_facet_vertices( absl::Span< const index_t > old2new );
+        std::vector< index_t > update_facet_vertices(
+            absl::Span< const index_t > old2new );
 
         void copy( const SolidFacets< dimension >& facets, BuilderKey )
         {
