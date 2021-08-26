@@ -33,167 +33,167 @@ def find_uuid_in_list( uuids, uuid ):
             return True
     return False
 
-def add_corners( model, builder ):
+def add_corners( section, builder ):
     nb = 5
     uuids = []
     for i in range( nb ):
         uuids.append( builder.add_corner() )
         
-    temp_corner = model.corner( builder.add_corner() )
+    temp_corner = section.corner( builder.add_corner() )
     builder.remove_corner( temp_corner )
-    if model.nb_corners() != nb:
+    if section.nb_corners() != nb:
         raise ValueError( "[Test] Section should have 5 corners")
     return uuids
 
-def add_lines( model, builder ):
+def add_lines( section, builder ):
     nb = 6
     uuids = []
     for i in range( nb ):
         uuids.append( builder.add_line() )
 
-    temp_line = model.line( builder.add_line() )
+    temp_line = section.line( builder.add_line() )
     builder.remove_line( temp_line )
-    if model.nb_lines() != nb:
+    if section.nb_lines() != nb:
         raise ValueError( "[Test] Section should have 6 lines" )
     return uuids
 
-def add_surfaces( model, builder ):
+def add_surfaces( section, builder ):
     nb = 2
     uuids = []
     for i in range( nb ):
         uuids.append( builder.add_surface() )
 
-    temp_surface = model.surface( builder.add_surface() )
+    temp_surface = section.surface( builder.add_surface() )
     builder.remove_surface( temp_surface )
-    if model.nb_surfaces() != nb:
+    if section.nb_surfaces() != nb:
         raise ValueError( "[Test] Section should have 2 surfaces" )
     return uuids
 
-def add_model_boundaries( model, builder ):
+def add_model_boundaries( section, builder ):
     nb = 2
     uuids = []
     for i in range( nb ):
         uuids.append( builder.add_model_boundary() )
         builder.set_model_boundary_name( uuids[-1], "boundary" + str(len( uuids )) )
 
-    temp_boundary = model.model_boundary( builder.add_model_boundary() )
+    temp_boundary = section.model_boundary( builder.add_model_boundary() )
     builder.remove_model_boundary( temp_boundary )
-    if model.nb_model_boundaries() != nb:
+    if section.nb_model_boundaries() != nb:
         raise ValueError( "[Test] Section should have 2 model boundaries" )
-    if model.model_boundary( uuids[0] ).name() != "boundary1":
+    if section.model_boundary( uuids[0] ).name() != "boundary1":
         raise ValueError( "[Test] Wrong ModelBoundary name" )
     return uuids
 
-def add_corner_line_boundary_relation( model, builder, corner_uuids, line_uuids ):
-    builder.add_corner_line_boundary_relationship( model.corner( corner_uuids[0] ), model.line( line_uuids[0] ) )
-    builder.add_corner_line_boundary_relationship( model.corner( corner_uuids[0] ), model.line( line_uuids[1] ) )
-    builder.add_corner_line_boundary_relationship( model.corner( corner_uuids[1] ), model.line( line_uuids[0] ) )
-    builder.add_corner_line_boundary_relationship( model.corner( corner_uuids[1] ), model.line( line_uuids[2] ) )
-    builder.add_corner_line_boundary_relationship( model.corner( corner_uuids[1] ), model.line( line_uuids[3] ) )
-    builder.add_corner_line_boundary_relationship( model.corner( corner_uuids[2] ), model.line( line_uuids[1] ) )
-    builder.add_corner_line_boundary_relationship( model.corner( corner_uuids[2] ), model.line( line_uuids[2] ) )
-    builder.add_corner_line_boundary_relationship( model.corner( corner_uuids[2] ), model.line( line_uuids[4] ) )
-    builder.add_corner_line_boundary_relationship( model.corner( corner_uuids[3] ), model.line( line_uuids[3] ) )
-    builder.add_corner_line_boundary_relationship( model.corner( corner_uuids[3] ), model.line( line_uuids[5] ) )
-    builder.add_corner_line_boundary_relationship( model.corner( corner_uuids[4] ), model.line( line_uuids[4] ) )
-    builder.add_corner_line_boundary_relationship( model.corner( corner_uuids[4] ), model.line( line_uuids[5] ) )
+def add_corner_line_boundary_relation( section, builder, corner_uuids, line_uuids ):
+    builder.add_corner_line_boundary_relationship( section.corner( corner_uuids[0] ), section.line( line_uuids[0] ) )
+    builder.add_corner_line_boundary_relationship( section.corner( corner_uuids[0] ), section.line( line_uuids[1] ) )
+    builder.add_corner_line_boundary_relationship( section.corner( corner_uuids[1] ), section.line( line_uuids[0] ) )
+    builder.add_corner_line_boundary_relationship( section.corner( corner_uuids[1] ), section.line( line_uuids[2] ) )
+    builder.add_corner_line_boundary_relationship( section.corner( corner_uuids[1] ), section.line( line_uuids[3] ) )
+    builder.add_corner_line_boundary_relationship( section.corner( corner_uuids[2] ), section.line( line_uuids[1] ) )
+    builder.add_corner_line_boundary_relationship( section.corner( corner_uuids[2] ), section.line( line_uuids[2] ) )
+    builder.add_corner_line_boundary_relationship( section.corner( corner_uuids[2] ), section.line( line_uuids[4] ) )
+    builder.add_corner_line_boundary_relationship( section.corner( corner_uuids[3] ), section.line( line_uuids[3] ) )
+    builder.add_corner_line_boundary_relationship( section.corner( corner_uuids[3] ), section.line( line_uuids[5] ) )
+    builder.add_corner_line_boundary_relationship( section.corner( corner_uuids[4] ), section.line( line_uuids[4] ) )
+    builder.add_corner_line_boundary_relationship( section.corner( corner_uuids[4] ), section.line( line_uuids[5] ) )
 
     for corner_id in corner_uuids:
-        for incidence in model.incident_lines( model.corner( corner_id ) ):
+        for incidence in section.incident_lines( section.corner( corner_id ) ):
             if not find_uuid_in_list( line_uuids, incidence.id() ):
                 raise ValueError( "[Test] All Corners incidences should be Lines" )
 
     for line_id in line_uuids:
-        for boundary in model.boundary_corners( model.line( line_id ) ):
+        for boundary in section.boundary_corners( section.line( line_id ) ):
             if not find_uuid_in_list( corner_uuids, boundary.id() ):
                 raise ValueError( "[Test] All Lines incidences should be Corners" )
 
-def add_line_surface_boundary_relation( model, builder, line_uuids, surface_uuids ):
-    builder.add_line_surface_boundary_relationship( model.line( line_uuids[0] ), model.surface( surface_uuids[0] ) )
-    builder.add_line_surface_boundary_relationship( model.line( line_uuids[1] ), model.surface( surface_uuids[0] ) )
-    builder.add_line_surface_boundary_relationship( model.line( line_uuids[2] ), model.surface( surface_uuids[0] ) )
-    builder.add_line_surface_boundary_relationship( model.line( line_uuids[2] ), model.surface( surface_uuids[1] ) )
-    builder.add_line_surface_boundary_relationship( model.line( line_uuids[3] ), model.surface( surface_uuids[1] ) )
-    builder.add_line_surface_boundary_relationship( model.line( line_uuids[4] ), model.surface( surface_uuids[1] ) )
-    builder.add_line_surface_boundary_relationship( model.line( line_uuids[5] ), model.surface( surface_uuids[1] ) )
+def add_line_surface_boundary_relation( section, builder, line_uuids, surface_uuids ):
+    builder.add_line_surface_boundary_relationship( section.line( line_uuids[0] ), section.surface( surface_uuids[0] ) )
+    builder.add_line_surface_boundary_relationship( section.line( line_uuids[1] ), section.surface( surface_uuids[0] ) )
+    builder.add_line_surface_boundary_relationship( section.line( line_uuids[2] ), section.surface( surface_uuids[0] ) )
+    builder.add_line_surface_boundary_relationship( section.line( line_uuids[2] ), section.surface( surface_uuids[1] ) )
+    builder.add_line_surface_boundary_relationship( section.line( line_uuids[3] ), section.surface( surface_uuids[1] ) )
+    builder.add_line_surface_boundary_relationship( section.line( line_uuids[4] ), section.surface( surface_uuids[1] ) )
+    builder.add_line_surface_boundary_relationship( section.line( line_uuids[5] ), section.surface( surface_uuids[1] ) )
 
     for line_id in line_uuids:
-        for incidence in model.incident_surfaces( model.line( line_id ) ):
+        for incidence in section.incident_surfaces( section.line( line_id ) ):
             if surface_uuids[0].string() != incidence.id().string() and surface_uuids[1].string() != incidence.id().string():
                 raise ValueError( "[Test] All Lines incidences should be Surfaces" )
-    if model.nb_boundaries( surface_uuids[0] ) != 3:
+    if section.nb_boundaries( surface_uuids[0] ) != 3:
         raise ValueError( "[Test] Surface 0 should have 3 Lines as boundaries" )
-    if model.nb_boundaries( surface_uuids[1] ) != 4:
+    if section.nb_boundaries( surface_uuids[1] ) != 4:
         raise ValueError( "[Test] Surface 1 should have 4 Lines as boundaries" )
 
-def add_lines_in_model_boundaries( model, builder, line_uuids, boundary_uuids ):
-    builder.add_line_in_model_boundary( model.line( line_uuids[0] ), model.model_boundary( boundary_uuids[0] ) )
+def add_lines_in_model_boundaries( section, builder, line_uuids, boundary_uuids ):
+    builder.add_line_in_model_boundary( section.line( line_uuids[0] ), section.model_boundary( boundary_uuids[0] ) )
     for i in range( 1, 3 ):
-        builder.add_line_in_model_boundary( model.line( line_uuids[i] ), model.model_boundary( boundary_uuids[1] ) )
+        builder.add_line_in_model_boundary( section.line( line_uuids[i] ), section.model_boundary( boundary_uuids[1] ) )
 
     for i in range( 3 ):
-        if model.nb_collections( line_uuids[i] ) != 1:
+        if section.nb_collections( line_uuids[i] ) != 1:
             raise ValueError( "[Test] This Line should be in 1 collection" )
-        for collection in model.collections(line_uuids[i]):
+        for collection in section.collections(line_uuids[i]):
             if collection.type() != model.ModelBoundary2D.component_type_static():
                             raise ValueError( "[Test] This Line should be in 1 collection of type Boundary" )
-    if model.nb_collections( line_uuids[4] ) != 0:
+    if section.nb_collections( line_uuids[4] ) != 0:
         raise ValueError( "[Test] Last Line should be in no collection (of type Boundary)" )
 
-def add_internal_corner_relations( model, builder, corner_uuids, surface_uuids ):
+def add_internal_corner_relations( section, builder, corner_uuids, surface_uuids ):
     for corner_id in corner_uuids:
-        builder.add_corner_surface_internal_relationship( model.corner( corner_id ), model.surface( surface_uuids[0] ) )
+        builder.add_corner_surface_internal_relationship( section.corner( corner_id ), section.surface( surface_uuids[0] ) )
 
     for corner_id in corner_uuids:
-        for embedding in model.embedding_surfaces_of_corner( model.corner( corner_id ) ):
+        for embedding in section.embedding_surfaces_of_corner( section.corner( corner_id ) ):
             if surface_uuids[0].string() != embedding.id().string():
                 raise ValueError( "[Test] All Corners embeddings should be Surfaces" )
-            if model.nb_internal_corners_of_surface( embedding ) != len( corner_uuids ):
+            if section.nb_internal_corners_of_surface( embedding ) != len( corner_uuids ):
                 raise ValueError( "[Test] Surface should embed all Corners" )
-        if model.nb_embeddings( corner_id ) != 1:
+        if section.nb_embeddings( corner_id ) != 1:
             raise ValueError( "[Test] All Corners should be embedded to 1 Surface" )
-        if model.nb_embedding_surfaces_of_corner( model.corner( corner_id ) ) != 1:
+        if section.nb_embedding_surfaces_of_corner( section.corner( corner_id ) ) != 1:
             raise ValueError( "[Test] All Corners should be embedded to 1 Surface" )
 
-def add_internal_line_relations( model, builder, line_uuids, surface_uuids ):
+def add_internal_line_relations( section, builder, line_uuids, surface_uuids ):
     for line_id in line_uuids:
-        builder.add_line_surface_internal_relationship( model.line( line_id ), model.surface( surface_uuids[0] ) )
+        builder.add_line_surface_internal_relationship( section.line( line_id ), section.surface( surface_uuids[0] ) )
 
     for line_id in line_uuids:
-        for embedding in model.embedding_surfaces_of_line( model.line( line_id ) ):
+        for embedding in section.embedding_surfaces_of_line( section.line( line_id ) ):
             if surface_uuids[0].string() != embedding.id().string():
                 raise ValueError( "[Test] All Lines embeddings should be Surfaces" )
-            if model.nb_internal_lines_of_surface( embedding ) != len( line_uuids ):
+            if section.nb_internal_lines_of_surface( embedding ) != len( line_uuids ):
                 raise ValueError( "[Test] Surface should embed all Lines" )
-        if model.nb_embeddings( line_id ) != 1:
+        if section.nb_embeddings( line_id ) != 1:
             raise ValueError( "[Test] All Lines should be embedded to 1 Surface" )
-        if model.nb_embedding_surfaces_of_line( model.line( line_id ) ) != 1:
+        if section.nb_embedding_surfaces_of_line( section.line( line_id ) ) != 1:
             raise ValueError( "[Test] All Lines should be embedded to 1 Surface" )
 
-def test_boundary_ranges( model, corner_uuids, line_uuids, surface_uuids ):
+def test_boundary_ranges( section, corner_uuids, line_uuids, surface_uuids ):
     line_boundary_count = 0
-    for line_boundary in model.boundary_corners( model.line( line_uuids[0] ) ):
+    for line_boundary in section.boundary_corners( section.line( line_uuids[0] ) ):
         line_boundary_count += 1
         if line_boundary.id().string() != corner_uuids[0].string() and line_boundary.id().string() != corner_uuids[1].string():
             raise ValueError( "[Test] BoundaryCornerRange iteration result is not correct" )
-        if not model.is_line_boundary( line_boundary, model.line( line_uuids[0] ) ):
+        if not section.is_line_boundary( line_boundary, section.line( line_uuids[0] ) ):
             raise ValueError( "[Test] Corner should be boundary of Line" )
     if line_boundary_count != 2:
         raise ValueError( "[Test] BoundaryCornerRange should iterates on 2 Corners" )
 
     surface_boundary_count = 0
-    for surface_boundary in model.boundary_lines( model.surface( surface_uuids[0] ) ):
+    for surface_boundary in section.boundary_lines( section.surface( surface_uuids[0] ) ):
         surface_boundary_count += 1
         if surface_boundary.id().string() != line_uuids[0].string() and surface_boundary.id().string() != line_uuids[1].string() and surface_boundary.id().string() != line_uuids[2].string():
             raise ValueError( "[Test] BoundaryLineRange iteration result is not correct" )
-        if not model.is_surface_boundary( surface_boundary, model.surface( surface_uuids[0] ) ):
+        if not section.is_surface_boundary( surface_boundary, section.surface( surface_uuids[0] ) ):
             raise ValueError( "[Test] Line should be boundary of Surface" )
     if surface_boundary_count != 3:
         raise ValueError( "[Test] BoundaryLineRange should iterates on 3 Lines" )
 
-def test_incidence_ranges( model, corner_uuids, line_uuids, surface_uuids ):
+def test_incidence_ranges( section, corner_uuids, line_uuids, surface_uuids ):
     corner_incidence_count = 0
-    for corner_incidence in model.incident_lines( model.corner( corner_uuids[0] ) ):
+    for corner_incidence in section.incident_lines( section.corner( corner_uuids[0] ) ):
         corner_incidence_count += 1
         if corner_incidence.id().string() != line_uuids[0].string() and corner_incidence.id().string() != line_uuids[1].string():
             raise ValueError( "[Test] IncidentLineRange iteration result is not correct" )
@@ -201,20 +201,20 @@ def test_incidence_ranges( model, corner_uuids, line_uuids, surface_uuids ):
         raise ValueError( "[Test] IncidentLineRange should iterates on 2 Lines" )
 
     line_incidence_count = 0
-    for line_incidence in model.incident_surfaces( model.line( line_uuids[0] ) ):
+    for line_incidence in section.incident_surfaces( section.line( line_uuids[0] ) ):
         line_incidence_count += 1
         if line_incidence.id().string() != surface_uuids[0].string():
             raise ValueError( "[Test] IncidentSurfaceRange iteration result is not correct" )
     if line_incidence_count != 1:
         raise ValueError( "[Test] IncidentSurfaceRange should iterates on 1 Surface" )
 
-def test_item_ranges( model, line_uuids, boundary_uuids ):
+def test_item_ranges( section, line_uuids, boundary_uuids ):
     boundary_item_count = 0
-    for boundary_item in model.model_boundary_items( model.model_boundary( boundary_uuids[1] ) ):
+    for boundary_item in section.model_boundary_items( section.model_boundary( boundary_uuids[1] ) ):
         boundary_item_count += 1
         if boundary_item.id().string() != line_uuids[1].string() and boundary_item.id().string() != line_uuids[2].string():
             raise ValueError( "[Test] ItemLineRange iteration result is not correct" )
-        if not model.is_model_boundary_item( boundary_item, model.model_boundary( boundary_uuids[1] ) ):
+        if not section.is_model_boundary_item( boundary_item, section.model_boundary( boundary_uuids[1] ) ):
             raise ValueError( "[Test] Surface should be item of ModelBoundary" )
     if boundary_item_count != 2:
         raise ValueError( "[Test] IncidentLineRange should iterates on 2 Lines (Boundary 1)" )
