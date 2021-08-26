@@ -40,7 +40,18 @@ namespace geode
             .def( "nb_items", &Relationships::nb_items )
             .def( "items", &Relationships::items )
             .def( "nb_collections", &Relationships::nb_collections )
-            .def( "collections", &Relationships::collections )
+            .def(
+                "collections",
+                []( const Relationships& relationships, const uuid& id ) {
+                    std::vector< const ComponentID* > components;
+                    for( const auto& component :
+                        relationships.collections( id ) )
+                    {
+                        components.push_back( &component );
+                    }
+                    return components;
+                },
+                pybind11::return_value_policy::reference )
             .def( "is_boundary", &Relationships::is_boundary )
             .def( "is_internal", &Relationships::is_internal )
             .def( "is_item", &Relationships::is_item );
