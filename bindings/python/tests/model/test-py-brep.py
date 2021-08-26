@@ -193,8 +193,8 @@ def add_surfaces_in_model_boundaries( brep, builder, surface_uuids, boundary_uui
         if brep.nb_collections( surface_id ) != 1:
             raise ValueError( "[Test] All Surfaces should be in 1 collection" )
         for collection in brep.collections(surface_id):
-            if collection.type() != model.ModelBoundary3D.component_type_static():
-                            raise ValueError( "[Test] This surface should be in 1 collection of type Boundary" )
+            if not collection.type().matches(model.ModelBoundary3D.component_type_static()):
+                raise ValueError( "[Test] This surface should be in 1 collection of type Boundary" )
 
 
 def add_internal_corner_relations( brep, builder, corner_uuids, surface_uuids, block_uuids ):
