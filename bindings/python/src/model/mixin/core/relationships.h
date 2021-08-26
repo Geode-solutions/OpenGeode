@@ -40,7 +40,8 @@ namespace geode
             .def( "nb_items", &Relationships::nb_items )
             .def( "items", &Relationships::items )
             .def( "nb_collections", &Relationships::nb_collections )
-            .def( "collections",
+            .def(
+                "collections",
                 []( const Relationships& relationships, const uuid& id ) {
                     std::vector< const ComponentID* > components;
                     for( const auto& component :
