@@ -224,6 +224,12 @@ namespace geode
         bool is_edge_on_border( const PolygonEdge& polygon_edge ) const;
 
         /*!
+         * Return true if at least one of the polygon edges is on border
+         * @param[in] polygon_id Index of a polygon
+         */
+        bool is_polygon_on_border( index_t polygon_id ) const;
+
+        /*!
          * Return all the edges of a polygon that are on border
          * @param[in] polygon_id Index of a polygon
          */

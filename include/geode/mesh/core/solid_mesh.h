@@ -293,6 +293,20 @@ namespace geode
          */
         bool is_polyhedron_facet_on_border(
             const PolyhedronFacet& polyhedron_facet ) const;
+        /*!
+         * Return true if at least on polyhedron facet is on border
+         * @param[in] polyhedron_id Index of a polyhedron
+         */
+        bool is_polyhedron_on_border( index_t polyhedron_id ) const;
+
+        /*!
+         * Return true if the edge belongs to the facet
+         * @param[in] polyhedron_facet Local index of facet in polyhedron.
+         * @param[in] edge_vertices Indices of edge vertices.
+         */
+        bool is_edge_in_polyhedron_facet(
+            const PolyhedronFacet& polyhedron_facet,
+            const std::array< index_t, 2 >& edge_vertices ) const;
 
         /*!
          * Return all the facets of a polyhedron that are on border
@@ -303,7 +317,7 @@ namespace geode
 
         /*!
          * Return the length of a given edge.
-         * @param[in] edge_id Index of edge.
+         * @param[in] edge_vertices Indices of edge vertices.
          */
         double edge_length(
             const std::array< index_t, 2 >& edge_vertices ) const;
@@ -343,6 +357,23 @@ namespace geode
          */
         PolyhedraAroundVertex polyhedra_around_vertex(
             index_t vertex_id ) const;
+
+        /*!
+         * Return true if at least one of thepolyhedron facets around the edge
+         * is on border
+         * @param[in] vertices Indices of edge vertices.
+         */
+        bool is_edge_on_border(
+            const std::array< index_t, 2 >& vertices ) const;
+
+        /*!
+         * Return true if at least one of thepolyhedron facets around the edge
+         * is on border
+         * @param[in] vertices Indices of edge vertices.
+         * @param[in] first_polyhedron One polyhedron index to begin research
+         */
+        bool is_edge_on_border( const std::array< index_t, 2 >& vertices,
+            index_t first_polyhedron ) const;
 
         /*!
          * Get all the polyhedra with both edge vertices.
