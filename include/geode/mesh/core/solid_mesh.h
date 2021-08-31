@@ -294,7 +294,8 @@ namespace geode
         bool is_polyhedron_facet_on_border(
             const PolyhedronFacet& polyhedron_facet ) const;
         /*!
-         * Return true if at least on polyhedron facet is on border
+         * Return true if at least one polyhedron facet is on border
+
          * @param[in] polyhedron_id Index of a polyhedron
          */
         bool is_polyhedron_on_border( index_t polyhedron_id ) const;
@@ -359,7 +360,8 @@ namespace geode
             index_t vertex_id ) const;
 
         /*!
-         * Return true if at least one of thepolyhedron facets around the edge
+         * Return true if at least one of the polyhedron facets around the edge
+
          * is on border
          * @param[in] vertices Indices of edge vertices.
          */
@@ -367,7 +369,8 @@ namespace geode
             const std::array< index_t, 2 >& vertices ) const;
 
         /*!
-         * Return true if at least one of thepolyhedron facets around the edge
+         * Return true if at least one of the polyhedron facets around the edge
+
          * is on border
          * @param[in] vertices Indices of edge vertices.
          * @param[in] first_polyhedron One polyhedron index to begin research
