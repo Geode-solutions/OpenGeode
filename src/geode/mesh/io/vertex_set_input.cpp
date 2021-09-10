@@ -53,6 +53,9 @@ namespace geode
                 VertexSetBuilder::create( *vertex_set )
                     ->set_name( filename_without_extension( filename ) );
             }
+            Logger::info( "VertexSet loaded from ", filename );
+            Logger::info(
+                "VertexSet has: ", vertex_set->nb_vertices(), " vertices" );
             return vertex_set;
         }
         catch( const OpenGeodeException& e )

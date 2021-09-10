@@ -85,6 +85,8 @@ namespace geode
     template < index_t dimension >
     void Blocks< dimension >::save_blocks( absl::string_view directory ) const
     {
+        const auto level = Logger::level();
+        Logger::set_level( Logger::Level::warn );
         const auto prefix = absl::StrCat(
             directory, "/", Block< dimension >::component_type_static().get() );
         for( const auto& block : blocks() )
@@ -118,6 +120,7 @@ namespace geode
                     "SolidMesh type" );
             }
         }
+        Logger::set_level( level );
         impl_->save_components( absl::StrCat( directory, "/blocks" ) );
     }
 
@@ -126,6 +129,8 @@ namespace geode
     {
         impl_->load_components( absl::StrCat( directory, "/blocks" ) );
         const auto mapping = impl_->file_mapping( directory );
+        const auto level = Logger::level();
+        Logger::set_level( Logger::Level::warn );
         for( auto& block : modifiable_blocks() )
         {
             const auto file = mapping.at( block.component_id().id().string() );
@@ -150,6 +155,7 @@ namespace geode
                     typename Block< dimension >::BlocksKey{} );
             }
         }
+        Logger::set_level( level );
     }
 
     template < index_t dimension >

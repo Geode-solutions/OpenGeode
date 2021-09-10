@@ -50,6 +50,11 @@ namespace geode
                     *triangulated_surface )
                     ->set_name( filename_without_extension( filename ) );
             }
+            Logger::info(
+                "TriangulatedSurface", dimension, "D loaded from ", filename );
+            Logger::info( "TriangulatedSurface", dimension,
+                "D has: ", triangulated_surface->nb_vertices(), " vertices, ",
+                triangulated_surface->nb_polygons(), " triangles" );
             return triangulated_surface;
         }
         catch( const OpenGeodeException& e )

@@ -39,6 +39,8 @@ namespace geode
                     extension_from_filename( filename ).data(),
                     tetrahedral_solid, filename );
             output->write();
+            Logger::info(
+                "TetrahedralSolid", dimension, "D saved in ", filename );
         }
         catch( const OpenGeodeException& e )
         {

@@ -34,6 +34,7 @@ namespace geode
             const auto output = GraphOutputFactory::create(
                 extension_from_filename( filename ).data(), graph, filename );
             output->write();
+            Logger::info( "Graph saved in ", filename );
         }
         catch( const OpenGeodeException& e )
         {

@@ -37,6 +37,7 @@ namespace geode
                 extension_from_filename( filename ).data(), edged_curve,
                 filename );
             output->write();
+            Logger::info( "EdgedCurve", dimension, "D saved in ", filename );
         }
         catch( const OpenGeodeException& e )
         {

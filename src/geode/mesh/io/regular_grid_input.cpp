@@ -37,7 +37,13 @@ namespace geode
             auto input = RegularGridInputFactory< dimension >::create(
                 extension_from_filename( filename ).data(), filename );
             input->read();
-            return input->regular_grid();
+            auto grid = input->regular_grid();
+
+            Logger::info(
+                "RegularGrid", dimension, "D loaded from ", filename );
+            Logger::info( "RegularGrid", dimension, "D has: ", grid->nb_cells(),
+                " cells" );
+            return grid;
         }
         catch( const OpenGeodeException& e )
         {

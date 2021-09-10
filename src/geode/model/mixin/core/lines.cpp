@@ -80,6 +80,8 @@ namespace geode
     {
         const auto prefix = absl::StrCat(
             directory, "/", Line< dimension >::component_type_static().get() );
+        const auto level = Logger::level();
+        Logger::set_level( Logger::Level::warn );
         for( const auto& line : lines() )
         {
             const auto& mesh = line.mesh();
@@ -87,6 +89,7 @@ namespace geode
                 prefix, line.id().string(), ".", mesh.native_extension() );
             save_edged_curve( mesh, file );
         }
+        Logger::set_level( level );
         impl_->save_components( absl::StrCat( directory, "/lines" ) );
     }
 
@@ -95,6 +98,8 @@ namespace geode
     {
         impl_->load_components( absl::StrCat( directory, "/lines" ) );
         const auto mapping = impl_->file_mapping( directory );
+        const auto level = Logger::level();
+        Logger::set_level( Logger::Level::warn );
         for( auto& line : modifiable_lines() )
         {
             const auto file = mapping.at( line.component_id().id().string() );
@@ -102,6 +107,7 @@ namespace geode
                 load_edged_curve< dimension >( line.mesh_type(), file ),
                 typename Line< dimension >::LinesKey{} );
         }
+        Logger::set_level( level );
     }
 
     template < index_t dimension >

@@ -45,6 +45,9 @@ namespace geode
                 GraphBuilder::create( *graph )->set_name(
                     filename_without_extension( filename ) );
             }
+            Logger::info( "Graph loaded from ", filename );
+            Logger::info( "Graph has: ", graph->nb_vertices(), " vertices, ",
+                graph->nb_edges(), " edges" );
             return graph;
         }
         catch( const OpenGeodeException& e )

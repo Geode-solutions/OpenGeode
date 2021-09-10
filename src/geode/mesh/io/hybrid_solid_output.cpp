@@ -37,6 +37,7 @@ namespace geode
                 extension_from_filename( filename ).data(), hybrid_solid,
                 filename );
             output->write();
+            Logger::info( "HybridSolid", dimension, "D saved in ", filename );
         }
         catch( const OpenGeodeException& e )
         {

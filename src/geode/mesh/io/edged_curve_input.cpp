@@ -47,6 +47,10 @@ namespace geode
                 EdgedCurveBuilder< dimension >::create( *edged_curve )
                     ->set_name( filename_without_extension( filename ) );
             }
+            Logger::info( "EdgedCurve", dimension, "D loaded from ", filename );
+            Logger::info( "EdgedCurve", dimension,
+                "D has: ", edged_curve->nb_vertices(), " vertices, ",
+                edged_curve->nb_edges(), " edges" );
             return edged_curve;
         }
         catch( const OpenGeodeException& e )

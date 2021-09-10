@@ -47,6 +47,9 @@ namespace geode
                 PointSetBuilder< dimension >::create( *point_set )
                     ->set_name( filename_without_extension( filename ) );
             }
+            Logger::info( "PointSet", dimension, "D loaded from ", filename );
+            Logger::info( "PointSet", dimension,
+                "D has: ", point_set->nb_vertices(), " vertices" );
             return point_set;
         }
         catch( const OpenGeodeException& e )
