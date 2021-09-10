@@ -37,6 +37,7 @@ namespace geode
                 extension_from_filename( filename ).data(), regular_grid,
                 filename );
             output->write();
+            Logger::info( "RegularGrid", dimension, "D saved in ", filename );
         }
         catch( const OpenGeodeException& e )
         {

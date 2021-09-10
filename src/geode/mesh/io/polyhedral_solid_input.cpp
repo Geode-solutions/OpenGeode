@@ -48,6 +48,11 @@ namespace geode
                 PolyhedralSolidBuilder< dimension >::create( *polyhedral_solid )
                     ->set_name( filename_without_extension( filename ) );
             }
+            Logger::info(
+                "PolyhedralSolid", dimension, "D loaded from ", filename );
+            Logger::info( "PolyhedralSolid", dimension,
+                "D has: ", polyhedral_solid->nb_vertices(), " vertices, ",
+                polyhedral_solid->nb_polyhedra(), " polyhedra" );
             return polyhedral_solid;
         }
         catch( const OpenGeodeException& e )

@@ -39,6 +39,8 @@ namespace geode
                     extension_from_filename( filename ).data(),
                     triangulated_surface, filename );
             output->write();
+            Logger::info(
+                "TriangulatedSurface", dimension, "D saved in ", filename );
         }
         catch( const OpenGeodeException& e )
         {

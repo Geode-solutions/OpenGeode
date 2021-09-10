@@ -82,6 +82,8 @@ namespace geode
     {
         const auto prefix = absl::StrCat( directory, "/",
             Corner< dimension >::component_type_static().get() );
+        const auto level = Logger::level();
+        Logger::set_level( Logger::Level::warn );
         for( const auto& corner : corners() )
         {
             const auto& mesh = corner.mesh();
@@ -89,6 +91,7 @@ namespace geode
                 prefix, corner.id().string(), ".", mesh.native_extension() );
             save_point_set( mesh, file );
         }
+        Logger::set_level( level );
         impl_->save_components( absl::StrCat( directory, "/corners" ) );
     }
 
@@ -97,6 +100,8 @@ namespace geode
     {
         impl_->load_components( absl::StrCat( directory, "/corners" ) );
         const auto mapping = impl_->file_mapping( directory );
+        const auto level = Logger::level();
+        Logger::set_level( Logger::Level::warn );
         for( auto& corner : modifiable_corners() )
         {
             const auto file = mapping.at( corner.component_id().id().string() );
@@ -104,6 +109,7 @@ namespace geode
                 load_point_set< dimension >( corner.mesh_type(), file ),
                 typename Corner< dimension >::CornersKey{} );
         }
+        Logger::set_level( level );
     }
 
     template < index_t dimension >

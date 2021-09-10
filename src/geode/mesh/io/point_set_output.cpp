@@ -37,6 +37,7 @@ namespace geode
                 extension_from_filename( filename ).data(), point_set,
                 filename );
             output->write();
+            Logger::info( "PointSet", dimension, "D saved in ", filename );
         }
         catch( const OpenGeodeException& e )
         {

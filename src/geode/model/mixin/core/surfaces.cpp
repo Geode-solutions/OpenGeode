@@ -90,6 +90,8 @@ namespace geode
     {
         const auto prefix = absl::StrCat( directory, "/",
             Surface< dimension >::component_type_static().get() );
+        const auto level = Logger::level();
+        Logger::set_level( Logger::Level::warn );
         for( const auto& surface : surfaces() )
         {
             const auto& mesh = surface.mesh();
@@ -114,6 +116,7 @@ namespace geode
                     "SurfaceMesh type" );
             }
         }
+        Logger::set_level( level );
         impl_->save_components( absl::StrCat( directory, "/surfaces" ) );
     }
 
@@ -122,6 +125,8 @@ namespace geode
     {
         impl_->load_components( absl::StrCat( directory, "/surfaces" ) );
         const auto mapping = impl_->file_mapping( directory );
+        const auto level = Logger::level();
+        Logger::set_level( Logger::Level::warn );
         for( auto& surface : modifiable_surfaces() )
         {
             const auto file =
@@ -140,6 +145,7 @@ namespace geode
                     typename Surface< dimension >::SurfacesKey{} );
             }
         }
+        Logger::set_level( level );
     }
 
     template < index_t dimension >

@@ -36,6 +36,7 @@ namespace geode
                 extension_from_filename( filename ).data(), vertex_set,
                 filename );
             output->write();
+            Logger::info( "VertexSet saved in ", filename );
         }
         catch( const OpenGeodeException& e )
         {

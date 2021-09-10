@@ -39,6 +39,8 @@ namespace geode
                     extension_from_filename( filename ).data(),
                     polygonal_surface, filename );
             output->write();
+            Logger::info(
+                "PolygonalSurface", dimension, "D saved in ", filename );
         }
         catch( const OpenGeodeException& e )
         {

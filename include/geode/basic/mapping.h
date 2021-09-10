@@ -30,11 +30,11 @@
 
 namespace geode
 {
-    template < typename T >
+    template < typename T1, typename T2 = T1 >
     class BijectiveMapping
     {
     public:
-        void map( const T& in, const T& out )
+        void map( const T1& in, const T2& out )
         {
             in2out_.emplace( in, out );
             out2in_.emplace( out, in );
@@ -46,28 +46,28 @@ namespace geode
             out2in_.reserve( capacity );
         }
 
-        bool has_mapping_input( const T& value ) const
+        bool has_mapping_input( const T1& value ) const
         {
             return in2out_.contains( value );
         }
 
-        bool has_mapping_output( const T& value ) const
+        bool has_mapping_output( const T2& value ) const
         {
             return out2in_.contains( value );
         }
 
-        const T& in2out( const T& in ) const
+        const T2& in2out( const T1& in ) const
         {
             return in2out_.at( in );
         }
-        const T& out2in( const T& out ) const
+        const T1& out2in( const T2& out ) const
         {
             return out2in_.at( out );
         }
 
     private:
-        absl::flat_hash_map< T, T > in2out_;
-        absl::flat_hash_map< T, T > out2in_;
+        absl::flat_hash_map< T1, T2 > in2out_;
+        absl::flat_hash_map< T2, T1 > out2in_;
     };
 
     template < typename T, index_t Capacity >
