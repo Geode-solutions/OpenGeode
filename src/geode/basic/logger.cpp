@@ -98,7 +98,7 @@ namespace geode
 
     Logger::Logger()
     {
-        impl_->set_level( Level::debug );
+        impl_->set_level( Level::trace );
     }
 
     Logger::~Logger() {}
