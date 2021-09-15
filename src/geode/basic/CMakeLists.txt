@@ -70,6 +70,7 @@ add_geode_library(
         ghcFilesystem::ghc_filesystem
         Bitsery::bitsery
     PRIVATE_DEPENDENCIES
+        Async++
         spdlog::spdlog_header_only
         MINIZIP::minizip
 )

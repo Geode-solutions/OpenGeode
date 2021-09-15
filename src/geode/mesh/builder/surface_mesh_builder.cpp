@@ -358,10 +358,6 @@ namespace geode
     {
         const auto polygon_vertex_id =
             surface_mesh_->polygon_vertex( polygon_vertex );
-        const auto previous_id = surface_mesh_->polygon_vertex(
-            surface_mesh_->previous_polygon_vertex( polygon_vertex ) );
-        const auto next_id = surface_mesh_->polygon_vertex(
-            surface_mesh_->next_polygon_edge( polygon_vertex ) );
 
         if( polygon_vertex_id != NO_ID )
         {
@@ -385,6 +381,10 @@ namespace geode
 
         if( surface_mesh_->are_edges_enabled() )
         {
+            const auto previous_id = surface_mesh_->polygon_vertex(
+                surface_mesh_->previous_polygon_vertex( polygon_vertex ) );
+            const auto next_id = surface_mesh_->polygon_vertex(
+                surface_mesh_->next_polygon_edge( polygon_vertex ) );
             auto edges = edges_builder();
             edges.update_edge_vertex(
                 { polygon_vertex_id, next_id }, 0, vertex_id );
