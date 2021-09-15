@@ -114,5 +114,7 @@ add_geode_library(
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
         ${PROJECT_NAME}::mesh
+    PRIVATE_DEPENDENCIES
+        Async++
 )
 

@@ -66,7 +66,7 @@ namespace geode
                 values[i - nb_removed_elements] = values[i];
             }
         }
-        values.resize( to_delete.size() - nb_removed_elements );
+        values.erase( values.end() - nb_removed_elements, values.end() );
         return nb_removed_elements;
     }
 
@@ -85,12 +85,13 @@ namespace geode
         OPENGEODE_ASSERT( to_keep.size() == in_values.size(),
             "[extract_vector_elements] Number of elements in the two vectors "
             "should match" );
-        if( absl::c_find( to_keep, false ) == to_keep.end() )
+        const index_t nb = absl::c_count( to_keep, true );
+        if( nb == in_values.size() )
         {
             return in_values;
         }
         std::vector< T > out_values;
-        out_values.reserve( absl::c_count( to_keep, true ) );
+        out_values.reserve( nb );
         for( const auto i : Indices{ to_keep } )
         {
             if( to_keep[i] )

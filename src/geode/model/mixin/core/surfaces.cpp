@@ -23,6 +23,8 @@
 
 #include <geode/model/mixin/core/surfaces.h>
 
+#include <async++.h>
+
 #include <geode/basic/pimpl_impl.h>
 #include <geode/basic/range.h>
 
@@ -88,36 +90,41 @@ namespace geode
     void Surfaces< dimension >::save_surfaces(
         absl::string_view directory ) const
     {
+        impl_->save_components( absl::StrCat( directory, "/surfaces" ) );
         const auto prefix = absl::StrCat( directory, "/",
             Surface< dimension >::component_type_static().get() );
         const auto level = Logger::level();
         Logger::set_level( Logger::Level::warn );
+        absl::FixedArray< async::task< void > > tasks( nb_surfaces() );
+        index_t count{ 0 };
         for( const auto& surface : surfaces() )
         {
-            const auto& mesh = surface.mesh();
-            const auto file = absl::StrCat(
-                prefix, surface.id().string(), ".", mesh.native_extension() );
-            if( const auto* triangulated =
-                    dynamic_cast< const TriangulatedSurface< dimension >* >(
-                        &mesh ) )
-            {
-                save_triangulated_surface( *triangulated, file );
-            }
-            else if( const auto* polygonal =
-                         dynamic_cast< const PolygonalSurface< dimension >* >(
-                             &mesh ) )
-            {
-                save_polygonal_surface( *polygonal, file );
-            }
-            else
-            {
-                throw OpenGeodeException(
-                    "[Surfaces::save_surfaces] Cannot find the explicit "
-                    "SurfaceMesh type" );
-            }
+            tasks[count++] = async::spawn( [&surface, &prefix] {
+                const auto& mesh = surface.mesh();
+                const auto file = absl::StrCat( prefix, surface.id().string(),
+                    ".", mesh.native_extension() );
+                if( const auto* triangulated =
+                        dynamic_cast< const TriangulatedSurface< dimension >* >(
+                            &mesh ) )
+                {
+                    save_triangulated_surface( *triangulated, file );
+                }
+                else if( const auto* polygonal = dynamic_cast<
+                             const PolygonalSurface< dimension >* >( &mesh ) )
+                {
+                    save_polygonal_surface( *polygonal, file );
+                }
+                else
+                {
+                    throw OpenGeodeException(
+                        "[Surfaces::save_surfaces] Cannot find the explicit "
+                        "SurfaceMesh type" );
+                }
+            } );
         }
-        Logger::set_level( level );
-        impl_->save_components( absl::StrCat( directory, "/surfaces" ) );
+        async::when_all( tasks.begin(), tasks.end() )
+            .then( [level] { Logger::set_level( level ); } )
+            .wait();
     }
 
     template < index_t dimension >
@@ -127,25 +134,31 @@ namespace geode
         const auto mapping = impl_->file_mapping( directory );
         const auto level = Logger::level();
         Logger::set_level( Logger::Level::warn );
+        absl::FixedArray< async::task< void > > tasks( nb_surfaces() );
+        index_t count{ 0 };
         for( auto& surface : modifiable_surfaces() )
         {
-            const auto file =
-                mapping.at( surface.component_id().id().string() );
-            if( MeshFactory::type( surface.mesh_type() )
-                == TriangulatedSurface< dimension >::type_name_static() )
-            {
-                surface.set_mesh( load_triangulated_surface< dimension >(
-                                      surface.mesh_type(), file ),
-                    typename Surface< dimension >::SurfacesKey{} );
-            }
-            else
-            {
-                surface.set_mesh( load_polygonal_surface< dimension >(
-                                      surface.mesh_type(), file ),
-                    typename Surface< dimension >::SurfacesKey{} );
-            }
+            tasks[count++] = async::spawn( [&surface, &mapping] {
+                const auto file =
+                    mapping.at( surface.component_id().id().string() );
+                if( MeshFactory::type( surface.mesh_type() )
+                    == TriangulatedSurface< dimension >::type_name_static() )
+                {
+                    surface.set_mesh( load_triangulated_surface< dimension >(
+                                          surface.mesh_type(), file ),
+                        typename Surface< dimension >::SurfacesKey{} );
+                }
+                else
+                {
+                    surface.set_mesh( load_polygonal_surface< dimension >(
+                                          surface.mesh_type(), file ),
+                        typename Surface< dimension >::SurfacesKey{} );
+                }
+            } );
         }
-        Logger::set_level( level );
+        async::when_all( tasks.begin(), tasks.end() )
+            .then( [level] { Logger::set_level( level ); } )
+            .wait();
     }
 
     template < index_t dimension >

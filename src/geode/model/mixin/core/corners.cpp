@@ -23,6 +23,8 @@
 
 #include <geode/model/mixin/core/corners.h>
 
+#include <async++.h>
+
 #include <geode/basic/pimpl_impl.h>
 #include <geode/basic/range.h>
 
@@ -80,19 +82,25 @@ namespace geode
     template < index_t dimension >
     void Corners< dimension >::save_corners( absl::string_view directory ) const
     {
+        impl_->save_components( absl::StrCat( directory, "/corners" ) );
         const auto prefix = absl::StrCat( directory, "/",
             Corner< dimension >::component_type_static().get() );
         const auto level = Logger::level();
         Logger::set_level( Logger::Level::warn );
+        absl::FixedArray< async::task< void > > tasks( nb_corners() );
+        index_t count{ 0 };
         for( const auto& corner : corners() )
         {
-            const auto& mesh = corner.mesh();
-            const auto file = absl::StrCat(
-                prefix, corner.id().string(), ".", mesh.native_extension() );
-            save_point_set( mesh, file );
+            tasks[count++] = async::spawn( [&corner, &prefix] {
+                const auto& mesh = corner.mesh();
+                const auto file = absl::StrCat( prefix, corner.id().string(),
+                    ".", mesh.native_extension() );
+                save_point_set( mesh, file );
+            } );
         }
-        Logger::set_level( level );
-        impl_->save_components( absl::StrCat( directory, "/corners" ) );
+        async::when_all( tasks.begin(), tasks.end() )
+            .then( [level] { Logger::set_level( level ); } )
+            .wait();
     }
 
     template < index_t dimension >
@@ -102,14 +110,21 @@ namespace geode
         const auto mapping = impl_->file_mapping( directory );
         const auto level = Logger::level();
         Logger::set_level( Logger::Level::warn );
+        absl::FixedArray< async::task< void > > tasks( nb_corners() );
+        index_t count{ 0 };
         for( auto& corner : modifiable_corners() )
         {
-            const auto file = mapping.at( corner.component_id().id().string() );
-            corner.set_mesh(
-                load_point_set< dimension >( corner.mesh_type(), file ),
-                typename Corner< dimension >::CornersKey{} );
+            tasks[count++] = async::spawn( [&corner, &mapping] {
+                const auto file =
+                    mapping.at( corner.component_id().id().string() );
+                corner.set_mesh(
+                    load_point_set< dimension >( corner.mesh_type(), file ),
+                    typename Corner< dimension >::CornersKey{} );
+            } );
         }
-        Logger::set_level( level );
+        async::when_all( tasks.begin(), tasks.end() )
+            .then( [level] { Logger::set_level( level ); } )
+            .wait();
     }
 
     template < index_t dimension >

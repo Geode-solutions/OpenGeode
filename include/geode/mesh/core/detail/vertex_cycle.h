@@ -96,6 +96,11 @@ namespace geode
                 return !operator==( other );
             }
 
+            bool operator<( const VertexCycle& other ) const
+            {
+                return this->vertices() < other.vertices();
+            }
+
         private:
             VertexCycle() = default;
 

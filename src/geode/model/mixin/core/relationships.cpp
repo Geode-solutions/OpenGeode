@@ -136,16 +136,18 @@ namespace geode
         absl::optional< index_t > check_relation_exists(
             const uuid& from, const uuid& to, const RelationType type ) const
         {
-            const auto& edges_around =
-                graph_->edges_around_vertex( vertex_id( from ) );
-            for( const auto& edge_vertex : edges_around )
+            for( const auto& edge_vertex :
+                graph_->edges_around_vertex( vertex_id( from ) ) )
             {
+                if( relation_type( edge_vertex.edge_id ) != type )
+                {
+                    continue;
+                }
                 const auto& other =
                     this->vertex_component_id( { edge_vertex.edge_id,
                         static_cast< local_index_t >(
                             ( edge_vertex.vertex_id + 1 ) % 2 ) } );
-                if( to == other.id()
-                    && relation_type( edge_vertex.edge_id ) == type )
+                if( to == other.id() )
                 {
                     return edge_vertex.edge_id;
                 }
