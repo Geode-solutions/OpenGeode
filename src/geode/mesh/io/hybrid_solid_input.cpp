@@ -39,7 +39,7 @@ namespace geode
         {
             auto hybrid_solid = HybridSolid< dimension >::create( impl );
             auto input = HybridSolidInputFactory< dimension >::create(
-                extension_from_filename( filename ).data(), *hybrid_solid,
+                to_string( extension_from_filename( filename ) ), *hybrid_solid,
                 filename );
             input->read();
             if( hybrid_solid->name() == Identifier::DEFAULT_NAME )

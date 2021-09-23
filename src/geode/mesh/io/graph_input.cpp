@@ -38,7 +38,8 @@ namespace geode
         {
             auto graph = Graph::create( impl );
             auto input = GraphInputFactory::create(
-                extension_from_filename( filename ).data(), *graph, filename );
+                to_string( extension_from_filename( filename ) ), *graph,
+                filename );
             input->read();
             if( graph->name() == Identifier::DEFAULT_NAME )
             {

@@ -32,7 +32,8 @@ namespace geode
         try
         {
             const auto output = GraphOutputFactory::create(
-                extension_from_filename( filename ).data(), graph, filename );
+                to_string( extension_from_filename( filename ) ), graph,
+                filename );
             output->write();
             Logger::info( "Graph saved in ", filename );
         }

@@ -39,7 +39,7 @@ namespace geode
         {
             auto point_set = PointSet< dimension >::create( impl );
             auto input = PointSetInputFactory< dimension >::create(
-                extension_from_filename( filename ).data(), *point_set,
+                to_string( extension_from_filename( filename ) ), *point_set,
                 filename );
             input->read();
             if( point_set->name() == Identifier::DEFAULT_NAME )

@@ -41,7 +41,7 @@ namespace geode
 
         void read() final
         {
-            std::ifstream file{ this->filename().data(),
+            std::ifstream file{ to_string( this->filename() ),
                 std::ifstream::binary };
             TContext context{};
             register_basic_deserialize_pcontext( std::get< 0 >( context ) );

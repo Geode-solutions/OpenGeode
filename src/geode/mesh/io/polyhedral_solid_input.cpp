@@ -40,8 +40,8 @@ namespace geode
             auto polyhedral_solid =
                 PolyhedralSolid< dimension >::create( impl );
             auto input = PolyhedralSolidInputFactory< dimension >::create(
-                extension_from_filename( filename ).data(), *polyhedral_solid,
-                filename );
+                to_string( extension_from_filename( filename ) ),
+                *polyhedral_solid, filename );
             input->read();
             if( polyhedral_solid->name() == Identifier::DEFAULT_NAME )
             {

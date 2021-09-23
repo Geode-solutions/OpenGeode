@@ -32,7 +32,8 @@ namespace geode
         try
         {
             const auto output = SectionOutputFactory::create(
-                extension_from_filename( filename ).data(), section, filename );
+                to_string( extension_from_filename( filename ) ), section,
+                filename );
             output->write();
             Logger::info( "Section saved in ", filename );
         }
