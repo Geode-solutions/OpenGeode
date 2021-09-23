@@ -34,7 +34,7 @@ namespace geode
         try
         {
             const auto output = RegularGridOutputFactory< dimension >::create(
-                extension_from_filename( filename ).data(), regular_grid,
+                to_string( extension_from_filename( filename ) ), regular_grid,
                 filename );
             output->write();
             Logger::info( "RegularGrid", dimension, "D saved in ", filename );

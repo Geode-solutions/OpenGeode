@@ -36,7 +36,7 @@ namespace geode
         {
             const auto output =
                 PolygonalSurfaceOutputFactory< dimension >::create(
-                    extension_from_filename( filename ).data(),
+                    to_string( extension_from_filename( filename ) ),
                     polygonal_surface, filename );
             output->write();
             Logger::info(

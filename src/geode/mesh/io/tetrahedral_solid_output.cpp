@@ -36,7 +36,7 @@ namespace geode
         {
             const auto output =
                 TetrahedralSolidOutputFactory< dimension >::create(
-                    extension_from_filename( filename ).data(),
+                    to_string( extension_from_filename( filename ) ),
                     tetrahedral_solid, filename );
             output->write();
             Logger::info(

@@ -41,7 +41,7 @@ namespace geode
             auto triangulated_surface =
                 TriangulatedSurface< dimension >::create( impl );
             auto input = TriangulatedSurfaceInputFactory< dimension >::create(
-                extension_from_filename( filename ).data(),
+                to_string( extension_from_filename( filename ) ),
                 *triangulated_surface, filename );
             input->read();
             if( triangulated_surface->name() == Identifier::DEFAULT_NAME )

@@ -35,7 +35,8 @@ namespace geode
         {
             BRep brep;
             auto input = BRepInputFactory::create(
-                extension_from_filename( filename ).data(), brep, filename );
+                to_string( extension_from_filename( filename ) ), brep,
+                filename );
             input->read();
             if( brep.name() == Identifier::DEFAULT_NAME )
             {

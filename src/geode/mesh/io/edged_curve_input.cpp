@@ -39,7 +39,7 @@ namespace geode
         {
             auto edged_curve = EdgedCurve< dimension >::create( impl );
             auto input = EdgedCurveInputFactory< dimension >::create(
-                extension_from_filename( filename ).data(), *edged_curve,
+                to_string( extension_from_filename( filename ) ), *edged_curve,
                 filename );
             input->read();
             if( edged_curve->name() == Identifier::DEFAULT_NAME )

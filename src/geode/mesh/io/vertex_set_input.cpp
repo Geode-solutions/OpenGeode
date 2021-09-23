@@ -45,7 +45,7 @@ namespace geode
         {
             auto vertex_set = VertexSet::create( impl );
             auto input = VertexSetInputFactory::create(
-                extension_from_filename( filename ).data(), *vertex_set,
+                to_string( extension_from_filename( filename ) ), *vertex_set,
                 filename );
             input->read();
             if( vertex_set->name() == Identifier::DEFAULT_NAME )

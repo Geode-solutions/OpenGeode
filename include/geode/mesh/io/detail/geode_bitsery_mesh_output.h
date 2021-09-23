@@ -32,7 +32,8 @@
 #define BITSERY_WRITE()                                                        \
     void write() const final                                                   \
     {                                                                          \
-        std::ofstream file{ this->filename().data(), std::ofstream::binary };  \
+        std::ofstream file{ to_string( this->filename() ),                     \
+            std::ofstream::binary };                                           \
         TContext context{};                                                    \
         register_basic_serialize_pcontext( std::get< 0 >( context ) );         \
         register_geometry_serialize_pcontext( std::get< 0 >( context ) );      \

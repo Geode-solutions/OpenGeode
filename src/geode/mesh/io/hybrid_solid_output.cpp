@@ -34,7 +34,7 @@ namespace geode
         try
         {
             const auto output = HybridSolidOutputFactory< dimension >::create(
-                extension_from_filename( filename ).data(), hybrid_solid,
+                to_string( extension_from_filename( filename ) ), hybrid_solid,
                 filename );
             output->write();
             Logger::info( "HybridSolid", dimension, "D saved in ", filename );

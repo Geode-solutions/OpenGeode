@@ -35,7 +35,7 @@ namespace geode
         try
         {
             auto input = RegularGridInputFactory< dimension >::create(
-                extension_from_filename( filename ).data(), filename );
+                to_string( extension_from_filename( filename ) ), filename );
             input->read();
             auto grid = input->regular_grid();
 

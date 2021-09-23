@@ -40,8 +40,8 @@ namespace geode
             auto polygonal_surface =
                 PolygonalSurface< dimension >::create( impl );
             auto input = PolygonalSurfaceInputFactory< dimension >::create(
-                extension_from_filename( filename ).data(), *polygonal_surface,
-                filename );
+                to_string( extension_from_filename( filename ) ),
+                *polygonal_surface, filename );
             input->read();
             if( polygonal_surface->name() == Identifier::DEFAULT_NAME )
             {

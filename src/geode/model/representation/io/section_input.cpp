@@ -35,7 +35,8 @@ namespace geode
         {
             Section section;
             auto input = SectionInputFactory::create(
-                extension_from_filename( filename ).data(), section, filename );
+                to_string( extension_from_filename( filename ) ), section,
+                filename );
             input->read();
             if( section.name() == Identifier::DEFAULT_NAME )
             {

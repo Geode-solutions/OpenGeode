@@ -89,7 +89,8 @@ namespace geode
 
             void save_components( absl::string_view filename ) const
             {
-                std::ofstream file{ filename.data(), std::ofstream::binary };
+                std::ofstream file{ to_string( filename ),
+                    std::ofstream::binary };
                 TContext context{};
                 register_librairies_in_serialize_pcontext( context );
                 Serializer archive{ context, file };
@@ -108,11 +109,12 @@ namespace geode
 
             void load_components( absl::string_view filename )
             {
-                if( !ghc::filesystem::exists( filename.data() ) )
+                if( !ghc::filesystem::exists( to_string( filename ) ) )
                 {
                     return;
                 }
-                std::ifstream file{ filename.data(), std::ifstream::binary };
+                std::ifstream file{ to_string( filename ),
+                    std::ifstream::binary };
                 TContext context{};
                 register_librairies_in_deserialize_pcontext( context );
                 Deserializer archive{ context, file };
@@ -131,8 +133,8 @@ namespace geode
                 absl::string_view directory ) const
             {
                 absl::flat_hash_map< std::string, std::string > mapping;
-                for( const auto& file :
-                    ghc::filesystem::directory_iterator( directory.data() ) )
+                for( const auto& file : ghc::filesystem::directory_iterator(
+                         to_string( directory ) ) )
                 {
                     auto path = file.path();
                     auto filename = path.replace_extension( "" ).string();
