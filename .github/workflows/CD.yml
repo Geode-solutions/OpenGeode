@@ -48,14 +48,14 @@ jobs:
       
   release-linux-wheel:
     runs-on: ubuntu-18.04
-    container: "geodesolutions/centos8"
+    container: "quay.io/pypa/manylinux2014_x86_64"
     strategy:
       matrix:
         config:
         - {python: 3.6, tag: "cp36-cp36m"}
         - {python: 3.7, tag: "cp37-cp37m"}
         - {python: 3.8, tag: "cp38-cp38"}
-        # - {python: 3.9, tag: "cp39-cp39"}
+        - {python: 3.9, tag: "cp39-cp39"}
     steps:
     - uses: actions/checkout@v1
     - name: Compile
