@@ -12,7 +12,7 @@ jobs:
       matrix:
         config:
         - {container: "geodesolutions/ubuntu", system: "ubuntu", doc: true}
-        - {container: "geodesolutions/centos", system: "rhel", doc: false}
+        - {container: "quay.io/pypa/manylinux2014_x86_64", system: "rhel", doc: false}
         
     steps:
     - uses: actions/checkout@v1

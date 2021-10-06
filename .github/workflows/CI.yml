@@ -25,8 +25,8 @@ jobs:
         config:
         - {container: "geodesolutions/ubuntu", system: "ubuntu", build_type: "Debug", benchmark: false}
         - {container: "geodesolutions/ubuntu", system: "ubuntu", build_type: "Release", cmake_args: "-DUSE_BENCHMARK=ON", benchmark: true}
-        - {container: "geodesolutions/centos", system: "rhel", build_type: "Debug", benchmark: false}
-        - {container: "geodesolutions/centos", system: "rhel", build_type: "Release", benchmark: false}
+        - {container: "quay.io/pypa/manylinux2014_x86_64", system: "rhel", build_type: "Debug", benchmark: false}
+        - {container: "quay.io/pypa/manylinux2014_x86_64", system: "rhel", build_type: "Release", benchmark: false}
 
     steps:
     - uses: actions/checkout@v1
