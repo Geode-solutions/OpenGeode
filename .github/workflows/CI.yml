@@ -71,6 +71,7 @@ jobs:
         - {python: 3.7, tag: "cp37-cp37m"}
         - {python: 3.8, tag: "cp38-cp38"}
         - {python: 3.9, tag: "cp39-cp39"}
+        - {python: 3.10, tag: "cp310-cp310"}
     steps:
     - uses: actions/checkout@v1
     - name: Compile
@@ -126,7 +127,7 @@ jobs:
     strategy:
       matrix:
         config: [Debug, Release]
-        python: [3.6, 3.7, 3.8, 3.9]
+        python: [3.6, 3.7, 3.8, 3.9, "3.10"]
 
     steps:
     - uses: actions/checkout@v1
@@ -159,7 +160,7 @@ jobs:
     strategy:
       matrix:
         config: [Debug, Release]
-        python: [3.6, 3.7, 3.8, 3.9]
+        python: [3.6, 3.7, 3.8, 3.9, "3.10"]
 
     steps:
     - uses: actions/checkout@v1
