@@ -21,6 +21,8 @@
  *
  */
 
+#include "../../../basic/factory.h"
+
 #include <geode/model/representation/io/brep_input.h>
 #include <geode/model/representation/io/brep_output.h>
 
@@ -30,5 +32,7 @@ namespace geode
     {
         module.def( "save_brep", &save_brep );
         module.def( "load_brep", &load_brep );
+        PYTHON_FACTORY_CLASS( BRepInputFactory );
+        PYTHON_FACTORY_CLASS( BRepOutputFactory );
     }
 } // namespace geode

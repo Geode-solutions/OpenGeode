@@ -71,6 +71,12 @@ namespace pybind11
             : string_caster< absl::string_view, true >
         {
         };
+
+        template < typename Type >
+        struct type_caster< absl::FixedArray< Type > >
+            : list_caster< absl::FixedArray< Type >, Type >
+        {
+        };
     } // namespace detail
 } // namespace pybind11
 

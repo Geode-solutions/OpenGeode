@@ -21,6 +21,8 @@
  *
  */
 
+#include "../../basic/factory.h"
+
 #include <geode/mesh/io/edged_curve_input.h>
 #include <geode/mesh/io/edged_curve_output.h>
 
@@ -33,7 +35,9 @@
     module.def( load##dimension.c_str(),                                       \
         ( std::unique_ptr< EdgedCurve< dimension > >( * )(                     \
             absl::string_view ) )                                              \
-            & load_edged_curve< dimension > )
+            & load_edged_curve< dimension > );                                 \
+    PYTHON_FACTORY_CLASS( EdgedCurveInputFactory##dimension##D );              \
+    PYTHON_FACTORY_CLASS( EdgedCurveOutputFactory##dimension##D )
 
 namespace geode
 {

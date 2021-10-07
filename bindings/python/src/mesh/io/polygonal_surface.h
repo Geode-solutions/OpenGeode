@@ -21,6 +21,8 @@
  *
  */
 
+#include "../../basic/factory.h"
+
 #include <geode/mesh/io/polygonal_surface_input.h>
 #include <geode/mesh/io/polygonal_surface_output.h>
 
@@ -34,7 +36,9 @@
     module.def( load##dimension.c_str(),                                       \
         ( std::unique_ptr< PolygonalSurface< dimension > >( * )(               \
             absl::string_view ) )                                              \
-            & load_polygonal_surface< dimension > )
+            & load_polygonal_surface< dimension > );                           \
+    PYTHON_FACTORY_CLASS( PolygonalSurfaceInputFactory##dimension##D );        \
+    PYTHON_FACTORY_CLASS( PolygonalSurfaceOutputFactory##dimension##D )
 
 namespace geode
 {
