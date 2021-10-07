@@ -12,7 +12,7 @@ jobs:
       matrix:
         config:
         - {container: "geodesolutions/ubuntu", system: "ubuntu", doc: true}
-        - {container: "quay.io/pypa/manylinux2014_x86_64", system: "rhel", doc: false}
+        - {container: "geodesolutions/centos", system: "rhel", doc: false}
         
     steps:
     - uses: actions/checkout@v1
@@ -48,7 +48,7 @@ jobs:
       
   release-linux-wheel:
     runs-on: ubuntu-18.04
-    container: "quay.io/pypa/manylinux2014_x86_64"
+    container: "geodesolutions/centos"
     strategy:
       matrix:
         config:
