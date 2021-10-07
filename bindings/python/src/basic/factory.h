@@ -21,20 +21,9 @@
  *
  */
 
-#include "../../basic/factory.h"
+#include <geode/basic/factory.h>
 
-#include <geode/mesh/io/graph_input.h>
-#include <geode/mesh/io/graph_output.h>
-
-namespace geode
-{
-    void define_graph_io( pybind11::module& module )
-    {
-        module.def( "save_graph", &save_graph );
-        module.def(
-            "load_graph", ( std::unique_ptr< Graph >( * )( absl::string_view ) )
-                              & load_graph );
-        PYTHON_FACTORY_CLASS( GraphInputFactory );
-        PYTHON_FACTORY_CLASS( GraphOutputFactory );
-    }
-} // namespace geode
+#define PYTHON_FACTORY_CLASS( type )                                           \
+    pybind11::class_< type >( module, #type )                                  \
+        .def( "list_creators", &type::list_creators )                          \
+        .def( "has_creator", &type::has_creator )

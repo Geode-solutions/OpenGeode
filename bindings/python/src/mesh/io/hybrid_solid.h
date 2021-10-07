@@ -21,6 +21,8 @@
  *
  */
 
+#include "../../basic/factory.h"
+
 #include <geode/mesh/io/hybrid_solid_input.h>
 #include <geode/mesh/io/hybrid_solid_output.h>
 
@@ -33,7 +35,9 @@
     module.def( load##dimension.c_str(),                                       \
         ( std::unique_ptr< HybridSolid< dimension > >( * )(                    \
             absl::string_view ) )                                              \
-            & load_hybrid_solid< dimension > )
+            & load_hybrid_solid< dimension > );                                \
+    PYTHON_FACTORY_CLASS( HybridSolidInputFactory##dimension##D );             \
+    PYTHON_FACTORY_CLASS( HybridSolidOutputFactory##dimension##D )
 
 namespace geode
 {
