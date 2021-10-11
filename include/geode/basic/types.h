@@ -27,6 +27,8 @@
 #define M_PI 3.14159265358979323846
 #endif
 
+#include <absl/strings/string_view.h>
+
 namespace geode
 {
     static constexpr double global_epsilon{ 1E-8 };
