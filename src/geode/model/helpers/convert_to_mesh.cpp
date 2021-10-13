@@ -198,7 +198,8 @@ namespace
                 }
                 polyhedra[p] = builder_->create_polyhedron(
                     polyhedron_vertices, polyhedron_facet_vertices );
-                attribute_->set_value( polyhedra[p], block.id() );
+                attribute_->set_value(
+                    polyhedra[p], block.component_id().id() );
             }
             return polyhedra;
         }
@@ -299,7 +300,8 @@ namespace
                     }
                 }
                 polygons[p] = builder_->create_polygon( polygon );
-                attribute_->set_value( polygons[p], surface.id() );
+                attribute_->set_value(
+                    polygons[p], surface.component_id().id() );
             }
             return polygons;
         }
@@ -374,7 +376,7 @@ namespace
                 }
                 const auto edge =
                     builder_->create_edge( vertices[0], vertices[1] );
-                attribute_->set_value( edge, line.id() );
+                attribute_->set_value( edge, line.component_id().id() );
             }
         }
 
