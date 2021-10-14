@@ -37,7 +37,7 @@ namespace geode
     ALIAS_3D( SolidMesh );
     class BRep;
     class Section;
-    class uuid;
+    struct uuid;
 } // namespace geode
 
 namespace geode
