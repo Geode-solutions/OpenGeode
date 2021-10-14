@@ -85,7 +85,8 @@ namespace geode
         OPENGEODE_ASSERT( to_keep.size() == in_values.size(),
             "[extract_vector_elements] Number of elements in the two vectors "
             "should match" );
-        const auto nb = static_cast < index_t>(absl::c_count( to_keep, true ));
+        const auto nb =
+            static_cast< index_t >( absl::c_count( to_keep, true ) );
         if( nb == in_values.size() )
         {
             return in_values;

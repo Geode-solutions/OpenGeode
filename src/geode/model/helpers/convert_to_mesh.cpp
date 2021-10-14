@@ -495,7 +495,7 @@ namespace geode
             model, *surface );
         return std::make_tuple( std::move( surface ), std::move( solid ) );
     }
-    
+
     template std::unique_ptr< SurfaceMesh2D > opengeode_model_api
         convert_section_into_surface( const Section& section );
     template std::unique_ptr< PolygonalSurface2D > opengeode_model_api
