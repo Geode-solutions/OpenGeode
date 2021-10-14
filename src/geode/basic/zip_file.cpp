@@ -58,8 +58,10 @@ namespace geode
         {
             ghc::filesystem::remove( directory_ );
             const auto status = mz_zip_writer_close( writer_ );
-            if(
-                status != MZ_OK) { Logger::error("[ZipFile] Error closing zip for writing" );}
+            if( status != MZ_OK )
+            {
+                Logger::error( "[ZipFile] Error closing zip for writing" );
+            }
             mz_zip_writer_delete( &writer_ );
         }
 

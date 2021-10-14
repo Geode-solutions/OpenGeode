@@ -67,7 +67,8 @@ namespace geode
 
         index_t nb_relations( const uuid& id ) const
         {
-            return static_cast<index_t>(graph_->edges_around_vertex( vertex_id( id ) ).size());
+            return static_cast< index_t >(
+                graph_->edges_around_vertex( vertex_id( id ) ).size() );
         }
 
         RelationType relation_type( const index_t edge_id ) const
