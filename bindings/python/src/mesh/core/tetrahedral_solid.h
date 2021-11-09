@@ -33,7 +33,9 @@
             ( std::unique_ptr< TetrahedralSolid##dimension##D >( * )() )       \
                 & TetrahedralSolid##dimension##D::create )                     \
         .def( "clone", &TetrahedralSolid##dimension##D::clone )                \
-        .def( "tetra", &TetrahedralSolid##dimension##D::tetra )
+        .def( "tetra", &TetrahedralSolid##dimension##D::tetra )                \
+        .def( "facet_triangle",                                                \
+            &TetrahedralSolid##dimension##D::facet_triangle )
 
 namespace geode
 {
