@@ -346,8 +346,7 @@ namespace geode
         for( const auto d : LRange{ dimension } )
         {
             extreme_point.set_value(
-                d, this->origin().value( d )
-                       + ( this->nb_cells( d ) + 1 ) * this->cell_size( d ) );
+                d, origin().value( d ) + nb_cells( d ) * cell_size( d ) );
         }
         bbox.add_point( extreme_point );
         return bbox;
@@ -356,9 +355,9 @@ namespace geode
     template < index_t dimension >
     RegularGrid< dimension > RegularGrid< dimension >::clone() const
     {
-        RegularGrid< dimension > clone{ this->origin(), impl_->cells_numbers(),
+        RegularGrid< dimension > clone{ origin(), impl_->cells_numbers(),
             impl_->cells_sizes() };
-        clone.cell_attribute_manager().copy( this->cell_attribute_manager() );
+        clone.cell_attribute_manager().copy( cell_attribute_manager() );
         return clone;
     }
 

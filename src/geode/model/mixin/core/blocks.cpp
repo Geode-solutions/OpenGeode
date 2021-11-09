@@ -23,6 +23,8 @@
 
 #include <geode/model/mixin/core/blocks.h>
 
+#include <async++.h>
+
 #include <geode/basic/pimpl_impl.h>
 #include <geode/basic/range.h>
 
@@ -85,40 +87,48 @@ namespace geode
     template < index_t dimension >
     void Blocks< dimension >::save_blocks( absl::string_view directory ) const
     {
+        impl_->save_components( absl::StrCat( directory, "/blocks" ) );
         const auto prefix = absl::StrCat(
             directory, "/", Block< dimension >::component_type_static().get() );
+        const auto level = Logger::level();
+        Logger::set_level( Logger::Level::warn );
+        absl::FixedArray< async::task< void > > tasks( nb_blocks() );
+        index_t count{ 0 };
         for( const auto& block : blocks() )
         {
-            const auto& mesh = block.mesh();
-            const auto file = absl::StrCat(
-                prefix, block.id().string(), ".", mesh.native_extension() );
+            tasks[count++] = async::spawn( [&block, &prefix] {
+                const auto& mesh = block.mesh();
+                const auto file = absl::StrCat(
+                    prefix, block.id().string(), ".", mesh.native_extension() );
 
-            if( const auto* tetra =
-                    dynamic_cast< const TetrahedralSolid< dimension >* >(
-                        &mesh ) )
-            {
-                save_tetrahedral_solid( *tetra, file );
-            }
-            else if( const auto* hybrid =
-                         dynamic_cast< const HybridSolid< dimension >* >(
-                             &mesh ) )
-            {
-                save_hybrid_solid( *hybrid, file );
-            }
-            else if( const auto* poly =
-                         dynamic_cast< const PolyhedralSolid< dimension >* >(
-                             &mesh ) )
-            {
-                save_polyhedral_solid( *poly, file );
-            }
-            else
-            {
-                throw OpenGeodeException(
-                    "[Blocks::save_blocks] Cannot find the explicit "
-                    "SolidMesh type" );
-            }
+                if( const auto* tetra =
+                        dynamic_cast< const TetrahedralSolid< dimension >* >(
+                            &mesh ) )
+                {
+                    save_tetrahedral_solid( *tetra, file );
+                }
+                else if( const auto* hybrid =
+                             dynamic_cast< const HybridSolid< dimension >* >(
+                                 &mesh ) )
+                {
+                    save_hybrid_solid( *hybrid, file );
+                }
+                else if( const auto* poly = dynamic_cast<
+                             const PolyhedralSolid< dimension >* >( &mesh ) )
+                {
+                    save_polyhedral_solid( *poly, file );
+                }
+                else
+                {
+                    throw OpenGeodeException(
+                        "[Blocks::save_blocks] Cannot find the explicit "
+                        "SolidMesh type" );
+                }
+            } );
         }
-        impl_->save_components( absl::StrCat( directory, "/blocks" ) );
+        async::when_all( tasks.begin(), tasks.end() )
+            .then( [level] { Logger::set_level( level ); } )
+            .wait();
     }
 
     template < index_t dimension >
@@ -126,30 +136,40 @@ namespace geode
     {
         impl_->load_components( absl::StrCat( directory, "/blocks" ) );
         const auto mapping = impl_->file_mapping( directory );
+        const auto level = Logger::level();
+        Logger::set_level( Logger::Level::warn );
+        absl::FixedArray< async::task< void > > tasks( nb_blocks() );
+        index_t count{ 0 };
         for( auto& block : modifiable_blocks() )
         {
-            const auto file = mapping.at( block.component_id().id().string() );
-            if( MeshFactory::type( block.mesh_type() )
-                == TetrahedralSolid< dimension >::type_name_static() )
-            {
-                block.set_mesh( load_tetrahedral_solid< dimension >(
-                                    block.mesh_type(), file ),
-                    typename Block< dimension >::BlocksKey{} );
-            }
-            else if( MeshFactory::type( block.mesh_type() )
-                     == HybridSolid< dimension >::type_name_static() )
-            {
-                block.set_mesh(
-                    load_hybrid_solid< dimension >( block.mesh_type(), file ),
-                    typename Block< dimension >::BlocksKey{} );
-            }
-            else
-            {
-                block.set_mesh( load_polyhedral_solid< dimension >(
-                                    block.mesh_type(), file ),
-                    typename Block< dimension >::BlocksKey{} );
-            }
+            tasks[count++] = async::spawn( [&block, &mapping] {
+                const auto file =
+                    mapping.at( block.component_id().id().string() );
+                if( MeshFactory::type( block.mesh_type() )
+                    == TetrahedralSolid< dimension >::type_name_static() )
+                {
+                    block.set_mesh( load_tetrahedral_solid< dimension >(
+                                        block.mesh_type(), file ),
+                        typename Block< dimension >::BlocksKey{} );
+                }
+                else if( MeshFactory::type( block.mesh_type() )
+                         == HybridSolid< dimension >::type_name_static() )
+                {
+                    block.set_mesh( load_hybrid_solid< dimension >(
+                                        block.mesh_type(), file ),
+                        typename Block< dimension >::BlocksKey{} );
+                }
+                else
+                {
+                    block.set_mesh( load_polyhedral_solid< dimension >(
+                                        block.mesh_type(), file ),
+                        typename Block< dimension >::BlocksKey{} );
+                }
+            } );
         }
+        async::when_all( tasks.begin(), tasks.end() )
+            .then( [level] { Logger::set_level( level ); } )
+            .wait();
     }
 
     template < index_t dimension >

@@ -21,6 +21,8 @@
  *
  */
 
+#include "../../basic/factory.h"
+
 #include <geode/mesh/io/tetrahedral_solid_input.h>
 #include <geode/mesh/io/tetrahedral_solid_output.h>
 
@@ -34,7 +36,9 @@
     module.def( load##dimension.c_str(),                                       \
         ( std::unique_ptr< TetrahedralSolid< dimension > >( * )(               \
             absl::string_view ) )                                              \
-            & load_tetrahedral_solid< dimension > )
+            & load_tetrahedral_solid< dimension > );                           \
+    PYTHON_FACTORY_CLASS( TetrahedralSolidInputFactory##dimension##D );        \
+    PYTHON_FACTORY_CLASS( TetrahedralSolidOutputFactory##dimension##D )
 
 namespace geode
 {

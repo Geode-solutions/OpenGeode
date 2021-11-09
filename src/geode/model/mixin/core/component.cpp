@@ -44,7 +44,7 @@ namespace geode
 
         void set_name( absl::string_view name )
         {
-            name_ = name.data();
+            name_ = to_string( name );
         }
 
         const uuid& id() const

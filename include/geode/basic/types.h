@@ -27,6 +27,8 @@
 #define M_PI 3.14159265358979323846
 #endif
 
+#include <absl/strings/string_view.h>
+
 namespace geode
 {
     static constexpr double global_epsilon{ 1E-8 };
@@ -45,5 +47,10 @@ namespace geode
         unsigned long long arg ) noexcept
     {
         return static_cast< unsigned char >( arg );
+    }
+
+    inline std::string to_string( absl::string_view view )
+    {
+        return static_cast< std::string >( view );
     }
 } // namespace geode

@@ -39,7 +39,7 @@ namespace geode
         {
             auto edged_curve = EdgedCurve< dimension >::create( impl );
             auto input = EdgedCurveInputFactory< dimension >::create(
-                extension_from_filename( filename ).data(), *edged_curve,
+                to_string( extension_from_filename( filename ) ), *edged_curve,
                 filename );
             input->read();
             if( edged_curve->name() == Identifier::DEFAULT_NAME )
@@ -47,6 +47,10 @@ namespace geode
                 EdgedCurveBuilder< dimension >::create( *edged_curve )
                     ->set_name( filename_without_extension( filename ) );
             }
+            Logger::info( "EdgedCurve", dimension, "D loaded from ", filename );
+            Logger::info( "EdgedCurve", dimension,
+                "D has: ", edged_curve->nb_vertices(), " vertices, ",
+                edged_curve->nb_edges(), " edges" );
             return edged_curve;
         }
         catch( const OpenGeodeException& e )

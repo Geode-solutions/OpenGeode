@@ -29,16 +29,17 @@
 
 #include <geode/basic/permutation.h>
 
+#include <async++.h>
+
 namespace geode
 {
     std::vector< index_t > old2new_permutation(
         absl::Span< const index_t > permutation )
     {
         std::vector< index_t > old2new( permutation.size() );
-        for( const auto i : Indices{ permutation } )
-        {
-            old2new[permutation[i]] = i;
-        }
+        async::parallel_for( async::irange( size_t{ 0 }, permutation.size() ),
+            [&old2new, &permutation](
+                size_t i ) { old2new[permutation[i]] = i; } );
         return old2new;
     }
 } // namespace geode

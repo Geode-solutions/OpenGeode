@@ -42,18 +42,16 @@ namespace geode
     public:
         Impl( absl::string_view file, absl::string_view archive_temp_filename )
         {
-            directory_ =
-                ghc::filesystem::current_path() / archive_temp_filename.data();
+            directory_ = ghc::filesystem::current_path()
+                         / to_string( archive_temp_filename );
             ghc::filesystem::create_directory( directory_ );
             mz_zip_writer_create( &writer_ );
             mz_zip_writer_set_compress_method(
                 writer_, MZ_COMPRESS_METHOD_STORE );
-            const auto status =
-                mz_zip_writer_open_file( writer_, file.data(), 0, 0 );
-            if( status != MZ_OK )
-            {
-                Logger::error( "Error opening zip for writing" );
-            }
+            const auto status = mz_zip_writer_open_file(
+                writer_, to_string( file ).c_str(), 0, 0 );
+            OPENGEODE_EXCEPTION(
+                status == MZ_OK, "[ZipFile] Error opening zip for writing" );
         }
 
         ~Impl()
@@ -62,7 +60,7 @@ namespace geode
             const auto status = mz_zip_writer_close( writer_ );
             if( status != MZ_OK )
             {
-                Logger::error( "Error closing zip for writing" );
+                Logger::error( "[ZipFile] Error closing zip for writing" );
             }
             mz_zip_writer_delete( &writer_ );
         }
@@ -77,7 +75,7 @@ namespace geode
 
         void archive_file( absl::string_view file ) const
         {
-            const ghc::filesystem::path file_path{ file.data() };
+            const ghc::filesystem::path file_path{ to_string( file ) };
             const auto status = mz_zip_writer_add_path(
                 writer_, file_path.c_str(), NULL, 0, 1 );
             OPENGEODE_EXCEPTION( status == MZ_OK,
@@ -126,14 +124,13 @@ namespace geode
             absl::string_view file, absl::string_view unarchive_temp_filename )
         {
             directory_ = ghc::filesystem::current_path()
-                         / unarchive_temp_filename.data();
+                         / to_string( unarchive_temp_filename );
             ghc::filesystem::create_directory( directory_ );
             mz_zip_reader_create( &reader_ );
-            const auto status = mz_zip_reader_open_file( reader_, file.data() );
-            if( status != MZ_OK )
-            {
-                Logger::error( "Error opening zip for reading" );
-            }
+            const auto status =
+                mz_zip_reader_open_file( reader_, to_string( file ).c_str() );
+            OPENGEODE_EXCEPTION(
+                status == MZ_OK, "[UnzipFile] Error opening zip for reading" );
         }
 
         ~Impl()

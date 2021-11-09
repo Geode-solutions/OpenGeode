@@ -21,6 +21,8 @@
  *
  */
 
+#include "../../basic/factory.h"
+
 #include <geode/mesh/io/triangulated_surface_input.h>
 #include <geode/mesh/io/triangulated_surface_output.h>
 
@@ -34,7 +36,9 @@
     module.def( load##dimension.c_str(),                                       \
         ( std::unique_ptr< TriangulatedSurface< dimension > >( * )(            \
             absl::string_view ) )                                              \
-            & load_triangulated_surface< dimension > )
+            & load_triangulated_surface< dimension > );                        \
+    PYTHON_FACTORY_CLASS( TriangulatedSurfaceInputFactory##dimension##D );     \
+    PYTHON_FACTORY_CLASS( TriangulatedSurfaceOutputFactory##dimension##D )
 
 namespace geode
 {

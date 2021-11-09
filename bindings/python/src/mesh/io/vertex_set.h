@@ -21,6 +21,8 @@
  *
  */
 
+#include "../../basic/factory.h"
+
 #include <geode/mesh/io/vertex_set_input.h>
 #include <geode/mesh/io/vertex_set_output.h>
 
@@ -32,5 +34,7 @@ namespace geode
         module.def( "load_vertex_set",
             ( std::unique_ptr< VertexSet >( * )( absl::string_view ) )
                 & load_vertex_set );
+        PYTHON_FACTORY_CLASS( VertexSetInputFactory );
+        PYTHON_FACTORY_CLASS( VertexSetOutputFactory );
     }
 } // namespace geode

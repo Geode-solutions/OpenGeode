@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <vector>
+
 #include <absl/base/casts.h>
 
 #include <geode/basic/types.h>

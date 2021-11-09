@@ -21,6 +21,8 @@
  *
  */
 
+#include "../../basic/factory.h"
+
 #include <geode/mesh/io/polyhedral_solid_input.h>
 #include <geode/mesh/io/polyhedral_solid_output.h>
 
@@ -34,7 +36,9 @@
     module.def( load##dimension.c_str(),                                       \
         ( std::unique_ptr< PolyhedralSolid< dimension > >( * )(                \
             absl::string_view ) )                                              \
-            & load_polyhedral_solid< dimension > )
+            & load_polyhedral_solid< dimension > );                            \
+    PYTHON_FACTORY_CLASS( PolyhedralSolidInputFactory##dimension##D );         \
+    PYTHON_FACTORY_CLASS( PolyhedralSolidOutputFactory##dimension##D )
 
 namespace geode
 {

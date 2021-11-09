@@ -136,7 +136,7 @@ void test_boundary_box( const geode::RegularGrid3D& grid )
 {
     const auto bbox = grid.bounding_box();
     geode::Point3D min{ { 1.5, 0, 1 } };
-    geode::Point3D max{ { 7.5, 22, 49 } };
+    geode::Point3D max{ { 6.5, 20, 46 } };
     OPENGEODE_EXCEPTION( bbox.min() == min, "[Test] Wrong bounding box min" );
     OPENGEODE_EXCEPTION( bbox.max() == max, "[Test] Wrong bounding box max" );
 }

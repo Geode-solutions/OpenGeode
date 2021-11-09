@@ -33,9 +33,10 @@ namespace geode
         try
         {
             const auto output = VertexSetOutputFactory::create(
-                extension_from_filename( filename ).data(), vertex_set,
+                to_string( extension_from_filename( filename ) ), vertex_set,
                 filename );
             output->write();
+            Logger::info( "VertexSet saved in ", filename );
         }
         catch( const OpenGeodeException& e )
         {

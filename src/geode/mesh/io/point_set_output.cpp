@@ -34,9 +34,10 @@ namespace geode
         try
         {
             const auto output = PointSetOutputFactory< dimension >::create(
-                extension_from_filename( filename ).data(), point_set,
+                to_string( extension_from_filename( filename ) ), point_set,
                 filename );
             output->write();
+            Logger::info( "PointSet", dimension, "D saved in ", filename );
         }
         catch( const OpenGeodeException& e )
         {

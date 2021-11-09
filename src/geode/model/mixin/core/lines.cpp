@@ -23,6 +23,8 @@
 
 #include <geode/model/mixin/core/lines.h>
 
+#include <async++.h>
+
 #include <geode/basic/pimpl_impl.h>
 #include <geode/basic/range.h>
 
@@ -78,16 +80,25 @@ namespace geode
     template < index_t dimension >
     void Lines< dimension >::save_lines( absl::string_view directory ) const
     {
+        impl_->save_components( absl::StrCat( directory, "/lines" ) );
         const auto prefix = absl::StrCat(
             directory, "/", Line< dimension >::component_type_static().get() );
+        const auto level = Logger::level();
+        Logger::set_level( Logger::Level::warn );
+        absl::FixedArray< async::task< void > > tasks( nb_lines() );
+        index_t count{ 0 };
         for( const auto& line : lines() )
         {
-            const auto& mesh = line.mesh();
-            const auto file = absl::StrCat(
-                prefix, line.id().string(), ".", mesh.native_extension() );
-            save_edged_curve( mesh, file );
+            tasks[count++] = async::spawn( [&line, &prefix] {
+                const auto& mesh = line.mesh();
+                const auto file = absl::StrCat(
+                    prefix, line.id().string(), ".", mesh.native_extension() );
+                save_edged_curve( mesh, file );
+            } );
         }
-        impl_->save_components( absl::StrCat( directory, "/lines" ) );
+        async::when_all( tasks.begin(), tasks.end() )
+            .then( [level] { Logger::set_level( level ); } )
+            .wait();
     }
 
     template < index_t dimension >
@@ -95,13 +106,23 @@ namespace geode
     {
         impl_->load_components( absl::StrCat( directory, "/lines" ) );
         const auto mapping = impl_->file_mapping( directory );
+        const auto level = Logger::level();
+        Logger::set_level( Logger::Level::warn );
+        absl::FixedArray< async::task< void > > tasks( nb_lines() );
+        index_t count{ 0 };
         for( auto& line : modifiable_lines() )
         {
-            const auto file = mapping.at( line.component_id().id().string() );
-            line.set_mesh(
-                load_edged_curve< dimension >( line.mesh_type(), file ),
-                typename Line< dimension >::LinesKey{} );
+            tasks[count++] = async::spawn( [&line, &mapping] {
+                const auto file =
+                    mapping.at( line.component_id().id().string() );
+                line.set_mesh(
+                    load_edged_curve< dimension >( line.mesh_type(), file ),
+                    typename Line< dimension >::LinesKey{} );
+            } );
         }
+        async::when_all( tasks.begin(), tasks.end() )
+            .then( [level] { Logger::set_level( level ); } )
+            .wait();
     }
 
     template < index_t dimension >

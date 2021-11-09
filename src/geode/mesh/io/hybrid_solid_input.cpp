@@ -39,7 +39,7 @@ namespace geode
         {
             auto hybrid_solid = HybridSolid< dimension >::create( impl );
             auto input = HybridSolidInputFactory< dimension >::create(
-                extension_from_filename( filename ).data(), *hybrid_solid,
+                to_string( extension_from_filename( filename ) ), *hybrid_solid,
                 filename );
             input->read();
             if( hybrid_solid->name() == Identifier::DEFAULT_NAME )
@@ -47,6 +47,11 @@ namespace geode
                 HybridSolidBuilder< dimension >::create( *hybrid_solid )
                     ->set_name( filename_without_extension( filename ) );
             }
+            Logger::info(
+                "HybridSolid", dimension, "D loaded from ", filename );
+            Logger::info( "HybridSolid", dimension,
+                "D has: ", hybrid_solid->nb_vertices(), " vertices, ",
+                hybrid_solid->nb_polyhedra(), " polyhedra" );
             return hybrid_solid;
         }
         catch( const OpenGeodeException& e )

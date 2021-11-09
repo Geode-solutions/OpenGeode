@@ -50,6 +50,8 @@ namespace geode
             off
         };
 
+        static Level level();
+
         static void set_level( Level level );
 
         template < typename... Args >

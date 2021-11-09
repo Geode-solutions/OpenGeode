@@ -99,15 +99,14 @@ namespace geode
             const index_t facet_vertex_id,
             const index_t new_vertex_id )
         {
-            auto updated_facet_vertices = facet_vertices;
-            updated_facet_vertices[facet_vertex_id] = new_vertex_id;
-            this->add_facet( std::move( updated_facet_vertices ) );
-            this->remove_facet( std::move( facet_vertices ) );
+            Facets::update_facet_vertex(
+                std::move( facet_vertices ), facet_vertex_id, new_vertex_id );
         }
 
-        void update_facet_vertices( absl::Span< const index_t > old2new )
+        std::vector< index_t > update_facet_vertices(
+            absl::Span< const index_t > old2new )
         {
-            Facets::update_facet_vertices( old2new );
+            return Facets::update_facet_vertices( old2new );
         }
 
         void remove_facet( PolyhedronFacetVertices facet_vertices )
@@ -200,10 +199,10 @@ namespace geode
     }
 
     template < index_t dimension >
-    void SolidFacets< dimension >::update_facet_vertices(
+    std::vector< index_t > SolidFacets< dimension >::update_facet_vertices(
         absl::Span< const index_t > old2new, SolidFacetsKey )
     {
-        impl_->update_facet_vertices( old2new );
+        return impl_->update_facet_vertices( old2new );
     }
 
     template < index_t dimension >

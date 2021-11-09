@@ -45,7 +45,7 @@ namespace geode
         {
             auto vertex_set = VertexSet::create( impl );
             auto input = VertexSetInputFactory::create(
-                extension_from_filename( filename ).data(), *vertex_set,
+                to_string( extension_from_filename( filename ) ), *vertex_set,
                 filename );
             input->read();
             if( vertex_set->name() == Identifier::DEFAULT_NAME )
@@ -53,6 +53,9 @@ namespace geode
                 VertexSetBuilder::create( *vertex_set )
                     ->set_name( filename_without_extension( filename ) );
             }
+            Logger::info( "VertexSet loaded from ", filename );
+            Logger::info(
+                "VertexSet has: ", vertex_set->nb_vertices(), " vertices" );
             return vertex_set;
         }
         catch( const OpenGeodeException& e )

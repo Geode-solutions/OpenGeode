@@ -21,6 +21,8 @@
  *
  */
 
+#include "../../basic/factory.h"
+
 #include <geode/mesh/io/graph_input.h>
 #include <geode/mesh/io/graph_output.h>
 
@@ -32,5 +34,7 @@ namespace geode
         module.def(
             "load_graph", ( std::unique_ptr< Graph >( * )( absl::string_view ) )
                               & load_graph );
+        PYTHON_FACTORY_CLASS( GraphInputFactory );
+        PYTHON_FACTORY_CLASS( GraphOutputFactory );
     }
 } // namespace geode

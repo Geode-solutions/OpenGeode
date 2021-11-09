@@ -36,9 +36,11 @@ namespace geode
         {
             const auto output =
                 TriangulatedSurfaceOutputFactory< dimension >::create(
-                    extension_from_filename( filename ).data(),
+                    to_string( extension_from_filename( filename ) ),
                     triangulated_surface, filename );
             output->write();
+            Logger::info(
+                "TriangulatedSurface", dimension, "D saved in ", filename );
         }
         catch( const OpenGeodeException& e )
         {

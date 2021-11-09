@@ -38,13 +38,17 @@ namespace geode
         {
             auto graph = Graph::create( impl );
             auto input = GraphInputFactory::create(
-                extension_from_filename( filename ).data(), *graph, filename );
+                to_string( extension_from_filename( filename ) ), *graph,
+                filename );
             input->read();
             if( graph->name() == Identifier::DEFAULT_NAME )
             {
                 GraphBuilder::create( *graph )->set_name(
                     filename_without_extension( filename ) );
             }
+            Logger::info( "Graph loaded from ", filename );
+            Logger::info( "Graph has: ", graph->nb_vertices(), " vertices, ",
+                graph->nb_edges(), " edges" );
             return graph;
         }
         catch( const OpenGeodeException& e )

@@ -41,7 +41,7 @@ namespace geode
             auto triangulated_surface =
                 TriangulatedSurface< dimension >::create( impl );
             auto input = TriangulatedSurfaceInputFactory< dimension >::create(
-                extension_from_filename( filename ).data(),
+                to_string( extension_from_filename( filename ) ),
                 *triangulated_surface, filename );
             input->read();
             if( triangulated_surface->name() == Identifier::DEFAULT_NAME )
@@ -50,6 +50,11 @@ namespace geode
                     *triangulated_surface )
                     ->set_name( filename_without_extension( filename ) );
             }
+            Logger::info(
+                "TriangulatedSurface", dimension, "D loaded from ", filename );
+            Logger::info( "TriangulatedSurface", dimension,
+                "D has: ", triangulated_surface->nb_vertices(), " vertices, ",
+                triangulated_surface->nb_polygons(), " triangles" );
             return triangulated_surface;
         }
         catch( const OpenGeodeException& e )

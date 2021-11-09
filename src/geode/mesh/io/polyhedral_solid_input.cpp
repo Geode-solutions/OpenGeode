@@ -40,14 +40,19 @@ namespace geode
             auto polyhedral_solid =
                 PolyhedralSolid< dimension >::create( impl );
             auto input = PolyhedralSolidInputFactory< dimension >::create(
-                extension_from_filename( filename ).data(), *polyhedral_solid,
-                filename );
+                to_string( extension_from_filename( filename ) ),
+                *polyhedral_solid, filename );
             input->read();
             if( polyhedral_solid->name() == Identifier::DEFAULT_NAME )
             {
                 PolyhedralSolidBuilder< dimension >::create( *polyhedral_solid )
                     ->set_name( filename_without_extension( filename ) );
             }
+            Logger::info(
+                "PolyhedralSolid", dimension, "D loaded from ", filename );
+            Logger::info( "PolyhedralSolid", dimension,
+                "D has: ", polyhedral_solid->nb_vertices(), " vertices, ",
+                polyhedral_solid->nb_polyhedra(), " polyhedra" );
             return polyhedral_solid;
         }
         catch( const OpenGeodeException& e )

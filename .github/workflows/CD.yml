@@ -48,13 +48,15 @@ jobs:
       
   release-linux-wheel:
     runs-on: ubuntu-18.04
-    container: "geodesolutions/centos8"
+    container: "geodesolutions/centos"
     strategy:
       matrix:
         config:
-        - {python: 3.6, tag: "cp36-cp36m"}
-        - {python: 3.7, tag: "cp37-cp37m"}
-        - {python: 3.8, tag: "cp38-cp38"}
+        - {python: "3.6", tag: "cp36-cp36m"}
+        - {python: "3.7", tag: "cp37-cp37m"}
+        - {python: "3.8", tag: "cp38-cp38"}
+        - {python: "3.9", tag: "cp39-cp39"}
+        - {python: "3.10", tag: "cp310-cp310"}
     steps:
     - uses: actions/checkout@v1
     - name: Compile
@@ -70,18 +72,18 @@ jobs:
         cd opengeode
         cmake --build . --target wheel --config Release
         mv wheel/dist/*.whl wheel/dist/OpenGeode_core-$version-${{ matrix.config.tag }}-manylinux2014_x86_64.whl
-    - name: Upload
-      uses: softprops/action-gh-release@v1
-      with:
-        files: "build/opengeode/wheel/dist/OpenGeode_core-${{ steps.package.outputs.version }}-${{ matrix.config.tag }}-manylinux2014_x86_64.whl"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: PyPI
       uses: pypa/gh-action-pypi-publish@master
       with:
         user: __token__
         password: ${{ secrets.PYPI_TOKEN }}
         packages_dir: "build/opengeode/wheel/dist/"
+    - name: Upload
+      uses: softprops/action-gh-release@v1
+      with:
+        files: "build/opengeode/wheel/dist/OpenGeode_core-${{ steps.package.outputs.version }}-${{ matrix.config.tag }}-manylinux2014_x86_64.whl"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Notify slack
       if: failure() && github.ref == 'refs/heads/master'
       uses: 8398a7/action-slack@v2
@@ -126,9 +128,11 @@ jobs:
     strategy:
       matrix:
         config:
-        - {python: 3.6, tag: "cp36-cp36m"}
-        - {python: 3.7, tag: "cp37-cp37m"}
-        - {python: 3.8, tag: "cp38-cp38"}
+        - {python: "3.6", tag: "cp36-cp36m"}
+        - {python: "3.7", tag: "cp37-cp37m"}
+        - {python: "3.8", tag: "cp38-cp38"}
+        - {python: "3.9", tag: "cp39-cp39"}
+        - {python: "3.10", tag: "cp310-cp310"}
 
     steps:
     - uses: actions/checkout@v1
@@ -149,16 +153,16 @@ jobs:
         cd opengeode
         cmake --build . --target wheel --config Release
         mv wheel/dist/*.whl wheel/dist/OpenGeode_core-$version-${{ matrix.config.tag }}-macosx_10_14_x86_64.whl
+    - name: PyPI
+      run: |
+        pip install twine
+        twine upload -u __token__ -p ${{ secrets.PYPI_TOKEN }} build/opengeode/wheel/dist/*
     - name: Upload
       uses: softprops/action-gh-release@v1
       with:
         files: "build/opengeode/wheel/dist/OpenGeode_core-${{ steps.package.outputs.version }}-${{ matrix.config.tag }}-macosx_10_14_x86_64.whl"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: PyPI
-      run: |
-        pip install twine
-        twine upload -u __token__ -p ${{ secrets.PYPI_TOKEN }} build/opengeode/wheel/dist/*
     - name: Notify slack
       if: failure()
       uses: 8398a7/action-slack@v2
@@ -203,9 +207,11 @@ jobs:
     strategy:
       matrix:
         config:
-        - {python: 3.6, tag: "cp36-cp36m"}
-        - {python: 3.7, tag: "cp37-cp37m"}
-        - {python: 3.8, tag: "cp38-cp38"}
+        - {python: "3.6", tag: "cp36-cp36m"}
+        - {python: "3.7", tag: "cp37-cp37m"}
+        - {python: "3.8", tag: "cp38-cp38"}
+        - {python: "3.9", tag: "cp39-cp39"}
+        - {python: "3.10", tag: "cp310-cp310"}
 
     steps:
     - uses: actions/checkout@v1
@@ -226,16 +232,16 @@ jobs:
         cd opengeode
         cmake --build . --target wheel --config Release
         mv wheel/dist/*.whl wheel/dist/OpenGeode_core-$version-${{ matrix.config.tag }}-win_amd64.whl
+    - name: PyPI
+      run: |
+        pip install twine
+        twine upload -u __token__ -p ${{ secrets.PYPI_TOKEN }} build/opengeode/wheel/dist/*
     - name: Upload
       uses: softprops/action-gh-release@v1
       with:
         files: "build/opengeode/wheel/dist/OpenGeode_core-${{ steps.package.outputs.version }}-${{ matrix.config.tag }}-win_amd64.whl"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: PyPI
-      run: |
-        pip install twine
-        twine upload -u __token__ -p ${{ secrets.PYPI_TOKEN }} build/opengeode/wheel/dist/*
     - name: Notify slack
       if: failure()
       uses: 8398a7/action-slack@v2

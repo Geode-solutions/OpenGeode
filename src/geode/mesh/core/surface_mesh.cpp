@@ -455,6 +455,13 @@ namespace geode
     }
 
     template < index_t dimension >
+    bool SurfaceMesh< dimension >::is_polygon_on_border(
+        index_t polygon_id ) const
+    {
+        return !polygon_edges_on_border( polygon_id ).empty();
+    }
+
+    template < index_t dimension >
     PolygonEdgesOnBorder SurfaceMesh< dimension >::polygon_edges_on_border(
         index_t polygon_id ) const
     {

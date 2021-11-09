@@ -222,7 +222,8 @@ void test_update_unique_vertices()
     for( const auto i : geode::Range{ 10 } )
     {
         surf_builder->create_vertex();
-        builder.set_unique_vertex( { surface_cid, i }, std::floor( i / 2 ) );
+        builder.set_unique_vertex( { surface_cid, i },
+            static_cast< geode::index_t >( std::floor( i / 2 ) ) );
     }
 
     OPENGEODE_EXCEPTION( provider.nb_unique_vertices() == 5,

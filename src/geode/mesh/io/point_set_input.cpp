@@ -39,7 +39,7 @@ namespace geode
         {
             auto point_set = PointSet< dimension >::create( impl );
             auto input = PointSetInputFactory< dimension >::create(
-                extension_from_filename( filename ).data(), *point_set,
+                to_string( extension_from_filename( filename ) ), *point_set,
                 filename );
             input->read();
             if( point_set->name() == Identifier::DEFAULT_NAME )
@@ -47,6 +47,9 @@ namespace geode
                 PointSetBuilder< dimension >::create( *point_set )
                     ->set_name( filename_without_extension( filename ) );
             }
+            Logger::info( "PointSet", dimension, "D loaded from ", filename );
+            Logger::info( "PointSet", dimension,
+                "D has: ", point_set->nb_vertices(), " vertices" );
             return point_set;
         }
         catch( const OpenGeodeException& e )

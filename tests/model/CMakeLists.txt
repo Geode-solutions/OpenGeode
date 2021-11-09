@@ -33,6 +33,20 @@ add_geode_test(
         ${PROJECT_NAME}::model
 )
 add_geode_test(
+    SOURCE "test-convert-to-mesh.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::model
+)
+add_geode_test(
+    SOURCE "test-model-creator.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::model
+)
+add_geode_test(
     SOURCE "test-section.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic

@@ -24,6 +24,9 @@ add_geode_library(
     SOURCES
         "common.cpp"
         "helpers/convert_model_meshes.cpp"
+        "helpers/convert_to_mesh.cpp"
+        "helpers/simplicial_brep_creator.cpp"
+        "helpers/simplicial_section_creator.cpp"
         "mixin/builder/blocks_builder.cpp"
         "mixin/builder/corners_builder.cpp"
         "mixin/builder/lines_builder.cpp"
@@ -56,6 +59,10 @@ add_geode_library(
     PUBLIC_HEADERS
         "common.h"
         "helpers/convert_model_meshes.h"
+        "helpers/convert_to_mesh.h"
+        "helpers/simplicial_brep_creator.h"
+        "helpers/simplicial_creator_definitions.h"
+        "helpers/simplicial_section_creator.h"
         "mixin/builder/add_components_builders.h"
         "mixin/builder/blocks_builder.h"
         "mixin/builder/corners_builder.h"
@@ -101,6 +108,8 @@ add_geode_library(
         "representation/io/detail/geode_section_input.h"
         "representation/io/detail/geode_brep_output.h"
         "representation/io/detail/geode_section_output.h"
+    PRIVATE_HEADERS
+        "helpers/private/simplicial_model_creator.h"
     PUBLIC_DEPENDENCIES
         absl::flat_hash_map
         Bitsery::bitsery
@@ -108,5 +117,7 @@ add_geode_library(
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
         ${PROJECT_NAME}::mesh
+    PRIVATE_DEPENDENCIES
+        Async++
 )
 

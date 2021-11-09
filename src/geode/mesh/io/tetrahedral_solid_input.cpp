@@ -40,8 +40,8 @@ namespace geode
             auto tetrahedral_solid =
                 TetrahedralSolid< dimension >::create( impl );
             auto input = TetrahedralSolidInputFactory< dimension >::create(
-                extension_from_filename( filename ).data(), *tetrahedral_solid,
-                filename );
+                to_string( extension_from_filename( filename ) ),
+                *tetrahedral_solid, filename );
             input->read();
             if( tetrahedral_solid->name() == Identifier::DEFAULT_NAME )
             {
@@ -49,6 +49,11 @@ namespace geode
                     *tetrahedral_solid )
                     ->set_name( filename_without_extension( filename ) );
             }
+            Logger::info(
+                "TetrahedralSolid", dimension, "D loaded from ", filename );
+            Logger::info( "TetrahedralSolid", dimension,
+                "D has: ", tetrahedral_solid->nb_vertices(), " vertices, ",
+                tetrahedral_solid->nb_polyhedra(), " tetrahedra" );
             return tetrahedral_solid;
         }
         catch( const OpenGeodeException& e )

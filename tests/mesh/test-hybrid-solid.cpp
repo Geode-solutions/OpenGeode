@@ -299,10 +299,10 @@ void test_delete_vertex( const geode::HybridSolid3D& hybrid_solid,
         "[Test] HybridSolid should have 3 polyhedra" );
     OPENGEODE_EXCEPTION( !hybrid_solid.polyhedron_adjacent( { 1, 0 } ),
         "[Test] HybridSolid adjacent index is not correct" );
-    OPENGEODE_EXCEPTION( hybrid_solid.facets().nb_facets() == 16,
-        "[Test] PolyhedralSolid should have 16 facets" );
-    OPENGEODE_EXCEPTION( hybrid_solid.edges().nb_edges() == 22,
-        "[Test] PolyhedralSolid should have 22 edges" );
+    OPENGEODE_EXCEPTION( hybrid_solid.facets().nb_facets() == 13,
+        "[Test] PolyhedralSolid should have 13 facets" );
+    OPENGEODE_EXCEPTION( hybrid_solid.edges().nb_edges() == 19,
+        "[Test] PolyhedralSolid should have 19 edges" );
     builder.edges_builder().delete_isolated_edges();
     builder.facets_builder().delete_isolated_facets();
     OPENGEODE_EXCEPTION( hybrid_solid.facets().nb_facets() == 12,

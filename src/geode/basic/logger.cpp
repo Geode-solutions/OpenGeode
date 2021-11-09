@@ -23,11 +23,14 @@
 
 #include <geode/basic/logger.h>
 
+#include <absl/container/flat_hash_map.h>
+
 // clang-format off
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 // clang-format on
 
+#include <geode/basic/mapping.h>
 #include <geode/basic/pimpl_impl.h>
 
 namespace geode
@@ -35,11 +38,27 @@ namespace geode
     class Logger::Impl
     {
     public:
-        Impl() : logger_impl_( spdlog::stdout_color_mt( "console" ) ) {}
+        Impl() : logger_impl_( spdlog::stdout_color_mt( "console" ) )
+        {
+            mapping_.reserve( spdlog::level::level_enum::n_levels );
+            mapping_.map( Level::trace, spdlog::level::level_enum::trace );
+            mapping_.map( Level::debug, spdlog::level::level_enum::debug );
+            mapping_.map( Level::info, spdlog::level::level_enum::info );
+            mapping_.map( Level::warn, spdlog::level::level_enum::warn );
+            mapping_.map( Level::err, spdlog::level::level_enum::err );
+            mapping_.map(
+                Level::critical, spdlog::level::level_enum::critical );
+            mapping_.map( Level::off, spdlog::level::level_enum::off );
+        }
+
+        Level level()
+        {
+            return mapping_.out2in( spdlog::get_level() );
+        }
 
         void set_level( Level level )
         {
-            spdlog::set_level( spdlog::level::level_enum( level ) );
+            spdlog::set_level( mapping_.in2out( level ) );
         }
 
         void log_trace( const std::string &message )
@@ -74,11 +93,12 @@ namespace geode
 
     private:
         std::shared_ptr< spdlog::logger > logger_impl_;
+        BijectiveMapping< Level, spdlog::level::level_enum > mapping_;
     };
 
     Logger::Logger()
     {
-        impl_->set_level( Level::debug );
+        impl_->set_level( Level::trace );
     }
 
     Logger::~Logger() {}
@@ -87,6 +107,11 @@ namespace geode
     {
         static Logger logger;
         return logger;
+    }
+
+    Logger::Level Logger::level()
+    {
+        return instance().impl_->level();
     }
 
     void Logger::set_level( Level level )

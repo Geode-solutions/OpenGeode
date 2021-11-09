@@ -32,7 +32,8 @@ namespace geode
         try
         {
             const auto output = BRepOutputFactory::create(
-                extension_from_filename( filename ).data(), brep, filename );
+                to_string( extension_from_filename( filename ) ), brep,
+                filename );
             output->write();
             Logger::info( "BRep saved in ", filename );
         }

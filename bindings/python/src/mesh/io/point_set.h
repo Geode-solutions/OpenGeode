@@ -21,6 +21,8 @@
  *
  */
 
+#include "../../basic/factory.h"
+
 #include <geode/mesh/io/point_set_input.h>
 #include <geode/mesh/io/point_set_output.h>
 
@@ -32,7 +34,9 @@
         "load_point_set" + std::to_string( dimension ) + "D";                  \
     module.def( load##dimension.c_str(),                                       \
         ( std::unique_ptr< PointSet< dimension > >( * )( absl::string_view ) ) \
-            & load_point_set< dimension > )
+            & load_point_set< dimension > );                                   \
+    PYTHON_FACTORY_CLASS( PointSetInputFactory##dimension##D );                \
+    PYTHON_FACTORY_CLASS( PointSetOutputFactory##dimension##D )
 
 namespace geode
 {
