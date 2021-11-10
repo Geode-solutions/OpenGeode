@@ -96,7 +96,7 @@ namespace geode
         Tetra tetra( index_t tetrahedron_id ) const;
 
         /*!
-         * Return a geometrical Triangle from an tetrahedron facet of the mesh.
+         * Return a geometrical Triangle from a tetrahedron facet of the mesh.
          */
         Triangle< dimension > triangle( const PolyhedronFacet& facet ) const;
 
