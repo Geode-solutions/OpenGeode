@@ -135,12 +135,12 @@ namespace geode
     }
 
     template < index_t dimension >
-    Triangle< dimension > TetrahedralSolid< dimension >::facet_triangle(
+    Triangle< dimension > TetrahedralSolid< dimension >::triangle(
         const PolyhedronFacet& facet ) const
     {
-        return { this->point( this->polyhedron_facet_vertex( { facet, 0 } ) ),
-            this->point( this->polyhedron_facet_vertex( { facet, 1 } ) ),
-            this->point( this->polyhedron_facet_vertex( { facet, 2 } ) ) };
+        const auto vertices = this->polyhedron_facet_vertices( facet );
+        return { this->point( vertices[0] ), this->point( vertices[1] ),
+            this->point( vertices[2] ) };
     }
 
     template < index_t dimension >
