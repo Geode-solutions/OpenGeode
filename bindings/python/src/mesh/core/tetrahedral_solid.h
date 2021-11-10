@@ -34,8 +34,7 @@
                 & TetrahedralSolid##dimension##D::create )                     \
         .def( "clone", &TetrahedralSolid##dimension##D::clone )                \
         .def( "tetra", &TetrahedralSolid##dimension##D::tetra )                \
-        .def( "facet_triangle",                                                \
-            &TetrahedralSolid##dimension##D::facet_triangle )
+        .def( "triangle", &TetrahedralSolid##dimension##D::triangle )
 
 namespace geode
 {

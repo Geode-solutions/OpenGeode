@@ -90,10 +90,15 @@ namespace geode
             index_t tetrahedron_id,
             const std::array< index_t, 2 >& edge_vertices ) const;
 
+        /*!
+         * Return a geometrical Tetra from an element of the mesh.
+         */
         Tetra tetra( index_t tetrahedron_id ) const;
 
-        Triangle< dimension > facet_triangle(
-            const PolyhedronFacet& facet ) const;
+        /*!
+         * Return a geometrical Triangle from an tetrahedron facet of the mesh.
+         */
+        Triangle< dimension > triangle( const PolyhedronFacet& facet ) const;
 
     protected:
         TetrahedralSolid() = default;
