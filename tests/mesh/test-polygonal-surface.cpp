@@ -598,52 +598,6 @@ void test_non_manifold_surface()
     }
 }
 
-void toto()
-{
-    auto polygonal_surface = geode::PolygonalSurface3D::create(
-        geode::OpenGeodePolygonalSurface3D::impl_name_static() );
-    auto builder =
-        geode::PolygonalSurfaceBuilder3D::create( *polygonal_surface );
-
-    builder->create_point( { { 187.17, 511.26, 0.111 } } );
-    builder->create_point( { { 184.15, 541.19, 0.111 } } );
-    builder->create_point( { { 175.50, 569.06, 0.111 } } );
-    builder->create_point( { { 161.80, 594.29, 0.111 } } );
-    builder->create_point( { { 143.67, 616.27, 0.111 } } );
-    builder->create_point( { { 121.69, 634.41, 0.111 } } );
-    builder->create_point( { { 96.46, 648.10, 0.111 } } );
-    builder->create_point( { { 68.58, 656.75, 0.111 } } );
-    builder->create_point( { { 38.65, 659.77, 0.111 } } );
-    builder->create_point( { { 8.72, 656.75, 0.111 } } );
-    builder->create_point( { { -19.16, 648.10, 0.111 } } );
-    builder->create_point( { { -44.39, 634.41, 0.111 } } );
-    builder->create_point( { { -66.37, 616.27, 0.111 } } );
-    builder->create_point( { { -84.50, 594.29, 0.111 } } );
-    builder->create_point( { { -98.19, 569.06, 0.111 } } );
-    builder->create_point( { { -106.85, 541.19, 0.111 } } );
-    builder->create_point( { { -109.87, 511.26, 0.111 } } );
-    builder->create_point( { { -106.99, 482.15, 0.111 } } );
-    builder->create_point( { { -98.56, 454.42, 0.111 } } );
-    builder->create_point( { { -84.91, 428.86, 0.111 } } );
-    builder->create_point( { { -66.37, 406.24, 0.111 } } );
-    builder->create_point( { { -43.75, 387.69, 0.111 } } );
-    builder->create_point( { { -18.18, 374.04, 0.111 } } );
-    builder->create_point( { { 9.54, 365.62, 0.111 } } );
-    builder->create_point( { { 38.65, 362.74, 0.111 } } );
-    builder->create_point( { { 68.58, 365.76, 0.111 } } );
-    builder->create_point( { { 96.46, 374.41, 0.111 } } );
-    builder->create_point( { { 121.69, 388.10, 0.111 } } );
-    builder->create_point( { { 143.67, 406.24, 0.111 } } );
-    builder->create_point( { { 161.80, 428.22, 0.111 } } );
-    builder->create_point( { { 175.50, 453.45, 0.111 } } );
-    builder->create_point( { { 184.15, 481.32, 0.111 } } );
-
-    builder->create_polygon( { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
-        15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 } );
-
-    geode::save_polygonal_surface( *polygonal_surface, "/tmp/globe.og_psf3d" );
-}
-
 void test()
 {
     auto polygonal_surface = geode::PolygonalSurface3D::create(
@@ -651,8 +605,6 @@ void test()
     polygonal_surface->enable_edges();
     auto builder =
         geode::PolygonalSurfaceBuilder3D::create( *polygonal_surface );
-
-    toto();
 
     test_create_vertices( *polygonal_surface, *builder );
     test_bounding_box( *polygonal_surface );
