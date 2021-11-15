@@ -126,7 +126,7 @@ endfunction()
 
 function(add_geode_library)
     cmake_parse_arguments(GEODE_LIB
-        ""
+        "STATIC"
         "NAME;FOLDER"
         "PUBLIC_HEADERS;ADVANCED_HEADERS;PRIVATE_HEADERS;SOURCES;PUBLIC_DEPENDENCIES;PRIVATE_DEPENDENCIES"
         ${ARGN}
@@ -151,17 +151,27 @@ function(add_geode_library)
             "${PROJECT_SOURCE_DIR}/include/${GEODE_LIB_FOLDER}/${file}"
         )
     endforeach()
-    add_library(${GEODE_LIB_NAME} SHARED  
-        "${ABSOLUTE_GEODE_LIB_SOURCES}"
-        "${ABSOLUTE_GEODE_LIB_PUBLIC_HEADERS}"
-        "${ABSOLUTE_GEODE_LIB_ADVANCED_HEADERS}"
-        "${ABSOLUTE_GEODE_LIB_PRIVATE_HEADERS}"
-    )
+    if(${GEODE_LIB_STATIC})
+        add_library(${GEODE_LIB_NAME} STATIC  
+            "${ABSOLUTE_GEODE_LIB_SOURCES}"
+            "${ABSOLUTE_GEODE_LIB_PUBLIC_HEADERS}"
+            "${ABSOLUTE_GEODE_LIB_ADVANCED_HEADERS}"
+            "${ABSOLUTE_GEODE_LIB_PRIVATE_HEADERS}"
+        )
+    else()
+        add_library(${GEODE_LIB_NAME} SHARED  
+            "${ABSOLUTE_GEODE_LIB_SOURCES}"
+            "${ABSOLUTE_GEODE_LIB_PUBLIC_HEADERS}"
+            "${ABSOLUTE_GEODE_LIB_ADVANCED_HEADERS}"
+            "${ABSOLUTE_GEODE_LIB_PRIVATE_HEADERS}"
+        )
+    endif()
     add_library(${PROJECT_NAME}::${GEODE_LIB_NAME} ALIAS ${GEODE_LIB_NAME})
     string(TOLOWER ${PROJECT_NAME} project-name)
     string(REGEX REPLACE "-" "_" project_name ${project-name})
     set_target_properties(${GEODE_LIB_NAME}
         PROPERTIES
+            POSITION_INDEPENDENT_CODE ON
             OUTPUT_NAME ${PROJECT_NAME}_${GEODE_LIB_NAME}
             DEFINE_SYMBOL ${project_name}_${GEODE_LIB_NAME}_EXPORTS
             FOLDER "Libraries"
