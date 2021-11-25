@@ -72,15 +72,16 @@ namespace geode
 } // namespace geode
 
 #ifdef OPENGEODE_DEBUG
-#define OPENGEODE_ASSERT( condition, message )                                 \
+#define OPENGEODE_ASSERT( condition, ... )                                     \
     if( ABSL_PREDICT_FALSE( !( condition ) ) )                                 \
-    geode::geode_assertion_failed( #condition, message, __FILE__, __LINE__ )
-#define OPENGEODE_ASSERT_NOT_REACHED( message )                                \
     geode::geode_assertion_failed(                                             \
-        "should not reached", message, __FILE__, __LINE__ )
+        #condition, absl::StrCat( __VA_ARGS__ ), __FILE__, __LINE__ )
+#define OPENGEODE_ASSERT_NOT_REACHED( ... )                                    \
+    geode::geode_assertion_failed( "should not reached",                       \
+        absl::StrCat( __VA_ARGS__ ), __FILE__, __LINE__ )
 #else
-#define OPENGEODE_ASSERT( x, message )
-#define OPENGEODE_ASSERT_NOT_REACHED( message )
+#define OPENGEODE_ASSERT( x, ... )
+#define OPENGEODE_ASSERT_NOT_REACHED( ... )
 #endif
 #define OPENGEODE_EXCEPTION( condition, ... )                                  \
     if( ABSL_PREDICT_FALSE( !( condition ) ) )                                 \

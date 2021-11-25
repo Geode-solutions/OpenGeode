@@ -48,7 +48,10 @@ namespace geode
 
         ~Impl()
         {
-            Logger::info( message_, " complete" );
+            if( current_ == max_number_ )
+            {
+                Logger::info( message_, " complete" );
+            }
         }
 
         void increment()
