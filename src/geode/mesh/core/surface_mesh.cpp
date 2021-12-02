@@ -609,6 +609,8 @@ namespace geode
         OPENGEODE_ASSERT( polygon_vertex( first_polygon.value() ) == vertex_id,
             "[SurfaceMesh::polygons_around_vertex] Wrong polygon "
             "around vertex" );
+        index_t safety_count{ 0 };
+        constexpr index_t MAX_SAFETY_COUNT{ 1000 };
         PolygonsAroundVertex polygons;
         auto cur_polygon_edge = first_polygon;
         do
@@ -621,12 +623,14 @@ namespace geode
             const auto prev_edge =
                 previous_polygon_edge( cur_polygon_edge.value() );
             cur_polygon_edge = polygon_adjacent_edge( prev_edge );
-        } while( cur_polygon_edge && cur_polygon_edge != first_polygon );
+            safety_count++;
+        } while( cur_polygon_edge && cur_polygon_edge != first_polygon
+                 && safety_count < MAX_SAFETY_COUNT );
 
         if( cur_polygon_edge != first_polygon )
         {
             cur_polygon_edge = polygon_adjacent_edge( first_polygon.value() );
-            while( cur_polygon_edge )
+            while( cur_polygon_edge && safety_count < MAX_SAFETY_COUNT )
             {
                 const auto next_edge =
                     next_polygon_edge( cur_polygon_edge.value() );
@@ -635,8 +639,13 @@ namespace geode
                     "around vertex" );
                 polygons.push_back( next_edge );
                 cur_polygon_edge = polygon_adjacent_edge( next_edge );
+                safety_count++;
             }
         }
+        OPENGEODE_EXCEPTION( safety_count < MAX_SAFETY_COUNT,
+            "[SurfaceMesh::polygons_around_vertex] Too many polygons around "
+            "vertex ",
+            vertex_id );
         return polygons;
     }
 
