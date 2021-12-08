@@ -217,6 +217,13 @@ namespace geode
             const PolygonEdge& polygon_edge ) const;
 
         /*!
+         * Return true if the vertex is on border, i.e. if at there are polygons
+         * around this vertex on border.
+         * @param[in] vertex_id Index the vertex.
+         */
+        bool is_vertex_on_border( index_t vertex_id ) const;
+
+        /*!
          * Return true if the edge is on border, i.e. if the polygon has no
          * adjacent through the specified edge.
          * @param[in] polygon_edge Local index of edge in polygon.
