@@ -53,11 +53,22 @@ namespace geode
                 nb_cells *= c;
             }
             cell_attribute_manager_.resize( nb_cells );
+            index_t nb_vertices{ 1 };
+            for( const auto c : cells_number )
+            {
+                nb_vertices *= c + 1;
+            }
+            vertex_attribute_manager_.resize( nb_vertices );
         }
 
         AttributeManager& cell_attribute_manager() const
         {
             return cell_attribute_manager_;
+        }
+
+        AttributeManager& vertex_attribute_manager() const
+        {
+            return vertex_attribute_manager_;
         }
 
         index_t nb_cells( index_t direction ) const
@@ -70,7 +81,7 @@ namespace geode
             return cells_size_.at( direction );
         }
 
-        index_t cell_index( const Index& index ) const
+        index_t cell_index( const GridCellIndex< dimension >& index ) const
         {
             index_t cell_id{ 0 };
             for( const auto d : LRange{ dimension } )
@@ -79,7 +90,7 @@ namespace geode
                     "[RegularGrid::cell_index] Invalid index" );
 
                 index_t offset{ 1 };
-                for( const auto d2 : Range{ d } )
+                for( const auto d2 : LRange{ d } )
                 {
                     offset *= cells_number_[d2];
                 }
@@ -88,15 +99,15 @@ namespace geode
             return cell_id;
         }
 
-        Index cell_index( index_t index ) const
+        GridCellIndex< dimension > cell_index( index_t index ) const
         {
             OPENGEODE_ASSERT( index < cell_attribute_manager().nb_elements(),
                 "[RegularGrid::cell_index] Invalid index" );
-            Index cell_id;
+            GridCellIndex< dimension > cell_id;
             for( const auto d : LRange{ dimension } )
             {
                 index_t offset{ 1 };
-                for( const auto d2 : Range{ dimension - d - 1 } )
+                for( const auto d2 : LRange{ dimension - d - 1 } )
                 {
                     offset *= cells_number_[d2];
                 }
@@ -108,8 +119,8 @@ namespace geode
             return cell_id;
         }
 
-        absl::optional< Index > next_cell(
-            const Index& index, index_t direction ) const
+        absl::optional< GridCellIndex< dimension > > next_cell(
+            const GridCellIndex< dimension >& index, index_t direction ) const
         {
             if( index[direction] + 1 < nb_cells( direction ) )
             {
@@ -120,8 +131,8 @@ namespace geode
             return absl::nullopt;
         }
 
-        absl::optional< Index > previous_cell(
-            const Index& index, index_t direction ) const
+        absl::optional< GridCellIndex< dimension > > previous_cell(
+            const GridCellIndex< dimension >& index, index_t direction ) const
         {
             if( index[direction] > 0 )
             {
@@ -132,7 +143,75 @@ namespace geode
             return absl::nullopt;
         }
 
-        Point< dimension > point( const Index& index ) const
+        index_t nb_vertices( index_t direction ) const
+        {
+            return cells_number_.at( direction ) + 1;
+        }
+
+        index_t vertex_index( const GridVertexIndex< dimension >& index ) const
+        {
+            index_t vertex_id{ 0 };
+            for( const auto d : LRange{ dimension } )
+            {
+                OPENGEODE_ASSERT( index[d] < nb_vertices( d ),
+                    "[RegularGrid::vertex_index] Invalid index" );
+
+                index_t offset{ 1 };
+                for( const auto d2 : LRange{ d } )
+                {
+                    offset *= nb_vertices( d2 );
+                }
+                vertex_id += offset * index[d];
+            }
+            return vertex_id;
+        }
+
+        GridVertexIndex< dimension > vertex_index( index_t index ) const
+        {
+            OPENGEODE_ASSERT( index < vertex_attribute_manager().nb_elements(),
+                "[RegularGrid::vertex_index] Invalid index" );
+            GridVertexIndex< dimension > vertex_id;
+            for( const auto d : LRange{ dimension } )
+            {
+                index_t offset{ 1 };
+                for( const auto d2 : LRange{ dimension - d - 1 } )
+                {
+                    offset *= nb_vertices( d2 );
+                }
+                const auto value =
+                    static_cast< index_t >( std::floor( index / offset ) );
+                vertex_id[dimension - d - 1] = value;
+                index -= value * offset;
+            }
+            return vertex_id;
+        }
+
+        absl::optional< GridVertexIndex< dimension > > next_vertex(
+            const GridVertexIndex< dimension >& index, index_t direction ) const
+        {
+            if( index[direction] + 1 < nb_vertices( direction ) )
+            {
+                auto next = index;
+                next[direction]++;
+                return next;
+            }
+            return absl::nullopt;
+        }
+
+        absl::optional< GridVertexIndex< dimension > > previous_vertex(
+            const GridVertexIndex< dimension >& index, index_t direction ) const
+        {
+            if( index[direction] > 0 )
+            {
+                auto prev = index;
+                prev[direction]--;
+                return prev;
+            }
+            return absl::nullopt;
+        }
+
+        Point< dimension > point(
+            const GridVertexIndex< dimension >& index ) const
         {
             Point< dimension > translation;
             for( const auto d : LRange{ dimension } )
@@ -149,12 +228,12 @@ namespace geode
             return origin_;
         }
 
-        absl::optional< typename RegularGrid< dimension >::Indices > cell(
+        absl::optional< GridCellIndices< dimension > > cell(
             const Point< dimension >& query ) const
         {
-            Indices indices;
-            Index min;
-            Index max;
+            GridCellIndices< dimension > indices;
+            GridCellIndex< dimension > min;
+            GridCellIndex< dimension > max;
             for( const auto d : LRange{ dimension } )
             {
                 const auto value =
@@ -198,7 +277,7 @@ namespace geode
             return cells_number_;
         }
 
-        const std::array< double, dimension > cells_sizes() const
+        const std::array< double, dimension >& cells_sizes() const
         {
             return cells_size_;
         }
@@ -208,17 +287,26 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& a, Impl& impl ) {
-                    a.object( impl.cell_attribute_manager_ );
-                    a.object( impl.origin_ );
-                    a.container4b( impl.cells_number_ );
-                    a.container8b( impl.cells_size_ );
-                } );
+            archive.ext(
+                *this, Growable< Archive, Impl >{
+                           { []( Archive& a, Impl& impl ) {
+                                a.object( impl.cell_attribute_manager_ );
+                                a.object( impl.origin_ );
+                                a.container4b( impl.cells_number_ );
+                                a.container8b( impl.cells_size_ );
+                            },
+                               []( Archive& a, Impl& impl ) {
+                                   a.object( impl.cell_attribute_manager_ );
+                                   a.object( impl.vertex_attribute_manager_ );
+                                   a.object( impl.origin_ );
+                                   a.container4b( impl.cells_number_ );
+                                   a.container8b( impl.cells_size_ );
+                               } } } );
         }
 
     private:
         mutable AttributeManager cell_attribute_manager_;
+        mutable AttributeManager vertex_attribute_manager_;
         Point< dimension > origin_;
         std::array< index_t, dimension > cells_number_;
         std::array< double, dimension > cells_size_;
@@ -282,37 +370,79 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t RegularGrid< dimension >::cell_index( const Index& index ) const
+    index_t RegularGrid< dimension >::cell_index(
+        const GridCellIndex< dimension >& index ) const
     {
         return impl_->cell_index( index );
     }
 
     template < index_t dimension >
-    typename RegularGrid< dimension >::Index
-        RegularGrid< dimension >::cell_index( index_t index ) const
+    GridCellIndex< dimension > RegularGrid< dimension >::cell_index(
+        index_t index ) const
     {
         return impl_->cell_index( index );
     }
 
     template < index_t dimension >
-    absl::optional< typename RegularGrid< dimension >::Index >
+    absl::optional< GridCellIndex< dimension > >
         RegularGrid< dimension >::next_cell(
-            const Index& index, index_t direction ) const
+            const GridCellIndex< dimension >& index, index_t direction ) const
     {
         return impl_->next_cell( index, direction );
     }
 
     template < index_t dimension >
-    absl::optional< typename RegularGrid< dimension >::Index >
+    absl::optional< GridCellIndex< dimension > >
         RegularGrid< dimension >::previous_cell(
-            const typename RegularGrid< dimension >::Index& index,
-            index_t direction ) const
+            const GridCellIndex< dimension >& index, index_t direction ) const
     {
         return impl_->previous_cell( index, direction );
     }
 
     template < index_t dimension >
-    absl::optional< typename RegularGrid< dimension >::Indices >
+    index_t RegularGrid< dimension >::nb_vertices() const
+    {
+        return vertex_attribute_manager().nb_elements();
+    }
+
+    template < index_t dimension >
+    index_t RegularGrid< dimension >::nb_vertices( index_t direction ) const
+    {
+        return impl_->nb_vertices( direction );
+    }
+
+    template < index_t dimension >
+    index_t RegularGrid< dimension >::vertex_index(
+        const GridCellIndex< dimension >& index ) const
+    {
+        return impl_->vertex_index( index );
+    }
+
+    template < index_t dimension >
+    GridCellIndex< dimension > RegularGrid< dimension >::vertex_index(
+        index_t index ) const
+    {
+        return impl_->vertex_index( index );
+    }
+
+    template < index_t dimension >
+    absl::optional< GridCellIndex< dimension > >
+        RegularGrid< dimension >::next_vertex(
+            const GridCellIndex< dimension >& index, index_t direction ) const
+    {
+        return impl_->next_vertex( index, direction );
+    }
+
+    template < index_t dimension >
+    absl::optional< GridCellIndex< dimension > >
+        RegularGrid< dimension >::previous_vertex(
+            const GridCellIndex< dimension >& index, index_t direction ) const
+    {
+        return impl_->previous_vertex( index, direction );
+    }
+
+    template < index_t dimension >
+    absl::optional< GridCellIndices< dimension > >
         RegularGrid< dimension >::cell( const Point< dimension >& query ) const
     {
         return impl_->cell( query );
@@ -326,7 +456,7 @@ namespace geode
 
     template < index_t dimension >
     Point< dimension > RegularGrid< dimension >::point(
-        const Index& index ) const
+        const GridCellIndex< dimension >& index ) const
     {
         return impl_->point( index );
     }
@@ -335,6 +465,12 @@ namespace geode
     AttributeManager& RegularGrid< dimension >::cell_attribute_manager() const
     {
         return impl_->cell_attribute_manager();
+    }
+
+    template < index_t dimension >
+    AttributeManager& RegularGrid< dimension >::vertex_attribute_manager() const
+    {
+        return impl_->vertex_attribute_manager();
     }
 
     template < index_t dimension >
@@ -358,6 +494,7 @@ namespace geode
         RegularGrid< dimension > clone{ origin(), impl_->cells_numbers(),
             impl_->cells_sizes() };
         clone.cell_attribute_manager().copy( cell_attribute_manager() );
+        clone.vertex_attribute_manager().copy( vertex_attribute_manager() );
         return clone;
     }
 
