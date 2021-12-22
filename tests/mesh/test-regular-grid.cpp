@@ -87,6 +87,58 @@ void test_cell_index( const geode::RegularGrid3D& grid )
         "[Test] Wrong cell index" );
 }
 
+void test_vertex_number( const geode::RegularGrid3D& grid )
+{
+    OPENGEODE_EXCEPTION(
+        grid.nb_vertices() == 1056, "[Test] Wrong total number of vertices" );
+    OPENGEODE_EXCEPTION( grid.nb_vertices( 0 ) == 6,
+        "[Test] Wrong total number of vertices along X" );
+    OPENGEODE_EXCEPTION( grid.nb_vertices( 1 ) == 11,
+        "[Test] Wrong total number of vertices along Y" );
+    OPENGEODE_EXCEPTION( grid.nb_vertices( 2 ) == 16,
+        "[Test] Wrong total number of vertices along Z" );
+}
+
+void test_vertex_index( const geode::RegularGrid3D& grid )
+{
+    OPENGEODE_EXCEPTION(
+        grid.vertex_index( { 0, 0, 0 } ) == 0, "[Test] Wrong vertex index" );
+    OPENGEODE_EXCEPTION(
+        grid.vertex_index( { 1, 0, 0 } ) == 1, "[Test] Wrong vertex index" );
+    OPENGEODE_EXCEPTION(
+        grid.vertex_index( { 0, 1, 0 } ) == 6, "[Test] Wrong vertex index" );
+    OPENGEODE_EXCEPTION(
+        grid.vertex_index( { 0, 0, 1 } ) == 66, "[Test] Wrong vertex index" );
+    OPENGEODE_EXCEPTION(
+        grid.vertex_index( { 1, 1, 1 } ) == 73, "[Test] Wrong vertex index" );
+    OPENGEODE_EXCEPTION(
+        grid.vertex_index( { 2, 2, 2 } ) == 146, "[Test] Wrong vertex index" );
+
+    OPENGEODE_EXCEPTION( grid.vertex_index( grid.vertex_index( 0 ) ) == 0,
+        "[Test] Wrong vertex index" );
+    OPENGEODE_EXCEPTION( grid.vertex_index( grid.vertex_index( 1 ) ) == 1,
+        "[Test] Wrong vertex index" );
+    OPENGEODE_EXCEPTION( grid.vertex_index( grid.vertex_index( 5 ) ) == 5,
+        "[Test] Wrong vertex index" );
+    OPENGEODE_EXCEPTION( grid.vertex_index( grid.vertex_index( 50 ) ) == 50,
+        "[Test] Wrong vertex index" );
+    OPENGEODE_EXCEPTION( grid.vertex_index( grid.vertex_index( 56 ) ) == 56,
+        "[Test] Wrong vertex index" );
+    OPENGEODE_EXCEPTION( grid.vertex_index( grid.vertex_index( 112 ) ) == 112,
+        "[Test] Wrong vertex index" );
+
+    OPENGEODE_EXCEPTION( grid.next_vertex( { 0, 0, 0 }, 0 )
+                             == geode::RegularGrid3D::Index( { 1, 0, 0 } ),
+        "[Test] Wrong vertex index" );
+    OPENGEODE_EXCEPTION(
+        !grid.next_vertex( { 5, 0, 0 }, 0 ), "[Test] Wrong vertex index" );
+    OPENGEODE_EXCEPTION(
+        !grid.previous_vertex( { 0, 0, 0 }, 1 ), "[Test] Wrong vertex index" );
+    OPENGEODE_EXCEPTION( grid.previous_vertex( { 0, 0, 1 }, 2 )
+                             == geode::RegularGrid3D::Index( { 0, 0, 0 } ),
+        "[Test] Wrong vertex index" );
+}
+
 void test_cell_geometry( const geode::RegularGrid3D& grid )
 {
     OPENGEODE_EXCEPTION(
@@ -144,27 +196,45 @@ void test_boundary_box( const geode::RegularGrid3D& grid )
 void test_clone( geode::RegularGrid3D& grid )
 {
     const auto attribute_name = "int_attribute";
+    const auto attribute_name_d = "double_attribute";
     auto attribute =
         grid.cell_attribute_manager()
             .find_or_create_attribute< geode::VariableAttribute, int >(
                 attribute_name, 0 );
+    auto attribute_d =
+        grid.vertex_attribute_manager()
+            .find_or_create_attribute< geode::VariableAttribute, double >(
+                attribute_name_d, 0 );
     for( const auto c : geode::Range{ grid.nb_cells() } )
     {
         attribute->set_value( c, 2 * c );
+    }
+    for( const auto c : geode::Range{ grid.nb_vertices() } )
+    {
+        attribute_d->set_value( c, 2 * c );
     }
     const auto clone = grid.clone();
     OPENGEODE_EXCEPTION(
         clone.origin() == grid.origin(), "[Test] Wrong clone origin" );
     OPENGEODE_EXCEPTION(
-        clone.nb_cells() == grid.nb_cells(), "[Test] Wrong clone nb_cells" );
-    OPENGEODE_EXCEPTION(
         clone.cell_attribute_manager().attribute_exists( attribute_name ),
+        "[Test] Clone missing attribute" );
+    OPENGEODE_EXCEPTION(
+        clone.vertex_attribute_manager().attribute_exists( attribute_name_d ),
         "[Test] Clone missing attribute" );
     const auto clone_attribute =
         clone.cell_attribute_manager().find_attribute< int >( attribute_name );
     for( const auto c : geode::TRange< int >{ clone.nb_cells() } )
     {
         OPENGEODE_EXCEPTION( clone_attribute->value( c ) == 2 * c,
+            "[Test] Wrong clone attribute" );
+    }
+    const auto clone_attribute_d =
+        clone.vertex_attribute_manager().find_attribute< double >(
+            attribute_name_d );
+    for( const auto c : geode::TRange< int >{ clone.nb_vertices() } )
+    {
+        OPENGEODE_EXCEPTION( clone_attribute_d->value( c ) == 2 * c,
             "[Test] Wrong clone attribute" );
     }
 }
@@ -180,6 +250,8 @@ void test()
     geode::RegularGrid3D grid{ { { 1.5, 0, 1 } }, { 5, 10, 15 }, { 1, 2, 3 } };
     test_cell_number( grid );
     test_cell_index( grid );
+    test_vertex_number( grid );
+    test_vertex_index( grid );
     test_cell_geometry( grid );
     test_cell_query( grid );
     test_boundary_box( grid );

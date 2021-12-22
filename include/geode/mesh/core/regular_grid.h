@@ -39,6 +39,19 @@ namespace geode
 
 namespace geode
 {
+    template < index_t dimension >
+    using GridCellIndex = std::array< index_t, dimension >;
+    ALIAS_2D_AND_3D( GridCellIndex );
+
+    template < index_t dimension >
+    using GridVertexIndex = std::array< index_t, dimension >;
+    ALIAS_2D_AND_3D( GridVertexIndex );
+
+    template < index_t dimension >
+    using GridCellIndices =
+        absl::InlinedVector< GridCellIndex< dimension >, 1 << dimension >;
+    ALIAS_2D_AND_3D( GridCellIndices );
+
     /*!
      * Interface class to represent regular grids.
      */
@@ -49,8 +62,8 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        using Index = std::array< index_t, dimension >;
-        using Indices = absl::InlinedVector< Index, dimension * dimension >;
+        using Index OPENGEODE_MESH_DEPRECATED = GridCellIndex< dimension >;
+        using Indices OPENGEODE_MESH_DEPRECATED = GridCellIndices< dimension >;
 
         RegularGrid( Point< dimension > origin,
             std::array< index_t, dimension > cells_number,
@@ -83,15 +96,31 @@ namespace geode
 
         double cell_size( index_t direction ) const;
 
-        index_t cell_index( const Index& index ) const;
+        index_t cell_index( const GridCellIndex< dimension >& index ) const;
 
-        Index cell_index( index_t index ) const;
+        GridCellIndex< dimension > cell_index( index_t index ) const;
 
-        absl::optional< Index > next_cell(
-            const Index& index, index_t direction ) const;
+        absl::optional< GridCellIndex< dimension > > next_cell(
+            const GridCellIndex< dimension >& index, index_t direction ) const;
 
-        absl::optional< Index > previous_cell(
-            const Index& index, index_t direction ) const;
+        absl::optional< GridCellIndex< dimension > > previous_cell(
+            const GridCellIndex< dimension >& index, index_t direction ) const;
+
+        index_t nb_vertices() const;
+
+        index_t nb_vertices( index_t direction ) const;
+
+        GridVertexIndex< dimension > vertex_index( index_t index ) const;
+
+        index_t vertex_index( const GridVertexIndex< dimension >& index ) const;
+
+        absl::optional< GridVertexIndex< dimension > > next_vertex(
+            const GridVertexIndex< dimension >& index,
+            index_t direction ) const;
+
+        absl::optional< GridVertexIndex< dimension > > previous_vertex(
+            const GridVertexIndex< dimension >& index,
+            index_t direction ) const;
 
         /*!
          * Return the cell(s) containing the query point
@@ -102,11 +131,15 @@ namespace geode
          * cell indices are returned: they correspond the potential cells that
          * may contain the point.
          */
-        absl::optional< Indices > cell( const Point< dimension >& query ) const;
+        absl::optional< GridCellIndices< dimension > > cell(
+            const Point< dimension >& query ) const;
 
-        Point< dimension > point( const Index& index ) const;
+        Point< dimension > point(
+            const GridVertexIndex< dimension >& index ) const;
 
         AttributeManager& cell_attribute_manager() const;
+
+        AttributeManager& vertex_attribute_manager() const;
 
         /*!
          * Compute the bounding box of the grid
