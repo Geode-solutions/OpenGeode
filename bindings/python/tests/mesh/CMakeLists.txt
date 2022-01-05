@@ -21,11 +21,13 @@
 add_geode_python_test(
     SOURCE "test-py-vertex-set.py"
     DEPENDENCIES 
+        ${PROJECT_NAME}::py_basic
         ${PROJECT_NAME}::py_mesh
 )
 add_geode_python_test(
     SOURCE "test-py-graph.py"
     DEPENDENCIES 
+        ${PROJECT_NAME}::py_basic
         ${PROJECT_NAME}::py_mesh
 )
 add_geode_python_test(
