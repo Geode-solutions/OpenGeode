@@ -37,6 +37,7 @@
 #include <bitsery/brief_syntax/array.h>
 #include <bitsery/brief_syntax/vector.h>
 
+#include <geode/basic/bitsery_archive.h>
 #include <geode/basic/common.h>
 
 namespace geode
