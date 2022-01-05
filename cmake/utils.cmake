@@ -22,12 +22,6 @@ endif()
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 #------------------------------------------------------------------------------------------------
-# Build configuration
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR})
-
-#------------------------------------------------------------------------------------------------
 # Platform dependent settings
 add_compile_options(
     $<$<CXX_COMPILER_ID:MSVC>:/bigobj>
@@ -61,6 +55,11 @@ set(CMAKE_INSTALL_RPATH "${OS_RPATH}")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
 set(CMAKE_BUILD_RPATH_USE_ORIGIN ON)
 
+set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
+set(CPACK_COMPONENT_INCLUDE_TOPLEVEL_DIRECTORY ON)
+set(CPACK_COMPONENTS_GROUPING ALL_COMPONENTS_IN_ONE)
+set(CPACK_COMPONENTS_ALL public)
+
 if(EXISTS ${PROJECT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in)
     set(OUTPUT_CONFIG_FILE ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}Config.cmake)
     configure_package_config_file(
@@ -71,6 +70,7 @@ if(EXISTS ${PROJECT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in)
     install(
         FILES ${OUTPUT_CONFIG_FILE}
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+        COMPONENT public
     )
 endif()
 
@@ -78,6 +78,7 @@ if(EXISTS ${PROJECT_SOURCE_DIR}/LICENSE)
     install(
         FILES ${PROJECT_SOURCE_DIR}/LICENSE
         DESTINATION .
+        COMPONENT public
     )
 endif()
 
@@ -85,6 +86,7 @@ if(EXISTS ${PROJECT_SOURCE_DIR}/COPYLEFT)
     install(
         FILES ${PROJECT_SOURCE_DIR}/COPYLEFT
         DESTINATION .
+        COMPONENT public
     )
 endif()
 
@@ -114,13 +116,17 @@ function(_export_library library_name)
     install(TARGETS ${library_name}
         EXPORT ${library_name}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        COMPONENT public
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        COMPONENT public
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        COMPONENT public
     )
     install(EXPORT ${library_name}
         FILE ${PROJECT_NAME}_${library_name}_target.cmake
         NAMESPACE ${PROJECT_NAME}::
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+        COMPONENT public
     )
 endfunction()
 
@@ -198,10 +204,18 @@ function(add_geode_library)
     )
     install(FILES ${PROJECT_BINARY_DIR}/${GEODE_LIB_FOLDER}/${project_name}_${GEODE_LIB_NAME}_export.h
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${GEODE_LIB_FOLDER}
+        COMPONENT public
     )
     install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/${GEODE_LIB_FOLDER}/
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${GEODE_LIB_FOLDER}
+        COMPONENT public
         PATTERN "*/private" EXCLUDE
+    )
+    install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/${GEODE_LIB_FOLDER}/
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${GEODE_LIB_FOLDER}
+        COMPONENT private
+        FILES_MATCHING
+        PATTERN "*/private/*"
     )
 endfunction()
 
@@ -261,7 +275,10 @@ function(add_geode_binary)
         ${ARGN}
     )
     _add_geode_executable(${GEODE_BINARY_SOURCE} "Utilities" ${GEODE_BINARY_DEPENDENCIES})
-    install(TARGETS ${target_name} RUNTIME)
+    install(TARGETS ${target_name}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        COMPONENT public
+    )
 endfunction()
 
 function(_add_dependency_directories test_name)
