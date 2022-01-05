@@ -62,8 +62,8 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        using Index OPENGEODE_MESH_DEPRECATED = GridCellIndex< dimension >;
-        using Indices OPENGEODE_MESH_DEPRECATED = GridCellIndices< dimension >;
+        using Index = GridCellIndex< dimension >;
+        using Indices = GridCellIndices< dimension >;
 
         RegularGrid( Point< dimension > origin,
             std::array< index_t, dimension > cells_number,

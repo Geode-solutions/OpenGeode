@@ -53,12 +53,7 @@ namespace geode
                 nb_cells *= c;
             }
             cell_attribute_manager_.resize( nb_cells );
-            index_t nb_vertices{ 1 };
-            for( const auto c : cells_number )
-            {
-                nb_vertices *= c + 1;
-            }
-            vertex_attribute_manager_.resize( nb_vertices );
+            resize_vertex_attribute_manager_to_right_size();
         }
 
         AttributeManager& cell_attribute_manager() const
@@ -283,25 +278,36 @@ namespace geode
         }
 
     private:
+        void resize_vertex_attribute_manager_to_right_size()
+        {
+            index_t nb_vertices{ 1 };
+            for( const auto c : cells_number_ )
+            {
+                nb_vertices *= c + 1;
+            }
+            vertex_attribute_manager_.resize( nb_vertices );
+        }
+
         friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext(
-                *this, Growable< Archive, Impl >{
-                           { []( Archive& a, Impl& impl ) {
-                                a.object( impl.cell_attribute_manager_ );
-                                a.object( impl.origin_ );
-                                a.container4b( impl.cells_number_ );
-                                a.container8b( impl.cells_size_ );
-                            },
-                               []( Archive& a, Impl& impl ) {
-                                   a.object( impl.cell_attribute_manager_ );
-                                   a.object( impl.vertex_attribute_manager_ );
-                                   a.object( impl.origin_ );
-                                   a.container4b( impl.cells_number_ );
-                                   a.container8b( impl.cells_size_ );
-                               } } } );
+            archive.ext( *this,
+                Growable< Archive, Impl >{
+                    { []( Archive& a, Impl& impl ) {
+                         a.object( impl.cell_attribute_manager_ );
+                         a.object( impl.origin_ );
+                         a.container4b( impl.cells_number_ );
+                         a.container8b( impl.cells_size_ );
+                         impl.resize_vertex_attribute_manager_to_right_size();
+                     },
+                        []( Archive& a, Impl& impl ) {
+                            a.object( impl.cell_attribute_manager_ );
+                            a.object( impl.vertex_attribute_manager_ );
+                            a.object( impl.origin_ );
+                            a.container4b( impl.cells_number_ );
+                            a.container8b( impl.cells_size_ );
+                        } } } );
         }
 
     private:
