@@ -54,7 +54,7 @@ namespace geode
         template < typename Container >
         inline void rotate( Container& vertices )
         {
-            if( vertices_.size() < 2 )
+            if( vertices.size() < 2 )
             {
                 return;
             }
