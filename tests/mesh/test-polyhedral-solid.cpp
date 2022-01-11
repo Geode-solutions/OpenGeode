@@ -113,6 +113,9 @@ void test_create_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
         "[Test] Wrong vertex in polyhedron" );
     OPENGEODE_EXCEPTION( polyhedral_solid.vertex_in_polyhedron( 1, 5 ),
         "[Test] Wrong vertex in polyhedron" );
+    geode::PolyhedronVertices answer{ 3, 4, 5, 6 };
+    OPENGEODE_EXCEPTION( polyhedral_solid.polyhedron_vertices( 1 ) == answer,
+        "[Test] Wrong polyhedron vertices list" );
 }
 
 void test_create_facet_attribute(

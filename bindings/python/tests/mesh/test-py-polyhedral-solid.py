@@ -58,6 +58,9 @@ def test_create_polyhedra( polyhedral_solid, builder ):
         raise ValueError( "[Test] PolyhedralSolid should have 11 facets" )
     if polyhedral_solid.edges().nb_edges() != 15:
         raise ValueError( "[Test] PolyhedralSolid should have 15 edges" )
+    answer = [3, 4, 5, 6]
+    if polyhedral_solid.polyhedron_vertices( 1 ) != answer:
+        raise ValueError("[Test] Wrong polyhedron vertices list" )
 
 def test_create_facet_attribute( polyhedral_solid ):
     attribute = polyhedral_solid.facets().facet_attribute_manager().find_or_create_attribute_variable_uint( "test", basic.NO_ID )
