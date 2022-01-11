@@ -356,7 +356,6 @@ namespace geode
         const auto nb_vertices = nb_polygon_vertices( polygon_id );
         PolygonVertices vertices( nb_vertices );
         for( const auto v : LRange{ nb_vertices } )
-
         {
             vertices[v] = polygon_vertex( { polygon_id, v } );
         }
