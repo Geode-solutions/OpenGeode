@@ -442,7 +442,6 @@ namespace geode
         const auto nb_vertices = nb_polyhedron_vertices( polyhedron_id );
         PolyhedronVertices vertices( nb_vertices );
         for( const auto v : LRange{ nb_vertices } )
-
         {
             vertices[v] = polyhedron_vertex( { polyhedron_id, v } );
         }
