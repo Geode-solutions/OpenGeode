@@ -80,6 +80,10 @@ namespace geode
             return Vector< dimension >{ vertices_[0].get(), vertices_[1].get() }
                 .length();
         }
+        void set_point( index_t vertex, const Point< dimension >& point )
+        {
+            vertices_.at( vertex ) = point;
+        }
         const std::array< std::reference_wrapper< const Point< dimension > >,
             2 >&
             vertices() const
@@ -279,6 +283,10 @@ namespace geode
             }
             return absl::nullopt;
         }
+        void set_point( index_t vertex, const Point< dimension >& point )
+        {
+            vertices_.at( vertex ) = point;
+        }
         const std::array< std::reference_wrapper< const Point< dimension > >,
             3 >&
             vertices() const
@@ -323,6 +331,10 @@ namespace geode
             return ( vertices_[0].get() + vertices_[1].get()
                        + vertices_[2].get() + vertices_[3].get() )
                    / 4.;
+        }
+        void set_point( index_t vertex, const Point3D& point )
+        {
+            vertices_.at( vertex ) = point;
         }
         const std::array< std::reference_wrapper< const Point3D >, 4 >&
             vertices() const
