@@ -62,6 +62,8 @@
             &SolidMesh##dimension##D::nb_polyhedron_facet_vertices )           \
         .def(                                                                  \
             "polyhedron_vertex", &SolidMesh##dimension##D::polyhedron_vertex ) \
+        .def( "polyhedron_vertices",                                           \
+            &SolidMesh##dimension##D::polyhedron_vertices )                    \
         .def( "polyhedron_facet_vertex",                                       \
             &SolidMesh##dimension##D::polyhedron_facet_vertex )                \
         .def( "polyhedron_facet_vertices",                                     \

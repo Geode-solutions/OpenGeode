@@ -102,6 +102,8 @@ namespace geode
         local_index_t edge_id{ NO_LID };
     };
 
+    using PolygonVertices = absl::InlinedVector< index_t, 3 >;
+
     using PolygonEdgesOnBorder = absl::InlinedVector< PolygonEdge, 3 >;
 
     using PolygonsAroundVertex = absl::InlinedVector< PolygonVertex, 10 >;
@@ -156,6 +158,12 @@ namespace geode
          * @param[in] polygon_vertex Local index of vertex in polygon
          */
         index_t polygon_vertex( const PolygonVertex& polygon_vertex ) const;
+
+        /*!
+         * Return all the indices in the mesh of polygon vertices.
+         * @param[in] polygon_id Index of polygon.
+         */
+        PolygonVertices polygon_vertices( index_t polygon_id ) const;
 
         /*!
          * Return the index in the mesh of a given polygon edge vertex.

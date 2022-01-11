@@ -150,6 +150,8 @@ namespace geode
 
     using PolyhedronFacetVertices = absl::InlinedVector< index_t, 4 >;
 
+    using PolyhedronVertices = absl::InlinedVector< index_t, 4 >;
+
     using PolyhedronFacets = absl::InlinedVector< PolyhedronFacet, 4 >;
 
     using PolyhedronFacetsOnBorder = PolyhedronFacets;
@@ -224,6 +226,12 @@ namespace geode
          */
         index_t polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex ) const;
+
+        /*!
+         * Return all the indices in the mesh of polyhedron vertices.
+         * @param[in] polyhedron_id Index of polyhedron.
+         */
+        PolyhedronVertices polyhedron_vertices( index_t polyhedron_id ) const;
 
         /*!
          * Return the local index in the tetrahedron of a vertex in the mesh.

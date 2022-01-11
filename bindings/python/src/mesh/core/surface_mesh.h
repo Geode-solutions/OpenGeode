@@ -48,6 +48,8 @@
         .def(                                                                  \
             "nb_polygon_edges", &SurfaceMesh##dimension##D::nb_polygon_edges ) \
         .def( "polygon_vertex", &SurfaceMesh##dimension##D::polygon_vertex )   \
+        .def(                                                                  \
+            "polygon_vertices", &SurfaceMesh##dimension##D::polygon_vertices ) \
         .def( "polygon_edge_vertex",                                           \
             &SurfaceMesh##dimension##D::polygon_edge_vertex )                  \
         .def( "next_polygon_vertex",                                           \
@@ -68,10 +70,10 @@
         .def( "previous_on_border",                                            \
             &SurfaceMesh##dimension##D::previous_on_border )                   \
         .def( "polygon_edge_length",                                           \
-            ( double ( SurfaceMesh##dimension##D::* )( const PolygonEdge& )    \
+            ( double( SurfaceMesh##dimension##D::* )( const PolygonEdge& )     \
                     const )                                                    \
                 & SurfaceMesh##dimension##D::edge_length )                     \
-        .def( "edge_length", ( double ( SurfaceMesh##dimension##D::* )(        \
+        .def( "edge_length", ( double( SurfaceMesh##dimension##D::* )(         \
                                  const std::array< index_t, 2 >& ) const )     \
                                  & SurfaceMesh##dimension##D::edge_length )    \
         .def( "polygon_edge_barycenter",                                       \

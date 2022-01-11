@@ -225,6 +225,9 @@ void test_create_polygons( const geode::PolygonalSurface3D& polygonal_surface,
         "[Test] PolygonalSurface should have 3 polygons" );
     OPENGEODE_EXCEPTION( polygonal_surface.edges().nb_edges() == 9,
         "[Test] PolygonalSurface should have 9 edges" );
+    geode::PolygonVertices answer{ 1, 3, 4, 2 };
+    OPENGEODE_EXCEPTION( polygonal_surface.polygon_vertices( 1 ) == answer,
+        "[Test] Wrong polygon vertices list" );
 }
 
 void test_create_edge_attribute(
