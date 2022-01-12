@@ -436,6 +436,19 @@ namespace geode
     }
 
     template < index_t dimension >
+    PolyhedronVertices SolidMesh< dimension >::polyhedron_vertices(
+        index_t polyhedron_id ) const
+    {
+        const auto nb_vertices = nb_polyhedron_vertices( polyhedron_id );
+        PolyhedronVertices vertices( nb_vertices );
+        for( const auto v : LRange{ nb_vertices } )
+        {
+            vertices[v] = polyhedron_vertex( { polyhedron_id, v } );
+        }
+        return vertices;
+    }
+
+    template < index_t dimension >
     absl::optional< local_index_t >
         SolidMesh< dimension >::vertex_in_polyhedron(
             index_t polyhedron_id, index_t vertex_id ) const

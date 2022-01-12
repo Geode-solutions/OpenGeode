@@ -83,6 +83,9 @@ def test_create_polygons( polygonal_surface, builder ):
         raise ValueError( "[Test] PolygonalSurface should have 3 polygons" )
     if polygonal_surface.edges().nb_edges() != 9:
         raise ValueError( "[Test] PolygonalSurface should have 9 edges" )
+    answer = [1, 3, 4, 2]
+    if polygonal_surface.polygon_vertices( 1 ) != answer:
+        raise ValueError("[Test] Wrong polygon vertices list" )
 
 def test_create_edge_attribute( polygonal_surface ):
     attribute = polygonal_surface.edges().edge_attribute_manager().find_or_create_attribute_variable_uint( "test", basic.NO_ID )

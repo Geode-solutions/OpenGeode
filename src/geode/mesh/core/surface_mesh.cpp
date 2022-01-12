@@ -350,6 +350,19 @@ namespace geode
     }
 
     template < index_t dimension >
+    PolygonVertices SurfaceMesh< dimension >::polygon_vertices(
+        index_t polygon_id ) const
+    {
+        const auto nb_vertices = nb_polygon_vertices( polygon_id );
+        PolygonVertices vertices( nb_vertices );
+        for( const auto v : LRange{ nb_vertices } )
+        {
+            vertices[v] = polygon_vertex( { polygon_id, v } );
+        }
+        return vertices;
+    }
+
+    template < index_t dimension >
     absl::optional< PolygonVertex >
         SurfaceMesh< dimension >::polygon_around_vertex(
             index_t vertex_id ) const

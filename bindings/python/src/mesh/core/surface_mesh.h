@@ -48,6 +48,8 @@
         .def(                                                                  \
             "nb_polygon_edges", &SurfaceMesh##dimension##D::nb_polygon_edges ) \
         .def( "polygon_vertex", &SurfaceMesh##dimension##D::polygon_vertex )   \
+        .def(                                                                  \
+            "polygon_vertices", &SurfaceMesh##dimension##D::polygon_vertices ) \
         .def( "polygon_edge_vertex",                                           \
             &SurfaceMesh##dimension##D::polygon_edge_vertex )                  \
         .def( "next_polygon_vertex",                                           \
