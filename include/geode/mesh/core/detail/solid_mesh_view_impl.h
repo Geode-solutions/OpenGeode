@@ -130,17 +130,20 @@ namespace geode
                                 { facet, v } );
                             if( v0 == vertices[0] )
                             {
+                                const auto next =
+                                    v + 1 == nb_vertices ? 0 : v + 1;
                                 const auto v1_next =
                                     solid_view_.polyhedron_facet_vertex(
-                                        { facet, ( v + 1 ) % nb_vertices } );
+                                        { facet, next } );
                                 if( v1_next == vertices[1] )
                                 {
                                     return false;
                                 }
+                                const auto prev =
+                                    v == 0 ? nb_vertices - 1 : v - 1;
                                 const auto v1_prev =
                                     solid_view_.polyhedron_facet_vertex(
-                                        { facet, ( v + nb_vertices - 1 )
-                                                     % nb_vertices } );
+                                        { facet, prev } );
                                 if( v1_prev == vertices[1] )
                                 {
                                     return false;

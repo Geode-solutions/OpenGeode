@@ -509,9 +509,9 @@ namespace geode
                 for( const auto e : LRange{ nb_vertices } )
                 {
                     PolygonEdge edge{ polygon, e };
-                    const auto edge_id =
-                        edges.edge_from_vertices( { vertices_id[e],
-                            vertices_id[( e + 1 ) % nb_vertices] } );
+                    const auto next = e + 1 == nb_vertices ? 0 : e + 1;
+                    const auto edge_id = edges.edge_from_vertices(
+                        { vertices_id[e], vertices_id[next] } );
                     polygon_edges_around[edge_id.value()].emplace_back(
                         std::move( edge ) );
                 }

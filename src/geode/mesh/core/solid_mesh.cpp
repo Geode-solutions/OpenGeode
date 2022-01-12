@@ -577,15 +577,14 @@ namespace geode
                 const auto vertices = polyhedron_facet_vertices( facet );
                 for( const auto v : LIndices{ vertices } )
                 {
+                    const auto next = v == vertices.size() - 1 ? 0 : v + 1;
                     if( vertices[v] == edge_vertices[0]
-                        && vertices[( v + 1 ) % vertices.size()]
-                               == edge_vertices[1] )
+                        && vertices[next] == edge_vertices[1] )
                     {
                         return PolyhedronFacetEdge{ facet, v };
                     }
                     if( vertices[v] == edge_vertices[1]
-                        && vertices[( v + 1 ) % vertices.size()]
-                               == edge_vertices[0] )
+                        && vertices[next] == edge_vertices[0] )
                     {
                         return PolyhedronFacetEdge{ facet, v };
                     }
@@ -924,12 +923,14 @@ namespace geode
         const auto v0 =
             polyhedron_facet_vertex( { polyhedron_facet_edge.polyhedron_facet,
                 polyhedron_facet_edge.edge_id } );
-        const auto v1 =
-            polyhedron_facet_vertex( { polyhedron_facet_edge.polyhedron_facet,
-                static_cast< local_index_t >(
-                    ( polyhedron_facet_edge.edge_id + 1 )
-                    % nb_polyhedron_facet_vertices(
-                        polyhedron_facet_edge.polyhedron_facet ) ) } );
+        const local_index_t next =
+            polyhedron_facet_edge.edge_id + 1
+                    == nb_polyhedron_facet_vertices(
+                        polyhedron_facet_edge.polyhedron_facet )
+                ? 0
+                : polyhedron_facet_edge.edge_id + 1;
+        const auto v1 = polyhedron_facet_vertex(
+            { polyhedron_facet_edge.polyhedron_facet, next } );
         return { v0, v1 };
     }
 

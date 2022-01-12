@@ -311,21 +311,21 @@ namespace geode
                     if( solid_mesh_->are_edges_enabled() )
                     {
                         auto edges = edges_builder();
+                        const auto next = position + 1 == nb_facet_vertices
+                                              ? 0
+                                              : position + 1;
                         std::array< index_t, 2 > next_edge_vertices{
-                            facet_vertices_id[position],
-                            facet_vertices_id[( position + 1 )
-                                              % nb_facet_vertices]
+                            facet_vertices_id[position], facet_vertices_id[next]
                         };
                         if( next_edge_vertices[0] < next_edge_vertices[1] )
                         {
                             edges.update_edge_vertex(
                                 next_edge_vertices, 0, vertex_id );
                         }
+                        const auto prev = position == 0 ? nb_facet_vertices - 1
+                                                        : position - 1;
                         std::array< index_t, 2 > previous_edge_vertices{
-                            facet_vertices_id[( position + nb_facet_vertices
-                                                  - 1 )
-                                              % nb_facet_vertices],
-                            facet_vertices_id[position]
+                            facet_vertices_id[prev], facet_vertices_id[position]
                         };
                         if( previous_edge_vertices[0]
                             < previous_edge_vertices[1] )

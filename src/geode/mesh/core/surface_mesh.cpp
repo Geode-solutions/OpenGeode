@@ -414,8 +414,8 @@ namespace geode
         const auto vertex = polygon_vertex.vertex_id;
         const auto polygon = polygon_vertex.polygon_id;
         const auto nb_vertices = nb_polygon_vertices( polygon );
-        return { polygon,
-            static_cast< local_index_t >( ( vertex + 1 ) % nb_vertices ) };
+        const local_index_t next = vertex + 1 == nb_vertices ? 0 : vertex + 1;
+        return { polygon, next };
     }
 
     template < index_t dimension >
@@ -425,8 +425,8 @@ namespace geode
         const auto vertex = polygon_vertex.vertex_id;
         const auto polygon = polygon_vertex.polygon_id;
         const auto nb_vertices = nb_polygon_vertices( polygon );
-        return { polygon, static_cast< local_index_t >(
-                              ( vertex + nb_vertices - 1 ) % nb_vertices ) };
+        const local_index_t prev = vertex == 0 ? nb_vertices - 1 : vertex - 1;
+        return { polygon, prev };
     }
 
     template < index_t dimension >
@@ -606,12 +606,12 @@ namespace geode
         OPENGEODE_ASSERT( vertex_id < 2, "[SurfaceMesh::polygon_"
                                          "edge_vertex] vertex_id should be "
                                          "0 or 1" );
-        const auto vertex = polygon_edge.edge_id;
+        const auto edge = polygon_edge.edge_id;
         const auto polygon = polygon_edge.polygon_id;
         const auto nb_vertices = nb_polygon_vertices( polygon );
-        return polygon_vertex(
-            { polygon, static_cast< local_index_t >(
-                           ( vertex + vertex_id ) % nb_vertices ) } );
+        const local_index_t vertex =
+            edge + vertex_id == nb_vertices ? 0 : edge + vertex_id;
+        return polygon_vertex( { polygon, vertex } );
     }
 
     template < index_t dimension >

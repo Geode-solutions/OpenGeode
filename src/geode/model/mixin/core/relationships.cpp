@@ -145,9 +145,7 @@ namespace geode
                     continue;
                 }
                 const auto& other =
-                    this->vertex_component_id( { edge_vertex.edge_id,
-                        static_cast< local_index_t >(
-                            ( edge_vertex.vertex_id + 1 ) % 2 ) } );
+                    this->vertex_component_id( edge_vertex.opposite() );
                 if( to == other.id() )
                 {
                     return edge_vertex.edge_id;
@@ -581,9 +579,7 @@ namespace geode
         const ComponentID& vertex_component_id() const
         {
             const auto iterator = this->current();
-            return relationships_.vertex_component_id(
-                { iterator->edge_id, static_cast< local_index_t >(
-                                         ( iterator->vertex_id + 1 ) % 2 ) } );
+            return relationships_.vertex_component_id( iterator->opposite() );
         }
 
     private:
@@ -652,9 +648,7 @@ namespace geode
         const ComponentID& vertex_component_id() const
         {
             const auto iterator = this->current();
-            return relationships_.vertex_component_id(
-                { iterator->edge_id, static_cast< local_index_t >(
-                                         ( iterator->vertex_id + 1 ) % 2 ) } );
+            return relationships_.vertex_component_id( iterator->opposite() );
         }
 
     private:
@@ -741,9 +735,7 @@ namespace geode
         const ComponentID& vertex_component_id() const
         {
             const auto iterator = this->current();
-            return relationships_.vertex_component_id(
-                { iterator->edge_id, static_cast< local_index_t >(
-                                         ( iterator->vertex_id + 1 ) % 2 ) } );
+            return relationships_.vertex_component_id( iterator->opposite() );
         }
 
     private:
@@ -831,9 +823,7 @@ namespace geode
         const ComponentID& vertex_component_id() const
         {
             const auto iterator = this->current();
-            return relationships_.vertex_component_id(
-                { iterator->edge_id, static_cast< local_index_t >(
-                                         ( iterator->vertex_id + 1 ) % 2 ) } );
+            return relationships_.vertex_component_id( iterator->opposite() );
         }
 
     private:
@@ -920,9 +910,7 @@ namespace geode
         const ComponentID& vertex_component_id() const
         {
             const auto iterator = this->current();
-            return relationships_.vertex_component_id(
-                { iterator->edge_id, static_cast< local_index_t >(
-                                         ( iterator->vertex_id + 1 ) % 2 ) } );
+            return relationships_.vertex_component_id( iterator->opposite() );
         }
 
     private:
@@ -1010,9 +998,7 @@ namespace geode
         const ComponentID& vertex_component_id() const
         {
             const auto iterator = this->current();
-            return relationships_.vertex_component_id(
-                { iterator->edge_id, static_cast< local_index_t >(
-                                         ( iterator->vertex_id + 1 ) % 2 ) } );
+            return relationships_.vertex_component_id( iterator->opposite() );
         }
 
     private:
@@ -1099,9 +1085,7 @@ namespace geode
         const ComponentID& vertex_component_id() const
         {
             const auto iterator = this->current();
-            return relationships_.vertex_component_id(
-                { iterator->edge_id, static_cast< local_index_t >(
-                                         ( iterator->vertex_id + 1 ) % 2 ) } );
+            return relationships_.vertex_component_id( iterator->opposite() );
         }
 
     private:
