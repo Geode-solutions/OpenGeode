@@ -192,9 +192,8 @@ namespace geode
     {
         for( const auto& edge : edges_around_vertex( v0 ) )
         {
-            const EdgeVertex opposite{ edge.edge_id,
-                static_cast< local_index_t >( ( edge.vertex_id + 1 ) % 2 ) };
-            if( edge_vertex( opposite ) == v1 )
+            const local_index_t next = edge.vertex_id == 0 ? 1 : 0;
+            if( edge_vertex( { edge.edge_id, next } ) == v1 )
             {
                 return edge.edge_id;
             }

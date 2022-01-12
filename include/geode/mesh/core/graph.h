@@ -59,6 +59,11 @@ namespace geode
         {
             return !( *this == other );
         }
+        EdgeVertex opposite() const
+        {
+            const local_index_t opposite = vertex_id == 0 ? 1 : 0;
+            return { edge_id, opposite };
+        }
         template < typename Archive >
         void serialize( Archive& archive );
 

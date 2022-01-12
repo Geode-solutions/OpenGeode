@@ -93,8 +93,10 @@ namespace
         {
             return;
         }
-        constexpr geode::local_index_t COORDY = ( COORDX + 1 ) % 3;
-        constexpr geode::local_index_t COORDZ = ( COORDY + 1 ) % 3;
+        constexpr geode::local_index_t COORDY =
+            COORDX + 1 == 3 ? 0 : COORDX + 1;
+        constexpr geode::local_index_t COORDZ =
+            COORDY + 1 == 3 ? 0 : COORDY + 1;
 
         const Morton_cmp3D compX{ points, COORDX };
         const Morton_cmp3D compY{ points, COORDY };
@@ -128,7 +130,8 @@ namespace
         {
             return;
         }
-        constexpr geode::local_index_t COORDY = ( COORDX + 1 ) % 2;
+        constexpr geode::local_index_t COORDY =
+            COORDX + 1 == 2 ? 0 : COORDX + 1;
 
         const Morton_cmp2D compX{ points, COORDX };
         const Morton_cmp2D compY{ points, COORDY };
