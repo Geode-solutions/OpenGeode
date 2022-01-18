@@ -27,7 +27,7 @@ jobs:
         cmake --build . -- -j2
         cmake --build . --target package
     - name: Upload
-      uses: softprops/action-gh-release@v1
+      uses: geode-solutions/action-gh-release@master
       with:
         files: "build/OpenGeode-${{ steps.package.outputs.version }}-${{ matrix.config.system }}.tar.gz"
       env:
@@ -79,7 +79,7 @@ jobs:
         password: ${{ secrets.PYPI_TOKEN }}
         packages_dir: "build/opengeode/wheel/dist/"
     - name: Upload
-      uses: softprops/action-gh-release@v1
+      uses: geode-solutions/action-gh-release@master
       with:
         files: "build/opengeode/wheel/dist/OpenGeode_core-${{ steps.package.outputs.version }}-${{ matrix.config.tag }}-manylinux2014_x86_64.whl"
       env:
@@ -109,7 +109,7 @@ jobs:
         cmake --build . --config Release
         cmake --build . --target package --config Release
     - name: Upload
-      uses: softprops/action-gh-release@v1
+      uses: geode-solutions/action-gh-release@master
       with:
         files: "build/OpenGeode-${{ steps.package.outputs.version }}-darwin.tar.gz"
       env:
@@ -158,7 +158,7 @@ jobs:
         pip install twine
         twine upload -u __token__ -p ${{ secrets.PYPI_TOKEN }} build/opengeode/wheel/dist/*
     - name: Upload
-      uses: softprops/action-gh-release@v1
+      uses: geode-solutions/action-gh-release@master
       with:
         files: "build/opengeode/wheel/dist/OpenGeode_core-${{ steps.package.outputs.version }}-${{ matrix.config.tag }}-macosx_10_14_x86_64.whl"
       env:
@@ -188,7 +188,7 @@ jobs:
         cmake --build . --config Release
         cmake --build . --target PACKAGE --config Release
     - name: Upload
-      uses: softprops/action-gh-release@v1
+      uses: geode-solutions/action-gh-release@master
       with:
         files: "build/OpenGeode-${{ steps.package.outputs.version }}-win64.zip"
       env:
@@ -237,7 +237,7 @@ jobs:
         pip install twine
         twine upload -u __token__ -p ${{ secrets.PYPI_TOKEN }} build/opengeode/wheel/dist/*
     - name: Upload
-      uses: softprops/action-gh-release@v1
+      uses: geode-solutions/action-gh-release@master
       with:
         files: "build/opengeode/wheel/dist/OpenGeode_core-${{ steps.package.outputs.version }}-${{ matrix.config.tag }}-win_amd64.whl"
       env:

@@ -87,14 +87,14 @@ void test_cell_index( const geode::RegularGrid3D& grid )
         "[Test] Wrong cell index" );
 
     OPENGEODE_EXCEPTION( grid.next_cell( { 0, 0, 0 }, 0 )
-                             == geode::RegularGrid3D::Index( { 1, 0, 0 } ),
+                             == geode::GridCellIndex3D( { 1, 0, 0 } ),
         "[Test] Wrong cell index" );
     OPENGEODE_EXCEPTION(
         !grid.next_cell( { 4, 0, 0 }, 0 ), "[Test] Wrong cell index" );
     OPENGEODE_EXCEPTION(
         !grid.previous_cell( { 0, 0, 0 }, 1 ), "[Test] Wrong cell index" );
     OPENGEODE_EXCEPTION( grid.previous_cell( { 0, 0, 1 }, 2 )
-                             == geode::RegularGrid3D::Index( { 0, 0, 0 } ),
+                             == geode::GridCellIndex3D( { 0, 0, 0 } ),
         "[Test] Wrong cell index" );
 }
 
@@ -141,14 +141,14 @@ void test_vertex_index( const geode::RegularGrid3D& grid )
         "[Test] Wrong vertex index" );
 
     OPENGEODE_EXCEPTION( grid.next_vertex( { 0, 0, 0 }, 0 )
-                             == geode::RegularGrid3D::Index( { 1, 0, 0 } ),
+                             == geode::GridVertexIndex3D( { 1, 0, 0 } ),
         "[Test] Wrong vertex index" );
     OPENGEODE_EXCEPTION(
         !grid.next_vertex( { 5, 0, 0 }, 0 ), "[Test] Wrong vertex index" );
     OPENGEODE_EXCEPTION(
         !grid.previous_vertex( { 0, 0, 0 }, 1 ), "[Test] Wrong vertex index" );
     OPENGEODE_EXCEPTION( grid.previous_vertex( { 0, 0, 1 }, 2 )
-                             == geode::RegularGrid3D::Index( { 0, 0, 0 } ),
+                             == geode::GridVertexIndex3D( { 0, 0, 0 } ),
         "[Test] Wrong vertex index" );
 }
 
@@ -161,7 +161,7 @@ void test_vertex_on_border( const geode::RegularGrid3D& grid )
         grid.is_vertex_on_border( grid.vertex_index( { { 0, 9, 0 } } ) ),
         "[Test] Vertex is not on border where it should be." );
     OPENGEODE_EXCEPTION(
-        grid.is_vertex_on_border( !grid.vertex_index( { { 1, 2, 3 } } ) ),
+        !grid.is_vertex_on_border( grid.vertex_index( { { 1, 2, 3 } } ) ),
         "[Test] Vertex is on border where it should not be." );
 }
 
@@ -188,25 +188,24 @@ void test_cell_query( const geode::RegularGrid3D& grid )
     auto result = grid.cell( geode::Point3D( { 2, 2, 2 } ) ).value();
     OPENGEODE_EXCEPTION(
         result.size() == 2
-            && result.front() == geode::RegularGrid3D::Index( { 0, 0, 0 } )
-            && result.back() == geode::RegularGrid3D::Index( { 0, 1, 0 } ),
+            && result.front() == geode::GridCellIndex3D( { 0, 0, 0 } )
+            && result.back() == geode::GridCellIndex3D( { 0, 1, 0 } ),
         "[Test] Wrong query result" );
     result = grid.cell( geode::Point3D( { 5, 7, 9 } ) ).value();
     OPENGEODE_EXCEPTION(
         result.size() == 1
-            && result.front() == geode::RegularGrid3D::Index( { 3, 3, 2 } ),
+            && result.front() == geode::GridCellIndex3D( { 3, 3, 2 } ),
         "[Test] Wrong query result" );
     result = grid.cell( geode::Point3D( { 4.5, 6, 7 - 1e-10 } ) ).value();
     OPENGEODE_EXCEPTION(
-        result.size() == 8
-            && result[0] == geode::RegularGrid3D::Index( { 2, 2, 1 } )
-            && result[1] == geode::RegularGrid3D::Index( { 3, 2, 1 } )
-            && result[2] == geode::RegularGrid3D::Index( { 2, 3, 1 } )
-            && result[3] == geode::RegularGrid3D::Index( { 3, 3, 1 } )
-            && result[4] == geode::RegularGrid3D::Index( { 2, 2, 2 } )
-            && result[5] == geode::RegularGrid3D::Index( { 3, 2, 2 } )
-            && result[6] == geode::RegularGrid3D::Index( { 2, 3, 2 } )
-            && result[7] == geode::RegularGrid3D::Index( { 3, 3, 2 } ),
+        result.size() == 8 && result[0] == geode::GridCellIndex3D( { 2, 2, 1 } )
+            && result[1] == geode::GridCellIndex3D( { 3, 2, 1 } )
+            && result[2] == geode::GridCellIndex3D( { 2, 3, 1 } )
+            && result[3] == geode::GridCellIndex3D( { 3, 3, 1 } )
+            && result[4] == geode::GridCellIndex3D( { 2, 2, 2 } )
+            && result[5] == geode::GridCellIndex3D( { 3, 2, 2 } )
+            && result[6] == geode::GridCellIndex3D( { 2, 3, 2 } )
+            && result[7] == geode::GridCellIndex3D( { 3, 3, 2 } ),
         "[Test] Wrong query result" );
 }
 

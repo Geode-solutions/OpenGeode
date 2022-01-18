@@ -67,11 +67,11 @@ namespace geode
 
         RegularGrid( Point< dimension > origin,
             std::array< index_t, dimension > cells_number,
-            std::array< double, dimension > cells_size );
+            std::array< double, dimension > cells_length );
 
         RegularGrid( Point< dimension > origin,
             std::array< index_t, dimension > cells_number,
-            double cells_size );
+            double cells_length );
 
         RegularGrid( RegularGrid&& );
 
@@ -129,6 +129,9 @@ namespace geode
             index_t direction ) const;
 
         bool is_vertex_on_border( index_t vertex_index ) const;
+
+        bool is_vertex_on_border(
+            const GridVertexIndex< dimension >& vertex_index ) const;
 
         /*!
          * Return the cell(s) containing the query point
