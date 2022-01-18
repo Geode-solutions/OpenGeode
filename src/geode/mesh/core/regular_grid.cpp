@@ -42,10 +42,10 @@ namespace geode
 
         Impl( Point< dimension > origin,
             std::array< index_t, dimension > cells_number,
-            std::array< double, dimension > cells_size )
+            std::array< double, dimension > cells_length )
             : origin_( std::move( origin ) ),
               cells_number_( std::move( cells_number ) ),
-              cells_size_( std::move( cells_size ) )
+              cells_length_( std::move( cells_length ) )
         {
             index_t nb_cells{ 1 };
             for( const auto c : cells_number )
@@ -73,12 +73,12 @@ namespace geode
 
         double cell_size( index_t direction ) const
         {
-            return cells_size_.at( direction );
+            return cells_length_.at( direction );
         }
 
         double cell_length( index_t direction ) const
         {
-            return cells_size_.at( direction );
+            return cells_length_.at( direction );
         }
 
         double cell_size() const
@@ -228,11 +228,16 @@ namespace geode
 
         bool is_vertex_on_border( index_t vertex_id ) const
         {
-            const auto vertex_indices = vertex_index( vertex_id );
+            return is_vertex_on_border( vertex_index( vertex_id ) );
+        }
+
+        bool is_vertex_on_border(
+            const GridVertexIndex< dimension >& vertex_index ) const
+        {
             for( const auto d : LRange{ dimension } )
             {
-                if( vertex_indices[d] == 0
-                    || vertex_indices[d] == nb_vertices( d ) - 1 )
+                if( vertex_index[d] == 0
+                    || vertex_index[d] == nb_vertices( d ) - 1 )
                 {
                     return true;
                 }
@@ -248,7 +253,7 @@ namespace geode
             {
                 OPENGEODE_ASSERT( index[d] < cells_number_[d] + 1,
                     "[RegularGrid::point] Invalid index" );
-                translation.set_value( d, cells_size_[d] * index[d] );
+                translation.set_value( d, cells_length_[d] * index[d] );
             }
             return origin_ + translation;
         }
@@ -266,8 +271,8 @@ namespace geode
             GridCellIndex< dimension > max;
             for( const auto d : LRange{ dimension } )
             {
-                const auto value =
-                    ( query.value( d ) - origin_.value( d ) ) / cells_size_[d];
+                const auto value = ( query.value( d ) - origin_.value( d ) )
+                                   / cells_length_[d];
                 if( value < 0 || value >= cells_number_[d] )
                 {
                     return absl::nullopt;
@@ -307,9 +312,9 @@ namespace geode
             return cells_number_;
         }
 
-        const std::array< double, dimension >& cells_sizes() const
+        const std::array< double, dimension >& cells_lengths() const
         {
-            return cells_size_;
+            return cells_length_;
         }
 
     private:
@@ -333,7 +338,7 @@ namespace geode
                          a.object( impl.cell_attribute_manager_ );
                          a.object( impl.origin_ );
                          a.container4b( impl.cells_number_ );
-                         a.container8b( impl.cells_size_ );
+                         a.container8b( impl.cells_length_ );
                          impl.resize_vertex_attribute_manager_to_right_size();
                      },
                         []( Archive& a, Impl& impl ) {
@@ -341,7 +346,7 @@ namespace geode
                             a.object( impl.vertex_attribute_manager_ );
                             a.object( impl.origin_ );
                             a.container4b( impl.cells_number_ );
-                            a.container8b( impl.cells_size_ );
+                            a.container8b( impl.cells_length_ );
                         } } } );
         }
 
@@ -350,27 +355,27 @@ namespace geode
         mutable AttributeManager vertex_attribute_manager_;
         Point< dimension > origin_;
         std::array< index_t, dimension > cells_number_;
-        std::array< double, dimension > cells_size_;
+        std::array< double, dimension > cells_length_;
     }; // namespace geode
 
     template < index_t dimension >
     RegularGrid< dimension >::RegularGrid( Point< dimension > origin,
         std::array< index_t, dimension > cells_number,
-        std::array< double, dimension > cells_size )
+        std::array< double, dimension > cells_length )
         : impl_( std::move( origin ),
             std::move( cells_number ),
-            std::move( cells_size ) )
+            std::move( cells_length ) )
     {
     }
 
     template < index_t dimension >
     RegularGrid< dimension >::RegularGrid( Point< dimension > origin,
         std::array< index_t, dimension > cells_number,
-        double cells_size )
+        double cells_length )
         : RegularGrid(
-            std::move( origin ), std::move( cells_number ), [&cells_size]() {
+            std::move( origin ), std::move( cells_number ), [&cells_length]() {
                 std::array< double, dimension > size;
-                size.fill( cells_size );
+                size.fill( cells_length );
                 return size;
             }() )
     {
@@ -508,6 +513,13 @@ namespace geode
     }
 
     template < index_t dimension >
+    bool RegularGrid< dimension >::is_vertex_on_border(
+        const GridVertexIndex< dimension >& vertex_index ) const
+    {
+        return impl_->is_vertex_on_border( vertex_index );
+    }
+
+    template < index_t dimension >
     absl::optional< GridCellIndices< dimension > >
         RegularGrid< dimension >::cell( const Point< dimension >& query ) const
     {
@@ -558,7 +570,7 @@ namespace geode
     RegularGrid< dimension > RegularGrid< dimension >::clone() const
     {
         RegularGrid< dimension > clone{ origin(), impl_->cells_numbers(),
-            impl_->cells_sizes() };
+            impl_->cells_lengths() };
         clone.cell_attribute_manager().copy( cell_attribute_manager() );
         clone.vertex_attribute_manager().copy( vertex_attribute_manager() );
         return clone;
