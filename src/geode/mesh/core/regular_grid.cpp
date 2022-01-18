@@ -76,6 +76,21 @@ namespace geode
             return cells_size_.at( direction );
         }
 
+        double cell_length( index_t direction ) const
+        {
+            return cells_size_.at( direction );
+        }
+
+        double cell_size() const
+        {
+            double cell_size{ 1 };
+            for( const auto d : LRange{ dimension } )
+            {
+                cell_size *= cell_length( d );
+            }
+            return cell_size;
+        }
+
         index_t cell_index( const GridCellIndex< dimension >& index ) const
         {
             index_t cell_id{ 0 };
@@ -143,6 +158,12 @@ namespace geode
             return cells_number_.at( direction ) + 1;
         }
 
+        local_index_t nb_cell_vertices() const
+        {
+            /* returns 1*pow(2,dimension) using binary operators (faster). */
+            return 1 << dimension;
+        }
+
         index_t vertex_index( const GridVertexIndex< dimension >& index ) const
         {
             index_t vertex_id{ 0 };
@@ -203,6 +224,20 @@ namespace geode
                 return prev;
             }
             return absl::nullopt;
+        }
+
+        bool is_vertex_on_border( index_t vertex_id ) const
+        {
+            const auto vertex_indices = vertex_index( vertex_id );
+            for( const auto d : LRange{ dimension } )
+            {
+                if( vertex_indices[d] == 0
+                    || vertex_indices[d] == nb_vertices( d ) - 1 )
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         Point< dimension > point(
@@ -376,6 +411,18 @@ namespace geode
     }
 
     template < index_t dimension >
+    double RegularGrid< dimension >::cell_length( index_t direction ) const
+    {
+        return impl_->cell_length( direction );
+    }
+
+    template < index_t dimension >
+    double RegularGrid< dimension >::cell_size() const
+    {
+        return impl_->cell_size();
+    }
+
+    template < index_t dimension >
     index_t RegularGrid< dimension >::cell_index(
         const GridCellIndex< dimension >& index ) const
     {
@@ -418,6 +465,12 @@ namespace geode
     }
 
     template < index_t dimension >
+    local_index_t RegularGrid< dimension >::nb_cell_vertices() const
+    {
+        return impl_->nb_cell_vertices();
+    }
+
+    template < index_t dimension >
     index_t RegularGrid< dimension >::vertex_index(
         const GridCellIndex< dimension >& index ) const
     {
@@ -445,6 +498,13 @@ namespace geode
             const GridCellIndex< dimension >& index, index_t direction ) const
     {
         return impl_->previous_vertex( index, direction );
+    }
+
+    template < index_t dimension >
+    bool RegularGrid< dimension >::is_vertex_on_border(
+        index_t vertex_index ) const
+    {
+        return impl_->is_vertex_on_border( vertex_index );
     }
 
     template < index_t dimension >
@@ -488,7 +548,7 @@ namespace geode
         for( const auto d : LRange{ dimension } )
         {
             extreme_point.set_value(
-                d, origin().value( d ) + nb_cells( d ) * cell_size( d ) );
+                d, origin().value( d ) + nb_cells( d ) * cell_length( d ) );
         }
         bbox.add_point( extreme_point );
         return bbox;

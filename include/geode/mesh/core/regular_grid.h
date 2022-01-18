@@ -62,8 +62,8 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        using Index = GridCellIndex< dimension >;
-        using Indices = GridCellIndices< dimension >;
+        using Index = GridCellIndex< dimension >; /* deprecated */
+        using Indices = GridCellIndices< dimension >; /* deprecated */
 
         RegularGrid( Point< dimension > origin,
             std::array< index_t, dimension > cells_number,
@@ -94,7 +94,11 @@ namespace geode
 
         index_t nb_cells( index_t direction ) const;
 
-        double cell_size( index_t direction ) const;
+        double OPENGEODE_MESH_DEPRECATED cell_size( index_t direction ) const;
+
+        double cell_length( index_t direction ) const;
+
+        double cell_size() const;
 
         index_t cell_index( const GridCellIndex< dimension >& index ) const;
 
@@ -110,6 +114,8 @@ namespace geode
 
         index_t nb_vertices( index_t direction ) const;
 
+        local_index_t nb_cell_vertices() const;
+
         GridVertexIndex< dimension > vertex_index( index_t index ) const;
 
         index_t vertex_index( const GridVertexIndex< dimension >& index ) const;
@@ -121,6 +127,8 @@ namespace geode
         absl::optional< GridVertexIndex< dimension > > previous_vertex(
             const GridVertexIndex< dimension >& index,
             index_t direction ) const;
+
+        bool is_vertex_on_border( index_t vertex_index ) const;
 
         /*!
          * Return the cell(s) containing the query point
