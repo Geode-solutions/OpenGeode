@@ -47,6 +47,17 @@ void test_cell_number( const geode::RegularGrid3D& grid )
         "[Test] Wrong total number of cells along Z" );
 }
 
+void test_cell_size( const geode::RegularGrid3D& grid )
+{
+    OPENGEODE_EXCEPTION(
+        grid.cell_length( 0 ) == 1, "[Test] Wrong length of cells along X" );
+    OPENGEODE_EXCEPTION(
+        grid.cell_length( 1 ) == 2, "[Test] Wrong length of cells along Y" );
+    OPENGEODE_EXCEPTION(
+        grid.cell_length( 2 ) == 3, "[Test] Wrong length of cells along Z" );
+    OPENGEODE_EXCEPTION( grid.cell_size() == 6, "[Test] Wrong cell size" );
+}
+
 void test_cell_index( const geode::RegularGrid3D& grid )
 {
     OPENGEODE_EXCEPTION(
@@ -97,6 +108,8 @@ void test_vertex_number( const geode::RegularGrid3D& grid )
         "[Test] Wrong total number of vertices along Y" );
     OPENGEODE_EXCEPTION( grid.nb_vertices( 2 ) == 16,
         "[Test] Wrong total number of vertices along Z" );
+    OPENGEODE_EXCEPTION( grid.nb_cell_vertices() == 8,
+        "[Test] Wrong number of vertices in cells" );
 }
 
 void test_vertex_index( const geode::RegularGrid3D& grid )
@@ -137,6 +150,19 @@ void test_vertex_index( const geode::RegularGrid3D& grid )
     OPENGEODE_EXCEPTION( grid.previous_vertex( { 0, 0, 1 }, 2 )
                              == geode::RegularGrid3D::Index( { 0, 0, 0 } ),
         "[Test] Wrong vertex index" );
+}
+
+void test_vertex_on_border( const geode::RegularGrid3D& grid )
+{
+    OPENGEODE_EXCEPTION(
+        grid.is_vertex_on_border( grid.vertex_index( { { 0, 0, 0 } } ) ),
+        "[Test] Vertex is not on border where it should be." );
+    OPENGEODE_EXCEPTION(
+        grid.is_vertex_on_border( grid.vertex_index( { { 0, 9, 0 } } ) ),
+        "[Test] Vertex is not on border where it should be." );
+    OPENGEODE_EXCEPTION(
+        grid.is_vertex_on_border( !grid.vertex_index( { { 1, 2, 3 } } ) ),
+        "[Test] Vertex is on border where it should not be." );
 }
 
 void test_cell_geometry( const geode::RegularGrid3D& grid )
@@ -252,6 +278,7 @@ void test()
     test_cell_index( grid );
     test_vertex_number( grid );
     test_vertex_index( grid );
+    test_vertex_on_border( grid );
     test_cell_geometry( grid );
     test_cell_query( grid );
     test_boundary_box( grid );
