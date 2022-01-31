@@ -24,6 +24,7 @@
 #include <geode/mesh/io/tetrahedral_solid_output.h>
 
 #include <geode/mesh/core/tetrahedral_solid.h>
+#include <geode/mesh/io/vertex_set_output.h>
 
 namespace geode
 {
@@ -34,11 +35,25 @@ namespace geode
     {
         try
         {
-            const auto output =
+            const auto extension =
+                to_string( extension_from_filename( filename ) );
+            if( TetrahedralSolidOutputFactory< dimension >::has_creator(
+                    extension ) )
+            {
                 TetrahedralSolidOutputFactory< dimension >::create(
-                    to_string( extension_from_filename( filename ) ),
-                    tetrahedral_solid, filename );
-            output->write();
+                    extension, tetrahedral_solid, filename )
+                    ->write();
+            }
+            else if( VertexSetOutputFactory::has_creator( extension ) )
+            {
+                VertexSetOutputFactory::create(
+                    extension, tetrahedral_solid, filename )
+                    ->write();
+            }
+            else
+            {
+                throw OpenGeodeException{ "Unknown extension: ", extension };
+            }
             Logger::info(
                 "TetrahedralSolid", dimension, "D saved in ", filename );
         }

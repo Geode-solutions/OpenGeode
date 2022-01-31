@@ -24,6 +24,8 @@
 #include <geode/mesh/io/edged_curve_output.h>
 
 #include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/io/graph_output.h>
+#include <geode/mesh/io/vertex_set_output.h>
 
 namespace geode
 {
@@ -33,10 +35,29 @@ namespace geode
     {
         try
         {
-            const auto output = EdgedCurveOutputFactory< dimension >::create(
-                to_string( extension_from_filename( filename ) ), edged_curve,
-                filename );
-            output->write();
+            const auto extension =
+                to_string( extension_from_filename( filename ) );
+            if( EdgedCurveOutputFactory< dimension >::has_creator( extension ) )
+            {
+                EdgedCurveOutputFactory< dimension >::create(
+                    extension, edged_curve, filename )
+                    ->write();
+            }
+            else if( GraphOutputFactory::has_creator( extension ) )
+            {
+                GraphOutputFactory::create( extension, edged_curve, filename )
+                    ->write();
+            }
+            else if( VertexSetOutputFactory::has_creator( extension ) )
+            {
+                VertexSetOutputFactory::create(
+                    extension, edged_curve, filename )
+                    ->write();
+            }
+            else
+            {
+                throw OpenGeodeException{ "Unknown extension: ", extension };
+            }
             Logger::info( "EdgedCurve", dimension, "D saved in ", filename );
         }
         catch( const OpenGeodeException& e )

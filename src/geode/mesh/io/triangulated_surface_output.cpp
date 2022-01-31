@@ -24,6 +24,7 @@
 #include <geode/mesh/io/triangulated_surface_output.h>
 
 #include <geode/mesh/core/triangulated_surface.h>
+#include <geode/mesh/io/vertex_set_output.h>
 
 namespace geode
 {
@@ -34,11 +35,25 @@ namespace geode
     {
         try
         {
-            const auto output =
+            const auto extension =
+                to_string( extension_from_filename( filename ) );
+            if( TriangulatedSurfaceOutputFactory< dimension >::has_creator(
+                    extension ) )
+            {
                 TriangulatedSurfaceOutputFactory< dimension >::create(
-                    to_string( extension_from_filename( filename ) ),
-                    triangulated_surface, filename );
-            output->write();
+                    extension, triangulated_surface, filename )
+                    ->write();
+            }
+            else if( VertexSetOutputFactory::has_creator( extension ) )
+            {
+                VertexSetOutputFactory::create(
+                    extension, triangulated_surface, filename )
+                    ->write();
+            }
+            else
+            {
+                throw OpenGeodeException{ "Unknown extension: ", extension };
+            }
             Logger::info(
                 "TriangulatedSurface", dimension, "D saved in ", filename );
         }
