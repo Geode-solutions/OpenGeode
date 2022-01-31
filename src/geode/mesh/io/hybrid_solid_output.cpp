@@ -24,6 +24,7 @@
 #include <geode/mesh/io/hybrid_solid_output.h>
 
 #include <geode/mesh/core/hybrid_solid.h>
+#include <geode/mesh/io/vertex_set_output.h>
 
 namespace geode
 {
@@ -33,10 +34,25 @@ namespace geode
     {
         try
         {
-            const auto output = HybridSolidOutputFactory< dimension >::create(
-                to_string( extension_from_filename( filename ) ), hybrid_solid,
-                filename );
-            output->write();
+            const auto extension =
+                to_string( extension_from_filename( filename ) );
+            if( HybridSolidOutputFactory< dimension >::has_creator(
+                    extension ) )
+            {
+                HybridSolidOutputFactory< dimension >::create(
+                    extension, hybrid_solid, filename )
+                    ->write();
+            }
+            else if( VertexSetOutputFactory::has_creator( extension ) )
+            {
+                VertexSetOutputFactory::create(
+                    extension, hybrid_solid, filename )
+                    ->write();
+            }
+            else
+            {
+                throw OpenGeodeException{ "Unknown extension: ", extension };
+            }
             Logger::info( "HybridSolid", dimension, "D saved in ", filename );
         }
         catch( const OpenGeodeException& e )
