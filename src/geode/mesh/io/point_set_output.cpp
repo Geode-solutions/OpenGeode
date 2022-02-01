@@ -36,21 +36,12 @@ namespace geode
         {
             const auto extension =
                 to_string( extension_from_filename( filename ) );
-            if( PointSetOutputFactory< dimension >::has_creator( extension ) )
-            {
-                PointSetOutputFactory< dimension >::create(
-                    extension, point_set, filename )
-                    ->write();
-            }
-            else if( VertexSetOutputFactory::has_creator( extension ) )
-            {
-                VertexSetOutputFactory::create( extension, point_set, filename )
-                    ->write();
-            }
-            else
-            {
-                throw OpenGeodeException{ "Unknown extension: ", extension };
-            }
+            OPENGEODE_EXCEPTION(
+                PointSetOutputFactory< dimension >::has_creator( extension ),
+                "Unknown extension: ", extension );
+            PointSetOutputFactory< dimension >::create(
+                extension, point_set, filename )
+                ->write();
             Logger::info( "PointSet", dimension, "D saved in ", filename );
         }
         catch( const OpenGeodeException& e )

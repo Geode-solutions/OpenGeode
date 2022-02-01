@@ -24,7 +24,6 @@
 #include <geode/mesh/io/polygonal_surface_output.h>
 
 #include <geode/mesh/core/polygonal_surface.h>
-#include <geode/mesh/io/vertex_set_output.h>
 
 namespace geode
 {
@@ -37,23 +36,13 @@ namespace geode
         {
             const auto extension =
                 to_string( extension_from_filename( filename ) );
-            if( PolygonalSurfaceOutputFactory< dimension >::has_creator(
-                    extension ) )
-            {
-                PolygonalSurfaceOutputFactory< dimension >::create(
-                    extension, polygonal_surface, filename )
-                    ->write();
-            }
-            else if( VertexSetOutputFactory::has_creator( extension ) )
-            {
-                VertexSetOutputFactory::create(
-                    extension, polygonal_surface, filename )
-                    ->write();
-            }
-            else
-            {
-                throw OpenGeodeException{ "Unknown extension: ", extension };
-            }
+            OPENGEODE_EXCEPTION(
+                PolygonalSurfaceOutputFactory< dimension >::has_creator(
+                    extension ),
+                "Unknown extension: ", extension );
+            PolygonalSurfaceOutputFactory< dimension >::create(
+                extension, polygonal_surface, filename )
+                ->write();
             Logger::info(
                 "PolygonalSurface", dimension, "D saved in ", filename );
         }

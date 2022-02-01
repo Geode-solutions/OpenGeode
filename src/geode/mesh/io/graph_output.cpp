@@ -24,7 +24,6 @@
 #include <geode/mesh/io/graph_output.h>
 
 #include <geode/mesh/core/graph.h>
-#include <geode/mesh/io/vertex_set_output.h>
 
 namespace geode
 {
@@ -34,20 +33,9 @@ namespace geode
         {
             const auto extension =
                 to_string( extension_from_filename( filename ) );
-            if( GraphOutputFactory::has_creator( extension ) )
-            {
-                GraphOutputFactory::create( extension, graph, filename )
-                    ->write();
-            }
-            else if( VertexSetOutputFactory::has_creator( extension ) )
-            {
-                VertexSetOutputFactory::create( extension, graph, filename )
-                    ->write();
-            }
-            else
-            {
-                throw OpenGeodeException{ "Unknown extension: ", extension };
-            }
+            OPENGEODE_EXCEPTION( GraphOutputFactory::has_creator( extension ),
+                "Unknown extension: ", extension );
+            GraphOutputFactory::create( extension, graph, filename )->write();
             Logger::info( "Graph saved in ", filename );
         }
         catch( const OpenGeodeException& e )
