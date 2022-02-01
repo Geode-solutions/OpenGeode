@@ -24,7 +24,6 @@
 #include <geode/mesh/io/polyhedral_solid_output.h>
 
 #include <geode/mesh/core/polyhedral_solid.h>
-#include <geode/mesh/io/vertex_set_output.h>
 
 namespace geode
 {
@@ -37,23 +36,13 @@ namespace geode
         {
             const auto extension =
                 to_string( extension_from_filename( filename ) );
-            if( PolyhedralSolidOutputFactory< dimension >::has_creator(
-                    extension ) )
-            {
-                PolyhedralSolidOutputFactory< dimension >::create(
-                    extension, polyhedral_solid, filename )
-                    ->write();
-            }
-            else if( VertexSetOutputFactory::has_creator( extension ) )
-            {
-                VertexSetOutputFactory::create(
-                    extension, polyhedral_solid, filename )
-                    ->write();
-            }
-            else
-            {
-                throw OpenGeodeException{ "Unknown extension: ", extension };
-            }
+            OPENGEODE_EXCEPTION(
+                PolyhedralSolidOutputFactory< dimension >::has_creator(
+                    extension ),
+                "Unknown extension: ", extension );
+            PolyhedralSolidOutputFactory< dimension >::create(
+                extension, polyhedral_solid, filename )
+                ->write();
             Logger::info(
                 "PolyhedralSolid", dimension, "D saved in ", filename );
         }
