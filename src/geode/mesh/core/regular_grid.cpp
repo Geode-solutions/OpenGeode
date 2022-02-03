@@ -165,15 +165,19 @@ namespace geode
 
         index_t nb_vertices_on_borders() const
         {
-            index_t nb_vertices_on_borders{ 0 };
-            for( const auto v_id : Range{ nb_vertices() } )
+            index_t nb_inside_vertices{ 1 };
+            for( const auto d : LRange{ dimension } )
             {
-                if( is_vertex_on_border( v_id ) )
+                if( nb_vertices( d ) < 2 )
                 {
-                    nb_vertices_on_borders++;
+                    nb_inside_vertices *= nb_vertices( d );
+                }
+                else
+                {
+                    nb_inside_vertices *= nb_vertices( d ) - 2;
                 }
             }
-            return nb_vertices_on_borders;
+            return nb_vertices() - nb_inside_vertices;
         }
 
         local_index_t nb_cell_vertices() const

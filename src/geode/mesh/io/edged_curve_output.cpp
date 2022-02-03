@@ -33,10 +33,14 @@ namespace geode
     {
         try
         {
-            const auto output = EdgedCurveOutputFactory< dimension >::create(
-                to_string( extension_from_filename( filename ) ), edged_curve,
-                filename );
-            output->write();
+            const auto extension =
+                to_string( extension_from_filename( filename ) );
+            OPENGEODE_EXCEPTION(
+                EdgedCurveOutputFactory< dimension >::has_creator( extension ),
+                "Unknown extension: ", extension );
+            EdgedCurveOutputFactory< dimension >::create(
+                extension, edged_curve, filename )
+                ->write();
             Logger::info( "EdgedCurve", dimension, "D saved in ", filename );
         }
         catch( const OpenGeodeException& e )

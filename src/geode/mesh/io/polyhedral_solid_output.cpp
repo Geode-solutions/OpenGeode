@@ -34,11 +34,15 @@ namespace geode
     {
         try
         {
-            const auto output =
-                PolyhedralSolidOutputFactory< dimension >::create(
-                    to_string( extension_from_filename( filename ) ),
-                    polyhedral_solid, filename );
-            output->write();
+            const auto extension =
+                to_string( extension_from_filename( filename ) );
+            OPENGEODE_EXCEPTION(
+                PolyhedralSolidOutputFactory< dimension >::has_creator(
+                    extension ),
+                "Unknown extension: ", extension );
+            PolyhedralSolidOutputFactory< dimension >::create(
+                extension, polyhedral_solid, filename )
+                ->write();
             Logger::info(
                 "PolyhedralSolid", dimension, "D saved in ", filename );
         }

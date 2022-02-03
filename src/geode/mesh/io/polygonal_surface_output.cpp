@@ -34,11 +34,15 @@ namespace geode
     {
         try
         {
-            const auto output =
-                PolygonalSurfaceOutputFactory< dimension >::create(
-                    to_string( extension_from_filename( filename ) ),
-                    polygonal_surface, filename );
-            output->write();
+            const auto extension =
+                to_string( extension_from_filename( filename ) );
+            OPENGEODE_EXCEPTION(
+                PolygonalSurfaceOutputFactory< dimension >::has_creator(
+                    extension ),
+                "Unknown extension: ", extension );
+            PolygonalSurfaceOutputFactory< dimension >::create(
+                extension, polygonal_surface, filename )
+                ->write();
             Logger::info(
                 "PolygonalSurface", dimension, "D saved in ", filename );
         }

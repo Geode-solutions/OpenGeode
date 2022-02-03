@@ -33,10 +33,14 @@ namespace geode
     {
         try
         {
-            const auto output = HybridSolidOutputFactory< dimension >::create(
-                to_string( extension_from_filename( filename ) ), hybrid_solid,
-                filename );
-            output->write();
+            const auto extension =
+                to_string( extension_from_filename( filename ) );
+            OPENGEODE_EXCEPTION(
+                HybridSolidOutputFactory< dimension >::has_creator( extension ),
+                "Unknown extension: ", extension );
+            HybridSolidOutputFactory< dimension >::create(
+                extension, hybrid_solid, filename )
+                ->write();
             Logger::info( "HybridSolid", dimension, "D saved in ", filename );
         }
         catch( const OpenGeodeException& e )

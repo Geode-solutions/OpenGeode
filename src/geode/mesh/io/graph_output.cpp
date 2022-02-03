@@ -31,10 +31,11 @@ namespace geode
     {
         try
         {
-            const auto output = GraphOutputFactory::create(
-                to_string( extension_from_filename( filename ) ), graph,
-                filename );
-            output->write();
+            const auto extension =
+                to_string( extension_from_filename( filename ) );
+            OPENGEODE_EXCEPTION( GraphOutputFactory::has_creator( extension ),
+                "Unknown extension: ", extension );
+            GraphOutputFactory::create( extension, graph, filename )->write();
             Logger::info( "Graph saved in ", filename );
         }
         catch( const OpenGeodeException& e )
