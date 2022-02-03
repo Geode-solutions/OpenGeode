@@ -110,6 +110,8 @@ void test_vertex_number( const geode::RegularGrid3D& grid )
         "[Test] Wrong total number of vertices along Z" );
     OPENGEODE_EXCEPTION( grid.nb_cell_vertices() == 8,
         "[Test] Wrong number of vertices in cells" );
+    OPENGEODE_EXCEPTION( grid.nb_vertices_on_borders() == 552,
+        "[Test] Wrong number of vertices on borders" );
 }
 
 void test_vertex_index( const geode::RegularGrid3D& grid )
