@@ -114,6 +114,8 @@ namespace geode
 
         index_t nb_vertices( index_t direction ) const;
 
+        index_t nb_vertices_on_borders() const;
+
         local_index_t nb_cell_vertices() const;
 
         GridVertexIndex< dimension > vertex_index( index_t index ) const;

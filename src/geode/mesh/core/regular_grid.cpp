@@ -153,9 +153,31 @@ namespace geode
             return absl::nullopt;
         }
 
+        index_t nb_vertices() const
+        {
+            return vertex_attribute_manager_.nb_elements();
+        }
+
         index_t nb_vertices( index_t direction ) const
         {
             return cells_number_.at( direction ) + 1;
+        }
+
+        index_t nb_vertices_on_borders() const
+        {
+            index_t nb_inside_vertices{ 1 };
+            for( const auto d : LRange{ dimension } )
+            {
+                if( nb_vertices( d ) < 2 )
+                {
+                    nb_inside_vertices *= nb_vertices( d );
+                }
+                else
+                {
+                    nb_inside_vertices *= nb_vertices( d ) - 2;
+                }
+            }
+            return nb_vertices() - nb_inside_vertices;
         }
 
         local_index_t nb_cell_vertices() const
@@ -460,13 +482,19 @@ namespace geode
     template < index_t dimension >
     index_t RegularGrid< dimension >::nb_vertices() const
     {
-        return vertex_attribute_manager().nb_elements();
+        return impl_->nb_vertices();
     }
 
     template < index_t dimension >
     index_t RegularGrid< dimension >::nb_vertices( index_t direction ) const
     {
         return impl_->nb_vertices( direction );
+    }
+
+    template < index_t dimension >
+    index_t RegularGrid< dimension >::nb_vertices_on_borders() const
+    {
+        return impl_->nb_vertices_on_borders();
     }
 
     template < index_t dimension >
