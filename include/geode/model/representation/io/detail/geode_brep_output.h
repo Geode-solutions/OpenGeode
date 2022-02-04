@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <async++.h>
+
 #include <ghc/filesystem.hpp>
 
 #include <geode/basic/uuid.h>
@@ -57,14 +59,26 @@ namespace geode
 
         void save_brep_files( absl::string_view directory ) const
         {
-            brep().save_identifier( directory );
-            brep().save_relationships( directory );
-            brep().save_unique_vertices( directory );
-            brep().save_corners( directory );
-            brep().save_lines( directory );
-            brep().save_surfaces( directory );
-            brep().save_blocks( directory );
-            brep().save_model_boundaries( directory );
+            absl::FixedArray< async::task< void > > tasks( 5 );
+            index_t count{ 0 };
+            tasks[count++] = async::spawn(
+                [&directory, this] { brep().save_identifier( directory ); } );
+            tasks[count++] = async::spawn( [&directory, this] {
+                brep().save_relationships( directory );
+            } );
+            tasks[count++] = async::spawn( [&directory, this] {
+                brep().save_unique_vertices( directory );
+            } );
+            tasks[count++] = async::spawn( [&directory, this] {
+                brep().save_corners( directory );
+                brep().save_lines( directory );
+                brep().save_surfaces( directory );
+                brep().save_blocks( directory );
+            } );
+            tasks[count++] = async::spawn( [&directory, this] {
+                brep().save_model_boundaries( directory );
+            } );
+            async::when_all( tasks.begin(), tasks.end() ).wait();
         }
 
         void write() const final

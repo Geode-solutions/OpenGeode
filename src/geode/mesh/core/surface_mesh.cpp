@@ -35,7 +35,7 @@
 
 #include <geode/geometry/basic_objects.h>
 #include <geode/geometry/bounding_box.h>
-#include <geode/geometry/vector.h>
+#include <geode/geometry/distance.h>
 
 #include <geode/mesh/builder/surface_mesh_builder.h>
 #include <geode/mesh/core/detail/facet_storage.h>
@@ -591,9 +591,8 @@ namespace geode
     double SurfaceMesh< dimension >::edge_length(
         const std::array< index_t, 2 >& polygon_edge_vertices ) const
     {
-        return Vector< dimension >{ this->point( polygon_edge_vertices[0] ),
-            this->point( polygon_edge_vertices[1] ) }
-            .length();
+        return point_point_distance( this->point( polygon_edge_vertices[0] ),
+            this->point( polygon_edge_vertices[1] ) );
     }
 
     template < index_t dimension >

@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <async++.h>
+
 #include <geode/basic/uuid.h>
 #include <geode/basic/zip_file.h>
 
@@ -48,26 +50,41 @@ namespace geode
         void load_section_files( absl::string_view directory )
         {
             SectionBuilder builder{ section() };
-            builder.load_identifier( directory );
-            builder.load_corners( directory );
-            builder.load_lines( directory );
-            builder.load_surfaces( directory );
-            builder.load_model_boundaries( directory );
-            builder.load_relationships( directory );
-            builder.load_unique_vertices( directory );
-
-            for( const auto& corner : section().corners() )
-            {
-                builder.register_mesh_component( corner );
-            }
-            for( const auto& line : section().lines() )
-            {
-                builder.register_mesh_component( line );
-            }
-            for( const auto& surface : section().surfaces() )
-            {
-                builder.register_mesh_component( surface );
-            }
+            absl::FixedArray< async::task< void > > tasks( 5 );
+            index_t count{ 0 };
+            tasks[count++] = async::spawn( [&builder, &directory] {
+                builder.load_identifier( directory );
+            } );
+            tasks[count++] = async::spawn( [&builder, &directory] {
+                builder.load_corners( directory );
+                builder.load_lines( directory );
+                builder.load_surfaces( directory );
+            } );
+            tasks[count++] = async::spawn( [&builder, &directory] {
+                builder.load_model_boundaries( directory );
+            } );
+            tasks[count++] = async::spawn( [&builder, &directory] {
+                builder.load_relationships( directory );
+            } );
+            tasks[count++] = async::spawn( [&builder, &directory] {
+                builder.load_unique_vertices( directory );
+            } );
+            async::when_all( tasks.begin(), tasks.end() )
+                .then( [&builder, this] {
+                    for( const auto& corner : section().corners() )
+                    {
+                        builder.register_mesh_component( corner );
+                    }
+                    for( const auto& line : section().lines() )
+                    {
+                        builder.register_mesh_component( line );
+                    }
+                    for( const auto& surface : section().surfaces() )
+                    {
+                        builder.register_mesh_component( surface );
+                    }
+                } )
+                .wait();
         }
 
         void read() final
