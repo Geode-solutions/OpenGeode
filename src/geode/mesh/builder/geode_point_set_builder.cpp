@@ -33,22 +33,23 @@ namespace geode
     template < index_t dimension >
     OpenGeodePointSetBuilder< dimension >::OpenGeodePointSetBuilder(
         VertexSet& vertex_set, MeshBuilderFactoryKey )
-        : PointSetBuilder< dimension >( vertex_set )
+        : OpenGeodePointSetBuilder< dimension >(
+            dynamic_cast< OpenGeodePointSet< dimension >& >( vertex_set ) )
     {
     }
 
     template < index_t dimension >
-    void OpenGeodePointSetBuilder< dimension >::do_set_mesh( VertexSet& mesh )
+    OpenGeodePointSetBuilder< dimension >::OpenGeodePointSetBuilder(
+        OpenGeodePointSet< dimension >& mesh )
+        : PointSetBuilder< dimension >( mesh ), geode_point_set_( mesh )
     {
-        geode_point_set_ =
-            &dynamic_cast< OpenGeodePointSet< dimension >& >( mesh );
     }
 
     template < index_t dimension >
     void OpenGeodePointSetBuilder< dimension >::do_set_point(
         index_t vertex_id, Point< dimension > point )
     {
-        geode_point_set_->set_vertex( vertex_id, std::move( point ), {} );
+        geode_point_set_.set_vertex( vertex_id, std::move( point ), {} );
     }
 
     template < index_t dimension >

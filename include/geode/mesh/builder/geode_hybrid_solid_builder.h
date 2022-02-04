@@ -50,9 +50,9 @@ namespace geode
         OpenGeodeHybridSolidBuilder(
             VertexSet& vertex_set, MeshBuilderFactoryKey );
 
-    private:
-        void do_set_mesh( VertexSet& mesh ) final;
+        OpenGeodeHybridSolidBuilder( OpenGeodeHybridSolid< dimension >& mesh );
 
+    private:
         void do_set_point( index_t vertex_id, Point< dimension > point ) final;
 
         void do_create_vertex() final;
@@ -124,7 +124,7 @@ namespace geode
             const PolyhedronFacet& polyhedron_facet ) final;
 
     private:
-        OpenGeodeHybridSolid< dimension >* geode_hybrid_solid_;
+        OpenGeodeHybridSolid< dimension >& geode_hybrid_solid_;
     };
     ALIAS_3D( OpenGeodeHybridSolidBuilder );
 } // namespace geode

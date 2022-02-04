@@ -33,22 +33,23 @@ namespace geode
     template < index_t dimension >
     OpenGeodeEdgedCurveBuilder< dimension >::OpenGeodeEdgedCurveBuilder(
         VertexSet& vertex_set, MeshBuilderFactoryKey )
-        : EdgedCurveBuilder< dimension >( vertex_set )
+        : OpenGeodeEdgedCurveBuilder< dimension >(
+            dynamic_cast< OpenGeodeEdgedCurve< dimension >& >( vertex_set ) )
     {
     }
 
     template < index_t dimension >
-    void OpenGeodeEdgedCurveBuilder< dimension >::do_set_mesh( VertexSet& mesh )
+    OpenGeodeEdgedCurveBuilder< dimension >::OpenGeodeEdgedCurveBuilder(
+        OpenGeodeEdgedCurve< dimension >& mesh )
+        : EdgedCurveBuilder< dimension >( mesh ), geode_edged_curve_( mesh )
     {
-        geode_edged_curve_ =
-            &dynamic_cast< OpenGeodeEdgedCurve< dimension >& >( mesh );
     }
 
     template < index_t dimension >
     void OpenGeodeEdgedCurveBuilder< dimension >::do_set_point(
         index_t vertex_id, Point< dimension > point )
     {
-        geode_edged_curve_->set_vertex( vertex_id, std::move( point ), {} );
+        geode_edged_curve_.set_vertex( vertex_id, std::move( point ), {} );
     }
 
     template < index_t dimension >
@@ -80,7 +81,7 @@ namespace geode
     void OpenGeodeEdgedCurveBuilder< dimension >::do_set_edge_vertex(
         const EdgeVertex& edge_vertex, index_t vertex_id )
     {
-        geode_edged_curve_->set_edge_vertex( edge_vertex, vertex_id, {} );
+        geode_edged_curve_.set_edge_vertex( edge_vertex, vertex_id, {} );
     }
 
     template < index_t dimension >

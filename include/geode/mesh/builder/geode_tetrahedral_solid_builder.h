@@ -52,13 +52,10 @@ namespace geode
         OpenGeodeTetrahedralSolidBuilder(
             VertexSet& vertex_set, MeshBuilderFactoryKey );
 
-    protected:
         OpenGeodeTetrahedralSolidBuilder(
-            OpenGeodeTetrahedralSolid< dimension >& solid );
+            OpenGeodeTetrahedralSolid< dimension >& mesh );
 
     private:
-        void do_set_mesh( VertexSet& mesh ) final;
-
         void do_set_point( index_t vertex_id, Point< dimension > point ) final;
 
         void do_create_vertex() final;
@@ -94,7 +91,7 @@ namespace geode
             const PolyhedronFacet& polyhedron_facet ) final;
 
     private:
-        OpenGeodeTetrahedralSolid< dimension >* geode_tetrahedral_solid_;
+        OpenGeodeTetrahedralSolid< dimension >& geode_tetrahedral_solid_;
     };
     ALIAS_3D( OpenGeodeTetrahedralSolidBuilder );
 } // namespace geode

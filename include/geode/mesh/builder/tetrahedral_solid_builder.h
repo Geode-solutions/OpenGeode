@@ -73,11 +73,8 @@ namespace geode
             copy( tetrahedral_solid );
         }
 
-        void set_mesh(
-            TetrahedralSolid< dimension >& mesh, MeshBuilderFactoryKey key );
-
     protected:
-        TetrahedralSolidBuilder( VertexSet& vertex_set );
+        TetrahedralSolidBuilder( TetrahedralSolid< dimension >& mesh );
 
         void copy( const TetrahedralSolid< dimension >& tetrahedral_solid );
 
@@ -91,7 +88,7 @@ namespace geode
         virtual void do_create_tetrahedra( index_t nb ) = 0;
 
     private:
-        TetrahedralSolid< dimension >* tetrahedral_solid_;
+        TetrahedralSolid< dimension >& tetrahedral_solid_;
     };
     ALIAS_3D( TetrahedralSolidBuilder );
 } // namespace geode

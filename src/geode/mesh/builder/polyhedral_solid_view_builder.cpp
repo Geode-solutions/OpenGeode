@@ -33,7 +33,16 @@ namespace geode
     template < index_t dimension >
     PolyhedralSolidViewBuilder< dimension >::PolyhedralSolidViewBuilder(
         VertexSet& vertex_set, MeshBuilderFactoryKey )
-        : PolyhedralSolidBuilder< dimension >( vertex_set )
+        : PolyhedralSolidViewBuilder< dimension >(
+            dynamic_cast< PolyhedralSolidView< dimension >& >( vertex_set ) )
+    {
+    }
+
+    template < index_t dimension >
+    PolyhedralSolidViewBuilder< dimension >::PolyhedralSolidViewBuilder(
+        PolyhedralSolidView< dimension >& mesh )
+        : PolyhedralSolidBuilder< dimension >( mesh ),
+          polyhedral_solid_view_( mesh )
     {
     }
 
@@ -47,17 +56,10 @@ namespace geode
     }
 
     template < index_t dimension >
-    void PolyhedralSolidViewBuilder< dimension >::do_set_mesh( VertexSet& mesh )
-    {
-        polyhedral_solid_view_ =
-            &dynamic_cast< PolyhedralSolidView< dimension >& >( mesh );
-    }
-
-    template < index_t dimension >
     void PolyhedralSolidViewBuilder< dimension >::do_set_point(
         index_t /*unused*/, Point< dimension > /*unused*/ )
     {
-        // polyhedral_solid_view_->set_vertex( vertex_id, point, {} );
+        // polyhedral_solid_view_.set_vertex( vertex_id, point, {} );
     }
 
     template < index_t dimension >
@@ -89,7 +91,7 @@ namespace geode
     void PolyhedralSolidViewBuilder< dimension >::do_set_polyhedron_vertex(
         const PolyhedronVertex& /*unused*/, index_t /*unused*/ )
     {
-        // polyhedral_solid_view_->set_polyhedron_vertex(
+        // polyhedral_solid_view_.set_polyhedron_vertex(
         //     polyhedron_vertex, vertex_id, {} );
     }
 
@@ -98,14 +100,14 @@ namespace geode
         absl::Span< const index_t > /*unused*/,
         absl::Span< const std::vector< local_index_t > > /*unused*/ )
     {
-        // polyhedral_solid_view_->add_polyhedron( vertices, facets, {} );
+        // polyhedral_solid_view_.add_polyhedron( vertices, facets, {} );
     }
 
     template < index_t dimension >
     void PolyhedralSolidViewBuilder< dimension >::do_set_polyhedron_adjacent(
         const PolyhedronFacet& /*unused*/, index_t /*unused*/ )
     {
-        // polyhedral_solid_view_->set_polyhedron_adjacent(
+        // polyhedral_solid_view_.set_polyhedron_adjacent(
         //     polyhedron_facet, adjacent_id, {} );
     }
 
@@ -113,7 +115,7 @@ namespace geode
     void PolyhedralSolidViewBuilder< dimension >::do_unset_polyhedron_adjacent(
         const PolyhedronFacet& /*unused*/ )
     {
-        // polyhedral_solid_view_->set_polyhedron_adjacent(
+        // polyhedral_solid_view_.set_polyhedron_adjacent(
         //     polyhedron_facet, NO_ID, {} );
     }
 
@@ -122,7 +124,7 @@ namespace geode
         const std::vector< bool >& /*unused*/,
         absl::Span< const index_t > /*unused*/ )
     {
-        // polyhedral_solid_view_->remove_polyhedra( to_delete, {} );
+        // polyhedral_solid_view_.remove_polyhedra( to_delete, {} );
     }
 
     template < index_t dimension >
@@ -136,14 +138,14 @@ namespace geode
     void PolyhedralSolidViewBuilder< dimension >::add_viewed_vertex(
         index_t vertex_id )
     {
-        polyhedral_solid_view_->add_viewed_vertex( vertex_id, {} );
+        polyhedral_solid_view_.add_viewed_vertex( vertex_id, {} );
     }
 
     template < index_t dimension >
     void PolyhedralSolidViewBuilder< dimension >::add_viewed_polyhedron(
         index_t polyhedron_id )
     {
-        polyhedral_solid_view_->add_viewed_polyhedron( polyhedron_id, {} );
+        polyhedral_solid_view_.add_viewed_polyhedron( polyhedron_id, {} );
     }
 
     template class opengeode_mesh_api PolyhedralSolidViewBuilder< 3 >;

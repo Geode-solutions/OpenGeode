@@ -33,7 +33,16 @@ namespace geode
     template < index_t dimension >
     PolygonalSurfaceViewBuilder< dimension >::PolygonalSurfaceViewBuilder(
         VertexSet& vertex_set, MeshBuilderFactoryKey )
-        : PolygonalSurfaceBuilder< dimension >( vertex_set )
+        : PolygonalSurfaceViewBuilder< dimension >(
+            dynamic_cast< PolygonalSurfaceView< dimension >& >( vertex_set ) )
+    {
+    }
+
+    template < index_t dimension >
+    PolygonalSurfaceViewBuilder< dimension >::PolygonalSurfaceViewBuilder(
+        PolygonalSurfaceView< dimension >& mesh )
+        : PolygonalSurfaceBuilder< dimension >( mesh ),
+          polygonal_surface_view_( mesh )
     {
     }
 
@@ -47,18 +56,10 @@ namespace geode
     }
 
     template < index_t dimension >
-    void PolygonalSurfaceViewBuilder< dimension >::do_set_mesh(
-        VertexSet& mesh )
-    {
-        polygonal_surface_view_ =
-            &dynamic_cast< PolygonalSurfaceView< dimension >& >( mesh );
-    }
-
-    template < index_t dimension >
     void PolygonalSurfaceViewBuilder< dimension >::do_set_point(
         index_t /*unused*/, Point< dimension > /*unused*/ )
     {
-        // polygonal_surface_view_->set_vertex( vertex_id, point, {} );
+        // polygonal_surface_view_.set_vertex( vertex_id, point, {} );
     }
 
     template < index_t dimension >
@@ -90,7 +91,7 @@ namespace geode
     void PolygonalSurfaceViewBuilder< dimension >::do_set_polygon_vertex(
         const PolygonVertex& /*unused*/, index_t /*unused*/ )
     {
-        // polygonal_surface_view_->set_polygon_vertex(
+        // polygonal_surface_view_.set_polygon_vertex(
         //     polygon_vertex, vertex_id, {} );
     }
 
@@ -98,7 +99,7 @@ namespace geode
     void PolygonalSurfaceViewBuilder< dimension >::do_set_polygon_adjacent(
         const PolygonEdge& /*unused*/, index_t /*unused*/ )
     {
-        // polygonal_surface_view_->set_polygon_adjacent(
+        // polygonal_surface_view_.set_polygon_adjacent(
         //     polygon_edge, adjacent_id, {} );
     }
 
@@ -106,7 +107,7 @@ namespace geode
     void PolygonalSurfaceViewBuilder< dimension >::do_unset_polygon_adjacent(
         const PolygonEdge& /*unused*/ )
     {
-        // polygonal_surface_view_->set_polygon_adjacent(
+        // polygonal_surface_view_.set_polygon_adjacent(
         //     polygon_edge, NO_ID, {} );
     }
 
@@ -134,14 +135,14 @@ namespace geode
     void PolygonalSurfaceViewBuilder< dimension >::add_viewed_vertex(
         index_t vertex_id )
     {
-        polygonal_surface_view_->add_viewed_vertex( vertex_id, {} );
+        polygonal_surface_view_.add_viewed_vertex( vertex_id, {} );
     }
 
     template < index_t dimension >
     void PolygonalSurfaceViewBuilder< dimension >::add_viewed_polygon(
         index_t polygon_id )
     {
-        polygonal_surface_view_->add_viewed_polygon( polygon_id, {} );
+        polygonal_surface_view_.add_viewed_polygon( polygon_id, {} );
     }
 
     template class opengeode_mesh_api PolygonalSurfaceViewBuilder< 2 >;

@@ -30,13 +30,15 @@ namespace geode
 {
     OpenGeodeVertexSetBuilder::OpenGeodeVertexSetBuilder(
         VertexSet& vertex_set, MeshBuilderFactoryKey )
-        : VertexSetBuilder( vertex_set )
+        : OpenGeodeVertexSetBuilder(
+            dynamic_cast< OpenGeodeVertexSet& >( vertex_set ) )
     {
     }
 
-    void OpenGeodeVertexSetBuilder::do_set_mesh( VertexSet& mesh )
+    OpenGeodeVertexSetBuilder::OpenGeodeVertexSetBuilder(
+        OpenGeodeVertexSet& mesh )
+        : VertexSetBuilder( mesh ), geode_vertex_set_( mesh )
     {
-        geode_vertex_set_ = &dynamic_cast< OpenGeodeVertexSet& >( mesh );
     }
 
     void OpenGeodeVertexSetBuilder::do_create_vertex() {}

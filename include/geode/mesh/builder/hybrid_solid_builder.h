@@ -82,11 +82,8 @@ namespace geode
             copy( hybrid_solid );
         }
 
-        void set_mesh(
-            HybridSolid< dimension >& mesh, MeshBuilderFactoryKey key );
-
     protected:
-        HybridSolidBuilder( VertexSet& vertex_set );
+        HybridSolidBuilder( HybridSolid< dimension >& mesh );
 
         void copy( const HybridSolid< dimension >& hybrid_solid );
 
@@ -107,7 +104,7 @@ namespace geode
             const std::array< index_t, 5 >& vertices ) = 0;
 
     private:
-        HybridSolid< dimension >* hybrid_solid_;
+        HybridSolid< dimension >& hybrid_solid_;
     };
     ALIAS_3D( HybridSolidBuilder );
 } // namespace geode

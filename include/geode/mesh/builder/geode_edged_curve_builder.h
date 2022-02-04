@@ -47,9 +47,9 @@ namespace geode
         OpenGeodeEdgedCurveBuilder(
             VertexSet& vertex_set, MeshBuilderFactoryKey );
 
-    private:
-        void do_set_mesh( VertexSet& mesh ) final;
+        OpenGeodeEdgedCurveBuilder( OpenGeodeEdgedCurve< dimension >& mesh );
 
+    private:
         void do_set_point( index_t vertex_id, Point< dimension > point ) final;
 
         void do_create_vertex() final;
@@ -76,7 +76,7 @@ namespace geode
             absl::Span< const index_t > old2new ) final;
 
     private:
-        OpenGeodeEdgedCurve< dimension >* geode_edged_curve_;
+        OpenGeodeEdgedCurve< dimension >& geode_edged_curve_;
     };
     ALIAS_2D_AND_3D( OpenGeodeEdgedCurveBuilder );
 } // namespace geode

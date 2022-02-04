@@ -35,8 +35,8 @@ namespace geode
 {
     template < index_t dimension >
     PolyhedralSolidBuilder< dimension >::PolyhedralSolidBuilder(
-        VertexSet& vertex_set )
-        : SolidMeshBuilder< dimension >( vertex_set )
+        PolyhedralSolid< dimension >& mesh )
+        : SolidMeshBuilder< dimension >( mesh ), polyhedral_solid_( mesh )
     {
     }
 
@@ -47,14 +47,6 @@ namespace geode
     {
         return MeshBuilderFactory::create_mesh_builder<
             PolyhedralSolidBuilder< dimension > >( mesh );
-    }
-
-    template < index_t dimension >
-    void PolyhedralSolidBuilder< dimension >::set_mesh(
-        PolyhedralSolid< dimension >& mesh, MeshBuilderFactoryKey key )
-    {
-        polyhedral_solid_ = &mesh;
-        SolidMeshBuilder< dimension >::set_mesh( mesh, key );
     }
 
     template < index_t dimension >

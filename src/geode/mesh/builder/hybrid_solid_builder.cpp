@@ -37,8 +37,9 @@
 namespace geode
 {
     template < index_t dimension >
-    HybridSolidBuilder< dimension >::HybridSolidBuilder( VertexSet& vertex_set )
-        : SolidMeshBuilder< dimension >( vertex_set )
+    HybridSolidBuilder< dimension >::HybridSolidBuilder(
+        HybridSolid< dimension >& mesh )
+        : SolidMeshBuilder< dimension >( mesh ), hybrid_solid_( mesh )
     {
     }
 
@@ -49,14 +50,6 @@ namespace geode
     {
         return MeshBuilderFactory::create_mesh_builder<
             HybridSolidBuilder< dimension > >( mesh );
-    }
-
-    template < index_t dimension >
-    void HybridSolidBuilder< dimension >::set_mesh(
-        HybridSolid< dimension >& mesh, MeshBuilderFactoryKey key )
-    {
-        hybrid_solid_ = &mesh;
-        SolidMeshBuilder< dimension >::set_mesh( mesh, key );
     }
 
     template < index_t dimension >
@@ -101,8 +94,8 @@ namespace geode
     index_t HybridSolidBuilder< dimension >::create_tetrahedron(
         const std::array< index_t, 4 >& vertices )
     {
-        const auto added_tetra = hybrid_solid_->nb_polyhedra();
-        hybrid_solid_->polyhedron_attribute_manager().resize( added_tetra + 1 );
+        const auto added_tetra = hybrid_solid_.nb_polyhedra();
+        hybrid_solid_.polyhedron_attribute_manager().resize( added_tetra + 1 );
         do_create_tetrahedron( vertices );
         this->update_polyhedron_info( added_tetra, vertices );
         return added_tetra;
@@ -112,8 +105,8 @@ namespace geode
     index_t HybridSolidBuilder< dimension >::create_hexahedron(
         const std::array< index_t, 8 >& vertices )
     {
-        const auto added_hexa = hybrid_solid_->nb_polyhedra();
-        hybrid_solid_->polyhedron_attribute_manager().resize( added_hexa + 1 );
+        const auto added_hexa = hybrid_solid_.nb_polyhedra();
+        hybrid_solid_.polyhedron_attribute_manager().resize( added_hexa + 1 );
         do_create_hexahedron( vertices );
         this->update_polyhedron_info( added_hexa, vertices );
         return added_hexa;
@@ -123,8 +116,8 @@ namespace geode
     index_t HybridSolidBuilder< dimension >::create_prism(
         const std::array< index_t, 6 >& vertices )
     {
-        const auto added_prism = hybrid_solid_->nb_polyhedra();
-        hybrid_solid_->polyhedron_attribute_manager().resize( added_prism + 1 );
+        const auto added_prism = hybrid_solid_.nb_polyhedra();
+        hybrid_solid_.polyhedron_attribute_manager().resize( added_prism + 1 );
         do_create_prism( vertices );
         this->update_polyhedron_info( added_prism, vertices );
         return added_prism;
@@ -134,8 +127,8 @@ namespace geode
     index_t HybridSolidBuilder< dimension >::create_pyramid(
         const std::array< index_t, 5 >& vertices )
     {
-        const auto added_pyramid = hybrid_solid_->nb_polyhedra();
-        hybrid_solid_->polyhedron_attribute_manager().resize(
+        const auto added_pyramid = hybrid_solid_.nb_polyhedra();
+        hybrid_solid_.polyhedron_attribute_manager().resize(
             added_pyramid + 1 );
         do_create_pyramid( vertices );
         this->update_polyhedron_info( added_pyramid, vertices );

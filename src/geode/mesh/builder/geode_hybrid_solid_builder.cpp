@@ -33,23 +33,23 @@ namespace geode
     template < index_t dimension >
     OpenGeodeHybridSolidBuilder< dimension >::OpenGeodeHybridSolidBuilder(
         VertexSet& vertex_set, MeshBuilderFactoryKey )
-        : HybridSolidBuilder< dimension >( vertex_set )
+        : OpenGeodeHybridSolidBuilder< dimension >(
+            dynamic_cast< OpenGeodeHybridSolid< dimension >& >( vertex_set ) )
     {
     }
 
     template < index_t dimension >
-    void OpenGeodeHybridSolidBuilder< dimension >::do_set_mesh(
-        VertexSet& mesh )
+    OpenGeodeHybridSolidBuilder< dimension >::OpenGeodeHybridSolidBuilder(
+        OpenGeodeHybridSolid< dimension >& mesh )
+        : HybridSolidBuilder< dimension >( mesh ), geode_hybrid_solid_( mesh )
     {
-        geode_hybrid_solid_ =
-            &dynamic_cast< OpenGeodeHybridSolid< dimension >& >( mesh );
     }
 
     template < index_t dimension >
     void OpenGeodeHybridSolidBuilder< dimension >::do_set_point(
         index_t vertex_id, Point< dimension > point )
     {
-        geode_hybrid_solid_->set_vertex( vertex_id, std::move( point ), {} );
+        geode_hybrid_solid_.set_vertex( vertex_id, std::move( point ), {} );
     }
 
     template < index_t dimension >
@@ -81,7 +81,7 @@ namespace geode
     void OpenGeodeHybridSolidBuilder< dimension >::do_set_polyhedron_vertex(
         const PolyhedronVertex& polyhedron_vertex, index_t vertex_id )
     {
-        geode_hybrid_solid_->set_polyhedron_vertex(
+        geode_hybrid_solid_.set_polyhedron_vertex(
             polyhedron_vertex, vertex_id, {} );
     }
 
@@ -89,35 +89,35 @@ namespace geode
     void OpenGeodeHybridSolidBuilder< dimension >::do_create_tetrahedron(
         const std::array< index_t, 4 >& vertices )
     {
-        geode_hybrid_solid_->add_tetrahedron( vertices, {} );
+        geode_hybrid_solid_.add_tetrahedron( vertices, {} );
     }
 
     template < index_t dimension >
     void OpenGeodeHybridSolidBuilder< dimension >::do_create_hexahedron(
         const std::array< index_t, 8 >& vertices )
     {
-        geode_hybrid_solid_->add_hexahedron( vertices, {} );
+        geode_hybrid_solid_.add_hexahedron( vertices, {} );
     }
 
     template < index_t dimension >
     void OpenGeodeHybridSolidBuilder< dimension >::do_create_prism(
         const std::array< index_t, 6 >& vertices )
     {
-        geode_hybrid_solid_->add_prism( vertices, {} );
+        geode_hybrid_solid_.add_prism( vertices, {} );
     }
 
     template < index_t dimension >
     void OpenGeodeHybridSolidBuilder< dimension >::do_create_pyramid(
         const std::array< index_t, 5 >& vertices )
     {
-        geode_hybrid_solid_->add_pyramid( vertices, {} );
+        geode_hybrid_solid_.add_pyramid( vertices, {} );
     }
 
     template < index_t dimension >
     void OpenGeodeHybridSolidBuilder< dimension >::do_set_polyhedron_adjacent(
         const PolyhedronFacet& polyhedron_facet, index_t adjacent_id )
     {
-        geode_hybrid_solid_->set_polyhedron_adjacent(
+        geode_hybrid_solid_.set_polyhedron_adjacent(
             polyhedron_facet, adjacent_id, {} );
     }
 
@@ -125,7 +125,7 @@ namespace geode
     void OpenGeodeHybridSolidBuilder< dimension >::do_unset_polyhedron_adjacent(
         const PolyhedronFacet& polyhedron_facet )
     {
-        geode_hybrid_solid_->set_polyhedron_adjacent(
+        geode_hybrid_solid_.set_polyhedron_adjacent(
             polyhedron_facet, NO_ID, {} );
     }
 
@@ -134,7 +134,7 @@ namespace geode
         const std::vector< bool >& to_delete,
         absl::Span< const index_t > /*unused*/ )
     {
-        geode_hybrid_solid_->remove_polyhedra( to_delete, {} );
+        geode_hybrid_solid_.remove_polyhedra( to_delete, {} );
     }
 
     template < index_t dimension >
@@ -142,7 +142,7 @@ namespace geode
         absl::Span< const index_t > permutation,
         absl::Span< const index_t > /*unused*/ )
     {
-        geode_hybrid_solid_->permute_polyhedra( permutation, {} );
+        geode_hybrid_solid_.permute_polyhedra( permutation, {} );
     }
 
     template class opengeode_mesh_api OpenGeodeHybridSolidBuilder< 3 >;

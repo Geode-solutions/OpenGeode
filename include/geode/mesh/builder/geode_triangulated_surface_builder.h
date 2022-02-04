@@ -49,9 +49,10 @@ namespace geode
         OpenGeodeTriangulatedSurfaceBuilder(
             VertexSet& vertex_set, MeshBuilderFactoryKey );
 
-    private:
-        void do_set_mesh( VertexSet& mesh ) final;
+        OpenGeodeTriangulatedSurfaceBuilder(
+            OpenGeodeTriangulatedSurface< dimension >& mesh );
 
+    private:
         void do_set_point( index_t vertex_id, Point< dimension > point ) final;
 
         void do_create_vertex() final;
@@ -85,7 +86,7 @@ namespace geode
         void do_unset_polygon_adjacent( const PolygonEdge& polygon_edge ) final;
 
     private:
-        OpenGeodeTriangulatedSurface< dimension >* geode_triangulated_surface_;
+        OpenGeodeTriangulatedSurface< dimension >& geode_triangulated_surface_;
     };
     ALIAS_2D_AND_3D( OpenGeodeTriangulatedSurfaceBuilder );
 } // namespace geode

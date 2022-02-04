@@ -55,9 +55,9 @@ namespace geode
         PolygonalSurfaceViewBuilder(
             VertexSet& vertex_set, MeshBuilderFactoryKey );
 
-    private:
-        void do_set_mesh( VertexSet& mesh ) final;
+        PolygonalSurfaceViewBuilder( PolygonalSurfaceView< dimension >& mesh );
 
+    private:
         void do_set_point( index_t vertex_id, Point< dimension > point ) final;
 
         void do_create_vertex() final;
@@ -88,7 +88,7 @@ namespace geode
         void do_unset_polygon_adjacent( const PolygonEdge& polygon_edge ) final;
 
     private:
-        PolygonalSurfaceView< dimension >* polygonal_surface_view_;
+        PolygonalSurfaceView< dimension >& polygonal_surface_view_;
     };
     ALIAS_2D_AND_3D( PolygonalSurfaceViewBuilder );
 } // namespace geode

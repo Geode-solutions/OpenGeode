@@ -172,11 +172,8 @@ namespace geode
             copy( solid_mesh );
         }
 
-        void set_mesh(
-            SolidMesh< dimension >& mesh, MeshBuilderFactoryKey key );
-
     protected:
-        SolidMeshBuilder( VertexSet& vertex_set );
+        SolidMeshBuilder( SolidMesh< dimension >& mesh );
 
         void copy( const SolidMesh< dimension >& solid_mesh );
 
@@ -240,7 +237,7 @@ namespace geode
                 absl::Span< const std::vector< index_t > > facets ) const;
 
     private:
-        SolidMesh< dimension >* solid_mesh_;
+        SolidMesh< dimension >& solid_mesh_;
     };
     ALIAS_3D( SolidMeshBuilder );
 } // namespace geode

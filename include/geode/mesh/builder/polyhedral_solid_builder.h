@@ -59,14 +59,11 @@ namespace geode
         void copy(
             const PolyhedralSolid< dimension >& polyhedral_solid, BuilderKey );
 
-        void set_mesh(
-            PolyhedralSolid< dimension >& mesh, MeshBuilderFactoryKey key );
-
     protected:
-        PolyhedralSolidBuilder( VertexSet& vertex_set );
+        PolyhedralSolidBuilder( PolyhedralSolid< dimension >& mesh );
 
     private:
-        PolyhedralSolid< dimension >* polyhedral_solid_;
+        PolyhedralSolid< dimension >& polyhedral_solid_;
     };
     ALIAS_3D( PolyhedralSolidBuilder );
 } // namespace geode

@@ -82,15 +82,9 @@ namespace
 
 namespace geode
 {
-    GraphBuilder::GraphBuilder( VertexSet& vertex_set )
-        : VertexSetBuilder( vertex_set )
+    GraphBuilder::GraphBuilder( Graph& mesh )
+        : VertexSetBuilder( mesh ), graph_( mesh )
     {
-    }
-
-    void GraphBuilder::set_mesh( Graph& mesh, MeshBuilderFactoryKey key )
-    {
-        graph_ = &mesh;
-        VertexSetBuilder::set_mesh( mesh, key );
     }
 
     std::unique_ptr< GraphBuilder > GraphBuilder::create( Graph& mesh )
@@ -101,16 +95,16 @@ namespace geode
     void GraphBuilder::set_edge_vertex(
         const EdgeVertex& edge_vertex, index_t vertex_id )
     {
-        OPENGEODE_ASSERT( edge_vertex.edge_id < graph_->nb_edges(),
+        OPENGEODE_ASSERT( edge_vertex.edge_id < graph_.nb_edges(),
             "[GraphBuilder::set_edge_vertex] Accessing an edge that does not "
             "exist" );
         OPENGEODE_ASSERT( edge_vertex.vertex_id < 2,
             "[GraphBuilder::set_edge_vertex] Trying to access an invalid edge "
             "local vertex" );
-        OPENGEODE_ASSERT( vertex_id < graph_->nb_vertices(),
+        OPENGEODE_ASSERT( vertex_id < graph_.nb_vertices(),
             "[GraphBuilder::set_edge_vertex] Accessing a vertex that does not "
             "exist" );
-        if( graph_->edge_vertex( edge_vertex ) == vertex_id )
+        if( graph_.edge_vertex( edge_vertex ) == vertex_id )
         {
             return;
         }
@@ -121,19 +115,19 @@ namespace geode
     void GraphBuilder::associate_edge_vertex_to_vertex(
         const EdgeVertex& edge_vertex, index_t vertex_id )
     {
-        graph_->associate_edge_vertex_to_vertex( edge_vertex, vertex_id, {} );
+        graph_.associate_edge_vertex_to_vertex( edge_vertex, vertex_id, {} );
     }
 
     void GraphBuilder::disassociate_edge_vertex_to_vertex(
         const EdgeVertex& edge_vertex )
     {
-        graph_->disassociate_edge_vertex_to_vertex( edge_vertex, {} );
+        graph_.disassociate_edge_vertex_to_vertex( edge_vertex, {} );
     }
 
     index_t GraphBuilder::create_edge()
     {
-        const auto added_edge = graph_->nb_edges();
-        graph_->edge_attribute_manager().resize( added_edge + 1 );
+        const auto added_edge = graph_.nb_edges();
+        graph_.edge_attribute_manager().resize( added_edge + 1 );
         do_create_edge();
         return added_edge;
     }
@@ -143,7 +137,7 @@ namespace geode
         OPENGEODE_ASSERT( v0_id != v1_id, "[GraphBuilder::create_edge] "
                                           "Trying to create an edge with "
                                           "same extremities" );
-        const auto added_edge = graph_->nb_edges();
+        const auto added_edge = graph_.nb_edges();
         create_edge();
         set_edge_vertex( { added_edge, 0 }, v0_id );
         set_edge_vertex( { added_edge, 1 }, v1_id );
@@ -152,8 +146,8 @@ namespace geode
 
     index_t GraphBuilder::create_edges( index_t nb )
     {
-        const auto first_added_edge = graph_->nb_edges();
-        graph_->edge_attribute_manager().resize( first_added_edge + nb );
+        const auto first_added_edge = graph_.nb_edges();
+        graph_.edge_attribute_manager().resize( first_added_edge + nb );
         do_create_edges( nb );
         return first_added_edge;
     }
@@ -161,7 +155,7 @@ namespace geode
     void GraphBuilder::do_delete_vertices( const std::vector< bool >& to_delete,
         absl::Span< const index_t > old2new )
     {
-        update_edge_vertices( *graph_, *this, old2new );
+        update_edge_vertices( graph_, *this, old2new );
         do_delete_curve_vertices( to_delete, old2new );
     }
 
@@ -169,14 +163,14 @@ namespace geode
         absl::Span< const index_t > permutation,
         absl::Span< const index_t > old2new )
     {
-        update_edge_vertices( *graph_, *this, old2new );
+        update_edge_vertices( graph_, *this, old2new );
         do_permute_curve_vertices( permutation, old2new );
     }
 
     void GraphBuilder::set_edges_around_vertex(
         index_t vertex_id, EdgesAroundVertex edges )
     {
-        graph_->set_edges_around_vertex( vertex_id, std::move( edges ), {} );
+        graph_.set_edges_around_vertex( vertex_id, std::move( edges ), {} );
     }
 
     std::vector< index_t > GraphBuilder::delete_edges(
@@ -187,8 +181,8 @@ namespace geode
         {
             return old2new;
         }
-        update_edges_around( *graph_, *this, old2new );
-        graph_->edge_attribute_manager().delete_elements( to_delete );
+        update_edges_around( graph_, *this, old2new );
+        graph_.edge_attribute_manager().delete_elements( to_delete );
         do_delete_edges( to_delete, old2new );
         return old2new;
     }
@@ -197,18 +191,18 @@ namespace geode
         absl::Span< const index_t > permutation )
     {
         const auto old2new = old2new_permutation( permutation );
-        update_edges_around( *graph_, *this, old2new );
-        graph_->edge_attribute_manager().permute_elements( permutation );
+        update_edges_around( graph_, *this, old2new );
+        graph_.edge_attribute_manager().permute_elements( permutation );
         do_permute_edges( permutation, old2new );
         return old2new;
     }
 
     std::vector< index_t > GraphBuilder::delete_isolated_vertices()
     {
-        std::vector< bool > to_delete( graph_->nb_vertices(), false );
-        for( const auto v : Range{ graph_->nb_vertices() } )
+        std::vector< bool > to_delete( graph_.nb_vertices(), false );
+        for( const auto v : Range{ graph_.nb_vertices() } )
         {
-            const auto& edge_vertices = graph_->edges_around_vertex( v );
+            const auto& edge_vertices = graph_.edges_around_vertex( v );
             if( edge_vertices.empty() )
             {
                 to_delete[v] = true;
@@ -221,7 +215,7 @@ namespace geode
     {
         VertexSetBuilder::copy( graph );
         create_edges( graph.nb_edges() );
-        graph_->edge_attribute_manager().copy( graph.edge_attribute_manager() );
+        graph_.edge_attribute_manager().copy( graph.edge_attribute_manager() );
         for( const auto e : Range{ graph.nb_edges() } )
         {
             for( const auto v : LRange{ 2 } )

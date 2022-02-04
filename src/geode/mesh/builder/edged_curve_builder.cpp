@@ -31,8 +31,9 @@
 namespace geode
 {
     template < index_t dimension >
-    EdgedCurveBuilder< dimension >::EdgedCurveBuilder( VertexSet& vertex_set )
-        : GraphBuilder( vertex_set )
+    EdgedCurveBuilder< dimension >::EdgedCurveBuilder(
+        EdgedCurve< dimension >& mesh )
+        : GraphBuilder( mesh ), edged_curve_( mesh )
     {
     }
 
@@ -45,18 +46,10 @@ namespace geode
     }
 
     template < index_t dimension >
-    void EdgedCurveBuilder< dimension >::set_mesh(
-        EdgedCurve< dimension >& mesh, MeshBuilderFactoryKey key )
-    {
-        edged_curve_ = &mesh;
-        GraphBuilder::set_mesh( mesh, key );
-    }
-
-    template < index_t dimension >
     void EdgedCurveBuilder< dimension >::set_point(
         index_t vertex_id, Point< dimension > point )
     {
-        OPENGEODE_ASSERT( vertex_id < edged_curve_->nb_vertices(),
+        OPENGEODE_ASSERT( vertex_id < edged_curve_.nb_vertices(),
             "[EdgedCurveBuilder::set_point] Accessing a vertex that does not "
             "exist" );
         do_set_point( vertex_id, std::move( point ) );
@@ -66,7 +59,7 @@ namespace geode
     index_t EdgedCurveBuilder< dimension >::create_point(
         Point< dimension > point )
     {
-        const auto added_vertex = edged_curve_->nb_vertices();
+        const auto added_vertex = edged_curve_.nb_vertices();
         create_vertex();
         set_point( added_vertex, std::move( point ) );
         return added_vertex;

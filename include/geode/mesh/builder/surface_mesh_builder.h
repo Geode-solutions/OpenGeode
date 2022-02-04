@@ -173,11 +173,8 @@ namespace geode
             copy( surface_mesh );
         }
 
-        void set_mesh(
-            SurfaceMesh< dimension >& mesh, MeshBuilderFactoryKey key );
-
     protected:
-        SurfaceMeshBuilder( VertexSet& vertex_set );
+        SurfaceMeshBuilder( SurfaceMesh< dimension >& mesh );
 
         void copy( const SurfaceMesh< dimension >& surface_mesh );
 
@@ -224,7 +221,7 @@ namespace geode
         void update_polygon_vertices( absl::Span< const index_t > old2new );
 
     private:
-        SurfaceMesh< dimension >* surface_mesh_;
+        SurfaceMesh< dimension >& surface_mesh_;
     };
     ALIAS_2D_AND_3D( SurfaceMeshBuilder );
 } // namespace geode

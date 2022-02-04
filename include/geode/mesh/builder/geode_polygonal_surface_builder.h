@@ -49,9 +49,10 @@ namespace geode
         OpenGeodePolygonalSurfaceBuilder(
             VertexSet& vertex_set, MeshBuilderFactoryKey );
 
-    private:
-        void do_set_mesh( VertexSet& mesh ) final;
+        OpenGeodePolygonalSurfaceBuilder(
+            OpenGeodePolygonalSurface< dimension >& mesh );
 
+    private:
         void do_set_point( index_t vertex_id, Point< dimension > point ) final;
 
         void do_create_vertex() final;
@@ -82,7 +83,7 @@ namespace geode
         void do_unset_polygon_adjacent( const PolygonEdge& polygon_edge ) final;
 
     private:
-        OpenGeodePolygonalSurface< dimension >* geode_polygonal_surface_;
+        OpenGeodePolygonalSurface< dimension >& geode_polygonal_surface_;
     };
     ALIAS_2D_AND_3D( OpenGeodePolygonalSurfaceBuilder );
 } // namespace geode

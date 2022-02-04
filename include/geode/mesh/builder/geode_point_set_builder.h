@@ -47,9 +47,9 @@ namespace geode
         OpenGeodePointSetBuilder(
             VertexSet& vertex_set, MeshBuilderFactoryKey );
 
-    private:
-        void do_set_mesh( VertexSet& mesh ) final;
+        OpenGeodePointSetBuilder( OpenGeodePointSet< dimension >& mesh );
 
+    private:
         void do_set_point( index_t vertex_id, Point< dimension > point ) final;
 
         void do_create_vertex() final;
@@ -63,7 +63,7 @@ namespace geode
             absl::Span< const index_t > old2new ) final;
 
     private:
-        OpenGeodePointSet< dimension >* geode_point_set_;
+        OpenGeodePointSet< dimension >& geode_point_set_;
     };
     ALIAS_2D_AND_3D( OpenGeodePointSetBuilder );
 } // namespace geode

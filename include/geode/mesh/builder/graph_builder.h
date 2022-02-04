@@ -124,10 +124,8 @@ namespace geode
             copy( graph );
         }
 
-        void set_mesh( Graph& mesh, MeshBuilderFactoryKey key );
-
     protected:
-        GraphBuilder( VertexSet& vertex_set );
+        GraphBuilder( Graph& mesh );
 
         void copy( const Graph& graph );
 
@@ -160,6 +158,6 @@ namespace geode
             absl::Span< const index_t > old2new ) = 0;
 
     private:
-        Graph* graph_;
+        Graph& graph_;
     };
 } // namespace geode

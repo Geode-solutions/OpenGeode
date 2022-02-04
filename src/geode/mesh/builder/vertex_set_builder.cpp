@@ -30,8 +30,8 @@
 
 namespace geode
 {
-    VertexSetBuilder::VertexSetBuilder( VertexSet& vertex_set )
-        : IdentifierBuilder( vertex_set )
+    VertexSetBuilder::VertexSetBuilder( VertexSet& mesh )
+        : IdentifierBuilder( mesh ), vertex_set_( mesh )
     {
     }
 
@@ -42,40 +42,26 @@ namespace geode
             mesh );
     }
 
-    void VertexSetBuilder::set_mesh( VertexSet& mesh, MeshBuilderFactoryKey )
-    {
-        DEBUG( "OLD VertexSetBuilder::set_mesh" );
-        vertex_set_ = &mesh;
-        do_set_mesh( mesh );
-    }
-
-    void VertexSetBuilder::set_mesh( VertexSet& mesh )
-    {
-        DEBUG( "NEW VertexSetBuilder::set_mesh" );
-        vertex_set_ = &mesh;
-        do_set_mesh( mesh );
-    }
-
     void VertexSetBuilder::copy( const VertexSet& vertex_set )
     {
         set_name( vertex_set.name() );
         create_vertices( vertex_set.nb_vertices() );
-        vertex_set_->vertex_attribute_manager().copy(
+        vertex_set_.vertex_attribute_manager().copy(
             vertex_set.vertex_attribute_manager() );
     }
 
     index_t VertexSetBuilder::create_vertex()
     {
-        const auto added_vertex = vertex_set_->nb_vertices();
-        vertex_set_->vertex_attribute_manager().resize( added_vertex + 1 );
+        const auto added_vertex = vertex_set_.nb_vertices();
+        vertex_set_.vertex_attribute_manager().resize( added_vertex + 1 );
         do_create_vertex();
         return added_vertex;
     }
 
     index_t VertexSetBuilder::create_vertices( index_t nb )
     {
-        const auto first_added_vertex = vertex_set_->nb_vertices();
-        vertex_set_->vertex_attribute_manager().resize(
+        const auto first_added_vertex = vertex_set_.nb_vertices();
+        vertex_set_.vertex_attribute_manager().resize(
             first_added_vertex + nb );
         do_create_vertices( nb );
         return first_added_vertex;
@@ -89,7 +75,7 @@ namespace geode
         {
             return old2new;
         }
-        vertex_set_->vertex_attribute_manager().delete_elements( to_delete );
+        vertex_set_.vertex_attribute_manager().delete_elements( to_delete );
         do_delete_vertices( to_delete, old2new );
         return old2new;
     }
@@ -98,7 +84,7 @@ namespace geode
         absl::Span< const index_t > permutation )
     {
         const auto old2new = old2new_permutation( permutation );
-        vertex_set_->vertex_attribute_manager().permute_elements( permutation );
+        vertex_set_.vertex_attribute_manager().permute_elements( permutation );
         do_permute_vertices( permutation, old2new );
         return old2new;
     }
