@@ -36,12 +36,24 @@ namespace geode
         MeshBuilderFactoryKey )
         : TetrahedralSolidBuilder< dimension >( vertex_set )
     {
+        DEBUG( "old cstr OpenGeodeTetrahedralSolidBuilder" );
+    }
+
+    template < index_t dimension >
+    OpenGeodeTetrahedralSolidBuilder< dimension >::
+        OpenGeodeTetrahedralSolidBuilder(
+            OpenGeodeTetrahedralSolid< dimension >& solid )
+        : TetrahedralSolidBuilder< dimension >( solid )
+    {
+        DEBUG( "new cstr OpenGeodeTetrahedralSolidBuilder" );
+        VertexSetBuilder::set_mesh( solid );
     }
 
     template < index_t dimension >
     void OpenGeodeTetrahedralSolidBuilder< dimension >::do_set_mesh(
         VertexSet& mesh )
     {
+        DEBUG( "OpenGeodeTetrahedralSolidBuilder::do set mesh " );
         geode_tetrahedral_solid_ =
             &dynamic_cast< OpenGeodeTetrahedralSolid< dimension >& >( mesh );
     }

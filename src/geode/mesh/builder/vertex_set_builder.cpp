@@ -44,6 +44,14 @@ namespace geode
 
     void VertexSetBuilder::set_mesh( VertexSet& mesh, MeshBuilderFactoryKey )
     {
+        DEBUG( "OLD VertexSetBuilder::set_mesh" );
+        vertex_set_ = &mesh;
+        do_set_mesh( mesh );
+    }
+
+    void VertexSetBuilder::set_mesh( VertexSet& mesh )
+    {
+        DEBUG( "NEW VertexSetBuilder::set_mesh" );
         vertex_set_ = &mesh;
         do_set_mesh( mesh );
     }

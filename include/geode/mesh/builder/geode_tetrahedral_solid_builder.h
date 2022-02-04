@@ -52,6 +52,10 @@ namespace geode
         OpenGeodeTetrahedralSolidBuilder(
             VertexSet& vertex_set, MeshBuilderFactoryKey );
 
+    protected:
+        OpenGeodeTetrahedralSolidBuilder(
+            OpenGeodeTetrahedralSolid< dimension >& solid );
+
     private:
         void do_set_mesh( VertexSet& mesh ) final;
 

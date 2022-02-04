@@ -94,6 +94,8 @@ namespace geode
     protected:
         VertexSetBuilder( VertexSet& vertex_set );
 
+        void set_mesh( VertexSet& mesh );
+
         friend class VertexSet;
         void copy( const VertexSet& vertex_set );
 

@@ -30,6 +30,7 @@
 
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/bitsery_archive.h>
+#include <geode/basic/logger.h>
 #include <geode/basic/pimpl_impl.h>
 
 #include <geode/geometry/point.h>
@@ -63,6 +64,7 @@ namespace geode
                               NO_ID, NO_ID, NO_ID, NO_ID },
                           { false, false } ) )
         {
+            DEBUG( "cstr OpenGeodeTetrahedralSolid::Impl" );
         }
 
         index_t get_polyhedron_vertex(
@@ -153,6 +155,7 @@ namespace geode
     OpenGeodeTetrahedralSolid< dimension >::OpenGeodeTetrahedralSolid()
         : impl_( *this )
     {
+        DEBUG( "sctr OpenGeodeTetrahedralSolid" );
     }
 
     template < index_t dimension >
