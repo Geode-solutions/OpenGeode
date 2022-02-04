@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <async++.h>
+
 #include <ghc/filesystem.hpp>
 
 #include <geode/basic/uuid.h>
@@ -50,13 +52,26 @@ namespace geode
 
         void save_section_files( absl::string_view directory ) const
         {
-            section().save_identifier( directory );
-            section().save_relationships( directory );
-            section().save_unique_vertices( directory );
-            section().save_corners( directory );
-            section().save_lines( directory );
-            section().save_surfaces( directory );
-            section().save_model_boundaries( directory );
+            absl::FixedArray< async::task< void > > tasks( 5 );
+            index_t count{ 0 };
+            tasks[count++] = async::spawn( [&directory, this] {
+                section().save_identifier( directory );
+            } );
+            tasks[count++] = async::spawn( [&directory, this] {
+                section().save_relationships( directory );
+            } );
+            tasks[count++] = async::spawn( [&directory, this] {
+                section().save_unique_vertices( directory );
+            } );
+            tasks[count++] = async::spawn( [&directory, this] {
+                section().save_corners( directory );
+                section().save_lines( directory );
+                section().save_surfaces( directory );
+            } );
+            tasks[count++] = async::spawn( [&directory, this] {
+                section().save_model_boundaries( directory );
+            } );
+            async::when_all( tasks.begin(), tasks.end() ).wait();
         }
 
         void archive_section_files( const ZipFile& zip_writer ) const
