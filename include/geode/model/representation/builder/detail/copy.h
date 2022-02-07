@@ -226,7 +226,8 @@ namespace geode
             BuilderTo& builder_to,
             const ModelCopyMapping& mapping )
         {
-            async::parallel_for( async::irange( 0, from.nb_unique_vertices() ),
+            async::parallel_for(
+                async::irange( index_t{ 0 }, from.nb_unique_vertices() ),
                 [&from, &builder_to, &mapping]( index_t v ) {
                     for( const auto& mesh_vertex :
                         from.mesh_component_vertices( v ) )
