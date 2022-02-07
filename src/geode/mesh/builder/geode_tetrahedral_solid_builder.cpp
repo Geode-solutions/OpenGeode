@@ -38,7 +38,6 @@ namespace geode
             dynamic_cast< OpenGeodeTetrahedralSolid< dimension >& >(
                 vertex_set ) )
     {
-        DEBUG( "old cstr OpenGeodeTetrahedralSolidBuilder" );
     }
 
     template < index_t dimension >
