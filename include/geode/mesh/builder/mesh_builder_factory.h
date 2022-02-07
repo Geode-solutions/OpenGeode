@@ -62,7 +62,6 @@ namespace geode
             OPENGEODE_EXCEPTION( builder,
                 "Cannot create mesh builder with key: ",
                 mesh.impl_name().get() );
-            builder->set_mesh( mesh, MeshBuilderFactoryKey{} );
             return std::unique_ptr< MeshBuilder >{ builder };
         }
     };

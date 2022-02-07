@@ -57,9 +57,9 @@ namespace geode
         TetrahedralSolidViewBuilder(
             VertexSet& vertex_set, MeshBuilderFactoryKey );
 
-    private:
-        void do_set_mesh( VertexSet& mesh ) final;
+        TetrahedralSolidViewBuilder( TetrahedralSolidView< dimension >& mesh );
 
+    private:
         void do_set_point( index_t vertex_id, Point< dimension > point ) final;
 
         void do_create_vertex() final;
@@ -95,7 +95,7 @@ namespace geode
         void do_create_tetrahedra( index_t nb ) final;
 
     private:
-        TetrahedralSolidView< dimension >* tetrahedral_solid_view_;
+        TetrahedralSolidView< dimension >& tetrahedral_solid_view_;
     };
     ALIAS_3D( TetrahedralSolidViewBuilder );
 } // namespace geode

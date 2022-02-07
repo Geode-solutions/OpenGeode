@@ -45,9 +45,9 @@ namespace geode
         OpenGeodeVertexSetBuilder(
             VertexSet& vertex_set, MeshBuilderFactoryKey );
 
-    private:
-        void do_set_mesh( VertexSet& mesh ) final;
+        OpenGeodeVertexSetBuilder( OpenGeodeVertexSet& mesh );
 
+    private:
         void do_create_vertex() final;
 
         void do_create_vertices( index_t nb ) final;
@@ -59,6 +59,6 @@ namespace geode
             absl::Span< const index_t > old2new ) final;
 
     private:
-        OpenGeodeVertexSet* geode_vertex_set_;
+        OpenGeodeVertexSet& geode_vertex_set_;
     };
 } // namespace geode

@@ -35,8 +35,8 @@ namespace geode
 {
     template < index_t dimension >
     PolygonalSurfaceBuilder< dimension >::PolygonalSurfaceBuilder(
-        VertexSet& vertex_set )
-        : SurfaceMeshBuilder< dimension >( vertex_set )
+        PolygonalSurface< dimension >& mesh )
+        : SurfaceMeshBuilder< dimension >( mesh ), polygonal_surface_( mesh )
     {
     }
 
@@ -47,14 +47,6 @@ namespace geode
     {
         return MeshBuilderFactory::create_mesh_builder<
             PolygonalSurfaceBuilder< dimension > >( mesh );
-    }
-
-    template < index_t dimension >
-    void PolygonalSurfaceBuilder< dimension >::set_mesh(
-        PolygonalSurface< dimension >& mesh, MeshBuilderFactoryKey key )
-    {
-        polygonal_surface_ = &mesh;
-        SurfaceMeshBuilder< dimension >::set_mesh( mesh, key );
     }
 
     template < index_t dimension >

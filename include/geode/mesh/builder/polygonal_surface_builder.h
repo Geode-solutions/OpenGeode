@@ -55,17 +55,14 @@ namespace geode
         static std::unique_ptr< PolygonalSurfaceBuilder< dimension > > create(
             PolygonalSurface< dimension >& mesh );
 
-        void set_mesh(
-            PolygonalSurface< dimension >& mesh, MeshBuilderFactoryKey key );
-
         void copy(
             const PolygonalSurface< dimension >& surface_mesh, BuilderKey );
 
     protected:
-        PolygonalSurfaceBuilder( VertexSet& vertex_set );
+        PolygonalSurfaceBuilder( PolygonalSurface< dimension >& mesh );
 
     private:
-        PolygonalSurface< dimension >* polygonal_surface_;
+        PolygonalSurface< dimension >& polygonal_surface_;
     };
     ALIAS_2D_AND_3D( PolygonalSurfaceBuilder );
 } // namespace geode

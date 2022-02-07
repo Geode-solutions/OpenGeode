@@ -34,23 +34,26 @@ namespace geode
     OpenGeodeTetrahedralSolidBuilder<
         dimension >::OpenGeodeTetrahedralSolidBuilder( VertexSet& vertex_set,
         MeshBuilderFactoryKey )
-        : TetrahedralSolidBuilder< dimension >( vertex_set )
+        : OpenGeodeTetrahedralSolidBuilder< dimension >(
+            dynamic_cast< OpenGeodeTetrahedralSolid< dimension >& >(
+                vertex_set ) )
     {
     }
 
     template < index_t dimension >
-    void OpenGeodeTetrahedralSolidBuilder< dimension >::do_set_mesh(
-        VertexSet& mesh )
+    OpenGeodeTetrahedralSolidBuilder< dimension >::
+        OpenGeodeTetrahedralSolidBuilder(
+            OpenGeodeTetrahedralSolid< dimension >& mesh )
+        : TetrahedralSolidBuilder< dimension >( mesh ),
+          geode_tetrahedral_solid_( mesh )
     {
-        geode_tetrahedral_solid_ =
-            &dynamic_cast< OpenGeodeTetrahedralSolid< dimension >& >( mesh );
     }
 
     template < index_t dimension >
     void OpenGeodeTetrahedralSolidBuilder< dimension >::do_set_point(
         index_t vertex_id, Point< dimension > point )
     {
-        geode_tetrahedral_solid_->set_vertex(
+        geode_tetrahedral_solid_.set_vertex(
             vertex_id, std::move( point ), {} );
     }
 
@@ -85,7 +88,7 @@ namespace geode
         OpenGeodeTetrahedralSolidBuilder< dimension >::do_set_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex, index_t vertex_id )
     {
-        geode_tetrahedral_solid_->set_polyhedron_vertex(
+        geode_tetrahedral_solid_.set_polyhedron_vertex(
             polyhedron_vertex, vertex_id, {} );
     }
 
@@ -93,7 +96,7 @@ namespace geode
     void OpenGeodeTetrahedralSolidBuilder< dimension >::do_create_tetrahedron(
         const std::array< index_t, 4 >& vertices )
     {
-        geode_tetrahedral_solid_->add_tetrahedron( vertices, {} );
+        geode_tetrahedral_solid_.add_tetrahedron( vertices, {} );
     }
 
     template < index_t dimension >
@@ -107,7 +110,7 @@ namespace geode
         do_set_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet, index_t adjacent_id )
     {
-        geode_tetrahedral_solid_->set_polyhedron_adjacent(
+        geode_tetrahedral_solid_.set_polyhedron_adjacent(
             polyhedron_facet, adjacent_id, {} );
     }
 
@@ -115,7 +118,7 @@ namespace geode
     void OpenGeodeTetrahedralSolidBuilder< dimension >::
         do_unset_polyhedron_adjacent( const PolyhedronFacet& polyhedron_facet )
     {
-        geode_tetrahedral_solid_->set_polyhedron_adjacent(
+        geode_tetrahedral_solid_.set_polyhedron_adjacent(
             polyhedron_facet, NO_ID, {} );
     }
 

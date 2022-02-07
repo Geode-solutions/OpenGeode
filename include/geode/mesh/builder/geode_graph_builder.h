@@ -44,9 +44,9 @@ namespace geode
     public:
         OpenGeodeGraphBuilder( VertexSet& vertex_set, MeshBuilderFactoryKey );
 
-    private:
-        void do_set_mesh( VertexSet& mesh ) final;
+        OpenGeodeGraphBuilder( OpenGeodeGraph& mesh );
 
+    private:
         void do_create_vertex() final;
 
         void do_create_vertices( index_t nb ) final;
@@ -71,6 +71,6 @@ namespace geode
             absl::Span< const index_t > old2new ) final;
 
     private:
-        OpenGeodeGraph* geode_graph_;
+        OpenGeodeGraph& geode_graph_;
     };
 } // namespace geode

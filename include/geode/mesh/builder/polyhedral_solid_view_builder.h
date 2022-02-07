@@ -58,9 +58,9 @@ namespace geode
         PolyhedralSolidViewBuilder(
             VertexSet& vertex_set, MeshBuilderFactoryKey );
 
-    private:
-        void do_set_mesh( VertexSet& mesh ) final;
+        PolyhedralSolidViewBuilder( PolyhedralSolidView< dimension >& mesh );
 
+    private:
         void do_set_point( index_t vertex_id, Point< dimension > point ) final;
 
         void do_create_vertex() final;
@@ -94,7 +94,7 @@ namespace geode
             const PolyhedronFacet& polyhedron_facet ) final;
 
     private:
-        PolyhedralSolidView< dimension >* polyhedral_solid_view_;
+        PolyhedralSolidView< dimension >& polyhedral_solid_view_;
     };
     ALIAS_3D( PolyhedralSolidViewBuilder );
 } // namespace geode

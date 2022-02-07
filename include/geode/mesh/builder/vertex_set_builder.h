@@ -89,8 +89,6 @@ namespace geode
         std::vector< index_t > permute_vertices(
             absl::Span< const index_t > permutation );
 
-        void set_mesh( VertexSet& mesh, MeshBuilderFactoryKey );
-
     protected:
         VertexSetBuilder( VertexSet& vertex_set );
 
@@ -98,8 +96,6 @@ namespace geode
         void copy( const VertexSet& vertex_set );
 
     private:
-        virtual void do_set_mesh( VertexSet& mesh ) = 0;
-
         virtual void do_create_vertex() = 0;
 
         virtual void do_create_vertices( index_t nb ) = 0;
@@ -112,6 +108,6 @@ namespace geode
             absl::Span< const index_t > old2new ) = 0;
 
     private:
-        VertexSet* vertex_set_;
+        VertexSet& vertex_set_;
     };
 } // namespace geode

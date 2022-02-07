@@ -34,23 +34,26 @@ namespace geode
     OpenGeodeTriangulatedSurfaceBuilder<
         dimension >::OpenGeodeTriangulatedSurfaceBuilder( VertexSet& vertex_set,
         MeshBuilderFactoryKey )
-        : TriangulatedSurfaceBuilder< dimension >( vertex_set )
+        : OpenGeodeTriangulatedSurfaceBuilder< dimension >(
+            dynamic_cast< OpenGeodeTriangulatedSurface< dimension >& >(
+                vertex_set ) )
     {
     }
 
     template < index_t dimension >
-    void OpenGeodeTriangulatedSurfaceBuilder< dimension >::do_set_mesh(
-        VertexSet& mesh )
+    OpenGeodeTriangulatedSurfaceBuilder< dimension >::
+        OpenGeodeTriangulatedSurfaceBuilder(
+            OpenGeodeTriangulatedSurface< dimension >& mesh )
+        : TriangulatedSurfaceBuilder< dimension >( mesh ),
+          geode_triangulated_surface_( mesh )
     {
-        geode_triangulated_surface_ =
-            &dynamic_cast< OpenGeodeTriangulatedSurface< dimension >& >( mesh );
     }
 
     template < index_t dimension >
     void OpenGeodeTriangulatedSurfaceBuilder< dimension >::do_set_point(
         index_t vertex_id, Point< dimension > point )
     {
-        geode_triangulated_surface_->set_vertex(
+        geode_triangulated_surface_.set_vertex(
             vertex_id, std::move( point ), {} );
     }
 
@@ -84,7 +87,7 @@ namespace geode
         OpenGeodeTriangulatedSurfaceBuilder< dimension >::do_set_polygon_vertex(
             const PolygonVertex& polygon_vertex, index_t vertex_id )
     {
-        geode_triangulated_surface_->set_polygon_vertex(
+        geode_triangulated_surface_.set_polygon_vertex(
             polygon_vertex, vertex_id, {} );
     }
 
@@ -92,7 +95,7 @@ namespace geode
     void OpenGeodeTriangulatedSurfaceBuilder< dimension >::do_create_triangle(
         const std::array< index_t, 3 >& vertices )
     {
-        geode_triangulated_surface_->add_triangle( vertices, {} );
+        geode_triangulated_surface_.add_triangle( vertices, {} );
     }
 
     template < index_t dimension >
@@ -106,7 +109,7 @@ namespace geode
         dimension >::do_set_polygon_adjacent( const PolygonEdge& polygon_edge,
         index_t adjacent_id )
     {
-        geode_triangulated_surface_->set_polygon_adjacent(
+        geode_triangulated_surface_.set_polygon_adjacent(
             polygon_edge, adjacent_id, {} );
     }
 
@@ -114,7 +117,7 @@ namespace geode
     void OpenGeodeTriangulatedSurfaceBuilder< dimension >::
         do_unset_polygon_adjacent( const PolygonEdge& polygon_edge )
     {
-        geode_triangulated_surface_->set_polygon_adjacent(
+        geode_triangulated_surface_.set_polygon_adjacent(
             polygon_edge, NO_ID, {} );
     }
 

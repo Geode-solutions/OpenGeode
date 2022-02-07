@@ -55,9 +55,10 @@ namespace geode
         TriangulatedSurfaceViewBuilder(
             VertexSet& vertex_set, MeshBuilderFactoryKey );
 
-    private:
-        void do_set_mesh( VertexSet& mesh ) final;
+        TriangulatedSurfaceViewBuilder(
+            TriangulatedSurfaceView< dimension >& mesh );
 
+    private:
         void do_set_point( index_t vertex_id, Point< dimension > point ) final;
 
         void do_create_vertex() final;
@@ -91,7 +92,7 @@ namespace geode
         void do_unset_polygon_adjacent( const PolygonEdge& polygon_edge ) final;
 
     private:
-        TriangulatedSurfaceView< dimension >* triangulated_surface_view_;
+        TriangulatedSurfaceView< dimension >& triangulated_surface_view_;
     };
     ALIAS_2D_AND_3D( TriangulatedSurfaceViewBuilder );
 } // namespace geode

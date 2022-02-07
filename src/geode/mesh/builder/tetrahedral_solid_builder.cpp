@@ -38,8 +38,8 @@ namespace geode
 {
     template < index_t dimension >
     TetrahedralSolidBuilder< dimension >::TetrahedralSolidBuilder(
-        VertexSet& vertex_set )
-        : SolidMeshBuilder< dimension >( vertex_set )
+        TetrahedralSolid< dimension >& mesh )
+        : SolidMeshBuilder< dimension >( mesh ), tetrahedral_solid_( mesh )
     {
     }
 
@@ -50,14 +50,6 @@ namespace geode
     {
         return MeshBuilderFactory::create_mesh_builder<
             TetrahedralSolidBuilder< dimension > >( mesh );
-    }
-
-    template < index_t dimension >
-    void TetrahedralSolidBuilder< dimension >::set_mesh(
-        TetrahedralSolid< dimension >& mesh, MeshBuilderFactoryKey key )
-    {
-        tetrahedral_solid_ = &mesh;
-        SolidMeshBuilder< dimension >::set_mesh( mesh, key );
     }
 
     template < index_t dimension >
@@ -78,8 +70,8 @@ namespace geode
     index_t TetrahedralSolidBuilder< dimension >::create_tetrahedron(
         const std::array< index_t, 4 >& vertices )
     {
-        const auto added_tetra = tetrahedral_solid_->nb_polyhedra();
-        tetrahedral_solid_->polyhedron_attribute_manager().resize(
+        const auto added_tetra = tetrahedral_solid_.nb_polyhedra();
+        tetrahedral_solid_.polyhedron_attribute_manager().resize(
             added_tetra + 1 );
         do_create_tetrahedron( vertices );
         this->update_polyhedron_info( added_tetra, vertices );
@@ -89,17 +81,17 @@ namespace geode
     template < index_t dimension >
     void TetrahedralSolidBuilder< dimension >::reserve_tetrahedra( index_t nb )
     {
-        const auto nb_tet = tetrahedral_solid_->nb_polyhedra();
-        tetrahedral_solid_->polyhedron_attribute_manager().reserve(
+        const auto nb_tet = tetrahedral_solid_.nb_polyhedra();
+        tetrahedral_solid_.polyhedron_attribute_manager().reserve(
             nb_tet + nb );
-        if( tetrahedral_solid_->are_facets_enabled() )
+        if( tetrahedral_solid_.are_facets_enabled() )
         {
-            tetrahedral_solid_->facets().facet_attribute_manager().reserve(
+            tetrahedral_solid_.facets().facet_attribute_manager().reserve(
                 nb_tet + 4 * nb );
         }
-        if( tetrahedral_solid_->are_edges_enabled() )
+        if( tetrahedral_solid_.are_edges_enabled() )
         {
-            tetrahedral_solid_->edges().edge_attribute_manager().reserve(
+            tetrahedral_solid_.edges().edge_attribute_manager().reserve(
                 nb_tet + 6 * nb );
         }
     }
@@ -108,8 +100,8 @@ namespace geode
     index_t TetrahedralSolidBuilder< dimension >::create_tetrahedra(
         index_t nb )
     {
-        const auto added_tetra = tetrahedral_solid_->nb_polyhedra();
-        tetrahedral_solid_->polyhedron_attribute_manager().resize(
+        const auto added_tetra = tetrahedral_solid_.nb_polyhedra();
+        tetrahedral_solid_.polyhedron_attribute_manager().resize(
             added_tetra + nb );
         do_create_tetrahedra( nb );
         return added_tetra;

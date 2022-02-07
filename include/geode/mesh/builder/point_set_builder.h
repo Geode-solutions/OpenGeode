@@ -74,10 +74,8 @@ namespace geode
             copy( point_set );
         }
 
-        void set_mesh( PointSet< dimension >& mesh, MeshBuilderFactoryKey key );
-
     protected:
-        PointSetBuilder( VertexSet& vertex_set );
+        PointSetBuilder( PointSet< dimension >& mesh );
 
         void copy( const PointSet< dimension >& point_set );
 
@@ -86,7 +84,7 @@ namespace geode
             index_t vertex_id, Point< dimension > point ) = 0;
 
     private:
-        PointSet< dimension >* point_set_;
+        PointSet< dimension >& point_set_;
     };
     ALIAS_2D_AND_3D( PointSetBuilder );
 } // namespace geode

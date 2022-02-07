@@ -71,11 +71,8 @@ namespace geode
             copy( edged_curve );
         }
 
-        void set_mesh(
-            EdgedCurve< dimension >& mesh, MeshBuilderFactoryKey key );
-
     protected:
-        EdgedCurveBuilder( VertexSet& vertex_set );
+        EdgedCurveBuilder( EdgedCurve< dimension >& mesh );
 
         void copy( const EdgedCurve< dimension >& edged_curve );
 
@@ -84,7 +81,7 @@ namespace geode
             index_t vertex_id, Point< dimension > point ) = 0;
 
     private:
-        EdgedCurve< dimension >* edged_curve_;
+        EdgedCurve< dimension >& edged_curve_;
     };
     ALIAS_2D_AND_3D( EdgedCurveBuilder );
 } // namespace geode

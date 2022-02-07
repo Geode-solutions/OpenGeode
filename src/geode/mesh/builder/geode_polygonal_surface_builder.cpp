@@ -34,23 +34,26 @@ namespace geode
     OpenGeodePolygonalSurfaceBuilder<
         dimension >::OpenGeodePolygonalSurfaceBuilder( VertexSet& vertex_set,
         MeshBuilderFactoryKey )
-        : PolygonalSurfaceBuilder< dimension >( vertex_set )
+        : OpenGeodePolygonalSurfaceBuilder< dimension >(
+            dynamic_cast< OpenGeodePolygonalSurface< dimension >& >(
+                vertex_set ) )
     {
     }
 
     template < index_t dimension >
-    void OpenGeodePolygonalSurfaceBuilder< dimension >::do_set_mesh(
-        VertexSet& mesh )
+    OpenGeodePolygonalSurfaceBuilder< dimension >::
+        OpenGeodePolygonalSurfaceBuilder(
+            OpenGeodePolygonalSurface< dimension >& mesh )
+        : PolygonalSurfaceBuilder< dimension >( mesh ),
+          geode_polygonal_surface_( mesh )
     {
-        geode_polygonal_surface_ =
-            &dynamic_cast< OpenGeodePolygonalSurface< dimension >& >( mesh );
     }
 
     template < index_t dimension >
     void OpenGeodePolygonalSurfaceBuilder< dimension >::do_set_point(
         index_t vertex_id, Point< dimension > point )
     {
-        geode_polygonal_surface_->set_vertex(
+        geode_polygonal_surface_.set_vertex(
             vertex_id, std::move( point ), {} );
     }
 
@@ -83,7 +86,7 @@ namespace geode
     void OpenGeodePolygonalSurfaceBuilder< dimension >::do_set_polygon_vertex(
         const PolygonVertex& polygon_vertex, index_t vertex_id )
     {
-        geode_polygonal_surface_->set_polygon_vertex(
+        geode_polygonal_surface_.set_polygon_vertex(
             polygon_vertex, vertex_id, {} );
     }
 
@@ -91,14 +94,14 @@ namespace geode
     void OpenGeodePolygonalSurfaceBuilder< dimension >::do_create_polygon(
         absl::Span< const index_t > vertices )
     {
-        geode_polygonal_surface_->add_polygon( vertices, {} );
+        geode_polygonal_surface_.add_polygon( vertices, {} );
     }
 
     template < index_t dimension >
     void OpenGeodePolygonalSurfaceBuilder< dimension >::do_set_polygon_adjacent(
         const PolygonEdge& polygon_edge, index_t adjacent_id )
     {
-        geode_polygonal_surface_->set_polygon_adjacent(
+        geode_polygonal_surface_.set_polygon_adjacent(
             polygon_edge, adjacent_id, {} );
     }
 
@@ -106,7 +109,7 @@ namespace geode
     void OpenGeodePolygonalSurfaceBuilder< dimension >::
         do_unset_polygon_adjacent( const PolygonEdge& polygon_edge )
     {
-        geode_polygonal_surface_->set_polygon_adjacent(
+        geode_polygonal_surface_.set_polygon_adjacent(
             polygon_edge, NO_ID, {} );
     }
 
@@ -115,7 +118,7 @@ namespace geode
         const std::vector< bool >& to_delete,
         absl::Span< const index_t > /*unused*/ )
     {
-        geode_polygonal_surface_->remove_polygons( to_delete, {} );
+        geode_polygonal_surface_.remove_polygons( to_delete, {} );
     }
 
     template < index_t dimension >
@@ -123,7 +126,7 @@ namespace geode
         absl::Span< const index_t > permutation,
         absl::Span< const index_t > /*unused*/ )
     {
-        geode_polygonal_surface_->permute_polygons( permutation, {} );
+        geode_polygonal_surface_.permute_polygons( permutation, {} );
     }
 
     template class opengeode_mesh_api OpenGeodePolygonalSurfaceBuilder< 2 >;
