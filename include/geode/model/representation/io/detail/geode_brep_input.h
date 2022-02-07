@@ -23,13 +23,6 @@
 
 #pragma once
 
-#include <async++.h>
-
-#include <geode/basic/uuid.h>
-#include <geode/basic/zip_file.h>
-
-#include <geode/model/representation/builder/brep_builder.h>
-#include <geode/model/representation/core/brep.h>
 #include <geode/model/representation/io/brep_input.h>
 
 namespace geode
@@ -47,56 +40,8 @@ namespace geode
             return BRep::native_extension_static();
         }
 
-        void load_brep_files( absl::string_view directory )
-        {
-            BRepBuilder builder{ brep() };
-            absl::FixedArray< async::task< void > > tasks( 5 );
-            index_t count{ 0 };
-            tasks[count++] = async::spawn( [&builder, &directory] {
-                builder.load_identifier( directory );
-            } );
-            tasks[count++] = async::spawn( [&builder, &directory] {
-                builder.load_corners( directory );
-                builder.load_lines( directory );
-                builder.load_surfaces( directory );
-                builder.load_blocks( directory );
-            } );
-            tasks[count++] = async::spawn( [&builder, &directory] {
-                builder.load_model_boundaries( directory );
-            } );
-            tasks[count++] = async::spawn( [&builder, &directory] {
-                builder.load_relationships( directory );
-            } );
-            tasks[count++] = async::spawn( [&builder, &directory] {
-                builder.load_unique_vertices( directory );
-            } );
-            async::when_all( tasks.begin(), tasks.end() )
-                .then( [&builder, this] {
-                    for( const auto& corner : brep().corners() )
-                    {
-                        builder.register_mesh_component( corner );
-                    }
-                    for( const auto& line : brep().lines() )
-                    {
-                        builder.register_mesh_component( line );
-                    }
-                    for( const auto& surface : brep().surfaces() )
-                    {
-                        builder.register_mesh_component( surface );
-                    }
-                    for( const auto& block : brep().blocks() )
-                    {
-                        builder.register_mesh_component( block );
-                    }
-                } )
-                .wait();
-        }
+        void load_brep_files( absl::string_view directory );
 
-        void read() final
-        {
-            const UnzipFile zip_reader{ filename(), uuid{}.string() };
-            zip_reader.extract_all();
-            load_brep_files( zip_reader.directory() );
-        }
+        void read() final;
     };
 } // namespace geode

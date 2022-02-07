@@ -53,8 +53,10 @@ add_geode_library(
         "representation/core/brep.cpp"
         "representation/core/section.cpp"
         "representation/io/brep_input.cpp"
+        "representation/io/geode_brep_input.cpp"
         "representation/io/section_input.cpp"
         "representation/io/brep_output.cpp"
+        "representation/io/geode_section_input.cpp"
         "representation/io/section_output.cpp"
     PUBLIC_HEADERS
         "common.h"
