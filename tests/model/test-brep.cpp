@@ -46,7 +46,7 @@
 #include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
 #include <geode/model/representation/builder/brep_builder.h>
-#include <geode/model/representation/builder/detail/copy.h>
+#include <geode/model/representation/builder/copy_mapping.h>
 #include <geode/model/representation/core/brep.h>
 #include <geode/model/representation/io/brep_input.h>
 #include <geode/model/representation/io/brep_output.h>

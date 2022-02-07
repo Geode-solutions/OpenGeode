@@ -22,7 +22,6 @@
  */
 
 #include <geode/model/representation/builder/brep_builder.h>
-#include <geode/model/representation/builder/detail/copy.h>
 
 namespace geode
 {

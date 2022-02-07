@@ -91,27 +91,16 @@ namespace geode
     void BRepBuilder::copy_component_geometry(
         const ModelCopyMapping& mappings, const BRep& brep )
     {
-        detail::copy_corner_geometry( brep, brep_, *this,
+        detail::copy_corner_geometry< 3 >( brep, brep_, *this,
             mappings.at( Corner3D::component_type_static() ) );
-        detail::copy_line_geometry( brep, brep_, *this,
+        detail::copy_line_geometry< 3 >( brep, brep_, *this,
             mappings.at( Line3D::component_type_static() ) );
-        detail::copy_surface_geometry( brep, brep_, *this,
+        detail::copy_surface_geometry< 3 >( brep, brep_, *this,
             mappings.at( Surface3D::component_type_static() ) );
-        detail::copy_block_geometry( brep, brep_, *this,
+        detail::copy_block_geometry< 3 >( brep, brep_, *this,
             mappings.at( Block3D::component_type_static() ) );
         create_unique_vertices( brep.nb_unique_vertices() );
-        detail::copy_vertex_identifier_components( brep, *this,
-            Corner3D::component_type_static(),
-            mappings.at( Corner3D::component_type_static() ) );
-        detail::copy_vertex_identifier_components( brep, *this,
-            Line3D::component_type_static(),
-            mappings.at( Line3D::component_type_static() ) );
-        detail::copy_vertex_identifier_components( brep, *this,
-            Surface3D::component_type_static(),
-            mappings.at( Surface3D::component_type_static() ) );
-        detail::copy_vertex_identifier_components( brep, *this,
-            Block3D::component_type_static(),
-            mappings.at( Block3D::component_type_static() ) );
+        detail::copy_vertex_identifier_components( brep, *this, mappings );
     }
 
     const uuid& BRepBuilder::add_corner()
