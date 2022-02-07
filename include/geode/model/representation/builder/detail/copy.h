@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <async++.h>
+
 #include <geode/basic/range.h>
 #include <geode/basic/uuid.h>
 
@@ -127,79 +129,116 @@ namespace geode
             return mapping;
         }
 
-        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
+        template < typename Mesh, typename Range >
+        absl::FixedArray< std::pair< uuid, std::unique_ptr< Mesh > > >
+            clone_meshes( Range&& range, index_t nb_components )
+        {
+            absl::FixedArray< std::pair< uuid, std::unique_ptr< Mesh > > >
+                result( nb_components );
+            absl::FixedArray< async::task< void > > tasks( nb_components );
+            index_t count{ 0 };
+            for( const auto& component : range )
+            {
+                tasks[count] = async::spawn( [&result, count, &component] {
+                    result[count] = std::make_pair(
+                        component.id(), component.mesh().clone() );
+                } );
+                count++;
+            }
+            async::when_all( tasks.begin(), tasks.end() ).wait();
+            return result;
+        }
+
+        template < index_t dimension,
+            typename ModelFrom,
+            typename ModelTo,
+            typename BuilderTo >
         void copy_corner_geometry( const ModelFrom& from,
             const ModelTo& to,
             BuilderTo& builder_to,
             const Mapping& corners )
         {
-            for( const auto& corner : from.corners() )
+            for( auto&& corner : clone_meshes< PointSet< dimension > >(
+                     from.corners(), from.nb_corners() ) )
             {
                 builder_to.update_corner_mesh(
-                    to.corner( corners.in2out( corner.id() ) ),
-                    corner.mesh().clone() );
+                    to.corner( corners.in2out( corner.first ) ),
+                    std::move( corner.second ) );
             }
         }
 
-        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
+        template < index_t dimension,
+            typename ModelFrom,
+            typename ModelTo,
+            typename BuilderTo >
         void copy_line_geometry( const ModelFrom& from,
             const ModelTo& to,
             BuilderTo& builder_to,
             const Mapping& lines )
         {
-            for( const auto& line : from.lines() )
+            for( auto&& line : clone_meshes< EdgedCurve< dimension > >(
+                     from.lines(), from.nb_lines() ) )
             {
                 builder_to.update_line_mesh(
-                    to.line( lines.in2out( line.id() ) ), line.mesh().clone() );
+                    to.line( lines.in2out( line.first ) ),
+                    std::move( line.second ) );
             }
         }
 
-        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
+        template < index_t dimension,
+            typename ModelFrom,
+            typename ModelTo,
+            typename BuilderTo >
         void copy_surface_geometry( const ModelFrom& from,
             const ModelTo& to,
             BuilderTo& builder_to,
             const Mapping& surfaces )
         {
-            for( const auto& surface : from.surfaces() )
+            for( auto&& surface : clone_meshes< SurfaceMesh< dimension > >(
+                     from.surfaces(), from.nb_surfaces() ) )
             {
                 builder_to.update_surface_mesh(
-                    to.surface( surfaces.in2out( surface.id() ) ),
-                    surface.mesh().clone() );
+                    to.surface( surfaces.in2out( surface.first ) ),
+                    std::move( surface.second ) );
             }
         }
 
-        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
+        template < index_t dimension,
+            typename ModelFrom,
+            typename ModelTo,
+            typename BuilderTo >
         void copy_block_geometry( const ModelFrom& from,
             const ModelTo& to,
             BuilderTo& builder_to,
             const Mapping& blocks )
         {
-            for( const auto& block : from.blocks() )
+            for( auto&& block : clone_meshes< SolidMesh< dimension > >(
+                     from.blocks(), from.nb_blocks() ) )
             {
                 builder_to.update_block_mesh(
-                    to.block( blocks.in2out( block.id() ) ),
-                    block.mesh().clone() );
+                    to.block( blocks.in2out( block.first ) ),
+                    std::move( block.second ) );
             }
         }
 
         template < typename Model, typename BuilderTo >
         void copy_vertex_identifier_components( const Model& from,
             BuilderTo& builder_to,
-            const ComponentType& type,
-            const Mapping& mapping )
+            const ModelCopyMapping& mapping )
         {
-            for( const auto v : Range{ from.nb_unique_vertices() } )
-            {
-                const auto vertices = from.mesh_component_vertices( v, type );
-                for( const auto& mesh_vertex : vertices )
-                {
-                    builder_to.set_unique_vertex(
-                        { { type,
-                              mapping.in2out( mesh_vertex.component_id.id() ) },
-                            mesh_vertex.vertex },
-                        v );
-                }
-            }
+            async::parallel_for( async::irange( 0, from.nb_unique_vertices() ),
+                [&from, &builder_to, &mapping]( index_t v ) {
+                    for( const auto& mesh_vertex :
+                        from.mesh_component_vertices( v ) )
+                    {
+                        const auto& type = mesh_vertex.component_id.type();
+                        builder_to.set_unique_vertex(
+                            { { type, mapping.at( type ).in2out(
+                                          mesh_vertex.component_id.id() ) },
+                                mesh_vertex.vertex },
+                            v );
+                    }
+                } );
         }
     } // namespace detail
 } // namespace geode

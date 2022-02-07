@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/model/representation/builder/detail/copy.h>
+#include <geode/model/representation/builder/copy_mapping.h>
 
 namespace geode
 {
