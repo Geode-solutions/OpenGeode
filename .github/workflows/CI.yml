@@ -120,39 +120,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-      
-  build-mac-xcode:
-    runs-on: macos-latest
-    needs: format
-    strategy:
-      matrix:
-        config: [Debug, Release]
-        python: ["3.6", "3.7", "3.8", "3.9", "3.10"]
-
-    steps:
-    - uses: actions/checkout@v1
-    - name: Set up Python ${{ matrix.python }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python }}
-    - name: Compile & Test
-      run: |
-        pip install wheel
-        mkdir -p build
-        cd build
-        cmake -G "Xcode" -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.python }} ..
-        cmake --build . --config ${{ matrix.config }}
-        cd opengeode
-        ctest -C ${{ matrix.config }} --output-on-failure
-        cmake --build . --target wheel --config ${{ matrix.config }}
-    - name: Notify slack
-      if: failure() && github.ref == 'refs/heads/master'
-      uses: 8398a7/action-slack@v2
-      with:
-        status: failure
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
   build-windows:
     runs-on: windows-2016
