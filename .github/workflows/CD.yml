@@ -78,12 +78,6 @@ jobs:
         user: __token__
         password: ${{ secrets.PYPI_TOKEN }}
         packages_dir: "build/opengeode/wheel/dist/"
-    - name: Upload
-      uses: geode-solutions/action-gh-release@master
-      with:
-        files: "build/opengeode/wheel/dist/OpenGeode_core-${{ steps.package.outputs.version }}-${{ matrix.config.tag }}-manylinux2014_x86_64.whl"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Notify slack
       if: failure() && github.ref == 'refs/heads/master'
       uses: 8398a7/action-slack@v2
@@ -157,12 +151,6 @@ jobs:
       run: |
         pip install twine
         twine upload -u __token__ -p ${{ secrets.PYPI_TOKEN }} build/opengeode/wheel/dist/*
-    - name: Upload
-      uses: geode-solutions/action-gh-release@master
-      with:
-        files: "build/opengeode/wheel/dist/OpenGeode_core-${{ steps.package.outputs.version }}-${{ matrix.config.tag }}-macosx_10_14_x86_64.whl"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Notify slack
       if: failure()
       uses: 8398a7/action-slack@v2
@@ -236,12 +224,6 @@ jobs:
       run: |
         pip install twine
         twine upload -u __token__ -p ${{ secrets.PYPI_TOKEN }} build/opengeode/wheel/dist/*
-    - name: Upload
-      uses: geode-solutions/action-gh-release@master
-      with:
-        files: "build/opengeode/wheel/dist/OpenGeode_core-${{ steps.package.outputs.version }}-${{ matrix.config.tag }}-win_amd64.whl"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Notify slack
       if: failure()
       uses: 8398a7/action-slack@v2
