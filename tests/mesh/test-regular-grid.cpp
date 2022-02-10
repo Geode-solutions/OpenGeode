@@ -152,6 +152,18 @@ void test_vertex_index( const geode::RegularGrid3D& grid )
     OPENGEODE_EXCEPTION( grid.previous_vertex( { 0, 0, 1 }, 2 )
                              == geode::GridVertexIndex3D( { 0, 0, 0 } ),
         "[Test] Wrong vertex index" );
+
+    OPENGEODE_EXCEPTION( grid.cell_vertex_indices( { 1, 1, 1 }, 0 )
+                             == geode::GridVertexIndex3D( { 1, 1, 1 } ),
+        "[Test] Wrong cell node vertex index" );
+    OPENGEODE_EXCEPTION( grid.cell_vertex_indices( { 1, 1, 1 }, 1 )
+                             == geode::GridVertexIndex3D( { 2, 1, 1 } ),
+        "[Test] Wrong cell node vertex index" );
+    OPENGEODE_EXCEPTION( grid.cell_vertex_indices( { 1, 1, 1 }, 2 )
+                             == geode::GridVertexIndex3D( { 1, 2, 1 } ),
+        "[Test] Wrong cell node vertex index" );
+    OPENGEODE_EXCEPTION( grid.cell_vertex_index( { 1, 1, 1 }, 7 ) == 146,
+        "[Test] Wrong cell node vertex index" );
 }
 
 void test_vertex_on_border( const geode::RegularGrid3D& grid )

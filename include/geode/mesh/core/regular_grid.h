@@ -122,6 +122,13 @@ namespace geode
 
         index_t vertex_index( const GridVertexIndex< dimension >& index ) const;
 
+        index_t cell_vertex_index( const GridCellIndex< dimension >& cell_id,
+            local_index_t vertex_id ) const;
+
+        GridVertexIndex< dimension > cell_vertex_indices(
+            const GridCellIndex< dimension >& cell_id,
+            local_index_t vertex_id ) const;
+
         absl::optional< GridVertexIndex< dimension > > next_vertex(
             const GridVertexIndex< dimension >& index,
             index_t direction ) const;
