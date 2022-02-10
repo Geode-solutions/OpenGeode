@@ -523,6 +523,15 @@ namespace geode
     template std::unique_ptr< TriangulatedSurface3D >
         opengeode_model_api convert_brep_into_surface( const BRep& );
 
+    template std::unique_ptr< SolidMesh3D >
+        opengeode_model_api convert_brep_into_solid( const BRep& );
+    template std::unique_ptr< PolyhedralSolid3D >
+        opengeode_model_api convert_brep_into_solid( const BRep& );
+    template std::unique_ptr< TetrahedralSolid3D >
+        opengeode_model_api convert_brep_into_solid( const BRep& );
+    template std::unique_ptr< HybridSolid3D >
+        opengeode_model_api convert_brep_into_solid( const BRep& );
+
     template std::tuple< std::unique_ptr< EdgedCurve3D >,
         std::unique_ptr< SurfaceMesh3D > >
         opengeode_model_api convert_brep_into_curve_and_surface( const BRep& );

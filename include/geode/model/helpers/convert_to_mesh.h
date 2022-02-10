@@ -66,7 +66,7 @@ namespace geode
         const BRep& brep );
 
     template < typename SolidType = SolidMesh3D >
-    std::unique_ptr< SolidMesh3D > convert_brep_into_solid( const BRep& brep );
+    std::unique_ptr< SolidType > convert_brep_into_solid( const BRep& brep );
 
     template < typename SurfaceType = SurfaceMesh3D >
     std::tuple< std::unique_ptr< EdgedCurve3D >,
