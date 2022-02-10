@@ -25,17 +25,6 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include "helpers/convert_model_meshes.h"
-
-#include "mixin/builder/blocks_builder.h"
-#include "mixin/builder/corners_builder.h"
-#include "mixin/builder/lines_builder.h"
-#include "mixin/builder/model_boundaries_builder.h"
-#include "mixin/builder/relationships_builder.h"
-#include "mixin/builder/surfaces_builder.h"
-#include "mixin/builder/topology_builder.h"
-#include "mixin/builder/vertex_identifier_builder.h"
-
 #include "mixin/core/block.h"
 #include "mixin/core/blocks.h"
 #include "mixin/core/component.h"
@@ -52,15 +41,27 @@
 #include "mixin/core/topology.h"
 #include "mixin/core/vertex_identifier.h"
 
-#include "representation/builder/brep_builder.h"
-#include "representation/builder/copy.h"
-#include "representation/builder/section_builder.h"
+#include "mixin/builder/blocks_builder.h"
+#include "mixin/builder/corners_builder.h"
+#include "mixin/builder/lines_builder.h"
+#include "mixin/builder/model_boundaries_builder.h"
+#include "mixin/builder/relationships_builder.h"
+#include "mixin/builder/surfaces_builder.h"
+#include "mixin/builder/topology_builder.h"
+#include "mixin/builder/vertex_identifier_builder.h"
 
 #include "representation/core/brep.h"
 #include "representation/core/section.h"
 
+#include "representation/builder/brep_builder.h"
+#include "representation/builder/copy.h"
+#include "representation/builder/section_builder.h"
+
 #include "representation/io/brep.h"
 #include "representation/io/section.h"
+
+#include "helpers/convert_model_meshes.h"
+#include "helpers/convert_to_mesh.h"
 
 namespace pybind11
 {
@@ -85,6 +86,7 @@ PYBIND11_MODULE( opengeode_py_model, module )
     try
     {
         pybind11::module::import( "opengeode_py_basic" );
+        pybind11::module::import( "opengeode_py_mesh" );
     }
     catch( ... )
     {
@@ -128,4 +130,5 @@ PYBIND11_MODULE( opengeode_py_model, module )
     geode::define_section_io( module );
 
     geode::define_convert_model_meshes( module );
+    geode::define_convert_to_mesh( module );
 }
