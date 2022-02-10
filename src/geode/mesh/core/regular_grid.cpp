@@ -32,6 +32,18 @@
 #include <geode/geometry/bounding_box.h>
 #include <geode/geometry/point.h>
 
+namespace
+{
+    template < geode::index_t dimension >
+    bool vertex_is_on_axis_origin(
+        geode::local_index_t vertex_id, geode::local_index_t axis_id )
+    {
+        /* returns ((vertex_id / pow(2,axis_id)) modulo 2) using binary
+         * operators (faster). */
+        return ( ( vertex_id / ( 1 << axis_id ) ) & 1 ) == 0;
+    }
+} // namespace
+
 namespace geode
 {
     template < index_t dimension >
@@ -222,6 +234,27 @@ namespace geode
                 index -= value * offset;
             }
             return vertex_id;
+        }
+
+        index_t cell_vertex_index( const GridCellIndex< dimension >& cell_id,
+            local_index_t vertex_id ) const
+        {
+            return vertex_index( cell_vertex_indices( cell_id, vertex_id ) );
+        }
+
+        GridVertexIndex< dimension > cell_vertex_indices(
+            const GridCellIndex< dimension >& cell_id,
+            local_index_t vertex_id ) const
+        {
+            auto node_index = cell_id;
+            for( const auto d : LRange{ dimension } )
+            {
+                if( !vertex_is_on_axis_origin< dimension >( vertex_id, d ) )
+                {
+                    node_index[d] += 1;
+                }
+            }
+            return node_index;
         }
 
         absl::optional< GridVertexIndex< dimension > > next_vertex(
@@ -505,16 +538,32 @@ namespace geode
 
     template < index_t dimension >
     index_t RegularGrid< dimension >::vertex_index(
-        const GridCellIndex< dimension >& index ) const
+        const GridVertexIndex< dimension >& index ) const
     {
         return impl_->vertex_index( index );
     }
 
     template < index_t dimension >
-    GridCellIndex< dimension > RegularGrid< dimension >::vertex_index(
+    GridVertexIndex< dimension > RegularGrid< dimension >::vertex_index(
         index_t index ) const
     {
         return impl_->vertex_index( index );
+    }
+
+    template < index_t dimension >
+    index_t RegularGrid< dimension >::cell_vertex_index(
+        const GridCellIndex< dimension >& cell_id,
+        local_index_t vertex_id ) const
+    {
+        return impl_->cell_vertex_index( cell_id, vertex_id );
+    }
+
+    template < index_t dimension >
+    GridVertexIndex< dimension > RegularGrid< dimension >::cell_vertex_indices(
+        const GridCellIndex< dimension >& cell_id,
+        local_index_t vertex_id ) const
+    {
+        return impl_->cell_vertex_indices( cell_id, vertex_id );
     }
 
     template < index_t dimension >
