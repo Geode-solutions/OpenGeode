@@ -23,6 +23,7 @@
 
 #include <geode/basic/progress_logger.h>
 
+#include <absl/synchronization/mutex.h>
 #include <absl/time/clock.h>
 #include <absl/time/time.h>
 
@@ -42,25 +43,29 @@ namespace geode
         Impl( std::string message, index_t max_number )
             : message_{ std::move( message ) },
               max_number_( max_number ),
-              start_{ absl::Now() }
+              start_time_{ absl::Now() },
+              current_time_{ start_time_ }
         {
+            Logger::info( message_, " starts" );
         }
 
         ~Impl()
         {
             if( current_ == max_number_ )
             {
-                Logger::info( message_, " complete" );
+                Logger::info( message_, " complete in ",
+                    absl::FormatDuration( absl::Now() - start_time_ ) );
             }
         }
 
         void increment()
         {
+            absl::MutexLock locking{ &lock_ };
             current_++;
             auto now = absl::Now();
-            if( now - start_ > SLEEP )
+            if( now - current_time_ > SLEEP )
             {
-                start_ = now;
+                current_time_ = now;
                 const auto percent = std::floor( current_ / max_number_ * 100 );
                 Logger::info( message_, " ", current_, "/", max_number_, " (",
                     percent, "%)" );
@@ -68,10 +73,12 @@ namespace geode
         }
 
     private:
-        std::string message_;
-        double max_number_;
+        const std::string message_;
+        const double max_number_;
         index_t current_{ 0 };
-        absl::Time start_;
+        const absl::Time start_time_;
+        absl::Time current_time_;
+        absl::Mutex lock_;
     };
 
     ProgressLogger::ProgressLogger( std::string message, index_t max_number )
