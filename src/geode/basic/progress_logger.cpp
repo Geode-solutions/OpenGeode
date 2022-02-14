@@ -46,7 +46,7 @@ namespace geode
               start_time_{ absl::Now() },
               current_time_{ start_time_ }
         {
-            Logger::info( message_, " starts" );
+            Logger::info( message_, " started" );
         }
 
         ~Impl()
