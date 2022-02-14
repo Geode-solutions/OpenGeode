@@ -53,7 +53,7 @@ namespace geode
         {
             if( current_ == max_number_ )
             {
-                Logger::info( message_, " complete in ",
+                Logger::info( message_, " completed in ",
                     absl::FormatDuration( absl::Now() - start_time_ ) );
             }
         }
