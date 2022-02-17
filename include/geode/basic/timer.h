@@ -21,41 +21,22 @@
  *
  */
 
-#include <geode/mesh/io/vertex_set_output.h>
+#pragma once
 
-#include <geode/basic/timer.h>
-
-#include <geode/mesh/core/vertex_set.h>
+#include <geode/basic/common.h>
+#include <geode/basic/pimpl.h>
 
 namespace geode
 {
-    void save_vertex_set(
-        const VertexSet& vertex_set, absl::string_view filename )
+    class opengeode_basic_api Timer
     {
-        try
-        {
-            Timer timer;
-            const auto extension =
-                to_string( extension_from_filename( filename ) );
-            OPENGEODE_EXCEPTION(
-                VertexSetOutputFactory::has_creator( extension ),
-                "Unknown extension: ", extension );
-            VertexSetOutputFactory::create( extension, vertex_set, filename )
-                ->write();
-            Logger::info(
-                "VertexSet saved in ", filename, " in ", timer.duration() );
-        }
-        catch( const OpenGeodeException& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeException{ "Cannot save VertexSet in file: ",
-                filename };
-        }
-    }
+    public:
+        Timer();
+        ~Timer();
 
-    VertexSetOutput::VertexSetOutput(
-        const VertexSet& vertex_set, absl::string_view filename )
-        : Output( filename ), vertex_set_( vertex_set )
-    {
-    }
+        std::string duration() const;
+
+    private:
+        IMPLEMENTATION_MEMBER( impl_ );
+    };
 } // namespace geode

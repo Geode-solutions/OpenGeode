@@ -24,6 +24,7 @@
 #include <geode/model/representation/io/brep_input.h>
 
 #include <geode/basic/filename.h>
+#include <geode/basic/timer.h>
 
 #include <geode/model/representation/builder/brep_builder.h>
 
@@ -33,6 +34,7 @@ namespace geode
     {
         try
         {
+            Timer timer;
             BRep brep;
             auto input = BRepInputFactory::create(
                 to_string( extension_from_filename( filename ) ), brep,
@@ -43,7 +45,8 @@ namespace geode
                 BRepBuilder{ brep }.set_name(
                     filename_without_extension( filename ) );
             }
-            Logger::info( "BRep loaded from ", filename );
+            Logger::info(
+                "BRep loaded from ", filename, " in ", timer.duration() );
             Logger::info( "BRep has: ", brep.nb_blocks(), " Blocks, ",
                 brep.nb_surfaces(), " Surfaces, ", brep.nb_lines(), " Lines, ",
                 brep.nb_corners(), " Corners, ", brep.nb_model_boundaries(),

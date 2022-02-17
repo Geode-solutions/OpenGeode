@@ -24,11 +24,10 @@
 #include <geode/basic/progress_logger.h>
 
 #include <absl/synchronization/mutex.h>
-#include <absl/time/clock.h>
-#include <absl/time/time.h>
 
 #include <geode/basic/logger.h>
 #include <geode/basic/pimpl_impl.h>
+#include <geode/basic/timer.h>
 
 namespace
 {
@@ -43,8 +42,7 @@ namespace geode
         Impl( std::string message, index_t max_number )
             : message_{ std::move( message ) },
               max_number_( max_number ),
-              start_time_{ absl::Now() },
-              current_time_{ start_time_ }
+              current_time_{ absl::Now() }
         {
             Logger::info( message_, " started" );
         }
@@ -53,8 +51,7 @@ namespace geode
         {
             if( current_ == max_number_ )
             {
-                Logger::info( message_, " completed in ",
-                    absl::FormatDuration( absl::Now() - start_time_ ) );
+                Logger::info( message_, " completed in ", timer_.duration() );
             }
         }
 
@@ -76,7 +73,7 @@ namespace geode
         const std::string message_;
         const double max_number_;
         index_t current_{ 0 };
-        const absl::Time start_time_;
+        const Timer timer_;
         absl::Time current_time_;
         absl::Mutex lock_;
     };

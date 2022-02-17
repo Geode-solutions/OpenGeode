@@ -24,6 +24,7 @@
 #include <geode/mesh/io/triangulated_surface_input.h>
 
 #include <geode/basic/filename.h>
+#include <geode/basic/timer.h>
 
 #include <geode/mesh/builder/triangulated_surface_builder.h>
 #include <geode/mesh/core/mesh_factory.h>
@@ -38,6 +39,7 @@ namespace geode
     {
         try
         {
+            Timer timer;
             auto triangulated_surface =
                 TriangulatedSurface< dimension >::create( impl );
             auto input = TriangulatedSurfaceInputFactory< dimension >::create(
@@ -50,8 +52,8 @@ namespace geode
                     *triangulated_surface )
                     ->set_name( filename_without_extension( filename ) );
             }
-            Logger::info(
-                "TriangulatedSurface", dimension, "D loaded from ", filename );
+            Logger::info( "TriangulatedSurface", dimension, "D loaded from ",
+                filename, " in ", timer.duration() );
             Logger::info( "TriangulatedSurface", dimension,
                 "D has: ", triangulated_surface->nb_vertices(), " vertices, ",
                 triangulated_surface->nb_polygons(), " triangles" );

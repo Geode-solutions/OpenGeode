@@ -24,6 +24,7 @@
 #include <geode/mesh/io/polygonal_surface_input.h>
 
 #include <geode/basic/filename.h>
+#include <geode/basic/timer.h>
 
 #include <geode/mesh/builder/polygonal_surface_builder.h>
 #include <geode/mesh/core/mesh_factory.h>
@@ -37,6 +38,7 @@ namespace geode
     {
         try
         {
+            Timer timer;
             auto polygonal_surface =
                 PolygonalSurface< dimension >::create( impl );
             auto input = PolygonalSurfaceInputFactory< dimension >::create(
@@ -49,8 +51,8 @@ namespace geode
                     *polygonal_surface )
                     ->set_name( filename_without_extension( filename ) );
             }
-            Logger::info(
-                "PolygonalSurface", dimension, "D loaded from ", filename );
+            Logger::info( "PolygonalSurface", dimension, "D loaded from ",
+                filename, " in ", timer.duration() );
             Logger::info( "PolygonalSurface", dimension,
                 "D has: ", polygonal_surface->nb_vertices(), " vertices, ",
                 polygonal_surface->nb_polygons(), " polygons" );

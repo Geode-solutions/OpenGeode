@@ -24,6 +24,7 @@
 #include <geode/mesh/io/hybrid_solid_input.h>
 
 #include <geode/basic/filename.h>
+#include <geode/basic/timer.h>
 
 #include <geode/mesh/builder/hybrid_solid_builder.h>
 #include <geode/mesh/core/hybrid_solid.h>
@@ -37,6 +38,7 @@ namespace geode
     {
         try
         {
+            Timer timer;
             auto hybrid_solid = HybridSolid< dimension >::create( impl );
             auto input = HybridSolidInputFactory< dimension >::create(
                 to_string( extension_from_filename( filename ) ), *hybrid_solid,
@@ -47,8 +49,8 @@ namespace geode
                 HybridSolidBuilder< dimension >::create( *hybrid_solid )
                     ->set_name( filename_without_extension( filename ) );
             }
-            Logger::info(
-                "HybridSolid", dimension, "D loaded from ", filename );
+            Logger::info( "HybridSolid", dimension, "D loaded from ", filename,
+                " in ", timer.duration() );
             Logger::info( "HybridSolid", dimension,
                 "D has: ", hybrid_solid->nb_vertices(), " vertices, ",
                 hybrid_solid->nb_polyhedra(), " polyhedra" );

@@ -23,6 +23,8 @@
 
 #include <geode/mesh/io/regular_grid_output.h>
 
+#include <geode/basic/timer.h>
+
 #include <geode/mesh/core/regular_grid.h>
 
 namespace geode
@@ -33,11 +35,13 @@ namespace geode
     {
         try
         {
+            Timer timer;
             const auto output = RegularGridOutputFactory< dimension >::create(
                 to_string( extension_from_filename( filename ) ), regular_grid,
                 filename );
             output->write();
-            Logger::info( "RegularGrid", dimension, "D saved in ", filename );
+            Logger::info( "RegularGrid", dimension, "D saved in ", filename,
+                " in ", timer.duration() );
         }
         catch( const OpenGeodeException& e )
         {

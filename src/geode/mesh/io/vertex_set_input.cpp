@@ -24,6 +24,7 @@
 #include <geode/mesh/io/vertex_set_input.h>
 
 #include <geode/basic/filename.h>
+#include <geode/basic/timer.h>
 
 #include <geode/mesh/builder/vertex_set_builder.h>
 #include <geode/mesh/core/mesh_factory.h>
@@ -43,6 +44,7 @@ namespace geode
     {
         try
         {
+            Timer timer;
             auto vertex_set = VertexSet::create( impl );
             auto input = VertexSetInputFactory::create(
                 to_string( extension_from_filename( filename ) ), *vertex_set,
@@ -53,7 +55,8 @@ namespace geode
                 VertexSetBuilder::create( *vertex_set )
                     ->set_name( filename_without_extension( filename ) );
             }
-            Logger::info( "VertexSet loaded from ", filename );
+            Logger::info(
+                "VertexSet loaded from ", filename, " in ", timer.duration() );
             Logger::info(
                 "VertexSet has: ", vertex_set->nb_vertices(), " vertices" );
             return vertex_set;

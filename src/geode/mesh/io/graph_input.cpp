@@ -24,6 +24,7 @@
 #include <geode/mesh/io/graph_input.h>
 
 #include <geode/basic/filename.h>
+#include <geode/basic/timer.h>
 
 #include <geode/mesh/builder/graph_builder.h>
 #include <geode/mesh/core/graph.h>
@@ -36,6 +37,7 @@ namespace geode
     {
         try
         {
+            Timer timer;
             auto graph = Graph::create( impl );
             auto input = GraphInputFactory::create(
                 to_string( extension_from_filename( filename ) ), *graph,
@@ -46,7 +48,8 @@ namespace geode
                 GraphBuilder::create( *graph )->set_name(
                     filename_without_extension( filename ) );
             }
-            Logger::info( "Graph loaded from ", filename );
+            Logger::info(
+                "Graph loaded from ", filename, " in ", timer.duration() );
             Logger::info( "Graph has: ", graph->nb_vertices(), " vertices, ",
                 graph->nb_edges(), " edges" );
             return graph;

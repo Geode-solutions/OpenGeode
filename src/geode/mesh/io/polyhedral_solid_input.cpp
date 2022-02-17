@@ -24,6 +24,7 @@
 #include <geode/mesh/io/polyhedral_solid_input.h>
 
 #include <geode/basic/filename.h>
+#include <geode/basic/timer.h>
 
 #include <geode/mesh/builder/polyhedral_solid_builder.h>
 #include <geode/mesh/core/mesh_factory.h>
@@ -37,6 +38,7 @@ namespace geode
     {
         try
         {
+            Timer timer;
             auto polyhedral_solid =
                 PolyhedralSolid< dimension >::create( impl );
             auto input = PolyhedralSolidInputFactory< dimension >::create(
@@ -48,8 +50,8 @@ namespace geode
                 PolyhedralSolidBuilder< dimension >::create( *polyhedral_solid )
                     ->set_name( filename_without_extension( filename ) );
             }
-            Logger::info(
-                "PolyhedralSolid", dimension, "D loaded from ", filename );
+            Logger::info( "PolyhedralSolid", dimension, "D loaded from ",
+                filename, " in ", timer.duration() );
             Logger::info( "PolyhedralSolid", dimension,
                 "D has: ", polyhedral_solid->nb_vertices(), " vertices, ",
                 polyhedral_solid->nb_polyhedra(), " polyhedra" );

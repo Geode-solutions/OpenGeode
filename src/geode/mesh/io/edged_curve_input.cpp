@@ -24,6 +24,7 @@
 #include <geode/mesh/io/edged_curve_input.h>
 
 #include <geode/basic/filename.h>
+#include <geode/basic/timer.h>
 
 #include <geode/mesh/builder/edged_curve_builder.h>
 #include <geode/mesh/core/edged_curve.h>
@@ -37,6 +38,7 @@ namespace geode
     {
         try
         {
+            Timer timer;
             auto edged_curve = EdgedCurve< dimension >::create( impl );
             auto input = EdgedCurveInputFactory< dimension >::create(
                 to_string( extension_from_filename( filename ) ), *edged_curve,
@@ -47,7 +49,8 @@ namespace geode
                 EdgedCurveBuilder< dimension >::create( *edged_curve )
                     ->set_name( filename_without_extension( filename ) );
             }
-            Logger::info( "EdgedCurve", dimension, "D loaded from ", filename );
+            Logger::info( "EdgedCurve", dimension, "D loaded from ", filename,
+                " in ", timer.duration() );
             Logger::info( "EdgedCurve", dimension,
                 "D has: ", edged_curve->nb_vertices(), " vertices, ",
                 edged_curve->nb_edges(), " edges" );

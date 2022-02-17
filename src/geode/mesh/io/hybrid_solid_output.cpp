@@ -23,6 +23,8 @@
 
 #include <geode/mesh/io/hybrid_solid_output.h>
 
+#include <geode/basic/timer.h>
+
 #include <geode/mesh/core/hybrid_solid.h>
 
 namespace geode
@@ -33,6 +35,7 @@ namespace geode
     {
         try
         {
+            Timer timer;
             const auto extension =
                 to_string( extension_from_filename( filename ) );
             OPENGEODE_EXCEPTION(
@@ -41,7 +44,8 @@ namespace geode
             HybridSolidOutputFactory< dimension >::create(
                 extension, hybrid_solid, filename )
                 ->write();
-            Logger::info( "HybridSolid", dimension, "D saved in ", filename );
+            Logger::info( "HybridSolid", dimension, "D saved in ", filename,
+                " in ", timer.duration() );
         }
         catch( const OpenGeodeException& e )
         {

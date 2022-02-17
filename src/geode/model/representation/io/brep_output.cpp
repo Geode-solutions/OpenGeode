@@ -23,6 +23,8 @@
 
 #include <geode/model/representation/io/brep_output.h>
 
+#include <geode/basic/timer.h>
+
 #include <geode/model/representation/core/brep.h>
 
 namespace geode
@@ -31,11 +33,13 @@ namespace geode
     {
         try
         {
+            Timer timer;
             const auto output = BRepOutputFactory::create(
                 to_string( extension_from_filename( filename ) ), brep,
                 filename );
             output->write();
-            Logger::info( "BRep saved in ", filename );
+            Logger::info(
+                "BRep saved in ", filename, " in ", timer.duration() );
         }
         catch( const OpenGeodeException& e )
         {
