@@ -23,6 +23,8 @@
 
 #include <geode/mesh/io/triangulated_surface_output.h>
 
+#include <geode/basic/timer.h>
+
 #include <geode/mesh/core/triangulated_surface.h>
 
 namespace geode
@@ -34,6 +36,7 @@ namespace geode
     {
         try
         {
+            Timer timer;
             const auto extension =
                 to_string( extension_from_filename( filename ) );
             OPENGEODE_EXCEPTION(
@@ -43,8 +46,8 @@ namespace geode
             TriangulatedSurfaceOutputFactory< dimension >::create(
                 extension, triangulated_surface, filename )
                 ->write();
-            Logger::info(
-                "TriangulatedSurface", dimension, "D saved in ", filename );
+            Logger::info( "TriangulatedSurface", dimension, "D saved in ",
+                filename, " in ", timer.duration() );
         }
         catch( const OpenGeodeException& e )
         {

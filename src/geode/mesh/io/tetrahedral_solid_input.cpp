@@ -24,6 +24,7 @@
 #include <geode/mesh/io/tetrahedral_solid_input.h>
 
 #include <geode/basic/filename.h>
+#include <geode/basic/timer.h>
 
 #include <geode/mesh/builder/tetrahedral_solid_builder.h>
 #include <geode/mesh/core/mesh_factory.h>
@@ -37,6 +38,7 @@ namespace geode
     {
         try
         {
+            Timer timer;
             auto tetrahedral_solid =
                 TetrahedralSolid< dimension >::create( impl );
             auto input = TetrahedralSolidInputFactory< dimension >::create(
@@ -49,8 +51,8 @@ namespace geode
                     *tetrahedral_solid )
                     ->set_name( filename_without_extension( filename ) );
             }
-            Logger::info(
-                "TetrahedralSolid", dimension, "D loaded from ", filename );
+            Logger::info( "TetrahedralSolid", dimension, "D loaded from ",
+                filename, " in ", timer.duration() );
             Logger::info( "TetrahedralSolid", dimension,
                 "D has: ", tetrahedral_solid->nb_vertices(), " vertices, ",
                 tetrahedral_solid->nb_polyhedra(), " tetrahedra" );

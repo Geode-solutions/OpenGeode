@@ -24,6 +24,7 @@
 #include <geode/mesh/io/point_set_input.h>
 
 #include <geode/basic/filename.h>
+#include <geode/basic/timer.h>
 
 #include <geode/mesh/builder/point_set_builder.h>
 #include <geode/mesh/core/mesh_factory.h>
@@ -37,6 +38,7 @@ namespace geode
     {
         try
         {
+            Timer timer;
             auto point_set = PointSet< dimension >::create( impl );
             auto input = PointSetInputFactory< dimension >::create(
                 to_string( extension_from_filename( filename ) ), *point_set,
@@ -47,7 +49,8 @@ namespace geode
                 PointSetBuilder< dimension >::create( *point_set )
                     ->set_name( filename_without_extension( filename ) );
             }
-            Logger::info( "PointSet", dimension, "D loaded from ", filename );
+            Logger::info( "PointSet", dimension, "D loaded from ", filename,
+                " in ", timer.duration() );
             Logger::info( "PointSet", dimension,
                 "D has: ", point_set->nb_vertices(), " vertices" );
             return point_set;

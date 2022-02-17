@@ -23,6 +23,8 @@
 
 #include <geode/mesh/io/graph_output.h>
 
+#include <geode/basic/timer.h>
+
 #include <geode/mesh/core/graph.h>
 
 namespace geode
@@ -31,12 +33,14 @@ namespace geode
     {
         try
         {
+            Timer timer;
             const auto extension =
                 to_string( extension_from_filename( filename ) );
             OPENGEODE_EXCEPTION( GraphOutputFactory::has_creator( extension ),
                 "Unknown extension: ", extension );
             GraphOutputFactory::create( extension, graph, filename )->write();
-            Logger::info( "Graph saved in ", filename );
+            Logger::info(
+                "Graph saved in ", filename, " in ", timer.duration() );
         }
         catch( const OpenGeodeException& e )
         {

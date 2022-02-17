@@ -34,6 +34,7 @@ add_geode_library(
         "permutation.cpp"
         "progress_logger.cpp"
         "singleton.cpp"
+        "timer.cpp"
         "uuid.cpp"
         "zip_file.cpp"
     PUBLIC_HEADERS
@@ -58,6 +59,7 @@ add_geode_library(
         "progress_logger.h"
         "range.h"
         "singleton.h"
+        "timer.h"
         "types.h"
         "uuid.h"
         "zip_file.h"
@@ -71,6 +73,7 @@ add_geode_library(
         Bitsery::bitsery
     PRIVATE_DEPENDENCIES
         Async++
+        absl::time
         spdlog::spdlog_header_only
         MINIZIP::minizip
 )

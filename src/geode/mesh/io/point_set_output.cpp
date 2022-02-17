@@ -23,6 +23,8 @@
 
 #include <geode/mesh/io/point_set_output.h>
 
+#include <geode/basic/timer.h>
+
 #include <geode/mesh/core/point_set.h>
 #include <geode/mesh/io/vertex_set_output.h>
 
@@ -34,6 +36,7 @@ namespace geode
     {
         try
         {
+            Timer timer;
             const auto extension =
                 to_string( extension_from_filename( filename ) );
             OPENGEODE_EXCEPTION(
@@ -42,7 +45,8 @@ namespace geode
             PointSetOutputFactory< dimension >::create(
                 extension, point_set, filename )
                 ->write();
-            Logger::info( "PointSet", dimension, "D saved in ", filename );
+            Logger::info( "PointSet", dimension, "D saved in ", filename,
+                " in ", timer.duration() );
         }
         catch( const OpenGeodeException& e )
         {

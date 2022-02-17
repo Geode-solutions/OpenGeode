@@ -24,6 +24,7 @@
 #include <geode/model/representation/io/section_input.h>
 
 #include <geode/basic/filename.h>
+#include <geode/basic/timer.h>
 
 #include <geode/model/representation/builder/section_builder.h>
 
@@ -33,6 +34,7 @@ namespace geode
     {
         try
         {
+            Timer timer;
             Section section;
             auto input = SectionInputFactory::create(
                 to_string( extension_from_filename( filename ) ), section,
@@ -43,7 +45,8 @@ namespace geode
                 SectionBuilder{ section }.set_name(
                     filename_without_extension( filename ) );
             }
-            Logger::info( "Section loaded from ", filename );
+            Logger::info(
+                "Section loaded from ", filename, " in ", timer.duration() );
             Logger::info( "Section has: ", section.nb_surfaces(), " Surfaces, ",
                 section.nb_lines(), " Lines, ", section.nb_corners(),
                 " Corners, ", section.nb_model_boundaries(),

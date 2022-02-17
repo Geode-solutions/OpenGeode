@@ -23,6 +23,8 @@
 
 #include <geode/mesh/io/regular_grid_input.h>
 
+#include <geode/basic/timer.h>
+
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/regular_grid.h>
 
@@ -34,13 +36,14 @@ namespace geode
     {
         try
         {
+            Timer timer;
             auto input = RegularGridInputFactory< dimension >::create(
                 to_string( extension_from_filename( filename ) ), filename );
             input->read();
             auto grid = input->regular_grid();
 
-            Logger::info(
-                "RegularGrid", dimension, "D loaded from ", filename );
+            Logger::info( "RegularGrid", dimension, "D loaded from ", filename,
+                " in ", timer.duration() );
             Logger::info( "RegularGrid", dimension, "D has: ", grid->nb_cells(),
                 " cells" );
             return grid;

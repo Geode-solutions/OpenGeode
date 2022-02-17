@@ -23,6 +23,8 @@
 
 #include <geode/model/representation/io/section_output.h>
 
+#include <geode/basic/timer.h>
+
 #include <geode/model/representation/core/section.h>
 
 namespace geode
@@ -31,11 +33,13 @@ namespace geode
     {
         try
         {
+            Timer timer;
             const auto output = SectionOutputFactory::create(
                 to_string( extension_from_filename( filename ) ), section,
                 filename );
             output->write();
-            Logger::info( "Section saved in ", filename );
+            Logger::info(
+                "Section saved in ", filename, " in ", timer.duration() );
         }
         catch( const OpenGeodeException& e )
         {
