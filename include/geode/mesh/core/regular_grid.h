@@ -88,6 +88,17 @@ namespace geode
             return ext;
         }
 
+        local_index_t nb_cell_vertices() const
+        {
+            return nb_cell_vertices_static();
+        }
+
+        static constexpr local_index_t nb_cell_vertices_static()
+        {
+            /* returns 1*pow(2,dimension) using binary operators (faster). */
+            return 1 << dimension;
+        }
+
         const Point< dimension >& origin() const;
 
         index_t nb_cells() const;
@@ -116,11 +127,13 @@ namespace geode
 
         index_t nb_vertices_on_borders() const;
 
-        local_index_t nb_cell_vertices() const;
-
         GridVertexIndex< dimension > vertex_index( index_t index ) const;
 
         index_t vertex_index( const GridVertexIndex< dimension >& index ) const;
+
+        std::array< GridVertexIndex< dimension >,
+            RegularGrid< dimension >::nb_cell_vertices_static() >
+            cell_vertices( const GridCellIndex< dimension >& cell_id ) const;
 
         index_t cell_vertex_index( const GridCellIndex< dimension >& cell_id,
             local_index_t vertex_id ) const;

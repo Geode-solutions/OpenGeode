@@ -59,6 +59,15 @@ namespace geode
               cells_number_( std::move( cells_number ) ),
               cells_length_( std::move( cells_length ) )
         {
+            double nb_cells_double{ 1 };
+            for( const auto c : cells_number )
+            {
+                nb_cells_double *= static_cast< double >( c + 1 );
+            }
+            OPENGEODE_EXCEPTION(
+                nb_cells_double < static_cast< double >( UINT_MAX ),
+                "[RegularGrid] Creation of a grid for which the number of cell "
+                "vertices exceeds the unsigned int limit. " );
             index_t nb_cells{ 1 };
             for( const auto c : cells_number )
             {
@@ -192,12 +201,6 @@ namespace geode
             return nb_vertices() - nb_inside_vertices;
         }
 
-        local_index_t nb_cell_vertices() const
-        {
-            /* returns 1*pow(2,dimension) using binary operators (faster). */
-            return 1 << dimension;
-        }
-
         index_t vertex_index( const GridVertexIndex< dimension >& index ) const
         {
             index_t vertex_id{ 0 };
@@ -234,6 +237,21 @@ namespace geode
                 index -= value * offset;
             }
             return vertex_id;
+        }
+
+        std::array< GridVertexIndex< dimension >, nb_cell_vertices_static() >
+            cell_vertices( const GridCellIndex< dimension >& cell_id ) const
+        {
+            std::array< GridVertexIndex< dimension >,
+                nb_cell_vertices_static() >
+                cell_vertices;
+            for( const auto vertex_local_id :
+                LRange{ nb_cell_vertices_static() } )
+            {
+                cell_vertices[vertex_local_id] =
+                    cell_vertex_indices( cell_id, vertex_local_id );
+            }
+            return cell_vertices;
         }
 
         index_t cell_vertex_index( const GridCellIndex< dimension >& cell_id,
@@ -531,12 +549,6 @@ namespace geode
     }
 
     template < index_t dimension >
-    local_index_t RegularGrid< dimension >::nb_cell_vertices() const
-    {
-        return impl_->nb_cell_vertices();
-    }
-
-    template < index_t dimension >
     index_t RegularGrid< dimension >::vertex_index(
         const GridVertexIndex< dimension >& index ) const
     {
@@ -548,6 +560,15 @@ namespace geode
         index_t index ) const
     {
         return impl_->vertex_index( index );
+    }
+
+    template < index_t dimension >
+    std::array< GridVertexIndex< dimension >,
+        RegularGrid< dimension >::nb_cell_vertices_static() >
+        RegularGrid< dimension >::cell_vertices(
+            const GridCellIndex< dimension >& cell_id ) const
+    {
+        return impl_->cell_vertices( cell_id );
     }
 
     template < index_t dimension >
