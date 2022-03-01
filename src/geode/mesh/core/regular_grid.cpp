@@ -239,7 +239,8 @@ namespace geode
             return vertex_id;
         }
 
-        std::array< GridVertexIndex< dimension >, nb_cell_vertices_static() >
+        std::array< GridVertexIndex< dimension >,
+            RegularGrid< dimension >::nb_cell_vertices_static() >
             cell_vertices( const GridCellIndex< dimension >& cell_id ) const
         {
             std::array< GridVertexIndex< dimension >,
