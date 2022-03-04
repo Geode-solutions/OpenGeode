@@ -170,6 +170,9 @@ namespace geode
         Point< dimension > point(
             const GridVertexIndex< dimension >& index ) const;
 
+        Point< dimension > cell_barycenter(
+            const GridCellIndex< dimension >& index ) const;
+
         AttributeManager& cell_attribute_manager() const;
 
         AttributeManager& vertex_attribute_manager() const;
