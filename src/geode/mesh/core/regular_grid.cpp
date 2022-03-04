@@ -332,6 +332,20 @@ namespace geode
             return origin_ + translation;
         }
 
+        Point< dimension > cell_barycenter(
+            const GridCellIndex< dimension >& index ) const
+        {
+            Point< dimension > translation;
+            for( const auto d : LRange{ dimension } )
+            {
+                OPENGEODE_ASSERT( index[d] < cells_number_[d],
+                    "[RegularGrid::point] Invalid index" );
+                translation.set_value(
+                    d, cells_length_[d] * ( index[d] + 0.5 ) );
+            }
+            return origin_ + translation;
+        }
+
         const Point< dimension >& origin() const
         {
             return origin_;
@@ -636,6 +650,13 @@ namespace geode
         const GridCellIndex< dimension >& index ) const
     {
         return impl_->point( index );
+    }
+
+    template < index_t dimension >
+    Point< dimension > RegularGrid< dimension >::cell_barycenter(
+        const GridCellIndex< dimension >& index ) const
+    {
+        return impl_->cell_barycenter( index );
     }
 
     template < index_t dimension >

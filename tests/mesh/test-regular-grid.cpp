@@ -193,6 +193,9 @@ void test_cell_geometry( const geode::RegularGrid3D& grid )
     OPENGEODE_EXCEPTION(
         grid.point( { 2, 1, 4 } ) == geode::Point3D( { 3.5, 2, 13 } ),
         "[Test] Wrong point coordinates" );
+    OPENGEODE_EXCEPTION(
+        grid.cell_barycenter( { 2, 1, 4 } ) == geode::Point3D( { 4, 3, 14.5 } ),
+        "[Test] Wrong point coordinates" );
 }
 
 void test_cell_query( const geode::RegularGrid3D& grid )
