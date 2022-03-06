@@ -173,10 +173,10 @@ namespace geode
     }
 
     template < index_t dimension >
-    bool SurfaceEdges< dimension >::isolated_edge( index_t edge_id ) const
+    bool SurfaceEdges< dimension >::is_edge_isolated( index_t edge_id ) const
     {
         check_edge_id( *this, edge_id );
-        return impl_->isolated_edge( edge_id );
+        return impl_->is_edge_isolated( edge_id );
     }
 
     template < index_t dimension >

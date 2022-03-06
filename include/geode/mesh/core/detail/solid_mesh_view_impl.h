@@ -111,7 +111,7 @@ namespace geode
                 return absl::nullopt;
             }
 
-            bool get_isolated_edge( index_t edge_id ) const
+            bool get_is_edge_isolated( index_t edge_id ) const
             {
                 const auto& vertices = solid_view_.edge_vertices( edge_id );
                 for( const auto& polyhedron_vertex :
@@ -156,7 +156,7 @@ namespace geode
                 return true;
             }
 
-            bool get_isolated_facet( index_t facet_id ) const
+            bool get_is_facet_isolated( index_t facet_id ) const
             {
                 using Cycle = detail::VertexCycle< PolyhedronFacetVertices >;
                 const auto& vertices = solid_view_.facet_vertices( facet_id );

@@ -8,6 +8,7 @@ TODO
 
 ### Breaking Changes
 
+- **Mesh**: The mesh `isolated_XXX` (e.g. `isolated_vertex`) has been renamed `is_XXX_isolated`.
 
 ## Upgrading from OpenGeode v8.x.x to v9.0.0
 
