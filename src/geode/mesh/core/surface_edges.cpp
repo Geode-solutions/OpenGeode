@@ -41,7 +41,6 @@
 #include <geode/mesh/core/polygonal_surface.h>
 #include <geode/mesh/core/private/facet_edges_impl.h>
 
-
 namespace
 {
     template < geode::index_t dimension >
