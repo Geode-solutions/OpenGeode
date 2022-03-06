@@ -8,6 +8,7 @@ TODO
 
 ### Breaking Changes
 
+- **SolidMesh**: Static method `type_name_static` has been remove in this class since `SolidMesh` is not a complete type.
 
 ## Upgrading from OpenGeode v8.x.x to v9.0.0
 
