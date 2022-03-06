@@ -43,7 +43,7 @@ namespace geode
 
         void archive_file( absl::string_view file ) const;
 
-        absl::string_view directory() const;
+        std::string directory() const;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );
@@ -58,7 +58,7 @@ namespace geode
 
         void extract_all() const;
 
-        absl::string_view directory() const;
+        std::string directory() const;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

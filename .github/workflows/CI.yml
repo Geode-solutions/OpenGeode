@@ -9,7 +9,6 @@ on:
 jobs:
   format:
     runs-on: ubuntu-latest
-    
     steps:
       - uses: actions/checkout@v1
       - uses: Geode-solutions/actions/clang-format@master
@@ -27,7 +26,6 @@ jobs:
         - {container: "geodesolutions/ubuntu", system: "ubuntu", build_type: "Release", cmake_args: "-DUSE_BENCHMARK=ON", benchmark: true}
         - {container: "geodesolutions/centos", system: "rhel", build_type: "Debug", benchmark: false}
         - {container: "geodesolutions/centos", system: "rhel", build_type: "Release", benchmark: false}
-
     steps:
     - uses: actions/checkout@v1
     - name: Compile
@@ -96,7 +94,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: format
     if: (github.event_name == 'pull_request' || github.ref == 'refs/heads/master')
-
     steps:
     - uses: actions/checkout@v1
     - name: Compile
@@ -121,13 +118,19 @@ jobs:
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
   build-windows:
-    runs-on: windows-2019
+    runs-on: ${{ matrix.image }}
     needs: format
     strategy:
       matrix:
+        image: [windows-2019, windows-2022]
+        generator: ["Visual Studio 16 2019", "Visual Studio 17 2022"]
         config: [Debug, Release]
         python: ["3.7", "3.8", "3.9", "3.10"]
-
+        exclude:
+          - image: windows-2019
+            generator: "Visual Studio 17 2022"
+          - image: windows-2022
+            generator: "Visual Studio 16 2019"
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python ${{ matrix.python }}
@@ -139,7 +142,7 @@ jobs:
         pip install wheel
         if(!(test-path build)) { mkdir build }
         cd build
-        cmake -G "Visual Studio 16 2019" -A x64 -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.python }} ..
+        cmake -G "${{ matrix.generator }}" -A x64 -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.python }} ..
         cmake --build . --config ${{ matrix.config }}
         cd opengeode
         ctest -C ${{ matrix.config }} --output-on-failure
