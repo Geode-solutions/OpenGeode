@@ -6,7 +6,7 @@ on:
 
 jobs:      
   release-linux:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     container: ${{ matrix.config.container }}
     strategy:
       matrix:
@@ -47,12 +47,11 @@ jobs:
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       
   release-linux-wheel:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     container: "geodesolutions/centos"
     strategy:
       matrix:
         config:
-        - {python: "3.6", tag: "cp36-cp36m"}
         - {python: "3.7", tag: "cp37-cp37m"}
         - {python: "3.8", tag: "cp38-cp38"}
         - {python: "3.9", tag: "cp39-cp39"}
@@ -88,7 +87,7 @@ jobs:
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       
   release-windows:
-    runs-on: windows-2016
+    runs-on: windows-2019
 
     steps:
     - uses: actions/checkout@v1
@@ -99,7 +98,7 @@ jobs:
         cd build
         $version = ${env:GITHUB_REF} -replace 'refs\/tags\/v', ''
         echo "::set-output name=version::$version"
-        cmake -G "Visual Studio 15 2017 Win64" -DOPENGEODE_WITH_TESTS:BOOL=OFF -DINCLUDE_PYBIND11:BOOL=ON -DCPACK_PACKAGE_VERSION:STRING=$version -DCPACK_SYSTEM_NAME:STRING=win64 ..
+        cmake -G "Visual Studio 16 2019" -A x64 -DOPENGEODE_WITH_TESTS:BOOL=OFF -DINCLUDE_PYBIND11:BOOL=ON -DCPACK_PACKAGE_VERSION:STRING=$version -DCPACK_SYSTEM_NAME:STRING=win64 ..
         cmake --build . --config Release
         cmake --build . --target PACKAGE --config Release
     - name: Upload
@@ -118,11 +117,10 @@ jobs:
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
   release-windows-wheel:
-    runs-on: windows-2016
+    runs-on: windows-2019
     strategy:
       matrix:
         config:
-        - {python: "3.6", tag: "cp36-cp36m"}
         - {python: "3.7", tag: "cp37-cp37m"}
         - {python: "3.8", tag: "cp38-cp38"}
         - {python: "3.9", tag: "cp39-cp39"}
@@ -142,7 +140,7 @@ jobs:
         cd build
         $version = ${env:GITHUB_REF} -replace 'refs\/tags\/v', ''
         echo "::set-output name=version::$version"
-        cmake -G "Visual Studio 15 2017 Win64" -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.config.python }} -DOPENGEODE_WITH_TESTS:BOOL=OFF -DCMAKE_PACKAGE_VERSION:STRING=$version ..
+        cmake -G "Visual Studio 16 2019" -A x64 -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.config.python }} -DOPENGEODE_WITH_TESTS:BOOL=OFF -DCMAKE_PACKAGE_VERSION:STRING=$version ..
         cmake --build . --config Release
         cd opengeode
         cmake --build . --target wheel --config Release

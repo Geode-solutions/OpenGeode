@@ -264,11 +264,11 @@ namespace geode
                 const auto edge1 =
                     Vector3D{ vertices_[v], vertices_[prev] }.normalize();
 
-                const auto normal = edge0.cross( edge1 );
-                const auto length = normal.length();
+                const auto triangle_normal = edge0.cross( edge1 );
+                const auto length = triangle_normal.length();
                 if( length > M_PI / 180 ) // 1 degree
                 {
-                    return normal / length;
+                    return triangle_normal / length;
                 }
             }
             return absl::nullopt;
@@ -277,9 +277,9 @@ namespace geode
         typename std::enable_if< T == 3, absl::optional< Plane > >::type
             new_plane() const
         {
-            if( const auto normal = this->new_normal() )
+            if( const auto triangle_normal = this->new_normal() )
             {
-                return Plane{ normal.value(), vertices_[0] };
+                return Plane{ triangle_normal.value(), vertices_[0] };
             }
             return absl::nullopt;
         }

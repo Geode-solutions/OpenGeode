@@ -23,7 +23,7 @@
 include(CMakeFindDependencyMacro)
 find_dependency(absl)
 find_dependency(Bitsery)
-find_dependency(ghcFilesystem)
+find_dependency(ghc_filesystem)
 find_dependency(Threads)
 
 # Load information for each target
