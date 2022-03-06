@@ -28,7 +28,7 @@
 
 #include <geode/geometry/point.h>
 
-#include <geode/mesh/core/detail/solid_mesh_view_impl.h>
+#include <geode/mesh/core/private/solid_mesh_view_impl.h>
 
 namespace geode
 {
