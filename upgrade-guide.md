@@ -1,5 +1,14 @@
 # Upgrade Guide
 
+## Upgrading from OpenGeode v9.x.x to v10.0.0
+
+### Motivations
+
+TODO
+
+### Breaking Changes
+
+
 ## Upgrading from OpenGeode v8.x.x to v9.0.0
 
 ### Motivations
