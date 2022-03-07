@@ -37,9 +37,9 @@
 #include <geode/geometry/vector.h>
 
 #include <geode/mesh/builder/surface_mesh_builder.h>
-#include <geode/mesh/core/detail/facet_edges_impl.h>
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polygonal_surface.h>
+#include <geode/mesh/core/private/facet_edges_impl.h>
 
 namespace
 {
