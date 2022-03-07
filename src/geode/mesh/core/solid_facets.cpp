@@ -125,7 +125,7 @@ namespace geode
             return this->clean_facets();
         }
 
-        bool isolated_facet( index_t facet_id ) const
+        bool is_facet_isolated( index_t facet_id ) const
         {
             return this->get_counter( facet_id ) == 0;
         }
@@ -170,10 +170,10 @@ namespace geode
     }
 
     template < index_t dimension >
-    bool SolidFacets< dimension >::isolated_facet( index_t facet_id ) const
+    bool SolidFacets< dimension >::is_facet_isolated( index_t facet_id ) const
     {
         check_facet_id( *this, facet_id );
-        return impl_->isolated_facet( facet_id );
+        return impl_->is_facet_isolated( facet_id );
     }
 
     template < index_t dimension >

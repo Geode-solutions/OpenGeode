@@ -133,6 +133,8 @@ namespace geode
          */
         const EdgesAroundVertex& edges_around_vertex( index_t vertex_id ) const;
 
+        bool is_vertex_isolated( index_t vertex_id ) const;
+
         absl::optional< index_t > edge_from_vertices(
             index_t v0, index_t v1 ) const;
 
