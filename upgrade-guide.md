@@ -8,6 +8,7 @@ TODO
 
 ### Breaking Changes
 
+- **RegularGrid**: The grid accessors structures were renamed: `GridCellIndices` to `GridCellsAroundVertex`, `GridCellIndex` to `GridCellIndices`, `GridVertexIndex` to `GridVertexIndices`. The following functions were renamed accordingly: `cell_index(index_t)` to `cell_indices(index_t)`, `vertex_index(index_t)` to `vertex_indices(index_t)`. The deprecated `Index` and `Indices` structures were removed, as well as the deprecated function cell_size(index_t). The following functions were removed to avoid multiple definitions: is_vertex_on_border(index_t) and cell_vertex_index(index_t).
 
 ## Upgrading from OpenGeode v8.x.x to v9.0.0
 

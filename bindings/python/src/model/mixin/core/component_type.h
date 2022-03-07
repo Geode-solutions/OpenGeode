@@ -33,7 +33,7 @@ namespace geode
             .def( pybind11::init<>() )
             .def( pybind11::init< std::string >() )
             .def( "get", &ComponentType::get )
-            .def( "matches", &ComponentType::operator==);
+            .def( "matches", &ComponentType::operator== );
 
         pybind11::class_< ComponentID >( module, "ComponentID" )
             .def( pybind11::init<>() )
