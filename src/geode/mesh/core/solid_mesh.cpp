@@ -541,7 +541,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    bool SolidMesh< dimension >::isolated_vertex( index_t vertex_id ) const
+    bool SolidMesh< dimension >::is_vertex_isolated( index_t vertex_id ) const
     {
         check_vertex_id( *this, vertex_id );
         return !get_polyhedron_around_vertex( vertex_id );

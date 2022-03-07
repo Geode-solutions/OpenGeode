@@ -43,7 +43,7 @@ void test_create_vertices( const geode::PolygonalSurface3D& polygonal_surface,
     builder.create_point( { { 4.7, 2.1, 1.3 } } );
     builder.create_point( { { 9.3, 5.3, 6.7 } } );
     builder.create_point( { { 7.5, 4.2, 2.8 } } );
-    OPENGEODE_EXCEPTION( polygonal_surface.isolated_vertex( 0 ),
+    OPENGEODE_EXCEPTION( polygonal_surface.is_vertex_isolated( 0 ),
         "[Test] Vertices should be isolated before polygons creation" );
     OPENGEODE_EXCEPTION( polygonal_surface.nb_vertices() == 7,
         "[Test] PolygonalSurface should have 7 vertices" );
@@ -87,7 +87,7 @@ void test_create_polygons( const geode::PolygonalSurface3D& polygonal_surface,
     builder.create_polygon( { 0, 1, 2 } );
     builder.create_polygon( { 1, 3, 4, 2 } );
     builder.create_polygon( { 1, 5, 6, 3 } );
-    OPENGEODE_EXCEPTION( !polygonal_surface.isolated_vertex( 0 ),
+    OPENGEODE_EXCEPTION( !polygonal_surface.is_vertex_isolated( 0 ),
         "[Test] Vertices should not be isolated after polygons creation" );
     OPENGEODE_EXCEPTION( polygonal_surface.nb_polygons() == 3,
         "[Test] PolygonalSurface should have 3 polygons" );
