@@ -187,6 +187,11 @@ namespace geode
         return impl_->edges_around_vertex( vertex_id );
     }
 
+    bool Graph::is_vertex_isolated( index_t vertex_id ) const
+    {
+        return edges_around_vertex( vertex_id ).empty();
+    }
+
     absl::optional< index_t > Graph::edge_from_vertices(
         index_t v0, index_t v1 ) const
     {

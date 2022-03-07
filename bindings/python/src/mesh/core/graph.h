@@ -40,7 +40,8 @@ namespace geode
             .def( "nb_edges", &Graph::nb_edges )
             .def( "edge_attribute_manager", &Graph::edge_attribute_manager,
                 pybind11::return_value_policy::reference )
-            .def( "edges_around_vertex", &Graph::edges_around_vertex );
+            .def( "edges_around_vertex", &Graph::edges_around_vertex )
+            .def( "is_vertex_isolated", &Graph::is_vertex_isolated );
 
         pybind11::class_< EdgeVertex >( module, "EdgeVertex" )
             .def( pybind11::init<>() )

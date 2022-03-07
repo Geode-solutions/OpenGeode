@@ -48,7 +48,7 @@ void test_create_vertices( const geode::PolygonalSurface3D& polygonal_surface,
     builder.create_point( { { 4.7, 2.1, 1.3 } } );
     builder.create_point( { { 9.3, 5.3, 6.7 } } );
     builder.create_point( { { 7.5, 4.2, 2.8 } } );
-    OPENGEODE_EXCEPTION( polygonal_surface.isolated_vertex( 0 ),
+    OPENGEODE_EXCEPTION( polygonal_surface.is_vertex_isolated( 0 ),
         "[Test] Vertices should be isolated before polygons creation" );
     OPENGEODE_EXCEPTION( polygonal_surface.nb_vertices() == 7,
         "[Test] PolygonalSurface should have 7 vertices" );
@@ -219,7 +219,7 @@ void test_create_polygons( const geode::PolygonalSurface3D& polygonal_surface,
     builder.create_polygon( { 0, 1, 2 } );
     builder.create_polygon( { 1, 3, 4, 2 } );
     builder.create_polygon( { 1, 5, 6, 3 } );
-    OPENGEODE_EXCEPTION( !polygonal_surface.isolated_vertex( 0 ),
+    OPENGEODE_EXCEPTION( !polygonal_surface.is_vertex_isolated( 0 ),
         "[Test] Vertices should not be isolated after polygons creation" );
     OPENGEODE_EXCEPTION( polygonal_surface.nb_polygons() == 3,
         "[Test] PolygonalSurface should have 3 polygons" );
@@ -341,7 +341,8 @@ void test_delete_polygon( const geode::PolygonalSurface3D& polygonal_surface,
         "[Test] PolygonalSurface edge vertex index is not correct" );
     const auto isol_edge =
         polygonal_surface.edges().edge_from_vertices( { 1, 5 } ).value();
-    OPENGEODE_EXCEPTION( polygonal_surface.edges().isolated_edge( isol_edge ),
+    OPENGEODE_EXCEPTION(
+        polygonal_surface.edges().is_edge_isolated( isol_edge ),
         "[Test] Edge should be isolated after polygon deletion" );
     builder.edges_builder().delete_isolated_edges();
     OPENGEODE_EXCEPTION( polygonal_surface.edges().nb_edges() == 3,
@@ -545,7 +546,7 @@ void test_replace_vertex( const geode::PolygonalSurface3D& polygonal_surface,
         OPENGEODE_EXCEPTION( polygonal_surface.polygon_vertex( pv ) == new_id,
             "[Test] PolygonVertex after replace_vertex is wrong" );
     }
-    OPENGEODE_EXCEPTION( polygonal_surface.isolated_vertex( 1 ),
+    OPENGEODE_EXCEPTION( polygonal_surface.is_vertex_isolated( 1 ),
         "[Test] Isolated vertex after replace_vertex is wrong" );
     builder.replace_vertex( new_id, 1 );
     for( const auto& pv : polygons_around )
