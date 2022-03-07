@@ -199,15 +199,9 @@ add_geode_library(
         "io/vertex_set_output.h"
     ADVANCED_HEADERS
         "builder/detail/register_builder.h"
-        "core/detail/edges_impl.h"
-        "core/detail/facet_edges_impl.h"
         "core/detail/facet_storage.h"
         "core/detail/geode_elements.h"
-        "core/detail/points_impl.h"
-        "core/detail/points_view_impl.h"
         "core/detail/register_mesh.h"
-        "core/detail/solid_mesh_view_impl.h"
-        "core/detail/surface_mesh_view_impl.h"
         "core/detail/vertex_cycle.h"
         "io/detail/geode_bitsery_mesh_input.h"
         "io/detail/geode_bitsery_mesh_output.h"
@@ -232,6 +226,13 @@ add_geode_library(
         "io/detail/geode_vertex_set_input.h"
         "io/detail/register_input.h"
         "io/detail/register_output.h"
+    PRIVATE_HEADERS
+        "core/private/edges_impl.h"
+        "core/private/facet_edges_impl.h"
+        "core/private/points_impl.h"
+        "core/private/points_view_impl.h"
+        "core/private/solid_mesh_view_impl.h"
+        "core/private/surface_mesh_view_impl.h"
     PUBLIC_DEPENDENCIES
         absl::flat_hash_map
         Bitsery::bitsery

@@ -9,6 +9,7 @@ TODO
 ### Breaking Changes
 
 - **global_epsilon**: The `global_epsilon` value has been changed from 1E-8 to 1E-6 to better find numerical approximation. Also, `global_epsilon2` and `global_epsilon3` have been removed because they make no practical sense. Use  `global_epsilon` instead.
+- **SolidMesh**: Static method `type_name_static` has been removed in this class since `SolidMesh` is not a complete type.
 
 ## Upgrading from OpenGeode v8.x.x to v9.0.0
 
