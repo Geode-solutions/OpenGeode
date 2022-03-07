@@ -188,11 +188,6 @@ namespace geode
         static std::unique_ptr< SolidMesh< dimension > > create(
             const MeshImpl& impl );
 
-        static MeshType type_name_static()
-        {
-            return MeshType{ absl::StrCat( "SolidMesh", dimension, "D" ) };
-        }
-
         std::unique_ptr< SolidMesh< dimension > > clone() const;
 
         ~SolidMesh();

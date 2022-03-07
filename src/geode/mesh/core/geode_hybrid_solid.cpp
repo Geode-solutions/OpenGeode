@@ -34,7 +34,7 @@
 #include <geode/geometry/point.h>
 
 #include <geode/mesh/core/detail/geode_elements.h>
-#include <geode/mesh/core/detail/points_impl.h>
+#include <geode/mesh/core/private/points_impl.h>
 
 namespace
 {

@@ -10,6 +10,8 @@ TODO
 
 - **Mesh**: The methods `isolated_XXX` (e.g. `isolated_vertex`) have been renamed `is_XXX_isolated`.
 
+- **SolidMesh**: Static method `type_name_static` has been removed in this class since `SolidMesh` is not a complete type.
+
 ## Upgrading from OpenGeode v8.x.x to v9.0.0
 
 ### Motivations
