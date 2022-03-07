@@ -341,7 +341,6 @@ namespace geode
         absl::optional< GridCellsAroundVertex< dimension > > cell(
             const Point< dimension >& query ) const
         {
-            GridCellsAroundVertex< dimension > cells_around_point;
             GridCellIndices< dimension > min;
             GridCellIndices< dimension > max;
             for( const auto d : LRange{ dimension } )
@@ -367,6 +366,7 @@ namespace geode
                     max[d] = std::min( integer_floor + 1, cells_number_[d] );
                 }
             }
+            GridCellsAroundVertex< dimension > cells_around_point;
             cells_around_point.push_back( min );
             for( const auto d : LRange{ dimension } )
             {
