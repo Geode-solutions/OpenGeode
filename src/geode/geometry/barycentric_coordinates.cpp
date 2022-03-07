@@ -40,7 +40,7 @@ namespace geode
         const auto volume3 = tetra_signed_volume( Tetra{ tetra.vertices()[0],
             tetra.vertices()[1], tetra.vertices()[2], point } );
         const auto total_volume = volume0 + volume1 + volume2 + volume3;
-        OPENGEODE_EXCEPTION( std::fabs( total_volume ) > global_epsilon3,
+        OPENGEODE_EXCEPTION( std::fabs( total_volume ) > global_epsilon,
             "[tetra_barycentric_coordinates] Volume of input tetrahedron too "
             "small" );
 
@@ -73,7 +73,7 @@ namespace geode
             triangle_normal.value() );
 
         const auto total_area = area0 + area1 + area2;
-        OPENGEODE_EXCEPTION( std::fabs( total_area ) > global_epsilon2,
+        OPENGEODE_EXCEPTION( std::fabs( total_area ) > global_epsilon,
             "[triangle_barycentric_coordinates] Area of input triangle too "
             "small" );
         const auto lambda0 = area0 / total_area;
@@ -94,7 +94,7 @@ namespace geode
             { triangle.vertices()[0], triangle.vertices()[1], point } );
 
         const auto total_area = area0 + area1 + area2;
-        OPENGEODE_EXCEPTION( std::fabs( total_area ) > global_epsilon2,
+        OPENGEODE_EXCEPTION( std::fabs( total_area ) > global_epsilon,
             "[triangle_barycentric_coordinates] Area of input triangle too "
             "small" );
         const auto lambda0 = area0 / total_area;
