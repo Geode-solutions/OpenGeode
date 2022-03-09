@@ -8,6 +8,12 @@ TODO
 
 ### Breaking Changes
 
+- **MeshBuilder**: `MeshBuilder::delete_vertices` has been removed for all mesh classes except `VertexSet` and `PointSet`. To remove vertices, use `MeshBuilder::delete_isolated_vertices` instead.
+
+- **Relationships**: Remove the `AttributeManger` on the component and related methods.
+
+- **RelationshipsBuilder**: Remove the `register_component` methods, the registration is now done automatically. Methods to create relations take a `ComponentID` instead of an `uuid`.
+
 - **RegularGrid**: The grid accessors structures were renamed: `GridCellIndices` to `GridCellsAroundVertex`, `GridCellIndex` to `GridCellIndices`, `GridVertexIndex` to `GridVertexIndices`. The following functions were renamed accordingly: `cell_index(index_t)` to `cell_indices(index_t)`, `vertex_index(index_t)` to `vertex_indices(index_t)`. The deprecated `Index` and `Indices` structures were removed, as well as the deprecated function cell_size(index_t). The following functions were removed to avoid multiple definitions: is_vertex_on_border(index_t) and cell_vertex_index(index_t).
 
 - **global_epsilon**: The `global_epsilon` value has been changed from 1E-8 to 1E-6 to better find numerical approximation. Also, `global_epsilon2` and `global_epsilon3` have been removed because they make no practical sense. Use  `global_epsilon` instead.

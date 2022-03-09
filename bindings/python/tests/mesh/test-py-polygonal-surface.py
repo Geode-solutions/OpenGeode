@@ -47,33 +47,6 @@ def test_bounding_box( polygonal_surface ):
     if polygonal_surface.bounding_box().max() != answer_max:
         raise ValueError( "[Test] Wrong computation of bounding box (max)" )
 
-def test_delete_vertex( polygonal_surface, builder ):
-    to_delete = [False] * polygonal_surface.nb_vertices()
-    to_delete[0] = True
-    builder.delete_vertices( to_delete )
-    if polygonal_surface.nb_vertices() != 6:
-        raise ValueError( "[Test] PolygonalSurface should have 6 vertices" )
-    answer = geom.Point3D( [ 2.1, 9.4, 6.7 ] )
-    if polygonal_surface.point( 2 ) != answer:
-        raise ValueError( "[Test] PolygonalSurface vertex coordinates are not correct" )
-    if polygonal_surface.nb_polygons() != 2:
-        raise ValueError( "[Test] PolygonalSurface should have 2 polygons" )
-    if polygonal_surface.polygon_adjacent( mesh.PolygonEdge( 1, 2 ) ):
-        raise ValueError( "[Test] PolygonalSurface adjacent index is not correct" )
-    builder.edges_builder().delete_isolated_edges()
-    if polygonal_surface.edges().nb_edges() != 7:
-        raise ValueError( "[Test] PolygonalSurface should have 7 edges" )
-
-    attribute = polygonal_surface.edges().edge_attribute_manager().find_attribute_uint( "test" )
-    if attribute.value( 4 ) != 6:
-        raise ValueError( "[Test] Update of edge attributes after "
-        "vertex deletion is not correct (value of 4)" )
-    if attribute.value( 5 ) != 7:
-        raise ValueError( "[Test] Update of edge attributes after "
-        "vertex deletion is not correct (value of 5)" )
-    if attribute.value( 6 ) != 8:
-        raise ValueError( "[Test] Update of edge attributes after "
-        "vertex deletion is not correct (value of 6)" )
 
 def test_create_polygons( polygonal_surface, builder ):
     builder.create_polygon( [ 0, 1, 2 ] )
@@ -126,28 +99,23 @@ def test_delete_polygon( polygonal_surface, builder ):
     to_delete = [False] * polygonal_surface.nb_polygons()
     to_delete[0] = True
     builder.delete_polygons( to_delete )
-    if polygonal_surface.nb_polygons() != 1:
-        raise ValueError( "[Test] PolygonalSurface should have 1 polygon" )
-    if polygonal_surface.polygon_vertex( mesh.PolygonVertex( 0, 0 ) ) != 4:
+    if polygonal_surface.nb_polygons() != 2:
+        raise ValueError( "[Test] PolygonalSurface should have 2 polygons" )
+    if polygonal_surface.polygon_vertex( mesh.PolygonVertex( 0, 0 ) ) != 5:
         raise ValueError( "[Test] PolygonalSurface edge vertex index is not correct" )
-    if polygonal_surface.polygon_vertex( mesh.PolygonVertex( 0, 1 ) ) != 2:
+    if polygonal_surface.polygon_vertex( mesh.PolygonVertex( 0, 1 ) ) != 3:
         raise ValueError( "[Test] PolygonalSurface edge vertex index is not correct" )
-    if polygonal_surface.polygon_vertex( mesh.PolygonVertex( 0, 2 ) ) != 0:
+    if polygonal_surface.polygon_vertex( mesh.PolygonVertex( 0, 2 ) ) != 1:
         raise ValueError( "[Test] PolygonalSurface edge vertex index is not correct" )
     builder.edges_builder().delete_isolated_edges()
-    if polygonal_surface.edges().nb_edges() != 3:
-        raise ValueError( "[Test] PolygonalSurface should have 3 edges" )
+    if polygonal_surface.edges().nb_edges() != 6:
+        raise ValueError( "[Test] PolygonalSurface should have 6 edges" )
 
     attribute = polygonal_surface.edges().edge_attribute_manager().find_attribute_uint( "test" )
-    if attribute.value( 0 ) != 0:
-        raise ValueError( "[Test] Update of edge attributes after "
-        "polygon deletion is not correct" )
-    if attribute.value( 1 ) != 1:
-        raise ValueError( "[Test] Update of edge attributes after "
-        "polygon deletion is not correct" )
-    if attribute.value( 2 ) != 2:
-        raise ValueError( "[Test] Update of edge attributes after "
-        "polygon deletion is not correct" )
+    for e in range(6):
+        if attribute.value( e ) != e:
+            raise ValueError( "[Test] Update of edge attributes after "
+                "polygon deletion is not correct" )
 
 def test_polygon_barycenter( polygonal_surface ):
     answer = geom.Point3D( [ 5.6, 4.525, 4.75 ] )
@@ -223,12 +191,12 @@ def test_io( polygonal_surface, filename ):
 
 def test_clone( polygonal_surface ):
     polygonal_surface2 = polygonal_surface.clone()
-    if polygonal_surface2.nb_vertices() != 6:
-        raise ValueError( "[Test] PolygonalSurface2 should have 6 vertices" )
-    if polygonal_surface2.edges().nb_edges() != 3:
-        raise ValueError( "[Test] PolygonalSurface2 should have 3 edges" )
-    if polygonal_surface2.nb_polygons() != 1:
-        raise ValueError( "[Test] PolygonalSurface2 should have 1 polygon" )
+    if polygonal_surface2.nb_vertices() != 7:
+        raise ValueError( "[Test] PolygonalSurface2 should have 7 vertices" )
+    if polygonal_surface2.edges().nb_edges() != 6:
+        raise ValueError( "[Test] PolygonalSurface2 should have 6 edges" )
+    if polygonal_surface2.nb_polygons() != 2:
+        raise ValueError( "[Test] PolygonalSurface2 should have 2 polygon" )
 
 def test_set_polygon_vertex( polygonal_surface, builder ):
     builder.set_polygon_vertex( mesh.PolygonVertex( 0, 2 ), 1 )
@@ -243,8 +211,8 @@ def test_set_polygon_vertex( polygonal_surface, builder ):
 def test_delete_all( polygonal_surface, builder ):
     to_delete = [True] * polygonal_surface.nb_polygons()
     builder.delete_polygons( to_delete )
-    if polygonal_surface.nb_vertices() != 6:
-        raise ValueError( "[Test] PolygonalSurface should have 6 vertices" )
+    if polygonal_surface.nb_vertices() != 7:
+        raise ValueError( "[Test] PolygonalSurface should have 7 vertices" )
     if polygonal_surface.nb_polygons() != 0:
         raise ValueError( "[Test] PolygonalSurface should have 0 polygon" )
     builder.edges_builder().delete_isolated_edges()
@@ -362,7 +330,6 @@ if __name__ == '__main__':
     test_io( polygonal_surface, "test." + polygonal_surface.native_extension() )
     
     test_permutation( polygonal_surface, builder )
-    test_delete_vertex( polygonal_surface, builder )
     test_delete_polygon( polygonal_surface, builder )
     test_clone( polygonal_surface )
     test_set_polygon_vertex( polygonal_surface, builder )

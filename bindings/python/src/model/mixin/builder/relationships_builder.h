@@ -30,8 +30,6 @@ namespace geode
         pybind11::class_< RelationshipsBuilder >(
             module, "RelationshipsBuilder" )
             .def( pybind11::init< Relationships& >() )
-            .def( "register_component",
-                &RelationshipsBuilder::register_component )
             .def( "unregister_component",
                 &RelationshipsBuilder::unregister_component )
             .def( "add_boundary_relation",

@@ -56,10 +56,10 @@ namespace geode
 
         void do_create_vertices( index_t nb ) final;
 
-        void do_delete_curve_vertices( const std::vector< bool >& to_delete,
+        void do_delete_graph_vertices( const std::vector< bool >& to_delete,
             absl::Span< const index_t > old2new ) final;
 
-        void do_permute_curve_vertices( absl::Span< const index_t > permutation,
+        void do_permute_graph_vertices( absl::Span< const index_t > permutation,
             absl::Span< const index_t > old2new ) final;
 
         void do_set_edge_vertex(
