@@ -57,8 +57,6 @@ PYBIND11_MODULE( opengeode_py_basic, module )
     module.attr( "NO_ID" ) = geode::NO_ID;
     module.attr( "NO_LID" ) = geode::NO_LID;
     module.attr( "global_epsilon" ) = geode::global_epsilon;
-    module.attr( "global_epsilon2" ) = geode::global_epsilon2;
-    module.attr( "global_epsilon3" ) = geode::global_epsilon3;
     geode::define_uuid( module );
     geode::define_attributes( module );
     geode::define_attribute_manager( module );

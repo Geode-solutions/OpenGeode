@@ -51,7 +51,7 @@ namespace geode
 
         index_t nb_facets() const;
 
-        bool isolated_facet( index_t facet_id ) const;
+        bool is_facet_isolated( index_t facet_id ) const;
 
         /*!
          * Return the indices of facet vertices.

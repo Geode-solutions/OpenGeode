@@ -53,7 +53,7 @@ void test_create_vertices( const geode::HybridSolid3D& hybrid_solid,
     builder.create_point( { { 1, 2, 1 } } );
     builder.create_point( { { 0, 2, 1 } } );
     builder.create_point( { { 1, 1, 2 } } );
-    OPENGEODE_EXCEPTION( hybrid_solid.isolated_vertex( 0 ),
+    OPENGEODE_EXCEPTION( hybrid_solid.is_vertex_isolated( 0 ),
         "[Test] Vertices should be isolated before polyhedra creation" );
     OPENGEODE_EXCEPTION( hybrid_solid.nb_vertices() == 11,
         "[Test] HybridSolid should have 11 vertices" );
@@ -124,7 +124,7 @@ void test_create_polyhedra( const geode::HybridSolid3D& hybrid_solid,
         "[Test] HybridSolid should have 16 facets" );
     OPENGEODE_EXCEPTION( hybrid_solid.edges().nb_edges() == 22,
         "[Test] HybridSolid should have 22 edges" );
-    OPENGEODE_EXCEPTION( !hybrid_solid.isolated_vertex( 0 ),
+    OPENGEODE_EXCEPTION( !hybrid_solid.is_vertex_isolated( 0 ),
         "[Test] Vertices should not be isolated after polyhedra creation" );
 }
 
@@ -382,7 +382,7 @@ void test_delete_all( const geode::HybridSolid3D& hybrid_solid,
 
     OPENGEODE_EXCEPTION( hybrid_solid.nb_vertices() == 10,
         "[Test] HybridSolid should have 10 vertices" );
-    OPENGEODE_EXCEPTION( hybrid_solid.isolated_vertex( 0 ),
+    OPENGEODE_EXCEPTION( hybrid_solid.is_vertex_isolated( 0 ),
         "[Test] Vertices should be isolated after polyhedra deletion" );
     OPENGEODE_EXCEPTION( hybrid_solid.nb_polyhedra() == 0,
         "[Test] HybridSolid should have 0 polyhedron" );

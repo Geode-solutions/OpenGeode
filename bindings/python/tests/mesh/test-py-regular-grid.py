@@ -133,11 +133,11 @@ def test_vertex_index( grid ):
         raise ValueError( "[Test] Wrong vertex index" )
 
 def test_vertex_on_border( grid ):
-    if not grid.is_vertex_on_border( grid.vertex_index( [ 0, 0, 0 ] ) ):
+    if not grid.is_vertex_on_border( [ 0, 0, 0 ] ):
         raise ValueError( "[Test] Vertex is not on border where it should be." )
-    if not grid.is_vertex_on_border( grid.vertex_index( [ 0, 9, 0 ] ) ):
+    if not grid.is_vertex_on_border( [ 0, 9, 0 ] ):
         raise ValueError( "[Test] Vertex is not on border where it should be." )
-    if grid.is_vertex_on_border( grid.vertex_index( [ 1, 2, 3 ] ) ):
+    if grid.is_vertex_on_border( [ 1, 2, 3 ] ):
         raise ValueError( "[Test] Vertex is on border where it should not be." )
 
 def test_cell_geometry( grid ):

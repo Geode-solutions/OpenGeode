@@ -57,7 +57,7 @@ namespace geode
 
         index_t nb_edges() const;
 
-        bool isolated_edge( index_t edge_id ) const;
+        bool is_edge_isolated( index_t edge_id ) const;
 
         /*!
          * Return the indices of edge vertices.
