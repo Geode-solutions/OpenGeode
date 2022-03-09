@@ -38,24 +38,18 @@ namespace
         geode::GraphBuilder& builder,
         absl::Span< const index_t > old2new )
     {
-        std::vector< bool > edges_to_delete( graph.nb_edges(), false );
         for( const auto e : geode::Range{ graph.nb_edges() } )
         {
             for( const auto v : geode::LRange{ 2 } )
             {
                 const geode::EdgeVertex id{ e, v };
                 const auto new_vertex = old2new[graph.edge_vertex( id )];
-                if( new_vertex == geode::NO_ID )
-                {
-                    edges_to_delete[e] = true;
-                }
-                else
-                {
-                    builder.set_edge_vertex( id, new_vertex );
-                }
+                OPENGEODE_EXCEPTION( new_vertex != geode::NO_ID,
+                    "[GraphBuilder::update_edge_vertices] Cannot remove vertex "
+                    "associated to an edge" );
+                builder.set_edge_vertex( id, new_vertex );
             }
         }
-        builder.delete_edges( edges_to_delete );
     }
 
     void update_edges_around( const geode::Graph& graph,
@@ -156,7 +150,7 @@ namespace geode
         absl::Span< const index_t > old2new )
     {
         update_edge_vertices( graph_, *this, old2new );
-        do_delete_curve_vertices( to_delete, old2new );
+        do_delete_graph_vertices( to_delete, old2new );
     }
 
     void GraphBuilder::do_permute_vertices(
@@ -164,7 +158,7 @@ namespace geode
         absl::Span< const index_t > old2new )
     {
         update_edge_vertices( graph_, *this, old2new );
-        do_permute_curve_vertices( permutation, old2new );
+        do_permute_graph_vertices( permutation, old2new );
     }
 
     void GraphBuilder::set_edges_around_vertex(
@@ -221,7 +215,11 @@ namespace geode
             for( const auto v : LRange{ 2 } )
             {
                 const EdgeVertex id{ e, v };
-                set_edge_vertex( id, graph.edge_vertex( id ) );
+                const auto vertex = graph.edge_vertex( id );
+                if( vertex != NO_ID )
+                {
+                    set_edge_vertex( id, vertex );
+                }
             }
         }
     }

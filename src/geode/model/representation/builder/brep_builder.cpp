@@ -37,17 +37,6 @@
 #include <geode/model/representation/builder/detail/copy.h>
 #include <geode/model/representation/core/brep.h>
 
-namespace
-{
-    template < typename Component >
-    void register_new_component(
-        geode::BRepBuilder& builder, const Component& component )
-    {
-        builder.register_component( component.component_id() );
-        builder.register_mesh_component( component );
-    }
-} // namespace
-
 namespace geode
 {
     BRepBuilder::BRepBuilder( BRep& brep )
@@ -106,63 +95,62 @@ namespace geode
     const uuid& BRepBuilder::add_corner()
     {
         const auto& id = create_corner();
-        register_new_component( *this, brep_.corner( id ) );
+        register_mesh_component( brep_.corner( id ) );
         return id;
     }
 
     const uuid& BRepBuilder::add_corner( const MeshImpl& impl )
     {
         const auto& id = create_corner( impl );
-        register_new_component( *this, brep_.corner( id ) );
+        register_mesh_component( brep_.corner( id ) );
         return id;
     }
 
     const uuid& BRepBuilder::add_line()
     {
         const auto& id = create_line();
-        register_new_component( *this, brep_.line( id ) );
+        register_mesh_component( brep_.line( id ) );
         return id;
     }
 
     const uuid& BRepBuilder::add_line( const MeshImpl& impl )
     {
         const auto& id = create_line( impl );
-        register_new_component( *this, brep_.line( id ) );
+        register_mesh_component( brep_.line( id ) );
         return id;
     }
 
     const uuid& BRepBuilder::add_surface()
     {
         const auto& id = create_surface();
-        register_new_component( *this, brep_.surface( id ) );
+        register_mesh_component( brep_.surface( id ) );
         return id;
     }
 
     const uuid& BRepBuilder::add_surface( const MeshImpl& impl )
     {
         const auto& id = create_surface( impl );
-        register_new_component( *this, brep_.surface( id ) );
+        register_mesh_component( brep_.surface( id ) );
         return id;
     }
 
     const uuid& BRepBuilder::add_block()
     {
         const auto& id = create_block();
-        register_new_component( *this, brep_.block( id ) );
+        register_mesh_component( brep_.block( id ) );
         return id;
     }
 
     const uuid& BRepBuilder::add_block( const MeshImpl& impl )
     {
         const auto& id = create_block( impl );
-        register_new_component( *this, brep_.block( id ) );
+        register_mesh_component( brep_.block( id ) );
         return id;
     }
 
     const uuid& BRepBuilder::add_model_boundary()
     {
         const auto& id = create_model_boundary();
-        register_component( brep_.model_boundary( id ).component_id() );
         return id;
     }
 
@@ -235,54 +223,55 @@ namespace geode
     void BRepBuilder::add_corner_line_boundary_relationship(
         const Corner3D& corner, const Line3D& line )
     {
-        add_boundary_relation( corner.id(), line.id() );
+        add_boundary_relation( corner.component_id(), line.component_id() );
     }
 
     void BRepBuilder::add_line_surface_boundary_relationship(
         const Line3D& line, const Surface3D& surface )
     {
-        add_boundary_relation( line.id(), surface.id() );
+        add_boundary_relation( line.component_id(), surface.component_id() );
     }
 
     void BRepBuilder::add_surface_block_boundary_relationship(
         const Surface3D& surface, const Block3D& block )
     {
-        add_boundary_relation( surface.id(), block.id() );
+        add_boundary_relation( surface.component_id(), block.component_id() );
     }
 
     void BRepBuilder::add_line_surface_internal_relationship(
         const Line3D& line, const Surface3D& surface )
     {
-        add_internal_relation( line.id(), surface.id() );
+        add_internal_relation( line.component_id(), surface.component_id() );
     }
 
     void BRepBuilder::add_corner_surface_internal_relationship(
         const Corner3D& corner, const Surface3D& surface )
     {
-        add_internal_relation( corner.id(), surface.id() );
+        add_internal_relation( corner.component_id(), surface.component_id() );
     }
 
     void BRepBuilder::add_corner_block_internal_relationship(
         const Corner3D& corner, const Block3D& block )
     {
-        add_internal_relation( corner.id(), block.id() );
+        add_internal_relation( corner.component_id(), block.component_id() );
     }
 
     void BRepBuilder::add_line_block_internal_relationship(
         const Line3D& line, const Block3D& block )
     {
-        add_internal_relation( line.id(), block.id() );
+        add_internal_relation( line.component_id(), block.component_id() );
     }
 
     void BRepBuilder::add_surface_block_internal_relationship(
         const Surface3D& surface, const Block3D& block )
     {
-        add_internal_relation( surface.id(), block.id() );
+        add_internal_relation( surface.component_id(), block.component_id() );
     }
 
     void BRepBuilder::add_surface_in_model_boundary(
         const Surface3D& surface, const ModelBoundary3D& boundary )
     {
-        add_item_in_collection( surface.id(), boundary.id() );
+        add_item_in_collection(
+            surface.component_id(), boundary.component_id() );
     }
 } // namespace geode

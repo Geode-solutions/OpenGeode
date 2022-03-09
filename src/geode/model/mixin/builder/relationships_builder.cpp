@@ -30,36 +30,31 @@ namespace geode
     {
     }
 
-    void RelationshipsBuilder::register_component( const ComponentID& id )
-    {
-        relationships_.register_component( id, {} );
-    }
-
     void RelationshipsBuilder::unregister_component( const uuid& id )
     {
-        relationships_.unregister_component( id, {} );
+        relationships_.remove_component( id, {} );
     }
 
     index_t RelationshipsBuilder::add_boundary_relation(
-        const uuid& boundary, const uuid& incidence )
+        const ComponentID& boundary, const ComponentID& incidence )
     {
         return relationships_.add_boundary_relation( boundary, incidence, {} );
     }
 
     index_t RelationshipsBuilder::add_internal_relation(
-        const uuid& internal, const uuid& embedding )
+        const ComponentID& internal, const ComponentID& embedding )
     {
         return relationships_.add_internal_relation( internal, embedding, {} );
     }
 
     index_t RelationshipsBuilder::add_item_in_collection(
-        const uuid& item, const uuid& collection )
+        const ComponentID& item, const ComponentID& collection )
     {
         return relationships_.add_item_in_collection( item, collection, {} );
     }
 
     index_t RelationshipsBuilder::add_relation(
-        const uuid& id1, const uuid& id2 )
+        const ComponentID& id1, const ComponentID& id2 )
     {
         return relationships_.add_relation( id1, id2, {} );
     }

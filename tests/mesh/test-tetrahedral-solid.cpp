@@ -178,44 +178,21 @@ void test_permutation( const geode::TetrahedralSolid3D& solid,
         "[Test] Wrong polyhedra_5 after polyhedron permute" );
 }
 
-void test_delete_vertex( const geode::TetrahedralSolid3D& solid,
-    geode::TetrahedralSolidBuilder3D& builder )
-{
-    std::vector< bool > to_delete( solid.nb_vertices(), false );
-    to_delete[3] = true;
-    builder.delete_vertices( to_delete );
-    OPENGEODE_EXCEPTION( solid.nb_vertices() == 5,
-        "[Test] TetrahedralSolid should have 5 vertices" );
-    geode::Point3D answer{ { 2.1, 9.4, 6.7 } };
-    OPENGEODE_EXCEPTION( solid.point( 2 ) == answer,
-        "[Test] TetrahedralSolid vertex coordinates are not correct" );
-    OPENGEODE_EXCEPTION( solid.nb_polyhedra() == 2,
-        "[Test] TetrahedralSolid should have 2 tetrahedra" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_adjacent( { 1, 3 } ) == 0,
-        "[Test] TetrahedralSolid adjacent index is not correct" );
-    builder.edges_builder().delete_isolated_edges();
-    builder.facets_builder().delete_isolated_facets();
-    OPENGEODE_EXCEPTION( solid.facets().nb_facets() == 7,
-        "[Test] TetrahedralSolid should have 7 facets" );
-    OPENGEODE_EXCEPTION( solid.edges().nb_edges() == 9,
-        "[Test] TetrahedralSolid should have 9 edges" );
-}
-
 void test_delete_polyhedron( const geode::TetrahedralSolid3D& solid,
     geode::TetrahedralSolidBuilder3D& builder )
 {
     std::vector< bool > to_delete( solid.nb_polyhedra(), false );
     to_delete.front() = true;
     builder.delete_polyhedra( to_delete );
-    OPENGEODE_EXCEPTION( solid.nb_polyhedra() == 1,
-        "[Test] TetrahedralSolid should have 1 polyhedron" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 0, 0 } ) == 2,
+    OPENGEODE_EXCEPTION( solid.nb_polyhedra() == 2,
+        "[Test] TetrahedralSolid should have 2 polyhedra" );
+    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 0, 0 } ) == 4,
         "[Test] TetrahedralSolid facet vertex index is not correct" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 0, 1 } ) == 1,
+    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 0, 1 } ) == 2,
         "[Test] TetrahedralSolid facet vertex index is not correct" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 0, 2 } ) == 4,
+    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 0, 2 } ) == 1,
         "[Test] TetrahedralSolid facet vertex index is not correct" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 0, 3 } ) == 0,
+    OPENGEODE_EXCEPTION( solid.polyhedron_vertex( { 0, 3 } ) == 5,
         "[Test] TetrahedralSolid facet vertex index is not correct" );
 }
 
@@ -281,13 +258,13 @@ void test_clone( const geode::TetrahedralSolid3D& solid )
             attr_edge_from->value( e ) == attr_edge_to->value( e ),
             "[Test] Error in edge attribute transfer during cloning" );
     }
-    OPENGEODE_EXCEPTION( solid2->nb_vertices() == 5,
-        "[Test] TetrahedralSolid2 should have 5 vertices" );
+    OPENGEODE_EXCEPTION( solid2->nb_vertices() == 6,
+        "[Test] TetrahedralSolid2 should have 6 vertices" );
     OPENGEODE_EXCEPTION(
         solid2->facets().nb_facets() == solid.facets().nb_facets(),
         "[Test] TetrahedralSolid2 should have same number of facets" );
-    OPENGEODE_EXCEPTION( solid2->nb_polyhedra() == 1,
-        "[Test] TetrahedralSolid2 should have 1 polyhedron" );
+    OPENGEODE_EXCEPTION( solid2->nb_polyhedra() == 2,
+        "[Test] TetrahedralSolid2 should have 2 polyhedra" );
 }
 
 void test_delete_all( const geode::TetrahedralSolid3D& solid,
@@ -329,7 +306,6 @@ void test()
     test_io( *solid, absl::StrCat( "test.", solid->native_extension() ) );
 
     test_permutation( *solid, *builder );
-    test_delete_vertex( *solid, *builder );
     test_delete_polyhedron( *solid, *builder );
     test_clone( *solid );
 }
