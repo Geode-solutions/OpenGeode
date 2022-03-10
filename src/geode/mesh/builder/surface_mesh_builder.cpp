@@ -129,26 +129,22 @@ namespace
     }
 
     template < geode::index_t dimension >
-    std::vector< bool > find_polygons_to_delete(
+    void check_no_polygon_to_delete(
         const geode::SurfaceMesh< dimension >& surface,
         absl::Span< const geode::index_t > vertices_old2new )
     {
-        std::vector< bool > polygons_to_delete( surface.nb_polygons(), false );
         for( const auto p : geode::Range{ surface.nb_polygons() } )
         {
             for( const auto v :
                 geode::LRange{ surface.nb_polygon_vertices( p ) } )
             {
-                const geode::PolygonVertex id{ p, v };
                 const auto new_vertex =
-                    vertices_old2new[surface.polygon_vertex( id )];
-                if( new_vertex == geode::NO_ID )
-                {
-                    polygons_to_delete[p] = true;
-                }
+                    vertices_old2new[surface.polygon_vertex( { p, v } )];
+                OPENGEODE_EXCEPTION( new_vertex != geode::NO_ID,
+                    "[SurfaceMesh::update_polygon_vertices] No polygon should "
+                    "be removed" );
             }
         }
-        return polygons_to_delete;
     }
 
     template < geode::index_t dimension >
@@ -391,11 +387,8 @@ namespace geode
     void SurfaceMeshBuilder< dimension >::update_polygon_vertices(
         absl::Span< const index_t > old2new )
     {
+        check_no_polygon_to_delete( surface_mesh_, old2new );
         update_polygon_around_vertices( surface_mesh_, *this, old2new );
-        const auto polygons_to_delete =
-            find_polygons_to_delete( surface_mesh_, old2new );
-        delete_polygons( polygons_to_delete );
-
         for( const auto p : Range{ surface_mesh_.nb_polygons() } )
         {
             for( const auto v :

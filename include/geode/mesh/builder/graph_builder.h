@@ -129,6 +129,8 @@ namespace geode
 
         void copy( const Graph& graph );
 
+        using VertexSetBuilder::delete_vertices;
+
     private:
         void do_delete_vertices( const std::vector< bool >& to_delete,
             absl::Span< const index_t > old2new ) final;
@@ -139,11 +141,11 @@ namespace geode
         virtual void do_permute_edges( absl::Span< const index_t > permutation,
             absl::Span< const index_t > old2new ) = 0;
 
-        virtual void do_delete_curve_vertices(
+        virtual void do_delete_graph_vertices(
             const std::vector< bool >& to_delete,
             absl::Span< const index_t > old2new ) = 0;
 
-        virtual void do_permute_curve_vertices(
+        virtual void do_permute_graph_vertices(
             absl::Span< const index_t > permutation,
             absl::Span< const index_t > old2new ) = 0;
 

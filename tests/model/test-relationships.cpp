@@ -34,60 +34,72 @@
 
 #include <geode/tests/common.h>
 
-std::array< geode::uuid, 6 > create_uuids( geode::Relationships& relationships )
+geode::ComponentID component_id( const geode::uuid& id )
 {
-    std::array< geode::uuid, 6 > uuids;
-    geode::RelationshipsBuilder builder{ relationships };
-    for( const auto c : geode::Range{ 6 } )
-    {
-        const geode::uuid cur_uuid;
-        builder.register_component(
-            geode::ComponentID{ geode::ComponentType{ "dummy" }, cur_uuid } );
-        uuids[c] = cur_uuid;
-    }
-    return uuids;
+    return { geode::ComponentType{ "dummy" }, id };
 }
 
 void add_boundary_relations(
     geode::Relationships& relationships, absl::Span< const geode::uuid > uuids )
 {
     geode::RelationshipsBuilder builder{ relationships };
-    builder.add_boundary_relation( uuids[0], uuids[1] );
-    builder.add_boundary_relation( uuids[0], uuids[2] );
-    builder.add_boundary_relation( uuids[0], uuids[3] );
-    builder.add_boundary_relation( uuids[1], uuids[2] );
-    builder.add_boundary_relation( uuids[1], uuids[3] );
-    builder.add_boundary_relation( uuids[2], uuids[3] );
-    builder.add_boundary_relation( uuids[4], uuids[0] );
-    builder.add_boundary_relation( uuids[4], uuids[5] );
-    builder.add_boundary_relation( uuids[5], uuids[0] );
-    // Repete last relation to test duplications
-    builder.add_boundary_relation( uuids[5], uuids[0] );
+    builder.add_boundary_relation(
+        component_id( uuids[0] ), component_id( uuids[1] ) );
+    builder.add_boundary_relation(
+        component_id( uuids[0] ), component_id( uuids[2] ) );
+    builder.add_boundary_relation(
+        component_id( uuids[0] ), component_id( uuids[3] ) );
+    builder.add_boundary_relation(
+        component_id( uuids[1] ), component_id( uuids[2] ) );
+    builder.add_boundary_relation(
+        component_id( uuids[1] ), component_id( uuids[3] ) );
+    builder.add_boundary_relation(
+        component_id( uuids[2] ), component_id( uuids[3] ) );
+    builder.add_boundary_relation(
+        component_id( uuids[4] ), component_id( uuids[0] ) );
+    builder.add_boundary_relation(
+        component_id( uuids[4] ), component_id( uuids[5] ) );
+    builder.add_boundary_relation(
+        component_id( uuids[5] ), component_id( uuids[0] ) );
+    // Repeat last relation to test duplications
+    builder.add_boundary_relation(
+        component_id( uuids[5] ), component_id( uuids[0] ) );
 }
 
 void add_internal_relations(
     geode::Relationships& relationships, absl::Span< const geode::uuid > uuids )
 {
     geode::RelationshipsBuilder builder{ relationships };
-    builder.add_internal_relation( uuids[0], uuids[1] );
-    builder.add_internal_relation( uuids[2], uuids[3] );
-    builder.add_internal_relation( uuids[4], uuids[5] );
-    builder.add_internal_relation( uuids[4], uuids[0] );
-    // Repete last relation to test duplications
-    builder.add_internal_relation( uuids[4], uuids[0] );
+    builder.add_internal_relation(
+        component_id( uuids[0] ), component_id( uuids[1] ) );
+    builder.add_internal_relation(
+        component_id( uuids[2] ), component_id( uuids[3] ) );
+    builder.add_internal_relation(
+        component_id( uuids[4] ), component_id( uuids[5] ) );
+    builder.add_internal_relation(
+        component_id( uuids[4] ), component_id( uuids[0] ) );
+    // Repeat last relation to test duplications
+    builder.add_internal_relation(
+        component_id( uuids[4] ), component_id( uuids[0] ) );
 }
 
 void add_items_in_collections(
     geode::Relationships& relationships, absl::Span< const geode::uuid > uuids )
 {
     geode::RelationshipsBuilder builder{ relationships };
-    builder.add_item_in_collection( uuids[1], uuids[5] );
-    builder.add_item_in_collection( uuids[2], uuids[5] );
-    builder.add_item_in_collection( uuids[3], uuids[5] );
-    builder.add_item_in_collection( uuids[5], uuids[4] );
-    builder.add_item_in_collection( uuids[0], uuids[4] );
-    // Repete last relation to test duplications
-    builder.add_item_in_collection( uuids[0], uuids[4] );
+    builder.add_item_in_collection(
+        component_id( uuids[1] ), component_id( uuids[5] ) );
+    builder.add_item_in_collection(
+        component_id( uuids[2] ), component_id( uuids[5] ) );
+    builder.add_item_in_collection(
+        component_id( uuids[3] ), component_id( uuids[5] ) );
+    builder.add_item_in_collection(
+        component_id( uuids[5] ), component_id( uuids[4] ) );
+    builder.add_item_in_collection(
+        component_id( uuids[0] ), component_id( uuids[4] ) );
+    // Repeat last relation to test duplications
+    builder.add_item_in_collection(
+        component_id( uuids[0] ), component_id( uuids[4] ) );
 }
 
 void test_uuid( const geode::Relationships& relations,
@@ -148,23 +160,6 @@ void test_relations( const geode::Relationships& relations,
 void test_attributes( const geode::Relationships& relations,
     absl::Span< const geode::uuid > uuids )
 {
-    for( const auto i : geode::Indices{ uuids } )
-    {
-        OPENGEODE_EXCEPTION( relations.component_index( uuids[i] ) == i,
-            "[Test] Wrong component index from uuid" );
-        OPENGEODE_EXCEPTION(
-            relations.component_from_index( i ).id() == uuids[i],
-            "[Test] Wrong component uuid from id" );
-    }
-    auto component_att =
-        relations.component_attribute_manager()
-            .find_or_create_attribute< geode::VariableAttribute, double >(
-                "double", 0 );
-    component_att->set_value( 2, 2 );
-    OPENGEODE_EXCEPTION(
-        component_att->value( relations.component_index( uuids[2] ) ) == 2,
-        "[Test] Wrong component attribute assignment" );
-
     OPENGEODE_EXCEPTION( relations.relation_index( uuids[0], uuids[1] ) == 0,
         "[Test] Wrong relation index from uuids" );
     const auto output = relations.relation_from_index( 0 );
@@ -184,10 +179,19 @@ void test_attributes( const geode::Relationships& relations,
         "[Test] Wrong relation attribute assignment" );
 }
 
+void test_io(
+    absl::string_view directory, absl::Span< const geode::uuid > uuids )
+{
+    geode::Relationships reloaded_relationships;
+    geode::RelationshipsBuilder reloader{ reloaded_relationships };
+    reloader.load_relationships( directory );
+    test_relations( reloaded_relationships, uuids );
+}
+
 void test()
 {
     geode::Relationships relationships;
-    const auto uuids = create_uuids( relationships );
+    const std::array< geode::uuid, 6 > uuids;
 
     // This Relationships do not represent anything.
     add_boundary_relations( relationships, uuids );

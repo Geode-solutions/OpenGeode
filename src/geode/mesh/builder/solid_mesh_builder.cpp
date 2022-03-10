@@ -191,26 +191,22 @@ namespace
     }
 
     template < geode::index_t dimension >
-    std::vector< bool > find_polyhedra_to_delete(
+    void check_no_polyhedron_to_delete(
         const geode::SolidMesh< dimension >& solid,
         absl::Span< const geode::index_t > vertices_old2new )
     {
-        std::vector< bool > polyhedra_to_delete( solid.nb_polyhedra(), false );
         for( const auto p : geode::Range{ solid.nb_polyhedra() } )
         {
             for( const auto v :
                 geode::LRange{ solid.nb_polyhedron_vertices( p ) } )
             {
-                const geode::PolyhedronVertex id{ p, v };
                 const auto new_vertex =
-                    vertices_old2new[solid.polyhedron_vertex( id )];
-                if( new_vertex == geode::NO_ID )
-                {
-                    polyhedra_to_delete[p] = true;
-                }
+                    vertices_old2new[solid.polyhedron_vertex( { p, v } )];
+                OPENGEODE_EXCEPTION( new_vertex != geode::NO_ID,
+                    "[SolidMesh::update_polyhedron_vertices] No polyhedron "
+                    "should be removed" );
             }
         }
-        return polyhedra_to_delete;
     }
 } // namespace
 
@@ -336,11 +332,9 @@ namespace geode
     void SolidMeshBuilder< dimension >::update_polyhedron_vertices(
         absl::Span< const index_t > old2new )
     {
+        check_no_polyhedron_to_delete( solid_mesh_, old2new );
         update_polyhedron_around_vertices_from_vertices(
             solid_mesh_, *this, old2new );
-        const auto polyhedra_to_delete =
-            find_polyhedra_to_delete( solid_mesh_, old2new );
-        delete_polyhedra( polyhedra_to_delete );
         for( const auto p : Range{ solid_mesh_.nb_polyhedra() } )
         {
             for( const auto v :

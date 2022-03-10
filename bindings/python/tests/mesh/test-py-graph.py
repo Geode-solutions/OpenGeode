@@ -34,30 +34,6 @@ def test_create_vertices( graph, builder ):
     if graph.nb_vertices() != 4:
         raise ValueError( "[Test] Graph should have 4 vertices" )
 
-def test_delete_vertex( graph, builder ):
-    to_delete = [False] * graph.nb_vertices()
-    to_delete[0] = True
-    builder.delete_vertices( to_delete )
-    if graph.nb_vertices() != 3:
-        raise ValueError( "[Test] Graph should have 3 vertices" )
-    if graph.nb_edges() != 2:
-        raise ValueError( "[Test] Graph should have 2 edges" )
-
-    edges_around_0 = graph.edges_around_vertex( 0 )
-    if len( edges_around_0 ) != 1:
-        raise ValueError( "[Test] edges_around_0 should have 1 edge" )
-    if edges_around_0[0].edge_id != 1:
-        raise ValueError( "[Test] edges_around_0 has wrong value" )
-    if edges_around_0[0].vertex_id != 0:
-        raise ValueError( "[Test] edges_around_0 has wrong value" )
-
-    edges_around_2 = graph.edges_around_vertex( 2 )
-    if len( edges_around_2 ) != 1:
-        raise ValueError( "[Test] edges_around_2 should have 1 edge" )
-    if edges_around_2[0].edge_id != 0:
-        raise ValueError( "[Test] edges_around_2 has wrong value" )
-    if edges_around_2[0].vertex_id != 0:
-        raise ValueError( "[Test] edges_around_2 has wrong value" )
 
 def test_create_edges( graph, builder ):
     builder.create_edge_with_vertices( 0, 1 )
@@ -102,23 +78,24 @@ def test_delete_edge( graph, builder ):
     to_delete = [False] * graph.nb_edges()
     to_delete[0] = True
     builder.delete_edges( to_delete )
-    if graph.nb_edges() != 1:
-        raise ValueError( "[Test] Graph should have 1 edge" )
+    if graph.nb_edges() != 3:
+        raise ValueError( "[Test] Graph should have 3 edges" )
     if graph.edge_vertex( mesh.EdgeVertex( 0, 0 ) ) != 0:
         raise ValueError( "[Test] Graph edge vertex index is not correct" )
-    if graph.edge_vertex( mesh.EdgeVertex( 0, 1 ) ) != 1:
+    if graph.edge_vertex( mesh.EdgeVertex( 0, 1 ) ) != 2:
         raise ValueError( "[Test] Graph edge vertex index is not correct" )
 
     builder.create_edges( 10 )
     builder.set_edge_vertex( mesh.EdgeVertex( 1, 0 ), 1 )
     builder.set_edge_vertex( mesh.EdgeVertex( 1, 1 ), 0 )
-    if graph.nb_edges() != 11:
-        raise ValueError( "[Test] Graph should have 11 edges" )
+    if graph.nb_edges() != 13:
+        raise ValueError( "[Test] Graph should have 13 edges" )
 
+    to_delete[-1] = True
     to_delete.extend( [True] * 9 )
     builder.delete_edges( to_delete )
-    if graph.nb_edges() != 1:
-        raise ValueError( "[Test] Graph should have 1 edge" )
+    if graph.nb_edges() != 2:
+        raise ValueError( "[Test] Graph should have 2 edges" )
     if graph.edge_vertex( mesh.EdgeVertex( 0, 0 ) ) != 1:
         raise ValueError( "[Test] Graph edge vertex index is not correct (0, 0)" )
     if graph.edge_vertex( mesh.EdgeVertex( 0, 1 ) ) != 0:
@@ -130,17 +107,17 @@ def test_io( graph, filename ):
 
 def test_clone( graph ):
     graph2 = graph.clone()
-    if graph2.nb_vertices() != 3:
-        raise ValueError( "[Test] Graph2 should have 3 vertices" )
-    if graph2.nb_edges() != 1:
-        raise ValueError( "[Test] Graph2 should have 1 edge" )
+    if graph2.nb_vertices() != 4:
+        raise ValueError( "[Test] Graph2 should have 4 vertices" )
+    if graph2.nb_edges() != 2:
+        raise ValueError( "[Test] Graph2 should have 2 edges" )
 
 def test_delete_isolated_vertices( graph, builder ):
     builder.delete_isolated_vertices()
-    if graph.nb_vertices() != 2:
-        raise ValueError( "[Test] Graph should have 2 vertices" )
-    if graph.nb_edges() != 1:
-        raise ValueError( "[Test] Graph2 should have 1 edge" )
+    if graph.nb_vertices() != 3:
+        raise ValueError( "[Test] Graph should have 3 vertices" )
+    if graph.nb_edges() != 2:
+        raise ValueError( "[Test] Graph2 should have 2 edges" )
 
 if __name__ == '__main__':
     graph = mesh.Graph.create()
@@ -150,7 +127,6 @@ if __name__ == '__main__':
     test_create_edges( graph, builder )
     test_io( graph,  "test."  + graph.native_extension() )
     
-    test_delete_vertex( graph, builder )
     test_delete_edge( graph, builder )
     test_clone( graph )
     test_delete_isolated_vertices( graph, builder )

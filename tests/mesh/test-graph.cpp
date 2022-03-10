@@ -41,34 +41,6 @@ void test_create_vertices(
         graph.nb_vertices() == 4, "[Test] Graph should have 4 vertices" );
 }
 
-void test_delete_vertex(
-    const geode::Graph& graph, geode::GraphBuilder& builder )
-{
-    std::vector< bool > to_delete( graph.nb_vertices(), false );
-    to_delete.front() = true;
-    builder.delete_vertices( to_delete );
-    OPENGEODE_EXCEPTION(
-        graph.nb_vertices() == 3, "[Test] Graph should have 3 vertices" );
-    OPENGEODE_EXCEPTION(
-        graph.nb_edges() == 2, "[Test] Graph should have 2 edges" );
-
-    const auto& edges_around_0 = graph.edges_around_vertex( 0 );
-    OPENGEODE_EXCEPTION( edges_around_0.size() == 1,
-        "[Test] edges_around_0 should have 1 edge" );
-    OPENGEODE_EXCEPTION( edges_around_0[0].edge_id == 1,
-        "[Test] edges_around_0 has wrong value" );
-    OPENGEODE_EXCEPTION( edges_around_0[0].vertex_id == 0,
-        "[Test] edges_around_0 has wrong value" );
-
-    const auto& edges_around_2 = graph.edges_around_vertex( 2 );
-    OPENGEODE_EXCEPTION( edges_around_2.size() == 1,
-        "[Test] edges_around_2 should have 1 edge" );
-    OPENGEODE_EXCEPTION( edges_around_2[0].edge_id == 0,
-        "[Test] edges_around_2 has wrong value" );
-    OPENGEODE_EXCEPTION( edges_around_2[0].vertex_id == 0,
-        "[Test] edges_around_2 has wrong value" );
-}
-
 void test_create_edges(
     const geode::Graph& graph, geode::GraphBuilder& builder )
 {
@@ -117,22 +89,31 @@ void test_delete_edge( const geode::Graph& graph, geode::GraphBuilder& builder )
     to_delete.front() = true;
     builder.delete_edges( to_delete );
     OPENGEODE_EXCEPTION(
-        graph.nb_edges() == 1, "[Test] Graph should have 1 edge" );
+        graph.nb_edges() == 3, "[Test] Graph should have 3 edges" );
     OPENGEODE_EXCEPTION( graph.edge_vertex( { 0, 0 } ) == 0,
         "[Test] Graph edge vertex index is not correct" );
-    OPENGEODE_EXCEPTION( graph.edge_vertex( { 0, 1 } ) == 1,
+    OPENGEODE_EXCEPTION( graph.edge_vertex( { 0, 1 } ) == 2,
+        "[Test] Graph edge vertex index is not correct" );
+    OPENGEODE_EXCEPTION( graph.edge_vertex( { 1, 0 } ) == 3,
+        "[Test] Graph edge vertex index is not correct" );
+    OPENGEODE_EXCEPTION( graph.edge_vertex( { 1, 1 } ) == 2,
+        "[Test] Graph edge vertex index is not correct" );
+    OPENGEODE_EXCEPTION( graph.edge_vertex( { 2, 0 } ) == 1,
+        "[Test] Graph edge vertex index is not correct" );
+    OPENGEODE_EXCEPTION( graph.edge_vertex( { 2, 1 } ) == 2,
         "[Test] Graph edge vertex index is not correct" );
 
     builder.create_edges( 10 );
     builder.set_edge_vertex( { 1, 0 }, 1 );
     builder.set_edge_vertex( { 1, 1 }, 0 );
     OPENGEODE_EXCEPTION(
-        graph.nb_edges() == 11, "[Test] Graph should have 11 edges" );
+        graph.nb_edges() == 13, "[Test] Graph should have 13 edges" );
 
+    to_delete.back() = true;
     to_delete.resize( graph.nb_edges(), true );
     builder.delete_edges( to_delete );
     OPENGEODE_EXCEPTION(
-        graph.nb_edges() == 1, "[Test] Graph should have 1 edge" );
+        graph.nb_edges() == 2, "[Test] Graph should have 2 edges" );
     OPENGEODE_EXCEPTION( graph.edge_vertex( { 0, 0 } ) == 1,
         "[Test] Graph edge vertex index is not correct (0, 0)" );
     OPENGEODE_EXCEPTION( graph.edge_vertex( { 0, 1 } ) == 0,
@@ -157,9 +138,9 @@ void test_clone( const geode::Graph& graph )
 {
     const auto graph2 = graph.clone();
     OPENGEODE_EXCEPTION(
-        graph2->nb_vertices() == 3, "[Test] Graph2 should have 3 vertices" );
+        graph2->nb_vertices() == 4, "[Test] Graph2 should have 4 vertices" );
     OPENGEODE_EXCEPTION(
-        graph2->nb_edges() == 1, "[Test] Graph2 should have 1 edge" );
+        graph2->nb_edges() == 2, "[Test] Graph2 should have2 edge2" );
 }
 
 void test_delete_isolated_vertices(
@@ -167,9 +148,9 @@ void test_delete_isolated_vertices(
 {
     builder.delete_isolated_vertices();
     OPENGEODE_EXCEPTION(
-        graph.nb_vertices() == 2, "[Test] Graph should have 2 vertices" );
+        graph.nb_vertices() == 3, "[Test] Graph should have 3 vertices" );
     OPENGEODE_EXCEPTION(
-        graph.nb_edges() == 1, "[Test] Graph2 should have 1 edge" );
+        graph.nb_edges() == 2, "[Test] Graph should have 2 edges" );
 }
 
 void test()
@@ -184,7 +165,6 @@ void test()
     test_backward_io( absl::StrCat(
         geode::data_path, "test_v7.", graph->native_extension() ) );
 
-    test_delete_vertex( *graph, *builder );
     test_delete_edge( *graph, *builder );
     test_clone( *graph );
     test_delete_isolated_vertices( *graph, *builder );

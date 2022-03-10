@@ -19,6 +19,7 @@ jobs:
       directory: opengeode
     secrets:
       TOKEN: ${{ secrets.TOKEN }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
   build-linux-python:
     needs: format
@@ -28,6 +29,7 @@ jobs:
       directory: opengeode
     secrets:
       TOKEN: ${{ secrets.TOKEN }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       
   coverage:
     needs: format
@@ -45,6 +47,7 @@ jobs:
       directory: opengeode
     secrets:
       TOKEN: ${{ secrets.TOKEN }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         
   semantic-release:
     needs: [build-linux, build-linux-python, build-windows]

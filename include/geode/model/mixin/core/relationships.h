@@ -321,12 +321,6 @@ namespace geode
 
         bool is_item( const uuid& item, const uuid& collection ) const;
 
-        AttributeManager& component_attribute_manager() const;
-
-        index_t component_index( const uuid& id ) const;
-
-        const ComponentID& component_from_index( index_t id ) const;
-
         AttributeManager& relation_attribute_manager() const;
 
         absl::optional< index_t > relation_index(
@@ -338,53 +332,41 @@ namespace geode
         void save_relationships( absl::string_view directory ) const;
 
         /*!
-         * Add a component in the set of components registered by the
-         * Relationships
-         * @param[in] id The component identifier to add
-         */
-        void register_component(
-            const ComponentID& id, RelationshipsBuilderKey );
-
-        /*!
          * Remove a component from the set of components registered by the
          * Relationships and all its associated relationships
          * @param[in] id Unique index of the component to remove
          */
-        void unregister_component( const uuid& id, RelationshipsBuilderKey );
+        void remove_component( const uuid& id, RelationshipsBuilderKey );
 
         /*!
          * Add a new relationship of type boundary-incidence between two
          * components
-         * @param[in] boundary Unique index of the boundary component
-         * @param[in] incidence Unique index of the incidence component
          */
-        index_t add_boundary_relation( const uuid& boundary,
-            const uuid& incidence,
+        index_t add_boundary_relation( const ComponentID& boundary,
+            const ComponentID& incidence,
             RelationshipsBuilderKey );
 
         /*!
          * Add a new relationship of type internal-embedding between two
          * components
-         * @param[in] internal Unique index of the internal component
-         * @param[in] embedding Unique index of the embedding component
          */
-        index_t add_internal_relation( const uuid& internal,
-            const uuid& embedding,
+        index_t add_internal_relation( const ComponentID& internal,
+            const ComponentID& embedding,
             RelationshipsBuilderKey );
 
         /*!
          * Add a new relationship of type item-collection between two components
-         * @param[in] item Unique index of the item component
-         * @param[in] collection Unique index of the collection component
          */
-        index_t add_item_in_collection(
-            const uuid& item, const uuid& collection, RelationshipsBuilderKey );
+        index_t add_item_in_collection( const ComponentID& item,
+            const ComponentID& collection,
+            RelationshipsBuilderKey );
 
         /*!
          * Add a new relationship between two components
          */
-        index_t add_relation(
-            const uuid& id1, const uuid& id2, RelationshipsBuilderKey );
+        index_t add_relation( const ComponentID& id1,
+            const ComponentID& id2,
+            RelationshipsBuilderKey );
 
         /*!
          * Remove a relationship between two components

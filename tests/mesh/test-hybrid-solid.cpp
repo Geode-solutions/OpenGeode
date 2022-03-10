@@ -284,57 +284,30 @@ void test_permutation(
         "[Test] Wrong polyhedra_5 after polyhedron permute" );
 }
 
-void test_delete_vertex( const geode::HybridSolid3D& hybrid_solid,
-    geode::HybridSolidBuilder3D& builder )
-{
-    std::vector< bool > to_delete( hybrid_solid.nb_vertices(), false );
-    to_delete[3] = true;
-    builder.delete_vertices( to_delete );
-    OPENGEODE_EXCEPTION( hybrid_solid.nb_vertices() == 10,
-        "[Test] HybridSolid should have 10 vertices" );
-    const geode::Point3D answer{ { 1, 0, 0 } };
-    OPENGEODE_EXCEPTION( hybrid_solid.point( 0 ) == answer,
-        "[Test] HybridSolid vertex coordinates are not correct" );
-    OPENGEODE_EXCEPTION( hybrid_solid.nb_polyhedra() == 3,
-        "[Test] HybridSolid should have 3 polyhedra" );
-    OPENGEODE_EXCEPTION( !hybrid_solid.polyhedron_adjacent( { 1, 0 } ),
-        "[Test] HybridSolid adjacent index is not correct" );
-    OPENGEODE_EXCEPTION( hybrid_solid.facets().nb_facets() == 13,
-        "[Test] PolyhedralSolid should have 13 facets" );
-    OPENGEODE_EXCEPTION( hybrid_solid.edges().nb_edges() == 19,
-        "[Test] PolyhedralSolid should have 19 edges" );
-    builder.edges_builder().delete_isolated_edges();
-    builder.facets_builder().delete_isolated_facets();
-    OPENGEODE_EXCEPTION( hybrid_solid.facets().nb_facets() == 12,
-        "[Test] HybridSolid should have 12 facets" );
-    OPENGEODE_EXCEPTION( hybrid_solid.edges().nb_edges() == 17,
-        "[Test] HybridSolid should have 17 edges" );
-}
-
 void test_delete_polyhedra( const geode::HybridSolid3D& hybrid_solid,
     geode::HybridSolidBuilder3D& builder )
 {
     std::vector< bool > to_delete( hybrid_solid.nb_polyhedra(), false );
     to_delete.front() = true;
     builder.delete_polyhedra( to_delete );
-    OPENGEODE_EXCEPTION( hybrid_solid.nb_polyhedra() == 2,
-        "[Test] HybridSolid should have 2 polyhedra" );
+    OPENGEODE_EXCEPTION( hybrid_solid.nb_polyhedra() == 3,
+        "[Test] HybridSolid should have 3 polyhedra" );
     OPENGEODE_EXCEPTION( hybrid_solid.polyhedron_vertex( { 0, 0 } ) == 2,
         "[Test] HybridSolid vertex index is not correct" );
-    OPENGEODE_EXCEPTION( hybrid_solid.polyhedron_vertex( { 0, 1 } ) == 4,
+    OPENGEODE_EXCEPTION( hybrid_solid.polyhedron_vertex( { 0, 1 } ) == 5,
         "[Test] HybridSolid vertex index is not correct" );
-    OPENGEODE_EXCEPTION( hybrid_solid.polyhedron_vertex( { 0, 2 } ) == 3,
+    OPENGEODE_EXCEPTION( hybrid_solid.polyhedron_vertex( { 0, 2 } ) == 4,
         "[Test] HybridSolid vertex index is not correct" );
-    OPENGEODE_EXCEPTION( hybrid_solid.polyhedron_vertex( { 0, 3 } ) == 7,
+    OPENGEODE_EXCEPTION( hybrid_solid.polyhedron_vertex( { 0, 3 } ) == 8,
         "[Test] HybridSolid vertex index is not correct" );
-    OPENGEODE_EXCEPTION( hybrid_solid.polyhedron_vertex( { 0, 4 } ) == 5,
+    OPENGEODE_EXCEPTION( hybrid_solid.polyhedron_vertex( { 0, 4 } ) == 6,
         "[Test] HybridSolid vertex index is not correct" );
     builder.edges_builder().delete_isolated_edges();
     builder.facets_builder().delete_isolated_facets();
-    OPENGEODE_EXCEPTION( hybrid_solid.facets().nb_facets() == 10,
-        "[Test] HybridSolid should have 10 facets" );
-    OPENGEODE_EXCEPTION( hybrid_solid.edges().nb_edges() == 16,
-        "[Test] HybridSolid should have 16 edges" );
+    OPENGEODE_EXCEPTION( hybrid_solid.facets().nb_facets() == 14,
+        "[Test] HybridSolid should have 14 facets" );
+    OPENGEODE_EXCEPTION( hybrid_solid.edges().nb_edges() == 21,
+        "[Test] HybridSolid should have 21 edges" );
 }
 
 void test_io(
@@ -364,14 +337,14 @@ void test_io(
 void test_clone( const geode::HybridSolid3D& hybrid_solid )
 {
     const auto hybrid_solid2 = hybrid_solid.clone();
-    OPENGEODE_EXCEPTION( hybrid_solid2->nb_vertices() == 10,
-        "[Test] Reloaded HybridSolid should have 10 vertices" );
-    OPENGEODE_EXCEPTION( hybrid_solid2->nb_polyhedra() == 2,
-        "[Test] HybridSolid should have 2 polyhedra" );
-    OPENGEODE_EXCEPTION( hybrid_solid2->facets().nb_facets() == 10,
-        "[Test] HybridSolid should have 10 facets" );
-    OPENGEODE_EXCEPTION( hybrid_solid2->edges().nb_edges() == 16,
-        "[Test] HybridSolid should have 16 edges" );
+    OPENGEODE_EXCEPTION( hybrid_solid2->nb_vertices() == 11,
+        "[Test] Reloaded HybridSolid should have 11 vertices" );
+    OPENGEODE_EXCEPTION( hybrid_solid2->nb_polyhedra() == 3,
+        "[Test] HybridSolid should have 3 polyhedra" );
+    OPENGEODE_EXCEPTION( hybrid_solid2->facets().nb_facets() == 14,
+        "[Test] HybridSolid should have 14 facets" );
+    OPENGEODE_EXCEPTION( hybrid_solid2->edges().nb_edges() == 21,
+        "[Test] HybridSolid should have 21 edges" );
 }
 
 void test_delete_all( const geode::HybridSolid3D& hybrid_solid,
@@ -380,8 +353,8 @@ void test_delete_all( const geode::HybridSolid3D& hybrid_solid,
     std::vector< bool > to_delete( hybrid_solid.nb_polyhedra(), true );
     builder.delete_polyhedra( to_delete );
 
-    OPENGEODE_EXCEPTION( hybrid_solid.nb_vertices() == 10,
-        "[Test] HybridSolid should have 10 vertices" );
+    OPENGEODE_EXCEPTION( hybrid_solid.nb_vertices() == 11,
+        "[Test] HybridSolid should have 11 vertices" );
     OPENGEODE_EXCEPTION( hybrid_solid.is_vertex_isolated( 0 ),
         "[Test] Vertices should be isolated after polyhedra deletion" );
     OPENGEODE_EXCEPTION( hybrid_solid.nb_polyhedra() == 0,
@@ -417,7 +390,6 @@ void test()
         absl::StrCat( "test.", hybrid_solid->native_extension() ) );
 
     test_permutation( *hybrid_solid, *builder );
-    test_delete_vertex( *hybrid_solid, *builder );
     test_delete_polyhedra( *hybrid_solid, *builder );
     test_clone( *hybrid_solid );
     test_delete_all( *hybrid_solid, *builder );
