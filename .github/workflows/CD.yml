@@ -2,12 +2,15 @@ name: CD
 
 on:
   push:
+    branches:
+      - '**'
     tags: 'v*'
 
 jobs:     
   release-linux:
     uses: Geode-solutions/actions/.github/workflows/cd-linux.yml@master
     with:
+      name: OPENGEODE
       directory: opengeode
       package: OpenGeode
     secrets:
