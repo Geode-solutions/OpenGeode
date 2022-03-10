@@ -4,7 +4,9 @@
 
 ### Motivations
 
-TODO
+This release is mostly to upgrade Microsoft Visual Studio version from 2017 to 2019. VS2022 is also part of the integration workflow.
+The other important change is the shift of the `global_epsilon` value from 1E-8 to 1E-6. This change was made after heavy testing on numerical approximation limits which showed 1E-8 was too low.
+The `RegularGrid` interface was also upgraded for a simplified and more efficient use.
 
 ### Breaking Changes
 
