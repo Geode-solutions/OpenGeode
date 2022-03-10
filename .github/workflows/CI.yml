@@ -8,157 +8,49 @@ on:
 
 jobs:
   format:
-    runs-on: ubuntu-18.04
-    
-    steps:
-      - uses: actions/checkout@v1
-      - uses: Geode-solutions/actions/clang-format@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+    uses: Geode-solutions/actions/.github/workflows/format.yml@master
+    secrets:
+      TOKEN: ${{ secrets.TOKEN }}
       
   build-linux:
-    runs-on: ubuntu-18.04
-    container: ${{ matrix.config.container }}
     needs: format
-    strategy:
-      matrix:
-        config:
-        - {container: "geodesolutions/ubuntu", system: "ubuntu", build_type: "Debug", benchmark: false}
-        - {container: "geodesolutions/ubuntu", system: "ubuntu", build_type: "Release", cmake_args: "-DUSE_BENCHMARK=ON", benchmark: true}
-        - {container: "geodesolutions/centos", system: "rhel", build_type: "Debug", benchmark: false}
-        - {container: "geodesolutions/centos", system: "rhel", build_type: "Release", benchmark: false}
+    uses: Geode-solutions/actions/.github/workflows/ci-linux.yml@master
+    with:
+      directory: opengeode
+    secrets:
+      TOKEN: ${{ secrets.TOKEN }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
-    steps:
-    - uses: actions/checkout@v1
-    - name: Compile
-      run: |
-        mkdir -p build
-        cd build
-        cmake -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} -DINCLUDE_PYBIND11:BOOL=ON ..
-        cmake --build . -- -j2
-        cd opengeode        
-        ctest --output-on-failure
-    - name: Test
-      run: |
-        mkdir -p test
-        cd test
-        cmake -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.cmake_args }} -DCMAKE_PREFIX_PATH:PATH=$GITHUB_WORKSPACE/build/opengeode/install ../tests
-        cmake --build . -- -j2
-        ctest --output-on-failure
-    - uses: Geode-solutions/actions/benchmark@master
-      if: matrix.config.benchmark && github.ref == 'refs/heads/master' && github.event_name == 'push'
-      with:
-        repository: OpenGeode
-        directory: test/bin
-        token: ${{ secrets.TOKEN }}
-    - name: Notify slack
-      if: failure() && github.ref == 'refs/heads/master'
-      uses: 8398a7/action-slack@v2
-      with:
-        status: failure
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
-  build-linux-wheel:
-    runs-on: ubuntu-18.04
-    container: "geodesolutions/centos"
+  build-linux-python:
     needs: format
-    strategy:
-      matrix:
-        config:
-        - {python: "3.6", tag: "cp36-cp36m"}
-        - {python: "3.7", tag: "cp37-cp37m"}
-        - {python: "3.8", tag: "cp38-cp38"}
-        - {python: "3.9", tag: "cp39-cp39"}
-        - {python: "3.10", tag: "cp310-cp310"}
-    steps:
-    - uses: actions/checkout@v1
-    - name: Compile
-      run: |
-        export PATH=/opt/python/${{ matrix.config.tag }}/bin:$PATH
-        mkdir -p build
-        cd build
-        cmake -DCMAKE_BUILD_TYPE=Debug -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.config.python }} ..
-        cmake --build . -- -j2
-        cd opengeode
-        ctest --output-on-failure -R -py-
-        cmake --build . --target wheel --config Debug
-    - name: Notify slack
-      if: failure() && github.ref == 'refs/heads/master'
-      uses: 8398a7/action-slack@v2
-      with:
-        status: failure
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    uses: Geode-solutions/actions/.github/workflows/ci-linux-python.yml@master
+    with:
+      name: OPENGEODE
+      directory: opengeode
+    secrets:
+      TOKEN: ${{ secrets.TOKEN }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       
   coverage:
-    runs-on: ubuntu-18.04
     needs: format
-    if: (github.event_name == 'pull_request' || github.ref == 'refs/heads/master')
-
-    steps:
-    - uses: actions/checkout@v1
-    - name: Compile
-      run: |
-        mkdir -p build
-        cd build
-        cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_STANDARD=11 ..
-        cmake --build . -- -j2
-    - name: Kcov
-      run: curl -s https://raw.githubusercontent.com/Geode-solutions/actions/master/kcov.sh | bash -s -- ${GITHUB_WORKSPACE}/build/opengeode/bin
-    - uses: codecov/codecov-action@v1.0.2
-      with: 
-        token: ${{ secrets.CODECOV_TOKEN }}
-        file: kcov/kcov-merged/cobertura.xml
-    - name: Notify slack
-      if: failure() && github.ref == 'refs/heads/master'
-      uses: 8398a7/action-slack@v2
-      with:
-        status: failure
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    uses: Geode-solutions/actions/.github/workflows/coverage.yml@master
+    with:
+      directory: opengeode
+    secrets:
+      TOKEN: ${{ secrets.TOKEN }}
 
   build-windows:
-    runs-on: windows-2016
     needs: format
-    strategy:
-      matrix:
-        config: [Debug, Release]
-        python: ["3.6", "3.7", "3.8", "3.9", "3.10"]
-
-    steps:
-    - uses: actions/checkout@v1
-    - name: Set up Python ${{ matrix.python }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python }}
-    - name: Compile & Test
-      run: |
-        pip install wheel
-        if(!(test-path build)) { mkdir build }
-        cd build
-        cmake -G "Visual Studio 15 2017 Win64" -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.python }} ..
-        cmake --build . --config ${{ matrix.config }}
-        cd opengeode
-        ctest -C ${{ matrix.config }} --output-on-failure
-        cmake --build . --target wheel --config ${{ matrix.config }}
-    - name: Notify slack
-      if: failure() && github.ref == 'refs/heads/master'
-      uses: 8398a7/action-slack@v2
-      with:
-        status: failure
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} 
+    uses: Geode-solutions/actions/.github/workflows/ci-windows.yml@master
+    with:
+      name: OPENGEODE
+      directory: opengeode
+    secrets:
+      TOKEN: ${{ secrets.TOKEN }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         
   semantic-release:
-    runs-on: ubuntu-18.04
-    needs: [build-linux, build-linux-wheel, coverage, build-windows]
-    steps:
-    - uses: actions/checkout@v1
-    - run: npx semantic-release
-      env:
-        GITHUB_TOKEN: ${{ secrets.TOKEN }}
+    needs: [build-linux, build-linux-python, build-windows]
+    uses: Geode-solutions/actions/.github/workflows/release.yml@master
+    secrets:
+      TOKEN: ${{ secrets.TOKEN }}

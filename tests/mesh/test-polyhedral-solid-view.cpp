@@ -41,7 +41,7 @@ void test_create_vertices( const geode::PolyhedralSolid3D& polyhedral_solid,
     builder.create_point( { { 9.3, 5.3, 6.7 } } );
     builder.create_point( { { 7.5, 4.2, 2.8 } } );
     builder.create_point( { { 2.2, 3.3, 4.4 } } );
-    OPENGEODE_EXCEPTION( polyhedral_solid.isolated_vertex( 0 ),
+    OPENGEODE_EXCEPTION( polyhedral_solid.is_vertex_isolated( 0 ),
         "[Test] Vertices should be isolated before polyhedra creation" );
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_vertices() == 8,
         "[Test] PolyhedralSolid should have 8 vertices" );
@@ -92,7 +92,7 @@ void test_create_polyhedra( const geode::PolyhedralSolid3D& polyhedral_solid,
         { { 1, 3, 2 }, { 0, 2, 3 }, { 3, 1, 0 }, { 0, 1, 2 } } );
     OPENGEODE_EXCEPTION( polyhedral_solid.nb_polyhedra() == 3,
         "[Test] PolyhedralSolid should have 3 polyhedra" );
-    OPENGEODE_EXCEPTION( !polyhedral_solid.isolated_vertex( 0 ),
+    OPENGEODE_EXCEPTION( !polyhedral_solid.is_vertex_isolated( 0 ),
         "[Test] Vertices should not be isolated after polyhedra creation" );
 }
 

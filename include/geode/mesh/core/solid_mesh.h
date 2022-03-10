@@ -188,11 +188,6 @@ namespace geode
         static std::unique_ptr< SolidMesh< dimension > > create(
             const MeshImpl& impl );
 
-        static MeshType type_name_static()
-        {
-            return MeshType{ absl::StrCat( "SolidMesh", dimension, "D" ) };
-        }
-
         std::unique_ptr< SolidMesh< dimension > > clone() const;
 
         ~SolidMesh();
@@ -201,7 +196,7 @@ namespace geode
 
         index_t nb_polyhedra() const;
 
-        bool isolated_vertex( index_t vertex_id ) const;
+        bool is_vertex_isolated( index_t vertex_id ) const;
 
         /*!
          * Return the number of vertices in a polyhedron.

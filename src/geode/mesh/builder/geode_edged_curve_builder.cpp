@@ -64,14 +64,14 @@ namespace geode
     }
 
     template < index_t dimension >
-    void OpenGeodeEdgedCurveBuilder< dimension >::do_delete_curve_vertices(
+    void OpenGeodeEdgedCurveBuilder< dimension >::do_delete_graph_vertices(
         const std::vector< bool >& /*unused*/,
         absl::Span< const index_t > /*unused*/ )
     {
     }
 
     template < index_t dimension >
-    void OpenGeodeEdgedCurveBuilder< dimension >::do_permute_curve_vertices(
+    void OpenGeodeEdgedCurveBuilder< dimension >::do_permute_graph_vertices(
         absl::Span< const index_t > /*unused*/,
         absl::Span< const index_t > /*unused*/ )
     {

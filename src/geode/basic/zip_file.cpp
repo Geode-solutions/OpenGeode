@@ -77,15 +77,15 @@ namespace geode
         {
             const ghc::filesystem::path file_path{ to_string( file ) };
             const auto status = mz_zip_writer_add_path(
-                writer_, file_path.c_str(), NULL, 0, 1 );
+                writer_, file_path.string().c_str(), NULL, 0, 1 );
             OPENGEODE_EXCEPTION( status == MZ_OK,
                 "[ZipFile::archive_file] Error adding path to zip" );
             ghc::filesystem::remove( file_path );
         }
 
-        absl::string_view directory() const
+        std::string directory() const
         {
-            return directory_.native();
+            return directory_.string();
         }
 
     private:
@@ -112,7 +112,7 @@ namespace geode
         impl_->archive_files( files );
     }
 
-    absl::string_view ZipFile::directory() const
+    std::string ZipFile::directory() const
     {
         return impl_->directory();
     }
@@ -151,16 +151,17 @@ namespace geode
                                                       "info in zip file" );
 
                 auto file = directory_ / file_info->filename;
-                status = mz_zip_reader_entry_save_file( reader_, file.c_str() );
+                status = mz_zip_reader_entry_save_file(
+                    reader_, file.string().c_str() );
                 OPENGEODE_EXCEPTION( status == MZ_OK,
                     "[UnzipFile::extract_all] Error extracting entry file" );
                 status = mz_zip_reader_goto_next_entry( reader_ );
             }
         }
 
-        absl::string_view directory() const
+        std::string directory() const
         {
-            return directory_.native();
+            return directory_.string();
         }
 
     private:
@@ -181,7 +182,7 @@ namespace geode
         impl_->extract_all();
     }
 
-    absl::string_view UnzipFile::directory() const
+    std::string UnzipFile::directory() const
     {
         return impl_->directory();
     }

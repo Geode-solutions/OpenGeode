@@ -399,7 +399,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    bool SurfaceMesh< dimension >::isolated_vertex( index_t vertex_id ) const
+    bool SurfaceMesh< dimension >::is_vertex_isolated( index_t vertex_id ) const
     {
         check_vertex_id( *this, vertex_id );
         return !get_polygon_around_vertex( vertex_id );

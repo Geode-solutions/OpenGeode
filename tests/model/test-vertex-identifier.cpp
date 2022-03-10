@@ -225,6 +225,7 @@ void test_update_unique_vertices()
         builder.set_unique_vertex( { surface_cid, i },
             static_cast< geode::index_t >( std::floor( i / 2 ) ) );
     }
+    surf_builder->create_polygon( { 1, 3, 5, 7, 9 } );
 
     OPENGEODE_EXCEPTION( provider.nb_unique_vertices() == 5,
         "[Test] Initialization of VertexIdentifier is not correct (nb)" );
@@ -240,7 +241,7 @@ void test_update_unique_vertices()
         "(id)" );
     std::vector< bool > to_delete{ true, false, true, false, true, false, true,
         false, true, false };
-    const auto old2new = surf_builder->delete_vertices( to_delete );
+    const auto old2new = surf_builder->delete_isolated_vertices();
     builder.update_unique_vertices( surface_cid, old2new );
     for( const auto uid : geode::Range{ 5 } )
     {

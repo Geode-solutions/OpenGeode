@@ -76,17 +76,17 @@ namespace geode
 
         void archive_section_files( const ZipFile& zip_writer ) const
         {
-            for( const auto& file : ghc::filesystem::directory_iterator(
-                     to_string( zip_writer.directory() ) ) )
+            for( const auto& file :
+                ghc::filesystem::directory_iterator( zip_writer.directory() ) )
             {
-                zip_writer.archive_file( file.path().native() );
+                zip_writer.archive_file( file.path().string() );
             }
         }
 
         void write() const final
         {
             const ZipFile zip_writer{ filename(), uuid{}.string() };
-            save_section_files( to_string( zip_writer.directory() ) );
+            save_section_files( zip_writer.directory() );
             archive_section_files( zip_writer );
         }
     };

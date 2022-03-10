@@ -90,7 +90,7 @@ namespace geode
                 return this->clean_facets();
             }
 
-            bool isolated_edge( index_t edge_id ) const
+            bool is_edge_isolated( index_t edge_id ) const
             {
                 return this->get_counter( edge_id ) == 0;
             }

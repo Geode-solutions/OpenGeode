@@ -75,7 +75,7 @@ add_geode_library(
         Async++
         absl::time
         spdlog::spdlog_header_only
-        MINIZIP::minizip
+        MINIZIP::minizip-ng
 )
 if(WIN32)
     set_target_properties(basic
