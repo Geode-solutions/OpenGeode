@@ -51,9 +51,6 @@ jobs:
         
   semantic-release:
     needs: [build-linux, build-linux-python, build-windows]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - run: npx semantic-release
-      env:
-        GITHUB_TOKEN: ${{ secrets.TOKEN }}
+    uses: Geode-solutions/actions/.github/workflows/release.yml@master
+    secrets:
+      TOKEN: ${{ secrets.TOKEN }}
