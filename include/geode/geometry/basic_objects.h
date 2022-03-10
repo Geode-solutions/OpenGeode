@@ -255,23 +255,30 @@ namespace geode
         typename std::enable_if< T == 3, absl::optional< Vector3D > >::type
             new_normal() const
         {
-            for( const auto v : LRange{ 3 } )
+            try
             {
-                const auto next = v + 1 == 3 ? 0 : v + 1;
-                const auto edge0 =
-                    Vector3D{ vertices_[v], vertices_[next] }.normalize();
-                const auto prev = v == 0 ? 2 : v - 1;
-                const auto edge1 =
-                    Vector3D{ vertices_[v], vertices_[prev] }.normalize();
-
-                const auto triangle_normal = edge0.cross( edge1 );
-                const auto length = triangle_normal.length();
-                if( length > M_PI / 180 ) // 1 degree
+                for( const auto v : LRange{ 3 } )
                 {
-                    return triangle_normal / length;
+                    const auto next = v + 1 == 3 ? 0 : v + 1;
+                    const auto edge0 =
+                        Vector3D{ vertices_[v], vertices_[next] }.normalize();
+                    const auto prev = v == 0 ? 2 : v - 1;
+                    const auto edge1 =
+                        Vector3D{ vertices_[v], vertices_[prev] }.normalize();
+
+                    const auto normal = edge0.cross( edge1 );
+                    const auto length = normal.length();
+                    if( length > M_PI / 180 ) // 1 degree
+                    {
+                        return normal / length;
+                    }
                 }
+                return absl::nullopt;
             }
-            return absl::nullopt;
+            catch( const OpenGeodeException& /*unused*/ )
+            {
+                return absl::nullopt;
+            }
         }
         template < index_t T = dimension >
         typename std::enable_if< T == 3, absl::optional< Plane > >::type
