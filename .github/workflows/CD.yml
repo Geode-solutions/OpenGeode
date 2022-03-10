@@ -34,7 +34,6 @@ jobs:
       TOKEN: ${{ secrets.TOKEN }}
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
-
   release-windows-python:
     uses: Geode-solutions/actions/.github/workflows/cd-windows-python.yml@master
     with:
