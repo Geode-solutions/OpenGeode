@@ -23,8 +23,6 @@
 
 #include <geode/geometry/distance.h>
 
-#include <geode/basic/logger.h>
-
 #include <geode/geometry/basic_objects.h>
 #include <geode/geometry/perpendicular.h>
 #include <geode/geometry/projection.h>
