@@ -133,16 +133,22 @@ namespace geode
         {
             if( const auto index = vertex_id( id ) )
             {
+                uuid2index_.erase( id );
                 std::vector< bool > to_delete( graph_->nb_edges(), false );
                 for( const auto& edge :
                     graph_->edges_around_vertex( index.value() ) )
                 {
                     to_delete[edge.edge_id] = true;
+                    const auto vertex = graph_->edge_vertex( edge.opposite() );
+                    if( graph_->edges_around_vertex( vertex ).size() == 1 )
+                    {
+                        uuid2index_.erase(
+                            component_from_index( vertex ).id() );
+                    }
                 }
                 auto builder = GraphBuilder::create( *graph_ );
                 builder->delete_edges( to_delete );
                 const auto old2new = builder->delete_isolated_vertices();
-                uuid2index_.erase( id );
                 uuid2index_.update( old2new );
             }
         }
