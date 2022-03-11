@@ -23,6 +23,8 @@
 
 #include <geode/geometry/distance.h>
 
+#include <geode/basic/logger.h>
+
 #include <geode/geometry/basic_objects.h>
 #include <geode/geometry/perpendicular.h>
 #include <geode/geometry/projection.h>
@@ -104,7 +106,7 @@ namespace geode
         auto tD = D; // tc = tN / tD, default tD = D >= 0
 
         // compute the line parameters of the two closest points
-        if( D < 0.0 )
+        if( D <= 0.0 )
         { // the lines are almost parallel
             sN = 0.0; // force using point P0 on segment0
             sD = 1.0; // to prevent possible division by 0.0 later
@@ -158,8 +160,8 @@ namespace geode
             }
         }
         // finally do the division to get sc and tc
-        sc = ( std::fabs( sN ) < 0.0 ? 0.0 : sN / sD );
-        tc = ( std::fabs( tN ) < 0.0 ? 0.0 : tN / tD );
+        sc = ( std::fabs( sN ) <= 0.0 ? 0.0 : sN / sD );
+        tc = ( std::fabs( tN ) <= 0.0 ? 0.0 : tN / tD );
 
         // get the difference of the two closest points
         const Point< dimension > closest0 =
