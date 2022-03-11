@@ -174,6 +174,20 @@ namespace geode
             return absl::nullopt;
         }
 
+        bool is_cell_on_border(
+            const GridCellIndices< dimension >& cell_indices ) const
+        {
+            for( const auto d : LRange{ dimension } )
+            {
+                if( cell_indices[d] == 0
+                    || cell_indices[d] == nb_cells( d ) - 1 )
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         index_t nb_vertices() const
         {
             return vertex_attribute_manager_.nb_elements();
@@ -524,6 +538,13 @@ namespace geode
             const GridCellIndices< dimension >& index, index_t direction ) const
     {
         return impl_->previous_cell( index, direction );
+    }
+
+    template < index_t dimension >
+    bool RegularGrid< dimension >::is_cell_on_border(
+        const GridVertexIndices< dimension >& cell_indices ) const
+    {
+        return impl_->is_cell_on_border( cell_indices );
     }
 
     template < index_t dimension >

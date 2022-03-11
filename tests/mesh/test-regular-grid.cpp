@@ -98,6 +98,16 @@ void test_cell_index( const geode::RegularGrid3D& grid )
         "[Test] Wrong cell index" );
 }
 
+void test_cell_on_border( const geode::RegularGrid3D& grid )
+{
+    OPENGEODE_EXCEPTION( grid.is_cell_on_border( { { 0, 0, 0 } } ),
+        "[Test] Vertex is not on border where it should be." );
+    OPENGEODE_EXCEPTION( grid.is_cell_on_border( { { 4, 8, 13 } } ),
+        "[Test] Vertex is not on border where it should be." );
+    OPENGEODE_EXCEPTION( !grid.is_cell_on_border( { { 1, 2, 3 } } ),
+        "[Test] Vertex is on border where it should not be." );
+}
+
 void test_vertex_number( const geode::RegularGrid3D& grid )
 {
     OPENGEODE_EXCEPTION(
