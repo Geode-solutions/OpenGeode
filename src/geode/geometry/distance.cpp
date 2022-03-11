@@ -95,7 +95,7 @@ namespace geode
         const auto c = v.dot( v ); // always >= 0
         const auto d = u.dot( w );
         const auto e = v.dot( w );
-        const auto D = a * c - b * b; // always >= 0
+        const auto D = a * c - b * b;
         auto sc = D;
         auto sN = D;
         auto sD = D; // sc = sN / sD, default sD = D >= 0
@@ -104,7 +104,7 @@ namespace geode
         auto tD = D; // tc = tN / tD, default tD = D >= 0
 
         // compute the line parameters of the two closest points
-        if( D < global_epsilon )
+        if( D < 0.0 )
         { // the lines are almost parallel
             sN = 0.0; // force using point P0 on segment0
             sD = 1.0; // to prevent possible division by 0.0 later
@@ -158,8 +158,8 @@ namespace geode
             }
         }
         // finally do the division to get sc and tc
-        sc = ( std::fabs( sN ) < global_epsilon ? 0.0 : sN / sD );
-        tc = ( std::fabs( tN ) < global_epsilon ? 0.0 : tN / tD );
+        sc = ( std::fabs( sN ) < 0.0 ? 0.0 : sN / sD );
+        tc = ( std::fabs( tN ) < 0.0 ? 0.0 : tN / tD );
 
         // get the difference of the two closest points
         const Point< dimension > closest0 =
