@@ -122,6 +122,9 @@ namespace geode
             const GridCellIndices< dimension >& index,
             index_t direction ) const;
 
+        bool is_cell_on_border(
+            const GridCellIndices< dimension >& cell_indices ) const;
+
         index_t nb_vertices() const;
 
         index_t nb_vertices( index_t direction ) const;
