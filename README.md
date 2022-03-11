@@ -33,7 +33,6 @@
 
 OpenGeode is an open source framework for representing and manipulating geometric models, from simple meshes to complex boundary representations. The framework is easy to use thanks to its readable API and its Python bindings for quick prototyping. It is the industrialization of a 5-year research prototype platform [RINGMesh](http://ringmesh.org).
 
-
 ## Ecosystem
 
 | Project | Version | Description |
@@ -58,7 +57,6 @@ OpenGeode is an open source framework for representing and manipulating geometri
 
 [Geode]: https://github.com/Geode-solutions/GeodePackage
 [Geode-version]: https://img.shields.io/github/release/Geode-solutions/GeodePackage.svg
-
 
 ## Documentation
 
