@@ -65,39 +65,19 @@ def test_polyhedron_adjacencies( solid, builder ):
     if solid.polyhedron_adjacent( mesh.PolyhedronFacet( 2, 0 ) ):
         raise ValueError( "[Test] TetrahedralSolid adjacent index is not correct" )
 
-def test_delete_vertex( solid, builder ):
-    to_delete = [False] * solid.nb_vertices()
-    to_delete[3] = True
-    builder.delete_vertices( to_delete )
-    if solid.nb_vertices() != 5:
-        raise ValueError( "[Test] TetrahedralSolid should have 5 vertices" )
-    answer = geom.Point3D( [ 2.1, 9.4, 6.7 ] )
-    if solid.point( 2 ) != answer:
-        raise ValueError( "[Test] TetrahedralSolid vertex coordinates are not correct" )
-    if solid.nb_polyhedra() != 2:
-        raise ValueError( "[Test] TetrahedralSolid should have 2 tetrahedra" )
-    if solid.polyhedron_adjacent( mesh.PolyhedronFacet( 1, 3 ) ) != 0:
-        raise ValueError( "[Test] TetrahedralSolid adjacent index is not correct" )
-    builder.edges_builder().delete_isolated_edges()
-    builder.facets_builder().delete_isolated_facets()
-    if solid.facets().nb_facets() != 7:
-        raise ValueError( "[Test] TetrahedralSolid should have 7 facets" )
-    if solid.edges().nb_edges() != 9:
-        raise ValueError( "[Test] TetrahedralSolid should have 9 edges" )
-
 def test_delete_polyhedron( solid, builder ):
     to_delete = [False] * solid.nb_polyhedra()
     to_delete[0] = True
     builder.delete_polyhedra( to_delete )
-    if solid.nb_polyhedra() != 1:
-        raise ValueError( "[Test] TetrahedralSolid should have 1 polyhedron" )
-    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 0 ) ) != 2:
+    if solid.nb_polyhedra() != 2:
+        raise ValueError( "[Test] TetrahedralSolid should have 2 polyhedra" )
+    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 0 ) ) != 4:
         raise ValueError( "[Test] TetrahedralSolid facet vertex index is not correct" )
-    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 1 ) ) != 1:
+    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 1 ) ) != 2:
         raise ValueError( "[Test] TetrahedralSolid facet vertex index is not correct" )
-    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 2 ) ) != 4:
+    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 2 ) ) != 1:
         raise ValueError( "[Test] TetrahedralSolid facet vertex index is not correct" )
-    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 3 ) ) != 0:
+    if solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 3 ) ) != 5:
         raise ValueError( "[Test] TetrahedralSolid facet vertex index is not correct" )
 
 def test_io( solid, filename ):
@@ -114,12 +94,12 @@ def test_io( solid, filename ):
 
 def test_clone( solid ):
     solid2 = solid.clone()
-    if solid2.nb_vertices() != 5:
-        raise ValueError( "[Test] TetrahedralSolid2 should have 5 vertices" )
+    if solid2.nb_vertices() != 6:
+        raise ValueError( "[Test] TetrahedralSolid2 should have 6 vertices" )
     if solid2.facets().nb_facets() != solid.facets().nb_facets():
         raise ValueError( "[Test] TetrahedralSolid2 should have same number of facets" )
-    if solid2.nb_polyhedra() != 1:
-        raise ValueError( "[Test] TetrahedralSolid2 should have 1 polyhedron" )
+    if solid2.nb_polyhedra() != 2:
+        raise ValueError( "[Test] TetrahedralSolid2 should have 2 polyhedra" )
 
 def test_delete_all( solid, builder ):
     builder.delete_isolated_vertices()
@@ -235,6 +215,5 @@ if __name__ == '__main__':
     test_io( solid, "test." + solid.native_extension() )
     
     test_permutation( solid, builder )
-    test_delete_vertex( solid, builder )
     test_delete_polyhedron( solid, builder )
     test_clone( solid )

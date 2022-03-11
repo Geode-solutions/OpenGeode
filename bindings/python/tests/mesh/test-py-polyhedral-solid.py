@@ -111,64 +111,36 @@ def test_polyhedron_adjacencies( polyhedral_solid, builder ):
     if not 2 in polyhedra:
         raise ValueError( "[Test] Polyhedra from facet should contain 2" )
 
-def test_delete_vertex(  polyhedral_solid, builder ):
-    to_delete = [False] * polyhedral_solid.nb_vertices()
-    to_delete[1] = True
-    builder.delete_vertices( to_delete )
-    if polyhedral_solid.nb_vertices() != 7:
-        raise ValueError( "[Test] PolyhedralSolid should have 7 vertices" )
-    answer = geom.Point3D( [ 2.1, 9.4, 6.7 ] )
-    if polyhedral_solid.point( 2 ) != answer:
-        raise ValueError( "[Test] PolyhedralSolid vertex coordinates are not correct" )
-    if polyhedral_solid.nb_polyhedra() != 2:
-        raise ValueError( "[Test] PolyhedralSolid should have 2 polyhedra" )
-    if polyhedral_solid.polyhedron_adjacent( mesh.PolyhedronFacet( 1, 0 ) ) != 0:
-        raise ValueError( "[Test] PolyhedralSolid adjacent index is not correct" )
-    if polyhedral_solid.facets().nb_facets() != 8:
-        raise ValueError( "[Test] PolyhedralSolid should have 8 facets" )
-    if polyhedral_solid.edges().nb_edges() != 12:
-        raise ValueError( "[Test] PolyhedralSolid should have 12 edges" )
-    builder.edges_builder().delete_isolated_edges()
-    builder.facets_builder().delete_isolated_facets()
-    if polyhedral_solid.facets().nb_facets() != 7:
-        raise ValueError( "[Test] PolyhedralSolid should have 7 facets" )
-    if polyhedral_solid.edges().nb_edges() != 9:
-        raise ValueError( "[Test] PolyhedralSolid should have 9 edges" )
-    attribute = polyhedral_solid.edges().edge_attribute_manager().find_attribute_uint( "test" )
-    if attribute.value( 0 ) != 8:
-        raise ValueError( "[Test] Wrong value for attribute on edge 0 after vertex deletion" )
-    if attribute.value( 1 ) != 7:
-        raise ValueError( "[Test] Wrong value for attribute on edge 1 after vertex deletion" )
 
 def test_delete_polyhedra( polyhedral_solid, builder ):
     to_delete = [False] * polyhedral_solid.nb_polyhedra()
     to_delete[0] = True
     builder.delete_polyhedra( to_delete )
-    if polyhedral_solid.nb_polyhedra() != 1:
-        raise ValueError( "[Test] PolyhedralSolid should have 1 polyhedron" )
-    if polyhedral_solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 0 ) ) != 6:
+    if polyhedral_solid.nb_polyhedra() != 2:
+        raise ValueError( "[Test] PolyhedralSolid should have 2 polyhedra" )
+    if polyhedral_solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 0 ) ) != 5:
         raise ValueError( "[Test] PolyhedralSolid vertex index is not correct" )
-    if polyhedral_solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 1 ) ) != 0:
+    if polyhedral_solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 1 ) ) != 3:
         raise ValueError( "[Test] PolyhedralSolid vertex index is not correct" )
-    if polyhedral_solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 2 ) ) != 3:
+    if polyhedral_solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 2 ) ) != 1:
         raise ValueError( "[Test] PolyhedralSolid vertex index is not correct" )
-    if polyhedral_solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 3 ) ) != 1:
+    if polyhedral_solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 3 ) ) != 7:
         raise ValueError( "[Test] PolyhedralSolid vertex index is not correct" )
-    if polyhedral_solid.facets().nb_facets() != 7:
-        raise ValueError( "[Test] PolyhedralSolid should have 7 facets" )
-    if polyhedral_solid.edges().nb_edges() != 9:
-        raise ValueError( "[Test] PolyhedralSolid should have 9 edges" )
+    if polyhedral_solid.facets().nb_facets() != 11:
+        raise ValueError( "[Test] PolyhedralSolid should have 11 facets" )
+    if polyhedral_solid.edges().nb_edges() != 15:
+        raise ValueError( "[Test] PolyhedralSolid should have 15 edges" )
     builder.edges_builder().delete_isolated_edges()
     builder.facets_builder().delete_isolated_facets()
-    if polyhedral_solid.facets().nb_facets() != 4:
-        raise ValueError( "[Test] PolyhedralSolid should have 4 facets" )
-    if polyhedral_solid.edges().nb_edges() != 6:
-        raise ValueError( "[Test] PolyhedralSolid should have 6 edges" )
+    if polyhedral_solid.facets().nb_facets() != 8:
+        raise ValueError( "[Test] PolyhedralSolid should have 8 facets" )
+    if polyhedral_solid.edges().nb_edges() != 12:
+        raise ValueError( "[Test] PolyhedralSolid should have 12 edges" )
     attribute = polyhedral_solid.edges().edge_attribute_manager().find_attribute_uint( "test" )
-    if attribute.value( 0 ) != 8:
-        raise ValueError( "[Test] Wrong value for attribute on edge 0 after vertex deletion" )
-    if attribute.value( 1 ) != 7:
-        raise ValueError( "[Test] Wrong value for attribute on edge 1 after vertex deletion" )
+    if attribute.value( 0 ) != 1:
+        raise ValueError( "[Test] Wrong value for attribute on edge 0 after polyhedron deletion" )
+    if attribute.value( 1 ) != 3:
+        raise ValueError( "[Test] Wrong value for attribute on edge 1 after polyhedron deletion" )
 
 def test_io( polyhedral_solid, filename ):
     mesh.save_polyhedral_solid3D( polyhedral_solid, filename )
@@ -233,31 +205,28 @@ def test_normals():
 
 def test_clone( polyhedral_solid ):
     polyhedral_solid2 = polyhedral_solid.clone()
-    if polyhedral_solid2.nb_vertices() != 7:
-        raise ValueError( "[Test] PolyhedralSolid2 should have 7 vertices" )
-    if polyhedral_solid2.facets().nb_facets() != 4:
-        raise ValueError( "[Test]PolyhedralSolid2 should have 4 facets" )
-    if polyhedral_solid2.nb_polyhedra() != 1:
-        raise ValueError( "[Test] PolyhedralSolid2 should have 1 polyhedron" )
+    if polyhedral_solid2.nb_vertices() != 8:
+        raise ValueError( "[Test] PolyhedralSolid2 should have 8 vertices" )
+    if polyhedral_solid2.facets().nb_facets() != 8:
+        raise ValueError( "[Test]PolyhedralSolid2 should have 8 facets" )
+    if polyhedral_solid2.nb_polyhedra() != 2:
+        raise ValueError( "[Test] PolyhedralSolid2 should have 2 polyhedra" )
 
 def test_set_polyhedron_vertex( polyhedral_solid, builder ):
-    facet_id = polyhedral_solid.facets().facet_from_vertices( polyhedral_solid.polyhedron_facet_vertices( mesh.PolyhedronFacet( 0, 1 ) ) )
     builder.set_polyhedron_vertex( mesh.PolyhedronVertex( 0, 2 ), 2 )
     builder.facets_builder().delete_isolated_facets()
 
     if polyhedral_solid.polyhedron_vertex( mesh.PolyhedronVertex( 0, 2 ) ) != 2:
         raise ValueError( "[Test] PolyhedronVertex after set_polyhedron_vertex is wrong" )
-    if polyhedral_solid.polyhedron_facet_vertex( mesh.PolyhedronFacetVertex( mesh.PolyhedronFacet( 0, 1 ), 1 ) ) != 2:
+    if polyhedral_solid.polyhedron_facet_vertex( mesh.PolyhedronFacetVertex( mesh.PolyhedronFacet( 0, 1 ), 1 ) ) != 4:
         raise ValueError( "[Test] PolyhedronFacetVertex after set_polyhedron_vertex is wrong" )
-    if polyhedral_solid.facets().facet_from_vertices( polyhedral_solid.polyhedron_facet_vertices( mesh.PolyhedronFacet( 0, 1 ) ) ) != facet_id:
-        raise ValueError( "[Test] Polyhedron facet id after set_polyhedron_vertex is wrong" )
 
 def test_delete_all( polyhedral_solid, builder ):
     to_delete = [True] * polyhedral_solid.nb_polyhedra()
     builder.delete_polyhedra( to_delete )
 
-    if polyhedral_solid.nb_vertices() != 7:
-        raise ValueError( "[Test] PolyhedralSolid should have 7 vertices" )
+    if polyhedral_solid.nb_vertices() != 8:
+        raise ValueError( "[Test] PolyhedralSolid should have 8 vertices" )
     if polyhedral_solid.nb_polyhedra() != 0:
         raise ValueError( "[Test] PolyhedralSolid should have 0 polyhedron" )
     builder.edges_builder().delete_isolated_edges()
@@ -373,7 +342,6 @@ if __name__ == '__main__':
     test_io( polyhedral_solid, "test." + polyhedral_solid.native_extension() )
     
     test_permutation( polyhedral_solid, builder )
-    test_delete_vertex( polyhedral_solid, builder )
     test_delete_polyhedra( polyhedral_solid, builder )
     test_clone( polyhedral_solid )
     test_set_polyhedron_vertex( polyhedral_solid, builder )

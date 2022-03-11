@@ -399,7 +399,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    bool SurfaceMesh< dimension >::isolated_vertex( index_t vertex_id ) const
+    bool SurfaceMesh< dimension >::is_vertex_isolated( index_t vertex_id ) const
     {
         check_vertex_id( *this, vertex_id );
         return !get_polygon_around_vertex( vertex_id );
@@ -800,7 +800,6 @@ namespace geode
     {
         check_polygon_id( *this, polygon_id );
         Vector3D normal;
-        index_t count{ 0 };
         const auto& p0 = this->point( polygon_vertex( { polygon_id, 0 } ) );
         for( const auto v : LRange{ 2, nb_polygon_vertices( polygon_id ) } )
         {
@@ -811,14 +810,16 @@ namespace geode
                     Triangle< T >{ p0, p1, p2 }.new_normal() )
             {
                 normal = normal + triangle_normal.value();
-                count++;
             }
         }
-        if( count == 0 )
+        try
+        {
+            return normal.normalize();
+        }
+        catch( const OpenGeodeException& /*unused*/ )
         {
             return absl::nullopt;
         }
-        return normal.normalize();
     }
 
     template < index_t dimension >
@@ -828,20 +829,21 @@ namespace geode
             index_t vertex_id ) const
     {
         Vector3D normal;
-        index_t count{ 0 };
         for( const auto& polygon : polygons_around_vertex( vertex_id ) )
         {
             if( const auto p_normal = new_polygon_normal( polygon.polygon_id ) )
             {
                 normal = normal + p_normal.value();
-                count++;
             }
         }
-        if( count == 0 )
+        try
+        {
+            return normal.normalize();
+        }
+        catch( const OpenGeodeException& /*unused*/ )
         {
             return absl::nullopt;
         }
-        return normal.normalize();
     }
 
     template < index_t dimension >

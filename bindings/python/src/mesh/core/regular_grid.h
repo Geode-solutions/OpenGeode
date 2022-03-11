@@ -38,6 +38,8 @@
             std::array< index_t, dimension >, double >() )                     \
         .def(                                                                  \
             "native_extension", &RegularGrid##dimension##D::native_extension ) \
+        .def(                                                                  \
+            "nb_cell_vertices", &RegularGrid##dimension##D::nb_cell_vertices ) \
         .def( "origin", &RegularGrid##dimension##D::origin )                   \
         .def( "nb_cells", ( index_t( RegularGrid< dimension >::* )() const )   \
                               & RegularGrid##dimension##D::nb_cells )          \
@@ -45,18 +47,9 @@
             ( index_t( RegularGrid< dimension >::* )( index_t ) const )        \
                 & RegularGrid##dimension##D::nb_cells )                        \
         .def( "cell_length", &RegularGrid##dimension##D::cell_length )         \
-        .def( "cell_size", ( double ( RegularGrid< dimension >::* )() const )  \
-                               & RegularGrid##dimension##D::cell_size )        \
-        .def( "cell_size_deprecated",                                          \
-            ( double ( RegularGrid< dimension >::* )( index_t ) const )        \
-                & RegularGrid##dimension##D::cell_size )                       \
-        .def( "cell_index", ( index_t( RegularGrid< dimension >::* )(          \
-                                const GridCellIndex< dimension >& ) const )    \
-                                & RegularGrid##dimension##D::cell_index )      \
-        .def( "cell_indices",                                                  \
-            ( GridCellIndex< dimension >( RegularGrid< dimension >::* )(       \
-                index_t ) const )                                              \
-                & RegularGrid##dimension##D::cell_index )                      \
+        .def( "cell_size", &RegularGrid##dimension##D::cell_size )             \
+        .def( "cell_index", &RegularGrid##dimension##D::cell_index )           \
+        .def( "cell_indices", &RegularGrid##dimension##D::cell_indices )       \
         .def( "next_cell", &RegularGrid##dimension##D::next_cell )             \
         .def( "previous_cell", &RegularGrid##dimension##D::previous_cell )     \
         .def(                                                                  \
@@ -65,27 +58,18 @@
         .def( "nb_vertices_in_direction",                                      \
             ( index_t( RegularGrid< dimension >::* )( index_t ) const )        \
                 & RegularGrid##dimension##D::nb_vertices )                     \
-        .def(                                                                  \
-            "nb_cell_vertices", &RegularGrid##dimension##D::nb_cell_vertices ) \
-        .def(                                                                  \
-            "vertex_index", ( index_t( RegularGrid< dimension >::* )(          \
-                                const GridVertexIndex< dimension >& ) const )  \
-                                & RegularGrid##dimension##D::vertex_index )    \
-        .def( "vertex_indices",                                                \
-            ( GridVertexIndex< dimension >( RegularGrid< dimension >::* )(     \
-                index_t ) const )                                              \
-                & RegularGrid##dimension##D::vertex_index )                    \
+        .def( "vertex_index", &RegularGrid##dimension##D::vertex_index )       \
+        .def( "vertex_indices", &RegularGrid##dimension##D::vertex_indices )   \
         .def( "next_vertex", &RegularGrid##dimension##D::next_vertex )         \
         .def( "previous_vertex", &RegularGrid##dimension##D::previous_vertex ) \
         .def( "is_vertex_on_border",                                           \
-            ( bool ( RegularGrid< dimension >::* )( index_t ) const )          \
-                & RegularGrid##dimension##D::is_vertex_on_border )             \
-        .def( "is_vertex_from_indices_on_border",                              \
-            ( bool ( RegularGrid< dimension >::* )(                            \
-                const GridVertexIndex< dimension >& ) const )                  \
-                & RegularGrid##dimension##D::is_vertex_on_border )             \
-        .def( "cell", &RegularGrid##dimension##D::cell )                       \
+            &RegularGrid##dimension##D::is_vertex_on_border )                  \
+        .def( "cell_vertices", &RegularGrid##dimension##D::cell_vertices )     \
+        .def( "cell_vertex_indices",                                           \
+            &RegularGrid##dimension##D::cell_vertex_indices )                  \
         .def( "point", &RegularGrid##dimension##D::point )                     \
+        .def( "cell", &RegularGrid##dimension##D::cell )                       \
+        .def( "cell_barycenter", &RegularGrid##dimension##D::cell_barycenter ) \
         .def( "cell_attribute_manager",                                        \
             &RegularGrid##dimension##D::cell_attribute_manager,                \
             pybind11::return_value_policy::reference )                         \

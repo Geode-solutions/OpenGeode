@@ -37,13 +37,6 @@ namespace geode
         RelationshipsBuilder( Relationships& relationships );
 
         /*!
-         * Add a component in the set of components registered by the
-         * Relationships
-         * @param[in] id The component identifier to add
-         */
-        void register_component( const ComponentID& id );
-
-        /*!
          * Remove a component from the set of components registered by the
          * Relationships and all its associated relationships
          * @param[in] id Unique index of the component to remove
@@ -53,33 +46,27 @@ namespace geode
         /*!
          * Add a new relationship of type boundary-incidence between two
          * components
-         * @param[in] boundary Unique index of the boundary component
-         * @param[in] incidence Unique index of the incidence component
          */
         index_t add_boundary_relation(
-            const uuid& boundary, const uuid& incidence );
+            const ComponentID& boundary, const ComponentID& incidence );
 
         /*!
          * Add a new relationship of type internal-embedding between two
          * components
-         * @param[in] internal Unique index of the internal component
-         * @param[in] embedding Unique index of the embedding component
          */
         index_t add_internal_relation(
-            const uuid& internal, const uuid& embedding );
+            const ComponentID& internal, const ComponentID& embedding );
 
         /*!
          * Add a new relationship of type item-collection between two components
-         * @param[in] item Unique index of the item component
-         * @param[in] collection Unique index of the collection component
          */
         index_t add_item_in_collection(
-            const uuid& item, const uuid& collection );
+            const ComponentID& item, const ComponentID& collection );
 
         /*!
          * Add a new relationship between two components
          */
-        index_t add_relation( const uuid& id1, const uuid& id2 );
+        index_t add_relation( const ComponentID& id1, const ComponentID& id2 );
 
         /*!
          * Remove a relationship between two components

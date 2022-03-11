@@ -42,9 +42,14 @@ namespace geode
                 return uuid2index_.size();
             }
 
-            index_t index( const uuid& id ) const
+            absl::optional< index_t > index( const uuid& id ) const
             {
-                return uuid2index_.at( id );
+                const auto index = uuid2index_.find( id );
+                if( index != uuid2index_.end() )
+                {
+                    return index->second;
+                }
+                return absl::nullopt;
             }
 
             void erase( const uuid& id )
@@ -57,14 +62,14 @@ namespace geode
                 uuid2index_[id] = index;
             }
 
-            void decrement_indices_larger_than( const index_t index )
+            void update( absl::Span< const index_t > old2new )
             {
                 for( auto& it : uuid2index_ )
                 {
-                    if( it.second > index )
-                    {
-                        it.second--;
-                    }
+                    const auto new_index = old2new[it.second];
+                    OPENGEODE_ASSERT( new_index != NO_ID,
+                        "[UuidToIndex::update] no uuid should be removed" );
+                    it.second = new_index;
                 }
             }
 

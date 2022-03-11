@@ -94,10 +94,10 @@ void test_create_viewed_tetrahedra( const geode::TetrahedralSolidView3D& solid,
 void test_isolated( const geode::TetrahedralSolid3D& solid,
     geode::TetrahedralSolidViewBuilder3D& builder )
 {
-    OPENGEODE_EXCEPTION( !solid.isolated_vertex( 0 ),
+    OPENGEODE_EXCEPTION( !solid.is_vertex_isolated( 0 ),
         "[Test] TetrahedralSolidView isolated vertex is not correct" );
     builder.add_viewed_vertex( 0 );
-    OPENGEODE_EXCEPTION( solid.isolated_vertex( 5 ),
+    OPENGEODE_EXCEPTION( solid.is_vertex_isolated( 5 ),
         "[Test] TetrahedralSolidView isolated vertex is not correct" );
 }
 

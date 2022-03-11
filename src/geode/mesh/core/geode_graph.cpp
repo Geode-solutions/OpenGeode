@@ -28,7 +28,7 @@
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
 
-#include <geode/mesh/core/detail/edges_impl.h>
+#include <geode/mesh/core/private/edges_impl.h>
 
 namespace geode
 {

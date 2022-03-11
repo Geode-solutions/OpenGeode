@@ -1,5 +1,29 @@
 # Upgrade Guide
 
+## Upgrading from OpenGeode v9.x.x to v10.0.0
+
+### Motivations
+
+This release is mostly to upgrade Microsoft Visual Studio version from 2017 to 2019. VS2022 is also part of the integration workflow.
+The other important change is the shift of the `global_epsilon` value from 1E-8 to 1E-6. This change was made after heavy testing on numerical approximation limits which showed 1E-8 was too low.
+The `RegularGrid` interface was also upgraded for a simplified and more efficient use.
+
+### Breaking Changes
+
+- **MeshBuilder**: `MeshBuilder::delete_vertices` has been removed for all mesh classes except `VertexSet` and `PointSet`. To remove vertices, use `MeshBuilder::delete_isolated_vertices` instead.
+
+- **Relationships**: Remove the `AttributeManger` on the component and related methods.
+
+- **RelationshipsBuilder**: Remove the `register_component` methods, the registration is now done automatically. Methods to create relations take a `ComponentID` instead of an `uuid`.
+
+- **RegularGrid**: The grid accessors structures were renamed: `GridCellIndices` to `GridCellsAroundVertex`, `GridCellIndex` to `GridCellIndices`, `GridVertexIndex` to `GridVertexIndices`. The following functions were renamed accordingly: `cell_index(index_t)` to `cell_indices(index_t)`, `vertex_index(index_t)` to `vertex_indices(index_t)`. The deprecated `Index` and `Indices` structures were removed, as well as the deprecated function cell_size(index_t). The following functions were removed to avoid multiple definitions: is_vertex_on_border(index_t) and cell_vertex_index(index_t).
+
+- **global_epsilon**: The `global_epsilon` value has been changed from 1E-8 to 1E-6 to better find numerical approximation. Also, `global_epsilon2` and `global_epsilon3` have been removed because they make no practical sense. Use  `global_epsilon` instead.
+
+- **Mesh**: The methods `isolated_XXX` (e.g. `isolated_vertex`) have been renamed `is_XXX_isolated`.
+
+- **SolidMesh**: Static method `type_name_static` has been removed in this class since `SolidMesh` is not a complete type.
+
 ## Upgrading from OpenGeode v8.x.x to v9.0.0
 
 ### Motivations

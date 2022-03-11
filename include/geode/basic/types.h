@@ -31,9 +31,7 @@
 
 namespace geode
 {
-    static constexpr double global_epsilon{ 1E-8 };
-    static constexpr double global_epsilon2{ global_epsilon * global_epsilon };
-    static constexpr double global_epsilon3{ global_epsilon2 * global_epsilon };
+    static constexpr double global_epsilon{ 1E-6 };
 
     using index_t = unsigned int;
     using signed_index_t = int;

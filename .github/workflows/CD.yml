@@ -4,158 +4,45 @@ on:
   push:
     tags: 'v*'
 
-jobs:      
+jobs:     
   release-linux:
-    runs-on: ubuntu-18.04
-    container: ${{ matrix.config.container }}
-    strategy:
-      matrix:
-        config:
-        - {container: "geodesolutions/ubuntu", system: "ubuntu", doc: true}
-        - {container: "geodesolutions/centos", system: "rhel", doc: false}
-        
-    steps:
-    - uses: actions/checkout@v1
-    - name: Generate package
-      id: package
-      run: |
-        mkdir -p build
-        cd build
-        version="${GITHUB_REF##*/*/v}"
-        echo ::set-output name=version::$version
-        cmake -DCMAKE_BUILD_TYPE=Release -DOPENGEODE_WITH_TESTS:BOOL=OFF -DINCLUDE_PYBIND11:BOOL=ON -DCPACK_PACKAGE_VERSION:STRING=$version -DCPACK_SYSTEM_NAME:STRING=${{ matrix.config.system }} ..
-        cmake --build . -- -j2
-        cmake --build . --target package
-    - name: Upload
-      uses: geode-solutions/action-gh-release@master
-      with:
-        files: "build/OpenGeode-${{ steps.package.outputs.version }}-${{ matrix.config.system }}.tar.gz"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Doc
-      if: matrix.config.doc
-      run: curl -s https://raw.githubusercontent.com/Geode-solutions/actions/master/doc/doc.sh | bash -s -- ${GITHUB_WORKSPACE}/build/opengeode
-      env:
-        GITHUB_TOKEN: ${{ secrets.TOKEN }}
-    - name: Notify slack
-      if: failure()
-      uses: 8398a7/action-slack@v2
-      with:
-        status: failure
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-      
-  release-linux-wheel:
-    runs-on: ubuntu-18.04
-    container: "geodesolutions/centos"
-    strategy:
-      matrix:
-        config:
-        - {python: "3.6", tag: "cp36-cp36m"}
-        - {python: "3.7", tag: "cp37-cp37m"}
-        - {python: "3.8", tag: "cp38-cp38"}
-        - {python: "3.9", tag: "cp39-cp39"}
-        - {python: "3.10", tag: "cp310-cp310"}
-    steps:
-    - uses: actions/checkout@v1
-    - name: Compile
-      id: package
-      run: |
-        export PATH=/opt/python/${{ matrix.config.tag }}/bin:$PATH
-        mkdir -p build
-        cd build
-        version="${GITHUB_REF##*/*/v}"
-        echo ::set-output name=version::$version
-        cmake -DCMAKE_BUILD_TYPE=Release -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.config.python }} -DCMAKE_PACKAGE_VERSION:STRING=$version ..
-        cmake --build . -- -j2
-        cd opengeode
-        cmake --build . --target wheel --config Release
-        mv wheel/dist/*.whl wheel/dist/OpenGeode_core-$version-${{ matrix.config.tag }}-manylinux2014_x86_64.whl
-    - name: PyPI
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_TOKEN }}
-        packages_dir: "build/opengeode/wheel/dist/"
-    - name: Notify slack
-      if: failure() && github.ref == 'refs/heads/master'
-      uses: 8398a7/action-slack@v2
-      with:
-        status: failure
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-      
+    uses: Geode-solutions/actions/.github/workflows/cd-linux.yml@master
+    with:
+      name: OPENGEODE
+      directory: opengeode
+      package: OpenGeode
+    secrets:
+      TOKEN: ${{ secrets.TOKEN }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} 
+
+  release-linux-python:
+    uses: Geode-solutions/actions/.github/workflows/cd-linux-python.yml@master
+    with:
+      name: OPENGEODE
+      directory: opengeode
+      package: OpenGeode_core
+    secrets:
+      TOKEN: ${{ secrets.TOKEN }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} 
+      PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }} 
+
   release-windows:
-    runs-on: windows-2016
+    uses: Geode-solutions/actions/.github/workflows/cd-windows.yml@master
+    with:
+      name: OPENGEODE
+      directory: opengeode
+      package: OpenGeode
+    secrets:
+      TOKEN: ${{ secrets.TOKEN }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
-    steps:
-    - uses: actions/checkout@v1
-    - name: Generate package
-      id: package
-      run: |
-        if(!(test-path build)) { mkdir build }
-        cd build
-        $version = ${env:GITHUB_REF} -replace 'refs\/tags\/v', ''
-        echo "::set-output name=version::$version"
-        cmake -G "Visual Studio 15 2017 Win64" -DOPENGEODE_WITH_TESTS:BOOL=OFF -DINCLUDE_PYBIND11:BOOL=ON -DCPACK_PACKAGE_VERSION:STRING=$version -DCPACK_SYSTEM_NAME:STRING=win64 ..
-        cmake --build . --config Release
-        cmake --build . --target PACKAGE --config Release
-    - name: Upload
-      uses: geode-solutions/action-gh-release@master
-      with:
-        files: "build/OpenGeode-${{ steps.package.outputs.version }}-win64.zip"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Notify slack
-      if: failure()
-      uses: 8398a7/action-slack@v2
-      with:
-        status: failure
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
-  release-windows-wheel:
-    runs-on: windows-2016
-    strategy:
-      matrix:
-        config:
-        - {python: "3.6", tag: "cp36-cp36m"}
-        - {python: "3.7", tag: "cp37-cp37m"}
-        - {python: "3.8", tag: "cp38-cp38"}
-        - {python: "3.9", tag: "cp39-cp39"}
-        - {python: "3.10", tag: "cp310-cp310"}
-
-    steps:
-    - uses: actions/checkout@v1
-    - name: Set up Python ${{ matrix.config.python }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.config.python }}
-    - name: Generate package
-      id: package
-      run: |
-        pip install wheel
-        if(!(test-path build)) { mkdir build }
-        cd build
-        $version = ${env:GITHUB_REF} -replace 'refs\/tags\/v', ''
-        echo "::set-output name=version::$version"
-        cmake -G "Visual Studio 15 2017 Win64" -DOPENGEODE_WITH_PYTHON:BOOL=ON -DPYTHON_VERSION:STRING=${{ matrix.config.python }} -DOPENGEODE_WITH_TESTS:BOOL=OFF -DCMAKE_PACKAGE_VERSION:STRING=$version ..
-        cmake --build . --config Release
-        cd opengeode
-        cmake --build . --target wheel --config Release
-        mv wheel/dist/*.whl wheel/dist/OpenGeode_core-$version-${{ matrix.config.tag }}-win_amd64.whl
-    - name: PyPI
-      run: |
-        pip install twine
-        twine upload -u __token__ -p ${{ secrets.PYPI_TOKEN }} build/opengeode/wheel/dist/*
-    - name: Notify slack
-      if: failure()
-      uses: 8398a7/action-slack@v2
-      with:
-        status: failure
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  release-windows-python:
+    uses: Geode-solutions/actions/.github/workflows/cd-windows-python.yml@master
+    with:
+      name: OPENGEODE
+      directory: opengeode
+      package: OpenGeode_core
+    secrets:
+      TOKEN: ${{ secrets.TOKEN }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }} 

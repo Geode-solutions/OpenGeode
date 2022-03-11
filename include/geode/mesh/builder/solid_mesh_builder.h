@@ -180,6 +180,8 @@ namespace geode
         void update_polyhedron_info(
             index_t polyhedron_id, absl::Span< const index_t > vertices );
 
+        using VertexSetBuilder::delete_vertices;
+
     private:
         /*!
          * @brief Sets a point.

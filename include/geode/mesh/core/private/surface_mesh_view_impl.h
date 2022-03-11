@@ -26,7 +26,7 @@
 #include <geode/basic/attribute_manager.h>
 
 #include <geode/mesh/builder/surface_mesh_builder.h>
-#include <geode/mesh/core/detail/points_view_impl.h>
+#include <geode/mesh/core/private/points_view_impl.h>
 #include <geode/mesh/core/surface_mesh.h>
 
 namespace geode

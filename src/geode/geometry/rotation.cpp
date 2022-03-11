@@ -88,7 +88,7 @@ namespace geode
     Point3D opengeode_geometry_api rotate(
         const Point3D& point, const Vector3D& axis, double angle )
     {
-        OPENGEODE_EXCEPTION( axis.length2() > geode::global_epsilon2,
+        OPENGEODE_EXCEPTION( axis.length2() > geode::global_epsilon,
             "[rotate] Given axis is almost null" );
         while( angle < 0 )
         {

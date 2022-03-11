@@ -37,9 +37,9 @@
 
 #include <geode/mesh/builder/solid_mesh_builder.h>
 #include <geode/mesh/core/bitsery_archive.h>
-#include <geode/mesh/core/detail/facet_edges_impl.h>
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polyhedral_solid.h>
+#include <geode/mesh/core/private/facet_edges_impl.h>
 
 namespace
 {
@@ -105,10 +105,10 @@ namespace geode
     }
 
     template < index_t dimension >
-    bool SolidEdges< dimension >::isolated_edge( index_t edge_id ) const
+    bool SolidEdges< dimension >::is_edge_isolated( index_t edge_id ) const
     {
         check_edge_id( *this, edge_id );
-        return impl_->isolated_edge( edge_id );
+        return impl_->is_edge_isolated( edge_id );
     }
 
     template < index_t dimension >

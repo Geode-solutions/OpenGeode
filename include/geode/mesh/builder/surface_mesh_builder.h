@@ -178,6 +178,8 @@ namespace geode
 
         void copy( const SurfaceMesh< dimension >& surface_mesh );
 
+        using VertexSetBuilder::delete_vertices;
+
     private:
         virtual void do_set_point(
             index_t vertex_id, Point< dimension > point ) = 0;
