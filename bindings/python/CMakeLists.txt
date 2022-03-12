@@ -32,12 +32,13 @@ configure_file(
     setup.py
     ${PROJECT_BINARY_DIR}/wheel/setup.py
 )
-message(STATUS "PACKAGE_VERSION = ${PACKAGE_VERSION}")
+message(STATUS "WHEEL_VERSION = ${WHEEL_VERSION}")
+message(STATUS "WHEEL_PLATFORM = ${WHEEL_PLATFORM}")
 add_custom_target(wheel
     COMMAND ${CMAKE_COMMAND} 
         -DSOURCE_DIR="${CMAKE_INSTALL_PREFIX}"
         -DDEST_DIR="${CMAKE_BINARY_DIR}/wheel/opengeode"
         -P "${CMAKE_CURRENT_LIST_DIR}/copy_wheel.cmake"
-    COMMAND ${PYTHON_EXECUTABLE} setup.py bdist_wheel
+    COMMAND ${PYTHON_EXECUTABLE} setup.py bdist_wheel --plat-name ${WHEEL_PLATFORM}
     WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/wheel
 )

@@ -31,7 +31,7 @@ with open(path.join('${CMAKE_SOURCE_DIR}', 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='OpenGeode-core',
-    version='${PACKAGE_VERSION}',
+    version='${WHEEL_VERSION}',
     description='Open source framework for representing and manipulating geometric models',
     keywords=['brep', 'modeling', 'mesh', 'meshing'],
     long_description=long_description,
