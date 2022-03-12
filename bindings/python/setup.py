@@ -20,11 +20,19 @@
 
 from setuptools import setup, Extension
 from setuptools.dist import Distribution
+from setuptools.command.install import install
 from os import path
 
 class BinaryDistribution(Distribution):
-    def has_ext_modules(foo):
+    def has_ext_modules(self):
         return True
+    def is_pure(self):
+        return False
+        
+class InstallPlatlib(install):
+    def finalize_options(self):
+        install.finalize_options(self)
+        self.install_lib = self.install_platlib
 
 with open(path.join('${CMAKE_SOURCE_DIR}', 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
@@ -48,5 +56,6 @@ setup(
         'License :: OSI Approved :: MIT License'
     ],
     zip_safe=False,
-    distclass=BinaryDistribution
+    distclass=BinaryDistribution,
+    cmdclass={'install': InstallPlatlib}
 )
