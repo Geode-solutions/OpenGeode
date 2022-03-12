@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from setuptools import setup
+from setuptools import setup, Extension
 from os import path
 
 with open(path.join('${CMAKE_SOURCE_DIR}', 'README.md'), encoding='utf-8') as f:
@@ -42,5 +42,11 @@ setup(
     classifiers=[
         'License :: OSI Approved :: MIT License'
     ],
-    zip_safe=False
+    zip_safe=False,
+    ext_modules=[
+        Extension(
+            name='opengeode',
+            sources=[]
+        )
+    ]
 )
