@@ -19,14 +19,19 @@
 # SOFTWARE.
 
 from setuptools import setup, Extension
+from setuptools.dist import Distribution
 from os import path
+
+class BinaryDistribution(Distribution):
+    def has_ext_modules(foo):
+        return True
 
 with open(path.join('${CMAKE_SOURCE_DIR}', 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
     name='OpenGeode-core',
-    version='${CMAKE_PACKAGE_VERSION}',
+    version='${CMAKE_PROJECT_VERSION}',
     description='Open source framework for representing and manipulating geometric models',
     keywords=['brep', 'modeling', 'mesh', 'meshing'],
     long_description=long_description,
@@ -43,10 +48,5 @@ setup(
         'License :: OSI Approved :: MIT License'
     ],
     zip_safe=False,
-    ext_modules=[
-        Extension(
-            name='opengeode',
-            sources=[]
-        )
-    ]
+    distclass=BinaryDistribution
 )
