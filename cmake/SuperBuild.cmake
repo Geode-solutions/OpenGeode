@@ -44,6 +44,7 @@ if("${CMAKE_CXX_STANDARD}" STREQUAL "")
     set(CMAKE_CXX_STANDARD 11)
 endif()
 
+message(STATUS "PACKAGE_VERSION = ${PACKAGE_VERSION}")
 # Begin configuration of the superbuild project
 project(SuperBuild NONE)
 
