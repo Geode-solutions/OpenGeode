@@ -10,7 +10,6 @@ jobs:
     with:
       name: OPENGEODE
       directory: opengeode
-      package: OpenGeode
     secrets:
       TOKEN: ${{ secrets.TOKEN }}
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} 
@@ -20,7 +19,6 @@ jobs:
     with:
       name: OPENGEODE
       directory: opengeode
-      package: OpenGeode_core
     secrets:
       TOKEN: ${{ secrets.TOKEN }}
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} 
@@ -31,7 +29,6 @@ jobs:
     with:
       name: OPENGEODE
       directory: opengeode
-      package: OpenGeode
     secrets:
       TOKEN: ${{ secrets.TOKEN }}
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -41,7 +38,6 @@ jobs:
     with:
       name: OPENGEODE
       directory: opengeode
-      package: OpenGeode_core
     secrets:
       TOKEN: ${{ secrets.TOKEN }}
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
