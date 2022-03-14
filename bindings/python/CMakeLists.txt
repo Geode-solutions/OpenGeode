@@ -32,8 +32,6 @@ configure_file(
     setup.py
     ${PROJECT_BINARY_DIR}/wheel/setup.py
 )
-message(STATUS "WHEEL_VERSION = ${WHEEL_VERSION}")
-message(STATUS "WHEEL_PLATFORM = ${WHEEL_PLATFORM}")
 add_custom_target(wheel
     COMMAND ${CMAKE_COMMAND} 
         -DSOURCE_DIR="${CMAKE_INSTALL_PREFIX}"
