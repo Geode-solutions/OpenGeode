@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from setuptools import setup, Extension
+from setuptools import setup
 from setuptools.dist import Distribution
 from setuptools.command.install import install
 from os import path

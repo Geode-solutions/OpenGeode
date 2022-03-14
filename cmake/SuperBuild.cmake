@@ -44,8 +44,6 @@ if("${CMAKE_CXX_STANDARD}" STREQUAL "")
     set(CMAKE_CXX_STANDARD 11)
 endif()
 
-message(STATUS "WHEEL_VERSION = ${WHEEL_VERSION}")
-message(STATUS "WHEEL_PLATFORM = ${WHEEL_PLATFORM}")
 # Begin configuration of the superbuild project
 project(SuperBuild NONE)
 
