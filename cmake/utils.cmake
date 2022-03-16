@@ -340,7 +340,7 @@ function(add_geode_python_binding)
         ${ARGN}
     )
     pybind11_add_module(${GEODE_BINDING_NAME} 
-        SHARED SYSTEM "${GEODE_BINDING_SOURCES}"
+        SHARED "${GEODE_BINDING_SOURCES}"
     )
     add_library(${PROJECT_NAME}::${GEODE_BINDING_NAME} ALIAS ${GEODE_BINDING_NAME})
     target_link_libraries(${GEODE_BINDING_NAME} 
