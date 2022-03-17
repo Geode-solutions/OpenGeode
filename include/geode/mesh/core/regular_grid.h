@@ -170,7 +170,7 @@ namespace geode
          * cell indices are returned: they correspond the potential cells that
          * may contain the point.
          */
-        absl::optional< GridCellsAroundVertex< dimension > > cell(
+        GridCellsAroundVertex< dimension > cells(
             const Point< dimension >& query ) const;
 
         /*!

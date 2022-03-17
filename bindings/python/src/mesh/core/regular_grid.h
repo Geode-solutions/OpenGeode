@@ -68,7 +68,7 @@
         .def( "cell_vertex_indices",                                           \
             &RegularGrid##dimension##D::cell_vertex_indices )                  \
         .def( "point", &RegularGrid##dimension##D::point )                     \
-        .def( "cell", &RegularGrid##dimension##D::cell )                       \
+        .def( "cells", &RegularGrid##dimension##D::cells )                     \
         .def( "cell_barycenter", &RegularGrid##dimension##D::cell_barycenter ) \
         .def( "cell_attribute_manager",                                        \
             &RegularGrid##dimension##D::cell_attribute_manager,                \
