@@ -352,7 +352,7 @@ namespace geode
             return origin_ + translation;
         }
 
-        absl::optional< GridCellsAroundVertex< dimension > > cell(
+        GridCellsAroundVertex< dimension > cells(
             const Point< dimension >& query ) const
         {
             GridCellIndices< dimension > min;
@@ -361,11 +361,20 @@ namespace geode
             {
                 const auto value = ( query.value( d ) - origin_.value( d ) )
                                    / cells_length_[d];
-                if( value < 0 || value >= cells_number_[d] )
+                if( value < -global_epsilon
+                    || value > cells_number_[d] + global_epsilon )
                 {
-                    return absl::nullopt;
+                    return {};
                 }
-                const auto floating_floor = std::floor( value );
+                auto floating_floor = std::floor( value );
+                if( floating_floor < 0 )
+                {
+                    floating_floor = 0;
+                }
+                else if( floating_floor > cells_number_[d] - 1 )
+                {
+                    floating_floor = cells_number_[d] - 1;
+                }
                 const auto integer_floor =
                     static_cast< index_t >( floating_floor );
                 min[d] = integer_floor;
@@ -377,7 +386,8 @@ namespace geode
                 }
                 else if( remainder > 1 - global_epsilon )
                 {
-                    max[d] = std::min( integer_floor + 1, cells_number_[d] );
+                    max[d] =
+                        std::min( integer_floor + 1, cells_number_[d] - 1 );
                 }
             }
             GridCellsAroundVertex< dimension > cells_around_point;
@@ -621,10 +631,10 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::optional< GridCellsAroundVertex< dimension > >
-        RegularGrid< dimension >::cell( const Point< dimension >& query ) const
+    GridCellsAroundVertex< dimension > RegularGrid< dimension >::cells(
+        const Point< dimension >& query ) const
     {
-        return impl_->cell( query );
+        return impl_->cells( query );
     }
 
     template < index_t dimension >

@@ -205,20 +205,22 @@ void test_cell_geometry( const geode::RegularGrid3D& grid )
 
 void test_cell_query( const geode::RegularGrid3D& grid )
 {
-    OPENGEODE_EXCEPTION( !grid.cell( geode::Point3D( { 0, 0, 0 } ) ),
-        "[Test] Wrong query result" );
-    auto result = grid.cell( geode::Point3D( { 2, 2, 2 } ) ).value();
+    OPENGEODE_EXCEPTION(
+        grid.cells( geode::Point3D( { 0, 0, 0 } ) ).size() == 0,
+        "[Test] Wrong query result: point is shown inside of grid where it is "
+        "not." );
+    auto result = grid.cells( geode::Point3D( { 2, 2, 2 } ) );
     OPENGEODE_EXCEPTION(
         result.size() == 2
             && result.front() == geode::GridCellIndices3D( { 0, 0, 0 } )
             && result.back() == geode::GridCellIndices3D( { 0, 1, 0 } ),
         "[Test] Wrong query result" );
-    result = grid.cell( geode::Point3D( { 5, 7, 9 } ) ).value();
+    result = grid.cells( geode::Point3D( { 5, 7, 9 } ) );
     OPENGEODE_EXCEPTION(
         result.size() == 1
             && result.front() == geode::GridCellIndices3D( { 3, 3, 2 } ),
         "[Test] Wrong query result" );
-    result = grid.cell( geode::Point3D( { 4.5, 6, 7 - 1e-10 } ) ).value();
+    result = grid.cells( geode::Point3D( { 4.5, 6, 7 - 1e-10 } ) );
     OPENGEODE_EXCEPTION(
         result.size() == 8
             && result[0] == geode::GridCellIndices3D( { 2, 2, 1 } )
@@ -230,6 +232,18 @@ void test_cell_query( const geode::RegularGrid3D& grid )
             && result[6] == geode::GridCellIndices3D( { 2, 3, 2 } )
             && result[7] == geode::GridCellIndices3D( { 3, 3, 2 } ),
         "[Test] Wrong query result" );
+    result = grid.cells( geode::Point3D( { 1.5 - geode::global_epsilon / 2,
+        -geode::global_epsilon / 2, 1 - geode::global_epsilon / 2 } ) );
+    OPENGEODE_EXCEPTION(
+        result.size() == 1
+            && result.front() == geode::GridCellIndices3D( { 0, 0, 0 } ),
+        "[Test] Wrong query result for point near origin." );
+    result = grid.cells( geode::Point3D( { 6.5 + geode::global_epsilon / 2,
+        20 + geode::global_epsilon / 2, 46 + geode::global_epsilon / 2 } ) );
+    OPENGEODE_EXCEPTION(
+        result.size() == 1
+            && result.front() == geode::GridCellIndices3D( { 4, 9, 14 } ),
+        "[Test] Wrong query result for point near origin furthest corner." );
 }
 
 void test_boundary_box( const geode::RegularGrid3D& grid )
