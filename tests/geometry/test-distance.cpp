@@ -356,6 +356,9 @@ void test_segment_segment_distance_2d()
     const geode::Segment2D segment_ab{ a, b };
     const geode::Segment2D segment_dc{ d, c };
     const geode::Segment2D segment_gh{ g, h };
+    const geode::OwnerSegment2D owner_segment_ab{ a, b };
+    const geode::OwnerSegment2D owner_segment_dc{ d, c };
+    const geode::OwnerSegment2D owner_segment_gh{ g, h };
 
     double distance;
     geode::Point2D closest_point0;
@@ -385,6 +388,21 @@ void test_segment_segment_distance_2d()
         distance == 1. && closest_point0 == d && closest_point1 == g,
         "[Test] Wrong result for segment_segment_distance 2D with segment_dc "
         "and segment_gh" );
+
+    std::tie( distance, closest_point0, closest_point1 ) =
+        geode::segment_segment_distance( segment_dc, { owner_segment_gh } );
+    OPENGEODE_EXCEPTION(
+        distance == 1. && closest_point0 == d && closest_point1 == g,
+        "[Test] Wrong result for segment_segment_distance 2D with segment_dc "
+        "and owner_segment_gh" );
+
+    std::tie( distance, closest_point0, closest_point1 ) =
+        geode::segment_segment_distance(
+            geode::Segment2D{ owner_segment_dc }, { owner_segment_gh } );
+    OPENGEODE_EXCEPTION(
+        distance == 1. && closest_point0 == d && closest_point1 == g,
+        "[Test] Wrong result for segment_segment_distance 2D with "
+        "owner_segment_dc and owner_segment_gh" );
 }
 
 void test_segment_segment_distance_3d()

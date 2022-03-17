@@ -61,6 +61,16 @@ void test_segment()
     OPENGEODE_EXCEPTION(
         segment5.vertices()[0].get() == a && segment5.vertices()[1].get() == b,
         "[Test] Wrong result for segment5" );
+
+    geode::OwnerSegment2D segment6{ a, b };
+    OPENGEODE_EXCEPTION(
+        segment6.vertices()[0] == a && segment6.vertices()[1] == b,
+        "[Test] Wrong result for segment6" );
+
+    geode::OwnerSegment2D segment7{ segment6 };
+    OPENGEODE_EXCEPTION(
+        segment7.vertices()[0] == a && segment7.vertices()[1] == b,
+        "[Test] Wrong result for segment7" );
 }
 
 void test_line()
