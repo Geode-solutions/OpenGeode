@@ -101,35 +101,25 @@ namespace geode
                         std::reference_wrapper< const Point< dimension > >,
                         dimension >
     {
+        using Base =
+            GenericSegment< std::reference_wrapper< const Point< dimension > >,
+                dimension >;
+
     public:
         Segment( const Point< dimension >& p0, const Point< dimension >& p1 )
-            : GenericSegment<
-                std::reference_wrapper< const Point< dimension > >,
-                dimension >( p0, p1 )
+            : Base( p0, p1 )
         {
         }
-        Segment( const Segment< dimension >& other )
-            : GenericSegment<
-                std::reference_wrapper< const Point< dimension > >,
-                dimension >( other )
-        {
-        }
+        Segment( const Segment< dimension >& other ) : Base( other ) {}
         Segment< dimension >& operator=( const Segment< dimension >& other )
         {
-            GenericSegment< std::reference_wrapper< const Point< dimension > >,
-                dimension >::operator=( other );
+            Base::operator=( other );
             return *this;
         }
-        Segment( Segment< dimension >&& other )
-            : GenericSegment<
-                std::reference_wrapper< const Point< dimension > >,
-                dimension >( std::move( other ) )
-        {
-        }
+        Segment( Segment< dimension >&& other ) : Base( std::move( other ) ) {}
         Segment< dimension >& operator=( Segment< dimension >&& other )
         {
-            GenericSegment< std::reference_wrapper< const Point< dimension > >,
-                dimension >::operator=( other );
+            Base::operator=( other );
             return *this;
         }
     };
@@ -138,31 +128,31 @@ namespace geode
     template < index_t dimension >
     class OwnerSegment : public GenericSegment< Point< dimension >, dimension >
     {
+        using Base = GenericSegment< Point< dimension >, dimension >;
+
     public:
         OwnerSegment(
             const Point< dimension >& p0, const Point< dimension >& p1 )
-            : GenericSegment< Point< dimension >, dimension >( p0, p1 )
+            : Base( p0, p1 )
         {
         }
-        OwnerSegment( const OwnerSegment< dimension >& other )
-            : GenericSegment< Point< dimension >, dimension >( other )
+        OwnerSegment( const OwnerSegment< dimension >& other ) : Base( other )
         {
         }
         OwnerSegment< dimension >& operator=(
             const OwnerSegment< dimension >& other )
         {
-            GenericSegment< Point< dimension >, dimension >::operator=( other );
+            Base::operator=( other );
             return *this;
         }
         OwnerSegment( OwnerSegment< dimension >&& other )
-            : GenericSegment< Point< dimension >, dimension >(
-                std::move( other ) )
+            : Base( std::move( other ) )
         {
         }
         OwnerSegment< dimension >& operator=(
             OwnerSegment< dimension >&& other )
         {
-            GenericSegment< Point< dimension >, dimension >::operator=( other );
+            Base::operator=( other );
             return *this;
         }
     };
@@ -227,12 +217,14 @@ namespace geode
                              std::reference_wrapper< const Point< dimension > >,
                              dimension >
     {
+        using Base = GenericInfiniteLine<
+            std::reference_wrapper< const Point< dimension > >,
+            dimension >;
+
     public:
         InfiniteLine( const Vector< dimension >& direction,
             const Point< dimension >& origin )
-            : GenericInfiniteLine<
-                std::reference_wrapper< const Point< dimension > >,
-                dimension >( direction, origin )
+            : Base( direction, origin )
         {
         }
         InfiniteLine( const Segment< dimension >& segment )
@@ -240,32 +232,20 @@ namespace geode
                 segment.normalized_direction(), segment.vertices()[0] )
         {
         }
-        InfiniteLine( const InfiniteLine< dimension >& other )
-            : GenericInfiniteLine<
-                std::reference_wrapper< const Point< dimension > >,
-                dimension >( other )
+        InfiniteLine( const InfiniteLine< dimension >& other ) : Base( other )
         {
         }
         InfiniteLine< dimension >& operator=(
             const InfiniteLine< dimension >& other )
         {
-            GenericInfiniteLine<
-                std::reference_wrapper< const Point< dimension > >,
-                dimension >::operator=( other );
+            Base::operator=( other );
             return *this;
         }
-        InfiniteLine( InfiniteLine< dimension >&& other )
-            : GenericInfiniteLine<
-                std::reference_wrapper< const Point< dimension > >,
-                dimension >( other )
-        {
-        }
+        InfiniteLine( InfiniteLine< dimension >&& other ) : Base( other ) {}
         InfiniteLine< dimension >& operator=(
             InfiniteLine< dimension >&& other )
         {
-            GenericInfiniteLine<
-                std::reference_wrapper< const Point< dimension > >,
-                dimension >::operator=( other );
+            Base::operator=( other );
             return *this;
         }
     };
@@ -274,29 +254,72 @@ namespace geode
     using Ray = InfiniteLine< dimension >;
     ALIAS_2D_AND_3D( Ray );
 
-    class Plane
+    template < index_t dimension >
+    class OwnerInfiniteLine
+        : public GenericInfiniteLine< Point< dimension >, dimension >
+    {
+        using Base = GenericInfiniteLine< Point< dimension >, dimension >;
+
+    public:
+        OwnerInfiniteLine( const Vector< dimension >& direction,
+            const Point< dimension >& origin )
+            : Base( direction, origin )
+        {
+        }
+        OwnerInfiniteLine( const Segment< dimension >& segment )
+            : OwnerInfiniteLine(
+                segment.normalized_direction(), segment.vertices()[0] )
+        {
+        }
+        OwnerInfiniteLine( const InfiniteLine< dimension >& other )
+            : Base( other )
+        {
+        }
+        OwnerInfiniteLine< dimension >& operator=(
+            const OwnerInfiniteLine< dimension >& other )
+        {
+            Base::operator=( other );
+            return *this;
+        }
+        OwnerInfiniteLine( InfiniteLine< dimension >&& other ) : Base( other )
+        {
+        }
+        OwnerInfiniteLine< dimension >& operator=(
+            OwnerInfiniteLine< dimension >&& other )
+        {
+            Base::operator=( other );
+            return *this;
+        }
+    };
+    ALIAS_2D_AND_3D( OwnerInfiniteLine );
+    template < index_t dimension >
+    using OwnerRay = OwnerInfiniteLine< dimension >;
+    ALIAS_2D_AND_3D( OwnerRay );
+
+    template < typename PointType >
+    class GenericPlane
     {
     public:
-        Plane( const Vector3D& normal, const Point3D& origin )
+        GenericPlane( const Vector3D& normal, const Point3D& origin )
             : normal_( normal.normalize() ), origin_( origin )
         {
         }
-        Plane( const Plane& other )
+        GenericPlane( const GenericPlane& other )
             : normal_( other.normal_ ), origin_( other.origin_ )
         {
         }
-        Plane& operator=( const Plane& other )
+        GenericPlane& operator=( const GenericPlane& other )
         {
             normal_ = other.normal_;
             origin_ = other.origin_;
             return *this;
         }
-        Plane( Plane&& other )
+        GenericPlane( GenericPlane&& other )
             : normal_( std::move( other.normal_ ) ),
               origin_( std::move( other.origin_ ) )
         {
         }
-        Plane& operator=( Plane&& other )
+        GenericPlane& operator=( GenericPlane&& other )
         {
             normal_ = std::move( other.normal_ );
             origin_ = std::move( other.origin_ );
@@ -313,7 +336,7 @@ namespace geode
         double plane_constant() const
         {
             double plane_constant{ 0.0 };
-            for( const auto i : Range{ 3 } )
+            for( const auto i : LRange{ 3 } )
             {
                 plane_constant -= origin_.get().value( i ) * normal_.value( i );
             }
@@ -322,33 +345,81 @@ namespace geode
 
     private:
         Vector3D normal_;
-        std::reference_wrapper< const Point3D > origin_;
+        PointType origin_;
     };
 
-    template < index_t dimension >
-    class Triangle
+    class Plane : public GenericPlane< std::reference_wrapper< const Point3D > >
+    {
+        using Base = GenericPlane< std::reference_wrapper< const Point3D > >;
+
+    public:
+        Plane( const Vector3D& normal, const Point3D& origin )
+            : Base( normal, origin )
+        {
+        }
+        Plane( const Plane& other ) : Base( other ) {}
+        Plane& operator=( const Plane& other )
+        {
+            Base::operator=( other );
+            return *this;
+        }
+        Plane( Plane&& other ) : Base( other ) {}
+        Plane& operator=( Plane&& other )
+        {
+            Base::operator=( other );
+            return *this;
+        }
+    };
+
+    class OwnerPlane : public GenericPlane< Point3D >
+    {
+        using Base = GenericPlane< Point3D >;
+
+    public:
+        OwnerPlane( const Vector3D& normal, const Point3D& origin )
+            : Base( normal, origin )
+        {
+        }
+        OwnerPlane( const OwnerPlane& other ) : Base( other ) {}
+        OwnerPlane& operator=( const OwnerPlane& other )
+        {
+            Base::operator=( other );
+            return *this;
+        }
+        OwnerPlane( OwnerPlane&& other ) : Base( other ) {}
+        OwnerPlane& operator=( OwnerPlane&& other )
+        {
+            Base::operator=( other );
+            return *this;
+        }
+    };
+
+    template < typename PointType, index_t dimension >
+    class GenericTriangle
     {
     public:
-        Triangle( const Point< dimension >& p0,
+        GenericTriangle( const Point< dimension >& p0,
             const Point< dimension >& p1,
             const Point< dimension >& p2 )
             : vertices_{ { { p0 }, { p1 }, { p2 } } }
         {
         }
-        Triangle( const Triangle< dimension >& other )
+        GenericTriangle( const GenericTriangle< PointType, dimension >& other )
             : vertices_( other.vertices_ )
         {
         }
-        Triangle< dimension >& operator=( const Triangle< dimension >& other )
+        GenericTriangle< PointType, dimension >& operator=(
+            const GenericTriangle< PointType, dimension >& other )
         {
             vertices_ = other.vertices_;
             return *this;
         }
-        Triangle( Triangle< dimension >&& other )
+        GenericTriangle( GenericTriangle< PointType, dimension >&& other )
             : vertices_( std::move( other.vertices_ ) )
         {
         }
-        Triangle< dimension >& operator=( Triangle< dimension >&& other )
+        GenericTriangle< PointType, dimension >& operator=(
+            GenericTriangle< PointType, dimension >&& other )
         {
             vertices_ = std::move( other.vertices_ );
             return *this;
@@ -368,6 +439,11 @@ namespace geode
         }
         template < index_t T = dimension >
         typename std::enable_if< T == 3, Plane >::type plane() const
+        {
+            return { this->normal(), vertices_[0] };
+        }
+        template < index_t T = dimension >
+        typename std::enable_if< T == 3, OwnerPlane >::type owner_plane() const
         {
             return { this->normal(), vertices_[0] };
         }
@@ -410,45 +486,120 @@ namespace geode
             }
             return absl::nullopt;
         }
+        template < index_t T = dimension >
+        typename std::enable_if< T == 3, absl::optional< OwnerPlane > >::type
+            new_owner_plane() const
+        {
+            if( const auto triangle_normal = this->new_normal() )
+            {
+                return OwnerPlane{ triangle_normal.value(), vertices_[0] };
+            }
+            return absl::nullopt;
+        }
         void set_point( index_t vertex, const Point< dimension >& point )
         {
             vertices_.at( vertex ) = point;
         }
-        const std::array< std::reference_wrapper< const Point< dimension > >,
-            3 >&
-            vertices() const
+        const std::array< PointType, 3 >& vertices() const
         {
             return vertices_;
         }
 
     private:
-        std::array< std::reference_wrapper< const Point< dimension > >, 3 >
-            vertices_;
+        std::array< PointType, 3 > vertices_;
+    };
+
+    template < index_t dimension >
+    class Triangle : public GenericTriangle<
+                         std::reference_wrapper< const Point< dimension > >,
+                         dimension >
+    {
+        using Base =
+            GenericTriangle< std::reference_wrapper< const Point< dimension > >,
+                dimension >;
+
+    public:
+        Triangle( const Point< dimension >& p0,
+            const Point< dimension >& p1,
+            const Point< dimension >& p2 )
+            : Base( p0, p1, p2 )
+        {
+        }
+        Triangle( const Triangle< dimension >& other ) : Base( other ) {}
+        Triangle< dimension >& operator=( const Triangle< dimension >& other )
+        {
+            Base::operator=( other );
+            return *this;
+        }
+        Triangle( Triangle< dimension >&& other ) : Base( other ) {}
+        Triangle< dimension >& operator=( Triangle< dimension >&& other )
+        {
+            Base::operator=( other );
+            return *this;
+        }
     };
     ALIAS_2D_AND_3D( Triangle );
 
-    class Tetra
+    template < index_t dimension >
+    class OwnerTriangle
+        : public GenericTriangle< Point< dimension >, dimension >
+    {
+        using Base = GenericTriangle< Point< dimension >, dimension >;
+
+    public:
+        OwnerTriangle( const Point< dimension >& p0,
+            const Point< dimension >& p1,
+            const Point< dimension >& p2 )
+            : Base( p0, p1, p2 )
+        {
+        }
+        OwnerTriangle( const OwnerTriangle< dimension >& other ) : Base( other )
+        {
+        }
+        OwnerTriangle< dimension >& operator=(
+            const OwnerTriangle< dimension >& other )
+        {
+            Base::operator=( other );
+            return *this;
+        }
+        OwnerTriangle( OwnerTriangle< dimension >&& other ) : Base( other ) {}
+        OwnerTriangle< dimension >& operator=(
+            OwnerTriangle< dimension >&& other )
+        {
+            Base::operator=( other );
+            return *this;
+        }
+    };
+    ALIAS_2D_AND_3D( OwnerTriangle );
+
+    template < typename PointType >
+    class GenericTetra
     {
     public:
         static constexpr std::array< std::array< index_t, 3 >, 4 >
             tetra_facet_vertex{ { { { 1, 3, 2 } }, { { 0, 2, 3 } },
                 { { 3, 1, 0 } }, { { 0, 1, 2 } } } };
 
-        Tetra( const Point3D& p0,
+        GenericTetra( const Point3D& p0,
             const Point3D& p1,
             const Point3D& p2,
             const Point3D& p3 )
             : vertices_{ { { p0 }, { p1 }, { p2 }, { p3 } } }
         {
         }
-        Tetra( const Tetra& other ) : vertices_( other.vertices_ ) {}
-        Tetra& operator=( const Tetra& other )
+        GenericTetra( const GenericTetra& other ) : vertices_( other.vertices_ )
+        {
+        }
+        GenericTetra& operator=( const GenericTetra& other )
         {
             vertices_ = other.vertices_;
             return *this;
         }
-        Tetra( Tetra&& other ) : vertices_( std::move( other.vertices_ ) ) {}
-        Tetra& operator=( Tetra&& other )
+        GenericTetra( GenericTetra&& other )
+            : vertices_( std::move( other.vertices_ ) )
+        {
+        }
+        GenericTetra& operator=( GenericTetra&& other )
         {
             vertices_ = std::move( other.vertices_ );
             return *this;
@@ -463,40 +614,91 @@ namespace geode
         {
             vertices_.at( vertex ) = point;
         }
-        const std::array< std::reference_wrapper< const Point3D >, 4 >&
-            vertices() const
+        const std::array< PointType, 4 >& vertices() const
         {
             return vertices_;
         }
 
     private:
-        std::array< std::reference_wrapper< const Point3D >, 4 > vertices_;
+        std::array< PointType, 4 > vertices_;
     };
 
-    template < index_t dimension >
-    class Sphere
+    class Tetra : public GenericTetra< std::reference_wrapper< const Point3D > >
+    {
+        using Base = GenericTetra< std::reference_wrapper< const Point3D > >;
+
+    public:
+        Tetra( const Point3D& p0,
+            const Point3D& p1,
+            const Point3D& p2,
+            const Point3D& p3 )
+            : Base( p0, p1, p2, p3 )
+        {
+        }
+        Tetra( const Tetra& other ) : Base( other ) {}
+        Tetra& operator=( const Tetra& other )
+        {
+            Base::operator=( other );
+            return *this;
+        }
+        Tetra( Tetra&& other ) : Base( other ) {}
+        Tetra& operator=( Tetra&& other )
+        {
+            Base::operator=( other );
+            return *this;
+        }
+    };
+
+    class OwnerTetra : public GenericTetra< Point3D >
+    {
+        using Base = GenericTetra< Point3D >;
+
+    public:
+        OwnerTetra( const Point3D& p0,
+            const Point3D& p1,
+            const Point3D& p2,
+            const Point3D& p3 )
+            : Base( p0, p1, p2, p3 )
+        {
+        }
+        OwnerTetra( const OwnerTetra& other ) : Base( other ) {}
+        OwnerTetra& operator=( const OwnerTetra& other )
+        {
+            Base::operator=( other );
+            return *this;
+        }
+        OwnerTetra( OwnerTetra&& other ) : Base( other ) {}
+        OwnerTetra& operator=( OwnerTetra&& other )
+        {
+            Base::operator=( other );
+            return *this;
+        }
+    };
+
+    template < typename PointType, index_t dimension >
+    class GenericSphere
     {
     public:
-        Sphere( const Point< dimension >& origin, double radius )
+        GenericSphere( const Point< dimension >& origin, double radius )
             : origin_( origin ), radius_( std::move( radius ) )
         {
         }
-        Sphere( const Sphere& other )
+        GenericSphere( const GenericSphere& other )
             : origin_( other.origin_ ), radius_( other.radius_ )
         {
         }
-        Sphere& operator=( const Sphere& other )
+        GenericSphere& operator=( const GenericSphere& other )
         {
             origin_ = other.origin_;
             radius_ = other.radius_;
             return *this;
         }
-        Sphere( Sphere&& other )
+        GenericSphere( GenericSphere&& other )
             : origin_( std::move( other.origin_ ) ),
               radius_( std::move( other.radius_ ) )
         {
         }
-        Sphere& operator=( Sphere&& other )
+        GenericSphere& operator=( GenericSphere&& other )
         {
             origin_ = std::move( other.origin_ );
             radius_ = std::move( other.radius_ );
@@ -512,45 +714,102 @@ namespace geode
         }
 
     private:
-        std::reference_wrapper< const Point< dimension > > origin_;
+        PointType origin_;
         double radius_{ 0 };
     };
 
     template < index_t dimension >
-    using Ball = Sphere< dimension >;
+    class Sphere : public GenericSphere<
+                       std::reference_wrapper< const Point< dimension > >,
+                       dimension >
+    {
+        using Base =
+            GenericSphere< std::reference_wrapper< const Point< dimension > >,
+                dimension >;
 
+    public:
+        Sphere( const Point< dimension >& origin, double radius )
+            : Base( origin, radius )
+        {
+        }
+        Sphere( const Sphere& other ) : Base( other ) {}
+        Sphere& operator=( const Sphere& other )
+        {
+            Base::operator=( other );
+            return *this;
+        }
+        Sphere( Sphere&& other ) : Base( other ) {}
+        Sphere& operator=( Sphere&& other )
+        {
+            Base::operator=( other );
+            return *this;
+        }
+    };
+
+    template < index_t dimension >
+    using Ball = Sphere< dimension >;
     ALIAS_2D_AND_3D( Sphere );
     ALIAS_2D_AND_3D( Ball );
 
-    class Circle
+    template < index_t dimension >
+    class OwnerSphere : public GenericSphere< Point< dimension >, dimension >
+    {
+        using Base = GenericSphere< Point< dimension >, dimension >;
+
+    public:
+        OwnerSphere( const Point< dimension >& origin, double radius )
+            : Base( origin, radius )
+        {
+        }
+        OwnerSphere( const OwnerSphere& other ) : Base( other ) {}
+        OwnerSphere& operator=( const OwnerSphere& other )
+        {
+            Base::operator=( other );
+            return *this;
+        }
+        OwnerSphere( OwnerSphere&& other ) : Base( other ) {}
+        OwnerSphere& operator=( OwnerSphere&& other )
+        {
+            Base::operator=( other );
+            return *this;
+        }
+    };
+
+    template < index_t dimension >
+    using OwnerBall = OwnerSphere< dimension >;
+    ALIAS_2D_AND_3D( OwnerSphere );
+    ALIAS_2D_AND_3D( OwnerBall );
+
+    template < typename PointType >
+    class GenericCircle
     {
     public:
-        Circle( const Plane& plane, double radius )
+        GenericCircle( const GenericPlane< PointType >& plane, double radius )
             : plane_( plane ), radius_( std::move( radius ) )
         {
         }
-        Circle( const Circle& other )
+        GenericCircle( const GenericCircle& other )
             : plane_( other.plane_ ), radius_( other.radius_ )
         {
         }
-        Circle& operator=( const Circle& other )
+        GenericCircle& operator=( const GenericCircle& other )
         {
             plane_ = other.plane_;
             radius_ = other.radius_;
             return *this;
         }
-        Circle( Circle&& other )
+        GenericCircle( GenericCircle&& other )
             : plane_( std::move( other.plane_ ) ),
               radius_( std::move( other.radius_ ) )
         {
         }
-        Circle& operator=( Circle&& other )
+        GenericCircle& operator=( GenericCircle&& other )
         {
             plane_ = std::move( other.plane_ );
             radius_ = std::move( other.radius_ );
             return *this;
         }
-        const Plane& plane() const
+        const GenericPlane< PointType >& plane() const
         {
             return plane_;
         }
@@ -560,11 +819,55 @@ namespace geode
         }
 
     private:
-        std::reference_wrapper< const Plane > plane_;
+        GenericPlane< PointType > plane_;
         double radius_{ 0 };
     };
 
+    class Circle
+        : public GenericCircle< std::reference_wrapper< const Point3D > >
+    {
+        using Base = GenericCircle< std::reference_wrapper< const Point3D > >;
+
+    public:
+        Circle( const Plane& plane, double radius ) : Base( plane, radius ) {}
+        Circle( const Circle& other ) : Base( other ) {}
+        Circle& operator=( const Circle& other )
+        {
+            Base::operator=( other );
+            return *this;
+        }
+        Circle( Circle&& other ) : Base( other ) {}
+        Circle& operator=( Circle&& other )
+        {
+            Base::operator=( other );
+            return *this;
+        }
+    };
     using Disk = Circle;
+
+    class OwnerCircle : public GenericCircle< Point3D >
+    {
+        using Base = GenericCircle< Point3D >;
+
+    public:
+        OwnerCircle( const OwnerPlane& plane, double radius )
+            : Base( plane, radius )
+        {
+        }
+        OwnerCircle( const OwnerCircle& other ) : Base( other ) {}
+        OwnerCircle& operator=( const OwnerCircle& other )
+        {
+            Base::operator=( other );
+            return *this;
+        }
+        OwnerCircle( OwnerCircle&& other ) : Base( other ) {}
+        OwnerCircle& operator=( OwnerCircle&& other )
+        {
+            Base::operator=( other );
+            return *this;
+        }
+    };
+    using OwnerDisk = OwnerCircle;
 
     enum struct Side
     {

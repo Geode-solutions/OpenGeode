@@ -25,6 +25,13 @@
 
 namespace geode
 {
+    template < typename PointType >
     constexpr std::array< std::array< index_t, 3 >, 4 >
-        Tetra::tetra_facet_vertex;
+        GenericTetra< PointType >::tetra_facet_vertex;
+
+    template const std::array< std::array< index_t, 3 >, 4 > GenericTetra<
+        std::reference_wrapper< Point< 3 > const > >::tetra_facet_vertex;
+
+    template const std::array< std::array< index_t, 3 >, 4 >
+        GenericTetra< Point< 3 > >::tetra_facet_vertex;
 } // namespace geode
