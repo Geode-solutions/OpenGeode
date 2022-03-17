@@ -24,7 +24,7 @@ if sys.version_info >= (3,8,0) and platform.system() == "Windows":
     for path in [x.strip() for x in os.environ['PATH'].split(';') if x]:
         os.add_dll_directory(path)
 
-import opengeode_py_basic
+import opengeode_py_basic as geode
 import opengeode_py_geometry as geom
 import opengeode_py_mesh as mesh
 
@@ -151,17 +151,23 @@ def test_cell_geometry( grid ):
         raise ValueError( "[Test] Wrong point coordinates" )
 
 def test_cell_query( grid ):
-    if grid.cell( geom.Point3D( [ 0, 0, 0 ] ) ):
+    if grid.cells( geom.Point3D( [ 0, 0, 0 ] ) ):
         raise ValueError( "[Test] Wrong query result" )
-    result = grid.cell( geom.Point3D( [ 2, 2, 2 ] ) )
+    result = grid.cells( geom.Point3D( [ 2, 2, 2 ] ) )
     if len( result ) != 2 or result[0] != [ 0, 0, 0 ] or result[-1] != [ 0, 1, 0 ]:
         raise ValueError( "[Test] Wrong query result" )
-    result = grid.cell( geom.Point3D( [ 5, 7, 9 ] ) )
+    result = grid.cells( geom.Point3D( [ 5, 7, 9 ] ) )
     if len( result ) != 1 or result[0] != [ 3, 3, 2 ]:
         raise ValueError( "[Test] Wrong query result" )
-    result = grid.cell( geom.Point3D( [ 4.5, 6, 7 - 1e-10 ] ) )
+    result = grid.cells( geom.Point3D( [ 4.5, 6, 7 - 1e-10 ] ) )
     if len( result ) != 8 or result[0] != [ 2, 2, 1 ] or result[1] != [ 3, 2, 1 ] or result[2] != [ 2, 3, 1 ] or result[3] != [ 3, 3, 1 ] or result[4] != [ 2, 2, 2 ] or result[5] != [ 3, 2, 2 ] or result[6] != [ 2, 3, 2 ] or result[7] != [ 3, 3, 2 ]:
         raise ValueError( "[Test] Wrong query result" )
+    result = grid.cells( geom.Point3D( [ 1.5 - geode.global_epsilon / 2, -geode.global_epsilon / 2, 1 - geode.global_epsilon / 2 ] ) )
+    if len( result ) != 1 or result[0] != [ 0, 0, 0 ]:
+        raise ValueError( "[Test] Wrong query result for point near origin." )
+    result = grid.cells( geom.Point3D( [ 6.5 + geode.global_epsilon / 2, 20 + geode.global_epsilon / 2, 46 + geode.global_epsilon / 2 ] ) );
+    if len( result ) != 1 or result[0] != [ 4, 9, 14 ]:
+        raise ValueError( "[Test] Wrong query result for point near origin furthest corner." )
 
 def test_boundary_box( grid ):
     bbox = grid.bounding_box()
