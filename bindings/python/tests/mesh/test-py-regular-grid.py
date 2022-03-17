@@ -167,7 +167,7 @@ def test_cell_query( grid ):
         raise ValueError( "[Test] Wrong query result for point near origin." )
     result = grid.cells( geom.Point3D( [ 6.5 + geode.global_epsilon / 2, 20 + geode.global_epsilon / 2, 46 + geode.global_epsilon / 2 ] ) );
     if len( result ) != 1 or result[0] != [ 4, 9, 14 ]:
-        "[Test] Wrong query result for point near origin furthest corner." )
+        raise ValueError( "[Test] Wrong query result for point near origin furthest corner." )
 
 def test_boundary_box( grid ):
     bbox = grid.bounding_box()

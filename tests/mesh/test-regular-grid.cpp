@@ -205,8 +205,7 @@ void test_cell_geometry( const geode::RegularGrid3D& grid )
 
 void test_cell_query( const geode::RegularGrid3D& grid )
 {
-    OPENGEODE_EXCEPTION(
-        grid.cells( geode::Point3D( { 0, 0, 0 } ) ).size() == 0,
+    OPENGEODE_EXCEPTION( grid.cells( geode::Point3D( { 0, 0, 0 } ) ).empty(),
         "[Test] Wrong query result: point is shown inside of grid where it is "
         "not." );
     auto result = grid.cells( geode::Point3D( { 2, 2, 2 } ) );
