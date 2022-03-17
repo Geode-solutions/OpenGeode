@@ -34,28 +34,31 @@ namespace geode
 
 namespace geode
 {
-    template < index_t dimension >
-    class Segment
+    template < typename PointType, index_t dimension >
+    class GenericSegment
     {
     public:
-        Segment( const Point< dimension >& p0, const Point< dimension >& p1 )
+        GenericSegment(
+            const Point< dimension >& p0, const Point< dimension >& p1 )
             : vertices_{ { { p0 }, { p1 } } }
         {
         }
-        Segment( const Segment< dimension >& other )
+        GenericSegment( const GenericSegment< PointType, dimension >& other )
             : vertices_( other.vertices_ )
         {
         }
-        Segment< dimension >& operator=( const Segment< dimension >& other )
+        GenericSegment< PointType, dimension >& operator=(
+            const GenericSegment< PointType, dimension >& other )
         {
             vertices_ = other.vertices_;
             return *this;
         }
-        Segment( Segment< dimension >&& other )
+        GenericSegment( GenericSegment< PointType, dimension >&& other )
             : vertices_( std::move( other.vertices_ ) )
         {
         }
-        Segment< dimension >& operator=( Segment< dimension >&& other )
+        GenericSegment< PointType, dimension >& operator=(
+            GenericSegment< PointType, dimension >&& other )
         {
             vertices_ = std::move( other.vertices_ );
             return *this;
@@ -84,51 +87,122 @@ namespace geode
         {
             vertices_.at( vertex ) = point;
         }
-        const std::array< std::reference_wrapper< const Point< dimension > >,
-            2 >&
-            vertices() const
+        const std::array< PointType, 2 >& vertices() const
         {
             return vertices_;
         }
 
     private:
-        std::array< std::reference_wrapper< const Point< dimension > >, 2 >
-            vertices_;
+        std::array< PointType, 2 > vertices_;
+    };
+
+    template < index_t dimension >
+    class Segment : public GenericSegment<
+                        std::reference_wrapper< const Point< dimension > >,
+                        dimension >
+    {
+    public:
+        Segment( const Point< dimension >& p0, const Point< dimension >& p1 )
+            : GenericSegment<
+                std::reference_wrapper< const Point< dimension > >,
+                dimension >( p0, p1 )
+        {
+        }
+        Segment( const Segment< dimension >& other )
+            : GenericSegment<
+                std::reference_wrapper< const Point< dimension > >,
+                dimension >( other )
+        {
+        }
+        Segment< dimension >& operator=( const Segment< dimension >& other )
+        {
+            GenericSegment< std::reference_wrapper< const Point< dimension > >,
+                dimension >::operator=( other );
+            return *this;
+        }
+        Segment( Segment< dimension >&& other )
+            : GenericSegment<
+                std::reference_wrapper< const Point< dimension > >,
+                dimension >( std::move( other ) )
+        {
+        }
+        Segment< dimension >& operator=( Segment< dimension >&& other )
+        {
+            GenericSegment< std::reference_wrapper< const Point< dimension > >,
+                dimension >::operator=( other );
+            return *this;
+        }
     };
     ALIAS_2D_AND_3D( Segment );
 
     template < index_t dimension >
-    class InfiniteLine
+    class OwnerSegment : public GenericSegment< Point< dimension >, dimension >
     {
     public:
-        InfiniteLine( const Vector< dimension >& direction,
+        OwnerSegment(
+            const Point< dimension >& p0, const Point< dimension >& p1 )
+            : GenericSegment< Point< dimension >, dimension >( p0, p1 )
+        {
+        }
+        OwnerSegment( const OwnerSegment< dimension >& other )
+            : GenericSegment< Point< dimension >, dimension >( other )
+        {
+        }
+        OwnerSegment< dimension >& operator=(
+            const OwnerSegment< dimension >& other )
+        {
+            GenericSegment< Point< dimension >, dimension >::operator=( other );
+            return *this;
+        }
+        OwnerSegment( OwnerSegment< dimension >&& other )
+            : GenericSegment< Point< dimension >, dimension >(
+                std::move( other ) )
+        {
+        }
+        OwnerSegment< dimension >& operator=(
+            OwnerSegment< dimension >&& other )
+        {
+            GenericSegment< Point< dimension >, dimension >::operator=( other );
+            return *this;
+        }
+    };
+    ALIAS_2D_AND_3D( OwnerSegment );
+
+    template < typename PointType, index_t dimension >
+    class GenericInfiniteLine
+    {
+    public:
+        GenericInfiniteLine( const Vector< dimension >& direction,
             const Point< dimension >& origin )
             : origin_( origin ), direction_( direction.normalize() )
         {
         }
-        InfiniteLine( const Segment< dimension >& segment )
-            : InfiniteLine(
+        GenericInfiniteLine(
+            const GenericSegment< PointType, dimension >& segment )
+            : GenericInfiniteLine(
                 segment.normalized_direction(), segment.vertices()[0] )
         {
         }
-        InfiniteLine( const InfiniteLine< dimension >& other )
+        GenericInfiniteLine(
+            const GenericInfiniteLine< PointType, dimension >& other )
             : origin_( other.origin_ ), direction_( other.direction_ )
         {
         }
-        InfiniteLine< dimension >& operator=(
-            const InfiniteLine< dimension >& other )
+        GenericInfiniteLine< PointType, dimension >& operator=(
+            const GenericInfiniteLine< PointType, dimension >& other )
         {
             origin_ = other.origin_;
             direction_ = other.direction_;
             return *this;
         }
-        InfiniteLine( InfiniteLine< dimension >&& other )
+        GenericInfiniteLine(
+            GenericInfiniteLine< PointType, dimension >&& other )
             : origin_( std::move( other.origin_ ) ),
               direction_( std::move( other.direction_ ) )
         {
         }
-        InfiniteLine< dimension >& operator=(
-            InfiniteLine< dimension >&& other )
+        GenericInfiniteLine< PointType, dimension >& operator=(
+            GenericInfiniteLine< PointType, dimension >&& other )
         {
             origin_ = std::move( other.origin_ );
             direction_ = std::move( other.direction_ );
@@ -144,14 +218,60 @@ namespace geode
         }
 
     private:
-        std::reference_wrapper< const Point< dimension > > origin_;
+        PointType origin_;
         Vector< dimension > direction_;
     };
 
     template < index_t dimension >
-    using Ray = InfiniteLine< dimension >;
-
+    class InfiniteLine : public GenericInfiniteLine<
+                             std::reference_wrapper< const Point< dimension > >,
+                             dimension >
+    {
+    public:
+        InfiniteLine( const Vector< dimension >& direction,
+            const Point< dimension >& origin )
+            : GenericInfiniteLine<
+                std::reference_wrapper< const Point< dimension > >,
+                dimension >( direction, origin )
+        {
+        }
+        InfiniteLine( const Segment< dimension >& segment )
+            : InfiniteLine(
+                segment.normalized_direction(), segment.vertices()[0] )
+        {
+        }
+        InfiniteLine( const InfiniteLine< dimension >& other )
+            : GenericInfiniteLine<
+                std::reference_wrapper< const Point< dimension > >,
+                dimension >( other )
+        {
+        }
+        InfiniteLine< dimension >& operator=(
+            const InfiniteLine< dimension >& other )
+        {
+            GenericInfiniteLine<
+                std::reference_wrapper< const Point< dimension > >,
+                dimension >::operator=( other );
+            return *this;
+        }
+        InfiniteLine( InfiniteLine< dimension >&& other )
+            : GenericInfiniteLine<
+                std::reference_wrapper< const Point< dimension > >,
+                dimension >( other )
+        {
+        }
+        InfiniteLine< dimension >& operator=(
+            InfiniteLine< dimension >&& other )
+        {
+            GenericInfiniteLine<
+                std::reference_wrapper< const Point< dimension > >,
+                dimension >::operator=( other );
+            return *this;
+        }
+    };
     ALIAS_2D_AND_3D( InfiniteLine );
+    template < index_t dimension >
+    using Ray = InfiniteLine< dimension >;
     ALIAS_2D_AND_3D( Ray );
 
     class Plane
