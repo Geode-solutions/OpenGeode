@@ -49,8 +49,7 @@ namespace geode
     class DistanceToTriangle
     {
     public:
-        explicit DistanceToTriangle(
-            const TriangulatedSurface< dimension >& mesh )
+        DistanceToTriangle( const TriangulatedSurface< dimension >& mesh )
             : mesh_( mesh )
         {
         }
@@ -61,5 +60,5 @@ namespace geode
     private:
         const TriangulatedSurface< dimension >& mesh_;
     };
-
+    ALIAS_2D_AND_3D( DistanceToTriangle );
 } // namespace geode

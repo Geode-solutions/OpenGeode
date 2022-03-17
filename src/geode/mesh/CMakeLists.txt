@@ -238,4 +238,6 @@ add_geode_library(
         Bitsery::bitsery
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
+    PRIVATE_DEPENDENCIES
+        Async++
 )
