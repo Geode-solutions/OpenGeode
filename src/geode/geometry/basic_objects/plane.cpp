@@ -120,6 +120,6 @@ namespace geode
         return *this;
     }
 
-    template class opengeode_basic_api GenericPlane< Point< 3 > >;
-    template class opengeode_basic_api GenericPlane< RefPoint< 3 > >;
+    template class opengeode_geometry_api GenericPlane< Point< 3 > >;
+    template class opengeode_geometry_api GenericPlane< RefPoint< 3 > >;
 } // namespace geode

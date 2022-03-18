@@ -239,38 +239,38 @@ namespace geode
         return *this;
     }
 
-    template class opengeode_basic_api GenericTriangle< Point< 2 >, 2 >;
-    template class opengeode_basic_api GenericTriangle< Point< 3 >, 3 >;
-    template class opengeode_basic_api GenericTriangle< RefPoint< 2 >, 2 >;
-    template class opengeode_basic_api GenericTriangle< RefPoint< 3 >, 3 >;
-    template class opengeode_basic_api OwnerTriangle< 2 >;
-    template class opengeode_basic_api OwnerTriangle< 3 >;
-    template class opengeode_basic_api Triangle< 2 >;
-    template class opengeode_basic_api Triangle< 3 >;
+    template class opengeode_geometry_api GenericTriangle< Point< 2 >, 2 >;
+    template class opengeode_geometry_api GenericTriangle< Point< 3 >, 3 >;
+    template class opengeode_geometry_api GenericTriangle< RefPoint< 2 >, 2 >;
+    template class opengeode_geometry_api GenericTriangle< RefPoint< 3 >, 3 >;
+    template class opengeode_geometry_api OwnerTriangle< 2 >;
+    template class opengeode_geometry_api OwnerTriangle< 3 >;
+    template class opengeode_geometry_api Triangle< 2 >;
+    template class opengeode_geometry_api Triangle< 3 >;
 
-    template opengeode_basic_api Vector3D
+    template opengeode_geometry_api Vector3D
         GenericTriangle< Point< 3 >, 3 >::normal< 3 >() const;
-    template opengeode_basic_api Plane
+    template opengeode_geometry_api Plane
         GenericTriangle< Point< 3 >, 3 >::plane< 3 >() const;
-    template opengeode_basic_api OwnerPlane
+    template opengeode_geometry_api OwnerPlane
         GenericTriangle< Point< 3 >, 3 >::owner_plane< 3 >() const;
-    template opengeode_basic_api absl::optional< Vector3D >
+    template opengeode_geometry_api absl::optional< Vector3D >
         GenericTriangle< Point< 3 >, 3 >::new_normal< 3 >() const;
-    template opengeode_basic_api absl::optional< Plane >
+    template opengeode_geometry_api absl::optional< Plane >
         GenericTriangle< Point< 3 >, 3 >::new_plane< 3 >() const;
-    template opengeode_basic_api absl::optional< OwnerPlane >
+    template opengeode_geometry_api absl::optional< OwnerPlane >
         GenericTriangle< Point< 3 >, 3 >::new_owner_plane< 3 >() const;
 
-    template opengeode_basic_api Vector3D
+    template opengeode_geometry_api Vector3D
         GenericTriangle< RefPoint< 3 >, 3 >::normal< 3 >() const;
-    template opengeode_basic_api Plane
+    template opengeode_geometry_api Plane
         GenericTriangle< RefPoint< 3 >, 3 >::plane< 3 >() const;
-    template opengeode_basic_api OwnerPlane
+    template opengeode_geometry_api OwnerPlane
         GenericTriangle< RefPoint< 3 >, 3 >::owner_plane< 3 >() const;
-    template opengeode_basic_api absl::optional< Vector3D >
+    template opengeode_geometry_api absl::optional< Vector3D >
         GenericTriangle< RefPoint< 3 >, 3 >::new_normal< 3 >() const;
-    template opengeode_basic_api absl::optional< Plane >
+    template opengeode_geometry_api absl::optional< Plane >
         GenericTriangle< RefPoint< 3 >, 3 >::new_plane< 3 >() const;
-    template opengeode_basic_api absl::optional< OwnerPlane >
+    template opengeode_geometry_api absl::optional< OwnerPlane >
         GenericTriangle< RefPoint< 3 >, 3 >::new_owner_plane< 3 >() const;
 } // namespace geode
