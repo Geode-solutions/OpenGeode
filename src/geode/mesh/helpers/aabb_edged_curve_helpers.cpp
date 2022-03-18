@@ -30,7 +30,7 @@
 #include <geode/mesh/helpers/aabb_edged_curve_helpers.h>
 
 #include <geode/geometry/aabb.h>
-#include <geode/geometry/basic_objects.h>
+#include <geode/geometry/basic_objects/segment.h>
 #include <geode/geometry/distance.h>
 #include <geode/geometry/point.h>
 #include <geode/geometry/vector.h>

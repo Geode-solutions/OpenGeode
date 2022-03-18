@@ -23,7 +23,9 @@
 
 #include <geode/geometry/barycentric_coordinates.h>
 
-#include <geode/geometry/basic_objects.h>
+#include <geode/geometry/basic_objects/segment.h>
+#include <geode/geometry/basic_objects/tetra.h>
+#include <geode/geometry/basic_objects/triangle.h>
 #include <geode/geometry/signed_mensuration.h>
 
 namespace geode

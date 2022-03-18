@@ -23,7 +23,13 @@
 
 #include <geode/geometry/distance.h>
 
-#include <geode/geometry/basic_objects.h>
+#include <geode/geometry/basic_objects/circle.h>
+#include <geode/geometry/basic_objects/infinite_line.h>
+#include <geode/geometry/basic_objects/plane.h>
+#include <geode/geometry/basic_objects/segment.h>
+#include <geode/geometry/basic_objects/sphere.h>
+#include <geode/geometry/basic_objects/tetra.h>
+#include <geode/geometry/basic_objects/triangle.h>
 #include <geode/geometry/perpendicular.h>
 #include <geode/geometry/projection.h>
 #include <geode/geometry/signed_mensuration.h>

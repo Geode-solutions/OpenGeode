@@ -33,7 +33,7 @@
 #include <geode/basic/detail/mapping_after_deletion.h>
 #include <geode/basic/pimpl_impl.h>
 
-#include <geode/geometry/basic_objects.h>
+#include <geode/geometry/basic_objects/triangle.h>
 #include <geode/geometry/bounding_box.h>
 #include <geode/geometry/distance.h>
 

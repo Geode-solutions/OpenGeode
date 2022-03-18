@@ -23,7 +23,8 @@
 
 #include <geode/geometry/signed_mensuration.h>
 
-#include <geode/geometry/basic_objects.h>
+#include <geode/geometry/basic_objects/tetra.h>
+#include <geode/geometry/basic_objects/triangle.h>
 #include <geode/geometry/perpendicular.h>
 
 namespace geode

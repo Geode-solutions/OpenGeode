@@ -21,25 +21,47 @@
  *
  */
 
-#include <geode/geometry/basic_objects/triangle.h>
-#include <geode/mesh/core/triangulated_surface.h>
-
-#define PYTHON_TRIANGULATED_SURFACE( dimension )                               \
-    const auto name##dimension =                                               \
-        "TriangulatedSurface" + std::to_string( dimension ) + "D";             \
-    pybind11::class_< TriangulatedSurface##dimension##D,                       \
-        SurfaceMesh##dimension##D >( module, name##dimension.c_str() )         \
-        .def_static( "create",                                                 \
-            ( std::unique_ptr< TriangulatedSurface##dimension##D >( * )() )    \
-                & TriangulatedSurface##dimension##D::create )                  \
-        .def( "clone", &TriangulatedSurface##dimension##D::clone )             \
-        .def( "triangle", &TriangulatedSurface##dimension##D::triangle )
+#pragma once
 
 namespace geode
 {
-    void define_triangulated_surface( pybind11::module& module )
+    enum struct Side
     {
-        PYTHON_TRIANGULATED_SURFACE( 2 );
-        PYTHON_TRIANGULATED_SURFACE( 3 );
-    }
+        positive,
+        negative,
+        zero
+    };
+
+    using Sign = Side;
+
+    enum struct Position
+    {
+        // Strictly outside
+        outside,
+        // Strictly inside
+        inside,
+        // Vertices
+        vertex0,
+        vertex1,
+        vertex2,
+        vertex3,
+        // Three edges of a triangle
+        edge0,
+        edge1,
+        edge2,
+        // Six edges of a tetra
+        edge01,
+        edge02,
+        edge03,
+        edge12,
+        edge13,
+        edge23,
+        // Four facets of a tetra
+        facet0,
+        facet1,
+        facet2,
+        facet3,
+        // Parallel or coplanar configuration
+        parallel
+    };
 } // namespace geode
