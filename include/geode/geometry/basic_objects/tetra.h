@@ -39,7 +39,6 @@ namespace geode
 
 namespace geode
 {
-
     template < typename PointType >
     class GenericTetra
     {

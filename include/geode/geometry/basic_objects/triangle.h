@@ -40,7 +40,6 @@ namespace geode
 
 namespace geode
 {
-
     template < typename PointType, index_t dimension >
     class GenericTriangle
     {
