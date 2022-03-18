@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/geometry/basic_objects.h>
+#include <geode/geometry/basic_objects/segment.h>
 #include <geode/mesh/core/edged_curve.h>
 
 #define PYTHON_EDGED_CURVE( dimension )                                        \

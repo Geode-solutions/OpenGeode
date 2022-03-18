@@ -21,7 +21,8 @@
  *
  */
 
-#include <geode/geometry/basic_objects.h>
+#include <geode/geometry/basic_objects/tetra.h>
+#include <geode/geometry/basic_objects/triangle.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
 
 #define PYTHON_TETRAHEDRAL_SOLID( dimension )                                  \

@@ -23,7 +23,7 @@
 
 #include <geode/mesh/core/triangulated_surface.h>
 
-#include <geode/geometry/basic_objects.h>
+#include <geode/geometry/basic_objects/triangle.h>
 
 #include <geode/mesh/builder/triangulated_surface_builder.h>
 #include <geode/mesh/core/mesh_factory.h>

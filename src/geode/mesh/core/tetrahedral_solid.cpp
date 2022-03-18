@@ -23,7 +23,8 @@
 
 #include <geode/mesh/core/tetrahedral_solid.h>
 
-#include <geode/geometry/basic_objects.h>
+#include <geode/geometry/basic_objects/tetra.h>
+#include <geode/geometry/basic_objects/triangle.h>
 
 #include <geode/mesh/builder/tetrahedral_solid_builder.h>
 #include <geode/mesh/core/detail/geode_elements.h>

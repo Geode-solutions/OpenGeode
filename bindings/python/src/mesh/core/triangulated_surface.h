@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/geometry/basic_objects.h>
+#include <geode/geometry/basic_objects/triangle.h>
 #include <geode/mesh/core/triangulated_surface.h>
 
 #define PYTHON_TRIANGULATED_SURFACE( dimension )                               \

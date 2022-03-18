@@ -21,10 +21,47 @@
  *
  */
 
-#include <geode/geometry/basic_objects.h>
+#pragma once
 
 namespace geode
 {
-    constexpr std::array< std::array< index_t, 3 >, 4 >
-        Tetra::tetra_facet_vertex;
+    enum struct Side
+    {
+        positive,
+        negative,
+        zero
+    };
+
+    using Sign = Side;
+
+    enum struct Position
+    {
+        // Strictly outside
+        outside,
+        // Strictly inside
+        inside,
+        // Vertices
+        vertex0,
+        vertex1,
+        vertex2,
+        vertex3,
+        // Three edges of a triangle
+        edge0,
+        edge1,
+        edge2,
+        // Six edges of a tetra
+        edge01,
+        edge02,
+        edge03,
+        edge12,
+        edge13,
+        edge23,
+        // Four facets of a tetra
+        facet0,
+        facet1,
+        facet2,
+        facet3,
+        // Parallel or coplanar configuration
+        parallel
+    };
 } // namespace geode
