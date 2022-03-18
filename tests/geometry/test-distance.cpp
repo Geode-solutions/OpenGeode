@@ -396,15 +396,15 @@ void test_segment_segment_distance_2d()
         "and segment_gh" );
 
     std::tie( distance, closest_point0, closest_point1 ) =
-        geode::segment_segment_distance( segment_dc, { owner_segment_gh } );
+        geode::segment_segment_distance< 2 >( segment_dc, owner_segment_gh );
     OPENGEODE_EXCEPTION(
         distance == 1. && closest_point0 == d && closest_point1 == g,
         "[Test] Wrong result for segment_segment_distance 2D with segment_dc "
         "and owner_segment_gh" );
 
     std::tie( distance, closest_point0, closest_point1 ) =
-        geode::segment_segment_distance(
-            geode::Segment2D{ owner_segment_dc }, { owner_segment_gh } );
+        geode::segment_segment_distance< 2 >(
+            owner_segment_dc, owner_segment_gh );
     OPENGEODE_EXCEPTION(
         distance == 1. && closest_point0 == d && closest_point1 == g,
         "[Test] Wrong result for segment_segment_distance 2D with "
