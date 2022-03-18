@@ -130,11 +130,13 @@ namespace geode
     template < typename PointType >
     constexpr std::array< std::array< index_t, 3 >, 4 >
         GenericTetra< PointType >::tetra_facet_vertex;
-    template const std::array< std::array< index_t, 3 >, 4 >
-        GenericTetra< RefPoint< 3 > >::tetra_facet_vertex;
-    template const std::array< std::array< index_t, 3 >, 4 >
-        GenericTetra< Point< 3 > >::tetra_facet_vertex;
+    template opengeode_geometry_api const
+        std::array< std::array< index_t, 3 >, 4 >
+            GenericTetra< RefPoint< 3 > >::tetra_facet_vertex;
+    template opengeode_geometry_api const
+        std::array< std::array< index_t, 3 >, 4 >
+            GenericTetra< Point< 3 > >::tetra_facet_vertex;
 
-    template class opengeode_basic_api GenericTetra< Point< 3 > >;
-    template class opengeode_basic_api GenericTetra< RefPoint< 3 > >;
+    template class opengeode_geometry_api GenericTetra< Point< 3 > >;
+    template class opengeode_geometry_api GenericTetra< RefPoint< 3 > >;
 } // namespace geode

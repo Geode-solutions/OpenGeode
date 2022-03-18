@@ -62,7 +62,7 @@ namespace geode
         double radius_{ 0 };
     };
 
-    class opengeode_basic_api OwnerCircle : public GenericCircle< Point3D >
+    class opengeode_geometry_api OwnerCircle : public GenericCircle< Point3D >
     {
         using Base = GenericCircle< Point3D >;
 
@@ -76,7 +76,7 @@ namespace geode
     };
     using OwnerDisk = OwnerCircle;
 
-    class opengeode_basic_api Circle : public GenericCircle< RefPoint3D >
+    class opengeode_geometry_api Circle : public GenericCircle< RefPoint3D >
     {
         using Base = GenericCircle< RefPoint3D >;
 

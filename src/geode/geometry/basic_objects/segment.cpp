@@ -179,12 +179,12 @@ namespace geode
         return *this;
     }
 
-    template class opengeode_basic_api GenericSegment< Point< 2 >, 2 >;
-    template class opengeode_basic_api GenericSegment< Point< 3 >, 3 >;
-    template class opengeode_basic_api GenericSegment< RefPoint< 2 >, 2 >;
-    template class opengeode_basic_api GenericSegment< RefPoint< 3 >, 3 >;
-    template class opengeode_basic_api OwnerSegment< 2 >;
-    template class opengeode_basic_api OwnerSegment< 3 >;
-    template class opengeode_basic_api Segment< 2 >;
-    template class opengeode_basic_api Segment< 3 >;
+    template class opengeode_geometry_api GenericSegment< Point< 2 >, 2 >;
+    template class opengeode_geometry_api GenericSegment< Point< 3 >, 3 >;
+    template class opengeode_geometry_api GenericSegment< RefPoint< 2 >, 2 >;
+    template class opengeode_geometry_api GenericSegment< RefPoint< 3 >, 3 >;
+    template class opengeode_geometry_api OwnerSegment< 2 >;
+    template class opengeode_geometry_api OwnerSegment< 3 >;
+    template class opengeode_geometry_api Segment< 2 >;
+    template class opengeode_geometry_api Segment< 3 >;
 } // namespace geode

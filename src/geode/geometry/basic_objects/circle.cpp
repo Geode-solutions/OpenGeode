@@ -110,6 +110,6 @@ namespace geode
         return *this;
     }
 
-    template class opengeode_basic_api GenericCircle< Point< 3 > >;
-    template class opengeode_basic_api GenericCircle< RefPoint< 3 > >;
+    template class opengeode_geometry_api GenericCircle< Point< 3 > >;
+    template class opengeode_geometry_api GenericCircle< RefPoint< 3 > >;
 } // namespace geode

@@ -61,7 +61,7 @@ namespace geode
         PointType origin_;
     };
 
-    class opengeode_basic_api OwnerPlane : public GenericPlane< Point3D >
+    class opengeode_geometry_api OwnerPlane : public GenericPlane< Point3D >
     {
         using Base = GenericPlane< Point3D >;
 
@@ -73,7 +73,7 @@ namespace geode
         OwnerPlane& operator=( OwnerPlane&& other );
     };
 
-    class opengeode_basic_api Plane : public GenericPlane< RefPoint3D >
+    class opengeode_geometry_api Plane : public GenericPlane< RefPoint3D >
     {
         using Base = GenericPlane< RefPoint3D >;
 

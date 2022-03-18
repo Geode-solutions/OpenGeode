@@ -68,7 +68,7 @@ namespace geode
         std::array< PointType, 4 > vertices_;
     };
 
-    class opengeode_basic_api OwnerTetra : public GenericTetra< Point3D >
+    class opengeode_geometry_api OwnerTetra : public GenericTetra< Point3D >
     {
         using Base = GenericTetra< Point3D >;
 
@@ -84,7 +84,7 @@ namespace geode
         OwnerTetra& operator=( OwnerTetra&& other );
     };
 
-    class opengeode_basic_api Tetra : public GenericTetra< RefPoint3D >
+    class opengeode_geometry_api Tetra : public GenericTetra< RefPoint3D >
     {
         using Base = GenericTetra< RefPoint3D >;
 
