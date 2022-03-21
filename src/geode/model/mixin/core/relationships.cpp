@@ -359,13 +359,6 @@ namespace geode
                                 bitsery::ext::StdSmartPtr{} );
                             a.ext( impl.ids_, bitsery::ext::StdSmartPtr{} );
                             impl.delete_isolated_vertices();
-                        },
-                        []( Archive& a, Impl& impl ) {
-                            a.ext( impl.graph_, bitsery::ext::StdSmartPtr{} );
-                            a.object( impl.uuid2index_ );
-                            a.ext( impl.relation_type_,
-                                bitsery::ext::StdSmartPtr{} );
-                            a.ext( impl.ids_, bitsery::ext::StdSmartPtr{} );
                         } } } );
         }
 
@@ -415,6 +408,13 @@ namespace geode
         {
             auto builder = GraphBuilder::create( *graph_ );
             const auto old2new = builder->delete_isolated_vertices();
+            for( const auto v : Indices{ old2new } )
+            {
+                if( old2new[v] == NO_ID )
+                {
+                    uuid2index_.erase( v );
+                }
+            }
             uuid2index_.update( old2new );
         }
 

@@ -57,6 +57,18 @@ namespace geode
                 uuid2index_.erase( id );
             }
 
+            void erase( index_t index )
+            {
+                for( auto& it : uuid2index_ )
+                {
+                    if( it.second == index )
+                    {
+                        uuid2index_.erase( it.first );
+                        return;
+                    }
+                }
+            }
+
             void set_new_mapping( const uuid& id, const index_t index )
             {
                 uuid2index_[id] = index;
