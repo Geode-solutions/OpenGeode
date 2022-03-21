@@ -205,6 +205,12 @@ void test_cell_geometry( const geode::RegularGrid3D& grid )
 
 void test_cell_query( const geode::RegularGrid3D& grid )
 {
+    OPENGEODE_EXCEPTION( !grid.contains( geode::Point3D( { 0, 0, 0 } ) ),
+        "[Test] Wrong result on contain: point is shown inside of grid where "
+        "it is not." );
+    OPENGEODE_EXCEPTION( !grid.contains( geode::Point3D( { 1.5, 0, 0 } ) ),
+        "[Test] Wrong result on contain: point is shown inside of grid where "
+        "it is not." );
     OPENGEODE_EXCEPTION( grid.cells( geode::Point3D( { 0, 0, 0 } ) ).empty(),
         "[Test] Wrong query result: point is shown inside of grid where it is "
         "not." );
@@ -231,14 +237,22 @@ void test_cell_query( const geode::RegularGrid3D& grid )
             && result[6] == geode::GridCellIndices3D( { 2, 3, 2 } )
             && result[7] == geode::GridCellIndices3D( { 3, 3, 2 } ),
         "[Test] Wrong query result" );
-    result = grid.cells( geode::Point3D( { 1.5 - geode::global_epsilon / 2,
-        -geode::global_epsilon / 2, 1 - geode::global_epsilon / 2 } ) );
+    geode::Point3D near_origin_point{ { 1.5 - geode::global_epsilon / 2,
+        -geode::global_epsilon / 2, 1 - geode::global_epsilon / 2 } };
+    OPENGEODE_EXCEPTION( grid.contains( near_origin_point ),
+        "[Test] Wrong result on contain: point is shown outside of grid when "
+        "it should be inside." );
+    result = grid.cells( near_origin_point );
     OPENGEODE_EXCEPTION(
         result.size() == 1
             && result.front() == geode::GridCellIndices3D( { 0, 0, 0 } ),
         "[Test] Wrong query result for point near origin." );
-    result = grid.cells( geode::Point3D( { 6.5 + geode::global_epsilon / 2,
-        20 + geode::global_epsilon / 2, 46 + geode::global_epsilon / 2 } ) );
+    geode::Point3D grid_furthest_point{ { 6.5 + geode::global_epsilon / 2,
+        20 + geode::global_epsilon / 2, 46 + geode::global_epsilon / 2 } };
+    OPENGEODE_EXCEPTION( grid.contains( grid_furthest_point ),
+        "[Test] Wrong result on contain: point is shown outside of grid when "
+        "it should be inside." );
+    result = grid.cells( grid_furthest_point );
     OPENGEODE_EXCEPTION(
         result.size() == 1
             && result.front() == geode::GridCellIndices3D( { 4, 9, 14 } ),

@@ -352,6 +352,20 @@ namespace geode
             return origin_ + translation;
         }
 
+        bool contains( const Point< dimension >& query ) const
+        {
+            for( const auto d : LRange{ dimension } )
+            {
+                const auto value = point_local_grid_coordinate( query, d );
+                if( value < -global_epsilon
+                    || value > cells_number_[d] + global_epsilon )
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         GridCellsAroundVertex< dimension > cells(
             const Point< dimension >& query ) const
         {
@@ -359,8 +373,7 @@ namespace geode
             GridCellIndices< dimension > max;
             for( const auto d : LRange{ dimension } )
             {
-                const auto value = ( query.value( d ) - origin_.value( d ) )
-                                   / cells_length_[d];
+                const auto value = point_local_grid_coordinate( query, d );
                 if( value < -global_epsilon
                     || value > cells_number_[d] + global_epsilon )
                 {
@@ -425,6 +438,13 @@ namespace geode
                 nb_vertices *= c + 1;
             }
             vertex_attribute_manager_.resize( nb_vertices );
+        }
+
+        double point_local_grid_coordinate(
+            const geode::Point< dimension >& query, local_index_t axis ) const
+        {
+            return ( query.value( axis ) - origin_.value( axis ) )
+                   / cells_length_[axis];
         }
 
         friend class bitsery::Access;
@@ -628,6 +648,13 @@ namespace geode
         const GridVertexIndices< dimension >& vertex_index ) const
     {
         return impl_->is_vertex_on_border( vertex_index );
+    }
+
+    template < index_t dimension >
+    bool RegularGrid< dimension >::contains(
+        const Point< dimension >& query ) const
+    {
+        return impl_->contains( query );
     }
 
     template < index_t dimension >

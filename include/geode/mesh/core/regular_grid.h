@@ -162,6 +162,12 @@ namespace geode
             const GridCellIndices< dimension >& index ) const;
 
         /*!
+         * Returns if the query point is inside the grid, up to a global_epsilon
+         * away from the grid bounding box.
+         */
+        bool contains( const Point< dimension >& query ) const;
+
+        /*!
          * Return the cell(s) containing the query point
          * @param[in] query Position of point
          * @return No, one index or several cell indices that contain the query
