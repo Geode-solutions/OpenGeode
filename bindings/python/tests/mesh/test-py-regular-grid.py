@@ -151,7 +151,10 @@ def test_cell_geometry( grid ):
         raise ValueError( "[Test] Wrong point coordinates" )
 
 def test_cell_query( grid ):
-    if grid.cells( geom.Point3D( [ 0, 0, 0 ] ) ):
+    global_origin_point = geom.Point3D( [ 0, 0, 0 ] )
+    if grid.contains( global_origin_point ):
+        raise ValueError( "[Test] Wrong query result on contains" )
+    if grid.cells( global_origin_point ):
         raise ValueError( "[Test] Wrong query result" )
     result = grid.cells( geom.Point3D( [ 2, 2, 2 ] ) )
     if len( result ) != 2 or result[0] != [ 0, 0, 0 ] or result[-1] != [ 0, 1, 0 ]:
@@ -162,10 +165,16 @@ def test_cell_query( grid ):
     result = grid.cells( geom.Point3D( [ 4.5, 6, 7 - 1e-10 ] ) )
     if len( result ) != 8 or result[0] != [ 2, 2, 1 ] or result[1] != [ 3, 2, 1 ] or result[2] != [ 2, 3, 1 ] or result[3] != [ 3, 3, 1 ] or result[4] != [ 2, 2, 2 ] or result[5] != [ 3, 2, 2 ] or result[6] != [ 2, 3, 2 ] or result[7] != [ 3, 3, 2 ]:
         raise ValueError( "[Test] Wrong query result" )
-    result = grid.cells( geom.Point3D( [ 1.5 - geode.global_epsilon / 2, -geode.global_epsilon / 2, 1 - geode.global_epsilon / 2 ] ) )
+    near_origin_point = geom.Point3D( [ 1.5 - geode.global_epsilon / 2, -geode.global_epsilon / 2, 1 - geode.global_epsilon / 2 ] )
+    if not grid.contains( near_origin_point ):
+        raise ValueError( "[Test] Wrong query result: grid should contain point" )
+    result = grid.cells( near_origin_point )
     if len( result ) != 1 or result[0] != [ 0, 0, 0 ]:
         raise ValueError( "[Test] Wrong query result for point near origin." )
-    result = grid.cells( geom.Point3D( [ 6.5 + geode.global_epsilon / 2, 20 + geode.global_epsilon / 2, 46 + geode.global_epsilon / 2 ] ) );
+    near_furthest_grid_point = geom.Point3D( [ 6.5 + geode.global_epsilon / 2, 20 + geode.global_epsilon / 2, 46 + geode.global_epsilon / 2 ] )
+    if not grid.contains( near_furthest_grid_point ):
+        raise ValueError( "[Test] Wrong query result: grid should contain point" )
+    result = grid.cells( near_furthest_grid_point );
     if len( result ) != 1 or result[0] != [ 4, 9, 14 ]:
         raise ValueError( "[Test] Wrong query result for point near origin furthest corner." )
 
