@@ -39,10 +39,14 @@ namespace geode
         try
         {
             Timer timer;
+            const auto extension =
+                to_string( extension_from_filename( filename ) );
+            OPENGEODE_EXCEPTION(
+                EdgedCurveInputFactory< dimension >::has_creator( extension ),
+                "Unknown extension: ", extension );
             auto edged_curve = EdgedCurve< dimension >::create( impl );
             auto input = EdgedCurveInputFactory< dimension >::create(
-                to_string( extension_from_filename( filename ) ), *edged_curve,
-                filename );
+                extension, *edged_curve, filename );
             input->read();
             if( edged_curve->name() == Identifier::DEFAULT_NAME )
             {

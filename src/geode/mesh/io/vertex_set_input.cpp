@@ -45,10 +45,14 @@ namespace geode
         try
         {
             Timer timer;
+            const auto extension =
+                to_string( extension_from_filename( filename ) );
+            OPENGEODE_EXCEPTION(
+                VertexSetInputFactory::has_creator( extension ),
+                "Unknown extension: ", extension );
             auto vertex_set = VertexSet::create( impl );
             auto input = VertexSetInputFactory::create(
-                to_string( extension_from_filename( filename ) ), *vertex_set,
-                filename );
+                extension, *vertex_set, filename );
             input->read();
             if( vertex_set->name() == Identifier::DEFAULT_NAME )
             {

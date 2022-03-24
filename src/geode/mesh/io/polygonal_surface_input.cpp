@@ -39,11 +39,16 @@ namespace geode
         try
         {
             Timer timer;
+            const auto extension =
+                to_string( extension_from_filename( filename ) );
+            OPENGEODE_EXCEPTION(
+                PolygonalSurfaceInputFactory< dimension >::has_creator(
+                    extension ),
+                "Unknown extension: ", extension );
             auto polygonal_surface =
                 PolygonalSurface< dimension >::create( impl );
             auto input = PolygonalSurfaceInputFactory< dimension >::create(
-                to_string( extension_from_filename( filename ) ),
-                *polygonal_surface, filename );
+                extension, *polygonal_surface, filename );
             input->read();
             if( polygonal_surface->name() == Identifier::DEFAULT_NAME )
             {

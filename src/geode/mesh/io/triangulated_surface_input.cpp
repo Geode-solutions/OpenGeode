@@ -40,11 +40,16 @@ namespace geode
         try
         {
             Timer timer;
+            const auto extension =
+                to_string( extension_from_filename( filename ) );
+            OPENGEODE_EXCEPTION(
+                TriangulatedSurfaceInputFactory< dimension >::has_creator(
+                    extension ),
+                "Unknown extension: ", extension );
             auto triangulated_surface =
                 TriangulatedSurface< dimension >::create( impl );
             auto input = TriangulatedSurfaceInputFactory< dimension >::create(
-                to_string( extension_from_filename( filename ) ),
-                *triangulated_surface, filename );
+                extension, *triangulated_surface, filename );
             input->read();
             if( triangulated_surface->name() == Identifier::DEFAULT_NAME )
             {

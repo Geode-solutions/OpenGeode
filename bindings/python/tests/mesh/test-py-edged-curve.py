@@ -47,34 +47,6 @@ def test_bounding_box( edged_curve ):
     if edged_curve.bounding_box().max() != answer_max:
         raise ValueError( "[Test] Wrong computation of bounding box (max)" )
 
-def test_delete_vertex( edged_curve, builder ):
-    to_delete = [False] * edged_curve.nb_vertices()
-    to_delete[0]= True
-    builder.delete_vertices( to_delete )
-    if edged_curve.nb_vertices() != 3:
-        raise ValueError( "[Test] EdgedCurve should have 3 vertices" )
-    answer = geom.Point3D( [ 2.1, 9.4, 6.7 ] )
-    if edged_curve.point( 0 ) != answer:
-        raise ValueError( "[Test] EdgedCurve vertex coordinates are not correct" )
-    if edged_curve.nb_edges() != 2:
-        raise ValueError( "[Test] EdgedCurve should have 2 edges" )
-
-    edges_around_0 = edged_curve.edges_around_vertex( 0 )
-    if len( edges_around_0 ) != 1:
-        raise ValueError( "[Test] edges_around_0 should have 1 edge" )
-    if edges_around_0[0].edge_id != 1:
-        raise ValueError( "[Test] edges_around_0 has wrong value" )
-    if edges_around_0[0].vertex_id != 0:
-        raise ValueError( "[Test] edges_around_0 has wrong value" )
-
-    edges_around_2 = edged_curve.edges_around_vertex( 2 )
-    if len( edges_around_2 ) != 1:
-        raise ValueError( "[Test] edges_around_2 should have 1 edge" )
-    if edges_around_2[0].edge_id != 0:
-        raise ValueError( "[Test] edges_around_2 has wrong value" )
-    if edges_around_2[0].vertex_id != 0:
-        raise ValueError( "[Test] edges_around_2 has wrong value" )
-
 def test_create_edges( edged_curve, builder ):
     builder.create_edge_with_vertices( 0, 1 )
     builder.create_edge_with_vertices( 0, 2 )
@@ -122,11 +94,11 @@ def test_delete_edge( edged_curve, builder ):
     to_delete = [False] * edged_curve.nb_edges()
     to_delete[0]= True
     builder.delete_edges( to_delete )
-    if edged_curve.nb_edges() != 1:
-        raise ValueError( "[Test] EdgedCurve should have 1 edges" )
-    if edged_curve.edge_vertex( mesh.EdgeVertex( 0, 0 ) ) != 0:
+    if edged_curve.nb_edges() != 3:
+        raise ValueError( "[Test] EdgedCurve should have 3 edges" )
+    if edged_curve.edge_vertex( mesh.EdgeVertex( 0, 0 ) ) != 3:
         raise ValueError( "[Test] EdgedCurve edge vertex index is not correct" )
-    if edged_curve.edge_vertex( mesh.EdgeVertex( 0, 1 ) ) != 1:
+    if edged_curve.edge_vertex( mesh.EdgeVertex( 0, 1 ) ) != 0:
         raise ValueError( "[Test] EdgedCurve edge vertex index is not correct" )
 
 def test_io( edged_curve, filename ):
@@ -146,10 +118,10 @@ def test_clone( edged_curve ):
     attribute.set_value( 0, 42 )
 
     edged_curve2 = edged_curve.clone()
-    if edged_curve2.nb_vertices() != 3:
-        raise ValueError( "[Test] EdgedCurve2 should have 3 vertices" )
-    if edged_curve2.nb_edges() != 1:
-        raise ValueError( "[Test] EdgedCurve2 should have 1 edge" )
+    if edged_curve2.nb_vertices() != 4:
+        raise ValueError( "[Test] EdgedCurve2 should have 4 vertices" )
+    if edged_curve2.nb_edges() != 3:
+        raise ValueError( "[Test] EdgedCurve2 should have 3 edge" )
 
     attribute2 = edged_curve2.edge_attribute_manager().find_attribute_int( "test" )
     if attribute2.value( 0 ) != 42:
@@ -200,7 +172,7 @@ def test_permutation( edged_curve, builder ):
         raise ValueError( "[Test] Wrong EdgeVertex after edge permute" )
 
     edges_around_1 = edged_curve.edges_around_vertex( 1 )
-    if edges_around_1.size() != 2:
+    if len(edges_around_1) != 2:
         raise ValueError( "[Test] edges_around_1 should have 2 edges" )
     if edges_around_1[0].edge_id != 2:
         raise ValueError( "[Test] edges_around_1 has wrong value" )
@@ -212,7 +184,7 @@ def test_permutation( edged_curve, builder ):
         raise ValueError( "[Test] edges_around_1 has wrong value" )
 
     edges_around_0 = edged_curve.edges_around_vertex( 0 )
-    if edges_around_0.size() != 3:
+    if len(edges_around_0) != 3:
         raise ValueError( "[Test] edges_around_0 should have 3 edges" )
     if edges_around_0[0].edge_id != 0:
         raise ValueError( "[Test] edges_around_0 has wrong value" )
@@ -227,7 +199,7 @@ def test_permutation( edged_curve, builder ):
     if edges_around_0[2].vertex_id != 1:
         raise ValueError( "[Test] edges_around_0 has wrong value" )
 
-if __name__ != '__main__':
+if __name__ == '__main__':
     edged_curve = mesh.EdgedCurve3D.create()
     builder = mesh.EdgedCurveBuilder3D.create( edged_curve )
     
@@ -237,7 +209,6 @@ if __name__ != '__main__':
     test_io( edged_curve, "test." + edged_curve.native_extension() )
     
     test_permutation( edged_curve, builder )
-    test_delete_vertex( edged_curve, builder )
     test_delete_edge( edged_curve, builder )
     test_clone( edged_curve )
     

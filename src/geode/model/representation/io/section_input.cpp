@@ -35,10 +35,13 @@ namespace geode
         try
         {
             Timer timer;
+            const auto extension =
+                to_string( extension_from_filename( filename ) );
+            OPENGEODE_EXCEPTION( SectionInputFactory::has_creator( extension ),
+                "Unknown extension: ", extension );
             Section section;
-            auto input = SectionInputFactory::create(
-                to_string( extension_from_filename( filename ) ), section,
-                filename );
+            auto input =
+                SectionInputFactory::create( extension, section, filename );
             input->read();
             if( section.name() == Identifier::DEFAULT_NAME )
             {

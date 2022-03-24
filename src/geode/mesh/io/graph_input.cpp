@@ -38,10 +38,13 @@ namespace geode
         try
         {
             Timer timer;
+            const auto extension =
+                to_string( extension_from_filename( filename ) );
+            OPENGEODE_EXCEPTION( GraphInputFactory::has_creator( extension ),
+                "Unknown extension: ", extension );
             auto graph = Graph::create( impl );
-            auto input = GraphInputFactory::create(
-                to_string( extension_from_filename( filename ) ), *graph,
-                filename );
+            auto input =
+                GraphInputFactory::create( extension, *graph, filename );
             input->read();
             if( graph->name() == Identifier::DEFAULT_NAME )
             {

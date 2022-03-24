@@ -35,10 +35,12 @@ namespace geode
         try
         {
             Timer timer;
+            const auto extension =
+                to_string( extension_from_filename( filename ) );
+            OPENGEODE_EXCEPTION( BRepInputFactory::has_creator( extension ),
+                "Unknown extension: ", extension );
             BRep brep;
-            auto input = BRepInputFactory::create(
-                to_string( extension_from_filename( filename ) ), brep,
-                filename );
+            auto input = BRepInputFactory::create( extension, brep, filename );
             input->read();
             if( brep.name() == Identifier::DEFAULT_NAME )
             {

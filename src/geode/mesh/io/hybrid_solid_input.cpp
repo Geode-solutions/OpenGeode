@@ -39,10 +39,14 @@ namespace geode
         try
         {
             Timer timer;
+            const auto extension =
+                to_string( extension_from_filename( filename ) );
+            OPENGEODE_EXCEPTION(
+                HybridSolidInputFactory< dimension >::has_creator( extension ),
+                "Unknown extension: ", extension );
             auto hybrid_solid = HybridSolid< dimension >::create( impl );
             auto input = HybridSolidInputFactory< dimension >::create(
-                to_string( extension_from_filename( filename ) ), *hybrid_solid,
-                filename );
+                extension, *hybrid_solid, filename );
             input->read();
             if( hybrid_solid->name() == Identifier::DEFAULT_NAME )
             {

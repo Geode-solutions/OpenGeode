@@ -34,9 +34,12 @@ namespace geode
         try
         {
             Timer timer;
-            const auto output = BRepOutputFactory::create(
-                to_string( extension_from_filename( filename ) ), brep,
-                filename );
+            const auto extension =
+                to_string( extension_from_filename( filename ) );
+            OPENGEODE_EXCEPTION( BRepOutputFactory::has_creator( extension ),
+                "Unknown extension: ", extension );
+            const auto output =
+                BRepOutputFactory::create( extension, brep, filename );
             output->write();
             Logger::info(
                 "BRep saved in ", filename, " in ", timer.duration() );
