@@ -59,9 +59,9 @@ namespace geode
             return values_.at( index );
         }
 
-        void set_value( local_index_t index, double value )
+        void set_value( local_index_t index, double coordinate )
         {
-            values_.at( index ) = value;
+            values_.at( index ) = coordinate;
         }
 
         bool operator==( const Point &other ) const
