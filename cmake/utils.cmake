@@ -300,9 +300,6 @@ function(_add_dependency_directories test_name)
     _find_dependency_directories(directories projects ${ARGN})
     if(WIN32)
         list(JOIN directories "\\;" directories)
-        file(TO_NATIVE_PATH "${directories}" native_directories)
-        message(STATUS "directories = ${directories}")
-        message(STATUS "native_directories = ${native_directories}")
         set_tests_properties(${test_name}
             PROPERTIES
                 ENVIRONMENT "Path=$ENV{Path}\\;${directories}"
