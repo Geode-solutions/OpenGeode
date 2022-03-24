@@ -302,13 +302,13 @@ function(_add_dependency_directories test_name)
         list(JOIN directories "\\;" directories)
         set_tests_properties(${test_name}
             PROPERTIES
-                ENVIRONMENT "Path=$ENV{Path}\\;${directories}"
+                ENVIRONMENT "Path=${directories}\\;$ENV{Path}"
         )
     else()
         list(JOIN directories ":" directories)
         set_tests_properties(${test_name}
             PROPERTIES
-                ENVIRONMENT "LD_LIBRARY_PATH=$ENV{LD_LIBRARY_PATH}:${directories}"
+                ENVIRONMENT "LD_LIBRARY_PATH=${directories}:$ENV{LD_LIBRARY_PATH}"
         )
     endif()
 endfunction()
