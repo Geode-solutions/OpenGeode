@@ -39,11 +39,16 @@ namespace geode
         try
         {
             Timer timer;
+            const auto extension =
+                to_string( extension_from_filename( filename ) );
+            OPENGEODE_EXCEPTION(
+                PolyhedralSolidInputFactory< dimension >::has_creator(
+                    extension ),
+                "Unknown extension: ", extension );
             auto polyhedral_solid =
                 PolyhedralSolid< dimension >::create( impl );
             auto input = PolyhedralSolidInputFactory< dimension >::create(
-                to_string( extension_from_filename( filename ) ),
-                *polyhedral_solid, filename );
+                extension, *polyhedral_solid, filename );
             input->read();
             if( polyhedral_solid->name() == Identifier::DEFAULT_NAME )
             {

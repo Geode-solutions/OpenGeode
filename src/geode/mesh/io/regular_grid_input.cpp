@@ -37,8 +37,13 @@ namespace geode
         try
         {
             Timer timer;
+            const auto extension =
+                to_string( extension_from_filename( filename ) );
+            OPENGEODE_EXCEPTION(
+                RegularGridInputFactory< dimension >::has_creator( extension ),
+                "Unknown extension: ", extension );
             auto input = RegularGridInputFactory< dimension >::create(
-                to_string( extension_from_filename( filename ) ), filename );
+                extension, filename );
             input->read();
             auto grid = input->regular_grid();
 

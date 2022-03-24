@@ -39,10 +39,14 @@ namespace geode
         try
         {
             Timer timer;
+            const auto extension =
+                to_string( extension_from_filename( filename ) );
+            OPENGEODE_EXCEPTION(
+                PointSetInputFactory< dimension >::has_creator( extension ),
+                "Unknown extension: ", extension );
             auto point_set = PointSet< dimension >::create( impl );
             auto input = PointSetInputFactory< dimension >::create(
-                to_string( extension_from_filename( filename ) ), *point_set,
-                filename );
+                extension, *point_set, filename );
             input->read();
             if( point_set->name() == Identifier::DEFAULT_NAME )
             {

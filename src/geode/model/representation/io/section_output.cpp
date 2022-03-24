@@ -34,9 +34,12 @@ namespace geode
         try
         {
             Timer timer;
-            const auto output = SectionOutputFactory::create(
-                to_string( extension_from_filename( filename ) ), section,
-                filename );
+            const auto extension =
+                to_string( extension_from_filename( filename ) );
+            OPENGEODE_EXCEPTION( SectionOutputFactory::has_creator( extension ),
+                "Unknown extension: ", extension );
+            const auto output =
+                SectionOutputFactory::create( extension, section, filename );
             output->write();
             Logger::info(
                 "Section saved in ", filename, " in ", timer.duration() );
