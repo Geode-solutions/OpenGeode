@@ -373,6 +373,9 @@ namespace geode
 
         SurfaceEdges< dimension >& edges( SurfaceMeshKey );
 
+        void copy_edges(
+            const SurfaceMesh< dimension >& surface_mesh, SurfaceMeshKey );
+
     protected:
         SurfaceMesh();
 

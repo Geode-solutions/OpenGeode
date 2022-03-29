@@ -49,6 +49,7 @@ namespace geode
         PASSKEY( SurfaceEdgesBuilder< dimension >, SurfaceEdgesKey );
 
     public:
+        SurfaceEdges();
         SurfaceEdges( const SurfaceMesh< dimension >& surface );
         ~SurfaceEdges();
 
@@ -100,8 +101,6 @@ namespace geode
             const SurfaceEdges< dimension >& from, SurfaceEdgesKey );
 
     private:
-        SurfaceEdges();
-
         index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices );
 
         friend class bitsery::Access;

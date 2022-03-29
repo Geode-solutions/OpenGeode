@@ -40,7 +40,6 @@ namespace geode
     class HybridSolidBuilder : public SolidMeshBuilder< dimension >
     {
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
-        PASSKEY( HybridSolid< dimension >, BuilderKey );
 
     public:
         static std::unique_ptr< HybridSolidBuilder< dimension > > create(
@@ -77,15 +76,10 @@ namespace geode
          */
         index_t create_pyramid( const std::array< index_t, 5 >& vertices );
 
-        void copy( const HybridSolid< dimension >& hybrid_solid, BuilderKey )
-        {
-            copy( hybrid_solid );
-        }
+        void copy( const HybridSolid< dimension >& hybrid_solid );
 
     protected:
         HybridSolidBuilder( HybridSolid< dimension >& mesh );
-
-        void copy( const HybridSolid< dimension >& hybrid_solid );
 
     private:
         void do_create_polyhedron( absl::Span< const index_t > vertices,

@@ -42,8 +42,6 @@ namespace geode
     template < index_t dimension >
     class EdgedCurveBuilder : public GraphBuilder
     {
-        PASSKEY( EdgedCurve< dimension >, BuilderKey );
-
     public:
         /*!
          * Create the builder associated with an EdgedCurve.
@@ -66,15 +64,10 @@ namespace geode
          */
         index_t create_point( Point< dimension > point );
 
-        void copy( const EdgedCurve< dimension >& edged_curve, BuilderKey )
-        {
-            copy( edged_curve );
-        }
+        void copy( const EdgedCurve< dimension >& edged_curve );
 
     protected:
         EdgedCurveBuilder( EdgedCurve< dimension >& mesh );
-
-        void copy( const EdgedCurve< dimension >& edged_curve );
 
     private:
         virtual void do_set_point(

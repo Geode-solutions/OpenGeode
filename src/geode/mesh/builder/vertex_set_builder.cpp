@@ -44,6 +44,9 @@ namespace geode
 
     void VertexSetBuilder::copy( const VertexSet& vertex_set )
     {
+        OPENGEODE_EXCEPTION( vertex_set_.nb_vertices() == 0,
+            "[VertexSetBuilder::copy] Cannot copy a mesh into an already "
+            "initialized mesh." );
         set_name( vertex_set.name() );
         create_vertices( vertex_set.nb_vertices() );
         vertex_set_.vertex_attribute_manager().copy(

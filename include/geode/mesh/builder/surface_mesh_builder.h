@@ -50,8 +50,6 @@ namespace geode
     template < index_t dimension >
     class SurfaceMeshBuilder : public VertexSetBuilder
     {
-        PASSKEY( SurfaceMesh< dimension >, BuilderKey );
-
     public:
         /*!
          * Create the builder associated with a SurfaceMesh.
@@ -168,15 +166,10 @@ namespace geode
          */
         void disassociate_polygon_vertex_to_vertex( index_t vertex_id );
 
-        void copy( const SurfaceMesh< dimension >& surface_mesh, BuilderKey )
-        {
-            copy( surface_mesh );
-        }
+        void copy( const SurfaceMesh< dimension >& surface_mesh );
 
     protected:
         SurfaceMeshBuilder( SurfaceMesh< dimension >& mesh );
-
-        void copy( const SurfaceMesh< dimension >& surface_mesh );
 
         using VertexSetBuilder::delete_vertices;
 

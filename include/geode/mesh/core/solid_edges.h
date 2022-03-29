@@ -52,6 +52,7 @@ namespace geode
         PASSKEY( SolidEdgesBuilder< dimension >, SolidEdgesKey );
 
     public:
+        SolidEdges();
         SolidEdges( const SolidMesh< dimension >& solid );
         ~SolidEdges();
 
@@ -103,8 +104,6 @@ namespace geode
             const SolidEdges< dimension >& from, SolidEdgesKey );
 
     private:
-        SolidEdges();
-
         index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices );
 
         friend class bitsery::Access;

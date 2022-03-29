@@ -51,8 +51,12 @@ namespace geode
 
     template < index_t dimension >
     void PolyhedralSolidBuilder< dimension >::copy(
-        const PolyhedralSolid< dimension >& polyhedral_solid, BuilderKey )
+        const PolyhedralSolid< dimension >& polyhedral_solid )
     {
+        OPENGEODE_EXCEPTION( polyhedral_solid_.nb_vertices() == 0
+                                 && polyhedral_solid_.nb_polyhedra() == 0,
+            "[PolyhedralSolidBuilder::copy] Cannot copy a mesh into an "
+            "already initialized mesh." );
         SolidMeshBuilder< dimension >::copy( polyhedral_solid );
     }
 

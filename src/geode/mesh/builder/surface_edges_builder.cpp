@@ -72,6 +72,9 @@ namespace geode
     void SurfaceEdgesBuilder< dimension >::copy(
         const SurfaceEdges< dimension >& edges )
     {
+        OPENGEODE_EXCEPTION( edges_->nb_edges() == 0,
+            "[SurfaceEdgesBuilder::copy] Cannot copy a mesh into an already "
+            "initialized mesh." );
         edges_->overwrite_edges( edges, {} );
     }
 

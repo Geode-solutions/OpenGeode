@@ -139,6 +139,10 @@ namespace geode
     void HybridSolidBuilder< dimension >::copy(
         const HybridSolid< dimension >& hybrid_solid )
     {
+        OPENGEODE_EXCEPTION( hybrid_solid_.nb_vertices() == 0
+                                 && hybrid_solid_.nb_polyhedra() == 0,
+            "[HybridSolidBuilder::copy] Cannot copy a mesh into an already "
+            "initialized mesh." );
         SolidMeshBuilder< dimension >::copy( hybrid_solid );
     }
 

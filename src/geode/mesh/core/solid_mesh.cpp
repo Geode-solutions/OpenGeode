@@ -35,6 +35,8 @@
 #include <geode/geometry/bounding_box.h>
 #include <geode/geometry/vector.h>
 
+#include <geode/mesh/builder/solid_edges_builder.h>
+#include <geode/mesh/builder/solid_facets_builder.h>
 #include <geode/mesh/builder/solid_mesh_builder.h>
 #include <geode/mesh/core/bitsery_archive.h>
 #include <geode/mesh/core/detail/vertex_cycle.h>
@@ -313,6 +315,16 @@ namespace geode
             }
         }
 
+        void copy_edges( const SolidMesh< dimension >& solid )
+        {
+            OPENGEODE_EXCEPTION( !are_edges_enabled(),
+                "[SolidMesh] Cannot copy edges into mesh "
+                "where edges are already enabled." );
+            edges_.reset( new SolidEdges< dimension >{} );
+            SolidEdgesBuilder< dimension > edges_builder{ *edges_ };
+            edges_builder.copy( solid.edges() );
+        }
+
         void disable_edges() const
         {
             edges_.reset();
@@ -345,6 +357,16 @@ namespace geode
             {
                 facets_.reset( new SolidFacets< dimension >{ solid } );
             }
+        }
+
+        void copy_facets( const SolidMesh< dimension >& solid )
+        {
+            OPENGEODE_EXCEPTION( !are_facets_enabled(),
+                "[SolidMesh] Cannot copy facets into mesh where facets are "
+                "already enabled." );
+            facets_.reset( new SolidFacets< dimension >{} );
+            SolidFacetsBuilder< dimension > facets_builder{ *facets_ };
+            facets_builder.copy( solid.facets() );
         }
 
         void disable_facets() const
@@ -1068,6 +1090,13 @@ namespace geode
     }
 
     template < index_t dimension >
+    void SolidMesh< dimension >::copy_edges(
+        const SolidMesh< dimension >& solid, SolidMeshKey )
+    {
+        impl_->copy_edges( solid );
+    }
+
+    template < index_t dimension >
     void SolidMesh< dimension >::disable_edges() const
     {
         impl_->disable_edges();
@@ -1095,6 +1124,13 @@ namespace geode
     void SolidMesh< dimension >::enable_facets() const
     {
         impl_->enable_facets( *this );
+    }
+
+    template < index_t dimension >
+    void SolidMesh< dimension >::copy_facets(
+        const SolidMesh< dimension >& solid, SolidMeshKey )
+    {
+        impl_->copy_facets( solid );
     }
 
     template < index_t dimension >
@@ -1140,7 +1176,7 @@ namespace geode
     {
         auto clone = create( this->impl_name() );
         auto builder = SolidMeshBuilder< dimension >::create( *clone );
-        builder->copy( *this, {} );
+        builder->copy( *this );
         return clone;
     }
 

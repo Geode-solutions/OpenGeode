@@ -44,8 +44,6 @@ namespace geode
     template < index_t dimension >
     class TriangulatedSurfaceBuilder : public SurfaceMeshBuilder< dimension >
     {
-        PASSKEY( TriangulatedSurface< dimension >, BuilderKey );
-
     public:
         /*!
          * Create the builder associated with a TriangulatedSurface.
@@ -75,17 +73,11 @@ namespace geode
          */
         void reserve_triangles( index_t nb );
 
-        void copy( const TriangulatedSurface< dimension >& triangulated_surface,
-            BuilderKey )
-        {
-            copy( triangulated_surface );
-        }
+        void copy(
+            const TriangulatedSurface< dimension >& triangulated_surface );
 
     protected:
         TriangulatedSurfaceBuilder( TriangulatedSurface< dimension >& mesh );
-
-        void copy(
-            const TriangulatedSurface< dimension >& triangulated_surface );
 
     private:
         void do_create_polygon( absl::Span< const index_t > vertices ) final;

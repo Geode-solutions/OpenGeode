@@ -245,7 +245,7 @@ namespace geode
     {
         auto clone = create( impl_name() );
         auto builder = GraphBuilder::create( *clone );
-        builder->copy( *this, {} );
+        builder->copy( *this );
         return clone;
     }
 

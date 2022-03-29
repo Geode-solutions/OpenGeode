@@ -46,8 +46,6 @@ namespace geode
     template < index_t dimension >
     class PolyhedralSolidBuilder : public SolidMeshBuilder< dimension >
     {
-        PASSKEY( PolyhedralSolid< dimension >, BuilderKey );
-
     public:
         /*!
          * Create the builder associated with a PolyhedralSolid.
@@ -56,8 +54,7 @@ namespace geode
         static std::unique_ptr< PolyhedralSolidBuilder< dimension > > create(
             PolyhedralSolid< dimension >& mesh );
 
-        void copy(
-            const PolyhedralSolid< dimension >& polyhedral_solid, BuilderKey );
+        void copy( const PolyhedralSolid< dimension >& polyhedral_solid );
 
     protected:
         PolyhedralSolidBuilder( PolyhedralSolid< dimension >& mesh );

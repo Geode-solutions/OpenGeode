@@ -45,8 +45,6 @@ namespace geode
      */
     class opengeode_mesh_api GraphBuilder : public VertexSetBuilder
     {
-        PASSKEY( Graph, BuilderKey );
-
     public:
         /*!
          * Create the builder associated with a Graph.
@@ -119,15 +117,10 @@ namespace geode
          */
         std::vector< index_t > delete_isolated_vertices();
 
-        void copy( const Graph& graph, BuilderKey )
-        {
-            copy( graph );
-        }
+        void copy( const Graph& graph );
 
     protected:
         GraphBuilder( Graph& mesh );
-
-        void copy( const Graph& graph );
 
         using VertexSetBuilder::delete_vertices;
 

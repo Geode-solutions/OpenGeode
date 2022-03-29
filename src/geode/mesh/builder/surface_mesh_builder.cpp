@@ -653,6 +653,10 @@ namespace geode
     void SurfaceMeshBuilder< dimension >::copy(
         const SurfaceMesh< dimension >& surface_mesh )
     {
+        OPENGEODE_EXCEPTION( surface_mesh_.nb_vertices() == 0
+                                 && surface_mesh_.nb_polygons() == 0,
+            "[SurfaceMeshBuilder::copy] Cannot copy a mesh into an already "
+            "initialized mesh." );
         VertexSetBuilder::copy( surface_mesh );
         for( const auto p : Range{ surface_mesh.nb_vertices() } )
         {
@@ -673,8 +677,7 @@ namespace geode
             surface_mesh.polygon_attribute_manager() );
         if( surface_mesh.are_edges_enabled() )
         {
-            surface_mesh_.enable_edges();
-            edges_builder().copy( surface_mesh.edges(), {} );
+            surface_mesh_.copy_edges( surface_mesh, {} );
         }
     }
 

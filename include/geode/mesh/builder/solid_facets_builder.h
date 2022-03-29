@@ -42,8 +42,6 @@ namespace geode
     template < index_t dimension >
     class SolidFacetsBuilder
     {
-        PASSKEY( SolidMeshBuilder< dimension >, BuilderKey );
-
     public:
         SolidFacetsBuilder( SolidFacets< dimension >& facets );
 
@@ -68,12 +66,6 @@ namespace geode
         std::vector< index_t > update_facet_vertices(
             absl::Span< const index_t > old2new );
 
-        void copy( const SolidFacets< dimension >& facets, BuilderKey )
-        {
-            copy( facets );
-        }
-
-    private:
         void copy( const SolidFacets< dimension >& facets );
 
     private:

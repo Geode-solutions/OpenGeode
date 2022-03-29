@@ -207,6 +207,10 @@ namespace geode
 
     void GraphBuilder::copy( const Graph& graph )
     {
+        OPENGEODE_EXCEPTION(
+            graph_.nb_vertices() == 0 && graph_.nb_edges() == 0,
+            "[GraphBuilder::copy] Cannot copy a mesh into an already "
+            "initialized mesh." );
         VertexSetBuilder::copy( graph );
         create_edges( graph.nb_edges() );
         graph_.edge_attribute_manager().copy( graph.edge_attribute_manager() );

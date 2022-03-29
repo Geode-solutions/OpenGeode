@@ -111,6 +111,10 @@ namespace geode
     void TriangulatedSurfaceBuilder< dimension >::copy(
         const TriangulatedSurface< dimension >& triangulated_surface )
     {
+        OPENGEODE_EXCEPTION( triangulated_surface_.nb_vertices() == 0
+                                 && triangulated_surface_.nb_polygons() == 0,
+            "[TriangulatedSurfaceBuilder::copy] Cannot copy a mesh into an "
+            "already initialized mesh." );
         SurfaceMeshBuilder< dimension >::copy( triangulated_surface );
     }
 

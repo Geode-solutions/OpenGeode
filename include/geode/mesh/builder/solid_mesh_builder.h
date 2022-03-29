@@ -48,8 +48,6 @@ namespace geode
     template < index_t dimension >
     class SolidMeshBuilder : public VertexSetBuilder
     {
-        PASSKEY( SolidMesh< dimension >, BuilderKey );
-
     public:
         /*!
          * Create the builder associated with a SolidMesh.
@@ -167,15 +165,10 @@ namespace geode
          */
         void disassociate_polyhedron_vertex_to_vertex( index_t vertex_id );
 
-        void copy( const SolidMesh< dimension >& solid_mesh, BuilderKey )
-        {
-            copy( solid_mesh );
-        }
+        void copy( const SolidMesh< dimension >& solid_mesh );
 
     protected:
         SolidMeshBuilder( SolidMesh< dimension >& mesh );
-
-        void copy( const SolidMesh< dimension >& solid_mesh );
 
         void update_polyhedron_info(
             index_t polyhedron_id, absl::Span< const index_t > vertices );
