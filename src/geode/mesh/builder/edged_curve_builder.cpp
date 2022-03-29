@@ -69,7 +69,10 @@ namespace geode
     void EdgedCurveBuilder< dimension >::copy(
         const EdgedCurve< dimension >& edged_curve )
     {
-        VertexSetBuilder::copy( edged_curve );
+        OPENGEODE_EXCEPTION(
+            edged_curve_.nb_vertices() == 0 && edged_curve_.nb_edges() == 0,
+            "[EdgedCurveBuilder::copy] Cannot copy a mesh into an already "
+            "initialized mesh." );
         GraphBuilder::copy( edged_curve );
         for( const auto p : Range{ edged_curve.nb_vertices() } )
         {

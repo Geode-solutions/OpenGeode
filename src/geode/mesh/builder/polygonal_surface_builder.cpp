@@ -51,8 +51,12 @@ namespace geode
 
     template < index_t dimension >
     void PolygonalSurfaceBuilder< dimension >::copy(
-        const PolygonalSurface< dimension >& polygonal_surface, BuilderKey )
+        const PolygonalSurface< dimension >& polygonal_surface )
     {
+        OPENGEODE_EXCEPTION( polygonal_surface_.nb_vertices() == 0
+                                 && polygonal_surface_.nb_polygons() == 0,
+            "[PolygonalSurfaceBuilder::copy] Cannot copy a mesh into an "
+            "already initialized mesh." );
         SurfaceMeshBuilder< dimension >::copy( polygonal_surface );
     }
 

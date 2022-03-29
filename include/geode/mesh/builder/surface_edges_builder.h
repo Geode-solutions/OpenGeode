@@ -44,8 +44,6 @@ namespace geode
     template < index_t dimension >
     class SurfaceEdgesBuilder
     {
-        PASSKEY( SurfaceMeshBuilder< dimension >, BuilderKey );
-
     public:
         SurfaceEdgesBuilder( SurfaceEdges< dimension >& edges );
 
@@ -69,12 +67,6 @@ namespace geode
             index_t edge_vertex_id,
             index_t new_vertex_id );
 
-        void copy( const SurfaceEdges< dimension >& edges, BuilderKey )
-        {
-            copy( edges );
-        }
-
-    private:
         void copy( const SurfaceEdges< dimension >& edges );
 
     private:

@@ -91,6 +91,9 @@ namespace geode
     void SolidFacetsBuilder< dimension >::copy(
         const SolidFacets< dimension >& facets )
     {
+        OPENGEODE_EXCEPTION( facets_->nb_facets() == 0,
+            "[SolidFacetsBuilder::copy] Cannot copy a mesh into an already "
+            "initialized mesh." );
         facets_->overwrite_facets( facets, {} );
     }
 

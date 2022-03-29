@@ -42,8 +42,6 @@ namespace geode
     template < index_t dimension >
     class SolidEdgesBuilder
     {
-        PASSKEY( SolidMeshBuilder< dimension >, BuilderKey );
-
     public:
         SolidEdgesBuilder( SolidEdges< dimension >& edges );
 
@@ -67,12 +65,6 @@ namespace geode
 
         void update_edge_vertices( absl::Span< const index_t > old2new );
 
-        void copy( const SolidEdges< dimension >& edges, BuilderKey )
-        {
-            copy( edges );
-        }
-
-    protected:
         void copy( const SolidEdges< dimension >& edges );
 
     private:

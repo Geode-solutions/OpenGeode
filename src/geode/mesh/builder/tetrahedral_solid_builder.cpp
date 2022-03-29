@@ -111,6 +111,10 @@ namespace geode
     void TetrahedralSolidBuilder< dimension >::copy(
         const TetrahedralSolid< dimension >& tetrahedral_solid )
     {
+        OPENGEODE_EXCEPTION( tetrahedral_solid_.nb_vertices() == 0
+                                 && tetrahedral_solid_.nb_polyhedra() == 0,
+            "[TetrahedralSolidBuilder::copy] Cannot copy a mesh into an "
+            "already initialized mesh." );
         SolidMeshBuilder< dimension >::copy( tetrahedral_solid );
     }
 

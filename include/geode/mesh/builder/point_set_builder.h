@@ -45,7 +45,6 @@ namespace geode
     class PointSetBuilder : public VertexSetBuilder
     {
         OPENGEODE_TEMPLATE_ASSERT_2D_OR_3D( dimension );
-        PASSKEY( PointSet< dimension >, BuilderKey );
 
     public:
         /*!
@@ -69,15 +68,10 @@ namespace geode
          */
         index_t create_point( Point< dimension > point );
 
-        void copy( const PointSet< dimension >& point_set, BuilderKey )
-        {
-            copy( point_set );
-        }
+        void copy( const PointSet< dimension >& point_set );
 
     protected:
         PointSetBuilder( PointSet< dimension >& mesh );
-
-        void copy( const PointSet< dimension >& point_set );
 
     private:
         virtual void do_set_point(

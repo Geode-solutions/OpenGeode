@@ -451,7 +451,11 @@ namespace geode
 
         SolidEdges< dimension >& edges( SolidMeshKey );
 
+        void copy_edges( const SolidMesh< dimension >& solid, SolidMeshKey );
+
         SolidFacets< dimension >& facets( SolidMeshKey );
+
+        void copy_facets( const SolidMesh< dimension >& solid, SolidMeshKey );
 
     protected:
         SolidMesh();

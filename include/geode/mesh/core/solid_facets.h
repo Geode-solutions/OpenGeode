@@ -46,6 +46,7 @@ namespace geode
         PASSKEY( SolidFacetsBuilder< dimension >, SolidFacetsKey );
 
     public:
+        SolidFacets();
         SolidFacets( const SolidMesh< dimension >& solid );
         ~SolidFacets();
 
@@ -97,8 +98,6 @@ namespace geode
             const SolidFacets< dimension >& from, SolidFacetsKey );
 
     private:
-        SolidFacets();
-
         index_t find_or_create_facet( PolyhedronFacetVertices facet_vertices );
 
         friend class bitsery::Access;

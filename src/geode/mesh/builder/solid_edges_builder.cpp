@@ -82,6 +82,9 @@ namespace geode
     void SolidEdgesBuilder< dimension >::copy(
         const SolidEdges< dimension >& edges )
     {
+        OPENGEODE_EXCEPTION( edges_->nb_edges() == 0,
+            "[SolidEdgesBuilder::copy] Cannot copy a mesh into an already "
+            "initialized mesh." );
         edges_->overwrite_edges( edges, {} );
     }
 

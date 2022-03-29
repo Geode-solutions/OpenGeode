@@ -734,6 +734,10 @@ namespace geode
     void SolidMeshBuilder< dimension >::copy(
         const SolidMesh< dimension >& solid_mesh )
     {
+        OPENGEODE_EXCEPTION(
+            solid_mesh_.nb_vertices() == 0 && solid_mesh_.nb_polyhedra() == 0,
+            "[SolidMeshBuilder::copy] Cannot copy a mesh into an already "
+            "initialized mesh." );
         VertexSetBuilder::copy( solid_mesh );
         for( const auto p : Range{ solid_mesh.nb_vertices() } )
         {
@@ -771,15 +775,13 @@ namespace geode
         }
         solid_mesh_.polyhedron_attribute_manager().copy(
             solid_mesh.polyhedron_attribute_manager() );
-        if( solid_mesh.are_facets_enabled() )
-        {
-            solid_mesh_.enable_facets();
-            facets_builder().copy( solid_mesh.facets(), {} );
-        }
         if( solid_mesh.are_edges_enabled() )
         {
-            solid_mesh_.enable_edges();
-            edges_builder().copy( solid_mesh.edges(), {} );
+            solid_mesh_.copy_edges( solid_mesh, {} );
+        }
+        if( solid_mesh.are_facets_enabled() )
+        {
+            solid_mesh_.copy_facets( solid_mesh, {} );
         }
     }
 

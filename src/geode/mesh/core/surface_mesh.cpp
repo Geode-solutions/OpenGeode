@@ -37,6 +37,7 @@
 #include <geode/geometry/bounding_box.h>
 #include <geode/geometry/distance.h>
 
+#include <geode/mesh/builder/surface_edges_builder.h>
 #include <geode/mesh/builder/surface_mesh_builder.h>
 #include <geode/mesh/core/detail/facet_storage.h>
 #include <geode/mesh/core/mesh_factory.h>
@@ -266,6 +267,17 @@ namespace geode
                 edges_.reset( new SurfaceEdges< dimension >{ surface } );
             }
         }
+
+        void copy_edges( const SurfaceMesh< dimension >& surface ) const
+        {
+            OPENGEODE_EXCEPTION( !are_edges_enabled(),
+                "[SurfaceMesh] Cannot copy edges into "
+                "mesh where edges are already enabled." );
+            edges_.reset( new SurfaceEdges< dimension >{} );
+            SurfaceEdgesBuilder< dimension > edges_builder{ *edges_ };
+            edges_builder.copy( surface.edges() );
+        }
+
         void disable_edges() const
         {
             edges_.reset();
@@ -384,12 +396,6 @@ namespace geode
         const PolygonVertex& polygon_vertex, index_t vertex_id, SurfaceMeshKey )
     {
         impl_->associate_polygon_vertex_to_vertex( polygon_vertex, vertex_id );
-    }
-
-    template < index_t dimension >
-    SurfaceEdges< dimension >& SurfaceMesh< dimension >::edges( SurfaceMeshKey )
-    {
-        return impl_->edges();
     }
 
     template < index_t dimension >
@@ -725,6 +731,19 @@ namespace geode
     }
 
     template < index_t dimension >
+    SurfaceEdges< dimension >& SurfaceMesh< dimension >::edges( SurfaceMeshKey )
+    {
+        return impl_->edges();
+    }
+
+    template < index_t dimension >
+    void SurfaceMesh< dimension >::copy_edges(
+        const SurfaceMesh< dimension >& surface_mesh, SurfaceMeshKey )
+    {
+        return impl_->copy_edges( surface_mesh );
+    }
+
+    template < index_t dimension >
     AttributeManager&
         SurfaceMesh< dimension >::polygon_attribute_manager() const
     {
@@ -852,7 +871,7 @@ namespace geode
     {
         auto clone = create( this->impl_name() );
         auto builder = SurfaceMeshBuilder< dimension >::create( *clone );
-        builder->copy( *this, {} );
+        builder->copy( *this );
         return clone;
     }
 

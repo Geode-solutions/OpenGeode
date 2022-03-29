@@ -45,8 +45,6 @@ namespace geode
     template < index_t dimension >
     class PolygonalSurfaceBuilder : public SurfaceMeshBuilder< dimension >
     {
-        PASSKEY( PolygonalSurface< dimension >, BuilderKey );
-
     public:
         /*!
          * Create the builder associated with a PolygonalSurface.
@@ -55,8 +53,7 @@ namespace geode
         static std::unique_ptr< PolygonalSurfaceBuilder< dimension > > create(
             PolygonalSurface< dimension >& mesh );
 
-        void copy(
-            const PolygonalSurface< dimension >& surface_mesh, BuilderKey );
+        void copy( const PolygonalSurface< dimension >& surface_mesh );
 
     protected:
         PolygonalSurfaceBuilder( PolygonalSurface< dimension >& mesh );

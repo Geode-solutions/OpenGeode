@@ -95,7 +95,7 @@ namespace geode
     {
         auto clone = create( this->impl_name() );
         auto builder = TetrahedralSolidBuilder< dimension >::create( *clone );
-        builder->copy( *this, {} );
+        builder->copy( *this );
         return clone;
     }
 

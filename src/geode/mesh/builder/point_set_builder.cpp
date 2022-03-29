@@ -68,6 +68,9 @@ namespace geode
     void PointSetBuilder< dimension >::copy(
         const PointSet< dimension >& point_set )
     {
+        OPENGEODE_EXCEPTION( point_set_.nb_vertices() == 0,
+            "[PointSetBuilder::copy] Cannot copy a mesh into an already "
+            "initialized mesh." );
         VertexSetBuilder::copy( point_set );
         for( const auto p : Range{ point_set.nb_vertices() } )
         {
