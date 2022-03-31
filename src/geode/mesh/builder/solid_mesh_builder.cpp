@@ -738,6 +738,20 @@ namespace geode
             solid_mesh_.nb_vertices() == 0 && solid_mesh_.nb_polyhedra() == 0,
             "[SolidMeshBuilder::copy] Cannot copy a mesh into an already "
             "initialized mesh." );
+        if( solid_mesh_.are_edges_enabled() )
+        {
+            OPENGEODE_EXCEPTION( solid_mesh_.edges().nb_edges() == 0,
+                "[SolidMeshBuilder::copy] Cannot copy a mesh into an already "
+                "initialized mesh." );
+            solid_mesh_.disable_edges();
+        }
+        if( solid_mesh_.are_facets_enabled() )
+        {
+            OPENGEODE_EXCEPTION( solid_mesh_.facets().nb_facets() == 0,
+                "[SolidMeshBuilder::copy] Cannot copy a mesh into an already "
+                "initialized mesh." );
+            solid_mesh_.disable_facets();
+        }
         VertexSetBuilder::copy( solid_mesh );
         for( const auto p : Range{ solid_mesh.nb_vertices() } )
         {

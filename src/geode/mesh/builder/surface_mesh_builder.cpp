@@ -657,6 +657,13 @@ namespace geode
                                  && surface_mesh_.nb_polygons() == 0,
             "[SurfaceMeshBuilder::copy] Cannot copy a mesh into an already "
             "initialized mesh." );
+        if( surface_mesh_.are_edges_enabled() )
+        {
+            OPENGEODE_EXCEPTION( surface_mesh_.edges().nb_edges() == 0,
+                "[SurfaceMeshBuilder::copy] Cannot copy a mesh into an already "
+                "initialized mesh." );
+            surface_mesh_.disable_edges();
+        }
         VertexSetBuilder::copy( surface_mesh );
         for( const auto p : Range{ surface_mesh.nb_vertices() } )
         {
