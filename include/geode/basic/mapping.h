@@ -70,10 +70,13 @@ namespace geode
         absl::flat_hash_map< T2, T1 > out2in_;
     };
 
-    template < typename T1, typename T2 = T1, index_t Capacity = 1 >
+    template < typename T1, typename T2 = T1 >
     class GenericMapping
     {
     public:
+        template < typename T >
+        using Storage = absl::InlinedVector< T, 1 >;
+
         void map( const T1& in, const T2& out )
         {
             in2out_[in].push_back( out );
@@ -86,17 +89,17 @@ namespace geode
             out2in_.reserve( capacity );
         }
 
-        const absl::InlinedVector< T2, Capacity >& in2out( const T1& in ) const
+        const Storage< T2 >& in2out( const T1& in ) const
         {
             return in2out_.at( in );
         }
-        const absl::InlinedVector< T1, Capacity >& out2in( const T2& out ) const
+        const Storage< T1 >& out2in( const T2& out ) const
         {
             return out2in_.at( out );
         }
 
     private:
-        absl::flat_hash_map< T1, absl::InlinedVector< T2, Capacity > > in2out_;
-        absl::flat_hash_map< T2, absl::InlinedVector< T1, Capacity > > out2in_;
+        absl::flat_hash_map< T1, Storage< T2 > > in2out_;
+        absl::flat_hash_map< T2, Storage< T1 > > out2in_;
     };
 } // namespace geode
