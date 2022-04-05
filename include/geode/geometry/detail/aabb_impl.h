@@ -60,27 +60,27 @@ namespace geode
             return mapping_morton_.size();
         }
 
-        const BoundingBox< dimension >& node( index_t i ) const
+        const BoundingBox< dimension >& node( index_t index ) const
         {
-            OPENGEODE_ASSERT( i < tree_.size(), "query out of tree" );
-            return tree_[i];
+            OPENGEODE_ASSERT( index < tree_.size(), "query out of tree" );
+            return tree_[index];
         }
 
-        void set_node( index_t i, const BoundingBox< dimension >& box )
+        void set_node( index_t index, const BoundingBox< dimension >& box )
         {
-            OPENGEODE_ASSERT( i < tree_.size(), "query out of tree" );
-            tree_[i] = box;
+            OPENGEODE_ASSERT( index < tree_.size(), "query out of tree" );
+            tree_[index] = box;
         }
 
-        void add_box( index_t i, const BoundingBox< dimension >& box )
+        void add_box( index_t index, const BoundingBox< dimension >& box )
         {
-            OPENGEODE_ASSERT( i < tree_.size(), "query out of tree" );
-            tree_[i].add_box( box );
+            OPENGEODE_ASSERT( index < tree_.size(), "query out of tree" );
+            tree_[index].add_box( box );
         }
 
-        index_t mapping_morton( index_t i ) const
+        index_t mapping_morton( index_t index ) const
         {
-            return mapping_morton_[i];
+            return mapping_morton_[index];
         }
 
         /*!
@@ -128,6 +128,16 @@ namespace geode
             ACTION& action ) const;
 
         template < class ACTION >
+        void other_intersect_recursive( index_t node_index1,
+            index_t element_begin1,
+            index_t element_end1,
+            const AABBTree< dimension >& other_tree,
+            index_t node_index2,
+            index_t element_begin2,
+            index_t element_end2,
+            ACTION& action ) const;
+
+        template < class ACTION >
         void ray_intersect_recursive( const Ray< dimension >& ray,
             index_t node_index,
             index_t element_begin,
@@ -146,10 +156,22 @@ namespace geode
     }
 
     template < index_t dimension >
-    const BoundingBox< dimension >& AABBTree< dimension >::node(
-        index_t i ) const
+    const BoundingBox< dimension >& AABBTree< dimension >::bounding_box() const
     {
-        return impl_->node( i );
+        return node( Impl::ROOT_INDEX );
+    }
+
+    template < index_t dimension >
+    const BoundingBox< dimension >& AABBTree< dimension >::node(
+        index_t index ) const
+    {
+        return impl_->node( index );
+    }
+
+    template < index_t dimension >
+    index_t AABBTree< dimension >::mapping_morton( index_t index ) const
+    {
+        return impl_->mapping_morton( index );
     }
 
     template < index_t dimension >
@@ -163,21 +185,18 @@ namespace geode
         index_t node_index{ Impl::ROOT_INDEX };
         while( !is_leaf( box_begin, box_end ) )
         {
-            index_t box_middle;
-            index_t child_left;
-            index_t child_right;
-            get_recursive_iterators( node_index, box_begin, box_end, box_middle,
-                child_left, child_right );
-            if( point_box_signed_distance( query, node( child_left ) )
-                < point_box_signed_distance( query, node( child_right ) ) )
+            const auto it =
+                get_recursive_iterators( node_index, box_begin, box_end );
+            if( point_box_signed_distance( query, node( it.child_left ) )
+                < point_box_signed_distance( query, node( it.child_right ) ) )
             {
-                box_end = box_middle;
-                node_index = child_left;
+                box_end = it.middle_box;
+                node_index = it.child_left;
             }
             else
             {
-                box_begin = box_middle;
-                node_index = child_right;
+                box_begin = it.middle_box;
+                node_index = it.child_right;
             }
         }
 
@@ -208,6 +227,16 @@ namespace geode
     {
         impl_->self_intersect_recursive( Impl::ROOT_INDEX, 0, nb_bboxes(),
             Impl::ROOT_INDEX, 0, nb_bboxes(), action );
+    }
+
+    template < index_t dimension >
+    template < class EvalIntersection >
+    void AABBTree< dimension >::compute_other_element_bbox_intersections(
+        const AABBTree< dimension >& other_tree,
+        EvalIntersection& action ) const
+    {
+        impl_->other_intersect_recursive( Impl::ROOT_INDEX, 0, nb_bboxes(),
+            other_tree, Impl::ROOT_INDEX, 0, other_tree.nb_bboxes(), action );
     }
 
     template < index_t dimension >
@@ -243,7 +272,7 @@ namespace geode
         // and replace current if nearer
         if( is_leaf( box_begin, box_end ) )
         {
-            const auto cur_box = mapping_morton_[box_begin];
+            const auto cur_box = mapping_morton( box_begin );
             Point< dimension > cur_nearest_point;
             double cur_distance;
             std::tie( cur_distance, cur_nearest_point ) =
@@ -256,14 +285,13 @@ namespace geode
             }
             return;
         }
-        index_t box_middle, child_left, child_right;
-        get_recursive_iterators( node_index, box_begin, box_end, box_middle,
-            child_left, child_right );
+        const auto it =
+            get_recursive_iterators( node_index, box_begin, box_end );
 
         const auto distance_left =
-            point_box_signed_distance( query, node( child_left ) );
+            point_box_signed_distance( query, node( it.child_left ) );
         const auto distance_right =
-            point_box_signed_distance( query, node( child_right ) );
+            point_box_signed_distance( query, node( it.child_right ) );
 
         // Traverse the "nearest" child first, so that it has more chances
         // to prune the traversal of the other child.
@@ -272,14 +300,14 @@ namespace geode
             if( distance_left < distance )
             {
                 closest_element_box_recursive< ACTION >( query, nearest_box,
-                    nearest_point, distance, child_left, box_begin, box_middle,
-                    action );
+                    nearest_point, distance, it.child_left, box_begin,
+                    it.middle_box, action );
             }
             if( distance_right < distance )
             {
                 closest_element_box_recursive< ACTION >( query, nearest_box,
-                    nearest_point, distance, child_right, box_middle, box_end,
-                    action );
+                    nearest_point, distance, it.child_right, it.middle_box,
+                    box_end, action );
             }
         }
         else
@@ -287,14 +315,14 @@ namespace geode
             if( distance_right < distance )
             {
                 closest_element_box_recursive< ACTION >( query, nearest_box,
-                    nearest_point, distance, child_right, box_middle, box_end,
-                    action );
+                    nearest_point, distance, it.child_right, it.middle_box,
+                    box_end, action );
             }
             if( distance_left < distance )
             {
                 closest_element_box_recursive< ACTION >( query, nearest_box,
-                    nearest_point, distance, child_left, box_begin, box_middle,
-                    action );
+                    nearest_point, distance, it.child_left, box_begin,
+                    it.middle_box, action );
             }
         }
     }
@@ -322,18 +350,17 @@ namespace geode
         if( is_leaf( element_begin, element_end ) )
         {
             // @todo Check if the box is not intersecting itself
-            action( mapping_morton_[element_begin] );
+            action( mapping_morton( element_begin ) );
             return;
         }
 
-        index_t box_middle, child_left, child_right;
-        get_recursive_iterators( node_index, element_begin, element_end,
-            box_middle, child_left, child_right );
+        const auto it =
+            get_recursive_iterators( node_index, element_begin, element_end );
 
         bbox_intersect_recursive< ACTION >(
-            box, child_left, element_begin, box_middle, action );
+            box, it.child_left, element_begin, it.middle_box, action );
         bbox_intersect_recursive< ACTION >(
-            box, child_right, box_middle, element_end, action );
+            box, it.child_right, it.middle_box, element_end, action );
     }
 
     template < index_t dimension >
@@ -375,8 +402,8 @@ namespace geode
             {
                 return;
             }
-            action( mapping_morton_[element_begin1],
-                mapping_morton_[element_begin2] );
+            action( mapping_morton( element_begin1 ),
+                mapping_morton( element_begin2 ) );
             return;
         }
 
@@ -386,26 +413,85 @@ namespace geode
         //   intersect node1's two children with node2
         if( element_end2 - element_begin2 > element_end1 - element_begin1 )
         {
-            index_t middle_box2, child_left2, child_right2;
-            get_recursive_iterators( node_index2, element_begin2, element_end2,
-                middle_box2, child_left2, child_right2 );
+            const auto it = get_recursive_iterators(
+                node_index2, element_begin2, element_end2 );
             self_intersect_recursive< ACTION >( node_index1, element_begin1,
-                element_end1, child_left2, element_begin2, middle_box2,
+                element_end1, it.child_left, element_begin2, it.middle_box,
                 action );
             self_intersect_recursive< ACTION >( node_index1, element_begin1,
-                element_end1, child_right2, middle_box2, element_end2, action );
+                element_end1, it.child_right, it.middle_box, element_end2,
+                action );
         }
         else
         {
-            index_t middle_box1, child_left1, child_right1;
-            get_recursive_iterators( node_index1, element_begin1, element_end1,
-                middle_box1, child_left1, child_right1 );
-            self_intersect_recursive< ACTION >( child_left1, element_begin1,
-                middle_box1, node_index2, element_begin2, element_end2,
+            const auto it = get_recursive_iterators(
+                node_index1, element_begin1, element_end1 );
+            self_intersect_recursive< ACTION >( it.child_left, element_begin1,
+                it.middle_box, node_index2, element_begin2, element_end2,
                 action );
-            self_intersect_recursive< ACTION >( child_right1, middle_box1,
+            self_intersect_recursive< ACTION >( it.child_right, it.middle_box,
                 element_end1, node_index2, element_begin2, element_end2,
                 action );
+        }
+    }
+
+    template < index_t dimension >
+    template < class ACTION >
+    void AABBTree< dimension >::Impl::other_intersect_recursive(
+        index_t node_index1,
+        index_t element_begin1,
+        index_t element_end1,
+        const AABBTree< dimension >& other_tree,
+        index_t node_index2,
+        index_t element_begin2,
+        index_t element_end2,
+        ACTION& action ) const
+    {
+        OPENGEODE_ASSERT( element_end1 != element_begin1,
+            "No iteration allowed start == end" );
+        OPENGEODE_ASSERT( element_end2 != element_begin2,
+            "No iteration allowed start == end" );
+
+        // The acceleration is here:
+        if( !node( node_index1 ).intersects( other_tree.node( node_index2 ) ) )
+        {
+            return;
+        }
+
+        // Simple case: leaf - leaf intersection.
+        if( is_leaf( element_begin1, element_end1 )
+            && is_leaf( element_begin2, element_end2 ) )
+        {
+            action( mapping_morton( element_begin1 ),
+                other_tree.mapping_morton( element_begin2 ) );
+            return;
+        }
+
+        // If node2 has more polygons than node1, then
+        //   intersect node2's two children with node1
+        // else
+        //   intersect node1's two children with node2
+        if( element_end2 - element_begin2 > element_end1 - element_begin1 )
+        {
+            const auto it = get_recursive_iterators(
+                node_index2, element_begin2, element_end2 );
+            other_intersect_recursive< ACTION >( node_index1, element_begin1,
+                element_end1, other_tree, it.child_left, element_begin2,
+                it.middle_box, action );
+            other_intersect_recursive< ACTION >( node_index1, element_begin1,
+                element_end1, other_tree, it.child_right, it.middle_box,
+                element_end2, action );
+        }
+        else
+        {
+            const auto it = get_recursive_iterators(
+                node_index1, element_begin1, element_end1 );
+            other_intersect_recursive< ACTION >( it.child_left, element_begin1,
+                it.middle_box, other_tree, node_index2, element_begin2,
+                element_end2, action );
+            other_intersect_recursive< ACTION >( it.child_right, it.middle_box,
+                element_end1, other_tree, node_index2, element_begin2,
+                element_end2, action );
         }
     }
 
@@ -431,18 +517,17 @@ namespace geode
         // Leaf case
         if( is_leaf( element_begin, element_end ) )
         {
-            action( mapping_morton_[element_begin] );
+            action( mapping_morton( element_begin ) );
             return;
         }
 
-        index_t box_middle, child_left, child_right;
-        get_recursive_iterators( node_index, element_begin, element_end,
-            box_middle, child_left, child_right );
+        const auto it =
+            get_recursive_iterators( node_index, element_begin, element_end );
 
         ray_intersect_recursive< ACTION >(
-            ray, child_left, element_begin, box_middle, action );
+            ray, it.child_left, element_begin, it.middle_box, action );
         ray_intersect_recursive< ACTION >(
-            ray, child_right, box_middle, element_end, action );
+            ray, it.child_right, it.middle_box, element_end, action );
     }
 
     template < index_t dimension >

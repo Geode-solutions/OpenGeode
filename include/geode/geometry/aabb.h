@@ -64,6 +64,8 @@ namespace geode
          */
         index_t nb_bboxes() const;
 
+        const BoundingBox< dimension >& bounding_box() const;
+
         /*!
          * @brief Gets the closest element to a point
          * @param[in] query the point to test
@@ -74,19 +76,17 @@ namespace geode
          * - the nearest point on the element in box.
          * - the distance between the \p query and \p nearest_point.
          *
-         * @tparam EvalDistance this functor should have an operator() defined
-         * like this:
-         *  std::tuple< double, Point< dimension > > operator()(
-         *      const Point< dimension >& query,
-         *      index_t curent_element_box ) const ;
-         * the output tuple contain
-         * - a double to store the distance between the point \p query and the
-         * element stored in the \p curent_element_box.
-         * - a Point< dimension > to store the nearest point from \p query on
-         * the object stored in the \p curent_element_box.
+         * @tparam EvalDistance this functor should have an operator()
+         * defined like this: std::tuple< double, Point< dimension > >
+         * operator()( const Point< dimension >& query, index_t
+         * curent_element_box ) const ; the output tuple contain
+         * - a double to store the distance between the point \p query and
+         * the element stored in the \p curent_element_box.
+         * - a Point< dimension > to store the nearest point from \p query
+         * on the object stored in the \p curent_element_box.
          *
-         * @note if several elements box cannot be discriminate by the distance
-         * computation one of them will be randomly retuned.
+         * @note if several elements box cannot be discriminate by the
+         * distance computation one of them will be randomly retuned.
          */
         template < typename EvalDistance >
         std::tuple< index_t, Point< dimension >, double > closest_element_box(
@@ -130,6 +130,22 @@ namespace geode
             EvalIntersection& action ) const;
 
         /*!
+         * @brief Computes all the intersections of the element boxes between
+         * this tree and another one.
+         * @param[in] action The functor to run when two boxes intersect
+         * @tparam EvalIntersection this functor should have an operator()
+         * defined like this:
+         * void operator()( index_t cur_element_box1, index_t cur_element_box2 )
+         * ;
+         * @note cur_element_box1 and cur_element_box2 are the element box
+         * indices that intersect in the current tree and in the other tree.
+         */
+        template < class EvalIntersection >
+        void compute_other_element_bbox_intersections(
+            const AABBTree< dimension >& other_tree,
+            EvalIntersection& action ) const;
+
+        /*!
          * @brief Computes the intersections between a given ray and all
          * element boxes.
          * @param[in] ray The ray to test.
@@ -145,25 +161,31 @@ namespace geode
         void compute_ray_element_bbox_intersections(
             const Ray< dimension >& ray, EvalIntersection& action ) const;
 
-    protected:
+    private:
         static bool is_leaf( index_t box_begin, index_t box_end )
         {
             return box_begin + 1 == box_end;
         }
 
-        static void get_recursive_iterators( index_t node_index,
-            index_t box_begin,
-            index_t box_end,
-            index_t& middle_box,
-            index_t& child_left,
-            index_t& child_right )
+        struct Iterator
         {
-            middle_box = box_begin + ( box_end - box_begin ) / 2;
-            child_left = 2 * node_index;
-            child_right = 2 * node_index + 1;
+            index_t middle_box;
+            index_t child_left;
+            index_t child_right;
+        };
+        static Iterator get_recursive_iterators(
+            index_t node_index, index_t box_begin, index_t box_end )
+        {
+            Iterator it;
+            it.middle_box = box_begin + ( box_end - box_begin ) / 2;
+            it.child_left = 2 * node_index;
+            it.child_right = 2 * node_index + 1;
+            return it;
         }
 
-        const BoundingBox< dimension >& node( index_t i ) const;
+        const BoundingBox< dimension >& node( index_t index ) const;
+
+        index_t mapping_morton( index_t index ) const;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

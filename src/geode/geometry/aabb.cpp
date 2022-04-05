@@ -102,14 +102,11 @@ namespace geode
         {
             return node_index;
         }
-        index_t element_middle;
-        index_t child_left;
-        index_t child_right;
-        get_recursive_iterators( node_index, box_begin, box_end, element_middle,
-            child_left, child_right );
+        const auto it =
+            get_recursive_iterators( node_index, box_begin, box_end );
         return std::max(
-            max_node_index( child_left, box_begin, element_middle ),
-            max_node_index( child_right, element_middle, box_end ) );
+            max_node_index( it.child_left, box_begin, it.middle_box ),
+            max_node_index( it.child_right, it.middle_box, box_end ) );
     }
 
     /**
@@ -136,21 +133,19 @@ namespace geode
             set_node( node_index, bboxes[mapping_morton_[element_begin]] );
             return;
         }
-        index_t element_middle;
-        index_t child_left;
-        index_t child_right;
-        get_recursive_iterators( node_index, element_begin, element_end,
-            element_middle, child_left, child_right );
-        OPENGEODE_ASSERT( child_left < tree_.size(), "Left index out of tree" );
+        const auto it =
+            get_recursive_iterators( node_index, element_begin, element_end );
         OPENGEODE_ASSERT(
-            child_right < tree_.size(), "Right index out of tree" );
+            it.child_left < tree_.size(), "Left index out of tree" );
+        OPENGEODE_ASSERT(
+            it.child_right < tree_.size(), "Right index out of tree" );
         initialize_tree_recursive(
-            bboxes, child_left, element_begin, element_middle );
+            bboxes, it.child_left, element_begin, it.middle_box );
         initialize_tree_recursive(
-            bboxes, child_right, element_middle, element_end );
+            bboxes, it.child_right, it.middle_box, element_end );
         // before box_union
-        add_box( node_index, node( child_left ) );
-        add_box( node_index, node( child_right ) );
+        add_box( node_index, node( it.child_left ) );
+        add_box( node_index, node( it.child_right ) );
     }
 
     template < index_t dimension >
