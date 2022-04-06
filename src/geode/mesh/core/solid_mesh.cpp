@@ -152,7 +152,8 @@ namespace
             {
                 const auto adj_facet = adj.value();
                 result.push_back( adj_facet.polyhedron_id );
-                for( const auto f : geode::LRange{ 4 } )
+                for( const auto f : geode::LRange{ solid.nb_polyhedron_facets(
+                         adj_facet.polyhedron_id ) } )
                 {
                     if( adj_facet.facet_id == f )
                     {
@@ -801,7 +802,7 @@ namespace geode
         index_t first_polyhedron ) const
     {
         PolyhedraAroundEdge result{ first_polyhedron };
-        for( const auto f : LRange{ 4 } )
+        for( const auto f : LRange{ nb_polyhedron_facets( first_polyhedron ) } )
         {
             if( !is_edge_in_polyhedron_facet(
                     { first_polyhedron, f }, vertices ) )
