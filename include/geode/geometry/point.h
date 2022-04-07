@@ -34,6 +34,7 @@
 
 #include <geode/geometry/bitsery_archive.h>
 #include <geode/geometry/common.h>
+#include <geode/geometry/detail/point_operators.h>
 
 namespace geode
 {
@@ -83,45 +84,22 @@ namespace geode
 
         Point operator*( double multiplier ) const
         {
-            Point result{ *this };
-            for( const auto i : LRange{ dimension } )
-            {
-                result.set_value( i, result.value( i ) * multiplier );
-            }
-            return result;
+            return detail::coords_multiply( *this, multiplier );
         }
 
         Point operator/( double divider ) const
         {
-            OPENGEODE_EXCEPTION( std::fabs( divider ) > 1e-30,
-                "[Point::operator/] Cannot divide Point by something close to "
-                "zero" );
-            Point result{ *this };
-            for( const auto i : LRange{ dimension } )
-            {
-                result.set_value( i, result.value( i ) / divider );
-            }
-            return result;
+            return detail::coords_divide( *this, divider );
         }
 
         Point operator+( const Point &other ) const
         {
-            Point result{ *this };
-            for( const auto i : LRange{ dimension } )
-            {
-                result.set_value( i, result.value( i ) + other.value( i ) );
-            }
-            return result;
+            return detail::coords_add( *this, other );
         }
 
         Point operator-( const Point &other ) const
         {
-            Point result{ *this };
-            for( const auto i : LRange{ dimension } )
-            {
-                result.set_value( i, result.value( i ) - other.value( i ) );
-            }
-            return result;
+            return detail::coords_substract( *this, other );
         }
 
         bool inexact_equal( const Point &other, double epsilon ) const

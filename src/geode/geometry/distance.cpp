@@ -79,7 +79,7 @@ namespace geode
     {
         const auto nearest_p = point_segment_projection( point, segment );
         return std::make_tuple(
-            Vector< dimension >{ point, nearest_p }.length(), nearest_p );
+            point_point_distance( point, nearest_p ), nearest_p );
     }
 
     template < index_t dimension >
@@ -184,7 +184,7 @@ namespace geode
     {
         const auto nearest_p = point_line_projection( point, line );
         return std::make_tuple(
-            Vector< dimension >{ point, nearest_p }.length(), nearest_p );
+            point_point_distance( point, nearest_p ), nearest_p );
     }
 
     std::tuple< double, Point2D > point_line_signed_distance(
@@ -598,7 +598,7 @@ namespace geode
             circle.plane().origin()
             + center_to_projected_point.normalize() * circle.radius();
         return std::make_tuple(
-            Vector3D{ point, nearest_point }.length(), nearest_point );
+            point_point_distance( point, nearest_point ), nearest_point );
     }
 
     std::tuple< double, Point3D > point_circle_signed_distance(
@@ -623,9 +623,8 @@ namespace geode
             center_to_point.dot( disk.plane().normal() );
         const auto projected_on_plane =
             point - disk.plane().normal() * distance_to_plane;
-        const auto distance_projected_center =
-            Vector3D{ disk.plane().origin(), projected_on_plane }.length();
-        if( distance_projected_center <= disk.radius() )
+        if( point_point_distance( disk.plane().origin(), projected_on_plane )
+            <= disk.radius() )
         {
             return std::make_tuple(
                 std::fabs( distance_to_plane ), projected_on_plane );

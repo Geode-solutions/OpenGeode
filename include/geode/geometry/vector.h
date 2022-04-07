@@ -64,6 +64,26 @@ namespace geode
             return std::sqrt( length2() );
         }
 
+        Vector operator*( double multiplier ) const
+        {
+            return detail::coords_multiply( *this, multiplier );
+        }
+
+        Vector operator/( double divider ) const
+        {
+            return detail::coords_divide( *this, divider );
+        }
+
+        Vector operator+( const Vector &other ) const
+        {
+            return detail::coords_add( *this, other );
+        }
+
+        Vector operator-( const Vector &other ) const
+        {
+            return detail::coords_substract( *this, other );
+        }
+
         Vector normalize() const
         {
             return *this / length();
