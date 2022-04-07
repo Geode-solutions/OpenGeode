@@ -41,7 +41,7 @@ namespace geode
         {
             return barycenter;
         }
-        const auto norm_dir = segment.normalized_direction();
+        const auto norm_dir = segment.direction() / length;
         const auto d = norm_dir.dot( { barycenter, point } );
         if( std::fabs( d ) <= length / 2. )
         {
