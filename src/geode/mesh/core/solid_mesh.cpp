@@ -745,6 +745,24 @@ namespace geode
     }
 
     template < index_t dimension >
+    bool SolidMesh< dimension >::is_vertex_on_border( index_t vertex_id ) const
+    {
+        for( const auto& polyhedron_vertex :
+            polyhedra_around_vertex( vertex_id ) )
+        {
+            for( const auto& border_facet :
+                polyhedron_facets_on_border( polyhedron_vertex.polyhedron_id ) )
+            {
+                if( polyhedron_vertex.vertex_id != border_facet.facet_id )
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    template < index_t dimension >
     bool SolidMesh< dimension >::is_edge_on_border(
         const std::array< index_t, 2 >& vertices ) const
     {
