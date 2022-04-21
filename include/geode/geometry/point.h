@@ -160,4 +160,32 @@ namespace geode
             return result;
         }
     };
+
+    template < index_t dimension >
+    struct GenericAttributeConversion< Point< dimension > >
+    {
+        static float converted_value( const Point< dimension > &point )
+        {
+            return converted_item_value( point, 0 );
+        }
+
+        static float converted_item_value(
+            const Point< dimension > &point, local_index_t item )
+        {
+            OPENGEODE_ASSERT( item < nb_items(),
+                "[GenericAttributeConversion] Accessing "
+                "incorrect item value" );
+            return static_cast< float >( point.value( item ) );
+        }
+
+        static bool is_genericable()
+        {
+            return true;
+        }
+        static local_index_t nb_items()
+
+        {
+            return dimension;
+        }
+    };
 } // namespace geode

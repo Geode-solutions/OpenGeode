@@ -66,7 +66,12 @@ namespace geode
 
         virtual float generic_value( index_t element ) const = 0;
 
+        virtual float generic_item_value(
+            index_t element, local_index_t item ) const = 0;
+
         virtual bool is_genericable() const = 0;
+
+        virtual bool nb_items() const = 0;
 
         virtual absl::string_view type() = 0;
 
@@ -145,9 +150,21 @@ namespace geode
                 value( element ) );
         }
 
+        float generic_item_value(
+            index_t element, local_index_t item ) const final
+        {
+            return GenericAttributeConversion< T >::converted_item_value(
+                value( element ), item );
+        }
+
         bool is_genericable() const final
         {
             return GenericAttributeConversion< T >::is_genericable();
+        }
+
+        bool nb_items() const final
+        {
+            return GenericAttributeConversion< T >::nb_items();
         }
 
     protected:
