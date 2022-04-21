@@ -67,9 +67,20 @@ namespace geode
             return value.generic_value();
         }
 
+        static float converted_item_value(
+            const Foo& value, local_index_t /*unused*/ )
+        {
+            return value.generic_value();
+        }
+
         static bool is_genericable()
         {
             return true;
+        }
+
+        static local_index_t nb_items()
+        {
+            return 1;
         }
     };
 
@@ -376,10 +387,16 @@ void test_generic_value( geode::AttributeManager& manager )
             std::array< double, 3 > >(
             "array_double", std::array< double, 3 >() );
     array_attr->set_value( 2, { 3.1, 1.3 } );
-    OPENGEODE_EXCEPTION( !array_attr->is_genericable(),
+    OPENGEODE_EXCEPTION( array_attr->is_genericable(),
         "[Test] Foo attribute is not genericable" );
-    OPENGEODE_EXCEPTION( array_attr->generic_value( 2 ) == 0.,
-        "[Test] Generic value for element 2 of array attribute should be 0." );
+    OPENGEODE_EXCEPTION( array_attr->generic_value( 2 ) == 3.1f,
+        "[Test] Generic value for element 2 of array attribute should be 3.1" );
+    OPENGEODE_EXCEPTION( array_attr->generic_item_value( 2, 0 ) == 3.1f,
+        "[Test] Generic value for element 2,0 of array attribute should be "
+        "3.1" );
+    OPENGEODE_EXCEPTION( array_attr->generic_item_value( 2, 1 ) == 1.3f,
+        "[Test] Generic value for element 2,1 of array attribute should be "
+        "1.3" );
 }
 
 void test_copy_manager( geode::AttributeManager& manager )
