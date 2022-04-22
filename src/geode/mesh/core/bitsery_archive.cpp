@@ -27,6 +27,7 @@
 
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/bitsery_archive.h>
+#include <geode/basic/cached_value.h>
 
 #include <geode/mesh/core/geode_edged_curve.h>
 #include <geode/mesh/core/geode_graph.h>
@@ -37,6 +38,7 @@
 #include <geode/mesh/core/geode_tetrahedral_solid.h>
 #include <geode/mesh/core/geode_triangulated_surface.h>
 #include <geode/mesh/core/geode_vertex_set.h>
+#include <geode/mesh/core/private/surface_mesh_impl.h>
 
 namespace bitsery
 {
@@ -211,6 +213,9 @@ namespace
         geode::AttributeManager::register_attribute_type<
             geode::PolyhedronVertex, Serializer >(
             context, "PolyhedronVertex" );
+        geode::AttributeManager::register_attribute_type<
+            geode::CachedValue< geode::detail::PolygonsAroundVertexImpl >,
+            Serializer >( context, "CachedPolygonsAroundVertexImpl" );
         geode::AttributeManager::register_attribute_type<
             geode::HybridSolid3D::Type, Serializer >(
             context, "HybridSolidType" );

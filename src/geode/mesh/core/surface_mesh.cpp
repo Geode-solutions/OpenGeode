@@ -30,6 +30,7 @@
 
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/bitsery_archive.h>
+#include <geode/basic/cached_value.h>
 #include <geode/basic/detail/mapping_after_deletion.h>
 #include <geode/basic/pimpl_impl.h>
 
@@ -42,6 +43,7 @@
 #include <geode/mesh/core/detail/facet_storage.h>
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polygonal_surface.h>
+#include <geode/mesh/core/private/surface_mesh_impl.h>
 #include <geode/mesh/core/surface_edges.h>
 
 namespace
@@ -107,14 +109,14 @@ namespace
     }
 
     template < geode::index_t dimension >
-    std::tuple< geode::PolygonsAroundVertex, bool > polygons_around_vertex(
+    geode::detail::PolygonsAroundVertexImpl compute_polygons_around_vertex(
         const geode::SurfaceMesh< dimension >& mesh,
-        geode::index_t vertex_id,
-        absl::optional< geode::PolygonVertex > first_polygon )
+        const geode::index_t& vertex_id,
+        absl::optional< geode::PolygonVertex >& first_polygon )
     {
         if( !first_polygon )
         {
-            return std::make_tuple( geode::PolygonsAroundVertex{}, true );
+            return {};
         }
         OPENGEODE_ASSERT(
             mesh.polygon_vertex( first_polygon.value() ) == vertex_id,
@@ -122,7 +124,7 @@ namespace
             "around vertex" );
         geode::index_t safety_count{ 0 };
         constexpr geode::index_t MAX_SAFETY_COUNT{ 1000 };
-        geode::PolygonsAroundVertex polygons;
+        geode::detail::PolygonsAroundVertexImpl result;
         auto cur_polygon_edge = first_polygon;
         do
         {
@@ -130,7 +132,7 @@ namespace
                 mesh.polygon_vertex( cur_polygon_edge.value() ) == vertex_id,
                 "[SurfaceMesh::polygons_around_vertex] Wrong polygon "
                 "around vertex" );
-            polygons.push_back( cur_polygon_edge.value() );
+            result.polygons.push_back( cur_polygon_edge.value() );
             const auto prev_edge =
                 mesh.previous_polygon_edge( cur_polygon_edge.value() );
             cur_polygon_edge = mesh.polygon_adjacent_edge( prev_edge );
@@ -138,8 +140,8 @@ namespace
         } while( cur_polygon_edge && cur_polygon_edge != first_polygon
                  && safety_count < MAX_SAFETY_COUNT );
 
-        const auto vertex_is_on_border = cur_polygon_edge != first_polygon;
-        if( vertex_is_on_border )
+        result.vertex_is_on_border = cur_polygon_edge != first_polygon;
+        if( result.vertex_is_on_border )
         {
             cur_polygon_edge =
                 mesh.polygon_adjacent_edge( first_polygon.value() );
@@ -150,19 +152,19 @@ namespace
                 OPENGEODE_ASSERT( mesh.polygon_vertex( next_edge ) == vertex_id,
                     "[SurfaceMesh::polygons_around_vertex] Wrong polygon "
                     "around vertex" );
-                polygons.push_back( next_edge );
+                result.polygons.push_back( next_edge );
                 cur_polygon_edge = mesh.polygon_adjacent_edge( next_edge );
                 safety_count++;
             }
         }
         OPENGEODE_EXCEPTION( safety_count < MAX_SAFETY_COUNT,
-            "[SurfaceMesh::polygons_around_vertex] Too many polygons around "
-            "vertex ",
+            "[SurfaceMesh::polygons_around_vertex] Too many polygons "
+            "around vertex ",
             vertex_id,
-            ". This is probably related to a bug in the polygon adjacencies." );
-        return std::make_tuple( std::move( polygons ), vertex_is_on_border );
+            ". This is probably related to a bug in the polygon "
+            "adjacencies." );
+        return result;
     }
-
 } // namespace
 
 namespace geode
@@ -217,14 +219,20 @@ namespace geode
     class SurfaceMesh< dimension >::Impl
     {
         friend class bitsery::Access;
+        using CachedPolygons = CachedValue< detail::PolygonsAroundVertexImpl >;
 
     public:
-        explicit Impl( SurfaceMesh& surface )
+        Impl( SurfaceMesh& surface )
             : polygon_around_vertex_(
                 surface.vertex_attribute_manager()
                     .template find_or_create_attribute< VariableAttribute,
                         PolygonVertex >(
-                        "polygon_around_vertex", PolygonVertex{} ) )
+                        "polygon_around_vertex", PolygonVertex{} ) ),
+              polygons_around_vertex_(
+                  surface.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          CachedPolygons >(
+                          "polygons_around_vertex", CachedPolygons{} ) )
         {
         }
 
@@ -237,6 +245,31 @@ namespace geode
                 return value;
             }
             return absl::nullopt;
+        }
+
+        void reset_polygons_around_vertex( index_t vertex_id )
+        {
+            polygons_around_vertex_->modify_value(
+                vertex_id, []( CachedPolygons& value ) { value.reset(); } );
+        }
+
+        const PolygonsAroundVertex& polygons_around_vertex(
+            const SurfaceMesh< dimension >& mesh,
+            index_t vertex_id,
+            absl::optional< PolygonVertex > first_polygon ) const
+        {
+            return update_polygons_around_vertex(
+                mesh, vertex_id, first_polygon )
+                .polygons;
+        }
+
+        bool is_vertex_on_border( const SurfaceMesh< dimension >& mesh,
+            index_t vertex_id,
+            absl::optional< PolygonVertex > first_polygon ) const
+        {
+            return update_polygons_around_vertex(
+                mesh, vertex_id, first_polygon )
+                .vertex_is_on_border;
         }
 
         void associate_polygon_vertex_to_vertex(
@@ -294,25 +327,59 @@ namespace geode
             return polygon_attribute_manager_;
         }
 
+        void initialize_polygons_around_vertex(
+            const SurfaceMesh< dimension >& surface )
+        {
+            polygons_around_vertex_ =
+                surface.vertex_attribute_manager()
+                    .template find_or_create_attribute< VariableAttribute,
+                        CachedPolygons >(
+                        "polygons_around_vertex", CachedPolygons{} );
+        }
+
     private:
         Impl() = default;
 
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& a, Impl& impl ) {
-                    a.object( impl.polygon_attribute_manager_ );
-                    a.ext( impl.polygon_around_vertex_,
-                        bitsery::ext::StdSmartPtr{} );
-                    a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
+            archive.ext( *this,
+                Growable< Archive, Impl >{
+                    { []( Archive& a, Impl& impl ) {
+                         a.object( impl.polygon_attribute_manager_ );
+                         a.ext( impl.polygon_around_vertex_,
+                             bitsery::ext::StdSmartPtr{} );
+                         a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
+                     },
+                        []( Archive& a, Impl& impl ) {
+                            a.object( impl.polygon_attribute_manager_ );
+                            a.ext( impl.polygon_around_vertex_,
+                                bitsery::ext::StdSmartPtr{} );
+                            a.ext( impl.polygons_around_vertex_,
+                                bitsery::ext::StdSmartPtr{} );
+                            a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
+                        } } } );
+        }
+
+        const detail::PolygonsAroundVertexImpl& update_polygons_around_vertex(
+            const SurfaceMesh< dimension >& mesh,
+            index_t vertex_id,
+            absl::optional< PolygonVertex > first_polygon ) const
+        {
+            polygons_around_vertex_->modify_value( vertex_id,
+                [&mesh, vertex_id, &first_polygon]( CachedPolygons& value ) {
+                    value( compute_polygons_around_vertex, mesh, vertex_id,
+                        first_polygon );
                 } );
+            return polygons_around_vertex_->value( vertex_id ).value();
         }
 
     private:
         mutable AttributeManager polygon_attribute_manager_;
         std::shared_ptr< VariableAttribute< PolygonVertex > >
             polygon_around_vertex_;
+        mutable std::shared_ptr< VariableAttribute< CachedPolygons > >
+            polygons_around_vertex_;
         mutable std::unique_ptr< SurfaceEdges< dimension > > edges_;
     };
 
@@ -663,12 +730,13 @@ namespace geode
     }
 
     template < index_t dimension >
-    PolygonsAroundVertex SurfaceMesh< dimension >::polygons_around_vertex(
-        index_t vertex_id ) const
+    const PolygonsAroundVertex&
+        SurfaceMesh< dimension >::polygons_around_vertex(
+            index_t vertex_id ) const
     {
         check_vertex_id( *this, vertex_id );
-        return std::get< 0 >( ::polygons_around_vertex(
-            *this, vertex_id, get_polygon_around_vertex( vertex_id ) ) );
+        return impl_->polygons_around_vertex(
+            *this, vertex_id, get_polygon_around_vertex( vertex_id ) );
     }
 
     template < index_t dimension >
@@ -686,8 +754,8 @@ namespace geode
         index_t vertex_id ) const
     {
         check_vertex_id( *this, vertex_id );
-        return std::get< 1 >( ::polygons_around_vertex(
-            *this, vertex_id, get_polygon_around_vertex( vertex_id ) ) );
+        return impl_->is_vertex_on_border(
+            *this, vertex_id, get_polygon_around_vertex( vertex_id ) );
     }
 
     template < index_t dimension >
@@ -787,11 +855,19 @@ namespace geode
     template < typename Archive >
     void SurfaceMesh< dimension >::serialize( Archive& archive )
     {
-        archive.ext( *this, DefaultGrowable< Archive, SurfaceMesh >{},
-            []( Archive& a, SurfaceMesh& surface ) {
-                a.ext( surface, bitsery::ext::BaseClass< VertexSet >{} );
-                a.object( surface.impl_ );
-            } );
+        archive.ext( *this,
+            Growable< Archive, SurfaceMesh >{
+                { []( Archive& a, SurfaceMesh& surface ) {
+                     a.ext( surface, bitsery::ext::BaseClass< VertexSet >{} );
+                     a.object( surface.impl_ );
+                     surface.impl_->initialize_polygons_around_vertex(
+                         surface );
+                 },
+                    []( Archive& a, SurfaceMesh& surface ) {
+                        a.ext(
+                            surface, bitsery::ext::BaseClass< VertexSet >{} );
+                        a.object( surface.impl_ );
+                    } } } );
     }
 
     template < index_t dimension >
@@ -803,6 +879,13 @@ namespace geode
             box.add_point( point( p ) );
         }
         return box;
+    }
+
+    template < index_t dimension >
+    void SurfaceMesh< dimension >::reset_polygons_around_vertex(
+        index_t vertex_id, SurfaceMeshKey )
+    {
+        impl_->reset_polygons_around_vertex( vertex_id );
     }
 
     template < index_t dimension >

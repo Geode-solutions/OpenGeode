@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <type_traits>
+
 #include <bitsery/brief_syntax.h>
 
 #include <geode/basic/bitsery_archive.h>
@@ -34,15 +36,28 @@ namespace geode
     {
     public:
         template < typename... Args >
+        using CachedFunction =
+            typename std::add_pointer< ReturnType( Args... ) >::type;
+
+        template < typename... Args >
         const ReturnType& operator()(
-            ReturnType ( *computer )( Args... ), Args... args ) const
+            CachedFunction< Args... > computer, Args&&... args ) const
         {
             if( !computed_ )
             {
-                value_ = computer( args... );
+                value_ = computer( std::forward< Args >( args )... );
                 computed_ = true;
             }
             return value_;
+        }
+
+        bool operator!=( const CachedValue& other ) const
+        {
+            if( computed() && other.computed() )
+            {
+                return value() != other.value();
+            }
+            return false;
         }
 
         void reset()
@@ -53,6 +68,11 @@ namespace geode
         bool computed() const
         {
             return computed_;
+        }
+
+        const ReturnType& value() const
+        {
+            return value_;
         }
 
     private:
