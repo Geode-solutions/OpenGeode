@@ -55,37 +55,37 @@ namespace geode
         static void set_level( Level level );
 
         template < typename... Args >
-        static void trace( const Args &...args )
+        static void trace( const Args &... args )
         {
             log_trace( absl::StrCat( args... ) );
         }
 
         template < typename... Args >
-        static void debug( const Args &...args )
+        static void debug( const Args &... args )
         {
             log_debug( absl::StrCat( args... ) );
         }
 
         template < typename... Args >
-        static void info( const Args &...args )
+        static void info( const Args &... args )
         {
             log_info( absl::StrCat( args... ) );
         }
 
         template < typename... Args >
-        static void warn( const Args &...args )
+        static void warn( const Args &... args )
         {
             log_warn( absl::StrCat( args... ) );
         }
 
         template < typename... Args >
-        static void error( const Args &...args )
+        static void error( const Args &... args )
         {
             log_error( absl::StrCat( args... ) );
         }
 
         template < typename... Args >
-        static void critical( const Args &...args )
+        static void critical( const Args &... args )
         {
             log_critical( absl::StrCat( args... ) );
         }
@@ -110,3 +110,9 @@ namespace geode
 
 #define DEBUG( a ) geode::Logger::debug( #a, " = ", a )
 #define SDEBUG( a ) geode::Logger::debug( #a, " = ", a.string() )
+
+#ifdef OPENGEODE_DEBUG
+#define DEBUG_LOGGER( ... ) geode::Logger::debug( __VA_ARGS__ )
+#else
+#define DEBUG_LOGGER( ... )
+#endif
