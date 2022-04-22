@@ -74,10 +74,10 @@ namespace geode
     template < index_t dimension >
     AABBTree< dimension >::Impl::Impl(
         absl::Span< const BoundingBox< dimension > > bboxes )
-        : tree_( max_node_index( ROOT_INDEX, 0, bboxes.size() ) + ROOT_INDEX ),
+        : tree_( max_node_index( bboxes ) + ROOT_INDEX ),
           mapping_morton_( sort( bboxes ) )
     {
-        initialize_tree_recursive( bboxes, ROOT_INDEX, 0, bboxes.size() );
+        initialize_tree( bboxes );
     }
 
     template < index_t dimension >
@@ -94,6 +94,17 @@ namespace geode
 
     template < index_t dimension >
     index_t AABBTree< dimension >::Impl::max_node_index(
+        absl::Span< const BoundingBox< dimension > > bboxes ) const
+    {
+        if( bboxes.empty() )
+        {
+            return 0;
+        }
+        return max_node_index_recursive( ROOT_INDEX, 0, bboxes.size() );
+    }
+
+    template < index_t dimension >
+    index_t AABBTree< dimension >::Impl::max_node_index_recursive(
         index_t node_index, index_t box_begin, index_t box_end ) const
     {
         OPENGEODE_ASSERT( box_end > box_begin,
@@ -105,8 +116,19 @@ namespace geode
         const auto it =
             get_recursive_iterators( node_index, box_begin, box_end );
         return std::max(
-            max_node_index( it.child_left, box_begin, it.middle_box ),
-            max_node_index( it.child_right, it.middle_box, box_end ) );
+            max_node_index_recursive( it.child_left, box_begin, it.middle_box ),
+            max_node_index_recursive(
+                it.child_right, it.middle_box, box_end ) );
+    }
+
+    template < index_t dimension >
+    void AABBTree< dimension >::Impl::initialize_tree(
+        absl::Span< const BoundingBox< dimension > > bboxes )
+    {
+        if( !bboxes.empty() )
+        {
+            initialize_tree_recursive( bboxes, ROOT_INDEX, 0, bboxes.size() );
+        }
     }
 
     /**
