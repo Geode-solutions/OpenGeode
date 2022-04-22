@@ -166,6 +166,8 @@ namespace geode
          */
         void disassociate_polygon_vertex_to_vertex( index_t vertex_id );
 
+        void reset_polygons_around_vertex( index_t vertex_id );
+
         void copy( const SurfaceMesh< dimension >& surface_mesh );
 
     protected:

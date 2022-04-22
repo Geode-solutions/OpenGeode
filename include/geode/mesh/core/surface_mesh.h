@@ -328,7 +328,8 @@ namespace geode
          * @param[in] vertex_id Index of the vertex.
          * @pre This function needs that polygon adjacencies are computed
          */
-        PolygonsAroundVertex polygons_around_vertex( index_t vertex_id ) const;
+        const PolygonsAroundVertex& polygons_around_vertex(
+            index_t vertex_id ) const;
 
         /*!
          * Find the polygon edge corresponding to an ordered pair of vertex
@@ -370,6 +371,8 @@ namespace geode
             const PolygonVertex& polygon_vertex,
             index_t vertex_id,
             SurfaceMeshKey );
+
+        void reset_polygons_around_vertex( index_t vertex_id, SurfaceMeshKey );
 
         SurfaceEdges< dimension >& edges( SurfaceMeshKey );
 
