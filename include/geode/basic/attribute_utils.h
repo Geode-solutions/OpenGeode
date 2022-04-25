@@ -219,10 +219,10 @@ namespace geode
     IMPLICIT_GENERIC_ATTRIBUTE_CONVERSION( double );
 
 #define IMPLICIT_ARRAY_GENERIC_ATTRIBUTE_CONVERSION( Type )                    \
-    template < size_t nb_items >                                               \
-    struct GenericAttributeConversion< std::array< Type, nb_items > >          \
+    template < size_t size >                                                   \
+    struct GenericAttributeConversion< std::array< Type, size > >              \
     {                                                                          \
-        using Container = std::array< Type, nb_items >;                        \
+        using Container = std::array< Type, size >;                            \
         static float converted_value( const Container& value )                 \
         {                                                                      \
             return converted_item_value( value, 0 );                           \
