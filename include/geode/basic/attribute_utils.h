@@ -244,7 +244,7 @@ namespace geode
                                                                                \
         static local_index_t nb_items()                                        \
         {                                                                      \
-            return dimension;                                                  \
+            return size;                                                       \
         }                                                                      \
     }
 
