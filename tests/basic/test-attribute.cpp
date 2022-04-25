@@ -384,8 +384,8 @@ void test_generic_value( geode::AttributeManager& manager )
 
     auto array_attr =
         manager.find_or_create_attribute< geode::VariableAttribute,
-            std::array< double, 3 > >(
-            "array_double", std::array< double, 3 >() );
+            std::array< double, 2 > >(
+            "array_double", std::array< double, 2 >() );
     array_attr->set_value( 2, { 3.1, 1.3 } );
     OPENGEODE_EXCEPTION( array_attr->is_genericable(),
         "[Test] Foo attribute is not genericable" );
