@@ -388,7 +388,7 @@ void test_generic_value( geode::AttributeManager& manager )
             "array_double", std::array< double, 2 >() );
     array_attr->set_value( 2, { 3.1, 1.3 } );
     OPENGEODE_EXCEPTION( array_attr->is_genericable(),
-        "[Test] Foo attribute is not genericable" );
+        "[Test] Foo attribute is genericable" );
     OPENGEODE_EXCEPTION( array_attr->generic_value( 2 ) == 3.1f,
         "[Test] Generic value for element 2 of array attribute should be 3.1" );
     OPENGEODE_EXCEPTION( array_attr->generic_item_value( 2, 0 ) == 3.1f,
