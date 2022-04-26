@@ -32,6 +32,38 @@
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/uuid.h>
 
+namespace
+{
+    template < typename Serializer, typename Type >
+    void register_attribute_type_for_all_containers(
+        geode::PContext& context, absl::string_view name )
+    {
+        geode::AttributeManager::register_attribute_type< Type, Serializer >(
+            context, name );
+        geode::AttributeManager::register_attribute_type< std::array< Type, 2 >,
+            Serializer >( context, absl::StrCat( "array_", name, "_2" ) );
+        geode::AttributeManager::register_attribute_type< std::array< Type, 3 >,
+            Serializer >( context, absl::StrCat( "array_", name, "_3" ) );
+        geode::AttributeManager::register_attribute_type< std::array< Type, 4 >,
+            Serializer >( context, absl::StrCat( "array_", name, "_4" ) );
+    }
+
+    template < typename Serializer,
+        geode::index_t min_size,
+        geode::index_t max_size >
+    void register_inlinedvector_up_to_size( geode::PContext& context )
+    {
+        if constexpr( min_size < max_size )
+        {
+            geode::AttributeManager::register_attribute_type<
+                absl::InlinedVector< geode::index_t, min_size >, Serializer >(
+                context, absl::StrCat( "InlinedVector_index_t_", min_size ) );
+            register_inlinedvector_up_to_size< Serializer, min_size + 1,
+                max_size >( context );
+        }
+    }
+} // namespace
+
 namespace geode
 {
     namespace detail
@@ -39,56 +71,21 @@ namespace geode
         template < typename Serializer >
         void register_basic_pcontext( PContext& context )
         {
-            AttributeManager::register_attribute_type< bool, Serializer >(
+            register_attribute_type_for_all_containers< Serializer, bool >(
                 context, "bool" );
-            AttributeManager::register_attribute_type< int, Serializer >(
+            register_attribute_type_for_all_containers< Serializer, int >(
                 context, "int" );
-            AttributeManager::register_attribute_type< double, Serializer >(
+            register_attribute_type_for_all_containers< Serializer, double >(
                 context, "double" );
-            AttributeManager::register_attribute_type< index_t, Serializer >(
+            register_attribute_type_for_all_containers< Serializer,
+                local_index_t >( context, "local_index_t" );
+            register_attribute_type_for_all_containers< Serializer, index_t >(
                 context, "index_t" );
-            AttributeManager::register_attribute_type< local_index_t,
-                Serializer >( context, "local_index_t" );
             AttributeManager::register_attribute_type< std::vector< index_t >,
                 Serializer >( context, "vector_index_t" );
-            AttributeManager::register_attribute_type< std::array< index_t, 2 >,
-                Serializer >( context, "array_index_t_2" );
-            AttributeManager::register_attribute_type< std::array< index_t, 3 >,
-                Serializer >( context, "array_index_t_3" );
-            AttributeManager::register_attribute_type< std::array< index_t, 4 >,
-                Serializer >( context, "array_index_t_4" );
             AttributeManager::register_attribute_type< uuid, Serializer >(
                 context, "uuid" );
-            AttributeManager::register_attribute_type<
-                absl::InlinedVector< index_t, 1 >, Serializer >(
-                context, "InlinedVector_index_t_1" );
-            AttributeManager::register_attribute_type<
-                absl::InlinedVector< index_t, 2 >, Serializer >(
-                context, "InlinedVector_index_t_2" );
-            AttributeManager::register_attribute_type<
-                absl::InlinedVector< index_t, 3 >, Serializer >(
-                context, "InlinedVector_index_t_3" );
-            AttributeManager::register_attribute_type<
-                absl::InlinedVector< index_t, 4 >, Serializer >(
-                context, "InlinedVector_index_t_4" );
-            AttributeManager::register_attribute_type<
-                absl::InlinedVector< index_t, 5 >, Serializer >(
-                context, "InlinedVector_index_t_5" );
-            AttributeManager::register_attribute_type<
-                absl::InlinedVector< index_t, 6 >, Serializer >(
-                context, "InlinedVector_index_t_6" );
-            AttributeManager::register_attribute_type<
-                absl::InlinedVector< index_t, 7 >, Serializer >(
-                context, "InlinedVector_index_t_7" );
-            AttributeManager::register_attribute_type<
-                absl::InlinedVector< index_t, 8 >, Serializer >(
-                context, "InlinedVector_index_t_8" );
-            AttributeManager::register_attribute_type<
-                absl::InlinedVector< index_t, 9 >, Serializer >(
-                context, "InlinedVector_index_t_9" );
-            AttributeManager::register_attribute_type<
-                absl::InlinedVector< index_t, 10 >, Serializer >(
-                context, "InlinedVector_index_t_10" );
+            register_inlinedvector_up_to_size< Serializer, 1, 11 >( context );
         }
     } // namespace detail
 } // namespace geode
