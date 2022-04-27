@@ -71,7 +71,7 @@ namespace geode
 
         virtual bool is_genericable() const = 0;
 
-        virtual bool nb_items() const = 0;
+        virtual local_index_t nb_items() const = 0;
 
         virtual absl::string_view type() = 0;
 
@@ -162,7 +162,7 @@ namespace geode
             return GenericAttributeConversion< T >::is_genericable();
         }
 
-        bool nb_items() const final
+        local_index_t nb_items() const final
         {
             return GenericAttributeConversion< T >::nb_items();
         }
