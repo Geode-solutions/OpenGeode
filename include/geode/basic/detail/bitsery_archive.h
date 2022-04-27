@@ -48,19 +48,39 @@ namespace
             Serializer >( context, absl::StrCat( "array_", name, "_4" ) );
     }
 
-    template < typename Serializer,
-        geode::index_t min_size,
-        geode::index_t max_size >
-    void register_inlinedvector_up_to_size( geode::PContext& context )
+    template < typename Serializer >
+    void register_inlinedvector( geode::PContext& context )
     {
-        if constexpr( min_size < max_size )
-        {
-            geode::AttributeManager::register_attribute_type<
-                absl::InlinedVector< geode::index_t, min_size >, Serializer >(
-                context, absl::StrCat( "InlinedVector_index_t_", min_size ) );
-            register_inlinedvector_up_to_size< Serializer, min_size + 1,
-                max_size >( context );
-        }
+        geode::AttributeManager::register_attribute_type<
+            absl::InlinedVector< geode::index_t, 1 >, Serializer >(
+            context, "InlinedVector_index_t_1" );
+        geode::AttributeManager::register_attribute_type<
+            absl::InlinedVector< geode::index_t, 2 >, Serializer >(
+            context, "InlinedVector_index_t_2" );
+        geode::AttributeManager::register_attribute_type<
+            absl::InlinedVector< geode::index_t, 3 >, Serializer >(
+            context, "InlinedVector_index_t_3" );
+        geode::AttributeManager::register_attribute_type<
+            absl::InlinedVector< geode::index_t, 4 >, Serializer >(
+            context, "InlinedVector_index_t_4" );
+        geode::AttributeManager::register_attribute_type<
+            absl::InlinedVector< geode::index_t, 5 >, Serializer >(
+            context, "InlinedVector_index_t_5" );
+        geode::AttributeManager::register_attribute_type<
+            absl::InlinedVector< geode::index_t, 6 >, Serializer >(
+            context, "InlinedVector_index_t_6" );
+        geode::AttributeManager::register_attribute_type<
+            absl::InlinedVector< geode::index_t, 7 >, Serializer >(
+            context, "InlinedVector_index_t_7" );
+        geode::AttributeManager::register_attribute_type<
+            absl::InlinedVector< geode::index_t, 8 >, Serializer >(
+            context, "InlinedVector_index_t_8" );
+        geode::AttributeManager::register_attribute_type<
+            absl::InlinedVector< geode::index_t, 9 >, Serializer >(
+            context, "InlinedVector_index_t_9" );
+        geode::AttributeManager::register_attribute_type<
+            absl::InlinedVector< geode::index_t, 10 >, Serializer >(
+            context, "InlinedVector_index_t_10" );
     }
 } // namespace
 
@@ -85,7 +105,7 @@ namespace geode
                 Serializer >( context, "vector_index_t" );
             AttributeManager::register_attribute_type< uuid, Serializer >(
                 context, "uuid" );
-            register_inlinedvector_up_to_size< Serializer, 1, 11 >( context );
+            register_inlinedvector< Serializer >( context );
         }
     } // namespace detail
 } // namespace geode
