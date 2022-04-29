@@ -259,7 +259,7 @@ namespace geode
         const AABBTree< dimension >& other_tree,
         EvalIntersection& action ) const
     {
-        if( nb_bboxes() == 0 )
+        if( nb_bboxes() == 0 || other_tree.nb_bboxes() == 0 )
         {
             return;
         }
