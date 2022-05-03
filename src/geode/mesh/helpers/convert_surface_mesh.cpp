@@ -115,7 +115,7 @@ namespace geode
         }
         auto tri_surface = TriangulatedSurface< dimension >::create();
         convert_surface( surface, *tri_surface );
-        return { std::move( tri_surface ) };
+        return tri_surface;
     }
 
     template < index_t dimension >

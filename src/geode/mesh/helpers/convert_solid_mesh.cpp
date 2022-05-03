@@ -87,6 +87,6 @@ namespace geode
                 }
             }
         }
-        return { std::move( tet_solid ) };
+        return tet_solid;
     }
 } // namespace geode
