@@ -617,12 +617,16 @@ namespace geode
                     if( vertices[v] == edge_vertices[0]
                         && vertices[next] == edge_vertices[1] )
                     {
-                        return PolyhedronFacetEdge{ facet, v };
+                        return absl::optional< PolyhedronFacetEdge >{
+                            absl::in_place, facet, v
+                        };
                     }
                     if( vertices[v] == edge_vertices[1]
                         && vertices[next] == edge_vertices[0] )
                     {
-                        return PolyhedronFacetEdge{ facet, v };
+                        return absl::optional< PolyhedronFacetEdge >{
+                            absl::in_place, facet, v
+                        };
                     }
                 }
             }
