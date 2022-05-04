@@ -51,7 +51,7 @@ namespace geode
     {
     public:
         template < typename... Args >
-        explicit OpenGeodeException( const Args &...message )
+        explicit OpenGeodeException( const Args &... message )
             : std::runtime_error{ absl::StrCat( message... ) }
         {
         }
@@ -79,10 +79,13 @@ namespace geode
 #define OPENGEODE_ASSERT_NOT_REACHED( ... )                                    \
     geode::geode_assertion_failed( "should not reached",                       \
         absl::StrCat( __VA_ARGS__ ), __FILE__, __LINE__ )
+#define DEBUG_CONST const
 #else
 #define OPENGEODE_ASSERT( x, ... )
 #define OPENGEODE_ASSERT_NOT_REACHED( ... )
+#define DEBUG_CONST
 #endif
+
 #define OPENGEODE_EXCEPTION( condition, ... )                                  \
     if( ABSL_PREDICT_FALSE( !( condition ) ) )                                 \
         throw geode::OpenGeodeException                                        \
