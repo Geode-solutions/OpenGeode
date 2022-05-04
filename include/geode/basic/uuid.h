@@ -104,6 +104,8 @@ namespace geode
     public:
         uuid();
 
+        uuid( absl::string_view string );
+
         bool operator==( const uuid &other ) const;
 
         bool operator!=( const uuid &other ) const;

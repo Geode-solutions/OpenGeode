@@ -27,12 +27,33 @@
 #include <random>
 #include <sstream>
 
+namespace
+{
+    size_t decode( char ch )
+    {
+        if( 'f' >= ch && ch >= 'a' )
+        {
+            return ch - 'a' + 10;
+        }
+        if( 'F' >= ch && ch >= 'A' )
+        {
+            return ch - 'A' + 10;
+        }
+        if( '9' >= ch && ch >= '0' )
+        {
+            return ch - '0';
+        }
+        return 0;
+    }
+} // namespace
+
 namespace geode
 {
     uuid::uuid()
     {
-        static std::random_device rd;
-        static std::uniform_int_distribution< uint64_t > dist( 0u, ~0u );
+        static thread_local std::random_device rd;
+        static thread_local std::uniform_int_distribution< uint64_t > dist(
+            0u, ~0u );
 
         ab = dist( rd );
         cd = dist( rd );
@@ -45,10 +66,12 @@ namespace geode
     {
         return ab == other.ab && cd == other.cd;
     }
+
     bool uuid::operator!=( const uuid &other ) const
     {
         return !operator==( other );
     }
+
     bool uuid::operator<( const uuid &other ) const
     {
         if( ab < other.ab )
@@ -68,21 +91,56 @@ namespace geode
 
     std::string uuid::string() const
     {
-        std::stringstream ss;
-        ss << std::hex << std::nouppercase << std::setfill( '0' );
+        char string[] = "00000000-0000-0000-0000-000000000000";
+        static constexpr char encode[] = "0123456789abcdef";
 
-        const uint32_t a = ( ab >> 32u );
-        const uint32_t b = ( ab & 0xFFFFFFFFu );
-        const uint32_t c = ( cd >> 32u );
-        const uint32_t d = ( cd & 0xFFFFFFFFu );
+        index_t bit = 15;
+        for( const auto i : Range{ 18 } )
+        {
+            if( i == 8 || i == 13 )
+            {
+                continue;
+            }
+            string[i] = encode[ab >> 4 * bit & 0x0f];
+            bit--;
+        }
 
-        ss << std::setw( 8 ) << ( a ) << '-';
-        ss << std::setw( 4 ) << ( b >> 16u ) << '-';
-        ss << std::setw( 4 ) << ( b & 0xFFFFu ) << '-';
-        ss << std::setw( 4 ) << ( c >> 16u ) << '-';
-        ss << std::setw( 4 ) << ( c & 0xFFFFu );
-        ss << std::setw( 8 ) << d;
+        bit = 15;
+        for( const auto i : Range{ 19, 36 } )
+        {
+            if( i == 23 )
+            {
+                continue;
+            }
+            string[i] = encode[cd >> 4 * bit & 0x0f];
+            bit--;
+        }
 
-        return ss.str();
+        return string;
+    }
+
+    uuid::uuid( absl::string_view string )
+    {
+        OPENGEODE_EXCEPTION( string.size() == 36, "[uuid] wrong string size" );
+        OPENGEODE_EXCEPTION( string[8] == '-' && string[13] == '-'
+                                 && string[18] == '-' && string[23] == '-',
+            "[uuid] unknown string format" );
+
+        for( const auto i : Range{ 18 } )
+        {
+            if( i == 8 || i == 13 )
+            {
+                continue;
+            }
+            ab = ab << 4 | decode( string[i] );
+        }
+        for( const auto i : Range{ 19, 36 } )
+        {
+            if( i == 23 )
+            {
+                continue;
+            }
+            cd = cd << 4 | decode( string[i] );
+        }
     }
 } // namespace geode
