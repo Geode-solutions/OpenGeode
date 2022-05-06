@@ -141,8 +141,7 @@ namespace geode
         for( auto& surface : modifiable_surfaces() )
         {
             tasks[count++] = async::spawn( [&surface, &mapping] {
-                const auto file =
-                    mapping.at( surface.component_id().id().string() );
+                const auto file = mapping.at( surface.id().string() );
                 if( MeshFactory::type( surface.mesh_type() )
                     == TriangulatedSurface< dimension >::type_name_static() )
                 {

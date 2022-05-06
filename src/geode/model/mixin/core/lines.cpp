@@ -115,8 +115,7 @@ namespace geode
         for( auto& line : modifiable_lines() )
         {
             tasks[count++] = async::spawn( [&line, &mapping] {
-                const auto file =
-                    mapping.at( line.component_id().id().string() );
+                const auto file = mapping.at( line.id().string() );
                 line.set_mesh(
                     load_edged_curve< dimension >( line.mesh_type(), file ),
                     typename Line< dimension >::LinesKey{} );

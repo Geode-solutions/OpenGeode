@@ -117,8 +117,7 @@ namespace geode
         for( auto& corner : modifiable_corners() )
         {
             tasks[count++] = async::spawn( [&corner, &mapping] {
-                const auto file =
-                    mapping.at( corner.component_id().id().string() );
+                const auto file = mapping.at( corner.id().string() );
                 corner.set_mesh(
                     load_point_set< dimension >( corner.mesh_type(), file ),
                     typename Corner< dimension >::CornersKey{} );
