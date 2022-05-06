@@ -160,7 +160,9 @@ namespace geode
         std::vector< index_t > mapping_morton( points.size() );
         async::parallel_for(
             async::irange( size_t{ 0 }, mapping_morton.size() ),
-            [&mapping_morton]( index_t i ) { mapping_morton[i] = i; } );
+            [&mapping_morton]( index_t i ) {
+                mapping_morton[i] = i;
+            } );
         ::morton_sort< 0_uc >(
             points, mapping_morton.begin(), mapping_morton.end() );
         return mapping_morton;

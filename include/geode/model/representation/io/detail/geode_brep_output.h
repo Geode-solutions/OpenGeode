@@ -61,8 +61,9 @@ namespace geode
         {
             absl::FixedArray< async::task< void > > tasks( 5 );
             index_t count{ 0 };
-            tasks[count++] = async::spawn(
-                [&directory, this] { brep().save_identifier( directory ); } );
+            tasks[count++] = async::spawn( [&directory, this] {
+                brep().save_identifier( directory );
+            } );
             tasks[count++] = async::spawn( [&directory, this] {
                 brep().save_relationships( directory );
             } );

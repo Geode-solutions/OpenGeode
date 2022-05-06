@@ -63,8 +63,9 @@ namespace
     {
         absl::FixedArray< geode::Point< dimension > > points( bboxes.size() );
         async::parallel_for( async::irange( size_t{ 0 }, bboxes.size() ),
-            [&bboxes, &points](
-                size_t i ) { points[i] = bboxes[i].min() + bboxes[i].max(); } );
+            [&bboxes, &points]( size_t i ) {
+                points[i] = bboxes[i].min() + bboxes[i].max();
+            } );
         return geode::morton_sort< dimension >( points );
     }
 } // namespace

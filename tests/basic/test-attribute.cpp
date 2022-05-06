@@ -127,7 +127,9 @@ void test_foo_constant_attribute( geode::AttributeManager& manager )
     auto constant_attribute =
         manager.find_or_create_attribute< geode::ConstantAttribute, Foo >(
             "foo_cst", Foo{} );
-    constant_attribute->modify_value( []( Foo& foo ) { foo.double_ = 12.4; } );
+    constant_attribute->modify_value( []( Foo& foo ) {
+        foo.double_ = 12.4;
+    } );
     OPENGEODE_EXCEPTION( constant_attribute->value().double_ == 12.4,
         "[Test] Should be equal to 12.4" );
 }
@@ -137,8 +139,9 @@ void test_foo_variable_attribute( geode::AttributeManager& manager )
     auto variable_attribute =
         manager.find_or_create_attribute< geode::VariableAttribute, Foo >(
             "foo_var", Foo{} );
-    variable_attribute->modify_value(
-        3, []( Foo& foo ) { foo.double_ = 12.4; } );
+    variable_attribute->modify_value( 3, []( Foo& foo ) {
+        foo.double_ = 12.4;
+    } );
     OPENGEODE_EXCEPTION( variable_attribute->value( 0 ).double_ == 0,
         "[Test] Should be equal to 0" );
     OPENGEODE_EXCEPTION( variable_attribute->value( 3 ).double_ == 12.4,
@@ -170,8 +173,12 @@ void test_foo_sparse_attribute( geode::AttributeManager& manager )
     auto sparse_attribute =
         manager.find_or_create_attribute< geode::SparseAttribute, Foo >(
             "foo_spr", Foo{} );
-    sparse_attribute->modify_value( 3, []( Foo& foo ) { foo.double_ = 12.4; } );
-    sparse_attribute->modify_value( 3, []( Foo& foo ) { foo.int_ = 3; } );
+    sparse_attribute->modify_value( 3, []( Foo& foo ) {
+        foo.double_ = 12.4;
+    } );
+    sparse_attribute->modify_value( 3, []( Foo& foo ) {
+        foo.int_ = 3;
+    } );
     OPENGEODE_EXCEPTION( sparse_attribute->value( 0 ).double_ == 0,
         "[Test] Should be equal to 0" );
     OPENGEODE_EXCEPTION( sparse_attribute->value( 3 ).double_ == 12.4,

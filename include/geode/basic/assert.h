@@ -72,18 +72,18 @@ namespace geode
 } // namespace geode
 
 #ifdef OPENGEODE_DEBUG
-#define OPENGEODE_ASSERT( condition, ... )                                     \
-    if( ABSL_PREDICT_FALSE( !( condition ) ) )                                 \
-    geode::geode_assertion_failed(                                             \
-        #condition, absl::StrCat( __VA_ARGS__ ), __FILE__, __LINE__ )
-#define OPENGEODE_ASSERT_NOT_REACHED( ... )                                    \
-    geode::geode_assertion_failed( "should not reached",                       \
-        absl::StrCat( __VA_ARGS__ ), __FILE__, __LINE__ )
-#define DEBUG_CONST const
+#    define OPENGEODE_ASSERT( condition, ... )                                 \
+        if( ABSL_PREDICT_FALSE( !( condition ) ) )                             \
+        geode::geode_assertion_failed(                                         \
+            #condition, absl::StrCat( __VA_ARGS__ ), __FILE__, __LINE__ )
+#    define OPENGEODE_ASSERT_NOT_REACHED( ... )                                \
+        geode::geode_assertion_failed( "should not reached",                   \
+            absl::StrCat( __VA_ARGS__ ), __FILE__, __LINE__ )
+#    define DEBUG_CONST const
 #else
-#define OPENGEODE_ASSERT( x, ... )
-#define OPENGEODE_ASSERT_NOT_REACHED( ... )
-#define DEBUG_CONST
+#    define OPENGEODE_ASSERT( x, ... )
+#    define OPENGEODE_ASSERT_NOT_REACHED( ... )
+#    define DEBUG_CONST
 #endif
 
 #define OPENGEODE_EXCEPTION( condition, ... )                                  \

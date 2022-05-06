@@ -134,19 +134,21 @@ namespace geode
         {
             switch( polyhedron_type( polyhedron_facet.polyhedron_id ) )
             {
-            case Type::TETRAHEDRON:
-                return 3;
-            case Type::HEXAHEDRON:
-                return 4;
-            case Type::PRISM:
-                return detail::prism_facet_vertices[polyhedron_facet.facet_id]
-                    .size();
-            case Type::PYRAMID:
-                return detail::pyramid_facet_vertices[polyhedron_facet.facet_id]
-                    .size();
-            case Type::UNKNOWN:
-                throw OpenGeodeException(
-                    "[HybridSolid] Unknown polyhedron type" );
+                case Type::TETRAHEDRON:
+                    return 3;
+                case Type::HEXAHEDRON:
+                    return 4;
+                case Type::PRISM:
+                    return detail::prism_facet_vertices[polyhedron_facet
+                                                            .facet_id]
+                        .size();
+                case Type::PYRAMID:
+                    return detail::pyramid_facet_vertices[polyhedron_facet
+                                                              .facet_id]
+                        .size();
+                case Type::UNKNOWN:
+                    throw OpenGeodeException(
+                        "[HybridSolid] Unknown polyhedron type" );
             }
             return 0;
         }
@@ -188,21 +190,25 @@ namespace geode
             const auto vertex_id = polyhedron_facet_vertex.vertex_id;
             switch( polyhedron_type( polyhedron_id ) )
             {
-            case Type::TETRAHEDRON:
-                return { polyhedron_id,
-                    detail::tetrahedron_facet_vertices[facet_id][vertex_id] };
-            case Type::HEXAHEDRON:
-                return { polyhedron_id,
-                    detail::hexahedron_facet_vertices[facet_id][vertex_id] };
-            case Type::PRISM:
-                return { polyhedron_id,
-                    detail::prism_facet_vertices[facet_id][vertex_id] };
-            case Type::PYRAMID:
-                return { polyhedron_id,
-                    detail::pyramid_facet_vertices[facet_id][vertex_id] };
-            case Type::UNKNOWN:
-                throw OpenGeodeException(
-                    "[HybridSolid] Unknown polyhedron type" );
+                case Type::TETRAHEDRON:
+                    return {
+                        polyhedron_id,
+                        detail::tetrahedron_facet_vertices[facet_id][vertex_id]
+                    };
+                case Type::HEXAHEDRON:
+                    return {
+                        polyhedron_id,
+                        detail::hexahedron_facet_vertices[facet_id][vertex_id]
+                    };
+                case Type::PRISM:
+                    return { polyhedron_id,
+                        detail::prism_facet_vertices[facet_id][vertex_id] };
+                case Type::PYRAMID:
+                    return { polyhedron_id,
+                        detail::pyramid_facet_vertices[facet_id][vertex_id] };
+                case Type::UNKNOWN:
+                    throw OpenGeodeException(
+                        "[HybridSolid] Unknown polyhedron type" );
             }
             return {};
         }
@@ -292,21 +298,21 @@ namespace geode
         {
             switch( polyhedron_type( polyhedron ) )
             {
-            case Type::TETRAHEDRON:
-                return ::polyhedron_edges_vertices(
-                    solid, polyhedron, detail::tetrahedron_edge_vertices );
-            case Type::HEXAHEDRON:
-                return ::polyhedron_edges_vertices(
-                    solid, polyhedron, detail::hexahedron_edge_vertices );
-            case Type::PRISM:
-                return ::polyhedron_edges_vertices(
-                    solid, polyhedron, detail::prism_edge_vertices );
-            case Type::PYRAMID:
-                return ::polyhedron_edges_vertices(
-                    solid, polyhedron, detail::pyramid_edge_vertices );
-            case Type::UNKNOWN:
-                throw OpenGeodeException(
-                    "[HybridSolid] Unknown polyhedron type" );
+                case Type::TETRAHEDRON:
+                    return ::polyhedron_edges_vertices(
+                        solid, polyhedron, detail::tetrahedron_edge_vertices );
+                case Type::HEXAHEDRON:
+                    return ::polyhedron_edges_vertices(
+                        solid, polyhedron, detail::hexahedron_edge_vertices );
+                case Type::PRISM:
+                    return ::polyhedron_edges_vertices(
+                        solid, polyhedron, detail::prism_edge_vertices );
+                case Type::PYRAMID:
+                    return ::polyhedron_edges_vertices(
+                        solid, polyhedron, detail::pyramid_edge_vertices );
+                case Type::UNKNOWN:
+                    throw OpenGeodeException(
+                        "[HybridSolid] Unknown polyhedron type" );
             }
             return {};
         }
@@ -316,21 +322,21 @@ namespace geode
         {
             switch( polyhedron_type( polyhedron ) )
             {
-            case Type::TETRAHEDRON:
-                return ::polyhedron_facets_vertices(
-                    solid, polyhedron, detail::tetrahedron_facet_vertices );
-            case Type::HEXAHEDRON:
-                return ::polyhedron_facets_vertices(
-                    solid, polyhedron, detail::hexahedron_facet_vertices );
-            case Type::PRISM:
-                return ::polyhedron_facets_vertices(
-                    solid, polyhedron, detail::prism_facet_vertices );
-            case Type::PYRAMID:
-                return ::polyhedron_facets_vertices(
-                    solid, polyhedron, detail::pyramid_facet_vertices );
-            case Type::UNKNOWN:
-                throw OpenGeodeException(
-                    "[HybridSolid] Unknown polyhedron type" );
+                case Type::TETRAHEDRON:
+                    return ::polyhedron_facets_vertices(
+                        solid, polyhedron, detail::tetrahedron_facet_vertices );
+                case Type::HEXAHEDRON:
+                    return ::polyhedron_facets_vertices(
+                        solid, polyhedron, detail::hexahedron_facet_vertices );
+                case Type::PRISM:
+                    return ::polyhedron_facets_vertices(
+                        solid, polyhedron, detail::prism_facet_vertices );
+                case Type::PYRAMID:
+                    return ::polyhedron_facets_vertices(
+                        solid, polyhedron, detail::pyramid_facet_vertices );
+                case Type::UNKNOWN:
+                    throw OpenGeodeException(
+                        "[HybridSolid] Unknown polyhedron type" );
             }
             return {};
         }

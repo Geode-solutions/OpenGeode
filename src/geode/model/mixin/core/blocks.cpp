@@ -127,7 +127,9 @@ namespace geode
             } );
         }
         async::when_all( tasks.begin(), tasks.end() )
-            .then( [level] { Logger::set_level( level ); } )
+            .then( [level] {
+                Logger::set_level( level );
+            } )
             .wait();
     }
 
@@ -168,7 +170,9 @@ namespace geode
             } );
         }
         async::when_all( tasks.begin(), tasks.end() )
-            .then( [level] { Logger::set_level( level ); } )
+            .then( [level] {
+                Logger::set_level( level );
+            } )
             .wait();
     }
 

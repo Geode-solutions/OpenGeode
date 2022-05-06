@@ -40,34 +40,34 @@ namespace geode
  */
 
 #ifdef OPENGEODE_BENCHMARK
-#define CATCH_CONFIG_MAIN
-#define CATCH_CONFIG_PREFIX_ALL
-#define CATCH_CONFIG_ENABLE_BENCHMARKING
-#include <geode/tests/catch2.h>
-#define OPENGEODE_TEST( name )                                                 \
-    CATCH_TEST_CASE( name )                                                    \
-    {                                                                          \
-        CATCH_BENCHMARK( name )                                                \
+#    define CATCH_CONFIG_MAIN
+#    define CATCH_CONFIG_PREFIX_ALL
+#    define CATCH_CONFIG_ENABLE_BENCHMARKING
+#    include <geode/tests/catch2.h>
+#    define OPENGEODE_TEST( name )                                             \
+        CATCH_TEST_CASE( name )                                                \
         {                                                                      \
-            return test();                                                     \
-        };                                                                     \
-    }
+            CATCH_BENCHMARK( name )                                            \
+            {                                                                  \
+                return test();                                                 \
+            };                                                                 \
+        }
 #else
-#define OPENGEODE_TEST( name )                                                 \
-    int main()                                                                 \
-    {                                                                          \
-        using namespace geode;                                                 \
-                                                                               \
-        try                                                                    \
+#    define OPENGEODE_TEST( name )                                             \
+        int main()                                                             \
         {                                                                      \
-            test();                                                            \
+            using namespace geode;                                             \
                                                                                \
-            Logger::info( "TEST SUCCESS" );                                    \
-            return 0;                                                          \
-        }                                                                      \
-        catch( ... )                                                           \
-        {                                                                      \
-            return geode_lippincott();                                         \
-        }                                                                      \
-    }
+            try                                                                \
+            {                                                                  \
+                test();                                                        \
+                                                                               \
+                Logger::info( "TEST SUCCESS" );                                \
+                return 0;                                                      \
+            }                                                                  \
+            catch( ... )                                                       \
+            {                                                                  \
+                return geode_lippincott();                                     \
+            }                                                                  \
+        }
 #endif

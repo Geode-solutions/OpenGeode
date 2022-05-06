@@ -196,7 +196,9 @@ namespace geode
     void SolidEdges< dimension >::serialize( Archive& archive )
     {
         archive.ext( *this, DefaultGrowable< Archive, SolidEdges >{},
-            []( Archive& a, SolidEdges& solid ) { a.object( solid.impl_ ); } );
+            []( Archive& a, SolidEdges& solid ) {
+                a.object( solid.impl_ );
+            } );
     }
 
     template class opengeode_mesh_api SolidEdges< 3 >;

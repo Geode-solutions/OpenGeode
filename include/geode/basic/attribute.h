@@ -375,7 +375,9 @@ namespace geode
                     a( attribute.default_value_ );
                     a.container( attribute.values_,
                         attribute.values_.max_size(),
-                        []( Archive& a2, T& item ) { a2( item ); } );
+                        []( Archive& a2, T& item ) {
+                            a2( item );
+                        } );
                 } );
             values_.reserve( 10 );
         }
