@@ -475,7 +475,7 @@ namespace geode
         Point< dimension > origin_;
         std::array< index_t, dimension > cells_number_;
         std::array< double, dimension > cells_length_;
-    }; // namespace geode
+    };
 
     template < index_t dimension >
     RegularGrid< dimension >::RegularGrid( Point< dimension > origin,
