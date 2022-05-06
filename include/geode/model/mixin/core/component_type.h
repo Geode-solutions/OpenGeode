@@ -52,14 +52,24 @@ namespace geode
         {
         }
 
-        const uuid& id() const
+        const uuid& id() const&
         {
             return id_;
         }
 
-        const ComponentType& type() const
+        uuid&& id() &&
+        {
+            return std::move( id_ );
+        }
+
+        const ComponentType& type() const&
         {
             return type_;
+        }
+
+        ComponentType&& type() &&
+        {
+            return std::move( type_ );
         }
 
         bool operator!=( const ComponentID& other ) const
