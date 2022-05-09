@@ -59,20 +59,30 @@ namespace geode
               cells_number_( std::move( cells_number ) ),
               cells_length_( std::move( cells_length ) )
         {
-            double nb_cells_double{ 1 };
+            for( const auto direction : LRange{ dimension } )
+            {
+                OPENGEODE_EXCEPTION( cells_length_[direction] > global_epsilon,
+                    "[RegularGrid] Creation of a grid with a cell length "
+                    "smaller than epsilon in direction ",
+                    direction, "." );
+            }
+            double nb_vertices_double{ 1 };
             for( const auto c : cells_number )
             {
-                nb_cells_double *= static_cast< double >( c + 1 );
+                nb_vertices_double *= static_cast< double >( c + 1 );
             }
             OPENGEODE_EXCEPTION(
-                nb_cells_double < static_cast< double >( UINT_MAX ),
+                nb_vertices_double < static_cast< double >( UINT_MAX ),
                 "[RegularGrid] Creation of a grid for which the number of cell "
-                "vertices exceeds the unsigned int limit. " );
+                "vertices exceeds the unsigned int limit." );
             index_t nb_cells{ 1 };
             for( const auto c : cells_number )
             {
                 nb_cells *= c;
             }
+            OPENGEODE_EXCEPTION( nb_cells != 0,
+                "[RegularGrid] Creation of a grid with no cells "
+                "in one direction." );
             cell_attribute_manager_.resize( nb_cells );
             resize_vertex_attribute_manager_to_right_size();
         }
