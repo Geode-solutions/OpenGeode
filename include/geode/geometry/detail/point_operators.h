@@ -79,5 +79,44 @@ namespace geode
             }
             return result;
         }
+
+        template < template < index_t > class Coords, index_t dimension >
+        void coords_multiply_equal(
+            Coords< dimension > &input, double multiplier )
+        {
+            for( const auto i : LRange{ dimension } )
+            {
+                input.set_value( i, input.value( i ) * multiplier );
+            }
+        }
+
+        template < template < index_t > class Coords, index_t dimension >
+        void coords_divide_equal( Coords< dimension > &input, double divider )
+        {
+            for( const auto i : LRange{ dimension } )
+            {
+                input.set_value( i, input.value( i ) / divider );
+            }
+        }
+
+        template < template < index_t > class Coords, index_t dimension >
+        void coords_add_equal(
+            Coords< dimension > &input, const Coords< dimension > &other )
+        {
+            for( const auto i : LRange{ dimension } )
+            {
+                input.set_value( i, input.value( i ) + other.value( i ) );
+            }
+        }
+
+        template < template < index_t > class Coords, index_t dimension >
+        void coords_substract_equal(
+            Coords< dimension > &input, const Coords< dimension > &other )
+        {
+            for( const auto i : LRange{ dimension } )
+            {
+                input.set_value( i, input.value( i ) - other.value( i ) );
+            }
+        }
     } // namespace detail
 } // namespace geode

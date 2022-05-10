@@ -102,6 +102,26 @@ namespace geode
             return detail::coords_substract( *this, other );
         }
 
+        void operator*=( double multiplier )
+        {
+            detail::coords_multiply_equal( *this, multiplier );
+        }
+
+        void operator/=( double divider )
+        {
+            detail::coords_divide_equal( *this, divider );
+        }
+
+        void operator+=( const Point &other )
+        {
+            detail::coords_add_equal( *this, other );
+        }
+
+        void operator-=( const Point &other )
+        {
+            detail::coords_substract_equal( *this, other );
+        }
+
         bool inexact_equal( const Point &other, double epsilon ) const
         {
             double square_length{ 0 };
