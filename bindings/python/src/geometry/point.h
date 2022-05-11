@@ -37,6 +37,10 @@
         .def( pybind11::self / double() )                                      \
         .def( pybind11::self + pybind11::self )                                \
         .def( pybind11::self - pybind11::self )                                \
+        .def( pybind11::self *= double() )                                     \
+        .def( pybind11::self /= double() )                                     \
+        .def( pybind11::self += pybind11::self )                               \
+        .def( pybind11::self -= pybind11::self )                               \
         .def( "value", &Point##dimension##D::value )                           \
         .def( "set_value", &Point##dimension##D::set_value )
 
