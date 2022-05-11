@@ -39,9 +39,9 @@ namespace geode
     class ProgressLogger::Impl
     {
     public:
-        Impl( std::string message, index_t max_number )
+        Impl( std::string message, index_t nb_steps )
             : message_{ std::move( message ) },
-              max_number_( max_number ),
+              nb_steps_( nb_steps ),
               current_time_{ absl::Now() }
         {
             Logger::info( message_, " started" );
@@ -49,7 +49,7 @@ namespace geode
 
         ~Impl()
         {
-            if( current_ == max_number_ )
+            if( current_ == nb_steps_ )
             {
                 Logger::info( message_, " completed in ", timer_.duration() );
             }
@@ -63,23 +63,29 @@ namespace geode
             if( now - current_time_ > SLEEP )
             {
                 current_time_ = now;
-                const auto percent = std::floor( current_ / max_number_ * 100 );
-                Logger::info( message_, " ", current_, "/", max_number_, " (",
+                const auto percent = std::floor( current_ / nb_steps_ * 100 );
+                Logger::info( message_, " ", current_, "/", nb_steps_, " (",
                     percent, "%)" );
             }
         }
 
+        void increment_nb_steps()
+        {
+            absl::MutexLock locking{ &lock_ };
+            nb_steps_++;
+        }
+
     private:
-        const std::string message_;
-        const double max_number_;
+        DEBUG_CONST std::string message_;
+        double nb_steps_;
         index_t current_{ 0 };
-        const Timer timer_;
+        DEBUG_CONST Timer timer_;
         absl::Time current_time_;
         absl::Mutex lock_;
     };
 
-    ProgressLogger::ProgressLogger( std::string message, index_t max_number )
-        : impl_( std::move( message ), max_number )
+    ProgressLogger::ProgressLogger( std::string message, index_t nb_steps )
+        : impl_( std::move( message ), nb_steps )
     {
     }
 
@@ -88,5 +94,10 @@ namespace geode
     void ProgressLogger::increment()
     {
         impl_->increment();
+    }
+
+    void ProgressLogger::increment_nb_steps()
+    {
+        impl_->increment_nb_steps();
     }
 } // namespace geode

@@ -33,10 +33,12 @@ namespace geode
     class opengeode_basic_api ProgressLogger
     {
     public:
-        ProgressLogger( std::string message, index_t max_number );
+        ProgressLogger( std::string message, index_t nb_steps );
         ~ProgressLogger();
 
         void increment();
+
+        void increment_nb_steps();
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );
