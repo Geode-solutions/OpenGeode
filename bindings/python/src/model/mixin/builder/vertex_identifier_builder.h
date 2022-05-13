@@ -73,6 +73,8 @@ namespace geode
                 &VertexIdentifierBuilder::create_unique_vertices )
             .def( "set_unique_vertex",
                 &VertexIdentifierBuilder::set_unique_vertex )
+            .def( "update_unique_vertices",
+                &VertexIdentifierBuilder::update_unique_vertices )
             .def( "delete_isolated_vertices",
                 &VertexIdentifierBuilder::delete_isolated_vertices );
     }
