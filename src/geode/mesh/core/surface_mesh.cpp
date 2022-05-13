@@ -47,16 +47,6 @@
 namespace
 {
     template < geode::index_t dimension >
-    void check_edge_id( const geode::SurfaceMesh< dimension >& surface,
-        const geode::index_t edge_id )
-    {
-        geode_unused( surface );
-        geode_unused( edge_id );
-        OPENGEODE_ASSERT( edge_id < surface.nb_edges(),
-            "[check_edge_id] Trying to access an invalid edge" );
-    }
-
-    template < geode::index_t dimension >
     void check_vertex_id( const geode::SurfaceMesh< dimension >& surface,
         const geode::index_t vertex_id )
     {
@@ -80,7 +70,7 @@ namespace
     void check_polygon_vertex_id(
         const geode::SurfaceMesh< dimension >& surface,
         const geode::index_t polygon_id,
-        const geode::index_t vertex_id )
+        const geode::local_index_t vertex_id )
     {
         geode_unused( surface );
         geode_unused( polygon_id );
@@ -93,7 +83,7 @@ namespace
     template < geode::index_t dimension >
     void check_polygon_edge_id( const geode::SurfaceMesh< dimension >& surface,
         const geode::index_t polygon_id,
-        const geode::index_t edge_id )
+        const geode::local_index_t edge_id )
     {
         geode_unused( surface );
         geode_unused( polygon_id );
@@ -679,6 +669,16 @@ namespace geode
         check_vertex_id( *this, vertex_id );
         return std::get< 0 >( ::polygons_around_vertex(
             *this, vertex_id, get_polygon_around_vertex( vertex_id ) ) );
+    }
+
+    template < index_t dimension >
+    PolygonsAroundVertex SurfaceMesh< dimension >::polygons_around_vertex(
+        const PolygonVertex& polygon_vertex ) const
+    {
+        check_polygon_vertex_id(
+            *this, polygon_vertex.polygon_id, polygon_vertex.vertex_id );
+        return std::get< 0 >( ::polygons_around_vertex(
+            *this, this->polygon_vertex( polygon_vertex ), polygon_vertex ) );
     }
 
     template < index_t dimension >

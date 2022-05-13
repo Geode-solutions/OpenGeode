@@ -162,6 +162,41 @@ namespace geode
     }
 
     template < index_t dimension >
+    PolyhedraAroundEdge TetrahedralSolid< dimension >::polyhedra_around_edge(
+        const PolyhedronFacetEdge& edge ) const
+    {
+        return polyhedra_around_edge(
+            this->polyhedron_facet_edge_vertices( edge ),
+            edge.polyhedron_facet.polyhedron_id );
+    }
+
+    template < index_t dimension >
+    PolyhedraAroundEdge TetrahedralSolid< dimension >::polyhedra_around_edge(
+        const std::array< index_t, 2 >& vertices,
+        index_t first_polyhedron ) const
+    {
+        PolyhedraAroundEdge result{ first_polyhedron };
+        const auto v0 =
+            this->vertex_in_polyhedron( first_polyhedron, vertices[0] ).value();
+        const auto v1 =
+            this->vertex_in_polyhedron( first_polyhedron, vertices[1] ).value();
+        for( const auto f : LRange{ 4 } )
+        {
+            if( f == v0 || f == v1 )
+            {
+                continue;
+            }
+            if( propagate_around_edge(
+                    *this, { first_polyhedron, f }, vertices, result ) )
+            {
+                result.pop_back();
+                return result;
+            }
+        }
+        return result;
+    }
+
+    template < index_t dimension >
     std::vector< std::array< index_t, 2 > >
         TetrahedralSolid< dimension >::polyhedron_edges_vertices(
             index_t polyhedron ) const
@@ -210,32 +245,6 @@ namespace geode
         {
             result.emplace_back( PolyhedronFacetVertices{
                 vertices[facet[0]], vertices[facet[1]], vertices[facet[2]] } );
-        }
-        return result;
-    }
-
-    template < index_t dimension >
-    PolyhedraAroundEdge TetrahedralSolid< dimension >::polyhedra_around_edge(
-        const std::array< index_t, 2 >& vertices,
-        index_t first_polyhedron ) const
-    {
-        PolyhedraAroundEdge result{ first_polyhedron };
-        const auto v0 =
-            this->vertex_in_polyhedron( first_polyhedron, vertices[0] ).value();
-        const auto v1 =
-            this->vertex_in_polyhedron( first_polyhedron, vertices[1] ).value();
-        for( const auto f : LRange{ 4 } )
-        {
-            if( f == v0 || f == v1 )
-            {
-                continue;
-            }
-            if( propagate_around_edge(
-                    *this, { first_polyhedron, f }, vertices, result ) )
-            {
-                result.pop_back();
-                return result;
-            }
         }
         return result;
     }

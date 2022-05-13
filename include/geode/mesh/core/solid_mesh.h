@@ -357,15 +357,26 @@ namespace geode
 
         /*!
          * Get all the polyhedra with one of the vertices matching given vertex.
-         * @param[in] vertex_id Index of the vertex
+         * @param[in] vertex_id Index of the vertex.
+         * @pre This function needs that polyhedron adjacencies are computed
          */
         PolyhedraAroundVertex polyhedra_around_vertex(
             index_t vertex_id ) const;
 
         /*!
+         * Get all the polyhedra with one of the vertices matching given
+         * polyhedron vertex.
+         * @param[in] polyhedron_vertex Local index of vertex in polyhedron.
+         * @pre This function needs that polyhedron adjacencies are computed
+         */
+        PolyhedraAroundVertex polyhedra_around_vertex(
+            const PolyhedronVertex& polyhedron_vertex ) const;
+
+        /*!
          * Return true if at least one of the polyhedron facets around the
-         * vertex is on border
-         * @param[in] vertex_id Index of the vertex
+         * vertex is on border.
+         * @param[in] vertex_id Index of the vertex.
+         * @pre This function needs that polyhedron adjacencies are computed
          */
         bool is_vertex_on_border( index_t vertex_id ) const;
 
@@ -389,14 +400,24 @@ namespace geode
         /*!
          * Get all the polyhedra with both edge vertices.
          * @param[in] vertices Indices of edge vertices.
+         * @pre This function needs that polyhedron adjacencies are computed
          */
         virtual PolyhedraAroundEdge polyhedra_around_edge(
             const std::array< index_t, 2 >& vertices ) const;
 
         /*!
+         * Get all the polyhedra around the edge.
+         * @param[in] edge Local index of an edge in a polyhedron.
+         * @pre This function needs that polyhedron adjacencies are computed
+         */
+        virtual PolyhedraAroundEdge polyhedra_around_edge(
+            const PolyhedronFacetEdge& edge ) const;
+
+        /*!
          * Get all the polyhedra with both edge vertices.
          * @param[in] vertices Indices of edge vertices.
-         * @param[in] first_polyhedron One polyhedron index to begin research
+         * @param[in] first_polyhedron One polyhedron index to begin research.
+         * @pre This function needs that polyhedron adjacencies are computed
          */
         virtual PolyhedraAroundEdge polyhedra_around_edge(
             const std::array< index_t, 2 >& vertices,

@@ -147,9 +147,19 @@ void test_polyhedron_adjacencies( const geode::HybridSolid3D& hybrid_solid,
     OPENGEODE_EXCEPTION( hybrid_solid.polyhedra_around_vertex( 6 ).size() == 4,
         "[Test] HybridSolid should have 4 polyhedra around this vertex" );
     OPENGEODE_EXCEPTION(
+        hybrid_solid.polyhedra_around_vertex( { 1, 3 } ).size() == 4,
+        "[Test] HybridSolid should have 4 polyhedra around this vertex" );
+    OPENGEODE_EXCEPTION(
         hybrid_solid.polyhedron_facets_on_border( 0 ).size() == 4,
         "[Test] First polyhedron of HybridSolid should have 4 facets on "
         "border" );
+    geode::PolyhedronFacetEdge pfe{ { 3, 3 }, 2 };
+    OPENGEODE_EXCEPTION(
+        hybrid_solid.polyhedra_around_edge( { 6, 8 } ).size() == 4,
+        "[Test] HybridSolid should have 4 polyhedra around the edge (6,8)" );
+    OPENGEODE_EXCEPTION( hybrid_solid.polyhedra_around_edge( pfe ).size() == 4,
+        "[Test] HybridSolid should have 4 polyhedra around this polyhedron "
+        "facet edge" );
 }
 
 void test_permutation(

@@ -190,6 +190,48 @@ namespace
         }
         return false;
     }
+
+    template < geode::index_t dimension >
+    geode::PolyhedraAroundVertex polyhedra_around_vertex(
+        const geode::SolidMesh< dimension >& solid,
+        const geode::PolyhedronVertex& first_polyhedron,
+        geode::index_t vertex_id )
+    {
+        geode::PolyhedraAroundVertex polyhedra;
+        absl::flat_hash_set< geode::index_t > polyhedra_visited;
+        polyhedra_visited.reserve( 20 );
+        std::stack< geode::PolyhedronVertex > S;
+        S.push( first_polyhedron );
+        polyhedra_visited.insert( first_polyhedron.polyhedron_id );
+        while( !S.empty() )
+        {
+            polyhedra.push_back( S.top() );
+            const auto& polyhedron_vertex_id = polyhedra.back();
+            S.pop();
+
+            for( const auto& polyhedron_facet :
+                solid.polyhedron_vertex_facets( polyhedron_vertex_id ) )
+            {
+                const auto adj_polyhedron =
+                    solid.polyhedron_adjacent( polyhedron_facet );
+                if( !adj_polyhedron )
+                {
+                    continue;
+                }
+                const auto p_adj = adj_polyhedron.value();
+                if( !polyhedra_visited.insert( p_adj ).second )
+                {
+                    continue;
+                }
+                if( const auto v_adj =
+                        solid.vertex_in_polyhedron( p_adj, vertex_id ) )
+                {
+                    S.emplace( p_adj, v_adj.value() );
+                }
+            }
+        }
+        return polyhedra;
+    }
 } // namespace
 
 namespace geode
@@ -655,6 +697,14 @@ namespace geode
 
     template < index_t dimension >
     PolyhedraAroundVertex SolidMesh< dimension >::polyhedra_around_vertex(
+        const PolyhedronVertex& first_polyhedron ) const
+    {
+        return ::polyhedra_around_vertex(
+            *this, first_polyhedron, polyhedron_vertex( first_polyhedron ) );
+    }
+
+    template < index_t dimension >
+    PolyhedraAroundVertex SolidMesh< dimension >::polyhedra_around_vertex(
         index_t vertex_id ) const
     {
         check_vertex_id( *this, vertex_id );
@@ -667,40 +717,8 @@ namespace geode
             polyhedron_vertex( first_polyhedron.value() ) == vertex_id,
             "[SolidMesh::polyhedra_around_vertex] Wrong "
             "polyhedron around vertex" );
-        PolyhedraAroundVertex polyhedra;
-        absl::flat_hash_set< index_t > polyhedra_visited;
-        polyhedra_visited.reserve( 20 );
-        std::stack< PolyhedronVertex > S;
-        S.push( first_polyhedron.value() );
-        polyhedra_visited.insert( first_polyhedron->polyhedron_id );
-        while( !S.empty() )
-        {
-            polyhedra.push_back( S.top() );
-            const auto& polyhedron_vertex_id = polyhedra.back();
-            S.pop();
-
-            for( const auto& polyhedron_facet :
-                polyhedron_vertex_facets( polyhedron_vertex_id ) )
-            {
-                const auto adj_polyhedron =
-                    polyhedron_adjacent( polyhedron_facet );
-                if( !adj_polyhedron )
-                {
-                    continue;
-                }
-                const auto p_adj = adj_polyhedron.value();
-                if( !polyhedra_visited.insert( p_adj ).second )
-                {
-                    continue;
-                }
-                if( const auto v_adj =
-                        vertex_in_polyhedron( p_adj, vertex_id ) )
-                {
-                    S.emplace( p_adj, v_adj.value() );
-                }
-            }
-        }
-        return polyhedra;
+        return ::polyhedra_around_vertex(
+            *this, first_polyhedron.value(), vertex_id );
     }
 
     template < geode::index_t dimension >
@@ -810,12 +828,20 @@ namespace geode
                     || ( vertices[0] == edge_vertices[1]
                          && vertices[1] == edge_vertices[0] ) )
                 {
-                    result.push_back( polyhedron.polyhedron_id );
-                    break;
+                    return polyhedra_around_edge(
+                        vertices, polyhedron.polyhedron_id );
                 }
             }
         }
         return result;
+    }
+
+    template < index_t dimension >
+    PolyhedraAroundEdge SolidMesh< dimension >::polyhedra_around_edge(
+        const PolyhedronFacetEdge& edge ) const
+    {
+        return polyhedra_around_edge( polyhedron_facet_edge_vertices( edge ),
+            edge.polyhedron_facet.polyhedron_id );
     }
 
     template < index_t dimension >

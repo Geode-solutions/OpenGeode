@@ -70,10 +70,10 @@
         .def( "previous_on_border",                                            \
             &SurfaceMesh##dimension##D::previous_on_border )                   \
         .def( "polygon_edge_length",                                           \
-            ( double ( SurfaceMesh##dimension##D::* )( const PolygonEdge& )    \
+            ( double( SurfaceMesh##dimension##D::* )( const PolygonEdge& )     \
                     const )                                                    \
                 & SurfaceMesh##dimension##D::edge_length )                     \
-        .def( "edge_length", ( double ( SurfaceMesh##dimension##D::* )(        \
+        .def( "edge_length", ( double( SurfaceMesh##dimension##D::* )(         \
                                  const std::array< index_t, 2 >& ) const )     \
                                  & SurfaceMesh##dimension##D::edge_length )    \
         .def( "polygon_edge_barycenter",                                       \
@@ -90,7 +90,13 @@
         .def( "polygon_around_vertex",                                         \
             &SurfaceMesh##dimension##D::polygon_around_vertex )                \
         .def( "polygons_around_vertex",                                        \
-            &SurfaceMesh##dimension##D::polygons_around_vertex )               \
+            ( PolygonsAroundVertex( SurfaceMesh##dimension##D::* )( index_t )  \
+                    const )                                                    \
+                & SurfaceMesh##dimension##D::polygons_around_vertex )          \
+        .def( "polygons_around_vertex",                                        \
+            ( PolygonsAroundVertex( SurfaceMesh##dimension##D::* )(            \
+                const PolygonVertex& ) const )                                 \
+                & SurfaceMesh##dimension##D::polygons_around_vertex )          \
         .def( "polygon_edge_from_vertices",                                    \
             &SurfaceMesh##dimension##D::polygon_edge_from_vertices )           \
         .def( "polygon_attribute_manager",                                     \
