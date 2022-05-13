@@ -642,35 +642,48 @@ namespace geode
     template < index_t dimension >
     absl::optional< PolyhedronFacetEdge >
         SolidMesh< dimension >::polyhedron_facet_edge_from_vertices(
+            const std::array< index_t, 2 >& edge_vertices,
+            index_t polyhedron_id ) const
+    {
+        for( const auto f : LRange{ nb_polyhedron_facets( polyhedron_id ) } )
+        {
+            const PolyhedronFacet facet{ polyhedron_id, f };
+            const auto vertices = polyhedron_facet_vertices( facet );
+            for( const auto v : LIndices{ vertices } )
+            {
+                const auto next = v == vertices.size() - 1 ? 0 : v + 1;
+                if( vertices[v] == edge_vertices[0]
+                    && vertices[next] == edge_vertices[1] )
+                {
+                    return absl::optional< PolyhedronFacetEdge >{
+                        absl::in_place, facet, v
+                    };
+                }
+                if( vertices[v] == edge_vertices[1]
+                    && vertices[next] == edge_vertices[0] )
+                {
+                    return absl::optional< PolyhedronFacetEdge >{
+                        absl::in_place, facet, v
+                    };
+                }
+            }
+        }
+        return absl::nullopt;
+    }
+
+    template < index_t dimension >
+    absl::optional< PolyhedronFacetEdge >
+        SolidMesh< dimension >::polyhedron_facet_edge_from_vertices(
             const std::array< index_t, 2 >& edge_vertices ) const
     {
         for( const auto polyhedron_vertex :
             polyhedra_around_vertex( edge_vertices[0] ) )
         {
-            for( const auto f : LRange{
-                     nb_polyhedron_facets( polyhedron_vertex.polyhedron_id ) } )
+            if( const auto polyhedron_facet_edge =
+                    polyhedron_facet_edge_from_vertices(
+                        edge_vertices, polyhedron_vertex.polyhedron_id ) )
             {
-                const PolyhedronFacet facet{ polyhedron_vertex.polyhedron_id,
-                    f };
-                const auto vertices = polyhedron_facet_vertices( facet );
-                for( const auto v : LIndices{ vertices } )
-                {
-                    const auto next = v == vertices.size() - 1 ? 0 : v + 1;
-                    if( vertices[v] == edge_vertices[0]
-                        && vertices[next] == edge_vertices[1] )
-                    {
-                        return absl::optional< PolyhedronFacetEdge >{
-                            absl::in_place, facet, v
-                        };
-                    }
-                    if( vertices[v] == edge_vertices[1]
-                        && vertices[next] == edge_vertices[0] )
-                    {
-                        return absl::optional< PolyhedronFacetEdge >{
-                            absl::in_place, facet, v
-                        };
-                    }
-                }
+                return polyhedron_facet_edge;
             }
         }
         return absl::nullopt;
