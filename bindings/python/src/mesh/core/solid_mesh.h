@@ -87,7 +87,7 @@
             ( PolyhedraAroundVertex( SolidMesh##dimension##D::* )( index_t )   \
                     const )                                                    \
                 & SolidMesh##dimension##D::polyhedra_around_vertex )           \
-        .def( "polyhedra_around_vertex",                                       \
+        .def( "polyhedra_around_polyhedron_vertex",                            \
             ( PolyhedraAroundVertex( SolidMesh##dimension##D::* )(             \
                 const PolyhedronVertex& ) const )                              \
                 & SolidMesh##dimension##D::polyhedra_around_vertex )           \
