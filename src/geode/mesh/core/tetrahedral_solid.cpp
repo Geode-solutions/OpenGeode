@@ -163,23 +163,19 @@ namespace geode
 
     template < index_t dimension >
     PolyhedraAroundEdge TetrahedralSolid< dimension >::polyhedra_around_edge(
-        const PolyhedronFacetEdge& edge ) const
-    {
-        return polyhedra_around_edge(
-            this->polyhedron_facet_edge_vertices( edge ),
-            edge.polyhedron_facet.polyhedron_id );
-    }
-
-    template < index_t dimension >
-    PolyhedraAroundEdge TetrahedralSolid< dimension >::polyhedra_around_edge(
         const std::array< index_t, 2 >& vertices,
         index_t first_polyhedron ) const
     {
         PolyhedraAroundEdge result{ first_polyhedron };
         const auto v0 =
-            this->vertex_in_polyhedron( first_polyhedron, vertices[0] ).value();
+            this->vertex_in_polyhedron( first_polyhedron, vertices[0] );
+        OPENGEODE_ASSERT( v0, "[TetrahedralSolid::polyhedra_around_edge] First "
+                              "vertex is not in given tetrahedron" );
         const auto v1 =
-            this->vertex_in_polyhedron( first_polyhedron, vertices[1] ).value();
+            this->vertex_in_polyhedron( first_polyhedron, vertices[1] );
+        OPENGEODE_ASSERT( v1,
+            "[TetrahedralSolid::polyhedra_around_edge] Second "
+            "vertex is not in given tetrahedron" );
         for( const auto f : LRange{ 4 } )
         {
             if( f == v0 || f == v1 )

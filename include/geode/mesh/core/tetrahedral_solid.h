@@ -75,9 +75,6 @@ namespace geode
             const std::array< index_t, 2 >& vertices ) const final;
 
         PolyhedraAroundEdge polyhedra_around_edge(
-            const PolyhedronFacetEdge& edge ) const final;
-
-        PolyhedraAroundEdge polyhedra_around_edge(
             const std::array< index_t, 2 >& vertices,
             index_t first_polyhedron ) const final;
 
