@@ -89,11 +89,11 @@
         .def( "polygon_area", &SurfaceMesh##dimension##D::polygon_area )       \
         .def( "polygon_around_vertex",                                         \
             &SurfaceMesh##dimension##D::polygon_around_vertex )                \
-        .def( "polygons_around_polygon_vertex",                                \
+        .def( "polygons_around_vertex",                                        \
             ( PolygonsAroundVertex( SurfaceMesh##dimension##D::* )( index_t )  \
                     const )                                                    \
                 & SurfaceMesh##dimension##D::polygons_around_vertex )          \
-        .def( "polygons_around_vertex",                                        \
+        .def( "polygons_around_polygon_vertex",                                \
             ( PolygonsAroundVertex( SurfaceMesh##dimension##D::* )(            \
                 const PolygonVertex& ) const )                                 \
                 & SurfaceMesh##dimension##D::polygons_around_vertex )          \
