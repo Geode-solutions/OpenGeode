@@ -53,7 +53,13 @@ namespace geode
     public:
         static constexpr index_t ROOT_INDEX{ 1 };
 
+        Impl() = default;
+
         Impl( absl::Span< const BoundingBox< dimension > > bboxes );
+
+        Impl( Impl&& other ) = default;
+
+        Impl& operator=( Impl&& other ) = default;
 
         index_t nb_bboxes() const
         {
@@ -157,7 +163,7 @@ namespace geode
             ACTION& action ) const;
 
     private:
-        absl::FixedArray< BoundingBox< dimension > > tree_;
+        std::vector< BoundingBox< dimension > > tree_;
         std::vector< index_t > mapping_morton_;
     };
 

@@ -53,9 +53,12 @@ namespace geode
          * Each element can then be accessed using the index of its box in the
          * tree which should match the index in its initial container.
          */
+        AABBTree();
         AABBTree( absl::Span< const BoundingBox< dimension > > bboxes );
-        AABBTree( AABBTree&& ) = default;
+        AABBTree( AABBTree&& );
         ~AABBTree();
+
+        AABBTree& operator=( AABBTree&& other );
 
         /*!
          * @brief Gets the number of boxes in the lower level of the aabb tree.
