@@ -68,6 +68,10 @@ namespace geode
         {
             return !( *this == other );
         }
+        std::string string() const
+        {
+            return absl::StrCat( "(", polyhedron_id, ", ", vertex_id, ")" );
+        }
         template < typename Archive >
         void serialize( Archive& archive );
 
