@@ -82,6 +82,11 @@ namespace geode
     }
 
     template < index_t dimension >
+    AABBTree< dimension >::AABBTree()
+    {
+    }
+
+    template < index_t dimension >
     AABBTree< dimension >::AABBTree(
         absl::Span< const BoundingBox< dimension > > bboxes )
         : impl_{ bboxes }
@@ -89,8 +94,21 @@ namespace geode
     }
 
     template < index_t dimension >
+    AABBTree< dimension >::AABBTree( AABBTree&& other )
+        : impl_( std::move( other.impl_ ) )
+    {
+    }
+
+    template < index_t dimension >
     AABBTree< dimension >::~AABBTree() // NOLINT
     {
+    }
+
+    template < index_t dimension >
+    AABBTree< dimension >& AABBTree< dimension >::operator=( AABBTree&& other )
+    {
+        *impl_ = std::move( *other.impl_ );
+        return *this;
     }
 
     template < index_t dimension >
