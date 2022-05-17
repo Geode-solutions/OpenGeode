@@ -98,6 +98,10 @@ namespace geode
         {
             return !( *this == other );
         }
+        std::string string() const
+        {
+            return absl::StrCat( "(", polyhedron_id, ", ", facet_id, ")" );
+        }
         template < typename Archive >
         void serialize( Archive& archive );
 
@@ -122,6 +126,11 @@ namespace geode
         {
             return !( *this == other );
         }
+        std::string string() const
+        {
+            return absl::StrCat( "(", polyhedron_facet.polyhedron_id, ", ",
+                polyhedron_facet.facet_id, ", ", vertex_id, ")" );
+        }
         template < typename Archive >
         void serialize( Archive& archive );
 
@@ -144,6 +153,11 @@ namespace geode
         bool operator!=( const PolyhedronFacetEdge& other ) const
         {
             return !( *this == other );
+        }
+        std::string string() const
+        {
+            return absl::StrCat( "(", polyhedron_facet.polyhedron_id, ", ",
+                polyhedron_facet.facet_id, ", ", edge_id, ")" );
         }
         template < typename Archive >
         void serialize( Archive& archive );

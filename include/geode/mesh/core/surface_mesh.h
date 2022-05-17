@@ -69,6 +69,10 @@ namespace geode
         {
             return !( *this == other );
         }
+        std::string string() const
+        {
+            return absl::StrCat( "(", polygon_id, ", ", vertex_id, ")" );
+        }
         template < typename Archive >
         void serialize( Archive& archive );
 
@@ -94,6 +98,10 @@ namespace geode
         bool operator!=( const PolygonEdge& other ) const
         {
             return !( *this == other );
+        }
+        std::string string() const
+        {
+            return absl::StrCat( "(", polygon_id, ", ", edge_id, ")" );
         }
         template < typename Archive >
         void serialize( Archive& archive );
