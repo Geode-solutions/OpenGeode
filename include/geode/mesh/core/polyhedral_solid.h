@@ -34,8 +34,6 @@
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( Point );
-    FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
     FORWARD_DECLARATION_DIMENSION_CLASS( PolyhedralSolidBuilder );
 
     class AttributeManager;
