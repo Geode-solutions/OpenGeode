@@ -264,13 +264,10 @@ namespace geode
             return vertex_id;
         }
 
-        std::array< GridVertexIndices< dimension >,
-            RegularGrid< dimension >::nb_cell_vertices_static() >
-            cell_vertices( const GridCellIndices< dimension >& cell_id ) const
+        GridCellVertices< dimension > cell_vertices(
+            const GridCellIndices< dimension >& cell_id ) const
         {
-            std::array< GridVertexIndices< dimension >,
-                nb_cell_vertices_static() >
-                cell_vertices;
+            GridCellVertices< dimension > cell_vertices;
             for( const auto vertex_local_id :
                 LRange{ nb_cell_vertices_static() } )
             {
@@ -620,10 +617,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::array< GridVertexIndices< dimension >,
-        RegularGrid< dimension >::nb_cell_vertices_static() >
-        RegularGrid< dimension >::cell_vertices(
-            const GridCellIndices< dimension >& cell_id ) const
+    GridCellVertices< dimension > RegularGrid< dimension >::cell_vertices(
+        const GridCellIndices< dimension >& cell_id ) const
     {
         return impl_->cell_vertices( cell_id );
     }
