@@ -48,6 +48,11 @@ namespace geode
     ALIAS_2D_AND_3D( GridVertexIndices );
 
     template < index_t dimension >
+    using GridCellVertices =
+        std::array< GridVertexIndices< dimension >, 1 << dimension >;
+    ALIAS_2D_AND_3D( GridCellVertices );
+
+    template < index_t dimension >
     using GridCellsAroundVertex =
         absl::InlinedVector< GridCellIndices< dimension >, 1 << dimension >;
     ALIAS_2D_AND_3D( GridCellsAroundVertex );
@@ -136,9 +141,8 @@ namespace geode
 
         GridVertexIndices< dimension > vertex_indices( index_t index ) const;
 
-        std::array< GridVertexIndices< dimension >,
-            RegularGrid< dimension >::nb_cell_vertices_static() >
-            cell_vertices( const GridCellIndices< dimension >& cell_id ) const;
+        GridCellVertices< dimension > cell_vertices(
+            const GridCellIndices< dimension >& cell_id ) const;
 
         GridVertexIndices< dimension > cell_vertex_indices(
             const GridCellIndices< dimension >& cell_id,
