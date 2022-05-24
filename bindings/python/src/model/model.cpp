@@ -60,6 +60,7 @@
 #include "representation/io/brep.h"
 #include "representation/io/section.h"
 
+#include "helpers/component_mesh_queries.h"
 #include "helpers/convert_model_meshes.h"
 #include "helpers/convert_to_mesh.h"
 
@@ -76,6 +77,12 @@ namespace pybind11
         template < typename Type >
         struct type_caster< absl::FixedArray< Type > >
             : list_caster< absl::FixedArray< Type >, Type >
+        {
+        };
+
+        template < typename Type, size_t dimension >
+        struct type_caster< absl::InlinedVector< Type, dimension > >
+            : list_caster< absl::InlinedVector< Type, dimension >, Type >
         {
         };
 
@@ -156,4 +163,5 @@ PYBIND11_MODULE( opengeode_py_model, module )
 
     geode::define_convert_model_meshes( module );
     geode::define_convert_to_mesh( module );
+    geode::define_component_mesh_queries( module );
 }
