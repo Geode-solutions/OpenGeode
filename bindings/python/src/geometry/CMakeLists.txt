@@ -28,6 +28,7 @@ add_geode_python_binding(
         "distance.h"
         "perpendicular.h"
         "point.h"
+        "points_sort.h"
         "projection.h"
         "rotation.h"
         "signed_mensuration.h"
