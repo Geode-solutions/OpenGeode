@@ -28,7 +28,6 @@
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/common.h>
 #include <geode/basic/detail/mapping_after_deletion.h>
-#include <geode/basic/logger.h>
 #include <geode/basic/range.h>
 
 #include <geode/mesh/core/detail/vertex_cycle.h>
@@ -113,39 +112,10 @@ namespace geode
             {
                 std::vector< bool > to_delete(
                     facet_attribute_manager_.nb_elements(), false );
-                if( facet_attribute_manager_.attribute_exists( "active" ) )
+                for( const auto e :
+                    Range{ facet_attribute_manager_.nb_elements() } )
                 {
-                    const auto att =
-                        facet_attribute_manager_.find_attribute< bool >(
-                            "active" );
-                    for( const auto e :
-                        Range{ facet_attribute_manager_.nb_elements() } )
-                    {
-                        to_delete[e] = !counter_->value( e );
-                        if( to_delete[e] )
-                        {
-                            if( att->value( e ) )
-                            {
-                                DEBUG( e );
-                                DEBUG( "SUPPRIME DE LACTIF" );
-                            }
-                        }
-                        else
-                        {
-                            if( !att->value( e ) )
-                            {
-                                DEBUG( "GARDE DE LINACTIF" );
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    for( const auto e :
-                        Range{ facet_attribute_manager_.nb_elements() } )
-                    {
-                        to_delete[e] = !counter_->value( e );
-                    }
+                    to_delete[e] = !counter_->value( e );
                 }
                 return delete_facets( to_delete );
             }
