@@ -42,9 +42,9 @@ def test_lexicographic_mapping():
     pts = [ pt0, pt1, pt2, pt3, pt4, pt5, pt6, pt7,
         pt8, pt9, pt10]
     mapping = geom.lexicographic_mapping3D( pts )
-    answer =[ 0, 9, 5, 6, 1, 10, 4, 7, 2, 3, 8 ]
+    answer = [ 0, 9, 5, 6, 1, 10, 4, 7, 2, 3, 8 ]
     for m in range( len(mapping) ) :
-        if mapping[m] == answer[m]:
+        if mapping[m] != answer[m]:
             raise ValueError("[Test] Wrong result in lexicographic sort" )
 
 def test_comparison():
