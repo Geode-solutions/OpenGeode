@@ -209,3 +209,29 @@ namespace geode
         }
     };
 } // namespace geode
+
+namespace std
+{
+    template <>
+    struct hash< geode::Point2D >
+    {
+    public:
+        size_t operator()( const geode::Point2D &point ) const
+        {
+            return absl::Hash< double >()( point.value( 0 ) )
+                   ^ absl::Hash< double >()( point.value( 1 ) );
+        }
+    };
+
+    template <>
+    struct hash< geode::Point3D >
+    {
+    public:
+        size_t operator()( const geode::Point3D &point ) const
+        {
+            return absl::Hash< double >()( point.value( 0 ) )
+                   ^ absl::Hash< double >()( point.value( 1 ) )
+                   ^ absl::Hash< double >()( point.value( 2 ) );
+        }
+    };
+} // namespace std
