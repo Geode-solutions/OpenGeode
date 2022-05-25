@@ -21,6 +21,22 @@
  *
  */
 
-#pragma once
-
 #include <geode/geometry/points_sort.h>
+
+#define PYTHON_SORT( dimension )                                               \
+    const auto lexicographic_mapping##dimension =                              \
+        "lexicographic_mapping" + std::to_string( dimension ) + "D";           \
+    module.def( lexicographic_mapping##dimension.c_str(),                      \
+        &lexicographic_mapping< dimension > );                                 \
+    const auto morton_sort##dimension =                                        \
+        "morton_sort" + std::to_string( dimension ) + "D";                     \
+    module.def( morton_sort##dimension.c_str(), &morton_sort< dimension > )
+
+namespace geode
+{
+    void define_points_sort( pybind11::module& module )
+    {
+        PYTHON_SORT( 2 );
+        PYTHON_SORT( 3 );
+    }
+} // namespace geode

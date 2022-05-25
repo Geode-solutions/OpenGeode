@@ -32,6 +32,7 @@
 #include "nn_search.h"
 #include "perpendicular.h"
 #include "point.h"
+#include "points_sort.h"
 #include "projection.h"
 #include "rotation.h"
 #include "signed_mensuration.h"
@@ -64,4 +65,5 @@ PYBIND11_MODULE( opengeode_py_geometry, module )
     geode::define_rotation( module );
     geode::define_mensuration( module );
     geode::define_barycentric( module );
+    geode::define_points_sort( module );
 }

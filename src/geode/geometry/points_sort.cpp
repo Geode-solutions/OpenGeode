@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/geometry/morton.h>
+#include <geode/geometry/points_sort.h>
 
 #include <async++.h>
 
@@ -149,10 +149,68 @@ namespace
         morton_sort< COORDY >( points, m3, m4 );
     }
 
+    /*
+     * Return true if p0 < p1 comparing first X, then Y.
+     */
+    bool lexicographic_compare(
+        const geode::Point2D& p0, const geode::Point2D& p1 )
+    {
+        if( p0.value( 0 ) < p1.value( 0 ) )
+        {
+            return true;
+        }
+        if( p0.value( 0 ) > p1.value( 0 ) )
+        {
+            return false;
+        }
+        return p0.value( 1 ) < p1.value( 1 );
+    }
+
+    /*
+     * Return true if p0 < p1 comparing first X, then Y and last Z.
+     */
+    bool lexicographic_compare(
+        const geode::Point3D& p0, const geode::Point3D& p1 )
+    {
+        if( p0.value( 0 ) < p1.value( 0 ) )
+        {
+            return true;
+        }
+        if( p0.value( 0 ) > p1.value( 0 ) )
+        {
+            return false;
+        }
+        if( p0.value( 1 ) < p1.value( 1 ) )
+        {
+            return true;
+        }
+        if( p0.value( 1 ) > p1.value( 1 ) )
+        {
+            return false;
+        }
+        return p0.value( 2 ) < p1.value( 2 );
+    }
+
 } // namespace
 
 namespace geode
 {
+    template < index_t dimension >
+    std::vector< index_t > lexicographic_mapping(
+        absl::Span< const Point< dimension > > points )
+    {
+        std::vector< index_t > mapping_lexico( points.size() );
+        async::parallel_for(
+            async::irange( size_t{ 0 }, mapping_lexico.size() ),
+            [&mapping_lexico]( index_t i ) {
+                mapping_lexico[i] = i;
+            } );
+        absl::c_sort( mapping_lexico, [&points]( index_t i, index_t j ) {
+            return lexicographic_compare( points[i], points[j] );
+        } );
+        return mapping_lexico;
+    }
+
     template < index_t dimension >
     std::vector< index_t > morton_sort(
         absl::Span< const Point< dimension > > points )
@@ -167,6 +225,11 @@ namespace geode
             points, mapping_morton.begin(), mapping_morton.end() );
         return mapping_morton;
     }
+
+    template std::vector< index_t > opengeode_geometry_api
+        lexicographic_mapping( absl::Span< const Point< 2 > > );
+    template std::vector< index_t > opengeode_geometry_api
+        lexicographic_mapping( absl::Span< const Point< 3 > > );
 
     template std::vector< index_t > opengeode_geometry_api morton_sort(
         absl::Span< const Point< 2 > > );
