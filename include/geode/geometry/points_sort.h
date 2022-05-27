@@ -22,7 +22,24 @@
  */
 
 #pragma once
-#pragma message(                                                               \
-    "#include <geode/geometry/morton.h> is deprecated. Use e.g. #include <geode/geometry/points_sort>" )
 
-#include <geode/geometry/points_sort.h>
+#include <absl/container/fixed_array.h>
+#include <absl/types/span.h>
+
+#include <geode/geometry/common.h>
+
+namespace geode
+{
+    FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+} // namespace geode
+
+namespace geode
+{
+    template < index_t dimension >
+    std::vector< index_t > lexicographic_mapping(
+        absl::Span< const Point< dimension > > points );
+
+    template < index_t dimension >
+    std::vector< index_t > morton_sort(
+        absl::Span< const Point< dimension > > points );
+} // namespace geode
