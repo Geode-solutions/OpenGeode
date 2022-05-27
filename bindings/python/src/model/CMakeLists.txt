@@ -23,6 +23,8 @@ add_geode_python_binding(
     SOURCES
         "model.cpp"
         "helpers/convert_model_meshes.h"
+        "helpers/convert_to_mesh.h"
+        "helpers/component_mesh_queries.h"
         "mixin/builder/blocks_builder.h"
         "mixin/builder/corners_builder.h"
         "mixin/builder/lines_builder.h"

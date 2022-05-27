@@ -64,3 +64,9 @@ add_geode_test(
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::model
 )
+add_geode_test(
+    SOURCE "test-component-mesh-queries.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::model
+)

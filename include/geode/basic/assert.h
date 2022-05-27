@@ -77,7 +77,7 @@ namespace geode
         geode::geode_assertion_failed(                                         \
             #condition, absl::StrCat( __VA_ARGS__ ), __FILE__, __LINE__ )
 #    define OPENGEODE_ASSERT_NOT_REACHED( ... )                                \
-        geode::geode_assertion_failed( "should not reached",                   \
+        geode::geode_assertion_failed( "should not have reached",              \
             absl::StrCat( __VA_ARGS__ ), __FILE__, __LINE__ )
 #    define DEBUG_CONST const
 #else
