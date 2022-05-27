@@ -22,5 +22,7 @@
  */
 
 #pragma once
+#pragma message(                                                               \
+    "#include <geode/geometry/morton.h> is deprecated. Use e.g. #include <geode/geometry/points_sort>" )
 
 #include <geode/geometry/points_sort.h>

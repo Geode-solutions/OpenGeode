@@ -31,8 +31,8 @@
 
 #include <async++.h>
 
-#include <geode/geometry/morton.h>
 #include <geode/geometry/point.h>
+#include <geode/geometry/points_sort.h>
 #include <geode/geometry/vector.h>
 
 #include <algorithm>
