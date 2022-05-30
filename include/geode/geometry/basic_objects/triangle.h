@@ -88,7 +88,7 @@ namespace geode
         using Base = GenericTriangle< Point< dimension >, dimension >;
 
     public:
-        OwnerTriangle( const Point< dimension >& p0,
+        explicit OwnerTriangle( const Point< dimension >& p0,
             const Point< dimension >& p1,
             const Point< dimension >& p2 );
 
