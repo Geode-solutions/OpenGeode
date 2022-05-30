@@ -73,7 +73,7 @@ namespace
         return {};
     }
 
-    geode::PolyhedraAroundFacet block_mesh_polyhedra_around_quadrangle(
+    geode::newPolyhedraAroundFacet block_mesh_polyhedra_around_quadrangle(
         const geode::SolidMesh3D& mesh,
         absl::Span< const std::vector< geode::index_t > >
             block_facet_from_unique_vertices )
@@ -90,7 +90,7 @@ namespace
                         block_facet_from_unique_vertices[3] )
                     {
                         const auto polyhedra_around_polygon_facet =
-                            mesh.polyhedra_from_facet(
+                            mesh.polyhedra_from_facet_vertices(
                                 { { first_vertex_id, second_vertex_id,
                                     third_vertex_id, fourth_vertex_id } } );
                         if( !polyhedra_around_polygon_facet.empty() )
