@@ -25,6 +25,7 @@
 
 #include <geode/mesh/core/solid_mesh.h>
 
+#include <geode/model/mixin/core/block.h>
 #include <geode/model/representation/core/brep.h>
 
 namespace geode
