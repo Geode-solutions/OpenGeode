@@ -64,8 +64,10 @@ void run_test_brep()
                         model, block, facet_unique_vertices );
                 OPENGEODE_EXCEPTION(
                     absl::c_any_of( polyhedra_around_facet,
-                        [polyhedron_id]( geode::index_t poly_around_id ) {
-                            return polyhedron_id == poly_around_id;
+                        [polyhedron_id](
+                            const geode::PolyhedronFacet& poly_around_id ) {
+                            return polyhedron_id
+                                   == poly_around_id.polyhedron_id;
                         } ),
                     "[Test] Facet ", facet_id, " of polyhedron ", polyhedron_id,
                     " could not be linked to the polyhedron through its unique "
