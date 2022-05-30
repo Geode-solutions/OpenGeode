@@ -237,6 +237,7 @@ add_geode_library(
         "core/private/surface_mesh_view_impl.h"
     PUBLIC_DEPENDENCIES
         absl::flat_hash_map
+        absl::inlined_vector
         Bitsery::bitsery
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
