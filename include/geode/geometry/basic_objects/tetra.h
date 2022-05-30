@@ -73,7 +73,7 @@ namespace geode
         using Base = GenericTetra< Point3D >;
 
     public:
-        OwnerTetra( const Point3D& p0,
+        explicit OwnerTetra( const Point3D& p0,
             const Point3D& p1,
             const Point3D& p2,
             const Point3D& p3 );

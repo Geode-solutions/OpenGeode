@@ -67,7 +67,7 @@ namespace geode
         using Base = GenericCircle< Point3D >;
 
     public:
-        OwnerCircle( const OwnerPlane& plane, double radius );
+        explicit OwnerCircle( const OwnerPlane& plane, double radius );
 
         OwnerCircle( const OwnerCircle& other );
         OwnerCircle& operator=( const OwnerCircle& other );

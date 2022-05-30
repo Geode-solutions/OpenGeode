@@ -66,7 +66,7 @@ namespace geode
         using Base = GenericPlane< Point3D >;
 
     public:
-        OwnerPlane( const Vector3D& normal, const Point3D& origin );
+        explicit OwnerPlane( const Vector3D& normal, const Point3D& origin );
         OwnerPlane( const OwnerPlane& other );
         OwnerPlane& operator=( const OwnerPlane& other );
         OwnerPlane( OwnerPlane&& other );
