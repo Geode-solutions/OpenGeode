@@ -93,7 +93,7 @@ namespace geode
     typename std::enable_if< T == 3, OwnerPlane >::type
         GenericTriangle< PointType, dimension >::owner_plane() const
     {
-        return { this->normal(), vertices_[0] };
+        return OwnerPlane{ this->normal(), vertices_[0] };
     }
     template < typename PointType, index_t dimension >
     template < index_t T >
