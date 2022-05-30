@@ -23,6 +23,8 @@
 
 #include <geode/model/helpers/component_mesh_queries.h>
 
+#include <absl/container/inlined_vector.h>
+
 #include <geode/model/mixin/core/block.h>
 #include <geode/model/representation/core/brep.h>
 
@@ -127,5 +129,6 @@ namespace geode
             "[helpers::block_mesh_polyhedra_from_unique_vertices_facet] "
             "Function is not yet implemented for facets other than "
             "triangles and quadrangles." );
+        return {};
     }
 } // namespace geode

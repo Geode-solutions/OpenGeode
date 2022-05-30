@@ -52,21 +52,17 @@ namespace geode
         }
 
         template < typename Container >
-        inline void rotate( Container& vertices )
+        inline void oriented_rotate( Container& vertices )
         {
             if( vertices.size() < 2 )
             {
                 return;
             }
             polygon_sort( vertices );
-            if( vertices[1] > vertices.back() )
-            {
-                std::reverse( vertices.begin() + 1, vertices.end() );
-            }
         }
 
         template <>
-        inline void rotate( std::array< index_t, 2 >& vertices )
+        inline void oriented_rotate( std::array< index_t, 2 >& vertices )
         {
             if( vertices.front() > vertices.back() )
             {
@@ -75,15 +71,24 @@ namespace geode
         }
 
         template < typename Container >
-        class VertexCycle
+        inline void remove_orientation( Container& vertices )
+        {
+            if( vertices[1] > vertices.back() )
+            {
+                std::reverse( vertices.begin() + 1, vertices.end() );
+            }
+        }
+
+        template < typename Container >
+        class OrientedVertexCycle
         {
             friend class bitsery::Access;
 
         public:
-            VertexCycle( Container vertices )
+            OrientedVertexCycle( Container vertices )
                 : vertices_( std::move( vertices ) )
             {
-                rotate( vertices_ );
+                oriented_rotate( vertices_ );
             }
 
             const Container& vertices() const
@@ -91,39 +96,88 @@ namespace geode
                 return vertices_;
             }
 
-            bool operator==( const VertexCycle& other ) const
+            bool is_opposite( const OrientedVertexCycle& other ) const
+            {
+                const auto& other_vertices = other.vertices();
+                if( vertices().size() != other_vertices.size()
+                    || vertices()[0] != other_vertices[0] )
+                {
+                    return false;
+                }
+                auto counter = other_vertices.size() - 1;
+                for( const auto vertex_id : Range{ 1, vertices().size() } )
+                {
+                    if( vertices()[vertex_id] != other_vertices[counter] )
+                    {
+                        return false;
+                    }
+                    counter--;
+                }
+                return true;
+            }
+
+            bool operator==( const OrientedVertexCycle& other ) const
             {
                 return this->vertices() == other.vertices();
             }
 
-            bool operator!=( const VertexCycle& other ) const
+            bool operator!=( const OrientedVertexCycle& other ) const
             {
                 return !operator==( other );
             }
 
-            bool operator<( const VertexCycle& other ) const
+            bool operator<( const OrientedVertexCycle& other ) const
             {
                 return this->vertices() < other.vertices();
             }
 
-        private:
-            VertexCycle() = default;
+        protected:
+            OrientedVertexCycle() = default;
 
+            Container& modifiable_vertices()
+            {
+                return vertices_;
+            }
+
+        private:
             template < typename Archive >
             void serialize( Archive& archive )
             {
-                archive.ext( *this, DefaultGrowable< Archive, VertexCycle >{},
-                    []( Archive& a, VertexCycle& storage ) {
+                archive.ext( *this,
+                    DefaultGrowable< Archive, OrientedVertexCycle >{},
+                    []( Archive& a, OrientedVertexCycle& storage ) {
                         a( storage.vertices_ );
                     } );
             }
 
-        public:
+        private:
             Container vertices_;
+        };
+
+        template < typename Container >
+        class VertexCycle : public OrientedVertexCycle< Container >
+        {
+            friend class bitsery::Access;
+
+        public:
+            VertexCycle( Container vertices )
+                : OrientedVertexCycle< Container >( std::move( vertices ) )
+            {
+                remove_orientation( this->modifiable_vertices() );
+            }
+
+        private:
+            VertexCycle() = default;
         };
 
         template < typename H, typename Container >
         H AbslHashValue( H h, const VertexCycle< Container >& m )
+        {
+            return H::combine( std::move( h ), m.vertices() );
+        }
+
+        template < typename H, typename Container >
+        H AbslHashValue( H h, const OrientedVertexCycle< Container >& m )
         {
             return H::combine( std::move( h ), m.vertices() );
         }
