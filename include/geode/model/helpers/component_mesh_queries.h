@@ -38,7 +38,8 @@ namespace geode
 
 namespace geode
 {
-    newPolyhedraAroundFacet block_mesh_polyhedra_from_unique_vertices_facet(
+    newPolyhedraAroundFacet opengeode_model_api
+        block_mesh_polyhedra_from_unique_vertices_facet(
         const BRep& model,
         const Block3D& block,
         absl::Span< const index_t > facet_unique_vertices );
