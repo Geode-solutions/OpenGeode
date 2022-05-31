@@ -39,7 +39,7 @@ def run_test_brep():
                 facet_vertices = block.mesh().polyhedron_facet_vertices( geode_mesh.PolyhedronFacet( polyhedron_id, facet_id) )
                 facet_unique_vertices = [brep.unique_vertex( geode_model.MeshComponentVertex( block.component_id(), facet_vertices[i] ) ) for i in range(len(facet_vertices))]
                 polyhedra_around_facet = geode_model.block_mesh_polyhedra_from_unique_vertices_facet( brep, block, facet_unique_vertices )
-                if polyhedron_id not in polyhedra_around_facet :
+                if geode_mesh.PolyhedronFacet([polyhedron_id,facet_id]) not in polyhedra_around_facet :
                     raise ValueError( "[Test] Facet of polyhedron could not be linked to the polyhedron through its unique vertices." )
 
 if __name__ == '__main__':
