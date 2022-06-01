@@ -52,6 +52,7 @@ namespace
         absl::Span< const std::vector< geode::index_t > >
             block_facet_from_unique_vertices )
     {
+        geode::newPolyhedraAroundFacet polyhedra_around_polygon_facet;
         for( const auto first_vertex_id : block_facet_from_unique_vertices[0] )
         {
             for( const auto second_vertex_id :
@@ -60,17 +61,22 @@ namespace
                 for( const auto third_vertex_id :
                     block_facet_from_unique_vertices[2] )
                 {
-                    const auto polyhedra_around_polygon_facet =
+                    const auto polyhedra_from_facet_vertices =
                         mesh.polyhedra_from_facet_vertices( { { first_vertex_id,
                             second_vertex_id, third_vertex_id } } );
-                    if( !polyhedra_around_polygon_facet.empty() )
+                    if( !polyhedra_from_facet_vertices.empty() )
                     {
-                        return polyhedra_around_polygon_facet;
+                        for( const auto& polyhedron :
+                            polyhedra_from_facet_vertices )
+                        {
+                            polyhedra_around_polygon_facet.emplace_back(
+                                polyhedron );
+                        }
                     }
                 }
             }
         }
-        return {};
+        return polyhedra_around_polygon_facet;
     }
 
     geode::newPolyhedraAroundFacet block_mesh_polyhedra_around_quadrangle(
