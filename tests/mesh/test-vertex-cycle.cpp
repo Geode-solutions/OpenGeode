@@ -29,6 +29,18 @@
 
 #include <geode/tests/common.h>
 
+void test_single_vertex_cycle()
+{
+    const geode::detail::VertexCycle< std::array< geode::index_t, 1 > > cycle1{
+        { 3 }
+    };
+    const geode::detail::VertexCycle< std::array< geode::index_t, 1 > > cycle2{
+        { 4 }
+    };
+    OPENGEODE_EXCEPTION( cycle1 != cycle2,
+        "[Test] Wrong result for operator!= with cycle1 and cycle2" );
+}
+
 void test_vertex_cycle()
 {
     const geode::detail::VertexCycle< std::vector< geode::index_t > > cycle1{
@@ -102,6 +114,7 @@ void test()
 {
     test_vertex_cycle();
     test_oriented_vertex_cycle();
+    test_single_vertex_cycle();
 }
 
 OPENGEODE_TEST( "vertex-cycle" )

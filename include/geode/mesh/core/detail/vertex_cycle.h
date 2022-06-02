@@ -73,7 +73,7 @@ namespace geode
         template < typename Container >
         inline void remove_orientation( Container& vertices )
         {
-            if( vertices[1] > vertices.back() )
+            if( vertices.size() > 1 && vertices[1] > vertices.back() )
             {
                 std::reverse( vertices.begin() + 1, vertices.end() );
             }
