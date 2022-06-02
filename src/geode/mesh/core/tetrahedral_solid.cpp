@@ -101,6 +101,30 @@ namespace geode
 
     template < index_t dimension >
     std::array< PolyhedronFacet, 2 >
+        TetrahedralSolid< dimension >::edge_incident_facets(
+            index_t tetrahedron_id,
+            const std::array< index_t, 2 >& edge_vertices ) const
+    {
+        std::array< PolyhedronFacet, 2 > facets;
+        index_t count{ 0 };
+        for( const auto v : LRange{ 4 } )
+        {
+            const PolyhedronVertex vertex{ tetrahedron_id, v };
+            if( this->polyhedron_vertex( vertex ) != edge_vertices[0]
+                && this->polyhedron_vertex( vertex ) != edge_vertices[1] )
+            {
+                OPENGEODE_EXCEPTION( count < 2,
+                    "[TetrahedralSolid::edge_incident_facets] Given edge "
+                    "vertices are not vertices of given tetrahedron" );
+                facets[count] = { vertex.polyhedron_id, vertex.vertex_id };
+                count++;
+            }
+        }
+        return facets;
+    }
+
+    template < index_t dimension >
+    std::array< PolyhedronFacet, 2 >
         TetrahedralSolid< dimension >::opposite_edge_incident_facets(
             index_t tetrahedron_id,
             const std::array< index_t, 2 >& edge_vertices ) const
