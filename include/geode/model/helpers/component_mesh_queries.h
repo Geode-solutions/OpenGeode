@@ -26,11 +26,14 @@
 #include <memory>
 
 #include <geode/mesh/core/solid_mesh.h>
+#include <geode/mesh/core/surface_mesh.h>
 
 #include <geode/model/common.h>
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( Surface );
+    ALIAS_3D( Surface );
     FORWARD_DECLARATION_DIMENSION_CLASS( Block );
     ALIAS_3D( Block );
     class BRep;
@@ -38,8 +41,44 @@ namespace geode
 
 namespace geode
 {
+    struct BlockPolyhedraFacetVertices
+    {
+        index_t nb_facets() const
+        {
+            index_t counter{ 0 };
+            if( oriented_polyhedron_vertices )
+            {
+                counter++;
+            }
+            if( opposite_polyhedron_vertices )
+            {
+                counter++;
+            }
+            return counter;
+        }
+
+        absl::optional< PolygonVertices > oriented_polyhedron_vertices;
+        absl::optional< PolygonVertices > opposite_polyhedron_vertices;
+    };
+
+    PolygonVertices opengeode_model_api surface_polygon_unique_vertices(
+        const BRep& model, const Surface3D& surface, index_t polygon_id );
+
     newPolyhedraAroundFacet opengeode_model_api
-        block_mesh_polyhedra_from_unique_vertices_facet( const BRep& model,
+        block_mesh_polyhedra_from_surface_polygon( const BRep& model,
             const Block3D& block,
-            absl::Span< const index_t > facet_unique_vertices );
+            const Surface3D& surface,
+            index_t polygon_id );
+
+    absl::InlinedVector< PolygonVertices, 2 >
+        block_vertices_from_surface_polygon( const BRep& model,
+            const Block3D& block,
+            const Surface3D& surface,
+            index_t polygon_id );
+
+    BlockPolyhedraFacetVertices oriented_block_vertices_from_surface_polygon(
+        const BRep& model,
+        const Block3D& block,
+        const Surface3D& surface,
+        index_t polygon_id );
 } // namespace geode

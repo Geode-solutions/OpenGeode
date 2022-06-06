@@ -27,9 +27,11 @@
 #include <geode/basic/uuid.h>
 
 #include <geode/mesh/core/solid_mesh.h>
+#include <geode/mesh/core/surface_mesh.h>
 
 #include <geode/model/helpers/component_mesh_queries.h>
 #include <geode/model/mixin/core/block.h>
+#include <geode/model/mixin/core/surface.h>
 #include <geode/model/representation/core/brep.h>
 #include <geode/model/representation/io/brep_input.h>
 #include <geode/model/representation/io/brep_output.h>
@@ -43,35 +45,42 @@ void run_test_brep()
 
     for( const auto& block : model.blocks() )
     {
-        for( const auto polyhedron_id :
-            geode::Range{ block.mesh().nb_polyhedra() } )
+        for( const auto& surface : model.surfaces() )
         {
-            for( const auto facet_id : geode::LRange{
-                     block.mesh().nb_polyhedron_facets( polyhedron_id ) } )
+            if( !model.is_boundary( surface, block )
+                && !model.is_internal( surface, block ) )
             {
-                const geode::PolyhedronFacet facet{ polyhedron_id, facet_id };
-                geode::PolyhedronFacetVertices facet_unique_vertices;
-                for( const auto facet_vertex_id : geode::LRange{
-                         block.mesh().nb_polyhedron_facet_vertices( facet ) } )
-                {
-                    facet_unique_vertices.push_back(
-                        model.unique_vertex( { block.component_id(),
-                            block.mesh().polyhedron_facet_vertex(
-                                { facet, facet_vertex_id } ) } ) );
-                }
-                const auto polyhedra_around_facet =
-                    geode::block_mesh_polyhedra_from_unique_vertices_facet(
-                        model, block, facet_unique_vertices );
+                continue;
+            }
+            for( const auto polygon_id :
+                geode::Range{ surface.mesh().nb_polygons() } )
+            {
+                const auto block_facets_vertices =
+                    geode::block_vertices_from_surface_polygon(
+                        model, block, surface, polygon_id );
+                const auto oriented_block_facets_vertices =
+                    geode::oriented_block_vertices_from_surface_polygon(
+                        model, block, surface, polygon_id );
                 OPENGEODE_EXCEPTION(
-                    absl::c_any_of( polyhedra_around_facet,
-                        [polyhedron_id, facet_id](
-                            const geode::PolyhedronFacet& poly_around_id ) {
-                            return polyhedron_id == poly_around_id.polyhedron_id
-                                   && facet_id == poly_around_id.facet_id;
-                        } ),
-                    "[Test] Facet ", facet_id, " of polyhedron ", polyhedron_id,
-                    " could not be linked to the polyhedron through its unique "
-                    "vertices." );
+                    block_facets_vertices.size()
+                        == oriented_block_facets_vertices.nb_facets(),
+                    "[Test] Different number of polyhedra for "
+                    "block_vertices_from_surface_polygon and "
+                    "oriented_block_vertices_from_surface_polygon functions." );
+                if( model.is_boundary( surface, block ) )
+                {
+                    OPENGEODE_EXCEPTION( block_facets_vertices.size() == 1,
+                        "[Test] ", block_facets_vertices.size(),
+                        " polyhedra were found from boundary surface "
+                        "polygon." );
+                }
+                else if( model.is_internal( surface, block ) )
+                {
+                    OPENGEODE_EXCEPTION( block_facets_vertices.size() == 2,
+                        "[Test] ", block_facets_vertices.size(),
+                        " polyhedra were found from internal surface "
+                        "polygon." );
+                }
             }
         }
     }
