@@ -34,13 +34,17 @@ def run_test_brep():
     brep = geode_model.load_brep(os.path.join(data_dir, "test_mesh3.og_brep"))
 
     for block in brep.blocks():
-        for polyhedron_id in range( block.mesh().nb_polyhedra() ):
-            for facet_id in range( block.mesh().nb_polyhedron_facets( polyhedron_id ) ):
-                facet_vertices = block.mesh().polyhedron_facet_vertices( geode_mesh.PolyhedronFacet( polyhedron_id, facet_id) )
-                facet_unique_vertices = [brep.unique_vertex( geode_model.MeshComponentVertex( block.component_id(), facet_vertices[i] ) ) for i in range(len(facet_vertices))]
-                polyhedra_around_facet = geode_model.block_mesh_polyhedra_from_unique_vertices_facet( brep, block, facet_unique_vertices )
-                if geode_mesh.PolyhedronFacet(polyhedron_id,facet_id) not in polyhedra_around_facet :
-                    raise ValueError( "[Test] Facet of polyhedron could not be linked to the polyhedron through its unique vertices." )
+        for surface in brep.surfaces():
+            if not brep.is_block_boundary( surface, block ) and not brep.is_surface_in_block_internals( surface, block ):
+                continue
+            for polygon_id in range( surface.mesh().nb_polygons() ):
+                block_facets_vertices = geode_model.oriented_block_vertices_from_surface_polygon( brep, block, surface, polygon_id )
+                if brep.is_block_boundary( surface, block ):
+                    if not block_facets_vertices.nb_facets() == 1:
+                        raise ValueError( "[Test] " + block_facets_vertices.nb_facets() + " polyhedra were found from boundary surface polygon." )
+                elif brep.is_surface_in_block_internals( surface, block ):
+                    if not block_facets_vertices.nb_facets() == 2:
+                        raise ValueError( "[Test] " + block_facets_vertices.nb_facets() + " polyhedra were found from internal surface polygon." )
 
 if __name__ == '__main__':
     run_test_brep()

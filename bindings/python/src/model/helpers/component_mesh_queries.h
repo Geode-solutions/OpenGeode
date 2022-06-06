@@ -32,7 +32,23 @@ namespace geode
 {
     void define_component_mesh_queries( pybind11::module& module )
     {
-        module.def( "block_mesh_polyhedra_from_unique_vertices_facet",
-            &block_mesh_polyhedra_from_unique_vertices_facet );
+        pybind11::class_< BlockPolyhedraFacetVertices >(
+            module, "BlockPolyhedraFacetVertices" )
+            .def( pybind11::init<>() )
+            .def( "nb_facets", &BlockPolyhedraFacetVertices::nb_facets )
+            .def_readwrite( "polygon_id",
+                &BlockPolyhedraFacetVertices::opposite_polyhedron_vertices )
+            .def_readwrite( "vertex_id",
+                &BlockPolyhedraFacetVertices::oriented_polyhedron_vertices );
+
+        module
+            .def( "surface_polygon_unique_vertices",
+                &surface_polygon_unique_vertices )
+            .def( "block_mesh_polyhedra_from_surface_polygon",
+                &block_mesh_polyhedra_from_surface_polygon )
+            .def( "block_vertices_from_surface_polygon",
+                &block_vertices_from_surface_polygon )
+            .def( "oriented_block_vertices_from_surface_polygon",
+                &oriented_block_vertices_from_surface_polygon );
     }
 } // namespace geode
