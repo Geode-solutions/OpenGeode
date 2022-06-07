@@ -97,26 +97,33 @@ namespace
     class SolidFromBRep
     {
     public:
-        SolidFromBRep( FromModel< geode::BRep, 3 >& model )
-            : model_( model ),
-              mesh_{ SolidType::create() },
-              builder_{ geode::SolidMeshBuilder3D::create( *mesh_ ) },
-              attribute_{ mesh_->polyhedron_attribute_manager()
-                              .template find_or_create_attribute<
-                                  geode::VariableAttribute,
-                                  geode::uuid_from_conversion_attribute_type >(
-                                  geode::uuid_from_conversion_attribute_name,
-                                  {} ) }
-        {
-        }
-
         SolidFromBRep( FromModel< geode::BRep, 3 >& model,
             const geode::SurfaceMesh3D& surface )
-            : SolidFromBRep( model )
+            : SolidFromBRep( model, true )
         {
             for( const auto& p : model_.points( surface ) )
             {
                 builder_->create_point( p );
+            }
+        }
+
+        SolidFromBRep( FromModel< geode::BRep, 3 >& model )
+            : SolidFromBRep( model, true )
+        {
+            const auto& brep = model_.model();
+            builder_->create_vertices( brep.nb_unique_vertices() );
+            for( const auto& block : brep.blocks() )
+            {
+                const auto& mesh = block.mesh();
+                for( const auto v : geode::Range{ mesh.nb_vertices() } )
+                {
+                    const auto vertex =
+                        brep.unique_vertex( { block.component_id(), v } );
+                    if( !model_.vertex( vertex ) )
+                    {
+                        builder_->set_point( vertex, mesh.point( v ) );
+                    }
+                }
             }
         }
 
@@ -135,6 +142,19 @@ namespace
         }
 
     private:
+        SolidFromBRep( FromModel< geode::BRep, 3 >& model, bool /*unused*/ )
+            : model_( model ),
+              mesh_{ SolidType::create() },
+              builder_{ geode::SolidMeshBuilder3D::create( *mesh_ ) },
+              attribute_{ mesh_->polyhedron_attribute_manager()
+                              .template find_or_create_attribute<
+                                  geode::VariableAttribute,
+                                  geode::uuid_from_conversion_attribute_type >(
+                                  geode::uuid_from_conversion_attribute_name,
+                                  {} ) }
+        {
+        }
+
         void set_polyhedra_adjacency( const geode::Block3D& block,
             const absl::FixedArray< geode::index_t >& polyhedra )
         {
