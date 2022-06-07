@@ -119,11 +119,12 @@ namespace
                 {
                     const auto vertex =
                         brep.unique_vertex( { block.component_id(), v } );
-                    if( !model_.vertex( vertex ) )
-                    {
-                        builder_->set_point( vertex, mesh.point( v ) );
-                    }
+                    builder_->set_point( vertex, mesh.point( v ) );
                 }
+            }
+            for( const auto v : geode::Range{ brep.nb_unique_vertices() } )
+            {
+                model_.create_vertex( v );
             }
         }
 
