@@ -912,7 +912,6 @@ namespace geode
             auto polyhedra = std::get< 0 >( propagation_result );
             if( std::get< 1 >( propagation_result ) )
             {
-                polyhedra.pop_back();
                 return polyhedra;
             }
             result.insert( result.end(), polyhedra.begin(), polyhedra.end() );
