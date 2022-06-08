@@ -49,10 +49,8 @@ namespace geode
 
         ~Impl()
         {
-            if( current_ == nb_steps_ )
-            {
-                Logger::info( message_, " completed in ", timer_.duration() );
-            }
+            const auto status = current_ == nb_steps_ ? "completed" : "failed";
+            Logger::info( message_, " ", status, " in ", timer_.duration() );
         }
 
         void increment()
