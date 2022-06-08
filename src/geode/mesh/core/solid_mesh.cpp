@@ -140,11 +140,12 @@ namespace
     }
 
     template < geode::index_t dimension >
-    bool propagate_around_edge( const geode::SolidMesh< dimension >& solid,
+    std::tuple< geode::PolyhedraAroundEdge, bool > propagate_around_edge(
+        const geode::SolidMesh< dimension >& solid,
         geode::PolyhedronFacet facet,
-        const std::array< geode::index_t, 2 >& edge_vertices,
-        geode::PolyhedraAroundEdge& result )
+        const std::array< geode::index_t, 2 >& edge_vertices )
     {
+        geode::PolyhedraAroundEdge result;
         const auto first_polyhedron = facet.polyhedron_id;
         do
         {
@@ -169,10 +170,32 @@ namespace
             }
             else
             {
-                return false;
+                return std::make_tuple( std::move( result ), false );
             }
         } while( facet.polyhedron_id != first_polyhedron );
-        return true;
+        return std::make_tuple( std::move( result ), true );
+    }
+
+    template < geode::index_t dimension >
+    absl::optional< geode::index_t > first_polyhedron_around_edge(
+        const geode::SolidMesh< dimension >& solid,
+        const std::array< geode::index_t, 2 >& vertices )
+    {
+        for( const auto& polyhedron :
+            solid.polyhedra_around_vertex( vertices[0] ) )
+        {
+            for( const auto& edge_vertices :
+                solid.polyhedron_edges_vertices( polyhedron.polyhedron_id ) )
+            {
+                if( vertices == edge_vertices
+                    || ( vertices[0] == edge_vertices[1]
+                         && vertices[1] == edge_vertices[0] ) )
+                {
+                    return polyhedron.polyhedron_id;
+                }
+            }
+        }
+        return absl::nullopt;
     }
 
     template < geode::index_t dimension >
@@ -822,14 +845,12 @@ namespace geode
     bool SolidMesh< dimension >::is_edge_on_border(
         const std::array< index_t, 2 >& vertices ) const
     {
-        for( const auto polyhedron : polyhedra_around_edge( vertices ) )
-        {
-            if( is_edge_on_facet_border( *this, vertices, polyhedron ) )
-            {
-                return true;
-            }
-        }
-        return false;
+        const auto first_polyhedron =
+            first_polyhedron_around_edge( *this, vertices );
+        OPENGEODE_EXCEPTION( first_polyhedron,
+            "[SolidMesh::is_edge_on_border] Given pair of "
+            "vertices does not define a Solid edge" );
+        return is_edge_on_border( vertices, first_polyhedron.value() );
     }
 
     template < index_t dimension >
@@ -837,14 +858,19 @@ namespace geode
         const std::array< index_t, 2 >& vertices,
         index_t first_polyhedron ) const
     {
-        for( const auto polyhedron :
-            polyhedra_around_edge( vertices, first_polyhedron ) )
+        for( const auto f : LRange{ nb_polyhedron_facets( first_polyhedron ) } )
         {
-            if( is_edge_on_facet_border( *this, vertices, polyhedron ) )
+            if( !is_edge_in_polyhedron_facet(
+                    { first_polyhedron, f }, vertices ) )
             {
-                return true;
+                continue;
             }
+            return std::get< 1 >( propagate_around_edge(
+                *this, { first_polyhedron, f }, vertices ) );
         }
+        OPENGEODE_EXCEPTION( true,
+            "[SolidMesh::is_edge_on_border] Incoherence between given vertices "
+            "and given first_polyhedron" );
         return false;
     }
 
@@ -852,22 +878,12 @@ namespace geode
     PolyhedraAroundEdge SolidMesh< dimension >::polyhedra_around_edge(
         const std::array< index_t, 2 >& vertices ) const
     {
-        PolyhedraAroundEdge result;
-        for( const auto& polyhedron : polyhedra_around_vertex( vertices[0] ) )
+        if( const auto first_polyhedron =
+                first_polyhedron_around_edge( *this, vertices ) )
         {
-            for( const auto& edge_vertices :
-                polyhedron_edges_vertices( polyhedron.polyhedron_id ) )
-            {
-                if( vertices == edge_vertices
-                    || ( vertices[0] == edge_vertices[1]
-                         && vertices[1] == edge_vertices[0] ) )
-                {
-                    return polyhedra_around_edge(
-                        vertices, polyhedron.polyhedron_id );
-                }
-            }
+            return polyhedra_around_edge( vertices, first_polyhedron.value() );
         }
-        return result;
+        return {};
     }
 
     template < index_t dimension >
@@ -891,12 +907,14 @@ namespace geode
             {
                 continue;
             }
-            if( propagate_around_edge(
-                    *this, { first_polyhedron, f }, vertices, result ) )
+            const auto propagation_result = propagate_around_edge(
+                *this, { first_polyhedron, f }, vertices );
+            auto polyhedra = std::get< 0 >( propagation_result );
+            if( std::get< 1 >( propagation_result ) )
             {
-                result.pop_back();
-                return result;
+                return polyhedra;
             }
+            result.insert( result.end(), polyhedra.begin(), polyhedra.end() );
         }
         return result;
     }

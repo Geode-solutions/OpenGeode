@@ -183,14 +183,18 @@ void test_polyhedron_adjacencies(
         "[Test] PolyhedralSolid should have 3 polyhedra around this edge" );
     const auto facet_id = polyhedral_solid.facets().facet_from_vertices(
         polyhedral_solid.polyhedron_facet_vertices( { 1, 0 } ) );
-    const auto& polyhedra = polyhedral_solid.polyhedra_from_facet(
+    const auto& polyhedra = polyhedral_solid.polyhedra_from_facet_vertices(
         polyhedral_solid.facets().facet_vertices( facet_id.value() ) );
     OPENGEODE_EXCEPTION(
         polyhedra.size() == 2, "[Test] Wrong number of polyhedra from facet" );
-    OPENGEODE_EXCEPTION( absl::c_find( polyhedra, 1 ) != polyhedra.end(),
-        "[Test] Polyhedra from facet should contain 1" );
-    OPENGEODE_EXCEPTION( absl::c_find( polyhedra, 2 ) != polyhedra.end(),
-        "[Test] Polyhedra from facet should contain 2" );
+    OPENGEODE_EXCEPTION(
+        absl::c_find( polyhedra, geode::PolyhedronFacet{ 1, 0 } )
+            != polyhedra.end(),
+        "[Test] Polyhedra from facet should contain (1, 0)" );
+    OPENGEODE_EXCEPTION(
+        absl::c_find( polyhedra, geode::PolyhedronFacet{ 2, 3 } )
+            != polyhedra.end(),
+        "[Test] Polyhedra from facet should contain (2, 3)" );
 }
 
 void test_permutation( const geode::PolyhedralSolid3D& solid,
