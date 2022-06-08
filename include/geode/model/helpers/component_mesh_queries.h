@@ -32,33 +32,45 @@
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( Surface );
-    ALIAS_3D( Surface );
     FORWARD_DECLARATION_DIMENSION_CLASS( Block );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Surface );
     ALIAS_3D( Block );
+    ALIAS_3D( Surface );
     class BRep;
 } // namespace geode
 
 namespace geode
 {
+    struct BlockPolyhedronFacet
+    {
+        BlockPolyhedronFacet() = default;
+        BlockPolyhedronFacet( PolyhedronFacet facet_in )
+            : facet{ std::move( facet_in ) }
+        {
+        }
+
+        PolyhedronFacet facet;
+        PolygonVertices vertices;
+    };
+
     struct BlockPolyhedraFacetVertices
     {
         index_t nb_facets() const
         {
             index_t counter{ 0 };
-            if( oriented_polyhedron_vertices )
+            if( oriented_polyhedron_facet )
             {
                 counter++;
             }
-            if( opposite_polyhedron_vertices )
+            if( opposite_polyhedron_facet )
             {
                 counter++;
             }
             return counter;
         }
 
-        absl::optional< PolygonVertices > oriented_polyhedron_vertices;
-        absl::optional< PolygonVertices > opposite_polyhedron_vertices;
+        absl::optional< BlockPolyhedronFacet > oriented_polyhedron_facet;
+        absl::optional< BlockPolyhedronFacet > opposite_polyhedron_facet;
     };
 
     PolygonVertices opengeode_model_api surface_polygon_unique_vertices(
@@ -70,15 +82,15 @@ namespace geode
             const Surface3D& surface,
             index_t polygon_id );
 
-    absl::InlinedVector< PolygonVertices, 2 >
+    absl::InlinedVector< BlockPolyhedronFacet, 2 > opengeode_model_api
         block_vertices_from_surface_polygon( const BRep& model,
             const Block3D& block,
             const Surface3D& surface,
             index_t polygon_id );
 
-    BlockPolyhedraFacetVertices oriented_block_vertices_from_surface_polygon(
-        const BRep& model,
-        const Block3D& block,
-        const Surface3D& surface,
-        index_t polygon_id );
+    BlockPolyhedraFacetVertices opengeode_model_api
+        oriented_block_vertices_from_surface_polygon( const BRep& model,
+            const Block3D& block,
+            const Surface3D& surface,
+            index_t polygon_id );
 } // namespace geode
