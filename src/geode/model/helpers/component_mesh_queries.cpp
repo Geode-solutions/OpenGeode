@@ -194,8 +194,8 @@ namespace
 
         if( facets_block_vertices.empty() )
         {
-            return { std::move( facets_block_vertices ),
-                std::move( facets_unique_vertices ), false };
+            return std::make_tuple( std::move( facets_block_vertices ),
+                std::move( facets_unique_vertices ), false );
         }
 
         geode::detail::OrientedVertexCycle< geode::PolygonVertices >
@@ -203,8 +203,8 @@ namespace
         if( polygon_unique_vertices_cycle.is_opposite(
                 { facets_unique_vertices[0].vertices } ) )
         {
-            return { std::move( facets_block_vertices ),
-                std::move( facets_unique_vertices ), false };
+            return std::make_tuple( std::move( facets_block_vertices ),
+                std::move( facets_unique_vertices ), false );
         }
         else if( facets_block_vertices.size() >= 2 )
         {
@@ -214,8 +214,8 @@ namespace
                 "found from the polygon vertices have the same "
                 "orientation." );
         }
-        return { std::move( facets_block_vertices ),
-            std::move( facets_unique_vertices ), true };
+        return std::make_tuple( std::move( facets_block_vertices ),
+            std::move( facets_unique_vertices ), true );
     }
 
     absl::InlinedVector< geode::BlockPolyhedronFacet, 2 >
