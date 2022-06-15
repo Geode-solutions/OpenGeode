@@ -280,6 +280,16 @@ void test_polygon_edge_requests(
     polygon_edge = polygonal_surface.polygon_edge_from_vertices( 1, 0 );
     OPENGEODE_EXCEPTION(
         !polygon_edge, "[Test] Polygon edge from vertices is not correct" );
+    const auto polygon_edges =
+        polygonal_surface.polygons_from_edge_vertices( { { 1, 2 } } );
+    OPENGEODE_EXCEPTION( polygon_edges.size() == 2,
+        "[Test] Wrong number of polygon edges from vertices are not correct." );
+    OPENGEODE_EXCEPTION(
+        ( polygon_edges[0] == geode::PolygonEdge( 0, 1 )
+            && polygon_edges[1] == geode::PolygonEdge( 1, 3 ) )
+            || ( polygon_edges[1] == geode::PolygonEdge( 0, 1 )
+                 && polygon_edges[0] == geode::PolygonEdge( 1, 3 ) ),
+        "[Test] Polygon edges from vertices are not correct." );
 }
 
 void test_delete_polygon( const geode::PolygonalSurface3D& polygonal_surface,

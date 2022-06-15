@@ -26,15 +26,20 @@
 #include <geode/basic/range.h>
 #include <geode/basic/uuid.h>
 
+#include <geode/geometry/point.h>
+
+#include <geode/mesh/core/edged_curve.h>
 #include <geode/mesh/core/solid_mesh.h>
 #include <geode/mesh/core/surface_mesh.h>
 
 #include <geode/model/helpers/component_mesh_queries.h>
 #include <geode/model/mixin/core/block.h>
+#include <geode/model/mixin/core/line.h>
 #include <geode/model/mixin/core/surface.h>
 #include <geode/model/representation/core/brep.h>
+#include <geode/model/representation/core/section.h>
 #include <geode/model/representation/io/brep_input.h>
-#include <geode/model/representation/io/brep_output.h>
+#include <geode/model/representation/io/section_input.h>
 
 #include <geode/tests/common.h>
 
@@ -45,6 +50,7 @@ void run_test_brep()
 
     for( const auto& block : model.blocks() )
     {
+        const auto& block_mesh = block.mesh();
         for( const auto& surface : model.surfaces() )
         {
             if( !model.is_boundary( surface, block )
@@ -52,8 +58,9 @@ void run_test_brep()
             {
                 continue;
             }
+            const auto& surface_mesh = surface.mesh();
             for( const auto polygon_id :
-                geode::Range{ surface.mesh().nb_polygons() } )
+                geode::Range{ surface_mesh.nb_polygons() } )
             {
                 const auto block_facets_vertices =
                     geode::block_vertices_from_surface_polygon(
@@ -80,6 +87,75 @@ void run_test_brep()
                         "[Test] ", block_facets_vertices.size(),
                         " polyhedra were found from internal surface "
                         "polygon." );
+                }
+                for( const auto polygon_vertex_id :
+                    geode::LIndices{ block_facets_vertices[0].vertices } )
+                {
+                    OPENGEODE_EXCEPTION(
+                        surface_mesh
+                            .point( surface_mesh.polygon_vertex(
+                                { polygon_id, polygon_vertex_id } ) )
+                            .inexact_equal(
+                                block_mesh.point(
+                                    block_facets_vertices[0]
+                                        .vertices[polygon_vertex_id] ),
+                                1e-7 ),
+                        "[Test] Point on the edge and on the surface have "
+                        "different positions." );
+                }
+            }
+        }
+    }
+
+    for( const auto& surface : model.surfaces() )
+    {
+        const auto& surface_mesh = surface.mesh();
+        for( const auto& line : model.lines() )
+        {
+            if( !model.is_boundary( line, surface )
+                && !model.is_internal( line, surface ) )
+            {
+                continue;
+            }
+            const auto& line_mesh = line.mesh();
+            for( const auto edge_id : geode::Range{ line_mesh.nb_edges() } )
+            {
+                const auto surface_edge_vertices =
+                    geode::surface_vertices_from_line_edge(
+                        model, surface, line, edge_id );
+                const auto oriented_surface_edge_vertices =
+                    geode::oriented_surface_vertices_from_line_edge(
+                        model, surface, line, edge_id );
+                OPENGEODE_EXCEPTION(
+                    surface_edge_vertices.size()
+                        == oriented_surface_edge_vertices.nb_edges(),
+                    "[Test] Different number of polygons for "
+                    "surface_vertices_from_line_edge and "
+                    "oriented_surface_vertices_from_line_edge functions." );
+                if( model.is_boundary( line, surface ) )
+                {
+                    OPENGEODE_EXCEPTION( surface_edge_vertices.size() == 1,
+                        "[Test] ", surface_edge_vertices.size(),
+                        " polygons were found from boundary line edge." );
+                }
+                else if( model.is_internal( line, surface ) )
+                {
+                    OPENGEODE_EXCEPTION( surface_edge_vertices.size() == 2,
+                        "[Test] ", surface_edge_vertices.size(),
+                        " polygons were found from internal line edge." );
+                }
+                for( const auto edge_vertex_id : geode::LRange{ 2 } )
+                {
+                    OPENGEODE_EXCEPTION(
+                        line_mesh
+                            .point( line_mesh.edge_vertex(
+                                { edge_id, edge_vertex_id } ) )
+                            .inexact_equal( surface_mesh.point(
+                                                surface_edge_vertices[0]
+                                                    .vertices[edge_vertex_id] ),
+                                1e-7 ),
+                        "[Test] Point on the edge and on the surface have "
+                        "different positions." );
                 }
             }
         }
