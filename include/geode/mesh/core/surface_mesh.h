@@ -364,7 +364,7 @@ namespace geode
          * @return Local indices of the edges found
          */
         PolygonsAroundEdge polygons_from_edge_vertices(
-            std::array< index_t, 2 > edge_vertices ) const;
+            absl::Span< const index_t > edge_vertices ) const;
 
         bool are_edges_enabled() const;
 

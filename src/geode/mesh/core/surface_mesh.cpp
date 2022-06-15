@@ -708,7 +708,7 @@ namespace geode
 
     template < index_t dimension >
     PolygonsAroundEdge SurfaceMesh< dimension >::polygons_from_edge_vertices(
-        std::array< index_t, 2 > edge_vertices ) const
+        absl::Span< const index_t > edge_vertices ) const
     {
         PolygonsAroundEdge polygons_around_edge;
         for( auto&& polygon_vertex :

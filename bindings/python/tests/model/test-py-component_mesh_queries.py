@@ -25,6 +25,7 @@ if sys.version_info >= (3,8,0) and platform.system() == "Windows":
         os.add_dll_directory(path)
 
 import opengeode_py_basic as geode_basic
+import opengeode_py_geometry
 import opengeode_py_mesh as geode_mesh
 import opengeode_py_model as geode_model
 
@@ -40,7 +41,7 @@ def run_test_brep():
                 continue
             surface_mesh = surface.mesh()
             for polygon_id in range( surface_mesh.nb_polygons() ):
-                block_facets_vertices = geode_model.oriented_block_vertices_from_surface_polygon( brep, block, surface, polygon_id )
+                block_facets_vertices = geode_model.block_vertices_from_surface_polygon( brep, block, surface, polygon_id )
                 oriented_block_facets_vertices = geode_model.oriented_block_vertices_from_surface_polygon( brep, block, surface, polygon_id )
                 if brep.is_block_boundary( surface, block ):
                     if not oriented_block_facets_vertices.nb_facets() == 1:
@@ -55,20 +56,20 @@ def run_test_brep():
     for surface in brep.surfaces():
         surface_mesh = surface.mesh()
         for line in brep.lines():
-            if not brep.is_boundary( line, surface ) and not brep.is_internal( line, surface ):
+            if not brep.is_surface_boundary( line, surface ) and not brep.is_line_in_surface_internals( line, surface ):
                 continue
             line_mesh = line.mesh()
             for edge_id in range( line_mesh.nb_edges() ):
-                surface_edge_vertices = geode_model.surface_vertices_from_line_edge( brep, surface, line, edge_id )
-                oriented_surface_edge_vertices = geode_model.oriented_surface_vertices_from_line_edge( brep, surface, line, edge_id )
-                if surface_edge_vertices.size() != oriented_surface_edge_vertices.nb_edges():
+                surface_edge_vertices = geode_model.brep_surface_vertices_from_line_edge( brep, surface, line, edge_id )
+                oriented_surface_edge_vertices = geode_model.brep_oriented_surface_vertices_from_line_edge( brep, surface, line, edge_id )
+                if len( surface_edge_vertices ) != oriented_surface_edge_vertices.nb_edges():
                     raise ValueError( "[Test] Different number of polygons for surface_vertices_from_line_edge and oriented_surface_vertices_from_line_edge functions." )
-                if brep.is_boundary( line, surface ):
-                    if surface_edge_vertices.size() != 1:
-                        raise ValueError( "[Test] " + surface_edge_vertices.size() + " polygons were found from boundary line edge." )
-                elif brep.is_internal( line, surface ):
-                    if surface_edge_vertices.size() != 2:
-                        raise ValueError( "[Test] " + surface_edge_vertices.size() + " polygons were found from internal line edge." )
+                if brep.is_surface_boundary( line, surface ):
+                    if len( surface_edge_vertices ) != 1:
+                        raise ValueError( "[Test] " + len( surface_edge_vertices ) + " polygons were found from boundary line edge." )
+                elif brep.is_line_in_surface_internals( line, surface ):
+                    if len( surface_edge_vertices ) != 2:
+                        raise ValueError( "[Test] " + len( surface_edge_vertices ) + " polygons were found from internal line edge." )
                 for edge_vertex_id in range(2):
                     if not line_mesh.point( line_mesh.edge_vertex( geode_mesh.EdgeVertex( edge_id, edge_vertex_id ) ) ).inexact_equal( surface_mesh.point( surface_edge_vertices[0].vertices[edge_vertex_id] ), 1e-7 ):
                         raise ValueError( "[Test] Point on the edge and on the surface have different positions." )
