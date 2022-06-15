@@ -213,7 +213,7 @@ void run_test_section()
                                                 surface_edge_vertices[0]
                                                     .vertices[edge_vertex_id] ),
                                 1e-7 ),
-                        "[Test] Point on the edge and on the surface have "
+                        "[Test] Points on the edge and on the surface have "
                         "different positions." );
                 }
             }

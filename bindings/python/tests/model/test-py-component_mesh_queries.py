@@ -41,12 +41,13 @@ def run_test_brep():
             surface_mesh = surface.mesh()
             for polygon_id in range( surface_mesh.nb_polygons() ):
                 block_facets_vertices = geode_model.oriented_block_vertices_from_surface_polygon( brep, block, surface, polygon_id )
+                oriented_block_facets_vertices = geode_model.oriented_block_vertices_from_surface_polygon( brep, block, surface, polygon_id )
                 if brep.is_block_boundary( surface, block ):
-                    if not block_facets_vertices.nb_facets() == 1:
-                        raise ValueError( "[Test] " + block_facets_vertices.nb_facets() + " polyhedra were found from boundary surface polygon." )
+                    if not oriented_block_facets_vertices.nb_facets() == 1:
+                        raise ValueError( "[Test] " + oriented_block_facets_vertices.nb_facets() + " polyhedra were found from boundary surface polygon." )
                 elif brep.is_surface_in_block_internals( surface, block ):
-                    if not block_facets_vertices.nb_facets() == 2:
-                        raise ValueError( "[Test] " + block_facets_vertices.nb_facets() + " polyhedra were found from internal surface polygon." )
+                    if not oriented_block_facets_vertices.nb_facets() == 2:
+                        raise ValueError( "[Test] " + oriented_block_facets_vertices.nb_facets() + " polyhedra were found from internal surface polygon." )
                 for polygon_vertex_id in range( len( block_facets_vertices[0].vertices)):
                         if not surface_mesh.point( surface_mesh.polygon_vertex( geode_mesh.PolygonVertex( polygon_id, polygon_vertex_id ) ) ).inexact_equal( block_mesh.point( block_facets_vertices[0].vertices[polygon_vertex_id] ), 1e-7 ):
                             raise ValueError( "[Test] Point on the edge and on the surface have different positions." )
