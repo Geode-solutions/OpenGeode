@@ -25,6 +25,7 @@
 
 #include <memory>
 
+#include <geode/mesh/core/edged_curve.h>
 #include <geode/mesh/core/solid_mesh.h>
 #include <geode/mesh/core/surface_mesh.h>
 
@@ -34,9 +35,12 @@ namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Block );
     FORWARD_DECLARATION_DIMENSION_CLASS( Surface );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Line );
     ALIAS_3D( Block );
-    ALIAS_3D( Surface );
+    ALIAS_2D_AND_3D( Surface );
+    ALIAS_2D_AND_3D( Line );
     class BRep;
+    class Section;
 } // namespace geode
 
 namespace geode
@@ -73,6 +77,37 @@ namespace geode
         absl::optional< BlockPolyhedronFacet > opposite_polyhedron_facet;
     };
 
+    struct SurfacePolygonEdge
+    {
+        SurfacePolygonEdge() = default;
+        SurfacePolygonEdge( PolygonEdge edge_in ) : edge{ std::move( edge_in ) }
+        {
+        }
+
+        PolygonEdge edge;
+        std::array< index_t, 2 > vertices;
+    };
+
+    struct SurfacePolygonsEdgeVertices
+    {
+        index_t nb_edges() const
+        {
+            index_t counter{ 0 };
+            if( oriented_edge )
+            {
+                counter++;
+            }
+            if( opposite_edge )
+            {
+                counter++;
+            }
+            return counter;
+        }
+
+        absl::optional< SurfacePolygonEdge > oriented_edge;
+        absl::optional< SurfacePolygonEdge > opposite_edge;
+    };
+
     PolygonVertices opengeode_model_api surface_polygon_unique_vertices(
         const BRep& model, const Surface3D& surface, index_t polygon_id );
 
@@ -93,4 +128,28 @@ namespace geode
             const Block3D& block,
             const Surface3D& surface,
             index_t polygon_id );
+
+    absl::InlinedVector< SurfacePolygonEdge, 2 >
+        opengeode_model_api surface_vertices_from_line_edge( const BRep& model,
+            const Surface3D& surface,
+            const Line3D& line,
+            index_t edge_id );
+
+    SurfacePolygonsEdgeVertices opengeode_model_api
+        oriented_surface_vertices_from_line_edge( const BRep& model,
+            const Surface3D& surface,
+            const Line3D& line,
+            index_t edge_id );
+
+    absl::InlinedVector< SurfacePolygonEdge, 2 > opengeode_model_api
+        surface_vertices_from_line_edge( const Section& model,
+            const Surface2D& surface,
+            const Line2D& line,
+            index_t edge_id );
+
+    SurfacePolygonsEdgeVertices opengeode_model_api
+        oriented_surface_vertices_from_line_edge( const Section& model,
+            const Surface2D& surface,
+            const Line2D& line,
+            index_t edge_id );
 } // namespace geode
