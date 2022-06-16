@@ -55,7 +55,16 @@ namespace geode
         std::vector< uuid > create_surfaces( absl::Span< const uuid > lines,
             absl::Span< const SurfaceDefinition > definitions );
 
+        std::vector< uuid > create_surfaces( absl::Span< const uuid > corners,
+            absl::Span< const uuid > lines,
+            absl::Span< const SurfaceDefinition > definitions );
+
         std::vector< uuid > create_blocks( absl::Span< const uuid > surfaces,
+            absl::Span< const BlockDefinition > definitions );
+
+        std::vector< uuid > create_blocks( absl::Span< const uuid > corners,
+            absl::Span< const uuid > lines,
+            absl::Span< const uuid > surfaces,
             absl::Span< const BlockDefinition > definitions );
 
         std::vector< uuid > create_model_boundaries(

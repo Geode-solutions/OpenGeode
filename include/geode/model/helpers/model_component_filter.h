@@ -23,47 +23,19 @@
 
 #pragma once
 
-#include <geode/basic/pimpl.h>
-
 #include <geode/model/common.h>
-#include <geode/model/helpers/simplicial_creator_definitions.h>
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( Point );
-    ALIAS_2D( Point );
+    class BRep;
     class Section;
-    struct uuid;
 } // namespace geode
 
 namespace geode
 {
-    class opengeode_model_api SimplicialSectionCreator
-    {
-    public:
-        SimplicialSectionCreator(
-            Section& brep, std::vector< Point2D > unique_points );
+    void opengeode_model_api filter_brep_components_with_regards_to_blocks(
+        BRep& brep );
 
-        ~SimplicialSectionCreator();
-
-        std::vector< uuid > create_corners(
-            absl::Span< const CornerDefinition > definitions );
-
-        std::vector< uuid > create_lines( absl::Span< const uuid > corners,
-            absl::Span< const LineDefinition > definitions );
-
-        std::vector< uuid > create_surfaces( absl::Span< const uuid > lines,
-            absl::Span< const SurfaceDefinition > definitions );
-
-        std::vector< uuid > create_surfaces( absl::Span< const uuid > corners,
-            absl::Span< const uuid > lines,
-            absl::Span< const SurfaceDefinition > definitions );
-
-        std::vector< uuid > create_model_boundaries(
-            absl::Span< const uuid > lines,
-            absl::Span< const BoundaryDefinition > definitions );
-
-    private:
-        IMPLEMENTATION_MEMBER( impl_ );
-    };
+    void opengeode_model_api filter_section_components_with_regards_to_surfaces(
+        Section& section );
 } // namespace geode

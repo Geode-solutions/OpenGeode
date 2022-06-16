@@ -87,6 +87,31 @@ namespace geode
             return blocks;
         }
 
+        std::vector< uuid > create_blocks( absl::Span< const uuid > corners,
+            absl::Span< const uuid > lines,
+            absl::Span< const uuid > surfaces,
+            absl::Span< const BlockDefinition > definitions )
+        {
+            const auto blocks = create_blocks( surfaces, definitions );
+            for( const auto d : Indices{ definitions } )
+            {
+                const auto& definition = definitions[d];
+                for( const auto internal : definition.internal_lines )
+                {
+                    builder().add_line_block_internal_relationship(
+                        model().line( lines[internal] ),
+                        model().block( blocks[d] ) );
+                }
+                for( const auto internal : definition.internal_corners )
+                {
+                    builder().add_corner_block_internal_relationship(
+                        model().corner( corners[internal] ),
+                        model().block( blocks[d] ) );
+                }
+            }
+            return blocks;
+        }
+
         std::vector< uuid > create_model_boundaries(
             absl::Span< const uuid > surfaces,
             absl::Span< const BoundaryDefinition > definitions )
@@ -136,11 +161,28 @@ namespace geode
         return impl_->create_surfaces( lines, definitions );
     }
 
+    std::vector< uuid > SimplicialBRepCreator::create_surfaces(
+        absl::Span< const uuid > corners,
+        absl::Span< const uuid > lines,
+        absl::Span< const SurfaceDefinition > definitions )
+    {
+        return impl_->create_surfaces( corners, lines, definitions );
+    }
+
     std::vector< uuid > SimplicialBRepCreator::create_blocks(
         absl::Span< const uuid > surfaces,
         absl::Span< const BlockDefinition > definitions )
     {
         return impl_->create_blocks( surfaces, definitions );
+    }
+
+    std::vector< uuid > SimplicialBRepCreator::create_blocks(
+        absl::Span< const uuid > corners,
+        absl::Span< const uuid > lines,
+        absl::Span< const uuid > surfaces,
+        absl::Span< const BlockDefinition > definitions )
+    {
+        return impl_->create_blocks( corners, lines, surfaces, definitions );
     }
 
     std::vector< uuid > SimplicialBRepCreator::create_model_boundaries(

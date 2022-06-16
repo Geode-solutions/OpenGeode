@@ -46,8 +46,11 @@ namespace geode
         std::vector< index_t > triangles;
         /// List of boundaries: index i correspond to the i-th created Line
         std::vector< index_t > boundaries;
-        /// List of internals: index i correspond to the i-th created Line
+        /// List of internal lines: index i correspond to the i-th created Line
         std::vector< index_t > internals;
+        /// List of internal corners: index i correspond to the i-th created
+        /// Corner
+        std::vector< index_t > internal_corners;
     };
 
     struct BlockDefinition
@@ -57,8 +60,14 @@ namespace geode
         std::vector< index_t > tetrahedra;
         /// List of boundaries: index i correspond to the i-th created Surface
         std::vector< index_t > boundaries;
-        /// List of internals: index i correspond to the i-th created Surface
+        /// List of internal surfaces: index i correspond to the i-th created
+        /// Surface
         std::vector< index_t > internals;
+        /// List of internal lines: index i correspond to the i-th created Line
+        std::vector< index_t > internal_lines;
+        /// List of internal corners: index i correspond to the i-th created
+        /// Corner
+        std::vector< index_t > internal_corners;
     };
 
     struct BoundaryDefinition
