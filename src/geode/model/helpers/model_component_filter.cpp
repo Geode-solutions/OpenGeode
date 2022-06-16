@@ -33,7 +33,6 @@
 
 namespace
 {
-
     template < typename Model, typename ComponentRange >
     std::vector< geode::uuid > find_components_to_delete( const Model& model,
         const ComponentRange& components,
