@@ -47,7 +47,7 @@ add_geode_test(
         ${PROJECT_NAME}::model
 )
 add_geode_test(
-    SOURCE "test-model-filter.cpp"
+    SOURCE "test-model-component-filter.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
