@@ -865,7 +865,7 @@ namespace geode
             {
                 continue;
             }
-            return std::get< 1 >( propagate_around_edge(
+            return !std::get< 1 >( propagate_around_edge(
                 *this, { first_polyhedron, f }, vertices ) );
         }
         OPENGEODE_EXCEPTION( true,
