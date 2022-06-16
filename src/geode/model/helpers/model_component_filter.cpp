@@ -33,57 +33,60 @@
 
 namespace
 {
-    void filter_surfaces( const geode::BRep& brep, geode::BRepBuilder& filter )
+    template < typename Model, typename Builder >
+    void filter_surfaces( const Model& model, Builder& filter )
     {
         std::vector< geode::uuid > surfaces_to_delete;
-        surfaces_to_delete.reserve( brep.nb_surfaces() );
-        for( const auto& surface : brep.surfaces() )
+        surfaces_to_delete.reserve( model.nb_surfaces() );
+        for( const auto& surface : model.surfaces() )
         {
-            if( brep.nb_incidences( surface.id() ) == 0
-                && brep.nb_embeddings( surface.id() ) == 0 )
+            if( model.nb_incidences( surface.id() ) == 0
+                && model.nb_embeddings( surface.id() ) == 0 )
             {
                 surfaces_to_delete.push_back( surface.id() );
             }
         }
         for( const auto& surface_uuid : surfaces_to_delete )
         {
-            filter.remove_surface( brep.surface( surface_uuid ) );
+            filter.remove_surface( model.surface( surface_uuid ) );
         }
     }
 
-    void filter_lines( const geode::BRep& brep, geode::BRepBuilder& filter )
+    template < typename Model, typename Builder >
+    void filter_lines( const Model& model, Builder& filter )
     {
         std::vector< geode::uuid > lines_to_delete;
-        lines_to_delete.reserve( brep.nb_lines() );
-        for( const auto& line : brep.lines() )
+        lines_to_delete.reserve( model.nb_lines() );
+        for( const auto& line : model.lines() )
         {
-            if( brep.nb_incidences( line.id() ) == 0
-                && brep.nb_embeddings( line.id() ) == 0 )
+            if( model.nb_incidences( line.id() ) == 0
+                && model.nb_embeddings( line.id() ) == 0 )
             {
                 lines_to_delete.push_back( line.id() );
             }
         }
         for( const auto& line_uuid : lines_to_delete )
         {
-            filter.remove_line( brep.line( line_uuid ) );
+            filter.remove_line( model.line( line_uuid ) );
         }
     }
 
-    void filter_corners( const geode::BRep& brep, geode::BRepBuilder& filter )
+    template < typename Model, typename Builder >
+    void filter_corners( const Model& model, Builder& filter )
     {
         std::vector< geode::uuid > corners_to_delete;
-        corners_to_delete.reserve( brep.nb_corners() );
-        for( const auto& corner : brep.corners() )
+        corners_to_delete.reserve( model.nb_corners() );
+        for( const auto& corner : model.corners() )
         {
-            if( brep.nb_incidences( corner.id() ) == 0
-                && brep.nb_embeddings( corner.id() ) == 0 )
+            if( model.nb_incidences( corner.id() ) == 0
+                && model.nb_embeddings( corner.id() ) == 0 )
             {
                 corners_to_delete.push_back( corner.id() );
             }
         }
         for( const auto& corner_uuid : corners_to_delete )
         {
-            filter.remove_corner( brep.corner( corner_uuid ) );
+            filter.remove_corner( model.corner( corner_uuid ) );
         }
     }
 } // namespace
@@ -100,6 +103,8 @@ namespace geode
 
     void filter_section_components_with_regards_to_surfaces( Section& section )
     {
-        ;
+        geode::SectionBuilder filter{ section };
+        filter_lines( section, filter );
+        filter_corners( section, filter );
     }
 } // namespace geode
