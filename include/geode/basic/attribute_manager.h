@@ -224,6 +224,9 @@ namespace geode
 
         void copy( const AttributeManager& attribute_manager );
 
+        void import( const AttributeManager& attribute_manager,
+            absl::Span< const index_t > old2new );
+
         template < typename Type, typename Serializer >
         static void register_attribute_type(
             PContext& context, absl::string_view name )

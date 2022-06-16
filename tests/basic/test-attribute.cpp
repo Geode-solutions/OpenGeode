@@ -415,6 +415,44 @@ void test_copy_manager( geode::AttributeManager& manager )
     test_number_of_attributes( manager2, 8 );
 }
 
+void test_import_manager( geode::AttributeManager& manager )
+{
+    const auto nb_elements = manager.nb_elements();
+    geode::AttributeManager manager2;
+    std::vector< geode::index_t > old2new( nb_elements, geode::NO_ID );
+    manager2.resize( 0 );
+    manager2.import( manager, old2new );
+    test_attribute_types( manager2 );
+    test_number_of_attributes( manager2, 8 );
+
+    geode::AttributeManager manager3;
+    for( const auto i : geode::LRange( nb_elements - 2 ) )
+    {
+        old2new[i] = nb_elements - 3 - i;
+    }
+    manager3.resize( nb_elements - 2 );
+    manager3.import( manager, old2new );
+    test_attribute_types( manager3 );
+    test_number_of_attributes( manager3, 8 );
+    auto array_attr =
+        manager.find_attribute< std::array< double, 2 > >( "array_double" );
+    auto array_attr2 =
+        manager3.find_attribute< std::array< double, 2 > >( "array_double" );
+    OPENGEODE_EXCEPTION( array_attr->value( 2 ) == array_attr2->value( 4 ),
+        "[Test] Error in attribute import value." );
+
+    geode::AttributeManager manager4;
+    for( const auto i : geode::LRange( nb_elements ) )
+    {
+        old2new[i] = i;
+    }
+    manager4.resize( nb_elements );
+    manager4.import( manager, old2new );
+    test_attribute_types( manager4 );
+    test_number_of_attributes( manager4, 8 );
+    test_sparse_attribute_after_element_deletion( manager4 );
+}
+
 void test_permutation( geode::AttributeManager& manager )
 {
     std::vector< geode::index_t > permutation{ 2, 1, 4, 6, 7, 8, 5, 9, 3, 0 };
@@ -458,6 +496,7 @@ void test()
     test_serialize_manager( manager );
 
     test_copy_manager( manager );
+    test_import_manager( manager );
     test_attribute_types( manager );
     test_number_of_attributes( manager, 8 );
     manager.delete_attribute( "bool" );

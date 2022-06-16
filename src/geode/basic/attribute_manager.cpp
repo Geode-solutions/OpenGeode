@@ -238,6 +238,21 @@ namespace geode
             }
         }
 
+        void import( const AttributeManager::Impl &attribute_manager,
+            absl::Span< const index_t > old2new,
+            AttributeBase::AttributeKey key )
+        {
+            for( const auto &attribute : attribute_manager.attributes_ )
+            {
+                if( !attribute_exists( attribute.first ) )
+                {
+                    attributes_.emplace(
+                        attribute.first, attribute.second->extract(
+                                             old2new, nb_elements_, key ) );
+                }
+            }
+        }
+
         template < typename Archive >
         void serialize( Archive &archive )
         {
@@ -370,6 +385,12 @@ namespace geode
     void AttributeManager::copy( const AttributeManager &attribute_manager )
     {
         impl_->copy( *attribute_manager.impl_, {} );
+    }
+
+    void AttributeManager::import( const AttributeManager &attribute_manager,
+        absl::Span< const index_t > old2new )
+    {
+        impl_->import( *attribute_manager.impl_, old2new, {} );
     }
 
     template < typename Archive >
