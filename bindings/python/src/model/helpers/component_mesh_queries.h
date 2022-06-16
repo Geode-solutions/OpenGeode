@@ -48,6 +48,21 @@ namespace geode
             .def_readwrite( "opposite_polyhedron_facet",
                 &BlockPolyhedraFacetVertices::opposite_polyhedron_facet );
 
+        pybind11::class_< SurfacePolygonEdge >( module, "SurfacePolygonEdge" )
+            .def( pybind11::init<>() )
+            .def( pybind11::init< PolygonEdge >() )
+            .def_readwrite( "facet", &SurfacePolygonEdge::edge )
+            .def_readwrite( "vertices", &SurfacePolygonEdge::vertices );
+
+        pybind11::class_< SurfacePolygonsEdgeVertices >(
+            module, "SurfacePolygonsEdgeVertices" )
+            .def( pybind11::init<>() )
+            .def( "nb_edges", &SurfacePolygonsEdgeVertices::nb_edges )
+            .def_readwrite(
+                "oriented_edge", &SurfacePolygonsEdgeVertices::oriented_edge )
+            .def_readwrite(
+                "opposite_edge", &SurfacePolygonsEdgeVertices::opposite_edge );
+
         module
             .def( "surface_polygon_unique_vertices",
                 &surface_polygon_unique_vertices )
@@ -56,6 +71,22 @@ namespace geode
             .def( "block_vertices_from_surface_polygon",
                 &block_vertices_from_surface_polygon )
             .def( "oriented_block_vertices_from_surface_polygon",
-                &oriented_block_vertices_from_surface_polygon );
+                &oriented_block_vertices_from_surface_polygon )
+            .def( "brep_surface_vertices_from_line_edge",
+                ( absl::InlinedVector< SurfacePolygonEdge, 2 >( * )(
+                    const BRep&, const Surface3D&, const Line3D&, index_t ) )
+                    & surface_vertices_from_line_edge )
+            .def( "brep_oriented_surface_vertices_from_line_edge",
+                ( SurfacePolygonsEdgeVertices( * )(
+                    const BRep&, const Surface3D&, const Line3D&, index_t ) )
+                    & oriented_surface_vertices_from_line_edge )
+            .def( "section_surface_vertices_from_line_edge",
+                ( absl::InlinedVector< SurfacePolygonEdge, 2 >( * )(
+                    const Section&, const Surface2D&, const Line2D&, index_t ) )
+                    & surface_vertices_from_line_edge )
+            .def( "section_oriented_surface_vertices_from_line_edge",
+                ( SurfacePolygonsEdgeVertices( * )(
+                    const Section&, const Surface2D&, const Line2D&, index_t ) )
+                    & oriented_surface_vertices_from_line_edge );
     }
 } // namespace geode

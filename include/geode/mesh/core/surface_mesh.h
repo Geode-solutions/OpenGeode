@@ -116,6 +116,8 @@ namespace geode
 
     using PolygonsAroundVertex = absl::InlinedVector< PolygonVertex, 10 >;
 
+    using PolygonsAroundEdge = absl::InlinedVector< PolygonEdge, 2 >;
+
     /*!
      * This class represents a Surface made up with polygons (triangles, quads,
      * ...) of arbitrary dimension and provides mesh functionnalities.
@@ -356,6 +358,13 @@ namespace geode
          */
         absl::optional< PolygonEdge > polygon_edge_from_vertices(
             index_t from_vertex_id, index_t to_vertex_id ) const;
+
+        /*!
+         * Find the polygon edges corresponding to a pair of vertex indices.
+         * @return Local indices of the edges found
+         */
+        PolygonsAroundEdge polygons_from_edge_vertices(
+            absl::Span< const index_t > edge_vertices ) const;
 
         bool are_edges_enabled() const;
 

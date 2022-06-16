@@ -707,6 +707,31 @@ namespace geode
     }
 
     template < index_t dimension >
+    PolygonsAroundEdge SurfaceMesh< dimension >::polygons_from_edge_vertices(
+        absl::Span< const index_t > edge_vertices ) const
+    {
+        PolygonsAroundEdge polygons_around_edge;
+        for( auto&& polygon_vertex :
+            polygons_around_vertex( edge_vertices[0] ) )
+        {
+            const auto next_vertex = next_polygon_vertex( polygon_vertex );
+            if( this->polygon_vertex( next_vertex ) == edge_vertices[1] )
+            {
+                polygons_around_edge.emplace_back(
+                    std::move( polygon_vertex ) );
+                continue;
+            }
+            auto previous_vertex = previous_polygon_vertex( polygon_vertex );
+            if( this->polygon_vertex( previous_vertex ) == edge_vertices[1] )
+            {
+                polygons_around_edge.emplace_back(
+                    std::move( previous_vertex ) );
+            }
+        }
+        return polygons_around_edge;
+    }
+
+    template < index_t dimension >
     bool SurfaceMesh< dimension >::are_edges_enabled() const
     {
         return impl_->are_edges_enabled();
