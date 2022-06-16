@@ -90,6 +90,14 @@ namespace geode
         return impl_->create_surfaces( lines, definitions );
     }
 
+    std::vector< uuid > SimplicialSectionCreator::create_surfaces(
+        absl::Span< const uuid > corners,
+        absl::Span< const uuid > lines,
+        absl::Span< const SurfaceDefinition > definitions )
+    {
+        return impl_->create_surfaces( corners, lines, definitions );
+    }
+
     std::vector< uuid > SimplicialSectionCreator::create_model_boundaries(
         absl::Span< const uuid > lines,
         absl::Span< const BoundaryDefinition > definitions )
