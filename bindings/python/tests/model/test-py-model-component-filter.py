@@ -65,4 +65,4 @@ if __name__ == '__main__':
 
     brep2 = geode_model.load_brep(os.path.join(data_dir, "dangling.og_brep"))
     geode_model.filter_brep_components_with_regards_to_blocks(brep2)
-    check_brep_dangling(brep)
+    check_brep_dangling(brep2)
