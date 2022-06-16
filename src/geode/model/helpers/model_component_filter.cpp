@@ -33,20 +33,30 @@
 
 namespace
 {
+
+    template < typename Model, typename ComponentRange >
+    std::vector< geode::uuid > find_components_to_delete( const Model& model,
+        const ComponentRange& components,
+        geode::index_t nb_components )
+    {
+        std::vector< geode::uuid > to_delete;
+        to_delete.reserve( nb_components );
+        for( const auto& component : components )
+        {
+            if( model.nb_incidences( component.id() ) == 0
+                && model.nb_embeddings( component.id() ) == 0 )
+            {
+                to_delete.push_back( component.id() );
+            }
+        }
+        return to_delete;
+    }
+
     template < typename Model, typename Builder >
     void filter_surfaces( const Model& model, Builder& filter )
     {
-        std::vector< geode::uuid > surfaces_to_delete;
-        surfaces_to_delete.reserve( model.nb_surfaces() );
-        for( const auto& surface : model.surfaces() )
-        {
-            if( model.nb_incidences( surface.id() ) == 0
-                && model.nb_embeddings( surface.id() ) == 0 )
-            {
-                surfaces_to_delete.push_back( surface.id() );
-            }
-        }
-        for( const auto& surface_uuid : surfaces_to_delete )
+        for( const auto& surface_uuid : find_components_to_delete(
+                 model, model.surfaces(), model.nb_surfaces() ) )
         {
             filter.remove_surface( model.surface( surface_uuid ) );
         }
@@ -55,17 +65,8 @@ namespace
     template < typename Model, typename Builder >
     void filter_lines( const Model& model, Builder& filter )
     {
-        std::vector< geode::uuid > lines_to_delete;
-        lines_to_delete.reserve( model.nb_lines() );
-        for( const auto& line : model.lines() )
-        {
-            if( model.nb_incidences( line.id() ) == 0
-                && model.nb_embeddings( line.id() ) == 0 )
-            {
-                lines_to_delete.push_back( line.id() );
-            }
-        }
-        for( const auto& line_uuid : lines_to_delete )
+        for( const auto& line_uuid : find_components_to_delete(
+                 model, model.lines(), model.nb_lines() ) )
         {
             filter.remove_line( model.line( line_uuid ) );
         }
@@ -74,17 +75,8 @@ namespace
     template < typename Model, typename Builder >
     void filter_corners( const Model& model, Builder& filter )
     {
-        std::vector< geode::uuid > corners_to_delete;
-        corners_to_delete.reserve( model.nb_corners() );
-        for( const auto& corner : model.corners() )
-        {
-            if( model.nb_incidences( corner.id() ) == 0
-                && model.nb_embeddings( corner.id() ) == 0 )
-            {
-                corners_to_delete.push_back( corner.id() );
-            }
-        }
-        for( const auto& corner_uuid : corners_to_delete )
+        for( const auto& corner_uuid : find_components_to_delete(
+                 model, model.corners(), model.nb_corners() ) )
         {
             filter.remove_corner( model.corner( corner_uuid ) );
         }
