@@ -372,8 +372,8 @@ namespace
 
         if( surface_edges_vertices.empty() )
         {
-            return { std::move( surface_edges_vertices ),
-                std::move( surface_edges_unique_vertices ), false };
+            return std::make_tuple( std::move( surface_edges_vertices ),
+                std::move( surface_edges_unique_vertices ), false );
         }
 
         geode::detail::OrientedVertexCycle< std::array< geode::index_t, 2 > >
@@ -381,8 +381,8 @@ namespace
         if( edge_unique_vertices_cycle.is_opposite(
                 { surface_edges_unique_vertices[0].vertices } ) )
         {
-            return { std::move( surface_edges_vertices ),
-                std::move( surface_edges_unique_vertices ), false };
+            return std::make_tuple( std::move( surface_edges_vertices ),
+                std::move( surface_edges_unique_vertices ), false );
         }
         else if( surface_edges_vertices.size() >= 2 )
         {
@@ -393,8 +393,8 @@ namespace
                 "found from the polygon vertices have the same "
                 "orientation." );
         }
-        return { std::move( surface_edges_vertices ),
-            std::move( surface_edges_unique_vertices ), true };
+        return std::make_tuple( std::move( surface_edges_vertices ),
+            std::move( surface_edges_unique_vertices ), true );
     }
 
     absl::InlinedVector< geode::SurfacePolygonEdge, 2 >
