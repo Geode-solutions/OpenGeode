@@ -166,10 +166,16 @@ namespace geode
             const GridCellIndices< dimension >& index ) const;
 
         /*!
-         * Returns if the query point is inside the grid, up to a global_epsilon
-         * away from the grid bounding box.
+         * Return true if the query point is inside the grid, up to a
+         * global_epsilon away from the grid bounding box.
          */
         bool contains( const Point< dimension >& query ) const;
+
+        /*!
+         * Returns the closest grid vertex to the query point.
+         */
+        GridVertexIndices< dimension > closest_vertex(
+            const Point< dimension >& query ) const;
 
         /*!
          * Return the cell(s) containing the query point
