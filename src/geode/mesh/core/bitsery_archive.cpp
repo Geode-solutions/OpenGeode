@@ -38,6 +38,7 @@
 #include <geode/mesh/core/geode_tetrahedral_solid.h>
 #include <geode/mesh/core/geode_triangulated_surface.h>
 #include <geode/mesh/core/geode_vertex_set.h>
+#include <geode/mesh/core/private/solid_mesh_impl.h>
 #include <geode/mesh/core/private/surface_mesh_impl.h>
 
 namespace bitsery
@@ -217,11 +218,14 @@ namespace
             geode::CachedValue< geode::detail::PolygonsAroundVertexImpl >,
             Serializer >( context, "CachedPolygonsAroundVertexImpl" );
         geode::AttributeManager::register_attribute_type<
+            geode::CachedValue< geode::detail::PolyhedraAroundVertexImpl >,
+            Serializer >( context, "CachedPolyhedraAroundVertexImpl" );
+        geode::AttributeManager::register_attribute_type<
             geode::HybridSolid3D::Type, Serializer >(
             context, "HybridSolidType" );
         context.registerBasesList< Serializer >(
             bitsery::ext::PolymorphicClassesList< geode::VertexSet >{} );
-    } // namespace )
+    }
 } // namespace
 
 namespace geode

@@ -140,11 +140,13 @@ namespace
                 else
                 {
                     builder.disassociate_polyhedron_vertex_to_vertex( v );
+                    builder.reset_polyhedra_around_vertex( v );
                 }
             }
             else
             {
                 builder.disassociate_polyhedron_vertex_to_vertex( v );
+                builder.reset_polyhedra_around_vertex( v );
             }
         }
     }
@@ -167,13 +169,14 @@ namespace
                 old2new[polyhedron_vertex->polyhedron_id];
             if( new_polyhedron_vertex.polyhedron_id == geode::NO_ID )
             {
-                for( auto&& polyhedron : solid.polyhedra_around_vertex( v ) )
+                for( const auto& polyhedron :
+                    solid.polyhedra_around_vertex( v ) )
                 {
-                    polyhedron.polyhedron_id =
-                        old2new[polyhedron.polyhedron_id];
-                    if( polyhedron.polyhedron_id != geode::NO_ID )
+                    const auto new_id = old2new[polyhedron.polyhedron_id];
+                    if( new_id != geode::NO_ID )
                     {
-                        new_polyhedron_vertex = std::move( polyhedron );
+                        new_polyhedron_vertex = { new_id,
+                            polyhedron.vertex_id };
                         break;
                     }
                 }
@@ -181,12 +184,25 @@ namespace
             if( new_polyhedron_vertex.polyhedron_id == geode::NO_ID )
             {
                 builder.disassociate_polyhedron_vertex_to_vertex( v );
+                builder.reset_polyhedra_around_vertex( v );
             }
             else
             {
                 builder.associate_polyhedron_vertex_to_vertex(
                     new_polyhedron_vertex, v );
             }
+        }
+    }
+
+    template < geode::index_t dimension >
+    void reset_polyhedra_around_facet_vertices(
+        const geode::SolidMesh< dimension >& solid,
+        geode::SolidMeshBuilder< dimension >& builder,
+        const geode::PolyhedronFacet& facet )
+    {
+        for( const auto vertex : solid.polyhedron_facet_vertices( facet ) )
+        {
+            builder.reset_polyhedra_around_vertex( vertex );
         }
     }
 
@@ -243,7 +259,7 @@ namespace geode
                 solid_mesh_.polyhedron_around_vertex( polyhedron_vertex_id );
             if( polyhedron_around == polyhedron_vertex )
             {
-                const auto polyhedra_around =
+                const auto& polyhedra_around =
                     solid_mesh_.polyhedra_around_vertex( polyhedron_vertex_id );
                 if( polyhedra_around.size() < 2 )
                 {
@@ -256,6 +272,7 @@ namespace geode
                         polyhedra_around[1], polyhedron_vertex_id );
                 }
             }
+            reset_polyhedra_around_vertex( polyhedron_vertex_id );
         }
 
         if( solid_mesh_.are_edges_enabled()
@@ -424,6 +441,13 @@ namespace geode
     }
 
     template < index_t dimension >
+    void SolidMeshBuilder< dimension >::reset_polyhedra_around_vertex(
+        index_t vertex_id )
+    {
+        solid_mesh_.reset_polyhedra_around_vertex( vertex_id, {} );
+    }
+
+    template < index_t dimension >
     void SolidMeshBuilder< dimension >::associate_polyhedron_vertex_to_vertex(
         const PolyhedronVertex& polyhedron_vertex, index_t vertex_id )
     {
@@ -490,6 +514,8 @@ namespace geode
         OPENGEODE_ASSERT( adjacent_id < solid_mesh_.nb_polyhedra(),
             "[SolidMeshBuilder::set_polyhedron_adjacent] Accessing a "
             "polyhedron that does not exist" );
+        reset_polyhedra_around_facet_vertices(
+            solid_mesh_, *this, polyhedron_facet );
         do_set_polyhedron_adjacent( polyhedron_facet, adjacent_id );
     }
 
@@ -500,6 +526,8 @@ namespace geode
         check_polyhedron_id( solid_mesh_, polyhedron_facet.polyhedron_id );
         check_polyhedron_facet_id( solid_mesh_, polyhedron_facet.polyhedron_id,
             polyhedron_facet.facet_id );
+        reset_polyhedra_around_facet_vertices(
+            solid_mesh_, *this, polyhedron_facet );
         do_unset_polyhedron_adjacent( polyhedron_facet );
     }
 

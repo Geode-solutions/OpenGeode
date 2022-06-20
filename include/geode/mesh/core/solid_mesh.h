@@ -386,7 +386,7 @@ namespace geode
          * @param[in] vertex_id Index of the vertex.
          * @pre This function needs that polyhedron adjacencies are computed
          */
-        PolyhedraAroundVertex polyhedra_around_vertex(
+        const PolyhedraAroundVertex& polyhedra_around_vertex(
             index_t vertex_id ) const;
 
         /*!
@@ -395,7 +395,7 @@ namespace geode
          * @param[in] polyhedron_vertex Local index of vertex in polyhedron.
          * @pre This function needs that polyhedron adjacencies are computed
          */
-        PolyhedraAroundVertex polyhedra_around_vertex(
+        const PolyhedraAroundVertex& polyhedra_around_vertex(
             const PolyhedronVertex& polyhedron_vertex ) const;
 
         /*!
@@ -496,10 +496,13 @@ namespace geode
         absl::optional< PolyhedronVertex > polyhedron_around_vertex(
             index_t vertex_id ) const;
 
+    public:
         void associate_polyhedron_vertex_to_vertex(
             const PolyhedronVertex& polyhedron_vertex,
             index_t vertex_id,
             SolidMeshKey );
+
+        void reset_polyhedra_around_vertex( index_t vertex_id, SolidMeshKey );
 
         PolyhedronVertex polyhedron_facet_vertex_id(
             const PolyhedronFacetVertex& polyhedron_facet_vertex,

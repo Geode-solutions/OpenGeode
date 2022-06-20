@@ -165,6 +165,8 @@ namespace geode
          */
         void disassociate_polyhedron_vertex_to_vertex( index_t vertex_id );
 
+        void reset_polyhedra_around_vertex( index_t vertex_id );
+
         void copy( const SolidMesh< dimension >& solid_mesh );
 
     protected:
