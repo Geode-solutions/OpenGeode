@@ -70,6 +70,7 @@
         .def( "point", &RegularGrid##dimension##D::point )                     \
         .def( "cells", &RegularGrid##dimension##D::cells )                     \
         .def( "contains", &RegularGrid##dimension##D::contains )               \
+        .def( "closest_vertex", &RegularGrid##dimension##D::closest_vertex )   \
         .def( "cell_barycenter", &RegularGrid##dimension##D::cell_barycenter ) \
         .def( "cell_attribute_manager",                                        \
             &RegularGrid##dimension##D::cell_attribute_manager,                \

@@ -187,6 +187,24 @@ def test_boundary_box( grid ):
     if bbox.max() != max:
         raise ValueError( "[Test] Wrong bounding box max" )
 
+def test_cosest_vertex( grid ):
+    p0 = geom.Point3D( [ 0, 0, 0 ] )
+    p1 = geom.Point3D( [ 0.5, 20, 46 ] )
+    p2 = geom.Point3D( [ 0, -1, -1 ] )
+    p3 = geom.Point3D( [ 10, 30, 50 ] )
+    p4 = geom.Point3D( [ 3.55, 3.9, 7.5 ] )
+    
+    if grid.closest_vertex( p0 ) != [0, 0, 0]:
+        raise ValueError( "[Test] Wrong result for closest vertex for query p0" )
+    if grid.closest_vertex( p1 ) != [5, 10, 15]:
+        raise ValueError( "[Test] Wrong result for closest vertex for query p1" )
+    if grid.closest_vertex( p2 ) != [0, 0, 0]:
+        raise ValueError( "[Test] Wrong result for closest vertex for query p2" )
+    if grid.closest_vertex( p3 ) != [5, 10, 15]:
+        raise ValueError( "[Test] Wrong result for closest vertex for query p3" )
+    if grid.closest_vertex( p4 ) != [2, 2, 2]:
+        raise ValueError( "[Test] Wrong result for closest vertex for query p4" )
+
 def test_clone( grid ):
     attribute_name = "int_attribute"
     attribute_name_d = "double_attribute"
@@ -228,5 +246,6 @@ if __name__ == '__main__':
     test_cell_geometry( grid )
     test_cell_query( grid )
     test_boundary_box( grid )
+    test_closest_vertex( grid )
     test_clone( grid )
     test_io( grid, "test." + grid.native_extension() )
