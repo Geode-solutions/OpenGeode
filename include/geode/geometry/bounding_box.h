@@ -25,6 +25,7 @@
 
 #include <geode/basic/pimpl.h>
 
+#include <geode/geometry/basic_objects/infinite_line.h>
 #include <geode/geometry/common.h>
 
 namespace geode
@@ -56,9 +57,21 @@ namespace geode
 
         bool intersects( const BoundingBox< dimension >& bbox ) const;
 
+        bool intersects( const Ray< dimension >& ray ) const;
+
+        /*!
+         * Returns the distance between the point and the box.
+         * If the point is inside the box, the distance is negative.
+         */
+        double signed_distance( const Point< dimension >& point ) const;
+
         const Point< dimension >& min() const;
 
         const Point< dimension >& max() const;
+
+        Point< dimension > center() const;
+
+        Vector< dimension > diagonal() const;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

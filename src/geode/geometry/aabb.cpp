@@ -41,23 +41,6 @@
 namespace
 {
     template < geode::index_t dimension >
-    double inner_point_box_distance( const geode::Point< dimension >& point,
-        const geode::BoundingBox< dimension >& box )
-    {
-        OPENGEODE_ASSERT( box.contains( point ), "point out of the box" );
-        const auto Pmin = point - box.min();
-        const auto Pmax = point - box.max();
-        auto result = std::numeric_limits< double >::max();
-        for( const auto c : geode::LRange{ dimension } )
-        {
-            const auto local_result = std::min(
-                std::abs( Pmin.value( c ) ), std::abs( Pmax.value( c ) ) );
-            result = std::min( result, local_result );
-        }
-        return result;
-    }
-
-    template < geode::index_t dimension >
     std::vector< geode::index_t > sort(
         absl::Span< const geode::BoundingBox< dimension > > bboxes )
     {
@@ -68,6 +51,7 @@ namespace
             } );
         return geode::morton_sort< dimension >( points );
     }
+
 } // namespace
 
 namespace geode
@@ -75,10 +59,73 @@ namespace geode
     template < index_t dimension >
     AABBTree< dimension >::Impl::Impl(
         absl::Span< const BoundingBox< dimension > > bboxes )
-        : tree_( max_node_index( bboxes ) + ROOT_INDEX ),
+        : tree_( bboxes.empty()
+                     ? ROOT_INDEX
+                     : max_node_index_recursive( ROOT_INDEX, 0, bboxes.size() )
+                           + ROOT_INDEX ),
           mapping_morton_( sort( bboxes ) )
     {
-        initialize_tree( bboxes );
+        if( !bboxes.empty() )
+        {
+            initialize_tree_recursive( bboxes, ROOT_INDEX, 0, bboxes.size() );
+        }
+    }
+
+    template < index_t dimension >
+    index_t AABBTree< dimension >::Impl::max_node_index_recursive(
+        index_t node_index, index_t box_begin, index_t box_end )
+    {
+        OPENGEODE_ASSERT( box_end > box_begin,
+            "End box index should be after Begin box index" );
+        if( is_leaf( box_begin, box_end ) )
+        {
+            return node_index;
+        }
+        const auto it =
+            get_recursive_iterators( node_index, box_begin, box_end );
+        return std::max(
+            max_node_index_recursive( it.child_left, box_begin, it.middle_box ),
+            max_node_index_recursive(
+                it.child_right, it.middle_box, box_end ) );
+    }
+
+    template < index_t dimension >
+    index_t AABBTree< dimension >::Impl::nb_bboxes() const
+    {
+        return mapping_morton_.size();
+    }
+
+    template < index_t dimension >
+    bool AABBTree< dimension >::Impl::is_leaf(
+        index_t box_begin, index_t box_end )
+    {
+        return box_begin + 1 == box_end;
+    }
+
+    template < index_t dimension >
+    typename AABBTree< dimension >::Impl::Iterator
+        AABBTree< dimension >::Impl::get_recursive_iterators(
+            index_t node_index, index_t box_begin, index_t box_end )
+    {
+        Iterator it;
+        it.middle_box = box_begin + ( box_end - box_begin ) / 2;
+        it.child_left = 2 * node_index;
+        it.child_right = 2 * node_index + 1;
+        return it;
+    }
+
+    template < index_t dimension >
+    const BoundingBox< dimension >& AABBTree< dimension >::Impl::node(
+        index_t index ) const
+    {
+        OPENGEODE_ASSERT( index < tree_.size(), "query out of tree" );
+        return tree_[index];
+    }
+
+    template < index_t dimension >
+    index_t AABBTree< dimension >::Impl::mapping_morton( index_t index ) const
+    {
+        return mapping_morton_[index];
     }
 
     template < index_t dimension >
@@ -112,42 +159,15 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t AABBTree< dimension >::Impl::max_node_index(
-        absl::Span< const BoundingBox< dimension > > bboxes ) const
+    index_t AABBTree< dimension >::nb_bboxes() const
     {
-        if( bboxes.empty() )
-        {
-            return 0;
-        }
-        return max_node_index_recursive( ROOT_INDEX, 0, bboxes.size() );
+        return impl_->nb_bboxes();
     }
 
     template < index_t dimension >
-    index_t AABBTree< dimension >::Impl::max_node_index_recursive(
-        index_t node_index, index_t box_begin, index_t box_end ) const
+    const BoundingBox< dimension >& AABBTree< dimension >::bounding_box() const
     {
-        OPENGEODE_ASSERT( box_end > box_begin,
-            "End box index should be after Begin box index" );
-        if( is_leaf( box_begin, box_end ) )
-        {
-            return node_index;
-        }
-        const auto it =
-            get_recursive_iterators( node_index, box_begin, box_end );
-        return std::max(
-            max_node_index_recursive( it.child_left, box_begin, it.middle_box ),
-            max_node_index_recursive(
-                it.child_right, it.middle_box, box_end ) );
-    }
-
-    template < index_t dimension >
-    void AABBTree< dimension >::Impl::initialize_tree(
-        absl::Span< const BoundingBox< dimension > > bboxes )
-    {
-        if( !bboxes.empty() )
-        {
-            initialize_tree_recursive( bboxes, ROOT_INDEX, 0, bboxes.size() );
-        }
+        return impl_->node( Impl::ROOT_INDEX );
     }
 
     /**
@@ -171,7 +191,7 @@ namespace geode
             "Begin and End indices should be different" );
         if( is_leaf( element_begin, element_end ) )
         {
-            set_node( node_index, bboxes[mapping_morton_[element_begin]] );
+            tree_[node_index] = bboxes[mapping_morton_[element_begin]];
             return;
         }
         const auto it =
@@ -185,41 +205,37 @@ namespace geode
         initialize_tree_recursive(
             bboxes, it.child_right, it.middle_box, element_end );
         // before box_union
-        add_box( node_index, node( it.child_left ) );
-        add_box( node_index, node( it.child_right ) );
+        tree_[node_index].add_box( node( it.child_left ) );
+        tree_[node_index].add_box( node( it.child_right ) );
     }
 
     template < index_t dimension >
-    double point_box_signed_distance(
-        const Point< dimension >& point, const BoundingBox< dimension >& box )
+    index_t AABBTree< dimension >::Impl::closest_element_box_hint(
+        const Point< dimension >& query ) const
     {
-        bool inside{ true };
-        Vector< dimension > result;
-        for( const auto c : LRange{ dimension } )
+        index_t box_begin{ 0 };
+        index_t box_end{ nb_bboxes() };
+        index_t node_index{ Impl::ROOT_INDEX };
+        while( !is_leaf( box_begin, box_end ) )
         {
-            if( point.value( c ) < box.min().value( c ) )
+            const auto it =
+                get_recursive_iterators( node_index, box_begin, box_end );
+            if( node( it.child_left ).signed_distance( query )
+                < node( it.child_right ).signed_distance( query ) )
             {
-                inside = false;
-                result.set_value( c, point.value( c ) - box.min().value( c ) );
+                box_end = it.middle_box;
+                node_index = it.child_left;
             }
-            else if( point.value( c ) > box.max().value( c ) )
+            else
             {
-                inside = false;
-                result.set_value( c, point.value( c ) - box.max().value( c ) );
+                box_begin = it.middle_box;
+                node_index = it.child_right;
             }
         }
-        if( inside )
-        {
-            return -inner_point_box_distance( point, box );
-        }
-        return result.length();
+
+        return mapping_morton( box_begin );
     }
 
-    template double opengeode_geometry_api point_box_signed_distance(
-        const Point2D&, const BoundingBox2D& );
     template class opengeode_geometry_api AABBTree< 2 >;
-
-    template double opengeode_geometry_api point_box_signed_distance(
-        const Point3D&, const BoundingBox3D& );
     template class opengeode_geometry_api AABBTree< 3 >;
 } // namespace geode

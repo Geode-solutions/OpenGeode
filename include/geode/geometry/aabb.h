@@ -165,32 +165,6 @@ namespace geode
             const Ray< dimension >& ray, EvalIntersection& action ) const;
 
     private:
-        static bool is_leaf( index_t box_begin, index_t box_end )
-        {
-            return box_begin + 1 == box_end;
-        }
-
-        struct Iterator
-        {
-            index_t middle_box;
-            index_t child_left;
-            index_t child_right;
-        };
-        static Iterator get_recursive_iterators(
-            index_t node_index, index_t box_begin, index_t box_end )
-        {
-            Iterator it;
-            it.middle_box = box_begin + ( box_end - box_begin ) / 2;
-            it.child_left = 2 * node_index;
-            it.child_right = 2 * node_index + 1;
-            return it;
-        }
-
-        const BoundingBox< dimension >& node( index_t index ) const;
-
-        index_t mapping_morton( index_t index ) const;
-
-    private:
         IMPLEMENTATION_MEMBER( impl_ );
     };
     ALIAS_2D_AND_3D( AABBTree );
