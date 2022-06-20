@@ -189,7 +189,7 @@ def test_boundary_box( grid ):
 
 def test_closest_vertex( grid ):
     p0 = geom.Point3D( [ 0, 0, 0 ] )
-    p1 = geom.Point3D( [ 0.5, 20, 46 ] )
+    p1 = geom.Point3D( [ 6.5, 20, 46 ] )
     p2 = geom.Point3D( [ 0, -1, -1 ] )
     p3 = geom.Point3D( [ 10, 30, 50 ] )
     p4 = geom.Point3D( [ 3.55, 3.9, 7.5 ] )
