@@ -32,7 +32,6 @@
 #include <geode/basic/pimpl_impl.h>
 
 #include <geode/geometry/aabb.h>
-#include <geode/geometry/perpendicular.h>
 
 namespace geode
 {
@@ -53,6 +52,14 @@ namespace geode
     public:
         static constexpr index_t ROOT_INDEX{ 1 };
 
+        struct Iterator
+        {
+            index_t middle_box;
+            index_t child_left;
+            index_t child_right;
+        };
+
+    public:
         Impl() = default;
 
         Impl( absl::Span< const BoundingBox< dimension > > bboxes );
@@ -61,64 +68,26 @@ namespace geode
 
         Impl& operator=( Impl&& other ) = default;
 
-        index_t nb_bboxes() const
-        {
-            return mapping_morton_.size();
-        }
+        index_t nb_bboxes() const;
 
-        const BoundingBox< dimension >& node( index_t index ) const
-        {
-            OPENGEODE_ASSERT( index < tree_.size(), "query out of tree" );
-            return tree_[index];
-        }
+        static bool is_leaf( index_t box_begin, index_t box_end );
 
-        void set_node( index_t index, const BoundingBox< dimension >& box )
-        {
-            OPENGEODE_ASSERT( index < tree_.size(), "query out of tree" );
-            tree_[index] = box;
-        }
+        static Iterator get_recursive_iterators(
+            index_t node_index, index_t box_begin, index_t box_end );
 
-        void add_box( index_t index, const BoundingBox< dimension >& box )
-        {
-            OPENGEODE_ASSERT( index < tree_.size(), "query out of tree" );
-            tree_[index].add_box( box );
-        }
+        const BoundingBox< dimension >& node( index_t index ) const;
 
-        index_t mapping_morton( index_t index ) const
-        {
-            return mapping_morton_[index];
-        }
+        index_t mapping_morton( index_t index ) const;
 
-        /*!
-         * @brief Gets the number of nodes in the tree subset
-         */
-        index_t max_node_index_recursive(
-            index_t node_index, index_t box_begin, index_t box_end ) const;
+        static index_t max_node_index_recursive(
+            index_t node_index, index_t box_begin, index_t box_end );
 
-        /*!
-         * @brief Gets the number of nodes in the tree subset
-         */
-        index_t max_node_index(
-            absl::Span< const BoundingBox< dimension > > bboxes ) const;
-
-        /*!
-         * @brief The recursive instruction used in initialize_tree()
-         */
-        void initialize_tree(
-            absl::Span< const BoundingBox< dimension > > bboxes );
-
-        /*!
-         * @brief The recursive instruction used in initialize_tree()
-         */
         void initialize_tree_recursive(
             absl::Span< const BoundingBox< dimension > > bboxes,
             index_t node_index,
             index_t element_begin,
             index_t element_end );
 
-        /*!
-         * @brief The recursive instruction used in closest_element_box()
-         */
         template < typename ACTION >
         void closest_element_box_recursive( const Point< dimension >& query,
             index_t& nearest_box,
@@ -162,35 +131,13 @@ namespace geode
             index_t element_end,
             ACTION& action ) const;
 
+        index_t closest_element_box_hint(
+            const Point< dimension >& query ) const;
+
     private:
         std::vector< BoundingBox< dimension > > tree_;
         std::vector< index_t > mapping_morton_;
     };
-
-    template < index_t dimension >
-    index_t AABBTree< dimension >::nb_bboxes() const
-    {
-        return impl_->nb_bboxes();
-    }
-
-    template < index_t dimension >
-    const BoundingBox< dimension >& AABBTree< dimension >::bounding_box() const
-    {
-        return node( Impl::ROOT_INDEX );
-    }
-
-    template < index_t dimension >
-    const BoundingBox< dimension >& AABBTree< dimension >::node(
-        index_t index ) const
-    {
-        return impl_->node( index );
-    }
-
-    template < index_t dimension >
-    index_t AABBTree< dimension >::mapping_morton( index_t index ) const
-    {
-        return impl_->mapping_morton( index );
-    }
 
     template < index_t dimension >
     template < typename EvalDistance >
@@ -202,27 +149,7 @@ namespace geode
         {
             return std::make_tuple( NO_ID, query, 0 );
         }
-        index_t box_begin{ 0 };
-        index_t box_end{ nb_bboxes() };
-        index_t node_index{ Impl::ROOT_INDEX };
-        while( !is_leaf( box_begin, box_end ) )
-        {
-            const auto it =
-                get_recursive_iterators( node_index, box_begin, box_end );
-            if( point_box_signed_distance( query, node( it.child_left ) )
-                < point_box_signed_distance( query, node( it.child_right ) ) )
-            {
-                box_end = it.middle_box;
-                node_index = it.child_left;
-            }
-            else
-            {
-                box_begin = it.middle_box;
-                node_index = it.child_right;
-            }
-        }
-
-        auto nearest_box = impl_->mapping_morton( box_begin );
+        auto nearest_box = impl_->closest_element_box_hint( query );
         double distance;
         Point< dimension > nearest_point;
         std::tie( distance, nearest_point ) = action( query, nearest_box );
@@ -287,10 +214,6 @@ namespace geode
     }
 
     template < index_t dimension >
-    double point_box_signed_distance(
-        const Point< dimension >& point, const BoundingBox< dimension >& box );
-
-    template < index_t dimension >
     template < typename ACTION >
     void AABBTree< dimension >::Impl::closest_element_box_recursive(
         const Point< dimension >& query,
@@ -325,11 +248,10 @@ namespace geode
         }
         const auto it =
             get_recursive_iterators( node_index, box_begin, box_end );
-
         const auto distance_left =
-            point_box_signed_distance( query, node( it.child_left ) );
+            node( it.child_left ).signed_distance( query );
         const auto distance_right =
-            point_box_signed_distance( query, node( it.child_right ) );
+            node( it.child_right ).signed_distance( query );
 
         // Traverse the "nearest" child first, so that it has more chances
         // to prune the traversal of the other child.
@@ -384,17 +306,14 @@ namespace geode
             return;
         }
 
-        // Leaf case
         if( is_leaf( element_begin, element_end ) )
         {
-            // @todo Check if the box is not intersecting itself
             action( mapping_morton( element_begin ) );
             return;
         }
 
         const auto it =
             get_recursive_iterators( node_index, element_begin, element_end );
-
         bbox_intersect_recursive< ACTION >(
             box, it.child_left, element_begin, it.middle_box, action );
         bbox_intersect_recursive< ACTION >(
@@ -491,7 +410,8 @@ namespace geode
             "No iteration allowed start == end" );
 
         // The acceleration is here:
-        if( !node( node_index1 ).intersects( other_tree.node( node_index2 ) ) )
+        if( !node( node_index1 )
+                 .intersects( other_tree.impl_->node( node_index2 ) ) )
         {
             return;
         }
@@ -501,7 +421,7 @@ namespace geode
             && is_leaf( element_begin2, element_end2 ) )
         {
             action( mapping_morton( element_begin1 ),
-                other_tree.mapping_morton( element_begin2 ) );
+                other_tree.impl_->mapping_morton( element_begin2 ) );
             return;
         }
 
@@ -547,12 +467,11 @@ namespace geode
             element_begin != element_end, "No iteration allowed start == end" );
 
         // Prune sub-tree that does not have intersection
-        if( !ray_box_intersection( ray, node( node_index ) ) )
+        if( !node( node_index ).intersects( ray ) )
         {
             return;
         }
 
-        // Leaf case
         if( is_leaf( element_begin, element_end ) )
         {
             action( mapping_morton( element_begin ) );
@@ -561,103 +480,9 @@ namespace geode
 
         const auto it =
             get_recursive_iterators( node_index, element_begin, element_end );
-
         ray_intersect_recursive< ACTION >(
             ray, it.child_left, element_begin, it.middle_box, action );
         ray_intersect_recursive< ACTION >(
             ray, it.child_right, it.middle_box, element_end, action );
-    }
-
-    template < index_t dimension >
-    bool ray_box_intersection(
-        const Ray< dimension >& ray, const BoundingBox< dimension >& box )
-    {
-        const auto box_center = ( box.min() + box.max() ) / 2.;
-        const auto box_half_extent = ( box.max() - box.min() ) / 2.;
-
-        // Transform the ray to the aligned-box coordinate system.
-        const auto ray_translated_origin = ray.origin() - box_center;
-
-        for( const auto i : geode::Range{ dimension } )
-        {
-            if( ( std::fabs( ray_translated_origin.value( i ) )
-                    - box_half_extent.value( i ) )
-                    > global_epsilon
-                && ray_translated_origin.value( i ) * ray.direction().value( i )
-                       >= global_epsilon )
-            {
-                return false;
-            }
-        }
-        return line_box_intersection( ray, box );
-    }
-
-    template < index_t dimension >
-    bool line_box_intersection( const InfiniteLine< dimension >& line,
-        const BoundingBox< dimension >& box );
-
-    template <>
-    inline bool line_box_intersection(
-        const InfiniteLine3D& line, const BoundingBox3D& box )
-    {
-        const auto box_center = ( box.min() + box.max() ) / 2.;
-        const auto box_half_extent = ( box.max() - box.min() ) / 2.;
-
-        // Transform the ray to the aligned-box coordinate system.
-        const auto line_translated_origin = line.origin() - box_center;
-
-        const auto orign_cross_direction =
-            line.direction().cross( line_translated_origin );
-        geode::Point3D abs_line_direction = {
-            { std::fabs( line.direction().value( 0 ) ),
-                std::fabs( line.direction().value( 1 ) ),
-                std::fabs( line.direction().value( 2 ) ) }
-        };
-
-        if( ( std::fabs( orign_cross_direction.value( 0 ) )
-                - ( box_half_extent.value( 1 ) * abs_line_direction.value( 2 )
-                    + box_half_extent.value( 2 )
-                          * abs_line_direction.value( 1 ) ) )
-            > global_epsilon )
-        {
-            return false;
-        }
-
-        if( ( std::fabs( orign_cross_direction.value( 1 ) )
-                - ( box_half_extent.value( 0 ) * abs_line_direction.value( 2 )
-                    + box_half_extent.value( 2 )
-                          * abs_line_direction.value( 0 ) ) )
-            > global_epsilon )
-        {
-            return false;
-        }
-
-        if( ( std::fabs( orign_cross_direction.value( 2 ) )
-                - ( box_half_extent.value( 0 ) * abs_line_direction.value( 1 )
-                    + box_half_extent.value( 1 )
-                          * abs_line_direction.value( 0 ) ) )
-            > global_epsilon )
-        {
-            return false;
-        }
-
-        return true;
-    }
-    template <>
-    inline bool line_box_intersection(
-        const InfiniteLine2D& line, const BoundingBox2D& box )
-    {
-        const auto box_center = ( box.min() + box.max() ) / 2.;
-        const auto box_half_extent = ( box.max() - box.min() ) / 2.;
-        // Transform the ray to the aligned-box coordinate system.
-        const auto line_translated_origin = line.origin() - box_center;
-
-        const auto lhs = std::fabs( geode::dot_perpendicular(
-            line.direction(), line_translated_origin ) );
-        const auto rhs = box_half_extent.value( 0 )
-                             * std::fabs( line.direction().value( 1 ) )
-                         + box_half_extent.value( 1 )
-                               * std::fabs( line.direction().value( 0 ) );
-        return ( lhs - rhs ) <= global_epsilon;
     }
 } // namespace geode
