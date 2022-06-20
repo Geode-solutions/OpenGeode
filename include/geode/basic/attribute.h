@@ -66,7 +66,12 @@ namespace geode
 
         virtual float generic_value( index_t element ) const = 0;
 
+        virtual float generic_item_value(
+            index_t element, local_index_t item ) const = 0;
+
         virtual bool is_genericable() const = 0;
+
+        virtual local_index_t nb_items() const = 0;
 
         virtual absl::string_view type() = 0;
 
@@ -76,6 +81,11 @@ namespace geode
         virtual void copy( const AttributeBase& attribute,
             index_t nb_elements,
             AttributeKey ) = 0;
+
+        virtual std::shared_ptr< AttributeBase > extract(
+            absl::Span< const index_t > old2new,
+            index_t nb_elements,
+            AttributeKey ) const = 0;
 
         virtual void resize( index_t size, AttributeKey ) = 0;
 
@@ -145,9 +155,21 @@ namespace geode
                 value( element ) );
         }
 
+        float generic_item_value(
+            index_t element, local_index_t item ) const final
+        {
+            return GenericAttributeConversion< T >::converted_item_value(
+                value( element ), item );
+        }
+
         bool is_genericable() const final
         {
             return GenericAttributeConversion< T >::is_genericable();
+        }
+
+        local_index_t nb_items() const final
+        {
+            return GenericAttributeConversion< T >::nb_items();
         }
 
     protected:
@@ -281,6 +303,17 @@ namespace geode
                          .value();
         }
 
+        std::shared_ptr< AttributeBase > extract(
+            absl::Span< const index_t > /* unused */,
+            index_t /* unused */,
+            AttributeBase::AttributeKey ) const override
+        {
+            std::shared_ptr< ConstantAttribute< T > > attribute{
+                new ConstantAttribute< T >{ value_, this->properties() }
+            };
+            return attribute;
+        }
+
     private:
         T value_;
     };
@@ -358,7 +391,9 @@ namespace geode
                     a( attribute.default_value_ );
                     a.container( attribute.values_,
                         attribute.values_.max_size(),
-                        []( Archive& a2, T& item ) { a2( item ); } );
+                        []( Archive& a2, T& item ) {
+                            a2( item );
+                        } );
                 } );
             values_.reserve( 10 );
         }
@@ -416,6 +451,30 @@ namespace geode
                     values_[i] = typed_attribute.value( i );
                 }
             }
+        }
+
+        std::shared_ptr< AttributeBase > extract(
+            absl::Span< const index_t > old2new,
+            index_t nb_elements,
+            AttributeBase::AttributeKey ) const override
+        {
+            std::shared_ptr< VariableAttribute< T > > attribute{
+                new VariableAttribute< T >{ default_value_, this->properties() }
+            };
+            attribute->values_.resize( nb_elements );
+            for( const auto i : Indices{ old2new } )
+            {
+                const auto new_index = old2new[i];
+                if( new_index != NO_ID )
+                {
+                    OPENGEODE_EXCEPTION( new_index < nb_elements,
+                        "[VariableAttribute::extract] The given mapping "
+                        "contains values that go beyond the given number of "
+                        "elements." );
+                    attribute->set_value( new_index, value( i ) );
+                }
+            }
+            return attribute;
         }
 
     private:
@@ -556,6 +615,31 @@ namespace geode
                     values_[i] = typed_attribute.value( i );
                 }
             }
+        }
+
+        std::shared_ptr< AttributeBase > extract(
+            absl::Span< const index_t > old2new,
+            index_t nb_elements,
+            AttributeBase::AttributeKey ) const override
+        {
+            std::shared_ptr< VariableAttribute< bool > > attribute{
+                new VariableAttribute< bool >{
+                    static_cast< bool >( default_value_ ), this->properties() }
+            };
+            attribute->values_.resize( nb_elements );
+            for( const auto i : Indices{ old2new } )
+            {
+                const auto new_index = old2new[i];
+                if( new_index != NO_ID )
+                {
+                    OPENGEODE_EXCEPTION( new_index < nb_elements,
+                        "[VariableAttribute::extract] The given mapping "
+                        "contains values that go beyond the given number of "
+                        "elements." );
+                    attribute->set_value( new_index, value( i ) );
+                }
+            }
+            return attribute;
         }
 
     private:
@@ -719,6 +803,29 @@ namespace geode
                     }
                 }
             }
+        }
+
+        std::shared_ptr< AttributeBase > extract(
+            absl::Span< const index_t > old2new,
+            index_t nb_elements,
+            AttributeBase::AttributeKey ) const override
+        {
+            std::shared_ptr< SparseAttribute< T > > attribute{
+                new SparseAttribute< T >{ default_value_, this->properties() }
+            };
+            for( const auto i : Indices{ old2new } )
+            {
+                const auto new_index = old2new[i];
+                if( value( i ) != default_value_ && new_index != NO_ID )
+                {
+                    OPENGEODE_EXCEPTION( new_index < nb_elements,
+                        "[VariableAttribute::extract] The given mapping "
+                        "contains values that go beyond the given number of "
+                        "elements." );
+                    attribute->set_value( new_index, value( i ) );
+                }
+            }
+            return attribute;
         }
 
     private:

@@ -99,7 +99,9 @@ namespace geode
             } );
         }
         async::when_all( tasks.begin(), tasks.end() )
-            .then( [level] { Logger::set_level( level ); } )
+            .then( [level] {
+                Logger::set_level( level );
+            } )
             .wait();
     }
 
@@ -115,15 +117,16 @@ namespace geode
         for( auto& corner : modifiable_corners() )
         {
             tasks[count++] = async::spawn( [&corner, &mapping] {
-                const auto file =
-                    mapping.at( corner.component_id().id().string() );
+                const auto file = mapping.at( corner.id().string() );
                 corner.set_mesh(
                     load_point_set< dimension >( corner.mesh_type(), file ),
                     typename Corner< dimension >::CornersKey{} );
             } );
         }
         async::when_all( tasks.begin(), tasks.end() )
-            .then( [level] { Logger::set_level( level ); } )
+            .then( [level] {
+                Logger::set_level( level );
+            } )
             .wait();
     }
 

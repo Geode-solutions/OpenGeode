@@ -68,7 +68,7 @@ namespace geode
         using Base = GenericSphere< Point< dimension >, dimension >;
 
     public:
-        OwnerSphere( const Point< dimension >& origin, double radius );
+        explicit OwnerSphere( const Point< dimension >& origin, double radius );
 
         OwnerSphere( const OwnerSphere< dimension >& other );
         OwnerSphere< dimension >& operator=(

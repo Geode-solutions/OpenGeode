@@ -53,7 +53,13 @@ namespace geode
     public:
         static constexpr index_t ROOT_INDEX{ 1 };
 
+        Impl() = default;
+
         Impl( absl::Span< const BoundingBox< dimension > > bboxes );
+
+        Impl( Impl&& other ) = default;
+
+        Impl& operator=( Impl&& other ) = default;
 
         index_t nb_bboxes() const
         {
@@ -86,8 +92,20 @@ namespace geode
         /*!
          * @brief Gets the number of nodes in the tree subset
          */
-        index_t max_node_index(
+        index_t max_node_index_recursive(
             index_t node_index, index_t box_begin, index_t box_end ) const;
+
+        /*!
+         * @brief Gets the number of nodes in the tree subset
+         */
+        index_t max_node_index(
+            absl::Span< const BoundingBox< dimension > > bboxes ) const;
+
+        /*!
+         * @brief The recursive instruction used in initialize_tree()
+         */
+        void initialize_tree(
+            absl::Span< const BoundingBox< dimension > > bboxes );
 
         /*!
          * @brief The recursive instruction used in initialize_tree()
@@ -145,7 +163,7 @@ namespace geode
             ACTION& action ) const;
 
     private:
-        absl::FixedArray< BoundingBox< dimension > > tree_;
+        std::vector< BoundingBox< dimension > > tree_;
         std::vector< index_t > mapping_morton_;
     };
 
@@ -180,6 +198,10 @@ namespace geode
         AABBTree< dimension >::closest_element_box(
             const Point< dimension >& query, const EvalDistance& action ) const
     {
+        if( nb_bboxes() == 0 )
+        {
+            return std::make_tuple( NO_ID, query, 0 );
+        }
         index_t box_begin{ 0 };
         index_t box_end{ nb_bboxes() };
         index_t node_index{ Impl::ROOT_INDEX };
@@ -216,6 +238,10 @@ namespace geode
     void AABBTree< dimension >::compute_bbox_element_bbox_intersections(
         const BoundingBox< dimension >& box, EvalIntersection& action ) const
     {
+        if( nb_bboxes() == 0 )
+        {
+            return;
+        }
         impl_->bbox_intersect_recursive(
             box, Impl::ROOT_INDEX, 0, nb_bboxes(), action );
     }
@@ -225,6 +251,10 @@ namespace geode
     void AABBTree< dimension >::compute_self_element_bbox_intersections(
         EvalIntersection& action ) const
     {
+        if( nb_bboxes() == 0 )
+        {
+            return;
+        }
         impl_->self_intersect_recursive( Impl::ROOT_INDEX, 0, nb_bboxes(),
             Impl::ROOT_INDEX, 0, nb_bboxes(), action );
     }
@@ -235,6 +265,10 @@ namespace geode
         const AABBTree< dimension >& other_tree,
         EvalIntersection& action ) const
     {
+        if( nb_bboxes() == 0 || other_tree.nb_bboxes() == 0 )
+        {
+            return;
+        }
         impl_->other_intersect_recursive( Impl::ROOT_INDEX, 0, nb_bboxes(),
             other_tree, Impl::ROOT_INDEX, 0, other_tree.nb_bboxes(), action );
     }
@@ -244,6 +278,10 @@ namespace geode
     void AABBTree< dimension >::compute_ray_element_bbox_intersections(
         const Ray< dimension >& ray, EvalIntersection& action ) const
     {
+        if( nb_bboxes() == 0 )
+        {
+            return;
+        }
         impl_->ray_intersect_recursive(
             ray, Impl::ROOT_INDEX, 0, nb_bboxes(), action );
     }

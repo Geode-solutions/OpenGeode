@@ -110,3 +110,9 @@ namespace geode
 
 #define DEBUG( a ) geode::Logger::debug( #a, " = ", a )
 #define SDEBUG( a ) geode::Logger::debug( #a, " = ", a.string() )
+
+#ifdef OPENGEODE_DEBUG
+#    define DEBUG_LOGGER( ... ) geode::Logger::debug( __VA_ARGS__ )
+#else
+#    define DEBUG_LOGGER( ... )
+#endif

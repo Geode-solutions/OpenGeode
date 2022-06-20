@@ -60,8 +60,10 @@
 #include "representation/io/brep.h"
 #include "representation/io/section.h"
 
+#include "helpers/component_mesh_queries.h"
 #include "helpers/convert_model_meshes.h"
 #include "helpers/convert_to_mesh.h"
+#include "helpers/model_component_filter.h"
 
 namespace pybind11
 {
@@ -77,6 +79,37 @@ namespace pybind11
         struct type_caster< absl::FixedArray< Type > >
             : list_caster< absl::FixedArray< Type >, Type >
         {
+        };
+
+        template < typename Type, size_t dimension >
+        struct type_caster< absl::InlinedVector< Type, dimension > >
+            : list_caster< absl::InlinedVector< Type, dimension >, Type >
+        {
+        };
+
+        template < typename Type >
+        struct type_caster< absl::Span< Type > >
+            : list_caster< absl::Span< Type >, Type >
+        {
+            using value_conv = make_caster< Type >;
+
+            bool load( handle src, bool convert )
+            {
+                cpp_.clear();
+                auto s = reinterpret_borrow< sequence >( src );
+                cpp_.reserve( s.size() );
+                for( auto it : s )
+                {
+                    value_conv conv;
+                    if( !conv.load( it, convert ) )
+                        return false;
+                    cpp_.push_back( cast_op< Type&& >( std::move( conv ) ) );
+                }
+                this->value = absl::MakeConstSpan( cpp_ );
+                return true;
+            }
+
+            std::vector< typename std::remove_const< Type >::type > cpp_;
         };
     } // namespace detail
 } // namespace pybind11
@@ -131,4 +164,6 @@ PYBIND11_MODULE( opengeode_py_model, module )
 
     geode::define_convert_model_meshes( module );
     geode::define_convert_to_mesh( module );
+    geode::define_component_mesh_queries( module );
+    geode::define_model_component_filter( module );
 }

@@ -169,9 +169,20 @@ namespace geode
             return 0.;
         }
 
+        static float converted_item_value(
+            const AttributeType& /*unused*/, local_index_t /*unused*/ )
+        {
+            return 0.;
+        }
+
         static bool is_genericable()
         {
             return false;
+        }
+
+        static local_index_t nb_items()
+        {
+            return 1;
         }
     };
 
@@ -184,9 +195,20 @@ namespace geode
             return static_cast< float >( value );                              \
         }                                                                      \
                                                                                \
+        static float converted_item_value(                                     \
+            const Type& value, local_index_t /*unused*/ )                      \
+        {                                                                      \
+            return converted_value( value );                                   \
+        }                                                                      \
+                                                                               \
         static bool is_genericable()                                           \
         {                                                                      \
             return true;                                                       \
+        }                                                                      \
+                                                                               \
+        static local_index_t nb_items()                                        \
+        {                                                                      \
+            return 1;                                                          \
         }                                                                      \
     }
 
@@ -195,4 +217,40 @@ namespace geode
     IMPLICIT_GENERIC_ATTRIBUTE_CONVERSION( unsigned int );
     IMPLICIT_GENERIC_ATTRIBUTE_CONVERSION( float );
     IMPLICIT_GENERIC_ATTRIBUTE_CONVERSION( double );
+
+#define IMPLICIT_ARRAY_GENERIC_ATTRIBUTE_CONVERSION( Type )                    \
+    template < size_t size >                                                   \
+    struct GenericAttributeConversion< std::array< Type, size > >              \
+    {                                                                          \
+        using Container = std::array< Type, size >;                            \
+        static float converted_value( const Container& value )                 \
+        {                                                                      \
+            return converted_item_value( value, 0 );                           \
+        }                                                                      \
+                                                                               \
+        static float converted_item_value(                                     \
+            const Container& value, local_index_t item )                       \
+        {                                                                      \
+            OPENGEODE_ASSERT( item < nb_items(),                               \
+                "[GenericAttributeConversion] Accessing "                      \
+                "incorrect item value" );                                      \
+            return static_cast< float >( value[item] );                        \
+        }                                                                      \
+                                                                               \
+        static bool is_genericable()                                           \
+        {                                                                      \
+            return true;                                                       \
+        }                                                                      \
+                                                                               \
+        static local_index_t nb_items()                                        \
+        {                                                                      \
+            return size;                                                       \
+        }                                                                      \
+    }
+
+    IMPLICIT_ARRAY_GENERIC_ATTRIBUTE_CONVERSION( bool );
+    IMPLICIT_ARRAY_GENERIC_ATTRIBUTE_CONVERSION( int );
+    IMPLICIT_ARRAY_GENERIC_ATTRIBUTE_CONVERSION( unsigned int );
+    IMPLICIT_ARRAY_GENERIC_ATTRIBUTE_CONVERSION( float );
+    IMPLICIT_ARRAY_GENERIC_ATTRIBUTE_CONVERSION( double );
 } // namespace geode

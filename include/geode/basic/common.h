@@ -24,22 +24,22 @@
 #pragma once
 
 #if defined( _WIN32 )
-#define OPENGEODE_WINDOWS
+#    define OPENGEODE_WINDOWS
 #elif defined( __linux__ )
-#define OPENGEODE_LINUX
+#    define OPENGEODE_LINUX
 #elif defined( __APPLE__ )
-#define OPENGEODE_APPLE
+#    define OPENGEODE_APPLE
 #endif
 
 #ifndef NDEBUG
-#define OPENGEODE_DEBUG
+#    define OPENGEODE_DEBUG
 #endif
 
 #ifdef OPENGEODE_WINDOWS
-#pragma warning(                                                               \
-    disable : 4267 ) // conversion between long unsigned int and unsigned int
-#pragma warning( disable : 4251 ) // dll interface warnings
-#pragma warning( disable : 4661 ) // template alias before implementation
+#    pragma warning( disable : 4267 ) // conversion between long unsigned int
+                                      // and unsigned int
+#    pragma warning( disable : 4251 ) // dll interface warnings
+#    pragma warning( disable : 4661 ) // template alias before implementation
 #endif
 
 #define OPENGEODE_DISABLE_COPY( Class )                                        \

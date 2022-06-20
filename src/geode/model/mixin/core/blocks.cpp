@@ -127,7 +127,9 @@ namespace geode
             } );
         }
         async::when_all( tasks.begin(), tasks.end() )
-            .then( [level] { Logger::set_level( level ); } )
+            .then( [level] {
+                Logger::set_level( level );
+            } )
             .wait();
     }
 
@@ -143,8 +145,7 @@ namespace geode
         for( auto& block : modifiable_blocks() )
         {
             tasks[count++] = async::spawn( [&block, &mapping] {
-                const auto file =
-                    mapping.at( block.component_id().id().string() );
+                const auto file = mapping.at( block.id().string() );
                 if( MeshFactory::type( block.mesh_type() )
                     == TetrahedralSolid< dimension >::type_name_static() )
                 {
@@ -168,7 +169,9 @@ namespace geode
             } );
         }
         async::when_all( tasks.begin(), tasks.end() )
-            .then( [level] { Logger::set_level( level ); } )
+            .then( [level] {
+                Logger::set_level( level );
+            } )
             .wait();
     }
 

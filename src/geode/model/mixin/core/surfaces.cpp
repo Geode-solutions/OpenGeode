@@ -123,7 +123,9 @@ namespace geode
             } );
         }
         async::when_all( tasks.begin(), tasks.end() )
-            .then( [level] { Logger::set_level( level ); } )
+            .then( [level] {
+                Logger::set_level( level );
+            } )
             .wait();
     }
 
@@ -139,8 +141,7 @@ namespace geode
         for( auto& surface : modifiable_surfaces() )
         {
             tasks[count++] = async::spawn( [&surface, &mapping] {
-                const auto file =
-                    mapping.at( surface.component_id().id().string() );
+                const auto file = mapping.at( surface.id().string() );
                 if( MeshFactory::type( surface.mesh_type() )
                     == TriangulatedSurface< dimension >::type_name_static() )
                 {
@@ -157,7 +158,9 @@ namespace geode
             } );
         }
         async::when_all( tasks.begin(), tasks.end() )
-            .then( [level] { Logger::set_level( level ); } )
+            .then( [level] {
+                Logger::set_level( level );
+            } )
             .wait();
     }
 

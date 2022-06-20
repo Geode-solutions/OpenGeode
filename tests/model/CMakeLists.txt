@@ -47,6 +47,13 @@ add_geode_test(
         ${PROJECT_NAME}::model
 )
 add_geode_test(
+    SOURCE "test-model-component-filter.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::model
+)
+add_geode_test(
     SOURCE "test-section.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
@@ -60,6 +67,12 @@ add_geode_test(
 )
 add_geode_test(
     SOURCE "test-vertex-identifier.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::model
+)
+add_geode_test(
+    SOURCE "test-component-mesh-queries.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::model

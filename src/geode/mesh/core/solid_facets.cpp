@@ -261,7 +261,9 @@ namespace geode
     void SolidFacets< dimension >::serialize( Archive& archive )
     {
         archive.ext( *this, DefaultGrowable< Archive, SolidFacets >{},
-            []( Archive& a, SolidFacets& solid ) { a.object( solid.impl_ ); } );
+            []( Archive& a, SolidFacets& solid ) {
+                a.object( solid.impl_ );
+            } );
     }
 
     template class opengeode_mesh_api SolidFacets< 3 >;

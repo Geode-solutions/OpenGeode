@@ -31,14 +31,105 @@
 #include <geode/mesh/core/edged_curve.h>
 #include <geode/mesh/core/surface_mesh.h>
 
+#include <geode/model/helpers/simplicial_brep_creator.h>
 #include <geode/model/helpers/simplicial_section_creator.h>
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/line.h>
 #include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
+#include <geode/model/representation/core/brep.h>
 #include <geode/model/representation/core/section.h>
 
 #include <geode/tests/common.h>
+
+void test_create_brep_with_dangling_components()
+{
+    std::vector< geode::Point3D > points{
+        { { 0, 0, 0 } }, // 0
+        { { 1, 0, 0 } }, // 1
+        { { 1, 1, 0 } }, // 2
+        { { 0, 1, 0 } }, // 3
+        { { 0, 0, 1 } }, // 4
+        { { 1, 0, 1 } }, // 5
+        { { 1, 1, 1 } }, // 6
+        { { 0, 1, 1 } }, // 7
+        { { 0, 0, 2 } }, // 8
+        { { 1, 0, 2 } }, // 9
+        { { 1, 1, 2 } }, // 10
+        { { 0, 1, 2 } }, // 11
+        { { 1, 0.5, 1.5 } }, // 12
+    };
+    geode::BRep brep;
+    geode::SimplicialBRepCreator creator{ brep, points };
+    std::vector< geode::CornerDefinition > corners{
+        { 0 },
+        { 1 },
+        { 2 },
+        { 3 },
+        { 4 },
+        { 5 },
+        { 6 },
+        { 7 },
+        { 8 },
+        { 9 },
+        { 10 },
+        { 11 },
+        { 12 },
+    };
+    const auto corner_uuids = creator.create_corners( corners );
+
+    std::vector< geode::LineDefinition > lines{
+        { { 0, 1 } },
+        { { 1, 2 } },
+        { { 2, 3 } },
+        { { 3, 0 } },
+        { { 4, 5 } },
+        { { 5, 6 } },
+        { { 6, 7 } },
+        { { 7, 4 } },
+        { { 0, 4 } },
+        { { 1, 5 } },
+        { { 2, 6 } },
+        { { 3, 7 } },
+        { { 5, 9 } },
+        { { 9, 10 } },
+        { { 10, 6 } },
+        { { 4, 8 } },
+        { { 8, 11 } },
+    };
+    const auto line_uuids = creator.create_lines( corner_uuids, lines );
+
+    std::vector< geode::SurfaceDefinition > surfaces{
+        { { 0, 1, 2, 3 }, { 0, 1, 2, 0, 3, 2 }, { 0, 1, 2, 3 }, {}, {} },
+        { { 0, 1, 5, 4 }, { 0, 1, 2, 0, 3, 2 }, { 0, 4, 8, 9 }, {}, {} },
+        { { 1, 2, 6, 5 }, { 0, 1, 2, 0, 3, 2 }, { 1, 5, 9, 10 }, {}, {} },
+        { { 2, 3, 7, 6 }, { 0, 1, 2, 0, 3, 2 }, { 2, 6, 10, 11 }, {}, {} },
+        { { 0, 3, 7, 4 }, { 0, 1, 2, 0, 3, 2 }, { 3, 7, 11, 8 }, {}, {} },
+        { { 4, 5, 6, 7 }, { 0, 1, 2, 0, 3, 2 }, {}, {}, {} },
+        { { 5, 6, 10, 9, 12 }, { 0, 1, 4, 1, 2, 4, 2, 3, 4, 3, 0, 4 },
+            { 5, 12, 13, 14 }, {}, { 12 } },
+    };
+    const auto surface_uuids =
+        creator.create_surfaces( corner_uuids, line_uuids, surfaces );
+
+    std::vector< geode::BlockDefinition > blocks{
+        { {}, {}, { 0, 1, 2, 3, 4, 5 }, {}, {}, {} },
+    };
+    creator.create_blocks( corner_uuids, line_uuids, surface_uuids, blocks );
+    OPENGEODE_EXCEPTION(
+        brep.nb_blocks() == blocks.size(), "[Test] Wrong number of blocks" );
+    geode::index_t nb_embedding_blocks{ 0 };
+    geode::index_t nb_embedding_surfaces{ 0 };
+    for( const auto& corner : brep.corners() )
+    {
+        nb_embedding_blocks += brep.nb_embedding_blocks( corner );
+        nb_embedding_surfaces += brep.nb_embedding_surfaces( corner );
+    }
+    OPENGEODE_EXCEPTION( nb_embedding_blocks == 0,
+        "[Test] Wrong number of corner embedding blocks" );
+    OPENGEODE_EXCEPTION( nb_embedding_surfaces == 1,
+        "[Test] Wrong number of corner embedding surfaces" );
+}
 
 void test()
 {
@@ -105,13 +196,10 @@ void test()
     }
 
     std::vector< geode::SurfaceDefinition > surface_definitions{
-        {
-            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10 },
+        { { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10 },
             { 0, 4, 7, 7, 4, 1, 1, 4, 8, 4, 10, 8, 8, 10, 5, 8, 5, 2, 2, 5, 9,
                 9, 5, 3, 3, 5, 6, 6, 5, 11, 6, 11, 4, 6, 4, 0 },
-            { 0, 1, 2, 3 },
-            { 4 },
-        },
+            { 0, 1, 2, 3 }, { 4 }, {} },
     };
     const auto surfaces = creator.create_surfaces( lines, surface_definitions );
     OPENGEODE_EXCEPTION( surfaces.size() == surface_definitions.size(),
@@ -184,6 +272,8 @@ void test()
                 found, "[Test] Missing Line in ModelBoundary" );
         }
     }
+
+    test_create_brep_with_dangling_components();
 }
 
 OPENGEODE_TEST( "model-creator" )

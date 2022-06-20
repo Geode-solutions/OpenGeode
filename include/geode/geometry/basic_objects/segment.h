@@ -72,7 +72,7 @@ namespace geode
         using Base = GenericSegment< Point< dimension >, dimension >;
 
     public:
-        OwnerSegment(
+        explicit OwnerSegment(
             const Point< dimension >& p0, const Point< dimension >& p1 );
 
         OwnerSegment( const OwnerSegment< dimension >& other );

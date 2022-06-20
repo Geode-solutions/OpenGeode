@@ -102,6 +102,26 @@ namespace geode
             return detail::coords_substract( *this, other );
         }
 
+        void operator*=( double multiplier )
+        {
+            detail::coords_multiply_equal( *this, multiplier );
+        }
+
+        void operator/=( double divider )
+        {
+            detail::coords_divide_equal( *this, divider );
+        }
+
+        void operator+=( const Point &other )
+        {
+            detail::coords_add_equal( *this, other );
+        }
+
+        void operator-=( const Point &other )
+        {
+            detail::coords_substract_equal( *this, other );
+        }
+
         bool inexact_equal( const Point &other, double epsilon ) const
         {
             double square_length{ 0 };
@@ -160,4 +180,58 @@ namespace geode
             return result;
         }
     };
+
+    template < index_t dimension >
+    struct GenericAttributeConversion< Point< dimension > >
+    {
+        static float converted_value( const Point< dimension > &point )
+        {
+            return converted_item_value( point, 0 );
+        }
+
+        static float converted_item_value(
+            const Point< dimension > &point, local_index_t item )
+        {
+            OPENGEODE_ASSERT( item < nb_items(),
+                "[GenericAttributeConversion] Accessing "
+                "incorrect item value" );
+            return static_cast< float >( point.value( item ) );
+        }
+
+        static bool is_genericable()
+        {
+            return true;
+        }
+        static local_index_t nb_items()
+
+        {
+            return dimension;
+        }
+    };
 } // namespace geode
+
+namespace std
+{
+    template <>
+    struct hash< geode::Point2D >
+    {
+    public:
+        size_t operator()( const geode::Point2D &point ) const
+        {
+            return absl::Hash< double >()( point.value( 0 ) )
+                   ^ absl::Hash< double >()( point.value( 1 ) );
+        }
+    };
+
+    template <>
+    struct hash< geode::Point3D >
+    {
+    public:
+        size_t operator()( const geode::Point3D &point ) const
+        {
+            return absl::Hash< double >()( point.value( 0 ) )
+                   ^ absl::Hash< double >()( point.value( 1 ) )
+                   ^ absl::Hash< double >()( point.value( 2 ) );
+        }
+    };
+} // namespace std

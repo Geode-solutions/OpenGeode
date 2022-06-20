@@ -49,16 +49,6 @@
 namespace
 {
     template < geode::index_t dimension >
-    void check_edge_id( const geode::SurfaceMesh< dimension >& surface,
-        const geode::index_t edge_id )
-    {
-        geode_unused( surface );
-        geode_unused( edge_id );
-        OPENGEODE_ASSERT( edge_id < surface.nb_edges(),
-            "[check_edge_id] Trying to access an invalid edge" );
-    }
-
-    template < geode::index_t dimension >
     void check_vertex_id( const geode::SurfaceMesh< dimension >& surface,
         const geode::index_t vertex_id )
     {
@@ -82,7 +72,7 @@ namespace
     void check_polygon_vertex_id(
         const geode::SurfaceMesh< dimension >& surface,
         const geode::index_t polygon_id,
-        const geode::index_t vertex_id )
+        const geode::local_index_t vertex_id )
     {
         geode_unused( surface );
         geode_unused( polygon_id );
@@ -95,7 +85,7 @@ namespace
     template < geode::index_t dimension >
     void check_polygon_edge_id( const geode::SurfaceMesh< dimension >& surface,
         const geode::index_t polygon_id,
-        const geode::index_t edge_id )
+        const geode::local_index_t edge_id )
     {
         geode_unused( surface );
         geode_unused( polygon_id );
@@ -750,6 +740,16 @@ namespace geode
     }
 
     template < index_t dimension >
+    PolygonsAroundVertex SurfaceMesh< dimension >::polygons_around_vertex(
+        const PolygonVertex& polygon_vertex ) const
+    {
+        check_polygon_vertex_id(
+            *this, polygon_vertex.polygon_id, polygon_vertex.vertex_id );
+        return std::get< 0 >( ::polygons_around_vertex(
+            *this, this->polygon_vertex( polygon_vertex ), polygon_vertex ) );
+    }
+
+    template < index_t dimension >
     bool SurfaceMesh< dimension >::is_vertex_on_border(
         index_t vertex_id ) const
     {
@@ -772,6 +772,31 @@ namespace geode
             }
         }
         return absl::nullopt;
+    }
+
+    template < index_t dimension >
+    PolygonsAroundEdge SurfaceMesh< dimension >::polygons_from_edge_vertices(
+        absl::Span< const index_t > edge_vertices ) const
+    {
+        PolygonsAroundEdge polygons_around_edge;
+        for( auto&& polygon_vertex :
+            polygons_around_vertex( edge_vertices[0] ) )
+        {
+            const auto next_vertex = next_polygon_vertex( polygon_vertex );
+            if( this->polygon_vertex( next_vertex ) == edge_vertices[1] )
+            {
+                polygons_around_edge.emplace_back(
+                    std::move( polygon_vertex ) );
+                continue;
+            }
+            auto previous_vertex = previous_polygon_vertex( polygon_vertex );
+            if( this->polygon_vertex( previous_vertex ) == edge_vertices[1] )
+            {
+                polygons_around_edge.emplace_back(
+                    std::move( previous_vertex ) );
+            }
+        }
+        return polygons_around_edge;
     }
 
     template < index_t dimension >

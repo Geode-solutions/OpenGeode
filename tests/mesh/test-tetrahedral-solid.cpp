@@ -95,6 +95,21 @@ void test_polyhedron_adjacencies( const geode::TetrahedralSolid3D& solid,
         "[Test] TetrahedralSolid should have 12 edges" );
 }
 
+void test_is_on_border( const geode::TetrahedralSolid3D& solid )
+{
+    for( const auto v : geode::Range{ solid.nb_vertices() } )
+    {
+        OPENGEODE_EXCEPTION( solid.is_vertex_on_border( v ),
+            "[Test] All vertices should be on border" );
+    }
+    for( const auto e : geode::Range{ solid.edges().nb_edges() } )
+    {
+        OPENGEODE_EXCEPTION(
+            solid.is_edge_on_border( solid.edges().edge_vertices( e ) ),
+            "[Test] All edges should be on border" );
+    }
+}
+
 void test_permutation( const geode::TetrahedralSolid3D& solid,
     geode::TetrahedralSolidBuilder3D& builder )
 {
@@ -303,6 +318,7 @@ void test()
     test_create_vertices( *solid, *builder );
     test_create_tetrahedra( *solid, *builder );
     test_polyhedron_adjacencies( *solid, *builder );
+    test_is_on_border( *solid );
     test_io( *solid, absl::StrCat( "test.", solid->native_extension() ) );
 
     test_permutation( *solid, *builder );

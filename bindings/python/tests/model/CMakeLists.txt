@@ -42,3 +42,15 @@ add_geode_python_test(
         ${PROJECT_NAME}::py_basic
         ${PROJECT_NAME}::py_model
 )
+add_geode_python_test(
+    SOURCE "test-py-component_mesh_queries.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_model
+)
+add_geode_python_test(
+    SOURCE "test-py-model-component-filter.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_model
+)

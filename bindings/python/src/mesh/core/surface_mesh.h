@@ -90,9 +90,17 @@
         .def( "polygon_around_vertex",                                         \
             &SurfaceMesh##dimension##D::polygon_around_vertex )                \
         .def( "polygons_around_vertex",                                        \
-            &SurfaceMesh##dimension##D::polygons_around_vertex )               \
+            ( PolygonsAroundVertex( SurfaceMesh##dimension##D::* )( index_t )  \
+                    const )                                                    \
+                & SurfaceMesh##dimension##D::polygons_around_vertex )          \
+        .def( "polygons_around_polygon_vertex",                                \
+            ( PolygonsAroundVertex( SurfaceMesh##dimension##D::* )(            \
+                const PolygonVertex& ) const )                                 \
+                & SurfaceMesh##dimension##D::polygons_around_vertex )          \
         .def( "polygon_edge_from_vertices",                                    \
             &SurfaceMesh##dimension##D::polygon_edge_from_vertices )           \
+        .def( "polygons_from_edge_vertices",                                   \
+            &SurfaceMesh##dimension##D::polygons_from_edge_vertices )          \
         .def( "polygon_attribute_manager",                                     \
             &SurfaceMesh##dimension##D::polygon_attribute_manager,             \
             pybind11::return_value_policy::reference )                         \

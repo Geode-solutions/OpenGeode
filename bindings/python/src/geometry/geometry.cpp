@@ -32,6 +32,7 @@
 #include "nn_search.h"
 #include "perpendicular.h"
 #include "point.h"
+#include "points_sort.h"
 #include "projection.h"
 #include "rotation.h"
 #include "signed_mensuration.h"
@@ -45,6 +46,31 @@ namespace pybind11
         struct type_caster< absl::FixedArray< Type > >
             : list_caster< absl::FixedArray< Type >, Type >
         {
+        };
+
+        template < typename Type >
+        struct type_caster< absl::Span< Type > >
+            : list_caster< absl::Span< Type >, Type >
+        {
+            using value_conv = make_caster< Type >;
+
+            bool load( handle src, bool convert )
+            {
+                cpp_.clear();
+                auto s = reinterpret_borrow< sequence >( src );
+                cpp_.reserve( s.size() );
+                for( auto it : s )
+                {
+                    value_conv conv;
+                    if( !conv.load( it, convert ) )
+                        return false;
+                    cpp_.push_back( cast_op< Type&& >( std::move( conv ) ) );
+                }
+                this->value = absl::MakeConstSpan( cpp_ );
+                return true;
+            }
+
+            std::vector< typename std::remove_const< Type >::type > cpp_;
         };
     } // namespace detail
 } // namespace pybind11
@@ -64,4 +90,5 @@ PYBIND11_MODULE( opengeode_py_geometry, module )
     geode::define_rotation( module );
     geode::define_mensuration( module );
     geode::define_barycentric( module );
+    geode::define_points_sort( module );
 }

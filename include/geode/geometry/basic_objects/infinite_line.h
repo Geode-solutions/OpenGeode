@@ -78,7 +78,7 @@ namespace geode
         using Base = GenericInfiniteLine< Point< dimension >, dimension >;
 
     public:
-        OwnerInfiniteLine( const Vector< dimension >& direction,
+        explicit OwnerInfiniteLine( const Vector< dimension >& direction,
             const Point< dimension >& origin );
 
         OwnerInfiniteLine( const Segment< dimension >& segment );

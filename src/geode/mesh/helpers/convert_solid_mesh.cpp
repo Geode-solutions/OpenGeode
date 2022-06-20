@@ -87,6 +87,8 @@ namespace geode
                 }
             }
         }
-        return { std::move( tet_solid ) };
+        return absl::optional< std::unique_ptr< TetrahedralSolid3D > >{
+            absl::in_place, tet_solid.release()
+        };
     }
 } // namespace geode

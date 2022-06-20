@@ -93,7 +93,7 @@ namespace geode
     typename std::enable_if< T == 3, OwnerPlane >::type
         GenericTriangle< PointType, dimension >::owner_plane() const
     {
-        return { this->normal(), vertices_[0] };
+        return OwnerPlane{ this->normal(), vertices_[0] };
     }
     template < typename PointType, index_t dimension >
     template < index_t T >
@@ -132,7 +132,8 @@ namespace geode
     {
         if( const auto triangle_normal = this->new_normal() )
         {
-            return Plane{ triangle_normal.value(), vertices_[0] };
+            return absl::optional< Plane >{ absl::in_place,
+                triangle_normal.value(), vertices_[0] };
         }
         return absl::nullopt;
     }
@@ -143,7 +144,8 @@ namespace geode
     {
         if( const auto triangle_normal = this->new_normal() )
         {
-            return OwnerPlane{ triangle_normal.value(), vertices_[0] };
+            return absl::optional< OwnerPlane >{ absl::in_place,
+                triangle_normal.value(), vertices_[0] };
         }
         return absl::nullopt;
     }

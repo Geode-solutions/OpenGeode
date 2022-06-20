@@ -38,6 +38,16 @@ void test()
             test += ii;
         }
         logger.increment();
+        logger.increment_nb_steps();
+    }
+    for( const auto i : geode::Range{ nb } )
+    {
+        auto test = 0;
+        for( const auto ii : geode::Range{ i, nb } )
+        {
+            test += ii;
+        }
+        logger.increment();
     }
 }
 

@@ -69,6 +69,10 @@ namespace geode
         {
             return !( *this == other );
         }
+        std::string string() const
+        {
+            return absl::StrCat( "(", polygon_id, ", ", vertex_id, ")" );
+        }
         template < typename Archive >
         void serialize( Archive& archive );
 
@@ -95,6 +99,10 @@ namespace geode
         {
             return !( *this == other );
         }
+        std::string string() const
+        {
+            return absl::StrCat( "(", polygon_id, ", ", edge_id, ")" );
+        }
         template < typename Archive >
         void serialize( Archive& archive );
 
@@ -107,6 +115,8 @@ namespace geode
     using PolygonEdgesOnBorder = absl::InlinedVector< PolygonEdge, 3 >;
 
     using PolygonsAroundVertex = absl::InlinedVector< PolygonVertex, 10 >;
+
+    using PolygonsAroundEdge = absl::InlinedVector< PolygonEdge, 2 >;
 
     /*!
      * This class represents a Surface made up with polygons (triangles, quads,
@@ -332,6 +342,14 @@ namespace geode
             index_t vertex_id ) const;
 
         /*!
+         * Get all the polygons with one of the vertices matching given vertex.
+         * @param[in] polygon_vertex Local index of vertex in polygon.
+         * @pre This function needs that polygon adjacencies are computed
+         */
+        PolygonsAroundVertex polygons_around_vertex(
+            const PolygonVertex& vertex ) const;
+
+        /*!
          * Find the polygon edge corresponding to an ordered pair of vertex
          * indices.
          * @param[in] from_vertex_id Index of the vertex from which starts the
@@ -341,6 +359,13 @@ namespace geode
          */
         absl::optional< PolygonEdge > polygon_edge_from_vertices(
             index_t from_vertex_id, index_t to_vertex_id ) const;
+
+        /*!
+         * Find the polygon edges corresponding to a pair of vertex indices.
+         * @return Local indices of the edges found
+         */
+        PolygonsAroundEdge polygons_from_edge_vertices(
+            absl::Span< const index_t > edge_vertices ) const;
 
         bool are_edges_enabled() const;
 

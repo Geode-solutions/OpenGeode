@@ -144,6 +144,25 @@ namespace geode
                 return surfaces;
             }
 
+            std::vector< uuid > create_surfaces(
+                absl::Span< const uuid > corners,
+                absl::Span< const uuid > lines,
+                absl::Span< const SurfaceDefinition > definitions )
+            {
+                const auto surfaces = create_surfaces( lines, definitions );
+                for( const auto d : Indices{ definitions } )
+                {
+                    const auto& definition = definitions[d];
+                    for( const auto internal : definition.internal_corners )
+                    {
+                        builder_.add_corner_surface_internal_relationship(
+                            model_.corner( corners[internal] ),
+                            model_.surface( surfaces[d] ) );
+                    }
+                }
+                return surfaces;
+            }
+
         protected:
             template < typename MeshBuilder, typename Component >
             void create_point( MeshBuilder& mesh_builder,

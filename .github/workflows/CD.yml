@@ -41,4 +41,11 @@ jobs:
     secrets:
       TOKEN: ${{ secrets.TOKEN }}
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-      PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }} 
+      PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+
+  notify:
+    uses: Geode-solutions/actions/.github/workflows/end-cd.yml@master
+    needs: [release-linux, release-linux-python, release-windows, release-windows-python]
+    secrets:
+      TOKEN: ${{ secrets.TOKEN }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

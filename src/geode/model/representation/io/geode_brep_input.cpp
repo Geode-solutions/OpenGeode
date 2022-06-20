@@ -38,8 +38,9 @@ namespace geode
         BRepBuilder builder{ brep() };
         absl::FixedArray< async::task< void > > tasks( 5 );
         index_t count{ 0 };
-        tasks[count++] = async::spawn(
-            [&builder, &directory] { builder.load_identifier( directory ); } );
+        tasks[count++] = async::spawn( [&builder, &directory] {
+            builder.load_identifier( directory );
+        } );
         tasks[count++] = async::spawn( [&builder, &directory] {
             builder.load_corners( directory );
             builder.load_lines( directory );

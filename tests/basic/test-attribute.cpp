@@ -67,9 +67,20 @@ namespace geode
             return value.generic_value();
         }
 
+        static float converted_item_value(
+            const Foo& value, local_index_t /*unused*/ )
+        {
+            return value.generic_value();
+        }
+
         static bool is_genericable()
         {
             return true;
+        }
+
+        static local_index_t nb_items()
+        {
+            return 1;
         }
     };
 
@@ -116,7 +127,9 @@ void test_foo_constant_attribute( geode::AttributeManager& manager )
     auto constant_attribute =
         manager.find_or_create_attribute< geode::ConstantAttribute, Foo >(
             "foo_cst", Foo{} );
-    constant_attribute->modify_value( []( Foo& foo ) { foo.double_ = 12.4; } );
+    constant_attribute->modify_value( []( Foo& foo ) {
+        foo.double_ = 12.4;
+    } );
     OPENGEODE_EXCEPTION( constant_attribute->value().double_ == 12.4,
         "[Test] Should be equal to 12.4" );
 }
@@ -126,8 +139,9 @@ void test_foo_variable_attribute( geode::AttributeManager& manager )
     auto variable_attribute =
         manager.find_or_create_attribute< geode::VariableAttribute, Foo >(
             "foo_var", Foo{} );
-    variable_attribute->modify_value(
-        3, []( Foo& foo ) { foo.double_ = 12.4; } );
+    variable_attribute->modify_value( 3, []( Foo& foo ) {
+        foo.double_ = 12.4;
+    } );
     OPENGEODE_EXCEPTION( variable_attribute->value( 0 ).double_ == 0,
         "[Test] Should be equal to 0" );
     OPENGEODE_EXCEPTION( variable_attribute->value( 3 ).double_ == 12.4,
@@ -159,8 +173,12 @@ void test_foo_sparse_attribute( geode::AttributeManager& manager )
     auto sparse_attribute =
         manager.find_or_create_attribute< geode::SparseAttribute, Foo >(
             "foo_spr", Foo{} );
-    sparse_attribute->modify_value( 3, []( Foo& foo ) { foo.double_ = 12.4; } );
-    sparse_attribute->modify_value( 3, []( Foo& foo ) { foo.int_ = 3; } );
+    sparse_attribute->modify_value( 3, []( Foo& foo ) {
+        foo.double_ = 12.4;
+    } );
+    sparse_attribute->modify_value( 3, []( Foo& foo ) {
+        foo.int_ = 3;
+    } );
     OPENGEODE_EXCEPTION( sparse_attribute->value( 0 ).double_ == 0,
         "[Test] Should be equal to 0" );
     OPENGEODE_EXCEPTION( sparse_attribute->value( 3 ).double_ == 12.4,
@@ -278,8 +296,8 @@ void test_serialize_manager( geode::AttributeManager& manager )
     geode::AttributeManager::register_attribute_type< Foo, geode::Serializer >(
         std::get< 0 >( context ), "Foo" );
     geode::register_basic_serialize_pcontext( std::get< 0 >( context ) );
-    geode::AttributeManager::register_attribute_type< std::array< double, 3 >,
-        geode::Serializer >( std::get< 0 >( context ), "array_double_3" );
+    geode::AttributeManager::register_attribute_type< std::array< double, 2 >,
+        geode::Serializer >( std::get< 0 >( context ), "array_double_2" );
     geode::Serializer archive{ context, file };
     archive.object( manager );
     archive.adapter().flush();
@@ -295,9 +313,9 @@ void test_serialize_manager( geode::AttributeManager& manager )
         std::get< 0 >( reload_context ) );
     geode::AttributeManager::register_attribute_type< Foo,
         geode::Deserializer >( std::get< 0 >( reload_context ), "Foo" );
-    geode::AttributeManager::register_attribute_type< std::array< double, 3 >,
+    geode::AttributeManager::register_attribute_type< std::array< double, 2 >,
         geode::Deserializer >(
-        std::get< 0 >( reload_context ), "array_double_3" );
+        std::get< 0 >( reload_context ), "array_double_2" );
     geode::Deserializer unarchive{ reload_context, infile };
     unarchive.object( reloaded_manager );
     const auto& adapter = unarchive.adapter();
@@ -373,13 +391,19 @@ void test_generic_value( geode::AttributeManager& manager )
 
     auto array_attr =
         manager.find_or_create_attribute< geode::VariableAttribute,
-            std::array< double, 3 > >(
-            "array_double", std::array< double, 3 >() );
+            std::array< double, 2 > >(
+            "array_double", std::array< double, 2 >() );
     array_attr->set_value( 2, { 3.1, 1.3 } );
-    OPENGEODE_EXCEPTION( !array_attr->is_genericable(),
-        "[Test] Foo attribute is not genericable" );
-    OPENGEODE_EXCEPTION( array_attr->generic_value( 2 ) == 0.,
-        "[Test] Generic value for element 2 of array attribute should be 0." );
+    OPENGEODE_EXCEPTION(
+        array_attr->is_genericable(), "[Test] Foo attribute is genericable" );
+    OPENGEODE_EXCEPTION( array_attr->generic_value( 2 ) == 3.1f,
+        "[Test] Generic value for element 2 of array attribute should be 3.1" );
+    OPENGEODE_EXCEPTION( array_attr->generic_item_value( 2, 0 ) == 3.1f,
+        "[Test] Generic value for element 2,0 of array attribute should be "
+        "3.1" );
+    OPENGEODE_EXCEPTION( array_attr->generic_item_value( 2, 1 ) == 1.3f,
+        "[Test] Generic value for element 2,1 of array attribute should be "
+        "1.3" );
 }
 
 void test_copy_manager( geode::AttributeManager& manager )
@@ -389,6 +413,44 @@ void test_copy_manager( geode::AttributeManager& manager )
     manager2.reserve( 15 );
     test_attribute_types( manager2 );
     test_number_of_attributes( manager2, 8 );
+}
+
+void test_import_manager( geode::AttributeManager& manager )
+{
+    const auto nb_elements = manager.nb_elements();
+    geode::AttributeManager manager2;
+    std::vector< geode::index_t > old2new( nb_elements, geode::NO_ID );
+    manager2.resize( 0 );
+    manager2.import( manager, old2new );
+    test_attribute_types( manager2 );
+    test_number_of_attributes( manager2, 8 );
+
+    geode::AttributeManager manager3;
+    for( const auto i : geode::LRange( nb_elements - 2 ) )
+    {
+        old2new[i] = nb_elements - 3 - i;
+    }
+    manager3.resize( nb_elements - 2 );
+    manager3.import( manager, old2new );
+    test_attribute_types( manager3 );
+    test_number_of_attributes( manager3, 8 );
+    auto array_attr =
+        manager.find_attribute< std::array< double, 2 > >( "array_double" );
+    auto array_attr2 =
+        manager3.find_attribute< std::array< double, 2 > >( "array_double" );
+    OPENGEODE_EXCEPTION( array_attr->value( 2 ) == array_attr2->value( 4 ),
+        "[Test] Error in attribute import value." );
+
+    geode::AttributeManager manager4;
+    for( const auto i : geode::LRange( nb_elements ) )
+    {
+        old2new[i] = i;
+    }
+    manager4.resize( nb_elements );
+    manager4.import( manager, old2new );
+    test_attribute_types( manager4 );
+    test_number_of_attributes( manager4, 8 );
+    test_sparse_attribute_after_element_deletion( manager4 );
 }
 
 void test_permutation( geode::AttributeManager& manager )
@@ -434,6 +496,7 @@ void test()
     test_serialize_manager( manager );
 
     test_copy_manager( manager );
+    test_import_manager( manager );
     test_attribute_types( manager );
     test_number_of_attributes( manager, 8 );
     manager.delete_attribute( "bool" );

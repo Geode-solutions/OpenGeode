@@ -68,6 +68,10 @@ namespace geode
         {
             return !( *this == other );
         }
+        std::string string() const
+        {
+            return absl::StrCat( "(", polyhedron_id, ", ", vertex_id, ")" );
+        }
         template < typename Archive >
         void serialize( Archive& archive );
 
@@ -94,6 +98,10 @@ namespace geode
         {
             return !( *this == other );
         }
+        std::string string() const
+        {
+            return absl::StrCat( "(", polyhedron_id, ", ", facet_id, ")" );
+        }
         template < typename Archive >
         void serialize( Archive& archive );
 
@@ -118,6 +126,11 @@ namespace geode
         {
             return !( *this == other );
         }
+        std::string string() const
+        {
+            return absl::StrCat( "(", polyhedron_facet.polyhedron_id, ", ",
+                polyhedron_facet.facet_id, ", ", vertex_id, ")" );
+        }
         template < typename Archive >
         void serialize( Archive& archive );
 
@@ -141,6 +154,11 @@ namespace geode
         {
             return !( *this == other );
         }
+        std::string string() const
+        {
+            return absl::StrCat( "(", polyhedron_facet.polyhedron_id, ", ",
+                polyhedron_facet.facet_id, ", ", edge_id, ")" );
+        }
         template < typename Archive >
         void serialize( Archive& archive );
 
@@ -160,7 +178,10 @@ namespace geode
 
     using PolyhedraAroundEdge = absl::InlinedVector< index_t, 10 >;
 
-    using PolyhedraAroundFacet = absl::InlinedVector< index_t, 2 >;
+    using PolyhedraAroundFacet =
+        absl::InlinedVector< index_t, 2 >; /* deprecated */
+
+    using newPolyhedraAroundFacet = absl::InlinedVector< PolyhedronFacet, 2 >;
 
     /*!
      * This class represents a 3D Solid made up with polyhedra and provides mesh
@@ -256,6 +277,11 @@ namespace geode
         absl::optional< PolyhedronFacetEdge >
             polyhedron_facet_edge_from_vertices(
                 const std::array< index_t, 2 >& edge_vertices ) const;
+
+        absl::optional< PolyhedronFacetEdge >
+            polyhedron_facet_edge_from_vertices(
+                const std::array< index_t, 2 >& edge_vertices,
+                index_t polyhedron_id ) const;
 
         virtual std::vector< std::array< index_t, 2 > >
             polyhedron_edges_vertices( index_t polyhedron ) const;
@@ -357,14 +383,31 @@ namespace geode
 
         /*!
          * Get all the polyhedra with one of the vertices matching given vertex.
-         * @param[in] vertex_id Index of the vertex
+         * @param[in] vertex_id Index of the vertex.
+         * @pre This function needs that polyhedron adjacencies are computed
          */
         PolyhedraAroundVertex polyhedra_around_vertex(
             index_t vertex_id ) const;
 
         /*!
-         * Return true if at least one of the polyhedron facets around the edge
+         * Get all the polyhedra with one of the vertices matching given
+         * polyhedron vertex.
+         * @param[in] polyhedron_vertex Local index of vertex in polyhedron.
+         * @pre This function needs that polyhedron adjacencies are computed
+         */
+        PolyhedraAroundVertex polyhedra_around_vertex(
+            const PolyhedronVertex& polyhedron_vertex ) const;
 
+        /*!
+         * Return true if at least one of the polyhedron facets around the
+         * vertex is on border.
+         * @param[in] vertex_id Index of the vertex.
+         * @pre This function needs that polyhedron adjacencies are computed
+         */
+        bool is_vertex_on_border( index_t vertex_id ) const;
+
+        /*!
+         * Return true if at least one of the polyhedron facets around the edge
          * is on border
          * @param[in] vertices Indices of edge vertices.
          */
@@ -372,8 +415,7 @@ namespace geode
             const std::array< index_t, 2 >& vertices ) const;
 
         /*!
-         * Return true if at least one of the polyhedron facets around the edge
-
+         * Return true if at least one of the polyhedron facets around the edges
          * is on border
          * @param[in] vertices Indices of edge vertices.
          * @param[in] first_polyhedron One polyhedron index to begin research
@@ -384,14 +426,24 @@ namespace geode
         /*!
          * Get all the polyhedra with both edge vertices.
          * @param[in] vertices Indices of edge vertices.
+         * @pre This function needs that polyhedron adjacencies are computed
          */
         virtual PolyhedraAroundEdge polyhedra_around_edge(
             const std::array< index_t, 2 >& vertices ) const;
 
         /*!
+         * Get all the polyhedra around the edge.
+         * @param[in] edge Local index of an edge in a polyhedron.
+         * @pre This function needs that polyhedron adjacencies are computed
+         */
+        virtual PolyhedraAroundEdge polyhedra_around_edge(
+            const PolyhedronFacetEdge& edge ) const;
+
+        /*!
          * Get all the polyhedra with both edge vertices.
          * @param[in] vertices Indices of edge vertices.
-         * @param[in] first_polyhedron One polyhedron index to begin research
+         * @param[in] first_polyhedron One polyhedron index to begin research.
+         * @pre This function needs that polyhedron adjacencies are computed
          */
         virtual PolyhedraAroundEdge polyhedra_around_edge(
             const std::array< index_t, 2 >& vertices,
@@ -401,7 +453,14 @@ namespace geode
          * Return all polyhedra made with the given facet.
          * @param[in] facet_vertices Vertex indices of the facet.
          */
-        PolyhedraAroundFacet polyhedra_from_facet(
+        PolyhedraAroundFacet OPENGEODE_MESH_DEPRECATED polyhedra_from_facet(
+            PolyhedronFacetVertices facet_vertices ) const;
+
+        /*!
+         * Return all polyhedra facets made with the given facet vertices.
+         * @param[in] facet_vertices Vertex indices of the facet.
+         */
+        newPolyhedraAroundFacet polyhedra_from_facet_vertices(
             PolyhedronFacetVertices facet_vertices ) const;
 
         bool are_edges_enabled() const;
