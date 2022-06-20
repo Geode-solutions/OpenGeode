@@ -112,7 +112,7 @@ namespace
     geode::detail::PolygonsAroundVertexImpl compute_polygons_around_vertex(
         const geode::SurfaceMesh< dimension >& mesh,
         const geode::index_t& vertex_id,
-        absl::optional< geode::PolygonVertex >& first_polygon )
+        const absl::optional< geode::PolygonVertex >& first_polygon )
     {
         if( !first_polygon )
         {
@@ -220,6 +220,8 @@ namespace geode
     {
         friend class bitsery::Access;
         using CachedPolygons = CachedValue< detail::PolygonsAroundVertexImpl >;
+        static constexpr auto polygons_around_vertex_name =
+            "polygons_around_vertex";
 
     public:
         Impl( SurfaceMesh& surface )
@@ -232,7 +234,7 @@ namespace geode
                   surface.vertex_attribute_manager()
                       .template find_or_create_attribute< VariableAttribute,
                           CachedPolygons >(
-                          "polygons_around_vertex", CachedPolygons{} ) )
+                          polygons_around_vertex_name, CachedPolygons{} ) )
         {
         }
 
@@ -250,24 +252,26 @@ namespace geode
         void reset_polygons_around_vertex( index_t vertex_id )
         {
             polygons_around_vertex_->modify_value(
-                vertex_id, []( CachedPolygons& value ) { value.reset(); } );
+                vertex_id, []( CachedPolygons& value ) {
+                    value.reset();
+                } );
         }
 
         const PolygonsAroundVertex& polygons_around_vertex(
             const SurfaceMesh< dimension >& mesh,
             index_t vertex_id,
-            absl::optional< PolygonVertex > first_polygon ) const
+            const absl::optional< PolygonVertex >& first_polygon ) const
         {
-            return update_polygons_around_vertex(
+            return updated_polygons_around_vertex(
                 mesh, vertex_id, first_polygon )
                 .polygons;
         }
 
         bool is_vertex_on_border( const SurfaceMesh< dimension >& mesh,
             index_t vertex_id,
-            absl::optional< PolygonVertex > first_polygon ) const
+            const absl::optional< PolygonVertex >& first_polygon ) const
         {
-            return update_polygons_around_vertex(
+            return updated_polygons_around_vertex(
                 mesh, vertex_id, first_polygon )
                 .vertex_is_on_border;
         }
@@ -334,7 +338,7 @@ namespace geode
                 surface.vertex_attribute_manager()
                     .template find_or_create_attribute< VariableAttribute,
                         CachedPolygons >(
-                        "polygons_around_vertex", CachedPolygons{} );
+                        polygons_around_vertex_name, CachedPolygons{} );
         }
 
     private:
@@ -361,17 +365,22 @@ namespace geode
                         } } } );
         }
 
-        const detail::PolygonsAroundVertexImpl& update_polygons_around_vertex(
+        const detail::PolygonsAroundVertexImpl& updated_polygons_around_vertex(
             const SurfaceMesh< dimension >& mesh,
-            index_t vertex_id,
-            absl::optional< PolygonVertex > first_polygon ) const
+            const index_t vertex_id,
+            const absl::optional< PolygonVertex >& first_polygon ) const
         {
-            polygons_around_vertex_->modify_value( vertex_id,
-                [&mesh, vertex_id, &first_polygon]( CachedPolygons& value ) {
-                    value( compute_polygons_around_vertex, mesh, vertex_id,
-                        first_polygon );
-                } );
-            return polygons_around_vertex_->value( vertex_id ).value();
+            const auto& cached = polygons_around_vertex_->value( vertex_id );
+            const auto& polygons = cached.value().polygons;
+            if( !cached.computed()
+                || ( first_polygon
+                     && absl::c_find( polygons, first_polygon.value() )
+                            == polygons.end() ) )
+            {
+                cached( compute_polygons_around_vertex, mesh, vertex_id,
+                    first_polygon );
+            }
+            return cached.value();
         }
 
     private:
@@ -740,13 +749,14 @@ namespace geode
     }
 
     template < index_t dimension >
-    PolygonsAroundVertex SurfaceMesh< dimension >::polygons_around_vertex(
-        const PolygonVertex& polygon_vertex ) const
+    const PolygonsAroundVertex&
+        SurfaceMesh< dimension >::polygons_around_vertex(
+            const PolygonVertex& polygon_vertex ) const
     {
         check_polygon_vertex_id(
             *this, polygon_vertex.polygon_id, polygon_vertex.vertex_id );
-        return std::get< 0 >( ::polygons_around_vertex(
-            *this, this->polygon_vertex( polygon_vertex ), polygon_vertex ) );
+        return impl_->polygons_around_vertex(
+            *this, this->polygon_vertex( polygon_vertex ), polygon_vertex );
     }
 
     template < index_t dimension >

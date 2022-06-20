@@ -346,7 +346,7 @@ namespace geode
          * @param[in] polygon_vertex Local index of vertex in polygon.
          * @pre This function needs that polygon adjacencies are computed
          */
-        PolygonsAroundVertex polygons_around_vertex(
+        const PolygonsAroundVertex& polygons_around_vertex(
             const PolygonVertex& vertex ) const;
 
         /*!

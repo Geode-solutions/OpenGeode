@@ -29,6 +29,7 @@
 
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/bitsery_archive.h>
+#include <geode/basic/cached_value.h>
 #include <geode/basic/detail/mapping_after_deletion.h>
 #include <geode/basic/pimpl_impl.h>
 
@@ -42,6 +43,7 @@
 #include <geode/mesh/core/detail/vertex_cycle.h>
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polyhedral_solid.h>
+#include <geode/mesh/core/private/solid_mesh_impl.h>
 #include <geode/mesh/core/solid_edges.h>
 #include <geode/mesh/core/solid_facets.h>
 
@@ -215,21 +217,33 @@ namespace
     }
 
     template < geode::index_t dimension >
-    geode::PolyhedraAroundVertex polyhedra_around_vertex(
+    geode::detail::PolyhedraAroundVertexImpl compute_polyhedra_around_vertex(
         const geode::SolidMesh< dimension >& solid,
-        const geode::PolyhedronVertex& first_polyhedron,
-        geode::index_t vertex_id )
+        const geode::index_t& vertex_id,
+        const absl::optional< geode::PolyhedronVertex >& first_polyhedron )
     {
-        geode::PolyhedraAroundVertex polyhedra;
+        if( !first_polyhedron )
+        {
+            return {};
+        }
+        OPENGEODE_ASSERT(
+            solid.polyhedron_vertex( first_polyhedron.value() ) == vertex_id,
+            "[SolidMesh::polyhedra_around_vertex] Wrong polyhedron "
+            "around vertex" );
+        geode::index_t safety_count{ 0 };
+        constexpr geode::index_t MAX_SAFETY_COUNT{ 1000 };
+        geode::detail::PolyhedraAroundVertexImpl result;
+        result.vertex_is_on_border = false;
         absl::flat_hash_set< geode::index_t > polyhedra_visited;
         polyhedra_visited.reserve( 20 );
         std::stack< geode::PolyhedronVertex > S;
-        S.push( first_polyhedron );
-        polyhedra_visited.insert( first_polyhedron.polyhedron_id );
-        while( !S.empty() )
+        S.push( first_polyhedron.value() );
+        polyhedra_visited.insert( first_polyhedron->polyhedron_id );
+        while( !S.empty() && safety_count < MAX_SAFETY_COUNT )
         {
-            polyhedra.push_back( S.top() );
-            const auto& polyhedron_vertex_id = polyhedra.back();
+            safety_count++;
+            result.polyhedra.push_back( S.top() );
+            const auto& polyhedron_vertex_id = result.polyhedra.back();
             S.pop();
 
             for( const auto& polyhedron_facet :
@@ -239,6 +253,7 @@ namespace
                     solid.polyhedron_adjacent( polyhedron_facet );
                 if( !adj_polyhedron )
                 {
+                    result.vertex_is_on_border = true;
                     continue;
                 }
                 const auto p_adj = adj_polyhedron.value();
@@ -253,7 +268,7 @@ namespace
                 }
             }
         }
-        return polyhedra;
+        return result;
     }
 } // namespace
 
@@ -334,6 +349,10 @@ namespace geode
     class SolidMesh< dimension >::Impl
     {
         friend class bitsery::Access;
+        using CachedPolyhedra =
+            CachedValue< detail::PolyhedraAroundVertexImpl >;
+        static constexpr auto polyhedra_around_vertex_name =
+            "polyhedra_around_vertex";
 
     public:
         explicit Impl( SolidMesh& solid )
@@ -341,7 +360,12 @@ namespace geode
                 solid.vertex_attribute_manager()
                     .template find_or_create_attribute< VariableAttribute,
                         PolyhedronVertex >(
-                        "polyhedron_around_vertex", PolyhedronVertex{} ) )
+                        "polyhedron_around_vertex", PolyhedronVertex{} ) ),
+              polyhedra_around_vertex_(
+                  solid.vertex_attribute_manager()
+                      .template find_or_create_attribute< VariableAttribute,
+                          CachedPolyhedra >(
+                          polyhedra_around_vertex_name, CachedPolyhedra{} ) )
         {
         }
 
@@ -354,6 +378,33 @@ namespace geode
                 return value;
             }
             return absl::nullopt;
+        }
+
+        void reset_polyhedra_around_vertex( index_t vertex_id )
+        {
+            polyhedra_around_vertex_->modify_value(
+                vertex_id, []( CachedPolyhedra& value ) {
+                    value.reset();
+                } );
+        }
+
+        const PolyhedraAroundVertex& polyhedra_around_vertex(
+            const SolidMesh< dimension >& mesh,
+            index_t vertex_id,
+            const absl::optional< PolyhedronVertex >& first_polyhedron ) const
+        {
+            return updated_polyhedra_around_vertex(
+                mesh, vertex_id, first_polyhedron )
+                .polyhedra;
+        }
+
+        bool is_vertex_on_border( const SolidMesh< dimension >& mesh,
+            index_t vertex_id,
+            const absl::optional< PolyhedronVertex >& first_polyhedron ) const
+        {
+            return updated_polyhedra_around_vertex(
+                mesh, vertex_id, first_polyhedron )
+                .vertex_is_on_border;
         }
 
         void associate_polyhedron_vertex_to_vertex(
@@ -456,26 +507,66 @@ namespace geode
             return *facets_;
         }
 
+        void initialize_polyhedra_around_vertex(
+            const SolidMesh< dimension >& solid )
+        {
+            polyhedra_around_vertex_ =
+                solid.vertex_attribute_manager()
+                    .template find_or_create_attribute< VariableAttribute,
+                        CachedPolyhedra >(
+                        polyhedra_around_vertex_name, CachedPolyhedra{} );
+        }
+
+        const detail::PolyhedraAroundVertexImpl& updated_polyhedra_around_vertex(
+            const SolidMesh< dimension >& mesh,
+            const index_t vertex_id,
+            const absl::optional< PolyhedronVertex >& first_polyhedron ) const
+        {
+            const auto& cached = polyhedra_around_vertex_->value( vertex_id );
+            const auto& polyhedra = cached.value().polyhedra;
+            if( !cached.computed()
+                || ( first_polyhedron
+                     && absl::c_find( polyhedra, first_polyhedron.value() )
+                            == polyhedra.end() ) )
+            {
+                cached( compute_polyhedra_around_vertex, mesh, vertex_id,
+                    first_polyhedron );
+            }
+            return cached.value();
+        }
+
     private:
         Impl() = default;
 
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& a, Impl& impl ) {
-                    a.object( impl.polyhedron_attribute_manager_ );
-                    a.ext( impl.polyhedron_around_vertex_,
-                        bitsery::ext::StdSmartPtr{} );
-                    a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
-                    a.ext( impl.facets_, bitsery::ext::StdSmartPtr{} );
-                } );
+            archive.ext( *this,
+                Growable< Archive, Impl >{
+                    { []( Archive& a, Impl& impl ) {
+                         a.object( impl.polyhedron_attribute_manager_ );
+                         a.ext( impl.polyhedron_around_vertex_,
+                             bitsery::ext::StdSmartPtr{} );
+                         a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
+                         a.ext( impl.facets_, bitsery::ext::StdSmartPtr{} );
+                     },
+                        []( Archive& a, Impl& impl ) {
+                            a.object( impl.polyhedron_attribute_manager_ );
+                            a.ext( impl.polyhedron_around_vertex_,
+                                bitsery::ext::StdSmartPtr{} );
+                            a.ext( impl.polyhedra_around_vertex_,
+                                bitsery::ext::StdSmartPtr{} );
+                            a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
+                            a.ext( impl.facets_, bitsery::ext::StdSmartPtr{} );
+                        } } } );
         }
 
     private:
         mutable AttributeManager polyhedron_attribute_manager_;
         std::shared_ptr< VariableAttribute< PolyhedronVertex > >
             polyhedron_around_vertex_;
+        mutable std::shared_ptr< VariableAttribute< CachedPolyhedra > >
+            polyhedra_around_vertex_;
         mutable std::unique_ptr< SolidEdges< dimension > > edges_;
         mutable std::unique_ptr< SolidFacets< dimension > > facets_;
     };
@@ -699,7 +790,7 @@ namespace geode
         SolidMesh< dimension >::polyhedron_facet_edge_from_vertices(
             const std::array< index_t, 2 >& edge_vertices ) const
     {
-        for( const auto polyhedron_vertex :
+        for( const auto& polyhedron_vertex :
             polyhedra_around_vertex( edge_vertices[0] ) )
         {
             if( const auto polyhedron_facet_edge =
@@ -753,29 +844,22 @@ namespace geode
     }
 
     template < index_t dimension >
-    PolyhedraAroundVertex SolidMesh< dimension >::polyhedra_around_vertex(
-        const PolyhedronVertex& first_polyhedron ) const
+    const PolyhedraAroundVertex&
+        SolidMesh< dimension >::polyhedra_around_vertex(
+            const PolyhedronVertex& first_polyhedron ) const
     {
-        return ::polyhedra_around_vertex(
-            *this, first_polyhedron, polyhedron_vertex( first_polyhedron ) );
+        return impl_->polyhedra_around_vertex(
+            *this, polyhedron_vertex( first_polyhedron ), first_polyhedron );
     }
 
     template < index_t dimension >
-    PolyhedraAroundVertex SolidMesh< dimension >::polyhedra_around_vertex(
-        index_t vertex_id ) const
+    const PolyhedraAroundVertex&
+        SolidMesh< dimension >::polyhedra_around_vertex(
+            index_t vertex_id ) const
     {
         check_vertex_id( *this, vertex_id );
-        const auto first_polyhedron = polyhedron_around_vertex( vertex_id );
-        if( !first_polyhedron )
-        {
-            return {};
-        }
-        OPENGEODE_ASSERT(
-            polyhedron_vertex( first_polyhedron.value() ) == vertex_id,
-            "[SolidMesh::polyhedra_around_vertex] Wrong "
-            "polyhedron around vertex" );
-        return ::polyhedra_around_vertex(
-            *this, first_polyhedron.value(), vertex_id );
+        return impl_->polyhedra_around_vertex(
+            *this, vertex_id, polyhedron_around_vertex( vertex_id ) );
     }
 
     template < geode::index_t dimension >
@@ -826,19 +910,8 @@ namespace geode
     template < index_t dimension >
     bool SolidMesh< dimension >::is_vertex_on_border( index_t vertex_id ) const
     {
-        for( const auto& polyhedron_vertex :
-            polyhedra_around_vertex( vertex_id ) )
-        {
-            for( const auto& border_facet :
-                polyhedron_facets_on_border( polyhedron_vertex.polyhedron_id ) )
-            {
-                if( polyhedron_vertex.vertex_id != border_facet.facet_id )
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return impl_->is_vertex_on_border(
+            *this, vertex_id, polyhedron_around_vertex( vertex_id ) );
     }
 
     template < index_t dimension >
@@ -1007,6 +1080,13 @@ namespace geode
     {
         impl_->associate_polyhedron_vertex_to_vertex(
             polyhedron_vertex, vertex_id );
+    }
+
+    template < index_t dimension >
+    void SolidMesh< dimension >::reset_polyhedra_around_vertex(
+        index_t vertex_id, SolidMeshKey )
+    {
+        impl_->reset_polyhedra_around_vertex( vertex_id );
     }
 
     template < index_t dimension >
@@ -1264,11 +1344,17 @@ namespace geode
     template < typename Archive >
     void SolidMesh< dimension >::serialize( Archive& archive )
     {
-        archive.ext( *this, DefaultGrowable< Archive, SolidMesh >{},
-            []( Archive& a, SolidMesh& solid ) {
-                a.ext( solid, bitsery::ext::BaseClass< VertexSet >{} );
-                a.object( solid.impl_ );
-            } );
+        archive.ext( *this,
+            Growable< Archive, SolidMesh >{
+                { []( Archive& a, SolidMesh& solid ) {
+                     a.ext( solid, bitsery::ext::BaseClass< VertexSet >{} );
+                     a.object( solid.impl_ );
+                     solid.impl_->initialize_polyhedra_around_vertex( solid );
+                 },
+                    []( Archive& a, SolidMesh& solid ) {
+                        a.ext( solid, bitsery::ext::BaseClass< VertexSet >{} );
+                        a.object( solid.impl_ );
+                    } } } );
     }
 
     template < index_t dimension >
