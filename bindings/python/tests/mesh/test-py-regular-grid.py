@@ -187,7 +187,7 @@ def test_boundary_box( grid ):
     if bbox.max() != max:
         raise ValueError( "[Test] Wrong bounding box max" )
 
-def test_cosest_vertex( grid ):
+def test_closest_vertex( grid ):
     p0 = geom.Point3D( [ 0, 0, 0 ] )
     p1 = geom.Point3D( [ 0.5, 20, 46 ] )
     p2 = geom.Point3D( [ 0, -1, -1 ] )
