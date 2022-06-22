@@ -201,14 +201,17 @@ void test_clone( const geode::TriangulatedSurface3D& surface )
     {
         attr_from->set_value( e, e );
     }
-    auto surface2 = surface.clone();
-    OPENGEODE_EXCEPTION( surface2->nb_vertices() == 5,
+    auto surface_clone = surface.clone();
+    geode::OpenGeodeTriangulatedSurface3D surface2{ std::move(
+        *dynamic_cast< geode::OpenGeodeTriangulatedSurface3D* >(
+            surface_clone.get() ) ) };
+    OPENGEODE_EXCEPTION( surface2.nb_vertices() == 5,
         "[Test] TriangulatedSurface2 should have 5 vertices" );
-    OPENGEODE_EXCEPTION( surface2->edges().nb_edges() == 5,
+    OPENGEODE_EXCEPTION( surface2.edges().nb_edges() == 5,
         "[Test] TriangulatedSurface2 should have 5 edges" );
-    OPENGEODE_EXCEPTION( surface2->nb_polygons() == 2,
+    OPENGEODE_EXCEPTION( surface2.nb_polygons() == 2,
         "[Test] TriangulatedSurface2 should have 2 polygons" );
-    auto attr_to = surface2->edges()
+    auto attr_to = surface2.edges()
                        .edge_attribute_manager()
                        .find_attribute< geode::index_t >( "edge_id" );
     for( const auto e : geode::Range{ surface.edges().nb_edges() } )

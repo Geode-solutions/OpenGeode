@@ -79,7 +79,7 @@ void test_io( const geode::VertexSet& vertex_set, absl::string_view filename )
 
 void test_clone( const geode::VertexSet& vertex_set )
 {
-    const auto vertex_set2 = vertex_set.clone();
+    const auto vertex_set2{ vertex_set.clone() };
     OPENGEODE_EXCEPTION( vertex_set2->nb_vertices() == 5,
         "[Test] VertexSet2 should have 5 vertices" );
 }

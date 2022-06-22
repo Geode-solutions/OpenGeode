@@ -346,14 +346,17 @@ void test_io(
 
 void test_clone( const geode::HybridSolid3D& hybrid_solid )
 {
-    const auto hybrid_solid2 = hybrid_solid.clone();
-    OPENGEODE_EXCEPTION( hybrid_solid2->nb_vertices() == 11,
+    const auto hybrid_solid_clone = hybrid_solid.clone();
+    geode::OpenGeodeHybridSolid3D hybrid_solid2{ std::move(
+        *dynamic_cast< geode::OpenGeodeHybridSolid3D* >(
+            hybrid_solid_clone.get() ) ) };
+    OPENGEODE_EXCEPTION( hybrid_solid2.nb_vertices() == 11,
         "[Test] Reloaded HybridSolid should have 11 vertices" );
-    OPENGEODE_EXCEPTION( hybrid_solid2->nb_polyhedra() == 3,
+    OPENGEODE_EXCEPTION( hybrid_solid2.nb_polyhedra() == 3,
         "[Test] HybridSolid should have 3 polyhedra" );
-    OPENGEODE_EXCEPTION( hybrid_solid2->facets().nb_facets() == 14,
+    OPENGEODE_EXCEPTION( hybrid_solid2.facets().nb_facets() == 14,
         "[Test] HybridSolid should have 14 facets" );
-    OPENGEODE_EXCEPTION( hybrid_solid2->edges().nb_edges() == 21,
+    OPENGEODE_EXCEPTION( hybrid_solid2.edges().nb_edges() == 21,
         "[Test] HybridSolid should have 21 edges" );
 }
 

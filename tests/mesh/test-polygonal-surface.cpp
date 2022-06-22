@@ -462,19 +462,22 @@ void test_backward_io( const std::string& filename )
 
 void test_clone( const geode::PolygonalSurface3D& polygonal_surface )
 {
-    const auto polygonal_surface2 = polygonal_surface.clone();
-    OPENGEODE_EXCEPTION( polygonal_surface2->nb_vertices() == 7,
+    const auto polygonal_surface_clone = polygonal_surface.clone();
+    geode::OpenGeodePolygonalSurface3D polygonal_surface2{ std::move(
+        *dynamic_cast< geode::OpenGeodePolygonalSurface3D* >(
+            polygonal_surface_clone.get() ) ) };
+    OPENGEODE_EXCEPTION( polygonal_surface2.nb_vertices() == 7,
         "[Test] PolygonalSurface2 should have 7 vertices" );
-    OPENGEODE_EXCEPTION( polygonal_surface2->edges().nb_edges() == 6,
+    OPENGEODE_EXCEPTION( polygonal_surface2.edges().nb_edges() == 6,
         "[Test] PolygonalSurface2 should have 6 edges" );
-    OPENGEODE_EXCEPTION( polygonal_surface2->nb_polygons() == 2,
+    OPENGEODE_EXCEPTION( polygonal_surface2.nb_polygons() == 2,
         "[Test] PolygonalSurface2 should have 2 polygons" );
 
-    const auto attribute2 = polygonal_surface2->vertex_attribute_manager()
+    const auto attribute2 = polygonal_surface2.vertex_attribute_manager()
                                 .find_attribute< geode::PolygonEdge >( "test" );
     std::vector< geode::PolygonEdge > att_answer{ { 4, 0 }, { 2, 0 }, { 6, 0 },
         { 1, 0 }, { 5, 0 }, { 0, 0 }, { 3, 0 } };
-    for( const auto v : geode::Range{ polygonal_surface2->nb_vertices() } )
+    for( const auto v : geode::Range{ polygonal_surface2.nb_vertices() } )
     {
         const geode::PolygonEdge answer{ v, 0 };
         OPENGEODE_EXCEPTION( attribute2->value( v ) == att_answer[v],

@@ -66,6 +66,14 @@ namespace geode
     }
 
     template < index_t dimension >
+    OpenGeodePointSet< dimension >::OpenGeodePointSet(
+        OpenGeodePointSet&& other )
+        : PointSet< dimension >( std::move( other ) ),
+          impl_( std::move( other.impl_ ) )
+    {
+    }
+
+    template < index_t dimension >
     OpenGeodePointSet< dimension >::~OpenGeodePointSet() // NOLINT
     {
     }
