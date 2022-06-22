@@ -28,7 +28,7 @@
 
 #include <geode/mesh/builder/point_set_builder.h>
 #include <geode/mesh/core/point_set.h>
-#include <geode/mesh/helpers/nnsearch_point_set.h>
+#include <geode/mesh/helpers/nnsearch_mesh.h>
 
 #include <geode/tests/common.h>
 

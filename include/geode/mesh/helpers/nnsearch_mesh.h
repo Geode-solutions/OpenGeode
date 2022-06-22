@@ -25,14 +25,19 @@
 
 #include <geode/mesh/common.h>
 
-namespace geode
-{
-    FORWARD_DECLARATION_DIMENSION_CLASS( NNSearch );
-    FORWARD_DECLARATION_DIMENSION_CLASS( PointSet );
-} // namespace geode
+#include <geode/geometry/nn_search.h>
 
 namespace geode
 {
-    template < index_t dimension >
-    NNSearch< dimension > create_nn_search( const PointSet< dimension >& mesh );
+    template < template < index_t > class Mesh, index_t dimension >
+    NNSearch< dimension > create_nn_search( const Mesh< dimension >& mesh )
+    {
+        std::vector< Point< dimension > > points;
+        points.reserve( mesh.nb_vertices() );
+        for( const auto v : Range{ mesh.nb_vertices() } )
+        {
+            points.push_back( mesh.point( v ) );
+        }
+        return { std::move( points ) };
+    }
 } // namespace geode
