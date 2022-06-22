@@ -176,6 +176,7 @@ add_geode_library(
         "helpers/aabb_solid_helpers.h"
         "helpers/convert_surface_mesh.h"
         "helpers/convert_solid_mesh.h"
+        "helpers/nnsearch_mesh.h"
         "io/edged_curve_input.h"
         "io/edged_curve_output.h"
         "io/graph_input.h"
