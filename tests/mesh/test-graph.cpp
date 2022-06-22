@@ -136,11 +136,13 @@ void test_backward_io( const std::string& filename )
 
 void test_clone( const geode::Graph& graph )
 {
-    const auto graph2 = graph.clone();
+    const auto graph_clone = graph.clone();
+    geode::OpenGeodeGraph graph2{ std::move(
+        *dynamic_cast< geode::OpenGeodeGraph* >( graph_clone.get() ) ) };
     OPENGEODE_EXCEPTION(
-        graph2->nb_vertices() == 4, "[Test] Graph2 should have 4 vertices" );
+        graph2.nb_vertices() == 4, "[Test] Graph2 should have 4 vertices" );
     OPENGEODE_EXCEPTION(
-        graph2->nb_edges() == 2, "[Test] Graph2 should have2 edge2" );
+        graph2.nb_edges() == 2, "[Test] Graph2 should have2 edge2" );
 }
 
 void test_delete_isolated_vertices(

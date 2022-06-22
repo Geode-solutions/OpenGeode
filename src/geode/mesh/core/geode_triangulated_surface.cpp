@@ -140,6 +140,14 @@ namespace geode
     }
 
     template < index_t dimension >
+    OpenGeodeTriangulatedSurface< dimension >::OpenGeodeTriangulatedSurface(
+        OpenGeodeTriangulatedSurface&& other )
+        : TriangulatedSurface< dimension >( std::move( other ) ),
+          impl_( std::move( other.impl_ ) )
+    {
+    }
+
+    template < index_t dimension >
     OpenGeodeTriangulatedSurface<
         dimension >::~OpenGeodeTriangulatedSurface() // NOLINT
     {

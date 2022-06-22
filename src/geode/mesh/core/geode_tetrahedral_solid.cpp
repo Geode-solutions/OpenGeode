@@ -156,6 +156,14 @@ namespace geode
     }
 
     template < index_t dimension >
+    OpenGeodeTetrahedralSolid< dimension >::OpenGeodeTetrahedralSolid(
+        OpenGeodeTetrahedralSolid&& other )
+        : TetrahedralSolid< dimension >( std::move( other ) ),
+          impl_( std::move( other.impl_ ) )
+    {
+    }
+
+    template < index_t dimension >
     OpenGeodeTetrahedralSolid<
         dimension >::~OpenGeodeTetrahedralSolid() // NOLINT
     {

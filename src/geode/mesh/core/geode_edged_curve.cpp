@@ -72,6 +72,14 @@ namespace geode
     }
 
     template < index_t dimension >
+    OpenGeodeEdgedCurve< dimension >::OpenGeodeEdgedCurve(
+        OpenGeodeEdgedCurve&& other )
+        : EdgedCurve< dimension >( std::move( other ) ),
+          impl_( std::move( other.impl_ ) )
+    {
+    }
+
+    template < index_t dimension >
     OpenGeodeEdgedCurve< dimension >::~OpenGeodeEdgedCurve() // NOLINT
     {
     }

@@ -76,6 +76,7 @@ namespace geode
 
     protected:
         PolyhedralSolid() = default;
+        PolyhedralSolid( PolyhedralSolid&& other ) = default;
 
     private:
         friend class bitsery::Access;
