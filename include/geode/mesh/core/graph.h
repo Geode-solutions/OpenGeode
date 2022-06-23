@@ -59,10 +59,22 @@ namespace geode
         {
             return !( *this == other );
         }
+        bool operator<( const EdgeVertex& other ) const
+        {
+            if( edge_id != other.edge_id )
+            {
+                return edge_id < other.edge_id;
+            }
+            return vertex_id < other.vertex_id;
+        }
         EdgeVertex opposite() const
         {
             const local_index_t opposite = vertex_id == 0 ? 1 : 0;
             return { edge_id, opposite };
+        }
+        std::string string() const
+        {
+            return absl::StrCat( "(", edge_id, ", ", vertex_id, ")" );
         }
         template < typename Archive >
         void serialize( Archive& archive );

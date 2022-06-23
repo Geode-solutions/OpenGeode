@@ -72,7 +72,13 @@ add_geode_test(
         ${PROJECT_NAME}::model
 )
 add_geode_test(
-    SOURCE "test-component-mesh-queries.cpp"
+    SOURCE "test-component-mesh-edges.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::model
+)
+add_geode_test(
+    SOURCE "test-component-mesh-polygons.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::model

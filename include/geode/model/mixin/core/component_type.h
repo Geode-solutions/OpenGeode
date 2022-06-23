@@ -117,4 +117,14 @@ namespace std
             return absl::Hash< string >()( type.get() );
         }
     };
+
+    template <>
+    struct hash< geode::ComponentID >
+    {
+    public:
+        size_t operator()( const geode::ComponentID& id ) const
+        {
+            return absl::Hash< geode::uuid >()( id.id() );
+        }
+    };
 } // namespace std
