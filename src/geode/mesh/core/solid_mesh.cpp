@@ -517,10 +517,11 @@ namespace geode
                         polyhedra_around_vertex_name, CachedPolyhedra{} );
         }
 
-        const detail::PolyhedraAroundVertexImpl& updated_polyhedra_around_vertex(
-            const SolidMesh< dimension >& mesh,
-            const index_t vertex_id,
-            const absl::optional< PolyhedronVertex >& first_polyhedron ) const
+        const detail::PolyhedraAroundVertexImpl&
+            updated_polyhedra_around_vertex( const SolidMesh< dimension >& mesh,
+                const index_t vertex_id,
+                const absl::optional< PolyhedronVertex >& first_polyhedron )
+                const
         {
             const auto& cached = polyhedra_around_vertex_->value( vertex_id );
             const auto& polyhedra = cached.value().polyhedra;
