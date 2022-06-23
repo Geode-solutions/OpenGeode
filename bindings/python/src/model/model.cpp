@@ -60,7 +60,7 @@
 #include "representation/io/brep.h"
 #include "representation/io/section.h"
 
-#include "helpers/component_mesh_queries.h"
+#include "helpers/component_mesh_polygons.h"
 #include "helpers/convert_model_meshes.h"
 #include "helpers/convert_to_mesh.h"
 #include "helpers/model_component_filter.h"

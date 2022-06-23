@@ -69,6 +69,14 @@ namespace geode
         {
             return !( *this == other );
         }
+        bool operator<( const PolygonVertex& other ) const
+        {
+            if( polygon_id != other.polygon_id )
+            {
+                return polygon_id < other.polygon_id;
+            }
+            return vertex_id < other.vertex_id;
+        }
         std::string string() const
         {
             return absl::StrCat( "(", polygon_id, ", ", vertex_id, ")" );
@@ -98,6 +106,14 @@ namespace geode
         bool operator!=( const PolygonEdge& other ) const
         {
             return !( *this == other );
+        }
+        bool operator<( const PolygonEdge& other ) const
+        {
+            if( polygon_id != other.polygon_id )
+            {
+                return polygon_id < other.polygon_id;
+            }
+            return edge_id < other.edge_id;
         }
         std::string string() const
         {
