@@ -43,7 +43,7 @@
         .def( "set_polyhedron_adjacent",                                       \
             &SolidMeshBuilder##dimension##D::set_polyhedron_adjacent )         \
         .def( "compute_polyhedron_adjacencies",                                \
-            ( void ( SolidMeshBuilder##dimension##D::* )() )                   \
+            ( void( SolidMeshBuilder##dimension##D::* )() )                    \
                 & SolidMeshBuilder##dimension##D::                             \
                     compute_polyhedron_adjacencies )                           \
         .def( "delete_polyhedra",                                              \
