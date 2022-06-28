@@ -79,8 +79,15 @@ void test_io( const geode::VertexSet& vertex_set, absl::string_view filename )
 
 void test_clone( const geode::VertexSet& vertex_set )
 {
-    const auto vertex_set2{ vertex_set.clone() };
-    OPENGEODE_EXCEPTION( vertex_set2->nb_vertices() == 5,
+    const auto vertex_set_clone = vertex_set.clone();
+    OPENGEODE_EXCEPTION( vertex_set_clone->nb_vertices() == 5,
+        "[Test] VertexSet2 should have 5 vertices" );
+}
+
+void test_move( geode::OpenGeodeVertexSet& vertex_set )
+{
+    geode::OpenGeodeVertexSet vertex_set_2{ std::move( vertex_set ) };
+    OPENGEODE_EXCEPTION( vertex_set_2.nb_vertices() == 5,
         "[Test] VertexSet2 should have 5 vertices" );
 }
 
@@ -94,6 +101,7 @@ void test()
         vertex_set, absl::StrCat( "test.", vertex_set.native_extension() ) );
     test_delete_vertex( vertex_set, *builder );
     test_clone( vertex_set );
+    test_move( vertex_set );
 }
 
 OPENGEODE_TEST( "vertex-set" )
