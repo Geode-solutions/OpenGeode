@@ -40,7 +40,7 @@ namespace geode
     {
         PYTHON_BARYCENTRIC( 2 );
         PYTHON_BARYCENTRIC( 3 );
-        module.def(
-            "tetra_barycentric_coordinates", &tetra_barycentric_coordinates );
+        module.def( "tetrahedron_barycentric_coordinates",
+            &tetrahedron_barycentric_coordinates );
     }
 } // namespace geode

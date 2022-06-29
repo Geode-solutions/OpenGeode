@@ -23,7 +23,7 @@
 
 #include <geode/mesh/core/tetrahedral_solid.h>
 
-#include <geode/geometry/basic_objects/tetra.h>
+#include <geode/geometry/basic_objects/tetrahedron.h>
 #include <geode/geometry/basic_objects/triangle.h>
 
 #include <geode/mesh/builder/tetrahedral_solid_builder.h>
@@ -150,7 +150,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    Tetra TetrahedralSolid< dimension >::tetra( index_t tetrahedron_id ) const
+    Tetrahedron TetrahedralSolid< dimension >::tetrahedron(
+        index_t tetrahedron_id ) const
     {
         return { this->point(
                      this->polyhedron_vertex( { tetrahedron_id, 0 } ) ),

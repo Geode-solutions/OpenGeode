@@ -30,7 +30,7 @@ namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
     ALIAS_3D( Point );
-    class OwnerTetra;
+    class OwnerTetrahedron;
 
     template < index_t dimension >
     using RefPoint = std::reference_wrapper< const Point< dimension > >;
@@ -40,64 +40,66 @@ namespace geode
 namespace geode
 {
     template < typename PointType >
-    class GenericTetra
+    class GenericTetrahedron
     {
     public:
         static constexpr std::array< std::array< index_t, 3 >, 4 >
-            tetra_facet_vertex{ { { { 1, 3, 2 } }, { { 0, 2, 3 } },
+            tetrahedron_facet_vertex{ { { { 1, 3, 2 } }, { { 0, 2, 3 } },
                 { { 3, 1, 0 } }, { { 0, 1, 2 } } } };
 
-        GenericTetra( const Point3D& p0,
+        GenericTetrahedron( const Point3D& p0,
             const Point3D& p1,
             const Point3D& p2,
             const Point3D& p3 );
 
-        GenericTetra( const GenericTetra& other );
-        GenericTetra& operator=( const GenericTetra& other );
-        GenericTetra( GenericTetra&& other );
-        GenericTetra& operator=( GenericTetra&& other );
+        GenericTetrahedron( const GenericTetrahedron& other );
+        GenericTetrahedron& operator=( const GenericTetrahedron& other );
+        GenericTetrahedron( GenericTetrahedron&& other );
+        GenericTetrahedron& operator=( GenericTetrahedron&& other );
 
         Point3D barycenter() const;
         void set_point( index_t vertex, const Point3D& point );
         const std::array< PointType, 4 >& vertices() const;
 
     protected:
-        GenericTetra( const OwnerTetra& other );
+        GenericTetrahedron( const OwnerTetrahedron& other );
 
     private:
         std::array< PointType, 4 > vertices_;
     };
 
-    class opengeode_geometry_api OwnerTetra : public GenericTetra< Point3D >
+    class opengeode_geometry_api OwnerTetrahedron
+        : public GenericTetrahedron< Point3D >
     {
-        using Base = GenericTetra< Point3D >;
+        using Base = GenericTetrahedron< Point3D >;
 
     public:
-        explicit OwnerTetra( const Point3D& p0,
+        explicit OwnerTetrahedron( const Point3D& p0,
             const Point3D& p1,
             const Point3D& p2,
             const Point3D& p3 );
 
-        OwnerTetra( const OwnerTetra& other );
-        OwnerTetra& operator=( const OwnerTetra& other );
-        OwnerTetra( OwnerTetra&& other );
-        OwnerTetra& operator=( OwnerTetra&& other );
+        OwnerTetrahedron( const OwnerTetrahedron& other );
+        OwnerTetrahedron& operator=( const OwnerTetrahedron& other );
+        OwnerTetrahedron( OwnerTetrahedron&& other );
+        OwnerTetrahedron& operator=( OwnerTetrahedron&& other );
     };
 
-    class opengeode_geometry_api Tetra : public GenericTetra< RefPoint3D >
+    class opengeode_geometry_api Tetrahedron
+        : public GenericTetrahedron< RefPoint3D >
     {
-        using Base = GenericTetra< RefPoint3D >;
+        using Base = GenericTetrahedron< RefPoint3D >;
 
     public:
-        Tetra( const Point3D& p0,
+        Tetrahedron( const Point3D& p0,
             const Point3D& p1,
             const Point3D& p2,
             const Point3D& p3 );
 
-        Tetra( const Tetra& other );
-        Tetra( const OwnerTetra& other );
-        Tetra& operator=( const Tetra& other );
-        Tetra( Tetra&& other );
-        Tetra& operator=( Tetra&& other );
+        Tetrahedron( const Tetrahedron& other );
+        Tetrahedron( const OwnerTetrahedron& other );
+        Tetrahedron& operator=( const Tetrahedron& other );
+        Tetrahedron( Tetrahedron&& other );
+        Tetrahedron& operator=( Tetrahedron&& other );
     };
 } // namespace geode

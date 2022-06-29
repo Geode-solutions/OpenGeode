@@ -31,7 +31,7 @@
 #include <geode/geometry/basic_objects/plane.h>
 #include <geode/geometry/basic_objects/segment.h>
 #include <geode/geometry/basic_objects/sphere.h>
-#include <geode/geometry/basic_objects/tetra.h>
+#include <geode/geometry/basic_objects/tetrahedron.h>
 #include <geode/geometry/basic_objects/triangle.h>
 #include <geode/geometry/distance.h>
 
@@ -672,63 +672,63 @@ void test_point_line_distance()
     test_point_line_distance_3d();
 }
 
-void test_point_tetra_distance()
+void test_point_tetrahedron_distance()
 {
     const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
     const geode::Point3D b{ { 1.0, 0.0, 0.0 } };
     const geode::Point3D c{ { 0.0, 1.0, 0.0 } };
     const geode::Point3D d{ { 0.0, 0.0, 1.0 } };
-    const geode::Tetra tetra{ a, b, c, d };
+    const geode::Tetrahedron tetra{ a, b, c, d };
 
     double distance;
     geode::Point3D closest_point, answer;
 
     std::tie( distance, closest_point ) =
-        geode::point_tetra_distance( a, tetra );
+        geode::point_tetrahedron_distance( a, tetra );
     OPENGEODE_EXCEPTION( distance == 0 && closest_point == a,
-        "[Test] Wrong result for point_tetra_distance with query Point3D "
+        "[Test] Wrong result for point_tetrahedron_distance with query Point3D "
         "a" );
 
     std::tie( distance, closest_point ) =
-        geode::point_tetra_distance( b, tetra );
+        geode::point_tetrahedron_distance( b, tetra );
     OPENGEODE_EXCEPTION( distance == 0 && closest_point == b,
-        "[Test] Wrong result for point_tetra_distance with query Point3D "
+        "[Test] Wrong result for point_tetrahedron_distance with query Point3D "
         "b" );
 
     std::tie( distance, closest_point ) =
-        geode::point_tetra_distance( c, tetra );
+        geode::point_tetrahedron_distance( c, tetra );
     OPENGEODE_EXCEPTION( distance == 0 && closest_point == c,
-        "[Test] Wrong result for point_tetra_distance with query Point3D "
+        "[Test] Wrong result for point_tetrahedron_distance with query Point3D "
         "c" );
 
     std::tie( distance, closest_point ) =
-        geode::point_tetra_distance( d, tetra );
+        geode::point_tetrahedron_distance( d, tetra );
     OPENGEODE_EXCEPTION( distance == 0 && closest_point == d,
-        "[Test] Wrong result for point_tetra_distance with query Point3D "
+        "[Test] Wrong result for point_tetrahedron_distance with query Point3D "
         "d" );
 
     const geode::Point3D q1{ { 0.25, 0.25, 0.25 } };
     std::tie( distance, closest_point ) =
-        geode::point_tetra_distance( q1, tetra );
+        geode::point_tetrahedron_distance( q1, tetra );
     OPENGEODE_EXCEPTION( distance == 0 && closest_point == q1,
-        "[Test] Wrong result for point_tetra_distance with query Point3D "
+        "[Test] Wrong result for point_tetrahedron_distance with query Point3D "
         "q1" );
 
     const geode::Point3D q2{ { 0.25, 0.25, 0.0 } };
     std::tie( distance, closest_point ) =
-        geode::point_tetra_distance( q2, tetra );
+        geode::point_tetrahedron_distance( q2, tetra );
     OPENGEODE_EXCEPTION( distance == 0 && closest_point == q2,
-        "[Test] Wrong result for point_tetra_distance with query Point3D "
+        "[Test] Wrong result for point_tetrahedron_distance with query Point3D "
         "q2" );
 
     const geode::Point3D q3{ { 2.5, 2.5, 0.0 } };
     std::tie( distance, closest_point ) =
-        geode::point_tetra_distance( q3, tetra );
+        geode::point_tetrahedron_distance( q3, tetra );
     answer = geode::Point3D{ { 0.5, 0.5, 0.0 } };
     OPENGEODE_EXCEPTION(
         distance == std::sqrt( 8 )
             && closest_point.inexact_equal( answer, geode::global_epsilon ),
-        "[Test] Wrong result for point_tetra_distance with query Point3D "
+        "[Test] Wrong result for point_tetrahedron_distance with query Point3D "
         "q3" );
 }
 
@@ -973,7 +973,7 @@ void test()
     test_segment_segment_distance();
     test_point_line_distance();
     test_point_triangle_distance();
-    test_point_tetra_distance();
+    test_point_tetrahedron_distance();
     test_point_plane_distance();
     test_point_sphere_distance();
     test_point_circle_distance();

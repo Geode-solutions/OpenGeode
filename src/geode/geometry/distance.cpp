@@ -28,7 +28,7 @@
 #include <geode/geometry/basic_objects/plane.h>
 #include <geode/geometry/basic_objects/segment.h>
 #include <geode/geometry/basic_objects/sphere.h>
-#include <geode/geometry/basic_objects/tetra.h>
+#include <geode/geometry/basic_objects/tetrahedron.h>
 #include <geode/geometry/basic_objects/triangle.h>
 #include <geode/geometry/perpendicular.h>
 #include <geode/geometry/projection.h>
@@ -445,8 +445,8 @@ namespace geode
         return std::make_tuple( result, closest_point );
     }
 
-    std::tuple< double, Point3D > point_tetra_distance(
-        const Point3D& point, const Tetra& tetra )
+    std::tuple< double, Point3D > point_tetrahedron_distance(
+        const Point3D& point, const Tetrahedron& tetra )
     {
         auto max_distance = MAX_DOUBLE;
         Point3D nearest_p;
@@ -456,9 +456,13 @@ namespace geode
             double distance;
             Point3D cur_p;
             std::tie( distance, cur_p ) = point_triangle_signed_distance( point,
-                Triangle3D{ tetra.vertices()[Tetra::tetra_facet_vertex[f][0]],
-                    tetra.vertices()[Tetra::tetra_facet_vertex[f][1]],
-                    tetra.vertices()[Tetra::tetra_facet_vertex[f][2]] } );
+                Triangle3D{
+                    tetra.vertices()[Tetrahedron::tetrahedron_facet_vertex[f]
+                                                                          [0]],
+                    tetra.vertices()[Tetrahedron::tetrahedron_facet_vertex[f]
+                                                                          [1]],
+                    tetra.vertices()
+                        [Tetrahedron::tetrahedron_facet_vertex[f][2]] } );
             if( distance > 0 )
             {
                 inside = false;

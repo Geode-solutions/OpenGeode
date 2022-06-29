@@ -36,7 +36,7 @@ namespace geode
     ALIAS_2D_AND_3D( Triangle );
     ALIAS_2D( InfiniteLine );
     class Plane;
-    class Tetra;
+    class Tetrahedron;
     class Circle;
     template < index_t dimension >
     using Ball = Sphere< dimension >;
@@ -124,8 +124,9 @@ namespace geode
      * - the smallest distance.
      * - the nearest point on the tetrahedron.
      */
-    std::tuple< double, Point3D > opengeode_geometry_api point_tetra_distance(
-        const Point3D& point, const Tetra& tetra );
+    std::tuple< double, Point3D >
+        opengeode_geometry_api point_tetrahedron_distance(
+            const Point3D& point, const Tetrahedron& tetra );
 
     /*!
      * Compute the distance between a point and a plane

@@ -26,7 +26,7 @@
 #include <async++.h>
 
 #include <geode/geometry/aabb.h>
-#include <geode/geometry/basic_objects/tetra.h>
+#include <geode/geometry/basic_objects/tetrahedron.h>
 #include <geode/geometry/distance.h>
 #include <geode/geometry/point.h>
 
@@ -57,7 +57,8 @@ namespace geode
         DistanceToTetrahedron< dimension >::operator()(
             const Point< dimension >& query, index_t cur_box ) const
     {
-        return point_tetra_distance( query, mesh_.tetra( cur_box ) );
+        return point_tetrahedron_distance(
+            query, mesh_.tetrahedron( cur_box ) );
     }
 
     template opengeode_mesh_api AABBTree3D create_aabb_tree< 3 >(

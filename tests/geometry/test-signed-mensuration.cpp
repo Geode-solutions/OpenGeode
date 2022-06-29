@@ -26,7 +26,7 @@
 
 #include <geode/geometry/point.h>
 
-#include <geode/geometry/basic_objects/tetra.h>
+#include <geode/geometry/basic_objects/tetrahedron.h>
 #include <geode/geometry/basic_objects/triangle.h>
 #include <geode/geometry/signed_mensuration.h>
 
@@ -130,29 +130,31 @@ void test_triangle_signed_area()
     test_triangle_signed_area_3d();
 }
 
-void test_tetra_signed_area()
+void test_tetrahedron_signed_area()
 {
     const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
     const geode::Point3D b{ { 1.0, 0.0, 0.0 } };
     const geode::Point3D c{ { 0.0, 1.0, 0.0 } };
     const geode::Point3D d{ { 0.0, 0.0, 1.0 } };
 
-    const geode::Tetra tetra1{ a, b, c, d };
-    const auto area1 = geode::tetra_signed_volume( tetra1 );
+    const geode::Tetrahedron tetra1{ a, b, c, d };
+    const auto area1 = geode::tetrahedron_signed_volume( tetra1 );
     OPENGEODE_EXCEPTION( area1 == 1. / 6.,
-        "[Test] Wrong result for tetra_signed_volume with query tetra tetra1" );
+        "[Test] Wrong result for tetrahedron_signed_volume "
+        "with query tetra tetra1" );
 
-    const geode::Tetra tetra2{ a, b, d, c };
-    const auto area2 = geode::tetra_signed_volume( tetra2 );
+    const geode::Tetrahedron tetra2{ a, b, d, c };
+    const auto area2 = geode::tetrahedron_signed_volume( tetra2 );
     OPENGEODE_EXCEPTION( area2 == -1. / 6.,
-        "[Test] Wrong result for tetra_signed_volume with query tetra tetra2" );
+        "[Test] Wrong result for tetrahedron_signed_volume "
+        "with query tetra tetra2" );
 }
 
 void test()
 {
     test_triangle_area();
     test_triangle_signed_area();
-    test_tetra_signed_area();
+    test_tetrahedron_signed_area();
 }
 
 OPENGEODE_TEST( "signed-mensuration" )

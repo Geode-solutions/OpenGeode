@@ -32,7 +32,7 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( Triangle );
     ALIAS_3D( Point );
 
-    class Tetra;
+    class Tetrahedron;
 } // namespace geode
 
 namespace geode
@@ -45,8 +45,8 @@ namespace geode
      * the tetra vertices.
      */
     std::array< double, 4 >
-        opengeode_geometry_api tetra_barycentric_coordinates(
-            const Point3D& point, const Tetra& tetra );
+        opengeode_geometry_api tetrahedron_barycentric_coordinates(
+            const Point3D& point, const Tetrahedron& tetra );
 
     /*!
      * Compute barycentric coordinates of a point with regards to a triangle.

@@ -8,6 +8,8 @@ XXXX
 
 ### Breaking Changes
 
+- **BasicObjects**: `Tetra` and related classes have been renamed in `Tetrahedron`. The header `basic_objets.h` has been removed and replaced by several files located in the `geode/geometry/basic_objects` folder. Methods containing the shorthand `tetra` have been renamed in `tetrahedron` too (e.g. `point_tetra_distance` in `point_tetrahedron_distance`).
+
 - **VertexIdentifier**: `MeshComponentVertex` has been renamed in `ComponentMeshVertex` and its methods `mesh_component_vertices` in `component_mesh_vertices`.
 
 - **PointsSort**: `morton_sort` has been renamed in `morton_mapping`.

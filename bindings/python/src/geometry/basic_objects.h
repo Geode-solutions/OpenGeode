@@ -28,7 +28,7 @@
 #include <geode/geometry/basic_objects/plane.h>
 #include <geode/geometry/basic_objects/segment.h>
 #include <geode/geometry/basic_objects/sphere.h>
-#include <geode/geometry/basic_objects/tetra.h>
+#include <geode/geometry/basic_objects/tetrahedron.h>
 #include <geode/geometry/basic_objects/triangle.h>
 #include <geode/geometry/information.h>
 
@@ -98,10 +98,10 @@ namespace geode
             .def( "origin", &Plane::origin )
             .def( "normal", &Plane::normal );
 
-        pybind11::class_< Tetra >( module, "Tetra" )
+        pybind11::class_< Tetrahedron >( module, "Tetrahedron" )
             .def( pybind11::init< const Point3D&, const Point3D&,
                 const Point3D&, const Point3D& >() )
-            .def( "vertices", &Tetra::vertices );
+            .def( "vertices", &Tetrahedron::vertices );
 
         pybind11::class_< Circle >( module, "Circle" )
             .def( pybind11::init< const Plane&, double >() )

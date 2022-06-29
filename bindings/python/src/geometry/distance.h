@@ -59,7 +59,7 @@ namespace geode
     {
         PYTHON_DISTANCE( 2 );
         PYTHON_DISTANCE( 3 );
-        module.def( "point_tetra_distance", &point_tetra_distance );
+        module.def( "point_tetrahedron_distance", &point_tetrahedron_distance );
         module.def( "point_plane_distance", &point_plane_distance );
         module.def(
             "point_plane_signed_distance", &point_plane_signed_distance );

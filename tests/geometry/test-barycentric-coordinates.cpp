@@ -29,7 +29,7 @@
 
 #include <geode/geometry/barycentric_coordinates.h>
 #include <geode/geometry/basic_objects/segment.h>
-#include <geode/geometry/basic_objects/tetra.h>
+#include <geode/geometry/basic_objects/tetrahedron.h>
 #include <geode/geometry/basic_objects/triangle.h>
 
 #include <geode/tests/common.h>
@@ -204,50 +204,56 @@ void test_triangle_barycentric_coordinates()
     test_triangle_barycentric_coordinates_3d();
 }
 
-void test_tetra_barycentric_coordinates()
+void test_tetrahedron_barycentric_coordinates()
 {
     const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
     const geode::Point3D b{ { 1.0, 0.0, 0.0 } };
     const geode::Point3D c{ { 0.0, 1.0, 0.0 } };
     const geode::Point3D d{ { 0.0, 0.0, 1.0 } };
-    const geode::Tetra tetra{ a, b, c, d };
+    const geode::Tetrahedron tetra{ a, b, c, d };
 
     OPENGEODE_EXCEPTION(
         check_bary_coords< 4 >(
-            geode::tetra_barycentric_coordinates( a, tetra ), { 1, 0, 0, 0 } ),
-        "[Test] Wrong result for tetra_barycentric_coordinates "
+            geode::tetrahedron_barycentric_coordinates( a, tetra ),
+            { 1, 0, 0, 0 } ),
+        "[Test] Wrong result for tetrahedron_barycentric_coordinates "
         "with query point a" );
 
     OPENGEODE_EXCEPTION(
         check_bary_coords< 4 >(
-            geode::tetra_barycentric_coordinates( b, tetra ), { 0, 1, 0, 0 } ),
-        "[Test] Wrong result for tetra_barycentric_coordinates "
+            geode::tetrahedron_barycentric_coordinates( b, tetra ),
+            { 0, 1, 0, 0 } ),
+        "[Test] Wrong result for tetrahedron_barycentric_coordinates "
         "with query point b" );
 
     OPENGEODE_EXCEPTION(
         check_bary_coords< 4 >(
-            geode::tetra_barycentric_coordinates( c, tetra ), { 0, 0, 1, 0 } ),
-        "[Test] Wrong result for tetra_barycentric_coordinates "
+            geode::tetrahedron_barycentric_coordinates( c, tetra ),
+            { 0, 0, 1, 0 } ),
+        "[Test] Wrong result for tetrahedron_barycentric_coordinates "
         "with query point c" );
 
     OPENGEODE_EXCEPTION(
         check_bary_coords< 4 >(
-            geode::tetra_barycentric_coordinates( d, tetra ), { 0, 0, 0, 1 } ),
-        "[Test] Wrong result for tetra_barycentric_coordinates "
+            geode::tetrahedron_barycentric_coordinates( d, tetra ),
+            { 0, 0, 0, 1 } ),
+        "[Test] Wrong result for tetrahedron_barycentric_coordinates "
         "with query point d" );
 
     const geode::Point3D q1{ { 0.25, 0.25, 0.25 } };
-    OPENGEODE_EXCEPTION( check_bary_coords< 4 >(
-                             geode::tetra_barycentric_coordinates( q1, tetra ),
-                             { 0.25, 0.25, 0.25, 0.25 } ),
-        "[Test] Wrong result for tetra_barycentric_coordinates "
+    OPENGEODE_EXCEPTION(
+        check_bary_coords< 4 >(
+            geode::tetrahedron_barycentric_coordinates( q1, tetra ),
+            { 0.25, 0.25, 0.25, 0.25 } ),
+        "[Test] Wrong result for tetrahedron_barycentric_coordinates "
         "with query point q1" );
 
     const geode::Point3D q2{ { 0.25, 1, -1 } };
-    OPENGEODE_EXCEPTION( check_bary_coords< 4 >(
-                             geode::tetra_barycentric_coordinates( q2, tetra ),
-                             { 0.75, 0.25, 1, -1 } ),
-        "[Test] Wrong result for tetra_barycentric_coordinates "
+    OPENGEODE_EXCEPTION(
+        check_bary_coords< 4 >(
+            geode::tetrahedron_barycentric_coordinates( q2, tetra ),
+            { 0.75, 0.25, 1, -1 } ),
+        "[Test] Wrong result for tetrahedron_barycentric_coordinates "
         "with query point q2" );
 }
 
@@ -255,7 +261,7 @@ void test()
 {
     test_segment_barycentric_coordinates();
     test_triangle_barycentric_coordinates();
-    test_tetra_barycentric_coordinates();
+    test_tetrahedron_barycentric_coordinates();
 }
 
 OPENGEODE_TEST( "barycentric-coordinates" )
