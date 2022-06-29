@@ -25,13 +25,13 @@
 
 #include <geode/basic/factory.h>
 
-#include <geode/mesh/io/vertex_set_input.h>
+#include <geode/mesh/io/input.h>
 
 #include <geode/model/common.h>
-#include <geode/model/representation/core/brep.h>
 
 namespace geode
 {
+    class BRep;
     class BRepBuilder;
 } // namespace geode
 
@@ -45,20 +45,12 @@ namespace geode
      */
     BRep opengeode_model_api load_brep( absl::string_view filename );
 
-    class opengeode_model_api BRepInput : public Input
+    class BRepInput : public Input< BRep >
     {
     protected:
-        BRepInput( BRep& brep, absl::string_view filename );
-
-        BRep& brep()
-        {
-            return brep_;
-        }
-
-    private:
-        BRep& brep_;
+        BRepInput( absl::string_view filename ) : Input< BRep >{ filename } {}
     };
 
     using BRepInputFactory =
-        Factory< std::string, BRepInput, BRep&, absl::string_view >;
+        Factory< std::string, BRepInput, absl::string_view >;
 } // namespace geode

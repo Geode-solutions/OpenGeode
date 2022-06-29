@@ -46,10 +46,9 @@ namespace geode
                     extension ),
                 "Unknown extension: ", extension );
             auto polyhedral_solid =
-                PolyhedralSolid< dimension >::create( impl );
-            auto input = PolyhedralSolidInputFactory< dimension >::create(
-                extension, *polyhedral_solid, filename );
-            input->read();
+                PolyhedralSolidInputFactory< dimension >::create(
+                    extension, filename )
+                    ->read( impl );
             if( polyhedral_solid->name() == Identifier::DEFAULT_NAME )
             {
                 PolyhedralSolidBuilder< dimension >::create( *polyhedral_solid )
@@ -80,20 +79,9 @@ namespace geode
             filename );
     }
 
-    template < index_t dimension >
-    PolyhedralSolidInput< dimension >::PolyhedralSolidInput(
-        PolyhedralSolid< dimension >& polyhedral_solid,
-        absl::string_view filename )
-        : VertexSetInput( polyhedral_solid, filename ),
-          polyhedral_solid_( polyhedral_solid )
-    {
-    }
-
     template std::unique_ptr< PolyhedralSolid< 3 > > opengeode_mesh_api
         load_polyhedral_solid( const MeshImpl&, absl::string_view );
 
     template std::unique_ptr< PolyhedralSolid< 3 > >
         opengeode_mesh_api load_polyhedral_solid( absl::string_view );
-
-    template class opengeode_mesh_api PolyhedralSolidInput< 3 >;
 } // namespace geode

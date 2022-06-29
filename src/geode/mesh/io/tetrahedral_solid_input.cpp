@@ -46,10 +46,9 @@ namespace geode
                     extension ),
                 "Unknown extension: ", extension );
             auto tetrahedral_solid =
-                TetrahedralSolid< dimension >::create( impl );
-            auto input = TetrahedralSolidInputFactory< dimension >::create(
-                extension, *tetrahedral_solid, filename );
-            input->read();
+                TetrahedralSolidInputFactory< dimension >::create(
+                    extension, filename )
+                    ->read( impl );
             if( tetrahedral_solid->name() == Identifier::DEFAULT_NAME )
             {
                 TetrahedralSolidBuilder< dimension >::create(
@@ -82,20 +81,9 @@ namespace geode
             filename );
     }
 
-    template < index_t dimension >
-    TetrahedralSolidInput< dimension >::TetrahedralSolidInput(
-        TetrahedralSolid< dimension >& tetrahedral_solid,
-        absl::string_view filename )
-        : VertexSetInput( tetrahedral_solid, filename ),
-          tetrahedral_solid_( tetrahedral_solid )
-    {
-    }
-
     template std::unique_ptr< TetrahedralSolid< 3 > > opengeode_mesh_api
         load_tetrahedral_solid( const MeshImpl&, absl::string_view );
 
     template std::unique_ptr< TetrahedralSolid< 3 > >
         opengeode_mesh_api load_tetrahedral_solid( absl::string_view );
-
-    template class opengeode_mesh_api TetrahedralSolidInput< 3 >;
 } // namespace geode

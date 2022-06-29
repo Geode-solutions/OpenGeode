@@ -67,6 +67,8 @@ namespace geode
         friend class bitsery::Access;
 
     public:
+        RegularGrid();
+
         RegularGrid( Point< dimension > origin,
             std::array< index_t, dimension > cells_number,
             std::array< double, dimension > cells_length );
@@ -191,8 +193,6 @@ namespace geode
         RegularGrid< dimension > clone() const;
 
     private:
-        RegularGrid();
-
         template < typename Archive >
         void serialize( Archive& archive );
 

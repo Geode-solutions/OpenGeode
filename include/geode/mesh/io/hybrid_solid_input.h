@@ -26,7 +26,8 @@
 #include <geode/basic/factory.h>
 
 #include <geode/mesh/common.h>
-#include <geode/mesh/io/vertex_set_input.h>
+#include <geode/mesh/core/mesh_id.h>
+#include <geode/mesh/io/input.h>
 
 namespace geode
 {
@@ -56,28 +57,23 @@ namespace geode
         absl::string_view filename );
 
     template < index_t dimension >
-    class HybridSolidInput : public VertexSetInput
+    class HybridSolidInput
+        : public Input< std::unique_ptr< HybridSolid< dimension > >, MeshImpl >
     {
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
-        OPENGEODE_DISABLE_COPY_AND_MOVE( HybridSolidInput );
 
     protected:
-        HybridSolidInput( HybridSolid< dimension >& hybrid_solid,
-            absl::string_view filename );
-
-        HybridSolid< dimension >& hybrid_solid()
+        HybridSolidInput( absl::string_view filename )
+            : Input< std::unique_ptr< HybridSolid< dimension > >, MeshImpl >{
+                  filename
+              }
         {
-            return hybrid_solid_;
         }
-
-    private:
-        HybridSolid< dimension >& hybrid_solid_;
     };
 
     template < index_t dimension >
     using HybridSolidInputFactory = Factory< std::string,
         HybridSolidInput< dimension >,
-        HybridSolid< dimension >&,
         absl::string_view >;
     ALIAS_3D( HybridSolidInputFactory );
 } // namespace geode

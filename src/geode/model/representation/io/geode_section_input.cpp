@@ -34,50 +34,47 @@
 namespace geode
 {
     void OpenGeodeSectionInput::load_section_files(
-        absl::string_view directory )
+        Section& section, absl::string_view directory )
     {
-        SectionBuilder builder{ section() };
-        absl::FixedArray< async::task< void > > tasks( 5 );
-        index_t count{ 0 };
-        tasks[count++] = async::spawn( [&builder, &directory] {
-            builder.load_identifier( directory );
-        } );
-        tasks[count++] = async::spawn( [&builder, &directory] {
-            builder.load_corners( directory );
-            builder.load_lines( directory );
-            builder.load_surfaces( directory );
-        } );
-        tasks[count++] = async::spawn( [&builder, &directory] {
-            builder.load_model_boundaries( directory );
-        } );
-        tasks[count++] = async::spawn( [&builder, &directory] {
-            builder.load_relationships( directory );
-        } );
-        tasks[count++] = async::spawn( [&builder, &directory] {
-            builder.load_unique_vertices( directory );
-        } );
-        async::when_all( tasks.begin(), tasks.end() )
-            .then( [&builder, this] {
-                for( const auto& corner : section().corners() )
-                {
-                    builder.register_mesh_component( corner );
-                }
-                for( const auto& line : section().lines() )
-                {
-                    builder.register_mesh_component( line );
-                }
-                for( const auto& surface : section().surfaces() )
-                {
-                    builder.register_mesh_component( surface );
-                }
-            } )
-            .wait();
+        SectionBuilder builder{ section };
+        async::parallel_invoke(
+            [&builder, &directory] {
+                builder.load_identifier( directory );
+            },
+            [&builder, &directory] {
+                builder.load_corners( directory );
+                builder.load_lines( directory );
+                builder.load_surfaces( directory );
+            },
+            [&builder, &directory] {
+                builder.load_model_boundaries( directory );
+            },
+            [&builder, &directory] {
+                builder.load_relationships( directory );
+            },
+            [&builder, &directory] {
+                builder.load_unique_vertices( directory );
+            } );
+        for( const auto& corner : section.corners() )
+        {
+            builder.register_mesh_component( corner );
+        }
+        for( const auto& line : section.lines() )
+        {
+            builder.register_mesh_component( line );
+        }
+        for( const auto& surface : section.surfaces() )
+        {
+            builder.register_mesh_component( surface );
+        }
     }
 
-    void OpenGeodeSectionInput::read()
+    Section OpenGeodeSectionInput::read()
     {
         const UnzipFile zip_reader{ filename(), uuid{}.string() };
         zip_reader.extract_all();
-        load_section_files( zip_reader.directory() );
+        Section section;
+        load_section_files( section, zip_reader.directory() );
+        return section;
     }
 } // namespace geode

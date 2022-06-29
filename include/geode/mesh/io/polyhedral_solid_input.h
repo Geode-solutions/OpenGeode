@@ -26,7 +26,8 @@
 #include <geode/basic/factory.h>
 
 #include <geode/mesh/common.h>
-#include <geode/mesh/io/vertex_set_input.h>
+#include <geode/mesh/core/mesh_id.h>
+#include <geode/mesh/io/input.h>
 
 namespace geode
 {
@@ -56,28 +57,23 @@ namespace geode
         absl::string_view filename );
 
     template < index_t dimension >
-    class PolyhedralSolidInput : public VertexSetInput
+    class PolyhedralSolidInput
+        : public Input< std::unique_ptr< PolyhedralSolid< dimension > >,
+              MeshImpl >
     {
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
-        OPENGEODE_DISABLE_COPY_AND_MOVE( PolyhedralSolidInput );
 
     protected:
-        PolyhedralSolidInput( PolyhedralSolid< dimension >& polyhedral_solid,
-            absl::string_view filename );
-
-        PolyhedralSolid< dimension >& polyhedral_solid()
+        PolyhedralSolidInput( absl::string_view filename )
+            : Input< std::unique_ptr< PolyhedralSolid< dimension > >,
+                MeshImpl >{ filename }
         {
-            return polyhedral_solid_;
         }
-
-    private:
-        PolyhedralSolid< dimension >& polyhedral_solid_;
     };
 
     template < index_t dimension >
     using PolyhedralSolidInputFactory = Factory< std::string,
         PolyhedralSolidInput< dimension >,
-        PolyhedralSolid< dimension >&,
         absl::string_view >;
     ALIAS_3D( PolyhedralSolidInputFactory );
 } // namespace geode

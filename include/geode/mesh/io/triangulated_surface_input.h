@@ -26,7 +26,8 @@
 #include <geode/basic/factory.h>
 
 #include <geode/mesh/common.h>
-#include <geode/mesh/io/vertex_set_input.h>
+#include <geode/mesh/core/mesh_id.h>
+#include <geode/mesh/io/input.h>
 
 namespace geode
 {
@@ -57,28 +58,21 @@ namespace geode
         load_triangulated_surface( absl::string_view filename );
 
     template < index_t dimension >
-    class TriangulatedSurfaceInput : public VertexSetInput
+    class TriangulatedSurfaceInput
+        : public Input< std::unique_ptr< TriangulatedSurface< dimension > >,
+              MeshImpl >
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( TriangulatedSurfaceInput );
-
     protected:
-        TriangulatedSurfaceInput(
-            TriangulatedSurface< dimension >& triangulated_surface,
-            absl::string_view filename );
-
-        TriangulatedSurface< dimension >& triangulated_surface()
+        TriangulatedSurfaceInput( absl::string_view filename )
+            : Input< std::unique_ptr< TriangulatedSurface< dimension > >,
+                MeshImpl >{ filename }
         {
-            return triangulated_surface_;
         }
-
-    private:
-        TriangulatedSurface< dimension >& triangulated_surface_;
     };
 
     template < index_t dimension >
     using TriangulatedSurfaceInputFactory = Factory< std::string,
         TriangulatedSurfaceInput< dimension >,
-        TriangulatedSurface< dimension >&,
         absl::string_view >;
     ALIAS_2D_AND_3D( TriangulatedSurfaceInputFactory );
 } // namespace geode

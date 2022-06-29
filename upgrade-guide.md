@@ -14,6 +14,8 @@ XXXX
 
 - **PointsSort**: `morton_sort` has been renamed `morton_mapping`.
 
+- **IO**: Input factories return the loaded Object and Output factories take the Object as parameter.
+
 ## Upgrading from OpenGeode v9.x.x to v10.0.0
 
 ### Motivations

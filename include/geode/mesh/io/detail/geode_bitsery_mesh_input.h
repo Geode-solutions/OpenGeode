@@ -29,8 +29,8 @@
 
 #include <geode/mesh/core/bitsery_archive.h>
 
-#define BITSERY_DO_READ()                                                      \
-    void do_read() final                                                       \
+#define BITSERY_READ( Mesh )                                                   \
+    std::unique_ptr< Mesh > read( const MeshImpl& impl ) final                 \
     {                                                                          \
         std::ifstream file{ to_string( this->filename() ),                     \
             std::ifstream::binary };                                           \
@@ -39,12 +39,14 @@
         register_geometry_deserialize_pcontext( std::get< 0 >( context ) );    \
         register_mesh_deserialize_pcontext( std::get< 0 >( context ) );        \
         Deserializer archive{ context, file };                                 \
-        archive.object( mesh_ );                                               \
+        auto mesh = Mesh::create( impl );                                      \
+        archive.object( dynamic_cast< OpenGeode##Mesh& >( *mesh ) );           \
         const auto& adapter = archive.adapter();                               \
         OPENGEODE_EXCEPTION( adapter.error() == bitsery::ReaderError::NoError  \
                                  && adapter.isCompletedSuccessfully()          \
                                  && std::get< 1 >( context ).isValid(),        \
             "[Bitsery::read] Error while reading file: ", this->filename() );  \
+        return mesh;                                                           \
     }
 
 #define BITSERY_INPUT_MESH_DIMENSION( Mesh )                                   \
@@ -52,17 +54,12 @@
     class OpenGeode##Mesh##Input : public Mesh##Input< dimension >             \
     {                                                                          \
     public:                                                                    \
-        OpenGeode##Mesh##Input(                                                \
-            Mesh< dimension >& mesh, absl::string_view filename )              \
-            : Mesh##Input< dimension >( mesh, filename ),                      \
-              mesh_( dynamic_cast< OpenGeode##Mesh< dimension >& >( mesh ) )   \
+        OpenGeode##Mesh##Input( absl::string_view filename )                   \
+            : Mesh##Input< dimension >( filename )                             \
         {                                                                      \
         }                                                                      \
                                                                                \
-        BITSERY_DO_READ()                                                      \
-                                                                               \
-    private:                                                                   \
-        OpenGeode##Mesh< dimension >& mesh_;                                   \
+        BITSERY_READ( Mesh< dimension > )                                      \
     };                                                                         \
     ALIAS_2D_AND_3D( OpenGeode##Mesh##Input )
 
@@ -70,14 +67,10 @@
     class OpenGeode##Mesh##Input : public Mesh##Input                          \
     {                                                                          \
     public:                                                                    \
-        OpenGeode##Mesh##Input( Mesh& mesh, absl::string_view filename )       \
-            : Mesh##Input( mesh, filename ),                                   \
-              mesh_( dynamic_cast< OpenGeode##Mesh& >( mesh ) )                \
+        OpenGeode##Mesh##Input( absl::string_view filename )                   \
+            : Mesh##Input( filename )                                          \
         {                                                                      \
         }                                                                      \
                                                                                \
-        BITSERY_DO_READ()                                                      \
-                                                                               \
-    private:                                                                   \
-        OpenGeode##Mesh& mesh_;                                                \
+        BITSERY_READ( Mesh )                                                   \
     }

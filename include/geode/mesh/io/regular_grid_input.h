@@ -45,15 +45,14 @@ namespace geode
         absl::string_view filename );
 
     template < index_t dimension >
-    class RegularGridInput : public Input
+    class RegularGridInput
+        : public Input< std::unique_ptr< RegularGrid< dimension > > >
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( RegularGridInput );
-
-    public:
-        virtual std::unique_ptr< RegularGrid< dimension > > regular_grid() = 0;
-
     protected:
-        RegularGridInput( absl::string_view filename );
+        RegularGridInput( absl::string_view filename )
+            : Input< std::unique_ptr< RegularGrid< dimension > > >{ filename }
+        {
+        }
     };
 
     template < index_t dimension >

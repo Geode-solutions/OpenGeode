@@ -27,6 +27,7 @@
 #include <geode/basic/timer.h>
 
 #include <geode/model/representation/builder/section_builder.h>
+#include <geode/model/representation/core/section.h>
 
 namespace geode
 {
@@ -39,10 +40,8 @@ namespace geode
                 to_string( extension_from_filename( filename ) );
             OPENGEODE_EXCEPTION( SectionInputFactory::has_creator( extension ),
                 "Unknown extension: ", extension );
-            Section section;
-            auto input =
-                SectionInputFactory::create( extension, section, filename );
-            input->read();
+            auto section =
+                SectionInputFactory::create( extension, filename )->read();
             if( section.name() == Identifier::DEFAULT_NAME )
             {
                 SectionBuilder{ section }.set_name(
@@ -62,10 +61,5 @@ namespace geode
             throw OpenGeodeException{ "Cannot load Section from file: ",
                 filename };
         }
-    }
-
-    SectionInput::SectionInput( Section& section, absl::string_view filename )
-        : Input( filename ), section_( section )
-    {
     }
 } // namespace geode

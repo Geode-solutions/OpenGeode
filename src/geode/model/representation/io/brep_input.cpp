@@ -27,6 +27,7 @@
 #include <geode/basic/timer.h>
 
 #include <geode/model/representation/builder/brep_builder.h>
+#include <geode/model/representation/core/brep.h>
 
 namespace geode
 {
@@ -39,9 +40,7 @@ namespace geode
                 to_string( extension_from_filename( filename ) );
             OPENGEODE_EXCEPTION( BRepInputFactory::has_creator( extension ),
                 "Unknown extension: ", extension );
-            BRep brep;
-            auto input = BRepInputFactory::create( extension, brep, filename );
-            input->read();
+            auto brep = BRepInputFactory::create( extension, filename )->read();
             if( brep.name() == Identifier::DEFAULT_NAME )
             {
                 BRepBuilder{ brep }.set_name(
@@ -61,10 +60,5 @@ namespace geode
             throw OpenGeodeException{ "Cannot load BRep from file: ",
                 filename };
         }
-    }
-
-    BRepInput::BRepInput( BRep& brep, absl::string_view filename )
-        : Input( filename ), brep_( brep )
-    {
     }
 } // namespace geode

@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/model/representation/core/brep.h>
 #include <geode/model/representation/io/brep_input.h>
 
 namespace geode
@@ -30,8 +31,7 @@ namespace geode
     class opengeode_model_api OpenGeodeBRepInput final : public BRepInput
     {
     public:
-        OpenGeodeBRepInput( BRep& brep, absl::string_view filename )
-            : BRepInput( brep, filename )
+        OpenGeodeBRepInput( absl::string_view filename ) : BRepInput( filename )
         {
         }
 
@@ -40,8 +40,8 @@ namespace geode
             return BRep::native_extension_static();
         }
 
-        void load_brep_files( absl::string_view directory );
+        void load_brep_files( BRep& brep, absl::string_view directory );
 
-        void read() final;
+        BRep read() final;
     };
 } // namespace geode

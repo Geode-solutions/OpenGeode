@@ -44,10 +44,9 @@ namespace geode
             OPENGEODE_EXCEPTION(
                 PointSetInputFactory< dimension >::has_creator( extension ),
                 "Unknown extension: ", extension );
-            auto point_set = PointSet< dimension >::create( impl );
-            auto input = PointSetInputFactory< dimension >::create(
-                extension, *point_set, filename );
-            input->read();
+            auto point_set =
+                PointSetInputFactory< dimension >::create( extension, filename )
+                    ->read( impl );
             if( point_set->name() == Identifier::DEFAULT_NAME )
             {
                 PointSetBuilder< dimension >::create( *point_set )
@@ -77,13 +76,6 @@ namespace geode
             filename );
     }
 
-    template < index_t dimension >
-    PointSetInput< dimension >::PointSetInput(
-        PointSet< dimension >& point_set, absl::string_view filename )
-        : VertexSetInput( point_set, filename ), point_set_( point_set )
-    {
-    }
-
     template std::unique_ptr< PointSet< 2 > > opengeode_mesh_api load_point_set(
         const MeshImpl&, absl::string_view );
     template std::unique_ptr< PointSet< 3 > > opengeode_mesh_api load_point_set(
@@ -93,7 +85,4 @@ namespace geode
         absl::string_view );
     template std::unique_ptr< PointSet< 3 > > opengeode_mesh_api load_point_set(
         absl::string_view );
-
-    template class opengeode_mesh_api PointSetInput< 2 >;
-    template class opengeode_mesh_api PointSetInput< 3 >;
 } // namespace geode

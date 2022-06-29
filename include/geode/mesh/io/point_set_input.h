@@ -27,7 +27,7 @@
 
 #include <geode/mesh/common.h>
 #include <geode/mesh/core/mesh_id.h>
-#include <geode/mesh/io/vertex_set_input.h>
+#include <geode/mesh/io/input.h>
 
 namespace geode
 {
@@ -57,27 +57,16 @@ namespace geode
         absl::string_view filename );
 
     template < index_t dimension >
-    class PointSetInput : public VertexSetInput
+    class PointSetInput : public Input<std::unique_ptr< PointSet< dimension > >,MeshImpl>
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( PointSetInput );
-
     protected:
         PointSetInput(
-            PointSet< dimension >& point_set, absl::string_view filename );
-
-        PointSet< dimension >& point_set()
-        {
-            return point_set_;
-        }
-
-    private:
-        PointSet< dimension >& point_set_;
+            absl::string_view filename ):Input<std::unique_ptr< PointSet< dimension > >,MeshImpl>{filename}{}
     };
 
     template < index_t dimension >
     using PointSetInputFactory = Factory< std::string,
         PointSetInput< dimension >,
-        PointSet< dimension >&,
         absl::string_view >;
     ALIAS_2D_AND_3D( PointSetInputFactory );
 } // namespace geode

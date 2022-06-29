@@ -26,7 +26,8 @@
 #include <geode/basic/factory.h>
 
 #include <geode/mesh/common.h>
-#include <geode/mesh/io/vertex_set_input.h>
+#include <geode/mesh/core/mesh_id.h>
+#include <geode/mesh/io/input.h>
 
 namespace geode
 {
@@ -56,27 +57,21 @@ namespace geode
         absl::string_view filename );
 
     template < index_t dimension >
-    class PolygonalSurfaceInput : public VertexSetInput
+    class PolygonalSurfaceInput
+        : public Input< std::unique_ptr< PolygonalSurface< dimension > >,
+              MeshImpl >
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( PolygonalSurfaceInput );
-
     protected:
-        PolygonalSurfaceInput( PolygonalSurface< dimension >& polygonal_surface,
-            absl::string_view filename );
-
-        PolygonalSurface< dimension >& polygonal_surface()
+        PolygonalSurfaceInput( absl::string_view filename )
+            : Input< std::unique_ptr< PolygonalSurface< dimension > >,
+                MeshImpl >{ filename }
         {
-            return polygonal_surface_;
         }
-
-    private:
-        PolygonalSurface< dimension >& polygonal_surface_;
     };
 
     template < index_t dimension >
     using PolygonalSurfaceInputFactory = Factory< std::string,
         PolygonalSurfaceInput< dimension >,
-        PolygonalSurface< dimension >&,
         absl::string_view >;
     ALIAS_2D_AND_3D( PolygonalSurfaceInputFactory );
 } // namespace geode

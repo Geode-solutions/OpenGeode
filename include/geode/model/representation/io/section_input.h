@@ -28,10 +28,10 @@
 #include <geode/mesh/io/vertex_set_input.h>
 
 #include <geode/model/common.h>
-#include <geode/model/representation/core/section.h>
 
 namespace geode
 {
+    class Section;
     class SectionBuilder;
 } // namespace geode
 
@@ -45,20 +45,15 @@ namespace geode
      */
     Section opengeode_model_api load_section( absl::string_view filename );
 
-    class opengeode_model_api SectionInput : public Input
+    class SectionInput : public Input< Section >
     {
     protected:
-        SectionInput( Section& section, absl::string_view filename );
-
-        Section& section()
+        SectionInput( absl::string_view filename )
+            : Input< Section >{ filename }
         {
-            return section_;
         }
-
-    private:
-        Section& section_;
     };
 
     using SectionInputFactory =
-        Factory< std::string, SectionInput, Section&, absl::string_view >;
+        Factory< std::string, SectionInput, absl::string_view >;
 } // namespace geode

@@ -26,7 +26,8 @@
 #include <geode/basic/factory.h>
 
 #include <geode/mesh/common.h>
-#include <geode/mesh/io/vertex_set_input.h>
+#include <geode/mesh/core/mesh_id.h>
+#include <geode/mesh/io/input.h>
 
 namespace geode
 {
@@ -53,20 +54,15 @@ namespace geode
     std::unique_ptr< Graph > opengeode_mesh_api load_graph(
         absl::string_view filename );
 
-    class opengeode_mesh_api GraphInput : public VertexSetInput
+    class GraphInput : public Input< std::unique_ptr< Graph >, MeshImpl >
     {
     protected:
-        GraphInput( Graph& graph, absl::string_view filename );
-
-        Graph& graph()
+        GraphInput( absl::string_view filename )
+            : Input< std::unique_ptr< Graph >, MeshImpl >{ filename }
         {
-            return graph_;
         }
-
-    private:
-        Graph& graph_;
     };
 
     using GraphInputFactory =
-        Factory< std::string, GraphInput, Graph&, absl::string_view >;
+        Factory< std::string, GraphInput, absl::string_view >;
 } // namespace geode

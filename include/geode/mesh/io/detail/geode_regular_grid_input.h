@@ -35,11 +35,9 @@ namespace geode
         OpenGeodeRegularGridInput( absl::string_view filename )
             : RegularGridInput< dimension >( filename )
         {
-            auto mesh = bitsery::Access::create< RegularGrid< dimension > >();
-            mesh_.reset( new RegularGrid< dimension >{ std::move( mesh ) } );
         }
 
-        void read() final
+        std::unique_ptr< RegularGrid< dimension > > read() final
         {
             std::ifstream file{ to_string( this->filename() ),
                 std::ifstream::binary };
@@ -48,7 +46,8 @@ namespace geode
             register_geometry_deserialize_pcontext( std::get< 0 >( context ) );
             register_mesh_deserialize_pcontext( std::get< 0 >( context ) );
             Deserializer archive{ context, file };
-            archive.object( *mesh_ );
+            auto mesh = absl::make_unique< RegularGrid< dimension > >();
+            archive.object( *mesh );
             const auto& adapter = archive.adapter();
             OPENGEODE_EXCEPTION(
                 adapter.error() == bitsery::ReaderError::NoError
@@ -56,15 +55,8 @@ namespace geode
                     && std::get< 1 >( context ).isValid(),
                 "[Bitsery::read] Error while reading file: ",
                 this->filename() );
+            return mesh;
         }
-
-        std::unique_ptr< RegularGrid< dimension > > regular_grid() override
-        {
-            return std::move( mesh_ );
-        }
-
-    private:
-        std::unique_ptr< RegularGrid< dimension > > mesh_;
     };
     ALIAS_2D_AND_3D( OpenGeodeRegularGridInput );
 } // namespace geode

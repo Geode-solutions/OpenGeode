@@ -26,7 +26,8 @@
 #include <geode/basic/factory.h>
 
 #include <geode/mesh/common.h>
-#include <geode/mesh/io/graph_input.h>
+#include <geode/mesh/core/mesh_id.h>
+#include <geode/mesh/io/input.h>
 
 namespace geode
 {
@@ -56,27 +57,20 @@ namespace geode
         absl::string_view filename );
 
     template < index_t dimension >
-    class EdgedCurveInput : public GraphInput
+    class EdgedCurveInput
+        : public Input< std::unique_ptr< EdgedCurve< dimension > >, MeshImpl >
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( EdgedCurveInput );
-
     protected:
-        EdgedCurveInput(
-            EdgedCurve< dimension >& edged_curve, absl::string_view filename );
-
-        EdgedCurve< dimension >& edged_curve()
+        EdgedCurveInput( absl::string_view filename )
+            : Input< std::unique_ptr< EdgedCurve< dimension > >, MeshImpl >{
+                  filename
+              }
         {
-            return edged_curve_;
         }
-
-    private:
-        EdgedCurve< dimension >& edged_curve_;
     };
 
     template < index_t dimension >
-    using EdgedCurveInputFactory = Factory< std::string,
-        EdgedCurveInput< dimension >,
-        EdgedCurve< dimension >&,
-        absl::string_view >;
+    using EdgedCurveInputFactory =
+        Factory< std::string, EdgedCurveInput< dimension >, absl::string_view >;
     ALIAS_2D_AND_3D( EdgedCurveInputFactory );
 } // namespace geode

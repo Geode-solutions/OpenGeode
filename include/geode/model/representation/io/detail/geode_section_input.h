@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/model/representation/core/section.h>
 #include <geode/model/representation/io/section_input.h>
 
 namespace geode
@@ -30,8 +31,8 @@ namespace geode
     class opengeode_model_api OpenGeodeSectionInput final : public SectionInput
     {
     public:
-        OpenGeodeSectionInput( Section& section, absl::string_view filename )
-            : SectionInput( section, filename )
+        OpenGeodeSectionInput( absl::string_view filename )
+            : SectionInput( filename )
         {
         }
 
@@ -40,8 +41,9 @@ namespace geode
             return Section::native_extension_static();
         }
 
-        void load_section_files( absl::string_view directory );
+        void load_section_files(
+            Section& section, absl::string_view directory );
 
-        void read() final;
+        Section read() final;
     };
 } // namespace geode

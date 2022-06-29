@@ -44,10 +44,9 @@ namespace geode
             OPENGEODE_EXCEPTION(
                 HybridSolidInputFactory< dimension >::has_creator( extension ),
                 "Unknown extension: ", extension );
-            auto hybrid_solid = HybridSolid< dimension >::create( impl );
-            auto input = HybridSolidInputFactory< dimension >::create(
-                extension, *hybrid_solid, filename );
-            input->read();
+            auto hybrid_solid = HybridSolidInputFactory< dimension >::create(
+                extension, filename )
+                                    ->read( impl );
             if( hybrid_solid->name() == Identifier::DEFAULT_NAME )
             {
                 HybridSolidBuilder< dimension >::create( *hybrid_solid )
@@ -78,19 +77,9 @@ namespace geode
             filename );
     }
 
-    template < index_t dimension >
-    HybridSolidInput< dimension >::HybridSolidInput(
-        HybridSolid< dimension >& hybrid_solid, absl::string_view filename )
-        : VertexSetInput( hybrid_solid, filename ),
-          hybrid_solid_( hybrid_solid )
-    {
-    }
-
     template std::unique_ptr< HybridSolid< 3 > > opengeode_mesh_api
         load_hybrid_solid( const MeshImpl&, absl::string_view );
 
     template std::unique_ptr< HybridSolid< 3 > >
         opengeode_mesh_api load_hybrid_solid( absl::string_view );
-
-    template class opengeode_mesh_api HybridSolidInput< 3 >;
 } // namespace geode

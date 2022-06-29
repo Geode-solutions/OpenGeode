@@ -42,11 +42,9 @@ namespace geode
             OPENGEODE_EXCEPTION(
                 RegularGridInputFactory< dimension >::has_creator( extension ),
                 "Unknown extension: ", extension );
-            auto input = RegularGridInputFactory< dimension >::create(
-                extension, filename );
-            input->read();
-            auto grid = input->regular_grid();
-
+            auto grid = RegularGridInputFactory< dimension >::create(
+                extension, filename )
+                            ->read();
             Logger::info( "RegularGrid", dimension, "D loaded from ", filename,
                 " in ", timer.duration() );
             Logger::info( "RegularGrid", dimension, "D has: ", grid->nb_cells(),
@@ -61,18 +59,8 @@ namespace geode
         }
     }
 
-    template < index_t dimension >
-    RegularGridInput< dimension >::RegularGridInput(
-        absl::string_view filename )
-        : Input( filename )
-    {
-    }
-
     template std::unique_ptr< RegularGrid< 2 > >
         opengeode_mesh_api load_regular_grid( absl::string_view );
     template std::unique_ptr< RegularGrid< 3 > >
         opengeode_mesh_api load_regular_grid( absl::string_view );
-
-    template class opengeode_mesh_api RegularGridInput< 2 >;
-    template class opengeode_mesh_api RegularGridInput< 3 >;
 } // namespace geode

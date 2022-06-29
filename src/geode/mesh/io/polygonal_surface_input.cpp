@@ -46,10 +46,9 @@ namespace geode
                     extension ),
                 "Unknown extension: ", extension );
             auto polygonal_surface =
-                PolygonalSurface< dimension >::create( impl );
-            auto input = PolygonalSurfaceInputFactory< dimension >::create(
-                extension, *polygonal_surface, filename );
-            input->read();
+                PolygonalSurfaceInputFactory< dimension >::create(
+                    extension, filename )
+                    ->read( impl );
             if( polygonal_surface->name() == Identifier::DEFAULT_NAME )
             {
                 PolygonalSurfaceBuilder< dimension >::create(
@@ -82,15 +81,6 @@ namespace geode
             filename );
     }
 
-    template < index_t dimension >
-    PolygonalSurfaceInput< dimension >::PolygonalSurfaceInput(
-        PolygonalSurface< dimension >& polygonal_surface,
-        absl::string_view filename )
-        : VertexSetInput( polygonal_surface, filename ),
-          polygonal_surface_( polygonal_surface )
-    {
-    }
-
     template std::unique_ptr< PolygonalSurface< 2 > > opengeode_mesh_api
         load_polygonal_surface( const MeshImpl&, absl::string_view );
     template std::unique_ptr< PolygonalSurface< 3 > > opengeode_mesh_api
@@ -100,7 +90,4 @@ namespace geode
         opengeode_mesh_api load_polygonal_surface( absl::string_view );
     template std::unique_ptr< PolygonalSurface< 3 > >
         opengeode_mesh_api load_polygonal_surface( absl::string_view );
-
-    template class opengeode_mesh_api PolygonalSurfaceInput< 2 >;
-    template class opengeode_mesh_api PolygonalSurfaceInput< 3 >;
 } // namespace geode

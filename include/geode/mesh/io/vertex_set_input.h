@@ -54,29 +54,16 @@ namespace geode
     std::unique_ptr< VertexSet > opengeode_mesh_api load_vertex_set(
         absl::string_view filename );
 
-    class opengeode_mesh_api VertexSetInput : public Input
+    class VertexSetInput
+        : public Input< std::unique_ptr< VertexSet >, MeshImpl >
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( VertexSetInput );
-
-        void read() final;
-
     protected:
-        VertexSetInput( VertexSet& vertex_set, absl::string_view filename );
-
-        VertexSet& vertex_set()
+        VertexSetInput( absl::string_view filename )
+            : Input< std::unique_ptr< VertexSet >, MeshImpl >{ filename }
         {
-            return vertex_set_;
         }
-
-    private:
-        void check_emptiness();
-
-        virtual void do_read() = 0;
-
-    private:
-        VertexSet& vertex_set_;
     };
 
     using VertexSetInputFactory =
-        Factory< std::string, VertexSetInput, VertexSet&, absl::string_view >;
+        Factory< std::string, VertexSetInput, absl::string_view >;
 } // namespace geode

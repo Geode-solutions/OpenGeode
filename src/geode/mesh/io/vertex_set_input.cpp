@@ -50,10 +50,9 @@ namespace geode
             OPENGEODE_EXCEPTION(
                 VertexSetInputFactory::has_creator( extension ),
                 "Unknown extension: ", extension );
-            auto vertex_set = VertexSet::create( impl );
-            auto input = VertexSetInputFactory::create(
-                extension, *vertex_set, filename );
-            input->read();
+            auto vertex_set =
+                VertexSetInputFactory::create( extension, filename )
+                    ->read( impl );
             if( vertex_set->name() == Identifier::DEFAULT_NAME )
             {
                 VertexSetBuilder::create( *vertex_set )
@@ -71,24 +70,5 @@ namespace geode
             throw OpenGeodeException{ "Cannot load VertexSet from file: ",
                 filename };
         }
-    }
-
-    VertexSetInput::VertexSetInput(
-        VertexSet& vertex_set, absl::string_view filename )
-        : Input( filename ), vertex_set_( vertex_set )
-    {
-    }
-
-    void VertexSetInput::read()
-    {
-        check_emptiness();
-        do_read();
-    }
-
-    void VertexSetInput::check_emptiness()
-    {
-        OPENGEODE_EXCEPTION( vertex_set_.nb_vertices() == 0,
-            "[VertexSetInput::check_emptiness] "
-            "The given mesh should be empty." );
     }
 } // namespace geode

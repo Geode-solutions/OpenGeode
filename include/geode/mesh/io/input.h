@@ -28,10 +28,11 @@
 
 namespace geode
 {
-    class opengeode_mesh_api Input : public IOFile
+    template < typename Mesh, typename... Args >
+    class Input : public IOFile
     {
     public:
-        virtual void read() = 0;
+        virtual Mesh read( const Args&... args ) = 0;
 
     protected:
         Input( absl::string_view filename ) : IOFile( filename ) {}

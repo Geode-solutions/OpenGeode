@@ -42,10 +42,8 @@ namespace geode
                 to_string( extension_from_filename( filename ) );
             OPENGEODE_EXCEPTION( GraphInputFactory::has_creator( extension ),
                 "Unknown extension: ", extension );
-            auto graph = Graph::create( impl );
-            auto input =
-                GraphInputFactory::create( extension, *graph, filename );
-            input->read();
+            auto graph =
+                GraphInputFactory::create( extension, filename )->read( impl );
             if( graph->name() == Identifier::DEFAULT_NAME )
             {
                 GraphBuilder::create( *graph )->set_name(
@@ -69,10 +67,5 @@ namespace geode
     {
         return load_graph(
             MeshFactory::default_impl( Graph::type_name_static() ), filename );
-    }
-
-    GraphInput::GraphInput( Graph& graph, absl::string_view filename )
-        : VertexSetInput( graph, filename ), graph_( graph )
-    {
     }
 } // namespace geode

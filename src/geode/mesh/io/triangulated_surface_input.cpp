@@ -47,10 +47,9 @@ namespace geode
                     extension ),
                 "Unknown extension: ", extension );
             auto triangulated_surface =
-                TriangulatedSurface< dimension >::create( impl );
-            auto input = TriangulatedSurfaceInputFactory< dimension >::create(
-                extension, *triangulated_surface, filename );
-            input->read();
+                TriangulatedSurfaceInputFactory< dimension >::create(
+                    extension, filename )
+                    ->read( impl );
             if( triangulated_surface->name() == Identifier::DEFAULT_NAME )
             {
                 TriangulatedSurfaceBuilder< dimension >::create(
@@ -83,15 +82,6 @@ namespace geode
             filename );
     }
 
-    template < index_t dimension >
-    TriangulatedSurfaceInput< dimension >::TriangulatedSurfaceInput(
-        TriangulatedSurface< dimension >& triangulated_surface,
-        absl::string_view filename )
-        : VertexSetInput( triangulated_surface, filename ),
-          triangulated_surface_( triangulated_surface )
-    {
-    }
-
     template std::unique_ptr< TriangulatedSurface< 2 > > opengeode_mesh_api
         load_triangulated_surface( const MeshImpl&, absl::string_view );
     template std::unique_ptr< TriangulatedSurface< 3 > > opengeode_mesh_api
@@ -101,7 +91,4 @@ namespace geode
         opengeode_mesh_api load_triangulated_surface( absl::string_view );
     template std::unique_ptr< TriangulatedSurface< 3 > >
         opengeode_mesh_api load_triangulated_surface( absl::string_view );
-
-    template class opengeode_mesh_api TriangulatedSurfaceInput< 2 >;
-    template class opengeode_mesh_api TriangulatedSurfaceInput< 3 >;
 } // namespace geode

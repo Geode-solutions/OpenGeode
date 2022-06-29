@@ -44,10 +44,9 @@ namespace geode
             OPENGEODE_EXCEPTION(
                 EdgedCurveInputFactory< dimension >::has_creator( extension ),
                 "Unknown extension: ", extension );
-            auto edged_curve = EdgedCurve< dimension >::create( impl );
-            auto input = EdgedCurveInputFactory< dimension >::create(
-                extension, *edged_curve, filename );
-            input->read();
+            auto edged_curve = EdgedCurveInputFactory< dimension >::create(
+                extension, filename )
+                                   ->read( impl );
             if( edged_curve->name() == Identifier::DEFAULT_NAME )
             {
                 EdgedCurveBuilder< dimension >::create( *edged_curve )
@@ -78,13 +77,6 @@ namespace geode
             filename );
     }
 
-    template < index_t dimension >
-    EdgedCurveInput< dimension >::EdgedCurveInput(
-        EdgedCurve< dimension >& edged_curve, absl::string_view filename )
-        : GraphInput( edged_curve, filename ), edged_curve_( edged_curve )
-    {
-    }
-
     template std::unique_ptr< EdgedCurve< 2 > > opengeode_mesh_api
         load_edged_curve( const MeshImpl&, absl::string_view );
     template std::unique_ptr< EdgedCurve< 3 > > opengeode_mesh_api
@@ -94,7 +86,4 @@ namespace geode
         opengeode_mesh_api load_edged_curve( absl::string_view );
     template std::unique_ptr< EdgedCurve< 3 > >
         opengeode_mesh_api load_edged_curve( absl::string_view );
-
-    template class opengeode_mesh_api EdgedCurveInput< 2 >;
-    template class opengeode_mesh_api EdgedCurveInput< 3 >;
 } // namespace geode

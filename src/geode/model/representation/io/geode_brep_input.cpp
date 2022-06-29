@@ -33,55 +33,53 @@
 
 namespace geode
 {
-    void OpenGeodeBRepInput::load_brep_files( absl::string_view directory )
+    void OpenGeodeBRepInput::load_brep_files(
+        BRep& brep, absl::string_view directory )
     {
-        BRepBuilder builder{ brep() };
-        absl::FixedArray< async::task< void > > tasks( 5 );
-        index_t count{ 0 };
-        tasks[count++] = async::spawn( [&builder, &directory] {
-            builder.load_identifier( directory );
-        } );
-        tasks[count++] = async::spawn( [&builder, &directory] {
-            builder.load_corners( directory );
-            builder.load_lines( directory );
-            builder.load_surfaces( directory );
-            builder.load_blocks( directory );
-        } );
-        tasks[count++] = async::spawn( [&builder, &directory] {
-            builder.load_model_boundaries( directory );
-        } );
-        tasks[count++] = async::spawn( [&builder, &directory] {
-            builder.load_relationships( directory );
-        } );
-        tasks[count++] = async::spawn( [&builder, &directory] {
-            builder.load_unique_vertices( directory );
-        } );
-        async::when_all( tasks.begin(), tasks.end() )
-            .then( [&builder, this] {
-                for( const auto& corner : brep().corners() )
-                {
-                    builder.register_mesh_component( corner );
-                }
-                for( const auto& line : brep().lines() )
-                {
-                    builder.register_mesh_component( line );
-                }
-                for( const auto& surface : brep().surfaces() )
-                {
-                    builder.register_mesh_component( surface );
-                }
-                for( const auto& block : brep().blocks() )
-                {
-                    builder.register_mesh_component( block );
-                }
-            } )
-            .wait();
+        BRepBuilder builder{ brep };
+        async::parallel_invoke(
+            [&builder, &directory] {
+                builder.load_identifier( directory );
+            },
+            [&builder, &directory] {
+                builder.load_corners( directory );
+                builder.load_lines( directory );
+                builder.load_surfaces( directory );
+                builder.load_blocks( directory );
+            },
+            [&builder, &directory] {
+                builder.load_model_boundaries( directory );
+            },
+            [&builder, &directory] {
+                builder.load_relationships( directory );
+            },
+            [&builder, &directory] {
+                builder.load_unique_vertices( directory );
+            } );
+        for( const auto& corner : brep.corners() )
+        {
+            builder.register_mesh_component( corner );
+        }
+        for( const auto& line : brep.lines() )
+        {
+            builder.register_mesh_component( line );
+        }
+        for( const auto& surface : brep.surfaces() )
+        {
+            builder.register_mesh_component( surface );
+        }
+        for( const auto& block : brep.blocks() )
+        {
+            builder.register_mesh_component( block );
+        }
     }
 
-    void OpenGeodeBRepInput::read()
+    BRep OpenGeodeBRepInput::read()
     {
         const UnzipFile zip_reader{ filename(), uuid{}.string() };
         zip_reader.extract_all();
-        load_brep_files( zip_reader.directory() );
+        BRep brep;
+        load_brep_files( brep, zip_reader.directory() );
+        return brep;
     }
 } // namespace geode
