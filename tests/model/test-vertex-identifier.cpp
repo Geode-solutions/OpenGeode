@@ -131,22 +131,22 @@ void test_set_unique_vertices(
         "[Test] Search of unique vertices is not correct" );
     OPENGEODE_EXCEPTION( vertex_identifier.has_component_mesh_vertices(
                              0, geode::Corner2D::component_type_static() ),
-        "[Test] Unique vertex should have mesh component vertices of type "
+        "[Test] Unique vertex should have component mesh vertices of type "
         "Corner" );
     const auto& uvertices0_type = vertex_identifier.component_mesh_vertices(
         0, geode::Corner2D::component_type_static() );
     OPENGEODE_EXCEPTION( uvertices0_type.size() == 2,
         "[Test] Search of unique vertices by "
-        "MeshComponentType is not correct" );
+        "ComponentType is not correct" );
     OPENGEODE_EXCEPTION(
         vertex_identifier.has_component_mesh_vertices( 0, uuids[0] ),
-        "[Test] Unique vertex should have mesh component vertices of given "
+        "[Test] Unique vertex should have component mesh vertices of given "
         "Corner id" );
     OPENGEODE_EXCEPTION(
         vertex_identifier.component_mesh_vertices( 0, uuids[0] ).size() == 1
             && vertex_identifier.component_mesh_vertices( 0, uuids[0] ).front()
                    == 0,
-        "[Test] Search of unique vertices by MeshComponent UUID is not "
+        "[Test] Search of unique vertices by ComponentMeshUUID is not "
         "correct" );
 
     const auto& uvertices3 = vertex_identifier.component_mesh_vertices( 3 );
@@ -197,7 +197,7 @@ void test_save_and_load_unique_vertices(
             vertex_identifier.component_mesh_vertices( v_id ).size()
                 == vertex_identifier2.component_mesh_vertices( v_id ).size(),
             "[Test] Save/Load of unique vertices are not correct (different "
-            "number of mesh component vertices)" );
+            "number of component mesh vertices)" );
         for( const auto cmv : geode::Range{
                  vertex_identifier.component_mesh_vertices( v_id ).size() } )
         {
@@ -205,7 +205,7 @@ void test_save_and_load_unique_vertices(
                 vertex_identifier.component_mesh_vertices( v_id )[cmv]
                     == vertex_identifier2.component_mesh_vertices( v_id )[cmv],
                 "[Test] Save/Load of unique vertices are not correct "
-                "(different mesh component vertices)" );
+                "(different component mesh vertices)" );
         }
     }
 }
