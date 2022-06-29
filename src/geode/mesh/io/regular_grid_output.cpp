@@ -41,8 +41,7 @@ namespace geode
             OPENGEODE_EXCEPTION(
                 RegularGridOutputFactory< dimension >::has_creator( extension ),
                 "Unknown extension: ", extension );
-            RegularGridOutputFactory< dimension >::create(
-                to_string( extension_from_filename( filename ) ), filename )
+            RegularGridOutputFactory< dimension >::create( extension, filename )
                 ->write( regular_grid );
             Logger::info( "RegularGrid", dimension, "D saved in ", filename,
                 " in ", timer.duration() );

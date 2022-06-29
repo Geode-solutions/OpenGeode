@@ -57,16 +57,20 @@ namespace geode
         absl::string_view filename );
 
     template < index_t dimension >
-    class PointSetInput : public Input<std::unique_ptr< PointSet< dimension > >,MeshImpl>
+    class PointSetInput
+        : public Input< std::unique_ptr< PointSet< dimension > >, MeshImpl >
     {
     protected:
-        PointSetInput(
-            absl::string_view filename ):Input<std::unique_ptr< PointSet< dimension > >,MeshImpl>{filename}{}
+        PointSetInput( absl::string_view filename )
+            : Input< std::unique_ptr< PointSet< dimension > >, MeshImpl >{
+                  filename
+              }
+        {
+        }
     };
 
     template < index_t dimension >
-    using PointSetInputFactory = Factory< std::string,
-        PointSetInput< dimension >,
-        absl::string_view >;
+    using PointSetInputFactory =
+        Factory< std::string, PointSetInput< dimension >, absl::string_view >;
     ALIAS_2D_AND_3D( PointSetInputFactory );
 } // namespace geode
