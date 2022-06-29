@@ -46,7 +46,7 @@ namespace
             geode::LIndices{ facet_unique_vertices } )
         {
             block_facet_from_unique_vertices[polygon_vertex_id] =
-                model.mesh_component_vertices(
+                model.component_mesh_vertices(
                     facet_unique_vertices[polygon_vertex_id], block.id() );
         }
         return block_facet_from_unique_vertices;
@@ -286,7 +286,7 @@ namespace
         for( const auto edge_vertex_id : geode::LRange{ 2 } )
         {
             surface_edge_from_unique_vertices[edge_vertex_id] =
-                model.mesh_component_vertices(
+                model.component_mesh_vertices(
                     edge_unique_vertices[edge_vertex_id], surface.id() );
         }
         return surface_edge_from_unique_vertices;

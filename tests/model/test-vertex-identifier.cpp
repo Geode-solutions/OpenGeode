@@ -126,30 +126,30 @@ void test_set_unique_vertices(
     OPENGEODE_EXCEPTION( vertex_identifier.nb_unique_vertices() == 4,
         "[Test] Creation of unique vertices is not correct" );
 
-    const auto& uvertices0 = vertex_identifier.mesh_component_vertices( 0 );
+    const auto& uvertices0 = vertex_identifier.component_mesh_vertices( 0 );
     OPENGEODE_EXCEPTION( uvertices0.size() == 2,
         "[Test] Search of unique vertices is not correct" );
-    OPENGEODE_EXCEPTION( vertex_identifier.has_mesh_component_vertices(
+    OPENGEODE_EXCEPTION( vertex_identifier.has_component_mesh_vertices(
                              0, geode::Corner2D::component_type_static() ),
-        "[Test] Unique vertex should have mesh component vertices of type "
+        "[Test] Unique vertex should have component mesh vertices of type "
         "Corner" );
-    const auto& uvertices0_type = vertex_identifier.mesh_component_vertices(
+    const auto& uvertices0_type = vertex_identifier.component_mesh_vertices(
         0, geode::Corner2D::component_type_static() );
     OPENGEODE_EXCEPTION( uvertices0_type.size() == 2,
         "[Test] Search of unique vertices by "
-        "MeshComponentType is not correct" );
+        "ComponentType is not correct" );
     OPENGEODE_EXCEPTION(
-        vertex_identifier.has_mesh_component_vertices( 0, uuids[0] ),
-        "[Test] Unique vertex should have mesh component vertices of given "
+        vertex_identifier.has_component_mesh_vertices( 0, uuids[0] ),
+        "[Test] Unique vertex should have component mesh vertices of given "
         "Corner id" );
     OPENGEODE_EXCEPTION(
-        vertex_identifier.mesh_component_vertices( 0, uuids[0] ).size() == 1
-            && vertex_identifier.mesh_component_vertices( 0, uuids[0] ).front()
+        vertex_identifier.component_mesh_vertices( 0, uuids[0] ).size() == 1
+            && vertex_identifier.component_mesh_vertices( 0, uuids[0] ).front()
                    == 0,
-        "[Test] Search of unique vertices by MeshComponent UUID is not "
+        "[Test] Search of unique vertices by ComponentMeshUUID is not "
         "correct" );
 
-    const auto& uvertices3 = vertex_identifier.mesh_component_vertices( 3 );
+    const auto& uvertices3 = vertex_identifier.component_mesh_vertices( 3 );
     OPENGEODE_EXCEPTION( uvertices3.size() == 0,
         "[Test] Search of unique vertices is not correct" );
 }
@@ -160,22 +160,22 @@ void test_modify_unique_vertices( geode::VertexIdentifier& vertex_identifier )
     OPENGEODE_EXCEPTION( builder.create_unique_vertex() == 4,
         "[Test] Creation of an unique vertices is not correct" );
 
-    const auto mesh_component_vertex0 =
-        vertex_identifier.mesh_component_vertices( 0 ).front();
+    const auto component_mesh_vertex0 =
+        vertex_identifier.component_mesh_vertices( 0 ).front();
 
-    builder.set_unique_vertex( mesh_component_vertex0, 0 );
+    builder.set_unique_vertex( component_mesh_vertex0, 0 );
     OPENGEODE_EXCEPTION(
-        vertex_identifier.mesh_component_vertices( 0 ).size() == 2
-            && vertex_identifier.mesh_component_vertices( 3 ).size() == 0,
+        vertex_identifier.component_mesh_vertices( 0 ).size() == 2
+            && vertex_identifier.component_mesh_vertices( 3 ).size() == 0,
         "[Test] Reset of a unique vertex (to similar value) is not correct" );
 
-    builder.set_unique_vertex( mesh_component_vertex0, 4 );
+    builder.set_unique_vertex( component_mesh_vertex0, 4 );
     OPENGEODE_EXCEPTION(
-        vertex_identifier.mesh_component_vertices( 0 ).size() == 1
-            && vertex_identifier.mesh_component_vertices( 4 ).size() == 1,
+        vertex_identifier.component_mesh_vertices( 0 ).size() == 1
+            && vertex_identifier.component_mesh_vertices( 4 ).size() == 1,
         "[Test] Reset of a unique vertex is not correct - sizes" );
     OPENGEODE_EXCEPTION(
-        vertex_identifier.unique_vertex( mesh_component_vertex0 ) == 4,
+        vertex_identifier.unique_vertex( component_mesh_vertex0 ) == 4,
         "[Test] Reset of a unique vertex is not correct - values" );
 }
 
@@ -194,18 +194,18 @@ void test_save_and_load_unique_vertices(
         geode::Range{ vertex_identifier2.nb_unique_vertices() } )
     {
         OPENGEODE_EXCEPTION(
-            vertex_identifier.mesh_component_vertices( v_id ).size()
-                == vertex_identifier2.mesh_component_vertices( v_id ).size(),
+            vertex_identifier.component_mesh_vertices( v_id ).size()
+                == vertex_identifier2.component_mesh_vertices( v_id ).size(),
             "[Test] Save/Load of unique vertices are not correct (different "
-            "number of mesh component vertices)" );
-        for( const auto mcv : geode::Range{
-                 vertex_identifier.mesh_component_vertices( v_id ).size() } )
+            "number of component mesh vertices)" );
+        for( const auto cmv : geode::Range{
+                 vertex_identifier.component_mesh_vertices( v_id ).size() } )
         {
             OPENGEODE_EXCEPTION(
-                vertex_identifier.mesh_component_vertices( v_id )[mcv]
-                    == vertex_identifier2.mesh_component_vertices( v_id )[mcv],
+                vertex_identifier.component_mesh_vertices( v_id )[cmv]
+                    == vertex_identifier2.component_mesh_vertices( v_id )[cmv],
                 "[Test] Save/Load of unique vertices are not correct "
-                "(different mesh component vertices)" );
+                "(different component mesh vertices)" );
         }
     }
 }
@@ -229,14 +229,14 @@ void test_update_unique_vertices()
 
     OPENGEODE_EXCEPTION( provider.nb_unique_vertices() == 5,
         "[Test] Initialization of VertexIdentifier is not correct (nb)" );
-    OPENGEODE_EXCEPTION( provider.mesh_component_vertices( 0 ).size() == 2,
+    OPENGEODE_EXCEPTION( provider.component_mesh_vertices( 0 ).size() == 2,
         "[Test] Initialization of VertexIdentifier is not correct (uid 0)" );
     builder.unset_unique_vertex( { surface_cid, 0 }, 0 );
-    OPENGEODE_EXCEPTION( provider.mesh_component_vertices( 0 ).size() == 1,
+    OPENGEODE_EXCEPTION( provider.component_mesh_vertices( 0 ).size() == 1,
         "[Test] VertexIdentifier after unset mesh component 0 is not correct "
         "(size)" );
     OPENGEODE_EXCEPTION(
-        provider.mesh_component_vertices( 0 ).front().vertex == 1,
+        provider.component_mesh_vertices( 0 ).front().vertex == 1,
         "[Test] VertexIdentifier after unset mesh component 0 is not correct "
         "(id)" );
     std::vector< bool > to_delete{ true, false, true, false, true, false, true,
@@ -246,7 +246,7 @@ void test_update_unique_vertices()
     for( const auto uid : geode::Range{ 5 } )
     {
         OPENGEODE_EXCEPTION(
-            provider.mesh_component_vertices( uid ).size() == 1,
+            provider.component_mesh_vertices( uid ).size() == 1,
             "[Test] VertexIdentifier after update_unique_vertices is not "
             "correct (size)" );
     }
@@ -290,9 +290,9 @@ void test()
     builder.unregister_mesh_component( provider.corner( corner2_id ) );
     builder.register_mesh_component( provider.corner( corner2_id ) );
 
-    const auto mcv = vertex_identifier.mesh_component_vertices( 4 ).front();
+    const auto cmv = vertex_identifier.component_mesh_vertices( 4 ).front();
     vertex_id_builder.delete_isolated_vertices();
-    OPENGEODE_EXCEPTION( vertex_identifier.unique_vertex( mcv ) == 3,
+    OPENGEODE_EXCEPTION( vertex_identifier.unique_vertex( cmv ) == 3,
         "[Test] Wrong UID after delete_isolated_vertices" );
 }
 

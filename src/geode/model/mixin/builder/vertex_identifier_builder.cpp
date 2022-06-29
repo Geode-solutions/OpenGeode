@@ -42,14 +42,14 @@ namespace geode
     }
 
     void VertexIdentifierBuilder::set_unique_vertex(
-        MeshComponentVertex component_vertex_id, index_t unique_vertex_id )
+        ComponentMeshVertex component_vertex_id, index_t unique_vertex_id )
     {
         vertex_identifier_.set_unique_vertex(
             component_vertex_id, unique_vertex_id, {} );
     }
 
     void VertexIdentifierBuilder::unset_unique_vertex(
-        const MeshComponentVertex& component_vertex_id,
+        const ComponentMeshVertex& component_vertex_id,
         index_t unique_vertex_id )
     {
         vertex_identifier_.unset_unique_vertex(
