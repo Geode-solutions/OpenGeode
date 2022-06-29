@@ -49,7 +49,7 @@ namespace
             [&bboxes, &points]( size_t i ) {
                 points[i] = bboxes[i].min() + bboxes[i].max();
             } );
-        return geode::morton_sort< dimension >( points );
+        return geode::morton_mapping< dimension >( points );
     }
 
 } // namespace

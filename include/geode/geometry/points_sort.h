@@ -40,6 +40,6 @@ namespace geode
         absl::Span< const Point< dimension > > points );
 
     template < index_t dimension >
-    std::vector< index_t > morton_sort(
+    std::vector< index_t > morton_mapping(
         absl::Span< const Point< dimension > > points );
 } // namespace geode

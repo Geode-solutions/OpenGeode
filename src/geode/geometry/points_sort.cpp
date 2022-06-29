@@ -87,7 +87,7 @@ namespace
      *   3.9 edition, 2011
      */
     template < geode::local_index_t COORDX >
-    void morton_sort( absl::Span< const geode::Point3D > points,
+    void morton_mapping( absl::Span< const geode::Point3D > points,
         const itr& begin,
         const itr& end )
     {
@@ -113,18 +113,18 @@ namespace
         const auto m6 = split( m4, m8, compY );
         const auto m5 = split( m4, m6, compZ );
         const auto m7 = split( m6, m8, compZ );
-        morton_sort< COORDZ >( points, m0, m1 );
-        morton_sort< COORDY >( points, m1, m2 );
-        morton_sort< COORDY >( points, m2, m3 );
-        morton_sort< COORDX >( points, m3, m4 );
-        morton_sort< COORDX >( points, m4, m5 );
-        morton_sort< COORDY >( points, m5, m6 );
-        morton_sort< COORDY >( points, m6, m7 );
-        morton_sort< COORDZ >( points, m7, m8 );
+        morton_mapping< COORDZ >( points, m0, m1 );
+        morton_mapping< COORDY >( points, m1, m2 );
+        morton_mapping< COORDY >( points, m2, m3 );
+        morton_mapping< COORDX >( points, m3, m4 );
+        morton_mapping< COORDX >( points, m4, m5 );
+        morton_mapping< COORDY >( points, m5, m6 );
+        morton_mapping< COORDY >( points, m6, m7 );
+        morton_mapping< COORDZ >( points, m7, m8 );
     }
 
     template < geode::local_index_t COORDX >
-    void morton_sort( absl::Span< const geode::Point2D > points,
+    void morton_mapping( absl::Span< const geode::Point2D > points,
         const itr& begin,
         const itr& end )
     {
@@ -143,10 +143,10 @@ namespace
         const auto m2 = split( m0, m4, compX );
         const auto m1 = split( m0, m2, compY );
         const auto m3 = split( m2, m4, compY );
-        morton_sort< COORDY >( points, m0, m1 );
-        morton_sort< COORDX >( points, m1, m2 );
-        morton_sort< COORDX >( points, m2, m3 );
-        morton_sort< COORDY >( points, m3, m4 );
+        morton_mapping< COORDY >( points, m0, m1 );
+        morton_mapping< COORDX >( points, m1, m2 );
+        morton_mapping< COORDX >( points, m2, m3 );
+        morton_mapping< COORDY >( points, m3, m4 );
     }
 
     /*
@@ -199,31 +199,28 @@ namespace geode
     std::vector< index_t > lexicographic_mapping(
         absl::Span< const Point< dimension > > points )
     {
-        std::vector< index_t > mapping_lexico( points.size() );
-        async::parallel_for(
-            async::irange( size_t{ 0 }, mapping_lexico.size() ),
-            [&mapping_lexico]( index_t i ) {
-                mapping_lexico[i] = i;
+        std::vector< index_t > mapping( points.size() );
+        async::parallel_for( async::irange( size_t{ 0 }, mapping.size() ),
+            [&mapping]( index_t i ) {
+                mapping[i] = i;
             } );
-        absl::c_sort( mapping_lexico, [&points]( index_t i, index_t j ) {
+        absl::c_sort( mapping, [&points]( index_t i, index_t j ) {
             return lexicographic_compare( points[i], points[j] );
         } );
-        return mapping_lexico;
+        return mapping;
     }
 
     template < index_t dimension >
-    std::vector< index_t > morton_sort(
+    std::vector< index_t > morton_mapping(
         absl::Span< const Point< dimension > > points )
     {
-        std::vector< index_t > mapping_morton( points.size() );
-        async::parallel_for(
-            async::irange( size_t{ 0 }, mapping_morton.size() ),
-            [&mapping_morton]( index_t i ) {
-                mapping_morton[i] = i;
+        std::vector< index_t > mapping( points.size() );
+        async::parallel_for( async::irange( size_t{ 0 }, mapping.size() ),
+            [&mapping]( index_t i ) {
+                mapping[i] = i;
             } );
-        ::morton_sort< 0_uc >(
-            points, mapping_morton.begin(), mapping_morton.end() );
-        return mapping_morton;
+        ::morton_mapping< 0_uc >( points, mapping.begin(), mapping.end() );
+        return mapping;
     }
 
     template std::vector< index_t > opengeode_geometry_api
@@ -231,8 +228,8 @@ namespace geode
     template std::vector< index_t > opengeode_geometry_api
         lexicographic_mapping( absl::Span< const Point< 3 > > );
 
-    template std::vector< index_t > opengeode_geometry_api morton_sort(
+    template std::vector< index_t > opengeode_geometry_api morton_mapping(
         absl::Span< const Point< 2 > > );
-    template std::vector< index_t > opengeode_geometry_api morton_sort(
+    template std::vector< index_t > opengeode_geometry_api morton_mapping(
         absl::Span< const Point< 3 > > );
 } // namespace geode

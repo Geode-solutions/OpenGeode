@@ -51,7 +51,6 @@ add_geode_library(
         "common.h"
         "distance.h"
         "information.h"
-        "morton.h"
         "nn_search.h"
         "perpendicular.h"
         "point.h"
