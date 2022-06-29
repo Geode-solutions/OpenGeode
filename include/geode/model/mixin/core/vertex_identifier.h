@@ -19,15 +19,15 @@ namespace geode
     /*!
      * Identify a vertex in a geometric component
      */
-    struct MeshComponentVertex
+    struct ComponentMeshVertex
     {
-        MeshComponentVertex( ComponentID component_id_in, index_t vertex_id_in )
+        ComponentMeshVertex( ComponentID component_id_in, index_t vertex_id_in )
             : component_id( std::move( component_id_in ) ),
               vertex( vertex_id_in )
         {
         }
 
-        bool operator==( const MeshComponentVertex& other ) const
+        bool operator==( const ComponentMeshVertex& other ) const
         {
             return component_id == other.component_id && vertex == other.vertex;
         }
@@ -36,10 +36,10 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this,
-                DefaultGrowable< Archive, MeshComponentVertex >{},
-                []( Archive& a, MeshComponentVertex& mesh_component_vertex ) {
-                    a.object( mesh_component_vertex.component_id );
-                    a.value4b( mesh_component_vertex.vertex );
+                DefaultGrowable< Archive, ComponentMeshVertex >{},
+                []( Archive& a, ComponentMeshVertex& component_mesh_vertex ) {
+                    a.object( component_mesh_vertex.component_id );
+                    a.value4b( component_mesh_vertex.vertex );
                 } );
         }
 
@@ -48,7 +48,7 @@ namespace geode
 
     private:
         friend class bitsery::Access;
-        MeshComponentVertex()
+        ComponentMeshVertex()
             : component_id( bitsery::Access::create< ComponentID >() )
         {
         }
@@ -73,7 +73,7 @@ namespace geode
          * Return the component vertices identified with an unique vertex.
          * @param[in] unique_vertex_id Indice of the unique vertex.
          */
-        const std::vector< MeshComponentVertex >& mesh_component_vertices(
+        const std::vector< ComponentMeshVertex >& component_mesh_vertices(
             index_t unique_vertex_id ) const;
 
         /*!
@@ -82,7 +82,7 @@ namespace geode
          * @param[in] unique_vertex_id Indice of the unique vertex.
          * @param[in] type Type of components used to filter returned vertices.
          */
-        std::vector< MeshComponentVertex > mesh_component_vertices(
+        std::vector< ComponentMeshVertex > component_mesh_vertices(
             index_t unique_vertex_id, const ComponentType& type ) const;
 
         /*!
@@ -92,7 +92,7 @@ namespace geode
          * @param[in] component_id Component unique index used to filter
          * returned vertices.
          */
-        std::vector< index_t > mesh_component_vertices(
+        std::vector< index_t > component_mesh_vertices(
             index_t unique_vertex_id, const uuid& component_id ) const;
 
         /*!
@@ -100,20 +100,20 @@ namespace geode
          * @param[in] component_vertex Vertex index in a geometric component.
          */
         index_t unique_vertex(
-            const MeshComponentVertex& component_vertex ) const;
+            const ComponentMeshVertex& component_vertex ) const;
 
         /*!
          * Return true if given unique vertex has at least one mesh component
          * vertex of given component type
          */
-        bool has_mesh_component_vertices(
+        bool has_component_mesh_vertices(
             index_t unique_vertex_id, const ComponentType& type ) const;
 
         /*!
          * Return true if given unique vertex has at least one mesh component
          * vertex of given component
          */
-        bool has_mesh_component_vertices(
+        bool has_component_mesh_vertices(
             index_t unique_vertex_id, const uuid& component_id ) const;
 
         /*!
@@ -154,7 +154,7 @@ namespace geode
          * @param[in] component_vertex_id Index of the vertex in the component.
          * @param[in] unique_vertex_id Unique vertex index.
          */
-        void set_unique_vertex( MeshComponentVertex component_vertex_id,
+        void set_unique_vertex( ComponentMeshVertex component_vertex_id,
             index_t unique_vertex_id,
             BuilderKey );
 
@@ -164,7 +164,7 @@ namespace geode
          * @param[in] unique_vertex_id Unique vertex index.
          */
         void unset_unique_vertex(
-            const MeshComponentVertex& component_vertex_id,
+            const ComponentMeshVertex& component_vertex_id,
             index_t unique_vertex_id,
             BuilderKey );
 
@@ -202,13 +202,13 @@ namespace geode
 namespace std
 {
     template <>
-    struct hash< geode::MeshComponentVertex >
+    struct hash< geode::ComponentMeshVertex >
     {
     public:
-        size_t operator()( const geode::MeshComponentVertex& mcv ) const
+        size_t operator()( const geode::ComponentMeshVertex& cmv ) const
         {
-            return absl::Hash< geode::uuid >()( mcv.component_id.id() )
-                   ^ absl::Hash< geode::index_t >()( mcv.vertex );
+            return absl::Hash< geode::uuid >()( cmv.component_id.id() )
+                   ^ absl::Hash< geode::index_t >()( cmv.vertex );
         }
     };
 } // namespace std

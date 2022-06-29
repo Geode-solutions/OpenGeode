@@ -75,7 +75,7 @@ namespace geode
          * @param[in] unique_vertex_id Unique vertex index.
          */
         void set_unique_vertex(
-            MeshComponentVertex component_vertex_id, index_t unique_vertex_id );
+            ComponentMeshVertex component_vertex_id, index_t unique_vertex_id );
 
         /*!
          * Remove a component vertex to its unique vertex index.
@@ -83,7 +83,7 @@ namespace geode
          * @param[in] unique_vertex_id Unique vertex index.
          */
         void unset_unique_vertex(
-            const MeshComponentVertex& component_vertex_id,
+            const ComponentMeshVertex& component_vertex_id,
             index_t unique_vertex_id );
 
         /*!
