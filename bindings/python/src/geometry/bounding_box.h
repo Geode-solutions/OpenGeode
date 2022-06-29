@@ -32,10 +32,10 @@
         .def( "add_box", &BoundingBox##dimension##D::add_box )                 \
         .def( "add_point", &BoundingBox##dimension##D::add_point )             \
         .def( "contains", &BoundingBox##dimension##D::contains )               \
-        .def( "intersects_bbox", ( bool ( BoundingBox##dimension##D::* )(      \
+        .def( "intersects_bbox", ( bool( BoundingBox##dimension##D::* )(       \
                                      const BoundingBox< dimension >& ) const ) \
                                      & BoundingBox##dimension##D::intersects ) \
-        .def( "intersects_ray", ( bool ( BoundingBox##dimension##D::* )(       \
+        .def( "intersects_ray", ( bool( BoundingBox##dimension##D::* )(        \
                                     const Ray< dimension >& ) const )          \
                                     & BoundingBox##dimension##D::intersects )  \
         .def( "min", &BoundingBox##dimension##D::min )                         \
