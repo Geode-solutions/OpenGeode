@@ -41,9 +41,8 @@ namespace geode
             OPENGEODE_EXCEPTION(
                 EdgedCurveOutputFactory< dimension >::has_creator( extension ),
                 "Unknown extension: ", extension );
-            EdgedCurveOutputFactory< dimension >::create(
-                extension, edged_curve, filename )
-                ->write();
+            EdgedCurveOutputFactory< dimension >::create( extension, filename )
+                ->write( edged_curve );
             Logger::info( "EdgedCurve", dimension, "D saved in ", filename,
                 " in ", timer.duration() );
         }
@@ -55,18 +54,8 @@ namespace geode
         }
     }
 
-    template < index_t dimension >
-    EdgedCurveOutput< dimension >::EdgedCurveOutput(
-        const EdgedCurve< dimension >& edged_curve, absl::string_view filename )
-        : GraphOutput( edged_curve, filename ), edged_curve_( edged_curve )
-    {
-    }
-
     template void opengeode_mesh_api save_edged_curve(
         const EdgedCurve< 2 >&, absl::string_view );
     template void opengeode_mesh_api save_edged_curve(
         const EdgedCurve< 3 >&, absl::string_view );
-
-    template class opengeode_mesh_api EdgedCurveOutput< 2 >;
-    template class opengeode_mesh_api EdgedCurveOutput< 3 >;
 } // namespace geode

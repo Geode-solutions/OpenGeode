@@ -26,7 +26,7 @@
 #include <geode/basic/factory.h>
 
 #include <geode/mesh/common.h>
-#include <geode/mesh/io/vertex_set_output.h>
+#include <geode/mesh/io/output.h>
 
 namespace geode
 {
@@ -46,28 +46,20 @@ namespace geode
         absl::string_view filename );
 
     template < index_t dimension >
-    class HybridSolidOutput : public VertexSetOutput
+    class HybridSolidOutput : public Output< HybridSolid< dimension > >
     {
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
-        OPENGEODE_DISABLE_COPY_AND_MOVE( HybridSolidOutput );
 
     protected:
-        HybridSolidOutput( const HybridSolid< dimension >& hybrid_solid,
-            absl::string_view filename );
-
-        const HybridSolid< dimension >& hybrid_solid() const
+        HybridSolidOutput( absl::string_view filename )
+            : Output< HybridSolid< dimension > >{ filename }
         {
-            return hybrid_solid_;
         }
-
-    private:
-        const HybridSolid< dimension >& hybrid_solid_;
     };
 
     template < index_t dimension >
     using HybridSolidOutputFactory = Factory< std::string,
         HybridSolidOutput< dimension >,
-        const HybridSolid< dimension >&,
         absl::string_view >;
     ALIAS_3D( HybridSolidOutputFactory );
 } // namespace geode

@@ -30,7 +30,7 @@ namespace geode
     absl::string_view opengeode_mesh_api extension_from_filename(
         absl::string_view filename );
 
-    class opengeode_mesh_api IOFile
+    class IOFile
     {
     public:
         virtual ~IOFile() = default;

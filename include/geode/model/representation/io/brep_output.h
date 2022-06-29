@@ -45,20 +45,12 @@ namespace geode
     void opengeode_model_api save_brep(
         const BRep& brep, absl::string_view filename );
 
-    class opengeode_model_api BRepOutput : public Output
+    class BRepOutput : public Output< BRep >
     {
     protected:
-        BRepOutput( const BRep& brep, absl::string_view filename );
-
-        const BRep& brep() const
-        {
-            return brep_;
-        }
-
-    private:
-        const BRep& brep_;
+        BRepOutput( absl::string_view filename ) : Output< BRep >{ filename } {}
     };
 
     using BRepOutputFactory =
-        Factory< std::string, BRepOutput, const BRep&, absl::string_view >;
+        Factory< std::string, BRepOutput, absl::string_view >;
 } // namespace geode

@@ -38,9 +38,7 @@ namespace geode
                 to_string( extension_from_filename( filename ) );
             OPENGEODE_EXCEPTION( BRepOutputFactory::has_creator( extension ),
                 "Unknown extension: ", extension );
-            const auto output =
-                BRepOutputFactory::create( extension, brep, filename );
-            output->write();
+            BRepOutputFactory::create( extension, filename )->write( brep );
             Logger::info(
                 "BRep saved in ", filename, " in ", timer.duration() );
         }
@@ -49,10 +47,5 @@ namespace geode
             Logger::error( e.what() );
             throw OpenGeodeException{ "Cannot save BRep in file: ", filename };
         }
-    }
-
-    BRepOutput::BRepOutput( const BRep& brep, absl::string_view filename )
-        : Output( filename ), brep_( brep )
-    {
     }
 } // namespace geode

@@ -26,7 +26,7 @@
 #include <geode/basic/factory.h>
 
 #include <geode/mesh/common.h>
-#include <geode/mesh/io/vertex_set_output.h>
+#include <geode/mesh/io/output.h>
 
 namespace geode
 {
@@ -47,28 +47,19 @@ namespace geode
         absl::string_view filename );
 
     template < index_t dimension >
-    class TriangulatedSurfaceOutput : public VertexSetOutput
+    class TriangulatedSurfaceOutput
+        : public Output< TriangulatedSurface< dimension > >
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( TriangulatedSurfaceOutput );
-
     protected:
-        TriangulatedSurfaceOutput(
-            const TriangulatedSurface< dimension >& triangulated_surface,
-            absl::string_view filename );
-
-        const TriangulatedSurface< dimension >& triangulated_surface() const
+        TriangulatedSurfaceOutput( absl::string_view filename )
+            : Output< TriangulatedSurface< dimension > >{ filename }
         {
-            return triangulated_surface_;
         }
-
-    private:
-        const TriangulatedSurface< dimension >& triangulated_surface_;
     };
 
     template < index_t dimension >
     using TriangulatedSurfaceOutputFactory = Factory< std::string,
         TriangulatedSurfaceOutput< dimension >,
-        const TriangulatedSurface< dimension >&,
         absl::string_view >;
     ALIAS_2D_AND_3D( TriangulatedSurfaceOutputFactory );
 } // namespace geode

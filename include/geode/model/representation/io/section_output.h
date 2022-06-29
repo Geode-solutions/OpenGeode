@@ -45,22 +45,15 @@ namespace geode
     void opengeode_model_api save_section(
         const Section& section, absl::string_view filename );
 
-    class opengeode_model_api SectionOutput : public Output
+    class SectionOutput : public Output< Section >
     {
     protected:
-        SectionOutput( const Section& section, absl::string_view filename );
-
-        const Section& section() const
+        SectionOutput( absl::string_view filename )
+            : Output< Section >{ filename }
         {
-            return section_;
         }
-
-    private:
-        const Section& section_;
     };
 
-    using SectionOutputFactory = Factory< std::string,
-        SectionOutput,
-        const Section&,
-        absl::string_view >;
+    using SectionOutputFactory =
+        Factory< std::string, SectionOutput, absl::string_view >;
 } // namespace geode

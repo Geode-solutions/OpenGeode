@@ -46,27 +46,18 @@ namespace geode
         absl::string_view filename );
 
     template < index_t dimension >
-    class RegularGridOutput : public Output
+    class RegularGridOutput : public Output< RegularGrid< dimension > >
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( RegularGridOutput );
-
     protected:
-        RegularGridOutput( const RegularGrid< dimension >& regular_grid,
-            absl::string_view filename );
-
-        const RegularGrid< dimension >& regular_grid() const
+        RegularGridOutput( absl::string_view filename )
+            : Output< RegularGrid< dimension > >{ filename }
         {
-            return regular_grid_;
         }
-
-    private:
-        const RegularGrid< dimension >& regular_grid_;
     };
 
     template < index_t dimension >
     using RegularGridOutputFactory = Factory< std::string,
         RegularGridOutput< dimension >,
-        const RegularGrid< dimension >&,
         absl::string_view >;
     ALIAS_2D_AND_3D( RegularGridOutputFactory );
 } // namespace geode

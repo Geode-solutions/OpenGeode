@@ -44,25 +44,15 @@ namespace geode
     void opengeode_mesh_api save_vertex_set(
         const VertexSet& vertex_set, absl::string_view filename );
 
-    class opengeode_mesh_api VertexSetOutput : public Output
+    class VertexSetOutput : public Output< VertexSet >
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( VertexSetOutput );
-
     protected:
-        VertexSetOutput(
-            const VertexSet& vertex_set, absl::string_view filename );
-
-        const VertexSet& vertex_set() const
+        VertexSetOutput( absl::string_view filename )
+            : Output< VertexSet >{ filename }
         {
-            return vertex_set_;
         }
-
-    private:
-        const VertexSet& vertex_set_;
     };
 
-    using VertexSetOutputFactory = Factory< std::string,
-        VertexSetOutput,
-        const VertexSet&,
-        absl::string_view >;
+    using VertexSetOutputFactory =
+        Factory< std::string, VertexSetOutput, absl::string_view >;
 } // namespace geode

@@ -41,9 +41,8 @@ namespace geode
             OPENGEODE_EXCEPTION(
                 HybridSolidOutputFactory< dimension >::has_creator( extension ),
                 "Unknown extension: ", extension );
-            HybridSolidOutputFactory< dimension >::create(
-                extension, hybrid_solid, filename )
-                ->write();
+            HybridSolidOutputFactory< dimension >::create( extension, filename )
+                ->write( hybrid_solid );
             Logger::info( "HybridSolid", dimension, "D saved in ", filename,
                 " in ", timer.duration() );
         }
@@ -55,17 +54,6 @@ namespace geode
         }
     }
 
-    template < index_t dimension >
-    HybridSolidOutput< dimension >::HybridSolidOutput(
-        const HybridSolid< dimension >& hybrid_solid,
-        absl::string_view filename )
-        : VertexSetOutput( hybrid_solid, filename ),
-          hybrid_solid_( hybrid_solid )
-    {
-    }
-
     template void opengeode_mesh_api save_hybrid_solid(
         const HybridSolid< 3 >&, absl::string_view );
-
-    template class opengeode_mesh_api HybridSolidOutput< 3 >;
 } // namespace geode

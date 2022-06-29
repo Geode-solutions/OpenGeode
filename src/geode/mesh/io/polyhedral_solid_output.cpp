@@ -44,8 +44,8 @@ namespace geode
                     extension ),
                 "Unknown extension: ", extension );
             PolyhedralSolidOutputFactory< dimension >::create(
-                extension, polyhedral_solid, filename )
-                ->write();
+                extension, filename )
+                ->write( polyhedral_solid );
             Logger::info( "PolyhedralSolid", dimension, "D saved in ", filename,
                 " in ", timer.duration() );
         }
@@ -57,17 +57,6 @@ namespace geode
         }
     }
 
-    template < index_t dimension >
-    PolyhedralSolidOutput< dimension >::PolyhedralSolidOutput(
-        const PolyhedralSolid< dimension >& polyhedral_solid,
-        absl::string_view filename )
-        : VertexSetOutput( polyhedral_solid, filename ),
-          polyhedral_solid_( polyhedral_solid )
-    {
-    }
-
     template void opengeode_mesh_api save_polyhedral_solid(
         const PolyhedralSolid< 3 >&, absl::string_view );
-
-    template class opengeode_mesh_api PolyhedralSolidOutput< 3 >;
 } // namespace geode

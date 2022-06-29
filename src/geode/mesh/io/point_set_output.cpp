@@ -42,9 +42,8 @@ namespace geode
             OPENGEODE_EXCEPTION(
                 PointSetOutputFactory< dimension >::has_creator( extension ),
                 "Unknown extension: ", extension );
-            PointSetOutputFactory< dimension >::create(
-                extension, point_set, filename )
-                ->write();
+            PointSetOutputFactory< dimension >::create( extension, filename )
+                ->write( point_set );
             Logger::info( "PointSet", dimension, "D saved in ", filename,
                 " in ", timer.duration() );
         }
@@ -56,18 +55,8 @@ namespace geode
         }
     }
 
-    template < index_t dimension >
-    PointSetOutput< dimension >::PointSetOutput(
-        const PointSet< dimension >& point_set, absl::string_view filename )
-        : VertexSetOutput( point_set, filename ), point_set_( point_set )
-    {
-    }
-
     template void opengeode_mesh_api save_point_set(
         const PointSet< 2 >&, absl::string_view );
     template void opengeode_mesh_api save_point_set(
         const PointSet< 3 >&, absl::string_view );
-
-    template class opengeode_mesh_api PointSetOutput< 2 >;
-    template class opengeode_mesh_api PointSetOutput< 3 >;
 } // namespace geode

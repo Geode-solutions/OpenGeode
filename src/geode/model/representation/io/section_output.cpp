@@ -38,9 +38,8 @@ namespace geode
                 to_string( extension_from_filename( filename ) );
             OPENGEODE_EXCEPTION( SectionOutputFactory::has_creator( extension ),
                 "Unknown extension: ", extension );
-            const auto output =
-                SectionOutputFactory::create( extension, section, filename );
-            output->write();
+            SectionOutputFactory::create( extension, filename )
+                ->write( section );
             Logger::info(
                 "Section saved in ", filename, " in ", timer.duration() );
         }
@@ -50,11 +49,5 @@ namespace geode
             throw OpenGeodeException{ "Cannot save Section in file: ",
                 filename };
         }
-    }
-
-    SectionOutput::SectionOutput(
-        const Section& section, absl::string_view filename )
-        : Output( filename ), section_( section )
-    {
     }
 } // namespace geode
