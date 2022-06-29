@@ -2,14 +2,14 @@
  * Copyright (c) 2019 - 2022 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
+ * of this software and associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -35,13 +35,11 @@
 
 namespace geode
 {
-    class opengeode_model_api OpenGeodeSectionOutput final
-        : public SectionOutput
+    class OpenGeodeSectionOutput final : public SectionOutput
     {
     public:
-        OpenGeodeSectionOutput(
-            const Section& section, absl::string_view filename )
-            : SectionOutput( section, filename )
+        OpenGeodeSectionOutput( absl::string_view filename )
+            : SectionOutput( filename )
         {
         }
 
@@ -50,28 +48,27 @@ namespace geode
             return Section::native_extension_static();
         }
 
-        void save_section_files( absl::string_view directory ) const
+        void save_section_files(
+            const Section& section, absl::string_view directory ) const
         {
-            absl::FixedArray< async::task< void > > tasks( 5 );
-            index_t count{ 0 };
-            tasks[count++] = async::spawn( [&directory, this] {
-                section().save_identifier( directory );
-            } );
-            tasks[count++] = async::spawn( [&directory, this] {
-                section().save_relationships( directory );
-            } );
-            tasks[count++] = async::spawn( [&directory, this] {
-                section().save_unique_vertices( directory );
-            } );
-            tasks[count++] = async::spawn( [&directory, this] {
-                section().save_corners( directory );
-                section().save_lines( directory );
-                section().save_surfaces( directory );
-            } );
-            tasks[count++] = async::spawn( [&directory, this] {
-                section().save_model_boundaries( directory );
-            } );
-            async::when_all( tasks.begin(), tasks.end() ).wait();
+            async::parallel_invoke(
+                [&directory, &section] {
+                    section.save_identifier( directory );
+                },
+                [&directory, &section] {
+                    section.save_relationships( directory );
+                },
+                [&directory, &section] {
+                    section.save_unique_vertices( directory );
+                },
+                [&directory, &section] {
+                    section.save_corners( directory );
+                    section.save_lines( directory );
+                    section.save_surfaces( directory );
+                },
+                [&directory, &section] {
+                    section.save_model_boundaries( directory );
+                } );
         }
 
         void archive_section_files( const ZipFile& zip_writer ) const
@@ -83,10 +80,10 @@ namespace geode
             }
         }
 
-        void write() const final
+        void write( const Section& section ) const final
         {
             const ZipFile zip_writer{ filename(), uuid{}.string() };
-            save_section_files( zip_writer.directory() );
+            save_section_files( section, zip_writer.directory() );
             archive_section_files( zip_writer );
         }
     };

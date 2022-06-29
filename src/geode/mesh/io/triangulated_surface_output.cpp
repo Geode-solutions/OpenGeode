@@ -44,8 +44,8 @@ namespace geode
                     extension ),
                 "Unknown extension: ", extension );
             TriangulatedSurfaceOutputFactory< dimension >::create(
-                extension, triangulated_surface, filename )
-                ->write();
+                extension, filename )
+                ->write( triangulated_surface );
             Logger::info( "TriangulatedSurface", dimension, "D saved in ",
                 filename, " in ", timer.duration() );
         }
@@ -58,20 +58,8 @@ namespace geode
         }
     }
 
-    template < index_t dimension >
-    TriangulatedSurfaceOutput< dimension >::TriangulatedSurfaceOutput(
-        const TriangulatedSurface< dimension >& triangulated_surface,
-        absl::string_view filename )
-        : VertexSetOutput( triangulated_surface, filename ),
-          triangulated_surface_( triangulated_surface )
-    {
-    }
-
     template void opengeode_mesh_api save_triangulated_surface(
         const TriangulatedSurface< 2 >&, absl::string_view );
     template void opengeode_mesh_api save_triangulated_surface(
         const TriangulatedSurface< 3 >&, absl::string_view );
-
-    template class opengeode_mesh_api TriangulatedSurfaceOutput< 2 >;
-    template class opengeode_mesh_api TriangulatedSurfaceOutput< 3 >;
 } // namespace geode

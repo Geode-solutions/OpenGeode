@@ -38,7 +38,7 @@ namespace geode
                 to_string( extension_from_filename( filename ) );
             OPENGEODE_EXCEPTION( GraphOutputFactory::has_creator( extension ),
                 "Unknown extension: ", extension );
-            GraphOutputFactory::create( extension, graph, filename )->write();
+            GraphOutputFactory::create( extension, filename )->write( graph );
             Logger::info(
                 "Graph saved in ", filename, " in ", timer.duration() );
         }
@@ -47,10 +47,5 @@ namespace geode
             Logger::error( e.what() );
             throw OpenGeodeException{ "Cannot save Graph in file: ", filename };
         }
-    }
-
-    GraphOutput::GraphOutput( const Graph& graph, absl::string_view filename )
-        : VertexSetOutput( graph, filename ), graph_( graph )
-    {
     }
 } // namespace geode

@@ -26,7 +26,7 @@
 #include <geode/basic/factory.h>
 
 #include <geode/mesh/common.h>
-#include <geode/mesh/io/graph_output.h>
+#include <geode/mesh/io/output.h>
 
 namespace geode
 {
@@ -46,27 +46,18 @@ namespace geode
         absl::string_view filename );
 
     template < index_t dimension >
-    class EdgedCurveOutput : public GraphOutput
+    class EdgedCurveOutput : public Output< EdgedCurve< dimension > >
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( EdgedCurveOutput );
-
-        const EdgedCurve< dimension >& edged_curve() const
-        {
-            return edged_curve_;
-        }
-
     protected:
-        EdgedCurveOutput( const EdgedCurve< dimension >& edged_curve,
-            absl::string_view filename );
-
-    private:
-        const EdgedCurve< dimension >& edged_curve_;
+        EdgedCurveOutput( absl::string_view filename )
+            : Output< EdgedCurve< dimension > >{ filename }
+        {
+        }
     };
 
     template < index_t dimension >
     using EdgedCurveOutputFactory = Factory< std::string,
         EdgedCurveOutput< dimension >,
-        const EdgedCurve< dimension >&,
         absl::string_view >;
     ALIAS_2D_AND_3D( EdgedCurveOutputFactory );
 } // namespace geode

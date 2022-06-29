@@ -40,8 +40,8 @@ namespace geode
             OPENGEODE_EXCEPTION(
                 VertexSetOutputFactory::has_creator( extension ),
                 "Unknown extension: ", extension );
-            VertexSetOutputFactory::create( extension, vertex_set, filename )
-                ->write();
+            VertexSetOutputFactory::create( extension, filename )
+                ->write( vertex_set );
             Logger::info(
                 "VertexSet saved in ", filename, " in ", timer.duration() );
         }
@@ -51,11 +51,5 @@ namespace geode
             throw OpenGeodeException{ "Cannot save VertexSet in file: ",
                 filename };
         }
-    }
-
-    VertexSetOutput::VertexSetOutput(
-        const VertexSet& vertex_set, absl::string_view filename )
-        : Output( filename ), vertex_set_( vertex_set )
-    {
     }
 } // namespace geode

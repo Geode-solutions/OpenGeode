@@ -26,7 +26,7 @@
 #include <geode/basic/factory.h>
 
 #include <geode/mesh/common.h>
-#include <geode/mesh/io/vertex_set_output.h>
+#include <geode/mesh/io/output.h>
 
 namespace geode
 {
@@ -47,29 +47,21 @@ namespace geode
         absl::string_view filename );
 
     template < index_t dimension >
-    class TetrahedralSolidOutput : public VertexSetOutput
+    class TetrahedralSolidOutput
+        : public Output< TetrahedralSolid< dimension > >
     {
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
-        OPENGEODE_DISABLE_COPY_AND_MOVE( TetrahedralSolidOutput );
 
     protected:
-        TetrahedralSolidOutput(
-            const TetrahedralSolid< dimension >& tetrahedral_solid,
-            absl::string_view filename );
-
-        const TetrahedralSolid< dimension >& tetrahedral_solid() const
+        TetrahedralSolidOutput( absl::string_view filename )
+            : Output< TetrahedralSolid< dimension > >{ filename }
         {
-            return tetrahedral_solid_;
         }
-
-    private:
-        const TetrahedralSolid< dimension >& tetrahedral_solid_;
     };
 
     template < index_t dimension >
     using TetrahedralSolidOutputFactory = Factory< std::string,
         TetrahedralSolidOutput< dimension >,
-        const TetrahedralSolid< dimension >&,
         absl::string_view >;
     ALIAS_3D( TetrahedralSolidOutputFactory );
 } // namespace geode

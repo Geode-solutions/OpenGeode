@@ -29,8 +29,8 @@
 
 #include <geode/mesh/core/bitsery_archive.h>
 
-#define BITSERY_WRITE()                                                        \
-    void write() const final                                                   \
+#define BITSERY_WRITE( Mesh, MeshImpl )                                        \
+    void write( const Mesh& mesh ) const final                                 \
     {                                                                          \
         std::ofstream file{ to_string( this->filename() ),                     \
             std::ofstream::binary };                                           \
@@ -39,7 +39,7 @@
         register_geometry_serialize_pcontext( std::get< 0 >( context ) );      \
         register_mesh_serialize_pcontext( std::get< 0 >( context ) );          \
         Serializer archive{ context, file };                                   \
-        archive.object( mesh_ );                                               \
+        archive.object( dynamic_cast< const MeshImpl& >( mesh ) );             \
         archive.adapter().flush();                                             \
         OPENGEODE_EXCEPTION( std::get< 1 >( context ).isValid(),               \
             "[Bitsery::write] Error while writing file: ", this->filename() ); \
@@ -50,17 +50,12 @@
     class OpenGeode##Mesh##Output : public Mesh##Output< dimension >           \
     {                                                                          \
     public:                                                                    \
-        OpenGeode##Mesh##Output(                                               \
-            const Mesh< dimension >& mesh, absl::string_view filename )        \
-            : Mesh##Output< dimension >( mesh, filename ),                     \
-              mesh_( dynamic_cast< const MeshImpl< dimension >& >( mesh ) )    \
+        OpenGeode##Mesh##Output( absl::string_view filename )                  \
+            : Mesh##Output< dimension >( filename )                            \
         {                                                                      \
         }                                                                      \
                                                                                \
-        BITSERY_WRITE()                                                        \
-                                                                               \
-    private:                                                                   \
-        const MeshImpl< dimension >& mesh_;                                    \
+        BITSERY_WRITE( Mesh< dimension >, MeshImpl< dimension > )              \
     };                                                                         \
     ALIAS_2D_AND_3D( OpenGeode##Mesh##Output )
 
@@ -71,17 +66,12 @@
     class OpenGeode##Mesh##Output : public Mesh##Output                        \
     {                                                                          \
     public:                                                                    \
-        OpenGeode##Mesh##Output(                                               \
-            const Mesh& mesh, absl::string_view filename )                     \
-            : Mesh##Output( mesh, filename ),                                  \
-              mesh_( dynamic_cast< const MeshImpl& >( mesh ) )                 \
+        OpenGeode##Mesh##Output( absl::string_view filename )                  \
+            : Mesh##Output( filename )                                         \
         {                                                                      \
         }                                                                      \
                                                                                \
-        BITSERY_WRITE()                                                        \
-                                                                               \
-    private:                                                                   \
-        const MeshImpl& mesh_;                                                 \
+        BITSERY_WRITE( Mesh, MeshImpl )                                        \
     }
 
 #define BITSERY_OUTPUT_MESH_NO_DIMENSION( Mesh )                               \

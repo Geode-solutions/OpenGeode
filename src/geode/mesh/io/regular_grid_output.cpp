@@ -36,10 +36,14 @@ namespace geode
         try
         {
             Timer timer;
-            const auto output = RegularGridOutputFactory< dimension >::create(
-                to_string( extension_from_filename( filename ) ), regular_grid,
-                filename );
-            output->write();
+            const auto extension =
+                to_string( extension_from_filename( filename ) );
+            OPENGEODE_EXCEPTION(
+                RegularGridOutputFactory< dimension >::has_creator( extension ),
+                "Unknown extension: ", extension );
+            RegularGridOutputFactory< dimension >::create(
+                to_string( extension_from_filename( filename ) ), filename )
+                ->write( regular_grid );
             Logger::info( "RegularGrid", dimension, "D saved in ", filename,
                 " in ", timer.duration() );
         }
@@ -51,19 +55,8 @@ namespace geode
         }
     }
 
-    template < index_t dimension >
-    RegularGridOutput< dimension >::RegularGridOutput(
-        const RegularGrid< dimension >& regular_grid,
-        absl::string_view filename )
-        : Output( filename ), regular_grid_( regular_grid )
-    {
-    }
-
     template void opengeode_mesh_api save_regular_grid(
         const RegularGrid< 2 >&, absl::string_view );
     template void opengeode_mesh_api save_regular_grid(
         const RegularGrid< 3 >&, absl::string_view );
-
-    template class opengeode_mesh_api RegularGridOutput< 2 >;
-    template class opengeode_mesh_api RegularGridOutput< 3 >;
 } // namespace geode

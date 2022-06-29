@@ -44,8 +44,8 @@ namespace geode
                     extension ),
                 "Unknown extension: ", extension );
             PolygonalSurfaceOutputFactory< dimension >::create(
-                extension, polygonal_surface, filename )
-                ->write();
+                extension, filename )
+                ->write( polygonal_surface );
             Logger::info( "PolygonalSurface", dimension, "D saved in ",
                 filename, " in ", timer.duration() );
         }
@@ -57,20 +57,8 @@ namespace geode
         }
     }
 
-    template < index_t dimension >
-    PolygonalSurfaceOutput< dimension >::PolygonalSurfaceOutput(
-        const PolygonalSurface< dimension >& polygonal_surface,
-        absl::string_view filename )
-        : VertexSetOutput( polygonal_surface, filename ),
-          polygonal_surface_( polygonal_surface )
-    {
-    }
-
     template void opengeode_mesh_api save_polygonal_surface(
         const PolygonalSurface< 2 >&, absl::string_view );
     template void opengeode_mesh_api save_polygonal_surface(
         const PolygonalSurface< 3 >&, absl::string_view );
-
-    template class opengeode_mesh_api PolygonalSurfaceOutput< 2 >;
-    template class opengeode_mesh_api PolygonalSurfaceOutput< 3 >;
 } // namespace geode

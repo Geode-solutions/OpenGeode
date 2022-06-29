@@ -26,7 +26,7 @@
 #include <geode/basic/factory.h>
 
 #include <geode/mesh/common.h>
-#include <geode/mesh/io/vertex_set_output.h>
+#include <geode/mesh/io/output.h>
 
 namespace geode
 {
@@ -46,27 +46,17 @@ namespace geode
         const PointSet< dimension >& point_set, absl::string_view filename );
 
     template < index_t dimension >
-    class PointSetOutput : public VertexSetOutput
+    class PointSetOutput : public Output< PointSet< dimension > >
     {
-        OPENGEODE_DISABLE_COPY_AND_MOVE( PointSetOutput );
-
     protected:
-        PointSetOutput( const PointSet< dimension >& point_set,
-            absl::string_view filename );
-
-        const PointSet< dimension >& point_set() const
+        PointSetOutput( absl::string_view filename )
+            : Output< PointSet< dimension > >{ filename }
         {
-            return point_set_;
         }
-
-    private:
-        const PointSet< dimension >& point_set_;
     };
 
     template < index_t dimension >
-    using PointSetOutputFactory = Factory< std::string,
-        PointSetOutput< dimension >,
-        const PointSet< dimension >&,
-        absl::string_view >;
+    using PointSetOutputFactory =
+        Factory< std::string, PointSetOutput< dimension >, absl::string_view >;
     ALIAS_2D_AND_3D( PointSetOutputFactory );
 } // namespace geode

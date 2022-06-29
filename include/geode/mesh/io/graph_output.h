@@ -26,7 +26,7 @@
 #include <geode/basic/factory.h>
 
 #include <geode/mesh/common.h>
-#include <geode/mesh/io/vertex_set_output.h>
+#include <geode/mesh/io/output.h>
 
 namespace geode
 {
@@ -44,20 +44,14 @@ namespace geode
     void opengeode_mesh_api save_graph(
         const Graph& graph, absl::string_view filename );
 
-    class opengeode_mesh_api GraphOutput : public VertexSetOutput
+    class GraphOutput : public Output< Graph >
     {
     protected:
-        GraphOutput( const Graph& graph, absl::string_view filename );
-
-        const Graph& graph() const
+        GraphOutput( absl::string_view filename ) : Output< Graph >{ filename }
         {
-            return graph_;
         }
-
-    private:
-        const Graph& graph_;
     };
 
     using GraphOutputFactory =
-        Factory< std::string, GraphOutput, const Graph&, absl::string_view >;
+        Factory< std::string, GraphOutput, absl::string_view >;
 } // namespace geode
