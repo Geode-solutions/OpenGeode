@@ -28,9 +28,10 @@
         "lexicographic_mapping" + std::to_string( dimension ) + "D";           \
     module.def( lexicographic_mapping##dimension.c_str(),                      \
         &lexicographic_mapping< dimension > );                                 \
-    const auto morton_sort##dimension =                                        \
-        "morton_sort" + std::to_string( dimension ) + "D";                     \
-    module.def( morton_sort##dimension.c_str(), &morton_sort< dimension > )
+    const auto morton_mapping##dimension =                                     \
+        "morton_mapping" + std::to_string( dimension ) + "D";                  \
+    module.def(                                                                \
+        morton_mapping##dimension.c_str(), &morton_mapping< dimension > )
 
 namespace geode
 {

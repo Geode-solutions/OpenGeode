@@ -10,6 +10,8 @@ XXXX
 
 - **VertexIdentifier**: `MeshComponentVertex` has been renamed in `ComponentMeshVertex` and its methods `mesh_component_vertices` in `component_mesh_vertices`.
 
+- **PointsSort**: `morton_sort` has been renamed in `morton_mapping`.
+
 ## Upgrading from OpenGeode v9.x.x to v10.0.0
 
 ### Motivations
