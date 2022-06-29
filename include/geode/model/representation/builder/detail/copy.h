@@ -230,7 +230,7 @@ namespace geode
                 async::irange( index_t{ 0 }, from.nb_unique_vertices() ),
                 [&from, &builder_to, &mapping]( index_t v ) {
                     for( const auto& mesh_vertex :
-                        from.mesh_component_vertices( v ) )
+                        from.component_mesh_vertices( v ) )
                     {
                         const auto& type = mesh_vertex.component_id.type();
                         builder_to.set_unique_vertex(

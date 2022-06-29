@@ -67,7 +67,7 @@ namespace geode
         void register_model_pcontext( PContext& context )
         {
             AttributeManager::register_attribute_type<
-                std::vector< MeshComponentVertex >, Serializer >( context );
+                std::vector< ComponentMeshVertex >, Serializer >( context );
             AttributeManager::register_attribute_type< ComponentID,
                 Serializer >( context );
             context.registerBasesList< Serializer >(

@@ -30,24 +30,24 @@ namespace geode
         pybind11::class_< VertexIdentifier >( module, "VertexIdentifier" )
             .def( pybind11::init<>() )
             .def( "nb_unique_vertices", &VertexIdentifier::nb_unique_vertices )
-            .def( "mesh_component_vertices",
-                ( const std::vector< MeshComponentVertex >& (
+            .def( "component_mesh_vertices",
+                ( const std::vector< ComponentMeshVertex >& (
                     VertexIdentifier::*) ( index_t ) const )
-                    & VertexIdentifier::mesh_component_vertices )
-            .def( "filtered_mesh_component_vertices_by_type",
-                ( std::vector< MeshComponentVertex >( VertexIdentifier::* )(
+                    & VertexIdentifier::component_mesh_vertices )
+            .def( "filtered_component_mesh_vertices_by_type",
+                ( std::vector< ComponentMeshVertex >( VertexIdentifier::* )(
                     index_t, const ComponentType& ) const )
-                    & VertexIdentifier::mesh_component_vertices )
-            .def( "filtered_mesh_component_vertices_by_id",
+                    & VertexIdentifier::component_mesh_vertices )
+            .def( "filtered_component_mesh_vertices_by_id",
                 ( std::vector< index_t >( VertexIdentifier::* )(
                     index_t, const uuid& ) const )
-                    & VertexIdentifier::mesh_component_vertices )
+                    & VertexIdentifier::component_mesh_vertices )
             .def( "unique_vertex", &VertexIdentifier::unique_vertex );
 
-        pybind11::class_< MeshComponentVertex >( module, "MeshComponentVertex" )
+        pybind11::class_< ComponentMeshVertex >( module, "ComponentMeshVertex" )
             .def( pybind11::init< ComponentID, index_t >() )
             .def( pybind11::self == pybind11::self )
-            .def_readwrite( "component_id", &MeshComponentVertex::component_id )
-            .def_readwrite( "vertex", &MeshComponentVertex::vertex );
+            .def_readwrite( "component_id", &ComponentMeshVertex::component_id )
+            .def_readwrite( "vertex", &ComponentMeshVertex::vertex );
     }
 } // namespace geode

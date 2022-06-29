@@ -1,5 +1,15 @@
 # Upgrade Guide
 
+## Upgrading from OpenGeode v10.x.x to v11.0.0
+
+### Motivations
+
+XXXX
+
+### Breaking Changes
+
+- **VertexIdentifier**: `MeshComponentVertex` has been renamed in `ComponentMeshVertex` and its methods `mesh_component_vertices` in `component_mesh_vertices`.
+
 ## Upgrading from OpenGeode v9.x.x to v10.0.0
 
 ### Motivations

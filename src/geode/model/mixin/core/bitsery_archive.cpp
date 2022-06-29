@@ -76,7 +76,7 @@ namespace
     void register_model_pcontext( geode::PContext& context )
     {
         geode::AttributeManager::register_attribute_type<
-            std::vector< geode::MeshComponentVertex >, Serializer >(
+            std::vector< geode::ComponentMeshVertex >, Serializer >(
             context, "vector_MCV" );
         geode::AttributeManager::register_attribute_type< geode::ComponentID,
             Serializer >( context, "ComponentID" );
