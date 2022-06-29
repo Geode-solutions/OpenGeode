@@ -39,7 +39,7 @@ namespace geode
         module.def( "triangle_signed_area3D",
             ( double ( * )( const Triangle3D&, const Vector3D& ) )
                 & triangle_signed_area );
-        module.def( "tetra_signed_volume", &tetra_signed_volume );
-        module.def( "tetra_volume", &tetra_volume );
+        module.def( "tetrahedron_signed_volume", &tetrahedron_signed_volume );
+        module.def( "tetrahedron_volume", &tetrahedron_volume );
     }
 } // namespace geode

@@ -30,24 +30,25 @@
 
 namespace geode
 {
-    std::array< double, 4 > tetra_barycentric_coordinates(
+    std::array< double, 4 > tetrahedron_barycentric_coordinates(
         const Point3D& point, const Tetrahedron& tetra )
     {
         const auto volume0 =
-            tetra_signed_volume( Tetrahedron{ tetra.vertices()[1],
+            tetrahedron_signed_volume( Tetrahedron{ tetra.vertices()[1],
                 tetra.vertices()[3], tetra.vertices()[2], point } );
         const auto volume1 =
-            tetra_signed_volume( Tetrahedron{ tetra.vertices()[0],
+            tetrahedron_signed_volume( Tetrahedron{ tetra.vertices()[0],
                 tetra.vertices()[2], tetra.vertices()[3], point } );
         const auto volume2 =
-            tetra_signed_volume( Tetrahedron{ tetra.vertices()[0],
+            tetrahedron_signed_volume( Tetrahedron{ tetra.vertices()[0],
                 tetra.vertices()[3], tetra.vertices()[1], point } );
         const auto volume3 =
-            tetra_signed_volume( Tetrahedron{ tetra.vertices()[0],
+            tetrahedron_signed_volume( Tetrahedron{ tetra.vertices()[0],
                 tetra.vertices()[1], tetra.vertices()[2], point } );
         const auto total_volume = volume0 + volume1 + volume2 + volume3;
         OPENGEODE_EXCEPTION( std::fabs( total_volume ) > global_epsilon,
-            "[tetra_barycentric_coordinates] Volume of input tetrahedron too "
+            "[tetrahedron_barycentric_coordinates] Volume of input tetrahedron "
+            "too "
             "small" );
 
         const auto lambda0 = volume0 / total_volume;

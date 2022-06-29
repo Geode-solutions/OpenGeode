@@ -259,33 +259,33 @@ namespace geode
                 },
                 pybind11::return_value_policy::reference )
             .def( "is_line_closed",
-                ( bool ( BRep::* )( const Line3D& ) const ) & BRep::is_closed )
+                ( bool( BRep::* )( const Line3D& ) const ) & BRep::is_closed )
             .def( "is_surface_closed",
-                ( bool ( BRep::* )( const Surface3D& ) const )
+                ( bool( BRep::* )( const Surface3D& ) const )
                     & BRep::is_closed )
             .def( "is_line_boundary",
-                ( bool ( BRep::* )( const Corner3D&, const Line3D& ) const )
+                ( bool( BRep::* )( const Corner3D&, const Line3D& ) const )
                     & BRep::is_boundary )
             .def( "is_surface_boundary",
-                ( bool ( BRep::* )( const Line3D&, const Surface3D& ) const )
+                ( bool( BRep::* )( const Line3D&, const Surface3D& ) const )
                     & BRep::is_boundary )
             .def( "is_block_boundary",
-                ( bool ( BRep::* )( const Surface3D&, const Block3D& ) const )
+                ( bool( BRep::* )( const Surface3D&, const Block3D& ) const )
                     & BRep::is_boundary )
             .def( "is_corner_in_surface_internals",
-                ( bool ( BRep::* )( const Corner3D&, const Surface3D& ) const )
+                ( bool( BRep::* )( const Corner3D&, const Surface3D& ) const )
                     & BRep::is_internal )
             .def( "is_line_in_surface_internals",
-                ( bool ( BRep::* )( const Line3D&, const Surface3D& ) const )
+                ( bool( BRep::* )( const Line3D&, const Surface3D& ) const )
                     & BRep::is_internal )
             .def( "is_corner_in_block_internals",
-                ( bool ( BRep::* )( const Corner3D&, const Block3D& ) const )
+                ( bool( BRep::* )( const Corner3D&, const Block3D& ) const )
                     & BRep::is_internal )
             .def( "is_line_in_block_internals",
-                ( bool ( BRep::* )( const Line3D&, const Block3D& ) const )
+                ( bool( BRep::* )( const Line3D&, const Block3D& ) const )
                     & BRep::is_internal )
             .def( "is_surface_in_block_internals",
-                ( bool ( BRep::* )( const Surface3D&, const Block3D& ) const )
+                ( bool( BRep::* )( const Surface3D&, const Block3D& ) const )
                     & BRep::is_internal )
             .def( "is_model_boundary_item", &BRep::is_model_boundary_item )
             .def( "bounding_box", &BRep::bounding_box )

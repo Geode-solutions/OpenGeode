@@ -84,7 +84,7 @@ namespace geode
                / 2.;
     }
 
-    double tetra_signed_volume( const Tetrahedron& tetra )
+    double tetrahedron_signed_volume( const Tetrahedron& tetra )
     {
         return Vector3D{ tetra.vertices()[0], tetra.vertices()[1] }.dot(
                    Vector3D{ tetra.vertices()[0], tetra.vertices()[2] }.cross(
@@ -92,9 +92,9 @@ namespace geode
                / 6.;
     }
 
-    double tetra_volume( const Tetrahedron& tetra )
+    double tetrahedron_volume( const Tetrahedron& tetra )
     {
-        return std::fabs( tetra_signed_volume( tetra ) );
+        return std::fabs( tetrahedron_signed_volume( tetra ) );
     }
 
     template double opengeode_geometry_api triangle_area( const Triangle2D& );

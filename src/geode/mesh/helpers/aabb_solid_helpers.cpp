@@ -57,7 +57,8 @@ namespace geode
         DistanceToTetrahedron< dimension >::operator()(
             const Point< dimension >& query, index_t cur_box ) const
     {
-        return point_tetra_distance( query, mesh_.tetra( cur_box ) );
+        return point_tetrahedron_distance(
+            query, mesh_.tetrahedron( cur_box ) );
     }
 
     template opengeode_mesh_api AABBTree3D create_aabb_tree< 3 >(

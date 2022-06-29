@@ -175,7 +175,7 @@ void test_triangle()
         "[Test] Wrong result for triangle5" );
 }
 
-void test_tetra()
+void test_tetrahedron()
 {
     const geode::Point3D a{ { 1.0, 5.0 } };
     const geode::Point3D b{ { -1.0, -5.0 } };
@@ -294,7 +294,7 @@ void test()
     test_line();
     test_plane();
     test_triangle();
-    test_tetra();
+    test_tetrahedron();
     test_sphere();
     test_circle();
 }

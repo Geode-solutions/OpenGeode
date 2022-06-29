@@ -60,9 +60,9 @@ namespace geode
         geode_unused( facets );
         if( vertices.size() == 4 )
         {
-            std::array< index_t, 4 > tetra_vertices;
-            absl::c_copy_n( vertices, 4, tetra_vertices.begin() );
-            do_create_tetrahedron( tetra_vertices );
+            std::array< index_t, 4 > tetrahedron_vertices;
+            absl::c_copy_n( vertices, 4, tetrahedron_vertices.begin() );
+            do_create_tetrahedron( tetrahedron_vertices );
         }
         else if( vertices.size() == 8 )
         {

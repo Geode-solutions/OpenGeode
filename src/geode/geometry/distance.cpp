@@ -445,7 +445,7 @@ namespace geode
         return std::make_tuple( result, closest_point );
     }
 
-    std::tuple< double, Point3D > point_tetra_distance(
+    std::tuple< double, Point3D > point_tetrahedron_distance(
         const Point3D& point, const Tetrahedron& tetra )
     {
         auto max_distance = MAX_DOUBLE;
@@ -457,9 +457,9 @@ namespace geode
             Point3D cur_p;
             std::tie( distance, cur_p ) = point_triangle_signed_distance( point,
                 Triangle3D{
-                    tetra.vertices()[Tetrahedron::tetra_facet_vertex[f][0]],
-                    tetra.vertices()[Tetrahedron::tetra_facet_vertex[f][1]],
-                    tetra.vertices()[Tetrahedron::tetra_facet_vertex[f][2]] } );
+                    tetra.vertices()[Tetrahedron::tetrahedron_facet_vertex[f][0]],
+                    tetra.vertices()[Tetrahedron::tetrahedron_facet_vertex[f][1]],
+                    tetra.vertices()[Tetrahedron::tetrahedron_facet_vertex[f][2]] } );
             if( distance > 0 )
             {
                 inside = false;

@@ -45,7 +45,7 @@ namespace geode
      * the tetra vertices.
      */
     std::array< double, 4 >
-        opengeode_geometry_api tetra_barycentric_coordinates(
+        opengeode_geometry_api tetrahedron_barycentric_coordinates(
             const Point3D& point, const Tetrahedron& tetra );
 
     /*!

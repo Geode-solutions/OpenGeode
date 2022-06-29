@@ -150,7 +150,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    Tetrahedron TetrahedralSolid< dimension >::tetra(
+    Tetrahedron TetrahedralSolid< dimension >::tetrahedron(
         index_t tetrahedron_id ) const
     {
         return { this->point(

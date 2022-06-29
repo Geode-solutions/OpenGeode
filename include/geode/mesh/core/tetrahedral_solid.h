@@ -105,7 +105,7 @@ namespace geode
         /*!
          * Return a geometrical Tetra from an element of the mesh.
          */
-        Tetrahedron tetra( index_t tetrahedron_id ) const;
+        Tetrahedron tetrahedron( index_t tetrahedron_id ) const;
 
         /*!
          * Return a geometrical Triangle from a tetrahedron facet of the mesh.

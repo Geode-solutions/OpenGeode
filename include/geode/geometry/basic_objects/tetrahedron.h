@@ -44,7 +44,7 @@ namespace geode
     {
     public:
         static constexpr std::array< std::array< index_t, 3 >, 4 >
-            tetra_facet_vertex{ { { { 1, 3, 2 } }, { { 0, 2, 3 } },
+            tetrahedron_facet_vertex{ { { { 1, 3, 2 } }, { { 0, 2, 3 } },
                 { { 3, 1, 0 } }, { { 0, 1, 2 } } } };
 
         GenericTetrahedron( const Point3D& p0,
