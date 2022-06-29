@@ -26,7 +26,7 @@
 
 #include <geode/geometry/point.h>
 
-#include <geode/geometry/basic_objects/tetra.h>
+#include <geode/geometry/basic_objects/tetrahedron.h>
 #include <geode/geometry/basic_objects/triangle.h>
 #include <geode/geometry/signed_mensuration.h>
 
@@ -137,12 +137,12 @@ void test_tetra_signed_area()
     const geode::Point3D c{ { 0.0, 1.0, 0.0 } };
     const geode::Point3D d{ { 0.0, 0.0, 1.0 } };
 
-    const geode::Tetra tetra1{ a, b, c, d };
+    const geode::Tetrahedron tetra1{ a, b, c, d };
     const auto area1 = geode::tetra_signed_volume( tetra1 );
     OPENGEODE_EXCEPTION( area1 == 1. / 6.,
         "[Test] Wrong result for tetra_signed_volume with query tetra tetra1" );
 
-    const geode::Tetra tetra2{ a, b, d, c };
+    const geode::Tetrahedron tetra2{ a, b, d, c };
     const auto area2 = geode::tetra_signed_volume( tetra2 );
     OPENGEODE_EXCEPTION( area2 == -1. / 6.,
         "[Test] Wrong result for tetra_signed_volume with query tetra tetra2" );

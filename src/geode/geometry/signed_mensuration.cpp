@@ -23,7 +23,7 @@
 
 #include <geode/geometry/signed_mensuration.h>
 
-#include <geode/geometry/basic_objects/tetra.h>
+#include <geode/geometry/basic_objects/tetrahedron.h>
 #include <geode/geometry/basic_objects/triangle.h>
 #include <geode/geometry/perpendicular.h>
 
@@ -84,7 +84,7 @@ namespace geode
                / 2.;
     }
 
-    double tetra_signed_volume( const Tetra& tetra )
+    double tetra_signed_volume( const Tetrahedron& tetra )
     {
         return Vector3D{ tetra.vertices()[0], tetra.vertices()[1] }.dot(
                    Vector3D{ tetra.vertices()[0], tetra.vertices()[2] }.cross(
@@ -92,7 +92,7 @@ namespace geode
                / 6.;
     }
 
-    double tetra_volume( const Tetra& tetra )
+    double tetra_volume( const Tetrahedron& tetra )
     {
         return std::fabs( tetra_signed_volume( tetra ) );
     }

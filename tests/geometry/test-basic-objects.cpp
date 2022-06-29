@@ -31,7 +31,7 @@
 #include <geode/geometry/basic_objects/plane.h>
 #include <geode/geometry/basic_objects/segment.h>
 #include <geode/geometry/basic_objects/sphere.h>
-#include <geode/geometry/basic_objects/tetra.h>
+#include <geode/geometry/basic_objects/tetrahedron.h>
 #include <geode/geometry/basic_objects/triangle.h>
 
 #include <geode/tests/common.h>
@@ -181,27 +181,27 @@ void test_tetra()
     const geode::Point3D b{ { -1.0, -5.0 } };
     const geode::Point3D c{ { 1.0, -5.0 } };
     const geode::Point3D d{ { -1.0, 5.0 } };
-    const geode::Tetra tetra{ a, b, c, d };
+    const geode::Tetrahedron tetra{ a, b, c, d };
 
     const geode::Point3D barycenter{ { 0, 0 } };
     OPENGEODE_EXCEPTION(
         tetra.barycenter() == barycenter, "[Test] Wrong barycenter result" );
 
-    geode::Tetra tetra2{ tetra };
+    geode::Tetrahedron tetra2{ tetra };
     OPENGEODE_EXCEPTION( tetra2.vertices()[0].get() == a
                              && tetra2.vertices()[1].get() == b
                              && tetra2.vertices()[2].get() == c
                              && tetra2.vertices()[3].get() == d,
         "[Test] Wrong result for tetra2" );
 
-    geode::Tetra tetra3{ std::move( tetra ) };
+    geode::Tetrahedron tetra3{ std::move( tetra ) };
     OPENGEODE_EXCEPTION( tetra3.vertices()[0].get() == a
                              && tetra3.vertices()[1].get() == b
                              && tetra3.vertices()[2].get() == c
                              && tetra2.vertices()[3].get() == d,
         "[Test] Wrong result for tetra3" );
 
-    geode::Tetra tetra4{ d, c, b, a };
+    geode::Tetrahedron tetra4{ d, c, b, a };
     tetra4 = tetra2;
     OPENGEODE_EXCEPTION( tetra4.vertices()[0].get() == a
                              && tetra4.vertices()[1].get() == b
@@ -209,7 +209,7 @@ void test_tetra()
                              && tetra2.vertices()[3].get() == d,
         "[Test] Wrong result for tetra4" );
 
-    geode::Tetra tetra5{ d, c, b, a };
+    geode::Tetrahedron tetra5{ d, c, b, a };
     tetra5 = std::move( tetra2 );
     OPENGEODE_EXCEPTION( tetra5.vertices()[0].get() == a
                              && tetra5.vertices()[1].get() == b

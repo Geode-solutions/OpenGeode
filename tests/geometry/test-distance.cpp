@@ -31,7 +31,7 @@
 #include <geode/geometry/basic_objects/plane.h>
 #include <geode/geometry/basic_objects/segment.h>
 #include <geode/geometry/basic_objects/sphere.h>
-#include <geode/geometry/basic_objects/tetra.h>
+#include <geode/geometry/basic_objects/tetrahedron.h>
 #include <geode/geometry/basic_objects/triangle.h>
 #include <geode/geometry/distance.h>
 
@@ -678,7 +678,7 @@ void test_point_tetra_distance()
     const geode::Point3D b{ { 1.0, 0.0, 0.0 } };
     const geode::Point3D c{ { 0.0, 1.0, 0.0 } };
     const geode::Point3D d{ { 0.0, 0.0, 1.0 } };
-    const geode::Tetra tetra{ a, b, c, d };
+    const geode::Tetrahedron tetra{ a, b, c, d };
 
     double distance;
     geode::Point3D closest_point, answer;

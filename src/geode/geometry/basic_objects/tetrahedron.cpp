@@ -21,12 +21,12 @@
  *
  */
 
-#include <geode/geometry/basic_objects/tetra.h>
+#include <geode/geometry/basic_objects/tetrahedron.h>
 
 namespace geode
 {
     template < typename PointType >
-    GenericTetra< PointType >::GenericTetra( const Point3D& p0,
+    GenericTetrahedron< PointType >::GenericTetrahedron( const Point3D& p0,
         const Point3D& p1,
         const Point3D& p2,
         const Point3D& p3 )
@@ -34,31 +34,33 @@ namespace geode
     {
     }
     template < typename PointType >
-    GenericTetra< PointType >::GenericTetra( const GenericTetra& other )
+    GenericTetrahedron< PointType >::GenericTetrahedron(
+        const GenericTetrahedron& other )
         : vertices_( other.vertices_ )
     {
     }
     template < typename PointType >
-    GenericTetra< PointType >& GenericTetra< PointType >::operator=(
-        const GenericTetra& other )
+    GenericTetrahedron< PointType >& GenericTetrahedron< PointType >::operator=(
+        const GenericTetrahedron& other )
     {
         vertices_ = other.vertices_;
         return *this;
     }
     template < typename PointType >
-    GenericTetra< PointType >::GenericTetra( GenericTetra&& other )
+    GenericTetrahedron< PointType >::GenericTetrahedron(
+        GenericTetrahedron&& other )
         : vertices_( std::move( other.vertices_ ) )
     {
     }
     template < typename PointType >
-    GenericTetra< PointType >& GenericTetra< PointType >::operator=(
-        GenericTetra&& other )
+    GenericTetrahedron< PointType >& GenericTetrahedron< PointType >::operator=(
+        GenericTetrahedron&& other )
     {
         vertices_ = std::move( other.vertices_ );
         return *this;
     }
     template < typename PointType >
-    Point3D GenericTetra< PointType >::barycenter() const
+    Point3D GenericTetrahedron< PointType >::barycenter() const
     {
         const Point3D& p0 = vertices_[0];
         const Point3D& p1 = vertices_[1];
@@ -67,61 +69,69 @@ namespace geode
         return ( p0 + p1 + p2 + p3 ) / 4.;
     }
     template < typename PointType >
-    void GenericTetra< PointType >::set_point(
+    void GenericTetrahedron< PointType >::set_point(
         index_t vertex, const Point3D& point )
     {
         vertices_.at( vertex ) = point;
     }
     template < typename PointType >
     const std::array< PointType, 4 >&
-        GenericTetra< PointType >::vertices() const
+        GenericTetrahedron< PointType >::vertices() const
     {
         return vertices_;
     }
 
     template < typename PointType >
-    GenericTetra< PointType >::GenericTetra( const OwnerTetra& other )
+    GenericTetrahedron< PointType >::GenericTetrahedron(
+        const OwnerTetrahedron& other )
         : vertices_{ { { other.vertices()[0] }, { other.vertices()[1] },
             { other.vertices()[2] }, { other.vertices()[3] } } }
     {
     }
 
-    OwnerTetra::OwnerTetra( const Point3D& p0,
+    OwnerTetrahedron::OwnerTetrahedron( const Point3D& p0,
         const Point3D& p1,
         const Point3D& p2,
         const Point3D& p3 )
         : Base( p0, p1, p2, p3 )
     {
     }
-    OwnerTetra::OwnerTetra( const OwnerTetra& other ) : Base( other ) {}
-    OwnerTetra& OwnerTetra::operator=( const OwnerTetra& other )
+    OwnerTetrahedron::OwnerTetrahedron( const OwnerTetrahedron& other )
+        : Base( other )
+    {
+    }
+    OwnerTetrahedron& OwnerTetrahedron::operator=(
+        const OwnerTetrahedron& other )
     {
         Base::operator=( other );
         return *this;
     }
-    OwnerTetra::OwnerTetra( OwnerTetra&& other ) : Base( other ) {}
-    OwnerTetra& OwnerTetra::operator=( OwnerTetra&& other )
+    OwnerTetrahedron::OwnerTetrahedron( OwnerTetrahedron&& other )
+        : Base( other )
+    {
+    }
+    OwnerTetrahedron& OwnerTetrahedron::operator=( OwnerTetrahedron&& other )
     {
         Base::operator=( other );
         return *this;
     }
 
-    Tetra::Tetra( const Point3D& p0,
+    Tetrahedron::Tetrahedron( const Point3D& p0,
         const Point3D& p1,
         const Point3D& p2,
         const Point3D& p3 )
         : Base( p0, p1, p2, p3 )
     {
     }
-    Tetra::Tetra( const Tetra& other ) : Base( other ) {}
-    Tetra::Tetra( const OwnerTetra& other ) : Base( other ) {}
-    Tetra& Tetra::operator=( const Tetra& other )
+    Tetrahedron::Tetrahedron( const Tetrahedron& other ) : Base( other ) {}
+    Tetrahedron::Tetrahedron( const OwnerTetrahedron& other ) : Base( other ) {}
+    Tetrahedron& Tetrahedron::operator=( const Tetrahedron& other )
     {
         Base::operator=( other );
         return *this;
     }
-    Tetra::Tetra( Tetra&& other ) : Base( other ) {}
-    Tetra& Tetra::operator=( Tetra&& other )
+    Tetrahedron::Tetrahedron( Tetrahedron&& other ) : Base( other ) {}
+    Tetrahedron& Tetrahedron::operator=( Tetrahedron&& other )
     {
         Base::operator=( other );
         return *this;
@@ -129,14 +139,14 @@ namespace geode
 
     template < typename PointType >
     constexpr std::array< std::array< index_t, 3 >, 4 >
-        GenericTetra< PointType >::tetra_facet_vertex;
+        GenericTetrahedron< PointType >::tetra_facet_vertex;
     template opengeode_geometry_api const
         std::array< std::array< index_t, 3 >, 4 >
-            GenericTetra< RefPoint< 3 > >::tetra_facet_vertex;
+            GenericTetrahedron< RefPoint< 3 > >::tetra_facet_vertex;
     template opengeode_geometry_api const
         std::array< std::array< index_t, 3 >, 4 >
-            GenericTetra< Point< 3 > >::tetra_facet_vertex;
+            GenericTetrahedron< Point< 3 > >::tetra_facet_vertex;
 
-    template class opengeode_geometry_api GenericTetra< Point< 3 > >;
-    template class opengeode_geometry_api GenericTetra< RefPoint< 3 > >;
+    template class opengeode_geometry_api GenericTetrahedron< Point< 3 > >;
+    template class opengeode_geometry_api GenericTetrahedron< RefPoint< 3 > >;
 } // namespace geode

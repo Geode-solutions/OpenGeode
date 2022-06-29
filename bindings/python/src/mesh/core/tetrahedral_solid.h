@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/geometry/basic_objects/tetra.h>
+#include <geode/geometry/basic_objects/tetrahedron.h>
 #include <geode/geometry/basic_objects/triangle.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
 

@@ -29,7 +29,7 @@ add_geode_library(
         "basic_objects/plane.cpp"
         "basic_objects/segment.cpp"
         "basic_objects/sphere.cpp"
-        "basic_objects/tetra.cpp"
+        "basic_objects/tetrahedron.cpp"
         "basic_objects/triangle.cpp"
         "bitsery_input.cpp"
         "bitsery_output.cpp"
@@ -45,7 +45,6 @@ add_geode_library(
     PUBLIC_HEADERS
         "aabb.h"
         "barycentric_coordinates.h"
-        "basic_objects.h"
         "bitsery_archive.h"
         "bounding_box.h"
         "common.h"
@@ -65,7 +64,7 @@ add_geode_library(
         "basic_objects/plane.h"
         "basic_objects/segment.h"
         "basic_objects/sphere.h"
-        "basic_objects/tetra.h"
+        "basic_objects/tetrahedron.h"
         "basic_objects/triangle.h"
     ADVANCED_HEADERS
         "detail/aabb_impl.h"

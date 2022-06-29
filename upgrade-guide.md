@@ -1,5 +1,15 @@
 # Upgrade Guide
 
+## Upgrading from OpenGeode v10.x.x to v11.0.0
+
+### Motivations
+
+XXXX
+
+### Breaking Changes
+
+- **BasicObjects**: `Tetra` and related classes have been renamed in `Tetrahedron`. The header `basic_objets.h` has been remove and replaced by several files located in a `geode/geometry/basic_objects` folder.
+
 ## Upgrading from OpenGeode v9.x.x to v10.0.0
 
 ### Motivations

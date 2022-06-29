@@ -31,7 +31,7 @@
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( TetrahedralSolidBuilder );
-    class Tetra;
+    class Tetrahedron;
     FORWARD_DECLARATION_DIMENSION_CLASS( Triangle );
 } // namespace geode
 
@@ -105,7 +105,7 @@ namespace geode
         /*!
          * Return a geometrical Tetra from an element of the mesh.
          */
-        Tetra tetra( index_t tetrahedron_id ) const;
+        Tetrahedron tetra( index_t tetrahedron_id ) const;
 
         /*!
          * Return a geometrical Triangle from a tetrahedron facet of the mesh.

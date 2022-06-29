@@ -29,7 +29,7 @@
 
 #include <geode/geometry/barycentric_coordinates.h>
 #include <geode/geometry/basic_objects/segment.h>
-#include <geode/geometry/basic_objects/tetra.h>
+#include <geode/geometry/basic_objects/tetrahedron.h>
 #include <geode/geometry/basic_objects/triangle.h>
 
 #include <geode/tests/common.h>
@@ -210,7 +210,7 @@ void test_tetra_barycentric_coordinates()
     const geode::Point3D b{ { 1.0, 0.0, 0.0 } };
     const geode::Point3D c{ { 0.0, 1.0, 0.0 } };
     const geode::Point3D d{ { 0.0, 0.0, 1.0 } };
-    const geode::Tetra tetra{ a, b, c, d };
+    const geode::Tetrahedron tetra{ a, b, c, d };
 
     OPENGEODE_EXCEPTION(
         check_bary_coords< 4 >(
