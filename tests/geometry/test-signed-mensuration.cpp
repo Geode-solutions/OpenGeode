@@ -139,15 +139,15 @@ void test_tetrahedron_signed_area()
 
     const geode::Tetrahedron tetra1{ a, b, c, d };
     const auto area1 = geode::tetrahedron_signed_volume( tetra1 );
-    OPENGEODE_EXCEPTION(
-        area1 == 1. / 6., "[Test] Wrong result for tetrahedron_signed_volume "
-                          "with query tetra tetra1" );
+    OPENGEODE_EXCEPTION( area1 == 1. / 6.,
+        "[Test] Wrong result for tetrahedron_signed_volume "
+        "with query tetra tetra1" );
 
     const geode::Tetrahedron tetra2{ a, b, d, c };
     const auto area2 = geode::tetrahedron_signed_volume( tetra2 );
-    OPENGEODE_EXCEPTION(
-        area2 == -1. / 6., "[Test] Wrong result for tetrahedron_signed_volume "
-                           "with query tetra tetra2" );
+    OPENGEODE_EXCEPTION( area2 == -1. / 6.,
+        "[Test] Wrong result for tetrahedron_signed_volume "
+        "with query tetra tetra2" );
 }
 
 void test()

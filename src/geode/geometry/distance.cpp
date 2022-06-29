@@ -457,9 +457,12 @@ namespace geode
             Point3D cur_p;
             std::tie( distance, cur_p ) = point_triangle_signed_distance( point,
                 Triangle3D{
-                    tetra.vertices()[Tetrahedron::tetrahedron_facet_vertex[f][0]],
-                    tetra.vertices()[Tetrahedron::tetrahedron_facet_vertex[f][1]],
-                    tetra.vertices()[Tetrahedron::tetrahedron_facet_vertex[f][2]] } );
+                    tetra.vertices()[Tetrahedron::tetrahedron_facet_vertex[f]
+                                                                          [0]],
+                    tetra.vertices()[Tetrahedron::tetrahedron_facet_vertex[f]
+                                                                          [1]],
+                    tetra.vertices()
+                        [Tetrahedron::tetrahedron_facet_vertex[f][2]] } );
             if( distance > 0 )
             {
                 inside = false;
