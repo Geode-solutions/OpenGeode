@@ -13,6 +13,8 @@
 #include <geode/geometry/point.h>
 #include <geode/geometry/position.h>
 
+#include <geode/tests/common.h>
+
 void test_point_side_to_segment()
 {
     const geode::Point2D a{ { 0.0, 0.0 } };
@@ -427,22 +429,16 @@ void test_point_side_to_triangle()
         "q3" );
 }
 
-int main()
+void test()
 {
-    try
-    {
-        test_point_side_to_segment();
-        test_point_side_to_plane();
-        test_point_side_to_triangle();
-        test_point_segment_position();
-        test_point_triangle_position();
-        test_point_tetrahedron_position();
+    test_point_side_to_segment();
+    test_point_side_to_plane();
+    test_point_side_to_triangle();
+    test_point_segment_position();
+    test_point_triangle_position();
+    test_point_tetrahedron_position();
 
-        geode::Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode::geode_lippincott();
-    }
+    geode::Logger::info( "TEST SUCCESS" );
 }
+
+OPENGEODE_TEST( "position" )
