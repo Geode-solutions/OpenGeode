@@ -26,7 +26,7 @@
 #include <geode/geometry/basic_objects/segment.h>
 #include <geode/geometry/basic_objects/tetrahedron.h>
 #include <geode/geometry/basic_objects/triangle.h>
-#include <geode/geometry/signed_mensuration.h>
+#include <geode/geometry/mensuration.h>
 
 namespace geode
 {

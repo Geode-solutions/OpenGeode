@@ -23,7 +23,12 @@
 
 #include <geode/geometry/common.h>
 
+#include <geode/geometry/private/predicates.h>
+
 namespace
 {
-    OPENGEODE_LIBRARY_INITIALIZE( OpenGeode_geometry ) {}
+    OPENGEODE_LIBRARY_INITIALIZE( OpenGeode_geometry )
+    {
+        GEO::PCK::initialize();
+    }
 } // namespace

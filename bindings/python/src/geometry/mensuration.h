@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/geometry/signed_mensuration.h>
+#include <geode/geometry/mensuration.h>
 
 #define PYTHON_MENSURATION( dimension )                                        \
     const auto triangle_area##dimension =                                      \
@@ -30,7 +30,7 @@
 
 namespace geode
 {
-    void define_signed_mensuration( pybind11::module& module )
+    void define_mensuration( pybind11::module& module )
     {
         PYTHON_MENSURATION( 2 );
         PYTHON_MENSURATION( 3 );
