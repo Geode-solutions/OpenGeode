@@ -87,6 +87,8 @@ add_geode_library(
         "helpers/aabb_solid_helpers.cpp"
         "helpers/convert_surface_mesh.cpp"
         "helpers/convert_solid_mesh.cpp"
+        "helpers/regular_grid_point_function.cpp"
+        "helpers/private/regular_grid_shape_function.cpp"
         "io/edged_curve_input.cpp"
         "io/edged_curve_output.cpp"
         "io/graph_input.cpp"
@@ -176,6 +178,7 @@ add_geode_library(
         "helpers/aabb_solid_helpers.h"
         "helpers/convert_surface_mesh.h"
         "helpers/convert_solid_mesh.h"
+        "helpers/regular_grid_point_function.h"
         "io/edged_curve_input.h"
         "io/edged_curve_output.h"
         "io/graph_input.h"
@@ -235,6 +238,7 @@ add_geode_library(
         "core/private/points_view_impl.h"
         "core/private/solid_mesh_view_impl.h"
         "core/private/surface_mesh_view_impl.h"
+        "helpers/private/regular_grid_shape_function.h"
     PUBLIC_DEPENDENCIES
         absl::flat_hash_map
         Bitsery::bitsery
