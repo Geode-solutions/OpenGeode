@@ -29,6 +29,7 @@
 #include "basic_objects.h"
 #include "bounding_box.h"
 #include "distance.h"
+#include "intersection.h"
 #include "nn_search.h"
 #include "perpendicular.h"
 #include "point.h"
@@ -79,16 +80,17 @@ PYBIND11_MODULE( opengeode_py_geometry, module )
 {
     pybind11::add_ostream_redirect( module );
     module.doc() = "OpenGeode Python binding for geometry";
-    geode::define_point( module );
-    geode::define_vector( module );
-    geode::define_bounding_box( module );
-    geode::define_nn_search( module );
+    geode::define_barycentric( module );
     geode::define_basic_objects( module );
+    geode::define_bounding_box( module );
     geode::define_distance( module );
+    geode::define_intersection( module );
+    geode::define_nn_search( module );
     geode::define_perpendicular( module );
+    geode::define_point( module );
+    geode::define_points_sort( module );
     geode::define_projection( module );
     geode::define_rotation( module );
-    geode::define_mensuration( module );
-    geode::define_barycentric( module );
-    geode::define_points_sort( module );
+    geode::define_signed_mensuration( module );
+    geode::define_vector( module );
 }

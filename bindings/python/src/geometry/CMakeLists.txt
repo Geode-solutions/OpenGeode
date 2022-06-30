@@ -26,6 +26,8 @@ add_geode_python_binding(
         "basic_objects.h"
         "bounding_box.h"
         "distance.h"
+        "intersection.h"
+        "nn_search.h"
         "perpendicular.h"
         "point.h"
         "points_sort.h"

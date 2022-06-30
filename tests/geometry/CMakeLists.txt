@@ -19,9 +19,15 @@
 # SOFTWARE.
 
 add_geode_test(
-    SOURCE "test-bounding-box.cpp" 
+    SOURCE "test-aabb.cpp"
     DEPENDENCIES
-        ${PROJECT_NAME}::basic
+        OpenGeode::basic
+        ${PROJECT_NAME}::geometry
+)
+add_geode_test(
+    SOURCE "test-barycentric-coordinates.cpp"
+    DEPENDENCIES
+        OpenGeode::basic
         ${PROJECT_NAME}::geometry
 )
 add_geode_test(
@@ -31,9 +37,33 @@ add_geode_test(
         ${PROJECT_NAME}::geometry
 )
 add_geode_test(
+    SOURCE "test-bounding-box.cpp" 
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+)
+add_geode_test(
+    SOURCE "test-distance.cpp"
+    DEPENDENCIES
+        OpenGeode::basic
+        ${PROJECT_NAME}::geometry
+)
+add_geode_test(
+    SOURCE "test-intersection.cpp"
+    DEPENDENCIES
+        OpenGeode::basic
+        ${PROJECT_NAME}::geometry
+)
+add_geode_test(
     SOURCE "test-nnsearch.cpp" 
     DEPENDENCIES
         ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+)
+add_geode_test(
+    SOURCE "test-perpendicular.cpp"
+    DEPENDENCIES
+        OpenGeode::basic
         ${PROJECT_NAME}::geometry
 )
 add_geode_test(
@@ -46,30 +76,6 @@ add_geode_test(
     SOURCE "test-points-sort.cpp" 
     DEPENDENCIES
         ${PROJECT_NAME}::basic
-        ${PROJECT_NAME}::geometry
-)
-add_geode_test(
-    SOURCE "test-vector.cpp" 
-    DEPENDENCIES
-        ${PROJECT_NAME}::basic
-        ${PROJECT_NAME}::geometry
-)
-add_geode_test(
-    SOURCE "test-barycentric-coordinates.cpp"
-    DEPENDENCIES
-        OpenGeode::basic
-        ${PROJECT_NAME}::geometry
-)
-add_geode_test(
-    SOURCE "test-distance.cpp"
-    DEPENDENCIES
-        OpenGeode::basic
-        ${PROJECT_NAME}::geometry
-)
-add_geode_test(
-    SOURCE "test-perpendicular.cpp"
-    DEPENDENCIES
-        OpenGeode::basic
         ${PROJECT_NAME}::geometry
 )
 add_geode_test(
@@ -91,8 +97,8 @@ add_geode_test(
         ${PROJECT_NAME}::geometry
 )
 add_geode_test(
-    SOURCE "test-aabb.cpp"
+    SOURCE "test-vector.cpp" 
     DEPENDENCIES
-        OpenGeode::basic
+        ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
 )
