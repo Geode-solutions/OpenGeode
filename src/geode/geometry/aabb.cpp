@@ -236,6 +236,9 @@ namespace geode
         return mapping_morton( box_begin );
     }
 
+    template class opengeode_geometry_api AABBTree< 2 >::Impl;
+    template class opengeode_geometry_api AABBTree< 3 >::Impl;
+
     template class opengeode_geometry_api AABBTree< 2 >;
     template class opengeode_geometry_api AABBTree< 3 >;
 } // namespace geode

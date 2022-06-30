@@ -19,12 +19,43 @@
 # SOFTWARE.
 
 add_geode_python_test(
+    SOURCE "test-py-barycentric-coordinates.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_geometry
+)
+add_geode_python_test(
     SOURCE "test-py-bounding-box.py"
     DEPENDENCIES
         ${PROJECT_NAME}::py_geometry
 )
 add_geode_python_test(
+    SOURCE "test-py-distance.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_geometry
+)
+add_geode_python_test(
+    SOURCE "test-py-intersection.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_geometry
+)
+add_geode_python_test(
+    SOURCE "test-py-intersection-detection.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_geometry
+)
+add_geode_python_test(
+    SOURCE "test-py-mensuration.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_geometry
+)
+add_geode_python_test(
     SOURCE "test-py-nnsearch.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_geometry
+)
+add_geode_python_test(
+    SOURCE "test-py-perpendicular.py"
     DEPENDENCIES
         ${PROJECT_NAME}::py_geometry
 )
@@ -39,22 +70,7 @@ add_geode_python_test(
         ${PROJECT_NAME}::py_geometry
 )
 add_geode_python_test(
-    SOURCE "test-py-vector.py"
-    DEPENDENCIES
-        ${PROJECT_NAME}::py_geometry
-)
-add_geode_python_test(
-    SOURCE "test-py-barycentric-coordinates.py"
-    DEPENDENCIES
-        ${PROJECT_NAME}::py_geometry
-)
-add_geode_python_test(
-    SOURCE "test-py-signed-mensuration.py"
-    DEPENDENCIES
-        ${PROJECT_NAME}::py_geometry
-)
-add_geode_python_test(
-    SOURCE "test-py-perpendicular.py"
+    SOURCE "test-py-position.py"
     DEPENDENCIES
         ${PROJECT_NAME}::py_geometry
 )
@@ -66,11 +82,16 @@ add_geode_python_test(
 add_geode_python_test(
     SOURCE "test-py-rotation.py"
     DEPENDENCIES
-        ${PROJECT_NAME}::py_geometry
         ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_geometry
 )
 add_geode_python_test(
-    SOURCE "test-py-distance.py"
+    SOURCE "test-py-sign.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_geometry
+)
+add_geode_python_test(
+    SOURCE "test-py-vector.py"
     DEPENDENCIES
         ${PROJECT_NAME}::py_geometry
 )

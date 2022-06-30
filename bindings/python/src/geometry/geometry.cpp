@@ -29,13 +29,17 @@
 #include "basic_objects.h"
 #include "bounding_box.h"
 #include "distance.h"
+#include "intersection.h"
+#include "intersection_detection.h"
+#include "mensuration.h"
 #include "nn_search.h"
 #include "perpendicular.h"
 #include "point.h"
 #include "points_sort.h"
+#include "position.h"
 #include "projection.h"
 #include "rotation.h"
-#include "signed_mensuration.h"
+#include "sign.h"
 #include "vector.h"
 
 namespace pybind11
@@ -72,6 +76,18 @@ namespace pybind11
 
             std::vector< typename std::remove_const< Type >::type > cpp_;
         };
+
+        template < typename Type, size_t dimension >
+        struct type_caster< absl::InlinedVector< Type, dimension > >
+            : list_caster< absl::InlinedVector< Type, dimension >, Type >
+        {
+        };
+
+        template < typename T >
+        struct type_caster< absl::optional< T > >
+            : public optional_caster< absl::optional< T > >
+        {
+        };
     } // namespace detail
 } // namespace pybind11
 
@@ -79,16 +95,20 @@ PYBIND11_MODULE( opengeode_py_geometry, module )
 {
     pybind11::add_ostream_redirect( module );
     module.doc() = "OpenGeode Python binding for geometry";
-    geode::define_point( module );
-    geode::define_vector( module );
-    geode::define_bounding_box( module );
-    geode::define_nn_search( module );
+    geode::define_barycentric( module );
     geode::define_basic_objects( module );
+    geode::define_bounding_box( module );
     geode::define_distance( module );
+    geode::define_intersection( module );
+    geode::define_intersection_detection( module );
+    geode::define_mensuration( module );
+    geode::define_nn_search( module );
     geode::define_perpendicular( module );
+    geode::define_point( module );
+    geode::define_points_sort( module );
+    geode::define_position( module );
     geode::define_projection( module );
     geode::define_rotation( module );
-    geode::define_mensuration( module );
-    geode::define_barycentric( module );
-    geode::define_points_sort( module );
+    geode::define_sign( module );
+    geode::define_vector( module );
 }

@@ -16,6 +16,8 @@ XXXX
 
 - **IO**: Input factories return the loaded Object and Output factories take the Object as parameter.
 
+- **Geometry**: `sign_mensuration.h` has been renamed `mensuration.h`.
+
 ## Upgrading from OpenGeode v9.x.x to v10.0.0
 
 ### Motivations

@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/geometry/signed_mensuration.h>
+#include <geode/geometry/mensuration.h>
 
 #define PYTHON_MENSURATION( dimension )                                        \
     const auto triangle_area##dimension =                                      \
