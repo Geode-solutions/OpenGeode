@@ -30,7 +30,7 @@
 
 namespace geode
 {
-    void define_mensuration( pybind11::module& module )
+    void define_signed_mensuration( pybind11::module& module )
     {
         PYTHON_MENSURATION( 2 );
         PYTHON_MENSURATION( 3 );
