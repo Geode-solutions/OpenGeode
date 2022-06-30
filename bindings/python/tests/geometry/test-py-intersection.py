@@ -7,6 +7,7 @@ if sys.version_info >= (3,8,0) and platform.system() == "Windows":
     for path in [x.strip() for x in os.environ['PATH'].split(';') if x]:
         os.add_dll_directory(path)
 
+import opengeode_py_basic as basic
 import opengeode_py_geometry as geometry
 
 def test_line_sphere_intersection():
@@ -232,17 +233,17 @@ def test_segment_plane_intersection():
 
     intersect4 = geometry.segment_plane_intersection3D( segment_hj, plane )
     distance_to_answer = geometry.Vector3D( intersect4.result, geometry.Point3D([0.5, 0.5, 0.0]) ).length()
-    if distance_to_answer > geometry.global_epsilon:
+    if distance_to_answer > basic.global_epsilon:
         raise ValueError("[Test] Wrong result for segment_plane_intersection3D with query segment_hj" )
 
     intersect5 = geometry.segment_plane_intersection3D( segment_ki, plane )
     distance_to_answer = geometry.Vector3D( intersect5.result, geometry.Point3D([0.5, 0.25, 0.0]) ).length()
-    if distance_to_answer > geometry.global_epsilon:
+    if distance_to_answer > basic.global_epsilon:
         raise ValueError("[Test] Wrong result for segment_plane_intersection3D with query segment_ki" )
 
     intersect6 = geometry.segment_plane_intersection3D( segment_li, plane )
     distance_to_answer = geometry.Vector3D( intersect6.result, geometry.Point3D([-4.5, 0.0, 0.0]) ).length()
-    if distance_to_answer > geometry.global_epsilon:
+    if distance_to_answer > basic.global_epsilon:
         raise ValueError("[Test] Wrong result for segment_plane_intersection3D with query segment_li" )
 
     intersect7 = geometry.segment_plane_intersection3D( segment_kb, plane )
