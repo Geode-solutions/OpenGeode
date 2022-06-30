@@ -30,13 +30,13 @@
 #include "bounding_box.h"
 #include "distance.h"
 #include "intersection.h"
+#include "mensuration.h"
 #include "nn_search.h"
 #include "perpendicular.h"
 #include "point.h"
 #include "points_sort.h"
 #include "projection.h"
 #include "rotation.h"
-#include "signed_mensuration.h"
 #include "vector.h"
 
 namespace pybind11
@@ -85,12 +85,12 @@ PYBIND11_MODULE( opengeode_py_geometry, module )
     geode::define_bounding_box( module );
     geode::define_distance( module );
     geode::define_intersection( module );
+    geode::define_mensuration( module );
     geode::define_nn_search( module );
     geode::define_perpendicular( module );
     geode::define_point( module );
     geode::define_points_sort( module );
     geode::define_projection( module );
     geode::define_rotation( module );
-    geode::define_signed_mensuration( module );
     geode::define_vector( module );
 }

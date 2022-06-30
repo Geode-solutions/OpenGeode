@@ -14,6 +14,8 @@ XXXX
 
 - **PointsSort**: `morton_sort` has been renamed `morton_mapping`.
 
+- **Geometry**: `sign_mensuration.h` has been renamed `mensuration.h`.
+
 ## Upgrading from OpenGeode v9.x.x to v10.0.0
 
 ### Motivations

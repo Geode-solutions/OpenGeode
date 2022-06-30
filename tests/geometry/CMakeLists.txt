@@ -21,13 +21,13 @@
 add_geode_test(
     SOURCE "test-aabb.cpp"
     DEPENDENCIES
-        OpenGeode::basic
+        ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
 )
 add_geode_test(
     SOURCE "test-barycentric-coordinates.cpp"
     DEPENDENCIES
-        OpenGeode::basic
+        ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
 )
 add_geode_test(
@@ -45,13 +45,19 @@ add_geode_test(
 add_geode_test(
     SOURCE "test-distance.cpp"
     DEPENDENCIES
-        OpenGeode::basic
+        ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
 )
 add_geode_test(
     SOURCE "test-intersection.cpp"
     DEPENDENCIES
-        OpenGeode::basic
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+)
+add_geode_test(
+    SOURCE "test-mensuration.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
 )
 add_geode_test(
@@ -63,7 +69,7 @@ add_geode_test(
 add_geode_test(
     SOURCE "test-perpendicular.cpp"
     DEPENDENCIES
-        OpenGeode::basic
+        ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
 )
 add_geode_test(
@@ -79,21 +85,27 @@ add_geode_test(
         ${PROJECT_NAME}::geometry
 )
 add_geode_test(
+    SOURCE "test-position.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+)
+add_geode_test(
     SOURCE "test-projection.cpp"
     DEPENDENCIES
-        OpenGeode::basic
+        ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
 )
 add_geode_test(
     SOURCE "test-rotation.cpp"
     DEPENDENCIES
-        OpenGeode::basic
+        ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
 )
 add_geode_test(
-    SOURCE "test-signed-mensuration.cpp"
+    SOURCE "test-sign.cpp"
     DEPENDENCIES
-        OpenGeode::basic
+        ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
 )
 add_geode_test(

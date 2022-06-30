@@ -30,9 +30,9 @@
 #include <geode/geometry/basic_objects/sphere.h>
 #include <geode/geometry/basic_objects/tetrahedron.h>
 #include <geode/geometry/basic_objects/triangle.h>
+#include <geode/geometry/mensuration.h>
 #include <geode/geometry/perpendicular.h>
 #include <geode/geometry/projection.h>
-#include <geode/geometry/signed_mensuration.h>
 #include <geode/geometry/vector.h>
 
 namespace
