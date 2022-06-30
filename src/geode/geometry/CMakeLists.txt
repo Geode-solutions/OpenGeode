@@ -45,6 +45,7 @@ add_geode_library(
         "position.cpp"
         "private/predicates.cpp"
         "projection.cpp"
+        "radial_sort.cpp"
         "rotation.cpp"
         "sign.cpp"
     PUBLIC_HEADERS
@@ -71,6 +72,7 @@ add_geode_library(
         "points_sort.h"
         "position.h"
         "projection.h"
+        "radial_sort.h"
         "rotation.h"
         "sign.h"
         "vector.h"

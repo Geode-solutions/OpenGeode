@@ -76,6 +76,18 @@ namespace pybind11
 
             std::vector< typename std::remove_const< Type >::type > cpp_;
         };
+
+        template < typename Type, size_t dimension >
+        struct type_caster< absl::InlinedVector< Type, dimension > >
+            : list_caster< absl::InlinedVector< Type, dimension >, Type >
+        {
+        };
+
+        template < typename T >
+        struct type_caster< absl::optional< T > >
+            : public optional_caster< absl::optional< T > >
+        {
+        };
     } // namespace detail
 } // namespace pybind11
 

@@ -226,7 +226,7 @@ def test_point_tetrahedron_position():
     b = geometry.Point3D([1.0, 0.0, 0.0])
     c = geometry.Point3D([0.0, 1.0, 0.0])
     d = geometry.Point3D([0.0, 0.0, 1.0])
-    tetra = geometry.Tetra(a, b, c, d)
+    tetra = geometry.Tetrahedron(a, b, c, d)
 
     position_a = geometry.point_tetrahedron_position3D( a, tetra )
     if position_a != geometry.Position.vertex0:

@@ -36,6 +36,7 @@ add_geode_python_test(
 add_geode_python_test(
     SOURCE "test-py-intersection.py"
     DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
         ${PROJECT_NAME}::py_geometry
 )
 add_geode_python_test(
