@@ -10,6 +10,8 @@
 #include <geode/geometry/point.h>
 #include <geode/geometry/sign.h>
 
+#include <geode/tests/common.h>
+
 void test_triangle_sign_2d()
 {
     const geode::Point2D a{ { 0.0, 0.0 } };
@@ -48,18 +50,11 @@ void test_triangle_sign()
     test_triangle_sign_2d();
     test_triangle_sign_3d();
 }
-
-int main()
+void test()
 {
-    try
-    {
-        test_triangle_sign();
+    test_triangle_sign();
 
-        geode::Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode::geode_lippincott();
-    }
+    geode::Logger::info( "TEST SUCCESS" );
 }
+
+OPENGEODE_TEST( "sign" )

@@ -27,13 +27,16 @@ add_geode_python_binding(
         "bounding_box.h"
         "distance.h"
         "intersection.h"
+        "intersection_detection.h"
         "mensuration.h"
         "nn_search.h"
         "perpendicular.h"
         "point.h"
         "points_sort.h"
+        "position.h"
         "projection.h"
         "rotation.h"
+        "sign.h"
         "vector.h"
     DEPENDENCIES
         ${PROJECT_NAME}::geometry

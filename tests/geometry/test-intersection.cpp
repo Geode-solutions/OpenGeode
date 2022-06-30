@@ -14,6 +14,8 @@
 #include <geode/geometry/intersection.h>
 #include <geode/geometry/point.h>
 
+#include <geode/tests/common.h>
+
 /*
  * InfiniteLines in this test are all defined using two points (constructor
  * using a Segment)
@@ -476,23 +478,17 @@ void test_segment_triangle_intersection()
         "query segment_mn" );
 }
 
-int main()
+void test()
 {
-    try
-    {
-        test_line_sphere_intersection();
-        test_segment_sphere_intersection();
-        test_line_line_intersection();
-        test_segment_segment_intersection();
-        test_segment_line_intersection();
-        test_segment_plane_intersection();
-        test_segment_triangle_intersection();
+    test_line_sphere_intersection();
+    test_segment_sphere_intersection();
+    test_line_line_intersection();
+    test_segment_segment_intersection();
+    test_segment_line_intersection();
+    test_segment_plane_intersection();
+    test_segment_triangle_intersection();
 
-        geode::Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode::geode_lippincott();
-    }
+    geode::Logger::info( "TEST SUCCESS" );
 }
+
+OPENGEODE_TEST( "intersection" )
