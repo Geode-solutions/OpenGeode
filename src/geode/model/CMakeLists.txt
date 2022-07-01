@@ -28,6 +28,7 @@ add_geode_library(
         "helpers/component_mesh_vertices.cpp"
         "helpers/convert_model_meshes.cpp"
         "helpers/convert_to_mesh.cpp"
+        "helpers/cut_along_internal_lines.cpp"
         "helpers/model_component_filter.cpp"
         "helpers/simplicial_brep_creator.cpp"
         "helpers/simplicial_section_creator.cpp"
@@ -110,6 +111,7 @@ add_geode_library(
         "representation/io/brep_output.h"
         "representation/io/section_output.h"
     ADVANCED_HEADERS
+        "helpers/detail/cut_along_internal_lines.h"
         "mixin/core/detail/components_storage.h"
         "mixin/core/detail/count_relationships.h"
         "mixin/core/detail/mesh_storage.h"
