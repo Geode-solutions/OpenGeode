@@ -123,11 +123,13 @@ namespace
                 else
                 {
                     builder.disassociate_polygon_vertex_to_vertex( v );
+                    builder.reset_polygons_around_vertex( v );
                 }
             }
             else
             {
                 builder.disassociate_polygon_vertex_to_vertex( v );
+                builder.reset_polygons_around_vertex( v );
             }
         }
     }
@@ -213,8 +215,7 @@ namespace
                     const auto new_polygon = old2new[polygon.polygon_id];
                     if( new_polygon != geode::NO_ID )
                     {
-                        new_polygon_vertex = polygon;
-                        new_polygon_vertex.polygon_id = new_polygon;
+                        new_polygon_vertex = { new_polygon, polygon.vertex_id };
                         break;
                     }
                 }
@@ -223,6 +224,14 @@ namespace
             }
             else
             {
+                for( const auto& polygon : surface.polygons_around_vertex( v ) )
+                {
+                    if( old2new[polygon.polygon_id] != polygon.polygon_id )
+                    {
+                        builder.reset_polygons_around_vertex( v );
+                        break;
+                    }
+                }
                 builder.associate_polygon_vertex_to_vertex(
                     new_polygon_vertex, v );
             }
