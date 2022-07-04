@@ -108,6 +108,12 @@ add_geode_test(
         ${PROJECT_NAME}::mesh
 )
 add_geode_test(
+    SOURCE "test-ray-tracing.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
     SOURCE "test-register-builder.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
