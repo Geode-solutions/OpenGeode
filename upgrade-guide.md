@@ -18,6 +18,8 @@ XXXX
 
 - **Geometry**: `sign_mensuration.h` has been renamed `mensuration.h`.
 
+- **MeshView**: all MeshView and related classes have been removed, use other classic Mesh instead.
+
 ## Upgrading from OpenGeode v9.x.x to v10.0.0
 
 ### Motivations

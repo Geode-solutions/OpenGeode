@@ -33,10 +33,6 @@
 #include <geode/mesh/builder/geode_triangulated_surface_builder.h>
 #include <geode/mesh/builder/geode_vertex_set_builder.h>
 #include <geode/mesh/builder/mesh_builder_factory.h>
-#include <geode/mesh/builder/polygonal_surface_view_builder.h>
-#include <geode/mesh/builder/polyhedral_solid_view_builder.h>
-#include <geode/mesh/builder/tetrahedral_solid_view_builder.h>
-#include <geode/mesh/builder/triangulated_surface_view_builder.h>
 #include <geode/mesh/core/geode_edged_curve.h>
 #include <geode/mesh/core/geode_graph.h>
 #include <geode/mesh/core/geode_hybrid_solid.h>
@@ -46,10 +42,6 @@
 #include <geode/mesh/core/geode_tetrahedral_solid.h>
 #include <geode/mesh/core/geode_triangulated_surface.h>
 #include <geode/mesh/core/geode_vertex_set.h>
-#include <geode/mesh/core/polygonal_surface_view.h>
-#include <geode/mesh/core/polyhedral_solid_view.h>
-#include <geode/mesh/core/tetrahedral_solid_view.h>
-#include <geode/mesh/core/triangulated_surface_view.h>
 
 namespace geode
 {
@@ -81,13 +73,6 @@ namespace geode
             OpenGeodePolygonalSurface3D::impl_name_static() );
 
         MeshBuilderFactory::register_mesh_builder<
-            PolygonalSurfaceViewBuilder2D >(
-            PolygonalSurfaceView2D::impl_name_static() );
-        MeshBuilderFactory::register_mesh_builder<
-            PolygonalSurfaceViewBuilder3D >(
-            PolygonalSurfaceView3D::impl_name_static() );
-
-        MeshBuilderFactory::register_mesh_builder<
             OpenGeodeTriangulatedSurfaceBuilder2D >(
             OpenGeodeTriangulatedSurface2D::impl_name_static() );
         MeshBuilderFactory::register_mesh_builder<
@@ -95,27 +80,12 @@ namespace geode
             OpenGeodeTriangulatedSurface3D::impl_name_static() );
 
         MeshBuilderFactory::register_mesh_builder<
-            TriangulatedSurfaceViewBuilder2D >(
-            TriangulatedSurfaceView2D::impl_name_static() );
-        MeshBuilderFactory::register_mesh_builder<
-            TriangulatedSurfaceViewBuilder3D >(
-            TriangulatedSurfaceView3D::impl_name_static() );
-
-        MeshBuilderFactory::register_mesh_builder<
             OpenGeodePolyhedralSolidBuilder3D >(
             OpenGeodePolyhedralSolid3D::impl_name_static() );
 
         MeshBuilderFactory::register_mesh_builder<
-            PolyhedralSolidViewBuilder3D >(
-            PolyhedralSolidView3D::impl_name_static() );
-
-        MeshBuilderFactory::register_mesh_builder<
             OpenGeodeTetrahedralSolidBuilder3D >(
             OpenGeodeTetrahedralSolid3D::impl_name_static() );
-
-        MeshBuilderFactory::register_mesh_builder<
-            TetrahedralSolidViewBuilder3D >(
-            TetrahedralSolidView3D::impl_name_static() );
 
         MeshBuilderFactory::register_mesh_builder<
             OpenGeodeHybridSolidBuilder3D >(
