@@ -268,6 +268,40 @@ void test_boundary_box( const geode::RegularGrid3D& grid )
     OPENGEODE_EXCEPTION( bbox.max() == max, "[Test] Wrong bounding box max" );
 }
 
+void test_closest_vertex( const geode::RegularGrid3D& grid )
+{
+    const geode::Point3D p0{ { 1.5, 0, 1 } }; // (0,0,0)
+    const geode::Point3D p1{ { 6.5, 20, 46 } }; // (5,10,15)
+    const geode::Point3D p2{ { 0, -1, -1 } }; // (0,0,0)
+    const geode::Point3D p3{ { 10, 30, 50 } }; // (5,10,15)
+    const geode::Point3D p4{ { 3.55, 3.9, 7.5 } }; // (2,2,2)
+
+    auto result = grid.closest_vertex( p0 );
+    geode::GridVertexIndices3D answer{ 0, 0, 0 };
+    OPENGEODE_ASSERT( result == answer,
+        "[Test] Wrong result for closest vertex for query p0" );
+
+    result = grid.closest_vertex( p1 );
+    answer = { 5, 10, 15 };
+    OPENGEODE_ASSERT( result == answer,
+        "[Test] Wrong result for closest vertex for query p1" );
+
+    result = grid.closest_vertex( p2 );
+    answer = { 0, 0, 0 };
+    OPENGEODE_ASSERT( result == answer,
+        "[Test] Wrong result for closest vertex for query p2" );
+
+    result = grid.closest_vertex( p3 );
+    answer = { 5, 10, 15 };
+    OPENGEODE_ASSERT( result == answer,
+        "[Test] Wrong result for closest vertex for query p3" );
+
+    result = grid.closest_vertex( p4 );
+    answer = { 2, 2, 2 };
+    OPENGEODE_ASSERT( result == answer,
+        "[Test] Wrong result for closest vertex for query p4" );
+}
+
 void test_clone( geode::RegularGrid3D& grid )
 {
     const auto attribute_name = "int_attribute";
@@ -331,6 +365,7 @@ void test()
     test_cell_geometry( grid );
     test_cell_query( grid );
     test_boundary_box( grid );
+    test_closest_vertex( grid );
     test_clone( grid );
     test_io( grid, absl::StrCat( "test.", grid.native_extension() ) );
 }

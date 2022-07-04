@@ -32,7 +32,7 @@
 #include <geode/mesh/core/solid_mesh.h>
 #include <geode/mesh/core/surface_mesh.h>
 
-#include <geode/model/helpers/component_mesh_queries.h>
+#include <geode/model/helpers/component_mesh_polygons.h>
 #include <geode/model/mixin/core/block.h>
 #include <geode/model/mixin/core/line.h>
 #include <geode/model/mixin/core/surface.h>

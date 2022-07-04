@@ -144,7 +144,10 @@ namespace geode
 
     Graph::Graph() : impl_( *this ) {}
 
-    Graph::Graph( Graph&& other ) : impl_( std::move( other.impl_ ) ) {}
+    Graph::Graph( Graph&& other )
+        : VertexSet( std::move( other ) ), impl_( std::move( other.impl_ ) )
+    {
+    }
 
     Graph::~Graph() {} // NOLINT
 

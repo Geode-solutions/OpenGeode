@@ -23,7 +23,23 @@
 
 #pragma once
 
-#pragma message(                                                               \
-    "#include <geode/model/helpers/component_mesh_queries.h> is deprecated. Use e.g. #include <geode/model/helpers/component_mesh_polygons.h>" )
+#include <absl/container/flat_hash_map.h>
+#include <absl/types/span.h>
 
-#include <geode/model/helpers/component_mesh_polygons.h>
+#include <geode/model/common.h>
+#include <geode/model/mixin/core/component_type.h>
+
+namespace geode
+{
+    struct ComponentMeshVertex;
+} // namespace geode
+
+namespace geode
+{
+    using ComponentMeshVertexPairs = absl::flat_hash_map< ComponentID,
+        std::vector< std::pair< index_t, index_t > > >;
+
+    ComponentMeshVertexPairs opengeode_model_api component_mesh_vertex_pairs(
+        absl::Span< const ComponentMeshVertex > unique_vertices0,
+        absl::Span< const ComponentMeshVertex > unique_vertices1 );
+} // namespace geode

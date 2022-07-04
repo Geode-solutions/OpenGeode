@@ -373,6 +373,29 @@ namespace geode
             return true;
         }
 
+        GridVertexIndices< dimension > closest_vertex(
+            const Point< dimension >& query ) const
+        {
+            GridVertexIndices< dimension > closest;
+            for( const auto d : LRange{ dimension } )
+            {
+                const auto value = point_local_grid_coordinate( query, d );
+                if( value < 0. )
+                {
+                    closest[d] = 0;
+                }
+                else if( value > cells_number_[d] )
+                {
+                    closest[d] = cells_number_[d];
+                }
+                else
+                {
+                    closest[d] = std::round( value );
+                }
+            }
+            return closest;
+        }
+
         GridCellsAroundVertex< dimension > cells(
             const Point< dimension >& query ) const
         {
@@ -660,6 +683,13 @@ namespace geode
         const Point< dimension >& query ) const
     {
         return impl_->contains( query );
+    }
+
+    template < index_t dimension >
+    GridVertexIndices< dimension > RegularGrid< dimension >::closest_vertex(
+        const Point< dimension >& query ) const
+    {
+        return impl_->closest_vertex( query );
     }
 
     template < index_t dimension >

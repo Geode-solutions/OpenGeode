@@ -45,6 +45,7 @@ namespace geode
 
     public:
         OpenGeodeEdgedCurve();
+        OpenGeodeEdgedCurve( OpenGeodeEdgedCurve&& other );
         ~OpenGeodeEdgedCurve();
 
         static MeshImpl impl_name_static()

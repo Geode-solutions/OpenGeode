@@ -68,6 +68,14 @@ namespace geode
         {
             return !( *this == other );
         }
+        bool operator<( const PolyhedronVertex& other ) const
+        {
+            if( polyhedron_id != other.polyhedron_id )
+            {
+                return polyhedron_id < other.polyhedron_id;
+            }
+            return vertex_id < other.vertex_id;
+        }
         std::string string() const
         {
             return absl::StrCat( "(", polyhedron_id, ", ", vertex_id, ")" );
@@ -98,6 +106,14 @@ namespace geode
         {
             return !( *this == other );
         }
+        bool operator<( const PolyhedronFacet& other ) const
+        {
+            if( polyhedron_id != other.polyhedron_id )
+            {
+                return polyhedron_id < other.polyhedron_id;
+            }
+            return facet_id < other.facet_id;
+        }
         std::string string() const
         {
             return absl::StrCat( "(", polyhedron_id, ", ", facet_id, ")" );
@@ -126,6 +142,14 @@ namespace geode
         {
             return !( *this == other );
         }
+        bool operator<( const PolyhedronFacetVertex& other ) const
+        {
+            if( polyhedron_facet != other.polyhedron_facet )
+            {
+                return polyhedron_facet < other.polyhedron_facet;
+            }
+            return vertex_id < other.vertex_id;
+        }
         std::string string() const
         {
             return absl::StrCat( "(", polyhedron_facet.polyhedron_id, ", ",
@@ -153,6 +177,14 @@ namespace geode
         bool operator!=( const PolyhedronFacetEdge& other ) const
         {
             return !( *this == other );
+        }
+        bool operator<( const PolyhedronFacetEdge& other ) const
+        {
+            if( polyhedron_facet != other.polyhedron_facet )
+            {
+                return polyhedron_facet < other.polyhedron_facet;
+            }
+            return edge_id < other.edge_id;
         }
         std::string string() const
         {
@@ -521,6 +553,7 @@ namespace geode
 
     protected:
         SolidMesh();
+        SolidMesh( SolidMesh&& other );
 
     private:
         friend class bitsery::Access;

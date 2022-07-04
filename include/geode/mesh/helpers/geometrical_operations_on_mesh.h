@@ -23,7 +23,42 @@
 
 #pragma once
 
-#pragma message(                                                               \
-    "#include <geode/model/helpers/component_mesh_queries.h> is deprecated. Use e.g. #include <geode/model/helpers/component_mesh_polygons.h>" )
+#include <geode/geometry/vector.h>
 
-#include <geode/model/helpers/component_mesh_polygons.h>
+#include <geode/mesh/common.h>
+
+namespace geode
+{
+    template < template < index_t > class Mesh,
+        template < index_t >
+        class MeshBuilder,
+        index_t dimension >
+    void translate_mesh( Mesh< dimension >& mesh,
+        MeshBuilder< dimension >& builder,
+        const Vector< dimension >& translation )
+    {
+        for( const auto v : Range{ mesh.nb_vertices() } )
+        {
+            builder.set_point( v, mesh.point( v ) + translation );
+        }
+    }
+
+    template < template < index_t > class Mesh,
+        template < index_t >
+        class MeshBuilder,
+        index_t dimension >
+    void rescale_mesh( Mesh< dimension >& mesh,
+        MeshBuilder< dimension >& builder,
+        const std::array< double, dimension >& scale )
+    {
+        for( const auto v : Range{ mesh.nb_vertices() } )
+        {
+            auto point = mesh.point( v );
+            for( const auto d : LRange{ dimension } )
+            {
+                point.set_value( d, point.value( d ) * scale[d] );
+            }
+            builder.set_point( v, point );
+        }
+    }
+} // namespace geode

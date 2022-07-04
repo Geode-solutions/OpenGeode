@@ -183,6 +183,7 @@ add_geode_library(
         "helpers/aabb_solid_helpers.h"
         "helpers/convert_surface_mesh.h"
         "helpers/convert_solid_mesh.h"
+        "helpers/nnsearch_mesh.h"
         "helpers/regular_grid_point_function.h"
         "helpers/regular_grid_scalar_function.h"
         "helpers/tetrahedral_solid_point_function.h"

@@ -47,6 +47,7 @@ namespace geode
 
     public:
         OpenGeodePointSet();
+        OpenGeodePointSet( OpenGeodePointSet&& other );
         ~OpenGeodePointSet();
 
         static MeshImpl impl_name_static()

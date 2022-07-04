@@ -46,6 +46,7 @@ namespace geode
 
     public:
         OpenGeodePolygonalSurface();
+        OpenGeodePolygonalSurface( OpenGeodePolygonalSurface&& other );
         ~OpenGeodePolygonalSurface();
 
         static MeshImpl impl_name_static()

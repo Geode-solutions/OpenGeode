@@ -398,6 +398,12 @@ namespace geode
     }
 
     template < index_t dimension >
+    SurfaceMesh< dimension >::SurfaceMesh( SurfaceMesh&& other )
+        : VertexSet( std::move( other ) ), impl_( std::move( other.impl_ ) )
+    {
+    }
+
+    template < index_t dimension >
     SurfaceMesh< dimension >::~SurfaceMesh() // NOLINT
     {
     }

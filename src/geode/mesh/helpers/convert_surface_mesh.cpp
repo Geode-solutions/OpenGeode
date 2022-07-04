@@ -24,6 +24,7 @@
 #include <geode/mesh/helpers/convert_surface_mesh.h>
 
 #include <geode/basic/attribute_manager.h>
+#include <geode/basic/logger.h>
 
 #include <geode/geometry/point.h>
 
@@ -111,6 +112,8 @@ namespace geode
     {
         if( !all_polygons_are_simplex( surface ) )
         {
+            Logger::info( "[convert_surface_mesh_into_triangulated_surface] "
+                          "Surface is not made of only triangles." );
             return absl::nullopt;
         }
         auto tri_surface = TriangulatedSurface< dimension >::create();
