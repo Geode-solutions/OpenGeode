@@ -29,7 +29,7 @@ namespace geode
 {
     std::vector< absl::string_view > string_split( absl::string_view string )
     {
-        return absl::StrSplit( string,
+        return absl::StrSplit( absl::StripAsciiWhitespace( string ),
             absl::ByAnyChar( " 	" ) /* space + tab */, absl::SkipWhitespace() );
     }
 
