@@ -201,32 +201,26 @@ void test_limit2()
     }
 }
 
-int main()
+void test()
 {
-    try
-    {
-        geode::RegularGrid3D grid{ { { 0., 0., 0. } }, { 10, 10, 10 }, 1 };
-        geode::Point3D pt0{ { 2, 2, 2 } };
-        geode::Point3D pt1{ { 3.55, 7.55, 3.55 } };
-        geode::Point3D pt2{ { 6.55, 1.55, 5.55 } };
-        geode::Point3D pt3{ { 6, 6, 6 } };
-        geode::Point3D pt4{ { 4, 4, 4 } };
+    geode::RegularGrid3D grid{ { { 0., 0., 0. } }, { 10, 10, 10 }, 1 };
+    geode::Point3D pt0{ { 2, 2, 2 } };
+    geode::Point3D pt1{ { 3.55, 7.55, 3.55 } };
+    geode::Point3D pt2{ { 6.55, 1.55, 5.55 } };
+    geode::Point3D pt3{ { 6, 6, 6 } };
+    geode::Point3D pt4{ { 4, 4, 4 } };
 
-        test_rasterize_segment( grid, geode::Segment3D{ pt0, pt1 } );
-        test_conservative_rasterize_segment();
-        test_conservative_rasterize_triangle();
-        test_rasterize_triangle( grid, geode::Triangle3D{ pt0, pt1, pt2 } );
-        test_rasterize_degenerate_triangle(
-            grid, geode::Triangle3D{ pt0, pt3, pt4 } );
+    test_rasterize_segment( grid, geode::Segment3D{ pt0, pt1 } );
+    test_conservative_rasterize_segment();
+    test_conservative_rasterize_triangle();
+    test_rasterize_triangle( grid, geode::Triangle3D{ pt0, pt1, pt2 } );
+    test_rasterize_degenerate_triangle(
+        grid, geode::Triangle3D{ pt0, pt3, pt4 } );
 
-        test_limit();
-        test_limit2();
+    test_limit();
+    test_limit2();
 
-        geode::Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode::geode_lippincott();
-    }
+    geode::Logger::info( "TEST SUCCESS" );
 }
+
+OPENGEODE_TEST( "rasterize" )

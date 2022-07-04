@@ -26,6 +26,18 @@ add_geode_test(
         ${PROJECT_NAME}::model
 )
 add_geode_test(
+    SOURCE "test-component-mesh-edges.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::model
+)
+add_geode_test(
+    SOURCE "test-component-mesh-polygons.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::model
+)
+add_geode_test(
     SOURCE "test-convert-model-meshes.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
@@ -40,13 +52,6 @@ add_geode_test(
         ${PROJECT_NAME}::model
 )
 add_geode_test(
-    SOURCE "test-model-creator.cpp"
-    DEPENDENCIES
-        ${PROJECT_NAME}::basic
-        ${PROJECT_NAME}::geometry
-        ${PROJECT_NAME}::model
-)
-add_geode_test(
     SOURCE "test-model-component-filter.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
@@ -54,9 +59,10 @@ add_geode_test(
         ${PROJECT_NAME}::model
 )
 add_geode_test(
-    SOURCE "test-section.cpp"
+    SOURCE "test-model-creator.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
         ${PROJECT_NAME}::model
 )
 add_geode_test(
@@ -66,19 +72,20 @@ add_geode_test(
         ${PROJECT_NAME}::model
 )
 add_geode_test(
+    SOURCE "test-section.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::model
+)
+add_geode_test(
+    SOURCE "test-surface-radial-sort.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::model
+)
+
+add_geode_test(
     SOURCE "test-vertex-identifier.cpp"
-    DEPENDENCIES
-        ${PROJECT_NAME}::basic
-        ${PROJECT_NAME}::model
-)
-add_geode_test(
-    SOURCE "test-component-mesh-edges.cpp"
-    DEPENDENCIES
-        ${PROJECT_NAME}::basic
-        ${PROJECT_NAME}::model
-)
-add_geode_test(
-    SOURCE "test-component-mesh-polygons.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::model

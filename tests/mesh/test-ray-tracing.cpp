@@ -12,6 +12,8 @@
 #include <geode/mesh/helpers/aabb_surface_helpers.h>
 #include <geode/mesh/helpers/ray_tracing.h>
 
+#include <geode/tests/common.h>
+
 void test_ray_inside()
 {
     auto mesh = geode::SurfaceMesh3D::create();
@@ -85,19 +87,13 @@ void test_ray_parallel()
         result->distance == 1, "[Test] Ray edge wrong distance" );
 }
 
-int main()
+void test()
 {
-    try
-    {
-        test_ray_inside();
-        test_ray_edge();
-        test_ray_parallel();
+    test_ray_inside();
+    test_ray_edge();
+    test_ray_parallel();
 
-        geode::Logger::info( "TEST SUCCESS" );
-        return 0;
-    }
-    catch( ... )
-    {
-        return geode::geode_lippincott();
-    }
+    geode::Logger::info( "TEST SUCCESS" );
 }
+
+OPENGEODE_TEST( "ray-tracing" )

@@ -1,0 +1,180 @@
+/*
+ * Copyright (c) 2019 - 2022 Geode-solutions. All rights reserved.
+ */
+
+#include <geode/model/helpers/surface_radial_sort.h>
+
+#include <geode/geometry/basic_objects/segment.h>
+#include <geode/geometry/radial_sort.h>
+
+#include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/core/surface_mesh.h>
+
+#include <geode/model/helpers/component_mesh_vertices.h>
+#include <geode/model/mixin/core/line.h>
+#include <geode/model/mixin/core/surface.h>
+#include <geode/model/mixin/core/vertex_identifier.h>
+#include <geode/model/representation/core/brep.h>
+
+namespace
+{
+    geode::Point3D opposite(
+        const geode::Surface3D& surface, const geode::PolygonEdge& edge )
+    {
+        const auto& mesh = surface.mesh();
+        auto vertex = mesh.polygon_vertex( mesh.previous_polygon_edge( edge ) );
+        return mesh.point( vertex );
+    }
+
+    struct BorderPolygon
+    {
+        BorderPolygon( const geode::Surface3D& surface_in,
+            bool same_orientation_in,
+            geode::PolygonEdge edge_in )
+            : surface( surface_in.id() ),
+              same_orientation( same_orientation_in ),
+              edge( std::move( edge_in ) ),
+              opposite_point{ opposite( surface_in, edge_in ) }
+        {
+        }
+
+        bool operator==( const BorderPolygon& rhs ) const
+        {
+            return surface == rhs.surface
+                   && edge.polygon_id == rhs.edge.polygon_id
+                   && edge.edge_id == rhs.edge.edge_id;
+        }
+
+        bool operator<( const BorderPolygon& rhs ) const
+        {
+            if( surface != rhs.surface )
+            {
+                return surface < rhs.surface;
+            }
+            if( edge.polygon_id != rhs.edge.polygon_id )
+            {
+                return edge.polygon_id < rhs.edge.polygon_id;
+            }
+            return edge.edge_id < rhs.edge.edge_id;
+        }
+
+        geode::uuid surface;
+        bool same_orientation;
+        geode::PolygonEdge edge;
+        geode::Point3D opposite_point;
+    };
+
+    std::vector< BorderPolygon > border_polygons( const geode::BRep& brep,
+        const geode::Line3D& line,
+        geode::index_t e0,
+        geode::index_t e1 )
+    {
+        const auto line_v0 = brep.unique_vertex( { line.component_id(), e0 } );
+        const auto line_v1 = brep.unique_vertex( { line.component_id(), e1 } );
+        const auto surface_vertices0 = brep.component_mesh_vertices(
+            line_v0, geode::Surface3D::component_type_static() );
+        const auto surface_vertices1 = brep.component_mesh_vertices(
+            line_v1, geode::Surface3D::component_type_static() );
+        std::vector< BorderPolygon > polygons;
+        for( const auto& vertex_pairs : geode::component_mesh_vertex_pairs(
+                 surface_vertices0, surface_vertices1 ) )
+        {
+            const auto& surface_id = vertex_pairs.first.id();
+            const auto& surface = brep.surface( surface_id );
+            const auto& surface_mesh = surface.mesh();
+            for( const auto& pair : vertex_pairs.second )
+            {
+                if( auto edge0 = surface_mesh.polygon_edge_from_vertices(
+                        pair.first, pair.second ) )
+                {
+                    polygons.emplace_back(
+                        surface, true, std::move( edge0.value() ) );
+                }
+                if( auto edge1 = surface_mesh.polygon_edge_from_vertices(
+                        pair.second, pair.first ) )
+                {
+                    polygons.emplace_back(
+                        surface, false, std::move( edge1.value() ) );
+                }
+            }
+        }
+        geode::sort_unique( polygons );
+        return polygons;
+    }
+
+    geode::SortedSurfaces sort( const geode::Segment3D& segment,
+        absl::Span< const BorderPolygon > polygons )
+    {
+        geode::SortedSurfaces sorted_surfaces( polygons.size() );
+        absl::FixedArray< geode::Point3D > points( polygons.size() );
+        for( const auto p : geode::Indices{ polygons } )
+        {
+            points[p] = polygons[p].opposite_point;
+        }
+        geode::index_t count{ 0 };
+        for( const auto sorted : geode::radial_sort( segment, points ) )
+        {
+            const auto& polygon = polygons[sorted];
+            sorted_surfaces.surfaces[count++] = { polygon.surface,
+                !polygon.same_orientation, polygon.edge };
+            sorted_surfaces.surfaces[count++] = { polygon.surface,
+                polygon.same_orientation, polygon.edge };
+        }
+        return sorted_surfaces;
+    }
+} // namespace
+
+namespace geode
+{
+    SortedSurfaces::SortedSurfaces( index_t nb_surfaces )
+        : surfaces( 2 * nb_surfaces )
+    {
+    }
+
+    index_t SortedSurfaces::opposite( index_t position ) const
+    {
+        const auto side_position = position % 2;
+        if( side_position == 1 )
+        {
+            return ( position + surfaces.size() - 1 ) % surfaces.size();
+        }
+        return ( position + 1 ) % surfaces.size();
+    }
+
+    index_t SortedSurfaces::next( index_t position ) const
+    {
+        const auto side_position = position % 2;
+        if( side_position == 1 )
+        {
+            return ( position + 1 ) % surfaces.size();
+        }
+        return ( position + surfaces.size() - 1 ) % surfaces.size();
+    }
+
+    absl::InlinedVector< index_t, 1 > SortedSurfaces::find(
+        const SidedSurface& surface ) const
+    {
+        absl::InlinedVector< index_t, 1 > positions;
+        index_t id{ 0 };
+        for( const auto& s : surfaces )
+        {
+            if( s == surface )
+            {
+                positions.push_back( id );
+            }
+            id++;
+        }
+        return positions;
+    }
+
+    SortedSurfaces surface_radial_sort( const BRep& brep, const Line3D& line )
+    {
+        const auto& mesh = line.mesh();
+        const auto e0 = mesh.edge_vertex( { 0, 0 } );
+        const auto e1 = mesh.edge_vertex( { 0, 1 } );
+        const auto polygons = border_polygons( brep, line, e0, e1 );
+        const auto& p0 = line.mesh().point( e0 );
+        const auto& p1 = line.mesh().point( e1 );
+        return sort( { p0, p1 }, polygons );
+    }
+} // namespace geode
