@@ -188,6 +188,16 @@ namespace
             }
             else
             {
+                for( const auto& polyhedron :
+                    solid.polyhedra_around_vertex( v ) )
+                {
+                    if( polyhedron.polyhedron_id
+                        != old2new[polyhedron.polyhedron_id] )
+                    {
+                        builder.reset_polyhedra_around_vertex( v );
+                        break;
+                    }
+                }
                 builder.associate_polyhedron_vertex_to_vertex(
                     new_polyhedron_vertex, v );
             }

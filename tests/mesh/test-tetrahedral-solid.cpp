@@ -291,31 +291,31 @@ void test_delete_all( const geode::TetrahedralSolid3D& solid,
 {
     builder.delete_isolated_vertices();
     OPENGEODE_EXCEPTION( solid.nb_vertices() == 5,
-        "[Test]TetrahedralSolid should have 5 vertices" );
+        "[Test] TetrahedralSolid should have 5 vertices" );
     OPENGEODE_EXCEPTION( solid.facets().nb_facets() == 7,
-        "[Test]TetrahedralSolid should have 4 facets" );
+        "[Test] TetrahedralSolid should have 4 facets" );
     OPENGEODE_EXCEPTION( solid.nb_polyhedra() == 2,
-        "[Test]TetrahedralSolid should have 1 polyhedron" );
+        "[Test] TetrahedralSolid should have 1 polyhedron" );
 
     std::vector< bool > to_delete( solid.nb_polyhedra(), true );
     builder.delete_polyhedra( to_delete );
     OPENGEODE_EXCEPTION( solid.nb_vertices() == 5,
-        "[Test]TetrahedralSolid should have 5 vertices" );
+        "[Test] TetrahedralSolid should have 5 vertices" );
     OPENGEODE_EXCEPTION( solid.facets().nb_facets() == 7,
-        "[Test]TetrahedralSolid should have 7 facet" );
+        "[Test] TetrahedralSolid should have 7 facet" );
     OPENGEODE_EXCEPTION( solid.nb_polyhedra() == 0,
-        "[Test]TetrahedralSolid should have 0 polyhedron" );
+        "[Test] TetrahedralSolid should have 0 polyhedron" );
     OPENGEODE_EXCEPTION( solid.polyhedra_around_vertex( 0 ).empty(),
         "[Test] No more polyhedron around vertices" );
 
     std::vector< bool > f_to_delete( solid.facets().nb_facets(), true );
     builder.facets_builder().delete_facets( f_to_delete );
     OPENGEODE_EXCEPTION( solid.facets().nb_facets() == 0,
-        "[Test]TetrahedralSolid should have 0 facet" );
+        "[Test] TetrahedralSolid should have 0 facet" );
 
     builder.delete_isolated_vertices();
     OPENGEODE_EXCEPTION( solid.nb_vertices() == 0,
-        "[Test]TetrahedralSolid should have 0 vertex" );
+        "[Test] TetrahedralSolid should have 0 vertex" );
 }
 
 void test()
