@@ -64,7 +64,7 @@ namespace geode
             function_attribute_ =
                 grid_.vertex_attribute_manager()
                     .template find_or_create_attribute< VariableAttribute,
-                        double >( function_name, 0 );
+                        double >( function_name, 0, { false, true } );
         }
 
         void set_value(
