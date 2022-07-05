@@ -30,7 +30,7 @@
 
 namespace geode
 {
-    void define_component_mesh_queries( pybind11::module& module )
+    void define_component_mesh_polygons( pybind11::module& module )
     {
         pybind11::class_< BlockPolyhedronFacet >(
             module, "BlockPolyhedronFacet" )
@@ -63,9 +63,7 @@ namespace geode
             .def_readwrite(
                 "opposite_edge", &SurfacePolygonsEdgeVertices::opposite_edge );
 
-        module
-            .def( "surface_polygon_unique_vertices",
-                &surface_polygon_unique_vertices )
+        module.def( "polygon_unique_vertices", &polygon_unique_vertices )
             .def( "block_mesh_polyhedra_from_surface_polygon",
                 &block_mesh_polyhedra_from_surface_polygon )
             .def( "block_vertices_from_surface_polygon",
