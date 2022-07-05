@@ -70,7 +70,7 @@ namespace geode
                 surface_.vertex_attribute_manager()
                     .template find_or_create_attribute< VariableAttribute,
                         Point< dimension > >(
-                        function_name, Point< dimension >() );
+                        function_name, Point< dimension >(), { false, true } );
         }
 
         void set_value( index_t vertex_id, Point< dimension > value )
