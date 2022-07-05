@@ -94,13 +94,6 @@ add_geode_test(
         ${PROJECT_NAME}::mesh
 )
 add_geode_test(
-    SOURCE "test-polyhedral-solid-view.cpp"
-    DEPENDENCIES
-        ${PROJECT_NAME}::basic
-        ${PROJECT_NAME}::geometry
-        ${PROJECT_NAME}::mesh
-)
-add_geode_test(
     SOURCE "test-rasterize.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
