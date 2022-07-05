@@ -68,7 +68,6 @@ add_geode_library(
         "common.h"
         "helpers/component_mesh_edges.h"
         "helpers/component_mesh_polygons.h"
-        "helpers/component_mesh_queries.h"
         "helpers/component_mesh_vertices.h"
         "helpers/convert_model_meshes.h"
         "helpers/convert_to_mesh.h"

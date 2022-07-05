@@ -496,7 +496,7 @@ namespace
 
 namespace geode
 {
-    PolygonVertices surface_polygon_unique_vertices(
+    PolygonVertices polygon_unique_vertices(
         const BRep& model, const Surface3D& surface, index_t polygon_id )
     {
         const auto& surface_mesh = surface.mesh();
@@ -524,7 +524,7 @@ namespace geode
             "is neither boundary nor internal to the given block in the given "
             "model." );
         return block_mesh_polyhedra_from_unique_vertices_facet( model, block,
-            surface_polygon_unique_vertices( model, surface, polygon_id ) );
+            polygon_unique_vertices( model, surface, polygon_id ) );
     }
 
     absl::InlinedVector< BlockPolyhedronFacet, 2 >
@@ -538,12 +538,12 @@ namespace geode
             "[helpers::block_vertices_from_surface_polygon] The given surface "
             "is neither boundary nor internal to the given block in the given "
             "model." );
-        const auto polygon_unique_vertices =
-            surface_polygon_unique_vertices( model, surface, polygon_id );
+        const auto polygon_vertices =
+            polygon_unique_vertices( model, surface, polygon_id );
         const auto facets_block_and_unique_vertices =
             polygon_vertices_to_block_facets_vertices(
-                model, block, polygon_unique_vertices );
-        return polygon_and_facet_to_block_vertices( polygon_unique_vertices,
+                model, block, polygon_vertices );
+        return polygon_and_facet_to_block_vertices( polygon_vertices,
             facets_block_and_unique_vertices.first,
             facets_block_and_unique_vertices.second );
     }
@@ -559,10 +559,10 @@ namespace geode
             "[helpers::block_vertices_from_surface_polygon] The given surface "
             "is neither boundary nor internal to the given block in the given "
             "model." );
-        const auto polygon_unique_vertices =
-            surface_polygon_unique_vertices( model, surface, polygon_id );
+        const auto polygon_vertices =
+            polygon_unique_vertices( model, surface, polygon_id );
         const auto output = oriented_polygon_vertices_to_block_facets_vertices(
-            model, block, polygon_unique_vertices );
+            model, block, polygon_vertices );
         const auto& facets_block_vertices = std::get< 0 >( output );
         if( facets_block_vertices.empty() )
         {
@@ -571,9 +571,8 @@ namespace geode
         const auto& facets_unique_vertices = std::get< 1 >( output );
         const auto v_are_oriented = std::get< 2 >( output );
         BlockPolyhedraFacetVertices p_to_block_vertices;
-        auto p_block_vertices =
-            polygon_and_facet_to_block_vertices( polygon_unique_vertices,
-                facets_block_vertices, facets_unique_vertices );
+        auto p_block_vertices = polygon_and_facet_to_block_vertices(
+            polygon_vertices, facets_block_vertices, facets_unique_vertices );
         if( v_are_oriented )
         {
             p_to_block_vertices.oriented_polyhedron_facet =

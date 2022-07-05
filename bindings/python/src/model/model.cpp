@@ -164,6 +164,6 @@ PYBIND11_MODULE( opengeode_py_model, module )
 
     geode::define_convert_model_meshes( module );
     geode::define_convert_to_mesh( module );
-    geode::define_component_mesh_queries( module );
+    geode::define_component_mesh_polygons( module );
     geode::define_model_component_filter( module );
 }

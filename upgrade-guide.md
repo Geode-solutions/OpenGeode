@@ -20,6 +20,8 @@ XXXX
 
 - **MeshView**: all MeshView and related classes have been removed, use other classic Mesh instead.
 
+- **ComponentMeshQueries**: `component_mesh_queries.h` has been renamed `component_mesh_polygons.h` and `surface_polygon_unique_vertices` has been renamed `polygon_unique_vertices`.
+
 ## Upgrading from OpenGeode v9.x.x to v10.0.0
 
 ### Motivations

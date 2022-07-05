@@ -25,7 +25,7 @@ add_geode_python_test(
         ${PROJECT_NAME}::py_model
 )
 add_geode_python_test(
-    SOURCE "test-py-section.py"
+    SOURCE "test-py-component-mesh-polygons.py"
     DEPENDENCIES
         ${PROJECT_NAME}::py_basic
         ${PROJECT_NAME}::py_model
@@ -43,13 +43,13 @@ add_geode_python_test(
         ${PROJECT_NAME}::py_model
 )
 add_geode_python_test(
-    SOURCE "test-py-component_mesh_queries.py"
+    SOURCE "test-py-model-component-filter.py"
     DEPENDENCIES
         ${PROJECT_NAME}::py_basic
         ${PROJECT_NAME}::py_model
 )
 add_geode_python_test(
-    SOURCE "test-py-model-component-filter.py"
+    SOURCE "test-py-section.py"
     DEPENDENCIES
         ${PROJECT_NAME}::py_basic
         ${PROJECT_NAME}::py_model

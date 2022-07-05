@@ -105,7 +105,7 @@ namespace geode
         absl::optional< SurfacePolygonEdge > opposite_edge;
     };
 
-    PolygonVertices opengeode_model_api surface_polygon_unique_vertices(
+    PolygonVertices opengeode_model_api polygon_unique_vertices(
         const BRep& model, const Surface3D& surface, index_t polygon_id );
 
     newPolyhedraAroundFacet opengeode_model_api
