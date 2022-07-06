@@ -23,11 +23,12 @@
 
 #pragma once
 
-#include <geode/mesh/core/regular_grid.h>
+#include <geode/mesh/core/geode_regular_grid_solid.h>
+#include <geode/mesh/core/geode_regular_grid_surface.h>
 #include <geode/mesh/io/detail/geode_bitsery_mesh_output.h>
 #include <geode/mesh/io/regular_grid_output.h>
 
 namespace geode
 {
-    BITSERY_OUTPUT_MESH_DIMENSION_IMPL( RegularGrid, RegularGrid );
+    BITSERY_OUTPUT_MESH_DIMENSION( RegularGrid );
 } // namespace geode

@@ -26,11 +26,12 @@
 #include <geode/basic/pimpl.h>
 
 #include <geode/mesh/common.h>
-#include <geode/mesh/core/regular_grid.h>
+#include <geode/mesh/core/grid.h>
 
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+    FORWARD_DECLARATION_DIMENSION_CLASS( RegularGrid );
 } // namespace geode
 
 namespace geode

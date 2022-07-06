@@ -25,7 +25,6 @@
 
 #include <vector>
 
-#include <geode/basic/bitsery_archive.h>
 #include <geode/basic/passkey.h>
 
 #include <geode/mesh/common.h>

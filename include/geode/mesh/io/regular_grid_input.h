@@ -26,6 +26,7 @@
 #include <geode/basic/factory.h>
 
 #include <geode/mesh/common.h>
+#include <geode/mesh/core/mesh_id.h>
 #include <geode/mesh/io/input.h>
 
 namespace geode
@@ -35,6 +36,16 @@ namespace geode
 
 namespace geode
 {
+    /*!
+     * API function for loading an RegularGrid.
+     * The adequate loader is called depending on the filename extension.
+     * @param[in] impl Data structure implementation.
+     * @param[in] filename Path to the file to load.
+     */
+    template < index_t dimension >
+    std::unique_ptr< RegularGrid< dimension > > load_regular_grid(
+        const MeshImpl& impl, absl::string_view filename );
+
     /*!
      * API function for loading a RegularGrid.
      * The adequate loader is called depending on the filename extension.
@@ -46,11 +57,13 @@ namespace geode
 
     template < index_t dimension >
     class RegularGridInput
-        : public Input< std::unique_ptr< RegularGrid< dimension > > >
+        : public Input< std::unique_ptr< RegularGrid< dimension > >, MeshImpl >
     {
     protected:
         RegularGridInput( absl::string_view filename )
-            : Input< std::unique_ptr< RegularGrid< dimension > > >{ filename }
+            : Input< std::unique_ptr< RegularGrid< dimension > >, MeshImpl >{
+                  filename
+              }
         {
         }
     };

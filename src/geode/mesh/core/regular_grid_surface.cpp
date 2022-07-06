@@ -21,52 +21,42 @@
  *
  */
 
-#include <geode/mesh/core/hybrid_solid.h>
+#include <geode/mesh/core/regular_grid_surface.h>
 
-#include <geode/basic/bitsery_archive.h>
-
-#include <geode/mesh/builder/hybrid_solid_builder.h>
+// #include <geode/mesh/builder/tetrahedral_solid_builder.h>
 #include <geode/mesh/core/mesh_factory.h>
 
 namespace geode
 {
-    template < index_t dimension >
-    std::unique_ptr< HybridSolid< dimension > >
-        HybridSolid< dimension >::create()
+    std::unique_ptr< RegularGrid< 2 > > RegularGrid< 2 >::create()
     {
-        return MeshFactory::create_default_mesh< HybridSolid< dimension > >(
-            HybridSolid< dimension >::type_name_static() );
+        return MeshFactory::create_default_mesh< RegularGrid< 2 > >(
+            RegularGrid< 2 >::type_name_static() );
     }
 
-    template < index_t dimension >
-    std::unique_ptr< HybridSolid< dimension > >
-        HybridSolid< dimension >::create( const MeshImpl& impl )
+    std::unique_ptr< RegularGrid< 2 > > RegularGrid< 2 >::create(
+        const MeshImpl& impl )
     {
-        return MeshFactory::create_mesh< HybridSolid< dimension > >( impl );
+        return MeshFactory::create_mesh< RegularGrid< 2 > >( impl );
     }
 
-    template < index_t dimension >
-    std::unique_ptr< HybridSolid< dimension > >
-        HybridSolid< dimension >::clone() const
+    std::unique_ptr< RegularGrid< 2 > > RegularGrid< 2 >::clone() const
     {
         auto clone = create( this->impl_name() );
-        auto builder = HybridSolidBuilder< dimension >::create( *clone );
-        builder->copy( *this );
+        // auto builder = TetrahedralSolidBuilder< dimension >::create( *clone
+        // ); builder->copy( *this );
         return clone;
     }
 
-    template < index_t dimension >
     template < typename Archive >
-    void HybridSolid< dimension >::serialize( Archive& archive )
+    void RegularGrid< 2 >::serialize( Archive& archive )
     {
-        archive.ext( *this, DefaultGrowable< Archive, HybridSolid >{},
-            []( Archive& a, HybridSolid& hybrid_solid ) {
-                a.ext( hybrid_solid,
-                    bitsery::ext::BaseClass< SolidMesh< dimension > >{} );
+        archive.ext( *this, DefaultGrowable< Archive, RegularGrid< 2 > >{},
+            []( Archive& a, RegularGrid< 2 >& grid ) {
+                a.ext( grid, bitsery::ext::BaseClass< SurfaceMesh< 2 > >{} );
+                a.ext( grid, bitsery::ext::BaseClass< Grid< 2 > >{} );
             } );
     }
 
-    template class opengeode_mesh_api HybridSolid< 3 >;
-
-    SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, HybridSolid< 3 > );
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, RegularGrid< 2 > );
 } // namespace geode

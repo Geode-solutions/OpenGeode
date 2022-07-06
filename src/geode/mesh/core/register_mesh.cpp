@@ -29,6 +29,8 @@
 #include <geode/mesh/core/geode_point_set.h>
 #include <geode/mesh/core/geode_polygonal_surface.h>
 #include <geode/mesh/core/geode_polyhedral_solid.h>
+#include <geode/mesh/core/geode_regular_grid_solid.h>
+#include <geode/mesh/core/geode_regular_grid_surface.h>
 #include <geode/mesh/core/geode_tetrahedral_solid.h>
 #include <geode/mesh/core/geode_triangulated_surface.h>
 #include <geode/mesh/core/geode_vertex_set.h>
@@ -84,5 +86,12 @@ namespace geode
         MeshFactory::register_default_mesh< OpenGeodeHybridSolid3D >(
             HybridSolid3D::type_name_static(),
             OpenGeodeHybridSolid3D::impl_name_static() );
+
+        MeshFactory::register_default_mesh< OpenGeodeRegularGrid2D >(
+            RegularGrid2D::type_name_static(),
+            OpenGeodeRegularGrid2D::impl_name_static() );
+        MeshFactory::register_default_mesh< OpenGeodeRegularGrid3D >(
+            RegularGrid3D::type_name_static(),
+            OpenGeodeRegularGrid3D::impl_name_static() );
     }
 } // namespace geode

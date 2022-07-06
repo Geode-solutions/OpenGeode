@@ -26,13 +26,14 @@
 #include <geode/basic/timer.h>
 
 #include <geode/mesh/core/mesh_factory.h>
-#include <geode/mesh/core/regular_grid.h>
+#include <geode/mesh/core/regular_grid_solid.h>
+#include <geode/mesh/core/regular_grid_surface.h>
 
 namespace geode
 {
     template < index_t dimension >
     std::unique_ptr< RegularGrid< dimension > > load_regular_grid(
-        absl::string_view filename )
+        const MeshImpl& impl, absl::string_view filename )
     {
         try
         {
@@ -44,7 +45,7 @@ namespace geode
                 "Unknown extension: ", extension );
             auto grid = RegularGridInputFactory< dimension >::create(
                 extension, filename )
-                            ->read();
+                            ->read( impl );
             Logger::info( "RegularGrid", dimension, "D loaded from ", filename,
                 " in ", timer.duration() );
             Logger::info( "RegularGrid", dimension, "D has: ", grid->nb_cells(),
@@ -58,6 +59,21 @@ namespace geode
                 filename };
         }
     }
+
+    template < index_t dimension >
+    std::unique_ptr< RegularGrid< dimension > > load_regular_grid(
+        absl::string_view filename )
+    {
+        return load_regular_grid< dimension >(
+            MeshFactory::default_impl(
+                RegularGrid< dimension >::type_name_static() ),
+            filename );
+    }
+
+    template std::unique_ptr< RegularGrid< 2 > > opengeode_mesh_api
+        load_regular_grid( const MeshImpl&, absl::string_view );
+    template std::unique_ptr< RegularGrid< 3 > > opengeode_mesh_api
+        load_regular_grid( const MeshImpl&, absl::string_view );
 
     template std::unique_ptr< RegularGrid< 2 > >
         opengeode_mesh_api load_regular_grid( absl::string_view );

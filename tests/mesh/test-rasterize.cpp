@@ -32,7 +32,8 @@
 #include <geode/geometry/basic_objects/triangle.h>
 #include <geode/geometry/point.h>
 
-#include <geode/mesh/core/regular_grid.h>
+#include <geode/mesh/core/regular_grid_solid.h>
+#include <geode/mesh/core/regular_grid_surface.h>
 #include <geode/mesh/core/triangulated_surface.h>
 #include <geode/mesh/helpers/rasterize.h>
 #include <geode/mesh/io/regular_grid_input.h>

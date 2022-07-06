@@ -23,16 +23,14 @@
 
 #pragma once
 
-#include <geode/basic/bitsery_archive.h>
-
 #include <geode/mesh/common.h>
 #include <geode/mesh/core/solid_mesh.h>
 
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( TetrahedralSolidBuilder );
-    class Tetrahedron;
     FORWARD_DECLARATION_DIMENSION_CLASS( Triangle );
+    class Tetrahedron;
 } // namespace geode
 
 namespace geode
@@ -118,14 +116,7 @@ namespace geode
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive )
-        {
-            archive.ext( *this, DefaultGrowable< Archive, TetrahedralSolid >{},
-                []( Archive& a, TetrahedralSolid& tetrahedral_solid ) {
-                    a.ext( tetrahedral_solid,
-                        bitsery::ext::BaseClass< SolidMesh< dimension > >{} );
-                } );
-        }
+        void serialize( Archive& archive );
 
         local_index_t get_nb_polyhedron_vertices(
             index_t /*unused*/ ) const final

@@ -23,7 +23,6 @@
 
 #pragma once
 
-#include <absl/container/inlined_vector.h>
 #include <absl/types/optional.h>
 
 #include <geode/basic/pimpl.h>
@@ -33,8 +32,6 @@
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
-    FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
-    class AttributeManager;
 } // namespace geode
 
 namespace geode
@@ -57,29 +54,24 @@ namespace geode
         absl::InlinedVector< GridCellIndices< dimension >, 1 << dimension >;
     ALIAS_2D_AND_3D( GridCellsAroundVertex );
 
-    /*!
-     * Interface class to represent regular grids.
-     */
     template < index_t dimension >
-    class RegularGrid
+    class Grid
     {
-        OPENGEODE_DISABLE_COPY( RegularGrid );
+        OPENGEODE_DISABLE_COPY( Grid );
         friend class bitsery::Access;
 
     public:
-        RegularGrid();
+        Grid();
 
-        RegularGrid( Point< dimension > origin,
-            std::array< index_t, dimension > cells_number,
+        Grid( std::array< index_t, dimension > cells_number,
             std::array< double, dimension > cells_length );
 
-        RegularGrid( Point< dimension > origin,
-            std::array< index_t, dimension > cells_number,
+        Grid( std::array< index_t, dimension > cells_number,
             double cells_length );
 
-        RegularGrid( RegularGrid&& );
+        Grid( Grid&& );
 
-        ~RegularGrid();
+        virtual ~Grid();
 
         absl::string_view native_extension() const
         {
@@ -92,6 +84,8 @@ namespace geode
             return ext;
         }
 
+        virtual const Point< dimension >& origin() const = 0;
+
         local_index_t nb_cell_vertices() const
         {
             return nb_cell_vertices_static();
@@ -103,23 +97,29 @@ namespace geode
             return 1 << dimension;
         }
 
-        const Point< dimension >& origin() const;
+        local_index_t nb_cell_facets() const
+        {
+            return nb_cell_facets_static();
+        }
 
-        AttributeManager& cell_attribute_manager() const;
-
-        AttributeManager& vertex_attribute_manager() const;
+        static constexpr local_index_t nb_cell_facets_static()
+        {
+            return 2 * dimension;
+        }
 
         index_t nb_cells() const;
 
-        index_t nb_cells( index_t direction ) const;
+        index_t nb_cells_in_direction( index_t direction ) const;
 
-        double cell_length( index_t direction ) const;
+        double cell_length_in_direction( index_t direction ) const;
 
         double cell_size() const;
 
-        index_t cell_index( const GridCellIndices< dimension >& index ) const;
+        virtual index_t cell_index(
+            const GridCellIndices< dimension >& index ) const = 0;
 
-        GridCellIndices< dimension > cell_indices( index_t index ) const;
+        virtual GridCellIndices< dimension > cell_indices(
+            index_t index ) const = 0;
 
         absl::optional< GridCellIndices< dimension > > next_cell(
             const GridCellIndices< dimension >& index,
@@ -132,16 +132,15 @@ namespace geode
         bool is_cell_on_border(
             const GridCellIndices< dimension >& cell_indices ) const;
 
-        index_t nb_vertices() const;
-
-        index_t nb_vertices( index_t direction ) const;
+        index_t nb_vertices_in_direction( index_t direction ) const;
 
         index_t nb_vertices_on_borders() const;
 
-        index_t vertex_index(
-            const GridVertexIndices< dimension >& index ) const;
+        virtual index_t vertex_index(
+            const GridVertexIndices< dimension >& index ) const = 0;
 
-        GridVertexIndices< dimension > vertex_indices( index_t index ) const;
+        virtual GridVertexIndices< dimension > vertex_indices(
+            index_t index ) const = 0;
 
         GridCellVertices< dimension > cell_vertices(
             const GridCellIndices< dimension >& cell_id ) const;
@@ -157,15 +156,6 @@ namespace geode
         absl::optional< GridVertexIndices< dimension > > previous_vertex(
             const GridVertexIndices< dimension >& index,
             index_t direction ) const;
-
-        bool is_vertex_on_border(
-            const GridVertexIndices< dimension >& vertex_index ) const;
-
-        Point< dimension > point(
-            const GridVertexIndices< dimension >& index ) const;
-
-        Point< dimension > cell_barycenter(
-            const GridCellIndices< dimension >& index ) const;
 
         /*!
          * Return true if the query point is inside the grid, up to a
@@ -191,13 +181,6 @@ namespace geode
         GridCellsAroundVertex< dimension > cells(
             const Point< dimension >& query ) const;
 
-        /*!
-         * Compute the bounding box of the grid
-         */
-        BoundingBox< dimension > bounding_box() const;
-
-        RegularGrid< dimension > clone() const;
-
     private:
         template < typename Archive >
         void serialize( Archive& archive );
@@ -205,5 +188,5 @@ namespace geode
     private:
         IMPLEMENTATION_MEMBER( impl_ );
     };
-    ALIAS_2D_AND_3D( RegularGrid );
+    ALIAS_2D_AND_3D( Grid );
 } // namespace geode

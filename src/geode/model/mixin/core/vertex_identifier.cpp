@@ -27,6 +27,17 @@
 
 namespace geode
 {
+
+    template < typename Archive >
+    void ComponentMeshVertex::serialize( Archive& archive )
+    {
+        archive.ext( *this, DefaultGrowable< Archive, ComponentMeshVertex >{},
+            []( Archive& a, ComponentMeshVertex& component_mesh_vertex ) {
+                a.object( component_mesh_vertex.component_id );
+                a.value4b( component_mesh_vertex.vertex );
+            } );
+    }
+
     class VertexIdentifier::Impl
     {
         const std::string unique_vertices_name = "unique vertices";
@@ -578,4 +589,6 @@ namespace geode
     template void opengeode_model_api
         VertexIdentifier::unregister_mesh_component(
             const Block3D&, BuilderKey );
+
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_model_api, ComponentMeshVertex );
 } // namespace geode

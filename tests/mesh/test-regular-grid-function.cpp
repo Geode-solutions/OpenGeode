@@ -27,7 +27,7 @@
 
 #include <geode/geometry/point.h>
 
-#include <geode/mesh/core/regular_grid.h>
+#include <geode/mesh/core/regular_grid_solid.h>
 #include <geode/mesh/helpers/regular_grid_point_function.h>
 #include <geode/mesh/helpers/regular_grid_scalar_function.h>
 

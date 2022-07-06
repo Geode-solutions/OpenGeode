@@ -25,6 +25,9 @@
 
 #include <geode/geometry/point.h>
 
+#include <geode/mesh/core/regular_grid_solid.h>
+#include <geode/mesh/core/regular_grid_surface.h>
+
 namespace
 {
     template < geode::index_t dimension >
@@ -45,8 +48,9 @@ namespace
         auto local_coords = point - grid.origin();
         for( const auto d : geode::LRange{ dimension } )
         {
-            local_coords.set_value( d,
-                local_coords.value( d ) / grid.cell_length( d ) - cell_id[d] );
+            local_coords.set_value(
+                d, local_coords.value( d ) / grid.cell_length_in_direction( d )
+                       - cell_id[d] );
             if( local_coords.value( d ) < 0 )
             {
                 local_coords.set_value( d, 0 );
@@ -104,7 +108,7 @@ namespace geode
 
         template double opengeode_mesh_api shape_function_value< 2 >(
             const RegularGrid< 2 >& grid,
-            const GridVertexIndices< 2 >& cell_id,
+            const GridCellIndices< 2 >& cell_id,
             local_index_t node_id,
             const Point< 2 >& point );
         template GridVertexIndices< 2 > opengeode_mesh_api cell_node_index< 2 >(
@@ -112,7 +116,7 @@ namespace geode
 
         template double opengeode_mesh_api shape_function_value< 3 >(
             const RegularGrid< 3 >& grid,
-            const GridVertexIndices< 3 >& cell_id,
+            const GridCellIndices< 3 >& cell_id,
             local_index_t node_id,
             const Point< 3 >& point );
         template GridVertexIndices< 3 > opengeode_mesh_api cell_node_index< 3 >(

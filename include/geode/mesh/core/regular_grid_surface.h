@@ -24,60 +24,71 @@
 #pragma once
 
 #include <geode/mesh/common.h>
+#include <geode/mesh/core/grid.h>
 #include <geode/mesh/core/surface_mesh.h>
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( Triangle );
-    FORWARD_DECLARATION_DIMENSION_CLASS( TriangulatedSurfaceBuilder );
+    FORWARD_DECLARATION_DIMENSION_CLASS( RegularGrid );
+    ALIAS_2D( RegularGrid );
 } // namespace geode
 
 namespace geode
 {
-    /*!
-     * Interface class for Surface of arbitrary dimension made up with triangles
-     * only.
-     */
-    template < index_t dimension >
-    class TriangulatedSurface : public SurfaceMesh< dimension >
+    template <>
+    class opengeode_mesh_api RegularGrid< 2 > : public SurfaceMesh< 2 >,
+                                                public Grid< 2 >
     {
+        OPENGEODE_DISABLE_COPY( RegularGrid );
+        friend class bitsery::Access;
+
     public:
-        using Builder = TriangulatedSurfaceBuilder< dimension >;
-
         /*!
-         * Create a new TriangulatedSurface using default data structure.
+         * Create a new RegularGrid using default data structure.
          */
-        static std::unique_ptr< TriangulatedSurface< dimension > > create();
+        static std::unique_ptr< RegularGrid2D > create();
 
         /*!
-         * Create a new TriangulatedSurface using a specified data structure.
+         * Create a new RegularGrid using a specified data structure.
          * @param[in] impl Data structure implementation
          */
-        static std::unique_ptr< TriangulatedSurface< dimension > > create(
-            const MeshImpl& impl );
+        static std::unique_ptr< RegularGrid2D > create( const MeshImpl& impl );
 
-        static MeshType type_name_static()
+        absl::string_view native_extension() const
         {
-            return MeshType{ absl::StrCat(
-                "TriangulatedSurface", dimension, "D" ) };
+            return native_extension_static();
         }
 
-        std::unique_ptr< TriangulatedSurface< dimension > > clone() const;
+        static absl::string_view native_extension_static()
+        {
+            static const auto ext = "og_rgd2d";
+            return ext;
+        }
 
-        Triangle< dimension > triangle( index_t triangle_id ) const;
+        std::unique_ptr< RegularGrid2D > clone() const;
 
     protected:
-        TriangulatedSurface() = default;
+        RegularGrid() = default;
+
+        RegularGrid( std::array< index_t, 2 > cells_number,
+            std::array< double, 2 > cells_length )
+            : Grid< 2 >{ std::move( cells_number ), std::move( cells_length ) }
+        {
+        }
+
+        RegularGrid(
+            std::array< index_t, 2 > cells_number, double cells_length )
+            : Grid< 2 >{ std::move( cells_number ), cells_length }
+        {
+        }
 
     private:
-        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive );
 
         local_index_t get_nb_polygon_vertices( index_t /*unused*/ ) const final
         {
-            return 3;
+            return nb_cell_vertices();
         }
     };
-    ALIAS_2D_AND_3D( TriangulatedSurface );
 } // namespace geode

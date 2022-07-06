@@ -26,7 +26,6 @@
 #include <absl/types/optional.h>
 #include <absl/types/span.h>
 
-#include <geode/basic/bitsery_archive.h>
 #include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 

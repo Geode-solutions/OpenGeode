@@ -24,10 +24,11 @@
 #pragma once
 
 #include <geode/mesh/common.h>
-#include <geode/mesh/core/regular_grid.h>
+#include <geode/mesh/core/grid.h>
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( RegularGrid );
     FORWARD_DECLARATION_DIMENSION_CLASS( Segment );
     FORWARD_DECLARATION_DIMENSION_CLASS( Triangle );
 } // namespace geode

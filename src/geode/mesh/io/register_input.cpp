@@ -74,12 +74,14 @@ namespace geode
         BITSERY_INPUT_MESH_REGISTER_3D( TetrahedralSolid );
         BITSERY_INPUT_MESH_REGISTER_3D( HybridSolid );
 
+        OpenGeodeRegularGridInput2D toto();
+
         RegularGridInputFactory2D::register_creator<
             OpenGeodeRegularGridInput2D >(
-            RegularGrid2D ::native_extension_static().data() );
+            RegularGrid2D::native_extension_static().data() );
 
         RegularGridInputFactory3D::register_creator<
             OpenGeodeRegularGridInput3D >(
-            RegularGrid3D ::native_extension_static().data() );
+            RegularGrid3D::native_extension_static().data() );
     }
 } // namespace geode

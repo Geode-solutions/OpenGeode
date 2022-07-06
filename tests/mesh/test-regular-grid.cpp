@@ -29,7 +29,7 @@
 #include <geode/geometry/bounding_box.h>
 #include <geode/geometry/point.h>
 
-#include <geode/mesh/core/regular_grid.h>
+#include <geode/mesh/core/geode_regular_grid_solid.h>
 #include <geode/mesh/io/regular_grid_input.h>
 #include <geode/mesh/io/regular_grid_output.h>
 
@@ -38,7 +38,7 @@
 void test_cell_number( const geode::RegularGrid3D& grid )
 {
     OPENGEODE_EXCEPTION(
-        grid.nb_cells() == 750, "[Test] Wrong total number of cells" );
+        grid.nb_polyhedra() == 750, "[Test] Wrong total number of cells" );
     OPENGEODE_EXCEPTION(
         grid.nb_cells( 0 ) == 5, "[Test] Wrong total number of cells along X" );
     OPENGEODE_EXCEPTION( grid.nb_cells( 1 ) == 10,
@@ -307,14 +307,14 @@ void test_clone( geode::RegularGrid3D& grid )
     const auto attribute_name = "int_attribute";
     const auto attribute_name_d = "double_attribute";
     auto attribute =
-        grid.cell_attribute_manager()
+        grid.polyhedron_attribute_manager()
             .find_or_create_attribute< geode::VariableAttribute, int >(
                 attribute_name, 0 );
     auto attribute_d =
         grid.vertex_attribute_manager()
             .find_or_create_attribute< geode::VariableAttribute, double >(
                 attribute_name_d, 0 );
-    for( const auto c : geode::Range{ grid.nb_cells() } )
+    for( const auto c : geode::Range{ grid.nb_polyhedra() } )
     {
         attribute->set_value( c, 2 * c );
     }
@@ -323,25 +323,24 @@ void test_clone( geode::RegularGrid3D& grid )
         attribute_d->set_value( c, 2 * c );
     }
     const auto clone = grid.clone();
-    OPENGEODE_EXCEPTION(
-        clone.origin() == grid.origin(), "[Test] Wrong clone origin" );
-    OPENGEODE_EXCEPTION(
-        clone.cell_attribute_manager().attribute_exists( attribute_name ),
+    OPENGEODE_EXCEPTION( clone->polyhedron_attribute_manager().attribute_exists(
+                             attribute_name ),
         "[Test] Clone missing attribute" );
     OPENGEODE_EXCEPTION(
-        clone.vertex_attribute_manager().attribute_exists( attribute_name_d ),
+        clone->vertex_attribute_manager().attribute_exists( attribute_name_d ),
         "[Test] Clone missing attribute" );
     const auto clone_attribute =
-        clone.cell_attribute_manager().find_attribute< int >( attribute_name );
-    for( const auto c : geode::TRange< int >{ clone.nb_cells() } )
+        clone->polyhedron_attribute_manager().find_attribute< int >(
+            attribute_name );
+    for( const auto c : geode::TRange< int >{ clone->nb_polyhedra() } )
     {
         OPENGEODE_EXCEPTION( clone_attribute->value( c ) == 2 * c,
             "[Test] Wrong clone attribute" );
     }
     const auto clone_attribute_d =
-        clone.vertex_attribute_manager().find_attribute< double >(
+        clone->vertex_attribute_manager().find_attribute< double >(
             attribute_name_d );
-    for( const auto c : geode::TRange< int >{ clone.nb_vertices() } )
+    for( const auto c : geode::TRange< int >{ clone->nb_vertices() } )
     {
         OPENGEODE_EXCEPTION( clone_attribute_d->value( c ) == 2 * c,
             "[Test] Wrong clone attribute" );
@@ -356,7 +355,8 @@ void test_io( const geode::RegularGrid3D& grid, absl::string_view filename )
 
 void test()
 {
-    geode::RegularGrid3D grid{ { { 1.5, 0, 1 } }, { 5, 10, 15 }, { 1, 2, 3 } };
+    geode::OpenGeodeRegularGrid3D grid{ { { 1.5, 0, 1 } }, { 5, 10, 15 },
+        { 1, 2, 3 } };
     test_cell_number( grid );
     test_cell_index( grid );
     test_vertex_number( grid );

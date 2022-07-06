@@ -23,40 +23,12 @@
 
 #pragma once
 
-#include <geode/mesh/core/regular_grid.h>
+#include <geode/mesh/core/geode_regular_grid_solid.h>
+#include <geode/mesh/core/geode_regular_grid_surface.h>
+#include <geode/mesh/io/detail/geode_bitsery_mesh_input.h>
 #include <geode/mesh/io/regular_grid_input.h>
 
 namespace geode
 {
-    template < index_t dimension >
-    class OpenGeodeRegularGridInput : public RegularGridInput< dimension >
-    {
-    public:
-        OpenGeodeRegularGridInput( absl::string_view filename )
-            : RegularGridInput< dimension >( filename )
-        {
-        }
-
-        std::unique_ptr< RegularGrid< dimension > > read() final
-        {
-            std::ifstream file{ to_string( this->filename() ),
-                std::ifstream::binary };
-            TContext context{};
-            register_basic_deserialize_pcontext( std::get< 0 >( context ) );
-            register_geometry_deserialize_pcontext( std::get< 0 >( context ) );
-            register_mesh_deserialize_pcontext( std::get< 0 >( context ) );
-            Deserializer archive{ context, file };
-            auto mesh = absl::make_unique< RegularGrid< dimension > >();
-            archive.object( *mesh );
-            const auto& adapter = archive.adapter();
-            OPENGEODE_EXCEPTION(
-                adapter.error() == bitsery::ReaderError::NoError
-                    && adapter.isCompletedSuccessfully()
-                    && std::get< 1 >( context ).isValid(),
-                "[Bitsery::read] Error while reading file: ",
-                this->filename() );
-            return mesh;
-        }
-    };
-    ALIAS_2D_AND_3D( OpenGeodeRegularGridInput );
+    BITSERY_INPUT_MESH_DIMENSION( RegularGrid );
 } // namespace geode
