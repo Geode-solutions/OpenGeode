@@ -29,33 +29,19 @@
 
 namespace geode
 {
-    template <>
-    double triangle_area( const Triangle3D& triangle )
+    template < index_t dimension >
+    double triangle_area( const Triangle< dimension >& triangle )
     {
-        const auto Ux = triangle.vertices()[1].get().value( 0 )
-                        - triangle.vertices()[0].get().value( 0 );
-        const auto Uy = triangle.vertices()[1].get().value( 1 )
-                        - triangle.vertices()[0].get().value( 1 );
-        const auto Uz = triangle.vertices()[1].get().value( 2 )
-                        - triangle.vertices()[0].get().value( 2 );
-
-        const auto Vx = triangle.vertices()[2].get().value( 0 )
-                        - triangle.vertices()[0].get().value( 0 );
-        const auto Vy = triangle.vertices()[2].get().value( 1 )
-                        - triangle.vertices()[0].get().value( 1 );
-        const auto Vz = triangle.vertices()[2].get().value( 2 )
-                        - triangle.vertices()[0].get().value( 2 );
-
-        const auto Nx = Uy * Vz - Uz * Vy;
-        const auto Ny = Uz * Vx - Ux * Vz;
-        const auto Nz = Ux * Vy - Uy * Vx;
-        return std::sqrt( Nx * Nx + Ny * Ny + Nz * Nz ) / 2.;
-    }
-
-    template <>
-    double triangle_area( const Triangle2D& triangle )
-    {
-        return std::fabs( triangle_signed_area( triangle ) );
+        const auto& tri_v = triangle.vertices();
+        // Heron's formula
+        const auto l0 =
+            geode::Vector< dimension >{ tri_v[0], tri_v[1] }.length();
+        const auto l1 =
+            geode::Vector< dimension >{ tri_v[1], tri_v[2] }.length();
+        const auto l2 =
+            geode::Vector< dimension >{ tri_v[2], tri_v[0] }.length();
+        const auto p = ( l0 + l1 + l2 ) / 2;
+        return std::sqrt( p * ( p - l0 ) * ( p - l1 ) * ( p - l2 ) );
     }
 
     double triangle_signed_area(
