@@ -44,7 +44,7 @@
         .def( "set_polygon_adjacent",                                          \
             &SurfaceMeshBuilder##dimension##D::set_polygon_adjacent )          \
         .def( "compute_polygon_adjacencies",                                   \
-            ( void ( SurfaceMeshBuilder##dimension##D::* )() )                 \
+            ( void( SurfaceMeshBuilder##dimension##D::* )() )                  \
                 & SurfaceMeshBuilder##dimension##D::                           \
                     compute_polygon_adjacencies )                              \
         .def( "delete_polygons",                                               \

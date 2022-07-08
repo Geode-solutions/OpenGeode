@@ -147,17 +147,17 @@ namespace geode
                 pybind11::return_value_policy::reference )
             .def( "is_line_closed", &Section::is_closed )
             .def( "is_line_boundary",
-                ( bool ( Section::* )( const Corner2D&, const Line2D& ) const )
+                ( bool( Section::* )( const Corner2D&, const Line2D& ) const )
                     & Section::is_boundary )
             .def( "is_surface_boundary",
-                ( bool ( Section::* )( const Line2D&, const Surface2D& ) const )
+                ( bool( Section::* )( const Line2D&, const Surface2D& ) const )
                     & Section::is_boundary )
             .def( "is_corner_in_surface_internals",
-                ( bool ( Section::* )( const Corner2D&, const Surface2D& )
+                ( bool( Section::* )( const Corner2D&, const Surface2D& )
                         const )
                     & Section::is_internal )
             .def( "is_line_in_surface_internals",
-                ( bool ( Section::* )( const Line2D&, const Surface2D& ) const )
+                ( bool( Section::* )( const Line2D&, const Surface2D& ) const )
                     & Section::is_internal )
             .def( "is_model_boundary_item", &Section::is_model_boundary_item )
             .def( "bounding_box", &Section::bounding_box )
