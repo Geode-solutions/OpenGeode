@@ -170,3 +170,10 @@ add_geode_test(
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::mesh
 )
+add_geode_test(
+    SOURCE "test-hausdorff-distance.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::mesh
+)
