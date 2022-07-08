@@ -35,33 +35,20 @@
 
 #include <geode/mesh/helpers/aabb_surface_helpers.h>
 
-namespace geode
+namespace
 {
-
-    double two_sided_hausdorff_distance( const TriangulatedSurface3D& mesh_A,
-        const TriangulatedSurface3D& mesh_B )
+    double one_sided_hausdorff_distance(
+        const geode::TriangulatedSurface3D& mesh_A,
+        const geode::TriangulatedSurface3D& mesh_B )
     {
-        const auto mesh_B_tree = create_aabb_tree( mesh_B );
-        const DistanceToTriangle3D distance_action_B{ mesh_B };
+        const auto mesh_B_tree = geode::create_aabb_tree( mesh_B );
+        const geode::DistanceToTriangle3D distance_action{ mesh_B };
         double min_dist = 0;
-        for( auto va : Range{ mesh_A.nb_vertices() } )
+        for( auto v : geode::Range{ mesh_A.nb_vertices() } )
         {
-            const auto& query = mesh_A.point( va );
+            const auto& query = mesh_A.point( v );
             const auto closest_element =
-                mesh_B_tree.closest_element_box( query, distance_action_B );
-            const auto distance = std::get< 2 >( closest_element );
-            if( distance > min_dist )
-            {
-                min_dist = distance;
-            }
-        }
-        const auto mesh_A_tree = create_aabb_tree( mesh_A );
-        const DistanceToTriangle3D distance_action_A{ mesh_A };
-        for( auto vb : Range{ mesh_B.nb_vertices() } )
-        {
-            const auto& query = mesh_B.point( vb );
-            const auto closest_element =
-                mesh_A_tree.closest_element_box( query, distance_action_A );
+                mesh_B_tree.closest_element_box( query, distance_action );
             const auto distance = std::get< 2 >( closest_element );
             if( distance > min_dist )
             {
@@ -69,5 +56,15 @@ namespace geode
             }
         }
         return min_dist;
+    }
+} // namespace
+
+namespace geode
+{
+    double hausdorff_distance( const TriangulatedSurface3D& mesh_A,
+        const TriangulatedSurface3D& mesh_B )
+    {
+        return std::max( one_sided_hausdorff_distance( mesh_A, mesh_B ),
+            one_sided_hausdorff_distance( mesh_B, mesh_A ) );
     }
 } // namespace geode

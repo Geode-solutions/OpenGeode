@@ -23,7 +23,7 @@ void test()
         geode::load_triangulated_surface< 3 >( simplified_mesh_filename );
 
     const auto hausdorff_distance =
-        geode::two_sided_hausdorff_distance( *mesh_A, *mesh_B );
+        geode::hausdorff_distance( *mesh_A, *mesh_B );
     DEBUG( hausdorff_distance );
 }
 

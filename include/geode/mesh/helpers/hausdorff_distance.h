@@ -34,6 +34,6 @@ namespace geode
 
 namespace geode
 {
-    double two_sided_hausdorff_distance( const TriangulatedSurface3D& mesh_A,
+    double hausdorff_distance( const TriangulatedSurface3D& mesh_A,
         const TriangulatedSurface3D& mesh_B );
 } // namespace geode
