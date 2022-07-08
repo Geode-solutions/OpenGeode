@@ -29,15 +29,11 @@ namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( AABBTree );
     FORWARD_DECLARATION_DIMENSION_CLASS( TriangulatedSurface );
-    FORWARD_DECLARATION_DIMENSION_CLASS( DistanceToTriangle );
+    ALIAS_3D( TriangulatedSurface );
 } // namespace geode
 
-namespace HAUSDORFF_DISTANCE
+namespace geode
 {
-    double compute_one_sided_hausdorff_distance(
-        const geode::TriangulatedSurface< 3 >& mesh_A,
-        const geode::TriangulatedSurface< 3 >& mesh_B );
-    double compute_two_sided_hausdorff_distance(
-        const geode::TriangulatedSurface< 3 >& mesh_A,
-        const geode::TriangulatedSurface< 3 >& mesh_B );
-} // namespace HAUSDORFF_DISTANCE
+    double two_sided_hausdorff_distance( const TriangulatedSurface3D& mesh_A,
+        const TriangulatedSurface3D& mesh_B );
+} // namespace geode
