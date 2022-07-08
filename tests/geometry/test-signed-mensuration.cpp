@@ -68,6 +68,16 @@ void test_triangle_area_3d()
     OPENGEODE_EXCEPTION( std::fabs( area2 ) < geode::global_epsilon,
         "[Test] Wrong result for triangle_area "
         "with query triangle triangle3D_2" );
+
+    const geode::Point3D d{ { 1, 1, -0.300000011920929 } };
+    const geode::Point3D e{ { 0, 0, -0.300000011920929 } };
+    const geode::Point3D f{ { 0.555555555555556, 0.555555555555555,
+        -0.300000011920929 } };
+    const geode::Triangle3D triangle3D_3{ d, e, f };
+    const auto area3 = geode::triangle_area( triangle3D_3 );
+    OPENGEODE_EXCEPTION( std::fabs( area3 ) < geode::global_epsilon,
+        "[Test] Wrong result for triangle_area "
+        "with query triangle triangle3D_3" );
 }
 
 void test_triangle_area()

@@ -25,6 +25,7 @@
 
 #include <geode/geometry/basic_objects/tetra.h>
 #include <geode/geometry/basic_objects/triangle.h>
+#include <geode/geometry/distance.h>
 #include <geode/geometry/perpendicular.h>
 
 namespace geode
@@ -34,32 +35,27 @@ namespace geode
     {
         const auto& tri_v = triangle.vertices();
         // Heron's formula
-        const auto l0 =
-            geode::Vector< dimension >{ tri_v[0], tri_v[1] }.length();
-        const auto l1 =
-            geode::Vector< dimension >{ tri_v[1], tri_v[2] }.length();
-        const auto l2 =
-            geode::Vector< dimension >{ tri_v[2], tri_v[0] }.length();
+        const auto l0 = point_point_distance( tri_v[0].get(), tri_v[1].get() );
+        const auto l1 = point_point_distance( tri_v[1].get(), tri_v[2].get() );
+        const auto l2 = point_point_distance( tri_v[2].get(), tri_v[0].get() );
         const auto p = ( l0 + l1 + l2 ) / 2;
-        return std::sqrt( p * ( p - l0 ) * ( p - l1 ) * ( p - l2 ) );
+        const auto area2 = p * ( p - l0 ) * ( p - l1 ) * ( p - l2 );
+        if( area2 < 0 )
+        {
+            return 0;
+        }
+        return std::sqrt( area2 );
     }
 
     double triangle_signed_area(
         const Triangle3D& triangle, const Vector3D& direction )
     {
         const auto area = triangle_area( triangle );
-        try
+        if( const auto normal = triangle.new_normal() )
         {
-            if( const auto area_normal = triangle.new_normal() )
-            {
-                return direction.dot( area_normal.value() ) > 0 ? area : -area;
-            }
-            return area;
+            return direction.dot( normal.value() ) > 0 ? area : -area;
         }
-        catch( const OpenGeodeException& )
-        {
-            return area;
-        }
+        return area;
     }
 
     double triangle_signed_area( const Triangle2D& triangle )
@@ -84,6 +80,5 @@ namespace geode
     }
 
     template double opengeode_geometry_api triangle_area( const Triangle2D& );
-
     template double opengeode_geometry_api triangle_area( const Triangle3D& );
 } // namespace geode
