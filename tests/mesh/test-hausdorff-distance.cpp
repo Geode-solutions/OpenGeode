@@ -13,11 +13,12 @@
 
 void test()
 {
-    const std::string filename( "iter1.og_tsf3d" );
+    const std::string filename( "../tests/data/iter1.og_tsf3d" );
     std::unique_ptr< geode::TriangulatedSurface3D > mesh_A =
         geode::load_triangulated_surface< 3 >( filename );
     std::unique_ptr< geode::TriangulatedSurface3D > mesh_B =
-        geode::load_triangulated_surface< 3 >( "modified_iter1.og_tsf3d" );
+        geode::load_triangulated_surface< 3 >(
+            "../tests/data/modified_iter1.og_tsf3d" );
 
     const auto hausdorff_distance =
         HAUSDORFF_DISTANCE::compute_two_sided_hausdorff_distance(
