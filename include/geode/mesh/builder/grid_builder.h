@@ -23,52 +23,29 @@
 
 #pragma once
 
-#include <absl/types/span.h>
+#include <memory>
 
-#include <geode/mesh/builder/vertex_set_builder.h>
 #include <geode/mesh/common.h>
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMeshBuilder );
-    FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceEdges );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Grid );
 } // namespace geode
 
 namespace geode
 {
-    /*!
-     * Interface class to represent the builder of a SurfaceEdges
-     */
     template < index_t dimension >
-    class SurfaceEdgesBuilder
+    class GridBuilder
     {
     public:
-        SurfaceEdgesBuilder( SurfaceEdges< dimension >& edges );
+        void set_grid_dimensions( std::array< index_t, dimension > cells_number,
+            std::array< double, dimension > cells_length );
 
-        /*!
-         * Delete all the isolated edges (not used as polygon edges)
-         * @return the mapping between old edge indices to new ones.
-         * Deleted edges new index is NO_ID
-         */
-        std::vector< index_t > delete_isolated_edges();
-
-        index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices );
-
-        std::vector< index_t > delete_edges(
-            const std::vector< bool >& to_delete );
-
-        void remove_edge( std::array< index_t, 2 > edge_vertices );
-
-        void update_edge_vertices( absl::Span< const index_t > old2new );
-
-        void update_edge_vertex( std::array< index_t, 2 > edge_vertices,
-            index_t edge_vertex_id,
-            index_t new_vertex_id );
-
-        void copy( const SurfaceEdges< dimension >& edges );
+    protected:
+        GridBuilder( Grid< dimension >& grid );
 
     private:
-        SurfaceEdges< dimension >* edges_;
+        Grid< dimension >& grid_;
     };
-    ALIAS_2D_AND_3D( SurfaceEdgesBuilder );
+    ALIAS_2D_AND_3D( GridBuilder );
 } // namespace geode

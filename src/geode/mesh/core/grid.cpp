@@ -342,6 +342,13 @@ namespace geode
             return cells_length_;
         }
 
+        void set_grid_dimensions( std::array< index_t, dimension > cells_number,
+            std::array< double, dimension > cells_length )
+        {
+            cells_number_ = std::move( cells_number );
+            cells_length_ = std::move( cells_length );
+        }
+
     private:
         // void resize_vertex_attribute_manager_to_right_size()
         // {
@@ -389,24 +396,6 @@ namespace geode
         std::array< index_t, dimension > cells_number_;
         std::array< double, dimension > cells_length_;
     };
-
-    template < index_t dimension >
-    Grid< dimension >::Grid( std::array< index_t, dimension > cells_number,
-        std::array< double, dimension > cells_length )
-        : impl_( std::move( cells_number ), std::move( cells_length ) )
-    {
-    }
-
-    template < index_t dimension >
-    Grid< dimension >::Grid(
-        std::array< index_t, dimension > cells_number, double cells_length )
-        : Grid( std::move( cells_number ), [&cells_length]() {
-              std::array< double, dimension > size;
-              size.fill( cells_length );
-              return size;
-          }() )
-    {
-    }
 
     template < index_t dimension >
     Grid< dimension >::Grid()
@@ -532,6 +521,16 @@ namespace geode
         const Point< dimension >& query ) const
     {
         return impl_->cells( origin(), query );
+    }
+
+    template < index_t dimension >
+    void Grid< dimension >::set_grid_dimensions(
+        std::array< index_t, dimension > cells_number,
+        std::array< double, dimension > cells_length,
+        GridKey )
+    {
+        return impl_->set_grid_dimensions(
+            std::move( cells_number ), std::move( cells_length ) );
     }
 
     template < index_t dimension >

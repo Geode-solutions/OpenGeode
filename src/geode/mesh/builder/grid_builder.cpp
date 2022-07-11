@@ -21,44 +21,28 @@
  *
  */
 
-#pragma once
+#include <geode/mesh/builder/grid_builder.h>
 
-#include <vector>
-
-#include <absl/container/inlined_vector.h>
-
-#include <geode/mesh/builder/solid_mesh_builder.h>
-#include <geode/mesh/common.h>
-#include <geode/mesh/core/polyhedral_solid.h>
+#include <geode/mesh/core/grid.h>
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( Point );
-} // namespace geode
 
-namespace geode
-{
-    /*!
-     * Interface class to represent the builder of a PolyhedralSolid
-     */
     template < index_t dimension >
-    class PolyhedralSolidBuilder : public SolidMeshBuilder< dimension >
+    GridBuilder< dimension >::GridBuilder( Grid< dimension >& grid )
+        : grid_( grid )
     {
-    public:
-        /*!
-         * Create the builder associated with a PolyhedralSolid.
-         * @param[in] mesh The PolyhedralSolid to build/modify
-         */
-        static std::unique_ptr< PolyhedralSolidBuilder< dimension > > create(
-            PolyhedralSolid< dimension >& mesh );
+    }
 
-        void copy( const PolyhedralSolid< dimension >& polyhedral_solid );
+    template < index_t dimension >
+    void GridBuilder< dimension >::set_grid_dimensions(
+        std::array< index_t, dimension > cells_number,
+        std::array< double, dimension > cells_length )
+    {
+        grid_.set_grid_dimensions(
+            std::move( cells_number ), std::move( cells_length ), {} );
+    }
 
-    protected:
-        PolyhedralSolidBuilder( PolyhedralSolid< dimension >& mesh );
-
-    private:
-        PolyhedralSolid< dimension >& polyhedral_solid_;
-    };
-    ALIAS_3D( PolyhedralSolidBuilder );
+    template class opengeode_mesh_api GridBuilder< 2 >;
+    template class opengeode_mesh_api GridBuilder< 3 >;
 } // namespace geode

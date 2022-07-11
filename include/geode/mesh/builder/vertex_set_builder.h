@@ -95,9 +95,9 @@ namespace geode
         friend class VertexSet;
         void copy( const VertexSet& vertex_set );
 
-    private:
         virtual void do_create_vertex() = 0;
 
+    private:
         virtual void do_create_vertices( index_t nb ) = 0;
 
         virtual void do_delete_vertices( const std::vector< bool >& to_delete,

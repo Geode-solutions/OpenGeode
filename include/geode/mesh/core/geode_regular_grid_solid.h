@@ -50,14 +50,6 @@ namespace geode
     public:
         OpenGeodeRegularGrid();
 
-        OpenGeodeRegularGrid( Point3D origin,
-            std::array< index_t, 3 > cells_number,
-            std::array< double, 3 > cells_length );
-
-        OpenGeodeRegularGrid( Point3D origin,
-            std::array< index_t, 3 > cells_number,
-            double cells_length );
-
         OpenGeodeRegularGrid( OpenGeodeRegularGrid&& other );
 
         ~OpenGeodeRegularGrid();
@@ -87,6 +79,9 @@ namespace geode
         {
             return native_extension_static();
         }
+
+    public:
+        void update_origin( const Point3D& origin, OGRegularGridKey );
 
     private:
         friend class bitsery::Access;

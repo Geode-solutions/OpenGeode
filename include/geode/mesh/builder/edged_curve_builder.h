@@ -23,8 +23,6 @@
 
 #pragma once
 
-#include <geode/basic/passkey.h>
-
 #include <geode/mesh/builder/graph_builder.h>
 #include <geode/mesh/common.h>
 

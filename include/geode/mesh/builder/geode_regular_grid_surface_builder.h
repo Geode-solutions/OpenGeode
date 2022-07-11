@@ -1,0 +1,143 @@
+/*
+ * Copyright (c) 2019 - 2022 Geode-solutions
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ */
+
+#pragma once
+
+#include <geode/geometry/point.h>
+
+#include <geode/mesh/builder/regular_grid_surface_builder.h>
+#include <geode/mesh/common.h>
+
+namespace geode
+{
+    FORWARD_DECLARATION_DIMENSION_CLASS( OpenGeodeRegularGrid );
+    FORWARD_DECLARATION_DIMENSION_CLASS( OpenGeodeRegularGridBuilder );
+    class VertexSet;
+} // namespace geode
+
+namespace geode
+{
+    /*!
+     * Implementation class for RegularGridBuilder using OpenGeode data
+     * structure
+     */
+    template <>
+    class opengeode_mesh_api OpenGeodeRegularGridBuilder< 2 >
+        : public RegularGridBuilder< 2 >
+    {
+    public:
+        OpenGeodeRegularGridBuilder(
+            VertexSet& vertex_set, MeshBuilderFactoryKey );
+
+        OpenGeodeRegularGridBuilder( OpenGeodeRegularGrid< 2 >& mesh );
+
+    private:
+        void update_origin( const Point2D& origin ) final;
+
+        void do_create_vertex() final
+        {
+            throw OpenGeodeException{
+                "[RegularGridBuilder] Cannot use create_vertex in RegularGrid"
+            };
+        }
+
+        void do_create_vertices( index_t /*unsued*/ ) final
+        {
+            throw OpenGeodeException{
+                "[RegularGridBuilder] Cannot use create_vertices in RegularGrid"
+            };
+        }
+
+        void do_set_point( index_t /*unsued*/, Point2D /*unsued*/ ) final
+        {
+            throw OpenGeodeException{
+                "[RegularGridBuilder] Cannot use set_point in RegularGrid"
+            };
+        }
+
+        void do_permute_polygons( absl::Span< const index_t > /*unsued*/,
+            absl::Span< const index_t > /*unsued*/ ) final
+        {
+            throw OpenGeodeException{ "[RegularGridBuilder] Cannot use "
+                                      "permute_polygons in RegularGrid" };
+        }
+
+        void do_delete_surface_vertices( const std::vector< bool >& /*unsued*/,
+            absl::Span< const index_t > /*unsued*/ ) final
+        {
+            throw OpenGeodeException{
+                "[RegularGridBuilder] Cannot use delete_surface_vertices in "
+                "RegularGrid"
+            };
+        }
+
+        void do_permute_surface_vertices(
+            absl::Span< const index_t > /*unsued*/,
+            absl::Span< const index_t > /*unsued*/ ) final
+        {
+            throw OpenGeodeException{
+                "[RegularGridBuilder] Cannot use permute_surface_vertices in "
+                "RegularGrid"
+            };
+        }
+
+        void do_set_polygon_vertex(
+            const PolygonVertex& /*unsued*/, index_t /*unsued*/ ) final
+        {
+            throw OpenGeodeException{ "[RegularGridBuilder] Cannot use "
+                                      "set_polygon_vertex in RegularGrid" };
+        }
+
+        void do_create_polygon( absl::Span< const index_t > /*unsued*/ ) final
+        {
+            throw OpenGeodeException{
+                "[RegularGridBuilder] Cannot use create_polygon in RegularGrid"
+            };
+        }
+
+        void do_delete_polygons( const std::vector< bool >& /*unsued*/,
+            absl::Span< const index_t > /*unsued*/ ) final
+        {
+            throw OpenGeodeException{
+                "[RegularGridBuilder] Cannot use delete_polygons in RegularGrid"
+            };
+        }
+
+        void do_set_polygon_adjacent(
+            const PolygonEdge& /*unsued*/, index_t /*unsued*/ ) final
+        {
+            throw OpenGeodeException{ "[RegularGridBuilder] Cannot use "
+                                      "set_polygon_adjacent in RegularGrid" };
+        }
+
+        void do_unset_polygon_adjacent( const PolygonEdge& /*unsued*/ ) final
+        {
+            throw OpenGeodeException{ "[RegularGridBuilder] Cannot use "
+                                      "unset_polygon_adjacent in RegularGrid" };
+        }
+
+    private:
+        OpenGeodeRegularGrid< 2 >& grid_;
+    };
+    ALIAS_2D( OpenGeodeRegularGridBuilder );
+} // namespace geode

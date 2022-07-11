@@ -30,6 +30,7 @@
 
 #include <geode/geometry/point.h>
 
+#include <geode/mesh/builder/regular_grid_solid_builder.h>
 #include <geode/mesh/core/private/grid_impl.h>
 #include <geode/mesh/core/private/points_impl.h>
 #include <geode/mesh/core/regular_grid_solid.h>
@@ -82,31 +83,6 @@ namespace geode
             return { facet.polyhedron_id, vertex };
         }
 
-        absl::optional< index_t > get_polyhedron_adjacent(
-            const RegularGrid3D& grid,
-            const PolyhedronFacet& polyhedron_facet ) const
-        {
-            const auto cell =
-                cell_indices( grid, polyhedron_facet.polyhedron_id );
-            const index_t direction =
-                static_cast< index_t >( polyhedron_facet.facet_id / 2 );
-            if( polyhedron_facet.facet_id % 2 == 0 )
-            {
-                if( const auto adj = grid.previous_cell( cell, direction ) )
-                {
-                    return grid.cell_index( adj.value() );
-                }
-            }
-            else
-            {
-                if( const auto adj = grid.next_cell( cell, direction ) )
-                {
-                    return grid.cell_index( adj.value() );
-                }
-            }
-            return absl::nullopt;
-        }
-
     private:
         Impl() = default;
 
@@ -117,6 +93,8 @@ namespace geode
                 []( Archive& a, Impl& impl ) {
                     a.ext( impl,
                         bitsery::ext::BaseClass< detail::PointsImpl< 3 > >{} );
+                    a.ext( impl,
+                        bitsery::ext::BaseClass< detail::GridImpl< 3 > >{} );
                 } );
         }
     };
@@ -185,7 +163,14 @@ namespace geode
         OpenGeodeRegularGrid< 3 >::get_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet ) const
     {
-        return impl_->get_polyhedron_adjacent( *this, polyhedron_facet );
+        return impl_->cell_adjacent(
+            *this, polyhedron_facet.polyhedron_id, polyhedron_facet.facet_id );
+    }
+
+    void OpenGeodeRegularGrid< 3 >::update_origin(
+        const Point3D& origin, OGRegularGridKey )
+    {
+        impl_->update_origin( *this, origin );
     }
 
     template < typename Archive >

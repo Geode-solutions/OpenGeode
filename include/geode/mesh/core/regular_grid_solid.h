@@ -29,7 +29,10 @@
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( Point );
     FORWARD_DECLARATION_DIMENSION_CLASS( RegularGrid );
+    FORWARD_DECLARATION_DIMENSION_CLASS( RegularGridBuilder );
+    ALIAS_3D( Point );
     ALIAS_3D( RegularGrid );
 } // namespace geode
 
@@ -42,6 +45,8 @@ namespace geode
         friend class bitsery::Access;
 
     public:
+        using Builder = RegularGridBuilder< 3 >;
+
         /*!
          * Create a new RegularGrid using default data structure.
          */
@@ -64,22 +69,13 @@ namespace geode
             return ext;
         }
 
+        const Point3D& point_from_indices(
+            const GridVertexIndices3D& index ) const;
+
         std::unique_ptr< RegularGrid3D > clone() const;
 
     protected:
         RegularGrid() = default;
-
-        RegularGrid( std::array< index_t, 3 > cells_number,
-            std::array< double, 3 > cells_length )
-            : Grid< 3 >{ std::move( cells_number ), std::move( cells_length ) }
-        {
-        }
-
-        RegularGrid(
-            std::array< index_t, 3 > cells_number, double cells_length )
-            : Grid< 3 >{ std::move( cells_number ), cells_length }
-        {
-        }
 
     private:
         template < typename Archive >

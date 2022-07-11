@@ -25,12 +25,14 @@
 
 #include <absl/types/optional.h>
 
+#include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
 #include <geode/mesh/common.h>
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( GridBuilder );
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
 } // namespace geode
 
@@ -58,16 +60,11 @@ namespace geode
     class Grid
     {
         OPENGEODE_DISABLE_COPY( Grid );
+        PASSKEY( GridBuilder< dimension >, GridKey );
         friend class bitsery::Access;
 
     public:
         Grid();
-
-        Grid( std::array< index_t, dimension > cells_number,
-            std::array< double, dimension > cells_length );
-
-        Grid( std::array< index_t, dimension > cells_number,
-            double cells_length );
 
         Grid( Grid&& );
 
@@ -180,6 +177,11 @@ namespace geode
          */
         GridCellsAroundVertex< dimension > cells(
             const Point< dimension >& query ) const;
+
+    public:
+        void set_grid_dimensions( std::array< index_t, dimension > cells_number,
+            std::array< double, dimension > cells_length,
+            GridKey );
 
     private:
         template < typename Archive >

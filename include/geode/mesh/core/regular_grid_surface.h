@@ -30,6 +30,7 @@
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( RegularGrid );
+    FORWARD_DECLARATION_DIMENSION_CLASS( RegularGridBuilder );
     ALIAS_2D( RegularGrid );
 } // namespace geode
 
@@ -39,10 +40,11 @@ namespace geode
     class opengeode_mesh_api RegularGrid< 2 > : public SurfaceMesh< 2 >,
                                                 public Grid< 2 >
     {
-        OPENGEODE_DISABLE_COPY( RegularGrid );
         friend class bitsery::Access;
 
     public:
+        using Builder = RegularGridBuilder< 2 >;
+
         /*!
          * Create a new RegularGrid using default data structure.
          */
@@ -69,18 +71,6 @@ namespace geode
 
     protected:
         RegularGrid() = default;
-
-        RegularGrid( std::array< index_t, 2 > cells_number,
-            std::array< double, 2 > cells_length )
-            : Grid< 2 >{ std::move( cells_number ), std::move( cells_length ) }
-        {
-        }
-
-        RegularGrid(
-            std::array< index_t, 2 > cells_number, double cells_length )
-            : Grid< 2 >{ std::move( cells_number ), cells_length }
-        {
-        }
 
     private:
         template < typename Archive >

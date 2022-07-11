@@ -44,6 +44,26 @@ namespace geode
                 return grid.point( 0 );
             }
 
+            void update_origin( RegularGrid< dimension >& grid,
+                const Point< dimension >& origin )
+            {
+                auto builder = RegularGridBuilder< dimension >::create( grid );
+                for( const auto v : Range{ grid.nb_vertices() } )
+                {
+                    const auto index = vertex_indices( grid, v );
+                    Point< dimension > translation;
+                    for( const auto d : LRange{ dimension } )
+                    {
+                        OPENGEODE_ASSERT(
+                            index[d] < grid.nb_vertices_in_direction( d ),
+                            "[RegularGrid::point] Invalid index" );
+                        translation.set_value(
+                            d, grid.cell_length_in_direction( d ) * index[d] );
+                    }
+                    builder->set_point( v, origin + translation );
+                }
+            }
+
             index_t cell_index( const RegularGrid< dimension >& grid,
                 const GridCellIndices< dimension >& index ) const
             {
@@ -126,14 +146,36 @@ namespace geode
                 return vertex_id;
             }
 
+            absl::optional< index_t > cell_adjacent(
+                const RegularGrid< dimension >& grid,
+                index_t element,
+                local_index_t facet ) const
+            {
+                const auto cell = cell_indices( grid, element );
+                const index_t direction = static_cast< index_t >( facet / 2 );
+                if( facet % 2 == 0 )
+                {
+                    if( const auto adj = grid.previous_cell( cell, direction ) )
+                    {
+                        return grid.cell_index( adj.value() );
+                    }
+                }
+                else
+                {
+                    if( const auto adj = grid.next_cell( cell, direction ) )
+                    {
+                        return grid.cell_index( adj.value() );
+                    }
+                }
+                return absl::nullopt;
+            }
+
         private:
             template < typename Archive >
             void serialize( Archive& archive )
             {
-                // archive.ext( *this, DefaultGrowable< Archive, GridImpl >{},
-                //     []( Archive& a, GridImpl& impl ) {
-                //         a.ext( impl.points_, bitsery::ext::StdSmartPtr{} );
-                //     } );
+                archive.ext( *this, DefaultGrowable< Archive, GridImpl >{},
+                    []( Archive& /*unused*/, GridImpl& /*unused*/ ) {} );
             }
         };
     } // namespace detail

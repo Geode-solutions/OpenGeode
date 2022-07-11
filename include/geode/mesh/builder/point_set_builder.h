@@ -25,8 +25,6 @@
 
 #include <vector>
 
-#include <geode/basic/passkey.h>
-
 #include <geode/mesh/builder/vertex_set_builder.h>
 #include <geode/mesh/common.h>
 

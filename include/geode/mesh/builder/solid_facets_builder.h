@@ -23,8 +23,6 @@
 
 #pragma once
 
-#include <geode/basic/passkey.h>
-
 #include <geode/mesh/common.h>
 #include <geode/mesh/core/solid_mesh.h>
 
