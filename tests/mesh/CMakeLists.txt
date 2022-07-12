@@ -184,6 +184,7 @@ add_geode_test(
         ${PROJECT_NAME}::geometry
         ${PROJECT_NAME}::mesh
 )
+add_geode_test(
     SOURCE "test-geometrical-operations-on-mesh.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
