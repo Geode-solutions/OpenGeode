@@ -146,10 +146,10 @@ PYBIND11_MODULE( opengeode_py_mesh, module )
     geode::define_surface_edges( module );
     geode::define_polygonal_surface( module );
     geode::define_triangulated_surface( module );
-    geode::define_regular_grid( module );
     geode::define_solid_mesh( module );
     geode::define_solid_edges( module );
     geode::define_solid_facets( module );
+    geode::define_regular_grid( module );
     geode::define_polyhedral_solid( module );
     geode::define_tetrahedral_solid( module );
     geode::define_hybrid_solid( module );
