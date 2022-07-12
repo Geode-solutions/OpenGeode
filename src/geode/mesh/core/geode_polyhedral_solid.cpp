@@ -307,6 +307,17 @@ namespace geode
             polyhedron_adjacent_ptr_ = std::move( new_polyhedron_adjacent_ptr );
         }
 
+        void copy_polyhedra(
+            const OpenGeodePolyhedralSolid< dimension >::Impl& impl )
+        {
+            polyhedron_vertices_ = impl.polyhedron_vertices_;
+            polyhedron_vertex_ptr_ = impl.polyhedron_vertex_ptr_;
+            polyhedron_facets_ = impl.polyhedron_facets_;
+            polyhedron_facet_ptr_ = impl.polyhedron_facet_ptr_;
+            polyhedron_adjacents_ = impl.polyhedron_adjacents_;
+            polyhedron_adjacent_ptr_ = impl.polyhedron_adjacent_ptr_;
+        }
+
     private:
         Impl() = default;
 
@@ -515,6 +526,14 @@ namespace geode
         OGPolyhedralSolidKey )
     {
         impl_->add_polyhedron( vertices, facets );
+    }
+
+    template < index_t dimension >
+    void OpenGeodePolyhedralSolid< dimension >::copy_polyhedra(
+        const OpenGeodePolyhedralSolid< dimension >& solid_mesh,
+        OGPolyhedralSolidKey )
+    {
+        impl_->copy_polyhedra( *solid_mesh.impl_ );
     }
 
     template < index_t dimension >

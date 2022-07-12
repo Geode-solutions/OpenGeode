@@ -39,14 +39,34 @@ namespace geode
 
     OpenGeodeRegularGridBuilder< 3 >::OpenGeodeRegularGridBuilder(
         OpenGeodeRegularGrid< 3 >& mesh )
-        : RegularGridBuilder< 3 >( mesh ), grid_( mesh )
+        : RegularGridBuilder< 3 >( mesh ), geode_regular_grid_( mesh )
     {
     }
 
     void OpenGeodeRegularGridBuilder< 3 >::update_origin(
         const Point3D& origin )
     {
-        grid_.update_origin( origin, {} );
+        geode_regular_grid_.update_origin( origin, {} );
     }
 
+    void OpenGeodeRegularGridBuilder< 3 >::do_set_point(
+        index_t vertex_id, Point3D point )
+    {
+        geode_regular_grid_.set_vertex( vertex_id, std::move( point ), {} );
+    }
+
+    void OpenGeodeRegularGridBuilder< 3 >::do_create_vertices(
+        index_t /*unsued*/ )
+    {
+    }
+
+    void OpenGeodeRegularGridBuilder< 3 >::do_copy_points(
+        const SolidMesh< 3 >& /*unused*/ )
+    {
+    }
+
+    void OpenGeodeRegularGridBuilder< 3 >::do_copy_polyhedra(
+        const SolidMesh< 3 >& /*unused*/ )
+    {
+    }
 } // namespace geode

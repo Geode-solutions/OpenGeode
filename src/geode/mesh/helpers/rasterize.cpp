@@ -23,7 +23,9 @@
 
 #include <geode/mesh/helpers/rasterize.h>
 
-#include <absl/container/flat_hash_set.h>
+#include <absl/container/flat_hash_map.h>
+
+#include <geode/basic/algorithm.h>
 
 #include <geode/geometry/basic_objects/infinite_line.h>
 #include <geode/geometry/basic_objects/plane.h>

@@ -23,11 +23,13 @@
 
 #include <geode/geometry/points_sort.h>
 
+#include <algorithm>
+
 #include <async++.h>
 
-#include <geode/geometry/point.h>
+#include <absl/algorithm/container.h>
 
-#include <algorithm>
+#include <geode/geometry/point.h>
 
 namespace
 {

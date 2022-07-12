@@ -60,6 +60,11 @@ namespace geode
         {
         }
 
+        void update_origin( RegularGrid2D& grid, const Point2D& origin )
+        {
+            do_update_origin( grid, *this, origin );
+        }
+
         index_t get_polygon_vertex( const RegularGrid2D& grid,
             const PolygonVertex& polygon_vertex ) const
         {
@@ -105,6 +110,12 @@ namespace geode
         index_t vertex_id ) const
     {
         return impl_->get_point( vertex_id );
+    }
+
+    void OpenGeodeRegularGrid< 2 >::set_vertex(
+        index_t vertex_id, Point2D point, OGRegularGridKey )
+    {
+        impl_->set_point( vertex_id, std::move( point ) );
     }
 
     const Point2D& OpenGeodeRegularGrid< 2 >::origin() const

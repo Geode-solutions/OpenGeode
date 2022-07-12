@@ -23,7 +23,7 @@
 
 #include <geode/mesh/core/regular_grid_solid.h>
 
-// #include <geode/mesh/builder/tetrahedral_solid_builder.h>
+#include <geode/mesh/builder/regular_grid_solid_builder.h>
 #include <geode/mesh/core/mesh_factory.h>
 
 namespace geode
@@ -43,8 +43,8 @@ namespace geode
     std::unique_ptr< RegularGrid< 3 > > RegularGrid< 3 >::clone() const
     {
         auto clone = create( this->impl_name() );
-        // auto builder = TetrahedralSolidBuilder< dimension >::create( *clone
-        // ); builder->copy( *this );
+        auto builder = RegularGridBuilder< 3 >::create( *clone );
+        builder->copy( *this );
         return clone;
     }
 

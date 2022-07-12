@@ -149,6 +149,7 @@ namespace geode
         absl::optional< index_t > edge_from_vertices(
             index_t v0, index_t v1 ) const;
 
+    public:
         void set_edges_around_vertex(
             index_t vertex_id, EdgesAroundVertex edges, GraphKey );
 

@@ -66,5 +66,6 @@ namespace geode
             "[RegularGridBuilder::copy] Cannot copy a mesh into an "
             "already initialized mesh." );
         SurfaceMeshBuilder2D::copy( grid );
+        GridBuilder2D::copy( grid );
     }
 } // namespace geode

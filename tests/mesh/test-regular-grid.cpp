@@ -29,7 +29,8 @@
 #include <geode/geometry/bounding_box.h>
 #include <geode/geometry/point.h>
 
-#include <geode/mesh/core/geode_regular_grid_solid.h>
+#include <geode/mesh/builder/regular_grid_solid_builder.h>
+#include <geode/mesh/core/regular_grid_solid.h>
 #include <geode/mesh/io/regular_grid_input.h>
 #include <geode/mesh/io/regular_grid_output.h>
 
@@ -39,22 +40,22 @@ void test_cell_number( const geode::RegularGrid3D& grid )
 {
     OPENGEODE_EXCEPTION(
         grid.nb_polyhedra() == 750, "[Test] Wrong total number of cells" );
-    OPENGEODE_EXCEPTION(
-        grid.nb_cells( 0 ) == 5, "[Test] Wrong total number of cells along X" );
-    OPENGEODE_EXCEPTION( grid.nb_cells( 1 ) == 10,
+    OPENGEODE_EXCEPTION( grid.nb_cells_in_direction( 0 ) == 5,
+        "[Test] Wrong total number of cells along X" );
+    OPENGEODE_EXCEPTION( grid.nb_cells_in_direction( 1 ) == 10,
         "[Test] Wrong total number of cells along Y" );
-    OPENGEODE_EXCEPTION( grid.nb_cells( 2 ) == 15,
+    OPENGEODE_EXCEPTION( grid.nb_cells_in_direction( 2 ) == 15,
         "[Test] Wrong total number of cells along Z" );
 }
 
 void test_cell_size( const geode::RegularGrid3D& grid )
 {
-    OPENGEODE_EXCEPTION(
-        grid.cell_length( 0 ) == 1, "[Test] Wrong length of cells along X" );
-    OPENGEODE_EXCEPTION(
-        grid.cell_length( 1 ) == 2, "[Test] Wrong length of cells along Y" );
-    OPENGEODE_EXCEPTION(
-        grid.cell_length( 2 ) == 3, "[Test] Wrong length of cells along Z" );
+    OPENGEODE_EXCEPTION( grid.cell_length_in_direction( 0 ) == 1,
+        "[Test] Wrong length of cells along X" );
+    OPENGEODE_EXCEPTION( grid.cell_length_in_direction( 1 ) == 2,
+        "[Test] Wrong length of cells along Y" );
+    OPENGEODE_EXCEPTION( grid.cell_length_in_direction( 2 ) == 3,
+        "[Test] Wrong length of cells along Z" );
     OPENGEODE_EXCEPTION( grid.cell_size() == 6, "[Test] Wrong cell size" );
 }
 
@@ -112,11 +113,11 @@ void test_vertex_number( const geode::RegularGrid3D& grid )
 {
     OPENGEODE_EXCEPTION(
         grid.nb_vertices() == 1056, "[Test] Wrong total number of vertices" );
-    OPENGEODE_EXCEPTION( grid.nb_vertices( 0 ) == 6,
+    OPENGEODE_EXCEPTION( grid.nb_vertices_in_direction( 0 ) == 6,
         "[Test] Wrong total number of vertices along X" );
-    OPENGEODE_EXCEPTION( grid.nb_vertices( 1 ) == 11,
+    OPENGEODE_EXCEPTION( grid.nb_vertices_in_direction( 1 ) == 11,
         "[Test] Wrong total number of vertices along Y" );
-    OPENGEODE_EXCEPTION( grid.nb_vertices( 2 ) == 16,
+    OPENGEODE_EXCEPTION( grid.nb_vertices_in_direction( 2 ) == 16,
         "[Test] Wrong total number of vertices along Z" );
     OPENGEODE_EXCEPTION( grid.nb_cell_vertices() == 8,
         "[Test] Wrong number of vertices in cells" );
@@ -176,30 +177,41 @@ void test_vertex_index( const geode::RegularGrid3D& grid )
 
 void test_vertex_on_border( const geode::RegularGrid3D& grid )
 {
-    OPENGEODE_EXCEPTION( grid.is_vertex_on_border( { { 0, 0, 0 } } ),
+    DEBUG( grid.nb_polyhedra() );
+    DEBUG( grid.nb_cells_in_direction( 0 ) );
+    DEBUG( grid.nb_cells_in_direction( 1 ) );
+    DEBUG( grid.nb_cells_in_direction( 2 ) );
+    DEBUG( grid.nb_vertices_in_direction( 0 ) );
+    DEBUG( grid.nb_vertices_in_direction( 1 ) );
+    DEBUG( grid.nb_vertices_in_direction( 2 ) );
+    OPENGEODE_EXCEPTION(
+        grid.is_vertex_on_border( grid.vertex_index( { { 0, 0, 0 } } ) ),
         "[Test] Vertex is not on border where it should be." );
-    OPENGEODE_EXCEPTION( grid.is_vertex_on_border( { { 0, 9, 0 } } ),
+    OPENGEODE_EXCEPTION(
+        grid.is_vertex_on_border( grid.vertex_index( { { 0, 9, 0 } } ) ),
         "[Test] Vertex is not on border where it should be." );
-    OPENGEODE_EXCEPTION( !grid.is_vertex_on_border( { { 1, 2, 3 } } ),
+    OPENGEODE_EXCEPTION(
+        !grid.is_vertex_on_border( grid.vertex_index( { { 1, 2, 3 } } ) ),
         "[Test] Vertex is on border where it should not be." );
 }
 
 void test_cell_geometry( const geode::RegularGrid3D& grid )
 {
-    OPENGEODE_EXCEPTION(
-        grid.point( { 0, 0, 0 } ) == geode::Point3D( { 1.5, 0, 1 } ),
+    OPENGEODE_EXCEPTION( grid.point( grid.vertex_index( { 0, 0, 0 } ) )
+                             == geode::Point3D( { 1.5, 0, 1 } ),
+        "[Test] Wrong point coordinates" );
+    OPENGEODE_EXCEPTION( grid.point( grid.vertex_index( { 0, 0, 1 } ) )
+                             == geode::Point3D( { 1.5, 0, 4 } ),
+        "[Test] Wrong point coordinates" );
+    OPENGEODE_EXCEPTION( grid.point( grid.vertex_index( { 1, 1, 1 } ) )
+                             == geode::Point3D( { 2.5, 2, 4 } ),
+        "[Test] Wrong point coordinates" );
+    OPENGEODE_EXCEPTION( grid.point( grid.vertex_index( { 2, 1, 4 } ) )
+                             == geode::Point3D( { 3.5, 2, 13 } ),
         "[Test] Wrong point coordinates" );
     OPENGEODE_EXCEPTION(
-        grid.point( { 0, 0, 1 } ) == geode::Point3D( { 1.5, 0, 4 } ),
-        "[Test] Wrong point coordinates" );
-    OPENGEODE_EXCEPTION(
-        grid.point( { 1, 1, 1 } ) == geode::Point3D( { 2.5, 2, 4 } ),
-        "[Test] Wrong point coordinates" );
-    OPENGEODE_EXCEPTION(
-        grid.point( { 2, 1, 4 } ) == geode::Point3D( { 3.5, 2, 13 } ),
-        "[Test] Wrong point coordinates" );
-    OPENGEODE_EXCEPTION(
-        grid.cell_barycenter( { 2, 1, 4 } ) == geode::Point3D( { 4, 3, 14.5 } ),
+        grid.polyhedron_barycenter( grid.cell_index( { 2, 1, 4 } ) )
+            == geode::Point3D( { 4, 3, 14.5 } ),
         "[Test] Wrong point coordinates" );
 }
 
@@ -323,6 +335,40 @@ void test_clone( geode::RegularGrid3D& grid )
         attribute_d->set_value( c, 2 * c );
     }
     const auto clone = grid.clone();
+    OPENGEODE_EXCEPTION( clone->nb_vertices() == grid.nb_vertices(),
+        "[Test] Clone wrong number of vertices" );
+    OPENGEODE_EXCEPTION( clone->nb_vertices_in_direction( 0 )
+                             == grid.nb_vertices_in_direction( 0 ),
+        "[Test] Clone wrong number of vertices in direction 0" );
+    OPENGEODE_EXCEPTION( clone->nb_vertices_in_direction( 1 )
+                             == grid.nb_vertices_in_direction( 1 ),
+        "[Test] Clone wrong number of vertices in direction 1" );
+    OPENGEODE_EXCEPTION( clone->nb_vertices_in_direction( 2 )
+                             == grid.nb_vertices_in_direction( 2 ),
+        "[Test] Clone wrong number of vertices in direction 2" );
+
+    OPENGEODE_EXCEPTION( clone->nb_cells() == grid.nb_cells(),
+        "[Test] Clone wrong number of cells" );
+    OPENGEODE_EXCEPTION(
+        clone->nb_cells_in_direction( 0 ) == grid.nb_cells_in_direction( 0 ),
+        "[Test] Clone wrong number of cells in direction 0" );
+    OPENGEODE_EXCEPTION(
+        clone->nb_cells_in_direction( 1 ) == grid.nb_cells_in_direction( 1 ),
+        "[Test] Clone wrong number of cells in direction 1" );
+    OPENGEODE_EXCEPTION(
+        clone->nb_cells_in_direction( 2 ) == grid.nb_cells_in_direction( 2 ),
+        "[Test] Clone wrong number of cells in direction 2" );
+
+    OPENGEODE_EXCEPTION( clone->cell_length_in_direction( 0 )
+                             == grid.cell_length_in_direction( 0 ),
+        "[Test] Clone wrong cell length in direction 0" );
+    OPENGEODE_EXCEPTION( clone->cell_length_in_direction( 1 )
+                             == grid.cell_length_in_direction( 1 ),
+        "[Test] Clone wrong cell length in direction 1" );
+    OPENGEODE_EXCEPTION( clone->cell_length_in_direction( 2 )
+                             == grid.cell_length_in_direction( 2 ),
+        "[Test] Clone wrong cell length in direction 2" );
+
     OPENGEODE_EXCEPTION( clone->polyhedron_attribute_manager().attribute_exists(
                              attribute_name ),
         "[Test] Clone missing attribute" );
@@ -355,19 +401,20 @@ void test_io( const geode::RegularGrid3D& grid, absl::string_view filename )
 
 void test()
 {
-    geode::OpenGeodeRegularGrid3D grid{ { { 1.5, 0, 1 } }, { 5, 10, 15 },
-        { 1, 2, 3 } };
-    test_cell_number( grid );
-    test_cell_index( grid );
-    test_vertex_number( grid );
-    test_vertex_index( grid );
-    test_vertex_on_border( grid );
-    test_cell_geometry( grid );
-    test_cell_query( grid );
-    test_boundary_box( grid );
-    test_closest_vertex( grid );
-    test_clone( grid );
-    test_io( grid, absl::StrCat( "test.", grid.native_extension() ) );
+    auto grid = geode::RegularGrid3D::create();
+    auto builder = geode::RegularGridBuilder3D::create( *grid );
+    builder->initialize_grid( { { 1.5, 0, 1 } }, { 5, 10, 15 }, { 1, 2, 3 } );
+    test_cell_number( *grid );
+    test_cell_index( *grid );
+    test_vertex_number( *grid );
+    test_vertex_index( *grid );
+    test_vertex_on_border( *grid );
+    test_cell_geometry( *grid );
+    test_cell_query( *grid );
+    test_boundary_box( *grid );
+    test_closest_vertex( *grid );
+    test_clone( *grid );
+    test_io( *grid, absl::StrCat( "test.", grid->native_extension() ) );
 }
 
 OPENGEODE_TEST( "regular-grid" )

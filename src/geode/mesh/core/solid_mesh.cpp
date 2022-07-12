@@ -523,6 +523,7 @@ namespace geode
                 const absl::optional< PolyhedronVertex >& first_polyhedron )
                 const
         {
+            SDEBUG( first_polyhedron.value_or( PolyhedronVertex{} ) );
             const auto& cached = polyhedra_around_vertex_->value( vertex_id );
             const auto& polyhedra = cached.value().polyhedra;
             if( !cached.computed()

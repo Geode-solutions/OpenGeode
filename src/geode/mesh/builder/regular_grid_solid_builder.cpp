@@ -23,6 +23,8 @@
 
 #include <geode/mesh/builder/regular_grid_solid_builder.h>
 
+#include <geode/basic/attribute_manager.h>
+
 #include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/core/regular_grid_solid.h>
 
@@ -46,6 +48,19 @@ namespace geode
     {
         set_grid_dimensions(
             std::move( cells_number ), std::move( cells_length ) );
+        grid_.vertex_attribute_manager().resize(
+            grid_.nb_vertices_in_direction( 0 )
+            * grid_.nb_vertices_in_direction( 1 )
+            * grid_.nb_vertices_in_direction( 2 ) );
+        grid_.polyhedron_attribute_manager().resize( grid_.nb_cells() );
+        for( const auto p : Range{ grid_.nb_polyhedra() } )
+        {
+            for( const auto v : LRange{ grid_.nb_polyhedron_vertices( p ) } )
+            {
+                associate_polyhedron_vertex_to_vertex(
+                    { p, v }, grid_.polyhedron_vertex( { p, v } ) );
+            }
+        }
         update_origin( origin );
     }
 
@@ -64,5 +79,6 @@ namespace geode
             "[RegularGridBuilder::copy] Cannot copy a mesh into an "
             "already initialized mesh." );
         SolidMeshBuilder3D::copy( grid );
+        GridBuilder3D::copy( grid );
     }
 } // namespace geode

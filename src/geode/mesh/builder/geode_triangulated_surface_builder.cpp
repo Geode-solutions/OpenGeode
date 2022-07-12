@@ -135,6 +135,18 @@ namespace geode
     {
     }
 
+    template < index_t dimension >
+    void OpenGeodeTriangulatedSurfaceBuilder< dimension >::do_copy_points(
+        const SurfaceMesh< dimension >& /*unused*/ )
+    {
+    }
+
+    template < index_t dimension >
+    void OpenGeodeTriangulatedSurfaceBuilder< dimension >::do_copy_polygons(
+        const SurfaceMesh< dimension >& /*unused*/ )
+    {
+    }
+
     template class opengeode_mesh_api OpenGeodeTriangulatedSurfaceBuilder< 2 >;
     template class opengeode_mesh_api OpenGeodeTriangulatedSurfaceBuilder< 3 >;
 } // namespace geode

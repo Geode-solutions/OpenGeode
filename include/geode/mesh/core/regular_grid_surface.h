@@ -56,6 +56,11 @@ namespace geode
          */
         static std::unique_ptr< RegularGrid2D > create( const MeshImpl& impl );
 
+        static MeshType type_name_static()
+        {
+            return MeshType{ "RegularGrid2D" };
+        }
+
         absl::string_view native_extension() const
         {
             return native_extension_static();

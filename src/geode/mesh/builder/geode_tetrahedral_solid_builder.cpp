@@ -136,5 +136,17 @@ namespace geode
     {
     }
 
+    template < index_t dimension >
+    void OpenGeodeTetrahedralSolidBuilder< dimension >::do_copy_points(
+        const SolidMesh< dimension >& /*unused*/ )
+    {
+    }
+
+    template < index_t dimension >
+    void OpenGeodeTetrahedralSolidBuilder< dimension >::do_copy_polyhedra(
+        const SolidMesh< dimension >& /*unused*/ )
+    {
+    }
+
     template class opengeode_mesh_api OpenGeodeTetrahedralSolidBuilder< 3 >;
 } // namespace geode

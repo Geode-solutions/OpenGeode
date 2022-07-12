@@ -215,6 +215,12 @@ namespace geode
 
         void update_polygon_vertices( absl::Span< const index_t > old2new );
 
+        virtual void do_copy_points(
+            const SurfaceMesh< dimension >& surface_mesh ) = 0;
+
+        virtual void do_copy_polygons(
+            const SurfaceMesh< dimension >& surface_mesh ) = 0;
+
     private:
         SurfaceMesh< dimension >& surface_mesh_;
     };

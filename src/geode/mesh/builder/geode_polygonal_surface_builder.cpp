@@ -129,6 +129,22 @@ namespace geode
         geode_polygonal_surface_.permute_polygons( permutation, {} );
     }
 
+    template < index_t dimension >
+    void OpenGeodePolygonalSurfaceBuilder< dimension >::do_copy_points(
+        const SurfaceMesh< dimension >& /*unused*/ )
+    {
+    }
+
+    template < index_t dimension >
+    void OpenGeodePolygonalSurfaceBuilder< dimension >::do_copy_polygons(
+        const SurfaceMesh< dimension >& surface_mesh )
+    {
+        geode_polygonal_surface_.copy_polygons(
+            dynamic_cast< const OpenGeodePolygonalSurface< dimension >& >(
+                surface_mesh ),
+            {} );
+    }
+
     template class opengeode_mesh_api OpenGeodePolygonalSurfaceBuilder< 2 >;
     template class opengeode_mesh_api OpenGeodePolygonalSurfaceBuilder< 3 >;
 } // namespace geode

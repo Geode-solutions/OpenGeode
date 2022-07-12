@@ -231,6 +231,12 @@ namespace geode
             get_polyhedron_facet_vertices( absl::Span< const index_t > vertices,
                 absl::Span< const std::vector< index_t > > facets ) const;
 
+        virtual void do_copy_points(
+            const SolidMesh< dimension >& solid_mesh ) = 0;
+
+        virtual void do_copy_polyhedra(
+            const SolidMesh< dimension >& solid_mesh ) = 0;
+
     private:
         SolidMesh< dimension >& solid_mesh_;
     };

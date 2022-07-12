@@ -23,23 +23,8 @@
 
 #pragma once
 
-#include <memory>
-#include <typeinfo>
-
-#include <absl/container/flat_hash_map.h>
-#include <absl/strings/string_view.h>
-
-#include <bitsery/bitsery.h>
-#include <bitsery/brief_syntax.h>
-#include <bitsery/brief_syntax/vector.h>
-#include <bitsery/ext/inheritance.h>
-#include <bitsery/ext/std_map.h>
-
-#include <geode/basic/algorithm.h>
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/common.h>
-#include <geode/basic/detail/mapping_after_deletion.h>
-#include <geode/basic/passkey.h>
 
 namespace geode
 {

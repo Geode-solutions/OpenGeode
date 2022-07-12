@@ -41,6 +41,8 @@ namespace geode
         void set_grid_dimensions( std::array< index_t, dimension > cells_number,
             std::array< double, dimension > cells_length );
 
+        void copy( const Grid< dimension >& grid );
+
     protected:
         GridBuilder( Grid< dimension >& grid );
 

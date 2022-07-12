@@ -23,6 +23,8 @@
 
 #include <geode/geometry/radial_sort.h>
 
+#include <absl/algorithm/container.h>
+
 #include <geode/geometry/basic_objects/plane.h>
 #include <geode/geometry/basic_objects/segment.h>
 #include <geode/geometry/basic_objects/triangle.h>

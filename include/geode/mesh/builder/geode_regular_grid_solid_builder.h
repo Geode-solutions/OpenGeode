@@ -54,24 +54,14 @@ namespace geode
     private:
         void update_origin( const Point3D& origin ) final;
 
+        void do_set_point( index_t vertex_id, Point3D point ) final;
+
+        void do_create_vertices( index_t /*unsued*/ ) final;
+
         void do_create_vertex() final
         {
             throw OpenGeodeException{
                 "[RegularGridBuilder] Cannot use create_vertex in RegularGrid"
-            };
-        }
-
-        void do_create_vertices( index_t /*unsued*/ ) final
-        {
-            throw OpenGeodeException{
-                "[RegularGridBuilder] Cannot use create_vertices in RegularGrid"
-            };
-        }
-
-        void do_set_point( index_t /*unsued*/, Point3D /*unsued*/ ) final
-        {
-            throw OpenGeodeException{
-                "[RegularGridBuilder] Cannot use set_point in RegularGrid"
             };
         }
 
@@ -137,8 +127,12 @@ namespace geode
             };
         }
 
+        void do_copy_points( const SolidMesh< 3 >& solid_mesh ) final;
+
+        void do_copy_polyhedra( const SolidMesh< 3 >& solid_mesh ) final;
+
     private:
-        OpenGeodeRegularGrid< 3 >& grid_;
+        OpenGeodeRegularGrid< 3 >& geode_regular_grid_;
     };
     ALIAS_3D( OpenGeodeRegularGridBuilder );
 } // namespace geode

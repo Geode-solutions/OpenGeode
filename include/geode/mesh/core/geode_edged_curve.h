@@ -76,6 +76,7 @@ namespace geode
             return native_extension_static();
         }
 
+    public:
         void set_vertex(
             index_t vertex_id, Point< dimension > point, OGEdgedCurveKey );
 

@@ -43,6 +43,12 @@ namespace geode
             std::move( cells_number ), std::move( cells_length ), {} );
     }
 
+    template < index_t dimension >
+    void GridBuilder< dimension >::copy( const Grid< dimension >& grid )
+    {
+        grid_.copy( grid, {} );
+    }
+
     template class opengeode_mesh_api GridBuilder< 2 >;
     template class opengeode_mesh_api GridBuilder< 3 >;
 } // namespace geode

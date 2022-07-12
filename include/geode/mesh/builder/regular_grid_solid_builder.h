@@ -54,7 +54,7 @@ namespace geode
             std::array< index_t, 3 > cells_number,
             double cells_length );
 
-        virtual void update_origin( const Point3D& origin );
+        virtual void update_origin( const Point3D& origin ) = 0;
 
         void copy( const RegularGrid3D& grid );
 

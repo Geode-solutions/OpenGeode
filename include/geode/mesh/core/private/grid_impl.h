@@ -28,6 +28,8 @@
 
 #include <geode/geometry/point.h>
 
+#include <geode/mesh/core/private/points_impl.h>
+
 namespace geode
 {
     namespace detail
@@ -42,26 +44,6 @@ namespace geode
                 const RegularGrid< dimension >& grid ) const
             {
                 return grid.point( 0 );
-            }
-
-            void update_origin( RegularGrid< dimension >& grid,
-                const Point< dimension >& origin )
-            {
-                auto builder = RegularGridBuilder< dimension >::create( grid );
-                for( const auto v : Range{ grid.nb_vertices() } )
-                {
-                    const auto index = vertex_indices( grid, v );
-                    Point< dimension > translation;
-                    for( const auto d : LRange{ dimension } )
-                    {
-                        OPENGEODE_ASSERT(
-                            index[d] < grid.nb_vertices_in_direction( d ),
-                            "[RegularGrid::point] Invalid index" );
-                        translation.set_value(
-                            d, grid.cell_length_in_direction( d ) * index[d] );
-                    }
-                    builder->set_point( v, origin + translation );
-                }
             }
 
             index_t cell_index( const RegularGrid< dimension >& grid,
@@ -168,6 +150,27 @@ namespace geode
                     }
                 }
                 return absl::nullopt;
+            }
+
+        protected:
+            void do_update_origin( RegularGrid< dimension >& grid,
+                PointsImpl< dimension >& impl,
+                const Point< dimension >& origin )
+            {
+                for( const auto v : Range{ grid.nb_vertices() } )
+                {
+                    const auto index = vertex_indices( grid, v );
+                    Point< dimension > translation;
+                    for( const auto d : LRange{ dimension } )
+                    {
+                        OPENGEODE_ASSERT(
+                            index[d] < grid.nb_vertices_in_direction( d ),
+                            "[RegularGrid::point] Invalid index" );
+                        translation.set_value(
+                            d, grid.cell_length_in_direction( d ) * index[d] );
+                    }
+                    impl.set_point( v, origin + translation );
+                }
             }
 
         private:

@@ -85,6 +85,12 @@ namespace geode
 
         void do_unset_polygon_adjacent( const PolygonEdge& polygon_edge ) final;
 
+        void do_copy_points(
+            const SurfaceMesh< dimension >& surface_mesh ) final;
+
+        void do_copy_polygons(
+            const SurfaceMesh< dimension >& surface_mesh ) final;
+
     private:
         OpenGeodeTriangulatedSurface< dimension >& geode_triangulated_surface_;
     };

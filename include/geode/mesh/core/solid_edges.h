@@ -77,6 +77,7 @@ namespace geode
          */
         AttributeManager& edge_attribute_manager() const;
 
+    public:
         void update_edge_vertices(
             absl::Span< const index_t > old2new, SolidEdgesKey );
 

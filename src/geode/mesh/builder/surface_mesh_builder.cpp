@@ -274,6 +274,33 @@ namespace
             builder.reset_polygons_around_vertex( vertex );
         }
     }
+
+    template < geode::index_t dimension >
+    void copy_points( const geode::SurfaceMesh< dimension >& surface,
+        geode::SurfaceMeshBuilder< dimension >& builder )
+    {
+        for( const auto p : geode::Range{ surface.nb_vertices() } )
+        {
+            builder.set_point( p, surface.point( p ) );
+        }
+    }
+
+    template < geode::index_t dimension >
+    void copy_polygons( const geode::SurfaceMesh< dimension >& surface,
+        geode::SurfaceMeshBuilder< dimension >& builder )
+    {
+        for( const auto p : geode::Range{ surface.nb_polygons() } )
+        {
+            absl::FixedArray< geode::index_t > vertices(
+                surface.nb_polygon_vertices( p ) );
+            for( const auto v :
+                geode::LRange{ surface.nb_polygon_vertices( p ) } )
+            {
+                vertices[v] = surface.polygon_vertex( { p, v } );
+            }
+            builder.create_polygon( vertices );
+        }
+    }
 } // namespace
 
 namespace geode
@@ -712,20 +739,15 @@ namespace geode
             surface_mesh_.disable_edges();
         }
         VertexSetBuilder::copy( surface_mesh );
-        for( const auto p : Range{ surface_mesh.nb_vertices() } )
+        if( surface_mesh.impl_name() == surface_mesh_.impl_name() )
         {
-            set_point( p, surface_mesh.point( p ) );
+            do_copy_points( surface_mesh );
+            do_copy_polygons( surface_mesh );
         }
-        for( const auto p : Range{ surface_mesh.nb_polygons() } )
+        else
         {
-            absl::FixedArray< index_t > vertices(
-                surface_mesh.nb_polygon_vertices( p ) );
-            for( const auto v :
-                LRange{ surface_mesh.nb_polygon_vertices( p ) } )
-            {
-                vertices[v] = surface_mesh.polygon_vertex( { p, v } );
-            }
-            create_polygon( vertices );
+            copy_points( surface_mesh, *this );
+            copy_polygons( surface_mesh, *this );
         }
         surface_mesh_.polygon_attribute_manager().copy(
             surface_mesh.polygon_attribute_manager() );

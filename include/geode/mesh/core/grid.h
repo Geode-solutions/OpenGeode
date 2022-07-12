@@ -183,6 +183,8 @@ namespace geode
             std::array< double, dimension > cells_length,
             GridKey );
 
+        void copy( const Grid< dimension >& grid, GridKey );
+
     private:
         template < typename Archive >
         void serialize( Archive& archive );

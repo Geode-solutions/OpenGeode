@@ -123,6 +123,11 @@ namespace geode
         void do_unset_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet ) final;
 
+        void do_copy_points( const SolidMesh< dimension >& solid_mesh ) final;
+
+        void do_copy_polyhedra(
+            const SolidMesh< dimension >& solid_mesh ) final;
+
     private:
         OpenGeodeHybridSolid< dimension >& geode_hybrid_solid_;
     };

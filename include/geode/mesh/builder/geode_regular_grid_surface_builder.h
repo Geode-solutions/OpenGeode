@@ -54,24 +54,14 @@ namespace geode
     private:
         void update_origin( const Point2D& origin ) final;
 
+        void do_set_point( index_t vertex_id, Point2D point ) final;
+
+        void do_create_vertices( index_t /*unsued*/ ) final;
+
         void do_create_vertex() final
         {
             throw OpenGeodeException{
                 "[RegularGridBuilder] Cannot use create_vertex in RegularGrid"
-            };
-        }
-
-        void do_create_vertices( index_t /*unsued*/ ) final
-        {
-            throw OpenGeodeException{
-                "[RegularGridBuilder] Cannot use create_vertices in RegularGrid"
-            };
-        }
-
-        void do_set_point( index_t /*unsued*/, Point2D /*unsued*/ ) final
-        {
-            throw OpenGeodeException{
-                "[RegularGridBuilder] Cannot use set_point in RegularGrid"
             };
         }
 
@@ -136,8 +126,12 @@ namespace geode
                                       "unset_polygon_adjacent in RegularGrid" };
         }
 
+        void do_copy_points( const SurfaceMesh< 2 >& surface_mesh ) final;
+
+        void do_copy_polygons( const SurfaceMesh< 2 >& surface_mesh ) final;
+
     private:
-        OpenGeodeRegularGrid< 2 >& grid_;
+        OpenGeodeRegularGrid< 2 >& geode_regular_grid_;
     };
     ALIAS_2D( OpenGeodeRegularGridBuilder );
 } // namespace geode

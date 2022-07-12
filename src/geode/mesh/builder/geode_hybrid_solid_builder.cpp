@@ -145,5 +145,21 @@ namespace geode
         geode_hybrid_solid_.permute_polyhedra( permutation, {} );
     }
 
+    template < index_t dimension >
+    void OpenGeodeHybridSolidBuilder< dimension >::do_copy_points(
+        const SolidMesh< dimension >& /*unused*/ )
+    {
+    }
+
+    template < index_t dimension >
+    void OpenGeodeHybridSolidBuilder< dimension >::do_copy_polyhedra(
+        const SolidMesh< dimension >& solid_mesh )
+    {
+        geode_hybrid_solid_.copy_polyhedra(
+            dynamic_cast< const OpenGeodeHybridSolid< dimension >& >(
+                solid_mesh ),
+            {} );
+    }
+
     template class opengeode_mesh_api OpenGeodeHybridSolidBuilder< 3 >;
 } // namespace geode

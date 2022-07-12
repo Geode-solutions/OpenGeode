@@ -349,6 +349,12 @@ namespace geode
             cells_length_ = std::move( cells_length );
         }
 
+        void copy( const Grid< dimension >::Impl& impl )
+        {
+            cells_number_ = impl.cells_number_;
+            cells_length_ = impl.cells_length_;
+        }
+
     private:
         // void resize_vertex_attribute_manager_to_right_size()
         // {
@@ -531,6 +537,12 @@ namespace geode
     {
         return impl_->set_grid_dimensions(
             std::move( cells_number ), std::move( cells_length ) );
+    }
+
+    template < index_t dimension >
+    void Grid< dimension >::copy( const Grid< dimension >& grid, GridKey )
+    {
+        impl_->copy( *grid.impl_ );
     }
 
     template < index_t dimension >

@@ -26,6 +26,7 @@
 #include <fstream>
 
 #include <geode/basic/bitsery_archive.h>
+#include <geode/basic/logger.h>
 #include <geode/basic/pimpl_impl.h>
 
 #include <geode/geometry/point.h>
@@ -60,6 +61,11 @@ namespace geode
         {
         }
 
+        void update_origin( RegularGrid3D& grid, const Point3D& origin )
+        {
+            do_update_origin( grid, *this, origin );
+        }
+
         index_t get_polyhedron_vertex( const RegularGrid3D& grid,
             const PolyhedronVertex& polyhedron_vertex ) const
         {
@@ -78,7 +84,7 @@ namespace geode
         {
             const auto& facet = polyhedron_facet_vertex.polyhedron_facet;
             const auto vertex =
-                cell_facet_vertices[facet.polyhedron_id]
+                cell_facet_vertices[facet.facet_id]
                                    [polyhedron_facet_vertex.vertex_id];
             return { facet.polyhedron_id, vertex };
         }
@@ -116,6 +122,12 @@ namespace geode
         index_t vertex_id ) const
     {
         return impl_->get_point( vertex_id );
+    }
+
+    void OpenGeodeRegularGrid< 3 >::set_vertex(
+        index_t vertex_id, Point3D point, OGRegularGridKey )
+    {
+        impl_->set_point( vertex_id, std::move( point ) );
     }
 
     const Point3D& OpenGeodeRegularGrid< 3 >::origin() const

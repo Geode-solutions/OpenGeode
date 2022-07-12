@@ -113,6 +113,7 @@ namespace geode
          */
         void save_unique_vertices( absl::string_view directory ) const;
 
+    public:
         /*!
          * Add a component in the VertexIdentifier
          */

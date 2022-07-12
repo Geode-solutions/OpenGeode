@@ -58,6 +58,11 @@ namespace geode
          */
         static std::unique_ptr< RegularGrid3D > create( const MeshImpl& impl );
 
+        static MeshType type_name_static()
+        {
+            return MeshType{ "RegularGrid3D" };
+        }
+
         absl::string_view native_extension() const
         {
             return native_extension_static();
@@ -68,9 +73,6 @@ namespace geode
             static const auto ext = "og_rgd3d";
             return ext;
         }
-
-        const Point3D& point_from_indices(
-            const GridVertexIndices3D& index ) const;
 
         std::unique_ptr< RegularGrid3D > clone() const;
 
