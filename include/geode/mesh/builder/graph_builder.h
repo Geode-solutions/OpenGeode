@@ -150,6 +150,8 @@ namespace geode
         virtual void do_delete_edges( const std::vector< bool >& to_delete,
             absl::Span< const index_t > old2new ) = 0;
 
+        virtual void do_copy_edges( const Graph& mesh ) = 0;
+
     private:
         Graph& graph_;
     };

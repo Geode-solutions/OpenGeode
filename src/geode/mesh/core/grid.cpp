@@ -356,16 +356,6 @@ namespace geode
         }
 
     private:
-        // void resize_vertex_attribute_manager_to_right_size()
-        // {
-        //     index_t nb_vertices{ 1 };
-        //     for( const auto c : cells_number_ )
-        //     {
-        //         nb_vertices *= c + 1;
-        //     }
-        //     vertex_attribute_manager_.resize( nb_vertices );
-        // }
-
         double point_local_grid_coordinate(
             const geode::Point< dimension >& origin,
             const geode::Point< dimension >& query,
@@ -379,23 +369,11 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            geode_unused( archive );
-            // archive.ext( *this,
-            //     Growable< Archive, Impl >{
-            //         { []( Archive& a, Impl& impl ) {
-            //              a.object( impl.cell_attribute_manager_ );
-            //              a.object( impl.origin_ );
-            //              a.container4b( impl.cells_number_ );
-            //              a.container8b( impl.cells_length_ );
-            //              impl.resize_vertex_attribute_manager_to_right_size();
-            //          },
-            //             []( Archive& a, Impl& impl ) {
-            //                 a.object( impl.cell_attribute_manager_ );
-            //                 a.object( impl.vertex_attribute_manager_ );
-            //                 a.object( impl.origin_ );
-            //                 a.container4b( impl.cells_number_ );
-            //                 a.container8b( impl.cells_length_ );
-            //             } } } );
+            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
+                []( Archive& a, Impl& impl ) {
+                    a.container4b( impl.cells_number_ );
+                    a.container8b( impl.cells_length_ );
+                } );
         }
 
     private:
@@ -550,8 +528,8 @@ namespace geode
     void Grid< dimension >::serialize( Archive& archive )
     {
         archive.ext( *this, DefaultGrowable< Archive, Grid >{},
-            []( Archive& a, Grid& regular_grid ) {
-                a.object( regular_grid.impl_ );
+            []( Archive& a, Grid& grid ) {
+                a.object( grid.impl_ );
             } );
     }
 

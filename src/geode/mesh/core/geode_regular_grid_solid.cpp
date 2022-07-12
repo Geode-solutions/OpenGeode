@@ -189,10 +189,9 @@ namespace geode
     void OpenGeodeRegularGrid< 3 >::serialize( Archive& archive )
     {
         archive.ext( *this, DefaultGrowable< Archive, OpenGeodeRegularGrid >{},
-            []( Archive& a, OpenGeodeRegularGrid& point_set ) {
-                a.ext(
-                    point_set, bitsery::ext::BaseClass< RegularGrid< 3 > >{} );
-                a.object( point_set.impl_ );
+            []( Archive& a, OpenGeodeRegularGrid& grid ) {
+                a.ext( grid, bitsery::ext::BaseClass< RegularGrid< 3 > >{} );
+                a.object( grid.impl_ );
             } );
     }
 

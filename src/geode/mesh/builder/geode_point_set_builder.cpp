@@ -77,6 +77,12 @@ namespace geode
     {
     }
 
+    template < index_t dimension >
+    void OpenGeodePointSetBuilder< dimension >::do_copy_points(
+        const PointSet< dimension >& /*unused*/ )
+    {
+    }
+
     template class opengeode_mesh_api OpenGeodePointSetBuilder< 2 >;
     template class opengeode_mesh_api OpenGeodePointSetBuilder< 3 >;
 } // namespace geode

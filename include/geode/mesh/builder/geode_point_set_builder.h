@@ -62,6 +62,8 @@ namespace geode
         void do_permute_vertices( absl::Span< const index_t > permutation,
             absl::Span< const index_t > old2new ) final;
 
+        void do_copy_points( const PointSet< dimension >& mesh ) final;
+
     private:
         OpenGeodePointSet< dimension >& geode_point_set_;
     };

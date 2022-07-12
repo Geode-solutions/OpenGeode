@@ -77,4 +77,5 @@ namespace geode
     {
     }
 
+    void OpenGeodeGraphBuilder::do_copy_edges( const Graph& /*unused*/ ) {}
 } // namespace geode

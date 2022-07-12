@@ -109,6 +109,18 @@ namespace geode
     {
     }
 
+    template < index_t dimension >
+    void OpenGeodeEdgedCurveBuilder< dimension >::do_copy_points(
+        const EdgedCurve< dimension >& /*unused*/ )
+    {
+    }
+
+    template < index_t dimension >
+    void OpenGeodeEdgedCurveBuilder< dimension >::do_copy_edges(
+        const Graph& /*unused*/ )
+    {
+    }
+
     template class opengeode_mesh_api OpenGeodeEdgedCurveBuilder< 2 >;
     template class opengeode_mesh_api OpenGeodeEdgedCurveBuilder< 3 >;
 } // namespace geode

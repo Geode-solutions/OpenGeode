@@ -75,6 +75,8 @@ namespace geode
         virtual void do_set_point(
             index_t vertex_id, Point< dimension > point ) = 0;
 
+        virtual void do_copy_points( const PointSet< dimension >& mesh ) = 0;
+
     private:
         PointSet< dimension >& point_set_;
     };

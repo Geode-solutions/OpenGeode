@@ -18,11 +18,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# add_subdirectory(src)
+add_subdirectory(src)
 
-# if(OPENGEODE_WITH_TESTS)
-#     add_subdirectory(tests)
-# endif()
+if(OPENGEODE_WITH_TESTS)
+    add_subdirectory(tests)
+endif()
 
 configure_file(
     __init__.py

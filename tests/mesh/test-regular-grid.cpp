@@ -177,13 +177,6 @@ void test_vertex_index( const geode::RegularGrid3D& grid )
 
 void test_vertex_on_border( const geode::RegularGrid3D& grid )
 {
-    DEBUG( grid.nb_polyhedra() );
-    DEBUG( grid.nb_cells_in_direction( 0 ) );
-    DEBUG( grid.nb_cells_in_direction( 1 ) );
-    DEBUG( grid.nb_cells_in_direction( 2 ) );
-    DEBUG( grid.nb_vertices_in_direction( 0 ) );
-    DEBUG( grid.nb_vertices_in_direction( 1 ) );
-    DEBUG( grid.nb_vertices_in_direction( 2 ) );
     OPENGEODE_EXCEPTION(
         grid.is_vertex_on_border( grid.vertex_index( { { 0, 0, 0 } } ) ),
         "[Test] Vertex is not on border where it should be." );
