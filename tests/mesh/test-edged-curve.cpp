@@ -234,14 +234,17 @@ void test_clone( const geode::EdgedCurve3D& edged_curve )
                 "test", 0 );
     attribute->set_value( 0, 42 );
 
-    const auto edged_curve2 = edged_curve.clone();
-    OPENGEODE_EXCEPTION( edged_curve2->nb_vertices() == 4,
+    const auto edged_curve_clone = edged_curve.clone();
+    geode::OpenGeodeEdgedCurve3D edged_curve2{ std::move(
+        *dynamic_cast< geode::OpenGeodeEdgedCurve3D* >(
+            edged_curve_clone.get() ) ) };
+    OPENGEODE_EXCEPTION( edged_curve2.nb_vertices() == 4,
         "[Test] EdgedCurve2 should have 4 vertices" );
-    OPENGEODE_EXCEPTION( edged_curve2->nb_edges() == 3,
-        "[Test] EdgedCurve2 should have 3 edge" );
+    OPENGEODE_EXCEPTION(
+        edged_curve2.nb_edges() == 3, "[Test] EdgedCurve2 should have 3 edge" );
 
     const auto attribute2 =
-        edged_curve2->edge_attribute_manager().find_attribute< int >( "test" );
+        edged_curve2.edge_attribute_manager().find_attribute< int >( "test" );
     OPENGEODE_EXCEPTION( attribute2->value( 0 ) == 42,
         "[Test] EdgedCurve2 attribute should be 42" );
 }

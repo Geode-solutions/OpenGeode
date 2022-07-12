@@ -23,7 +23,32 @@
 
 #pragma once
 
-#pragma message(                                                               \
-    "#include <geode/model/helpers/component_mesh_queries.h> is deprecated. Use e.g. #include <geode/model/helpers/component_mesh_polygons.h>" )
+#include <geode/basic/pimpl.h>
 
-#include <geode/model/helpers/component_mesh_polygons.h>
+#include <geode/model/common.h>
+
+namespace geode
+{
+    FORWARD_DECLARATION_DIMENSION_CLASS( Surface );
+} // namespace geode
+
+namespace geode
+{
+    namespace detail
+    {
+        template < typename Model, typename ModelBuilder, index_t dimension >
+        class CutAlongInternalLines
+        {
+        public:
+            CutAlongInternalLines( Model& model );
+            ~CutAlongInternalLines();
+
+            void cut_all_surfaces();
+
+            void cut_surface( const Surface< dimension >& surface );
+
+        private:
+            IMPLEMENTATION_MEMBER( impl_ );
+        };
+    } // namespace detail
+} // namespace geode

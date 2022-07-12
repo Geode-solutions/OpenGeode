@@ -214,6 +214,14 @@ namespace geode
     }
 
     template < index_t dimension >
+    OpenGeodePolygonalSurface< dimension >::OpenGeodePolygonalSurface(
+        OpenGeodePolygonalSurface&& other )
+        : PolygonalSurface< dimension >( std::move( other ) ),
+          impl_( std::move( other.impl_ ) )
+    {
+    }
+
+    template < index_t dimension >
     OpenGeodePolygonalSurface<
         dimension >::~OpenGeodePolygonalSurface() // NOLINT
     {

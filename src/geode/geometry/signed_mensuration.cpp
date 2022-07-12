@@ -25,55 +25,37 @@
 
 #include <geode/geometry/basic_objects/tetra.h>
 #include <geode/geometry/basic_objects/triangle.h>
+#include <geode/geometry/distance.h>
 #include <geode/geometry/perpendicular.h>
 
 namespace geode
 {
-    template <>
-    double triangle_area( const Triangle3D& triangle )
+    template < index_t dimension >
+    double triangle_area( const Triangle< dimension >& triangle )
     {
-        const auto Ux = triangle.vertices()[1].get().value( 0 )
-                        - triangle.vertices()[0].get().value( 0 );
-        const auto Uy = triangle.vertices()[1].get().value( 1 )
-                        - triangle.vertices()[0].get().value( 1 );
-        const auto Uz = triangle.vertices()[1].get().value( 2 )
-                        - triangle.vertices()[0].get().value( 2 );
-
-        const auto Vx = triangle.vertices()[2].get().value( 0 )
-                        - triangle.vertices()[0].get().value( 0 );
-        const auto Vy = triangle.vertices()[2].get().value( 1 )
-                        - triangle.vertices()[0].get().value( 1 );
-        const auto Vz = triangle.vertices()[2].get().value( 2 )
-                        - triangle.vertices()[0].get().value( 2 );
-
-        const auto Nx = Uy * Vz - Uz * Vy;
-        const auto Ny = Uz * Vx - Ux * Vz;
-        const auto Nz = Ux * Vy - Uy * Vx;
-        return std::sqrt( Nx * Nx + Ny * Ny + Nz * Nz ) / 2.;
-    }
-
-    template <>
-    double triangle_area( const Triangle2D& triangle )
-    {
-        return std::fabs( triangle_signed_area( triangle ) );
+        const auto& tri_v = triangle.vertices();
+        // Heron's formula
+        const auto l0 = point_point_distance( tri_v[0].get(), tri_v[1].get() );
+        const auto l1 = point_point_distance( tri_v[1].get(), tri_v[2].get() );
+        const auto l2 = point_point_distance( tri_v[2].get(), tri_v[0].get() );
+        const auto p = ( l0 + l1 + l2 ) / 2;
+        const auto area2 = p * ( p - l0 ) * ( p - l1 ) * ( p - l2 );
+        if( area2 < 0 )
+        {
+            return 0;
+        }
+        return std::sqrt( area2 );
     }
 
     double triangle_signed_area(
         const Triangle3D& triangle, const Vector3D& direction )
     {
         const auto area = triangle_area( triangle );
-        try
+        if( const auto normal = triangle.new_normal() )
         {
-            if( const auto area_normal = triangle.new_normal() )
-            {
-                return direction.dot( area_normal.value() ) > 0 ? area : -area;
-            }
-            return area;
+            return direction.dot( normal.value() ) > 0 ? area : -area;
         }
-        catch( const OpenGeodeException& )
-        {
-            return area;
-        }
+        return area;
     }
 
     double triangle_signed_area( const Triangle2D& triangle )
@@ -98,6 +80,5 @@ namespace geode
     }
 
     template double opengeode_geometry_api triangle_area( const Triangle2D& );
-
     template double opengeode_geometry_api triangle_area( const Triangle3D& );
 } // namespace geode

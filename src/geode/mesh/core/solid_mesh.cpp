@@ -486,6 +486,12 @@ namespace geode
     }
 
     template < index_t dimension >
+    SolidMesh< dimension >::SolidMesh( SolidMesh&& other )
+        : VertexSet( std::move( other ) ), impl_( std::move( other.impl_ ) )
+    {
+    }
+
+    template < index_t dimension >
     SolidMesh< dimension >::~SolidMesh() // NOLINT
     {
     }

@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/model/helpers/component_mesh_queries.h>
+#include <geode/model/helpers/component_mesh_polygons.h>
 
 #include <geode/mesh/core/solid_mesh.h>
 

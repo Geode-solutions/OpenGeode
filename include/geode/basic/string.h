@@ -23,7 +23,18 @@
 
 #pragma once
 
-#pragma message(                                                               \
-    "#include <geode/model/helpers/component_mesh_queries.h> is deprecated. Use e.g. #include <geode/model/helpers/component_mesh_polygons.h>" )
+#include <geode/basic/common.h>
 
-#include <geode/model/helpers/component_mesh_polygons.h>
+namespace geode
+{
+    std::vector< absl::string_view > opengeode_basic_api string_split(
+        absl::string_view string );
+
+    index_t opengeode_basic_api string_to_index( absl::string_view string );
+
+    int opengeode_basic_api string_to_int( absl::string_view string );
+
+    float opengeode_basic_api string_to_float( absl::string_view string );
+
+    double opengeode_basic_api string_to_double( absl::string_view string );
+} // namespace geode

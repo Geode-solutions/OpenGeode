@@ -23,7 +23,21 @@
 
 #pragma once
 
-#pragma message(                                                               \
-    "#include <geode/model/helpers/component_mesh_queries.h> is deprecated. Use e.g. #include <geode/model/helpers/component_mesh_polygons.h>" )
+#include <geode/mesh/common.h>
 
-#include <geode/model/helpers/component_mesh_polygons.h>
+#include <geode/geometry/nn_search.h>
+
+namespace geode
+{
+    template < template < index_t > class Mesh, index_t dimension >
+    NNSearch< dimension > create_nn_search( const Mesh< dimension >& mesh )
+    {
+        std::vector< Point< dimension > > points;
+        points.reserve( mesh.nb_vertices() );
+        for( const auto v : Range{ mesh.nb_vertices() } )
+        {
+            points.push_back( mesh.point( v ) );
+        }
+        return { std::move( points ) };
+    }
+} // namespace geode

@@ -247,8 +247,12 @@ void test_clone( const geode::TetrahedralSolid3D& solid )
     {
         attr_edge_from->set_value( e, e );
     }
+
     const auto solid2 = solid.clone();
-    const auto attr_to = solid2->facets()
+    geode::OpenGeodeTetrahedralSolid3D solid4{ std::move(
+        *dynamic_cast< geode::OpenGeodeTetrahedralSolid3D* >(
+            solid2.get() ) ) };
+    const auto attr_to = solid4.facets()
                              .facet_attribute_manager()
                              .find_attribute< geode::index_t >( "facet_id" );
     for( const auto f : geode::Range{ solid.facets().nb_facets() } )
@@ -256,7 +260,7 @@ void test_clone( const geode::TetrahedralSolid3D& solid )
         OPENGEODE_EXCEPTION( attr_from->value( f ) == attr_to->value( f ),
             "[Test] Error in facet attribute transfer during cloning" );
         const auto from_vertices = solid.facets().facet_vertices( f );
-        const auto to_vertices = solid2->facets().facet_vertices( f );
+        const auto to_vertices = solid4.facets().facet_vertices( f );
         for( const auto v : geode::Indices{ from_vertices } )
         {
             OPENGEODE_EXCEPTION( from_vertices[v] == to_vertices[v],
@@ -264,7 +268,7 @@ void test_clone( const geode::TetrahedralSolid3D& solid )
         }
     }
     const auto attr_edge_to =
-        solid2->edges()
+        solid4.edges()
             .edge_attribute_manager()
             .find_attribute< geode::index_t >( "edge_id" );
     for( const auto e : geode::Range{ solid.edges().nb_edges() } )
@@ -273,12 +277,12 @@ void test_clone( const geode::TetrahedralSolid3D& solid )
             attr_edge_from->value( e ) == attr_edge_to->value( e ),
             "[Test] Error in edge attribute transfer during cloning" );
     }
-    OPENGEODE_EXCEPTION( solid2->nb_vertices() == 6,
+    OPENGEODE_EXCEPTION( solid4.nb_vertices() == 6,
         "[Test] TetrahedralSolid2 should have 6 vertices" );
     OPENGEODE_EXCEPTION(
-        solid2->facets().nb_facets() == solid.facets().nb_facets(),
+        solid4.facets().nb_facets() == solid.facets().nb_facets(),
         "[Test] TetrahedralSolid2 should have same number of facets" );
-    OPENGEODE_EXCEPTION( solid2->nb_polyhedra() == 2,
+    OPENGEODE_EXCEPTION( solid4.nb_polyhedra() == 2,
         "[Test] TetrahedralSolid2 should have 2 polyhedra" );
 }
 
@@ -288,21 +292,26 @@ void test_delete_all( const geode::TetrahedralSolid3D& solid,
     builder.delete_isolated_vertices();
     OPENGEODE_EXCEPTION( solid.nb_vertices() == 5,
         "[Test]TetrahedralSolid should have 5 vertices" );
-    OPENGEODE_EXCEPTION( solid.facets().nb_facets() == 4,
+    OPENGEODE_EXCEPTION( solid.facets().nb_facets() == 7,
         "[Test]TetrahedralSolid should have 4 facets" );
-    OPENGEODE_EXCEPTION( solid.nb_polyhedra() == 1,
+    OPENGEODE_EXCEPTION( solid.nb_polyhedra() == 2,
         "[Test]TetrahedralSolid should have 1 polyhedron" );
 
     std::vector< bool > to_delete( solid.nb_polyhedra(), true );
     builder.delete_polyhedra( to_delete );
     OPENGEODE_EXCEPTION( solid.nb_vertices() == 5,
         "[Test]TetrahedralSolid should have 5 vertices" );
-    OPENGEODE_EXCEPTION( solid.facets().nb_facets() == 0,
-        "[Test]TetrahedralSolid should have 0 facet" );
+    OPENGEODE_EXCEPTION( solid.facets().nb_facets() == 7,
+        "[Test]TetrahedralSolid should have 7 facet" );
     OPENGEODE_EXCEPTION( solid.nb_polyhedra() == 0,
         "[Test]TetrahedralSolid should have 0 polyhedron" );
     OPENGEODE_EXCEPTION( solid.polyhedra_around_vertex( 0 ).empty(),
         "[Test] No more polyhedron around vertices" );
+
+    std::vector< bool > f_to_delete( solid.facets().nb_facets(), true );
+    builder.facets_builder().delete_facets( f_to_delete );
+    OPENGEODE_EXCEPTION( solid.facets().nb_facets() == 0,
+        "[Test]TetrahedralSolid should have 0 facet" );
 
     builder.delete_isolated_vertices();
     OPENGEODE_EXCEPTION( solid.nb_vertices() == 0,
@@ -324,6 +333,7 @@ void test()
     test_permutation( *solid, *builder );
     test_delete_polyhedron( *solid, *builder );
     test_clone( *solid );
+    test_delete_all( *solid, *builder );
 }
 
 OPENGEODE_TEST( "tetrahedral-solid" )

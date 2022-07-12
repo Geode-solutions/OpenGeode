@@ -32,11 +32,11 @@ def test_triangle_area():
     c = geom.Point2D( [1.0, 1.0] )
 
     triangle2D_1 = geom.Triangle2D( a, b, c )
-    if geom.triangle_area2D( triangle2D_1 ) != 0.5:
+    if abs(geom.triangle_area2D( triangle2D_1 )-0.5) > 1e-7:
         raise ValueError( "[Test] Wrong result for triangle_area with query triangle triangle2D_1" )
 
     triangle2D_2 = geom.Triangle2D( a, b, a )
-    if geom.triangle_area2D( triangle2D_2 ) != 0.0:
+    if abs(geom.triangle_area2D( triangle2D_2 )) > 1e-7:
         raise ValueError( "[Test] Wrong result for triangle_area with query triangle triangle2D_2" )
 
 def test_triangle_signed_area():
@@ -45,15 +45,15 @@ def test_triangle_signed_area():
     c = geom.Point2D( [1.0, 1.0] )
 
     triangle2D_1 = geom.Triangle2D( a, b, c )
-    if geom.triangle_signed_area2D( triangle2D_1 ) != 0.5:
+    if abs(geom.triangle_signed_area2D( triangle2D_1 ) - 0.5) > 1e-7:
         raise ValueError( "[Test] Wrong result for triangle_signed_area with query triangle triangle2D_1" )
 
     triangle2D_2 = geom.Triangle2D( a, c, b )
-    if geom.triangle_signed_area2D( triangle2D_2 ) != -0.5:
+    if abs(geom.triangle_signed_area2D( triangle2D_2 ) + 0.5) > 1e-7:
         raise ValueError( "[Test] Wrong result for triangle_signed_area with query triangle triangle2D_2" )
 
     triangle2D_3 = geom.Triangle2D( a, b, a )
-    if geom.triangle_signed_area2D( triangle2D_3 ) != -0.0:
+    if abs(geom.triangle_signed_area2D( triangle2D_3 )) > 1e-7:
         raise ValueError( "[Test] Wrong result for triangle_signed_area with query triangle triangle2D_3" )
 
 if __name__ == '__main__':

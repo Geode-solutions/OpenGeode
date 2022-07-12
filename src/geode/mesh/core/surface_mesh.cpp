@@ -36,6 +36,7 @@
 #include <geode/geometry/basic_objects/triangle.h>
 #include <geode/geometry/bounding_box.h>
 #include <geode/geometry/distance.h>
+#include <geode/geometry/signed_mensuration.h>
 
 #include <geode/mesh/builder/surface_edges_builder.h>
 #include <geode/mesh/builder/surface_mesh_builder.h>
@@ -91,19 +92,6 @@ namespace
         OPENGEODE_ASSERT( edge_id < surface.nb_polygon_edges( polygon_id ),
             "[check_polygon_edge_id] Trying to access an invalid polygon local "
             "edge" );
-    }
-
-    template < geode::index_t dimension >
-    double triangle_area( const geode::Point< dimension >& p0,
-        const geode::Point< dimension >& p1,
-        const geode::Point< dimension >& p2 )
-    {
-        // Heron's formula
-        const auto l0 = geode::Vector< dimension >{ p0, p1 }.length();
-        const auto l1 = geode::Vector< dimension >{ p1, p2 }.length();
-        const auto l2 = geode::Vector< dimension >{ p2, p0 }.length();
-        const auto p = ( l0 + l1 + l2 ) / 2;
-        return std::sqrt( p * ( p - l0 ) * ( p - l1 ) * ( p - l2 ) );
     }
 
     template < geode::index_t dimension >
@@ -318,6 +306,12 @@ namespace geode
 
     template < index_t dimension >
     SurfaceMesh< dimension >::SurfaceMesh() : impl_( *this )
+    {
+    }
+
+    template < index_t dimension >
+    SurfaceMesh< dimension >::SurfaceMesh( SurfaceMesh&& other )
+        : VertexSet( std::move( other ) ), impl_( std::move( other.impl_ ) )
     {
     }
 
@@ -657,7 +651,7 @@ namespace geode
             const auto& p2 = this->point( polygon_vertex( { polygon_id, i } ) );
             const auto& p3 = this->point( polygon_vertex(
                 { polygon_id, static_cast< local_index_t >( i + 1 ) } ) );
-            area += triangle_area( p1, p2, p3 );
+            area += triangle_area( geode::Triangle< dimension >{ p1, p2, p3 } );
         }
         return area;
     }

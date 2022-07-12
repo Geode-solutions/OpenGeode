@@ -456,21 +456,24 @@ void test_create_vertex_attribute(
 
 void test_clone( const geode::PolyhedralSolid3D& polyhedral_solid )
 {
-    const auto polyhedral_solid2 = polyhedral_solid.clone();
-    OPENGEODE_EXCEPTION( polyhedral_solid2->nb_vertices() == 8,
+    const auto polyhedral_solid_clone = polyhedral_solid.clone();
+    geode::OpenGeodePolyhedralSolid3D polyhedral_solid2{ std::move(
+        *dynamic_cast< geode::OpenGeodePolyhedralSolid3D* >(
+            polyhedral_solid_clone.get() ) ) };
+    OPENGEODE_EXCEPTION( polyhedral_solid2.nb_vertices() == 8,
         "[Test] PolyhedralSolid2 should have 8 vertices" );
-    OPENGEODE_EXCEPTION( polyhedral_solid2->facets().nb_facets() == 8,
+    OPENGEODE_EXCEPTION( polyhedral_solid2.facets().nb_facets() == 8,
         "[Test]PolyhedralSolid2 should have 8 facets" );
-    OPENGEODE_EXCEPTION( polyhedral_solid2->nb_polyhedra() == 2,
+    OPENGEODE_EXCEPTION( polyhedral_solid2.nb_polyhedra() == 2,
         "[Test] PolyhedralSolid2 should have 2 polyhedra" );
 
     const auto attribute2 =
-        polyhedral_solid2->vertex_attribute_manager()
+        polyhedral_solid2.vertex_attribute_manager()
             .find_attribute< geode::PolyhedronFacetVertex >( "test" );
     std::vector< geode::PolyhedronFacetVertex > att_answer{ { { 4, 0 }, 1 },
         { { 2, 0 }, 1 }, { { 6, 0 }, 1 }, { { 1, 0 }, 1 }, { { 5, 0 }, 1 },
         { { 0, 0 }, 1 }, { { 7, 0 }, 1 }, { { 3, 0 }, 1 } };
-    for( const auto v : geode::Range{ polyhedral_solid2->nb_vertices() } )
+    for( const auto v : geode::Range{ polyhedral_solid2.nb_vertices() } )
     {
         OPENGEODE_EXCEPTION( attribute2->value( v ) == att_answer[v],
             "[Test] PolyhedralSolid2 attribute is not correct" );

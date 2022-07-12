@@ -25,6 +25,7 @@
 
 #include <bitsery/brief_syntax/array.h>
 
+#include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/logger.h>
 
@@ -138,7 +139,10 @@ void test_foo_variable_attribute( geode::AttributeManager& manager )
 {
     auto variable_attribute =
         manager.find_or_create_attribute< geode::VariableAttribute, Foo >(
-            "foo_var", Foo{} );
+            "foo_var", Foo{}, { false, false } );
+    variable_attribute->set_properties( { true, true } );
+    OPENGEODE_EXCEPTION( variable_attribute->properties().interpolable,
+        "[Test] Attribute should be interpolable." );
     variable_attribute->modify_value( 3, []( Foo& foo ) {
         foo.double_ = 12.4;
     } );

@@ -46,6 +46,7 @@ namespace geode
 
     public:
         OpenGeodePolyhedralSolid();
+        OpenGeodePolyhedralSolid( OpenGeodePolyhedralSolid&& other );
         ~OpenGeodePolyhedralSolid();
 
         static MeshImpl impl_name_static()

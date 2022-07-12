@@ -21,14 +21,14 @@
  *
  */
 
-#include <geode/model/helpers/component_mesh_queries.h>
+#include <geode/model/helpers/component_mesh_polygons.h>
 
 #include <absl/container/inlined_vector.h>
 
 #include <geode/mesh/core/detail/vertex_cycle.h>
 
+#include <geode/model/helpers/component_mesh_edges.h>
 #include <geode/model/mixin/core/block.h>
-#include <geode/model/mixin/core/line.h>
 #include <geode/model/mixin/core/surface.h>
 #include <geode/model/representation/core/brep.h>
 #include <geode/model/representation/core/section.h>
@@ -259,23 +259,6 @@ namespace
     }
 
     template < geode::index_t dimension, class ModelType >
-    std::array< geode::index_t, 2 > line_edge_unique_vertices(
-        const ModelType& model,
-        const geode::Line< dimension >& line,
-        geode::index_t edge_id )
-    {
-        const auto& line_mesh = line.mesh();
-        std::array< geode::index_t, 2 > edge_unique_vertices;
-        for( const auto edge_vertex_id : geode::LRange{ 2 } )
-        {
-            edge_unique_vertices[edge_vertex_id] =
-                model.unique_vertex( { line.component_id(),
-                    line_mesh.edge_vertex( { edge_id, edge_vertex_id } ) } );
-        }
-        return edge_unique_vertices;
-    }
-
-    template < geode::index_t dimension, class ModelType >
     std::array< std::vector< geode::index_t >, 2 >
         surface_edge_from_model_unique_vertices( const ModelType& model,
             const geode::Surface< dimension >& surface,
@@ -450,8 +433,7 @@ namespace
             "is neither boundary nor internal to the given surface in the "
             "given model." );
         const auto edge_unique_vertices =
-            line_edge_unique_vertices< dimension, ModelType >(
-                model, line, edge_id );
+            geode::edge_unique_vertices( model, line, edge_id );
         const auto edges_surface_and_unique_vertices =
             edge_vertices_to_surface_vertices< dimension, ModelType >(
                 model, surface, edge_unique_vertices );
@@ -473,8 +455,7 @@ namespace
             "line is neither boundary nor internal to the given surface in the "
             "given model." );
         const auto edge_unique_vertices =
-            line_edge_unique_vertices< dimension, ModelType >(
-                model, line, edge_id );
+            geode::edge_unique_vertices( model, line, edge_id );
         const auto output =
             oriented_edge_vertices_to_surface_vertices< dimension, ModelType >(
                 model, surface, edge_unique_vertices );
