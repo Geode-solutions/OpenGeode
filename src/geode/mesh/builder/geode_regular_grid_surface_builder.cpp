@@ -60,7 +60,7 @@ namespace geode
     {
     }
 
-        void OpenGeodeRegularGridBuilder< 2 >::do_copy_points(
+    void OpenGeodeRegularGridBuilder< 2 >::do_copy_points(
         const SurfaceMesh< 2 >& /*unused*/ )
     {
     }
