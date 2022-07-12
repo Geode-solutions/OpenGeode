@@ -210,10 +210,7 @@ namespace geode
 
     using PolyhedraAroundEdge = absl::InlinedVector< index_t, 10 >;
 
-    using PolyhedraAroundFacet =
-        absl::InlinedVector< index_t, 2 >; /* deprecated */
-
-    using newPolyhedraAroundFacet = absl::InlinedVector< PolyhedronFacet, 2 >;
+    using PolyhedraAroundFacet = absl::InlinedVector< PolyhedronFacet, 2 >;
 
     /*!
      * This class represents a 3D Solid made up with polyhedra and provides mesh
@@ -482,17 +479,10 @@ namespace geode
             index_t first_polyhedron ) const;
 
         /*!
-         * Return all polyhedra made with the given facet.
-         * @param[in] facet_vertices Vertex indices of the facet.
-         */
-        PolyhedraAroundFacet OPENGEODE_MESH_DEPRECATED polyhedra_from_facet(
-            PolyhedronFacetVertices facet_vertices ) const;
-
-        /*!
          * Return all polyhedra facets made with the given facet vertices.
          * @param[in] facet_vertices Vertex indices of the facet.
          */
-        newPolyhedraAroundFacet polyhedra_from_facet_vertices(
+        PolyhedraAroundFacet polyhedra_from_facet_vertices(
             PolyhedronFacetVertices facet_vertices ) const;
 
         bool are_edges_enabled() const;

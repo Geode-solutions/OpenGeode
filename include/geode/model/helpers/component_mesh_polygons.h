@@ -108,7 +108,7 @@ namespace geode
     PolygonVertices opengeode_model_api polygon_unique_vertices(
         const BRep& model, const Surface3D& surface, index_t polygon_id );
 
-    newPolyhedraAroundFacet opengeode_model_api
+    PolyhedraAroundFacet opengeode_model_api
         block_mesh_polyhedra_from_surface_polygon( const BRep& model,
             const Block3D& block,
             const Surface3D& surface,

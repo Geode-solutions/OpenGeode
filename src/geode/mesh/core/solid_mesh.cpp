@@ -811,28 +811,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    PolyhedraAroundFacet SolidMesh< dimension >::polyhedra_from_facet(
+    PolyhedraAroundFacet SolidMesh< dimension >::polyhedra_from_facet_vertices(
         PolyhedronFacetVertices facet_vertices ) const
-    {
-        if( const auto facet =
-                polyhedron_facet_from_vertices( std::move( facet_vertices ) ) )
-        {
-            if( const auto adjacent = polyhedron_adjacent( facet.value() ) )
-            {
-                return { facet->polyhedron_id, adjacent.value() };
-            }
-            else
-            {
-                return { facet->polyhedron_id };
-            }
-        }
-        return {};
-    }
-
-    template < index_t dimension >
-    newPolyhedraAroundFacet
-        SolidMesh< dimension >::polyhedra_from_facet_vertices(
-            PolyhedronFacetVertices facet_vertices ) const
     {
         if( const auto facet =
                 polyhedron_facet_from_vertices( std::move( facet_vertices ) ) )
