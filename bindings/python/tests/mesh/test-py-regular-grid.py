@@ -39,11 +39,11 @@ def test_cell_number( grid ):
         raise ValueError( "[Test] Wrong total number of cells along Z" )
 
 def test_cell_size( grid ):
-    if grid.cell_length( 0 ) != 1:
+    if grid.cell_length_in_direction( 0 ) != 1:
         raise ValueError( "[Test] Wrong length of cells along X" )
-    if grid.cell_length( 1 ) != 2:
+    if grid.cell_length_in_direction( 1 ) != 2:
         raise ValueError( "[Test] Wrong length of cells along Y" )
-    if grid.cell_length( 2 ) != 3:
+    if grid.cell_length_in_direction( 2 ) != 3:
         raise ValueError( "[Test] Wrong length of cells along Z" )
     if grid.cell_size() != 6:
         raise ValueError( "[Test] Wrong cell size" )
@@ -133,21 +133,21 @@ def test_vertex_index( grid ):
         raise ValueError( "[Test] Wrong vertex index" )
 
 def test_vertex_on_border( grid ):
-    if not grid.is_vertex_on_border( [ 0, 0, 0 ] ):
+    if not grid.is_vertex_on_border( grid.vertex_index([ 0, 0, 0 ] )):
         raise ValueError( "[Test] Vertex is not on border where it should be." )
-    if not grid.is_vertex_on_border( [ 0, 9, 0 ] ):
+    if not grid.is_vertex_on_border( grid.vertex_index([ 0, 9, 0 ] )):
         raise ValueError( "[Test] Vertex is not on border where it should be." )
-    if grid.is_vertex_on_border( [ 1, 2, 3 ] ):
+    if grid.is_vertex_on_border( grid.vertex_index([ 1, 2, 3 ] )):
         raise ValueError( "[Test] Vertex is on border where it should not be." )
 
 def test_cell_geometry( grid ):
-    if grid.point( [ 0, 0, 0 ] ) != geom.Point3D( [ 1.5, 0, 1 ] ):
+    if grid.point( grid.vertex_index([ 0, 0, 0 ]) ) != geom.Point3D( [ 1.5, 0, 1 ] ):
         raise ValueError( "[Test] Wrong point coordinates" )
-    if grid.point( [ 0, 0, 1 ] ) != geom.Point3D( [ 1.5, 0, 4 ] ):
+    if grid.point( grid.vertex_index([ 0, 0, 1 ]) ) != geom.Point3D( [ 1.5, 0, 4 ] ):
         raise ValueError( "[Test] Wrong point coordinates" )
-    if grid.point( [ 1, 1, 1 ] ) != geom.Point3D( [ 2.5, 2, 4 ] ):
+    if grid.point( grid.vertex_index([ 1, 1, 1 ]) ) != geom.Point3D( [ 2.5, 2, 4 ] ):
         raise ValueError( "[Test] Wrong point coordinates" )
-    if grid.point( [ 2, 1, 4 ] ) != geom.Point3D( [ 3.5, 2, 13 ] ):
+    if grid.point( grid.vertex_index([ 2, 1, 4 ]) ) != geom.Point3D( [ 3.5, 2, 13 ] ):
         raise ValueError( "[Test] Wrong point coordinates" )
 
 def test_cell_query( grid ):
@@ -208,7 +208,7 @@ def test_closest_vertex( grid ):
 def test_clone( grid ):
     attribute_name = "int_attribute"
     attribute_name_d = "double_attribute"
-    attribute = grid.cell_attribute_manager().find_or_create_attribute_variable_int( attribute_name, 0 )
+    attribute = grid.polyhedron_attribute_manager().find_or_create_attribute_variable_int( attribute_name, 0 )
     attribute_d = grid.vertex_attribute_manager().find_or_create_attribute_variable_double( attribute_name_d, 0 )
     for c in range( grid.nb_cells() ):
         attribute.set_value( c, 2 * c )
@@ -217,11 +217,11 @@ def test_clone( grid ):
     clone = grid.clone()
     if clone.origin() != grid.origin():
         raise ValueError( "[Test] Wrong clone origin" )
-    if not clone.cell_attribute_manager().attribute_exists( attribute_name ):
+    if not clone.polyhedron_attribute_manager().attribute_exists( attribute_name ):
         raise ValueError( "[Test] Clone missing attribute" )
     if not clone.vertex_attribute_manager().attribute_exists( attribute_name_d ):
         raise ValueError( "[Test] Clone missing attribute" )
-    clone_attribute = clone.cell_attribute_manager().find_attribute_int( attribute_name )
+    clone_attribute = clone.polyhedron_attribute_manager().find_attribute_int( attribute_name )
     for c in range( clone.nb_cells() ):
         if clone_attribute.value( c ) != 2 * c:
             raise ValueError( "[Test] Wrong clone attribute" )
@@ -235,8 +235,9 @@ def test_io( grid, filename ):
     mesh.load_regular_grid3D( filename )
 
 if __name__ == '__main__':
-    print(dir(mesh))
-    grid = mesh.RegularGrid3D( geom.Point3D( [ 1.5, 0, 1 ] ), [ 5, 10, 15 ], [ 1., 2., 3. ] )
+    grid = mesh.RegularGrid3D.create()
+    builder = mesh.RegularGridBuilder3D.create( grid )
+    builder.initialize_grid( geom.Point3D( [ 1.5, 0, 1 ] ), [ 5, 10, 15 ], [ 1., 2., 3. ] )
     test_cell_number( grid )
     test_cell_size( grid )
     test_cell_index( grid )

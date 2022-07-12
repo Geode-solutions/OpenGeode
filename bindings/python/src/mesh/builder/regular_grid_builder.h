@@ -30,7 +30,8 @@
     pybind11::class_< RegularGridBuilder##dimension##D,                        \
         Base##Builder##dimension##D >( module, name##dimension.c_str() )       \
         .def_static( "create",                                                 \
-            ( std::unique_ptr< RegularGridBuilder##dimension##D >( * )() )     \
+            ( std::unique_ptr< RegularGridBuilder##dimension##D >( * )(        \
+                RegularGrid< dimension >& ) )                                  \
                 & RegularGridBuilder##dimension##D::create )                   \
         .def( "initialize_grid",                                               \
             ( void( RegularGridBuilder##dimension##D::* )(                     \

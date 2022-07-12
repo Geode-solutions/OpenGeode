@@ -31,6 +31,7 @@
 #include "builder/point_set_builder.h"
 #include "builder/polygonal_surface_builder.h"
 #include "builder/polyhedral_solid_builder.h"
+#include "builder/regular_grid_builder.h"
 #include "builder/solid_edges_builder.h"
 #include "builder/solid_facets_builder.h"
 #include "builder/solid_mesh_builder.h"
@@ -165,6 +166,7 @@ PYBIND11_MODULE( opengeode_py_mesh, module )
     geode::define_solid_mesh_builder( module );
     geode::define_solid_edges_builder( module );
     geode::define_solid_facets_builder( module );
+    geode::define_regular_grid_builder( module );
     geode::define_polyhedral_solid_builder( module );
     geode::define_tetrahedral_solid_builder( module );
     geode::define_hybrid_solid_builder( module );
