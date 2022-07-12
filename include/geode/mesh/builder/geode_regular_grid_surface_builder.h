@@ -54,9 +54,14 @@ namespace geode
     private:
         void update_origin( const Point2D& origin ) final;
 
-        void do_set_point( index_t vertex_id, Point2D point ) final;
-
         void do_create_vertices( index_t /*unsued*/ ) final;
+
+        void do_set_point( index_t /*unsued*/, Point2D /*unsued*/ )
+        {
+            throw OpenGeodeException{
+                "[RegularGridBuilder] Cannot use set_point in RegularGrid"
+            };
+        }
 
         void do_create_vertex() final
         {

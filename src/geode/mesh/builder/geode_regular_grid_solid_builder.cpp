@@ -49,12 +49,6 @@ namespace geode
         geode_regular_grid_.update_origin( origin, {} );
     }
 
-    void OpenGeodeRegularGridBuilder< 3 >::do_set_point(
-        index_t vertex_id, Point3D point )
-    {
-        geode_regular_grid_.set_vertex( vertex_id, std::move( point ), {} );
-    }
-
     void OpenGeodeRegularGridBuilder< 3 >::do_create_vertices(
         index_t /*unsued*/ )
     {

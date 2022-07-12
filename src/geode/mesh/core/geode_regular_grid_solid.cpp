@@ -124,12 +124,6 @@ namespace geode
         return impl_->get_point( vertex_id );
     }
 
-    void OpenGeodeRegularGrid< 3 >::set_vertex(
-        index_t vertex_id, Point3D point, OGRegularGridKey )
-    {
-        impl_->set_point( vertex_id, std::move( point ) );
-    }
-
     const Point3D& OpenGeodeRegularGrid< 3 >::origin() const
     {
         return impl_->origin( *this );

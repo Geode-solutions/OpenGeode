@@ -83,8 +83,6 @@ namespace geode
     public:
         void update_origin( const Point2D& origin, OGRegularGridKey );
 
-        void set_vertex( index_t vertex_id, Point2D point, OGRegularGridKey );
-
     private:
         friend class bitsery::Access;
         template < typename Archive >
