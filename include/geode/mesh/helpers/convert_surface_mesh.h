@@ -85,9 +85,6 @@ namespace geode
     std::unique_ptr< SurfaceMesh< dimension > > merge_surface_mesh(
         const SurfaceMesh< dimension >& surface );
 
-    std::unique_ptr< SurfaceMesh3D > opengeode_mesh_api
-        merge_closed_surface_mesh( const SurfaceMesh3D& surface );
-
     template < index_t dimension >
     std::unique_ptr< SurfaceMesh< dimension > > merge_surface_meshes(
         const std::vector<

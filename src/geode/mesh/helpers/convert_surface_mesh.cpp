@@ -102,22 +102,6 @@ namespace
             input.polygon_attribute_manager() );
     }
 
-    template < geode::index_t dimension >
-    bool has_borders( const geode::SurfaceMesh< dimension >& mesh )
-    {
-        for( const auto p : geode::Range{ mesh.nb_polygons() } )
-        {
-            for( const auto e : geode::LRange{ mesh.nb_polygon_edges( p ) } )
-            {
-                if( mesh.is_edge_on_border( { p, e } ) )
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     template < typename SurfaceIn, typename SurfaceOut >
     void copy_surface_attributes(
         const SurfaceIn& surface_in, const SurfaceOut& surface_out )
@@ -275,23 +259,6 @@ namespace geode
         const SurfaceMesh< dimension >& surface )
     {
         return merge_surface_meshes< dimension >( { surface } );
-    }
-
-    std::unique_ptr< SurfaceMesh3D > merge_closed_surface_mesh(
-        const SurfaceMesh3D& surface )
-    {
-        auto epsilon = global_epsilon;
-        std::vector< std::reference_wrapper< const SurfaceMesh3D > > surfaces{
-            surface
-        };
-        auto merged = merge_surface_meshes( surfaces );
-        while( has_borders( *merged ) )
-        {
-            epsilon *= 10;
-            detail::SurfaceMeshMerger< 3 > merger{ surfaces, epsilon };
-            merged = merger.merge();
-        }
-        return merged;
     }
 
     template < index_t dimension >
