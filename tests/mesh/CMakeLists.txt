@@ -40,7 +40,7 @@ add_geode_test(
         ${PROJECT_NAME}::mesh
 )
 add_geode_test(
-    SOURCE "test-nnsearch-point-set.cpp"
+    SOURCE "test-convert-surface.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
@@ -54,15 +54,42 @@ add_geode_test(
         ${PROJECT_NAME}::mesh
 )
 add_geode_test(
+    SOURCE "test-geometrical-operations-on-mesh.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
     SOURCE "test-graph.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::mesh
 )
 add_geode_test(
+    SOURCE "test-hybrid-solid.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
+    SOURCE "test-merge-surface.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
     SOURCE "test-mesh-factory.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
+    SOURCE "test-nnsearch-point-set.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
         ${PROJECT_NAME}::mesh
 )
 add_geode_test(
@@ -74,13 +101,6 @@ add_geode_test(
 )
 add_geode_test(
     SOURCE "test-polygonal-surface.cpp"
-    DEPENDENCIES
-        ${PROJECT_NAME}::basic
-        ${PROJECT_NAME}::geometry
-        ${PROJECT_NAME}::mesh
-)
-add_geode_test(
-    SOURCE "test-hybrid-solid.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
@@ -183,12 +203,6 @@ add_geode_test(
 )
 add_geode_test(
     SOURCE "test-vertex-set.cpp"
-    DEPENDENCIES
-        ${PROJECT_NAME}::basic
-        ${PROJECT_NAME}::mesh
-)
-add_geode_test(
-    SOURCE "test-geometrical-operations-on-mesh.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::mesh
