@@ -34,5 +34,22 @@ namespace geode
                 &convert_surface_mesh_into_triangulated_surface< 2 > )
             .def( "convert_surface_mesh_into_triangulated_surface3D",
                 &convert_surface_mesh_into_triangulated_surface< 3 > );
+        module.def(
+            "convert_surface_mesh2d_into_3d", &convert_surface_mesh2d_into_3d );
+        module.def(
+            "convert_surface_mesh3d_into_2d", &convert_surface_mesh3d_into_2d );
+        module.def( "convert_polygonal_surface2d_into_3d",
+            &convert_polygonal_surface2d_into_3d );
+        module.def( "convert_polygonal_surface3d_into_2d",
+            &convert_polygonal_surface3d_into_2d );
+        module.def( "convert_triangulated_surface2d_into_3d",
+            &convert_triangulated_surface2d_into_3d );
+        module.def( "convert_triangulated_surface3d_into_2d",
+            &convert_triangulated_surface3d_into_2d );
+        module.def( "merge_surface_mesh2D", &merge_surface_mesh< 2 > );
+        module.def( "merge_surface_mesh3D", &merge_surface_mesh< 3 > );
+        module.def( "merge_closed_surface_mesh", &merge_closed_surface_mesh );
+        module.def( "merge_surface_meshes2D", &merge_surface_meshes< 2 > );
+        module.def( "merge_surface_meshes3D", &merge_surface_meshes< 3 > );
     }
 } // namespace geode

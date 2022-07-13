@@ -28,9 +28,13 @@
 
 #include <geode/geometry/point.h>
 
-#include <geode/mesh/builder/surface_mesh_builder.h>
+#include <geode/mesh/builder/polygonal_surface_builder.h>
+#include <geode/mesh/builder/triangulated_surface_builder.h>
 #include <geode/mesh/core/polygonal_surface.h>
+#include <geode/mesh/core/surface_edges.h>
 #include <geode/mesh/core/triangulated_surface.h>
+#include <geode/mesh/helpers/detail/surface_merger.h>
+#include <geode/mesh/helpers/private/copy.h>
 
 namespace
 {
@@ -58,6 +62,33 @@ namespace
         return true;
     }
 
+    template < typename Surface, typename Builder >
+    void copy_polygons( const Surface& surface, Builder& builder )
+    {
+        for( const auto p : geode::Range{ surface.nb_polygons() } )
+        {
+            absl::FixedArray< geode::index_t > vertices(
+                surface.nb_polygon_vertices( p ) );
+            for( const auto v :
+                geode::LRange{ surface.nb_polygon_vertices( p ) } )
+            {
+                vertices[v] = surface.polygon_vertex( { p, v } );
+            }
+            builder.create_polygon( vertices );
+        }
+        for( const auto p : geode::Range{ surface.nb_polygons() } )
+        {
+            for( const auto e : geode::LRange{ surface.nb_polygon_edges( p ) } )
+            {
+                const geode::PolygonEdge edge{ p, e };
+                if( const auto adj = surface.polygon_adjacent( edge ) )
+                {
+                    builder.set_polygon_adjacent( edge, adj.value() );
+                }
+            }
+        }
+    }
+
     template < geode::index_t dimension >
     void convert_surface( const geode::SurfaceMesh< dimension >& input,
         geode::SurfaceMesh< dimension >& output )
@@ -66,30 +97,42 @@ namespace
         copy_points( input, *builder );
         output.vertex_attribute_manager().copy(
             input.vertex_attribute_manager() );
-        for( const auto p : geode::Range{ input.nb_polygons() } )
+        copy_polygons( input, *builder );
+        output.polygon_attribute_manager().copy(
+            input.polygon_attribute_manager() );
+    }
+
+    template < geode::index_t dimension >
+    bool has_borders( const geode::SurfaceMesh< dimension >& mesh )
+    {
+        for( const auto p : geode::Range{ mesh.nb_polygons() } )
         {
-            absl::FixedArray< geode::index_t > vertices(
-                input.nb_polygon_vertices( p ) );
-            for( const auto v :
-                geode::LRange{ input.nb_polygon_vertices( p ) } )
+            for( const auto e : geode::LRange{ mesh.nb_polygon_edges( p ) } )
             {
-                vertices[v] = input.polygon_vertex( { p, v } );
-            }
-            builder->create_polygon( vertices );
-        }
-        for( const auto p : geode::Range{ input.nb_polygons() } )
-        {
-            for( const auto e : geode::LRange{ input.nb_polygon_edges( p ) } )
-            {
-                const geode::PolygonEdge edge{ p, e };
-                if( const auto adjacent = input.polygon_adjacent( edge ) )
+                if( mesh.is_edge_on_border( { p, e } ) )
                 {
-                    builder->set_polygon_adjacent( edge, adjacent.value() );
+                    return true;
                 }
             }
         }
-        output.polygon_attribute_manager().copy(
-            input.polygon_attribute_manager() );
+        return false;
+    }
+
+    template < typename SurfaceIn, typename SurfaceOut >
+    void copy_surface_attributes(
+        const SurfaceIn& surface_in, const SurfaceOut& surface_out )
+    {
+        geode::detail::copy_attributes( surface_in.vertex_attribute_manager(),
+            surface_out.vertex_attribute_manager() );
+        geode::detail::copy_attributes( surface_in.polygon_attribute_manager(),
+            surface_out.polygon_attribute_manager() );
+        if( surface_in.are_edges_enabled() )
+        {
+            surface_out.enable_edges();
+            geode::detail::copy_attributes(
+                surface_in.edges().edge_attribute_manager(),
+                surface_out.edges().edge_attribute_manager() );
+        }
     }
 } // namespace
 
@@ -157,6 +200,111 @@ namespace geode
         builder.compute_polygon_adjacencies();
     }
 
+    std::unique_ptr< SurfaceMesh3D > convert_surface_mesh2d_into_3d(
+        const SurfaceMesh2D& surface2d, index_t axis_to_add )
+    {
+        auto surface3d = SurfaceMesh3D::create();
+        auto builder3d = SurfaceMeshBuilder3D::create( *surface3d );
+        detail::copy_points2d_into_3d( surface2d, *builder3d, axis_to_add );
+        copy_polygons( surface2d, *builder3d );
+        copy_surface_attributes( surface2d, *surface3d );
+        return surface3d;
+    }
+
+    std::unique_ptr< SurfaceMesh2D > convert_surface_mesh3d_into_2d(
+        const SurfaceMesh3D& surface3d, index_t axis_to_remove )
+    {
+        auto surface2d = SurfaceMesh2D::create();
+        auto builder2d = SurfaceMeshBuilder2D::create( *surface2d );
+        detail::copy_points3d_into_2d( surface3d, *builder2d, axis_to_remove );
+        copy_polygons( surface3d, *builder2d );
+        copy_surface_attributes( surface3d, *surface2d );
+        return surface2d;
+    }
+
+    std::unique_ptr< PolygonalSurface3D > convert_polygonal_surface2d_into_3d(
+        const PolygonalSurface2D& surface2d, index_t axis_to_add )
+    {
+        auto surface3d = PolygonalSurface3D::create();
+        auto builder3d = PolygonalSurfaceBuilder3D::create( *surface3d );
+        detail::copy_points2d_into_3d( surface2d, *builder3d, axis_to_add );
+        copy_polygons( surface2d, *builder3d );
+        copy_surface_attributes( surface2d, *surface3d );
+        return surface3d;
+    }
+
+    std::unique_ptr< PolygonalSurface2D > convert_polygonal_surface3d_into_2d(
+        const PolygonalSurface3D& surface3d, index_t axis_to_remove )
+    {
+        auto surface2d = PolygonalSurface2D::create();
+        auto builder2d = PolygonalSurfaceBuilder2D::create( *surface2d );
+
+        detail::copy_points3d_into_2d( surface3d, *builder2d, axis_to_remove );
+        copy_polygons( surface3d, *builder2d );
+        copy_surface_attributes( surface3d, *surface2d );
+        return surface2d;
+    }
+
+    std::unique_ptr< TriangulatedSurface3D >
+        convert_triangulated_surface2d_into_3d(
+            const TriangulatedSurface2D& surface2d, index_t axis_to_add )
+    {
+        auto surface3d = TriangulatedSurface3D::create();
+        auto builder3d = TriangulatedSurfaceBuilder3D::create( *surface3d );
+        detail::copy_points2d_into_3d( surface2d, *builder3d, axis_to_add );
+        copy_polygons( surface2d, *builder3d );
+        copy_surface_attributes( surface2d, *surface3d );
+        return surface3d;
+    }
+
+    std::unique_ptr< TriangulatedSurface2D >
+        convert_triangulated_surface3d_into_2d(
+            const TriangulatedSurface3D& surface3d, index_t axis_to_remove )
+    {
+        auto surface2d = TriangulatedSurface2D::create();
+        auto builder2d = TriangulatedSurfaceBuilder2D::create( *surface2d );
+
+        detail::copy_points3d_into_2d( surface3d, *builder2d, axis_to_remove );
+        copy_polygons( surface3d, *builder2d );
+        copy_surface_attributes( surface3d, *surface2d );
+        return surface2d;
+    }
+
+    template < index_t dimension >
+    std::unique_ptr< SurfaceMesh< dimension > > merge_surface_mesh(
+        const SurfaceMesh< dimension >& surface )
+    {
+        return merge_surface_meshes< dimension >( { surface } );
+    }
+
+    std::unique_ptr< SurfaceMesh3D > merge_closed_surface_mesh(
+        const SurfaceMesh3D& surface )
+    {
+        auto epsilon = global_epsilon;
+        std::vector< std::reference_wrapper< const SurfaceMesh3D > > surfaces{
+            surface
+        };
+        auto merged = merge_surface_meshes( surfaces );
+        while( has_borders( *merged ) )
+        {
+            epsilon *= 10;
+            detail::SurfaceMeshMerger< 3 > merger{ surfaces, epsilon };
+            merged = merger.merge();
+        }
+        return merged;
+    }
+
+    template < index_t dimension >
+    std::unique_ptr< SurfaceMesh< dimension > > merge_surface_meshes(
+        const std::vector<
+            std::reference_wrapper< const SurfaceMesh< dimension > > >&
+            surfaces )
+    {
+        detail::SurfaceMeshMerger< dimension > merger{ surfaces,
+            global_epsilon };
+        return merger.merge();
+    }
+
     template absl::optional< std::unique_ptr< TriangulatedSurface2D > >
         opengeode_mesh_api convert_surface_mesh_into_triangulated_surface(
             const SurfaceMesh2D& );
@@ -172,4 +320,15 @@ namespace geode
     template void opengeode_mesh_api triangulate_surface_mesh(
         const SurfaceMesh3D&, SurfaceMeshBuilder3D& );
 
+    template std::unique_ptr< SurfaceMesh< 2 > >
+        opengeode_mesh_api merge_surface_mesh( const SurfaceMesh< 2 >& );
+    template std::unique_ptr< SurfaceMesh< 3 > >
+        opengeode_mesh_api merge_surface_mesh( const SurfaceMesh< 3 >& );
+
+    template std::unique_ptr< SurfaceMesh< 2 > >
+        opengeode_mesh_api merge_surface_meshes( const std::vector<
+            std::reference_wrapper< const SurfaceMesh< 2 > > >& );
+    template std::unique_ptr< SurfaceMesh< 3 > >
+        opengeode_mesh_api merge_surface_meshes( const std::vector<
+            std::reference_wrapper< const SurfaceMesh< 3 > > >& );
 } // namespace geode

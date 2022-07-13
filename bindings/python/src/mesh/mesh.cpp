@@ -56,6 +56,8 @@
 #include "core/triangulated_surface.h"
 #include "core/vertex_set.h"
 
+#include "helpers/convert_edged_curve.h"
+#include "helpers/convert_point_set.h"
 #include "helpers/convert_solid_mesh.h"
 #include "helpers/convert_surface_mesh.h"
 #include "helpers/geometrical_operations_on_mesh.h"
@@ -169,6 +171,8 @@ PYBIND11_MODULE( opengeode_py_mesh, module )
     geode::define_tetrahedral_solid_builder( module );
     geode::define_hybrid_solid_builder( module );
 
+    geode::define_convert_edged_curve( module );
+    geode::define_convert_point_set( module );
     geode::define_convert_surface_mesh( module );
     geode::define_convert_solid_mesh( module );
     geode::geometrical_operations_on_mesh( module );
