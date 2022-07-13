@@ -87,11 +87,6 @@ namespace
                     facet.polyhedron_id == adj_facet.polyhedron_id,
                     "[TetrahedralSolid3D::propagate_around_edge] Next "
                     "facet not found" );
-                if( facet.polyhedron_id != adj_facet.polyhedron_id )
-                {
-                    DEBUG( "FAILED" );
-                    exit( 1 );
-                }
             }
             else
             {
