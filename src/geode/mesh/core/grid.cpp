@@ -71,12 +71,7 @@ namespace geode
                 nb_vertices_double < static_cast< double >( UINT_MAX ),
                 "[Grid] Creation of a grid for which the number of cell "
                 "vertices exceeds the unsigned int limit." );
-            index_t nb_cells{ 1 };
-            for( const auto c : cells_number )
-            {
-                nb_cells *= c;
-            }
-            OPENGEODE_EXCEPTION( nb_cells != 0,
+            OPENGEODE_EXCEPTION( nb_cells() != 0,
                 "[Grid] Creation of a grid with no cells "
                 "in one direction." );
         }

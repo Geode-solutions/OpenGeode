@@ -35,6 +35,8 @@
 #include <geode/mesh/core/geode_point_set.h>
 #include <geode/mesh/core/geode_polygonal_surface.h>
 #include <geode/mesh/core/geode_polyhedral_solid.h>
+#include <geode/mesh/core/geode_regular_grid_solid.h>
+#include <geode/mesh/core/geode_regular_grid_surface.h>
 #include <geode/mesh/core/geode_tetrahedral_solid.h>
 #include <geode/mesh/core/geode_triangulated_surface.h>
 #include <geode/mesh/core/geode_vertex_set.h>
@@ -97,7 +99,8 @@ namespace bitsery
         template <>
         struct PolymorphicBaseClass< geode::SurfaceMesh2D >
             : PolymorphicDerivedClasses< geode::PolygonalSurface2D,
-                  geode::TriangulatedSurface2D >
+                  geode::TriangulatedSurface2D,
+                  geode::RegularGrid2D >
         {
         };
 
@@ -133,10 +136,17 @@ namespace bitsery
         };
 
         template <>
+        struct PolymorphicBaseClass< geode::RegularGrid2D >
+            : PolymorphicDerivedClasses< geode::OpenGeodeRegularGrid2D >
+        {
+        };
+
+        template <>
         struct PolymorphicBaseClass< geode::SolidMesh3D >
             : PolymorphicDerivedClasses< geode::PolyhedralSolid3D,
                   geode::TetrahedralSolid3D,
-                  geode::HybridSolid3D >
+                  geode::HybridSolid3D,
+                  geode::RegularGrid3D >
         {
         };
 
@@ -149,6 +159,12 @@ namespace bitsery
         template <>
         struct PolymorphicBaseClass< geode::TetrahedralSolid3D >
             : PolymorphicDerivedClasses< geode::OpenGeodeTetrahedralSolid3D >
+        {
+        };
+
+        template <>
+        struct PolymorphicBaseClass< geode::RegularGrid3D >
+            : PolymorphicDerivedClasses< geode::OpenGeodeRegularGrid3D >
         {
         };
 
@@ -181,6 +197,9 @@ namespace bitsery
             geode::TriangulatedSurface3D, "TriangulatedSurface3D" );
         BITSERY_CLASS_NAME( geode::OpenGeodeTriangulatedSurface3D,
             "OpenGeodeTriangulatedSurface3D" );
+        BITSERY_CLASS_NAME( geode::RegularGrid2D, "RegularGrid2D" );
+        BITSERY_CLASS_NAME(
+            geode::OpenGeodeRegularGrid2D, "OpenGeodeRegularGrid2D" );
         BITSERY_CLASS_NAME( geode::SolidMesh3D, "SolidMesh3D" );
         BITSERY_CLASS_NAME( geode::PolyhedralSolid3D, "PolyhedralSolid3D" );
         BITSERY_CLASS_NAME(
@@ -191,6 +210,9 @@ namespace bitsery
         BITSERY_CLASS_NAME( geode::HybridSolid3D, "HybridSolid3D" );
         BITSERY_CLASS_NAME(
             geode::OpenGeodeHybridSolid3D, "OpenGeodeHybridSolid3D" );
+        BITSERY_CLASS_NAME( geode::RegularGrid3D, "RegularGrid3D" );
+        BITSERY_CLASS_NAME(
+            geode::OpenGeodeRegularGrid3D, "OpenGeodeRegularGrid3D" );
     } // namespace ext
 } // namespace bitsery
 

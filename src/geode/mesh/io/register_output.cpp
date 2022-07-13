@@ -66,20 +66,13 @@ namespace geode
         GraphOutputFactory::register_creator< OpenGeodeGraphOutput >(
             OpenGeodeGraph::native_extension_static().data() );
 
-        BITSERY_OUTPUT_MESH_REGISTER_2D_3D( PointSet );
         BITSERY_OUTPUT_MESH_REGISTER_2D_3D( EdgedCurve );
+        BITSERY_OUTPUT_MESH_REGISTER_2D_3D( PointSet );
         BITSERY_OUTPUT_MESH_REGISTER_2D_3D( PolygonalSurface );
+        BITSERY_OUTPUT_MESH_REGISTER_2D_3D( RegularGrid );
         BITSERY_OUTPUT_MESH_REGISTER_2D_3D( TriangulatedSurface );
+        BITSERY_OUTPUT_MESH_REGISTER_3D( HybridSolid );
         BITSERY_OUTPUT_MESH_REGISTER_3D( PolyhedralSolid );
         BITSERY_OUTPUT_MESH_REGISTER_3D( TetrahedralSolid );
-        BITSERY_OUTPUT_MESH_REGISTER_3D( HybridSolid );
-
-        RegularGridOutputFactory2D::register_creator<
-            OpenGeodeRegularGridOutput2D >(
-            RegularGrid2D ::native_extension_static().data() );
-
-        RegularGridOutputFactory3D::register_creator<
-            OpenGeodeRegularGridOutput3D >(
-            RegularGrid3D ::native_extension_static().data() );
     }
 } // namespace geode

@@ -56,7 +56,7 @@ namespace geode
         grid_.polygon_attribute_manager().resize( grid_.nb_cells() );
         for( const auto p : Range{ grid_.nb_polygons() } )
         {
-            for( const auto v : LRange{ grid_.nb_polygon_vertices( p ) } )
+            for( const auto v : LRange{ 4 } )
             {
                 associate_polygon_vertex_to_vertex(
                     { p, v }, grid_.polygon_vertex( { p, v } ) );

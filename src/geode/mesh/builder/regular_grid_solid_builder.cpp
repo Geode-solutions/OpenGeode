@@ -55,7 +55,7 @@ namespace geode
         grid_.polyhedron_attribute_manager().resize( grid_.nb_cells() );
         for( const auto p : Range{ grid_.nb_polyhedra() } )
         {
-            for( const auto v : LRange{ grid_.nb_polyhedron_vertices( p ) } )
+            for( const auto v : LRange{ 8 } )
             {
                 associate_polyhedron_vertex_to_vertex(
                     { p, v }, grid_.polyhedron_vertex( { p, v } ) );

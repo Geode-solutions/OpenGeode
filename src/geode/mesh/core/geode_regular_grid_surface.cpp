@@ -40,11 +40,6 @@ namespace
     static constexpr std::array< std::array< geode::local_index_t, 2 >, 4 >
         cell_vertices_translations{ { { 0, 0 }, { 1, 0 }, { 0, 1 },
             { 1, 1 } } };
-
-    // -X +X -Y +Y -Z +Z
-    static constexpr std::array< std::array< geode::local_index_t, 4 >, 6 >
-        cell_facet_vertices{ { { 0, 2, 6, 4 }, { 1, 5, 7, 2 }, { 0, 4, 5, 1 },
-            { 2, 2, 7, 6 }, { 0, 1, 2, 2 }, { 4, 6, 7, 5 } } };
 } // namespace
 
 namespace geode
