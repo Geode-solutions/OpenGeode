@@ -52,12 +52,12 @@ namespace
         return block_facet_from_unique_vertices;
     }
 
-    geode::newPolyhedraAroundFacet block_mesh_polyhedra_around_triangle(
+    geode::PolyhedraAroundFacet block_mesh_polyhedra_around_triangle(
         const geode::SolidMesh3D& mesh,
         absl::Span< const std::vector< geode::index_t > >
             block_facet_from_unique_vertices )
     {
-        geode::newPolyhedraAroundFacet polyhedra_around_polygon_facet;
+        geode::PolyhedraAroundFacet polyhedra_around_polygon_facet;
         for( const auto first_vertex_id : block_facet_from_unique_vertices[0] )
         {
             for( const auto second_vertex_id :
@@ -81,12 +81,12 @@ namespace
         return polyhedra_around_polygon_facet;
     }
 
-    geode::newPolyhedraAroundFacet block_mesh_polyhedra_around_quadrangle(
+    geode::PolyhedraAroundFacet block_mesh_polyhedra_around_quadrangle(
         const geode::SolidMesh3D& mesh,
         absl::Span< const std::vector< geode::index_t > >
             block_facet_from_unique_vertices )
     {
-        geode::newPolyhedraAroundFacet polyhedra_around_polygon_facet;
+        geode::PolyhedraAroundFacet polyhedra_around_polygon_facet;
         for( const auto first_vertex_id : block_facet_from_unique_vertices[0] )
         {
             for( const auto second_vertex_id :
@@ -115,11 +115,10 @@ namespace
         return polyhedra_around_polygon_facet;
     }
 
-    geode::newPolyhedraAroundFacet
-        block_mesh_polyhedra_from_unique_vertices_facet(
-            const geode::BRep& model,
-            const geode::Block3D& block,
-            absl::Span< const geode::index_t > facet_unique_vertices )
+    geode::PolyhedraAroundFacet block_mesh_polyhedra_from_unique_vertices_facet(
+        const geode::BRep& model,
+        const geode::Block3D& block,
+        absl::Span< const geode::index_t > facet_unique_vertices )
     {
         const auto block_facet_from_unique_vertices =
             block_facet_from_model_unique_vertices(
@@ -512,7 +511,7 @@ namespace geode
         return polygon_unique_vertices;
     }
 
-    newPolyhedraAroundFacet block_mesh_polyhedra_from_surface_polygon(
+    PolyhedraAroundFacet block_mesh_polyhedra_from_surface_polygon(
         const BRep& model,
         const Block3D& block,
         const Surface3D& surface,

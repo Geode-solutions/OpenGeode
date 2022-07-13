@@ -22,6 +22,8 @@ XXXX
 
 - **ComponentMeshQueries**: `component_mesh_queries.h` has been renamed `component_mesh_polygons.h` and `surface_polygon_unique_vertices` has been renamed `polygon_unique_vertices`.
 
+- **SolidMesh**: `polyhedra_from_facet` has been renamed `polyhedra_from_facet_vertices` and `PolyhedraAroundFacet` is storing `PolyhedronFacet` instead of `index_t`.
+
 ## Upgrading from OpenGeode v9.x.x to v10.0.0
 
 ### Motivations

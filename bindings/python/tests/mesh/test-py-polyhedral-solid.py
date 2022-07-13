@@ -99,17 +99,17 @@ def test_polyhedron_adjacencies( polyhedral_solid, builder ):
     edge_id = polyhedral_solid.edges().edge_from_vertices( [ 5, 4 ] )
     if edge_id != 8:
         raise ValueError( "[Test] Wrong edge index from vertices" )
-    if len( polyhedral_solid.polyhedra_around_edge(  [ 5, 4 ]) ) != 3:
+    if len( polyhedral_solid.polyhedra_around_edge( [ 5, 4 ]) ) != 3:
         raise ValueError( "[Test] PolyhedralSolid should have 3 polyhedra around this edge" )
     facet_id = polyhedral_solid.facets().facet_from_vertices(
         polyhedral_solid.polyhedron_facet_vertices( mesh.PolyhedronFacet( 1, 0 ) ) )
-    polyhedra = polyhedral_solid.polyhedra_from_facet( polyhedral_solid.facets().facet_vertices( facet_id ) )
+    polyhedra = polyhedral_solid.polyhedra_from_facet_vertices( polyhedral_solid.facets().facet_vertices( facet_id ) )
     if len( polyhedra ) != 2:
         raise ValueError( "[Test] Wrong number of polyhedra from facet" )
-    if not 1 in polyhedra:
-        raise ValueError( "[Test] Polyhedra from facet should contain 1" )
-    if not 2 in polyhedra:
-        raise ValueError( "[Test] Polyhedra from facet should contain 2" )
+    if not mesh.PolyhedronFacet( 1, 0 ) in polyhedra:
+        raise ValueError( "[Test] Polyhedra from facet should contain (1, 0)" )
+    if not mesh.PolyhedronFacet( 2, 3 ) in polyhedra:
+        raise ValueError( "[Test] Polyhedra from facet should contain (2, 3)" )
 
 
 def test_delete_polyhedra( polyhedral_solid, builder ):

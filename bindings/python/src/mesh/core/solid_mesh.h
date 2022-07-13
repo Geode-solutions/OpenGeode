@@ -100,8 +100,8 @@
             ( PolyhedraAroundEdge( SolidMesh##dimension##D::* )(               \
                 const std::array< index_t, 2 >&, index_t ) const )             \
                 & SolidMesh##dimension##D::polyhedra_around_edge )             \
-        .def( "polyhedra_from_facet",                                          \
-            &SolidMesh##dimension##D::polyhedra_from_facet )                   \
+        .def( "polyhedra_from_facet_vertices",                                 \
+            &SolidMesh##dimension##D::polyhedra_from_facet_vertices )          \
         .def( "polyhedron_attribute_manager",                                  \
             &SolidMesh##dimension##D::polyhedron_attribute_manager,            \
             pybind11::return_value_policy::reference )                         \
