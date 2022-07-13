@@ -23,6 +23,8 @@
 
 #include <geode/mesh/builder/regular_grid_surface_builder.h>
 
+#include <geode/basic/attribute_manager.h>
+
 #include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/core/regular_grid_surface.h>
 
@@ -48,6 +50,18 @@ namespace geode
     {
         set_grid_dimensions(
             std::move( cells_number ), std::move( cells_length ) );
+        grid_.vertex_attribute_manager().resize(
+            grid_.nb_vertices_in_direction( 0 )
+            * grid_.nb_vertices_in_direction( 1 ) );
+        grid_.polygon_attribute_manager().resize( grid_.nb_cells() );
+        for( const auto p : Range{ grid_.nb_polygons() } )
+        {
+            for( const auto v : LRange{ grid_.nb_polygon_vertices( p ) } )
+            {
+                associate_polygon_vertex_to_vertex(
+                    { p, v }, grid_.polygon_vertex( { p, v } ) );
+            }
+        }
         update_origin( origin );
     }
 
