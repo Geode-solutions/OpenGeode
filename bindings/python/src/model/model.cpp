@@ -61,6 +61,7 @@
 #include "representation/io/section.h"
 
 #include "helpers/component_mesh_polygons.h"
+#include "helpers/convert_brep_section.h"
 #include "helpers/convert_model_meshes.h"
 #include "helpers/convert_to_mesh.h"
 #include "helpers/model_component_filter.h"
@@ -162,6 +163,7 @@ PYBIND11_MODULE( opengeode_py_model, module )
     geode::define_brep_io( module );
     geode::define_section_io( module );
 
+    geode::define_convert_brep_section( module );
     geode::define_convert_model_meshes( module );
     geode::define_convert_to_mesh( module );
     geode::define_component_mesh_polygons( module );

@@ -22,9 +22,10 @@ add_geode_python_binding(
     NAME "py_model"
     SOURCES
         "model.cpp"
+        "helpers/component_mesh_polygons.h"
+        "helpers/convert_brep_section.h"
         "helpers/convert_model_meshes.h"
         "helpers/convert_to_mesh.h"
-        "helpers/component_mesh_polygons.h"
         "helpers/model_component_filter.h"
         "mixin/builder/blocks_builder.h"
         "mixin/builder/corners_builder.h"
