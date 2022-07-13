@@ -250,10 +250,8 @@ namespace geode
             {
                 continue;
             }
-            // DEBUG( f );
             const auto status = propagate_around_edge(
                 *this, { first_polyhedron, f }, vertices, result );
-            // DEBUG( result.size() );
             if( !status.first )
             {
                 return polyhedra_around_edge( vertices );
@@ -261,7 +259,6 @@ namespace geode
             if( status.second )
             {
                 result.pop_back();
-                // DEBUG( result.size() );
                 return result;
             }
         }
