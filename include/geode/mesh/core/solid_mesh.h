@@ -472,6 +472,14 @@ namespace geode
             const PolyhedronFacetEdge& edge ) const;
 
         /*!
+         * Get one polyhedron with both edge vertices.
+         * @param[in] vertices Indices of edge vertices.
+         * @pre This function needs that polyhedron adjacencies are computed
+         */
+        absl::optional< index_t > polyhedron_around_edge(
+            const std::array< index_t, 2 >& vertices ) const;
+
+        /*!
          * Get all the polyhedra with both edge vertices.
          * @param[in] vertices Indices of edge vertices.
          * @param[in] first_polyhedron One polyhedron index to begin research.

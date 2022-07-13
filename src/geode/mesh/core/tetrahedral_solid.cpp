@@ -33,7 +33,7 @@
 namespace
 {
     template < geode::index_t dimension >
-    bool propagate_around_edge(
+    std::pair< bool, bool > propagate_around_edge(
         const geode::TetrahedralSolid< dimension >& solid,
         geode::PolyhedronFacet facet,
         const std::array< geode::index_t, 2 >& edge_vertices,
@@ -46,27 +46,54 @@ namespace
             {
                 const auto adj_facet = adj.value();
                 result.push_back( adj_facet.polyhedron_id );
-
-                const auto v0 =
-                    solid
-                        .vertex_in_polyhedron(
-                            adj_facet.polyhedron_id, edge_vertices[0] )
-                        .value();
-                const auto v1 =
-                    solid
-                        .vertex_in_polyhedron(
-                            adj_facet.polyhedron_id, edge_vertices[1] )
-                        .value();
-                facet = { adj_facet.polyhedron_id,
-                    static_cast< geode::local_index_t >(
-                        6 - v0 - v1 - adj_facet.facet_id ) };
+                absl::InlinedVector< geode::local_index_t, 1 > v0;
+                absl::InlinedVector< geode::local_index_t, 1 > v1;
+                for( const auto v : geode::LRange{ 4 } )
+                {
+                    if( solid.polyhedron_vertex(
+                            { adj_facet.polyhedron_id, v } )
+                        == edge_vertices[0] )
+                    {
+                        v0.push_back( v );
+                    }
+                    else if( solid.polyhedron_vertex(
+                                 { adj_facet.polyhedron_id, v } )
+                             == edge_vertices[1] )
+                    {
+                        v1.push_back( v );
+                    }
+                }
+                if( v0.size() != 1 || v1.size() != 1 )
+                {
+                    return std::make_pair( false, false );
+                }
+                for( const auto f : geode::LRange{ 4 } )
+                {
+                    if( f == adj_facet.facet_id )
+                    {
+                        continue;
+                    }
+                    const auto vertex_id = solid.polyhedron_vertex(
+                        { adj_facet.polyhedron_id, f } );
+                    if( vertex_id == edge_vertices[0]
+                        || vertex_id == edge_vertices[1] )
+                    {
+                        continue;
+                    }
+                    facet = { adj_facet.polyhedron_id, f };
+                    break;
+                }
+                OPENGEODE_ASSERT(
+                    facet.polyhedron_id == adj_facet.polyhedron_id,
+                    "[TetrahedralSolid3D::propagate_around_edge] Next "
+                    "facet not found" );
             }
             else
             {
-                return false;
+                return std::make_pair( true, false );
             }
         } while( facet.polyhedron_id != first_polyhedron );
-        return true;
+        return std::make_pair( true, true );
     }
 } // namespace
 
@@ -176,10 +203,16 @@ namespace geode
         for( const auto& polyhedron :
             this->polyhedra_around_vertex( vertices[0] ) )
         {
-            if( this->vertex_in_polyhedron(
-                    polyhedron.polyhedron_id, vertices[1] ) )
+            for( const auto v : LRange{ 4 } )
             {
-                result.push_back( polyhedron.polyhedron_id );
+                if( v != polyhedron.vertex_id
+                    && this->polyhedron_vertex(
+                           { polyhedron.polyhedron_id, v } )
+                           == vertices[1] )
+                {
+                    result.push_back( polyhedron.polyhedron_id );
+                    break;
+                }
             }
         }
         return result;
@@ -206,14 +239,34 @@ namespace geode
             {
                 continue;
             }
-            if( propagate_around_edge(
-                    *this, { first_polyhedron, f }, vertices, result ) )
+            const auto vertex_id =
+                this->polyhedron_vertex( { first_polyhedron, f } );
+            if( vertex_id == vertices[0] || vertex_id == vertices[1] )
+            {
+                continue;
+            }
+            const auto status = propagate_around_edge(
+                *this, { first_polyhedron, f }, vertices, result );
+            if( !status.first )
+            {
+                return polyhedra_around_edge( vertices );
+            }
+            if( status.second )
             {
                 result.pop_back();
                 return result;
             }
         }
         return result;
+    }
+
+    template < index_t dimension >
+    PolyhedraAroundEdge TetrahedralSolid< dimension >::polyhedra_around_edge(
+        const PolyhedronFacetEdge& edge ) const
+    {
+        return polyhedra_around_edge(
+            this->polyhedron_facet_edge_vertices( edge ),
+            edge.polyhedron_facet.polyhedron_id );
     }
 
     template < index_t dimension >

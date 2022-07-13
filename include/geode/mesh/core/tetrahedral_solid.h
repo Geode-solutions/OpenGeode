@@ -78,6 +78,9 @@ namespace geode
             const std::array< index_t, 2 >& vertices,
             index_t first_polyhedron ) const final;
 
+        PolyhedraAroundEdge polyhedra_around_edge(
+            const PolyhedronFacetEdge& edge ) const final;
+
         /*!
          * Return the local indices of the two facets incident to the
          * edge in tetrahedron.
