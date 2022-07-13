@@ -87,14 +87,6 @@ void test()
         !merged->polygon_adjacent( { 0, 1 } ), "[Test] Wrong adjacency" );
     OPENGEODE_EXCEPTION(
         !merged->polygon_adjacent( { 3, 2 } ), "[Test] Wrong adjacency" );
-
-    const auto closed = geode::load_triangulated_surface< 3 >(
-        absl::StrCat( geode::data_path, "closed.og_tsf3d" ) );
-    auto closed_merged = geode::merge_closed_surface_mesh( *closed );
-    OPENGEODE_EXCEPTION( closed_merged->nb_vertices() < closed->nb_vertices(),
-        "[Test] Wrong number of closed vertices" );
-    OPENGEODE_EXCEPTION( closed_merged->nb_polygons() < closed->nb_polygons(),
-        "[Test] Wrong number of closed polygons" );
 }
 
 OPENGEODE_TEST( "merge-surface" )
