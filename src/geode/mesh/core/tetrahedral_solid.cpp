@@ -39,47 +39,12 @@ namespace
         const std::array< geode::index_t, 2 >& edge_vertices,
         geode::PolyhedraAroundEdge& result )
     {
-        // DEBUG( "~~~~~~~~~" );
-        // SDEBUG( facet );
-        // DEBUG( edge_vertices[0] );
-        // DEBUG( edge_vertices[1] );
-        // for( const auto vertex :
-        //     solid.polyhedron_vertices( { facet.polyhedron_id } ) )
-        // {
-        //     DEBUG( vertex );
-        // }
-        // for( const auto f : geode::LRange{ 4 } )
-        // {
-        //     SDEBUG(
-        //         solid.polyhedron_adjacent_facet( { facet.polyhedron_id, f } )
-        //             .value_or( geode::PolyhedronFacet{} ) );
-        // }
         const auto first_polyhedron = facet.polyhedron_id;
         do
         {
-            // SDEBUG( facet );
-            // for( const auto fvertex : solid.polyhedron_facet_vertices( facet
-            // ) )
-            // {
-            //     DEBUG( fvertex );
-            // }
             if( const auto adj = solid.polyhedron_adjacent_facet( facet ) )
             {
                 const auto adj_facet = adj.value();
-                // SDEBUG( adj_facet );
-                // for( const auto vertex :
-                //     solid.polyhedron_vertices( { adj_facet.polyhedron_id } )
-                //     )
-                // {
-                //     DEBUG( vertex );
-                // }
-                // for( const auto f : geode::LRange{ 4 } )
-                // {
-                //     SDEBUG( solid
-                //                 .polyhedron_adjacent_facet(
-                //                     { adj_facet.polyhedron_id, f } )
-                //                 .value_or( geode::PolyhedronFacet{} ) );
-                // }
                 result.push_back( adj_facet.polyhedron_id );
                 absl::InlinedVector< geode::local_index_t, 1 > v0;
                 absl::InlinedVector< geode::local_index_t, 1 > v1;
@@ -98,12 +63,8 @@ namespace
                         v1.push_back( v );
                     }
                 }
-                // DEBUG( v0.size() );
-                // DEBUG( v1.size() );
                 if( v0.size() != 1 || v1.size() != 1 )
                 {
-                    // DEBUG( "not classique -> exit" );
-                    // DEBUG( "FALSE FALSE" );
                     return std::make_pair( false, false );
                 }
                 for( const auto f : geode::LRange{ 4 } )
@@ -134,12 +95,9 @@ namespace
             }
             else
             {
-                // DEBUG( "no adj" );
-                // DEBUG( "TRUE FALSE" );
                 return std::make_pair( true, false );
             }
         } while( facet.polyhedron_id != first_polyhedron );
-        // DEBUG( "TRUE TRUE" );
         return std::make_pair( true, true );
     }
 } // namespace
