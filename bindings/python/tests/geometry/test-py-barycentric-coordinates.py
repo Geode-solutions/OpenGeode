@@ -28,7 +28,7 @@ import opengeode_py_geometry as geom
 
 def check_triangle_bary_coords( result, answer ):
     for i in range(3):
-        if result[i] != answer[i]:
+        if abs( result[i] -answer[i]) > 1e-7:
             print( "Lambda ", i, " is incorrect." )
             print( "Result = ", result[i], " - Answer = ", answer[i] )
             return False

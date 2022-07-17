@@ -128,6 +128,11 @@ namespace geode
         {
         }
 
+        void set_properties( AttributeProperties new_properties )
+        {
+            properties_ = std::move( new_properties );
+        }
+
     private:
         AttributeProperties properties_;
     };
@@ -368,6 +373,11 @@ namespace geode
             AttributeBase::AttributeKey ) override
         {
             set_value( to_element, interpolation.compute_value( *this ) );
+        }
+
+        void set_properties( AttributeProperties new_properties )
+        {
+            AttributeBase::set_properties( std::move( new_properties ) );
         }
 
     protected:
