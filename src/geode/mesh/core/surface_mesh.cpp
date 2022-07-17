@@ -728,11 +728,11 @@ namespace geode
     template < index_t dimension >
     double SurfaceMesh< dimension >::polygon_area( index_t polygon_id ) const
     {
-        double area{ 0 };
-        if( nb_polygon_vertices( polygon_id ) == 0 )
+        if( nb_polygon_vertices( polygon_id ) < 3 )
         {
-            return area;
+            return 0;
         }
+        double area{ 0 };
         const auto& p1 = this->point( polygon_vertex( { polygon_id, 0 } ) );
         for( const auto i : LRange{ 1, nb_polygon_vertices( polygon_id ) - 1 } )
         {

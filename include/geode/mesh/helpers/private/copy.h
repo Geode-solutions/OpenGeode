@@ -21,6 +21,8 @@
  *
  */
 
+#pragma once
+
 #include <async++.h>
 
 #include <geode/basic/attribute_manager.h>

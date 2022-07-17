@@ -177,7 +177,6 @@ add_geode_library(
         "helpers/convert_surface_mesh.h"
         "helpers/convert_solid_mesh.h"
         "helpers/nnsearch_mesh.h"
-        "helpers/private/copy.h"
         "helpers/rasterize.h"
         "helpers/ray_tracing.h"
         "helpers/regular_grid_point_function.h"
