@@ -2,23 +2,19 @@ name: CI
 
 on: 
   push:
-  schedule:
-    - cron: 0 0 * * *
+    tags-ignore: 'v*'
 
 jobs:
   format:
     uses: Geode-solutions/actions/.github/workflows/format.yml@master
-    secrets:
-      TOKEN: ${{ secrets.TOKEN }}
+    secrets: inherit
       
   build-linux:
     needs: format
     uses: Geode-solutions/actions/.github/workflows/ci-linux.yml@master
     with:
       directory: opengeode
-    secrets:
-      TOKEN: ${{ secrets.TOKEN }}
-      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    secrets: inherit
 
   build-linux-python:
     needs: format
@@ -26,17 +22,14 @@ jobs:
     with:
       name: OPENGEODE
       directory: opengeode
-    secrets:
-      TOKEN: ${{ secrets.TOKEN }}
-      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    secrets: inherit
       
   coverage:
     needs: format
     uses: Geode-solutions/actions/.github/workflows/coverage.yml@master
     with:
       directory: opengeode
-    secrets:
-      TOKEN: ${{ secrets.TOKEN }}
+    secrets: inherit
 
   build-windows:
     needs: format
@@ -44,12 +37,9 @@ jobs:
     with:
       name: OPENGEODE
       directory: opengeode
-    secrets:
-      TOKEN: ${{ secrets.TOKEN }}
-      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    secrets: inherit
         
   semantic-release:
     needs: [build-linux, build-linux-python, build-windows]
     uses: Geode-solutions/actions/.github/workflows/release.yml@master
-    secrets:
-      TOKEN: ${{ secrets.TOKEN }}
+    secrets: inherit
