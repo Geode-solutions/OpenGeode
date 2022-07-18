@@ -28,14 +28,16 @@
 namespace geode
 {
     class BRep;
+    class ModelCopyMapping;
     class Section;
 } // namespace geode
 
 namespace geode
 {
-    Section opengeode_model_api convert_brep_into_section(
-        const BRep& brep, index_t axis_to_remove );
+    std::tuple< Section, ModelCopyMapping > opengeode_model_api
+        convert_brep_into_section( const BRep& brep, index_t axis_to_remove );
 
-    BRep opengeode_model_api convert_section_into_brep(
-        const Section& section, index_t axis_to_add );
+    std::tuple< BRep, ModelCopyMapping >
+        opengeode_model_api convert_section_into_brep(
+            const Section& section, index_t axis_to_add );
 } // namespace geode
