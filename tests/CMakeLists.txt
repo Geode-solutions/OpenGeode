@@ -27,20 +27,10 @@ if(NOT TARGET OpenGeode::basic)
 endif()
 
 set(DATA_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/data)
-set(test_common_file_in ${CMAKE_CURRENT_LIST_DIR}/common.h)
+set(test_common_file_in ${CMAKE_CURRENT_LIST_DIR}/common.h.in)
 set(test_common_file ${PROJECT_BINARY_DIR}/geode/tests/common.h)
 configure_file(${test_common_file_in} ${test_common_file})
-
-if(NOT EXISTS ${PROJECT_BINARY_DIR}/geode/tests/catch2.h)
-    file(DOWNLOAD 
-        https://github.com/catchorg/Catch2/releases/download/v2.11.0/catch.hpp
-        ${PROJECT_BINARY_DIR}/geode/tests/catch2.h
-    )
-endif()
-
-install(DIRECTORY ${PROJECT_BINARY_DIR}/geode/tests/
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/geode/tests
-)
+include_directories(${PROJECT_BINARY_DIR})
 
 add_subdirectory(basic)
 add_subdirectory(geometry)
