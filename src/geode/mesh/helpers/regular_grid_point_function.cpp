@@ -28,6 +28,8 @@
 
 #include <geode/geometry/point.h>
 
+#include <geode/mesh/core/regular_grid_solid.h>
+#include <geode/mesh/core/regular_grid_surface.h>
 #include <geode/mesh/helpers/private/regular_grid_shape_function.h>
 
 namespace geode

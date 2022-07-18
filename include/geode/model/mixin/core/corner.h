@@ -80,6 +80,7 @@ namespace geode
 
         const MeshImpl& mesh_type() const;
 
+    public:
         Corner( CornersKey ) : Corner() {}
 
         Corner( const MeshImpl& impl, CornersKey ) : Corner( impl ) {}

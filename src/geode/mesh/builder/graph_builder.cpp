@@ -214,15 +214,22 @@ namespace geode
         VertexSetBuilder::copy( graph );
         create_edges( graph.nb_edges() );
         graph_.edge_attribute_manager().copy( graph.edge_attribute_manager() );
-        for( const auto e : Range{ graph.nb_edges() } )
+        if( graph_.impl_name() == graph.impl_name() )
         {
-            for( const auto v : LRange{ 2 } )
+            do_copy_edges( graph );
+        }
+        else
+        {
+            for( const auto e : Range{ graph.nb_edges() } )
             {
-                const EdgeVertex id{ e, v };
-                const auto vertex = graph.edge_vertex( id );
-                if( vertex != NO_ID )
+                for( const auto v : LRange{ 2 } )
                 {
-                    set_edge_vertex( id, vertex );
+                    const EdgeVertex id{ e, v };
+                    const auto vertex = graph.edge_vertex( id );
+                    if( vertex != NO_ID )
+                    {
+                        set_edge_vertex( id, vertex );
+                    }
                 }
             }
         }

@@ -77,6 +77,7 @@ namespace geode
             return native_extension_static();
         }
 
+    public:
         void set_vertex( index_t vertex_id,
             Point< dimension > point,
             OGPolygonalSurfaceKey );
@@ -97,6 +98,10 @@ namespace geode
 
         void permute_polygons(
             absl::Span< const index_t > permutation, OGPolygonalSurfaceKey );
+
+        void copy_polygons(
+            const OpenGeodePolygonalSurface< dimension >& surface_mesh,
+            OGPolygonalSurfaceKey );
 
     private:
         friend class bitsery::Access;

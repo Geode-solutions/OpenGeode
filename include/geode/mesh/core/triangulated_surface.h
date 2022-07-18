@@ -23,8 +23,6 @@
 
 #pragma once
 
-#include <geode/basic/bitsery_archive.h>
-
 #include <geode/mesh/common.h>
 #include <geode/mesh/core/surface_mesh.h>
 
@@ -74,15 +72,7 @@ namespace geode
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive )
-        {
-            archive.ext( *this,
-                DefaultGrowable< Archive, TriangulatedSurface >{},
-                []( Archive& a, TriangulatedSurface& triangulated_surface ) {
-                    a.ext( triangulated_surface,
-                        bitsery::ext::BaseClass< SurfaceMesh< dimension > >{} );
-                } );
-        }
+        void serialize( Archive& archive );
 
         local_index_t get_nb_polygon_vertices( index_t /*unused*/ ) const final
         {

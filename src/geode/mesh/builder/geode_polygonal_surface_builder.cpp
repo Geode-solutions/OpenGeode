@@ -60,12 +60,14 @@ namespace geode
     template < index_t dimension >
     void OpenGeodePolygonalSurfaceBuilder< dimension >::do_create_vertex()
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
     void OpenGeodePolygonalSurfaceBuilder< dimension >::do_create_vertices(
         index_t /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
@@ -73,6 +75,7 @@ namespace geode
         do_delete_surface_vertices( const std::vector< bool >& /*unused*/,
             absl::Span< const index_t > /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
@@ -80,6 +83,7 @@ namespace geode
         do_permute_surface_vertices( absl::Span< const index_t > /*unused*/,
             absl::Span< const index_t > /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
@@ -127,6 +131,23 @@ namespace geode
         absl::Span< const index_t > /*unused*/ )
     {
         geode_polygonal_surface_.permute_polygons( permutation, {} );
+    }
+
+    template < index_t dimension >
+    void OpenGeodePolygonalSurfaceBuilder< dimension >::do_copy_points(
+        const SurfaceMesh< dimension >& /*unused*/ )
+    {
+        // Operation is directly handled by the AttributeManager
+    }
+
+    template < index_t dimension >
+    void OpenGeodePolygonalSurfaceBuilder< dimension >::do_copy_polygons(
+        const SurfaceMesh< dimension >& surface_mesh )
+    {
+        geode_polygonal_surface_.copy_polygons(
+            dynamic_cast< const OpenGeodePolygonalSurface< dimension >& >(
+                surface_mesh ),
+            {} );
     }
 
     template class opengeode_mesh_api OpenGeodePolygonalSurfaceBuilder< 2 >;

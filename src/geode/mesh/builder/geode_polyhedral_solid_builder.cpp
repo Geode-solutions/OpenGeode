@@ -59,12 +59,14 @@ namespace geode
     template < index_t dimension >
     void OpenGeodePolyhedralSolidBuilder< dimension >::do_create_vertex()
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
     void OpenGeodePolyhedralSolidBuilder< dimension >::do_create_vertices(
         index_t /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
@@ -72,6 +74,7 @@ namespace geode
         const std::vector< bool >& /*unused*/,
         absl::Span< const index_t > /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
@@ -80,6 +83,7 @@ namespace geode
             absl::Span< const index_t > /*unused*/,
             absl::Span< const index_t > /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
@@ -129,6 +133,23 @@ namespace geode
         absl::Span< const index_t > /*unused*/ )
     {
         geode_polyhedral_solid_.permute_polyhedra( permutation, {} );
+    }
+
+    template < index_t dimension >
+    void OpenGeodePolyhedralSolidBuilder< dimension >::do_copy_points(
+        const SolidMesh< dimension >& /*unused*/ )
+    {
+        // Operation is directly handled by the AttributeManager
+    }
+
+    template < index_t dimension >
+    void OpenGeodePolyhedralSolidBuilder< dimension >::do_copy_polyhedra(
+        const SolidMesh< dimension >& solid_mesh )
+    {
+        geode_polyhedral_solid_.copy_polyhedra(
+            dynamic_cast< const OpenGeodePolyhedralSolid< dimension >& >(
+                solid_mesh ),
+            {} );
     }
 
     template class opengeode_mesh_api OpenGeodePolyhedralSolidBuilder< 3 >;

@@ -331,6 +331,7 @@ namespace geode
 
         void save_relationships( absl::string_view directory ) const;
 
+    public:
         /*!
          * Remove a component from the set of components registered by the
          * Relationships and all its associated relationships

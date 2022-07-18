@@ -27,8 +27,6 @@
 
 #include <absl/container/inlined_vector.h>
 
-#include <geode/basic/passkey.h>
-
 #include <geode/mesh/builder/vertex_set_builder.h>
 #include <geode/mesh/common.h>
 #include <geode/mesh/core/solid_mesh.h>
@@ -232,6 +230,12 @@ namespace geode
         virtual std::vector< PolyhedronFacetVertices >
             get_polyhedron_facet_vertices( absl::Span< const index_t > vertices,
                 absl::Span< const std::vector< index_t > > facets ) const;
+
+        virtual void do_copy_points(
+            const SolidMesh< dimension >& solid_mesh ) = 0;
+
+        virtual void do_copy_polyhedra(
+            const SolidMesh< dimension >& solid_mesh ) = 0;
 
     private:
         SolidMesh< dimension >& solid_mesh_;

@@ -26,8 +26,6 @@
 #include <array>
 #include <vector>
 
-#include <geode/basic/passkey.h>
-
 #include <geode/mesh/builder/surface_mesh_builder.h>
 #include <geode/mesh/common.h>
 

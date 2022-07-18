@@ -27,8 +27,6 @@
 
 #include <absl/types/span.h>
 
-#include <geode/basic/passkey.h>
-
 #include <geode/mesh/builder/surface_mesh_builder.h>
 #include <geode/mesh/common.h>
 

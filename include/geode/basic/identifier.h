@@ -52,6 +52,7 @@ namespace geode
 
         void save_identifier( absl::string_view directory ) const;
 
+    public:
         void set_id( uuid id, IdentifierKey );
 
         void set_name( absl::string_view name, IdentifierKey );

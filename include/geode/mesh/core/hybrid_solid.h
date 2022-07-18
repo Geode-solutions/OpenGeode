@@ -23,8 +23,6 @@
 
 #pragma once
 
-#include <geode/basic/bitsery_archive.h>
-
 #include <geode/mesh/common.h>
 #include <geode/mesh/core/solid_mesh.h>
 
@@ -81,14 +79,7 @@ namespace geode
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive )
-        {
-            archive.ext( *this, DefaultGrowable< Archive, HybridSolid >{},
-                []( Archive& a, HybridSolid& hybrid_solid ) {
-                    a.ext( hybrid_solid,
-                        bitsery::ext::BaseClass< SolidMesh< dimension > >{} );
-                } );
-        }
+        void serialize( Archive& archive );
     };
     ALIAS_3D( HybridSolid );
 } // namespace geode

@@ -23,8 +23,6 @@
 
 #pragma once
 
-#include <geode/basic/passkey.h>
-
 #include <geode/mesh/builder/graph_builder.h>
 #include <geode/mesh/common.h>
 
@@ -72,6 +70,8 @@ namespace geode
     private:
         virtual void do_set_point(
             index_t vertex_id, Point< dimension > point ) = 0;
+
+        virtual void do_copy_points( const EdgedCurve< dimension >& mesh ) = 0;
 
     private:
         EdgedCurve< dimension >& edged_curve_;

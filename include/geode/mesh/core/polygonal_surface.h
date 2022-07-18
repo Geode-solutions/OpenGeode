@@ -23,19 +23,14 @@
 
 #pragma once
 
-#include <geode/basic/bitsery_archive.h>
-
 #include <geode/mesh/common.h>
 #include <geode/mesh/core/surface_mesh.h>
 
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( PolygonalSurfaceBuilder );
-
     ALIAS_2D_AND_3D( Vector );
-
     class AttributeManager;
-
     struct PolygonEdge;
 } // namespace geode
 

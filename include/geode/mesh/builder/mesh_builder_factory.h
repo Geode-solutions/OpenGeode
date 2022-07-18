@@ -24,7 +24,6 @@
 #pragma once
 
 #include <geode/basic/factory.h>
-#include <geode/basic/passkey.h>
 
 #include <geode/mesh/builder/vertex_set_builder.h>
 #include <geode/mesh/common.h>
@@ -45,8 +44,6 @@ namespace geode
                                                       VertexSet&,
                                                       MeshBuilderFactoryKey >
     {
-        PASSKEY( MeshBuilderFactory, Key );
-
     public:
         template < typename MeshBuilder >
         static void register_mesh_builder( MeshImpl key )

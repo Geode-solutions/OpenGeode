@@ -27,8 +27,6 @@
 
 #include <absl/container/inlined_vector.h>
 
-#include <geode/basic/passkey.h>
-
 #include <geode/mesh/builder/solid_mesh_builder.h>
 #include <geode/mesh/common.h>
 #include <geode/mesh/core/polyhedral_solid.h>

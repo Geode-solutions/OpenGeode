@@ -23,7 +23,6 @@
 
 #pragma once
 
-#include <geode/basic/bitsery_archive.h>
 #include <geode/basic/passkey.h>
 
 #include <geode/mesh/common.h>
@@ -72,6 +71,7 @@ namespace geode
          */
         AttributeManager& facet_attribute_manager() const;
 
+    public:
         std::vector< index_t > update_facet_vertices(
             absl::Span< const index_t > old2new, SolidFacetsKey );
 

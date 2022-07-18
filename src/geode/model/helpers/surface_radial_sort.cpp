@@ -23,6 +23,8 @@
 
 #include <geode/model/helpers/surface_radial_sort.h>
 
+#include <geode/basic/algorithm.h>
+
 #include <geode/geometry/basic_objects/segment.h>
 #include <geode/geometry/radial_sort.h>
 

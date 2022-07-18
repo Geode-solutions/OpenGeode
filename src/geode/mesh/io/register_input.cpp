@@ -66,20 +66,13 @@ namespace geode
         GraphInputFactory::register_creator< OpenGeodeGraphInput >(
             OpenGeodeGraph::native_extension_static().data() );
 
-        BITSERY_INPUT_MESH_REGISTER_2D_3D( PointSet );
         BITSERY_INPUT_MESH_REGISTER_2D_3D( EdgedCurve );
+        BITSERY_INPUT_MESH_REGISTER_2D_3D( PointSet );
         BITSERY_INPUT_MESH_REGISTER_2D_3D( PolygonalSurface );
+        BITSERY_INPUT_MESH_REGISTER_2D_3D( RegularGrid );
         BITSERY_INPUT_MESH_REGISTER_2D_3D( TriangulatedSurface );
+        BITSERY_INPUT_MESH_REGISTER_3D( HybridSolid );
         BITSERY_INPUT_MESH_REGISTER_3D( PolyhedralSolid );
         BITSERY_INPUT_MESH_REGISTER_3D( TetrahedralSolid );
-        BITSERY_INPUT_MESH_REGISTER_3D( HybridSolid );
-
-        RegularGridInputFactory2D::register_creator<
-            OpenGeodeRegularGridInput2D >(
-            RegularGrid2D ::native_extension_static().data() );
-
-        RegularGridInputFactory3D::register_creator<
-            OpenGeodeRegularGridInput3D >(
-            RegularGrid3D ::native_extension_static().data() );
     }
 } // namespace geode

@@ -27,8 +27,6 @@
 
 #include <absl/types/span.h>
 
-#include <geode/basic/passkey.h>
-
 #include <geode/mesh/builder/vertex_set_builder.h>
 #include <geode/mesh/common.h>
 
@@ -216,6 +214,12 @@ namespace geode
             const PolygonVertex& polygon_vertex, index_t vertex_id );
 
         void update_polygon_vertices( absl::Span< const index_t > old2new );
+
+        virtual void do_copy_points(
+            const SurfaceMesh< dimension >& surface_mesh ) = 0;
+
+        virtual void do_copy_polygons(
+            const SurfaceMesh< dimension >& surface_mesh ) = 0;
 
     private:
         SurfaceMesh< dimension >& surface_mesh_;

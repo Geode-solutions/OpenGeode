@@ -55,12 +55,14 @@ namespace geode
     template < index_t dimension >
     void OpenGeodeEdgedCurveBuilder< dimension >::do_create_vertex()
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
     void OpenGeodeEdgedCurveBuilder< dimension >::do_create_vertices(
         index_t /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
@@ -68,6 +70,7 @@ namespace geode
         const std::vector< bool >& /*unused*/,
         absl::Span< const index_t > /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
@@ -75,6 +78,7 @@ namespace geode
         absl::Span< const index_t > /*unused*/,
         absl::Span< const index_t > /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
@@ -87,12 +91,14 @@ namespace geode
     template < index_t dimension >
     void OpenGeodeEdgedCurveBuilder< dimension >::do_create_edge()
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
     void OpenGeodeEdgedCurveBuilder< dimension >::do_create_edges(
         index_t /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
@@ -100,6 +106,7 @@ namespace geode
         const std::vector< bool >& /*unused*/,
         absl::Span< const index_t > /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
@@ -107,6 +114,21 @@ namespace geode
         absl::Span< const index_t > /*unused*/,
         absl::Span< const index_t > /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
+    }
+
+    template < index_t dimension >
+    void OpenGeodeEdgedCurveBuilder< dimension >::do_copy_points(
+        const EdgedCurve< dimension >& /*unused*/ )
+    {
+        // Operation is directly handled by the AttributeManager
+    }
+
+    template < index_t dimension >
+    void OpenGeodeEdgedCurveBuilder< dimension >::do_copy_edges(
+        const Graph& /*unused*/ )
+    {
+        // Operation is directly handled by the AttributeManager
     }
 
     template class opengeode_mesh_api OpenGeodeEdgedCurveBuilder< 2 >;

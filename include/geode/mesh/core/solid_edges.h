@@ -25,7 +25,6 @@
 
 #include <vector>
 
-#include <geode/basic/bitsery_archive.h>
 #include <geode/basic/passkey.h>
 
 #include <geode/mesh/common.h>
@@ -78,6 +77,7 @@ namespace geode
          */
         AttributeManager& edge_attribute_manager() const;
 
+    public:
         void update_edge_vertices(
             absl::Span< const index_t > old2new, SolidEdgesKey );
 

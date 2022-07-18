@@ -234,6 +234,52 @@ namespace
             }
         }
     }
+
+    template < geode::index_t dimension >
+    void copy_points( const geode::SolidMesh< dimension >& solid,
+        geode::SolidMeshBuilder< dimension >& builder )
+    {
+        for( const auto p : geode::Range{ solid.nb_vertices() } )
+        {
+            builder.set_point( p, solid.point( p ) );
+        }
+    }
+
+    template < geode::index_t dimension >
+    void copy_polyhedra( const geode::SolidMesh< dimension >& solid,
+        geode::SolidMeshBuilder< dimension >& builder )
+    {
+        for( const auto p : geode::Range{ solid.nb_polyhedra() } )
+        {
+            absl::FixedArray< geode::index_t > vertices(
+                solid.nb_polyhedron_vertices( p ) );
+            for( const auto v :
+                geode::LRange{ solid.nb_polyhedron_vertices( p ) } )
+            {
+                vertices[v] = solid.polyhedron_vertex( { p, v } );
+            }
+            absl::FixedArray< std::vector< geode::local_index_t > > facets(
+                solid.nb_polyhedron_facets( p ) );
+            for( const auto f :
+                geode::LRange{ solid.nb_polyhedron_facets( p ) } )
+            {
+                auto& facet = facets[f];
+                facet.resize( solid.nb_polyhedron_facet_vertices( { p, f } ) );
+                for( const auto v : geode::LRange{
+                         solid.nb_polyhedron_facet_vertices( { p, f } ) } )
+                {
+                    const auto it = absl::c_find( vertices,
+                        solid.polyhedron_facet_vertex( { { p, f }, v } ) );
+                    OPENGEODE_ASSERT( it != vertices.end(),
+                        "[SolidMeshBuilder::copy] Wrong indexing between "
+                        "polyhedron_vertex and polyhedron_facet_vertex" );
+                    facet[v] = static_cast< geode::local_index_t >(
+                        std::distance( vertices.begin(), it ) );
+                }
+            }
+            builder.create_polyhedron( vertices, facets );
+        }
+    }
 } // namespace
 
 namespace geode
@@ -755,39 +801,15 @@ namespace geode
             solid_mesh_.disable_facets();
         }
         VertexSetBuilder::copy( solid_mesh );
-        for( const auto p : Range{ solid_mesh.nb_vertices() } )
+        if( solid_mesh.impl_name() == solid_mesh_.impl_name() )
         {
-            set_point( p, solid_mesh.point( p ) );
+            do_copy_points( solid_mesh );
+            do_copy_polyhedra( solid_mesh );
         }
-        for( const auto p : Range{ solid_mesh.nb_polyhedra() } )
+        else
         {
-            absl::FixedArray< index_t > vertices(
-                solid_mesh.nb_polyhedron_vertices( p ) );
-            for( const auto v :
-                LRange{ solid_mesh.nb_polyhedron_vertices( p ) } )
-            {
-                vertices[v] = solid_mesh.polyhedron_vertex( { p, v } );
-            }
-            absl::FixedArray< std::vector< local_index_t > > facets(
-                solid_mesh.nb_polyhedron_facets( p ) );
-            for( const auto f : LRange{ solid_mesh.nb_polyhedron_facets( p ) } )
-            {
-                auto& facet = facets[f];
-                facet.resize(
-                    solid_mesh.nb_polyhedron_facet_vertices( { p, f } ) );
-                for( const auto v : LRange{
-                         solid_mesh.nb_polyhedron_facet_vertices( { p, f } ) } )
-                {
-                    const auto it = absl::c_find( vertices,
-                        solid_mesh.polyhedron_facet_vertex( { { p, f }, v } ) );
-                    OPENGEODE_ASSERT( it != vertices.end(),
-                        "[SolidMeshBuilder::copy] Wrong indexing between "
-                        "polyhedron_vertex and polyhedron_facet_vertex" );
-                    facet[v] = static_cast< local_index_t >(
-                        std::distance( vertices.begin(), it ) );
-                }
-            }
-            create_polyhedron( vertices, facets );
+            copy_points( solid_mesh, *this );
+            copy_polyhedra( solid_mesh, *this );
         }
         solid_mesh_.polyhedron_attribute_manager().copy(
             solid_mesh.polyhedron_attribute_manager() );

@@ -170,6 +170,14 @@ namespace geode
             polygon_ptr_ = std::move( new_polygon_ptr );
         }
 
+        void copy_polygons(
+            const OpenGeodePolygonalSurface< dimension >::Impl& impl )
+        {
+            polygon_vertices_ = impl.polygon_vertices_;
+            polygon_adjacents_ = impl.polygon_adjacents_;
+            polygon_ptr_ = impl.polygon_ptr_;
+        }
+
     private:
         Impl() = default;
 
@@ -314,6 +322,14 @@ namespace geode
         OGPolygonalSurfaceKey )
     {
         impl_->set_polygon_adjacent( polygon_edge, adjacent_id );
+    }
+
+    template < index_t dimension >
+    void OpenGeodePolygonalSurface< dimension >::copy_polygons(
+        const OpenGeodePolygonalSurface< dimension >& surface_mesh,
+        OGPolygonalSurfaceKey )
+    {
+        impl_->copy_polygons( *surface_mesh.impl_ );
     }
 
     template class opengeode_mesh_api OpenGeodePolygonalSurface< 2 >;

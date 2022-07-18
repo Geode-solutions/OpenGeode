@@ -30,6 +30,7 @@
 
 #include <geode/tests/common.h>
 
+#include <absl/container/flat_hash_map.h>
 #include <absl/container/flat_hash_set.h>
 
 template < geode::index_t dimension >

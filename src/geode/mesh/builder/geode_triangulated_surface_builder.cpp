@@ -60,12 +60,14 @@ namespace geode
     template < index_t dimension >
     void OpenGeodeTriangulatedSurfaceBuilder< dimension >::do_create_vertex()
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
     void OpenGeodeTriangulatedSurfaceBuilder< dimension >::do_create_vertices(
         index_t /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
@@ -73,6 +75,7 @@ namespace geode
         do_delete_surface_vertices( const std::vector< bool >& /*unused*/,
             absl::Span< const index_t > /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
@@ -80,6 +83,7 @@ namespace geode
         do_permute_surface_vertices( absl::Span< const index_t > /*unused*/,
             absl::Span< const index_t > /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
@@ -102,6 +106,7 @@ namespace geode
     void OpenGeodeTriangulatedSurfaceBuilder< dimension >::do_create_triangles(
         index_t /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
@@ -126,6 +131,7 @@ namespace geode
         const std::vector< bool >& /*unused*/,
         absl::Span< const index_t > /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
@@ -133,6 +139,21 @@ namespace geode
         absl::Span< const index_t > /*unused*/,
         absl::Span< const index_t > /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
+    }
+
+    template < index_t dimension >
+    void OpenGeodeTriangulatedSurfaceBuilder< dimension >::do_copy_points(
+        const SurfaceMesh< dimension >& /*unused*/ )
+    {
+        // Operation is directly handled by the AttributeManager
+    }
+
+    template < index_t dimension >
+    void OpenGeodeTriangulatedSurfaceBuilder< dimension >::do_copy_polygons(
+        const SurfaceMesh< dimension >& /*unused*/ )
+    {
+        // Operation is directly handled by the AttributeManager
     }
 
     template class opengeode_mesh_api OpenGeodeTriangulatedSurfaceBuilder< 2 >;

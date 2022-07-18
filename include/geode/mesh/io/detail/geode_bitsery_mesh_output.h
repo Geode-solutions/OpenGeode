@@ -29,7 +29,7 @@
 
 #include <geode/mesh/core/bitsery_archive.h>
 
-#define BITSERY_WRITE( Mesh, MeshImpl )                                        \
+#define BITSERY_WRITE( Mesh )                                                  \
     void write( const Mesh& mesh ) const final                                 \
     {                                                                          \
         std::ofstream file{ to_string( this->filename() ),                     \
@@ -39,13 +39,13 @@
         register_geometry_serialize_pcontext( std::get< 0 >( context ) );      \
         register_mesh_serialize_pcontext( std::get< 0 >( context ) );          \
         Serializer archive{ context, file };                                   \
-        archive.object( dynamic_cast< const MeshImpl& >( mesh ) );             \
+        archive.object( dynamic_cast< const OpenGeode##Mesh& >( mesh ) );      \
         archive.adapter().flush();                                             \
         OPENGEODE_EXCEPTION( std::get< 1 >( context ).isValid(),               \
             "[Bitsery::write] Error while writing file: ", this->filename() ); \
     }
 
-#define BITSERY_OUTPUT_MESH_DIMENSION_IMPL( Mesh, MeshImpl )                   \
+#define BITSERY_OUTPUT_MESH_DIMENSION( Mesh )                                  \
     template < index_t dimension >                                             \
     class OpenGeode##Mesh##Output : public Mesh##Output< dimension >           \
     {                                                                          \
@@ -55,14 +55,11 @@
         {                                                                      \
         }                                                                      \
                                                                                \
-        BITSERY_WRITE( Mesh< dimension >, MeshImpl< dimension > )              \
+        BITSERY_WRITE( Mesh< dimension > )                                     \
     };                                                                         \
     ALIAS_2D_AND_3D( OpenGeode##Mesh##Output )
 
-#define BITSERY_OUTPUT_MESH_DIMENSION( Mesh )                                  \
-    BITSERY_OUTPUT_MESH_DIMENSION_IMPL( Mesh, OpenGeode##Mesh )
-
-#define BITSERY_OUTPUT_MESH_NO_DIMENSION_IMPL( Mesh, MeshImpl )                \
+#define BITSERY_OUTPUT_MESH_NO_DIMENSION( Mesh )                               \
     class OpenGeode##Mesh##Output : public Mesh##Output                        \
     {                                                                          \
     public:                                                                    \
@@ -71,8 +68,5 @@
         {                                                                      \
         }                                                                      \
                                                                                \
-        BITSERY_WRITE( Mesh, MeshImpl )                                        \
+        BITSERY_WRITE( Mesh )                                                  \
     }
-
-#define BITSERY_OUTPUT_MESH_NO_DIMENSION( Mesh )                               \
-    BITSERY_OUTPUT_MESH_NO_DIMENSION_IMPL( Mesh, OpenGeode##Mesh )

@@ -71,6 +71,7 @@ namespace geode
             return native_extension_static();
         }
 
+    public:
         void set_edge_vertex(
             const EdgeVertex& edge_vertex, index_t vertex_id, OGGraphKey );
 

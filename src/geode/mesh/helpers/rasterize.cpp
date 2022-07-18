@@ -23,7 +23,9 @@
 
 #include <geode/mesh/helpers/rasterize.h>
 
-#include <absl/container/flat_hash_set.h>
+#include <absl/container/flat_hash_map.h>
+
+#include <geode/basic/algorithm.h>
 
 #include <geode/geometry/basic_objects/infinite_line.h>
 #include <geode/geometry/basic_objects/plane.h>
@@ -33,6 +35,9 @@
 #include <geode/geometry/mensuration.h>
 #include <geode/geometry/perpendicular.h>
 #include <geode/geometry/position.h>
+
+#include <geode/mesh/core/regular_grid_solid.h>
+#include <geode/mesh/core/regular_grid_surface.h>
 
 namespace
 {
@@ -245,9 +250,9 @@ namespace
                     { triangle.vertices()[e].get().value( plane_axes[0] ),
                         triangle.vertices()[e].get().value(
                             plane_axes[1] ) } } )
-                + std::max( 0., grid.cell_length( plane_axes[0] )
+                + std::max( 0., grid.cell_length_in_direction( plane_axes[0] )
                                     * result[e].first.value( 0 ) )
-                + std::max( 0., grid.cell_length( plane_axes[1] )
+                + std::max( 0., grid.cell_length_in_direction( plane_axes[1] )
                                     * result[e].first.value( 1 ) );
         }
         return result;
@@ -263,7 +268,7 @@ namespace
         {
             if( normal.value( d ) > 0. )
             {
-                critical.set_value( d, grid.cell_length( d ) );
+                critical.set_value( d, grid.cell_length_in_direction( d ) );
             }
         }
         return critical;
@@ -309,7 +314,7 @@ namespace
         const geode::Triangle3D& triangle,
         const std::array< geode::GridCellsAroundVertex3D, 3 > vertex_cells )
     {
-        auto min = grid.cell_indices( grid.nb_cells() - 1 );
+        auto min = grid.cell_indices( grid.nb_polyhedra() - 1 );
         auto max = grid.cell_indices( 0 );
         for( const auto v : geode::LRange{ 3 } )
         {
@@ -350,7 +355,8 @@ namespace
                 for( const auto i : geode::Range( min[0], max[0] + 1 ) )
                 {
                     geode::GridCellIndices3D cur_cell{ { i, j, k } };
-                    const auto point = grid.point( cur_cell );
+                    const auto point =
+                        grid.point( grid.vertex_index( cur_cell ) );
 
                     // Test triangle plane through box
                     const auto p_minus = point + critical_point;
@@ -358,8 +364,9 @@ namespace
                     std::tie( p_minus_dist, std::ignore ) =
                         geode::point_plane_signed_distance(
                             p_minus, triangle.plane() );
-                    const auto p_plus =
-                        grid.point( { i + 1, j + 1, k + 1 } ) - critical_point;
+                    const auto p_plus = grid.point( grid.vertex_index(
+                                            { i + 1, j + 1, k + 1 } ) )
+                                        - critical_point;
                     double p_plus_dist;
                     std::tie( p_plus_dist, std::ignore ) =
                         geode::point_plane_signed_distance(
@@ -456,7 +463,7 @@ namespace
             "[conservative_voxelization_segment] Segment should be longer than "
             "epsilon" );
         std::vector< geode::GridCellIndices2D > cells;
-        auto min = grid.cell_indices( grid.nb_cells() - 1 );
+        auto min = grid.cell_indices( grid.nb_polygons() - 1 );
         auto max = grid.cell_indices( 0 );
         for( const auto v : geode::LRange{ 2 } )
         {
@@ -476,8 +483,8 @@ namespace
         {
             for( const auto i : geode::Range( min[0], max[0] + 1 ) )
             {
-                const geode::GridCellIndices2D cur_cell{ { i, j } };
-                const auto point = grid.point( cur_cell );
+                geode::GridCellIndices2D cur_cell{ { i, j } };
+                const auto point = grid.point( grid.vertex_index( cur_cell ) );
 
                 // Test segment line through box
                 const auto p_minus = point + critical_point;
@@ -485,7 +492,8 @@ namespace
                 std::tie( p_minus_dist, std::ignore ) =
                     geode::point_line_signed_distance( p_minus, { segment } );
                 const auto p_plus =
-                    grid.point( { i + 1, j + 1 } ) - critical_point;
+                    grid.point( grid.vertex_index( { i + 1, j + 1 } ) )
+                    - critical_point;
                 double p_plus_dist;
                 std::tie( p_plus_dist, std::ignore ) =
                     geode::point_line_signed_distance( p_plus, { segment } );
@@ -496,7 +504,7 @@ namespace
                     continue;
                 }
 
-                cells.push_back( cur_cell );
+                cells.emplace_back( std::move( cur_cell ) );
             }
         }
         return cells;

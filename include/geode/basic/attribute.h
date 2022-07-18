@@ -75,6 +75,12 @@ namespace geode
 
         virtual absl::string_view type() = 0;
 
+        const AttributeProperties& properties() const
+        {
+            return properties_;
+        }
+
+    public:
         virtual std::shared_ptr< AttributeBase > clone(
             AttributeKey ) const = 0;
 
@@ -104,11 +110,6 @@ namespace geode
             const AttributeLinearInterpolation& interpolation,
             index_t to_element,
             AttributeKey ) = 0;
-
-        const AttributeProperties& properties() const
-        {
-            return properties_;
-        }
 
     private:
         AttributeBase() = default;
@@ -240,6 +241,7 @@ namespace geode
             modifier( value_ );
         }
 
+    public:
         void compute_value( index_t /*unused*/,
             index_t /*unused*/,
             AttributeBase::AttributeKey ) override
@@ -273,6 +275,7 @@ namespace geode
                 } );
         }
 
+    public:
         void resize( index_t /*unused*/, AttributeBase::AttributeKey ) override
         {
         }
@@ -361,6 +364,7 @@ namespace geode
             modifier( values_.at( element ) );
         }
 
+    public:
         void compute_value( index_t from_element,
             index_t to_element,
             AttributeBase::AttributeKey ) override
@@ -531,6 +535,7 @@ namespace geode
             modifier( reinterpret_cast< bool& >( values_.at( element ) ) );
         }
 
+    public:
         void compute_value( index_t from_element,
             index_t to_element,
             AttributeBase::AttributeKey ) override
@@ -706,6 +711,7 @@ namespace geode
             modifier( values_[element] );
         }
 
+    public:
         void compute_value( index_t from_element,
             index_t to_element,
             AttributeBase::AttributeKey ) override

@@ -26,7 +26,6 @@
 #include <absl/container/inlined_vector.h>
 #include <absl/types/optional.h>
 
-#include <geode/basic/bitsery_archive.h>
 #include <geode/basic/passkey.h>
 
 #include <geode/mesh/common.h>
@@ -408,6 +407,7 @@ namespace geode
         absl::optional< PolygonVertex > polygon_around_vertex(
             index_t vertex_id ) const;
 
+    public:
         void associate_polygon_vertex_to_vertex(
             const PolygonVertex& polygon_vertex,
             index_t vertex_id,

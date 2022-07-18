@@ -27,6 +27,8 @@
 #include <limits>
 #include <sstream>
 
+#include <absl/hash/hash.h>
+
 #include <bitsery/bitsery.h>
 
 #include <geode/basic/attribute_utils.h>

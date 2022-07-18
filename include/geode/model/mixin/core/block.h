@@ -86,6 +86,7 @@ namespace geode
             return dynamic_cast< Mesh& >( get_modifiable_mesh() );
         }
 
+    public:
         Block( BlocksKey ) : Block() {}
 
         Block( const MeshImpl& impl, BlocksKey ) : Block( impl ) {}

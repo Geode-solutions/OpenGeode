@@ -23,6 +23,8 @@
 
 #include <geode/mesh/core/hybrid_solid.h>
 
+#include <geode/basic/bitsery_archive.h>
+
 #include <geode/mesh/builder/hybrid_solid_builder.h>
 #include <geode/mesh/core/mesh_factory.h>
 
@@ -53,5 +55,18 @@ namespace geode
         return clone;
     }
 
+    template < index_t dimension >
+    template < typename Archive >
+    void HybridSolid< dimension >::serialize( Archive& archive )
+    {
+        archive.ext( *this, DefaultGrowable< Archive, HybridSolid >{},
+            []( Archive& a, HybridSolid& hybrid_solid ) {
+                a.ext( hybrid_solid,
+                    bitsery::ext::BaseClass< SolidMesh< dimension > >{} );
+            } );
+    }
+
     template class opengeode_mesh_api HybridSolid< 3 >;
+
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, HybridSolid< 3 > );
 } // namespace geode

@@ -27,7 +27,6 @@
 
 #include <absl/container/inlined_vector.h>
 
-#include <geode/basic/bitsery_archive.h>
 #include <geode/basic/passkey.h>
 
 #include <geode/mesh/common.h>
@@ -150,6 +149,7 @@ namespace geode
         absl::optional< index_t > edge_from_vertices(
             index_t v0, index_t v1 ) const;
 
+    public:
         void set_edges_around_vertex(
             index_t vertex_id, EdgesAroundVertex edges, GraphKey );
 
@@ -167,6 +167,7 @@ namespace geode
         friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive );
+
         virtual index_t get_edge_vertex(
             const EdgeVertex& edge_vertex ) const = 0;
 

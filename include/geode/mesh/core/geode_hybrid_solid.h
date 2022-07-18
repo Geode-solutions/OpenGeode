@@ -78,6 +78,7 @@ namespace geode
             return native_extension_static();
         }
 
+    public:
         void set_vertex(
             index_t vertex_id, Point< dimension > point, OGHybridSolidKey );
 
@@ -106,6 +107,10 @@ namespace geode
 
         void permute_polyhedra(
             absl::Span< const index_t > permutation, OGHybridSolidKey );
+
+        void copy_polyhedra(
+            const OpenGeodeHybridSolid< dimension >& solid_mesh,
+            OGHybridSolidKey );
 
     private:
         friend class bitsery::Access;

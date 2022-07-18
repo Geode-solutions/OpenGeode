@@ -77,6 +77,7 @@ namespace geode
             return native_extension_static();
         }
 
+    public:
         void set_vertex(
             index_t vertex_id, Point< dimension > point, OGPolyhedralSolidKey );
 
@@ -96,6 +97,10 @@ namespace geode
 
         void set_polyhedron_vertex( const PolyhedronVertex& polyhedron_vertex,
             index_t vertex_id,
+            OGPolyhedralSolidKey );
+
+        void copy_polyhedra(
+            const OpenGeodePolyhedralSolid< dimension >& solid_mesh,
             OGPolyhedralSolidKey );
 
     private:

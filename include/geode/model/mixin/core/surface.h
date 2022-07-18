@@ -77,6 +77,7 @@ namespace geode
             return dynamic_cast< const Mesh& >( get_mesh() );
         }
 
+    public:
         Surface( SurfacesKey ) : Surface() {}
 
         Surface( const MeshImpl& impl, SurfacesKey ) : Surface( impl ){};

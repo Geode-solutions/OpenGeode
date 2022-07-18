@@ -25,7 +25,8 @@
 
 #include <geode/basic/timer.h>
 
-#include <geode/mesh/core/regular_grid.h>
+#include <geode/mesh/core/regular_grid_solid.h>
+#include <geode/mesh/core/regular_grid_surface.h>
 
 namespace geode
 {

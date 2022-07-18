@@ -67,6 +67,7 @@ namespace geode
             return { this->component_type_static(), this->id() };
         };
 
+    public:
         ModelBoundary( ModelBoundariesKey ) : ModelBoundary() {}
 
         void set_model_boundary_name(

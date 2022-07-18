@@ -2,7 +2,6 @@
 
 #include <absl/types/span.h>
 
-#include <geode/basic/bitsery_archive.h>
 #include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
@@ -12,14 +11,14 @@
 namespace geode
 {
     class VertexIdentifierBuilder;
-}
+} // namespace geode
 
 namespace geode
 {
     /*!
      * Identify a vertex in a geometric component
      */
-    struct ComponentMeshVertex
+    struct opengeode_model_api ComponentMeshVertex
     {
         ComponentMeshVertex( ComponentID component_id_in, index_t vertex_id_in )
             : component_id( std::move( component_id_in ) ),
@@ -33,15 +32,7 @@ namespace geode
         }
 
         template < typename Archive >
-        void serialize( Archive& archive )
-        {
-            archive.ext( *this,
-                DefaultGrowable< Archive, ComponentMeshVertex >{},
-                []( Archive& a, ComponentMeshVertex& component_mesh_vertex ) {
-                    a.object( component_mesh_vertex.component_id );
-                    a.value4b( component_mesh_vertex.vertex );
-                } );
-        }
+        void serialize( Archive& archive );
 
         ComponentID component_id;
         index_t vertex{ NO_ID };
@@ -122,6 +113,7 @@ namespace geode
          */
         void save_unique_vertices( absl::string_view directory ) const;
 
+    public:
         /*!
          * Add a component in the VertexIdentifier
          */

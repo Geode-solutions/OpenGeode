@@ -23,6 +23,8 @@
 
 #include <geode/mesh/core/polyhedral_solid.h>
 
+#include <geode/basic/bitsery_archive.h>
+
 #include <geode/mesh/builder/polyhedral_solid_builder.h>
 #include <geode/mesh/core/mesh_factory.h>
 
@@ -53,5 +55,18 @@ namespace geode
         return clone;
     }
 
+    template < index_t dimension >
+    template < typename Archive >
+    void PolyhedralSolid< dimension >::serialize( Archive& archive )
+    {
+        archive.ext( *this, DefaultGrowable< Archive, PolyhedralSolid >{},
+            []( Archive& a, PolyhedralSolid& solid ) {
+                a.ext( solid,
+                    bitsery::ext::BaseClass< SolidMesh< dimension > >{} );
+            } );
+    }
+
     template class opengeode_mesh_api PolyhedralSolid< 3 >;
+
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, PolyhedralSolid< 3 > );
 } // namespace geode

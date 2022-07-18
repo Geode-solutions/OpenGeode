@@ -402,6 +402,15 @@ namespace geode
             polyhedron_adjacent_ptr_ = std::move( new_polyhedron_adjacent_ptr );
         }
 
+        void copy_polyhedra(
+            const OpenGeodeHybridSolid< dimension >::Impl& impl )
+        {
+            polyhedron_vertices_ = impl.polyhedron_vertices_;
+            polyhedron_vertex_ptr_ = impl.polyhedron_vertex_ptr_;
+            polyhedron_adjacents_ = impl.polyhedron_adjacents_;
+            polyhedron_adjacent_ptr_ = impl.polyhedron_adjacent_ptr_;
+        }
+
     private:
         Impl() = default;
 
@@ -616,6 +625,13 @@ namespace geode
             index_t polyhedron_id ) const
     {
         return impl_->polyhedron_type( polyhedron_id );
+    }
+
+    template < index_t dimension >
+    void OpenGeodeHybridSolid< dimension >::copy_polyhedra(
+        const OpenGeodeHybridSolid< dimension >& solid_mesh, OGHybridSolidKey )
+    {
+        impl_->copy_polyhedra( *solid_mesh.impl_ );
     }
 
     template < index_t dimension >

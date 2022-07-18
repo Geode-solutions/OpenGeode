@@ -80,6 +80,7 @@ namespace geode
             return modifiable_mesh();
         }
 
+    public:
         Line( LinesKey ) : Line() {}
 
         Line( const MeshImpl& impl, LinesKey ) : Line( impl ) {}

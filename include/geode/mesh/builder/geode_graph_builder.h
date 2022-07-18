@@ -70,6 +70,8 @@ namespace geode
         void do_permute_edges( absl::Span< const index_t > permutation,
             absl::Span< const index_t > old2new ) final;
 
+        void do_copy_edges( const Graph& mesh ) final;
+
     private:
         OpenGeodeGraph& geode_graph_;
     };

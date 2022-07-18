@@ -25,8 +25,6 @@
 
 #include <vector>
 
-#include <geode/basic/passkey.h>
-
 #include <geode/mesh/builder/vertex_set_builder.h>
 #include <geode/mesh/common.h>
 
@@ -76,6 +74,8 @@ namespace geode
     private:
         virtual void do_set_point(
             index_t vertex_id, Point< dimension > point ) = 0;
+
+        virtual void do_copy_points( const PointSet< dimension >& mesh ) = 0;
 
     private:
         PointSet< dimension >& point_set_;

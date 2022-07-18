@@ -27,15 +27,12 @@
 
 #include <absl/container/inlined_vector.h>
 
-#include <geode/basic/bitsery_archive.h>
-
 #include <geode/mesh/common.h>
 #include <geode/mesh/core/solid_mesh.h>
 
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( PolyhedralSolidBuilder );
-
     class AttributeManager;
 } // namespace geode
 
@@ -81,14 +78,7 @@ namespace geode
     private:
         friend class bitsery::Access;
         template < typename Archive >
-        void serialize( Archive& archive )
-        {
-            archive.ext( *this, DefaultGrowable< Archive, PolyhedralSolid >{},
-                []( Archive& a, PolyhedralSolid& solid ) {
-                    a.ext( solid,
-                        bitsery::ext::BaseClass< SolidMesh< dimension > >{} );
-                } );
-        }
+        void serialize( Archive& archive );
     };
     ALIAS_3D( PolyhedralSolid );
 } // namespace geode

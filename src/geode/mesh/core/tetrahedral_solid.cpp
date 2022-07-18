@@ -23,6 +23,8 @@
 
 #include <geode/mesh/core/tetrahedral_solid.h>
 
+#include <geode/basic/bitsery_archive.h>
+
 #include <geode/geometry/basic_objects/tetrahedron.h>
 #include <geode/geometry/basic_objects/triangle.h>
 
@@ -323,5 +325,18 @@ namespace geode
         return result;
     }
 
+    template < index_t dimension >
+    template < typename Archive >
+    void TetrahedralSolid< dimension >::serialize( Archive& archive )
+    {
+        archive.ext( *this, DefaultGrowable< Archive, TetrahedralSolid >{},
+            []( Archive& a, TetrahedralSolid& tetrahedral_solid ) {
+                a.ext( tetrahedral_solid,
+                    bitsery::ext::BaseClass< SolidMesh< dimension > >{} );
+            } );
+    }
+
     template class opengeode_mesh_api TetrahedralSolid< 3 >;
+
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, TetrahedralSolid< 3 > );
 } // namespace geode

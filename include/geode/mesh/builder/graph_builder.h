@@ -25,8 +25,6 @@
 
 #include <vector>
 
-#include <geode/basic/passkey.h>
-
 #include <geode/mesh/builder/vertex_set_builder.h>
 #include <geode/mesh/common.h>
 #include <geode/mesh/core/graph.h>
@@ -151,6 +149,8 @@ namespace geode
 
         virtual void do_delete_edges( const std::vector< bool >& to_delete,
             absl::Span< const index_t > old2new ) = 0;
+
+        virtual void do_copy_edges( const Graph& mesh ) = 0;
 
     private:
         Graph& graph_;

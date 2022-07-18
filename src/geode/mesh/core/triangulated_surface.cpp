@@ -23,6 +23,8 @@
 
 #include <geode/mesh/core/triangulated_surface.h>
 
+#include <geode/basic/bitsery_archive.h>
+
 #include <geode/geometry/basic_objects/triangle.h>
 
 #include <geode/mesh/builder/triangulated_surface_builder.h>
@@ -41,7 +43,7 @@ namespace geode
 
     template < index_t dimension >
     std::unique_ptr< TriangulatedSurface< dimension > >
-        TriangulatedSurface< dimension >::create( const MeshImpl &type )
+        TriangulatedSurface< dimension >::create( const MeshImpl& type )
     {
         return MeshFactory::create_mesh< TriangulatedSurface< dimension > >(
             type );
@@ -67,6 +69,20 @@ namespace geode
             this->point( this->polygon_vertex( { triangle_id, 2 } ) ) };
     }
 
+    template < index_t dimension >
+    template < typename Archive >
+    void TriangulatedSurface< dimension >::serialize( Archive& archive )
+    {
+        archive.ext( *this, DefaultGrowable< Archive, TriangulatedSurface >{},
+            []( Archive& a, TriangulatedSurface& triangulated_surface ) {
+                a.ext( triangulated_surface,
+                    bitsery::ext::BaseClass< SurfaceMesh< dimension > >{} );
+            } );
+    }
+
     template class opengeode_mesh_api TriangulatedSurface< 2 >;
     template class opengeode_mesh_api TriangulatedSurface< 3 >;
+
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, TriangulatedSurface< 2 > );
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, TriangulatedSurface< 3 > );
 } // namespace geode
