@@ -31,7 +31,7 @@ if __name__ == '__main__':
     data_dir = os.path.abspath(os.path.join(test_dir, "../../../../tests/data"))
 
     brep = model.load_brep( os.path.join(data_dir, "random_dfn.og_brep") )
-    section = model.convert_brep_into_section( brep,2 )
+    section, _ = model.convert_brep_into_section( brep,2 )
 
     if section.nb_corners() != 172:
         raise ValueError("[Test] Section should have 172 corners" )

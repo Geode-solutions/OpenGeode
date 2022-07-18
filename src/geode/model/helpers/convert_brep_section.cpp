@@ -37,25 +37,50 @@
 #include <geode/model/representation/core/brep.h>
 #include <geode/model/representation/core/section.h>
 
+namespace
+{
+    template < typename ModelFrom,
+        typename ModelTo,
+        typename BuilderTo,
+        geode::index_t dimension >
+    geode::ModelCopyMapping copy_components(
+        const ModelFrom& from, const ModelTo& to, BuilderTo& builder_to )
+    {
+        geode::ModelCopyMapping mappings;
+        mappings.emplace( geode::Corner< dimension >::component_type_static(),
+            geode::detail::copy_corner_components_without_type(
+                from, to, builder_to ) );
+        mappings.emplace( geode::Line< dimension >::component_type_static(),
+            geode::detail::copy_line_components_without_type(
+                from, to, builder_to ) );
+        mappings.emplace( geode::Surface< dimension >::component_type_static(),
+            geode::detail::copy_surface_components_without_type(
+                from, to, builder_to ) );
+        builder_to.copy_relationships( mappings, from );
+        return mappings;
+    }
+
+    template < typename ModelFrom, typename BuilderTo >
+    void copy_unique_vertices( const ModelFrom& from,
+        BuilderTo& builder_to,
+        const geode::ModelCopyMapping& mappings )
+    {
+        builder_to.create_unique_vertices( from.nb_unique_vertices() );
+        geode::detail::copy_vertex_identifier_components(
+            from, builder_to, mappings );
+    }
+} // namespace
+
 namespace geode
 {
-    Section convert_brep_into_section(
+    std::tuple< Section, ModelCopyMapping > convert_brep_into_section(
         const BRep& brep, index_t axis_to_remove )
     {
         Section section;
         SectionBuilder builder{ section };
-        ModelCopyMapping mappings;
-        mappings.emplace( Corner2D::component_type_static(),
-            detail::copy_corner_components_without_type(
-                brep, section, builder ) );
-        mappings.emplace( Line2D::component_type_static(),
-            detail::copy_line_components_without_type(
-                brep, section, builder ) );
-        mappings.emplace( Surface2D::component_type_static(),
-            detail::copy_surface_components_without_type(
-                brep, section, builder ) );
-        builder.copy_relationships( mappings, brep );
-
+        DEBUG_CONST auto mappings =
+            copy_components< BRep, Section, SectionBuilder, 2 >(
+                brep, section, builder );
         for( const auto& corner : brep.corners() )
         {
             builder.update_corner_mesh(
@@ -79,28 +104,18 @@ namespace geode
                 convert_surface_mesh3d_into_2d(
                     surface.mesh(), axis_to_remove ) );
         }
-
-        builder.create_unique_vertices( brep.nb_unique_vertices() );
-        detail::copy_vertex_identifier_components( brep, builder, mappings );
-        return section;
+        copy_unique_vertices( brep, builder, mappings );
+        return std::make_tuple( std::move( section ), std::move( mappings ) );
     }
 
-    BRep convert_section_into_brep(
+    std::tuple< BRep, ModelCopyMapping > convert_section_into_brep(
         const Section& section, index_t axis_to_add )
     {
         BRep brep;
         BRepBuilder builder{ brep };
-        ModelCopyMapping mappings;
-        mappings.emplace( Corner3D::component_type_static(),
-            detail::copy_corner_components_without_type(
-                section, brep, builder ) );
-        mappings.emplace( Line3D::component_type_static(),
-            detail::copy_line_components_without_type(
-                section, brep, builder ) );
-        mappings.emplace( Surface3D::component_type_static(),
-            detail::copy_surface_components_without_type(
-                section, brep, builder ) );
-
+        DEBUG_CONST auto mappings =
+            copy_components< Section, BRep, BRepBuilder, 3 >(
+                section, brep, builder );
         for( const auto& corner : section.corners() )
         {
             builder.update_corner_mesh(
@@ -122,9 +137,7 @@ namespace geode
                                   .in2out( surface.id() ) ),
                 convert_surface_mesh2d_into_3d( surface.mesh(), axis_to_add ) );
         }
-
-        builder.create_unique_vertices( section.nb_unique_vertices() );
-        detail::copy_vertex_identifier_components( section, builder, mappings );
-        return brep;
+        copy_unique_vertices( section, builder, mappings );
+        return std::make_tuple( std::move( brep ), std::move( mappings ) );
     }
 } // namespace geode

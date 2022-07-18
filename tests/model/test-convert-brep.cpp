@@ -27,6 +27,7 @@
 #include <geode/basic/logger.h>
 
 #include <geode/model/helpers/convert_brep_section.h>
+#include <geode/model/representation/builder/copy_mapping.h>
 #include <geode/model/representation/core/brep.h>
 #include <geode/model/representation/core/section.h>
 #include <geode/model/representation/io/brep_input.h>
@@ -35,7 +36,8 @@ void test()
 {
     auto brep = geode::load_brep(
         absl::StrCat( geode::data_path, "random_dfn.og_brep" ) );
-    const auto section = geode::convert_brep_into_section( brep, 2 );
+    const auto section =
+        std::get< 0 >( geode::convert_brep_into_section( brep, 2 ) );
 
     OPENGEODE_EXCEPTION(
         section.nb_corners() == 172, "[Test] Section should have 172 corners" );
@@ -44,7 +46,8 @@ void test()
     OPENGEODE_EXCEPTION( section.nb_surfaces() == 117,
         "[Test] Section should have 117 surfaces" );
 
-    const auto brep2 = geode::convert_section_into_brep( section, 2 );
+    const auto brep2 =
+        std::get< 0 >( geode::convert_section_into_brep( section, 2 ) );
 
     OPENGEODE_EXCEPTION(
         brep2.nb_corners() == 172, "[Test] BRep should have 172 corners" );
