@@ -55,12 +55,14 @@ namespace geode
     template < index_t dimension >
     void OpenGeodePointSetBuilder< dimension >::do_create_vertex()
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
     void OpenGeodePointSetBuilder< dimension >::do_create_vertices(
         index_t /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
@@ -68,6 +70,7 @@ namespace geode
         const std::vector< bool >& /*unused*/,
         absl::Span< const index_t > /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
@@ -75,12 +78,14 @@ namespace geode
         absl::Span< const index_t > /*unused*/,
         absl::Span< const index_t > /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
     void OpenGeodePointSetBuilder< dimension >::do_copy_points(
         const PointSet< dimension >& /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template class opengeode_mesh_api OpenGeodePointSetBuilder< 2 >;

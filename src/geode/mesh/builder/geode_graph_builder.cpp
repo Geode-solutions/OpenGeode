@@ -39,20 +39,28 @@ namespace geode
     {
     }
 
-    void OpenGeodeGraphBuilder::do_create_vertex() {}
+    void OpenGeodeGraphBuilder::do_create_vertex()
+    {
+        // Operation is directly handled by the AttributeManager
+    }
 
-    void OpenGeodeGraphBuilder::do_create_vertices( index_t /*unused*/ ) {}
+    void OpenGeodeGraphBuilder::do_create_vertices( index_t /*unused*/ )
+    {
+        // Operation is directly handled by the AttributeManager
+    }
 
     void OpenGeodeGraphBuilder::do_delete_graph_vertices(
         const std::vector< bool >& /*unused*/,
         absl::Span< const index_t > /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     void OpenGeodeGraphBuilder::do_permute_graph_vertices(
         absl::Span< const index_t > /*unused*/,
         absl::Span< const index_t > /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     void OpenGeodeGraphBuilder::do_set_edge_vertex(
@@ -61,21 +69,32 @@ namespace geode
         geode_graph_.set_edge_vertex( edge_vertex, vertex_id, {} );
     }
 
-    void OpenGeodeGraphBuilder::do_create_edge() {}
+    void OpenGeodeGraphBuilder::do_create_edge()
+    {
+        // Operation is directly handled by the AttributeManager
+    }
 
-    void OpenGeodeGraphBuilder::do_create_edges( index_t /*unused*/ ) {}
+    void OpenGeodeGraphBuilder::do_create_edges( index_t /*unused*/ )
+    {
+        // Operation is directly handled by the AttributeManager
+    }
 
     void OpenGeodeGraphBuilder::do_delete_edges(
         const std::vector< bool >& /*unused*/,
         absl::Span< const index_t > /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     void OpenGeodeGraphBuilder::do_permute_edges(
         absl::Span< const index_t > /*unused*/,
         absl::Span< const index_t > /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
     }
 
-    void OpenGeodeGraphBuilder::do_copy_edges( const Graph& /*unused*/ ) {}
+    void OpenGeodeGraphBuilder::do_copy_edges( const Graph& /*unused*/ )
+    {
+        // Operation is directly handled by the AttributeManager
+    }
 } // namespace geode

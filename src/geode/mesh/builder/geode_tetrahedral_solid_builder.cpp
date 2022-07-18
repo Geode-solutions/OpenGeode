@@ -60,12 +60,14 @@ namespace geode
     template < index_t dimension >
     void OpenGeodeTetrahedralSolidBuilder< dimension >::do_create_vertex()
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
     void OpenGeodeTetrahedralSolidBuilder< dimension >::do_create_vertices(
         index_t /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
@@ -74,6 +76,7 @@ namespace geode
             const std::vector< bool >& /*unused*/,
             absl::Span< const index_t > /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
@@ -81,6 +84,7 @@ namespace geode
         do_permute_solid_vertices( absl::Span< const index_t > /*unused*/,
             absl::Span< const index_t > /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
@@ -103,6 +107,7 @@ namespace geode
     void OpenGeodeTetrahedralSolidBuilder< dimension >::do_create_tetrahedra(
         index_t /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
@@ -127,6 +132,7 @@ namespace geode
         const std::vector< bool >& /*unused*/,
         absl::Span< const index_t > /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
@@ -134,18 +140,21 @@ namespace geode
         absl::Span< const index_t > /*unused*/,
         absl::Span< const index_t > /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
     void OpenGeodeTetrahedralSolidBuilder< dimension >::do_copy_points(
         const SolidMesh< dimension >& /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template < index_t dimension >
     void OpenGeodeTetrahedralSolidBuilder< dimension >::do_copy_polyhedra(
         const SolidMesh< dimension >& /*unused*/ )
     {
+        // Operation is directly handled by the AttributeManager
     }
 
     template class opengeode_mesh_api OpenGeodeTetrahedralSolidBuilder< 3 >;

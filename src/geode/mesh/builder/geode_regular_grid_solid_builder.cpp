@@ -50,17 +50,20 @@ namespace geode
     }
 
     void OpenGeodeRegularGridBuilder< 3 >::do_create_vertices(
-        index_t /*unsued*/ )
+        index_t /*unused*/ )
     {
+        // Operation no needed for the RegularGrid
     }
 
     void OpenGeodeRegularGridBuilder< 3 >::do_copy_points(
         const SolidMesh< 3 >& /*unused*/ )
     {
+        // Operation no needed for the RegularGrid
     }
 
     void OpenGeodeRegularGridBuilder< 3 >::do_copy_polyhedra(
         const SolidMesh< 3 >& /*unused*/ )
     {
+        // Operation no needed for the RegularGrid
     }
 } // namespace geode

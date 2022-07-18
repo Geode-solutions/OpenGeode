@@ -135,7 +135,7 @@ namespace geode
             {
                 const auto cell = cell_indices( grid, element );
                 const index_t direction = static_cast< index_t >( facet / 2 );
-                if( facet % 2 == 0 )
+                if( ( facet & 1 ) == 0 /* modulo 2 */ )
                 {
                     if( const auto adj = grid.previous_cell( cell, direction ) )
                     {
