@@ -70,23 +70,23 @@ void test()
         merged->nb_polygons() == 4, "[Test] Wrong number of polygons" );
 
     OPENGEODE_EXCEPTION(
-        !merged->polygon_adjacent( { 0, 0 } ), "[Test] Wrong adjacency" );
+        !merged->polygon_adjacent( { 0, 2 } ), "[Test] Wrong adjacency" );
     OPENGEODE_EXCEPTION(
-        !merged->polygon_adjacent( { 2, 0 } ), "[Test] Wrong adjacency" );
+        !merged->polygon_adjacent( { 2, 2 } ), "[Test] Wrong adjacency" );
 
     OPENGEODE_EXCEPTION(
-        merged->polygon_adjacent( { 0, 2 } ) == 1, "[Test] Wrong adjacency" );
+        merged->polygon_adjacent( { 0, 0 } ) == 1, "[Test] Wrong adjacency" );
     OPENGEODE_EXCEPTION(
-        merged->polygon_adjacent( { 1, 0 } ) == 0, "[Test] Wrong adjacency" );
+        merged->polygon_adjacent( { 1, 2 } ) == 0, "[Test] Wrong adjacency" );
     OPENGEODE_EXCEPTION(
-        merged->polygon_adjacent( { 2, 2 } ) == 3, "[Test] Wrong adjacency" );
+        merged->polygon_adjacent( { 2, 0 } ) == 3, "[Test] Wrong adjacency" );
     OPENGEODE_EXCEPTION(
-        merged->polygon_adjacent( { 3, 0 } ) == 2, "[Test] Wrong adjacency" );
+        merged->polygon_adjacent( { 3, 2 } ) == 2, "[Test] Wrong adjacency" );
 
     OPENGEODE_EXCEPTION(
         !merged->polygon_adjacent( { 0, 1 } ), "[Test] Wrong adjacency" );
     OPENGEODE_EXCEPTION(
-        !merged->polygon_adjacent( { 3, 2 } ), "[Test] Wrong adjacency" );
+        !merged->polygon_adjacent( { 3, 0 } ), "[Test] Wrong adjacency" );
 }
 
 OPENGEODE_TEST( "merge-surface" )

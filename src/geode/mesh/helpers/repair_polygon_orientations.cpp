@@ -29,6 +29,10 @@
 
 #include <geode/basic/logger.h>
 
+#include <geode/geometry/basic_objects/triangle.h>
+#include <geode/geometry/information.h>
+#include <geode/geometry/sign.h>
+
 #include <geode/mesh/builder/surface_edges_builder.h>
 #include <geode/mesh/builder/surface_mesh_builder.h>
 #include <geode/mesh/core/surface_mesh.h>
@@ -38,8 +42,6 @@ namespace
     template < geode::index_t dimension >
     class PolygonOrientationChecker
     {
-        static constexpr auto reorient_attribute_name = "reorient";
-
     public:
         PolygonOrientationChecker( const geode::SurfaceMesh< dimension >& mesh )
             : mesh_( mesh ), reorient_polygon_( mesh.nb_polygons(), false )
@@ -124,11 +126,148 @@ namespace
         geode::index_t nb_{ 0 };
     };
 
-    template < geode::index_t dimension >
-    absl::FixedArray< geode::index_t > identify_bad_orented_polygons(
-        const geode::SurfaceMesh< dimension >& mesh )
+    struct polygons_area_sign_info
     {
-        PolygonOrientationChecker< dimension > checker{ mesh };
+        polygons_area_sign_info( geode::index_t nb_init,
+            geode::index_t nb_polygons,
+            geode::Sign sign_init )
+            : nb_bad_polygons{ nb_init }, area_sign{ nb_polygons, sign_init }
+        {
+        }
+
+        geode::index_t nb_bad_polygons;
+        std::queue< geode::index_t > queue;
+        absl::FixedArray< geode::Sign > area_sign;
+    };
+
+    polygons_area_sign_info compute_polygon_area_sign(
+        const geode::SurfaceMesh2D& mesh )
+    {
+        polygons_area_sign_info area_sign_info{ 0, mesh.nb_polygons(),
+            geode::Sign::zero };
+        for( const auto polygon_id : geode::Range{ mesh.nb_polygons() } )
+        {
+            const auto& p1 =
+                mesh.point( mesh.polygon_vertex( { polygon_id, 0 } ) );
+            for( const auto i :
+                geode::LRange{ 1, mesh.nb_polygon_vertices( polygon_id ) - 1 } )
+            {
+                const auto& p2 =
+                    mesh.point( mesh.polygon_vertex( { polygon_id, i } ) );
+                const auto& p3 = mesh.point( mesh.polygon_vertex( { polygon_id,
+                    static_cast< geode::local_index_t >( i + 1 ) } ) );
+                const auto sign = geode::triangle_area_sign( { p1, p2, p3 } );
+                if( sign == geode::Sign::positive )
+                {
+                    area_sign_info.area_sign[polygon_id] =
+                        geode::Sign::positive;
+                    break;
+                }
+                if( sign == geode::Sign::negative )
+                {
+                    area_sign_info.area_sign[polygon_id] =
+                        geode::Sign::negative;
+                    area_sign_info.nb_bad_polygons++;
+                    break;
+                }
+            }
+            if( area_sign_info.area_sign[polygon_id] == geode::Sign::zero )
+            {
+                area_sign_info.queue.emplace( polygon_id );
+            }
+        }
+        OPENGEODE_EXCEPTION( area_sign_info.queue.size() != mesh.nb_polygons(),
+            "[repair_polygon_bad_orientations] Cannot repair orientations of a "
+            "SurfaceMesh2D where all polygons have a null area." );
+        return area_sign_info;
+    }
+
+    void process_null_area_polygons( const geode::SurfaceMesh2D& mesh,
+        polygons_area_sign_info& area_sign_info )
+    {
+        while( !area_sign_info.queue.empty() )
+        {
+            const auto cur_polygon = area_sign_info.queue.front();
+            area_sign_info.queue.pop();
+            for( const auto e :
+                geode::LRange{ mesh.nb_polygon_edges( cur_polygon ) } )
+            {
+                const geode::PolygonEdge edge{ cur_polygon, e };
+                if( mesh.is_edge_on_border( edge ) )
+                {
+                    continue;
+                }
+                const auto adj = mesh.polygon_adjacent_edge( edge ).value();
+                if( area_sign_info.area_sign[adj.polygon_id]
+                    == geode::Sign::zero )
+                {
+                    continue;
+                }
+                const auto vertices = mesh.polygon_edge_vertices( edge );
+                const auto adj_vertices = mesh.polygon_edge_vertices( adj );
+                const auto same_orientation =
+                    ( vertices[0] == adj_vertices[1]
+                        && vertices[1] == adj_vertices[0] );
+                if( same_orientation )
+                {
+                    area_sign_info.area_sign[cur_polygon] =
+                        area_sign_info.area_sign[adj.polygon_id];
+                    break;
+                }
+                if( area_sign_info.area_sign[adj.polygon_id]
+                    == geode::Sign::positive )
+                {
+                    area_sign_info.area_sign[cur_polygon] =
+                        geode::Sign::negative;
+                }
+                else
+                {
+                    area_sign_info.area_sign[cur_polygon] =
+                        geode::Sign::positive;
+                }
+                break;
+            }
+            if( area_sign_info.area_sign[cur_polygon] == geode::Sign::zero )
+            {
+                area_sign_info.queue.emplace( cur_polygon );
+            }
+            else if( area_sign_info.area_sign[cur_polygon]
+                     == geode::Sign::negative )
+            {
+                area_sign_info.nb_bad_polygons++;
+            }
+        }
+    }
+
+    template < geode::index_t dimension >
+    absl::FixedArray< geode::index_t > identify_badly_oriented_polygons(
+        const geode::SurfaceMesh< dimension >& mesh );
+
+    template <>
+    absl::FixedArray< geode::index_t > identify_badly_oriented_polygons< 2 >(
+        const geode::SurfaceMesh2D& mesh )
+    {
+        auto area_sign_info = compute_polygon_area_sign( mesh );
+        process_null_area_polygons( mesh, area_sign_info );
+
+        absl::FixedArray< geode::index_t > bad_polygons(
+            area_sign_info.nb_bad_polygons );
+        geode::index_t count{ 0 };
+        for( const auto p : geode::Range{ mesh.nb_polygons() } )
+        {
+            if( area_sign_info.area_sign[p] == geode::Sign::negative )
+            {
+                bad_polygons[count++] = p;
+            }
+        }
+        return bad_polygons;
+    }
+
+    template <>
+    absl::FixedArray< geode::index_t > identify_badly_oriented_polygons< 3 >(
+        const geode::SurfaceMesh3D& mesh )
+    {
+        PolygonOrientationChecker< 3 > checker{ mesh };
         return checker.compute_bad_oriented_polygons();
     }
 
@@ -177,7 +316,8 @@ namespace geode
     void repair_polygon_orientations( SurfaceMesh< dimension >& mesh )
     {
         auto builder = SurfaceMeshBuilder< dimension >::create( mesh );
-        const auto polygons_to_reorient = identify_bad_orented_polygons( mesh );
+        const auto polygons_to_reorient =
+            identify_badly_oriented_polygons( mesh );
         reorient_bad_polygons( *builder, mesh, polygons_to_reorient );
         if( mesh.are_edges_enabled() )
         {
