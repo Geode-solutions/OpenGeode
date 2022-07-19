@@ -48,6 +48,11 @@ namespace geode
         return clone;
     }
 
+    AttributeManager& RegularGrid< 3 >::cell_attribute_manager() const
+    {
+        return polyhedron_attribute_manager();
+    }
+
     template < typename Archive >
     void RegularGrid< 3 >::serialize( Archive& archive )
     {
