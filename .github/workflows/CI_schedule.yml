@@ -7,4 +7,6 @@ on:
 jobs:
   schedule:
     uses: Geode-solutions/actions/.github/workflows/ci-schedule.yml@master
+    with:
+      directory: opengeode
     secrets: inherit
