@@ -4,7 +4,11 @@
 
 ### Motivations
 
-XXXX
+Some cleanup was required in several classes to improve naming and clarify usage.
+A lot of new features were added, very few with breaking changes, and all of them documented in the release changelog.
+
+The largest breaking change is the refactoring and integration of the RegularGrid into the Mesh hierarchy.
+The whole design of this class has been reshaped to be more aligned with the other Mesh classes including abstract interface, builder...
 
 ### Breaking Changes
 
