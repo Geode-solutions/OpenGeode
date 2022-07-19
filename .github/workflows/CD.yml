@@ -10,42 +10,30 @@ jobs:
     with:
       name: OPENGEODE
       directory: opengeode
-    secrets:
-      TOKEN: ${{ secrets.TOKEN }}
-      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} 
+    secrets: inherit
 
   release-linux-python:
     uses: Geode-solutions/actions/.github/workflows/cd-linux-python.yml@master
     with:
       name: OPENGEODE
       directory: opengeode
-    secrets:
-      TOKEN: ${{ secrets.TOKEN }}
-      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} 
-      PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }} 
+    secrets: inherit
 
   release-windows:
     uses: Geode-solutions/actions/.github/workflows/cd-windows.yml@master
     with:
       name: OPENGEODE
       directory: opengeode
-    secrets:
-      TOKEN: ${{ secrets.TOKEN }}
-      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    secrets: inherit
 
   release-windows-python:
     uses: Geode-solutions/actions/.github/workflows/cd-windows-python.yml@master
     with:
       name: OPENGEODE
       directory: opengeode
-    secrets:
-      TOKEN: ${{ secrets.TOKEN }}
-      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-      PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+    secrets: inherit
 
   notify:
     uses: Geode-solutions/actions/.github/workflows/end-cd.yml@master
     needs: [release-linux, release-linux-python, release-windows, release-windows-python]
-    secrets:
-      TOKEN: ${{ secrets.TOKEN }}
-      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    secrets: inherit
