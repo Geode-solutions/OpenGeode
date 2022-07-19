@@ -27,8 +27,9 @@
 
 #include <geode/basic/uuid.h>
 
-#include <geode/mesh/common.h>
 #include <geode/mesh/core/surface_mesh.h>
+
+#include <geode/model/common.h>
 
 namespace geode
 {
@@ -72,7 +73,7 @@ namespace geode
         PolygonEdge edge;
     };
 
-    struct opengeode_mesh_api SortedSurfaces
+    struct opengeode_model_api SortedSurfaces
     {
         SortedSurfaces( index_t nb_surfaces );
 
@@ -86,7 +87,7 @@ namespace geode
         absl::FixedArray< SidedSurface > surfaces;
     };
 
-    SortedSurfaces opengeode_mesh_api surface_radial_sort(
+    SortedSurfaces opengeode_model_api surface_radial_sort(
         const BRep& brep, const Line3D& line );
 } // namespace geode
 
