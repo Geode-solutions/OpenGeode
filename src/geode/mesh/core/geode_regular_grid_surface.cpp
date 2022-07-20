@@ -38,8 +38,11 @@
 namespace
 {
     static constexpr std::array< std::array< geode::local_index_t, 2 >, 4 >
-        cell_vertices_translations{ { { 0, 0 }, { 1, 0 }, { 0, 1 },
-            { 1, 1 } } };
+        cell_vertices_translations{ { { 0, 0 }, { 1, 0 }, { 1, 1 },
+            { 0, 1 } } };
+    static constexpr std::array< std::pair< bool, geode::index_t >, 4 >
+        cell_adjacent_directions{ { { false, 1 }, { true, 0 }, { true, 1 },
+            { false, 0 } } };
 } // namespace
 
 namespace geode
@@ -70,6 +73,29 @@ namespace geode
                     cell_vertices_translations[polygon_vertex.vertex_id][d];
             }
             return vertex_index( grid, cell_vertex );
+        }
+
+        absl::optional< index_t > cell_adjacent(
+            const RegularGrid2D& grid, const PolygonEdge& edge ) const
+        {
+            const auto cell = cell_indices( grid, edge.polygon_id );
+            const auto& direction = cell_adjacent_directions[edge.edge_id];
+            if( direction.first )
+            {
+                if( const auto adj = grid.next_cell( cell, direction.second ) )
+                {
+                    return grid.cell_index( adj.value() );
+                }
+            }
+            else
+            {
+                if( const auto adj =
+                        grid.previous_cell( cell, direction.second ) )
+                {
+                    return grid.cell_index( adj.value() );
+                }
+            }
+            return absl::nullopt;
         }
 
     private:
@@ -145,7 +171,7 @@ namespace geode
     absl::optional< index_t > OpenGeodeRegularGrid< 2 >::get_polygon_adjacent(
         const PolygonEdge& edge ) const
     {
-        return impl_->cell_adjacent( *this, edge.polygon_id, edge.edge_id );
+        return impl_->cell_adjacent( *this, edge );
     }
 
     void OpenGeodeRegularGrid< 2 >::update_origin(

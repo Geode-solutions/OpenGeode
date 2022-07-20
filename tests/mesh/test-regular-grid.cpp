@@ -30,7 +30,9 @@
 #include <geode/geometry/point.h>
 
 #include <geode/mesh/builder/regular_grid_solid_builder.h>
+#include <geode/mesh/builder/regular_grid_surface_builder.h>
 #include <geode/mesh/core/regular_grid_solid.h>
+#include <geode/mesh/core/regular_grid_surface.h>
 #include <geode/mesh/io/regular_grid_input.h>
 #include <geode/mesh/io/regular_grid_output.h>
 
@@ -392,6 +394,20 @@ void test_io( const geode::RegularGrid3D& grid, absl::string_view filename )
     geode::load_regular_grid< 3 >( filename );
 }
 
+void test_adjacencies2D()
+{
+    auto grid = geode::RegularGrid2D::create();
+    auto builder = geode::RegularGridBuilder2D::create( *grid );
+    builder->initialize_grid( { { 0., 0. } }, { 10, 10 }, 1 );
+    for( const auto p : geode::Range{ grid->nb_polygons() } )
+    {
+        for( const auto ee : geode::LRange{ grid->nb_polygon_edges( p ) } )
+        {
+            grid->polygon_adjacent_edge( { p, ee } );
+        }
+    }
+}
+
 void test()
 {
     auto grid = geode::RegularGrid3D::create();
@@ -408,6 +424,7 @@ void test()
     test_closest_vertex( *grid );
     test_clone( *grid );
     test_io( *grid, absl::StrCat( "test.", grid->native_extension() ) );
+    test_adjacencies2D();
 }
 
 OPENGEODE_TEST( "regular-grid" )
