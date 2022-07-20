@@ -43,11 +43,11 @@ namespace geode
                 geode::Logger::warn(
                     "[Input] The file loader notified INCONSISTENCIES in the "
                     "given data file. In consequence, the loaded structure is "
-                    "likely BROKEN, and there is NO GUARENTEE that any further "
+                    "likely BROKEN, and there is NO GUARANTEE that any further "
                     "operation will work on it without repairing it first. We "
                     "highly recommend inspecting the data to make sure these "
                     "inconsistencies do not impact your following work. To do "
-                    "so, you can for example usethe Open-Source "
+                    "so, you can for example use the Open-Source "
                     "OpenGeode-Inspector or the online free tool: "
                     "https://geode-solutions.com/tools/validitychecker" );
             }
