@@ -382,7 +382,7 @@ namespace geode
         {
             return;
         }
-        const auto polygons_around =
+        const auto& polygons_around =
             surface_mesh_.polygons_around_vertex( old_vertex_id );
         disassociate_polygon_vertex_to_vertex( old_vertex_id );
         for( const auto& polygon_around : polygons_around )
@@ -401,6 +401,7 @@ namespace geode
             }
             update_polygon_vertex( polygon_around, new_vertex_id );
         }
+        reset_polygons_around_vertex( old_vertex_id );
     }
 
     template < index_t dimension >
