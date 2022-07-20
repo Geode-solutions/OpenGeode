@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <geode/basic/logger.h>
+
 #include <geode/mesh/common.h>
 #include <geode/mesh/io/io.h>
 
@@ -34,7 +36,32 @@ namespace geode
     public:
         virtual Mesh read( const Args&... args ) = 0;
 
+        ~Input()
+        {
+            if( inspect_required_ )
+            {
+                geode::Logger::warn(
+                    "[Input] The file loader notified INCONSISTENCIES in the "
+                    "given data file. In consequence, the loaded structure is "
+                    "likely BROKEN, and there is NO GUARENTEE that any further "
+                    "operation will work on it without repairing it first. We "
+                    "highly recommend inspecting the data to make sure these "
+                    "inconsistencies do not impact your following work. To do "
+                    "so, you can for example usethe Open-Source "
+                    "OpenGeode-Inspector or the online free tool: "
+                    "https://geode-solutions.com/tools/validitychecker" );
+            }
+        }
+
     protected:
         Input( absl::string_view filename ) : IOFile( filename ) {}
+
+        void need_to_inspect_result()
+        {
+            inspect_required_ = true;
+        }
+
+    private:
+        bool inspect_required_{ false };
     };
 } // namespace geode
