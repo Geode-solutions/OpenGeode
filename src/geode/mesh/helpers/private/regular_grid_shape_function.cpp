@@ -25,8 +25,7 @@
 
 #include <geode/geometry/point.h>
 
-#include <geode/mesh/core/regular_grid_solid.h>
-#include <geode/mesh/core/regular_grid_surface.h>
+#include <geode/mesh/core/grid.h>
 
 namespace
 {
@@ -41,7 +40,7 @@ namespace
 
     template < geode::index_t dimension >
     geode::Point< dimension > local_point_coordinates(
-        const geode::RegularGrid< dimension >& grid,
+        const geode::Grid< dimension >& grid,
         const geode::Point< dimension >& point,
         const geode::GridCellIndices< dimension >& cell_id )
     {
@@ -69,7 +68,7 @@ namespace geode
     namespace detail
     {
         template < index_t dimension >
-        double shape_function_value( const RegularGrid< dimension >& grid,
+        double shape_function_value( const Grid< dimension >& grid,
             const GridCellIndices< dimension >& cell_id,
             local_index_t node_id,
             const Point< dimension >& point )
@@ -91,35 +90,16 @@ namespace geode
             return shape_function_value;
         }
 
-        template < index_t dimension >
-        GridVertexIndices< dimension > cell_node_index(
-            const GridCellIndices< dimension >& cell_id, local_index_t node_id )
-        {
-            auto node_index = cell_id;
-            for( const auto d : LRange{ dimension } )
-            {
-                if( !node_is_on_axis_origin< dimension >( node_id, d ) )
-                {
-                    node_index[d] += 1;
-                }
-            }
-            return node_index;
-        }
-
         template double opengeode_mesh_api shape_function_value< 2 >(
-            const RegularGrid< 2 >& grid,
+            const Grid< 2 >& grid,
             const GridCellIndices< 2 >& cell_id,
             local_index_t node_id,
             const Point< 2 >& point );
-        template GridVertexIndices< 2 > opengeode_mesh_api cell_node_index< 2 >(
-            const GridCellIndices< 2 >& cell_id, local_index_t node_id );
 
         template double opengeode_mesh_api shape_function_value< 3 >(
-            const RegularGrid< 3 >& grid,
+            const Grid< 3 >& grid,
             const GridCellIndices< 3 >& cell_id,
             local_index_t node_id,
             const Point< 3 >& point );
-        template GridVertexIndices< 3 > opengeode_mesh_api cell_node_index< 3 >(
-            const GridCellIndices< 3 >& cell_id, local_index_t node_id );
     } // namespace detail
 } // namespace geode

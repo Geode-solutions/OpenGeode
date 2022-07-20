@@ -29,7 +29,7 @@
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
-    FORWARD_DECLARATION_DIMENSION_CLASS( RegularGrid );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Grid );
 } // namespace geode
 
 namespace geode
@@ -37,14 +37,9 @@ namespace geode
     namespace detail
     {
         template < index_t dimension >
-        double shape_function_value( const RegularGrid< dimension >& grid,
+        double shape_function_value( const Grid< dimension >& grid,
             const GridCellIndices< dimension >& cell_id,
             local_index_t node_id,
             const Point< dimension >& point );
-
-        template < index_t dimension >
-        GridVertexIndices< dimension > cell_node_index(
-            const GridCellIndices< dimension >& cell_id,
-            local_index_t node_id );
     } // namespace detail
 } // namespace geode

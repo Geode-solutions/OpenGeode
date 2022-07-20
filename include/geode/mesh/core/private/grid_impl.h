@@ -128,30 +128,6 @@ namespace geode
                 return vertex_id;
             }
 
-            absl::optional< index_t > cell_adjacent(
-                const RegularGrid< dimension >& grid,
-                index_t element,
-                local_index_t facet ) const
-            {
-                const auto cell = cell_indices( grid, element );
-                const index_t direction = static_cast< index_t >( facet / 2 );
-                if( ( facet & 1 ) == 0 /* modulo 2 */ )
-                {
-                    if( const auto adj = grid.previous_cell( cell, direction ) )
-                    {
-                        return grid.cell_index( adj.value() );
-                    }
-                }
-                else
-                {
-                    if( const auto adj = grid.next_cell( cell, direction ) )
-                    {
-                        return grid.cell_index( adj.value() );
-                    }
-                }
-                return absl::nullopt;
-            }
-
         protected:
             void do_update_origin( RegularGrid< dimension >& grid,
                 PointsImpl< dimension >& impl,
