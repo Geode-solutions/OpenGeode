@@ -290,6 +290,11 @@ namespace geode
         : VertexSetBuilder( mesh ), solid_mesh_( mesh )
     {
     }
+    
+    template < index_t dimension >
+    SolidMeshBuilder< dimension >::~SolidMeshBuilder()
+    {
+    }
 
     template < index_t dimension >
     std::unique_ptr< SolidMeshBuilder< dimension > >

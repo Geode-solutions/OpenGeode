@@ -312,6 +312,11 @@ namespace geode
     {
     }
 
+     template < index_t dimension >
+    SurfaceMeshBuilder< dimension >::~SurfaceMeshBuilder()
+    {
+    }
+
     template < index_t dimension >
     std::unique_ptr< SurfaceMeshBuilder< dimension > >
         SurfaceMeshBuilder< dimension >::create(
