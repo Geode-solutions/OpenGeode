@@ -312,7 +312,7 @@ namespace geode
     {
     }
 
-     template < index_t dimension >
+    template < index_t dimension >
     SurfaceMeshBuilder< dimension >::~SurfaceMeshBuilder()
     {
     }

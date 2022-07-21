@@ -47,7 +47,7 @@ namespace geode
     class SolidMeshBuilder : public VertexSetBuilder
     {
     public:
-    virtual ~SolidMeshBuilder();
+        virtual ~SolidMeshBuilder();
         /*!
          * Create the builder associated with a SolidMesh.
          * @param[in] mesh The SolidMesh to build/modify
