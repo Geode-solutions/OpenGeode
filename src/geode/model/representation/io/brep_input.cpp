@@ -40,7 +40,8 @@ namespace geode
                 to_string( extension_from_filename( filename ) );
             OPENGEODE_EXCEPTION( BRepInputFactory::has_creator( extension ),
                 "Unknown extension: ", extension );
-            auto brep = BRepInputFactory::create( extension, filename )->read();
+            auto input = BRepInputFactory::create( extension, filename );
+            auto brep = input->read();
             if( brep.name() == Identifier::DEFAULT_NAME )
             {
                 BRepBuilder{ brep }.set_name(

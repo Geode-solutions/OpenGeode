@@ -45,10 +45,9 @@ namespace geode
                 TetrahedralSolidInputFactory< dimension >::has_creator(
                     extension ),
                 "Unknown extension: ", extension );
-            auto tetrahedral_solid =
-                TetrahedralSolidInputFactory< dimension >::create(
-                    extension, filename )
-                    ->read( impl );
+            auto input = TetrahedralSolidInputFactory< dimension >::create(
+                extension, filename );
+            auto tetrahedral_solid = input->read( impl );
             if( tetrahedral_solid->name() == Identifier::DEFAULT_NAME )
             {
                 TetrahedralSolidBuilder< dimension >::create(

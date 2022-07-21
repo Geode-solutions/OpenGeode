@@ -44,9 +44,9 @@ namespace geode
             OPENGEODE_EXCEPTION(
                 PointSetInputFactory< dimension >::has_creator( extension ),
                 "Unknown extension: ", extension );
-            auto point_set =
-                PointSetInputFactory< dimension >::create( extension, filename )
-                    ->read( impl );
+            auto input = PointSetInputFactory< dimension >::create(
+                extension, filename );
+            auto point_set = input->read( impl );
             if( point_set->name() == Identifier::DEFAULT_NAME )
             {
                 PointSetBuilder< dimension >::create( *point_set )

@@ -45,10 +45,9 @@ namespace geode
                 PolyhedralSolidInputFactory< dimension >::has_creator(
                     extension ),
                 "Unknown extension: ", extension );
-            auto polyhedral_solid =
-                PolyhedralSolidInputFactory< dimension >::create(
-                    extension, filename )
-                    ->read( impl );
+            auto input = PolyhedralSolidInputFactory< dimension >::create(
+                extension, filename );
+            auto polyhedral_solid = input->read( impl );
             if( polyhedral_solid->name() == Identifier::DEFAULT_NAME )
             {
                 PolyhedralSolidBuilder< dimension >::create( *polyhedral_solid )

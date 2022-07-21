@@ -42,8 +42,8 @@ namespace geode
                 to_string( extension_from_filename( filename ) );
             OPENGEODE_EXCEPTION( GraphInputFactory::has_creator( extension ),
                 "Unknown extension: ", extension );
-            auto graph =
-                GraphInputFactory::create( extension, filename )->read( impl );
+            auto input = GraphInputFactory::create( extension, filename );
+            auto graph = input->read( impl );
             if( graph->name() == Identifier::DEFAULT_NAME )
             {
                 GraphBuilder::create( *graph )->set_name(

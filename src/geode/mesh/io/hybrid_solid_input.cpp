@@ -44,9 +44,9 @@ namespace geode
             OPENGEODE_EXCEPTION(
                 HybridSolidInputFactory< dimension >::has_creator( extension ),
                 "Unknown extension: ", extension );
-            auto hybrid_solid = HybridSolidInputFactory< dimension >::create(
-                extension, filename )
-                                    ->read( impl );
+            auto input = HybridSolidInputFactory< dimension >::create(
+                extension, filename );
+            auto hybrid_solid = input->read( impl );
             if( hybrid_solid->name() == Identifier::DEFAULT_NAME )
             {
                 HybridSolidBuilder< dimension >::create( *hybrid_solid )
