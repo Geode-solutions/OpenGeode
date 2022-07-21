@@ -49,6 +49,8 @@ namespace geode
     class SurfaceMeshBuilder : public VertexSetBuilder
     {
     public:
+        virtual ~SurfaceMeshBuilder();
+
         /*!
          * Create the builder associated with a SurfaceMesh.
          * @param[in] mesh The SurfaceMesh to build/modify
