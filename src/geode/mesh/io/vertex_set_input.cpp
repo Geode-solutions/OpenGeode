@@ -50,9 +50,8 @@ namespace geode
             OPENGEODE_EXCEPTION(
                 VertexSetInputFactory::has_creator( extension ),
                 "Unknown extension: ", extension );
-            auto vertex_set =
-                VertexSetInputFactory::create( extension, filename )
-                    ->read( impl );
+            auto input = VertexSetInputFactory::create( extension, filename );
+            auto vertex_set = input->read( impl );
             if( vertex_set->name() == Identifier::DEFAULT_NAME )
             {
                 VertexSetBuilder::create( *vertex_set )

@@ -44,9 +44,9 @@ namespace geode
             OPENGEODE_EXCEPTION(
                 EdgedCurveInputFactory< dimension >::has_creator( extension ),
                 "Unknown extension: ", extension );
-            auto edged_curve = EdgedCurveInputFactory< dimension >::create(
-                extension, filename )
-                                   ->read( impl );
+            auto input = EdgedCurveInputFactory< dimension >::create(
+                extension, filename );
+            auto edged_curve = input->read( impl );
             if( edged_curve->name() == Identifier::DEFAULT_NAME )
             {
                 EdgedCurveBuilder< dimension >::create( *edged_curve )

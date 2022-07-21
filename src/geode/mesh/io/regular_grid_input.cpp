@@ -43,9 +43,9 @@ namespace geode
             OPENGEODE_EXCEPTION(
                 RegularGridInputFactory< dimension >::has_creator( extension ),
                 "Unknown extension: ", extension );
-            auto grid = RegularGridInputFactory< dimension >::create(
-                extension, filename )
-                            ->read( impl );
+            auto input = RegularGridInputFactory< dimension >::create(
+                extension, filename );
+            auto grid = input->read( impl );
             Logger::info( "RegularGrid", dimension, "D loaded from ", filename,
                 " in ", timer.duration() );
             Logger::info( "RegularGrid", dimension, "D has: ", grid->nb_cells(),

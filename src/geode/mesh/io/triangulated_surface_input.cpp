@@ -46,10 +46,9 @@ namespace geode
                 TriangulatedSurfaceInputFactory< dimension >::has_creator(
                     extension ),
                 "Unknown extension: ", extension );
-            auto triangulated_surface =
-                TriangulatedSurfaceInputFactory< dimension >::create(
-                    extension, filename )
-                    ->read( impl );
+            auto input = TriangulatedSurfaceInputFactory< dimension >::create(
+                extension, filename );
+            auto triangulated_surface = input->read( impl );
             if( triangulated_surface->name() == Identifier::DEFAULT_NAME )
             {
                 TriangulatedSurfaceBuilder< dimension >::create(

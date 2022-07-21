@@ -40,8 +40,8 @@ namespace geode
                 to_string( extension_from_filename( filename ) );
             OPENGEODE_EXCEPTION( SectionInputFactory::has_creator( extension ),
                 "Unknown extension: ", extension );
-            auto section =
-                SectionInputFactory::create( extension, filename )->read();
+            auto input = SectionInputFactory::create( extension, filename );
+            auto section = input->read();
             if( section.name() == Identifier::DEFAULT_NAME )
             {
                 SectionBuilder{ section }.set_name(

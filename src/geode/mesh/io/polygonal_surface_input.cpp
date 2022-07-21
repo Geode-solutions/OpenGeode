@@ -45,10 +45,9 @@ namespace geode
                 PolygonalSurfaceInputFactory< dimension >::has_creator(
                     extension ),
                 "Unknown extension: ", extension );
-            auto polygonal_surface =
-                PolygonalSurfaceInputFactory< dimension >::create(
-                    extension, filename )
-                    ->read( impl );
+            auto input = PolygonalSurfaceInputFactory< dimension >::create(
+                extension, filename );
+            auto polygonal_surface = input->read( impl );
             if( polygonal_surface->name() == Identifier::DEFAULT_NAME )
             {
                 PolygonalSurfaceBuilder< dimension >::create(
