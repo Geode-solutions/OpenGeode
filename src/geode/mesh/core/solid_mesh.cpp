@@ -1250,7 +1250,8 @@ namespace geode
             index_t polyhedron_id,
             const std::array< index_t, 2 >& edge_vertices ) const
     {
-        std::array< local_index_t, 2 > result{ NO_LID, NO_LID };
+        std::array< local_index_t, 2 > result{ { NO_LID, NO_LID } };
+
         const auto vertices = polyhedron_vertices( polyhedron_id );
         for( const auto v : LRange{ nb_polyhedron_vertices( polyhedron_id ) } )
         {
