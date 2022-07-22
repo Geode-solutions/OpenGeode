@@ -492,6 +492,17 @@ namespace geode
         PolyhedraAroundFacet polyhedra_from_facet_vertices(
             PolyhedronFacetVertices facet_vertices ) const;
 
+        /*!
+         * Get the local indices in the polyhedra of both edge vertices.
+         * @param[in] polyhedron_id Index of polyhedron.
+         * @param[in] edge_vertices Global indices of the two edge vertices.
+         * @details If the vertices are not in the polyhedron, NO_LID is
+         * returned.
+         */
+        std::array< local_index_t, 2 > edge_vertices_in_polyhedron(
+            index_t polyhedron_id,
+            const std::array< index_t, 2 >& edge_vertices ) const;
+
         bool are_edges_enabled() const;
 
         void enable_edges() const;

@@ -1245,6 +1245,29 @@ namespace geode
     }
 
     template < index_t dimension >
+    std::array< local_index_t, 2 >
+        SolidMesh< dimension >::edge_vertices_in_polyhedron(
+            index_t polyhedron_id,
+            const std::array< index_t, 2 >& edge_vertices ) const
+    {
+        std::array< local_index_t, 2 > result{ { NO_LID, NO_LID } };
+
+        const auto vertices = polyhedron_vertices( polyhedron_id );
+        for( const auto v : LRange{ nb_polyhedron_vertices( polyhedron_id ) } )
+        {
+            if( vertices[v] == edge_vertices[0] && result[0] == NO_LID )
+            {
+                result[0] = v;
+            }
+            else if( vertices[v] == edge_vertices[1] && result[1] == NO_LID )
+            {
+                result[1] = v;
+            }
+        }
+        return result;
+    }
+
+    template < index_t dimension >
     AttributeManager&
         SolidMesh< dimension >::polyhedron_attribute_manager() const
     {
