@@ -105,7 +105,9 @@
         .def( "polyhedron_attribute_manager",                                  \
             &SolidMesh##dimension##D::polyhedron_attribute_manager,            \
             pybind11::return_value_policy::reference )                         \
-        .def( "bounding_box", &SolidMesh##dimension##D::bounding_box )
+        .def( "bounding_box", &SolidMesh##dimension##D::bounding_box )         \
+        .def( "edge_vertices_in_polyhedron",                                   \
+            &SolidMesh##dimension##D::edge_vertices_in_polyhedron )
 
 namespace geode
 {
