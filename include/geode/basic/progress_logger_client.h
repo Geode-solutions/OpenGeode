@@ -21,15 +21,40 @@
  *
  */
 
+#pragma once
+
+#include <string>
+
 #include <geode/basic/common.h>
+#include <geode/basic/factory.h>
 
-#include <geode/basic/console_progress_logger_client.h>
-
-namespace
+namespace geode
 {
-    OPENGEODE_LIBRARY_INITIALIZE( OpenGeode_basic )
+    class opengeode_basic_api ProgressLoggerClient
     {
-        geode::ProgressLoggerClientFactory::register_creator<
-            geode::ConsoleProgressLoggerClient >( "console" );
-    }
-} // namespace
+    public:
+        virtual ~ProgressLoggerClient() = default;
+
+        virtual void start( index_t nb_steps ) = 0;
+
+        virtual void update( index_t current_step, index_t nb_steps ) = 0;
+
+        virtual void end( index_t current_step, index_t nb_steps ) = 0;
+
+    protected:
+        ProgressLoggerClient( const std::string& message ) : message_{ message }
+        {
+        }
+
+        absl::string_view message() const
+        {
+            return message_;
+        }
+
+    private:
+        const std::string& message_;
+    };
+
+    using ProgressLoggerClientFactory =
+        Factory< std::string, ProgressLoggerClient, const std::string& >;
+} // namespace geode

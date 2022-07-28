@@ -27,7 +27,7 @@
 
 #include <geode/basic/logger.h>
 #include <geode/basic/pimpl_impl.h>
-#include <geode/basic/timer.h>
+#include <geode/basic/progress_logger_client.h>
 
 namespace
 {
@@ -44,13 +44,21 @@ namespace geode
               nb_steps_( nb_steps ),
               current_time_{ absl::Now() }
         {
-            Logger::info( message_, " started" );
+            for( const auto& key :
+                ProgressLoggerClientFactory::list_creators() )
+            {
+                auto& logger = loggers_.emplace_back(
+                    ProgressLoggerClientFactory::create( key, message_ ) );
+                logger->start( nb_steps_ );
+            }
         }
 
         ~Impl()
         {
-            const auto status = current_ == nb_steps_ ? "completed" : "failed";
-            Logger::info( message_, " ", status, " in ", timer_.duration() );
+            for( auto& logger : loggers_ )
+            {
+                logger->end( current_, nb_steps_ );
+            }
         }
 
         void increment()
@@ -61,9 +69,10 @@ namespace geode
             if( now - current_time_ > SLEEP )
             {
                 current_time_ = now;
-                const auto percent = std::floor( current_ / nb_steps_ * 100 );
-                Logger::info( message_, " ", current_, "/", nb_steps_, " (",
-                    percent, "%)" );
+                for( auto& logger : loggers_ )
+                {
+                    logger->update( current_, nb_steps_ );
+                }
             }
         }
 
@@ -77,9 +86,10 @@ namespace geode
         DEBUG_CONST std::string message_;
         double nb_steps_;
         index_t current_{ 0 };
-        DEBUG_CONST Timer timer_;
         absl::Time current_time_;
         absl::Mutex lock_;
+        absl::InlinedVector< std::unique_ptr< ProgressLoggerClient >, 2 >
+            loggers_;
     };
 
     ProgressLogger::ProgressLogger( std::string message, index_t nb_steps )
