@@ -25,7 +25,9 @@
 
 #include <geode/geometry/vector.h>
 
+#include <geode/mesh/core/polygonal_surface.h>
 #include <geode/mesh/core/surface_mesh.h>
+#include <geode/mesh/core/triangulated_surface.h>
 
 #define PYTHON_SURFACE_MESH( dimension )                                       \
     const auto name##dimension =                                               \
@@ -108,7 +110,18 @@
         .def_static(                                                           \
             "create", ( std::unique_ptr< SurfaceMesh##dimension##D >( * )() )  \
                           & SurfaceMesh##dimension##D::create )                \
-        .def( "clone", &SurfaceMesh##dimension##D::clone )
+        .def( "clone", &SurfaceMesh##dimension##D::clone )                     \
+        .def( "is_triangulated_type",                                          \
+            []( const SurfaceMesh< dimension >& surface ) {                    \
+                return surface.type_name()                                     \
+                       == TriangulatedSurface<                                 \
+                           dimension >::type_name_static();                    \
+            } )                                                                \
+        .def( "is_polygonal_type",                                             \
+            []( const SurfaceMesh< dimension >& surface ) {                    \
+                return surface.type_name()                                     \
+                       == PolygonalSurface< dimension >::type_name_static();   \
+            } )
 
 namespace geode
 {

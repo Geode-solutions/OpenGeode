@@ -21,9 +21,11 @@
  *
  */
 
+#include <geode/mesh/core/polyhedral_solid.h>
 #include <geode/mesh/core/solid_edges.h>
 #include <geode/mesh/core/solid_facets.h>
 #include <geode/mesh/core/solid_mesh.h>
+#include <geode/mesh/core/tetrahedral_solid.h>
 
 #define PYTHON_SOLID_MESH( dimension )                                         \
     const auto name##dimension =                                               \
@@ -107,7 +109,17 @@
             pybind11::return_value_policy::reference )                         \
         .def( "bounding_box", &SolidMesh##dimension##D::bounding_box )         \
         .def( "edge_vertices_in_polyhedron",                                   \
-            &SolidMesh##dimension##D::edge_vertices_in_polyhedron )
+            &SolidMesh##dimension##D::edge_vertices_in_polyhedron )            \
+        .def( "is_tetrahedral_type",                                           \
+            []( const SolidMesh< dimension >& solid ) {                        \
+                return solid.type_name()                                       \
+                       == TetrahedralSolid< dimension >::type_name_static();   \
+            } )                                                                \
+        .def(                                                                  \
+            "is_polyhedral_type", []( const SolidMesh< dimension >& solid ) {  \
+                return solid.type_name()                                       \
+                       == PolyhedralSolid< dimension >::type_name_static();    \
+            } )
 
 namespace geode
 {
