@@ -27,7 +27,7 @@
 
 #include <geode/basic/logger.h>
 #include <geode/basic/pimpl_impl.h>
-#include <geode/basic/progress_logger_client.h>
+#include <geode/basic/progress_logger_manager.h>
 
 namespace
 {
@@ -40,24 +40,20 @@ namespace geode
     {
     public:
         Impl( std::string message, index_t nb_steps )
-            : message_{ std::move( message ) },
-              nb_steps_( nb_steps ),
-              current_time_{ absl::Now() }
+            : nb_steps_( nb_steps ), current_time_{ absl::Now() }
         {
-            for( const auto& key :
-                ProgressLoggerClientFactory::list_creators() )
-            {
-                auto& logger = loggers_.emplace_back(
-                    ProgressLoggerClientFactory::create( key, message_ ) );
-                logger->start( nb_steps_ );
-            }
+            ProgressLoggerManager::start( std::move( message ), nb_steps_ );
         }
 
         ~Impl()
         {
-            for( auto& logger : loggers_ )
+            if( current_ == nb_steps_ )
             {
-                logger->end( current_, nb_steps_ );
+                ProgressLoggerManager::completed();
+            }
+            else
+            {
+                ProgressLoggerManager::failed();
             }
         }
 
@@ -69,10 +65,7 @@ namespace geode
             if( now - current_time_ > SLEEP )
             {
                 current_time_ = now;
-                for( auto& logger : loggers_ )
-                {
-                    logger->update( current_, nb_steps_ );
-                }
+                ProgressLoggerManager::update( current_, nb_steps_ );
             }
         }
 
@@ -83,13 +76,10 @@ namespace geode
         }
 
     private:
-        DEBUG_CONST std::string message_;
         double nb_steps_;
         index_t current_{ 0 };
         absl::Time current_time_;
         absl::Mutex lock_;
-        absl::InlinedVector< std::unique_ptr< ProgressLoggerClient >, 2 >
-            loggers_;
     };
 
     ProgressLogger::ProgressLogger( std::string message, index_t nb_steps )
