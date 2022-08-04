@@ -32,50 +32,58 @@ namespace geode
     class ConsoleProgressLoggerClient::Impl
     {
     public:
-        void start( absl::string_view message, index_t /*nb_steps */ )
+        void start( const std::string& message, index_t /*nb_steps */ )
         {
-            Logger::info( message, " started" );
+            message_ = message;
+            Logger::info( message_, " started" );
         }
 
-        void update(
-            absl::string_view message, index_t current, index_t nb_steps )
+        void update( index_t current, index_t nb_steps )
         {
-            const auto percent = std::floor( current / nb_steps * 100 );
+            const auto percent =
+                std::floor( static_cast< double >( current ) / nb_steps * 100 );
             Logger::info(
-                message, " ", current, "/", nb_steps, "(", percent, "%)" );
+                message_, " ", current, "/", nb_steps, " (", percent, "%)" );
         }
 
-        void end( absl::string_view message, index_t current, index_t nb_steps )
+        void completed()
         {
-            const auto status = current == nb_steps ? "completed" : "failed";
-            Logger::info( message, " ", status, " in ", timer_.duration() );
+            Logger::info( message_, " completed in ", timer_.duration() );
+        }
+
+        void failed()
+        {
+            Logger::info( message_, " failed in ", timer_.duration() );
         }
 
     private:
         DEBUG_CONST Timer timer_;
+        std::string message_;
     };
 
-    ConsoleProgressLoggerClient::ConsoleProgressLoggerClient(
-        const std::string& message )
-        : ProgressLoggerClient{ message }
-    {
-    }
+    ConsoleProgressLoggerClient::ConsoleProgressLoggerClient() {}
 
     ConsoleProgressLoggerClient::~ConsoleProgressLoggerClient() {}
 
-    void ConsoleProgressLoggerClient::start( index_t nb_steps )
+    void ConsoleProgressLoggerClient::start(
+        const std::string& message, index_t nb_steps )
     {
-        impl_->start( message(), nb_steps );
+        impl_->start( message, nb_steps );
     }
 
     void ConsoleProgressLoggerClient::update(
         index_t current, index_t nb_steps )
     {
-        impl_->update( message(), current, nb_steps );
+        impl_->update( current, nb_steps );
     }
 
-    void ConsoleProgressLoggerClient::end( index_t current, index_t nb_steps )
+    void ConsoleProgressLoggerClient::completed()
     {
-        impl_->end( message(), current, nb_steps );
+        impl_->completed();
+    }
+
+    void ConsoleProgressLoggerClient::failed()
+    {
+        impl_->failed();
     }
 } // namespace geode

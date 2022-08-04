@@ -21,13 +21,54 @@
  *
  */
 
+#include <absl/memory/memory.h>
+
 #include <geode/basic/logger.h>
 #include <geode/basic/progress_logger.h>
+#include <geode/basic/progress_logger_client.h>
+#include <geode/basic/progress_logger_manager.h>
 
 #include <geode/tests/common.h>
 
+class CustomClient : public geode::ProgressLoggerClient
+{
+public:
+    CustomClient( std::string private_message )
+        : private_message_{ std::move( private_message ) }
+    {
+    }
+
+    void start( const std::string& message, geode::index_t nb_steps ) override
+    {
+        geode::Logger::info(
+            private_message_, ": ", message, " => ", nb_steps );
+    }
+
+    void update( geode::index_t current_step, geode::index_t nb_steps ) override
+    {
+        geode::Logger::info(
+            private_message_, ": ", current_step, " => ", nb_steps );
+    }
+
+    void completed() override
+    {
+        geode::Logger::info( private_message_, ": DONE" );
+    }
+
+    void failed() override
+    {
+        geode::Logger::info( private_message_, ": TRY AGAIN" );
+    }
+
+private:
+    std::string private_message_;
+};
+
 void test()
 {
+    geode::ProgressLoggerManager::register_client(
+        absl::make_unique< CustomClient >( "Custom logger" ) );
+
     geode::index_t nb{ 30000 };
     geode::ProgressLogger logger{ "Cool message", nb };
     for( const auto i : geode::Range{ nb } )
