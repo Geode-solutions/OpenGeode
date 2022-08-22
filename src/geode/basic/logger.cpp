@@ -26,8 +26,10 @@
 #include <absl/container/flat_hash_map.h>
 
 // clang-format off
+// NOLINTBEGIN
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+// NOLINTEND
 // clang-format on
 
 #include <geode/basic/mapping.h>

@@ -137,15 +137,15 @@ namespace geode
         return *this;
     }
 
-    template < typename PointType >
-    constexpr std::array< std::array< index_t, 3 >, 4 >
-        GenericTetrahedron< PointType >::tetrahedron_facet_vertex;
-    template opengeode_geometry_api const
-        std::array< std::array< index_t, 3 >, 4 >
-            GenericTetrahedron< RefPoint< 3 > >::tetrahedron_facet_vertex;
-    template opengeode_geometry_api const
-        std::array< std::array< index_t, 3 >, 4 >
-            GenericTetrahedron< Point< 3 > >::tetrahedron_facet_vertex;
+    // template < typename PointType >
+    // constexpr std::array< std::array< index_t, 3 >, 4 >
+    //     GenericTetrahedron< PointType >::tetrahedron_facet_vertex;
+    // template opengeode_geometry_api const
+    //     std::array< std::array< index_t, 3 >, 4 >
+    //         GenericTetrahedron< RefPoint< 3 > >::tetrahedron_facet_vertex;
+    // template opengeode_geometry_api const
+    //     std::array< std::array< index_t, 3 >, 4 >
+    //         GenericTetrahedron< Point< 3 > >::tetrahedron_facet_vertex;
 
     template class opengeode_geometry_api GenericTetrahedron< Point< 3 > >;
     template class opengeode_geometry_api GenericTetrahedron< RefPoint< 3 > >;

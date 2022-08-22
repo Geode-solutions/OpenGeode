@@ -33,9 +33,9 @@ namespace geode
     {
     }
 
-    void IdentifierBuilder::set_id( uuid id )
+    void IdentifierBuilder::set_id( const uuid& id )
     {
-        identifier_.set_id( std::move( id ), {} );
+        identifier_.set_id( id, {} );
     }
 
     void IdentifierBuilder::set_name( absl::string_view name )

@@ -28,7 +28,7 @@ namespace geode
     template < typename PointType >
     GenericCircle< PointType >::GenericCircle(
         const GenericPlane< PointType >& plane, double radius )
-        : plane_( plane ), radius_( std::move( radius ) )
+        : plane_( plane ), radius_( radius )
     {
     }
     template < typename PointType >

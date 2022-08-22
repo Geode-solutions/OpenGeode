@@ -32,22 +32,10 @@ namespace geode
     class ConsoleProgressLoggerClient::Impl
     {
     public:
-        void start( absl::string_view message, index_t /*nb_steps */ )
-        {
-            Logger::info( message, " started" );
-        }
-
-        void update(
-            absl::string_view message, index_t current, index_t nb_steps )
-        {
-            const auto percent = std::floor( current / nb_steps * 100 );
-            Logger::info(
-                message, " ", current, "/", nb_steps, "(", percent, "%)" );
-        }
-
         void end( absl::string_view message, index_t current, index_t nb_steps )
         {
-            const auto status = current == nb_steps ? "completed" : "failed";
+            const auto* const status =
+                current == nb_steps ? "completed" : "failed";
             Logger::info( message, " ", status, " in ", timer_.duration() );
         }
 
@@ -61,17 +49,19 @@ namespace geode
     {
     }
 
-    ConsoleProgressLoggerClient::~ConsoleProgressLoggerClient() {}
+    ConsoleProgressLoggerClient::~ConsoleProgressLoggerClient() {} // NOLINT
 
-    void ConsoleProgressLoggerClient::start( index_t nb_steps )
+    void ConsoleProgressLoggerClient::start( index_t /*nb_steps*/ )
     {
-        impl_->start( message(), nb_steps );
+        Logger::info( message(), " started" );
     }
 
     void ConsoleProgressLoggerClient::update(
         index_t current, index_t nb_steps )
     {
-        impl_->update( message(), current, nb_steps );
+        const auto percent = std::floor( current / nb_steps * 100 );
+        Logger::info(
+            message(), " ", current, "/", nb_steps, "(", percent, "%)" );
     }
 
     void ConsoleProgressLoggerClient::end( index_t current, index_t nb_steps )
