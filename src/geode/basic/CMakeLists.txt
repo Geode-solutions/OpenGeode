@@ -80,6 +80,7 @@ add_geode_library(
         Bitsery::bitsery
     PRIVATE_DEPENDENCIES
         Async++
+        absl::random_random
         absl::time
         spdlog::spdlog_header_only
         MINIZIP::minizip-ng
