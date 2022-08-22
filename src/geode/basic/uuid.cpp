@@ -24,8 +24,9 @@
 #include <geode/basic/uuid.h>
 
 #include <iomanip>
-#include <random>
 #include <sstream>
+
+#include <absl/random/random.h>
 
 namespace
 {
@@ -51,12 +52,12 @@ namespace geode
 {
     uuid::uuid()
     {
-        static thread_local std::random_device rd;
-        static thread_local std::uniform_int_distribution< uint64_t > dist(
+        static thread_local absl::BitGen gen;
+        static thread_local absl::uniform_int_distribution< uint64_t > dist(
             0u, ~0u );
 
-        ab = dist( rd );
-        cd = dist( rd );
+        ab = dist( gen );
+        cd = dist( gen );
 
         ab = ( ab & 0xFFFFFFFFFFFF0FFFULL ) | 0x0000000000004000ULL;
         cd = ( cd & 0x3FFFFFFFFFFFFFFFULL ) | 0x8000000000000000ULL;
