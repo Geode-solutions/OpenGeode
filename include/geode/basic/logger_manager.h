@@ -21,23 +21,43 @@
  *
  */
 
+#pragma once
+
 #include <geode/basic/common.h>
+#include <geode/basic/pimpl.h>
 
-#include <absl/memory/memory.h>
-
-#include <geode/basic/console_logger_client.h>
-#include <geode/basic/console_progress_logger_client.h>
-#include <geode/basic/logger_manager.h>
-#include <geode/basic/progress_logger_manager.h>
-
-namespace
+namespace geode
 {
-    OPENGEODE_LIBRARY_INITIALIZE( OpenGeode_basic )
-    {
-        geode::LoggerManager::register_client(
-            absl::make_unique< geode::ConsoleLoggerClient >() );
+    class LoggerClient;
+} // namespace geode
 
-        geode::ProgressLoggerManager::register_client(
-            absl::make_unique< geode::ConsoleProgressLoggerClient >() );
-    }
-} // namespace
+namespace geode
+{
+    class opengeode_basic_api LoggerManager
+    {
+    public:
+        ~LoggerManager();
+
+        static void register_client( std::unique_ptr< LoggerClient > &&client );
+
+        static void trace( const std::string &message );
+
+        static void debug( const std::string &message );
+
+        static void info( const std::string &message );
+
+        static void warn( const std::string &message );
+
+        static void error( const std::string &message );
+
+        static void critical( const std::string &message );
+
+    private:
+        LoggerManager();
+
+        static LoggerManager &instance();
+
+    private:
+        IMPLEMENTATION_MEMBER( impl_ );
+    };
+} // namespace geode
