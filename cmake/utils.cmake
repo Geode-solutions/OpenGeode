@@ -9,6 +9,8 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
         "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
+option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
+
 include(GNUInstallDirs)
 include(GenerateExportHeader)
 include(CMakePackageConfigHelpers)
@@ -180,7 +182,7 @@ function(add_geode_library)
             "${ABSOLUTE_GEODE_LIB_PRIVATE_HEADERS}"
         )
     else()
-        add_library(${GEODE_LIB_NAME} SHARED  
+        add_library(${GEODE_LIB_NAME}  
             "${ABSOLUTE_GEODE_LIB_SOURCES}"
             "${ABSOLUTE_GEODE_LIB_PUBLIC_HEADERS}"
             "${ABSOLUTE_GEODE_LIB_ADVANCED_HEADERS}"
