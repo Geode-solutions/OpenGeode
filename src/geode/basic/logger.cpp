@@ -20,8 +20,8 @@
  * SOFTWARE.
  *
  */
-
 #include <geode/basic/logger.h>
+#include <iostream>
 
 #include <geode/basic/logger_manager.h>
 #include <geode/basic/pimpl_impl.h>

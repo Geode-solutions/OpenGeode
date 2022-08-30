@@ -20,8 +20,8 @@
  * SOFTWARE.
  *
  */
-
 #include <geode/basic/common.h>
+#include <iostream>
 
 #include <absl/memory/memory.h>
 
@@ -34,6 +34,7 @@ namespace
 {
     OPENGEODE_LIBRARY_INITIALIZE( OpenGeode_basic )
     {
+        std::cout << "basic" << std::endl;
         geode::LoggerManager::register_client(
             absl::make_unique< geode::ConsoleLoggerClient >() );
 

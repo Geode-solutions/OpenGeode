@@ -99,10 +99,10 @@ void geode_unused( const T & /*unused*/ )
         }                                                                      \
                                                                                \
     private:                                                                   \
-        void initialize();                                                     \
+        void initialize() const;                                               \
     };                                                                         \
-    lib_library_name lib_library_name_instance; /* NOLINT */                   \
-    void lib_library_name::initialize()
+    static const lib_library_name lib_library_name_instance; /* NOLINT */      \
+    void lib_library_name::initialize() const
 
 #include <geode/basic/assert.h>
 #include <geode/basic/opengeode_basic_export.h>
