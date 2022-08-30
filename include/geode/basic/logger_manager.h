@@ -23,29 +23,39 @@
 
 #pragma once
 
-#include <string>
-
 #include <geode/basic/common.h>
 #include <geode/basic/pimpl.h>
-#include <geode/basic/progress_logger_client.h>
 
 namespace geode
 {
-    class opengeode_basic_api ConsoleProgressLoggerClient
-        : public ProgressLoggerClient
+    class LoggerClient;
+} // namespace geode
+
+namespace geode
+{
+    class opengeode_basic_api LoggerManager
     {
     public:
-        ConsoleProgressLoggerClient();
-        ~ConsoleProgressLoggerClient();
+        ~LoggerManager();
+
+        static void register_client( std::unique_ptr< LoggerClient > &&client );
+
+        static void trace( const std::string &message );
+
+        static void debug( const std::string &message );
+
+        static void info( const std::string &message );
+
+        static void warn( const std::string &message );
+
+        static void error( const std::string &message );
+
+        static void critical( const std::string &message );
 
     private:
-        void start( const std::string& message, index_t nb_steps ) override;
+        LoggerManager();
 
-        void update( index_t current_step, index_t nb_steps ) override;
-
-        void completed() override;
-
-        void failed() override;
+        static LoggerManager &instance();
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

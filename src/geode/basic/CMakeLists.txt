@@ -27,13 +27,16 @@ add_geode_library(
         "bitsery_input.cpp"
         "bitsery_output.cpp"
         "common.cpp"
+        "console_logger_client.cpp"
         "console_progress_logger_client.cpp"
         "filename.cpp"
         "identifier.cpp"
         "identifier_builder.cpp"
         "logger.cpp"
+        "logger_manager.cpp"
         "permutation.cpp"
         "progress_logger.cpp"
+        "progress_logger_manager.cpp"
         "singleton.cpp"
         "string.cpp"
         "timer.cpp"
@@ -47,12 +50,15 @@ add_geode_library(
         "attribute.h"
         "bitsery_archive.h"
         "common.h"
+        "console_logger_client.h"
         "console_progress_logger_client.h"
         "factory.h"
         "filename.h"
         "identifier.h"
         "identifier_builder.h"
         "logger.h"
+        "logger_client.h"
+        "logger_manager.h"
         "mapping.h"
         "named_type.h"
         "passkey.h"
@@ -61,6 +67,7 @@ add_geode_library(
         "pimpl_impl.h"
         "progress_logger.h"
         "progress_logger_client.h"
+        "progress_logger_manager.h"
         "range.h"
         "singleton.h"
         "string.h"
@@ -78,6 +85,7 @@ add_geode_library(
         Bitsery::bitsery
     PRIVATE_DEPENDENCIES
         Async++
+        absl::random_random
         absl::time
         spdlog::spdlog_header_only
         MINIZIP::minizip-ng

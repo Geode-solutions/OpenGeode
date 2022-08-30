@@ -21,9 +21,47 @@
  *
  */
 
+#include <iostream>
+
 #include <geode/basic/logger.h>
+#include <geode/basic/logger_client.h>
+#include <geode/basic/logger_manager.h>
 
 #include <geode/tests/common.h>
+
+class CustomClient : public geode::LoggerClient
+{
+public:
+    void trace( const std::string &message ) override
+    {
+        std::cout << "Old school logger => " << message << std::endl;
+    }
+
+    void debug( const std::string &message ) override
+    {
+        std::cout << "Old school logger => " << message << std::endl;
+    }
+
+    void info( const std::string &message ) override
+    {
+        std::cout << "Old school logger => " << message << std::endl;
+    }
+
+    void warn( const std::string &message ) override
+    {
+        std::cout << "Old school logger => " << message << std::endl;
+    }
+
+    void error( const std::string &message ) override
+    {
+        std::cout << "Old school logger => " << message << std::endl;
+    }
+
+    void critical( const std::string &message ) override
+    {
+        std::cout << "Old school logger => " << message << std::endl;
+    }
+};
 
 void test_logger()
 {
@@ -37,8 +75,11 @@ void test_logger()
 
 void test()
 {
+    geode::LoggerManager::register_client(
+        absl::make_unique< CustomClient >() );
+
     test_logger();
-    geode::Logger::set_level( geode::Logger::Level::trace );
+    geode::Logger::set_level( geode::Logger::Level::err );
     test_logger();
 }
 

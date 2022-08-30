@@ -26,7 +26,7 @@
 
 #include <geode/tests/common.h>
 
-geode::index_t nb_computed{ 0 };
+static geode::index_t nb_computed{ 0 };
 
 struct Value
 {
@@ -42,7 +42,7 @@ struct Value
 Value compute_value( double d, int i )
 {
     nb_computed++;
-    Value value;
+    Value value{};
     value.d = d;
     value.i = i;
     return value;

@@ -24,20 +24,26 @@
 #include <geode/basic/uuid.h>
 
 #include <iomanip>
-#include <random>
 #include <sstream>
+
+#include <absl/random/random.h>
 
 namespace
 {
+    constexpr auto SHIFT = 10;
+    constexpr auto NB_DIGITS = 15;
+    constexpr std::array< char, 16 > encode{ { '0', '1', '2', '3', '4', '5',
+        '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' } };
+
     size_t decode( char ch )
     {
         if( 'f' >= ch && ch >= 'a' )
         {
-            return ch - 'a' + 10;
+            return ch - 'a' + SHIFT;
         }
         if( 'F' >= ch && ch >= 'A' )
         {
-            return ch - 'A' + 10;
+            return ch - 'A' + SHIFT;
         }
         if( '9' >= ch && ch >= '0' )
         {
@@ -51,12 +57,12 @@ namespace geode
 {
     uuid::uuid()
     {
-        static thread_local std::random_device rd;
-        static thread_local std::uniform_int_distribution< uint64_t > dist(
-            0u, ~0u );
+        static thread_local absl::BitGen gen;
+        static thread_local absl::uniform_int_distribution< uint64_t > dist(
+            0U, ~0U );
 
-        ab = dist( rd );
-        cd = dist( rd );
+        ab = dist( gen );
+        cd = dist( gen );
 
         ab = ( ab & 0xFFFFFFFFFFFF0FFFULL ) | 0x0000000000004000ULL;
         cd = ( cd & 0x3FFFFFFFFFFFFFFFULL ) | 0x8000000000000000ULL;
@@ -91,10 +97,8 @@ namespace geode
 
     std::string uuid::string() const
     {
-        char string[] = "00000000-0000-0000-0000-000000000000";
-        static constexpr char encode[] = "0123456789abcdef";
-
-        index_t bit = 15;
+        std::string string = "00000000-0000-0000-0000-000000000000";
+        index_t bit{ NB_DIGITS };
         for( const auto i : Range{ 18 } )
         {
             if( i == 8 || i == 13 )
@@ -105,7 +109,7 @@ namespace geode
             bit--;
         }
 
-        bit = 15;
+        bit = NB_DIGITS;
         for( const auto i : Range{ 19, 36 } )
         {
             if( i == 23 )

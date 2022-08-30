@@ -23,16 +23,7 @@
 
 #include <geode/basic/logger.h>
 
-#include <absl/container/flat_hash_map.h>
-
-// clang-format off
-// NOLINTBEGIN
-#include <spdlog/spdlog.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
-// NOLINTEND
-// clang-format on
-
-#include <geode/basic/mapping.h>
+#include <geode/basic/logger_manager.h>
 #include <geode/basic/pimpl_impl.h>
 
 namespace geode
@@ -40,70 +31,71 @@ namespace geode
     class Logger::Impl
     {
     public:
-        Impl() : logger_impl_( spdlog::stdout_color_mt( "console" ) )
+        Level level() const
         {
-            mapping_.reserve( spdlog::level::level_enum::n_levels );
-            mapping_.map( Level::trace, spdlog::level::level_enum::trace );
-            mapping_.map( Level::debug, spdlog::level::level_enum::debug );
-            mapping_.map( Level::info, spdlog::level::level_enum::info );
-            mapping_.map( Level::warn, spdlog::level::level_enum::warn );
-            mapping_.map( Level::err, spdlog::level::level_enum::err );
-            mapping_.map(
-                Level::critical, spdlog::level::level_enum::critical );
-            mapping_.map( Level::off, spdlog::level::level_enum::off );
-        }
-
-        Level level()
-        {
-            return mapping_.out2in( spdlog::get_level() );
+            return level_;
         }
 
         void set_level( Level level )
         {
-            spdlog::set_level( mapping_.in2out( level ) );
+            level_ = level;
         }
 
         void log_trace( const std::string &message )
         {
-            logger_impl_->trace( message );
+            if( level_ <= Level::trace )
+            {
+                LoggerManager::trace( message );
+            }
         }
 
         void log_debug( const std::string &message )
         {
-            logger_impl_->debug( message );
+            if( level_ <= Level::debug )
+            {
+                LoggerManager::debug( message );
+            }
         }
 
         void log_info( const std::string &message )
         {
-            logger_impl_->info( message );
+            if( level_ <= Level::info )
+            {
+                LoggerManager::info( message );
+            }
         }
 
         void log_warn( const std::string &message )
         {
-            logger_impl_->warn( message );
+            if( level_ <= Level::warn )
+            {
+                LoggerManager::warn( message );
+            }
         }
 
         void log_error( const std::string &message )
         {
-            logger_impl_->error( message );
+            if( level_ <= Level::err )
+            {
+                LoggerManager::error( message );
+            }
         }
 
         void log_critical( const std::string &message )
         {
-            logger_impl_->critical( message );
+            if( level_ <= Level::critical )
+            {
+                LoggerManager::critical( message );
+            }
         }
 
     private:
-        std::shared_ptr< spdlog::logger > logger_impl_;
-        BijectiveMapping< Level, spdlog::level::level_enum > mapping_;
+        Level level_{ Level::trace };
     };
 
-    Logger::Logger()
-    {
-        impl_->set_level( Level::trace );
-    }
+    Logger::Logger() {} // NOLINT
 
-    Logger::~Logger() {}
+    Logger::~Logger() {} // NOLINT
 
     Logger &Logger::instance()
     {

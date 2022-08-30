@@ -23,13 +23,21 @@
 
 #include <geode/basic/common.h>
 
+#include <absl/memory/memory.h>
+
+#include <geode/basic/console_logger_client.h>
 #include <geode/basic/console_progress_logger_client.h>
+#include <geode/basic/logger_manager.h>
+#include <geode/basic/progress_logger_manager.h>
 
 namespace
 {
     OPENGEODE_LIBRARY_INITIALIZE( OpenGeode_basic )
     {
-        geode::ProgressLoggerClientFactory::register_creator<
-            geode::ConsoleProgressLoggerClient >( "console" );
+        geode::LoggerManager::register_client(
+            absl::make_unique< geode::ConsoleLoggerClient >() );
+
+        geode::ProgressLoggerManager::register_client(
+            absl::make_unique< geode::ConsoleProgressLoggerClient >() );
     }
 } // namespace
