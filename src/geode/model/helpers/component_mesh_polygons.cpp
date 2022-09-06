@@ -257,6 +257,11 @@ namespace
         return p_to_block_vertices;
     }
 
+    /*!
+     * Returns an array of two vectors of unique vertices, each vector
+     * corresponding to the vertices of the model surface associated to the
+     * given edge unique vertices.
+     */
     template < geode::index_t dimension, class ModelType >
     std::array< std::vector< geode::index_t >, 2 >
         surface_edge_from_model_unique_vertices( const ModelType& model,
@@ -274,6 +279,10 @@ namespace
         return surface_edge_from_unique_vertices;
     }
 
+    /*!
+     * Returns the PolygonEdges of the given surface from the given model,
+     * corresponding to the edge given by its unique vertices.
+     */
     template < geode::index_t dimension, class ModelType >
     absl::InlinedVector< geode::PolygonEdge, 2 >
         surface_mesh_polygons_from_unique_vertices_edge( const ModelType& model,
@@ -301,6 +310,13 @@ namespace
         return polygons_around_edge;
     }
 
+    /*!
+     * Returns a pair of SurfacePolygonEdges, the first corresponding to the
+     * edges of the model surface (and the indices of their vertices) whose
+     * vertices are associated to the same unique vertices as the given edge
+     * unique vertices, and the second corresponding to the same edges and the
+     * indices of the unique vertices associated to their vertices.
+     */
     template < geode::index_t dimension, class ModelType >
     std::pair< absl::InlinedVector< geode::SurfacePolygonEdge, 2 >,
         absl::InlinedVector< geode::SurfacePolygonEdge, 2 > >
@@ -335,9 +351,9 @@ namespace
     }
 
     /*!
-     * Returns the result of edge_vertices_to_surface_vertices, but with
-     * the lists oriented so that the first PolygonVertices of each vector is
-     * linked to the facet with the same orientation as the given vertices.
+     * Returns the result of edge_vertices_to_surface_vertices, and checks if
+     * the lists are oriented so that the first PolygonVertices of each vector
+     * is linked to the facet with the same orientation as the given vertices.
      */
     template < geode::index_t dimension, class ModelType >
     std::tuple< absl::InlinedVector< geode::SurfacePolygonEdge, 2 >,
@@ -358,25 +374,24 @@ namespace
                 std::move( surface_edges_unique_vertices ), false );
         }
 
-        geode::detail::OrientedVertexCycle< std::array< geode::index_t, 2 > >
-            edge_unique_vertices_cycle{ edge_unique_vertices };
-        if( edge_unique_vertices_cycle.is_opposite(
-                { surface_edges_unique_vertices[0].vertices } ) )
+        if( edge_unique_vertices[0]
+                == surface_edges_unique_vertices[0].vertices[0]
+            && edge_unique_vertices[1]
+                   == surface_edges_unique_vertices[0].vertices[1] )
         {
             return std::make_tuple( std::move( surface_edges_vertices ),
-                std::move( surface_edges_unique_vertices ), false );
+                std::move( surface_edges_unique_vertices ), true );
         }
-        else if( surface_edges_vertices.size() >= 2 )
-        {
-            OPENGEODE_ASSERT(
-                edge_unique_vertices_cycle.is_opposite(
-                    { surface_edges_unique_vertices[1].vertices } ),
-                "[block_vertices_from_surface_polygon] The block facets "
-                "found from the polygon vertices have the same "
-                "orientation." );
-        }
+        OPENGEODE_ASSERT(
+            edge_unique_vertices[0]
+                    == surface_edges_unique_vertices[0].vertices[1]
+                && edge_unique_vertices[1]
+                       == surface_edges_unique_vertices[0].vertices[0],
+            "[block_vertices_from_surface_polygon] The surface edges "
+            "found from the polygon vertices don't have the same unique "
+            "vertices." );
         return std::make_tuple( std::move( surface_edges_vertices ),
-            std::move( surface_edges_unique_vertices ), true );
+            std::move( surface_edges_unique_vertices ), false );
     }
 
     absl::InlinedVector< geode::SurfacePolygonEdge, 2 >
