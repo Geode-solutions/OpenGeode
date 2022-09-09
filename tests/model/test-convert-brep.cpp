@@ -34,6 +34,7 @@
 
 void test()
 {
+    geode::OpenGeodeModel::initialize();
     auto brep = geode::load_brep(
         absl::StrCat( geode::data_path, "random_dfn.og_brep" ) );
     const auto section =

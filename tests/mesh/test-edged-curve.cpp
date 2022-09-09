@@ -251,6 +251,7 @@ void test_clone( const geode::EdgedCurve3D& edged_curve )
 
 void test()
 {
+    geode::OpenGeodeMesh::initialize();
     auto edged_curve = geode::EdgedCurve3D::create(
         geode::OpenGeodeEdgedCurve3D::impl_name_static() );
     auto builder = geode::EdgedCurveBuilder3D::create( *edged_curve );

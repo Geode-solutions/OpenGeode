@@ -23,6 +23,8 @@
 
 #include <geode/model/common.h>
 
+#include <geode/mesh/common.h>
+
 #include <geode/model/representation/io/detail/geode_brep_input.h>
 #include <geode/model/representation/io/detail/geode_brep_output.h>
 #include <geode/model/representation/io/detail/geode_section_input.h>
@@ -56,12 +58,16 @@ namespace
             geode::OpenGeodeSectionOutput >(
             geode::OpenGeodeSectionOutput::extension().data() );
     }
+} // namespace
 
-    OPENGEODE_LIBRARY_INITIALIZE( OpenGeode_model )
+namespace geode
+{
+    OPENGEODE_LIBRARY_IMPLEMENTATION( OpenGeodeModel )
     {
+        OpenGeodeMesh::initialize();
         register_brep_input();
         register_section_input();
         register_brep_output();
         register_section_output();
     }
-} // namespace
+} // namespace geode

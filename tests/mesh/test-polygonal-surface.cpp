@@ -571,6 +571,7 @@ void test_non_manifold_surface()
 
 void test()
 {
+    geode::OpenGeodeMesh::initialize();
     auto polygonal_surface = geode::PolygonalSurface3D::create(
         geode::OpenGeodePolygonalSurface3D::impl_name_static() );
     polygonal_surface->enable_edges();

@@ -1,5 +1,17 @@
 # Upgrade Guide
 
+## Upgrading from OpenGeode v11.x.x to v12.0.0
+
+### Motivations
+
+The goal is to provide a build system with full static linking support. This way, a single executable can embed the entire OpenGeode ecosystem without have to deploy the numerous shared libraries.
+
+To allow this feature, each library needs to be explicitly initialized at the begining of the execution (for registering ito factories for example).
+
+### Breaking Changes
+
+- **Library**: Each library/OpenGeode module needs to use the new macro pairs `OPENGEODE_LIBRARY`/`OPENGEODE_LIBRARY_IMPLEMENTATION` defined in the basic/library.h header file. They replace the macro `OPENGEODE_LIBRARY_INITIALIZE`. Examples ca be found in the common.h and common.cpp of each OpenGeode library.
+
 ## Upgrading from OpenGeode v10.x.x to v11.0.0
 
 ### Motivations

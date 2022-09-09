@@ -25,10 +25,11 @@
 
 #include <geode/geometry/private/predicates.h>
 
-namespace
+namespace geode
 {
-    OPENGEODE_LIBRARY_INITIALIZE( OpenGeode_geometry )
+    OPENGEODE_LIBRARY_IMPLEMENTATION( OpenGeodeGeometry )
     {
+        OpenGeodeBasic::initialize();
         GEO::PCK::initialize();
     }
-} // namespace
+} // namespace geode

@@ -25,6 +25,8 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+#include <geode/basic/library.h>
+
 #include "attribute.h"
 #include "attribute_manager.h"
 #include "identifier.h"
@@ -57,6 +59,8 @@ PYBIND11_MODULE( opengeode_py_basic, module )
     module.attr( "NO_ID" ) = geode::NO_ID;
     module.attr( "NO_LID" ) = geode::NO_LID;
     module.attr( "global_epsilon" ) = geode::global_epsilon;
+    pybind11::class_< geode::OpenGeodeBasic >( module, "OpenGeodeBasic" )
+        .def( "initialize", &geode::OpenGeodeBasic::initialize );
     geode::define_uuid( module );
     geode::define_attributes( module );
     geode::define_attribute_manager( module );

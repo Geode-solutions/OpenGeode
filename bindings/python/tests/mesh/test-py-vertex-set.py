@@ -19,36 +19,44 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os, sys, platform
-if sys.version_info >= (3,8,0) and platform.system() == "Windows":
+import os
+import sys
+import platform
+if sys.version_info >= (3, 8, 0) and platform.system() == "Windows":
     for path in [x.strip() for x in os.environ['PATH'].split(';') if x]:
         os.add_dll_directory(path)
 
 import opengeode_py_mesh as mesh
 
-def test_create_vertices( vertex_set, builder ):
+mesh.OpenGeodeMesh.initialize()
+
+
+def test_create_vertices(vertex_set, builder):
     builder.create_vertex()
     if vertex_set.nb_vertices() != 1:
-        raise ValueError( "[Test] VertexSet should have 1 vertex" )
-    builder.create_vertices( 5 )
+        raise ValueError("[Test] VertexSet should have 1 vertex")
+    builder.create_vertices(5)
     if vertex_set.nb_vertices() != 6:
-        raise ValueError( "[Test] VertexSet should have 6 vertices" )
+        raise ValueError("[Test] VertexSet should have 6 vertices")
 
-def test_delete_vertex( vertex_set, builder ):
+
+def test_delete_vertex(vertex_set, builder):
     to_delete = [False] * vertex_set.nb_vertices()
     to_delete[0] = True
-    builder.delete_vertices( to_delete )
+    builder.delete_vertices(to_delete)
     if vertex_set.nb_vertices() != 5:
-        raise ValueError( "[Test] VertexSet should have 5 vertices" )
+        raise ValueError("[Test] VertexSet should have 5 vertices")
 
-def test_clone( vertex_set ):
+
+def test_clone(vertex_set):
     vertex_set2 = vertex_set.clone()
     if vertex_set2.nb_vertices() != 5:
-        raise ValueError( "[Test] VertexSet2 should have 5 vertices" )
+        raise ValueError("[Test] VertexSet2 should have 5 vertices")
+
 
 if __name__ == '__main__':
     vertex_set = mesh.VertexSet.create()
-    builder = mesh.VertexSetBuilder.create( vertex_set )
-    test_create_vertices( vertex_set, builder )
-    test_delete_vertex( vertex_set, builder )
-    test_clone( vertex_set )
+    builder = mesh.VertexSetBuilder.create(vertex_set)
+    test_create_vertices(vertex_set, builder)
+    test_delete_vertex(vertex_set, builder)
+    test_clone(vertex_set)

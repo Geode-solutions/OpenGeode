@@ -33,6 +33,7 @@
 
 void test()
 {
+    geode::OpenGeodeMesh::initialize();
     const auto surface2d = geode::load_triangulated_surface< 2 >(
         absl::StrCat( geode::data_path, "3patches.og_tsf2d" ) );
     const auto surface3d =

@@ -388,6 +388,7 @@ void test_delete_all( const geode::HybridSolid3D& hybrid_solid,
 
 void test()
 {
+    geode::OpenGeodeMesh::initialize();
     auto hybrid_solid = geode::HybridSolid3D::create(
         geode::OpenGeodeHybridSolid3D::impl_name_static() );
     hybrid_solid->enable_edges();

@@ -157,9 +157,7 @@ void test_delete_isolated_vertices(
 
 void test()
 {
-    std::cout << "tutu" << std::endl;
-    DEBUG( "tto" );
-    std::cout << "tutu" << std::endl;
+    geode::OpenGeodeMesh::initialize();
     auto graph =
         geode::Graph::create( geode::OpenGeodeGraph::impl_name_static() );
     auto builder = geode::GraphBuilder::create( *graph );

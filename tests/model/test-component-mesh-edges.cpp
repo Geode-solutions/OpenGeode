@@ -38,6 +38,8 @@
 #include <geode/model/representation/builder/section_builder.h>
 #include <geode/model/representation/core/section.h>
 
+#include <geode/tests/common.h>
+
 geode::Section build_section()
 {
     geode::Section section;
@@ -128,39 +130,32 @@ geode::Section build_section()
     return section;
 }
 
-int main()
+void test()
 {
-    try
+    geode::OpenGeodeModel::initialize();
+    const auto section = build_section();
+    const auto surface_edges = geode::component_mesh_edges(
+        section, *section.surfaces().begin(), { 1, 0 } );
+    OPENGEODE_EXCEPTION(
+        surface_edges.line_edges.size() == 1, "[Test] Wrong number of Lines" );
+    for( const auto& lines : surface_edges.line_edges )
     {
-        const auto section = build_section();
-        const auto surface_edges = geode::component_mesh_edges(
-            section, *section.surfaces().begin(), { 1, 0 } );
-        OPENGEODE_EXCEPTION( surface_edges.line_edges.size() == 1,
-            "[Test] Wrong number of Lines" );
-        for( const auto& lines : surface_edges.line_edges )
+        for( const auto& line : lines.second )
         {
-            for( const auto& line : lines.second )
-            {
-                OPENGEODE_EXCEPTION( line == 1, "[Test] Wrong Line edge id" );
-            }
+            OPENGEODE_EXCEPTION( line == 1, "[Test] Wrong Line edge id" );
         }
-        OPENGEODE_EXCEPTION( surface_edges.surface_edges.size() == 2,
-            "[Test] Wrong number of Surfaces" );
-        for( const auto& surfaces : surface_edges.surface_edges )
-        {
-            for( const auto& surface : surfaces.second )
-            {
-                const geode::PolygonEdge edge{ 1, 0 };
-                OPENGEODE_EXCEPTION(
-                    surface == edge, "[Test] Wrong Surface PolygonEdge" );
-            }
-        }
-
-        geode::Logger::info( "TEST SUCCESS" );
-        return 0;
     }
-    catch( ... )
+    OPENGEODE_EXCEPTION( surface_edges.surface_edges.size() == 2,
+        "[Test] Wrong number of Surfaces" );
+    for( const auto& surfaces : surface_edges.surface_edges )
     {
-        return geode::geode_lippincott();
+        for( const auto& surface : surfaces.second )
+        {
+            const geode::PolygonEdge edge{ 1, 0 };
+            OPENGEODE_EXCEPTION(
+                surface == edge, "[Test] Wrong Surface PolygonEdge" );
+        }
     }
 }
+
+OPENGEODE_TEST( "component-mesh-edges" )

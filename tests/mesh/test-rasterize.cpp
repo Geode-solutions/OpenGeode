@@ -207,6 +207,7 @@ void test_limit()
 
 void test()
 {
+    geode::OpenGeodeMesh::initialize();
     auto grid = geode::RegularGrid3D::create();
     auto builder = geode::RegularGridBuilder3D::create( *grid );
     builder->initialize_grid( { { 0., 0., 0. } }, { 10, 10, 10 }, 1 );
@@ -224,8 +225,6 @@ void test()
         *grid, geode::Triangle3D{ pt0, pt3, pt4 } );
 
     test_limit();
-
-    geode::Logger::info( "TEST SUCCESS" );
 }
 
 OPENGEODE_TEST( "rasterize" )

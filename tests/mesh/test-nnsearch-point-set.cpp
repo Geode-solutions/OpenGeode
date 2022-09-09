@@ -92,6 +92,7 @@ void test_nn_search3d()
 
 void test()
 {
+    geode::OpenGeodeMesh::initialize();
     test_nn_search3d();
 }
 

@@ -85,25 +85,6 @@ void geode_unused( const T & /*unused*/ )
 {
 }
 
-/*!
- * Use this macro to initialize an OpenGeode library and execute some functions
- * at library loading.
- */
-#define OPENGEODE_LIBRARY_INITIALIZE( library_name )                           \
-    class lib_library_name                                                     \
-    {                                                                          \
-    public:                                                                    \
-        lib_library_name()                                                     \
-        {                                                                      \
-            initialize();                                                      \
-        }                                                                      \
-                                                                               \
-    private:                                                                   \
-        void initialize() const;                                               \
-    };                                                                         \
-    static const lib_library_name lib_library_name_instance; /* NOLINT */      \
-    void lib_library_name::initialize() const
-
 #include <geode/basic/assert.h>
 #include <geode/basic/opengeode_basic_export.h>
 #include <geode/basic/types.h>

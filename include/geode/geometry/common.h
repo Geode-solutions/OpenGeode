@@ -24,5 +24,11 @@
 #pragma once
 
 #include <geode/basic/common.h>
+#include <geode/basic/library.h>
 
 #include <geode/geometry/opengeode_geometry_export.h>
+
+namespace geode
+{
+    OPENGEODE_LIBRARY( opengeode_geometry_api, OpenGeodeGeometry );
+} // namespace geode

@@ -556,6 +556,7 @@ void test_moved_section( const geode::Section& model )
 
 void test()
 {
+    geode::OpenGeodeModel::initialize();
     geode::Section model;
     geode::SectionBuilder builder( model );
 

@@ -21,42 +21,34 @@
  *
  */
 
-#pragma once
+#include <geode/basic/library.h>
 
-#include <memory>
-
-#include <bitsery/bitsery.h>
-#include <bitsery/ext/std_smart_ptr.h>
-
-#include <geode/basic/common.h>
+#include <geode/basic/pimpl_impl.h>
 
 namespace geode
 {
-    template < typename T >
-    class PImpl
+    class Library::Impl
     {
-        OPENGEODE_DISABLE_COPY( PImpl );
-
     public:
-        template < typename... Args >
-        explicit PImpl( Args &&... );
-        PImpl( PImpl< T > && );
-        ~PImpl();
-        void reset();
-        T *operator->();
-        const T *operator->() const;
-        T &operator*();
-        const T &operator*() const;
-
-        template < typename Archive >
-        void serialize( Archive &archive );
+        void call_initialize( Library& library )
+        {
+            if( !is_loaded_ )
+            {
+                is_loaded_ = true;
+                library.do_initialize();
+            }
+        }
 
     private:
-        std::unique_ptr< T > pimpl_;
+        bool is_loaded_{ false };
     };
 
-#define IMPLEMENTATION_MEMBER( impl )                                          \
-    class Impl;                                                                \
-    geode::PImpl< Impl > impl
+    Library::Library() {} // NOLINT
 
+    Library::~Library() {} // NOLINT
+
+    void Library::call_initialize()
+    {
+        impl_->call_initialize( *this );
+    }
 } // namespace geode
