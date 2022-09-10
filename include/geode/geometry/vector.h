@@ -131,5 +131,5 @@ namespace geode
                     - this->value( 1 ) * other.value( 0 ) } };
         }
     };
-    ALIAS_2D_AND_3D( Vector );
+    ALIAS_1D_AND_2D_AND_3D( Vector );
 } // namespace geode

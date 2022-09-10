@@ -37,7 +37,6 @@ namespace geode
 
     template < index_t dimension >
     using RefPoint = std::reference_wrapper< const Point< dimension > >;
-    ALIAS_2D_AND_3D( RefPoint );
 } // namespace geode
 
 namespace geode
@@ -89,10 +88,10 @@ namespace geode
         OwnerInfiniteLine< dimension >& operator=(
             OwnerInfiniteLine< dimension >&& other );
     };
-    ALIAS_2D_AND_3D( OwnerInfiniteLine );
+    ALIAS_1D_AND_2D_AND_3D( OwnerInfiniteLine );
     template < index_t dimension >
     using OwnerRay = OwnerInfiniteLine< dimension >;
-    ALIAS_2D_AND_3D( OwnerRay );
+    ALIAS_1D_AND_2D_AND_3D( OwnerRay );
 
     template < index_t dimension >
     class InfiniteLine
@@ -113,8 +112,8 @@ namespace geode
         InfiniteLine< dimension >& operator=(
             InfiniteLine< dimension >&& other );
     };
-    ALIAS_2D_AND_3D( InfiniteLine );
+    ALIAS_1D_AND_2D_AND_3D( InfiniteLine );
     template < index_t dimension >
     using Ray = InfiniteLine< dimension >;
-    ALIAS_2D_AND_3D( Ray );
+    ALIAS_1D_AND_2D_AND_3D( Ray );
 } // namespace geode
