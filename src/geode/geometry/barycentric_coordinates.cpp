@@ -131,13 +131,13 @@ namespace geode
 
     template std::array< double, 3 > opengeode_geometry_api
         triangle_barycentric_coordinates( const Point2D&, const Triangle2D& );
-
     template std::array< double, 3 > opengeode_geometry_api
         triangle_barycentric_coordinates( const Point3D&, const Triangle3D& );
 
     template std::array< double, 2 > opengeode_geometry_api
+        segment_barycentric_coordinates( const Point1D&, const Segment1D& );
+    template std::array< double, 2 > opengeode_geometry_api
         segment_barycentric_coordinates( const Point2D&, const Segment2D& );
-
     template std::array< double, 2 > opengeode_geometry_api
         segment_barycentric_coordinates( const Point3D&, const Segment3D& );
 } // namespace geode
