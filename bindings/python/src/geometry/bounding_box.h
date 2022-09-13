@@ -39,7 +39,9 @@
                                     const Ray< dimension >& ) const )          \
                                     & BoundingBox##dimension##D::intersects )  \
         .def( "min", &BoundingBox##dimension##D::min )                         \
-        .def( "max", &BoundingBox##dimension##D::max )
+        .def( "max", &BoundingBox##dimension##D::max )                         \
+        .def( "center", &BoundingBox##dimension##D::center )                   \
+        .def( "diagonal", &BoundingBox##dimension##D::diagonal )
 
 namespace geode
 {
