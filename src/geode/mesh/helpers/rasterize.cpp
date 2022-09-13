@@ -467,14 +467,14 @@ namespace
         const std::array< geode::GridCellsAroundVertex3D, 2 > /*unused*/ )
     {
         auto cells = geode::rasterize_segment( grid, segment );
-        std::vector< geode::index_t > tested_cells( grid.nb_cells(), false );
+        std::vector< bool > tested_cells( grid.nb_cells(), false );
         std::queue< geode::GridCellIndices3D > to_test;
         for( const auto& cell : cells )
         {
             tested_cells[grid.cell_index( cell )] = true;
             for( auto&& neighbor : neighbors( grid, cell ) )
             {
-                to_test.emplace( neighbor );
+                to_test.emplace( std::move( neighbor ) );
             }
         }
         const auto half_cell_size =
