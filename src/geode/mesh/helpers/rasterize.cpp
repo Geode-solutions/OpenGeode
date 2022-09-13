@@ -466,16 +466,12 @@ namespace
         const geode::Segment3D& segment,
         const std::array< geode::GridCellsAroundVertex3D, 2 > /*unused*/ )
     {
-        constexpr auto cell_tested_attribute_name = "tested_cell_rasterize";
         auto cells = geode::rasterize_segment( grid, segment );
-        auto tested_att =
-            grid.cell_attribute_manager()
-                .find_or_create_attribute< geode::VariableAttribute, bool >(
-                    cell_tested_attribute_name, false );
+        std::vector< geode::index_t > tested_cells( grid.nb_cells(), false );
         std::queue< geode::GridCellIndices3D > to_test;
         for( const auto& cell : cells )
         {
-            tested_att->set_value( grid.cell_index( cell ), true );
+            tested_cells[grid.cell_index( cell )] = true;
             for( auto&& neighbor : neighbors( grid, cell ) )
             {
                 to_test.emplace( neighbor );
@@ -494,25 +490,23 @@ namespace
             const auto cell = to_test.front();
             to_test.pop();
             const auto cell_id = grid.cell_index( cell );
-            if( tested_att->value( cell_id ) )
+            if( tested_cells[cell_id] )
             {
                 continue;
             }
-            tested_att->set_value( cell_id, true );
+            tested_cells[cell_id] = true;
             const auto center = grid.polyhedron_barycenter( cell_id );
             if( std::get< 0 >(
                     geode::point_segment_distance( center, segment ) )
                 <= half_cell_size )
             {
-                cells.push_back( cell );
                 for( auto&& neighbor : neighbors( grid, cell ) )
                 {
-                    to_test.emplace( neighbor );
+                    to_test.emplace( std::move( neighbor ) );
                 }
+                cells.push_back( std::move( cell ) );
             }
         }
-        grid.cell_attribute_manager().delete_attribute(
-            cell_tested_attribute_name );
         return cells;
     }
 
