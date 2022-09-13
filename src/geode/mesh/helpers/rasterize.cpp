@@ -504,7 +504,7 @@ namespace
                 {
                     to_test.emplace( std::move( neighbor ) );
                 }
-                cells.push_back( std::move( cell ) );
+                cells.emplace_back( std::move( cell ) );
             }
         }
         return cells;
