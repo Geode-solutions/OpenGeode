@@ -28,11 +28,11 @@
 
 #include <geode/model/common.h>
 #include <geode/model/mixin/core/component_type.h>
+#include <geode/model/representation/core/mapping.h>
 
 namespace geode
 {
     class AttributeManager;
-    class ModelCopyMapping;
     class RelationshipsBuilder;
     struct uuid;
 } // namespace geode

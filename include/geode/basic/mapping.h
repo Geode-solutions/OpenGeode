@@ -56,6 +56,11 @@ namespace geode
             return out2in_.contains( value );
         }
 
+        size_t size() const
+        {
+            return in2out_.size();
+        }
+
         const T2& in2out( const T1& in ) const
         {
             return in2out_.at( in );
@@ -87,6 +92,16 @@ namespace geode
         {
             in2out_.reserve( capacity );
             out2in_.reserve( capacity );
+        }
+
+        size_t size_in() const
+        {
+            return in2out_.size();
+        }
+
+        size_t size_out() const
+        {
+            return out2in_.size();
         }
 
         const Storage< T2 >& in2out( const T1& in ) const

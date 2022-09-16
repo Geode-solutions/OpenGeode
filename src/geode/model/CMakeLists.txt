@@ -109,6 +109,7 @@ add_geode_library(
         "representation/builder/section_builder.h"
         "representation/core/brep.h"
         "representation/core/section.h"
+        "representation/core/mapping.h"
         "representation/io/brep_input.h"
         "representation/io/section_input.h"
         "representation/io/brep_output.h"

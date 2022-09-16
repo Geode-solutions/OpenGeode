@@ -39,7 +39,7 @@
 #include <geode/model/mixin/core/line.h>
 #include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
-#include <geode/model/representation/builder/copy_mapping.h>
+#include <geode/model/representation/core/mapping.h>
 
 namespace geode
 {
