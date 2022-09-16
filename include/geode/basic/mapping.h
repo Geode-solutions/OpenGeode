@@ -94,14 +94,14 @@ namespace geode
             out2in_.reserve( capacity );
         }
 
-        size_t size_in() const
+        index_t size_in() const
         {
-            return in2out_.size();
+            return static_cast< index_t >( in2out_.size() );
         }
 
-        size_t size_out() const
+        index_t size_out() const
         {
-            return out2in_.size();
+            return static_cast< index_t >( out2in_.size() );
         }
 
         const Storage< T2 >& in2out( const T1& in ) const
