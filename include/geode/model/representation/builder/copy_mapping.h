@@ -23,42 +23,7 @@
 
 #pragma once
 
-#include <absl/container/flat_hash_map.h>
+#include <geode/model/representation/core/mapping.h>
 
-#include <geode/basic/mapping.h>
-#include <geode/basic/uuid.h>
-
-#include <geode/model/common.h>
-#include <geode/model/mixin/core/component_type.h>
-
-namespace geode
-{
-    class ModelCopyMapping
-    {
-    public:
-        using Mapping = BijectiveMapping< uuid >;
-
-        Mapping& at( const ComponentType& type )
-        {
-            return mappings.at( type );
-        }
-
-        const Mapping& at( const ComponentType& type ) const
-        {
-            return mappings.at( type );
-        }
-
-        bool has_mapping_type( const ComponentType& type ) const
-        {
-            return mappings.contains( type );
-        }
-
-        void emplace( const ComponentType& type, Mapping mapping )
-        {
-            mappings.emplace( type, std::move( mapping ) );
-        }
-
-    private:
-        absl::flat_hash_map< ComponentType, Mapping > mappings;
-    };
-} // namespace geode
+#pragma message                                                                \
+    "<geode/model/representation/builder/copy_mapping.h> is deprecated. Use <geode/model/representation/core/mapping.h> instead"

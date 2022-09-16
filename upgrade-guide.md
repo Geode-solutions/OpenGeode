@@ -1,5 +1,15 @@
 # Upgrade Guide
 
+## Upgrading from OpenGeode v11.x.x to v12.0.0
+
+### Motivations
+
+TODO
+
+### Breaking Changes
+
+- **Mapping**: Header file `<geode/model/representation/builder/copy_mapping.h>` no more exists, use `<geode/model/representation/core/mapping.h>` instead. Moreover, the class `ModelCopyMapping` cannot be forward declared anymore. Add the correspondign include in your files.
+
 ## Upgrading from OpenGeode v10.x.x to v11.0.0
 
 ### Motivations

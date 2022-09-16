@@ -40,6 +40,7 @@
 #include <geode/model/mixin/core/model_boundaries.h>
 #include <geode/model/mixin/core/surfaces.h>
 #include <geode/model/mixin/core/topology.h>
+#include <geode/model/representation/core/mapping.h>
 
 namespace geode
 {
@@ -57,7 +58,6 @@ namespace geode
     ALIAS_3D( Surface );
     ALIAS_3D( SurfaceMesh );
     class BRep;
-    class ModelCopyMapping;
     struct uuid;
 } // namespace geode
 
