@@ -8,7 +8,7 @@ TODO
 
 ### Breaking Changes
 
-- **Mapping**: Header file `<geode/model/representation/builder/copy_mapping.h>` no more exists, use `<geode/model/representation/core/mapping.h>` instead. Moreover, the class `ModelCopyMapping` cannot be forward declared anymore. Add the correspondign include in your files.
+- **Mapping**: Header file `<geode/model/representation/builder/copy_mapping.h>` no longer exists, use `<geode/model/representation/core/mapping.h>` instead. Moreover, the class `ModelCopyMapping` cannot be forward declared anymore. Add the corresponding include in your files.
 
 ## Upgrading from OpenGeode v10.x.x to v11.0.0
 

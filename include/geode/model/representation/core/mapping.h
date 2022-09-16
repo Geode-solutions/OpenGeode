@@ -49,7 +49,7 @@ namespace geode
             return mappings.at( type );
         }
 
-        bool has_mapping_type( const geode::ComponentType& type ) const
+        bool has_mapping_type( const ComponentType& type ) const
         {
             return mappings.contains( type );
         }
@@ -63,7 +63,7 @@ namespace geode
         absl::flat_hash_map< ComponentType, Mapping > mappings;
     };
 
-    using ModelCopyMapping = ModelMapping< BijectiveMapping< geode::uuid > >;
+    using ModelCopyMapping = ModelMapping< BijectiveMapping< uuid > >;
 
-    using ModelGenericMapping = ModelMapping< GenericMapping< geode::uuid > >;
+    using ModelGenericMapping = ModelMapping< GenericMapping< uuid > >;
 } // namespace geode
