@@ -174,14 +174,19 @@ namespace geode
         return *this;
     }
 
+    template class opengeode_geometry_api GenericInfiniteLine< Point< 1 >, 1 >;
     template class opengeode_geometry_api GenericInfiniteLine< Point< 2 >, 2 >;
     template class opengeode_geometry_api GenericInfiniteLine< Point< 3 >, 3 >;
+    template class opengeode_geometry_api
+        GenericInfiniteLine< RefPoint< 1 >, 1 >;
     template class opengeode_geometry_api
         GenericInfiniteLine< RefPoint< 2 >, 2 >;
     template class opengeode_geometry_api
         GenericInfiniteLine< RefPoint< 3 >, 3 >;
+    template class opengeode_geometry_api OwnerInfiniteLine< 1 >;
     template class opengeode_geometry_api OwnerInfiniteLine< 2 >;
     template class opengeode_geometry_api OwnerInfiniteLine< 3 >;
+    template class opengeode_geometry_api InfiniteLine< 1 >;
     template class opengeode_geometry_api InfiniteLine< 2 >;
     template class opengeode_geometry_api InfiniteLine< 3 >;
 } // namespace geode

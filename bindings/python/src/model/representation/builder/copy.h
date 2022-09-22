@@ -21,11 +21,11 @@
  *
  */
 
-#include <geode/model/representation/builder/copy_mapping.h>
+#include <geode/model/representation/core/mapping.h>
 
 namespace geode
 {
-    void define_copy( pybind11::module& module )
+    void define_copy_mapping( pybind11::module& module )
     {
         pybind11::class_< ModelCopyMapping >( module, "ModelCopyMapping" )
             .def( pybind11::init<>() )
@@ -33,5 +33,15 @@ namespace geode
                             & (ModelCopyMapping::*) (const ComponentType&) )
                             & ModelCopyMapping::at )
             .def( "emplace", &ModelCopyMapping::emplace );
+    }
+
+    void define_generic_mapping( pybind11::module& module )
+    {
+        pybind11::class_< ModelGenericMapping >( module, "ModelGenericMapping" )
+            .def( pybind11::init<>() )
+            .def( "at", ( ModelGenericMapping::Mapping
+                            & (ModelGenericMapping::*) (const ComponentType&) )
+                            & ModelGenericMapping::at )
+            .def( "emplace", &ModelGenericMapping::emplace );
     }
 } // namespace geode

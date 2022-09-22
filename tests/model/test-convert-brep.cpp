@@ -27,7 +27,6 @@
 #include <geode/basic/logger.h>
 
 #include <geode/model/helpers/convert_brep_section.h>
-#include <geode/model/representation/builder/copy_mapping.h>
 #include <geode/model/representation/core/brep.h>
 #include <geode/model/representation/core/section.h>
 #include <geode/model/representation/io/brep_input.h>

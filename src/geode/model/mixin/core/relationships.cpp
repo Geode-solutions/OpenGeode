@@ -41,7 +41,6 @@
 #include <geode/model/mixin/core/bitsery_archive.h>
 #include <geode/model/mixin/core/detail/count_relationships.h>
 #include <geode/model/mixin/core/detail/uuid_to_index.h>
-#include <geode/model/representation/builder/copy_mapping.h>
 
 namespace geode
 {

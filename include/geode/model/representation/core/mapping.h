@@ -33,17 +33,18 @@
 
 namespace geode
 {
-    class ModelCopyMapping
+    template < typename MappingType >
+    class ModelMapping
     {
     public:
-        using Mapping = BijectiveMapping< uuid >;
+        using Mapping = MappingType;
 
-        Mapping& at( const ComponentType& type )
+        MappingType& at( const ComponentType& type )
         {
             return mappings.at( type );
         }
 
-        const Mapping& at( const ComponentType& type ) const
+        const MappingType& at( const ComponentType& type ) const
         {
             return mappings.at( type );
         }
@@ -53,7 +54,7 @@ namespace geode
             return mappings.contains( type );
         }
 
-        void emplace( const ComponentType& type, Mapping mapping )
+        void emplace( const ComponentType& type, MappingType mapping )
         {
             mappings.emplace( type, std::move( mapping ) );
         }
@@ -61,4 +62,8 @@ namespace geode
     private:
         absl::flat_hash_map< ComponentType, Mapping > mappings;
     };
+
+    using ModelCopyMapping = ModelMapping< BijectiveMapping< uuid > >;
+
+    using ModelGenericMapping = ModelMapping< GenericMapping< uuid > >;
 } // namespace geode

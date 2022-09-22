@@ -33,7 +33,6 @@ namespace geode
 
     template < index_t dimension >
     using RefPoint = std::reference_wrapper< const Point< dimension > >;
-    ALIAS_2D_AND_3D( RefPoint );
 } // namespace geode
 
 namespace geode
@@ -82,7 +81,7 @@ namespace geode
         OwnerSegment< dimension >& operator=(
             OwnerSegment< dimension >&& other );
     };
-    ALIAS_2D_AND_3D( OwnerSegment );
+    ALIAS_1D_AND_2D_AND_3D( OwnerSegment );
 
     template < index_t dimension >
     class Segment : public GenericSegment< RefPoint< dimension >, dimension >
@@ -98,5 +97,5 @@ namespace geode
         Segment( Segment< dimension >&& other );
         Segment< dimension >& operator=( Segment< dimension >&& other );
     };
-    ALIAS_2D_AND_3D( Segment );
+    ALIAS_1D_AND_2D_AND_3D( Segment );
 } // namespace geode

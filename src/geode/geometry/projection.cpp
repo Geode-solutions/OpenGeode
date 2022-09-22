@@ -72,6 +72,9 @@ namespace geode
         return point - plane.normal() * distance;
     }
 
+    template Point1D opengeode_geometry_api point_segment_projection(
+        const Point1D&, const Segment1D& );
+
     template Point2D opengeode_geometry_api point_segment_projection(
         const Point2D&, const Segment2D& );
     template Point2D opengeode_geometry_api point_line_projection(

@@ -23,9 +23,12 @@
 
 #include <geode/mesh/helpers/rasterize.h>
 
+#include <queue>
+
 #include <absl/container/flat_hash_map.h>
 
 #include <geode/basic/algorithm.h>
+#include <geode/basic/attribute_manager.h>
 
 #include <geode/geometry/basic_objects/infinite_line.h>
 #include <geode/geometry/basic_objects/plane.h>
@@ -440,17 +443,70 @@ namespace
         return cells;
     }
 
+    absl::InlinedVector< geode::GridCellIndices3D, 6 > neighbors(
+        const geode::RegularGrid3D& grid, const geode::GridCellIndices3D& cell )
+    {
+        absl::InlinedVector< geode::GridCellIndices3D, 6 > neighbors;
+        for( const auto d : geode::LRange{ 3 } )
+        {
+            if( const auto prev = grid.previous_cell( cell, d ) )
+            {
+                neighbors.push_back( prev.value() );
+            }
+            if( const auto next = grid.next_cell( cell, d ) )
+            {
+                neighbors.push_back( next.value() );
+            }
+        }
+        return neighbors;
+    }
+
     std::vector< geode::GridCellIndices3D > conservative_voxelization_segment(
         const geode::RegularGrid3D& grid,
         const geode::Segment3D& segment,
-        const std::array< geode::GridCellsAroundVertex3D, 2 > vertex_cells )
+        const std::array< geode::GridCellsAroundVertex3D, 2 > /*unused*/ )
     {
-        std::vector< geode::GridCellIndices3D > cells;
-        geode_unused( grid );
-        geode_unused( segment );
-        geode_unused( vertex_cells );
-        OPENGEODE_EXCEPTION( false,
-            "[conservative_voxelization_segment] Not implement yet for 3D" );
+        auto cells = geode::rasterize_segment( grid, segment );
+        std::vector< bool > tested_cells( grid.nb_cells(), false );
+        std::queue< geode::GridCellIndices3D > to_test;
+        for( const auto& cell : cells )
+        {
+            tested_cells[grid.cell_index( cell )] = true;
+            for( auto&& neighbor : neighbors( grid, cell ) )
+            {
+                to_test.emplace( std::move( neighbor ) );
+            }
+        }
+        const auto half_cell_size =
+            std::sqrt( grid.cell_length_in_direction( 0 )
+                           * grid.cell_length_in_direction( 0 )
+                       + grid.cell_length_in_direction( 1 )
+                             * grid.cell_length_in_direction( 1 )
+                       + grid.cell_length_in_direction( 2 )
+                             * grid.cell_length_in_direction( 2 ) )
+            / 2.;
+        while( !to_test.empty() )
+        {
+            const auto cell = to_test.front();
+            to_test.pop();
+            const auto cell_id = grid.cell_index( cell );
+            if( tested_cells[cell_id] )
+            {
+                continue;
+            }
+            tested_cells[cell_id] = true;
+            const auto center = grid.polyhedron_barycenter( cell_id );
+            if( std::get< 0 >(
+                    geode::point_segment_distance( center, segment ) )
+                <= half_cell_size )
+            {
+                for( auto&& neighbor : neighbors( grid, cell ) )
+                {
+                    to_test.emplace( std::move( neighbor ) );
+                }
+                cells.emplace_back( std::move( cell ) );
+            }
+        }
         return cells;
     }
 
