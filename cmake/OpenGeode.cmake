@@ -47,6 +47,16 @@ install(
     DESTINATION
         .
 )
+if(NOT BUILD_SHARED_LIBS)
+    install(
+        DIRECTORY
+            ${MINIZIP_INSTALL_PREFIX}/
+            ${NANOFLANN_INSTALL_PREFIX}/
+            ${SPDLOG_INSTALL_PREFIX}/
+        DESTINATION
+            .
+    )
+endif()
 
 if(OPENGEODE_WITH_PYTHON OR INCLUDE_PYBIND11)
     find_package(pybind11 REQUIRED CONFIG NO_DEFAULT_PATH PATHS ${PYBIND11_INSTALL_PREFIX})

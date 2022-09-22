@@ -108,11 +108,10 @@ void test_ray_parallel()
 
 void test()
 {
+    geode::OpenGeodeMesh::initialize();
     test_ray_inside();
     test_ray_edge();
     test_ray_parallel();
-
-    geode::Logger::info( "TEST SUCCESS" );
 }
 
 OPENGEODE_TEST( "ray-tracing" )

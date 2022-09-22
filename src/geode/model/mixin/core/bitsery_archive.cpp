@@ -55,18 +55,6 @@ namespace bitsery
                   geode::ModelBoundary3D >
         {
         };
-
-        BITSERY_CLASS_NAME( geode::Component2D, "Component2D" );
-        BITSERY_CLASS_NAME( geode::Corner2D, "Corner2D" );
-        BITSERY_CLASS_NAME( geode::Line2D, "Line2D" );
-        BITSERY_CLASS_NAME( geode::Surface2D, "Surface2D" );
-        BITSERY_CLASS_NAME( geode::ModelBoundary2D, "ModelBoundary2D" );
-        BITSERY_CLASS_NAME( geode::Component3D, "Component3D" );
-        BITSERY_CLASS_NAME( geode::Corner3D, "Corner3D" );
-        BITSERY_CLASS_NAME( geode::Line3D, "Line3D" );
-        BITSERY_CLASS_NAME( geode::Surface3D, "Surface3D" );
-        BITSERY_CLASS_NAME( geode::ModelBoundary3D, "ModelBoundary3D" );
-        BITSERY_CLASS_NAME( geode::Block3D, "Block3D" );
     } // namespace ext
 } // namespace bitsery
 

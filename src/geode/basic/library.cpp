@@ -21,9 +21,34 @@
  *
  */
 
-#pragma once
+#include <geode/basic/library.h>
 
-#include <geode/model/representation/core/mapping.h>
+#include <geode/basic/pimpl_impl.h>
 
-#pragma message                                                                \
-    "<geode/model/representation/builder/copy_mapping.h> is deprecated. Use <geode/model/representation/core/mapping.h> instead"
+namespace geode
+{
+    class Library::Impl
+    {
+    public:
+        void call_initialize( Library& library )
+        {
+            if( !is_loaded_ )
+            {
+                is_loaded_ = true;
+                library.do_initialize();
+            }
+        }
+
+    private:
+        bool is_loaded_{ false };
+    };
+
+    Library::Library() {} // NOLINT
+
+    Library::~Library() {} // NOLINT
+
+    void Library::call_initialize()
+    {
+        impl_->call_initialize( *this );
+    }
+} // namespace geode

@@ -190,6 +190,7 @@ void test_io(
 
 void test()
 {
+    geode::OpenGeodeModel::initialize();
     geode::Relationships relationships;
     const std::array< geode::uuid, 6 > uuids;
 

@@ -392,6 +392,7 @@ def test_permutation(solid, builder):
 
 
 if __name__ == '__main__':
+    mesh.OpenGeodeMesh.initialize()
     polyhedral_solid = mesh.PolyhedralSolid3D.create()
     if polyhedral_solid.is_tetrahedral_type():
         raise ValueError("[Test] Wrong surface type")

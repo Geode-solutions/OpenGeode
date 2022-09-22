@@ -29,6 +29,7 @@ option(OPENGEODE_WITH_PYTHON "Compile Python bindings" OFF)
 if(OPENGEODE_WITH_PYTHON)
     set(PYTHON_VERSION "" CACHE STRING "Python version to use for compiling modules")
 endif()
+option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 
 # Internal options
 option(USE_SUPERBUILD "Whether or not a superbuild should be invoked" ON)

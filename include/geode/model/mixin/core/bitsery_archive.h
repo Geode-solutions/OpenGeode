@@ -29,6 +29,22 @@
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( Component );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Corner );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Line );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Surface );
+    FORWARD_DECLARATION_DIMENSION_CLASS( ModelBoundary );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Block );
+    ALIAS_2D_AND_3D( Component );
+    ALIAS_2D_AND_3D( Corner );
+    ALIAS_2D_AND_3D( Line );
+    ALIAS_2D_AND_3D( Surface );
+    ALIAS_2D_AND_3D( ModelBoundary );
+    ALIAS_3D( Block );
+} // namespace geode
+
+namespace geode
+{
     /*!
      * Register all the information needed by Bitsery to serialize the objects
      * in the model library.
@@ -47,3 +63,21 @@ namespace geode
     void opengeode_model_api register_model_deserialize_pcontext(
         PContext& context );
 } // namespace geode
+
+namespace bitsery
+{
+    namespace ext
+    {
+        BITSERY_CLASS_NAME( geode::Component2D, "Component2D" );
+        BITSERY_CLASS_NAME( geode::Corner2D, "Corner2D" );
+        BITSERY_CLASS_NAME( geode::Line2D, "Line2D" );
+        BITSERY_CLASS_NAME( geode::Surface2D, "Surface2D" );
+        BITSERY_CLASS_NAME( geode::ModelBoundary2D, "ModelBoundary2D" );
+        BITSERY_CLASS_NAME( geode::Component3D, "Component3D" );
+        BITSERY_CLASS_NAME( geode::Corner3D, "Corner3D" );
+        BITSERY_CLASS_NAME( geode::Line3D, "Line3D" );
+        BITSERY_CLASS_NAME( geode::Surface3D, "Surface3D" );
+        BITSERY_CLASS_NAME( geode::ModelBoundary3D, "ModelBoundary3D" );
+        BITSERY_CLASS_NAME( geode::Block3D, "Block3D" );
+    } // namespace ext
+} // namespace bitsery

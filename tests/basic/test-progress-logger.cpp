@@ -23,10 +23,12 @@
 
 #include <absl/memory/memory.h>
 
+#include <geode/basic/library.h>
 #include <geode/basic/logger.h>
 #include <geode/basic/progress_logger.h>
 #include <geode/basic/progress_logger_client.h>
 #include <geode/basic/progress_logger_manager.h>
+#include <geode/basic/range.h>
 
 #include <geode/tests/common.h>
 
@@ -66,6 +68,7 @@ private:
 
 void test()
 {
+    geode::OpenGeodeBasic::initialize();
     geode::ProgressLoggerManager::register_client(
         absl::make_unique< CustomClient >( "Custom logger" ) );
 

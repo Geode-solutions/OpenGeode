@@ -187,10 +187,9 @@ void test_point_function()
 
 void test()
 {
+    geode::OpenGeodeMesh::initialize();
     test_scalar_function();
     test_point_function();
-
-    geode::Logger::info( "TEST SUCCESS" );
 }
 
 OPENGEODE_TEST( "regular-grid-function" )

@@ -23,6 +23,9 @@
 
 #include <iostream>
 
+#include <absl/memory/memory.h>
+
+#include <geode/basic/library.h>
 #include <geode/basic/logger.h>
 #include <geode/basic/logger_client.h>
 #include <geode/basic/logger_manager.h>
@@ -75,6 +78,7 @@ void test_logger()
 
 void test()
 {
+    geode::OpenGeodeBasic::initialize();
     geode::LoggerManager::register_client(
         absl::make_unique< CustomClient >() );
 

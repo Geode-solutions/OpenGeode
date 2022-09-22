@@ -105,7 +105,6 @@ add_geode_library(
         "mixin/core/topology.h"
         "mixin/core/vertex_identifier.h"
         "representation/builder/brep_builder.h"
-        "representation/builder/copy_mapping.h"
         "representation/builder/section_builder.h"
         "representation/core/brep.h"
         "representation/core/section.h"

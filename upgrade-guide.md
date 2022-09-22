@@ -4,9 +4,13 @@
 
 ### Motivations
 
-TODO
+The goal is to provide a build system with full static linking support. This way, a single executable can embed the entire OpenGeode ecosystem without having to deploy the numerous shared libraries.
+
+To allow this feature, each library needs to be explicitly initialized at the begining of the execution (for registering into factories for example).
 
 ### Breaking Changes
+
+- **Library**: Each library/OpenGeode module needs to use the new macro pairs `OPENGEODE_LIBRARY`/`OPENGEODE_LIBRARY_IMPLEMENTATION` defined in the basic/library.h header file. They replace the macro `OPENGEODE_LIBRARY_INITIALIZE`. Examples can be found in the common.h and common.cpp of each OpenGeode library.
 
 - **Mapping**: Header file `<geode/model/representation/builder/copy_mapping.h>` no longer exists, use `<geode/model/representation/core/mapping.h>` instead. Moreover, the class `ModelCopyMapping` cannot be forward declared anymore. Add the corresponding include in your files.
 

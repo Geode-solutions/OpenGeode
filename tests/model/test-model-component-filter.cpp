@@ -64,6 +64,7 @@ void check_brep_dangling( const geode::BRep& brep )
 
 void test()
 {
+    geode::OpenGeodeModel::initialize();
     auto brep = geode::load_brep(
         absl::StrCat( geode::data_path, "prism_curve.og_brep" ) );
     geode::filter_brep_components_with_regards_to_blocks( brep );

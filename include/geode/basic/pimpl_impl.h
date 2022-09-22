@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <geode/basic/bitsery_archive.h>
+
 namespace geode
 {
     template < typename T >
@@ -72,4 +74,16 @@ namespace geode
     {
         return *pimpl_.get();
     }
+
+    template < typename T >
+    template < typename Archive >
+    void PImpl< T >::serialize( Archive& archive )
+    {
+        archive.ext( *this, DefaultGrowable< Archive, PImpl >{},
+            []( Archive& a, PImpl& impl ) {
+                a.ext( impl.pimpl_, bitsery::ext::StdSmartPtr{} );
+            } );
+    }
+
+    // SERIALIZE_BITSERY_ARCHIVE( opengeode_basic_api, PImpl< T > );
 } // namespace geode

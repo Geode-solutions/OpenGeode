@@ -19,24 +19,27 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os, sys, platform
-if sys.version_info >= (3,8,0) and platform.system() == "Windows":
+import os
+import sys
+import platform
+if sys.version_info >= (3, 8, 0) and platform.system() == "Windows":
     for path in [x.strip() for x in os.environ['PATH'].split(';') if x]:
         os.add_dll_directory(path)
 
 import opengeode_py_model as model
 
 if __name__ == '__main__':
+    model.OpenGeodeModel.initialize()
     test_dir = os.path.dirname(__file__)
-    data_dir = os.path.abspath(os.path.join(test_dir, "../../../../tests/data"))
+    data_dir = os.path.abspath(os.path.join(
+        test_dir, "../../../../tests/data"))
 
-    brep = model.load_brep( os.path.join(data_dir, "random_dfn.og_brep") )
-    section, _ = model.convert_brep_into_section( brep,2 )
+    brep = model.load_brep(os.path.join(data_dir, "random_dfn.og_brep"))
+    section, _ = model.convert_brep_into_section(brep, 2)
 
     if section.nb_corners() != 172:
-        raise ValueError("[Test] Section should have 172 corners" )
+        raise ValueError("[Test] Section should have 172 corners")
     if section.nb_lines() != 288:
-        raise ValueError( "[Test] Section should have 288 lines" )
+        raise ValueError("[Test] Section should have 288 lines")
     if section.nb_surfaces() != 117:
-        raise ValueError("[Test] Section should have 117 surfaces" )
-
+        raise ValueError("[Test] Section should have 117 surfaces")

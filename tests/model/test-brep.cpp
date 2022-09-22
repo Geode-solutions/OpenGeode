@@ -828,6 +828,7 @@ void test_clone( const geode::BRep& brep )
 
 void test()
 {
+    geode::OpenGeodeModel::initialize();
     geode::BRep model;
     geode::BRepBuilder builder( model );
 

@@ -145,12 +145,11 @@ void test_point_function( geode::TetrahedralSolid3D& solid )
 
 void test()
 {
+    geode::OpenGeodeMesh::initialize();
     auto solid = geode::TetrahedralSolid3D::create();
     build_test_solid( *solid );
     test_scalar_function( *solid );
     test_point_function( *solid );
-
-    geode::Logger::info( "TEST SUCCESS" );
 }
 
 OPENGEODE_TEST( "tetrahedral-solid-function" )

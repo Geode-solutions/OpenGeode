@@ -20,24 +20,24 @@
  * SOFTWARE.
  *
  */
-
 #include <geode/basic/common.h>
 
 #include <absl/memory/memory.h>
 
 #include <geode/basic/console_logger_client.h>
 #include <geode/basic/console_progress_logger_client.h>
+#include <geode/basic/library.h>
 #include <geode/basic/logger_manager.h>
 #include <geode/basic/progress_logger_manager.h>
 
-namespace
+namespace geode
 {
-    OPENGEODE_LIBRARY_INITIALIZE( OpenGeode_basic )
+    OPENGEODE_LIBRARY_IMPLEMENTATION( OpenGeodeBasic )
     {
-        geode::LoggerManager::register_client(
-            absl::make_unique< geode::ConsoleLoggerClient >() );
+        LoggerManager::register_client(
+            absl::make_unique< ConsoleLoggerClient >() );
 
-        geode::ProgressLoggerManager::register_client(
-            absl::make_unique< geode::ConsoleProgressLoggerClient >() );
+        ProgressLoggerManager::register_client(
+            absl::make_unique< ConsoleProgressLoggerClient >() );
     }
-} // namespace
+} // namespace geode

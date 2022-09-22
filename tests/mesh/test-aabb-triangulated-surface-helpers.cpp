@@ -146,6 +146,7 @@ void test_SurfaceAABB()
 
 void test()
 {
+    geode::OpenGeodeMesh::initialize();
     test_SurfaceAABB< 2 >();
     test_SurfaceAABB< 3 >();
 }

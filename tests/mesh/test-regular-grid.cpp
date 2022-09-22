@@ -410,6 +410,7 @@ void test_adjacencies2D()
 
 void test()
 {
+    geode::OpenGeodeMesh::initialize();
     auto grid = geode::RegularGrid3D::create();
     auto builder = geode::RegularGridBuilder3D::create( *grid );
     builder->initialize_grid( { { 1.5, 0, 1 } }, { 5, 10, 15 }, { 1, 2, 3 } );
