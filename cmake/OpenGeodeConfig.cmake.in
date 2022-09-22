@@ -27,6 +27,7 @@ find_dependency(ghc_filesystem)
 find_dependency(Threads)
 
 if(NOT @BUILD_SHARED_LIBS@)
+    find_dependency(Async++)
     find_dependency(minizip-ng)
     find_dependency(nanoflann)
     find_dependency(spdlog)
