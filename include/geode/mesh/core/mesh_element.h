@@ -45,9 +45,9 @@ namespace geode
         MeshElement() = default;
     };
 
-    using ComponentVertex = MeshElement;
-    using ComponentEdge = MeshElement;
-    using ComponentPolygon = MeshElement;
+    using MeshVertex = MeshElement;
+    using MeshEdge = MeshElement;
+    using MeshPolygon = MeshElement;
 } // namespace geode
 
 namespace std
