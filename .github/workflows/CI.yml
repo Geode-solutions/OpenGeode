@@ -34,11 +34,18 @@ jobs:
     needs: format
     uses: Geode-solutions/actions/.github/workflows/ci-windows.yml@master
     with:
+      directory: opengeode
+    secrets: inherit
+
+  build-windows-python:
+    needs: format
+    uses: Geode-solutions/actions/.github/workflows/ci-windows-python.yml@master
+    with:
       name: OPENGEODE
       directory: opengeode
     secrets: inherit
         
   semantic-release:
-    needs: [build-linux, build-linux-python, build-windows]
+    needs: [build-linux, build-linux-python, build-windows, build-windows-python]
     uses: Geode-solutions/actions/.github/workflows/release.yml@master
     secrets: inherit

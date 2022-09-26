@@ -50,14 +50,10 @@ add_compile_options(
     $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wshadow>
     $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wnon-virtual-dtor>
 )
-
-if(WIN32)
-    if(CMAKE_C_FLAGS_DEBUG)
-        string(REPLACE "/MDd" "/MD" CMAKE_C_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
-    endif()
-    if(CMAKE_CXX_FLAGS_DEBUG)
-        string(REPLACE "/MDd" "/MD" CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
-    endif()
+if(NOT BUILD_SHARED_LIBS)
+    add_link_options(
+        $<$<CXX_COMPILER_ID:MSVC>:/INCREMENTAL:NO> 
+    )
 endif()
 
 #------------------------------------------------------------------------------------------------
@@ -274,6 +270,13 @@ function(_add_geode_executable exe_path folder_name)
             PROPERTIES
                 VS_DEBUGGER_ENVIRONMENT "PATH=${directories}\\;$ENV{Path}"
         )
+        if(NOT BUILD_SHARED_LIBS)
+            set(pdb_file "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/${target_name}.pdb")
+            add_custom_command(
+                TARGET ${target_name} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E remove  ${pdb_file}
+            )
+        endif()
     endif()
 	
     set_target_properties(${target_name}
