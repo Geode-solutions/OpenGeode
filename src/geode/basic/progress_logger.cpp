@@ -76,7 +76,7 @@ namespace geode
         }
 
     private:
-        double nb_steps_;
+        index_t nb_steps_;
         index_t current_{ 0 };
         absl::Time current_time_;
         absl::Mutex lock_;

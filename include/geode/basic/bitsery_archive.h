@@ -192,4 +192,4 @@ namespace bitsery
     struct PolymorphicClassName< Type >                                        \
     {                                                                          \
         static constexpr auto name = Name;                                     \
-    };
+    }

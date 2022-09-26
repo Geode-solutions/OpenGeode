@@ -240,7 +240,7 @@ namespace geode
                 }
                 else
                 {
-                    closest[d] = std::round( value );
+                    closest[d] = static_cast< index_t >( std::round( value ) );
                 }
             }
             return closest;
