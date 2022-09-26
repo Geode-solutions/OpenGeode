@@ -172,6 +172,7 @@ add_geode_library(
         "core/grid.h"
         "core/hybrid_solid.h"
         "core/mesh_factory.h"
+        "core/mesh_element.h"
         "core/mesh_id.h"
         "core/point_set.h"
         "core/polygonal_surface.h"
