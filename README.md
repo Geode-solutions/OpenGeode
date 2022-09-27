@@ -35,13 +35,13 @@ OpenGeode is an open source framework for representing and manipulating geometri
 
 ## Ecosystem
 
-| Project | Version | Description |
-|---------|---------|-------------|
-| [OpenGeode-IO]          | ![OpenGeode-IO-version] | Implementation of input and output formats |
-| [OpenGeode-Geosciences]          | ![OpenGeode-Geosciences-version] | Custom objects and algorithms tailored for Geosciences |
-| [OpenGeode-GeosciencesIO]          | ![OpenGeode-GeosciencesIO-version] | Implementation of input and output formats for Geosciences |
-| [OpenGeode-ModuleTemplate]          | ![OpenGeode-ModuleTemplate-version] | Template for creating your own OpenGeode modules |
-| [Geode]          | ![Geode-version] | Open-source software for visualization, modeling and much more |
+| Project                     | Version                               | Description                                                     |
+|-----------------------------|---------------------------------------|-----------------------------------------------------------------|
+| [OpenGeode-IO]              | ![OpenGeode-IO-version]               | Implementation of input and output formats                      |
+| [OpenGeode-Geosciences]     | ![OpenGeode-Geosciences-version]      | Custom objects and algorithms tailored for Geosciences          |
+| [OpenGeode-GeosciencesIO]   | ![OpenGeode-GeosciencesIO-version]    | Implementation of input and output formats for Geosciences      |
+| [OpenGeode-ModuleTemplate]  | ![OpenGeode-ModuleTemplate-version]   | Template for creating your own OpenGeode modules                |
+| [Geode]                     | ![Geode-version]                      | Open-source software for visualization, modeling and much more  |
 
 [OpenGeode-IO]: https://github.com/Geode-solutions/OpenGeode-IO
 [OpenGeode-IO-version]: https://img.shields.io/github/release/Geode-solutions/OpenGeode-IO.svg
