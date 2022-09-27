@@ -60,7 +60,7 @@ namespace geode
         {
             return in2out_.at( in );
         }
-        
+
         const Storage< T1 >& out2in( const T2& out ) const
         {
             return out2in_.at( out );
