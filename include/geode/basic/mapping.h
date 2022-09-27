@@ -30,7 +30,6 @@
 
 namespace geode
 {
-
     template < typename T1,
         typename T2,
         template < typename >
@@ -61,6 +60,7 @@ namespace geode
         {
             return in2out_.at( in );
         }
+        
         const Storage< T1 >& out2in( const T2& out ) const
         {
             return out2in_.at( out );
@@ -82,12 +82,12 @@ namespace geode
         absl::flat_hash_map< T1, Storage< T2 > >& in2out_map()
         {
             return in2out_;
-        };
+        }
 
         absl::flat_hash_map< T2, Storage< T1 > >& out2in_map()
         {
             return out2in_;
-        };
+        }
 
     private:
         absl::flat_hash_map< T1, Storage< T2 > > in2out_;
