@@ -10,6 +10,8 @@ To allow this feature, each library needs to be explicitly initialized at the be
 
 ### Breaking Changes
 
+-**CMake**: Minimum required version bump to 3.15
+
 - **Library**: Each library/OpenGeode module needs to use the new macro pairs `OPENGEODE_LIBRARY`/`OPENGEODE_LIBRARY_IMPLEMENTATION` defined in the basic/library.h header file. They replace the macro `OPENGEODE_LIBRARY_INITIALIZE`. Examples can be found in the common.h and common.cpp of each OpenGeode library.
 
 - **Mapping**: Header file `<geode/model/representation/builder/copy_mapping.h>` no longer exists, use `<geode/model/representation/core/mapping.h>` instead. Moreover, the class `ModelCopyMapping` cannot be forward declared anymore. Add the corresponding include in your files.

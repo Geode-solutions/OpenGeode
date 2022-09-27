@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.15)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     message(STATUS "Setting build type to 'Release' as none was specified.")
@@ -55,6 +55,7 @@ if(NOT BUILD_SHARED_LIBS)
         $<$<CXX_COMPILER_ID:MSVC>:/INCREMENTAL:NO> 
     )
 endif()
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<BOOL:${BUILD_SHARED_LIBS}>:DLL>")
 
 #------------------------------------------------------------------------------------------------
 # Install configuration    
