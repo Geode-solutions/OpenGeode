@@ -56,7 +56,7 @@ if(NOT BUILD_SHARED_LIBS)
     )
 endif()
 
-cmake_policy(CMP0091 NEW)
+cmake_policy(SET CMP0091 NEW)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
 
 #------------------------------------------------------------------------------------------------
