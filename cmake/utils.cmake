@@ -55,7 +55,15 @@ if(NOT BUILD_SHARED_LIBS)
         $<$<CXX_COMPILER_ID:MSVC>:/INCREMENTAL:NO> 
     )
 endif()
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
+
+if(WIN32)
+    if(CMAKE_C_FLAGS_DEBUG)
+        string(REPLACE "/MDd" "/MD" CMAKE_C_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
+    endif()
+    if(CMAKE_CXX_FLAGS_DEBUG)
+        string(REPLACE "/MDd" "/MD" CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
+    endif()
+endif()
 
 #------------------------------------------------------------------------------------------------
 # Install configuration    
