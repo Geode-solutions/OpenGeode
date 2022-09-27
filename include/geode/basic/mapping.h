@@ -30,15 +30,15 @@
 
 namespace geode
 {
-    template < typename T1, typename T2 = T1 >
-    class BijectiveMapping
+    template < typename T1,
+        typename T2,
+        template < typename >
+        class StorageType >
+    class MappingBase
     {
     public:
-        void map( const T1& in, const T2& out )
-        {
-            in2out_.emplace( in, out );
-            out2in_.emplace( out, in );
-        }
+        template < typename T >
+        using Storage = typename StorageType< T >::Type;
 
         void reserve( index_t capacity )
         {
@@ -56,65 +56,90 @@ namespace geode
             return out2in_.contains( value );
         }
 
-        size_t size() const
-        {
-            return in2out_.size();
-        }
-
-        const T2& in2out( const T1& in ) const
-        {
-            return in2out_.at( in );
-        }
-        const T1& out2in( const T2& out ) const
-        {
-            return out2in_.at( out );
-        }
-
-    private:
-        absl::flat_hash_map< T1, T2 > in2out_;
-        absl::flat_hash_map< T2, T1 > out2in_;
-    };
-
-    template < typename T1, typename T2 = T1 >
-    class GenericMapping
-    {
-    public:
-        template < typename T >
-        using Storage = absl::InlinedVector< T, 1 >;
-
-        void map( const T1& in, const T2& out )
-        {
-            in2out_[in].push_back( out );
-            out2in_[out].push_back( in );
-        }
-
-        void reserve( index_t capacity )
-        {
-            in2out_.reserve( capacity );
-            out2in_.reserve( capacity );
-        }
-
-        index_t size_in() const
-        {
-            return static_cast< index_t >( in2out_.size() );
-        }
-
-        index_t size_out() const
-        {
-            return static_cast< index_t >( out2in_.size() );
-        }
-
         const Storage< T2 >& in2out( const T1& in ) const
         {
             return in2out_.at( in );
         }
+
         const Storage< T1 >& out2in( const T2& out ) const
         {
             return out2in_.at( out );
         }
 
+    protected:
+        MappingBase() = default;
+
+        index_t size_input() const
+        {
+            return static_cast< index_t >( in2out_.size() );
+        }
+
+        index_t size_output() const
+        {
+            return static_cast< index_t >( out2in_.size() );
+        }
+
+        absl::flat_hash_map< T1, Storage< T2 > >& in2out_map()
+        {
+            return in2out_;
+        }
+
+        absl::flat_hash_map< T2, Storage< T1 > >& out2in_map()
+        {
+            return out2in_;
+        }
+
     private:
         absl::flat_hash_map< T1, Storage< T2 > > in2out_;
         absl::flat_hash_map< T2, Storage< T1 > > out2in_;
+    };
+
+    template < typename T >
+    struct OneValueStorage
+    {
+        using Type = T;
+    };
+
+    template < typename T1, typename T2 = T1 >
+    class BijectiveMapping : public MappingBase< T1, T2, OneValueStorage >
+    {
+    public:
+        void map( const T1& in, const T2& out )
+        {
+            this->in2out_map().emplace( in, out );
+            this->out2in_map().emplace( out, in );
+        }
+
+        index_t size() const
+        {
+            return this->size_input();
+        }
+    };
+
+    template < typename T >
+    struct MultipleValueStorage
+    {
+        using Type = absl::InlinedVector< T, 1 >;
+    };
+
+    template < typename T1, typename T2 = T1 >
+    class GenericMapping : public MappingBase< T1, T2, MultipleValueStorage >
+    {
+    public:
+        void map( const T1& in, const T2& out )
+        {
+            this->in2out_map()[in].push_back( out );
+            this->out2in_map()[out].push_back( in );
+        }
+
+        index_t size_in() const
+        {
+            return this->size_input();
+        }
+
+        index_t size_out() const
+        {
+            return this->size_output();
+        }
     };
 } // namespace geode
