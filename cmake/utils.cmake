@@ -56,14 +56,8 @@ if(NOT BUILD_SHARED_LIBS)
     )
 endif()
 
-if(WIN32)
-    if(CMAKE_C_FLAGS_DEBUG)
-        string(REPLACE "/MDd" "/MD" CMAKE_C_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
-    endif()
-    if(CMAKE_CXX_FLAGS_DEBUG)
-        string(REPLACE "/MDd" "/MD" CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
-    endif()
-endif()
+cmake_policy(CMP0091 NEW)
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
 
 #------------------------------------------------------------------------------------------------
 # Install configuration    
