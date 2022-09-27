@@ -55,7 +55,7 @@ if(NOT BUILD_SHARED_LIBS)
         $<$<CXX_COMPILER_ID:MSVC>:/INCREMENTAL:NO> 
     )
 endif()
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<BOOL:${BUILD_SHARED_LIBS}>:DLL>")
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
 
 #------------------------------------------------------------------------------------------------
 # Install configuration    

@@ -34,7 +34,7 @@ endif()
 if("${CMAKE_CXX_STANDARD}" STREQUAL "")
     set(CMAKE_CXX_STANDARD 11)
 endif()
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<BOOL:${BUILD_SHARED_LIBS}>:DLL>")
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
 
 # Begin configuration of the superbuild project
 project(SuperBuild NONE)
