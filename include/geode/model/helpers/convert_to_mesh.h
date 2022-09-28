@@ -45,6 +45,9 @@ namespace geode
     static constexpr auto uuid_from_conversion_attribute_name =
         "uuid_from_conversion";
     using uuid_from_conversion_attribute_type = uuid;
+    static constexpr auto unique_vertex_from_conversion_attribute_name =
+        "unique_vertex_from_conversion";
+    using unique_vertex_from_conversion_attribute_type = index_t;
 
     std::unique_ptr< EdgedCurve2D > opengeode_model_api
         convert_section_into_curve( const Section& section );

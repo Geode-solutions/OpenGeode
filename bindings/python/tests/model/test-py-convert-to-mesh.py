@@ -67,7 +67,7 @@ def run_test_section():
     if curve.nb_edges() != 0:
         raise ValueError("[Test] Section - Wrong number of curve edges")
 
-    if surface.nb_vertices() != 1:
+    if surface.nb_vertices() != 4:
         raise ValueError("[Test] Section - Wrong number of surface vertices")
     if surface.nb_polygons() != 1:
         raise ValueError("[Test] Section - Wrong number of surface polygons")
