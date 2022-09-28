@@ -26,6 +26,7 @@
 #include <absl/container/flat_hash_map.h>
 
 #include <geode/basic/attribute_manager.h>
+#include <geode/basic/logger.h>
 
 #include <geode/geometry/point.h>
 
@@ -51,7 +52,12 @@ namespace
     class FromModel
     {
     public:
-        FromModel( const Model& model ) : model_( model ) {}
+        FromModel( const Model& model ) : model_( model )
+        {
+            OPENGEODE_EXCEPTION( model.nb_unique_vertices() > 0,
+                "[Convert Model to Mesh(es)] Given model should have unique "
+                "vertices" );
+        }
 
         const Model& model() const
         {
@@ -71,6 +77,9 @@ namespace
 
         geode::index_t create_vertex( geode::index_t vertex_id )
         {
+            OPENGEODE_EXCEPTION( vertex_id != geode::NO_ID,
+                "[Convert Model to Mesh(es)] At least one Component Mesh "
+                "Vertex is not link to a unique vertex" );
             const geode::index_t new_id = vertices_.size();
             vertices_.emplace( vertex_id, new_id );
             return new_id;
