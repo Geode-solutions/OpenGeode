@@ -26,7 +26,6 @@
 #include <absl/container/flat_hash_map.h>
 
 #include <geode/basic/attribute_manager.h>
-#include <geode/basic/logger.h>
 
 #include <geode/geometry/point.h>
 
