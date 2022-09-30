@@ -180,6 +180,10 @@ namespace geode
         };
 
     public:
+        Section();
+        Section( Section&& section );
+        ~Section();
+
         BoundaryCornerRange boundaries( const Line2D& line ) const;
 
         BoundaryLineRange boundaries( const Surface2D& surface ) const;

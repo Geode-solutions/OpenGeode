@@ -272,6 +272,11 @@ namespace geode
     }
 
     template < index_t dimension >
+    Blocks< dimension >::BlockRange::~BlockRange() // NOLINT
+    {
+    }
+
+    template < index_t dimension >
     const Block< dimension >& Blocks< dimension >::BlockRange::operator*() const
     {
         return this->impl_->block();

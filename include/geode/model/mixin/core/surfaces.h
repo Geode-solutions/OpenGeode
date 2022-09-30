@@ -71,6 +71,7 @@ namespace geode
         {
         public:
             SurfaceRange( const Surfaces& surfaces );
+            ~SurfaceRange();
 
             const Surface< dimension >& operator*() const;
         };

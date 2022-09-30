@@ -239,6 +239,11 @@ namespace geode
     }
 
     template < index_t dimension >
+    Corners< dimension >::CornerRange::~CornerRange() // NOLINT
+    {
+    }
+
+    template < index_t dimension >
     const Corner< dimension >&
         Corners< dimension >::CornerRange::operator*() const
     {

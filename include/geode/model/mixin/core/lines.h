@@ -71,6 +71,7 @@ namespace geode
         {
         public:
             LineRange( const Lines& lines );
+            ~LineRange();
 
             const Line< dimension >& operator*() const;
         };

@@ -233,6 +233,11 @@ namespace geode
     }
 
     template < index_t dimension >
+    Lines< dimension >::LineRange::~LineRange() // NOLINT
+    {
+    }
+
+    template < index_t dimension >
     const Line< dimension >& Lines< dimension >::LineRange::operator*() const
     {
         return this->impl_->line();

@@ -274,6 +274,11 @@ namespace geode
     }
 
     template < index_t dimension >
+    Surfaces< dimension >::SurfaceRange::~SurfaceRange() // NOLINT
+    {
+    }
+
+    template < index_t dimension >
     const Surface< dimension >&
         Surfaces< dimension >::SurfaceRange::operator*() const
     {

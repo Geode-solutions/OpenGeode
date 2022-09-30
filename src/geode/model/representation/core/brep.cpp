@@ -416,6 +416,19 @@ namespace geode
             Relationships::ItemRangeIterator::operator*().id() );
     }
 
+    BRep::BRep() {} // NOLINT
+
+    BRep::BRep( BRep&& brep )
+        : Topology{ std::move( brep ) },
+          AddComponents< 3, Corners, Lines, Surfaces, Blocks, ModelBoundaries >{
+              std::move( brep )
+          },
+          Identifier{ std::move( brep ) }
+    {
+    }
+
+    BRep::~BRep() {} // NOLINT
+
     BRep::ItemSurfaceRange BRep::model_boundary_items(
         const ModelBoundary3D& boundary ) const
     {

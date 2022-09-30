@@ -72,6 +72,7 @@ namespace geode
         {
         public:
             ModelBoundaryRange( const ModelBoundaries& boundaries );
+            ~ModelBoundaryRange();
 
             const ModelBoundary< dimension >& operator*() const;
         };
