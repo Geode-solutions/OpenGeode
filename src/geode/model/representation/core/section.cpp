@@ -271,13 +271,10 @@ namespace geode
 
     Section::Section( Section&& section )
         : Topology{ std::move( section ) },
-          AddComponents< 2,
-              Corners,
-              Lines,
-              Surfaces,
-              ModelBoundaries >{ std::move( static_cast<
-              AddComponents< 2, Corners, Lines, Surfaces, ModelBoundaries >& >(
-              section ) ) },
+          Corners2D{ std::move( section ) },
+          Lines2D{ std::move( section ) },
+          Surfaces2D{ std::move( section ) },
+          ModelBoundaries2D{ std::move( section ) },
           Identifier{ std::move( section ) }
     {
     }

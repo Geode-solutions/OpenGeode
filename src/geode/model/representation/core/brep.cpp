@@ -420,14 +420,11 @@ namespace geode
 
     BRep::BRep( BRep&& brep )
         : Topology{ std::move( brep ) },
-          AddComponents< 3, Corners, Lines, Surfaces, Blocks, ModelBoundaries >{
-              std::move( static_cast< AddComponents< 3,
-                      Corners,
-                      Lines,
-                      Surfaces,
-                      Blocks,
-                      ModelBoundaries >& >( brep ) )
-          },
+          Corners3D{ std::move( brep ) },
+          Lines3D{ std::move( brep ) },
+          Surfaces3D{ std::move( brep ) },
+          Blocks3D{ std::move( brep ) },
+          ModelBoundaries3D{ std::move( brep ) },
           Identifier{ std::move( brep ) }
     {
     }

@@ -59,12 +59,11 @@ namespace geode
      * @extends ModelBoundaries
      */
     class opengeode_model_api BRep : public Topology,
-                                     public AddComponents< 3,
-                                         Corners,
-                                         Lines,
-                                         Surfaces,
-                                         Blocks,
-                                         ModelBoundaries >,
+                                     public Corners3D,
+                                     public Lines3D,
+                                     public Surfaces3D,
+                                     public Blocks3D,
+                                     public ModelBoundaries3D,
                                      public Identifier
     {
     public:
