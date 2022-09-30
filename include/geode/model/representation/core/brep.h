@@ -246,6 +246,10 @@ namespace geode
         };
 
     public:
+        BRep() = default;
+        BRep( BRep&& brep ) = default;
+        ~BRep() = default;
+
         BoundaryCornerRange boundaries( const Line3D& line ) const;
 
         BoundaryLineRange boundaries( const Surface3D& surface ) const;

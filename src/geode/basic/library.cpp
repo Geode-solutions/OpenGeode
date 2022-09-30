@@ -23,6 +23,7 @@
 
 #include <geode/basic/library.h>
 
+#include <geode/basic/logger.h>
 #include <geode/basic/pimpl_impl.h>
 
 namespace geode
@@ -30,12 +31,14 @@ namespace geode
     class Library::Impl
     {
     public:
-        void call_initialize( Library& library )
+        void call_initialize( Library& library, const char* library_name )
         {
+            geode_unused( library_name );
             if( !is_loaded_ )
             {
                 is_loaded_ = true;
                 library.do_initialize();
+                DEBUG_LOGGER( library_name, " initialized" );
             }
         }
 
@@ -47,8 +50,8 @@ namespace geode
 
     Library::~Library() {} // NOLINT
 
-    void Library::call_initialize()
+    void Library::call_initialize( const char* library_name )
     {
-        impl_->call_initialize( *this );
+        impl_->call_initialize( *this, library_name );
     }
 } // namespace geode

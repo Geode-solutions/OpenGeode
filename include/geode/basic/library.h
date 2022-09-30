@@ -36,7 +36,7 @@ namespace geode
     protected:
         Library();
 
-        void call_initialize();
+        void call_initialize( const char* library_name );
 
     private:
         virtual void do_initialize() = 0;
@@ -57,7 +57,7 @@ namespace geode
         static void initialize()                                               \
         {                                                                      \
             static library_name library;                                       \
-            library.call_initialize();                                         \
+            library.call_initialize( #library_name );                          \
         }                                                                      \
                                                                                \
     private:                                                                   \
