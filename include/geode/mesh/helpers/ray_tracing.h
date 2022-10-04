@@ -65,10 +65,14 @@ namespace geode
 
         absl::optional< PolygonDistance > closest_polygon() const;
 
+        absl::optional< absl::FixedArray< PolygonDistance > > closest_polygons(
+            index_t size ) const;
+
+        std::vector< PolygonDistance > all_intersections() const;
+
         void operator()( index_t polygon_id );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );
     };
-
 } // namespace geode
