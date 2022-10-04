@@ -39,10 +39,10 @@ namespace geode
         MeshBuilderFactoryKey() {}
     };
 
-    class opengeode_mesh_api MeshBuilderFactory : public Factory< MeshImpl,
-                                                      VertexSetBuilder,
-                                                      VertexSet&,
-                                                      MeshBuilderFactoryKey >
+    class MeshBuilderFactory : public Factory< MeshImpl,
+                                   VertexSetBuilder,
+                                   VertexSet&,
+                                   MeshBuilderFactoryKey >
     {
     public:
         template < typename MeshBuilder >
