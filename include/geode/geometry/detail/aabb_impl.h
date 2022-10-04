@@ -98,14 +98,14 @@ namespace geode
             index_t element_end,
             const ACTION& action ) const;
 
-        template < class ACTION >
+        template < typename ACTION >
         void bbox_intersect_recursive( const BoundingBox< dimension >& box,
             index_t node_index,
             index_t element_begin,
             index_t element_end,
             ACTION& action ) const;
 
-        template < class ACTION >
+        template < typename ACTION >
         void self_intersect_recursive( index_t node_index1,
             index_t element_begin1,
             index_t element_end1,
@@ -114,7 +114,7 @@ namespace geode
             index_t element_end2,
             ACTION& action ) const;
 
-        template < class ACTION >
+        template < typename ACTION >
         void other_intersect_recursive( index_t node_index1,
             index_t element_begin1,
             index_t element_end1,
@@ -124,8 +124,8 @@ namespace geode
             index_t element_end2,
             ACTION& action ) const;
 
-        template < class ACTION >
-        void ray_intersect_recursive( const Ray< dimension >& ray,
+        template < typename Line, typename ACTION >
+        void line_intersect_recursive( const Line& line,
             index_t node_index,
             index_t element_begin,
             index_t element_end,
@@ -209,8 +209,21 @@ namespace geode
         {
             return;
         }
-        impl_->ray_intersect_recursive(
+        impl_->line_intersect_recursive(
             ray, Impl::ROOT_INDEX, 0, nb_bboxes(), action );
+    }
+
+    template < index_t dimension >
+    template < class EvalIntersection >
+    void AABBTree< dimension >::compute_line_element_bbox_intersections(
+        const InfiniteLine< dimension >& line, EvalIntersection& action ) const
+    {
+        if( nb_bboxes() == 0 )
+        {
+            return;
+        }
+        impl_->line_intersect_recursive(
+            line, Impl::ROOT_INDEX, 0, nb_bboxes(), action );
     }
 
     template < index_t dimension >
@@ -259,13 +272,13 @@ namespace geode
         {
             if( distance_left < distance )
             {
-                closest_element_box_recursive< ACTION >( query, nearest_box,
+                closest_element_box_recursive( query, nearest_box,
                     nearest_point, distance, it.child_left, box_begin,
                     it.middle_box, action );
             }
             if( distance_right < distance )
             {
-                closest_element_box_recursive< ACTION >( query, nearest_box,
+                closest_element_box_recursive( query, nearest_box,
                     nearest_point, distance, it.child_right, it.middle_box,
                     box_end, action );
             }
@@ -274,13 +287,13 @@ namespace geode
         {
             if( distance_right < distance )
             {
-                closest_element_box_recursive< ACTION >( query, nearest_box,
+                closest_element_box_recursive( query, nearest_box,
                     nearest_point, distance, it.child_right, it.middle_box,
                     box_end, action );
             }
             if( distance_left < distance )
             {
-                closest_element_box_recursive< ACTION >( query, nearest_box,
+                closest_element_box_recursive( query, nearest_box,
                     nearest_point, distance, it.child_left, box_begin,
                     it.middle_box, action );
             }
@@ -314,14 +327,14 @@ namespace geode
 
         const auto it =
             get_recursive_iterators( node_index, element_begin, element_end );
-        bbox_intersect_recursive< ACTION >(
+        bbox_intersect_recursive(
             box, it.child_left, element_begin, it.middle_box, action );
-        bbox_intersect_recursive< ACTION >(
+        bbox_intersect_recursive(
             box, it.child_right, it.middle_box, element_end, action );
     }
 
     template < index_t dimension >
-    template < class ACTION >
+    template < typename ACTION >
     void AABBTree< dimension >::Impl::self_intersect_recursive(
         index_t node_index1,
         index_t element_begin1,
@@ -372,28 +385,26 @@ namespace geode
         {
             const auto it = get_recursive_iterators(
                 node_index2, element_begin2, element_end2 );
-            self_intersect_recursive< ACTION >( node_index1, element_begin1,
-                element_end1, it.child_left, element_begin2, it.middle_box,
-                action );
-            self_intersect_recursive< ACTION >( node_index1, element_begin1,
-                element_end1, it.child_right, it.middle_box, element_end2,
-                action );
+            self_intersect_recursive( node_index1, element_begin1, element_end1,
+                it.child_left, element_begin2, it.middle_box, action );
+            self_intersect_recursive( node_index1, element_begin1, element_end1,
+                it.child_right, it.middle_box, element_end2, action );
         }
         else
         {
             const auto it = get_recursive_iterators(
                 node_index1, element_begin1, element_end1 );
-            self_intersect_recursive< ACTION >( it.child_left, element_begin1,
+            self_intersect_recursive( it.child_left, element_begin1,
                 it.middle_box, node_index2, element_begin2, element_end2,
                 action );
-            self_intersect_recursive< ACTION >( it.child_right, it.middle_box,
+            self_intersect_recursive( it.child_right, it.middle_box,
                 element_end1, node_index2, element_begin2, element_end2,
                 action );
         }
     }
 
     template < index_t dimension >
-    template < class ACTION >
+    template < typename ACTION >
     void AABBTree< dimension >::Impl::other_intersect_recursive(
         index_t node_index1,
         index_t element_begin1,
@@ -433,10 +444,10 @@ namespace geode
         {
             const auto it = get_recursive_iterators(
                 node_index2, element_begin2, element_end2 );
-            other_intersect_recursive< ACTION >( node_index1, element_begin1,
+            other_intersect_recursive( node_index1, element_begin1,
                 element_end1, other_tree, it.child_left, element_begin2,
                 it.middle_box, action );
-            other_intersect_recursive< ACTION >( node_index1, element_begin1,
+            other_intersect_recursive( node_index1, element_begin1,
                 element_end1, other_tree, it.child_right, it.middle_box,
                 element_end2, action );
         }
@@ -444,19 +455,19 @@ namespace geode
         {
             const auto it = get_recursive_iterators(
                 node_index1, element_begin1, element_end1 );
-            other_intersect_recursive< ACTION >( it.child_left, element_begin1,
+            other_intersect_recursive( it.child_left, element_begin1,
                 it.middle_box, other_tree, node_index2, element_begin2,
                 element_end2, action );
-            other_intersect_recursive< ACTION >( it.child_right, it.middle_box,
+            other_intersect_recursive( it.child_right, it.middle_box,
                 element_end1, other_tree, node_index2, element_begin2,
                 element_end2, action );
         }
     }
 
     template < index_t dimension >
-    template < typename ACTION >
-    void AABBTree< dimension >::Impl::ray_intersect_recursive(
-        const Ray< dimension >& ray,
+    template < typename Line, typename ACTION >
+    void AABBTree< dimension >::Impl::line_intersect_recursive(
+        const Line& line,
         index_t node_index,
         index_t element_begin,
         index_t element_end,
@@ -467,7 +478,7 @@ namespace geode
             element_begin != element_end, "No iteration allowed start == end" );
 
         // Prune sub-tree that does not have intersection
-        if( !node( node_index ).intersects( ray ) )
+        if( !node( node_index ).intersects( line ) )
         {
             return;
         }
@@ -480,9 +491,9 @@ namespace geode
 
         const auto it =
             get_recursive_iterators( node_index, element_begin, element_end );
-        ray_intersect_recursive< ACTION >(
-            ray, it.child_left, element_begin, it.middle_box, action );
-        ray_intersect_recursive< ACTION >(
-            ray, it.child_right, it.middle_box, element_end, action );
+        line_intersect_recursive(
+            line, it.child_left, element_begin, it.middle_box, action );
+        line_intersect_recursive(
+            line, it.child_right, it.middle_box, element_end, action );
     }
 } // namespace geode

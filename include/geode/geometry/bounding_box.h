@@ -59,6 +59,8 @@ namespace geode
 
         bool intersects( const Ray< dimension >& ray ) const;
 
+        bool intersects( const InfiniteLine< dimension >& line ) const;
+
         /*!
          * Returns the distance between the point and the box.
          * If the point is inside the box, the distance is negative.
