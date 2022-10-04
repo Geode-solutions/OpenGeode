@@ -67,8 +67,8 @@ namespace geode
 
     public:
         RayTracing3D( const SurfaceMesh3D& mesh, const Ray3D& ray );
-        RayTracing3D(
-            const SurfaceMesh3D& mesh, const InfiniteLine3D& infinite_line );
+        // RayTracing3D(
+        //     const SurfaceMesh3D& mesh, const InfiniteLine3D& infinite_line );
         RayTracing3D( RayTracing3D&& other );
         ~RayTracing3D();
 

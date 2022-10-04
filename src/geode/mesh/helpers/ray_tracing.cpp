@@ -23,8 +23,8 @@
 
 #include <geode/mesh/helpers/ray_tracing.h>
 
-#include <absl/algorithm/container.h>
-
+#include <geode/basic/algorithm.h>
+#include <geode/basic/logger.h>
 #include <geode/basic/pimpl_impl.h>
 
 #include <geode/geometry/basic_objects/segment.h>
@@ -48,6 +48,115 @@ namespace
             geode::point_point_distance( bbox.min(), bbox.max() );
         return ray.origin() + ray.direction() * diagonal;
     }
+
+    bool test_vertex_mode( const geode::SurfaceMesh3D& mesh,
+        const geode::RayTracing3D::PolygonDistance& polygon0,
+        const geode::RayTracing3D::PolygonDistance& polygon1 )
+    {
+        geode::PolygonVertex polygon_vertex0{ polygon0.polygon, geode::NO_LID };
+        if( polygon0.position == geode::Position::vertex0 )
+        {
+            polygon_vertex0.vertex_id = 0;
+        }
+        if( polygon0.position == geode::Position::vertex1 )
+        {
+            polygon_vertex0.vertex_id = 1;
+        }
+        if( polygon0.position == geode::Position::vertex2 )
+        {
+            polygon_vertex0.vertex_id = 2;
+        }
+        if( polygon_vertex0.vertex_id == geode::NO_LID )
+        {
+            return false;
+        }
+        geode::PolygonVertex polygon_vertex1{ polygon1.polygon, geode::NO_LID };
+        if( polygon1.position == geode::Position::vertex0 )
+        {
+            polygon_vertex1.vertex_id = 0;
+        }
+        if( polygon1.position == geode::Position::vertex1 )
+        {
+            polygon_vertex1.vertex_id = 1;
+        }
+        if( polygon1.position == geode::Position::vertex2 )
+        {
+            polygon_vertex1.vertex_id = 2;
+        }
+        if( polygon_vertex1.vertex_id == geode::NO_LID )
+        {
+            return false;
+        }
+        return mesh.polygon_vertex( polygon_vertex0 )
+               == mesh.polygon_vertex( polygon_vertex1 );
+    }
+
+    bool test_edge_mode( const geode::SurfaceMesh3D& mesh,
+        const geode::RayTracing3D::PolygonDistance& polygon0,
+        const geode::RayTracing3D::PolygonDistance& polygon1 )
+    {
+        geode::PolygonEdge polygon_edge0{ polygon0.polygon, geode::NO_LID };
+        if( polygon0.position == geode::Position::edge0 )
+        {
+            polygon_edge0.edge_id = 0;
+        }
+        if( polygon0.position == geode::Position::edge1 )
+        {
+            polygon_edge0.edge_id = 1;
+        }
+        if( polygon0.position == geode::Position::edge2 )
+        {
+            polygon_edge0.edge_id = 2;
+        }
+        if( polygon_edge0.edge_id == geode::NO_LID )
+        {
+            return false;
+        }
+        geode::PolygonEdge polygon_edge1{ polygon1.polygon, geode::NO_LID };
+        if( polygon1.position == geode::Position::edge0 )
+        {
+            polygon_edge1.edge_id = 0;
+        }
+        if( polygon1.position == geode::Position::edge1 )
+        {
+            polygon_edge1.edge_id = 1;
+        }
+        if( polygon1.position == geode::Position::edge2 )
+        {
+            polygon_edge1.edge_id = 2;
+        }
+        if( polygon_edge1.edge_id == geode::NO_LID )
+        {
+            return false;
+        }
+        return mesh.polygon_adjacent_edge( polygon_edge0 ) == polygon_edge1;
+    }
+
+    bool are_equal( const geode::SurfaceMesh3D& mesh,
+        const geode::RayTracing3D::PolygonDistance& polygon0,
+        const geode::RayTracing3D::PolygonDistance& polygon1 )
+    {
+        if( std::fabs( polygon0.distance - polygon1.distance )
+            > geode::global_epsilon )
+        {
+            return false;
+        }
+        if( polygon0.position == geode::Position::inside
+            || polygon0.position == geode::Position::parallel )
+        {
+            return false;
+        }
+        if( polygon1.position == geode::Position::inside
+            || polygon1.position == geode::Position::parallel )
+        {
+            return false;
+        }
+        if( test_vertex_mode( mesh, polygon0, polygon1 ) )
+        {
+            return true;
+        }
+        return test_edge_mode( mesh, polygon0, polygon1 );
+    }
 } // namespace
 
 namespace geode
@@ -62,12 +171,13 @@ namespace geode
         {
         }
 
-        Impl( const SurfaceMesh3D& mesh, const InfiniteLine3D& infinite_line )
-            : mesh_( mesh ),
-              end_{ end( mesh, infinite_line ) },
-              segment_{ infinite_line.origin(), end_ }
-        {
-        }
+        // Impl( const SurfaceMesh3D& mesh, const InfiniteLine3D& infinite_line
+        // )
+        //     : mesh_( mesh ),
+        //       end_{ end( mesh, infinite_line ) },
+        //       segment_{ infinite_line.origin(), end_ }
+        // {
+        // }
 
         absl::optional< PolygonDistance > closest_polygon() const
         {
@@ -175,6 +285,12 @@ namespace geode
                 return;
             }
             absl::c_sort( results_ );
+            const auto last = std::unique( results_.begin(), results_.end(),
+                [this]( const PolygonDistance& polygon0,
+                    const PolygonDistance& polygon1 ) {
+                    return are_equal( this->mesh_, polygon0, polygon1 );
+                } );
+            results_.erase( last, results_.end() );
             are_results_sorted_ = true;
         }
 
@@ -191,11 +307,11 @@ namespace geode
     {
     }
 
-    RayTracing3D::RayTracing3D(
-        const SurfaceMesh3D& mesh, const InfiniteLine3D& infinite_line )
-        : impl_{ mesh, infinite_line }
-    {
-    }
+    // RayTracing3D::RayTracing3D(
+    //     const SurfaceMesh3D& mesh, const InfiniteLine3D& infinite_line )
+    //     : impl_{ mesh, infinite_line }
+    // {
+    // }
 
     RayTracing3D::RayTracing3D( RayTracing3D&& other ) : impl_{ *other.impl_ }
     {
