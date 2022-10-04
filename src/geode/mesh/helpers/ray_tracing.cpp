@@ -62,6 +62,13 @@ namespace geode
         {
         }
 
+        Impl( const SurfaceMesh3D& mesh, const InfiniteLine3D& infinite_line )
+            : mesh_( mesh ),
+              end_{ end( mesh, infinite_line ) },
+              segment_{ infinite_line.origin(), end_ }
+        {
+        }
+
         absl::optional< PolygonDistance > closest_polygon() const
         {
             if( results_.empty() )
@@ -80,8 +87,9 @@ namespace geode
                 return absl::nullopt;
             }
             sort_results();
-            absl::FixedArray< RayTracing3D::PolygonDistance > closest_polygons(
-                std::min( size, static_cast< index_t >( results_.size() ) ) );
+            absl::FixedArray< RayTracing3D::PolygonDistance > closest_polygons{
+                std::min( size, static_cast< index_t >( results_.size() ) )
+            };
             for( const auto i : Indices( closest_polygons ) )
             {
                 closest_polygons[i] = results_[i];
@@ -121,10 +129,18 @@ namespace geode
                     segment_triangle_intersection( segment_, triangle );
                 if( intersection.has_intersection() )
                 {
-                    const auto distance =
+                    auto distance =
                         point_point_distance( segment_.vertices()[0].get(),
                             intersection.result.value() );
-                    results_.emplace_back( polygon_id, distance );
+                    if( Vector3D{ segment_.vertices()[0].get(),
+                            intersection.result.value() }
+                            .dot( segment_.direction() )
+                        < 0 )
+                    {
+                        distance *= -1.;
+                    }
+                    results_.emplace_back(
+                        polygon_id, distance, result.second );
                 }
                 else
                 {
@@ -135,9 +151,16 @@ namespace geode
                             std::ignore ) = segment_segment_distance( segment_,
                             { triangle.vertices()[e2].get(),
                                 triangle.vertices()[( e2 + 1 ) % 3].get() } );
-                        const auto distance = point_point_distance(
+                        auto distance = point_point_distance(
                             segment_.vertices()[0].get(), point );
-                        results_.emplace_back( polygon_id, distance );
+                        if( Vector3D{ segment_.vertices()[0].get(), point }.dot(
+                                segment_.direction() )
+                            < 0 )
+                        {
+                            distance *= -1.;
+                        }
+                        results_.emplace_back(
+                            polygon_id, distance, result.second );
                     }
                 }
                 break;
@@ -165,6 +188,12 @@ namespace geode
 
     RayTracing3D::RayTracing3D( const SurfaceMesh3D& mesh, const Ray3D& ray )
         : impl_{ mesh, ray }
+    {
+    }
+
+    RayTracing3D::RayTracing3D(
+        const SurfaceMesh3D& mesh, const InfiniteLine3D& infinite_line )
+        : impl_{ mesh, infinite_line }
     {
     }
 
