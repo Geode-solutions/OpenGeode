@@ -58,15 +58,15 @@ namespace
         {
             polygon_vertex0.vertex_id = 0;
         }
-        if( polygon0.position == geode::Position::vertex1 )
+        else if( polygon0.position == geode::Position::vertex1 )
         {
             polygon_vertex0.vertex_id = 1;
         }
-        if( polygon0.position == geode::Position::vertex2 )
+        else if( polygon0.position == geode::Position::vertex2 )
         {
             polygon_vertex0.vertex_id = 2;
         }
-        if( polygon_vertex0.vertex_id == geode::NO_LID )
+        else
         {
             return false;
         }
@@ -75,15 +75,15 @@ namespace
         {
             polygon_vertex1.vertex_id = 0;
         }
-        if( polygon1.position == geode::Position::vertex1 )
+        else if( polygon1.position == geode::Position::vertex1 )
         {
             polygon_vertex1.vertex_id = 1;
         }
-        if( polygon1.position == geode::Position::vertex2 )
+        else if( polygon1.position == geode::Position::vertex2 )
         {
             polygon_vertex1.vertex_id = 2;
         }
-        if( polygon_vertex1.vertex_id == geode::NO_LID )
+        else
         {
             return false;
         }
@@ -100,15 +100,15 @@ namespace
         {
             polygon_edge0.edge_id = 0;
         }
-        if( polygon0.position == geode::Position::edge1 )
+        else if( polygon0.position == geode::Position::edge1 )
         {
             polygon_edge0.edge_id = 1;
         }
-        if( polygon0.position == geode::Position::edge2 )
+        else if( polygon0.position == geode::Position::edge2 )
         {
             polygon_edge0.edge_id = 2;
         }
-        if( polygon_edge0.edge_id == geode::NO_LID )
+        else
         {
             return false;
         }
@@ -117,15 +117,15 @@ namespace
         {
             polygon_edge1.edge_id = 0;
         }
-        if( polygon1.position == geode::Position::edge1 )
+        else if( polygon1.position == geode::Position::edge1 )
         {
             polygon_edge1.edge_id = 1;
         }
-        if( polygon1.position == geode::Position::edge2 )
+        else if( polygon1.position == geode::Position::edge2 )
         {
             polygon_edge1.edge_id = 2;
         }
-        if( polygon_edge1.edge_id == geode::NO_LID )
+        else
         {
             return false;
         }
@@ -234,22 +234,21 @@ namespace geode
                 {
                     continue;
                 }
-                const auto intersection =
-                    segment_triangle_intersection( segment_, triangle );
-                if( intersection.has_intersection() )
+                if( auto intersection =
+                        segment_triangle_intersection( segment_, triangle ) )
                 {
-                    auto distance =
-                        point_point_distance( segment_.vertices()[0].get(),
-                            intersection.result.value() );
-                    if( Vector3D{ segment_.vertices()[0].get(),
-                            intersection.result.value() }
+                    auto& intersection_result = intersection.result.value();
+                    auto distance = point_point_distance(
+                        segment_.vertices()[0].get(), intersection_result );
+                    if( Vector3D{
+                            segment_.vertices()[0].get(), intersection_result }
                             .dot( segment_.direction() )
                         < 0 )
                     {
                         distance *= -1.;
                     }
-                    results_.emplace_back(
-                        polygon_id, distance, result.second );
+                    results_.emplace_back( polygon_id, distance, result.second,
+                        std::move( intersection_result ) );
                 }
                 else
                 {
@@ -268,8 +267,8 @@ namespace geode
                         {
                             distance *= -1.;
                         }
-                        results_.emplace_back(
-                            polygon_id, distance, result.second );
+                        results_.emplace_back( polygon_id, distance,
+                            result.second, std::move( point ) );
                     }
                 }
                 break;
