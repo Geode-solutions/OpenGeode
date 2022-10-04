@@ -123,6 +123,11 @@ namespace geode
             return line_intersects( ray );
         }
 
+        bool intersects( const InfiniteLine< dimension >& line ) const
+        {
+            return line_intersects( line );
+        }
+
         double signed_distance( const Point< dimension >& point ) const
         {
             bool inside{ true };
@@ -168,7 +173,9 @@ namespace geode
         }
 
     private:
-        bool line_intersects( const InfiniteLine< dimension >& line ) const;
+        bool line_intersects(
+            const GenericInfiniteLine< RefPoint< dimension >, dimension >&
+                line ) const;
 
     private:
         Point< dimension > min_;
@@ -177,7 +184,7 @@ namespace geode
 
     template <>
     bool BoundingBox< 3 >::Impl::line_intersects(
-        const InfiniteLine3D& line ) const
+        const GenericInfiniteLine< RefPoint< 3 >, 3 >& line ) const
     {
         const auto box_half_extent = diagonal() / 2.;
         const auto line_translated_origin = line.origin() - center();
@@ -207,7 +214,7 @@ namespace geode
 
     template <>
     bool BoundingBox< 2 >::Impl::line_intersects(
-        const InfiniteLine2D& line ) const
+        const GenericInfiniteLine< RefPoint< 2 >, 2 >& line ) const
     {
         const auto box_center = center();
         const auto box_half_extent = diagonal() / 2.;
@@ -223,7 +230,7 @@ namespace geode
 
     template <>
     bool BoundingBox< 1 >::Impl::line_intersects(
-        const InfiniteLine1D& line ) const
+        const GenericInfiniteLine< RefPoint< 1 >, 1 >& line ) const
     {
         if( diagonal().dot( line.direction() ) > 0 )
         {
@@ -314,6 +321,13 @@ namespace geode
         const Ray< dimension >& ray ) const
     {
         return impl_->intersects( ray );
+    }
+
+    template < index_t dimension >
+    bool BoundingBox< dimension >::intersects(
+        const InfiniteLine< dimension >& line ) const
+    {
+        return impl_->intersects( line );
     }
 
     template < index_t dimension >
