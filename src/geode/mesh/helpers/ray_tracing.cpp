@@ -68,8 +68,35 @@ namespace geode
             {
                 return absl::nullopt;
             }
-            absl::c_sort( results_ );
+            sort_results();
             return results_.front();
+        }
+
+        absl::optional< absl::FixedArray< RayTracing3D::PolygonDistance > >
+            closest_polygons( index_t size ) const
+        {
+            if( results_.empty() )
+            {
+                return absl::nullopt;
+            }
+            sort_results();
+            absl::FixedArray< RayTracing3D::PolygonDistance > closest_polygons(
+                std::min( size, static_cast< index_t >( results_.size() ) ) );
+            for( const auto i : Indices( closest_polygons ) )
+            {
+                closest_polygons[i] = results_[i];
+            }
+            return closest_polygons;
+        }
+
+        std::vector< PolygonDistance > all_intersections() const
+        {
+            if( results_.empty() )
+            {
+                return {};
+            }
+            sort_results();
+            return results_;
         }
 
         void compute( index_t polygon_id )
@@ -118,10 +145,22 @@ namespace geode
         }
 
     private:
+        void sort_results() const
+        {
+            if( are_results_sorted_ )
+            {
+                return;
+            }
+            absl::c_sort( results_ );
+            are_results_sorted_ = true;
+        }
+
+    private:
         const SurfaceMesh3D& mesh_;
         DEBUG_CONST Point3D end_;
         DEBUG_CONST Segment3D segment_;
         mutable std::vector< PolygonDistance > results_;
+        mutable bool are_results_sorted_{ false };
     };
 
     RayTracing3D::RayTracing3D( const SurfaceMesh3D& mesh, const Ray3D& ray )
@@ -141,9 +180,20 @@ namespace geode
         return impl_->closest_polygon();
     }
 
+    absl::optional< absl::FixedArray< RayTracing3D::PolygonDistance > >
+        RayTracing3D::closest_polygons( index_t size ) const
+    {
+        return impl_->closest_polygons( size );
+    }
+
+    std::vector< RayTracing3D::PolygonDistance >
+        RayTracing3D::all_intersections() const
+    {
+        return impl_->all_intersections();
+    }
+
     void RayTracing3D::operator()( index_t polygon_id )
     {
         impl_->compute( polygon_id );
     }
-
 } // namespace geode
