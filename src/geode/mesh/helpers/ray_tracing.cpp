@@ -100,11 +100,11 @@ namespace
         {
             polygon_edge0.edge_id = 0;
         }
-        if( polygon0.position == geode::Position::edge1 )
+        else if( polygon0.position == geode::Position::edge1 )
         {
             polygon_edge0.edge_id = 1;
         }
-        if( polygon0.position == geode::Position::edge2 )
+        else if( polygon0.position == geode::Position::edge2 )
         {
             polygon_edge0.edge_id = 2;
         }
@@ -117,11 +117,11 @@ namespace
         {
             polygon_edge1.edge_id = 0;
         }
-        if( polygon1.position == geode::Position::edge1 )
+        else if( polygon1.position == geode::Position::edge1 )
         {
             polygon_edge1.edge_id = 1;
         }
-        if( polygon1.position == geode::Position::edge2 )
+        else if( polygon1.position == geode::Position::edge2 )
         {
             polygon_edge1.edge_id = 2;
         }
