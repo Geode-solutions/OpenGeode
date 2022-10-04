@@ -39,14 +39,14 @@
 
 namespace
 {
-    geode::Point3D end(
-        const geode::SurfaceMesh3D& mesh, const geode::Ray3D& ray )
+    template < typename Line >
+    geode::Point3D end( const geode::SurfaceMesh3D& mesh, const Line& line )
     {
         auto bbox = mesh.bounding_box();
-        bbox.add_point( ray.origin() );
+        bbox.add_point( line.origin() );
         const auto diagonal =
             geode::point_point_distance( bbox.min(), bbox.max() );
-        return ray.origin() + ray.direction() * diagonal;
+        return line.origin() + line.direction() * diagonal;
     }
 
     bool test_vertex_mode( const geode::SurfaceMesh3D& mesh,
@@ -171,13 +171,12 @@ namespace geode
         {
         }
 
-        // Impl( const SurfaceMesh3D& mesh, const InfiniteLine3D& infinite_line
-        // )
-        //     : mesh_( mesh ),
-        //       end_{ end( mesh, infinite_line ) },
-        //       segment_{ infinite_line.origin(), end_ }
-        // {
-        // }
+        Impl( const SurfaceMesh3D& mesh, const InfiniteLine3D& infinite_line )
+            : mesh_( mesh ),
+              end_{ end( mesh, infinite_line ) },
+              segment_{ infinite_line.origin(), end_ }
+        {
+        }
 
         absl::optional< PolygonDistance > closest_polygon() const
         {
@@ -307,11 +306,11 @@ namespace geode
     {
     }
 
-    // RayTracing3D::RayTracing3D(
-    //     const SurfaceMesh3D& mesh, const InfiniteLine3D& infinite_line )
-    //     : impl_{ mesh, infinite_line }
-    // {
-    // }
+    RayTracing3D::RayTracing3D(
+        const SurfaceMesh3D& mesh, const InfiniteLine3D& infinite_line )
+        : impl_{ mesh, infinite_line }
+    {
+    }
 
     RayTracing3D::RayTracing3D( RayTracing3D&& other ) : impl_{ *other.impl_ }
     {
