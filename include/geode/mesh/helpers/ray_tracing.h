@@ -28,6 +28,7 @@
 #include <geode/basic/pimpl.h>
 
 #include <geode/geometry/basic_objects/infinite_line.h>
+#include <geode/geometry/information.h>
 
 #include <geode/mesh/common.h>
 
@@ -44,22 +45,30 @@ namespace geode
     public:
         struct PolygonDistance
         {
-            PolygonDistance( index_t polygon_in, double distance_in )
-                : polygon{ polygon_in }, distance{ distance_in }
+            PolygonDistance() = default;
+
+            PolygonDistance(
+                index_t polygon_in, double distance_in, Position position_in )
+                : polygon{ polygon_in },
+                  distance{ distance_in },
+                  position{ position_in }
             {
             }
 
             bool operator<( const PolygonDistance& other ) const
             {
-                return distance < other.distance;
+                return std::fabs( distance ) < std::fabs( other.distance );
             }
 
-            index_t polygon;
-            double distance;
+            index_t polygon{ NO_ID };
+            double distance{ 0 };
+            Position position{ Position::outside };
         };
 
     public:
         RayTracing3D( const SurfaceMesh3D& mesh, const Ray3D& ray );
+        RayTracing3D(
+            const SurfaceMesh3D& mesh, const InfiniteLine3D& infinite_line );
         RayTracing3D( RayTracing3D&& other );
         ~RayTracing3D();
 
