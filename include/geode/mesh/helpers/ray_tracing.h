@@ -29,6 +29,7 @@
 
 #include <geode/geometry/basic_objects/infinite_line.h>
 #include <geode/geometry/information.h>
+#include <geode/geometry/point.h>
 
 #include <geode/mesh/common.h>
 
@@ -47,11 +48,14 @@ namespace geode
         {
             PolygonDistance() = default;
 
-            PolygonDistance(
-                index_t polygon_in, double distance_in, Position position_in )
+            PolygonDistance( index_t polygon_in,
+                double distance_in,
+                Position position_in,
+                Point3D point_in )
                 : polygon{ polygon_in },
                   distance{ distance_in },
-                  position{ position_in }
+                  position{ position_in },
+                  point{ std::move( point_in ) }
             {
             }
 
@@ -63,6 +67,7 @@ namespace geode
             index_t polygon{ NO_ID };
             double distance{ 0 };
             Position position{ Position::outside };
+            Point3D point;
         };
 
     public:
