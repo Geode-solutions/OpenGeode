@@ -27,6 +27,24 @@
 
 namespace geode
 {
+    ComponentMeshVertex::ComponentMeshVertex(
+        ComponentID component_id_in, index_t vertex_id_in )
+        : component_id( std::move( component_id_in ) ), vertex( vertex_id_in )
+    {
+    }
+
+    ComponentMeshVertex::ComponentMeshVertex()
+        : component_id( bitsery::Access::create< ComponentID >() )
+    {
+    }
+
+    ComponentMeshVertex::~ComponentMeshVertex() {} // NOLINT
+
+    bool ComponentMeshVertex::operator==(
+        const ComponentMeshVertex& other ) const
+    {
+        return component_id == other.component_id && vertex == other.vertex;
+    }
 
     template < typename Archive >
     void ComponentMeshVertex::serialize( Archive& archive )

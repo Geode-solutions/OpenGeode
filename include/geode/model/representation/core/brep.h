@@ -73,6 +73,7 @@ namespace geode
         {
         public:
             BoundaryCornerRange( const BRep& brep, const Line3D& line );
+            ~BoundaryCornerRange();
 
             const Corner3D& operator*() const;
 
@@ -86,6 +87,7 @@ namespace geode
         {
         public:
             BoundaryLineRange( const BRep& brep, const Surface3D& surface );
+            ~BoundaryLineRange();
 
             const Line3D& operator*() const;
 
@@ -99,6 +101,7 @@ namespace geode
         {
         public:
             BoundarySurfaceRange( const BRep& brep, const Block3D& block );
+            ~BoundarySurfaceRange();
 
             const Surface3D& operator*() const;
 
@@ -112,6 +115,7 @@ namespace geode
         {
         public:
             IncidentLineRange( const BRep& brep, const Corner3D& corner );
+            ~IncidentLineRange();
 
             const Line3D& operator*() const;
 
@@ -125,6 +129,7 @@ namespace geode
         {
         public:
             IncidentSurfaceRange( const BRep& brep, const Line3D& line );
+            ~IncidentSurfaceRange();
 
             const Surface3D& operator*() const;
 
@@ -138,6 +143,7 @@ namespace geode
         {
         public:
             IncidentBlockRange( const BRep& brep, const Surface3D& surface );
+            ~IncidentBlockRange();
 
             const Block3D& operator*() const;
 
@@ -151,8 +157,8 @@ namespace geode
         {
         public:
             InternalCornerRange( const BRep& brep, const Surface3D& surface );
-
             InternalCornerRange( const BRep& brep, const Block3D& block );
+            ~InternalCornerRange();
 
             void operator++();
 
@@ -168,8 +174,8 @@ namespace geode
         {
         public:
             InternalLineRange( const BRep& brep, const Surface3D& surface );
-
             InternalLineRange( const BRep& brep, const Block3D& block );
+            ~InternalLineRange();
 
             void operator++();
 
@@ -185,6 +191,7 @@ namespace geode
         {
         public:
             InternalSurfaceRange( const BRep& brep, const Block3D& block );
+            ~InternalSurfaceRange();
 
             void operator++();
 
@@ -200,8 +207,8 @@ namespace geode
         {
         public:
             EmbeddingSurfaceRange( const BRep& brep, const Corner3D& corner );
-
             EmbeddingSurfaceRange( const BRep& brep, const Line3D& line );
+            ~EmbeddingSurfaceRange();
 
             void operator++();
 
@@ -217,10 +224,9 @@ namespace geode
         {
         public:
             EmbeddingBlockRange( const BRep& brep, const Corner3D& corner );
-
             EmbeddingBlockRange( const BRep& brep, const Line3D& line );
-
             EmbeddingBlockRange( const BRep& brep, const Surface3D& surface );
+            ~EmbeddingBlockRange();
 
             void operator++();
 
@@ -237,6 +243,7 @@ namespace geode
         public:
             ItemSurfaceRange(
                 const BRep& brep, const ModelBoundary3D& boundary );
+            ~ItemSurfaceRange();
 
             const Surface3D& operator*() const;
 
