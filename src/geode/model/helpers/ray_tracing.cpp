@@ -23,7 +23,10 @@
 
 #include <geode/model/helpers/ray_tracing.h>
 
+#include <geode/geometry/aabb.h>
+
 #include <geode/mesh/core/surface_mesh.h>
+#include <geode/mesh/helpers/aabb_surface_helpers.h>
 
 #include <geode/model/mixin/core/block.h>
 #include <geode/model/mixin/core/surface.h>
@@ -39,7 +42,10 @@ namespace geode
         BoundarySurfaceIntersections result;
         for( const auto& surface : brep.boundaries( block ) )
         {
+            const auto aabb = create_aabb_tree( surface.mesh() );
             RayTracing3D ray_tracing{ surface.mesh(), infinite_line };
+            aabb.compute_line_element_bbox_intersections(
+                infinite_line, ray_tracing );
             result[surface.id()] = ray_tracing.all_intersections();
         }
         return result;

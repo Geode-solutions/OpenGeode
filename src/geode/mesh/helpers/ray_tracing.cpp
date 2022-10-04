@@ -24,7 +24,6 @@
 #include <geode/mesh/helpers/ray_tracing.h>
 
 #include <geode/basic/algorithm.h>
-#include <geode/basic/logger.h>
 #include <geode/basic/pimpl_impl.h>
 
 #include <geode/geometry/basic_objects/segment.h>
