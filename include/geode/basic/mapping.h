@@ -27,7 +27,6 @@
 #include <absl/container/inlined_vector.h>
 
 #include <geode/basic/common.h>
-#include <geode/basic/logger.h>
 
 namespace geode
 {

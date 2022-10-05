@@ -60,8 +60,8 @@ namespace
                  model, model.surfaces(), model.nb_surfaces() ) )
         {
             filter.remove_surface( model.surface( surface_uuid ) );
-            removed_components.push_back(
-                { geode::Surface3D::component_type_static(), surface_uuid } );
+            removed_components.emplace_back(
+                geode::Surface3D::component_type_static(), surface_uuid );
         }
     }
 
@@ -74,8 +74,8 @@ namespace
                  model, model.lines(), model.nb_lines() ) )
         {
             filter.remove_line( model.line( line_uuid ) );
-            removed_components.push_back(
-                { geode::Line3D::component_type_static(), line_uuid } );
+            removed_components.emplace_back(
+                geode::Line3D::component_type_static(), line_uuid );
         }
     }
 
@@ -88,8 +88,8 @@ namespace
                  model, model.corners(), model.nb_corners() ) )
         {
             filter.remove_corner( model.corner( corner_uuid ) );
-            removed_components.push_back(
-                { geode::Corner3D::component_type_static(), corner_uuid } );
+            removed_components.emplace_back(
+                geode::Corner3D::component_type_static(), corner_uuid );
         }
     }
 } // namespace
