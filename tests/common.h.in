@@ -24,6 +24,7 @@
 #pragma once
 
 #include <geode/basic/common.h>
+#include <geode/basic/library.h>
 
 namespace geode
 {
@@ -44,6 +45,7 @@ namespace geode
                                                                                \
         try                                                                    \
         {                                                                      \
+            geode::OpenGeodeBasic::initialize();                               \
             test();                                                            \
                                                                                \
             Logger::info( "TEST SUCCESS" );                                    \
