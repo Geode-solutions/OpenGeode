@@ -27,6 +27,7 @@
 #include <absl/container/inlined_vector.h>
 
 #include <geode/basic/common.h>
+#include <geode/basic/logger.h>
 
 namespace geode
 {
@@ -106,13 +107,49 @@ namespace geode
     public:
         void map( const T1& in, const T2& out )
         {
-            this->in2out_map().emplace( in, out );
-            this->out2in_map().emplace( out, in );
+            if( this->has_mapping_input( in ) )
+            {
+                erase_in( in );
+            }
+            if( this->has_mapping_output( out ) )
+            {
+                erase_out( out );
+            }
+            emplace( in, out );
+        }
+
+        void erase_in( const T1& in )
+        {
+            if( !this->has_mapping_input( in ) )
+            {
+                return;
+            }
+            const auto out = this->in2out( in );
+            this->in2out_map().erase( in );
+            this->out2in_map().erase( out );
+        }
+
+        void erase_out( const T2& out )
+        {
+            if( !this->has_mapping_output( out ) )
+            {
+                return;
+            }
+            const auto in = this->out2in( out );
+            this->in2out_map().erase( in );
+            this->out2in_map().erase( out );
         }
 
         index_t size() const
         {
             return this->size_input();
+        }
+
+    private:
+        void emplace( const T1& in, const T2& out )
+        {
+            this->in2out_map().emplace( in, out );
+            this->out2in_map().emplace( out, in );
         }
     };
 
@@ -130,6 +167,44 @@ namespace geode
         {
             this->in2out_map()[in].push_back( out );
             this->out2in_map()[out].push_back( in );
+        }
+
+        void erase_in( const T1& in )
+        {
+            if( !this->has_mapping_input( in ) )
+            {
+                return;
+            }
+            for( const auto& out : this->in2out( in ) )
+            {
+                auto& out_map = this->out2in_map().at( out );
+                const auto itr = absl::c_find( out_map, in );
+                out_map.erase( itr );
+                if( this->out2in( out ).empty() )
+                {
+                    this->out2in_map().erase( out );
+                }
+            }
+            this->in2out_map().erase( in );
+        }
+
+        void erase_out( const T2& out )
+        {
+            if( !this->has_mapping_output( out ) )
+            {
+                return;
+            }
+            for( const auto& in : this->out2in( out ) )
+            {
+                auto& in_map = this->in2out_map().at( in );
+                const auto itr = absl::c_find( in_map, out );
+                in_map.erase( itr );
+                if( this->in2out( in ).empty() )
+                {
+                    this->in2out_map().erase( in );
+                }
+            }
+            this->out2in_map().erase( out );
         }
 
         index_t size_in() const
