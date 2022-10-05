@@ -738,9 +738,8 @@ namespace geode
         SolidMesh< dimension >::polyhedron_facet_from_vertices(
             PolyhedronFacetVertices facet_vertices ) const
     {
-        detail::VertexCycle< absl::InlinedVector< index_t, 4 > > vertices{
-            std::move( facet_vertices )
-        };
+        detail::VertexCycle< PolyhedronFacetVertices > vertices{ std::move(
+            facet_vertices ) };
         for( const auto& polyhedron_vertex :
             polyhedra_around_vertex( vertices.vertices()[0] ) )
         {
@@ -749,8 +748,9 @@ namespace geode
             {
                 const PolyhedronFacet facet{ polyhedron_vertex.polyhedron_id,
                     f };
-                detail::VertexCycle< absl::InlinedVector< index_t, 4 > >
-                    cur_vertices{ polyhedron_facet_vertices( facet ) };
+                detail::VertexCycle< PolyhedronFacetVertices > cur_vertices{
+                    polyhedron_facet_vertices( facet )
+                };
                 if( vertices == cur_vertices )
                 {
                     return facet;

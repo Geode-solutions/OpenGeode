@@ -197,7 +197,7 @@ namespace geode
         local_index_t edge_id{ NO_LID };
     };
 
-    using PolyhedronFacetVertices = absl::InlinedVector< index_t, 4 >;
+    using PolyhedronFacetVertices = absl::InlinedVector< index_t, 3 >;
 
     using PolyhedronVertices = absl::InlinedVector< index_t, 4 >;
 
