@@ -220,20 +220,22 @@ namespace
                     }
                 }
                 builder.disassociate_polygon_vertex_to_vertex( v );
-                builder.reset_polygons_around_vertex( v );
             }
             else
             {
-                for( const auto& polygon : surface.polygons_around_vertex( v ) )
-                {
-                    if( old2new[polygon.polygon_id] != polygon.polygon_id )
-                    {
-                        builder.reset_polygons_around_vertex( v );
-                        break;
-                    }
-                }
                 builder.associate_polygon_vertex_to_vertex(
                     new_polygon_vertex, v );
+            }
+        }
+        for( const auto p : geode::Indices{ old2new } )
+        {
+            if( p == old2new[p] )
+            {
+                continue;
+            }
+            for( const auto v : surface.polygon_vertices( p ) )
+            {
+                builder.reset_polygons_around_vertex( v );
             }
         }
     }
