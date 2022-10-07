@@ -56,6 +56,16 @@ namespace
             OPENGEODE_EXCEPTION( model.nb_unique_vertices() > 0,
                 "[Convert Model to Mesh(es)] Given model should have unique "
                 "vertices" );
+            for( const auto uv : geode::Range{ model.nb_unique_vertices() } )
+            {
+                OPENGEODE_EXCEPTION(
+                    !model.component_mesh_vertices( uv ).empty(),
+                    "[Convert Model to Mesh(es)] At least one unique vertex of "
+                    "the given model is isolated. You should clean your model, "
+                    "before calling conversion functions, using "
+                    "BRepBuilder::delete_isolated_vertices() or "
+                    "SectionBuilder::::delete_isolated_vertices()" );
+            }
         }
 
         const Model& model() const
@@ -151,10 +161,6 @@ namespace
             }
             for( const auto& v2uv : model_.vertices() )
             {
-                if( v2uv.first > mesh_.nb_vertices() )
-                {
-                    continue;
-                }
                 attribute_unique_vertex_->set_value( v2uv.first, v2uv.second );
             }
         }
@@ -313,10 +319,6 @@ namespace
             }
             for( const auto& v2uv : model_.vertices() )
             {
-                if( v2uv.first > mesh_.nb_vertices() )
-                {
-                    continue;
-                }
                 attribute_unique_vertex_->set_value( v2uv.first, v2uv.second );
             }
         }
@@ -429,10 +431,6 @@ namespace
             }
             for( const auto& v2uv : model_.vertices() )
             {
-                if( v2uv.first > mesh_.nb_vertices() )
-                {
-                    continue;
-                }
                 attribute_unique_vertex_->set_value( v2uv.first, v2uv.second );
             }
         }
