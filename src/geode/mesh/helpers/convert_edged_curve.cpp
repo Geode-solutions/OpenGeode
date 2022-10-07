@@ -57,6 +57,7 @@ namespace geode
             curve2d->vertex_attribute_manager() );
         detail::copy_attributes( curve3d.edge_attribute_manager(),
             curve2d->edge_attribute_manager() );
+        detail::copy_meta_info( curve3d, *builder2d );
         return curve2d;
     }
 
@@ -71,6 +72,7 @@ namespace geode
             curve3d->vertex_attribute_manager() );
         detail::copy_attributes( curve2d.edge_attribute_manager(),
             curve3d->edge_attribute_manager() );
+        detail::copy_meta_info( curve2d, *builder3d );
         return curve3d;
     }
 } // namespace geode

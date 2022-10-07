@@ -38,22 +38,6 @@
 
 namespace
 {
-    template < typename MeshFrom, typename Builder >
-    void copy_meta_info( const MeshFrom& from, Builder& builder )
-    {
-        builder.set_name( from.name() );
-    }
-
-    template < typename MeshFrom, typename Builder >
-    void copy_points( const MeshFrom& from, Builder& builder )
-    {
-        builder.create_vertices( from.nb_vertices() );
-        for( const auto v : geode::Range{ from.nb_vertices() } )
-        {
-            builder.set_point( v, from.point( v ) );
-        }
-    }
-
     template < geode::index_t dimension >
     bool all_polygons_are_simplex(
         const geode::SurfaceMesh< dimension >& surface )
@@ -100,13 +84,13 @@ namespace
         geode::SurfaceMesh< dimension >& output )
     {
         auto builder = geode::SurfaceMeshBuilder< dimension >::create( output );
-        copy_points( input, *builder );
+        geode::detail::copy_points( input, *builder );
         output.vertex_attribute_manager().copy(
             input.vertex_attribute_manager() );
         copy_polygons( input, *builder );
         output.polygon_attribute_manager().copy(
             input.polygon_attribute_manager() );
-        copy_meta_info( input, *builder );
+        geode::detail::copy_meta_info( input, *builder );
     }
 
     template < typename SurfaceIn, typename SurfaceOut >
@@ -196,10 +180,10 @@ namespace geode
     {
         auto surface3d = SurfaceMesh3D::create();
         auto builder3d = SurfaceMeshBuilder3D::create( *surface3d );
+        detail::copy_meta_info( surface2d, *builder3d );
         detail::copy_points2d_into_3d( surface2d, *builder3d, axis_to_add );
         copy_polygons( surface2d, *builder3d );
         copy_surface_attributes( surface2d, *surface3d );
-        copy_meta_info( surface2d, *builder3d );
         return surface3d;
     }
 
@@ -208,10 +192,10 @@ namespace geode
     {
         auto surface2d = SurfaceMesh2D::create();
         auto builder2d = SurfaceMeshBuilder2D::create( *surface2d );
+        detail::copy_meta_info( surface3d, *builder2d );
         detail::copy_points3d_into_2d( surface3d, *builder2d, axis_to_remove );
         copy_polygons( surface3d, *builder2d );
         copy_surface_attributes( surface3d, *surface2d );
-        copy_meta_info( surface3d, *builder2d );
         return surface2d;
     }
 
@@ -220,10 +204,10 @@ namespace geode
     {
         auto surface3d = PolygonalSurface3D::create();
         auto builder3d = PolygonalSurfaceBuilder3D::create( *surface3d );
+        detail::copy_meta_info( surface2d, *builder3d );
         detail::copy_points2d_into_3d( surface2d, *builder3d, axis_to_add );
         copy_polygons( surface2d, *builder3d );
         copy_surface_attributes( surface2d, *surface3d );
-        copy_meta_info( surface2d, *builder3d );
         return surface3d;
     }
 
@@ -232,11 +216,10 @@ namespace geode
     {
         auto surface2d = PolygonalSurface2D::create();
         auto builder2d = PolygonalSurfaceBuilder2D::create( *surface2d );
-
+        detail::copy_meta_info( surface3d, *builder2d );
         detail::copy_points3d_into_2d( surface3d, *builder2d, axis_to_remove );
         copy_polygons( surface3d, *builder2d );
         copy_surface_attributes( surface3d, *surface2d );
-        copy_meta_info( surface3d, *builder2d );
         return surface2d;
     }
 
@@ -247,9 +230,9 @@ namespace geode
         auto surface3d = TriangulatedSurface3D::create();
         auto builder3d = TriangulatedSurfaceBuilder3D::create( *surface3d );
         detail::copy_points2d_into_3d( surface2d, *builder3d, axis_to_add );
+        detail::copy_meta_info( surface2d, *builder3d );
         copy_polygons( surface2d, *builder3d );
         copy_surface_attributes( surface2d, *surface3d );
-        copy_meta_info( surface2d, *builder3d );
         return surface3d;
     }
 
@@ -261,9 +244,9 @@ namespace geode
         auto builder2d = TriangulatedSurfaceBuilder2D::create( *surface2d );
 
         detail::copy_points3d_into_2d( surface3d, *builder2d, axis_to_remove );
+        detail::copy_meta_info( surface3d, *builder2d );
         copy_polygons( surface3d, *builder2d );
         copy_surface_attributes( surface3d, *surface2d );
-        copy_meta_info( surface3d, *builder2d );
         return surface2d;
     }
 
