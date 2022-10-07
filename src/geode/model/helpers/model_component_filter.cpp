@@ -104,6 +104,7 @@ namespace geode
         filter_surfaces( brep, filter, removed_components );
         filter_lines( brep, filter, removed_components );
         filter_corners( brep, filter, removed_components );
+        filter.delete_isolated_vertices();
         return removed_components;
     }
 
@@ -114,6 +115,7 @@ namespace geode
         SectionBuilder filter{ section };
         filter_lines( section, filter, removed_components );
         filter_corners( section, filter, removed_components );
+        filter.delete_isolated_vertices();
         return removed_components;
     }
 } // namespace geode
