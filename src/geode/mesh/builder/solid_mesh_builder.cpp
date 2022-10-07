@@ -184,22 +184,22 @@ namespace
             if( new_polyhedron_vertex.polyhedron_id == geode::NO_ID )
             {
                 builder.disassociate_polyhedron_vertex_to_vertex( v );
-                builder.reset_polyhedra_around_vertex( v );
             }
             else
             {
-                for( const auto& polyhedron :
-                    solid.polyhedra_around_vertex( v ) )
-                {
-                    if( polyhedron.polyhedron_id
-                        != old2new[polyhedron.polyhedron_id] )
-                    {
-                        builder.reset_polyhedra_around_vertex( v );
-                        break;
-                    }
-                }
                 builder.associate_polyhedron_vertex_to_vertex(
                     new_polyhedron_vertex, v );
+            }
+        }
+        for( const auto p : geode::Indices{ old2new } )
+        {
+            if( p == old2new[p] )
+            {
+                continue;
+            }
+            for( const auto v : solid.polyhedron_vertices( p ) )
+            {
+                builder.reset_polyhedra_around_vertex( v );
             }
         }
     }
