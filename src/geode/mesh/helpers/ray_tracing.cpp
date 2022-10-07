@@ -39,13 +39,21 @@
 namespace
 {
     template < typename Line >
+    geode::Point3D begin( const geode::SurfaceMesh3D& mesh, const Line& line )
+    {
+        auto bbox = mesh.bounding_box();
+        bbox.add_point( line.origin() );
+        const auto diagonal = bbox.diagonal();
+        return line.origin() - line.direction() * diagonal.length();
+    }
+
+    template < typename Line >
     geode::Point3D end( const geode::SurfaceMesh3D& mesh, const Line& line )
     {
         auto bbox = mesh.bounding_box();
         bbox.add_point( line.origin() );
-        const auto diagonal =
-            geode::point_point_distance( bbox.min(), bbox.max() );
-        return line.origin() + line.direction() * diagonal;
+        const auto diagonal = bbox.diagonal();
+        return line.origin() + line.direction() * diagonal.length();
     }
 
     bool test_vertex_mode( const geode::SurfaceMesh3D& mesh,
@@ -165,15 +173,16 @@ namespace geode
     public:
         Impl( const SurfaceMesh3D& mesh, const Ray3D& ray )
             : mesh_( mesh ),
-              end_{ end( mesh, ray ) },
-              segment_{ ray.origin(), end_ }
+              origin_( ray.origin() ),
+              segment_{ ray.origin(), end( mesh, ray ) }
         {
         }
 
         Impl( const SurfaceMesh3D& mesh, const InfiniteLine3D& infinite_line )
             : mesh_( mesh ),
-              end_{ end( mesh, infinite_line ) },
-              segment_{ infinite_line.origin(), end_ }
+              origin_( infinite_line.origin() ),
+              segment_{ begin( mesh, infinite_line ),
+                  end( mesh, infinite_line ) }
         {
         }
 
@@ -237,11 +246,10 @@ namespace geode
                         segment_triangle_intersection( segment_, triangle ) )
                 {
                     auto& intersection_result = intersection.result.value();
-                    auto distance = point_point_distance(
-                        segment_.vertices()[0].get(), intersection_result );
-                    if( Vector3D{
-                            segment_.vertices()[0].get(), intersection_result }
-                            .dot( segment_.direction() )
+                    auto distance =
+                        point_point_distance( origin_, intersection_result );
+                    if( Vector3D{ origin_, intersection_result }.dot(
+                            segment_.direction() )
                         < 0 )
                     {
                         distance *= -1.;
@@ -253,14 +261,12 @@ namespace geode
                 {
                     for( const auto e2 : LRange{ 3 } )
                     {
-                        Point3D point;
-                        std::tie( std::ignore, point,
-                            std::ignore ) = segment_segment_distance( segment_,
+                        auto point = std::get< 1 >( segment_segment_distance(
+                            Segment3D{ segment_ },
                             { triangle.vertices()[e2].get(),
-                                triangle.vertices()[( e2 + 1 ) % 3].get() } );
-                        auto distance = point_point_distance(
-                            segment_.vertices()[0].get(), point );
-                        if( Vector3D{ segment_.vertices()[0].get(), point }.dot(
+                                triangle.vertices()[( e2 + 1 ) % 3].get() } ) );
+                        auto distance = point_point_distance( origin_, point );
+                        if( Vector3D{ origin_, point }.dot(
                                 segment_.direction() )
                             < 0 )
                         {
@@ -293,8 +299,8 @@ namespace geode
 
     private:
         const SurfaceMesh3D& mesh_;
-        DEBUG_CONST Point3D end_;
-        DEBUG_CONST Segment3D segment_;
+        const Point3D& origin_;
+        DEBUG_CONST OwnerSegment3D segment_;
         mutable std::vector< PolygonDistance > results_;
         mutable bool are_results_sorted_{ false };
     };
