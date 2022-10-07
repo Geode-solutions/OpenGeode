@@ -39,6 +39,12 @@
 namespace
 {
     template < typename MeshFrom, typename Builder >
+    void copy_meta_info( const MeshFrom& from, Builder& builder )
+    {
+        builder.set_name( from.name() );
+    }
+
+    template < typename MeshFrom, typename Builder >
     void copy_points( const MeshFrom& from, Builder& builder )
     {
         builder.create_vertices( from.nb_vertices() );
@@ -100,6 +106,7 @@ namespace
         copy_polygons( input, *builder );
         output.polygon_attribute_manager().copy(
             input.polygon_attribute_manager() );
+        copy_meta_info( input, *builder );
     }
 
     template < typename SurfaceIn, typename SurfaceOut >
@@ -192,6 +199,7 @@ namespace geode
         detail::copy_points2d_into_3d( surface2d, *builder3d, axis_to_add );
         copy_polygons( surface2d, *builder3d );
         copy_surface_attributes( surface2d, *surface3d );
+        copy_meta_info( surface2d, *builder3d );
         return surface3d;
     }
 
@@ -203,6 +211,7 @@ namespace geode
         detail::copy_points3d_into_2d( surface3d, *builder2d, axis_to_remove );
         copy_polygons( surface3d, *builder2d );
         copy_surface_attributes( surface3d, *surface2d );
+        copy_meta_info( surface3d, *builder2d );
         return surface2d;
     }
 
@@ -214,6 +223,7 @@ namespace geode
         detail::copy_points2d_into_3d( surface2d, *builder3d, axis_to_add );
         copy_polygons( surface2d, *builder3d );
         copy_surface_attributes( surface2d, *surface3d );
+        copy_meta_info( surface2d, *builder3d );
         return surface3d;
     }
 
@@ -226,6 +236,7 @@ namespace geode
         detail::copy_points3d_into_2d( surface3d, *builder2d, axis_to_remove );
         copy_polygons( surface3d, *builder2d );
         copy_surface_attributes( surface3d, *surface2d );
+        copy_meta_info( surface3d, *builder2d );
         return surface2d;
     }
 
@@ -238,6 +249,7 @@ namespace geode
         detail::copy_points2d_into_3d( surface2d, *builder3d, axis_to_add );
         copy_polygons( surface2d, *builder3d );
         copy_surface_attributes( surface2d, *surface3d );
+        copy_meta_info( surface2d, *builder3d );
         return surface3d;
     }
 
@@ -251,6 +263,7 @@ namespace geode
         detail::copy_points3d_into_2d( surface3d, *builder2d, axis_to_remove );
         copy_polygons( surface3d, *builder2d );
         copy_surface_attributes( surface3d, *surface2d );
+        copy_meta_info( surface3d, *builder2d );
         return surface2d;
     }
 
