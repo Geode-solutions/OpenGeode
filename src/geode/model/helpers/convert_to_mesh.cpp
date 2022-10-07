@@ -151,6 +151,10 @@ namespace
             }
             for( const auto& v2uv : model_.vertices() )
             {
+                if( v2uv.first > mesh_.nb_vertices() )
+                {
+                    continue;
+                }
                 attribute_unique_vertex_->set_value( v2uv.first, v2uv.second );
             }
         }
@@ -309,6 +313,10 @@ namespace
             }
             for( const auto& v2uv : model_.vertices() )
             {
+                if( v2uv.first > mesh_.nb_vertices() )
+                {
+                    continue;
+                }
                 attribute_unique_vertex_->set_value( v2uv.first, v2uv.second );
             }
         }
@@ -421,6 +429,10 @@ namespace
             }
             for( const auto& v2uv : model_.vertices() )
             {
+                if( v2uv.first > mesh_.nb_vertices() )
+                {
+                    continue;
+                }
                 attribute_unique_vertex_->set_value( v2uv.first, v2uv.second );
             }
         }
