@@ -42,6 +42,7 @@ namespace geode
             point_set3d, *builder2d, axis_to_remove );
         detail::copy_attributes( point_set3d.vertex_attribute_manager(),
             point_set2d->vertex_attribute_manager() );
+        detail::copy_meta_info( point_set3d, *builder2d );
         return point_set2d;
     }
 
@@ -53,6 +54,7 @@ namespace geode
         detail::copy_points2d_into_3d( point_set2d, *builder3d, axis_to_add );
         detail::copy_attributes( point_set2d.vertex_attribute_manager(),
             point_set3d->vertex_attribute_manager() );
+        detail::copy_meta_info( point_set2d, *builder3d );
         return point_set3d;
     }
 } // namespace geode

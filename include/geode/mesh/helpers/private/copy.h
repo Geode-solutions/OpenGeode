@@ -80,6 +80,12 @@ namespace geode
             }
         }
 
+        template < typename MeshFrom, typename Builder >
+        void copy_meta_info( const MeshFrom& from, Builder& builder )
+        {
+            builder.set_name( from.name() );
+        }
+
         void copy_attributes(
             const AttributeManager& manager_in, AttributeManager& manager_out );
     } // namespace detail
