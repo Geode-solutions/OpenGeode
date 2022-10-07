@@ -28,7 +28,7 @@
 
 #include <geode/tests/common.h>
 
-void test()
+void test_bbox()
 {
     geode::BoundingBox2D box;
     box.add_point( { { -1, -1 } } );
@@ -88,6 +88,54 @@ void test()
         "[Test] Error in BoundingBox move constructor" );
     OPENGEODE_EXCEPTION( box_neg3.max() == geode::Point2D( { -1.5, -1.5 } ),
         "[Test] Error in BoundingBox move constructor" );
+}
+
+void test_ray_intersections()
+{
+    geode::BoundingBox3D bbox;
+    bbox.add_point( { { -1, -1, -1 } } );
+    bbox.add_point( { { 1, 1, 1 } } );
+
+    const geode::OwnerRay3D ray_inside{ { { 0, 0, 1 } }, { { 0, 0, 0 } } };
+    OPENGEODE_EXCEPTION(
+        bbox.intersects( ray_inside ), "[Test] Wrong result with ray_inside" );
+
+    const geode::OwnerRay3D ray_up{ { { 0, 0, 1 } }, { { 0, 0, 2 } } };
+    OPENGEODE_EXCEPTION(
+        !bbox.intersects( ray_up ), "[Test] Wrong result with ray_up" );
+
+    const geode::OwnerRay3D ray_down{ { { 0, 0, 1 } }, { { 0, 0, -2 } } };
+    OPENGEODE_EXCEPTION(
+        bbox.intersects( ray_down ), "[Test] Wrong result with ray_down" );
+}
+
+void test_line_intersections()
+{
+    geode::BoundingBox3D bbox;
+    bbox.add_point( { { -1, -1, -1 } } );
+    bbox.add_point( { { 1, 1, 1 } } );
+
+    const geode::OwnerInfiniteLine3D line_inside{ { { 0, 0, 1 } },
+        { { 0, 0, 0 } } };
+    OPENGEODE_EXCEPTION( bbox.intersects( line_inside ),
+        "[Test] Wrong result with line_inside" );
+
+    const geode::OwnerInfiniteLine3D line_up{ { { 0, 0, 1 } },
+        { { 0, 0, 2 } } };
+    OPENGEODE_EXCEPTION(
+        bbox.intersects( line_up ), "[Test] Wrong result with line_up" );
+
+    const geode::OwnerInfiniteLine3D line_down{ { { 0, 0, 1 } },
+        { { 0, 0, -2 } } };
+    OPENGEODE_EXCEPTION(
+        bbox.intersects( line_down ), "[Test] Wrong result with line_down" );
+}
+
+void test()
+{
+    test_bbox();
+    test_ray_intersections();
+    test_line_intersections();
 }
 
 OPENGEODE_TEST( "bounding-box" )
