@@ -219,6 +219,9 @@ namespace
                         break;
                     }
                 }
+            }
+            if( new_polygon_vertex.polygon_id == geode::NO_ID )
+            {
                 builder.disassociate_polygon_vertex_to_vertex( v );
             }
             else
