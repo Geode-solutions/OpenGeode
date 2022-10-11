@@ -24,8 +24,10 @@
 #include <geode/model/helpers/surface_radial_sort.h>
 
 #include <geode/basic/algorithm.h>
+#include <geode/basic/logger.h>
 
 #include <geode/geometry/basic_objects/segment.h>
+#include <geode/geometry/distance.h>
 #include <geode/geometry/radial_sort.h>
 
 #include <geode/mesh/core/edged_curve.h>
@@ -85,7 +87,19 @@ namespace
         geode::Point3D opposite_point;
     };
 
-    std::vector< BorderPolygon > border_polygons( const geode::BRep& brep,
+    bool is_polygon_degenerate( const geode::SurfaceMesh3D& mesh,
+        const geode::PolygonEdge& edge,
+        const geode::Point3D& opposite_point )
+    {
+        const auto edge_vertices = mesh.polygon_edge_vertices( edge );
+        return std::get< 0 >( geode::point_segment_distance(
+                   opposite_point, { mesh.point( edge_vertices[0] ),
+                                       mesh.point( edge_vertices[1] ) } ) )
+               <= geode::global_epsilon;
+    }
+
+    std::pair< bool, std::vector< BorderPolygon > > border_polygons(
+        const geode::BRep& brep,
         const geode::Line3D& line,
         geode::index_t e0,
         geode::index_t e1 )
@@ -97,6 +111,7 @@ namespace
         const auto surface_vertices1 = brep.component_mesh_vertices(
             line_v1, geode::Surface3D::component_type_static() );
         std::vector< BorderPolygon > polygons;
+        bool degenerate_polygon{ false };
         for( const auto& vertex_pairs : geode::component_mesh_vertex_pairs(
                  surface_vertices0, surface_vertices1 ) )
         {
@@ -110,17 +125,25 @@ namespace
                 {
                     polygons.emplace_back(
                         surface, true, std::move( edge0.value() ) );
+                    degenerate_polygon =
+                        degenerate_polygon
+                        || is_polygon_degenerate( surface_mesh, edge0.value(),
+                            polygons.back().opposite_point );
                 }
                 if( auto edge1 = surface_mesh.polygon_edge_from_vertices(
                         pair.second, pair.first ) )
                 {
                     polygons.emplace_back(
                         surface, false, std::move( edge1.value() ) );
+                    degenerate_polygon =
+                        degenerate_polygon
+                        || is_polygon_degenerate( surface_mesh, edge1.value(),
+                            polygons.back().opposite_point );
                 }
             }
         }
         geode::sort_unique( polygons );
-        return polygons;
+        return std::make_pair( !degenerate_polygon, polygons );
     }
 
     geode::SortedSurfaces sort( const geode::Segment3D& segment,
@@ -191,11 +214,32 @@ namespace geode
     SortedSurfaces surface_radial_sort( const BRep& brep, const Line3D& line )
     {
         const auto& mesh = line.mesh();
-        const auto e0 = mesh.edge_vertex( { 0, 0 } );
-        const auto e1 = mesh.edge_vertex( { 0, 1 } );
-        const auto polygons = border_polygons( brep, line, e0, e1 );
-        const auto& p0 = line.mesh().point( e0 );
-        const auto& p1 = line.mesh().point( e1 );
-        return sort( { p0, p1 }, polygons );
+        for( const auto edge_id : Range{ mesh.nb_edges() } )
+        {
+            const auto e0 = mesh.edge_vertex( { 0, 0 } );
+            const auto e1 = mesh.edge_vertex( { 0, 1 } );
+            auto polygons = border_polygons( brep, line, e0, e1 );
+            if( !polygons.first )
+            {
+                if( edge_id == mesh.nb_edges() - 1 )
+                {
+                    Logger::warn( "[surface_radial_sort] Degenerated polygons "
+                                  "has been found on all the edges of Line ",
+                        line.id().string(),
+                        ". The result of surface_radial_sort is not "
+                        "guaranteed." );
+                }
+                else
+                {
+                    continue;
+                }
+            }
+            const auto& p0 = line.mesh().point( e0 );
+            const auto& p1 = line.mesh().point( e1 );
+            return sort( { p0, p1 }, polygons.second );
+        }
+        OPENGEODE_ASSERT_NOT_REACHED(
+            "[surface_radial_sort] Cannot find sorted surfaces on a Line" );
+        return { 0 };
     }
 } // namespace geode
