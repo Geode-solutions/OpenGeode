@@ -1,0 +1,9 @@
+name: Manual release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    uses: Geode-solutions/actions/.github/workflows/trigger-release.yml@master
+    secrets: inherit
