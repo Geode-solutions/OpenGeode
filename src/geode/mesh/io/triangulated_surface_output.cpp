@@ -23,6 +23,8 @@
 
 #include <geode/mesh/io/triangulated_surface_output.h>
 
+#include <absl/strings/ascii.h>
+
 #include <geode/basic/timer.h>
 
 #include <geode/mesh/core/triangulated_surface.h>
@@ -38,7 +40,7 @@ namespace geode
         {
             Timer timer;
             const auto extension =
-                to_string( extension_from_filename( filename ) );
+                absl::AsciiStrToLower( extension_from_filename( filename ) );
             OPENGEODE_EXCEPTION(
                 TriangulatedSurfaceOutputFactory< dimension >::has_creator(
                     extension ),
