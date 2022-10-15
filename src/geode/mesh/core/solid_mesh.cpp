@@ -231,7 +231,7 @@ namespace
             "[SolidMesh::polyhedra_around_vertex] Wrong polyhedron "
             "around vertex" );
         geode::index_t safety_count{ 0 };
-        constexpr geode::index_t MAX_SAFETY_COUNT{ 1000 };
+        constexpr geode::index_t MAX_SAFETY_COUNT{ 10000 };
         geode::detail::PolyhedraAroundVertexImpl result;
         result.vertex_is_on_border = false;
         absl::flat_hash_set< geode::index_t > polyhedra_visited;
@@ -268,6 +268,12 @@ namespace
                 }
             }
         }
+        OPENGEODE_EXCEPTION( safety_count < MAX_SAFETY_COUNT,
+            "[SolidMesh::polygons_around_vertex] Too many polyhedra "
+            "around vertex ",
+            vertex_id,
+            ". This is probably related to a bug in the polyhedra "
+            "adjacencies." );
         return result;
     }
 } // namespace
