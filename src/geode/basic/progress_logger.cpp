@@ -59,10 +59,10 @@ namespace geode
             }
         }
 
-        void increment()
+        void increment( index_t nb_increments )
         {
             const std::lock_guard< std::mutex > locking{ lock_ };
-            current_++;
+            current_ += nb_increments;
             auto now = absl::Now();
             if( now - current_time_ > SLEEP )
             {
@@ -71,10 +71,10 @@ namespace geode
             }
         }
 
-        void increment_nb_steps()
+        void increment_nb_steps( index_t nb_steps )
         {
             const std::lock_guard< std::mutex > locking{ lock_ };
-            nb_steps_++;
+            nb_steps_ += nb_steps;
         }
 
     private:
@@ -93,11 +93,21 @@ namespace geode
 
     void ProgressLogger::increment()
     {
-        impl_->increment();
+        impl_->increment( 1 );
+    }
+
+    void ProgressLogger::increment( index_t nb_increments )
+    {
+        impl_->increment( nb_increments );
     }
 
     void ProgressLogger::increment_nb_steps()
     {
-        impl_->increment_nb_steps();
+        impl_->increment_nb_steps( 1 );
+    }
+
+    void ProgressLogger::increment_nb_steps( index_t nb_steps )
+    {
+        impl_->increment_nb_steps( nb_steps );
     }
 } // namespace geode
