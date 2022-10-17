@@ -38,7 +38,11 @@ namespace geode
 
         void increment();
 
+        void increment( index_t nb_increments );
+
         void increment_nb_steps();
+
+        void increment_nb_steps( index_t nb_steps );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );
