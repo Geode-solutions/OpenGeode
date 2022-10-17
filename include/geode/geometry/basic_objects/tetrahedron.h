@@ -28,7 +28,9 @@
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+    ALIAS_3D( BoundingBox );
     ALIAS_3D( Point );
     class OwnerTetrahedron;
 
@@ -60,6 +62,7 @@ namespace geode
         Point3D barycenter() const;
         void set_point( index_t vertex, const Point3D& point );
         const std::array< PointType, 4 >& vertices() const;
+        BoundingBox3D bounding_box() const;
 
     protected:
         GenericTetrahedron( const OwnerTetrahedron& other );
