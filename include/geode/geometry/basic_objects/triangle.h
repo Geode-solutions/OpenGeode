@@ -28,6 +28,7 @@
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
     FORWARD_DECLARATION_DIMENSION_CLASS( OwnerTriangle );
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
     class OwnerPlane;
@@ -73,6 +74,7 @@ namespace geode
             new_owner_plane() const;
         void set_point( index_t vertex, const Point< dimension >& point );
         const std::array< PointType, 3 >& vertices() const;
+        BoundingBox< dimension > bounding_box() const;
 
     protected:
         GenericTriangle( const OwnerTriangle< dimension >& other );

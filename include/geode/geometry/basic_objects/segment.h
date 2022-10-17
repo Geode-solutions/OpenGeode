@@ -28,6 +28,7 @@
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
     FORWARD_DECLARATION_DIMENSION_CLASS( OwnerSegment );
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
 
@@ -57,6 +58,7 @@ namespace geode
         double length() const;
         void set_point( index_t vertex, const Point< dimension >& point );
         const std::array< PointType, 2 >& vertices() const;
+        BoundingBox< dimension > bounding_box() const;
 
     protected:
         GenericSegment( const OwnerSegment< dimension >& other );

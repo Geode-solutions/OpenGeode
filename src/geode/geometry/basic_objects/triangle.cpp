@@ -24,6 +24,7 @@
 #include <geode/geometry/basic_objects/triangle.h>
 
 #include <geode/geometry/basic_objects/plane.h>
+#include <geode/geometry/bounding_box.h>
 
 namespace geode
 {
@@ -160,6 +161,17 @@ namespace geode
         GenericTriangle< PointType, dimension >::vertices() const
     {
         return vertices_;
+    }
+    template < typename PointType, index_t dimension >
+    BoundingBox< dimension >
+        GenericTriangle< PointType, dimension >::bounding_box() const
+    {
+        BoundingBox< dimension > bbox;
+        for( const auto& point : vertices_ )
+        {
+            bbox.add_point( point );
+        }
+        return bbox;
     }
 
     template < typename PointType, index_t dimension >

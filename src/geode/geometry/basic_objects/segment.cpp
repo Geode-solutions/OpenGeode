@@ -23,6 +23,7 @@
 
 #include <geode/geometry/basic_objects/segment.h>
 
+#include <geode/geometry/bounding_box.h>
 #include <geode/geometry/distance.h>
 
 namespace geode
@@ -102,6 +103,17 @@ namespace geode
         GenericSegment< PointType, dimension >::vertices() const
     {
         return vertices_;
+    }
+    template < typename PointType, index_t dimension >
+    BoundingBox< dimension >
+        GenericSegment< PointType, dimension >::bounding_box() const
+    {
+        BoundingBox< dimension > bbox;
+        for( const auto& point : vertices_ )
+        {
+            bbox.add_point( point );
+        }
+        return bbox;
     }
 
     template < typename PointType, index_t dimension >
