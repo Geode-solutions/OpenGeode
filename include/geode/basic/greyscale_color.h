@@ -69,7 +69,8 @@ namespace geode
 
         GreyscaleColor operator+( const GreyscaleColor &other ) const
         {
-            return { ( value() + other.value() ) / 2 };
+            return { static_cast< geode::local_index_t >(
+                value() / 2 + other.value() / 2 ) };
         }
 
         void operator+=( const GreyscaleColor &other )
@@ -123,15 +124,30 @@ namespace geode
             return color.value();
         }
 
+        static float converted_item_value(
+            const GreyscaleColor &color, local_index_t item )
+        {
+            OPENGEODE_ASSERT( item < nb_items(),
+                "[GenericAttributeConversion] Accessing "
+                "incorrect item value" );
+            return static_cast< float >( color.value() );
+        }
+
         static bool is_genericable()
         {
             return true;
+        }
+        static local_index_t nb_items()
+
+        {
+            return 1;
         }
     };
 } // namespace geode
 
 namespace std
 {
+    template <>
     struct hash< geode::GreyscaleColor >
     {
     public:
