@@ -205,6 +205,7 @@ namespace geode
 
 namespace std
 {
+    template <>
     struct hash< geode::RGBColor >
     {
     public:

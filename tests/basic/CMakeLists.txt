@@ -39,6 +39,11 @@ add_geode_test(
         ${PROJECT_NAME}::basic
 )
 add_geode_test(
+    SOURCE "test-colors.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+)
+add_geode_test(
     SOURCE "test-factory.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
