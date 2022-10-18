@@ -140,6 +140,7 @@ namespace geode
         std::array< local_index_t, 3 > values_;
     };
 
+    template <>
     struct AttributeLinearInterpolationImpl< RGBColor >
     {
         template < template < typename > class Attribute >
@@ -165,6 +166,7 @@ namespace geode
         }
     };
 
+    template <>
     struct GenericAttributeConversion< RGBColor >
     {
         static float converted_value( const RGBColor &color )

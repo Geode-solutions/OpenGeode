@@ -97,6 +97,7 @@ namespace geode
         local_index_t value_;
     };
 
+    template <>
     struct AttributeLinearInterpolationImpl< GreyscaleColor >
     {
         template < template < typename > class Attribute >
@@ -114,6 +115,7 @@ namespace geode
         }
     };
 
+    template <>
     struct GenericAttributeConversion< GreyscaleColor >
     {
         static float converted_value( const GreyscaleColor &color )
