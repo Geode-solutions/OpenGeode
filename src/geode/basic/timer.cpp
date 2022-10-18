@@ -32,15 +32,23 @@ namespace geode
     class Timer::Impl
     {
     public:
-        Impl() : start_time_{ absl::Now() } {}
+        Impl()
+        {
+            reset();
+        }
 
         std::string duration() const
         {
             return absl::FormatDuration( absl::Now() - start_time_ );
         }
 
+        void reset()
+        {
+            start_time_ = absl::Now();
+        }
+
     private:
-        const absl::Time start_time_;
+        absl::Time start_time_;
     };
 
     Timer::Timer() {}
@@ -50,5 +58,10 @@ namespace geode
     std::string Timer::duration() const
     {
         return impl_->duration();
+    }
+
+    void Timer::reset()
+    {
+        return impl_->reset();
     }
 } // namespace geode
