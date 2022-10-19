@@ -140,9 +140,8 @@ namespace geode
         bool has_component_mesh_vertices(
             index_t unique_vertex_id, const uuid& component_id ) const
         {
-            const auto& component_vertices =
-                component_mesh_vertices( unique_vertex_id );
-            for( const auto& component_vertex : component_vertices )
+            for( const auto& component_vertex :
+                component_mesh_vertices( unique_vertex_id ) )
             {
                 if( component_vertex.component_id.id() == component_id )
                 {
@@ -266,13 +265,11 @@ namespace geode
         void update_unique_vertices( const ComponentID& component_id,
             absl::Span< const index_t > old2new )
         {
-            const auto unique_vertices =
-                component_unique_vertices( component_id.id() );
-            for( const auto uv : unique_vertices )
+            for( const auto uv :
+                component_unique_vertices( component_id.id() ) )
             {
-                const auto& old_vertices =
-                    component_mesh_vertices( uv, component_id.id() );
-                for( const auto old_id : old_vertices )
+                for( const auto old_id :
+                    component_mesh_vertices( uv, component_id.id() ) )
                 {
                     const auto& all_vertices = component_vertices_->value( uv );
                     const auto it = absl::c_find( all_vertices,
@@ -431,10 +428,9 @@ namespace geode
             const uuid& component_id )
         {
             std::vector< index_t > result;
-            result.reserve( nb_unique_vertices() );
             for( const auto uv_id : Range{ nb_unique_vertices() } )
             {
-                if( !component_mesh_vertices( uv_id, component_id ).empty() )
+                if( has_component_mesh_vertices( uv_id, component_id ) )
                 {
                     result.push_back( uv_id );
                 }
