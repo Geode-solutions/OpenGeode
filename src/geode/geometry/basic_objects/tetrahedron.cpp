@@ -74,7 +74,7 @@ namespace geode
     void GenericTetrahedron< PointType >::set_point(
         index_t vertex, const Point3D& point )
     {
-        vertices_.at( vertex ) = point;
+        vertices_[vertex] = point;
     }
     template < typename PointType >
     const std::array< PointType, 4 >&

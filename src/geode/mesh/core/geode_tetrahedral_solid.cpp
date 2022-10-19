@@ -68,17 +68,16 @@ namespace geode
         index_t get_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex ) const
         {
-            return tetrahedron_vertices_
-                ->value( polyhedron_vertex.polyhedron_id )
-                .at( polyhedron_vertex.vertex_id );
+            return tetrahedron_vertices_->value(
+                polyhedron_vertex.polyhedron_id )[polyhedron_vertex.vertex_id];
         }
 
         PolyhedronVertex get_polyhedron_facet_vertex_id(
             const PolyhedronFacetVertex& polyhedron_facet_vertex ) const
         {
-            const auto vertex_id = detail::tetrahedron_facet_vertices.at(
-                polyhedron_facet_vertex.polyhedron_facet
-                    .facet_id )[polyhedron_facet_vertex.vertex_id];
+            const auto vertex_id = detail::tetrahedron_facet_vertices
+                [polyhedron_facet_vertex.polyhedron_facet.facet_id]
+                [polyhedron_facet_vertex.vertex_id];
             return { polyhedron_facet_vertex.polyhedron_facet.polyhedron_id,
                 vertex_id };
         }
@@ -86,9 +85,8 @@ namespace geode
         absl::optional< index_t > get_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet ) const
         {
-            const auto adj =
-                tetrahedron_adjacents_->value( polyhedron_facet.polyhedron_id )
-                    .at( polyhedron_facet.facet_id );
+            const auto adj = tetrahedron_adjacents_->value(
+                polyhedron_facet.polyhedron_id )[polyhedron_facet.facet_id];
             if( adj == NO_ID )
             {
                 return absl::nullopt;
@@ -103,7 +101,7 @@ namespace geode
                 polyhedron_vertex.polyhedron_id,
                 [&polyhedron_vertex, vertex_id](
                     std::array< index_t, 4 >& array ) {
-                    array.at( polyhedron_vertex.vertex_id ) = vertex_id;
+                    array[polyhedron_vertex.vertex_id] = vertex_id;
                 } );
         }
 
@@ -114,7 +112,7 @@ namespace geode
                 polyhedron_facet.polyhedron_id,
                 [&polyhedron_facet, adjacent_id](
                     std::array< index_t, 4 >& array ) {
-                    array.at( polyhedron_facet.facet_id ) = adjacent_id;
+                    array[polyhedron_facet.facet_id] = adjacent_id;
                 } );
         }
 

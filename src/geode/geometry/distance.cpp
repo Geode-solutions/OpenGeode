@@ -70,7 +70,13 @@ namespace geode
     double point_point_distance(
         const Point< dimension >& point0, const Point< dimension >& point1 )
     {
-        return Vector< dimension >{ point0, point1 }.length();
+        double diff2{ 0 };
+        for( const auto d : LRange{ dimension } )
+        {
+            const auto diff = point0.value( d ) - point1.value( d );
+            diff2 += diff * diff;
+        }
+        return std::sqrt( diff2 );
     }
 
     template < index_t dimension >
