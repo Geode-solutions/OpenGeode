@@ -59,12 +59,12 @@ namespace geode
 
         double value( local_index_t index ) const
         {
-            return values_.at( index );
+            return values_[index];
         }
 
         void set_value( local_index_t index, double coordinate )
         {
-            values_.at( index ) = coordinate;
+            values_[index] = coordinate;
         }
 
         bool operator==( const Point &other ) const

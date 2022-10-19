@@ -154,7 +154,7 @@ namespace geode
     void GenericTriangle< PointType, dimension >::set_point(
         index_t vertex, const Point< dimension >& point )
     {
-        vertices_.at( vertex ) = point;
+        vertices_[vertex] = point;
     }
     template < typename PointType, index_t dimension >
     const std::array< PointType, 3 >&
