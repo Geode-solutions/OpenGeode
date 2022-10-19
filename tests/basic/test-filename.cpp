@@ -41,6 +41,10 @@ void test()
         "[Test] Wrong result for path2 with extension" );
     OPENGEODE_EXCEPTION( geode::filename_without_extension( path2 ) == "file",
         "[Test] Wrong result for path2 without extension" );
+    OPENGEODE_EXCEPTION( geode::filepath_without_extension( path2 ) == "file",
+        "[Test] Wrong result for filepath2 without extension" );
+    OPENGEODE_EXCEPTION( geode::filepath_without_filename( path2 ) == "",
+        "[Test] Wrong result for filepath2 without file name" );
 
     std::string path3 = "C:/where/is/file.ext";
     OPENGEODE_EXCEPTION( geode::filename_with_extension( path3 ) == "file.ext",
