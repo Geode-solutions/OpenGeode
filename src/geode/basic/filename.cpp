@@ -44,4 +44,10 @@ namespace geode
         ghc::filesystem::path filepath{ to_string( path ) };
         return filepath.replace_extension( "" ).string();
     }
+
+    std::string filepath_without_filename( absl::string_view path )
+    {
+        ghc::filesystem::path filepath{ to_string( path ) };
+        return filepath.replace_filename( "" ).string();
+    }
 } // namespace geode
