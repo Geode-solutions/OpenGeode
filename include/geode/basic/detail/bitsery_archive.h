@@ -30,6 +30,8 @@
 #include <bitsery/brief_syntax/array.h>
 
 #include <geode/basic/attribute_manager.h>
+#include <geode/basic/greyscale_color.h>
+#include <geode/basic/rgb_color.h>
 #include <geode/basic/uuid.h>
 
 namespace
@@ -106,6 +108,10 @@ namespace geode
             AttributeManager::register_attribute_type< uuid, Serializer >(
                 context, "uuid" );
             register_inlinedvector< Serializer >( context );
+            AttributeManager::register_attribute_type< GreyscaleColor,
+                Serializer >( context, "GreyScaleColor" );
+            AttributeManager::register_attribute_type< RGBColor, Serializer >(
+                context, "RGBColor" );
         }
     } // namespace detail
 } // namespace geode

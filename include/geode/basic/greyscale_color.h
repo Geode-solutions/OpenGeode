@@ -90,7 +90,7 @@ namespace geode
         {
             archive.ext( *this, DefaultGrowable< Archive, GreyscaleColor >{},
                 []( Archive &a, GreyscaleColor &color ) {
-                    a.container1b( color.value_ );
+                    a.value1b( color.value_ );
                 } );
         }
 
