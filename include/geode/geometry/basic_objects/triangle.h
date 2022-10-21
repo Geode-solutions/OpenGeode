@@ -72,6 +72,9 @@ namespace geode
         template < index_t T = dimension >
         typename std::enable_if< T == 3, absl::optional< OwnerPlane > >::type
             new_owner_plane() const;
+        template < index_t T = dimension >
+        typename std::enable_if< T == 3, absl::optional< local_index_t > >::type
+            pivot() const;
         void set_point( index_t vertex, const Point< dimension >& point );
         const std::array< PointType, 3 >& vertices() const;
         BoundingBox< dimension > bounding_box() const;

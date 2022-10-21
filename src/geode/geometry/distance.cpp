@@ -207,19 +207,22 @@ namespace geode
         return std::make_tuple( signed_distance, nearest_point );
     }
 
-    template <>
     std::tuple< double, Point3D > point_triangle_distance(
-        const Point3D& point, const Triangle3D& triangle )
+        const Point3D& point, const Triangle3D& triangle, local_index_t v0 )
     {
-        const Vector3D diff{ point, triangle.vertices()[0] };
-        const Vector3D edge0{ triangle.vertices()[0], triangle.vertices()[1] };
-        const Vector3D edge1{ triangle.vertices()[0], triangle.vertices()[2] };
+        const auto v1 = v0 == 2 ? 0 : v0 + 1;
+        const auto v2 = v1 == 2 ? 0 : v1 + 1;
+        const Vector3D edge0{ triangle.vertices()[v0],
+            triangle.vertices()[v1] };
+        const Vector3D edge1{ triangle.vertices()[v0],
+            triangle.vertices()[v2] };
         const auto a00 = edge0.length2();
         const auto a01 = edge0.dot( edge1 );
         const auto a11 = edge1.length2();
+        const auto det = std::fabs( a00 * a11 - a01 * a01 );
+        const Vector3D diff{ point, triangle.vertices()[v0] };
         const auto b0 = diff.dot( edge0 );
         const auto b1 = diff.dot( edge1 );
-        const auto det = std::fabs( a00 * a11 - a01 * a01 );
         auto s = a01 * b1 - a11 * b0;
         auto t = a01 * b0 - a00 * b1;
 
@@ -398,10 +401,36 @@ namespace geode
             }
         }
 
-        Point3D closest_point{ triangle.vertices()[0].get() + edge0 * s
+        Point3D closest_point{ triangle.vertices()[v0].get() + edge0 * s
                                + edge1 * t };
         const auto distance = point_point_distance( point, closest_point );
         return std::make_tuple( distance, std::move( closest_point ) );
+    }
+
+    template <>
+    std::tuple< double, Point3D > point_triangle_distance(
+        const Point3D& point, const Triangle3D& triangle )
+    {
+        if( const auto pivot = triangle.pivot() )
+        {
+            return point_triangle_distance( point, triangle, pivot.value() );
+        }
+        std::array< std::tuple< double, Point3D >, 3 > edge_distances;
+        auto min_distance = std::numeric_limits< double >::max();
+        local_index_t selected_edge{ NO_LID };
+        for( const auto e : LRange{ 3 } )
+        {
+            const auto next = e == 2 ? 0 : e + 1;
+            edge_distances[e] = point_segment_distance(
+                point, { triangle.vertices()[e], triangle.vertices()[next] } );
+            const auto& cur_distance = std::get< 0 >( edge_distances[e] );
+            if( cur_distance < min_distance )
+            {
+                min_distance = cur_distance;
+                selected_edge = e;
+            }
+        }
+        return edge_distances[selected_edge];
     }
 
     template <>

@@ -127,6 +127,7 @@ namespace geode
         static float converted_item_value(
             const GreyscaleColor &color, local_index_t item )
         {
+            geode_unused( item );
             OPENGEODE_ASSERT( item < nb_items(),
                 "[GenericAttributeConversion] Accessing "
                 "incorrect item value" );
