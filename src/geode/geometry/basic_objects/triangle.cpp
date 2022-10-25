@@ -47,7 +47,7 @@ namespace
 
                 const auto normal = edge0.cross( edge1 );
                 const auto length = normal.length();
-                if( length > M_PI / 180 ) // 1 degree
+                if( length > 0.0001 )
                 {
                     return std::make_pair( pivot, normal / length );
                 }

@@ -90,7 +90,7 @@ namespace geode
 
     template < index_t dimension >
     std::tuple< double, Point< dimension >, Point< dimension > >
-        segment_segment_distance( const Segment< dimension >& segment0,
+        compute_segment_segment_distance( const Segment< dimension >& segment0,
             const Segment< dimension >& segment1 )
     {
         /* Algorithm and code found on
@@ -105,8 +105,6 @@ namespace geode
         const auto a = u.dot( u ); // always >= 0
         const auto b = u.dot( v );
         const auto c = v.dot( v ); // always >= 0
-        const auto d = u.dot( w );
-        const auto e = v.dot( w );
         const auto D = a * c - b * b;
         auto sc = D;
         auto sN = D;
@@ -114,6 +112,8 @@ namespace geode
         auto tc = D;
         auto tN = D;
         auto tD = D; // tc = tN / tD, default tD = D >= 0
+        const auto d = u.dot( w );
+        const auto e = v.dot( w );
 
         // compute the line parameters of the two closest points
         if( D <= 0.0 )
@@ -182,6 +182,48 @@ namespace geode
             closest1 }; // =  segment0(sc) - segment1(tc)
 
         return std::make_tuple( dP.length(), closest0, closest1 );
+    }
+
+    template < index_t dimension >
+    std::tuple< double, Point< dimension >, Point< dimension > >
+        segment_segment_distance( const Segment< dimension >& segment0,
+            const Segment< dimension >& segment1 )
+    {
+        auto min_distance = std::numeric_limits< double >::max();
+        local_index_t min_p0{ 0 };
+        local_index_t min_p1{ 0 };
+        for( const auto p0 : LRange{ 2 } )
+        {
+            for( const auto p1 : LRange{ 2 } )
+            {
+                const auto cur_dist =
+                    point_point_distance( segment0.vertices()[p0].get(),
+                        segment1.vertices()[p1].get() );
+                if( cur_dist < min_distance )
+                {
+                    min_distance = cur_dist;
+                    min_p0 = p0;
+                    min_p1 = p1;
+                }
+            }
+        }
+        if( min_p0 == 1 )
+        {
+            if( min_p1 == 1 )
+            {
+                return compute_segment_segment_distance< dimension >(
+                    { segment0.vertices()[1], segment0.vertices()[0] },
+                    { segment1.vertices()[1], segment1.vertices()[0] } );
+            }
+            return compute_segment_segment_distance(
+                { segment0.vertices()[1], segment0.vertices()[0] }, segment1 );
+        }
+        if( min_p1 == 1 )
+        {
+            return compute_segment_segment_distance(
+                segment0, { segment1.vertices()[1], segment1.vertices()[0] } );
+        }
+        return compute_segment_segment_distance( segment0, segment1 );
     }
 
     template < index_t dimension >
