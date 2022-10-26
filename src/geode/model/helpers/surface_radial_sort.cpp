@@ -26,6 +26,7 @@
 #include <geode/basic/algorithm.h>
 #include <geode/basic/logger.h>
 
+#include <geode/geometry/basic_objects/infinite_line.h>
 #include <geode/geometry/basic_objects/segment.h>
 #include <geode/geometry/distance.h>
 #include <geode/geometry/radial_sort.h>
@@ -92,9 +93,9 @@ namespace
         const geode::Point3D& opposite_point )
     {
         const auto edge_vertices = mesh.polygon_edge_vertices( edge );
-        return std::get< 0 >( geode::point_segment_distance(
-                   opposite_point, { mesh.point( edge_vertices[0] ),
-                                       mesh.point( edge_vertices[1] ) } ) )
+        return std::get< 0 >( geode::point_line_distance( opposite_point,
+                   { geode::Segment3D{ mesh.point( edge_vertices[0] ),
+                       mesh.point( edge_vertices[1] ) } } ) )
                <= geode::global_epsilon;
     }
 
@@ -216,8 +217,8 @@ namespace geode
         const auto& mesh = line.mesh();
         for( const auto edge_id : Range{ mesh.nb_edges() } )
         {
-            const auto e0 = mesh.edge_vertex( { 0, 0 } );
-            const auto e1 = mesh.edge_vertex( { 0, 1 } );
+            const auto e0 = mesh.edge_vertex( { edge_id, 0 } );
+            const auto e1 = mesh.edge_vertex( { edge_id, 1 } );
             auto polygons = border_polygons( brep, line, e0, e1 );
             if( !polygons.first )
             {
