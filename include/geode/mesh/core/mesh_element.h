@@ -92,4 +92,34 @@ namespace std
                    ^ absl::Hash< geode::index_t >()( mesh_element.element_id );
         }
     };
+
+    template <>
+    struct hash< geode::MeshVertex >
+    {
+    public:
+        size_t operator()( const geode::MeshVertex& mesh_vertex ) const
+        {
+            return std::hash< geode::MeshElement >()( mesh_vertex );
+        }
+    };
+
+    template <>
+    struct hash< geode::MeshEdge >
+    {
+    public:
+        size_t operator()( const geode::MeshEdge& mesh_edge ) const
+        {
+            return std::hash< geode::MeshElement >()( mesh_edge );
+        }
+    };
+
+    template <>
+    struct hash< geode::MeshPolygon >
+    {
+    public:
+        size_t operator()( const geode::MeshPolygon& mesh_polygon ) const
+        {
+            return std::hash< geode::MeshElement >()( mesh_polygon );
+        }
+    };
 } // namespace std
