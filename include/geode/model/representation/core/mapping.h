@@ -28,8 +28,11 @@
 #include <geode/basic/mapping.h>
 #include <geode/basic/uuid.h>
 
+#include <geode/mesh/core/mesh_element.h>
+
 #include <geode/model/common.h>
-#include <geode/model/mixin/core/component_type.h>
+#include <geode/model/mixin/core/component_mesh_element.h>
+#include <geode/model/mixin/core/vertex_identifier.h>
 
 namespace geode
 {
@@ -66,4 +69,11 @@ namespace geode
     using ModelCopyMapping = ModelMapping< BijectiveMapping< uuid > >;
 
     using ModelGenericMapping = ModelMapping< GenericMapping< uuid > >;
+
+    using ComponentMeshElementMapping =
+        GenericMapping< MeshElement, ComponentMeshElement >;
+
+    using ComponentMeshVertexMapping =
+        GenericMapping< MeshVertex, ComponentMeshVertex >;
+
 } // namespace geode

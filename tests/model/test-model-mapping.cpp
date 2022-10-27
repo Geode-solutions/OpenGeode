@@ -25,6 +25,7 @@
 #include <geode/basic/logger.h>
 
 #include <geode/model/mixin/core/corner.h>
+#include <geode/model/mixin/core/line.h>
 #include <geode/model/mixin/core/surface.h>
 #include <geode/model/representation/core/mapping.h>
 
@@ -107,10 +108,82 @@ void test_generic_mapping()
     }
 }
 
+void test_components_mapping()
+{
+    geode::ComponentMeshVertexMapping vertices_mapping;
+    geode::ComponentMeshVertexMapping elements_mapping;
+
+    std::vector< geode::uuid > uuids_in( 3 );
+    std::vector< geode::uuid > uuids_out( 3 );
+
+    for( const auto mesh_id : geode::LRange{ 2 } )
+    {
+        for( const auto vertex_id : geode::Range{ 10 } )
+        {
+            vertices_mapping.map( { uuids_in[mesh_id], vertex_id },
+                { { geode::Line3D::component_type_static(),
+                      uuids_out[mesh_id] },
+                    2 * vertex_id } );
+        }
+        for( const auto element_id : geode::Range{ 8 } )
+        {
+            elements_mapping.map( { uuids_in[mesh_id], element_id },
+                { { geode::Line3D::component_type_static(),
+                      uuids_out[mesh_id] },
+                    8 - element_id } );
+        }
+    }
+    for( const auto vertex_id : geode::Range{ 9 } )
+    {
+        vertices_mapping.map( { uuids_in[2], vertex_id },
+            { { geode::Surface3D::component_type_static(), uuids_out[2] },
+                3 * vertex_id } );
+    }
+    for( const auto element_id : geode::Range{ 5 } )
+    {
+        elements_mapping.map( { uuids_in[2], element_id },
+            { { geode::Surface3D::component_type_static(), uuids_out[2] },
+                element_id + 2 } );
+    }
+
+    OPENGEODE_EXCEPTION( vertices_mapping.size_in() == 29,
+        "[Test] Wrong size for vertices mappings" );
+    OPENGEODE_EXCEPTION( elements_mapping.size_out() == 21,
+        "[Test] Wrong size for elements mappings" );
+    for( const auto mesh_id : geode::LRange{ 2 } )
+    {
+        for( const auto vertex_id : geode::Range{ 10 } )
+        {
+            geode::ComponentMeshVertex value{
+                { geode::Line3D::component_type_static(), uuids_out[mesh_id] },
+                2 * vertex_id
+            };
+            OPENGEODE_EXCEPTION(
+                vertices_mapping.in2out( { uuids_in[mesh_id], vertex_id } )
+                        .at( 0 )
+                    == value,
+                "[Test] Wrong mapping for vertices (in2out)" );
+        }
+        for( const auto element_id : geode::Range{ 8 } )
+        {
+            geode::ComponentMeshVertex value{
+                { geode::Line3D::component_type_static(), uuids_out[mesh_id] },
+                8 - element_id
+            };
+            OPENGEODE_EXCEPTION(
+                elements_mapping.in2out( { uuids_in[mesh_id], element_id } )
+                        .at( 0 )
+                    == value,
+                "[Test] Wrong mapping for elements (in2out)" );
+        }
+    }
+}
+
 void test()
 {
     test_copy_mapping();
     test_generic_mapping();
+    test_components_mapping();
 }
 
 OPENGEODE_TEST( "model-mapping" )
