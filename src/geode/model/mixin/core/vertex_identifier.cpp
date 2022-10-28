@@ -76,6 +76,11 @@ namespace geode
             return unique_vertices_.nb_vertices();
         }
 
+        bool is_unique_vertex_isolated( index_t unique_vertex_id ) const
+        {
+            return component_mesh_vertices( unique_vertex_id ).empty();
+        }
+
         const std::vector< ComponentMeshVertex >& component_mesh_vertices(
             index_t unique_vertex_id ) const
         {
@@ -213,6 +218,10 @@ namespace geode
         void set_unique_vertex( ComponentMeshVertex component_vertex_id,
             const index_t unique_vertex_id )
         {
+            OPENGEODE_ASSERT( unique_vertex_id < nb_unique_vertices(),
+                "[VertexIdentifier::set_unique_vertex] Unique vertex ",
+                unique_vertex_id, " does not exist (nb=", nb_unique_vertices(),
+                ")" );
             const auto& old_unique_id =
                 vertex2unique_vertex_
                     .at( component_vertex_id.component_id.id() )
@@ -312,13 +321,12 @@ namespace geode
                 components_vertices;
             for( const auto v : Range{ unique_vertices_.nb_vertices() } )
             {
-                const auto& vertices = component_mesh_vertices( v );
-                if( vertices.empty() )
+                if( is_unique_vertex_isolated( v ) )
                 {
                     to_delete[v] = true;
                     continue;
                 }
-                for( const auto& cmv : vertices )
+                for( const auto& cmv : component_mesh_vertices( v ) )
                 {
                     components_vertices[cmv.component_id.id()].emplace_back(
                         cmv.vertex );
@@ -458,6 +466,12 @@ namespace geode
     index_t VertexIdentifier::nb_unique_vertices() const
     {
         return impl_->nb_unique_vertices();
+    }
+
+    bool VertexIdentifier::is_unique_vertex_isolated(
+        index_t unique_vertex_id ) const
+    {
+        return impl_->is_unique_vertex_isolated( unique_vertex_id );
     }
 
     const std::vector< ComponentMeshVertex >&

@@ -53,6 +53,8 @@ namespace geode
 
         index_t nb_unique_vertices() const;
 
+        bool is_unique_vertex_isolated( index_t unique_vertex_id ) const;
+
         /*!
          * Return the component vertices identified with an unique vertex.
          * @param[in] unique_vertex_id Indice of the unique vertex.
