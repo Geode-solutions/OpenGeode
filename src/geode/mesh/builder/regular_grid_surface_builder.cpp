@@ -50,18 +50,37 @@ namespace geode
     {
         set_grid_dimensions(
             std::move( cells_number ), std::move( cells_length ) );
-        grid_.vertex_attribute_manager().resize(
-            grid_.nb_vertices_in_direction( 0 )
-            * grid_.nb_vertices_in_direction( 1 ) );
+        const auto nb_u = grid_.nb_cells_in_direction( 0 );
+        const auto nb_v = grid_.nb_cells_in_direction( 1 );
+        grid_.vertex_attribute_manager().resize( ( nb_u + 1 ) * ( nb_v + 1 ) );
         grid_.polygon_attribute_manager().resize( grid_.nb_cells() );
-        for( const auto p : Range{ grid_.nb_polygons() } )
+        for( const auto v : Range{ nb_v } )
         {
-            for( const auto v : LRange{ 4 } )
+            for( const auto u : Range{ nb_u } )
             {
-                associate_polygon_vertex_to_vertex(
-                    { p, v }, grid_.polygon_vertex( { p, v } ) );
+                const auto cell = u + v * nb_u;
+                const auto vertex = u + v * ( nb_u + 1 );
+                associate_polygon_vertex_to_vertex( { cell, 0 }, vertex );
             }
         }
+        // Last Line U
+        for( const auto v : Range{ nb_v } )
+        {
+            const auto cell = ( nb_u - 1 ) + v * nb_u;
+            const auto vertex = nb_u + v * ( nb_u + 1 );
+            associate_polygon_vertex_to_vertex( { cell, 1 }, vertex );
+        }
+        // Last Line V
+        for( const auto u : Range{ nb_u } )
+        {
+            const auto cell = u + ( nb_v - 1 ) * nb_u;
+            const auto vertex = u + nb_v * ( nb_u + 1 );
+            associate_polygon_vertex_to_vertex( { cell, 2 }, vertex );
+        }
+        // Last Corner U-V
+        const auto cell = ( nb_u - 1 ) + ( nb_v - 1 ) * nb_u;
+        const auto vertex = nb_u + nb_v * ( nb_u + 1 );
+        associate_polygon_vertex_to_vertex( { cell, 3 }, vertex );
         update_origin( origin );
     }
 
