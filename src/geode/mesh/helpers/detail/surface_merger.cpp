@@ -133,6 +133,7 @@ namespace geode
                 create_points( info );
                 vertices_ = std::move( info.colocated_mapping );
                 create_polygons();
+                create_adjacencies();
                 clean_surface();
                 surface_->polygon_attribute_manager().delete_attribute(
                     from_surface );
@@ -184,7 +185,6 @@ namespace geode
                         }
                     }
                 }
-                builder_->compute_polygon_adjacencies();
                 separate_surfaces();
                 repair_polygon_orientations( *surface_ );
             }
