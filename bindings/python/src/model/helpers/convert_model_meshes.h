@@ -41,6 +41,7 @@ namespace geode
                 ( void ( * )( BRep& ) )
                     & convert_surface_meshes_into_triangulated_surfaces )
             .def( "convert_brep_block_meshes_into_tetrahedral_solids",
-                &convert_block_meshes_into_tetrahedral_solids );
+                ( void ( * )( BRep& ) )
+                    & convert_block_meshes_into_tetrahedral_solids );
     }
 } // namespace geode
