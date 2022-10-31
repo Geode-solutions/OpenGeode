@@ -64,6 +64,8 @@ namespace geode
                                         public Identifier
     {
     public:
+        static constexpr index_t dimension{ 2 };
+
         class opengeode_model_api BoundaryCornerRange
             : public Relationships::BoundaryRangeIterator,
               public BeginEnd< BoundaryCornerRange >
