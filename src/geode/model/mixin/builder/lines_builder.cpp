@@ -69,6 +69,7 @@ namespace geode
         const uuid& id, absl::string_view name )
     {
         lines_.modifiable_line( id ).set_line_name( name, {} );
+        line_mesh_builder( id )->set_name( name );
     }
 
     template < index_t dimension >
