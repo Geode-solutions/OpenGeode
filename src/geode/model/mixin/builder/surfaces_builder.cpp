@@ -63,6 +63,7 @@ namespace geode
         const uuid& id, absl::string_view name )
     {
         surfaces_.modifiable_surface( id ).set_surface_name( name, {} );
+        surface_mesh_builder( id )->set_name( name );
     }
 
     template < index_t dimension >

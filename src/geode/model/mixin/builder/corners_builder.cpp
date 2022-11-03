@@ -72,6 +72,7 @@ namespace geode
         const uuid& id, absl::string_view name )
     {
         corners_.modifiable_corner( id ).set_corner_name( name, {} );
+        corner_mesh_builder( id )->set_name( name );
     }
 
     template < index_t dimension >
