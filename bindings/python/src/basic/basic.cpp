@@ -29,9 +29,11 @@
 
 #include "attribute.h"
 #include "attribute_manager.h"
+#include "greyscale_color.h"
 #include "identifier.h"
 #include "identifier_builder.h"
 #include "mapping.h"
+#include "rgb_color.h"
 #include "uuid.h"
 
 namespace pybind11
@@ -67,4 +69,6 @@ PYBIND11_MODULE( opengeode_py_basic, module )
     geode::define_mapping( module );
     geode::define_identifier( module );
     geode::define_identifier_builder( module );
+    geode::define_rgb_color( module );
+    geode::define_greyscale_color( module );
 }
