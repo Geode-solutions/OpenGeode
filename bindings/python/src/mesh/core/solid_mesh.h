@@ -133,6 +133,7 @@ namespace geode
             .def( pybind11::init< index_t, index_t >() )
             .def( pybind11::self == pybind11::self )
             .def( pybind11::self != pybind11::self )
+            .def( "string", &PolyhedronVertex::string )
             .def_readwrite( "polyhedron_id", &PolyhedronVertex::polyhedron_id )
             .def_readwrite( "vertex_id", &PolyhedronVertex::vertex_id );
 
@@ -141,6 +142,7 @@ namespace geode
             .def( pybind11::init< index_t, index_t >() )
             .def( pybind11::self == pybind11::self )
             .def( pybind11::self != pybind11::self )
+            .def( "string", &PolyhedronFacet::string )
             .def_readwrite( "polyhedron_id", &PolyhedronFacet::polyhedron_id )
             .def_readwrite( "facet_id", &PolyhedronFacet::facet_id );
 
@@ -150,8 +152,19 @@ namespace geode
             .def( pybind11::init< PolyhedronFacet, index_t >() )
             .def( pybind11::self == pybind11::self )
             .def( pybind11::self != pybind11::self )
+            .def( "string", &PolyhedronFacetVertex::string )
             .def_readwrite(
                 "polyhedron_facet", &PolyhedronFacetVertex::polyhedron_facet )
             .def_readwrite( "vertex_id", &PolyhedronFacetVertex::vertex_id );
+
+        pybind11::class_< PolyhedronFacetEdge >( module, "PolyhedronFacetEdge" )
+            .def( pybind11::init<>() )
+            .def( pybind11::init< PolyhedronFacet, local_index_t >() )
+            .def( pybind11::self == pybind11::self )
+            .def( pybind11::self != pybind11::self )
+            .def( "string", &PolyhedronFacetEdge::string )
+            .def_readwrite(
+                "polyhedron_facet", &PolyhedronFacetEdge::polyhedron_facet )
+            .def_readwrite( "edge_id", &PolyhedronFacetEdge::edge_id );
     }
 } // namespace geode
