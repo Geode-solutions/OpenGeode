@@ -49,19 +49,12 @@ namespace geode
             index_t cell_index( const RegularGrid< dimension >& grid,
                 const GridCellIndices< dimension >& index ) const
             {
-                index_t cell_id{ 0 };
-                for( const auto d : LRange{ dimension } )
+                const auto nb_u = grid.nb_cells_in_direction( 0 );
+                auto cell_id = index[0] + index[1] * nb_u;
+                if( dimension == 3 )
                 {
-                    OPENGEODE_ASSERT(
-                        index[d] < grid.nb_cells_in_direction( d ),
-                        "[RegularGrid::cell_index] Invalid index" );
-
-                    index_t offset{ 1 };
-                    for( const auto d2 : LRange{ d } )
-                    {
-                        offset *= grid.nb_cells_in_direction( d2 );
-                    }
-                    cell_id += offset * index[d];
+                    cell_id +=
+                        index[2] * nb_u * grid.nb_cells_in_direction( 1 );
                 }
                 return cell_id;
             }
