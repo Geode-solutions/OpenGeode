@@ -772,25 +772,28 @@ namespace geode
             const std::array< index_t, 2 >& edge_vertices,
             index_t polyhedron_id ) const
     {
-        for( const auto f : LRange{ nb_polyhedron_facets( polyhedron_id ) } )
+        const auto facet_vertices = polyhedron_facets_vertices( polyhedron_id );
+        for( const auto f : LIndices{ facet_vertices } )
         {
-            const PolyhedronFacet facet{ polyhedron_id, f };
-            const auto vertices = polyhedron_facet_vertices( facet );
+            const auto& vertices = facet_vertices[f];
             for( const auto v : LIndices{ vertices } )
             {
                 const auto next = v == vertices.size() - 1 ? 0 : v + 1;
-                if( vertices[v] == edge_vertices[0]
-                    && vertices[next] == edge_vertices[1] )
+                if( vertices[v] == edge_vertices[0] )
                 {
-                    return absl::optional< PolyhedronFacetEdge >{
-                        absl::in_place, facet, v
-                    };
+                    if( vertices[next] == edge_vertices[1] )
+                    {
+                        return absl::optional< PolyhedronFacetEdge >{
+                            absl::in_place, PolyhedronFacet{ polyhedron_id, f },
+                            v
+                        };
+                    }
                 }
-                if( vertices[v] == edge_vertices[1]
-                    && vertices[next] == edge_vertices[0] )
+                else if( vertices[v] == edge_vertices[1]
+                         && vertices[next] == edge_vertices[0] )
                 {
                     return absl::optional< PolyhedronFacetEdge >{
-                        absl::in_place, facet, v
+                        absl::in_place, PolyhedronFacet{ polyhedron_id, f }, v
                     };
                 }
             }
