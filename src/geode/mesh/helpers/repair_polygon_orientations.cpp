@@ -273,7 +273,7 @@ namespace
 
     template < geode::index_t dimension >
     void reorient_bad_polygons( geode::SurfaceMeshBuilder< dimension >& builder,
-        geode::SurfaceMesh< dimension >& mesh,
+        const geode::SurfaceMesh< dimension >& mesh,
         absl::Span< const geode::index_t > bad_polygons )
     {
         for( const auto p : bad_polygons )
@@ -316,12 +316,19 @@ namespace geode
     void repair_polygon_orientations( SurfaceMesh< dimension >& mesh )
     {
         auto builder = SurfaceMeshBuilder< dimension >::create( mesh );
+        repair_polygon_orientations( mesh, *builder );
+    }
+
+    template < index_t dimension >
+    void repair_polygon_orientations( const SurfaceMesh< dimension >& mesh,
+        SurfaceMeshBuilder< dimension >& builder )
+    {
         const auto polygons_to_reorient =
             identify_badly_oriented_polygons( mesh );
-        reorient_bad_polygons( *builder, mesh, polygons_to_reorient );
+        reorient_bad_polygons( builder, mesh, polygons_to_reorient );
         if( mesh.are_edges_enabled() )
         {
-            builder->edges_builder().delete_isolated_edges();
+            builder.edges_builder().delete_isolated_edges();
         }
         Logger::info( "Repair polygons orientations: ",
             polygons_to_reorient.size(), " polygons reoriented" );
@@ -331,4 +338,9 @@ namespace geode
         SurfaceMesh2D& );
     template void opengeode_mesh_api repair_polygon_orientations(
         SurfaceMesh3D& );
+
+    template void opengeode_mesh_api repair_polygon_orientations(
+        const SurfaceMesh2D&, SurfaceMeshBuilder2D& );
+    template void opengeode_mesh_api repair_polygon_orientations(
+        const SurfaceMesh3D&, SurfaceMeshBuilder3D& );
 } // namespace geode

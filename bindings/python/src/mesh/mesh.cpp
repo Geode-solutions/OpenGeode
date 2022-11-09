@@ -62,6 +62,7 @@
 #include "helpers/convert_solid_mesh.h"
 #include "helpers/convert_surface_mesh.h"
 #include "helpers/geometrical_operations_on_mesh.h"
+#include "helpers/repair_polygon_orientations.h"
 
 #include "io/edged_curve.h"
 #include "io/graph.h"
@@ -179,6 +180,7 @@ PYBIND11_MODULE( opengeode_py_mesh, module )
     geode::define_convert_point_set( module );
     geode::define_convert_surface_mesh( module );
     geode::define_convert_solid_mesh( module );
+    geode::define_repair_polygon_orientations( module );
     geode::geometrical_operations_on_mesh( module );
 
     geode::define_vertex_set_io( module );

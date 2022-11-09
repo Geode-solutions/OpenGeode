@@ -21,22 +21,17 @@
  *
  */
 
-#pragma once
-
-#include <geode/mesh/common.h>
+#include <geode/mesh/helpers/repair_polygon_orientations.h>
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMesh );
-    FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMeshBuilder );
-} // namespace geode
-
-namespace geode
-{
-    template < index_t dimension >
-    void repair_polygon_orientations( SurfaceMesh< dimension >& mesh );
-
-    template < index_t dimension >
-    void repair_polygon_orientations( const SurfaceMesh< dimension >& mesh,
-        SurfaceMeshBuilder< dimension >& builder );
+    void define_repair_polygon_orientations( pybind11::module& module )
+    {
+        module.def( "repair_polygon_orientations2D",
+            ( void ( * )( SurfaceMesh< 2 >& ) )
+                & repair_polygon_orientations< 2 > );
+        module.def( "repair_polygon_orientations3D",
+            ( void ( * )( SurfaceMesh< 3 >& ) )
+                & repair_polygon_orientations< 3 > );
+    }
 } // namespace geode
