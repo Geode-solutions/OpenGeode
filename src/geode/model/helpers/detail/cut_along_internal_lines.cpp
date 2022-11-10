@@ -25,6 +25,8 @@
 
 #include <async++.h>
 
+#include <absl/memory/memory.h>
+
 #include <geode/basic/pimpl_impl.h>
 
 #include <geode/geometry/point.h>
@@ -63,7 +65,17 @@ namespace geode
             };
 
         public:
-            Impl( Model& model ) : model_( model ), builder_{ model } {}
+            Impl( Model& model )
+                : model_( model ),
+                  builder_ptr_{ absl::make_unique< ModelBuilder >( model ) },
+                  builder_( *builder_ptr_ )
+            {
+            }
+
+            Impl( const Model& model, ModelBuilder& builder )
+                : model_( model ), builder_( builder )
+            {
+            }
 
             CMVmappings cut()
             {
@@ -246,13 +258,21 @@ namespace geode
 
         private:
             const Model& model_;
-            ModelBuilder builder_;
+            std::unique_ptr< ModelBuilder > builder_ptr_;
+            ModelBuilder& builder_;
         };
 
         template < typename Model, typename ModelBuilder, index_t dimension >
         CutAlongInternalLines< Model, ModelBuilder, dimension >::
             CutAlongInternalLines( Model& model )
-            : impl_( model )
+            : impl_{ model }
+        {
+        }
+
+        template < typename Model, typename ModelBuilder, index_t dimension >
+        CutAlongInternalLines< Model, ModelBuilder, dimension >::
+            CutAlongInternalLines( const Model& model, ModelBuilder& builder )
+            : impl_{ model, builder }
         {
         }
 

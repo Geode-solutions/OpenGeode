@@ -295,6 +295,9 @@ namespace geode
         index_t polyhedron_facet_vertex(
             const PolyhedronFacetVertex& polyhedron_facet_vertex ) const;
 
+        PolyhedronVertex polyhedron_facet_vertex_id(
+            const PolyhedronFacetVertex& polyhedron_facet_vertex ) const;
+
         /*!
          * Return the indices in the mesh of the two polyhedron edge vertices.
          * @param[in] polyhedron_facet_edge Local index of edge in a polyhedron.
@@ -543,13 +546,6 @@ namespace geode
             SolidMeshKey );
 
         void reset_polyhedra_around_vertex( index_t vertex_id, SolidMeshKey );
-
-        PolyhedronVertex polyhedron_facet_vertex_id(
-            const PolyhedronFacetVertex& polyhedron_facet_vertex,
-            SolidMeshKey ) const
-        {
-            return get_polyhedron_facet_vertex_id( polyhedron_facet_vertex );
-        }
 
         SolidEdges< dimension >& edges( SolidMeshKey );
 
