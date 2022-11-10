@@ -692,6 +692,13 @@ namespace geode
     }
 
     template < index_t dimension >
+    PolyhedronVertex SolidMesh< dimension >::polyhedron_facet_vertex_id(
+        const PolyhedronFacetVertex& polyhedron_facet_vertex ) const
+    {
+        return get_polyhedron_facet_vertex_id( polyhedron_facet_vertex );
+    }
+
+    template < index_t dimension >
     PolyhedronFacetVertices SolidMesh< dimension >::polyhedron_facet_vertices(
         const PolyhedronFacet& polyhedron_facet ) const
     {

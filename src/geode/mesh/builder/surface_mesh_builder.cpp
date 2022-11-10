@@ -306,6 +306,24 @@ namespace
             builder.create_polygon( vertices );
         }
     }
+
+    template < geode::index_t dimension >
+    void update_edge( const geode::SurfaceMesh< dimension >& surface,
+        geode::SurfaceMeshBuilder< dimension >& builder,
+        const geode::PolygonVertex& polygon_vertex,
+        geode::index_t old_vertex_id,
+        geode::index_t new_vertex_id )
+    {
+        const auto previous_id = surface.polygon_vertex(
+            surface.previous_polygon_vertex( polygon_vertex ) );
+        const auto next_id = surface.polygon_vertex(
+            surface.next_polygon_edge( polygon_vertex ) );
+        auto edges = builder.edges_builder();
+        edges.update_edge_vertex(
+            { old_vertex_id, next_id }, 0, new_vertex_id );
+        edges.update_edge_vertex(
+            { previous_id, old_vertex_id }, 1, new_vertex_id );
+    }
 } // namespace
 
 namespace geode
@@ -399,15 +417,8 @@ namespace geode
         {
             if( surface_mesh_.are_edges_enabled() )
             {
-                const auto previous_id = surface_mesh_.polygon_vertex(
-                    surface_mesh_.previous_polygon_vertex( polygon_around ) );
-                const auto next_id = surface_mesh_.polygon_vertex(
-                    surface_mesh_.next_polygon_edge( polygon_around ) );
-                auto edges = edges_builder();
-                edges.update_edge_vertex(
-                    { old_vertex_id, next_id }, 0, new_vertex_id );
-                edges.update_edge_vertex(
-                    { previous_id, old_vertex_id }, 1, new_vertex_id );
+                update_edge( surface_mesh_, *this, polygon_around,
+                    old_vertex_id, new_vertex_id );
             }
             update_polygon_vertex( polygon_around, new_vertex_id );
         }
@@ -447,15 +458,8 @@ namespace geode
 
         if( surface_mesh_.are_edges_enabled() )
         {
-            const auto previous_id = surface_mesh_.polygon_vertex(
-                surface_mesh_.previous_polygon_vertex( polygon_vertex ) );
-            const auto next_id = surface_mesh_.polygon_vertex(
-                surface_mesh_.next_polygon_edge( polygon_vertex ) );
-            auto edges = edges_builder();
-            edges.update_edge_vertex(
-                { polygon_vertex_id, next_id }, 0, vertex_id );
-            edges.update_edge_vertex(
-                { previous_id, polygon_vertex_id }, 1, vertex_id );
+            update_edge( surface_mesh_, *this, polygon_vertex,
+                polygon_vertex_id, vertex_id );
         }
         update_polygon_vertex( polygon_vertex, vertex_id );
     }
