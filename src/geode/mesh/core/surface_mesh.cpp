@@ -553,36 +553,42 @@ namespace geode
         const auto polygon_adj_id = polygon_adj.value();
         const auto v0 = polygon_vertex( polygon_edge );
         const auto v1 = polygon_edge_vertex( polygon_edge, 1 );
-        for( const auto e : LRange{ nb_polygon_edges( polygon_adj_id ) } )
+        const auto adj_vertices = polygon_vertices( polygon_adj_id );
+        const auto nb_edges = adj_vertices.size();
+        for( const auto e : LRange{ nb_edges } )
         {
-            const PolygonEdge adj_edge{ polygon_adj_id, e };
-            const auto adj_v0 = polygon_vertex( adj_edge );
-            if( v0 == adj_v0 )
+            if( v0 == adj_vertices[e] )
             {
-                const auto adj_v1 = polygon_edge_vertex( adj_edge, 1 );
-                if( v1 == adj_v1 )
+                const auto enext = e + 1 == nb_edges
+                                       ? 0u
+                                       : static_cast< local_index_t >( e + 1 );
+                if( v1 == adj_vertices[enext] )
                 {
-                    OPENGEODE_ASSERT(
-                        polygon_adjacent( adj_edge ) == polygon_edge.polygon_id,
+                    OPENGEODE_ASSERT( polygon_adjacent( { polygon_adj_id, e } )
+                                          == polygon_edge.polygon_id,
                         absl::StrCat( "[SurfaceMesh::polygon_adjacent_"
                                       "edge] Wrong adjacency with polygons: ",
                             polygon_edge.polygon_id, " and ",
                             polygon_adj_id ) );
-                    return adj_edge;
+                    return absl::optional< PolygonEdge >{ absl::in_place,
+                        polygon_adj_id, e };
                 }
             }
-            else if( v1 == adj_v0 )
+            else if( v1 == adj_vertices[e] )
             {
-                const auto adj_v1 = polygon_edge_vertex( adj_edge, 1 );
-                if( v0 == adj_v1 )
+                const auto enext = e + 1 == nb_edges
+                                       ? 0u
+                                       : static_cast< local_index_t >( e + 1 );
+                if( v0 == adj_vertices[enext] )
                 {
-                    OPENGEODE_ASSERT(
-                        polygon_adjacent( adj_edge ) == polygon_edge.polygon_id,
+                    OPENGEODE_ASSERT( polygon_adjacent( { polygon_adj_id, e } )
+                                          == polygon_edge.polygon_id,
                         absl::StrCat( "[SurfaceMesh::polygon_adjacent_"
                                       "edge] Wrong adjacency with polygons: ",
                             polygon_edge.polygon_id, " and ",
                             polygon_adj_id ) );
-                    return adj_edge;
+                    return absl::optional< PolygonEdge >{ absl::in_place,
+                        polygon_adj_id, e };
                 }
             }
         }
