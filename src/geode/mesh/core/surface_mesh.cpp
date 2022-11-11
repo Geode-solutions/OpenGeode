@@ -559,7 +559,7 @@ namespace geode
         {
             if( v0 == adj_vertices[e] )
             {
-                const auto enext = e + 1 == nb_edges
+                const auto enext = e == nb_edges - 1
                                        ? 0u
                                        : static_cast< local_index_t >( e + 1 );
                 if( v1 == adj_vertices[enext] )
@@ -576,7 +576,7 @@ namespace geode
             }
             else if( v1 == adj_vertices[e] )
             {
-                const auto enext = e + 1 == nb_edges
+                const auto enext = e == nb_edges - 1
                                        ? 0u
                                        : static_cast< local_index_t >( e + 1 );
                 if( v0 == adj_vertices[enext] )
