@@ -291,8 +291,9 @@ namespace
             absl::c_reverse( adjacents );
             for( const auto v : geode::LRange{ mesh.nb_polygon_vertices( p ) } )
             {
+                const auto bad_polygon_vertex = mesh.polygon_vertex( { p, v } );
                 builder.disassociate_polygon_vertex_to_vertex(
-                    mesh.polygon_vertex( { p, v } ) );
+                    bad_polygon_vertex );
                 builder.set_polygon_vertex( { p, v }, vertices[v] );
                 builder.associate_polygon_vertex_to_vertex(
                     { p, v }, vertices[v] );
@@ -305,6 +306,7 @@ namespace
                 {
                     builder.unset_polygon_adjacent( { p, v } );
                 }
+                builder.reset_polygons_around_vertex( bad_polygon_vertex );
             }
         }
     }
