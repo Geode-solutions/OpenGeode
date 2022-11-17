@@ -23,6 +23,7 @@ add_geode_library(
     FOLDER "geode/model"
     SOURCES
         "common.cpp"
+        "helpers/aabb_model_helpers.cpp"
         "helpers/component_mesh_edges.cpp"
         "helpers/component_mesh_polygons.cpp"
         "helpers/component_mesh_vertices.cpp"
@@ -69,6 +70,7 @@ add_geode_library(
         "representation/io/section_output.cpp"
     PUBLIC_HEADERS
         "common.h"
+        "helpers/aabb_model_helpers.h"
         "helpers/component_mesh_edges.h"
         "helpers/component_mesh_polygons.h"
         "helpers/component_mesh_vertices.h"
