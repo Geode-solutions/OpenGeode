@@ -227,23 +227,25 @@ namespace geode
         index_t first_polyhedron ) const
     {
         PolyhedraAroundEdge result{ first_polyhedron };
-        const auto v0 =
-            this->vertex_in_polyhedron( first_polyhedron, vertices[0] );
-        OPENGEODE_ASSERT( v0, "[TetrahedralSolid::polyhedra_around_edge] First "
-                              "vertex is not in given tetrahedron" );
-        const auto v1 =
-            this->vertex_in_polyhedron( first_polyhedron, vertices[1] );
-        OPENGEODE_ASSERT( v1,
-            "[TetrahedralSolid::polyhedra_around_edge] Second "
-            "vertex is not in given tetrahedron" );
+        std::array< index_t, 2 > excluded_facets{ NO_ID, NO_ID };
+        local_index_t count{ 0 };
+        const auto polyhedron_vertices =
+            this->polyhedron_vertices( first_polyhedron );
+        for( const auto v : LRange{ 4 } )
+        {
+            if( polyhedron_vertices[v] == vertices[0]
+                || polyhedron_vertices[v] == vertices[1] )
+            {
+                excluded_facets[count++] = v;
+            }
+        }
         for( const auto f : LRange{ 4 } )
         {
-            if( f == v0 || f == v1 )
+            if( f == excluded_facets[0] || f == excluded_facets[1] )
             {
                 continue;
             }
-            const auto vertex_id =
-                this->polyhedron_vertex( { first_polyhedron, f } );
+            const auto vertex_id = polyhedron_vertices[f];
             if( vertex_id == vertices[0] || vertex_id == vertices[1] )
             {
                 continue;
@@ -273,7 +275,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< std::array< index_t, 2 > >
+    PolyhedronEdgesVertices
         TetrahedralSolid< dimension >::polyhedron_edges_vertices(
             index_t polyhedron ) const
     {
@@ -282,8 +284,7 @@ namespace geode
             this->polyhedron_vertex( { polyhedron, 1 } ),
             this->polyhedron_vertex( { polyhedron, 2 } ),
             this->polyhedron_vertex( { polyhedron, 3 } ) };
-        std::vector< std::array< index_t, 2 > > result;
-        result.reserve( detail::tetrahedron_edge_vertices.size() );
+        PolyhedronEdgesVertices result;
         for( const auto& edge : detail::tetrahedron_edge_vertices )
         {
             result.emplace_back( std::array< index_t, 2 >{
@@ -306,7 +307,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< PolyhedronFacetVertices >
+    PolyhedronFacetsVertices
         TetrahedralSolid< dimension >::polyhedron_facets_vertices(
             index_t polyhedron ) const
     {
@@ -315,8 +316,7 @@ namespace geode
             this->polyhedron_vertex( { polyhedron, 1 } ),
             this->polyhedron_vertex( { polyhedron, 2 } ),
             this->polyhedron_vertex( { polyhedron, 3 } ) };
-        std::vector< PolyhedronFacetVertices > result;
-        result.reserve( detail::tetrahedron_facet_vertices.size() );
+        PolyhedronFacetsVertices result;
         for( const auto& facet : detail::tetrahedron_facet_vertices )
         {
             result.emplace_back( PolyhedronFacetVertices{

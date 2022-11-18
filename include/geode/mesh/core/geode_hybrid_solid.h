@@ -138,10 +138,10 @@ namespace geode
         absl::optional< index_t > get_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet ) const override;
 
-        std::vector< std::array< index_t, 2 > > polyhedron_edges_vertices(
+        PolyhedronEdgesVertices polyhedron_edges_vertices(
             index_t polyhedron ) const final;
 
-        std::vector< PolyhedronFacetVertices > polyhedron_facets_vertices(
+        PolyhedronFacetsVertices polyhedron_facets_vertices(
             index_t polyhedron ) const final;
 
         typename HybridSolid< dimension >::Type polyhedron_type(

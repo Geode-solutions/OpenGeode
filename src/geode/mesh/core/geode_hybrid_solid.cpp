@@ -51,12 +51,12 @@ namespace
     };
 
     template < typename Data >
-    std::vector< std::array< geode::index_t, 2 > > polyhedron_edges_vertices(
+    geode::PolyhedronEdgesVertices polyhedron_edges_vertices(
         const geode::HybridSolid3D& mesh,
         geode::index_t polyhedron,
         const Data& data )
     {
-        std::vector< std::array< geode::index_t, 2 > > result;
+        geode::PolyhedronEdgesVertices result;
         result.reserve( data.size() );
         for( const auto& edge : data )
         {
@@ -68,12 +68,12 @@ namespace
     }
 
     template < typename Data >
-    std::vector< geode::PolyhedronFacetVertices > polyhedron_facets_vertices(
+    geode::PolyhedronFacetsVertices polyhedron_facets_vertices(
         const geode::HybridSolid3D& mesh,
         geode::index_t polyhedron,
         const Data& data )
     {
-        std::vector< geode::PolyhedronFacetVertices > result;
+        geode::PolyhedronFacetsVertices result;
         result.reserve( data.size() );
         for( const auto& facet : data )
         {
@@ -293,7 +293,7 @@ namespace geode
                 polyhedron_adjacents_.end() );
         }
 
-        std::vector< std::array< index_t, 2 > > polyhedron_edges_vertices(
+        PolyhedronEdgesVertices polyhedron_edges_vertices(
             const HybridSolid< dimension >& solid, index_t polyhedron ) const
         {
             switch( polyhedron_type( polyhedron ) )
@@ -317,7 +317,7 @@ namespace geode
             return {};
         }
 
-        std::vector< PolyhedronFacetVertices > polyhedron_facets_vertices(
+        PolyhedronFacetsVertices polyhedron_facets_vertices(
             const HybridSolid< dimension >& solid, index_t polyhedron ) const
         {
             switch( polyhedron_type( polyhedron ) )
@@ -604,7 +604,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< std::array< index_t, 2 > >
+    PolyhedronEdgesVertices
         OpenGeodeHybridSolid< dimension >::polyhedron_edges_vertices(
             index_t polyhedron ) const
     {
@@ -612,7 +612,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< PolyhedronFacetVertices >
+    PolyhedronFacetsVertices
         OpenGeodeHybridSolid< dimension >::polyhedron_facets_vertices(
             index_t polyhedron ) const
     {

@@ -197,7 +197,13 @@ namespace geode
         local_index_t edge_id{ NO_LID };
     };
 
+    using PolyhedronEdgesVertices =
+        absl::InlinedVector< std::array< index_t, 2 >, 6 >;
+
     using PolyhedronFacetVertices = absl::InlinedVector< index_t, 3 >;
+
+    using PolyhedronFacetsVertices =
+        absl::InlinedVector< PolyhedronFacetVertices, 4 >;
 
     using PolyhedronVertices = absl::InlinedVector< index_t, 4 >;
 
@@ -314,8 +320,8 @@ namespace geode
                 const std::array< index_t, 2 >& edge_vertices,
                 index_t polyhedron_id ) const;
 
-        virtual std::vector< std::array< index_t, 2 > >
-            polyhedron_edges_vertices( index_t polyhedron ) const;
+        virtual PolyhedronEdgesVertices polyhedron_edges_vertices(
+            index_t polyhedron ) const;
 
         absl::optional< PolyhedronFacet > polyhedron_facet_from_vertices(
             PolyhedronFacetVertices polyhedron_facet_vertices ) const;
@@ -323,8 +329,8 @@ namespace geode
         PolyhedronFacetVertices polyhedron_facet_vertices(
             const PolyhedronFacet& polyhedron_facet ) const;
 
-        virtual std::vector< PolyhedronFacetVertices >
-            polyhedron_facets_vertices( index_t polyhedron ) const;
+        virtual PolyhedronFacetsVertices polyhedron_facets_vertices(
+            index_t polyhedron ) const;
 
         virtual PolyhedronFacets polyhedron_vertex_facets(
             const PolyhedronVertex& polyhedron_vertex ) const;
