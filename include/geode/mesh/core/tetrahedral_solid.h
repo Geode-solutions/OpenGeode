@@ -63,10 +63,10 @@ namespace geode
 
         std::unique_ptr< TetrahedralSolid< dimension > > clone() const;
 
-        std::vector< std::array< index_t, 2 > > polyhedron_edges_vertices(
+        PolyhedronEdgesVertices polyhedron_edges_vertices(
             index_t polyhedron ) const final;
 
-        std::vector< PolyhedronFacetVertices > polyhedron_facets_vertices(
+        PolyhedronFacetsVertices polyhedron_facets_vertices(
             index_t polyhedron ) const final;
 
         PolyhedraAroundEdge polyhedra_around_edge(
