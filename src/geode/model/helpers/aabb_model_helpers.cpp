@@ -51,10 +51,11 @@ namespace
         geode::index_t id{ 0 };
         for( const auto& element : range )
         {
-            tasks[id++] = async::spawn( [id, &mapping, &boxes, &element] {
+            tasks[id] = async::spawn( [id, &mapping, &boxes, &element] {
                 mapping[id] = element.id();
                 boxes[id] = element.mesh().bounding_box();
             } );
+            id++;
         }
         async::when_all( tasks.begin(), tasks.end() ).wait();
         return std::make_tuple(
