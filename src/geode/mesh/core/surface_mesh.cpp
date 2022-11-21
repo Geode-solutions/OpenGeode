@@ -945,12 +945,12 @@ namespace geode
     {
         check_polygon_id( *this, polygon_id );
         Vector3D normal;
-        const auto& p0 = this->point( polygon_vertex( { polygon_id, 0 } ) );
+        const auto vertices = polygon_vertices( polygon_id );
+        const auto& p0 = this->point( vertices[0] );
         for( const auto v : LRange{ 2, nb_polygon_vertices( polygon_id ) } )
         {
-            const auto& p1 = this->point( polygon_vertex(
-                { polygon_id, static_cast< local_index_t >( v - 1 ) } ) );
-            const auto& p2 = this->point( polygon_vertex( { polygon_id, v } ) );
+            const auto& p1 = this->point( vertices[v - 1] );
+            const auto& p2 = this->point( vertices[v] );
             if( const auto triangle_normal =
                     Triangle< T >{ p0, p1, p2 }.new_normal() )
             {

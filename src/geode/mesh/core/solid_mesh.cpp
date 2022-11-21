@@ -785,9 +785,9 @@ namespace geode
             const auto& vertices = facet_vertices[f];
             for( const auto v : LIndices{ vertices } )
             {
-                const auto next = v == vertices.size() - 1 ? 0 : v + 1;
                 if( vertices[v] == edge_vertices[0] )
                 {
+                    const auto next = v == vertices.size() - 1 ? 0 : v + 1;
                     if( vertices[next] == edge_vertices[1] )
                     {
                         return absl::optional< PolyhedronFacetEdge >{
@@ -796,12 +796,16 @@ namespace geode
                         };
                     }
                 }
-                else if( vertices[v] == edge_vertices[1]
-                         && vertices[next] == edge_vertices[0] )
+                else if( vertices[v] == edge_vertices[1] )
                 {
-                    return absl::optional< PolyhedronFacetEdge >{
-                        absl::in_place, PolyhedronFacet{ polyhedron_id, f }, v
-                    };
+                    const auto next = v == vertices.size() - 1 ? 0 : v + 1;
+                    if( vertices[next] == edge_vertices[0] )
+                    {
+                        return absl::optional< PolyhedronFacetEdge >{
+                            absl::in_place, PolyhedronFacet{ polyhedron_id, f },
+                            v
+                        };
+                    }
                 }
             }
         }

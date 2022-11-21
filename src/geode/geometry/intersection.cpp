@@ -202,8 +202,9 @@ namespace geode
         // http://www.geometrictools.com/LibMathematics/Intersection/Intersection.html
         // Compute the offset origin, edges, and normal.
         const auto seg_center = segment.barycenter();
-        const Vector3D edge1{ triangle.vertices()[0], triangle.vertices()[1] };
-        const Vector3D edge2{ triangle.vertices()[0], triangle.vertices()[2] };
+        const auto& vertices = triangle.vertices();
+        const Vector3D edge1{ vertices[0], vertices[1] };
+        const Vector3D edge2{ vertices[0], vertices[2] };
         const auto normal = edge1.cross( edge2 );
 
         // Solve Q + t*D = b1*E1 + b2*E2 (Q = diff, D = segment direction,
@@ -228,7 +229,7 @@ namespace geode
             return { IntersectionType::PARALLEL };
         }
 
-        const Vector3D diff{ triangle.vertices()[0], seg_center };
+        const Vector3D diff{ vertices[0], seg_center };
         const auto DdQxE2 =
             sign * segment.normalized_direction().dot( diff.cross( edge2 ) );
         if( DdQxE2 >= 0 )
@@ -280,9 +281,9 @@ namespace geode
                         tri_lambdas.fill( 1. / 3. );
                     }
                     correctness.second.second =
-                        triangle.vertices()[0].get() * tri_lambdas[0]
-                        + triangle.vertices()[1].get() * tri_lambdas[1]
-                        + triangle.vertices()[2].get() * tri_lambdas[2];
+                        vertices[0].get() * tri_lambdas[0]
+                        + vertices[1].get() * tri_lambdas[1]
+                        + vertices[2].get() * tri_lambdas[2];
                     correctness.second.first =
                         std::get< 0 >( point_triangle_distance(
                             correctness.second.second, triangle ) )
@@ -303,8 +304,9 @@ namespace geode
     {
         // http://www.geometrictools.com/LibMathematics/Intersection/Intersection.html
         // Compute the offset origin, edges, and normal.
-        const Vector3D edge1{ triangle.vertices()[0], triangle.vertices()[1] };
-        const Vector3D edge2{ triangle.vertices()[0], triangle.vertices()[2] };
+        const auto& vertices = triangle.vertices();
+        const Vector3D edge1{ vertices[0], vertices[1] };
+        const Vector3D edge2{ vertices[0], vertices[2] };
         const auto normal = edge1.cross( edge2 );
 
         // Solve Q + t*D = b1*E1 + b2*E2 (Q = diff, D = segment direction,
@@ -329,7 +331,7 @@ namespace geode
             return { IntersectionType::PARALLEL };
         }
 
-        const Vector3D diff{ triangle.vertices()[0], line.origin() };
+        const Vector3D diff{ vertices[0], line.origin() };
         const auto DdQxE2 = sign * line.direction().dot( diff.cross( edge2 ) );
         if( DdQxE2 >= 0 )
         {
@@ -360,9 +362,9 @@ namespace geode
                     tri_lambdas.fill( 1. / 3. );
                 }
                 correctness.second.second =
-                    triangle.vertices()[0].get() * tri_lambdas[0]
-                    + triangle.vertices()[1].get() * tri_lambdas[1]
-                    + triangle.vertices()[2].get() * tri_lambdas[2];
+                    vertices[0].get() * tri_lambdas[0]
+                    + vertices[1].get() * tri_lambdas[1]
+                    + vertices[2].get() * tri_lambdas[2];
                 correctness.second.first =
                     point_point_distance( result, correctness.second.second )
                     < global_epsilon;
