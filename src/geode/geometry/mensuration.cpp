@@ -60,17 +60,18 @@ namespace geode
 
     double triangle_signed_area( const Triangle2D& triangle )
     {
+        const auto& vertices = triangle.vertices();
         return dot_perpendicular(
-                   { triangle.vertices()[0], triangle.vertices()[1] },
-                   { triangle.vertices()[0], triangle.vertices()[2] } )
+                   { vertices[0], vertices[1] }, { vertices[0], vertices[2] } )
                / 2.;
     }
 
     double tetrahedron_signed_volume( const Tetrahedron& tetra )
     {
-        return Vector3D{ tetra.vertices()[0], tetra.vertices()[1] }.dot(
-                   Vector3D{ tetra.vertices()[0], tetra.vertices()[2] }.cross(
-                       { tetra.vertices()[0], tetra.vertices()[3] } ) )
+        const auto& vertices = tetra.vertices();
+        return Vector3D{ vertices[0], vertices[1] }.dot(
+                   Vector3D{ vertices[0], vertices[2] }.cross(
+                       { vertices[0], vertices[3] } ) )
                / 6.;
     }
 

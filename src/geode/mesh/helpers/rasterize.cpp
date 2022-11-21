@@ -85,12 +85,10 @@ namespace
         const geode::RegularGrid< dimension >& grid,
         const geode::Triangle< dimension > triangle )
     {
-        const geode::Segment< dimension > edge0{ triangle.vertices()[0],
-            triangle.vertices()[1] };
-        const geode::Segment< dimension > edge1{ triangle.vertices()[1],
-            triangle.vertices()[2] };
-        const geode::Segment< dimension > edge2{ triangle.vertices()[2],
-            triangle.vertices()[0] };
+        const auto& vertices = triangle.vertices();
+        const geode::Segment< dimension > edge0{ vertices[0], vertices[1] };
+        const geode::Segment< dimension > edge1{ vertices[1], vertices[2] };
+        const geode::Segment< dimension > edge2{ vertices[2], vertices[0] };
         auto painted_cells = rasterize_segment( grid, edge0 );
         auto edge1_cells = rasterize_segment( grid, edge1 );
         auto edge2_cells = rasterize_segment( grid, edge2 );
@@ -206,11 +204,12 @@ namespace
         absl::flat_hash_map< geode::index_t,
             std::pair< geode::index_t, geode::index_t > >
             min_max;
+        const auto& vertices = triangle.vertices();
         for( const auto e : geode::LRange{ 3 } )
         {
+            const auto e_next = e == 2 ? 0 : e + 1;
             const auto segment_cells = geode::conservative_rasterize_segment(
-                grid, { triangle.vertices()[e].get(),
-                          triangle.vertices()[( e + 1 ) % 3].get() } );
+                grid, { vertices[e].get(), vertices[e_next].get() } );
             for( const auto& cell : segment_cells )
             {
                 auto it = min_max.try_emplace( cell[1], cell[0], cell[0] );
@@ -242,17 +241,18 @@ namespace
         int normal_orientation )
     {
         std::array< std::pair< geode::Vector2D, double >, 3 > result;
+        const auto& vertices = triangle.vertices();
         for( const auto e : geode::LRange{ 3 } )
         {
             result[e].first = geode::Vector2D{
                 { -1 * edges[e].direction().value( plane_axes[1] ),
                     edges[e].direction().value( plane_axes[0] ) }
             } * normal_orientation;
+            const auto& vertex = vertices[e].get();
             result[e].second =
-                -result[e].first.dot( geode::Vector2D{
-                    { triangle.vertices()[e].get().value( plane_axes[0] ),
-                        triangle.vertices()[e].get().value(
-                            plane_axes[1] ) } } )
+                -result[e].first.dot(
+                    geode::Vector2D{ { vertex.value( plane_axes[0] ),
+                        vertex.value( plane_axes[1] ) } } )
                 + std::max( 0., grid.cell_length_in_direction( plane_axes[0] )
                                     * result[e].first.value( 0 ) )
                 + std::max( 0., grid.cell_length_in_direction( plane_axes[1] )
@@ -281,12 +281,10 @@ namespace
     std::array< geode::Segment< dimension >, 3 > get_triangle_edges(
         const geode::Triangle< dimension >& triangle )
     {
-        return { geode::Segment< dimension >{
-                     triangle.vertices()[0], triangle.vertices()[1] },
-            geode::Segment< dimension >{
-                triangle.vertices()[1], triangle.vertices()[2] },
-            geode::Segment< dimension >{
-                triangle.vertices()[2], triangle.vertices()[0] } };
+        const auto& vertices = triangle.vertices();
+        return { geode::Segment< dimension >{ vertices[0], vertices[1] },
+            geode::Segment< dimension >{ vertices[1], vertices[2] },
+            geode::Segment< dimension >{ vertices[2], vertices[0] } };
     }
 
     void add_cells( std::vector< geode::GridCellIndices3D >& cells,
@@ -606,9 +604,10 @@ namespace geode
         const Segment< dimension >& segment )
     {
         std::array< GridCellsAroundVertex< dimension >, 2 > vertex_cells;
+        const auto& vertices = segment.vertices();
         for( const auto v : LRange{ 2 } )
         {
-            vertex_cells[v] = grid.cells( segment.vertices()[v] );
+            vertex_cells[v] = grid.cells( vertices[v] );
             OPENGEODE_EXCEPTION( !vertex_cells[v].empty(),
                 "[conservative_rasterize_segment] Segment is "
                 "not included in the given RegularGrid" );
@@ -626,9 +625,10 @@ namespace geode
         const Triangle< dimension >& triangle )
     {
         std::array< GridCellsAroundVertex< dimension >, 3 > vertex_cells;
+        const auto& vertices = triangle.vertices();
         for( const auto v : LRange{ 3 } )
         {
-            vertex_cells[v] = grid.cells( triangle.vertices()[v] );
+            vertex_cells[v] = grid.cells( vertices[v] );
             OPENGEODE_EXCEPTION( !vertex_cells[v].empty(),
                 "[rasterize_triangle] Triangle is not included in "
                 "the given RegularGrid" );

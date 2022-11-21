@@ -54,4 +54,38 @@ namespace geode
         }
         return result;
     }
+
+    ComponentMeshVertexPairs component_mesh_vertex_pairs(
+        absl::Span< const ComponentMeshVertex > unique_vertices0,
+        absl::Span< const ComponentMeshVertex > unique_vertices1,
+        const geode::ComponentType& type )
+    {
+        if( unique_vertices0.empty() || unique_vertices1.empty() )
+        {
+            return {};
+        }
+        ComponentMeshVertexPairs result;
+        result.reserve(
+            std::min( unique_vertices0.size(), unique_vertices1.size() ) );
+        for( const auto& mcv0 : unique_vertices0 )
+        {
+            if( mcv0.component_id.type() != type )
+            {
+                continue;
+            }
+            for( const auto& mcv1 : unique_vertices1 )
+            {
+                if( mcv1.component_id.type() == type
+                    && mcv0.component_id == mcv1.component_id )
+                {
+                    OPENGEODE_ASSERT( mcv0.vertex != mcv1.vertex,
+                        "[component_mesh_vertex_pairs] Vertices should be "
+                        "different" );
+                    result[mcv0.component_id].emplace_back(
+                        mcv0.vertex, mcv1.vertex );
+                }
+            }
+        }
+        return result;
+    }
 } // namespace geode

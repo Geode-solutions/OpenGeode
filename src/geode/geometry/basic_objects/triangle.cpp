@@ -34,16 +34,17 @@ namespace
     {
         try
         {
+            const auto& vertices = triangle.vertices();
             for( const auto pivot : geode::LRange{ 3 } )
             {
                 const auto next = pivot + 1 == 3 ? 0 : pivot + 1;
-                const auto edge0 = geode::Vector3D{ triangle.vertices()[pivot],
-                    triangle.vertices()[next] }
-                                       .normalize();
+                const auto edge0 =
+                    geode::Vector3D{ vertices[pivot], vertices[next] }
+                        .normalize();
                 const auto prev = pivot == 0 ? 2 : pivot - 1;
-                const auto edge1 = geode::Vector3D{ triangle.vertices()[pivot],
-                    triangle.vertices()[prev] }
-                                       .normalize();
+                const auto edge1 =
+                    geode::Vector3D{ vertices[pivot], vertices[prev] }
+                        .normalize();
 
                 const auto normal = edge0.cross( edge1 );
                 const auto length = normal.length();

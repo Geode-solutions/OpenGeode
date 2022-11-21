@@ -282,70 +282,69 @@ namespace
     }
 
     template < geode::index_t dimension >
+    absl::optional< geode::index_t > polyhedron_vertex_in_facet(
+        const geode::SolidMesh< dimension >& solid,
+        const geode::PolyhedronFacet& facet,
+        geode::local_index_t vertex_id )
+    {
+        for( const auto v :
+            geode::LRange{ solid.nb_polyhedron_facet_vertices( facet ) } )
+        {
+            if( solid.polyhedron_facet_vertex_id( { facet, v } ).vertex_id
+                == vertex_id )
+            {
+                return v;
+            }
+        }
+        return absl::nullopt;
+    }
+
+    template < geode::index_t dimension >
     void update_edge_and_facet( const geode::SolidMesh< dimension >& solid,
         geode::SolidMeshBuilder< dimension >& builder,
         const geode::PolyhedronVertex& polyhedron_vertex,
         geode::index_t new_vertex_id )
     {
-        for( const auto f : geode::LRange{ solid.nb_polyhedron_facets(
-                 polyhedron_vertex.polyhedron_id ) } )
+        const auto facets_vertices =
+            solid.polyhedron_facets_vertices( polyhedron_vertex.polyhedron_id );
+        for( const auto f : geode::LIndices{ facets_vertices } )
         {
             const geode::PolyhedronFacet facet{ polyhedron_vertex.polyhedron_id,
                 f };
-            const auto nb_facet_vertices =
-                solid.nb_polyhedron_facet_vertices( facet );
-            absl::FixedArray< geode::PolyhedronVertex > facet_vertices(
-                nb_facet_vertices );
-            for( const auto v : geode::LRange{ nb_facet_vertices } )
+            const auto opt_position = polyhedron_vertex_in_facet(
+                solid, facet, polyhedron_vertex.vertex_id );
+            if( !opt_position )
             {
-                facet_vertices[v] =
-                    solid.polyhedron_facet_vertex_id( { facet, v } );
+                continue;
             }
-            const auto position_it =
-                absl::c_find( facet_vertices, polyhedron_vertex );
-            if( position_it != facet_vertices.end() )
+            const auto position = opt_position.value();
+            const auto& facet_vertices = facets_vertices[f];
+            if( solid.are_facets_enabled() )
             {
-                geode::PolyhedronFacetVertices facet_vertices_id;
-                facet_vertices_id.reserve( nb_facet_vertices );
-                for( const auto& v : facet_vertices )
+                auto facets = builder.facets_builder();
+                facets.update_facet_vertex(
+                    facet_vertices, position, new_vertex_id );
+            }
+
+            if( solid.are_edges_enabled() )
+            {
+                auto edges = builder.edges_builder();
+                const auto nb_facet_vertices = facet_vertices.size();
+                const auto next =
+                    position + 1 == nb_facet_vertices ? 0 : position + 1;
+                if( facet_vertices[position] < facet_vertices[next] )
                 {
-                    facet_vertices_id.emplace_back(
-                        solid.polyhedron_vertex( v ) );
+                    edges.update_edge_vertex(
+                        { facet_vertices[position], facet_vertices[next] }, 0,
+                        new_vertex_id );
                 }
-
-                const auto position = static_cast< geode::index_t >(
-                    std::distance( facet_vertices.begin(), position_it ) );
-
-                if( solid.are_facets_enabled() )
+                const auto prev =
+                    position == 0 ? nb_facet_vertices - 1 : position - 1;
+                if( facet_vertices[prev] < facet_vertices[position] )
                 {
-                    auto facets = builder.facets_builder();
-                    facets.update_facet_vertex(
-                        facet_vertices_id, position, new_vertex_id );
-                }
-
-                if( solid.are_edges_enabled() )
-                {
-                    auto edges = builder.edges_builder();
-                    const auto next =
-                        position + 1 == nb_facet_vertices ? 0 : position + 1;
-                    std::array< geode::index_t, 2 > next_edge_vertices{
-                        facet_vertices_id[position], facet_vertices_id[next]
-                    };
-                    if( next_edge_vertices[0] < next_edge_vertices[1] )
-                    {
-                        edges.update_edge_vertex(
-                            next_edge_vertices, 0, new_vertex_id );
-                    }
-                    const auto prev =
-                        position == 0 ? nb_facet_vertices - 1 : position - 1;
-                    std::array< geode::index_t, 2 > previous_edge_vertices{
-                        facet_vertices_id[prev], facet_vertices_id[position]
-                    };
-                    if( previous_edge_vertices[0] < previous_edge_vertices[1] )
-                    {
-                        edges.update_edge_vertex(
-                            previous_edge_vertices, 1, new_vertex_id );
-                    }
+                    edges.update_edge_vertex(
+                        { facet_vertices[prev], facet_vertices[position] }, 1,
+                        new_vertex_id );
                 }
             }
         }
