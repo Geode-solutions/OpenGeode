@@ -63,7 +63,7 @@ namespace geode
             }
             else
             {
-                values[i - nb_removed_elements] = values[i];
+                values[i - nb_removed_elements] = std::move( values[i] );
             }
         }
         values.erase( values.end() - nb_removed_elements, values.end() );
