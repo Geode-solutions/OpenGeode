@@ -50,12 +50,13 @@ namespace geode
         OPENGEODE_ASSERT( to_delete.size() == values.size(),
             "[delete_vector_elements] Number of elements in the two vectors "
             "should match" );
-        index_t nb_removed_elements{ 0 };
-        if( absl::c_find( to_delete, true ) == to_delete.end() )
+        const auto it = absl::c_find( to_delete, true );
+        if( it == to_delete.end() )
         {
             return 0;
         }
-        for( const auto i : Indices{ to_delete } )
+        index_t nb_removed_elements{ 0 };
+        for( const auto i : Range{ it - to_delete.begin(), to_delete.size() } )
         {
             if( to_delete[i] )
             {
