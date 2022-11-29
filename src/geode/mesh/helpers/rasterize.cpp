@@ -331,7 +331,8 @@ namespace
         std::vector< geode::GridCellIndices3D > cells;
         cells.reserve( max_number_cells( min, max ) );
         const auto triangle_edges = get_triangle_edges( triangle );
-        if( geode::triangle_area( triangle ) < geode::global_epsilon )
+        const auto normal = triangle.new_normal();
+        if( !normal )
         {
             for( const auto e : geode::LRange{ 3 } )
             {
@@ -340,14 +341,14 @@ namespace
             }
             return cells;
         }
-        const auto normal = triangle.normal();
-        const auto critical_point = compute_critical_point( grid, normal );
+        const auto critical_point =
+            compute_critical_point( grid, normal.value() );
         const auto xy_params = get_edge_projection( grid, triangle,
-            triangle_edges, { 0, 1 }, ( normal.value( 2 ) >= 0 ? 1 : -1 ) );
+            triangle_edges, { 0, 1 }, ( normal->value( 2 ) >= 0 ? 1 : -1 ) );
         const auto yz_params = get_edge_projection( grid, triangle,
-            triangle_edges, { 1, 2 }, ( normal.value( 0 ) >= 0 ? 1 : -1 ) );
+            triangle_edges, { 1, 2 }, ( normal->value( 0 ) >= 0 ? 1 : -1 ) );
         const auto zx_params = get_edge_projection( grid, triangle,
-            triangle_edges, { 2, 0 }, ( normal.value( 1 ) >= 0 ? 1 : -1 ) );
+            triangle_edges, { 2, 0 }, ( normal->value( 1 ) >= 0 ? 1 : -1 ) );
 
         for( const auto k : geode::Range( min[2], max[2] + 1 ) )
         {
