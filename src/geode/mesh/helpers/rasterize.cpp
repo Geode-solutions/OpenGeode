@@ -332,7 +332,12 @@ namespace
         cells.reserve( max_number_cells( min, max ) );
         const auto triangle_edges = get_triangle_edges( triangle );
         const auto normal = triangle.new_normal();
-        if( !normal )
+        if( !normal
+            || absl::c_count_if( triangle_edges,
+                   []( const geode::Segment3D& segment ) {
+                       return segment.length() <= geode::global_epsilon;
+                   } )
+                   > 0 )
         {
             for( const auto e : geode::LRange{ 3 } )
             {
