@@ -212,7 +212,9 @@ namespace geode
         //   |Dot(D,N)|*b1 = sign(Dot(D,N))*Dot(D,Cross(Q,E2))
         //   |Dot(D,N)|*b2 = sign(Dot(D,N))*Dot(D,Cross(E1,Q))
         //   |Dot(D,N)|*t = -sign(Dot(D,N))*Dot(Q,N)
-        auto DdN = segment.normalized_direction().dot( normal );
+        const auto segment_normalized_direction =
+            segment.normalized_direction();
+        auto DdN = segment_normalized_direction.dot( normal );
         signed_index_t sign;
         if( DdN > 0. )
         {
@@ -231,12 +233,11 @@ namespace geode
 
         const Vector3D diff{ vertices[0], seg_center };
         const auto DdQxE2 =
-            sign * segment.normalized_direction().dot( diff.cross( edge2 ) );
+            sign * segment_normalized_direction.dot( diff.cross( edge2 ) );
         if( DdQxE2 >= 0 )
         {
             const auto DdE1xQ =
-                sign
-                * segment.normalized_direction().dot( edge1.cross( diff ) );
+                sign * segment_normalized_direction.dot( edge1.cross( diff ) );
             if( DdE1xQ >= 0 && DdQxE2 + DdE1xQ <= DdN )
             {
                 // InfiniteLine intersects triangle, check if segment does.
@@ -250,44 +251,21 @@ namespace geode
 
                     auto result =
                         seg_center
-                        + segment.normalized_direction() * seg_parameter;
+                        + segment_normalized_direction * seg_parameter;
                     CorrectnessInfo< Point3D > correctness;
 
-                    std::array< double, 2 > seg_lambdas;
-                    try
-                    {
-                        seg_lambdas =
-                            segment_barycentric_coordinates( result, segment );
-                    }
-                    catch( const OpenGeodeException& )
-                    {
-                        seg_lambdas.fill( 0.5 );
-                    }
-                    correctness.first.second =
-                        segment.vertices()[0].get() * seg_lambdas[0]
-                        + segment.vertices()[1].get() * seg_lambdas[1];
+                    const auto point_to_segment =
+                        point_segment_distance( result, segment );
                     correctness.first.first =
-                        std::get< 0 >( point_segment_distance(
-                            correctness.first.second, segment ) )
-                        < global_epsilon;
-                    std::array< double, 3 > tri_lambdas;
-                    try
-                    {
-                        tri_lambdas = triangle_barycentric_coordinates(
-                            result, triangle );
-                    }
-                    catch( const OpenGeodeException& )
-                    {
-                        tri_lambdas.fill( 1. / 3. );
-                    }
-                    correctness.second.second =
-                        vertices[0].get() * tri_lambdas[0]
-                        + vertices[1].get() * tri_lambdas[1]
-                        + vertices[2].get() * tri_lambdas[2];
+                        std::get< 0 >( point_to_segment ) < global_epsilon;
+                    correctness.first.second =
+                        std::get< 1 >( point_to_segment );
+                    const auto point_to_triangle =
+                        point_triangle_distance( result, triangle );
                     correctness.second.first =
-                        std::get< 0 >( point_triangle_distance(
-                            correctness.second.second, triangle ) )
-                        < global_epsilon;
+                        std::get< 0 >( point_to_triangle ) < global_epsilon;
+                    correctness.second.second =
+                        std::get< 1 >( point_to_triangle );
                     return { std::move( result ), std::move( correctness ) };
                 }
                 // else: |t| > extent, no intersection
@@ -394,7 +372,7 @@ namespace geode
         const Vector2D diff{ line0.origin(), line1.origin() };
         const auto D0DotPerpD1 =
             dot_perpendicular( line0.direction(), line1.direction() );
-        if( std::fabs( D0DotPerpD1 ) < 0. )
+        if( std::fabs( D0DotPerpD1 ) == 0. )
         {
             // The lines are parallel.
             return { IntersectionType::PARALLEL };
