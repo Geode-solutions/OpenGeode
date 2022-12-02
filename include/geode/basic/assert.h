@@ -51,7 +51,7 @@ namespace geode
     {
     public:
         template < typename... Args >
-        explicit OpenGeodeException( const Args &...message )
+        explicit OpenGeodeException( const Args&... message )
             : std::runtime_error{ absl::StrCat( message... ) }
         {
         }

@@ -86,9 +86,8 @@ namespace geode
                 }
                 CMVmappings mapping;
                 async::when_all( tasks.begin(), tasks.end() )
-                    .then( [this, &mapping](
-                               async::task< std::vector< Task > > all_task ) {
-                        for( auto& task : all_task.get() )
+                    .then( [this, &mapping]( std::vector< Task > all_task ) {
+                        for( auto& task : all_task )
                         {
                             auto cmv_mappings = task.get();
                             update_unique_vertices( cmv_mappings );
@@ -97,7 +96,7 @@ namespace geode
                                 std::make_move_iterator( cmv_mappings.end() ) );
                         }
                     } )
-                    .wait();
+                    .get();
                 return mapping;
             }
 

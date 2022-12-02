@@ -57,7 +57,10 @@ namespace
             } );
             id++;
         }
-        async::when_all( tasks.begin(), tasks.end() ).wait();
+        for( auto& task : async::when_all( tasks.begin(), tasks.end() ).get() )
+        {
+            task.get();
+        }
         return std::make_tuple(
             geode::AABBTree< dimension >{ boxes }, std::move( mapping ) );
     }

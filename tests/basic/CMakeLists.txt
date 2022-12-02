@@ -26,6 +26,7 @@ add_geode_test(
 add_geode_test(
     SOURCE "test-assert.cpp"
     DEPENDENCIES
+        Async++
         ${PROJECT_NAME}::basic
 )
 add_geode_test(

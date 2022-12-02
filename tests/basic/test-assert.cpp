@@ -21,12 +21,124 @@
  *
  */
 
+#include <async++.h>
+
 #include <geode/basic/assert.h>
 #include <geode/basic/logger.h>
+#include <geode/basic/range.h>
 
 #include <geode/tests/common.h>
 
-void test()
+void test_when_all()
+{
+    try
+    {
+        std::vector< async::task< void > > tasks;
+        for( const auto t : geode::Range{ 10 } )
+        {
+            geode_unused( t );
+            tasks.emplace_back( async::spawn( [] {
+                throw std::runtime_error( "Some list error" );
+            } ) );
+        }
+        for( auto& task : async::when_all( tasks.begin(), tasks.end() ).get() )
+        {
+            task.get();
+        }
+        exit( 1 );
+    }
+    catch( ... )
+    {
+        geode::geode_lippincott();
+    }
+
+    try
+    {
+        std::vector< async::task< int > > tasks;
+        for( const auto t : geode::Range{ 10 } )
+        {
+            geode_unused( t );
+            tasks.emplace_back( async::spawn( [] {
+                throw std::runtime_error( "Some list error 2" );
+                return 42;
+            } ) );
+        }
+        async::when_all( tasks.begin(), tasks.end() )
+            .then( []( std::vector< async::task< int > > all_tasks ) {
+                for( auto& task : all_tasks )
+                {
+                    DEBUG( "toto" );
+                    task.get();
+                }
+            } )
+            .get();
+        exit( 1 );
+    }
+    catch( ... )
+    {
+        geode::geode_lippincott();
+    }
+}
+
+void test_parallel()
+{
+    try
+    {
+        async::parallel_invoke(
+            [] {
+                throw std::runtime_error( "Some // error 0" );
+            },
+            [] {
+                throw std::runtime_error( "Some // error 1" );
+            },
+            [] {
+                throw std::runtime_error( "Some // error 2" );
+            },
+            [] {
+                throw std::runtime_error( "Some // error 3" );
+            } );
+        exit( 1 );
+    }
+    catch( ... )
+    {
+        geode::geode_lippincott();
+    }
+
+    try
+    {
+        async::parallel_for( async::irange( 0, 10 ), []( int i ) {
+            geode_unused( i );
+            throw std::runtime_error( "Some for error" );
+        } );
+        exit( 1 );
+    }
+    catch( ... )
+    {
+        geode::geode_lippincott();
+    }
+}
+
+void test_async()
+{
+    try
+    {
+        async::spawn( [] {
+            throw std::runtime_error( "Some async error" );
+            return 42;
+        } )
+            .then( []( int t ) {
+                DEBUG( t );
+            } )
+            .get();
+        exit( 1 );
+    }
+    catch( ... )
+    {
+        geode::geode_lippincott();
+    }
+}
+
+void test_exception()
 {
     try
     {
@@ -64,6 +176,14 @@ void test()
     {
         geode::geode_lippincott();
     }
+}
+
+void test()
+{
+    test_exception();
+    test_async();
+    test_parallel();
+    test_when_all();
 }
 
 OPENGEODE_TEST( "assert" )

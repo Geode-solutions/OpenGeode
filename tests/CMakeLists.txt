@@ -23,6 +23,7 @@ cmake_minimum_required(VERSION 3.15)
 if(NOT TARGET OpenGeode::basic)
     project(OpenGeode CXX)
     find_package(OpenGeode REQUIRED CONFIG)
+    find_package(Async++ REQUIRED CONFIG)
     enable_testing()
 endif()
 
