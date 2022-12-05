@@ -93,5 +93,5 @@ namespace geode
             __VA_ARGS__                                                        \
         }
 
-#define OPENGEODE_RESEARCH( condition, ... )                                  \
+#define OPENGEODE_RESEARCH( condition, ... )                                   \
     OPENGEODE_EXCEPTION( condition, __VA_ARGS__ )
