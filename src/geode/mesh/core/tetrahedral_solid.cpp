@@ -50,17 +50,15 @@ namespace
                 result.push_back( adj_facet.polyhedron_id );
                 absl::InlinedVector< geode::local_index_t, 1 > v0;
                 absl::InlinedVector< geode::local_index_t, 1 > v1;
+                const auto vertices =
+                    solid.polyhedron_vertices( adj_facet.polyhedron_id );
                 for( const auto v : geode::LRange{ 4 } )
                 {
-                    if( solid.polyhedron_vertex(
-                            { adj_facet.polyhedron_id, v } )
-                        == edge_vertices[0] )
+                    if( vertices[v] == edge_vertices[0] )
                     {
                         v0.push_back( v );
                     }
-                    else if( solid.polyhedron_vertex(
-                                 { adj_facet.polyhedron_id, v } )
-                             == edge_vertices[1] )
+                    else if( vertices[v] == edge_vertices[1] )
                     {
                         v1.push_back( v );
                     }
@@ -75,8 +73,7 @@ namespace
                     {
                         continue;
                     }
-                    const auto vertex_id = solid.polyhedron_vertex(
-                        { adj_facet.polyhedron_id, f } );
+                    const auto vertex_id = vertices[f];
                     if( vertex_id == edge_vertices[0]
                         || vertex_id == edge_vertices[1] )
                     {
@@ -323,6 +320,85 @@ namespace geode
                 vertices[facet[0]], vertices[facet[1]], vertices[facet[2]] } );
         }
         return result;
+    }
+
+    template < index_t dimension >
+    absl::optional< PolyhedronFacet >
+        TetrahedralSolid< dimension >::polyhedron_adjacent_facet(
+            const PolyhedronFacet& polyhedron_facet ) const
+    {
+        const auto opt_polyhedron_adj =
+            this->polyhedron_adjacent( polyhedron_facet );
+        if( !opt_polyhedron_adj )
+        {
+            return absl::nullopt;
+        }
+        std::array< index_t, 3 > vertices;
+        for( const auto v : LRange{ 3 } )
+        {
+            vertices[v] =
+                this->polyhedron_facet_vertex( { polyhedron_facet, v } );
+        }
+        const auto polyhedron_adj = opt_polyhedron_adj.value();
+        const std::array< index_t, 4 > adj_vertices{
+            this->polyhedron_vertex( { polyhedron_adj, 0 } ),
+            this->polyhedron_vertex( { polyhedron_adj, 1 } ),
+            this->polyhedron_vertex( { polyhedron_adj, 2 } ),
+            this->polyhedron_vertex( { polyhedron_adj, 3 } )
+        };
+        std::array< bool, 4 > candidates{ true, true, true, true };
+        for( const auto v : LRange{ 4 } )
+        {
+            const auto opp_adj_vertex_id = adj_vertices[v];
+            if( opp_adj_vertex_id != vertices[0]
+                && opp_adj_vertex_id != vertices[1]
+                && opp_adj_vertex_id != vertices[2] )
+            {
+                for( const auto other_v : LRange{ 4 } )
+                {
+                    if( other_v == v )
+                    {
+                        continue;
+                    }
+                    candidates[other_v] = false;
+                }
+            }
+        }
+        for( const auto f : LRange{ 4 } )
+        {
+            if( !candidates[f] )
+            {
+                continue;
+            }
+            if( this->polyhedron_adjacent( { polyhedron_adj, f } )
+                != polyhedron_facet.polyhedron_id )
+            {
+                continue;
+            }
+            // bool all_contained{ true };
+            // for( const auto v : LRange{ 3 } )
+            // {
+            //     if( absl::c_find( vertices, this->polyhedron_facet_vertex(
+            //                                     { { polyhedron_adj, f }, v }
+            //                                     ) )
+            //         == vertices.end() )
+            //     {
+            //         all_contained = false;
+            //         break;
+            //     }
+            // }
+            // if( all_contained )
+            // {
+            return absl::optional< PolyhedronFacet >{ absl::in_place,
+                polyhedron_adj, f };
+            // }
+        }
+        // SDEBUG( polyhedron_barycenter( polyhedron_adj ) );
+        // SDEBUG( polyhedron_barycenter( polyhedron_facet.polyhedron_id ) );
+        throw OpenGeodeException{ "[SolidMesh::polyhedron_adjacent_"
+                                  "facet] Wrong adjacency with polyhedra: ",
+            polyhedron_facet.polyhedron_id, " and ", polyhedron_adj };
+        return absl::nullopt;
     }
 
     template < index_t dimension >

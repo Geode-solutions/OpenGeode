@@ -1230,6 +1230,8 @@ namespace geode
                     polyhedron_adj, f };
             }
         }
+        // SDEBUG( polyhedron_barycenter( polyhedron_adj ) );
+        // SDEBUG( polyhedron_barycenter( polyhedron_facet.polyhedron_id ) );
         throw OpenGeodeException{ "[SolidMesh::polyhedron_adjacent_"
                                   "facet] Wrong adjacency with polyhedra: ",
             polyhedron_facet.polyhedron_id, " and ", polyhedron_adj };

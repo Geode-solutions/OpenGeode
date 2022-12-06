@@ -79,6 +79,9 @@ namespace geode
         PolyhedraAroundEdge polyhedra_around_edge(
             const PolyhedronFacetEdge& edge ) const final;
 
+        absl::optional< PolyhedronFacet > polyhedron_adjacent_facet(
+            const PolyhedronFacet& polyhedron_facet ) const final;
+
         /*!
          * Return the local indices of the two facets incident to the
          * edge in tetrahedron.

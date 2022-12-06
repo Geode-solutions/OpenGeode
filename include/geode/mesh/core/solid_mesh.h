@@ -349,7 +349,7 @@ namespace geode
          * @param[in] polyhedron_facet Local index of facet in polyhedron.
          * @return the index of the adjacent polyhedron facet if it exists.
          */
-        absl::optional< PolyhedronFacet > polyhedron_adjacent_facet(
+        virtual absl::optional< PolyhedronFacet > polyhedron_adjacent_facet(
             const PolyhedronFacet& polyhedron_facet ) const;
 
         /*!
