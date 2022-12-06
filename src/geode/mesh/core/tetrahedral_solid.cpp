@@ -375,26 +375,9 @@ namespace geode
             {
                 continue;
             }
-            // bool all_contained{ true };
-            // for( const auto v : LRange{ 3 } )
-            // {
-            //     if( absl::c_find( vertices, this->polyhedron_facet_vertex(
-            //                                     { { polyhedron_adj, f }, v }
-            //                                     ) )
-            //         == vertices.end() )
-            //     {
-            //         all_contained = false;
-            //         break;
-            //     }
-            // }
-            // if( all_contained )
-            // {
             return absl::optional< PolyhedronFacet >{ absl::in_place,
                 polyhedron_adj, f };
-            // }
         }
-        // SDEBUG( polyhedron_barycenter( polyhedron_adj ) );
-        // SDEBUG( polyhedron_barycenter( polyhedron_facet.polyhedron_id ) );
         throw OpenGeodeException{ "[SolidMesh::polyhedron_adjacent_"
                                   "facet] Wrong adjacency with polyhedra: ",
             polyhedron_facet.polyhedron_id, " and ", polyhedron_adj };
