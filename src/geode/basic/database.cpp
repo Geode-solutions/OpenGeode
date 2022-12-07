@@ -39,7 +39,8 @@
 
 namespace
 {
-    constexpr auto DATA_EXPIRATION = std::chrono::minutes( 5 );
+    constexpr auto DATA_EXPIRATION = std::chrono::minutes( 1 );
+    int count{ 0 };
 } // namespace
 
 namespace geode
@@ -48,21 +49,21 @@ namespace geode
     {
     public:
         Storage( std::unique_ptr< geode::Identifier >&& data )
-            : data_{ std::move( data ) }
+            : data_{ std::move( data ) }, count_{ count++ }
         {
         }
 
         ~Storage()
         {
-            DEBUG( "~Storage" );
+            Logger::debug( count, " -> ", "~Storage" );
             std::unique_lock< std::mutex > locking{ lock_ };
             terminate_ = true;
-            DEBUG( nb_calls_ );
             condition_.notify_all();
             condition_.wait( locking, [this] {
+                Logger::debug( count, " -> ", nb_calls_ );
                 return nb_calls_ == 0;
             } );
-            DEBUG( "~Storage end" );
+            Logger::debug( count, " -> ", "~Storage end" );
         }
 
         bool expired() const
@@ -113,26 +114,26 @@ namespace geode
         {
             last_used_ = std::chrono::system_clock::now();
             async::spawn( [this] {
-                DEBUG( "wait" );
+                Logger::debug( count, " -> ", "wait" );
                 std::unique_lock< std::mutex > locking{ lock_ };
                 nb_calls_++;
-                DEBUG( nb_calls_ );
-                DEBUG( "wait 2" );
+                Logger::debug( count, " -> ", "wait 2" );
                 if( !condition_.wait_for( locking,
                         DATA_EXPIRATION + std::chrono::seconds( 1 ), [this] {
+                            Logger::debug( count, " -> ", terminate_ );
                             return terminate_;
                         } ) )
                 {
-                    DEBUG( "wait in" );
+                    Logger::debug( count, " -> ", "wait in" );
                     if( !terminate_ && unused()
                         && std::chrono::system_clock::now() - last_used_
                                > DATA_EXPIRATION )
                     {
-                        DEBUG( "wait reset" );
+                        Logger::debug( count, " -> ", "wait reset" );
                         data_.reset();
                     }
                 }
-                DEBUG( "wait out" );
+                Logger::debug( count, " -> ", "wait out" );
                 nb_calls_--;
                 condition_.notify_all();
             } );
@@ -146,6 +147,7 @@ namespace geode
         std::chrono::time_point< std::chrono::system_clock > last_used_;
         std::mutex lock_;
         std::condition_variable condition_;
+        int count_;
     };
 
     class Database::Impl
