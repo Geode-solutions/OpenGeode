@@ -22,12 +22,15 @@
  */
 #include <geode/basic/database.h>
 
+#include <chrono>
+#include <condition_variable>
+#include <mutex>
+
 #include <async++.h>
 
 #include <ghc/filesystem.hpp>
 
 #include <absl/container/flat_hash_map.h>
-#include <absl/synchronization/mutex.h>
 #include <absl/time/time.h>
 
 #include <geode/basic/identifier.h>
@@ -36,7 +39,7 @@
 
 namespace
 {
-    constexpr auto DATA_EXPIRATION = absl::Minutes( 5 );
+    constexpr auto DATA_EXPIRATION = std::chrono::minutes( 5 );
 } // namespace
 
 namespace geode
@@ -51,13 +54,15 @@ namespace geode
 
         ~Storage()
         {
-            absl::MutexLock locking{ &lock_ };
+            DEBUG( "~Storage" );
+            std::unique_lock< std::mutex > locking{ lock_ };
             terminate_ = true;
-            lock_.Await( absl::Condition(
-                +[]( index_t* nb_calls ) {
-                    return *nb_calls == 0;
-                },
-                &nb_calls_ ) );
+            DEBUG( nb_calls_ );
+            condition_.notify_all();
+            condition_.wait( locking, [this] {
+                return nb_calls_ == 0;
+            } );
+            DEBUG( "~Storage end" );
         }
 
         bool expired() const
@@ -72,13 +77,13 @@ namespace geode
 
         void new_data_reference()
         {
-            absl::MutexLock locking{ &lock_ };
+            const std::lock_guard< std::mutex > locking{ lock_ };
             counter_++;
         }
 
         void delete_data_reference()
         {
-            absl::MutexLock locking{ &lock_ };
+            const std::lock_guard< std::mutex > locking{ lock_ };
             OPENGEODE_ASSERT(
                 counter_ > 0, "[Database::Storage] Cannot decrement" );
             counter_--;
@@ -106,24 +111,30 @@ namespace geode
     private:
         void wait_for_memory_release()
         {
-            last_used_ = absl::Now();
+            last_used_ = std::chrono::system_clock::now();
             async::spawn( [this] {
-                absl::MutexLock locking{ &lock_ };
+                DEBUG( "wait" );
+                std::unique_lock< std::mutex > locking{ lock_ };
                 nb_calls_++;
-                if( !lock_.AwaitWithTimeout( absl::Condition(
-                                                 +[]( bool* terminate ) {
-                                                     return *terminate;
-                                                 },
-                                                 &terminate_ ),
-                        DATA_EXPIRATION + absl::Seconds( 1 ) ) )
+                DEBUG( nb_calls_ );
+                DEBUG( "wait 2" );
+                if( !condition_.wait_for( locking,
+                        DATA_EXPIRATION + std::chrono::seconds( 1 ), [this] {
+                            return terminate_;
+                        } ) )
                 {
+                    DEBUG( "wait in" );
                     if( !terminate_ && unused()
-                        && absl::Now() - last_used_ > DATA_EXPIRATION )
+                        && std::chrono::system_clock::now() - last_used_
+                               > DATA_EXPIRATION )
                     {
+                        DEBUG( "wait reset" );
                         data_.reset();
                     }
                 }
+                DEBUG( "wait out" );
                 nb_calls_--;
+                condition_.notify_all();
             } );
         }
 
@@ -132,8 +143,9 @@ namespace geode
         bool terminate_{ false };
         index_t nb_calls_{ 0 };
         index_t counter_{ 0 };
-        absl::Time last_used_;
-        absl::Mutex lock_;
+        std::chrono::time_point< std::chrono::system_clock > last_used_;
+        std::mutex lock_;
+        std::condition_variable condition_;
     };
 
     class Database::Impl
@@ -175,10 +187,14 @@ namespace geode
             auto& storage = storage_.at( id );
             if( storage && storage->unused() && !storage->expired() )
             {
+                DEBUG( "in" );
                 auto* data = storage->steal_data();
+                DEBUG( "steal" );
                 storage.reset();
+                DEBUG( "reset" );
                 return std::unique_ptr< Identifier >{ data };
             }
+            DEBUG( "load" );
             return load_data( id );
         }
 

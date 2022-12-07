@@ -60,14 +60,18 @@ void register_foo_deserializer( geode::PContext& context )
 void test_take_data( geode::Database& database, const geode::uuid& id )
 {
     auto stolen_foo = database.take_data< Foo >( id );
+    DEBUG( "take 1" );
     OPENGEODE_EXCEPTION(
         stolen_foo->value_ == 42, "[Test] Wrong value after take data" );
     auto foo_data = database.get_data( id );
+    DEBUG( "take 2" );
     const auto& foo = foo_data.get< Foo >();
+    DEBUG( "take 3" );
     OPENGEODE_EXCEPTION(
         foo.value_ == 42, "[Test] Wrong value after register data" );
     OPENGEODE_EXCEPTION( stolen_foo.get() != &foo,
         "[Test] Objects adresses should be different" );
+    DEBUG( "take 4" );
 }
 
 void test_take_wrong_data( geode::Database& database, const geode::uuid& id )
@@ -127,11 +131,17 @@ void test()
     geode::Database database( "temp" );
     database.register_serializer_functions(
         register_foo_serializer, register_foo_deserializer );
+    DEBUG( "functions" );
     auto foo0 = test_register_data( database );
+    DEBUG( "register" );
     test_register_unique_data( database );
+    DEBUG( "register unique" );
     test_take_data( database, foo0 );
+    DEBUG( "take" );
     test_modify_data( database, foo0 );
+    DEBUG( "modify" );
     test_take_wrong_data( database, foo0 );
+    DEBUG( "wrong" );
     OPENGEODE_EXCEPTION(
         database.nb_data() == 2, "[Test] Database incomplete" );
 }

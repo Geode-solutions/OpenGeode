@@ -117,8 +117,10 @@ namespace geode
         std::unique_ptr< DataType > take_data( const uuid& id )
         {
             get_data( id ).get< DataType >();
+            DEBUG( "get" );
             auto* data =
                 dynamic_cast< DataType* >( steal_data( id ).release() );
+            DEBUG( "steal" );
             return std::unique_ptr< DataType >{ data };
         }
 
