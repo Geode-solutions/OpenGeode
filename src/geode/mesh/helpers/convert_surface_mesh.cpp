@@ -156,17 +156,15 @@ namespace geode
         std::vector< bool > to_delete( surface.nb_polygons(), false );
         for( const auto p : geode::Range{ surface.nb_polygons() } )
         {
-            if( surface.nb_polygon_vertices( p ) > 3 )
+            const auto nb_vertices = surface.nb_polygon_vertices( p );
+            to_delete[p] = nb_vertices != 3;
+            if( nb_vertices > 3 )
             {
-                to_delete[p] = true;
-                const auto v0 = surface.polygon_vertex( { p, 0 } );
-                for( const auto v :
-                    LRange{ 2, surface.nb_polygon_vertices( p ) } )
+                const auto vertices = surface.polygon_vertices( p );
+                for( const auto v : LRange{ 2, nb_vertices } )
                 {
-                    builder.create_polygon( { v0,
-                        surface.polygon_vertex(
-                            { p, static_cast< local_index_t >( v - 1 ) } ),
-                        surface.polygon_vertex( { p, v } ) } );
+                    builder.create_polygon(
+                        { vertices[0], vertices[v - 1], vertices[v] } );
                 }
             }
         }
