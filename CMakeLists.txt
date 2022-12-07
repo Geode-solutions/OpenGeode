@@ -18,7 +18,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.15)
+
+cmake_policy(SET CMP0091 NEW)
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
 
 #-------------------------------------------------------------------------------
 # Project options
@@ -29,6 +32,7 @@ option(OPENGEODE_WITH_PYTHON "Compile Python bindings" OFF)
 if(OPENGEODE_WITH_PYTHON)
     set(PYTHON_VERSION "" CACHE STRING "Python version to use for compiling modules")
 endif()
+option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 
 # Internal options
 option(USE_SUPERBUILD "Whether or not a superbuild should be invoked" ON)

@@ -267,6 +267,20 @@ namespace geode
             Relationships::ItemRangeIterator::operator*().id() );
     }
 
+    Section::Section() {} // NOLINT
+
+    Section::Section( Section&& section )
+        : Topology{ std::move( section ) },
+          Corners2D{ std::move( section ) },
+          Lines2D{ std::move( section ) },
+          Surfaces2D{ std::move( section ) },
+          ModelBoundaries2D{ std::move( section ) },
+          Identifier{ std::move( section ) }
+    {
+    }
+
+    Section::~Section() {} // NOLINT
+
     Section::ItemLineRange Section::model_boundary_items(
         const ModelBoundary2D& boundary ) const
     {

@@ -67,7 +67,10 @@ void test_ray_edge()
     builder->create_point( { { 1, -1, 0 } } );
     builder->create_point( { { 1, 1, 0 } } );
     builder->create_point( { { 1, 0, 1 } } );
+    builder->create_point( { { 1, 0, 3 } } );
     builder->create_polygon( { 0, 1, 2 } );
+    builder->create_polygon( { 1, 0, 3 } );
+    builder->compute_polygon_adjacencies();
 
     const auto aabb = geode::create_aabb_tree( *mesh );
     const geode::Vector3D direction{ { 1, 0, 0 } };
@@ -81,6 +84,8 @@ void test_ray_edge()
         result->polygon == 0, "[Test] Ray edge wrong polygon" );
     OPENGEODE_EXCEPTION(
         result->distance == 1, "[Test] Ray edge wrong distance" );
+    OPENGEODE_EXCEPTION( tracing.all_intersections().size() == 1,
+        "[Test] Wrong size for ray tracing result for case edge" );
 }
 
 void test_ray_parallel()
@@ -108,11 +113,10 @@ void test_ray_parallel()
 
 void test()
 {
+    geode::OpenGeodeMesh::initialize();
     test_ray_inside();
     test_ray_edge();
     test_ray_parallel();
-
-    geode::Logger::info( "TEST SUCCESS" );
 }
 
 OPENGEODE_TEST( "ray-tracing" )

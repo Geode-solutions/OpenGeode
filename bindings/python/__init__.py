@@ -22,3 +22,5 @@ from .opengeode_py_basic import *
 from .opengeode_py_geometry import *
 from .opengeode_py_mesh import *
 from .opengeode_py_model import *
+
+OpenGeodeModel.initialize()

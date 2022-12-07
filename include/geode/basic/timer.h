@@ -36,6 +36,8 @@ namespace geode
 
         std::string duration() const;
 
+        void reset();
+
     private:
         IMPLEMENTATION_MEMBER( impl_ );
     };

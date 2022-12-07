@@ -63,11 +63,18 @@ public:                                                                        \
 #define OPENGEODE_TEMPLATE_ASSERT_3D( type )                                   \
     static_assert( ( type ) == 3, #type " template should be 3" )
 
+#define ALIAS_1D( Class ) using Class##1D = Class< 1 >
+
 #define ALIAS_2D( Class ) using Class##2D = Class< 2 >
 
 #define ALIAS_3D( Class ) using Class##3D = Class< 3 >
 
 #define ALIAS_2D_AND_3D( Class )                                               \
+    ALIAS_2D( Class );                                                         \
+    ALIAS_3D( Class )
+
+#define ALIAS_1D_AND_2D_AND_3D( Class )                                        \
+    ALIAS_1D( Class );                                                         \
     ALIAS_2D( Class );                                                         \
     ALIAS_3D( Class )
 
@@ -84,25 +91,6 @@ template < typename T >
 void geode_unused( const T & /*unused*/ )
 {
 }
-
-/*!
- * Use this macro to initialize an OpenGeode library and execute some functions
- * at library loading.
- */
-#define OPENGEODE_LIBRARY_INITIALIZE( library_name )                           \
-    class lib_library_name                                                     \
-    {                                                                          \
-    public:                                                                    \
-        lib_library_name()                                                     \
-        {                                                                      \
-            initialize();                                                      \
-        }                                                                      \
-                                                                               \
-    private:                                                                   \
-        void initialize();                                                     \
-    };                                                                         \
-    lib_library_name lib_library_name_instance; /* NOLINT */                   \
-    void lib_library_name::initialize()
 
 #include <geode/basic/assert.h>
 #include <geode/basic/opengeode_basic_export.h>

@@ -66,7 +66,7 @@ namespace geode
 
     public:
         template < typename DerivedClass >
-        static void register_creator( Key key )
+        static inline void register_creator( Key key )
         {
             static_assert( std::is_base_of< BaseClass, DerivedClass >::value,
                 "DerivedClass is not a subclass of BaseClass" );
@@ -84,7 +84,7 @@ namespace geode
             }
         }
 
-        static std::unique_ptr< BaseClass > create(
+        static inline std::unique_ptr< BaseClass > create(
             const Key &key, Args... args )
         {
             const auto &store = get_store();
@@ -95,7 +95,7 @@ namespace geode
             return creator->second( std::forward< Args >( args )... );
         }
 
-        static absl::FixedArray< Key > list_creators()
+        static inline absl::FixedArray< Key > list_creators()
         {
             const auto &store = get_store();
             absl::FixedArray< Key > creators( store.size() );
@@ -107,7 +107,7 @@ namespace geode
             return creators;
         }
 
-        static bool has_creator( const Key &key )
+        static inline bool has_creator( const Key &key )
         {
             const auto &store = get_store();
             return store.find( key ) != store.end();
@@ -119,13 +119,14 @@ namespace geode
 
     private:
         template < typename DerivedClass >
-        static std::unique_ptr< BaseClass > create_function_impl( Args... args )
+        static inline std::unique_ptr< BaseClass > create_function_impl(
+            Args... args )
         {
             return std::unique_ptr< BaseClass >{ new DerivedClass{
                 std::forward< Args >( args )... } };
         }
 
-        static FactoryStore &get_store()
+        static inline FactoryStore &get_store()
         {
             return Singleton::instance< Factory >().store_;
         }

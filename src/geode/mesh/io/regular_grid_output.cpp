@@ -23,6 +23,8 @@
 
 #include <geode/mesh/io/regular_grid_output.h>
 
+#include <absl/strings/ascii.h>
+
 #include <geode/basic/timer.h>
 
 #include <geode/mesh/core/regular_grid_solid.h>
@@ -38,7 +40,7 @@ namespace geode
         {
             Timer timer;
             const auto extension =
-                to_string( extension_from_filename( filename ) );
+                absl::AsciiStrToLower( extension_from_filename( filename ) );
             OPENGEODE_EXCEPTION(
                 RegularGridOutputFactory< dimension >::has_creator( extension ),
                 "Unknown extension: ", extension );

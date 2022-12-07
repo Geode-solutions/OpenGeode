@@ -28,7 +28,6 @@
 #include <bitsery/bitsery.h>
 #include <bitsery/ext/std_smart_ptr.h>
 
-#include <geode/basic/bitsery_archive.h>
 #include <geode/basic/common.h>
 
 namespace geode
@@ -50,13 +49,7 @@ namespace geode
         const T &operator*() const;
 
         template < typename Archive >
-        void serialize( Archive &archive )
-        {
-            archive.ext( *this, DefaultGrowable< Archive, PImpl >{},
-                []( Archive &a, PImpl &impl ) {
-                    a.ext( impl.pimpl_, bitsery::ext::StdSmartPtr{} );
-                } );
-        }
+        void serialize( Archive &archive );
 
     private:
         std::unique_ptr< T > pimpl_;

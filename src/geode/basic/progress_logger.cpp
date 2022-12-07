@@ -23,7 +23,9 @@
 
 #include <geode/basic/progress_logger.h>
 
-#include <absl/synchronization/mutex.h>
+#include <mutex>
+
+#include <absl/time/clock.h>
 
 #include <geode/basic/logger.h>
 #include <geode/basic/pimpl_impl.h>
@@ -57,10 +59,10 @@ namespace geode
             }
         }
 
-        void increment()
+        void increment( index_t nb_increments )
         {
-            absl::MutexLock locking{ &lock_ };
-            current_++;
+            const std::lock_guard< std::mutex > locking{ lock_ };
+            current_ += nb_increments;
             auto now = absl::Now();
             if( now - current_time_ > SLEEP )
             {
@@ -69,17 +71,17 @@ namespace geode
             }
         }
 
-        void increment_nb_steps()
+        void increment_nb_steps( index_t nb_steps )
         {
-            absl::MutexLock locking{ &lock_ };
-            nb_steps_++;
+            const std::lock_guard< std::mutex > locking{ lock_ };
+            nb_steps_ += nb_steps;
         }
 
     private:
-        double nb_steps_;
+        index_t nb_steps_;
         index_t current_{ 0 };
         absl::Time current_time_;
-        absl::Mutex lock_;
+        std::mutex lock_;
     };
 
     ProgressLogger::ProgressLogger( std::string message, index_t nb_steps )
@@ -91,11 +93,21 @@ namespace geode
 
     void ProgressLogger::increment()
     {
-        impl_->increment();
+        impl_->increment( 1 );
+    }
+
+    void ProgressLogger::increment( index_t nb_increments )
+    {
+        impl_->increment( nb_increments );
     }
 
     void ProgressLogger::increment_nb_steps()
     {
-        impl_->increment_nb_steps();
+        impl_->increment_nb_steps( 1 );
+    }
+
+    void ProgressLogger::increment_nb_steps( index_t nb_steps )
+    {
+        impl_->increment_nb_steps( nb_steps );
     }
 } // namespace geode

@@ -38,6 +38,7 @@
 #include <geode/model/mixin/core/model_boundaries.h>
 #include <geode/model/mixin/core/surfaces.h>
 #include <geode/model/mixin/core/topology.h>
+#include <geode/model/representation/core/mapping.h>
 
 namespace geode
 {
@@ -51,7 +52,6 @@ namespace geode
     ALIAS_2D( ModelBoundary );
     ALIAS_2D( Surface );
     ALIAS_2D( SurfaceMesh );
-    class ModelCopyMapping;
     class Section;
     struct uuid;
 } // namespace geode

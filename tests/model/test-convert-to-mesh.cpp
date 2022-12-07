@@ -40,7 +40,7 @@
 
 void run_test_brep()
 {
-    auto model =
+    const auto model =
         geode::load_brep( absl::StrCat( geode::data_path, "layers.og_brep" ) );
 
     const auto output =
@@ -66,7 +66,7 @@ void run_test_brep()
 
 void run_test_section()
 {
-    auto model =
+    const auto model =
         geode::load_section( absl::StrCat( geode::data_path, "quad.og_sctn" ) );
 
     const auto output = geode::convert_section_into_curve_and_surface( model );
@@ -77,7 +77,7 @@ void run_test_section()
         "[Test] Section - Wrong number of curve edges" );
 
     const auto& surface = std::get< 1 >( output );
-    OPENGEODE_EXCEPTION( surface->nb_vertices() == 1,
+    OPENGEODE_EXCEPTION( surface->nb_vertices() == 4,
         "[Test] Section - Wrong number of surface vertices" );
     OPENGEODE_EXCEPTION( surface->nb_polygons() == 1,
         "[Test] Section - Wrong number of surface polygons" );
@@ -85,6 +85,7 @@ void run_test_section()
 
 void test()
 {
+    geode::OpenGeodeModel::initialize();
     run_test_brep();
     run_test_section();
 }

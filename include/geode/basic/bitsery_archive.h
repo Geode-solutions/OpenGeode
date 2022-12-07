@@ -191,6 +191,5 @@ namespace bitsery
     template <>                                                                \
     struct PolymorphicClassName< Type >                                        \
     {                                                                          \
-        static const char *name;                                               \
-    };                                                                         \
-    const char *PolymorphicClassName< Type >::name = Name
+        static constexpr auto name = Name;                                     \
+    }

@@ -128,6 +128,8 @@ PYBIND11_MODULE( opengeode_py_model, module )
     }
     pybind11::add_ostream_redirect( module );
     module.doc() = "OpenGeode Python binding for model";
+    pybind11::class_< geode::OpenGeodeModel >( module, "OpenGeodeModel" )
+        .def( "initialize", &geode::OpenGeodeModel::initialize );
     geode::define_component_type( module );
     geode::define_component( module );
     geode::define_block( module );
@@ -155,8 +157,9 @@ PYBIND11_MODULE( opengeode_py_model, module )
 
     geode::define_brep( module );
     geode::define_section( module );
+    geode::define_copy_mapping( module );
+    geode::define_generic_mapping( module );
 
-    geode::define_copy( module );
     geode::define_brep_builder( module );
     geode::define_section_builder( module );
 

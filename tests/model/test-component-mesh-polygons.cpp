@@ -223,8 +223,9 @@ void run_test_section()
 
 void test()
 {
+    geode::OpenGeodeModel::initialize();
     run_test_brep();
     run_test_section();
 }
 
-OPENGEODE_TEST( "convert-model-meshes" )
+OPENGEODE_TEST( "convert-mesh-polygons" )

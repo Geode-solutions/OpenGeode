@@ -27,19 +27,10 @@
 
 #include <geode/mesh/builder/tetrahedral_solid_builder.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
+#include <geode/mesh/helpers/private/copy.h>
 
 namespace
 {
-    template < typename MeshFrom, typename Builder >
-    void copy_points( const MeshFrom& from, Builder& builder )
-    {
-        builder.create_vertices( from.nb_vertices() );
-        for( const auto v : geode::Range{ from.nb_vertices() } )
-        {
-            builder.set_point( v, from.point( v ) );
-        }
-    }
-
     bool all_polyhedra_are_simplex( const geode::SolidMesh3D& solid )
     {
         for( const auto p : geode::Range{ solid.nb_polyhedra() } )
@@ -64,7 +55,8 @@ namespace geode
         }
         auto tet_solid = TetrahedralSolid3D::create();
         auto builder = TetrahedralSolidBuilder3D::create( *tet_solid );
-        copy_points( solid, *builder );
+        detail::copy_meta_info( solid, *builder );
+        detail::copy_points( solid, *builder );
         builder->reserve_tetrahedra( solid.nb_polyhedra() );
         for( const auto p : Range{ solid.nb_polyhedra() } )
         {

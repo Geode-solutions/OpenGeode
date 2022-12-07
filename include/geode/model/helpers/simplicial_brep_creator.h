@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <absl/types/span.h>
+
 #include <geode/basic/pimpl.h>
 
 #include <geode/model/common.h>

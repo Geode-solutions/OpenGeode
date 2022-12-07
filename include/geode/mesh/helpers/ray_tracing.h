@@ -28,6 +28,8 @@
 #include <geode/basic/pimpl.h>
 
 #include <geode/geometry/basic_objects/infinite_line.h>
+#include <geode/geometry/information.h>
+#include <geode/geometry/point.h>
 
 #include <geode/mesh/common.h>
 
@@ -44,31 +46,47 @@ namespace geode
     public:
         struct PolygonDistance
         {
-            PolygonDistance( index_t polygon_in, double distance_in )
-                : polygon{ polygon_in }, distance{ distance_in }
+            PolygonDistance() = default;
+
+            PolygonDistance( index_t polygon_in,
+                double distance_in,
+                Position position_in,
+                Point3D point_in )
+                : polygon{ polygon_in },
+                  distance{ distance_in },
+                  position{ position_in },
+                  point{ std::move( point_in ) }
             {
             }
 
             bool operator<( const PolygonDistance& other ) const
             {
-                return distance < other.distance;
+                return std::fabs( distance ) < std::fabs( other.distance );
             }
 
-            index_t polygon;
-            double distance;
+            index_t polygon{ NO_ID };
+            double distance{ 0 };
+            Position position{ Position::outside };
+            Point3D point;
         };
 
     public:
         RayTracing3D( const SurfaceMesh3D& mesh, const Ray3D& ray );
+        RayTracing3D(
+            const SurfaceMesh3D& mesh, const InfiniteLine3D& infinite_line );
         RayTracing3D( RayTracing3D&& other );
         ~RayTracing3D();
 
         absl::optional< PolygonDistance > closest_polygon() const;
+
+        absl::optional< absl::FixedArray< PolygonDistance > > closest_polygons(
+            index_t size ) const;
+
+        std::vector< PolygonDistance > all_intersections() const;
 
         void operator()( index_t polygon_id );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );
     };
-
 } // namespace geode

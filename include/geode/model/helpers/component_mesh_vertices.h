@@ -42,4 +42,9 @@ namespace geode
     ComponentMeshVertexPairs opengeode_model_api component_mesh_vertex_pairs(
         absl::Span< const ComponentMeshVertex > unique_vertices0,
         absl::Span< const ComponentMeshVertex > unique_vertices1 );
+
+    ComponentMeshVertexPairs opengeode_model_api component_mesh_vertex_pairs(
+        absl::Span< const ComponentMeshVertex > unique_vertices0,
+        absl::Span< const ComponentMeshVertex > unique_vertices1,
+        const geode::ComponentType& type );
 } // namespace geode

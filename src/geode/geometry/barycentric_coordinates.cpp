@@ -33,18 +33,15 @@ namespace geode
     std::array< double, 4 > tetrahedron_barycentric_coordinates(
         const Point3D& point, const Tetrahedron& tetra )
     {
-        const auto volume0 =
-            tetrahedron_signed_volume( Tetrahedron{ tetra.vertices()[1],
-                tetra.vertices()[3], tetra.vertices()[2], point } );
-        const auto volume1 =
-            tetrahedron_signed_volume( Tetrahedron{ tetra.vertices()[0],
-                tetra.vertices()[2], tetra.vertices()[3], point } );
-        const auto volume2 =
-            tetrahedron_signed_volume( Tetrahedron{ tetra.vertices()[0],
-                tetra.vertices()[3], tetra.vertices()[1], point } );
-        const auto volume3 =
-            tetrahedron_signed_volume( Tetrahedron{ tetra.vertices()[0],
-                tetra.vertices()[1], tetra.vertices()[2], point } );
+        const auto& vertices = tetra.vertices();
+        const auto volume0 = tetrahedron_signed_volume(
+            Tetrahedron{ vertices[1], vertices[3], vertices[2], point } );
+        const auto volume1 = tetrahedron_signed_volume(
+            Tetrahedron{ vertices[0], vertices[2], vertices[3], point } );
+        const auto volume2 = tetrahedron_signed_volume(
+            Tetrahedron{ vertices[0], vertices[3], vertices[1], point } );
+        const auto volume3 = tetrahedron_signed_volume(
+            Tetrahedron{ vertices[0], vertices[1], vertices[2], point } );
         const auto total_volume = volume0 + volume1 + volume2 + volume3;
         OPENGEODE_EXCEPTION( std::fabs( total_volume ) > global_epsilon,
             "[tetrahedron_barycentric_coordinates] Volume of input tetrahedron "
@@ -69,15 +66,14 @@ namespace geode
             result.fill( 1. / 3. );
             return result;
         }
-        const auto area0 = triangle_signed_area(
-            { triangle.vertices()[1], triangle.vertices()[2], point },
-            triangle_normal.value() );
-        const auto area1 = triangle_signed_area(
-            { triangle.vertices()[2], triangle.vertices()[0], point },
-            triangle_normal.value() );
-        const auto area2 = triangle_signed_area(
-            { triangle.vertices()[0], triangle.vertices()[1], point },
-            triangle_normal.value() );
+        const auto& vertices = triangle.vertices();
+        const auto& normal = triangle_normal.value();
+        const auto area0 =
+            triangle_signed_area( { vertices[1], vertices[2], point }, normal );
+        const auto area1 =
+            triangle_signed_area( { vertices[2], vertices[0], point }, normal );
+        const auto area2 =
+            triangle_signed_area( { vertices[0], vertices[1], point }, normal );
 
         const auto total_area = area0 + area1 + area2;
         OPENGEODE_EXCEPTION( std::fabs( total_area ) > global_epsilon,
@@ -93,12 +89,13 @@ namespace geode
     std::array< double, 3 > triangle_barycentric_coordinates(
         const Point2D& point, const Triangle2D& triangle )
     {
-        const auto area0 = triangle_signed_area(
-            { triangle.vertices()[1], triangle.vertices()[2], point } );
-        const auto area1 = triangle_signed_area(
-            { triangle.vertices()[2], triangle.vertices()[0], point } );
-        const auto area2 = triangle_signed_area(
-            { triangle.vertices()[0], triangle.vertices()[1], point } );
+        const auto& vertices = triangle.vertices();
+        const auto area0 =
+            triangle_signed_area( { vertices[1], vertices[2], point } );
+        const auto area1 =
+            triangle_signed_area( { vertices[2], vertices[0], point } );
+        const auto area2 =
+            triangle_signed_area( { vertices[0], vertices[1], point } );
 
         const auto total_area = area0 + area1 + area2;
         OPENGEODE_EXCEPTION( std::fabs( total_area ) > global_epsilon,
@@ -116,9 +113,10 @@ namespace geode
     {
         const auto dir = segment.direction();
         const auto length = dir.length();
-        const Vector< dimension > v0p{ segment.vertices()[0], point };
+        const auto& vertices = segment.vertices();
+        const Vector< dimension > v0p{ vertices[0], point };
         const auto dot0 = v0p.dot( dir ) / length;
-        const Vector< dimension > v1p{ segment.vertices()[1], point };
+        const Vector< dimension > v1p{ vertices[1], point };
         const auto dot1 = -v1p.dot( dir ) / length;
         const auto sum = dot0 + dot1;
         OPENGEODE_EXCEPTION( std::fabs( sum ) > global_epsilon,
@@ -131,13 +129,13 @@ namespace geode
 
     template std::array< double, 3 > opengeode_geometry_api
         triangle_barycentric_coordinates( const Point2D&, const Triangle2D& );
-
     template std::array< double, 3 > opengeode_geometry_api
         triangle_barycentric_coordinates( const Point3D&, const Triangle3D& );
 
     template std::array< double, 2 > opengeode_geometry_api
+        segment_barycentric_coordinates( const Point1D&, const Segment1D& );
+    template std::array< double, 2 > opengeode_geometry_api
         segment_barycentric_coordinates( const Point2D&, const Segment2D& );
-
     template std::array< double, 2 > opengeode_geometry_api
         segment_barycentric_coordinates( const Point3D&, const Segment3D& );
 } // namespace geode

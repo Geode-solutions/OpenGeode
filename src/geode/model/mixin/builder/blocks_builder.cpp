@@ -61,6 +61,7 @@ namespace geode
         const uuid& id, absl::string_view name )
     {
         blocks_.modifiable_block( id ).set_block_name( name, {} );
+        block_mesh_builder( id )->set_name( name );
     }
 
     template < index_t dimension >

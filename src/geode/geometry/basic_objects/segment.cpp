@@ -23,6 +23,7 @@
 
 #include <geode/geometry/basic_objects/segment.h>
 
+#include <geode/geometry/bounding_box.h>
 #include <geode/geometry/distance.h>
 
 namespace geode
@@ -95,13 +96,24 @@ namespace geode
     void GenericSegment< PointType, dimension >::set_point(
         index_t vertex, const Point< dimension >& point )
     {
-        vertices_.at( vertex ) = point;
+        vertices_[vertex] = point;
     }
     template < typename PointType, index_t dimension >
     const std::array< PointType, 2 >&
         GenericSegment< PointType, dimension >::vertices() const
     {
         return vertices_;
+    }
+    template < typename PointType, index_t dimension >
+    BoundingBox< dimension >
+        GenericSegment< PointType, dimension >::bounding_box() const
+    {
+        BoundingBox< dimension > bbox;
+        for( const auto& point : vertices_ )
+        {
+            bbox.add_point( point );
+        }
+        return bbox;
     }
 
     template < typename PointType, index_t dimension >
@@ -179,12 +191,16 @@ namespace geode
         return *this;
     }
 
+    template class opengeode_geometry_api GenericSegment< Point< 1 >, 1 >;
     template class opengeode_geometry_api GenericSegment< Point< 2 >, 2 >;
     template class opengeode_geometry_api GenericSegment< Point< 3 >, 3 >;
+    template class opengeode_geometry_api GenericSegment< RefPoint< 1 >, 1 >;
     template class opengeode_geometry_api GenericSegment< RefPoint< 2 >, 2 >;
     template class opengeode_geometry_api GenericSegment< RefPoint< 3 >, 3 >;
+    template class opengeode_geometry_api OwnerSegment< 1 >;
     template class opengeode_geometry_api OwnerSegment< 2 >;
     template class opengeode_geometry_api OwnerSegment< 3 >;
+    template class opengeode_geometry_api Segment< 1 >;
     template class opengeode_geometry_api Segment< 2 >;
     template class opengeode_geometry_api Segment< 3 >;
 } // namespace geode

@@ -23,6 +23,8 @@
 
 #include <geode/mesh/io/edged_curve_output.h>
 
+#include <absl/strings/ascii.h>
+
 #include <geode/basic/timer.h>
 
 #include <geode/mesh/core/edged_curve.h>
@@ -37,7 +39,7 @@ namespace geode
         {
             Timer timer;
             const auto extension =
-                to_string( extension_from_filename( filename ) );
+                absl::AsciiStrToLower( extension_from_filename( filename ) );
             OPENGEODE_EXCEPTION(
                 EdgedCurveOutputFactory< dimension >::has_creator( extension ),
                 "Unknown extension: ", extension );

@@ -59,12 +59,12 @@ namespace geode
 
         double value( local_index_t index ) const
         {
-            return values_.at( index );
+            return values_[index];
         }
 
         void set_value( local_index_t index, double coordinate )
         {
-            values_.at( index ) = coordinate;
+            values_[index] = coordinate;
         }
 
         bool operator==( const Point &other ) const
@@ -162,7 +162,7 @@ namespace geode
     private:
         std::array< double, dimension > values_;
     };
-    ALIAS_2D_AND_3D( Point );
+    ALIAS_1D_AND_2D_AND_3D( Point );
 
     template < index_t dimension >
     struct AttributeLinearInterpolationImpl< Point< dimension > >
@@ -214,6 +214,16 @@ namespace geode
 
 namespace std
 {
+    template <>
+    struct hash< geode::Point1D >
+    {
+    public:
+        size_t operator()( const geode::Point1D &point ) const
+        {
+            return absl::Hash< double >()( point.value( 0 ) );
+        }
+    };
+
     template <>
     struct hash< geode::Point2D >
     {

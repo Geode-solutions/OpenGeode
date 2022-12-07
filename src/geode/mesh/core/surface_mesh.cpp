@@ -512,14 +512,22 @@ namespace geode
     PolygonEdge SurfaceMesh< dimension >::next_polygon_edge(
         const PolygonEdge& polygon_edge ) const
     {
-        return next_polygon_vertex( polygon_edge );
+        const auto edge = polygon_edge.edge_id;
+        const auto polygon = polygon_edge.polygon_id;
+        const auto nb_vertices = nb_polygon_edges( polygon );
+        const local_index_t next = edge + 1 == nb_vertices ? 0 : edge + 1;
+        return { polygon, next };
     }
 
     template < index_t dimension >
     PolygonEdge SurfaceMesh< dimension >::previous_polygon_edge(
         const PolygonEdge& polygon_edge ) const
     {
-        return previous_polygon_vertex( polygon_edge );
+        const auto edge = polygon_edge.edge_id;
+        const auto polygon = polygon_edge.polygon_id;
+        const auto nb_vertices = nb_polygon_edges( polygon );
+        const local_index_t prev = edge == 0 ? nb_vertices - 1 : edge - 1;
+        return { polygon, prev };
     }
 
     template < index_t dimension >
@@ -537,50 +545,56 @@ namespace geode
         SurfaceMesh< dimension >::polygon_adjacent_edge(
             const PolygonEdge& polygon_edge ) const
     {
-        if( const auto polygon_adj = polygon_adjacent( polygon_edge ) )
+        const auto polygon_adj = polygon_adjacent( polygon_edge );
+        if( !polygon_adj )
         {
-            const auto polygon_adj_id = polygon_adj.value();
-            const auto v0 = polygon_vertex( polygon_edge );
-            const auto v1 = polygon_edge_vertex( polygon_edge, 1 );
-            for( const auto e : LRange{ nb_polygon_edges( polygon_adj_id ) } )
+            return absl::nullopt;
+        }
+        const auto polygon_adj_id = polygon_adj.value();
+        const auto v0 = polygon_vertex( polygon_edge );
+        const auto v1 = polygon_edge_vertex( polygon_edge, 1 );
+        const auto adj_vertices = polygon_vertices( polygon_adj_id );
+        const auto nb_edges = adj_vertices.size();
+        for( const auto e : LRange{ nb_edges } )
+        {
+            if( v0 == adj_vertices[e] )
             {
-                const PolygonEdge adj_edge{ polygon_adj_id, e };
-                const auto adj_v0 = polygon_vertex( adj_edge );
-                if( v0 == adj_v0 )
+                const auto enext = e == nb_edges - 1
+                                       ? 0u
+                                       : static_cast< local_index_t >( e + 1 );
+                if( v1 == adj_vertices[enext] )
                 {
-                    const auto adj_v1 = polygon_edge_vertex( adj_edge, 1 );
-                    if( v1 == adj_v1 )
-                    {
-                        OPENGEODE_ASSERT( polygon_adjacent( adj_edge )
-                                              == polygon_edge.polygon_id,
-                            absl::StrCat(
-                                "[SurfaceMesh::polygon_adjacent_"
-                                "edge] Wrong adjacency with polygons: ",
-                                polygon_edge.polygon_id, " and ",
-                                polygon_adj_id ) );
-                        return adj_edge;
-                    }
-                }
-                else if( v1 == adj_v0 )
-                {
-                    const auto adj_v1 = polygon_edge_vertex( adj_edge, 1 );
-                    if( v0 == adj_v1 )
-                    {
-                        OPENGEODE_ASSERT( polygon_adjacent( adj_edge )
-                                              == polygon_edge.polygon_id,
-                            absl::StrCat(
-                                "[SurfaceMesh::polygon_adjacent_"
-                                "edge] Wrong adjacency with polygons: ",
-                                polygon_edge.polygon_id, " and ",
-                                polygon_adj_id ) );
-                        return adj_edge;
-                    }
+                    OPENGEODE_ASSERT( polygon_adjacent( { polygon_adj_id, e } )
+                                          == polygon_edge.polygon_id,
+                        absl::StrCat( "[SurfaceMesh::polygon_adjacent_"
+                                      "edge] Wrong adjacency with polygons: ",
+                            polygon_edge.polygon_id, " and ",
+                            polygon_adj_id ) );
+                    return absl::optional< PolygonEdge >{ absl::in_place,
+                        polygon_adj_id, e };
                 }
             }
-            throw OpenGeodeException{ "[SurfaceMesh::polygon_adjacent_"
+            else if( v1 == adj_vertices[e] )
+            {
+                const auto enext = e == nb_edges - 1
+                                       ? 0u
+                                       : static_cast< local_index_t >( e + 1 );
+                if( v0 == adj_vertices[enext] )
+                {
+                    OPENGEODE_ASSERT( polygon_adjacent( { polygon_adj_id, e } )
+                                          == polygon_edge.polygon_id,
+                        absl::StrCat( "[SurfaceMesh::polygon_adjacent_"
                                       "edge] Wrong adjacency with polygons: ",
-                polygon_edge.polygon_id, " and ", polygon_adj_id };
+                            polygon_edge.polygon_id, " and ",
+                            polygon_adj_id ) );
+                    return absl::optional< PolygonEdge >{ absl::in_place,
+                        polygon_adj_id, e };
+                }
+            }
         }
+        throw OpenGeodeException{ "[SurfaceMesh::polygon_adjacent_edge] Wrong "
+                                  "adjacency with polygons: ",
+            polygon_edge.polygon_id, " and ", polygon_adj_id };
         return absl::nullopt;
     }
 
@@ -931,12 +945,12 @@ namespace geode
     {
         check_polygon_id( *this, polygon_id );
         Vector3D normal;
-        const auto& p0 = this->point( polygon_vertex( { polygon_id, 0 } ) );
+        const auto vertices = polygon_vertices( polygon_id );
+        const auto& p0 = this->point( vertices[0] );
         for( const auto v : LRange{ 2, nb_polygon_vertices( polygon_id ) } )
         {
-            const auto& p1 = this->point( polygon_vertex(
-                { polygon_id, static_cast< local_index_t >( v - 1 ) } ) );
-            const auto& p2 = this->point( polygon_vertex( { polygon_id, v } ) );
+            const auto& p1 = this->point( vertices[v - 1] );
+            const auto& p2 = this->point( vertices[v] );
             if( const auto triangle_normal =
                     Triangle< T >{ p0, p1, p2 }.new_normal() )
             {

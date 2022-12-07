@@ -81,6 +81,7 @@ namespace geode
         {
         public:
             BlockRange( const Blocks& blocks );
+            ~BlockRange();
 
             const Block< dimension >& operator*() const;
         };

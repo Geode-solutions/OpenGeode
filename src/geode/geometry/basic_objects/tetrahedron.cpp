@@ -23,6 +23,8 @@
 
 #include <geode/geometry/basic_objects/tetrahedron.h>
 
+#include <geode/geometry/bounding_box.h>
+
 namespace geode
 {
     template < typename PointType >
@@ -72,13 +74,23 @@ namespace geode
     void GenericTetrahedron< PointType >::set_point(
         index_t vertex, const Point3D& point )
     {
-        vertices_.at( vertex ) = point;
+        vertices_[vertex] = point;
     }
     template < typename PointType >
     const std::array< PointType, 4 >&
         GenericTetrahedron< PointType >::vertices() const
     {
         return vertices_;
+    }
+    template < typename PointType >
+    BoundingBox3D GenericTetrahedron< PointType >::bounding_box() const
+    {
+        BoundingBox3D bbox;
+        for( const auto& point : vertices_ )
+        {
+            bbox.add_point( point );
+        }
+        return bbox;
     }
 
     template < typename PointType >

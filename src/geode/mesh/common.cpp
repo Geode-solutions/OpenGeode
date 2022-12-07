@@ -23,18 +23,21 @@
 
 #include <geode/mesh/common.h>
 
+#include <geode/geometry/common.h>
+
 #include <geode/mesh/builder/detail/register_builder.h>
 #include <geode/mesh/core/detail/register_mesh.h>
 #include <geode/mesh/io/detail/register_input.h>
 #include <geode/mesh/io/detail/register_output.h>
 
-namespace
+namespace geode
 {
-    OPENGEODE_LIBRARY_INITIALIZE( OpenGeode_mesh )
+    OPENGEODE_LIBRARY_IMPLEMENTATION( OpenGeodeMesh )
     {
-        geode::register_geode_mesh();
-        geode::register_geode_builder();
-        geode::register_geode_mesh_input();
-        geode::register_geode_mesh_output();
+        OpenGeodeGeometry::initialize();
+        register_geode_mesh();
+        register_geode_builder();
+        register_geode_mesh_input();
+        register_geode_mesh_output();
     }
-} // namespace
+} // namespace geode

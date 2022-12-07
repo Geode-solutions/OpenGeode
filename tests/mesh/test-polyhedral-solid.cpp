@@ -531,6 +531,7 @@ void test_delete_all( const geode::PolyhedralSolid3D& polyhedral_solid,
 
 void test()
 {
+    geode::OpenGeodeMesh::initialize();
     auto polyhedral_solid = geode::PolyhedralSolid3D::create(
         geode::OpenGeodePolyhedralSolid3D::impl_name_static() );
     polyhedral_solid->enable_edges();

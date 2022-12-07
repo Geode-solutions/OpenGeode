@@ -40,6 +40,7 @@
 #include <geode/mesh/core/geode_tetrahedral_solid.h>
 #include <geode/mesh/core/geode_triangulated_surface.h>
 #include <geode/mesh/core/geode_vertex_set.h>
+#include <geode/mesh/core/mesh_element.h>
 #include <geode/mesh/core/private/solid_mesh_impl.h>
 #include <geode/mesh/core/private/surface_mesh_impl.h>
 
@@ -251,6 +252,9 @@ namespace
         geode::AttributeManager::register_attribute_type<
             geode::HybridSolid3D::Type, Serializer >(
             context, "HybridSolidType" );
+        geode::AttributeManager::register_attribute_type<
+            std::vector< geode::MeshElement >, Serializer >(
+            context, "MeshElement" );
         context.registerBasesList< Serializer >(
             bitsery::ext::PolymorphicClassesList< geode::VertexSet >{} );
     }

@@ -33,6 +33,7 @@ add_geode_library(
         "filename.cpp"
         "identifier.cpp"
         "identifier_builder.cpp"
+        "library.cpp"
         "logger.cpp"
         "logger_manager.cpp"
         "permutation.cpp"
@@ -56,8 +57,10 @@ add_geode_library(
         "database.h"
         "factory.h"
         "filename.h"
+        "greyscale_color.h"
         "identifier.h"
         "identifier_builder.h"
+        "library.h"
         "logger.h"
         "logger_client.h"
         "logger_manager.h"
@@ -71,6 +74,7 @@ add_geode_library(
         "progress_logger_client.h"
         "progress_logger_manager.h"
         "range.h"
+        "rgb_color.h"
         "singleton.h"
         "string.h"
         "timer.h"
@@ -92,9 +96,3 @@ add_geode_library(
         spdlog::spdlog_header_only
         MINIZIP::minizip-ng
 )
-if(WIN32)
-    set_target_properties(basic
-        PROPERTIES
-            LINK_FLAGS_DEBUG "/NODEFAULTLIB:MSVCRTD"
-    )
-endif()

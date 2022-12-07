@@ -53,8 +53,8 @@ namespace
         const geode::ComponentType& type )
     {
         return geode::component_mesh_vertex_pairs(
-            model.component_mesh_vertices( edge_unique_vertices[0], type ),
-            model.component_mesh_vertices( edge_unique_vertices[1], type ) );
+            model.component_mesh_vertices( edge_unique_vertices[0] ),
+            model.component_mesh_vertices( edge_unique_vertices[1] ), type );
     }
 
     template < class ModelType >

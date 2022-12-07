@@ -29,6 +29,7 @@
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( OwnerInfiniteLine );
+    FORWARD_DECLARATION_DIMENSION_CLASS( OwnerRay );
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
     template < typename PointType, index_t dimension >
     class GenericSegment;
@@ -37,7 +38,6 @@ namespace geode
 
     template < index_t dimension >
     using RefPoint = std::reference_wrapper< const Point< dimension > >;
-    ALIAS_2D_AND_3D( RefPoint );
 } // namespace geode
 
 namespace geode
@@ -65,6 +65,7 @@ namespace geode
 
     protected:
         GenericInfiniteLine( const OwnerInfiniteLine< dimension >& other );
+        GenericInfiniteLine( const OwnerRay< dimension >& other );
 
     private:
         PointType origin_;
@@ -89,10 +90,24 @@ namespace geode
         OwnerInfiniteLine< dimension >& operator=(
             OwnerInfiniteLine< dimension >&& other );
     };
-    ALIAS_2D_AND_3D( OwnerInfiniteLine );
+    ALIAS_1D_AND_2D_AND_3D( OwnerInfiniteLine );
+
     template < index_t dimension >
-    using OwnerRay = OwnerInfiniteLine< dimension >;
-    ALIAS_2D_AND_3D( OwnerRay );
+    class OwnerRay : public GenericInfiniteLine< Point< dimension >, dimension >
+    {
+        using Base = GenericInfiniteLine< Point< dimension >, dimension >;
+
+    public:
+        explicit OwnerRay( const Vector< dimension >& direction,
+            const Point< dimension >& origin );
+
+        OwnerRay( const Segment< dimension >& segment );
+        OwnerRay( const OwnerRay< dimension >& other );
+        OwnerRay< dimension >& operator=( const OwnerRay< dimension >& other );
+        OwnerRay( OwnerRay< dimension >&& other );
+        OwnerRay< dimension >& operator=( OwnerRay< dimension >&& other );
+    };
+    ALIAS_1D_AND_2D_AND_3D( OwnerRay );
 
     template < index_t dimension >
     class InfiniteLine
@@ -113,8 +128,23 @@ namespace geode
         InfiniteLine< dimension >& operator=(
             InfiniteLine< dimension >&& other );
     };
-    ALIAS_2D_AND_3D( InfiniteLine );
+    ALIAS_1D_AND_2D_AND_3D( InfiniteLine );
+
     template < index_t dimension >
-    using Ray = InfiniteLine< dimension >;
-    ALIAS_2D_AND_3D( Ray );
+    class Ray : public GenericInfiniteLine< RefPoint< dimension >, dimension >
+    {
+        using Base = GenericInfiniteLine< RefPoint< dimension >, dimension >;
+
+    public:
+        Ray( const Vector< dimension >& direction,
+            const Point< dimension >& origin );
+        Ray( const Segment< dimension >& segment );
+
+        Ray( const Ray< dimension >& other );
+        Ray( const OwnerRay< dimension >& other );
+        Ray< dimension >& operator=( const Ray< dimension >& other );
+        Ray( Ray< dimension >&& other );
+        Ray< dimension >& operator=( Ray< dimension >&& other );
+    };
+    ALIAS_1D_AND_2D_AND_3D( Ray );
 } // namespace geode

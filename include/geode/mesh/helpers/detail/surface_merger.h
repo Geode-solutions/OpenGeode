@@ -25,6 +25,8 @@
 
 #include <geode/basic/pimpl.h>
 
+#include <absl/types/span.h>
+
 #include <geode/mesh/common.h>
 
 namespace geode

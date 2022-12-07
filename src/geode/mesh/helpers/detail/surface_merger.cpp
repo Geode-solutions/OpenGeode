@@ -80,7 +80,6 @@ namespace geode
             using SurfaceId = absl::flat_hash_set< index_t >;
 
             static constexpr auto from_surface = "from surface id";
-            static constexpr auto new_polygon = "new polygon id";
 
         public:
             Impl( absl::Span< const std::reference_wrapper<
@@ -102,22 +101,9 @@ namespace geode
                 for( const auto s : Indices{ surfaces_ } )
                 {
                     const auto& surface = surfaces_[s].get();
-                    new_id_[s] = surface.polygon_attribute_manager()
-                                     .template find_or_create_attribute<
-                                         VariableAttribute, index_t >(
-                                         new_polygon, NO_ID );
+                    new_id_[s].resize( surface.nb_polygons(), NO_ID );
                     offset_vertices_[s + 1] =
                         offset_vertices_[s] + surface.nb_vertices();
-                }
-            }
-
-            ~Impl()
-            {
-                for( const auto s : Indices{ surfaces_ } )
-                {
-                    const auto& surface = surfaces_[s].get();
-                    surface.polygon_attribute_manager().delete_attribute(
-                        new_polygon );
                 }
             }
 
@@ -133,6 +119,7 @@ namespace geode
                 create_points( info );
                 vertices_ = std::move( info.colocated_mapping );
                 create_polygons();
+                create_adjacencies();
                 clean_surface();
                 surface_->polygon_attribute_manager().delete_attribute(
                     from_surface );
@@ -150,7 +137,7 @@ namespace geode
 
             index_t polygon_in_merged( index_t surface, index_t polygon ) const
             {
-                return new_id_[surface]->value( polygon );
+                return new_id_[surface][polygon];
             }
 
         private:
@@ -179,12 +166,11 @@ namespace geode
                         const auto& surface = surfaces_[s].get();
                         for( const auto p : Range{ surface.nb_polygons() } )
                         {
-                            const auto old = new_id_[s]->value( p );
-                            new_id_[s]->set_value( p, old2new[old] );
+                            const auto old = new_id_[s][p];
+                            new_id_[s][p] = old2new[old];
                         }
                     }
                 }
-                builder_->compute_polygon_adjacencies();
                 separate_surfaces();
                 repair_polygon_orientations( *surface_ );
             }
@@ -219,7 +205,7 @@ namespace geode
                             const auto polygon_id =
                                 builder_->create_polygon( vertices );
                             surface_id_->set_value( polygon_id, { s } );
-                            new_id_[s]->set_value( p, polygon_id );
+                            new_id_[s][p] = polygon_id;
                         }
                         else
                         {
@@ -228,7 +214,7 @@ namespace geode
                                 polygon_id, [s]( SurfaceId& id ) {
                                     id.insert( s );
                                 } );
-                            new_id_[s]->set_value( p, polygon_id );
+                            new_id_[s][p] = polygon_id;
                         }
                     }
                 }
@@ -247,9 +233,8 @@ namespace geode
                             if( const auto adj =
                                     surface.polygon_adjacent( { p, e } ) )
                             {
-                                const auto new_id = new_id_[s]->value( p );
-                                const auto new_adj_id =
-                                    new_id_[s]->value( adj.value() );
+                                const auto new_id = new_id_[s][p];
+                                const auto new_adj_id = new_id_[s][adj.value()];
                                 builder_->set_polygon_adjacent(
                                     { new_id, e }, new_adj_id );
                             }
@@ -307,8 +292,7 @@ namespace geode
             std::unique_ptr< SurfaceMeshBuilder< dimension > > builder_;
             absl::flat_hash_map< TypedVertexCycle, index_t > polygons_;
             std::shared_ptr< VariableAttribute< SurfaceId > > surface_id_;
-            absl::FixedArray< std::shared_ptr< VariableAttribute< index_t > > >
-                new_id_;
+            absl::FixedArray< std::vector< index_t > > new_id_;
             std::vector< index_t > vertices_;
             absl::FixedArray< index_t > offset_vertices_;
         };

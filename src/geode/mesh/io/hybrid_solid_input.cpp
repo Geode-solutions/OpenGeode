@@ -23,6 +23,8 @@
 
 #include <geode/mesh/io/hybrid_solid_input.h>
 
+#include <absl/strings/ascii.h>
+
 #include <geode/basic/filename.h>
 #include <geode/basic/timer.h>
 
@@ -40,7 +42,7 @@ namespace geode
         {
             Timer timer;
             const auto extension =
-                to_string( extension_from_filename( filename ) );
+                absl::AsciiStrToLower( extension_from_filename( filename ) );
             OPENGEODE_EXCEPTION(
                 HybridSolidInputFactory< dimension >::has_creator( extension ),
                 "Unknown extension: ", extension );

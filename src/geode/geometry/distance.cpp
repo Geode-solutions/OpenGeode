@@ -47,15 +47,13 @@ namespace
     bool may_point_be_in_triangle(
         const geode::Point2D& point, const geode::Triangle2D& triangle )
     {
-        const auto signed_area_1 =
-            geode::triangle_signed_area( geode::Triangle2D{
-                triangle.vertices()[0], triangle.vertices()[1], point } );
-        const auto signed_area_2 =
-            geode::triangle_signed_area( geode::Triangle2D{
-                triangle.vertices()[1], triangle.vertices()[2], point } );
-        const auto signed_area_3 =
-            geode::triangle_signed_area( geode::Triangle2D{
-                triangle.vertices()[2], triangle.vertices()[0], point } );
+        const auto& vertices = triangle.vertices();
+        const auto signed_area_1 = geode::triangle_signed_area(
+            geode::Triangle2D{ vertices[0], vertices[1], point } );
+        const auto signed_area_2 = geode::triangle_signed_area(
+            geode::Triangle2D{ vertices[1], vertices[2], point } );
+        const auto signed_area_3 = geode::triangle_signed_area(
+            geode::Triangle2D{ vertices[2], vertices[0], point } );
 
         return ( signed_area_1 <= 0. && signed_area_2 <= 0.
                    && signed_area_3 <= 0 )
@@ -70,7 +68,13 @@ namespace geode
     double point_point_distance(
         const Point< dimension >& point0, const Point< dimension >& point1 )
     {
-        return Vector< dimension >{ point0, point1 }.length();
+        double diff2{ 0 };
+        for( const auto d : LRange{ dimension } )
+        {
+            const auto diff = point0.value( d ) - point1.value( d );
+            diff2 += diff * diff;
+        }
+        return std::sqrt( diff2 );
     }
 
     template < index_t dimension >
@@ -84,23 +88,20 @@ namespace geode
 
     template < index_t dimension >
     std::tuple< double, Point< dimension >, Point< dimension > >
-        segment_segment_distance( const Segment< dimension >& segment0,
+        compute_segment_segment_distance( const Segment< dimension >& segment0,
             const Segment< dimension >& segment1 )
     {
         /* Algorithm and code found on
          * http://geomalgorithms.com/a07-_distance.html
          */
-        const Vector< dimension > u{ segment0.vertices()[0],
-            segment0.vertices()[1] };
-        const Vector< dimension > v{ segment1.vertices()[0],
-            segment1.vertices()[1] };
-        const Vector< dimension > w{ segment1.vertices()[0],
-            segment0.vertices()[0] };
+        const auto& vertices0 = segment0.vertices();
+        const auto& vertices1 = segment1.vertices();
+        const Vector< dimension > u{ vertices0[0], vertices0[1] };
+        const Vector< dimension > v{ vertices1[0], vertices1[1] };
+        const Vector< dimension > w{ vertices1[0], vertices0[0] };
         const auto a = u.dot( u ); // always >= 0
         const auto b = u.dot( v );
         const auto c = v.dot( v ); // always >= 0
-        const auto d = u.dot( w );
-        const auto e = v.dot( w );
         const auto D = a * c - b * b;
         auto sc = D;
         auto sN = D;
@@ -108,6 +109,8 @@ namespace geode
         auto tc = D;
         auto tN = D;
         auto tD = D; // tc = tN / tD, default tD = D >= 0
+        const auto d = u.dot( w );
+        const auto e = v.dot( w );
 
         // compute the line parameters of the two closest points
         if( D <= 0.0 )
@@ -168,14 +171,55 @@ namespace geode
         tc = ( std::fabs( tN ) <= 0.0 ? 0.0 : tN / tD );
 
         // get the difference of the two closest points
-        const Point< dimension > closest0 =
-            segment0.vertices()[0].get() + u * sc;
-        const Point< dimension > closest1 =
-            segment1.vertices()[0].get() + v * tc;
+        const Point< dimension > closest0 = vertices0[0].get() + u * sc;
+        const Point< dimension > closest1 = vertices1[0].get() + v * tc;
         const Vector< dimension > dP{ closest0,
             closest1 }; // =  segment0(sc) - segment1(tc)
 
         return std::make_tuple( dP.length(), closest0, closest1 );
+    }
+
+    template < index_t dimension >
+    std::tuple< double, Point< dimension >, Point< dimension > >
+        segment_segment_distance( const Segment< dimension >& segment0,
+            const Segment< dimension >& segment1 )
+    {
+        auto min_distance = std::numeric_limits< double >::max();
+        local_index_t min_p0{ 0 };
+        local_index_t min_p1{ 0 };
+        const auto& vertices0 = segment0.vertices();
+        const auto& vertices1 = segment1.vertices();
+        for( const auto p0 : LRange{ 2 } )
+        {
+            for( const auto p1 : LRange{ 2 } )
+            {
+                const auto cur_dist = point_point_distance(
+                    vertices0[p0].get(), vertices1[p1].get() );
+                if( cur_dist < min_distance )
+                {
+                    min_distance = cur_dist;
+                    min_p0 = p0;
+                    min_p1 = p1;
+                }
+            }
+        }
+        if( min_p0 == 1 )
+        {
+            if( min_p1 == 1 )
+            {
+                return compute_segment_segment_distance< dimension >(
+                    { vertices0[1], vertices0[0] },
+                    { vertices1[1], vertices1[0] } );
+            }
+            return compute_segment_segment_distance(
+                { vertices0[1], vertices0[0] }, segment1 );
+        }
+        if( min_p1 == 1 )
+        {
+            return compute_segment_segment_distance(
+                segment0, { vertices1[1], vertices1[0] } );
+        }
+        return compute_segment_segment_distance( segment0, segment1 );
     }
 
     template < index_t dimension >
@@ -201,19 +245,21 @@ namespace geode
         return std::make_tuple( signed_distance, nearest_point );
     }
 
-    template <>
     std::tuple< double, Point3D > point_triangle_distance(
-        const Point3D& point, const Triangle3D& triangle )
+        const Point3D& point, const Triangle3D& triangle, local_index_t v0 )
     {
-        const Vector3D diff{ point, triangle.vertices()[0] };
-        const Vector3D edge0{ triangle.vertices()[0], triangle.vertices()[1] };
-        const Vector3D edge1{ triangle.vertices()[0], triangle.vertices()[2] };
+        const auto v1 = v0 == 2 ? 0 : v0 + 1;
+        const auto v2 = v1 == 2 ? 0 : v1 + 1;
+        const auto& vertices = triangle.vertices();
+        const Vector3D edge0{ vertices[v0], vertices[v1] };
+        const Vector3D edge1{ vertices[v0], vertices[v2] };
         const auto a00 = edge0.length2();
         const auto a01 = edge0.dot( edge1 );
         const auto a11 = edge1.length2();
+        const auto det = std::fabs( a00 * a11 - a01 * a01 );
+        const Vector3D diff{ point, vertices[v0] };
         const auto b0 = diff.dot( edge0 );
         const auto b1 = diff.dot( edge1 );
-        const auto det = std::fabs( a00 * a11 - a01 * a01 );
         auto s = a01 * b1 - a11 * b0;
         auto t = a01 * b0 - a00 * b1;
 
@@ -392,10 +438,36 @@ namespace geode
             }
         }
 
-        Point3D closest_point{ triangle.vertices()[0].get() + edge0 * s
-                               + edge1 * t };
+        Point3D closest_point{ vertices[v0].get() + edge0 * s + edge1 * t };
         const auto distance = point_point_distance( point, closest_point );
         return std::make_tuple( distance, std::move( closest_point ) );
+    }
+
+    template <>
+    std::tuple< double, Point3D > point_triangle_distance(
+        const Point3D& point, const Triangle3D& triangle )
+    {
+        if( const auto pivot = triangle.pivot() )
+        {
+            return point_triangle_distance( point, triangle, pivot.value() );
+        }
+        std::array< std::tuple< double, Point3D >, 3 > edge_distances;
+        auto min_distance = std::numeric_limits< double >::max();
+        local_index_t selected_edge{ NO_LID };
+        const auto& vertices = triangle.vertices();
+        for( const auto e : LRange{ 3 } )
+        {
+            const auto next = e == 2 ? 0 : e + 1;
+            edge_distances[e] = point_segment_distance(
+                point, { vertices[e], vertices[next] } );
+            const auto& cur_distance = std::get< 0 >( edge_distances[e] );
+            if( cur_distance < min_distance )
+            {
+                min_distance = cur_distance;
+                selected_edge = e;
+            }
+        }
+        return edge_distances[selected_edge];
     }
 
     template <>
@@ -406,14 +478,15 @@ namespace geode
         {
             return std::make_tuple( 0.0, point );
         }
+        const auto& vertices = triangle.vertices();
         std::array< Point2D, 3 > closest;
         std::array< double, 3 > distance;
-        std::tie( distance[0], closest[0] ) = point_segment_distance( point,
-            Segment2D{ triangle.vertices()[0], triangle.vertices()[1] } );
-        std::tie( distance[1], closest[1] ) = point_segment_distance( point,
-            Segment2D{ triangle.vertices()[1], triangle.vertices()[2] } );
-        std::tie( distance[2], closest[2] ) = point_segment_distance( point,
-            Segment2D{ triangle.vertices()[2], triangle.vertices()[0] } );
+        std::tie( distance[0], closest[0] ) = point_segment_distance(
+            point, Segment2D{ vertices[0], vertices[1] } );
+        std::tie( distance[1], closest[1] ) = point_segment_distance(
+            point, Segment2D{ vertices[1], vertices[2] } );
+        std::tie( distance[2], closest[2] ) = point_segment_distance(
+            point, Segment2D{ vertices[2], vertices[0] } );
         double result;
         Point2D closest_point;
         if( distance[0] < distance[1] )
@@ -451,18 +524,17 @@ namespace geode
         auto max_distance = MAX_DOUBLE;
         Point3D nearest_p;
         bool inside{ true };
+        const auto& vertices = tetra.vertices();
         for( const auto f : Range{ 4 } )
         {
+            const auto& facet_vertices =
+                Tetrahedron::tetrahedron_facet_vertex[f];
             double distance;
             Point3D cur_p;
-            std::tie( distance, cur_p ) = point_triangle_signed_distance( point,
-                Triangle3D{
-                    tetra.vertices()[Tetrahedron::tetrahedron_facet_vertex[f]
-                                                                          [0]],
-                    tetra.vertices()[Tetrahedron::tetrahedron_facet_vertex[f]
-                                                                          [1]],
-                    tetra.vertices()
-                        [Tetrahedron::tetrahedron_facet_vertex[f][2]] } );
+            std::tie( distance, cur_p ) = point_triangle_signed_distance(
+                point, Triangle3D{ vertices[facet_vertices[0]],
+                           vertices[facet_vertices[1]],
+                           vertices[facet_vertices[2]] } );
             if( distance > 0 )
             {
                 inside = false;
@@ -635,6 +707,13 @@ namespace geode
         }
         return point_circle_distance( point, disk );
     }
+
+    template double opengeode_geometry_api point_point_distance(
+        const Point1D&, const Point1D& );
+    template std::tuple< double, Point1D > opengeode_geometry_api
+        point_segment_distance( const Point1D&, const Segment1D& );
+    template std::tuple< double, Point1D, Point1D > opengeode_geometry_api
+        segment_segment_distance( const Segment1D&, const Segment1D& );
 
     template double opengeode_geometry_api point_point_distance(
         const Point2D&, const Point2D& );

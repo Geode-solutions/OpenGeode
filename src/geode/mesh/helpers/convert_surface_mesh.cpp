@@ -38,16 +38,6 @@
 
 namespace
 {
-    template < typename MeshFrom, typename Builder >
-    void copy_points( const MeshFrom& from, Builder& builder )
-    {
-        builder.create_vertices( from.nb_vertices() );
-        for( const auto v : geode::Range{ from.nb_vertices() } )
-        {
-            builder.set_point( v, from.point( v ) );
-        }
-    }
-
     template < geode::index_t dimension >
     bool all_polygons_are_simplex(
         const geode::SurfaceMesh< dimension >& surface )
@@ -94,12 +84,13 @@ namespace
         geode::SurfaceMesh< dimension >& output )
     {
         auto builder = geode::SurfaceMeshBuilder< dimension >::create( output );
-        copy_points( input, *builder );
+        geode::detail::copy_points( input, *builder );
         output.vertex_attribute_manager().copy(
             input.vertex_attribute_manager() );
         copy_polygons( input, *builder );
         output.polygon_attribute_manager().copy(
             input.polygon_attribute_manager() );
+        geode::detail::copy_meta_info( input, *builder );
     }
 
     template < typename SurfaceIn, typename SurfaceOut >
@@ -165,17 +156,15 @@ namespace geode
         std::vector< bool > to_delete( surface.nb_polygons(), false );
         for( const auto p : geode::Range{ surface.nb_polygons() } )
         {
-            if( surface.nb_polygon_vertices( p ) > 3 )
+            const auto nb_vertices = surface.nb_polygon_vertices( p );
+            to_delete[p] = nb_vertices != 3;
+            if( nb_vertices > 3 )
             {
-                to_delete[p] = true;
-                const auto v0 = surface.polygon_vertex( { p, 0 } );
-                for( const auto v :
-                    LRange{ 2, surface.nb_polygon_vertices( p ) } )
+                const auto vertices = surface.polygon_vertices( p );
+                for( const auto v : LRange{ 2, nb_vertices } )
                 {
-                    builder.create_polygon( { v0,
-                        surface.polygon_vertex(
-                            { p, static_cast< local_index_t >( v - 1 ) } ),
-                        surface.polygon_vertex( { p, v } ) } );
+                    builder.create_polygon(
+                        { vertices[0], vertices[v - 1], vertices[v] } );
                 }
             }
         }
@@ -189,6 +178,7 @@ namespace geode
     {
         auto surface3d = SurfaceMesh3D::create();
         auto builder3d = SurfaceMeshBuilder3D::create( *surface3d );
+        detail::copy_meta_info( surface2d, *builder3d );
         detail::copy_points2d_into_3d( surface2d, *builder3d, axis_to_add );
         copy_polygons( surface2d, *builder3d );
         copy_surface_attributes( surface2d, *surface3d );
@@ -200,6 +190,7 @@ namespace geode
     {
         auto surface2d = SurfaceMesh2D::create();
         auto builder2d = SurfaceMeshBuilder2D::create( *surface2d );
+        detail::copy_meta_info( surface3d, *builder2d );
         detail::copy_points3d_into_2d( surface3d, *builder2d, axis_to_remove );
         copy_polygons( surface3d, *builder2d );
         copy_surface_attributes( surface3d, *surface2d );
@@ -211,6 +202,7 @@ namespace geode
     {
         auto surface3d = PolygonalSurface3D::create();
         auto builder3d = PolygonalSurfaceBuilder3D::create( *surface3d );
+        detail::copy_meta_info( surface2d, *builder3d );
         detail::copy_points2d_into_3d( surface2d, *builder3d, axis_to_add );
         copy_polygons( surface2d, *builder3d );
         copy_surface_attributes( surface2d, *surface3d );
@@ -222,7 +214,7 @@ namespace geode
     {
         auto surface2d = PolygonalSurface2D::create();
         auto builder2d = PolygonalSurfaceBuilder2D::create( *surface2d );
-
+        detail::copy_meta_info( surface3d, *builder2d );
         detail::copy_points3d_into_2d( surface3d, *builder2d, axis_to_remove );
         copy_polygons( surface3d, *builder2d );
         copy_surface_attributes( surface3d, *surface2d );
@@ -236,6 +228,7 @@ namespace geode
         auto surface3d = TriangulatedSurface3D::create();
         auto builder3d = TriangulatedSurfaceBuilder3D::create( *surface3d );
         detail::copy_points2d_into_3d( surface2d, *builder3d, axis_to_add );
+        detail::copy_meta_info( surface2d, *builder3d );
         copy_polygons( surface2d, *builder3d );
         copy_surface_attributes( surface2d, *surface3d );
         return surface3d;
@@ -249,6 +242,7 @@ namespace geode
         auto builder2d = TriangulatedSurfaceBuilder2D::create( *surface2d );
 
         detail::copy_points3d_into_2d( surface3d, *builder2d, axis_to_remove );
+        detail::copy_meta_info( surface3d, *builder2d );
         copy_polygons( surface3d, *builder2d );
         copy_surface_attributes( surface3d, *surface2d );
         return surface2d;

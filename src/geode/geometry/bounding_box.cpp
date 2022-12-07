@@ -106,7 +106,7 @@ namespace geode
 
         bool intersects( const Ray< dimension >& ray ) const
         {
-            const auto box_half_extent = ( diagonal() ) / 2.;
+            const auto box_half_extent = diagonal() / 2.;
             const auto ray_translated_origin = ray.origin() - center();
             for( const auto i : LRange{ dimension } )
             {
@@ -121,6 +121,11 @@ namespace geode
                 }
             }
             return line_intersects( ray );
+        }
+
+        bool intersects( const InfiniteLine< dimension >& line ) const
+        {
+            return line_intersects( line );
         }
 
         double signed_distance( const Point< dimension >& point ) const
@@ -168,7 +173,9 @@ namespace geode
         }
 
     private:
-        bool line_intersects( const InfiniteLine< dimension >& line ) const;
+        bool line_intersects(
+            const GenericInfiniteLine< RefPoint< dimension >, dimension >&
+                line ) const;
 
     private:
         Point< dimension > min_;
@@ -177,7 +184,7 @@ namespace geode
 
     template <>
     bool BoundingBox< 3 >::Impl::line_intersects(
-        const InfiniteLine3D& line ) const
+        const GenericInfiniteLine< RefPoint< 3 >, 3 >& line ) const
     {
         const auto box_half_extent = diagonal() / 2.;
         const auto line_translated_origin = line.origin() - center();
@@ -207,7 +214,7 @@ namespace geode
 
     template <>
     bool BoundingBox< 2 >::Impl::line_intersects(
-        const InfiniteLine2D& line ) const
+        const GenericInfiniteLine< RefPoint< 2 >, 2 >& line ) const
     {
         const auto box_center = center();
         const auto box_half_extent = diagonal() / 2.;
@@ -219,6 +226,17 @@ namespace geode
                          + box_half_extent.value( 1 )
                                * std::fabs( line.direction().value( 0 ) );
         return lhs - rhs <= global_epsilon;
+    }
+
+    template <>
+    bool BoundingBox< 1 >::Impl::line_intersects(
+        const GenericInfiniteLine< RefPoint< 1 >, 1 >& line ) const
+    {
+        if( diagonal().dot( line.direction() ) > 0 )
+        {
+            return line.origin().value( 0 ) < min().value( 0 );
+        }
+        return line.origin().value( 0 ) > max().value( 0 );
     }
 
     template < index_t dimension >
@@ -306,6 +324,13 @@ namespace geode
     }
 
     template < index_t dimension >
+    bool BoundingBox< dimension >::intersects(
+        const InfiniteLine< dimension >& line ) const
+    {
+        return impl_->intersects( line );
+    }
+
+    template < index_t dimension >
     Point< dimension > BoundingBox< dimension >::center() const
     {
         return impl_->center();
@@ -324,6 +349,7 @@ namespace geode
         return impl_->signed_distance( point );
     }
 
+    template class opengeode_geometry_api BoundingBox< 1 >;
     template class opengeode_geometry_api BoundingBox< 2 >;
     template class opengeode_geometry_api BoundingBox< 3 >;
 } // namespace geode

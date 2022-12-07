@@ -29,13 +29,14 @@ namespace geode
 {
     class BRep;
     class Section;
+    class ComponentID;
 } // namespace geode
 
 namespace geode
 {
-    void opengeode_model_api filter_brep_components_with_regards_to_blocks(
-        BRep& brep );
+    std::vector< ComponentID > opengeode_model_api
+        filter_brep_components_with_regards_to_blocks( BRep& brep );
 
-    void opengeode_model_api filter_section_components_with_regards_to_surfaces(
-        Section& section );
+    std::vector< ComponentID > opengeode_model_api
+        filter_section_components_with_regards_to_surfaces( Section& section );
 } // namespace geode

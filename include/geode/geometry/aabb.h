@@ -164,6 +164,23 @@ namespace geode
         void compute_ray_element_bbox_intersections(
             const Ray< dimension >& ray, EvalIntersection& action ) const;
 
+        /*!
+         * @brief Computes the intersections between a given infinite line and
+         * all element boxes.
+         * @param[in] line The line to test.
+         * @param[in] action The functor to run when a box is intersected by the
+         * line.
+         * @tparam EvalIntersection this functor should have an operator()
+         * defined like this:
+         * void operator()( index_t cur_element_box ) ;
+         * @note the operator define what to do with the box \p cur_element_box
+         * if it is intersected by the \p line.
+         */
+        template < class EvalIntersection >
+        void compute_line_element_bbox_intersections(
+            const InfiniteLine< dimension >& line,
+            EvalIntersection& action ) const;
+
     private:
         IMPLEMENTATION_MEMBER( impl_ );
     };

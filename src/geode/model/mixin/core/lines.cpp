@@ -96,11 +96,13 @@ namespace geode
                 save_edged_curve( mesh, file );
             } );
         }
-        async::when_all( tasks.begin(), tasks.end() )
-            .then( [level] {
-                Logger::set_level( level );
-            } )
-            .wait();
+        auto all_tasks = async::when_all( tasks.begin(), tasks.end() );
+        all_tasks.wait();
+        Logger::set_level( level );
+        for( auto& task : all_tasks.get() )
+        {
+            task.get();
+        }
     }
 
     template < index_t dimension >
@@ -121,11 +123,13 @@ namespace geode
                     typename Line< dimension >::LinesKey{} );
             } );
         }
-        async::when_all( tasks.begin(), tasks.end() )
-            .then( [level] {
-                Logger::set_level( level );
-            } )
-            .wait();
+        auto all_tasks = async::when_all( tasks.begin(), tasks.end() );
+        all_tasks.wait();
+        Logger::set_level( level );
+        for( auto& task : all_tasks.get() )
+        {
+            task.get();
+        }
     }
 
     template < index_t dimension >
@@ -229,6 +233,11 @@ namespace geode
     template < index_t dimension >
     Lines< dimension >::LineRange::LineRange( const Lines& lines )
         : LineRangeBase( lines ), BeginEnd< LineRange >( *this )
+    {
+    }
+
+    template < index_t dimension >
+    Lines< dimension >::LineRange::~LineRange() // NOLINT
     {
     }
 

@@ -191,6 +191,12 @@ namespace geode
     }
 
     template < index_t dimension >
+    ModelBoundaries<
+        dimension >::ModelBoundaryRange::~ModelBoundaryRange() // NOLINT
+    {
+    }
+
+    template < index_t dimension >
     const ModelBoundary< dimension >&
         ModelBoundaries< dimension >::ModelBoundaryRange::operator*() const
     {

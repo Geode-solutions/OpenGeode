@@ -52,50 +52,70 @@ namespace
     }
 
     template < typename Model, typename Builder >
-    void filter_surfaces( const Model& model, Builder& filter )
+    void filter_surfaces( const Model& model,
+        Builder& filter,
+        std::vector< geode::ComponentID >& removed_components )
     {
         for( const auto& surface_uuid : find_components_to_delete(
                  model, model.surfaces(), model.nb_surfaces() ) )
         {
             filter.remove_surface( model.surface( surface_uuid ) );
+            removed_components.emplace_back(
+                geode::Surface3D::component_type_static(), surface_uuid );
         }
     }
 
     template < typename Model, typename Builder >
-    void filter_lines( const Model& model, Builder& filter )
+    void filter_lines( const Model& model,
+        Builder& filter,
+        std::vector< geode::ComponentID >& removed_components )
     {
         for( const auto& line_uuid : find_components_to_delete(
                  model, model.lines(), model.nb_lines() ) )
         {
             filter.remove_line( model.line( line_uuid ) );
+            removed_components.emplace_back(
+                geode::Line3D::component_type_static(), line_uuid );
         }
     }
 
     template < typename Model, typename Builder >
-    void filter_corners( const Model& model, Builder& filter )
+    void filter_corners( const Model& model,
+        Builder& filter,
+        std::vector< geode::ComponentID >& removed_components )
     {
         for( const auto& corner_uuid : find_components_to_delete(
                  model, model.corners(), model.nb_corners() ) )
         {
             filter.remove_corner( model.corner( corner_uuid ) );
+            removed_components.emplace_back(
+                geode::Corner3D::component_type_static(), corner_uuid );
         }
     }
 } // namespace
 
 namespace geode
 {
-    void filter_brep_components_with_regards_to_blocks( BRep& brep )
+    std::vector< ComponentID > filter_brep_components_with_regards_to_blocks(
+        BRep& brep )
     {
-        geode::BRepBuilder filter{ brep };
-        filter_surfaces( brep, filter );
-        filter_lines( brep, filter );
-        filter_corners( brep, filter );
+        std::vector< ComponentID > removed_components;
+        BRepBuilder filter{ brep };
+        filter_surfaces( brep, filter, removed_components );
+        filter_lines( brep, filter, removed_components );
+        filter_corners( brep, filter, removed_components );
+        filter.delete_isolated_vertices();
+        return removed_components;
     }
 
-    void filter_section_components_with_regards_to_surfaces( Section& section )
+    std::vector< ComponentID >
+        filter_section_components_with_regards_to_surfaces( Section& section )
     {
-        geode::SectionBuilder filter{ section };
-        filter_lines( section, filter );
-        filter_corners( section, filter );
+        std::vector< ComponentID > removed_components;
+        SectionBuilder filter{ section };
+        filter_lines( section, filter, removed_components );
+        filter_corners( section, filter, removed_components );
+        filter.delete_isolated_vertices();
+        return removed_components;
     }
 } // namespace geode

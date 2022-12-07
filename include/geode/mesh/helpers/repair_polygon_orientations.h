@@ -28,10 +28,15 @@
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMesh );
+    FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMeshBuilder );
 } // namespace geode
 
 namespace geode
 {
     template < index_t dimension >
     void repair_polygon_orientations( SurfaceMesh< dimension >& mesh );
+
+    template < index_t dimension >
+    void repair_polygon_orientations( const SurfaceMesh< dimension >& mesh,
+        SurfaceMeshBuilder< dimension >& builder );
 } // namespace geode

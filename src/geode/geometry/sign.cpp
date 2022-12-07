@@ -41,26 +41,29 @@ namespace geode
 {
     Sign tetrahedron_volume_sign( const Tetrahedron& tetra )
     {
-        return detail::side( GEO::PCK::orient_3d( tetra.vertices()[0],
-            tetra.vertices()[1], tetra.vertices()[2], tetra.vertices()[3] ) );
+        const auto& vertices = tetra.vertices();
+        return detail::side( GEO::PCK::orient_3d(
+            vertices[0], vertices[1], vertices[2], vertices[3] ) );
     }
 
     Sign triangle_area_sign( const Triangle2D& triangle )
     {
-        return detail::side( GEO::PCK::orient_2d( triangle.vertices()[0],
-            triangle.vertices()[1], triangle.vertices()[2] ) );
+        const auto& vertices = triangle.vertices();
+        return detail::side(
+            GEO::PCK::orient_2d( vertices[0], vertices[1], vertices[2] ) );
     }
 
     Sign triangle_area_sign( const Triangle3D& triangle, local_index_t axis )
     {
         const auto axis1 = new_axis[axis][0];
         const auto axis2 = new_axis[axis][1];
-        const Point2D pt0{ { triangle.vertices()[0].get().value( axis1 ),
-            triangle.vertices()[0].get().value( axis2 ) } };
-        const Point2D pt1{ { triangle.vertices()[1].get().value( axis1 ),
-            triangle.vertices()[1].get().value( axis2 ) } };
-        const Point2D pt2{ { triangle.vertices()[2].get().value( axis1 ),
-            triangle.vertices()[2].get().value( axis2 ) } };
+        const auto& vertices = triangle.vertices();
+        const Point2D pt0{ { vertices[0].get().value( axis1 ),
+            vertices[0].get().value( axis2 ) } };
+        const Point2D pt1{ { vertices[1].get().value( axis1 ),
+            vertices[1].get().value( axis2 ) } };
+        const Point2D pt2{ { vertices[2].get().value( axis1 ),
+            vertices[2].get().value( axis2 ) } };
         return triangle_area_sign( { pt0, pt1, pt2 } );
     }
 } // namespace geode

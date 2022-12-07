@@ -13,6 +13,7 @@
 
 void test()
 {
+    geode::OpenGeodeMesh::initialize();
     const auto initial_mesh_filename =
         absl::StrCat( geode::data_path, "Armadillo.og_tsf3d" );
     auto mesh_A =

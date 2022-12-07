@@ -42,6 +42,7 @@
         .def( pybind11::self += pybind11::self )                               \
         .def( pybind11::self -= pybind11::self )                               \
         .def( "value", &Point##dimension##D::value )                           \
+        .def( "string", &Point##dimension##D::string )                         \
         .def( "set_value", &Point##dimension##D::set_value )
 
 namespace geode

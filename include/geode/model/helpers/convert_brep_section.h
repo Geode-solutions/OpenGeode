@@ -24,11 +24,11 @@
 #pragma once
 
 #include <geode/model/common.h>
+#include <geode/model/representation/core/mapping.h>
 
 namespace geode
 {
     class BRep;
-    class ModelCopyMapping;
     class Section;
 } // namespace geode
 

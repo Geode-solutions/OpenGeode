@@ -30,6 +30,7 @@
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Surface );
+    struct ComponentMeshVertex;
 } // namespace geode
 
 namespace geode
@@ -41,11 +42,24 @@ namespace geode
         {
         public:
             CutAlongInternalLines( Model& model );
+            CutAlongInternalLines( const Model& model, ModelBuilder& builder );
             ~CutAlongInternalLines();
 
-            void cut_all_surfaces();
+            /* Cuts the surfaces along internal lines, and returns pairs of
+             * component mesh vertices where the surfaces vertices were split
+             * (first the initial cmv of the vertices, second the cmv of the
+             * newly created vertex)
+             */
+            std::vector< std::pair< ComponentMeshVertex, ComponentMeshVertex > >
+                cut_all_surfaces();
 
-            void cut_surface( const Surface< dimension >& surface );
+            /* Cuts the surface along internal lines, and returns pairs of
+             * component mesh vertices where the surface vertices were split
+             * (first the initial id of the vertices, second the id of the newly
+             * created vertex)
+             */
+            std::vector< std::pair< ComponentMeshVertex, ComponentMeshVertex > >
+                cut_surface( const Surface< dimension >& surface );
 
         private:
             IMPLEMENTATION_MEMBER( impl_ );

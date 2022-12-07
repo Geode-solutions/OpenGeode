@@ -35,6 +35,20 @@
 #include <geode/basic/logger.h>
 #include <geode/basic/pimpl_impl.h>
 
+namespace
+{
+    ghc::filesystem::path create_directory(
+        absl::string_view file, absl::string_view temp_filename )
+    {
+        const auto file_string = geode::to_string( file );
+        const auto directory =
+            ghc::filesystem::path{ file_string }.parent_path()
+            / geode::to_string( temp_filename );
+        ghc::filesystem::create_directory( directory );
+        return directory;
+    }
+} // namespace
+
 namespace geode
 {
     class ZipFile::Impl
@@ -42,9 +56,7 @@ namespace geode
     public:
         Impl( absl::string_view file, absl::string_view archive_temp_filename )
         {
-            directory_ = ghc::filesystem::current_path()
-                         / to_string( archive_temp_filename );
-            ghc::filesystem::create_directory( directory_ );
+            directory_ = create_directory( file, archive_temp_filename );
             mz_zip_writer_create( &writer_ );
             mz_zip_writer_set_compress_method(
                 writer_, MZ_COMPRESS_METHOD_STORE );
@@ -123,9 +135,7 @@ namespace geode
         Impl(
             absl::string_view file, absl::string_view unarchive_temp_filename )
         {
-            directory_ = ghc::filesystem::current_path()
-                         / to_string( unarchive_temp_filename );
-            ghc::filesystem::create_directory( directory_ );
+            directory_ = create_directory( file, unarchive_temp_filename );
             mz_zip_reader_create( &reader_ );
             const auto status =
                 mz_zip_reader_open_file( reader_, to_string( file ).c_str() );

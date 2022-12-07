@@ -34,6 +34,7 @@ namespace geode
     public:
         void start( const std::string& message, index_t /*nb_steps */ )
         {
+            timer_.reset();
             message_ = message;
             Logger::info( message_, " started" );
         }
@@ -57,7 +58,7 @@ namespace geode
         }
 
     private:
-        DEBUG_CONST Timer timer_;
+        Timer timer_;
         std::string message_;
     };
 

@@ -24,6 +24,43 @@
 #include <geode/geometry/basic_objects/triangle.h>
 
 #include <geode/geometry/basic_objects/plane.h>
+#include <geode/geometry/bounding_box.h>
+
+namespace
+{
+    template < typename GenericTriangle >
+    absl::optional< std::pair< geode::local_index_t, geode::Vector3D > > normal(
+        const GenericTriangle& triangle )
+    {
+        try
+        {
+            const auto& vertices = triangle.vertices();
+            for( const auto pivot : geode::LRange{ 3 } )
+            {
+                const auto next = pivot + 1 == 3 ? 0 : pivot + 1;
+                const auto edge0 =
+                    geode::Vector3D{ vertices[pivot], vertices[next] }
+                        .normalize();
+                const auto prev = pivot == 0 ? 2 : pivot - 1;
+                const auto edge1 =
+                    geode::Vector3D{ vertices[pivot], vertices[prev] }
+                        .normalize();
+
+                const auto normal = edge0.cross( edge1 );
+                const auto length = normal.length();
+                if( length > 0.001 )
+                {
+                    return std::make_pair( pivot, normal / length );
+                }
+            }
+            return absl::nullopt;
+        }
+        catch( const geode::OpenGeodeException& /*unused*/ )
+        {
+            return absl::nullopt;
+        }
+    }
+} // namespace
 
 namespace geode
 {
@@ -35,12 +72,14 @@ namespace geode
         : vertices_{ { { p0 }, { p1 }, { p2 } } }
     {
     }
+
     template < typename PointType, index_t dimension >
     GenericTriangle< PointType, dimension >::GenericTriangle(
         const GenericTriangle< PointType, dimension >& other )
         : vertices_( other.vertices_ )
     {
     }
+
     template < typename PointType, index_t dimension >
     GenericTriangle< PointType, dimension >&
         GenericTriangle< PointType, dimension >::operator=(
@@ -49,12 +88,14 @@ namespace geode
         vertices_ = other.vertices_;
         return *this;
     }
+
     template < typename PointType, index_t dimension >
     GenericTriangle< PointType, dimension >::GenericTriangle(
         GenericTriangle< PointType, dimension >&& other )
         : vertices_( std::move( other.vertices_ ) )
     {
     }
+
     template < typename PointType, index_t dimension >
     GenericTriangle< PointType, dimension >&
         GenericTriangle< PointType, dimension >::operator=(
@@ -63,6 +104,7 @@ namespace geode
         vertices_ = std::move( other.vertices_ );
         return *this;
     }
+
     template < typename PointType, index_t dimension >
     Point< dimension >
         GenericTriangle< PointType, dimension >::barycenter() const
@@ -72,6 +114,7 @@ namespace geode
         const Point< dimension >& p2 = vertices_[2];
         return ( p0 + p1 + p2 ) / 3.;
     }
+
     template < typename PointType, index_t dimension >
     template < index_t T >
     typename std::enable_if< T == 3, Vector3D >::type
@@ -81,6 +124,7 @@ namespace geode
             .cross( Vector3D{ vertices_[0], vertices_[2] } )
             .normalize();
     }
+
     template < typename PointType, index_t dimension >
     template < index_t T >
     typename std::enable_if< T == 3, Plane >::type
@@ -88,6 +132,7 @@ namespace geode
     {
         return { this->normal(), vertices_[0] };
     }
+
     template < typename PointType, index_t dimension >
     template < index_t T >
     typename std::enable_if< T == 3, OwnerPlane >::type
@@ -95,36 +140,19 @@ namespace geode
     {
         return OwnerPlane{ this->normal(), vertices_[0] };
     }
+
     template < typename PointType, index_t dimension >
     template < index_t T >
     typename std::enable_if< T == 3, absl::optional< Vector3D > >::type
         GenericTriangle< PointType, dimension >::new_normal() const
     {
-        try
+        if( auto normal = ::normal( *this ) )
         {
-            for( const auto v : LRange{ 3 } )
-            {
-                const auto next = v + 1 == 3 ? 0 : v + 1;
-                const auto edge0 =
-                    Vector3D{ vertices_[v], vertices_[next] }.normalize();
-                const auto prev = v == 0 ? 2 : v - 1;
-                const auto edge1 =
-                    Vector3D{ vertices_[v], vertices_[prev] }.normalize();
-
-                const auto normal = edge0.cross( edge1 );
-                const auto length = normal.length();
-                if( length > M_PI / 180 ) // 1 degree
-                {
-                    return normal / length;
-                }
-            }
-            return absl::nullopt;
+            return std::move( normal->second );
         }
-        catch( const OpenGeodeException& /*unused*/ )
-        {
-            return absl::nullopt;
-        }
+        return absl::nullopt;
     }
+
     template < typename PointType, index_t dimension >
     template < index_t T >
     typename std::enable_if< T == 3, absl::optional< Plane > >::type
@@ -137,6 +165,7 @@ namespace geode
         }
         return absl::nullopt;
     }
+
     template < typename PointType, index_t dimension >
     template < index_t T >
     typename std::enable_if< T == 3, absl::optional< OwnerPlane > >::type
@@ -149,17 +178,43 @@ namespace geode
         }
         return absl::nullopt;
     }
+
+    template < typename PointType, index_t dimension >
+    template < index_t T >
+    typename std::enable_if< T == 3, absl::optional< local_index_t > >::type
+        GenericTriangle< PointType, dimension >::pivot() const
+    {
+        if( auto normal = ::normal( *this ) )
+        {
+            return std::move( normal->first );
+        }
+        return absl::nullopt;
+    }
+
     template < typename PointType, index_t dimension >
     void GenericTriangle< PointType, dimension >::set_point(
         index_t vertex, const Point< dimension >& point )
     {
-        vertices_.at( vertex ) = point;
+        vertices_[vertex] = point;
     }
+
     template < typename PointType, index_t dimension >
     const std::array< PointType, 3 >&
         GenericTriangle< PointType, dimension >::vertices() const
     {
         return vertices_;
+    }
+
+    template < typename PointType, index_t dimension >
+    BoundingBox< dimension >
+        GenericTriangle< PointType, dimension >::bounding_box() const
+    {
+        BoundingBox< dimension > bbox;
+        for( const auto& point : vertices_ )
+        {
+            bbox.add_point( point );
+        }
+        return bbox;
     }
 
     template < typename PointType, index_t dimension >
@@ -262,6 +317,8 @@ namespace geode
         GenericTriangle< Point< 3 >, 3 >::new_plane< 3 >() const;
     template opengeode_geometry_api absl::optional< OwnerPlane >
         GenericTriangle< Point< 3 >, 3 >::new_owner_plane< 3 >() const;
+    template opengeode_geometry_api absl::optional< local_index_t >
+        GenericTriangle< Point< 3 >, 3 >::pivot< 3 >() const;
 
     template opengeode_geometry_api Vector3D
         GenericTriangle< RefPoint< 3 >, 3 >::normal< 3 >() const;
@@ -275,4 +332,6 @@ namespace geode
         GenericTriangle< RefPoint< 3 >, 3 >::new_plane< 3 >() const;
     template opengeode_geometry_api absl::optional< OwnerPlane >
         GenericTriangle< RefPoint< 3 >, 3 >::new_owner_plane< 3 >() const;
+    template opengeode_geometry_api absl::optional< local_index_t >
+        GenericTriangle< RefPoint< 3 >, 3 >::pivot< 3 >() const;
 } // namespace geode

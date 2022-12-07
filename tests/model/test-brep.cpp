@@ -46,7 +46,6 @@
 #include <geode/model/mixin/core/model_boundary.h>
 #include <geode/model/mixin/core/surface.h>
 #include <geode/model/representation/builder/brep_builder.h>
-#include <geode/model/representation/builder/copy_mapping.h>
 #include <geode/model/representation/core/brep.h>
 #include <geode/model/representation/io/brep_input.h>
 #include <geode/model/representation/io/brep_output.h>
@@ -829,6 +828,7 @@ void test_clone( const geode::BRep& brep )
 
 void test()
 {
+    geode::OpenGeodeModel::initialize();
     geode::BRep model;
     geode::BRepBuilder builder( model );
 

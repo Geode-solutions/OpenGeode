@@ -89,6 +89,12 @@ namespace geode
         : origin_( other.origin() ), direction_( other.direction() )
     {
     }
+    template < typename PointType, index_t dimension >
+    GenericInfiniteLine< PointType, dimension >::GenericInfiniteLine(
+        const OwnerRay< dimension >& other )
+        : origin_( other.origin() ), direction_( other.direction() )
+    {
+    }
 
     template < index_t dimension >
     OwnerInfiniteLine< dimension >::OwnerInfiniteLine(
@@ -174,14 +180,98 @@ namespace geode
         return *this;
     }
 
+    template < index_t dimension >
+    OwnerRay< dimension >::OwnerRay(
+        const Vector< dimension >& direction, const Point< dimension >& origin )
+        : Base( direction, origin )
+    {
+    }
+    template < index_t dimension >
+    OwnerRay< dimension >::OwnerRay( const Segment< dimension >& segment )
+        : OwnerRay( segment.normalized_direction(), segment.vertices()[0] )
+    {
+    }
+    template < index_t dimension >
+    OwnerRay< dimension >::OwnerRay( const OwnerRay< dimension >& other )
+        : Base( other )
+    {
+    }
+    template < index_t dimension >
+    OwnerRay< dimension >& OwnerRay< dimension >::operator=(
+        const OwnerRay< dimension >& other )
+    {
+        Base::operator=( other );
+        return *this;
+    }
+    template < index_t dimension >
+    OwnerRay< dimension >::OwnerRay( OwnerRay< dimension >&& other )
+        : Base( other )
+    {
+    }
+    template < index_t dimension >
+    OwnerRay< dimension >& OwnerRay< dimension >::operator=(
+        OwnerRay< dimension >&& other )
+    {
+        Base::operator=( other );
+        return *this;
+    }
+
+    template < index_t dimension >
+    Ray< dimension >::Ray(
+        const Vector< dimension >& direction, const Point< dimension >& origin )
+        : Base( direction, origin )
+    {
+    }
+    template < index_t dimension >
+    Ray< dimension >::Ray( const Segment< dimension >& segment )
+        : Ray( segment.normalized_direction(), segment.vertices()[0] )
+    {
+    }
+    template < index_t dimension >
+    Ray< dimension >::Ray( const Ray< dimension >& other ) : Base( other )
+    {
+    }
+    template < index_t dimension >
+    Ray< dimension >::Ray( const OwnerRay< dimension >& other ) : Base( other )
+    {
+    }
+    template < index_t dimension >
+    Ray< dimension >& Ray< dimension >::operator=(
+        const Ray< dimension >& other )
+    {
+        Base::operator=( other );
+        return *this;
+    }
+    template < index_t dimension >
+    Ray< dimension >::Ray( Ray< dimension >&& other ) : Base( other )
+    {
+    }
+    template < index_t dimension >
+    Ray< dimension >& Ray< dimension >::operator=( Ray< dimension >&& other )
+    {
+        Base::operator=( other );
+        return *this;
+    }
+
+    template class opengeode_geometry_api GenericInfiniteLine< Point< 1 >, 1 >;
     template class opengeode_geometry_api GenericInfiniteLine< Point< 2 >, 2 >;
     template class opengeode_geometry_api GenericInfiniteLine< Point< 3 >, 3 >;
+    template class opengeode_geometry_api
+        GenericInfiniteLine< RefPoint< 1 >, 1 >;
     template class opengeode_geometry_api
         GenericInfiniteLine< RefPoint< 2 >, 2 >;
     template class opengeode_geometry_api
         GenericInfiniteLine< RefPoint< 3 >, 3 >;
+    template class opengeode_geometry_api OwnerInfiniteLine< 1 >;
     template class opengeode_geometry_api OwnerInfiniteLine< 2 >;
     template class opengeode_geometry_api OwnerInfiniteLine< 3 >;
+    template class opengeode_geometry_api InfiniteLine< 1 >;
     template class opengeode_geometry_api InfiniteLine< 2 >;
     template class opengeode_geometry_api InfiniteLine< 3 >;
+    template class opengeode_geometry_api OwnerRay< 1 >;
+    template class opengeode_geometry_api OwnerRay< 2 >;
+    template class opengeode_geometry_api OwnerRay< 3 >;
+    template class opengeode_geometry_api Ray< 1 >;
+    template class opengeode_geometry_api Ray< 2 >;
+    template class opengeode_geometry_api Ray< 3 >;
 } // namespace geode

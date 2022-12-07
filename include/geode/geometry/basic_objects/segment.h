@@ -28,12 +28,12 @@
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
     FORWARD_DECLARATION_DIMENSION_CLASS( OwnerSegment );
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
 
     template < index_t dimension >
     using RefPoint = std::reference_wrapper< const Point< dimension > >;
-    ALIAS_2D_AND_3D( RefPoint );
 } // namespace geode
 
 namespace geode
@@ -58,6 +58,7 @@ namespace geode
         double length() const;
         void set_point( index_t vertex, const Point< dimension >& point );
         const std::array< PointType, 2 >& vertices() const;
+        BoundingBox< dimension > bounding_box() const;
 
     protected:
         GenericSegment( const OwnerSegment< dimension >& other );
@@ -82,7 +83,7 @@ namespace geode
         OwnerSegment< dimension >& operator=(
             OwnerSegment< dimension >&& other );
     };
-    ALIAS_2D_AND_3D( OwnerSegment );
+    ALIAS_1D_AND_2D_AND_3D( OwnerSegment );
 
     template < index_t dimension >
     class Segment : public GenericSegment< RefPoint< dimension >, dimension >
@@ -98,5 +99,5 @@ namespace geode
         Segment( Segment< dimension >&& other );
         Segment< dimension >& operator=( Segment< dimension >&& other );
     };
-    ALIAS_2D_AND_3D( Segment );
+    ALIAS_1D_AND_2D_AND_3D( Segment );
 } // namespace geode

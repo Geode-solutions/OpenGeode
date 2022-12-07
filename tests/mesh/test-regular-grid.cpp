@@ -408,8 +408,31 @@ void test_adjacencies2D()
     }
 }
 
+void test_around_vertex( const geode::RegularGrid3D& grid )
+{
+    for( const auto v : geode::Range{ grid.nb_vertices() } )
+    {
+        const auto vertex = grid.vertex_indices( v );
+        geode::index_t nb_polyhedra{ 8 };
+        for( const auto d : geode::LRange{ 3 } )
+        {
+            if( vertex[d] == 0
+                || vertex[d] == grid.nb_vertices_in_direction( d ) - 1 )
+            {
+                nb_polyhedra /= 2;
+            }
+        }
+        const auto nb_polyhedra_around =
+            grid.polyhedra_around_vertex( v ).size();
+        OPENGEODE_EXCEPTION( nb_polyhedra_around == nb_polyhedra,
+            "[Test] Wrong number of polyhedra around vertex ", v, "(",
+            nb_polyhedra_around, "/", nb_polyhedra, ")" );
+    }
+}
+
 void test()
 {
+    geode::OpenGeodeMesh::initialize();
     auto grid = geode::RegularGrid3D::create();
     auto builder = geode::RegularGridBuilder3D::create( *grid );
     builder->initialize_grid( { { 1.5, 0, 1 } }, { 5, 10, 15 }, { 1, 2, 3 } );
@@ -418,6 +441,7 @@ void test()
     test_vertex_number( *grid );
     test_vertex_index( *grid );
     test_vertex_on_border( *grid );
+    test_around_vertex( *grid );
     test_cell_geometry( *grid );
     test_cell_query( *grid );
     test_boundary_box( *grid );

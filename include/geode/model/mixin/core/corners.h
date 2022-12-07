@@ -80,6 +80,7 @@ namespace geode
         {
         public:
             CornerRange( const Corners& corners );
+            ~CornerRange();
 
             const Corner< dimension >& operator*() const;
         };

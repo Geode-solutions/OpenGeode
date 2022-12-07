@@ -20,8 +20,8 @@
  * SOFTWARE.
  *
  */
-
 #include <geode/basic/logger.h>
+#include <iostream>
 
 #include <geode/mesh/builder/geode_graph_builder.h>
 #include <geode/mesh/core/geode_graph.h>
@@ -157,6 +157,7 @@ void test_delete_isolated_vertices(
 
 void test()
 {
+    geode::OpenGeodeMesh::initialize();
     auto graph =
         geode::Graph::create( geode::OpenGeodeGraph::impl_name_static() );
     auto builder = geode::GraphBuilder::create( *graph );

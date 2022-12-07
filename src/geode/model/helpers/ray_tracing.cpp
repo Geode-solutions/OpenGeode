@@ -21,44 +21,34 @@
  *
  */
 
-#pragma once
+#include <geode/model/helpers/ray_tracing.h>
 
-#include <absl/container/flat_hash_map.h>
+#include <geode/geometry/aabb.h>
 
-#include <geode/basic/mapping.h>
-#include <geode/basic/uuid.h>
+#include <geode/mesh/core/surface_mesh.h>
+#include <geode/mesh/helpers/aabb_surface_helpers.h>
 
-#include <geode/model/common.h>
-#include <geode/model/mixin/core/component_type.h>
+#include <geode/model/mixin/core/block.h>
+#include <geode/model/mixin/core/surface.h>
+#include <geode/model/representation/core/brep.h>
 
 namespace geode
 {
-    class ModelCopyMapping
+    BoundarySurfaceIntersections find_intersections_with_boundaries(
+        const InfiniteLine3D& infinite_line,
+        const BRep& brep,
+        const Block3D& block )
     {
-    public:
-        using Mapping = BijectiveMapping< uuid >;
-
-        Mapping& at( const ComponentType& type )
+        BoundarySurfaceIntersections result;
+        for( const auto& surface : brep.boundaries( block ) )
         {
-            return mappings.at( type );
+            const auto aabb = create_aabb_tree( surface.mesh() );
+            RayTracing3D ray_tracing{ surface.mesh(), infinite_line };
+            aabb.compute_line_element_bbox_intersections(
+                infinite_line, ray_tracing );
+            result[surface.id()] = ray_tracing.all_intersections();
         }
+        return result;
+    }
 
-        const Mapping& at( const ComponentType& type ) const
-        {
-            return mappings.at( type );
-        }
-
-        bool has_mapping_type( const ComponentType& type ) const
-        {
-            return mappings.contains( type );
-        }
-
-        void emplace( const ComponentType& type, Mapping mapping )
-        {
-            mappings.emplace( type, std::move( mapping ) );
-        }
-
-    private:
-        absl::flat_hash_map< ComponentType, Mapping > mappings;
-    };
 } // namespace geode

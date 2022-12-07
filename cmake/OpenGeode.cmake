@@ -21,6 +21,15 @@
 # Define the project
 project(OpenGeode CXX)
 
+if(WIN32)
+    if(CMAKE_C_FLAGS_DEBUG)
+        string(REPLACE "/MDd" "/MD" CMAKE_C_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
+    endif()
+    if(CMAKE_CXX_FLAGS_DEBUG)
+        string(REPLACE "/MDd" "/MD" CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
+    endif()
+endif()
+
 set(OPENGEODE_CXX_STANDARD ${CMAKE_CXX_STANDARD})
 
 set(UTILS_FILE "${PROJECT_SOURCE_DIR}/cmake/utils.cmake")
@@ -47,6 +56,16 @@ install(
     DESTINATION
         .
 )
+if(NOT BUILD_SHARED_LIBS)
+    install(
+        DIRECTORY
+            ${MINIZIP_INSTALL_PREFIX}/
+            ${NANOFLANN_INSTALL_PREFIX}/
+            ${SPDLOG_INSTALL_PREFIX}/
+        DESTINATION
+            .
+    )
+endif()
 
 if(OPENGEODE_WITH_PYTHON OR INCLUDE_PYBIND11)
     find_package(pybind11 REQUIRED CONFIG NO_DEFAULT_PATH PATHS ${PYBIND11_INSTALL_PREFIX})

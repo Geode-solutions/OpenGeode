@@ -62,12 +62,12 @@ namespace geode
 
         index_t nb_cells_in_direction( index_t direction ) const
         {
-            return cells_number_.at( direction );
+            return cells_number_[direction];
         }
 
         double cell_length_in_direction( index_t direction ) const
         {
-            return cells_length_.at( direction );
+            return cells_length_[direction];
         }
 
         double cell_size() const
@@ -240,7 +240,7 @@ namespace geode
                 }
                 else
                 {
-                    closest[d] = std::round( value );
+                    closest[d] = static_cast< index_t >( std::round( value ) );
                 }
             }
             return closest;

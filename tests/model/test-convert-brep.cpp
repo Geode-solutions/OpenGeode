@@ -27,13 +27,13 @@
 #include <geode/basic/logger.h>
 
 #include <geode/model/helpers/convert_brep_section.h>
-#include <geode/model/representation/builder/copy_mapping.h>
 #include <geode/model/representation/core/brep.h>
 #include <geode/model/representation/core/section.h>
 #include <geode/model/representation/io/brep_input.h>
 
 void test()
 {
+    geode::OpenGeodeModel::initialize();
     auto brep = geode::load_brep(
         absl::StrCat( geode::data_path, "random_dfn.og_brep" ) );
     const auto section =

@@ -25,6 +25,8 @@
 
 #include <async++.h>
 
+#include <absl/memory/memory.h>
+
 #include <geode/basic/pimpl_impl.h>
 
 #include <geode/geometry/point.h>
@@ -48,7 +50,8 @@ namespace geode
         template < typename Model, typename ModelBuilder, index_t dimension >
         class CutAlongInternalLines< Model, ModelBuilder, dimension >::Impl
         {
-            using CMVmapping = std::pair< ComponentMeshVertex, index_t >;
+            using CMVmapping =
+                std::pair< ComponentMeshVertex, ComponentMeshVertex >;
             using CMVmappings = std::vector< CMVmapping >;
             using Task = async::task< CMVmappings >;
             struct SurfaceInfo
@@ -62,9 +65,19 @@ namespace geode
             };
 
         public:
-            Impl( Model& model ) : model_( model ), builder_{ model } {}
+            Impl( Model& model )
+                : model_( model ),
+                  builder_ptr_{ absl::make_unique< ModelBuilder >( model ) },
+                  builder_( *builder_ptr_ )
+            {
+            }
 
-            void cut()
+            Impl( const Model& model, ModelBuilder& builder )
+                : model_( model ), builder_( builder )
+            {
+            }
+
+            CMVmappings cut()
             {
                 absl::FixedArray< Task > tasks( model_.nb_surfaces() );
                 index_t count{ 0 };
@@ -74,29 +87,38 @@ namespace geode
                         return split_points( surface );
                     } );
                 }
+                CMVmappings mapping;
                 async::when_all( tasks.begin(), tasks.end() )
-                    .then(
-                        [this]( async::task< std::vector< Task > > all_task ) {
-                            for( auto& task : all_task.get() )
-                            {
-                                update_unique_vertices( task.get() );
-                            }
-                        } )
-                    .wait();
+                    .then( [this, &mapping]( std::vector< Task > all_task ) {
+                        for( auto& task : all_task )
+                        {
+                            auto cmv_mappings = task.get();
+                            update_unique_vertices( cmv_mappings );
+                            mapping.insert( mapping.end(),
+                                std::make_move_iterator( cmv_mappings.begin() ),
+                                std::make_move_iterator( cmv_mappings.end() ) );
+                        }
+                    } )
+                    .get();
+                return mapping;
             }
 
-            void cut_surface( const Surface< dimension >& surface )
+            CMVmappings cut_surface( const Surface< dimension >& surface )
             {
                 const auto mapping = split_points( surface );
                 update_unique_vertices( mapping );
+                return mapping;
             }
 
         private:
             void update_unique_vertices( const CMVmappings& mapping )
             {
-                for( const auto& mcv : mapping )
+                for( const auto& cmv_mapping : mapping )
                 {
-                    builder_.set_unique_vertex( mcv.first, mcv.second );
+                    const auto unique_vertex_id =
+                        model_.unique_vertex( cmv_mapping.first );
+                    builder_.set_unique_vertex(
+                        cmv_mapping.second, unique_vertex_id );
                 }
             }
 
@@ -120,10 +142,10 @@ namespace geode
                         mesh.polygons_around_vertex( vertex_id );
                     const auto& polygon_vertices =
                         info.polygon_vertices[vertex_id];
-                    OPENGEODE_ASSERT(
-                        polygons_around.size() <= polygon_vertices.size(),
-                        "[CutAlongInternalLines] Wrong size comparison" );
                     auto nb_polygons_around = polygons_around.size();
+                    OPENGEODE_ASSERT(
+                        nb_polygons_around <= polygon_vertices.size(),
+                        "[CutAlongInternalLines] Wrong size comparison" );
                     PolygonsAroundVertex total_polygons;
                     while( nb_polygons_around != polygon_vertices.size() )
                     {
@@ -227,22 +249,29 @@ namespace geode
                     !mesh.polygons_around_vertex( vertex_id ).empty(),
                     "[ModelFromMeshBuilder::cut_surface_by_lines] Lost "
                     "polygon around vertex" );
-                const auto uid = model_.unique_vertex(
-                    { surface.component_id(), vertex_id } );
-                return { ComponentMeshVertex{
-                             surface.component_id(), new_vertex_id },
-                    uid };
+                return {
+                    ComponentMeshVertex{ surface.component_id(), vertex_id },
+                    ComponentMeshVertex{ surface.component_id(), new_vertex_id }
+                };
             }
 
         private:
             const Model& model_;
-            ModelBuilder builder_;
+            std::unique_ptr< ModelBuilder > builder_ptr_;
+            ModelBuilder& builder_;
         };
 
         template < typename Model, typename ModelBuilder, index_t dimension >
         CutAlongInternalLines< Model, ModelBuilder, dimension >::
             CutAlongInternalLines( Model& model )
-            : impl_( model )
+            : impl_{ model }
+        {
+        }
+
+        template < typename Model, typename ModelBuilder, index_t dimension >
+        CutAlongInternalLines< Model, ModelBuilder, dimension >::
+            CutAlongInternalLines( const Model& model, ModelBuilder& builder )
+            : impl_{ model, builder }
         {
         }
 
@@ -253,17 +282,19 @@ namespace geode
         }
 
         template < typename Model, typename ModelBuilder, index_t dimension >
-        void CutAlongInternalLines< Model, ModelBuilder, dimension >::
-            cut_all_surfaces()
+        std::vector< std::pair< ComponentMeshVertex, ComponentMeshVertex > >
+            CutAlongInternalLines< Model, ModelBuilder, dimension >::
+                cut_all_surfaces()
         {
-            impl_->cut();
+            return impl_->cut();
         }
 
         template < typename Model, typename ModelBuilder, index_t dimension >
-        void CutAlongInternalLines< Model, ModelBuilder, dimension >::
-            cut_surface( const Surface< dimension >& surface )
+        std::vector< std::pair< ComponentMeshVertex, ComponentMeshVertex > >
+            CutAlongInternalLines< Model, ModelBuilder, dimension >::
+                cut_surface( const Surface< dimension >& surface )
         {
-            impl_->cut_surface( surface );
+            return impl_->cut_surface( surface );
         }
 
         template class opengeode_model_api

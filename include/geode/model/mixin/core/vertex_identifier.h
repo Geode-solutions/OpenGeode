@@ -20,16 +20,12 @@ namespace geode
      */
     struct opengeode_model_api ComponentMeshVertex
     {
-        ComponentMeshVertex( ComponentID component_id_in, index_t vertex_id_in )
-            : component_id( std::move( component_id_in ) ),
-              vertex( vertex_id_in )
-        {
-        }
+        ComponentMeshVertex(
+            ComponentID component_id_in, index_t vertex_id_in );
 
-        bool operator==( const ComponentMeshVertex& other ) const
-        {
-            return component_id == other.component_id && vertex == other.vertex;
-        }
+        ~ComponentMeshVertex();
+
+        bool operator==( const ComponentMeshVertex& other ) const;
 
         template < typename Archive >
         void serialize( Archive& archive );
@@ -39,10 +35,7 @@ namespace geode
 
     private:
         friend class bitsery::Access;
-        ComponentMeshVertex()
-            : component_id( bitsery::Access::create< ComponentID >() )
-        {
-        }
+        ComponentMeshVertex();
     };
 
     /*!
@@ -59,6 +52,8 @@ namespace geode
         ~VertexIdentifier();
 
         index_t nb_unique_vertices() const;
+
+        bool is_unique_vertex_isolated( index_t unique_vertex_id ) const;
 
         /*!
          * Return the component vertices identified with an unique vertex.

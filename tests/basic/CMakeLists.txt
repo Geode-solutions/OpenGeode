@@ -26,6 +26,7 @@ add_geode_test(
 add_geode_test(
     SOURCE "test-assert.cpp"
     DEPENDENCIES
+        Async++
         ${PROJECT_NAME}::basic
 )
 add_geode_test(
@@ -35,6 +36,11 @@ add_geode_test(
 )
 add_geode_test(
     SOURCE "test-cached-value.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+)
+add_geode_test(
+    SOURCE "test-colors.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
 )
@@ -60,6 +66,11 @@ add_geode_test(
 )
 add_geode_test(
     SOURCE "test-logger.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+)
+add_geode_test(
+    SOURCE "test-mappings.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
 )

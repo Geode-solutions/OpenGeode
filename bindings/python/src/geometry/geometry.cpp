@@ -95,6 +95,8 @@ PYBIND11_MODULE( opengeode_py_geometry, module )
 {
     pybind11::add_ostream_redirect( module );
     module.doc() = "OpenGeode Python binding for geometry";
+    pybind11::class_< geode::OpenGeodeGeometry >( module, "OpenGeodeGeometry" )
+        .def( "initialize", &geode::OpenGeodeGeometry::initialize );
     geode::define_barycentric( module );
     geode::define_basic_objects( module );
     geode::define_bounding_box( module );

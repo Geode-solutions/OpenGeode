@@ -39,15 +39,13 @@ namespace geode
     Position point_segment_position_exact(
         const Point3D& point, const Segment3D& segment )
     {
-        if( !GEO::PCK::aligned_3d(
-                point, segment.vertices()[0], segment.vertices()[1] ) )
+        const auto& vertices = segment.vertices();
+        if( !GEO::PCK::aligned_3d( point, vertices[0], vertices[1] ) )
         {
             return Position::outside;
         }
-        const auto dot0 = GEO::PCK::dot_3d(
-            segment.vertices()[0], point, segment.vertices()[1] );
-        const auto dot1 = GEO::PCK::dot_3d(
-            segment.vertices()[1], point, segment.vertices()[0] );
+        const auto dot0 = GEO::PCK::dot_3d( vertices[0], point, vertices[1] );
+        const auto dot1 = GEO::PCK::dot_3d( vertices[1], point, vertices[0] );
         return detail::point_segment_position(
             detail::side( dot0 ), detail::opposite_side( dot1 ) );
     }
@@ -55,16 +53,14 @@ namespace geode
     Position point_segment_position_exact(
         const Point2D& point, const Segment2D& segment )
     {
-        if( GEO::PCK::orient_2d(
-                point, segment.vertices()[0], segment.vertices()[1] )
+        const auto& vertices = segment.vertices();
+        if( GEO::PCK::orient_2d( point, vertices[0], vertices[1] )
             != GEO::ZERO )
         {
             return Position::outside;
         }
-        const auto dot0 = GEO::PCK::dot_2d(
-            segment.vertices()[0], point, segment.vertices()[1] );
-        const auto dot1 = GEO::PCK::dot_2d(
-            segment.vertices()[1], point, segment.vertices()[0] );
+        const auto dot0 = GEO::PCK::dot_2d( vertices[0], point, vertices[1] );
+        const auto dot1 = GEO::PCK::dot_2d( vertices[1], point, vertices[0] );
         return detail::point_segment_position(
             detail::side( dot0 ), detail::opposite_side( dot1 ) );
     }
@@ -72,12 +68,13 @@ namespace geode
     Position point_triangle_position_exact(
         const Point2D& point, const Triangle2D& triangle )
     {
-        const auto s0 = point_side_to_segment(
-            point, { triangle.vertices()[0], triangle.vertices()[1] } );
-        const auto s1 = point_side_to_segment(
-            point, { triangle.vertices()[1], triangle.vertices()[2] } );
-        const auto s2 = point_side_to_segment(
-            point, { triangle.vertices()[2], triangle.vertices()[0] } );
+        const auto& vertices = triangle.vertices();
+        const auto s0 =
+            point_side_to_segment( point, { vertices[0], vertices[1] } );
+        const auto s1 =
+            point_side_to_segment( point, { vertices[1], vertices[2] } );
+        const auto s2 =
+            point_side_to_segment( point, { vertices[2], vertices[0] } );
         return detail::point_triangle_position( s0, s1, s2 );
     }
 
@@ -85,12 +82,13 @@ namespace geode
         const Triangle3D& triangle,
         const Vector3D& third_vector )
     {
-        const auto det0 = GEO::PCK::det_3d( point - triangle.vertices()[0],
-            point - triangle.vertices()[1], third_vector );
-        const auto det1 = GEO::PCK::det_3d( point - triangle.vertices()[1],
-            point - triangle.vertices()[2], third_vector );
-        const auto det2 = GEO::PCK::det_3d( point - triangle.vertices()[2],
-            point - triangle.vertices()[0], third_vector );
+        const auto& vertices = triangle.vertices();
+        const auto det0 = GEO::PCK::det_3d(
+            point - vertices[0], point - vertices[1], third_vector );
+        const auto det1 = GEO::PCK::det_3d(
+            point - vertices[1], point - vertices[2], third_vector );
+        const auto det2 = GEO::PCK::det_3d(
+            point - vertices[2], point - vertices[0], third_vector );
 
         if( det0 == GEO::ZERO && det1 == GEO::ZERO && det2 == GEO::ZERO )
         {
@@ -105,8 +103,8 @@ namespace geode
     Position point_triangle_position_exact(
         const Point3D& point, const Triangle3D& triangle )
     {
-        if( GEO::PCK::orient_3d( point, triangle.vertices()[0],
-                triangle.vertices()[1], triangle.vertices()[2] )
+        const auto& vertices = triangle.vertices();
+        if( GEO::PCK::orient_3d( point, vertices[0], vertices[1], vertices[2] )
             != GEO::ZERO )
         {
             return Position::outside;
@@ -119,12 +117,13 @@ namespace geode
         const Point3D& point, const Tetrahedron& tetra )
     {
         std::array< GEO::Sign, 4 > signs;
+        const auto& vertices = tetra.vertices();
         for( const auto f : Range{ 4 } )
         {
-            signs[f] = GEO::PCK::orient_3d(
-                tetra.vertices()[Tetrahedron::tetrahedron_facet_vertex[f][0]],
-                tetra.vertices()[Tetrahedron::tetrahedron_facet_vertex[f][1]],
-                tetra.vertices()[Tetrahedron::tetrahedron_facet_vertex[f][2]],
+            const auto& facet_vertices =
+                Tetrahedron::tetrahedron_facet_vertex[f];
+            signs[f] = GEO::PCK::orient_3d( vertices[facet_vertices[0]],
+                vertices[facet_vertices[1]], vertices[facet_vertices[2]],
                 point );
             if( signs[f] == GEO::Sign::NEGATIVE )
             {
@@ -137,15 +136,14 @@ namespace geode
     Position point_tetrahedron_position(
         const Point3D& point, const Tetrahedron& tetra )
     {
+        const auto& vertices = tetra.vertices();
         for( const auto f : Range{ 4 } )
         {
+            const auto& facet_vertices =
+                Tetrahedron::tetrahedron_facet_vertex[f];
             const auto volume = tetrahedron_signed_volume(
-                { tetra.vertices()[Tetrahedron::tetrahedron_facet_vertex[f][0]],
-                    tetra.vertices()[Tetrahedron::tetrahedron_facet_vertex[f]
-                                                                          [1]],
-                    tetra.vertices()[Tetrahedron::tetrahedron_facet_vertex[f]
-                                                                          [2]],
-                    point } );
+                { vertices[facet_vertices[0]], vertices[facet_vertices[1]],
+                    vertices[facet_vertices[2]], point } );
             if( volume < -global_epsilon )
             {
                 return Position::outside;
@@ -162,22 +160,23 @@ namespace geode
     Position point_triangle_position(
         const Point2D& point, const Triangle2D& triangle )
     {
-        const auto area1 = triangle_signed_area(
-            { point, triangle.vertices()[0], triangle.vertices()[1] } );
+        const auto& vertices = triangle.vertices();
+        const auto area1 =
+            triangle_signed_area( { point, vertices[0], vertices[1] } );
         if( std::fabs( area1 ) < global_epsilon )
         {
             return point_triangle_position_exact( point, triangle );
         }
         const auto s1 = GEO::geo_sgn( area1 );
-        const auto area2 = triangle_signed_area(
-            { point, triangle.vertices()[1], triangle.vertices()[2] } );
+        const auto area2 =
+            triangle_signed_area( { point, vertices[1], vertices[2] } );
         if( std::fabs( area2 ) < global_epsilon )
         {
             return point_triangle_position_exact( point, triangle );
         }
         const auto s2 = GEO::geo_sgn( area2 );
-        const auto area3 = triangle_signed_area(
-            { point, triangle.vertices()[2], triangle.vertices()[0] } );
+        const auto area3 =
+            triangle_signed_area( { point, vertices[2], vertices[0] } );
         if( std::fabs( area3 ) < global_epsilon )
         {
             return point_triangle_position_exact( point, triangle );
@@ -220,8 +219,9 @@ namespace geode
 
     Side point_side_to_segment( const Point2D& point, const Segment2D& segment )
     {
-        return detail::side( GEO::PCK::orient_2d(
-            point, segment.vertices()[0], segment.vertices()[1] ) );
+        const auto& vertices = segment.vertices();
+        return detail::side(
+            GEO::PCK::orient_2d( point, vertices[0], vertices[1] ) );
     }
 
     Side point_side_to_line( const Point2D& point, const InfiniteLine2D& line )
@@ -250,8 +250,9 @@ namespace geode
     Side point_side_to_triangle(
         const Point3D& point, const Triangle3D& triangle )
     {
-        return detail::side( GEO::PCK::orient_3d( triangle.vertices()[0],
-            triangle.vertices()[1], triangle.vertices()[2], point ) );
+        const auto& vertices = triangle.vertices();
+        return detail::side( GEO::PCK::orient_3d(
+            vertices[0], vertices[1], vertices[2], point ) );
     }
 
     template Position opengeode_geometry_api point_triangle_position(

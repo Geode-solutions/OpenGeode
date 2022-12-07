@@ -345,12 +345,12 @@ namespace geode
 
         const T& value( index_t element ) const override
         {
-            return values_.at( element );
+            return values_[element];
         }
 
         void set_value( index_t element, T value )
         {
-            values_.at( element ) = std::move( value );
+            values_[element] = std::move( value );
         }
 
         T default_value() const
@@ -361,7 +361,7 @@ namespace geode
         template < typename Modifier >
         void modify_value( index_t element, Modifier&& modifier )
         {
-            modifier( values_.at( element ) );
+            modifier( values_[element] );
         }
 
     public:
@@ -516,12 +516,12 @@ namespace geode
 
         const bool& value( index_t element ) const override
         {
-            return reinterpret_cast< const bool& >( values_.at( element ) );
+            return reinterpret_cast< const bool& >( values_[element] );
         }
 
         void set_value( index_t element, bool value )
         {
-            values_.at( element ) = std::move( value );
+            values_[element] = std::move( value );
         }
 
         bool default_value() const
@@ -532,7 +532,7 @@ namespace geode
         template < typename Modifier >
         void modify_value( index_t element, Modifier&& modifier )
         {
-            modifier( reinterpret_cast< bool& >( values_.at( element ) ) );
+            modifier( reinterpret_cast< bool& >( values_[element] ) );
         }
 
     public:

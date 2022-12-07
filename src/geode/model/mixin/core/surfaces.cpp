@@ -116,17 +116,19 @@ namespace geode
                 }
                 else
                 {
-                    throw OpenGeodeException(
-                        "[Surfaces::save_surfaces] Cannot find the explicit "
-                        "SurfaceMesh type" );
+                    throw OpenGeodeException( "[Surfaces::save_surfaces] "
+                                              "Cannot find the explicit "
+                                              "SurfaceMesh type" );
                 }
             } );
         }
-        async::when_all( tasks.begin(), tasks.end() )
-            .then( [level] {
-                Logger::set_level( level );
-            } )
-            .wait();
+        auto all_tasks = async::when_all( tasks.begin(), tasks.end() );
+        all_tasks.wait();
+        Logger::set_level( level );
+        for( auto& task : all_tasks.get() )
+        {
+            task.get();
+        }
     }
 
     template < index_t dimension >
@@ -157,11 +159,13 @@ namespace geode
                 }
             } );
         }
-        async::when_all( tasks.begin(), tasks.end() )
-            .then( [level] {
-                Logger::set_level( level );
-            } )
-            .wait();
+        auto all_tasks = async::when_all( tasks.begin(), tasks.end() );
+        all_tasks.wait();
+        Logger::set_level( level );
+        for( auto& task : all_tasks.get() )
+        {
+            task.get();
+        }
     }
 
     template < index_t dimension >
@@ -270,6 +274,11 @@ namespace geode
     Surfaces< dimension >::SurfaceRange::SurfaceRange(
         const Surfaces& surfaces )
         : SurfaceRangeBase( surfaces ), BeginEnd< SurfaceRange >( *this )
+    {
+    }
+
+    template < index_t dimension >
+    Surfaces< dimension >::SurfaceRange::~SurfaceRange() // NOLINT
     {
     }
 

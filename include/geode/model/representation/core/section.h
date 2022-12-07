@@ -56,12 +56,16 @@ namespace geode
      * @extends Surfaces
      * @extends ModelBoundaries
      */
-    class opengeode_model_api Section
-        : public Topology,
-          public AddComponents< 2, Corners, Lines, Surfaces, ModelBoundaries >,
-          public Identifier
+    class opengeode_model_api Section : public Topology,
+                                        public Corners2D,
+                                        public Lines2D,
+                                        public Surfaces2D,
+                                        public ModelBoundaries2D,
+                                        public Identifier
     {
     public:
+        static constexpr index_t dimension{ 2 };
+
         class opengeode_model_api BoundaryCornerRange
             : public Relationships::BoundaryRangeIterator,
               public BeginEnd< BoundaryCornerRange >
@@ -180,6 +184,10 @@ namespace geode
         };
 
     public:
+        Section();
+        Section( Section&& section );
+        ~Section();
+
         BoundaryCornerRange boundaries( const Line2D& line ) const;
 
         BoundaryLineRange boundaries( const Surface2D& surface ) const;
