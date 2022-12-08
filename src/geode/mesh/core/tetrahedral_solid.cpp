@@ -340,12 +340,7 @@ namespace geode
                 this->polyhedron_facet_vertex( { polyhedron_facet, v } );
         }
         const auto polyhedron_adj = opt_polyhedron_adj.value();
-        const std::array< index_t, 4 > adj_vertices{
-            this->polyhedron_vertex( { polyhedron_adj, 0 } ),
-            this->polyhedron_vertex( { polyhedron_adj, 1 } ),
-            this->polyhedron_vertex( { polyhedron_adj, 2 } ),
-            this->polyhedron_vertex( { polyhedron_adj, 3 } )
-        };
+        const auto adj_vertices = this->polyhedron_vertices( polyhedron_adj );
         std::array< bool, 4 > candidates{ true, true, true, true };
         for( const auto v : LRange{ 4 } )
         {

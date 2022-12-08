@@ -62,6 +62,10 @@ namespace geode
     std::tuple< double, Point< dimension > > point_segment_distance(
         const Point< dimension >& point, const Segment< dimension >& segment );
 
+    template < index_t dimension >
+    double new_point_segment_distance(
+        const Point< dimension >& point, const Segment< dimension >& segment );
+
     /*!
      * Compute the smallest distance between two segments
      * @return a tuple containing:
@@ -85,6 +89,10 @@ namespace geode
         const Point< dimension >& point,
         const InfiniteLine< dimension >& line );
 
+    template < index_t dimension >
+    double new_point_line_distance( const Point< dimension >& point,
+        const InfiniteLine< dimension >& line );
+
     /*!
      * Compute the smallest signed distance between a point and an infinite line
      * in 2D
@@ -95,6 +103,9 @@ namespace geode
     std::tuple< double, Point2D >
         opengeode_geometry_api point_line_signed_distance(
             const Point2D& point, const InfiniteLine2D& line );
+
+    double opengeode_geometry_api new_point_line_signed_distance(
+        const Point2D& point, const InfiniteLine2D& line );
 
     /*!
      * Compute the smallest distance between a point and a triangle
