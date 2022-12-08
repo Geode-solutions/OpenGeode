@@ -25,6 +25,9 @@
 #include <chrono>
 #include <condition_variable>
 #include <mutex>
+#include <queue>
+#include <sstream>
+#include <thread>
 
 #include <async++.h>
 
@@ -51,19 +54,21 @@ namespace geode
         Storage( std::unique_ptr< geode::Identifier >&& data )
             : data_{ std::move( data ) }, count_{ count++ }
         {
+            Logger::debug( count_, " -> ", "Storage" );
         }
 
         ~Storage()
         {
-            Logger::debug( count, " -> ", "~Storage" );
+            Logger::debug( count_, " -> ", "~Storage" );
+            terminate_storage();
             std::unique_lock< std::mutex > locking{ lock_ };
-            terminate_ = true;
-            condition_.notify_all();
-            condition_.wait( locking, [this] {
-                Logger::debug( count, " -> ", nb_calls_ );
-                return nb_calls_ == 0;
+            condition_.wait( locking, [&] {
+                Logger::debug( count_, " -> ", "~calls ", queue_.size() );
+                clean_queue();
+                Logger::debug( count_, " -> ", "~calls2 ", queue_.size() );
+                return queue_.empty();
             } );
-            Logger::debug( count, " -> ", "~Storage end" );
+            Logger::debug( count_, " -> ", "~Storage end" );
         }
 
         bool expired() const
@@ -80,6 +85,9 @@ namespace geode
         {
             const std::lock_guard< std::mutex > locking{ lock_ };
             counter_++;
+            std::ostringstream oss;
+            oss << std::this_thread::get_id() << " " << this;
+            Logger::debug( count_, " -> ", "new ", counter_, " ", oss.str() );
         }
 
         void delete_data_reference()
@@ -88,16 +96,26 @@ namespace geode
             OPENGEODE_ASSERT(
                 counter_ > 0, "[Database::Storage] Cannot decrement" );
             counter_--;
+            std::ostringstream oss;
+            oss << std::this_thread::get_id() << " " << this;
+            Logger::debug(
+                count_, " -> ", "delete ", counter_, " ", oss.str() );
             if( unused() )
             {
+                clean_queue();
                 wait_for_memory_release();
             }
         }
 
-        void set_data( std::unique_ptr< geode::Identifier >&& data )
-        {
-            data_ = std::move( data );
-        }
+        // void set_data( std::unique_ptr< geode::Identifier >&& data )
+        // {
+        //     const std::lock_guard< std::mutex > locking{ lock_ };
+        //     terminate_ = false;
+        //     counter_ = 0;
+        //     count_ = count++;
+        //     Logger::debug( count_, " -> ", "set_data " );
+        //     data_ = std::move( data );
+        // }
 
         const std::unique_ptr< geode::Identifier >& data() const
         {
@@ -110,44 +128,75 @@ namespace geode
         }
 
     private:
+        void terminate_storage()
+        {
+            std::ostringstream oss;
+            oss << std::this_thread::get_id() << " " << this;
+            Logger::debug( count_, " -> ", "begin terminate_storage" );
+            terminate_ = true;
+            Logger::debug(
+                count_, " -> ", "calls ", queue_.size(), " ", oss.str() );
+            condition_.notify_all();
+            Logger::debug( count_, " -> ", "end terminate_storage" );
+        }
+
+        void clean_queue()
+        {
+            while( !queue_.empty() )
+            {
+                if( !queue_.front().ready() )
+                {
+                    return;
+                }
+                queue_.pop();
+            }
+        }
+
         void wait_for_memory_release()
         {
-            last_used_ = std::chrono::system_clock::now();
-            async::spawn( [this] {
-                Logger::debug( count, " -> ", "wait" );
+            queue_.emplace( async::spawn( [this] {
+                std::ostringstream oss;
+                oss << std::this_thread::get_id() << " " << this;
+                Logger::debug( count_, " -> ", "wait start ", oss.str() );
+                Logger::debug( count_, " -> ", "wait start 2 ", oss.str() );
                 std::unique_lock< std::mutex > locking{ lock_ };
-                nb_calls_++;
-                Logger::debug( count, " -> ", "wait 2" );
+                last_used_ = std::chrono::system_clock::now();
+                Logger::debug( count_, " -> ", "wait 2 + ", oss.str() );
                 if( !condition_.wait_for( locking,
-                        DATA_EXPIRATION + std::chrono::seconds( 1 ), [this] {
-                            Logger::debug( count, " -> ", terminate_ );
-                            return terminate_;
+                        DATA_EXPIRATION + std::chrono::seconds( 1 ),
+                        [this, &oss] {
+                            Logger::debug( count_, " -> ", "terminate ",
+                                terminate_.load(), " ", oss.str() );
+                            return terminate_.load();
                         } ) )
                 {
-                    Logger::debug( count, " -> ", "wait in" );
+                    Logger::debug( count_, " -> ", "wait in", " ", oss.str() );
                     if( !terminate_ && unused()
                         && std::chrono::system_clock::now() - last_used_
                                > DATA_EXPIRATION )
                     {
-                        Logger::debug( count, " -> ", "wait reset" );
+                        Logger::debug( count_, " -> ", "wait reset", " ",
+                            oss.str(), " ",
+                            reinterpret_cast< size_t >( this ) );
                         data_.reset();
                     }
                 }
-                Logger::debug( count, " -> ", "wait out" );
-                nb_calls_--;
+                Logger::debug( count_, " -> ", "wait out + ", queue_.size(),
+                    " ", oss.str() );
+                locking.unlock();
                 condition_.notify_all();
-            } );
+            } ) );
         }
 
     private:
         std::unique_ptr< Identifier > data_;
-        bool terminate_{ false };
-        index_t nb_calls_{ 0 };
+        std::atomic< bool > terminate_{ false };
         index_t counter_{ 0 };
         std::chrono::time_point< std::chrono::system_clock > last_used_;
         std::mutex lock_;
         std::condition_variable condition_;
         int count_;
+        std::queue< async::task< void > > queue_;
     };
 
     class Database::Impl
@@ -220,13 +269,13 @@ namespace geode
             const auto it = storage_.find( id );
             if( it != storage_.end() )
             {
-                if( it->second->unused() )
-                {
-                    it->second->set_data( std::move( data ) );
-                    return it->second->data();
-                }
+                // if( it->second->unused() )
+                // {
+                //     it->second->set_data( std::move( data ) );
+                //     return it->second->data();
+                // }
                 delete_data( id );
-                return do_register_data( std::move( data ) );
+                // return do_register_data( std::move( data ) );
             }
             return do_register_data( std::move( data ) );
         }
