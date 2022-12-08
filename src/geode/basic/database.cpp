@@ -62,14 +62,10 @@ namespace geode
             Logger::debug( count_, " -> ", "~Storage" );
             terminate_storage();
             std::unique_lock< std::mutex > locking{ lock_ };
-            do
-            {
+            condition_.wait( locking, [this] {
                 clean_queue();
-
-            } while( !condition_.wait_for(
-                locking, std::chrono::milliseconds( 1 ), [this] {
-                    return queue_.empty();
-                } ) );
+                return queue_.empty();
+            } );
             Logger::debug( count_, " -> ", "~Storage end" );
         }
 
@@ -185,8 +181,8 @@ namespace geode
                 }
                 Logger::debug( count_, " -> ", "wait out + ", queue_.size(),
                     " ", oss.str() );
-                locking.unlock();
                 condition_.notify_all();
+                locking.unlock();
             } ) );
         }
 
