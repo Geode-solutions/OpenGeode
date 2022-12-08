@@ -62,10 +62,13 @@ namespace geode
             Logger::debug( count_, " -> ", "~Storage" );
             terminate_storage();
             std::unique_lock< std::mutex > locking{ lock_ };
-            condition_.wait( locking, [this] {
+            do
+            {
                 clean_queue();
-                return queue_.empty();
-            } );
+            } while( !condition_.wait_for(
+                locking, std::chrono::microseconds( 10 ), [this] {
+                    return queue_.empty();
+                } ) );
             Logger::debug( count_, " -> ", "~Storage end" );
         }
 
@@ -83,9 +86,10 @@ namespace geode
         {
             const std::lock_guard< std::mutex > locking{ lock_ };
             counter_++;
+            last_++;
             std::ostringstream oss;
             oss << std::this_thread::get_id() << " " << this;
-            Logger::debug( count_, " -> ", "new ", counter_, " ", oss.str() );
+            Logger::debug( count_, " -> ", "new ", counter_, " " );
         }
 
         void delete_data_reference()
@@ -96,8 +100,7 @@ namespace geode
             counter_--;
             std::ostringstream oss;
             oss << std::this_thread::get_id() << " " << this;
-            Logger::debug(
-                count_, " -> ", "delete ", counter_, " ", oss.str() );
+            Logger::debug( count_, " -> ", "delete ", counter_, " " );
             if( unused() )
             {
                 clean_queue();
@@ -132,8 +135,7 @@ namespace geode
             oss << std::this_thread::get_id() << " " << this;
             Logger::debug( count_, " -> ", "begin terminate_storage" );
             terminate_ = true;
-            Logger::debug(
-                count_, " -> ", "calls ", queue_.size(), " ", oss.str() );
+            Logger::debug( count_, " -> ", "calls ", queue_.size(), " " );
             condition_.notify_all();
             Logger::debug( count_, " -> ", "end terminate_storage" );
         }
@@ -152,37 +154,32 @@ namespace geode
 
         void wait_for_memory_release()
         {
-            queue_.emplace( async::spawn( [this] {
-                std::ostringstream oss;
-                oss << std::this_thread::get_id() << " " << this;
-                Logger::debug( count_, " -> ", "wait start ", oss.str() );
-                Logger::debug( count_, " -> ", "wait start 2 ", oss.str() );
+            const auto last = last_;
+            queue_.emplace( async::spawn( [this, last] {
+                Logger::debug( count_, " -> ", "wait start " );
+                Logger::debug( count_, " -> ", "wait start 2 " );
                 std::unique_lock< std::mutex > locking{ lock_ };
-                last_used_ = std::chrono::system_clock::now();
-                Logger::debug( count_, " -> ", "wait 2 + ", oss.str() );
-                if( !condition_.wait_for( locking,
-                        DATA_EXPIRATION + std::chrono::seconds( 1 ),
-                        [this, &oss] {
+                Logger::debug( count_, " -> ", "wait 2 + " );
+                Logger::debug( count_, " -> ", "last ", last, " ", last_ );
+                if( !condition_.wait_for(
+                        locking, DATA_EXPIRATION, [this, last] {
                             Logger::debug( count_, " -> ", "terminate ",
-                                terminate_.load(), " ", oss.str() );
+                                terminate_.load(), " " );
                             return terminate_.load();
                         } ) )
                 {
-                    Logger::debug( count_, " -> ", "wait in", " ", oss.str() );
-                    if( !terminate_ && unused()
-                        && std::chrono::system_clock::now() - last_used_
-                               > DATA_EXPIRATION )
+                    Logger::debug(
+                        count_, " -> ", "wait in", " ", last, " ", last_ );
+                    if( last == last_ )
                     {
-                        Logger::debug( count_, " -> ", "wait reset", " ",
-                            oss.str(), " ",
-                            reinterpret_cast< size_t >( this ) );
+                        Logger::debug( count_, " -> ", "wait reset", " " );
                         data_.reset();
                     }
                 }
-                Logger::debug( count_, " -> ", "wait out + ", queue_.size(),
-                    " ", oss.str() );
-                condition_.notify_all();
+                Logger::debug(
+                    count_, " -> ", "wait out + ", queue_.size(), " " );
                 locking.unlock();
+                condition_.notify_all();
             } ) );
         }
 
@@ -190,9 +187,9 @@ namespace geode
         std::unique_ptr< Identifier > data_;
         std::atomic< bool > terminate_{ false };
         index_t counter_{ 0 };
-        std::chrono::time_point< std::chrono::system_clock > last_used_;
         std::mutex lock_;
         std::condition_variable condition_;
+        index_t last_;
         int count_;
         std::queue< async::task< void > > queue_;
     };
