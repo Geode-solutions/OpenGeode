@@ -56,16 +56,16 @@ namespace geode
         {
             terminate_storage();
             std::unique_lock< std::mutex > locking{ lock_ };
-            clean_queue();
-            while( !condition_.wait_for(
+            index_t count{ 0 };
+            do
+            {
+                DEBUG( count++ );
+                clean_queue();
+            } while( !condition_.wait_for(
                 locking, std::chrono::milliseconds( 10 ), [this] {
                     return queue_.empty();
-                } ) )
-                ;
-            {
-                condition_.notify_all();
-                clean_queue();
-            }
+                } ) );
+            DEBUG( "end" );
         }
 
         bool expired() const
