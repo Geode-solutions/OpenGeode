@@ -54,12 +54,13 @@ namespace geode
 
         ~Storage()
         {
-            terminate_storage();
-            std::unique_lock< std::mutex > locking{ lock_ };
-            condition_.wait( locking, [this] {
-                clean_queue();
-                return queue_.empty();
-            } );
+            terminate_ = true;
+            condition_.notify_all();
+            while( !queue_.empty() )
+            {
+                queue_.front().wait();
+                queue_.pop();
+            }
         }
 
         bool expired() const
@@ -110,23 +111,16 @@ namespace geode
         }
 
     private:
-        void terminate_storage()
-        {
-            terminate_ = true;
-            condition_.notify_all();
-        }
-
         void clean_queue()
         {
             while( !queue_.empty() )
             {
                 if( !queue_.front().ready() )
                 {
-                    break;
+                    return;
                 }
                 queue_.pop();
             }
-            condition_.notify_all();
         }
 
         void wait_for_memory_release()
@@ -145,7 +139,7 @@ namespace geode
                     }
                 }
                 locking.unlock();
-                condition_.notify_all();
+                // condition_.notify_all();
             } ) );
         }
 
