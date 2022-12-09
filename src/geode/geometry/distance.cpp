@@ -61,7 +61,7 @@ namespace
                     && signed_area_3 >= 0 );
     }
 
-    double compute_point_segment_distance( double segment_length,
+    double compute_point_line_line_distance( double segment_length,
         double point_to_v0_length,
         double point_to_v1_length )
     {
@@ -73,8 +73,9 @@ namespace
         }
         const auto p =
             ( point_to_v0_length + point_to_v1_length + segment_length ) / 2;
-        auto area2 = p * ( p - point_to_v0_length ) * ( p - point_to_v1_length )
-                     * ( p - segment_length );
+        const auto area2 = p * ( p - point_to_v0_length )
+                           * ( p - point_to_v1_length )
+                           * ( p - segment_length );
         if( area2 < 0 )
         {
             return 0;
@@ -134,7 +135,7 @@ namespace geode
             return length0;
         }
         // acute angles
-        return compute_point_segment_distance( length, length0, length1 );
+        return compute_point_line_line_distance( length, length0, length1 );
     }
 
     template < index_t dimension >
@@ -289,7 +290,7 @@ namespace geode
         const auto length0 = point_point_distance( line.origin(), point );
         const auto length1 =
             point_point_distance( line.origin() + line.direction(), point );
-        return compute_point_segment_distance( 1, length0, length1 );
+        return compute_point_line_line_distance( 1, length0, length1 );
     }
 
     std::tuple< double, Point2D > point_line_signed_distance(

@@ -829,7 +829,7 @@ namespace geode
                     }
                     if( new_adjacent == NO_ID )
                     {
-                        unset_polyhedron_adjacent( id );
+                        do_unset_polyhedron_adjacent( id );
                     }
                     else
                     {

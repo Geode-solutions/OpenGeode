@@ -176,6 +176,8 @@ namespace geode
         using VertexSetBuilder::delete_vertices;
 
     private:
+        void update_polygon_adjacencies( absl::Span< const index_t > old2new );
+
         virtual void do_set_point(
             index_t vertex_id, Point< dimension > point ) = 0;
 

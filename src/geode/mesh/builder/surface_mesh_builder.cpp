@@ -73,33 +73,6 @@ namespace
     }
 
     template < geode::index_t dimension >
-    void update_polygon_adjacencies(
-        const geode::SurfaceMesh< dimension >& surface,
-        geode::SurfaceMeshBuilder< dimension >& builder,
-        absl::Span< const geode::index_t > old2new )
-    {
-        for( const auto p : geode::Range{ surface.nb_polygons() } )
-        {
-            for( const auto e : geode::LRange{ surface.nb_polygon_edges( p ) } )
-            {
-                const geode::PolygonEdge id{ p, e };
-                if( const auto adj = surface.polygon_adjacent( id ) )
-                {
-                    const auto new_adjacent = old2new[adj.value()];
-                    if( new_adjacent == geode::NO_ID )
-                    {
-                        builder.unset_polygon_adjacent( id );
-                    }
-                    else
-                    {
-                        builder.set_polygon_adjacent( id, new_adjacent );
-                    }
-                }
-            }
-        }
-    }
-
-    template < geode::index_t dimension >
     void update_polygon_around_vertices(
         const geode::SurfaceMesh< dimension >& surface,
         geode::SurfaceMeshBuilder< dimension >& builder,
@@ -736,6 +709,31 @@ namespace geode
         create_vertex();
         set_point( added_vertex, std::move( point ) );
         return added_vertex;
+    }
+
+    template < geode::index_t dimension >
+    void SurfaceMeshBuilder< dimension >::update_polygon_adjacencies(
+        absl::Span< const geode::index_t > old2new )
+    {
+        for( const auto p : geode::Range{ surface.nb_polygons() } )
+        {
+            for( const auto e : geode::LRange{ surface.nb_polygon_edges( p ) } )
+            {
+                const geode::PolygonEdge id{ p, e };
+                if( const auto adj = surface.polygon_adjacent( id ) )
+                {
+                    const auto new_adjacent = old2new[adj.value()];
+                    if( new_adjacent == geode::NO_ID )
+                    {
+                        builder.do_unset_polygon_adjacent( id );
+                    }
+                    else
+                    {
+                        builder.do_set_polygon_adjacent( id, new_adjacent );
+                    }
+                }
+            }
+        }
     }
 
     template < index_t dimension >
