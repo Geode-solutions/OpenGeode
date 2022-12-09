@@ -18,20 +18,20 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# add_geode_binary(
-#     SOURCE "geode-triangulate-brep.cpp"
-#     DEPENDENCIES
-#         absl::flags
-#         absl::flags_parse
-#         absl::flags_usage
-#         ${PROJECT_NAME}::mesh
-#         ${PROJECT_NAME}::model
-# )
-# add_geode_binary(
-#     SOURCE "geode-triangulate-section.cpp"
-#     DEPENDENCIES
-#         absl::flags
-#         absl::flags_parse
-#         absl::flags_usage
-#         ${PROJECT_NAME}::model
-# )
+add_geode_binary(
+    SOURCE "geode-triangulate-brep.cpp"
+    DEPENDENCIES
+        absl::flags
+        absl::flags_parse
+        absl::flags_usage
+        ${PROJECT_NAME}::mesh
+        ${PROJECT_NAME}::model
+)
+add_geode_binary(
+    SOURCE "geode-triangulate-section.cpp"
+    DEPENDENCIES
+        absl::flags
+        absl::flags_parse
+        absl::flags_usage
+        ${PROJECT_NAME}::model
+)

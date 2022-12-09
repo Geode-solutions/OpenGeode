@@ -21,6 +21,6 @@
 #------------------------------------------------------------------------------------------------
 # Configure the OpenGeode libraries
 add_subdirectory(basic)
-# add_subdirectory(geometry)
-# add_subdirectory(mesh)
-# add_subdirectory(model)
+add_subdirectory(geometry)
+add_subdirectory(mesh)
+add_subdirectory(model)
