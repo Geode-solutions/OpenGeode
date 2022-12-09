@@ -139,7 +139,6 @@ namespace geode
                     }
                 }
                 locking.unlock();
-                // condition_.notify_all();
             } ) );
         }
 
