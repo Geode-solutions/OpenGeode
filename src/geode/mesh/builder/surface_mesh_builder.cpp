@@ -660,7 +660,7 @@ namespace geode
             }
         }
         update_polygon_around( surface_mesh_, *this, old2new );
-        update_polygon_adjacencies( surface_mesh_, *this, old2new );
+        update_polygon_adjacencies( old2new );
         surface_mesh_.polygon_attribute_manager().delete_elements( to_delete );
         do_delete_polygons( to_delete, old2new );
         return old2new;
@@ -672,7 +672,7 @@ namespace geode
     {
         const auto old2new = old2new_permutation( permutation );
         update_polygon_around( surface_mesh_, *this, old2new );
-        update_polygon_adjacencies( surface_mesh_, *this, old2new );
+        update_polygon_adjacencies( old2new );
         surface_mesh_.polygon_attribute_manager().permute_elements(
             permutation );
         do_permute_polygons( permutation, old2new );
@@ -715,21 +715,22 @@ namespace geode
     void SurfaceMeshBuilder< dimension >::update_polygon_adjacencies(
         absl::Span< const geode::index_t > old2new )
     {
-        for( const auto p : geode::Range{ surface.nb_polygons() } )
+        for( const auto p : geode::Range{ surface_mesh_.nb_polygons() } )
         {
-            for( const auto e : geode::LRange{ surface.nb_polygon_edges( p ) } )
+            for( const auto e :
+                geode::LRange{ surface_mesh_.nb_polygon_edges( p ) } )
             {
                 const geode::PolygonEdge id{ p, e };
-                if( const auto adj = surface.polygon_adjacent( id ) )
+                if( const auto adj = surface_mesh_.polygon_adjacent( id ) )
                 {
                     const auto new_adjacent = old2new[adj.value()];
                     if( new_adjacent == geode::NO_ID )
                     {
-                        builder.do_unset_polygon_adjacent( id );
+                        do_unset_polygon_adjacent( id );
                     }
                     else
                     {
-                        builder.do_set_polygon_adjacent( id, new_adjacent );
+                        do_set_polygon_adjacent( id, new_adjacent );
                     }
                 }
             }
