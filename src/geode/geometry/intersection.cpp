@@ -145,10 +145,8 @@ namespace geode
                 line_intersections.result.value().size() );
             for( auto&& point : line_intersections.result.value() )
             {
-                double distance_to_segment;
-                std::tie( distance_to_segment, std::ignore ) =
-                    point_segment_distance( point, segment );
-                if( distance_to_segment <= global_epsilon )
+                if( new_point_segment_distance( point, segment )
+                    <= global_epsilon )
                 {
                     segment_intersections.emplace_back( point );
                 }
@@ -170,11 +168,9 @@ namespace geode
             line_plane_intersection( InfiniteLine3D{ segment }, plane );
         if( line_plane_result )
         {
-            double distance_to_segment;
-            std::tie( distance_to_segment, std::ignore ) =
-                point_segment_distance(
-                    line_plane_result.result.value(), segment );
-            if( distance_to_segment > global_epsilon )
+            if( new_point_segment_distance(
+                    line_plane_result.result.value(), segment )
+                > global_epsilon )
             {
                 return {};
             }
@@ -267,8 +263,8 @@ namespace geode
                         segment.vertices()[0].get() * seg_lambdas[0]
                         + segment.vertices()[1].get() * seg_lambdas[1];
                     correctness.first.first =
-                        std::get< 0 >( point_segment_distance(
-                            correctness.first.second, segment ) )
+                        new_point_segment_distance(
+                            correctness.first.second, segment )
                         < global_epsilon;
                     std::array< double, 3 > tri_lambdas;
                     try
@@ -423,18 +419,15 @@ namespace geode
         if( line_intersection_result )
         {
             // Test whether the line-line intersection is on the segments.
-            double distance_to_segment;
-            std::tie( distance_to_segment, std::ignore ) =
-                point_segment_distance(
-                    line_intersection_result.result.value(), segment0 );
-            if( distance_to_segment > global_epsilon )
+            if( new_point_segment_distance(
+                    line_intersection_result.result.value(), segment0 )
+                > global_epsilon )
             {
                 return {};
             }
-            std::tie( distance_to_segment, std::ignore ) =
-                point_segment_distance(
-                    line_intersection_result.result.value(), segment1 );
-            if( distance_to_segment > global_epsilon )
+            if( new_point_segment_distance(
+                    line_intersection_result.result.value(), segment1 )
+                > global_epsilon )
             {
                 return {};
             }
@@ -477,11 +470,9 @@ namespace geode
         if( line_intersection_result )
         {
             // Test whether the line-line intersection is on the segment.
-            double distance_to_segment;
-            std::tie( distance_to_segment, std::ignore ) =
-                point_segment_distance(
-                    line_intersection_result.result.value(), segment );
-            if( distance_to_segment > global_epsilon )
+            if( new_point_segment_distance(
+                    line_intersection_result.result.value(), segment )
+                > global_epsilon )
             {
                 return {};
             }

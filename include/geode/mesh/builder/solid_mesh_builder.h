@@ -185,6 +185,9 @@ namespace geode
         using VertexSetBuilder::delete_vertices;
 
     private:
+        void update_polyhedron_adjacencies(
+            absl::Span< const index_t > old2new );
+
         /*!
          * @brief Sets a point.
          * @param[in] vertex_id the vertex, in 0.. @function nb_vetices()-1.

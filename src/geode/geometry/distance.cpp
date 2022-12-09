@@ -60,6 +60,28 @@ namespace
                || ( signed_area_1 >= 0. && signed_area_2 >= 0.
                     && signed_area_3 >= 0 );
     }
+
+    double compute_point_line_line_distance( double segment_length,
+        double point_to_v0_length,
+        double point_to_v1_length )
+    {
+        if( std::fabs(
+                point_to_v0_length + point_to_v1_length - segment_length )
+            < geode::global_epsilon )
+        {
+            return 0;
+        }
+        const auto p =
+            ( point_to_v0_length + point_to_v1_length + segment_length ) / 2;
+        const auto area2 = p * ( p - point_to_v0_length )
+                           * ( p - point_to_v1_length )
+                           * ( p - segment_length );
+        if( area2 < 0 )
+        {
+            return 0;
+        }
+        return 2 * std::sqrt( area2 ) / segment_length;
+    }
 } // namespace
 
 namespace geode
@@ -84,6 +106,36 @@ namespace geode
         const auto nearest_p = point_segment_projection( point, segment );
         return std::make_tuple(
             point_point_distance( point, nearest_p ), nearest_p );
+    }
+
+    template < index_t dimension >
+    double new_point_segment_distance(
+        const Point< dimension >& point, const Segment< dimension >& segment )
+    {
+        const auto length = segment.length();
+        const auto length0 =
+            point_point_distance( segment.vertices()[0].get(), point );
+        if( length <= global_epsilon )
+        {
+            return length0;
+        }
+        const auto length1 =
+            point_point_distance( segment.vertices()[1].get(), point );
+        const auto sqr_length = length * length;
+        const auto sqr_length0 = length0 * length0;
+        const auto sqr_length1 = length1 * length1;
+        if( length0 >= length && length0 >= length1
+            && sqr_length + sqr_length1 <= sqr_length0 )
+        { // obtuse by vertex 1
+            return length1;
+        }
+        if( length1 >= length && length1 >= length0
+            && sqr_length + sqr_length0 <= sqr_length1 )
+        { // obtuse by vertex 0
+            return length0;
+        }
+        // acute angles
+        return compute_point_line_line_distance( length, length0, length1 );
     }
 
     template < index_t dimension >
@@ -231,6 +283,16 @@ namespace geode
             point_point_distance( point, nearest_p ), nearest_p );
     }
 
+    template < index_t dimension >
+    double new_point_line_distance(
+        const Point< dimension >& point, const InfiniteLine< dimension >& line )
+    {
+        const auto length0 = point_point_distance( line.origin(), point );
+        const auto length1 =
+            point_point_distance( line.origin() + line.direction(), point );
+        return compute_point_line_line_distance( 1, length0, length1 );
+    }
+
     std::tuple< double, Point2D > point_line_signed_distance(
         const Point2D& point, const InfiniteLine2D& line )
     {
@@ -243,6 +305,16 @@ namespace geode
             dot_perpendicular( proj2point, line.direction() ) <= 0 ? distance
                                                                    : -distance;
         return std::make_tuple( signed_distance, nearest_point );
+    }
+
+    double new_point_line_signed_distance(
+        const Point2D& point, const InfiniteLine2D& line )
+    {
+        const auto distance = new_point_line_distance< 2 >( point, line );
+        const Vector2D origin2point{ line.origin(), point };
+        return dot_perpendicular( origin2point, line.direction() ) <= 0
+                   ? distance
+                   : -distance;
     }
 
     std::tuple< double, Point3D > point_triangle_distance(
@@ -719,10 +791,14 @@ namespace geode
         const Point2D&, const Point2D& );
     template std::tuple< double, Point2D > opengeode_geometry_api
         point_segment_distance( const Point2D&, const Segment2D& );
+    template double opengeode_geometry_api new_point_segment_distance(
+        const Point2D&, const Segment2D& );
     template std::tuple< double, Point2D, Point2D > opengeode_geometry_api
         segment_segment_distance( const Segment2D&, const Segment2D& );
     template std::tuple< double, Point2D > opengeode_geometry_api
         point_line_distance( const Point2D&, const InfiniteLine2D& );
+    template double opengeode_geometry_api new_point_line_distance(
+        const Point2D&, const InfiniteLine2D& );
     template std::tuple< double, Point2D > opengeode_geometry_api
         point_triangle_distance( const Point2D&, const Triangle2D& );
     template std::tuple< double, Point2D > opengeode_geometry_api
@@ -736,10 +812,14 @@ namespace geode
         const Point3D&, const Point3D& );
     template std::tuple< double, Point3D > opengeode_geometry_api
         point_segment_distance( const Point3D&, const Segment3D& );
+    template double opengeode_geometry_api new_point_segment_distance(
+        const Point3D&, const Segment3D& );
     template std::tuple< double, Point3D, Point3D > opengeode_geometry_api
         segment_segment_distance( const Segment3D&, const Segment3D& );
     template std::tuple< double, Point3D > opengeode_geometry_api
         point_line_distance( const Point3D&, const InfiniteLine3D& );
+    template double opengeode_geometry_api new_point_line_distance(
+        const Point3D&, const InfiniteLine3D& );
     template std::tuple< double, Point3D > opengeode_geometry_api
         point_triangle_distance( const Point3D&, const Triangle3D& );
     template std::tuple< double, Point3D > opengeode_geometry_api

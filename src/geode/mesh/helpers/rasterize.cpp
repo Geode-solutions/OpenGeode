@@ -500,8 +500,7 @@ namespace
             }
             tested_cells[cell_id] = true;
             const auto center = grid.polyhedron_barycenter( cell_id );
-            if( std::get< 0 >(
-                    geode::point_segment_distance( center, segment ) )
+            if( geode::new_point_segment_distance( center, segment )
                 <= half_cell_size )
             {
                 for( auto&& neighbor : neighbors( grid, cell ) )

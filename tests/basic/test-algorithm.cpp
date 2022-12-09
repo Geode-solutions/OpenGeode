@@ -26,6 +26,7 @@
 
 #include <geode/basic/algorithm.h>
 #include <geode/basic/logger.h>
+#include <geode/basic/uuid.h>
 
 #include <geode/tests/common.h>
 
@@ -37,6 +38,25 @@ std::vector< bool > create_bool_vector()
 std::vector< double > create_double_vector()
 {
     return { 0.0, 1.1, 2.2, 3.3 };
+}
+
+std::vector< std::vector< std::pair< geode::uuid, geode::index_t > > >
+    create_toto_vector()
+{
+    return { { { geode::uuid{}, 0 } }, { { geode::uuid{}, 1 } },
+        { { geode::uuid{}, 2 } }, { { geode::uuid{}, 3 } } };
+}
+
+struct Toto
+{
+    geode::uuid tutu;
+    geode::index_t titi;
+};
+
+std::vector< std::vector< Toto > > create_totostruct_vector()
+{
+    return { { { geode::uuid{}, 0 } }, { { geode::uuid{}, 1 } },
+        { { geode::uuid{}, 2 } }, { { geode::uuid{}, 3 } } };
 }
 
 void test_delete_vector_elements()
@@ -56,6 +76,27 @@ void test_delete_vector_elements()
     OPENGEODE_EXCEPTION( ( double_vector[0] == 0.0 )
                              && ( double_vector[1] == 2.2 )
                              && ( double_vector[2] == 3.3 ),
+        "[Test] Delete elements result (values) for double is not correct" );
+
+    auto toto_vector = create_toto_vector();
+    geode::delete_vector_elements( to_delete, toto_vector );
+    OPENGEODE_EXCEPTION( toto_vector.size() == 3,
+        "[Test] Delete elements result (size) for double is not correct" );
+    toto_vector[0].front();
+    toto_vector[1].front();
+    toto_vector[2].front();
+    OPENGEODE_EXCEPTION( ( toto_vector[0].front().second == 0 )
+                             && ( toto_vector[1].front().second == 2 )
+                             && ( toto_vector[2].front().second == 3 ),
+        "[Test] Delete elements result (values) for double is not correct" );
+
+    auto totos_vector = create_totostruct_vector();
+    geode::delete_vector_elements( to_delete, totos_vector );
+    OPENGEODE_EXCEPTION( totos_vector.size() == 3,
+        "[Test] Delete elements result (size) for double is not correct" );
+    OPENGEODE_EXCEPTION( ( totos_vector[0].front().titi == 0 )
+                             && ( totos_vector[1].front().titi == 2 )
+                             && ( totos_vector[2].front().titi == 3 ),
         "[Test] Delete elements result (values) for double is not correct" );
 }
 
