@@ -52,9 +52,9 @@ namespace geode
         using serializer_function = std::function< void( PContext& ) >;
 
         /*!
-         * Classe holding a const reference of a data.
-         * @warning Do not destroy this Data class before the const reference
-         * obtained using its get() method is no longer in used
+         * Class holding a const reference of data.
+         * @warning Do not destroy this Data class if the const reference
+         * obtained using its get() method is still in used.
          */
         class opengeode_basic_api Data
         {

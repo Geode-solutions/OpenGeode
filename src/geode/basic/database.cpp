@@ -75,19 +75,18 @@ namespace geode
 
         void new_data_reference()
         {
-            const std::lock_guard< std::mutex > locking{ lock_ };
             counter_++;
             last_++;
         }
 
         void delete_data_reference()
         {
-            const std::lock_guard< std::mutex > locking{ lock_ };
             OPENGEODE_ASSERT(
                 counter_ > 0, "[Database::Storage] Cannot decrement" );
             counter_--;
             if( unused() )
             {
+                const std::lock_guard< std::mutex > locking{ lock_ };
                 clean_queue();
                 wait_for_memory_release();
             }
@@ -125,7 +124,7 @@ namespace geode
 
         void wait_for_memory_release()
         {
-            const auto last = last_;
+            const auto last = last_.load();
             queue_.emplace( async::spawn( [this, last] {
                 std::unique_lock< std::mutex > locking{ lock_ };
                 if( !condition_.wait_for(
@@ -138,17 +137,16 @@ namespace geode
                         data_.reset();
                     }
                 }
-                locking.unlock();
             } ) );
         }
 
     private:
         std::unique_ptr< Identifier > data_;
         std::atomic< bool > terminate_{ false };
-        index_t counter_{ 0 };
+        std::atomic< index_t > counter_{ 0 };
         std::mutex lock_;
         std::condition_variable condition_;
-        index_t last_{ 0 };
+        std::atomic< index_t > last_{ 0 };
         std::queue< async::task< void > > queue_;
     };
 
