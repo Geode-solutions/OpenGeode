@@ -26,15 +26,12 @@
 #include <condition_variable>
 #include <mutex>
 #include <queue>
-#include <sstream>
-#include <thread>
 
 #include <async++.h>
 
 #include <ghc/filesystem.hpp>
 
 #include <absl/container/flat_hash_map.h>
-#include <absl/time/time.h>
 
 #include <geode/basic/identifier.h>
 #include <geode/basic/pimpl_impl.h>
@@ -42,8 +39,7 @@
 
 namespace
 {
-    constexpr auto DATA_EXPIRATION = std::chrono::minutes( 1 );
-    int count{ 0 };
+    constexpr auto DATA_EXPIRATION = std::chrono::minutes( 3 );
 } // namespace
 
 namespace geode
@@ -52,24 +48,24 @@ namespace geode
     {
     public:
         Storage( std::unique_ptr< geode::Identifier >&& data )
-            : data_{ std::move( data ) }, count_{ count++ }
+            : data_{ std::move( data ) }
         {
-            Logger::debug( count_, " -> ", "Storage" );
         }
 
         ~Storage()
         {
-            Logger::debug( count_, " -> ", "~Storage" );
             terminate_storage();
             std::unique_lock< std::mutex > locking{ lock_ };
-            do
-            {
-                clean_queue();
-            } while( !condition_.wait_for(
-                locking, std::chrono::microseconds( 10 ), [this] {
+            clean_queue();
+            while( !condition_.wait_for(
+                locking, std::chrono::milliseconds( 10 ), [this] {
                     return queue_.empty();
-                } ) );
-            Logger::debug( count_, " -> ", "~Storage end" );
+                } ) )
+                ;
+            {
+                condition_.notify_all();
+                clean_queue();
+            }
         }
 
         bool expired() const
@@ -87,9 +83,6 @@ namespace geode
             const std::lock_guard< std::mutex > locking{ lock_ };
             counter_++;
             last_++;
-            std::ostringstream oss;
-            oss << std::this_thread::get_id() << " " << this;
-            Logger::debug( count_, " -> ", "new ", counter_, " " );
         }
 
         void delete_data_reference()
@@ -98,9 +91,6 @@ namespace geode
             OPENGEODE_ASSERT(
                 counter_ > 0, "[Database::Storage] Cannot decrement" );
             counter_--;
-            std::ostringstream oss;
-            oss << std::this_thread::get_id() << " " << this;
-            Logger::debug( count_, " -> ", "delete ", counter_, " " );
             if( unused() )
             {
                 clean_queue();
@@ -108,15 +98,12 @@ namespace geode
             }
         }
 
-        // void set_data( std::unique_ptr< geode::Identifier >&& data )
-        // {
-        //     const std::lock_guard< std::mutex > locking{ lock_ };
-        //     terminate_ = false;
-        //     counter_ = 0;
-        //     count_ = count++;
-        //     Logger::debug( count_, " -> ", "set_data " );
-        //     data_ = std::move( data );
-        // }
+        void set_data( std::unique_ptr< geode::Identifier >&& data )
+        {
+            const std::lock_guard< std::mutex > locking{ lock_ };
+            counter_ = 0;
+            data_ = std::move( data );
+        }
 
         const std::unique_ptr< geode::Identifier >& data() const
         {
@@ -131,13 +118,8 @@ namespace geode
     private:
         void terminate_storage()
         {
-            std::ostringstream oss;
-            oss << std::this_thread::get_id() << " " << this;
-            Logger::debug( count_, " -> ", "begin terminate_storage" );
             terminate_ = true;
-            Logger::debug( count_, " -> ", "calls ", queue_.size(), " " );
             condition_.notify_all();
-            Logger::debug( count_, " -> ", "end terminate_storage" );
         }
 
         void clean_queue()
@@ -156,28 +138,17 @@ namespace geode
         {
             const auto last = last_;
             queue_.emplace( async::spawn( [this, last] {
-                Logger::debug( count_, " -> ", "wait start " );
-                Logger::debug( count_, " -> ", "wait start 2 " );
                 std::unique_lock< std::mutex > locking{ lock_ };
-                Logger::debug( count_, " -> ", "wait 2 + " );
-                Logger::debug( count_, " -> ", "last ", last, " ", last_ );
                 if( !condition_.wait_for(
                         locking, DATA_EXPIRATION, [this, last] {
-                            Logger::debug( count_, " -> ", "terminate ",
-                                terminate_.load(), " " );
                             return terminate_.load();
                         } ) )
                 {
-                    Logger::debug(
-                        count_, " -> ", "wait in", " ", last, " ", last_ );
                     if( last == last_ )
                     {
-                        Logger::debug( count_, " -> ", "wait reset", " " );
                         data_.reset();
                     }
                 }
-                Logger::debug(
-                    count_, " -> ", "wait out + ", queue_.size(), " " );
                 locking.unlock();
                 condition_.notify_all();
             } ) );
@@ -189,8 +160,7 @@ namespace geode
         index_t counter_{ 0 };
         std::mutex lock_;
         std::condition_variable condition_;
-        index_t last_;
-        int count_;
+        index_t last_{ 0 };
         std::queue< async::task< void > > queue_;
     };
 
@@ -211,11 +181,11 @@ namespace geode
             return storage_.size();
         }
 
-        const uuid& register_unique_data( std::unique_ptr< Identifier >&& data )
+        void register_unique_data(
+            const uuid& id, std::unique_ptr< Identifier >&& data )
         {
-            const auto& registered_data = register_data( std::move( data ) );
-            save_data( registered_data );
-            return registered_data->id();
+            save_data( id, data );
+            register_data( id, std::move( data ) );
         }
 
         std::shared_ptr< Storage > data( const uuid& id ) const
@@ -233,14 +203,10 @@ namespace geode
             auto& storage = storage_.at( id );
             if( storage && storage->unused() && !storage->expired() )
             {
-                DEBUG( "in" );
                 auto* data = storage->steal_data();
-                DEBUG( "steal" );
                 storage.reset();
-                DEBUG( "reset" );
                 return std::unique_ptr< Identifier >{ data };
             }
-            DEBUG( "load" );
             return load_data( id );
         }
 
@@ -258,36 +224,34 @@ namespace geode
 
     private:
         const std::unique_ptr< Identifier >& register_data(
-            std::unique_ptr< Identifier >&& data )
+            const uuid& id, std::unique_ptr< Identifier >&& data )
         {
-            const auto& id = data->id();
             const auto it = storage_.find( id );
             if( it != storage_.end() )
             {
-                // if( it->second->unused() )
-                // {
-                //     it->second->set_data( std::move( data ) );
-                //     return it->second->data();
-                // }
+                if( it->second->unused() )
+                {
+                    it->second->set_data( std::move( data ) );
+                    return it->second->data();
+                }
                 delete_data( id );
-                // return do_register_data( std::move( data ) );
+                return do_register_data( id, std::move( data ) );
             }
-            return do_register_data( std::move( data ) );
+            return do_register_data( id, std::move( data ) );
         }
 
         const std::unique_ptr< Identifier >& do_register_data(
-            std::unique_ptr< Identifier >&& data )
+            const uuid& id, std::unique_ptr< Identifier >&& data )
         {
-            const auto id = data->id();
             auto new_storage = std::make_shared< Storage >( std::move( data ) );
             return storage_.emplace( id, std::move( new_storage ) )
                 .first->second->data();
         }
 
-        void save_data( const std::unique_ptr< Identifier >& data ) const
+        void save_data(
+            const uuid& id, const std::unique_ptr< Identifier >& data ) const
         {
-            const auto filename =
-                absl::StrCat( directory_, "/", data->id().string() );
+            const auto filename = absl::StrCat( directory_, "/", id.string() );
             std::ofstream file{ filename, std::ofstream::binary };
             TContext context;
             for( const auto& serializer : serializers_ )
@@ -378,10 +342,10 @@ namespace geode
         return impl_->nb_data();
     }
 
-    const uuid& Database::register_unique_data(
-        std::unique_ptr< Identifier >&& data )
+    void Database::register_unique_data(
+        const uuid& id, std::unique_ptr< Identifier >&& data )
     {
-        return impl_->register_unique_data( std::move( data ) );
+        impl_->register_unique_data( id, std::move( data ) );
     }
 
     Database::Data Database::get_data( const uuid& id ) const

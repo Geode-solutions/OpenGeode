@@ -60,18 +60,14 @@ void register_foo_deserializer( geode::PContext& context )
 void test_take_data( geode::Database& database, const geode::uuid& id )
 {
     auto stolen_foo = database.take_data< Foo >( id );
-    DEBUG( "take 1" );
     OPENGEODE_EXCEPTION(
         stolen_foo->value_ == 42, "[Test] Wrong value after take data" );
     auto foo_data = database.get_data( id );
-    DEBUG( "take 2" );
     const auto& foo = foo_data.get< Foo >();
-    DEBUG( "take 3" );
     OPENGEODE_EXCEPTION(
         foo.value_ == 42, "[Test] Wrong value after register data" );
     OPENGEODE_EXCEPTION( stolen_foo.get() != &foo,
         "[Test] Objects adresses should be different" );
-    DEBUG( "take 4" );
 }
 
 void test_take_wrong_data( geode::Database& database, const geode::uuid& id )
@@ -91,7 +87,7 @@ void test_take_wrong_data( geode::Database& database, const geode::uuid& id )
 
 geode::uuid test_register_data( geode::Database& database )
 {
-    auto foo = database.register_data( Foo{ 42 } );
+    auto foo = database.register_new_data( Foo{ 42 } );
     auto foo_data = database.get_data( foo );
     OPENGEODE_EXCEPTION( foo_data.get< Foo >().value_ == 42,
         "[Test] Wrong value after register data" );
@@ -100,7 +96,7 @@ geode::uuid test_register_data( geode::Database& database )
 
 geode::uuid test_register_unique_data( geode::Database& database )
 {
-    auto foo = database.register_data( absl::make_unique< Foo >( 22 ) );
+    auto foo = database.register_new_data( absl::make_unique< Foo >( 22 ) );
     auto foo_data = database.get_data( foo );
     OPENGEODE_EXCEPTION( foo_data.get< Foo >().value_ == 22,
         "[Test] Wrong value after register unique data" );
@@ -117,7 +113,7 @@ void test_modify_data( geode::Database& database, const geode::uuid& id )
         taken_foo->value_ == 12, "[Test] Wrong value after modify taken data" );
     OPENGEODE_EXCEPTION(
         foo.value_ == 42, "[Test] Wrong value after register data" );
-    database.register_data( std::move( taken_foo ) );
+    database.update_data( id, std::move( taken_foo ) );
     auto foo_data2 = database.get_data( id );
     const auto& foo2 = foo_data2.get< Foo >();
     OPENGEODE_EXCEPTION(
@@ -131,17 +127,11 @@ void test()
     geode::Database database( "temp" );
     database.register_serializer_functions(
         register_foo_serializer, register_foo_deserializer );
-    DEBUG( "functions" );
     auto foo0 = test_register_data( database );
-    DEBUG( "register" );
     test_register_unique_data( database );
-    DEBUG( "register unique" );
     test_take_data( database, foo0 );
-    DEBUG( "take" );
     test_modify_data( database, foo0 );
-    DEBUG( "modify" );
     test_take_wrong_data( database, foo0 );
-    DEBUG( "wrong" );
     OPENGEODE_EXCEPTION(
         database.nb_data() == 2, "[Test] Database incomplete" );
 }

@@ -87,22 +87,45 @@ namespace geode
         index_t nb_data() const;
 
         template < typename DataType >
-        const uuid& register_data( DataType&& data )
+        uuid register_new_data( DataType&& data )
+        {
+            static_assert( std::is_base_of< Identifier, DataType >::value,
+                "[Database::register_data] Data is not a subclass of "
+                "Identifier" );
+            uuid new_id;
+            register_unique_data(
+                new_id, absl::make_unique< DataType >( std::move( data ) ) );
+            return new_id;
+        }
+
+        template < typename DataType >
+        uuid register_new_data( std::unique_ptr< DataType >&& data )
+        {
+            static_assert( std::is_base_of< Identifier, DataType >::value,
+                "[Database::register_data] Data is not a subclass of "
+                "Identifier" );
+            uuid new_id;
+            register_unique_data( new_id, std::move( data ) );
+            return new_id;
+        }
+
+        template < typename DataType >
+        void update_data( const uuid& id, DataType&& data )
         {
             static_assert( std::is_base_of< Identifier, DataType >::value,
                 "[Database::register_data] Data is not a subclass of "
                 "Identifier" );
             return register_unique_data(
-                absl::make_unique< DataType >( std::move( data ) ) );
+                id, absl::make_unique< DataType >( std::move( data ) ) );
         }
 
         template < typename DataType >
-        const uuid& register_data( std::unique_ptr< DataType >&& data )
+        void update_data( const uuid& id, std::unique_ptr< DataType >&& data )
         {
             static_assert( std::is_base_of< Identifier, DataType >::value,
                 "[Database::register_data] Data is not a subclass of "
                 "Identifier" );
-            return register_unique_data( std::move( data ) );
+            return register_unique_data( id, std::move( data ) );
         }
 
         void delete_data( const uuid& id );
@@ -117,10 +140,8 @@ namespace geode
         std::unique_ptr< DataType > take_data( const uuid& id )
         {
             get_data( id ).get< DataType >();
-            DEBUG( "get" );
             auto* data =
                 dynamic_cast< DataType* >( steal_data( id ).release() );
-            DEBUG( "steal" );
             return std::unique_ptr< DataType >{ data };
         }
 
@@ -132,8 +153,8 @@ namespace geode
             serializer_function serializer, serializer_function deserializer );
 
     private:
-        const uuid& register_unique_data(
-            std::unique_ptr< Identifier >&& data );
+        void register_unique_data(
+            const uuid& id, std::unique_ptr< Identifier >&& data );
 
         std::unique_ptr< Identifier > steal_data( const uuid& id );
 
