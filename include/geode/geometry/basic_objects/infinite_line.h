@@ -43,29 +43,26 @@ namespace geode
 namespace geode
 {
     template < typename PointType, index_t dimension >
-    class GenericInfiniteLine
+    class GenericLine
     {
     public:
-        GenericInfiniteLine( const Vector< dimension >& direction,
+        GenericLine( const Vector< dimension >& direction,
             const Point< dimension >& origin );
 
-        GenericInfiniteLine(
-            const GenericSegment< PointType, dimension >& segment );
-        GenericInfiniteLine(
-            const GenericInfiniteLine< PointType, dimension >& other );
-        GenericInfiniteLine< PointType, dimension >& operator=(
-            const GenericInfiniteLine< PointType, dimension >& other );
-        GenericInfiniteLine(
-            GenericInfiniteLine< PointType, dimension >&& other );
-        GenericInfiniteLine< PointType, dimension >& operator=(
-            GenericInfiniteLine< PointType, dimension >&& other );
+        GenericLine( const GenericSegment< PointType, dimension >& segment );
+        GenericLine( const GenericLine< PointType, dimension >& other );
+        GenericLine< PointType, dimension >& operator=(
+            const GenericLine< PointType, dimension >& other );
+        GenericLine( GenericLine< PointType, dimension >&& other );
+        GenericLine< PointType, dimension >& operator=(
+            GenericLine< PointType, dimension >&& other );
 
         const Point< dimension >& origin() const;
         const Vector< dimension >& direction() const;
 
     protected:
-        GenericInfiniteLine( const OwnerInfiniteLine< dimension >& other );
-        GenericInfiniteLine( const OwnerRay< dimension >& other );
+        GenericLine( const OwnerInfiniteLine< dimension >& other );
+        GenericLine( const OwnerRay< dimension >& other );
 
     private:
         PointType origin_;
@@ -74,9 +71,9 @@ namespace geode
 
     template < index_t dimension >
     class OwnerInfiniteLine
-        : public GenericInfiniteLine< Point< dimension >, dimension >
+        : public GenericLine< Point< dimension >, dimension >
     {
-        using Base = GenericInfiniteLine< Point< dimension >, dimension >;
+        using Base = GenericLine< Point< dimension >, dimension >;
 
     public:
         explicit OwnerInfiniteLine( const Vector< dimension >& direction,
@@ -93,9 +90,9 @@ namespace geode
     ALIAS_1D_AND_2D_AND_3D( OwnerInfiniteLine );
 
     template < index_t dimension >
-    class OwnerRay : public GenericInfiniteLine< Point< dimension >, dimension >
+    class OwnerRay : public GenericLine< Point< dimension >, dimension >
     {
-        using Base = GenericInfiniteLine< Point< dimension >, dimension >;
+        using Base = GenericLine< Point< dimension >, dimension >;
 
     public:
         explicit OwnerRay( const Vector< dimension >& direction,
@@ -110,10 +107,9 @@ namespace geode
     ALIAS_1D_AND_2D_AND_3D( OwnerRay );
 
     template < index_t dimension >
-    class InfiniteLine
-        : public GenericInfiniteLine< RefPoint< dimension >, dimension >
+    class InfiniteLine : public GenericLine< RefPoint< dimension >, dimension >
     {
-        using Base = GenericInfiniteLine< RefPoint< dimension >, dimension >;
+        using Base = GenericLine< RefPoint< dimension >, dimension >;
 
     public:
         InfiniteLine( const Vector< dimension >& direction,
@@ -131,9 +127,9 @@ namespace geode
     ALIAS_1D_AND_2D_AND_3D( InfiniteLine );
 
     template < index_t dimension >
-    class Ray : public GenericInfiniteLine< RefPoint< dimension >, dimension >
+    class Ray : public GenericLine< RefPoint< dimension >, dimension >
     {
-        using Base = GenericInfiniteLine< RefPoint< dimension >, dimension >;
+        using Base = GenericLine< RefPoint< dimension >, dimension >;
 
     public:
         Ray( const Vector< dimension >& direction,

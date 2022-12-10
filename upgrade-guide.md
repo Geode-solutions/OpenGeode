@@ -9,6 +9,7 @@
 ### Breaking Changes
 
 
+- **GenericInfiniteLine**: `GenericInfiniteLine` has been renamed `GenericLine`
 
 ## Upgrading from OpenGeode v11.x.x to v12.0.0
 

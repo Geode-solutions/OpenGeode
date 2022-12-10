@@ -28,44 +28,44 @@
 namespace geode
 {
     template < typename PointType, index_t dimension >
-    GenericInfiniteLine< PointType, dimension >::GenericInfiniteLine(
+    GenericLine< PointType, dimension >::GenericLine(
         const Vector< dimension >& direction, const Point< dimension >& origin )
         : origin_( origin ), direction_( direction.normalize() )
     {
     }
     template < typename PointType, index_t dimension >
-    GenericInfiniteLine< PointType, dimension >::GenericInfiniteLine(
+    GenericLine< PointType, dimension >::GenericLine(
         const GenericSegment< PointType, dimension >& segment )
-        : GenericInfiniteLine(
+        : GenericLine(
             segment.normalized_direction(), segment.vertices()[0] )
     {
     }
     template < typename PointType, index_t dimension >
-    GenericInfiniteLine< PointType, dimension >::GenericInfiniteLine(
-        const GenericInfiniteLine< PointType, dimension >& other )
+    GenericLine< PointType, dimension >::GenericLine(
+        const GenericLine< PointType, dimension >& other )
         : origin_( other.origin_ ), direction_( other.direction_ )
     {
     }
     template < typename PointType, index_t dimension >
-    GenericInfiniteLine< PointType, dimension >&
-        GenericInfiniteLine< PointType, dimension >::operator=(
-            const GenericInfiniteLine< PointType, dimension >& other )
+    GenericLine< PointType, dimension >&
+        GenericLine< PointType, dimension >::operator=(
+            const GenericLine< PointType, dimension >& other )
     {
         origin_ = other.origin_;
         direction_ = other.direction_;
         return *this;
     }
     template < typename PointType, index_t dimension >
-    GenericInfiniteLine< PointType, dimension >::GenericInfiniteLine(
-        GenericInfiniteLine< PointType, dimension >&& other )
+    GenericLine< PointType, dimension >::GenericLine(
+        GenericLine< PointType, dimension >&& other )
         : origin_( std::move( other.origin_ ) ),
           direction_( std::move( other.direction_ ) )
     {
     }
     template < typename PointType, index_t dimension >
-    GenericInfiniteLine< PointType, dimension >&
-        GenericInfiniteLine< PointType, dimension >::operator=(
-            GenericInfiniteLine< PointType, dimension >&& other )
+    GenericLine< PointType, dimension >&
+        GenericLine< PointType, dimension >::operator=(
+            GenericLine< PointType, dimension >&& other )
     {
         origin_ = std::move( other.origin_ );
         direction_ = std::move( other.direction_ );
@@ -73,24 +73,24 @@ namespace geode
     }
     template < typename PointType, index_t dimension >
     const Point< dimension >&
-        GenericInfiniteLine< PointType, dimension >::origin() const
+        GenericLine< PointType, dimension >::origin() const
     {
         return origin_;
     }
     template < typename PointType, index_t dimension >
     const Vector< dimension >&
-        GenericInfiniteLine< PointType, dimension >::direction() const
+        GenericLine< PointType, dimension >::direction() const
     {
         return direction_;
     }
     template < typename PointType, index_t dimension >
-    GenericInfiniteLine< PointType, dimension >::GenericInfiniteLine(
+    GenericLine< PointType, dimension >::GenericLine(
         const OwnerInfiniteLine< dimension >& other )
         : origin_( other.origin() ), direction_( other.direction() )
     {
     }
     template < typename PointType, index_t dimension >
-    GenericInfiniteLine< PointType, dimension >::GenericInfiniteLine(
+    GenericLine< PointType, dimension >::GenericLine(
         const OwnerRay< dimension >& other )
         : origin_( other.origin() ), direction_( other.direction() )
     {
@@ -253,15 +253,15 @@ namespace geode
         return *this;
     }
 
-    template class opengeode_geometry_api GenericInfiniteLine< Point< 1 >, 1 >;
-    template class opengeode_geometry_api GenericInfiniteLine< Point< 2 >, 2 >;
-    template class opengeode_geometry_api GenericInfiniteLine< Point< 3 >, 3 >;
+    template class opengeode_geometry_api GenericLine< Point< 1 >, 1 >;
+    template class opengeode_geometry_api GenericLine< Point< 2 >, 2 >;
+    template class opengeode_geometry_api GenericLine< Point< 3 >, 3 >;
     template class opengeode_geometry_api
-        GenericInfiniteLine< RefPoint< 1 >, 1 >;
+        GenericLine< RefPoint< 1 >, 1 >;
     template class opengeode_geometry_api
-        GenericInfiniteLine< RefPoint< 2 >, 2 >;
+        GenericLine< RefPoint< 2 >, 2 >;
     template class opengeode_geometry_api
-        GenericInfiniteLine< RefPoint< 3 >, 3 >;
+        GenericLine< RefPoint< 3 >, 3 >;
     template class opengeode_geometry_api OwnerInfiniteLine< 1 >;
     template class opengeode_geometry_api OwnerInfiniteLine< 2 >;
     template class opengeode_geometry_api OwnerInfiniteLine< 3 >;
