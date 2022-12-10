@@ -36,8 +36,7 @@ namespace geode
     template < typename PointType, index_t dimension >
     GenericLine< PointType, dimension >::GenericLine(
         const GenericSegment< PointType, dimension >& segment )
-        : GenericLine(
-            segment.normalized_direction(), segment.vertices()[0] )
+        : GenericLine( segment.normalized_direction(), segment.vertices()[0] )
     {
     }
     template < typename PointType, index_t dimension >
@@ -256,12 +255,9 @@ namespace geode
     template class opengeode_geometry_api GenericLine< Point< 1 >, 1 >;
     template class opengeode_geometry_api GenericLine< Point< 2 >, 2 >;
     template class opengeode_geometry_api GenericLine< Point< 3 >, 3 >;
-    template class opengeode_geometry_api
-        GenericLine< RefPoint< 1 >, 1 >;
-    template class opengeode_geometry_api
-        GenericLine< RefPoint< 2 >, 2 >;
-    template class opengeode_geometry_api
-        GenericLine< RefPoint< 3 >, 3 >;
+    template class opengeode_geometry_api GenericLine< RefPoint< 1 >, 1 >;
+    template class opengeode_geometry_api GenericLine< RefPoint< 2 >, 2 >;
+    template class opengeode_geometry_api GenericLine< RefPoint< 3 >, 3 >;
     template class opengeode_geometry_api OwnerInfiniteLine< 1 >;
     template class opengeode_geometry_api OwnerInfiniteLine< 2 >;
     template class opengeode_geometry_api OwnerInfiniteLine< 3 >;
