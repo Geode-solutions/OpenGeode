@@ -39,8 +39,10 @@ namespace geode
 {
     SectionBuilder::SectionBuilder( Section& section )
         : TopologyBuilder( section ),
-          AddComponentsBuilders< 2, Corners, Lines, Surfaces, ModelBoundaries >(
-              section ),
+          CornersBuilder2D( section ),
+          LinesBuilder2D( section ),
+          SurfacesBuilder2D( section ),
+          ModelBoundariesBuilder2D( section ),
           IdentifierBuilder( section ),
           section_( section )
     {

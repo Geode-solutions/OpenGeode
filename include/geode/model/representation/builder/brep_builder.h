@@ -27,7 +27,6 @@
 #include <geode/basic/mapping.h>
 
 #include <geode/model/common.h>
-#include <geode/model/mixin/builder/add_components_builders.h>
 #include <geode/model/mixin/builder/blocks_builder.h>
 #include <geode/model/mixin/builder/corners_builder.h>
 #include <geode/model/mixin/builder/lines_builder.h>
@@ -72,12 +71,11 @@ namespace geode
      * @extends ModelBoundariesBuilder
      */
     class opengeode_model_api BRepBuilder : public TopologyBuilder,
-                                            public AddComponentsBuilders< 3,
-                                                Corners,
-                                                Lines,
-                                                Surfaces,
-                                                Blocks,
-                                                ModelBoundaries >,
+                                            public CornersBuilder3D,
+                                            public LinesBuilder3D,
+                                            public SurfacesBuilder3D,
+                                            public BlocksBuilder3D,
+                                            public ModelBoundariesBuilder3D,
                                             public IdentifierBuilder
     {
         OPENGEODE_DISABLE_COPY( BRepBuilder );

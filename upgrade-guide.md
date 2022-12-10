@@ -8,6 +8,7 @@
 
 ### Breaking Changes
 
+-**AddComponents**: `AddComponents` and `AddComponentsBuilder` have been removed. VisualStudio cannot compile move constructor using these helpers.
 
 
 ## Upgrading from OpenGeode v11.x.x to v12.0.0

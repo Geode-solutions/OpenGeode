@@ -41,12 +41,11 @@ namespace geode
 {
     BRepBuilder::BRepBuilder( BRep& brep )
         : TopologyBuilder( brep ),
-          AddComponentsBuilders< 3,
-              Corners,
-              Lines,
-              Surfaces,
-              Blocks,
-              ModelBoundaries >( brep ),
+          CornersBuilder3D( brep ),
+          LinesBuilder3D( brep ),
+          SurfacesBuilder3D( brep ),
+          BlocksBuilder3D( brep ),
+          ModelBoundariesBuilder3D( brep ),
           IdentifierBuilder( brep ),
           brep_( brep )
     {
