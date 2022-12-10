@@ -38,9 +38,10 @@ namespace geode
     {
         using Mapping = ModelCopyMapping::Mapping;
 
-        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
-        Mapping copy_corner_components_without_type(
-            const ModelFrom& from, const ModelTo& to, BuilderTo& builder_to )
+        template < typename ModelFrom, typename ModelTo >
+        Mapping copy_corner_components_without_type( const ModelFrom& from,
+            const ModelTo& to,
+            typename ModelTo::Builder& builder_to )
         {
             Mapping mapping;
             mapping.reserve( from.nb_corners() );
@@ -54,9 +55,10 @@ namespace geode
             return mapping;
         }
 
-        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
-        Mapping copy_line_components_without_type(
-            const ModelFrom& from, const ModelTo& to, BuilderTo& builder_to )
+        template < typename ModelFrom, typename ModelTo >
+        Mapping copy_line_components_without_type( const ModelFrom& from,
+            const ModelTo& to,
+            typename ModelTo::Builder& builder_to )
         {
             Mapping mapping;
             mapping.reserve( from.nb_lines() );
@@ -70,9 +72,10 @@ namespace geode
             return mapping;
         }
 
-        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
-        Mapping copy_surface_components_without_type(
-            const ModelFrom& from, const ModelTo& to, BuilderTo& builder_to )
+        template < typename ModelFrom, typename ModelTo >
+        Mapping copy_surface_components_without_type( const ModelFrom& from,
+            const ModelTo& to,
+            typename ModelTo::Builder& builder_to )
         {
             Mapping mapping;
             mapping.reserve( from.nb_surfaces() );
