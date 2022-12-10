@@ -58,20 +58,14 @@ namespace geode
 
         Point< dimension > barycenter() const;
         template < index_t T = dimension >
-        typename std::enable_if< T == 3, Vector3D >::type normal() const;
-        template < index_t T = dimension >
-        typename std::enable_if< T == 3, Plane >::type plane() const;
-        template < index_t T = dimension >
-        typename std::enable_if< T == 3, OwnerPlane >::type owner_plane() const;
-        template < index_t T = dimension >
         typename std::enable_if< T == 3, absl::optional< Vector3D > >::type
-            new_normal() const;
+            normal() const;
         template < index_t T = dimension >
         typename std::enable_if< T == 3, absl::optional< Plane > >::type
-            new_plane() const;
+            plane() const;
         template < index_t T = dimension >
         typename std::enable_if< T == 3, absl::optional< OwnerPlane > >::type
-            new_owner_plane() const;
+            owner_plane() const;
         template < index_t T = dimension >
         typename std::enable_if< T == 3, absl::optional< local_index_t > >::type
             pivot() const;

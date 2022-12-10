@@ -536,7 +536,7 @@ void test_point_plane_distance()
     const geode::Point3D b{ { 1.0, 0.0, 0.0 } };
     const geode::Point3D c{ { 1.0, 1.0, 0.0 } };
     const geode::Triangle3D triangle{ a, b, c };
-    const auto plane = triangle.new_plane().value();
+    const auto plane = triangle.plane().value();
 
     double distance;
     geode::Point3D closest_point, answer;

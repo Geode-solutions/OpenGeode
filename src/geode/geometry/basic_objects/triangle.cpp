@@ -117,34 +117,8 @@ namespace geode
 
     template < typename PointType, index_t dimension >
     template < index_t T >
-    typename std::enable_if< T == 3, Vector3D >::type
-        GenericTriangle< PointType, dimension >::normal() const
-    {
-        return Vector3D{ vertices_[0], vertices_[1] }
-            .cross( Vector3D{ vertices_[0], vertices_[2] } )
-            .normalize();
-    }
-
-    template < typename PointType, index_t dimension >
-    template < index_t T >
-    typename std::enable_if< T == 3, Plane >::type
-        GenericTriangle< PointType, dimension >::plane() const
-    {
-        return { this->normal(), vertices_[0] };
-    }
-
-    template < typename PointType, index_t dimension >
-    template < index_t T >
-    typename std::enable_if< T == 3, OwnerPlane >::type
-        GenericTriangle< PointType, dimension >::owner_plane() const
-    {
-        return OwnerPlane{ this->normal(), vertices_[0] };
-    }
-
-    template < typename PointType, index_t dimension >
-    template < index_t T >
     typename std::enable_if< T == 3, absl::optional< Vector3D > >::type
-        GenericTriangle< PointType, dimension >::new_normal() const
+        GenericTriangle< PointType, dimension >::normal() const
     {
         if( auto normal = ::normal( *this ) )
         {
@@ -156,9 +130,9 @@ namespace geode
     template < typename PointType, index_t dimension >
     template < index_t T >
     typename std::enable_if< T == 3, absl::optional< Plane > >::type
-        GenericTriangle< PointType, dimension >::new_plane() const
+        GenericTriangle< PointType, dimension >::plane() const
     {
-        if( const auto triangle_normal = this->new_normal() )
+        if( const auto triangle_normal = this->normal() )
         {
             return absl::optional< Plane >{ absl::in_place,
                 triangle_normal.value(), vertices_[0] };
@@ -169,9 +143,9 @@ namespace geode
     template < typename PointType, index_t dimension >
     template < index_t T >
     typename std::enable_if< T == 3, absl::optional< OwnerPlane > >::type
-        GenericTriangle< PointType, dimension >::new_owner_plane() const
+        GenericTriangle< PointType, dimension >::owner_plane() const
     {
-        if( const auto triangle_normal = this->new_normal() )
+        if( const auto triangle_normal = this->normal() )
         {
             return absl::optional< OwnerPlane >{ absl::in_place,
                 triangle_normal.value(), vertices_[0] };
@@ -305,33 +279,21 @@ namespace geode
     template class opengeode_geometry_api Triangle< 2 >;
     template class opengeode_geometry_api Triangle< 3 >;
 
-    template opengeode_geometry_api Vector3D
-        GenericTriangle< Point< 3 >, 3 >::normal< 3 >() const;
-    template opengeode_geometry_api Plane
-        GenericTriangle< Point< 3 >, 3 >::plane< 3 >() const;
-    template opengeode_geometry_api OwnerPlane
-        GenericTriangle< Point< 3 >, 3 >::owner_plane< 3 >() const;
     template opengeode_geometry_api absl::optional< Vector3D >
-        GenericTriangle< Point< 3 >, 3 >::new_normal< 3 >() const;
+        GenericTriangle< Point< 3 >, 3 >::normal< 3 >() const;
     template opengeode_geometry_api absl::optional< Plane >
-        GenericTriangle< Point< 3 >, 3 >::new_plane< 3 >() const;
+        GenericTriangle< Point< 3 >, 3 >::plane< 3 >() const;
     template opengeode_geometry_api absl::optional< OwnerPlane >
-        GenericTriangle< Point< 3 >, 3 >::new_owner_plane< 3 >() const;
+        GenericTriangle< Point< 3 >, 3 >::owner_plane< 3 >() const;
     template opengeode_geometry_api absl::optional< local_index_t >
         GenericTriangle< Point< 3 >, 3 >::pivot< 3 >() const;
 
-    template opengeode_geometry_api Vector3D
-        GenericTriangle< RefPoint< 3 >, 3 >::normal< 3 >() const;
-    template opengeode_geometry_api Plane
-        GenericTriangle< RefPoint< 3 >, 3 >::plane< 3 >() const;
-    template opengeode_geometry_api OwnerPlane
-        GenericTriangle< RefPoint< 3 >, 3 >::owner_plane< 3 >() const;
     template opengeode_geometry_api absl::optional< Vector3D >
-        GenericTriangle< RefPoint< 3 >, 3 >::new_normal< 3 >() const;
+        GenericTriangle< RefPoint< 3 >, 3 >::normal< 3 >() const;
     template opengeode_geometry_api absl::optional< Plane >
-        GenericTriangle< RefPoint< 3 >, 3 >::new_plane< 3 >() const;
+        GenericTriangle< RefPoint< 3 >, 3 >::plane< 3 >() const;
     template opengeode_geometry_api absl::optional< OwnerPlane >
-        GenericTriangle< RefPoint< 3 >, 3 >::new_owner_plane< 3 >() const;
+        GenericTriangle< RefPoint< 3 >, 3 >::owner_plane< 3 >() const;
     template opengeode_geometry_api absl::optional< local_index_t >
         GenericTriangle< RefPoint< 3 >, 3 >::pivot< 3 >() const;
 } // namespace geode
