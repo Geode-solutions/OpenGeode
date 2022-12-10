@@ -174,8 +174,7 @@ namespace geode
 
     private:
         bool line_intersects(
-            const GenericInfiniteLine< RefPoint< dimension >, dimension >&
-                line ) const;
+            const GenericLine< RefPoint< dimension >, dimension >& line ) const;
 
     private:
         Point< dimension > min_;
@@ -184,7 +183,7 @@ namespace geode
 
     template <>
     bool BoundingBox< 3 >::Impl::line_intersects(
-        const GenericInfiniteLine< RefPoint< 3 >, 3 >& line ) const
+        const GenericLine< RefPoint< 3 >, 3 >& line ) const
     {
         const auto box_half_extent = diagonal() / 2.;
         const auto line_translated_origin = line.origin() - center();
@@ -214,7 +213,7 @@ namespace geode
 
     template <>
     bool BoundingBox< 2 >::Impl::line_intersects(
-        const GenericInfiniteLine< RefPoint< 2 >, 2 >& line ) const
+        const GenericLine< RefPoint< 2 >, 2 >& line ) const
     {
         const auto box_center = center();
         const auto box_half_extent = diagonal() / 2.;
@@ -230,7 +229,7 @@ namespace geode
 
     template <>
     bool BoundingBox< 1 >::Impl::line_intersects(
-        const GenericInfiniteLine< RefPoint< 1 >, 1 >& line ) const
+        const GenericLine< RefPoint< 1 >, 1 >& line ) const
     {
         if( diagonal().dot( line.direction() ) > 0 )
         {
