@@ -8,6 +8,7 @@
 
 ### Breaking Changes
 
+-**AddComponents**: `AddComponents` and `AddComponentsBuilder` have been removed. VisualStudio cannot compile move constructor using these helpers.
 
 - **GenericInfiniteLine**: `GenericInfiniteLine` has been renamed `GenericLine`
 
