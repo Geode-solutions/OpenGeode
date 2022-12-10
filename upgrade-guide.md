@@ -1,5 +1,15 @@
 # Upgrade Guide
 
+## Upgrading from OpenGeode v12.x.x to v13.0.0
+
+### Motivations
+
+
+
+### Breaking Changes
+
+
+
 ## Upgrading from OpenGeode v11.x.x to v12.0.0
 
 ### Motivations
