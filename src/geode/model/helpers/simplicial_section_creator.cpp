@@ -32,11 +32,11 @@
 namespace geode
 {
     class SimplicialSectionCreator::Impl
-        : public detail::SimplicialModelCreator< Section, SectionBuilder, 2 >
+        : public detail::SimplicialModelCreator< Section >
     {
     public:
         Impl( Section& section, std::vector< Point2D > unique_points )
-            : detail::SimplicialModelCreator< Section, SectionBuilder, 2 >(
+            : detail::SimplicialModelCreator< Section >(
                 section, std::move( unique_points ) )
         {
         }

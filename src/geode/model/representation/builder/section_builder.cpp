@@ -74,11 +74,11 @@ namespace geode
     void SectionBuilder::copy_component_geometry(
         const ModelCopyMapping& mappings, const Section& section )
     {
-        detail::copy_corner_geometry< 2 >( section, section_, *this,
+        detail::copy_corner_geometry( section, section_, *this,
             mappings.at( Corner2D::component_type_static() ) );
-        detail::copy_line_geometry< 2 >( section, section_, *this,
+        detail::copy_line_geometry( section, section_, *this,
             mappings.at( Line2D::component_type_static() ) );
-        detail::copy_surface_geometry< 2 >( section, section_, *this,
+        detail::copy_surface_geometry( section, section_, *this,
             mappings.at( Surface2D::component_type_static() ) );
         create_unique_vertices( section.nb_unique_vertices() );
         detail::copy_vertex_identifier_components( section, *this, mappings );
