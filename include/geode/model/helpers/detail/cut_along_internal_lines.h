@@ -37,12 +37,13 @@ namespace geode
 {
     namespace detail
     {
-        template < typename Model, typename ModelBuilder, index_t dimension >
+        template < typename Model >
         class CutAlongInternalLines
         {
         public:
             CutAlongInternalLines( Model& model );
-            CutAlongInternalLines( const Model& model, ModelBuilder& builder );
+            CutAlongInternalLines(
+                const Model& model, typename Model::Builder& builder );
             ~CutAlongInternalLines();
 
             /* Cuts the surfaces along internal lines, and returns pairs of
@@ -59,7 +60,7 @@ namespace geode
              * created vertex)
              */
             std::vector< std::pair< ComponentMeshVertex, ComponentMeshVertex > >
-                cut_surface( const Surface< dimension >& surface );
+                cut_surface( const Surface< Model::dimension >& surface );
 
         private:
             IMPLEMENTATION_MEMBER( impl_ );

@@ -47,13 +47,15 @@ namespace geode
 {
     namespace detail
     {
-        template < typename Model, typename ModelBuilder, index_t dimension >
-        class CutAlongInternalLines< Model, ModelBuilder, dimension >::Impl
+        template < typename Model >
+        class CutAlongInternalLines< Model >::Impl
         {
             using CMVmapping =
                 std::pair< ComponentMeshVertex, ComponentMeshVertex >;
             using CMVmappings = std::vector< CMVmapping >;
             using Task = async::task< CMVmappings >;
+            using ModelBuilder = typename Model::Builder;
+            static constexpr auto dimension = Model::dimension;
             struct SurfaceInfo
             {
                 SurfaceInfo( index_t nb_vertices )
@@ -261,45 +263,40 @@ namespace geode
             ModelBuilder& builder_;
         };
 
-        template < typename Model, typename ModelBuilder, index_t dimension >
-        CutAlongInternalLines< Model, ModelBuilder, dimension >::
-            CutAlongInternalLines( Model& model )
+        template < typename Model >
+        CutAlongInternalLines< Model >::CutAlongInternalLines( Model& model )
             : impl_{ model }
         {
         }
 
-        template < typename Model, typename ModelBuilder, index_t dimension >
-        CutAlongInternalLines< Model, ModelBuilder, dimension >::
-            CutAlongInternalLines( const Model& model, ModelBuilder& builder )
+        template < typename Model >
+        CutAlongInternalLines< Model >::CutAlongInternalLines(
+            const Model& model, typename Model::Builder& builder )
             : impl_{ model, builder }
         {
         }
 
-        template < typename Model, typename ModelBuilder, index_t dimension >
-        CutAlongInternalLines< Model, ModelBuilder, dimension >::
-            ~CutAlongInternalLines()
+        template < typename Model >
+        CutAlongInternalLines< Model >::~CutAlongInternalLines()
         {
         }
 
-        template < typename Model, typename ModelBuilder, index_t dimension >
+        template < typename Model >
         std::vector< std::pair< ComponentMeshVertex, ComponentMeshVertex > >
-            CutAlongInternalLines< Model, ModelBuilder, dimension >::
-                cut_all_surfaces()
+            CutAlongInternalLines< Model >::cut_all_surfaces()
         {
             return impl_->cut();
         }
 
-        template < typename Model, typename ModelBuilder, index_t dimension >
+        template < typename Model >
         std::vector< std::pair< ComponentMeshVertex, ComponentMeshVertex > >
-            CutAlongInternalLines< Model, ModelBuilder, dimension >::
-                cut_surface( const Surface< dimension >& surface )
+            CutAlongInternalLines< Model >::cut_surface(
+                const Surface< Model::dimension >& surface )
         {
             return impl_->cut_surface( surface );
         }
 
-        template class opengeode_model_api
-            CutAlongInternalLines< Section, SectionBuilder, 2 >;
-        template class opengeode_model_api
-            CutAlongInternalLines< BRep, BRepBuilder, 3 >;
+        template class opengeode_model_api CutAlongInternalLines< Section >;
+        template class opengeode_model_api CutAlongInternalLines< BRep >;
     } // namespace detail
 } // namespace geode

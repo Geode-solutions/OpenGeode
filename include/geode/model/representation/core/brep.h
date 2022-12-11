@@ -26,7 +26,6 @@
 #include <geode/basic/identifier.h>
 
 #include <geode/model/common.h>
-#include <geode/model/mixin/core/add_components.h>
 #include <geode/model/mixin/core/blocks.h>
 #include <geode/model/mixin/core/corners.h>
 #include <geode/model/mixin/core/lines.h>
@@ -43,6 +42,7 @@ namespace geode
     ALIAS_3D( Surface );
     FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
     ALIAS_3D( BoundingBox );
+    class BRepBuilder;
 } // namespace geode
 
 namespace geode
@@ -68,6 +68,7 @@ namespace geode
     {
     public:
         static constexpr index_t dimension{ 3 };
+        using Builder = BRepBuilder;
 
         class opengeode_model_api BoundaryCornerRange
             : public Relationships::BoundaryRangeIterator,

@@ -47,9 +47,10 @@ namespace geode
     {
         using Mapping = ModelCopyMapping::Mapping;
 
-        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
-        Mapping copy_corner_components(
-            const ModelFrom& from, const ModelTo& to, BuilderTo& builder_to )
+        template < typename ModelFrom, typename ModelTo >
+        Mapping copy_corner_components( const ModelFrom& from,
+            const ModelTo& to,
+            typename ModelTo::Builder& builder_to )
         {
             Mapping mapping;
             mapping.reserve( from.nb_corners() );
@@ -64,9 +65,10 @@ namespace geode
             return mapping;
         }
 
-        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
-        Mapping copy_line_components(
-            const ModelFrom& from, const ModelTo& to, BuilderTo& builder_to )
+        template < typename ModelFrom, typename ModelTo >
+        Mapping copy_line_components( const ModelFrom& from,
+            const ModelTo& to,
+            typename ModelTo::Builder& builder_to )
         {
             Mapping mapping;
             mapping.reserve( from.nb_lines() );
@@ -80,9 +82,10 @@ namespace geode
             return mapping;
         }
 
-        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
-        Mapping copy_surface_components(
-            const ModelFrom& from, const ModelTo& to, BuilderTo& builder_to )
+        template < typename ModelFrom, typename ModelTo >
+        Mapping copy_surface_components( const ModelFrom& from,
+            const ModelTo& to,
+            typename ModelTo::Builder& builder_to )
         {
             Mapping mapping;
             mapping.reserve( from.nb_surfaces() );
@@ -97,9 +100,10 @@ namespace geode
             return mapping;
         }
 
-        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
-        Mapping copy_block_components(
-            const ModelFrom& from, const ModelTo& to, BuilderTo& builder_to )
+        template < typename ModelFrom, typename ModelTo >
+        Mapping copy_block_components( const ModelFrom& from,
+            const ModelTo& to,
+            typename ModelTo::Builder& builder_to )
         {
             Mapping mapping;
             mapping.reserve( from.nb_blocks() );
@@ -153,17 +157,15 @@ namespace geode
             return result;
         }
 
-        template < index_t dimension,
-            typename ModelFrom,
-            typename ModelTo,
-            typename BuilderTo >
+        template < typename ModelFrom, typename ModelTo >
         void copy_corner_geometry( const ModelFrom& from,
             const ModelTo& to,
-            BuilderTo& builder_to,
+            typename ModelTo::Builder& builder_to,
             const Mapping& corners )
         {
-            for( auto&& corner : clone_meshes< PointSet< dimension > >(
-                     from.corners(), from.nb_corners() ) )
+            for( auto&& corner :
+                clone_meshes< PointSet< ModelFrom::dimension > >(
+                    from.corners(), from.nb_corners() ) )
             {
                 builder_to.update_corner_mesh(
                     to.corner( corners.in2out( corner.first ) ),
@@ -171,17 +173,15 @@ namespace geode
             }
         }
 
-        template < index_t dimension,
-            typename ModelFrom,
-            typename ModelTo,
-            typename BuilderTo >
+        template < typename ModelFrom, typename ModelTo >
         void copy_line_geometry( const ModelFrom& from,
             const ModelTo& to,
-            BuilderTo& builder_to,
+            typename ModelTo::Builder& builder_to,
             const Mapping& lines )
         {
-            for( auto&& line : clone_meshes< EdgedCurve< dimension > >(
-                     from.lines(), from.nb_lines() ) )
+            for( auto&& line :
+                clone_meshes< EdgedCurve< ModelFrom::dimension > >(
+                    from.lines(), from.nb_lines() ) )
             {
                 builder_to.update_line_mesh(
                     to.line( lines.in2out( line.first ) ),
@@ -189,17 +189,15 @@ namespace geode
             }
         }
 
-        template < index_t dimension,
-            typename ModelFrom,
-            typename ModelTo,
-            typename BuilderTo >
+        template < typename ModelFrom, typename ModelTo >
         void copy_surface_geometry( const ModelFrom& from,
             const ModelTo& to,
-            BuilderTo& builder_to,
+            typename ModelTo::Builder& builder_to,
             const Mapping& surfaces )
         {
-            for( auto&& surface : clone_meshes< SurfaceMesh< dimension > >(
-                     from.surfaces(), from.nb_surfaces() ) )
+            for( auto&& surface :
+                clone_meshes< SurfaceMesh< ModelFrom::dimension > >(
+                    from.surfaces(), from.nb_surfaces() ) )
             {
                 builder_to.update_surface_mesh(
                     to.surface( surfaces.in2out( surface.first ) ),
@@ -207,17 +205,15 @@ namespace geode
             }
         }
 
-        template < index_t dimension,
-            typename ModelFrom,
-            typename ModelTo,
-            typename BuilderTo >
+        template < typename ModelFrom, typename ModelTo >
         void copy_block_geometry( const ModelFrom& from,
             const ModelTo& to,
-            BuilderTo& builder_to,
+            typename ModelTo::Builder& builder_to,
             const Mapping& blocks )
         {
-            for( auto&& block : clone_meshes< SolidMesh< dimension > >(
-                     from.blocks(), from.nb_blocks() ) )
+            for( auto&& block :
+                clone_meshes< SolidMesh< ModelFrom::dimension > >(
+                    from.blocks(), from.nb_blocks() ) )
             {
                 builder_to.update_block_mesh(
                     to.block( blocks.in2out( block.first ) ),
