@@ -9,7 +9,7 @@
 ### Breaking Changes
 
 
-- **Triangle/SurfaceMesh**: all methods related to normal commputation now returns an optional.
+- **Triangle/SurfaceMesh**: all methods related to normal computation now return an optional.
 
 ## Upgrading from OpenGeode v11.x.x to v12.0.0
 
