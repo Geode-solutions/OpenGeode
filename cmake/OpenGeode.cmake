@@ -18,18 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# Define the project
-project(OpenGeode CXX)
-
-if(WIN32)
-    if(CMAKE_C_FLAGS_DEBUG)
-        string(REPLACE "/MDd" "/MD" CMAKE_C_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
-    endif()
-    if(CMAKE_CXX_FLAGS_DEBUG)
-        string(REPLACE "/MDd" "/MD" CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
-    endif()
-endif()
-
 set(OPENGEODE_CXX_STANDARD ${CMAKE_CXX_STANDARD})
 
 set(UTILS_FILE "${PROJECT_SOURCE_DIR}/cmake/utils.cmake")

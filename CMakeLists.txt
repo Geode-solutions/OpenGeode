@@ -45,7 +45,9 @@ mark_as_advanced(USE_SUPERBUILD INCLUDE_PYBIND11)
 # the one of OpenGeode. This is done during compilation, i.e., OpenGeode.cmake is
 # called (USE_SUPERBUILD = OFF) when the super build project is compiled.
 if(USE_SUPERBUILD)
+    project(SuperBuild)
     include(cmake/SuperBuild.cmake)
 else()
+    project(OpenGeode CXX)
     include(cmake/OpenGeode.cmake)
 endif()
