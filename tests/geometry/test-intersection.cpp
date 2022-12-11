@@ -322,7 +322,7 @@ void test_segment_plane_intersection()
     const geode::Point3D c{ { 1.0, 1.0, 0.0 } };
 
     const geode::Triangle3D triangle{ a, b, c };
-    const auto plane = triangle.new_plane().value();
+    const auto plane = triangle.plane().value();
 
     const geode::Point3D d{ { -1.0, -1.0, 0.0 } };
     const geode::Point3D e{ { 2.0, 2.0, 0.0 } };

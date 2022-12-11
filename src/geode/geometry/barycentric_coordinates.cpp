@@ -59,7 +59,7 @@ namespace geode
     std::array< double, 3 > triangle_barycentric_coordinates(
         const Point3D& point, const Triangle3D& triangle )
     {
-        const auto triangle_normal = triangle.new_normal();
+        const auto triangle_normal = triangle.normal();
         if( !triangle_normal )
         {
             std::array< double, 3 > result;

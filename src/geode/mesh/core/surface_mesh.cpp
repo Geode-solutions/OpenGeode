@@ -908,40 +908,8 @@ namespace geode
 
     template < index_t dimension >
     template < index_t T >
-    typename std::enable_if< T == 3, Vector3D >::type
-        SurfaceMesh< dimension >::polygon_normal( index_t polygon_id ) const
-    {
-        check_polygon_id( *this, polygon_id );
-        Vector3D normal;
-        const auto& p0 = this->point( polygon_vertex( { polygon_id, 0 } ) );
-        for( const auto v : LRange{ 2, nb_polygon_vertices( polygon_id ) } )
-        {
-            const auto& p1 = this->point( polygon_vertex(
-                { polygon_id, static_cast< local_index_t >( v - 1 ) } ) );
-            const auto& p2 = this->point( polygon_vertex( { polygon_id, v } ) );
-            normal = normal + Vector3D{ p1, p0 }.cross( { p2, p0 } );
-        }
-        return normal.normalize();
-    }
-
-    template < index_t dimension >
-    template < index_t T >
-    typename std::enable_if< T == 3, Vector3D >::type
-        SurfaceMesh< dimension >::polygon_vertex_normal(
-            index_t vertex_id ) const
-    {
-        Vector3D normal;
-        for( const auto& polygon : polygons_around_vertex( vertex_id ) )
-        {
-            normal = normal + polygon_normal( polygon.polygon_id );
-        }
-        return normal.normalize();
-    }
-
-    template < index_t dimension >
-    template < index_t T >
     typename std::enable_if< T == 3, absl::optional< Vector3D > >::type
-        SurfaceMesh< dimension >::new_polygon_normal( index_t polygon_id ) const
+        SurfaceMesh< dimension >::polygon_normal( index_t polygon_id ) const
     {
         check_polygon_id( *this, polygon_id );
         Vector3D normal;
@@ -952,7 +920,7 @@ namespace geode
             const auto& p1 = this->point( vertices[v - 1] );
             const auto& p2 = this->point( vertices[v] );
             if( const auto triangle_normal =
-                    Triangle< T >{ p0, p1, p2 }.new_normal() )
+                    Triangle< T >{ p0, p1, p2 }.normal() )
             {
                 normal = normal + triangle_normal.value();
             }
@@ -970,13 +938,13 @@ namespace geode
     template < index_t dimension >
     template < index_t T >
     typename std::enable_if< T == 3, absl::optional< Vector3D > >::type
-        SurfaceMesh< dimension >::new_polygon_vertex_normal(
+        SurfaceMesh< dimension >::polygon_vertex_normal(
             index_t vertex_id ) const
     {
         Vector3D normal;
         for( const auto& polygon : polygons_around_vertex( vertex_id ) )
         {
-            if( const auto p_normal = new_polygon_normal( polygon.polygon_id ) )
+            if( const auto p_normal = polygon_normal( polygon.polygon_id ) )
             {
                 normal = normal + p_normal.value();
             }
@@ -1004,15 +972,10 @@ namespace geode
     template class opengeode_mesh_api SurfaceMesh< 2 >;
     template class opengeode_mesh_api SurfaceMesh< 3 >;
 
-    template opengeode_mesh_api Vector3D SurfaceMesh< 3 >::polygon_normal< 3 >(
-        index_t ) const;
-    template opengeode_mesh_api
-        Vector3D SurfaceMesh< 3 >::polygon_vertex_normal< 3 >( index_t ) const;
-
     template opengeode_mesh_api absl::optional< Vector3D >
-        SurfaceMesh< 3 >::new_polygon_normal< 3 >( index_t ) const;
+        SurfaceMesh< 3 >::polygon_normal< 3 >( index_t ) const;
     template opengeode_mesh_api absl::optional< Vector3D >
-        SurfaceMesh< 3 >::new_polygon_vertex_normal< 3 >( index_t ) const;
+        SurfaceMesh< 3 >::polygon_vertex_normal< 3 >( index_t ) const;
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, PolygonVertex );
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, PolygonEdge );

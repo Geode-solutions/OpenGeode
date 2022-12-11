@@ -51,7 +51,7 @@ namespace geode
         const Triangle3D& triangle, const Vector3D& direction )
     {
         const auto area = triangle_area( triangle );
-        if( const auto normal = triangle.new_normal() )
+        if( const auto normal = triangle.normal() )
         {
             return direction.dot( normal.value() ) > 0 ? area : -area;
         }
