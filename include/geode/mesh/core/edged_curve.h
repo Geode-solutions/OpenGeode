@@ -54,9 +54,9 @@ namespace geode
 
         const Point< dimension >& point( index_t vertex_id ) const;
 
-        double edge_length( index_t edge_id ) const;
+        double length( index_t edge_id ) const;
 
-        Point< dimension > edge_barycenter( index_t edge_id ) const;
+        Point< dimension > barycenter( index_t edge_id ) const;
 
         Segment< dimension > segment( index_t edge_id ) const;
 

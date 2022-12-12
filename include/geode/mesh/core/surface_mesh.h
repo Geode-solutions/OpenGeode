@@ -182,62 +182,60 @@ namespace geode
          * Return the index in the mesh of a local vertex in a polygon
          * @param[in] polygon_vertex Local index of vertex in polygon
          */
-        index_t polygon_vertex( const PolygonVertex& polygon_vertex ) const;
+        index_t vertex( const PolygonVertex& polygon_vertex ) const;
 
         /*!
          * Return all the indices in the mesh of polygon vertices.
          * @param[in] polygon_id Index of polygon.
          */
-        PolygonVertices polygon_vertices( index_t polygon_id ) const;
+        PolygonVertices vertices( index_t polygon_id ) const;
 
         /*!
          * Return the index in the mesh of a given polygon edge vertex.
          * @param[in] polygon_edge Local index of edge in a polygon.
          * @param[in] vertex_id Local index of vertex in the edge (0 or 1).
          */
-        index_t polygon_edge_vertex(
+        index_t edge_vertex(
             const PolygonEdge& polygon_edge, local_index_t vertex_id ) const;
 
         /*!
          * Return the indices in the mesh of the two polygon edge vertices.
          * @param[in] polygon_edge Local index of edge in a polygon.
          */
-        std::array< index_t, 2 > polygon_edge_vertices(
+        std::array< index_t, 2 > edge_vertices(
             const PolygonEdge& polygon_edge ) const;
 
         /*!
          * Return the next vertex in a polygon (local indexation)
          * @param[in] polygon_vertex Local index of vertex in polygon
          */
-        PolygonVertex next_polygon_vertex(
-            const PolygonVertex& polygon_vertex ) const;
+        PolygonVertex next_vertex( const PolygonVertex& polygon_vertex ) const;
 
         /*!
          * Return the previous vertex in a polygon (local indexation)
          * @param[in] polygon_vertex Local index of vertex in polygon
          */
-        PolygonVertex previous_polygon_vertex(
+        PolygonVertex previous_vertex(
             const PolygonVertex& polygon_vertex ) const;
 
         /*!
          * Return the next edge in a polygon (local indexation)
          * @param[in] polygon_edge Local index of edge in polygon
          */
-        PolygonEdge next_polygon_edge( const PolygonEdge& polygon_edge ) const;
+        PolygonEdge next_edge( const PolygonEdge& polygon_edge ) const;
 
         /*!
          * Return the previous edge in a polygon (local indexation)
          * @param[in] polygon_edge Local index of edge in polygon
          */
-        PolygonEdge previous_polygon_edge(
-            const PolygonEdge& polygon_edge ) const;
+        PolygonEdge previous_edge( const PolygonEdge& polygon_edge ) const;
 
         /*!
          * Return the index of the polygon adjacent through an edge.
          * @param[in] polygon_edge Local index of edge in polygon.
          * @return the index of the adjacent polygon if it exists.
          */
-        absl::optional< index_t > polygon_adjacent(
+        absl::optional< index_t > adjacent(
             const PolygonEdge& polygon_edge ) const;
 
         /*!
@@ -246,7 +244,7 @@ namespace geode
          * @param[in] polygon_edge Local index of edge in polygon.
          * @return the index of the adjacent polygon edge if it exists.
          */
-        absl::optional< PolygonEdge > polygon_adjacent_edge(
+        absl::optional< PolygonEdge > adjacent_edge(
             const PolygonEdge& polygon_edge ) const;
 
         /*!
@@ -273,22 +271,23 @@ namespace geode
          * Return all the edges of a polygon that are on border
          * @param[in] polygon_id Index of a polygon
          */
-        PolygonEdgesOnBorder polygon_edges_on_border(
-            index_t polygon_id ) const;
+        PolygonEdgesOnBorder edges_on_border( index_t polygon_id ) const;
 
         /*!
          * Return the next edge on the border (local indexation).
          * @param[in] polygon_edge Local index of edge in a polygon.
          * @pre The given polygon edge should be on border.
          */
-        PolygonEdge next_on_border( const PolygonEdge& polygon_edge ) const;
+        PolygonEdge next_edge_on_border(
+            const PolygonEdge& polygon_edge ) const;
 
         /*!
          * Return the previous edge on the border (local indexation).
          * @param[in] polygon_edge Local index of edge in a polygon.
          * @pre The given polygon edge should be on border.
          */
-        PolygonEdge previous_on_border( const PolygonEdge& polygon_edge ) const;
+        PolygonEdge previous_edge_on_border(
+            const PolygonEdge& polygon_edge ) const;
 
         /*!
          * Return the length of a given edge.
@@ -311,28 +310,28 @@ namespace geode
          * Return the barycenter of a polygon
          * @param[in] polygon_id Index of a polygon
          */
-        Point< dimension > polygon_barycenter( index_t polygon_id ) const;
+        Point< dimension > barycenter( index_t polygon_id ) const;
 
         /*!
          * Return the area of a polygon.
          * @param[in] polygon_id Index of a polygon.
          * @warning Result guaranteed only for convex polygon.
          */
-        double polygon_area( index_t polygon_id ) const;
+        double area( index_t polygon_id ) const;
 
         /*!
          * Return the normal of a polygon
          */
         template < index_t T = dimension >
         typename std::enable_if< T == 3, absl::optional< Vector3D > >::type
-            polygon_normal( index_t polygon_id ) const;
+            normal( index_t polygon_id ) const;
 
         /*!
          * Return the normal at a polygon vertex
          */
         template < index_t T = dimension >
         typename std::enable_if< T == 3, absl::optional< Vector3D > >::type
-            polygon_vertex_normal( index_t vertex_id ) const;
+            vertex_normal( index_t vertex_id ) const;
 
         /*!
          * Get all the polygons with one of the vertices matching given vertex.
@@ -358,7 +357,7 @@ namespace geode
          * @param[in] to_vertex_id Index of the vertex to which ends the edge
          * @return Local index if the edge is found.
          */
-        absl::optional< PolygonEdge > polygon_edge_from_vertices(
+        absl::optional< PolygonEdge > edge_from_vertices(
             index_t from_vertex_id, index_t to_vertex_id ) const;
 
         /*!

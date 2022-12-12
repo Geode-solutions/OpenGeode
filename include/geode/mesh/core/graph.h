@@ -123,13 +123,13 @@ namespace geode
          * Return the vertex index corresponding to an edge endpoint
          * @param[in] edge_vertex Edge endpoint
          */
-        index_t edge_vertex( const EdgeVertex& edge_vertex ) const;
+        index_t vertex( const EdgeVertex& edge_vertex ) const;
 
         /*!
          * Return the indices of the two edge vertices
          * @param[in] edge_id Index of the edge
          */
-        std::array< index_t, 2 > edge_vertices( index_t edge_id ) const;
+        std::array< index_t, 2 > vertices( index_t edge_id ) const;
 
         index_t nb_edges() const;
 
