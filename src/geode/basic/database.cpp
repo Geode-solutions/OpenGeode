@@ -54,10 +54,9 @@ namespace geode
 
         ~Storage()
         {
-            terminate_ = true;
+            terminate_storage();
             while( !queue_.empty() )
             {
-                condition_.notify_all();
                 queue_.front().wait();
                 queue_.pop();
             }
@@ -75,18 +74,19 @@ namespace geode
 
         void new_data_reference()
         {
+            const std::lock_guard< std::mutex > locking{ lock_ };
             counter_++;
             last_++;
         }
 
         void delete_data_reference()
         {
+            const std::lock_guard< std::mutex > locking{ lock_ };
             OPENGEODE_ASSERT(
                 counter_ > 0, "[Database::Storage] Cannot decrement" );
             counter_--;
             if( unused() )
             {
-                const std::lock_guard< std::mutex > locking{ lock_ };
                 clean_queue();
                 wait_for_memory_release();
             }
@@ -110,6 +110,13 @@ namespace geode
         }
 
     private:
+        void terminate_storage()
+        {
+            const std::lock_guard< std::mutex > locking{ lock_ };
+            terminate_ = true;
+            condition_.notify_all();
+        }
+
         void clean_queue()
         {
             while( !queue_.empty() )
@@ -124,12 +131,12 @@ namespace geode
 
         void wait_for_memory_release()
         {
-            const auto last = last_.load();
+            const auto last = last_;
             queue_.emplace( async::spawn( [this, last] {
                 std::unique_lock< std::mutex > locking{ lock_ };
                 if( !condition_.wait_for(
                         locking, DATA_EXPIRATION, [this, last] {
-                            return terminate_.load();
+                            return terminate_;
                         } ) )
                 {
                     if( last == last_ )
@@ -142,11 +149,11 @@ namespace geode
 
     private:
         std::unique_ptr< Identifier > data_;
-        std::atomic< bool > terminate_{ false };
-        std::atomic< index_t > counter_{ 0 };
+        bool terminate_{ false };
+        index_t counter_{ 0 };
         std::mutex lock_;
         std::condition_variable condition_;
-        std::atomic< index_t > last_{ 0 };
+        index_t last_{ 0 };
         std::queue< async::task< void > > queue_;
     };
 
