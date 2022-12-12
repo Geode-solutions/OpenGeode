@@ -55,9 +55,9 @@ namespace geode
         ~Storage()
         {
             terminate_ = true;
-            condition_.notify_all();
             while( !queue_.empty() )
             {
+                condition_.notify_all();
                 queue_.front().wait();
                 queue_.pop();
             }
