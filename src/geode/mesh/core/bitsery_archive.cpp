@@ -49,6 +49,12 @@ namespace bitsery
     namespace ext
     {
         template <>
+        struct PolymorphicBaseClass< geode::Identifier >
+            : PolymorphicDerivedClasses< geode::VertexSet >
+        {
+        };
+
+        template <>
         struct PolymorphicBaseClass< geode::VertexSet >
             : PolymorphicDerivedClasses< geode::Graph,
                   geode::PointSet2D,
