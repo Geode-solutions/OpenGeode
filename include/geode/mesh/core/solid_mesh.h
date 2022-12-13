@@ -23,8 +23,6 @@
 
 #pragma once
 
-#include <vector>
-
 #include <absl/container/inlined_vector.h>
 
 #include <geode/basic/passkey.h>
@@ -271,7 +269,7 @@ namespace geode
          * Return all the indices in the mesh of polyhedron vertices.
          * @param[in] polyhedron_id Index of polyhedron.
          */
-        Vertices polyhedron_vertices( index_t polyhedron_id ) const;
+        Vertices vertices( index_t polyhedron_id ) const;
 
         /*!
          * Return the local index in the tetrahedron of a vertex in the mesh.
@@ -290,15 +288,14 @@ namespace geode
          * Return the indices in the mesh of the two polyhedron edge vertices.
          * @param[in] polyhedron_facet_edge Local index of edge in a polyhedron.
          */
-        EdgeVertices polyhedron_facet_edge_vertices(
+        EdgeVertices edge_vertices(
             const PolyhedronFacetEdge& polyhedron_facet_edge ) const;
 
         absl::optional< PolyhedronFacetEdge > polyhedron_facet_edge(
             const EdgeVertices& edge_vertices,
             absl::optional< index_t > polyhedron_id ) const;
 
-        virtual EdgesVertices polyhedron_edges_vertices(
-            index_t polyhedron ) const;
+        virtual EdgesVertices edges_vertices( index_t polyhedron ) const;
 
         absl::optional< PolyhedronFacet > polyhedron_facet(
             FacetVertices polyhedron_facet_vertices ) const;
