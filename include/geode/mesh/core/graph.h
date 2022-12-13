@@ -88,8 +88,6 @@ namespace geode
         local_index_t vertex_id{ NO_LID };
     };
 
-    using EdgesAroundVertex = absl::InlinedVector< EdgeVertex, 2 >;
-
     /*!
      * Interface class to represent a Graph.
      * A graph is a set of vertices linked by edges
@@ -99,6 +97,10 @@ namespace geode
         PASSKEY( GraphBuilder, GraphKey );
 
     public:
+        using Builder = GraphBuilder;
+        using EdgeVertices = std::array< index_t, 2 >;
+        using EdgesAroundVertex = absl::InlinedVector< EdgeVertex, 2 >;
+
         /*!
          * Create a new Graph using default data structure.
          */
@@ -129,7 +131,7 @@ namespace geode
          * Return the indices of the two edge vertices
          * @param[in] edge_id Index of the edge
          */
-        std::array< index_t, 2 > vertices( index_t edge_id ) const;
+        EdgeVertices vertices( index_t edge_id ) const;
 
         index_t nb_edges() const;
 

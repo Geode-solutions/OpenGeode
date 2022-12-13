@@ -40,6 +40,8 @@ namespace geode
     class EdgedCurve : public Graph
     {
     public:
+        using Builder = EdgedCurveBuilder< dimension >;
+
         static std::unique_ptr< EdgedCurve< dimension > > create();
 
         static std::unique_ptr< EdgedCurve< dimension > > create(

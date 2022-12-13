@@ -46,6 +46,8 @@ namespace geode
         OPENGEODE_TEMPLATE_ASSERT_2D_OR_3D( dimension );
 
     public:
+        using Builder = PointSetBuilder< dimension >;
+
         /*!
          * Create a new PointSet using default data structure.
          */

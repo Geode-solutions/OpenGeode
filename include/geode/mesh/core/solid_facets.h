@@ -45,6 +45,9 @@ namespace geode
         PASSKEY( SolidFacetsBuilder< dimension >, SolidFacetsKey );
 
     public:
+        using Builder = SolidFacetsBuilder< dimension >;
+        using FacetVertices = SolidMesh< dimension >::FacetVertices;
+
         SolidFacets();
         SolidFacets( const SolidMesh< dimension >& solid );
         ~SolidFacets();
@@ -57,14 +60,13 @@ namespace geode
          * Return the indices of facet vertices.
          * @param[in] edge_id Index of an edge.
          */
-        const PolyhedronFacetVertices& facet_vertices( index_t facet_id ) const;
+        const FacetVertices& facet_vertices( index_t facet_id ) const;
 
         /*!
          * Get the index of facet corresponding to given vertices
          * @param[in] vertices Ordered vertex indices
          */
-        absl::optional< index_t > facet_from_vertices(
-            const PolyhedronFacetVertices& vertices ) const;
+        absl::optional< index_t > facet( const FacetVertices& vertices ) const;
 
         /*!
          * Access to the manager of attributes associated with facets.
@@ -75,13 +77,12 @@ namespace geode
         std::vector< index_t > update_facet_vertices(
             absl::Span< const index_t > old2new, SolidFacetsKey );
 
-        void update_facet_vertex( PolyhedronFacetVertices facet_vertices,
+        void update_facet_vertex( FacetVertices facet_vertices,
             index_t facet_vertex_id,
             index_t new_vertex_id,
             SolidFacetsKey );
 
-        void remove_facet(
-            PolyhedronFacetVertices facet_vertices, SolidFacetsKey );
+        void remove_facet( FacetVertices facet_vertices, SolidFacetsKey );
 
         std::vector< index_t > delete_facets(
             const std::vector< bool >& to_delete, SolidFacetsKey );
@@ -89,7 +90,7 @@ namespace geode
         std::vector< index_t > remove_isolated_facets( SolidFacetsKey );
 
         index_t find_or_create_facet(
-            PolyhedronFacetVertices facet_vertices, SolidFacetsKey )
+            FacetVertices facet_vertices, SolidFacetsKey )
         {
             return find_or_create_facet( std::move( facet_vertices ) );
         }
@@ -98,7 +99,7 @@ namespace geode
             const SolidFacets< dimension >& from, SolidFacetsKey );
 
     private:
-        index_t find_or_create_facet( PolyhedronFacetVertices facet_vertices );
+        index_t find_or_create_facet( FacetVertices facet_vertices );
 
         friend class bitsery::Access;
         template < typename Archive >

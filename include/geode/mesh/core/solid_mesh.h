@@ -197,26 +197,6 @@ namespace geode
         local_index_t edge_id{ NO_LID };
     };
 
-    using PolyhedronEdgesVertices =
-        absl::InlinedVector< std::array< index_t, 2 >, 6 >;
-
-    using PolyhedronFacetVertices = absl::InlinedVector< index_t, 3 >;
-
-    using PolyhedronFacetsVertices =
-        absl::InlinedVector< PolyhedronFacetVertices, 4 >;
-
-    using PolyhedronVertices = absl::InlinedVector< index_t, 4 >;
-
-    using PolyhedronFacets = absl::InlinedVector< PolyhedronFacet, 4 >;
-
-    using PolyhedronFacetsOnBorder = PolyhedronFacets;
-
-    using PolyhedraAroundVertex = absl::InlinedVector< PolyhedronVertex, 20 >;
-
-    using PolyhedraAroundEdge = absl::InlinedVector< index_t, 10 >;
-
-    using PolyhedraAroundFacet = absl::InlinedVector< PolyhedronFacet, 2 >;
-
     /*!
      * This class represents a 3D Solid made up with polyhedra and provides mesh
      * functionnalities.
@@ -230,6 +210,17 @@ namespace geode
 
     public:
         using Builder = SolidMeshBuilder< dimension >;
+        using Vertices = absl::InlinedVector< index_t, 4 >;
+        using EdgeVertices = std::array< index_t, 2 >;
+        using EdgesVertices = absl::InlinedVector< EdgeVertices, 6 >;
+        using FacetVertices = absl::InlinedVector< index_t, 3 >;
+        using FacetsVertices = absl::InlinedVector< FacetVertices, 4 >;
+        using PolyhedronFacets = absl::InlinedVector< PolyhedronFacet, 4 >;
+        using PolyhedronFacetsOnBorder = PolyhedronFacets;
+        using PolyhedraAroundVertex =
+            absl::InlinedVector< PolyhedronVertex, 20 >;
+        using PolyhedraAroundEdge = absl::InlinedVector< index_t, 10 >;
+        using PolyhedraAroundFacet = absl::InlinedVector< PolyhedronFacet, 2 >;
 
         /*!
          * Create a new SolidMesh using default data structure.
@@ -280,7 +271,7 @@ namespace geode
          * Return all the indices in the mesh of polyhedron vertices.
          * @param[in] polyhedron_id Index of polyhedron.
          */
-        PolyhedronVertices vertices( index_t polyhedron_id ) const;
+        Vertices polyhedron_vertices( index_t polyhedron_id ) const;
 
         /*!
          * Return the local index in the tetrahedron of a vertex in the mesh.
@@ -292,45 +283,32 @@ namespace geode
         absl::optional< local_index_t > vertex_in_polyhedron(
             index_t polyhedron_id, index_t vertex_id ) const;
 
-        /*!
-         * Return the index in the mesh of a given polyhedron facet vertex.
-         * @param[in] polyhedron_facet_vertex Local index of the vertex in the
-         * facet of a polyhedron.
-         */
-        index_t vertex(
-            const PolyhedronFacetVertex& polyhedron_facet_vertex ) const;
-
-        PolyhedronVertex vertex_id(
+        PolyhedronVertex polyhedron_vertex(
             const PolyhedronFacetVertex& polyhedron_facet_vertex ) const;
 
         /*!
          * Return the indices in the mesh of the two polyhedron edge vertices.
          * @param[in] polyhedron_facet_edge Local index of edge in a polyhedron.
          */
-        std::array< index_t, 2 > edge_vertices(
+        EdgeVertices polyhedron_facet_edge_vertices(
             const PolyhedronFacetEdge& polyhedron_facet_edge ) const;
 
-        absl::optional< PolyhedronFacetEdge >
-            polyhedron_facet_edge_from_vertices(
-                const std::array< index_t, 2 >& edge_vertices ) const;
+        absl::optional< PolyhedronFacetEdge > polyhedron_facet_edge(
+            const EdgeVertices& edge_vertices,
+            absl::optional< index_t > polyhedron_id ) const;
 
-        absl::optional< PolyhedronFacetEdge > edge_from_vertices(
-            const std::array< index_t, 2 >& edge_vertices,
-            index_t polyhedron_id ) const;
-
-        virtual PolyhedronEdgesVertices edges_vertices(
+        virtual EdgesVertices polyhedron_edges_vertices(
             index_t polyhedron ) const;
 
-        absl::optional< PolyhedronFacet > facet_from_vertices(
-            PolyhedronFacetVertices polyhedron_facet_vertices ) const;
+        absl::optional< PolyhedronFacet > polyhedron_facet(
+            FacetVertices polyhedron_facet_vertices ) const;
 
-        PolyhedronFacetVertices facet_vertices(
+        FacetVertices facet_vertices(
             const PolyhedronFacet& polyhedron_facet ) const;
 
-        virtual PolyhedronFacetsVertices facets_vertices(
-            index_t polyhedron ) const;
+        virtual FacetsVertices facets_vertices( index_t polyhedron ) const;
 
-        virtual PolyhedronFacets vertex_facets(
+        virtual PolyhedronFacets vertex_polyhedron_facets(
             const PolyhedronVertex& polyhedron_vertex ) const;
 
         /*!
@@ -338,7 +316,7 @@ namespace geode
          * @param[in] polyhedron_facet Local index of facet in polyhedron.
          * @return the index of the adjacent polyhedron if it exists.
          */
-        absl::optional< index_t > adjacent(
+        absl::optional< index_t > adjacent_polyhedron(
             const PolyhedronFacet& polyhedron_facet ) const;
 
         /*!
@@ -347,7 +325,7 @@ namespace geode
          * @param[in] polyhedron_facet Local index of facet in polyhedron.
          * @return the index of the adjacent polyhedron facet if it exists.
          */
-        virtual absl::optional< PolyhedronFacet > adjacent_facet(
+        virtual absl::optional< PolyhedronFacet > adjacent_polyhedron_facet(
             const PolyhedronFacet& polyhedron_facet ) const;
 
         /*!
@@ -355,7 +333,7 @@ namespace geode
          * adjacent through the specified facet.
          * @param[in] polyhedron_facet Local index of facet in polyhedron.
          */
-        bool is_facet_on_border(
+        bool is_polyhedron_facet_on_border(
             const PolyhedronFacet& polyhedron_facet ) const;
         /*!
          * Return true if at least one polyhedron facet is on border
@@ -369,67 +347,60 @@ namespace geode
          * @param[in] polyhedron_facet Local index of facet in polyhedron.
          * @param[in] edge_vertices Indices of edge vertices.
          */
-        bool is_edge_in_facet( const PolyhedronFacet& polyhedron_facet,
-            const std::array< index_t, 2 >& edge_vertices ) const;
+        bool is_edge_in_polyhedron_facet(
+            const PolyhedronFacet& polyhedron_facet,
+            const EdgeVertices& edge_vertices ) const;
 
         /*!
          * Return all the facets of a polyhedron that are on border
          * @param[in] polyhedron_id Index of a polyhedron
          */
-        PolyhedronFacetsOnBorder facets_on_border(
+        PolyhedronFacetsOnBorder polyhedron_facets_on_border(
             index_t polyhedron_id ) const;
 
         /*!
          * Return the length of a given edge.
          * @param[in] edge_vertices Indices of edge vertices.
          */
-        double edge_length(
-            const std::array< index_t, 2 >& edge_vertices ) const;
+        double edge_length( const EdgeVertices& edge_vertices ) const;
 
         /*!
          * Return the barycenter of a polyhedron
          * @param[in] polyhedron_id Index of a polyhedron
          */
-        Point< dimension > barycenter( index_t polyhedron_id ) const;
+        Point< dimension > polyhedron_barycenter( index_t polyhedron_id ) const;
 
         /*!
          * Return the barycenter coordinates of a given facet.
          * @param[in] facet_vertices Vertex indices of the facet.
          */
         Point< dimension > facet_barycenter(
-            const PolyhedronFacetVertices& facet_vertices ) const;
+            const FacetVertices& facet_vertices ) const;
 
         /*!
          * Return the coordinates of the barycenter of a given edge.
          * @param[in] edge_vertices Indices of edge vertices.
          */
         Point< dimension > edge_barycenter(
-            const std::array< index_t, 2 >& edge_vertices ) const;
+            const EdgeVertices& edge_vertices ) const;
 
         /*!
          * Return the normal of a given PolyhedronFacet.
          * @param[in] polyhedron_facet Local index of facet in polyhedron.
          */
         template < index_t T = dimension >
-        typename std::enable_if< T == 3, Vector3D >::type facet_normal(
-            const PolyhedronFacet& polyhedron_facet ) const;
+        typename std::enable_if< T == 3, Vector3D >::type
+            polyhedron_facet_normal(
+                const PolyhedronFacet& polyhedron_facet ) const;
 
         /*!
          * Get all the polyhedra with one of the vertices matching given vertex.
          * @param[in] vertex_id Index of the vertex.
+         * @param[in] first_polyhedron One polyhedron index to begin research
          * @pre This function needs that polyhedron adjacencies are computed
          */
-        const PolyhedraAroundVertex& polyhedra_around_vertex(
-            index_t vertex_id ) const;
-
-        /*!
-         * Get all the polyhedra with one of the vertices matching given
-         * polyhedron vertex.
-         * @param[in] polyhedron_vertex Local index of vertex in polyhedron.
-         * @pre This function needs that polyhedron adjacencies are computed
-         */
-        const PolyhedraAroundVertex& polyhedra_around_vertex(
-            const PolyhedronVertex& polyhedron_vertex ) const;
+        const PolyhedraAroundVertex& polyhedra_around_vertex( index_t vertex_id,
+            absl::optional< index_t > first_polyhedron ) const;
 
         /*!
          * Return true if at least one of the polyhedron facets around the
@@ -440,29 +411,13 @@ namespace geode
         bool is_vertex_on_border( index_t vertex_id ) const;
 
         /*!
-         * Return true if at least one of the polyhedron facets around the edge
-         * is on border
-         * @param[in] vertices Indices of edge vertices.
-         */
-        bool is_edge_on_border(
-            const std::array< index_t, 2 >& vertices ) const;
-
-        /*!
          * Return true if at least one of the polyhedron facets around the edges
          * is on border
          * @param[in] vertices Indices of edge vertices.
          * @param[in] first_polyhedron One polyhedron index to begin research
          */
-        bool is_edge_on_border( const std::array< index_t, 2 >& vertices,
-            index_t first_polyhedron ) const;
-
-        /*!
-         * Get all the polyhedra with both edge vertices.
-         * @param[in] vertices Indices of edge vertices.
-         * @pre This function needs that polyhedron adjacencies are computed
-         */
-        virtual PolyhedraAroundEdge polyhedra_around_edge(
-            const std::array< index_t, 2 >& vertices ) const;
+        bool is_edge_on_border( const EdgeVertices& vertices,
+            absl::optional< index_t > first_polyhedron ) const;
 
         /*!
          * Get all the polyhedra around the edge.
@@ -473,28 +428,20 @@ namespace geode
             const PolyhedronFacetEdge& edge ) const;
 
         /*!
-         * Get one polyhedron with both edge vertices.
-         * @param[in] vertices Indices of edge vertices.
-         * @pre This function needs that polyhedron adjacencies are computed
-         */
-        absl::optional< index_t > polyhedron_around_edge(
-            const std::array< index_t, 2 >& vertices ) const;
-
-        /*!
          * Get all the polyhedra with both edge vertices.
          * @param[in] vertices Indices of edge vertices.
          * @param[in] first_polyhedron One polyhedron index to begin research.
          * @pre This function needs that polyhedron adjacencies are computed
          */
-        virtual PolyhedraAroundEdge polyhedra_around_edge(
-            const std::array< index_t, 2 >& vertices,
-            index_t first_polyhedron ) const;
+        virtual PolyhedraAroundEdge polyhedra_around_edge_vertices(
+            const EdgeVertices& vertices,
+            absl::optional< index_t > first_polyhedron ) const;
 
         /*!
          * Return all polyhedra facets made with the given facet vertices.
          * @param[in] facet_vertices Vertex indices of the facet.
          */
-        PolyhedraAroundFacet polyhedra_from_facet_vertices(
+        PolyhedraAroundFacet polyhedra_around_facet_vertices(
             PolyhedronFacetVertices facet_vertices ) const;
 
         /*!
@@ -505,8 +452,7 @@ namespace geode
          * returned.
          */
         std::array< local_index_t, 2 > edge_vertices_in_polyhedron(
-            index_t polyhedron_id,
-            const std::array< index_t, 2 >& edge_vertices ) const;
+            index_t polyhedron_id, const EdgeVertices& edge_vertices ) const;
 
         bool are_edges_enabled() const;
 

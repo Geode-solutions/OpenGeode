@@ -51,6 +51,9 @@ namespace geode
         PASSKEY( SolidEdgesBuilder< dimension >, SolidEdgesKey );
 
     public:
+        using Builder = SolidEdgesBuilder< dimension >;
+        using EdgeVertices = SolidMesh< dimension >::EdgeVertices;
+
         SolidEdges();
         SolidEdges( const SolidMesh< dimension >& solid );
         ~SolidEdges();
@@ -63,14 +66,13 @@ namespace geode
          * Return the indices of edge vertices.
          * @param[in] edge_id Index of an edge.
          */
-        const std::array< index_t, 2 >& edge_vertices( index_t edge_id ) const;
+        const EdgeVertices& edge_vertices( index_t edge_id ) const;
 
         /*!
          * Get the index of edge corresponding to given vertices
          * @param[in] vertices Ordered vertex indices
          */
-        absl::optional< index_t > edge_from_vertices(
-            const std::array< index_t, 2 >& vertices ) const;
+        absl::optional< index_t > edge( const EdgeVertices& vertices ) const;
 
         /*!
          * Access to the manager of attributes associated with edges.
@@ -81,21 +83,19 @@ namespace geode
         void update_edge_vertices(
             absl::Span< const index_t > old2new, SolidEdgesKey );
 
-        void update_edge_vertex( std::array< index_t, 2 > edge_vertices,
+        void update_edge_vertex( EdgeVertices edge_vertices,
             index_t edge_vertex_id,
             index_t new_vertex_id,
             SolidEdgesKey );
 
-        void remove_edge(
-            std::array< index_t, 2 > edge_vertices, SolidEdgesKey );
+        void remove_edge( EdgeVertices edge_vertices, SolidEdgesKey );
 
         std::vector< index_t > delete_edges(
             const std::vector< bool >& to_delete, SolidEdgesKey );
 
         std::vector< index_t > remove_isolated_edges( SolidEdgesKey );
 
-        index_t find_or_create_edge(
-            std::array< index_t, 2 > edge_vertices, SolidEdgesKey )
+        index_t find_or_create_edge( EdgeVertices edge_vertices, SolidEdgesKey )
         {
             return find_or_create_edge( std::move( edge_vertices ) );
         }
@@ -104,7 +104,7 @@ namespace geode
             const SolidEdges< dimension >& from, SolidEdgesKey );
 
     private:
-        index_t find_or_create_edge( std::array< index_t, 2 > edge_vertices );
+        index_t find_or_create_edge( EdgeVertices edge_vertices );
 
         friend class bitsery::Access;
         template < typename Archive >
