@@ -98,7 +98,7 @@ namespace geode
 
     public:
         using Builder = GraphBuilder;
-        using EdgeVertices = std::array< index_t, 2 >;
+        using Vertices = std::array< index_t, 2 >;
         using EdgesAroundVertex = absl::InlinedVector< EdgeVertex, 2 >;
 
         /*!
@@ -131,7 +131,7 @@ namespace geode
          * Return the indices of the two edge vertices
          * @param[in] edge_id Index of the edge
          */
-        EdgeVertices vertices( index_t edge_id ) const;
+        Vertices vertices( index_t edge_id ) const;
 
         index_t nb_edges() const;
 

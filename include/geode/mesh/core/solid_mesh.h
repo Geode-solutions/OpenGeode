@@ -308,8 +308,8 @@ namespace geode
 
         virtual FacetsVertices facets_vertices( index_t polyhedron ) const;
 
-        virtual PolyhedronFacets vertex_polyhedron_facets(
-            const PolyhedronVertex& polyhedron_vertex ) const;
+        virtual PolyhedronFacets incident_polyhedron_facets_in_polyhedron(
+            index_t polyhedron_id, index_t vertex_id ) const;
 
         /*!
          * Return the index of the polyhedron adjacent through a facet.
