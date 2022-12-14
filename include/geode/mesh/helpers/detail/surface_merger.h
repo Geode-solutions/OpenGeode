@@ -25,6 +25,7 @@
 
 #include <geode/basic/pimpl.h>
 
+#include <absl/container/inlined_vector.h>
 #include <absl/types/span.h>
 
 #include <geode/mesh/common.h>
@@ -42,6 +43,18 @@ namespace geode
         class SurfaceMeshMerger
         {
         public:
+            struct PolygonOrigin
+            {
+                PolygonOrigin( index_t surface_in, index_t polygon_in )
+                    : surface( surface_in ), polygon( polygon_in )
+                {
+                }
+
+                index_t surface;
+                index_t polygon;
+            };
+            using PolygonOrigins = absl::InlinedVector< PolygonOrigin, 1 >;
+
             SurfaceMeshMerger( absl::Span< const std::reference_wrapper<
                                    const SurfaceMesh< dimension > > > surfaces,
                 double epsilon );
@@ -57,6 +70,8 @@ namespace geode
             index_t vertex_in_merged( index_t surface, index_t vertex ) const;
 
             index_t polygon_in_merged( index_t surface, index_t polygon ) const;
+
+            const PolygonOrigins& polygon_origins( index_t polygon ) const;
 
         private:
             IMPLEMENTATION_MEMBER( impl_ );
