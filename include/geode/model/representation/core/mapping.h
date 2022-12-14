@@ -70,10 +70,28 @@ namespace geode
 
     using ModelGenericMapping = ModelMapping< GenericMapping< uuid > >;
 
+    using MeshElementMapping = GenericMapping< MeshElement, MeshElement >;
+
     using ComponentMeshElementMapping =
         GenericMapping< MeshElement, ComponentMeshElement >;
 
     using ComponentMeshVertexMapping =
         GenericMapping< MeshVertex, ComponentMeshVertex >;
+
+    struct ModelMeshesElementMapping
+    {
+        MeshElementMapping corners;
+        MeshElementMapping lines;
+        MeshElementMapping surfaces;
+    };
+
+    struct SectionMeshesElementMapping : public ModelMeshesElementMapping
+    {
+    };
+
+    struct BRepMeshesElementMapping : public ModelMeshesElementMapping
+    {
+        MeshElementMapping blocks;
+    };
 
 } // namespace geode

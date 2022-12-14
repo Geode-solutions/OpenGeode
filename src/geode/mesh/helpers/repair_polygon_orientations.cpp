@@ -73,34 +73,30 @@ namespace
                 queue_.pop();
                 const auto cur_polygon_reorient =
                     reorient_polygon_[cur_polygon];
-                for( const auto e :
-                    geode::LRange{ mesh_.nb_polygon_edges( cur_polygon ) } )
+                const auto vertices = mesh_.polygon_vertices( cur_polygon );
+                for( const auto e : geode::LIndices{ vertices } )
                 {
-                    const geode::PolygonEdge edge{ cur_polygon, e };
-                    if( mesh_.is_edge_on_border( edge ) )
-                    {
-                        continue;
-                    }
                     const auto adj =
-                        mesh_.polygon_adjacent_edge( edge ).value();
-                    if( visited[adj.polygon_id] )
+                        mesh_.polygon_adjacent_edge( { cur_polygon, e } );
+                    if( !adj || visited[adj->polygon_id] )
                     {
                         continue;
                     }
-                    const auto vertices = mesh_.polygon_edge_vertices( edge );
+                    const auto e_next = e == vertices.size() - 1 ? 0 : e + 1;
                     const auto adj_vertices =
-                        mesh_.polygon_edge_vertices( adj );
+                        mesh_.polygon_edge_vertices( adj.value() );
                     const auto same_orientation =
-                        ( vertices[0] == adj_vertices[1]
-                            && vertices[1] == adj_vertices[0] );
-                    visited[adj.polygon_id] = true;
-                    reorient_polygon_[adj.polygon_id] =
+                        ( vertices[e] == adj_vertices[1]
+                            && vertices[e_next] == adj_vertices[0] );
+                    const auto adj_polygon = adj->polygon_id;
+                    visited[adj_polygon] = true;
+                    reorient_polygon_[adj_polygon] =
                         cur_polygon_reorient == same_orientation;
-                    if( reorient_polygon_[adj.polygon_id] )
+                    if( reorient_polygon_[adj_polygon] )
                     {
                         nb_++;
                     }
-                    queue_.emplace( adj.polygon_id );
+                    queue_.emplace( adj_polygon );
                 }
             }
         }
