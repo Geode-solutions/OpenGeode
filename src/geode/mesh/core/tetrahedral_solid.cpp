@@ -135,14 +135,15 @@ namespace geode
         index_t count{ 0 };
         for( const auto v : LRange{ 4 } )
         {
-            const PolyhedronVertex vertex{ tetrahedron_id, v };
-            if( this->polyhedron_vertex( vertex ) != edge_vertices[0]
-                && this->polyhedron_vertex( vertex ) != edge_vertices[1] )
+            const auto solid_vertex =
+                this->polyhedron_vertex( { tetrahedron_id, v } );
+            if( solid_vertex != edge_vertices[0]
+                && solid_vertex != edge_vertices[1] )
             {
                 OPENGEODE_EXCEPTION( count < 2,
                     "[TetrahedralSolid::edge_incident_facets] Given edge "
                     "vertices are not vertices of given tetrahedron" );
-                facets[count] = { vertex.polyhedron_id, vertex.vertex_id };
+                facets[count] = { tetrahedron_id, v };
                 count++;
             }
         }
