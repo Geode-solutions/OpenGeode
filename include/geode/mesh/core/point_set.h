@@ -29,6 +29,7 @@
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+    FORWARD_DECLARATION_DIMENSION_CLASS( PointSetBuilder );
     FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
 
     class AttributeManager;

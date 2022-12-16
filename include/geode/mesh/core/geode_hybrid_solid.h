@@ -46,6 +46,9 @@ namespace geode
         PASSKEY( OpenGeodeHybridSolidBuilder< dimension >, OGHybridSolidKey );
 
     public:
+        using EdgesVertices = typename SolidMesh< dimension >::EdgesVertices;
+        using FacetsVertices = typename SolidMesh< dimension >::FacetsVertices;
+
         OpenGeodeHybridSolid();
         OpenGeodeHybridSolid( OpenGeodeHybridSolid&& other );
         ~OpenGeodeHybridSolid();
@@ -138,11 +141,9 @@ namespace geode
         absl::optional< index_t > get_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet ) const override;
 
-        PolyhedronEdgesVertices polyhedron_edges_vertices(
-            index_t polyhedron ) const final;
+        EdgesVertices edges_vertices( index_t polyhedron ) const final;
 
-        PolyhedronFacetsVertices polyhedron_facets_vertices(
-            index_t polyhedron ) const final;
+        FacetsVertices facets_vertices( index_t polyhedron ) const final;
 
         typename HybridSolid< dimension >::Type polyhedron_type(
             index_t polyhedron_id ) const final;

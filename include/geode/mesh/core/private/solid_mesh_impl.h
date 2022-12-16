@@ -33,6 +33,8 @@ namespace geode
     {
         struct PolyhedraAroundVertexImpl
         {
+            using PolyhedraAroundVertex = SolidMesh3D::PolyhedraAroundVertex;
+
             PolyhedraAroundVertexImpl() = default;
             PolyhedraAroundVertexImpl( PolyhedraAroundVertex polyhedra_in,
                 bool vertex_is_on_border_in )

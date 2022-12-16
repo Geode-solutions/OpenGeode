@@ -118,7 +118,7 @@ namespace
                 geode::LRange{ surface.nb_polygon_vertices( p ) } )
             {
                 const auto new_vertex =
-                    vertices_old2new[surface.polygon_vertex( { p, v } )];
+                    vertices_old2new[surface.vertex( { p, v } )];
                 OPENGEODE_EXCEPTION( new_vertex != geode::NO_ID,
                     "[SurfaceMesh::update_polygon_vertices] No polygon should "
                     "be removed" );
@@ -135,7 +135,7 @@ namespace
         absl::FixedArray< geode::index_t > vertices_id( nb_vertices );
         for( const auto v : geode::LRange{ nb_vertices } )
         {
-            vertices_id[v] = surface.polygon_vertex( { polygon_id, v } );
+            vertices_id[v] = surface.vertex( { polygon_id, v } );
         }
         return vertices_id;
     }
@@ -146,22 +146,33 @@ namespace
         const geode::PolygonEdge& polygon_edge,
         const std::array< geode::index_t, 2 >& vertices )
     {
-        const auto polygon_adj = surface.polygon_adjacent( polygon_edge );
+        const auto polygon_adj = surface.adjacent_polygon( polygon_edge );
         if( !polygon_adj )
         {
             return absl::nullopt;
         }
-        const auto polygon_adj_id = polygon_adj.value();
-        for( const auto e :
-            geode::LRange{ surface.nb_polygon_edges( polygon_adj_id ) } )
+        const auto polygon_vertices = surface.vertices( polygon_adj.value() );
+        for( const auto e : geode::LIndices{ polygon_vertices } )
         {
-            const geode::PolygonEdge adj_edge{ polygon_adj_id, e };
-            const auto adj_v0 = surface.polygon_vertex( adj_edge );
-            const auto adj_v1 = surface.polygon_edge_vertex( adj_edge, 1 );
-            if( ( vertices[0] == adj_v1 && vertices[1] == adj_v0 )
-                || ( vertices[0] == adj_v0 && vertices[1] == adj_v1 ) )
+            if( vertices[0] == polygon_vertices[e] )
             {
-                return adj_edge;
+                const auto e_next =
+                    e == polygon_vertices.size() - 1 ? 0 : e + 1;
+                if( vertices[1] == polygon_vertices[e_next] )
+                {
+                    return absl::optional< geode::PolygonEdge >{ absl::in_place,
+                        polygon_adj.value(), e };
+                }
+            }
+            else if( vertices[1] == polygon_vertices[e] )
+            {
+                const auto e_next =
+                    e == polygon_vertices.size() - 1 ? 0 : e + 1;
+                if( vertices[0] == polygon_vertices[e_next] )
+                {
+                    return absl::optional< geode::PolygonEdge >{ absl::in_place,
+                        polygon_adj.value(), e };
+                }
             }
         }
         return absl::nullopt;
@@ -183,7 +194,8 @@ namespace
             new_polygon_vertex.polygon_id = old2new[polygon_vertex->polygon_id];
             if( new_polygon_vertex.polygon_id == geode::NO_ID )
             {
-                for( const auto& polygon : surface.polygons_around_vertex( v ) )
+                for( const auto& polygon : surface.polygons_around_vertex(
+                         v, polygon_vertex->polygon_id ) )
                 {
                     const auto new_polygon = old2new[polygon.polygon_id];
                     if( new_polygon != geode::NO_ID )
@@ -209,7 +221,7 @@ namespace
             {
                 continue;
             }
-            for( const auto v : surface.polygon_vertices( p ) )
+            for( const auto v : surface.vertices( p ) )
             {
                 builder.reset_polygons_around_vertex( v );
             }
@@ -228,7 +240,7 @@ namespace
         {
             return absl::nullopt;
         }
-        const auto polygon = surface.polygon_adjacent( adj_edge.value() );
+        const auto polygon = surface.adjacent_polygon( adj_edge.value() );
         if( !polygon )
         {
             return absl::nullopt;
@@ -247,7 +259,7 @@ namespace
         geode::SurfaceMeshBuilder< dimension >& builder,
         const geode::PolygonEdge& edge )
     {
-        for( const auto vertex : surface.polygon_edge_vertices( edge ) )
+        for( const auto vertex : surface.edge_vertices( edge ) )
         {
             builder.reset_polygons_around_vertex( vertex );
         }
@@ -269,14 +281,7 @@ namespace
     {
         for( const auto p : geode::Range{ surface.nb_polygons() } )
         {
-            absl::FixedArray< geode::index_t > vertices(
-                surface.nb_polygon_vertices( p ) );
-            for( const auto v :
-                geode::LRange{ surface.nb_polygon_vertices( p ) } )
-            {
-                vertices[v] = surface.polygon_vertex( { p, v } );
-            }
-            builder.create_polygon( vertices );
+            builder.create_polygon( surface.vertices( p ) );
         }
     }
 
@@ -287,10 +292,10 @@ namespace
         geode::index_t old_vertex_id,
         geode::index_t new_vertex_id )
     {
-        const auto previous_id = surface.polygon_vertex(
-            surface.previous_polygon_vertex( polygon_vertex ) );
-        const auto next_id = surface.polygon_vertex(
-            surface.next_polygon_edge( polygon_vertex ) );
+        const auto previous_id =
+            surface.vertex( surface.previous_polygon_vertex( polygon_vertex ) );
+        const auto next_id =
+            surface.vertex( surface.next_polygon_edge( polygon_vertex ) );
         auto edges = builder.edges_builder();
         edges.update_edge_vertex(
             { old_vertex_id, next_id }, 0, new_vertex_id );
@@ -383,8 +388,8 @@ namespace geode
         {
             return;
         }
-        const auto& polygons_around =
-            surface_mesh_.polygons_around_vertex( old_vertex_id );
+        const auto& polygons_around = surface_mesh_.polygons_around_vertex(
+            old_vertex_id, absl::nullopt );
         disassociate_polygon_vertex_to_vertex( old_vertex_id );
         for( const auto& polygon_around : polygons_around )
         {
@@ -402,8 +407,7 @@ namespace geode
     void SurfaceMeshBuilder< dimension >::set_polygon_vertex(
         const PolygonVertex& polygon_vertex, index_t vertex_id )
     {
-        const auto polygon_vertex_id =
-            surface_mesh_.polygon_vertex( polygon_vertex );
+        const auto polygon_vertex_id = surface_mesh_.vertex( polygon_vertex );
         if( polygon_vertex_id == vertex_id )
         {
             return;
@@ -415,7 +419,8 @@ namespace geode
             if( polygon_around == polygon_vertex )
             {
                 const auto& polygons_around =
-                    surface_mesh_.polygons_around_vertex( polygon_vertex_id );
+                    surface_mesh_.polygons_around_vertex(
+                        polygon_vertex_id, polygon_vertex.polygon_id );
                 if( polygons_around.size() < 2 )
                 {
                     disassociate_polygon_vertex_to_vertex( polygon_vertex_id );
@@ -449,7 +454,7 @@ namespace geode
                 LRange{ surface_mesh_.nb_polygon_vertices( p ) } )
             {
                 const PolygonVertex id{ p, v };
-                const auto old_vertex = surface_mesh_.polygon_vertex( id );
+                const auto old_vertex = surface_mesh_.vertex( id );
                 const auto new_vertex = old2new[old_vertex];
                 OPENGEODE_ASSERT( new_vertex != NO_ID,
                     "[SurfaceMeshBuilder::update_polygon_vertices] No "
@@ -558,8 +563,8 @@ namespace geode
                 {
                     PolygonEdge edge{ polygon, e };
                     const auto next = e + 1 == nb_vertices ? 0 : e + 1;
-                    const auto edge_id = edges.edge_from_vertices(
-                        { vertices_id[e], vertices_id[next] } );
+                    const auto edge_id =
+                        edges.edge( { vertices_id[e], vertices_id[next] } );
                     polygon_edges_around[edge_id.value()].emplace_back(
                         std::move( edge ) );
                 }
@@ -582,35 +587,34 @@ namespace geode
             absl::flat_hash_map< Edge, PolygonEdge > edges;
             for( const auto polygon : polygons_to_connect )
             {
-                for( const auto e :
-                    LRange{ surface_mesh_.nb_polygon_edges( polygon ) } )
+                const auto vertices = surface_mesh_.vertices( polygon );
+                for( const auto e : LIndices{ vertices } )
                 {
-                    const PolygonEdge edge{ polygon, e };
-                    if( !surface_mesh_.is_edge_on_border( edge ) )
+                    PolygonEdge edge{ polygon, e };
+                    if( !surface_mesh_.is_polygon_edge_on_border( edge ) )
                     {
                         continue;
                     }
-                    auto output = edges.emplace(
-                        surface_mesh_.polygon_edge_vertices( edge ), edge );
-                    if( !output.second )
+                    const std::array< index_t, 2 > edge_vertices{ vertices[e],
+                        vertices[e == vertices.size() - 1 ? 0 : e + 1] };
+                    auto output = edges.emplace( edge_vertices, edge );
+                    if( output.second )
                     {
-                        auto& adj_edge = output.first->second;
-                        do_set_polygon_adjacent( edge, adj_edge.polygon_id );
-                        if( surface_mesh_.is_edge_on_border( adj_edge ) )
-                        {
-                            do_set_polygon_adjacent( adj_edge, polygon );
-                        }
-                        else
-                        {
-                            const auto adj_adj_edge =
-                                find_polygon_adjacent_edge( surface_mesh_,
-                                    adj_edge,
-                                    surface_mesh_.polygon_edge_vertices(
-                                        edge ) );
-                            do_unset_polygon_adjacent( adj_adj_edge.value() );
-                        }
-                        adj_edge = edge;
+                        continue;
                     }
+                    auto& adj_edge = output.first->second;
+                    do_set_polygon_adjacent( edge, adj_edge.polygon_id );
+                    if( surface_mesh_.is_polygon_edge_on_border( adj_edge ) )
+                    {
+                        do_set_polygon_adjacent( adj_edge, polygon );
+                    }
+                    else
+                    {
+                        const auto adj_adj_edge = find_polygon_adjacent_edge(
+                            surface_mesh_, adj_edge, edge_vertices );
+                        do_unset_polygon_adjacent( adj_adj_edge.value() );
+                    }
+                    adj_edge = std::move( edge );
                 }
             }
             for( const auto& polygon_edges : edges )
@@ -650,11 +654,11 @@ namespace geode
             {
                 if( to_delete[p] )
                 {
-                    for( const auto e :
-                        LRange{ surface_mesh_.nb_polygon_edges( p ) } )
+                    const auto vertices = surface_mesh_.vertices( p );
+                    for( const auto e : LIndices{ vertices } )
                     {
-                        edges.remove_edge(
-                            surface_mesh_.polygon_edge_vertices( { p, e } ) );
+                        edges.remove_edge( { vertices[e],
+                            vertices[e == vertices.size() - 1 ? 0 : e + 1] } );
                     }
                 }
             }
@@ -721,7 +725,7 @@ namespace geode
                 geode::LRange{ surface_mesh_.nb_polygon_edges( p ) } )
             {
                 const geode::PolygonEdge id{ p, e };
-                if( const auto adj = surface_mesh_.polygon_adjacent( id ) )
+                if( const auto adj = surface_mesh_.adjacent_polygon( id ) )
                 {
                     const auto new_adjacent = old2new[adj.value()];
                     if( new_adjacent == geode::NO_ID )

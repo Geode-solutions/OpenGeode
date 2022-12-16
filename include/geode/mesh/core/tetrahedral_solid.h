@@ -41,7 +41,13 @@ namespace geode
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
 
     public:
+        using Base = SolidMesh< dimension >;
         using Builder = TetrahedralSolidBuilder< dimension >;
+        using EdgeVertices = typename Base::EdgeVertices;
+        using EdgesVertices = typename Base::EdgesVertices;
+        using FacetsVertices = typename Base::FacetsVertices;
+        using PolyhedronFacets = typename Base::PolyhedronFacets;
+        using PolyhedraAroundEdge = typename Base::PolyhedraAroundEdge;
 
         /*!
          * Create a new TetrahedralSolid using default data structure.
@@ -63,23 +69,18 @@ namespace geode
 
         std::unique_ptr< TetrahedralSolid< dimension > > clone() const;
 
-        PolyhedronEdgesVertices polyhedron_edges_vertices(
-            index_t polyhedron ) const final;
+        EdgesVertices edges_vertices( index_t polyhedron ) const final;
 
-        PolyhedronFacetsVertices polyhedron_facets_vertices(
-            index_t polyhedron ) const final;
+        FacetsVertices facets_vertices( index_t polyhedron ) const final;
 
-        PolyhedraAroundEdge polyhedra_around_edge(
-            const std::array< index_t, 2 >& vertices ) const final;
-
-        PolyhedraAroundEdge polyhedra_around_edge(
-            const std::array< index_t, 2 >& vertices,
-            index_t first_polyhedron ) const final;
+        PolyhedraAroundEdge polyhedra_around_edge_vertices(
+            const EdgeVertices& vertices,
+            absl::optional< index_t > first_polyhedron ) const final;
 
         PolyhedraAroundEdge polyhedra_around_edge(
             const PolyhedronFacetEdge& edge ) const final;
 
-        absl::optional< PolyhedronFacet > polyhedron_adjacent_facet(
+        absl::optional< PolyhedronFacet > adjacent_polyhedron_facet(
             const PolyhedronFacet& polyhedron_facet ) const final;
 
         /*!
@@ -141,7 +142,7 @@ namespace geode
             return 3;
         }
 
-        PolyhedronFacets polyhedron_vertex_facets(
+        PolyhedronFacets incident_polyhedron_facets_in_polyhedron(
             const PolyhedronVertex& polyhedron_vertex ) const final;
     };
     ALIAS_3D( TetrahedralSolid );

@@ -40,7 +40,7 @@ namespace geode
 
     template < index_t dimension >
     index_t SolidFacetsBuilder< dimension >::find_or_create_facet(
-        PolyhedronFacetVertices facet_vertices )
+        FacetVertices facet_vertices )
     {
         return facets_->find_or_create_facet( std::move( facet_vertices ), {} );
     }
@@ -62,7 +62,7 @@ namespace geode
 
     template < index_t dimension >
     void SolidFacetsBuilder< dimension >::update_facet_vertex(
-        PolyhedronFacetVertices facet_vertices,
+        FacetVertices facet_vertices,
         index_t facet_vertex_id,
         index_t new_vertex_id )
     {
@@ -75,7 +75,7 @@ namespace geode
 
     template < index_t dimension >
     void SolidFacetsBuilder< dimension >::remove_facet(
-        PolyhedronFacetVertices facet_vertices )
+        FacetVertices facet_vertices )
     {
         facets_->remove_facet( std::move( facet_vertices ), {} );
     }

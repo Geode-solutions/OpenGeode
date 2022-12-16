@@ -51,38 +51,37 @@ namespace
     };
 
     template < typename Data >
-    geode::PolyhedronEdgesVertices polyhedron_edges_vertices(
+    geode::HybridSolid3D::EdgesVertices polyhedron_edges_vertices(
         const geode::HybridSolid3D& mesh,
         geode::index_t polyhedron,
         const Data& data )
     {
-        geode::PolyhedronEdgesVertices result;
+        geode::HybridSolid3D::EdgesVertices result;
         result.reserve( data.size() );
         for( const auto& edge : data )
         {
             result.emplace_back( std::array< geode::index_t, 2 >{
-                mesh.polyhedron_vertex( { polyhedron, edge[0] } ),
-                mesh.polyhedron_vertex( { polyhedron, edge[1] } ) } );
+                mesh.vertex( { polyhedron, edge[0] } ),
+                mesh.vertex( { polyhedron, edge[1] } ) } );
         }
         return result;
     }
 
     template < typename Data >
-    geode::PolyhedronFacetsVertices polyhedron_facets_vertices(
+    geode::HybridSolid3D::FacetsVertices polyhedron_facets_vertices(
         const geode::HybridSolid3D& mesh,
         geode::index_t polyhedron,
         const Data& data )
     {
-        geode::PolyhedronFacetsVertices result;
+        geode::HybridSolid3D::FacetsVertices result;
         result.reserve( data.size() );
         for( const auto& facet : data )
         {
-            geode::PolyhedronFacetVertices facet_vertices;
+            geode::HybridSolid3D::FacetVertices facet_vertices;
             facet_vertices.reserve( facet.size() );
             for( const auto v : facet )
             {
-                facet_vertices.push_back(
-                    mesh.polyhedron_vertex( { polyhedron, v } ) );
+                facet_vertices.push_back( mesh.vertex( { polyhedron, v } ) );
             }
             result.emplace_back( std::move( facet_vertices ) );
         }
@@ -293,7 +292,7 @@ namespace geode
                 polyhedron_adjacents_.end() );
         }
 
-        PolyhedronEdgesVertices polyhedron_edges_vertices(
+        EdgesVertices edges_vertices(
             const HybridSolid< dimension >& solid, index_t polyhedron ) const
         {
             switch( polyhedron_type( polyhedron ) )
@@ -317,7 +316,7 @@ namespace geode
             return {};
         }
 
-        PolyhedronFacetsVertices polyhedron_facets_vertices(
+        FacetsVertices facets_vertices(
             const HybridSolid< dimension >& solid, index_t polyhedron ) const
         {
             switch( polyhedron_type( polyhedron ) )
@@ -604,19 +603,17 @@ namespace geode
     }
 
     template < index_t dimension >
-    PolyhedronEdgesVertices
-        OpenGeodeHybridSolid< dimension >::polyhedron_edges_vertices(
-            index_t polyhedron ) const
+    auto OpenGeodeHybridSolid< dimension >::edges_vertices(
+        index_t polyhedron ) const -> EdgesVertices
     {
-        return impl_->polyhedron_edges_vertices( *this, polyhedron );
+        return impl_->edges_vertices( *this, polyhedron );
     }
 
     template < index_t dimension >
-    PolyhedronFacetsVertices
-        OpenGeodeHybridSolid< dimension >::polyhedron_facets_vertices(
-            index_t polyhedron ) const
+    auto OpenGeodeHybridSolid< dimension >::facets_vertices(
+        index_t polyhedron ) const -> FacetsVertices
     {
-        return impl_->polyhedron_facets_vertices( *this, polyhedron );
+        return impl_->facets_vertices( *this, polyhedron );
     }
 
     template < index_t dimension >

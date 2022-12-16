@@ -69,7 +69,7 @@ namespace geode
         {
             for( const auto p : Range{ solid.nb_polyhedra() } )
             {
-                for( auto&& e : solid.polyhedron_edges_vertices( p ) )
+                for( auto&& e : solid.edges_vertices( p ) )
                 {
                     this->find_or_create_edge( std::move( e ) );
                 }
@@ -113,22 +113,22 @@ namespace geode
 
     template < index_t dimension >
     index_t SolidEdges< dimension >::find_or_create_edge(
-        std::array< index_t, 2 > edge_vertices )
+        EdgeVertices edge_vertices )
     {
         return impl_->find_or_create_edge( std::move( edge_vertices ) );
     }
 
     template < index_t dimension >
-    const std::array< index_t, 2 >& SolidEdges< dimension >::edge_vertices(
-        index_t edge_id ) const
+    auto SolidEdges< dimension >::edge_vertices( index_t edge_id ) const
+        -> const EdgeVertices&
     {
         check_edge_id( *this, edge_id );
         return impl_->edge_vertices( edge_id );
     }
 
     template < index_t dimension >
-    absl::optional< index_t > SolidEdges< dimension >::edge_from_vertices(
-        const std::array< index_t, 2 >& vertices ) const
+    absl::optional< index_t > SolidEdges< dimension >::edge(
+        const EdgeVertices& vertices ) const
     {
         return impl_->find_edge( vertices );
     }
@@ -142,7 +142,7 @@ namespace geode
 
     template < index_t dimension >
     void SolidEdges< dimension >::update_edge_vertex(
-        std::array< index_t, 2 > edge_vertices,
+        EdgeVertices edge_vertices,
         index_t edge_vertex_id,
         index_t new_vertex_id,
         SolidEdgesKey )
@@ -153,7 +153,7 @@ namespace geode
 
     template < index_t dimension >
     void SolidEdges< dimension >::remove_edge(
-        std::array< index_t, 2 > edge_vertices, SolidEdgesKey )
+        EdgeVertices edge_vertices, SolidEdgesKey )
     {
         impl_->remove_edge( std::move( edge_vertices ) );
     }

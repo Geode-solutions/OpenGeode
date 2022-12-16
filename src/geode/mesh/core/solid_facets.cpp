@@ -60,10 +60,10 @@ namespace geode
 {
     template < index_t dimension >
     class SolidFacets< dimension >::Impl
-        : public detail::FacetStorage< PolyhedronFacetVertices >
+        : public detail::FacetStorage< FacetVertices >
     {
         friend class bitsery::Access;
-        using Facets = detail::FacetStorage< PolyhedronFacetVertices >;
+        using Facets = detail::FacetStorage< FacetVertices >;
 
     public:
         Impl() = default;
@@ -71,7 +71,7 @@ namespace geode
         {
             for( const auto p : Range{ solid.nb_polyhedra() } )
             {
-                for( auto&& f : solid.polyhedron_facets_vertices( p ) )
+                for( auto&& f : solid.facets_vertices( p ) )
                 {
                     this->find_or_create_facet( std::move( f ) );
                 }
@@ -79,23 +79,22 @@ namespace geode
         }
 
         absl::optional< index_t > find_facet(
-            const PolyhedronFacetVertices& facet_vertices ) const
+            const FacetVertices& facet_vertices ) const
         {
             return Facets::find_facet( facet_vertices );
         }
 
-        index_t find_or_create_facet( PolyhedronFacetVertices facet_vertices )
+        index_t find_or_create_facet( FacetVertices facet_vertices )
         {
             return this->add_facet( std::move( facet_vertices ) );
         }
 
-        const PolyhedronFacetVertices& get_facet_vertices(
-            const index_t facet_id ) const
+        const FacetVertices& get_facet_vertices( const index_t facet_id ) const
         {
             return Facets::get_facet_vertices( facet_id );
         }
 
-        void update_facet_vertex( PolyhedronFacetVertices facet_vertices,
+        void update_facet_vertex( FacetVertices facet_vertices,
             const index_t facet_vertex_id,
             const index_t new_vertex_id )
         {
@@ -109,7 +108,7 @@ namespace geode
             return Facets::update_facet_vertices( old2new );
         }
 
-        void remove_facet( PolyhedronFacetVertices facet_vertices )
+        void remove_facet( FacetVertices facet_vertices )
         {
             Facets::remove_facet( std::move( facet_vertices ) );
         }
@@ -136,7 +135,7 @@ namespace geode
         }
 
         void overwrite_facets(
-            const detail::FacetStorage< PolyhedronFacetVertices >& from )
+            const detail::FacetStorage< FacetVertices >& from )
         {
             this->overwrite( from );
         }
@@ -147,8 +146,9 @@ namespace geode
         {
             archive.ext( *this, DefaultGrowable< Archive, Impl >{},
                 []( Archive& a, Impl& impl ) {
-                    a.ext( impl, bitsery::ext::BaseClass< detail::FacetStorage<
-                                     PolyhedronFacetVertices > >{} );
+                    a.ext(
+                        impl, bitsery::ext::BaseClass<
+                                  detail::FacetStorage< FacetVertices > >{} );
                 } );
         }
     };
@@ -178,22 +178,22 @@ namespace geode
 
     template < index_t dimension >
     index_t SolidFacets< dimension >::find_or_create_facet(
-        PolyhedronFacetVertices facet_vertices )
+        FacetVertices facet_vertices )
     {
         return impl_->find_or_create_facet( std::move( facet_vertices ) );
     }
 
     template < index_t dimension >
-    const PolyhedronFacetVertices& SolidFacets< dimension >::facet_vertices(
-        index_t facet_id ) const
+    auto SolidFacets< dimension >::facet_vertices( index_t facet_id ) const
+        -> const FacetVertices&
     {
         check_facet_id( *this, facet_id );
         return impl_->get_facet_vertices( facet_id );
     }
 
     template < index_t dimension >
-    absl::optional< index_t > SolidFacets< dimension >::facet_from_vertices(
-        const PolyhedronFacetVertices& vertices ) const
+    absl::optional< index_t > SolidFacets< dimension >::facet(
+        const FacetVertices& vertices ) const
     {
         return impl_->find_facet( vertices );
     }
@@ -207,7 +207,7 @@ namespace geode
 
     template < index_t dimension >
     void SolidFacets< dimension >::update_facet_vertex(
-        PolyhedronFacetVertices facet_vertices,
+        FacetVertices facet_vertices,
         index_t facet_vertex_id,
         index_t new_vertex_id,
         SolidFacetsKey )
@@ -218,7 +218,7 @@ namespace geode
 
     template < index_t dimension >
     void SolidFacets< dimension >::remove_facet(
-        PolyhedronFacetVertices facet_vertices, SolidFacetsKey )
+        FacetVertices facet_vertices, SolidFacetsKey )
     {
         impl_->remove_facet( std::move( facet_vertices ) );
     }

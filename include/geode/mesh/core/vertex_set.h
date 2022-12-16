@@ -32,6 +32,7 @@
 namespace geode
 {
     class AttributeManager;
+    class VertexSetBuilder;
 } // namespace geode
 
 namespace geode

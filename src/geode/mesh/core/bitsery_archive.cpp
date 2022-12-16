@@ -223,7 +223,7 @@ namespace
     void register_mesh_pcontext( geode::PContext& context )
     {
         geode::AttributeManager::register_attribute_type<
-            geode::EdgesAroundVertex, Serializer >(
+            geode::Graph::EdgesAroundVertex, Serializer >(
             context, "EdgesAroundVertex" );
         geode::AttributeManager::register_attribute_type< geode::PolygonVertex,
             Serializer >( context, "PolygonVertex" );

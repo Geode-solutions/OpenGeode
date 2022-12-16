@@ -52,7 +52,7 @@ namespace geode
 
     public:
         using Builder = SolidEdgesBuilder< dimension >;
-        using EdgeVertices = SolidMesh< dimension >::EdgeVertices;
+        using EdgeVertices = typename SolidMesh< dimension >::EdgeVertices;
 
         SolidEdges();
         SolidEdges( const SolidMesh< dimension >& solid );

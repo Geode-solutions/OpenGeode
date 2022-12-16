@@ -47,6 +47,8 @@ namespace geode
     class SolidMeshBuilder : public VertexSetBuilder
     {
     public:
+        using FacetVertices = typename SolidMesh< dimension >::FacetVertices;
+
         virtual ~SolidMeshBuilder();
         /*!
          * Create the builder associated with a SolidMesh.
@@ -239,9 +241,9 @@ namespace geode
 
         void remove_polyhedra_edges( const std::vector< bool >& to_delete );
 
-        virtual std::vector< PolyhedronFacetVertices >
-            get_polyhedron_facet_vertices( absl::Span< const index_t > vertices,
-                absl::Span< const std::vector< index_t > > facets ) const;
+        virtual std::vector< FacetVertices > get_polyhedron_facet_vertices(
+            absl::Span< const index_t > vertices,
+            absl::Span< const std::vector< index_t > > facets ) const;
 
         virtual void do_copy_points(
             const SolidMesh< dimension >& solid_mesh ) = 0;

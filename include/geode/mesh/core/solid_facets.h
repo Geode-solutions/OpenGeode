@@ -46,7 +46,7 @@ namespace geode
 
     public:
         using Builder = SolidFacetsBuilder< dimension >;
-        using FacetVertices = SolidMesh< dimension >::FacetVertices;
+        using FacetVertices = typename SolidMesh< dimension >::FacetVertices;
 
         SolidFacets();
         SolidFacets( const SolidMesh< dimension >& solid );

@@ -30,6 +30,7 @@
 #include <geode/basic/pimpl.h>
 
 #include <geode/mesh/common.h>
+#include <geode/mesh/core/surface_mesh.h>
 
 namespace geode
 {
@@ -49,7 +50,7 @@ namespace geode
 
     public:
         using Builder = SurfaceEdgesBuilder< dimension >;
-        using EdgeVertices = SurfaceMesh< dimension >::EdgeVertices;
+        using EdgeVertices = typename SurfaceMesh< dimension >::EdgeVertices;
 
         SurfaceEdges();
         SurfaceEdges( const SurfaceMesh< dimension >& surface );

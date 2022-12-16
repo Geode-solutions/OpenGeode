@@ -41,6 +41,8 @@ namespace geode
     class SolidFacetsBuilder
     {
     public:
+        using FacetVertices = typename SolidMesh< dimension >::FacetVertices;
+
         SolidFacetsBuilder( SolidFacets< dimension >& facets );
 
         /*!
@@ -50,14 +52,14 @@ namespace geode
          */
         std::vector< index_t > delete_isolated_facets();
 
-        index_t find_or_create_facet( PolyhedronFacetVertices facet_vertices );
+        index_t find_or_create_facet( FacetVertices facet_vertices );
 
         std::vector< index_t > delete_facets(
             const std::vector< bool >& to_delete );
 
-        void remove_facet( PolyhedronFacetVertices facet_vertices );
+        void remove_facet( FacetVertices facet_vertices );
 
-        void update_facet_vertex( PolyhedronFacetVertices facet_vertices,
+        void update_facet_vertex( FacetVertices facet_vertices,
             index_t facet_vertex_id,
             index_t new_vertex_id );
 

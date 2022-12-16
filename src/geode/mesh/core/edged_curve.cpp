@@ -51,8 +51,8 @@ namespace geode
     template < index_t dimension >
     double EdgedCurve< dimension >::edge_length( index_t edge_id ) const
     {
-        const auto& e0 = this->point( edge_vertex( { edge_id, 0 } ) );
-        const auto& e1 = this->point( edge_vertex( { edge_id, 1 } ) );
+        const auto& e0 = point( vertex( { edge_id, 0 } ) );
+        const auto& e1 = point( vertex( { edge_id, 1 } ) );
         return Vector< dimension >{ e0, e1 }.length();
     }
 
@@ -60,8 +60,8 @@ namespace geode
     Point< dimension > EdgedCurve< dimension >::edge_barycenter(
         index_t edge_id ) const
     {
-        const auto& e0 = this->point( edge_vertex( { edge_id, 0 } ) );
-        const auto& e1 = this->point( edge_vertex( { edge_id, 1 } ) );
+        const auto& e0 = point( vertex( { edge_id, 0 } ) );
+        const auto& e1 = point( vertex( { edge_id, 1 } ) );
         return ( e0 + e1 ) / 2.;
     }
 
@@ -109,8 +109,8 @@ namespace geode
     Segment< dimension > EdgedCurve< dimension >::segment(
         index_t edge_id ) const
     {
-        return { point( edge_vertex( { edge_id, 0 } ) ),
-            point( edge_vertex( { edge_id, 1 } ) ) };
+        return { point( vertex( { edge_id, 0 } ) ),
+            point( vertex( { edge_id, 1 } ) ) };
     }
 
     template class opengeode_mesh_api EdgedCurve< 2 >;

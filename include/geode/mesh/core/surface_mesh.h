@@ -185,7 +185,7 @@ namespace geode
          * Return all the indices in the mesh of polygon vertices.
          * @param[in] polygon_id Index of polygon.
          */
-        PolygonVertices vertices( index_t polygon_id ) const;
+        Vertices vertices( index_t polygon_id ) const;
 
         /*!
          * Return the index in the mesh of a given polygon edge vertex.

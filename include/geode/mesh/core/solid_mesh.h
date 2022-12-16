@@ -306,7 +306,7 @@ namespace geode
         virtual FacetsVertices facets_vertices( index_t polyhedron ) const;
 
         virtual PolyhedronFacets incident_polyhedron_facets_in_polyhedron(
-            index_t polyhedron_id, index_t vertex_id ) const;
+            const PolyhedronVertex& polyhedron_vertex ) const;
 
         /*!
          * Return the index of the polyhedron adjacent through a facet.
@@ -386,7 +386,7 @@ namespace geode
          * @param[in] polyhedron_facet Local index of facet in polyhedron.
          */
         template < index_t T = dimension >
-        typename std::enable_if< T == 3, Vector3D >::type
+        typename std::enable_if< T == 3, absl::optional< Vector3D > >::type
             polyhedron_facet_normal(
                 const PolyhedronFacet& polyhedron_facet ) const;
 
@@ -439,7 +439,7 @@ namespace geode
          * @param[in] facet_vertices Vertex indices of the facet.
          */
         PolyhedraAroundFacet polyhedra_around_facet_vertices(
-            PolyhedronFacetVertices facet_vertices ) const;
+            FacetVertices facet_vertices ) const;
 
         /*!
          * Get the local indices in the polyhedra of both edge vertices.

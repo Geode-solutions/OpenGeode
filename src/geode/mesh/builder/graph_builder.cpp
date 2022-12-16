@@ -43,7 +43,7 @@ namespace
             for( const auto v : geode::LRange{ 2 } )
             {
                 const geode::EdgeVertex id{ e, v };
-                const auto new_vertex = old2new[graph.edge_vertex( id )];
+                const auto new_vertex = old2new[graph.vertex( id )];
                 OPENGEODE_EXCEPTION( new_vertex != geode::NO_ID,
                     "[GraphBuilder::update_edge_vertices] Cannot remove vertex "
                     "associated to an edge" );
@@ -59,7 +59,7 @@ namespace
         for( const auto v : geode::Range{ graph.nb_vertices() } )
         {
             const auto& edges = graph.edges_around_vertex( v );
-            geode::EdgesAroundVertex new_edges;
+            geode::Graph::EdgesAroundVertex new_edges;
             new_edges.reserve( edges.size() );
             for( const auto& edge : edges )
             {
@@ -98,7 +98,7 @@ namespace geode
         OPENGEODE_ASSERT( vertex_id < graph_.nb_vertices(),
             "[GraphBuilder::set_edge_vertex] Accessing a vertex that does not "
             "exist" );
-        if( graph_.edge_vertex( edge_vertex ) == vertex_id )
+        if( graph_.vertex( edge_vertex ) == vertex_id )
         {
             return;
         }
@@ -225,7 +225,7 @@ namespace geode
                 for( const auto v : LRange{ 2 } )
                 {
                     const EdgeVertex id{ e, v };
-                    const auto vertex = graph.edge_vertex( id );
+                    const auto vertex = graph.vertex( id );
                     if( vertex != NO_ID )
                     {
                         set_edge_vertex( id, vertex );

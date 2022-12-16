@@ -914,15 +914,15 @@ namespace geode
         check_polygon_id( *this, polygon_id );
         Vector3D normal;
         const auto vertices = polygon_vertices( polygon_id );
-        const auto& p0 = this->point( vertices[0] );
+        const auto& p0 = point( vertices[0] );
         for( const auto v : LRange{ 2, nb_polygon_vertices( polygon_id ) } )
         {
-            const auto& p1 = this->point( vertices[v - 1] );
-            const auto& p2 = this->point( vertices[v] );
+            const auto& p1 = point( vertices[v - 1] );
+            const auto& p2 = point( vertices[v] );
             if( const auto triangle_normal =
                     Triangle< T >{ p0, p1, p2 }.normal() )
             {
-                normal = normal + triangle_normal.value();
+                normal += triangle_normal.value();
             }
         }
         try

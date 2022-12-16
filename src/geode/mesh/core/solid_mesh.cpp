@@ -33,6 +33,7 @@
 #include <geode/basic/detail/mapping_after_deletion.h>
 #include <geode/basic/pimpl_impl.h>
 
+#include <geode/geometry/basic_objects/triangle.h>
 #include <geode/geometry/bounding_box.h>
 #include <geode/geometry/vector.h>
 
@@ -142,16 +143,17 @@ namespace
     }
 
     template < geode::index_t dimension >
-    std::tuple< geode::PolyhedraAroundEdge, bool > propagate_around_edge(
-        const geode::SolidMesh< dimension >& solid,
-        geode::PolyhedronFacet facet,
-        const std::array< geode::index_t, 2 >& edge_vertices )
+    std::tuple< typename geode::SolidMesh< dimension >::PolyhedraAroundEdge,
+        bool >
+        propagate_around_edge( const geode::SolidMesh< dimension >& solid,
+            geode::PolyhedronFacet facet,
+            const std::array< geode::index_t, 2 >& edge_vertices )
     {
-        geode::PolyhedraAroundEdge result;
+        typename geode::SolidMesh< dimension >::PolyhedraAroundEdge result;
         const auto first_polyhedron = facet.polyhedron_id;
         do
         {
-            if( const auto adj = solid.polyhedron_adjacent_facet( facet ) )
+            if( const auto adj = solid.adjacent_polyhedron_facet( facet ) )
             {
                 const auto adj_facet = adj.value();
                 result.push_back( adj_facet.polyhedron_id );
@@ -187,7 +189,7 @@ namespace
             solid.polyhedra_around_vertex( vertices[0] ) )
         {
             for( const auto& edge_vertices :
-                solid.polyhedron_edges_vertices( polyhedron.polyhedron_id ) )
+                solid.edges_vertices( polyhedron.polyhedron_id ) )
             {
                 if( vertices == edge_vertices
                     || ( vertices[0] == edge_vertices[1]
@@ -247,10 +249,11 @@ namespace
             S.pop();
 
             for( const auto& polyhedron_facet :
-                solid.polyhedron_vertex_facets( polyhedron_vertex_id ) )
+                solid.incident_polyhedron_facets_in_polyhedron(
+                    polyhedron_vertex_id ) )
             {
                 const auto adj_polyhedron =
-                    solid.polyhedron_adjacent( polyhedron_facet );
+                    solid.adjacent_polyhedron( polyhedron_facet );
                 if( !adj_polyhedron )
                 {
                     result.vertex_is_on_border = true;
@@ -610,7 +613,7 @@ namespace geode
 
     template < index_t dimension >
     double SolidMesh< dimension >::edge_length(
-        const std::array< index_t, 2 >& edge_vertices ) const
+        const EdgeVertices& edge_vertices ) const
     {
         return Vector< dimension >{ this->point( edge_vertices[0] ),
             this->point( edge_vertices[1] ) }
@@ -618,7 +621,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t SolidMesh< dimension >::polyhedron_vertex(
+    index_t SolidMesh< dimension >::vertex(
         const PolyhedronVertex& polyhedron_vertex ) const
     {
         check_polyhedron_id( *this, polyhedron_vertex.polyhedron_id );
@@ -628,14 +631,14 @@ namespace geode
     }
 
     template < index_t dimension >
-    PolyhedronVertices SolidMesh< dimension >::polyhedron_vertices(
-        index_t polyhedron_id ) const
+    auto SolidMesh< dimension >::vertices( index_t polyhedron_id ) const
+        -> Vertices
     {
         const auto nb_vertices = nb_polyhedron_vertices( polyhedron_id );
-        PolyhedronVertices vertices( nb_vertices );
+        Vertices vertices( nb_vertices );
         for( const auto v : LRange{ nb_vertices } )
         {
-            vertices[v] = polyhedron_vertex( { polyhedron_id, v } );
+            vertices[v] = vertex( { polyhedron_id, v } );
         }
         return vertices;
     }
@@ -648,7 +651,7 @@ namespace geode
         for( const auto v : LRange{ nb_polyhedron_vertices( polyhedron_id ) } )
 
         {
-            if( polyhedron_vertex( { polyhedron_id, v } ) == vertex_id )
+            if( vertex( { polyhedron_id, v } ) == vertex_id )
             {
                 return v;
             }
@@ -664,15 +667,14 @@ namespace geode
         for( const auto v : LRange{ nb_polyhedron_vertices( polyhedron_id ) } )
         {
             barycenter =
-                barycenter
-                + this->point( polyhedron_vertex( { polyhedron_id, v } ) );
+                barycenter + this->point( vertex( { polyhedron_id, v } ) );
         }
         return barycenter / nb_polyhedron_vertices( polyhedron_id );
     }
 
     template < index_t dimension >
     Point< dimension > SolidMesh< dimension >::facet_barycenter(
-        const PolyhedronFacetVertices& facet_vertices ) const
+        const FacetVertices& facet_vertices ) const
     {
         Point< dimension > barycenter;
         for( const auto v : facet_vertices )
@@ -684,53 +686,59 @@ namespace geode
 
     template < index_t dimension >
     Point< dimension > SolidMesh< dimension >::edge_barycenter(
-        const std::array< index_t, 2 >& edge_vertices ) const
+        const EdgeVertices& edge_vertices ) const
     {
-        return ( this->point( edge_vertices[0] )
-                   + this->point( edge_vertices[1] ) )
-               / 2.;
+        return ( point( edge_vertices[0] ) + point( edge_vertices[1] ) ) / 2.;
     }
 
     template < index_t dimension >
-    PolyhedronVertex SolidMesh< dimension >::polyhedron_facet_vertex_id(
+    PolyhedronVertex SolidMesh< dimension >::polyhedron_vertex(
         const PolyhedronFacetVertex& polyhedron_facet_vertex ) const
     {
         return get_polyhedron_facet_vertex_id( polyhedron_facet_vertex );
     }
 
     template < index_t dimension >
-    PolyhedronFacetVertices SolidMesh< dimension >::polyhedron_facet_vertices(
-        const PolyhedronFacet& polyhedron_facet ) const
+    auto SolidMesh< dimension >::facet_vertices(
+        const PolyhedronFacet& polyhedron_facet ) const -> FacetVertices
     {
-        PolyhedronFacetVertices vertices;
+        FacetVertices vertices;
         for( const auto v :
             LRange{ nb_polyhedron_facet_vertices( polyhedron_facet ) } )
         {
             vertices.push_back(
-                polyhedron_facet_vertex( { polyhedron_facet, v } ) );
+                vertex( polyhedron_vertex( { polyhedron_facet, v } ) ) );
         }
         return vertices;
     }
 
     template < index_t dimension >
     template < index_t T >
-    typename std::enable_if< T == 3, Vector3D >::type
+    typename std::enable_if< T == 3, absl::optional< Vector3D > >::type
         SolidMesh< dimension >::polyhedron_facet_normal(
             const PolyhedronFacet& polyhedron_facet ) const
     {
         Vector3D normal;
-        const auto& p0 = this->point(
-            this->polyhedron_facet_vertex( { polyhedron_facet, 0 } ) );
-        for( const auto v :
-            LRange{ 2, nb_polyhedron_facet_vertices( polyhedron_facet ) } )
+        const auto vertices = facet_vertices( polyhedron_facet );
+        const auto& p0 = point( vertices[0] );
+        for( const auto v : LRange{ 2, vertices.size() } )
         {
-            const auto& p1 = this->point( polyhedron_facet_vertex(
-                { polyhedron_facet, static_cast< local_index_t >( v - 1 ) } ) );
-            const auto& p2 = this->point(
-                polyhedron_facet_vertex( { polyhedron_facet, v } ) );
-            normal = normal + Vector3D{ p1, p0 }.cross( { p2, p0 } );
+            const auto& p1 = point( vertices[v - 1] );
+            const auto& p2 = point( vertices[v] );
+            if( const auto triangle_normal =
+                    Triangle< T >{ p0, p1, p2 }.normal() )
+            {
+                normal += triangle_normal.value();
+            }
         }
-        return normal.normalize();
+        try
+        {
+            return normal.normalize();
+        }
+        catch( const OpenGeodeException& /*unused*/ )
+        {
+            return absl::nullopt;
+        }
     }
 
     template < index_t dimension >
@@ -747,22 +755,21 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::optional< PolyhedronFacet >
-        SolidMesh< dimension >::polyhedron_facet_from_vertices(
-            PolyhedronFacetVertices facet_vertices ) const
+    absl::optional< PolyhedronFacet > SolidMesh< dimension >::polyhedron_facet(
+        FacetVertices facet_vertices ) const
     {
-        detail::VertexCycle< PolyhedronFacetVertices > vertices{ std::move(
+        detail::VertexCycle< FacetVertices > vertices{ std::move(
             facet_vertices ) };
         for( const auto& polyhedron_vertex :
-            polyhedra_around_vertex( vertices.vertices()[0] ) )
+            polyhedra_around_vertex( vertices.vertices()[0], absl::nullopt ) )
         {
             for( const auto f : LRange{
                      nb_polyhedron_facets( polyhedron_vertex.polyhedron_id ) } )
             {
                 const PolyhedronFacet facet{ polyhedron_vertex.polyhedron_id,
                     f };
-                detail::VertexCycle< PolyhedronFacetVertices > cur_vertices{
-                    polyhedron_facet_vertices( facet )
+                detail::VertexCycle< FacetVertices > cur_vertices{
+                    this->facet_vertices( facet )
                 };
                 if( vertices == cur_vertices )
                 {
@@ -775,70 +782,64 @@ namespace geode
 
     template < index_t dimension >
     absl::optional< PolyhedronFacetEdge >
-        SolidMesh< dimension >::polyhedron_facet_edge_from_vertices(
-            const std::array< index_t, 2 >& edge_vertices,
-            index_t polyhedron_id ) const
+        SolidMesh< dimension >::polyhedron_facet_edge(
+            const EdgeVertices& edge_vertices,
+            absl::optional< index_t > polyhedron_id ) const
     {
-        const auto facet_vertices = polyhedron_facets_vertices( polyhedron_id );
-        for( const auto f : LIndices{ facet_vertices } )
+        if( !polyhedron_id )
         {
-            const auto& vertices = facet_vertices[f];
-            for( const auto v : LIndices{ vertices } )
+            for( const auto& polyhedron_vertex :
+                polyhedra_around_vertex( edge_vertices[0], absl::nullopt ) )
             {
-                if( vertices[v] == edge_vertices[0] )
-                {
-                    const auto next = v == vertices.size() - 1 ? 0 : v + 1;
-                    if( vertices[next] == edge_vertices[1] )
-                    {
-                        return absl::optional< PolyhedronFacetEdge >{
-                            absl::in_place, PolyhedronFacet{ polyhedron_id, f },
-                            v
-                        };
-                    }
-                }
-                else if( vertices[v] == edge_vertices[1] )
-                {
-                    const auto next = v == vertices.size() - 1 ? 0 : v + 1;
-                    if( vertices[next] == edge_vertices[0] )
-                    {
-                        return absl::optional< PolyhedronFacetEdge >{
-                            absl::in_place, PolyhedronFacet{ polyhedron_id, f },
-                            v
-                        };
-                    }
-                }
-            }
-        }
-        return absl::nullopt;
-    }
-
-    template < index_t dimension >
-    absl::optional< PolyhedronFacetEdge >
-        SolidMesh< dimension >::polyhedron_facet_edge_from_vertices(
-            const std::array< index_t, 2 >& edge_vertices ) const
-    {
-        for( const auto& polyhedron_vertex :
-            polyhedra_around_vertex( edge_vertices[0] ) )
-        {
-            if( const auto polyhedron_facet_edge =
-                    polyhedron_facet_edge_from_vertices(
+                if( const auto edge = polyhedron_facet_edge(
                         edge_vertices, polyhedron_vertex.polyhedron_id ) )
+                {
+                    return edge;
+                }
+            }
+            return absl::nullopt;
+        }
+        const auto facets = facets_vertices( polyhedron_id.value() );
+        for( const auto f : LIndices{ facets } )
+        {
+            const auto& facet = facets[f];
+            for( const auto v : LIndices{ facet } )
             {
-                return polyhedron_facet_edge;
+                if( facet[v] == edge_vertices[0] )
+                {
+                    const auto next = v == facet.size() - 1 ? 0 : v + 1;
+                    if( facet[next] == edge_vertices[1] )
+                    {
+                        return absl::optional< PolyhedronFacetEdge >{
+                            absl::in_place,
+                            PolyhedronFacet{ polyhedron_id.value(), f }, v
+                        };
+                    }
+                }
+                else if( facet[v] == edge_vertices[1] )
+                {
+                    const auto next = v == facet.size() - 1 ? 0 : v + 1;
+                    if( facet[next] == edge_vertices[0] )
+                    {
+                        return absl::optional< PolyhedronFacetEdge >{
+                            absl::in_place,
+                            PolyhedronFacet{ polyhedron_id.value(), f }, v
+                        };
+                    }
+                }
             }
         }
         return absl::nullopt;
     }
 
     template < index_t dimension >
-    PolyhedraAroundFacet SolidMesh< dimension >::polyhedra_from_facet_vertices(
-        PolyhedronFacetVertices facet_vertices ) const
+    auto SolidMesh< dimension >::polyhedra_around_facet_vertices(
+        FacetVertices facet_vertices ) const -> PolyhedraAroundFacet
     {
-        if( const auto facet =
-                polyhedron_facet_from_vertices( std::move( facet_vertices ) ) )
+        if( const auto facet = polyhedron_facet( std::move( facet_vertices ) ) )
         {
             if( const auto adjacent_facet =
-                    polyhedron_adjacent_facet( facet.value() ) )
+                    adjacent_polyhedron_facet( facet.value() ) )
             {
                 return { facet.value(), adjacent_facet.value() };
             }
@@ -851,37 +852,32 @@ namespace geode
     }
 
     template < index_t dimension >
-    const PolyhedraAroundVertex&
-        SolidMesh< dimension >::polyhedra_around_vertex(
-            const PolyhedronVertex& first_polyhedron ) const
-    {
-        return impl_->polyhedra_around_vertex(
-            *this, polyhedron_vertex( first_polyhedron ), first_polyhedron );
-    }
-
-    template < index_t dimension >
-    const PolyhedraAroundVertex&
-        SolidMesh< dimension >::polyhedra_around_vertex(
-            index_t vertex_id ) const
+    auto SolidMesh< dimension >::polyhedra_around_vertex(
+        index_t vertex_id, absl::optional< index_t > first_polyhedron ) const
+        -> const PolyhedraAroundVertex&
     {
         check_vertex_id( *this, vertex_id );
+        if( first_polyhedron )
+        {
+            return impl_->polyhedra_around_vertex(
+                *this, vertex_id, first_polyhedron.value() );
+        }
         return impl_->polyhedra_around_vertex(
             *this, vertex_id, polyhedron_around_vertex( vertex_id ) );
     }
 
     template < geode::index_t dimension >
     bool SolidMesh< dimension >::is_edge_in_polyhedron_facet(
-        const PolyhedronFacet& facet,
-        const std::array< index_t, 2 >& edge_vertices ) const
+        const PolyhedronFacet& facet, const EdgeVertices& edge_vertices ) const
     {
-        const auto facet_vertices = polyhedron_facet_vertices( facet );
-        const auto it = absl::c_find( facet_vertices, edge_vertices[0] );
-        if( it == facet_vertices.end() )
+        const auto vertices = facet_vertices( facet );
+        const auto it = absl::c_find( vertices, edge_vertices[0] );
+        if( it == vertices.end() )
         {
             return false;
         }
         const auto it_next = std::next( it );
-        if( it_next != facet_vertices.end() )
+        if( it_next != vertices.end() )
         {
             if( *it_next == edge_vertices[1] )
             {
@@ -890,13 +886,13 @@ namespace geode
         }
         else
         {
-            if( facet_vertices[0] == edge_vertices[1] )
+            if( vertices[0] == edge_vertices[1] )
             {
                 return true;
             }
         }
 
-        if( it != facet_vertices.begin() )
+        if( it != vertices.begin() )
         {
             const auto it_prev = std::prev( it );
             if( *it_prev == edge_vertices[1] )
@@ -906,7 +902,7 @@ namespace geode
         }
         else
         {
-            if( facet_vertices[facet_vertices.size() - 1] == edge_vertices[1] )
+            if( vertices[vertices.size() - 1] == edge_vertices[1] )
             {
                 return true;
             }
@@ -923,21 +919,17 @@ namespace geode
 
     template < index_t dimension >
     bool SolidMesh< dimension >::is_edge_on_border(
-        const std::array< index_t, 2 >& vertices ) const
+        const EdgeVertices& vertices,
+        absl::optional< index_t > first_polyhedron ) const
     {
-        const auto first_polyhedron =
-            first_polyhedron_around_edge( *this, vertices );
-        OPENGEODE_EXCEPTION( first_polyhedron,
-            "[SolidMesh::is_edge_on_border] Given pair of "
-            "vertices does not define a Solid edge" );
-        return is_edge_on_border( vertices, first_polyhedron.value() );
-    }
-
-    template < index_t dimension >
-    bool SolidMesh< dimension >::is_edge_on_border(
-        const std::array< index_t, 2 >& vertices,
-        index_t first_polyhedron ) const
-    {
+        if( !first_polyhedron )
+        {
+            const auto start = first_polyhedron_around_edge( *this, vertices );
+            OPENGEODE_EXCEPTION( start,
+                "[SolidMesh::is_edge_on_border] Given pair of "
+                "vertices does not define a Solid edge" );
+            return is_edge_on_border( vertices, start.value() );
+        }
         for( const auto f : LRange{ nb_polyhedron_facets( first_polyhedron ) } )
         {
             if( !is_edge_in_polyhedron_facet(
@@ -955,40 +947,31 @@ namespace geode
     }
 
     template < index_t dimension >
-    PolyhedraAroundEdge SolidMesh< dimension >::polyhedra_around_edge(
-        const std::array< index_t, 2 >& vertices ) const
+    auto SolidMesh< dimension >::polyhedra_around_edge_vertices(
+        const EdgeVertices& vertices,
+        absl::optional< index_t > first_polyhedron ) const
+        -> PolyhedraAroundEdge
     {
-        if( const auto first_polyhedron =
-                first_polyhedron_around_edge( *this, vertices ) )
+        if( !first_polyhedron )
         {
-            return polyhedra_around_edge( vertices, first_polyhedron.value() );
+            if( const auto start =
+                    first_polyhedron_around_edge( *this, vertices ) )
+            {
+                return polyhedra_around_edge( vertices, start.value() );
+            }
+            return {};
         }
-        return {};
-    }
-
-    template < index_t dimension >
-    PolyhedraAroundEdge SolidMesh< dimension >::polyhedra_around_edge(
-        const PolyhedronFacetEdge& edge ) const
-    {
-        return polyhedra_around_edge( polyhedron_facet_edge_vertices( edge ),
-            edge.polyhedron_facet.polyhedron_id );
-    }
-
-    template < index_t dimension >
-    PolyhedraAroundEdge SolidMesh< dimension >::polyhedra_around_edge(
-        const std::array< index_t, 2 >& vertices,
-        index_t first_polyhedron ) const
-    {
-        PolyhedraAroundEdge result{ first_polyhedron };
-        for( const auto f : LRange{ nb_polyhedron_facets( first_polyhedron ) } )
+        PolyhedraAroundEdge result{ first_polyhedron.value() };
+        for( const auto f :
+            LRange{ nb_polyhedron_facets( first_polyhedron.value() ) } )
         {
-            if( !is_edge_in_polyhedron_facet(
-                    { first_polyhedron, f }, vertices ) )
+            const PolyhedronFacet facet{ first_polyhedron.value(), f };
+            if( !is_edge_in_polyhedron_facet( facet, vertices ) )
             {
                 continue;
             }
-            const auto propagation_result = propagate_around_edge(
-                *this, { first_polyhedron, f }, vertices );
+            const auto propagation_result =
+                propagate_around_edge( *this, facet, vertices );
             auto polyhedra = std::get< 0 >( propagation_result );
             if( std::get< 1 >( propagation_result ) )
             {
@@ -998,41 +981,43 @@ namespace geode
         }
         return result;
     }
+
     template < index_t dimension >
-    absl::optional< index_t > SolidMesh< dimension >::polyhedron_around_edge(
-        const std::array< index_t, 2 >& vertices ) const
+    auto SolidMesh< dimension >::polyhedra_around_edge(
+        const PolyhedronFacetEdge& edge ) const -> PolyhedraAroundEdge
     {
-        return first_polyhedron_around_edge( *this, vertices );
+        return polyhedra_around_edge(
+            edge_vertices( edge ), edge.polyhedron_facet.polyhedron_id );
     }
 
     template < index_t dimension >
-    PolyhedronEdgesVertices SolidMesh< dimension >::polyhedron_edges_vertices(
-        index_t polyhedron ) const
+    auto SolidMesh< dimension >::edges_vertices( index_t polyhedron ) const
+        -> EdgesVertices
     {
-        PolyhedronEdgesVertices edge_vertices;
+        EdgesVertices edges_vertices;
         for( const auto f : LRange{ nb_polyhedron_facets( polyhedron ) } )
         {
             const PolyhedronFacet facet{ polyhedron, f };
             for( const auto v :
                 LRange{ nb_polyhedron_facet_vertices( facet ) } )
             {
-                auto vertices = polyhedron_facet_edge_vertices( { facet, v } );
+                auto vertices = edge_vertices( { facet, v } );
                 if( vertices[0] < vertices[1] )
                 {
-                    edge_vertices.emplace_back( std::move( vertices ) );
+                    edges_vertices.emplace_back( std::move( vertices ) );
                 }
             }
         }
-        return edge_vertices;
+        return edges_vertices;
     }
 
     template < index_t dimension >
-    PolyhedronFacetsVertices SolidMesh< dimension >::polyhedron_facets_vertices(
-        index_t polyhedron ) const
+    auto SolidMesh< dimension >::facets_vertices( index_t polyhedron ) const
+        -> FacetsVertices
     {
-        PolyhedronFacetsVertices facets_vertices;
+        FacetsVertices facets_vertices;
         facets_vertices.reserve( nb_polyhedron_facets( polyhedron ) );
-        const auto vertices = polyhedron_vertices( polyhedron );
+        const auto polyhedron_vertices = vertices( polyhedron );
         for( const auto f : LRange{ nb_polyhedron_facets( polyhedron ) } )
         {
             const PolyhedronFacet facet{ polyhedron, f };
@@ -1041,31 +1026,28 @@ namespace geode
                 LRange{ nb_polyhedron_facet_vertices( facet ) } )
             {
                 facet_vertices.push_back(
-                    vertices[polyhedron_facet_vertex_id( { facet, v } )
-                                 .vertex_id] );
+                    polyhedron_vertices[polyhedron_vertex( { facet, v } )
+                                            .vertex_id] );
             }
         }
         return facets_vertices;
     }
 
     template < index_t dimension >
-    PolyhedronFacets SolidMesh< dimension >::polyhedron_vertex_facets(
-        const PolyhedronVertex& polyhedron_vertex ) const
+    auto SolidMesh< dimension >::incident_polyhedron_facets_in_polyhedron(
+        const PolyhedronVertex& vertex ) const -> PolyhedronFacets
     {
-        const auto vertex_id = this->polyhedron_vertex( polyhedron_vertex );
         PolyhedronFacets facets;
         for( const auto f :
-            LRange{ nb_polyhedron_facets( polyhedron_vertex.polyhedron_id ) } )
+            LRange{ nb_polyhedron_facets( vertex.polyhedron_id ) } )
         {
-            PolyhedronFacet polyhedron_facet{ polyhedron_vertex.polyhedron_id,
-                f };
+            PolyhedronFacet facet{ vertex.polyhedron_id, f };
             for( const auto v :
-                LRange{ nb_polyhedron_facet_vertices( polyhedron_facet ) } )
+                LRange{ nb_polyhedron_facet_vertices( facet ) } )
             {
-                if( polyhedron_facet_vertex( { polyhedron_facet, v } )
-                    == vertex_id )
+                if( polyhedron_vertex( { facet, v } ) == vertex )
                 {
-                    facets.emplace_back( std::move( polyhedron_facet ) );
+                    facets.emplace_back( std::move( facet ) );
                     break;
                 }
             }
@@ -1124,26 +1106,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    index_t SolidMesh< dimension >::polyhedron_facet_vertex(
-        const PolyhedronFacetVertex& polyhedron_facet_vertex ) const
-    {
-        check_polyhedron_id(
-            *this, polyhedron_facet_vertex.polyhedron_facet.polyhedron_id );
-        check_polyhedron_facet_id( *this,
-            polyhedron_facet_vertex.polyhedron_facet.polyhedron_id,
-            polyhedron_facet_vertex.polyhedron_facet.facet_id );
-        check_polyhedron_facet_vertex_id( *this,
-            polyhedron_facet_vertex.polyhedron_facet.polyhedron_id,
-            polyhedron_facet_vertex.polyhedron_facet.facet_id,
-            polyhedron_facet_vertex.vertex_id );
-        return polyhedron_vertex(
-            get_polyhedron_facet_vertex_id( polyhedron_facet_vertex ) );
-    }
-
-    template < index_t dimension >
-    std::array< index_t, 2 >
-        SolidMesh< dimension >::polyhedron_facet_edge_vertices(
-            const PolyhedronFacetEdge& polyhedron_facet_edge ) const
+    auto SolidMesh< dimension >::edge_vertices(
+        const PolyhedronFacetEdge& polyhedron_facet_edge ) const -> EdgeVertices
     {
         check_polyhedron_id(
             *this, polyhedron_facet_edge.polyhedron_facet.polyhedron_id );
@@ -1155,16 +1119,16 @@ namespace geode
             polyhedron_facet_edge.polyhedron_facet.facet_id,
             polyhedron_facet_edge.edge_id );
         const auto v0 =
-            polyhedron_facet_vertex( { polyhedron_facet_edge.polyhedron_facet,
-                polyhedron_facet_edge.edge_id } );
+            vertex( polyhedron_vertex( { polyhedron_facet_edge.polyhedron_facet,
+                polyhedron_facet_edge.edge_id } ) );
         const local_index_t next =
             polyhedron_facet_edge.edge_id + 1
                     == nb_polyhedron_facet_vertices(
                         polyhedron_facet_edge.polyhedron_facet )
                 ? 0
                 : polyhedron_facet_edge.edge_id + 1;
-        const auto v1 = polyhedron_facet_vertex(
-            { polyhedron_facet_edge.polyhedron_facet, next } );
+        const auto v1 = vertex( polyhedron_vertex(
+            { polyhedron_facet_edge.polyhedron_facet, next } ) );
         return { v0, v1 };
     }
 
@@ -1179,7 +1143,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    absl::optional< index_t > SolidMesh< dimension >::polyhedron_adjacent(
+    absl::optional< index_t > SolidMesh< dimension >::adjacent_polyhedron(
         const PolyhedronFacet& polyhedron_facet ) const
     {
         check_polyhedron_id( *this, polyhedron_facet.polyhedron_id );
@@ -1190,10 +1154,10 @@ namespace geode
 
     template < index_t dimension >
     absl::optional< PolyhedronFacet >
-        SolidMesh< dimension >::polyhedron_adjacent_facet(
+        SolidMesh< dimension >::adjacent_polyhedron_facet(
             const PolyhedronFacet& polyhedron_facet ) const
     {
-        const auto opt_polyhedron_adj = polyhedron_adjacent( polyhedron_facet );
+        const auto opt_polyhedron_adj = adjacent_polyhedron( polyhedron_facet );
         if( !opt_polyhedron_adj )
         {
             return absl::nullopt;
@@ -1202,12 +1166,13 @@ namespace geode
             nb_polyhedron_facet_vertices( polyhedron_facet ) );
         for( const auto v : LIndices{ vertices } )
         {
-            vertices[v] = polyhedron_facet_vertex( { polyhedron_facet, v } );
+            vertices[v] =
+                vertex( polyhedron_vertex( { polyhedron_facet, v } ) );
         }
         const auto polyhedron_adj = opt_polyhedron_adj.value();
         for( const auto f : LRange{ nb_polyhedron_facets( polyhedron_adj ) } )
         {
-            if( polyhedron_adjacent( { polyhedron_adj, f } )
+            if( adjacent_polyhedron( { polyhedron_adj, f } )
                 != polyhedron_facet.polyhedron_id )
             {
                 continue;
@@ -1216,8 +1181,9 @@ namespace geode
             for( const auto v : LRange{
                      nb_polyhedron_facet_vertices( { polyhedron_adj, f } ) } )
             {
-                if( absl::c_find( vertices, polyhedron_facet_vertex(
-                                                { { polyhedron_adj, f }, v } ) )
+                if( absl::c_find(
+                        vertices, vertex( polyhedron_vertex(
+                                      { { polyhedron_adj, f }, v } ) ) )
                     == vertices.end() )
                 {
                     all_contained = false;
@@ -1240,7 +1206,7 @@ namespace geode
     bool SolidMesh< dimension >::is_polyhedron_facet_on_border(
         const PolyhedronFacet& polyhedron_facet ) const
     {
-        return !polyhedron_adjacent( polyhedron_facet );
+        return !adjacent_polyhedron( polyhedron_facet );
     }
 
     template < index_t dimension >
@@ -1251,9 +1217,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    PolyhedronFacetsOnBorder
-        SolidMesh< dimension >::polyhedron_facets_on_border(
-            index_t polyhedron_id ) const
+    auto SolidMesh< dimension >::polyhedron_facets_on_border(
+        index_t polyhedron_id ) const -> PolyhedronFacetsOnBorder
     {
         check_polyhedron_id( *this, polyhedron_id );
         PolyhedronFacetsOnBorder borders;
@@ -1271,19 +1236,19 @@ namespace geode
     template < index_t dimension >
     std::array< local_index_t, 2 >
         SolidMesh< dimension >::edge_vertices_in_polyhedron(
-            index_t polyhedron_id,
-            const std::array< index_t, 2 >& edge_vertices ) const
+            index_t polyhedron_id, const EdgeVertices& edge_vertices ) const
     {
         std::array< local_index_t, 2 > result{ { NO_LID, NO_LID } };
-
-        const auto vertices = polyhedron_vertices( polyhedron_id );
+        const auto polyhedron_vertices = vertices( polyhedron_id );
         for( const auto v : LRange{ nb_polyhedron_vertices( polyhedron_id ) } )
         {
-            if( vertices[v] == edge_vertices[0] && result[0] == NO_LID )
+            if( polyhedron_vertices[v] == edge_vertices[0]
+                && result[0] == NO_LID )
             {
                 result[0] = v;
             }
-            else if( vertices[v] == edge_vertices[1] && result[1] == NO_LID )
+            else if( polyhedron_vertices[v] == edge_vertices[1]
+                     && result[1] == NO_LID )
             {
                 result[1] = v;
             }
@@ -1420,7 +1385,7 @@ namespace geode
 
     template class opengeode_mesh_api SolidMesh< 3 >;
 
-    template opengeode_mesh_api Vector3D
+    template opengeode_mesh_api absl::optional< Vector3D >
         SolidMesh< 3 >::polyhedron_facet_normal< 3 >(
             const PolyhedronFacet& ) const;
 

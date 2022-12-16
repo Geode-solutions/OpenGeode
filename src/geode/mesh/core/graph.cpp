@@ -90,19 +90,19 @@ namespace geode
         void disassociate_edge_vertex_to_vertex(
             const Graph& graph, const EdgeVertex& edge_vertex )
         {
-            const auto previous_vertex = graph.edge_vertex( edge_vertex );
-            if( previous_vertex < graph.nb_vertices() )
+            const auto previous_vertex = graph.vertex( edge_vertex );
+            if( previous_vertex >= graph.nb_vertices() )
             {
-                const auto& edges =
-                    edges_around_vertex_->value( previous_vertex );
-                const auto it = absl::c_find( edges, edge_vertex );
-                if( it != edges.end() )
-                {
-                    edges_around_vertex_->modify_value(
-                        previous_vertex, [&it]( EdgesAroundVertex& value ) {
-                            value.erase( it );
-                        } );
-                }
+                return;
+            }
+            const auto& edges = edges_around_vertex_->value( previous_vertex );
+            const auto it = absl::c_find( edges, edge_vertex );
+            if( it != edges.end() )
+            {
+                edges_around_vertex_->modify_value(
+                    previous_vertex, [&it]( EdgesAroundVertex& value ) {
+                        value.erase( it );
+                    } );
             }
         }
 
@@ -162,7 +162,7 @@ namespace geode
         return MeshFactory::create_mesh< Graph >( impl );
     }
 
-    index_t Graph::edge_vertex( const EdgeVertex& edge_vertex ) const
+    index_t Graph::vertex( const EdgeVertex& edge_vertex ) const
     {
         OPENGEODE_ASSERT( edge_vertex.edge_id < nb_edges(),
             "[Graph::edge_vertex] Trying to access an invalid edge" );
@@ -172,9 +172,9 @@ namespace geode
         return get_edge_vertex( edge_vertex );
     }
 
-    std::array< index_t, 2 > Graph::edge_vertices( index_t edge_id ) const
+    std::array< index_t, 2 > Graph::vertices( index_t edge_id ) const
     {
-        return { edge_vertex( { edge_id, 0 } ), edge_vertex( { edge_id, 1 } ) };
+        return { vertex( { edge_id, 0 } ), vertex( { edge_id, 1 } ) };
     }
 
     index_t Graph::nb_edges() const
@@ -182,8 +182,8 @@ namespace geode
         return edge_attribute_manager().nb_elements();
     }
 
-    const EdgesAroundVertex& Graph::edges_around_vertex(
-        index_t vertex_id ) const
+    auto Graph::edges_around_vertex( index_t vertex_id ) const
+        -> const EdgesAroundVertex&
     {
         OPENGEODE_ASSERT( vertex_id < this->nb_vertices(),
             "[Graph::edges_around_vertex] Accessing an invalid vertex" );
@@ -201,7 +201,7 @@ namespace geode
         for( const auto& edge : edges_around_vertex( v0 ) )
         {
             const local_index_t next = edge.vertex_id == 0 ? 1 : 0;
-            if( edge_vertex( { edge.edge_id, next } ) == v1 )
+            if( vertex( { edge.edge_id, next } ) == v1 )
             {
                 return edge.edge_id;
             }

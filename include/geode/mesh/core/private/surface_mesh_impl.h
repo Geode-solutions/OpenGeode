@@ -33,6 +33,8 @@ namespace geode
     {
         struct PolygonsAroundVertexImpl
         {
+            using PolygonsAroundVertex = SurfaceMesh3D::PolygonsAroundVertex;
+
             PolygonsAroundVertexImpl() = default;
             PolygonsAroundVertexImpl(
                 PolygonsAroundVertex polygons_in, bool vertex_is_on_border_in )

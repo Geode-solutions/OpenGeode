@@ -44,6 +44,8 @@ namespace geode
     class opengeode_mesh_api GraphBuilder : public VertexSetBuilder
     {
     public:
+        using EdgesAroundVertex = Graph::EdgesAroundVertex;
+
         /*!
          * Create the builder associated with a Graph.
          * @param[in] mesh The Graph to build/modify
