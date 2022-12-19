@@ -45,22 +45,12 @@ namespace
             surfaces )
     {
         const auto type = surfaces.front().get().type_name();
-        const auto impl = surfaces.front().get().impl_name();
-        bool same_impl{ true };
         for( const auto& surface : surfaces )
         {
             if( surface.get().type_name() != type )
             {
                 return geode::SurfaceMesh< dimension >::create();
             }
-            if( surface.get().impl_name() != impl )
-            {
-                same_impl = false;
-            }
-        }
-        if( same_impl )
-        {
-            return geode::SurfaceMesh< dimension >::create( impl );
         }
         return geode::SurfaceMesh< dimension >::create(
             geode::MeshFactory::default_impl( type ) );
