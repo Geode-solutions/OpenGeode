@@ -25,12 +25,17 @@
 
 #include <geode/basic/pimpl.h>
 
-#include <geode/geometry/basic_objects/infinite_line.h>
 #include <geode/geometry/common.h>
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( InfiniteLine );
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Ray );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Segment );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Triangle );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Vector );
+    class Tetrahedron;
 } // namespace geode
 
 namespace geode
@@ -60,6 +65,30 @@ namespace geode
         bool intersects( const Ray< dimension >& ray ) const;
 
         bool intersects( const InfiniteLine< dimension >& line ) const;
+
+        /*!
+         * Returns true if the element is crossing, is inside, or is containing
+         * the bbox
+         */
+        template < index_t T = dimension >
+        typename std::enable_if< T == 2, bool >::type intersects(
+            const Segment< T >& segment ) const;
+
+        /*!
+         * Returns true if the element is crossing, is inside (or is containing
+         * the bbox in 2D)
+         */
+        template < index_t T = dimension >
+        typename std::enable_if< T == 2 || T == 3, bool >::type intersects(
+            const Triangle< T >& triangle ) const;
+
+        /*!
+         * Returns true if the element is crossing, is inside, or is containing
+         * the bbox
+         */
+        template < index_t T = dimension >
+        typename std::enable_if< T == 3, bool >::type intersects(
+            const Tetrahedron& tetra ) const;
 
         /*!
          * Returns the distance between the point and the box.
