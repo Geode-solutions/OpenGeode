@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2019 - 2022 Geode-solutions
+# Copyright (c) 2019 - 2023 Geode-solutions
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -19,8 +19,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os, sys, platform
-if sys.version_info >= (3,8,0) and platform.system() == "Windows":
+import os
+import sys
+import platform
+if sys.version_info >= (3, 8, 0) and platform.system() == "Windows":
     for path in [x.strip() for x in os.environ['PATH'].split(';') if x]:
         os.add_dll_directory(path)
 
@@ -28,29 +30,32 @@ import math
 
 import opengeode_py_geometry as geom
 
+
 def test_length():
-    p = geom.Vector3D( [1, 2, 4] )
-    if p.length() != math.sqrt( 1 + 4 + 16 ):
-        raise ValueError( "[Test] Wrong vector length" )
+    p = geom.Vector3D([1, 2, 4])
+    if p.length() != math.sqrt(1 + 4 + 16):
+        raise ValueError("[Test] Wrong vector length")
 
     p_normalized = p.normalize()
     if p_normalized.length() != 1:
-        raise ValueError( "[Test] Wrong vector length" )
+        raise ValueError("[Test] Wrong vector length")
+
 
 def test_operations():
-    unit = geom.Vector3D( [0, 2, 0] )
-    p = geom.Vector3D( [1, 2, 4] )
-    if p.dot( unit ) != 4:
-        raise ValueError( "[Test] Wrong dot product" )
+    unit = geom.Vector3D([0, 2, 0])
+    p = geom.Vector3D([1, 2, 4])
+    if p.dot(unit) != 4:
+        raise ValueError("[Test] Wrong dot product")
 
-    cross_unit = geom.Vector3D( [1, 0, 0] ).cross( geom.Vector3D( [0, 1, 0] ) )
-    answer_unit = geom.Vector3D( [0, 0, 1] )
+    cross_unit = geom.Vector3D([1, 0, 0]).cross(geom.Vector3D([0, 1, 0]))
+    answer_unit = geom.Vector3D([0, 0, 1])
     if cross_unit != answer_unit:
-        raise ValueError( "[Test] Wrong unit cross product" )
+        raise ValueError("[Test] Wrong unit cross product")
 
-    answer = geom.Vector3D( [-8, 0, 2] )
-    if p.cross( unit ) != answer:
-        raise ValueError( "[Test] Wrong cross product" )
+    answer = geom.Vector3D([-8, 0, 2])
+    if p.cross(unit) != answer:
+        raise ValueError("[Test] Wrong cross product")
+
 
 if __name__ == '__main__':
     test_length()
