@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - 2022 Geode-solutions. All rights reserved.
+ * Copyright (c) 2019 - 2023 Geode-solutions. All rights reserved.
  */
 
 #pragma once
