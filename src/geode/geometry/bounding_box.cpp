@@ -326,6 +326,13 @@ namespace geode
         const Triangle< 3 >& triangle ) const
     {
         const auto& vertices = triangle.vertices();
+        for( const auto v : LRange{ 3 } )
+        {
+            if( contains( vertices[v].get() ) )
+            {
+                return true;
+            }
+        }
         const auto triangle_projection = [&vertices]( const Vector3D& normal ) {
             BoundingBox1D interval;
             interval.add_point( { { normal.dot( vertices[0].get() ) } } );

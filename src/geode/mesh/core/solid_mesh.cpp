@@ -271,8 +271,8 @@ namespace
         OPENGEODE_EXCEPTION( safety_count < MAX_SAFETY_COUNT,
             "[SolidMesh::polygons_around_vertex] Too many polyhedra "
             "around vertex ",
-            vertex_id,
-            ". This is probably related to a bug in the polyhedra "
+            vertex_id, " (", solid.point( vertex_id ).string(),
+            "). This is probably related to a bug in the polyhedra "
             "adjacencies." );
         return result;
     }
