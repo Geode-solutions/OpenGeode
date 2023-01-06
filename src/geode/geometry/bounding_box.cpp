@@ -148,6 +148,13 @@ namespace geode
                 return true;
             }
             const auto& vertices = tetra.vertices();
+            for( const auto v : LRange{ 3 } )
+            {
+                if( contains( vertices[v].get() ) )
+                {
+                    return true;
+                }
+            }
             return intersects( { vertices[0].get(), vertices[1].get(),
                        vertices[2].get() } )
                    || intersects( { vertices[0].get(), vertices[1].get(),
@@ -162,9 +169,16 @@ namespace geode
         typename std::enable_if< T == 2, bool >::type intersects(
             const Segment< T >& segment ) const
         {
+            const auto& vertices = segment.vertices();
+            for( const auto v : LRange{ 3 } )
+            {
+                if( contains( vertices[v].get() ) )
+                {
+                    return true;
+                }
+            }
             const auto box_center = center();
             const auto box_extent = diagonal() / 2.;
-            const auto& vertices = segment.vertices();
             const Segment2D transformed_segment{ vertices[0].get() - box_center,
                 vertices[1].get() - box_center };
             const auto segment_origin = transformed_segment.barycenter();
@@ -313,6 +327,13 @@ namespace geode
             return true;
         }
         const auto& vertices = triangle.vertices();
+        for( const auto v : LRange{ 3 } )
+        {
+            if( contains( vertices[v].get() ) )
+            {
+                return true;
+            }
+        }
         return intersects( Segment2D{ vertices[0].get(), vertices[1].get() } )
                || intersects(
                    Segment2D{ vertices[0].get(), vertices[2].get() } )
