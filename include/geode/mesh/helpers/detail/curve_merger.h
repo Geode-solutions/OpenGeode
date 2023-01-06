@@ -32,7 +32,7 @@
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMesh );
+    FORWARD_DECLARATION_DIMENSION_CLASS( EdgedCurve );
 } // namespace geode
 
 namespace geode
@@ -40,38 +40,38 @@ namespace geode
     namespace detail
     {
         template < index_t dimension >
-        class SurfaceMeshMerger
+        class EdgedCurveMerger
         {
         public:
-            struct PolygonOrigin
+            struct EdgeOrigin
             {
-                PolygonOrigin( index_t surface_in, index_t polygon_in )
-                    : surface( surface_in ), polygon( polygon_in )
+                EdgeOrigin( index_t curve_in, index_t edge_in )
+                    : curve( curve_in ), edge( edge_in )
                 {
                 }
 
-                index_t surface;
-                index_t polygon;
+                index_t curve;
+                index_t edge;
             };
-            using PolygonOrigins = absl::InlinedVector< PolygonOrigin, 1 >;
+            using EdgeOrigins = absl::InlinedVector< EdgeOrigin, 1 >;
 
-            SurfaceMeshMerger( absl::Span< const std::reference_wrapper<
-                                   const SurfaceMesh< dimension > > > surfaces,
+            EdgedCurveMerger( absl::Span< const std::reference_wrapper<
+                                  const EdgedCurve< dimension > > > curves,
                 double epsilon );
 
-            ~SurfaceMeshMerger();
+            ~EdgedCurveMerger();
 
-            std::unique_ptr< SurfaceMesh< dimension > > merge();
+            std::unique_ptr< EdgedCurve< dimension > > merge();
 
-            index_t vertex_in_merged( index_t surface, index_t vertex ) const;
+            index_t vertex_in_merged( index_t curve, index_t vertex ) const;
 
-            index_t polygon_in_merged( index_t surface, index_t polygon ) const;
+            index_t edge_in_merged( index_t curve, index_t edge ) const;
 
-            const PolygonOrigins& polygon_origins( index_t polygon ) const;
+            const EdgeOrigins& edge_origins( index_t edge ) const;
 
         private:
             IMPLEMENTATION_MEMBER( impl_ );
         };
-        ALIAS_2D_AND_3D( SurfaceMeshMerger );
+        ALIAS_2D_AND_3D( EdgedCurveMerger );
     } // namespace detail
 } // namespace geode

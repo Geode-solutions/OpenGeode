@@ -25,37 +25,13 @@
 
 #include <absl/container/flat_hash_set.h>
 
-#include <geode/basic/attribute_manager.h>
 #include <geode/basic/pimpl_impl.h>
-
-#include <geode/geometry/nn_search.h>
-#include <geode/geometry/point.h>
 
 #include <geode/mesh/builder/surface_mesh_builder.h>
 #include <geode/mesh/core/detail/vertex_cycle.h>
-#include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/surface_mesh.h>
+#include <geode/mesh/helpers/private/vertex_merger.h>
 #include <geode/mesh/helpers/repair_polygon_orientations.h>
-
-namespace
-{
-    template < geode::index_t dimension >
-    std::unique_ptr< geode::SurfaceMesh< dimension > > create_mesh( absl::Span<
-        const std::reference_wrapper< const geode::SurfaceMesh< dimension > > >
-            surfaces )
-    {
-        const auto type = surfaces.front().get().type_name();
-        for( const auto& surface : surfaces )
-        {
-            if( surface.get().type_name() != type )
-            {
-                return geode::SurfaceMesh< dimension >::create();
-            }
-        }
-        return geode::SurfaceMesh< dimension >::create(
-            geode::MeshFactory::default_impl( type ) );
-    }
-} // namespace
 
 namespace geode
 {
@@ -63,6 +39,7 @@ namespace geode
     {
         template < index_t dimension >
         class SurfaceMeshMerger< dimension >::Impl
+            : public VertexMerger< SurfaceMesh, SurfaceMeshBuilder, dimension >
         {
             using ColocatedInfo = typename NNSearch< dimension >::ColocatedInfo;
             using Polygon = absl::FixedArray< index_t >;
@@ -73,22 +50,16 @@ namespace geode
             Impl( absl::Span< const std::reference_wrapper<
                       const SurfaceMesh< dimension > > > surfaces,
                 double epsilon )
-                : surfaces_( surfaces ),
-                  epsilon_( epsilon ),
-                  surface_{ create_mesh( surfaces ) },
-                  builder_{ SurfaceMeshBuilder< dimension >::create(
-                      *surface_ ) },
-                  new_id_( surfaces.size() ),
-                  offset_vertices_( surfaces.size() + 1 )
+                : VertexMerger< SurfaceMesh,
+                    SurfaceMeshBuilder,
+                    dimension >{ surfaces, epsilon },
+                  new_id_( surfaces.size() )
             {
-                offset_vertices_[0] = 0;
                 index_t nb_polygons{ 0 };
-                for( const auto s : Indices{ surfaces_ } )
+                for( const auto s : Indices{ this->meshes() } )
                 {
-                    const auto& surface = surfaces_[s].get();
+                    const auto& surface = this->meshes()[s].get();
                     new_id_[s].resize( surface.nb_polygons(), NO_ID );
-                    offset_vertices_[s + 1] =
-                        offset_vertices_[s] + surface.nb_vertices();
                     nb_polygons += surface.nb_polygons();
                 }
                 polygons_origins_.reserve( nb_polygons );
@@ -98,46 +69,15 @@ namespace geode
             std::unique_ptr< SurfaceMesh< dimension > > merge()
             {
                 create_surface_step();
-                return std::move( surface_ );
-            }
-
-            void create_surface_step()
-            {
-                auto info = create_colocated_index_mapping();
-                create_points( info );
-                vertices_ = std::move( info.colocated_mapping );
-                create_polygons();
-                create_adjacencies();
-                clean_surface();
-                surface_id_.clear();
-            }
-
-            const SurfaceMesh< dimension >& merged() const
-            {
-                return *surface_;
-            }
-
-            index_t vertex_in_merged( index_t surface, index_t vertex ) const
-            {
-                OPENGEODE_ASSERT( surface < surfaces_.size(),
-                    "[SurfaceMerger::vertex_in_merged] Wrong surface index" );
-                OPENGEODE_ASSERT(
-                    vertex < surfaces_[surface].get().nb_vertices(),
-                    "[SurfaceMerger::vertex_in_merged] Wrong surface vertex "
-                    "index" );
-                OPENGEODE_ASSERT(
-                    offset_vertices_[surface] + vertex < vertices_.size(),
-                    "[SurfaceMerger::vertex_in_merged] Wrong global vertex "
-                    "index" );
-                return vertices_[offset_vertices_[surface] + vertex];
+                return this->steal_mesh();
             }
 
             index_t polygon_in_merged( index_t surface, index_t polygon ) const
             {
-                OPENGEODE_ASSERT( surface < surfaces_.size(),
+                OPENGEODE_ASSERT( surface < this->meshes().size(),
                     "[SurfaceMerger::polygon_in_merged] Wrong surface index" );
                 OPENGEODE_ASSERT(
-                    polygon < surfaces_[surface].get().nb_polygons(),
+                    polygon < this->meshes()[surface].get().nb_polygons(),
                     "[SurfaceMerger::polygon_in_merged] Wrong surface polygon "
                     "index" );
                 return new_id_[surface][polygon];
@@ -145,20 +85,30 @@ namespace geode
 
             const PolygonOrigins& polygon_origins( index_t polygon ) const
             {
-                OPENGEODE_ASSERT( polygon < surface_->nb_polygons(),
+                OPENGEODE_ASSERT( polygon < this->mesh().nb_polygons(),
                     "[SurfaceMerger::polygon_origins] Wrong surface polygon "
                     "index" );
                 return polygons_origins_[polygon];
             }
 
         private:
+            void create_surface_step()
+            {
+                this->create_points();
+                create_polygons();
+                create_adjacencies();
+                clean_surface();
+                surface_id_.clear();
+            }
+
             void clean_surface()
             {
                 bool delete_needed{ false };
-                std::vector< bool > to_delete( surface_->nb_polygons(), false );
-                for( const auto p : Range{ surface_->nb_polygons() } )
+                std::vector< bool > to_delete(
+                    this->mesh().nb_polygons(), false );
+                for( const auto p : Range{ this->mesh().nb_polygons() } )
                 {
-                    const auto vertices = surface_->polygon_vertices( p );
+                    const auto vertices = this->mesh().polygon_vertices( p );
                     for( const auto v : LIndices{ vertices } )
                     {
                         if( vertices[v]
@@ -171,51 +121,43 @@ namespace geode
                 }
                 if( delete_needed )
                 {
-                    const auto old2new = builder_->delete_polygons( to_delete );
-                    for( const auto s : Indices{ surfaces_ } )
+                    const auto old2new =
+                        this->builder().delete_polygons( to_delete );
+                    for( const auto surface_id : Indices{ this->meshes() } )
                     {
-                        const auto& surface = surfaces_[s].get();
+                        const auto& surface = this->meshes()[surface_id].get();
                         for( const auto p : Range{ surface.nb_polygons() } )
                         {
-                            const auto old = new_id_[s][p];
-                            new_id_[s][p] = old2new[old];
+                            const auto old = new_id_[surface_id][p];
+                            new_id_[surface_id][p] = old2new[old];
                         }
                     }
                 }
                 separate_surfaces();
-                repair_polygon_orientations( *surface_ );
-            }
-
-            void create_points( const ColocatedInfo& info )
-            {
-                for( const auto& point : info.unique_points )
-                {
-                    builder_->create_point( point );
-                }
+                repair_polygon_orientations( this->mesh(), this->builder() );
             }
 
             void create_polygons()
             {
                 absl::flat_hash_map< TypedVertexCycle, index_t > polygons;
-                for( const auto s : Indices{ surfaces_ } )
+                for( const auto s : Indices{ this->meshes() } )
                 {
-                    const auto& surface = surfaces_[s].get();
+                    const auto& surface = this->meshes()[s].get();
                     for( const auto p : Range{ surface.nb_polygons() } )
                     {
-                        absl::FixedArray< index_t > vertices(
-                            surface.nb_polygon_vertices( p ) );
+                        Polygon vertices( surface.nb_polygon_vertices( p ) );
                         for( const auto v :
                             LRange{ surface.nb_polygon_vertices( p ) } )
                         {
-                            vertices[v] = vertex_in_merged(
+                            vertices[v] = this->vertex_in_merged(
                                 s, surface.polygon_vertex( { p, v } ) );
                         }
                         const auto it = polygons.try_emplace(
-                            vertices, surface_->nb_polygons() );
+                            vertices, this->mesh().nb_polygons() );
                         if( it.second )
                         {
                             const auto polygon_id =
-                                builder_->create_polygon( vertices );
+                                this->builder().create_polygon( vertices );
                             OPENGEODE_ASSERT( polygon_id == surface_id_.size(),
                                 "[SurfaceMerger::create_polygons] Issue in "
                                 "polygon database (surface_id_)" );
@@ -249,9 +191,9 @@ namespace geode
 
             void create_adjacencies()
             {
-                for( const auto s : Indices{ surfaces_ } )
+                for( const auto s : Indices{ this->meshes() } )
                 {
-                    const auto& surface = surfaces_[s].get();
+                    const auto& surface = this->meshes()[s].get();
                     for( const auto p : Range{ surface.nb_polygons() } )
                     {
                         for( const auto e :
@@ -262,7 +204,7 @@ namespace geode
                             {
                                 const auto new_id = new_id_[s][p];
                                 const auto new_adj_id = new_id_[s][adj.value()];
-                                builder_->set_polygon_adjacent(
+                                this->builder().set_polygon_adjacent(
                                     { new_id, e }, new_adj_id );
                             }
                         }
@@ -272,54 +214,27 @@ namespace geode
 
             void separate_surfaces()
             {
-                for( const auto p : Range{ surface_->nb_polygons() } )
+                for( const auto p : Range{ this->mesh().nb_polygons() } )
                 {
                     for( const auto e :
-                        LRange{ surface_->nb_polygon_edges( p ) } )
+                        LRange{ this->mesh().nb_polygon_edges( p ) } )
                     {
                         if( const auto adj =
-                                surface_->polygon_adjacent( { p, e } ) )
+                                this->mesh().polygon_adjacent( { p, e } ) )
                         {
                             if( surface_id_[p] != surface_id_[adj.value()] )
                             {
-                                builder_->unset_polygon_adjacent( { p, e } );
+                                this->builder().unset_polygon_adjacent(
+                                    { p, e } );
                             }
                         }
                     }
                 }
             }
 
-            ColocatedInfo create_colocated_index_mapping()
-            {
-                index_t nb_points{ 0 };
-                for( const auto& surface : surfaces_ )
-                {
-                    nb_points += surface.get().nb_vertices();
-                }
-                std::vector< Point< dimension > > points;
-                points.reserve( nb_points );
-                for( const auto& surface : surfaces_ )
-                {
-                    for( const auto v : Range{ surface.get().nb_vertices() } )
-                    {
-                        points.emplace_back( surface.get().point( v ) );
-                    }
-                }
-                NNSearch< dimension > nnsearch{ std::move( points ) };
-                return nnsearch.colocated_index_mapping( epsilon_ );
-            }
-
         private:
-            absl::Span<
-                const std::reference_wrapper< const SurfaceMesh< dimension > > >
-                surfaces_;
-            double epsilon_;
-            std::unique_ptr< SurfaceMesh< dimension > > surface_;
-            std::unique_ptr< SurfaceMeshBuilder< dimension > > builder_;
             std::vector< SurfaceId > surface_id_;
             absl::FixedArray< std::vector< index_t > > new_id_;
-            std::vector< index_t > vertices_;
-            absl::FixedArray< index_t > offset_vertices_;
             std::vector< PolygonOrigins > polygons_origins_;
         };
 
@@ -342,19 +257,6 @@ namespace geode
             SurfaceMeshMerger< dimension >::merge()
         {
             return impl_->merge();
-        }
-
-        template < index_t dimension >
-        void SurfaceMeshMerger< dimension >::create_surface_step()
-        {
-            impl_->create_surface_step();
-        }
-
-        template < index_t dimension >
-        const SurfaceMesh< dimension >&
-            SurfaceMeshMerger< dimension >::merged() const
-        {
-            return impl_->merged();
         }
 
         template < index_t dimension >

@@ -90,10 +90,7 @@ add_geode_library(
         "helpers/convert_point_set.cpp"
         "helpers/convert_surface_mesh.cpp"
         "helpers/convert_solid_mesh.cpp"
-        "helpers/detail/surface_merger.cpp"
         "helpers/hausdorff_distance.cpp"
-        "helpers/private/copy.cpp"
-        "helpers/private/regular_grid_shape_function.cpp"
         "helpers/rasterize.cpp"
         "helpers/ray_tracing.cpp"
         "helpers/regular_grid_point_function.cpp"
@@ -103,6 +100,10 @@ add_geode_library(
         "helpers/tetrahedral_solid_scalar_function.cpp"
         "helpers/triangulated_surface_point_function.cpp"
         "helpers/triangulated_surface_scalar_function.cpp"
+        "helpers/detail/curve_merger.cpp"
+        "helpers/detail/surface_merger.cpp"
+        "helpers/private/copy.cpp"
+        "helpers/private/regular_grid_shape_function.cpp"
         "io/edged_curve_input.cpp"
         "io/edged_curve_output.cpp"
         "io/graph_input.cpp"
@@ -233,6 +234,7 @@ add_geode_library(
         "core/detail/geode_elements.h"
         "core/detail/register_mesh.h"
         "core/detail/vertex_cycle.h"
+        "helpers/detail/curve_merger.h"
         "helpers/detail/surface_merger.h"
         "io/detail/geode_bitsery_mesh_input.h"
         "io/detail/geode_bitsery_mesh_output.h"
@@ -263,6 +265,7 @@ add_geode_library(
         "core/private/points_impl.h"
         "helpers/private/copy.h"
         "helpers/private/regular_grid_shape_function.h"
+        "helpers/private/vertex_merger.h"
     PUBLIC_DEPENDENCIES
         absl::flat_hash_map
         Bitsery::bitsery
