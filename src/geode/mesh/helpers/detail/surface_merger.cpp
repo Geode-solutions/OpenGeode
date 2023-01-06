@@ -85,9 +85,6 @@ namespace geode
 
             const PolygonOrigins& polygon_origins( index_t polygon ) const
             {
-                OPENGEODE_ASSERT( polygon < this->mesh().nb_polygons(),
-                    "[SurfaceMerger::polygon_origins] Wrong surface polygon "
-                    "index" );
                 return polygons_origins_[polygon];
             }
 

@@ -83,9 +83,6 @@ namespace geode
 
             const EdgeOrigins& edge_origins( index_t edge ) const
             {
-                OPENGEODE_ASSERT( edge < this->mesh().nb_edges(),
-                    "[EdgedCurveMerger::edge_origins] Wrong curve edge "
-                    "index" );
                 return edges_origins_[edge];
             }
 
