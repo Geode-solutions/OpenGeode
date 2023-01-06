@@ -671,8 +671,8 @@ namespace geode
     double SurfaceMesh< dimension >::edge_length(
         const std::array< index_t, 2 >& polygon_edge_vertices ) const
     {
-        return point_point_distance( this->point( polygon_edge_vertices[0] ),
-            this->point( polygon_edge_vertices[1] ) );
+        return point_point_distance( point( polygon_edge_vertices[0] ),
+            point( polygon_edge_vertices[1] ) );
     }
 
     template < index_t dimension >
@@ -686,8 +686,8 @@ namespace geode
     Point< dimension > SurfaceMesh< dimension >::edge_barycenter(
         const std::array< index_t, 2 >& polygon_edge_vertices ) const
     {
-        return ( this->point( polygon_edge_vertices[0] )
-                   + this->point( polygon_edge_vertices[1] ) )
+        return ( point( polygon_edge_vertices[0] )
+                   + point( polygon_edge_vertices[1] ) )
                / 2.;
     }
 
@@ -722,28 +722,9 @@ namespace geode
         for( const auto v : LRange{ nb_polygon_vertices( polygon_id ) } )
         {
             barycenter =
-                barycenter + this->point( polygon_vertex( { polygon_id, v } ) );
+                barycenter + point( polygon_vertex( { polygon_id, v } ) );
         }
         return barycenter / nb_polygon_vertices( polygon_id );
-    }
-
-    template < index_t dimension >
-    double SurfaceMesh< dimension >::polygon_area( index_t polygon_id ) const
-    {
-        if( nb_polygon_vertices( polygon_id ) < 3 )
-        {
-            return 0;
-        }
-        double area{ 0 };
-        const auto& p1 = this->point( polygon_vertex( { polygon_id, 0 } ) );
-        for( const auto i : LRange{ 1, nb_polygon_vertices( polygon_id ) - 1 } )
-        {
-            const auto& p2 = this->point( polygon_vertex( { polygon_id, i } ) );
-            const auto& p3 = this->point( polygon_vertex(
-                { polygon_id, static_cast< local_index_t >( i + 1 ) } ) );
-            area += triangle_area( geode::Triangle< dimension >{ p1, p2, p3 } );
-        }
-        return area;
     }
 
     template < index_t dimension >
@@ -906,6 +887,46 @@ namespace geode
         impl_->reset_polygons_around_vertex( vertex_id );
     }
 
+    template <>
+    double SurfaceMesh< 2 >::polygon_area( index_t polygon_id ) const
+    {
+        if( nb_polygon_vertices( polygon_id ) < 3 )
+        {
+            return 0;
+        }
+        double area{ 0 };
+        const auto vertices = polygon_vertices( polygon_id );
+        const auto& p1 = point( vertices[0] );
+        for( const auto i : LRange{ 1, vertices.size() - 1 } )
+        {
+            const auto& p2 = point( vertices[i] );
+            const auto& p3 = point( vertices[i + 1] );
+            area += triangle_signed_area( { p1, p2, p3 } );
+        }
+        return area;
+    }
+
+    template <>
+    double SurfaceMesh< 3 >::polygon_area( index_t polygon_id ) const
+    {
+        if( nb_polygon_vertices( polygon_id ) < 3 )
+        {
+            return 0;
+        }
+        double area{ 0 };
+        const auto direction = new_polygon_normal( polygon_id )
+                                   .value_or( Vector3D{ { 0, 0, 1 } } );
+        const auto vertices = polygon_vertices( polygon_id );
+        const auto& p1 = point( vertices[0] );
+        for( const auto i : LRange{ 1, vertices.size() - 1 } )
+        {
+            const auto& p2 = point( vertices[i] );
+            const auto& p3 = point( vertices[i + 1] );
+            area += triangle_signed_area( { p1, p2, p3 }, direction );
+        }
+        return area;
+    }
+
     template < index_t dimension >
     template < index_t T >
     typename std::enable_if< T == 3, Vector3D >::type
@@ -913,12 +934,12 @@ namespace geode
     {
         check_polygon_id( *this, polygon_id );
         Vector3D normal;
-        const auto& p0 = this->point( polygon_vertex( { polygon_id, 0 } ) );
+        const auto& p0 = point( polygon_vertex( { polygon_id, 0 } ) );
         for( const auto v : LRange{ 2, nb_polygon_vertices( polygon_id ) } )
         {
-            const auto& p1 = this->point( polygon_vertex(
+            const auto& p1 = point( polygon_vertex(
                 { polygon_id, static_cast< local_index_t >( v - 1 ) } ) );
-            const auto& p2 = this->point( polygon_vertex( { polygon_id, v } ) );
+            const auto& p2 = point( polygon_vertex( { polygon_id, v } ) );
             normal = normal + Vector3D{ p1, p0 }.cross( { p2, p0 } );
         }
         return normal.normalize();
@@ -946,11 +967,11 @@ namespace geode
         check_polygon_id( *this, polygon_id );
         Vector3D normal;
         const auto vertices = polygon_vertices( polygon_id );
-        const auto& p0 = this->point( vertices[0] );
+        const auto& p0 = point( vertices[0] );
         for( const auto v : LRange{ 2, nb_polygon_vertices( polygon_id ) } )
         {
-            const auto& p1 = this->point( vertices[v - 1] );
-            const auto& p2 = this->point( vertices[v] );
+            const auto& p1 = point( vertices[v - 1] );
+            const auto& p2 = point( vertices[v] );
             if( const auto triangle_normal =
                     Triangle< T >{ p0, p1, p2 }.new_normal() )
             {
@@ -995,7 +1016,7 @@ namespace geode
     std::unique_ptr< SurfaceMesh< dimension > >
         SurfaceMesh< dimension >::clone() const
     {
-        auto clone = create( this->impl_name() );
+        auto clone = create( impl_name() );
         auto builder = SurfaceMeshBuilder< dimension >::create( *clone );
         builder->copy( *this );
         return clone;

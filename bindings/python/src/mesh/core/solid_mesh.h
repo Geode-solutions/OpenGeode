@@ -83,6 +83,12 @@
             &SolidMesh##dimension##D::polyhedron_barycenter )                  \
         .def( "facet_barycenter", &SolidMesh##dimension##D::facet_barycenter ) \
         .def( "edge_barycenter", &SolidMesh##dimension##D::edge_barycenter )   \
+        .def(                                                                  \
+            "polyhedron_volume", &SolidMesh##dimension##D::polyhedron_volume ) \
+        .def( "polyhedron_facet_normal",                                       \
+            &SolidMesh##dimension##D::polyhedron_facet_normal )                \
+        .def( "new_polyhedron_facet_normal",                                   \
+            &SolidMesh##dimension##D::new_polyhedron_facet_normal )            \
         .def( "polyhedron_around_vertex",                                      \
             &SolidMesh##dimension##D::polyhedron_around_vertex )               \
         .def( "polyhedra_around_vertex",                                       \
@@ -125,8 +131,7 @@ namespace geode
 {
     void define_solid_mesh( pybind11::module& module )
     {
-        PYTHON_SOLID_MESH( 3 ).def( "polyhedron_facet_normal",
-            &SolidMesh3D::polyhedron_facet_normal< 3 > );
+        PYTHON_SOLID_MESH( 3 );
 
         pybind11::class_< PolyhedronVertex >( module, "PolyhedronVertex" )
             .def( pybind11::init<>() )
