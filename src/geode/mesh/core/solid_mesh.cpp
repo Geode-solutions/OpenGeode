@@ -33,7 +33,10 @@
 #include <geode/basic/detail/mapping_after_deletion.h>
 #include <geode/basic/pimpl_impl.h>
 
+#include <geode/geometry/basic_objects/tetrahedron.h>
+#include <geode/geometry/basic_objects/triangle.h>
 #include <geode/geometry/bounding_box.h>
+#include <geode/geometry/mensuration.h>
 #include <geode/geometry/vector.h>
 
 #include <geode/mesh/builder/solid_edges_builder.h>
@@ -612,8 +615,8 @@ namespace geode
     double SolidMesh< dimension >::edge_length(
         const std::array< index_t, 2 >& edge_vertices ) const
     {
-        return Vector< dimension >{ this->point( edge_vertices[0] ),
-            this->point( edge_vertices[1] ) }
+        return Vector< dimension >{ point( edge_vertices[0] ),
+            point( edge_vertices[1] ) }
             .length();
     }
 
@@ -664,8 +667,7 @@ namespace geode
         for( const auto v : LRange{ nb_polyhedron_vertices( polyhedron_id ) } )
         {
             barycenter =
-                barycenter
-                + this->point( polyhedron_vertex( { polyhedron_id, v } ) );
+                barycenter + point( polyhedron_vertex( { polyhedron_id, v } ) );
         }
         return barycenter / nb_polyhedron_vertices( polyhedron_id );
     }
@@ -677,7 +679,7 @@ namespace geode
         Point< dimension > barycenter;
         for( const auto v : facet_vertices )
         {
-            barycenter = barycenter + this->point( v );
+            barycenter = barycenter + point( v );
         }
         return barycenter / static_cast< double >( facet_vertices.size() );
     }
@@ -686,9 +688,7 @@ namespace geode
     Point< dimension > SolidMesh< dimension >::edge_barycenter(
         const std::array< index_t, 2 >& edge_vertices ) const
     {
-        return ( this->point( edge_vertices[0] )
-                   + this->point( edge_vertices[1] ) )
-               / 2.;
+        return ( point( edge_vertices[0] ) + point( edge_vertices[1] ) ) / 2.;
     }
 
     template < index_t dimension >
@@ -713,24 +713,86 @@ namespace geode
     }
 
     template < index_t dimension >
-    template < index_t T >
-    typename std::enable_if< T == 3, Vector3D >::type
-        SolidMesh< dimension >::polyhedron_facet_normal(
-            const PolyhedronFacet& polyhedron_facet ) const
+    double SolidMesh< dimension >::polyhedron_volume(
+        index_t polyhedron_id ) const
+    {
+        if( nb_polyhedron_vertices( polyhedron_id ) < 4 )
+        {
+            return 0;
+        }
+        double volume{ 0 };
+        const auto first_pt_index = polyhedron_vertex( { polyhedron_id, 0 } );
+        const auto& p0 = point( first_pt_index );
+        const auto facets_vertices =
+            polyhedron_facets_vertices( polyhedron_id );
+        for( const auto facet_id : LIndices{ facets_vertices } )
+        {
+            const auto& facet_vertices = facets_vertices[facet_id];
+            if( absl::c_any_of(
+                    facet_vertices, [first_pt_index]( index_t vertex_id ) {
+                        return vertex_id == first_pt_index;
+                    } ) )
+            {
+                continue;
+            }
+            for( const auto i : LRange{ 2, facet_vertices.size() } )
+            {
+                const auto& p1 = point( facet_vertices[i - 2] );
+                const auto& p2 = point( facet_vertices[i - 1] );
+                const auto& p3 = point( facet_vertices[i] );
+                volume += tetrahedron_signed_volume( { p0, p1, p2, p3 } );
+            }
+        }
+        return volume;
+    }
+
+    template < index_t dimension >
+    Vector3D SolidMesh< dimension >::polyhedron_facet_normal(
+        const PolyhedronFacet& polyhedron_facet ) const
     {
         Vector3D normal;
-        const auto& p0 = this->point(
-            this->polyhedron_facet_vertex( { polyhedron_facet, 0 } ) );
+        const auto facet_vertices =
+            polyhedron_facet_vertices( polyhedron_facet );
+        const auto& p0 = point( facet_vertices[0] );
+        for( const auto v : LRange{ 2, facet_vertices.size() } )
+        {
+            const auto& p1 = point( facet_vertices[v - 1] );
+            const auto& p2 = point( facet_vertices[v] );
+            normal += Vector3D{ p1, p0 }.cross( { p2, p0 } );
+        }
+        return normal.normalize();
+    }
+
+    template < index_t dimension >
+    absl::optional< Vector3D >
+        SolidMesh< dimension >::new_polyhedron_facet_normal(
+            const PolyhedronFacet& polyhedron_facet ) const
+    {
+        check_polyhedron_facet_id(
+            *this, polyhedron_facet.polyhedron_id, polyhedron_facet.facet_id );
+        Vector3D normal;
+        const auto facet_vertices =
+            polyhedron_facet_vertices( polyhedron_facet );
+        const auto& p0 = point( facet_vertices[0] );
         for( const auto v :
             LRange{ 2, nb_polyhedron_facet_vertices( polyhedron_facet ) } )
         {
-            const auto& p1 = this->point( polyhedron_facet_vertex(
-                { polyhedron_facet, static_cast< local_index_t >( v - 1 ) } ) );
-            const auto& p2 = this->point(
-                polyhedron_facet_vertex( { polyhedron_facet, v } ) );
-            normal = normal + Vector3D{ p1, p0 }.cross( { p2, p0 } );
+            const auto& p1 = point( facet_vertices[v - 1] );
+            const auto& p2 = point( facet_vertices[v] );
+            if( const auto triangle_normal =
+                    Triangle3D{ p0, p1, p2 }.new_normal() )
+            {
+                normal += triangle_normal.value();
+            }
         }
-        return normal.normalize();
+        try
+        {
+            return normal.normalize();
+        }
+        catch( const OpenGeodeException& /*unused*/ )
+        {
+            return absl::nullopt;
+        }
     }
 
     template < index_t dimension >
@@ -1401,7 +1463,7 @@ namespace geode
     std::unique_ptr< SolidMesh< dimension > >
         SolidMesh< dimension >::clone() const
     {
-        auto clone = create( this->impl_name() );
+        auto clone = create( impl_name() );
         auto builder = SolidMeshBuilder< dimension >::create( *clone );
         builder->copy( *this );
         return clone;
@@ -1419,10 +1481,6 @@ namespace geode
     }
 
     template class opengeode_mesh_api SolidMesh< 3 >;
-
-    template opengeode_mesh_api Vector3D
-        SolidMesh< 3 >::polyhedron_facet_normal< 3 >(
-            const PolyhedronFacet& ) const;
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, PolyhedronVertex );
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, PolyhedronFacet );
