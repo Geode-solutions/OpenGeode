@@ -148,7 +148,7 @@ namespace geode
                 return true;
             }
             const auto& vertices = tetra.vertices();
-            for( const auto v : LRange{ 3 } )
+            for( const auto v : LRange{ 4 } )
             {
                 if( contains( vertices[v].get() ) )
                 {
@@ -170,7 +170,7 @@ namespace geode
             const Segment< T >& segment ) const
         {
             const auto& vertices = segment.vertices();
-            for( const auto v : LRange{ 3 } )
+            for( const auto v : LRange{ 2 } )
             {
                 if( contains( vertices[v].get() ) )
                 {
