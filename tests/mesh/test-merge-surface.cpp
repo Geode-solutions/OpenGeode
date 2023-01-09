@@ -31,9 +31,8 @@
 #include <geode/mesh/builder/surface_mesh_builder.h>
 #include <geode/mesh/core/surface_mesh.h>
 #include <geode/mesh/core/triangulated_surface.h>
-#include <geode/mesh/io/triangulated_surface_input.h>
-
 #include <geode/mesh/helpers/convert_surface_mesh.h>
+#include <geode/mesh/io/triangulated_surface_input.h>
 
 void test()
 {

@@ -29,6 +29,7 @@
 
 #include <geode/mesh/builder/edged_curve_builder.h>
 #include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/helpers/detail/curve_merger.h>
 #include <geode/mesh/helpers/private/copy.h>
 
 namespace
@@ -75,4 +76,19 @@ namespace geode
         detail::copy_meta_info( curve2d, *builder3d );
         return curve3d;
     }
+
+    template < index_t dimension >
+    std::unique_ptr< EdgedCurve< dimension > > merge_edged_curves( absl::Span<
+        const std::reference_wrapper< const EdgedCurve< dimension > > > curves )
+    {
+        detail::EdgedCurveMerger< dimension > merger{ curves, global_epsilon };
+        return merger.merge();
+    }
+
+    template std::unique_ptr< EdgedCurve< 2 > >
+        opengeode_mesh_api merge_edged_curves( absl::Span<
+            const std::reference_wrapper< const EdgedCurve< 2 > > > );
+    template std::unique_ptr< EdgedCurve< 3 > >
+        opengeode_mesh_api merge_edged_curves( absl::Span<
+            const std::reference_wrapper< const EdgedCurve< 3 > > > );
 } // namespace geode
