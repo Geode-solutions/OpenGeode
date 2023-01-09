@@ -61,8 +61,11 @@ namespace
     {
         for( const auto v : geode::Indices{ unique_vertices } )
         {
-            builder.set_unique_vertex(
-                { component_id, v }, unique_vertices[v] );
+            if( unique_vertices[v] != geode::NO_ID )
+            {
+                builder.set_unique_vertex(
+                    { component_id, v }, unique_vertices[v] );
+            }
         }
     }
 
