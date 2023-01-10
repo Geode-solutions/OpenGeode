@@ -27,6 +27,7 @@
 
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/progress_logger.h>
+#include <geode/mesh/core/regular_grid_solid.h>
 #include <geode/mesh/core/regular_grid_surface.h>
 
 #include <geode/basic/logger.h>
@@ -65,7 +66,7 @@ namespace geode
             return ed_map_attribute_;
         }
 
-        void transform( double ( *eval )( double, index_t ) );
+        void transform();
 
         void squared_root_filter()
         {
@@ -98,20 +99,22 @@ namespace geode
         void eval_distance( const Index& from_index,
             const Index& to_index,
             double cell_length,
-            index_t& count )
+            index_t count )
         {
-            if( ed_map_attribute_->value( grid_.cell_index( to_index ) ) == 0 )
-            {
-                count = 0;
-                return;
-            }
-            count = count + 2;
             auto old_metric =
                 ed_map_attribute_->value( grid_.cell_index( from_index ) );
-            auto new_metric = old_metric + cell_length;
+            auto new_metric = old_metric + cell_length + count;
+
             paint_cell( to_index, new_metric );
         }
 
+        index_t count_increment(
+            const Index& to_index, const index_t increment )
+        {
+            return ed_map_attribute_->value( grid_.cell_index( to_index ) ) == 0
+                       ? 0
+                       : increment + 2;
+        }
         void paint_cell( const Index& index, double distance )
         {
             ed_map_attribute_->modify_value(
@@ -126,7 +129,7 @@ namespace geode
     };
 
     template <>
-    void EDTransform< 2 >::transform( double ( *eval )( double, index_t ) )
+    void EDTransform< 2 >::transform()
     {
         geode::ProgressLogger logger{ "Compute euclidian distance", 2 };
         for( const auto d : geode::LRange{ 2 } )
@@ -137,7 +140,7 @@ namespace geode
             for( const auto c2 :
                 geode::Range{ grid_.nb_cells_in_direction( d2 ) } )
             {
-                tasks.emplace_back( async::spawn( [this, &eval, d, d2, c2] {
+                tasks.emplace_back( async::spawn( [this, d, d2, c2] {
                     index_t count = 0;
                     for( const auto c :
                         geode::Range{ 1, grid_.nb_cells_in_direction( d ) } )
@@ -148,8 +151,8 @@ namespace geode
                         geode::GridCellIndices2D prev_index = index;
                         prev_index[d] = c - 1;
                         eval_distance( prev_index, index,
-                            eval( grid_.cell_length_in_direction( d ), count ),
-                            count );
+                            grid_.cell_length_in_direction( d ), count );
+                        count = count_increment( index, count );
                     }
                     count = 0;
                     for( const auto c : geode::ReverseRange{
@@ -161,8 +164,8 @@ namespace geode
                         geode::GridCellIndices2D prev_index = index;
                         prev_index[d] = c + 1;
                         eval_distance( prev_index, index,
-                            eval( grid_.cell_length_in_direction( d ), count ),
-                            count );
+                            grid_.cell_length_in_direction( d ), count );
+                        count = count_increment( index, count );
                     }
                 } ) );
             }
@@ -175,38 +178,63 @@ namespace geode
         }
     }
 
-    template < index_t dimension >
-    std::shared_ptr< VariableAttribute< double > >
-        approximated_euclidean_distance_transform(
-            const RegularGrid< dimension >& grid,
-            const std::vector< GridCellIndices< dimension > >& grid_cell_ids,
-            absl::string_view ed_attribute_name )
+    template <>
+    void EDTransform< 3 >::transform()
     {
-        EDTransform< dimension > edt( grid, grid_cell_ids, ed_attribute_name );
-        edt.transform( &eval_length );
-        return edt.get_ed_attribute();
+        geode::ProgressLogger logger{ "Compute euclidian distance", 3 };
+        for( const auto d : LRange{ 3 } )
+        {
+            const auto d2 = ( d + 1 ) % 3;
+            const auto d3 = ( d + 2 ) % 3;
+            std::vector< async::task< void > > tasks;
+            tasks.reserve( grid_.nb_cells_in_direction( d2 )
+                           * grid_.nb_cells_in_direction( d3 ) );
+            for( const auto c3 : Range{ grid_.nb_cells_in_direction( d3 ) } )
+            {
+                for( const auto c2 :
+                    Range{ grid_.nb_cells_in_direction( d2 ) } )
+                {
+                    tasks.emplace_back( async::spawn( [this, d, d2, d3, c2,
+                                                          c3] {
+                        index_t count = 0;
+                        for( const auto c :
+                            Range{ 1, grid_.nb_cells_in_direction( d ) } )
+                        {
+                            Index index;
+                            index[d] = c;
+                            index[d2] = c2;
+                            index[d3] = c3;
+                            Index prev_index = index;
+                            prev_index[d] = c - 1;
+                            eval_distance( prev_index, index,
+                                grid_.cell_length_in_direction( d ), count );
+                            count = count_increment( index, count );
+                        }
+                        count = 0;
+                        for( const auto c : ReverseRange{
+                                 grid_.nb_cells_in_direction( d ) - 1 } )
+                        {
+                            Index index;
+                            index[d] = c;
+                            index[d2] = c2;
+                            index[d3] = c3;
+                            Index prev_index = index;
+                            prev_index[d] = c + 1;
+                            eval_distance( prev_index, index,
+                                grid_.cell_length_in_direction( d ), count );
+                            count = count_increment( index, count );
+                        }
+                    } ) );
+                }
+            }
+            for( auto& task :
+                async::when_all( tasks.begin(), tasks.end() ).get() )
+            {
+                task.get();
+            }
+            logger.increment();
+        }
     }
-    template std::shared_ptr< VariableAttribute< double > > opengeode_mesh_api
-        approximated_euclidean_distance_transform< 2 >( const RegularGrid2D&,
-            const std::vector< GridCellIndices2D >&,
-            absl::string_view );
-
-    template < index_t dimension >
-    std::shared_ptr< VariableAttribute< double > >
-        euclidean_squared_distance_transform(
-            const RegularGrid< dimension >& grid,
-            const std::vector< GridCellIndices< dimension > >& grid_cell_ids,
-            absl::string_view ed_attribute_name )
-    {
-        EDTransform< dimension > edt( grid, grid_cell_ids, ed_attribute_name );
-        edt.transform( &eval_squared_length );
-        return edt.get_ed_attribute();
-    }
-
-    template std::shared_ptr< VariableAttribute< double > > opengeode_mesh_api
-        euclidean_squared_distance_transform< 2 >( const RegularGrid2D&,
-            const std::vector< GridCellIndices2D >&,
-            absl::string_view );
 
     template < index_t dimension >
     std::shared_ptr< VariableAttribute< double > > euclidean_distance_transform(
@@ -215,7 +243,7 @@ namespace geode
         absl::string_view ed_attribute_name )
     {
         EDTransform< dimension > edt( grid, grid_cell_ids, ed_attribute_name );
-        edt.transform( &eval_squared_length );
+        edt.transform();
         edt.squared_root_filter();
         return edt.get_ed_attribute();
     }
@@ -223,5 +251,9 @@ namespace geode
     template std::shared_ptr< VariableAttribute< double > > opengeode_mesh_api
         euclidean_distance_transform< 2 >( const RegularGrid2D&,
             const std::vector< GridCellIndices2D >&,
+            absl::string_view );
+    template std::shared_ptr< VariableAttribute< double > > opengeode_mesh_api
+        euclidean_distance_transform< 3 >( const RegularGrid3D&,
+            const std::vector< GridCellIndices3D >&,
             absl::string_view );
 } // namespace geode
