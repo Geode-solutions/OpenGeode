@@ -39,6 +39,18 @@ namespace geode
         const auto l1 = point_point_distance( tri_v[1].get(), tri_v[2].get() );
         const auto l2 = point_point_distance( tri_v[2].get(), tri_v[0].get() );
         const auto p = ( l0 + l1 + l2 ) / 2;
+        if( p - l0 <= global_epsilon )
+        {
+            return 0;
+        }
+        if( p - l1 <= global_epsilon )
+        {
+            return 0;
+        }
+        if( p - l2 <= global_epsilon )
+        {
+            return 0;
+        }
         const auto area2 = p * ( p - l0 ) * ( p - l1 ) * ( p - l2 );
         if( area2 < 0 )
         {
