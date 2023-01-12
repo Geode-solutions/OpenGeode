@@ -57,6 +57,7 @@ add_geode_test(
     SOURCE "test-euclidean-distance-transform.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
         ${PROJECT_NAME}::mesh
 )
 add_geode_test(

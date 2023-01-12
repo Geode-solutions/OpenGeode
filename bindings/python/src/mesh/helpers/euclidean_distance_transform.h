@@ -21,38 +21,15 @@
  *
  */
 
-#pragma once
-
-#include <absl/types/span.h>
-#include <geode/basic/attribute.h>
-#include <geode/mesh/common.h>
-#include <geode/mesh/core/grid.h>
+#include <geode/mesh/helpers/euclidean_distance_transform.h>
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( RegularGrid );
-} // namespace geode
-
-namespace geode
-{
-    /*!
-     * API function for creating and computing the euclidean distance
-     * map from raterized objects.
-     * It computes the exact euclidean distance map.
-     *
-     * @param[in] grid Regular grid on which the euclidean distance map is
-     * computed.
-     * @param[in] grid_cell_ids Rasterization of every objects from which the
-     * distance will be computed.
-     * @param[in] distance_map_name Name of the attribute to store the map on
-     * the \param grid.
-     * @exception OpenGeodeException if the attribute named \param
-     * distance_map_name cannot be accessed.
-     * @return the created attribute
-     */
-    template < index_t dimension >
-    std::shared_ptr< VariableAttribute< double > > euclidean_distance_transform(
-        const RegularGrid< dimension >& grid,
-        absl::Span< const GridCellIndices< dimension > > grid_cell_ids,
-        absl::string_view distance_map_name );
+    void define_euclidean_distance_transform( pybind11::module& module )
+    {
+        module.def( "euclidean_distance_transform2D",
+            &euclidean_distance_transform< 2 > );
+        module.def( "euclidean_distance_transform3D",
+            &euclidean_distance_transform< 3 > );
+    }
 } // namespace geode

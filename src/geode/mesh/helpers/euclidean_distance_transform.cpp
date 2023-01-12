@@ -27,53 +27,50 @@
 
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/progress_logger.h>
+
 #include <geode/mesh/core/regular_grid_solid.h>
 #include <geode/mesh/core/regular_grid_surface.h>
-
-#include <geode/basic/logger.h>
-
-namespace
-{
-    double eval_length( double cell_lenth, geode::index_t increment )
-    {
-        geode_unused( increment );
-        return cell_lenth;
-    }
-    double eval_squared_length( double cell_lenth, geode::index_t increment )
-    {
-        return cell_lenth + increment;
-    }
-} // namespace
 
 namespace geode
 {
     template < index_t dimension >
-    class EDTransform
+    class EuclideanDistanceTransform
     {
         using Index = GridCellIndices< dimension >;
 
     public:
-        EDTransform( const RegularGrid< dimension >& grid,
-            const std::vector< GridCellIndices< dimension > >& grid_cell_id,
-            absl::string_view ed_attribute_name )
+        EuclideanDistanceTransform( const RegularGrid< dimension >& grid,
+            absl::Span< const GridCellIndices< dimension > > grid_cell_id,
+            absl::string_view distance_map_name )
             : grid_{ grid }
         {
-            init_distance_map( grid_cell_id, ed_attribute_name );
+            distance_map_ =
+                grid_.cell_attribute_manager()
+                    .template find_or_create_attribute< VariableAttribute,
+                        double >( distance_map_name,
+                        std::numeric_limits< double >::max() );
+
+            for( const auto& cell_id : grid_cell_id )
+            {
+                distance_map_->set_value( grid_.cell_index( cell_id ), 0. );
+            }
         }
 
-        std::shared_ptr< geode::VariableAttribute< double > > get_ed_attribute()
+        std::shared_ptr< geode::VariableAttribute< double > > distance_map()
         {
-            return ed_map_attribute_;
+            return distance_map_;
         }
 
-        void transform();
+        void compute_distance_map();
+        void directional_squared_distance( index_t direction );
+        void propagate_squared_distance( index_t direction );
 
         void squared_root_filter()
         {
             async::parallel_for(
                 async::irange( index_t{ 0 }, grid_.nb_cells() ),
                 [this]( index_t cell ) {
-                    ed_map_attribute_->modify_value( cell, []( double& value ) {
+                    distance_map_->modify_value( cell, []( double& value ) {
                         value = std::sqrt( value );
                     } );
                 } );
@@ -81,179 +78,293 @@ namespace geode
         }
 
     private:
-        void init_distance_map( const std::vector< Index >& grid_cell_id,
-            absl::string_view ed_attribute_name )
-        {
-            ed_map_attribute_ =
-                grid_.cell_attribute_manager()
-                    .template find_or_create_attribute< VariableAttribute,
-                        double >( ed_attribute_name,
-                        std::numeric_limits< double >::max(), { true, false } );
-
-            for( const auto& cell_id : grid_cell_id )
-            {
-                ed_map_attribute_->set_value( grid_.cell_index( cell_id ), 0. );
-            }
-        }
-
-        void eval_distance( const Index& from_index,
+        void update_squared_distance_map( const Index& from_index,
             const Index& to_index,
-            double cell_length,
-            index_t count )
+            double step_squared_distance )
         {
-            auto old_metric =
-                ed_map_attribute_->value( grid_.cell_index( from_index ) );
-            auto new_metric = old_metric + cell_length + count;
-
-            paint_cell( to_index, new_metric );
-        }
-
-        index_t count_increment(
-            const Index& to_index, const index_t increment )
-        {
-            return ed_map_attribute_->value( grid_.cell_index( to_index ) ) == 0
-                       ? 0
-                       : increment + 2;
-        }
-        void paint_cell( const Index& index, double distance )
-        {
-            ed_map_attribute_->modify_value(
-                grid_.cell_index( index ), [distance]( double& value ) {
-                    value = std::min( value, distance );
+            const auto old_distance =
+                distance_map_->value( grid_.cell_index( from_index ) );
+            const auto new_distance = old_distance + step_squared_distance;
+            distance_map_->modify_value(
+                grid_.cell_index( to_index ), [new_distance]( double& value ) {
+                    value = std::min( value, new_distance );
                 } );
+        }
+
+        double directional_step_squared_distance( const Index& index,
+            const index_t direction,
+            const double last_step_squared_distance )
+        {
+            const auto squared_cell_length =
+                grid_.cell_length_in_direction( direction )
+                * grid_.cell_length_in_direction( direction );
+            return distance_map_->value( grid_.cell_index( index ) ) == 0
+                       ? squared_cell_length
+                       : last_step_squared_distance + 2 * squared_cell_length;
         }
 
     private:
         const geode::RegularGrid< dimension >& grid_;
-        std::shared_ptr< geode::VariableAttribute< double > > ed_map_attribute_;
+        std::shared_ptr< geode::VariableAttribute< double > > distance_map_;
     };
-
     template <>
-    void EDTransform< 2 >::transform()
+    void EuclideanDistanceTransform< 2 >::compute_distance_map()
     {
         geode::ProgressLogger logger{ "Compute euclidian distance", 2 };
-        for( const auto d : geode::LRange{ 2 } )
+        directional_squared_distance( 0 );
+        propagate_squared_distance( 1 );
+        logger.increment();
+    }
+    template <>
+    void EuclideanDistanceTransform< 3 >::compute_distance_map()
+    {
+        geode::ProgressLogger logger{ "Compute euclidian distance", 3 };
+        directional_squared_distance( 0 );
+        propagate_squared_distance( 1 );
+        propagate_squared_distance( 2 );
+        logger.increment();
+    }
+    template <>
+    void EuclideanDistanceTransform< 2 >::directional_squared_distance(
+        index_t d )
+    {
+        const auto d2 = d == 1 ? 0 : 1;
+        absl::FixedArray< async::task< void > > tasks(
+            grid_.nb_cells_in_direction( d2 ) );
+        index_t task_id{ 0 };
+        for( const auto c2 : geode::Range{ grid_.nb_cells_in_direction( d2 ) } )
         {
-            const auto d2 = ( d + 1 ) % 2;
-            std::vector< async::task< void > > tasks;
-            tasks.reserve( grid_.nb_cells_in_direction( d2 ) );
-            for( const auto c2 :
-                geode::Range{ grid_.nb_cells_in_direction( d2 ) } )
+            tasks[task_id++] = async::spawn( [this, d, d2, c2] {
+                double step_squared_distance = 0.;
+                for( const auto c :
+                    geode::Range{ 1, grid_.nb_cells_in_direction( d ) } )
+                {
+                    geode::GridCellIndices2D index;
+                    index[d] = c;
+                    index[d2] = c2;
+                    geode::GridCellIndices2D prev_index = index;
+                    prev_index[d] = c - 1;
+                    step_squared_distance = directional_step_squared_distance(
+                        prev_index, d, step_squared_distance );
+                    update_squared_distance_map(
+                        prev_index, index, step_squared_distance );
+                }
+                step_squared_distance = 0.;
+                for( const auto c : geode::ReverseRange{
+                         grid_.nb_cells_in_direction( d ) - 1 } )
+                {
+                    geode::GridCellIndices2D index;
+                    index[d] = c;
+                    index[d2] = c2;
+                    geode::GridCellIndices2D prev_index = index;
+                    prev_index[d] = c + 1;
+                    step_squared_distance = directional_step_squared_distance(
+                        prev_index, d, step_squared_distance );
+                    update_squared_distance_map(
+                        prev_index, index, step_squared_distance );
+                }
+            } );
+        }
+        for( auto& task : async::when_all( tasks.begin(), tasks.end() ).get() )
+        {
+            task.get();
+        }
+    }
+    template <>
+    void EuclideanDistanceTransform< 3 >::directional_squared_distance(
+        index_t d )
+    {
+        const auto d2 = d == 2 ? 0 : d + 1;
+        const auto d3 = d2 == 2 ? 0 : d2 + 1;
+        absl::FixedArray< async::task< void > > tasks(
+            grid_.nb_cells_in_direction( d2 )
+            * grid_.nb_cells_in_direction( d3 ) );
+        index_t task_id{ 0 };
+        for( const auto c3 : Range{ grid_.nb_cells_in_direction( d3 ) } )
+        {
+            for( const auto c2 : Range{ grid_.nb_cells_in_direction( d2 ) } )
             {
-                tasks.emplace_back( async::spawn( [this, d, d2, c2] {
-                    index_t count = 0;
+                tasks[task_id++] = async::spawn( [this, d, d2, d3, c2, c3] {
+                    double step_squared_distance = 0;
                     for( const auto c :
-                        geode::Range{ 1, grid_.nb_cells_in_direction( d ) } )
+                        Range{ 1, grid_.nb_cells_in_direction( d ) } )
                     {
-                        geode::GridCellIndices2D index;
+                        Index index;
                         index[d] = c;
                         index[d2] = c2;
-                        geode::GridCellIndices2D prev_index = index;
+                        index[d3] = c3;
+                        Index prev_index = index;
                         prev_index[d] = c - 1;
-                        eval_distance( prev_index, index,
-                            grid_.cell_length_in_direction( d ), count );
-                        count = count_increment( index, count );
+                        step_squared_distance =
+                            directional_step_squared_distance(
+                                prev_index, d, step_squared_distance );
+                        update_squared_distance_map(
+                            prev_index, index, step_squared_distance );
                     }
-                    count = 0;
-                    for( const auto c : geode::ReverseRange{
-                             grid_.nb_cells_in_direction( d ) - 1 } )
+                    step_squared_distance = 0;
+                    for( const auto c :
+                        ReverseRange{ grid_.nb_cells_in_direction( d ) - 1 } )
                     {
-                        geode::GridCellIndices2D index;
+                        Index index;
                         index[d] = c;
                         index[d2] = c2;
-                        geode::GridCellIndices2D prev_index = index;
+                        index[d3] = c3;
+                        Index prev_index = index;
                         prev_index[d] = c + 1;
-                        eval_distance( prev_index, index,
-                            grid_.cell_length_in_direction( d ), count );
-                        count = count_increment( index, count );
+                        step_squared_distance =
+                            directional_step_squared_distance(
+                                prev_index, d, step_squared_distance );
+                        update_squared_distance_map(
+                            prev_index, index, step_squared_distance );
                     }
-                } ) );
+                } );
             }
-            for( auto& task :
-                async::when_all( tasks.begin(), tasks.end() ).get() )
-            {
-                task.get();
-            }
-            logger.increment();
+        }
+        for( auto& task : async::when_all( tasks.begin(), tasks.end() ).get() )
+        {
+            task.get();
         }
     }
 
     template <>
-    void EDTransform< 3 >::transform()
+    void EuclideanDistanceTransform< 2 >::propagate_squared_distance(
+        index_t d )
     {
-        geode::ProgressLogger logger{ "Compute euclidian distance", 3 };
-        for( const auto d : LRange{ 3 } )
+        const auto d2 = d == 1 ? 0 : 1;
+        absl::FixedArray< async::task< void > > tasks(
+            grid_.nb_cells_in_direction( d2 ) );
+        index_t task_id{ 0 };
+        for( const auto c2 : geode::Range{ grid_.nb_cells_in_direction( d2 ) } )
         {
-            const auto d2 = ( d + 1 ) % 3;
-            const auto d3 = ( d + 2 ) % 3;
-            std::vector< async::task< void > > tasks;
-            tasks.reserve( grid_.nb_cells_in_direction( d2 )
-                           * grid_.nb_cells_in_direction( d3 ) );
-            for( const auto c3 : Range{ grid_.nb_cells_in_direction( d3 ) } )
-            {
-                for( const auto c2 :
-                    Range{ grid_.nb_cells_in_direction( d2 ) } )
+            tasks[task_id++] = async::spawn( [this, d, d2, c2] {
+                absl::FixedArray< double > temps_dist(
+                    grid_.nb_cells_in_direction( d ) );
+                for( const auto c_ref :
+                    geode::Range{ 0, grid_.nb_cells_in_direction( d ) } )
                 {
-                    tasks.emplace_back( async::spawn( [this, d, d2, d3, c2,
-                                                          c3] {
-                        index_t count = 0;
-                        for( const auto c :
-                            Range{ 1, grid_.nb_cells_in_direction( d ) } )
-                        {
-                            Index index;
-                            index[d] = c;
-                            index[d2] = c2;
-                            index[d3] = c3;
-                            Index prev_index = index;
-                            prev_index[d] = c - 1;
-                            eval_distance( prev_index, index,
-                                grid_.cell_length_in_direction( d ), count );
-                            count = count_increment( index, count );
-                        }
-                        count = 0;
-                        for( const auto c : ReverseRange{
-                                 grid_.nb_cells_in_direction( d ) - 1 } )
-                        {
-                            Index index;
-                            index[d] = c;
-                            index[d2] = c2;
-                            index[d3] = c3;
-                            Index prev_index = index;
-                            prev_index[d] = c + 1;
-                            eval_distance( prev_index, index,
-                                grid_.cell_length_in_direction( d ), count );
-                            count = count_increment( index, count );
-                        }
-                    } ) );
+                    geode::GridCellIndices2D index;
+                    index[d] = c_ref;
+                    index[d2] = c2;
+                    auto min_dist =
+                        distance_map_->value( grid_.cell_index( index ) );
+                    for( const auto c_comp :
+                        geode::Range{ 0, grid_.nb_cells_in_direction( d ) } )
+                    {
+                        geode::GridCellIndices2D index_comp;
+                        index_comp[d] = c_comp;
+                        index_comp[d2] = c2;
+
+                        min_dist = std::min( min_dist,
+                            distance_map_->value(
+                                grid_.cell_index( index_comp ) )
+                                + std::pow(
+                                    ( static_cast< double >( c_comp )
+                                        - static_cast< double >( c_ref ) )
+                                        * grid_.cell_length_in_direction( d ),
+                                    2 ) );
+                    }
+                    temps_dist[c_ref] = min_dist;
                 }
-            }
-            for( auto& task :
-                async::when_all( tasks.begin(), tasks.end() ).get() )
+                for( const auto c_ref :
+                    geode::Range{ 0, grid_.nb_cells_in_direction( d ) } )
+                {
+                    geode::GridCellIndices2D index;
+                    index[d] = c_ref;
+                    index[d2] = c2;
+                    distance_map_->set_value(
+                        grid_.cell_index( index ), temps_dist[c_ref] );
+                }
+            } );
+        }
+        for( auto& task : async::when_all( tasks.begin(), tasks.end() ).get() )
+        {
+            task.get();
+        }
+    }
+    template <>
+    void EuclideanDistanceTransform< 3 >::propagate_squared_distance(
+        index_t d )
+    {
+        const auto d2 = d == 2 ? 0 : d + 1;
+        const auto d3 = d2 == 2 ? 0 : d2 + 1;
+        absl::FixedArray< async::task< void > > tasks(
+            grid_.nb_cells_in_direction( d2 )
+            * grid_.nb_cells_in_direction( d3 ) );
+        index_t task_id{ 0 };
+        for( const auto c3 : Range{ grid_.nb_cells_in_direction( d3 ) } )
+        {
+            for( const auto c2 : Range{ grid_.nb_cells_in_direction( d2 ) } )
             {
-                task.get();
+                tasks[task_id++] = async::spawn( [this, d, d2, d3, c2, c3] {
+                    absl::FixedArray< double > temps_dist(
+                        grid_.nb_cells_in_direction( d ) );
+                    for( const auto c_ref :
+                        geode::Range{ 0, grid_.nb_cells_in_direction( d ) } )
+                    {
+                        geode::GridCellIndices3D index;
+                        index[d] = c_ref;
+                        index[d2] = c2;
+                        index[d3] = c3;
+                        auto min_dist =
+                            distance_map_->value( grid_.cell_index( index ) );
+                        for( const auto c_comp : geode::Range{
+                                 0, grid_.nb_cells_in_direction( d ) } )
+                        {
+                            geode::GridCellIndices3D index_comp;
+                            index_comp[d] = c_comp;
+                            index_comp[d2] = c2;
+                            index_comp[d3] = c3;
+
+                            min_dist = std::min( min_dist,
+                                distance_map_->value(
+                                    grid_.cell_index( index_comp ) )
+                                    + std::pow(
+                                        ( static_cast< double >( c_comp )
+                                            - static_cast< double >( c_ref ) )
+                                            * grid_.cell_length_in_direction(
+                                                d ),
+                                        2 ) );
+                        }
+                        temps_dist[c_ref] = min_dist;
+                    }
+                    for( const auto c_ref :
+                        geode::Range{ 0, grid_.nb_cells_in_direction( d ) } )
+                    {
+                        geode::GridCellIndices3D index;
+                        index[d] = c_ref;
+                        index[d2] = c2;
+                        index[d3] = c3;
+                        distance_map_->set_value(
+                            grid_.cell_index( index ), temps_dist[c_ref] );
+                    }
+                } );
             }
-            logger.increment();
+        }
+        for( auto& task : async::when_all( tasks.begin(), tasks.end() ).get() )
+        {
+            task.get();
         }
     }
 
     template < index_t dimension >
     std::shared_ptr< VariableAttribute< double > > euclidean_distance_transform(
         const RegularGrid< dimension >& grid,
-        const std::vector< GridCellIndices< dimension > >& grid_cell_ids,
-        absl::string_view ed_attribute_name )
+        absl::Span< const GridCellIndices< dimension > > grid_cell_ids,
+        absl::string_view distance_map_name )
     {
-        EDTransform< dimension > edt( grid, grid_cell_ids, ed_attribute_name );
-        edt.transform();
+        EuclideanDistanceTransform< dimension > edt{ grid, grid_cell_ids,
+            distance_map_name };
+        edt.compute_distance_map();
         edt.squared_root_filter();
-        return edt.get_ed_attribute();
+        return edt.distance_map();
     }
 
     template std::shared_ptr< VariableAttribute< double > > opengeode_mesh_api
         euclidean_distance_transform< 2 >( const RegularGrid2D&,
-            const std::vector< GridCellIndices2D >&,
+            absl::Span< const GridCellIndices2D >,
             absl::string_view );
     template std::shared_ptr< VariableAttribute< double > > opengeode_mesh_api
         euclidean_distance_transform< 3 >( const RegularGrid3D&,
-            const std::vector< GridCellIndices3D >&,
+            absl::Span< const GridCellIndices3D >,
             absl::string_view );
 } // namespace geode

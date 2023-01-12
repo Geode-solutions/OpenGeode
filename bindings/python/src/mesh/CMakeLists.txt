@@ -56,6 +56,7 @@ add_geode_python_binding(
         "helpers/convert_point_set.h"
         "helpers/convert_solid_mesh.h"
         "helpers/convert_surface_mesh.h"
+        "helpers/euclidean_distance_transform.h"
         "helpers/geometrical_operations_on_mesh.h"
         "io/edged_curve.h"
         "io/graph.h"
