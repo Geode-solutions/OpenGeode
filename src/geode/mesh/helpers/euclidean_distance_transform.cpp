@@ -171,7 +171,7 @@ namespace geode
             for( const auto c2 : Range{ grid_.nb_cells_in_direction( d2 ) } )
             {
                 tasks[task_id++] = async::spawn( [this, d, d2, d3, c2, c3] {
-                    double step_squared_distance = 0;
+                    double step_squared_distance{ 0 };
                     for( const auto c :
                         Range{ 1, grid_.nb_cells_in_direction( d ) } )
                     {
