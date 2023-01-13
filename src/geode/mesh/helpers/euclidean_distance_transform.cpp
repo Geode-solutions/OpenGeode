@@ -121,6 +121,7 @@ namespace geode
         const std::array< double, dimension > cell_length_;
         std::shared_ptr< VariableAttribute< double > > distance_map_;
     };
+
     template <>
     void EuclideanDistanceTransform< 2 >::directional_squared_distance(
         const index_t d )
@@ -132,14 +133,14 @@ namespace geode
         for( const auto c2 : Range{ grid_.nb_cells_in_direction( d2 ) } )
         {
             tasks[task_id++] = async::spawn( [this, d, d2, c2] {
-                double step_squared_distance = 0.;
+                double step_squared_distance{ 0. };
                 for( const auto c :
                     Range{ 1, grid_.nb_cells_in_direction( d ) } )
                 {
                     GridCellIndices2D index;
                     index[d] = c;
                     index[d2] = c2;
-                    GridCellIndices2D prev_index = index;
+                    auto prev_index = index;
                     prev_index[d] = c - 1;
                     step_squared_distance = directional_step_squared_distance(
                         prev_index, index, d, step_squared_distance );
@@ -151,7 +152,7 @@ namespace geode
                     GridCellIndices2D index;
                     index[d] = c;
                     index[d2] = c2;
-                    GridCellIndices2D prev_index = index;
+                    auto prev_index = index;
                     prev_index[d] = c + 1;
                     step_squared_distance = directional_step_squared_distance(
                         prev_index, index, d, step_squared_distance );
@@ -178,7 +179,7 @@ namespace geode
             for( const auto c2 : Range{ grid_.nb_cells_in_direction( d2 ) } )
             {
                 tasks[task_id++] = async::spawn( [this, d, d2, d3, c2, c3] {
-                    double step_squared_distance = 0;
+                    double step_squared_distance{ 0 };
                     for( const auto c :
                         Range{ 1, grid_.nb_cells_in_direction( d ) } )
                     {
