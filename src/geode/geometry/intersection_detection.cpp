@@ -27,9 +27,89 @@
 #include <geode/geometry/basic_objects/segment.h>
 #include <geode/geometry/basic_objects/triangle.h>
 #include <geode/geometry/intersection.h>
+#include <geode/geometry/point.h>
 #include <geode/geometry/position.h>
 #include <geode/geometry/private/intersection_from_sides.h>
 #include <geode/geometry/private/predicates.h>
+
+namespace
+{
+    geode::local_index_t largest_axis( const geode::Vector3D& normal )
+    {
+        geode::local_index_t axis_to_remove{ 2 };
+        for( const auto other_axis : geode::LRange{ 2 } )
+        {
+            if( std::fabs( normal.value( other_axis ) )
+                > std::fabs( normal.value( 2 ) ) )
+            {
+                axis_to_remove = other_axis;
+            }
+        }
+        return axis_to_remove;
+    }
+
+    geode::SegmentTriangleIntersection
+        segment_triangle_plane_intersection_detection(
+            const geode::Segment3D& segment, const geode::Triangle3D& triangle )
+    {
+        const auto normal_result = triangle.new_normal();
+        if( !normal_result )
+        {
+            return { geode::Position::parallel, geode::Position::parallel };
+        }
+        const auto normal = normal_result.value();
+        const geode::local_index_t axis_to_remove = largest_axis( normal );
+        const std::array< geode::local_index_t, 2 > projection_axis{
+            axis_to_remove == 0 ? 1 : 0, axis_to_remove == 2 ? 1 : 2
+        };
+        const geode::Point2D segment_proj_p0{
+            { segment.vertices()[0].get().value( projection_axis[0] ),
+                segment.vertices()[0].get().value( projection_axis[1] ) }
+        };
+        const geode::Point2D segment_proj_p1{
+            { segment.vertices()[1].get().value( projection_axis[0] ),
+                segment.vertices()[1].get().value( projection_axis[1] ) }
+        };
+        const geode::Segment2D segment_projection{ segment_proj_p0,
+            segment_proj_p1 };
+        std::array< geode::Point2D, 3 > triangle_points_projection;
+        for( const auto triangle_pt : geode::LRange{ 3 } )
+        {
+            triangle_points_projection[triangle_pt] = {
+                { triangle.vertices()[triangle_pt].get().value(
+                      projection_axis[0] ),
+                    triangle.vertices()[triangle_pt].get().value(
+                        projection_axis[1] ) }
+            };
+        }
+        for( const auto edge_v0 : geode::LRange{ 3 } )
+        {
+            const auto seg_edge_inter =
+                geode::segment_segment_intersection_detection(
+                    segment_projection,
+                    { triangle_points_projection[edge_v0],
+                        triangle_points_projection[edge_v0 == 2
+                                                       ? 0
+                                                       : edge_v0 + 1] } );
+            if( seg_edge_inter.first != geode::Position::outside
+                && seg_edge_inter.first != geode::Position::parallel )
+            {
+                return { geode::Position::parallel, geode::Position::parallel };
+            }
+        }
+        const geode::Triangle2D triangle_projection{
+            triangle_points_projection[0], triangle_points_projection[1],
+            triangle_points_projection[2]
+        };
+        if( geode::point_triangle_position(
+                segment_proj_p0, triangle_projection )
+            != geode::Position::outside )
+        {
+            return { geode::Position::parallel, geode::Position::parallel };
+        }
+        return { geode::Position::outside, geode::Position::outside };
+    }
+} // namespace
 
 namespace geode
 {
@@ -228,7 +308,8 @@ namespace geode
         {
             if( side0 == Side::zero )
             {
-                return { Position::parallel, Position::parallel };
+                return segment_triangle_plane_intersection_detection(
+                    segment, triangle );
             }
             return { Position::outside, Position::outside };
         }
