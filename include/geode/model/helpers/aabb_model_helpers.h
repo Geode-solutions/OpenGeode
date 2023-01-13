@@ -24,6 +24,9 @@
 #pragma once
 
 #include <absl/container/fixed_array.h>
+#include <absl/container/flat_hash_map.h>
+
+#include <geode/basic/uuid.h>
 
 #include <geode/model/common.h>
 
@@ -33,7 +36,6 @@ namespace geode
     ALIAS_2D_AND_3D( AABBTree );
     class BRep;
     class Section;
-    struct uuid;
 } // namespace geode
 
 namespace geode
@@ -52,4 +54,36 @@ namespace geode
 
     std::tuple< AABBTree2D, absl::FixedArray< uuid > >
         opengeode_model_api create_surfaces_aabb_tree( const Section& model );
+
+    template < index_t dimension >
+    struct ModelMeshesAABBTree
+    {
+        ModelMeshesAABBTree( index_t nb_components )
+            : mesh_trees_( nb_components ), uuids_( nb_components )
+        {
+            mesh_tree_ids_.reserve( nb_components );
+        }
+
+        AABBTree< dimension > components_tree_;
+        absl::FixedArray< AABBTree< dimension > > mesh_trees_;
+        absl::FixedArray< uuid > uuids_;
+        absl::flat_hash_map< uuid, index_t > mesh_tree_ids_;
+    };
+    ALIAS_2D_AND_3D( ModelMeshesAABBTree );
+
+    ModelMeshesAABBTree3D opengeode_model_api create_line_meshes_aabb_trees(
+        const BRep& model );
+
+    ModelMeshesAABBTree3D opengeode_model_api create_surface_meshes_aabb_trees(
+        const BRep& model );
+
+    ModelMeshesAABBTree3D opengeode_model_api create_block_meshes_aabb_trees(
+        const BRep& model );
+
+    ModelMeshesAABBTree2D opengeode_model_api create_line_meshes_aabb_trees(
+        const Section& model );
+
+    ModelMeshesAABBTree2D opengeode_model_api create_surface_meshes_aabb_trees(
+        const Section& model );
+
 } // namespace geode
