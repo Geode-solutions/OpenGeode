@@ -27,7 +27,7 @@ if sys.version_info >= (3, 8, 0) and platform.system() == "Windows":
         os.add_dll_directory(path)
 import math
 
-import opengeode_py_basic as geode
+import opengeode_py_basic as basic
 import opengeode_py_geometry as geom
 import opengeode_py_mesh as mesh
 
@@ -35,7 +35,7 @@ import opengeode_py_mesh as mesh
 def test_distance_transform_2D(cell_length):
     grid = mesh.RegularGrid2D.create()
     builder = mesh.RegularGridBuilder2D.create(grid)
-    builder.initialize_grid(geom.Point2D([ 0, 0]), [
+    builder.initialize_cartesian_grid(geom.Point2D([ 0, 0]), [
                             10,10], cell_length)
     objects_raster = [[0,0],[9,9]]
     map_distance = mesh.euclidean_distance_transform2D(grid,objects_raster,"test_edt")
@@ -78,13 +78,13 @@ def test_distance_transform_2D(cell_length):
         ([1, 8 ], cell_length * math.sqrt( 65 ))
         ]
     for value in values:
-        if math.fabs(map_distance.value(grid.cell_index(value[0])) - value[1] > 0.0001):
+        if math.fabs(map_distance.value(grid.cell_index(value[0])) - value[1] > basic.global_epsilon):
             raise ValueError("[Test] Wrong 2D euclidean distance map" )
 
 def test_distance_transform_3D(cell_length):
     grid = mesh.RegularGrid3D.create()
     builder = mesh.RegularGridBuilder3D.create(grid)
-    builder.initialize_grid(geom.Point3D([ 0, 0,0]), [
+    builder.initialize_cartesian_grid(geom.Point3D([ 0, 0,0]), [
                             10,10,10], cell_length)
     objects_raster = [[0,0,0],[9,9,9]]
     map_distance = mesh.euclidean_distance_transform3D(grid,objects_raster,"test_edt")
@@ -108,7 +108,7 @@ def test_distance_transform_3D(cell_length):
         ]
 
     for value in values:
-        if math.fabs(map_distance.value(grid.cell_index(value[0])) - value[1]) > 0.0001:
+        if math.fabs(map_distance.value(grid.cell_index(value[0])) - value[1]) > basic.global_epsilon:
             raise ValueError("[Test] Wrong 3D euclidean distance map" )
 
 if __name__ == '__main__':

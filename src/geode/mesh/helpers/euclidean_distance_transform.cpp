@@ -42,14 +42,20 @@ namespace geode
         EuclideanDistanceTransform( const RegularGrid< dimension >& grid,
             absl::Span< const GridCellIndices< dimension > > grid_cell_id,
             absl::string_view distance_map_name )
-            : grid_{ grid }
+            : grid_{ grid },
+              squared_cell_length_{ 0. },
+              distance_map_{ nullptr }
         {
+            for( const auto d : dimension )
+            {
+                squared_cell_length_[d] = grid_.cell_length_in_direction( d )
+                                          * grid_.cell_length_in_direction( d );
+            }
             distance_map_ =
                 grid_.cell_attribute_manager()
                     .template find_or_create_attribute< VariableAttribute,
                         double >( distance_map_name,
                         std::numeric_limits< double >::max() );
-
             for( const auto& cell_id : grid_cell_id )
             {
                 distance_map_->set_value( grid_.cell_index( cell_id ), 0. );
@@ -61,9 +67,7 @@ namespace geode
             return distance_map_;
         }
 
-        void compute_distance_map();
-        void directional_squared_distance( const index_t direction );
-        void combine_squared_distance_components( const index_t direction );
+        void compute_squared_distance_map();
 
         void squared_root_filter()
         {
@@ -78,20 +82,21 @@ namespace geode
         }
 
     private:
+        void directional_squared_distance( const index_t direction );
+
+        void combine_squared_distance_components( const index_t direction );
+
         double directional_step_squared_distance( const Index& from_index,
             const Index& to_index,
             const index_t direction,
             const double last_step_squared_distance )
         {
-            const auto squared_cell_length =
-                grid_.cell_length_in_direction( direction )
-                * grid_.cell_length_in_direction( direction );
             const auto old_distance =
                 distance_map_->value( grid_.cell_index( from_index ) );
             const auto step_squared_distance =
-                old_distance == 0
-                    ? squared_cell_length
-                    : last_step_squared_distance + 2 * squared_cell_length;
+                old_distance == 0 ? squared_cell_length_[direction]
+                                  : last_step_squared_distance
+                                        + 2 * squared_cell_length_[direction];
             const auto new_distance = old_distance + step_squared_distance;
             distance_map_->modify_value(
                 grid_.cell_index( to_index ), [new_distance]( double& value ) {
@@ -104,14 +109,16 @@ namespace geode
             const index_t to,
             const index_t direction ) const
         {
-            return std::pow(
-                ( static_cast< double >( from ) - static_cast< double >( to ) )
-                    * grid_.cell_length_in_direction( direction ),
-                2 );
+            return ( static_cast< double >( from )
+                       - static_cast< double >( to ) )
+                   * ( static_cast< double >( from )
+                       - static_cast< double >( to ) )
+                   * squared_cell_length_( direction );
         }
 
     private:
         const RegularGrid< dimension >& grid_;
+        const std::array< double, dimension > cell_length_;
         std::shared_ptr< VariableAttribute< double > > distance_map_;
     };
     template <>
@@ -351,7 +358,7 @@ namespace geode
         }
     }
     template <>
-    void EuclideanDistanceTransform< 2 >::compute_distance_map()
+    void EuclideanDistanceTransform< 2 >::compute_squared_distance_map()
     {
         ProgressLogger logger{ "Compute euclidian distance", 2 };
         directional_squared_distance( 0 );
@@ -359,7 +366,7 @@ namespace geode
         logger.increment();
     }
     template <>
-    void EuclideanDistanceTransform< 3 >::compute_distance_map()
+    void EuclideanDistanceTransform< 3 >::compute_squared_distance_map()
     {
         ProgressLogger logger{ "Compute euclidian distance", 3 };
         directional_squared_distance( 0 );
@@ -376,7 +383,7 @@ namespace geode
     {
         EuclideanDistanceTransform< dimension > edt{ grid, grid_cell_ids,
             distance_map_name };
-        edt.compute_distance_map();
+        edt.compute_squared_distance_map();
         edt.squared_root_filter();
         return edt.distance_map();
     }
