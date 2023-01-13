@@ -24,7 +24,9 @@
 #pragma once
 
 #include <absl/types/span.h>
+
 #include <geode/basic/attribute.h>
+
 #include <geode/mesh/common.h>
 #include <geode/mesh/core/grid.h>
 
