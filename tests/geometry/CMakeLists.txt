@@ -19,6 +19,12 @@
 # SOFTWARE.
 
 add_geode_test(
+    SOURCE "test-triangle.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+)
+add_geode_test(
     SOURCE "test-aabb.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
