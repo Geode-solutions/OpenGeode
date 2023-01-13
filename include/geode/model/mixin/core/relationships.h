@@ -52,7 +52,7 @@ namespace geode
 
     public:
         /*!
-         * Range to iterates on all relations of one component
+         * Range to iterate on all relations of one component
          */
         class opengeode_model_api RelationRangeIterator
         {
@@ -85,7 +85,7 @@ namespace geode
         };
 
         /*!
-         * Range to iterates on all boundaries of one component
+         * Range to iterate on all boundaries of one component
          */
         class opengeode_model_api BoundaryRangeIterator
         {
@@ -118,7 +118,7 @@ namespace geode
         };
 
         /*!
-         * Range to iterates on all incidences of one component
+         * Range to iterate on all incidences of one component
          */
         class opengeode_model_api IncidenceRangeIterator
         {
@@ -151,7 +151,7 @@ namespace geode
         };
 
         /*!
-         * Range to iterates on all internal components of one component
+         * Range to iterate on all internal components of one component
          */
         class opengeode_model_api InternalRangeIterator
         {
@@ -184,7 +184,7 @@ namespace geode
         };
 
         /*!
-         * Range to iterates on all embeddings of one component
+         * Range to iterate on all embeddings of one component
          */
         class opengeode_model_api EmbeddingRangeIterator
         {
@@ -217,7 +217,7 @@ namespace geode
         };
 
         /*!
-         * Range to iterates on all items of one component
+         * Range to iterate on all items of one component
          */
         class opengeode_model_api ItemRangeIterator
         {
@@ -249,7 +249,7 @@ namespace geode
         };
 
         /*!
-         * Range to iterates on all collections of one component
+         * Range to iterate on all collections of one component
          */
         class opengeode_model_api CollectionRangeIterator
         {
