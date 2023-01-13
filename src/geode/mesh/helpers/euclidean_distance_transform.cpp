@@ -133,7 +133,7 @@ namespace geode
                     GridCellIndices2D index;
                     index[d] = c;
                     index[d2] = c2;
-                    GridCellIndices2D prev_index = index;
+                    auto prev_index = index;
                     prev_index[d] = c - 1;
                     step_squared_distance = directional_step_squared_distance(
                         prev_index, index, d, step_squared_distance );
