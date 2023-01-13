@@ -46,7 +46,7 @@ namespace geode
               squared_cell_length_{ 0. },
               distance_map_{ nullptr }
         {
-            for( const auto d : dimension )
+            for( const auto d : Range( dimension ) )
             {
                 squared_cell_length_[d] = grid_.cell_length_in_direction( d )
                                           * grid_.cell_length_in_direction( d );
@@ -113,12 +113,12 @@ namespace geode
                        - static_cast< double >( to ) )
                    * ( static_cast< double >( from )
                        - static_cast< double >( to ) )
-                   * squared_cell_length_( direction );
+                   * squared_cell_length_[direction];
         }
 
     private:
         const RegularGrid< dimension >& grid_;
-        const std::array< double, dimension > cell_length_;
+        std::array< double, dimension > squared_cell_length_;
         std::shared_ptr< VariableAttribute< double > > distance_map_;
     };
 
@@ -361,7 +361,7 @@ namespace geode
     template <>
     void EuclideanDistanceTransform< 2 >::compute_squared_distance_map()
     {
-        ProgressLogger logger{ "Compute euclidian distance", 2 };
+        ProgressLogger logger{ "Compute euclidian distance", 1 };
         directional_squared_distance( 0 );
         combine_squared_distance_components( 1 );
         logger.increment();
@@ -369,7 +369,7 @@ namespace geode
     template <>
     void EuclideanDistanceTransform< 3 >::compute_squared_distance_map()
     {
-        ProgressLogger logger{ "Compute euclidian distance", 3 };
+        ProgressLogger logger{ "Compute euclidian distance", 1 };
         directional_squared_distance( 0 );
         combine_squared_distance_components( 1 );
         combine_squared_distance_components( 2 );
