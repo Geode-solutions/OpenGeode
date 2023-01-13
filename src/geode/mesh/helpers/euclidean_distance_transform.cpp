@@ -114,6 +114,7 @@ namespace geode
         const RegularGrid< dimension >& grid_;
         std::shared_ptr< VariableAttribute< double > > distance_map_;
     };
+
     template <>
     void EuclideanDistanceTransform< 2 >::directional_squared_distance(
         const index_t d )
