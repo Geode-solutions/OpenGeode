@@ -42,9 +42,7 @@ namespace geode
         EuclideanDistanceTransform( const RegularGrid< dimension >& grid,
             absl::Span< const GridCellIndices< dimension > > grid_cell_id,
             absl::string_view distance_map_name )
-            : grid_{ grid },
-              squared_cell_length_{ 0. },
-              distance_map_{ nullptr }
+            : grid_{ grid }, squared_cell_length_{}, distance_map_{ nullptr }
         {
             for( const auto d : Range( dimension ) )
             {
@@ -82,11 +80,10 @@ namespace geode
         }
 
     private:
-        void directional_squared_distance( const index_t direction );
+        void propagate_directional_squared_distance( const index_t direction );
 
-        void combine_squared_distance_components( const index_t direction );
-
-        double directional_step_squared_distance( const Index& from_index,
+        double propagate_directional_step_squared_distance(
+            const Index& from_index,
             const Index& to_index,
             const index_t direction,
             const double last_step_squared_distance )
@@ -105,7 +102,9 @@ namespace geode
             return step_squared_distance;
         }
 
-        double directional_step_squared_distance( const index_t from,
+        void combine_squared_distance_components( const index_t direction );
+
+        double directional_squared_distance( const index_t from,
             const index_t to,
             const index_t direction ) const
         {
@@ -123,8 +122,9 @@ namespace geode
     };
 
     template <>
-    void EuclideanDistanceTransform< 2 >::directional_squared_distance(
-        const index_t d )
+    void
+        EuclideanDistanceTransform< 2 >::propagate_directional_squared_distance(
+            const index_t d )
     {
         const auto d2 = d == 1 ? 0 : 1;
         absl::FixedArray< async::task< void > > tasks(
@@ -142,8 +142,9 @@ namespace geode
                     index[d2] = c2;
                     auto prev_index = index;
                     prev_index[d] = c - 1;
-                    step_squared_distance = directional_step_squared_distance(
-                        prev_index, index, d, step_squared_distance );
+                    step_squared_distance =
+                        propagate_directional_step_squared_distance(
+                            prev_index, index, d, step_squared_distance );
                 }
                 step_squared_distance = 0.;
                 for( const auto c :
@@ -154,8 +155,9 @@ namespace geode
                     index[d2] = c2;
                     auto prev_index = index;
                     prev_index[d] = c + 1;
-                    step_squared_distance = directional_step_squared_distance(
-                        prev_index, index, d, step_squared_distance );
+                    step_squared_distance =
+                        propagate_directional_step_squared_distance(
+                            prev_index, index, d, step_squared_distance );
                 }
             } );
         }
@@ -165,8 +167,9 @@ namespace geode
         }
     }
     template <>
-    void EuclideanDistanceTransform< 3 >::directional_squared_distance(
-        const index_t d )
+    void
+        EuclideanDistanceTransform< 3 >::propagate_directional_squared_distance(
+            const index_t d )
     {
         const auto d2 = d == 2 ? 0 : d + 1;
         const auto d3 = d2 == 2 ? 0 : d2 + 1;
@@ -190,7 +193,7 @@ namespace geode
                         Index prev_index = index;
                         prev_index[d] = c - 1;
                         step_squared_distance =
-                            directional_step_squared_distance(
+                            propagate_directional_step_squared_distance(
                                 prev_index, index, d, step_squared_distance );
                     }
                     step_squared_distance = 0;
@@ -204,7 +207,7 @@ namespace geode
                         Index prev_index = index;
                         prev_index[d] = c + 1;
                         step_squared_distance =
-                            directional_step_squared_distance(
+                            propagate_directional_step_squared_distance(
                                 prev_index, index, d, step_squared_distance );
                     }
                 } );
@@ -237,7 +240,7 @@ namespace geode
                         Range{ c, grid_.nb_cells_in_direction( d ) } )
                     {
                         const auto step_squared_distance =
-                            directional_step_squared_distance( c, cf, d );
+                            directional_squared_distance( c, cf, d );
                         if( min_dist < step_squared_distance )
                         {
                             break;
@@ -252,7 +255,7 @@ namespace geode
                     for( const auto cb : ReverseRange{ c, 0 } )
                     {
                         const auto step_squared_distance =
-                            directional_step_squared_distance( c, cb, d );
+                            directional_squared_distance( c, cb, d );
                         if( min_dist < step_squared_distance )
                         {
                             break;
@@ -307,7 +310,7 @@ namespace geode
                             Range{ c, grid_.nb_cells_in_direction( d ) } )
                         {
                             const auto step_squared_distance =
-                                directional_step_squared_distance( c, cf, d );
+                                directional_squared_distance( c, cf, d );
                             if( min_dist < step_squared_distance )
                             {
                                 break;
@@ -324,7 +327,7 @@ namespace geode
                         for( const auto cb : ReverseRange{ c, 0 } )
                         {
                             const auto step_squared_distance =
-                                directional_step_squared_distance( c, cb, d );
+                                directional_squared_distance( c, cb, d );
                             if( min_dist < step_squared_distance )
                             {
                                 break;
@@ -361,17 +364,20 @@ namespace geode
     template <>
     void EuclideanDistanceTransform< 2 >::compute_squared_distance_map()
     {
-        ProgressLogger logger{ "Compute euclidian distance", 1 };
-        directional_squared_distance( 0 );
+        ProgressLogger logger{ "Compute 2D euclidian distance", 2 };
+        propagate_directional_squared_distance( 0 );
+        logger.increment();
         combine_squared_distance_components( 1 );
         logger.increment();
     }
     template <>
     void EuclideanDistanceTransform< 3 >::compute_squared_distance_map()
     {
-        ProgressLogger logger{ "Compute euclidian distance", 1 };
-        directional_squared_distance( 0 );
+        ProgressLogger logger{ "Compute 3D euclidian distance", 3 };
+        propagate_directional_squared_distance( 0 );
+        logger.increment();
         combine_squared_distance_components( 1 );
+        logger.increment();
         combine_squared_distance_components( 2 );
         logger.increment();
     }
