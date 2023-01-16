@@ -40,7 +40,7 @@ namespace geode
 
     public:
         EuclideanDistanceTransform( const RegularGrid< dimension >& grid,
-            absl::Span< const GridCellIndices< dimension > > grid_cell_id,
+            absl::Span< const Index > grid_cell_id,
             absl::string_view distance_map_name )
             : grid_{ grid },
               squared_cell_length_{},
@@ -51,7 +51,7 @@ namespace geode
                           std::numeric_limits< double >::max() )
               }
         {
-            for( const auto d : Range( dimension ) )
+            for( const auto d : LRange( dimension ) )
             {
                 squared_cell_length_[d] = grid_.cell_length_in_direction( d )
                                           * grid_.cell_length_in_direction( d );
@@ -138,7 +138,7 @@ namespace geode
                 for( const auto c :
                     Range{ 1, grid_.nb_cells_in_direction( d ) } )
                 {
-                    GridCellIndices2D index;
+                    Index index;
                     index[d] = c;
                     index[d2] = c2;
                     auto prev_index = index;
@@ -151,7 +151,7 @@ namespace geode
                 for( const auto c :
                     ReverseRange{ grid_.nb_cells_in_direction( d ) - 1 } )
                 {
-                    GridCellIndices2D index;
+                    Index index;
                     index[d] = c;
                     index[d2] = c2;
                     auto prev_index = index;
@@ -191,7 +191,7 @@ namespace geode
                         index[d] = c;
                         index[d2] = c2;
                         index[d3] = c3;
-                        Index prev_index = index;
+                        auto prev_index = index;
                         prev_index[d] = c - 1;
                         step_squared_distance =
                             propagate_directional_step_squared_distance(
@@ -205,7 +205,7 @@ namespace geode
                         index[d] = c;
                         index[d2] = c2;
                         index[d3] = c3;
-                        Index prev_index = index;
+                        auto prev_index = index;
                         prev_index[d] = c + 1;
                         step_squared_distance =
                             propagate_directional_step_squared_distance(
@@ -246,7 +246,7 @@ namespace geode
                         {
                             break;
                         }
-                        GridCellIndices2D index;
+                        Index index;
                         index[d] = cf;
                         index[d2] = c2;
                         min_dist = std::min( min_dist,
@@ -261,7 +261,7 @@ namespace geode
                         {
                             break;
                         }
-                        GridCellIndices2D index;
+                        Index index;
                         index[d] = cb;
                         index[d2] = c2;
                         min_dist = std::min( min_dist,
@@ -273,7 +273,7 @@ namespace geode
                 for( const auto c :
                     Range{ 0, grid_.nb_cells_in_direction( d ) } )
                 {
-                    GridCellIndices2D index;
+                    Index index;
                     index[d] = c;
                     index[d2] = c2;
                     distance_map_->set_value(
@@ -316,7 +316,7 @@ namespace geode
                             {
                                 break;
                             }
-                            GridCellIndices3D index;
+                            Index index;
                             index[d] = cf;
                             index[d2] = c2;
                             index[d3] = c3;
@@ -333,7 +333,7 @@ namespace geode
                             {
                                 break;
                             }
-                            GridCellIndices3D index;
+                            Index index;
                             index[d] = cb;
                             index[d2] = c2;
                             index[d3] = c3;
@@ -347,7 +347,7 @@ namespace geode
                     for( const auto c :
                         Range{ 0, grid_.nb_cells_in_direction( d ) } )
                     {
-                        GridCellIndices3D index;
+                        Index index;
                         index[d] = c;
                         index[d2] = c2;
                         index[d3] = c3;
