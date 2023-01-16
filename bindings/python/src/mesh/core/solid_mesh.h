@@ -21,6 +21,7 @@
  *
  */
 
+#include <geode/mesh/core/hybrid_solid.h>
 #include <geode/mesh/core/polyhedral_solid.h>
 #include <geode/mesh/core/solid_edges.h>
 #include <geode/mesh/core/solid_facets.h>
@@ -121,11 +122,15 @@
                 return solid.type_name()                                       \
                        == TetrahedralSolid< dimension >::type_name_static();   \
             } )                                                                \
-        .def(                                                                  \
-            "is_polyhedral_type", []( const SolidMesh< dimension >& solid ) {  \
+        .def( "is_polyhedral_type",                                            \
+            []( const SolidMesh< dimension >& solid ) {                        \
                 return solid.type_name()                                       \
                        == PolyhedralSolid< dimension >::type_name_static();    \
-            } )
+            } )                                                                \
+        .def( "is_hybrid_type", []( const SolidMesh< dimension >& solid ) {    \
+            return solid.type_name()                                           \
+                   == HybridSolid< dimension >::type_name_static();            \
+        } )
 
 namespace geode
 {
