@@ -42,10 +42,10 @@ namespace geode
         EuclideanDistanceTransform( const RegularGrid< dimension >& grid,
             absl::Span< const GridCellIndices< dimension > > grid_cell_id,
             absl::string_view distance_map_name )
-            : grid_{ grid }, squared_cell_length_{}, distance_map_{ grid_.cell_attribute_manager()
+            : grid_{ grid }, squared_cell_length_{}, distance_map_{ grid.cell_attribute_manager()
                     .template find_or_create_attribute< VariableAttribute,
                         double >( distance_map_name,
-                        std::numeric_limits< double >::max() }
+                        std::numeric_limits< double >::max() ) }
         {
             for( const auto d : Range( dimension ) )
             {
@@ -106,10 +106,9 @@ namespace geode
             const index_t to,
             const index_t direction ) const
         {
-            return ( static_cast< double >( from )
-                       - static_cast< double >( to ) )
-                   * ( static_cast< double >( from )
-                       - static_cast< double >( to ) )
+            const auto directional_distance =
+                static_cast< double >( from ) - static_cast< double >( to );
+            return directional_distance * directional_distance
                    * squared_cell_length_[direction];
         }
 
