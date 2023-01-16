@@ -38,6 +38,11 @@
                 const Point##dimension##D&, std::array< index_t, dimension >,  \
                 std::array< double, dimension > ) )                            \
                 & RegularGridBuilder##dimension##D::initialize_grid )          \
+        .def( "initialize_cartesian_grid",                                     \
+            ( void( RegularGridBuilder##dimension##D::* )(                     \
+                const Point##dimension##D&, std::array< index_t, dimension >,  \
+                double ) )                                                     \
+                & RegularGridBuilder##dimension##D::initialize_grid )          \
         .def( "update_origin",                                                 \
             &RegularGridBuilder##dimension##D::update_origin )
 
