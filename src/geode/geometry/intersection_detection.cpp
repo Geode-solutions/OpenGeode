@@ -34,18 +34,32 @@
 
 namespace
 {
-    geode::local_index_t largest_axis( const geode::Vector3D& normal )
+    static constexpr std::array< geode::Position, 4 > vertex_id_to_position{
+        geode::Position::vertex0, geode::Position::vertex1,
+        geode::Position::vertex2, geode::Position::vertex0
+    };
+
+    std::array< geode::local_index_t, 2 > best_projection_axis(
+        const geode::Vector3D& normal )
     {
-        geode::local_index_t axis_to_remove{ 2 };
+        geode::local_index_t largest_axis{ 2 };
         for( const auto other_axis : geode::LRange{ 2 } )
         {
             if( std::fabs( normal.value( other_axis ) )
                 > std::fabs( normal.value( 2 ) ) )
             {
-                axis_to_remove = other_axis;
+                largest_axis = other_axis;
             }
         }
-        return axis_to_remove;
+        if( largest_axis == 0 )
+        {
+            return { 1, 2 };
+        }
+        if( largest_axis == 1 )
+        {
+            return { 2, 0 };
+        }
+        return { 0, 1 };
     }
 
     geode::SegmentTriangleIntersection
@@ -58,10 +72,7 @@ namespace
             return { geode::Position::parallel, geode::Position::parallel };
         }
         const auto normal = normal_result.value();
-        const geode::local_index_t axis_to_remove = largest_axis( normal );
-        const std::array< geode::local_index_t, 2 > projection_axis{
-            axis_to_remove == 0 ? 1 : 0, axis_to_remove == 2 ? 1 : 2
-        };
+        const auto projection_axis = best_projection_axis( normal );
         const geode::Point2D segment_proj_p0{
             { segment.vertices()[0].get().value( projection_axis[0] ),
                 segment.vertices()[0].get().value( projection_axis[1] ) }
@@ -82,6 +93,8 @@ namespace
                         projection_axis[1] ) }
             };
         }
+        geode::SegmentTriangleIntersection result{ geode::Position::outside,
+            geode::Position::outside };
         for( const auto edge_v0 : geode::LRange{ 3 } )
         {
             const auto seg_edge_inter =
@@ -91,11 +104,25 @@ namespace
                         triangle_points_projection[edge_v0 == 2
                                                        ? 0
                                                        : edge_v0 + 1] } );
-            if( seg_edge_inter.first != geode::Position::outside
-                && seg_edge_inter.first != geode::Position::parallel )
+            if( seg_edge_inter.first == geode::Position::outside
+                || seg_edge_inter.first == geode::Position::parallel )
             {
-                return { geode::Position::parallel, geode::Position::parallel };
+                continue;
             }
+            if( ( seg_edge_inter.first == geode::Position::vertex0
+                    || seg_edge_inter.first == geode::Position::vertex1 )
+                && ( seg_edge_inter.second == geode::Position::vertex0
+                     || seg_edge_inter.second == geode::Position::vertex1 ) )
+            {
+                result.first = seg_edge_inter.first;
+                result.second =
+                    vertex_id_to_position[seg_edge_inter.second
+                                                  == geode::Position::vertex0
+                                              ? edge_v0
+                                              : edge_v0 + 1];
+                continue;
+            }
+            return { geode::Position::parallel, geode::Position::parallel };
         }
         const geode::Triangle2D triangle_projection{
             triangle_points_projection[0], triangle_points_projection[1],
@@ -103,11 +130,14 @@ namespace
         };
         if( geode::point_triangle_position(
                 segment_proj_p0, triangle_projection )
-            != geode::Position::outside )
+                != geode::Position::outside
+            && geode::point_triangle_position(
+                   segment_proj_p1, triangle_projection )
+                   != geode::Position::outside )
         {
             return { geode::Position::parallel, geode::Position::parallel };
         }
-        return { geode::Position::outside, geode::Position::outside };
+        return result;
     }
 } // namespace
 
