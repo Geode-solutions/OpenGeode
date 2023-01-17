@@ -224,7 +224,7 @@ def test_segment_triangle_intersection_detection():
 
     result = geometry.segment_triangle_intersection_detection3D(
         segment_da, triangle)
-    if result != (geometry.Position.parallel, geometry.Position.parallel):
+    if result != (geometry.Position.vertex1, geometry.Position.vertex0):
         raise ValueError(
             "[Test] Wrong result for segment_triangle_intersection_detection3D with query segment_da")
 
