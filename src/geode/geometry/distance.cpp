@@ -88,6 +88,40 @@ namespace
     }
 
     template < geode::index_t dimension >
+    double compute_gradient( const geode::Point< dimension >& point,
+        double distance,
+        const geode::Vector< dimension >& direction,
+        double step,
+        const geode::Segment< dimension >& segment )
+    {
+        for( const auto j : geode::LRange{ 5 } )
+        {
+            geode_unused( j );
+            DEBUG( j );
+            const auto plus = point + direction * step;
+            const auto plus_distance =
+                geode::new_point_segment_distance( plus, segment );
+            const auto plus_diff = plus_distance - distance;
+            const auto minus = point - direction * step;
+            const auto minus_distance =
+                geode::new_point_segment_distance( minus, segment );
+            const auto minus_diff = minus_distance - distance;
+            DEBUG( plus_diff / step );
+            DEBUG( minus_diff / step );
+            if( plus_diff < 0 )
+            {
+                return step;
+            }
+            if( minus_diff < 0 )
+            {
+                return -step;
+            }
+            step /= 2;
+        }
+        return 0;
+    }
+
+    template < geode::index_t dimension >
     std::tuple< geode::Point< dimension >, double >
         optimize_point_segment_distance(
             const geode::Segment< dimension >& segment,
@@ -95,24 +129,34 @@ namespace
             double start_distance,
             const geode::Segment< dimension >& other_segment )
     {
+        const auto step = segment.length() * 0.1;
+        DEBUG( step );
         auto distance = start_distance;
         auto point = start;
+        const auto direction = segment.normalized_direction();
         auto length =
             geode::point_point_distance( segment.vertices()[0].get(), start );
-        const auto direction = segment.normalized_direction();
         for( const auto i : geode::LRange{ 5 } )
         {
             geode_unused( i );
-            const auto next = start + direction;
-            const auto next_distance =
-                new_point_segment_distance( next, other_segment );
-            const auto gradient = next_distance - start_distance;
-            const auto next_length =
-                ( geode::global_epsilon + gradient * length ) / gradient;
-            auto new_point =
-                segment.vertices()[0].get() + direction * next_length;
+            DEBUG( i );
+            const auto gradient = compute_gradient(
+                point, distance, direction, step, other_segment );
+            DEBUG( gradient );
+            if( gradient == 0 )
+            {
+                break;
+            }
+            DEBUG( length );
+            length += gradient;
+            DEBUG( length );
+            length = std::max( 0., std::min( length, segment.length() ) );
+            DEBUG( length );
+            auto new_point = segment.vertices()[0].get() + direction * length;
             const auto new_distance =
                 new_point_segment_distance( new_point, other_segment );
+            DEBUG( new_distance );
+            DEBUG( std::fabs( new_distance - distance ) );
             if( std::fabs( new_distance - distance ) < geode::global_epsilon )
             {
                 return std::make_tuple( new_point, new_distance );
@@ -206,7 +250,7 @@ namespace geode
         DEBUG( det );
         double s, t, nd, bmd, bte, ctd, bpe, ate, btd;
 
-        if( det > global_epsilon )
+        if( det > 0 )
         {
             bte = b * e;
             ctd = c * d;
@@ -472,14 +516,19 @@ namespace geode
         DEBUG( distance - distance_to_closest1 );
         const auto optim0 = optimize_point_segment_distance(
             segment0, closest_on_segment0, distance_to_closest0, segment1 );
-        DEBUG( std::get< 1 >( optim0 ) );
         const auto optim1 = optimize_point_segment_distance(
             segment1, closest_on_segment1, distance_to_closest1, segment0 );
+        DEBUG( std::get< 1 >( optim0 ) );
         DEBUG( std::get< 1 >( optim1 ) );
         const auto optim_dist = geode::point_point_distance(
             std::get< 0 >( optim0 ), std::get< 0 >( optim1 ) );
+        DEBUG( optim_dist );
         DEBUG( optim_dist - std::get< 1 >( optim0 ) );
         DEBUG( optim_dist - std::get< 1 >( optim1 ) );
+        DEBUG( geode::new_point_segment_distance(
+            std::get< 0 >( optim0 ), segment1 ) );
+        DEBUG( geode::new_point_segment_distance(
+            std::get< 0 >( optim1 ), segment0 ) );
         OPENGEODE_EXCEPTION(
             distance_to_closest0 >= distance - global_epsilon
                 && distance_to_closest1 >= distance - global_epsilon,
