@@ -86,6 +86,42 @@ namespace
                            * ( p - segment_length );
         return 2 * std::sqrt( area2 ) / segment_length;
     }
+
+    template < geode::index_t dimension >
+    std::tuple< geode::Point< dimension >, double >
+        optimize_point_segment_distance(
+            const geode::Segment< dimension >& segment,
+            const geode::Point< dimension >& start,
+            double start_distance,
+            const geode::Segment< dimension >& other_segment )
+    {
+        auto distance = start_distance;
+        auto point = start;
+        auto length =
+            geode::point_point_distance( segment.vertices()[0].get(), start );
+        const auto direction = segment.normalized_direction();
+        for( const auto i : geode::LRange{ 5 } )
+        {
+            geode_unused( i );
+            const auto next = start + direction;
+            const auto next_distance =
+                new_point_segment_distance( next, other_segment );
+            const auto gradient = next_distance - start_distance;
+            const auto next_length =
+                ( geode::global_epsilon + gradient * length ) / gradient;
+            auto new_point =
+                segment.vertices()[0].get() + direction * next_length;
+            const auto new_distance =
+                new_point_segment_distance( new_point, other_segment );
+            if( std::fabs( new_distance - distance ) < geode::global_epsilon )
+            {
+                return std::make_tuple( new_point, new_distance );
+            }
+            point = std::move( new_point );
+            distance = new_distance;
+        }
+        return std::make_tuple( point, distance );
+    }
 } // namespace
 
 namespace geode
@@ -434,6 +470,16 @@ namespace geode
         DEBUG( distance_to_closest1 );
         DEBUG( distance - distance_to_closest0 );
         DEBUG( distance - distance_to_closest1 );
+        const auto optim0 = optimize_point_segment_distance(
+            segment0, closest_on_segment0, distance_to_closest0, segment1 );
+        DEBUG( std::get< 1 >( optim0 ) );
+        const auto optim1 = optimize_point_segment_distance(
+            segment1, closest_on_segment1, distance_to_closest1, segment0 );
+        DEBUG( std::get< 1 >( optim1 ) );
+        const auto optim_dist = geode::point_point_distance(
+            std::get< 0 >( optim0 ), std::get< 0 >( optim1 ) );
+        DEBUG( optim_dist - std::get< 1 >( optim0 ) );
+        DEBUG( optim_dist - std::get< 1 >( optim1 ) );
         OPENGEODE_EXCEPTION(
             distance_to_closest0 >= distance - global_epsilon
                 && distance_to_closest1 >= distance - global_epsilon,
