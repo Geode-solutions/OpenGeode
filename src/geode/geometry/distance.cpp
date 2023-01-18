@@ -23,6 +23,8 @@
 
 #include <geode/geometry/distance.h>
 
+#include <geode/basic/logger.h>
+
 #include <geode/geometry/basic_objects/circle.h>
 #include <geode/geometry/basic_objects/infinite_line.h>
 #include <geode/geometry/basic_objects/plane.h>
@@ -65,21 +67,23 @@ namespace
         double point_to_v0_length,
         double point_to_v1_length )
     {
-        if( std::fabs(
-                point_to_v0_length + point_to_v1_length - segment_length )
-            < geode::global_epsilon )
+        const auto p =
+            ( point_to_v0_length + point_to_v1_length + segment_length ) / 2;
+        if( p - point_to_v0_length <= geode::global_epsilon )
         {
             return 0;
         }
-        const auto p =
-            ( point_to_v0_length + point_to_v1_length + segment_length ) / 2;
+        if( p - point_to_v1_length <= geode::global_epsilon )
+        {
+            return 0;
+        }
+        if( p - segment_length <= geode::global_epsilon )
+        {
+            return 0;
+        }
         const auto area2 = p * ( p - point_to_v0_length )
                            * ( p - point_to_v1_length )
                            * ( p - segment_length );
-        if( area2 < 0 )
-        {
-            return 0;
-        }
         return 2 * std::sqrt( area2 ) / segment_length;
     }
 } // namespace
@@ -144,91 +148,301 @@ namespace geode
             const Segment< dimension >& segment1 )
     {
         /* Algorithm and code found on
-         * http://geomalgorithms.com/a07-_distance.html
+         * https://github.com/davideberly/GeometricTools/blob/master/GTE/Mathematics/DistSegmentSegment.h
          */
-        const auto& vertices0 = segment0.vertices();
-        const auto& vertices1 = segment1.vertices();
-        const Vector< dimension > u{ vertices0[0], vertices0[1] };
-        const Vector< dimension > v{ vertices1[0], vertices1[1] };
-        const Vector< dimension > w{ vertices1[0], vertices0[0] };
-        const auto a = u.dot( u ); // always >= 0
-        const auto b = u.dot( v );
-        const auto c = v.dot( v ); // always >= 0
-        const auto D = a * c - b * b;
-        auto sc = D;
-        auto sN = D;
-        auto sD = D; // sc = sN / sD, default sD = D >= 0
-        auto tc = D;
-        auto tN = D;
-        auto tD = D; // tc = tN / tD, default tD = D >= 0
-        const auto d = u.dot( w );
-        const auto e = v.dot( w );
+        DEBUG( segment0.length() );
+        DEBUG( segment1.length() );
+        const auto P1mP0 = segment0.direction();
+        const auto Q1mQ0 = segment1.direction();
+        const Vector< dimension > P0mQ0{ segment1.vertices()[0],
+            segment0.vertices()[0] };
+        const auto a = P1mP0.dot( P1mP0 );
+        const auto b = P1mP0.dot( Q1mQ0 );
+        const auto c = Q1mQ0.dot( Q1mQ0 );
+        const auto d = P1mP0.dot( P0mQ0 );
+        const auto e = Q1mQ0.dot( P0mQ0 );
+        const auto det = a * c - b * b;
+        DEBUG( a );
+        DEBUG( b );
+        DEBUG( c );
+        DEBUG( d );
+        DEBUG( e );
+        DEBUG( det );
+        double s, t, nd, bmd, bte, ctd, bpe, ate, btd;
 
-        // compute the line parameters of the two closest points
-        if( D <= 0.0 )
-        { // the lines are almost parallel
-            sN = 0.0; // force using point P0 on segment0
-            sD = 1.0; // to prevent possible division by 0.0 later
-            tN = e;
-            tD = c;
+        if( det > global_epsilon )
+        {
+            bte = b * e;
+            ctd = c * d;
+            if( bte <= ctd ) // s <= 0
+            {
+                s = 0;
+                if( e <= 0 ) // t <= 0
+                {
+                    // region 6
+                    DEBUG( "reg6" );
+                    t = 0;
+                    nd = -d;
+                    if( nd >= a )
+                    {
+                        s = 1;
+                    }
+                    else if( nd > 0 )
+                    {
+                        s = nd / a;
+                    }
+                    // else: s is already zero
+                }
+                else if( e < c ) // 0 < t < 1
+                {
+                    // region 5
+                    DEBUG( "reg5" );
+                    t = e / c;
+                }
+                else // t >= 1
+                {
+                    // region 4
+                    DEBUG( "reg4" );
+                    t = 1;
+                    bmd = b - d;
+                    if( bmd >= a )
+                    {
+                        s = 1;
+                    }
+                    else if( bmd > 0 )
+                    {
+                        s = bmd / a;
+                    }
+                    // else:  s is already zero
+                }
+            }
+            else // s > 0
+            {
+                s = bte - ctd;
+                if( s >= det ) // s >= 1
+                {
+                    // s = 1
+                    s = 1;
+                    bpe = b + e;
+                    if( bpe <= 0 ) // t <= 0
+                    {
+                        // region 8
+                        DEBUG( "reg8" );
+                        t = 0;
+                        nd = -d;
+                        if( nd <= 0 )
+                        {
+                            s = 0;
+                        }
+                        else if( nd < a )
+                        {
+                            s = nd / a;
+                        }
+                        // else: s is already one
+                    }
+                    else if( bpe < c ) // 0 < t < 1
+                    {
+                        // region 1
+                        DEBUG( "reg1" );
+                        t = bpe / c;
+                    }
+                    else // t >= 1
+                    {
+                        // region 2
+                        DEBUG( "reg2" );
+                        t = 1;
+                        bmd = b - d;
+                        if( bmd <= 0 )
+                        {
+                            s = 0;
+                        }
+                        else if( bmd < a )
+                        {
+                            s = bmd / a;
+                        }
+                        // else:  s is already one
+                    }
+                }
+                else // 0 < s < 1
+                {
+                    ate = a * e;
+                    btd = b * d;
+                    if( ate <= btd ) // t <= 0
+                    {
+                        // region 7
+                        DEBUG( "reg7" );
+                        t = 0;
+                        nd = -d;
+                        if( nd <= 0 )
+                        {
+                            s = 0;
+                        }
+                        else if( nd >= a )
+                        {
+                            s = 1;
+                        }
+                        else
+                        {
+                            s = nd / a;
+                        }
+                    }
+                    else // t > 0
+                    {
+                        t = ate - btd;
+                        if( t >= det ) // t >= 1
+                        {
+                            // region 3
+                            DEBUG( "reg3" );
+                            t = 1;
+                            bmd = b - d;
+                            if( bmd <= 0 )
+                            {
+                                s = 0;
+                            }
+                            else if( bmd >= a )
+                            {
+                                s = 1;
+                            }
+                            else
+                            {
+                                s = bmd / a;
+                            }
+                        }
+                        else // 0 < t < 1
+                        {
+                            // region 0
+                            DEBUG( "reg0" );
+                            DEBUG( s );
+                            DEBUG( t );
+                            DEBUG( det );
+                            s /= det;
+                            t /= det;
+                            DEBUG( s );
+                            DEBUG( t );
+                        }
+                    }
+                }
+            }
         }
         else
-        { // get the closest points on the infinite lines
-            sN = ( b * e - c * d );
-            tN = ( a * e - b * d );
-            if( sN < 0.0 )
-            { // sc < 0 => the s=0 edge is visible
-                sN = 0.0;
-                tN = e;
-                tD = c;
-            }
-            else if( sN > sD )
-            { // sc > 1  => the s=1 edge is visible
-                sN = sD;
-                tN = e + b;
-                tD = c;
-            }
-        }
+        {
+            // The segments are parallel. The quadratic factors to
+            //   R(s,t) = a*(s-(b/a)*t)^2 + 2*d*(s - (b/a)*t) + f
+            // where a*c = b^2, e = b*d/a, f = |P0-Q0|^2, and b is not
+            // zero. R is constant along lines of the form s-(b/a)*t = k
+            // and its occurs on the line a*s - b*t + d = 0. This line
+            // must intersect both the s-axis and the t-axis because 'a'
+            // and 'b' are not zero. Because of parallelism, the line is
+            // also represented by -b*s + c*t - e = 0.
+            //
+            // The code determines an edge of the domain [0,1]^2 that
+            // intersects the minimum line, or if none of the edges
+            // intersect, it determines the closest corner to the minimum
+            // line. The conditionals are designed to test first for
+            // intersection with the t-axis (s = 0) using
+            // -b*s + c*t - e = 0 and then with the s-axis (t = 0) using
+            // a*s - b*t + d = 0.
 
-        if( tN < 0.0 )
-        { // tc < 0 => the t=0 edge is visible
-            tN = 0.0;
-            // recompute sc for this edge
-            if( -d < 0.0 )
-                sN = 0.0;
-            else if( -d > a )
-                sN = sD;
-            else
+            // When s = 0, solve c*t - e = 0 (t = e/c).
+            if( e <= 0 ) // t <= 0
             {
-                sN = -d;
-                sD = a;
+                // Now solve a*s - b*t + d = 0 for t = 0 (s = -d/a).
+                t = 0;
+                nd = -d;
+                if( nd <= 0 ) // s <= 0
+                {
+                    // region 6
+                    s = 0;
+                }
+                else if( nd >= a ) // s >= 1
+                {
+                    // region 8
+                    s = 1;
+                }
+                else // 0 < s < 1
+                {
+                    // region 7
+                    s = nd / a;
+                }
             }
-        }
-        else if( tN > tD )
-        { // tc > 1  => the t=1 edge is visible
-            tN = tD;
-            // recompute sc for this edge
-            if( ( -d + b ) < 0.0 )
-                sN = 0;
-            else if( ( -d + b ) > a )
-                sN = sD;
-            else
+            else if( e >= c ) // t >= 1
             {
-                sN = ( -d + b );
-                sD = a;
+                // Now solve a*s - b*t + d = 0 for t = 1 (s = (b-d)/a).
+                t = 1;
+                bmd = b - d;
+                if( bmd <= 0 ) // s <= 0
+                {
+                    // region 4
+                    s = 0;
+                }
+                else if( bmd >= a ) // s >= 1
+                {
+                    // region 2
+                    s = 1;
+                }
+                else // 0 < s < 1
+                {
+                    // region 3
+                    s = bmd / a;
+                }
+            }
+            else // 0 < t < 1
+            {
+                // The point (0,e/c) is on the line and domain, so we have
+                // one point at which R is a minimum.
+                s = 0;
+                t = e / c;
+                DEBUG( e );
+                DEBUG( c );
             }
         }
-        // finally do the division to get sc and tc
-        sc = ( std::fabs( sN ) <= 0.0 ? 0.0 : sN / sD );
-        tc = ( std::fabs( tN ) <= 0.0 ? 0.0 : tN / tD );
 
-        // get the difference of the two closest points
-        const Point< dimension > closest0 = vertices0[0].get() + u * sc;
-        const Point< dimension > closest1 = vertices1[0].get() + v * tc;
-        const Vector< dimension > dP{ closest0,
-            closest1 }; // =  segment0(sc) - segment1(tc)
+        DEBUG( s );
+        DEBUG( t );
 
-        return std::make_tuple( dP.length(), closest0, closest1 );
+        const auto closest_on_segment0 =
+            segment0.vertices()[0].get() + P1mP0 * s;
+        const auto closest_on_segment1 =
+            segment1.vertices()[0].get() + Q1mQ0 * t;
+        SDEBUG( closest_on_segment0 );
+        SDEBUG( closest_on_segment1 );
+        const auto distance =
+            point_point_distance( closest_on_segment0, closest_on_segment1 );
+        if( distance < global_epsilon )
+        {
+            return std::make_tuple(
+                distance, closest_on_segment0, closest_on_segment1 );
+        }
+        const auto distance_to_closest0 =
+            new_point_segment_distance( closest_on_segment0, segment1 );
+        if( distance_to_closest0 < global_epsilon )
+        {
+            return std::make_tuple(
+                0, closest_on_segment0, closest_on_segment0 );
+        }
+        const auto distance_to_closest1 =
+            new_point_segment_distance( closest_on_segment1, segment0 );
+        DEBUG( std::get< 0 >(
+            point_segment_distance( closest_on_segment1, segment0 ) ) );
+        if( distance_to_closest1 < global_epsilon )
+        {
+            return std::make_tuple(
+                0, closest_on_segment1, closest_on_segment1 );
+        }
+        DEBUG( distance );
+        DEBUG( distance_to_closest0 );
+        DEBUG( distance_to_closest1 );
+        DEBUG( distance - distance_to_closest0 );
+        DEBUG( distance - distance_to_closest1 );
+        OPENGEODE_EXCEPTION(
+            distance_to_closest0 >= distance - global_epsilon
+                && distance_to_closest1 >= distance - global_epsilon,
+            "[segment_segment_distance] Divergence between the distance "
+            "between the closest points and the distance between one "
+            "closest point to the other segment. It may be symptomatic of "
+            "bad numerical computation." );
+        return std::make_tuple(
+            distance, closest_on_segment0, closest_on_segment1 );
     }
 
     template < index_t dimension >
@@ -236,41 +450,41 @@ namespace geode
         segment_segment_distance( const Segment< dimension >& segment0,
             const Segment< dimension >& segment1 )
     {
-        auto min_distance = std::numeric_limits< double >::max();
-        local_index_t min_p0{ 0 };
-        local_index_t min_p1{ 0 };
-        const auto& vertices0 = segment0.vertices();
-        const auto& vertices1 = segment1.vertices();
-        for( const auto p0 : LRange{ 2 } )
-        {
-            for( const auto p1 : LRange{ 2 } )
-            {
-                const auto cur_dist = point_point_distance(
-                    vertices0[p0].get(), vertices1[p1].get() );
-                if( cur_dist < min_distance )
-                {
-                    min_distance = cur_dist;
-                    min_p0 = p0;
-                    min_p1 = p1;
-                }
-            }
-        }
-        if( min_p0 == 1 )
-        {
-            if( min_p1 == 1 )
-            {
-                return compute_segment_segment_distance< dimension >(
-                    { vertices0[1], vertices0[0] },
-                    { vertices1[1], vertices1[0] } );
-            }
-            return compute_segment_segment_distance(
-                { vertices0[1], vertices0[0] }, segment1 );
-        }
-        if( min_p1 == 1 )
-        {
-            return compute_segment_segment_distance(
-                segment0, { vertices1[1], vertices1[0] } );
-        }
+        // auto min_distance = std::numeric_limits< double >::max();
+        // local_index_t min_p0{ 0 };
+        // local_index_t min_p1{ 0 };
+        // const auto& vertices0 = segment0.vertices();
+        // const auto& vertices1 = segment1.vertices();
+        // for( const auto p0 : LRange{ 2 } )
+        // {
+        //     for( const auto p1 : LRange{ 2 } )
+        //     {
+        //         const auto cur_dist = point_point_distance(
+        //             vertices0[p0].get(), vertices1[p1].get() );
+        //         if( cur_dist < min_distance )
+        //         {
+        //             min_distance = cur_dist;
+        //             min_p0 = p0;
+        //             min_p1 = p1;
+        //         }
+        //     }
+        // }
+        // if( min_p0 == 1 )
+        // {
+        //     if( min_p1 == 1 )
+        //     {
+        //         return compute_segment_segment_distance< dimension >(
+        //             { vertices0[1], vertices0[0] },
+        //             { vertices1[1], vertices1[0] } );
+        //     }
+        //     return compute_segment_segment_distance(
+        //         { vertices0[1], vertices0[0] }, segment1 );
+        // }
+        // if( min_p1 == 1 )
+        // {
+        //     return compute_segment_segment_distance(
+        //         segment0, { vertices1[1], vertices1[0] } );
+        // }
         return compute_segment_segment_distance( segment0, segment1 );
     }
 
