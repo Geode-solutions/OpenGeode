@@ -31,8 +31,6 @@
 #include <geode/mesh/builder/edged_curve_builder.h>
 #include <geode/mesh/core/edged_curve.h>
 #include <geode/mesh/helpers/convert_edged_curve.h>
-#include <geode/mesh/io/edged_curve_input.h>
-#include <geode/mesh/io/edged_curve_output.h>
 
 std::vector< std::unique_ptr< geode::EdgedCurve2D > > create_curves()
 {
@@ -89,4 +87,4 @@ void test()
         merged->nb_edges() == 7, "[Test] Wrong number of edges" );
 }
 
-OPENGEODE_TEST( "merge-surface" )
+OPENGEODE_TEST( "merge-curve" )

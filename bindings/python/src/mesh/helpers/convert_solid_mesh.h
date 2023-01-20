@@ -29,7 +29,9 @@ namespace geode
 {
     void define_convert_solid_mesh( pybind11::module& module )
     {
-        module.def( "convert_solid_mesh_into_tetrahedral_solid",
-            &convert_solid_mesh_into_tetrahedral_solid );
+        module
+            .def( "convert_solid_mesh_into_tetrahedral_solid",
+                &convert_solid_mesh_into_tetrahedral_solid )
+            .def( "merge_solid_meshes", &merge_solid_meshes );
     }
 } // namespace geode
