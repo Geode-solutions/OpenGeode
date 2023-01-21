@@ -52,10 +52,6 @@ namespace geode
             return 0;
         }
         const auto area2 = p * ( p - l0 ) * ( p - l1 ) * ( p - l2 );
-        if( area2 < 0 )
-        {
-            return 0;
-        }
         return std::sqrt( area2 );
     }
 
