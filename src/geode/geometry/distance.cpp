@@ -23,8 +23,6 @@
 
 #include <geode/geometry/distance.h>
 
-#include <geode/basic/logger.h>
-
 #include <geode/geometry/basic_objects/circle.h>
 #include <geode/geometry/basic_objects/infinite_line.h>
 #include <geode/geometry/basic_objects/plane.h>
@@ -150,8 +148,6 @@ namespace geode
         /* Algorithm and code found on
          * https://github.com/davideberly/GeometricTools/blob/master/GTE/Mathematics/DistSegmentSegment.h
          */
-        DEBUG( segment0.length() );
-        DEBUG( segment1.length() );
         const auto P1mP0 = segment0.direction();
         const auto Q1mQ0 = segment1.direction();
         const Vector< dimension > P0mQ0{ segment1.vertices()[0],
@@ -162,15 +158,9 @@ namespace geode
         const auto d = P1mP0.dot( P0mQ0 );
         const auto e = Q1mQ0.dot( P0mQ0 );
         const auto det = a * c - b * b;
-        DEBUG( a );
-        DEBUG( b );
-        DEBUG( c );
-        DEBUG( d );
-        DEBUG( e );
-        DEBUG( det );
         double s, t, nd, bmd, bte, ctd, bpe, ate, btd;
 
-        if( det > global_epsilon )
+        if( det > 0 )
         {
             bte = b * e;
             ctd = c * d;
@@ -180,7 +170,6 @@ namespace geode
                 if( e <= 0 ) // t <= 0
                 {
                     // region 6
-                    DEBUG( "reg6" );
                     t = 0;
                     nd = -d;
                     if( nd >= a )
@@ -196,13 +185,11 @@ namespace geode
                 else if( e < c ) // 0 < t < 1
                 {
                     // region 5
-                    DEBUG( "reg5" );
                     t = e / c;
                 }
                 else // t >= 1
                 {
                     // region 4
-                    DEBUG( "reg4" );
                     t = 1;
                     bmd = b - d;
                     if( bmd >= a )
@@ -227,7 +214,6 @@ namespace geode
                     if( bpe <= 0 ) // t <= 0
                     {
                         // region 8
-                        DEBUG( "reg8" );
                         t = 0;
                         nd = -d;
                         if( nd <= 0 )
@@ -243,13 +229,11 @@ namespace geode
                     else if( bpe < c ) // 0 < t < 1
                     {
                         // region 1
-                        DEBUG( "reg1" );
                         t = bpe / c;
                     }
                     else // t >= 1
                     {
                         // region 2
-                        DEBUG( "reg2" );
                         t = 1;
                         bmd = b - d;
                         if( bmd <= 0 )
@@ -270,7 +254,6 @@ namespace geode
                     if( ate <= btd ) // t <= 0
                     {
                         // region 7
-                        DEBUG( "reg7" );
                         t = 0;
                         nd = -d;
                         if( nd <= 0 )
@@ -292,7 +275,6 @@ namespace geode
                         if( t >= det ) // t >= 1
                         {
                             // region 3
-                            DEBUG( "reg3" );
                             t = 1;
                             bmd = b - d;
                             if( bmd <= 0 )
@@ -311,14 +293,8 @@ namespace geode
                         else // 0 < t < 1
                         {
                             // region 0
-                            DEBUG( "reg0" );
-                            DEBUG( s );
-                            DEBUG( t );
-                            DEBUG( det );
                             s /= det;
                             t /= det;
-                            DEBUG( s );
-                            DEBUG( t );
                         }
                     }
                 }
@@ -392,20 +368,13 @@ namespace geode
                 // one point at which R is a minimum.
                 s = 0;
                 t = e / c;
-                DEBUG( e );
-                DEBUG( c );
             }
         }
-
-        DEBUG( s );
-        DEBUG( t );
 
         const auto closest_on_segment0 =
             segment0.vertices()[0].get() + P1mP0 * s;
         const auto closest_on_segment1 =
             segment1.vertices()[0].get() + Q1mQ0 * t;
-        SDEBUG( closest_on_segment0 );
-        SDEBUG( closest_on_segment1 );
         const auto distance =
             point_point_distance( closest_on_segment0, closest_on_segment1 );
         if( distance < global_epsilon )
@@ -417,30 +386,36 @@ namespace geode
             new_point_segment_distance( closest_on_segment0, segment1 );
         if( distance_to_closest0 < global_epsilon )
         {
-            return std::make_tuple(
-                0, closest_on_segment0, closest_on_segment0 );
+            return std::make_tuple( distance_to_closest0, closest_on_segment0,
+                geode::point_segment_projection(
+                    closest_on_segment0, segment1 ) );
         }
         const auto distance_to_closest1 =
             new_point_segment_distance( closest_on_segment1, segment0 );
-        DEBUG( std::get< 0 >(
-            point_segment_distance( closest_on_segment1, segment0 ) ) );
         if( distance_to_closest1 < global_epsilon )
         {
-            return std::make_tuple(
-                0, closest_on_segment1, closest_on_segment1 );
+            return std::make_tuple( distance_to_closest1,
+                geode::point_segment_projection(
+                    closest_on_segment1, segment0 ),
+                closest_on_segment1 );
         }
-        DEBUG( distance );
-        DEBUG( distance_to_closest0 );
-        DEBUG( distance_to_closest1 );
-        DEBUG( distance - distance_to_closest0 );
-        DEBUG( distance - distance_to_closest1 );
-        OPENGEODE_EXCEPTION(
-            distance_to_closest0 >= distance - global_epsilon
-                && distance_to_closest1 >= distance - global_epsilon,
-            "[segment_segment_distance] Divergence between the distance "
-            "between the closest points and the distance between one "
-            "closest point to the other segment. It may be symptomatic of "
-            "bad numerical computation." );
+        if( distance_to_closest0 < distance )
+        {
+            if( distance_to_closest1 < distance_to_closest0 )
+            {
+                return std::make_tuple( distance_to_closest1,
+                    point_segment_projection( closest_on_segment1, segment0 ),
+                    closest_on_segment1 );
+            }
+            return std::make_tuple( distance_to_closest0, closest_on_segment0,
+                point_segment_projection( closest_on_segment0, segment1 ) );
+        }
+        if( distance_to_closest1 < distance )
+        {
+            return std::make_tuple( distance_to_closest1,
+                point_segment_projection( closest_on_segment1, segment0 ),
+                closest_on_segment1 );
+        }
         return std::make_tuple(
             distance, closest_on_segment0, closest_on_segment1 );
     }
