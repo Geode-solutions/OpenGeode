@@ -497,23 +497,6 @@ void test_config()
     geode::Segment3D seg21{ p2, p1 };
     geode::Segment3D seg31{ p3, p1 };
     geode::Segment3D seg32{ p3, p2 };
-
-    DEBUG( std::get< 0 >( geode::segment_segment_distance( seg01, seg23 ) ) );
-    DEBUG( std::get< 0 >( geode::segment_segment_distance( seg02, seg13 ) ) );
-    DEBUG( std::get< 0 >( geode::segment_segment_distance( seg03, seg12 ) ) );
-    DEBUG( "~~~~~~~~~~" );
-    DEBUG( std::get< 0 >( geode::segment_segment_distance( seg10, seg23 ) ) );
-    DEBUG( std::get< 0 >( geode::segment_segment_distance( seg20, seg13 ) ) );
-    DEBUG( std::get< 0 >( geode::segment_segment_distance( seg30, seg12 ) ) );
-    DEBUG( "~~~~~~~~~~" );
-    DEBUG( std::get< 0 >( geode::segment_segment_distance( seg10, seg32 ) ) );
-    DEBUG( std::get< 0 >( geode::segment_segment_distance( seg20, seg31 ) ) );
-    DEBUG( std::get< 0 >( geode::segment_segment_distance( seg30, seg21 ) ) );
-    DEBUG( "~~~~~~~~~~" );
-    DEBUG( std::get< 0 >( geode::segment_segment_distance( seg01, seg32 ) ) );
-    DEBUG( std::get< 0 >( geode::segment_segment_distance( seg02, seg31 ) ) );
-    DEBUG( std::get< 0 >( geode::segment_segment_distance( seg03, seg21 ) ) );
-    DEBUG( "~~~~~~~~~~" );
 }
 
 void test_segment_segment_distance_3d()
@@ -539,8 +522,11 @@ void test_segment_segment_distance_3d()
         geode::segment_segment_distance( segment_ab, segment_cd );
     const geode::Point3D result_t00{ { 1.0, 1.0, 0.0 } };
     const geode::Point3D result_t01{ { 1.0, 1.0, 1.0 } };
-    OPENGEODE_EXCEPTION( distance == 1. && closest_point0 == result_t00
-                             && closest_point1 == result_t01,
+    OPENGEODE_EXCEPTION(
+        distance == 1.
+            && closest_point0.inexact_equal( result_t00, geode::global_epsilon )
+            && closest_point1.inexact_equal(
+                result_t01, geode::global_epsilon ),
         "[Test] Wrong result for segment_segment_distance with segment_ab and "
         "segment_cd" );
 
@@ -548,8 +534,11 @@ void test_segment_segment_distance_3d()
         geode::segment_segment_distance( segment_ab, segment_ef );
     const geode::Point3D result_t10{ { 0.0, 0.0, 0.0 } };
     const geode::Point3D result_t11{ { 0.0, 0.0, 1.0 } };
-    OPENGEODE_EXCEPTION( distance == 1. && closest_point0 == result_t10
-                             && closest_point1 == result_t11,
+    OPENGEODE_EXCEPTION(
+        std::fabs( distance - 1 ) <= geode::global_epsilon
+            && closest_point0.inexact_equal( result_t10, geode::global_epsilon )
+            && closest_point1.inexact_equal(
+                result_t11, geode::global_epsilon ),
         "[Test] Wrong result for segment_segment_distance with segment_ab and "
         "segment_ef" );
 
