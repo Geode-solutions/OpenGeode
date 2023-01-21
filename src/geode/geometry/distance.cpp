@@ -211,7 +211,7 @@ namespace geode
 
     template < index_t dimension >
     std::tuple< double, Point< dimension >, Point< dimension > >
-        compute_segment_segment_distance( const Segment< dimension >& segment0,
+        segment_segment_distance( const Segment< dimension >& segment0,
             const Segment< dimension >& segment1 )
     {
         /* Algorithm and code found on
@@ -487,49 +487,6 @@ namespace geode
         }
         return std::make_tuple(
             distance, closest_on_segment0, closest_on_segment1 );
-    }
-
-    template < index_t dimension >
-    std::tuple< double, Point< dimension >, Point< dimension > >
-        segment_segment_distance( const Segment< dimension >& segment0,
-            const Segment< dimension >& segment1 )
-    {
-        // auto min_distance = std::numeric_limits< double >::max();
-        // local_index_t min_p0{ 0 };
-        // local_index_t min_p1{ 0 };
-        // const auto& vertices0 = segment0.vertices();
-        // const auto& vertices1 = segment1.vertices();
-        // for( const auto p0 : LRange{ 2 } )
-        // {
-        //     for( const auto p1 : LRange{ 2 } )
-        //     {
-        //         const auto cur_dist = point_point_distance(
-        //             vertices0[p0].get(), vertices1[p1].get() );
-        //         if( cur_dist < min_distance )
-        //         {
-        //             min_distance = cur_dist;
-        //             min_p0 = p0;
-        //             min_p1 = p1;
-        //         }
-        //     }
-        // }
-        // if( min_p0 == 1 )
-        // {
-        //     if( min_p1 == 1 )
-        //     {
-        //         return compute_segment_segment_distance< dimension >(
-        //             { vertices0[1], vertices0[0] },
-        //             { vertices1[1], vertices1[0] } );
-        //     }
-        //     return compute_segment_segment_distance(
-        //         { vertices0[1], vertices0[0] }, segment1 );
-        // }
-        // if( min_p1 == 1 )
-        // {
-        //     return compute_segment_segment_distance(
-        //         segment0, { vertices1[1], vertices1[0] } );
-        // }
-        return compute_segment_segment_distance( segment0, segment1 );
     }
 
     template < index_t dimension >
