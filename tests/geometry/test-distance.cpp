@@ -473,6 +473,49 @@ void test_segment_segment_distance_2d()
         "owner_segment_dc and owner_segment_gh" );
 }
 
+void test_config()
+{
+    const geode::Point3D p0{ { 12176.394751023, 2232.19265248916,
+        -2786.33164987907 } };
+    const geode::Point3D p1{ { 12163.6629087524, 2243.46415131496,
+        -2788.01160166871 } };
+    const geode::Point3D p2{ { 12265.6854636383, 2153.14358863662,
+        -2774.54981274668 } };
+    const geode::Point3D p3{ { 12267.5446450186, 2151.49765551934,
+        -2774.30450245031 } };
+
+    geode::Segment3D seg01{ p0, p1 };
+    geode::Segment3D seg02{ p0, p2 };
+    geode::Segment3D seg03{ p0, p3 };
+    geode::Segment3D seg12{ p1, p2 };
+    geode::Segment3D seg13{ p1, p3 };
+    geode::Segment3D seg23{ p2, p3 };
+
+    geode::Segment3D seg10{ p1, p0 };
+    geode::Segment3D seg20{ p2, p0 };
+    geode::Segment3D seg30{ p3, p0 };
+    geode::Segment3D seg21{ p2, p1 };
+    geode::Segment3D seg31{ p3, p1 };
+    geode::Segment3D seg32{ p3, p2 };
+
+    DEBUG( std::get< 0 >( geode::segment_segment_distance( seg01, seg23 ) ) );
+    DEBUG( std::get< 0 >( geode::segment_segment_distance( seg02, seg13 ) ) );
+    DEBUG( std::get< 0 >( geode::segment_segment_distance( seg03, seg12 ) ) );
+    DEBUG( "~~~~~~~~~~" );
+    DEBUG( std::get< 0 >( geode::segment_segment_distance( seg10, seg23 ) ) );
+    DEBUG( std::get< 0 >( geode::segment_segment_distance( seg20, seg13 ) ) );
+    DEBUG( std::get< 0 >( geode::segment_segment_distance( seg30, seg12 ) ) );
+    DEBUG( "~~~~~~~~~~" );
+    DEBUG( std::get< 0 >( geode::segment_segment_distance( seg10, seg32 ) ) );
+    DEBUG( std::get< 0 >( geode::segment_segment_distance( seg20, seg31 ) ) );
+    DEBUG( std::get< 0 >( geode::segment_segment_distance( seg30, seg21 ) ) );
+    DEBUG( "~~~~~~~~~~" );
+    DEBUG( std::get< 0 >( geode::segment_segment_distance( seg01, seg32 ) ) );
+    DEBUG( std::get< 0 >( geode::segment_segment_distance( seg02, seg31 ) ) );
+    DEBUG( std::get< 0 >( geode::segment_segment_distance( seg03, seg21 ) ) );
+    DEBUG( "~~~~~~~~~~" );
+}
+
 void test_segment_segment_distance_3d()
 {
     const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
@@ -516,6 +559,8 @@ void test_segment_segment_distance_3d()
         distance == 1. && closest_point0 == d && closest_point1 == g,
         "[Test] Wrong result for segment_segment_distance with segment_cd and "
         "segment_gh" );
+
+    test_config();
 }
 
 void test_segment_segment_distance()
