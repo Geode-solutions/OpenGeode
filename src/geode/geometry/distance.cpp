@@ -84,6 +84,75 @@ namespace
                            * ( p - segment_length );
         return 2 * std::sqrt( area2 ) / segment_length;
     }
+
+    template < geode::index_t dimension >
+    double compute_gradient( const geode::Point< dimension >& point,
+        double distance,
+        const geode::Vector< dimension >& direction,
+        double step,
+        const geode::Segment< dimension >& segment )
+    {
+        for( const auto j : geode::LRange{ 5 } )
+        {
+            geode_unused( j );
+            const auto plus = point + direction * step;
+            const auto plus_distance =
+                geode::new_point_segment_distance( plus, segment );
+            const auto plus_diff = plus_distance - distance;
+            const auto minus = point - direction * step;
+            const auto minus_distance =
+                geode::new_point_segment_distance( minus, segment );
+            const auto minus_diff = minus_distance - distance;
+            if( plus_diff < 0 )
+            {
+                return step;
+            }
+            if( minus_diff < 0 )
+            {
+                return -step;
+            }
+            step /= 2;
+        }
+        return 0;
+    }
+
+    template < geode::index_t dimension >
+    std::tuple< geode::Point< dimension >, double >
+        optimize_point_segment_distance(
+            const geode::Segment< dimension >& segment,
+            const geode::Point< dimension >& start,
+            double start_distance,
+            const geode::Segment< dimension >& other_segment )
+    {
+        const auto step = segment.length() * 0.1;
+        auto distance = start_distance;
+        auto point = start;
+        const auto direction = segment.normalized_direction();
+        auto length =
+            geode::point_point_distance( segment.vertices()[0].get(), start );
+        for( const auto i : geode::LRange{ 5 } )
+        {
+            geode_unused( i );
+            const auto gradient = compute_gradient(
+                point, distance, direction, step, other_segment );
+            if( gradient == 0 )
+            {
+                break;
+            }
+            length += gradient;
+            length = std::max( 0., std::min( length, segment.length() ) );
+            auto new_point = segment.vertices()[0].get() + direction * length;
+            const auto new_distance =
+                new_point_segment_distance( new_point, other_segment );
+            if( std::fabs( new_distance - distance ) < geode::global_epsilon )
+            {
+                return std::make_tuple( new_point, new_distance );
+            }
+            point = std::move( new_point );
+            distance = new_distance;
+        }
+        return std::make_tuple( point, distance );
+    }
 } // namespace
 
 namespace geode
