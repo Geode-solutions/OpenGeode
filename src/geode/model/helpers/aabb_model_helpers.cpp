@@ -31,6 +31,9 @@
 #include <geode/mesh/core/edged_curve.h>
 #include <geode/mesh/core/solid_mesh.h>
 #include <geode/mesh/core/surface_mesh.h>
+#include <geode/mesh/helpers/aabb_edged_curve_helpers.h>
+#include <geode/mesh/helpers/aabb_solid_helpers.h>
+#include <geode/mesh/helpers/aabb_surface_helpers.h>
 
 #include <geode/model/mixin/core/block.h>
 #include <geode/model/mixin/core/line.h>
@@ -64,6 +67,34 @@ namespace
         return std::make_tuple(
             geode::AABBTree< dimension >{ boxes }, std::move( mapping ) );
     }
+
+    template < geode::index_t dimension, typename Range >
+    geode::ModelMeshesAABBTree< dimension > create_aabbs(
+        const Range& range, geode::index_t nb_elements )
+    {
+        geode::ModelMeshesAABBTree< dimension > result{ nb_elements };
+        absl::FixedArray< geode::BoundingBox< dimension > > boxes(
+            nb_elements );
+        absl::FixedArray< async::task< void > > tasks( nb_elements );
+        geode::index_t id{ 0 };
+        for( const auto& element : range )
+        {
+            tasks[id] = async::spawn( [id, &result, &boxes, &element] {
+                result.mesh_trees_[id] =
+                    geode::create_aabb_tree( element.mesh() );
+                result.uuids_[id] = element.id();
+                result.mesh_tree_ids_.emplace( element.id(), id );
+                boxes[id] = result.mesh_trees_[id].bounding_box();
+            } );
+            id++;
+        }
+        for( auto& task : async::when_all( tasks.begin(), tasks.end() ).get() )
+        {
+            task.get();
+        }
+        result.components_tree_ = geode::AABBTree< dimension >{ boxes };
+        return result;
+    }
 } // namespace
 
 namespace geode
@@ -96,5 +127,31 @@ namespace geode
         create_surfaces_aabb_tree( const Section& model )
     {
         return create_aabb< 2 >( model.surfaces(), model.nb_surfaces() );
+    }
+
+    ModelMeshesAABBTree3D create_line_meshes_aabb_trees( const BRep& model )
+    {
+        return create_aabbs< 3 >( model.lines(), model.nb_lines() );
+    }
+
+    ModelMeshesAABBTree3D create_surface_meshes_aabb_trees( const BRep& model )
+    {
+        return create_aabbs< 3 >( model.surfaces(), model.nb_surfaces() );
+    }
+
+    ModelMeshesAABBTree3D create_block_meshes_aabb_trees( const BRep& model )
+    {
+        return create_aabbs< 3 >( model.blocks(), model.nb_blocks() );
+    }
+
+    ModelMeshesAABBTree2D create_line_meshes_aabb_trees( const Section& model )
+    {
+        return create_aabbs< 2 >( model.lines(), model.nb_lines() );
+    }
+
+    ModelMeshesAABBTree2D create_surface_meshes_aabb_trees(
+        const Section& model )
+    {
+        return create_aabbs< 2 >( model.surfaces(), model.nb_surfaces() );
     }
 } // namespace geode
