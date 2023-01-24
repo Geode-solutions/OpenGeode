@@ -72,6 +72,8 @@ namespace geode
 
     using MeshElementMapping = GenericMapping< MeshElement, MeshElement >;
 
+    using MeshVertexMapping = GenericMapping< MeshVertex, MeshVertex >;
+
     using ComponentMeshElementMapping =
         GenericMapping< MeshElement, ComponentMeshElement >;
 
@@ -94,4 +96,19 @@ namespace geode
         MeshElementMapping blocks;
     };
 
+    struct ModelMeshesVertexMapping
+    {
+        MeshVertexMapping corners;
+        MeshVertexMapping lines;
+        MeshVertexMapping surfaces;
+    };
+
+    struct SectionMeshesVertexMapping : public ModelMeshesVertexMapping
+    {
+    };
+
+    struct BRepMeshesVertexMapping : public ModelMeshesVertexMapping
+    {
+        MeshVertexMapping blocks;
+    };
 } // namespace geode
