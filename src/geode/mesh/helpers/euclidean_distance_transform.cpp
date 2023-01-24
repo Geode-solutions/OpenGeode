@@ -42,7 +42,7 @@ namespace geode
         EuclideanDistanceTransform( const RegularGrid< dimension >& grid,
             absl::Span< const Index > grid_cell_id,
             absl::string_view distance_map_name )
-            : grid_{ grid },
+            : grid_( grid ),
               squared_cell_length_{},
               distance_map_{
                   grid.cell_attribute_manager()
