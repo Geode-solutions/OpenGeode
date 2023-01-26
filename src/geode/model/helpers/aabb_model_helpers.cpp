@@ -83,9 +83,9 @@ namespace
                 result.mesh_trees_[id] =
                     geode::create_aabb_tree( element.mesh() );
                 result.uuids_[id] = element.id();
-                result.mesh_tree_ids_.emplace( element.id(), id );
                 boxes[id] = result.mesh_trees_[id].bounding_box();
             } );
+            result.mesh_tree_ids_.emplace( element.id(), id );
             id++;
         }
         for( auto& task : async::when_all( tasks.begin(), tasks.end() ).get() )
