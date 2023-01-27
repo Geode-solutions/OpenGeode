@@ -34,6 +34,7 @@
 #include <geode/mesh/helpers/aabb_surface_helpers.h>
 
 #include <geode/geometry/aabb.h>
+#include <geode/geometry/distance.h>
 #include <geode/geometry/point.h>
 
 #include <geode/tests/common.h>
@@ -99,7 +100,8 @@ void check_surface_tree( const geode::AABBTree< dimension >& tree,
             OPENGEODE_EXCEPTION(
                 triangle1 == id++, "[TEST] Wrong triangle found" );
             OPENGEODE_EXCEPTION(
-                nearest_point1 == query1, "[TEST] Wrong nearest point found" );
+                nearest_point1.inexact_equal( query1, geode::global_epsilon ),
+                "[TEST] Wrong nearest point found" );
 
             const auto query2 =
                 create_vertex< dimension >( i + 1 - offset, j + 1 - offset );
@@ -110,7 +112,8 @@ void check_surface_tree( const geode::AABBTree< dimension >& tree,
             OPENGEODE_EXCEPTION(
                 triangle2 == id++, "[TEST] Wrong triangle found" );
             OPENGEODE_EXCEPTION(
-                nearest_point2 == query2, "[TEST] Wrong nearest point found" );
+                nearest_point2.inexact_equal( query2, geode::global_epsilon ),
+                "[TEST] Wrong nearest point found" );
         }
     }
 

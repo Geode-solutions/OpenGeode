@@ -84,6 +84,63 @@ namespace
                            * ( p - segment_length );
         return 2 * std::sqrt( area2 ) / segment_length;
     }
+
+    void get_min_edge02( double a11, double b1, std::array< double, 2 >& p )
+    {
+        p[0] = 0;
+        if( b1 >= 0 )
+        {
+            p[1] = 0;
+        }
+        else if( a11 + b1 <= 0 )
+        {
+            p[1] = 1;
+        }
+        else
+        {
+            p[1] = -b1 / a11;
+        }
+    }
+
+    void get_min_edge12( double a01,
+        double a11,
+        double b1,
+        double f10,
+        double f01,
+        std::array< double, 2 >& p )
+    {
+        const auto h0 = a01 + b1 - f10;
+        if( h0 >= 0 )
+        {
+            p[1] = 0;
+        }
+        else
+        {
+            const auto h1 = a11 + b1 - f01;
+            if( h1 <= 0 )
+            {
+                p[1] = 1;
+            }
+            else
+            {
+                p[1] = h0 / ( h0 - h1 );
+            }
+        }
+        p[0] = 1 - p[1];
+    }
+
+    void get_min_interior( const std::array< double, 2 >& p0,
+        double h0,
+        const std::array< double, 2 >& p1,
+        double h1,
+        std::array< double, 2 >& p )
+    {
+        const auto z = h0 / ( h0 - h1 );
+        const auto omz = 1 - z;
+        p[0] = omz * p0[0] + z * p1[0];
+        p[1] = omz * p0[1] + z * p1[1];
+    }
+
 } // namespace
 
 namespace geode
@@ -180,7 +237,7 @@ namespace geode
                     {
                         s = nd / a;
                     }
-                    // else: s is already zero
+                    // else: s is already 0
                 }
                 else if( e < c ) // 0 < t < 1
                 {
@@ -200,7 +257,7 @@ namespace geode
                     {
                         s = bmd / a;
                     }
-                    // else:  s is already zero
+                    // else:  s is already 0
                 }
             }
             else // s > 0
@@ -224,7 +281,7 @@ namespace geode
                         {
                             s = nd / a;
                         }
-                        // else: s is already one
+                        // else: s is already 1
                     }
                     else if( bpe < c ) // 0 < t < 1
                     {
@@ -244,7 +301,7 @@ namespace geode
                         {
                             s = bmd / a;
                         }
-                        // else:  s is already one
+                        // else:  s is already 1
                     }
                 }
                 else // 0 < s < 1
@@ -305,14 +362,14 @@ namespace geode
             // The segments are parallel. The quadratic factors to
             //   R(s,t) = a*(s-(b/a)*t)^2 + 2*d*(s - (b/a)*t) + f
             // where a*c = b^2, e = b*d/a, f = |P0-Q0|^2, and b is not
-            // zero. R is constant along lines of the form s-(b/a)*t = k
+            // 0. R is constant along lines of the form s-(b/a)*t = k
             // and its occurs on the line a*s - b*t + d = 0. This line
             // must intersect both the s-axis and the t-axis because 'a'
-            // and 'b' are not zero. Because of parallelism, the line is
+            // and 'b' are not 0. Because of parallelism, the line is
             // also represented by -b*s + c*t - e = 0.
             //
             // The code determines an edge of the domain [0,1]^2 that
-            // intersects the minimum line, or if none of the edges
+            // intersects the minimum line, or if n1 of the edges
             // intersect, it determines the closest corner to the minimum
             // line. The conditionals are designed to test first for
             // intersection with the t-axis (s = 0) using
@@ -365,7 +422,7 @@ namespace geode
             else // 0 < t < 1
             {
                 // The point (0,e/c) is on the line and domain, so we have
-                // one point at which R is a minimum.
+                // 1 point at which R is a minimum.
                 s = 0;
                 t = e / c;
             }
@@ -474,189 +531,138 @@ namespace geode
         const auto a00 = edge0.length2();
         const auto a01 = edge0.dot( edge1 );
         const auto a11 = edge1.length2();
-        const auto det = std::fabs( a00 * a11 - a01 * a01 );
-        const Vector3D diff{ point, vertices[v0] };
-        const auto b0 = diff.dot( edge0 );
-        const auto b1 = diff.dot( edge1 );
-        auto s = a01 * b1 - a11 * b0;
-        auto t = a01 * b0 - a00 * b1;
+        const Vector3D diff{ vertices[v0], point };
+        const auto b0 = -diff.dot( edge0 );
+        const auto b1 = -diff.dot( edge1 );
 
-        if( s + t <= det )
+        auto f00 = b0;
+        auto f10 = b0 + a00;
+        auto f01 = b0 + a01;
+
+        std::array< double, 2 > p0, p1, p;
+        double dt1, h0, h1;
+
+        if( f00 >= 0 )
         {
-            if( s < 0.0 )
-            {
-                if( t < 0.0 )
-                { // region 4
-                    if( b0 < 0.0 )
-                    {
-                        t = 0.0;
-                        if( -b0 >= a00 )
-                        {
-                            s = 1.0;
-                        }
-                        else
-                        {
-                            s = -b0 / a00;
-                        }
-                    }
-                    else
-                    {
-                        s = 0.0;
-                        if( b1 >= 0.0 )
-                        {
-                            t = 0.0;
-                        }
-                        else if( -b1 >= a11 )
-                        {
-                            t = 1.0;
-                        }
-                        else
-                        {
-                            t = -b1 / a11;
-                        }
-                    }
-                }
-                else
-                { // region 3
-                    s = 0.0;
-                    if( b1 >= 0.0 )
-                    {
-                        t = 0.0;
-                    }
-                    else if( -b1 >= a11 )
-                    {
-                        t = 1.0;
-                    }
-                    else
-                    {
-                        t = -b1 / a11;
-                    }
-                }
-            }
-            else if( t < 0.0 )
-            { // region 5
-                t = 0.0;
-                if( b0 >= 0.0 )
-                {
-                    s = 0.0;
-                }
-                else if( -b0 >= a00 )
-                {
-                    s = 1.0;
-                }
-                else
-                {
-                    s = -b0 / a00;
-                }
+            if( f01 >= 0 )
+            { // (1) p0 = (0,0), p1 = (0,1), H(z) = G(L(z))
+                get_min_edge02( a11, b1, p );
             }
             else
-            { // region 0
-              // minimum at interior point
-                const auto invDet = 1.0 / det;
-                s *= invDet;
-                t *= invDet;
+            { // (2) p0 = (0,t10), p1 = (t01,1-t01),
+                // H(z) = (t11 - t10)*G(L(z))
+                p0[0] = 0;
+                p0[1] = f00 / ( f00 - f01 );
+                p1[0] = f01 / ( f01 - f10 );
+                p1[1] = 1 - p1[0];
+                dt1 = p1[1] - p0[1];
+                h0 = dt1 * ( a11 * p0[1] + b1 );
+                if( h0 >= 0 )
+                {
+                    get_min_edge02( a11, b1, p );
+                }
+                else
+                {
+                    h1 = dt1 * ( a01 * p1[0] + a11 * p1[1] + b1 );
+                    if( h1 <= 0 )
+                    {
+                        get_min_edge12( a01, a11, b1, f10, f01, p );
+                    }
+                    else
+                    {
+                        get_min_interior( p0, h0, p1, h1, p );
+                    }
+                }
+            }
+        }
+        else if( f01 <= 0 )
+        {
+            if( f10 <= 0 )
+            {
+                // (3) p0 = (1,0), p1 = (0,1), H(z) = G(L(z)) - F(L(z))
+                get_min_edge12( a01, a11, b1, f10, f01, p );
+            }
+            else
+            {
+                // (4) p0 = (t00,0), p1 = (t01,1-t01), H(z) = t11*G(L(z))
+                p0[0] = f00 / ( f00 - f10 );
+                p0[1] = 0;
+                p1[0] = f01 / ( f01 - f10 );
+                p1[1] = 1 - p1[0];
+                h0 = p1[1] * ( a01 * p0[0] + b1 );
+                if( h0 >= 0 )
+                {
+                    p = p0; // GetMinEdge01
+                }
+                else
+                {
+                    h1 = p1[1] * ( a01 * p1[0] + a11 * p1[1] + b1 );
+                    if( h1 <= 0 )
+                    {
+                        get_min_edge12( a01, a11, b1, f10, f01, p );
+                    }
+                    else
+                    {
+                        get_min_interior( p0, h0, p1, h1, p );
+                    }
+                }
+            }
+        }
+        else if( f10 <= 0 )
+        {
+            // (5) p0 = (0,t10), p1 = (t01,1-t01),
+            // H(z) = (t11 - t10)*G(L(z))
+            p0[0] = 0;
+            p0[1] = f00 / ( f00 - f01 );
+            p1[0] = f01 / ( f01 - f10 );
+            p1[1] = 1 - p1[0];
+            dt1 = p1[1] - p0[1];
+            h0 = dt1 * ( a11 * p0[1] + b1 );
+            if( h0 >= 0 )
+            {
+                get_min_edge02( a11, b1, p );
+            }
+            else
+            {
+                h1 = dt1 * ( a01 * p1[0] + a11 * p1[1] + b1 );
+                if( h1 <= 0 )
+                {
+                    get_min_edge12( a01, a11, b1, f10, f01, p );
+                }
+                else
+                {
+                    get_min_interior( p0, h0, p1, h1, p );
+                }
             }
         }
         else
         {
-            if( s < 0.0 )
-            { // region 2
-                const auto tmp0 = a01 + b0;
-                const auto tmp1 = a11 + b1;
-                if( tmp1 > tmp0 )
-                {
-                    const auto numer = tmp1 - tmp0;
-                    const auto denom = a00 - 2.0 * a01 + a11;
-                    if( numer >= denom )
-                    {
-                        s = 1.0;
-                        t = 0.0;
-                    }
-                    else
-                    {
-                        s = numer / denom;
-                        t = 1.0 - s;
-                    }
-                }
-                else
-                {
-                    s = 0.0;
-                    if( tmp1 <= 0.0 )
-                    {
-                        t = 1.0;
-                    }
-                    else if( b1 >= 0.0 )
-                    {
-                        t = 0.0;
-                    }
-                    else
-                    {
-                        t = -b1 / a11;
-                    }
-                }
-            }
-            else if( t < 0.0 )
-            { // region 6
-                const auto tmp0 = a01 + b1;
-                const auto tmp1 = a00 + b0;
-                if( tmp1 > tmp0 )
-                {
-                    const auto numer = tmp1 - tmp0;
-                    const auto denom = a00 - 2.0 * a01 + a11;
-                    if( numer >= denom )
-                    {
-                        t = 1.0;
-                        s = 0.0;
-                    }
-                    else
-                    {
-                        t = numer / denom;
-                        s = 1.0 - t;
-                    }
-                }
-                else
-                {
-                    t = 0.0;
-                    if( tmp1 <= 0.0 )
-                    {
-                        s = 1.0;
-                    }
-                    else if( b0 >= 0.0 )
-                    {
-                        s = 0.0;
-                    }
-                    else
-                    {
-                        s = -b0 / a00;
-                    }
-                }
+            // (6) p0 = (t00,0), p1 = (0,t11), H(z) = t11*G(L(z))
+            p0[0] = f00 / ( f00 - f10 );
+            p0[1] = 0;
+            p1[0] = 0;
+            p1[1] = f00 / ( f00 - f01 );
+            h0 = p1[1] * ( a01 * p0[0] + b1 );
+            if( h0 >= 0 )
+            {
+                p = p0; // GetMinEdge01
             }
             else
-            { // region 1
-                const auto numer = a11 + b1 - a01 - b0;
-                if( numer <= 0.0 )
+            {
+                h1 = p1[1] * ( a11 * p1[1] + b1 );
+                if( h1 <= 0 )
                 {
-                    s = 0.0;
-                    t = 1.0;
+                    get_min_edge02( a11, b1, p );
                 }
                 else
                 {
-                    const auto denom = a00 - 2.0 * a01 + a11;
-                    if( numer >= denom )
-                    {
-                        s = 1.0;
-                        t = 0.0;
-                    }
-                    else
-                    {
-                        s = numer / denom;
-                        t = 1.0 - s;
-                    }
+                    get_min_interior( p0, h0, p1, h1, p );
                 }
             }
         }
 
-        Point3D closest_point{ vertices[v0].get() + edge0 * s + edge1 * t };
+        Point3D closest_point{ vertices[v0].get() + edge0 * p[0]
+                               + edge1 * p[1] };
         const auto distance = point_point_distance( point, closest_point );
         return std::make_tuple( distance, std::move( closest_point ) );
     }
