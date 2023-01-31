@@ -38,6 +38,13 @@ namespace geode
         convert_brep_into_section( const BRep& brep, index_t axis_to_remove );
 
     std::tuple< BRep, ModelCopyMapping >
-        opengeode_model_api convert_section_into_brep(
-            const Section& section, index_t axis_to_add );
+        opengeode_model_api convert_section_into_brep( const Section& section,
+            index_t axis_to_add,
+            double axis_coordinate );
+
+    std::tuple< BRep, ModelCopyMapping >
+        opengeode_model_api extrude_section_to_brep( const Section& section,
+            index_t axis_to_add,
+            double min_axis_coordinate,
+            double thickness );
 } // namespace geode

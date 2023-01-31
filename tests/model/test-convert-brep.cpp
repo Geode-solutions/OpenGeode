@@ -30,10 +30,10 @@
 #include <geode/model/representation/core/brep.h>
 #include <geode/model/representation/core/section.h>
 #include <geode/model/representation/io/brep_input.h>
+#include <geode/model/representation/io/section_input.h>
 
-void test()
+void test_convert_brep_section()
 {
-    geode::OpenGeodeModel::initialize();
     auto brep = geode::load_brep(
         absl::StrCat( geode::data_path, "random_dfn.og_brep" ) );
     const auto section =
@@ -47,7 +47,7 @@ void test()
         "[Test] Section should have 117 surfaces" );
 
     const auto brep2 =
-        std::get< 0 >( geode::convert_section_into_brep( section, 2 ) );
+        std::get< 0 >( geode::convert_section_into_brep( section, 2, 0. ) );
 
     OPENGEODE_EXCEPTION(
         brep2.nb_corners() == 172, "[Test] BRep should have 172 corners" );
@@ -55,6 +55,25 @@ void test()
         brep2.nb_lines() == 288, "[Test] BRep should have 288 lines" );
     OPENGEODE_EXCEPTION(
         brep2.nb_surfaces() == 117, "[Test] BRep should have 117 surfaces" );
+}
+
+void test_extrusion_section_to_brep()
+{
+    auto section = geode::load_section(
+        absl::StrCat( geode::data_path, "random_dfn.og_sctn" ) );
+
+    const auto brep =
+        std::get< 0 >( geode::extrude_section_to_brep( section, 2, 0., 10. ) );
+
+    OPENGEODE_EXCEPTION( brep.nb_corners() == 2 * section.nb_corners(),
+        "[Test] BRep should have twice more corners than the Section" );
+}
+
+void test()
+{
+    geode::OpenGeodeModel::initialize();
+    test_convert_brep_section();
+    test_extrusion_section_to_brep();
 }
 
 OPENGEODE_TEST( "convert-brep" )

@@ -57,9 +57,10 @@ namespace geode
     void triangulate_surface_mesh( const SurfaceMesh< dimension >& surface,
         SurfaceMeshBuilder< dimension >& builder );
 
-    std::unique_ptr< SurfaceMesh3D >
-        opengeode_mesh_api convert_surface_mesh2d_into_3d(
-            const SurfaceMesh2D& surface2d, index_t axis_to_add );
+    std::unique_ptr< SurfaceMesh3D > opengeode_mesh_api
+        convert_surface_mesh2d_into_3d( const SurfaceMesh2D& surface2d,
+            index_t axis_to_add,
+            double axis_coordinate );
 
     std::unique_ptr< SurfaceMesh2D >
         opengeode_mesh_api convert_surface_mesh3d_into_2d(
@@ -67,7 +68,9 @@ namespace geode
 
     std::unique_ptr< PolygonalSurface3D >
         opengeode_mesh_api convert_polygonal_surface2d_into_3d(
-            const PolygonalSurface2D& surface2d, index_t axis_to_add );
+            const PolygonalSurface2D& surface2d,
+            index_t axis_to_add,
+            double axis_coordinate );
 
     std::unique_ptr< PolygonalSurface2D >
         opengeode_mesh_api convert_polygonal_surface3d_into_2d(
@@ -75,7 +78,9 @@ namespace geode
 
     std::unique_ptr< TriangulatedSurface3D >
         opengeode_mesh_api convert_triangulated_surface2d_into_3d(
-            const TriangulatedSurface2D& surface2d, index_t axis_to_add );
+            const TriangulatedSurface2D& surface2d,
+            index_t axis_to_add,
+            double axis_coordinate );
 
     std::unique_ptr< TriangulatedSurface2D >
         opengeode_mesh_api convert_triangulated_surface3d_into_2d(
