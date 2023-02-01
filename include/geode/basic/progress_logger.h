@@ -36,13 +36,13 @@ namespace geode
         ProgressLogger( std::string message, index_t nb_steps );
         ~ProgressLogger();
 
-        void increment();
+        index_t increment();
 
-        void increment( index_t nb_increments );
+        index_t increment( index_t nb_increments );
 
-        void increment_nb_steps();
+        index_t increment_nb_steps();
 
-        void increment_nb_steps( index_t nb_steps );
+        index_t increment_nb_steps( index_t nb_steps );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );
