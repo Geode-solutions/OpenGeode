@@ -26,6 +26,8 @@
 #include <memory>
 
 #include <geode/basic/bitsery_archive.h>
+#include <geode/basic/identifier_builder.h>
+#include <geode/basic/uuid.h>
 
 #include <geode/mesh/core/mesh_id.h>
 
@@ -39,10 +41,12 @@ namespace geode
         public:
             MeshStorage() : mesh_type_{ "" } {}
 
-            void set_mesh( std::unique_ptr< Mesh > mesh )
+            void set_mesh( uuid new_mesh_uuid, std::unique_ptr< Mesh > mesh )
             {
                 mesh_type_ = mesh->impl_name();
                 mesh_ = std::move( mesh );
+                IdentifierBuilder mesh_builder{ *mesh_ };
+                mesh_builder.set_id( std::move( new_mesh_uuid ) );
             }
 
             const Mesh& mesh() const

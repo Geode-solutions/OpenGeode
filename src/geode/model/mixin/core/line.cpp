@@ -70,7 +70,7 @@ namespace geode
     template < index_t dimension >
     Line< dimension >::Line( const MeshImpl& impl )
     {
-        impl_->set_mesh( EdgedCurve< dimension >::create( impl ) );
+        impl_->set_mesh( this->id(), EdgedCurve< dimension >::create( impl ) );
     }
 
     template < index_t dimension >
@@ -95,26 +95,34 @@ namespace geode
     template < typename Archive >
     void Line< dimension >::serialize( Archive& archive )
     {
-        archive.ext( *this, DefaultGrowable< Archive, Line >{},
-            []( Archive& a, Line& line ) {
-                a.object( line.impl_ );
-                a.ext(
-                    line, bitsery::ext::BaseClass< Component< dimension > >{} );
-            } );
+        archive.ext( *this,
+            Growable< Archive, Line >{
+                { []( Archive& a, Line& line ) {
+                     a.object( line.impl_ );
+                     a.ext( line,
+                         bitsery::ext::BaseClass< Component< dimension > >{} );
+                     IdentifierBuilder mesh_builder{ line.modifiable_mesh() };
+                     mesh_builder.set_id( line.id() );
+                 },
+                    []( Archive& a, Line& line ) {
+                        a.object( line.impl_ );
+                        a.ext( line, bitsery::ext::BaseClass<
+                                         Component< dimension > >{} );
+                    } } } );
     }
 
     template < index_t dimension >
     void Line< dimension >::set_mesh(
         std::unique_ptr< EdgedCurve< dimension > > mesh, LinesKey )
     {
-        impl_->set_mesh( std::move( mesh ) );
+        impl_->set_mesh( this->id(), std::move( mesh ) );
     }
 
     template < index_t dimension >
     void Line< dimension >::set_mesh(
         std::unique_ptr< EdgedCurve< dimension > > mesh, LinesBuilderKey )
     {
-        impl_->set_mesh( std::move( mesh ) );
+        impl_->set_mesh( this->id(), std::move( mesh ) );
     }
 
     template class opengeode_model_api Line< 2 >;
