@@ -26,6 +26,7 @@
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
 
+#include <geode/mesh/builder/point_set_builder.h>
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/point_set.h>
 
@@ -72,7 +73,7 @@ namespace geode
     template < index_t dimension >
     Corner< dimension >::Corner( const MeshImpl& impl )
     {
-        impl_->set_mesh( PointSet< dimension >::create( impl ) );
+        impl_->set_mesh( this->id(), PointSet< dimension >::create( impl ) );
     }
 
     template < index_t dimension >
@@ -97,26 +98,34 @@ namespace geode
     template < typename Archive >
     void Corner< dimension >::serialize( Archive& archive )
     {
-        archive.ext( *this, DefaultGrowable< Archive, Corner >{},
-            []( Archive& a, Corner& corner ) {
-                a.object( corner.impl_ );
-                a.ext( corner,
-                    bitsery::ext::BaseClass< Component< dimension > >{} );
-            } );
+        archive.ext( *this,
+            Growable< Archive, Corner >{
+                { []( Archive& a, Corner& corner ) {
+                     a.object( corner.impl_ );
+                     a.ext( corner,
+                         bitsery::ext::BaseClass< Component< dimension > >{} );
+                     IdentifierBuilder mesh_builder{ corner.modifiable_mesh() };
+                     mesh_builder.set_id( corner.id() );
+                 },
+                    []( Archive& a, Corner& corner ) {
+                        a.object( corner.impl_ );
+                        a.ext( corner, bitsery::ext::BaseClass<
+                                           Component< dimension > >{} );
+                    } } } );
     }
 
     template < index_t dimension >
     void Corner< dimension >::set_mesh(
         std::unique_ptr< PointSet< dimension > > mesh, CornersKey )
     {
-        impl_->set_mesh( std::move( mesh ) );
+        impl_->set_mesh( this->id(), std::move( mesh ) );
     }
 
     template < index_t dimension >
     void Corner< dimension >::set_mesh(
         std::unique_ptr< PointSet< dimension > > mesh, CornersBuilderKey )
     {
-        impl_->set_mesh( std::move( mesh ) );
+        impl_->set_mesh( this->id(), std::move( mesh ) );
     }
 
     template class opengeode_model_api Corner< 2 >;

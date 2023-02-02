@@ -826,6 +826,34 @@ void test_clone( const geode::BRep& brep )
     }
 }
 
+void test_backward_io()
+{
+    const auto brep = geode::load_brep(
+        absl::StrCat( geode::data_path, "dangling.og_brep" ) );
+    for( const auto& block : brep.blocks() )
+    {
+        OPENGEODE_EXCEPTION( block.id() == block.mesh().id(),
+            "[Backward_IO] Brep block should have the same uuid as its mesh." );
+    }
+    for( const auto& surface : brep.surfaces() )
+    {
+        OPENGEODE_EXCEPTION( surface.id() == surface.mesh().id(),
+            "[Backward_IO] Brep surface should have the same uuid as its "
+            "mesh." );
+    }
+    for( const auto& line : brep.lines() )
+    {
+        OPENGEODE_EXCEPTION( line.id() == line.mesh().id(),
+            "[Backward_IO] Brep line should have the same uuid as its mesh." );
+    }
+    for( const auto& corner : brep.corners() )
+    {
+        OPENGEODE_EXCEPTION( corner.id() == corner.mesh().id(),
+            "[Backward_IO] Brep corner should have the same uuid as its "
+            "mesh." );
+    }
+}
+
 void test()
 {
     geode::OpenGeodeModel::initialize();
@@ -875,6 +903,8 @@ void test()
 
     geode::BRep model3{ std::move( model2 ) };
     test_moved_brep( model3 );
+
+    test_backward_io();
 }
 
 OPENGEODE_TEST( "brep" )
