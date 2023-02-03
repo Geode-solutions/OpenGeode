@@ -296,11 +296,14 @@ void test_cylinder()
     const geode::Segment3D segment{ p0, p1 };
     const geode::Cylinder cylinder{ segment, geode::global_epsilon };
 
-    OPENGEODE_EXCEPTION( cylinder.basis()[0].length() == 1,
+    OPENGEODE_EXCEPTION(
+        std::fabs( cylinder.basis()[0].length() - 1 ) < geode::global_epsilon,
         "[Test] Wrong computation of basis[0]" );
-    OPENGEODE_EXCEPTION( cylinder.basis()[1].length() == 1,
+    OPENGEODE_EXCEPTION(
+        std::fabs( cylinder.basis()[1].length() - 1 ) < geode::global_epsilon,
         "[Test] Wrong computation of basis[1]" );
-    OPENGEODE_EXCEPTION( cylinder.basis()[2].length() == 1,
+    OPENGEODE_EXCEPTION(
+        std::fabs( cylinder.basis()[2].length() - 1 ) < geode::global_epsilon,
         "[Test] Wrong computation of basis[2]" );
 }
 
