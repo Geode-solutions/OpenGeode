@@ -28,7 +28,7 @@
 
 namespace geode
 {
-    class Cylinder
+    class opengeode_geometry_api Cylinder
     {
     public:
         using Basis3D = std::array< Vector3D, 3 >;
