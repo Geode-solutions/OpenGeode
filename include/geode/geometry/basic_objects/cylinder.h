@@ -28,10 +28,10 @@
 
 namespace geode
 {
-    using Basis3D = std::array< Vector3D, 3 >;
     class Cylinder
     {
     public:
+        using Basis3D = std::array< Vector3D, 3 >;
         Cylinder( const Segment3D& axis, double radius );
 
         Cylinder( const Cylinder& other );

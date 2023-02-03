@@ -61,23 +61,22 @@ namespace
                     && signed_area_3 >= 0 );
     }
 
-    double compute_point_line_line_distance( double segment_length,
+    absl::optional< double > compute_point_line_distance( double segment_length,
         double point_to_v0_length,
         double point_to_v1_length )
     {
         const auto p =
             ( point_to_v0_length + point_to_v1_length + segment_length ) / 2;
-        if( p - point_to_v0_length <= geode::global_epsilon )
         {
-            return 0;
+            return absl::nullopt;
         }
         if( p - point_to_v1_length <= geode::global_epsilon )
         {
-            return 0;
+            return absl::nullopt;
         }
         if( p - segment_length <= geode::global_epsilon )
         {
-            return 0;
+            return absl::nullopt;
         }
         const auto area2 = p * ( p - point_to_v0_length )
                            * ( p - point_to_v1_length )
@@ -194,7 +193,12 @@ namespace geode
             return length0;
         }
         // acute angles
-        return compute_point_line_line_distance( length, length0, length1 );
+        if( const auto distance =
+                compute_point_line_distance( length, length0, length1 ) )
+        {
+            return distance.value();
+        }
+        return std::get< 0 >( point_segment_distance( point, segment ) );
     }
 
     template < index_t dimension >
@@ -444,16 +448,14 @@ namespace geode
         if( distance_to_closest0 < global_epsilon )
         {
             return std::make_tuple( distance_to_closest0, closest_on_segment0,
-                geode::point_segment_projection(
-                    closest_on_segment0, segment1 ) );
+                point_segment_projection( closest_on_segment0, segment1 ) );
         }
         const auto distance_to_closest1 =
             new_point_segment_distance( closest_on_segment1, segment0 );
         if( distance_to_closest1 < global_epsilon )
         {
             return std::make_tuple( distance_to_closest1,
-                geode::point_segment_projection(
-                    closest_on_segment1, segment0 ),
+                point_segment_projection( closest_on_segment1, segment0 ),
                 closest_on_segment1 );
         }
         if( distance_to_closest0 < distance )
@@ -493,7 +495,12 @@ namespace geode
         const auto length0 = point_point_distance( line.origin(), point );
         const auto length1 =
             point_point_distance( line.origin() + line.direction(), point );
-        return compute_point_line_line_distance( 1, length0, length1 );
+        if( const auto distance =
+                compute_point_line_distance( 1, length0, length1 ) )
+        {
+            return distance.value();
+        }
+        return std::get< 0 >( point_line_distance( point, line ) );
     }
 
     std::tuple< double, Point2D > point_line_signed_distance(

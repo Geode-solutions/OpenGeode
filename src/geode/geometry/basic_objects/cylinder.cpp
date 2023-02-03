@@ -32,7 +32,7 @@ namespace
     // length of the unnormalized vectors computed during the process.  If
     // this value is nearly zero, it is possible that the inputs are linearly
     // dependent (within numerical round-off errors).
-    void orthonormalize( geode::Basis3D& basis )
+    void orthonormalize( geode::Cylinder::Basis3D& basis )
     {
         for( const auto i : geode::LRange{ 3 } )
         {
@@ -50,9 +50,10 @@ namespace
     // unnormalized vectors computed during the process.  If this value is
     // nearly zero, it is possible that the inputs are linearly dependent
     // (within numerical round-off errors).
-    geode::Basis3D compute_orthogonal_basis( const geode::Vector3D& axis )
+    geode::Cylinder::Basis3D compute_orthogonal_basis(
+        const geode::Vector3D& axis )
     {
-        geode::Basis3D basis;
+        geode::Cylinder::Basis3D basis;
         basis[0] = axis;
         if( std::fabs( axis.value( 0 ) ) > std::fabs( axis.value( 1 ) ) )
         {
@@ -108,7 +109,7 @@ namespace geode
     {
         return axis_;
     }
-    const Basis3D& Cylinder::basis() const
+    const Cylinder::Basis3D& Cylinder::basis() const
     {
         return basis_;
     }
