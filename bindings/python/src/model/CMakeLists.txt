@@ -38,6 +38,7 @@ add_geode_python_binding(
         "mixin/core/block.h"
         "mixin/core/blocks.h"
         "mixin/core/component.h"
+        "mixin/core/component_mesh_element.h"
         "mixin/core/component_type.h"
         "mixin/core/corner.h"
         "mixin/core/corners.h"
