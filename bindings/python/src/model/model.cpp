@@ -28,6 +28,7 @@
 #include "mixin/core/block.h"
 #include "mixin/core/blocks.h"
 #include "mixin/core/component.h"
+#include "mixin/core/component_mesh_element.h"
 #include "mixin/core/component_type.h"
 #include "mixin/core/corner.h"
 #include "mixin/core/corners.h"
@@ -132,6 +133,7 @@ PYBIND11_MODULE( opengeode_py_model, module )
         .def( "initialize", &geode::OpenGeodeModel::initialize );
     geode::define_component_type( module );
     geode::define_component( module );
+    geode::define_component_mesh_element( module );
     geode::define_block( module );
     geode::define_blocks( module );
     geode::define_corner( module );
