@@ -47,6 +47,9 @@ namespace geode
             OGTriangulatedSurfaceKey );
 
     public:
+        using Builder = OpenGeodeTriangulatedSurfaceBuilder< dimension >;
+        static constexpr auto dim = dimension;
+
         OpenGeodeTriangulatedSurface();
         OpenGeodeTriangulatedSurface( OpenGeodeTriangulatedSurface&& other );
         ~OpenGeodeTriangulatedSurface();

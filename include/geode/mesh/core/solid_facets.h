@@ -45,6 +45,9 @@ namespace geode
         PASSKEY( SolidFacetsBuilder< dimension >, SolidFacetsKey );
 
     public:
+        using Builder = SolidFacetsBuilder< dimension >;
+        static constexpr auto dim = dimension;
+
         SolidFacets();
         SolidFacets( const SolidMesh< dimension >& solid );
         ~SolidFacets();

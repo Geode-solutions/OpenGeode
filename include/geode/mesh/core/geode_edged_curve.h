@@ -44,6 +44,9 @@ namespace geode
         PASSKEY( OpenGeodeEdgedCurveBuilder< dimension >, OGEdgedCurveKey );
 
     public:
+        using Builder = OpenGeodeEdgedCurveBuilder< dimension >;
+        static constexpr auto dim = dimension;
+
         OpenGeodeEdgedCurve();
         OpenGeodeEdgedCurve( OpenGeodeEdgedCurve&& other );
         ~OpenGeodeEdgedCurve();

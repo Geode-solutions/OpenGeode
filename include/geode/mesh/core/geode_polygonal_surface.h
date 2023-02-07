@@ -45,6 +45,9 @@ namespace geode
             OGPolygonalSurfaceKey );
 
     public:
+        using Builder = OpenGeodePolygonalSurfaceBuilder< dimension >;
+        static constexpr auto dim = dimension;
+
         OpenGeodePolygonalSurface();
         OpenGeodePolygonalSurface( OpenGeodePolygonalSurface&& other );
         ~OpenGeodePolygonalSurface();

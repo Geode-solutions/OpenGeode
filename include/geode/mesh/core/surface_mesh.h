@@ -145,6 +145,7 @@ namespace geode
 
     public:
         using Builder = SurfaceMeshBuilder< dimension >;
+        static constexpr auto dim = dimension;
 
         ~SurfaceMesh();
 

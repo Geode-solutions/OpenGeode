@@ -42,6 +42,7 @@ namespace geode
     ALIAS_2D( ModelBoundary );
     FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
     ALIAS_2D( BoundingBox );
+    class SectionBuilder;
 } // namespace geode
 
 namespace geode
@@ -64,7 +65,8 @@ namespace geode
                                         public Identifier
     {
     public:
-        static constexpr index_t dimension{ 2 };
+        static constexpr index_t dim{ 2 };
+        using Builder = SectionBuilder;
 
         class opengeode_model_api BoundaryCornerRange
             : public Relationships::BoundaryRangeIterator,
