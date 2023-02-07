@@ -48,6 +48,9 @@ namespace geode
         PASSKEY( SurfaceEdgesBuilder< dimension >, SurfaceEdgesKey );
 
     public:
+        using Builder = SurfaceEdgesBuilder< dimension >;
+        static constexpr auto dim = dimension;
+
         SurfaceEdges();
         SurfaceEdges( const SurfaceMesh< dimension >& surface );
         ~SurfaceEdges();

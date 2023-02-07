@@ -230,6 +230,7 @@ namespace geode
 
     public:
         using Builder = SolidMeshBuilder< dimension >;
+        static constexpr auto dim = dimension;
 
         /*!
          * Create a new SolidMesh using default data structure.

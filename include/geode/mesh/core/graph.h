@@ -99,6 +99,8 @@ namespace geode
         PASSKEY( GraphBuilder, GraphKey );
 
     public:
+        using Builder = GraphBuilder;
+
         /*!
          * Create a new Graph using default data structure.
          */

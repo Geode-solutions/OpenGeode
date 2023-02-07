@@ -45,6 +45,7 @@ namespace geode
     {
     public:
         using Builder = PolygonalSurfaceBuilder< dimension >;
+        static constexpr auto dim = dimension;
 
         /*!
          * Create a new PolygonalSurface using default data structure.

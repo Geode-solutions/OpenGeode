@@ -32,6 +32,7 @@
 namespace geode
 {
     class AttributeManager;
+    class VertexSetBuilder;
 } // namespace geode
 
 namespace geode
@@ -45,6 +46,8 @@ namespace geode
         friend class bitsery::Access;
 
     public:
+        using Builder = VertexSetBuilder;
+
         /*!
          * Create a new VertexSet
          */

@@ -45,6 +45,9 @@ namespace geode
             OGPolyhedralSolidKey );
 
     public:
+        using Builder = OpenGeodePolyhedralSolidBuilder< dimension >;
+        static constexpr auto dim = dimension;
+
         OpenGeodePolyhedralSolid();
         OpenGeodePolyhedralSolid( OpenGeodePolyhedralSolid&& other );
         ~OpenGeodePolyhedralSolid();

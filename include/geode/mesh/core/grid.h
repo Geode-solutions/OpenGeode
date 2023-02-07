@@ -65,6 +65,9 @@ namespace geode
         friend class bitsery::Access;
 
     public:
+        using Builder = GridBuilder< dimension >;
+        static constexpr auto dim = dimension;
+
         Grid();
 
         Grid( Grid&& );

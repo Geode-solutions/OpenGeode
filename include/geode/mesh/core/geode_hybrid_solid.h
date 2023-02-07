@@ -46,6 +46,9 @@ namespace geode
         PASSKEY( OpenGeodeHybridSolidBuilder< dimension >, OGHybridSolidKey );
 
     public:
+        using Builder = OpenGeodeHybridSolidBuilder< dimension >;
+        static constexpr auto dim = dimension;
+
         OpenGeodeHybridSolid();
         OpenGeodeHybridSolid( OpenGeodeHybridSolid&& other );
         ~OpenGeodeHybridSolid();

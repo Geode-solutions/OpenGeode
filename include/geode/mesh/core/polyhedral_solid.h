@@ -50,6 +50,7 @@ namespace geode
 
     public:
         using Builder = PolyhedralSolidBuilder< dimension >;
+        static constexpr auto dim = dimension;
 
         /*!
          * Create a new PolyhedralSolid using default data structure.

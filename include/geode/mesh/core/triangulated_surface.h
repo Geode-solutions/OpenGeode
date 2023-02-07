@@ -43,6 +43,7 @@ namespace geode
     {
     public:
         using Builder = TriangulatedSurfaceBuilder< dimension >;
+        static constexpr auto dim = dimension;
 
         /*!
          * Create a new TriangulatedSurface using default data structure.

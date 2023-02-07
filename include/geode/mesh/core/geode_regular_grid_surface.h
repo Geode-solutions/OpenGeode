@@ -48,6 +48,9 @@ namespace geode
         PASSKEY( OpenGeodeRegularGridBuilder< 2 >, OGRegularGridKey );
 
     public:
+        using Builder = OpenGeodeRegularGridBuilder< 2 >;
+        static constexpr index_t dim{ 2 };
+
         OpenGeodeRegularGrid();
 
         OpenGeodeRegularGrid( OpenGeodeRegularGrid&& other );

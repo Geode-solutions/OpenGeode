@@ -32,9 +32,16 @@
 
 namespace geode
 {
+    class OpenGeodeVertexSetBuilder;
+}
+
+namespace geode
+{
     class opengeode_mesh_api OpenGeodeVertexSet : public VertexSet
     {
     public:
+        using Builder = OpenGeodeVertexSetBuilder;
+
         static MeshImpl impl_name_static()
         {
             return MeshImpl{ "OpenGeodeVertexSet" };

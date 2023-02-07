@@ -41,6 +41,7 @@ namespace geode
 
     public:
         using Builder = HybridSolidBuilder< dimension >;
+        static constexpr auto dim = dimension;
 
         enum class Type : unsigned char
         {

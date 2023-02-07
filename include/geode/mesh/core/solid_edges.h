@@ -51,6 +51,9 @@ namespace geode
         PASSKEY( SolidEdgesBuilder< dimension >, SolidEdgesKey );
 
     public:
+        using Builder = SolidEdgesBuilder< dimension >;
+        static constexpr auto dim = dimension;
+
         SolidEdges();
         SolidEdges( const SolidMesh< dimension >& solid );
         ~SolidEdges();
