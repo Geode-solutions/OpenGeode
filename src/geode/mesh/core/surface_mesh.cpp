@@ -564,8 +564,9 @@ namespace geode
                                        : static_cast< local_index_t >( e + 1 );
                 if( v1 == adj_vertices[enext] )
                 {
-                    OPENGEODE_ASSERT( polygon_adjacent( { polygon_adj_id, e } )
-                                          == polygon_edge.polygon_id,
+                    OPENGEODE_EXCEPTION(
+                        polygon_adjacent( { polygon_adj_id, e } )
+                            == polygon_edge.polygon_id,
                         absl::StrCat( "[SurfaceMesh::polygon_adjacent_"
                                       "edge] Wrong adjacency with polygons: ",
                             polygon_edge.polygon_id, " and ",
@@ -581,8 +582,9 @@ namespace geode
                                        : static_cast< local_index_t >( e + 1 );
                 if( v0 == adj_vertices[enext] )
                 {
-                    OPENGEODE_ASSERT( polygon_adjacent( { polygon_adj_id, e } )
-                                          == polygon_edge.polygon_id,
+                    OPENGEODE_EXCEPTION(
+                        polygon_adjacent( { polygon_adj_id, e } )
+                            == polygon_edge.polygon_id,
                         absl::StrCat( "[SurfaceMesh::polygon_adjacent_"
                                       "edge] Wrong adjacency with polygons: ",
                             polygon_edge.polygon_id, " and ",
