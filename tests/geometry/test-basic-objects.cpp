@@ -289,24 +289,6 @@ void test_circle()
         "[Test] Wrong result for circle5" );
 }
 
-void test_cylinder()
-{
-    const geode::Point3D p0{ { 1, 1, 1 } };
-    const geode::Point3D p1{ { 2, 2, 2 } };
-    const geode::Segment3D segment{ p0, p1 };
-    const geode::Cylinder cylinder{ segment, geode::global_epsilon };
-
-    OPENGEODE_EXCEPTION(
-        std::fabs( cylinder.basis()[0].length() - 1 ) < geode::global_epsilon,
-        "[Test] Wrong computation of basis[0]" );
-    OPENGEODE_EXCEPTION(
-        std::fabs( cylinder.basis()[1].length() - 1 ) < geode::global_epsilon,
-        "[Test] Wrong computation of basis[1]" );
-    OPENGEODE_EXCEPTION(
-        std::fabs( cylinder.basis()[2].length() - 1 ) < geode::global_epsilon,
-        "[Test] Wrong computation of basis[2]" );
-}
-
 void test()
 {
     test_segment();
@@ -316,7 +298,6 @@ void test()
     test_tetrahedron();
     test_sphere();
     test_circle();
-    test_cylinder();
 }
 
 OPENGEODE_TEST( "basic-object" )

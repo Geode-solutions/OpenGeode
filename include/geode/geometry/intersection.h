@@ -39,7 +39,6 @@ namespace geode
     ALIAS_2D_AND_3D( Point );
     ALIAS_2D_AND_3D( Segment );
     ALIAS_3D( Triangle );
-    ALIAS_3D( Triangle );
     class Plane;
     class Cylinder;
 } // namespace geode
@@ -190,12 +189,4 @@ namespace geode
     IntersectionResult< absl::InlinedVector< Point3D, 2 > >
         opengeode_geometry_api line_cylinder_intersection(
             const InfiniteLine3D& line, const Cylinder& cylinder );
-
-    /*!
-     * Compute the intersection between a segment and a cylinder
-     * @return an optional of the intersection points.
-     */
-    IntersectionResult< absl::InlinedVector< Point3D, 2 > >
-        opengeode_geometry_api segment_cylinder_intersection(
-            const Segment3D& segment, const Cylinder& cylinder );
 } // namespace geode
