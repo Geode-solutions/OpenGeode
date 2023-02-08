@@ -37,9 +37,51 @@
 
 namespace
 {
-    struct CyclinderLineResult
+    using Basis3D = std::array< geode::Vector3D, 3 >;
+
+    // Gram-Schmidt orthonormalization to generate orthonormal vectors from
+    // the linearly independent inputs.  The function returns the smallest
+    // length of the unnormalized vectors computed during the process.  If
+    // this value is nearly zero, it is possible that the inputs are linearly
+    // dependent (within numerical round-off errors).
+    void orthonormalize( Basis3D& basis )
     {
-        CyclinderLineResult()
+        for( const auto i : geode::LRange{ 3 } )
+        {
+            for( const auto j : geode::LRange{ i } )
+            {
+                const auto dot_ij = basis[i].dot( basis[j] );
+                basis[i] -= basis[j] * dot_ij;
+            }
+            basis[i] = basis[i].normalize();
+        }
+    }
+
+    // Compute a right-handed orthonormal basis for the orthogonal complement
+    // of the input vectors.  The function returns the smallest length of the
+    // unnormalized vectors computed during the process.  If this value is
+    // nearly zero, it is possible that the inputs are linearly dependent
+    // (within numerical round-off errors).
+    Basis3D compute_orthogonal_basis( const geode::Vector3D& axis )
+    {
+        Basis3D basis;
+        basis[0] = axis;
+        if( std::fabs( axis.value( 0 ) ) > std::fabs( axis.value( 1 ) ) )
+        {
+            basis[1] = { { -axis.value( 2 ), 0, axis.value( 0 ) } };
+        }
+        else
+        {
+            basis[1] = { { 0, axis.value( 2 ), -axis.value( 1 ) } };
+        }
+        basis[2] = basis[0].cross( basis[1] );
+        orthonormalize( basis );
+        return basis;
+    }
+
+    struct CylinderLineResult
+    {
+        CylinderLineResult()
             : intersect( false ), numIntersections( 0 ), parameter{ 0, 0 }
         {
         }
@@ -495,16 +537,18 @@ namespace geode
         opengeode_geometry_api line_cylinder_intersection(
             const InfiniteLine3D& line, const Cylinder& cylinder )
     {
-        CyclinderLineResult result;
+        CylinderLineResult result;
         // Create a coordinate system for the cylinder. In this system,
         // the cylinder segment center C is the origin and the cylinder
         // axis direction W is the z-axis. U and V are the other
         // coordinate axis directions. If P = x*U+y*V+z*W, the cylinder
         // is x^2 + y^2 = r^2, where r is the cylinder radius. The end
         // caps are |z| = h/2, where h is the cylinder height.
-        const auto& W = cylinder.basis()[0];
-        const auto& U = cylinder.basis()[1];
-        const auto& V = cylinder.basis()[2];
+        const auto basis =
+            compute_orthogonal_basis( cylinder.axis().normalized_direction() );
+        const auto& W = basis[0];
+        const auto& U = basis[1];
+        const auto& V = basis[2];
         const auto halfHeight = 0.5 * cylinder.axis().length();
         const auto rSqr = cylinder.radius() * cylinder.radius();
 

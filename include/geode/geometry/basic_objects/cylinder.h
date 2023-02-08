@@ -31,7 +31,6 @@ namespace geode
     class opengeode_geometry_api Cylinder
     {
     public:
-        using Basis3D = std::array< Vector3D, 3 >;
         Cylinder( const Segment3D& axis, double radius );
 
         Cylinder( const Cylinder& other );
@@ -40,12 +39,10 @@ namespace geode
         Cylinder& operator=( Cylinder&& other );
 
         const Segment3D& axis() const;
-        const Basis3D& basis() const;
         double radius() const;
 
     private:
         Segment3D axis_;
         double radius_{ 0 };
-        Basis3D basis_;
     };
 } // namespace geode

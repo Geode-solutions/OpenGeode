@@ -25,62 +25,16 @@
 
 #include <geode/basic/logger.h>
 
-namespace
-{
-    // Gram-Schmidt orthonormalization to generate orthonormal vectors from
-    // the linearly independent inputs.  The function returns the smallest
-    // length of the unnormalized vectors computed during the process.  If
-    // this value is nearly zero, it is possible that the inputs are linearly
-    // dependent (within numerical round-off errors).
-    void orthonormalize( geode::Cylinder::Basis3D& basis )
-    {
-        for( const auto i : geode::LRange{ 3 } )
-        {
-            for( const auto j : geode::LRange{ i } )
-            {
-                const auto dot_ij = basis[i].dot( basis[j] );
-                basis[i] -= basis[j] * dot_ij;
-            }
-            basis[i] = basis[i].normalize();
-        }
-    }
-
-    // Compute a right-handed orthonormal basis for the orthogonal complement
-    // of the input vectors.  The function returns the smallest length of the
-    // unnormalized vectors computed during the process.  If this value is
-    // nearly zero, it is possible that the inputs are linearly dependent
-    // (within numerical round-off errors).
-    geode::Cylinder::Basis3D compute_orthogonal_basis(
-        const geode::Vector3D& axis )
-    {
-        geode::Cylinder::Basis3D basis;
-        basis[0] = axis;
-        if( std::fabs( axis.value( 0 ) ) > std::fabs( axis.value( 1 ) ) )
-        {
-            basis[1] = { { -axis.value( 2 ), 0, axis.value( 0 ) } };
-        }
-        else
-        {
-            basis[1] = { { 0, axis.value( 2 ), -axis.value( 1 ) } };
-        }
-        basis[2] = basis[0].cross( basis[1] );
-        orthonormalize( basis );
-        return basis;
-    }
-} // namespace
-
 namespace geode
 {
 
     Cylinder::Cylinder( const Segment3D& axis, double radius )
-        : axis_( axis ),
-          radius_( radius ),
-          basis_( compute_orthogonal_basis( axis.normalized_direction() ) )
+        : axis_( axis ), radius_( radius )
     {
     }
 
     Cylinder::Cylinder( const Cylinder& other )
-        : axis_( other.axis_ ), radius_( other.radius_ ), basis_( other.basis_ )
+        : axis_( other.axis_ ), radius_( other.radius_ )
     {
     }
 
@@ -88,12 +42,11 @@ namespace geode
     {
         axis_ = other.axis_;
         radius_ = other.radius_;
-        basis_ = other.basis_;
         return *this;
     }
 
     Cylinder::Cylinder( Cylinder&& other )
-        : axis_( other.axis_ ), radius_( other.radius_ ), basis_( other.basis_ )
+        : axis_( other.axis_ ), radius_( other.radius_ )
     {
     }
 
@@ -101,17 +54,12 @@ namespace geode
     {
         axis_ = other.axis_;
         radius_ = other.radius_;
-        basis_ = other.basis_;
         return *this;
     }
 
     const Segment3D& Cylinder::axis() const
     {
         return axis_;
-    }
-    const Cylinder::Basis3D& Cylinder::basis() const
-    {
-        return basis_;
     }
     double Cylinder::radius() const
     {
