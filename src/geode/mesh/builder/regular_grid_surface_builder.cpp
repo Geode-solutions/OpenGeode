@@ -75,12 +75,12 @@ namespace geode
         {
             const auto cell = u + ( nb_v - 1 ) * nb_u;
             const auto vertex = u + nb_v * ( nb_u + 1 );
-            associate_polygon_vertex_to_vertex( { cell, 2 }, vertex );
+            associate_polygon_vertex_to_vertex( { cell, 3 }, vertex );
         }
         // Last Corner U-V
         const auto cell = ( nb_u - 1 ) + ( nb_v - 1 ) * nb_u;
         const auto vertex = nb_u + nb_v * ( nb_u + 1 );
-        associate_polygon_vertex_to_vertex( { cell, 3 }, vertex );
+        associate_polygon_vertex_to_vertex( { cell, 2 }, vertex );
         update_origin( origin );
     }
 
