@@ -40,10 +40,6 @@ namespace geode
         static constexpr auto dim = dimension;
         using CellIndices = std::array< index_t, dimension >;
 
-        Array();
-        Array( std::array< index_t, dimension > cells_number );
-        Array( Array&& );
-
         virtual ~Array();
 
         local_index_t nb_cell_neighbors() const
@@ -72,7 +68,11 @@ namespace geode
 
         bool is_cell_on_border( const CellIndices& cell_indices ) const;
 
-    public:
+    protected:
+        Array();
+        Array( std::array< index_t, dimension > cells_number );
+        Array( Array&& );
+
         void set_array_dimensions(
             std::array< index_t, dimension > cells_number );
 

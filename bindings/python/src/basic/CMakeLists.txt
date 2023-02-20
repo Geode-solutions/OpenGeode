@@ -22,8 +22,11 @@ add_geode_python_binding(
     NAME "py_basic"
     SOURCES
         "basic.cpp"
+        "array.h"
         "attribute.h"
         "attribute_manager.h"
+        "identifier.h"
+        "identifier_builder.h"
         "mapping.h"
         "uuid.h"
     DEPENDENCIES

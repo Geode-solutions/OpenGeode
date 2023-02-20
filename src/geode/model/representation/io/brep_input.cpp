@@ -26,6 +26,7 @@
 #include <absl/strings/ascii.h>
 
 #include <geode/basic/filename.h>
+#include <geode/basic/identifier_builder.h>
 #include <geode/basic/timer.h>
 
 #include <geode/model/representation/builder/brep_builder.h>
@@ -46,7 +47,7 @@ namespace geode
             auto brep = input->read();
             if( brep.name() == Identifier::DEFAULT_NAME )
             {
-                BRepBuilder{ brep }.set_name(
+                IdentifierBuilder{ brep }.set_name(
                     filename_without_extension( filename ) );
             }
             Logger::info(

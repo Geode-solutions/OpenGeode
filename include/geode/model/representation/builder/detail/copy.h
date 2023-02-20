@@ -163,9 +163,8 @@ namespace geode
             typename ModelTo::Builder& builder_to,
             const Mapping& corners )
         {
-            for( auto&& corner :
-                clone_meshes< PointSet< ModelFrom::dimension > >(
-                    from.corners(), from.nb_corners() ) )
+            for( auto&& corner : clone_meshes< PointSet< ModelFrom::dim > >(
+                     from.corners(), from.nb_corners() ) )
             {
                 builder_to.update_corner_mesh(
                     to.corner( corners.in2out( corner.first ) ),
@@ -179,9 +178,8 @@ namespace geode
             typename ModelTo::Builder& builder_to,
             const Mapping& lines )
         {
-            for( auto&& line :
-                clone_meshes< EdgedCurve< ModelFrom::dimension > >(
-                    from.lines(), from.nb_lines() ) )
+            for( auto&& line : clone_meshes< EdgedCurve< ModelFrom::dim > >(
+                     from.lines(), from.nb_lines() ) )
             {
                 builder_to.update_line_mesh(
                     to.line( lines.in2out( line.first ) ),
@@ -195,9 +193,8 @@ namespace geode
             typename ModelTo::Builder& builder_to,
             const Mapping& surfaces )
         {
-            for( auto&& surface :
-                clone_meshes< SurfaceMesh< ModelFrom::dimension > >(
-                    from.surfaces(), from.nb_surfaces() ) )
+            for( auto&& surface : clone_meshes< SurfaceMesh< ModelFrom::dim > >(
+                     from.surfaces(), from.nb_surfaces() ) )
             {
                 builder_to.update_surface_mesh(
                     to.surface( surfaces.in2out( surface.first ) ),
@@ -211,9 +208,8 @@ namespace geode
             typename ModelTo::Builder& builder_to,
             const Mapping& blocks )
         {
-            for( auto&& block :
-                clone_meshes< SolidMesh< ModelFrom::dimension > >(
-                    from.blocks(), from.nb_blocks() ) )
+            for( auto&& block : clone_meshes< SolidMesh< ModelFrom::dim > >(
+                     from.blocks(), from.nb_blocks() ) )
             {
                 builder_to.update_block_mesh(
                     to.block( blocks.in2out( block.first ) ),

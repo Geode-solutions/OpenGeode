@@ -39,7 +39,6 @@ namespace geode
 
 namespace geode
 {
-
     template < index_t dimension >
     class Grid : public Array< dimension >
     {

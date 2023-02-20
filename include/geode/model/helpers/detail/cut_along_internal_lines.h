@@ -60,7 +60,7 @@ namespace geode
              * created vertex)
              */
             std::vector< std::pair< ComponentMeshVertex, ComponentMeshVertex > >
-                cut_surface( const Surface< Model::dimension >& surface );
+                cut_surface( const Surface< Model::dim >& surface );
 
         private:
             IMPLEMENTATION_MEMBER( impl_ );

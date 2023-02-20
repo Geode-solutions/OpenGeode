@@ -66,7 +66,7 @@ namespace
         segment_triangle_plane_intersection_detection(
             const geode::Segment3D& segment, const geode::Triangle3D& triangle )
     {
-        const auto normal_result = triangle.new_normal();
+        const auto normal_result = triangle.normal();
         if( !normal_result )
         {
             return { geode::Position::parallel, geode::Position::parallel };

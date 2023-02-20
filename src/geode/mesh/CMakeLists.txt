@@ -113,7 +113,6 @@ add_geode_library(
         "io/graph_output.cpp"
         "io/hybrid_solid_input.cpp"
         "io/hybrid_solid_output.cpp"
-        "io/io.cpp"
         "io/point_set_input.cpp"
         "io/point_set_output.cpp"
         "io/polygonal_surface_input.cpp"
@@ -215,9 +214,6 @@ add_geode_library(
         "io/graph_output.h"
         "io/hybrid_solid_input.h"
         "io/hybrid_solid_output.h"
-        "io/input.h"
-        "io/io.h"
-        "io/output.h"
         "io/point_set_input.h"
         "io/point_set_output.h"
         "io/polygonal_surface_input.h"
@@ -278,4 +274,5 @@ add_geode_library(
         ${PROJECT_NAME}::geometry
     PRIVATE_DEPENDENCIES
         Async++
+        ${PROJECT_NAME}::image
 )

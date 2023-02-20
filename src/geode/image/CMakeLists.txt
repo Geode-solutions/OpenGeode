@@ -24,11 +24,20 @@ add_geode_library(
     SOURCES
         "common.cpp"
         "core/bitsery_archive.cpp"
+        "core/raster.cpp"
+        "io/raster_input.cpp"
+        "io/raster_output.cpp"
     PUBLIC_HEADERS
         "common.h"
         "core/bitsery_archive.h"
         "core/greyscale_color.h"
+        "core/raster.h"
         "core/rgb_color.h"
+        "io/raster_input.h"
+        "io/raster_output.h"
+    ADVANCED_HEADERS
+        "io/detail/geode_bitsery_raster_input.h"
+        "io/detail/geode_bitsery_raster_output.h"
     PUBLIC_DEPENDENCIES
         ${PROJECT_NAME}::basic
 )

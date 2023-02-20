@@ -45,16 +45,17 @@
 namespace
 {
     template < geode::index_t dimension >
-    using Index = typename geode::Grid< dimension >::CellIndices;
+    using CellIndices = typename geode::Grid< dimension >::CellIndices;
 
     template < geode::index_t dimension >
-    std::vector< Index< dimension > > paint_segment_axis( geode::index_t axis0,
+    std::vector< CellIndices< dimension > > paint_segment_axis(
+        geode::index_t axis0,
         const std::array< double, dimension >& deltas,
         const std::array< int, dimension >& increments,
-        Index< dimension > index,
-        const Index< dimension >& end )
+        CellIndices< dimension > index,
+        const CellIndices< dimension >& end )
     {
-        std::vector< Index< dimension > > painted_cells;
+        std::vector< CellIndices< dimension > > painted_cells;
         painted_cells.push_back( index );
         std::array< geode::index_t, dimension - 1 > axis;
         std::array< double, dimension - 1 > error;
@@ -82,7 +83,7 @@ namespace
     }
 
     template < geode::index_t dimension >
-    std::vector< Index< dimension > > paint_edges(
+    std::vector< CellIndices< dimension > > paint_edges(
         const geode::RegularGrid< dimension >& grid,
         const geode::Triangle< dimension > triangle )
     {
@@ -105,8 +106,8 @@ namespace
     template < geode::index_t dimension >
     std::tuple< std::array< double, dimension >,
         const std::array< int, dimension > >
-        compute_deltas(
-            const Index< dimension >& start, const Index< dimension >& end )
+        compute_deltas( const CellIndices< dimension >& start,
+            const CellIndices< dimension >& end )
     {
         std::array< double, dimension > deltas;
         std::array< int, dimension > increments;
@@ -182,8 +183,9 @@ namespace
     }
 
     template < geode::index_t dimension >
-    std::vector< Index< dimension > > paint_segment(
-        const Index< dimension >& start, const Index< dimension >& end )
+    std::vector< CellIndices< dimension > > paint_segment(
+        const CellIndices< dimension >& start,
+        const CellIndices< dimension >& end )
     {
         std::array< double, dimension > deltas;
         std::array< int, dimension > increments;
@@ -194,11 +196,10 @@ namespace
             i, deltas, increments, start, end );
     }
 
-    std::vector< geode::Grid2D::CellIndices >
-        conservative_voxelization_triangle( const geode::RegularGrid2D& grid,
-            const geode::Triangle2D& triangle,
-            const std::array< geode::Grid2D::CellsAroundVertex, 3 >
-                vertex_cells )
+    std::vector< CellIndices< 2 > > conservative_voxelization_triangle(
+        const geode::RegularGrid2D& grid,
+        const geode::Triangle2D& triangle,
+        const std::array< geode::Grid2D::CellsAroundVertex, 3 > vertex_cells )
     {
         geode_unused( vertex_cells );
         absl::flat_hash_map< geode::index_t,
@@ -221,13 +222,13 @@ namespace
                 }
             }
         }
-        std::vector< geode::Grid2D::CellIndices > cells;
+        std::vector< CellIndices< 2 > > cells;
         for( const auto& it : min_max )
         {
             for( const auto i :
                 geode::Range{ it.second.first, it.second.second + 1 } )
             {
-                cells.emplace_back( geode::Grid2D::CellIndices{ i, it.first } );
+                cells.emplace_back( CellIndices< 2 >{ i, it.first } );
             }
         }
         return cells;
@@ -287,8 +288,8 @@ namespace
             geode::Segment< dimension >{ vertices[2], vertices[0] } };
     }
 
-    void add_cells( std::vector< geode::Grid3D::CellIndices >& cells,
-        std::vector< geode::Grid3D::CellIndices > new_cells )
+    void add_cells( std::vector< CellIndices< 3 > >& cells,
+        std::vector< CellIndices< 3 > > new_cells )
     {
         for( auto&& new_cell : new_cells )
         {
@@ -299,8 +300,8 @@ namespace
         }
     }
 
-    geode::index_t max_number_cells( const geode::Grid3D::CellIndices& min,
-        const geode::Grid3D::CellIndices& max )
+    geode::index_t max_number_cells(
+        const CellIndices< 3 >& min, const CellIndices< 3 >& max )
     {
         geode::index_t nb_cells{ 1 };
         for( const auto d : geode::LRange{ 3 } )
@@ -310,11 +311,10 @@ namespace
         return nb_cells;
     }
 
-    std::vector< geode::Grid3D::CellIndices >
-        conservative_voxelization_triangle( const geode::RegularGrid3D& grid,
-            const geode::Triangle3D& triangle,
-            const std::array< geode::Grid3D::CellsAroundVertex, 3 >
-                vertex_cells )
+    std::vector< CellIndices< 3 > > conservative_voxelization_triangle(
+        const geode::RegularGrid3D& grid,
+        const geode::Triangle3D& triangle,
+        const std::array< geode::Grid3D::CellsAroundVertex, 3 > vertex_cells )
     {
         auto min = grid.cell_indices( grid.nb_polyhedra() - 1 );
         auto max = grid.cell_indices( 0 );
@@ -329,7 +329,7 @@ namespace
                 }
             }
         }
-        std::vector< geode::Grid3D::CellIndices > cells;
+        std::vector< CellIndices< 3 > > cells;
         cells.reserve( max_number_cells( min, max ) );
         const auto triangle_edges = get_triangle_edges( triangle );
         const auto normal = triangle.normal();
@@ -362,7 +362,7 @@ namespace
             {
                 for( const auto i : geode::Range( min[0], max[0] + 1 ) )
                 {
-                    geode::Grid3D::CellIndices cur_cell{ { i, j, k } };
+                    CellIndices< 3 > cur_cell{ { i, j, k } };
                     const auto point =
                         grid.point( grid.vertex_index( cur_cell ) );
 
@@ -446,11 +446,10 @@ namespace
         return cells;
     }
 
-    absl::InlinedVector< geode::Grid3D::CellIndices, 6 > neighbors(
-        const geode::RegularGrid3D& grid,
-        const geode::Grid3D::CellIndices& cell )
+    absl::InlinedVector< CellIndices< 3 >, 6 > neighbors(
+        const geode::RegularGrid3D& grid, const CellIndices< 3 >& cell )
     {
-        absl::InlinedVector< geode::Grid3D::CellIndices, 6 > neighbors;
+        absl::InlinedVector< CellIndices< 3 >, 6 > neighbors;
         for( const auto d : geode::LRange{ 3 } )
         {
             if( const auto prev = grid.previous_cell( cell, d ) )
@@ -465,14 +464,14 @@ namespace
         return neighbors;
     }
 
-    std::vector< geode::Grid3D::CellIndices > conservative_voxelization_segment(
+    std::vector< CellIndices< 3 > > conservative_voxelization_segment(
         const geode::RegularGrid3D& grid,
         const geode::Segment3D& segment,
         const std::array< geode::Grid3D::CellsAroundVertex, 2 > /*unused*/ )
     {
         auto cells = geode::rasterize_segment( grid, segment );
         std::vector< bool > tested_cells( grid.nb_cells(), false );
-        std::queue< geode::Grid3D::CellIndices > to_test;
+        std::queue< CellIndices< 3 > > to_test;
         for( const auto& cell : cells )
         {
             tested_cells[grid.cell_index( cell )] = true;
@@ -513,7 +512,7 @@ namespace
         return cells;
     }
 
-    std::vector< geode::Grid2D::CellIndices > conservative_voxelization_segment(
+    std::vector< CellIndices< 2 > > conservative_voxelization_segment(
         const geode::RegularGrid2D& grid,
         const geode::Segment2D& segment,
         const std::array< geode::Grid2D::CellsAroundVertex, 2 > vertex_cells )
@@ -521,7 +520,7 @@ namespace
         OPENGEODE_ASSERT( segment.length() > geode::global_epsilon,
             "[conservative_voxelization_segment] Segment should be longer than "
             "epsilon" );
-        std::vector< geode::Grid2D::CellIndices > cells;
+        std::vector< CellIndices< 2 > > cells;
         auto min = grid.cell_indices( grid.nb_polygons() - 1 );
         auto max = grid.cell_indices( 0 );
         for( const auto v : geode::LRange{ 2 } )
@@ -542,7 +541,7 @@ namespace
         {
             for( const auto i : geode::Range( min[0], max[0] + 1 ) )
             {
-                geode::Grid2D::CellIndices cur_cell{ { i, j } };
+                CellIndices< 2 > cur_cell{ { i, j } };
                 const auto point = grid.point( grid.vertex_index( cur_cell ) );
 
                 // Test segment line through box
@@ -573,7 +572,7 @@ namespace
 namespace geode
 {
     template < index_t dimension >
-    std::vector< Index< dimension > > rasterize_segment(
+    std::vector< CellIndices< dimension > > rasterize_segment(
         const RegularGrid< dimension >& grid,
         const Segment< dimension >& segment )
     {
@@ -587,7 +586,7 @@ namespace geode
             return { start.begin(), start.end() };
         }
 
-        std::vector< Index< dimension > > cells;
+        std::vector< CellIndices< dimension > > cells;
         for( const auto& start_id : start )
         {
             for( const auto& end_id : end )
@@ -604,7 +603,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< Index< dimension > > conservative_rasterize_segment(
+    std::vector< CellIndices< dimension > > conservative_rasterize_segment(
         const RegularGrid< dimension >& grid,
         const Segment< dimension >& segment )
     {
@@ -626,7 +625,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::vector< Index< dimension > > rasterize_triangle(
+    std::vector< CellIndices< dimension > > rasterize_triangle(
         const RegularGrid< dimension >& grid,
         const Triangle< dimension >& triangle )
     {
@@ -649,23 +648,23 @@ namespace geode
             grid, triangle, vertex_cells );
     }
 
-    template std::vector< Index< 2 > > opengeode_mesh_api
+    template std::vector< CellIndices< 2 > > opengeode_mesh_api
         rasterize_segment< 2 >( const RegularGrid2D&, const Segment2D& );
 
-    template std::vector< Index< 3 > > opengeode_mesh_api
+    template std::vector< CellIndices< 3 > > opengeode_mesh_api
         rasterize_segment< 3 >( const RegularGrid3D&, const Segment3D& );
 
-    template std::vector< Index< 2 > >
+    template std::vector< CellIndices< 2 > >
         opengeode_mesh_api conservative_rasterize_segment< 2 >(
             const RegularGrid2D&, const Segment2D& );
 
-    template std::vector< Index< 3 > >
+    template std::vector< CellIndices< 3 > >
         opengeode_mesh_api conservative_rasterize_segment< 3 >(
             const RegularGrid3D&, const Segment3D& );
 
-    template std::vector< Index< 2 > > opengeode_mesh_api
+    template std::vector< CellIndices< 2 > > opengeode_mesh_api
         rasterize_triangle< 2 >( const RegularGrid2D&, const Triangle2D& );
 
-    template std::vector< Index< 3 > > opengeode_mesh_api
+    template std::vector< CellIndices< 3 > > opengeode_mesh_api
         rasterize_triangle< 3 >( const RegularGrid3D&, const Triangle3D& );
 } // namespace geode

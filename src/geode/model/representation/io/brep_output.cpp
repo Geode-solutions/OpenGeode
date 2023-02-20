@@ -25,6 +25,7 @@
 
 #include <absl/strings/ascii.h>
 
+#include <geode/basic/filename.h>
 #include <geode/basic/timer.h>
 
 #include <geode/model/representation/core/brep.h>

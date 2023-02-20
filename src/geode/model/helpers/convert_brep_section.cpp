@@ -46,15 +46,14 @@ namespace
     {
         geode::ModelCopyMapping mappings;
         mappings.emplace(
-            geode::Corner< ModelTo::dimension >::component_type_static(),
+            geode::Corner< ModelTo::dim >::component_type_static(),
             geode::detail::copy_corner_components_without_type(
                 from, to, builder_to ) );
-        mappings.emplace(
-            geode::Line< ModelTo::dimension >::component_type_static(),
+        mappings.emplace( geode::Line< ModelTo::dim >::component_type_static(),
             geode::detail::copy_line_components_without_type(
                 from, to, builder_to ) );
         mappings.emplace(
-            geode::Surface< ModelTo::dimension >::component_type_static(),
+            geode::Surface< ModelTo::dim >::component_type_static(),
             geode::detail::copy_surface_components_without_type(
                 from, to, builder_to ) );
         builder_to.copy_relationships( mappings, from );

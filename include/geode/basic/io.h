@@ -23,45 +23,24 @@
 
 #pragma once
 
-#include <geode/basic/logger.h>
-
-#include <geode/mesh/common.h>
-#include <geode/mesh/io/io.h>
+#include <geode/basic/common.h>
 
 namespace geode
 {
-    template < typename Mesh, typename... Args >
-    class Input : public IOFile
+    class IOFile
     {
     public:
-        virtual Mesh read( const Args&... args ) = 0;
+        virtual ~IOFile() = default;
 
-        ~Input()
+        absl::string_view filename() const
         {
-            if( inspect_required_ )
-            {
-                geode::Logger::warn(
-                    "[Input] The file loader notified INCONSISTENCIES in the "
-                    "given data file. In consequence, the loaded structure is "
-                    "likely BROKEN, and there is NO GUARANTEE that any further "
-                    "operation will work on it without repairing it first. We "
-                    "highly recommend inspecting the data to make sure these "
-                    "inconsistencies do not impact your following work. To do "
-                    "so, you can for example use the Open-Source "
-                    "OpenGeode-Inspector or the online free tool: "
-                    "https://geode-solutions.com/tools/validitychecker" );
-            }
+            return filename_;
         }
 
     protected:
-        Input( absl::string_view filename ) : IOFile( filename ) {}
-
-        void need_to_inspect_result()
-        {
-            inspect_required_ = true;
-        }
+        IOFile( absl::string_view filename ) : filename_( filename ) {}
 
     private:
-        bool inspect_required_{ false };
+        absl::string_view filename_;
     };
 } // namespace geode

@@ -47,7 +47,7 @@ namespace geode
         class SimplicialModelCreator
         {
             using ModelBuilder = typename Model::Builder;
-            static constexpr auto dimension = Model::dimension;
+            static constexpr auto dimension = Model::dim;
 
         public:
             SimplicialModelCreator(

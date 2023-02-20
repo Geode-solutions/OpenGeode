@@ -27,13 +27,12 @@
 
 #include <geode/basic/library.h>
 
+#include "array.h"
 #include "attribute.h"
 #include "attribute_manager.h"
-#include "greyscale_color.h"
 #include "identifier.h"
 #include "identifier_builder.h"
 #include "mapping.h"
-#include "rgb_color.h"
 #include "uuid.h"
 
 namespace pybind11
@@ -51,6 +50,12 @@ namespace pybind11
             : string_caster< absl::string_view, true >
         {
         };
+
+        template < typename T >
+        struct type_caster< absl::optional< T > >
+            : public optional_caster< absl::optional< T > >
+        {
+        };
     } // namespace detail
 } // namespace pybind11
 
@@ -63,12 +68,11 @@ PYBIND11_MODULE( opengeode_py_basic, module )
     module.attr( "global_epsilon" ) = geode::global_epsilon;
     pybind11::class_< geode::OpenGeodeBasic >( module, "OpenGeodeBasic" )
         .def( "initialize", &geode::OpenGeodeBasic::initialize );
-    geode::define_uuid( module );
+    geode::define_array( module );
     geode::define_attributes( module );
     geode::define_attribute_manager( module );
-    geode::define_mapping( module );
     geode::define_identifier( module );
     geode::define_identifier_builder( module );
-    geode::define_rgb_color( module );
-    geode::define_greyscale_color( module );
+    geode::define_mapping( module );
+    geode::define_uuid( module );
 }

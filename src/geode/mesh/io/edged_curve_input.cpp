@@ -26,9 +26,9 @@
 #include <absl/strings/ascii.h>
 
 #include <geode/basic/filename.h>
+#include <geode/basic/identifier_builder.h>
 #include <geode/basic/timer.h>
 
-#include <geode/mesh/builder/edged_curve_builder.h>
 #include <geode/mesh/core/edged_curve.h>
 #include <geode/mesh/core/mesh_factory.h>
 
@@ -51,8 +51,8 @@ namespace geode
             auto edged_curve = input->read( impl );
             if( edged_curve->name() == Identifier::DEFAULT_NAME )
             {
-                EdgedCurveBuilder< dimension >::create( *edged_curve )
-                    ->set_name( filename_without_extension( filename ) );
+                IdentifierBuilder{ *edged_curve }.set_name(
+                    filename_without_extension( filename ) );
             }
             Logger::info( "EdgedCurve", dimension, "D loaded from ", filename,
                 " in ", timer.duration() );

@@ -23,27 +23,44 @@
 
 #pragma once
 
-#include <geode/mesh/common.h>
+#include <geode/basic/common.h>
+#include <geode/basic/io.h>
+#include <geode/basic/logger.h>
 
 namespace geode
 {
-    absl::string_view opengeode_mesh_api extension_from_filename(
-        absl::string_view filename );
-
-    class IOFile
+    template < typename Object, typename... Args >
+    class Input : public IOFile
     {
     public:
-        virtual ~IOFile() = default;
+        virtual Object read( const Args&... args ) = 0;
 
-        absl::string_view filename() const
+        ~Input()
         {
-            return filename_;
+            if( inspect_required_ )
+            {
+                geode::Logger::warn(
+                    "[Input] The file loader notified INCONSISTENCIES in the "
+                    "given data file. In consequence, the loaded structure is "
+                    "likely BROKEN, and there is NO GUARANTEE that any further "
+                    "operation will work on it without repairing it first. We "
+                    "highly recommend inspecting the data to make sure these "
+                    "inconsistencies do not impact your following work. To do "
+                    "so, you can for example use the Open-Source "
+                    "OpenGeode-Inspector or the online free tool: "
+                    "https://geode-solutions.com/tools/validitychecker" );
+            }
         }
 
     protected:
-        IOFile( absl::string_view filename ) : filename_( filename ) {}
+        Input( absl::string_view filename ) : IOFile( filename ) {}
+
+        void need_to_inspect_result()
+        {
+            inspect_required_ = true;
+        }
 
     private:
-        absl::string_view filename_;
+        bool inspect_required_{ false };
     };
 } // namespace geode

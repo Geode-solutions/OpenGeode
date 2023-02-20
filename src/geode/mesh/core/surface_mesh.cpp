@@ -916,8 +916,8 @@ namespace geode
             return 0;
         }
         double area{ 0 };
-        const auto direction = new_polygon_normal( polygon_id )
-                                   .value_or( Vector3D{ { 0, 0, 1 } } );
+        const auto direction =
+            polygon_normal( polygon_id ).value_or( Vector3D{ { 0, 0, 1 } } );
         const auto vertices = polygon_vertices( polygon_id );
         const auto& p1 = point( vertices[0] );
         for( const auto i : LRange{ 1, vertices.size() - 1 } )

@@ -23,7 +23,7 @@
 
 #include <pybind11/operators.h>
 
-#include <geode/basic/rgb_color.h>
+#include <geode/image/core/rgb_color.h>
 
 namespace geode
 {

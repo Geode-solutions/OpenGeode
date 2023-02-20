@@ -30,25 +30,17 @@
 #define PYTHON_REGULAR_GRID( Base, dimension )                                 \
     const auto name##dimension =                                               \
         "RegularGrid" + std::to_string( dimension ) + "D";                     \
-    pybind11::class_< RegularGrid##dimension##D, Base##dimension##D >(         \
-        module, name##dimension.c_str() )                                      \
+    pybind11::class_< RegularGrid##dimension##D, Base##dimension##D,           \
+        Array##dimension##D >( module, name##dimension.c_str() )               \
         .def_static(                                                           \
             "create", ( std::unique_ptr< RegularGrid##dimension##D >( * )() )  \
                           & RegularGrid##dimension##D::create )                \
         .def(                                                                  \
             "nb_cell_vertices", &RegularGrid##dimension##D::nb_cell_vertices ) \
         .def( "origin", &RegularGrid##dimension##D::origin )                   \
-        .def( "nb_cells", ( index_t( RegularGrid< dimension >::* )() const )   \
-                              & RegularGrid##dimension##D::nb_cells )          \
-        .def( "nb_cells_in_direction",                                         \
-            &RegularGrid##dimension##D::nb_cells_in_direction )                \
         .def( "cell_length_in_direction",                                      \
             &RegularGrid##dimension##D::cell_length_in_direction )             \
         .def( "cell_size", &RegularGrid##dimension##D::cell_size )             \
-        .def( "cell_index", &RegularGrid##dimension##D::cell_index )           \
-        .def( "cell_indices", &RegularGrid##dimension##D::cell_indices )       \
-        .def( "next_cell", &RegularGrid##dimension##D::next_cell )             \
-        .def( "previous_cell", &RegularGrid##dimension##D::previous_cell )     \
         .def( "nb_vertices_in_direction",                                      \
             &RegularGrid##dimension##D::nb_vertices_in_direction )             \
         .def( "vertex_index", &RegularGrid##dimension##D::vertex_index )       \

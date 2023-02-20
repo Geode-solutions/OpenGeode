@@ -779,8 +779,7 @@ namespace geode
         {
             const auto& p1 = point( facet_vertices[v - 1] );
             const auto& p2 = point( facet_vertices[v] );
-            if( const auto triangle_normal =
-                    Triangle3D{ p0, p1, p2 }.new_normal() )
+            if( const auto triangle_normal = Triangle3D{ p0, p1, p2 }.normal() )
             {
                 normal += triangle_normal.value();
             }

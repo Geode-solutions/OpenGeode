@@ -23,3 +23,8 @@ add_geode_test(
     DEPENDENCIES
         ${PROJECT_NAME}::image
 )
+add_geode_test(
+    SOURCE "test-raster.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::image
+)

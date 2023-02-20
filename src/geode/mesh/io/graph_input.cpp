@@ -26,9 +26,9 @@
 #include <absl/strings/ascii.h>
 
 #include <geode/basic/filename.h>
+#include <geode/basic/identifier_builder.h>
 #include <geode/basic/timer.h>
 
-#include <geode/mesh/builder/graph_builder.h>
 #include <geode/mesh/core/graph.h>
 #include <geode/mesh/core/mesh_factory.h>
 
@@ -48,7 +48,7 @@ namespace geode
             auto graph = input->read( impl );
             if( graph->name() == Identifier::DEFAULT_NAME )
             {
-                GraphBuilder::create( *graph )->set_name(
+                IdentifierBuilder{ *graph }.set_name(
                     filename_without_extension( filename ) );
             }
             Logger::info(

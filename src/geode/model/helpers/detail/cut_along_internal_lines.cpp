@@ -55,7 +55,7 @@ namespace geode
             using CMVmappings = std::vector< CMVmapping >;
             using Task = async::task< CMVmappings >;
             using ModelBuilder = typename Model::Builder;
-            static constexpr auto dimension = Model::dimension;
+            static constexpr auto dimension = Model::dim;
             struct SurfaceInfo
             {
                 SurfaceInfo( index_t nb_vertices )
@@ -291,7 +291,7 @@ namespace geode
         template < typename Model >
         std::vector< std::pair< ComponentMeshVertex, ComponentMeshVertex > >
             CutAlongInternalLines< Model >::cut_surface(
-                const Surface< Model::dimension >& surface )
+                const Surface< Model::dim >& surface )
         {
             return impl_->cut_surface( surface );
         }

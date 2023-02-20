@@ -27,6 +27,8 @@
 
 #include <geode/geometry/bitsery_archive.h>
 
+#include <geode/image/core/bitsery_archive.h>
+
 #include <geode/mesh/core/bitsery_archive.h>
 
 #define BITSERY_READ( Mesh )                                                   \
@@ -39,6 +41,7 @@
         TContext context{};                                                    \
         register_basic_deserialize_pcontext( std::get< 0 >( context ) );       \
         register_geometry_deserialize_pcontext( std::get< 0 >( context ) );    \
+        register_image_deserialize_pcontext( std::get< 0 >( context ) );       \
         register_mesh_deserialize_pcontext( std::get< 0 >( context ) );        \
         Deserializer archive{ context, file };                                 \
         auto mesh = Mesh::create( impl );                                      \

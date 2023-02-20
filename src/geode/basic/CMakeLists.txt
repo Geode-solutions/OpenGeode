@@ -58,6 +58,8 @@ add_geode_library(
         "factory.h"
         "filename.h"
         "identifier.h"
+        "input.h"
+        "io.h"
         "identifier_builder.h"
         "library.h"
         "logger.h"
@@ -65,6 +67,7 @@ add_geode_library(
         "logger_manager.h"
         "mapping.h"
         "named_type.h"
+        "output.h"
         "passkey.h"
         "permutation.h"
         "pimpl.h"
@@ -82,6 +85,8 @@ add_geode_library(
     ADVANCED_HEADERS
         "detail/bitsery_archive.h"
         "detail/mapping_after_deletion.h"
+    PRIVATE_HEADERS
+        "private/array_impl.h"
     PUBLIC_DEPENDENCIES
         absl::flat_hash_map
         absl::strings

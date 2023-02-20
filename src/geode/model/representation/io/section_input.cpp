@@ -26,6 +26,7 @@
 #include <absl/strings/ascii.h>
 
 #include <geode/basic/filename.h>
+#include <geode/basic/identifier_builder.h>
 #include <geode/basic/timer.h>
 
 #include <geode/model/representation/builder/section_builder.h>
@@ -46,7 +47,7 @@ namespace geode
             auto section = input->read();
             if( section.name() == Identifier::DEFAULT_NAME )
             {
-                SectionBuilder{ section }.set_name(
+                IdentifierBuilder{ section }.set_name(
                     filename_without_extension( filename ) );
             }
             Logger::info(

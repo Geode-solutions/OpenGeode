@@ -43,10 +43,10 @@ void test()
     const geode::Vector3D answer{ { 0, 0, -1 } };
 
     const geode::Triangle3D triangle_ref{ a, b_ref, c };
-    const auto new_normal_ref = triangle_ref.new_normal();
-    OPENGEODE_EXCEPTION( new_normal_ref,
+    const auto normal_ref = triangle_ref.normal();
+    OPENGEODE_EXCEPTION( normal_ref,
         "[Test] Normal of reference triangle should be calculated" );
-    OPENGEODE_EXCEPTION( new_normal_ref.value() == answer,
+    OPENGEODE_EXCEPTION( normal_ref.value() == answer,
         "[Test] Wrong normal of reference triangle" );
     const auto pivot_ref = triangle_ref.pivot();
     OPENGEODE_EXCEPTION(
@@ -55,19 +55,19 @@ void test()
         pivot_ref.value() == 0, "[Test] Wrong pivot of reference triangle" );
 
     const geode::Triangle3D triangle1{ a, b, c };
-    const auto new_normal1 = triangle1.new_normal();
+    const auto normal1 = triangle1.normal();
     OPENGEODE_EXCEPTION(
-        new_normal1, "[Test] Normal of triangle1 should be calculated" );
+        normal1, "[Test] Normal of triangle1 should be calculated" );
     OPENGEODE_EXCEPTION(
-        new_normal1.value() == answer, "[Test] Wrong normal of triangle1" );
+        normal1.value() == answer, "[Test] Wrong normal of triangle1" );
     const auto pivot1 = triangle1.pivot();
     OPENGEODE_EXCEPTION(
         !pivot1, "[Test] Pivot of triangle1 should not be calculated" );
 
     const geode::Triangle3D triangle2{ a, b2, c };
-    const auto new_normal2 = triangle2.new_normal();
+    const auto normal2 = triangle2.normal();
     OPENGEODE_EXCEPTION(
-        !new_normal2, "[Test] Normal of triangle2 should not be calculated" );
+        !normal2, "[Test] Normal of triangle2 should not be calculated" );
     const auto pivot2 = triangle2.pivot();
     OPENGEODE_EXCEPTION(
         !pivot2, "[Test] Pivot of triangle2 should not be calculated" );

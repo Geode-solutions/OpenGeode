@@ -25,10 +25,36 @@
 
 #include <geode/basic/library.h>
 
+#include <geode/image/core/raster.h>
+#include <geode/image/io/detail/geode_bitsery_raster_input.h>
+#include <geode/image/io/detail/geode_bitsery_raster_output.h>
+#include <geode/image/io/raster_input.h>
+#include <geode/image/io/raster_output.h>
+
+#define BITSERY_INPUT_RASTER_REGISTER_XD( dimension )                          \
+    geode::RasterImageInputFactory##dimension##D::register_creator<            \
+        geode::OpenGeodeRasterImageInput##dimension##D >(                      \
+        geode::RasterImage##dimension##D ::native_extension_static() )
+
+#define BITSERY_INPUT_RASTER_REGISTER_2D_3D()                                  \
+    BITSERY_INPUT_RASTER_REGISTER_XD( 2 );                                     \
+    BITSERY_INPUT_RASTER_REGISTER_XD( 3 )
+
+#define BITSERY_OUTPUT_RASTER_REGISTER_XD( dimension )                         \
+    geode::RasterImageOutputFactory##dimension##D::register_creator<           \
+        geode::OpenGeodeRasterImageOutput##dimension##D >(                     \
+        geode::RasterImage##dimension##D ::native_extension_static() )
+
+#define BITSERY_OUTPUT_RASTER_REGISTER_2D_3D()                                 \
+    BITSERY_OUTPUT_RASTER_REGISTER_XD( 2 );                                    \
+    BITSERY_OUTPUT_RASTER_REGISTER_XD( 3 )
+
 namespace geode
 {
     OPENGEODE_LIBRARY_IMPLEMENTATION( OpenGeodeImage )
     {
         OpenGeodeBasic::initialize();
+        BITSERY_INPUT_RASTER_REGISTER_2D_3D();
+        BITSERY_OUTPUT_RASTER_REGISTER_2D_3D();
     }
 } // namespace geode

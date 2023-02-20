@@ -25,6 +25,8 @@
 
 #include <geode/geometry/common.h>
 
+#include <geode/image/common.h>
+
 #include <geode/mesh/builder/detail/register_builder.h>
 #include <geode/mesh/core/detail/register_mesh.h>
 #include <geode/mesh/io/detail/register_input.h>
@@ -35,6 +37,7 @@ namespace geode
     OPENGEODE_LIBRARY_IMPLEMENTATION( OpenGeodeMesh )
     {
         OpenGeodeGeometry::initialize();
+        OpenGeodeImage::initialize();
         register_geode_mesh();
         register_geode_builder();
         register_geode_mesh_input();

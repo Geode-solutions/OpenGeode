@@ -50,7 +50,7 @@ namespace
     template < typename Model >
     class FromModel
     {
-        static constexpr auto dimension = Model::dimension;
+        static constexpr auto dimension = Model::dim;
 
     public:
         FromModel( const Model& model ) : model_( model )
@@ -278,7 +278,7 @@ namespace
     template < typename SurfaceType, typename Model >
     class SurfaceFromModel
     {
-        static constexpr auto dimension = Model::dimension;
+        static constexpr auto dimension = Model::dim;
 
     public:
         SurfaceFromModel( FromModel< Model >& model )
@@ -402,7 +402,7 @@ namespace
     template < typename Model >
     class CurveFromModel
     {
-        static constexpr auto dimension = Model::dimension;
+        static constexpr auto dimension = Model::dim;
 
     public:
         CurveFromModel( FromModel< Model >& model )
