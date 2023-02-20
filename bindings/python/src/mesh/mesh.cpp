@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - 2022 Geode-solutions
+ * Copyright (c) 2019 - 2023 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -61,6 +61,7 @@
 #include "helpers/convert_point_set.h"
 #include "helpers/convert_solid_mesh.h"
 #include "helpers/convert_surface_mesh.h"
+#include "helpers/euclidean_distance_transform.h"
 #include "helpers/geometrical_operations_on_mesh.h"
 #include "helpers/repair_polygon_orientations.h"
 
@@ -180,6 +181,7 @@ PYBIND11_MODULE( opengeode_py_mesh, module )
     geode::define_convert_point_set( module );
     geode::define_convert_surface_mesh( module );
     geode::define_convert_solid_mesh( module );
+    geode::define_euclidean_distance_transform( module );
     geode::define_repair_polygon_orientations( module );
     geode::geometrical_operations_on_mesh( module );
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - 2022 Geode-solutions
+ * Copyright (c) 2019 - 2023 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@
 #include <geode/basic/assert.h>
 #include <geode/basic/logger.h>
 
+#include <geode/geometry/basic_objects/cylinder.h>
 #include <geode/geometry/basic_objects/infinite_line.h>
 #include <geode/geometry/basic_objects/plane.h>
 #include <geode/geometry/basic_objects/segment.h>
@@ -497,6 +498,119 @@ void test_segment_triangle_intersection()
         "query segment_mn" );
 }
 
+void test_line_cylinder_intersection()
+{
+    const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
+    const geode::Point3D b{ { 1.0, 0.0, 0.0 } };
+    const geode::Segment3D segment_ab{ a, b };
+    const geode::Cylinder cylinder{ segment_ab, 0.2 };
+
+    const geode::InfiniteLine3D line_ab{ segment_ab };
+    const auto result_ab =
+        geode::line_cylinder_intersection( line_ab, cylinder );
+    OPENGEODE_EXCEPTION( result_ab,
+        "[Test] Wrong result for line_cylinder_intersection with "
+        "query line_ab" );
+    OPENGEODE_EXCEPTION( result_ab.result->size() == 2,
+        "[Test] Wrong result size for line_cylinder_intersection with "
+        "query line_ab" );
+    OPENGEODE_EXCEPTION( result_ab.result->front() == a,
+        "[Test] Wrong result values for line_cylinder_intersection with "
+        "query line_ab" );
+    OPENGEODE_EXCEPTION( result_ab.result->back() == b,
+        "[Test] Wrong result values for line_cylinder_intersection with "
+        "query line_ab" );
+
+    const geode::Point3D c{ { 0.5, 0.0, 0.0 } };
+    const geode::Point3D d{ { 0.5, 1.0, 0.0 } };
+    const geode::Segment3D segment_cd{ c, d };
+    const geode::InfiniteLine3D line_cd{ segment_cd };
+    const auto result_cd =
+        geode::line_cylinder_intersection( line_cd, cylinder );
+    OPENGEODE_EXCEPTION( result_cd,
+        "[Test] Wrong result for line_cylinder_intersection with "
+        "query line_cd" );
+    OPENGEODE_EXCEPTION( result_cd.result->size() == 2,
+        "[Test] Wrong result size for line_cylinder_intersection with "
+        "query line_cd" );
+    const geode::Point3D answer_cd0{ { 0.5, -0.2, 0.0 } };
+    const geode::Point3D answer_cd1{ { 0.5, 0.2, 0.0 } };
+    OPENGEODE_EXCEPTION( result_cd.result->front() == answer_cd0,
+        "[Test] Wrong result values for line_cylinder_intersection with "
+        "query line_cd" );
+    OPENGEODE_EXCEPTION( result_cd.result->back() == answer_cd1,
+        "[Test] Wrong result values for line_cylinder_intersection with "
+        "query line_cd" );
+
+    const geode::Point3D e{ { 0.2, 0.1, 0.0 } };
+    const geode::Point3D f{ { 0.4, 0.2, 0.0 } };
+    const geode::Segment3D segment_ef{ e, f };
+    const geode::InfiniteLine3D line_ef{ segment_ef };
+    const auto result_ef =
+        geode::line_cylinder_intersection( line_ef, cylinder );
+    OPENGEODE_EXCEPTION( result_ef,
+        "[Test] Wrong result for line_cylinder_intersection with "
+        "query line_ef" );
+    OPENGEODE_EXCEPTION( result_ef.result->size() == 2,
+        "[Test] Wrong result size for line_cylinder_intersection with "
+        "query line_ef" );
+    const geode::Point3D answer_ef1{ { 0.4, 0.2, 0.0 } };
+    OPENGEODE_EXCEPTION( result_ef.result->front() == a,
+        "[Test] Wrong result values for line_cylinder_intersection with "
+        "query line_ef" );
+    OPENGEODE_EXCEPTION( result_ef.result->back() == answer_ef1,
+        "[Test] Wrong result values for line_cylinder_intersection with "
+        "query line_ef" );
+}
+
+void test_segment_cylinder_intersection()
+{
+    const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
+    const geode::Point3D b{ { 1.0, 0.0, 0.0 } };
+    const geode::Segment3D segment_ab{ a, b };
+    const geode::Cylinder cylinder{ segment_ab, 0.2 };
+
+    const auto result_ab =
+        geode::segment_cylinder_intersection( segment_ab, cylinder );
+    OPENGEODE_EXCEPTION( result_ab,
+        "[Test] Wrong result for segment_cylinder_intersection with "
+        "query segment_ab" );
+    OPENGEODE_EXCEPTION( result_ab.result->size() == 2,
+        "[Test] Wrong result size for segment_cylinder_intersection with "
+        "query segment_ab" );
+    OPENGEODE_EXCEPTION( result_ab.result->front() == a,
+        "[Test] Wrong result values for segment_cylinder_intersection with "
+        "query segment_ab" );
+    OPENGEODE_EXCEPTION( result_ab.result->back() == b,
+        "[Test] Wrong result values for segment_cylinder_intersection with "
+        "query segment_ab" );
+
+    const geode::Point3D c{ { 0.5, 0.0, 0.0 } };
+    const geode::Point3D d{ { 0.5, 1.0, 0.0 } };
+    const geode::Segment3D segment_cd{ c, d };
+    const auto result_cd =
+        geode::segment_cylinder_intersection( segment_cd, cylinder );
+    OPENGEODE_EXCEPTION( result_cd,
+        "[Test] Wrong result for segment_cylinder_intersection with "
+        "query segment_cd" );
+    OPENGEODE_EXCEPTION( result_cd.result->size() == 1,
+        "[Test] Wrong result size for segment_cylinder_intersection with "
+        "query segment_cd" );
+    const geode::Point3D answer_cd{ { 0.5, 0.2, 0.0 } };
+    OPENGEODE_EXCEPTION( result_cd.result->front() == answer_cd,
+        "[Test] Wrong result values for segment_cylinder_intersection with "
+        "query segment_cd" );
+
+    const geode::Point3D e{ { 0.2, 0.1, 0.0 } };
+    const geode::Point3D f{ { 0.3, 0.15, 0.0 } };
+    const geode::Segment3D segment_ef{ e, f };
+    const auto result_ef =
+        geode::segment_cylinder_intersection( segment_ef, cylinder );
+    OPENGEODE_EXCEPTION( !result_ef,
+        "[Test] Wrong result for segment_cylinder_intersection with "
+        "query segment_ef" );
+}
+
 void test()
 {
     test_line_sphere_intersection();
@@ -506,8 +620,8 @@ void test()
     test_segment_line_intersection();
     test_segment_plane_intersection();
     test_segment_triangle_intersection();
-
-    geode::Logger::info( "TEST SUCCESS" );
+    test_line_cylinder_intersection();
+    test_segment_cylinder_intersection();
 }
 
 OPENGEODE_TEST( "intersection" )

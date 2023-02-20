@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - 2022 Geode-solutions
+ * Copyright (c) 2019 - 2023 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,6 +21,7 @@
  *
  */
 
+#include <geode/mesh/core/hybrid_solid.h>
 #include <geode/mesh/core/polyhedral_solid.h>
 #include <geode/mesh/core/solid_edges.h>
 #include <geode/mesh/core/solid_facets.h>
@@ -83,6 +84,12 @@
             &SolidMesh##dimension##D::polyhedron_barycenter )                  \
         .def( "facet_barycenter", &SolidMesh##dimension##D::facet_barycenter ) \
         .def( "edge_barycenter", &SolidMesh##dimension##D::edge_barycenter )   \
+        .def(                                                                  \
+            "polyhedron_volume", &SolidMesh##dimension##D::polyhedron_volume ) \
+        .def( "polyhedron_facet_normal",                                       \
+            &SolidMesh##dimension##D::polyhedron_facet_normal )                \
+        .def( "new_polyhedron_facet_normal",                                   \
+            &SolidMesh##dimension##D::new_polyhedron_facet_normal )            \
         .def( "polyhedron_around_vertex",                                      \
             &SolidMesh##dimension##D::polyhedron_around_vertex )               \
         .def( "polyhedra_around_vertex",                                       \
@@ -115,18 +122,21 @@
                 return solid.type_name()                                       \
                        == TetrahedralSolid< dimension >::type_name_static();   \
             } )                                                                \
-        .def(                                                                  \
-            "is_polyhedral_type", []( const SolidMesh< dimension >& solid ) {  \
+        .def( "is_polyhedral_type",                                            \
+            []( const SolidMesh< dimension >& solid ) {                        \
                 return solid.type_name()                                       \
                        == PolyhedralSolid< dimension >::type_name_static();    \
-            } )
+            } )                                                                \
+        .def( "is_hybrid_type", []( const SolidMesh< dimension >& solid ) {    \
+            return solid.type_name()                                           \
+                   == HybridSolid< dimension >::type_name_static();            \
+        } )
 
 namespace geode
 {
     void define_solid_mesh( pybind11::module& module )
     {
-        PYTHON_SOLID_MESH( 3 ).def( "polyhedron_facet_normal",
-            &SolidMesh3D::polyhedron_facet_normal< 3 > );
+        PYTHON_SOLID_MESH( 3 );
 
         pybind11::class_< PolyhedronVertex >( module, "PolyhedronVertex" )
             .def( pybind11::init<>() )

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - 2022 Geode-solutions
+ * Copyright (c) 2019 - 2023 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -46,6 +46,7 @@ namespace geode
 
     public:
         using Builder = RegularGridBuilder< 3 >;
+        static constexpr index_t dim{ 3 };
 
         /*!
          * Create a new RegularGrid using default data structure.

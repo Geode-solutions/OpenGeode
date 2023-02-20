@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - 2022 Geode-solutions
+ * Copyright (c) 2019 - 2023 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -47,7 +47,7 @@ namespace geode
         class SimplicialModelCreator
         {
             using ModelBuilder = typename Model::Builder;
-            static constexpr auto dimension = Model::dimension;
+            static constexpr auto dimension = Model::dim;
 
         public:
             SimplicialModelCreator(

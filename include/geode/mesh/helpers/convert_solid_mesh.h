@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - 2022 Geode-solutions
+ * Copyright (c) 2019 - 2023 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,19 +24,24 @@
 #pragma once
 
 #include <absl/types/optional.h>
+#include <absl/types/span.h>
 
 #include <geode/mesh/common.h>
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( TetrahedralSolid );
-    ALIAS_3D( TetrahedralSolid );
     FORWARD_DECLARATION_DIMENSION_CLASS( SolidMesh );
+    FORWARD_DECLARATION_DIMENSION_CLASS( TetrahedralSolid );
     ALIAS_3D( SolidMesh );
+    ALIAS_3D( TetrahedralSolid );
 } // namespace geode
 
 namespace geode
 {
     absl::optional< std::unique_ptr< TetrahedralSolid3D > > opengeode_mesh_api
         convert_solid_mesh_into_tetrahedral_solid( const SolidMesh3D& solid );
+
+    std::unique_ptr< SolidMesh3D > opengeode_mesh_api merge_solid_meshes(
+        absl::Span< const std::reference_wrapper< const SolidMesh3D > >
+            solids );
 } // namespace geode

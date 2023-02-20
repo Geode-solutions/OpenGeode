@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - 2022 Geode-solutions
+ * Copyright (c) 2019 - 2023 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,7 @@
 
 #include <geode/mesh/builder/tetrahedral_solid_builder.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
+#include <geode/mesh/helpers/detail/solid_merger.h>
 #include <geode/mesh/helpers/private/copy.h>
 
 namespace
@@ -82,5 +83,12 @@ namespace geode
         return absl::optional< std::unique_ptr< TetrahedralSolid3D > >{
             absl::in_place, tet_solid.release()
         };
+    }
+
+    std::unique_ptr< SolidMesh3D > merge_solid_meshes(
+        absl::Span< const std::reference_wrapper< const SolidMesh3D > > solids )
+    {
+        detail::SolidMeshMerger3D merger{ solids, global_epsilon };
+        return merger.merge();
     }
 } // namespace geode

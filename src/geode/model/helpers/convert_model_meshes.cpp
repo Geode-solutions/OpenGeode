@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - 2022 Geode-solutions
+ * Copyright (c) 2019 - 2023 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -61,8 +61,11 @@ namespace
     {
         for( const auto v : geode::Indices{ unique_vertices } )
         {
-            builder.set_unique_vertex(
-                { component_id, v }, unique_vertices[v] );
+            if( unique_vertices[v] != geode::NO_ID )
+            {
+                builder.set_unique_vertex(
+                    { component_id, v }, unique_vertices[v] );
+            }
         }
     }
 
@@ -75,7 +78,7 @@ namespace
             const auto& mesh = surface.mesh();
             if( mesh.type_name()
                 == geode::TriangulatedSurface<
-                    Model::dimension >::type_name_static() )
+                    Model::dim >::type_name_static() )
             {
                 continue;
             }

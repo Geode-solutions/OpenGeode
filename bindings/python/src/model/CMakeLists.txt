@@ -1,4 +1,4 @@
-# Copyright (c) 2019 - 2022 Geode-solutions
+# Copyright (c) 2019 - 2023 Geode-solutions
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -38,6 +38,7 @@ add_geode_python_binding(
         "mixin/core/block.h"
         "mixin/core/blocks.h"
         "mixin/core/component.h"
+        "mixin/core/component_mesh_element.h"
         "mixin/core/component_type.h"
         "mixin/core/corner.h"
         "mixin/core/corners.h"

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2019 - 2022 Geode-solutions
+# Copyright (c) 2019 - 2023 Geode-solutions
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -19,8 +19,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os, sys, platform
-if sys.version_info >= (3,8,0) and platform.system() == "Windows":
+import os
+import sys
+import platform
+if sys.version_info >= (3, 8, 0) and platform.system() == "Windows":
     for path in [x.strip() for x in os.environ['PATH'].split(';') if x]:
         os.add_dll_directory(path)
 
@@ -28,20 +30,20 @@ import opengeode_py_geometry as geom
 
 if __name__ == '__main__':
     box = geom.BoundingBox2D()
-    box.add_point( geom.Point2D( [-1, -1] ) )
-    box.add_point( geom.Point2D( [1, 1] ) )
-    
+    box.add_point(geom.Point2D([-1, -1]))
+    box.add_point(geom.Point2D([1, 1]))
+
     box2 = box
-    box2.add_point( geom.Point2D( [-2, -2] ) )
-    box2.add_point( geom.Point2D( [0, 0] ) )
-    
-    box2.add_box( box )
-    if box2.min() != geom.Point2D( [-2, -2] ):
-        raise ValueError( "[Test] Error in BoundingBox union computation" )
-    if box2.max() != geom.Point2D( [1, 1] ):
-        raise ValueError( "[Test] Error in BoundingBox union computation" )
-    
-    if not box2.contains( geom.Point2D( [0, 0] ) ):
-        raise ValueError( "[Test] BBox should contain this point" )
-    if box2.contains( geom.Point2D( [10, 0] ) ):
-        raise ValueError( "[Test] BBox should not contain this point" )
+    box2.add_point(geom.Point2D([-2, -2]))
+    box2.add_point(geom.Point2D([0, 0]))
+
+    box2.add_box(box)
+    if box2.min() != geom.Point2D([-2, -2]):
+        raise ValueError("[Test] Error in BoundingBox union computation")
+    if box2.max() != geom.Point2D([1, 1]):
+        raise ValueError("[Test] Error in BoundingBox union computation")
+
+    if not box2.contains(geom.Point2D([0, 0])):
+        raise ValueError("[Test] BBox should contain this point")
+    if box2.contains(geom.Point2D([10, 0])):
+        raise ValueError("[Test] BBox should not contain this point")
