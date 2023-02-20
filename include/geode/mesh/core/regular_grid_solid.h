@@ -94,7 +94,7 @@ namespace geode
 
         local_index_t get_nb_polyhedron_facets( index_t /*unused*/ ) const final
         {
-            return nb_cell_facets();
+            return nb_cell_neighbors();
         }
 
         local_index_t get_nb_polyhedron_facet_vertices(

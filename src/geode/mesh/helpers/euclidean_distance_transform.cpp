@@ -36,7 +36,7 @@ namespace geode
     template < index_t dimension >
     class EuclideanDistanceTransform
     {
-        using Index = GridCellIndices< dimension >;
+        using Index = typename Grid< dimension >::CellIndices;
 
     public:
         EuclideanDistanceTransform( const RegularGrid< dimension >& grid,
@@ -386,7 +386,8 @@ namespace geode
     template < index_t dimension >
     std::shared_ptr< VariableAttribute< double > > euclidean_distance_transform(
         const RegularGrid< dimension >& grid,
-        absl::Span< const GridCellIndices< dimension > > grid_cell_ids,
+        absl::Span< const typename Grid< dimension >::CellIndices >
+            grid_cell_ids,
         absl::string_view distance_map_name )
     {
         EuclideanDistanceTransform< dimension > edt{ grid, grid_cell_ids,
@@ -398,10 +399,10 @@ namespace geode
 
     template std::shared_ptr< VariableAttribute< double > > opengeode_mesh_api
         euclidean_distance_transform< 2 >( const RegularGrid2D&,
-            absl::Span< const GridCellIndices2D >,
+            absl::Span< const Grid2D::CellIndices >,
             absl::string_view );
     template std::shared_ptr< VariableAttribute< double > > opengeode_mesh_api
         euclidean_distance_transform< 3 >( const RegularGrid3D&,
-            absl::Span< const GridCellIndices3D >,
+            absl::Span< const Grid3D::CellIndices >,
             absl::string_view );
 } // namespace geode

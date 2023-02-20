@@ -22,6 +22,7 @@ add_geode_library(
     NAME basic
     FOLDER "geode/basic"
     SOURCES
+        "array.cpp"
         "assert.cpp"
         "attribute_manager.cpp"
         "bitsery_input.cpp"
@@ -45,6 +46,7 @@ add_geode_library(
         "zip_file.cpp"
     PUBLIC_HEADERS
         "algorithm.h"
+        "array.h"
         "assert.h"
         "attribute_manager.h"
         "attribute_utils.h"
@@ -55,7 +57,6 @@ add_geode_library(
         "console_progress_logger_client.h"
         "factory.h"
         "filename.h"
-        "greyscale_color.h"
         "identifier.h"
         "identifier_builder.h"
         "library.h"
@@ -72,7 +73,6 @@ add_geode_library(
         "progress_logger_client.h"
         "progress_logger_manager.h"
         "range.h"
-        "rgb_color.h"
         "singleton.h"
         "string.h"
         "timer.h"

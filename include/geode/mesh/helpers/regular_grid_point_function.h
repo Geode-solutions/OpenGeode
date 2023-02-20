@@ -63,18 +63,21 @@ namespace geode
             const RegularGrid< dimension >& grid,
             absl::string_view function_name );
 
-        void set_value( const GridVertexIndices< dimension >& vertex_index,
+        void set_value(
+            const typename Grid< dimension >::VertexIndices& vertex_index,
             Point< dimension > value );
 
         void set_value( index_t vertex_index, Point< dimension > value );
 
         const Point< dimension >& value(
-            const GridVertexIndices< dimension >& vertex_index ) const;
+            const typename Grid< dimension >::VertexIndices& vertex_index )
+            const;
 
         const Point< dimension >& value( index_t vertex_index ) const;
 
         Point< dimension > value( const Point< dimension >& point,
-            const GridCellIndices< dimension >& grid_cell_indices ) const;
+            const typename Grid< dimension >::CellIndices& grid_cell_indices )
+            const;
 
     private:
         RegularGridPointFunction( const RegularGrid< dimension >& grid,

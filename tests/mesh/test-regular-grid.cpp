@@ -90,14 +90,14 @@ void test_cell_index( const geode::RegularGrid3D& grid )
         "[Test] Wrong cell index" );
 
     OPENGEODE_EXCEPTION( grid.next_cell( { 0, 0, 0 }, 0 )
-                             == geode::GridCellIndices3D( { 1, 0, 0 } ),
+                             == geode::Grid3D::CellIndices( { 1, 0, 0 } ),
         "[Test] Wrong cell index" );
     OPENGEODE_EXCEPTION(
         !grid.next_cell( { 4, 0, 0 }, 0 ), "[Test] Wrong cell index" );
     OPENGEODE_EXCEPTION(
         !grid.previous_cell( { 0, 0, 0 }, 1 ), "[Test] Wrong cell index" );
     OPENGEODE_EXCEPTION( grid.previous_cell( { 0, 0, 1 }, 2 )
-                             == geode::GridCellIndices3D( { 0, 0, 0 } ),
+                             == geode::Grid3D::CellIndices( { 0, 0, 0 } ),
         "[Test] Wrong cell index" );
 }
 
@@ -156,24 +156,24 @@ void test_vertex_index( const geode::RegularGrid3D& grid )
         "[Test] Wrong vertex index" );
 
     OPENGEODE_EXCEPTION( grid.next_vertex( { 0, 0, 0 }, 0 )
-                             == geode::GridVertexIndices3D( { 1, 0, 0 } ),
+                             == geode::Grid3D::VertexIndices( { 1, 0, 0 } ),
         "[Test] Wrong vertex index" );
     OPENGEODE_EXCEPTION(
         !grid.next_vertex( { 5, 0, 0 }, 0 ), "[Test] Wrong vertex index" );
     OPENGEODE_EXCEPTION(
         !grid.previous_vertex( { 0, 0, 0 }, 1 ), "[Test] Wrong vertex index" );
     OPENGEODE_EXCEPTION( grid.previous_vertex( { 0, 0, 1 }, 2 )
-                             == geode::GridVertexIndices3D( { 0, 0, 0 } ),
+                             == geode::Grid3D::VertexIndices( { 0, 0, 0 } ),
         "[Test] Wrong vertex index" );
 
     OPENGEODE_EXCEPTION( grid.cell_vertices( { 1, 1, 1 } )[0]
-                             == geode::GridVertexIndices3D( { 1, 1, 1 } ),
+                             == geode::Grid3D::VertexIndices( { 1, 1, 1 } ),
         "[Test] Wrong cell node vertex index" );
     OPENGEODE_EXCEPTION( grid.cell_vertex_indices( { 1, 1, 1 }, 1 )
-                             == geode::GridVertexIndices3D( { 2, 1, 1 } ),
+                             == geode::Grid3D::VertexIndices( { 2, 1, 1 } ),
         "[Test] Wrong cell node vertex index" );
     OPENGEODE_EXCEPTION( grid.cell_vertex_indices( { 1, 1, 1 }, 2 )
-                             == geode::GridVertexIndices3D( { 1, 2, 1 } ),
+                             == geode::Grid3D::VertexIndices( { 1, 2, 1 } ),
         "[Test] Wrong cell node vertex index" );
 }
 
@@ -224,25 +224,25 @@ void test_cell_query( const geode::RegularGrid3D& grid )
     auto result = grid.cells( geode::Point3D( { 2, 2, 2 } ) );
     OPENGEODE_EXCEPTION(
         result.size() == 2
-            && result.front() == geode::GridCellIndices3D( { 0, 0, 0 } )
-            && result.back() == geode::GridCellIndices3D( { 0, 1, 0 } ),
+            && result.front() == geode::Grid3D::CellIndices( { 0, 0, 0 } )
+            && result.back() == geode::Grid3D::CellIndices( { 0, 1, 0 } ),
         "[Test] Wrong query result" );
     result = grid.cells( geode::Point3D( { 5, 7, 9 } ) );
     OPENGEODE_EXCEPTION(
         result.size() == 1
-            && result.front() == geode::GridCellIndices3D( { 3, 3, 2 } ),
+            && result.front() == geode::Grid3D::CellIndices( { 3, 3, 2 } ),
         "[Test] Wrong query result" );
     result = grid.cells( geode::Point3D( { 4.5, 6, 7 - 1e-10 } ) );
     OPENGEODE_EXCEPTION(
         result.size() == 8
-            && result[0] == geode::GridCellIndices3D( { 2, 2, 1 } )
-            && result[1] == geode::GridCellIndices3D( { 3, 2, 1 } )
-            && result[2] == geode::GridCellIndices3D( { 2, 3, 1 } )
-            && result[3] == geode::GridCellIndices3D( { 3, 3, 1 } )
-            && result[4] == geode::GridCellIndices3D( { 2, 2, 2 } )
-            && result[5] == geode::GridCellIndices3D( { 3, 2, 2 } )
-            && result[6] == geode::GridCellIndices3D( { 2, 3, 2 } )
-            && result[7] == geode::GridCellIndices3D( { 3, 3, 2 } ),
+            && result[0] == geode::Grid3D::CellIndices( { 2, 2, 1 } )
+            && result[1] == geode::Grid3D::CellIndices( { 3, 2, 1 } )
+            && result[2] == geode::Grid3D::CellIndices( { 2, 3, 1 } )
+            && result[3] == geode::Grid3D::CellIndices( { 3, 3, 1 } )
+            && result[4] == geode::Grid3D::CellIndices( { 2, 2, 2 } )
+            && result[5] == geode::Grid3D::CellIndices( { 3, 2, 2 } )
+            && result[6] == geode::Grid3D::CellIndices( { 2, 3, 2 } )
+            && result[7] == geode::Grid3D::CellIndices( { 3, 3, 2 } ),
         "[Test] Wrong query result" );
     geode::Point3D near_origin_point{ { 1.5 - geode::global_epsilon / 2,
         -geode::global_epsilon / 2, 1 - geode::global_epsilon / 2 } };
@@ -252,7 +252,7 @@ void test_cell_query( const geode::RegularGrid3D& grid )
     result = grid.cells( near_origin_point );
     OPENGEODE_EXCEPTION(
         result.size() == 1
-            && result.front() == geode::GridCellIndices3D( { 0, 0, 0 } ),
+            && result.front() == geode::Grid3D::CellIndices( { 0, 0, 0 } ),
         "[Test] Wrong query result for point near origin." );
     geode::Point3D grid_furthest_point{ { 6.5 + geode::global_epsilon / 2,
         20 + geode::global_epsilon / 2, 46 + geode::global_epsilon / 2 } };
@@ -262,7 +262,7 @@ void test_cell_query( const geode::RegularGrid3D& grid )
     result = grid.cells( grid_furthest_point );
     OPENGEODE_EXCEPTION(
         result.size() == 1
-            && result.front() == geode::GridCellIndices3D( { 4, 9, 14 } ),
+            && result.front() == geode::Grid3D::CellIndices( { 4, 9, 14 } ),
         "[Test] Wrong query result for point near origin furthest corner." );
 }
 
@@ -284,7 +284,7 @@ void test_closest_vertex( const geode::RegularGrid3D& grid )
     const geode::Point3D p4{ { 3.55, 3.9, 7.5 } }; // (2,2,2)
 
     auto result = grid.closest_vertex( p0 );
-    geode::GridVertexIndices3D answer{ 0, 0, 0 };
+    geode::Grid3D::VertexIndices answer{ 0, 0, 0 };
     OPENGEODE_ASSERT( result == answer,
         "[Test] Wrong result for closest vertex for query p0" );
 
@@ -309,7 +309,7 @@ void test_closest_vertex( const geode::RegularGrid3D& grid )
         "[Test] Wrong result for closest vertex for query p4" );
 }
 
-void test_clone( geode::RegularGrid3D& grid )
+void test_clone( const geode::RegularGrid3D& grid )
 {
     const auto attribute_name = "int_attribute";
     const auto attribute_name_d = "double_attribute";
@@ -391,7 +391,18 @@ void test_clone( geode::RegularGrid3D& grid )
 void test_io( const geode::RegularGrid3D& grid, absl::string_view filename )
 {
     geode::save_regular_grid( grid, filename );
-    geode::load_regular_grid< 3 >( filename );
+    const auto reload = geode::load_regular_grid< 3 >( filename );
+    OPENGEODE_EXCEPTION( grid.nb_cells() == reload->nb_cells(),
+        "[Test] Wrong reload nb_cells()" );
+    OPENGEODE_EXCEPTION(
+        grid.nb_cells_in_direction( 0 ) == reload->nb_cells_in_direction( 0 ),
+        "[Test] Wrong reload nb_cells_in_direction(0)" );
+    OPENGEODE_EXCEPTION(
+        grid.nb_cells_in_direction( 1 ) == reload->nb_cells_in_direction( 1 ),
+        "[Test] Wrong reload nb_cells_in_direction(1)" );
+    OPENGEODE_EXCEPTION(
+        grid.nb_cells_in_direction( 2 ) == reload->nb_cells_in_direction( 2 ),
+        "[Test] Wrong reload nb_cells_in_direction(2)" );
 }
 
 void test_adjacencies2D()
@@ -430,24 +441,35 @@ void test_around_vertex( const geode::RegularGrid3D& grid )
     }
 }
 
+void test_grid( const geode::RegularGrid3D& grid )
+{
+    test_cell_number( grid );
+    test_cell_index( grid );
+    test_vertex_number( grid );
+    test_vertex_index( grid );
+    test_vertex_on_border( grid );
+    test_around_vertex( grid );
+    test_cell_geometry( grid );
+    test_cell_query( grid );
+    test_boundary_box( grid );
+    test_closest_vertex( grid );
+    test_clone( grid );
+    test_io( grid, absl::StrCat( "test.", grid.native_extension() ) );
+}
+
 void test()
 {
     geode::OpenGeodeMesh::initialize();
+
     auto grid = geode::RegularGrid3D::create();
     auto builder = geode::RegularGridBuilder3D::create( *grid );
     builder->initialize_grid( { { 1.5, 0, 1 } }, { 5, 10, 15 }, { 1, 2, 3 } );
-    test_cell_number( *grid );
-    test_cell_index( *grid );
-    test_vertex_number( *grid );
-    test_vertex_index( *grid );
-    test_vertex_on_border( *grid );
-    test_around_vertex( *grid );
-    test_cell_geometry( *grid );
-    test_cell_query( *grid );
-    test_boundary_box( *grid );
-    test_closest_vertex( *grid );
-    test_clone( *grid );
-    test_io( *grid, absl::StrCat( "test.", grid->native_extension() ) );
+    test_grid( *grid );
+
+    const auto grid_v12 = geode::load_regular_grid< 3 >(
+        absl::StrCat( geode::data_path, "test_v12.og_rgd3d" ) );
+    test_grid( *grid_v12 );
+
     test_adjacencies2D();
 }
 

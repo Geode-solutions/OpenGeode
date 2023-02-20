@@ -58,7 +58,7 @@ void test_scalar_function()
                 {
                     OPENGEODE_EXCEPTION(
                         scalar_function.value(
-                            geode::GridVertexIndices3D{ { i, j, k } } )
+                            geode::Grid3D::VertexIndices{ { i, j, k } } )
                             == 22,
                         "[Test] Object function value is wrong." );
                 }
@@ -66,7 +66,7 @@ void test_scalar_function()
                 {
                     OPENGEODE_EXCEPTION(
                         scalar_function.value(
-                            geode::GridVertexIndices3D{ { i, j, k } } )
+                            geode::Grid3D::VertexIndices{ { i, j, k } } )
                             == 26,
                         "[Test] Object function value is wrong." );
                 }
@@ -133,7 +133,7 @@ void test_point_function()
                 {
                     OPENGEODE_EXCEPTION(
                         ( point_function.value(
-                              geode::GridVertexIndices3D{ { i, j, k } } )
+                              geode::Grid3D::VertexIndices{ { i, j, k } } )
                             == geode::Point3D{ { 22, -3, -20 } } ),
                         "[Test] Point function value is wrong." );
                 }
@@ -141,7 +141,7 @@ void test_point_function()
                 {
                     OPENGEODE_EXCEPTION(
                         ( point_function.value(
-                              geode::GridVertexIndices3D{ { i, j, k } } )
+                              geode::Grid3D::VertexIndices{ { i, j, k } } )
                             == geode::Point3D{ { 26, 2, -10 } } ),
                         "[Test] Point function value is wrong." );
                 }

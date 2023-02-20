@@ -18,23 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.15)
-    
-if(NOT TARGET OpenGeode::basic)
-    project(OpenGeode CXX)
-    find_package(OpenGeode REQUIRED CONFIG)
-    find_package(Async++ REQUIRED CONFIG)
-    enable_testing()
-endif()
-
-set(DATA_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/data)
-set(test_common_file_in ${CMAKE_CURRENT_LIST_DIR}/common.h.in)
-set(test_common_file ${PROJECT_BINARY_DIR}/geode/tests/common.h)
-configure_file(${test_common_file_in} ${test_common_file})
-include_directories(${PROJECT_BINARY_DIR})
-
-add_subdirectory(basic)
-add_subdirectory(geometry)
-add_subdirectory(image)
-add_subdirectory(mesh)
-add_subdirectory(model)
+add_geode_test(
+    SOURCE "test-colors.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::image
+)

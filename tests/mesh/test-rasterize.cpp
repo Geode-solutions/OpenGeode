@@ -151,7 +151,7 @@ void test_conservative_rasterize_triangle()
     }
 }
 
-void add_cells( absl::flat_hash_set< geode::GridCellIndices3D >& set,
+void add_cells( absl::flat_hash_set< geode::Grid3D::CellIndices >& set,
     const geode::RegularGrid3D& grid,
     const geode::Triangle3D& triangle )
 {
@@ -187,7 +187,7 @@ void test_limit()
     const geode::Triangle3D triangle6{ pt100, pt101, pt111 };
     const geode::Triangle3D triangle6b{ pt100, pt111, pt110 };
 
-    absl::flat_hash_set< geode::GridCellIndices3D > all_cells;
+    absl::flat_hash_set< geode::Grid3D::CellIndices > all_cells;
     add_cells( all_cells, *grid, triangle1 );
     add_cells( all_cells, *grid, triangle1b );
     add_cells( all_cells, *grid, triangle2 );

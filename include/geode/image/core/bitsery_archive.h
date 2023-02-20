@@ -23,30 +23,27 @@
 
 #pragma once
 
-#include <geode/mesh/common.h>
-#include <geode/mesh/core/grid.h>
+#include <geode/basic/bitsery_archive.h>
+
+#include <geode/image/common.h>
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( RegularGrid );
-    FORWARD_DECLARATION_DIMENSION_CLASS( Segment );
-    FORWARD_DECLARATION_DIMENSION_CLASS( Triangle );
-} // namespace geode
+    /*!
+     * Register all the information needed by Bitsery to serialize the objects
+     * in the image library.
+     * @param[in] context The context where to register this information.
+     * @warning The context can be used only once per archive.
+     */
+    void opengeode_image_api register_image_serialize_pcontext(
+        PContext &context );
 
-namespace geode
-{
-    template < index_t dimension >
-    std::vector< typename Grid< dimension >::CellIndices > rasterize_segment(
-        const RegularGrid< dimension >& grid,
-        const Segment< dimension >& segment );
-
-    template < index_t dimension >
-    std::vector< typename Grid< dimension >::CellIndices >
-        conservative_rasterize_segment( const RegularGrid< dimension >& grid,
-            const Segment< dimension >& segment );
-
-    template < index_t dimension >
-    std::vector< typename Grid< dimension >::CellIndices > rasterize_triangle(
-        const RegularGrid< dimension >& grid,
-        const Triangle< dimension >& triangle );
+    /*!
+     * Register all the information needed by Bitsery to deserialize the objects
+     * in the image library.
+     * @param[in] context The context where to register this information.
+     * @warning The context can be used only once per archive.
+     */
+    void opengeode_image_api register_image_deserialize_pcontext(
+        PContext &context );
 } // namespace geode

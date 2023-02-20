@@ -154,24 +154,24 @@ namespace geode
     }
 
     index_t OpenGeodeRegularGrid< 3 >::cell_index(
-        const GridCellIndices3D& index ) const
+        const Grid3D::CellIndices& index ) const
     {
         return impl_->cell_index( *this, index );
     }
 
-    GridCellIndices3D OpenGeodeRegularGrid< 3 >::cell_indices(
+    Grid3D::CellIndices OpenGeodeRegularGrid< 3 >::cell_indices(
         index_t index ) const
     {
         return impl_->cell_indices( *this, index );
     }
 
     index_t OpenGeodeRegularGrid< 3 >::vertex_index(
-        const GridVertexIndices3D& index ) const
+        const Grid3D::VertexIndices& index ) const
     {
         return impl_->vertex_index( *this, index );
     }
 
-    GridVertexIndices3D OpenGeodeRegularGrid< 3 >::vertex_indices(
+    Grid3D::VertexIndices OpenGeodeRegularGrid< 3 >::vertex_indices(
         index_t index ) const
     {
         return impl_->vertex_indices( *this, index );

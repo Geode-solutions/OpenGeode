@@ -38,6 +38,8 @@ namespace geode
         class GridImpl
         {
             friend class bitsery::Access;
+            using CellIndices = typename Grid< dimension >::CellIndices;
+            using VertexIndices = typename Grid< dimension >::VertexIndices;
 
         public:
             const Point< dimension >& origin(
@@ -47,7 +49,7 @@ namespace geode
             }
 
             index_t cell_index( const RegularGrid< dimension >& grid,
-                const GridCellIndices< dimension >& index ) const
+                const CellIndices& index ) const
             {
                 const auto nb_u = grid.nb_cells_in_direction( 0 );
                 auto cell_id = index[0] + index[1] * nb_u;
@@ -59,12 +61,12 @@ namespace geode
                 return cell_id;
             }
 
-            GridCellIndices< dimension > cell_indices(
+            CellIndices cell_indices(
                 const RegularGrid< dimension >& grid, index_t index ) const
             {
                 OPENGEODE_ASSERT( index < grid.nb_cells(),
                     "[RegularGrid::cell_index] Invalid index" );
-                GridCellIndices< dimension > cell_id;
+                CellIndices cell_id;
                 for( const auto d : LRange{ dimension } )
                 {
                     index_t offset{ 1 };
@@ -81,7 +83,7 @@ namespace geode
             }
 
             index_t vertex_index( const RegularGrid< dimension >& grid,
-                const GridVertexIndices< dimension >& index ) const
+                const VertexIndices& index ) const
             {
                 index_t vertex_id{ 0 };
                 for( const auto d : LRange{ dimension } )
@@ -100,12 +102,12 @@ namespace geode
                 return vertex_id;
             }
 
-            GridVertexIndices< dimension > vertex_indices(
+            VertexIndices vertex_indices(
                 const RegularGrid< dimension >& grid, index_t index ) const
             {
                 OPENGEODE_ASSERT( index < grid.nb_vertices(),
                     "[RegularGrid::vertex_index] Invalid index" );
-                GridVertexIndices< dimension > vertex_id;
+                VertexIndices vertex_id;
                 for( const auto d : LRange{ dimension } )
                 {
                     index_t offset{ 1 };

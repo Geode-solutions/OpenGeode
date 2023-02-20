@@ -21,32 +21,34 @@
  *
  */
 
-#pragma once
+#include <geode/image/core/bitsery_archive.h>
 
-#include <geode/mesh/common.h>
-#include <geode/mesh/core/grid.h>
+#include <geode/basic/attribute_manager.h>
+
+#include <geode/image/core/greyscale_color.h>
+#include <geode/image/core/rgb_color.h>
+
+namespace
+{
+    template < typename Serializer >
+    void register_image_pcontext( geode::PContext& context )
+    {
+        geode::AttributeManager::register_attribute_type< geode::GreyscaleColor,
+            Serializer >( context, "GreyScaleColor" );
+        geode::AttributeManager::register_attribute_type< geode::RGBColor,
+            Serializer >( context, "RGBColor" );
+    }
+} // namespace
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( RegularGrid );
-    FORWARD_DECLARATION_DIMENSION_CLASS( Segment );
-    FORWARD_DECLARATION_DIMENSION_CLASS( Triangle );
-} // namespace geode
+    void register_image_serialize_pcontext( PContext& context )
+    {
+        register_image_pcontext< Serializer >( context );
+    }
 
-namespace geode
-{
-    template < index_t dimension >
-    std::vector< typename Grid< dimension >::CellIndices > rasterize_segment(
-        const RegularGrid< dimension >& grid,
-        const Segment< dimension >& segment );
-
-    template < index_t dimension >
-    std::vector< typename Grid< dimension >::CellIndices >
-        conservative_rasterize_segment( const RegularGrid< dimension >& grid,
-            const Segment< dimension >& segment );
-
-    template < index_t dimension >
-    std::vector< typename Grid< dimension >::CellIndices > rasterize_triangle(
-        const RegularGrid< dimension >& grid,
-        const Triangle< dimension >& triangle );
+    void register_image_deserialize_pcontext( PContext& context )
+    {
+        register_image_pcontext< Deserializer >( context );
+    }
 } // namespace geode
