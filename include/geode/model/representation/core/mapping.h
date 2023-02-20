@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - 2022 Geode-solutions
+ * Copyright (c) 2019 - 2023 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -70,10 +70,45 @@ namespace geode
 
     using ModelGenericMapping = ModelMapping< GenericMapping< uuid > >;
 
+    using MeshElementMapping = GenericMapping< MeshElement, MeshElement >;
+
+    using MeshVertexMapping = GenericMapping< MeshVertex, MeshVertex >;
+
     using ComponentMeshElementMapping =
         GenericMapping< MeshElement, ComponentMeshElement >;
 
     using ComponentMeshVertexMapping =
         GenericMapping< MeshVertex, ComponentMeshVertex >;
 
+    struct ModelMeshesElementMapping
+    {
+        MeshElementMapping corners;
+        MeshElementMapping lines;
+        MeshElementMapping surfaces;
+    };
+
+    struct SectionMeshesElementMapping : public ModelMeshesElementMapping
+    {
+    };
+
+    struct BRepMeshesElementMapping : public ModelMeshesElementMapping
+    {
+        MeshElementMapping blocks;
+    };
+
+    struct ModelMeshesVertexMapping
+    {
+        MeshVertexMapping corners;
+        MeshVertexMapping lines;
+        MeshVertexMapping surfaces;
+    };
+
+    struct SectionMeshesVertexMapping : public ModelMeshesVertexMapping
+    {
+    };
+
+    struct BRepMeshesVertexMapping : public ModelMeshesVertexMapping
+    {
+        MeshVertexMapping blocks;
+    };
 } // namespace geode

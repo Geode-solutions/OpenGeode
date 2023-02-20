@@ -232,6 +232,13 @@ function(add_geode_library)
         FILES_MATCHING
         PATTERN "*/private/*"
     )
+    if(MSVC AND BUILD_SHARED_LIBS)
+        install(FILES $<TARGET_PDB_FILE:${GEODE_LIB_NAME}> 
+            DESTINATION bin 
+            COMPONENT public
+            OPTIONAL
+        )
+    endif()
 endfunction()
 
 macro(_find_dependency_directories directories projects)

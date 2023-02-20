@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - 2022 Geode-solutions
+ * Copyright (c) 2019 - 2023 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,10 @@ namespace geode
 {
     void define_convert_edged_curve( pybind11::module& module )
     {
-        module.def(
-            "convert_edged_curve3d_into_2d", &convert_edged_curve3d_into_2d );
+        module
+            .def( "convert_edged_curve3d_into_2d",
+                &convert_edged_curve3d_into_2d )
+            .def( "merge_edged_curves2D", &merge_edged_curves< 2 > )
+            .def( "merge_edged_curves3D", &merge_edged_curves< 3 > );
     }
 } // namespace geode

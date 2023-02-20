@@ -1,4 +1,4 @@
-# Copyright (c) 2019 - 2022 Geode-solutions
+# Copyright (c) 2019 - 2023 Geode-solutions
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the 'Software'), to deal
@@ -23,16 +23,20 @@ from setuptools.dist import Distribution
 from setuptools.command.install import install
 from os import path
 
+
 class BinaryDistribution(Distribution):
     def has_ext_modules(self):
         return True
+
     def is_pure(self):
         return False
-        
+
+
 class InstallPlatlib(install):
     def finalize_options(self):
         install.finalize_options(self)
         self.install_lib = self.install_platlib
+
 
 with open(path.join('${CMAKE_SOURCE_DIR}', 'README.md'), encoding='utf-8') as f:
     long_description = f.read()

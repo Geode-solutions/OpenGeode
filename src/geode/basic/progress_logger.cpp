@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - 2022 Geode-solutions
+ * Copyright (c) 2019 - 2023 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -59,7 +59,7 @@ namespace geode
             }
         }
 
-        void increment( index_t nb_increments )
+        index_t increment( index_t nb_increments )
         {
             const std::lock_guard< std::mutex > locking{ lock_ };
             current_ += nb_increments;
@@ -69,12 +69,14 @@ namespace geode
                 current_time_ = now;
                 ProgressLoggerManager::update( current_, nb_steps_ );
             }
+            return current_;
         }
 
-        void increment_nb_steps( index_t nb_steps )
+        index_t increment_nb_steps( index_t nb_steps )
         {
             const std::lock_guard< std::mutex > locking{ lock_ };
             nb_steps_ += nb_steps;
+            return nb_steps_;
         }
 
     private:
@@ -91,23 +93,23 @@ namespace geode
 
     ProgressLogger::~ProgressLogger() {}
 
-    void ProgressLogger::increment()
+    index_t ProgressLogger::increment()
     {
-        impl_->increment( 1 );
+        return impl_->increment( 1 );
     }
 
-    void ProgressLogger::increment( index_t nb_increments )
+    index_t ProgressLogger::increment( index_t nb_increments )
     {
-        impl_->increment( nb_increments );
+        return impl_->increment( nb_increments );
     }
 
-    void ProgressLogger::increment_nb_steps()
+    index_t ProgressLogger::increment_nb_steps()
     {
-        impl_->increment_nb_steps( 1 );
+        return impl_->increment_nb_steps( 1 );
     }
 
-    void ProgressLogger::increment_nb_steps( index_t nb_steps )
+    index_t ProgressLogger::increment_nb_steps( index_t nb_steps )
     {
-        impl_->increment_nb_steps( nb_steps );
+        return impl_->increment_nb_steps( nb_steps );
     }
 } // namespace geode

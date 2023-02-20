@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - 2022 Geode-solutions
+ * Copyright (c) 2019 - 2023 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
 
+#include <geode/mesh/builder/solid_mesh_builder.h>
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polyhedral_solid.h>
 
@@ -67,7 +68,7 @@ namespace geode
     template < index_t dimension >
     Block< dimension >::Block( const MeshImpl& impl )
     {
-        impl_->set_mesh( SolidMesh< dimension >::create( impl ) );
+        impl_->set_mesh( this->id(), SolidMesh< dimension >::create( impl ) );
     }
 
     template < index_t dimension >
@@ -97,26 +98,36 @@ namespace geode
     template < typename Archive >
     void Block< dimension >::serialize( Archive& archive )
     {
-        archive.ext( *this, DefaultGrowable< Archive, Block >{},
-            []( Archive& a, Block& block ) {
-                a.object( block.impl_ );
-                a.ext( block,
-                    bitsery::ext::BaseClass< Component< dimension > >{} );
-            } );
+        archive.ext( *this,
+            Growable< Archive, Block >{
+                { []( Archive& a, Block& block ) {
+                     a.object( block.impl_ );
+                     a.ext( block,
+                         bitsery::ext::BaseClass< Component< dimension > >{} );
+                     IdentifierBuilder mesh_builder{
+                         block.get_modifiable_mesh()
+                     };
+                     mesh_builder.set_id( block.id() );
+                 },
+                    []( Archive& a, Block& block ) {
+                        a.object( block.impl_ );
+                        a.ext( block, bitsery::ext::BaseClass<
+                                          Component< dimension > >{} );
+                    } } } );
     }
 
     template < index_t dimension >
     void Block< dimension >::set_mesh(
         std::unique_ptr< SolidMesh< dimension > > mesh, BlocksKey )
     {
-        impl_->set_mesh( std::move( mesh ) );
+        impl_->set_mesh( this->id(), std::move( mesh ) );
     }
 
     template < index_t dimension >
     void Block< dimension >::set_mesh(
         std::unique_ptr< SolidMesh< dimension > > mesh, BlocksBuilderKey )
     {
-        impl_->set_mesh( std::move( mesh ) );
+        impl_->set_mesh( this->id(), std::move( mesh ) );
     }
 
     template class opengeode_model_api Block< 3 >;

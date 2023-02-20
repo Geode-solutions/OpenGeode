@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - 2022 Geode-solutions
+ * Copyright (c) 2019 - 2023 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -145,6 +145,7 @@ namespace geode
 
     public:
         using Builder = SurfaceMeshBuilder< dimension >;
+        static constexpr auto dim = dimension;
 
         ~SurfaceMesh();
 
@@ -250,8 +251,8 @@ namespace geode
             const PolygonEdge& polygon_edge ) const;
 
         /*!
-         * Return true if the vertex is on border, i.e. if at there are polygons
-         * around this vertex on border.
+         * Return true if the vertex is on border, i.e. if there are polygons
+         * around this vertex and on the border.
          * @param[in] vertex_id Index the vertex.
          */
         bool is_vertex_on_border( index_t vertex_id ) const;

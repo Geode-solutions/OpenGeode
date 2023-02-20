@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - 2022 Geode-solutions
+ * Copyright (c) 2019 - 2023 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,10 @@
 
 #include <geode/basic/logger.h>
 
+#include <geode/geometry/basic_objects/infinite_line.h>
+#include <geode/geometry/basic_objects/segment.h>
+#include <geode/geometry/basic_objects/tetrahedron.h>
+#include <geode/geometry/basic_objects/triangle.h>
 #include <geode/geometry/bounding_box.h>
 #include <geode/geometry/point.h>
 
@@ -131,11 +135,193 @@ void test_line_intersections()
         bbox.intersects( line_down ), "[Test] Wrong result with line_down" );
 }
 
+void test_triangle2d_intersections()
+{
+    geode::BoundingBox2D bbox;
+    bbox.add_point( { { -1, -1 } } );
+    bbox.add_point( { { 1, 1 } } );
+
+    const geode::Point2D O{ { 0, 0 } };
+    const geode::Point2D a{ { 0.5, 0.5 } };
+    const geode::Point2D b{ { 0.5, -0.5 } };
+
+    const geode::Triangle2D inside{ O, a, b };
+    OPENGEODE_EXCEPTION(
+        bbox.intersects( inside ), "[Test] Wrong result with inside" );
+
+    const geode::Point2D c{ { 2, 0 } };
+    const geode::Triangle2D one_edge_crossing{ O, a, c };
+    OPENGEODE_EXCEPTION( bbox.intersects( one_edge_crossing ),
+        "[Test] Wrong result with one_edge_crossing" );
+
+    const geode::Point2D c2{ { 2, 2 } };
+    const geode::Triangle2D one_edge_crossing2{ O, a, c2 };
+    OPENGEODE_EXCEPTION( bbox.intersects( one_edge_crossing2 ),
+        "[Test] Wrong result with one_edge_crossing2" );
+
+    const geode::Point2D d{ { 0, 2 } };
+    const geode::Triangle2D two_edge_crossing{ O, d, c };
+    OPENGEODE_EXCEPTION( bbox.intersects( two_edge_crossing ),
+        "[Test] Wrong result with two_edge_crossing" );
+
+    const geode::Point2D e{ { -2, -2 } };
+    const geode::Triangle2D no_edge_crossing{ c, d, e };
+    OPENGEODE_EXCEPTION( bbox.intersects( no_edge_crossing ),
+        "[Test] Wrong result with no_edge_crossing" );
+
+    const geode::Point2D e2{ { 0, -2 } };
+    const geode::Triangle2D no_edge_crossing2{ c, d, e2 };
+    OPENGEODE_EXCEPTION( bbox.intersects( no_edge_crossing2 ),
+        "[Test] Wrong result with no_edge_crossing2" );
+
+    const geode::Point2D f{ { 5, 0 } };
+    const geode::Point2D g{ { 0, 5 } };
+    const geode::Point2D h{ { 5, 5 } };
+    const geode::Triangle2D no_crossing{ f, g, h };
+    OPENGEODE_EXCEPTION( !bbox.intersects( no_crossing ),
+        "[Test] Wrong result with no_crossing" );
+
+    const geode::Point2D i{ { -5, -5 } };
+    const geode::Point2D j{ { 5, -5 } };
+    const geode::Point2D k{ { 0, 5 } };
+    const geode::Triangle2D outside{ i, j, k };
+    OPENGEODE_EXCEPTION(
+        bbox.intersects( outside ), "[Test] Wrong result with outside" );
+}
+
+void test_triangle3d_intersections()
+{
+    geode::BoundingBox3D bbox;
+    bbox.add_point( { { -1, -1, -1 } } );
+    bbox.add_point( { { 1, 1, 1 } } );
+
+    const geode::Point3D O{ { 0, 0, 0 } };
+    const geode::Point3D a{ { 0.5, 0.5, 0.5 } };
+    const geode::Point3D b{ { 0.5, 0.5, -0.5 } };
+
+    const geode::Triangle3D inside{ O, a, b };
+    OPENGEODE_EXCEPTION(
+        bbox.intersects( inside ), "[Test] Wrong result with inside" );
+
+    const geode::Point3D c{ { 2, 0, 0 } };
+    const geode::Triangle3D one_edge_crossing{ O, a, c };
+    OPENGEODE_EXCEPTION( bbox.intersects( one_edge_crossing ),
+        "[Test] Wrong result with one_edge_crossing" );
+
+    const geode::Point3D c2{ { 2, 2, 0 } };
+    const geode::Triangle3D one_edge_crossing2{ O, a, c2 };
+    OPENGEODE_EXCEPTION( bbox.intersects( one_edge_crossing2 ),
+        "[Test] Wrong result with one_edge_crossing2" );
+
+    const geode::Point3D d{ { 0, 0, 2 } };
+    const geode::Triangle3D two_edge_crossing{ O, d, c };
+    OPENGEODE_EXCEPTION( bbox.intersects( two_edge_crossing ),
+        "[Test] Wrong result with two_edge_crossing" );
+
+    const geode::Point3D e{ { -2, -2, 0 } };
+    const geode::Triangle3D no_edge_crossing{ c, d, e };
+    OPENGEODE_EXCEPTION( bbox.intersects( no_edge_crossing ),
+        "[Test] Wrong result with no_edge_crossing" );
+
+    const geode::Point3D e2{ { 0, -2, 0 } };
+    const geode::Triangle3D no_edge_crossing2{ c, d, e2 };
+    OPENGEODE_EXCEPTION( bbox.intersects( no_edge_crossing2 ),
+        "[Test] Wrong result with no_edge_crossing2" );
+
+    const geode::Point3D f{ { 5, 0, 0 } };
+    const geode::Point3D g{ { 0, 5, 0 } };
+    const geode::Point3D h{ { 0, 0, 5 } };
+    const geode::Triangle3D no_crossing{ f, g, h };
+    OPENGEODE_EXCEPTION( !bbox.intersects( no_crossing ),
+        "[Test] Wrong result with no_crossing" );
+
+    const geode::Point3D g2{ { 5, 5, 0 } };
+    const geode::Point3D h2{ { 5, 5, 5 } };
+    const geode::Triangle3D no_crossing2{ f, g, h };
+    OPENGEODE_EXCEPTION( !bbox.intersects( no_crossing2 ),
+        "[Test] Wrong result with no_crossing2" );
+}
+
+void test_tetra_intersections()
+{
+    geode::BoundingBox3D bbox;
+    bbox.add_point( { { -1, -1, -1 } } );
+    bbox.add_point( { { 1, 1, 1 } } );
+
+    const geode::Point3D a{ { 0.5, 0.5, 0.5 } };
+    const geode::Point3D b{ { 0.5, 0.5, -0.5 } };
+    const geode::Point3D c{ { -0.5, 0.5, 0.5 } };
+    const geode::Point3D d{ { 0.5, -0.5, -0.5 } };
+
+    const geode::Tetrahedron inside{ a, b, c, d };
+    OPENGEODE_EXCEPTION(
+        bbox.intersects( inside ), "[Test] Wrong result with inside" );
+
+    const geode::Point3D a2{ { -5, -5, -5 } };
+    const geode::Point3D b2{ { 5, -5, -5 } };
+    const geode::Point3D c2{ { 0, 5, -5 } };
+    const geode::Point3D d2{ { 0, 0, 5 } };
+
+    const geode::Tetrahedron outside{ a2, b2, c2, d2 };
+    OPENGEODE_EXCEPTION(
+        bbox.intersects( outside ), "[Test] Wrong result with outside" );
+}
+
+void test_segment_intersections()
+{
+    geode::BoundingBox2D bbox;
+    bbox.add_point( { { -1, -1 } } );
+    bbox.add_point( { { 1, 1 } } );
+
+    const geode::Point2D O{ { 0, 0 } };
+    const geode::Point2D a{ { 0.5, 0.5 } };
+
+    const geode::Segment2D inside{ O, a };
+    OPENGEODE_EXCEPTION(
+        bbox.intersects( inside ), "[Test] Wrong result with inside" );
+
+    const geode::Point2D b{ { 5, 5 } };
+    const geode::Segment2D crossing_once{ O, b };
+    OPENGEODE_EXCEPTION( bbox.intersects( crossing_once ),
+        "[Test] Wrong result with crossing_once" );
+
+    const geode::Point2D c{ { -5, -5 } };
+    const geode::Segment2D crossing_twice{ b, c };
+    OPENGEODE_EXCEPTION( bbox.intersects( crossing_twice ),
+        "[Test] Wrong result with crossing_twice" );
+
+    const geode::Point2D d{ { 1.5, 0 } };
+    const geode::Point2D e{ { 0, 1.5 } };
+    const geode::Segment2D crossing_sideway{ d, e };
+    OPENGEODE_EXCEPTION( bbox.intersects( crossing_twice ),
+        "[Test] Wrong result with crossing_twice" );
+
+    const geode::Point2D f{ { 5, 0 } };
+    const geode::Point2D g{ { 0, 5 } };
+    const geode::Segment2D no_crossing{ f, g };
+    OPENGEODE_EXCEPTION( !bbox.intersects( no_crossing ),
+        "[Test] Wrong result with no_crossing" );
+
+    const geode::Point2D h{ { 5, 5 } };
+    const geode::Segment2D parallel{ f, h };
+    OPENGEODE_EXCEPTION(
+        !bbox.intersects( parallel ), "[Test] Wrong result with parallel" );
+
+    const geode::Point2D i{ { 10, 0 } };
+    const geode::Segment2D parallel2{ f, i };
+    OPENGEODE_EXCEPTION(
+        !bbox.intersects( parallel2 ), "[Test] Wrong result with parallel2" );
+}
+
 void test()
 {
     test_bbox();
     test_ray_intersections();
     test_line_intersections();
+    test_segment_intersections();
+    test_tetra_intersections();
+    test_triangle2d_intersections();
+    test_triangle3d_intersections();
 }
 
 OPENGEODE_TEST( "bounding-box" )

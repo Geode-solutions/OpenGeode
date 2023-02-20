@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - 2022 Geode-solutions
+ * Copyright (c) 2019 - 2023 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -230,6 +230,7 @@ namespace geode
 
     public:
         using Builder = SolidMeshBuilder< dimension >;
+        static constexpr auto dim = dimension;
 
         /*!
          * Create a new SolidMesh using default data structure.
@@ -410,13 +411,24 @@ namespace geode
             const std::array< index_t, 2 >& edge_vertices ) const;
 
         /*!
+         * Return the volume of a given polyhedron.
+         * @param[in] polyhedron_id Index of a polyhedron.
+         */
+        double polyhedron_volume( index_t polyhedron_id ) const;
+
+        /*!
          * Return the normal of a given PolyhedronFacet.
          * @param[in] polyhedron_facet Local index of facet in polyhedron.
          */
-        template < index_t T = dimension >
-        typename std::enable_if< T == 3, Vector3D >::type
-            polyhedron_facet_normal(
-                const PolyhedronFacet& polyhedron_facet ) const;
+        Vector3D polyhedron_facet_normal(
+            const PolyhedronFacet& polyhedron_facet ) const;
+
+        /*!
+         * Return the normal of a given PolyhedronFacet.
+         * @param[in] polyhedron_facet Local index of facet in polyhedron.
+         */
+        absl::optional< Vector3D > new_polyhedron_facet_normal(
+            const PolyhedronFacet& polyhedron_facet ) const;
 
         /*!
          * Get all the polyhedra with one of the vertices matching given vertex.

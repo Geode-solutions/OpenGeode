@@ -1,4 +1,4 @@
-# Copyright (c) 2019 - 2022 Geode-solutions
+# Copyright (c) 2019 - 2023 Geode-solutions
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -54,6 +54,13 @@ add_geode_test(
         ${PROJECT_NAME}::mesh
 )
 add_geode_test(
+    SOURCE "test-euclidean-distance-transform.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
     SOURCE "test-geometrical-operations-on-mesh.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
@@ -74,6 +81,20 @@ add_geode_test(
 )
 add_geode_test(
     SOURCE "test-hybrid-solid.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
+    SOURCE "test-merge-curve.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
+    SOURCE "test-merge-solid.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry

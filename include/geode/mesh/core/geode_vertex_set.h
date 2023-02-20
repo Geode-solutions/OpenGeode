@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - 2022 Geode-solutions
+ * Copyright (c) 2019 - 2023 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,9 +32,16 @@
 
 namespace geode
 {
+    class OpenGeodeVertexSetBuilder;
+}
+
+namespace geode
+{
     class opengeode_mesh_api OpenGeodeVertexSet : public VertexSet
     {
     public:
+        using Builder = OpenGeodeVertexSetBuilder;
+
         static MeshImpl impl_name_static()
         {
             return MeshImpl{ "OpenGeodeVertexSet" };

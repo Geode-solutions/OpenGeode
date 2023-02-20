@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - 2022 Geode-solutions
+ * Copyright (c) 2019 - 2023 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,8 @@
 
 #include <memory>
 
+#include <absl/types/span.h>
+
 #include <geode/mesh/common.h>
 
 namespace geode
@@ -42,4 +44,9 @@ namespace geode
     std::unique_ptr< EdgedCurve3D >
         opengeode_mesh_api convert_edged_curve2d_into_3d(
             const EdgedCurve2D& curve2d, index_t axis_to_add );
+
+    template < index_t dimension >
+    std::unique_ptr< EdgedCurve< dimension > > merge_edged_curves( absl::Span<
+        const std::reference_wrapper< const EdgedCurve< dimension > > >
+            curves );
 } // namespace geode

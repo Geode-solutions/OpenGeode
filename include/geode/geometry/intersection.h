@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - 2022 Geode-solutions
+ * Copyright (c) 2019 - 2023 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,6 +40,7 @@ namespace geode
     ALIAS_2D_AND_3D( Segment );
     ALIAS_3D( Triangle );
     class Plane;
+    class Cylinder;
 } // namespace geode
 
 namespace geode
@@ -172,4 +173,20 @@ namespace geode
     IntersectionResult< Point2D >
         opengeode_geometry_api segment_line_intersection(
             const Segment2D& segment, const InfiniteLine2D& line );
+
+    /*!
+     * Compute the intersection between a segment and a cylinder
+     * @return an optional of the intersection points.
+     */
+    IntersectionResult< absl::InlinedVector< Point3D, 2 > >
+        opengeode_geometry_api segment_cylinder_intersection(
+            const Segment3D& segment, const Cylinder& cylinder );
+
+    /*!
+     * Compute the intersection between a line and a cylinder
+     * @return an optional of the intersection points.
+     */
+    IntersectionResult< absl::InlinedVector< Point3D, 2 > >
+        opengeode_geometry_api line_cylinder_intersection(
+            const InfiniteLine3D& line, const Cylinder& cylinder );
 } // namespace geode

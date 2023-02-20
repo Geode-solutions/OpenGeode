@@ -24,6 +24,7 @@ jobs:
     with:
       name: OPENGEODE
       directory: opengeode
+      config: RelWithDebInfo
     secrets: inherit
 
   release-windows-python:

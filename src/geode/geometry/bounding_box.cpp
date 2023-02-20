@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - 2022 Geode-solutions
+ * Copyright (c) 2019 - 2023 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,8 +27,14 @@
 
 #include <geode/basic/pimpl_impl.h>
 
+#include <geode/geometry/basic_objects/infinite_line.h>
+#include <geode/geometry/basic_objects/segment.h>
+#include <geode/geometry/basic_objects/tetrahedron.h>
+#include <geode/geometry/basic_objects/triangle.h>
+#include <geode/geometry/information.h>
 #include <geode/geometry/perpendicular.h>
 #include <geode/geometry/point.h>
+#include <geode/geometry/position.h>
 
 namespace geode
 {
@@ -126,6 +132,78 @@ namespace geode
         bool intersects( const InfiniteLine< dimension >& line ) const
         {
             return line_intersects( line );
+        }
+
+        template < index_t T = dimension >
+        typename std::enable_if< T == 2 || T == 3, bool >::type intersects(
+            const Triangle< T >& triangle ) const;
+
+        template < index_t T = dimension >
+        typename std::enable_if< T == 3, bool >::type intersects(
+            const Tetrahedron& tetra ) const
+        {
+            if( point_tetrahedron_position( center(), tetra )
+                == Position::inside )
+            {
+                return true;
+            }
+            const auto& vertices = tetra.vertices();
+            for( const auto v : LRange{ 4 } )
+            {
+                if( contains( vertices[v].get() ) )
+                {
+                    return true;
+                }
+            }
+            return intersects( { vertices[0].get(), vertices[1].get(),
+                       vertices[2].get() } )
+                   || intersects( { vertices[0].get(), vertices[1].get(),
+                       vertices[3].get() } )
+                   || intersects( { vertices[0].get(), vertices[2].get(),
+                       vertices[3].get() } )
+                   || intersects( { vertices[1].get(), vertices[2].get(),
+                       vertices[3].get() } );
+        }
+
+        template < index_t T = dimension >
+        typename std::enable_if< T == 2, bool >::type intersects(
+            const Segment< T >& segment ) const
+        {
+            const auto& vertices = segment.vertices();
+            for( const auto v : LRange{ 2 } )
+            {
+                if( contains( vertices[v].get() ) )
+                {
+                    return true;
+                }
+            }
+            const auto box_center = center();
+            const auto box_extent = diagonal() / 2.;
+            const Segment2D transformed_segment{ vertices[0].get() - box_center,
+                vertices[1].get() - box_center };
+            const auto segment_origin = transformed_segment.barycenter();
+            const auto segment_extent = transformed_segment.length() / 2.;
+            const auto segment_direction =
+                transformed_segment.normalized_direction();
+            for( const auto i : LRange{ 2 } )
+            {
+                const auto lhs = std::fabs( segment_origin.value( i ) );
+                const auto rhs =
+                    box_extent.value( i )
+                    + segment_extent
+                          * std::fabs( segment_direction.value( i ) );
+                if( lhs > rhs )
+                {
+                    return false;
+                }
+            }
+            const auto lhs = std::fabs(
+                dot_perpendicular( segment_direction, segment_origin ) );
+            const auto rhs = box_extent.value( 0 )
+                                 * std::fabs( segment_direction.value( 1 ) )
+                             + box_extent.value( 1 )
+                                   * std::fabs( segment_direction.value( 0 ) );
+            return lhs <= rhs;
         }
 
         double signed_distance( const Point< dimension >& point ) const
@@ -238,6 +316,114 @@ namespace geode
         return line.origin().value( 0 ) > max().value( 0 );
     }
 
+    template <>
+    template <>
+    bool BoundingBox< 2 >::Impl::intersects< 2 >(
+        const Triangle< 2 >& triangle ) const
+    {
+        if( point_triangle_position( center(), triangle ) == Position::inside )
+        {
+            return true;
+        }
+        const auto& vertices = triangle.vertices();
+        for( const auto v : LRange{ 3 } )
+        {
+            if( contains( vertices[v].get() ) )
+            {
+                return true;
+            }
+        }
+        return intersects( Segment2D{ vertices[0].get(), vertices[1].get() } )
+               || intersects(
+                   Segment2D{ vertices[0].get(), vertices[2].get() } )
+               || intersects(
+                   Segment2D{ vertices[1].get(), vertices[2].get() } );
+    }
+
+    template <>
+    template <>
+    bool BoundingBox< 3 >::Impl::intersects< 3 >(
+        const Triangle< 3 >& triangle ) const
+    {
+        const auto& vertices = triangle.vertices();
+        for( const auto v : LRange{ 3 } )
+        {
+            if( contains( vertices[v].get() ) )
+            {
+                return true;
+            }
+        }
+        const auto triangle_projection = [&vertices]( const Vector3D& normal ) {
+            BoundingBox1D interval;
+            interval.add_point( { { normal.dot( vertices[0].get() ) } } );
+            interval.add_point( { { normal.dot( vertices[1].get() ) } } );
+            interval.add_point( { { normal.dot( vertices[2].get() ) } } );
+            return interval;
+        };
+        const auto bbox_projection = [this]( const Vector3D& normal ) {
+            const auto origin = normal.dot( center() );
+            const auto extent = diagonal();
+            const auto maximum_extent =
+                ( std::fabs( normal.value( 0 ) * extent.value( 0 ) )
+                    + std::fabs( normal.value( 1 ) * extent.value( 1 ) )
+                    + std::fabs( normal.value( 2 ) * extent.value( 2 ) ) )
+                / 2.;
+            BoundingBox1D interval;
+            interval.add_point( { { origin - maximum_extent } } );
+            interval.add_point( { { origin + maximum_extent } } );
+            return interval;
+        };
+        const std::array< Vector3D, 3 > edges{ Vector3D{ vertices[0].get(),
+                                                   vertices[1].get() },
+            Vector3D{ vertices[0].get(), vertices[2].get() },
+            Vector3D{ vertices[1].get(), vertices[2].get() } };
+
+        // Test direction of triangle normal.
+        const auto triangle_normal = edges[0].cross( edges[1] );
+        if( !bbox_projection( triangle_normal )
+                 .contains( { { triangle_normal.dot( vertices[0].get() ) } } ) )
+        {
+            return false;
+        }
+
+        // Test direction of box faces.
+        const auto box_center = center();
+        const auto box_diagonal = diagonal();
+        for( const auto i : LRange{ 3 } )
+        {
+            Vector3D axis;
+            axis.set_value( i, 1 );
+            const auto triangle_interval = triangle_projection( axis );
+            BoundingBox1D box_interval;
+            const auto& center_value = box_center.value( i );
+            const auto extent = box_diagonal.value( i ) / 2.;
+            box_interval.add_point( { { center_value - extent } } );
+            box_interval.add_point( { { center_value + extent } } );
+            if( !triangle_interval.intersects( box_interval ) )
+            {
+                return false;
+            }
+        }
+
+        // Test direction of triangle-box edge cross products.
+        for( const auto i0 : LRange{ 3 } )
+        {
+            for( const auto i1 : LRange{ 3 } )
+            {
+                Vector3D axis;
+                axis.set_value( i1, 1 );
+                const auto normal = edges[i0].cross( axis );
+                const auto triangle_interval = triangle_projection( normal );
+                const auto box_interval = bbox_projection( normal );
+                if( !triangle_interval.intersects( box_interval ) )
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     template < index_t dimension >
     BoundingBox< dimension >::BoundingBox() // NOLINT
     {
@@ -330,6 +516,32 @@ namespace geode
     }
 
     template < index_t dimension >
+    template < index_t T >
+    typename std::enable_if< T == 2, bool >::type
+        BoundingBox< dimension >::intersects(
+            const Segment< T >& segment ) const
+    {
+        return impl_->intersects( segment );
+    }
+
+    template < index_t dimension >
+    template < index_t T >
+    typename std::enable_if< T == 2 || T == 3, bool >::type
+        BoundingBox< dimension >::intersects(
+            const Triangle< T >& triangle ) const
+    {
+        return impl_->intersects( triangle );
+    }
+
+    template < index_t dimension >
+    template < index_t T >
+    typename std::enable_if< T == 3, bool >::type
+        BoundingBox< dimension >::intersects( const Tetrahedron& tetra ) const
+    {
+        return impl_->intersects( tetra );
+    }
+
+    template < index_t dimension >
     Point< dimension > BoundingBox< dimension >::center() const
     {
         return impl_->center();
@@ -351,4 +563,13 @@ namespace geode
     template class opengeode_geometry_api BoundingBox< 1 >;
     template class opengeode_geometry_api BoundingBox< 2 >;
     template class opengeode_geometry_api BoundingBox< 3 >;
+
+    template opengeode_geometry_api bool BoundingBox< 2 >::intersects< 2 >(
+        const Segment< 2 >& ) const;
+    template opengeode_geometry_api bool BoundingBox< 2 >::intersects< 2 >(
+        const Triangle< 2 >& ) const;
+    template opengeode_geometry_api bool BoundingBox< 3 >::intersects< 3 >(
+        const Triangle< 3 >& ) const;
+    template opengeode_geometry_api bool BoundingBox< 3 >::intersects< 3 >(
+        const Tetrahedron& ) const;
 } // namespace geode

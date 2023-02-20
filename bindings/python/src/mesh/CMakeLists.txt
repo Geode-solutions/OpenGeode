@@ -1,4 +1,4 @@
-# Copyright (c) 2019 - 2022 Geode-solutions
+# Copyright (c) 2019 - 2023 Geode-solutions
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -56,6 +56,7 @@ add_geode_python_binding(
         "helpers/convert_point_set.h"
         "helpers/convert_solid_mesh.h"
         "helpers/convert_surface_mesh.h"
+        "helpers/euclidean_distance_transform.h"
         "helpers/geometrical_operations_on_mesh.h"
         "io/edged_curve.h"
         "io/graph.h"

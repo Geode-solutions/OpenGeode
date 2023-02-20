@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - 2022 Geode-solutions. All rights reserved.
+ * Copyright (c) 2019 - 2023 Geode-solutions. All rights reserved.
  */
 
 #pragma once
@@ -35,6 +35,12 @@ namespace geode
                     a.object( cme.component_id );
                     a.value4b( cme.element_id );
                 } );
+        }
+
+        std::string string() const
+        {
+            return absl::StrCat(
+                "[", component_id.string(), " ", element_id, "]" );
         }
 
         ComponentID component_id;

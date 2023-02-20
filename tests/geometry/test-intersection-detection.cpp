@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - 2022 Geode-solutions
+ * Copyright (c) 2019 - 2023 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -265,7 +265,7 @@ void test_segment_triangle_intersection_detection()
 
     result =
         geode::segment_triangle_intersection_detection( segment_da, triangle );
-    answer = { geode::Position::parallel, geode::Position::parallel };
+    answer = { geode::Position::vertex1, geode::Position::vertex0 };
     OPENGEODE_EXCEPTION( result == answer,
         "[Test] Wrong result for segment_triangle_intersection_detection with "
         "query segment_da" );
