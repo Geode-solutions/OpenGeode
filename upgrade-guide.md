@@ -1,5 +1,20 @@
 # Upgrade Guide
 
+## Upgrading from OpenGeode v12.x.x to v13.0.0
+
+### Motivations
+
+
+
+### Breaking Changes
+
+- **AddComponents**: `AddComponents` and `AddComponentsBuilder` have been removed. VisualStudio cannot compile move constructor using these helpers.
+
+- **Triangle/SurfaceMesh**: all methods related to normal computation now return an optional.
+
+- **GenericInfiniteLine**: `GenericInfiniteLine` has been renamed `GenericLine`
+
+
 ## Upgrading from OpenGeode v11.x.x to v12.0.0
 
 ### Motivations
@@ -10,7 +25,7 @@ To allow this feature, each library needs to be explicitly initialized at the be
 
 ### Breaking Changes
 
--**CMake**: Minimum required version bump to 3.15
+- **CMake**: Minimum required version bump to 3.15
 
 - **Library**: Each library/OpenGeode module needs to use the new macro pairs `OPENGEODE_LIBRARY`/`OPENGEODE_LIBRARY_IMPLEMENTATION` defined in the basic/library.h header file. They replace the macro `OPENGEODE_LIBRARY_INITIALIZE`. Examples can be found in the common.h and common.cpp of each OpenGeode library.
 

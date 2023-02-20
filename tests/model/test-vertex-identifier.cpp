@@ -29,11 +29,9 @@
 #include <geode/mesh/builder/surface_mesh_builder.h>
 #include <geode/mesh/core/surface_mesh.h>
 
-#include <geode/model/mixin/builder/add_components_builders.h>
 #include <geode/model/mixin/builder/corners_builder.h>
 #include <geode/model/mixin/builder/surfaces_builder.h>
 #include <geode/model/mixin/builder/topology_builder.h>
-#include <geode/model/mixin/core/add_components.h>
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/corners.h>
 #include <geode/model/mixin/core/surface.h>
@@ -43,21 +41,19 @@
 
 #include <geode/tests/common.h>
 
-class CornerProvider : public geode::Topology,
-                       public geode::AddComponents< 2, geode::Corners >
+class CornerProvider : public geode::Topology, public geode::Corners2D
 {
 public:
     CornerProvider() = default;
 };
 
-class CornerProviderBuilder
-    : public geode::TopologyBuilder,
-      public geode::AddComponentsBuilders< 2, geode::Corners >
+class CornerProviderBuilder : public geode::TopologyBuilder,
+                              public geode::CornersBuilder2D
 {
 public:
     CornerProviderBuilder( CornerProvider& corner_provider )
         : TopologyBuilder( corner_provider ),
-          AddComponentsBuilders< 2, geode::Corners >( corner_provider ),
+          geode::CornersBuilder2D( corner_provider ),
           corner_provider_( corner_provider )
     {
     }
@@ -73,21 +69,19 @@ private:
     CornerProvider& corner_provider_;
 };
 
-class SurfaceProvider : public geode::Topology,
-                        public geode::AddComponents< 2, geode::Surfaces >
+class SurfaceProvider : public geode::Topology, public geode::Surfaces2D
 {
 public:
     SurfaceProvider() = default;
 };
 
-class SurfaceProviderBuilder
-    : public geode::TopologyBuilder,
-      public geode::AddComponentsBuilders< 2, geode::Surfaces >
+class SurfaceProviderBuilder : public geode::TopologyBuilder,
+                               public geode::SurfacesBuilder2D
 {
 public:
     SurfaceProviderBuilder( SurfaceProvider& surface_provider )
         : TopologyBuilder( surface_provider ),
-          AddComponentsBuilders< 2, geode::Surfaces >( surface_provider ),
+          geode::SurfacesBuilder2D( surface_provider ),
           surface_provider_( surface_provider )
     {
     }

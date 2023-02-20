@@ -792,7 +792,7 @@ namespace geode
             point_triangle_distance( point, triangle );
         const Vector3D proj2point{ nearest_point, point };
         // Tetra facet normals point towards inside
-        if( const auto normal = triangle.new_normal() )
+        if( const auto normal = triangle.normal() )
         {
             const auto signed_distance =
                 proj2point.dot( normal.value() ) <= 0 ? distance : -distance;

@@ -96,8 +96,9 @@ namespace
         }
     }
 
-    template < typename Model, typename ModelBuilder >
-    void do_triangulate_surfaces( Model& model, ModelBuilder& builder )
+    template < typename Model >
+    void do_triangulate_surfaces(
+        Model& model, typename Model::Builder& builder )
     {
         for( const auto& surface : model.surfaces() )
         {

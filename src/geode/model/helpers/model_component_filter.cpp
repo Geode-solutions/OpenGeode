@@ -51,9 +51,9 @@ namespace
         return to_delete;
     }
 
-    template < typename Model, typename Builder >
+    template < typename Model >
     void filter_surfaces( const Model& model,
-        Builder& filter,
+        typename Model::Builder& filter,
         std::vector< geode::ComponentID >& removed_components )
     {
         for( const auto& surface_uuid : find_components_to_delete(
@@ -65,9 +65,9 @@ namespace
         }
     }
 
-    template < typename Model, typename Builder >
+    template < typename Model >
     void filter_lines( const Model& model,
-        Builder& filter,
+        typename Model::Builder& filter,
         std::vector< geode::ComponentID >& removed_components )
     {
         for( const auto& line_uuid : find_components_to_delete(
@@ -79,9 +79,9 @@ namespace
         }
     }
 
-    template < typename Model, typename Builder >
+    template < typename Model >
     void filter_corners( const Model& model,
-        Builder& filter,
+        typename Model::Builder& filter,
         std::vector< geode::ComponentID >& removed_components )
     {
         for( const auto& corner_uuid : find_components_to_delete(

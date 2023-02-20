@@ -26,7 +26,6 @@
 #include <geode/basic/identifier.h>
 
 #include <geode/model/common.h>
-#include <geode/model/mixin/core/add_components.h>
 #include <geode/model/mixin/core/blocks.h>
 #include <geode/model/mixin/core/corners.h>
 #include <geode/model/mixin/core/lines.h>

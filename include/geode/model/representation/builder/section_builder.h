@@ -27,7 +27,6 @@
 #include <geode/basic/mapping.h>
 
 #include <geode/model/common.h>
-#include <geode/model/mixin/builder/add_components_builders.h>
 #include <geode/model/mixin/builder/corners_builder.h>
 #include <geode/model/mixin/builder/lines_builder.h>
 #include <geode/model/mixin/builder/model_boundaries_builder.h>
@@ -66,11 +65,10 @@ namespace geode
      * @extends ModelBoundariesBuilder
      */
     class opengeode_model_api SectionBuilder : public TopologyBuilder,
-                                               public AddComponentsBuilders< 2,
-                                                   Corners,
-                                                   Lines,
-                                                   Surfaces,
-                                                   ModelBoundaries >,
+                                               public CornersBuilder2D,
+                                               public LinesBuilder2D,
+                                               public SurfacesBuilder2D,
+                                               public ModelBoundariesBuilder2D,
                                                public IdentifierBuilder
     {
         OPENGEODE_DISABLE_COPY( SectionBuilder );

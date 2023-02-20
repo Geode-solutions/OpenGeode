@@ -332,7 +332,7 @@ namespace
         std::vector< geode::Grid3D::CellIndices > cells;
         cells.reserve( max_number_cells( min, max ) );
         const auto triangle_edges = get_triangle_edges( triangle );
-        const auto normal = triangle.new_normal();
+        const auto normal = triangle.normal();
         if( !normal
             || absl::c_count_if( triangle_edges,
                    []( const geode::Segment3D& segment ) {
@@ -355,7 +355,7 @@ namespace
             triangle_edges, { 1, 2 }, ( normal->value( 0 ) >= 0 ? 1 : -1 ) );
         const auto zx_params = get_edge_projection( grid, triangle,
             triangle_edges, { 2, 0 }, ( normal->value( 1 ) >= 0 ? 1 : -1 ) );
-
+        const auto plane = triangle.plane().value();
         for( const auto k : geode::Range( min[2], max[2] + 1 ) )
         {
             for( const auto j : geode::Range( min[1], max[1] + 1 ) )
@@ -370,15 +370,13 @@ namespace
                     const auto p_minus = point + critical_point;
                     double p_minus_dist;
                     std::tie( p_minus_dist, std::ignore ) =
-                        geode::point_plane_signed_distance(
-                            p_minus, triangle.plane() );
+                        geode::point_plane_signed_distance( p_minus, plane );
                     const auto p_plus = grid.point( grid.vertex_index(
                                             { i + 1, j + 1, k + 1 } ) )
                                         - critical_point;
                     double p_plus_dist;
                     std::tie( p_plus_dist, std::ignore ) =
-                        geode::point_plane_signed_distance(
-                            p_plus, triangle.plane() );
+                        geode::point_plane_signed_distance( p_plus, plane );
                     if( std::fabs( p_minus_dist ) > 2. * geode::global_epsilon
                         && std::fabs( p_plus_dist ) > 2. * geode::global_epsilon
                         && p_minus_dist * p_plus_dist > 0. )

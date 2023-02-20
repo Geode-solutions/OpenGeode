@@ -384,7 +384,7 @@ void test_polygon_normal()
 
     const geode::Vector3D answer{ { 0., 0., 1. } };
     OPENGEODE_EXCEPTION(
-        polygonal_surface->new_polygon_normal( 0 ).value() == answer,
+        polygonal_surface->polygon_normal( 0 ).value() == answer,
         "[Test] PolygonalSurface polygon normal is not correct" );
 }
 
@@ -406,7 +406,7 @@ void test_polygon_vertex_normal()
 
     const geode::Vector3D answer{ { 0., 0., 1. } };
     OPENGEODE_EXCEPTION(
-        polygonal_surface->new_polygon_vertex_normal( 0 ).value() == answer,
+        polygonal_surface->polygon_vertex_normal( 0 ).value() == answer,
         "[Test] PolygonalSurface polygon vertex normal is not correct" );
 }
 

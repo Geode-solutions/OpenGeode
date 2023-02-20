@@ -36,11 +36,11 @@
 namespace geode
 {
     class SimplicialBRepCreator::Impl
-        : public detail::SimplicialModelCreator< BRep, BRepBuilder, 3 >
+        : public detail::SimplicialModelCreator< BRep >
     {
     public:
         Impl( BRep& brep, std::vector< Point3D > unique_points )
-            : detail::SimplicialModelCreator< BRep, BRepBuilder, 3 >(
+            : detail::SimplicialModelCreator< BRep >(
                 brep, std::move( unique_points ) )
         {
         }

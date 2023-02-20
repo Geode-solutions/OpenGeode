@@ -47,9 +47,11 @@
 
 namespace
 {
-    template < typename Model, geode::index_t dimension >
+    template < typename Model >
     class FromModel
     {
+        static constexpr auto dimension = Model::dimension;
+
     public:
         FromModel( const Model& model ) : model_( model )
         {
@@ -121,7 +123,7 @@ namespace
     class SolidFromBRep
     {
     public:
-        SolidFromBRep( FromModel< geode::BRep, 3 >& model,
+        SolidFromBRep( FromModel< geode::BRep >& model,
             const geode::SurfaceMesh3D& surface )
             : SolidFromBRep( model, true )
         {
@@ -131,7 +133,7 @@ namespace
             }
         }
 
-        SolidFromBRep( FromModel< geode::BRep, 3 >& model )
+        SolidFromBRep( FromModel< geode::BRep >& model )
             : SolidFromBRep( model, true )
         {
             const auto& brep = model_.model();
@@ -171,7 +173,7 @@ namespace
         }
 
     private:
-        SolidFromBRep( FromModel< geode::BRep, 3 >& model, bool /*unused*/ )
+        SolidFromBRep( FromModel< geode::BRep >& model, bool /*unused*/ )
             : model_( model ),
               mesh_{ SolidType::create() },
               builder_{ geode::SolidMeshBuilder3D::create( *mesh_ ) },
@@ -262,7 +264,7 @@ namespace
         }
 
     private:
-        FromModel< geode::BRep, 3 >& model_;
+        FromModel< geode::BRep >& model_;
         std::unique_ptr< SolidType > mesh_;
         std::unique_ptr< geode::SolidMeshBuilder3D > builder_;
         std::shared_ptr< geode::VariableAttribute<
@@ -273,11 +275,13 @@ namespace
             attribute_unique_vertex_;
     };
 
-    template < typename SurfaceType, typename Model, geode::index_t dimension >
+    template < typename SurfaceType, typename Model >
     class SurfaceFromModel
     {
+        static constexpr auto dimension = Model::dimension;
+
     public:
-        SurfaceFromModel( FromModel< Model, dimension >& model )
+        SurfaceFromModel( FromModel< Model >& model )
             : model_( model ),
               mesh_{ SurfaceType::create() },
               builder_{ geode::SurfaceMeshBuilder< dimension >::create(
@@ -300,7 +304,7 @@ namespace
         {
         }
 
-        SurfaceFromModel( FromModel< Model, dimension >& model,
+        SurfaceFromModel( FromModel< Model >& model,
             const geode::EdgedCurve< dimension >& curve )
             : SurfaceFromModel( model )
         {
@@ -379,7 +383,7 @@ namespace
         }
 
     private:
-        FromModel< Model, dimension >& model_;
+        FromModel< Model >& model_;
         std::unique_ptr< SurfaceType > mesh_;
         std::unique_ptr< geode::SurfaceMeshBuilder< dimension > > builder_;
         std::shared_ptr< geode::VariableAttribute<
@@ -391,16 +395,17 @@ namespace
     };
 
     template < typename SurfaceType >
-    using SurfaceFromBRep = SurfaceFromModel< SurfaceType, geode::BRep, 3 >;
+    using SurfaceFromBRep = SurfaceFromModel< SurfaceType, geode::BRep >;
     template < typename SurfaceType >
-    using SurfaceFromSection =
-        SurfaceFromModel< SurfaceType, geode::Section, 2 >;
+    using SurfaceFromSection = SurfaceFromModel< SurfaceType, geode::Section >;
 
-    template < typename Model, geode::index_t dimension >
+    template < typename Model >
     class CurveFromModel
     {
+        static constexpr auto dimension = Model::dimension;
+
     public:
-        CurveFromModel( FromModel< Model, dimension >& model )
+        CurveFromModel( FromModel< Model >& model )
             : model_( model ),
               mesh_{ geode::EdgedCurve< dimension >::create() },
               builder_{ geode::EdgedCurveBuilder< dimension >::create(
@@ -469,7 +474,7 @@ namespace
         }
 
     private:
-        FromModel< Model, dimension >& model_;
+        FromModel< Model >& model_;
         std::unique_ptr< geode::EdgedCurve< dimension > > mesh_;
         std::unique_ptr< geode::EdgedCurveBuilder< dimension > > builder_;
         std::shared_ptr< geode::VariableAttribute<
@@ -480,8 +485,8 @@ namespace
             attribute_unique_vertex_;
     };
 
-    using CurveFromBRep = CurveFromModel< geode::BRep, 3 >;
-    using CurveFromSection = CurveFromModel< geode::Section, 2 >;
+    using CurveFromBRep = CurveFromModel< geode::BRep >;
+    using CurveFromSection = CurveFromModel< geode::Section >;
 
     template < typename Builder,
         typename Mesh,
@@ -500,14 +505,14 @@ namespace geode
     template < typename SolidType >
     std::unique_ptr< SolidType > convert_brep_into_solid( const BRep& brep )
     {
-        FromModel< BRep, 3 > model{ brep };
+        FromModel< BRep > model{ brep };
         return build_mesh< SolidFromBRep< SolidType >, SolidType >( model );
     }
 
     template < typename SurfaceType >
     std::unique_ptr< SurfaceType > convert_brep_into_surface( const BRep& brep )
     {
-        FromModel< BRep, 3 > model{ brep };
+        FromModel< BRep > model{ brep };
         return build_mesh< SurfaceFromBRep< SurfaceType >, SurfaceType >(
             model );
     }
@@ -516,7 +521,7 @@ namespace geode
     std::unique_ptr< SurfaceType > convert_section_into_surface(
         const Section& section )
     {
-        FromModel< Section, 2 > model{ section };
+        FromModel< Section > model{ section };
         return build_mesh< SurfaceFromSection< SurfaceType >, SurfaceType >(
             model );
     }
@@ -524,13 +529,13 @@ namespace geode
     std::unique_ptr< EdgedCurve2D > convert_section_into_curve(
         const Section& section )
     {
-        FromModel< Section, 2 > model{ section };
+        FromModel< Section > model{ section };
         return build_mesh< CurveFromSection, EdgedCurve2D >( model );
     }
 
     std::unique_ptr< EdgedCurve3D > convert_brep_into_curve( const BRep& brep )
     {
-        FromModel< BRep, 3 > model{ brep };
+        FromModel< BRep > model{ brep };
         return build_mesh< CurveFromBRep, EdgedCurve3D >( model );
     }
 
@@ -539,7 +544,7 @@ namespace geode
         std::unique_ptr< SurfaceType > >
         convert_section_into_curve_and_surface( const Section& section )
     {
-        FromModel< Section, 2 > model{ section };
+        FromModel< Section > model{ section };
         auto curve = build_mesh< CurveFromSection, EdgedCurve2D >( model );
         auto surface =
             build_mesh< SurfaceFromSection< SurfaceType >, SurfaceType >(
@@ -553,7 +558,7 @@ namespace geode
         std::unique_ptr< SolidType > >
         convert_brep_into_curve_and_surface_and_solid( const BRep& brep )
     {
-        FromModel< BRep, 3 > model{ brep };
+        FromModel< BRep > model{ brep };
         auto curve = build_mesh< CurveFromBRep, EdgedCurve3D >( model );
         auto surface =
             build_mesh< SurfaceFromBRep< SurfaceType >, SurfaceType >(
@@ -569,7 +574,7 @@ namespace geode
         std::unique_ptr< SurfaceType > >
         convert_brep_into_curve_and_surface( const BRep& brep )
     {
-        FromModel< BRep, 3 > model{ brep };
+        FromModel< BRep > model{ brep };
         auto curve = build_mesh< CurveFromBRep, EdgedCurve3D >( model );
         auto surface =
             build_mesh< SurfaceFromBRep< SurfaceType >, SurfaceType >(
@@ -581,7 +586,7 @@ namespace geode
     std::tuple< std::unique_ptr< SurfaceType >, std::unique_ptr< SolidType > >
         convert_brep_into_surface_and_solid( const BRep& brep )
     {
-        FromModel< BRep, 3 > model{ brep };
+        FromModel< BRep > model{ brep };
         auto surface =
             build_mesh< SurfaceFromBRep< SurfaceType >, SurfaceType >( model );
         auto solid = build_mesh< SolidFromBRep< SolidType >, SolidType >(

@@ -43,9 +43,12 @@ namespace geode
 {
     namespace detail
     {
-        template < typename Model, typename ModelBuilder, index_t dimension >
+        template < typename Model >
         class SimplicialModelCreator
         {
+            using ModelBuilder = typename Model::Builder;
+            static constexpr auto dimension = Model::dimension;
+
         public:
             SimplicialModelCreator(
                 Model& model, std::vector< Point< dimension > > unique_points )
