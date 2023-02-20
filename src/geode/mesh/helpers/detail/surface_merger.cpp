@@ -201,8 +201,12 @@ namespace geode
                             {
                                 const auto new_id = new_id_[s][p];
                                 const auto new_adj_id = new_id_[s][adj.value()];
-                                this->builder().set_polygon_adjacent(
-                                    { new_id, e }, new_adj_id );
+                                if( this->mesh().is_edge_on_border(
+                                        { new_id, e } ) )
+                                {
+                                    this->builder().set_polygon_adjacent(
+                                        { new_id, e }, new_adj_id );
+                                }
                             }
                         }
                     }

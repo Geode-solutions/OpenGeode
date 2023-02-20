@@ -222,8 +222,12 @@ namespace geode
                             {
                                 const auto new_id = new_id_[s][p];
                                 const auto new_adj_id = new_id_[s][adj.value()];
-                                this->builder().set_polyhedron_adjacent(
-                                    { new_id, f }, new_adj_id );
+                                if( this->mesh().is_polyhedron_facet_on_border(
+                                        { new_id, f } ) )
+                                {
+                                    this->builder().set_polyhedron_adjacent(
+                                        { new_id, f }, new_adj_id );
+                                }
                             }
                         }
                     }

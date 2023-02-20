@@ -72,7 +72,7 @@ namespace geode
     template < index_t dimension >
     Surface< dimension >::Surface( const MeshImpl& impl )
     {
-        impl_->set_mesh( SurfaceMesh< dimension >::create( impl ) );
+        impl_->set_mesh( this->id(), SurfaceMesh< dimension >::create( impl ) );
     }
 
     template < index_t dimension >
@@ -97,26 +97,36 @@ namespace geode
     template < typename Archive >
     void Surface< dimension >::serialize( Archive& archive )
     {
-        archive.ext( *this, DefaultGrowable< Archive, Surface >{},
-            []( Archive& a, Surface& surface ) {
-                a.object( surface.impl_ );
-                a.ext( surface,
-                    bitsery::ext::BaseClass< Component< dimension > >{} );
-            } );
+        archive.ext( *this,
+            Growable< Archive, Surface >{
+                { []( Archive& a, Surface& surface ) {
+                     a.object( surface.impl_ );
+                     a.ext( surface,
+                         bitsery::ext::BaseClass< Component< dimension > >{} );
+                     IdentifierBuilder mesh_builder{
+                         surface.get_modifiable_mesh()
+                     };
+                     mesh_builder.set_id( surface.id() );
+                 },
+                    []( Archive& a, Surface& surface ) {
+                        a.object( surface.impl_ );
+                        a.ext( surface, bitsery::ext::BaseClass<
+                                            Component< dimension > >{} );
+                    } } } );
     }
 
     template < index_t dimension >
     void Surface< dimension >::set_mesh(
         std::unique_ptr< SurfaceMesh< dimension > > mesh, SurfacesKey )
     {
-        impl_->set_mesh( std::move( mesh ) );
+        impl_->set_mesh( this->id(), std::move( mesh ) );
     }
 
     template < index_t dimension >
     void Surface< dimension >::set_mesh(
         std::unique_ptr< SurfaceMesh< dimension > > mesh, SurfacesBuilderKey )
     {
-        impl_->set_mesh( std::move( mesh ) );
+        impl_->set_mesh( this->id(), std::move( mesh ) );
     }
 
     template class opengeode_model_api Surface< 2 >;

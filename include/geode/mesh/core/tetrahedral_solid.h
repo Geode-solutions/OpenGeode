@@ -42,6 +42,7 @@ namespace geode
 
     public:
         using Builder = TetrahedralSolidBuilder< dimension >;
+        static constexpr auto dim = dimension;
 
         /*!
          * Create a new TetrahedralSolid using default data structure.

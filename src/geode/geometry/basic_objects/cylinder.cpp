@@ -21,30 +21,48 @@
  *
  */
 
-#pragma once
+#include <geode/geometry/basic_objects/cylinder.h>
 
-#include <string>
-
-#include <geode/basic/common.h>
-#include <geode/basic/pimpl.h>
+#include <geode/basic/logger.h>
 
 namespace geode
 {
-    class opengeode_basic_api ProgressLogger
+
+    Cylinder::Cylinder( const Segment3D& axis, double radius )
+        : axis_( axis ), radius_( radius )
     {
-    public:
-        ProgressLogger( std::string message, index_t nb_steps );
-        ~ProgressLogger();
+    }
 
-        index_t increment();
+    Cylinder::Cylinder( const Cylinder& other )
+        : axis_( other.axis_ ), radius_( other.radius_ )
+    {
+    }
 
-        index_t increment( index_t nb_increments );
+    Cylinder& Cylinder::operator=( const Cylinder& other )
+    {
+        axis_ = other.axis_;
+        radius_ = other.radius_;
+        return *this;
+    }
 
-        index_t increment_nb_steps();
+    Cylinder::Cylinder( Cylinder&& other )
+        : axis_( other.axis_ ), radius_( other.radius_ )
+    {
+    }
 
-        index_t increment_nb_steps( index_t nb_steps );
+    Cylinder& Cylinder::operator=( Cylinder&& other )
+    {
+        axis_ = other.axis_;
+        radius_ = other.radius_;
+        return *this;
+    }
 
-    private:
-        IMPLEMENTATION_MEMBER( impl_ );
-    };
+    const Segment3D& Cylinder::axis() const
+    {
+        return axis_;
+    }
+    double Cylinder::radius() const
+    {
+        return radius_;
+    }
 } // namespace geode

@@ -44,6 +44,7 @@ namespace geode
 
     public:
         using Builder = RegularGridBuilder< 2 >;
+        static constexpr index_t dim{ 2 };
 
         /*!
          * Create a new RegularGrid using default data structure.

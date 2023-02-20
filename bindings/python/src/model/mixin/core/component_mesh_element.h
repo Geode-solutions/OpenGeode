@@ -21,30 +21,17 @@
  *
  */
 
-#pragma once
+#include <pybind11/operators.h>
 
-#include <string>
-
-#include <geode/basic/common.h>
-#include <geode/basic/pimpl.h>
+#include <geode/model/mixin/core/component_mesh_element.h>
 
 namespace geode
 {
-    class opengeode_basic_api ProgressLogger
+    void define_component_mesh_element( pybind11::module& module )
     {
-    public:
-        ProgressLogger( std::string message, index_t nb_steps );
-        ~ProgressLogger();
-
-        index_t increment();
-
-        index_t increment( index_t nb_increments );
-
-        index_t increment_nb_steps();
-
-        index_t increment_nb_steps( index_t nb_steps );
-
-    private:
-        IMPLEMENTATION_MEMBER( impl_ );
-    };
+        pybind11::class_< ComponentMeshElement >(
+            module, "ComponentMeshElement" )
+            .def( pybind11::init< ComponentID, index_t >() )
+            .def( "string", &ComponentMeshElement::string );
+    }
 } // namespace geode

@@ -46,6 +46,9 @@ namespace geode
         PASSKEY( OpenGeodePointSetBuilder< dimension >, OGPointSetKey );
 
     public:
+        using Builder = OpenGeodePointSetBuilder< dimension >;
+        static constexpr auto dim = dimension;
+
         OpenGeodePointSet();
         OpenGeodePointSet( OpenGeodePointSet&& other );
         ~OpenGeodePointSet();

@@ -41,6 +41,8 @@ namespace geode
         PASSKEY( OpenGeodeGraphBuilder, OGGraphKey );
 
     public:
+        using Builder = OpenGeodeGraphBuilder;
+
         OpenGeodeGraph();
         OpenGeodeGraph( OpenGeodeGraph&& );
         ~OpenGeodeGraph();

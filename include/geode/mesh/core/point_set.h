@@ -30,6 +30,7 @@ namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
     FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
+    FORWARD_DECLARATION_DIMENSION_CLASS( PointSetBuilder );
 
     class AttributeManager;
 } // namespace geode
@@ -46,6 +47,9 @@ namespace geode
         OPENGEODE_TEMPLATE_ASSERT_2D_OR_3D( dimension );
 
     public:
+        using Builder = PointSetBuilder< dimension >;
+        static constexpr auto dim = dimension;
+
         /*!
          * Create a new PointSet using default data structure.
          */

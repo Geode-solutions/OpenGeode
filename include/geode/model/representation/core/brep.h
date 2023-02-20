@@ -43,6 +43,7 @@ namespace geode
     ALIAS_3D( Surface );
     FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
     ALIAS_3D( BoundingBox );
+    class BRepBuilder;
 } // namespace geode
 
 namespace geode
@@ -67,7 +68,8 @@ namespace geode
                                      public Identifier
     {
     public:
-        static constexpr index_t dimension{ 3 };
+        static constexpr index_t dim{ 3 };
+        using Builder = BRepBuilder;
 
         class opengeode_model_api BoundaryCornerRange
             : public Relationships::BoundaryRangeIterator,

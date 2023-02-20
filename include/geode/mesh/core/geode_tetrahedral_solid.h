@@ -47,6 +47,9 @@ namespace geode
             OGTetrahedralSolidKey );
 
     public:
+        using Builder = OpenGeodeTetrahedralSolidBuilder< dimension >;
+        static constexpr auto dim = dimension;
+
         OpenGeodeTetrahedralSolid();
         OpenGeodeTetrahedralSolid( OpenGeodeTetrahedralSolid&& other );
         ~OpenGeodeTetrahedralSolid();

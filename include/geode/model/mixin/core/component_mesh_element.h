@@ -37,6 +37,12 @@ namespace geode
                 } );
         }
 
+        std::string string() const
+        {
+            return absl::StrCat(
+                "[", component_id.string(), " ", element_id, "]" );
+        }
+
         ComponentID component_id;
         index_t element_id{ NO_ID };
     };

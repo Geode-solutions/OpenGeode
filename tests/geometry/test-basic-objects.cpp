@@ -27,6 +27,7 @@
 #include <geode/geometry/point.h>
 
 #include <geode/geometry/basic_objects/circle.h>
+#include <geode/geometry/basic_objects/cylinder.h>
 #include <geode/geometry/basic_objects/infinite_line.h>
 #include <geode/geometry/basic_objects/plane.h>
 #include <geode/geometry/basic_objects/segment.h>

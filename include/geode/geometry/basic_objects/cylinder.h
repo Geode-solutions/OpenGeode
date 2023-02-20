@@ -23,28 +23,26 @@
 
 #pragma once
 
-#include <string>
-
-#include <geode/basic/common.h>
-#include <geode/basic/pimpl.h>
+#include <geode/geometry/basic_objects/segment.h>
+#include <geode/geometry/common.h>
 
 namespace geode
 {
-    class opengeode_basic_api ProgressLogger
+    class opengeode_geometry_api Cylinder
     {
     public:
-        ProgressLogger( std::string message, index_t nb_steps );
-        ~ProgressLogger();
+        Cylinder( const Segment3D& axis, double radius );
 
-        index_t increment();
+        Cylinder( const Cylinder& other );
+        Cylinder& operator=( const Cylinder& other );
+        Cylinder( Cylinder&& other );
+        Cylinder& operator=( Cylinder&& other );
 
-        index_t increment( index_t nb_increments );
-
-        index_t increment_nb_steps();
-
-        index_t increment_nb_steps( index_t nb_steps );
+        const Segment3D& axis() const;
+        double radius() const;
 
     private:
-        IMPLEMENTATION_MEMBER( impl_ );
+        Segment3D axis_;
+        double radius_{ 0 };
     };
 } // namespace geode

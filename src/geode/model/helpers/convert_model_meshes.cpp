@@ -69,15 +69,16 @@ namespace
         }
     }
 
-    template < typename Model, typename ModelBuilder >
-    void do_convert_surfaces( const Model& model, ModelBuilder& builder )
+    template < typename Model >
+    void do_convert_surfaces(
+        const Model& model, typename Model::Builder& builder )
     {
         for( const auto& surface : model.surfaces() )
         {
             const auto& mesh = surface.mesh();
             if( mesh.type_name()
                 == geode::TriangulatedSurface<
-                    Model::dimension >::type_name_static() )
+                    Model::dim >::type_name_static() )
             {
                 continue;
             }
