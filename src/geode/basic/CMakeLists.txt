@@ -22,11 +22,11 @@ add_geode_library(
     NAME basic
     FOLDER "geode/basic"
     SOURCES
-        "array.cpp"
         "assert.cpp"
         "attribute_manager.cpp"
         "bitsery_input.cpp"
         "bitsery_output.cpp"
+        "cell_array.cpp"
         "common.cpp"
         "console_logger_client.cpp"
         "console_progress_logger_client.cpp"
@@ -46,12 +46,12 @@ add_geode_library(
         "zip_file.cpp"
     PUBLIC_HEADERS
         "algorithm.h"
-        "array.h"
         "assert.h"
         "attribute_manager.h"
         "attribute_utils.h"
         "attribute.h"
         "bitsery_archive.h"
+        "cell_array.h"
         "common.h"
         "console_logger_client.h"
         "console_progress_logger_client.h"

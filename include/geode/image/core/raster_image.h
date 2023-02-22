@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <geode/basic/array.h>
+#include <geode/basic/cell_array.h>
 #include <geode/basic/identifier.h>
 #include <geode/basic/pimpl.h>
 
@@ -37,13 +37,13 @@ namespace geode
 namespace geode
 {
     template < index_t dimension >
-    class RasterImage : public Array< dimension >, public Identifier
+    class RasterImage : public CellArray< dimension >, public Identifier
     {
         friend class bitsery::Access;
 
     public:
         static constexpr auto dim = dimension;
-        using CellIndices = typename Array< dimension >::CellIndices;
+        using CellIndices = typename CellArray< dimension >::CellIndices;
 
         RasterImage( std::array< index_t, dimension > cells_number );
         RasterImage( RasterImage&& );
@@ -75,8 +75,8 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive );
 
-        using Array< dimension >::set_array_dimensions;
-        using Array< dimension >::copy;
+        using CellArray< dimension >::set_array_dimensions;
+        using CellArray< dimension >::copy;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

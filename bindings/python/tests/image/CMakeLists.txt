@@ -24,7 +24,7 @@ add_geode_python_test(
         ${PROJECT_NAME}::py_image
 )
 add_geode_python_test(
-    SOURCE "test-py-raster.py"
+    SOURCE "test-py-raster-image.py"
     DEPENDENCIES
         ${PROJECT_NAME}::py_image
 )

@@ -31,16 +31,16 @@
 namespace geode
 {
     template < index_t dimension >
-    class Array
+    class CellArray
     {
-        OPENGEODE_DISABLE_COPY( Array );
+        OPENGEODE_DISABLE_COPY( CellArray );
         friend class bitsery::Access;
 
     public:
         static constexpr auto dim = dimension;
         using CellIndices = std::array< index_t, dimension >;
 
-        virtual ~Array();
+        virtual ~CellArray();
 
         local_index_t nb_cell_neighbors() const
         {
@@ -69,14 +69,14 @@ namespace geode
         bool is_cell_on_border( const CellIndices& cell_indices ) const;
 
     protected:
-        Array();
-        Array( std::array< index_t, dimension > cells_number );
-        Array( Array&& );
+        CellArray();
+        CellArray( std::array< index_t, dimension > cells_number );
+        CellArray( CellArray&& );
 
         void set_array_dimensions(
             std::array< index_t, dimension > cells_number );
 
-        void copy( const Array< dimension >& array );
+        void copy( const CellArray< dimension >& array );
 
     private:
         template < typename Archive >
@@ -85,5 +85,5 @@ namespace geode
     private:
         IMPLEMENTATION_MEMBER( impl_ );
     };
-    ALIAS_2D_AND_3D( Array );
+    ALIAS_2D_AND_3D( CellArray );
 } // namespace geode

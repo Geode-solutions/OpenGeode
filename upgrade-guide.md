@@ -10,7 +10,7 @@
 
 - **IO**: base classes for input and output file are moved into the basic library
 
-- **Grid**: `Grid` has been refactore using the new `Array` class
+- **Grid**: `Grid` has been refactore using the new `CellArray` class
 
 - **AddComponents**: `AddComponents` and `AddComponentsBuilder` have been removed. VisualStudio cannot compile move constructor using these helpers.
 

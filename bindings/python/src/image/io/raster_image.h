@@ -23,10 +23,10 @@
 
 #include "../../basic/factory.h"
 
-#include <geode/image/io/raster_input.h>
-#include <geode/image/io/raster_output.h>
+#include <geode/image/io/raster_image_input.h>
+#include <geode/image/io/raster_image_output.h>
 
-#define PYTHON_RASTER_IO( dimension )                                          \
+#define PYTHON_RASTER_IMAGE_IO( dimension )                                    \
     const auto save##dimension =                                               \
         "save_raster" + std::to_string( dimension ) + "D";                     \
     module.def( save##dimension.c_str(), &save_raster< dimension > );          \
@@ -38,9 +38,9 @@
 
 namespace geode
 {
-    void define_raster_io( pybind11::module& module )
+    void define_raster_image_io( pybind11::module& module )
     {
-        PYTHON_RASTER_IO( 2 );
-        PYTHON_RASTER_IO( 3 );
+        PYTHON_RASTER_IMAGE_IO( 2 );
+        PYTHON_RASTER_IMAGE_IO( 3 );
     }
 } // namespace geode

@@ -38,10 +38,10 @@ namespace geode
         class ArrayImpl
         {
             friend class bitsery::Access;
-            using CellIndices = typename Array< dimension >::CellIndices;
+            using CellIndices = typename CellArray< dimension >::CellIndices;
 
         public:
-            index_t cell_index( const Array< dimension >& array,
+            index_t cell_index( const CellArray< dimension >& array,
                 const CellIndices& index ) const
             {
                 const auto nb_u = array.nb_cells_in_direction( 0 );
@@ -55,10 +55,10 @@ namespace geode
             }
 
             CellIndices cell_indices(
-                const Array< dimension >& array, index_t index ) const
+                const CellArray< dimension >& array, index_t index ) const
             {
                 OPENGEODE_ASSERT( index < array.nb_cells(),
-                    "[Array::cell_index] Invalid index" );
+                    "[CellArray::cell_index] Invalid index" );
                 CellIndices cell_id;
                 for( const auto d : LRange{ dimension } )
                 {

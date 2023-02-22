@@ -27,9 +27,9 @@
 
 #include <geode/basic/library.h>
 
-#include "array.h"
 #include "attribute.h"
 #include "attribute_manager.h"
+#include "cell_array.h"
 #include "identifier.h"
 #include "identifier_builder.h"
 #include "mapping.h"
@@ -68,7 +68,7 @@ PYBIND11_MODULE( opengeode_py_basic, module )
     module.attr( "global_epsilon" ) = geode::global_epsilon;
     pybind11::class_< geode::OpenGeodeBasic >( module, "OpenGeodeBasic" )
         .def( "initialize", &geode::OpenGeodeBasic::initialize );
-    geode::define_array( module );
+    geode::define_cell_array( module );
     geode::define_attributes( module );
     geode::define_attribute_manager( module );
     geode::define_identifier( module );

@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/basic/array.h>
+#include <geode/basic/cell_array.h>
 
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
@@ -29,7 +29,7 @@
 namespace geode
 {
     template < index_t dimension >
-    class Array< dimension >::Impl
+    class CellArray< dimension >::Impl
     {
     public:
         Impl() = default;
@@ -95,11 +95,11 @@ namespace geode
         {
             cells_number_ = std::move( cells_number );
             OPENGEODE_EXCEPTION( nb_cells() != 0,
-                "[Array] Creation of a array with no cells "
+                "[CellArray] Creation of a array with no cells "
                 "in one direction." );
         }
 
-        void copy( const Array< dimension >::Impl& impl )
+        void copy( const CellArray< dimension >::Impl& impl )
         {
             cells_number_ = impl.cells_number_;
         }
@@ -120,86 +120,88 @@ namespace geode
     };
 
     template < index_t dimension >
-    Array< dimension >::Array()
+    CellArray< dimension >::CellArray()
     {
     }
 
     template < index_t dimension >
-    Array< dimension >::Array( std::array< index_t, dimension > cells_number )
+    CellArray< dimension >::CellArray(
+        std::array< index_t, dimension > cells_number )
         : impl_{ std::move( cells_number ) }
     {
     }
 
     template < index_t dimension >
-    Array< dimension >::Array( Array&& other )
+    CellArray< dimension >::CellArray( CellArray&& other )
         : impl_( std::move( other.impl_ ) )
     {
     }
 
     template < index_t dimension >
-    Array< dimension >::~Array() // NOLINT
+    CellArray< dimension >::~CellArray() // NOLINT
     {
     }
 
     template < index_t dimension >
-    index_t Array< dimension >::nb_cells() const
+    index_t CellArray< dimension >::nb_cells() const
     {
         return impl_->nb_cells();
     }
 
     template < index_t dimension >
-    index_t Array< dimension >::nb_cells_in_direction( index_t direction ) const
+    index_t CellArray< dimension >::nb_cells_in_direction(
+        index_t direction ) const
     {
         return impl_->nb_cells_in_direction( direction );
     }
 
     template < index_t dimension >
-    auto Array< dimension >::next_cell( const CellIndices& index,
+    auto CellArray< dimension >::next_cell( const CellIndices& index,
         index_t direction ) const -> absl::optional< CellIndices >
     {
         return impl_->next_cell( index, direction );
     }
 
     template < index_t dimension >
-    auto Array< dimension >::previous_cell( const CellIndices& index,
+    auto CellArray< dimension >::previous_cell( const CellIndices& index,
         index_t direction ) const -> absl::optional< CellIndices >
     {
         return impl_->previous_cell( index, direction );
     }
 
     template < index_t dimension >
-    bool Array< dimension >::is_cell_on_border(
+    bool CellArray< dimension >::is_cell_on_border(
         const CellIndices& cell_indices ) const
     {
         return impl_->is_cell_on_border( cell_indices );
     }
 
     template < index_t dimension >
-    void Array< dimension >::set_array_dimensions(
+    void CellArray< dimension >::set_array_dimensions(
         std::array< index_t, dimension > cells_number )
     {
         impl_->set_array_dimensions( std::move( cells_number ) );
     }
 
     template < index_t dimension >
-    void Array< dimension >::copy( const Array< dimension >& array )
+    void CellArray< dimension >::copy( const CellArray< dimension >& array )
     {
         impl_->copy( *array.impl_ );
     }
 
     template < index_t dimension >
     template < typename Archive >
-    void Array< dimension >::serialize( Archive& archive )
+    void CellArray< dimension >::serialize( Archive& archive )
     {
-        archive.ext( *this, DefaultGrowable< Archive, Array >{},
-            []( Archive& a, Array& array ) {
+        archive.ext( *this, DefaultGrowable< Archive, CellArray >{},
+            []( Archive& a, CellArray& array ) {
                 a.object( array.impl_ );
             } );
     }
 
-    template class opengeode_basic_api Array< 2 >;
-    template class opengeode_basic_api Array< 3 >;
+    template class opengeode_basic_api CellArray< 2 >;
+    template class opengeode_basic_api CellArray< 3 >;
 
-    SERIALIZE_BITSERY_ARCHIVE( opengeode_basic_api, Array< 2 > );
-    SERIALIZE_BITSERY_ARCHIVE( opengeode_basic_api, Array< 3 > );
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_basic_api, CellArray< 2 > );
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_basic_api, CellArray< 3 > );
 } // namespace geode

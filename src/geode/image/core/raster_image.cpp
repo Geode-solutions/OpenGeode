@@ -21,7 +21,7 @@
  *
  */
 
-#include <geode/image/core/raster.h>
+#include <geode/image/core/raster_image.h>
 
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
@@ -87,14 +87,14 @@ namespace geode
     template < index_t dimension >
     RasterImage< dimension >::RasterImage(
         std::array< index_t, dimension > cells_number )
-        : Array< dimension >{ std::move( cells_number ) }
+        : CellArray< dimension >{ std::move( cells_number ) }
     {
         impl_->resize( this->nb_cells() );
     }
 
     template < index_t dimension >
     RasterImage< dimension >::RasterImage( RasterImage&& other )
-        : Array< dimension >{ std::move( other ) },
+        : CellArray< dimension >{ std::move( other ) },
           impl_( std::move( other.impl_ ) )
     {
     }
@@ -131,8 +131,8 @@ namespace geode
     {
         archive.ext( *this, DefaultGrowable< Archive, RasterImage >{},
             []( Archive& a, RasterImage& raster ) {
-                a.ext(
-                    raster, bitsery::ext::BaseClass< Array< dimension > >{} );
+                a.ext( raster,
+                    bitsery::ext::BaseClass< CellArray< dimension > >{} );
                 a.object( raster.impl_ );
             } );
     }

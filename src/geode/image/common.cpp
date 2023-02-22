@@ -25,11 +25,11 @@
 
 #include <geode/basic/library.h>
 
-#include <geode/image/core/raster.h>
+#include <geode/image/core/raster_image.h>
 #include <geode/image/io/detail/geode_bitsery_raster_input.h>
 #include <geode/image/io/detail/geode_bitsery_raster_output.h>
-#include <geode/image/io/raster_input.h>
-#include <geode/image/io/raster_output.h>
+#include <geode/image/io/raster_image_input.h>
+#include <geode/image/io/raster_image_output.h>
 
 #define BITSERY_INPUT_RASTER_REGISTER_XD( dimension )                          \
     geode::RasterImageInputFactory##dimension##D::register_creator<            \

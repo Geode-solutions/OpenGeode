@@ -24,7 +24,7 @@ add_geode_test(
         ${PROJECT_NAME}::image
 )
 add_geode_test(
-    SOURCE "test-raster.cpp"
+    SOURCE "test-raster-image.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::image
 )
