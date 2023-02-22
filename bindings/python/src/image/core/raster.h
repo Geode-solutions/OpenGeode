@@ -24,12 +24,14 @@
 #include <geode/image/core/raster.h>
 
 #define PYTHON_RASTER( dimension )                                             \
-    const auto name##dimension = "RasterImage" + std::to_string( dimension ) + "D"; \
-    pybind11::class_< RasterImage##dimension##D, Array##dimension##D >(             \
+    const auto name##dimension =                                               \
+        "RasterImage" + std::to_string( dimension ) + "D";                     \
+    pybind11::class_< RasterImage##dimension##D, Array##dimension##D >(        \
         module, name##dimension.c_str() )                                      \
         .def( pybind11::init< std::array< index_t, dimension > >() )           \
-        .def( "native_extension", &RasterImage##dimension##D::native_extension )    \
-        .def( "color", &RasterImage##dimension##D::color )                          \
+        .def(                                                                  \
+            "native_extension", &RasterImage##dimension##D::native_extension ) \
+        .def( "color", &RasterImage##dimension##D::color )                     \
         .def( "set_color", &RasterImage##dimension##D::set_color )
 
 namespace geode

@@ -39,17 +39,17 @@ namespace geode
     public:
         const RGBColor& color( index_t index ) const
         {
-            OPENGEODE_ASSERT(
-                index < colors_.size(), "[RasterImage::set_color] Accessing a "
-                                        "cell that does not exist" );
+            OPENGEODE_ASSERT( index < colors_.size(),
+                "[RasterImage::set_color] Accessing a "
+                "cell that does not exist" );
             return colors_[index];
         }
 
         void set_color( index_t index, RGBColor color )
         {
-            OPENGEODE_ASSERT(
-                index < colors_.size(), "[RasterImage::set_color] Accessing a "
-                                        "cell that does not exist" );
+            OPENGEODE_ASSERT( index < colors_.size(),
+                "[RasterImage::set_color] Accessing a "
+                "cell that does not exist" );
             colors_[index] = std::move( color );
         }
 
