@@ -124,7 +124,7 @@ namespace geode
          * @note cur_element_box1 and cur_element_box2 are the element box
          * indices that intersect.
          * @note the operator defines what to do when two boxes of the
-         * tree ( \p cur_element_box1 and \p cur_element_box2 ) intesect each
+         * tree ( \p cur_element_box1 and \p cur_element_box2 ) intersect each
          * other (for example: test real intersection between each element in
          * boxes and store the result.)
          */

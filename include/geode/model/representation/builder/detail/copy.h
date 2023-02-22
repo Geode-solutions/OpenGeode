@@ -47,59 +47,63 @@ namespace geode
     {
         using Mapping = ModelCopyMapping::Mapping;
 
-        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
+        template < typename ModelFrom, typename BuilderTo >
         Mapping copy_corner_components(
-            const ModelFrom& from, const ModelTo& to, BuilderTo& builder_to )
+            const ModelFrom& from, BuilderTo& builder_to )
         {
             Mapping mapping;
             mapping.reserve( from.nb_corners() );
             for( const auto& corner : from.corners() )
             {
                 const auto& id =
-                    builder_to.add_corner( corner.mesh().impl_name() );
+                    ModelFrom::dim == BuilderTo::dim
+                        ? builder_to.add_corner( corner.mesh().impl_name() )
+                        : builder_to.add_corner();
                 builder_to.set_corner_name( id, corner.name() );
                 mapping.map( corner.id(), id );
-                builder_to.register_mesh_component( to.corner( id ) );
             }
             return mapping;
         }
 
-        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
+        template < typename ModelFrom, typename BuilderTo >
         Mapping copy_line_components(
-            const ModelFrom& from, const ModelTo& to, BuilderTo& builder_to )
+            const ModelFrom& from, BuilderTo& builder_to )
         {
             Mapping mapping;
             mapping.reserve( from.nb_lines() );
             for( const auto& line : from.lines() )
             {
-                const auto& id = builder_to.add_line( line.mesh().impl_name() );
+                const auto& id =
+                    ModelFrom::dim == BuilderTo::dim
+                        ? builder_to.add_line( line.mesh().impl_name() )
+                        : builder_to.add_line();
                 builder_to.set_line_name( id, line.name() );
                 mapping.map( line.id(), id );
-                builder_to.register_mesh_component( to.line( id ) );
             }
             return mapping;
         }
 
-        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
+        template < typename ModelFrom, typename BuilderTo >
         Mapping copy_surface_components(
-            const ModelFrom& from, const ModelTo& to, BuilderTo& builder_to )
+            const ModelFrom& from, BuilderTo& builder_to )
         {
             Mapping mapping;
             mapping.reserve( from.nb_surfaces() );
             for( const auto& surface : from.surfaces() )
             {
                 const auto& id =
-                    builder_to.add_surface( surface.mesh().impl_name() );
+                    ModelFrom::dim == BuilderTo::dim
+                        ? builder_to.add_surface( surface.mesh().impl_name() )
+                        : builder_to.add_surface();
                 builder_to.set_surface_name( id, surface.name() );
                 mapping.map( surface.id(), id );
-                builder_to.register_mesh_component( to.surface( id ) );
             }
             return mapping;
         }
 
-        template < typename ModelFrom, typename ModelTo, typename BuilderTo >
+        template < typename ModelFrom, typename BuilderTo >
         Mapping copy_block_components(
-            const ModelFrom& from, const ModelTo& to, BuilderTo& builder_to )
+            const ModelFrom& from, BuilderTo& builder_to )
         {
             Mapping mapping;
             mapping.reserve( from.nb_blocks() );
@@ -109,7 +113,6 @@ namespace geode
                     builder_to.add_block( block.mesh().impl_name() );
                 builder_to.set_block_name( id, block.name() );
                 mapping.map( block.id(), id );
-                builder_to.register_mesh_component( to.block( id ) );
             }
             return mapping;
         }
