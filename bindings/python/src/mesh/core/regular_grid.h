@@ -31,7 +31,7 @@
     const auto name##dimension =                                               \
         "RegularGrid" + std::to_string( dimension ) + "D";                     \
     pybind11::class_< RegularGrid##dimension##D, Base##dimension##D,           \
-        Array##dimension##D >( module, name##dimension.c_str() )               \
+        CellArray##dimension##D >( module, name##dimension.c_str() )           \
         .def_static(                                                           \
             "create", ( std::unique_ptr< RegularGrid##dimension##D >( * )() )  \
                           & RegularGrid##dimension##D::create )                \

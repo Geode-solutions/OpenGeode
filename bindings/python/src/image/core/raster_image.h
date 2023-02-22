@@ -21,26 +21,24 @@
  *
  */
 
-#include <geode/basic/array.h>
+#include <geode/image/core/raster_image.h>
 
-#define PYTHON_ARRAY( dimension )                                              \
-    const auto name##dimension = "Array" + std::to_string( dimension ) + "D";  \
-    pybind11::class_< Array##dimension##D >( module, name##dimension.c_str() ) \
-        .def( "nb_cell_neighbors", &Array##dimension##D::nb_cell_neighbors )   \
-        .def( "nb_cells", &Array##dimension##D::nb_cells )                     \
-        .def( "nb_cells_in_direction",                                         \
-            &Array##dimension##D::nb_cells_in_direction )                      \
-        .def( "cell_index", &Array##dimension##D::cell_index )                 \
-        .def( "cell_indices", &Array##dimension##D::cell_indices )             \
-        .def( "next_cell", &Array##dimension##D::next_cell )                   \
-        .def( "previous_cell", &Array##dimension##D::previous_cell )           \
-        .def( "is_cell_on_border", &Array##dimension##D::is_cell_on_border )
+#define PYTHON_RASTER_IMAGE( dimension )                                       \
+    const auto name##dimension =                                               \
+        "RasterImage" + std::to_string( dimension ) + "D";                     \
+    pybind11::class_< RasterImage##dimension##D, CellArray##dimension##D >(    \
+        module, name##dimension.c_str() )                                      \
+        .def( pybind11::init< std::array< index_t, dimension > >() )           \
+        .def(                                                                  \
+            "native_extension", &RasterImage##dimension##D::native_extension ) \
+        .def( "color", &RasterImage##dimension##D::color )                     \
+        .def( "set_color", &RasterImage##dimension##D::set_color )
 
 namespace geode
 {
-    void define_array( pybind11::module& module )
+    void define_raster_image( pybind11::module& module )
     {
-        PYTHON_ARRAY( 2 );
-        PYTHON_ARRAY( 3 );
+        PYTHON_RASTER_IMAGE( 2 );
+        PYTHON_RASTER_IMAGE( 3 );
     }
 } // namespace geode

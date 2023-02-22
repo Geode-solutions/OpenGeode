@@ -421,7 +421,7 @@ namespace geode
     template < index_t dimension >
     void Grid< dimension >::copy( const Grid< dimension >& grid, GridKey )
     {
-        Array< dimension >::copy( grid );
+        CellArray< dimension >::copy( grid );
         impl_->copy( *grid.impl_ );
     }
 
@@ -430,17 +430,17 @@ namespace geode
     void Grid< dimension >::serialize( Archive& archive )
     {
         archive.ext( *this,
-            Growable< Archive, Grid >{
-                { []( Archive& a, Grid& grid ) {
-                     a.object( grid.impl_ );
-                     grid.set_array_dimensions(
-                         grid.impl_->deprecated_cells_number() );
-                 },
-                    []( Archive& a, Grid& grid ) {
-                        a.ext( grid,
-                            bitsery::ext::BaseClass< Array< dimension > >{} );
-                        a.object( grid.impl_ );
-                    } } } );
+            Growable< Archive,
+                Grid >{ { []( Archive& a, Grid& grid ) {
+                             a.object( grid.impl_ );
+                             grid.set_array_dimensions(
+                                 grid.impl_->deprecated_cells_number() );
+                         },
+                []( Archive& a, Grid& grid ) {
+                    a.ext( grid,
+                        bitsery::ext::BaseClass< CellArray< dimension > >{} );
+                    a.object( grid.impl_ );
+                } } } );
     }
 
     template class opengeode_mesh_api Grid< 2 >;

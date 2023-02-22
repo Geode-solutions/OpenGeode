@@ -22,7 +22,7 @@ add_geode_python_binding(
     NAME "py_basic"
     SOURCES
         "basic.cpp"
-        "array.h"
+        "cell_array.h"
         "attribute.h"
         "attribute_manager.h"
         "identifier.h"

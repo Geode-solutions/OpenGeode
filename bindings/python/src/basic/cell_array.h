@@ -21,24 +21,30 @@
  *
  */
 
-#include <geode/image/core/raster.h>
+#include <geode/basic/cell_array.h>
 
-#define PYTHON_RASTER( dimension )                                             \
+#define PYTHON_ARRAY( dimension )                                              \
     const auto name##dimension =                                               \
-        "RasterImage" + std::to_string( dimension ) + "D";                     \
-    pybind11::class_< RasterImage##dimension##D, Array##dimension##D >(        \
+        "CellArray" + std::to_string( dimension ) + "D";                       \
+    pybind11::class_< CellArray##dimension##D >(                               \
         module, name##dimension.c_str() )                                      \
-        .def( pybind11::init< std::array< index_t, dimension > >() )           \
         .def(                                                                  \
-            "native_extension", &RasterImage##dimension##D::native_extension ) \
-        .def( "color", &RasterImage##dimension##D::color )                     \
-        .def( "set_color", &RasterImage##dimension##D::set_color )
+            "nb_cell_neighbors", &CellArray##dimension##D::nb_cell_neighbors ) \
+        .def( "nb_cells", &CellArray##dimension##D::nb_cells )                 \
+        .def( "nb_cells_in_direction",                                         \
+            &CellArray##dimension##D::nb_cells_in_direction )                  \
+        .def( "cell_index", &CellArray##dimension##D::cell_index )             \
+        .def( "cell_indices", &CellArray##dimension##D::cell_indices )         \
+        .def( "next_cell", &CellArray##dimension##D::next_cell )               \
+        .def( "previous_cell", &CellArray##dimension##D::previous_cell )       \
+        .def(                                                                  \
+            "is_cell_on_border", &CellArray##dimension##D::is_cell_on_border )
 
 namespace geode
 {
-    void define_raster( pybind11::module& module )
+    void define_cell_array( pybind11::module& module )
     {
-        PYTHON_RASTER( 2 );
-        PYTHON_RASTER( 3 );
+        PYTHON_ARRAY( 2 );
+        PYTHON_ARRAY( 3 );
     }
 } // namespace geode

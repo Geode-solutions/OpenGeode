@@ -24,17 +24,17 @@ add_geode_library(
     SOURCES
         "common.cpp"
         "core/bitsery_archive.cpp"
-        "core/raster.cpp"
-        "io/raster_input.cpp"
-        "io/raster_output.cpp"
+        "core/raster_image.cpp"
+        "io/raster_image_input.cpp"
+        "io/raster_image_output.cpp"
     PUBLIC_HEADERS
         "common.h"
         "core/bitsery_archive.h"
         "core/greyscale_color.h"
-        "core/raster.h"
+        "core/raster_image.h"
         "core/rgb_color.h"
-        "io/raster_input.h"
-        "io/raster_output.h"
+        "io/raster_image_input.h"
+        "io/raster_image_output.h"
     ADVANCED_HEADERS
         "io/detail/geode_bitsery_raster_input.h"
         "io/detail/geode_bitsery_raster_output.h"

@@ -23,9 +23,9 @@ add_geode_python_binding(
     SOURCES
         "image.cpp"
         "core/greyscale_color.h"
-        "core/raster.h"
+        "core/raster_image.h"
         "core/rgb_color.h"
-        "io/raster.h"
+        "io/raster_image.h"
     DEPENDENCIES
         ${PROJECT_NAME}::image
 )

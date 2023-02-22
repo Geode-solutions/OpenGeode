@@ -26,10 +26,10 @@
 #include <pybind11/stl.h>
 
 #include "core/greyscale_color.h"
-#include "core/raster.h"
+#include "core/raster_image.h"
 #include "core/rgb_color.h"
 
-#include "io/raster.h"
+#include "io/raster_image.h"
 
 namespace pybind11
 {
@@ -93,7 +93,7 @@ PYBIND11_MODULE( opengeode_py_image, module )
     pybind11::class_< geode::OpenGeodeImage >( module, "OpenGeodeImage" )
         .def( "initialize", &geode::OpenGeodeImage::initialize );
     geode::define_greyscale_color( module );
-    geode::define_raster( module );
-    geode::define_raster_io( module );
+    geode::define_raster_image( module );
+    geode::define_raster_image_io( module );
     geode::define_rgb_color( module );
 }

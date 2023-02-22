@@ -21,20 +21,20 @@
  *
  */
 
-#include <geode/image/io/raster_input.h>
+#include <geode/image/io/raster_image_output.h>
 
 #include <absl/strings/ascii.h>
 
 #include <geode/basic/filename.h>
-#include <geode/basic/identifier_builder.h>
 #include <geode/basic/timer.h>
 
-#include <geode/image/core/raster.h>
+#include <geode/image/core/raster_image.h>
 
 namespace geode
 {
     template < index_t dimension >
-    RasterImage< dimension > load_raster( absl::string_view filename )
+    void save_raster(
+        const RasterImage< dimension >& raster, absl::string_view filename )
     {
         try
         {
@@ -42,32 +42,23 @@ namespace geode
             const auto extension =
                 absl::AsciiStrToLower( extension_from_filename( filename ) );
             OPENGEODE_EXCEPTION(
-                RasterImageInputFactory< dimension >::has_creator( extension ),
+                RasterImageOutputFactory< dimension >::has_creator( extension ),
                 "Unknown extension: ", extension );
-            auto input = RasterImageInputFactory< dimension >::create(
-                extension, filename );
-            auto raster = input->read();
-            if( raster.name() == Identifier::DEFAULT_NAME )
-            {
-                IdentifierBuilder{ raster }.set_name(
-                    filename_without_extension( filename ) );
-            }
-            Logger::info( "RasterImage", dimension, "D loaded from ", filename,
+            RasterImageOutputFactory< dimension >::create( extension, filename )
+                ->write( raster );
+            Logger::info( "RasterImage", dimension, "D saved in ", filename,
                 " in ", timer.duration() );
-            Logger::info( "RasterImage", dimension,
-                "D has: ", raster.nb_cells(), " cells" );
-            return raster;
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
-            throw OpenGeodeException{ "Cannot load RasterImage from file: ",
+            throw OpenGeodeException{ "Cannot save RasterImage in file: ",
                 filename };
         }
     }
 
-    template RasterImage< 2 > opengeode_image_api load_raster(
-        absl::string_view );
-    template RasterImage< 3 > opengeode_image_api load_raster(
-        absl::string_view );
+    template void opengeode_image_api save_raster(
+        const RasterImage< 2 >&, absl::string_view );
+    template void opengeode_image_api save_raster(
+        const RasterImage< 3 >&, absl::string_view );
 } // namespace geode

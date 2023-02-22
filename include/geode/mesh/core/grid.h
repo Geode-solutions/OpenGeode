@@ -25,7 +25,7 @@
 
 #include <absl/container/inlined_vector.h>
 
-#include <geode/basic/array.h>
+#include <geode/basic/cell_array.h>
 #include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
@@ -40,7 +40,7 @@ namespace geode
 namespace geode
 {
     template < index_t dimension >
-    class Grid : public Array< dimension >
+    class Grid : public CellArray< dimension >
     {
         OPENGEODE_DISABLE_COPY( Grid );
         PASSKEY( GridBuilder< dimension >, GridKey );
@@ -49,7 +49,7 @@ namespace geode
     public:
         using Builder = GridBuilder< dimension >;
         static constexpr auto dim = dimension;
-        using CellIndices = typename Array< dimension >::CellIndices;
+        using CellIndices = typename CellArray< dimension >::CellIndices;
         using VertexIndices = CellIndices;
         using CellVertices = std::array< VertexIndices, 1 << dimension >;
         using CellsAroundVertex =
@@ -131,8 +131,8 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive );
 
-        using Array< dimension >::set_array_dimensions;
-        using Array< dimension >::copy;
+        using CellArray< dimension >::set_array_dimensions;
+        using CellArray< dimension >::copy;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );
