@@ -70,7 +70,8 @@ namespace geode
         }
 
         void set_value(
-            const GridVertexIndices< dimension >& vertex_id, double value )
+            const typename Grid< dimension >::VertexIndices& vertex_id,
+            double value )
         {
             function_attribute_->set_value(
                 grid_.vertex_index( vertex_id ), value );
@@ -86,14 +87,16 @@ namespace geode
             return function_attribute_->value( vertex_id );
         }
 
-        double value( const GridVertexIndices< dimension >& vertex_id ) const
+        double value(
+            const typename Grid< dimension >::VertexIndices& vertex_id ) const
         {
             return function_attribute_->value(
                 grid_.vertex_index( vertex_id ) );
         }
 
         double value( const Point< dimension >& point,
-            const GridCellIndices< dimension >& grid_cell_indices ) const
+            const typename Grid< dimension >::CellIndices& grid_cell_indices )
+            const
         {
             double point_value{ 0. };
             for( const auto node_id : LRange{ grid_.nb_cell_vertices() } )
@@ -161,7 +164,8 @@ namespace geode
 
     template < index_t dimension >
     void RegularGridScalarFunction< dimension >::set_value(
-        const GridVertexIndices< dimension >& vertex_index, double value )
+        const typename Grid< dimension >::VertexIndices& vertex_index,
+        double value )
     {
         impl_->set_value( vertex_index, value );
     }
@@ -175,7 +179,7 @@ namespace geode
 
     template < index_t dimension >
     double RegularGridScalarFunction< dimension >::value(
-        const GridVertexIndices< dimension >& vertex_index ) const
+        const typename Grid< dimension >::VertexIndices& vertex_index ) const
     {
         return impl_->value( vertex_index );
     }
@@ -190,7 +194,7 @@ namespace geode
     template < index_t dimension >
     double RegularGridScalarFunction< dimension >::value(
         const Point< dimension >& point,
-        const GridCellIndices< dimension >& grid_cell_indices ) const
+        const typename Grid< dimension >::CellIndices& grid_cell_indices ) const
     {
         return impl_->value( point, grid_cell_indices );
     }

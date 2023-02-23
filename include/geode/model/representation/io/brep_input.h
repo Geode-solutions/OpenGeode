@@ -24,8 +24,7 @@
 #pragma once
 
 #include <geode/basic/factory.h>
-
-#include <geode/mesh/io/input.h>
+#include <geode/basic/input.h>
 
 #include <geode/model/common.h>
 

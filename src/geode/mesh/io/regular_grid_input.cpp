@@ -25,6 +25,8 @@
 
 #include <absl/strings/ascii.h>
 
+#include <geode/basic/filename.h>
+#include <geode/basic/identifier_builder.h>
 #include <geode/basic/timer.h>
 
 #include <geode/mesh/core/mesh_factory.h>
@@ -48,6 +50,11 @@ namespace geode
             auto input = RegularGridInputFactory< dimension >::create(
                 extension, filename );
             auto grid = input->read( impl );
+            if( grid->name() == Identifier::DEFAULT_NAME )
+            {
+                IdentifierBuilder{ *grid }.set_name(
+                    filename_without_extension( filename ) );
+            }
             Logger::info( "RegularGrid", dimension, "D loaded from ", filename,
                 " in ", timer.duration() );
             Logger::info( "RegularGrid", dimension, "D has: ", grid->nb_cells(),

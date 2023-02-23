@@ -25,12 +25,11 @@
 
 #include <absl/hash/hash.h>
 
-#include <bitsery/bitsery.h>
-
 #include <geode/basic/attribute_utils.h>
 #include <geode/basic/bitsery_archive.h>
-#include <geode/basic/common.h>
 #include <geode/basic/range.h>
+
+#include <geode/image/common.h>
 
 namespace geode
 {

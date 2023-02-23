@@ -101,13 +101,14 @@ namespace geode
 
         const Point2D& origin() const override;
 
-        index_t cell_index( const GridCellIndices2D& index ) const override;
+        index_t cell_index( const Grid2D::CellIndices& index ) const override;
 
-        GridCellIndices2D cell_indices( index_t index ) const override;
+        Grid2D::CellIndices cell_indices( index_t index ) const override;
 
-        index_t vertex_index( const GridVertexIndices2D& index ) const override;
+        index_t vertex_index(
+            const Grid2D::VertexIndices& index ) const override;
 
-        GridVertexIndices2D vertex_indices( index_t index ) const override;
+        Grid2D::VertexIndices vertex_indices( index_t index ) const override;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

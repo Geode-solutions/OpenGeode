@@ -23,18 +23,41 @@
 
 #pragma once
 
-#include <geode/mesh/common.h>
-#include <geode/mesh/io/io.h>
+#include <geode/basic/factory.h>
+#include <geode/basic/output.h>
+
+#include <geode/image/common.h>
 
 namespace geode
 {
-    template < typename Mesh >
-    class Output : public IOFile
-    {
-    public:
-        virtual void write( const Mesh& mesh ) const = 0;
+    FORWARD_DECLARATION_DIMENSION_CLASS( RasterImage );
+} // namespace geode
 
+namespace geode
+{
+    /*!
+     * API function for saving a RasterImage.
+     * The adequate saver is called depending on the given filename extension.
+     * @param[in] raster RasterImage to save.
+     * @param[in] filename Path to the file where save the RasterImage.
+     */
+    template < index_t dimension >
+    void save_raster(
+        const RasterImage< dimension >& raster, absl::string_view filename );
+
+    template < index_t dimension >
+    class RasterImageOutput : public Output< RasterImage< dimension > >
+    {
     protected:
-        Output( absl::string_view filename ) : IOFile( filename ) {}
+        RasterImageOutput( absl::string_view filename )
+            : Output< RasterImage< dimension > >{ filename }
+        {
+        }
     };
+
+    template < index_t dimension >
+    using RasterImageOutputFactory = Factory< std::string,
+        RasterImageOutput< dimension >,
+        absl::string_view >;
+    ALIAS_2D_AND_3D( RasterImageOutputFactory );
 } // namespace geode

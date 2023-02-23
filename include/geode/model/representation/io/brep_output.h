@@ -24,8 +24,7 @@
 #pragma once
 
 #include <geode/basic/factory.h>
-
-#include <geode/mesh/io/output.h>
+#include <geode/basic/output.h>
 
 #include <geode/model/common.h>
 

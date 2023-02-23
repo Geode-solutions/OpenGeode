@@ -21,23 +21,42 @@
  *
  */
 
-#include <pybind11/operators.h>
+#pragma once
 
-#include <geode/basic/greyscale_color.h>
+#include <geode/basic/factory.h>
+#include <geode/basic/input.h>
+
+#include <geode/image/common.h>
 
 namespace geode
 {
-    void define_greyscale_color( pybind11::module& module )
+    FORWARD_DECLARATION_DIMENSION_CLASS( RasterImage );
+} // namespace geode
+
+namespace geode
+{
+    /*!
+     * API function for loading an RasterImage.
+     * The adequate loader is called depending on the filename extension.
+     * Default data structure implémentation is used.
+     * @param[in] filename Path to the file to load.
+     */
+    template < index_t dimension >
+    RasterImage< dimension > load_raster( absl::string_view filename );
+
+    template < index_t dimension >
+    class RasterImageInput : public Input< RasterImage< dimension > >
     {
-        pybind11::class_< GreyscaleColor >( module, "GreyscaleColor" )
-            .def( pybind11::init<>() )
-            .def( pybind11::init< local_index_t >() )
-            .def( "value", &GreyscaleColor::value )
-            .def( "set_value", &GreyscaleColor::set_value )
-            .def( "string", &GreyscaleColor::string )
-            .def( pybind11::self == pybind11::self )
-            .def( pybind11::self != pybind11::self )
-            .def( pybind11::self + pybind11::self )
-            .def( pybind11::self += pybind11::self );
-    }
+    protected:
+        RasterImageInput( absl::string_view filename )
+            : Input< RasterImage< dimension > >{ filename }
+        {
+        }
+    };
+
+    template < index_t dimension >
+    using RasterImageInputFactory = Factory< std::string,
+        RasterImageInput< dimension >,
+        absl::string_view >;
+    ALIAS_2D_AND_3D( RasterImageInputFactory );
 } // namespace geode

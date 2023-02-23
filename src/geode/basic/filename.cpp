@@ -50,4 +50,9 @@ namespace geode
         ghc::filesystem::path filepath{ to_string( path ) };
         return filepath.replace_filename( "" ).string();
     }
+
+    absl::string_view extension_from_filename( absl::string_view filename )
+    {
+        return filename.substr( filename.find_last_of( '.' ) + 1 );
+    }
 } // namespace geode

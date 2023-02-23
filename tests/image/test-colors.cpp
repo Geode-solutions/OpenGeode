@@ -22,9 +22,10 @@
  */
 
 #include <geode/basic/attribute_manager.h>
-#include <geode/basic/greyscale_color.h>
 #include <geode/basic/logger.h>
-#include <geode/basic/rgb_color.h>
+
+#include <geode/image/core/greyscale_color.h>
+#include <geode/image/core/rgb_color.h>
 
 #include <geode/tests/common.h>
 

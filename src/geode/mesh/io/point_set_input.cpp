@@ -26,9 +26,9 @@
 #include <absl/strings/ascii.h>
 
 #include <geode/basic/filename.h>
+#include <geode/basic/identifier_builder.h>
 #include <geode/basic/timer.h>
 
-#include <geode/mesh/builder/point_set_builder.h>
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/point_set.h>
 
@@ -51,8 +51,8 @@ namespace geode
             auto point_set = input->read( impl );
             if( point_set->name() == Identifier::DEFAULT_NAME )
             {
-                PointSetBuilder< dimension >::create( *point_set )
-                    ->set_name( filename_without_extension( filename ) );
+                IdentifierBuilder{ *point_set }.set_name(
+                    filename_without_extension( filename ) );
             }
             Logger::info( "PointSet", dimension, "D loaded from ", filename,
                 " in ", timer.duration() );

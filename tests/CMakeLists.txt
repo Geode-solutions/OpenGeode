@@ -35,5 +35,6 @@ include_directories(${PROJECT_BINARY_DIR})
 
 add_subdirectory(basic)
 add_subdirectory(geometry)
+add_subdirectory(image)
 add_subdirectory(mesh)
 add_subdirectory(model)

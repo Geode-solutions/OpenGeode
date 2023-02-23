@@ -26,9 +26,9 @@
 #include <absl/strings/ascii.h>
 
 #include <geode/basic/filename.h>
+#include <geode/basic/identifier_builder.h>
 #include <geode/basic/timer.h>
 
-#include <geode/mesh/builder/tetrahedral_solid_builder.h>
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
 
@@ -52,9 +52,8 @@ namespace geode
             auto tetrahedral_solid = input->read( impl );
             if( tetrahedral_solid->name() == Identifier::DEFAULT_NAME )
             {
-                TetrahedralSolidBuilder< dimension >::create(
-                    *tetrahedral_solid )
-                    ->set_name( filename_without_extension( filename ) );
+                IdentifierBuilder{ *tetrahedral_solid }.set_name(
+                    filename_without_extension( filename ) );
             }
             Logger::info( "TetrahedralSolid", dimension, "D loaded from ",
                 filename, " in ", timer.duration() );

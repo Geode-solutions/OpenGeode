@@ -21,12 +21,38 @@
  *
  */
 
-#include <geode/mesh/io/output.h>
+#pragma once
+
+#include <fstream>
+
+#include <geode/image/core/bitsery_archive.h>
+#include <geode/image/io/raster_image_output.h>
 
 namespace geode
 {
-    absl::string_view extension_from_filename( absl::string_view filename )
+    template < index_t dimension >
+    class OpenGeodeRasterImageOutput : public RasterImageOutput< dimension >
     {
-        return filename.substr( filename.find_last_of( '.' ) + 1 );
-    }
+    public:
+        OpenGeodeRasterImageOutput( absl::string_view filename )
+            : RasterImageOutput< dimension >( filename )
+        {
+        }
+
+        void write( const RasterImage< dimension >& mesh ) const final
+        {
+            std::ofstream file{ to_string( this->filename() ),
+                std::ofstream::binary };
+            TContext context{};
+            register_basic_serialize_pcontext( std::get< 0 >( context ) );
+            register_image_serialize_pcontext( std::get< 0 >( context ) );
+            Serializer archive{ context, file };
+            archive.object( mesh );
+            archive.adapter().flush();
+            OPENGEODE_EXCEPTION( std::get< 1 >( context ).isValid(),
+                "[Bitsery::write] Error while writing file: ",
+                this->filename() );
+        }
+    };
+    ALIAS_2D_AND_3D( OpenGeodeRasterImageOutput );
 } // namespace geode

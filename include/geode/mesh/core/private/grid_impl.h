@@ -25,6 +25,7 @@
 
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/bitsery_archive.h>
+#include <geode/basic/private/array_impl.h>
 
 #include <geode/geometry/point.h>
 
@@ -35,9 +36,10 @@ namespace geode
     namespace detail
     {
         template < index_t dimension >
-        class GridImpl
+        class GridImpl : public ArrayImpl< dimension >
         {
             friend class bitsery::Access;
+            using VertexIndices = typename Grid< dimension >::VertexIndices;
 
         public:
             const Point< dimension >& origin(
@@ -46,42 +48,8 @@ namespace geode
                 return grid.point( 0 );
             }
 
-            index_t cell_index( const RegularGrid< dimension >& grid,
-                const GridCellIndices< dimension >& index ) const
-            {
-                const auto nb_u = grid.nb_cells_in_direction( 0 );
-                auto cell_id = index[0] + index[1] * nb_u;
-                if( dimension == 3 )
-                {
-                    cell_id +=
-                        index[2] * nb_u * grid.nb_cells_in_direction( 1 );
-                }
-                return cell_id;
-            }
-
-            GridCellIndices< dimension > cell_indices(
-                const RegularGrid< dimension >& grid, index_t index ) const
-            {
-                OPENGEODE_ASSERT( index < grid.nb_cells(),
-                    "[RegularGrid::cell_index] Invalid index" );
-                GridCellIndices< dimension > cell_id;
-                for( const auto d : LRange{ dimension } )
-                {
-                    index_t offset{ 1 };
-                    for( const auto d2 : LRange{ dimension - d - 1 } )
-                    {
-                        offset *= grid.nb_cells_in_direction( d2 );
-                    }
-                    const auto value =
-                        static_cast< index_t >( std::floor( index / offset ) );
-                    cell_id[dimension - d - 1] = value;
-                    index -= value * offset;
-                }
-                return cell_id;
-            }
-
             index_t vertex_index( const RegularGrid< dimension >& grid,
-                const GridVertexIndices< dimension >& index ) const
+                const VertexIndices& index ) const
             {
                 index_t vertex_id{ 0 };
                 for( const auto d : LRange{ dimension } )
@@ -100,12 +68,12 @@ namespace geode
                 return vertex_id;
             }
 
-            GridVertexIndices< dimension > vertex_indices(
+            VertexIndices vertex_indices(
                 const RegularGrid< dimension >& grid, index_t index ) const
             {
                 OPENGEODE_ASSERT( index < grid.nb_vertices(),
                     "[RegularGrid::vertex_index] Invalid index" );
-                GridVertexIndices< dimension > vertex_id;
+                VertexIndices vertex_id;
                 for( const auto d : LRange{ dimension } )
                 {
                     index_t offset{ 1 };
@@ -146,8 +114,13 @@ namespace geode
             template < typename Archive >
             void serialize( Archive& archive )
             {
-                archive.ext( *this, DefaultGrowable< Archive, GridImpl >{},
-                    []( Archive& /*unused*/, GridImpl& /*unused*/ ) {} );
+                archive.ext( *this,
+                    Growable< Archive, GridImpl >{
+                        { []( Archive& /*unused*/, GridImpl& /*unused*/ ) {},
+                            []( Archive& a, GridImpl& grid ) {
+                                a.ext( grid, bitsery::ext::BaseClass<
+                                                 ArrayImpl< dimension > >{} );
+                            } } } );
             }
         };
     } // namespace detail

@@ -24,9 +24,9 @@
 #pragma once
 
 #include <geode/basic/factory.h>
+#include <geode/basic/output.h>
 
 #include <geode/mesh/common.h>
-#include <geode/mesh/io/output.h>
 
 namespace geode
 {

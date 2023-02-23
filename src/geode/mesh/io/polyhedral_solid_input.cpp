@@ -26,9 +26,9 @@
 #include <absl/strings/ascii.h>
 
 #include <geode/basic/filename.h>
+#include <geode/basic/identifier_builder.h>
 #include <geode/basic/timer.h>
 
-#include <geode/mesh/builder/polyhedral_solid_builder.h>
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polyhedral_solid.h>
 
@@ -52,8 +52,8 @@ namespace geode
             auto polyhedral_solid = input->read( impl );
             if( polyhedral_solid->name() == Identifier::DEFAULT_NAME )
             {
-                PolyhedralSolidBuilder< dimension >::create( *polyhedral_solid )
-                    ->set_name( filename_without_extension( filename ) );
+                IdentifierBuilder{ *polyhedral_solid }.set_name(
+                    filename_without_extension( filename ) );
             }
             Logger::info( "PolyhedralSolid", dimension, "D loaded from ",
                 filename, " in ", timer.duration() );

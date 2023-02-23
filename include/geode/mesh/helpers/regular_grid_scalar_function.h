@@ -64,17 +64,20 @@ namespace geode
             absl::string_view function_name );
 
         void set_value(
-            const GridVertexIndices< dimension >& vertex_index, double value );
+            const typename Grid< dimension >::VertexIndices& vertex_index,
+            double value );
 
         void set_value( index_t vertex_index, double value );
 
         double value(
-            const GridVertexIndices< dimension >& vertex_index ) const;
+            const typename Grid< dimension >::VertexIndices& vertex_index )
+            const;
 
         double value( index_t vertex_index ) const;
 
         double value( const Point< dimension >& point,
-            const GridCellIndices< dimension >& grid_cell_indices ) const;
+            const typename Grid< dimension >::CellIndices& grid_cell_indices )
+            const;
 
     private:
         RegularGridScalarFunction( const RegularGrid< dimension >& grid,

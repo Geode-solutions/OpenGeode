@@ -26,9 +26,9 @@
 #include <absl/strings/ascii.h>
 
 #include <geode/basic/filename.h>
+#include <geode/basic/identifier_builder.h>
 #include <geode/basic/timer.h>
 
-#include <geode/mesh/builder/vertex_set_builder.h>
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/vertex_set.h>
 
@@ -56,8 +56,8 @@ namespace geode
             auto vertex_set = input->read( impl );
             if( vertex_set->name() == Identifier::DEFAULT_NAME )
             {
-                VertexSetBuilder::create( *vertex_set )
-                    ->set_name( filename_without_extension( filename ) );
+                IdentifierBuilder{ *vertex_set }.set_name(
+                    filename_without_extension( filename ) );
             }
             Logger::info(
                 "VertexSet loaded from ", filename, " in ", timer.duration() );

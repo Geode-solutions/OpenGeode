@@ -26,9 +26,9 @@
 #include <absl/strings/ascii.h>
 
 #include <geode/basic/filename.h>
+#include <geode/basic/identifier_builder.h>
 #include <geode/basic/timer.h>
 
-#include <geode/mesh/builder/polygonal_surface_builder.h>
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polygonal_surface.h>
 
@@ -52,9 +52,8 @@ namespace geode
             auto polygonal_surface = input->read( impl );
             if( polygonal_surface->name() == Identifier::DEFAULT_NAME )
             {
-                PolygonalSurfaceBuilder< dimension >::create(
-                    *polygonal_surface )
-                    ->set_name( filename_without_extension( filename ) );
+                IdentifierBuilder{ *polygonal_surface }.set_name(
+                    filename_without_extension( filename ) );
             }
             Logger::info( "PolygonalSurface", dimension, "D loaded from ",
                 filename, " in ", timer.duration() );

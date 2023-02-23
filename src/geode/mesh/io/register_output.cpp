@@ -43,15 +43,17 @@
 #include <geode/mesh/io/detail/geode_triangulated_surface_output.h>
 #include <geode/mesh/io/detail/geode_vertex_set_output.h>
 
+#define BITSERY_OUTPUT_MESH_REGISTER_XD( Mesh, dimension )                     \
+    geode::Mesh##OutputFactory##dimension##D::register_creator<                \
+        geode::OpenGeode##Mesh##Output##dimension##D >(                        \
+        geode::OpenGeode##Mesh##dimension##D ::native_extension_static()       \
+            .data() )
+
 #define BITSERY_OUTPUT_MESH_REGISTER_2D( Mesh )                                \
-    geode::Mesh##OutputFactory2D::register_creator<                            \
-        geode::OpenGeode##Mesh##Output2D >(                                    \
-        geode::OpenGeode##Mesh##2D ::native_extension_static().data() )
+    BITSERY_OUTPUT_MESH_REGISTER_XD( Mesh, 2 )
 
 #define BITSERY_OUTPUT_MESH_REGISTER_3D( Mesh )                                \
-    geode::Mesh##OutputFactory3D::register_creator<                            \
-        geode::OpenGeode##Mesh##Output3D >(                                    \
-        geode::OpenGeode##Mesh##3D ::native_extension_static().data() )
+    BITSERY_OUTPUT_MESH_REGISTER_XD( Mesh, 3 )
 
 #define BITSERY_OUTPUT_MESH_REGISTER_2D_3D( Mesh )                             \
     BITSERY_OUTPUT_MESH_REGISTER_2D( Mesh );                                   \

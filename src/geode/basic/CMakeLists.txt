@@ -26,6 +26,7 @@ add_geode_library(
         "attribute_manager.cpp"
         "bitsery_input.cpp"
         "bitsery_output.cpp"
+        "cell_array.cpp"
         "common.cpp"
         "console_logger_client.cpp"
         "console_progress_logger_client.cpp"
@@ -50,13 +51,15 @@ add_geode_library(
         "attribute_utils.h"
         "attribute.h"
         "bitsery_archive.h"
+        "cell_array.h"
         "common.h"
         "console_logger_client.h"
         "console_progress_logger_client.h"
         "factory.h"
         "filename.h"
-        "greyscale_color.h"
         "identifier.h"
+        "input.h"
+        "io.h"
         "identifier_builder.h"
         "library.h"
         "logger.h"
@@ -64,6 +67,7 @@ add_geode_library(
         "logger_manager.h"
         "mapping.h"
         "named_type.h"
+        "output.h"
         "passkey.h"
         "permutation.h"
         "pimpl.h"
@@ -72,7 +76,6 @@ add_geode_library(
         "progress_logger_client.h"
         "progress_logger_manager.h"
         "range.h"
-        "rgb_color.h"
         "singleton.h"
         "string.h"
         "timer.h"
@@ -82,6 +85,8 @@ add_geode_library(
     ADVANCED_HEADERS
         "detail/bitsery_archive.h"
         "detail/mapping_after_deletion.h"
+    PRIVATE_HEADERS
+        "private/array_impl.h"
     PUBLIC_DEPENDENCIES
         absl::flat_hash_map
         absl::strings

@@ -26,9 +26,9 @@
 #include <absl/strings/ascii.h>
 
 #include <geode/basic/filename.h>
+#include <geode/basic/identifier_builder.h>
 #include <geode/basic/timer.h>
 
-#include <geode/mesh/builder/hybrid_solid_builder.h>
 #include <geode/mesh/core/hybrid_solid.h>
 #include <geode/mesh/core/mesh_factory.h>
 
@@ -51,8 +51,8 @@ namespace geode
             auto hybrid_solid = input->read( impl );
             if( hybrid_solid->name() == Identifier::DEFAULT_NAME )
             {
-                HybridSolidBuilder< dimension >::create( *hybrid_solid )
-                    ->set_name( filename_without_extension( filename ) );
+                IdentifierBuilder{ *hybrid_solid }.set_name(
+                    filename_without_extension( filename ) );
             }
             Logger::info( "HybridSolid", dimension, "D loaded from ", filename,
                 " in ", timer.duration() );

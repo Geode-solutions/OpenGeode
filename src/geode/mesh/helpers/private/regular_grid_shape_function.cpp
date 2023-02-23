@@ -42,7 +42,7 @@ namespace
     geode::Point< dimension > local_point_coordinates(
         const geode::Grid< dimension >& grid,
         const geode::Point< dimension >& point,
-        const geode::GridCellIndices< dimension >& cell_id )
+        const typename geode::Grid< dimension >::CellIndices& cell_id )
     {
         auto local_coords = point - grid.origin();
         for( const auto d : geode::LRange{ dimension } )
@@ -69,7 +69,7 @@ namespace geode
     {
         template < index_t dimension >
         double shape_function_value( const Grid< dimension >& grid,
-            const GridCellIndices< dimension >& cell_id,
+            const typename Grid< dimension >::CellIndices& cell_id,
             local_index_t node_id,
             const Point< dimension >& point )
         {
@@ -92,13 +92,13 @@ namespace geode
 
         template double opengeode_mesh_api shape_function_value< 2 >(
             const Grid< 2 >& grid,
-            const GridCellIndices< 2 >& cell_id,
+            const Grid< 2 >::CellIndices& cell_id,
             local_index_t node_id,
             const Point< 2 >& point );
 
         template double opengeode_mesh_api shape_function_value< 3 >(
             const Grid< 3 >& grid,
-            const GridCellIndices< 3 >& cell_id,
+            const Grid< 3 >::CellIndices& cell_id,
             local_index_t node_id,
             const Point< 3 >& point );
     } // namespace detail

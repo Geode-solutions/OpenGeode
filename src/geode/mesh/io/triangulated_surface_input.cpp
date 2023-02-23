@@ -26,9 +26,9 @@
 #include <absl/strings/ascii.h>
 
 #include <geode/basic/filename.h>
+#include <geode/basic/identifier_builder.h>
 #include <geode/basic/timer.h>
 
-#include <geode/mesh/builder/triangulated_surface_builder.h>
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/triangulated_surface.h>
 
@@ -53,9 +53,8 @@ namespace geode
             auto triangulated_surface = input->read( impl );
             if( triangulated_surface->name() == Identifier::DEFAULT_NAME )
             {
-                TriangulatedSurfaceBuilder< dimension >::create(
-                    *triangulated_surface )
-                    ->set_name( filename_without_extension( filename ) );
+                IdentifierBuilder{ *triangulated_surface }.set_name(
+                    filename_without_extension( filename ) );
             }
             Logger::info( "TriangulatedSurface", dimension, "D loaded from ",
                 filename, " in ", timer.duration() );

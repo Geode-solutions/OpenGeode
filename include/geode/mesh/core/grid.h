@@ -24,8 +24,8 @@
 #pragma once
 
 #include <absl/container/inlined_vector.h>
-#include <absl/types/optional.h>
 
+#include <geode/basic/cell_array.h>
 #include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
@@ -40,25 +40,7 @@ namespace geode
 namespace geode
 {
     template < index_t dimension >
-    using GridCellIndices = std::array< index_t, dimension >;
-    ALIAS_2D_AND_3D( GridCellIndices );
-
-    template < index_t dimension >
-    using GridVertexIndices = std::array< index_t, dimension >;
-    ALIAS_2D_AND_3D( GridVertexIndices );
-
-    template < index_t dimension >
-    using GridCellVertices =
-        std::array< GridVertexIndices< dimension >, 1 << dimension >;
-    ALIAS_2D_AND_3D( GridCellVertices );
-
-    template < index_t dimension >
-    using GridCellsAroundVertex =
-        absl::InlinedVector< GridCellIndices< dimension >, 1 << dimension >;
-    ALIAS_2D_AND_3D( GridCellsAroundVertex );
-
-    template < index_t dimension >
-    class Grid
+    class Grid : public CellArray< dimension >
     {
         OPENGEODE_DISABLE_COPY( Grid );
         PASSKEY( GridBuilder< dimension >, GridKey );
@@ -67,23 +49,13 @@ namespace geode
     public:
         using Builder = GridBuilder< dimension >;
         static constexpr auto dim = dimension;
+        using CellIndices = typename CellArray< dimension >::CellIndices;
+        using VertexIndices = CellIndices;
+        using CellVertices = std::array< VertexIndices, 1 << dimension >;
+        using CellsAroundVertex =
+            absl::InlinedVector< CellIndices, 1 << dimension >;
 
-        Grid();
-
-        Grid( Grid&& );
-
-        virtual ~Grid();
-
-        absl::string_view native_extension() const
-        {
-            return native_extension_static();
-        }
-
-        static absl::string_view native_extension_static()
-        {
-            static const auto ext = absl::StrCat( "og_rgd", dimension, "d" );
-            return ext;
-        }
+        ~Grid();
 
         virtual const Point< dimension >& origin() const = 0;
 
@@ -98,65 +70,28 @@ namespace geode
             return 1 << dimension;
         }
 
-        local_index_t nb_cell_facets() const
-        {
-            return nb_cell_facets_static();
-        }
-
-        static constexpr local_index_t nb_cell_facets_static()
-        {
-            return 2 * dimension;
-        }
-
-        index_t nb_cells() const;
-
-        index_t nb_cells_in_direction( index_t direction ) const;
-
         double cell_length_in_direction( index_t direction ) const;
 
         double cell_size() const;
-
-        virtual index_t cell_index(
-            const GridCellIndices< dimension >& index ) const = 0;
-
-        virtual GridCellIndices< dimension > cell_indices(
-            index_t index ) const = 0;
-
-        absl::optional< GridCellIndices< dimension > > next_cell(
-            const GridCellIndices< dimension >& index,
-            index_t direction ) const;
-
-        absl::optional< GridCellIndices< dimension > > previous_cell(
-            const GridCellIndices< dimension >& index,
-            index_t direction ) const;
-
-        bool is_cell_on_border(
-            const GridCellIndices< dimension >& cell_indices ) const;
 
         index_t nb_vertices_in_direction( index_t direction ) const;
 
         index_t nb_vertices_on_borders() const;
 
-        virtual index_t vertex_index(
-            const GridVertexIndices< dimension >& index ) const = 0;
+        virtual index_t vertex_index( const VertexIndices& index ) const = 0;
 
-        virtual GridVertexIndices< dimension > vertex_indices(
-            index_t index ) const = 0;
+        virtual VertexIndices vertex_indices( index_t index ) const = 0;
 
-        GridCellVertices< dimension > cell_vertices(
-            const GridCellIndices< dimension >& cell_id ) const;
+        CellVertices cell_vertices( const CellIndices& cell_id ) const;
 
-        GridVertexIndices< dimension > cell_vertex_indices(
-            const GridCellIndices< dimension >& cell_id,
-            local_index_t vertex_id ) const;
+        VertexIndices cell_vertex_indices(
+            const CellIndices& cell_id, local_index_t vertex_id ) const;
 
-        absl::optional< GridVertexIndices< dimension > > next_vertex(
-            const GridVertexIndices< dimension >& index,
-            index_t direction ) const;
+        absl::optional< VertexIndices > next_vertex(
+            const VertexIndices& index, index_t direction ) const;
 
-        absl::optional< GridVertexIndices< dimension > > previous_vertex(
-            const GridVertexIndices< dimension >& index,
-            index_t direction ) const;
+        absl::optional< VertexIndices > previous_vertex(
+            const VertexIndices& index, index_t direction ) const;
 
         /*!
          * Return true if the query point is inside the grid, up to a
@@ -167,8 +102,7 @@ namespace geode
         /*!
          * Returns the closest grid vertex to the query point.
          */
-        GridVertexIndices< dimension > closest_vertex(
-            const Point< dimension >& query ) const;
+        VertexIndices closest_vertex( const Point< dimension >& query ) const;
 
         /*!
          * Return the cell(s) containing the query point
@@ -179,8 +113,7 @@ namespace geode
          * cell indices are returned: they correspond the potential cells that
          * may contain the point.
          */
-        GridCellsAroundVertex< dimension > cells(
-            const Point< dimension >& query ) const;
+        CellsAroundVertex cells( const Point< dimension >& query ) const;
 
     public:
         void set_grid_dimensions( std::array< index_t, dimension > cells_number,
@@ -189,9 +122,17 @@ namespace geode
 
         void copy( const Grid< dimension >& grid, GridKey );
 
+    protected:
+        Grid();
+
+        Grid( Grid&& );
+
     private:
         template < typename Archive >
         void serialize( Archive& archive );
+
+        using CellArray< dimension >::set_array_dimensions;
+        using CellArray< dimension >::copy;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );
