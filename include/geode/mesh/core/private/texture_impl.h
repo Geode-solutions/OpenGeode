@@ -67,7 +67,10 @@ namespace geode
             {
                 coordinates_->modify_value( element,
                     [vertex, &coordinates]( ElementTextureCoordinates& value ) {
-                        value.resize( vertex + 1 );
+                        if( vertex >= value.size() )
+                        {
+                            value.resize( vertex + 1 );
+                        }
                         value[vertex] = coordinates;
                     } );
             }

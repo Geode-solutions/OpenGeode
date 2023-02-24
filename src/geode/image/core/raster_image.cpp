@@ -103,6 +103,7 @@ namespace geode
     RasterImage< dimension >& RasterImage< dimension >::operator=(
         RasterImage&& other )
     {
+        CellArray< dimension >::operator=( std::move( other ) );
         *impl_ = std::move( *other.impl_ );
         return *this;
     }

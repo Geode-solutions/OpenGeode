@@ -59,6 +59,9 @@ void test()
     geode::save_raster( raster, "test.og_img2d" );
     const auto reload = geode::load_raster< 2 >( "test.og_img2d" );
     test_raster( reload );
+    auto raster2 = std::move( raster );
+    OPENGEODE_EXCEPTION(
+        raster2.nb_cells() == 100, "[Test] Wrong number of cells after move" );
 }
 
 OPENGEODE_TEST( "raster" )

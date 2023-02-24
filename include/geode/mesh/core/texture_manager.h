@@ -47,6 +47,8 @@ namespace geode
         TextureManager( TextureManager&& );
         ~TextureManager();
 
+        index_t nb_textures() const;
+
         Texture< dimension >& find_or_create_texture( absl::string_view name );
 
         const Texture< dimension >& find_texture(

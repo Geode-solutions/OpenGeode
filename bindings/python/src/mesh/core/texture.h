@@ -21,30 +21,34 @@
  *
  */
 
-#include <geode/geometry/basic_objects/segment.h>
-#include <geode/mesh/core/edged_curve.h>
+#include <geode/image/core/raster_image.h>
 
-#define PYTHON_EDGED_CURVE( dimension )                                        \
+#include <geode/mesh/core/texture1d.h>
+#include <geode/mesh/core/texture2d.h>
+#include <geode/mesh/core/texture3d.h>
+
+#define PYTHON_TEXTURE( dimension )                                            \
     const auto name##dimension =                                               \
-        "EdgedCurve" + std::to_string( dimension ) + "D";                      \
-    pybind11::class_< EdgedCurve##dimension##D, Graph >(                       \
+        "Texture" + std::to_string( dimension ) + "D";                         \
+    pybind11::class_< Texture< dimension > >(                                  \
         module, name##dimension.c_str() )                                      \
-        .def_static(                                                           \
-            "create", ( std::unique_ptr< EdgedCurve##dimension##D >( * )() )   \
-                          & EdgedCurve##dimension##D::create )                 \
-        .def( "clone", &EdgedCurve##dimension##D::clone )                      \
-        .def( "point", &EdgedCurve##dimension##D::point )                      \
-        .def( "edge_length", &EdgedCurve##dimension##D::edge_length )          \
-        .def( "edge_barycenter", &EdgedCurve##dimension##D::edge_barycenter )  \
-        .def( "bounding_box", &EdgedCurve##dimension##D::bounding_box )        \
-        .def( "segment", &EdgedCurve##dimension##D::segment )                  \
-        .def( "texture_manager", &EdgedCurve##dimension##D::texture_manager )
+        .def( "image", &Texture< dimension >::image )                          \
+        .def( "set_image",                                                     \
+            []( Texture< dimension >& texture,                                 \
+                RasterImage< dimension >& image ) {                            \
+                texture.set_image( std::move( image ) );                       \
+            } )                                                                \
+        .def( "texture_coordinates",                                           \
+            &Texture< dimension >::texture_coordinates )                       \
+        .def( "set_texture_coordinates",                                       \
+            &Texture< dimension >::set_texture_coordinates )
 
 namespace geode
 {
-    void define_edged_curve( pybind11::module& module )
+    void define_texture( pybind11::module& module )
     {
-        PYTHON_EDGED_CURVE( 2 );
-        PYTHON_EDGED_CURVE( 3 );
+        PYTHON_TEXTURE( 1 );
+        PYTHON_TEXTURE( 2 );
+        PYTHON_TEXTURE( 3 );
     }
 } // namespace geode

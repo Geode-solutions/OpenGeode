@@ -41,6 +41,11 @@ namespace geode
         friend class bitsery::Access;
 
     public:
+        index_t nb_textures() const
+        {
+            return textures_.size();
+        }
+
         Texture< dimension >& find_or_create_texture(
             AttributeManager& manager, absl::string_view name )
         {
@@ -119,6 +124,12 @@ namespace geode
     template < index_t dimension >
     TextureStorage< dimension >::~TextureStorage()
     {
+    }
+
+    template < index_t dimension >
+    index_t TextureStorage< dimension >::nb_textures( TextureManagerKey ) const
+    {
+        return impl_->nb_textures();
     }
 
     template < index_t dimension >

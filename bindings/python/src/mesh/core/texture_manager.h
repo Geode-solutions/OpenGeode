@@ -21,30 +21,29 @@
  *
  */
 
-#include <geode/geometry/basic_objects/segment.h>
-#include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/core/texture1d.h>
+#include <geode/mesh/core/texture2d.h>
+#include <geode/mesh/core/texture3d.h>
+#include <geode/mesh/core/texture_manager.h>
 
-#define PYTHON_EDGED_CURVE( dimension )                                        \
+#define PYTHON_TEXTURE_MANAGER( dimension )                                    \
     const auto name##dimension =                                               \
-        "EdgedCurve" + std::to_string( dimension ) + "D";                      \
-    pybind11::class_< EdgedCurve##dimension##D, Graph >(                       \
+        "TextureManager" + std::to_string( dimension ) + "D";                  \
+    pybind11::class_< TextureManager< dimension > >(                           \
         module, name##dimension.c_str() )                                      \
-        .def_static(                                                           \
-            "create", ( std::unique_ptr< EdgedCurve##dimension##D >( * )() )   \
-                          & EdgedCurve##dimension##D::create )                 \
-        .def( "clone", &EdgedCurve##dimension##D::clone )                      \
-        .def( "point", &EdgedCurve##dimension##D::point )                      \
-        .def( "edge_length", &EdgedCurve##dimension##D::edge_length )          \
-        .def( "edge_barycenter", &EdgedCurve##dimension##D::edge_barycenter )  \
-        .def( "bounding_box", &EdgedCurve##dimension##D::bounding_box )        \
-        .def( "segment", &EdgedCurve##dimension##D::segment )                  \
-        .def( "texture_manager", &EdgedCurve##dimension##D::texture_manager )
+        .def( "find_or_create_texture",                                        \
+            &TextureManager< dimension >::find_or_create_texture )             \
+        .def( "find_texture", &TextureManager< dimension >::find_texture )     \
+        .def( "texture_names", &TextureManager< dimension >::texture_names )   \
+        .def( "texture_exists", &TextureManager< dimension >::texture_exists ) \
+        .def( "delete_texture", &TextureManager< dimension >::delete_texture )
 
 namespace geode
 {
-    void define_edged_curve( pybind11::module& module )
+    void define_texture_manager( pybind11::module& module )
     {
-        PYTHON_EDGED_CURVE( 2 );
-        PYTHON_EDGED_CURVE( 3 );
+        PYTHON_TEXTURE_MANAGER( 1 );
+        PYTHON_TEXTURE_MANAGER( 2 );
+        PYTHON_TEXTURE_MANAGER( 3 );
     }
 } // namespace geode

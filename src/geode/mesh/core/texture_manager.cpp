@@ -27,6 +27,7 @@
 
 #include <bitsery/ext/std_map.h>
 
+#include <geode/basic/attribute_manager.h>
 #include <geode/basic/pimpl_impl.h>
 
 #include <geode/mesh/core/texture1d.h>
@@ -43,6 +44,11 @@ namespace geode
         Impl( AttributeManager& manager, TextureStorage< dimension >& textures )
             : manager_( manager ), textures_( textures )
         {
+        }
+
+        index_t nb_textures() const
+        {
+            return textures_.nb_textures( {} );
         }
 
         Texture< dimension >& find_or_create_texture( absl::string_view name )
@@ -67,7 +73,8 @@ namespace geode
 
         void delete_texture( absl::string_view name )
         {
-            return textures_.delete_texture( name, {} );
+            textures_.delete_texture( name, {} );
+            manager_.delete_attribute( name );
         }
 
     private:
@@ -91,6 +98,12 @@ namespace geode
     template < index_t dimension >
     TextureManager< dimension >::~TextureManager()
     {
+    }
+
+    template < index_t dimension >
+    index_t TextureManager< dimension >::nb_textures() const
+    {
+        return impl_->nb_textures();
     }
 
     template < index_t dimension >

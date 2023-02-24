@@ -51,6 +51,8 @@ namespace geode
         ~TextureStorage();
 
     public:
+        index_t nb_textures( TextureManagerKey ) const;
+
         Texture< dimension >& find_or_create_texture( AttributeManager& manager,
             absl::string_view name,
             TextureManagerKey );

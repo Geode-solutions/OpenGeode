@@ -106,6 +106,7 @@
         .def( "polygon_attribute_manager",                                     \
             &SurfaceMesh##dimension##D::polygon_attribute_manager,             \
             pybind11::return_value_policy::reference )                         \
+        .def( "texture_manager", &SurfaceMesh##dimension##D::texture_manager ) \
         .def( "bounding_box", &SurfaceMesh##dimension##D::bounding_box )       \
         .def_static(                                                           \
             "create", ( std::unique_ptr< SurfaceMesh##dimension##D >( * )() )  \
