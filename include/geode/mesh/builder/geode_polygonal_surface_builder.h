@@ -46,6 +46,8 @@ namespace geode
         : public PolygonalSurfaceBuilder< dimension >
     {
     public:
+        static constexpr auto dim = dimension;
+
         OpenGeodePolygonalSurfaceBuilder(
             VertexSet& vertex_set, MeshBuilderFactoryKey );
 

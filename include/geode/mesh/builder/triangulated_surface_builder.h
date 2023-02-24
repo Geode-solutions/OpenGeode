@@ -43,6 +43,8 @@ namespace geode
     class TriangulatedSurfaceBuilder : public SurfaceMeshBuilder< dimension >
     {
     public:
+        static constexpr auto dim = dimension;
+
         /*!
          * Create the builder associated with a TriangulatedSurface.
          * @param[in] mesh The TriangulatedSurface to build/modify

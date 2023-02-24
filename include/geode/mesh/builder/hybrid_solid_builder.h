@@ -42,6 +42,8 @@ namespace geode
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
 
     public:
+        static constexpr auto dim = dimension;
+
         static std::unique_ptr< HybridSolidBuilder< dimension > > create(
             HybridSolid< dimension >& mesh );
 

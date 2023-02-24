@@ -83,7 +83,7 @@ namespace geode
         OPENGEODE_DISABLE_COPY( BRepBuilder );
 
     public:
-        static constexpr auto dim = BRep::dim;
+        static constexpr index_t dim{ 3 };
 
         BRepBuilder( BRep& brep );
         BRepBuilder( BRepBuilder&& ) = default;

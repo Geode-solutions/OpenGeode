@@ -45,6 +45,8 @@ namespace geode
     class PolyhedralSolidBuilder : public SolidMeshBuilder< dimension >
     {
     public:
+        static constexpr auto dim = dimension;
+
         /*!
          * Create the builder associated with a PolyhedralSolid.
          * @param[in] mesh The PolyhedralSolid to build/modify

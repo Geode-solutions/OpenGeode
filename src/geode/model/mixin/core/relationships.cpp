@@ -58,7 +58,7 @@ namespace geode
         static constexpr local_index_t ITEM_EDGE_VERTEX{ 0 };
         static constexpr local_index_t COLLECTION_EDGE_VERTEX{ 1 };
 
-        Impl()
+        Impl() : RelationshipsImpl()
         {
             initialize_relation_attribute();
         }
