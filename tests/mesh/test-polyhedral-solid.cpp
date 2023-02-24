@@ -28,10 +28,10 @@
 #include <geode/geometry/point.h>
 #include <geode/geometry/vector.h>
 
-#include <geode/mesh/builder/geode_polyhedral_solid_builder.h>
+#include <geode/mesh/builder/geode/geode_polyhedral_solid_builder.h>
 #include <geode/mesh/builder/solid_edges_builder.h>
 #include <geode/mesh/builder/solid_facets_builder.h>
-#include <geode/mesh/core/geode_polyhedral_solid.h>
+#include <geode/mesh/core/geode/geode_polyhedral_solid.h>
 #include <geode/mesh/core/solid_edges.h>
 #include <geode/mesh/core/solid_facets.h>
 #include <geode/mesh/io/polyhedral_solid_input.h>
@@ -354,6 +354,12 @@ void test_io( const geode::PolyhedralSolid3D& polyhedral_solid,
             "[Test] Reloaded PolyhedralSolid has "
             "wrong attributes on its facets" );
     }
+    auto manager = new_polyhedral_solid->texture_manager();
+    auto texture_names = manager.texture_names();
+    OPENGEODE_EXCEPTION( texture_names.size() == 1,
+        "[Test] Reloaded PolyhedralSolid has wrong number of textures" );
+    OPENGEODE_EXCEPTION( texture_names[0] == "texture",
+        "[Test] Reloaded PolyhedralSolid has wrong texture name" );
 }
 
 void test_backward_io( const std::string& filename )
@@ -529,6 +535,12 @@ void test_delete_all( const geode::PolyhedralSolid3D& polyhedral_solid,
         "[Test]PolyhedralSolid should have 0 vertex" );
 }
 
+void test_texture( const geode::PolyhedralSolid3D& polyhedral_solid )
+{
+    auto manager = polyhedral_solid.texture_manager();
+    manager.find_or_create_texture( "texture" );
+}
+
 void test()
 {
     geode::OpenGeodeMesh::initialize();
@@ -546,10 +558,14 @@ void test()
     test_edges( *polyhedral_solid );
     test_facets( *polyhedral_solid );
     test_polyhedron_adjacencies( *polyhedral_solid, *builder );
+    test_texture( *polyhedral_solid );
+
     test_io( *polyhedral_solid,
         absl::StrCat( "test.", polyhedral_solid->native_extension() ) );
     test_backward_io( absl::StrCat(
         geode::data_path, "test_v7.", polyhedral_solid->native_extension() ) );
+    test_backward_io( absl::StrCat(
+        geode::data_path, "test_v12.", polyhedral_solid->native_extension() ) );
 
     test_permutation( *polyhedral_solid, *builder );
     test_delete_polyhedra( *polyhedral_solid, *builder );

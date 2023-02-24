@@ -27,8 +27,8 @@
 #include <geode/geometry/bounding_box.h>
 #include <geode/geometry/point.h>
 
-#include <geode/mesh/builder/geode_edged_curve_builder.h>
-#include <geode/mesh/core/geode_edged_curve.h>
+#include <geode/mesh/builder/geode/geode_edged_curve_builder.h>
+#include <geode/mesh/core/geode/geode_edged_curve.h>
 #include <geode/mesh/io/edged_curve_input.h>
 #include <geode/mesh/io/edged_curve_output.h>
 
@@ -209,8 +209,27 @@ void test_io(
 {
     geode::save_edged_curve( edged_curve, filename );
     geode::load_edged_curve< 3 >( filename );
-    geode::load_edged_curve< 3 >(
+    const auto reload = geode::load_edged_curve< 3 >(
         geode::OpenGeodeEdgedCurve3D::impl_name_static(), filename );
+    OPENGEODE_EXCEPTION( reload->nb_edges() == 4,
+        "[Test] Reload EdgedCurve has wrong number of edges" );
+    OPENGEODE_EXCEPTION( reload->nb_vertices() == 4,
+        "[Test] Reload EdgedCurve has wrong number of vertices" );
+    auto manager = reload->texture_manager();
+    auto texture_names = manager.texture_names();
+    OPENGEODE_EXCEPTION( texture_names.size() == 1,
+        "[Test] Reloaded EdgedCurve has wrong number of textures" );
+    OPENGEODE_EXCEPTION( texture_names[0] == "texture",
+        "[Test] Reloaded EdgedCurve has wrong texture name" );
+}
+
+void test_backward_io( const std::string& filename )
+{
+    const auto curve = geode::load_edged_curve< 3 >( filename );
+    OPENGEODE_EXCEPTION( curve->nb_edges() == 4,
+        "[Test] Backward EdgedCurve has wrong number of edges" );
+    OPENGEODE_EXCEPTION( curve->nb_vertices() == 4,
+        "[Test] Backward EdgedCurve has wrong number of vertices" );
 }
 
 void test_edge_requests( const geode::EdgedCurve3D& edged_curve,
@@ -249,6 +268,12 @@ void test_clone( const geode::EdgedCurve3D& edged_curve )
         "[Test] EdgedCurve2 attribute should be 42" );
 }
 
+void test_texture( const geode::EdgedCurve3D& edged_curve )
+{
+    auto manager = edged_curve.texture_manager();
+    manager.find_or_create_texture( "texture" );
+}
+
 void test()
 {
     geode::OpenGeodeMesh::initialize();
@@ -259,8 +284,12 @@ void test()
     test_create_vertices( *edged_curve, *builder );
     test_create_edges( *edged_curve, *builder );
     test_bounding_box( *edged_curve );
+    test_texture( *edged_curve );
+
     test_io( *edged_curve,
         absl::StrCat( "test.", edged_curve->native_extension() ) );
+    test_backward_io( absl::StrCat(
+        geode::data_path, "test_v12.", edged_curve->native_extension() ) );
 
     test_permutation( *edged_curve, *builder );
     test_delete_edge( *edged_curve, *builder );

@@ -8,6 +8,8 @@
 
 ### Breaking Changes
 
+- **Mesh**: OpenGeode mesh implementations (datamodel and builder) are moved into a subfolder `geode` (i.e. file like `geode_point_set.h` and `geode_point_set_builer.h`)
+
 - **IO**: base classes for input and output file are moved into the basic library
 
 - **Grid**: `Grid` has been refactore using the new `CellArray` class

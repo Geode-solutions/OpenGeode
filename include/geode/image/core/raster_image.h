@@ -45,8 +45,10 @@ namespace geode
         static constexpr auto dim = dimension;
         using CellIndices = typename CellArray< dimension >::CellIndices;
 
+        RasterImage();
         RasterImage( std::array< index_t, dimension > cells_number );
         RasterImage( RasterImage&& );
+        RasterImage& operator=( RasterImage&& );
         ~RasterImage();
 
         static std::string native_extension_static()
@@ -70,8 +72,6 @@ namespace geode
         void set_color( index_t index, RGBColor color );
 
     private:
-        RasterImage();
-
         template < typename Archive >
         void serialize( Archive& archive );
 
@@ -81,5 +81,5 @@ namespace geode
     private:
         IMPLEMENTATION_MEMBER( impl_ );
     };
-    ALIAS_2D_AND_3D( RasterImage );
+    ALIAS_1D_AND_2D_AND_3D( RasterImage );
 } // namespace geode

@@ -13,10 +13,10 @@
 
 #include <geode/geometry/bitsery_archive.h>
 
-#include <geode/mesh/builder/geode_vertex_set_builder.h>
+#include <geode/mesh/builder/geode/geode_vertex_set_builder.h>
 #include <geode/mesh/core/bitsery_archive.h>
 #include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/core/geode_vertex_set.h>
+#include <geode/mesh/core/geode/geode_vertex_set.h>
 #include <geode/mesh/core/point_set.h>
 #include <geode/mesh/core/solid_mesh.h>
 #include <geode/mesh/core/surface_mesh.h>

@@ -199,9 +199,11 @@ namespace geode
             } );
     }
 
+    template class opengeode_basic_api CellArray< 1 >;
     template class opengeode_basic_api CellArray< 2 >;
     template class opengeode_basic_api CellArray< 3 >;
 
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_basic_api, CellArray< 1 > );
     SERIALIZE_BITSERY_ARCHIVE( opengeode_basic_api, CellArray< 2 > );
     SERIALIZE_BITSERY_ARCHIVE( opengeode_basic_api, CellArray< 3 > );
 } // namespace geode

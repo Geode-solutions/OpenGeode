@@ -46,6 +46,8 @@
 #include <geode/mesh/core/polygonal_surface.h>
 #include <geode/mesh/core/private/surface_mesh_impl.h>
 #include <geode/mesh/core/surface_edges.h>
+#include <geode/mesh/core/texture2d.h>
+#include <geode/mesh/core/texture_storage.h>
 
 namespace
 {
@@ -319,6 +321,11 @@ namespace geode
             return polygon_attribute_manager_;
         }
 
+        TextureManager2D texture_manager() const
+        {
+            return { polygon_attribute_manager_, texture_storage_ };
+        }
+
         void initialize_polygons_around_vertex(
             const SurfaceMesh< dimension >& surface )
         {
@@ -350,6 +357,15 @@ namespace geode
                             a.ext( impl.polygons_around_vertex_,
                                 bitsery::ext::StdSmartPtr{} );
                             a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
+                        },
+                        []( Archive& a, Impl& impl ) {
+                            a.object( impl.polygon_attribute_manager_ );
+                            a.ext( impl.polygon_around_vertex_,
+                                bitsery::ext::StdSmartPtr{} );
+                            a.ext( impl.polygons_around_vertex_,
+                                bitsery::ext::StdSmartPtr{} );
+                            a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
+                            a.object( impl.texture_storage_ );
                         } } } );
         }
 
@@ -378,6 +394,7 @@ namespace geode
         mutable std::shared_ptr< VariableAttribute< CachedPolygons > >
             polygons_around_vertex_;
         mutable std::unique_ptr< SurfaceEdges< dimension > > edges_;
+        mutable TextureStorage2D texture_storage_;
     };
 
     template < index_t dimension >
@@ -990,6 +1007,12 @@ namespace geode
         auto builder = SurfaceMeshBuilder< dimension >::create( *clone );
         builder->copy( *this );
         return clone;
+    }
+
+    template < index_t dimension >
+    TextureManager2D SurfaceMesh< dimension >::texture_manager() const
+    {
+        return impl_->texture_manager();
     }
 
     template class opengeode_mesh_api SurfaceMesh< 2 >;

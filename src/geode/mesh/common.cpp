@@ -27,10 +27,10 @@
 
 #include <geode/image/common.h>
 
-#include <geode/mesh/builder/detail/register_builder.h>
-#include <geode/mesh/core/detail/register_mesh.h>
-#include <geode/mesh/io/detail/register_input.h>
-#include <geode/mesh/io/detail/register_output.h>
+#include <geode/mesh/builder/geode/register_builder.h>
+#include <geode/mesh/core/geode/register_mesh.h>
+#include <geode/mesh/io/geode/register_input.h>
+#include <geode/mesh/io/geode/register_output.h>
 
 namespace geode
 {

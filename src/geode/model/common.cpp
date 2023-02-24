@@ -25,10 +25,10 @@
 
 #include <geode/mesh/common.h>
 
-#include <geode/model/representation/io/detail/geode_brep_input.h>
-#include <geode/model/representation/io/detail/geode_brep_output.h>
-#include <geode/model/representation/io/detail/geode_section_input.h>
-#include <geode/model/representation/io/detail/geode_section_output.h>
+#include <geode/model/representation/io/geode/geode_brep_input.h>
+#include <geode/model/representation/io/geode/geode_brep_output.h>
+#include <geode/model/representation/io/geode/geode_section_input.h>
+#include <geode/model/representation/io/geode/geode_section_output.h>
 
 namespace
 {
