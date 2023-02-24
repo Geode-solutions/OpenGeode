@@ -31,6 +31,42 @@ namespace geode
 {
     namespace detail
     {
+
+        template < typename Type, typename Serializer >
+        void register_inlinedvector( PContext& context, absl::string_view type )
+        {
+            AttributeManager::register_attribute_type<
+                absl::InlinedVector< Type, 1 >, Serializer >(
+                context, absl::StrCat( "InlinedVector_", type, "_1" ) );
+            AttributeManager::register_attribute_type<
+                absl::InlinedVector< Type, 2 >, Serializer >(
+                context, absl::StrCat( "InlinedVector_", type, "_2" ) );
+            AttributeManager::register_attribute_type<
+                absl::InlinedVector< Type, 3 >, Serializer >(
+                context, absl::StrCat( "InlinedVector_", type, "_3" ) );
+            AttributeManager::register_attribute_type<
+                absl::InlinedVector< Type, 4 >, Serializer >(
+                context, absl::StrCat( "InlinedVector_", type, "_4" ) );
+            AttributeManager::register_attribute_type<
+                absl::InlinedVector< Type, 5 >, Serializer >(
+                context, absl::StrCat( "InlinedVector_", type, "_5" ) );
+            AttributeManager::register_attribute_type<
+                absl::InlinedVector< Type, 6 >, Serializer >(
+                context, absl::StrCat( "InlinedVector_", type, "_6" ) );
+            AttributeManager::register_attribute_type<
+                absl::InlinedVector< Type, 7 >, Serializer >(
+                context, absl::StrCat( "InlinedVector_", type, "_7" ) );
+            AttributeManager::register_attribute_type<
+                absl::InlinedVector< Type, 8 >, Serializer >(
+                context, absl::StrCat( "InlinedVector_", type, "_8" ) );
+            AttributeManager::register_attribute_type<
+                absl::InlinedVector< Type, 9 >, Serializer >(
+                context, absl::StrCat( "InlinedVector_", type, "_9" ) );
+            AttributeManager::register_attribute_type<
+                absl::InlinedVector< Type, 10 >, Serializer >(
+                context, absl::StrCat( "InlinedVector_", type, "_10" ) );
+        }
+
         template < typename Serializer >
         void register_geometry_pcontext( PContext& context )
         {
@@ -38,6 +74,9 @@ namespace geode
                 context, "Point2D" );
             AttributeManager::register_attribute_type< Point3D, Serializer >(
                 context, "Point3D" );
+            register_inlinedvector< Point1D, Serializer >( context, "Point1D" );
+            register_inlinedvector< Point2D, Serializer >( context, "Point2D" );
+            register_inlinedvector< Point3D, Serializer >( context, "Point3D" );
         }
     } // namespace detail
 } // namespace geode

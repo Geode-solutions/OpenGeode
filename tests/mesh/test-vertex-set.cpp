@@ -25,9 +25,9 @@
 
 #include <geode/basic/logger.h>
 
-#include <geode/mesh/builder/geode_vertex_set_builder.h>
+#include <geode/mesh/builder/geode/geode_vertex_set_builder.h>
 #include <geode/mesh/builder/vertex_set_builder.h>
-#include <geode/mesh/core/geode_vertex_set.h>
+#include <geode/mesh/core/geode/geode_vertex_set.h>
 #include <geode/mesh/io/vertex_set_input.h>
 #include <geode/mesh/io/vertex_set_output.h>
 

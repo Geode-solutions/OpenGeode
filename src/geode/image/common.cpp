@@ -26,8 +26,8 @@
 #include <geode/basic/library.h>
 
 #include <geode/image/core/raster_image.h>
-#include <geode/image/io/detail/geode_bitsery_raster_input.h>
-#include <geode/image/io/detail/geode_bitsery_raster_output.h>
+#include <geode/image/io/geode/geode_bitsery_raster_input.h>
+#include <geode/image/io/geode/geode_bitsery_raster_output.h>
 #include <geode/image/io/raster_image_input.h>
 #include <geode/image/io/raster_image_output.h>
 

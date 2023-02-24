@@ -30,6 +30,7 @@
 #include <geode/basic/passkey.h>
 
 #include <geode/mesh/common.h>
+#include <geode/mesh/core/texture_manager.h>
 #include <geode/mesh/core/vertex_set.h>
 
 namespace geode
@@ -544,6 +545,8 @@ namespace geode
          * Access to the manager of attributes associated with polyhedra.
          */
         AttributeManager& polyhedron_attribute_manager() const;
+
+        TextureManager3D texture_manager() const;
 
         /*!
          * Compute the bounding box from mesh vertices

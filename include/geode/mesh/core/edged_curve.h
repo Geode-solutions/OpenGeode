@@ -23,8 +23,11 @@
 
 #pragma once
 
+#include <geode/basic/pimpl.h>
+
 #include <geode/mesh/common.h>
 #include <geode/mesh/core/graph.h>
+#include <geode/mesh/core/texture_manager.h>
 
 namespace geode
 {
@@ -39,9 +42,13 @@ namespace geode
     template < index_t dimension >
     class EdgedCurve : public Graph
     {
+        friend class bitsery::Access;
+
     public:
         using Builder = EdgedCurveBuilder< dimension >;
         static constexpr auto dim = dimension;
+
+        ~EdgedCurve();
 
         static std::unique_ptr< EdgedCurve< dimension > > create();
 
@@ -63,21 +70,26 @@ namespace geode
 
         Segment< dimension > segment( index_t edge_id ) const;
 
+        TextureManager1D texture_manager() const;
+
         /*!
          * Compute the bounding box from mesh vertices
          */
         BoundingBox< dimension > bounding_box() const;
 
     protected:
-        EdgedCurve() = default;
+        EdgedCurve();
+        EdgedCurve( EdgedCurve&& other );
 
     private:
-        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive );
 
         virtual const Point< dimension >& get_point(
             index_t vertex_id ) const = 0;
+
+    private:
+        IMPLEMENTATION_MEMBER( impl_ );
     };
     ALIAS_2D_AND_3D( EdgedCurve );
 } // namespace geode

@@ -49,6 +49,8 @@
 #include <geode/mesh/core/private/solid_mesh_impl.h>
 #include <geode/mesh/core/solid_edges.h>
 #include <geode/mesh/core/solid_facets.h>
+#include <geode/mesh/core/texture3d.h>
+#include <geode/mesh/core/texture_storage.h>
 
 namespace
 {
@@ -428,6 +430,11 @@ namespace geode
             return polyhedron_attribute_manager_;
         }
 
+        TextureManager3D texture_manager() const
+        {
+            return { polyhedron_attribute_manager_, texture_storage_ };
+        }
+
         bool are_edges_enabled() const
         {
             return edges_.get() != nullptr;
@@ -568,6 +575,16 @@ namespace geode
                                 bitsery::ext::StdSmartPtr{} );
                             a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
                             a.ext( impl.facets_, bitsery::ext::StdSmartPtr{} );
+                        },
+                        []( Archive& a, Impl& impl ) {
+                            a.object( impl.polyhedron_attribute_manager_ );
+                            a.ext( impl.polyhedron_around_vertex_,
+                                bitsery::ext::StdSmartPtr{} );
+                            a.ext( impl.polyhedra_around_vertex_,
+                                bitsery::ext::StdSmartPtr{} );
+                            a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
+                            a.ext( impl.facets_, bitsery::ext::StdSmartPtr{} );
+                            a.object( impl.texture_storage_ );
                         } } } );
         }
 
@@ -579,6 +596,7 @@ namespace geode
             polyhedra_around_vertex_;
         mutable std::unique_ptr< SolidEdges< dimension > > edges_;
         mutable std::unique_ptr< SolidFacets< dimension > > facets_;
+        mutable TextureStorage3D texture_storage_;
     };
 
     template < index_t dimension >
@@ -1477,6 +1495,12 @@ namespace geode
             box.add_point( point( p ) );
         }
         return box;
+    }
+
+    template < index_t dimension >
+    TextureManager3D SolidMesh< dimension >::texture_manager() const
+    {
+        return impl_->texture_manager();
     }
 
     template class opengeode_mesh_api SolidMesh< 3 >;

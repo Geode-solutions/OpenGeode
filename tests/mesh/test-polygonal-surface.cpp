@@ -28,9 +28,9 @@
 #include <geode/geometry/point.h>
 #include <geode/geometry/vector.h>
 
-#include <geode/mesh/builder/geode_polygonal_surface_builder.h>
+#include <geode/mesh/builder/geode/geode_polygonal_surface_builder.h>
 #include <geode/mesh/builder/surface_edges_builder.h>
-#include <geode/mesh/core/geode_polygonal_surface.h>
+#include <geode/mesh/core/geode/geode_polygonal_surface.h>
 #include <geode/mesh/core/polygonal_surface.h>
 #include <geode/mesh/core/surface_edges.h>
 #include <geode/mesh/io/polygonal_surface_input.h>
@@ -415,7 +415,7 @@ void test_io( const geode::PolygonalSurface3D& polygonal_surface,
 {
     geode::save_polygonal_surface( polygonal_surface, filename );
     geode::load_polygonal_surface< 3 >( filename );
-    auto new_polygonal_surface = geode::load_polygonal_surface< 3 >(
+    const auto new_polygonal_surface = geode::load_polygonal_surface< 3 >(
         geode::OpenGeodePolygonalSurface3D::impl_name_static(), filename );
 
     OPENGEODE_EXCEPTION( new_polygonal_surface->nb_vertices() == 7,
@@ -438,6 +438,12 @@ void test_io( const geode::PolygonalSurface3D& polygonal_surface,
             "[Test] Reloaded PolygonalSurface has "
             "wrong attributes on its edges" );
     }
+    auto manager = new_polygonal_surface->texture_manager();
+    auto texture_names = manager.texture_names();
+    OPENGEODE_EXCEPTION( texture_names.size() == 1,
+        "[Test] Reloaded PolygonalSurface has wrong number of textures" );
+    OPENGEODE_EXCEPTION( texture_names[0] == "texture",
+        "[Test] Reloaded PolygonalSurface has wrong texture name" );
 }
 
 void test_backward_io( const std::string& filename )
@@ -569,6 +575,12 @@ void test_non_manifold_surface()
     }
 }
 
+void test_texture( const geode::PolygonalSurface3D& polygonal_surface )
+{
+    auto manager = polygonal_surface.texture_manager();
+    manager.find_or_create_texture( "texture" );
+}
+
 void test()
 {
     geode::OpenGeodeMesh::initialize();
@@ -591,11 +603,14 @@ void test()
     test_polygon_area();
     test_polygon_normal();
     test_polygon_vertex_normal();
+    test_texture( *polygonal_surface );
 
     test_io( *polygonal_surface,
         absl::StrCat( "test.", polygonal_surface->native_extension() ) );
     test_backward_io( absl::StrCat(
         geode::data_path, "test_v7.", polygonal_surface->native_extension() ) );
+    test_backward_io( absl::StrCat( geode::data_path, "test_v12.",
+        polygonal_surface->native_extension() ) );
 
     test_permutation( *polygonal_surface, *builder );
     test_replace_vertex( *polygonal_surface, *builder );

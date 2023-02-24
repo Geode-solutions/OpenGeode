@@ -26,10 +26,10 @@
 
 #include <geode/geometry/point.h>
 
-#include <geode/mesh/builder/geode_tetrahedral_solid_builder.h>
+#include <geode/mesh/builder/geode/geode_tetrahedral_solid_builder.h>
 #include <geode/mesh/builder/solid_edges_builder.h>
 #include <geode/mesh/builder/solid_facets_builder.h>
-#include <geode/mesh/core/geode_tetrahedral_solid.h>
+#include <geode/mesh/core/geode/geode_tetrahedral_solid.h>
 #include <geode/mesh/core/solid_edges.h>
 #include <geode/mesh/core/solid_facets.h>
 #include <geode/mesh/io/tetrahedral_solid_input.h>

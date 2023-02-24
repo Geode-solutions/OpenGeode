@@ -35,9 +35,8 @@ add_geode_library(
         "core/rgb_color.h"
         "io/raster_image_input.h"
         "io/raster_image_output.h"
-    ADVANCED_HEADERS
-        "io/detail/geode_bitsery_raster_input.h"
-        "io/detail/geode_bitsery_raster_output.h"
+        "io/geode/geode_bitsery_raster_input.h"
+        "io/geode/geode_bitsery_raster_output.h"
     PUBLIC_DEPENDENCIES
         ${PROJECT_NAME}::basic
 )
