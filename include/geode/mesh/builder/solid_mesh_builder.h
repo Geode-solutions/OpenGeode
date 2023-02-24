@@ -47,6 +47,8 @@ namespace geode
     class SolidMeshBuilder : public VertexSetBuilder
     {
     public:
+        static constexpr auto dim = dimension;
+
         virtual ~SolidMeshBuilder();
         /*!
          * Create the builder associated with a SolidMesh.

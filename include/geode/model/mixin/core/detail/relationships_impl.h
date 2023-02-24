@@ -45,8 +45,6 @@ namespace geode
         public:
             using Iterator = typename EdgesAroundVertex::const_iterator;
 
-            virtual ~RelationshipsImpl();
-
             index_t nb_relations( const uuid& id ) const;
 
             Iterator begin_edge( const uuid& id ) const;

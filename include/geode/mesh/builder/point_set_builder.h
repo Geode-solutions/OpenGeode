@@ -45,6 +45,8 @@ namespace geode
         OPENGEODE_TEMPLATE_ASSERT_2D_OR_3D( dimension );
 
     public:
+        static constexpr auto dim = dimension;
+
         /*!
          * Create the builder associated with a PointSet.
          * @param[in] mesh The PointSet to build/modify

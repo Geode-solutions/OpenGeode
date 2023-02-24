@@ -49,6 +49,8 @@ namespace geode
         : public TetrahedralSolidBuilder< dimension >
     {
     public:
+        static constexpr auto dim = dimension;
+
         OpenGeodeTetrahedralSolidBuilder(
             VertexSet& vertex_set, MeshBuilderFactoryKey );
 

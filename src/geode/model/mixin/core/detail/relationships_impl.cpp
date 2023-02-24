@@ -46,7 +46,6 @@ namespace geode
         {
             initialize_attributes();
         }
-        RelationshipsImpl::~RelationshipsImpl() {} // NOLINT
 
         index_t RelationshipsImpl::nb_relations( const uuid& id ) const
         {

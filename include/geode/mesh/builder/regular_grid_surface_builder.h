@@ -43,6 +43,8 @@ namespace geode
         : public SurfaceMeshBuilder< 2 >, public GridBuilder< 2 >
     {
     public:
+        static constexpr index_t dim{ 2 };
+
         static std::unique_ptr< RegularGridBuilder< 2 > > create(
             RegularGrid2D& grid );
 

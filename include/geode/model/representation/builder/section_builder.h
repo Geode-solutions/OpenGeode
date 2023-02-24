@@ -76,7 +76,7 @@ namespace geode
         OPENGEODE_DISABLE_COPY( SectionBuilder );
 
     public:
-        static constexpr auto dim = Section::dim;
+        static constexpr index_t dim{ 2 };
 
         SectionBuilder( Section& section );
         SectionBuilder( SectionBuilder&& ) = default;

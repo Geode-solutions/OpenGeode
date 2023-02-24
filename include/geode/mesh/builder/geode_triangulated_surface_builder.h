@@ -46,6 +46,8 @@ namespace geode
         : public TriangulatedSurfaceBuilder< dimension >
     {
     public:
+        static constexpr auto dim = dimension;
+
         OpenGeodeTriangulatedSurfaceBuilder(
             VertexSet& vertex_set, MeshBuilderFactoryKey );
 

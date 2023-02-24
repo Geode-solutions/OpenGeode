@@ -49,6 +49,8 @@ namespace geode
     class SurfaceMeshBuilder : public VertexSetBuilder
     {
     public:
+        static constexpr auto dim = dimension;
+
         virtual ~SurfaceMeshBuilder();
 
         /*!

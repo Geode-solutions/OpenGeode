@@ -44,6 +44,8 @@ namespace geode
     class PolygonalSurfaceBuilder : public SurfaceMeshBuilder< dimension >
     {
     public:
+        static constexpr auto dim = dimension;
+
         /*!
          * Create the builder associated with a PolygonalSurface.
          * @param[in] mesh The PolygonalSurface to build/modify
