@@ -178,7 +178,7 @@ void add_corner_line_boundary_relation( const geode::Section& model,
         {
             OPENGEODE_EXCEPTION( absl::c_find( corner_uuids, boundary.id() )
                                      != corner_uuids.end(),
-                "[Test] All Lines incidences should be Corners" );
+                "[Test] All Lines boundaries should be Corners" );
         }
     }
 }
@@ -324,29 +324,38 @@ void add_internal_line_relations( const geode::Section& model,
     absl::Span< const geode::uuid > line_uuids,
     absl::Span< const geode::uuid > surface_uuids )
 {
-    for( const auto& line_id : line_uuids )
-    {
-        builder.add_line_surface_internal_relationship(
-            model.line( line_id ), model.surface( surface_uuids.front() ) );
-    }
+    builder.add_line_surface_internal_relationship(
+        model.line( line_uuids[3] ), model.surface( surface_uuids[0] ) );
+    builder.add_line_surface_internal_relationship(
+        model.line( line_uuids[4] ), model.surface( surface_uuids[0] ) );
+    builder.add_line_surface_internal_relationship(
+        model.line( line_uuids[5] ), model.surface( surface_uuids[0] ) );
+    builder.add_line_surface_internal_relationship(
+        model.line( line_uuids[0] ), model.surface( surface_uuids[1] ) );
+    builder.add_line_surface_internal_relationship(
+        model.line( line_uuids[1] ), model.surface( surface_uuids[1] ) );
 
-    for( const auto& line_id : line_uuids )
+    for( const auto& line_id : geode::LRange{ 0, 1 } )
     {
         for( const auto& embedding :
-            model.embedding_surfaces( model.line( line_id ) ) )
+            model.embedding_surfaces( model.line( line_uuids[line_id] ) ) )
         {
-            OPENGEODE_EXCEPTION( surface_uuids.front() == embedding.id(),
-                "[Test] All Lines embeddings should be Surfaces" );
-            OPENGEODE_EXCEPTION(
-                model.nb_internal_lines( embedding ) == line_uuids.size(),
-                "[Test] Surface should embed all Lines" );
+            OPENGEODE_EXCEPTION( embedding.id() == surface_uuids[1],
+                "[Test] Lines embeddings are wrong" );
         }
-        OPENGEODE_EXCEPTION( model.nb_embeddings( line_id ) == 1,
+        OPENGEODE_EXCEPTION( model.nb_embeddings( line_uuids[line_id] ) == 1,
             "[Test] All Lines should be embedded to 1 Surface" );
         OPENGEODE_EXCEPTION(
-            model.nb_embedding_surfaces( model.line( line_id ) ) == 1,
+            model.nb_embedding_surfaces( model.line( line_uuids[line_id] ) )
+                == 1,
             "[Test] All Lines should be embedded to 1 Surface" );
     }
+    OPENGEODE_EXCEPTION(
+        model.nb_internal_lines( model.surface( surface_uuids[0] ) ) == 3,
+        "[Test] Surface should embed 3 Lines" );
+    OPENGEODE_EXCEPTION(
+        model.nb_internal_lines( model.surface( surface_uuids[1] ) ) == 2,
+        "[Test] Surface should embed 2 Lines" );
 }
 
 void test_boundary_ranges( const geode::Section& model,
@@ -577,11 +586,10 @@ void test()
     add_internal_corner_relations(
         model, builder, corner_uuids, surface_uuids );
     add_internal_line_relations( model, builder, line_uuids, surface_uuids );
-    OPENGEODE_EXCEPTION( model.nb_internals( surface_uuids.front() )
-                             == corner_uuids.size() + line_uuids.size(),
+    OPENGEODE_EXCEPTION(
+        model.nb_internals( surface_uuids[0] ) == corner_uuids.size() + 3,
         "[Test] The Surface should embed all Corners & Lines (that are "
-        "internal to the "
-        "Surface)" );
+        "internal to the Surface)" );
     test_boundary_ranges( model, corner_uuids, line_uuids, surface_uuids );
     test_incidence_ranges( model, corner_uuids, line_uuids, surface_uuids );
     test_item_ranges( model, line_uuids, model_boundary_uuids );

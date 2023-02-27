@@ -46,6 +46,8 @@ namespace geode
         : public RegularGridBuilder< 2 >
     {
     public:
+        static constexpr index_t dim{ 2 };
+
         OpenGeodeRegularGridBuilder(
             VertexSet& vertex_set, MeshBuilderFactoryKey );
 

@@ -38,6 +38,8 @@ namespace geode
     class GridBuilder
     {
     public:
+        static constexpr auto dim = dimension;
+
         void set_grid_dimensions( std::array< index_t, dimension > cells_number,
             std::array< double, dimension > cells_length );
 

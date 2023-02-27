@@ -43,6 +43,8 @@ namespace geode
         : public SolidMeshBuilder< 3 >, public GridBuilder< 3 >
     {
     public:
+        static constexpr index_t dim{ 3 };
+
         static std::unique_ptr< RegularGridBuilder< 3 > > create(
             RegularGrid3D& grid );
 

@@ -41,6 +41,8 @@ namespace geode
     class EdgedCurveBuilder : public GraphBuilder
     {
     public:
+        static constexpr auto dim = dimension;
+
         /*!
          * Create the builder associated with an EdgedCurve.
          * @param[in] mesh The EdgedCurve to build/modify
