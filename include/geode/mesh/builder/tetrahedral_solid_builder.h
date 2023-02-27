@@ -42,6 +42,8 @@ namespace geode
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
 
     public:
+        static constexpr auto dim = dimension;
+
         static std::unique_ptr< TetrahedralSolidBuilder< dimension > > create(
             TetrahedralSolid< dimension >& mesh );
 

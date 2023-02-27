@@ -129,7 +129,7 @@ def add_corner_line_boundary_relation(section, builder, corner_uuids, line_uuids
         for boundary in section.boundary_corners(section.line(line_id)):
             if not find_uuid_in_list(corner_uuids, boundary.id()):
                 raise ValueError(
-                    "[Test] All Lines incidences should be Corners")
+                    "[Test] All Lines boundaries should be Corners")
 
 
 def add_line_surface_boundary_relation(section, builder, line_uuids, surface_uuids):
@@ -199,23 +199,24 @@ def add_internal_corner_relations(section, builder, corner_uuids, surface_uuids)
 
 
 def add_internal_line_relations(section, builder, line_uuids, surface_uuids):
-    for line_id in line_uuids:
-        builder.add_line_surface_internal_relationship(
-            section.line(line_id), section.surface(surface_uuids[0]))
+    builder.add_line_surface_internal_relationship(section.line(line_uuids[3]), section.surface(surface_uuids[0]))
+    builder.add_line_surface_internal_relationship(section.line(line_uuids[4]), section.surface(surface_uuids[0]))
+    builder.add_line_surface_internal_relationship(section.line(line_uuids[5]), section.surface(surface_uuids[0]))
+    builder.add_line_surface_internal_relationship(section.line(line_uuids[0]), section.surface(surface_uuids[1]))
+    builder.add_line_surface_internal_relationship(section.line(line_uuids[1]), section.surface(surface_uuids[1]))
 
-    for line_id in line_uuids:
-        for embedding in section.embedding_surfaces_of_line(section.line(line_id)):
-            if surface_uuids[0].string() != embedding.id().string():
-                raise ValueError(
-                    "[Test] All Lines embeddings should be Surfaces")
-            if section.nb_internal_lines_of_surface(embedding) != len(line_uuids):
-                raise ValueError("[Test] Surface should embed all Lines")
-        if section.nb_embeddings(line_id) != 1:
-            raise ValueError(
-                "[Test] All Lines should be embedded to 1 Surface")
-        if section.nb_embedding_surfaces_of_line(section.line(line_id)) != 1:
-            raise ValueError(
-                "[Test] All Lines should be embedded to 1 Surface")
+    for line_id in range(0,1):
+        for embedding in section.embedding_surfaces_of_line(section.line(line_uuids[line_id])):
+            if embedding.id().string() != surface_uuids[1].string():
+                raise ValueError("[Test] Lines embeddings are wrong")
+        if section.nb_embeddings(line_uuids[line_id]) != 1:
+            raise ValueError("[Test] All Lines should be embedded to 1 Surface")
+        if section.nb_embedding_surfaces_of_line(section.line(line_uuids[line_id])) != 1:
+            raise ValueError("[Test] All Lines should be embedded to 1 Surface")
+    if section.nb_internal_lines_of_surface(section.surface(surface_uuids[0])) != 3:
+        raise ValueError("[Test] Surface 0 should embed 3 Lines")
+    if section.nb_internal_lines_of_surface(section.surface(surface_uuids[1])) != 2:
+        raise ValueError("[Test] Surface 1 should embed 2 Lines")
 
 
 def test_boundary_ranges(section, corner_uuids, line_uuids, surface_uuids):
@@ -312,7 +313,7 @@ if __name__ == '__main__':
     add_internal_corner_relations(
         section, builder, corner_uuids, surface_uuids)
     add_internal_line_relations(section, builder, line_uuids, surface_uuids)
-    if section.nb_internals(surface_uuids[0]) != len(corner_uuids) + len(line_uuids):
+    if section.nb_internals(surface_uuids[0]) != len(corner_uuids) + 3:
         raise ValueError(
             "[Test] The Surface should embed all Corners & Lines (that are internal to the Surface)")
     test_boundary_ranges(section, corner_uuids, line_uuids, surface_uuids)

@@ -44,6 +44,7 @@ add_geode_library(
         "mixin/builder/surfaces_builder.cpp"
         "mixin/builder/relationships_builder.cpp"
         "mixin/builder/vertex_identifier_builder.cpp"
+        "mixin/core/detail/relationships_impl.cpp"
         "mixin/core/bitsery_archive.cpp"
         "mixin/core/block.cpp"
         "mixin/core/blocks.cpp"
@@ -123,13 +124,13 @@ add_geode_library(
         "mixin/core/detail/count_relationships.h"
         "mixin/core/detail/mesh_storage.h"
         "mixin/core/detail/uuid_to_index.h"
+        "mixin/core/detail/relationships_impl.h"
         "representation/builder/detail/copy.h"
         "representation/io/detail/geode_brep_input.h"
         "representation/io/detail/geode_section_input.h"
         "representation/io/detail/geode_brep_output.h"
         "representation/io/detail/geode_section_output.h"
     PRIVATE_HEADERS
-        "helpers/private/copy.h"
         "helpers/private/simplicial_model_creator.h"
     PUBLIC_DEPENDENCIES
         absl::flat_hash_map

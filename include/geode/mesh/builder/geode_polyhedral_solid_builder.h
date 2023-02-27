@@ -48,6 +48,8 @@ namespace geode
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
 
     public:
+        static constexpr auto dim = dimension;
+
         OpenGeodePolyhedralSolidBuilder(
             VertexSet& vertex_set, MeshBuilderFactoryKey );
 

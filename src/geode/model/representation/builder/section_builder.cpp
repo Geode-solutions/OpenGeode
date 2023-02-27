@@ -50,6 +50,13 @@ namespace geode
 
     ModelCopyMapping SectionBuilder::copy( const Section& section )
     {
+        auto nb_components =
+            section_.nb_corners() + section_.nb_lines() + section_.nb_surfaces()
+            + section_.nb_model_boundaries() + section_.nb_unique_vertices();
+        OPENGEODE_EXCEPTION( nb_components == 0,
+            "[BRepBuild::copy] Section should be empty before copy. To add "
+            "Section components in a Section which is not empty, use "
+            "ModelConcatener." );
         set_name( section.name() );
         const auto mapping = copy_components( section );
         copy_relationships( mapping, section );
@@ -61,11 +68,11 @@ namespace geode
     {
         ModelCopyMapping mappings;
         mappings.emplace( Corner2D::component_type_static(),
-            detail::copy_corner_components( section, section_, *this ) );
+            detail::copy_corner_components( section, *this ) );
         mappings.emplace( Line2D::component_type_static(),
-            detail::copy_line_components( section, section_, *this ) );
+            detail::copy_line_components( section, *this ) );
         mappings.emplace( Surface2D::component_type_static(),
-            detail::copy_surface_components( section, section_, *this ) );
+            detail::copy_surface_components( section, *this ) );
         mappings.emplace( ModelBoundary2D::component_type_static(),
             detail::copy_model_boundary_components( section, *this ) );
         return mappings;

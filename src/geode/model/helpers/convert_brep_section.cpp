@@ -27,7 +27,6 @@
 #include <geode/mesh/helpers/convert_point_set.h>
 #include <geode/mesh/helpers/convert_surface_mesh.h>
 
-#include <geode/model/helpers/private/copy.h>
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/line.h>
 #include <geode/model/mixin/core/surface.h>
@@ -39,23 +38,18 @@
 
 namespace
 {
-    template < typename ModelFrom, typename ModelTo >
-    geode::ModelCopyMapping copy_components( const ModelFrom& from,
-        const ModelTo& to,
-        typename ModelTo::Builder& builder_to )
+    template < typename ModelFrom, typename BuilderTo >
+    geode::ModelCopyMapping copy_components(
+        const ModelFrom& from, BuilderTo& builder_to )
     {
         geode::ModelCopyMapping mappings;
-        mappings.emplace(
-            geode::Corner< ModelTo::dim >::component_type_static(),
-            geode::detail::copy_corner_components_without_type(
-                from, to, builder_to ) );
-        mappings.emplace( geode::Line< ModelTo::dim >::component_type_static(),
-            geode::detail::copy_line_components_without_type(
-                from, to, builder_to ) );
-        mappings.emplace(
-            geode::Surface< ModelTo::dim >::component_type_static(),
-            geode::detail::copy_surface_components_without_type(
-                from, to, builder_to ) );
+        const auto dimension = BuilderTo::dim;
+        mappings.emplace( geode::Corner< dimension >::component_type_static(),
+            geode::detail::copy_corner_components( from, builder_to ) );
+        mappings.emplace( geode::Line< dimension >::component_type_static(),
+            geode::detail::copy_line_components( from, builder_to ) );
+        mappings.emplace( geode::Surface< dimension >::component_type_static(),
+            geode::detail::copy_surface_components( from, builder_to ) );
         builder_to.copy_relationships( mappings, from );
         return mappings;
     }
@@ -79,7 +73,7 @@ namespace geode
         Section section;
         SectionBuilder builder{ section };
         DEBUG_CONST auto mappings =
-            copy_components< BRep, Section >( brep, section, builder );
+            copy_components< BRep, SectionBuilder >( brep, builder );
         for( const auto& corner : brep.corners() )
         {
             builder.update_corner_mesh(
@@ -113,7 +107,7 @@ namespace geode
         BRep brep;
         BRepBuilder builder{ brep };
         DEBUG_CONST auto mappings =
-            copy_components< Section, BRep >( section, brep, builder );
+            copy_components< Section, BRepBuilder >( section, builder );
         for( const auto& corner : section.corners() )
         {
             builder.update_corner_mesh(

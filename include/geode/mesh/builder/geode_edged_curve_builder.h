@@ -44,6 +44,8 @@ namespace geode
     class OpenGeodeEdgedCurveBuilder : public EdgedCurveBuilder< dimension >
     {
     public:
+        static constexpr auto dim = dimension;
+
         OpenGeodeEdgedCurveBuilder(
             VertexSet& vertex_set, MeshBuilderFactoryKey );
 

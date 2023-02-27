@@ -64,11 +64,6 @@ namespace geode
             const ComponentID& item, const ComponentID& collection );
 
         /*!
-         * Add a new relationship between two components
-         */
-        index_t add_relation( const ComponentID& id1, const ComponentID& id2 );
-
-        /*!
          * Remove a relationship between two components
          */
         void remove_relation( const uuid& id1, const uuid& id2 );

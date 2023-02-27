@@ -53,6 +53,13 @@ namespace geode
 
     ModelCopyMapping BRepBuilder::copy( const BRep& brep )
     {
+        auto nb_components = brep_.nb_corners() + brep_.nb_lines()
+                             + brep_.nb_surfaces() + brep_.nb_blocks()
+                             + brep_.nb_model_boundaries()
+                             + brep_.nb_unique_vertices();
+        OPENGEODE_EXCEPTION( nb_components == 0,
+            "[BRepBuild::copy] BRep should be empty before copy. To add BRep "
+            "components in a BRep which is not empty, use ModelConcatener." );
         set_name( brep.name() );
         const auto mapping = copy_components( brep );
         copy_relationships( mapping, brep );
@@ -64,13 +71,13 @@ namespace geode
     {
         ModelCopyMapping mappings;
         mappings.emplace( Corner3D::component_type_static(),
-            detail::copy_corner_components( brep, brep_, *this ) );
+            detail::copy_corner_components( brep, *this ) );
         mappings.emplace( Line3D::component_type_static(),
-            detail::copy_line_components( brep, brep_, *this ) );
+            detail::copy_line_components( brep, *this ) );
         mappings.emplace( Surface3D::component_type_static(),
-            detail::copy_surface_components( brep, brep_, *this ) );
+            detail::copy_surface_components( brep, *this ) );
         mappings.emplace( Block3D::component_type_static(),
-            detail::copy_block_components( brep, brep_, *this ) );
+            detail::copy_block_components( brep, *this ) );
         mappings.emplace( ModelBoundary3D::component_type_static(),
             detail::copy_model_boundary_components( brep, *this ) );
         return mappings;

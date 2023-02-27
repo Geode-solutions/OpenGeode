@@ -224,20 +224,20 @@ def add_line_surface_boundary_relation(brep, builder, line_uuids, surface_uuids)
 
 
 def add_surface_block_relation(brep, builder, surface_uuids, block_uuids):
-    for surface_id in surface_uuids:
+    for surface_id in range(3):
         builder.add_surface_block_boundary_relationship(
-            brep.surface(surface_id), brep.block(block_uuids[0]))
+            brep.surface(surface_uuids[surface_id]), brep.block(block_uuids[0]))
 
-    for surface_id in surface_uuids:
-        for incidence in brep.incident_blocks(brep.surface(surface_id)):
+    for surface_id in range(3):
+        for incidence in brep.incident_blocks(brep.surface(surface_uuids[surface_id])):
             if block_uuids[0].string() != incidence.id().string():
                 raise ValueError(
                     "[Test] All Surfaces incidences should be Blocks")
-        if brep.nb_incidences(surface_id) != 1:
+        if brep.nb_incidences(surface_uuids[surface_id]) != 1:
             raise ValueError(
-                "[Test] All Surfaces should be connected to 1 Block")
+                "[Test] All Surfaces should be boundary to the first Block")
 
-    if brep.nb_boundaries(block_uuids[0]) != len(surface_uuids):
+    if brep.nb_boundaries(block_uuids[0]) != 3:
         raise ValueError(
             "[Test] The Block should be connected to all Surfaces")
 
@@ -279,7 +279,7 @@ def add_internal_corner_relations(brep, builder, corner_uuids, surface_uuids, bl
                 raise ValueError(
                     "[Test] All Corners embedded blocks should be Blocks")
             if brep.nb_internal_corners_of_block(embedding) != len(corner_uuids):
-                raise ValueError("[Test] Block should embed all Lines")
+                raise ValueError("[Test] Block should embed all Corners")
         if brep.nb_embeddings(corner_id) != 2:
             raise ValueError(
                 "[Test] All Corners should be embedded to 1 Block and 1 Surface")
@@ -292,54 +292,58 @@ def add_internal_corner_relations(brep, builder, corner_uuids, surface_uuids, bl
 
 
 def add_internal_line_relations(brep, builder, line_uuids, surface_uuids, block_uuids):
+    nb_boundaries = 0
     for line_id in line_uuids:
-        builder.add_line_surface_internal_relationship(
-            brep.line(line_id), brep.surface(surface_uuids[0]))
+        if brep.is_surface_boundary(brep.line(line_id),brep.surface(surface_uuids[0])):
+            nb_boundaries+=1
+        else:
+            builder.add_line_surface_internal_relationship(
+                brep.line(line_id), brep.surface(surface_uuids[0]))
         builder.add_line_block_internal_relationship(
             brep.line(line_id), brep.block(block_uuids[0]))
 
     for line_id in line_uuids:
         for embedding in brep.embedding_surfaces_of_line(brep.line(line_id)):
             if surface_uuids[0].string() != embedding.id().string():
-                raise ValueError(
-                    "[Test] All Line embedded surfaces should be Surfaces")
-            if brep.nb_internal_lines_of_surface(embedding) != len(line_uuids):
-                raise ValueError("[Test] Surface should embed all Lines")
+                raise ValueError("[Test] All Line embedded surfaces should be Surfaces")
+            if brep.nb_internal_lines_of_surface(embedding) != len(line_uuids)-nb_boundaries:
+                raise ValueError("[Test] Surface should embed all Lines that are not its boundaries")
         for embedding in brep.embedding_blocks_of_line(brep.line(line_id)):
             if block_uuids[0].string() != embedding.id().string():
-                raise ValueError(
-                    "[Test] All Lines embedded blocks should be Blocks")
+                raise ValueError("[Test] All Lines embedded blocks should be Blocks")
             if brep.nb_internal_lines_of_block(embedding) != len(line_uuids):
                 raise ValueError("[Test] Block should embed all Lines")
-        if brep.nb_embeddings(line_id) != 2:
-            raise ValueError(
-                "[Test] All Surfaces should be embedded to 1 Block and 1 Surface")
-        if brep.nb_embedding_surfaces_of_line(brep.line(line_id)) != 1:
-            raise ValueError(
-                "[Test] All Surfaces should be embedded to 1 Surface")
+        if brep.is_surface_boundary(brep.line(line_id),brep.surface(surface_uuids[0])):
+            if brep.nb_embeddings(line_id) != 1:
+                raise ValueError("[Test] Line should be embedded to 1 Block")
+            if brep.nb_embedding_surfaces_of_line(brep.line(line_id)) != 0:
+                raise ValueError("[Test] Line should be embedded to 0 Surface")
+        else:
+            if brep.nb_embeddings(line_id) != 2:
+                raise ValueError(
+                    "[Test] Line should be embedded to 1 Block and 1 Surface")
+            if brep.nb_embedding_surfaces_of_line(brep.line(line_id)) != 1:
+                raise ValueError(
+                    "[Test] Line should be embedded to 1 Surface")
         if brep.nb_embedding_blocks_of_line(brep.line(line_id)) != 1:
-            raise ValueError(
-                "[Test] All Surfaces should be embedded to 1 Block")
+            raise ValueError("[Test] All Surfaces should be embedded to 1 Block")
 
 
 def add_internal_surface_relations(brep, builder, surface_uuids, block_uuids):
-    for surface_id in surface_uuids:
+    for surface_id in range(3, len(surface_uuids)):
         builder.add_surface_block_internal_relationship(
-            brep.surface(surface_id), brep.block(block_uuids[0]))
+            brep.surface(surface_uuids[surface_id]), brep.block(block_uuids[0]))
 
-    for surface_id in surface_uuids:
-        for embedding in brep.embedding_blocks_of_surface(brep.surface(surface_id)):
-            if brep.nb_internal_surfaces_of_block(embedding) != len(surface_uuids):
-                raise ValueError("[Test] Block should embed all Surfaces")
+    for surface_id in range(3, len(surface_uuids)):
+        for embedding in brep.embedding_blocks_of_surface(brep.surface(surface_uuids[surface_id])):
+            if brep.nb_internal_surfaces_of_block(embedding) != len(surface_uuids)-3:
+                raise ValueError("[Test] Block should embed 2 Surfaces")
             if block_uuids[0].string() != embedding.id().string():
-                raise ValueError(
-                    "[Test] All Surfaces embeddings should be Blocks")
-        if brep.nb_embeddings(surface_id) != 1:
-            raise ValueError(
-                "[Test] All Surfaces should be embedded to 1 Block")
-        if brep.nb_embedding_blocks_of_surface(brep.surface(surface_id)) != 1:
-            raise ValueError(
-                "[Test] All Surfaces should be embedded to 1 Block")
+                raise ValueError("[Test] Surfaces embeddings should be Blocks")
+        if brep.nb_embeddings(surface_uuids[surface_id]) != 1:
+            raise ValueError("[Test] Surfaces should be embedded to 1 Block")
+        if brep.nb_embedding_blocks_of_surface(brep.surface(surface_uuids[surface_id])) != 1:
+            raise ValueError("[Test] Surfaces should be embedded to 1 Block")
 
 
 def test_boundary_ranges(brep, corner_uuids, line_uuids, surface_uuids, block_uuids):
@@ -347,13 +351,11 @@ def test_boundary_ranges(brep, corner_uuids, line_uuids, surface_uuids, block_uu
     for line_boundary in brep.boundary_corners(brep.line(line_uuids[0])):
         line_boundary_count += 1
         if line_boundary.id().string() != corner_uuids[0].string() and line_boundary.id().string() != corner_uuids[1].string():
-            raise ValueError(
-                "[Test] BoundaryCornerRange iteration result is not correct")
+            raise ValueError("[Test] BoundaryCornerRange iteration result is not correct")
         if not brep.is_line_boundary(line_boundary, brep.line(line_uuids[0])):
             raise ValueError("[Test] Corner should be boundary of Line")
     if line_boundary_count != 2:
-        raise ValueError(
-            "[Test] BoundaryCornerRange should iterates on 2 Corners")
+        raise ValueError("[Test] BoundaryCornerRange should iterates on 2 Corners")
 
     surface_boundary_count = 0
     for surface_boundary in brep.boundary_lines(brep.surface(surface_uuids[0])):
@@ -369,14 +371,14 @@ def test_boundary_ranges(brep, corner_uuids, line_uuids, surface_uuids, block_uu
     block_boundary_count = 0
     for block_boundary in brep.boundary_surfaces(brep.block(block_uuids[0])):
         block_boundary_count += 1
-        if block_boundary.id().string() != surface_uuids[0].string() and block_boundary.id().string() != surface_uuids[1].string() and block_boundary.id().string() != surface_uuids[2].string() and block_boundary.id().string() != surface_uuids[3].string() and block_boundary.id().string() != surface_uuids[4].string():
+        if block_boundary.id().string() != surface_uuids[0].string() and block_boundary.id().string() != surface_uuids[1].string() and block_boundary.id().string() != surface_uuids[2].string():
             raise ValueError(
                 "[Test] BoundarySurfaceRange iteration result is not correct")
         if not brep.is_block_boundary(block_boundary, brep.block(block_uuids[0])):
             raise ValueError("[Test] Surface should be boundary of Block")
-    if block_boundary_count != 5:
+    if block_boundary_count != 3:
         raise ValueError(
-            "[Test] BoundarySurfaceRange should iterates on 5 Surfaces")
+            "[Test] BoundarySurfaceRange should iterates on 3 Surfaces")
 
 
 def test_incidence_ranges(brep, corner_uuids, line_uuids, surface_uuids, block_uuids):
@@ -480,7 +482,7 @@ if __name__ == '__main__':
     add_internal_line_relations(
         brep, builder, line_uuids, surface_uuids, block_uuids)
     add_internal_surface_relations(brep, builder, surface_uuids, block_uuids)
-    if brep.nb_internals(block_uuids[0]) != len(corner_uuids) + len(line_uuids) + len(surface_uuids):
+    if brep.nb_internals(block_uuids[0]) != len(corner_uuids) + len(line_uuids) + len(surface_uuids)-3:
         raise ValueError(
             "[Test] The Block should embed all Corners & Lines & Surfaces (that are internal to the Block)")
     test_boundary_ranges(brep, corner_uuids, line_uuids,

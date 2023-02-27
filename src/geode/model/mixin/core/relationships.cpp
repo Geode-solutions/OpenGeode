@@ -34,44 +34,33 @@
 
 #include <geode/mesh/builder/geode_graph_builder.h>
 #include <geode/mesh/core/bitsery_archive.h>
-#include <geode/mesh/core/geode_graph.h>
 #include <geode/mesh/io/graph_input.h>
 #include <geode/mesh/io/graph_output.h>
 
 #include <geode/model/mixin/core/bitsery_archive.h>
 #include <geode/model/mixin/core/detail/count_relationships.h>
-#include <geode/model/mixin/core/detail/uuid_to_index.h>
+#include <geode/model/mixin/core/detail/relationships_impl.h>
 
 namespace geode
 {
-    class Relationships::Impl
+    class Relationships::Impl : public detail::RelationshipsImpl
     {
     public:
-        using Iterator = typename EdgesAroundVertex::const_iterator;
         using RelationType = index_t;
-        static constexpr index_t BOUNDARY_RELATION = index_t( 0 );
-        static constexpr index_t INTERNAL_RELATION = index_t( 1 );
-        static constexpr index_t ITEM_RELATION = index_t( 2 );
-        static constexpr index_t BOUNDARY_EDGE_VERTEX = index_t( 0 );
-        static constexpr index_t INCIDENT_EDGE_VERTEX = index_t( 1 );
-        static constexpr index_t ITEM_EDGE_VERTEX = index_t( 0 );
-        static constexpr index_t COLLECTION_EDGE_VERTEX = index_t( 1 );
-        static constexpr index_t INTERNAL_EDGE_VERTEX = index_t( 0 );
-        static constexpr index_t EMBEDDING_EDGE_VERTEX = index_t( 1 );
+        static constexpr index_t NO_RELATION{ NO_ID };
+        static constexpr index_t BOUNDARY_RELATION{ 0 };
+        static constexpr index_t INTERNAL_RELATION{ 1 };
+        static constexpr index_t ITEM_RELATION{ 2 };
+        static constexpr local_index_t BOUNDARY_EDGE_VERTEX{ 0 };
+        static constexpr local_index_t INCIDENT_EDGE_VERTEX{ 1 };
+        static constexpr local_index_t INTERNAL_EDGE_VERTEX{ 0 };
+        static constexpr local_index_t EMBEDDING_EDGE_VERTEX{ 1 };
+        static constexpr local_index_t ITEM_EDGE_VERTEX{ 0 };
+        static constexpr local_index_t COLLECTION_EDGE_VERTEX{ 1 };
 
-        Impl() : graph_{ Graph::create() }
+        Impl() : RelationshipsImpl()
         {
-            initialize_attributes();
-        }
-
-        index_t nb_relations( const uuid& id ) const
-        {
-            if( const auto index = vertex_id( id ) )
-            {
-                return static_cast< index_t >(
-                    graph_->edges_around_vertex( index.value() ).size() );
-            }
-            return 0;
+            initialize_relation_attribute();
         }
 
         RelationType relation_type( const index_t edge_id ) const
@@ -94,129 +83,79 @@ namespace geode
             return relation_type_->value( edge_id ) == ITEM_RELATION;
         }
 
-        Iterator begin_edge( const index_t id ) const
-        {
-            return graph_->edges_around_vertex( id ).begin();
-        }
-
-        Iterator end_edge( const index_t id ) const
-        {
-            return graph_->edges_around_vertex( id ).end();
-        }
-
-        Iterator begin_edge( const uuid& id ) const
-        {
-            if( const auto index = vertex_id( id ) )
-            {
-                return begin_edge( index.value() );
-            }
-            return {};
-        }
-
-        Iterator end_edge( const uuid& id ) const
-        {
-            if( const auto index = vertex_id( id ) )
-            {
-                return end_edge( index.value() );
-            }
-            return {};
-        }
-
-        const ComponentID& vertex_component_id(
-            const EdgeVertex& edge_vertex ) const
-        {
-            return ids_->value( graph_->edge_vertex( edge_vertex ) );
-        }
-
-        void remove_component( const uuid& id )
-        {
-            if( const auto index = vertex_id( id ) )
-            {
-                uuid2index_.erase( id );
-                std::vector< bool > to_delete( graph_->nb_edges(), false );
-                for( const auto& edge :
-                    graph_->edges_around_vertex( index.value() ) )
-                {
-                    to_delete[edge.edge_id] = true;
-                    const auto vertex = graph_->edge_vertex( edge.opposite() );
-                    if( graph_->edges_around_vertex( vertex ).size() == 1 )
-                    {
-                        uuid2index_.erase(
-                            component_from_index( vertex ).id() );
-                    }
-                }
-                auto builder = GraphBuilder::create( *graph_ );
-                builder->delete_edges( to_delete );
-                const auto old2new = builder->delete_isolated_vertices();
-                uuid2index_.update( old2new );
-            }
-        }
-
         absl::optional< index_t > check_relation_exists(
             const uuid& from, const uuid& to, const RelationType type ) const
         {
-            const auto index_from = vertex_id( from );
-            if( !index_from )
+            if( const auto edge_id = relation_edge_index( from, to ) )
             {
-                return absl::nullopt;
-            }
-            const auto index_to = vertex_id( to );
-            if( !index_to )
-            {
-                return absl::nullopt;
-            }
-            for( const auto& edge_vertex :
-                graph_->edges_around_vertex( index_from.value() ) )
-            {
-                if( relation_type( edge_vertex.edge_id ) != type )
+                if( relation_type( edge_id.value() ) == type )
                 {
-                    continue;
-                }
-                const auto& other =
-                    this->vertex_component_id( edge_vertex.opposite() );
-                if( to == other.id() )
-                {
-                    return edge_vertex.edge_id;
+                    return edge_id;
                 }
             }
             return absl::nullopt;
+        }
+
+        bool is_boundary( const uuid& from, const uuid& to ) const
+        {
+            const auto edge_id =
+                check_relation_exists( from, to, BOUNDARY_RELATION );
+            if( !edge_id )
+            {
+                return false;
+            }
+            return vertex_component_id(
+                       { edge_id.value(), BOUNDARY_EDGE_VERTEX } )
+                       .id()
+                   == from;
+        }
+
+        bool is_internal( const uuid& from, const uuid& to ) const
+        {
+            const auto edge_id =
+                check_relation_exists( from, to, INTERNAL_RELATION );
+            if( !edge_id )
+            {
+                return false;
+            }
+            return vertex_component_id(
+                       { edge_id.value(), INTERNAL_EDGE_VERTEX } )
+                       .id()
+                   == from;
+        }
+
+        bool is_item( const uuid& from, const uuid& to ) const
+        {
+            const auto edge_id =
+                check_relation_exists( from, to, ITEM_RELATION );
+            if( !edge_id )
+            {
+                return false;
+            }
+            return vertex_component_id( { edge_id.value(), ITEM_EDGE_VERTEX } )
+                       .id()
+                   == from;
         }
 
         index_t add_relation( const ComponentID& from,
             const ComponentID& to,
             const RelationType type )
         {
-            if( const auto id =
-                    check_relation_exists( from.id(), to.id(), type ) )
+            if( const auto id = relation_edge_index( from.id(), to.id() ) )
             {
-                Logger::warn( "This relation already exists (", from.string(),
-                    " and ", to.string(), ")" );
+                Logger::warn( "There is already a relation between (",
+                    from.string(), " and ", to.string(), ")" );
                 return id.value();
             }
-            const auto index = do_add_relation( from, to );
+            const auto index = add_relation_edge( from, to );
             relation_type_->set_value( index, type );
             return index;
         }
 
-        index_t add_relation( const ComponentID& from, const ComponentID& to )
+        void copy( const Impl& impl, const ModelCopyMapping& mapping )
         {
-            if( const auto id = relation_index( from.id(), to.id() ) )
-            {
-                Logger::warn( "This relation already exists (", from.string(),
-                    " and ", to.string(), ")" );
-                return id.value();
-            }
-            return do_add_relation( from, to );
-        }
-
-        void remove_relation( const uuid& id1, const uuid& id2 )
-        {
-            if( const auto id = relation_index( id1, id2 ) )
-            {
-                std::vector< bool > to_delete( graph_->nb_edges(), false );
-                to_delete[id.value()] = true;
-                GraphBuilder::create( *graph_ )->delete_edges( to_delete );
-            }
+            detail::RelationshipsImpl::copy( impl, mapping );
+            initialize_relation_attribute();
         }
 
         void save( absl::string_view directory ) const
@@ -254,85 +193,6 @@ namespace geode
                 "[Relationships::load] Error while reading file: ", filename );
         }
 
-        AttributeManager& component_attribute_manager() const
-        {
-            return graph_->vertex_attribute_manager();
-        }
-
-        const ComponentID& component_from_index( index_t id ) const
-        {
-            return ids_->value( id );
-        }
-
-        AttributeManager& relation_attribute_manager() const
-        {
-            return graph_->edge_attribute_manager();
-        }
-
-        absl::optional< index_t > relation_index(
-            const uuid& id1, const uuid& id2 ) const
-        {
-            const auto index1 = vertex_id( id1 );
-            if( !index1 )
-            {
-                return absl::nullopt;
-            }
-            const auto index2 = vertex_id( id2 );
-            if( !index2 )
-            {
-                return absl::nullopt;
-            }
-            return graph_->edge_from_vertices( index1.value(), index2.value() );
-        }
-
-        std::tuple< ComponentID, ComponentID > relation_from_index(
-            index_t id ) const
-        {
-            const auto id0 = graph_->edge_vertex( { id, 0 } );
-            const auto id1 = graph_->edge_vertex( { id, 1 } );
-            return std::make_tuple(
-                component_from_index( id0 ), component_from_index( id1 ) );
-        }
-
-        void copy( const Impl& impl, const ModelCopyMapping& mapping )
-        {
-            graph_ = impl.graph_->clone();
-            initialize_attributes();
-            std::vector< index_t > vertices_to_delete;
-            for( const auto v : Range{ graph_->nb_vertices() } )
-            {
-                const auto& id = component_from_index( v );
-                if( mapping.has_mapping_type( id.type() )
-                    && mapping.at( id.type() ).has_mapping_input( id.id() ) )
-                {
-                    const auto& new_uuid =
-                        mapping.at( id.type() ).in2out( id.id() );
-                    ids_->set_value( v, { id.type(), new_uuid } );
-                    uuid2index_.set_new_mapping( new_uuid, v );
-                }
-                else
-                {
-                    vertices_to_delete.push_back( v );
-                }
-            }
-            if( vertices_to_delete.empty() )
-            {
-                return;
-            }
-            std::vector< bool > to_delete( graph_->nb_edges(), false );
-            for( const auto v : vertices_to_delete )
-            {
-                for( const auto& edge : graph_->edges_around_vertex( v ) )
-                {
-                    to_delete[edge.edge_id] = true;
-                }
-            }
-            auto builder = GraphBuilder::create( *graph_ );
-            builder->delete_edges( to_delete );
-            const auto old2new = builder->delete_isolated_vertices();
-            uuid2index_.update( old2new );
-        }
-
     private:
         friend class bitsery::Access;
         template < typename Archive >
@@ -349,6 +209,7 @@ namespace geode
                          a.ext( impl.ids_, bitsery::ext::StdSmartPtr{} );
                          impl.graph_ = graph.clone();
                          impl.initialize_attributes();
+                         impl.initialize_relation_attribute();
                          impl.delete_isolated_vertices();
                      },
                         []( Archive& a, Impl& impl ) {
@@ -358,70 +219,24 @@ namespace geode
                                 bitsery::ext::StdSmartPtr{} );
                             a.ext( impl.ids_, bitsery::ext::StdSmartPtr{} );
                             impl.delete_isolated_vertices();
+                        },
+                        []( Archive& a, Impl& impl ) {
+                            a.ext( impl, bitsery::ext::BaseClass<
+                                             detail::RelationshipsImpl >{} );
+                            a.ext( impl.relation_type_,
+                                bitsery::ext::StdSmartPtr{} );
                         } } } );
         }
 
-        index_t register_component( const ComponentID& id )
+        void initialize_relation_attribute()
         {
-            const auto index = GraphBuilder::create( *graph_ )->create_vertex();
-            uuid2index_.set_new_mapping( id.id(), index );
-            ids_->set_value( index, id );
-            return index;
-        }
-
-        index_t do_add_relation(
-            const ComponentID& from, const ComponentID& to )
-        {
-            const auto index = GraphBuilder::create( *graph_ )->create_edge(
-                find_or_create_vertex_id( from ),
-                find_or_create_vertex_id( to ) );
-            return index;
-        }
-
-        absl::optional< index_t > vertex_id( const uuid& id ) const
-        {
-            return uuid2index_.index( id );
-        }
-
-        index_t find_or_create_vertex_id( const ComponentID& id )
-        {
-            if( const auto index = vertex_id( id.id() ) )
-            {
-                return index.value();
-            }
-            return register_component( id );
-        }
-
-        void initialize_attributes()
-        {
-            relation_type_ = graph_->edge_attribute_manager()
+            relation_type_ = relation_attribute_manager()
                                  .find_or_create_attribute< VariableAttribute,
                                      RelationType >( "relation_type", NO_ID );
-            ids_ =
-                graph_->vertex_attribute_manager()
-                    .find_or_create_attribute< VariableAttribute, ComponentID >(
-                        "id", ComponentID{} );
-        }
-
-        void delete_isolated_vertices()
-        {
-            auto builder = GraphBuilder::create( *graph_ );
-            const auto old2new = builder->delete_isolated_vertices();
-            for( const auto v : Indices{ old2new } )
-            {
-                if( old2new[v] == NO_ID )
-                {
-                    uuid2index_.erase( v );
-                }
-            }
-            uuid2index_.update( old2new );
         }
 
     private:
-        std::unique_ptr< Graph > graph_;
-        detail::UuidToIndex uuid2index_;
         std::shared_ptr< VariableAttribute< RelationType > > relation_type_;
-        std::shared_ptr< VariableAttribute< ComponentID > > ids_;
     };
 
     Relationships::Relationships() {} // NOLINT
@@ -537,44 +352,28 @@ namespace geode
             item, collection, Relationships::Impl::ITEM_RELATION );
     }
 
-    index_t Relationships::add_relation( const ComponentID& id1,
-        const ComponentID& id2,
-        RelationshipsBuilderKey )
-    {
-        return impl_->add_relation( id1, id2 );
-    }
-
     void Relationships::remove_relation(
         const uuid& id1, const uuid& id2, RelationshipsBuilderKey )
     {
-        return impl_->remove_relation( id1, id2 );
+        impl_->remove_relation( id1, id2 );
     }
 
     bool Relationships::is_boundary(
         const uuid& boundary, const uuid& incidence ) const
     {
-        return impl_
-            ->check_relation_exists(
-                boundary, incidence, Relationships::Impl::BOUNDARY_RELATION )
-            .has_value();
+        return impl_->is_boundary( boundary, incidence );
     }
 
     bool Relationships::is_internal(
         const uuid& internal, const uuid& embedding ) const
     {
-        return impl_
-            ->check_relation_exists(
-                internal, embedding, Relationships::Impl::INTERNAL_RELATION )
-            .has_value();
+        return impl_->is_internal( internal, embedding );
     }
 
     bool Relationships::is_item(
         const uuid& item, const uuid& collection ) const
     {
-        return impl_
-            ->check_relation_exists(
-                item, collection, Relationships::Impl::ITEM_RELATION )
-            .has_value();
+        return impl_->is_item( item, collection );
     }
 
     void Relationships::save_relationships( absl::string_view directory ) const
@@ -603,13 +402,13 @@ namespace geode
     absl::optional< index_t > Relationships::relation_index(
         const uuid& id1, const uuid& id2 ) const
     {
-        return impl_->relation_index( id1, id2 );
+        return impl_->relation_edge_index( id1, id2 );
     }
 
     std::tuple< ComponentID, ComponentID > Relationships::relation_from_index(
         index_t id ) const
     {
-        return impl_->relation_from_index( id );
+        return impl_->relation_components_from_index( id );
     }
 
     class Relationships::RelationRangeIterator::Impl

@@ -53,12 +53,6 @@ namespace geode
         return relationships_.add_item_in_collection( item, collection, {} );
     }
 
-    index_t RelationshipsBuilder::add_relation(
-        const ComponentID& id1, const ComponentID& id2 )
-    {
-        return relationships_.add_relation( id1, id2, {} );
-    }
-
     void RelationshipsBuilder::remove_relation(
         const uuid& id1, const uuid& id2 )
     {

@@ -44,6 +44,8 @@ namespace geode
     class OpenGeodePointSetBuilder : public PointSetBuilder< dimension >
     {
     public:
+        static constexpr auto dim = dimension;
+
         OpenGeodePointSetBuilder(
             VertexSet& vertex_set, MeshBuilderFactoryKey );
 
