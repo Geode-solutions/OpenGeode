@@ -38,8 +38,8 @@ void test_comparison()
     OPENGEODE_EXCEPTION( P != P2, "[Test] Points should be different" );
 
     const geode::Point3D p_epsilon{ { 2.0000000001, 1, 2.6 } };
-    OPENGEODE_EXCEPTION( p.inexact_equal( p_epsilon, 0.0001 ),
-        "[Test] Points should be almost equal" );
+    OPENGEODE_EXCEPTION(
+        p.inexact_equal( p_epsilon ), "[Test] Points should be almost equal" );
 }
 
 void test_operators()

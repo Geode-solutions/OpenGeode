@@ -95,11 +95,9 @@ void run_test_brep()
                         surface_mesh
                             .point( surface_mesh.polygon_vertex(
                                 { polygon_id, polygon_vertex_id } ) )
-                            .inexact_equal(
-                                block_mesh.point(
-                                    block_facets_vertices[0]
-                                        .vertices[polygon_vertex_id] ),
-                                1e-7 ),
+                            .inexact_equal( block_mesh.point(
+                                block_facets_vertices[0]
+                                    .vertices[polygon_vertex_id] ) ),
                         "[Test] Point on the edge and on the surface have "
                         "different positions." );
                 }
@@ -151,9 +149,8 @@ void run_test_brep()
                             .point( line_mesh.edge_vertex(
                                 { edge_id, edge_vertex_id } ) )
                             .inexact_equal( surface_mesh.point(
-                                                surface_edge_vertices[0]
-                                                    .vertices[edge_vertex_id] ),
-                                1e-7 ),
+                                surface_edge_vertices[0]
+                                    .vertices[edge_vertex_id] ) ),
                         "[Test] Point on the edge and on the surface have "
                         "different positions." );
                 }
@@ -210,9 +207,8 @@ void run_test_section()
                             .point( line_mesh.edge_vertex(
                                 { edge_id, edge_vertex_id } ) )
                             .inexact_equal( surface_mesh.point(
-                                                surface_edge_vertices[0]
-                                                    .vertices[edge_vertex_id] ),
-                                1e-7 ),
+                                surface_edge_vertices[0]
+                                    .vertices[edge_vertex_id] ) ),
                         "[Test] Points on the edge and on the surface have "
                         "different positions." );
                 }

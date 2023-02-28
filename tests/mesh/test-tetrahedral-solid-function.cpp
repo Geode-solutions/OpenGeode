@@ -130,16 +130,16 @@ void test_point_function( geode::TetrahedralSolid3D& solid )
     point_function.set_value( 1, { { 22, -3, -20 } } );
     point_function.set_value( 6, { { 22, -3, -20 } } );
     geode::Point3D point{ { 0.91, 0.87, 0.19 } };
-    OPENGEODE_EXCEPTION( point_function.value( point, 1 )
-                             .inexact_equal( { { 22, -3, -20 } }, 1e-7 ),
+    OPENGEODE_EXCEPTION(
+        point_function.value( point, 1 ).inexact_equal( { { 22, -3, -20 } } ),
         "[Test] Object function value 1 is wrong." );
     point = { { 0., 0., 1. } };
-    OPENGEODE_EXCEPTION( point_function.value( point, 4 )
-                             .inexact_equal( { { 26, 3, -10 } }, 1e-7 ),
+    OPENGEODE_EXCEPTION(
+        point_function.value( point, 4 ).inexact_equal( { { 26, 3, -10 } } ),
         "[Test] Object function value 2 is wrong." );
     point = { { 0.5, 0.5, 0.5 } };
     OPENGEODE_EXCEPTION( point_function.value( point, 4 )
-                             .inexact_equal( { { 23, -1.5, -17.5 } }, 1e-7 ),
+                             .inexact_equal( { { 23, -1.5, -17.5 } } ),
         "[Test] Object function value 3 is wrong." );
 }
 

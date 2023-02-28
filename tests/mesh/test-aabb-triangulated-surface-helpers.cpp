@@ -99,8 +99,7 @@ void check_surface_tree( const geode::AABBTree< dimension >& tree,
                 tree.closest_element_box( query1, distance_action );
             OPENGEODE_EXCEPTION(
                 triangle1 == id++, "[TEST] Wrong triangle found" );
-            OPENGEODE_EXCEPTION(
-                nearest_point1.inexact_equal( query1, geode::global_epsilon ),
+            OPENGEODE_EXCEPTION( nearest_point1.inexact_equal( query1 ),
                 "[TEST] Wrong nearest point found" );
 
             const auto query2 =
@@ -111,8 +110,7 @@ void check_surface_tree( const geode::AABBTree< dimension >& tree,
                 tree.closest_element_box( query2, distance_action );
             OPENGEODE_EXCEPTION(
                 triangle2 == id++, "[TEST] Wrong triangle found" );
-            OPENGEODE_EXCEPTION(
-                nearest_point2.inexact_equal( query2, geode::global_epsilon ),
+            OPENGEODE_EXCEPTION( nearest_point2.inexact_equal( query2 ),
                 "[TEST] Wrong nearest point found" );
         }
     }

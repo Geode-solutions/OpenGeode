@@ -130,15 +130,15 @@ void test_point_function( geode::TriangulatedSurface2D& surface )
     point_function.set_value( 5, { { 22, -3 } } );
     geode::Point2D point{ { 1., 1. } };
     OPENGEODE_EXCEPTION(
-        point_function.value( point, 2 ).inexact_equal( { { 26, 3 } }, 1e-7 ),
+        point_function.value( point, 2 ).inexact_equal( { { 26, 3 } } ),
         "[Test] Point function value 1 is wrong." );
     point = { { 1., 1.8 } };
     OPENGEODE_EXCEPTION(
-        point_function.value( point, 5 ).inexact_equal( { { 22, -3 } }, 1e-7 ),
+        point_function.value( point, 5 ).inexact_equal( { { 22, -3 } } ),
         "[Test] Point function value 2 is wrong." );
     point = { { 1., 1.375 } };
     OPENGEODE_EXCEPTION(
-        point_function.value( point, 2 ).inexact_equal( { { 24, 0 } }, 1e-7 ),
+        point_function.value( point, 2 ).inexact_equal( { { 24, 0 } } ),
         "[Test] Point function value 3 is wrong." );
 }
 
