@@ -8,6 +8,8 @@
 
 ### Breaking Changes
 
+- **AABB**: intersection functors now returns a boolean to indicate if the search should be stopped
+
 - **Point**: `inexact_equal` method only take the other Point as parameter
 
 - **Mesh**: OpenGeode mesh implementations (datamodel and builder) are moved into a subfolder `geode` (i.e. file like `geode_point_set.h` and `geode_point_set_builer.h`)

@@ -224,7 +224,7 @@ namespace geode
             return results_;
         }
 
-        void compute( index_t polygon_id )
+        bool compute( index_t polygon_id )
         {
             const auto& p0 =
                 mesh_.point( mesh_.polygon_vertex( { polygon_id, 0 } ) );
@@ -278,6 +278,7 @@ namespace geode
                 }
                 break;
             }
+            return false;
         }
 
     private:
@@ -340,8 +341,8 @@ namespace geode
         return impl_->all_intersections();
     }
 
-    void RayTracing3D::operator()( index_t polygon_id )
+    bool RayTracing3D::operator()( index_t polygon_id )
     {
-        impl_->compute( polygon_id );
+        return impl_->compute( polygon_id );
     }
 } // namespace geode

@@ -104,8 +104,9 @@ namespace geode
          *
          * @tparam EvalIntersection this functor should have an operator()
          * defined like this:
-         * void operator()( index_t cur_element_box ) ;
-         *
+         * bool operator()( index_t cur_element_box ) ;
+         * @note The returned boolean indicates if the search should stop or
+         * continue. Return true to stop the search, false to continue.
          * @note the operator define what to do with the box \p cur_element_box
          * if it is intersected by the \p box.
          */
@@ -119,14 +120,16 @@ namespace geode
          * @param[in] action The functor to run when two boxes intersect
          * @tparam EvalIntersection this functor should have an operator()
          * defined like this:
-         * void operator()( index_t cur_element_box1, index_t cur_element_box2 )
-         * ;
+         * bool operator()( index_t cur_element_box1, index_t cur_element_box2
+         * );
          * @note cur_element_box1 and cur_element_box2 are the element box
          * indices that intersect.
          * @note the operator defines what to do when two boxes of the
          * tree ( \p cur_element_box1 and \p cur_element_box2 ) intersect each
          * other (for example: test real intersection between each element in
          * boxes and store the result.)
+         * @note The returned boolean indicates if the search should stop or
+         * continue. Return true to stop the search, false to continue.
          */
         template < class EvalIntersection >
         void compute_self_element_bbox_intersections(
@@ -138,10 +141,12 @@ namespace geode
          * @param[in] action The functor to run when two boxes intersect
          * @tparam EvalIntersection this functor should have an operator()
          * defined like this:
-         * void operator()( index_t cur_element_box1, index_t cur_element_box2 )
-         * ;
+         * bool operator()( index_t cur_element_box1, index_t cur_element_box2
+         * );
          * @note cur_element_box1 and cur_element_box2 are the element box
          * indices that intersect in the current tree and in the other tree.
+         * @note The returned boolean indicates if the search should stop or
+         * continue. Return true to stop the search, false to continue.
          */
         template < class EvalIntersection >
         void compute_other_element_bbox_intersections(
@@ -156,9 +161,11 @@ namespace geode
          * ray.
          * @tparam EvalIntersection this functor should have an operator()
          * defined like this:
-         * void operator()( index_t cur_element_box ) ;
+         * bool operator()( index_t cur_element_box ) ;
          * @note the operator define what to do with the box \p cur_element_box
          * if it is intersected by the \p ray.
+         * @note The returned boolean indicates if the search should stop or
+         * continue. Return true to stop the search, false to continue.
          */
         template < class EvalIntersection >
         void compute_ray_element_bbox_intersections(
@@ -172,9 +179,11 @@ namespace geode
          * line.
          * @tparam EvalIntersection this functor should have an operator()
          * defined like this:
-         * void operator()( index_t cur_element_box ) ;
+         * bool operator()( index_t cur_element_box ) ;
          * @note the operator define what to do with the box \p cur_element_box
          * if it is intersected by the \p line.
+         * @note The returned boolean indicates if the search should stop or
+         * continue. Return true to stop the search, false to continue.
          */
         template < class EvalIntersection >
         void compute_line_element_bbox_intersections(

@@ -84,7 +84,7 @@ namespace geode
 
         std::vector< PolygonDistance > all_intersections() const;
 
-        void operator()( index_t polygon_id );
+        bool operator()( index_t polygon_id );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );
