@@ -24,6 +24,7 @@ add_geode_test(
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
         ${PROJECT_NAME}::model
+    ESSENTIAL
 )
 add_geode_test(
     SOURCE "test-component-mesh-edges.cpp"
@@ -57,6 +58,7 @@ add_geode_test(
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
         ${PROJECT_NAME}::model
+    ESSENTIAL
 )
 add_geode_test(
     SOURCE "test-model-component-filter.cpp"
