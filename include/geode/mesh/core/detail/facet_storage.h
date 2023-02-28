@@ -234,21 +234,23 @@ namespace geode
             void serialize( Archive& archive )
             {
                 archive.ext( *this,
-                    DefaultGrowable< Archive,
-                        FacetStorage< VertexContainer > >{},
-                    []( Archive& a, FacetStorage< VertexContainer >& storage ) {
-                        a.object( storage.facet_attribute_manager_ );
-                        a.ext( storage.facet_indices_,
-                            bitsery::ext::StdMap{
-                                storage.facet_indices_.max_size() },
-                            []( Archive& a2, TypedVertexCycle& cycle,
-                                index_t& attribute ) {
-                                a2.object( cycle );
-                                a2.value4b( attribute );
-                            } );
-                        a.ext( storage.counter_, bitsery::ext::StdSmartPtr{} );
-                        a.ext( storage.vertices_, bitsery::ext::StdSmartPtr{} );
-                    } );
+                    Growable< Archive, FacetStorage< VertexContainer > >{
+                        { []( Archive& a,
+                              FacetStorage< VertexContainer >& storage ) {
+                            a.object( storage.facet_attribute_manager_ );
+                            a.ext( storage.facet_indices_,
+                                bitsery::ext::StdMap{
+                                    storage.facet_indices_.max_size() },
+                                []( Archive& a2, TypedVertexCycle& cycle,
+                                    index_t& attribute ) {
+                                    a2.object( cycle );
+                                    a2.value4b( attribute );
+                                } );
+                            a.ext(
+                                storage.counter_, bitsery::ext::StdSmartPtr{} );
+                            a.ext( storage.vertices_,
+                                bitsery::ext::StdSmartPtr{} );
+                        } } } );
             }
 
         private:

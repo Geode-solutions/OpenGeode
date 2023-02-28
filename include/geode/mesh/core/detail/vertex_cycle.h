@@ -144,10 +144,10 @@ namespace geode
             void serialize( Archive& archive )
             {
                 archive.ext( *this,
-                    DefaultGrowable< Archive, OrientedVertexCycle >{},
-                    []( Archive& a, OrientedVertexCycle& storage ) {
-                        a( storage.vertices_ );
-                    } );
+                    Growable< Archive, OrientedVertexCycle >{
+                        { []( Archive& a, OrientedVertexCycle& storage ) {
+                            a( storage.vertices_ );
+                        } } } );
             }
 
         private:

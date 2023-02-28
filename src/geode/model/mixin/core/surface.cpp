@@ -43,11 +43,12 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& a, Impl& impl ) {
-                    a.ext( impl, bitsery::ext::BaseClass< detail::MeshStorage<
-                                     SurfaceMesh< dimension > > >{} );
-                } );
+            archive.ext( *this, Growable< Archive, Impl >{ { []( Archive& a,
+                                                                 Impl& impl ) {
+                a.ext( impl,
+                    bitsery::ext::BaseClass<
+                        detail::MeshStorage< SurfaceMesh< dimension > > >{} );
+            } } } );
         }
     };
 

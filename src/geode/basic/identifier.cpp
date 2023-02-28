@@ -92,11 +92,11 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& a, Impl& impl ) {
+            archive.ext( *this,
+                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
                     a.object( impl.id_ );
                     a.text1b( impl.name_, impl.name_.max_size() );
-                } );
+                } } } );
         }
 
     private:
@@ -157,10 +157,10 @@ namespace geode
     template < typename Archive >
     void Identifier::serialize( Archive& archive )
     {
-        archive.ext( *this, DefaultGrowable< Archive, Identifier >{},
-            []( Archive& a, Identifier& identifier ) {
-                a.object( identifier.impl_ );
-            } );
+        archive.ext( *this, Growable< Archive, Identifier >{
+                                { []( Archive& a, Identifier& identifier ) {
+                                    a.object( identifier.impl_ );
+                                } } } );
     }
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_basic_api, Identifier );

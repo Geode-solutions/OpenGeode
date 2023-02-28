@@ -417,8 +417,8 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& a, Impl& impl ) {
+            archive.ext( *this,
+                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
                     a.container4b( impl.polyhedron_vertices_,
                         impl.polyhedron_vertices_.max_size() );
                     a.container4b( impl.polyhedron_vertex_ptr_,
@@ -429,7 +429,7 @@ namespace geode
                         impl.polyhedron_adjacent_ptr_.max_size() );
                     a.ext( impl, bitsery::ext::BaseClass<
                                      detail::PointsImpl< dimension > >{} );
-                } );
+                } } } );
         }
 
         void add_vertices( absl::Span< const index_t > vertices )
@@ -638,12 +638,13 @@ namespace geode
     template < typename Archive >
     void OpenGeodeHybridSolid< dimension >::serialize( Archive& archive )
     {
-        archive.ext( *this, DefaultGrowable< Archive, OpenGeodeHybridSolid >{},
-            []( Archive& a, OpenGeodeHybridSolid& solid ) {
-                a.ext( solid,
-                    bitsery::ext::BaseClass< HybridSolid< dimension > >{} );
-                a.object( solid.impl_ );
-            } );
+        archive.ext( *this,
+            Growable< Archive, OpenGeodeHybridSolid >{
+                { []( Archive& a, OpenGeodeHybridSolid& solid ) {
+                    a.ext( solid,
+                        bitsery::ext::BaseClass< HybridSolid< dimension > >{} );
+                    a.object( solid.impl_ );
+                } } } );
     }
 
     template class opengeode_mesh_api OpenGeodeHybridSolid< 3 >;

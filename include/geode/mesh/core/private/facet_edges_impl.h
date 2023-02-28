@@ -111,12 +111,12 @@ namespace geode
             void serialize( Archive& archive )
             {
                 archive.ext( *this,
-                    DefaultGrowable< Archive, FacetEdgesImpl >{},
-                    []( Archive& a, FacetEdgesImpl& impl ) {
-                        a.ext(
-                            impl, bitsery::ext::BaseClass< detail::FacetStorage<
-                                      std::array< index_t, 2 > > >{} );
-                    } );
+                    Growable< Archive, FacetEdgesImpl >{
+                        { []( Archive& a, FacetEdgesImpl& impl ) {
+                            a.ext( impl,
+                                bitsery::ext::BaseClass< detail::FacetStorage<
+                                    std::array< index_t, 2 > > >{} );
+                        } } } );
             }
         };
     } // namespace detail

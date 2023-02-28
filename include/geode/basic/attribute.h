@@ -117,10 +117,11 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, DefaultGrowable< Archive, AttributeBase >{},
-                []( Archive& a, AttributeBase& attribute ) {
-                    a.object( attribute.properties_ );
-                } );
+            archive.ext(
+                *this, Growable< Archive, AttributeBase >{
+                           { []( Archive& a, AttributeBase& attribute ) {
+                               a.object( attribute.properties_ );
+                           } } } );
         }
 
     protected:
@@ -191,11 +192,11 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this,
-                DefaultGrowable< Archive, ReadOnlyAttribute< T > >{},
-                []( Archive& a, ReadOnlyAttribute< T >& attribute ) {
-                    a.ext(
-                        attribute, bitsery::ext::BaseClass< AttributeBase >{} );
-                } );
+                Growable< Archive, ReadOnlyAttribute< T > >{
+                    { []( Archive& a, ReadOnlyAttribute< T >& attribute ) {
+                        a.ext( attribute,
+                            bitsery::ext::BaseClass< AttributeBase >{} );
+                    } } } );
         }
     };
 
@@ -267,12 +268,12 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this,
-                DefaultGrowable< Archive, ConstantAttribute< T > >{},
-                []( Archive& a, ConstantAttribute< T >& attribute ) {
-                    a.ext( attribute,
-                        bitsery::ext::BaseClass< ReadOnlyAttribute< T > >{} );
-                    a( attribute.value_ );
-                } );
+                Growable< Archive, ConstantAttribute< T > >{
+                    { []( Archive& a, ConstantAttribute< T >& attribute ) {
+                        a.ext( attribute, bitsery::ext::BaseClass<
+                                              ReadOnlyAttribute< T > >{} );
+                        a( attribute.value_ );
+                    } } } );
         }
 
     public:
@@ -398,17 +399,17 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this,
-                DefaultGrowable< Archive, VariableAttribute< T > >{},
-                []( Archive& a, VariableAttribute< T >& attribute ) {
-                    a.ext( attribute,
-                        bitsery::ext::BaseClass< ReadOnlyAttribute< T > >{} );
-                    a( attribute.default_value_ );
-                    a.container( attribute.values_,
-                        attribute.values_.max_size(),
-                        []( Archive& a2, T& item ) {
-                            a2( item );
-                        } );
-                } );
+                Growable< Archive, VariableAttribute< T > >{
+                    { []( Archive& a, VariableAttribute< T >& attribute ) {
+                        a.ext( attribute, bitsery::ext::BaseClass<
+                                              ReadOnlyAttribute< T > >{} );
+                        a( attribute.default_value_ );
+                        a.container( attribute.values_,
+                            attribute.values_.max_size(),
+                            []( Archive& a2, T& item ) {
+                                a2( item );
+                            } );
+                    } } } );
             values_.reserve( 10 );
         }
 
@@ -565,14 +566,14 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this,
-                DefaultGrowable< Archive, VariableAttribute< bool > >{},
-                []( Archive& a, VariableAttribute< bool >& attribute ) {
-                    a.ext( attribute, bitsery::ext::BaseClass<
-                                          ReadOnlyAttribute< bool > >{} );
-                    a.value1b( attribute.default_value_ );
-                    a.container1b(
-                        attribute.values_, attribute.values_.max_size() );
-                } );
+                Growable< Archive, VariableAttribute< bool > >{
+                    { []( Archive& a, VariableAttribute< bool >& attribute ) {
+                        a.ext( attribute, bitsery::ext::BaseClass<
+                                              ReadOnlyAttribute< bool > >{} );
+                        a.value1b( attribute.default_value_ );
+                        a.container1b(
+                            attribute.values_, attribute.values_.max_size() );
+                    } } } );
             values_.reserve( 10 );
         }
 
@@ -740,18 +741,19 @@ namespace geode
         void serialize( Archive& archive )
         {
             archive.ext( *this,
-                DefaultGrowable< Archive, SparseAttribute< T > >{},
-                []( Archive& a, SparseAttribute< T >& attribute ) {
-                    a.ext( attribute,
-                        bitsery::ext::BaseClass< ReadOnlyAttribute< T > >{} );
-                    a( attribute.default_value_ );
-                    a.ext( attribute.values_,
-                        bitsery::ext::StdMap{ attribute.values_.max_size() },
-                        []( Archive& a2, index_t& i, T& item ) {
-                            a2.value4b( i );
-                            a2( item );
-                        } );
-                } );
+                Growable< Archive, SparseAttribute< T > >{
+                    { []( Archive& a, SparseAttribute< T >& attribute ) {
+                        a.ext( attribute, bitsery::ext::BaseClass<
+                                              ReadOnlyAttribute< T > >{} );
+                        a( attribute.default_value_ );
+                        a.ext( attribute.values_,
+                            bitsery::ext::StdMap{
+                                attribute.values_.max_size() },
+                            []( Archive& a2, index_t& i, T& item ) {
+                                a2.value4b( i );
+                                a2( item );
+                            } );
+                    } } } );
             values_.reserve( 10 );
         }
 

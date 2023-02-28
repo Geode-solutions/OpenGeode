@@ -129,10 +129,10 @@ namespace geode
         template < typename Archive >
         void serialize( Archive &archive )
         {
-            archive.ext( *this, DefaultGrowable< Archive, RGBColor >{},
-                []( Archive &a, RGBColor &color ) {
-                    a.container1b( color.values_ );
-                } );
+            archive.ext( *this, Growable< Archive, RGBColor >{
+                                    { []( Archive &a, RGBColor &color ) {
+                                        a.container1b( color.values_ );
+                                    } } } );
         }
 
     private:

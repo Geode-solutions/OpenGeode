@@ -87,10 +87,10 @@ namespace geode
         template < typename Archive >
         void serialize( Archive &archive )
         {
-            archive.ext( *this, DefaultGrowable< Archive, GreyscaleColor >{},
-                []( Archive &a, GreyscaleColor &color ) {
-                    a.value1b( color.value_ );
-                } );
+            archive.ext( *this, Growable< Archive, GreyscaleColor >{
+                                    { []( Archive &a, GreyscaleColor &color ) {
+                                        a.value1b( color.value_ );
+                                    } } } );
         }
 
     private:
