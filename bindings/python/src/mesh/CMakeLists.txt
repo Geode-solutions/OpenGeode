@@ -52,6 +52,8 @@ add_geode_python_binding(
         "core/tetrahedral_solid.h"
         "core/triangulated_surface.h"
         "core/vertex_set.h"
+        "core/texture.h"
+        "core/texture_manager.h"
         "helpers/convert_edged_curve.h"
         "helpers/convert_point_set.h"
         "helpers/convert_solid_mesh.h"

@@ -26,9 +26,9 @@
 
 #include <geode/geometry/point.h>
 
-#include <geode/mesh/builder/geode_triangulated_surface_builder.h>
+#include <geode/mesh/builder/geode/geode_triangulated_surface_builder.h>
 #include <geode/mesh/builder/surface_edges_builder.h>
-#include <geode/mesh/core/geode_triangulated_surface.h>
+#include <geode/mesh/core/geode/geode_triangulated_surface.h>
 #include <geode/mesh/core/surface_edges.h>
 #include <geode/mesh/io/triangulated_surface_input.h>
 #include <geode/mesh/io/triangulated_surface_output.h>

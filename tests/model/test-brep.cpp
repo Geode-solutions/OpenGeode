@@ -32,11 +32,11 @@
 #include <geode/mesh/builder/point_set_builder.h>
 #include <geode/mesh/builder/surface_mesh_builder.h>
 #include <geode/mesh/builder/triangulated_surface_builder.h>
-#include <geode/mesh/core/geode_edged_curve.h>
-#include <geode/mesh/core/geode_point_set.h>
-#include <geode/mesh/core/geode_polygonal_surface.h>
-#include <geode/mesh/core/geode_polyhedral_solid.h>
-#include <geode/mesh/core/geode_triangulated_surface.h>
+#include <geode/mesh/core/geode/geode_edged_curve.h>
+#include <geode/mesh/core/geode/geode_point_set.h>
+#include <geode/mesh/core/geode/geode_polygonal_surface.h>
+#include <geode/mesh/core/geode/geode_polyhedral_solid.h>
+#include <geode/mesh/core/geode/geode_triangulated_surface.h>
 #include <geode/mesh/core/point_set.h>
 
 #include <geode/model/mixin/core/block.h>

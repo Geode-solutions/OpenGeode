@@ -37,7 +37,8 @@
         .def( "edge_length", &EdgedCurve##dimension##D::edge_length )          \
         .def( "edge_barycenter", &EdgedCurve##dimension##D::edge_barycenter )  \
         .def( "bounding_box", &EdgedCurve##dimension##D::bounding_box )        \
-        .def( "segment", &EdgedCurve##dimension##D::segment )
+        .def( "segment", &EdgedCurve##dimension##D::segment )                  \
+        .def( "texture_manager", &EdgedCurve##dimension##D::texture_manager )
 
 namespace geode
 {

@@ -25,7 +25,7 @@
 
 #include <geode/basic/attribute_manager.h>
 
-#include <geode/mesh/core/geode_graph.h>
+#include <geode/mesh/core/graph.h>
 
 #include <geode/model/common.h>
 #include <geode/model/mixin/core/component_type.h>

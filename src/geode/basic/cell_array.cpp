@@ -138,6 +138,13 @@ namespace geode
     }
 
     template < index_t dimension >
+    auto CellArray< dimension >::operator=( CellArray&& other ) -> CellArray&
+    {
+        *impl_ = std::move( *other.impl_ );
+        return *this;
+    }
+
+    template < index_t dimension >
     CellArray< dimension >::~CellArray() // NOLINT
     {
     }
@@ -199,9 +206,11 @@ namespace geode
             } );
     }
 
+    template class opengeode_basic_api CellArray< 1 >;
     template class opengeode_basic_api CellArray< 2 >;
     template class opengeode_basic_api CellArray< 3 >;
 
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_basic_api, CellArray< 1 > );
     SERIALIZE_BITSERY_ARCHIVE( opengeode_basic_api, CellArray< 2 > );
     SERIALIZE_BITSERY_ARCHIVE( opengeode_basic_api, CellArray< 3 > );
 } // namespace geode

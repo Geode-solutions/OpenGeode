@@ -100,6 +100,15 @@ namespace geode
     }
 
     template < index_t dimension >
+    RasterImage< dimension >& RasterImage< dimension >::operator=(
+        RasterImage&& other )
+    {
+        CellArray< dimension >::operator=( std::move( other ) );
+        *impl_ = std::move( *other.impl_ );
+        return *this;
+    }
+
+    template < index_t dimension >
     index_t RasterImage< dimension >::cell_index(
         const CellIndices& index ) const
     {
@@ -137,9 +146,11 @@ namespace geode
             } );
     }
 
+    template class opengeode_image_api RasterImage< 1 >;
     template class opengeode_image_api RasterImage< 2 >;
     template class opengeode_image_api RasterImage< 3 >;
 
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_image_api, RasterImage< 1 > );
     SERIALIZE_BITSERY_ARCHIVE( opengeode_image_api, RasterImage< 2 > );
     SERIALIZE_BITSERY_ARCHIVE( opengeode_image_api, RasterImage< 3 > );
 } // namespace geode

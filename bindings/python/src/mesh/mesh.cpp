@@ -54,6 +54,8 @@
 #include "core/surface_edges.h"
 #include "core/surface_mesh.h"
 #include "core/tetrahedral_solid.h"
+#include "core/texture.h"
+#include "core/texture_manager.h"
 #include "core/triangulated_surface.h"
 #include "core/vertex_set.h"
 
@@ -160,6 +162,9 @@ PYBIND11_MODULE( opengeode_py_mesh, module )
     geode::define_polyhedral_solid( module );
     geode::define_tetrahedral_solid( module );
     geode::define_hybrid_solid( module );
+
+    geode::define_texture( module );
+    geode::define_texture_manager( module );
 
     geode::define_vertex_set_builder( module );
     geode::define_graph_builder( module );

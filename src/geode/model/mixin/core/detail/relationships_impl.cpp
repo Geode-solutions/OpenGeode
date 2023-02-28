@@ -30,9 +30,8 @@
 
 #include <geode/geometry/bitsery_archive.h>
 
-#include <geode/mesh/builder/geode_graph_builder.h>
+#include <geode/mesh/builder/graph_builder.h>
 #include <geode/mesh/core/bitsery_archive.h>
-#include <geode/mesh/core/geode_graph.h>
 #include <geode/mesh/io/graph_input.h>
 #include <geode/mesh/io/graph_output.h>
 

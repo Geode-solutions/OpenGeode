@@ -28,8 +28,8 @@
 
 #include <geode/basic/logger.h>
 
-#include <geode/mesh/builder/geode_regular_grid_solid_builder.h>
-#include <geode/mesh/builder/geode_regular_grid_surface_builder.h>
+#include <geode/mesh/builder/geode/geode_regular_grid_solid_builder.h>
+#include <geode/mesh/builder/geode/geode_regular_grid_surface_builder.h>
 #include <geode/mesh/core/regular_grid_solid.h>
 #include <geode/mesh/core/regular_grid_surface.h>
 #include <geode/mesh/helpers/euclidean_distance_transform.h>

@@ -72,6 +72,7 @@ namespace geode
         CellArray();
         CellArray( std::array< index_t, dimension > cells_number );
         CellArray( CellArray&& );
+        CellArray& operator=( CellArray&& );
 
         void set_array_dimensions(
             std::array< index_t, dimension > cells_number );

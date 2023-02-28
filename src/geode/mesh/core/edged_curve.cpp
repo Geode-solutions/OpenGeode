@@ -24,6 +24,7 @@
 #include <geode/mesh/core/edged_curve.h>
 
 #include <geode/basic/bitsery_archive.h>
+#include <geode/basic/pimpl_impl.h>
 
 #include <geode/geometry/basic_objects/segment.h>
 #include <geode/geometry/bounding_box.h>
@@ -31,9 +32,53 @@
 
 #include <geode/mesh/builder/edged_curve_builder.h>
 #include <geode/mesh/core/mesh_factory.h>
+#include <geode/mesh/core/texture1d.h>
+#include <geode/mesh/core/texture_storage.h>
 
 namespace geode
 {
+    template < index_t dimension >
+    class EdgedCurve< dimension >::Impl
+    {
+        friend class bitsery::Access;
+
+    public:
+        TextureManager1D texture_manager(
+            const EdgedCurve< dimension >& curve ) const
+        {
+            return { curve.edge_attribute_manager(), texture_storage_ };
+        }
+
+    private:
+        template < typename Archive >
+        void serialize( Archive& archive )
+        {
+            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
+                []( Archive& a, Impl& impl ) {
+                    a.object( impl.texture_storage_ );
+                } );
+        }
+
+    private:
+        mutable TextureStorage1D texture_storage_;
+    };
+
+    template < index_t dimension >
+    EdgedCurve< dimension >::EdgedCurve()
+    {
+    }
+
+    template < index_t dimension >
+    EdgedCurve< dimension >::EdgedCurve( EdgedCurve&& other )
+        : Graph{ std::move( other ) }, impl_{ std::move( other.impl_ ) }
+    {
+    }
+
+    template < index_t dimension >
+    EdgedCurve< dimension >::~EdgedCurve()
+    {
+    }
+
     template < index_t dimension >
     std::unique_ptr< EdgedCurve< dimension > > EdgedCurve< dimension >::create()
     {
@@ -78,10 +123,16 @@ namespace geode
     template < typename Archive >
     void EdgedCurve< dimension >::serialize( Archive& archive )
     {
-        archive.ext( *this, DefaultGrowable< Archive, EdgedCurve >{},
-            []( Archive& a, EdgedCurve& edged_curve ) {
-                a.ext( edged_curve, bitsery::ext::BaseClass< Graph >{} );
-            } );
+        archive.ext( *this,
+            Growable< Archive, EdgedCurve >{
+                { []( Archive& a, EdgedCurve& edged_curve ) {
+                     a.ext( edged_curve, bitsery::ext::BaseClass< Graph >{} );
+                 },
+                    []( Archive& a, EdgedCurve& edged_curve ) {
+                        a.ext(
+                            edged_curve, bitsery::ext::BaseClass< Graph >{} );
+                        a.object( edged_curve.impl_ );
+                    } } } );
     }
 
     template < index_t dimension >
@@ -111,6 +162,12 @@ namespace geode
     {
         return { point( edge_vertex( { edge_id, 0 } ) ),
             point( edge_vertex( { edge_id, 1 } ) ) };
+    }
+
+    template < index_t dimension >
+    TextureManager1D EdgedCurve< dimension >::texture_manager() const
+    {
+        return impl_->texture_manager( *this );
     }
 
     template class opengeode_mesh_api EdgedCurve< 2 >;

@@ -64,11 +64,11 @@ add_geode_library(
         "representation/core/brep.cpp"
         "representation/core/section.cpp"
         "representation/io/brep_input.cpp"
-        "representation/io/geode_brep_input.cpp"
         "representation/io/section_input.cpp"
         "representation/io/brep_output.cpp"
-        "representation/io/geode_section_input.cpp"
         "representation/io/section_output.cpp"
+        "representation/io/geode/geode_brep_input.cpp"
+        "representation/io/geode/geode_section_input.cpp"
     PUBLIC_HEADERS
         "common.h"
         "helpers/aabb_model_helpers.h"
@@ -118,6 +118,10 @@ add_geode_library(
         "representation/io/section_input.h"
         "representation/io/brep_output.h"
         "representation/io/section_output.h"
+        "representation/io/geode/geode_brep_input.h"
+        "representation/io/geode/geode_section_input.h"
+        "representation/io/geode/geode_brep_output.h"
+        "representation/io/geode/geode_section_output.h"
     ADVANCED_HEADERS
         "helpers/detail/cut_along_internal_lines.h"
         "mixin/core/detail/components_storage.h"
@@ -126,10 +130,6 @@ add_geode_library(
         "mixin/core/detail/uuid_to_index.h"
         "mixin/core/detail/relationships_impl.h"
         "representation/builder/detail/copy.h"
-        "representation/io/detail/geode_brep_input.h"
-        "representation/io/detail/geode_section_input.h"
-        "representation/io/detail/geode_brep_output.h"
-        "representation/io/detail/geode_section_output.h"
     PRIVATE_HEADERS
         "helpers/private/simplicial_model_creator.h"
     PUBLIC_DEPENDENCIES

@@ -29,8 +29,8 @@
 #include <geode/geometry/bounding_box.h>
 #include <geode/geometry/point.h>
 
-#include <geode/mesh/builder/geode_point_set_builder.h>
-#include <geode/mesh/core/geode_point_set.h>
+#include <geode/mesh/builder/geode/geode_point_set_builder.h>
+#include <geode/mesh/core/geode/geode_point_set.h>
 #include <geode/mesh/io/point_set_input.h>
 #include <geode/mesh/io/point_set_output.h>
 

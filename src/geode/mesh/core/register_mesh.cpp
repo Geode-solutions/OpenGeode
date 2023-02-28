@@ -21,19 +21,19 @@
  *
  */
 
-#include <geode/mesh/core/detail/register_mesh.h>
+#include <geode/mesh/core/geode/register_mesh.h>
 
-#include <geode/mesh/core/geode_edged_curve.h>
-#include <geode/mesh/core/geode_graph.h>
-#include <geode/mesh/core/geode_hybrid_solid.h>
-#include <geode/mesh/core/geode_point_set.h>
-#include <geode/mesh/core/geode_polygonal_surface.h>
-#include <geode/mesh/core/geode_polyhedral_solid.h>
-#include <geode/mesh/core/geode_regular_grid_solid.h>
-#include <geode/mesh/core/geode_regular_grid_surface.h>
-#include <geode/mesh/core/geode_tetrahedral_solid.h>
-#include <geode/mesh/core/geode_triangulated_surface.h>
-#include <geode/mesh/core/geode_vertex_set.h>
+#include <geode/mesh/core/geode/geode_edged_curve.h>
+#include <geode/mesh/core/geode/geode_graph.h>
+#include <geode/mesh/core/geode/geode_hybrid_solid.h>
+#include <geode/mesh/core/geode/geode_point_set.h>
+#include <geode/mesh/core/geode/geode_polygonal_surface.h>
+#include <geode/mesh/core/geode/geode_polyhedral_solid.h>
+#include <geode/mesh/core/geode/geode_regular_grid_solid.h>
+#include <geode/mesh/core/geode/geode_regular_grid_surface.h>
+#include <geode/mesh/core/geode/geode_tetrahedral_solid.h>
+#include <geode/mesh/core/geode/geode_triangulated_surface.h>
+#include <geode/mesh/core/geode/geode_vertex_set.h>
 #include <geode/mesh/core/mesh_factory.h>
 
 namespace geode
