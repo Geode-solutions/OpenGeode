@@ -8,6 +8,8 @@
 
 ### Breaking Changes
 
+- **AABB**: intersection functors now returns a boolean to indicate if the search should be stopped
+
 - **MeshHelpers**: `merge_surface_mesh` has been removed
 
 - **Point**: `inexact_equal` method only take the other Point as parameter

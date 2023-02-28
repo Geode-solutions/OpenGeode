@@ -99,14 +99,14 @@ namespace geode
             const ACTION& action ) const;
 
         template < typename ACTION >
-        void bbox_intersect_recursive( const BoundingBox< dimension >& box,
+        bool bbox_intersect_recursive( const BoundingBox< dimension >& box,
             index_t node_index,
             index_t element_begin,
             index_t element_end,
             ACTION& action ) const;
 
         template < typename ACTION >
-        void self_intersect_recursive( index_t node_index1,
+        bool self_intersect_recursive( index_t node_index1,
             index_t element_begin1,
             index_t element_end1,
             index_t node_index2,
@@ -115,7 +115,7 @@ namespace geode
             ACTION& action ) const;
 
         template < typename ACTION >
-        void other_intersect_recursive( index_t node_index1,
+        bool other_intersect_recursive( index_t node_index1,
             index_t element_begin1,
             index_t element_end1,
             const AABBTree< dimension >& other_tree,
@@ -125,7 +125,7 @@ namespace geode
             ACTION& action ) const;
 
         template < typename Line, typename ACTION >
-        void line_intersect_recursive( const Line& line,
+        bool line_intersect_recursive( const Line& line,
             index_t node_index,
             index_t element_begin,
             index_t element_end,
@@ -302,7 +302,7 @@ namespace geode
 
     template < index_t dimension >
     template < typename ACTION >
-    void AABBTree< dimension >::Impl::bbox_intersect_recursive(
+    bool AABBTree< dimension >::Impl::bbox_intersect_recursive(
         const BoundingBox< dimension >& box,
         index_t node_index,
         index_t element_begin,
@@ -316,26 +316,28 @@ namespace geode
         // Prune sub-tree that does not have intersection
         if( !box.intersects( node( node_index ) ) )
         {
-            return;
+            return false;
         }
 
         if( is_leaf( element_begin, element_end ) )
         {
-            action( mapping_morton( element_begin ) );
-            return;
+            return action( mapping_morton( element_begin ) );
         }
 
         const auto it =
             get_recursive_iterators( node_index, element_begin, element_end );
-        bbox_intersect_recursive(
-            box, it.child_left, element_begin, it.middle_box, action );
-        bbox_intersect_recursive(
+        if( bbox_intersect_recursive(
+                box, it.child_left, element_begin, it.middle_box, action ) )
+        {
+            return true;
+        }
+        return bbox_intersect_recursive(
             box, it.child_right, it.middle_box, element_end, action );
     }
 
     template < index_t dimension >
     template < typename ACTION >
-    void AABBTree< dimension >::Impl::self_intersect_recursive(
+    bool AABBTree< dimension >::Impl::self_intersect_recursive(
         index_t node_index1,
         index_t element_begin1,
         index_t element_end1,
@@ -355,13 +357,13 @@ namespace geode
         // node1's polygon index interval.
         if( element_end2 <= element_begin1 )
         {
-            return;
+            return false;
         }
 
         // The acceleration is here:
         if( !node( node_index1 ).intersects( node( node_index2 ) ) )
         {
-            return;
+            return false;
         }
 
         // Simple case: leaf - leaf intersection.
@@ -370,11 +372,10 @@ namespace geode
         {
             if( node_index1 == node_index2 )
             {
-                return;
+                return false;
             }
-            action( mapping_morton( element_begin1 ),
+            return action( mapping_morton( element_begin1 ),
                 mapping_morton( element_begin2 ) );
-            return;
         }
 
         // If node2 has more polygons than node1, then
@@ -385,27 +386,31 @@ namespace geode
         {
             const auto it = get_recursive_iterators(
                 node_index2, element_begin2, element_end2 );
-            self_intersect_recursive( node_index1, element_begin1, element_end1,
-                it.child_left, element_begin2, it.middle_box, action );
-            self_intersect_recursive( node_index1, element_begin1, element_end1,
-                it.child_right, it.middle_box, element_end2, action );
+            if( self_intersect_recursive( node_index1, element_begin1,
+                    element_end1, it.child_left, element_begin2, it.middle_box,
+                    action ) )
+            {
+                return true;
+            }
+            return self_intersect_recursive( node_index1, element_begin1,
+                element_end1, it.child_right, it.middle_box, element_end2,
+                action );
         }
-        else
-        {
-            const auto it = get_recursive_iterators(
-                node_index1, element_begin1, element_end1 );
-            self_intersect_recursive( it.child_left, element_begin1,
+        const auto it = get_recursive_iterators(
+            node_index1, element_begin1, element_end1 );
+        if( self_intersect_recursive( it.child_left, element_begin1,
                 it.middle_box, node_index2, element_begin2, element_end2,
-                action );
-            self_intersect_recursive( it.child_right, it.middle_box,
-                element_end1, node_index2, element_begin2, element_end2,
-                action );
+                action ) )
+        {
+            return true;
         }
+        return self_intersect_recursive( it.child_right, it.middle_box,
+            element_end1, node_index2, element_begin2, element_end2, action );
     }
 
     template < index_t dimension >
     template < typename ACTION >
-    void AABBTree< dimension >::Impl::other_intersect_recursive(
+    bool AABBTree< dimension >::Impl::other_intersect_recursive(
         index_t node_index1,
         index_t element_begin1,
         index_t element_end1,
@@ -424,16 +429,15 @@ namespace geode
         if( !node( node_index1 )
                  .intersects( other_tree.impl_->node( node_index2 ) ) )
         {
-            return;
+            return false;
         }
 
         // Simple case: leaf - leaf intersection.
         if( is_leaf( element_begin1, element_end1 )
             && is_leaf( element_begin2, element_end2 ) )
         {
-            action( mapping_morton( element_begin1 ),
+            return action( mapping_morton( element_begin1 ),
                 other_tree.impl_->mapping_morton( element_begin2 ) );
-            return;
         }
 
         // If node2 has more polygons than node1, then
@@ -444,29 +448,32 @@ namespace geode
         {
             const auto it = get_recursive_iterators(
                 node_index2, element_begin2, element_end2 );
-            other_intersect_recursive( node_index1, element_begin1,
-                element_end1, other_tree, it.child_left, element_begin2,
-                it.middle_box, action );
-            other_intersect_recursive( node_index1, element_begin1,
+            if( other_intersect_recursive( node_index1, element_begin1,
+                    element_end1, other_tree, it.child_left, element_begin2,
+                    it.middle_box, action ) )
+            {
+                return true;
+            }
+            return other_intersect_recursive( node_index1, element_begin1,
                 element_end1, other_tree, it.child_right, it.middle_box,
                 element_end2, action );
         }
-        else
-        {
-            const auto it = get_recursive_iterators(
-                node_index1, element_begin1, element_end1 );
-            other_intersect_recursive( it.child_left, element_begin1,
+        const auto it = get_recursive_iterators(
+            node_index1, element_begin1, element_end1 );
+        if( other_intersect_recursive( it.child_left, element_begin1,
                 it.middle_box, other_tree, node_index2, element_begin2,
-                element_end2, action );
-            other_intersect_recursive( it.child_right, it.middle_box,
-                element_end1, other_tree, node_index2, element_begin2,
-                element_end2, action );
+                element_end2, action ) )
+        {
+            return true;
         }
+        return other_intersect_recursive( it.child_right, it.middle_box,
+            element_end1, other_tree, node_index2, element_begin2, element_end2,
+            action );
     }
 
     template < index_t dimension >
     template < typename Line, typename ACTION >
-    void AABBTree< dimension >::Impl::line_intersect_recursive(
+    bool AABBTree< dimension >::Impl::line_intersect_recursive(
         const Line& line,
         index_t node_index,
         index_t element_begin,
@@ -480,20 +487,22 @@ namespace geode
         // Prune sub-tree that does not have intersection
         if( !node( node_index ).intersects( line ) )
         {
-            return;
+            return false;
         }
 
         if( is_leaf( element_begin, element_end ) )
         {
-            action( mapping_morton( element_begin ) );
-            return;
+            return action( mapping_morton( element_begin ) );
         }
 
         const auto it =
             get_recursive_iterators( node_index, element_begin, element_end );
-        line_intersect_recursive(
-            line, it.child_left, element_begin, it.middle_box, action );
-        line_intersect_recursive(
+        if( line_intersect_recursive(
+                line, it.child_left, element_begin, it.middle_box, action ) )
+        {
+            return true;
+        }
+        return line_intersect_recursive(
             line, it.child_right, it.middle_box, element_end, action );
     }
 } // namespace geode

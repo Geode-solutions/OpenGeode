@@ -172,9 +172,10 @@ public:
     }
     ~BoxAABBIntersection() = default;
 
-    void operator()( geode::index_t cur_box )
+    bool operator()( geode::index_t cur_box )
     {
         box_intersections_.emplace( cur_box );
+        return false;
     }
 
     // test box strict inclusion
@@ -184,7 +185,7 @@ public:
             bounding_boxes_[box1].contains( bounding_boxes_[box2].min() )
             && bounding_boxes_[box1].contains( bounding_boxes_[box2].max() ) );
     }
-    void operator()( geode::index_t box1, geode::index_t box2 )
+    bool operator()( geode::index_t box1, geode::index_t box2 )
     {
         if( box_contains_box( box1, box2 ) )
         {
@@ -194,6 +195,7 @@ public:
         {
             included_box_.emplace_back( box2, box1 );
         }
+        return false;
     }
 
 public:
@@ -276,9 +278,10 @@ public:
     {
     }
 
-    void operator()( geode::index_t cur_box )
+    bool operator()( geode::index_t cur_box )
     {
         box_intersections_.emplace( cur_box );
+        return false;
     }
 
 public:
@@ -425,9 +428,10 @@ template < geode::index_t dimension >
 class OtherAABBIntersection
 {
 public:
-    void operator()( geode::index_t box1, geode::index_t box2 )
+    bool operator()( geode::index_t box1, geode::index_t box2 )
     {
         included_box_.push_back( { box1, box2 } );
+        return false;
     }
 
 public:
