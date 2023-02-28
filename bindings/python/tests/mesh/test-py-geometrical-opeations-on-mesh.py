@@ -48,15 +48,15 @@ def create_surface():
 def test_rescale(surface):
     builder = mesh.TriangulatedSurfaceBuilder3D.create(surface)
     mesh.rescale_triangulated_surface3D(surface, builder, [2, -2, 0.1])
-    if not surface.point(0).inexact_equal(geom.Point3D([0.2, -0.4, 0.03]), 1e-6):
+    if not surface.point(0).inexact_equal(geom.Point3D([0.2, -0.4, 0.03])):
         raise ValueError("[Test] Wrong rescale of vertex 0")
-    if not surface.point(1).inexact_equal(geom.Point3D([4.2, -18.8, 0.67]), 1e-6):
+    if not surface.point(1).inexact_equal(geom.Point3D([4.2, -18.8, 0.67])):
         raise ValueError("[Test] Wrong rescale of vertex 1")
-    if not surface.point(2).inexact_equal(geom.Point3D([15.0, -10.4, 0.63]), 1e-6):
+    if not surface.point(2).inexact_equal(geom.Point3D([15.0, -10.4, 0.63])):
         raise ValueError("[Test] Wrong rescale of vertex 2")
-    if not surface.point(3).inexact_equal(geom.Point3D([16.2, -2.8, 0.47]), 1e-6):
+    if not surface.point(3).inexact_equal(geom.Point3D([16.2, -2.8, 0.47])):
         raise ValueError("[Test] Wrong rescale of vertex 3")
-    if not surface.point(4).inexact_equal(geom.Point3D([9.4, -4.2, 0.13]), 1e-6):
+    if not surface.point(4).inexact_equal(geom.Point3D([9.4, -4.2, 0.13])):
         raise ValueError("[Test] Wrong rescale of vertex 4")
 
 
@@ -64,15 +64,15 @@ def test_translate(surface):
     builder = mesh.TriangulatedSurfaceBuilder3D.create(surface)
     mesh.translate_triangulated_surface3D(
         surface, builder, geom.Vector3D([2, -2, 1]))
-    if not surface.point(0).inexact_equal(geom.Point3D([2.1, -1.8, 1.3]), 1e-6):
+    if not surface.point(0).inexact_equal(geom.Point3D([2.1, -1.8, 1.3])):
         raise ValueError("[Test] Wrong translation of vertex 0")
-    if not surface.point(1).inexact_equal(geom.Point3D([4.1, 7.4, 7.7]), 1e-6):
+    if not surface.point(1).inexact_equal(geom.Point3D([4.1, 7.4, 7.7])):
         raise ValueError("[Test] Wrong translation of vertex 1")
-    if not surface.point(2).inexact_equal(geom.Point3D([9.5, 3.2, 7.3]), 1e-6):
+    if not surface.point(2).inexact_equal(geom.Point3D([9.5, 3.2, 7.3])):
         raise ValueError("[Test] Wrong translation of vertex 2")
-    if not surface.point(3).inexact_equal(geom.Point3D([10.1, -0.6, 5.7]), 1e-6):
+    if not surface.point(3).inexact_equal(geom.Point3D([10.1, -0.6, 5.7])):
         raise ValueError("[Test] Wrong translation of vertex 3")
-    if not surface.point(4).inexact_equal(geom.Point3D([6.7, 0.1, 2.3]), 1e-6):
+    if not surface.point(4).inexact_equal(geom.Point3D([6.7, 0.1, 2.3])):
         raise ValueError("[Test] Wrong translation of vertex 4")
 
 

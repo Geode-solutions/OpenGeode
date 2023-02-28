@@ -113,7 +113,7 @@ namespace
             const auto proj =
                 longest_edge.vertices()[0].get() * bary_coord[0]
                 + longest_edge.vertices()[1].get() * bary_coord[1];
-            if( opposite.inexact_equal( proj, geode::global_epsilon ) )
+            if( opposite.inexact_equal( proj ) )
             {
                 return absl::nullopt;
             }
