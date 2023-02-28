@@ -24,6 +24,7 @@
 #pragma once
 
 #include <absl/types/optional.h>
+#include <absl/types/span.h>
 
 #include <geode/mesh/common.h>
 
@@ -82,12 +83,8 @@ namespace geode
             const TriangulatedSurface3D& surface3d, index_t axis_to_remove );
 
     template < index_t dimension >
-    std::unique_ptr< SurfaceMesh< dimension > > merge_surface_mesh(
-        const SurfaceMesh< dimension >& surface );
-
-    template < index_t dimension >
     std::unique_ptr< SurfaceMesh< dimension > > merge_surface_meshes(
-        const std::vector<
-            std::reference_wrapper< const SurfaceMesh< dimension > > >&
+        absl::Span<
+            const std::reference_wrapper< const SurfaceMesh< dimension > > >
             surfaces );
 } // namespace geode

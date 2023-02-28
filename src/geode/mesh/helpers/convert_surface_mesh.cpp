@@ -249,16 +249,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::unique_ptr< SurfaceMesh< dimension > > merge_surface_mesh(
-        const SurfaceMesh< dimension >& surface )
-    {
-        return merge_surface_meshes< dimension >( { surface } );
-    }
-
-    template < index_t dimension >
     std::unique_ptr< SurfaceMesh< dimension > > merge_surface_meshes(
-        const std::vector<
-            std::reference_wrapper< const SurfaceMesh< dimension > > >&
+        absl::Span<
+            const std::reference_wrapper< const SurfaceMesh< dimension > > >
             surfaces )
     {
         detail::SurfaceMeshMerger< dimension > merger{ surfaces,
@@ -282,14 +275,9 @@ namespace geode
         const SurfaceMesh3D&, SurfaceMeshBuilder3D& );
 
     template std::unique_ptr< SurfaceMesh< 2 > >
-        opengeode_mesh_api merge_surface_mesh( const SurfaceMesh< 2 >& );
+        opengeode_mesh_api merge_surface_meshes( absl::Span<
+            const std::reference_wrapper< const SurfaceMesh< 2 > > > );
     template std::unique_ptr< SurfaceMesh< 3 > >
-        opengeode_mesh_api merge_surface_mesh( const SurfaceMesh< 3 >& );
-
-    template std::unique_ptr< SurfaceMesh< 2 > >
-        opengeode_mesh_api merge_surface_meshes( const std::vector<
-            std::reference_wrapper< const SurfaceMesh< 2 > > >& );
-    template std::unique_ptr< SurfaceMesh< 3 > >
-        opengeode_mesh_api merge_surface_meshes( const std::vector<
-            std::reference_wrapper< const SurfaceMesh< 3 > > >& );
+        opengeode_mesh_api merge_surface_meshes( absl::Span<
+            const std::reference_wrapper< const SurfaceMesh< 3 > > > );
 } // namespace geode
