@@ -879,16 +879,15 @@ namespace geode
         if( center_to_projected_point.length() < global_epsilon )
         {
             Vector3D other_direction{ { 1.0, 0.0, 0.0 } };
-            if( circle.plane().normal().inexact_equal(
-                    other_direction, global_epsilon )
-                || circle.plane().normal().inexact_equal( other_direction * -1.,
-                    global_epsilon ) ) // dummy_direction is aligned along plane
-                                       // normal
+            if( circle.plane().normal().inexact_equal( other_direction )
+                || circle.plane().normal().inexact_equal(
+                    other_direction * -1. ) ) // dummy_direction is aligned
+                                              // along plane normal
             {
                 other_direction.set_value( 1, 1.0 );
             }
-            OPENGEODE_ASSERT( !circle.plane().normal().inexact_equal(
-                                  other_direction, global_epsilon ),
+            OPENGEODE_ASSERT(
+                !circle.plane().normal().inexact_equal( other_direction ),
                 "[point_circle_distance] Problem while getting circle nearest "
                 "point" );
             const Vector3D other_projected_on_plane =

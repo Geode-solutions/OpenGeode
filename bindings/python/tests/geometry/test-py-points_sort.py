@@ -51,21 +51,5 @@ def test_lexicographic_mapping():
             raise ValueError("[Test] Wrong result in lexicographic sort")
 
 
-def test_comparison():
-    p = geom.Point3D([2, 1.0, 2.6])
-    p2 = p
-    if p != p2:
-        raise ValueError("[Test] Points should be equal")
-
-    P = geom.Point2D([15, 2.6])
-    P2 = geom.Point2D([16, 2.6])
-    if P == P2:
-        raise ValueError("[Test] Points should be different")
-
-    p_epsilon = geom.Point3D([2.0000000001, 1, 2.6])
-    if not p.inexact_equal(p_epsilon, 0.0001):
-        raise ValueError("[Test] Points should be almost equal")
-
-
 if __name__ == '__main__':
     test_lexicographic_mapping()

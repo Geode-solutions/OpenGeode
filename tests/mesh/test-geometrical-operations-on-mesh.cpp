@@ -49,20 +49,20 @@ void test_rescale( geode::TriangulatedSurface3D& surface )
 {
     auto builder = geode::TriangulatedSurfaceBuilder3D::create( surface );
     geode::rescale_mesh( surface, *builder, { 2, -2, 0.1 } );
-    OPENGEODE_EXCEPTION( surface.point( 0 ).inexact_equal(
-                             { { 0.2, -0.4, 0.03 } }, geode::global_epsilon ),
+    OPENGEODE_EXCEPTION(
+        surface.point( 0 ).inexact_equal( { { 0.2, -0.4, 0.03 } } ),
         "[Test] Wrong rescale of vertex 0" );
-    OPENGEODE_EXCEPTION( surface.point( 1 ).inexact_equal(
-                             { { 4.2, -18.8, 0.67 } }, geode::global_epsilon ),
+    OPENGEODE_EXCEPTION(
+        surface.point( 1 ).inexact_equal( { { 4.2, -18.8, 0.67 } } ),
         "[Test] Wrong rescale of vertex 1" );
-    OPENGEODE_EXCEPTION( surface.point( 2 ).inexact_equal(
-                             { { 15.0, -10.4, 0.63 } }, geode::global_epsilon ),
+    OPENGEODE_EXCEPTION(
+        surface.point( 2 ).inexact_equal( { { 15.0, -10.4, 0.63 } } ),
         "[Test] Wrong rescale of vertex 2" );
-    OPENGEODE_EXCEPTION( surface.point( 3 ).inexact_equal(
-                             { { 16.2, -2.8, 0.47 } }, geode::global_epsilon ),
+    OPENGEODE_EXCEPTION(
+        surface.point( 3 ).inexact_equal( { { 16.2, -2.8, 0.47 } } ),
         "[Test] Wrong rescale of vertex 3" );
-    OPENGEODE_EXCEPTION( surface.point( 4 ).inexact_equal(
-                             { { 9.4, -4.2, 0.13 } }, geode::global_epsilon ),
+    OPENGEODE_EXCEPTION(
+        surface.point( 4 ).inexact_equal( { { 9.4, -4.2, 0.13 } } ),
         "[Test] Wrong rescale of vertex 4" );
 }
 
@@ -70,20 +70,20 @@ void test_translate( geode::TriangulatedSurface3D& surface )
 {
     auto builder = geode::TriangulatedSurfaceBuilder3D::create( surface );
     geode::translate_mesh( surface, *builder, { { 2, -2, 1 } } );
-    OPENGEODE_EXCEPTION( surface.point( 0 ).inexact_equal(
-                             { { 2.1, -1.8, 1.3 } }, geode::global_epsilon ),
+    OPENGEODE_EXCEPTION(
+        surface.point( 0 ).inexact_equal( { { 2.1, -1.8, 1.3 } } ),
         "[Test] Wrong translation of vertex 0" );
-    OPENGEODE_EXCEPTION( surface.point( 1 ).inexact_equal(
-                             { { 4.1, 7.4, 7.7 } }, geode::global_epsilon ),
+    OPENGEODE_EXCEPTION(
+        surface.point( 1 ).inexact_equal( { { 4.1, 7.4, 7.7 } } ),
         "[Test] Wrong translation of vertex 1" );
-    OPENGEODE_EXCEPTION( surface.point( 2 ).inexact_equal(
-                             { { 9.5, 3.2, 7.3 } }, geode::global_epsilon ),
+    OPENGEODE_EXCEPTION(
+        surface.point( 2 ).inexact_equal( { { 9.5, 3.2, 7.3 } } ),
         "[Test] Wrong translation of vertex 2" );
-    OPENGEODE_EXCEPTION( surface.point( 3 ).inexact_equal(
-                             { { 10.1, -0.6, 5.7 } }, geode::global_epsilon ),
+    OPENGEODE_EXCEPTION(
+        surface.point( 3 ).inexact_equal( { { 10.1, -0.6, 5.7 } } ),
         "[Test] Wrong translation of vertex 3" );
-    OPENGEODE_EXCEPTION( surface.point( 4 ).inexact_equal(
-                             { { 6.7, 0.1, 2.3 } }, geode::global_epsilon ),
+    OPENGEODE_EXCEPTION(
+        surface.point( 4 ).inexact_equal( { { 6.7, 0.1, 2.3 } } ),
         "[Test] Wrong translation of vertex 4" );
 }
 

@@ -88,50 +88,43 @@ void point_segment_projection_3d()
     geode::Point3D closest_point;
 
     closest_point = geode::point_segment_projection( b, tiny_segment3D );
-    OPENGEODE_EXCEPTION(
-        closest_point.inexact_equal( a, geode::global_epsilon ),
+    OPENGEODE_EXCEPTION( closest_point.inexact_equal( a ),
         "[Test] Wrong result for point_segment_projection with query Point3D "
         "b and tiny_segment" );
 
     closest_point = geode::point_segment_projection( a, segment3D );
-    OPENGEODE_EXCEPTION(
-        closest_point.inexact_equal( a, geode::global_epsilon ),
+    OPENGEODE_EXCEPTION( closest_point.inexact_equal( a ),
         "[Test] Wrong result for point_segment_projection with query Point3D "
         "a" );
 
     closest_point = geode::point_segment_projection( b, segment3D );
-    OPENGEODE_EXCEPTION(
-        closest_point.inexact_equal( b, geode::global_epsilon ),
+    OPENGEODE_EXCEPTION( closest_point.inexact_equal( b ),
         "[Test] Wrong result for point_segment_projection with query Point3D "
         "b" );
 
     const geode::Point3D q1{ { 0.0, 0.0, 0.0 } };
     closest_point = geode::point_segment_projection( q1, segment3D );
-    OPENGEODE_EXCEPTION(
-        closest_point.inexact_equal( q1, geode::global_epsilon ),
+    OPENGEODE_EXCEPTION( closest_point.inexact_equal( q1 ),
         "[Test] Wrong result for point_segment_projection with query Point3D "
         "q1" );
 
     const geode::Point3D q2{ { 10.0, 10.0, 10.0 } };
     closest_point = geode::point_segment_projection( q2, segment3D );
-    OPENGEODE_EXCEPTION(
-        closest_point.inexact_equal( a, geode::global_epsilon ),
+    OPENGEODE_EXCEPTION( closest_point.inexact_equal( a ),
         "[Test] Wrong result for point_segment_projection with query Point3D "
         "q2" );
 
     const geode::Point3D q3{ { 5.0, -1.0, 0.0 } };
     closest_point = geode::point_segment_projection( q3, segment3D );
     const geode::Point3D result_q3{ { 0.0, 0.0, 0.0 } };
-    OPENGEODE_EXCEPTION(
-        closest_point.inexact_equal( result_q3, geode::global_epsilon ),
+    OPENGEODE_EXCEPTION( closest_point.inexact_equal( result_q3 ),
         "[Test] Wrong result for point_segment_projection with query Point3D "
         "q3" );
 
     const geode::Point3D q4{ { 5.5, 1.5, 0.25 } };
     closest_point = geode::point_segment_projection( q4, segment3D );
     const geode::Point3D result_q4{ { 0.45, 2.25, 0.9 } };
-    OPENGEODE_EXCEPTION(
-        closest_point.inexact_equal( result_q4, geode::global_epsilon ),
+    OPENGEODE_EXCEPTION( closest_point.inexact_equal( result_q4 ),
         "[Test] Wrong result for point_segment_projection with query Point3D "
         "q4" );
 }
@@ -144,8 +137,7 @@ void point_triangle_projection_3d()
     const geode::Triangle3D triangle{ a, b, c };
 
     const auto closest_point = geode::point_triangle_projection( a, triangle );
-    OPENGEODE_EXCEPTION(
-        closest_point.inexact_equal( a, geode::global_epsilon ),
+    OPENGEODE_EXCEPTION( closest_point.inexact_equal( a ),
         "[Test] Wrong result for point_triangle_projection with query Point3D "
         "a" );
 }
@@ -159,8 +151,7 @@ void point_plane_projection()
 
     const auto closest_point = geode::point_plane_projection( a, plane );
     const geode::Point3D answer{ { 1.0, 5.0, 0.0 } };
-    OPENGEODE_EXCEPTION(
-        closest_point.inexact_equal( answer, geode::global_epsilon ),
+    OPENGEODE_EXCEPTION( closest_point.inexact_equal( answer ),
         "[Test] Wrong result for point_plane_projection with query Point3D a" );
 }
 

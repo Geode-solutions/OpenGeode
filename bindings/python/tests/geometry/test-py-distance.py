@@ -91,7 +91,7 @@ def test_segment_segment_distance():
         segment_ab, segment_cd)
     r00 = geom.Point3D([1.0, 1.0, 0.0])
     r01 = geom.Point3D([1.0, 1.0, 1.0])
-    if abs(distance - 1 ) > og.global_epsilon or not closest_point0.inexact_equal(r00, og.global_epsilon ) or not closest_point1.inexact_equal(r01, og.global_epsilon ):
+    if abs(distance - 1) > og.global_epsilon or not closest_point0.inexact_equal(r00) or not closest_point1.inexact_equal(r01):
         raise ValueError(
             "[Test] Wrong result for segment_segment_distance3D with query segment_ab and segment_cd")
 
@@ -99,13 +99,13 @@ def test_segment_segment_distance():
         segment_ab, segment_ef)
     r00 = geom.Point3D([0.0, 0.0, 0.0])
     r01 = geom.Point3D([0.0, 0.0, 1.0])
-    if abs(distance - 1 ) > og.global_epsilon or not closest_point0.inexact_equal(r00, og.global_epsilon ) or not closest_point1.inexact_equal(r01, og.global_epsilon ):
+    if abs(distance - 1) > og.global_epsilon or not closest_point0.inexact_equal(r00) or not closest_point1.inexact_equal(r01):
         raise ValueError(
             "[Test] Wrong result for segment_segment_distance3D with query segment_ab and segment_ef")
 
     distance, closest_point0, closest_point1 = geom.segment_segment_distance3D(
         segment_cd, segment_gh)
-    if abs(distance - 1 ) > og.global_epsilon or not closest_point0.inexact_equal(d, og.global_epsilon ) or not closest_point1.inexact_equal(g, og.global_epsilon ):
+    if abs(distance - 1) > og.global_epsilon or not closest_point0.inexact_equal(d) or not closest_point1.inexact_equal(g):
         raise ValueError(
             "[Test] Wrong result for segment_segment_distance3D with query segment_cd and segment_gh")
 

@@ -124,15 +124,20 @@ namespace geode
             detail::coords_substract_equal( *this, other );
         }
 
-        bool inexact_equal( const Point &other, double epsilon ) const
+        bool inexact_equal( const Point &other ) const
         {
             double square_length{ 0 };
+            static constexpr auto sqr_epsilon = global_epsilon * global_epsilon;
             for( const auto i : LRange{ dimension } )
             {
                 const double diff{ other.value( i ) - this->value( i ) };
                 square_length += diff * diff;
+                if( square_length > sqr_epsilon )
+                {
+                    return false;
+                }
             }
-            return square_length < epsilon * epsilon;
+            return true;
         }
 
         std::string string() const

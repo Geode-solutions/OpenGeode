@@ -161,27 +161,27 @@ void test_point_function()
     geode::Point3D point{ { 2.6, 4.1, 11.2 } };
     auto cell_indices = grid->cells( point );
     OPENGEODE_EXCEPTION( point_function.value( point, cell_indices[0] )
-                             .inexact_equal( { { 22, -3, -20 } }, 1e-7 ),
+                             .inexact_equal( { { 22, -3, -20 } } ),
         "[Test] Point function value 1 is wrong." );
     point = { { 1.5, 0, 1 } };
     cell_indices = grid->cells( point );
     OPENGEODE_EXCEPTION( point_function.value( point, cell_indices[0] )
-                             .inexact_equal( { { 26, 2, -10 } }, 1e-7 ),
+                             .inexact_equal( { { 26, 2, -10 } } ),
         "[Test] Point function value 2 is wrong." );
     point = { { 3, 4, 10 } };
     cell_indices = grid->cells( point );
     OPENGEODE_EXCEPTION( point_function.value( point, cell_indices[0] )
-                             .inexact_equal( { { 22, -3, -20 } }, 1e-7 ),
+                             .inexact_equal( { { 22, -3, -20 } } ),
         "[Test] Point function value 3 is wrong." );
     point = { { 3, 5, 8.5 } };
     cell_indices = grid->cells( point );
     OPENGEODE_EXCEPTION( point_function.value( point, cell_indices[0] )
-                             .inexact_equal( { { 24, -0.5, -15 } }, 1e-7 ),
+                             .inexact_equal( { { 24, -0.5, -15 } } ),
         "[Test] Point function value 4 is wrong." );
     point = { { 3.9, 7.4, 11.05 } };
     cell_indices = grid->cells( point );
     OPENGEODE_EXCEPTION( point_function.value( point, cell_indices[0] )
-                             .inexact_equal( { { 25.28, 1.1, -11.8 } }, 1e-7 ),
+                             .inexact_equal( { { 25.28, 1.1, -11.8 } } ),
         "[Test] Point function value 5 is wrong." );
 }
 

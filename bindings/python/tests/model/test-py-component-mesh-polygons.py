@@ -58,7 +58,7 @@ def run_test_brep():
                         raise ValueError("[Test] " + oriented_block_facets_vertices.nb_facets(
                         ) + " polyhedra were found from internal surface polygon.")
                 for polygon_vertex_id in range(len(block_facets_vertices[0].vertices)):
-                    if not surface_mesh.point(surface_mesh.polygon_vertex(mesh.PolygonVertex(polygon_id, polygon_vertex_id))).inexact_equal(block_mesh.point(block_facets_vertices[0].vertices[polygon_vertex_id]), 1e-7):
+                    if not surface_mesh.point(surface_mesh.polygon_vertex(mesh.PolygonVertex(polygon_id, polygon_vertex_id))).inexact_equal(block_mesh.point(block_facets_vertices[0].vertices[polygon_vertex_id])):
                         raise ValueError(
                             "[Test] Point on the edge and on the surface have different positions.")
 
@@ -85,7 +85,7 @@ def run_test_brep():
                         raise ValueError(
                             "[Test] " + len(surface_edge_vertices) + " polygons were found from internal line edge.")
                 for edge_vertex_id in range(2):
-                    if not line_mesh.point(line_mesh.edge_vertex(mesh.EdgeVertex(edge_id, edge_vertex_id))).inexact_equal(surface_mesh.point(surface_edge_vertices[0].vertices[edge_vertex_id]), 1e-7):
+                    if not line_mesh.point(line_mesh.edge_vertex(mesh.EdgeVertex(edge_id, edge_vertex_id))).inexact_equal(surface_mesh.point(surface_edge_vertices[0].vertices[edge_vertex_id])):
                         raise ValueError(
                             "[Test] Point on the edge and on the surface have different positions.")
 

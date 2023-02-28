@@ -41,7 +41,7 @@ def test_comparison():
         raise ValueError("[Test] Points should be different")
 
     p_epsilon = geom.Point3D([2.0000000001, 1, 2.6])
-    if not p.inexact_equal(p_epsilon, 0.0001):
+    if not p.inexact_equal(p_epsilon):
         raise ValueError("[Test] Points should be almost equal")
 
 

@@ -236,7 +236,7 @@ void test_edge_requests( const geode::EdgedCurve3D& edged_curve,
     geode::EdgedCurveBuilder3D& builder )
 {
     OPENGEODE_EXCEPTION( edged_curve.edge_barycenter( 0 ).inexact_equal(
-                             geode::Point3D( { 4.8, 7.3, 6.5 } ), 1e-15 ),
+                             geode::Point3D( { 4.8, 7.3, 6.5 } ) ),
         "[Test] Edge barycenter is not correct" );
     const auto p0 = builder.create_point( { { 1, 1, 1 } } );
     const auto p1 = builder.create_point( { { 1, 4, -3 } } );

@@ -114,7 +114,7 @@ def test_io(edged_curve, filename):
 
 
 def test_edge_requests(edged_curve, builder):
-    if not edged_curve.edge_barycenter(0).inexact_equal(geom.Point3D([4.8, 7.3, 6.5]), 1e-15):
+    if not edged_curve.edge_barycenter(0).inexact_equal(geom.Point3D([4.8, 7.3, 6.5])):
         raise ValueError("[Test] Edge barycenter is not correct")
     p0 = builder.create_point(geom.Point3D([1, 1, 1]))
     p1 = builder.create_point(geom.Point3D([1, 4, -3]))
