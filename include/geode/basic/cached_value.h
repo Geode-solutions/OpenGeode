@@ -80,11 +80,11 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, DefaultGrowable< Archive, CachedValue >{},
-                []( Archive& a, CachedValue& value ) {
-                    a.value1b( value.computed_ );
-                    a( value.value_ );
-                } );
+            archive.ext( *this, Growable< Archive, CachedValue >{
+                                    { []( Archive& a, CachedValue& value ) {
+                                        a.value1b( value.computed_ );
+                                        a( value.value_ );
+                                    } } } );
         }
 
     private:

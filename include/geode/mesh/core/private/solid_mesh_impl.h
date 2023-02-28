@@ -55,12 +55,12 @@ namespace geode
             void serialize( Archive& archive )
             {
                 archive.ext( *this,
-                    DefaultGrowable< Archive, PolyhedraAroundVertexImpl >{},
-                    []( Archive& a, PolyhedraAroundVertexImpl& value ) {
-                        a.container(
-                            value.polyhedra, value.polyhedra.max_size() );
-                        a.value1b( value.vertex_is_on_border );
-                    } );
+                    Growable< Archive, PolyhedraAroundVertexImpl >{
+                        { []( Archive& a, PolyhedraAroundVertexImpl& value ) {
+                            a.container(
+                                value.polyhedra, value.polyhedra.max_size() );
+                            a.value1b( value.vertex_is_on_border );
+                        } } } );
             }
 
             PolyhedraAroundVertex polyhedra;

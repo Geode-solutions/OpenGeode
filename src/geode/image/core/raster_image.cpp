@@ -62,12 +62,12 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& a, Impl& impl ) {
+            archive.ext( *this,
+                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
                     a.ext( impl, bitsery::ext::BaseClass<
                                      detail::ArrayImpl< dimension > >{} );
                     a.container( impl.colors_, impl.colors_.max_size() );
-                } );
+                } } } );
         }
 
     private:
@@ -138,12 +138,13 @@ namespace geode
     template < typename Archive >
     void RasterImage< dimension >::serialize( Archive& archive )
     {
-        archive.ext( *this, DefaultGrowable< Archive, RasterImage >{},
-            []( Archive& a, RasterImage& raster ) {
-                a.ext( raster,
-                    bitsery::ext::BaseClass< CellArray< dimension > >{} );
-                a.object( raster.impl_ );
-            } );
+        archive.ext( *this,
+            Growable< Archive, RasterImage >{
+                { []( Archive& a, RasterImage& raster ) {
+                    a.ext( raster,
+                        bitsery::ext::BaseClass< CellArray< dimension > >{} );
+                    a.object( raster.impl_ );
+                } } } );
     }
 
     template class opengeode_image_api RasterImage< 1 >;

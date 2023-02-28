@@ -80,10 +80,11 @@ namespace geode
             template < typename Archive >
             void serialize( Archive& archive )
             {
-                archive.ext( *this, DefaultGrowable< Archive, EdgesImpl >{},
-                    []( Archive& a, EdgesImpl& impl ) {
-                        a.ext( impl.edges_, bitsery::ext::StdSmartPtr{} );
-                    } );
+                archive.ext( *this, Growable< Archive, EdgesImpl >{
+                                        { []( Archive& a, EdgesImpl& impl ) {
+                                            a.ext( impl.edges_,
+                                                bitsery::ext::StdSmartPtr{} );
+                                        } } } );
             }
 
         private:

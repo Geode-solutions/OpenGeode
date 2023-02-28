@@ -175,16 +175,17 @@ namespace geode
             void serialize( Archive& archive )
             {
                 archive.ext( *this,
-                    DefaultGrowable< Archive, ComponentsStorage >{},
-                    []( Archive& a, ComponentsStorage& storage ) {
-                        a.ext( storage.components_,
-                            bitsery::ext::StdMap{
-                                storage.components_.max_size() },
-                            []( Archive& a2, uuid& id, ComponentPtr& item ) {
-                                a2.object( id );
-                                a2.ext( item, bitsery::ext::StdSmartPtr{} );
-                            } );
-                    } );
+                    Growable< Archive, ComponentsStorage >{
+                        { []( Archive& a, ComponentsStorage& storage ) {
+                            a.ext( storage.components_,
+                                bitsery::ext::StdMap{
+                                    storage.components_.max_size() },
+                                []( Archive& a2, uuid& id,
+                                    ComponentPtr& item ) {
+                                    a2.object( id );
+                                    a2.ext( item, bitsery::ext::StdSmartPtr{} );
+                                } );
+                        } } } );
             }
 
         private:

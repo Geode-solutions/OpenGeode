@@ -384,11 +384,12 @@ namespace geode
     template < typename Archive >
     void TetrahedralSolid< dimension >::serialize( Archive& archive )
     {
-        archive.ext( *this, DefaultGrowable< Archive, TetrahedralSolid >{},
-            []( Archive& a, TetrahedralSolid& tetrahedral_solid ) {
-                a.ext( tetrahedral_solid,
-                    bitsery::ext::BaseClass< SolidMesh< dimension > >{} );
-            } );
+        archive.ext( *this,
+            Growable< Archive, TetrahedralSolid >{
+                { []( Archive& a, TetrahedralSolid& tetrahedral_solid ) {
+                    a.ext( tetrahedral_solid,
+                        bitsery::ext::BaseClass< SolidMesh< dimension > >{} );
+                } } } );
     }
 
     template class opengeode_mesh_api TetrahedralSolid< 3 >;

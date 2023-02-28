@@ -91,13 +91,13 @@ namespace geode
             void serialize( Archive& archive )
             {
                 archive.ext( *this,
-                    DefaultGrowable< Archive, RelationshipsImpl >{},
-                    []( Archive& a, RelationshipsImpl& impl ) {
-                        a.ext( impl.graph_, bitsery::ext::StdSmartPtr{} );
-                        a.object( impl.uuid2index_ );
-                        a.ext( impl.ids_, bitsery::ext::StdSmartPtr{} );
-                        impl.delete_isolated_vertices();
-                    } );
+                    Growable< Archive, RelationshipsImpl >{
+                        { []( Archive& a, RelationshipsImpl& impl ) {
+                            a.ext( impl.graph_, bitsery::ext::StdSmartPtr{} );
+                            a.object( impl.uuid2index_ );
+                            a.ext( impl.ids_, bitsery::ext::StdSmartPtr{} );
+                            impl.delete_isolated_vertices();
+                        } } } );
             }
 
             index_t register_component( const ComponentID& id );

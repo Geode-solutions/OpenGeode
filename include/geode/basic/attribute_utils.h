@@ -49,12 +49,12 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this,
-                DefaultGrowable< Archive, AttributeProperties >{},
-                []( Archive& a, AttributeProperties& properties ) {
-                    a.value1b( properties.assignable );
-                    a.value1b( properties.interpolable );
-                } );
+            archive.ext(
+                *this, Growable< Archive, AttributeProperties >{
+                           { []( Archive& a, AttributeProperties& properties ) {
+                               a.value1b( properties.assignable );
+                               a.value1b( properties.interpolable );
+                           } } } );
         }
 
         bool assignable{ true };

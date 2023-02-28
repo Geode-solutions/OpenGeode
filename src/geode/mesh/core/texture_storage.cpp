@@ -94,8 +94,8 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& a, Impl& impl ) {
+            archive.ext( *this,
+                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
                     a.ext( impl.textures_,
                         bitsery::ext::StdMap{ impl.textures_.max_size() },
                         []( Archive& a2, std::string& name,
@@ -103,7 +103,7 @@ namespace geode
                             a2.text1b( name, name.max_size() );
                             a2.object( texture );
                         } );
-                } );
+                } } } );
         }
 
     private:
@@ -171,10 +171,10 @@ namespace geode
     template < typename Archive >
     void TextureStorage< dimension >::serialize( Archive& archive )
     {
-        archive.ext( *this, DefaultGrowable< Archive, TextureStorage >{},
-            []( Archive& a, TextureStorage& manager ) {
-                a.object( manager.impl_ );
-            } );
+        archive.ext( *this, Growable< Archive, TextureStorage >{
+                                { []( Archive& a, TextureStorage& manager ) {
+                                    a.object( manager.impl_ );
+                                } } } );
     }
 
     template class opengeode_mesh_api TextureStorage< 1 >;

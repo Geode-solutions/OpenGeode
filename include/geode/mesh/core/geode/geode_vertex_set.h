@@ -73,11 +73,12 @@ namespace geode
         template < typename Archive >
         void serialize( Archive &archive )
         {
-            archive.ext( *this,
-                DefaultGrowable< Archive, OpenGeodeVertexSet >{},
-                []( Archive &a, OpenGeodeVertexSet &vertex_set ) {
-                    a.ext( vertex_set, bitsery::ext::BaseClass< VertexSet >{} );
-                } );
+            archive.ext(
+                *this, Growable< Archive, OpenGeodeVertexSet >{
+                           { []( Archive &a, OpenGeodeVertexSet &vertex_set ) {
+                               a.ext( vertex_set,
+                                   bitsery::ext::BaseClass< VertexSet >{} );
+                           } } } );
         }
     };
 } // namespace geode

@@ -56,11 +56,13 @@ namespace geode
     template < typename Archive >
     void RegularGrid< 2 >::serialize( Archive& archive )
     {
-        archive.ext( *this, DefaultGrowable< Archive, RegularGrid< 2 > >{},
-            []( Archive& a, RegularGrid< 2 >& grid ) {
-                a.ext( grid, bitsery::ext::BaseClass< SurfaceMesh< 2 > >{} );
-                a.ext( grid, bitsery::ext::BaseClass< Grid< 2 > >{} );
-            } );
+        archive.ext( *this,
+            Growable< Archive, RegularGrid< 2 > >{
+                { []( Archive& a, RegularGrid< 2 >& grid ) {
+                    a.ext(
+                        grid, bitsery::ext::BaseClass< SurfaceMesh< 2 > >{} );
+                    a.ext( grid, bitsery::ext::BaseClass< Grid< 2 > >{} );
+                } } } );
     }
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, RegularGrid< 2 > );

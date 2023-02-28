@@ -59,11 +59,12 @@ namespace geode
     template < typename Archive >
     void HybridSolid< dimension >::serialize( Archive& archive )
     {
-        archive.ext( *this, DefaultGrowable< Archive, HybridSolid >{},
-            []( Archive& a, HybridSolid& hybrid_solid ) {
-                a.ext( hybrid_solid,
-                    bitsery::ext::BaseClass< SolidMesh< dimension > >{} );
-            } );
+        archive.ext( *this,
+            Growable< Archive, HybridSolid >{
+                { []( Archive& a, HybridSolid& hybrid_solid ) {
+                    a.ext( hybrid_solid,
+                        bitsery::ext::BaseClass< SolidMesh< dimension > >{} );
+                } } } );
     }
 
     template class opengeode_mesh_api HybridSolid< 3 >;

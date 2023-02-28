@@ -153,10 +153,10 @@ namespace geode
         template < typename Archive >
         void serialize( Archive &archive )
         {
-            archive.ext( *this, DefaultGrowable< Archive, Point >{},
-                []( Archive &a, Point &point ) {
+            archive.ext( *this,
+                Growable< Archive, Point >{ { []( Archive &a, Point &point ) {
                     a.container8b( point.values_ );
-                } );
+                } } } );
         }
 
     private:
