@@ -68,6 +68,7 @@ endif()
 set(CMAKE_MACOSX_RPATH ON)
 set(CMAKE_INSTALL_RPATH "${OS_RPATH}")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
+set(CMAKE_SKIP_INSTALL_ALL_DEPENDENCY ON)
 set(CMAKE_BUILD_RPATH_USE_ORIGIN ON)
 
 set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
@@ -135,16 +136,20 @@ function(_export_library library_name)
         EXPORT ${library_name}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         COMPONENT public
+        ${ARGN}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         COMPONENT public
+        ${ARGN}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         COMPONENT public
+        ${ARGN}
     )
     install(EXPORT ${library_name}
         FILE ${PROJECT_NAME}_${library_name}_target.cmake
         NAMESPACE ${PROJECT_NAME}::
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
         COMPONENT public
+        ${ARGN}
     )
 endfunction()
 
@@ -311,6 +316,7 @@ function(add_geode_binary)
     install(TARGETS ${target_name}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         COMPONENT public
+        OPTIONAL
     )
 endfunction()
 
@@ -377,7 +383,7 @@ function(add_geode_python_binding)
             CXX_VISIBILITY_PRESET "default"
             FOLDER "Bindings/Python"
     )
-    _export_library(${GEODE_BINDING_NAME})
+    _export_library(${GEODE_BINDING_NAME} OPTIONAL)
 endfunction()
 
 function(add_geode_python_test)
