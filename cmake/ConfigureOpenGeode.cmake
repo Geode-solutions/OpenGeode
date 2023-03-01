@@ -63,14 +63,9 @@ ExternalProject_Add(opengeode
         ${bindings}
 )
 
+ExternalProject_Add_StepTargets(opengeode configure)
+
 add_custom_target(third_party
     DEPENDS
-        abseil
-        asyncplusplus
-        bitsery
-        ghcFilesystem
-        minizip
-        nanoflann
-        spdlog
-        ${bindings}
+        opengeode-configure
 )
