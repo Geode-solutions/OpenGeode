@@ -913,8 +913,7 @@ void test()
                              == corner_uuids.size() + line_uuids.size()
                                     + surface_uuids.size() - 3,
         "[Test] The Block should embed all Corners & Lines & Surfaces "
-        "(that are internal to the "
-        "Block)" );
+        "(that are internal to the Block)" );
     test_boundary_ranges(
         model, corner_uuids, line_uuids, surface_uuids, block_uuids );
     test_incidence_ranges(

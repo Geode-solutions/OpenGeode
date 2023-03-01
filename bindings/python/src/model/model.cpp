@@ -66,6 +66,7 @@
 #include "helpers/convert_model_meshes.h"
 #include "helpers/convert_to_mesh.h"
 #include "helpers/model_component_filter.h"
+#include "helpers/model_concatener.h"
 
 namespace pybind11
 {
@@ -173,4 +174,5 @@ PYBIND11_MODULE( opengeode_py_model, module )
     geode::define_convert_to_mesh( module );
     geode::define_component_mesh_polygons( module );
     geode::define_model_component_filter( module );
+    geode::define_model_concatener( module );
 }
