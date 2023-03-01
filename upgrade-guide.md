@@ -5,7 +5,7 @@
 ### Motivations
 
 This release introduces a new angular epsilon to increase robustness of computations such as triangle normal.
-These operations now return an optional of there previous return type.
+These operations now return an optional of their previous return type.
 
 The second important feature is the new Image library that introduces the `RasterImage` data model.
 
