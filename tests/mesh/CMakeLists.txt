@@ -106,6 +106,7 @@ add_geode_test(
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
         ${PROJECT_NAME}::mesh
+    ESSENTIAL
 )
 add_geode_test(
     SOURCE "test-mesh-factory.cpp"
@@ -133,6 +134,7 @@ add_geode_test(
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
         ${PROJECT_NAME}::mesh
+    ESSENTIAL
 )
 add_geode_test(
     SOURCE "test-polyhedral-solid.cpp"
@@ -146,6 +148,7 @@ add_geode_test(
     DEPENDENCIES
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::mesh
+    ESSENTIAL
 )
 add_geode_test(
     SOURCE "test-ray-tracing.cpp"

@@ -63,3 +63,9 @@ ExternalProject_Add(opengeode
         ${bindings}
 )
 
+ExternalProject_Add_StepTargets(opengeode configure)
+
+add_custom_target(third_party
+    DEPENDS
+        opengeode-configure
+)

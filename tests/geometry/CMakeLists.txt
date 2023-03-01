@@ -59,12 +59,14 @@ add_geode_test(
     DEPENDENCIES
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
+    ESSENTIAL
 )
 add_geode_test(
     SOURCE "test-intersection-detection.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::geometry
+    ESSENTIAL
 )
 add_geode_test(
     SOURCE "test-mensuration.cpp"

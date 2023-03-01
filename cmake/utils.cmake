@@ -123,6 +123,9 @@ if(DOXYGEN_FOUND AND EXISTS ${PROJECT_SOURCE_DIR}/cmake/Doxyfile.in)
         VERBATIM )
 endif()
 
+add_custom_target(third_party)
+add_custom_target(essential)
+
 function(_export_library library_name)
     export(TARGETS ${library_name}
         NAMESPACE ${PROJECT_NAME}::
@@ -188,6 +191,7 @@ function(add_geode_library)
         )
     endif()
     add_library(${PROJECT_NAME}::${GEODE_LIB_NAME} ALIAS ${GEODE_LIB_NAME})
+    add_dependencies(essential ${GEODE_LIB_NAME})
     string(TOLOWER ${PROJECT_NAME} project-name)
     string(REGEX REPLACE "-" "_" project_name ${project-name})
     set_target_properties(${GEODE_LIB_NAME}
@@ -330,13 +334,16 @@ endfunction()
 option(USE_BENCHMARK "Toggle benchmarking of tests" OFF)
 function(add_geode_test)
     cmake_parse_arguments(GEODE_TEST
-        ""
+        "ESSENTIAL"
         "SOURCE"
         "DEPENDENCIES"
         ${ARGN}
     )
     _add_geode_executable(${GEODE_TEST_SOURCE} "Tests" ${GEODE_TEST_DEPENDENCIES})
     add_test(NAME ${target_name} COMMAND ${target_name})
+    if(${GEODE_TEST_ESSENTIAL})
+        add_dependencies(essential ${target_name})
+    endif()
     set_tests_properties(${target_name} PROPERTIES TIMEOUT 300) 
     _add_dependency_directories(${target_name} ${GEODE_TEST_DEPENDENCIES})
     if(USE_BENCHMARK)
