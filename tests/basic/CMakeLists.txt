@@ -33,6 +33,7 @@ add_geode_test(
     SOURCE "test-attribute.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
+    ESSENTIAL
 )
 add_geode_test(
     SOURCE "test-cached-value.cpp"
@@ -83,4 +84,5 @@ add_geode_test(
     SOURCE "test-uuid.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
+    ESSENTIAL
 )

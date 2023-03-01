@@ -63,3 +63,14 @@ ExternalProject_Add(opengeode
         ${bindings}
 )
 
+add_custom_target(third_party
+    DEPENDS
+        abseil
+        asyncplusplus
+        bitsery
+        ghcFilesystem
+        minizip
+        nanoflann
+        spdlog
+        ${bindings}
+)
