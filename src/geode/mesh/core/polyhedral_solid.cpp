@@ -59,11 +59,12 @@ namespace geode
     template < typename Archive >
     void PolyhedralSolid< dimension >::serialize( Archive& archive )
     {
-        archive.ext( *this, DefaultGrowable< Archive, PolyhedralSolid >{},
-            []( Archive& a, PolyhedralSolid& solid ) {
-                a.ext( solid,
-                    bitsery::ext::BaseClass< SolidMesh< dimension > >{} );
-            } );
+        archive.ext( *this,
+            Growable< Archive, PolyhedralSolid >{
+                { []( Archive& a, PolyhedralSolid& solid ) {
+                    a.ext( solid,
+                        bitsery::ext::BaseClass< SolidMesh< dimension > >{} );
+                } } } );
     }
 
     template class opengeode_mesh_api PolyhedralSolid< 3 >;

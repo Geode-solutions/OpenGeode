@@ -540,13 +540,13 @@ namespace geode
     template < typename Archive >
     void OpenGeodePolyhedralSolid< dimension >::serialize( Archive& archive )
     {
-        archive.ext( *this,
-            DefaultGrowable< Archive, OpenGeodePolyhedralSolid >{},
-            []( Archive& a, OpenGeodePolyhedralSolid& solid ) {
-                a.ext( solid,
-                    bitsery::ext::BaseClass< PolyhedralSolid< dimension > >{} );
-                a.object( solid.impl_ );
-            } );
+        archive.ext(
+            *this, Growable< Archive, OpenGeodePolyhedralSolid >{
+                       { []( Archive& a, OpenGeodePolyhedralSolid& solid ) {
+                           a.ext( solid, bitsery::ext::BaseClass<
+                                             PolyhedralSolid< dimension > >{} );
+                           a.object( solid.impl_ );
+                       } } } );
     }
 
     template class opengeode_mesh_api OpenGeodePolyhedralSolid< 3 >;

@@ -90,16 +90,17 @@ namespace geode
             template < typename Archive >
             void serialize( Archive& archive )
             {
-                archive.ext( *this, DefaultGrowable< Archive, UuidToIndex >{},
-                    []( Archive& a, UuidToIndex& uuids ) {
-                        a.ext( uuids.uuid2index_,
-                            bitsery::ext::StdMap{
-                                uuids.uuid2index_.max_size() },
-                            []( Archive& a2, uuid& id, index_t& index ) {
-                                a2.object( id );
-                                a2.value4b( index );
-                            } );
-                    } );
+                archive.ext( *this,
+                    Growable< Archive, UuidToIndex >{
+                        { []( Archive& a, UuidToIndex& uuids ) {
+                            a.ext( uuids.uuid2index_,
+                                bitsery::ext::StdMap{
+                                    uuids.uuid2index_.max_size() },
+                                []( Archive& a2, uuid& id, index_t& index ) {
+                                    a2.object( id );
+                                    a2.value4b( index );
+                                } );
+                        } } } );
             }
 
         private:

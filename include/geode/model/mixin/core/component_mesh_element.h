@@ -29,12 +29,12 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this,
-                DefaultGrowable< Archive, ComponentMeshElement >{},
-                []( Archive& a, ComponentMeshElement& cme ) {
-                    a.object( cme.component_id );
-                    a.value4b( cme.element_id );
-                } );
+            archive.ext(
+                *this, Growable< Archive, ComponentMeshElement >{
+                           { []( Archive& a, ComponentMeshElement& cme ) {
+                               a.object( cme.component_id );
+                               a.value4b( cme.element_id );
+                           } } } );
         }
 
         std::string string() const

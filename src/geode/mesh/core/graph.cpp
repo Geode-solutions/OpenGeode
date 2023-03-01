@@ -112,12 +112,12 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& a, Impl& impl ) {
+            archive.ext( *this,
+                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
                     a.object( impl.edge_attribute_manager_ );
                     a.ext( impl.edges_around_vertex_,
                         bitsery::ext::StdSmartPtr{} );
-                } );
+                } } } );
         }
 
     private:
@@ -237,11 +237,11 @@ namespace geode
     template < typename Archive >
     void Graph::serialize( Archive& archive )
     {
-        archive.ext( *this, DefaultGrowable< Archive, Graph >{},
-            []( Archive& a, Graph& graph ) {
+        archive.ext( *this,
+            Growable< Archive, Graph >{ { []( Archive& a, Graph& graph ) {
                 a.ext( graph, bitsery::ext::BaseClass< VertexSet >{} );
                 a.object( graph.impl_ );
-            } );
+            } } } );
     }
 
     std::unique_ptr< Graph > Graph::clone() const

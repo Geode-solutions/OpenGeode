@@ -51,11 +51,12 @@ namespace geode
     template < typename Archive >
     void ComponentMeshVertex::serialize( Archive& archive )
     {
-        archive.ext( *this, DefaultGrowable< Archive, ComponentMeshVertex >{},
-            []( Archive& a, ComponentMeshVertex& component_mesh_vertex ) {
-                a.object( component_mesh_vertex.component_id );
-                a.value4b( component_mesh_vertex.vertex );
-            } );
+        archive.ext( *this,
+            Growable< Archive, ComponentMeshVertex >{
+                { []( Archive& a, ComponentMeshVertex& component_mesh_vertex ) {
+                    a.object( component_mesh_vertex.component_id );
+                    a.value4b( component_mesh_vertex.vertex );
+                } } } );
     }
 
     class VertexIdentifier::Impl
@@ -393,8 +394,8 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& a, Impl& impl ) {
+            archive.ext( *this,
+                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
                     a.object( impl.unique_vertices_ );
                     a.ext(
                         impl.component_vertices_, bitsery::ext::StdSmartPtr{} );
@@ -407,7 +408,7 @@ namespace geode
                             a2.object( id );
                             a2.ext( attribute, bitsery::ext::StdSmartPtr{} );
                         } );
-                } );
+                } } } );
         }
 
         void filter_component_vertices( const uuid& component_id )

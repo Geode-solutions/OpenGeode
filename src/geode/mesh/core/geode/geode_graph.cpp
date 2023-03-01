@@ -45,11 +45,11 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& a, Impl& impl ) {
+            archive.ext( *this,
+                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
                     a.ext(
                         impl, bitsery::ext::BaseClass< detail::EdgesImpl >{} );
-                } );
+                } } } );
         }
     };
 
@@ -77,11 +77,12 @@ namespace geode
     template < typename Archive >
     void OpenGeodeGraph::serialize( Archive& archive )
     {
-        archive.ext( *this, DefaultGrowable< Archive, OpenGeodeGraph >{},
-            []( Archive& a, OpenGeodeGraph& graph ) {
-                a.ext( graph, bitsery::ext::BaseClass< Graph >{} );
-                a.object( graph.impl_ );
-            } );
+        archive.ext(
+            *this, Growable< Archive, OpenGeodeGraph >{
+                       { []( Archive& a, OpenGeodeGraph& graph ) {
+                           a.ext( graph, bitsery::ext::BaseClass< Graph >{} );
+                           a.object( graph.impl_ );
+                       } } } );
     }
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, OpenGeodeGraph );

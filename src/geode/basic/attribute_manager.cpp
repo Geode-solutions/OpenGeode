@@ -256,8 +256,8 @@ namespace geode
         template < typename Archive >
         void serialize( Archive &archive )
         {
-            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive &a, Impl &impl ) {
+            archive.ext( *this,
+                Growable< Archive, Impl >{ { []( Archive &a, Impl &impl ) {
                     a.value4b( impl.nb_elements_ );
                     a.ext( impl.attributes_,
                         bitsery::ext::StdMap{ impl.attributes_.max_size() },
@@ -266,7 +266,7 @@ namespace geode
                             a2.text1b( name, name.max_size() );
                             a2.ext( attribute, bitsery::ext::StdSmartPtr{} );
                         } );
-                } );
+                } } } );
         }
 
     private:
@@ -396,10 +396,11 @@ namespace geode
     template < typename Archive >
     void AttributeManager::serialize( Archive &archive )
     {
-        archive.ext( *this, DefaultGrowable< Archive, AttributeManager >{},
-            []( Archive &a, AttributeManager &attribute_manager ) {
-                a.object( attribute_manager.impl_ );
-            } );
+        archive.ext(
+            *this, Growable< Archive, AttributeManager >{
+                       { []( Archive &a, AttributeManager &attribute_manager ) {
+                           a.object( attribute_manager.impl_ );
+                       } } } );
     }
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_basic_api, AttributeManager );

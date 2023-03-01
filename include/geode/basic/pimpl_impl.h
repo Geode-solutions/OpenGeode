@@ -79,10 +79,10 @@ namespace geode
     template < typename Archive >
     void PImpl< T >::serialize( Archive& archive )
     {
-        archive.ext( *this, DefaultGrowable< Archive, PImpl >{},
-            []( Archive& a, PImpl& impl ) {
+        archive.ext(
+            *this, Growable< Archive, PImpl >{ { []( Archive& a, PImpl& impl ) {
                 a.ext( impl.pimpl_, bitsery::ext::StdSmartPtr{} );
-            } );
+            } } } );
     }
 
     // SERIALIZE_BITSERY_ARCHIVE( opengeode_basic_api, PImpl< T > );

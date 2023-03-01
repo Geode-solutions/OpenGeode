@@ -80,11 +80,11 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& a, Impl& impl ) {
+            archive.ext( *this,
+                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
                     a.ext( impl, bitsery::ext::BaseClass<
                                      detail::FacetEdgesImpl< dimension > >{} );
-                } );
+                } } } );
         }
     };
 
@@ -195,10 +195,10 @@ namespace geode
     template < typename Archive >
     void SolidEdges< dimension >::serialize( Archive& archive )
     {
-        archive.ext( *this, DefaultGrowable< Archive, SolidEdges >{},
-            []( Archive& a, SolidEdges& solid ) {
-                a.object( solid.impl_ );
-            } );
+        archive.ext( *this, Growable< Archive, SolidEdges >{
+                                { []( Archive& a, SolidEdges& solid ) {
+                                    a.object( solid.impl_ );
+                                } } } );
     }
 
     template class opengeode_mesh_api SolidEdges< 3 >;

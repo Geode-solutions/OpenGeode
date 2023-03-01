@@ -115,15 +115,13 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& a, Impl& impl ) {
-                    a.ext( impl, bitsery::ext::BaseClass<
-                                     detail::PointsImpl< dimension > >{} );
-                    a.ext(
-                        impl.triangle_vertices_, bitsery::ext::StdSmartPtr{} );
-                    a.ext(
-                        impl.triangle_adjacents_, bitsery::ext::StdSmartPtr{} );
-                } );
+            archive.ext( *this, Growable< Archive, Impl >{ { []( Archive& a,
+                                                                 Impl& impl ) {
+                a.ext( impl, bitsery::ext::BaseClass<
+                                 detail::PointsImpl< dimension > >{} );
+                a.ext( impl.triangle_vertices_, bitsery::ext::StdSmartPtr{} );
+                a.ext( impl.triangle_adjacents_, bitsery::ext::StdSmartPtr{} );
+            } } } );
         }
 
     private:
@@ -189,12 +187,12 @@ namespace geode
         Archive& archive )
     {
         archive.ext( *this,
-            DefaultGrowable< Archive, OpenGeodeTriangulatedSurface >{},
-            []( Archive& a, OpenGeodeTriangulatedSurface& surface ) {
-                a.ext( surface, bitsery::ext::BaseClass<
-                                    TriangulatedSurface< dimension > >{} );
-                a.object( surface.impl_ );
-            } );
+            Growable< Archive, OpenGeodeTriangulatedSurface >{
+                { []( Archive& a, OpenGeodeTriangulatedSurface& surface ) {
+                    a.ext( surface, bitsery::ext::BaseClass<
+                                        TriangulatedSurface< dimension > >{} );
+                    a.object( surface.impl_ );
+                } } } );
     }
 
     template < index_t dimension >

@@ -57,11 +57,11 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, DefaultGrowable< Archive, Impl >{},
-                []( Archive& a, Impl& impl ) {
+            archive.ext( *this,
+                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
                     a.text1b( impl.name_, impl.name_.max_size() );
                     a.object( impl.id_ );
-                } );
+                } } } );
         }
 
     private:

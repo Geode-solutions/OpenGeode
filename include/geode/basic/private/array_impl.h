@@ -79,8 +79,9 @@ namespace geode
             template < typename Archive >
             void serialize( Archive& archive )
             {
-                archive.ext( *this, DefaultGrowable< Archive, ArrayImpl >{},
-                    []( Archive& /*unused*/, ArrayImpl& /*unused*/ ) {} );
+                archive.ext( *this, Growable< Archive, ArrayImpl >{
+                                        { []( Archive& /*unused*/,
+                                              ArrayImpl& /*unused*/ ) {} } } );
             }
         };
     } // namespace detail

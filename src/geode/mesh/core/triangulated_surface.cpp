@@ -73,11 +73,12 @@ namespace geode
     template < typename Archive >
     void TriangulatedSurface< dimension >::serialize( Archive& archive )
     {
-        archive.ext( *this, DefaultGrowable< Archive, TriangulatedSurface >{},
-            []( Archive& a, TriangulatedSurface& triangulated_surface ) {
-                a.ext( triangulated_surface,
-                    bitsery::ext::BaseClass< SurfaceMesh< dimension > >{} );
-            } );
+        archive.ext( *this,
+            Growable< Archive, TriangulatedSurface >{
+                { []( Archive& a, TriangulatedSurface& triangulated_surface ) {
+                    a.ext( triangulated_surface,
+                        bitsery::ext::BaseClass< SurfaceMesh< dimension > >{} );
+                } } } );
     }
 
     template class opengeode_mesh_api TriangulatedSurface< 2 >;
