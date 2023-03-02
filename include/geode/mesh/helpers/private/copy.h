@@ -54,19 +54,24 @@ namespace geode
         }
 
         template < typename MeshFrom, typename Builder >
-        void copy_points2d_into_3d(
-            const MeshFrom& from, Builder& builder, index_t axis_to_add )
+        void copy_points2d_into_3d( const MeshFrom& from,
+            Builder& builder,
+            index_t axis_to_add,
+            double axis_coordinate )
         {
             OPENGEODE_EXCEPTION( axis_to_add < 3,
-                "[copy_points3d_into_2d] Invalid axis to remove." );
+                "[copy_points2d_into_3d] Invalid axis to add." );
             builder.create_vertices( from.nb_vertices() );
             for( const auto v : Range{ from.nb_vertices() } )
             {
                 const auto& pt_2d = from.point( v );
                 builder.set_point( v,
-                    Point3D{ { axis_to_add == 0 ? 0 : pt_2d.value( 0 ),
-                        axis_to_add == 1 ? 0 : pt_2d.value( axis_to_add / 2 ),
-                        axis_to_add == 2 ? 0 : pt_2d.value( 1 ) } } );
+                    Point3D{
+                        { axis_to_add == 0 ? axis_coordinate : pt_2d.value( 0 ),
+                            axis_to_add == 1 ? axis_coordinate
+                                             : pt_2d.value( axis_to_add / 2 ),
+                            axis_to_add == 2 ? axis_coordinate
+                                             : pt_2d.value( 1 ) } } );
             }
         }
 
