@@ -15,6 +15,10 @@ The second important feature is the new Image library that introduces the `Raste
 
 - **MeshHelpers**: `merge_surface_mesh` has been removed
 
+- **MeshHelpers**: Add a parameter to choose the coordinate value of the added axis in mesh (poinset, edged_curve, surfaces) converter functions from 2D to 3D.
+
+- **ModelHelpers**: Add a parameter to choose the coordinate value of the added axis in Section to BRep converter function.
+
 - **Point**: `inexact_equal` method only take the other Point as parameter
 
 - **Bitsery**: remove `DefaultGrowable`, use `Growable` instead
