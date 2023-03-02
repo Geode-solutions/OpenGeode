@@ -102,7 +102,7 @@ namespace geode
     }
 
     std::tuple< BRep, ModelCopyMapping > convert_section_into_brep(
-        const Section& section, index_t axis_to_add )
+        const Section& section, index_t axis_to_add, double axis_coordinate )
     {
         BRep brep;
         BRepBuilder builder{ brep };
@@ -113,21 +113,24 @@ namespace geode
             builder.update_corner_mesh(
                 brep.corner( mappings.at( Corner3D::component_type_static() )
                                  .in2out( corner.id() ) ),
-                convert_point_set2d_into_3d( corner.mesh(), axis_to_add ) );
+                convert_point_set2d_into_3d(
+                    corner.mesh(), axis_to_add, axis_coordinate ) );
         }
         for( const auto& line : section.lines() )
         {
             builder.update_line_mesh(
                 brep.line( mappings.at( Line3D::component_type_static() )
                                .in2out( line.id() ) ),
-                convert_edged_curve2d_into_3d( line.mesh(), axis_to_add ) );
+                convert_edged_curve2d_into_3d(
+                    line.mesh(), axis_to_add, axis_coordinate ) );
         }
         for( const auto& surface : section.surfaces() )
         {
             builder.update_surface_mesh(
                 brep.surface( mappings.at( Surface3D::component_type_static() )
                                   .in2out( surface.id() ) ),
-                convert_surface_mesh2d_into_3d( surface.mesh(), axis_to_add ) );
+                convert_surface_mesh2d_into_3d(
+                    surface.mesh(), axis_to_add, axis_coordinate ) );
         }
         copy_unique_vertices( section, builder, mappings );
         return std::make_tuple( std::move( brep ), std::move( mappings ) );
