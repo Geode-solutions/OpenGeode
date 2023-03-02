@@ -63,11 +63,14 @@ namespace geode
     }
 
     std::unique_ptr< EdgedCurve3D > convert_edged_curve2d_into_3d(
-        const EdgedCurve2D& curve2d, index_t axis_to_add )
+        const EdgedCurve2D& curve2d,
+        index_t axis_to_add,
+        double axis_coordinate )
     {
         auto curve3d = EdgedCurve3D::create();
         auto builder3d = EdgedCurveBuilder3D::create( *curve3d );
-        detail::copy_points2d_into_3d( curve2d, *builder3d, axis_to_add );
+        detail::copy_points2d_into_3d(
+            curve2d, *builder3d, axis_to_add, axis_coordinate );
         copy_edges( curve2d, builder3d );
         detail::copy_attributes( curve2d.vertex_attribute_manager(),
             curve3d->vertex_attribute_manager() );

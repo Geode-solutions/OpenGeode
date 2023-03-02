@@ -47,7 +47,7 @@ void test()
         "[Test] Section should have 117 surfaces" );
 
     const auto brep2 =
-        std::get< 0 >( geode::convert_section_into_brep( section, 2 ) );
+        std::get< 0 >( geode::convert_section_into_brep( section, 2, 10. ) );
 
     OPENGEODE_EXCEPTION(
         brep2.nb_corners() == 172, "[Test] BRep should have 172 corners" );

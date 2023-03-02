@@ -37,7 +37,7 @@ void test()
     const auto surface2d = geode::load_triangulated_surface< 2 >(
         absl::StrCat( geode::data_path, "3patches.og_tsf2d" ) );
     const auto surface3d =
-        geode::convert_triangulated_surface2d_into_3d( *surface2d, 2 );
+        geode::convert_triangulated_surface2d_into_3d( *surface2d, 2, 0. );
     OPENGEODE_EXCEPTION( surface2d->nb_vertices() == surface3d->nb_vertices(),
         "[Test] Number of vertices in TriangulatedSurface3D is not "
         "correct" );
@@ -46,7 +46,7 @@ void test()
         "correct" );
 
     const auto surface_mesh3d =
-        geode::convert_surface_mesh2d_into_3d( *surface2d, 2 );
+        geode::convert_surface_mesh2d_into_3d( *surface2d, 2, 0. );
     OPENGEODE_EXCEPTION(
         surface2d->nb_vertices() == surface_mesh3d->nb_vertices(),
         "[Test] Number of vertices in SurfaceMesh3D is not "
