@@ -83,6 +83,10 @@ namespace
                 result.mesh_trees_[id] =
                     geode::create_aabb_tree( element.mesh() );
                 result.uuids_[id] = element.id();
+                OPENGEODE_EXCEPTION( result.mesh_trees_[id].nb_bboxes() != 0,
+                    "[create_model_meshes_aabbs] Cannot compute the AABBTree "
+                    "for this model: ",
+                    element.component_id().string(), " has an empty mesh." );
                 boxes[id] = result.mesh_trees_[id].bounding_box();
             } );
             result.mesh_tree_ids_.emplace( element.id(), id );
