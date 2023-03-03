@@ -15,7 +15,7 @@ The second important feature is the new Image library that introduces the `Raste
 
 - **MeshHelpers**: `merge_surface_mesh` has been removed
 
-- **MeshHelpers**: Add a parameter to choose the coordinate value of the added axis in mesh (poinset, edged_curve, surfaces) converter functions from 2D to 3D.
+- **MeshHelpers**: Add a parameter to choose the coordinate value of the added axis in mesh (PointSet, EdgedCurve, SurfaceMesh) converter functions from 2D to 3D.
 
 - **ModelHelpers**: Add a parameter to choose the coordinate value of the added axis in Section to BRep converter function.
 
