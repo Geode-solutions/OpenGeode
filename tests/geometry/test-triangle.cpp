@@ -36,8 +36,7 @@ void test()
 {
     const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
     const geode::Point3D b_ref{ { 0.5, 0.1, 0.0 } };
-    const geode::Point3D b{ { 0.5, 1.3 * geode::global_epsilon, 0.0 } };
-    const geode::Point3D b2{ { 0.6, 0.3 * geode::global_epsilon, 0.0 } };
+    const geode::Point3D b{ { 0.6, 0.3 * geode::global_epsilon, 0.0 } };
     const geode::Point3D c{ { 1.0, 0.0, 0.0 } };
 
     const geode::Vector3D answer{ { 0, 0, -1 } };
@@ -54,17 +53,7 @@ void test()
     OPENGEODE_EXCEPTION(
         pivot_ref.value() == 0, "[Test] Wrong pivot of reference triangle" );
 
-    const geode::Triangle3D triangle1{ a, b, c };
-    const auto new_normal1 = triangle1.new_normal();
-    OPENGEODE_EXCEPTION(
-        new_normal1, "[Test] Normal of triangle1 should be calculated" );
-    OPENGEODE_EXCEPTION(
-        new_normal1.value() == answer, "[Test] Wrong normal of triangle1" );
-    const auto pivot1 = triangle1.pivot();
-    OPENGEODE_EXCEPTION(
-        !pivot1, "[Test] Pivot of triangle1 should not be calculated" );
-
-    const geode::Triangle3D triangle2{ a, b2, c };
+    const geode::Triangle3D triangle2{ a, b, c };
     const auto new_normal2 = triangle2.new_normal();
     OPENGEODE_EXCEPTION(
         !new_normal2, "[Test] Normal of triangle2 should not be calculated" );

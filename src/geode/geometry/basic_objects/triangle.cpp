@@ -35,90 +35,25 @@ namespace
     absl::optional< std::pair< geode::local_index_t, geode::Vector3D > >
         pivot_and_normal( const std::array< geode::RefPoint3D, 3 >& points )
     {
-        for( const auto pivot : geode::LRange{ 3 } )
-        {
-            const auto next = pivot + 1 == 3 ? 0 : pivot + 1;
-            const auto edge0 =
-                geode::Vector3D{ points[pivot], points[next] }.normalize();
-            const auto prev = pivot == 0 ? 2 : pivot - 1;
-            const auto edge1 =
-                geode::Vector3D{ points[pivot], points[prev] }.normalize();
-
-            const auto normal = edge0.cross( edge1 );
-            const auto length = normal.length();
-            if( length > 0.001 )
-            {
-                return std::make_pair( pivot, normal / length );
-            }
-        }
-        return absl::nullopt;
-    }
-
-    template < typename GenericTriangle >
-    absl::optional< std::pair< geode::local_index_t, geode::Vector3D > > pivot(
-        const GenericTriangle& triangle )
-    {
         try
         {
-            const auto& vertices = triangle.vertices();
-            return pivot_and_normal(
-                { vertices[0], vertices[1], vertices[2] } );
-        }
-        catch( const geode::OpenGeodeException& /*unused*/ )
-        {
+            for( const auto pivot : geode::LRange{ 3 } )
+            {
+                const auto next = pivot + 1 == 3 ? 0 : pivot + 1;
+                const auto edge0 =
+                    geode::Vector3D{ points[pivot], points[next] }.normalize();
+                const auto prev = pivot == 0 ? 2 : pivot - 1;
+                const auto edge1 =
+                    geode::Vector3D{ points[pivot], points[prev] }.normalize();
+
+                const auto normal = edge0.cross( edge1 );
+                const auto length = normal.length();
+                if( length > 0.001 )
+                {
+                    return std::make_pair( pivot, normal / length );
+                }
+            }
             return absl::nullopt;
-        }
-    }
-
-    template < typename GenericTriangle >
-    absl::optional< std::pair< geode::local_index_t, geode::Vector3D > > normal(
-        const GenericTriangle& triangle )
-    {
-        try
-        {
-            const auto& vertices = triangle.vertices();
-            double max_edge_length{ 0 };
-            geode::local_index_t longest_edge_lid{ 0 };
-            for( const auto edge : geode::LRange{ 3 } )
-            {
-                const auto next = edge + 1 == 3 ? 0 : edge + 1;
-                const geode::Point3D& point = vertices[edge];
-                const geode::Point3D& next_pt = vertices[next];
-                const auto cur_edge_length =
-                    geode::point_point_distance( point, next_pt );
-                if( cur_edge_length <= geode::global_epsilon )
-                {
-                    return absl::nullopt;
-                }
-                if( cur_edge_length > max_edge_length )
-                {
-                    max_edge_length = cur_edge_length;
-                    longest_edge_lid = edge;
-                }
-            }
-            if( const auto result = pivot_and_normal(
-                    { vertices[0], vertices[1], vertices[2] } ) )
-            {
-                return result;
-            }
-
-            const auto next =
-                longest_edge_lid + 1 == 3 ? 0 : longest_edge_lid + 1;
-            const geode::Point3D& opposite =
-                vertices[next + 1 == 3 ? 0 : next + 1];
-            geode::Segment3D longest_edge{ vertices[longest_edge_lid],
-                vertices[next] };
-            const auto bary_coord =
-                segment_barycentric_coordinates( opposite, longest_edge );
-            const auto proj =
-                longest_edge.vertices()[0].get() * bary_coord[0]
-                + longest_edge.vertices()[1].get() * bary_coord[1];
-            if( opposite.inexact_equal( proj, geode::global_epsilon ) )
-            {
-                return absl::nullopt;
-            }
-            return pivot_and_normal(
-                { longest_edge.vertices()[0], proj, opposite } );
         }
         catch( const geode::OpenGeodeException& /*unused*/ )
         {
@@ -211,9 +146,10 @@ namespace geode
     typename std::enable_if< T == 3, absl::optional< Vector3D > >::type
         GenericTriangle< PointType, dimension >::new_normal() const
     {
-        if( auto normal = ::normal( *this ) )
+        if( const auto result = pivot_and_normal(
+                { vertices_[0], vertices_[1], vertices_[2] } ) )
         {
-            return std::move( normal->second );
+            return result->second;
         }
         return absl::nullopt;
     }
@@ -249,9 +185,10 @@ namespace geode
     typename std::enable_if< T == 3, absl::optional< local_index_t > >::type
         GenericTriangle< PointType, dimension >::pivot() const
     {
-        if( auto normal = ::pivot( *this ) )
+        if( const auto result = pivot_and_normal(
+                { vertices_[0], vertices_[1], vertices_[2] } ) )
         {
-            return std::move( normal->first );
+            return result->first;
         }
         return absl::nullopt;
     }
