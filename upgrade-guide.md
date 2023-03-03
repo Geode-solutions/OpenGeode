@@ -11,6 +11,8 @@ The second important feature is the new Image library that introduces the `Raste
 
 ### Breaking Changes
 
+- **Basic**: method `extension_from_filename` is now located in `filename.h`
+
 - **AABB**: intersection functors now returns a boolean to indicate if the search should be stopped
 
 - **MeshHelpers**: `merge_surface_mesh` has been removed
@@ -27,7 +29,7 @@ The second important feature is the new Image library that introduces the `Raste
 
 - **IO**: base classes for input and output file are moved into the basic library
 
-- **Grid**: `Grid` has been refactore using the new `CellArray` class
+- **Grid**: `Grid` has been refactored using the new `CellArray` class
 
 - **AddComponents**: `AddComponents` and `AddComponentsBuilder` have been removed. VisualStudio cannot compile move constructor using these helpers.
 
