@@ -37,38 +37,38 @@ def test_point_segment_distance():
     segment2D = geom.Segment2D(a, b)
 
     distance = geom.point_segment_distance2D(a, segment2D)
-    if distance != 0 or closest_point != a:
+    if distance != 0:
         raise ValueError(
             "[Test] Wrong result for point_segment_distance2D with query point a")
 
     distance = geom.point_segment_distance2D(b, segment2D)
-    if distance != 0 or closest_point != b:
+    if distance != 0:
         raise ValueError(
             "[Test] Wrong result for point_segment_distance2D with query point b")
 
     q1 = geom.Point2D([0.0, 0.0])
     distance = geom.point_segment_distance2D(q1, segment2D)
-    if distance != 0 or closest_point != q1:
+    if distance != 0:
         raise ValueError(
             "[Test] Wrong result for point_segment_distance2D with query point q1")
 
     q2 = geom.Point2D([10.0, 10.0])
     distance = geom.point_segment_distance2D(q2, segment2D)
-    if distance != math.sqrt(106) or closest_point != a:
+    if distance != math.sqrt(106):
         raise ValueError(
             "[Test] Wrong result for point_segment_distance2D with query point q2")
 
     q3 = geom.Point2D([5.0, -1.0])
     distance = geom.point_segment_distance2D(q3, segment2D)
     result_q3 = geom.Point2D([0.0, 0.0])
-    if distance != math.sqrt(26) or closest_point != result_q3:
+    if distance != math.sqrt(26):
         raise ValueError(
             "[Test] Wrong result for point_segment_distance2D with query point q3")
 
     q4 = geom.Point2D([5.5, 1.5])
     distance = geom.point_segment_distance2D(q4, segment2D)
     result_q4 = geom.Point2D([0.5, 2.5])
-    if distance != math.sqrt(26) or closest_point != result_q4:
+    if distance != math.sqrt(26):
         raise ValueError(
             "[Test] Wrong result for point_segment_distance2D with query point q4")
 
