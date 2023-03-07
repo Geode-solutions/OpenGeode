@@ -42,7 +42,7 @@ namespace geode
      * @param[in] filename Path to the file to load.
      */
     template < index_t dimension >
-    RasterImage< dimension > load_raster( absl::string_view filename );
+    RasterImage< dimension > load_raster_image( absl::string_view filename );
 
     template < index_t dimension >
     class RasterImageInput : public Input< RasterImage< dimension > >

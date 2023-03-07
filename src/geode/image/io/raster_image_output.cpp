@@ -33,7 +33,7 @@
 namespace geode
 {
     template < index_t dimension >
-    void save_raster(
+    void save_raster_image(
         const RasterImage< dimension >& raster, absl::string_view filename )
     {
         try
@@ -57,8 +57,8 @@ namespace geode
         }
     }
 
-    template void opengeode_image_api save_raster(
+    template void opengeode_image_api save_raster_image(
         const RasterImage< 2 >&, absl::string_view );
-    template void opengeode_image_api save_raster(
+    template void opengeode_image_api save_raster_image(
         const RasterImage< 3 >&, absl::string_view );
 } // namespace geode

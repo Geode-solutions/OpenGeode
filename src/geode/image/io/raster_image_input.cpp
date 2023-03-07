@@ -34,7 +34,7 @@
 namespace geode
 {
     template < index_t dimension >
-    RasterImage< dimension > load_raster( absl::string_view filename )
+    RasterImage< dimension > load_raster_image( absl::string_view filename )
     {
         try
         {
@@ -66,8 +66,8 @@ namespace geode
         }
     }
 
-    template RasterImage< 2 > opengeode_image_api load_raster(
+    template RasterImage< 2 > opengeode_image_api load_raster_image(
         absl::string_view );
-    template RasterImage< 3 > opengeode_image_api load_raster(
+    template RasterImage< 3 > opengeode_image_api load_raster_image(
         absl::string_view );
 } // namespace geode
