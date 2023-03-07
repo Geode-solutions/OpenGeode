@@ -42,7 +42,7 @@ namespace geode
      * @param[in] filename Path to the file where save the RasterImage.
      */
     template < index_t dimension >
-    void save_raster(
+    void save_raster_image(
         const RasterImage< dimension >& raster, absl::string_view filename );
 
     template < index_t dimension >

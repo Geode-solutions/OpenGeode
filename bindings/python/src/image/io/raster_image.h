@@ -28,11 +28,11 @@
 
 #define PYTHON_RASTER_IMAGE_IO( dimension )                                    \
     const auto save##dimension =                                               \
-        "save_raster" + std::to_string( dimension ) + "D";                     \
-    module.def( save##dimension.c_str(), &save_raster< dimension > );          \
+        "save_raster_image" + std::to_string( dimension ) + "D";               \
+    module.def( save##dimension.c_str(), &save_raster_image< dimension > );    \
     const auto load##dimension =                                               \
-        "load_raster" + std::to_string( dimension ) + "D";                     \
-    module.def( load##dimension.c_str(), &load_raster< dimension > );          \
+        "load_raster_image" + std::to_string( dimension ) + "D";               \
+    module.def( load##dimension.c_str(), &load_raster_image< dimension > );    \
     PYTHON_FACTORY_CLASS( RasterImageInputFactory##dimension##D );             \
     PYTHON_FACTORY_CLASS( RasterImageOutputFactory##dimension##D )
 

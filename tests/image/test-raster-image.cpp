@@ -56,8 +56,8 @@ void test()
         raster.set_color( i, { i, i, i } );
     }
     test_raster( raster );
-    geode::save_raster( raster, "test.og_img2d" );
-    const auto reload = geode::load_raster< 2 >( "test.og_img2d" );
+    geode::save_raster_image( raster, "test.og_img2d" );
+    const auto reload = geode::load_raster_image< 2 >( "test.og_img2d" );
     test_raster( reload );
     auto raster2 = std::move( raster );
     OPENGEODE_EXCEPTION(
