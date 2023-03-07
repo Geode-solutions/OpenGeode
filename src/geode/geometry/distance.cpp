@@ -140,6 +140,28 @@ namespace
         p[1] = omz * p0[1] + z * p1[1];
     }
 
+    template < geode::index_t dimension >
+    std::tuple< double, geode::Point< dimension > >
+        point_segment_distance_using_projection(
+            const geode::Point< dimension >& point,
+            const geode::Segment< dimension >& segment )
+    {
+        const auto nearest_p = point_segment_projection( point, segment );
+        return std::make_tuple(
+            point_point_distance( point, nearest_p ), nearest_p );
+    }
+
+    template < geode::index_t dimension >
+    std::tuple< double, geode::Point< dimension > >
+        point_line_distance_using_projection(
+            const geode::Point< dimension >& point,
+            const geode::InfiniteLine< dimension >& line )
+    {
+        const auto nearest_p = point_line_projection( point, line );
+        return std::make_tuple(
+            point_point_distance( point, nearest_p ), nearest_p );
+    }
+
 } // namespace
 
 namespace geode
@@ -158,16 +180,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::tuple< double, Point< dimension > > point_segment_distance(
-        const Point< dimension >& point, const Segment< dimension >& segment )
-    {
-        const auto nearest_p = point_segment_projection( point, segment );
-        return std::make_tuple(
-            point_point_distance( point, nearest_p ), nearest_p );
-    }
-
-    template < index_t dimension >
-    double new_point_segment_distance(
+    double point_segment_distance(
         const Point< dimension >& point, const Segment< dimension >& segment )
     {
         const auto length = segment.length();
@@ -198,7 +211,8 @@ namespace geode
         {
             return distance.value();
         }
-        return std::get< 0 >( point_segment_distance( point, segment ) );
+        return std::get< 0 >(
+            point_segment_distance_using_projection( point, segment ) );
     }
 
     template < index_t dimension >
@@ -444,14 +458,14 @@ namespace geode
                 distance, closest_on_segment0, closest_on_segment1 );
         }
         const auto distance_to_closest0 =
-            new_point_segment_distance( closest_on_segment0, segment1 );
+            point_segment_distance( closest_on_segment0, segment1 );
         if( distance_to_closest0 < global_epsilon )
         {
             return std::make_tuple( distance_to_closest0, closest_on_segment0,
                 point_segment_projection( closest_on_segment0, segment1 ) );
         }
         const auto distance_to_closest1 =
-            new_point_segment_distance( closest_on_segment1, segment0 );
+            point_segment_distance( closest_on_segment1, segment0 );
         if( distance_to_closest1 < global_epsilon )
         {
             return std::make_tuple( distance_to_closest1,
@@ -480,16 +494,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::tuple< double, Point< dimension > > point_line_distance(
-        const Point< dimension >& point, const InfiniteLine< dimension >& line )
-    {
-        const auto nearest_p = point_line_projection( point, line );
-        return std::make_tuple(
-            point_point_distance( point, nearest_p ), nearest_p );
-    }
-
-    template < index_t dimension >
-    double new_point_line_distance(
+    double point_line_distance(
         const Point< dimension >& point, const InfiniteLine< dimension >& line )
     {
         const auto length0 = point_point_distance( line.origin(), point );
@@ -500,27 +505,14 @@ namespace geode
         {
             return distance.value();
         }
-        return std::get< 0 >( point_line_distance( point, line ) );
+        return std::get< 0 >(
+            point_line_distance_using_projection( point, line ) );
     }
 
-    std::tuple< double, Point2D > point_line_signed_distance(
+    double point_line_signed_distance(
         const Point2D& point, const InfiniteLine2D& line )
     {
-        Point2D nearest_point;
-        double distance;
-        std::tie( distance, nearest_point ) =
-            point_line_distance< 2 >( point, line );
-        const Vector2D proj2point{ nearest_point, point };
-        const auto signed_distance =
-            dot_perpendicular( proj2point, line.direction() ) <= 0 ? distance
-                                                                   : -distance;
-        return std::make_tuple( signed_distance, nearest_point );
-    }
-
-    double new_point_line_signed_distance(
-        const Point2D& point, const InfiniteLine2D& line )
-    {
-        const auto distance = new_point_line_distance< 2 >( point, line );
+        const auto distance = point_line_distance< 2 >( point, line );
         const Vector2D origin2point{ line.origin(), point };
         return dot_perpendicular( origin2point, line.direction() ) <= 0
                    ? distance
@@ -689,7 +681,7 @@ namespace geode
         for( const auto e : LRange{ 3 } )
         {
             const auto next = e == 2 ? 0 : e + 1;
-            edge_distances[e] = point_segment_distance(
+            edge_distances[e] = point_segment_distance_using_projection(
                 point, { vertices[e], vertices[next] } );
             const auto& cur_distance = std::get< 0 >( edge_distances[e] );
             if( cur_distance < min_distance )
@@ -712,12 +704,15 @@ namespace geode
         const auto& vertices = triangle.vertices();
         std::array< Point2D, 3 > closest;
         std::array< double, 3 > distance;
-        std::tie( distance[0], closest[0] ) = point_segment_distance(
-            point, Segment2D{ vertices[0], vertices[1] } );
-        std::tie( distance[1], closest[1] ) = point_segment_distance(
-            point, Segment2D{ vertices[1], vertices[2] } );
-        std::tie( distance[2], closest[2] ) = point_segment_distance(
-            point, Segment2D{ vertices[2], vertices[0] } );
+        std::tie( distance[0], closest[0] ) =
+            point_segment_distance_using_projection(
+                point, Segment2D{ vertices[0], vertices[1] } );
+        std::tie( distance[1], closest[1] ) =
+            point_segment_distance_using_projection(
+                point, Segment2D{ vertices[1], vertices[2] } );
+        std::tie( distance[2], closest[2] ) =
+            point_segment_distance_using_projection(
+                point, Segment2D{ vertices[2], vertices[0] } );
         double result;
         Point2D closest_point;
         if( distance[0] < distance[1] )
@@ -940,22 +935,16 @@ namespace geode
 
     template double opengeode_geometry_api point_point_distance(
         const Point1D&, const Point1D& );
-    template std::tuple< double, Point1D > opengeode_geometry_api
-        point_segment_distance( const Point1D&, const Segment1D& );
     template std::tuple< double, Point1D, Point1D > opengeode_geometry_api
         segment_segment_distance( const Segment1D&, const Segment1D& );
 
     template double opengeode_geometry_api point_point_distance(
         const Point2D&, const Point2D& );
-    template std::tuple< double, Point2D > opengeode_geometry_api
-        point_segment_distance( const Point2D&, const Segment2D& );
-    template double opengeode_geometry_api new_point_segment_distance(
+    template double opengeode_geometry_api point_segment_distance(
         const Point2D&, const Segment2D& );
     template std::tuple< double, Point2D, Point2D > opengeode_geometry_api
         segment_segment_distance( const Segment2D&, const Segment2D& );
-    template std::tuple< double, Point2D > opengeode_geometry_api
-        point_line_distance( const Point2D&, const InfiniteLine2D& );
-    template double opengeode_geometry_api new_point_line_distance(
+    template double opengeode_geometry_api point_line_distance(
         const Point2D&, const InfiniteLine2D& );
     template std::tuple< double, Point2D > opengeode_geometry_api
         point_triangle_distance( const Point2D&, const Triangle2D& );
@@ -968,15 +957,11 @@ namespace geode
 
     template double opengeode_geometry_api point_point_distance(
         const Point3D&, const Point3D& );
-    template std::tuple< double, Point3D > opengeode_geometry_api
-        point_segment_distance( const Point3D&, const Segment3D& );
-    template double opengeode_geometry_api new_point_segment_distance(
+    template double opengeode_geometry_api point_segment_distance(
         const Point3D&, const Segment3D& );
     template std::tuple< double, Point3D, Point3D > opengeode_geometry_api
         segment_segment_distance( const Segment3D&, const Segment3D& );
-    template std::tuple< double, Point3D > opengeode_geometry_api
-        point_line_distance( const Point3D&, const InfiniteLine3D& );
-    template double opengeode_geometry_api new_point_line_distance(
+    template double opengeode_geometry_api point_line_distance(
         const Point3D&, const InfiniteLine3D& );
     template std::tuple< double, Point3D > opengeode_geometry_api
         point_triangle_distance( const Point3D&, const Triangle3D& );

@@ -54,16 +54,9 @@ namespace geode
 
     /*!
      * Compute the smallest distance between a point and a segment
-     * @return a tuple containing:
-     * - the smallest distance.
-     * - the closest point on the segment.
      */
     template < index_t dimension >
-    std::tuple< double, Point< dimension > > point_segment_distance(
-        const Point< dimension >& point, const Segment< dimension >& segment );
-
-    template < index_t dimension >
-    double new_point_segment_distance(
+    double point_segment_distance(
         const Point< dimension >& point, const Segment< dimension >& segment );
 
     /*!
@@ -80,31 +73,16 @@ namespace geode
 
     /*!
      * Compute the smallest distance between a point and an infinite line
-     * @return a tuple containing:
-     * - the smallest distance.
-     * - the closest point on the line.
      */
     template < index_t dimension >
-    std::tuple< double, Point< dimension > > point_line_distance(
-        const Point< dimension >& point,
-        const InfiniteLine< dimension >& line );
-
-    template < index_t dimension >
-    double new_point_line_distance( const Point< dimension >& point,
+    double point_line_distance( const Point< dimension >& point,
         const InfiniteLine< dimension >& line );
 
     /*!
      * Compute the smallest signed distance between a point and an infinite line
      * in 2D
-     * @return a tuple containing:
-     * - the smallest signed distance.
-     * - the closest point on the line.
      */
-    std::tuple< double, Point2D >
-        opengeode_geometry_api point_line_signed_distance(
-            const Point2D& point, const InfiniteLine2D& line );
-
-    double opengeode_geometry_api new_point_line_signed_distance(
+    double opengeode_geometry_api point_line_signed_distance(
         const Point2D& point, const InfiniteLine2D& line );
 
     /*!

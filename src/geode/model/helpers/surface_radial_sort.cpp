@@ -93,9 +93,9 @@ namespace
         const geode::Point3D& opposite_point )
     {
         const auto edge_vertices = mesh.polygon_edge_vertices( edge );
-        return std::get< 0 >( geode::point_line_distance( opposite_point,
+        return geode::point_line_distance( opposite_point,
                    { geode::Segment3D{ mesh.point( edge_vertices[0] ),
-                       mesh.point( edge_vertices[1] ) } } ) )
+                       mesh.point( edge_vertices[1] ) } } )
                <= geode::global_epsilon;
     }
 

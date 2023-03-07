@@ -37,6 +37,8 @@ The second important feature is the new Image library that introduces the `Raste
 
 - **GenericInfiniteLine**: `GenericInfiniteLine` has been renamed `GenericLine`
 
+- **Distance**: `point_segment_distance`, `point_line_distance` and `point_line_signed_distance` now return only the distance. Use projection functions to know the closest point.
+
 
 ## Upgrading from OpenGeode v11.x.x to v12.0.0
 

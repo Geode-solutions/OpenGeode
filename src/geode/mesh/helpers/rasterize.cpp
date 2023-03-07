@@ -499,7 +499,7 @@ namespace
             }
             tested_cells[cell_id] = true;
             const auto center = grid.polyhedron_barycenter( cell_id );
-            if( geode::new_point_segment_distance( center, segment )
+            if( geode::point_segment_distance( center, segment )
                 <= half_cell_size )
             {
                 for( auto&& neighbor : neighbors( grid, cell ) )
@@ -546,14 +546,12 @@ namespace
 
                 // Test segment line through box
                 const auto p_minus = point + critical_point;
-                double p_minus_dist;
-                std::tie( p_minus_dist, std::ignore ) =
+                const auto p_minus_dist =
                     geode::point_line_signed_distance( p_minus, { segment } );
                 const auto p_plus =
                     grid.point( grid.vertex_index( { i + 1, j + 1 } ) )
                     - critical_point;
-                double p_plus_dist;
-                std::tie( p_plus_dist, std::ignore ) =
+                const auto p_plus_dist =
                     geode::point_line_signed_distance( p_plus, { segment } );
                 if( std::fabs( p_minus_dist ) > 2. * geode::global_epsilon
                     && std::fabs( p_plus_dist ) > 2. * geode::global_epsilon
