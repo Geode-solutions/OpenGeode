@@ -98,7 +98,7 @@ namespace geode
         const InfiniteLine3D& line, const Plane& plane )
     {
         const auto dot_directions = line.direction().dot( plane.normal() );
-        if( std::fabs( dot_directions ) < global_epsilon )
+        if( std::fabs( dot_directions ) <= global_epsilon )
         {
             // line is parallel to the plane
             return { IntersectionType::PARALLEL };
@@ -109,13 +109,12 @@ namespace geode
         auto result =
             line.origin() - line.direction() * signed_distance / dot_directions;
         CorrectnessInfo< Point3D > correctness;
-        double distance;
-        std::tie( distance, correctness.first.second ) =
-            point_line_distance( result, line );
-        correctness.first.first = distance < global_epsilon;
+        auto distance = point_line_distance( result, line );
+        correctness.first.first = distance <= global_epsilon;
+        correctness.first.second = point_line_projection( result, line );
         std::tie( distance, correctness.second.second ) =
             point_plane_distance( result, plane );
-        correctness.second.first = distance < global_epsilon;
+        correctness.second.first = distance <= global_epsilon;
         return { std::move( result ), std::move( correctness ) };
     }
 
@@ -146,25 +145,24 @@ namespace geode
                 line.origin() + line.direction() * ( -a1 + root ) );
             CorrectnessInfo< absl::InlinedVector< Point< dimension >, 2 > >
                 correctness;
-            double distance;
+            auto distance = point_line_distance( results.front(), line );
+            correctness.first.first = distance <= global_epsilon;
+            correctness.first.second.push_back(
+                point_line_projection( results.front(), line ) );
+            distance = point_line_distance( results.back(), line );
+            correctness.first.first =
+                correctness.first.first && distance <= global_epsilon;
+            correctness.first.second.push_back(
+                point_line_projection( results.back(), line ) );
             Point< dimension > point;
             std::tie( distance, point ) =
-                point_line_distance( results.front(), line );
-            correctness.first.first = distance < global_epsilon;
-            correctness.first.second.push_back( point );
-            std::tie( distance, point ) =
-                point_line_distance( results.back(), line );
-            correctness.first.first =
-                correctness.first.first && distance < global_epsilon;
-            correctness.first.second.push_back( point );
-            std::tie( distance, point ) =
                 point_sphere_distance( results.front(), sphere );
-            correctness.second.first = distance < global_epsilon;
+            correctness.second.first = distance <= global_epsilon;
             correctness.second.second.push_back( point );
             std::tie( distance, point ) =
                 point_sphere_distance( results.back(), sphere );
             correctness.second.first =
-                correctness.second.first && distance < global_epsilon;
+                correctness.second.first && distance <= global_epsilon;
             correctness.second.second.push_back( point );
             return { std::move( results ), std::move( correctness ) };
         }
@@ -175,15 +173,14 @@ namespace geode
             results.emplace_back( line.origin() - line.direction() * a1 );
             CorrectnessInfo< absl::InlinedVector< Point< dimension >, 2 > >
                 correctness;
-            double distance;
+            auto distance = point_line_distance( results.front(), line );
+            correctness.first.first = distance <= global_epsilon;
+            correctness.first.second.push_back(
+                point_line_projection( results.front(), line ) );
             Point< dimension > point;
             std::tie( distance, point ) =
-                point_line_distance( results.front(), line );
-            correctness.first.first = distance < global_epsilon;
-            correctness.first.second.push_back( point );
-            std::tie( distance, point ) =
                 point_sphere_distance( results.front(), sphere );
-            correctness.second.first = distance < global_epsilon;
+            correctness.second.first = distance <= global_epsilon;
             correctness.second.second.push_back( point );
             return { std::move( results ), std::move( correctness ) };
         }
@@ -204,8 +201,7 @@ namespace geode
                 line_intersections.result.value().size() );
             for( auto&& point : line_intersections.result.value() )
             {
-                if( new_point_segment_distance( point, segment )
-                    <= global_epsilon )
+                if( point_segment_distance( point, segment ) <= global_epsilon )
                 {
                     segment_intersections.emplace_back( point );
                 }
@@ -227,7 +223,7 @@ namespace geode
             line_plane_intersection( InfiniteLine3D{ segment }, plane );
         if( line_plane_result )
         {
-            if( new_point_segment_distance(
+            if( point_segment_distance(
                     line_plane_result.result.value(), segment )
                 > global_epsilon )
             {
@@ -320,7 +316,7 @@ namespace geode
                     correctness.first.second =
                         point_segment_projection( result, segment );
                     correctness.first.first =
-                        new_point_segment_distance( result, segment )
+                        point_segment_distance( result, segment )
                         <= global_epsilon;
 
                     return { std::move( result ), std::move( correctness ) };
@@ -382,10 +378,10 @@ namespace geode
                 auto result = line.origin() + line.direction() * seg_parameter;
 
                 CorrectnessInfo< Point3D > correctness;
-                double distance;
-                std::tie( distance, correctness.first.second ) =
-                    point_line_distance( result, line );
-                correctness.first.first = distance < global_epsilon;
+                auto distance = point_line_distance( result, line );
+                correctness.first.first = distance <= global_epsilon;
+                correctness.first.second =
+                    point_line_projection( result, line );
                 std::array< double, 3 > tri_lambdas;
                 try
                 {
@@ -401,8 +397,7 @@ namespace geode
                     + vertices[1].get() * tri_lambdas[1]
                     + vertices[2].get() * tri_lambdas[2];
                 correctness.second.first =
-                    point_point_distance( result, correctness.second.second )
-                    < global_epsilon;
+                    result.inexact_equal( correctness.second.second );
                 return { std::move( result ), std::move( correctness ) };
             }
             // else: b1+b2 > 1, no intersection
@@ -440,13 +435,12 @@ namespace geode
         const auto s0 = diffDotPerpD1 * invD0DotPerpD1;
         auto result = line0.origin() + line0.direction() * s0;
         CorrectnessInfo< Point2D > correctness;
-        double distance;
-        std::tie( distance, correctness.first.second ) =
-            point_line_distance( result, line0 );
-        correctness.first.first = distance < global_epsilon;
-        std::tie( distance, correctness.second.second ) =
-            point_line_distance( result, line1 );
-        correctness.second.first = distance < global_epsilon;
+        auto distance = point_line_distance( result, line0 );
+        correctness.first.first = distance <= global_epsilon;
+        correctness.first.second = point_line_projection( result, line0 );
+        distance = point_line_distance( result, line1 );
+        correctness.second.first = distance <= global_epsilon;
+        correctness.second.second = point_line_projection( result, line1 );
         return { std::move( result ), std::move( correctness ) };
     }
 
@@ -458,13 +452,13 @@ namespace geode
         if( line_intersection_result )
         {
             // Test whether the line-line intersection is on the segments.
-            if( new_point_segment_distance(
+            if( point_segment_distance(
                     line_intersection_result.result.value(), segment0 )
                 > global_epsilon )
             {
                 return {};
             }
-            if( new_point_segment_distance(
+            if( point_segment_distance(
                     line_intersection_result.result.value(), segment1 )
                 > global_epsilon )
             {
@@ -509,7 +503,7 @@ namespace geode
         if( line_intersection_result )
         {
             // Test whether the line-line intersection is on the segment.
-            if( new_point_segment_distance(
+            if( point_segment_distance(
                     line_intersection_result.result.value(), segment )
                 > global_epsilon )
             {
@@ -769,19 +763,16 @@ namespace geode
         correctness.second.first = true;
         for( const auto r : LRange{ result.numIntersections } )
         {
-            double distance;
-            Point3D point;
-
             // distance to line
-            std::tie( distance, point ) =
-                point_line_distance( results[r], line );
+            auto distance = point_line_distance( results[r], line );
             correctness.first.first = distance <= global_epsilon;
-            correctness.first.second.push_back( point );
-            std::tie( distance, point ) =
-                point_line_distance( results.back(), line );
+            correctness.first.second.push_back(
+                point_line_projection( results[r], line ) );
+            distance = point_line_distance( results.back(), line );
             correctness.first.first =
                 correctness.first.first && distance <= global_epsilon;
-            correctness.first.second.push_back( point );
+            correctness.first.second.push_back(
+                point_line_projection( results.back(), line ) );
 
             // distance to cylinder
             // first check distance and projection orientation to the cylinder
@@ -816,7 +807,7 @@ namespace geode
             if( !cur_correctness )
             {
                 distance =
-                    new_point_segment_distance( results[r], cylinder.axis() );
+                    point_segment_distance( results[r], cylinder.axis() );
                 cur_correctness =
                     std::fabs( distance - cylinder.radius() ) <= global_epsilon;
             }
@@ -840,8 +831,7 @@ namespace geode
                 line_intersections.result.value().size() );
             for( auto&& point : line_intersections.result.value() )
             {
-                if( new_point_segment_distance( point, segment )
-                    <= global_epsilon )
+                if( point_segment_distance( point, segment ) <= global_epsilon )
                 {
                     segment_intersections.emplace_back( point );
                 }

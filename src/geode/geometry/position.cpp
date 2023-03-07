@@ -207,7 +207,7 @@ namespace geode
     Position point_segment_position(
         const Point< dimension >& point, const Segment< dimension >& segment )
     {
-        if( new_point_segment_distance( point, segment ) > global_epsilon )
+        if( point_segment_distance( point, segment ) > global_epsilon )
         {
             return Position::outside;
         }

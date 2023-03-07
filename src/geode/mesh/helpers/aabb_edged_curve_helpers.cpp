@@ -35,6 +35,7 @@
 #include <geode/geometry/basic_objects/segment.h>
 #include <geode/geometry/distance.h>
 #include <geode/geometry/point.h>
+#include <geode/geometry/projection.h>
 
 #include <geode/mesh/core/edged_curve.h>
 
@@ -61,7 +62,9 @@ namespace geode
         DistanceToEdge< dimension >::operator()(
             const Point< dimension >& query, index_t cur_box ) const
     {
-        return point_segment_distance( query, mesh_.segment( cur_box ) );
+        const auto segment = mesh_.segment( cur_box );
+        return std::make_tuple( point_segment_distance( query, segment ),
+            point_segment_projection( query, segment ) );
     }
 
     template opengeode_mesh_api AABBTree2D create_aabb_tree< 2 >(
