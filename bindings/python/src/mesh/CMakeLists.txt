@@ -71,5 +71,6 @@ add_geode_python_binding(
         "io/triangulated_surface.h"
         "io/vertex_set.h"
     DEPENDENCIES
+        ${PROJECT_NAME}::image
         ${PROJECT_NAME}::mesh
 )
