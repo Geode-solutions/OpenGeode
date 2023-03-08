@@ -406,32 +406,6 @@ void test_segment_segment_distance_2d()
         "owner_segment_dc and owner_segment_gh" );
 }
 
-void test_config()
-{
-    const geode::Point3D p0{ { 12176.394751023, 2232.19265248916,
-        -2786.33164987907 } };
-    const geode::Point3D p1{ { 12163.6629087524, 2243.46415131496,
-        -2788.01160166871 } };
-    const geode::Point3D p2{ { 12265.6854636383, 2153.14358863662,
-        -2774.54981274668 } };
-    const geode::Point3D p3{ { 12267.5446450186, 2151.49765551934,
-        -2774.30450245031 } };
-
-    geode::Segment3D seg01{ p0, p1 };
-    geode::Segment3D seg02{ p0, p2 };
-    geode::Segment3D seg03{ p0, p3 };
-    geode::Segment3D seg12{ p1, p2 };
-    geode::Segment3D seg13{ p1, p3 };
-    geode::Segment3D seg23{ p2, p3 };
-
-    geode::Segment3D seg10{ p1, p0 };
-    geode::Segment3D seg20{ p2, p0 };
-    geode::Segment3D seg30{ p3, p0 };
-    geode::Segment3D seg21{ p2, p1 };
-    geode::Segment3D seg31{ p3, p1 };
-    geode::Segment3D seg32{ p3, p2 };
-}
-
 void test_segment_segment_distance_3d()
 {
     const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
@@ -477,14 +451,63 @@ void test_segment_segment_distance_3d()
         distance == 1. && closest_point0 == d && closest_point1 == g,
         "[Test] Wrong result for segment_segment_distance with segment_cd and "
         "segment_gh" );
-
-    test_config();
 }
 
 void test_segment_segment_distance()
 {
     test_segment_segment_distance_2d();
     test_segment_segment_distance_3d();
+}
+
+void test_segment_line_distance()
+{
+    const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
+    const geode::Point3D b{ { 2.0, 2.0, 0.0 } };
+    const geode::Point3D c{ { 0.0, 2.0, 1.0 } };
+    const geode::Point3D d{ { 2.0, 0.0, 1.0 } };
+    const geode::Point3D e{ { 0.0, 0.0, 1.0 } };
+    const geode::Point3D f{ { 2.0, 2.0, 1.0 } };
+    const geode::Point3D g{ { 3.0, 0.0, 1.0 } };
+    const geode::Point3D h{ { 5.0, -2.0, 1.0 } };
+    const geode::Segment3D segment_ab{ a, b };
+    const geode::Segment3D segment_cd{ c, d };
+    const geode::Segment3D segment_ef{ e, f };
+    const geode::Segment3D segment_gh{ g, h };
+    const geode::InfiniteLine3D line_cd{ segment_cd };
+    const geode::InfiniteLine3D line_ef{ segment_ef };
+    const geode::InfiniteLine3D line_gh{ segment_gh };
+
+    double distance;
+    geode::Point3D closest_point0;
+    geode::Point3D closest_point1;
+
+    std::tie( distance, closest_point0, closest_point1 ) =
+        geode::segment_line_distance( segment_ab, line_cd );
+    const geode::Point3D result_t00{ { 1.0, 1.0, 0.0 } };
+    const geode::Point3D result_t01{ { 1.0, 1.0, 1.0 } };
+    OPENGEODE_EXCEPTION( distance == 1.
+                             && closest_point0.inexact_equal( result_t00 )
+                             && closest_point1.inexact_equal( result_t01 ),
+        "[Test] Wrong result for segment_line_distance with segment_ab and "
+        "line_cd" );
+
+    std::tie( distance, closest_point0, closest_point1 ) =
+        geode::segment_line_distance( segment_ab, line_ef );
+    const geode::Point3D result_t10{ { 0.0, 0.0, 0.0 } };
+    const geode::Point3D result_t11{ { 0.0, 0.0, 1.0 } };
+    OPENGEODE_EXCEPTION( std::fabs( distance - 1 ) <= geode::global_epsilon
+                             && closest_point0.inexact_equal( result_t10 )
+                             && closest_point1.inexact_equal( result_t11 ),
+        "[Test] Wrong result for segment_line_distance with segment_ab and "
+        "line_ef" );
+
+    std::tie( distance, closest_point0, closest_point1 ) =
+        geode::segment_line_distance( segment_cd, line_gh );
+    const geode::Point3D result_t21{ { 0.5, 2.5, 1.0 } };
+    OPENGEODE_EXCEPTION( distance == sqrt( 2 ) / 2. && closest_point0 == c
+                             && closest_point1.inexact_equal( result_t21 ),
+        "[Test] Wrong result for segment_line_distance with segment_cd and "
+        "line_gh" );
 }
 
 void test_point_triangle_distance()
@@ -930,16 +953,137 @@ void test_point_circle_distance()
         "a and circle_x" );
 }
 
+void test_line_triangle_distance()
+{
+    const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
+    const geode::Point3D b{ { 2.0, 2.0, 0.0 } };
+    const geode::Point3D c{ { 0.0, 2.0, 1.0 } };
+    const geode::Point3D d{ { 2.0, 0.0, 1.0 } };
+    const geode::Point3D e{ { 0.0, 0.0, 1.0 } };
+    const geode::Point3D f{ { 2.0, 2.0, 1.0 } };
+    const geode::Point3D g{ { 3.0, 3.0, 1.0 } };
+    const geode::Point3D h{ { 5.0, 5.0, 1.0 } };
+    const geode::Triangle3D cdg{ c, d, g };
+    const geode::Segment3D seg_ab{ a, b };
+    const geode::Segment3D seg_ef{ e, f };
+    const geode::InfiniteLine3D line_ab{ seg_ab };
+    const geode::InfiniteLine3D line_ef{ seg_ef };
+    const geode::InfiniteLine3D line_bz{ geode::Vector3D{ { 0, 0, 1 } }, b };
+    const geode::InfiniteLine3D line_hx{ geode::Vector3D{ { 1, 0, 0 } }, h };
+
+    double distance;
+    geode::Point3D closest_point0;
+    geode::Point3D closest_point1;
+
+    std::tie( distance, closest_point0, closest_point1 ) =
+        geode::line_triangle_distance( line_ab, cdg );
+    const geode::Point3D result_t00{ { 1.0, 1.0, 0.0 } };
+    const geode::Point3D result_t01{ { 1.0, 1.0, 1.0 } };
+    OPENGEODE_EXCEPTION( distance == 1.
+                             && closest_point0.inexact_equal( result_t00 )
+                             && closest_point1.inexact_equal( result_t01 ),
+        "[Test] Wrong result for line_triangle_distance with line_ab" );
+
+    std::tie( distance, closest_point0, closest_point1 ) =
+        geode::line_triangle_distance( line_ef, cdg );
+    const geode::Point3D result_t10{ { 1.0, 1.0, 1.0 } };
+    const geode::Point3D result_t11{ { 1.0, 1.0, 1.0 } };
+    OPENGEODE_EXCEPTION( distance == 0.
+                             && closest_point0.inexact_equal( result_t10 )
+                             && closest_point1.inexact_equal( result_t11 ),
+        "[Test] Wrong result for line_triangle_distance with line_ef" );
+
+    std::tie( distance, closest_point0, closest_point1 ) =
+        geode::line_triangle_distance( line_bz, cdg );
+    OPENGEODE_EXCEPTION( distance == 0. && closest_point0.inexact_equal( f )
+                             && closest_point1.inexact_equal( f ),
+        "[Test] Wrong result for line_triangle_distance with line_bz" );
+
+    std::tie( distance, closest_point0, closest_point1 ) =
+        geode::line_triangle_distance( line_hx, cdg );
+    const geode::Point3D result_t30{ { 3.0, 5.0, 1.0 } };
+    OPENGEODE_EXCEPTION( distance == 2.
+                             && closest_point0.inexact_equal( result_t30 )
+                             && closest_point1.inexact_equal( g ),
+        "[Test] Wrong result for line_triangle_distance with line_hx" );
+}
+
+void test_segment_triangle_distance()
+{
+    const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
+    const geode::Point3D b{ { 2.0, 2.0, 0.0 } };
+    const geode::Point3D bplus{ { 2.0, 2.0, 2.0 } };
+    const geode::Point3D bminus{ { 2.0, 2.0, -2.0 } };
+    const geode::Point3D c{ { 0.0, 2.0, 1.0 } };
+    const geode::Point3D d{ { 2.0, 0.0, 1.0 } };
+    const geode::Point3D e{ { 0.0, 0.0, 1.0 } };
+    const geode::Point3D f{ { 2.0, 2.0, 1.0 } };
+    const geode::Point3D g{ { 3.0, 3.0, 1.0 } };
+    const geode::Point3D h{ { 5.0, 5.0, 1.0 } };
+    const geode::Point3D h2{ { 0.0, 5.0, 1.0 } };
+    const geode::Triangle3D cdg{ c, d, g };
+    const geode::Segment3D seg_ab{ a, b };
+    const geode::Segment3D seg_ef{ e, f };
+    const geode::Segment3D seg_bz0{ bplus, b };
+    const geode::Segment3D seg_bz1{ bminus, b };
+    const geode::Segment3D seg_hx{ h2, h };
+
+    double distance;
+    geode::Point3D closest_point0;
+    geode::Point3D closest_point1;
+
+    std::tie( distance, closest_point0, closest_point1 ) =
+        geode::segment_triangle_distance( seg_ab, cdg );
+    const geode::Point3D result_t00{ { 1.0, 1.0, 0.0 } };
+    const geode::Point3D result_t01{ { 1.0, 1.0, 1.0 } };
+    OPENGEODE_EXCEPTION( distance == 1.
+                             && closest_point0.inexact_equal( result_t00 )
+                             && closest_point1.inexact_equal( result_t01 ),
+        "[Test] Wrong result for segment_triangle_distance with seg_ab" );
+
+    std::tie( distance, closest_point0, closest_point1 ) =
+        geode::segment_triangle_distance( seg_ef, cdg );
+    const geode::Point3D result_t10{ { 1.0, 1.0, 1.0 } };
+    const geode::Point3D result_t11{ { 1.0, 1.0, 1.0 } };
+    OPENGEODE_EXCEPTION( distance == 0.
+                             && closest_point0.inexact_equal( result_t10 )
+                             && closest_point1.inexact_equal( result_t11 ),
+        "[Test] Wrong result for segment_triangle_distance with seg_ef" );
+
+    std::tie( distance, closest_point0, closest_point1 ) =
+        geode::segment_triangle_distance( seg_bz0, cdg );
+    OPENGEODE_EXCEPTION( distance == 0. && closest_point0.inexact_equal( f )
+                             && closest_point1.inexact_equal( f ),
+        "[Test] Wrong result for segment_triangle_distance with seg_bz0" );
+
+    std::tie( distance, closest_point0, closest_point1 ) =
+        geode::segment_triangle_distance( seg_bz1, cdg );
+    OPENGEODE_EXCEPTION( distance == 1. && closest_point0.inexact_equal( b )
+                             && closest_point1.inexact_equal( f ),
+        "[Test] Wrong result for segment_triangle_distance with seg_bz1" );
+
+    std::tie( distance, closest_point0, closest_point1 ) =
+        geode::segment_triangle_distance( seg_hx, cdg );
+    const geode::Point3D result_t30{ { 3.0, 5.0, 1.0 } };
+    OPENGEODE_EXCEPTION( distance == 2.
+                             && closest_point0.inexact_equal( result_t30 )
+                             && closest_point1.inexact_equal( g ),
+        "[Test] Wrong result for segment_triangle_distance with seg_hx" );
+}
+
 void test()
 {
     test_point_segment_distance();
     test_segment_segment_distance();
+    test_segment_line_distance();
     test_point_line_distance();
     test_point_triangle_distance();
     test_point_tetrahedron_distance();
     test_point_plane_distance();
     test_point_sphere_distance();
     test_point_circle_distance();
+    test_line_triangle_distance();
+    test_segment_triangle_distance();
 }
 
 OPENGEODE_TEST( "distance" )
