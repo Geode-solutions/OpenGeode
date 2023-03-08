@@ -494,6 +494,68 @@ namespace geode
     }
 
     template < index_t dimension >
+    std::tuple< double, Point< dimension >, Point< dimension > >
+        segment_line_distance( const Segment< dimension >& segment,
+            const InfiniteLine< dimension >& line )
+    {
+        const auto segDirection = segment.direction();
+        const Vector< dimension > diff{ segment.vertices()[0], line.origin() };
+        const auto a00 = line.direction().dot( line.direction() );
+        const auto a01 = -line.direction().dot( segDirection );
+        const auto a11 = segDirection.dot( segDirection );
+        const auto b0 = line.direction().dot( diff );
+        const auto det = std::max( a00 * a11 - a01 * a01, 0. );
+        double s0, s1;
+
+        if( det > 0 )
+        {
+            // The line and segment are not parallel.
+            const auto b1 = -segDirection.dot( diff );
+            s1 = a01 * b0 - a00 * b1;
+
+            if( s1 >= 0 )
+            {
+                if( s1 <= det )
+                {
+                    // Two interior points are closest, one on the line
+                    // and one on the segment.
+                    s0 = ( a01 * b1 - a11 * b0 ) / det;
+                    s1 /= det;
+                }
+                else
+                {
+                    // The endpoint Q1 of the segment and an interior
+                    // point of the line are closest.
+                    s0 = -( a01 + b0 ) / a00;
+                    s1 = 1;
+                }
+            }
+            else
+            {
+                // The endpoint Q0 of the segment and an interior point
+                // of the line are closest.
+                s0 = -b0 / a00;
+                s1 = 0;
+            }
+        }
+        else
+        {
+            // The line and segment are parallel. Select the pair of
+            // closest points where the closest segment point is the
+            // endpoint Q0.
+            s0 = -b0 / a00;
+            s1 = 0;
+        }
+
+        auto closest_on_line = line.origin() + line.direction() * s0;
+        auto closest_on_segment =
+            segment.vertices()[0].get() + segDirection * s1;
+        return std::make_tuple(
+            point_point_distance( closest_on_line, closest_on_segment ),
+            std::move( closest_on_segment ), std::move( closest_on_line ) );
+    }
+
+    template < index_t dimension >
     double point_line_distance(
         const Point< dimension >& point, const InfiniteLine< dimension >& line )
     {
@@ -744,6 +806,108 @@ namespace geode
         return std::make_tuple( result, closest_point );
     }
 
+    std::tuple< double, Point3D, Point3D > line_triangle_distance(
+        const InfiniteLine3D& line, const Triangle3D& triangle )
+    {
+        // The line points are X = P + t * D and the triangle points
+        // are Y = b[0] * V[0] + b[1] * V[1] + b[2] * V[2], where the
+        // barycentric coordinates satisfy b[i] in [0,1] and
+        // b[0] + b[1] + b[2 = 1. Define the triangle edge directions by
+        // E[1] = V[1] - V[0] and E[2] = V[2] - V[0]; then
+        // Y = V[0] + b1 * E[1] + b2 * E[2]. If Y is specified the
+        // barycentric coordinates are the solution to
+        //
+        // +-                        -+ +-    -+   +-                 -+
+        // | Dot(E1, E1)  Dot(E1, E2) | | b[1] | = | Dot(E1, Y - V[0]) |
+        // | Dot(E1, E2)  Dot(E2, E2) | | b[2] |   | Dot(E2, Y - V[0]) |
+        // +-                        -+ +-    -+   +-                 -+
+        //
+        // and b[0] = 1 - b[1] - b[2].
+
+        // Test whether the line intersects triangle. If so, the squared
+        // distance is zero. The normal of the plane of the triangle does
+        // not have to be normalized to unit length.
+        const Vector3D E1{ triangle.vertices()[0], triangle.vertices()[1] };
+        const Vector3D E2{ triangle.vertices()[0], triangle.vertices()[2] };
+        const auto N = E1.cross( E2 );
+        const auto NdD = N.dot( line.direction() );
+        if( std::fabs( NdD ) > 0 )
+        {
+            // The line and triangle are not parallel, so the line
+            // intersects the plane of the triangle at a point Y.
+            // Determine whether Y is contained by the triangle.
+            const Vector3D PmV0{ triangle.vertices()[0], line.origin() };
+            const auto NdDiff = N.dot( PmV0 );
+            const auto tIntersect = -NdDiff / NdD;
+            const auto Y = line.origin() + line.direction() * tIntersect;
+            const Vector3D YmV0{ triangle.vertices()[0], Y };
+
+            // Compute the barycentric coordinates of the intersection.
+            const auto E1dE1 = E1.dot( E1 );
+            const auto E1dE2 = E1.dot( E2 );
+            const auto E2dE2 = E2.dot( E2 );
+            const auto E1dYmV0 = E1.dot( YmV0 );
+            const auto E2dYmV0 = E2.dot( YmV0 );
+            const auto det = E1dE1 * E2dE2 - E1dE2 * E1dE2;
+            const auto b1 = ( E2dE2 * E1dYmV0 - E1dE2 * E2dYmV0 ) / det;
+            const auto b2 = ( E1dE1 * E2dYmV0 - E1dE2 * E1dYmV0 ) / det;
+            const auto b0 = 1 - b1 - b2;
+
+            if( b0 >= 0 && b1 >= 0 && b2 >= 0 )
+            {
+                // The point Y is contained by the triangle.
+                return std::make_tuple( 0, Y, Y );
+            }
+        }
+
+        // Either (1) the line is not parallel to the triangle and the
+        // point of intersection of the line and the plane of the triangle
+        // is outside the triangle or (2) the line and triangle are
+        // parallel. Regardless, the closest point on the triangle is on
+        // an edge of the triangle. Compare the line to all three edges
+        // of the triangle. To allow for arbitrary precision arithmetic,
+        // the initial distance and sqrDistance are initialized to a
+        // negative number rather than a floating-point maximum value.
+        // Tracking the minimum requires a small amount of extra logic.
+
+        double smallest_distance = std::numeric_limits< double >::max();
+        Point3D closest_on_edge;
+        Point3D closest_on_line;
+        for( const auto v : LRange{ 3 } )
+        {
+            const auto next = v == 2 ? 0 : v + 1;
+            const Segment3D edge{ triangle.vertices()[v],
+                triangle.vertices()[next] };
+            const auto result = segment_line_distance( edge, line );
+            const auto cur_distance = std::get< 0 >( result );
+
+            if( cur_distance < smallest_distance )
+            {
+                smallest_distance = cur_distance;
+                closest_on_edge = std::get< 1 >( result );
+                closest_on_line = std::get< 2 >( result );
+            }
+        }
+
+        return std::make_tuple(
+            smallest_distance, closest_on_line, closest_on_edge );
+    }
+
+    std::tuple< double, Point3D, Point3D > segment_triangle_distance(
+        const Segment3D& segment, const Triangle3D& triangle )
+    {
+        const InfiniteLine3D line{ segment };
+        const auto line_triangle_result =
+            line_triangle_distance( line, triangle );
+        const auto& closest_on_line = std::get< 1 >( line_triangle_result );
+        const auto& closest_on_triangle = std::get< 2 >( line_triangle_result );
+        const auto closest_on_segment =
+            point_segment_projection( closest_on_line, segment );
+        return std::make_tuple(
+            point_point_distance( closest_on_segment, closest_on_triangle ),
+            closest_on_segment, closest_on_triangle );
+    }
+
     std::tuple< double, Point3D > point_tetrahedron_distance(
         const Point3D& point, const Tetrahedron& tetra )
     {
@@ -944,6 +1108,8 @@ namespace geode
         const Point2D&, const Segment2D& );
     template std::tuple< double, Point2D, Point2D > opengeode_geometry_api
         segment_segment_distance( const Segment2D&, const Segment2D& );
+    template std::tuple< double, Point2D, Point2D > opengeode_geometry_api
+        segment_line_distance( const Segment2D&, const InfiniteLine2D& );
     template double opengeode_geometry_api point_line_distance(
         const Point2D&, const InfiniteLine2D& );
     template std::tuple< double, Point2D > opengeode_geometry_api
@@ -961,6 +1127,8 @@ namespace geode
         const Point3D&, const Segment3D& );
     template std::tuple< double, Point3D, Point3D > opengeode_geometry_api
         segment_segment_distance( const Segment3D&, const Segment3D& );
+    template std::tuple< double, Point3D, Point3D > opengeode_geometry_api
+        segment_line_distance( const Segment3D&, const InfiniteLine3D& );
     template double opengeode_geometry_api point_line_distance(
         const Point3D&, const InfiniteLine3D& );
     template std::tuple< double, Point3D > opengeode_geometry_api

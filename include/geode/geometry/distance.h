@@ -34,7 +34,8 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( Sphere );
     ALIAS_2D_AND_3D( Point );
     ALIAS_2D_AND_3D( Triangle );
-    ALIAS_2D( InfiniteLine );
+    ALIAS_2D_AND_3D( InfiniteLine );
+    ALIAS_3D( Segment );
     class Plane;
     class Tetrahedron;
     class Circle;
@@ -71,6 +72,11 @@ namespace geode
         segment_segment_distance( const Segment< dimension >& segment0,
             const Segment< dimension >& segment1 );
 
+    template < index_t dimension >
+    std::tuple< double, Point< dimension >, Point< dimension > >
+        segment_line_distance( const Segment< dimension >& segment,
+            const InfiniteLine< dimension >& line );
+
     /*!
      * Compute the smallest distance between a point and an infinite line
      */
@@ -106,6 +112,28 @@ namespace geode
      */
     std::tuple< double, Point3D > point_triangle_signed_distance(
         const Point3D& point, const Triangle3D& triangle );
+
+    /*!
+     * Compute the smallest distance between an infinite line and a triangle
+     * @return a tuple containing:
+     * - the smallest distance.
+     * - the closest point on the line.
+     * - the closest point on the triangle.
+     */
+    std::tuple< double, Point3D, Point3D >
+        opengeode_geometry_api line_triangle_distance(
+            const InfiniteLine3D& line, const Triangle3D& triangle );
+
+    /*!
+     * Compute the smallest distance between an segment and a triangle
+     * @return a tuple containing:
+     * - the smallest distance.
+     * - the closest point on the segment.
+     * - the closest point on the triangle.
+     */
+    std::tuple< double, Point3D, Point3D >
+        opengeode_geometry_api segment_triangle_distance(
+            const Segment3D& segment, const Triangle3D& triangle );
 
     /*!
      * Compute the distance between a point and a tetrahedron

@@ -32,6 +32,10 @@
         "segment_segment_distance" + std::to_string( dimension ) + "D";        \
     module.def( segment_segment_distance##dimension.c_str(),                   \
         &segment_segment_distance< dimension > );                              \
+    const auto segment_line_distance##dimension =                              \
+        "segment_line_distance" + std::to_string( dimension ) + "D";           \
+    module.def( segment_line_distance##dimension.c_str(),                      \
+        &segment_line_distance< dimension > );                                 \
     const auto point_line_distance##dimension =                                \
         "point_line_distance" + std::to_string( dimension ) + "D";             \
     module.def( point_line_distance##dimension.c_str(),                        \
@@ -67,5 +71,7 @@ namespace geode
         module.def(
             "point_circle_signed_distance", &point_circle_signed_distance );
         module.def( "point_disk_distance", &point_disk_distance );
+        module.def( "line_triangle_distance", &line_triangle_distance );
+        module.def( "segment_triangle_distance", &segment_triangle_distance );
     }
 } // namespace geode
