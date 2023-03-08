@@ -391,34 +391,34 @@ def test_line_triangle_distance():
     line_bz = geom.InfiniteLine3D( geom.Vector3D([0.0, 0.0, 1.0]), b )
     line_hx = geom.InfiniteLine3D( geom.Vector3D([1.0, 0.0, 0.0]), h )
 
-    distance, closest_point0, closest_point1 = geom.line_triangle_distance3D(
+    distance, closest_point0, closest_point1 = geom.line_triangle_distance(
         line_ab, cdg)
     r00 = geom.Point3D([1.0, 1.0, 0.0])
     r01 = geom.Point3D([1.0, 1.0, 1.0])
     if abs(distance - 1) > og.global_epsilon or not closest_point0.inexact_equal(r00) or not closest_point1.inexact_equal(r01):
         raise ValueError(
-            "[Test] Wrong result for line_triangle_distance3D with query line_ab")
+            "[Test] Wrong result for line_triangle_distance with query line_ab")
     
-    distance, closest_point0, closest_point1 = geom.line_triangle_distance3D(
+    distance, closest_point0, closest_point1 = geom.line_triangle_distance(
         line_ef, cdg)
     r00 = geom.Point3D([1.0, 1.0, 1.0])
     r01 = geom.Point3D([1.0, 1.0, 1.0])
     if abs(distance) > og.global_epsilon or not closest_point0.inexact_equal(r00) or not closest_point1.inexact_equal(r01):
         raise ValueError(
-            "[Test] Wrong result for line_triangle_distance3D with query line_ef")
+            "[Test] Wrong result for line_triangle_distance with query line_ef")
     
-    distance, closest_point0, closest_point1 = geom.line_triangle_distance3D(
+    distance, closest_point0, closest_point1 = geom.line_triangle_distance(
         line_bz, cdg)
     if abs(distance) > og.global_epsilon or not closest_point0.inexact_equal(f) or not closest_point1.inexact_equal(f):
         raise ValueError(
-            "[Test] Wrong result for line_triangle_distance3D with query line_bz")
+            "[Test] Wrong result for line_triangle_distance with query line_bz")
     
-    distance, closest_point0, closest_point1 = geom.line_triangle_distance3D(
+    distance, closest_point0, closest_point1 = geom.line_triangle_distance(
         line_hx, cdg)
     r00 = geom.Point3D([3.0, 5.0, 0.0])
     if abs(distance - 2) > og.global_epsilon or not closest_point0.inexact_equal(r00) or not closest_point1.inexact_equal(g):
         raise ValueError(
-            "[Test] Wrong result for line_triangle_distance3D with query line_hx")
+            "[Test] Wrong result for line_triangle_distance with query line_hx")
     
 def test_segment_triangle_distance():
     a = geom.Point3D([0.0, 0.0, 0.0])
@@ -439,40 +439,40 @@ def test_segment_triangle_distance():
     seg_bz1 = geom.Segment3D(bminus, b)
     seg_hx = geom.Segment3D(h2, h)
 
-    distance, closest_point0, closest_point1 = geom.segment_triangle_distance3D(
+    distance, closest_point0, closest_point1 = geom.segment_triangle_distance(
         seg_ab, cdg)
     r00 = geom.Point3D([1.0, 1.0, 0.0])
     r01 = geom.Point3D([1.0, 1.0, 1.0])
     if abs(distance - 1) > og.global_epsilon or not closest_point0.inexact_equal(r00) or not closest_point1.inexact_equal(r01):
         raise ValueError(
-            "[Test] Wrong result for segment_triangle_distance3D with query seg_ab")
+            "[Test] Wrong result for segment_triangle_distance with query seg_ab")
     
-    distance, closest_point0, closest_point1 = geom.segment_triangle_distance3D(
+    distance, closest_point0, closest_point1 = geom.segment_triangle_distance(
         seg_ef, cdg)
     r00 = geom.Point3D([1.0, 1.0, 1.0])
     r01 = geom.Point3D([1.0, 1.0, 1.0])
     if abs(distance) > og.global_epsilon or not closest_point0.inexact_equal(r00) or not closest_point1.inexact_equal(r01):
         raise ValueError(
-            "[Test] Wrong result for segment_triangle_distance3D with query seg_ef")
+            "[Test] Wrong result for segment_triangle_distance with query seg_ef")
     
-    distance, closest_point0, closest_point1 = geom.segment_triangle_distance3D(
+    distance, closest_point0, closest_point1 = geom.segment_triangle_distance(
         seg_bz0, cdg)
     if abs(distance) > og.global_epsilon or not closest_point0.inexact_equal(f) or not closest_point1.inexact_equal(f):
         raise ValueError(
-            "[Test] Wrong result for segment_triangle_distance3D with query seg_bz0")
+            "[Test] Wrong result for segment_triangle_distance with query seg_bz0")
     
-    distance, closest_point0, closest_point1 = geom.segment_triangle_distance3D(
+    distance, closest_point0, closest_point1 = geom.segment_triangle_distance(
         seg_bz1, cdg)
     if abs(distance - 1) > og.global_epsilon or not closest_point0.inexact_equal(b) or not closest_point1.inexact_equal(f):
         raise ValueError(
-            "[Test] Wrong result for segment_triangle_distance3D with query seg_bz1")
+            "[Test] Wrong result for segment_triangle_distance with query seg_bz1")
     
-    distance, closest_point0, closest_point1 = geom.segment_triangle_distance3D(
+    distance, closest_point0, closest_point1 = geom.segment_triangle_distance(
         seg_hx, cdg)
     r00 = geom.Point3D([3.0, 5.0, 0.0])
     if abs(distance - 2) > og.global_epsilon or not closest_point0.inexact_equal(r00) or not closest_point1.inexact_equal(g):
         raise ValueError(
-            "[Test] Wrong result for segment_triangle_distance3D with query seg_hx")
+            "[Test] Wrong result for segment_triangle_distance with query seg_hx")
 
 if __name__ == '__main__':
     test_point_segment_distance()
