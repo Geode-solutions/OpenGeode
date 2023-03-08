@@ -378,7 +378,7 @@ namespace geode
                 auto result = line.origin() + line.direction() * seg_parameter;
 
                 CorrectnessInfo< Point3D > correctness;
-                auto distance = point_line_distance( result, line );
+                const auto distance = point_line_distance( result, line );
                 correctness.first.first = distance <= global_epsilon;
                 correctness.first.second =
                     point_line_projection( result, line );

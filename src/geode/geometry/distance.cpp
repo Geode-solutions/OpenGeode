@@ -827,8 +827,9 @@ namespace geode
         // Test whether the line intersects triangle. If so, the squared
         // distance is zero. The normal of the plane of the triangle does
         // not have to be normalized to unit length.
-        const Vector3D E1{ triangle.vertices()[0], triangle.vertices()[1] };
-        const Vector3D E2{ triangle.vertices()[0], triangle.vertices()[2] };
+        const auto& vertices = triangle.vertices();
+        const Vector3D E1{ vertices[0], vertices[1] };
+        const Vector3D E2{ vertices[0], vertices[2] };
         const auto N = E1.cross( E2 );
         const auto NdD = N.dot( line.direction() );
         if( std::fabs( NdD ) > 0 )
@@ -836,11 +837,11 @@ namespace geode
             // The line and triangle are not parallel, so the line
             // intersects the plane of the triangle at a point Y.
             // Determine whether Y is contained by the triangle.
-            const Vector3D PmV0{ triangle.vertices()[0], line.origin() };
+            const Vector3D PmV0{ vertices[0], line.origin() };
             const auto NdDiff = N.dot( PmV0 );
             const auto tIntersect = -NdDiff / NdD;
             const auto Y = line.origin() + line.direction() * tIntersect;
-            const Vector3D YmV0{ triangle.vertices()[0], Y };
+            const Vector3D YmV0{ vertices[0], Y };
 
             // Compute the barycentric coordinates of the intersection.
             const auto E1dE1 = E1.dot( E1 );
@@ -876,8 +877,7 @@ namespace geode
         for( const auto v : LRange{ 3 } )
         {
             const auto next = v == 2 ? 0 : v + 1;
-            const Segment3D edge{ triangle.vertices()[v],
-                triangle.vertices()[next] };
+            const Segment3D edge{ vertices[v], vertices[next] };
             const auto result = segment_line_distance( edge, line );
             const auto cur_distance = std::get< 0 >( result );
 
