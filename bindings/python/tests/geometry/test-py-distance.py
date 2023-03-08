@@ -135,7 +135,7 @@ def test_segment_line_distance():
             "[Test] Wrong result for segment_line_distance3D with query segment_ab and line_cd")
 
     distance, closest_point0, closest_point1 = geom.segment_line_distance3D(
-        segment_ab, segment_ef)
+        segment_ab, line_ef)
     r00 = geom.Point3D([0.0, 0.0, 0.0])
     r01 = geom.Point3D([0.0, 0.0, 1.0])
     if abs(distance - 1) > og.global_epsilon or not closest_point0.inexact_equal(r00) or not closest_point1.inexact_equal(r01):
@@ -143,7 +143,7 @@ def test_segment_line_distance():
             "[Test] Wrong result for segment_line_distance3D with query segment_ab and line_ef")
 
     distance, closest_point0, closest_point1 = geom.segment_line_distance3D(
-        segment_cd, segment_gh)
+        segment_cd, line_gh)
     r01 = geom.Point3D([0.5, 2.5, 1.0])
     if abs(distance - math.sqrt(2)/2.) > og.global_epsilon or not closest_point0.inexact_equal(c) or not closest_point1.inexact_equal(r01):
         raise ValueError(
