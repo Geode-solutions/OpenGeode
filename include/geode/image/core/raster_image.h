@@ -71,6 +71,8 @@ namespace geode
 
         void set_color( index_t index, RGBColor color );
 
+        RasterImage clone() const;
+
     private:
         template < typename Archive >
         void serialize( Archive& archive );

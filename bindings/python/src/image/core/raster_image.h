@@ -32,7 +32,8 @@
         .def(                                                                  \
             "native_extension", &RasterImage##dimension##D::native_extension ) \
         .def( "color", &RasterImage##dimension##D::color )                     \
-        .def( "set_color", &RasterImage##dimension##D::set_color )
+        .def( "set_color", &RasterImage##dimension##D::set_color )             \
+        .def( "clone", &RasterImage##dimension##D::clone )
 
 namespace geode
 {

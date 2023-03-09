@@ -58,6 +58,11 @@ namespace geode
             colors_.resize( nb_cells );
         }
 
+        void copy_colors( const Impl& impl )
+        {
+            colors_ = impl.colors_;
+        }
+
     private:
         template < typename Archive >
         void serialize( Archive& archive )
@@ -132,6 +137,15 @@ namespace geode
     void RasterImage< dimension >::set_color( index_t index, RGBColor color )
     {
         impl_->set_color( index, std::move( color ) );
+    }
+
+    template < index_t dimension >
+    RasterImage< dimension > RasterImage< dimension >::clone() const
+    {
+        RasterImage< dimension > image;
+        image.copy( *this );
+        image.impl_->copy_colors( *impl_ );
+        return image;
     }
 
     template < index_t dimension >
