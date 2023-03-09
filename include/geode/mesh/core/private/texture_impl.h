@@ -43,6 +43,8 @@ namespace geode
             using ElementTextureCoordinates =
                 absl::InlinedVector< Point< dimension >, dimension + 1 >;
 
+            const Point< dimension > DEFAULT_COORD;
+
         public:
             const RasterImage< dimension >& image() const
             {
@@ -58,18 +60,25 @@ namespace geode
             const Point< dimension >& texture_coordinates_impl(
                 index_t element, local_index_t vertex ) const
             {
-                return coordinates_->value( element )[vertex];
+                const auto& element_coordinates =
+                    coordinates_->value( element );
+                if( vertex < element_coordinates.size() )
+                {
+                    return element_coordinates[vertex];
+                }
+                return DEFAULT_COORD;
             }
 
             void set_texture_coordinates_impl( index_t element,
                 local_index_t vertex,
                 const Point< dimension >& coordinates ) const
             {
-                coordinates_->modify_value( element,
-                    [vertex, &coordinates]( ElementTextureCoordinates& value ) {
+                coordinates_->modify_value(
+                    element, [this, vertex, &coordinates](
+                                 ElementTextureCoordinates& value ) {
                         if( vertex >= value.size() )
                         {
-                            value.resize( vertex + 1 );
+                            value.resize( vertex + 1, DEFAULT_COORD );
                         }
                         value[vertex] = coordinates;
                     } );
