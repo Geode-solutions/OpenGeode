@@ -51,6 +51,7 @@ if __name__ == '__main__':
         color = image.RGBColor(i, i, i)
         raster.set_color(i, color)
     test_raster(raster)
+    test_raster(raster.clone())
     image.save_raster_image2D(raster, "test.og_img2d")
     reload = image.load_raster_image2D("test.og_img2d")
     test_raster(reload)
