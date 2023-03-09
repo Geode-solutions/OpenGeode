@@ -1099,6 +1099,8 @@ namespace geode
 
     template double opengeode_geometry_api point_point_distance(
         const Point1D&, const Point1D& );
+    template double opengeode_geometry_api point_segment_distance(
+        const Point1D&, const Segment1D& );
     template std::tuple< double, Point1D, Point1D > opengeode_geometry_api
         segment_segment_distance( const Segment1D&, const Segment1D& );
 
