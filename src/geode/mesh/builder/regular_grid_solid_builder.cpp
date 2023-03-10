@@ -23,6 +23,8 @@
 
 #include <geode/mesh/builder/regular_grid_solid_builder.h>
 
+#include <async++.h>
+
 #include <geode/basic/attribute_manager.h>
 
 #include <geode/mesh/builder/mesh_builder_factory.h>
@@ -54,87 +56,115 @@ namespace geode
         grid_.vertex_attribute_manager().resize(
             ( nb_u + 1 ) * ( nb_v + 1 ) * ( nb_w + 1 ) );
         grid_.polyhedron_attribute_manager().resize( grid_.nb_cells() );
-        for( const auto w : Range{ nb_w } )
-        {
-            for( const auto v : Range{ nb_v } )
-            {
+        async::parallel_invoke(
+            [this, nb_u, nb_v, nb_w] {
+                for( const auto w : Range{ nb_w } )
+                {
+                    for( const auto v : Range{ nb_v } )
+                    {
+                        for( const auto u : Range{ nb_u } )
+                        {
+                            const auto cell = u + v * nb_u + w * nb_u * nb_v;
+                            const auto vertex =
+                                u + v * ( nb_u + 1 )
+                                + w * ( nb_u + 1 ) * ( nb_v + 1 );
+                            associate_polyhedron_vertex_to_vertex(
+                                { cell, 0 }, vertex );
+                        }
+                    }
+                }
+            },
+            [this, nb_u, nb_v, nb_w] {
+                // Last Face U
+                for( const auto w : Range{ nb_w } )
+                {
+                    for( const auto v : Range{ nb_v } )
+                    {
+                        const auto cell =
+                            ( nb_u - 1 ) + v * nb_u + w * nb_u * nb_v;
+                        const auto vertex = nb_u + v * ( nb_u + 1 )
+                                            + w * ( nb_u + 1 ) * ( nb_v + 1 );
+                        associate_polyhedron_vertex_to_vertex(
+                            { cell, 1 }, vertex );
+                    }
+                }
+            },
+            [this, nb_u, nb_v, nb_w] {
+                // Last Face V
+                for( const auto w : Range{ nb_w } )
+                {
+                    for( const auto u : Range{ nb_u } )
+                    {
+                        const auto cell =
+                            u + ( nb_v - 1 ) * nb_u + w * nb_u * nb_v;
+                        const auto vertex = u + nb_v * ( nb_u + 1 )
+                                            + w * ( nb_u + 1 ) * ( nb_v + 1 );
+                        associate_polyhedron_vertex_to_vertex(
+                            { cell, 2 }, vertex );
+                    }
+                }
+            },
+            [this, nb_u, nb_v, nb_w] {
+                // Last Face W
+                for( const auto v : Range{ nb_v } )
+                {
+                    for( const auto u : Range{ nb_u } )
+                    {
+                        const auto cell =
+                            u + v * nb_u + ( nb_w - 1 ) * nb_u * nb_v;
+                        const auto vertex =
+                            u + v * ( nb_u + 1 )
+                            + nb_w * ( nb_u + 1 ) * ( nb_v + 1 );
+                        associate_polyhedron_vertex_to_vertex(
+                            { cell, 4 }, vertex );
+                    }
+                }
+            },
+            [this, nb_u, nb_v, nb_w] {
+                // Last Line U-V
+                for( const auto w : Range{ nb_w } )
+                {
+                    const auto cell =
+                        ( nb_u - 1 ) + ( nb_v - 1 ) * nb_u + w * nb_u * nb_v;
+                    const auto vertex = nb_u + nb_v * ( nb_u + 1 )
+                                        + w * ( nb_u + 1 ) * ( nb_v + 1 );
+                    associate_polyhedron_vertex_to_vertex(
+                        { cell, 3 }, vertex );
+                }
+            },
+            [this, nb_u, nb_v, nb_w] {
+                // Last Line U-W
+                for( const auto v : Range{ nb_v } )
+                {
+                    const auto cell =
+                        ( nb_u - 1 ) + v * nb_u + ( nb_w - 1 ) * nb_u * nb_v;
+                    const auto vertex = nb_u + v * ( nb_u + 1 )
+                                        + nb_w * ( nb_u + 1 ) * ( nb_v + 1 );
+                    associate_polyhedron_vertex_to_vertex(
+                        { cell, 5 }, vertex );
+                }
+            },
+            [this, nb_u, nb_v, nb_w] {
+                // Last Line V-W
                 for( const auto u : Range{ nb_u } )
                 {
-                    const auto cell = u + v * nb_u + w * nb_u * nb_v;
-                    const auto vertex =
-                        u + v * ( nb_u + 1 ) + w * ( nb_u + 1 ) * ( nb_v + 1 );
+                    const auto cell =
+                        u + ( nb_v - 1 ) * nb_u + ( nb_w - 1 ) * nb_u * nb_v;
+                    const auto vertex = u + nb_v * ( nb_u + 1 )
+                                        + nb_w * ( nb_u + 1 ) * ( nb_v + 1 );
                     associate_polyhedron_vertex_to_vertex(
-                        { cell, 0 }, vertex );
+                        { cell, 6 }, vertex );
                 }
-            }
-        }
-        // Last Face U
-        for( const auto w : Range{ nb_w } )
-        {
-            for( const auto v : Range{ nb_v } )
-            {
-                const auto cell = ( nb_u - 1 ) + v * nb_u + w * nb_u * nb_v;
-                const auto vertex =
-                    nb_u + v * ( nb_u + 1 ) + w * ( nb_u + 1 ) * ( nb_v + 1 );
-                associate_polyhedron_vertex_to_vertex( { cell, 1 }, vertex );
-            }
-        }
-        // Last Face V
-        for( const auto w : Range{ nb_w } )
-        {
-            for( const auto u : Range{ nb_u } )
-            {
-                const auto cell = u + ( nb_v - 1 ) * nb_u + w * nb_u * nb_v;
-                const auto vertex =
-                    u + nb_v * ( nb_u + 1 ) + w * ( nb_u + 1 ) * ( nb_v + 1 );
-                associate_polyhedron_vertex_to_vertex( { cell, 2 }, vertex );
-            }
-        }
-        // Last Face W
-        for( const auto v : Range{ nb_v } )
-        {
-            for( const auto u : Range{ nb_u } )
-            {
-                const auto cell = u + v * nb_u + ( nb_w - 1 ) * nb_u * nb_v;
-                const auto vertex =
-                    u + v * ( nb_u + 1 ) + nb_w * ( nb_u + 1 ) * ( nb_v + 1 );
-                associate_polyhedron_vertex_to_vertex( { cell, 4 }, vertex );
-            }
-        }
-        // Last Line U-V
-        for( const auto w : Range{ nb_w } )
-        {
-            const auto cell =
-                ( nb_u - 1 ) + ( nb_v - 1 ) * nb_u + w * nb_u * nb_v;
-            const auto vertex =
-                nb_u + nb_v * ( nb_u + 1 ) + w * ( nb_u + 1 ) * ( nb_v + 1 );
-            associate_polyhedron_vertex_to_vertex( { cell, 3 }, vertex );
-        }
-        // Last Line U-W
-        for( const auto v : Range{ nb_v } )
-        {
-            const auto cell =
-                ( nb_u - 1 ) + v * nb_u + ( nb_w - 1 ) * nb_u * nb_v;
-            const auto vertex =
-                nb_u + v * ( nb_u + 1 ) + nb_w * ( nb_u + 1 ) * ( nb_v + 1 );
-            associate_polyhedron_vertex_to_vertex( { cell, 5 }, vertex );
-        }
-        // Last Line V-W
-        for( const auto u : Range{ nb_u } )
-        {
-            const auto cell =
-                u + ( nb_v - 1 ) * nb_u + ( nb_w - 1 ) * nb_u * nb_v;
-            const auto vertex =
-                u + nb_v * ( nb_u + 1 ) + nb_w * ( nb_u + 1 ) * ( nb_v + 1 );
-            associate_polyhedron_vertex_to_vertex( { cell, 6 }, vertex );
-        }
-        // Last Corner U-V-W
-        const auto cell =
-            ( nb_u - 1 ) + ( nb_v - 1 ) * nb_u + ( nb_w - 1 ) * nb_u * nb_v;
-        const auto vertex =
-            nb_u + nb_v * ( nb_u + 1 ) + nb_w * ( nb_u + 1 ) * ( nb_v + 1 );
-        associate_polyhedron_vertex_to_vertex( { cell, 7 }, vertex );
-        update_origin( origin );
+            },
+            [this, nb_u, nb_v, nb_w, &origin] {
+                // Last Corner U-V-W
+                const auto cell = ( nb_u - 1 ) + ( nb_v - 1 ) * nb_u
+                                  + ( nb_w - 1 ) * nb_u * nb_v;
+                const auto vertex = nb_u + nb_v * ( nb_u + 1 )
+                                    + nb_w * ( nb_u + 1 ) * ( nb_v + 1 );
+                associate_polyhedron_vertex_to_vertex( { cell, 7 }, vertex );
+                update_origin( origin );
+            } );
     }
 
     void RegularGridBuilder< 3 >::initialize_grid( const Point3D& origin,

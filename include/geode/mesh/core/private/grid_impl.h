@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <async++.h>
+
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/private/array_impl.h>
@@ -30,6 +32,8 @@
 #include <geode/geometry/point.h>
 
 #include <geode/mesh/core/private/points_impl.h>
+#include <geode/mesh/core/regular_grid_solid.h>
+#include <geode/mesh/core/regular_grid_surface.h>
 
 namespace geode
 {
@@ -92,23 +96,7 @@ namespace geode
         protected:
             void do_update_origin( RegularGrid< dimension >& grid,
                 PointsImpl< dimension >& impl,
-                const Point< dimension >& origin )
-            {
-                for( const auto v : Range{ grid.nb_vertices() } )
-                {
-                    const auto index = vertex_indices( grid, v );
-                    Point< dimension > translation;
-                    for( const auto d : LRange{ dimension } )
-                    {
-                        OPENGEODE_ASSERT(
-                            index[d] < grid.nb_vertices_in_direction( d ),
-                            "[RegularGrid::point] Invalid index" );
-                        translation.set_value(
-                            d, grid.cell_length_in_direction( d ) * index[d] );
-                    }
-                    impl.set_point( v, origin + translation );
-                }
-            }
+                const Point< dimension >& origin );
 
         private:
             template < typename Archive >
@@ -123,5 +111,71 @@ namespace geode
                             } } } );
             }
         };
+
+        template <>
+        inline void GridImpl< 2 >::do_update_origin( RegularGrid< 2 >& grid,
+            PointsImpl< 2 >& impl,
+            const Point< 2 >& origin )
+        {
+            const auto du = grid.cell_length_in_direction( 0 );
+            const auto dv = grid.cell_length_in_direction( 1 );
+            const auto nu = grid.nb_vertices_in_direction( 0 );
+            const auto nv = grid.nb_vertices_in_direction( 1 );
+            index_t task_id{ 0 };
+            absl::FixedArray< async::task< void > > tasks( nv );
+            for( const auto v : Range{ nv } )
+            {
+                tasks[task_id++] =
+                    async::spawn( [&impl, &origin, v, du, dv, nu, nv] {
+                        for( const auto u : Range{ nu } )
+                        {
+                            const auto vertex = u + v * nu;
+                            const Point2D translation{ { u * du, v * dv } };
+                            impl.set_point( vertex, origin + translation );
+                        }
+                    } );
+            }
+            for( auto& task :
+                async::when_all( tasks.begin(), tasks.end() ).get() )
+            {
+                task.get();
+            }
+        }
+
+        template <>
+        inline void GridImpl< 3 >::do_update_origin( RegularGrid< 3 >& grid,
+            PointsImpl< 3 >& impl,
+            const Point< 3 >& origin )
+        {
+            const auto du = grid.cell_length_in_direction( 0 );
+            const auto dv = grid.cell_length_in_direction( 1 );
+            const auto dw = grid.cell_length_in_direction( 2 );
+            const auto nu = grid.nb_vertices_in_direction( 0 );
+            const auto nv = grid.nb_vertices_in_direction( 1 );
+            const auto nw = grid.nb_vertices_in_direction( 2 );
+            index_t task_id{ 0 };
+            absl::FixedArray< async::task< void > > tasks( nw * nv );
+            for( const auto w : Range{ nw } )
+            {
+                for( const auto v : Range{ nv } )
+                {
+                    tasks[task_id++] = async::spawn(
+                        [&impl, &origin, v, w, du, dv, dw, nu, nv, nw] {
+                            for( const auto u : Range{ nu } )
+                            {
+                                const auto vertex = u + v * nu + w * nu * nv;
+                                const Point3D translation{ { u * du, v * dv,
+                                    w * dw } };
+                                impl.set_point( vertex, origin + translation );
+                            }
+                        } );
+                }
+            }
+            for( auto& task :
+                async::when_all( tasks.begin(), tasks.end() ).get() )
+            {
+                task.get();
+            }
+        }
     } // namespace detail
 } // namespace geode

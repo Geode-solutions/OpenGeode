@@ -23,6 +23,8 @@
 
 #include <geode/mesh/builder/regular_grid_surface_builder.h>
 
+#include <async++.h>
+
 #include <geode/basic/attribute_manager.h>
 
 #include <geode/mesh/builder/mesh_builder_factory.h>
@@ -54,34 +56,44 @@ namespace geode
         const auto nb_v = grid_.nb_cells_in_direction( 1 );
         grid_.vertex_attribute_manager().resize( ( nb_u + 1 ) * ( nb_v + 1 ) );
         grid_.polygon_attribute_manager().resize( grid_.nb_cells() );
-        for( const auto v : Range{ nb_v } )
-        {
-            for( const auto u : Range{ nb_u } )
-            {
-                const auto cell = u + v * nb_u;
-                const auto vertex = u + v * ( nb_u + 1 );
-                associate_polygon_vertex_to_vertex( { cell, 0 }, vertex );
-            }
-        }
-        // Last Line U
-        for( const auto v : Range{ nb_v } )
-        {
-            const auto cell = ( nb_u - 1 ) + v * nb_u;
-            const auto vertex = nb_u + v * ( nb_u + 1 );
-            associate_polygon_vertex_to_vertex( { cell, 1 }, vertex );
-        }
-        // Last Line V
-        for( const auto u : Range{ nb_u } )
-        {
-            const auto cell = u + ( nb_v - 1 ) * nb_u;
-            const auto vertex = u + nb_v * ( nb_u + 1 );
-            associate_polygon_vertex_to_vertex( { cell, 3 }, vertex );
-        }
-        // Last Corner U-V
-        const auto cell = ( nb_u - 1 ) + ( nb_v - 1 ) * nb_u;
-        const auto vertex = nb_u + nb_v * ( nb_u + 1 );
-        associate_polygon_vertex_to_vertex( { cell, 2 }, vertex );
-        update_origin( origin );
+        async::parallel_invoke(
+            [this, nb_u, nb_v] {
+                for( const auto v : Range{ nb_v } )
+                {
+                    for( const auto u : Range{ nb_u } )
+                    {
+                        const auto cell = u + v * nb_u;
+                        const auto vertex = u + v * ( nb_u + 1 );
+                        associate_polygon_vertex_to_vertex(
+                            { cell, 0 }, vertex );
+                    }
+                }
+            },
+            [this, nb_u, nb_v] {
+                // Last Line U
+                for( const auto v : Range{ nb_v } )
+                {
+                    const auto cell = ( nb_u - 1 ) + v * nb_u;
+                    const auto vertex = nb_u + v * ( nb_u + 1 );
+                    associate_polygon_vertex_to_vertex( { cell, 1 }, vertex );
+                }
+            },
+            [this, nb_u, nb_v] {
+                // Last Line V
+                for( const auto u : Range{ nb_u } )
+                {
+                    const auto cell = u + ( nb_v - 1 ) * nb_u;
+                    const auto vertex = u + nb_v * ( nb_u + 1 );
+                    associate_polygon_vertex_to_vertex( { cell, 3 }, vertex );
+                }
+            },
+            [this, nb_u, nb_v, &origin] {
+                // Last Corner U-V
+                const auto cell = ( nb_u - 1 ) + ( nb_v - 1 ) * nb_u;
+                const auto vertex = nb_u + nb_v * ( nb_u + 1 );
+                associate_polygon_vertex_to_vertex( { cell, 2 }, vertex );
+                update_origin( origin );
+            } );
     }
 
     void RegularGridBuilder< 2 >::initialize_grid( const Point2D& origin,
