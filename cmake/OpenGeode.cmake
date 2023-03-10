@@ -41,6 +41,8 @@ install(
         ${ASYNCPLUSPLUS_INSTALL_PREFIX}/
         ${BITSERY_INSTALL_PREFIX}/
         ${FILESYSTEM_INSTALL_PREFIX}/
+        ${GDAL_INSTALL_PREFIX}/
+        ${PROJ_INSTALL_PREFIX}/
     DESTINATION
         .
 )
@@ -50,6 +52,7 @@ if(NOT BUILD_SHARED_LIBS)
             ${MINIZIP_INSTALL_PREFIX}/
             ${NANOFLANN_INSTALL_PREFIX}/
             ${SPDLOG_INSTALL_PREFIX}/
+            ${SQLITE_INSTALL_PREFIX}/
         DESTINATION
             .
     )
