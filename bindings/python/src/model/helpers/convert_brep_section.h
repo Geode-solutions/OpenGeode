@@ -31,5 +31,7 @@ namespace geode
     void define_convert_brep_section( pybind11::module& module )
     {
         module.def( "convert_brep_into_section", &convert_brep_into_section );
+        module.def( "convert_section_into_brep", &convert_section_into_brep );
+        module.def( "extrude_section_to_brep", &extrude_section_to_brep );
     }
 } // namespace geode

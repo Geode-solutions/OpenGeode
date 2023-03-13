@@ -28,12 +28,7 @@ if sys.version_info >= (3, 8, 0) and platform.system() == "Windows":
 
 import opengeode_py_model as model
 
-if __name__ == '__main__':
-    model.OpenGeodeModel.initialize()
-    test_dir = os.path.dirname(__file__)
-    data_dir = os.path.abspath(os.path.join(
-        test_dir, "../../../../tests/data"))
-
+def test_convert_brep_section(data_dir):
     brep = model.load_brep(os.path.join(data_dir, "random_dfn.og_brep"))
     section, _ = model.convert_brep_into_section(brep, 2)
 
@@ -43,3 +38,32 @@ if __name__ == '__main__':
         raise ValueError("[Test] Section should have 288 lines")
     if section.nb_surfaces() != 117:
         raise ValueError("[Test] Section should have 117 surfaces")
+    
+    brep2, _ = model.convert_section_into_brep(section, 2 , 10.)
+    if brep2.nb_corners() != 172:
+        raise ValueError("[Test] BRep should have 172 corners")
+    if brep2.nb_lines() != 288:
+        raise ValueError("[Test] BRep should have 288 lines")
+    if brep2.nb_surfaces() != 117:
+        raise ValueError("[Test] BRep should have 117 surfaces")
+
+def test_extrusion_section_to_brep(data_dir):
+    section = model.load_section(os.path.join(data_dir, "fractures.og_sctn"))
+    brep = model.extrude_section_to_brep(section, 2, 0., 10.)
+
+    if brep.nb_corners() != 2*section.nb_corners():
+        raise ValueError("[Test] Extruded BRep have wrong number of corners")
+    if brep.nb_lines() != 2*section.nb_lines()+section.nb_corners():
+        raise ValueError("[Test] Extruded BRep have wrong number of lines")
+    if brep.nb_surfaces() != 2*section.nb_surfaces()+section.nb_lines():
+        raise ValueError("[Test] Extruded BRep have wrong number of surfaces")
+    if brep.nb_blocks() != section.nb_surfaces():
+        raise ValueError("[Test] Extruded BRep have wrong number of blocks")
+    
+if __name__ == '__main__':
+    model.OpenGeodeModel.initialize()
+    test_dir = os.path.dirname(__file__)
+    data_dir = os.path.abspath(os.path.join(
+        test_dir, "../../../../tests/data"))
+    test_convert_brep_section(data_dir)
+    test_extrusion_section_to_brep(data_dir)

@@ -23,10 +23,17 @@
 
 #include <geode/model/helpers/convert_brep_section.h>
 
+#include <geode/geometry/point.h>
+
+#include <geode/mesh/builder/geode/geode_edged_curve_builder.h>
+#include <geode/mesh/builder/geode/geode_point_set_builder.h>
+#include <geode/mesh/builder/geode/geode_polygonal_surface_builder.h>
+#include <geode/mesh/core/geode/geode_polygonal_surface.h>
 #include <geode/mesh/helpers/convert_edged_curve.h>
 #include <geode/mesh/helpers/convert_point_set.h>
 #include <geode/mesh/helpers/convert_surface_mesh.h>
 
+#include <geode/model/helpers/model_concatener.h>
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/line.h>
 #include <geode/model/mixin/core/surface.h>
@@ -35,6 +42,7 @@
 #include <geode/model/representation/builder/section_builder.h>
 #include <geode/model/representation/core/brep.h>
 #include <geode/model/representation/core/section.h>
+
 
 namespace
 {
@@ -64,6 +72,321 @@ namespace
         geode::detail::copy_vertex_identifier_components(
             from, builder_to, first_new_unique_vertex_id, mappings );
     }
+
+    class SectionExtruder
+    {
+    public:
+        SectionExtruder( const geode::Section& section )
+            : section_( section ), brep_builder_{ brep_ }
+
+        {
+        }
+
+        geode::BRep extrude( geode::index_t axis_to_extrude,
+            double min_coordinate,
+            double max_coordinate )
+        {
+            initialize_extrusion(
+                axis_to_extrude, min_coordinate, max_coordinate );
+            create_lines();
+            create_surfaces();
+            create_blocks();
+            return std::move( brep_ );
+        }
+
+    private:
+        void initialize_extrusion( geode::index_t axis_to_extrude,
+            double min_coordinate,
+            double max_coordinate )
+        {
+            auto slice0_conversion_output = convert_section_into_brep(
+                section_, axis_to_extrude, min_coordinate );
+            section_slice0_mapping_ = std::get< 1 >( slice0_conversion_output );
+            slice0_brep_mapping_ =
+                brep_builder_.copy( std::get< 0 >( slice0_conversion_output ) );
+
+            auto slice1_conversion_output = convert_section_into_brep(
+                section_, axis_to_extrude, max_coordinate );
+            section_slice1_mapping_ = std::get< 1 >( slice1_conversion_output );
+            geode::BRepConcatener brep_concatener{ brep_ };
+            slice1_brep_mapping_ = brep_concatener.concatenate(
+                std::get< 0 >( slice1_conversion_output ) );
+        }
+
+        geode::uuid section_slice0_brep_mapping(
+            const geode::ComponentType& brep_component_type,
+            geode::uuid section_component )
+        {
+            return slice0_brep_mapping_.at( brep_component_type )
+                .in2out( section_slice0_mapping_.at( brep_component_type )
+                             .in2out( section_component ) );
+        }
+
+        geode::uuid section_slice1_brep_mapping(
+            const geode::ComponentType& brep_component_type,
+            geode::uuid section_component )
+        {
+            return slice1_brep_mapping_.at( brep_component_type )
+                .in2out( section_slice1_mapping_.at( brep_component_type )
+                             .in2out( section_component ) );
+        }
+
+        void create_lines()
+        {
+            for( const auto& corner : section_.corners() )
+            {
+                extrude_corner( corner );
+            }
+        }
+
+        void extrude_corner( const geode::Corner2D& section_corner )
+        {
+            const auto& corner_slice0 =
+                brep_.corner( section_slice0_brep_mapping(
+                    geode::Corner3D::component_type_static(),
+                    section_corner.id() ) );
+            const auto& corner_slice1 =
+                brep_.corner( section_slice1_brep_mapping(
+                    geode::Corner3D::component_type_static(),
+                    section_corner.id() ) );
+            const auto& line = brep_.line( brep_builder_.add_line() );
+            brep_builder_.add_corner_line_boundary_relationship(
+                corner_slice0, line );
+            brep_builder_.add_corner_line_boundary_relationship(
+                corner_slice1, line );
+            auto line_builder = brep_builder_.line_mesh_builder( line.id() );
+            const auto corner_slice0_vid =
+                line_builder->create_point( corner_slice0.mesh().point( 0 ) );
+            brep_builder_.set_unique_vertex(
+                { line.component_id(), corner_slice0_vid },
+                brep_.unique_vertex( { corner_slice0.component_id(), 0 } ) );
+            const auto corner_slice1_vid =
+                line_builder->create_point( corner_slice1.mesh().point( 0 ) );
+            brep_builder_.set_unique_vertex(
+                { line.component_id(), corner_slice1_vid },
+                brep_.unique_vertex( { corner_slice1.component_id(), 0 } ) );
+            line_builder->create_edge( corner_slice0_vid, corner_slice1_vid );
+        }
+
+        void create_surfaces()
+        {
+            for( const auto& line : section_.lines() )
+            {
+                extrude_line( line );
+            }
+        }
+
+        void extrude_line( const geode::Line2D& section_line )
+        {
+            const auto& line_slice0 = brep_.line( section_slice0_brep_mapping(
+                geode::Line3D::component_type_static(), section_line.id() ) );
+            const auto& line_slice1 = brep_.line( section_slice1_brep_mapping(
+                geode::Line3D::component_type_static(), section_line.id() ) );
+            const auto& surface = brep_.surface( brep_builder_.add_surface() );
+            brep_builder_.add_line_surface_boundary_relationship(
+                line_slice0, surface );
+            brep_builder_.add_line_surface_boundary_relationship(
+                line_slice1, surface );
+            add_extruded_line_surface_boundary_relationship(
+                section_line, surface );
+            auto surface_builder =
+                brep_builder_.surface_mesh_builder( surface.id() );
+            const auto prev_slide0_pointid =
+                line_slice0.mesh().edge_vertex( { 0, 0 } );
+            auto prev_slice0_pt = surface_builder->create_point(
+                line_slice0.mesh().point( prev_slide0_pointid ) );
+            brep_builder_.set_unique_vertex(
+                { surface.component_id(), prev_slice0_pt },
+                brep_.unique_vertex(
+                    { line_slice0.component_id(), prev_slide0_pointid } ) );
+            const auto prev_slide1_pointid =
+                line_slice1.mesh().edge_vertex( { 0, 0 } );
+            auto prev_slice1_pt = surface_builder->create_point(
+                line_slice1.mesh().point( prev_slide1_pointid ) );
+            brep_builder_.set_unique_vertex(
+                { surface.component_id(), prev_slice1_pt },
+                brep_.unique_vertex(
+                    { line_slice1.component_id(), prev_slide1_pointid } ) );
+            for( const auto edge_id :
+                geode::Range{ line_slice0.mesh().nb_edges() } )
+            {
+                const auto slide0_pointid =
+                    line_slice0.mesh().edge_vertex( { edge_id, 1 } );
+                const auto slide0_pt = surface_builder->create_point(
+                    line_slice0.mesh().point( slide0_pointid ) );
+                brep_builder_.set_unique_vertex(
+                    { surface.component_id(), slide0_pt },
+                    brep_.unique_vertex(
+                        { line_slice0.component_id(), slide0_pointid } ) );
+                const auto slide1_pointid =
+                    line_slice1.mesh().edge_vertex( { edge_id, 1 } );
+                const auto slice1_pt = surface_builder->create_point(
+                    line_slice1.mesh().point( slide1_pointid ) );
+                brep_builder_.set_unique_vertex(
+                    { surface.component_id(), slice1_pt },
+                    brep_.unique_vertex(
+                        { line_slice1.component_id(), slide1_pointid } ) );
+                surface_builder->create_polygon(
+                    { prev_slice0_pt, prev_slice1_pt, slice1_pt, slide0_pt } );
+                prev_slice0_pt = slide0_pt;
+                prev_slice1_pt = slice1_pt;
+            }
+            surface_builder->compute_polygon_adjacencies();
+        }
+
+        void add_extruded_line_surface_boundary_relationship(
+            const geode::Line2D& section_line,
+            const geode::Surface3D& brep_surface )
+        {
+            for( const auto& boundary : section_.boundaries( section_line ) )
+            {
+                for( const auto& incidence0 :
+                    brep_.incidences( brep_.corner( section_slice0_brep_mapping(
+                        geode::Corner3D::component_type_static(),
+                        boundary.id() ) ) ) )
+                {
+                    for( const auto& incidence1 : brep_.incidences(
+                             brep_.corner( section_slice1_brep_mapping(
+                                 geode::Corner3D::component_type_static(),
+                                 boundary.id() ) ) ) )
+                    {
+                        if( incidence0.id() == incidence1.id() )
+                        {
+                            brep_builder_
+                                .add_line_surface_boundary_relationship(
+                                    incidence0, brep_surface );
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        void create_blocks()
+        {
+            for( const auto& surface : section_.surfaces() )
+            {
+                extrude_surface( surface );
+            }
+        }
+
+        void extrude_surface( const geode::Surface2D& section_surface )
+        {
+            const auto& surface_slice0 =
+                brep_.surface( section_slice0_brep_mapping(
+                    geode::Surface3D::component_type_static(),
+                    section_surface.id() ) );
+            const auto& surface_slice1 =
+                brep_.surface( section_slice1_brep_mapping(
+                    geode::Surface3D::component_type_static(),
+                    section_surface.id() ) );
+            const auto& block = brep_.block( brep_builder_.add_block() );
+            brep_builder_.add_surface_block_boundary_relationship(
+                surface_slice0, block );
+            brep_builder_.add_surface_block_boundary_relationship(
+                surface_slice1, block );
+            add_extruded_surface_block_boundary_relationship(
+                section_surface, block );
+            add_extruded_surface_block_internal_relationship(
+                section_surface, block );
+            add_extruded_line_block_internal_relationship(
+                section_surface, block );
+        }
+
+        void add_extruded_surface_block_boundary_relationship(
+            const geode::Surface2D& section_surface,
+            const geode::Block3D& brep_block )
+        {
+            for( const auto& boundary : section_.boundaries( section_surface ) )
+            {
+                for( const auto& incidence0 :
+                    brep_.incidences( brep_.line( section_slice0_brep_mapping(
+                        geode::Line3D::component_type_static(),
+                        boundary.id() ) ) ) )
+                {
+                    for( const auto& incidence1 : brep_.incidences(
+                             brep_.line( section_slice1_brep_mapping(
+                                 geode::Line3D::component_type_static(),
+                                 boundary.id() ) ) ) )
+                    {
+                        if( incidence0.id() == incidence1.id() )
+                        {
+                            brep_builder_
+                                .add_surface_block_boundary_relationship(
+                                    incidence0, brep_block );
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        void add_extruded_surface_block_internal_relationship(
+            const geode::Surface2D& section_surface,
+            const geode::Block3D& brep_block )
+        {
+            for( const auto& internal_line :
+                section_.internal_lines( section_surface ) )
+            {
+                for( const auto& incidence0 :
+                    brep_.incidences( brep_.line( section_slice0_brep_mapping(
+                        geode::Line3D::component_type_static(),
+                        internal_line.id() ) ) ) )
+                {
+                    for( const auto& incidence1 : brep_.incidences(
+                             brep_.line( section_slice1_brep_mapping(
+                                 geode::Line3D::component_type_static(),
+                                 internal_line.id() ) ) ) )
+                    {
+                        if( incidence0.id() == incidence1.id() )
+                        {
+                            brep_builder_
+                                .add_surface_block_internal_relationship(
+                                    incidence0, brep_block );
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        void add_extruded_line_block_internal_relationship(
+            const geode::Surface2D& section_surface,
+            const geode::Block3D& brep_block )
+        {
+            for( const auto& internal_corner :
+                section_.internal_corners( section_surface ) )
+            {
+                for( const auto& incidence0 :
+                    brep_.incidences( brep_.corner( section_slice0_brep_mapping(
+                        geode::Corner3D::component_type_static(),
+                        internal_corner.id() ) ) ) )
+                {
+                    for( const auto& incidence1 : brep_.incidences(
+                             brep_.corner( section_slice1_brep_mapping(
+                                 geode::Corner3D::component_type_static(),
+                                 internal_corner.id() ) ) ) )
+                    {
+                        if( incidence0.id() == incidence1.id() )
+                        {
+                            brep_builder_.add_line_block_internal_relationship(
+                                incidence0, brep_block );
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+    private:
+        const geode::Section& section_;
+        geode::BRep brep_;
+        geode::BRepBuilder brep_builder_;
+        geode::ModelCopyMapping section_slice0_mapping_;
+        geode::ModelCopyMapping slice0_brep_mapping_;
+        geode::ModelCopyMapping section_slice1_mapping_;
+        geode::ModelCopyMapping slice1_brep_mapping_;
+    };
 } // namespace
 
 namespace geode
@@ -135,5 +458,15 @@ namespace geode
         }
         copy_unique_vertices( section, builder, mappings );
         return std::make_tuple( std::move( brep ), std::move( mappings ) );
+    }
+
+    BRep extrude_section_to_brep( const Section& section,
+        index_t axis_to_extrude,
+        double min_coordinate,
+        double max_coordinate )
+    {
+        SectionExtruder extruder{ section };
+        return extruder.extrude(
+            axis_to_extrude, min_coordinate, max_coordinate );
     }
 } // namespace geode
