@@ -94,8 +94,10 @@ namespace geode
             mappings.at( Surface3D::component_type_static() ) );
         detail::copy_block_geometry( brep, brep_, *this,
             mappings.at( Block3D::component_type_static() ) );
-        create_unique_vertices( brep.nb_unique_vertices() );
-        detail::copy_vertex_identifier_components( brep, *this, mappings );
+        const auto first_new_unique_vertex_id =
+            create_unique_vertices( brep.nb_unique_vertices() );
+        detail::copy_vertex_identifier_components(
+            brep, *this, first_new_unique_vertex_id, mappings );
     }
 
     const uuid& BRepBuilder::add_corner()
