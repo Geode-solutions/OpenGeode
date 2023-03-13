@@ -59,9 +59,10 @@ namespace
         BuilderTo& builder_to,
         const geode::ModelCopyMapping& mappings )
     {
-        builder_to.create_unique_vertices( from.nb_unique_vertices() );
+        const auto first_new_unique_vertex_id =
+            builder_to.create_unique_vertices( from.nb_unique_vertices() );
         geode::detail::copy_vertex_identifier_components(
-            from, builder_to, mappings );
+            from, builder_to, first_new_unique_vertex_id, mappings );
     }
 } // namespace
 

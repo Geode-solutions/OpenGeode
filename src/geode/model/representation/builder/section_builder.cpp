@@ -87,8 +87,10 @@ namespace geode
             mappings.at( Line2D::component_type_static() ) );
         detail::copy_surface_geometry( section, section_, *this,
             mappings.at( Surface2D::component_type_static() ) );
-        create_unique_vertices( section.nb_unique_vertices() );
-        detail::copy_vertex_identifier_components( section, *this, mappings );
+        const auto first_new_unique_vertex_id =
+            create_unique_vertices( section.nb_unique_vertices() );
+        detail::copy_vertex_identifier_components(
+            section, *this, first_new_unique_vertex_id, mappings );
     }
 
     const uuid& SectionBuilder::add_corner()

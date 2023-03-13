@@ -219,11 +219,13 @@ namespace geode
         template < typename Model, typename BuilderTo >
         void copy_vertex_identifier_components( const Model& from,
             BuilderTo& builder_to,
+            index_t first_new_unique_vertex_id,
             const ModelCopyMapping& mapping )
         {
             async::parallel_for(
                 async::irange( index_t{ 0 }, from.nb_unique_vertices() ),
-                [&from, &builder_to, &mapping]( index_t v ) {
+                [&from, &builder_to, &first_new_unique_vertex_id, &mapping](
+                    index_t v ) {
                     for( const auto& mesh_vertex :
                         from.component_mesh_vertices( v ) )
                     {
@@ -232,7 +234,7 @@ namespace geode
                             { { type, mapping.at( type ).in2out(
                                           mesh_vertex.component_id.id() ) },
                                 mesh_vertex.vertex },
-                            v );
+                            first_new_unique_vertex_id + v );
                     }
                 } );
         }
