@@ -31,30 +31,10 @@
     const auto name##dimension =                                               \
         "RegularGrid" + std::to_string( dimension ) + "D";                     \
     pybind11::class_< RegularGrid##dimension##D, Base##dimension##D,           \
-        CellArray##dimension##D >( module, name##dimension.c_str() )           \
+        Grid##dimension##D >( module, name##dimension.c_str() )                \
         .def_static(                                                           \
             "create", ( std::unique_ptr< RegularGrid##dimension##D >( * )() )  \
                           & RegularGrid##dimension##D::create )                \
-        .def(                                                                  \
-            "nb_cell_vertices", &RegularGrid##dimension##D::nb_cell_vertices ) \
-        .def( "origin", &RegularGrid##dimension##D::origin )                   \
-        .def( "cell_length_in_direction",                                      \
-            &RegularGrid##dimension##D::cell_length_in_direction )             \
-        .def( "cell_size", &RegularGrid##dimension##D::cell_size )             \
-        .def( "nb_vertices_in_direction",                                      \
-            &RegularGrid##dimension##D::nb_vertices_in_direction )             \
-        .def( "vertex_index", &RegularGrid##dimension##D::vertex_index )       \
-        .def( "vertex_indices", &RegularGrid##dimension##D::vertex_indices )   \
-        .def( "next_vertex", &RegularGrid##dimension##D::next_vertex )         \
-        .def( "previous_vertex", &RegularGrid##dimension##D::previous_vertex ) \
-        .def( "is_vertex_on_border",                                           \
-            &RegularGrid##dimension##D::is_vertex_on_border )                  \
-        .def( "cell_vertices", &RegularGrid##dimension##D::cell_vertices )     \
-        .def( "cell_vertex_indices",                                           \
-            &RegularGrid##dimension##D::cell_vertex_indices )                  \
-        .def( "cells", &RegularGrid##dimension##D::cells )                     \
-        .def( "contains", &RegularGrid##dimension##D::contains )               \
-        .def( "closest_vertex", &RegularGrid##dimension##D::closest_vertex )   \
         .def( "clone", &RegularGrid##dimension##D::clone )                     \
         .def( "bounding_box", &RegularGrid##dimension##D::bounding_box )
 

@@ -73,7 +73,7 @@ namespace geode
             return ext;
         }
 
-        AttributeManager& cell_attribute_manager() const;
+        AttributeManager& cell_attribute_manager() const override;
 
         std::unique_ptr< RegularGrid2D > clone() const;
 

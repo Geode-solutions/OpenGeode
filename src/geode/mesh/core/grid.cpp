@@ -28,6 +28,7 @@
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
 
+#include <geode/geometry/bounding_box.h>
 #include <geode/geometry/point.h>
 
 namespace
@@ -75,10 +76,51 @@ namespace geode
             return result;
         }
 
+        Point< dimension > point(
+            const Grid< dimension >& grid, const VertexIndices& index ) const
+        {
+            auto point = grid.origin();
+            for( const auto d : LRange{ dimension } )
+            {
+                point.set_value(
+                    d, point.value( d )
+                           + index[d] * cell_length_in_direction( d ) );
+            }
+            return point;
+        }
+
+        BoundingBox< dimension > grid_bounding_box(
+            const Grid< dimension >& grid ) const
+        {
+            BoundingBox< dimension > bbox;
+            bbox.add_point( grid.origin() );
+            VertexIndices last;
+            for( const auto d : LRange{ dimension } )
+            {
+                last[d] = nb_vertices_in_direction( grid, d ) - 1;
+            }
+            bbox.add_point( point( grid, last ) );
+            return bbox;
+        }
+
         index_t nb_vertices_in_direction(
             const Grid< dimension >& grid, index_t direction ) const
         {
             return grid.nb_cells_in_direction( direction ) + 1;
+        }
+
+        bool is_vertex_on_border(
+            const Grid< dimension >& grid, const VertexIndices& index ) const
+        {
+            for( const auto d : LRange{ dimension } )
+            {
+                if( index[d] == 0
+                    || index[d] == nb_vertices_in_direction( grid, d ) - 1 )
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         index_t nb_vertices_on_borders( const Grid< dimension >& grid ) const
@@ -193,6 +235,17 @@ namespace geode
                 }
             }
             return closest;
+        }
+
+        Point< dimension > cell_barycenter(
+            const Grid< dimension >& grid, const CellIndices& cell_id ) const
+        {
+            auto other = cell_id;
+            for( const auto d : LRange{ dimension } )
+            {
+                other[d]++;
+            }
+            return ( point( grid, cell_id ) + point( grid, other ) ) / 2.;
         }
 
         CellsAroundVertex cells( const Grid< dimension >& grid,
@@ -348,6 +401,19 @@ namespace geode
     }
 
     template < index_t dimension >
+    Point< dimension > Grid< dimension >::grid_point(
+        const VertexIndices& index ) const
+    {
+        return impl_->point( *this, index );
+    }
+
+    template < index_t dimension >
+    index_t Grid< dimension >::nb_grid_vertices() const
+    {
+        return impl_->nb_vertices( *this );
+    }
+
+    template < index_t dimension >
     index_t Grid< dimension >::nb_vertices_in_direction(
         index_t direction ) const
     {
@@ -358,6 +424,13 @@ namespace geode
     index_t Grid< dimension >::nb_vertices_on_borders() const
     {
         return impl_->nb_vertices_on_borders( *this );
+    }
+
+    template < index_t dimension >
+    bool Grid< dimension >::is_grid_vertex_on_border(
+        const VertexIndices& index ) const
+    {
+        return impl_->is_vertex_on_border( *this, index );
     }
 
     template < index_t dimension >
@@ -406,6 +479,19 @@ namespace geode
         -> CellsAroundVertex
     {
         return impl_->cells( *this, origin(), query );
+    }
+
+    template < index_t dimension >
+    Point< dimension > Grid< dimension >::cell_barycenter(
+        const CellIndices& cell_id ) const
+    {
+        return impl_->cell_barycenter( *this, cell_id );
+    }
+
+    template < index_t dimension >
+    BoundingBox< dimension > Grid< dimension >::grid_bounding_box() const
+    {
+        return impl_->grid_bounding_box( *this );
     }
 
     template < index_t dimension >
