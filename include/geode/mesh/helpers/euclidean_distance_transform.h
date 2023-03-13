@@ -32,7 +32,7 @@
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( RegularGrid );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Grid );
 } // namespace geode
 
 namespace geode
@@ -54,7 +54,7 @@ namespace geode
      */
     template < index_t dimension >
     std::shared_ptr< VariableAttribute< double > > euclidean_distance_transform(
-        const RegularGrid< dimension >& grid,
+        const Grid< dimension >& grid,
         absl::Span< const typename Grid< dimension >::CellIndices >
             grid_cell_ids,
         absl::string_view distance_map_name );

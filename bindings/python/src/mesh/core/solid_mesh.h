@@ -118,6 +118,8 @@
         .def( "texture_manager", &SolidMesh##dimension##D::texture_manager )   \
         .def( "edge_vertices_in_polyhedron",                                   \
             &SolidMesh##dimension##D::edge_vertices_in_polyhedron )            \
+        .def( "is_vertex_on_border",                                           \
+            &SolidMesh##dimension##D::is_vertex_on_border )                    \
         .def( "is_tetrahedral_type",                                           \
             []( const SolidMesh< dimension >& solid ) {                        \
                 return solid.type_name()                                       \

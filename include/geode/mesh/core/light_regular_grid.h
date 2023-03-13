@@ -23,32 +23,47 @@
 
 #pragma once
 
-#include <memory>
+#include <geode/basic/pimpl.h>
 
 #include <geode/mesh/common.h>
+#include <geode/mesh/core/grid.h>
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( Grid );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+    class AttributeManager;
 } // namespace geode
 
 namespace geode
 {
     template < index_t dimension >
-    class GridBuilder
+    class LightRegularGrid : public Grid< dimension >
     {
     public:
         static constexpr auto dim = dimension;
+        using CellIndices = typename Grid< dimension >::CellIndices;
+        using VertexIndices = typename Grid< dimension >::VertexIndices;
 
-        GridBuilder( Grid< dimension >& grid );
-
-        void set_grid_dimensions( std::array< index_t, dimension > cells_number,
+        LightRegularGrid( Point< dimension > origin,
+            std::array< index_t, dimension > cells_number,
             std::array< double, dimension > cells_length );
+        LightRegularGrid( LightRegularGrid&& );
+        ~LightRegularGrid();
 
-        void copy( const Grid< dimension >& grid );
+        const Point< dimension >& origin() const override;
+
+        index_t vertex_index( const VertexIndices& index ) const override;
+
+        VertexIndices vertex_indices( index_t index ) const override;
+
+        index_t cell_index( const CellIndices& index ) const override;
+
+        CellIndices cell_indices( index_t index ) const override;
+
+        AttributeManager& cell_attribute_manager() const override;
 
     private:
-        Grid< dimension >& grid_;
+        IMPLEMENTATION_MEMBER( impl_ );
     };
-    ALIAS_2D_AND_3D( GridBuilder );
+    ALIAS_2D_AND_3D( LightRegularGrid );
 } // namespace geode

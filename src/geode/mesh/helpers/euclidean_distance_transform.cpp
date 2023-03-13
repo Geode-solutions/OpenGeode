@@ -28,8 +28,7 @@
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/progress_logger.h>
 
-#include <geode/mesh/core/regular_grid_solid.h>
-#include <geode/mesh/core/regular_grid_surface.h>
+#include <geode/mesh/core/grid.h>
 
 namespace geode
 {
@@ -39,7 +38,7 @@ namespace geode
         using Index = typename Grid< dimension >::CellIndices;
 
     public:
-        EuclideanDistanceTransform( const RegularGrid< dimension >& grid,
+        EuclideanDistanceTransform( const Grid< dimension >& grid,
             absl::Span< const Index > grid_cell_id,
             absl::string_view distance_map_name )
             : grid_( grid ),
@@ -117,7 +116,7 @@ namespace geode
         }
 
     private:
-        const RegularGrid< dimension >& grid_;
+        const Grid< dimension >& grid_;
         std::array< double, dimension > squared_cell_length_;
         std::shared_ptr< VariableAttribute< double > > distance_map_;
     };
@@ -385,7 +384,7 @@ namespace geode
 
     template < index_t dimension >
     std::shared_ptr< VariableAttribute< double > > euclidean_distance_transform(
-        const RegularGrid< dimension >& grid,
+        const Grid< dimension >& grid,
         absl::Span< const typename Grid< dimension >::CellIndices >
             grid_cell_ids,
         absl::string_view distance_map_name )
@@ -397,12 +396,12 @@ namespace geode
         return edt.distance_map();
     }
 
-    template std::shared_ptr< VariableAttribute< double > > opengeode_mesh_api
-        euclidean_distance_transform< 2 >( const RegularGrid2D&,
+    template std::shared_ptr< VariableAttribute< double > >
+        opengeode_mesh_api euclidean_distance_transform< 2 >( const Grid2D&,
             absl::Span< const Grid2D::CellIndices >,
             absl::string_view );
-    template std::shared_ptr< VariableAttribute< double > > opengeode_mesh_api
-        euclidean_distance_transform< 3 >( const RegularGrid3D&,
+    template std::shared_ptr< VariableAttribute< double > >
+        opengeode_mesh_api euclidean_distance_transform< 3 >( const Grid3D&,
             absl::Span< const Grid3D::CellIndices >,
             absl::string_view );
 } // namespace geode

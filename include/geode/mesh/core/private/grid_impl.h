@@ -46,13 +46,7 @@ namespace geode
             using VertexIndices = typename Grid< dimension >::VertexIndices;
 
         public:
-            const Point< dimension >& origin(
-                const RegularGrid< dimension >& grid ) const
-            {
-                return grid.point( 0 );
-            }
-
-            index_t vertex_index( const RegularGrid< dimension >& grid,
+            index_t vertex_index( const Grid< dimension >& grid,
                 const VertexIndices& index ) const
             {
                 index_t vertex_id{ 0 };
@@ -73,9 +67,9 @@ namespace geode
             }
 
             VertexIndices vertex_indices(
-                const RegularGrid< dimension >& grid, index_t index ) const
+                const Grid< dimension >& grid, index_t index ) const
             {
-                OPENGEODE_ASSERT( index < grid.nb_vertices(),
+                OPENGEODE_ASSERT( index < grid.nb_grid_vertices(),
                     "[RegularGrid::vertex_index] Invalid index" );
                 VertexIndices vertex_id;
                 for( const auto d : LRange{ dimension } )
@@ -94,7 +88,7 @@ namespace geode
             }
 
         protected:
-            void do_update_origin( RegularGrid< dimension >& grid,
+            void do_update_origin( Grid< dimension >& grid,
                 PointsImpl< dimension >& impl,
                 const Point< dimension >& origin );
 
@@ -113,9 +107,8 @@ namespace geode
         };
 
         template <>
-        inline void GridImpl< 2 >::do_update_origin( RegularGrid< 2 >& grid,
-            PointsImpl< 2 >& impl,
-            const Point< 2 >& origin )
+        inline void GridImpl< 2 >::do_update_origin(
+            Grid< 2 >& grid, PointsImpl< 2 >& impl, const Point< 2 >& origin )
         {
             const auto du = grid.cell_length_in_direction( 0 );
             const auto dv = grid.cell_length_in_direction( 1 );
@@ -143,9 +136,8 @@ namespace geode
         }
 
         template <>
-        inline void GridImpl< 3 >::do_update_origin( RegularGrid< 3 >& grid,
-            PointsImpl< 3 >& impl,
-            const Point< 3 >& origin )
+        inline void GridImpl< 3 >::do_update_origin(
+            Grid< 3 >& grid, PointsImpl< 3 >& impl, const Point< 3 >& origin )
         {
             const auto du = grid.cell_length_in_direction( 0 );
             const auto dv = grid.cell_length_in_direction( 1 );

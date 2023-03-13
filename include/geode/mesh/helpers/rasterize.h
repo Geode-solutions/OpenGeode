@@ -28,7 +28,7 @@
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( RegularGrid );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Grid );
     FORWARD_DECLARATION_DIMENSION_CLASS( Segment );
     FORWARD_DECLARATION_DIMENSION_CLASS( Triangle );
 } // namespace geode
@@ -37,16 +37,14 @@ namespace geode
 {
     template < index_t dimension >
     std::vector< typename Grid< dimension >::CellIndices > rasterize_segment(
-        const RegularGrid< dimension >& grid,
-        const Segment< dimension >& segment );
+        const Grid< dimension >& grid, const Segment< dimension >& segment );
 
     template < index_t dimension >
     std::vector< typename Grid< dimension >::CellIndices >
-        conservative_rasterize_segment( const RegularGrid< dimension >& grid,
+        conservative_rasterize_segment( const Grid< dimension >& grid,
             const Segment< dimension >& segment );
 
     template < index_t dimension >
     std::vector< typename Grid< dimension >::CellIndices > rasterize_triangle(
-        const RegularGrid< dimension >& grid,
-        const Triangle< dimension >& triangle );
+        const Grid< dimension >& grid, const Triangle< dimension >& triangle );
 } // namespace geode

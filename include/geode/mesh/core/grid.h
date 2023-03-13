@@ -33,8 +33,10 @@
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
     FORWARD_DECLARATION_DIMENSION_CLASS( GridBuilder );
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+    class AttributeManager;
 } // namespace geode
 
 namespace geode
@@ -74,6 +76,10 @@ namespace geode
 
         double cell_size() const;
 
+        Point< dimension > grid_point( const VertexIndices& index ) const;
+
+        index_t nb_grid_vertices() const;
+
         index_t nb_vertices_in_direction( index_t direction ) const;
 
         index_t nb_vertices_on_borders() const;
@@ -92,6 +98,10 @@ namespace geode
 
         absl::optional< VertexIndices > previous_vertex(
             const VertexIndices& index, index_t direction ) const;
+
+        bool is_grid_vertex_on_border( const VertexIndices& index ) const;
+
+        Point< dimension > cell_barycenter( const CellIndices& cell_id ) const;
 
         /*!
          * Return true if the query point is inside the grid, up to a
@@ -114,6 +124,10 @@ namespace geode
          * may contain the point.
          */
         CellsAroundVertex cells( const Point< dimension >& query ) const;
+
+        virtual AttributeManager& cell_attribute_manager() const = 0;
+
+        BoundingBox< dimension > grid_bounding_box() const;
 
     public:
         void set_grid_dimensions( std::array< index_t, dimension > cells_number,

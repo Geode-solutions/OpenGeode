@@ -87,6 +87,12 @@ add_geode_test(
         ${PROJECT_NAME}::mesh
 )
 add_geode_test(
+    SOURCE "test-light-regular-grid.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
     SOURCE "test-merge-curve.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic

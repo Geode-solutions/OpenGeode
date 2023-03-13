@@ -58,6 +58,11 @@ namespace geode
         {
         }
 
+        const Point< 2 >& origin( const RegularGrid< 2 >& grid ) const
+        {
+            return grid.point( 0 );
+        }
+
         void update_origin( RegularGrid2D& grid, const Point2D& origin )
         {
             do_update_origin( grid, *this, origin );

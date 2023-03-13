@@ -43,6 +43,7 @@
 
 #include "core/edged_curve.h"
 #include "core/graph.h"
+#include "core/grid.h"
 #include "core/hybrid_solid.h"
 #include "core/point_set.h"
 #include "core/polygonal_surface.h"
@@ -150,6 +151,7 @@ PYBIND11_MODULE( opengeode_py_mesh, module )
     geode::define_vertex_set( module );
     geode::define_graph( module );
     geode::define_edged_curve( module );
+    geode::define_grid( module );
     geode::define_point_set( module );
     geode::define_surface_mesh( module );
     geode::define_surface_edges( module );
