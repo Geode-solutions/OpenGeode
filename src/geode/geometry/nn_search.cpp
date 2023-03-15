@@ -188,7 +188,7 @@ namespace geode
     {
         OPENGEODE_EXCEPTION( epsilon >= global_epsilon,
             "[NNSearch::colocated_index_mapping] Given epsilon too small, "
-            "should be bigger than global_epsilon" );
+            "should be bigger than global_epsilon (i.e. ", global_epsilon, ")" );
         std::vector< index_t > mapping( nb_points() );
         absl::c_iota( mapping, 0 );
         async::parallel_for( async::irange( index_t{ 0 }, nb_points() ),
