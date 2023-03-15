@@ -30,10 +30,10 @@
 #include <geode/model/representation/core/brep.h>
 #include <geode/model/representation/core/section.h>
 #include <geode/model/representation/io/brep_input.h>
+#include <geode/model/representation/io/section_input.h>
 
-void test()
+void test_convert_brep_section()
 {
-    geode::OpenGeodeModel::initialize();
     auto brep = geode::load_brep(
         absl::StrCat( geode::data_path, "random_dfn.og_brep" ) );
     const auto section =
@@ -55,6 +55,30 @@ void test()
         brep2.nb_lines() == 288, "[Test] BRep should have 288 lines" );
     OPENGEODE_EXCEPTION(
         brep2.nb_surfaces() == 117, "[Test] BRep should have 117 surfaces" );
+}
+
+void test_extrusion_section_to_brep()
+{
+    const auto section = geode::load_section(
+        absl::StrCat( geode::data_path, "fractures.og_sctn" ) );
+    const auto brep = geode::extrude_section_to_brep( section, 2, 0., 10. );
+    OPENGEODE_EXCEPTION( brep.nb_corners() == 2 * section.nb_corners(),
+        "[Test] Extruded BRep - wrong number of corners." );
+    OPENGEODE_EXCEPTION(
+        brep.nb_lines() == 2 * section.nb_lines() + section.nb_corners(),
+        "[Test] Extruded BRep - wrong number of lines." );
+    OPENGEODE_EXCEPTION(
+        brep.nb_surfaces() == 2 * section.nb_surfaces() + section.nb_lines(),
+        "[Test] Extruded BRep - wrong number of surfaces." );
+    OPENGEODE_EXCEPTION( brep.nb_blocks() == section.nb_surfaces(),
+        "[Test] Extruded BRep - wrong number of blocks." );
+}
+
+void test()
+{
+    geode::OpenGeodeModel::initialize();
+    test_convert_brep_section();
+    test_extrusion_section_to_brep();
 }
 
 OPENGEODE_TEST( "convert-brep" )
