@@ -53,7 +53,8 @@ void test()
     const geode::Point3D p3{ { 3.1, 9.4, 9.7 } };
     const geode::NNSearch3D colocator( { p0, p0, p1, p0, p2, p1, p3 } );
 
-    const auto colocated_info = colocator.colocated_index_mapping( 1e-8 );
+    const auto colocated_info =
+        colocator.colocated_index_mapping( geode::global_epsilon );
     OPENGEODE_EXCEPTION( colocated_info.nb_colocated_points() == 3,
         "[Test] Should be 3 colocated points" );
     const std::vector< geode::index_t > mapping_answer{ 0, 0, 1, 0, 2, 1, 3 };

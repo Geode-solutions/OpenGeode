@@ -31,6 +31,7 @@
 
 #include <nanoflann.hpp>
 
+#include <geode/basic/logger.h>
 #include <geode/basic/pimpl_impl.h>
 
 namespace geode
@@ -185,6 +186,9 @@ namespace geode
     typename NNSearch< dimension >::ColocatedInfo
         NNSearch< dimension >::colocated_index_mapping( double epsilon ) const
     {
+        OPENGEODE_EXCEPTION( epsilon >= global_epsilon,
+            "[NNSearch::colocated_index_mapping] Given epsilon too small, "
+            "should be bigger than global_epsilon" );
         std::vector< index_t > mapping( nb_points() );
         absl::c_iota( mapping, 0 );
         async::parallel_for( async::irange( index_t{ 0 }, nb_points() ),

@@ -177,6 +177,10 @@ namespace geode
                     return true;
                 }
             }
+            if( segment.length() < global_epsilon )
+            {
+                return false;
+            }
             const auto box_center = center();
             const auto box_extent = diagonal() / 2.;
             const Segment2D transformed_segment{ vertices[0].get() - box_center,
