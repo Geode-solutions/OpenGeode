@@ -34,7 +34,7 @@ namespace geode
     public:
         Impl() = default;
         Impl( std::array< index_t, dimension > cells_number )
-            : cells_number_{ std::move( cells_number ) }
+            : cells_number_( std::move( cells_number ) )
         {
         }
 
