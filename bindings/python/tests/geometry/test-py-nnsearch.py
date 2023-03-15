@@ -26,6 +26,7 @@ if sys.version_info >= (3, 8, 0) and platform.system() == "Windows":
     for path in [x.strip() for x in os.environ['PATH'].split(';') if x]:
         os.add_dll_directory(path)
 
+import opengeode_py_basic as basic
 import opengeode_py_geometry as geom
 
 if __name__ == '__main__':
@@ -51,7 +52,7 @@ if __name__ == '__main__':
     p3 = geom.Point3D([3.1, 9.4, 9.7])
     colocator = geom.NNSearch3D([p0, p0, p1, p0, p2, p1, p3])
 
-    colocated_info = colocator.colocated_index_mapping(1e-8)
+    colocated_info = colocator.colocated_index_mapping(basic.global_epsilon)
     if colocated_info.nb_colocated_points() != 3:
         raise ValueError("[Test] Should be 3 colocated points")
     mapping_answer = [0, 0, 1, 0, 2, 1, 3]
