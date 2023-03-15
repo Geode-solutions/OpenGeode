@@ -43,7 +43,6 @@
 #include <geode/model/representation/core/brep.h>
 #include <geode/model/representation/core/section.h>
 
-
 namespace
 {
     template < typename ModelFrom, typename BuilderTo >
