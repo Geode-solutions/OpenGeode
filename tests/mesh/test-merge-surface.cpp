@@ -36,7 +36,7 @@ void test()
 {
     geode::OpenGeodeMesh::initialize();
     std::vector< geode::Point2D > points{ { { 0, 0 } }, { { 0, 1 } },
-        { { 0, 2 } }, { { 1, 0 } }, { { 1, 1 } }, { { 1, 2 } }, { { -1, 0 } } };
+        { { 0, 2 } }, { { 1, 0 } }, { { 1, 1 } }, { { 1, 2 } } };
 
     auto mesh0 = geode::SurfaceMesh2D::create();
     auto builder0 = geode::SurfaceMeshBuilder2D::create( *mesh0 );
