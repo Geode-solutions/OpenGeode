@@ -36,7 +36,7 @@ void test()
 {
     geode::OpenGeodeMesh::initialize();
     std::vector< geode::Point2D > points{ { { 0, 0 } }, { { 0, 1 } },
-        { { 0, 2 } }, { { 1, 0 } }, { { 1, 1 } }, { { 1, 2 } } };
+        { { 0, 2 } }, { { 1, 0 } }, { { 1, 1 } }, { { 1, 2 } }, { { -1, 0 } } };
 
     auto mesh0 = geode::SurfaceMesh2D::create();
     auto builder0 = geode::SurfaceMeshBuilder2D::create( *mesh0 );
@@ -44,8 +44,10 @@ void test()
     builder0->create_point( points[1] );
     builder0->create_point( points[3] );
     builder0->create_point( points[4] );
+    builder0->create_point( points[5] );
     builder0->create_polygon( { 0, 1, 3 } );
     builder0->create_polygon( { 0, 3, 2 } );
+    builder0->create_polygon( { 1, 4, 3 } );
     builder0->compute_polygon_adjacencies();
 
     auto mesh1 = geode::SurfaceMesh2D::create();
@@ -54,8 +56,12 @@ void test()
     builder1->create_point( points[2] );
     builder1->create_point( points[4] );
     builder1->create_point( points[5] );
-    builder1->create_polygon( { 0, 1, 3 } );
-    builder1->create_polygon( { 0, 3, 2 } );
+    builder1->create_point( points[0] );
+    builder1->create_point( points[3] );
+    builder1->create_polygon( { 0, 3, 1 } );
+    builder1->create_polygon( { 0, 2, 3 } );
+    builder1->create_polygon( { 2, 0, 4 } );
+    builder1->create_polygon( { 2, 4, 5 } );
     builder1->compute_polygon_adjacencies();
 
     std::vector< std::reference_wrapper< const geode::SurfaceMesh2D > > meshes{
@@ -66,25 +72,41 @@ void test()
         merged->nb_vertices() == 6, "[Test] Wrong number of vertices" );
     OPENGEODE_EXCEPTION(
         merged->nb_polygons() == 4, "[Test] Wrong number of polygons" );
+    for( const auto p : geode::Range{ merged->nb_polygons() } )
+    {
+        for( const auto e : geode::LRange{ 3 } )
+        {
+            merged->polygon_adjacent_edge( { p, e } );
+        }
+    }
 
-    OPENGEODE_EXCEPTION(
-        !merged->polygon_adjacent( { 0, 2 } ), "[Test] Wrong adjacency" );
-    OPENGEODE_EXCEPTION(
-        !merged->polygon_adjacent( { 2, 2 } ), "[Test] Wrong adjacency" );
+    OPENGEODE_EXCEPTION( merged->polygon_adjacent( { 0, 0 } ) = 1,
+        "[Test] Wrong adjacency for { 0, 0 }" );
+    OPENGEODE_EXCEPTION( merged->polygon_adjacent( { 0, 1 } ) = 2,
+        "[Test] Wrong adjacency for { 0, 1 }" );
+    OPENGEODE_EXCEPTION( !merged->polygon_adjacent( { 0, 2 } ),
+        "[Test] Wrong adjacency for { 0, 2 }" );
 
-    OPENGEODE_EXCEPTION(
-        merged->polygon_adjacent( { 0, 0 } ) == 1, "[Test] Wrong adjacency" );
-    OPENGEODE_EXCEPTION(
-        merged->polygon_adjacent( { 1, 2 } ) == 0, "[Test] Wrong adjacency" );
-    OPENGEODE_EXCEPTION(
-        merged->polygon_adjacent( { 2, 0 } ) == 3, "[Test] Wrong adjacency" );
-    OPENGEODE_EXCEPTION(
-        merged->polygon_adjacent( { 3, 2 } ) == 2, "[Test] Wrong adjacency" );
+    OPENGEODE_EXCEPTION( !merged->polygon_adjacent( { 1, 0 } ),
+        "[Test] Wrong adjacency for { 1, 0 }" );
+    OPENGEODE_EXCEPTION( !merged->polygon_adjacent( { 1, 1 } ),
+        "[Test] Wrong adjacency for { 1, 1 }" );
+    OPENGEODE_EXCEPTION( merged->polygon_adjacent( { 1, 2 } ) = 0,
+        "[Test] Wrong adjacency for { 1, 2 }" );
 
-    OPENGEODE_EXCEPTION(
-        !merged->polygon_adjacent( { 0, 1 } ), "[Test] Wrong adjacency" );
-    OPENGEODE_EXCEPTION(
-        !merged->polygon_adjacent( { 3, 0 } ), "[Test] Wrong adjacency" );
+    OPENGEODE_EXCEPTION( merged->polygon_adjacent( { 2, 0 } ) = 0,
+        "[Test] Wrong adjacency for { 2, 0 }" );
+    OPENGEODE_EXCEPTION( !merged->polygon_adjacent( { 2, 1 } ),
+        "[Test] Wrong adjacency for { 2, 1 }" );
+    OPENGEODE_EXCEPTION( !merged->polygon_adjacent( { 2, 2 } ),
+        "[Test] Wrong adjacency for { 2, 2 }" );
+
+    OPENGEODE_EXCEPTION( !merged->polygon_adjacent( { 3, 0 } ),
+        "[Test] Wrong adjacency for { 3, 0 }" );
+    OPENGEODE_EXCEPTION( !merged->polygon_adjacent( { 3, 1 } ),
+        "[Test] Wrong adjacency for { 3, 1 }" );
+    OPENGEODE_EXCEPTION( !merged->polygon_adjacent( { 3, 2 } ),
+        "[Test] Wrong adjacency for { 3, 2 }" );
 }
 
 OPENGEODE_TEST( "merge-surface" )

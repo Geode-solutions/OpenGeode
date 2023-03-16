@@ -188,25 +188,28 @@ namespace geode
 
             void create_adjacencies()
             {
+                absl::FixedArray< bool > visited_polygons(
+                    this->mesh().nb_polygons(), false );
                 for( const auto s : Indices{ this->meshes() } )
                 {
                     const auto& surface = this->meshes()[s].get();
                     for( const auto p : Range{ surface.nb_polygons() } )
                     {
+                        const auto new_id = new_id_[s][p];
+                        if( visited_polygons[new_id] )
+                        {
+                            continue;
+                        }
+                        visited_polygons[new_id] = true;
                         for( const auto e :
                             LRange{ surface.nb_polygon_edges( p ) } )
                         {
                             if( const auto adj =
                                     surface.polygon_adjacent( { p, e } ) )
                             {
-                                const auto new_id = new_id_[s][p];
                                 const auto new_adj_id = new_id_[s][adj.value()];
-                                if( this->mesh().is_edge_on_border(
-                                        { new_id, e } ) )
-                                {
-                                    this->builder().set_polygon_adjacent(
-                                        { new_id, e }, new_adj_id );
-                                }
+                                this->builder().set_polygon_adjacent(
+                                    { new_id, e }, new_adj_id );
                             }
                         }
                     }

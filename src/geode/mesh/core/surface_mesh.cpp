@@ -586,8 +586,9 @@ namespace geode
                             == polygon_edge.polygon_id,
                         absl::StrCat( "[SurfaceMesh::polygon_adjacent_"
                                       "edge] Wrong adjacency with polygons: ",
-                            polygon_edge.polygon_id, " and ",
-                            polygon_adj_id ) );
+                            polygon_edge.polygon_id, " and ", polygon_adj_id,
+                            " (v0 = ", point( v0 ).string(),
+                            ", v1 = ", point( v1 ).string(), ")" ) );
                     return absl::optional< PolygonEdge >{ absl::in_place,
                         polygon_adj_id, e };
                 }
@@ -604,8 +605,9 @@ namespace geode
                             == polygon_edge.polygon_id,
                         absl::StrCat( "[SurfaceMesh::polygon_adjacent_"
                                       "edge] Wrong adjacency with polygons: ",
-                            polygon_edge.polygon_id, " and ",
-                            polygon_adj_id ) );
+                            polygon_edge.polygon_id, " and ", polygon_adj_id,
+                            " (v0 = ", point( v0 ).string(),
+                            ", v1 = ", point( v1 ).string(), ")" ) );
                     return absl::optional< PolygonEdge >{ absl::in_place,
                         polygon_adj_id, e };
                 }
@@ -613,7 +615,9 @@ namespace geode
         }
         throw OpenGeodeException{ "[SurfaceMesh::polygon_adjacent_edge] Wrong "
                                   "adjacency with polygons: ",
-            polygon_edge.polygon_id, " and ", polygon_adj_id };
+            polygon_edge.polygon_id, " and ", polygon_adj_id,
+            " (v0 = ", point( v0 ).string(), ", v1 = ", point( v1 ).string(),
+            ")" };
         return absl::nullopt;
     }
 
