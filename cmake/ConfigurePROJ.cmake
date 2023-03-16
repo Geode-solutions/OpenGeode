@@ -22,8 +22,8 @@ set(PROJ_PATH ${PROJECT_BINARY_DIR}/third_party/proj)
 set(PROJ_INSTALL_PREFIX ${PROJ_PATH}/install)
 ExternalProject_Add(proj
     PREFIX ${PROJ_PATH}
-    GIT_REPOSITORY https://github.com/OSGeo/proj
-    GIT_TAG 4a7fbe48b489d8e7c5a10de0f67cda8a3b3904a0
+    GIT_REPOSITORY https://github.com/Geode-solutions/proj
+    GIT_TAG 6cc277f197d181b312c74c6129497040e8c4d2b9
     GIT_PROGRESS ON
     CMAKE_GENERATOR ${CMAKE_GENERATOR}
     CMAKE_GENERATOR_PLATFORM ${CMAKE_GENERATOR_PLATFORM}
