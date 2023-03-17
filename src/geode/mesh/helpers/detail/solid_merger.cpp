@@ -209,25 +209,28 @@ namespace geode
 
             void create_adjacencies()
             {
+                absl::FixedArray< bool > visited_polyhedra(
+                    this->mesh().nb_polyhedra(), false );
                 for( const auto s : Indices{ this->meshes() } )
                 {
                     const auto& solid = this->meshes()[s].get();
                     for( const auto p : Range{ solid.nb_polyhedra() } )
                     {
+                        const auto new_id = new_id_[s][p];
+                        if( visited_polyhedra[new_id] )
+                        {
+                            continue;
+                        }
+                        visited_polyhedra[new_id] = true;
                         for( const auto f :
                             LRange{ solid.nb_polyhedron_facets( p ) } )
                         {
                             if( const auto adj =
                                     solid.polyhedron_adjacent( { p, f } ) )
                             {
-                                const auto new_id = new_id_[s][p];
                                 const auto new_adj_id = new_id_[s][adj.value()];
-                                if( this->mesh().is_polyhedron_facet_on_border(
-                                        { new_id, f } ) )
-                                {
-                                    this->builder().set_polyhedron_adjacent(
-                                        { new_id, f }, new_adj_id );
-                                }
+                                this->builder().set_polyhedron_adjacent(
+                                    { new_id, f }, new_adj_id );
                             }
                         }
                     }
