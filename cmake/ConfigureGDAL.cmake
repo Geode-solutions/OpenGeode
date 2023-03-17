@@ -26,6 +26,7 @@ ExternalProject_Add(gdal
     GIT_REPOSITORY https://github.com/Geode-solutions/gdal
     GIT_TAG c99428cdfae57f190da8bd88f0347f1dec7085e6
     GIT_PROGRESS ON
+    GIT_CONFIG core.longpaths=true
     CMAKE_GENERATOR ${CMAKE_GENERATOR}
     CMAKE_GENERATOR_PLATFORM ${CMAKE_GENERATOR_PLATFORM}
     CMAKE_ARGS
