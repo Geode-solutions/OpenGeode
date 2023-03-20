@@ -35,14 +35,15 @@ namespace geode
 
 namespace geode
 {
-    template < index_t dimension >
+    template < index_t dimension, index_t point_dimension = dimension >
     class TetrahedralSolidPointFunction
     {
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
 
     public:
         TetrahedralSolidPointFunction(
-            TetrahedralSolidPointFunction< dimension >&& other );
+            TetrahedralSolidPointFunction< dimension, point_dimension >&&
+                other );
         ~TetrahedralSolidPointFunction();
 
         /*!
@@ -50,25 +51,25 @@ namespace geode
          * value.
          * Throws an exception if an attribute with the same name exists.
          */
-        static TetrahedralSolidPointFunction< dimension > create(
-            const TetrahedralSolid< dimension >& solid,
-            absl::string_view function_name,
-            Point< dimension > value );
+        static TetrahedralSolidPointFunction< dimension, point_dimension >
+            create( const TetrahedralSolid< dimension >& solid,
+                absl::string_view function_name,
+                Point< point_dimension > value );
 
         /*!
          * Finds an object function that already exists in the given
          * TetrahedralSolid, from its given name.
          * Throws an exception if no attribute with the same name exists.
          */
-        static TetrahedralSolidPointFunction< dimension > find(
+        static TetrahedralSolidPointFunction< dimension, point_dimension > find(
             const TetrahedralSolid< dimension >& solid,
             absl::string_view function_name );
 
-        void set_value( index_t vertex_index, Point< dimension > value );
+        void set_value( index_t vertex_index, Point< point_dimension > value );
 
-        const Point< dimension >& value( index_t vertex_index ) const;
+        const Point< point_dimension >& value( index_t vertex_index ) const;
 
-        Point< dimension > value(
+        Point< point_dimension > value(
             const Point< dimension >& point, index_t tetrahedron_id ) const;
 
     private:
@@ -79,7 +80,7 @@ namespace geode
         TetrahedralSolidPointFunction(
             const TetrahedralSolid< dimension >& solid,
             absl::string_view function_name,
-            Point< dimension > value );
+            Point< point_dimension > value );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );
