@@ -30,8 +30,8 @@ namespace geode
 {
     template < typename PointType, index_t dimension >
     GenericSegment< PointType, dimension >::GenericSegment(
-        const Point< dimension >& p0, const Point< dimension >& p1 )
-        : vertices_{ { { p0 }, { p1 } } }
+        PointType p0, PointType p1 )
+        : vertices_{ { std::move( p0 ), std::move( p1 ) } }
     {
     }
     template < typename PointType, index_t dimension >
@@ -94,9 +94,9 @@ namespace geode
     }
     template < typename PointType, index_t dimension >
     void GenericSegment< PointType, dimension >::set_point(
-        index_t vertex, const Point< dimension >& point )
+        index_t vertex, PointType point )
     {
-        vertices_[vertex] = point;
+        vertices_[vertex] = std::move( point );
     }
     template < typename PointType, index_t dimension >
     const std::array< PointType, 2 >&
@@ -116,17 +116,10 @@ namespace geode
         return bbox;
     }
 
-    template < typename PointType, index_t dimension >
-    GenericSegment< PointType, dimension >::GenericSegment(
-        const OwnerSegment< dimension >& other )
-        : vertices_{ { { other.vertices()[0] }, { other.vertices()[1] } } }
-    {
-    }
-
     template < index_t dimension >
     OwnerSegment< dimension >::OwnerSegment(
-        const Point< dimension >& p0, const Point< dimension >& p1 )
-        : Base( p0, p1 )
+        Point< dimension > p0, Point< dimension > p1 )
+        : Base( std::move( p0 ), std::move( p1 ) )
     {
     }
     template < index_t dimension >
@@ -168,7 +161,7 @@ namespace geode
     }
     template < index_t dimension >
     Segment< dimension >::Segment( const OwnerSegment< dimension >& other )
-        : Base( other )
+        : Base( other.vertices()[0], other.vertices()[1] )
     {
     }
     template < index_t dimension >

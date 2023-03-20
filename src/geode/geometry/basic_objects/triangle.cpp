@@ -66,10 +66,8 @@ namespace geode
 {
     template < typename PointType, index_t dimension >
     GenericTriangle< PointType, dimension >::GenericTriangle(
-        const Point< dimension >& p0,
-        const Point< dimension >& p1,
-        const Point< dimension >& p2 )
-        : vertices_{ { { p0 }, { p1 }, { p2 } } }
+        PointType p0, PointType p1, PointType p2 )
+        : vertices_{ { std::move( p0 ), std::move( p1 ), std::move( p2 ) } }
     {
     }
 
@@ -169,9 +167,9 @@ namespace geode
 
     template < typename PointType, index_t dimension >
     void GenericTriangle< PointType, dimension >::set_point(
-        index_t vertex, const Point< dimension >& point )
+        index_t vertex, PointType point )
     {
-        vertices_[vertex] = point;
+        vertices_[vertex] = std::move( point );
     }
 
     template < typename PointType, index_t dimension >
@@ -193,19 +191,10 @@ namespace geode
         return bbox;
     }
 
-    template < typename PointType, index_t dimension >
-    GenericTriangle< PointType, dimension >::GenericTriangle(
-        const OwnerTriangle< dimension >& other )
-        : vertices_{ { { other.vertices()[0] }, { other.vertices()[1] },
-            { other.vertices()[2] } } }
-    {
-    }
-
     template < index_t dimension >
-    OwnerTriangle< dimension >::OwnerTriangle( const Point< dimension >& p0,
-        const Point< dimension >& p1,
-        const Point< dimension >& p2 )
-        : Base( p0, p1, p2 )
+    OwnerTriangle< dimension >::OwnerTriangle(
+        Point< dimension > p0, Point< dimension > p1, Point< dimension > p2 )
+        : Base( std::move( p0 ), std::move( p1 ), std::move( p2 ) )
     {
     }
     template < index_t dimension >
@@ -249,7 +238,7 @@ namespace geode
     }
     template < index_t dimension >
     Triangle< dimension >::Triangle( const OwnerTriangle< dimension >& other )
-        : Base( other )
+        : Base( other.vertices()[0], other.vertices()[1], other.vertices()[2] )
     {
     }
     template < index_t dimension >

@@ -42,7 +42,7 @@ namespace geode
     class GenericSphere
     {
     public:
-        GenericSphere( const Point< dimension >& origin, double radius );
+        GenericSphere( PointType origin, double radius );
 
         GenericSphere( const GenericSphere< PointType, dimension >& other );
         GenericSphere< PointType, dimension >& operator=(
@@ -53,9 +53,6 @@ namespace geode
 
         const Point< dimension >& origin() const;
         double radius() const;
-
-    protected:
-        GenericSphere( const OwnerSphere< dimension >& other );
 
     private:
         PointType origin_;
@@ -68,7 +65,7 @@ namespace geode
         using Base = GenericSphere< Point< dimension >, dimension >;
 
     public:
-        explicit OwnerSphere( const Point< dimension >& origin, double radius );
+        explicit OwnerSphere( Point< dimension > origin, double radius );
 
         OwnerSphere( const OwnerSphere< dimension >& other );
         OwnerSphere< dimension >& operator=(

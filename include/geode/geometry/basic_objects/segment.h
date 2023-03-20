@@ -42,8 +42,7 @@ namespace geode
     class GenericSegment
     {
     public:
-        GenericSegment(
-            const Point< dimension >& p0, const Point< dimension >& p1 );
+        GenericSegment( PointType p0, PointType p1 );
 
         GenericSegment( const GenericSegment< PointType, dimension >& other );
         GenericSegment< PointType, dimension >& operator=(
@@ -56,12 +55,9 @@ namespace geode
         Vector< dimension > normalized_direction() const;
         Point< dimension > barycenter() const;
         double length() const;
-        void set_point( index_t vertex, const Point< dimension >& point );
+        void set_point( index_t vertex, PointType point );
         const std::array< PointType, 2 >& vertices() const;
         BoundingBox< dimension > bounding_box() const;
-
-    protected:
-        GenericSegment( const OwnerSegment< dimension >& other );
 
     private:
         std::array< PointType, 2 > vertices_;
@@ -73,8 +69,7 @@ namespace geode
         using Base = GenericSegment< Point< dimension >, dimension >;
 
     public:
-        explicit OwnerSegment(
-            const Point< dimension >& p0, const Point< dimension >& p1 );
+        explicit OwnerSegment( Point< dimension > p0, Point< dimension > p1 );
 
         OwnerSegment( const OwnerSegment< dimension >& other );
         OwnerSegment< dimension >& operator=(

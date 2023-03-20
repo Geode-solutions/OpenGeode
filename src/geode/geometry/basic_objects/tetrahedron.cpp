@@ -28,11 +28,10 @@
 namespace geode
 {
     template < typename PointType >
-    GenericTetrahedron< PointType >::GenericTetrahedron( const Point3D& p0,
-        const Point3D& p1,
-        const Point3D& p2,
-        const Point3D& p3 )
-        : vertices_{ { { p0 }, { p1 }, { p2 }, { p3 } } }
+    GenericTetrahedron< PointType >::GenericTetrahedron(
+        PointType p0, PointType p1, PointType p2, PointType p3 )
+        : vertices_{ { std::move( p0 ), std::move( p1 ), std::move( p2 ),
+            std::move( p3 ) } }
     {
     }
     template < typename PointType >
@@ -72,9 +71,9 @@ namespace geode
     }
     template < typename PointType >
     void GenericTetrahedron< PointType >::set_point(
-        index_t vertex, const Point3D& point )
+        index_t vertex, PointType point )
     {
-        vertices_[vertex] = point;
+        vertices_[vertex] = std::move( point );
     }
     template < typename PointType >
     const std::array< PointType, 4 >&
@@ -93,19 +92,10 @@ namespace geode
         return bbox;
     }
 
-    template < typename PointType >
-    GenericTetrahedron< PointType >::GenericTetrahedron(
-        const OwnerTetrahedron& other )
-        : vertices_{ { { other.vertices()[0] }, { other.vertices()[1] },
-            { other.vertices()[2] }, { other.vertices()[3] } } }
-    {
-    }
-
-    OwnerTetrahedron::OwnerTetrahedron( const Point3D& p0,
-        const Point3D& p1,
-        const Point3D& p2,
-        const Point3D& p3 )
-        : Base( p0, p1, p2, p3 )
+    OwnerTetrahedron::OwnerTetrahedron(
+        Point3D p0, Point3D p1, Point3D p2, Point3D p3 )
+        : Base(
+            std::move( p0 ), std::move( p1 ), std::move( p2 ), std::move( p3 ) )
     {
     }
     OwnerTetrahedron::OwnerTetrahedron( const OwnerTetrahedron& other )
@@ -136,7 +126,13 @@ namespace geode
     {
     }
     Tetrahedron::Tetrahedron( const Tetrahedron& other ) : Base( other ) {}
-    Tetrahedron::Tetrahedron( const OwnerTetrahedron& other ) : Base( other ) {}
+    Tetrahedron::Tetrahedron( const OwnerTetrahedron& other )
+        : Base( other.vertices()[0],
+            other.vertices()[1],
+            other.vertices()[2],
+            other.vertices()[3] )
+    {
+    }
     Tetrahedron& Tetrahedron::operator=( const Tetrahedron& other )
     {
         Base::operator=( other );

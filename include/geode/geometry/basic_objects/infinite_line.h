@@ -46,8 +46,7 @@ namespace geode
     class GenericLine
     {
     public:
-        GenericLine( const Vector< dimension >& direction,
-            const Point< dimension >& origin );
+        GenericLine( const Vector< dimension >& direction, PointType origin );
 
         GenericLine( const GenericSegment< PointType, dimension >& segment );
         GenericLine( const GenericLine< PointType, dimension >& other );
@@ -60,13 +59,9 @@ namespace geode
         const Point< dimension >& origin() const;
         const Vector< dimension >& direction() const;
 
-    protected:
-        GenericLine( const OwnerInfiniteLine< dimension >& other );
-        GenericLine( const OwnerRay< dimension >& other );
-
     private:
-        PointType origin_;
         Vector< dimension > direction_;
+        PointType origin_;
     };
 
     template < index_t dimension >
@@ -76,8 +71,8 @@ namespace geode
         using Base = GenericLine< Point< dimension >, dimension >;
 
     public:
-        explicit OwnerInfiniteLine( const Vector< dimension >& direction,
-            const Point< dimension >& origin );
+        explicit OwnerInfiniteLine(
+            const Vector< dimension >& direction, Point< dimension > origin );
 
         OwnerInfiniteLine( const Segment< dimension >& segment );
         OwnerInfiniteLine( const OwnerInfiniteLine< dimension >& other );
@@ -95,8 +90,8 @@ namespace geode
         using Base = GenericLine< Point< dimension >, dimension >;
 
     public:
-        explicit OwnerRay( const Vector< dimension >& direction,
-            const Point< dimension >& origin );
+        explicit OwnerRay(
+            const Vector< dimension >& direction, Point< dimension > origin );
 
         OwnerRay( const Segment< dimension >& segment );
         OwnerRay( const OwnerRay< dimension >& other );

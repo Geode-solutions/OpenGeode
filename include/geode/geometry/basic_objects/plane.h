@@ -42,7 +42,7 @@ namespace geode
     class GenericPlane
     {
     public:
-        GenericPlane( const Vector3D& normal, const Point3D& origin );
+        GenericPlane( const Vector3D& normal, PointType origin );
 
         GenericPlane( const GenericPlane& other );
         GenericPlane& operator=( const GenericPlane& other );
@@ -52,9 +52,6 @@ namespace geode
         const Vector3D& normal() const;
         const Point3D& origin() const;
         double plane_constant() const;
-
-    protected:
-        GenericPlane( const OwnerPlane& other );
 
     private:
         Vector3D normal_;
@@ -66,7 +63,7 @@ namespace geode
         using Base = GenericPlane< Point3D >;
 
     public:
-        explicit OwnerPlane( const Vector3D& normal, const Point3D& origin );
+        explicit OwnerPlane( const Vector3D& normal, Point3D origin );
         OwnerPlane( const OwnerPlane& other );
         OwnerPlane& operator=( const OwnerPlane& other );
         OwnerPlane( OwnerPlane&& other );
