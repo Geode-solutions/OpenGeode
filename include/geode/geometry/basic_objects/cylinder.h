@@ -31,7 +31,7 @@ namespace geode
     class opengeode_geometry_api Cylinder
     {
     public:
-        Cylinder( const Segment3D& axis, double radius );
+        Cylinder( Segment3D axis, double radius );
 
         Cylinder( const Cylinder& other );
         Cylinder& operator=( const Cylinder& other );

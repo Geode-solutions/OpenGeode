@@ -29,8 +29,8 @@ namespace geode
 {
     template < typename PointType, index_t dimension >
     GenericLine< PointType, dimension >::GenericLine(
-        const Vector< dimension >& direction, const Point< dimension >& origin )
-        : origin_( origin ), direction_( direction.normalize() )
+        const Vector< dimension >& direction, PointType origin )
+        : direction_( direction.normalize() ), origin_( std::move( origin ) )
     {
     }
     template < typename PointType, index_t dimension >
@@ -50,15 +50,15 @@ namespace geode
         GenericLine< PointType, dimension >::operator=(
             const GenericLine< PointType, dimension >& other )
     {
-        origin_ = other.origin_;
         direction_ = other.direction_;
+        origin_ = other.origin_;
         return *this;
     }
     template < typename PointType, index_t dimension >
     GenericLine< PointType, dimension >::GenericLine(
         GenericLine< PointType, dimension >&& other )
-        : origin_( std::move( other.origin_ ) ),
-          direction_( std::move( other.direction_ ) )
+        : direction_( std::move( other.direction_ ) ),
+          origin_( std::move( other.origin_ ) )
     {
     }
     template < typename PointType, index_t dimension >
@@ -66,8 +66,8 @@ namespace geode
         GenericLine< PointType, dimension >::operator=(
             GenericLine< PointType, dimension >&& other )
     {
-        origin_ = std::move( other.origin_ );
         direction_ = std::move( other.direction_ );
+        origin_ = std::move( other.origin_ );
         return *this;
     }
     template < typename PointType, index_t dimension >
@@ -82,23 +82,11 @@ namespace geode
     {
         return direction_;
     }
-    template < typename PointType, index_t dimension >
-    GenericLine< PointType, dimension >::GenericLine(
-        const OwnerInfiniteLine< dimension >& other )
-        : origin_( other.origin() ), direction_( other.direction() )
-    {
-    }
-    template < typename PointType, index_t dimension >
-    GenericLine< PointType, dimension >::GenericLine(
-        const OwnerRay< dimension >& other )
-        : origin_( other.origin() ), direction_( other.direction() )
-    {
-    }
 
     template < index_t dimension >
     OwnerInfiniteLine< dimension >::OwnerInfiniteLine(
-        const Vector< dimension >& direction, const Point< dimension >& origin )
-        : Base( direction, origin )
+        const Vector< dimension >& direction, Point< dimension > origin )
+        : Base( direction, std::move( origin ) )
     {
     }
     template < index_t dimension >
@@ -156,7 +144,7 @@ namespace geode
     template < index_t dimension >
     InfiniteLine< dimension >::InfiniteLine(
         const OwnerInfiniteLine< dimension >& other )
-        : Base( other )
+        : Base( other.direction(), other.origin() )
     {
     }
     template < index_t dimension >
@@ -181,8 +169,8 @@ namespace geode
 
     template < index_t dimension >
     OwnerRay< dimension >::OwnerRay(
-        const Vector< dimension >& direction, const Point< dimension >& origin )
-        : Base( direction, origin )
+        const Vector< dimension >& direction, Point< dimension > origin )
+        : Base( direction, std::move( origin ) )
     {
     }
     template < index_t dimension >
@@ -231,7 +219,8 @@ namespace geode
     {
     }
     template < index_t dimension >
-    Ray< dimension >::Ray( const OwnerRay< dimension >& other ) : Base( other )
+    Ray< dimension >::Ray( const OwnerRay< dimension >& other )
+        : Base( other.direction(), other.origin() )
     {
     }
     template < index_t dimension >

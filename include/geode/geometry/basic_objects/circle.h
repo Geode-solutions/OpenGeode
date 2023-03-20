@@ -44,7 +44,7 @@ namespace geode
     class GenericCircle
     {
     public:
-        GenericCircle( const GenericPlane< PointType >& plane, double radius );
+        GenericCircle( GenericPlane< PointType > plane, double radius );
 
         GenericCircle( const GenericCircle& other );
         GenericCircle& operator=( const GenericCircle& other );
@@ -53,9 +53,6 @@ namespace geode
 
         const GenericPlane< PointType >& plane() const;
         double radius() const;
-
-    protected:
-        GenericCircle( const OwnerCircle& other );
 
     private:
         GenericPlane< PointType > plane_;
@@ -67,7 +64,7 @@ namespace geode
         using Base = GenericCircle< Point3D >;
 
     public:
-        explicit OwnerCircle( const OwnerPlane& plane, double radius );
+        explicit OwnerCircle( OwnerPlane plane, double radius );
 
         OwnerCircle( const OwnerCircle& other );
         OwnerCircle& operator=( const OwnerCircle& other );
@@ -81,7 +78,7 @@ namespace geode
         using Base = GenericCircle< RefPoint3D >;
 
     public:
-        Circle( const Plane& plane, double radius );
+        Circle( Plane plane, double radius );
 
         Circle( const Circle& other );
         Circle( const OwnerCircle& other );

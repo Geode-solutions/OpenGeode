@@ -27,8 +27,8 @@ namespace geode
 {
     template < typename PointType >
     GenericPlane< PointType >::GenericPlane(
-        const Vector3D& normal, const Point3D& origin )
-        : normal_( normal.normalize() ), origin_( origin )
+        const Vector3D& normal, PointType origin )
+        : normal_( normal.normalize() ), origin_( std::move( origin ) )
     {
     }
     template < typename PointType >
@@ -79,14 +79,8 @@ namespace geode
         return plane_constant;
     }
 
-    template < typename PointType >
-    GenericPlane< PointType >::GenericPlane( const OwnerPlane& other )
-        : normal_( other.normal() ), origin_( other.origin() )
-    {
-    }
-
-    OwnerPlane::OwnerPlane( const Vector3D& normal, const Point3D& origin )
-        : Base( normal, origin )
+    OwnerPlane::OwnerPlane( const Vector3D& normal, Point3D origin )
+        : Base( normal, std::move( origin ) )
     {
     }
     OwnerPlane::OwnerPlane( const OwnerPlane& other ) : Base( other ) {}
@@ -107,7 +101,10 @@ namespace geode
     {
     }
     Plane::Plane( const Plane& other ) : Base( other ) {}
-    Plane::Plane( const OwnerPlane& other ) : Base( other ) {}
+    Plane::Plane( const OwnerPlane& other )
+        : Base( other.normal(), other.origin() )
+    {
+    }
     Plane& Plane::operator=( const Plane& other )
     {
         Base::operator=( other );

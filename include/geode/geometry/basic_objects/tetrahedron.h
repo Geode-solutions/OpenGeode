@@ -49,10 +49,8 @@ namespace geode
             tetrahedron_facet_vertex{ { { { 1, 3, 2 } }, { { 0, 2, 3 } },
                 { { 3, 1, 0 } }, { { 0, 1, 2 } } } };
 
-        GenericTetrahedron( const Point3D& p0,
-            const Point3D& p1,
-            const Point3D& p2,
-            const Point3D& p3 );
+        GenericTetrahedron(
+            PointType p0, PointType p1, PointType p2, PointType p3 );
 
         GenericTetrahedron( const GenericTetrahedron& other );
         GenericTetrahedron& operator=( const GenericTetrahedron& other );
@@ -60,12 +58,9 @@ namespace geode
         GenericTetrahedron& operator=( GenericTetrahedron&& other );
 
         Point3D barycenter() const;
-        void set_point( index_t vertex, const Point3D& point );
+        void set_point( index_t vertex, PointType point );
         const std::array< PointType, 4 >& vertices() const;
         BoundingBox3D bounding_box() const;
-
-    protected:
-        GenericTetrahedron( const OwnerTetrahedron& other );
 
     private:
         std::array< PointType, 4 > vertices_;
@@ -77,10 +72,8 @@ namespace geode
         using Base = GenericTetrahedron< Point3D >;
 
     public:
-        explicit OwnerTetrahedron( const Point3D& p0,
-            const Point3D& p1,
-            const Point3D& p2,
-            const Point3D& p3 );
+        explicit OwnerTetrahedron(
+            Point3D p0, Point3D p1, Point3D p2, Point3D p3 );
 
         OwnerTetrahedron( const OwnerTetrahedron& other );
         OwnerTetrahedron& operator=( const OwnerTetrahedron& other );

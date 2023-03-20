@@ -27,9 +27,8 @@
 
 namespace geode
 {
-
-    Cylinder::Cylinder( const Segment3D& axis, double radius )
-        : axis_( axis ), radius_( radius )
+    Cylinder::Cylinder( Segment3D axis, double radius )
+        : axis_( std::move( axis ) ), radius_( radius )
     {
     }
 

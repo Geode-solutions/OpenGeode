@@ -27,8 +27,8 @@ namespace geode
 {
     template < typename PointType, index_t dimension >
     GenericSphere< PointType, dimension >::GenericSphere(
-        const Point< dimension >& origin, double radius )
-        : origin_( origin ), radius_( std::move( radius ) )
+        PointType origin, double radius )
+        : origin_( std::move( origin ) ), radius_( radius )
     {
     }
     template < typename PointType, index_t dimension >
@@ -74,17 +74,10 @@ namespace geode
         return radius_;
     }
 
-    template < typename PointType, index_t dimension >
-    GenericSphere< PointType, dimension >::GenericSphere(
-        const OwnerSphere< dimension >& other )
-        : origin_( other.origin() ), radius_( other.radius() )
-    {
-    }
-
     template < index_t dimension >
     OwnerSphere< dimension >::OwnerSphere(
-        const Point< dimension >& origin, double radius )
-        : Base( origin, radius )
+        Point< dimension > origin, double radius )
+        : Base( std::move( origin ), radius )
     {
     }
     template < index_t dimension >
@@ -126,7 +119,7 @@ namespace geode
     }
     template < index_t dimension >
     Sphere< dimension >::Sphere( const OwnerSphere< dimension >& other )
-        : Base( other )
+        : Base( other.origin(), other.radius() )
     {
     }
     template < index_t dimension >

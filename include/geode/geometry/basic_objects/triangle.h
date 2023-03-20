@@ -45,9 +45,7 @@ namespace geode
     class GenericTriangle
     {
     public:
-        GenericTriangle( const Point< dimension >& p0,
-            const Point< dimension >& p1,
-            const Point< dimension >& p2 );
+        GenericTriangle( PointType p0, PointType p1, PointType p2 );
 
         GenericTriangle( const GenericTriangle< PointType, dimension >& other );
         GenericTriangle< PointType, dimension >& operator=(
@@ -69,12 +67,9 @@ namespace geode
         template < index_t T = dimension >
         typename std::enable_if< T == 3, absl::optional< local_index_t > >::type
             pivot() const;
-        void set_point( index_t vertex, const Point< dimension >& point );
+        void set_point( index_t vertex, PointType point );
         const std::array< PointType, 3 >& vertices() const;
         BoundingBox< dimension > bounding_box() const;
-
-    protected:
-        GenericTriangle( const OwnerTriangle< dimension >& other );
 
     private:
         std::array< PointType, 3 > vertices_;
@@ -87,9 +82,9 @@ namespace geode
         using Base = GenericTriangle< Point< dimension >, dimension >;
 
     public:
-        explicit OwnerTriangle( const Point< dimension >& p0,
-            const Point< dimension >& p1,
-            const Point< dimension >& p2 );
+        explicit OwnerTriangle( Point< dimension > p0,
+            Point< dimension > p1,
+            Point< dimension > p2 );
 
         OwnerTriangle( const OwnerTriangle< dimension >& other );
         OwnerTriangle< dimension >& operator=(

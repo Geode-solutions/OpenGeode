@@ -27,8 +27,8 @@ namespace geode
 {
     template < typename PointType >
     GenericCircle< PointType >::GenericCircle(
-        const GenericPlane< PointType >& plane, double radius )
-        : plane_( plane ), radius_( std::move( radius ) )
+        GenericPlane< PointType > plane, double radius )
+        : plane_( std::move( plane ) ), radius_( radius )
     {
     }
     template < typename PointType >
@@ -69,15 +69,8 @@ namespace geode
         return radius_;
     }
 
-    template < typename PointType >
-    GenericCircle< PointType >::GenericCircle( const OwnerCircle& other )
-        : plane_( other.plane().normal(), other.plane().origin() ),
-          radius_( other.radius() )
-    {
-    }
-
-    OwnerCircle::OwnerCircle( const OwnerPlane& plane, double radius )
-        : Base( plane, radius )
+    OwnerCircle::OwnerCircle( OwnerPlane plane, double radius )
+        : Base( std::move( plane ), radius )
     {
     }
     OwnerCircle::OwnerCircle( const OwnerCircle& other ) : Base( other ) {}
@@ -93,11 +86,16 @@ namespace geode
         return *this;
     }
 
-    Circle::Circle( const Plane& plane, double radius ) : Base( plane, radius )
+    Circle::Circle( Plane plane, double radius )
+        : Base( std::move( plane ), radius )
     {
     }
     Circle::Circle( const Circle& other ) : Base( other ) {}
-    Circle::Circle( const OwnerCircle& other ) : Base( other ) {}
+    Circle::Circle( const OwnerCircle& other )
+        : Base(
+            { other.plane().normal(), other.plane().origin() }, other.radius() )
+    {
+    }
     Circle& Circle::operator=( const Circle& other )
     {
         Base::operator=( other );
