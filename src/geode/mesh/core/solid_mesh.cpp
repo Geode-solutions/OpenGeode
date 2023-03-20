@@ -758,7 +758,7 @@ namespace geode
                 const auto& p1 = point( facet_vertices[i - 2] );
                 const auto& p2 = point( facet_vertices[i - 1] );
                 const auto& p3 = point( facet_vertices[i] );
-                volume += tetrahedron_signed_volume( { p0, p1, p2, p3 } );
+                volume += tetrahedron_signed_volume( { p1, p2, p3, p0 } );
             }
         }
         return volume;

@@ -24,6 +24,8 @@
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/logger.h>
 
+#include <geode/geometry/basic_objects/tetrahedron.h>
+#include <geode/geometry/mensuration.h>
 #include <geode/geometry/point.h>
 
 #include <geode/mesh/builder/geode/geode_tetrahedral_solid_builder.h>
@@ -66,6 +68,18 @@ void test_create_tetrahedra( const geode::TetrahedralSolid3D& solid,
     builder.set_polyhedron_vertex( { 0, 1 }, 1 );
     builder.set_polyhedron_vertex( { 0, 2 }, 2 );
     builder.set_polyhedron_vertex( { 0, 3 }, 3 );
+}
+
+void test_polyhedron_volumes( const geode::TetrahedralSolid3D& solid )
+{
+    for( const auto p : geode::Range{ solid.nb_polyhedra() } )
+    {
+        OPENGEODE_EXCEPTION( std::fabs( solid.polyhedron_volume( p )
+                                        - geode::tetrahedron_signed_volume(
+                                            solid.tetrahedron( p ) ) )
+                                 < geode::global_epsilon,
+            "[Test] Not correct tetrahedron volume computation" );
+    }
 }
 
 void test_polyhedron_adjacencies( const geode::TetrahedralSolid3D& solid,
@@ -327,6 +341,7 @@ void test()
 
     test_create_vertices( *solid, *builder );
     test_create_tetrahedra( *solid, *builder );
+    test_polyhedron_volumes( *solid );
     test_polyhedron_adjacencies( *solid, *builder );
     test_is_on_border( *solid );
     test_io( *solid, absl::StrCat( "test.", solid->native_extension() ) );
