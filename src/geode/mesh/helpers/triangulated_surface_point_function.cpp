@@ -34,13 +34,13 @@
 
 namespace geode
 {
-    template < index_t dimension >
-    class TriangulatedSurfacePointFunction< dimension >::Impl
+    template < index_t dimension, index_t point_dimension >
+    class TriangulatedSurfacePointFunction< dimension, point_dimension >::Impl
     {
     public:
         Impl( const TriangulatedSurface< dimension >& surface,
             absl::string_view function_name,
-            Point< dimension > value )
+            Point< point_dimension > value )
             : surface_( surface )
         {
             OPENGEODE_EXCEPTION(
@@ -52,7 +52,7 @@ namespace geode
             function_attribute_ =
                 surface_.vertex_attribute_manager()
                     .template find_or_create_attribute< VariableAttribute,
-                        Point< dimension > >(
+                        Point< point_dimension > >(
                         function_name, std::move( value ), { false, true } );
         }
 
@@ -69,24 +69,24 @@ namespace geode
             function_attribute_ =
                 surface_.vertex_attribute_manager()
                     .template find_or_create_attribute< VariableAttribute,
-                        Point< dimension > >(
-                        function_name, Point< dimension >(), { false, true } );
+                        Point< point_dimension > >( function_name,
+                        Point< point_dimension >(), { false, true } );
         }
 
-        void set_value( index_t vertex_id, Point< dimension > value )
+        void set_value( index_t vertex_id, Point< point_dimension > value )
         {
             function_attribute_->set_value( vertex_id, std::move( value ) );
         }
 
-        const Point< dimension >& value( index_t vertex_id ) const
+        const Point< point_dimension >& value( index_t vertex_id ) const
         {
             return function_attribute_->value( vertex_id );
         }
 
-        Point< dimension > value(
+        Point< point_dimension > value(
             const Point< dimension >& point, index_t triangle_id ) const
         {
-            Point< dimension > point_value;
+            Point< point_dimension > point_value;
             const auto triangle = surface_.triangle( triangle_id );
             const auto triangle_vertices =
                 surface_.polygon_vertices( triangle_id );
@@ -103,30 +103,31 @@ namespace geode
 
     private:
         const TriangulatedSurface< dimension >& surface_;
-        std::shared_ptr< VariableAttribute< Point< dimension > > >
+        std::shared_ptr< VariableAttribute< Point< point_dimension > > >
             function_attribute_;
     };
 
-    template < index_t dimension >
-    TriangulatedSurfacePointFunction< dimension >::
+    template < index_t dimension, index_t point_dimension >
+    TriangulatedSurfacePointFunction< dimension, point_dimension >::
         TriangulatedSurfacePointFunction(
-            TriangulatedSurfacePointFunction< dimension >&& other )
+            TriangulatedSurfacePointFunction< dimension, point_dimension >&&
+                other )
         : impl_( std::move( other.impl_ ) )
     {
     }
 
-    template < index_t dimension >
-    TriangulatedSurfacePointFunction< dimension >::
+    template < index_t dimension, index_t point_dimension >
+    TriangulatedSurfacePointFunction< dimension, point_dimension >::
         TriangulatedSurfacePointFunction(
             const TriangulatedSurface< dimension >& surface,
             absl::string_view function_name,
-            Point< dimension > value )
+            Point< point_dimension > value )
         : impl_{ surface, function_name, value }
     {
     }
 
-    template < index_t dimension >
-    TriangulatedSurfacePointFunction< dimension >::
+    template < index_t dimension, index_t point_dimension >
+    TriangulatedSurfacePointFunction< dimension, point_dimension >::
         TriangulatedSurfacePointFunction(
             const TriangulatedSurface< dimension >& surface,
             absl::string_view function_name )
@@ -134,49 +135,51 @@ namespace geode
     {
     }
 
-    template < index_t dimension >
-    TriangulatedSurfacePointFunction<
-        dimension >::~TriangulatedSurfacePointFunction()
+    template < index_t dimension, index_t point_dimension >
+    TriangulatedSurfacePointFunction< dimension,
+        point_dimension >::~TriangulatedSurfacePointFunction()
     {
     }
 
-    template < index_t dimension >
-    TriangulatedSurfacePointFunction< dimension >
-        TriangulatedSurfacePointFunction< dimension >::create(
+    template < index_t dimension, index_t point_dimension >
+    TriangulatedSurfacePointFunction< dimension, point_dimension >
+        TriangulatedSurfacePointFunction< dimension, point_dimension >::create(
             const TriangulatedSurface< dimension >& surface,
             absl::string_view function_name,
-            Point< dimension > value )
+            Point< point_dimension > value )
     {
         return { surface, function_name, value };
     }
 
-    template < index_t dimension >
-    TriangulatedSurfacePointFunction< dimension >
-        TriangulatedSurfacePointFunction< dimension >::find(
+    template < index_t dimension, index_t point_dimension >
+    TriangulatedSurfacePointFunction< dimension, point_dimension >
+        TriangulatedSurfacePointFunction< dimension, point_dimension >::find(
             const TriangulatedSurface< dimension >& surface,
             absl::string_view function_name )
     {
         return { surface, function_name };
     }
 
-    template < index_t dimension >
-    void TriangulatedSurfacePointFunction< dimension >::set_value(
-        index_t vertex_index, Point< dimension > value )
+    template < index_t dimension, index_t point_dimension >
+    void TriangulatedSurfacePointFunction< dimension,
+        point_dimension >::set_value( index_t vertex_index,
+        Point< point_dimension > value )
     {
         impl_->set_value( vertex_index, value );
     }
 
-    template < index_t dimension >
-    const Point< dimension >&
-        TriangulatedSurfacePointFunction< dimension >::value(
+    template < index_t dimension, index_t point_dimension >
+    const Point< point_dimension >&
+        TriangulatedSurfacePointFunction< dimension, point_dimension >::value(
             index_t vertex_index ) const
     {
         return impl_->value( vertex_index );
     }
 
-    template < index_t dimension >
-    Point< dimension > TriangulatedSurfacePointFunction< dimension >::value(
-        const Point< dimension >& point, index_t triangle_id ) const
+    template < index_t dimension, index_t point_dimension >
+    Point< point_dimension >
+        TriangulatedSurfacePointFunction< dimension, point_dimension >::value(
+            const Point< dimension >& point, index_t triangle_id ) const
     {
         return impl_->value( point, triangle_id );
     }

@@ -35,12 +35,13 @@ namespace geode
 
 namespace geode
 {
-    template < index_t dimension >
+    template < index_t dimension, index_t point_dimension = dimension >
     class TriangulatedSurfacePointFunction
     {
     public:
         TriangulatedSurfacePointFunction(
-            TriangulatedSurfacePointFunction< dimension >&& other );
+            TriangulatedSurfacePointFunction< dimension, point_dimension >&&
+                other );
         ~TriangulatedSurfacePointFunction();
 
         /*!
@@ -48,25 +49,25 @@ namespace geode
          * a value. Throws an exception if an attribute with the same name
          * exists.
          */
-        static TriangulatedSurfacePointFunction< dimension > create(
-            const TriangulatedSurface< dimension >& solid,
-            absl::string_view function_name,
-            Point< dimension > value );
+        static TriangulatedSurfacePointFunction< dimension, point_dimension >
+            create( const TriangulatedSurface< dimension >& solid,
+                absl::string_view function_name,
+                Point< point_dimension > value );
 
         /*!
          * Finds an object function that already exists in the given
          * TriangulatedSurface, from its given name.
          * Throws an exception if no attribute with the same name exists.
          */
-        static TriangulatedSurfacePointFunction< dimension > find(
-            const TriangulatedSurface< dimension >& solid,
-            absl::string_view function_name );
+        static TriangulatedSurfacePointFunction< dimension, point_dimension >
+            find( const TriangulatedSurface< dimension >& solid,
+                absl::string_view function_name );
 
-        void set_value( index_t vertex_index, Point< dimension > value );
+        void set_value( index_t vertex_index, Point< point_dimension > value );
 
-        const Point< dimension >& value( index_t vertex_index ) const;
+        const Point< point_dimension >& value( index_t vertex_index ) const;
 
-        Point< dimension > value(
+        Point< point_dimension > value(
             const Point< dimension >& point, index_t tetrahedron_id ) const;
 
     private:
@@ -77,7 +78,7 @@ namespace geode
         TriangulatedSurfacePointFunction(
             const TriangulatedSurface< dimension >& solid,
             absl::string_view function_name,
-            Point< dimension > value );
+            Point< point_dimension > value );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

@@ -34,13 +34,13 @@
 
 namespace geode
 {
-    template < index_t dimension >
-    class TetrahedralSolidPointFunction< dimension >::Impl
+    template < index_t dimension, index_t point_dimension >
+    class TetrahedralSolidPointFunction< dimension, point_dimension >::Impl
     {
     public:
         Impl( const TetrahedralSolid< dimension >& solid,
             absl::string_view function_name,
-            Point< dimension > value )
+            Point< point_dimension > value )
             : solid_( solid )
         {
             OPENGEODE_EXCEPTION(
@@ -52,7 +52,7 @@ namespace geode
             function_attribute_ =
                 solid_.vertex_attribute_manager()
                     .template find_or_create_attribute< VariableAttribute,
-                        Point< dimension > >(
+                        Point< point_dimension > >(
                         function_name, std::move( value ), { false, true } );
         }
 
@@ -69,24 +69,24 @@ namespace geode
             function_attribute_ =
                 solid_.vertex_attribute_manager()
                     .template find_or_create_attribute< VariableAttribute,
-                        Point< dimension > >(
-                        function_name, Point< dimension >(), { false, true } );
+                        Point< point_dimension > >( function_name,
+                        Point< point_dimension >(), { false, true } );
         }
 
-        void set_value( index_t vertex_id, Point< dimension > value )
+        void set_value( index_t vertex_id, Point< point_dimension > value )
         {
             function_attribute_->set_value( vertex_id, std::move( value ) );
         }
 
-        const Point< dimension >& value( index_t vertex_id ) const
+        const Point< point_dimension >& value( index_t vertex_id ) const
         {
             return function_attribute_->value( vertex_id );
         }
 
-        Point< dimension > value(
+        Point< point_dimension > value(
             const Point< dimension >& point, index_t tetrahedron_id ) const
         {
-            Point< dimension > point_value;
+            Point< point_dimension > point_value;
             const auto tetrahedron = solid_.tetrahedron( tetrahedron_id );
             const auto tetrahedron_vertices =
                 solid_.polyhedron_vertices( tetrahedron_id );
@@ -103,75 +103,82 @@ namespace geode
 
     private:
         const TetrahedralSolid< dimension >& solid_;
-        std::shared_ptr< VariableAttribute< Point< dimension > > >
+        std::shared_ptr< VariableAttribute< Point< point_dimension > > >
             function_attribute_;
     };
 
-    template < index_t dimension >
-    TetrahedralSolidPointFunction< dimension >::TetrahedralSolidPointFunction(
-        TetrahedralSolidPointFunction< dimension >&& other )
+    template < index_t dimension, index_t point_dimension >
+    TetrahedralSolidPointFunction< dimension, point_dimension >::
+        TetrahedralSolidPointFunction(
+            TetrahedralSolidPointFunction< dimension, point_dimension >&&
+                other )
         : impl_( std::move( other.impl_ ) )
     {
     }
 
-    template < index_t dimension >
-    TetrahedralSolidPointFunction< dimension >::TetrahedralSolidPointFunction(
-        const TetrahedralSolid< dimension >& solid,
-        absl::string_view function_name,
-        Point< dimension > value )
+    template < index_t dimension, index_t point_dimension >
+    TetrahedralSolidPointFunction< dimension, point_dimension >::
+        TetrahedralSolidPointFunction(
+            const TetrahedralSolid< dimension >& solid,
+            absl::string_view function_name,
+            Point< point_dimension > value )
         : impl_{ solid, function_name, value }
     {
     }
 
-    template < index_t dimension >
-    TetrahedralSolidPointFunction< dimension >::TetrahedralSolidPointFunction(
-        const TetrahedralSolid< dimension >& solid,
-        absl::string_view function_name )
+    template < index_t dimension, index_t point_dimension >
+    TetrahedralSolidPointFunction< dimension, point_dimension >::
+        TetrahedralSolidPointFunction(
+            const TetrahedralSolid< dimension >& solid,
+            absl::string_view function_name )
         : impl_{ solid, function_name }
     {
     }
 
-    template < index_t dimension >
-    TetrahedralSolidPointFunction< dimension >::~TetrahedralSolidPointFunction()
+    template < index_t dimension, index_t point_dimension >
+    TetrahedralSolidPointFunction< dimension,
+        point_dimension >::~TetrahedralSolidPointFunction()
     {
     }
 
-    template < index_t dimension >
-    TetrahedralSolidPointFunction< dimension >
-        TetrahedralSolidPointFunction< dimension >::create(
+    template < index_t dimension, index_t point_dimension >
+    TetrahedralSolidPointFunction< dimension, point_dimension >
+        TetrahedralSolidPointFunction< dimension, point_dimension >::create(
             const TetrahedralSolid< dimension >& solid,
             absl::string_view function_name,
-            Point< dimension > value )
+            Point< point_dimension > value )
     {
         return { solid, function_name, value };
     }
 
-    template < index_t dimension >
-    TetrahedralSolidPointFunction< dimension >
-        TetrahedralSolidPointFunction< dimension >::find(
+    template < index_t dimension, index_t point_dimension >
+    TetrahedralSolidPointFunction< dimension, point_dimension >
+        TetrahedralSolidPointFunction< dimension, point_dimension >::find(
             const TetrahedralSolid< dimension >& solid,
             absl::string_view function_name )
     {
         return { solid, function_name };
     }
 
-    template < index_t dimension >
-    void TetrahedralSolidPointFunction< dimension >::set_value(
-        index_t vertex_index, Point< dimension > value )
+    template < index_t dimension, index_t point_dimension >
+    void TetrahedralSolidPointFunction< dimension, point_dimension >::set_value(
+        index_t vertex_index, Point< point_dimension > value )
     {
         impl_->set_value( vertex_index, value );
     }
 
-    template < index_t dimension >
-    const Point< dimension >& TetrahedralSolidPointFunction< dimension >::value(
-        index_t vertex_index ) const
+    template < index_t dimension, index_t point_dimension >
+    const Point< point_dimension >&
+        TetrahedralSolidPointFunction< dimension, point_dimension >::value(
+            index_t vertex_index ) const
     {
         return impl_->value( vertex_index );
     }
 
-    template < index_t dimension >
-    Point< dimension > TetrahedralSolidPointFunction< dimension >::value(
-        const Point< dimension >& point, index_t tetrahedron_id ) const
+    template < index_t dimension, index_t point_dimension >
+    Point< point_dimension >
+        TetrahedralSolidPointFunction< dimension, point_dimension >::value(
+            const Point< dimension >& point, index_t tetrahedron_id ) const
     {
         return impl_->value( point, tetrahedron_id );
     }

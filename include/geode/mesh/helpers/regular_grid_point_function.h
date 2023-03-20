@@ -36,12 +36,12 @@ namespace geode
 
 namespace geode
 {
-    template < index_t dimension >
+    template < index_t dimension, index_t point_dimension = dimension >
     class RegularGridPointFunction
     {
     public:
         RegularGridPointFunction(
-            RegularGridPointFunction< dimension >&& other );
+            RegularGridPointFunction< dimension, point_dimension >&& other );
         ~RegularGridPointFunction();
 
         /*!
@@ -49,33 +49,33 @@ namespace geode
          * value.
          * Throws an exception if an attribute with the same name exists.
          */
-        static RegularGridPointFunction< dimension > create(
+        static RegularGridPointFunction< dimension, point_dimension > create(
             const RegularGrid< dimension >& grid,
             absl::string_view function_name,
-            Point< dimension > value );
+            Point< point_dimension > value );
 
         /*!
          * Finds an object function that already exists in the given
          * RegularGrid, from its given name.
          * Throws an exception if no attribute with the same name exists.
          */
-        static RegularGridPointFunction< dimension > find(
+        static RegularGridPointFunction< dimension, point_dimension > find(
             const RegularGrid< dimension >& grid,
             absl::string_view function_name );
 
         void set_value(
             const typename Grid< dimension >::VertexIndices& vertex_index,
-            Point< dimension > value );
+            Point< point_dimension > value );
 
-        void set_value( index_t vertex_index, Point< dimension > value );
+        void set_value( index_t vertex_index, Point< point_dimension > value );
 
-        const Point< dimension >& value(
+        const Point< point_dimension >& value(
             const typename Grid< dimension >::VertexIndices& vertex_index )
             const;
 
-        const Point< dimension >& value( index_t vertex_index ) const;
+        const Point< point_dimension >& value( index_t vertex_index ) const;
 
-        Point< dimension > value( const Point< dimension >& point,
+        Point< point_dimension > value( const Point< dimension >& point,
             const typename Grid< dimension >::CellIndices& grid_cell_indices )
             const;
 
@@ -85,7 +85,7 @@ namespace geode
 
         RegularGridPointFunction( const RegularGrid< dimension >& grid,
             absl::string_view function_name,
-            Point< dimension > value );
+            Point< point_dimension > value );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );
