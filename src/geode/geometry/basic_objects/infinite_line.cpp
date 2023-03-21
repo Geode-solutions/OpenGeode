@@ -42,7 +42,7 @@ namespace geode
     template < typename PointType, index_t dimension >
     GenericLine< PointType, dimension >::GenericLine(
         const GenericLine< PointType, dimension >& other )
-        : origin_( other.origin_ ), direction_( other.direction_ )
+        : direction_( other.direction_ ), origin_( other.origin_ )
     {
     }
     template < typename PointType, index_t dimension >
