@@ -25,6 +25,8 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+#include <gdal_priv.h>
+
 #include "core/greyscale_color.h"
 #include "core/raster_image.h"
 #include "core/rgb_color.h"
@@ -91,7 +93,10 @@ PYBIND11_MODULE( opengeode_py_image, module )
     pybind11::add_ostream_redirect( module );
     module.doc() = "OpenGeode Python binding for image";
     pybind11::class_< geode::OpenGeodeImage >( module, "OpenGeodeImage" )
-        .def( "initialize", &geode::OpenGeodeImage::initialize );
+        .def( "initialize", [] {
+            geode::OpenGeodeImage::initialize();
+            GDALAllRegister();
+        } );
     geode::define_greyscale_color( module );
     geode::define_raster_image( module );
     geode::define_raster_image_io( module );
