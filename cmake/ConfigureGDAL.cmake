@@ -24,7 +24,7 @@ set(GDAL_CMAKE_PREFIX_PATH ${PROJ_INSTALL_PREFIX} ${SQLITE_INSTALL_PREFIX})
 ExternalProject_Add(gdal
     PREFIX ${GDAL_PATH}
     GIT_REPOSITORY https://github.com/Geode-solutions/gdal
-    GIT_TAG c99428cdfae57f190da8bd88f0347f1dec7085e6
+    GIT_TAG 0cb8936c37a71aac82868f9c56e3823d656055a2
     GIT_PROGRESS ON
     GIT_CONFIG core.longpaths=true
     CMAKE_GENERATOR ${CMAKE_GENERATOR}
