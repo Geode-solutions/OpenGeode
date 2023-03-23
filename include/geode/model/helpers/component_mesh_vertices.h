@@ -51,14 +51,16 @@ namespace geode
     using ComponentMeshVertexTriplets = absl::flat_hash_map< ComponentID,
         std::vector< std::array< index_t, 3 > > >;
 
-    ComponentMeshVertexTriplets opengeode_model_api component_mesh_vertex_triplets(
-        absl::Span< const ComponentMeshVertex > unique_vertices0,
-        absl::Span< const ComponentMeshVertex > unique_vertices1,
-        absl::Span< const ComponentMeshVertex > unique_vertices2 );
+    ComponentMeshVertexTriplets opengeode_model_api
+        component_mesh_vertex_triplets(
+            absl::Span< const ComponentMeshVertex > unique_vertices0,
+            absl::Span< const ComponentMeshVertex > unique_vertices1,
+            absl::Span< const ComponentMeshVertex > unique_vertices2 );
 
-    ComponentMeshVertexTriplets opengeode_model_api component_mesh_vertex_triplets(
-        absl::Span< const ComponentMeshVertex > unique_vertices0,
-        absl::Span< const ComponentMeshVertex > unique_vertices1,
-        absl::Span< const ComponentMeshVertex > unique_vertices2,
-        const ComponentType& type );
+    ComponentMeshVertexTriplets opengeode_model_api
+        component_mesh_vertex_triplets(
+            absl::Span< const ComponentMeshVertex > unique_vertices0,
+            absl::Span< const ComponentMeshVertex > unique_vertices1,
+            absl::Span< const ComponentMeshVertex > unique_vertices2,
+            const ComponentType& type );
 } // namespace geode
