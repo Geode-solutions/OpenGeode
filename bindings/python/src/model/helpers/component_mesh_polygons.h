@@ -63,7 +63,15 @@ namespace geode
             .def_readwrite(
                 "opposite_edge", &SurfacePolygonsEdgeVertices::opposite_edge );
 
-        module.def( "polygon_unique_vertices", &polygon_unique_vertices )
+        module
+            .def( "block_polygon_unique_vertices",
+                ( PolygonVertices( * )(
+                    const BRep&, const Block3D&, const PolyhedronFacet& ) )
+                    & polygon_unique_vertices )
+            .def( "surface_polygon_unique_vertices",
+                ( PolygonVertices( * )(
+                    const BRep&, const Surface3D&, index_t ) )
+                    & polygon_unique_vertices )
             .def( "block_mesh_polyhedra_from_surface_polygon",
                 &block_mesh_polyhedra_from_surface_polygon )
             .def( "block_vertices_from_surface_polygon",

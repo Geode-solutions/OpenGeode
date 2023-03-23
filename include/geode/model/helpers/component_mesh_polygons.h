@@ -23,6 +23,10 @@
 
 #pragma once
 
+#include <absl/container/flat_hash_map.h>
+
+#include <geode/basic/uuid.h>
+
 #include <geode/mesh/core/solid_mesh.h>
 #include <geode/mesh/core/surface_mesh.h>
 
@@ -42,6 +46,29 @@ namespace geode
 
 namespace geode
 {
+    PolygonVertices opengeode_model_api polygon_unique_vertices(
+        const BRep& model, const Surface3D& surface, index_t polygon_id );
+
+    PolygonVertices opengeode_model_api polygon_unique_vertices(
+        const BRep& model, const Block3D& block, const PolyhedronFacet& facet );
+
+    struct BRepComponentMeshPolygons
+    {
+        using SurfacePolygons =
+            absl::flat_hash_map< uuid, std::vector< index_t > >;
+        using BlockPolygons =
+            absl::flat_hash_map< uuid, std::vector< PolyhedronFacet > >;
+
+        SurfacePolygons surface_polygons;
+        BlockPolygons block_polygons;
+    };
+
+    BRepComponentMeshPolygons opengeode_model_api component_mesh_polygons(
+        const BRep& brep, const Surface3D& surface, index_t polygon_id );
+
+    BRepComponentMeshPolygons opengeode_model_api component_mesh_polygons(
+        const BRep& brep, const Block3D& block, const PolyhedronFacet& facet );
+
     struct BlockPolyhedronFacet
     {
         BlockPolyhedronFacet() = default;
@@ -104,9 +131,6 @@ namespace geode
         absl::optional< SurfacePolygonEdge > oriented_edge;
         absl::optional< SurfacePolygonEdge > opposite_edge;
     };
-
-    PolygonVertices opengeode_model_api polygon_unique_vertices(
-        const BRep& model, const Surface3D& surface, index_t polygon_id );
 
     PolyhedraAroundFacet opengeode_model_api
         block_mesh_polyhedra_from_surface_polygon( const BRep& model,

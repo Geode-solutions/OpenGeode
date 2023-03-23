@@ -92,11 +92,11 @@ namespace
             for( const auto& pair : line_pair.second )
             {
                 for( const auto& edge_vertex :
-                    mesh.edges_around_vertex( pair.first ) )
+                    mesh.edges_around_vertex( pair[0] ) )
                 {
                     const auto opposite_vertex =
                         mesh.edge_vertex( edge_vertex.opposite() );
-                    if( opposite_vertex == pair.second )
+                    if( opposite_vertex == pair[1] )
                     {
                         edges[line.id()].emplace_back( edge_vertex.edge_id );
                     }
@@ -127,9 +127,8 @@ namespace
             const auto& mesh = surface.mesh();
             for( const auto& pair : surface_pair.second )
             {
-                for( auto& polygon_vertex : mesh.polygons_from_edge_vertices(
-                         std::array< geode::index_t, 2 >{
-                             pair.first, pair.second } ) )
+                for( auto& polygon_vertex :
+                    mesh.polygons_from_edge_vertices( pair ) )
                 {
                     edges[surface.id()].emplace_back(
                         std::move( polygon_vertex ) );
@@ -158,8 +157,8 @@ namespace
             const auto& mesh = block.mesh();
             for( const auto& pair : block_pair.second )
             {
-                if( auto edge = mesh.polyhedron_facet_edge_from_vertices(
-                        { pair.first, pair.second } ) )
+                if( auto edge =
+                        mesh.polyhedron_facet_edge_from_vertices( pair ) )
                 {
                     edges[block.id()].emplace_back( std::move( edge.value() ) );
                 }
