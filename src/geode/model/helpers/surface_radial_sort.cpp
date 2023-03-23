@@ -122,7 +122,7 @@ namespace
             for( const auto& pair : vertex_pairs.second )
             {
                 if( auto edge0 = surface_mesh.polygon_edge_from_vertices(
-                        pair.first, pair.second ) )
+                        pair[0], pair[1] ) )
                 {
                     polygons.emplace_back(
                         surface, true, std::move( edge0.value() ) );
@@ -132,7 +132,7 @@ namespace
                             polygons.back().opposite_point );
                 }
                 if( auto edge1 = surface_mesh.polygon_edge_from_vertices(
-                        pair.second, pair.first ) )
+                        pair[1], pair[0] ) )
                 {
                     polygons.emplace_back(
                         surface, false, std::move( edge1.value() ) );

@@ -25,9 +25,12 @@
 
 #include <absl/container/inlined_vector.h>
 
+#include <geode/basic/algorithm.h>
+
 #include <geode/mesh/core/detail/vertex_cycle.h>
 
 #include <geode/model/helpers/component_mesh_edges.h>
+#include <geode/model/helpers/component_mesh_vertices.h>
 #include <geode/model/mixin/core/block.h>
 #include <geode/model/mixin/core/surface.h>
 #include <geode/model/representation/core/brep.h>
@@ -506,10 +509,127 @@ namespace
         }
         return e_to_surface_vertices;
     }
+
+    template < class Polygons >
+    void filter_polygons( Polygons& polygons )
+    {
+        for( auto& polygon : polygons )
+        {
+            geode::sort_unique( polygon.second );
+        }
+    }
+
+    geode::ComponentMeshVertexTriplets model_polygon_pairs(
+        const geode::BRep& model,
+        const geode::PolygonVertices& polygon_unique_vertices,
+        const geode::ComponentType& type )
+    {
+        return geode::component_mesh_vertex_triplets(
+            model.component_mesh_vertices( polygon_unique_vertices[0] ),
+            model.component_mesh_vertices( polygon_unique_vertices[1] ),
+            model.component_mesh_vertices( polygon_unique_vertices[2] ), type );
+    }
+
+    geode::BRepComponentMeshPolygons::SurfacePolygons surface_polygons(
+        const geode::BRep& model,
+        const geode::PolygonVertices& polygon_unique_vertices )
+    {
+        auto surface_pairs =
+            model_polygon_pairs( model, polygon_unique_vertices,
+                geode::Surface3D::component_type_static() );
+        if( surface_pairs.empty() )
+        {
+            return {};
+        }
+        geode::BRepComponentMeshPolygons::SurfacePolygons polygons;
+        polygons.reserve( surface_pairs.size() );
+        for( auto& surface_pair : surface_pairs )
+        {
+            const auto& surface = model.surface( surface_pair.first.id() );
+            const auto& mesh = surface.mesh();
+            for( auto& pair : surface_pair.second )
+            {
+                absl::c_sort( pair );
+                for( auto& polygon_vertex :
+                    mesh.polygons_around_vertex( pair[0] ) )
+                {
+                    auto vertices =
+                        mesh.polygon_vertices( polygon_vertex.polygon_id );
+                    absl::c_sort( vertices );
+                    if( absl::c_equal( pair, vertices ) )
+                    {
+                        polygons[surface.id()].emplace_back(
+                            polygon_vertex.polygon_id );
+                        break;
+                    }
+                }
+            }
+        }
+        filter_polygons( polygons );
+        return polygons;
+    }
+
+    geode::BRepComponentMeshPolygons::BlockPolygons block_polygons(
+        const geode::BRep& model,
+        const geode::PolygonVertices& polygon_unique_vertices )
+    {
+        const auto block_pairs = model_polygon_pairs( model,
+            polygon_unique_vertices, geode::Block3D::component_type_static() );
+        if( block_pairs.empty() )
+        {
+            return {};
+        }
+        geode::BRepComponentMeshPolygons::BlockPolygons polygons;
+        polygons.reserve( block_pairs.size() );
+        for( const auto& block_pair : block_pairs )
+        {
+            const auto& block = model.block( block_pair.first.id() );
+            const auto& mesh = block.mesh();
+            for( const auto& pair : block_pair.second )
+            {
+                if( auto facet = mesh.polyhedron_facet_from_vertices(
+                        { pair[0], pair[1], pair[2] } ) )
+                {
+                    polygons[block.id()].emplace_back(
+                        std::move( facet.value() ) );
+                }
+            }
+        }
+        filter_polygons( polygons );
+        return polygons;
+    }
+
+    geode::BRepComponentMeshPolygons brep_component_mesh_polygons(
+        const geode::BRep& brep,
+        const geode::PolygonVertices& polygon_unique_vertices )
+    {
+        geode::BRepComponentMeshPolygons polygons;
+        polygons.surface_polygons =
+            surface_polygons( brep, polygon_unique_vertices );
+        polygons.block_polygons =
+            block_polygons( brep, polygon_unique_vertices );
+        return polygons;
+    }
 } // namespace
 
 namespace geode
 {
+    PolygonVertices polygon_unique_vertices(
+        const BRep& model, const Block3D& block, const PolyhedronFacet& facet )
+    {
+        const auto& solid_mesh = block.mesh();
+        const auto nb_vertices =
+            solid_mesh.nb_polyhedron_facet_vertices( facet );
+        PolygonVertices polygon_unique_vertices( nb_vertices );
+        for( const auto v : LRange{ nb_vertices } )
+        {
+            polygon_unique_vertices[v] =
+                model.unique_vertex( { block.component_id(),
+                    solid_mesh.polyhedron_facet_vertex( { facet, v } ) } );
+        }
+        return polygon_unique_vertices;
+    }
+
     PolygonVertices polygon_unique_vertices(
         const BRep& model, const Surface3D& surface, index_t polygon_id )
     {
@@ -524,6 +644,20 @@ namespace geode
                         { polygon_id, polygon_vertex_id } ) } );
         }
         return polygon_unique_vertices;
+    }
+
+    BRepComponentMeshPolygons component_mesh_polygons(
+        const BRep& brep, const Surface3D& surface, index_t polygon_id )
+    {
+        return brep_component_mesh_polygons(
+            brep, polygon_unique_vertices( brep, surface, polygon_id ) );
+    }
+
+    BRepComponentMeshPolygons component_mesh_polygons(
+        const BRep& brep, const Block3D& block, const PolyhedronFacet& facet )
+    {
+        return brep_component_mesh_polygons(
+            brep, polygon_unique_vertices( brep, block, facet ) );
     }
 
     PolyhedraAroundFacet block_mesh_polyhedra_from_surface_polygon(
