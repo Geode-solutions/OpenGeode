@@ -134,6 +134,12 @@ namespace geode
         index_t closest_element_box_hint(
             const Point< dimension >& query ) const;
 
+        void containing_boxes_recursive( index_t node_index,
+            index_t element_begin,
+            index_t element_end,
+            const Point< dimension >& query,
+            std::vector< index_t >& result ) const;
+
     private:
         std::vector< BoundingBox< dimension > > tree_;
         std::vector< index_t > mapping_morton_;

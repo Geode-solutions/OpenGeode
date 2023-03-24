@@ -173,6 +173,48 @@ namespace geode
         return impl_->node( Impl::ROOT_INDEX );
     }
 
+    template < index_t dimension >
+    std::vector< index_t > AABBTree< dimension >::containing_boxes(
+        const Point< dimension >& query ) const
+    {
+        if( nb_bboxes() == 0 )
+        {
+            return {};
+        }
+        std::vector< index_t > result;
+        impl_->containing_boxes_recursive(
+            Impl::ROOT_INDEX, 0, nb_bboxes(), query, result );
+        return result;
+    }
+
+    template < index_t dimension >
+    void AABBTree< dimension >::Impl::containing_boxes_recursive(
+        index_t node_index,
+        index_t element_begin,
+        index_t element_end,
+        const Point< dimension >& query,
+        std::vector< index_t >& result ) const
+    {
+        OPENGEODE_ASSERT( node_index < tree_.size(), "Node index out of tree" );
+        OPENGEODE_ASSERT( element_begin != element_end,
+            "Begin and End indices should be different" );
+        if( !node( node_index ).contains( query ) )
+        {
+            return;
+        }
+        if( is_leaf( element_begin, element_end ) )
+        {
+            result.push_back( mapping_morton( element_begin ) );
+            return;
+        }
+        const auto it =
+            get_recursive_iterators( node_index, element_begin, element_end );
+        containing_boxes_recursive(
+            it.child_left, element_begin, it.middle_box, query, result );
+        containing_boxes_recursive(
+            it.child_right, it.middle_box, element_end, query, result );
+    }
+
     /**
      * \brief Computes the hierarchy of bounding boxes recursively.
      * \param[in] bboxes the array of bounding boxes

@@ -70,6 +70,13 @@ namespace geode
         const BoundingBox< dimension >& bounding_box() const;
 
         /*!
+         * @brief Gets all the boxes containing a point
+         * @param[in] query the point to test
+         */
+        std::vector< index_t > containing_boxes(
+            const Point< dimension >& query ) const;
+
+        /*!
          * @brief Gets the closest element to a point
          * @param[in] query the point to test
          * @param[in] action the functor to compute the distance between
