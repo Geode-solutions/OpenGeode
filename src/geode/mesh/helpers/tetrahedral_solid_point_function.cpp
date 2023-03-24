@@ -183,5 +183,7 @@ namespace geode
         return impl_->value( point, tetrahedron_id );
     }
 
-    template class opengeode_mesh_api TetrahedralSolidPointFunction< 3 >;
+    template class opengeode_mesh_api TetrahedralSolidPointFunction< 3, 3 >;
+    template class opengeode_mesh_api TetrahedralSolidPointFunction< 3, 2 >;
+    template class opengeode_mesh_api TetrahedralSolidPointFunction< 3, 1 >;
 } // namespace geode
