@@ -157,6 +157,12 @@ void test_nearest_neighbor_search()
                 distance == geode::point_point_distance( box_center, query ),
                 "[Test]  Nearest box to point AABB - Wrong distance to nearest "
                 "box center" );
+
+            const auto boxes = aabb.containing_boxes( box_center );
+            OPENGEODE_EXCEPTION( boxes.size() == 1,
+                "[Test] Containing box AABB - Wrong number of boxes" );
+            OPENGEODE_EXCEPTION( boxes[0] == box_id,
+                "[Test] Containing box AABB - Wrong box index" );
         }
     }
 }
