@@ -184,6 +184,9 @@ namespace geode
         return impl_->value( point, triangle_id );
     }
 
-    template class opengeode_mesh_api TriangulatedSurfacePointFunction< 2 >;
-    template class opengeode_mesh_api TriangulatedSurfacePointFunction< 3 >;
+    template class opengeode_mesh_api TriangulatedSurfacePointFunction< 2, 2 >;
+    template class opengeode_mesh_api TriangulatedSurfacePointFunction< 2, 1 >;
+    template class opengeode_mesh_api TriangulatedSurfacePointFunction< 3, 3 >;
+    template class opengeode_mesh_api TriangulatedSurfacePointFunction< 3, 2 >;
+    template class opengeode_mesh_api TriangulatedSurfacePointFunction< 3, 1 >;
 } // namespace geode
