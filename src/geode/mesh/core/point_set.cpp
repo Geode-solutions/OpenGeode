@@ -49,15 +49,6 @@ namespace geode
     }
 
     template < index_t dimension >
-    const Point< dimension >& PointSet< dimension >::point(
-        index_t vertex_id ) const
-    {
-        OPENGEODE_ASSERT( vertex_id < nb_vertices(),
-            "[PointSet::point] Trying to access an invalid point" );
-        return get_point( vertex_id );
-    }
-
-    template < index_t dimension >
     template < typename Archive >
     void PointSet< dimension >::serialize( Archive& archive )
     {
@@ -84,7 +75,7 @@ namespace geode
         BoundingBox< dimension > box;
         for( const auto p : Range{ nb_vertices() } )
         {
-            box.add_point( point( p ) );
+            box.add_point( this->point( p ) );
         }
         return box;
     }

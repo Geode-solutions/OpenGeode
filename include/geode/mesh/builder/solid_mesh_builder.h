@@ -27,6 +27,7 @@
 
 #include <absl/container/inlined_vector.h>
 
+#include <geode/mesh/builder/coordinate_reference_system_managers_builder.h>
 #include <geode/mesh/builder/vertex_set_builder.h>
 #include <geode/mesh/common.h>
 #include <geode/mesh/core/solid_mesh.h>
@@ -44,7 +45,9 @@ namespace geode
      * Interface class to represent the builder of a SolidMesh
      */
     template < index_t dimension >
-    class SolidMeshBuilder : public VertexSetBuilder
+    class SolidMeshBuilder
+        : public VertexSetBuilder,
+          public CoordinateReferenceSystemManagersBuilder< dimension >
     {
     public:
         static constexpr auto dim = dimension;
@@ -60,13 +63,6 @@ namespace geode
         SolidEdgesBuilder< dimension > edges_builder();
 
         SolidFacetsBuilder< dimension > facets_builder();
-
-        /*!
-         * Set coordinates to a vertex. This vertex should be created before.
-         * @param[in] vertex_id The vertex, in [0, nb_vertices()-1].
-         * @param[in] point The vertex coordinates
-         */
-        void set_point( index_t vertex_id, Point< dimension > point );
 
         /*!
          * Create a new point with associated coordinates.
@@ -189,15 +185,6 @@ namespace geode
     private:
         void update_polyhedron_adjacencies(
             absl::Span< const index_t > old2new );
-
-        /*!
-         * @brief Sets a point.
-         * @param[in] vertex_id the vertex, in 0.. @function nb_vetices()-1.
-         * @param[in] vertex the vertex coordinates
-         * @return reference to the point that corresponds to the vertex.
-         */
-        virtual void do_set_point(
-            index_t vertex_id, Point< dimension > point ) = 0;
 
         void do_delete_vertices( const std::vector< bool >& to_delete,
             absl::Span< const index_t > old2new ) final;

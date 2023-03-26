@@ -1,0 +1,95 @@
+/*
+ * Copyright (c) 2029 - 2023 Geode-solutions
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ */
+
+#include <geode/mesh/core/attribute_coordinate_reference_system.h>
+
+#include <geode/basic/attribute_manager.h>
+#include <geode/basic/pimpl_impl.h>
+
+#include <geode/mesh/core/private/points_impl.h>
+
+namespace geode
+{
+    template < index_t dimension >
+    class AttributeCoordinateReferenceSystem< dimension >::Impl
+        : public detail::PointsImpl< dimension >
+    {
+    public:
+        Impl( AttributeManager& manager )
+            : detail::PointsImpl< dimension >{ manager }
+        {
+        }
+        Impl( AttributeManager& manager, absl::string_view attribute_name )
+            : detail::PointsImpl< dimension >{ manager, attribute_name }
+        {
+        }
+
+        Impl() = default;
+    };
+
+    template < index_t dimension >
+    AttributeCoordinateReferenceSystem<
+        dimension >::AttributeCoordinateReferenceSystem()
+    {
+    }
+
+    template < index_t dimension >
+    AttributeCoordinateReferenceSystem< dimension >::
+        AttributeCoordinateReferenceSystem( AttributeManager& manager )
+        : impl_{ manager }
+    {
+    }
+
+    template < index_t dimension >
+    AttributeCoordinateReferenceSystem< dimension >::
+        AttributeCoordinateReferenceSystem(
+            AttributeManager& manager, absl::string_view attribute_name )
+        : impl_{ manager, attribute_name }
+    {
+    }
+
+    template < index_t dimension >
+    AttributeCoordinateReferenceSystem<
+        dimension >::~AttributeCoordinateReferenceSystem()
+    {
+    }
+
+    template < index_t dimension >
+    const Point< dimension >&
+        AttributeCoordinateReferenceSystem< dimension >::point(
+            index_t point_id ) const
+    {
+        return impl_->get_point( point_id );
+    }
+
+    template < index_t dimension >
+    void AttributeCoordinateReferenceSystem< dimension >::set_point(
+        index_t point_id, Point< dimension > point )
+    {
+        impl_->set_point( point_id, std::move( point ) );
+    }
+
+    template class opengeode_mesh_api AttributeCoordinateReferenceSystem< 1 >;
+    template class opengeode_mesh_api AttributeCoordinateReferenceSystem< 2 >;
+    template class opengeode_mesh_api AttributeCoordinateReferenceSystem< 3 >;
+} // namespace geode

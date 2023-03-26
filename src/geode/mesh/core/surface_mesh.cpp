@@ -587,8 +587,8 @@ namespace geode
                         absl::StrCat( "[SurfaceMesh::polygon_adjacent_"
                                       "edge] Wrong adjacency with polygons: ",
                             polygon_edge.polygon_id, " and ", polygon_adj_id,
-                            " (v0 = ", point( v0 ).string(),
-                            ", v1 = ", point( v1 ).string(), ")" ) );
+                            " (v0 = ", this->point( v0 ).string(),
+                            ", v1 = ", this->point( v1 ).string(), ")" ) );
                     return absl::optional< PolygonEdge >{ absl::in_place,
                         polygon_adj_id, e };
                 }
@@ -606,8 +606,8 @@ namespace geode
                         absl::StrCat( "[SurfaceMesh::polygon_adjacent_"
                                       "edge] Wrong adjacency with polygons: ",
                             polygon_edge.polygon_id, " and ", polygon_adj_id,
-                            " (v0 = ", point( v0 ).string(),
-                            ", v1 = ", point( v1 ).string(), ")" ) );
+                            " (v0 = ", this->point( v0 ).string(),
+                            ", v1 = ", this->point( v1 ).string(), ")" ) );
                     return absl::optional< PolygonEdge >{ absl::in_place,
                         polygon_adj_id, e };
                 }
@@ -616,8 +616,8 @@ namespace geode
         throw OpenGeodeException{ "[SurfaceMesh::polygon_adjacent_edge] Wrong "
                                   "adjacency with polygons: ",
             polygon_edge.polygon_id, " and ", polygon_adj_id,
-            " (v0 = ", point( v0 ).string(), ", v1 = ", point( v1 ).string(),
-            ")" };
+            " (v0 = ", this->point( v0 ).string(),
+            ", v1 = ", this->point( v1 ).string(), ")" };
         return absl::nullopt;
     }
 
@@ -694,8 +694,8 @@ namespace geode
     double SurfaceMesh< dimension >::edge_length(
         const std::array< index_t, 2 >& polygon_edge_vertices ) const
     {
-        return point_point_distance( point( polygon_edge_vertices[0] ),
-            point( polygon_edge_vertices[1] ) );
+        return point_point_distance( this->point( polygon_edge_vertices[0] ),
+            this->point( polygon_edge_vertices[1] ) );
     }
 
     template < index_t dimension >
@@ -709,8 +709,8 @@ namespace geode
     Point< dimension > SurfaceMesh< dimension >::edge_barycenter(
         const std::array< index_t, 2 >& polygon_edge_vertices ) const
     {
-        return ( point( polygon_edge_vertices[0] )
-                   + point( polygon_edge_vertices[1] ) )
+        return ( this->point( polygon_edge_vertices[0] )
+                   + this->point( polygon_edge_vertices[1] ) )
                / 2.;
     }
 
@@ -745,7 +745,7 @@ namespace geode
         for( const auto v : LRange{ nb_polygon_vertices( polygon_id ) } )
         {
             barycenter =
-                barycenter + point( polygon_vertex( { polygon_id, v } ) );
+                barycenter + this->point( polygon_vertex( { polygon_id, v } ) );
         }
         return barycenter / nb_polygon_vertices( polygon_id );
     }
@@ -866,14 +866,6 @@ namespace geode
     }
 
     template < index_t dimension >
-    const Point< dimension >& SurfaceMesh< dimension >::point(
-        index_t vertex_id ) const
-    {
-        check_vertex_id( *this, vertex_id );
-        return get_point( vertex_id );
-    }
-
-    template < index_t dimension >
     template < typename Archive >
     void SurfaceMesh< dimension >::serialize( Archive& archive )
     {
@@ -889,6 +881,14 @@ namespace geode
                         a.ext(
                             surface, bitsery::ext::BaseClass< VertexSet >{} );
                         a.object( surface.impl_ );
+                    },
+                    []( Archive& a, SurfaceMesh& surface ) {
+                        a.ext(
+                            surface, bitsery::ext::BaseClass< VertexSet >{} );
+                        a.object( surface.impl_ );
+                        a.ext( surface, bitsery::ext::BaseClass<
+                                            CoordinateReferenceSystemManagers<
+                                                dimension > >{} );
                     } } } );
     }
 
@@ -898,7 +898,7 @@ namespace geode
         BoundingBox< dimension > box;
         for( const auto p : Range{ nb_vertices() } )
         {
-            box.add_point( point( p ) );
+            box.add_point( this->point( p ) );
         }
         return box;
     }
@@ -919,11 +919,11 @@ namespace geode
         }
         double area{ 0 };
         const auto vertices = polygon_vertices( polygon_id );
-        const auto& p1 = point( vertices[0] );
+        const auto& p1 = this->point( vertices[0] );
         for( const auto i : LRange{ 1, vertices.size() - 1 } )
         {
-            const auto& p2 = point( vertices[i] );
-            const auto& p3 = point( vertices[i + 1] );
+            const auto& p2 = this->point( vertices[i] );
+            const auto& p3 = this->point( vertices[i + 1] );
             area += triangle_signed_area( { p1, p2, p3 } );
         }
         return area;
@@ -940,11 +940,11 @@ namespace geode
         const auto direction =
             polygon_normal( polygon_id ).value_or( Vector3D{ { 0, 0, 1 } } );
         const auto vertices = polygon_vertices( polygon_id );
-        const auto& p1 = point( vertices[0] );
+        const auto& p1 = this->point( vertices[0] );
         for( const auto i : LRange{ 1, vertices.size() - 1 } )
         {
-            const auto& p2 = point( vertices[i] );
-            const auto& p3 = point( vertices[i + 1] );
+            const auto& p2 = this->point( vertices[i] );
+            const auto& p3 = this->point( vertices[i + 1] );
             area += triangle_signed_area( { p1, p2, p3 }, direction );
         }
         return area;
@@ -958,11 +958,11 @@ namespace geode
         check_polygon_id( *this, polygon_id );
         Vector3D normal;
         const auto vertices = polygon_vertices( polygon_id );
-        const auto& p0 = point( vertices[0] );
+        const auto& p0 = this->point( vertices[0] );
         for( const auto v : LRange{ 2, nb_polygon_vertices( polygon_id ) } )
         {
-            const auto& p1 = point( vertices[v - 1] );
-            const auto& p2 = point( vertices[v] );
+            const auto& p1 = this->point( vertices[v - 1] );
+            const auto& p2 = this->point( vertices[v] );
             if( const auto triangle_normal =
                     Triangle< T >{ p0, p1, p2 }.normal() )
             {

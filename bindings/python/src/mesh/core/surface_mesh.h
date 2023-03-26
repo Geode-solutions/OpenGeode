@@ -32,7 +32,8 @@
 #define PYTHON_SURFACE_MESH( dimension )                                       \
     const auto name##dimension =                                               \
         "SurfaceMesh" + std::to_string( dimension ) + "D";                     \
-    pybind11::class_< SurfaceMesh##dimension##D, VertexSet >(                  \
+    pybind11::class_< SurfaceMesh##dimension##D, VertexSet,                    \
+        CoordinateReferenceSystemManagers##dimension##D >(                     \
         module, name##dimension.c_str() )                                      \
         .def( "are_edges_enabled",                                             \
             &SurfaceMesh##dimension##D::are_edges_enabled )                    \
@@ -43,7 +44,6 @@
                 SurfaceMesh##dimension##D::*) () const )                       \
                 & SurfaceMesh##dimension##D::edges,                            \
             pybind11::return_value_policy::reference )                         \
-        .def( "point", &SurfaceMesh##dimension##D::point )                     \
         .def( "nb_polygons", &SurfaceMesh##dimension##D::nb_polygons )         \
         .def( "nb_polygon_vertices",                                           \
             &SurfaceMesh##dimension##D::nb_polygon_vertices )                  \

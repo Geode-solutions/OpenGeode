@@ -26,6 +26,7 @@
 #include <geode/basic/pimpl.h>
 
 #include <geode/mesh/common.h>
+#include <geode/mesh/core/coordinate_reference_system_managers.h>
 #include <geode/mesh/core/graph.h>
 #include <geode/mesh/core/texture_manager.h>
 
@@ -40,7 +41,8 @@ namespace geode
 namespace geode
 {
     template < index_t dimension >
-    class EdgedCurve : public Graph
+    class EdgedCurve : public Graph,
+                       public CoordinateReferenceSystemManagers< dimension >
     {
         friend class bitsery::Access;
 
@@ -62,8 +64,6 @@ namespace geode
 
         std::unique_ptr< EdgedCurve< dimension > > clone() const;
 
-        const Point< dimension >& point( index_t vertex_id ) const;
-
         double edge_length( index_t edge_id ) const;
 
         Point< dimension > edge_barycenter( index_t edge_id ) const;
@@ -84,9 +84,6 @@ namespace geode
     private:
         template < typename Archive >
         void serialize( Archive& archive );
-
-        virtual const Point< dimension >& get_point(
-            index_t vertex_id ) const = 0;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

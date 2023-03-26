@@ -31,13 +31,13 @@
 #define PYTHON_SOLID_MESH( dimension )                                         \
     const auto name##dimension =                                               \
         "SolidMesh" + std::to_string( dimension ) + "D";                       \
-    pybind11::class_< SolidMesh##dimension##D, VertexSet >(                    \
+    pybind11::class_< SolidMesh##dimension##D, VertexSet,                      \
+        CoordinateReferenceSystemManagers##dimension##D >(                     \
         module, name##dimension.c_str() )                                      \
         .def_static(                                                           \
             "create", ( std::unique_ptr< SolidMesh##dimension##D >( * )() )    \
                           & SolidMesh##dimension##D::create )                  \
         .def( "clone", &SolidMesh##dimension##D::clone )                       \
-        .def( "point", &SolidMesh##dimension##D::point )                       \
         .def( "nb_polyhedra", &SolidMesh##dimension##D::nb_polyhedra )         \
         .def(                                                                  \
             "are_edges_enabled", &SolidMesh##dimension##D::are_edges_enabled ) \

@@ -29,6 +29,7 @@
 #include <geode/basic/passkey.h>
 
 #include <geode/mesh/common.h>
+#include <geode/mesh/core/coordinate_reference_system_managers.h>
 #include <geode/mesh/core/texture_manager.h>
 #include <geode/mesh/core/vertex_set.h>
 
@@ -139,7 +140,9 @@ namespace geode
      * ...) of arbitrary dimension and provides mesh functionnalities.
      */
     template < index_t dimension >
-    class opengeode_mesh_api SurfaceMesh : public VertexSet
+    class opengeode_mesh_api SurfaceMesh
+        : public VertexSet,
+          public CoordinateReferenceSystemManagers< dimension >
     {
         OPENGEODE_DISABLE_COPY( SurfaceMesh );
         PASSKEY( SurfaceMeshBuilder< dimension >, SurfaceMeshKey );
@@ -163,8 +166,6 @@ namespace geode
             const MeshImpl& impl );
 
         std::unique_ptr< SurfaceMesh< dimension > > clone() const;
-
-        const Point< dimension >& point( index_t vertex_id ) const;
 
         index_t nb_polygons() const;
 
@@ -418,9 +419,6 @@ namespace geode
         friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive );
-
-        virtual const Point< dimension >& get_point(
-            index_t vertex_id ) const = 0;
 
         virtual index_t get_polygon_vertex(
             const PolygonVertex& polygon_vertex ) const = 0;

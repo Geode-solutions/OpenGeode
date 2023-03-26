@@ -25,6 +25,8 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+#include "builder/crs_manager_builder.h"
+#include "builder/crs_managers_builder.h"
 #include "builder/edged_curve_builder.h"
 #include "builder/graph_builder.h"
 #include "builder/hybrid_solid_builder.h"
@@ -41,6 +43,9 @@
 #include "builder/triangulated_surface_builder.h"
 #include "builder/vertex_set_builder.h"
 
+#include "core/crs.h"
+#include "core/crs_manager.h"
+#include "core/crs_managers.h"
 #include "core/edged_curve.h"
 #include "core/graph.h"
 #include "core/grid.h"
@@ -148,6 +153,13 @@ PYBIND11_MODULE( opengeode_py_mesh, module )
     module.doc() = "OpenGeode Python binding for mesh";
     pybind11::class_< geode::OpenGeodeMesh >( module, "OpenGeodeMesh" )
         .def( "initialize", &geode::OpenGeodeMesh::initialize );
+
+    geode::define_crs( module );
+    geode::define_crs_manager( module );
+    geode::define_crs_managers( module );
+    geode::define_crs_manager_builder( module );
+    geode::define_crs_managers_builder( module );
+
     geode::define_vertex_set( module );
     geode::define_graph( module );
     geode::define_edged_curve( module );

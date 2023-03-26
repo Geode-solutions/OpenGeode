@@ -29,6 +29,7 @@
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/cached_value.h>
 
+#include <geode/mesh/core/attribute_coordinate_reference_system.h>
 #include <geode/mesh/core/geode/geode_edged_curve.h>
 #include <geode/mesh/core/geode/geode_graph.h>
 #include <geode/mesh/core/geode/geode_hybrid_solid.h>
@@ -249,6 +250,18 @@ namespace
         geode::AttributeManager::register_attribute_type<
             std::vector< geode::MeshElement >, Serializer >(
             context, "MeshElement" );
+        geode::CoordinateReferenceSystem1D::
+            register_coordinate_reference_system_type<
+                geode::AttributeCoordinateReferenceSystem1D, Serializer >(
+                context, "AttributeCoordinateReferenceSystem1D" );
+        geode::CoordinateReferenceSystem2D::
+            register_coordinate_reference_system_type<
+                geode::AttributeCoordinateReferenceSystem2D, Serializer >(
+                context, "AttributeCoordinateReferenceSystem2D" );
+        geode::CoordinateReferenceSystem3D::
+            register_coordinate_reference_system_type<
+                geode::AttributeCoordinateReferenceSystem3D, Serializer >(
+                context, "AttributeCoordinateReferenceSystem3D" );
         context.registerBasesList< Serializer >(
             bitsery::ext::PolymorphicClassesList< geode::VertexSet >{} );
     }

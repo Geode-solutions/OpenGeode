@@ -27,6 +27,7 @@
 
 #include <absl/types/span.h>
 
+#include <geode/mesh/builder/coordinate_reference_system_managers_builder.h>
 #include <geode/mesh/builder/vertex_set_builder.h>
 #include <geode/mesh/common.h>
 
@@ -46,7 +47,9 @@ namespace geode
      * Interface class to represent the builder of a SurfaceMesh
      */
     template < index_t dimension >
-    class SurfaceMeshBuilder : public VertexSetBuilder
+    class SurfaceMeshBuilder
+        : public VertexSetBuilder,
+          public CoordinateReferenceSystemManagersBuilder< dimension >
     {
     public:
         static constexpr auto dim = dimension;
@@ -61,13 +64,6 @@ namespace geode
             SurfaceMesh< dimension >& mesh );
 
         SurfaceEdgesBuilder< dimension > edges_builder();
-
-        /*!
-         * Set coordinates to a vertex. This vertex should be created before.
-         * @param[in] vertex_id The vertex, in [0, nb_vertices()-1].
-         * @param[in] point The vertex coordinates
-         */
-        void set_point( index_t vertex_id, Point< dimension > point );
 
         /*!
          * Create a new point with associated coordinates.
@@ -179,9 +175,6 @@ namespace geode
 
     private:
         void update_polygon_adjacencies( absl::Span< const index_t > old2new );
-
-        virtual void do_set_point(
-            index_t vertex_id, Point< dimension > point ) = 0;
 
         void do_delete_vertices( const std::vector< bool >& to_delete,
             absl::Span< const index_t > old2new ) final;

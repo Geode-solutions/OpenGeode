@@ -236,13 +236,6 @@ namespace geode
     }
 
     template < index_t dimension >
-    const Point< dimension >& OpenGeodePolygonalSurface< dimension >::get_point(
-        index_t vertex_id ) const
-    {
-        return impl_->get_point( vertex_id );
-    }
-
-    template < index_t dimension >
     void OpenGeodePolygonalSurface< dimension >::set_vertex(
         index_t vertex_id, Point< dimension > point, OGPolygonalSurfaceKey )
     {
@@ -279,10 +272,16 @@ namespace geode
         archive.ext( *this,
             Growable< Archive, OpenGeodePolygonalSurface >{
                 { []( Archive& a, OpenGeodePolygonalSurface& surface ) {
-                    a.ext( surface, bitsery::ext::BaseClass<
-                                        PolygonalSurface< dimension > >{} );
-                    a.object( surface.impl_ );
-                } } } );
+                     a.ext( surface, bitsery::ext::BaseClass<
+                                         PolygonalSurface< dimension > >{} );
+                     a.object( surface.impl_ );
+                     surface.impl_->initialize_crs( surface );
+                 },
+                    []( Archive& a, OpenGeodePolygonalSurface& surface ) {
+                        a.ext( surface, bitsery::ext::BaseClass<
+                                            PolygonalSurface< dimension > >{} );
+                        a.object( surface.impl_ );
+                    } } } );
     }
 
     template < index_t dimension >

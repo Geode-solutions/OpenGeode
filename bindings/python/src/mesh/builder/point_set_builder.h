@@ -26,13 +26,13 @@
 #define PYTHON_POINT_SET_BUILDER( dimension )                                  \
     const auto name##dimension =                                               \
         "PointSetBuilder" + std::to_string( dimension ) + "D";                 \
-    pybind11::class_< PointSetBuilder##dimension##D, VertexSetBuilder >(       \
+    pybind11::class_< PointSetBuilder##dimension##D, VertexSetBuilder,         \
+        CoordinateReferenceSystemManagersBuilder##dimension##D >(              \
         module, name##dimension.c_str() )                                      \
         .def_static(                                                           \
             "create", ( std::unique_ptr< PointSetBuilder##dimension##D >( * )( \
                           PointSet< dimension >& ) )                           \
                           & PointSetBuilder##dimension##D::create )            \
-        .def( "set_point", &PointSetBuilder##dimension##D::set_point )         \
         .def( "create_point", &PointSetBuilder##dimension##D::create_point )
 
 namespace geode

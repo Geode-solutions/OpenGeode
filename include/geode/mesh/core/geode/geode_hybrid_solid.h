@@ -120,8 +120,6 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive );
 
-        const Point< dimension >& get_point( index_t vertex_id ) const override;
-
         index_t get_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex ) const override;
 

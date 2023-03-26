@@ -304,7 +304,9 @@ namespace geode
     template < index_t dimension >
     SurfaceMeshBuilder< dimension >::SurfaceMeshBuilder(
         SurfaceMesh< dimension >& mesh )
-        : VertexSetBuilder( mesh ), surface_mesh_( mesh )
+        : VertexSetBuilder( mesh ),
+          CoordinateReferenceSystemManagersBuilder< dimension >( mesh ),
+          surface_mesh_( mesh )
     {
     }
 
@@ -692,22 +694,12 @@ namespace geode
     }
 
     template < index_t dimension >
-    void SurfaceMeshBuilder< dimension >::set_point(
-        index_t vertex_id, Point< dimension > point )
-    {
-        OPENGEODE_ASSERT( vertex_id < surface_mesh_.nb_vertices(),
-            "[SurfaceMeshBuilder::set_point] Accessing a vertex that does "
-            "not exist" );
-        do_set_point( vertex_id, std::move( point ) );
-    }
-
-    template < index_t dimension >
     index_t SurfaceMeshBuilder< dimension >::create_point(
         Point< dimension > point )
     {
         const auto added_vertex = surface_mesh_.nb_vertices();
         create_vertex();
-        set_point( added_vertex, std::move( point ) );
+        this->set_point( added_vertex, std::move( point ) );
         return added_vertex;
     }
 

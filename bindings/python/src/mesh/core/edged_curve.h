@@ -27,13 +27,13 @@
 #define PYTHON_EDGED_CURVE( dimension )                                        \
     const auto name##dimension =                                               \
         "EdgedCurve" + std::to_string( dimension ) + "D";                      \
-    pybind11::class_< EdgedCurve##dimension##D, Graph >(                       \
+    pybind11::class_< EdgedCurve##dimension##D, Graph,                         \
+        CoordinateReferenceSystemManagers##dimension##D >(                     \
         module, name##dimension.c_str() )                                      \
         .def_static(                                                           \
             "create", ( std::unique_ptr< EdgedCurve##dimension##D >( * )() )   \
                           & EdgedCurve##dimension##D::create )                 \
         .def( "clone", &EdgedCurve##dimension##D::clone )                      \
-        .def( "point", &EdgedCurve##dimension##D::point )                      \
         .def( "edge_length", &EdgedCurve##dimension##D::edge_length )          \
         .def( "edge_barycenter", &EdgedCurve##dimension##D::edge_barycenter )  \
         .def( "bounding_box", &EdgedCurve##dimension##D::bounding_box )        \

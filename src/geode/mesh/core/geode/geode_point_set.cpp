@@ -79,13 +79,6 @@ namespace geode
     }
 
     template < index_t dimension >
-    const Point< dimension >& OpenGeodePointSet< dimension >::get_point(
-        index_t vertex_id ) const
-    {
-        return impl_->get_point( vertex_id );
-    }
-
-    template < index_t dimension >
     void OpenGeodePointSet< dimension >::set_vertex(
         index_t vertex_id, Point< dimension > point, OGPointSetKey )
     {
@@ -99,10 +92,16 @@ namespace geode
         archive.ext( *this,
             Growable< Archive, OpenGeodePointSet >{
                 { []( Archive& a, OpenGeodePointSet& point_set ) {
-                    a.ext( point_set,
-                        bitsery::ext::BaseClass< PointSet< dimension > >{} );
-                    a.object( point_set.impl_ );
-                } } } );
+                     a.ext( point_set,
+                         bitsery::ext::BaseClass< PointSet< dimension > >{} );
+                     a.object( point_set.impl_ );
+                     point_set.impl_->initialize_crs( point_set );
+                 },
+                    []( Archive& a, OpenGeodePointSet& point_set ) {
+                        a.ext( point_set, bitsery::ext::BaseClass<
+                                              PointSet< dimension > >{} );
+                        a.object( point_set.impl_ );
+                    } } } );
     }
 
     template class opengeode_mesh_api OpenGeodePointSet< 2 >;

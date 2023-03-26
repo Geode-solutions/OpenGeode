@@ -50,13 +50,6 @@ namespace geode
     }
 
     template < index_t dimension >
-    void OpenGeodePolyhedralSolidBuilder< dimension >::do_set_point(
-        index_t vertex_id, Point< dimension > point )
-    {
-        geode_polyhedral_solid_.set_vertex( vertex_id, std::move( point ), {} );
-    }
-
-    template < index_t dimension >
     void OpenGeodePolyhedralSolidBuilder< dimension >::do_create_vertex()
     {
         // Operation is directly handled by the AttributeManager

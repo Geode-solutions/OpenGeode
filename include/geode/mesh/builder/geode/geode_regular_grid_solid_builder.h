@@ -58,13 +58,6 @@ namespace geode
 
         void do_create_vertices( index_t /*unused*/ ) final;
 
-        void do_set_point( index_t /*unused*/, Point3D /*unused*/ )
-        {
-            throw OpenGeodeException{
-                "[RegularGridBuilder] Cannot use set_point in RegularGrid"
-            };
-        }
-
         void do_create_vertex() final
         {
             throw OpenGeodeException{

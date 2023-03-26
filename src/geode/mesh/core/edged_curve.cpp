@@ -111,15 +111,6 @@ namespace geode
     }
 
     template < index_t dimension >
-    const Point< dimension >& EdgedCurve< dimension >::point(
-        index_t vertex_id ) const
-    {
-        OPENGEODE_ASSERT( vertex_id < nb_vertices(),
-            "[EdgedCurve::point] Trying to access an invalid point" );
-        return get_point( vertex_id );
-    }
-
-    template < index_t dimension >
     template < typename Archive >
     void EdgedCurve< dimension >::serialize( Archive& archive )
     {
@@ -151,7 +142,7 @@ namespace geode
         BoundingBox< dimension > box;
         for( const auto p : Range{ nb_vertices() } )
         {
-            box.add_point( point( p ) );
+            box.add_point( this->point( p ) );
         }
         return box;
     }
@@ -160,8 +151,8 @@ namespace geode
     Segment< dimension > EdgedCurve< dimension >::segment(
         index_t edge_id ) const
     {
-        return { point( edge_vertex( { edge_id, 0 } ) ),
-            point( edge_vertex( { edge_id, 1 } ) ) };
+        return { this->point( edge_vertex( { edge_id, 0 } ) ),
+            this->point( edge_vertex( { edge_id, 1 } ) ) };
     }
 
     template < index_t dimension >

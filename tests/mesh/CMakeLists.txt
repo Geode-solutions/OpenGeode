@@ -47,6 +47,13 @@ add_geode_test(
         ${PROJECT_NAME}::mesh
 )
 add_geode_test(
+    SOURCE "test-coordinate-reference-system.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
     SOURCE "test-edged-curve.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic

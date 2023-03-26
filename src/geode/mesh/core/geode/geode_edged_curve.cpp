@@ -85,13 +85,6 @@ namespace geode
     }
 
     template < index_t dimension >
-    const Point< dimension >& OpenGeodeEdgedCurve< dimension >::get_point(
-        index_t vertex_id ) const
-    {
-        return impl_->get_point( vertex_id );
-    }
-
-    template < index_t dimension >
     void OpenGeodeEdgedCurve< dimension >::set_vertex(
         index_t vertex_id, Point< dimension > point, OGEdgedCurveKey )
     {
@@ -119,10 +112,16 @@ namespace geode
         archive.ext( *this,
             Growable< Archive, OpenGeodeEdgedCurve >{
                 { []( Archive& a, OpenGeodeEdgedCurve& edged_curve ) {
-                    a.ext( edged_curve,
-                        bitsery::ext::BaseClass< EdgedCurve< dimension > >{} );
-                    a.object( edged_curve.impl_ );
-                } } } );
+                     a.ext( edged_curve,
+                         bitsery::ext::BaseClass< EdgedCurve< dimension > >{} );
+                     a.object( edged_curve.impl_ );
+                     edged_curve.impl_->initialize_crs( edged_curve );
+                 },
+                    []( Archive& a, OpenGeodeEdgedCurve& edged_curve ) {
+                        a.ext( edged_curve, bitsery::ext::BaseClass<
+                                                EdgedCurve< dimension > >{} );
+                        a.object( edged_curve.impl_ );
+                    } } } );
     }
 
     template class opengeode_mesh_api OpenGeodeEdgedCurve< 2 >;
