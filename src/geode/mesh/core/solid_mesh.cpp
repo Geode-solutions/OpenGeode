@@ -633,8 +633,8 @@ namespace geode
     double SolidMesh< dimension >::edge_length(
         const std::array< index_t, 2 >& edge_vertices ) const
     {
-        return Vector< dimension >{ point( edge_vertices[0] ),
-            point( edge_vertices[1] ) }
+        return Vector< dimension >{ this->point( edge_vertices[0] ),
+            this->point( edge_vertices[1] ) }
             .length();
     }
 
@@ -685,7 +685,8 @@ namespace geode
         for( const auto v : LRange{ nb_polyhedron_vertices( polyhedron_id ) } )
         {
             barycenter =
-                barycenter + point( polyhedron_vertex( { polyhedron_id, v } ) );
+                barycenter
+                + this->point( polyhedron_vertex( { polyhedron_id, v } ) );
         }
         return barycenter / nb_polyhedron_vertices( polyhedron_id );
     }
@@ -697,7 +698,7 @@ namespace geode
         Point< dimension > barycenter;
         for( const auto v : facet_vertices )
         {
-            barycenter = barycenter + point( v );
+            barycenter = barycenter + this->point( v );
         }
         return barycenter / static_cast< double >( facet_vertices.size() );
     }
@@ -706,7 +707,9 @@ namespace geode
     Point< dimension > SolidMesh< dimension >::edge_barycenter(
         const std::array< index_t, 2 >& edge_vertices ) const
     {
-        return ( point( edge_vertices[0] ) + point( edge_vertices[1] ) ) / 2.;
+        return ( this->point( edge_vertices[0] )
+                   + this->point( edge_vertices[1] ) )
+               / 2.;
     }
 
     template < index_t dimension >
@@ -740,7 +743,7 @@ namespace geode
         }
         double volume{ 0 };
         const auto first_pt_index = polyhedron_vertex( { polyhedron_id, 0 } );
-        const auto& p0 = point( first_pt_index );
+        const auto& p0 = this->point( first_pt_index );
         const auto facets_vertices =
             polyhedron_facets_vertices( polyhedron_id );
         for( const auto facet_id : LIndices{ facets_vertices } )
@@ -755,9 +758,9 @@ namespace geode
             }
             for( const auto i : LRange{ 2, facet_vertices.size() } )
             {
-                const auto& p1 = point( facet_vertices[i - 2] );
-                const auto& p2 = point( facet_vertices[i - 1] );
-                const auto& p3 = point( facet_vertices[i] );
+                const auto& p1 = this->point( facet_vertices[i - 2] );
+                const auto& p2 = this->point( facet_vertices[i - 1] );
+                const auto& p3 = this->point( facet_vertices[i] );
                 volume += tetrahedron_signed_volume( { p1, p2, p3, p0 } );
             }
         }
@@ -771,11 +774,11 @@ namespace geode
         Vector3D normal;
         const auto facet_vertices =
             polyhedron_facet_vertices( polyhedron_facet );
-        const auto& p0 = point( facet_vertices[0] );
+        const auto& p0 = this->point( facet_vertices[0] );
         for( const auto v : LRange{ 2, facet_vertices.size() } )
         {
-            const auto& p1 = point( facet_vertices[v - 1] );
-            const auto& p2 = point( facet_vertices[v] );
+            const auto& p1 = this->point( facet_vertices[v - 1] );
+            const auto& p2 = this->point( facet_vertices[v] );
             normal += Vector3D{ p1, p0 }.cross( { p2, p0 } );
         }
         return normal.normalize();
@@ -791,12 +794,12 @@ namespace geode
         Vector3D normal;
         const auto facet_vertices =
             polyhedron_facet_vertices( polyhedron_facet );
-        const auto& p0 = point( facet_vertices[0] );
+        const auto& p0 = this->point( facet_vertices[0] );
         for( const auto v :
             LRange{ 2, nb_polyhedron_facet_vertices( polyhedron_facet ) } )
         {
-            const auto& p1 = point( facet_vertices[v - 1] );
-            const auto& p2 = point( facet_vertices[v] );
+            const auto& p1 = this->point( facet_vertices[v - 1] );
+            const auto& p2 = this->point( facet_vertices[v] );
             if( const auto triangle_normal = Triangle3D{ p0, p1, p2 }.normal() )
             {
                 normal += triangle_normal.value();
@@ -1452,14 +1455,6 @@ namespace geode
     }
 
     template < index_t dimension >
-    const Point< dimension >& SolidMesh< dimension >::point(
-        index_t vertex_id ) const
-    {
-        check_vertex_id( *this, vertex_id );
-        return get_point( vertex_id );
-    }
-
-    template < index_t dimension >
     template < typename Archive >
     void SolidMesh< dimension >::serialize( Archive& archive )
     {
@@ -1492,7 +1487,7 @@ namespace geode
         BoundingBox< dimension > box;
         for( const auto p : Range{ nb_vertices() } )
         {
-            box.add_point( point( p ) );
+            box.add_point( this->point( p ) );
         }
         return box;
     }

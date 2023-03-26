@@ -16,11 +16,11 @@ void test()
     geode::OpenGeodeMesh::initialize();
     const auto initial_mesh_filename =
         absl::StrCat( geode::data_path, "Armadillo.og_tsf3d" );
-    auto mesh_A =
+    const auto mesh_A =
         geode::load_triangulated_surface< 3 >( initial_mesh_filename );
     const auto simplified_mesh_filename =
         absl::StrCat( geode::data_path, "modified_Armadillo.og_tsf3d" );
-    auto mesh_B =
+    const auto mesh_B =
         geode::load_triangulated_surface< 3 >( simplified_mesh_filename );
 
     const auto hausdorff_distance =
@@ -28,4 +28,4 @@ void test()
     DEBUG( hausdorff_distance );
 }
 
-OPENGEODE_TEST( "hausdorff_distance" )
+OPENGEODE_TEST( "hausdorff-distance" )

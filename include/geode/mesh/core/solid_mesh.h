@@ -30,6 +30,7 @@
 #include <geode/basic/passkey.h>
 
 #include <geode/mesh/common.h>
+#include <geode/mesh/core/coordinate_reference_system_managers.h>
 #include <geode/mesh/core/texture_manager.h>
 #include <geode/mesh/core/vertex_set.h>
 
@@ -223,7 +224,8 @@ namespace geode
      * functionnalities.
      */
     template < index_t dimension >
-    class SolidMesh : public VertexSet
+    class SolidMesh : public VertexSet,
+                      public CoordinateReferenceSystemManagers< dimension >
     {
         OPENGEODE_DISABLE_COPY( SolidMesh );
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
@@ -248,8 +250,6 @@ namespace geode
         std::unique_ptr< SolidMesh< dimension > > clone() const;
 
         ~SolidMesh();
-
-        const Point< dimension >& point( index_t vertex_id ) const;
 
         index_t nb_polyhedra() const;
 
@@ -584,9 +584,6 @@ namespace geode
         friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive );
-
-        virtual const Point< dimension >& get_point(
-            index_t vertex_id ) const = 0;
 
         virtual index_t get_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex ) const = 0;

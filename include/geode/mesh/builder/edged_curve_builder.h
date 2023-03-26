@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/mesh/builder/coordinate_reference_system_managers_builder.h>
 #include <geode/mesh/builder/graph_builder.h>
 #include <geode/mesh/common.h>
 
@@ -38,7 +39,9 @@ namespace geode
      * Interface class to represent the builder of a EdgedCurve
      */
     template < index_t dimension >
-    class EdgedCurveBuilder : public GraphBuilder
+    class EdgedCurveBuilder
+        : public GraphBuilder,
+          public CoordinateReferenceSystemManagersBuilder< dimension >
     {
     public:
         static constexpr auto dim = dimension;
@@ -49,13 +52,6 @@ namespace geode
          */
         static std::unique_ptr< EdgedCurveBuilder< dimension > > create(
             EdgedCurve< dimension >& mesh );
-
-        /*!
-         * Set coordinates to a vertex. This vertex should be created before.
-         * @param[in] vertex_id The vertex, in [0, nb_vertices()-1].
-         * @param[in] point The vertex coordinates
-         */
-        void set_point( index_t vertex_id, Point< dimension > point );
 
         /*!
          * Create a new point with associated coordinates.
@@ -70,9 +66,6 @@ namespace geode
         EdgedCurveBuilder( EdgedCurve< dimension >& mesh );
 
     private:
-        virtual void do_set_point(
-            index_t vertex_id, Point< dimension > point ) = 0;
-
         virtual void do_copy_points( const EdgedCurve< dimension >& mesh ) = 0;
 
     private:

@@ -52,8 +52,6 @@ namespace geode
         OpenGeodePointSetBuilder( OpenGeodePointSet< dimension >& mesh );
 
     private:
-        void do_set_point( index_t vertex_id, Point< dimension > point ) final;
-
         void do_create_vertex() final;
 
         void do_create_vertices( index_t nb ) final;

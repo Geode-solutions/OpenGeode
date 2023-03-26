@@ -168,13 +168,6 @@ namespace geode
     }
 
     template < index_t dimension >
-    const Point< dimension >& OpenGeodeTetrahedralSolid< dimension >::get_point(
-        index_t vertex_id ) const
-    {
-        return impl_->get_point( vertex_id );
-    }
-
-    template < index_t dimension >
     void OpenGeodeTetrahedralSolid< dimension >::set_vertex(
         index_t vertex_id, Point< dimension > point, OGTetrahedralSolidKey )
     {
@@ -211,10 +204,16 @@ namespace geode
         archive.ext( *this,
             Growable< Archive, OpenGeodeTetrahedralSolid >{
                 { []( Archive& a, OpenGeodeTetrahedralSolid& solid ) {
-                    a.ext( solid, bitsery::ext::BaseClass<
-                                      TetrahedralSolid< dimension > >{} );
-                    a.object( solid.impl_ );
-                } } } );
+                     a.ext( solid, bitsery::ext::BaseClass<
+                                       TetrahedralSolid< dimension > >{} );
+                     a.object( solid.impl_ );
+                     solid.impl_->initialize_crs( solid );
+                 },
+                    []( Archive& a, OpenGeodeTetrahedralSolid& solid ) {
+                        a.ext( solid, bitsery::ext::BaseClass<
+                                          TetrahedralSolid< dimension > >{} );
+                        a.object( solid.impl_ );
+                    } } } );
     }
 
     template < index_t dimension >

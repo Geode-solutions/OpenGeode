@@ -29,13 +29,13 @@
 #define PYTHON_POINT_SET( dimension )                                          \
     const auto name##dimension =                                               \
         "PointSet" + std::to_string( dimension ) + "D";                        \
-    pybind11::class_< PointSet##dimension##D, VertexSet >(                     \
+    pybind11::class_< PointSet##dimension##D, VertexSet,                       \
+        CoordinateReferenceSystemManagers##dimension##D >(                     \
         module, name##dimension.c_str() )                                      \
         .def_static(                                                           \
             "create", ( std::unique_ptr< PointSet##dimension##D >( * )() )     \
                           & PointSet##dimension##D::create )                   \
         .def( "clone", &PointSet##dimension##D::clone )                        \
-        .def( "point", &PointSet##dimension##D::point )                        \
         .def( "bounding_box", &PointSet##dimension##D::bounding_box )
 
 namespace geode

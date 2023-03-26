@@ -90,8 +90,6 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive );
 
-        const Point< dimension >& get_point( index_t vertex_id ) const override;
-
     private:
         IMPLEMENTATION_MEMBER( impl_ );
     };

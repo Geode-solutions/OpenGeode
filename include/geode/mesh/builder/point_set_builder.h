@@ -25,6 +25,7 @@
 
 #include <vector>
 
+#include <geode/mesh/builder/coordinate_reference_system_managers_builder.h>
 #include <geode/mesh/builder/vertex_set_builder.h>
 #include <geode/mesh/common.h>
 
@@ -40,7 +41,9 @@ namespace geode
      * Interface class to represent the builder of a PointSet
      */
     template < index_t dimension >
-    class PointSetBuilder : public VertexSetBuilder
+    class PointSetBuilder
+        : public VertexSetBuilder,
+          public CoordinateReferenceSystemManagersBuilder< dimension >
     {
         OPENGEODE_TEMPLATE_ASSERT_2D_OR_3D( dimension );
 
@@ -55,13 +58,6 @@ namespace geode
             PointSet< dimension >& mesh );
 
         /*!
-         * Set coordinates to a vertex. This vertex should be created before.
-         * @param[in] vertex_id The vertex, in [0, nb_vertices()-1].
-         * @param[in] point The vertex coordinates
-         */
-        void set_point( index_t vertex_id, Point< dimension > point );
-
-        /*!
          * Create a new point with associated coordinates.
          * @param[in] point The point to create
          * @return the index of the created point
@@ -74,9 +70,6 @@ namespace geode
         PointSetBuilder( PointSet< dimension >& mesh );
 
     private:
-        virtual void do_set_point(
-            index_t vertex_id, Point< dimension > point ) = 0;
-
         virtual void do_copy_points( const PointSet< dimension >& mesh ) = 0;
 
     private:

@@ -24,6 +24,7 @@
 #pragma once
 
 #include <geode/mesh/common.h>
+#include <geode/mesh/core/coordinate_reference_system_managers.h>
 #include <geode/mesh/core/vertex_set.h>
 
 namespace geode
@@ -42,7 +43,8 @@ namespace geode
      * A point is a vertex associated to spatial coordinates
      */
     template < index_t dimension >
-    class PointSet : public VertexSet
+    class PointSet : public VertexSet,
+                     public CoordinateReferenceSystemManagers< dimension >
     {
         OPENGEODE_TEMPLATE_ASSERT_2D_OR_3D( dimension );
 
@@ -69,8 +71,6 @@ namespace geode
 
         std::unique_ptr< PointSet< dimension > > clone() const;
 
-        const Point< dimension >& point( index_t vertex_id ) const;
-
         /*!
          * Compute the bounding box from mesh vertices
          */
@@ -83,9 +83,6 @@ namespace geode
         friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive );
-
-        virtual const Point< dimension >& get_point(
-            index_t vertex_id ) const = 0;
     };
     ALIAS_2D_AND_3D( PointSet );
 } // namespace geode

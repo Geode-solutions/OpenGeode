@@ -32,7 +32,9 @@ namespace geode
 {
     template < index_t dimension >
     PointSetBuilder< dimension >::PointSetBuilder( PointSet< dimension >& mesh )
-        : VertexSetBuilder( mesh ), point_set_( mesh )
+        : VertexSetBuilder( mesh ),
+          CoordinateReferenceSystemManagersBuilder< dimension >( mesh ),
+          point_set_( mesh )
     {
     }
 
@@ -45,22 +47,12 @@ namespace geode
     }
 
     template < index_t dimension >
-    void PointSetBuilder< dimension >::set_point(
-        index_t vertex_id, Point< dimension > point )
-    {
-        OPENGEODE_ASSERT( vertex_id < point_set_.nb_vertices(),
-            "[PointSetBuilder::set_point] Accessing a vertex that does not "
-            "exist" );
-        do_set_point( vertex_id, std::move( point ) );
-    }
-
-    template < index_t dimension >
     index_t PointSetBuilder< dimension >::create_point(
         Point< dimension > point )
     {
         const auto added_vertex = point_set_.nb_vertices();
         create_vertex();
-        set_point( added_vertex, std::move( point ) );
+        this->set_point( added_vertex, std::move( point ) );
         return added_vertex;
     }
 
@@ -80,7 +72,7 @@ namespace geode
         {
             for( const auto p : Range{ point_set.nb_vertices() } )
             {
-                set_point( p, point_set.point( p ) );
+                this->set_point( p, point_set.point( p ) );
             }
         }
     }

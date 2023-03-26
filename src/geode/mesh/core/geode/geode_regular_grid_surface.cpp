@@ -132,12 +132,6 @@ namespace geode
     {
     }
 
-    const Point2D& OpenGeodeRegularGrid< 2 >::get_point(
-        index_t vertex_id ) const
-    {
-        return impl_->get_point( vertex_id );
-    }
-
     const Point2D& OpenGeodeRegularGrid< 2 >::origin() const
     {
         return impl_->origin( *this );
@@ -188,13 +182,19 @@ namespace geode
     template < typename Archive >
     void OpenGeodeRegularGrid< 2 >::serialize( Archive& archive )
     {
-        archive.ext(
-            *this, Growable< Archive, OpenGeodeRegularGrid >{
-                       { []( Archive& a, OpenGeodeRegularGrid& point_set ) {
-                           a.ext( point_set,
-                               bitsery::ext::BaseClass< RegularGrid< 2 > >{} );
-                           a.object( point_set.impl_ );
-                       } } } );
+        archive.ext( *this,
+            Growable< Archive, OpenGeodeRegularGrid >{
+                { []( Archive& a, OpenGeodeRegularGrid& grid ) {
+                     a.ext(
+                         grid, bitsery::ext::BaseClass< RegularGrid< 2 > >{} );
+                     a.object( grid.impl_ );
+                     grid.impl_->initialize_crs( grid );
+                 },
+                    []( Archive& a, OpenGeodeRegularGrid& grid ) {
+                        a.ext( grid,
+                            bitsery::ext::BaseClass< RegularGrid< 2 > >{} );
+                        a.object( grid.impl_ );
+                    } } } );
     }
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, OpenGeodeRegularGrid< 2 > );

@@ -33,7 +33,9 @@ namespace geode
     template < index_t dimension >
     EdgedCurveBuilder< dimension >::EdgedCurveBuilder(
         EdgedCurve< dimension >& mesh )
-        : GraphBuilder( mesh ), edged_curve_( mesh )
+        : GraphBuilder( mesh ),
+          CoordinateReferenceSystemManagersBuilder< dimension >( mesh ),
+          edged_curve_( mesh )
     {
     }
 
@@ -46,22 +48,12 @@ namespace geode
     }
 
     template < index_t dimension >
-    void EdgedCurveBuilder< dimension >::set_point(
-        index_t vertex_id, Point< dimension > point )
-    {
-        OPENGEODE_ASSERT( vertex_id < edged_curve_.nb_vertices(),
-            "[EdgedCurveBuilder::set_point] Accessing a vertex that does not "
-            "exist" );
-        do_set_point( vertex_id, std::move( point ) );
-    }
-
-    template < index_t dimension >
     index_t EdgedCurveBuilder< dimension >::create_point(
         Point< dimension > point )
     {
         const auto added_vertex = edged_curve_.nb_vertices();
         create_vertex();
-        set_point( added_vertex, std::move( point ) );
+        this->set_point( added_vertex, std::move( point ) );
         return added_vertex;
     }
 
@@ -82,7 +74,7 @@ namespace geode
         {
             for( const auto p : Range{ edged_curve.nb_vertices() } )
             {
-                set_point( p, edged_curve.point( p ) );
+                this->set_point( p, edged_curve.point( p ) );
             }
         }
     }

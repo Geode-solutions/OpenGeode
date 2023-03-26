@@ -26,13 +26,13 @@
 #define PYTHON_EDGED_CURVE_BUILDER( dimension )                                \
     const auto name##dimension =                                               \
         "EdgedCurveBuilder" + std::to_string( dimension ) + "D";               \
-    pybind11::class_< EdgedCurveBuilder##dimension##D, GraphBuilder >(         \
+    pybind11::class_< EdgedCurveBuilder##dimension##D, GraphBuilder,           \
+        CoordinateReferenceSystemManagersBuilder##dimension##D >(              \
         module, name##dimension.c_str() )                                      \
         .def_static( "create",                                                 \
             ( std::unique_ptr< EdgedCurveBuilder##dimension##D >( * )(         \
                 EdgedCurve< dimension >& ) )                                   \
                 & EdgedCurveBuilder##dimension##D::create )                    \
-        .def( "set_point", &EdgedCurveBuilder##dimension##D::set_point )       \
         .def( "create_point", &EdgedCurveBuilder##dimension##D::create_point )
 
 namespace geode

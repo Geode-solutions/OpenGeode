@@ -91,8 +91,6 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive );
 
-        const Point2D& get_point( index_t vertex_id ) const override;
-
         index_t get_polygon_vertex(
             const PolygonVertex& polygon_vertex ) const override;
 

@@ -28,13 +28,13 @@
 #define PYTHON_SURFACE_MESH_BUILDER( dimension )                               \
     const auto name##dimension =                                               \
         "SurfaceMeshBuilder" + std::to_string( dimension ) + "D";              \
-    pybind11::class_< SurfaceMeshBuilder##dimension##D, VertexSetBuilder >(    \
+    pybind11::class_< SurfaceMeshBuilder##dimension##D, VertexSetBuilder,      \
+        CoordinateReferenceSystemManagersBuilder##dimension##D >(              \
         module, name##dimension.c_str() )                                      \
         .def_static( "create",                                                 \
             ( std::unique_ptr< SurfaceMeshBuilder##dimension##D >( * )(        \
                 SurfaceMesh< dimension >& ) )                                  \
                 & SurfaceMeshBuilder##dimension##D::create )                   \
-        .def( "set_point", &SurfaceMeshBuilder##dimension##D::set_point )      \
         .def(                                                                  \
             "create_point", &SurfaceMeshBuilder##dimension##D::create_point )  \
         .def( "create_polygon",                                                \

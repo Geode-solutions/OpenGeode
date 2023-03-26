@@ -427,13 +427,6 @@ namespace geode
     }
 
     template < index_t dimension >
-    const Point< dimension >& OpenGeodePolyhedralSolid< dimension >::get_point(
-        index_t vertex_id ) const
-    {
-        return impl_->get_point( vertex_id );
-    }
-
-    template < index_t dimension >
     void OpenGeodePolyhedralSolid< dimension >::set_vertex(
         index_t vertex_id, Point< dimension > point, OGPolyhedralSolidKey )
     {
@@ -540,13 +533,19 @@ namespace geode
     template < typename Archive >
     void OpenGeodePolyhedralSolid< dimension >::serialize( Archive& archive )
     {
-        archive.ext(
-            *this, Growable< Archive, OpenGeodePolyhedralSolid >{
-                       { []( Archive& a, OpenGeodePolyhedralSolid& solid ) {
-                           a.ext( solid, bitsery::ext::BaseClass<
-                                             PolyhedralSolid< dimension > >{} );
-                           a.object( solid.impl_ );
-                       } } } );
+        archive.ext( *this,
+            Growable< Archive, OpenGeodePolyhedralSolid >{
+                { []( Archive& a, OpenGeodePolyhedralSolid& solid ) {
+                     a.ext( solid, bitsery::ext::BaseClass<
+                                       PolyhedralSolid< dimension > >{} );
+                     a.object( solid.impl_ );
+                     solid.impl_->initialize_crs( solid );
+                 },
+                    []( Archive& a, OpenGeodePolyhedralSolid& solid ) {
+                        a.ext( solid, bitsery::ext::BaseClass<
+                                          PolyhedralSolid< dimension > >{} );
+                        a.object( solid.impl_ );
+                    } } } );
     }
 
     template class opengeode_mesh_api OpenGeodePolyhedralSolid< 3 >;

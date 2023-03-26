@@ -152,14 +152,6 @@ namespace geode
     }
 
     template < index_t dimension >
-    const Point< dimension >&
-        OpenGeodeTriangulatedSurface< dimension >::get_point(
-            index_t vertex_id ) const
-    {
-        return impl_->get_point( vertex_id );
-    }
-
-    template < index_t dimension >
     void OpenGeodeTriangulatedSurface< dimension >::set_vertex(
         index_t vertex_id, Point< dimension > point, OGTriangulatedSurfaceKey )
     {
@@ -189,10 +181,17 @@ namespace geode
         archive.ext( *this,
             Growable< Archive, OpenGeodeTriangulatedSurface >{
                 { []( Archive& a, OpenGeodeTriangulatedSurface& surface ) {
-                    a.ext( surface, bitsery::ext::BaseClass<
-                                        TriangulatedSurface< dimension > >{} );
-                    a.object( surface.impl_ );
-                } } } );
+                     a.ext( surface, bitsery::ext::BaseClass<
+                                         TriangulatedSurface< dimension > >{} );
+                     a.object( surface.impl_ );
+                     surface.impl_->initialize_crs( surface );
+                 },
+                    []( Archive& a, OpenGeodeTriangulatedSurface& surface ) {
+                        a.ext(
+                            surface, bitsery::ext::BaseClass<
+                                         TriangulatedSurface< dimension > >{} );
+                        a.object( surface.impl_ );
+                    } } } );
     }
 
     template < index_t dimension >
