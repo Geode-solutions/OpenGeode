@@ -70,6 +70,8 @@ namespace geode
         template < typename Serializer >
         void register_geometry_pcontext( PContext& context )
         {
+            AttributeManager::register_attribute_type< Point1D, Serializer >(
+                context, "Point1D" );
             AttributeManager::register_attribute_type< Point2D, Serializer >(
                 context, "Point2D" );
             AttributeManager::register_attribute_type< Point3D, Serializer >(
