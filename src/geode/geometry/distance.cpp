@@ -23,6 +23,9 @@
 
 #include <geode/geometry/distance.h>
 
+#include <absl/algorithm/container.h>
+
+#include <geode/geometry/barycentric_coordinates.h>
 #include <geode/geometry/basic_objects/circle.h>
 #include <geode/geometry/basic_objects/infinite_line.h>
 #include <geode/geometry/basic_objects/plane.h>
@@ -911,35 +914,21 @@ namespace geode
     std::tuple< double, Point3D > point_tetrahedron_distance(
         const Point3D& point, const Tetrahedron& tetra )
     {
-        auto max_distance = MAX_DOUBLE;
-        Point3D nearest_p;
-        bool inside{ true };
-        const auto& vertices = tetra.vertices();
-        for( const auto f : Range{ 4 } )
-        {
-            const auto& facet_vertices =
-                Tetrahedron::tetrahedron_facet_vertex[f];
-            double distance;
-            Point3D cur_p;
-            std::tie( distance, cur_p ) = point_triangle_signed_distance(
-                point, Triangle3D{ vertices[facet_vertices[0]],
-                           vertices[facet_vertices[1]],
-                           vertices[facet_vertices[2]] } );
-            if( distance > 0 )
-            {
-                inside = false;
-            }
-            if( distance < max_distance && distance >= 0 )
-            {
-                max_distance = distance;
-                nearest_p = cur_p;
-            }
-        }
-        if( inside )
+        const auto lambdas =
+            tetrahedron_barycentric_coordinates( point, tetra );
+        const auto facet = static_cast< geode::local_index_t >(
+            std::distance( lambdas.begin(), absl::c_min_element( lambdas ) ) );
+        if( lambdas[facet] >= 0 )
         {
             return std::make_tuple( 0.0, point );
         }
-        return std::make_tuple( max_distance, nearest_p );
+        const auto& facet_vertices =
+            Tetrahedron::tetrahedron_facet_vertex[facet];
+        const auto& vertices = tetra.vertices();
+        const auto output = point_triangle_signed_distance( point,
+            Triangle3D{ vertices[facet_vertices[0]],
+                vertices[facet_vertices[1]], vertices[facet_vertices[2]] } );
+        return output;
     }
 
     std::tuple< double, Point3D > point_triangle_signed_distance(
