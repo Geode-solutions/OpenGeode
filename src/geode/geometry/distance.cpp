@@ -33,15 +33,15 @@
 #include <geode/geometry/basic_objects/sphere.h>
 #include <geode/geometry/basic_objects/tetrahedron.h>
 #include <geode/geometry/basic_objects/triangle.h>
+#include <geode/geometry/information.h>
 #include <geode/geometry/mensuration.h>
 #include <geode/geometry/perpendicular.h>
 #include <geode/geometry/projection.h>
+#include <geode/geometry/sign.h>
 #include <geode/geometry/vector.h>
 
 namespace
 {
-    constexpr double MAX_DOUBLE = std::numeric_limits< double >::max();
-
     /*
      * This function tests if the point is in the triangle by computing signed
      * areas
@@ -916,7 +916,7 @@ namespace geode
     {
         const auto lambdas =
             tetrahedron_barycentric_coordinates( point, tetra );
-        const auto facet = static_cast< geode::local_index_t >(
+        const auto facet = static_cast< local_index_t >(
             std::distance( lambdas.begin(), absl::c_min_element( lambdas ) ) );
         if( lambdas[facet] >= 0 )
         {
@@ -928,7 +928,12 @@ namespace geode
         const auto output = point_triangle_signed_distance( point,
             Triangle3D{ vertices[facet_vertices[0]],
                 vertices[facet_vertices[1]], vertices[facet_vertices[2]] } );
-        return output;
+        if( tetrahedron_volume_sign( tetra ) == Sign::positive )
+        {
+            return output;
+        }
+        return std::make_tuple(
+            -std::get< 0 >( output ), std::get< 1 >( output ) );
     }
 
     std::tuple< double, Point3D > point_triangle_signed_distance(
