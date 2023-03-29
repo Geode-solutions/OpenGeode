@@ -66,6 +66,16 @@ namespace geode
             return out2in_.at( out );
         }
 
+        const absl::flat_hash_map< T1, Storage< T2 > >& in2out_map() const
+        {
+            return in2out_;
+        }
+
+        const absl::flat_hash_map< T2, Storage< T1 > >& out2in_map() const
+        {
+            return out2in_;
+        }
+
     protected:
         MappingBase() = default;
 
@@ -79,12 +89,12 @@ namespace geode
             return static_cast< index_t >( out2in_.size() );
         }
 
-        absl::flat_hash_map< T1, Storage< T2 > >& in2out_map()
+        absl::flat_hash_map< T1, Storage< T2 > >& in2out_mapping()
         {
             return in2out_;
         }
 
-        absl::flat_hash_map< T2, Storage< T1 > >& out2in_map()
+        absl::flat_hash_map< T2, Storage< T1 > >& out2in_mapping()
         {
             return out2in_;
         }
@@ -124,8 +134,8 @@ namespace geode
                 return;
             }
             const auto out = this->in2out( in );
-            this->in2out_map().erase( in );
-            this->out2in_map().erase( out );
+            this->in2out_mapping().erase( in );
+            this->out2in_mapping().erase( out );
         }
 
         void erase_out( const T2& out )
@@ -135,8 +145,8 @@ namespace geode
                 return;
             }
             const auto in = this->out2in( out );
-            this->in2out_map().erase( in );
-            this->out2in_map().erase( out );
+            this->in2out_mapping().erase( in );
+            this->out2in_mapping().erase( out );
         }
 
         index_t size() const
@@ -147,8 +157,8 @@ namespace geode
     private:
         void emplace( const T1& in, const T2& out )
         {
-            this->in2out_map().emplace( in, out );
-            this->out2in_map().emplace( out, in );
+            this->in2out_mapping().emplace( in, out );
+            this->out2in_mapping().emplace( out, in );
         }
     };
 
@@ -164,8 +174,8 @@ namespace geode
     public:
         void map( const T1& in, const T2& out )
         {
-            this->in2out_map()[in].push_back( out );
-            this->out2in_map()[out].push_back( in );
+            this->in2out_mapping()[in].push_back( out );
+            this->out2in_mapping()[out].push_back( in );
         }
 
         void erase_in( const T1& in )
@@ -176,15 +186,15 @@ namespace geode
             }
             for( const auto& out : this->in2out( in ) )
             {
-                auto& out_map = this->out2in_map().at( out );
+                auto& out_map = this->out2in_mapping().at( out );
                 const auto itr = absl::c_find( out_map, in );
                 out_map.erase( itr );
                 if( this->out2in( out ).empty() )
                 {
-                    this->out2in_map().erase( out );
+                    this->out2in_mapping().erase( out );
                 }
             }
-            this->in2out_map().erase( in );
+            this->in2out_mapping().erase( in );
         }
 
         void erase_out( const T2& out )
@@ -195,15 +205,15 @@ namespace geode
             }
             for( const auto& in : this->out2in( out ) )
             {
-                auto& in_map = this->in2out_map().at( in );
+                auto& in_map = this->in2out_mapping().at( in );
                 const auto itr = absl::c_find( in_map, out );
                 in_map.erase( itr );
                 if( this->in2out( in ).empty() )
                 {
-                    this->in2out_map().erase( in );
+                    this->in2out_mapping().erase( in );
                 }
             }
-            this->out2in_map().erase( out );
+            this->out2in_mapping().erase( out );
         }
 
         index_t size_in() const
