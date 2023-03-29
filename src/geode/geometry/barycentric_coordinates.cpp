@@ -23,6 +23,8 @@
 
 #include <geode/geometry/barycentric_coordinates.h>
 
+#include <geode/basic/logger.h>
+
 #include <geode/geometry/basic_objects/segment.h>
 #include <geode/geometry/basic_objects/tetrahedron.h>
 #include <geode/geometry/basic_objects/triangle.h>
@@ -34,76 +36,54 @@ namespace geode
         const Point3D& point, const Tetrahedron& tetra )
     {
         const auto& vertices = tetra.vertices();
-        const auto volume0 = tetrahedron_signed_volume(
-            Tetrahedron{ vertices[1], vertices[3], vertices[2], point } );
-        const auto volume1 = tetrahedron_signed_volume(
-            Tetrahedron{ vertices[0], vertices[2], vertices[3], point } );
-        const auto volume2 = tetrahedron_signed_volume(
-            Tetrahedron{ vertices[0], vertices[3], vertices[1], point } );
-        const auto volume3 = tetrahedron_signed_volume(
-            Tetrahedron{ vertices[0], vertices[1], vertices[2], point } );
-        const auto total_volume = volume0 + volume1 + volume2 + volume3;
-        OPENGEODE_EXCEPTION( std::fabs( total_volume ) > global_epsilon,
-            "[tetrahedron_barycentric_coordinates] Volume of input tetrahedron "
-            "too "
-            "small" );
-
-        const auto lambda0 = volume0 / total_volume;
-        const auto lambda1 = volume1 / total_volume;
-        const auto lambda2 = volume2 / total_volume;
-        const auto lambda3 = volume3 / total_volume;
+        const Vector3D v0{ vertices[0], vertices[1] };
+        const Vector3D v1{ vertices[0], vertices[2] };
+        const Vector3D v2{ vertices[0], vertices[3] };
+        const Vector3D v3{ vertices[0], point };
+        const auto a = v0.dot( v3 );
+        const auto b = v0.dot( v0 );
+        const auto c = v0.dot( v1 );
+        const auto d = v0.dot( v2 );
+        const auto e = v1.dot( v3 );
+        const auto f = v1.dot( v1 );
+        const auto g = v1.dot( v2 );
+        const auto h = v2.dot( v3 );
+        const auto i = v2.dot( v2 );
+        const auto denom =
+            2 * c * d * g - b * g * g + i * b * f - i * c * c - d * d * f;
+            OPENGEODE_EXCEPTION(denom != 0, "[tetrahedron_barycentric_coordinates] Computation failed" );
+        const auto dg_ci = d * g - c * i;
+        const auto cg_df = c * g - d * f;
+        const auto cd_bg = c * d - b * g;
+        const auto lambda1 =
+            ( a * ( i * f - g * g ) + e * dg_ci + h * cg_df ) / denom;
+        const auto lambda2 =
+            ( a * dg_ci + e * ( -d * d + b * i ) + h * cd_bg ) / denom;
+        const auto lambda3 =
+            ( a * cg_df + e * cd_bg + h * ( b * f - c * c ) ) / denom;
+        const auto lambda0 = 1. - lambda1 - lambda2 - lambda3;
         return { { lambda0, lambda1, lambda2, lambda3 } };
     }
 
-    template <>
+    template < index_t dimension >
     std::array< double, 3 > triangle_barycentric_coordinates(
-        const Point3D& point, const Triangle3D& triangle )
-    {
-        const auto triangle_normal = triangle.normal();
-        if( !triangle_normal )
-        {
-            std::array< double, 3 > result;
-            result.fill( 1. / 3. );
-            return result;
-        }
-        const auto& vertices = triangle.vertices();
-        const auto& normal = triangle_normal.value();
-        const auto area0 =
-            triangle_signed_area( { vertices[1], vertices[2], point }, normal );
-        const auto area1 =
-            triangle_signed_area( { vertices[2], vertices[0], point }, normal );
-        const auto area2 =
-            triangle_signed_area( { vertices[0], vertices[1], point }, normal );
-
-        const auto total_area = area0 + area1 + area2;
-        OPENGEODE_EXCEPTION( std::fabs( total_area ) > global_epsilon,
-            "[triangle_barycentric_coordinates] Area of input triangle too "
-            "small" );
-        const auto lambda0 = area0 / total_area;
-        const auto lambda1 = area1 / total_area;
-        const auto lambda2 = area2 / total_area;
-        return { { lambda0, lambda1, lambda2 } };
-    }
-
-    template <>
-    std::array< double, 3 > triangle_barycentric_coordinates(
-        const Point2D& point, const Triangle2D& triangle )
+        const Point< dimension >& point, const Triangle< dimension >& triangle )
     {
         const auto& vertices = triangle.vertices();
-        const auto area0 =
-            triangle_signed_area( { vertices[1], vertices[2], point } );
-        const auto area1 =
-            triangle_signed_area( { vertices[2], vertices[0], point } );
-        const auto area2 =
-            triangle_signed_area( { vertices[0], vertices[1], point } );
-
-        const auto total_area = area0 + area1 + area2;
-        OPENGEODE_EXCEPTION( std::fabs( total_area ) > global_epsilon,
-            "[triangle_barycentric_coordinates] Area of input triangle too "
-            "small" );
-        const auto lambda0 = area0 / total_area;
-        const auto lambda1 = area1 / total_area;
-        const auto lambda2 = area2 / total_area;
+        const Vector< dimension > v0{ vertices[0], vertices[1] };
+        const Vector< dimension > v1{ vertices[0], vertices[2] };
+        const Vector< dimension > v2{ vertices[0], point };
+        const auto d00 = v0.dot( v0 );
+        const auto d01 = v0.dot( v1 );
+        const auto d11 = v1.dot( v1 );
+        const auto d20 = v2.dot( v0 );
+        const auto d21 = v2.dot( v1 );
+        const auto denom = d00 * d11 - d01 * d01;
+        OPENGEODE_EXCEPTION( denom != 0,
+            "[triangle_barycentric_coordinates] Computation failed" );
+        const auto lambda1 = ( d11 * d20 - d01 * d21 ) / denom;
+        const auto lambda2 = ( d00 * d21 - d01 * d20 ) / denom;
+        const auto lambda0 = 1. - lambda1 - lambda2;
         return { { lambda0, lambda1, lambda2 } };
     }
 
