@@ -23,8 +23,6 @@
 
 #include <geode/geometry/barycentric_coordinates.h>
 
-#include <geode/basic/logger.h>
-
 #include <geode/geometry/basic_objects/segment.h>
 #include <geode/geometry/basic_objects/tetrahedron.h>
 #include <geode/geometry/basic_objects/triangle.h>
@@ -51,7 +49,8 @@ namespace geode
         const auto i = v2.dot( v2 );
         const auto denom =
             2 * c * d * g - b * g * g + i * b * f - i * c * c - d * d * f;
-            OPENGEODE_EXCEPTION(denom != 0, "[tetrahedron_barycentric_coordinates] Computation failed" );
+        OPENGEODE_EXCEPTION( denom != 0,
+            "[tetrahedron_barycentric_coordinates] Computation failed" );
         const auto dg_ci = d * g - c * i;
         const auto cg_df = c * g - d * f;
         const auto cd_bg = c * d - b * g;
