@@ -34,6 +34,8 @@ namespace geode
     class AttributeCoordinateReferenceSystem< dimension >::Impl
         : public detail::PointsImpl< dimension >
     {
+        friend class bitsery::Access;
+
     public:
         Impl( AttributeManager& manager )
             : detail::PointsImpl< dimension >{ manager }
@@ -45,6 +47,17 @@ namespace geode
         }
 
         Impl() = default;
+
+    private:
+        template < typename Archive >
+        void serialize( Archive& archive )
+        {
+            archive.ext( *this,
+                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
+                    a.ext( impl, bitsery::ext::BaseClass<
+                                     detail::PointsImpl< dimension > >{} );
+                } } } );
+        }
     };
 
     template < index_t dimension >
@@ -89,7 +102,29 @@ namespace geode
         impl_->set_point( point_id, std::move( point ) );
     }
 
+    template < index_t dimension >
+    template < typename Archive >
+    void AttributeCoordinateReferenceSystem< dimension >::serialize(
+        Archive& archive )
+    {
+        archive.ext( *this,
+            Growable< Archive, AttributeCoordinateReferenceSystem >{
+                { []( Archive& a, AttributeCoordinateReferenceSystem& crs ) {
+                    a.ext(
+                        crs, bitsery::ext::BaseClass<
+                                 CoordinateReferenceSystem< dimension > >{} );
+                    a.object( crs.impl_ );
+                } } } );
+    }
+
     template class opengeode_mesh_api AttributeCoordinateReferenceSystem< 1 >;
     template class opengeode_mesh_api AttributeCoordinateReferenceSystem< 2 >;
     template class opengeode_mesh_api AttributeCoordinateReferenceSystem< 3 >;
+
+    SERIALIZE_BITSERY_ARCHIVE(
+        opengeode_mesh_api, AttributeCoordinateReferenceSystem< 1 > );
+    SERIALIZE_BITSERY_ARCHIVE(
+        opengeode_mesh_api, AttributeCoordinateReferenceSystem< 2 > );
+    SERIALIZE_BITSERY_ARCHIVE(
+        opengeode_mesh_api, AttributeCoordinateReferenceSystem< 3 > );
 } // namespace geode

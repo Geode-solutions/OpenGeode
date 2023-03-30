@@ -538,28 +538,64 @@ void test_clone( const geode::Section& section )
     }
 }
 
-void test_reloaded_section( const geode::Section& model )
+void test_compare_section(
+    const geode::Section& model, const geode::Section& model2 )
 {
-    OPENGEODE_EXCEPTION( model.nb_corners() == 5,
-        "[Test] Number of Corners in reloaded Section should be 5" );
-    OPENGEODE_EXCEPTION( model.nb_lines() == 6,
-        "[Test] Number of Lines in reloaded Section should be 6" );
-    OPENGEODE_EXCEPTION( model.nb_surfaces() == 2,
-        "[Test] Number of Surfaces in reloaded Section should be 2" );
-    OPENGEODE_EXCEPTION( model.nb_model_boundaries() == 2,
-        "[Test] Number of Boundaries in reloaded Section should be 2" );
-}
-
-void test_moved_section( const geode::Section& model )
-{
-    OPENGEODE_EXCEPTION( model.nb_corners() == 5,
-        "[Test] Number of Corners in moved Section should be 5" );
-    OPENGEODE_EXCEPTION( model.nb_lines() == 6,
-        "[Test] Number of Lines in moved Section should be 6" );
-    OPENGEODE_EXCEPTION( model.nb_surfaces() == 2,
-        "[Test] Number of Surfaces in moved Section should be 2" );
-    OPENGEODE_EXCEPTION( model.nb_model_boundaries() == 2,
-        "[Test] Number of Boundaries in moved Section should be 2" );
+    OPENGEODE_EXCEPTION( model.nb_corners() == model2.nb_corners(),
+        "[Test] Number of Corners in reloaded Model should be ",
+        model.nb_corners() );
+    OPENGEODE_EXCEPTION( model.nb_lines() == model2.nb_lines(),
+        "[Test] Number of Lines in reloaded Model should be ",
+        model.nb_lines() );
+    OPENGEODE_EXCEPTION( model.nb_surfaces() == model2.nb_surfaces(),
+        "[Test] Number of Surfaces in reloaded Model should be ",
+        model.nb_surfaces() );
+    OPENGEODE_EXCEPTION(
+        model.nb_model_boundaries() == model2.nb_model_boundaries(),
+        "[Test] Number of Boundaries in reloaded Model should be ",
+        model.nb_model_boundaries() );
+    for( const auto& surface : model.surfaces() )
+    {
+        OPENGEODE_EXCEPTION( surface.id() == surface.mesh().id(),
+            "[Backward_IO] Model surface should have the same uuid as its "
+            "mesh." );
+        const auto& mesh = surface.mesh();
+        const auto& mesh2 = model2.surface( surface.id() ).mesh();
+        for( const auto vertex_id : geode::Range{ mesh.nb_vertices() } )
+        {
+            OPENGEODE_EXCEPTION( mesh.point( vertex_id )
+                                     .inexact_equal( mesh2.point( vertex_id ) ),
+                "[Test] Wrong reloaded mesh point coordinates." );
+        }
+    }
+    for( const auto& line : model.lines() )
+    {
+        OPENGEODE_EXCEPTION( line.id() == line.mesh().id(),
+            "[Backward_IO] Model line should have the same uuid as its "
+            "mesh." );
+        const auto& mesh = line.mesh();
+        const auto& mesh2 = model2.line( line.id() ).mesh();
+        for( const auto vertex_id : geode::Range{ mesh.nb_vertices() } )
+        {
+            OPENGEODE_EXCEPTION( mesh.point( vertex_id )
+                                     .inexact_equal( mesh2.point( vertex_id ) ),
+                "[Test] Wrong reloaded mesh point coordinates." );
+        }
+    }
+    for( const auto& corner : model.corners() )
+    {
+        OPENGEODE_EXCEPTION( corner.id() == corner.mesh().id(),
+            "[Backward_IO] Model corner should have the same uuid as its "
+            "mesh." );
+        const auto& mesh = corner.mesh();
+        const auto& mesh2 = model2.corner( corner.id() ).mesh();
+        for( const auto vertex_id : geode::Range{ mesh.nb_vertices() } )
+        {
+            OPENGEODE_EXCEPTION( mesh.point( vertex_id )
+                                     .inexact_equal( mesh2.point( vertex_id ) ),
+                "[Test] Wrong reloaded mesh point coordinates." );
+        }
+    }
 }
 
 void test()
@@ -599,10 +635,10 @@ void test()
     geode::save_section( model, file_io );
 
     auto model2 = geode::load_section( file_io );
-    test_reloaded_section( model2 );
+    test_compare_section( model, model2 );
 
     geode::Section model3{ std::move( model2 ) };
-    test_moved_section( model3 );
+    test_compare_section( model, model3 );
 }
 
 OPENGEODE_TEST( "section" )

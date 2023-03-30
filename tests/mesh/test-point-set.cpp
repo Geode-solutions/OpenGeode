@@ -103,8 +103,14 @@ void test_io( const geode::PointSet3D& point_set, absl::string_view filename )
 {
     geode::save_point_set( point_set, filename );
     geode::load_point_set< 3 >( filename );
-    geode::load_point_set< 3 >(
+    const auto reload = geode::load_point_set< 3 >(
         geode::OpenGeodePointSet3D::impl_name_static(), filename );
+    for( const auto vertex_id : geode::Range{ point_set.nb_vertices() } )
+    {
+        OPENGEODE_EXCEPTION( point_set.point( vertex_id )
+                                 .inexact_equal( reload->point( vertex_id ) ),
+            "[Test] Wrong reloaded mesh point coordinates." );
+    }
 }
 
 void test_clone( const geode::PointSet3D& point_set )

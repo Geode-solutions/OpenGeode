@@ -78,6 +78,7 @@ namespace geode
 
     protected:
         PointSet() = default;
+        PointSet( PointSet&& ) = default;
 
     private:
         friend class bitsery::Access;

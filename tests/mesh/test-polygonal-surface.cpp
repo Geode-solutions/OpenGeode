@@ -420,6 +420,14 @@ void test_io( const geode::PolygonalSurface3D& polygonal_surface,
 
     OPENGEODE_EXCEPTION( new_polygonal_surface->nb_vertices() == 7,
         "[Test] Reloaded PolygonalSurface should have 7 vertices" );
+    for( const auto vertex_id :
+        geode::Range{ polygonal_surface.nb_vertices() } )
+    {
+        OPENGEODE_EXCEPTION(
+            polygonal_surface.point( vertex_id )
+                .inexact_equal( new_polygonal_surface->point( vertex_id ) ),
+            "[Test] Wrong reloaded mesh point coordinates." );
+    }
     OPENGEODE_EXCEPTION( new_polygonal_surface->edges().nb_edges() == 9,
         "[Test] Reloaded PolygonalSurface should have 9 edges" );
     OPENGEODE_EXCEPTION( new_polygonal_surface->nb_polygons() == 3,
