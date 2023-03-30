@@ -129,11 +129,11 @@ namespace geode
                     []( Archive& a, EdgedCurve& edged_curve ) {
                         a.ext(
                             edged_curve, bitsery::ext::BaseClass< Graph >{} );
-                        a.object( edged_curve.impl_ );
                         a.ext(
                             edged_curve, bitsery::ext::BaseClass<
                                              CoordinateReferenceSystemManagers<
                                                  dimension > >{} );
+                        a.object( edged_curve.impl_ );
                     } } } );
     }
 

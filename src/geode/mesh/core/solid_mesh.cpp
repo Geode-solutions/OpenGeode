@@ -1473,10 +1473,10 @@ namespace geode
                     },
                     []( Archive& a, SolidMesh& solid ) {
                         a.ext( solid, bitsery::ext::BaseClass< VertexSet >{} );
-                        a.object( solid.impl_ );
                         a.ext( solid, bitsery::ext::BaseClass<
                                           CoordinateReferenceSystemManagers<
                                               dimension > >{} );
+                        a.object( solid.impl_ );
                     } } } );
     }
 

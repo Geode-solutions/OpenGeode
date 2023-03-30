@@ -30,6 +30,7 @@
 #include <geode/basic/cached_value.h>
 
 #include <geode/mesh/core/attribute_coordinate_reference_system.h>
+#include <geode/mesh/core/coordinate_reference_system.h>
 #include <geode/mesh/core/geode/geode_edged_curve.h>
 #include <geode/mesh/core/geode/geode_graph.h>
 #include <geode/mesh/core/geode/geode_hybrid_solid.h>
@@ -215,6 +216,19 @@ namespace bitsery
         BITSERY_CLASS_NAME( geode::RegularGrid3D, "RegularGrid3D" );
         BITSERY_CLASS_NAME(
             geode::OpenGeodeRegularGrid3D, "OpenGeodeRegularGrid3D" );
+
+        BITSERY_CLASS_NAME(
+            geode::CoordinateReferenceSystem1D, "CoordinateReferenceSystem1D" );
+        BITSERY_CLASS_NAME(
+            geode::CoordinateReferenceSystem2D, "CoordinateReferenceSystem2D" );
+        BITSERY_CLASS_NAME(
+            geode::CoordinateReferenceSystem3D, "CoordinateReferenceSystem3D" );
+        BITSERY_CLASS_NAME( geode::AttributeCoordinateReferenceSystem1D,
+            "AttributeCoordinateReferenceSystem1D" );
+        BITSERY_CLASS_NAME( geode::AttributeCoordinateReferenceSystem2D,
+            "AttributeCoordinateReferenceSystem2D" );
+        BITSERY_CLASS_NAME( geode::AttributeCoordinateReferenceSystem3D,
+            "AttributeCoordinateReferenceSystem3D" );
     } // namespace ext
 } // namespace bitsery
 
