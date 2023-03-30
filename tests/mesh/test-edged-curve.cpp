@@ -211,9 +211,9 @@ void test_io(
     geode::load_edged_curve< 3 >( filename );
     const auto reload = geode::load_edged_curve< 3 >(
         geode::OpenGeodeEdgedCurve3D::impl_name_static(), filename );
-    OPENGEODE_EXCEPTION( reload->nb_edges() == 4,
+    OPENGEODE_EXCEPTION( reload->nb_edges() == edged_curve.nb_edges(),
         "[Test] Reload EdgedCurve has wrong number of edges" );
-    OPENGEODE_EXCEPTION( reload->nb_vertices() == 4,
+    OPENGEODE_EXCEPTION( reload->nb_vertices() == edged_curve.nb_vertices(),
         "[Test] Reload EdgedCurve has wrong number of vertices" );
     auto manager = reload->texture_manager();
     auto texture_names = manager.texture_names();
@@ -221,6 +221,11 @@ void test_io(
         "[Test] Reloaded EdgedCurve has wrong number of textures" );
     OPENGEODE_EXCEPTION( texture_names[0] == "texture",
         "[Test] Reloaded EdgedCurve has wrong texture name" );
+    for( const auto vertex_id : geode::Range{ edged_curve.nb_vertices() } )
+    {
+        OPENGEODE_EXCEPTION( edged_curve.point( vertex_id )
+                                 .inexact_equal( reload->point( vertex_id ) ) );
+    }
 }
 
 void test_backward_io( const std::string& filename )

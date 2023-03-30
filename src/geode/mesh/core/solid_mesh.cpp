@@ -606,7 +606,9 @@ namespace geode
 
     template < index_t dimension >
     SolidMesh< dimension >::SolidMesh( SolidMesh&& other )
-        : VertexSet( std::move( other ) ), impl_( std::move( other.impl_ ) )
+        : VertexSet( std::move( other ) ),
+          CoordinateReferenceSystemManagers< dimension >( std::move( other ) ),
+          impl_( std::move( other.impl_ ) )
     {
     }
 
@@ -1468,6 +1470,13 @@ namespace geode
                     []( Archive& a, SolidMesh& solid ) {
                         a.ext( solid, bitsery::ext::BaseClass< VertexSet >{} );
                         a.object( solid.impl_ );
+                    },
+                    []( Archive& a, SolidMesh& solid ) {
+                        a.ext( solid, bitsery::ext::BaseClass< VertexSet >{} );
+                        a.object( solid.impl_ );
+                        a.ext( solid, bitsery::ext::BaseClass<
+                                          CoordinateReferenceSystemManagers<
+                                              dimension > >{} );
                     } } } );
     }
 

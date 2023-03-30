@@ -64,6 +64,9 @@ namespace geode
     private:
         AttributeCoordinateReferenceSystem();
 
+        template < typename Archive >
+        void serialize( Archive& archive );
+
     private:
         IMPLEMENTATION_MEMBER( impl_ );
     };

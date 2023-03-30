@@ -333,6 +333,13 @@ void test_io( const geode::PolyhedralSolid3D& polyhedral_solid,
 
     OPENGEODE_EXCEPTION( new_polyhedral_solid->nb_vertices() == 8,
         "[Test] Reloaded PolyhedralSolid should have 8 vertices" );
+    for( const auto vertex_id : geode::Range{ polyhedral_solid.nb_vertices() } )
+    {
+        OPENGEODE_EXCEPTION(
+            polyhedral_solid.point( vertex_id )
+                .inexact_equal( new_polyhedral_solid->point( vertex_id ) ),
+            "[Test] Wrong reloaded mesh point coordinates." );
+    }
     OPENGEODE_EXCEPTION( new_polyhedral_solid->facets().nb_facets() == 11,
         "[Test] Reloaded PolyhedralSolid should have 11 facets" );
     OPENGEODE_EXCEPTION( new_polyhedral_solid->edges().nb_edges() == 15,

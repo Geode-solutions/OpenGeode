@@ -70,7 +70,9 @@ namespace geode
 
     template < index_t dimension >
     EdgedCurve< dimension >::EdgedCurve( EdgedCurve&& other )
-        : Graph{ std::move( other ) }, impl_{ std::move( other.impl_ ) }
+        : Graph{ std::move( other ) },
+          CoordinateReferenceSystemManagers< dimension >( std::move( other ) ),
+          impl_{ std::move( other.impl_ ) }
     {
     }
 
@@ -123,6 +125,15 @@ namespace geode
                         a.ext(
                             edged_curve, bitsery::ext::BaseClass< Graph >{} );
                         a.object( edged_curve.impl_ );
+                    },
+                    []( Archive& a, EdgedCurve& edged_curve ) {
+                        a.ext(
+                            edged_curve, bitsery::ext::BaseClass< Graph >{} );
+                        a.object( edged_curve.impl_ );
+                        a.ext(
+                            edged_curve, bitsery::ext::BaseClass<
+                                             CoordinateReferenceSystemManagers<
+                                                 dimension > >{} );
                     } } } );
     }
 

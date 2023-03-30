@@ -234,6 +234,13 @@ void test_io(
         geode::OpenGeodeTetrahedralSolid3D::impl_name_static(), filename );
     OPENGEODE_EXCEPTION( new_solid->nb_vertices() == 6,
         "[Test] Reloaded TetrahedralSolid should have 6 vertices" );
+    for( const auto vertex_id : geode::Range{ solid.nb_vertices() } )
+    {
+        OPENGEODE_EXCEPTION(
+            solid.point( vertex_id )
+                .inexact_equal( new_solid->point( vertex_id ) ),
+            "[Test] Wrong reloaded mesh point coordinates." );
+    }
     OPENGEODE_EXCEPTION( new_solid->facets().nb_facets() == 10,
         "[Test] Reloaded TetrahedralSolid should have 10 facets" );
     OPENGEODE_EXCEPTION( new_solid->edges().nb_edges() == 12,

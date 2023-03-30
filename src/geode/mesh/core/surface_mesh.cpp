@@ -404,7 +404,9 @@ namespace geode
 
     template < index_t dimension >
     SurfaceMesh< dimension >::SurfaceMesh( SurfaceMesh&& other )
-        : VertexSet( std::move( other ) ), impl_( std::move( other.impl_ ) )
+        : VertexSet( std::move( other ) ),
+          CoordinateReferenceSystemManagers< dimension >( std::move( other ) ),
+          impl_( std::move( other.impl_ ) )
     {
     }
 

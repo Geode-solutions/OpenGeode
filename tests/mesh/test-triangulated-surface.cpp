@@ -187,8 +187,14 @@ void test_io(
 {
     geode::save_triangulated_surface( surface, filename );
     geode::load_triangulated_surface< 3 >( filename );
-    geode::load_triangulated_surface< 3 >(
+    const auto reload = geode::load_triangulated_surface< 3 >(
         geode::OpenGeodeTriangulatedSurface3D::impl_name_static(), filename );
+    for( const auto vertex_id : geode::Range{ surface.nb_vertices() } )
+    {
+        OPENGEODE_EXCEPTION( surface.point( vertex_id )
+                                 .inexact_equal( reload->point( vertex_id ) ),
+            "[Test] Wrong reloaded mesh point coordinates." );
+    }
 }
 
 void test_clone( const geode::TriangulatedSurface3D& surface )
