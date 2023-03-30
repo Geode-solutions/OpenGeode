@@ -887,10 +887,10 @@ namespace geode
                     []( Archive& a, SurfaceMesh& surface ) {
                         a.ext(
                             surface, bitsery::ext::BaseClass< VertexSet >{} );
-                        a.object( surface.impl_ );
                         a.ext( surface, bitsery::ext::BaseClass<
                                             CoordinateReferenceSystemManagers<
                                                 dimension > >{} );
+                        a.object( surface.impl_ );
                     } } } );
     }
 
