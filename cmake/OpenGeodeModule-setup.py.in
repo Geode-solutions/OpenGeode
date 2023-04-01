@@ -42,23 +42,19 @@ with open(path.join('${CMAKE_SOURCE_DIR}', 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='OpenGeode-core',
+    name='${GEODE_WHEEL_NAME}',
     version='${WHEEL_VERSION}',
-    description='Open source framework for representing and manipulating geometric models',
-    keywords=['brep', 'modeling', 'mesh', 'meshing'],
+    description='${GEODE_WHEEL_DESCRIPTION}',
     long_description=long_description,
     long_description_content_type='text/markdown',
     author='Geode-solutions',
     author_email='contact@geode-solutions.com',
-    url='https://github.com/Geode-solutions/OpenGeode',
-    packages=['opengeode'],
+    url='https://github.com/Geode-solutions/${PROJECT_NAME}',
+    packages=['${project_name}'],
     package_data={
-        'opengeode': ['*.so', '*.dll', '*.pyd', '*.dylib']
+        '${project_name}': ['*.so', '*.dll', '*.pyd']
     },
-    license='MIT',
-    classifiers=[
-        'License :: OSI Approved :: MIT License'
-    ],
+    license='${GEODE_WHEEL_LICENSE}',
     zip_safe=False,
     distclass=BinaryDistribution,
     cmdclass={'install': InstallPlatlib}

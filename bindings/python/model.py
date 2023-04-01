@@ -18,14 +18,5 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .opengeode_py_basic import *
-from .opengeode_py_geometry import *
-from .opengeode_py_image import *
-from .opengeode_py_mesh import *
 from .opengeode_py_model import *
-
-OpenGeodeBasic.initialize()
-OpenGeodeGeometry.initialize()
-OpenGeodeImage.initialize()
-OpenGeodeMesh.initialize()
 OpenGeodeModel.initialize()

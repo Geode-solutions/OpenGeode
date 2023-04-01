@@ -68,6 +68,11 @@ if(OPENGEODE_WITH_PYTHON OR INCLUDE_PYBIND11)
     )
 endif()
 
+install(
+    FILES "${PROJECT_SOURCE_DIR}/cmake/OpenGeodeModule-setup.py.in"
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+)
+
 # Configure the OpenGeode sources
 add_subdirectory(src/geode)
 

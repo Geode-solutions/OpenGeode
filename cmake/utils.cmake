@@ -11,6 +11,9 @@ endif()
 
 option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 
+string(TOLOWER ${PROJECT_NAME} project-name)
+string(REGEX REPLACE "-" "_" project_name ${project-name})
+
 include(GNUInstallDirs)
 include(GenerateExportHeader)
 include(CMakePackageConfigHelpers)
@@ -320,23 +323,6 @@ function(add_geode_binary)
     )
 endfunction()
 
-function(_add_dependency_directories test_name)
-    _find_dependency_directories(directories projects ${ARGN})
-    if(WIN32)
-        list(JOIN directories "\\;" directories)
-        set_tests_properties(${test_name}
-            PROPERTIES
-                ENVIRONMENT "Path=${directories}\\;$ENV{Path}"
-        )
-    else()
-        list(JOIN directories ":" directories)
-        set_tests_properties(${test_name}
-            PROPERTIES
-                ENVIRONMENT "LD_LIBRARY_PATH=${directories}:$ENV{LD_LIBRARY_PATH}"
-        )
-    endif()
-endfunction()
-
 option(USE_BENCHMARK "Toggle benchmarking of tests" OFF)
 function(add_geode_test)
     cmake_parse_arguments(GEODE_TEST
@@ -351,8 +337,21 @@ function(add_geode_test)
         add_dependencies(essential ${target_name})
         set_tests_properties(${target_name} PROPERTIES LABELS essential) 
     endif()
-    set_tests_properties(${target_name} PROPERTIES TIMEOUT 300) 
-    _add_dependency_directories(${target_name} ${GEODE_TEST_DEPENDENCIES})
+    set_tests_properties(${target_name} PROPERTIES TIMEOUT 300)
+    _find_dependency_directories(directories projects ${GEODE_TEST_DEPENDENCIES})
+    if(WIN32)
+        list(JOIN directories "\\;" directories)
+        set_tests_properties(${target_name}
+            PROPERTIES
+                ENVIRONMENT "Path=${directories}\\;$ENV{Path}"
+        )
+    else()
+        list(JOIN directories ":" directories)
+        set_tests_properties(${target_name}
+            PROPERTIES
+                ENVIRONMENT "LD_LIBRARY_PATH=${directories}:$ENV{LD_LIBRARY_PATH}"
+        )
+    endif()
     if(USE_BENCHMARK)
         target_compile_definitions(${target_name} PRIVATE OPENGEODE_BENCHMARK)
     endif()
@@ -375,8 +374,6 @@ function(add_geode_python_binding)
     target_link_libraries(${GEODE_BINDING_NAME} 
         PRIVATE "${GEODE_BINDING_DEPENDENCIES}"
     )
-    string(TOLOWER ${PROJECT_NAME} project-name)
-    string(REGEX REPLACE "-" "_" project_name ${project-name})
     set_target_properties(${GEODE_BINDING_NAME}
         PROPERTIES
             OUTPUT_NAME ${project_name}_${GEODE_BINDING_NAME}
@@ -402,27 +399,61 @@ function(add_geode_python_test)
     )
     add_test(NAME ${test_name} COMMAND ${PYTHON_EXECUTABLE} ${absolute_path})
     set_tests_properties(${test_name} PROPERTIES TIMEOUT 300) 
-    _add_dependency_directories(${test_name} ${GEODE_TEST_DEPENDENCIES})
-    foreach(dependency ${GEODE_TEST_DEPENDENCIES})
-        list(APPEND directories $<TARGET_FILE_DIR:${dependency}>)
-    endforeach()
+    _find_dependency_directories(directories projects ${GEODE_TEST_DEPENDENCIES})
     if(WIN32)
         list(JOIN directories "\\;" directories)
-        set_property(
-            TEST
-                ${test_name}
-            APPEND
-            PROPERTY
-                ENVIRONMENT "PYTHONPATH=${directories}\\;$ENV{PYTHONPATH}"
+        set_tests_properties(${test_name}
+            PROPERTIES
+                ENVIRONMENT "Path=${directories}\\;$ENV{Path};PYTHONPATH=${directories}\\;$ENV{PYTHONPATH}"
         )
     else()
         list(JOIN directories ":" directories)
-        set_property(
-            TEST
-                ${test_name}
-            APPEND
-            PROPERTY
-                ENVIRONMENT "PYTHONPATH=${directories}:$ENV{PYTHONPATH}"
+        set_tests_properties(${test_name}
+            PROPERTIES
+                ENVIRONMENT "LD_LIBRARY_PATH=${directories}:$ENV{LD_LIBRARY_PATH};PYTHONPATH=${directories}:$ENV{PYTHONPATH}"
         )
     endif()
+endfunction()
+
+function(add_geode_python_wheel)
+    cmake_parse_arguments(GEODE_WHEEL
+        "SUPERBUILD"
+        "NAME;DESCRIPTION;LICENSE"
+        "MODULES"
+        ${ARGN}
+    )
+    set(wheel_output_directory "${PROJECT_BINARY_DIR}/wheel/${project_name}")
+    set(wheel_init "${wheel_output_directory}/__init__.py")
+    if(${GEODE_WHEEL_SUPERBUILD})
+        if(WIN32)
+            set(wheel_build_directory "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}")
+    else()
+            set(wheel_build_directory "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+        endif()
+    else()
+        if(WIN32)
+            set(wheel_build_directory "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}")
+        else()
+            set(wheel_build_directory "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
+        endif()
+    endif()
+    set(wheel_import "${wheel_build_directory}/${project_name}.py")
+    set(header "# Copyright (c) 2019 - 2023 Geode-solutions\n\n")
+    file(WRITE ${wheel_init} "#${header}")
+    file(WRITE ${wheel_import} "${header}")
+    foreach(module ${GEODE_WHEEL_MODULES})
+        string(REPLACE ".py" "" module_name "${module}")
+        file(APPEND ${wheel_init} "from .${module_name} import *\n")
+        file(APPEND ${wheel_import} "from ${module_name} import *\n")
+        configure_file("${module}" "${wheel_output_directory}/${module}" COPYONLY)
+        file(READ "${module}" FILE_CONTENTS)
+        string(REPLACE "from .${project_name}" "from ${project_name}" FILE_CONTENTS "${FILE_CONTENTS}")
+        file(WRITE "${wheel_build_directory}/${module}" ${FILE_CONTENTS})
+    endforeach()
+    configure_file("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/OpenGeodeModule-setup.py.in" "${wheel_output_directory}/../setup.py")
+    add_custom_target(wheel
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${wheel_build_directory}" "${wheel_output_directory}"
+        COMMAND ${PYTHON_EXECUTABLE} setup.py bdist_wheel
+        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/wheel
+    )
 endfunction()
