@@ -67,9 +67,23 @@ namespace geode
     }
 
     template < index_t dimension >
+    Surfaces< dimension >& Surfaces< dimension >::operator=(
+        Surfaces< dimension >&& other )
+    {
+        impl_ = std::move( other.impl_ );
+        return *this;
+    }
+
+    template < index_t dimension >
     index_t Surfaces< dimension >::nb_surfaces() const
     {
         return impl_->nb_components();
+    }
+
+    template < index_t dimension >
+    bool Surfaces< dimension >::has_surface( const uuid& id ) const
+    {
+        return impl_->has_component( id );
     }
 
     template < index_t dimension >

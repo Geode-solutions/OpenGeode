@@ -113,6 +113,12 @@ namespace geode
     {
     }
 
+    Identifier& Identifier::operator=( Identifier&& other )
+    {
+        impl_ = std::move( other.impl_ );
+        return *this;
+    }
+
     const uuid& Identifier::id() const
     {
         return impl_->id();

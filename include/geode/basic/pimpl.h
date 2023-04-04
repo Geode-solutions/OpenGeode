@@ -42,6 +42,7 @@ namespace geode
         explicit PImpl( Args &&... );
         PImpl( PImpl< T > && );
         ~PImpl();
+        PImpl< T > &operator=( PImpl< T > && );
         void reset();
         T *operator->();
         const T *operator->() const;

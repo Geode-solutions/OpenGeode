@@ -90,6 +90,8 @@ namespace geode
 
         index_t nb_corners() const;
 
+        bool has_corner( const uuid& id ) const;
+
         /*!
          * Access to an unmodifiable Corner by its unique index
          */
@@ -105,6 +107,8 @@ namespace geode
     protected:
         Corners();
         Corners( Corners&& );
+
+        Corners& operator=( Corners&& other );
 
     private:
         class ModifiableCornerRange : public CornerRangeBase,

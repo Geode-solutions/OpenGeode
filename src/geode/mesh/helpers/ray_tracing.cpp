@@ -317,7 +317,8 @@ namespace geode
     {
     }
 
-    RayTracing3D::RayTracing3D( RayTracing3D&& other ) : impl_{ *other.impl_ }
+    RayTracing3D::RayTracing3D( RayTracing3D&& other )
+        : impl_{ std::move( other.impl_ ) }
     {
     }
 

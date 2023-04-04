@@ -91,6 +91,8 @@ namespace geode
 
         index_t nb_blocks() const;
 
+        bool has_block( const uuid& id ) const;
+
         /*!
          * Access to an unmodifiable Block by its unique index
          */
@@ -106,6 +108,8 @@ namespace geode
     protected:
         Blocks();
         Blocks( Blocks&& );
+
+        Blocks& operator=( Blocks&& other );
 
     private:
         class ModifiableBlockRange : public BlockRangeBase,

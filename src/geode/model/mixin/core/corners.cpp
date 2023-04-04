@@ -60,6 +60,20 @@ namespace geode
     }
 
     template < index_t dimension >
+    Corners< dimension >& Corners< dimension >::operator=(
+        Corners< dimension >&& other )
+    {
+        impl_ = std::move( other.impl_ );
+        return *this;
+    }
+
+    template < index_t dimension >
+    bool Corners< dimension >::has_corner( const uuid& id ) const
+    {
+        return impl_->has_component( id );
+    }
+
+    template < index_t dimension >
     index_t Corners< dimension >::nb_corners() const
     {
         return impl_->nb_components();

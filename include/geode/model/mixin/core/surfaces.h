@@ -81,6 +81,8 @@ namespace geode
 
         index_t nb_surfaces() const;
 
+        bool has_surface( const uuid& id ) const;
+
         const Surface< dimension >& surface( const uuid& id ) const;
 
         SurfaceRange surfaces() const;
@@ -90,6 +92,8 @@ namespace geode
     protected:
         Surfaces();
         Surfaces( Surfaces&& );
+
+        Surfaces& operator=( Surfaces&& other );
 
     private:
         class ModifiableSurfaceRange : public SurfaceRangeBase,
