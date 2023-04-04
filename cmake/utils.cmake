@@ -444,15 +444,16 @@ function(add_geode_python_wheel)
     foreach(module ${GEODE_WHEEL_MODULES})
         string(REPLACE ".py" "" module_name "${module}")
         file(APPEND ${wheel_init} "from .${module_name} import *\n")
-        file(APPEND ${wheel_import} "from ${module_name} import *\n")
+        file(APPEND ${wheel_import} "from ${project_name}_${module_name} import *\n")
         configure_file("${module}" "${wheel_output_directory}/${module}" COPYONLY)
         file(READ "${module}" FILE_CONTENTS)
         string(REPLACE "from .${project_name}" "from ${project_name}" FILE_CONTENTS "${FILE_CONTENTS}")
-        file(WRITE "${wheel_build_directory}/${module}" ${FILE_CONTENTS})
+        file(WRITE "${wheel_build_directory}/${project_name}_${module}" ${FILE_CONTENTS})
     endforeach()
     configure_file("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/OpenGeodeModule-setup.py.in" "${wheel_output_directory}/../setup.py")
     add_custom_target(wheel
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${wheel_build_directory}" "${wheel_output_directory}"
+        COMMAND ${CMAKE_COMMAND} -E remove "${wheel_output_directory}/${project_name}*.py"
         COMMAND ${PYTHON_EXECUTABLE} setup.py bdist_wheel
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/wheel
     )
