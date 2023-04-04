@@ -454,15 +454,15 @@ namespace geode
 
     template < index_t dimension >
     BoundingBox< dimension >::BoundingBox( BoundingBox&& other ) noexcept
+        : impl_{ std::move( other.impl_ ) }
     {
-        *impl_ = std::move( *other.impl_ );
     }
 
     template < index_t dimension >
     BoundingBox< dimension >& BoundingBox< dimension >::operator=(
         BoundingBox&& other ) noexcept
     {
-        *impl_ = std::move( *other.impl_ );
+        impl_ = std::move( other.impl_ );
         return *this;
     }
 

@@ -81,6 +81,8 @@ namespace geode
 
         index_t nb_lines() const;
 
+        bool has_line( const uuid& id ) const;
+
         const Line< dimension >& line( const uuid& id ) const;
 
         LineRange lines() const;
@@ -90,6 +92,8 @@ namespace geode
     protected:
         Lines();
         Lines( Lines&& );
+
+        Lines& operator=( Lines&& other );
 
     private:
         class ModifiableLineRange : public LineRangeBase,

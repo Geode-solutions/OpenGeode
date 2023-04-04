@@ -46,6 +46,13 @@ namespace geode
     }
 
     template < typename T >
+    PImpl< T >& PImpl< T >::operator=( PImpl< T >&& other )
+    {
+        pimpl_ = std::move( other.pimpl_ );
+        return *this;
+    }
+
+    template < typename T >
     void PImpl< T >::reset()
     {
         return pimpl_.reset();

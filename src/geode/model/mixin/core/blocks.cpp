@@ -67,9 +67,22 @@ namespace geode
     }
 
     template < index_t dimension >
+    auto Blocks< dimension >::operator=( Blocks&& other ) -> Blocks&
+    {
+        impl_ = std::move( other.impl_ );
+        return *this;
+    }
+
+    template < index_t dimension >
     index_t Blocks< dimension >::nb_blocks() const
     {
         return impl_->nb_components();
+    }
+
+    template < index_t dimension >
+    bool Blocks< dimension >::has_block( const uuid& id ) const
+    {
+        return impl_->has_component( id );
     }
 
     template < index_t dimension >

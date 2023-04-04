@@ -60,9 +60,23 @@ namespace geode
     }
 
     template < index_t dimension >
+    Lines< dimension >& Lines< dimension >::operator=(
+        Lines< dimension >&& other )
+    {
+        impl_ = std::move( other.impl_ );
+        return *this;
+    }
+
+    template < index_t dimension >
     index_t Lines< dimension >::nb_lines() const
     {
         return impl_->nb_components();
+    }
+
+    template < index_t dimension >
+    bool Lines< dimension >::has_line( const uuid& id ) const
+    {
+        return impl_->has_component( id );
     }
 
     template < index_t dimension >

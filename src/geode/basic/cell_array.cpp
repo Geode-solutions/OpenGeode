@@ -140,7 +140,7 @@ namespace geode
     template < index_t dimension >
     auto CellArray< dimension >::operator=( CellArray&& other ) -> CellArray&
     {
-        *impl_ = std::move( *other.impl_ );
+        impl_ = std::move( other.impl_ );
         return *this;
     }
 

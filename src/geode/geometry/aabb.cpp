@@ -154,7 +154,7 @@ namespace geode
     template < index_t dimension >
     AABBTree< dimension >& AABBTree< dimension >::operator=( AABBTree&& other )
     {
-        *impl_ = std::move( *other.impl_ );
+        impl_ = std::move( other.impl_ );
         return *this;
     }
 

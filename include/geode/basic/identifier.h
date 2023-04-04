@@ -62,6 +62,8 @@ namespace geode
     protected:
         Identifier();
 
+        Identifier& operator=( Identifier&& other );
+
         void set_id( uuid id );
 
         void set_name( absl::string_view name );

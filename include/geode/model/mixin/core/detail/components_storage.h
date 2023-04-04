@@ -62,6 +62,11 @@ namespace geode
                 return components_.size();
             }
 
+            bool has_component( const uuid& id ) const
+            {
+                return components_.contains( id );
+            }
+
             const Component& component( const uuid& id ) const
             {
                 return *components_.at( id );
