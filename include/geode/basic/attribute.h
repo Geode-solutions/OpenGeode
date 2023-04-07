@@ -61,7 +61,6 @@ namespace geode
     public:
         PASSKEY( AttributeManager, AttributeKey );
 
-    public:
         virtual ~AttributeBase() = default;
 
         virtual float generic_value( index_t element ) const = 0;
@@ -78,6 +77,11 @@ namespace geode
         const AttributeProperties& properties() const
         {
             return properties_;
+        }
+
+        void set_properties( AttributeProperties new_properties )
+        {
+            properties_ = std::move( new_properties );
         }
 
     public:
@@ -128,11 +132,6 @@ namespace geode
         AttributeBase( AttributeProperties properties )
             : properties_( std::move( properties ) )
         {
-        }
-
-        void set_properties( AttributeProperties new_properties )
-        {
-            properties_ = std::move( new_properties );
         }
 
     private:
@@ -365,6 +364,11 @@ namespace geode
             modifier( values_[element] );
         }
 
+        index_t size() const
+        {
+            return values_.size();
+        }
+
     public:
         void compute_value( index_t from_element,
             index_t to_element,
@@ -378,11 +382,6 @@ namespace geode
             AttributeBase::AttributeKey ) override
         {
             set_value( to_element, interpolation.compute_value( *this ) );
-        }
-
-        void set_properties( AttributeProperties new_properties )
-        {
-            AttributeBase::set_properties( std::move( new_properties ) );
         }
 
     protected:
@@ -534,6 +533,11 @@ namespace geode
         void modify_value( index_t element, Modifier&& modifier )
         {
             modifier( reinterpret_cast< bool& >( values_[element] ) );
+        }
+
+        index_t size() const
+        {
+            return values_.size();
         }
 
     public:
