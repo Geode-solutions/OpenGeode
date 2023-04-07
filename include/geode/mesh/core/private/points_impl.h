@@ -53,6 +53,11 @@ namespace geode
                 points_->set_value( vertex_id, std::move( point ) );
             }
 
+            index_t nb_points() const
+            {
+                return points_->size();
+            }
+
             template < typename Mesh >
             void initialize_crs( Mesh& mesh )
             {
