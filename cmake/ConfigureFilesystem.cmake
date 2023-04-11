@@ -22,6 +22,9 @@ set(FILESYSTEM_PATH ${PROJECT_BINARY_DIR}/third_party/ghcFilesystem)
 set(FILESYSTEM_INSTALL_PREFIX ${FILESYSTEM_PATH}/install)
 ExternalProject_Add(ghcFilesystem
     PREFIX ${FILESYSTEM_PATH}
+    SOURCE_DIR ${FILESYSTEM_PATH}/src
+    BINARY_DIR ${FILESYSTEM_PATH}/build
+    STAMP_DIR ${FILESYSTEM_PATH}/stamp
     GIT_REPOSITORY https://github.com/gulrak/filesystem
     GIT_TAG f437344e7945e343d86fcf97c84e815b03c6851f
     GIT_PROGRESS ON

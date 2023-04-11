@@ -22,6 +22,9 @@ set(NANOFLANN_PATH ${PROJECT_BINARY_DIR}/third_party/nanoflann)
 set(NANOFLANN_INSTALL_PREFIX ${NANOFLANN_PATH}/install)
 ExternalProject_Add(nanoflann
     PREFIX ${NANOFLANN_PATH}
+    SOURCE_DIR ${NANOFLANN_PATH}/src
+    BINARY_DIR ${NANOFLANN_PATH}/build
+    STAMP_DIR ${NANOFLANN_PATH}/stamp
     GIT_REPOSITORY https://github.com/jlblancoc/nanoflann
     GIT_TAG v1.3.2
     GIT_PROGRESS ON

@@ -23,6 +23,9 @@ set(GDAL_INSTALL_PREFIX ${GDAL_PATH}/install)
 set(GDAL_CMAKE_PREFIX_PATH ${PROJ_INSTALL_PREFIX} ${SQLITE_INSTALL_PREFIX})
 ExternalProject_Add(gdal
     PREFIX ${GDAL_PATH}
+    SOURCE_DIR ${GDAL_PATH}/src
+    BINARY_DIR ${GDAL_PATH}/build
+    STAMP_DIR ${GDAL_PATH}/stamp
     GIT_REPOSITORY https://github.com/Geode-solutions/gdal
     GIT_TAG 5c939ee0750f57e3261e211ed1658701e83feba8
     GIT_PROGRESS ON

@@ -22,7 +22,9 @@ set(MINIZIP_PATH ${PROJECT_BINARY_DIR}/third_party/minizip)
 set(MINIZIP_INSTALL_PREFIX ${MINIZIP_PATH}/install)
 ExternalProject_Add(minizip
     PREFIX ${MINIZIP_PATH}
-    BINARY_DIR ${MINIZIP_PATH}/src/minizip
+    SOURCE_DIR ${MINIZIP_PATH}/src
+    BINARY_DIR ${MINIZIP_PATH}/build
+    STAMP_DIR ${MINIZIP_PATH}/stamp
     GIT_REPOSITORY https://github.com/nmoinvaz/minizip
     GIT_TAG f3d400e999056ca290998b3fd89cc5a74e4b8b58
     GIT_PROGRESS ON

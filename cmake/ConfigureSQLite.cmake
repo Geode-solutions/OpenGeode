@@ -22,6 +22,9 @@ set(SQLITE_PATH ${PROJECT_BINARY_DIR}/third_party/sqlite)
 set(SQLITE_INSTALL_PREFIX ${SQLITE_PATH}/install)
 ExternalProject_Add(sqlite
     PREFIX ${SQLITE_PATH}
+    SOURCE_DIR ${SQLITE_PATH}/src
+    BINARY_DIR ${SQLITE_PATH}/build
+    STAMP_DIR ${SQLITE_PATH}/stamp
     GIT_REPOSITORY https://github.com/Geode-solutions/sqlite-amalgamation
     GIT_TAG e22d590f9af3e8cf8e61b9967ef447e29ef5c099
     GIT_PROGRESS ON

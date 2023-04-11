@@ -22,6 +22,9 @@ set(SPDLOG_PATH ${PROJECT_BINARY_DIR}/third_party/spdlog)
 set(SPDLOG_INSTALL_PREFIX ${SPDLOG_PATH}/install)
 ExternalProject_Add(spdlog
     PREFIX ${SPDLOG_PATH}
+    SOURCE_DIR ${SPDLOG_PATH}/src
+    BINARY_DIR ${SPDLOG_PATH}/build
+    STAMP_DIR ${SPDLOG_PATH}/stamp
     GIT_REPOSITORY https://github.com/gabime/spdlog
     GIT_TAG 2f2d04b3e840428a18942ca2d3d65203ec564647
     GIT_PROGRESS ON
