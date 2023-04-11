@@ -22,6 +22,9 @@ set(PROJ_PATH ${PROJECT_BINARY_DIR}/third_party/proj)
 set(PROJ_INSTALL_PREFIX ${PROJ_PATH}/install)
 ExternalProject_Add(proj
     PREFIX ${PROJ_PATH}
+    SOURCE_DIR ${PROJ_PATH}/src
+    BINARY_DIR ${PROJ_PATH}/build
+    STAMP_DIR ${PROJ_PATH}/stamp
     GIT_REPOSITORY https://github.com/Geode-solutions/proj
     GIT_TAG e169e108cbcac62c69e730c1158995d2dfdc23c7
     GIT_PROGRESS ON

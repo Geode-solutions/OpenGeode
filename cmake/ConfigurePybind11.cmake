@@ -22,6 +22,9 @@ set(PYBIND11_PATH ${PROJECT_BINARY_DIR}/third_party/pybind11)
 set(PYBIND11_INSTALL_PREFIX ${PYBIND11_PATH}/install)
 ExternalProject_Add(pybind11
     PREFIX ${PYBIND11_PATH}
+    SOURCE_DIR ${PYBIND11_PATH}/src
+    BINARY_DIR ${PYBIND11_PATH}/build
+    STAMP_DIR ${PYBIND11_PATH}/stamp
     GIT_REPOSITORY https://github.com/pybind/pybind11
     GIT_TAG 2dd52544942be4bef80811ef18c8fcf1d3c7e246
     GIT_PROGRESS ON

@@ -22,6 +22,9 @@ set(ABSEIL_PATH ${PROJECT_BINARY_DIR}/third_party/abseil)
 set(ABSEIL_INSTALL_PREFIX ${ABSEIL_PATH}/install)
 ExternalProject_Add(abseil
     PREFIX ${ABSEIL_PATH}
+    SOURCE_DIR ${ABSEIL_PATH}/src
+    BINARY_DIR ${ABSEIL_PATH}/build
+    STAMP_DIR ${ABSEIL_PATH}/stamp
     GIT_REPOSITORY https://github.com/Geode-solutions/abseil-cpp
     GIT_TAG 2b4b4fa49aeaa07be934d7b4bddd183d6f850bcb
     GIT_PROGRESS ON

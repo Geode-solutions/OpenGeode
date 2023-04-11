@@ -22,6 +22,9 @@ set(BITSERY_PATH ${PROJECT_BINARY_DIR}/third_party/bitsery)
 set(BITSERY_INSTALL_PREFIX ${BITSERY_PATH}/install)
 ExternalProject_Add(bitsery
     PREFIX ${BITSERY_PATH}
+    SOURCE_DIR ${BITSERY_PATH}/src
+    BINARY_DIR ${BITSERY_PATH}/build
+    STAMP_DIR ${BITSERY_PATH}/stamp
     GIT_REPOSITORY https://github.com/Geode-solutions/bitsery
     GIT_TAG bf5d1fb305b86730021418df572228f60369f499
     GIT_PROGRESS ON
