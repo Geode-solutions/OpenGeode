@@ -349,6 +349,16 @@ void test_attribute_types( geode::AttributeManager& manager )
         "[Test] Returned attribute type is not correct (should be undefined)" );
 }
 
+void test_attribute_rename( geode::AttributeManager& manager )
+{
+    manager.rename_attribute( "foo_cst", "foo_constant" );
+    auto constant_attribute =
+        manager.find_or_create_attribute< geode::ConstantAttribute, Foo >(
+            "foo_constant", Foo{} );
+    OPENGEODE_EXCEPTION( constant_attribute->value().double_ == 12.4,
+        "[Test] Should be equal to 12.4" );
+}
+
 void test_number_of_attributes(
     geode::AttributeManager& manager, geode::index_t nb )
 {
@@ -502,6 +512,7 @@ void test()
     test_copy_manager( manager );
     test_import_manager( manager );
     test_attribute_types( manager );
+    test_attribute_rename( manager );
     test_number_of_attributes( manager, 8 );
     manager.delete_attribute( "bool" );
     test_number_of_attributes( manager, 7 );

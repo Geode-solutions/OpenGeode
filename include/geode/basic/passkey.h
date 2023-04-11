@@ -57,7 +57,7 @@ namespace geode
         friend T;
 
     private:
-        PassKey(){};
+        PassKey() = default;
     };
 
 #define PASSKEY( Friend, Key ) using Key = geode::PassKey< Friend >

@@ -52,13 +52,13 @@ namespace geode
 
         void register_attribute( std::shared_ptr< AttributeBase > &attribute,
             absl::string_view name,
-            AttributeBase::AttributeKey key )
+            const AttributeBase::AttributeKey &key )
         {
             attribute->resize( nb_elements_, key );
             attributes_.emplace( name, attribute );
         }
 
-        void resize( index_t size, AttributeBase::AttributeKey key )
+        void resize( index_t size, const AttributeBase::AttributeKey &key )
         {
             if( size == nb_elements_ )
             {
@@ -71,7 +71,7 @@ namespace geode
             }
         }
 
-        void reserve( index_t capacity, AttributeBase::AttributeKey key )
+        void reserve( index_t capacity, const AttributeBase::AttributeKey &key )
         {
             if( capacity <= nb_elements_ )
             {
@@ -85,7 +85,7 @@ namespace geode
 
         void assign_attribute_value( index_t from_element,
             index_t to_element,
-            AttributeBase::AttributeKey key )
+            const AttributeBase::AttributeKey &key )
         {
             for( auto &it : attributes_ )
             {
@@ -99,7 +99,7 @@ namespace geode
         void interpolate_attribute_value(
             const AttributeLinearInterpolation &interpolation,
             index_t to_element,
-            AttributeBase::AttributeKey key )
+            const AttributeBase::AttributeKey &key )
         {
             for( auto &it : attributes_ )
             {
@@ -176,7 +176,7 @@ namespace geode
             nb_elements_ = 0;
         }
 
-        void clear_attributes( AttributeBase::AttributeKey key )
+        void clear_attributes( const AttributeBase::AttributeKey &key )
         {
             for( auto &it : attributes_ )
             {
@@ -186,7 +186,7 @@ namespace geode
         }
 
         void delete_elements( const std::vector< bool > &to_delete,
-            AttributeBase::AttributeKey key )
+            const AttributeBase::AttributeKey &key )
         {
             for( auto &it : attributes_ )
             {
@@ -197,7 +197,7 @@ namespace geode
         }
 
         void permute_elements( absl::Span< const index_t > permutation,
-            AttributeBase::AttributeKey key )
+            const AttributeBase::AttributeKey &key )
         {
             for( auto &it : attributes_ )
             {
@@ -211,7 +211,7 @@ namespace geode
         }
 
         void copy( const AttributeManager::Impl &attribute_manager,
-            AttributeBase::AttributeKey key )
+            const AttributeBase::AttributeKey &key )
         {
             nb_elements_ = attribute_manager.nb_elements_;
             for( const auto &attribute : attribute_manager.attributes_ )
@@ -240,7 +240,7 @@ namespace geode
 
         void import( const AttributeManager::Impl &attribute_manager,
             absl::Span< const index_t > old2new,
-            AttributeBase::AttributeKey key )
+            const AttributeBase::AttributeKey &key )
         {
             for( const auto &attribute : attribute_manager.attributes_ )
             {
@@ -251,6 +251,28 @@ namespace geode
                                              old2new, nb_elements_, key ) );
                 }
             }
+        }
+
+        void initialize_attribute_names(
+            const AttributeBase::AttributeKey &key )
+        {
+            for( auto &attribute : attributes_ )
+            {
+                attribute.second->set_name( attribute.first, key );
+            }
+        }
+
+        void rename_attribute( absl::string_view old_name,
+            absl::string_view new_name,
+            const AttributeBase::AttributeKey &key )
+        {
+            const auto it = attributes_.find( old_name );
+            OPENGEODE_EXCEPTION( it != attributes_.end(),
+                "[AttributeManager::rename_attribute] Attribute ", old_name,
+                "does not exist" );
+            it->second->set_name( new_name, key );
+            attributes_.emplace( new_name, it->second );
+            attributes_.erase( it );
         }
 
         template < typename Archive >
@@ -393,14 +415,25 @@ namespace geode
         impl_->import( *attribute_manager.impl_, old2new, {} );
     }
 
+    void AttributeManager::rename_attribute(
+        absl::string_view old_name, absl::string_view new_name )
+    {
+        impl_->rename_attribute( old_name, new_name, {} );
+    }
+
     template < typename Archive >
     void AttributeManager::serialize( Archive &archive )
     {
-        archive.ext(
-            *this, Growable< Archive, AttributeManager >{
-                       { []( Archive &a, AttributeManager &attribute_manager ) {
-                           a.object( attribute_manager.impl_ );
-                       } } } );
+        archive.ext( *this,
+            Growable< Archive, AttributeManager >{
+                { []( Archive &a, AttributeManager &attribute_manager ) {
+                     a.object( attribute_manager.impl_ );
+                     const AttributeBase::AttributeKey key;
+                     attribute_manager.impl_->initialize_attribute_names( key );
+                 },
+                    []( Archive &a, AttributeManager &attribute_manager ) {
+                        a.object( attribute_manager.impl_ );
+                    } } } );
     }
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_basic_api, AttributeManager );

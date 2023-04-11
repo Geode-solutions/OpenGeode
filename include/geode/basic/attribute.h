@@ -74,6 +74,11 @@ namespace geode
 
         virtual absl::string_view type() = 0;
 
+        absl::string_view name() const
+        {
+            return name_;
+        }
+
         const AttributeProperties& properties() const
         {
             return properties_;
@@ -85,6 +90,11 @@ namespace geode
         }
 
     public:
+        void set_name( absl::string_view name, AttributeKey )
+        {
+            name_ = to_string( name );
+        }
+
         virtual std::shared_ptr< AttributeBase > clone(
             AttributeKey ) const = 0;
 
@@ -124,8 +134,13 @@ namespace geode
             archive.ext(
                 *this, Growable< Archive, AttributeBase >{
                            { []( Archive& a, AttributeBase& attribute ) {
-                               a.object( attribute.properties_ );
-                           } } } );
+                                a.object( attribute.properties_ );
+                            },
+                               []( Archive& a, AttributeBase& attribute ) {
+                                   a.object( attribute.properties_ );
+                                   a.text1b( attribute.name_,
+                                       attribute.name_.max_size() );
+                               } } } );
         }
 
     protected:
@@ -136,6 +151,7 @@ namespace geode
 
     private:
         AttributeProperties properties_;
+        std::string name_;
     };
 
     /*!
