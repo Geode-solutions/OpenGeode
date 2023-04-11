@@ -65,7 +65,7 @@ namespace geode
 
         index_t nb_points() const;
 
-    private:
+    protected:
         AttributeCoordinateReferenceSystem();
 
         template < typename Archive >
