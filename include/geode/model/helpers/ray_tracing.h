@@ -42,7 +42,7 @@ namespace geode
     using BoundarySurfaceIntersections = absl::flat_hash_map< uuid,
         std::vector< RayTracing3D::PolygonDistance > >;
 
-    BoundarySurfaceIntersections opengeode_mesh_api
+    BoundarySurfaceIntersections opengeode_model_api
         find_intersections_with_boundaries( const InfiniteLine3D& infinite_line,
             const BRep& brep,
             const Block3D& block );
