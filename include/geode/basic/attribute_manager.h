@@ -192,6 +192,9 @@ namespace geode
          */
         absl::string_view attribute_type( absl::string_view name ) const;
 
+        void rename_attribute(
+            absl::string_view old_name, absl::string_view new_name );
+
         /*!
          * Remove all the attributes in the manager
          */
