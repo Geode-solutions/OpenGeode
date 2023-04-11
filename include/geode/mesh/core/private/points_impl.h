@@ -58,6 +58,11 @@ namespace geode
                 return points_->size();
             }
 
+            absl::string_view attribute_name() const
+            {
+                return points_->name();
+            }
+
             template < typename Mesh >
             void initialize_crs( Mesh& mesh )
             {

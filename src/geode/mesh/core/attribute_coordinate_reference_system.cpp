@@ -103,6 +103,19 @@ namespace geode
     }
 
     template < index_t dimension >
+    absl::string_view
+        AttributeCoordinateReferenceSystem< dimension >::attribute_name() const
+    {
+        return impl_->attribute_name();
+    }
+
+    template < index_t dimension >
+    index_t AttributeCoordinateReferenceSystem< dimension >::nb_points() const
+    {
+        return impl_->nb_points();
+    }
+
+    template < index_t dimension >
     template < typename Archive >
     void AttributeCoordinateReferenceSystem< dimension >::serialize(
         Archive& archive )
