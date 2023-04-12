@@ -52,7 +52,7 @@ setup(
     url='https://github.com/Geode-solutions/${PROJECT_NAME}',
     packages=['${project_name}'],
     package_data={
-        '${project_name}': ['*.so', '*.dll', '*.pyd']
+        '${project_name}': ['*/*.so', '*/*.dll', '*/*.pyd', 'share/*/*.db']
     },
     license='${GEODE_WHEEL_LICENSE}',
     zip_safe=False,
