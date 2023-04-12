@@ -63,7 +63,6 @@ OpenGeode is an open source framework for representing and manipulating geometri
 [Geode-version]: https://img.shields.io/github/release/Geode-solutions/GeodePackage.svg
 
 ## Documentation
-
 Code and API are fully documented inside the code itself.
 To check out our live documentation, visit [docs.geode-solutions.com](https://docs.geode-solutions.com).
 
@@ -77,12 +76,10 @@ For questions and support please use the official [slack](https://opengeode-slac
 
 
 ## Changelog
-
 Detailed changes for each release are documented in the [release notes](https://github.com/Geode-solutions/OpenGeode/releases).
 
 
 ## License
-
 [MIT](https://opensource.org/licenses/MIT)
 
 Copyright (c) 2019 - 2023, Geode-solutions
