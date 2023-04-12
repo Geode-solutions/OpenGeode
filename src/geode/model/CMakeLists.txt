@@ -69,7 +69,9 @@ add_geode_library(
         "representation/io/brep_output.cpp"
         "representation/io/section_output.cpp"
         "representation/io/geode/geode_brep_input.cpp"
+        "representation/io/geode/geode_brep_output.cpp"
         "representation/io/geode/geode_section_input.cpp"
+        "representation/io/geode/geode_section_output.cpp"
     PUBLIC_HEADERS
         "common.h"
         "helpers/aabb_model_helpers.h"

@@ -97,7 +97,7 @@ namespace geode
                 std::ofstream file{ to_string( filename ),
                     std::ofstream::binary };
                 TContext context{};
-                register_librairies_in_serialize_pcontext( context );
+                register_libraries_in_serialize_pcontext( context );
                 Serializer archive{ context, file };
                 archive.object( *this );
                 archive.adapter().flush();
@@ -121,7 +121,7 @@ namespace geode
                 std::ifstream file{ to_string( filename ),
                     std::ifstream::binary };
                 TContext context{};
-                register_librairies_in_deserialize_pcontext( context );
+                register_libraries_in_deserialize_pcontext( context );
                 Deserializer archive{ context, file };
                 archive.object( *this );
                 const auto& adapter = archive.adapter();
@@ -154,7 +154,7 @@ namespace geode
             }
 
         protected:
-            virtual void register_librairies_in_serialize_pcontext(
+            virtual void register_libraries_in_serialize_pcontext(
                 TContext& context ) const
             {
                 register_basic_serialize_pcontext( std::get< 0 >( context ) );
@@ -164,7 +164,7 @@ namespace geode
                 register_model_serialize_pcontext( std::get< 0 >( context ) );
             }
 
-            virtual void register_librairies_in_deserialize_pcontext(
+            virtual void register_libraries_in_deserialize_pcontext(
                 TContext& context ) const
             {
                 register_basic_deserialize_pcontext( std::get< 0 >( context ) );

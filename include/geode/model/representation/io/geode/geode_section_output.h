@@ -23,15 +23,13 @@
 
 #pragma once
 
-#include <async++.h>
-
-#include <ghc/filesystem.hpp>
-
-#include <geode/basic/uuid.h>
-#include <geode/basic/zip_file.h>
-
 #include <geode/model/representation/core/section.h>
 #include <geode/model/representation/io/section_output.h>
+
+namespace geode
+{
+    class ZipFile;
+}
 
 namespace geode
 {
@@ -49,42 +47,10 @@ namespace geode
         }
 
         void save_section_files(
-            const Section& section, absl::string_view directory ) const
-        {
-            async::parallel_invoke(
-                [&directory, &section] {
-                    section.save_identifier( directory );
-                },
-                [&directory, &section] {
-                    section.save_relationships( directory );
-                },
-                [&directory, &section] {
-                    section.save_unique_vertices( directory );
-                },
-                [&directory, &section] {
-                    section.save_corners( directory );
-                    section.save_lines( directory );
-                    section.save_surfaces( directory );
-                },
-                [&directory, &section] {
-                    section.save_model_boundaries( directory );
-                } );
-        }
+            const Section& section, absl::string_view directory ) const;
 
-        void archive_section_files( const ZipFile& zip_writer ) const
-        {
-            for( const auto& file :
-                ghc::filesystem::directory_iterator( zip_writer.directory() ) )
-            {
-                zip_writer.archive_file( file.path().string() );
-            }
-        }
+        void archive_section_files( const ZipFile& zip_writer ) const;
 
-        void write( const Section& section ) const final
-        {
-            const ZipFile zip_writer{ filename(), uuid{}.string() };
-            save_section_files( section, zip_writer.directory() );
-            archive_section_files( zip_writer );
-        }
+        void write( const Section& section ) const final;
     };
 } // namespace geode
