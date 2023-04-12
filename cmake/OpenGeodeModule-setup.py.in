@@ -41,6 +41,12 @@ class InstallPlatlib(install):
 with open(path.join('${CMAKE_SOURCE_DIR}', 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
+try:
+    with open('${CMAKE_SOURCE_DIR}/bindings/python/requirements.txt') as f:
+        install_requires = f.read().strip().split('\n')
+except FileNotFoundError:
+    install_requires=""
+
 setup(
     name='${GEODE_WHEEL_NAME}',
     version='${WHEEL_VERSION}',
@@ -54,6 +60,7 @@ setup(
     package_data={
         '${project_name}': ['*/*.so', '*/*.dll', '*/*.pyd', 'share/*/*.db']
     },
+    install_requires=install_requires,
     license='${GEODE_WHEEL_LICENSE}',
     zip_safe=False,
     distclass=BinaryDistribution,
