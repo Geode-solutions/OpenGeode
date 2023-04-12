@@ -45,6 +45,8 @@ install(
         ${PROJ_INSTALL_PREFIX}/
     DESTINATION
         .
+    COMPONENT
+        public
 )
 if(NOT BUILD_SHARED_LIBS)
     install(
@@ -55,6 +57,8 @@ if(NOT BUILD_SHARED_LIBS)
             ${SQLITE_INSTALL_PREFIX}/
         DESTINATION
             .
+        COMPONENT
+            public
     )
 endif()
 
@@ -65,12 +69,16 @@ if(OPENGEODE_WITH_PYTHON OR INCLUDE_PYBIND11)
             ${PYBIND11_INSTALL_PREFIX}/
         DESTINATION
             .
+        COMPONENT
+            public
     )
 endif()
 
 install(
     FILES "${PROJECT_SOURCE_DIR}/cmake/OpenGeodeModule-setup.py.in"
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+    COMPONENT
+        public
 )
 
 # Configure the OpenGeode sources
