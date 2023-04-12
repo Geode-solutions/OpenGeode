@@ -109,6 +109,8 @@ void test_constant_attribute( geode::AttributeManager& manager )
     auto constant_attribute =
         manager.find_or_create_attribute< geode::ConstantAttribute, bool >(
             "bool", true, { true, true } );
+    OPENGEODE_EXCEPTION(
+        constant_attribute->name() == "bool", "[Test] Wrong attribute name" );
     OPENGEODE_EXCEPTION( constant_attribute->default_value() == true,
         "[Test] Wrong default value" );
 

@@ -55,6 +55,7 @@ namespace geode
             const AttributeBase::AttributeKey &key )
         {
             attribute->resize( nb_elements_, key );
+            attribute->set_name( name, key );
             attributes_.emplace( name, attribute );
         }
 
