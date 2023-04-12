@@ -23,15 +23,13 @@
 
 #pragma once
 
-#include <async++.h>
-
-#include <ghc/filesystem.hpp>
-
-#include <geode/basic/uuid.h>
-#include <geode/basic/zip_file.h>
-
 #include <geode/model/representation/core/brep.h>
 #include <geode/model/representation/io/brep_output.h>
+
+namespace geode
+{
+    class ZipFile;
+}
 
 namespace geode
 {
@@ -48,44 +46,11 @@ namespace geode
             return BRep::native_extension_static();
         }
 
-        void archive_brep_files( const ZipFile& zip_writer ) const
-        {
-            for( const auto& file :
-                ghc::filesystem::directory_iterator( zip_writer.directory() ) )
-            {
-                zip_writer.archive_file( file.path().string() );
-            }
-        }
+        void archive_brep_files( const ZipFile& zip_writer ) const;
 
         void save_brep_files(
-            const BRep& brep, absl::string_view directory ) const
-        {
-            async::parallel_invoke(
-                [&directory, &brep] {
-                    brep.save_identifier( directory );
-                },
-                [&directory, &brep] {
-                    brep.save_relationships( directory );
-                },
-                [&directory, &brep] {
-                    brep.save_unique_vertices( directory );
-                },
-                [&directory, &brep] {
-                    brep.save_corners( directory );
-                    brep.save_lines( directory );
-                    brep.save_surfaces( directory );
-                    brep.save_blocks( directory );
-                },
-                [&directory, &brep] {
-                    brep.save_model_boundaries( directory );
-                } );
-        }
+            const BRep& brep, absl::string_view directory ) const;
 
-        void write( const BRep& brep ) const final
-        {
-            const ZipFile zip_writer{ filename(), uuid{}.string() };
-            save_brep_files( brep, zip_writer.directory() );
-            archive_brep_files( zip_writer );
-        }
+        void write( const BRep& brep ) const final;
     };
 } // namespace geode
