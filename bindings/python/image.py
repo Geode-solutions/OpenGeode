@@ -18,5 +18,5 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .opengeode_py_image import *
+from opengeode_py_image import *
 OpenGeodeImage.initialize()
