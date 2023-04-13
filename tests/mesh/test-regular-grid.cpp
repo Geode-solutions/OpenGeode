@@ -459,7 +459,7 @@ void test_grid( const geode::RegularGrid3D& grid )
 
 void test()
 {
-    geode::OpenGeodeMesh::initialize();
+    geode::OpenGeodeMeshLibrary::initialize();
 
     auto grid = geode::RegularGrid3D::create();
     auto builder = geode::RegularGridBuilder3D::create( *grid );

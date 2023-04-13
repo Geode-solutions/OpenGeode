@@ -29,7 +29,7 @@ namespace geode
 {
     OPENGEODE_LIBRARY_IMPLEMENTATION( OpenGeodeGeometry )
     {
-        OpenGeodeBasic::initialize();
+        OpenGeodeBasicLibrary::initialize();
         GEO::PCK::initialize();
     }
 } // namespace geode

@@ -353,7 +353,7 @@ def test_permutation(surface, builder):
 
 
 if __name__ == '__main__':
-    mesh.OpenGeodeMesh.initialize()
+    mesh.OpenGeodeMeshLibrary.initialize()
     polygonal_surface = mesh.PolygonalSurface3D.create()
     if polygonal_surface.is_triangulated_type():
         raise ValueError("[Test] Wrong surface type")

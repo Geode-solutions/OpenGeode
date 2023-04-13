@@ -132,7 +132,7 @@ geode::Section build_section()
 
 void test()
 {
-    geode::OpenGeodeModel::initialize();
+    geode::OpenGeodeModelLibrary::initialize();
     const auto section = build_section();
     const auto surface_edges = geode::component_mesh_edges(
         section, *section.surfaces().begin(), { 1, 0 } );

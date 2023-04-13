@@ -41,7 +41,7 @@
 
 void test()
 {
-    geode::OpenGeodeModel::initialize();
+    geode::OpenGeodeModelLibrary::initialize();
     std::vector< geode::Point3D > points{ { { 0, 0, 0 } }, { { 0, 1, 0 } },
         { { 0, 0, 1 } }, { { -1, 0, -1 } }, { { 1, 0, -1 } } };
 

@@ -281,7 +281,7 @@ void test_texture( const geode::EdgedCurve3D& edged_curve )
 
 void test()
 {
-    geode::OpenGeodeMesh::initialize();
+    geode::OpenGeodeMeshLibrary::initialize();
     auto edged_curve = geode::EdgedCurve3D::create(
         geode::OpenGeodeEdgedCurve3D::impl_name_static() );
     auto builder = geode::EdgedCurveBuilder3D::create( *edged_curve );

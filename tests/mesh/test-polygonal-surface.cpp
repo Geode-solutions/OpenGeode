@@ -591,7 +591,7 @@ void test_texture( const geode::PolygonalSurface3D& polygonal_surface )
 
 void test()
 {
-    geode::OpenGeodeMesh::initialize();
+    geode::OpenGeodeMeshLibrary::initialize();
     auto polygonal_surface = geode::PolygonalSurface3D::create(
         geode::OpenGeodePolygonalSurface3D::impl_name_static() );
     polygonal_surface->enable_edges();

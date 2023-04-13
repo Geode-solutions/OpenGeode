@@ -259,7 +259,7 @@ def test_io(grid, filename):
 
 
 if __name__ == '__main__':
-    mesh.OpenGeodeMesh.initialize()
+    mesh.OpenGeodeMeshLibrary.initialize()
     grid = mesh.RegularGrid3D.create()
     builder = mesh.RegularGridBuilder3D.create(grid)
     builder.initialize_grid(geom.Point3D([1.5, 0, 1]), [

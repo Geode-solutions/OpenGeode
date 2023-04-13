@@ -61,7 +61,7 @@ def check_brep_dangling(brep):
 
 
 if __name__ == '__main__':
-    model.OpenGeodeModel.initialize()
+    model.OpenGeodeModelLibrary.initialize()
     test_dir = os.path.dirname(__file__)
     data_dir = os.path.abspath(os.path.join(
         test_dir, "../../../../tests/data"))

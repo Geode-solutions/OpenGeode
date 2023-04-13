@@ -19,4 +19,4 @@
 # SOFTWARE.
 
 from opengeode_py_image import *
-OpenGeodeImage.initialize()
+OpenGeodeImageLibrary.initialize()

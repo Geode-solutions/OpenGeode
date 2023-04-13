@@ -91,5 +91,5 @@ def run_test_brep():
 
 
 if __name__ == '__main__':
-    model.OpenGeodeModel.initialize()
+    model.OpenGeodeModelLibrary.initialize()
     run_test_brep()

@@ -137,7 +137,7 @@ void test_distance_transform_3D( double cell_length )
 }
 void test()
 {
-    geode::OpenGeodeMesh::initialize();
+    geode::OpenGeodeMeshLibrary::initialize();
     test_distance_transform_2D( 0.5 );
     test_distance_transform_3D( 4.8 );
 }

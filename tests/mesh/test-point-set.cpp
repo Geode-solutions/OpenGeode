@@ -131,7 +131,7 @@ void test_clone( const geode::PointSet3D& point_set )
 
 void test()
 {
-    geode::OpenGeodeMesh::initialize();
+    geode::OpenGeodeMeshLibrary::initialize();
     auto point_set = geode::PointSet3D::create(
         geode::OpenGeodePointSet3D::impl_name_static() );
     auto builder = geode::PointSetBuilder3D::create( *point_set );

@@ -35,85 +35,87 @@ import opengeode_py_mesh as mesh
 def test_distance_transform_2D(cell_length):
     grid = mesh.RegularGrid2D.create()
     builder = mesh.RegularGridBuilder2D.create(grid)
-    builder.initialize_cartesian_grid(geom.Point2D([ 0, 0]), [
-                            10,10], cell_length)
-    objects_raster = [[0,0],[9,9]]
-    map_distance = mesh.euclidean_distance_transform2D(grid,objects_raster,"test_edt")
+    builder.initialize_cartesian_grid(geom.Point2D([0, 0]), [
+        10, 10], cell_length)
+    objects_raster = [[0, 0], [9, 9]]
+    map_distance = mesh.euclidean_distance_transform2D(
+        grid, objects_raster, "test_edt")
     values = [
-        ([0, 1 ], cell_length * 1. ),
-        ([0, 2 ], cell_length * 2. ),
-        ([0, 3 ], cell_length * 3. ),
-        ([0, 4 ], cell_length * 4. ),
-        ([0, 5 ], cell_length * 5. ),
-        ([0, 6 ], cell_length * 6. ),
-        ([0, 7 ], cell_length * 7. ),
-        ([0, 8 ], cell_length * 8. ),
-        ([0, 9 ], cell_length * 9. ),
-        ([1, 0 ], cell_length * 1. ),
-        ([2, 0 ], cell_length * 2. ),
-        ([3, 0 ], cell_length * 3. ),
-        ([4, 0 ], cell_length * 4. ),
-        ([5, 0 ], cell_length * 5. ),
-        ([6, 0 ], cell_length * 6. ),
-        ([7, 0 ], cell_length * 7. ),
-        ([8, 0 ], cell_length * 8. ),
-        ([9, 0 ], cell_length * 9. ),
-        ([0, 0 ], cell_length * 0. ),
-        ([1, 1 ], cell_length * math.sqrt(2) ),
-        ([2, 2 ], cell_length * math.sqrt(8) ),
-        ([3, 3 ], cell_length * math.sqrt(18)),
-        ([4, 4 ], cell_length * math.sqrt(32)),
-        ([5, 5 ], cell_length * math.sqrt(32)),
-        ([6, 6 ], cell_length * math.sqrt(18)),
-        ([7, 7 ], cell_length * math.sqrt(8) ),
-        ([8, 8 ], cell_length * math.sqrt(2) ),
-        ([9, 9 ], cell_length * 0. ),      
-        ([8, 1 ], cell_length * math.sqrt( 65 )),
-        ([7, 2 ], cell_length * math.sqrt( 53 )),
-        ([6, 3 ], cell_length * math.sqrt( 45 )),
-        ([5, 4 ], cell_length * math.sqrt( 41 )),
-        ([4, 5 ], cell_length * math.sqrt( 41 )),
-        ([3, 6 ], cell_length * math.sqrt( 45 )),
-        ([2, 7 ], cell_length * math.sqrt( 53 )),
-        ([1, 8 ], cell_length * math.sqrt( 65 ))
-        ]
+        ([0, 1], cell_length * 1.),
+        ([0, 2], cell_length * 2.),
+        ([0, 3], cell_length * 3.),
+        ([0, 4], cell_length * 4.),
+        ([0, 5], cell_length * 5.),
+        ([0, 6], cell_length * 6.),
+        ([0, 7], cell_length * 7.),
+        ([0, 8], cell_length * 8.),
+        ([0, 9], cell_length * 9.),
+        ([1, 0], cell_length * 1.),
+        ([2, 0], cell_length * 2.),
+        ([3, 0], cell_length * 3.),
+        ([4, 0], cell_length * 4.),
+        ([5, 0], cell_length * 5.),
+        ([6, 0], cell_length * 6.),
+        ([7, 0], cell_length * 7.),
+        ([8, 0], cell_length * 8.),
+        ([9, 0], cell_length * 9.),
+        ([0, 0], cell_length * 0.),
+        ([1, 1], cell_length * math.sqrt(2)),
+        ([2, 2], cell_length * math.sqrt(8)),
+        ([3, 3], cell_length * math.sqrt(18)),
+        ([4, 4], cell_length * math.sqrt(32)),
+        ([5, 5], cell_length * math.sqrt(32)),
+        ([6, 6], cell_length * math.sqrt(18)),
+        ([7, 7], cell_length * math.sqrt(8)),
+        ([8, 8], cell_length * math.sqrt(2)),
+        ([9, 9], cell_length * 0.),
+        ([8, 1], cell_length * math.sqrt(65)),
+        ([7, 2], cell_length * math.sqrt(53)),
+        ([6, 3], cell_length * math.sqrt(45)),
+        ([5, 4], cell_length * math.sqrt(41)),
+        ([4, 5], cell_length * math.sqrt(41)),
+        ([3, 6], cell_length * math.sqrt(45)),
+        ([2, 7], cell_length * math.sqrt(53)),
+        ([1, 8], cell_length * math.sqrt(65))
+    ]
     for value in values:
         if math.fabs(map_distance.value(grid.cell_index(value[0])) - value[1] > basic.global_epsilon):
-            raise ValueError("[Test] Wrong 2D euclidean distance map" )
+            raise ValueError("[Test] Wrong 2D euclidean distance map")
+
 
 def test_distance_transform_3D(cell_length):
     grid = mesh.RegularGrid3D.create()
     builder = mesh.RegularGridBuilder3D.create(grid)
-    builder.initialize_cartesian_grid(geom.Point3D([ 0, 0,0]), [
-                            10,10,10], cell_length)
-    objects_raster = [[0,0,0],[9,9,9]]
-    map_distance = mesh.euclidean_distance_transform3D(grid,objects_raster,"test_edt")
+    builder.initialize_cartesian_grid(geom.Point3D([0, 0, 0]), [
+        10, 10, 10], cell_length)
+    objects_raster = [[0, 0, 0], [9, 9, 9]]
+    map_distance = mesh.euclidean_distance_transform3D(
+        grid, objects_raster, "test_edt")
     values = [
-        ([ 0, 9, 0 ], cell_length * 9.),
-        ([ 0, 9, 9 ], cell_length * 9.),
-        ([ 0, 0, 9 ], cell_length * 9.),
-        ([ 9, 0, 0 ], cell_length * 9.),
-        ([ 9, 0, 9 ], cell_length * 9.),
-        ([ 9, 9, 0 ], cell_length * 9.),
-        ([ 0, 0, 0 ], cell_length * 0.),
-        ([ 1, 1, 1 ], cell_length * math.sqrt( 3 )),
-        ([ 2, 2, 2 ], cell_length * math.sqrt(12)),
-        ([ 3, 3, 3 ], cell_length * math.sqrt(27)),
-        ([ 4, 4, 4 ], cell_length * math.sqrt(48)),
-        ([ 5, 5, 5 ], cell_length * math.sqrt(48)),
-        ([ 6, 6, 6 ], cell_length * math.sqrt(27)),
-        ([ 7, 7, 7 ], cell_length * math.sqrt(12)),
-        ([ 8, 8, 8 ], cell_length * math.sqrt(3)),
-        ([ 9, 9, 9 ], cell_length * 0.)
-        ]
+        ([0, 9, 0], cell_length * 9.),
+        ([0, 9, 9], cell_length * 9.),
+        ([0, 0, 9], cell_length * 9.),
+        ([9, 0, 0], cell_length * 9.),
+        ([9, 0, 9], cell_length * 9.),
+        ([9, 9, 0], cell_length * 9.),
+        ([0, 0, 0], cell_length * 0.),
+        ([1, 1, 1], cell_length * math.sqrt(3)),
+        ([2, 2, 2], cell_length * math.sqrt(12)),
+        ([3, 3, 3], cell_length * math.sqrt(27)),
+        ([4, 4, 4], cell_length * math.sqrt(48)),
+        ([5, 5, 5], cell_length * math.sqrt(48)),
+        ([6, 6, 6], cell_length * math.sqrt(27)),
+        ([7, 7, 7], cell_length * math.sqrt(12)),
+        ([8, 8, 8], cell_length * math.sqrt(3)),
+        ([9, 9, 9], cell_length * 0.)
+    ]
 
     for value in values:
         if math.fabs(map_distance.value(grid.cell_index(value[0])) - value[1]) > basic.global_epsilon:
-            raise ValueError("[Test] Wrong 3D euclidean distance map" )
+            raise ValueError("[Test] Wrong 3D euclidean distance map")
+
 
 if __name__ == '__main__':
-    mesh.OpenGeodeMesh.initialize()
+    mesh.OpenGeodeMeshLibrary.initialize()
     test_distance_transform_2D(1.)
     test_distance_transform_3D(4.5)
-    
-

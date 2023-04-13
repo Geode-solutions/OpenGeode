@@ -159,7 +159,7 @@ void compare_edges(
 
 void test()
 {
-    geode::OpenGeodeMesh::initialize();
+    geode::OpenGeodeMeshLibrary::initialize();
     auto wrong_surface = build_bad_orientation_surface();
     wrong_surface->enable_edges();
     const auto edges_before = get_edges( *wrong_surface );

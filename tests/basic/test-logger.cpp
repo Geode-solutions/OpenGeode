@@ -78,7 +78,7 @@ void test_logger()
 
 void test()
 {
-    geode::OpenGeodeBasic::initialize();
+    geode::OpenGeodeBasicLibrary::initialize();
     geode::LoggerManager::register_client(
         absl::make_unique< CustomClient >() );
 

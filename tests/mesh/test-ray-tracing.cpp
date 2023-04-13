@@ -113,7 +113,7 @@ void test_ray_parallel()
 
 void test()
 {
-    geode::OpenGeodeMesh::initialize();
+    geode::OpenGeodeMeshLibrary::initialize();
     test_ray_inside();
     test_ray_edge();
     test_ray_parallel();

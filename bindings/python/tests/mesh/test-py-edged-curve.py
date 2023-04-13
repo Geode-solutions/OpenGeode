@@ -213,7 +213,7 @@ def test_permutation(edged_curve, builder):
 
 
 if __name__ == '__main__':
-    mesh.OpenGeodeMesh.initialize()
+    mesh.OpenGeodeMeshLibrary.initialize()
     edged_curve = mesh.EdgedCurve3D.create()
     builder = mesh.EdgedCurveBuilder3D.create(edged_curve)
 

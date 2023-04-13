@@ -550,7 +550,7 @@ void test_texture( const geode::PolyhedralSolid3D& polyhedral_solid )
 
 void test()
 {
-    geode::OpenGeodeMesh::initialize();
+    geode::OpenGeodeMeshLibrary::initialize();
     auto polyhedral_solid = geode::PolyhedralSolid3D::create(
         geode::OpenGeodePolyhedralSolid3D::impl_name_static() );
     polyhedral_solid->enable_edges();

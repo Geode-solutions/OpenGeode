@@ -66,8 +66,9 @@ PYBIND11_MODULE( opengeode_py_basic, module )
     module.attr( "NO_ID" ) = geode::NO_ID;
     module.attr( "NO_LID" ) = geode::NO_LID;
     module.attr( "global_epsilon" ) = geode::global_epsilon;
-    pybind11::class_< geode::OpenGeodeBasic >( module, "OpenGeodeBasic" )
-        .def( "initialize", &geode::OpenGeodeBasic::initialize );
+    pybind11::class_< geode::OpenGeodeBasicLibrary >(
+        module, "OpenGeodeBasicLibrary" )
+        .def( "initialize", &geode::OpenGeodeBasicLibrary::initialize );
     geode::define_cell_array( module );
     geode::define_attributes( module );
     geode::define_attribute_manager( module );

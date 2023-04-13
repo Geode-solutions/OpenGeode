@@ -19,4 +19,4 @@
 # SOFTWARE.
 
 from opengeode_py_model import *
-OpenGeodeModel.initialize()
+OpenGeodeModelLibrary.initialize()

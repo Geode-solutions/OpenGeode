@@ -151,8 +151,9 @@ PYBIND11_MODULE( opengeode_py_mesh, module )
     }
     pybind11::add_ostream_redirect( module );
     module.doc() = "OpenGeode Python binding for mesh";
-    pybind11::class_< geode::OpenGeodeMesh >( module, "OpenGeodeMesh" )
-        .def( "initialize", &geode::OpenGeodeMesh::initialize );
+    pybind11::class_< geode::OpenGeodeMeshLibrary >(
+        module, "OpenGeodeMeshLibrary" )
+        .def( "initialize", &geode::OpenGeodeMeshLibrary::initialize );
 
     geode::define_crs( module );
     geode::define_crs_manager( module );

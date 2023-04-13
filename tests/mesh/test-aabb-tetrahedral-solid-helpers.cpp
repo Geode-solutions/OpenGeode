@@ -111,7 +111,7 @@ void test_SolidAABB()
 
 void test()
 {
-    geode::OpenGeodeMesh::initialize();
+    geode::OpenGeodeMeshLibrary::initialize();
     test_SolidAABB();
 }
 

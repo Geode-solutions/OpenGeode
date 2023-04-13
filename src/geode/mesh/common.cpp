@@ -36,8 +36,8 @@ namespace geode
 {
     OPENGEODE_LIBRARY_IMPLEMENTATION( OpenGeodeMesh )
     {
-        OpenGeodeGeometry::initialize();
-        OpenGeodeImage::initialize();
+        OpenGeodeGeometryLibrary::initialize();
+        OpenGeodeImageLibrary::initialize();
         register_geode_mesh();
         register_geode_builder();
         register_geode_mesh_input();

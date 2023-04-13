@@ -145,7 +145,7 @@ void test_point_function( geode::TetrahedralSolid3D& solid )
 
 void test()
 {
-    geode::OpenGeodeMesh::initialize();
+    geode::OpenGeodeMeshLibrary::initialize();
     auto solid = geode::TetrahedralSolid3D::create();
     build_test_solid( *solid );
     test_scalar_function( *solid );

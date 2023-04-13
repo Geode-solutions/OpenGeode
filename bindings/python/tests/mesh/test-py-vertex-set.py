@@ -28,7 +28,7 @@ if sys.version_info >= (3, 8, 0) and platform.system() == "Windows":
 
 import opengeode_py_mesh as mesh
 
-mesh.OpenGeodeMesh.initialize()
+mesh.OpenGeodeMeshLibrary.initialize()
 
 
 def test_create_vertices(vertex_set, builder):

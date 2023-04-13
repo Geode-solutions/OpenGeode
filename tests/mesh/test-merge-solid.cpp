@@ -34,7 +34,7 @@
 
 void test()
 {
-    geode::OpenGeodeMesh::initialize();
+    geode::OpenGeodeMeshLibrary::initialize();
     std::vector< geode::Point3D > points{
         { { -1, 0, 0 } },
         { { -1, -1, -1 } },

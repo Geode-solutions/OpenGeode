@@ -93,7 +93,7 @@ void test_move( geode::OpenGeodeVertexSet& vertex_set )
 
 void test()
 {
-    geode::OpenGeodeMesh::initialize();
+    geode::OpenGeodeMeshLibrary::initialize();
     geode::OpenGeodeVertexSet vertex_set;
     test_default_vertex_set( vertex_set );
     auto builder = geode::VertexSetBuilder::create( vertex_set );

@@ -105,7 +105,7 @@ def test_permutation(point_set, builder):
 
 
 if __name__ == '__main__':
-    mesh.OpenGeodeMesh.initialize()
+    mesh.OpenGeodeMeshLibrary.initialize()
     point_set = mesh.PointSet3D.create()
     builder = mesh.PointSetBuilder3D.create(point_set)
     test_create_vertices(point_set, builder)

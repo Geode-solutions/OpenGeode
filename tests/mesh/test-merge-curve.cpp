@@ -76,7 +76,7 @@ std::vector< std::unique_ptr< geode::EdgedCurve2D > > create_curves()
 
 void test()
 {
-    geode::OpenGeodeMesh::initialize();
+    geode::OpenGeodeMeshLibrary::initialize();
 
     const auto curves = create_curves();
     const auto merged = geode::merge_edged_curves< 2 >(

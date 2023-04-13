@@ -61,7 +61,7 @@ def test_extrusion_section_to_brep(data_dir):
         raise ValueError("[Test] Extruded BRep have wrong number of blocks")
     
 if __name__ == '__main__':
-    model.OpenGeodeModel.initialize()
+    model.OpenGeodeModelLibrary.initialize()
     test_dir = os.path.dirname(__file__)
     data_dir = os.path.abspath(os.path.join(
         test_dir, "../../../../tests/data"))

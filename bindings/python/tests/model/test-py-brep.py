@@ -460,7 +460,7 @@ def test_clone(brep):
 
 
 if __name__ == '__main__':
-    model.OpenGeodeModel.initialize()
+    model.OpenGeodeModelLibrary.initialize()
     brep = model.BRep()
     builder = model.BRepBuilder(brep)
 

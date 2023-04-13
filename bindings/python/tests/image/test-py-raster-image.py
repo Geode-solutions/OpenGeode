@@ -45,7 +45,7 @@ def test_raster(raster):
 
 
 if __name__ == '__main__':
-    image.OpenGeodeImage.initialize()
+    image.OpenGeodeImageLibrary.initialize()
     raster = image.RasterImage2D([10, 10])
     for i in range(raster.nb_cells()):
         color = image.RGBColor(i, i, i)

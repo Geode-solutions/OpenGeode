@@ -104,7 +104,7 @@ void test_EdgedCurveAABB()
 
 void test()
 {
-    geode::OpenGeodeMesh::initialize();
+    geode::OpenGeodeMeshLibrary::initialize();
     test_EdgedCurveAABB< 2 >();
     test_EdgedCurveAABB< 3 >();
 }

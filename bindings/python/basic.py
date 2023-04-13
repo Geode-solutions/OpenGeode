@@ -19,4 +19,4 @@
 # SOFTWARE.
 
 from opengeode_py_basic import *
-OpenGeodeBasic.initialize()
+OpenGeodeBasicLibrary.initialize()

@@ -1,5 +1,17 @@
 # Upgrade Guide
 
+## Upgrading from OpenGeode v13.x.x to v14.0.0
+
+### Motivations
+
+OpenGeode ecosystem has grown and needs a refresh on some of our software conventions to ease and simplify future extensions.
+
+### Breaking Changes
+
+- **Library**: the library naming convention changed. The `OPENGEODE_LIBRARY` and `OPENGEODE_LIBRARY_IMPLEMENTATION` automatically add a `Library` suffix. For example, the library defined by `OPENGEODE_LIBRARY( opengeode_basic_api, OpenGeodeBasic );` is usable with `OpenGeodeBasicLibrary::initialize()`.
+
+- **Python**: the inside of the python wheels has been changed. There is now a folder folder containing the libraries (named bin or lib or lib64 acording the compiling OS) and an optional folder for addiontal data (named share). All other python files stay at the wheel root. all of this is hanlde by the `add_geode_python_wheel` cmake function.
+
 ## Upgrading from OpenGeode v12.x.x to v13.0.0
 
 ### Motivations

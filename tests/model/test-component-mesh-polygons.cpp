@@ -219,7 +219,7 @@ void run_test_section()
 
 void test()
 {
-    geode::OpenGeodeModel::initialize();
+    geode::OpenGeodeModelLibrary::initialize();
     run_test_brep();
     run_test_section();
 }
