@@ -33,7 +33,8 @@ namespace geode
 
 namespace geode
 {
-    class opengeode_model_api OpenGeodeSectionOutput final : public SectionOutput
+    class opengeode_model_api OpenGeodeSectionOutput final
+        : public SectionOutput
     {
     public:
         OpenGeodeSectionOutput( absl::string_view filename )
