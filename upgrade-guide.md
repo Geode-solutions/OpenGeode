@@ -10,7 +10,7 @@ OpenGeode ecosystem has grown and needs a clean up on some of our software conve
 
 - **Library**: the library naming convention changed. The `OPENGEODE_LIBRARY` and `OPENGEODE_LIBRARY_IMPLEMENTATION` automatically add a `Library` suffix. For example, the library defined by `OPENGEODE_LIBRARY( opengeode_basic_api, OpenGeodeBasic );` is usable with `OpenGeodeBasicLibrary::initialize()`.
 
-- **Python**: the inside of the python wheels has been changed. There is now a folder folder containing the libraries (named bin or lib or lib64 acording the compiling OS) and an optional folder for additional data (named share). All other python files stay at the wheel root. All of this is handled by the `add_geode_python_wheel` cmake function.
+- **Python**: the inside of the Python wheels has been changed. There is now a folder containing the libraries (named bin or lib or lib64 according to the compiling OS) and an optional folder for additional data (named share). All other Python files stay at the wheel root. All of this is handled by the `add_geode_python_wheel` cmake function.
 
 ## Upgrading from OpenGeode v12.x.x to v13.0.0
 
