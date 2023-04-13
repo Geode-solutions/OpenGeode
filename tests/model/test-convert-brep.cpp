@@ -76,7 +76,7 @@ void test_extrusion_section_to_brep()
 
 void test()
 {
-    geode::OpenGeodeModel::initialize();
+    geode::OpenGeodeModelLibrary::initialize();
     test_convert_brep_section();
     test_extrusion_section_to_brep();
 }

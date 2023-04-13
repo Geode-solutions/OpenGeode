@@ -314,7 +314,7 @@ void test_attribute( const geode::LightRegularGrid3D& grid )
 
 void test()
 {
-    geode::OpenGeodeMesh::initialize();
+    geode::OpenGeodeMeshLibrary::initialize();
 
     const geode::LightRegularGrid3D grid{ { { 1.5, 0, 1 } }, { 5, 10, 15 },
         { 1, 2, 3 } };

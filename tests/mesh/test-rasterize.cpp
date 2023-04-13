@@ -207,7 +207,7 @@ void test_limit()
 
 void test()
 {
-    geode::OpenGeodeMesh::initialize();
+    geode::OpenGeodeMeshLibrary::initialize();
     auto grid = geode::RegularGrid3D::create();
     auto builder = geode::RegularGridBuilder3D::create( *grid );
     builder->initialize_grid( { { 0., 0., 0. } }, { 10, 10, 10 }, 1 );

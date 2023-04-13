@@ -930,7 +930,7 @@ void test_backward_io()
 
 void test()
 {
-    geode::OpenGeodeModel::initialize();
+    geode::OpenGeodeModelLibrary::initialize();
     geode::BRep model;
     geode::BRepBuilder builder( model );
 

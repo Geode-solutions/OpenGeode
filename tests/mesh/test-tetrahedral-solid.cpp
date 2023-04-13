@@ -341,7 +341,7 @@ void test_delete_all( const geode::TetrahedralSolid3D& solid,
 
 void test()
 {
-    geode::OpenGeodeMesh::initialize();
+    geode::OpenGeodeMeshLibrary::initialize();
     auto solid = geode::TetrahedralSolid3D::create(
         geode::OpenGeodeTetrahedralSolid3D::impl_name_static() );
     auto builder = geode::TetrahedralSolidBuilder3D::create( *solid );

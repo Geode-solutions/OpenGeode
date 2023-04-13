@@ -38,7 +38,7 @@ namespace geode
             {
                 is_loaded_ = true;
                 library.do_initialize();
-                DEBUG_LOGGER( library_name, " initialized" );
+                DEBUG_LOGGER( library_name, "Library initialized" );
             }
         }
 

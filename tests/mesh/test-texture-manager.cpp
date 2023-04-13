@@ -118,7 +118,7 @@ geode::TextureStorage2D load( absl::string_view filename )
 
 void test()
 {
-    geode::OpenGeodeMesh::initialize();
+    geode::OpenGeodeMeshLibrary::initialize();
     geode::AttributeManager attributes;
     attributes.resize( 42 );
     geode::TextureStorage2D storage;

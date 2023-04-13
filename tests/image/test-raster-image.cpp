@@ -49,7 +49,7 @@ void test_raster( const geode::RasterImage2D& raster )
 
 void test()
 {
-    geode::OpenGeodeImage::initialize();
+    geode::OpenGeodeImageLibrary::initialize();
     geode::RasterImage2D raster{ { 10, 10 } };
     for( const auto i : geode::LRange{ raster.nb_cells() } )
     {

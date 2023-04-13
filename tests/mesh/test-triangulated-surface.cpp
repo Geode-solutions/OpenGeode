@@ -258,7 +258,7 @@ void test_delete_all( const geode::TriangulatedSurface3D& triangulated_surface,
 
 void test()
 {
-    geode::OpenGeodeMesh::initialize();
+    geode::OpenGeodeMeshLibrary::initialize();
     auto surface = geode::TriangulatedSurface3D::create(
         geode::OpenGeodeTriangulatedSurface3D::impl_name_static() );
     auto builder = geode::TriangulatedSurfaceBuilder3D::create( *surface );

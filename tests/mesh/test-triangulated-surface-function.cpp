@@ -144,7 +144,7 @@ void test_point_function( geode::TriangulatedSurface2D& surface )
 
 void test()
 {
-    geode::OpenGeodeMesh::initialize();
+    geode::OpenGeodeMeshLibrary::initialize();
     auto surface = geode::TriangulatedSurface2D::create();
     build_test_surface( *surface );
     test_scalar_function( *surface );

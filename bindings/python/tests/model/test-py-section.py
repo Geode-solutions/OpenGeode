@@ -294,7 +294,7 @@ def test_clone(section):
 
 
 if __name__ == '__main__':
-    model.OpenGeodeModel.initialize()
+    model.OpenGeodeModelLibrary.initialize()
     section = model.Section()
     builder = model.SectionBuilder(section)
 

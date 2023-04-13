@@ -180,7 +180,7 @@ void test_io(
 
 void test()
 {
-    geode::OpenGeodeModel::initialize();
+    geode::OpenGeodeModelLibrary::initialize();
     geode::Relationships relationships;
     const std::array< geode::uuid, 6 > uuids{
         geode::uuid{ "00000000-a9c9-4d4e-8000-0000d0ecddf1" },

@@ -19,4 +19,4 @@
 # SOFTWARE.
 
 from opengeode_py_geometry import *
-OpenGeodeGeometry.initialize()
+OpenGeodeGeometryLibrary.initialize()

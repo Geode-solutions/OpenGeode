@@ -19,4 +19,4 @@
 # SOFTWARE.
 
 from opengeode_py_mesh import *
-OpenGeodeMesh.initialize()
+OpenGeodeMeshLibrary.initialize()

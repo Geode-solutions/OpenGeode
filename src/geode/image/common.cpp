@@ -53,7 +53,7 @@ namespace geode
 {
     OPENGEODE_LIBRARY_IMPLEMENTATION( OpenGeodeImage )
     {
-        OpenGeodeBasic::initialize();
+        OpenGeodeBasicLibrary::initialize();
         BITSERY_INPUT_RASTER_REGISTER_2D_3D();
         BITSERY_OUTPUT_RASTER_REGISTER_2D_3D();
     }

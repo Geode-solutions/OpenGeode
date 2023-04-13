@@ -157,7 +157,7 @@ void test_delete_isolated_vertices(
 
 void test()
 {
-    geode::OpenGeodeMesh::initialize();
+    geode::OpenGeodeMeshLibrary::initialize();
     auto graph =
         geode::Graph::create( geode::OpenGeodeGraph::impl_name_static() );
     auto builder = geode::GraphBuilder::create( *graph );

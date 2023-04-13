@@ -77,7 +77,7 @@ def test_translate(surface):
 
 
 if __name__ == '__main__':
-    mesh.OpenGeodeMesh.initialize()
+    mesh.OpenGeodeMeshLibrary.initialize()
     surface = create_surface()
     test_rescale(surface.clone())
     test_translate(surface.clone())

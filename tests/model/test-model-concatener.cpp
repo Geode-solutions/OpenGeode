@@ -54,7 +54,7 @@ void check_concatenation(
 
 void test()
 {
-    geode::OpenGeodeModel::initialize();
+    geode::OpenGeodeModelLibrary::initialize();
     auto brep = geode::load_brep(
         absl::StrCat( geode::data_path, "prism_curve.og_brep" ) );
     const auto brep2 = geode::load_brep(

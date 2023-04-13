@@ -130,7 +130,7 @@ def test_delete_isolated_vertices(graph, builder):
 
 
 if __name__ == '__main__':
-    mesh.OpenGeodeMesh.initialize()
+    mesh.OpenGeodeMeshLibrary.initialize()
     graph = mesh.Graph.create()
     builder = mesh.GraphBuilder.create(graph)
 

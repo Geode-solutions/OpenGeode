@@ -35,7 +35,7 @@
 
 void test()
 {
-    geode::OpenGeodeMesh::initialize();
+    geode::OpenGeodeMeshLibrary::initialize();
     geode::CoordinateReferenceSystemManager3D crs_manager;
     geode::CoordinateReferenceSystemManagerBuilder3D crs_manager_builder{
         crs_manager

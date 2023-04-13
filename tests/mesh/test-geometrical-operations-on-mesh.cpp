@@ -89,7 +89,7 @@ void test_translate( geode::TriangulatedSurface3D& surface )
 
 void test()
 {
-    geode::OpenGeodeMesh::initialize();
+    geode::OpenGeodeMeshLibrary::initialize();
     auto surf = create_surface();
     test_rescale( *surf->clone() );
     test_translate( *surf->clone() );

@@ -600,7 +600,7 @@ void test_compare_section(
 
 void test()
 {
-    geode::OpenGeodeModel::initialize();
+    geode::OpenGeodeModelLibrary::initialize();
     geode::Section model;
     geode::SectionBuilder builder( model );
 

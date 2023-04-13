@@ -187,7 +187,7 @@ void test_point_function()
 
 void test()
 {
-    geode::OpenGeodeMesh::initialize();
+    geode::OpenGeodeMeshLibrary::initialize();
     test_scalar_function();
     test_point_function();
 }

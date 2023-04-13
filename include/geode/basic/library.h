@@ -52,12 +52,13 @@ namespace geode
  * common.h)
  */
 #define OPENGEODE_LIBRARY( export_api, library_name )                          \
-    class export_api library_name : public geode::Library                      \
+    class export_api library_name##Library : public geode::Library             \
     {                                                                          \
     public:                                                                    \
         static void initialize()                                               \
         {                                                                      \
-            library_name& library = Singleton::instance< library_name >();     \
+            library_name##Library& library =                                   \
+                Singleton::instance< library_name##Library >();                \
             library.call_initialize( #library_name );                          \
         }                                                                      \
                                                                                \
@@ -70,7 +71,7 @@ namespace geode
  * common.cpp) and call all functions that need to be initialized.
  */
 #define OPENGEODE_LIBRARY_IMPLEMENTATION( library_name )                       \
-    void library_name::do_initialize()
+    void library_name##Library::do_initialize()
 
 namespace geode
 {

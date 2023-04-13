@@ -248,7 +248,7 @@ void test_update_unique_vertices()
 
 void test()
 {
-    geode::OpenGeodeModel::initialize();
+    geode::OpenGeodeModelLibrary::initialize();
     geode::VertexIdentifier vertex_identifier;
     OPENGEODE_EXCEPTION( vertex_identifier.nb_unique_vertices() == 0,
         "[Test] Initialization of VertexIdentifier is not correct" );

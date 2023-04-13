@@ -133,7 +133,7 @@ void test_create_brep_with_dangling_components()
 
 void test()
 {
-    geode::OpenGeodeModel::initialize();
+    geode::OpenGeodeModelLibrary::initialize();
     std::vector< geode::Point2D > points{
         { { 0, 0 } },
         { { 1, 0 } },
