@@ -41,18 +41,16 @@ namespace geode
 #define OPENGEODE_TEST( name )                                                 \
     int main()                                                                 \
     {                                                                          \
-        using namespace geode;                                                 \
-                                                                               \
         try                                                                    \
         {                                                                      \
             geode::OpenGeodeBasicLibrary::initialize();                        \
             test();                                                            \
                                                                                \
-            Logger::info( "TEST SUCCESS" );                                    \
+            geode::Logger::info( "TEST SUCCESS" );                             \
             return 0;                                                          \
         }                                                                      \
         catch( ... )                                                           \
         {                                                                      \
-            return geode_lippincott();                                         \
+            return geode::geode_lippincott();                                  \
         }                                                                      \
     }
