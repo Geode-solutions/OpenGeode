@@ -21,75 +21,30 @@
  *
  */
 
+#include "../common.h"
 #include <pybind11/iostream.h>
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
 
-#include "barycentric_coordinates.h"
-#include "basic_objects.h"
-#include "bounding_box.h"
-#include "distance.h"
-#include "intersection.h"
-#include "intersection_detection.h"
-#include "mensuration.h"
-#include "nn_search.h"
-#include "perpendicular.h"
-#include "point.h"
-#include "points_sort.h"
-#include "position.h"
-#include "projection.h"
-#include "rotation.h"
-#include "sign.h"
-#include "vector.h"
+#include <geode/geometry/common.h>
 
-namespace pybind11
+namespace geode
 {
-    namespace detail
-    {
-        template < typename Type >
-        struct type_caster< absl::FixedArray< Type > >
-            : list_caster< absl::FixedArray< Type >, Type >
-        {
-        };
-
-        template < typename Type >
-        struct type_caster< absl::Span< Type > >
-            : list_caster< absl::Span< Type >, Type >
-        {
-            using value_conv = make_caster< Type >;
-
-            bool load( handle src, bool convert )
-            {
-                cpp_.clear();
-                auto s = reinterpret_borrow< sequence >( src );
-                cpp_.reserve( s.size() );
-                for( auto it : s )
-                {
-                    value_conv conv;
-                    if( !conv.load( it, convert ) )
-                        return false;
-                    cpp_.push_back( cast_op< Type&& >( std::move( conv ) ) );
-                }
-                this->value = absl::MakeConstSpan( cpp_ );
-                return true;
-            }
-
-            std::vector< typename std::remove_const< Type >::type > cpp_;
-        };
-
-        template < typename Type, size_t dimension >
-        struct type_caster< absl::InlinedVector< Type, dimension > >
-            : list_caster< absl::InlinedVector< Type, dimension >, Type >
-        {
-        };
-
-        template < typename T >
-        struct type_caster< absl::optional< T > >
-            : public optional_caster< absl::optional< T > >
-        {
-        };
-    } // namespace detail
-} // namespace pybind11
+    void define_barycentric( pybind11::module& );
+    void define_basic_objects( pybind11::module& );
+    void define_bounding_box( pybind11::module& );
+    void define_distance( pybind11::module& );
+    void define_intersection( pybind11::module& );
+    void define_intersection_detection( pybind11::module& );
+    void define_mensuration( pybind11::module& );
+    void define_nn_search( pybind11::module& );
+    void define_perpendicular( pybind11::module& );
+    void define_point( pybind11::module& );
+    void define_points_sort( pybind11::module& );
+    void define_position( pybind11::module& );
+    void define_projection( pybind11::module& );
+    void define_rotation( pybind11::module& );
+    void define_sign( pybind11::module& );
+    void define_vector( pybind11::module& );
+} // namespace geode
 
 PYBIND11_MODULE( opengeode_py_geometry, module )
 {
