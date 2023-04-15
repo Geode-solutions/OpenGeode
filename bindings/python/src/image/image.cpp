@@ -21,72 +21,20 @@
  *
  */
 
+#include "../common.h"
 #include <pybind11/iostream.h>
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
 
 #include <gdal_priv.h>
 
-#include "core/greyscale_color.h"
-#include "core/raster_image.h"
-#include "core/rgb_color.h"
+#include <geode/image/common.h>
 
-#include "io/raster_image.h"
-
-namespace pybind11
+namespace geode
 {
-    namespace detail
-    {
-        template < typename Type >
-        struct type_caster< absl::FixedArray< Type > >
-            : list_caster< absl::FixedArray< Type >, Type >
-        {
-        };
-
-        template < typename Type >
-        struct type_caster< absl::Span< Type > >
-            : list_caster< absl::Span< Type >, Type >
-        {
-            using value_conv = make_caster< Type >;
-
-            bool load( handle src, bool convert )
-            {
-                cpp_.clear();
-                auto s = reinterpret_borrow< sequence >( src );
-                cpp_.reserve( s.size() );
-                for( auto it : s )
-                {
-                    value_conv conv;
-                    if( !conv.load( it, convert ) )
-                        return false;
-                    cpp_.push_back( cast_op< Type&& >( std::move( conv ) ) );
-                }
-                this->value = absl::MakeConstSpan( cpp_ );
-                return true;
-            }
-
-            std::vector< typename std::remove_const< Type >::type > cpp_;
-        };
-
-        template < typename Type, size_t dimension >
-        struct type_caster< absl::InlinedVector< Type, dimension > >
-            : list_caster< absl::InlinedVector< Type, dimension >, Type >
-        {
-        };
-
-        template < typename T >
-        struct type_caster< absl::optional< T > >
-            : public optional_caster< absl::optional< T > >
-        {
-        };
-
-        template <>
-        struct type_caster< absl::string_view >
-            : string_caster< absl::string_view, true >
-        {
-        };
-    } // namespace detail
-} // namespace pybind11
+    void define_greyscale_color( pybind11::module& );
+    void define_raster_image( pybind11::module& );
+    void define_raster_image_io( pybind11::module& );
+    void define_rgb_color( pybind11::module& );
+} // namespace geode
 
 PYBIND11_MODULE( opengeode_py_image, module )
 {

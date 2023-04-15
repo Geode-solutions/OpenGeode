@@ -22,10 +22,10 @@ add_geode_python_binding(
     NAME "py_image"
     SOURCES
         "image.cpp"
-        "core/greyscale_color.h"
-        "core/raster_image.h"
-        "core/rgb_color.h"
-        "io/raster_image.h"
+        "core/greyscale_color.cpp"
+        "core/raster_image.cpp"
+        "core/rgb_color.cpp"
+        "io/raster_image.cpp"
     DEPENDENCIES
         GDAL::GDAL
         ${PROJECT_NAME}::image

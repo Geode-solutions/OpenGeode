@@ -21,43 +21,21 @@
  *
  */
 
+#include "../common.h"
 #include <pybind11/iostream.h>
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
 
 #include <geode/basic/library.h>
 
-#include "attribute.h"
-#include "attribute_manager.h"
-#include "cell_array.h"
-#include "identifier.h"
-#include "identifier_builder.h"
-#include "mapping.h"
-#include "uuid.h"
-
-namespace pybind11
+namespace geode
 {
-    namespace detail
-    {
-        template < typename Type >
-        struct type_caster< absl::FixedArray< Type > >
-            : list_caster< absl::FixedArray< Type >, Type >
-        {
-        };
-
-        template <>
-        struct type_caster< absl::string_view >
-            : string_caster< absl::string_view, true >
-        {
-        };
-
-        template < typename T >
-        struct type_caster< absl::optional< T > >
-            : public optional_caster< absl::optional< T > >
-        {
-        };
-    } // namespace detail
-} // namespace pybind11
+    void define_cell_array( pybind11::module& );
+    void define_attributes( pybind11::module& );
+    void define_attribute_manager( pybind11::module& );
+    void define_identifier( pybind11::module& );
+    void define_identifier_builder( pybind11::module& );
+    void define_mapping( pybind11::module& );
+    void define_uuid( pybind11::module& );
+} // namespace geode
 
 PYBIND11_MODULE( opengeode_py_basic, module )
 {

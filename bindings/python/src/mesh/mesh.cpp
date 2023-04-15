@@ -21,123 +21,74 @@
  *
  */
 
+#include "../common.h"
 #include <pybind11/iostream.h>
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
 
-#include "builder/crs_manager_builder.h"
-#include "builder/crs_managers_builder.h"
-#include "builder/edged_curve_builder.h"
-#include "builder/graph_builder.h"
-#include "builder/hybrid_solid_builder.h"
-#include "builder/point_set_builder.h"
-#include "builder/polygonal_surface_builder.h"
-#include "builder/polyhedral_solid_builder.h"
-#include "builder/regular_grid_builder.h"
-#include "builder/solid_edges_builder.h"
-#include "builder/solid_facets_builder.h"
-#include "builder/solid_mesh_builder.h"
-#include "builder/surface_edges_builder.h"
-#include "builder/surface_mesh_builder.h"
-#include "builder/tetrahedral_solid_builder.h"
-#include "builder/triangulated_surface_builder.h"
-#include "builder/vertex_set_builder.h"
+#include <geode/mesh/common.h>
 
-#include "core/crs.h"
-#include "core/crs_manager.h"
-#include "core/crs_managers.h"
-#include "core/edged_curve.h"
-#include "core/graph.h"
-#include "core/grid.h"
-#include "core/hybrid_solid.h"
-#include "core/point_set.h"
-#include "core/polygonal_surface.h"
-#include "core/polyhedral_solid.h"
-#include "core/regular_grid.h"
-#include "core/solid_edges.h"
-#include "core/solid_facets.h"
-#include "core/solid_mesh.h"
-#include "core/surface_edges.h"
-#include "core/surface_mesh.h"
-#include "core/tetrahedral_solid.h"
-#include "core/texture.h"
-#include "core/texture_manager.h"
-#include "core/triangulated_surface.h"
-#include "core/vertex_set.h"
-
-#include "helpers/convert_edged_curve.h"
-#include "helpers/convert_point_set.h"
-#include "helpers/convert_solid_mesh.h"
-#include "helpers/convert_surface_mesh.h"
-#include "helpers/euclidean_distance_transform.h"
-#include "helpers/geometrical_operations_on_mesh.h"
-#include "helpers/repair_polygon_orientations.h"
-
-#include "io/edged_curve.h"
-#include "io/graph.h"
-#include "io/hybrid_solid.h"
-#include "io/point_set.h"
-#include "io/polygonal_surface.h"
-#include "io/polyhedral_solid.h"
-#include "io/regular_grid.h"
-#include "io/tetrahedral_solid.h"
-#include "io/triangulated_surface.h"
-#include "io/vertex_set.h"
-
-namespace pybind11
+namespace geode
 {
-    namespace detail
-    {
-        template < typename Type >
-        struct type_caster< absl::FixedArray< Type > >
-            : list_caster< absl::FixedArray< Type >, Type >
-        {
-        };
+    void define_crs( pybind11::module& );
+    void define_crs_manager( pybind11::module& );
+    void define_crs_managers( pybind11::module& );
+    void define_crs_manager_builder( pybind11::module& );
+    void define_crs_managers_builder( pybind11::module& );
 
-        template < typename Type, size_t dimension >
-        struct type_caster< absl::InlinedVector< Type, dimension > >
-            : list_caster< absl::InlinedVector< Type, dimension >, Type >
-        {
-        };
+    void define_vertex_set( pybind11::module& );
+    void define_graph( pybind11::module& );
+    void define_edged_curve( pybind11::module& );
+    void define_grid( pybind11::module& );
+    void define_point_set( pybind11::module& );
+    void define_surface_mesh( pybind11::module& );
+    void define_surface_edges( pybind11::module& );
+    void define_polygonal_surface( pybind11::module& );
+    void define_triangulated_surface( pybind11::module& );
+    void define_solid_mesh( pybind11::module& );
+    void define_solid_edges( pybind11::module& );
+    void define_solid_facets( pybind11::module& );
+    void define_regular_grid( pybind11::module& );
+    void define_polyhedral_solid( pybind11::module& );
+    void define_tetrahedral_solid( pybind11::module& );
+    void define_hybrid_solid( pybind11::module& );
 
-        template < typename Type >
-        struct type_caster< absl::Span< Type > >
-            : list_caster< absl::Span< Type >, Type >
-        {
-            using value_conv = make_caster< Type >;
+    void define_texture( pybind11::module& );
+    void define_texture_manager( pybind11::module& );
 
-            bool load( handle src, bool convert )
-            {
-                cpp_.clear();
-                auto s = reinterpret_borrow< sequence >( src );
-                cpp_.reserve( s.size() );
-                for( auto it : s )
-                {
-                    value_conv conv;
-                    if( !conv.load( it, convert ) )
-                        return false;
-                    cpp_.push_back( cast_op< Type&& >( std::move( conv ) ) );
-                }
-                this->value = absl::MakeConstSpan( cpp_ );
-                return true;
-            }
+    void define_vertex_set_builder( pybind11::module& );
+    void define_graph_builder( pybind11::module& );
+    void define_edged_curve_builder( pybind11::module& );
+    void define_point_set_builder( pybind11::module& );
+    void define_surface_mesh_builder( pybind11::module& );
+    void define_surface_edges_builder( pybind11::module& );
+    void define_polygonal_surface_builder( pybind11::module& );
+    void define_triangulated_surface_builder( pybind11::module& );
+    void define_solid_mesh_builder( pybind11::module& );
+    void define_solid_edges_builder( pybind11::module& );
+    void define_solid_facets_builder( pybind11::module& );
+    void define_regular_grid_builder( pybind11::module& );
+    void define_polyhedral_solid_builder( pybind11::module& );
+    void define_tetrahedral_solid_builder( pybind11::module& );
+    void define_hybrid_solid_builder( pybind11::module& );
 
-            std::vector< typename std::remove_const< Type >::type > cpp_;
-        };
+    void define_convert_edged_curve( pybind11::module& );
+    void define_convert_point_set( pybind11::module& );
+    void define_convert_surface_mesh( pybind11::module& );
+    void define_convert_solid_mesh( pybind11::module& );
+    void define_euclidean_distance_transform( pybind11::module& );
+    void define_repair_polygon_orientations( pybind11::module& );
+    void geometrical_operations_on_mesh( pybind11::module& );
 
-        template <>
-        struct type_caster< absl::string_view >
-            : string_caster< absl::string_view, true >
-        {
-        };
-
-        template < typename T >
-        struct type_caster< absl::optional< T > >
-            : public optional_caster< absl::optional< T > >
-        {
-        };
-    } // namespace detail
-} // namespace pybind11
+    void define_vertex_set_io( pybind11::module& );
+    void define_graph_io( pybind11::module& );
+    void define_edged_curve_io( pybind11::module& );
+    void define_point_set_io( pybind11::module& );
+    void define_polygonal_surface_io( pybind11::module& );
+    void define_triangulated_surface_io( pybind11::module& );
+    void define_polyhedral_solid_io( pybind11::module& );
+    void define_tetrahedral_solid_io( pybind11::module& );
+    void define_hybrid_solid_io( pybind11::module& );
+    void define_regular_grid_io( pybind11::module& );
+} // namespace geode
 
 PYBIND11_MODULE( opengeode_py_mesh, module )
 {

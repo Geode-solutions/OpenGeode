@@ -21,101 +21,57 @@
  *
  */
 
+#include "../common.h"
 #include <pybind11/iostream.h>
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
 
-#include "mixin/core/block.h"
-#include "mixin/core/blocks.h"
-#include "mixin/core/component.h"
-#include "mixin/core/component_mesh_element.h"
-#include "mixin/core/component_type.h"
-#include "mixin/core/corner.h"
-#include "mixin/core/corners.h"
-#include "mixin/core/line.h"
-#include "mixin/core/lines.h"
-#include "mixin/core/model_boundaries.h"
-#include "mixin/core/model_boundary.h"
-#include "mixin/core/relationships.h"
-#include "mixin/core/surface.h"
-#include "mixin/core/surfaces.h"
-#include "mixin/core/topology.h"
-#include "mixin/core/vertex_identifier.h"
+#include <geode/model/common.h>
 
-#include "mixin/builder/blocks_builder.h"
-#include "mixin/builder/corners_builder.h"
-#include "mixin/builder/lines_builder.h"
-#include "mixin/builder/model_boundaries_builder.h"
-#include "mixin/builder/relationships_builder.h"
-#include "mixin/builder/surfaces_builder.h"
-#include "mixin/builder/topology_builder.h"
-#include "mixin/builder/vertex_identifier_builder.h"
-
-#include "representation/core/brep.h"
-#include "representation/core/section.h"
-
-#include "representation/builder/brep_builder.h"
-#include "representation/builder/copy.h"
-#include "representation/builder/section_builder.h"
-
-#include "representation/io/brep.h"
-#include "representation/io/section.h"
-
-#include "helpers/component_mesh_polygons.h"
-#include "helpers/convert_brep_section.h"
-#include "helpers/convert_model_meshes.h"
-#include "helpers/convert_to_mesh.h"
-#include "helpers/model_component_filter.h"
-#include "helpers/model_concatener.h"
-
-namespace pybind11
+namespace geode
 {
-    namespace detail
-    {
-        template <>
-        struct type_caster< absl::string_view >
-            : string_caster< absl::string_view, true >
-        {
-        };
+    void define_component_type( pybind11::module& );
+    void define_component( pybind11::module& );
+    void define_component_mesh_element( pybind11::module& );
+    void define_block( pybind11::module& );
+    void define_blocks( pybind11::module& );
+    void define_corner( pybind11::module& );
+    void define_corners( pybind11::module& );
+    void define_line( pybind11::module& );
+    void define_lines( pybind11::module& );
+    void define_model_boundary( pybind11::module& );
+    void define_model_boundaries( pybind11::module& );
+    void define_surface( pybind11::module& );
+    void define_surfaces( pybind11::module& );
+    void define_relationships( pybind11::module& );
+    void define_vertex_identifier( pybind11::module& );
+    void define_topology( pybind11::module& );
 
-        template < typename Type >
-        struct type_caster< absl::FixedArray< Type > >
-            : list_caster< absl::FixedArray< Type >, Type >
-        {
-        };
+    void define_blocks_builder( pybind11::module& );
+    void define_corners_builder( pybind11::module& );
+    void define_lines_builder( pybind11::module& );
+    void define_model_boundaries_builder( pybind11::module& );
+    void define_surfaces_builder( pybind11::module& );
+    void define_relationships_builder( pybind11::module& );
+    void define_vertex_identifier_builder( pybind11::module& );
+    void define_topology_builder( pybind11::module& );
 
-        template < typename Type, size_t dimension >
-        struct type_caster< absl::InlinedVector< Type, dimension > >
-            : list_caster< absl::InlinedVector< Type, dimension >, Type >
-        {
-        };
+    void define_brep( pybind11::module& );
+    void define_section( pybind11::module& );
+    void define_copy_mapping( pybind11::module& );
+    void define_generic_mapping( pybind11::module& );
 
-        template < typename Type >
-        struct type_caster< absl::Span< Type > >
-            : list_caster< absl::Span< Type >, Type >
-        {
-            using value_conv = make_caster< Type >;
+    void define_brep_builder( pybind11::module& );
+    void define_section_builder( pybind11::module& );
 
-            bool load( handle src, bool convert )
-            {
-                cpp_.clear();
-                auto s = reinterpret_borrow< sequence >( src );
-                cpp_.reserve( s.size() );
-                for( auto it : s )
-                {
-                    value_conv conv;
-                    if( !conv.load( it, convert ) )
-                        return false;
-                    cpp_.push_back( cast_op< Type&& >( std::move( conv ) ) );
-                }
-                this->value = absl::MakeConstSpan( cpp_ );
-                return true;
-            }
+    void define_brep_io( pybind11::module& );
+    void define_section_io( pybind11::module& );
 
-            std::vector< typename std::remove_const< Type >::type > cpp_;
-        };
-    } // namespace detail
-} // namespace pybind11
+    void define_convert_brep_section( pybind11::module& );
+    void define_convert_model_meshes( pybind11::module& );
+    void define_convert_to_mesh( pybind11::module& );
+    void define_component_mesh_polygons( pybind11::module& );
+    void define_model_component_filter( pybind11::module& );
+    void define_model_concatener( pybind11::module& );
+} // namespace geode
 
 PYBIND11_MODULE( opengeode_py_model, module )
 {

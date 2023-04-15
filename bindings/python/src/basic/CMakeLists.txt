@@ -22,13 +22,13 @@ add_geode_python_binding(
     NAME "py_basic"
     SOURCES
         "basic.cpp"
-        "cell_array.h"
-        "attribute.h"
-        "attribute_manager.h"
-        "identifier.h"
-        "identifier_builder.h"
-        "mapping.h"
-        "uuid.h"
+        "attribute.cpp"
+        "attribute_manager.cpp"
+        "cell_array.cpp"
+        "identifier.cpp"
+        "identifier_builder.cpp"
+        "mapping.cpp"
+        "uuid.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
 )
