@@ -21,8 +21,8 @@
  *
  */
 
-#include "../../common.h"
 #include "../../basic/factory.h"
+#include "../../common.h"
 
 #include <geode/mesh/core/tetrahedral_solid.h>
 #include <geode/mesh/io/tetrahedral_solid_input.h>
