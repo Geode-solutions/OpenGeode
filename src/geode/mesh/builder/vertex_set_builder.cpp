@@ -24,7 +24,6 @@
 #include <geode/mesh/builder/vertex_set_builder.h>
 
 #include <geode/basic/attribute_manager.h>
-#include <geode/basic/logger.h>
 
 #include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/core/vertex_set.h>
@@ -74,19 +73,13 @@ namespace geode
     std::vector< index_t > VertexSetBuilder::delete_vertices(
         const std::vector< bool >& to_delete )
     {
-        DEBUG( "0" );
         const auto old2new = detail::mapping_after_deletion( to_delete );
-        DEBUG( "1" );
         if( absl::c_find( to_delete, true ) == to_delete.end() )
         {
-            DEBUG( "2" );
             return old2new;
         }
-        DEBUG( "3" );
         vertex_set_.vertex_attribute_manager().delete_elements( to_delete );
-        DEBUG( "4" );
         do_delete_vertices( to_delete, old2new );
-        DEBUG( "5" );
         return old2new;
     }
 

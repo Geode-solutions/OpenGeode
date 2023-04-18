@@ -41,17 +41,11 @@ def test_create_vertices(vertex_set, builder):
 
 
 def test_delete_vertex(vertex_set, builder):
-    print("0")
     to_delete = [False] * vertex_set.nb_vertices()
-    print("1")
     to_delete[0] = True
-    print("2")
-    print(to_delete)
     builder.delete_vertices(to_delete)
-    print("3")
     if vertex_set.nb_vertices() != 5:
         raise ValueError("[Test] VertexSet should have 5 vertices")
-    print("4")
 
 
 def test_clone(vertex_set):
@@ -61,14 +55,8 @@ def test_clone(vertex_set):
 
 
 if __name__ == '__main__':
-    print("0")
     vertex_set = mesh.VertexSet.create()
-    print("1")
     builder = mesh.VertexSetBuilder.create(vertex_set)
-    print("2")
     test_create_vertices(vertex_set, builder)
-    print("3")
     test_delete_vertex(vertex_set, builder)
-    print("4")
     test_clone(vertex_set)
-    print("5")
