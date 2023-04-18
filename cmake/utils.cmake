@@ -449,11 +449,20 @@ function(add_geode_python_wheel)
     endforeach()
     configure_file("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/OpenGeodeModule-setup.py.in" "${wheel_output_directory}/../setup.py")
     file(MAKE_DIRECTORY "${wheel_build_directory}/share")
-    add_custom_target(wheel
-        COMMAND ${CMAKE_COMMAND} -E copy_directory "${wheel_build_directory}/${binary_folder}" "${wheel_output_directory}/${binary_folder}"
-        COMMAND ${CMAKE_COMMAND} -E copy_directory "${wheel_build_directory}/share" "${wheel_output_directory}/share"
-        COMMAND ${CMAKE_COMMAND} -E remove "${wheel_output_directory}/${binary_folder}/*.py"
-        COMMAND ${PYTHON_EXECUTABLE} setup.py bdist_wheel
-        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/wheel
-    )
+    if(WIN32 AND NOT ${GEODE_WHEEL_SUPERBUILD})
+        add_custom_target(wheel
+            COMMAND ${CMAKE_COMMAND} -E copy_directory "${wheel_build_directory}/${binary_folder}/$<CONFIG>" "${wheel_output_directory}/${binary_folder}"
+            COMMAND ${CMAKE_COMMAND} -E copy_directory "${wheel_build_directory}/share" "${wheel_output_directory}/share"
+            COMMAND ${PYTHON_EXECUTABLE} setup.py bdist_wheel
+            WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/wheel
+        )    
+    else()
+        add_custom_target(wheel
+            COMMAND ${CMAKE_COMMAND} -E copy_directory "${wheel_build_directory}/${binary_folder}" "${wheel_output_directory}/${binary_folder}"
+            COMMAND ${CMAKE_COMMAND} -E copy_directory "${wheel_build_directory}/share" "${wheel_output_directory}/share"
+            COMMAND ${CMAKE_COMMAND} -E remove "${wheel_output_directory}/${binary_folder}/*.py"
+            COMMAND ${PYTHON_EXECUTABLE} setup.py bdist_wheel
+            WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/wheel
+        )    
+    endif()
 endfunction()
