@@ -465,4 +465,14 @@ function(add_geode_python_wheel)
             WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/wheel
         )    
     endif()
+    execute_process(
+        COMMAND ${PYTHON_EXECUTABLE} -c 
+"from wheel.bdist_wheel import *
+from wheel.vendored.packaging import tags
+print(tags.interpreter_name() + tags.interpreter_version() + '-' + get_abi_tag() + '-' + get_platform(None))
+"
+    OUTPUT_VARIABLE toto
+    )
+
+    message(FATAL_ERROR "${toto}")
 endfunction()
