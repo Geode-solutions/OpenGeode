@@ -295,7 +295,7 @@ function(_add_geode_executable exe_path folder_name)
             set(pdb_file "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/${target_name}.pdb")
             add_custom_command(
                 TARGET ${target_name} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E remove  ${pdb_file}
+                COMMAND ${CMAKE_COMMAND} -E remove ${pdb_file}
             )
         endif()
     endif()
@@ -422,7 +422,8 @@ function(add_geode_python_wheel)
         "MODULES"
         ${ARGN}
     )
-    set(wheel_output_directory "${PROJECT_BINARY_DIR}/wheel/${project_name}")
+    set(wheel_output_path "${PROJECT_BINARY_DIR}/wheel")
+    set(wheel_output_directory "${wheel_output_path}/${project_name}")
     set(wheel_init "${wheel_output_directory}/__init__.py")
     if(WIN32)
         set(binary_folder "${CMAKE_INSTALL_BINDIR}")
@@ -447,15 +448,32 @@ function(add_geode_python_wheel)
         string(REPLACE "from ${project_name}" "from .${binary_folder}.${project_name}" FILE_CONTENTS "${FILE_CONTENTS}")
         file(WRITE "${wheel_output_directory}/${module}" ${FILE_CONTENTS})
     endforeach()
+    if(NOT WHEEL_VERSION)
+        set(WHEEL_VERSION "0.0.0")
+    endif()
     configure_file("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/OpenGeodeModule-setup.py.in" "${wheel_output_directory}/../setup.py")
     file(MAKE_DIRECTORY "${wheel_build_directory}/share")
+    execute_process(
+        COMMAND ${PYTHON_EXECUTABLE} -c 
+"from wheel.bdist_wheel import get_abi_tag, get_platform
+from wheel.vendored.packaging import tags
+name=tags.interpreter_name()
+version=tags.interpreter_version()
+abi=get_abi_tag()
+platform=get_platform(None)
+print(name + version + '-' + abi + '-' + platform)"
+        OUTPUT_VARIABLE wheel_sufix
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    string(REGEX REPLACE "-" "_" wheel_name ${GEODE_WHEEL_NAME})
+    set(wheel_file "${wheel_output_path}/dist/${wheel_name}-${WHEEL_VERSION}-${wheel_sufix}.whl")
     if(WIN32 AND NOT ${GEODE_WHEEL_SUPERBUILD})
         add_custom_target(wheel
             COMMAND ${CMAKE_COMMAND} -E copy_directory "${wheel_build_directory}/${binary_folder}/$<CONFIG>" "${wheel_output_directory}/${binary_folder}"
             COMMAND ${CMAKE_COMMAND} -E copy_directory "${wheel_build_directory}/share" "${wheel_output_directory}/share"
             COMMAND ${PYTHON_EXECUTABLE} setup.py bdist_wheel
             WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/wheel
-        )    
+        )
     else()
         add_custom_target(wheel
             COMMAND ${CMAKE_COMMAND} -E copy_directory "${wheel_build_directory}/${binary_folder}" "${wheel_output_directory}/${binary_folder}"
@@ -463,16 +481,11 @@ function(add_geode_python_wheel)
             COMMAND ${CMAKE_COMMAND} -E remove "${wheel_output_directory}/${binary_folder}/*.py"
             COMMAND ${PYTHON_EXECUTABLE} setup.py bdist_wheel
             WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/wheel
-        )    
+        )
     endif()
-    execute_process(
-        COMMAND ${PYTHON_EXECUTABLE} -c 
-"from wheel.bdist_wheel import *
-from wheel.vendored.packaging import tags
-print(tags.interpreter_name() + tags.interpreter_version() + '-' + get_abi_tag() + '-' + get_platform(None))
-"
-    OUTPUT_VARIABLE toto
+    string(CONCAT import_test "import " "${project_name}")
+    add_custom_target(test-wheel
+        COMMAND ${PYTHON_EXECUTABLE} -m pip install ${wheel_file}
+        COMMAND ${PYTHON_EXECUTABLE} -c ${import_test}
     )
-
-    message(FATAL_ERROR "${toto}")
 endfunction()
