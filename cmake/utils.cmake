@@ -34,6 +34,7 @@ endif()
 #-------------------------------------------------------------------------------
 # Turn on the ability to create folders to organize projects and files
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 
 #------------------------------------------------------------------------------------------------
 # Build configuration
@@ -46,12 +47,12 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}
 add_compile_options(
     $<$<CXX_COMPILER_ID:MSVC>:/bigobj>
     $<$<CXX_COMPILER_ID:MSVC>:/DNOMINMAX>
-    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wall>
-    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wextra>
-    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wpedantic>
-    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wno-attributes>
-    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wshadow>
-    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wnon-virtual-dtor>
+    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-Wall>
+    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-Wextra>
+    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-Wpedantic>
+    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-Wno-attributes>
+    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-Wshadow>
+    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-Wnon-virtual-dtor>
 )
 if(NOT BUILD_SHARED_LIBS)
     add_link_options(
@@ -292,7 +293,7 @@ function(_add_geode_executable exe_path folder_name)
                 VS_DEBUGGER_ENVIRONMENT "PATH=${directories}\\;$ENV{Path}"
         )
         if(NOT BUILD_SHARED_LIBS)
-            set(pdb_file "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/${target_name}.pdb")
+            set(pdb_file "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<$<BOOL:${isMultiConfig}>:$<CONFIG>>/${target_name}.pdb")
             add_custom_command(
                 TARGET ${target_name} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E remove ${pdb_file}
@@ -467,22 +468,18 @@ print(name + version + '-' + abi + '-' + platform)"
     )
     string(REGEX REPLACE "-" "_" wheel_name ${GEODE_WHEEL_NAME})
     set(wheel_file "${wheel_output_path}/dist/${wheel_name}-${WHEEL_VERSION}-${wheel_sufix}.whl")
-    if(WIN32 AND NOT ${GEODE_WHEEL_SUPERBUILD})
-        add_custom_target(wheel
-            COMMAND ${CMAKE_COMMAND} -E copy_directory "${wheel_build_directory}/${binary_folder}/$<CONFIG>" "${wheel_output_directory}/${binary_folder}"
-            COMMAND ${CMAKE_COMMAND} -E copy_directory "${wheel_build_directory}/share" "${wheel_output_directory}/share"
-            COMMAND ${PYTHON_EXECUTABLE} setup.py bdist_wheel
-            WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/wheel
-        )
+    if(${GEODE_WHEEL_SUPERBUILD})
+        set(wheel_config_folder "")
     else()
-        add_custom_target(wheel
-            COMMAND ${CMAKE_COMMAND} -E copy_directory "${wheel_build_directory}/${binary_folder}" "${wheel_output_directory}/${binary_folder}"
-            COMMAND ${CMAKE_COMMAND} -E copy_directory "${wheel_build_directory}/share" "${wheel_output_directory}/share"
-            COMMAND ${CMAKE_COMMAND} -E remove "${wheel_output_directory}/${binary_folder}/*.py"
-            COMMAND ${PYTHON_EXECUTABLE} setup.py bdist_wheel
-            WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/wheel
-        )
+        set(wheel_config_folder "$<$<BOOL:${isMultiConfig}>:$<CONFIG>>")
     endif()
+    add_custom_target(wheel
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${wheel_build_directory}/${binary_folder}/${wheel_config_folder}" "${wheel_output_directory}/${binary_folder}"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${wheel_build_directory}/share" "${wheel_output_directory}/share"
+        COMMAND ${CMAKE_COMMAND} -E remove "${wheel_output_directory}/${binary_folder}/*.py"
+        COMMAND ${PYTHON_EXECUTABLE} setup.py bdist_wheel
+        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/wheel
+    )
     string(CONCAT import_test "import " "${project_name}")
     add_custom_target(test-wheel
         COMMAND ${PYTHON_EXECUTABLE} -m pip install ${wheel_file}
