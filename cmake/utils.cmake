@@ -440,6 +440,10 @@ function(add_geode_python_wheel)
     set(header "# Copyright (c) 2019 - 2023 Geode-solutions\n\n")
     file(WRITE ${wheel_init} "#${header}")
     file(WRITE ${wheel_import} "${header}")
+    if(WIN32)
+        file(APPEND ${wheel_init} "import os, pathlib\n")
+        file(APPEND ${wheel_init} "os.add_dll_directory(pathlib.Path(__file__).parent.resolve().joinpath('bin'))\n\n")
+    endif()
     foreach(module ${GEODE_WHEEL_MODULES})
         string(REPLACE ".py" "" module_name "${module}")
         file(APPEND ${wheel_init} "from .${module_name} import *\n")
@@ -482,7 +486,7 @@ print(name + version + '-' + abi + '-' + platform)"
     )
     string(CONCAT import_test "import " "${project_name}")
     add_custom_target(test-wheel
-        COMMAND ${PYTHON_EXECUTABLE} -m pip install ${wheel_file}
+        COMMAND ${PYTHON_EXECUTABLE} -m pip install --force-reinstall ${wheel_file}
         COMMAND ${PYTHON_EXECUTABLE} -c ${import_test}
     )
 endfunction()
