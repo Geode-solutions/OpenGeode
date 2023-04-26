@@ -36,8 +36,8 @@
     {                                                                          \
         std::ifstream file{ to_string( this->filename() ),                     \
             std::ifstream::binary };                                           \
-        OPENGEODE_EXCEPTION( file, "[", #Mesh,                                 \
-            "Input] Failed to open file: ", to_string( this->filename() ) );   \
+        OPENGEODE_EXCEPTION( file, "[Bitsery::read] Failed to open file: ",    \
+            to_string( this->filename() ) );                                   \
         TContext context{};                                                    \
         register_basic_deserialize_pcontext( std::get< 0 >( context ) );       \
         register_geometry_deserialize_pcontext( std::get< 0 >( context ) );    \

@@ -21,27 +21,34 @@
  *
  */
 
-#include <geode/mesh/io/vertex_set_output.h>
+#pragma once
 
-#include <geode/basic/private/geode_output_impl.h>
+#include <ghc/filesystem.hpp>
 
-#include <geode/mesh/core/vertex_set.h>
+#include <absl/strings/ascii.h>
+
+#include <geode/basic/filename.h>
+#include <geode/basic/timer.h>
 
 namespace geode
 {
-    void save_vertex_set(
-        const VertexSet& vertex_set, absl::string_view filename )
+    namespace detail
     {
-        try
+        template < typename Factory, typename Object >
+        void geode_object_output_impl( absl::string_view type,
+            const Object& object,
+            absl::string_view filename )
         {
-            detail::geode_object_output_impl< VertexSetOutputFactory >(
-                "VertexSet", vertex_set, filename );
+            Timer timer;
+            const auto extension =
+                absl::AsciiStrToLower( extension_from_filename( filename ) );
+            OPENGEODE_EXCEPTION( Factory::has_creator( extension ),
+                "Unknown extension: ", extension );
+            ghc::filesystem::create_directories(
+                filepath_without_filename( filename ) );
+            Factory::create( extension, filename )->write( object );
+            Logger::info(
+                type, " saved in ", filename, " in ", timer.duration() );
         }
-        catch( const OpenGeodeException& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeException{ "Cannot save VertexSet in file: ",
-                filename };
-        }
-    }
+    } // namespace detail
 } // namespace geode

@@ -23,10 +23,7 @@
 
 #include <geode/image/io/raster_image_output.h>
 
-#include <absl/strings/ascii.h>
-
-#include <geode/basic/filename.h>
-#include <geode/basic/timer.h>
+#include <geode/basic/private/geode_output_impl.h>
 
 #include <geode/image/core/raster_image.h>
 
@@ -38,16 +35,10 @@ namespace geode
     {
         try
         {
-            Timer timer;
-            const auto extension =
-                absl::AsciiStrToLower( extension_from_filename( filename ) );
-            OPENGEODE_EXCEPTION(
-                RasterImageOutputFactory< dimension >::has_creator( extension ),
-                "Unknown extension: ", extension );
-            RasterImageOutputFactory< dimension >::create( extension, filename )
-                ->write( raster );
-            Logger::info( "RasterImage", dimension, "D saved in ", filename,
-                " in ", timer.duration() );
+            detail::geode_object_output_impl<
+                RasterImageOutputFactory< dimension > >(
+                absl::StrCat( "RasterImage", dimension, "D" ), raster,
+                filename );
         }
         catch( const OpenGeodeException& e )
         {
