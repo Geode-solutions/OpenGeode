@@ -23,10 +23,7 @@
 
 #include <geode/model/representation/io/section_output.h>
 
-#include <absl/strings/ascii.h>
-
-#include <geode/basic/filename.h>
-#include <geode/basic/timer.h>
+#include <geode/basic/private/geode_output_impl.h>
 
 #include <geode/model/representation/core/section.h>
 
@@ -36,15 +33,8 @@ namespace geode
     {
         try
         {
-            Timer timer;
-            const auto extension =
-                absl::AsciiStrToLower( extension_from_filename( filename ) );
-            OPENGEODE_EXCEPTION( SectionOutputFactory::has_creator( extension ),
-                "Unknown extension: ", extension );
-            SectionOutputFactory::create( extension, filename )
-                ->write( section );
-            Logger::info(
-                "Section saved in ", filename, " in ", timer.duration() );
+            detail::geode_object_output_impl< SectionOutputFactory >(
+                "Section", section, filename );
         }
         catch( const OpenGeodeException& e )
         {

@@ -23,10 +23,7 @@
 
 #include <geode/mesh/io/hybrid_solid_output.h>
 
-#include <absl/strings/ascii.h>
-
-#include <geode/basic/filename.h>
-#include <geode/basic/timer.h>
+#include <geode/basic/private/geode_output_impl.h>
 
 #include <geode/mesh/core/hybrid_solid.h>
 
@@ -38,16 +35,10 @@ namespace geode
     {
         try
         {
-            Timer timer;
-            const auto extension =
-                absl::AsciiStrToLower( extension_from_filename( filename ) );
-            OPENGEODE_EXCEPTION(
-                HybridSolidOutputFactory< dimension >::has_creator( extension ),
-                "Unknown extension: ", extension );
-            HybridSolidOutputFactory< dimension >::create( extension, filename )
-                ->write( hybrid_solid );
-            Logger::info( "HybridSolid", dimension, "D saved in ", filename,
-                " in ", timer.duration() );
+            detail::geode_object_output_impl<
+                HybridSolidOutputFactory< dimension > >(
+                absl::StrCat( "HybridSolid", dimension, "D" ), hybrid_solid,
+                filename );
         }
         catch( const OpenGeodeException& e )
         {

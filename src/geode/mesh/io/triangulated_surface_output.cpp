@@ -23,10 +23,7 @@
 
 #include <geode/mesh/io/triangulated_surface_output.h>
 
-#include <absl/strings/ascii.h>
-
-#include <geode/basic/filename.h>
-#include <geode/basic/timer.h>
+#include <geode/basic/private/geode_output_impl.h>
 
 #include <geode/mesh/core/triangulated_surface.h>
 
@@ -39,18 +36,10 @@ namespace geode
     {
         try
         {
-            Timer timer;
-            const auto extension =
-                absl::AsciiStrToLower( extension_from_filename( filename ) );
-            OPENGEODE_EXCEPTION(
-                TriangulatedSurfaceOutputFactory< dimension >::has_creator(
-                    extension ),
-                "Unknown extension: ", extension );
-            TriangulatedSurfaceOutputFactory< dimension >::create(
-                extension, filename )
-                ->write( triangulated_surface );
-            Logger::info( "TriangulatedSurface", dimension, "D saved in ",
-                filename, " in ", timer.duration() );
+            detail::geode_object_output_impl<
+                TriangulatedSurfaceOutputFactory< dimension > >(
+                absl::StrCat( "TriangulatedSurface", dimension, "D" ),
+                triangulated_surface, filename );
         }
         catch( const OpenGeodeException& e )
         {

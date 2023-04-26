@@ -23,10 +23,7 @@
 
 #include <geode/mesh/io/graph_output.h>
 
-#include <absl/strings/ascii.h>
-
-#include <geode/basic/filename.h>
-#include <geode/basic/timer.h>
+#include <geode/basic/private/geode_output_impl.h>
 
 #include <geode/mesh/core/graph.h>
 
@@ -36,14 +33,8 @@ namespace geode
     {
         try
         {
-            Timer timer;
-            const auto extension =
-                absl::AsciiStrToLower( extension_from_filename( filename ) );
-            OPENGEODE_EXCEPTION( GraphOutputFactory::has_creator( extension ),
-                "Unknown extension: ", extension );
-            GraphOutputFactory::create( extension, filename )->write( graph );
-            Logger::info(
-                "Graph saved in ", filename, " in ", timer.duration() );
+            detail::geode_object_output_impl< GraphOutputFactory >(
+                "Graph", graph, filename );
         }
         catch( const OpenGeodeException& e )
         {
