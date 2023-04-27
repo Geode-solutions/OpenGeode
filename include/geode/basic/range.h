@@ -99,12 +99,12 @@ namespace geode
     public:
         explicit BeginEnd( const Type& type ) : type_( type ) {}
 
-        const Type& begin() const
+        inline const Type& begin() const
         {
             return type_;
         }
 
-        const Type& end() const
+        inline const Type& end() const
         {
             return type_;
         }
