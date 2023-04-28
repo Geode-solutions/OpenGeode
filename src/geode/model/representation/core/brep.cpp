@@ -130,7 +130,6 @@ namespace geode
     BRep::BoundarySurfaceRange::BoundarySurfaceRange(
         const BRep& brep, const Block3D& block )
         : Relationships::BoundaryRangeIterator( brep, block.id() ),
-          BeginEnd< BoundarySurfaceRange >( *this ),
           brep_( brep )
     {
     }

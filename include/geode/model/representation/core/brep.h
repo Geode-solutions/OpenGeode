@@ -99,14 +99,24 @@ namespace geode
         };
 
         class opengeode_model_api BoundarySurfaceRange
-            : public Relationships::BoundaryRangeIterator,
-              public BeginEnd< BoundarySurfaceRange >
+            : public Relationships::BoundaryRangeIterator
         {
         public:
             BoundarySurfaceRange( const BRep& brep, const Block3D& block );
+            BoundarySurfaceRange( const BoundarySurfaceRange& other ) = default;
             ~BoundarySurfaceRange();
 
             const Surface3D& operator*() const;
+
+            const BoundarySurfaceRange& begin() const
+            {
+                return *this;
+            }
+
+            const BoundarySurfaceRange& end() const
+            {
+                return *this;
+            }
 
         private:
             const BRep& brep_;
