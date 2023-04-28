@@ -185,8 +185,14 @@ namespace geode
     template < index_t dimension >
     ModelBoundaries< dimension >::ModelBoundaryRange::ModelBoundaryRange(
         const ModelBoundaries& boundaries )
-        : ModelBoundaryRangeBase( boundaries ),
-          BeginEnd< ModelBoundaryRange >( *this )
+        : ModelBoundaryRangeBase( boundaries )
+    {
+    }
+
+    template < index_t dimension >
+    ModelBoundaries< dimension >::ModelBoundaryRange::ModelBoundaryRange(
+        const ModelBoundaryRange& range )
+        : ModelBoundaryRangeBase{ range }
     {
     }
 
@@ -206,8 +212,21 @@ namespace geode
     template < index_t dimension >
     ModelBoundaries< dimension >::ModifiableModelBoundaryRange::
         ModifiableModelBoundaryRange( const ModelBoundaries& boundaries )
-        : ModelBoundaryRangeBase( boundaries ),
-          BeginEnd< ModifiableModelBoundaryRange >( *this )
+        : ModelBoundaryRangeBase( boundaries )
+    {
+    }
+
+    template < index_t dimension >
+    ModelBoundaries< dimension >::ModifiableModelBoundaryRange::
+        ModifiableModelBoundaryRange(
+            const ModifiableModelBoundaryRange& range )
+        : ModelBoundaryRangeBase{ range }
+    {
+    }
+
+    template < index_t dimension >
+    ModelBoundaries< dimension >::ModifiableModelBoundaryRange::
+        ~ModifiableModelBoundaryRange()
     {
     }
 

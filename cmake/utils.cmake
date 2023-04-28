@@ -21,6 +21,7 @@ include(InstallRequiredSystemLibraries)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_COLOR_DIAGNOSTICS ON)
 
 find_program(CLANG_TIDY "clang-tidy-6.0" "clang-tidy-5.0" "clang-tidy")
 if(CLANG_TIDY)

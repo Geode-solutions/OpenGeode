@@ -27,7 +27,7 @@
 
 #include <absl/base/casts.h>
 
-#include <geode/basic/types.h>
+#include <geode/basic/common.h>
 
 namespace geode
 {
@@ -92,9 +92,10 @@ namespace geode
     /*!
      * Begin and end methods for range-based iteration on custom range.
      * See derived classes for usage.
+     *
      */
     template < typename Type >
-    class BeginEnd
+    class OPENGEODE_BASIC_DEPRECATED BeginEnd
     {
     public:
         explicit BeginEnd( const Type& type ) : type_( type ) {}
@@ -113,6 +114,17 @@ namespace geode
         const Type& type_;
     };
 
+#define OPENGEODE_RANGE_LOOP( Type )                                           \
+public:                                                                        \
+    inline const Type& begin() const                                           \
+    {                                                                          \
+        return *this;                                                          \
+    }                                                                          \
+    inline const Type& end() const                                             \
+    {                                                                          \
+        return *this;                                                          \
+    }
+
     /*!
      * This class can be used to iterate over integer loop.
      * Example:
@@ -129,14 +141,14 @@ namespace geode
      *    }
      */
     template < typename Type >
-    class TRange : public BaseRange< Type, IncrementOperator >,
-                   public BeginEnd< TRange< Type > >
+    class TRange : public BaseRange< Type, IncrementOperator >
     {
+        OPENGEODE_RANGE_LOOP( TRange< Type > )
+
     public:
         template < typename T1, typename T2 >
         TRange( T1 begin, T2 end )
-            : BaseRange< Type, IncrementOperator >( begin, end ),
-              BeginEnd< TRange< Type > >( *this )
+            : BaseRange< Type, IncrementOperator >( begin, end )
         {
         }
 
@@ -154,14 +166,14 @@ namespace geode
     using LRange = TRange< local_index_t >;
 
     template < typename Type >
-    class TReverseRange : public BaseRange< Type, DecrementOperator >,
-                          public BeginEnd< TReverseRange< Type > >
+    class TReverseRange : public BaseRange< Type, DecrementOperator >
     {
+        OPENGEODE_RANGE_LOOP( TReverseRange< Type > )
+
     public:
         template < typename T1, typename T2 >
         TReverseRange( T1 begin, T2 end )
-            : BaseRange< Type, DecrementOperator >( begin - 1, end - 1 ),
-              BeginEnd< TReverseRange< Type > >( *this )
+            : BaseRange< Type, DecrementOperator >( begin - 1, end - 1 )
         {
         }
 
@@ -179,14 +191,14 @@ namespace geode
     using LReverseRange = TReverseRange< local_index_t >;
 
     template < typename Type >
-    class TIndices : public BaseRange< Type, IncrementOperator >,
-                     public BeginEnd< TIndices< Type > >
+    class TIndices : public BaseRange< Type, IncrementOperator >
     {
+        OPENGEODE_RANGE_LOOP( TIndices< Type > )
+
     public:
         template < typename Container >
         explicit TIndices( const Container& container )
-            : BaseRange< Type, IncrementOperator >( 0, container.size() ),
-              BeginEnd< TIndices< Type > >( *this )
+            : BaseRange< Type, IncrementOperator >( 0, container.size() )
         {
         }
 
@@ -199,13 +211,13 @@ namespace geode
     using LIndices = TIndices< local_index_t >;
 
     template < typename Type >
-    class EraserRange : public BaseRange< index_t, DecrementOperator >,
-                        public BeginEnd< EraserRange< Type > >
+    class EraserRange : public BaseRange< index_t, DecrementOperator >
     {
+        OPENGEODE_RANGE_LOOP( EraserRange< Type > )
+
     public:
         EraserRange( std::vector< Type >& values )
             : BaseRange< index_t, DecrementOperator >( values.size() - 1, -1 ),
-              BeginEnd< EraserRange< Type > >( *this ),
               values_( values )
         {
         }

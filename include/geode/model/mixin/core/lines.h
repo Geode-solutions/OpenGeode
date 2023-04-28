@@ -66,11 +66,13 @@ namespace geode
             IMPLEMENTATION_MEMBER( impl_ );
         };
 
-        class opengeode_model_api LineRange : public LineRangeBase,
-                                              public BeginEnd< LineRange >
+        class opengeode_model_api LineRange : public LineRangeBase
         {
+            OPENGEODE_RANGE_LOOP( LineRange )
+
         public:
             LineRange( const Lines& lines );
+            LineRange( const LineRange& range );
             ~LineRange();
 
             const Line< dimension >& operator*() const;
@@ -96,11 +98,14 @@ namespace geode
         Lines& operator=( Lines&& other );
 
     private:
-        class ModifiableLineRange : public LineRangeBase,
-                                    public BeginEnd< ModifiableLineRange >
+        class ModifiableLineRange : public LineRangeBase
         {
+            OPENGEODE_RANGE_LOOP( ModifiableLineRange )
+
         public:
             ModifiableLineRange( const Lines& lines );
+            ModifiableLineRange( const ModifiableLineRange& range );
+            ~ModifiableLineRange();
 
             Line< dimension >& operator*() const;
         };

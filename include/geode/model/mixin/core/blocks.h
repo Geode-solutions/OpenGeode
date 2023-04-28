@@ -76,11 +76,13 @@ namespace geode
         /*!
          * Class for range-based iteration on unmodifiable Blocks
          */
-        class opengeode_model_api BlockRange : public BlockRangeBase,
-                                               public BeginEnd< BlockRange >
+        class opengeode_model_api BlockRange : public BlockRangeBase
         {
+            OPENGEODE_RANGE_LOOP( BlockRange )
+
         public:
             BlockRange( const Blocks& blocks );
+            BlockRange( const BlockRange& range );
             ~BlockRange();
 
             const Block< dimension >& operator*() const;
@@ -112,11 +114,14 @@ namespace geode
         Blocks& operator=( Blocks&& other );
 
     private:
-        class ModifiableBlockRange : public BlockRangeBase,
-                                     public BeginEnd< ModifiableBlockRange >
+        class ModifiableBlockRange : public BlockRangeBase
         {
+            OPENGEODE_RANGE_LOOP( ModifiableBlockRange )
+
         public:
             ModifiableBlockRange( const Blocks& blocks );
+            ModifiableBlockRange( const ModifiableBlockRange& range );
+            ~ModifiableBlockRange();
 
             Block< dimension >& operator*() const;
         };
