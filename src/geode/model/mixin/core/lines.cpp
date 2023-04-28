@@ -246,7 +246,13 @@ namespace geode
 
     template < index_t dimension >
     Lines< dimension >::LineRange::LineRange( const Lines& lines )
-        : LineRangeBase( lines ), BeginEnd< LineRange >( *this )
+        : LineRangeBase( lines )
+    {
+    }
+
+    template < index_t dimension >
+    Lines< dimension >::LineRange::LineRange( const LineRange& range )
+        : LineRangeBase{ range }
     {
     }
 
@@ -264,7 +270,19 @@ namespace geode
     template < index_t dimension >
     Lines< dimension >::ModifiableLineRange::ModifiableLineRange(
         const Lines& lines )
-        : LineRangeBase( lines ), BeginEnd< ModifiableLineRange >( *this )
+        : LineRangeBase( lines )
+    {
+    }
+
+    template < index_t dimension >
+    Lines< dimension >::ModifiableLineRange::ModifiableLineRange(
+        const ModifiableLineRange& range )
+        : LineRangeBase{ range }
+    {
+    }
+
+    template < index_t dimension >
+    Lines< dimension >::ModifiableLineRange::~ModifiableLineRange()
     {
     }
 

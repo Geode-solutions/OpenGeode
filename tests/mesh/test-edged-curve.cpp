@@ -224,7 +224,8 @@ void test_io(
     for( const auto vertex_id : geode::Range{ edged_curve.nb_vertices() } )
     {
         OPENGEODE_EXCEPTION( edged_curve.point( vertex_id )
-                                 .inexact_equal( reload->point( vertex_id ) ) );
+                                 .inexact_equal( reload->point( vertex_id ) ),
+            "[Test] Reloaded EdgedCurve has wrong point coordinates" );
     }
 }
 

@@ -75,11 +75,13 @@ namespace geode
         /*!
          * Class for range-based iteration on unmodifiable Corners
          */
-        class opengeode_model_api CornerRange : public CornerRangeBase,
-                                                public BeginEnd< CornerRange >
+        class opengeode_model_api CornerRange : public CornerRangeBase
         {
+            OPENGEODE_RANGE_LOOP( CornerRange )
+
         public:
             CornerRange( const Corners& corners );
+            CornerRange( const CornerRange& range );
             ~CornerRange();
 
             const Corner< dimension >& operator*() const;
@@ -111,11 +113,14 @@ namespace geode
         Corners& operator=( Corners&& other );
 
     private:
-        class ModifiableCornerRange : public CornerRangeBase,
-                                      public BeginEnd< ModifiableCornerRange >
+        class ModifiableCornerRange : public CornerRangeBase
         {
+            OPENGEODE_RANGE_LOOP( ModifiableCornerRange )
+
         public:
             ModifiableCornerRange( const Corners& corners );
+            ModifiableCornerRange( const ModifiableCornerRange& range );
+            ~ModifiableCornerRange();
 
             Corner< dimension >& operator*() const;
         };

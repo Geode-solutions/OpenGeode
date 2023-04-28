@@ -284,7 +284,13 @@ namespace geode
 
     template < index_t dimension >
     Blocks< dimension >::BlockRange::BlockRange( const Blocks& blocks )
-        : BlockRangeBase( blocks ), BeginEnd< BlockRange >( *this )
+        : BlockRangeBase( blocks )
+    {
+    }
+
+    template < index_t dimension >
+    Blocks< dimension >::BlockRange::BlockRange( const BlockRange& range )
+        : BlockRangeBase{ range }
     {
     }
 
@@ -309,7 +315,19 @@ namespace geode
     template < index_t dimension >
     Blocks< dimension >::ModifiableBlockRange::ModifiableBlockRange(
         const Blocks& blocks )
-        : BlockRangeBase( blocks ), BeginEnd< ModifiableBlockRange >( *this )
+        : BlockRangeBase( blocks )
+    {
+    }
+
+    template < index_t dimension >
+    Blocks< dimension >::ModifiableBlockRange::ModifiableBlockRange(
+        const ModifiableBlockRange& range )
+        : BlockRangeBase{ range }
+    {
+    }
+
+    template < index_t dimension >
+    Blocks< dimension >::ModifiableBlockRange::~ModifiableBlockRange()
     {
     }
 

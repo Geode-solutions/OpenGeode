@@ -67,11 +67,13 @@ namespace geode
         };
 
         class opengeode_model_api ModelBoundaryRange
-            : public ModelBoundaryRangeBase,
-              public BeginEnd< ModelBoundaryRange >
+            : public ModelBoundaryRangeBase
         {
+            OPENGEODE_RANGE_LOOP( ModelBoundaryRange )
+
         public:
             ModelBoundaryRange( const ModelBoundaries& boundaries );
+            ModelBoundaryRange( const ModelBoundaryRange& range );
             ~ModelBoundaryRange();
 
             const ModelBoundary< dimension >& operator*() const;
@@ -94,12 +96,15 @@ namespace geode
         ModelBoundaries( ModelBoundaries&& );
 
     private:
-        class ModifiableModelBoundaryRange
-            : public ModelBoundaryRangeBase,
-              public BeginEnd< ModifiableModelBoundaryRange >
+        class ModifiableModelBoundaryRange : public ModelBoundaryRangeBase
         {
+            OPENGEODE_RANGE_LOOP( ModifiableModelBoundaryRange )
+
         public:
             ModifiableModelBoundaryRange( const ModelBoundaries& boundaries );
+            ModifiableModelBoundaryRange(
+                const ModifiableModelBoundaryRange& range );
+            ~ModifiableModelBoundaryRange();
 
             ModelBoundary< dimension >& operator*() const;
         };
