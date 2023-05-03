@@ -75,12 +75,20 @@ namespace geode
 
         class opengeode_model_api RelationRange : public RelationRangeIterator
         {
-            OPENGEODE_RANGE_LOOP( RelationRange )
-
         public:
             RelationRange( const Relationships& relationships, const uuid& id )
                 : RelationRangeIterator( relationships, id )
             {
+            }
+
+            const RelationRange& begin() const
+            {
+                return *this;
+            }
+
+            const RelationRange& end() const
+            {
+                return *this;
             }
         };
 
@@ -108,12 +116,20 @@ namespace geode
 
         class opengeode_model_api BoundaryRange : public BoundaryRangeIterator
         {
-            OPENGEODE_RANGE_LOOP( BoundaryRange )
-
         public:
             BoundaryRange( const Relationships& relationships, const uuid& id )
                 : BoundaryRangeIterator( relationships, id )
             {
+            }
+
+            const BoundaryRange& begin() const
+            {
+                return *this;
+            }
+
+            const BoundaryRange& end() const
+            {
+                return *this;
             }
         };
 
@@ -141,12 +157,20 @@ namespace geode
 
         class opengeode_model_api IncidenceRange : public IncidenceRangeIterator
         {
-            OPENGEODE_RANGE_LOOP( IncidenceRange )
-
         public:
             IncidenceRange( const Relationships& relationships, const uuid& id )
                 : IncidenceRangeIterator( relationships, id )
             {
+            }
+
+            const IncidenceRange& begin() const
+            {
+                return *this;
+            }
+
+            const IncidenceRange& end() const
+            {
+                return *this;
             }
         };
 
@@ -174,12 +198,20 @@ namespace geode
 
         class opengeode_model_api InternalRange : public InternalRangeIterator
         {
-            OPENGEODE_RANGE_LOOP( InternalRange )
-
         public:
             InternalRange( const Relationships& relationships, const uuid& id )
                 : InternalRangeIterator( relationships, id )
             {
+            }
+
+            const InternalRange& begin() const
+            {
+                return *this;
+            }
+
+            const InternalRange& end() const
+            {
+                return *this;
             }
         };
 
@@ -207,12 +239,20 @@ namespace geode
 
         class opengeode_model_api EmbeddingRange : public EmbeddingRangeIterator
         {
-            OPENGEODE_RANGE_LOOP( EmbeddingRange )
-
         public:
             EmbeddingRange( const Relationships& relationships, const uuid& id )
                 : EmbeddingRangeIterator( relationships, id )
             {
+            }
+
+            const EmbeddingRange& begin() const
+            {
+                return *this;
+            }
+
+            const EmbeddingRange& end() const
+            {
+                return *this;
             }
         };
 
@@ -240,12 +280,20 @@ namespace geode
 
         class opengeode_model_api ItemRange : public ItemRangeIterator
         {
-            OPENGEODE_RANGE_LOOP( ItemRange )
-
         public:
             ItemRange( const Relationships& relationships, const uuid& id )
                 : ItemRangeIterator( relationships, id )
             {
+            }
+
+            const ItemRange& begin() const
+            {
+                return *this;
+            }
+
+            const ItemRange& end() const
+            {
+                return *this;
             }
         };
 
@@ -274,13 +322,21 @@ namespace geode
         class opengeode_model_api CollectionRange
             : public CollectionRangeIterator
         {
-            OPENGEODE_RANGE_LOOP( CollectionRange )
-
         public:
             CollectionRange(
                 const Relationships& relationships, const uuid& id )
                 : CollectionRangeIterator( relationships, id )
             {
+            }
+
+            const CollectionRange& begin() const
+            {
+                return *this;
+            }
+
+            const CollectionRange& end() const
+            {
+                return *this;
             }
         };
 

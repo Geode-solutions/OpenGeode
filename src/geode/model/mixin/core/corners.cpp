@@ -268,6 +268,18 @@ namespace geode
     }
 
     template < index_t dimension >
+    auto Corners< dimension >::CornerRange::begin() const -> const CornerRange&
+    {
+        return *this;
+    }
+
+    template < index_t dimension >
+    auto Corners< dimension >::CornerRange::end() const -> const CornerRange&
+    {
+        return *this;
+    }
+
+    template < index_t dimension >
     const Corner< dimension >&
         Corners< dimension >::CornerRange::operator*() const
     {
@@ -291,6 +303,20 @@ namespace geode
     template < index_t dimension >
     Corners< dimension >::ModifiableCornerRange::~ModifiableCornerRange()
     {
+    }
+
+    template < index_t dimension >
+    auto Corners< dimension >::ModifiableCornerRange::begin() const
+        -> const ModifiableCornerRange&
+    {
+        return *this;
+    }
+
+    template < index_t dimension >
+    auto Corners< dimension >::ModifiableCornerRange::end() const
+        -> const ModifiableCornerRange&
+    {
+        return *this;
     }
 
     template < index_t dimension >

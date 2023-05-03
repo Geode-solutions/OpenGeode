@@ -99,6 +99,17 @@ namespace geode
 
     Section::BoundaryCornerRange::~BoundaryCornerRange() {}
 
+    auto Section::BoundaryCornerRange::begin() const
+        -> const BoundaryCornerRange&
+    {
+        return *this;
+    }
+
+    auto Section::BoundaryCornerRange::end() const -> const BoundaryCornerRange&
+    {
+        return *this;
+    }
+
     const Corner2D& Section::BoundaryCornerRange::operator*() const
     {
         return section_.corner(
@@ -126,6 +137,16 @@ namespace geode
     }
 
     Section::BoundaryLineRange::~BoundaryLineRange() {}
+
+    auto Section::BoundaryLineRange::begin() const -> const BoundaryLineRange&
+    {
+        return *this;
+    }
+
+    auto Section::BoundaryLineRange::end() const -> const BoundaryLineRange&
+    {
+        return *this;
+    }
 
     const Line2D& Section::BoundaryLineRange::operator*() const
     {
@@ -155,6 +176,16 @@ namespace geode
 
     Section::IncidentLineRange::~IncidentLineRange() {}
 
+    auto Section::IncidentLineRange::begin() const -> const IncidentLineRange&
+    {
+        return *this;
+    }
+
+    auto Section::IncidentLineRange::end() const -> const IncidentLineRange&
+    {
+        return *this;
+    }
+
     const Line2D& Section::IncidentLineRange::operator*() const
     {
         return section_.line(
@@ -182,6 +213,18 @@ namespace geode
     }
 
     Section::IncidentSurfaceRange::~IncidentSurfaceRange() {}
+
+    auto Section::IncidentSurfaceRange::begin() const
+        -> const IncidentSurfaceRange&
+    {
+        return *this;
+    }
+
+    auto Section::IncidentSurfaceRange::end() const
+        -> const IncidentSurfaceRange&
+    {
+        return *this;
+    }
 
     const Surface2D& Section::IncidentSurfaceRange::operator*() const
     {
@@ -211,6 +254,16 @@ namespace geode
     }
 
     Section::InternalLineRange::~InternalLineRange() {}
+
+    auto Section::InternalLineRange::begin() const -> const InternalLineRange&
+    {
+        return *this;
+    }
+
+    auto Section::InternalLineRange::end() const -> const InternalLineRange&
+    {
+        return *this;
+    }
 
     void Section::InternalLineRange::operator++()
     {
@@ -246,6 +299,17 @@ namespace geode
     }
 
     Section::InternalCornerRange::~InternalCornerRange() {}
+
+    auto Section::InternalCornerRange::begin() const
+        -> const InternalCornerRange&
+    {
+        return *this;
+    }
+
+    auto Section::InternalCornerRange::end() const -> const InternalCornerRange&
+    {
+        return *this;
+    }
 
     void Section::InternalCornerRange::operator++()
     {
@@ -296,6 +360,18 @@ namespace geode
 
     Section::EmbeddingSurfaceRange::~EmbeddingSurfaceRange() {}
 
+    auto Section::EmbeddingSurfaceRange::begin() const
+        -> const EmbeddingSurfaceRange&
+    {
+        return *this;
+    }
+
+    auto Section::EmbeddingSurfaceRange::end() const
+        -> const EmbeddingSurfaceRange&
+    {
+        return *this;
+    }
+
     void Section::EmbeddingSurfaceRange::operator++()
     {
         Relationships::EmbeddingRangeIterator::operator++();
@@ -321,6 +397,16 @@ namespace geode
     }
 
     Section::ItemLineRange::~ItemLineRange() {}
+
+    auto Section::ItemLineRange::begin() const -> const ItemLineRange&
+    {
+        return *this;
+    }
+
+    auto Section::ItemLineRange::end() const -> const ItemLineRange&
+    {
+        return *this;
+    }
 
     const Line2D& Section::ItemLineRange::operator*() const
     {

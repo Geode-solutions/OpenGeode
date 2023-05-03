@@ -203,6 +203,20 @@ namespace geode
     }
 
     template < index_t dimension >
+    auto ModelBoundaries< dimension >::ModelBoundaryRange::begin() const
+        -> const ModelBoundaryRange&
+    {
+        return *this;
+    }
+
+    template < index_t dimension >
+    auto ModelBoundaries< dimension >::ModelBoundaryRange::end() const
+        -> const ModelBoundaryRange&
+    {
+        return *this;
+    }
+
+    template < index_t dimension >
     const ModelBoundary< dimension >&
         ModelBoundaries< dimension >::ModelBoundaryRange::operator*() const
     {
@@ -228,6 +242,20 @@ namespace geode
     ModelBoundaries< dimension >::ModifiableModelBoundaryRange::
         ~ModifiableModelBoundaryRange()
     {
+    }
+
+    template < index_t dimension >
+    auto ModelBoundaries< dimension >::ModifiableModelBoundaryRange::begin()
+        const -> const ModifiableModelBoundaryRange&
+    {
+        return *this;
+    }
+
+    template < index_t dimension >
+    auto ModelBoundaries< dimension >::ModifiableModelBoundaryRange::end() const
+        -> const ModifiableModelBoundaryRange&
+    {
+        return *this;
     }
 
     template < index_t dimension >

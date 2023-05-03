@@ -73,12 +73,14 @@ namespace geode
         class opengeode_model_api BoundaryCornerRange
             : public Relationships::BoundaryRangeIterator
         {
-            OPENGEODE_RANGE_LOOP( BoundaryCornerRange )
-
         public:
             BoundaryCornerRange( const BRep& brep, const Line3D& line );
             BoundaryCornerRange( const BoundaryCornerRange& range );
             ~BoundaryCornerRange();
+
+            const BoundaryCornerRange& begin() const;
+
+            const BoundaryCornerRange& end() const;
 
             const Corner3D& operator*() const;
 
@@ -89,12 +91,14 @@ namespace geode
         class opengeode_model_api BoundaryLineRange
             : public Relationships::BoundaryRangeIterator
         {
-            OPENGEODE_RANGE_LOOP( BoundaryLineRange )
-
         public:
             BoundaryLineRange( const BRep& brep, const Surface3D& surface );
             BoundaryLineRange( const BoundaryLineRange& range );
             ~BoundaryLineRange();
+
+            const BoundaryLineRange& begin() const;
+
+            const BoundaryLineRange& end() const;
 
             const Line3D& operator*() const;
 
@@ -105,12 +109,14 @@ namespace geode
         class opengeode_model_api BoundarySurfaceRange
             : public Relationships::BoundaryRangeIterator
         {
-            OPENGEODE_RANGE_LOOP( BoundarySurfaceRange )
-
         public:
             BoundarySurfaceRange( const BRep& brep, const Block3D& block );
             BoundarySurfaceRange( const BoundarySurfaceRange& range );
             ~BoundarySurfaceRange();
+
+            const BoundarySurfaceRange& begin() const;
+
+            const BoundarySurfaceRange& end() const;
 
             const Surface3D& operator*() const;
 
@@ -121,12 +127,14 @@ namespace geode
         class opengeode_model_api IncidentLineRange
             : public Relationships::IncidenceRangeIterator
         {
-            OPENGEODE_RANGE_LOOP( IncidentLineRange )
-
         public:
             IncidentLineRange( const BRep& brep, const Corner3D& corner );
             IncidentLineRange( const IncidentLineRange& range );
             ~IncidentLineRange();
+
+            const IncidentLineRange& begin() const;
+
+            const IncidentLineRange& end() const;
 
             const Line3D& operator*() const;
 
@@ -137,12 +145,14 @@ namespace geode
         class opengeode_model_api IncidentSurfaceRange
             : public Relationships::IncidenceRangeIterator
         {
-            OPENGEODE_RANGE_LOOP( IncidentSurfaceRange )
-
         public:
             IncidentSurfaceRange( const BRep& brep, const Line3D& line );
             IncidentSurfaceRange( const IncidentSurfaceRange& range );
             ~IncidentSurfaceRange();
+
+            const IncidentSurfaceRange& begin() const;
+
+            const IncidentSurfaceRange& end() const;
 
             const Surface3D& operator*() const;
 
@@ -153,12 +163,14 @@ namespace geode
         class opengeode_model_api IncidentBlockRange
             : public Relationships::IncidenceRangeIterator
         {
-            OPENGEODE_RANGE_LOOP( IncidentBlockRange )
-
         public:
             IncidentBlockRange( const BRep& brep, const Surface3D& surface );
             IncidentBlockRange( const IncidentBlockRange& range );
             ~IncidentBlockRange();
+
+            const IncidentBlockRange& begin() const;
+
+            const IncidentBlockRange& end() const;
 
             const Block3D& operator*() const;
 
@@ -169,13 +181,15 @@ namespace geode
         class opengeode_model_api InternalCornerRange
             : public Relationships::InternalRangeIterator
         {
-            OPENGEODE_RANGE_LOOP( InternalCornerRange )
-
         public:
             InternalCornerRange( const BRep& brep, const Surface3D& surface );
             InternalCornerRange( const BRep& brep, const Block3D& block );
             InternalCornerRange( const InternalCornerRange& range );
             ~InternalCornerRange();
+
+            const InternalCornerRange& begin() const;
+
+            const InternalCornerRange& end() const;
 
             void operator++();
 
@@ -188,13 +202,15 @@ namespace geode
         class opengeode_model_api InternalLineRange
             : public Relationships::InternalRangeIterator
         {
-            OPENGEODE_RANGE_LOOP( InternalLineRange )
-
         public:
             InternalLineRange( const BRep& brep, const Surface3D& surface );
             InternalLineRange( const BRep& brep, const Block3D& block );
             InternalLineRange( const InternalLineRange& range );
             ~InternalLineRange();
+
+            const InternalLineRange& begin() const;
+
+            const InternalLineRange& end() const;
 
             void operator++();
 
@@ -207,12 +223,14 @@ namespace geode
         class opengeode_model_api InternalSurfaceRange
             : public Relationships::InternalRangeIterator
         {
-            OPENGEODE_RANGE_LOOP( InternalSurfaceRange )
-
         public:
             InternalSurfaceRange( const BRep& brep, const Block3D& block );
             InternalSurfaceRange( const InternalSurfaceRange& range );
             ~InternalSurfaceRange();
+
+            const InternalSurfaceRange& begin() const;
+
+            const InternalSurfaceRange& end() const;
 
             void operator++();
 
@@ -225,13 +243,15 @@ namespace geode
         class opengeode_model_api EmbeddingSurfaceRange
             : public Relationships::EmbeddingRangeIterator
         {
-            OPENGEODE_RANGE_LOOP( EmbeddingSurfaceRange )
-
         public:
             EmbeddingSurfaceRange( const BRep& brep, const Corner3D& corner );
             EmbeddingSurfaceRange( const BRep& brep, const Line3D& line );
             EmbeddingSurfaceRange( const EmbeddingSurfaceRange& range );
             ~EmbeddingSurfaceRange();
+
+            const EmbeddingSurfaceRange& begin() const;
+
+            const EmbeddingSurfaceRange& end() const;
 
             void operator++();
 
@@ -244,14 +264,16 @@ namespace geode
         class opengeode_model_api EmbeddingBlockRange
             : public Relationships::EmbeddingRangeIterator
         {
-            OPENGEODE_RANGE_LOOP( EmbeddingBlockRange )
-
         public:
             EmbeddingBlockRange( const BRep& brep, const Corner3D& corner );
             EmbeddingBlockRange( const BRep& brep, const Line3D& line );
             EmbeddingBlockRange( const BRep& brep, const Surface3D& surface );
             EmbeddingBlockRange( const EmbeddingBlockRange& range );
             ~EmbeddingBlockRange();
+
+            const EmbeddingBlockRange& begin() const;
+
+            const EmbeddingBlockRange& end() const;
 
             void operator++();
 
@@ -264,13 +286,15 @@ namespace geode
         class opengeode_model_api ItemSurfaceRange
             : public Relationships::ItemRangeIterator
         {
-            OPENGEODE_RANGE_LOOP( ItemSurfaceRange )
-
         public:
             ItemSurfaceRange(
                 const BRep& brep, const ModelBoundary3D& boundary );
             ItemSurfaceRange( const ItemSurfaceRange& range );
             ~ItemSurfaceRange();
+
+            const ItemSurfaceRange& begin() const;
+
+            const ItemSurfaceRange& end() const;
 
             const Surface3D& operator*() const;
 

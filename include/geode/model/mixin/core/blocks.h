@@ -78,12 +78,14 @@ namespace geode
          */
         class opengeode_model_api BlockRange : public BlockRangeBase
         {
-            OPENGEODE_RANGE_LOOP( BlockRange )
-
         public:
             BlockRange( const Blocks& blocks );
             BlockRange( const BlockRange& range );
             ~BlockRange();
+
+            const BlockRange& begin() const;
+
+            const BlockRange& end() const;
 
             const Block< dimension >& operator*() const;
         };
@@ -116,12 +118,14 @@ namespace geode
     private:
         class ModifiableBlockRange : public BlockRangeBase
         {
-            OPENGEODE_RANGE_LOOP( ModifiableBlockRange )
-
         public:
             ModifiableBlockRange( const Blocks& blocks );
             ModifiableBlockRange( const ModifiableBlockRange& range );
             ~ModifiableBlockRange();
+
+            const ModifiableBlockRange& begin() const;
+
+            const ModifiableBlockRange& end() const;
 
             Block< dimension >& operator*() const;
         };

@@ -99,6 +99,16 @@ namespace geode
 
     BRep::BoundaryCornerRange::~BoundaryCornerRange() {} // NOLINT
 
+    auto BRep::BoundaryCornerRange::begin() const -> const BoundaryCornerRange&
+    {
+        return *this;
+    }
+
+    auto BRep::BoundaryCornerRange::end() const -> const BoundaryCornerRange&
+    {
+        return *this;
+    }
+
     const Corner3D& BRep::BoundaryCornerRange::operator*() const
     {
         return brep_.corner(
@@ -123,6 +133,16 @@ namespace geode
     }
 
     BRep::BoundaryLineRange::~BoundaryLineRange() {} // NOLINT
+
+    auto BRep::BoundaryLineRange::begin() const -> const BoundaryLineRange&
+    {
+        return *this;
+    }
+
+    auto BRep::BoundaryLineRange::end() const -> const BoundaryLineRange&
+    {
+        return *this;
+    }
 
     const Line3D& BRep::BoundaryLineRange::operator*() const
     {
@@ -150,6 +170,17 @@ namespace geode
 
     BRep::BoundarySurfaceRange::~BoundarySurfaceRange() {} // NOLINT
 
+    auto BRep::BoundarySurfaceRange::begin() const
+        -> const BoundarySurfaceRange&
+    {
+        return *this;
+    }
+
+    auto BRep::BoundarySurfaceRange::end() const -> const BoundarySurfaceRange&
+    {
+        return *this;
+    }
+
     const Surface3D& BRep::BoundarySurfaceRange::operator*() const
     {
         return brep_.surface(
@@ -174,6 +205,16 @@ namespace geode
     }
 
     BRep::IncidentLineRange::~IncidentLineRange() {} // NOLINT
+
+    auto BRep::IncidentLineRange::begin() const -> const IncidentLineRange&
+    {
+        return *this;
+    }
+
+    auto BRep::IncidentLineRange::end() const -> const IncidentLineRange&
+    {
+        return *this;
+    }
 
     const Line3D& BRep::IncidentLineRange::operator*() const
     {
@@ -201,6 +242,17 @@ namespace geode
 
     BRep::IncidentSurfaceRange::~IncidentSurfaceRange() {} // NOLINT
 
+    auto BRep::IncidentSurfaceRange::begin() const
+        -> const IncidentSurfaceRange&
+    {
+        return *this;
+    }
+
+    auto BRep::IncidentSurfaceRange::end() const -> const IncidentSurfaceRange&
+    {
+        return *this;
+    }
+
     const Surface3D& BRep::IncidentSurfaceRange::operator*() const
     {
         return brep_.surface(
@@ -226,6 +278,16 @@ namespace geode
     }
 
     BRep::IncidentBlockRange::~IncidentBlockRange() {} // NOLINT
+
+    auto BRep::IncidentBlockRange::begin() const -> const IncidentBlockRange&
+    {
+        return *this;
+    }
+
+    auto BRep::IncidentBlockRange::end() const -> const IncidentBlockRange&
+    {
+        return *this;
+    }
 
     const Block3D& BRep::IncidentBlockRange::operator*() const
     {
@@ -258,6 +320,16 @@ namespace geode
     }
 
     BRep::InternalLineRange::~InternalLineRange() {} // NOLINT
+
+    auto BRep::InternalLineRange::begin() const -> const InternalLineRange&
+    {
+        return *this;
+    }
+
+    auto BRep::InternalLineRange::end() const -> const InternalLineRange&
+    {
+        return *this;
+    }
 
     BRep::InternalLineRange::InternalLineRange(
         const BRep& brep, const Block3D& block )
@@ -300,6 +372,16 @@ namespace geode
     }
 
     BRep::InternalCornerRange::~InternalCornerRange() {} // NOLINT
+
+    auto BRep::InternalCornerRange::begin() const -> const InternalCornerRange&
+    {
+        return *this;
+    }
+
+    auto BRep::InternalCornerRange::end() const -> const InternalCornerRange&
+    {
+        return *this;
+    }
 
     BRep::InternalCornerRange BRep::internal_corners(
         const Block3D& block ) const
@@ -349,6 +431,17 @@ namespace geode
 
     BRep::InternalSurfaceRange::~InternalSurfaceRange() {} // NOLINT
 
+    auto BRep::InternalSurfaceRange::begin() const
+        -> const InternalSurfaceRange&
+    {
+        return *this;
+    }
+
+    auto BRep::InternalSurfaceRange::end() const -> const InternalSurfaceRange&
+    {
+        return *this;
+    }
+
     void BRep::InternalSurfaceRange::operator++()
     {
         Relationships::InternalRangeIterator::operator++();
@@ -382,6 +475,18 @@ namespace geode
     }
 
     BRep::EmbeddingSurfaceRange::~EmbeddingSurfaceRange() {} // NOLINT
+
+    auto BRep::EmbeddingSurfaceRange::begin() const
+        -> const EmbeddingSurfaceRange&
+    {
+        return *this;
+    }
+
+    auto BRep::EmbeddingSurfaceRange::end() const
+        -> const EmbeddingSurfaceRange&
+    {
+        return *this;
+    }
 
     BRep::EmbeddingSurfaceRange BRep::embedding_surfaces(
         const Line3D& line ) const
@@ -444,6 +549,16 @@ namespace geode
 
     BRep::EmbeddingBlockRange::~EmbeddingBlockRange() {} // NOLINT
 
+    auto BRep::EmbeddingBlockRange::begin() const -> const EmbeddingBlockRange&
+    {
+        return *this;
+    }
+
+    auto BRep::EmbeddingBlockRange::end() const -> const EmbeddingBlockRange&
+    {
+        return *this;
+    }
+
     BRep::EmbeddingBlockRange BRep::embedding_blocks(
         const Surface3D& surface ) const
     {
@@ -482,6 +597,16 @@ namespace geode
     }
 
     BRep::ItemSurfaceRange::~ItemSurfaceRange() {} // NOLINT
+
+    auto BRep::ItemSurfaceRange::begin() const -> const ItemSurfaceRange&
+    {
+        return *this;
+    }
+
+    auto BRep::ItemSurfaceRange::end() const -> const ItemSurfaceRange&
+    {
+        return *this;
+    }
 
     const Surface3D& BRep::ItemSurfaceRange::operator*() const
     {

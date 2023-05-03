@@ -262,6 +262,18 @@ namespace geode
     }
 
     template < index_t dimension >
+    auto Lines< dimension >::LineRange::begin() const -> const LineRange&
+    {
+        return *this;
+    }
+
+    template < index_t dimension >
+    auto Lines< dimension >::LineRange::end() const -> const LineRange&
+    {
+        return *this;
+    }
+
+    template < index_t dimension >
     const Line< dimension >& Lines< dimension >::LineRange::operator*() const
     {
         return this->impl_->line();
@@ -284,6 +296,20 @@ namespace geode
     template < index_t dimension >
     Lines< dimension >::ModifiableLineRange::~ModifiableLineRange()
     {
+    }
+
+    template < index_t dimension >
+    auto Lines< dimension >::ModifiableLineRange::begin() const
+        -> const ModifiableLineRange&
+    {
+        return *this;
+    }
+
+    template < index_t dimension >
+    auto Lines< dimension >::ModifiableLineRange::end() const
+        -> const ModifiableLineRange&
+    {
+        return *this;
     }
 
     template < index_t dimension >

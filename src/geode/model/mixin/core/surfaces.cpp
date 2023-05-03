@@ -304,6 +304,19 @@ namespace geode
     }
 
     template < index_t dimension >
+    auto Surfaces< dimension >::SurfaceRange::begin() const
+        -> const SurfaceRange&
+    {
+        return *this;
+    }
+
+    template < index_t dimension >
+    auto Surfaces< dimension >::SurfaceRange::end() const -> const SurfaceRange&
+    {
+        return *this;
+    }
+
+    template < index_t dimension >
     const Surface< dimension >&
         Surfaces< dimension >::SurfaceRange::operator*() const
     {
@@ -327,6 +340,20 @@ namespace geode
     template < index_t dimension >
     Surfaces< dimension >::ModifiableSurfaceRange::~ModifiableSurfaceRange()
     {
+    }
+
+    template < index_t dimension >
+    auto Surfaces< dimension >::ModifiableSurfaceRange::begin() const
+        -> const ModifiableSurfaceRange&
+    {
+        return *this;
+    }
+
+    template < index_t dimension >
+    auto Surfaces< dimension >::ModifiableSurfaceRange::end() const
+        -> const ModifiableSurfaceRange&
+    {
+        return *this;
     }
 
     template < index_t dimension >

@@ -300,6 +300,18 @@ namespace geode
     }
 
     template < index_t dimension >
+    auto Blocks< dimension >::BlockRange::begin() const -> const BlockRange&
+    {
+        return *this;
+    }
+
+    template < index_t dimension >
+    auto Blocks< dimension >::BlockRange::end() const -> const BlockRange&
+    {
+        return *this;
+    }
+
+    template < index_t dimension >
     const Block< dimension >& Blocks< dimension >::BlockRange::operator*() const
     {
         return this->impl_->block();
@@ -329,6 +341,20 @@ namespace geode
     template < index_t dimension >
     Blocks< dimension >::ModifiableBlockRange::~ModifiableBlockRange()
     {
+    }
+
+    template < index_t dimension >
+    auto Blocks< dimension >::ModifiableBlockRange::begin() const
+        -> const ModifiableBlockRange&
+    {
+        return *this;
+    }
+
+    template < index_t dimension >
+    auto Blocks< dimension >::ModifiableBlockRange::end() const
+        -> const ModifiableBlockRange&
+    {
+        return *this;
     }
 
     template < index_t dimension >

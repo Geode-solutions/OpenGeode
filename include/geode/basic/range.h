@@ -114,17 +114,6 @@ namespace geode
         const Type& type_;
     };
 
-#define OPENGEODE_RANGE_LOOP( Type )                                           \
-public:                                                                        \
-    inline const Type& begin() const                                           \
-    {                                                                          \
-        return *this;                                                          \
-    }                                                                          \
-    inline const Type& end() const                                             \
-    {                                                                          \
-        return *this;                                                          \
-    }
-
     /*!
      * This class can be used to iterate over integer loop.
      * Example:
@@ -143,8 +132,6 @@ public:                                                                        \
     template < typename Type >
     class TRange : public BaseRange< Type, IncrementOperator >
     {
-        OPENGEODE_RANGE_LOOP( TRange< Type > )
-
     public:
         template < typename T1, typename T2 >
         TRange( T1 begin, T2 end )
@@ -155,6 +142,16 @@ public:                                                                        \
         template < typename T >
         explicit TRange( T end ) : TRange( 0, end )
         {
+        }
+
+        const TRange< Type >& begin() const
+        {
+            return *this;
+        }
+
+        const TRange< Type >& end() const
+        {
+            return *this;
         }
 
         Type operator*() const
@@ -168,8 +165,6 @@ public:                                                                        \
     template < typename Type >
     class TReverseRange : public BaseRange< Type, DecrementOperator >
     {
-        OPENGEODE_RANGE_LOOP( TReverseRange< Type > )
-
     public:
         template < typename T1, typename T2 >
         TReverseRange( T1 begin, T2 end )
@@ -180,6 +175,16 @@ public:                                                                        \
         template < typename T >
         explicit TReverseRange( T begin ) : TReverseRange( begin, 0 )
         {
+        }
+
+        const TReverseRange< Type >& begin() const
+        {
+            return *this;
+        }
+
+        const TReverseRange< Type >& end() const
+        {
+            return *this;
         }
 
         Type operator*() const
@@ -193,13 +198,21 @@ public:                                                                        \
     template < typename Type >
     class TIndices : public BaseRange< Type, IncrementOperator >
     {
-        OPENGEODE_RANGE_LOOP( TIndices< Type > )
-
     public:
         template < typename Container >
         explicit TIndices( const Container& container )
             : BaseRange< Type, IncrementOperator >( 0, container.size() )
         {
+        }
+
+        const TIndices< Type >& begin() const
+        {
+            return *this;
+        }
+
+        const TIndices< Type >& end() const
+        {
+            return *this;
         }
 
         Type operator*() const
@@ -213,13 +226,21 @@ public:                                                                        \
     template < typename Type >
     class EraserRange : public BaseRange< index_t, DecrementOperator >
     {
-        OPENGEODE_RANGE_LOOP( EraserRange< Type > )
-
     public:
         EraserRange( std::vector< Type >& values )
             : BaseRange< index_t, DecrementOperator >( values.size() - 1, -1 ),
               values_( values )
         {
+        }
+
+        const EraserRange< Type >& begin() const
+        {
+            return *this;
+        }
+
+        const EraserRange< Type >& end() const
+        {
+            return *this;
         }
 
         Type&& operator*()
