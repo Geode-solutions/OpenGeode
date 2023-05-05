@@ -39,8 +39,9 @@ namespace geode
     ALIAS_2D_AND_3D( Point );
     ALIAS_2D_AND_3D( Segment );
     ALIAS_3D( Triangle );
-    class Plane;
+    class Circle;
     class Cylinder;
+    class Plane;
 } // namespace geode
 
 namespace geode
@@ -56,6 +57,12 @@ namespace geode
     template < typename Intersection >
     struct CorrectnessInfo
     {
+        CorrectnessInfo() = default;
+        CorrectnessInfo( const Intersection& intersection )
+            : first{ false, intersection }, second{ false, intersection }
+        {
+        }
+
         std::pair< bool, Intersection > first{ false, {} };
         std::pair< bool, Intersection > second{ false, {} };
     };
@@ -63,20 +70,19 @@ namespace geode
     template < typename Intersection >
     struct IntersectionResult
     {
-        IntersectionResult() = default;
         IntersectionResult( Intersection intersection,
             CorrectnessInfo< Intersection > correctness_info )
             : result( std::move( intersection ) ),
               type( IntersectionType::INTERSECT ),
               correctness( std::move( correctness_info ) )
         {
-            if( !correctness.first.first || !correctness.second.first )
+            if( !correctness->first.first || !correctness->second.first )
             {
                 type = IntersectionType::INCORRECT;
             }
         }
-        IntersectionResult( IntersectionType intersection )
-            : type( intersection )
+        IntersectionResult( IntersectionType intersection_type )
+            : type( intersection_type )
         {
         }
 
@@ -91,8 +97,8 @@ namespace geode
         }
 
         absl::optional< Intersection > result;
-        IntersectionType type{ IntersectionType::NONE };
-        CorrectnessInfo< Intersection > correctness;
+        IntersectionType type;
+        absl::optional< CorrectnessInfo< Intersection > > correctness;
     };
 
     /*!
@@ -189,4 +195,27 @@ namespace geode
     IntersectionResult< absl::InlinedVector< Point3D, 2 > >
         opengeode_geometry_api line_cylinder_intersection(
             const InfiniteLine3D& line, const Cylinder& cylinder );
+
+    /*!
+     * Compute the intersection between a triangle and a circle
+     * @return an optional of the intersection points.
+     */
+    IntersectionResult< absl::InlinedVector< Point3D, 2 > >
+        opengeode_geometry_api triangle_circle_intersection(
+            const Triangle3D& triangle, const Circle& circle );
+
+    /*!
+     * Compute the intersection between a plane and a circle
+     * @return an optional of the intersection points.
+     */
+    IntersectionResult< absl::InlinedVector< Point3D, 2 > >
+        opengeode_geometry_api plane_circle_intersection(
+            const Plane& plane, const Circle& circle );
+
+    /*!
+     * Compute the intersection between two planes
+     * @return an optional of the intersection line.
+     */
+    IntersectionResult< InfiniteLine3D > opengeode_geometry_api
+        plane_plane_intersection( const Plane& plane0, const Plane& plane1 );
 } // namespace geode

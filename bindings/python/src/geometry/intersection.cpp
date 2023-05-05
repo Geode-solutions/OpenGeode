@@ -23,6 +23,8 @@
 
 #include "../common.h"
 
+#include <geode/geometry/basic_objects/circle.h>
+#include <geode/geometry/basic_objects/cylinder.h>
 #include <geode/geometry/basic_objects/infinite_line.h>
 #include <geode/geometry/basic_objects/plane.h>
 #include <geode/geometry/basic_objects/segment.h>
@@ -69,16 +71,32 @@ namespace geode
         using InlinedVectorPoint3D = absl::InlinedVector< Point3D, 2 >;
         PYTHON_INTERSECTION_RESULT( InlinedVectorPoint3D );
         PYTHON_INTERSECTION_RESULT( InfiniteLine3D );
+        module.def( "line_plane_intersection3D", &line_plane_intersection );
+        module.def(
+            "line_sphere_intersection2D", &line_sphere_intersection< 2 > );
+        module.def(
+            "line_sphere_intersection3D", &line_sphere_intersection< 3 > );
+        module.def( "segment_sphere_intersection2D",
+            &segment_sphere_intersection< 2 > );
+        module.def( "segment_sphere_intersection3D",
+            &segment_sphere_intersection< 3 > );
         module.def(
             "segment_plane_intersection3D", &segment_plane_intersection );
         module.def(
             "segment_triangle_intersection3D", &segment_triangle_intersection );
-        module.def( "line_plane_intersection3D", &line_plane_intersection );
         module.def(
             "line_triangle_intersection3D", &line_triangle_intersection );
         module.def( "line_line_intersection2D", &line_line_intersection );
         module.def(
             "segment_segment_intersection2D", &segment_segment_intersection );
         module.def( "segment_line_intersection2D", &segment_line_intersection );
+        module.def(
+            "segment_cylinder_intersection3D", &segment_cylinder_intersection );
+        module.def(
+            "line_cylinder_intersection3D", &line_cylinder_intersection );
+        module.def(
+            "triangle_circle_intersection3D", &triangle_circle_intersection );
+        module.def( "plane_circle_intersection3D", &plane_circle_intersection );
+        module.def( "plane_plane_intersection3D", &plane_plane_intersection );
     }
 } // namespace geode

@@ -40,28 +40,29 @@ namespace geode
 
 namespace geode
 {
-    template < typename PointType >
+    template < typename PlaneType >
     class GenericCircle
     {
     public:
-        GenericCircle( GenericPlane< PointType > plane, double radius );
+        GenericCircle( PlaneType plane, double radius );
 
         GenericCircle( const GenericCircle& other );
         GenericCircle& operator=( const GenericCircle& other );
         GenericCircle( GenericCircle&& other );
         GenericCircle& operator=( GenericCircle&& other );
 
-        const GenericPlane< PointType >& plane() const;
+        const PlaneType& plane() const;
         double radius() const;
 
     private:
-        GenericPlane< PointType > plane_;
+        PlaneType plane_;
         double radius_{ 0 };
     };
 
-    class opengeode_geometry_api OwnerCircle : public GenericCircle< Point3D >
+    class opengeode_geometry_api OwnerCircle
+        : public GenericCircle< OwnerPlane >
     {
-        using Base = GenericCircle< Point3D >;
+        using Base = GenericCircle< OwnerPlane >;
 
     public:
         explicit OwnerCircle( OwnerPlane plane, double radius );
@@ -73,9 +74,9 @@ namespace geode
     };
     using OwnerDisk = OwnerCircle;
 
-    class opengeode_geometry_api Circle : public GenericCircle< RefPoint3D >
+    class opengeode_geometry_api Circle : public GenericCircle< Plane >
     {
-        using Base = GenericCircle< RefPoint3D >;
+        using Base = GenericCircle< Plane >;
 
     public:
         Circle( Plane plane, double radius );
