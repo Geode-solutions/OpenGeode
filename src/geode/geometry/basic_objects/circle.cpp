@@ -25,46 +25,45 @@
 
 namespace geode
 {
-    template < typename PointType >
-    GenericCircle< PointType >::GenericCircle(
-        GenericPlane< PointType > plane, double radius )
+    template < typename PlaneType >
+    GenericCircle< PlaneType >::GenericCircle( PlaneType plane, double radius )
         : plane_( std::move( plane ) ), radius_( radius )
     {
     }
-    template < typename PointType >
-    GenericCircle< PointType >::GenericCircle( const GenericCircle& other )
+    template < typename PlaneType >
+    GenericCircle< PlaneType >::GenericCircle( const GenericCircle& other )
         : plane_( other.plane_ ), radius_( other.radius_ )
     {
     }
-    template < typename PointType >
-    GenericCircle< PointType >& GenericCircle< PointType >::operator=(
+    template < typename PlaneType >
+    GenericCircle< PlaneType >& GenericCircle< PlaneType >::operator=(
         const GenericCircle& other )
     {
         plane_ = other.plane_;
         radius_ = other.radius_;
         return *this;
     }
-    template < typename PointType >
-    GenericCircle< PointType >::GenericCircle( GenericCircle&& other )
+    template < typename PlaneType >
+    GenericCircle< PlaneType >::GenericCircle( GenericCircle&& other )
         : plane_( std::move( other.plane_ ) ),
           radius_( std::move( other.radius_ ) )
     {
     }
-    template < typename PointType >
-    GenericCircle< PointType >& GenericCircle< PointType >::operator=(
+    template < typename PlaneType >
+    GenericCircle< PlaneType >& GenericCircle< PlaneType >::operator=(
         GenericCircle&& other )
     {
         plane_ = std::move( other.plane_ );
         radius_ = std::move( other.radius_ );
         return *this;
     }
-    template < typename PointType >
-    const GenericPlane< PointType >& GenericCircle< PointType >::plane() const
+    template < typename PlaneType >
+    const PlaneType& GenericCircle< PlaneType >::plane() const
     {
         return plane_;
     }
-    template < typename PointType >
-    double GenericCircle< PointType >::radius() const
+    template < typename PlaneType >
+    double GenericCircle< PlaneType >::radius() const
     {
         return radius_;
     }
@@ -108,6 +107,6 @@ namespace geode
         return *this;
     }
 
-    template class opengeode_geometry_api GenericCircle< Point< 3 > >;
-    template class opengeode_geometry_api GenericCircle< RefPoint< 3 > >;
+    template class opengeode_geometry_api GenericCircle< Plane >;
+    template class opengeode_geometry_api GenericCircle< OwnerPlane >;
 } // namespace geode

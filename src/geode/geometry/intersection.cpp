@@ -24,6 +24,7 @@
 #include <geode/geometry/intersection.h>
 
 #include <geode/geometry/barycentric_coordinates.h>
+#include <geode/geometry/basic_objects/circle.h>
 #include <geode/geometry/basic_objects/cylinder.h>
 #include <geode/geometry/basic_objects/infinite_line.h>
 #include <geode/geometry/basic_objects/plane.h>
@@ -184,7 +185,7 @@ namespace geode
             correctness.second.second.push_back( point );
             return { std::move( results ), std::move( correctness ) };
         }
-        return {}; // negative
+        return { IntersectionType::NONE }; // negative
     }
 
     template < index_t dimension >
@@ -208,10 +209,10 @@ namespace geode
             }
             if( segment_intersections.empty() )
             {
-                return {};
+                return { IntersectionType::NONE };
             }
             return { std::move( segment_intersections ),
-                std::move( line_intersections.correctness ) };
+                std::move( line_intersections.correctness.value() ) };
         }
         return line_intersections.type;
     }
@@ -227,7 +228,7 @@ namespace geode
                     line_plane_result.result.value(), segment )
                 > global_epsilon )
             {
-                return {};
+                return { IntersectionType::NONE };
             }
             std::array< double, 2 > lambdas;
             try
@@ -239,7 +240,7 @@ namespace geode
             {
                 lambdas.fill( 0.5 );
             }
-            line_plane_result.correctness.first.second =
+            line_plane_result.correctness->first.second =
                 segment.vertices()[0].get() * lambdas[0]
                 + segment.vertices()[1].get() * lambdas[1];
             return line_plane_result;
@@ -327,7 +328,7 @@ namespace geode
             // else: b2 < 0, no intersection
         }
         // else: b1 < 0, no intersection
-        return {};
+        return { IntersectionType::NONE };
     }
 
     IntersectionResult< Point3D > line_triangle_intersection(
@@ -404,7 +405,7 @@ namespace geode
             // else: b2 < 0, no intersection
         }
         // else: b1 < 0, no intersection
-        return {};
+        return { IntersectionType::NONE };
     }
 
     IntersectionResult< Point2D > line_line_intersection(
@@ -456,13 +457,13 @@ namespace geode
                     line_intersection_result.result.value(), segment0 )
                 > global_epsilon )
             {
-                return {};
+                return { IntersectionType::NONE };
             }
             if( point_segment_distance(
                     line_intersection_result.result.value(), segment1 )
                 > global_epsilon )
             {
-                return {};
+                return { IntersectionType::NONE };
             }
             std::array< double, 2 > lambdas0;
             try
@@ -474,7 +475,7 @@ namespace geode
             {
                 lambdas0.fill( 0.5 );
             }
-            line_intersection_result.correctness.first.second =
+            line_intersection_result.correctness->first.second =
                 segment0.vertices()[0].get() * lambdas0[0]
                 + segment0.vertices()[1].get() * lambdas0[1];
             std::array< double, 2 > lambdas1;
@@ -487,7 +488,7 @@ namespace geode
             {
                 lambdas1.fill( 0.5 );
             }
-            line_intersection_result.correctness.second.second =
+            line_intersection_result.correctness->second.second =
                 segment1.vertices()[0].get() * lambdas1[0]
                 + segment1.vertices()[1].get() * lambdas1[1];
             return line_intersection_result;
@@ -507,7 +508,7 @@ namespace geode
                     line_intersection_result.result.value(), segment )
                 > global_epsilon )
             {
-                return {};
+                return { IntersectionType::NONE };
             }
             std::array< double, 2 > lambdas;
             try
@@ -519,7 +520,7 @@ namespace geode
             {
                 lambdas.fill( 0.5 );
             }
-            line_intersection_result.correctness.first.second =
+            line_intersection_result.correctness->first.second =
                 segment.vertices()[0].get() * lambdas[0]
                 + segment.vertices()[1].get() * lambdas[1];
             return line_intersection_result;
@@ -580,7 +581,7 @@ namespace geode
             else
             {
                 // else:  The line is outside the cylinder, no intersection.
-                return {};
+                return { IntersectionType::NONE };
             }
         }
         else
@@ -628,7 +629,7 @@ namespace geode
                 else
                 { // else: The line is outside the planes of the cylinder end
                     // disks.
-                    return {};
+                    return { IntersectionType::NONE };
                 }
             }
 
@@ -750,7 +751,7 @@ namespace geode
 
         if( !result.intersect )
         {
-            return {};
+            return { IntersectionType::NONE };
         }
         absl::InlinedVector< Point3D, 2 > results;
         results.reserve( result.numIntersections );
@@ -838,12 +839,170 @@ namespace geode
             }
             if( segment_intersections.empty() )
             {
-                return {};
+                return { IntersectionType::NONE };
             }
             return { std::move( segment_intersections ),
-                std::move( line_intersections.correctness ) };
+                std::move( line_intersections.correctness.value() ) };
         }
         return line_intersections.type;
+    }
+
+    IntersectionResult< absl::InlinedVector< Point3D, 2 > >
+        triangle_circle_intersection(
+            const Triangle3D& triangle, const Circle& circle )
+    {
+        const auto plane = triangle.plane();
+        if( !plane )
+        {
+            return { IntersectionType::NONE };
+        }
+        const auto plane_intersection =
+            plane_circle_intersection( plane.value(), circle );
+        if( !plane_intersection.has_intersection() )
+        {
+            // The planes are parallel or nonintersecting.
+            return { plane_intersection.type };
+        }
+        absl::InlinedVector< Point3D, 2 > result;
+        CorrectnessInfo< absl::InlinedVector< Point3D, 2 > > correctness;
+        auto& intersections = plane_intersection.result.value();
+        for( const auto i : Indices{ intersections } )
+        {
+            auto& intersection = intersections[i];
+            auto triangle_output =
+                point_triangle_distance( intersection, triangle );
+            if( std::get< 0 >( triangle_output ) <= global_epsilon )
+            {
+                result.emplace_back( std::move( intersection ) );
+                correctness.first.second.emplace_back(
+                    std::move( std::get< 1 >( triangle_output ) ) );
+                correctness.second.second.emplace_back(
+                    plane_intersection.correctness->second.second[i] );
+            }
+        }
+        if( result.empty() )
+        {
+            return { IntersectionType::NONE };
+        }
+        correctness.first.first = true;
+        correctness.second.first = true;
+        return { std::move( result ), std::move( correctness ) };
+    }
+
+    IntersectionResult< absl::InlinedVector< Point3D, 2 > >
+        plane_circle_intersection( const Plane& plane, const Circle& circle )
+    {
+        const auto& circle_plane = circle.plane();
+        const auto planes_intersection =
+            plane_plane_intersection( plane, circle_plane );
+        if( !planes_intersection.has_intersection() )
+        {
+            // The planes are parallel or nonintersecting.
+            return { planes_intersection.type };
+        }
+        // The planes intersect in a line. Locate one or two points that
+        // are on the circle and line. If the line is t*D+P, the circle
+        // center is C, and the circle radius is r, then
+        //   r^2 = |t*D+P-C|^2 = |D|^2*t^2 + 2*Dot(D,P-C)*t + |P-C|^2
+        // This is a quadratic equation of the form
+        // a2*t^2 + 2*a1*t + a0 = 0.
+        const auto& line = planes_intersection.result.value();
+        const Vector3D diff{ circle_plane.origin(), line.origin() };
+        const auto a2 = line.direction().dot( line.direction() );
+        const auto a1 = diff.dot( line.direction() );
+        const auto a0 = diff.dot( diff ) - circle.radius() * circle.radius();
+
+        const auto discr = a1 * a1 - a0 * a2;
+        if( discr < 0. )
+        {
+            // No real roots, the circle does not intersect the plane.
+            return { IntersectionType::NONE };
+        }
+        absl::InlinedVector< Point3D, 2 > result;
+        CorrectnessInfo< absl::InlinedVector< Point3D, 2 > > correctness;
+        const auto compute_correctness = [&result, &correctness, &plane,
+                                             &circle](
+                                             const Point3D& intersection ) {
+            auto plane_output = point_plane_distance( intersection, plane );
+            correctness.first.first =
+                std::get< 0 >( plane_output ) <= global_epsilon;
+            correctness.first.second.emplace_back(
+                std::move( std::get< 1 >( plane_output ) ) );
+            auto circle_output = point_circle_distance( intersection, circle );
+            correctness.second.first =
+                std::get< 0 >( circle_output ) <= global_epsilon;
+            correctness.second.second.emplace_back(
+                std::move( std::get< 1 >( circle_output ) ) );
+        };
+        if( discr == 0. )
+        {
+            // The quadratic polynomial has 1 real-valued repeated root.
+            // The circle just touches the plane.
+            compute_correctness( result.emplace_back(
+                line.origin() - line.direction() * ( a1 / a2 ) ) );
+        }
+        else
+        {
+            // The quadratic polynomial has 2 distinct, real-valued roots.
+            // The circle intersects the plane in two points.
+            const auto root = std::sqrt( discr );
+            compute_correctness( result.emplace_back(
+                line.origin() - line.direction() * ( ( a1 + root ) / a2 ) ) );
+            compute_correctness( result.emplace_back(
+                line.origin() - line.direction() * ( ( a1 - root ) / a2 ) ) );
+        }
+        return { std::move( result ), std::move( correctness ) };
+    }
+
+    IntersectionResult< InfiniteLine3D > plane_plane_intersection(
+        const Plane& plane0, const Plane& plane1 )
+    {
+        // If N0 and N1 are parallel, either the planes are parallel and
+        // separated or the same plane.
+        //  Otherwise, the intersection line is
+        //   L(t) = t*Cross(N0,N1)/|Cross(N0,N1)| + c0*N0 + c1*N1
+        // for some coefficients c0 and c1 and for t any real number (the
+        // line parameter).  Taking dot products with the normals,
+        //   d0 = Dot(N0,L) = c0*Dot(N0,N0) + c1*Dot(N0,N1) = c0 + c1*d
+        //   d1 = Dot(N1,L) = c0*Dot(N0,N1) + c1*Dot(N1,N1) = c0*d + c1
+        // where d = Dot(N0,N1).  These are two equations in two unknowns.
+        // The solution is
+        //   c0 = (d0 - d*d1)/det
+        //   c1 = (d1 - d*d0)/det
+        // where det = 1 - d^2.
+        const auto dot = plane0.normal().dot( plane1.normal() );
+        const auto constant0 = plane0.plane_constant();
+        const auto constant1 = plane1.plane_constant();
+        if( std::fabs( dot ) >= 1. )
+        {
+            // The planes are parallel.  Check if they are coplanar.
+            const auto constant_diff =
+                dot >= 0. ? constant0 - constant1 : constant0 + constant1;
+            if( std::fabs( constant_diff ) == 0. )
+            {
+                // The planes are coplanar.
+                return { IntersectionType::PARALLEL };
+            }
+            // The planes are parallel but distinct.
+            return { IntersectionType::NONE };
+        }
+        const auto invDet = 1. / ( 1. - dot * dot );
+        const auto c0 = ( constant0 - dot * constant1 ) * invDet;
+        const auto c1 = ( constant1 - dot * constant0 ) * invDet;
+        InfiniteLine3D line{ plane0.normal().cross( plane1.normal() ),
+            plane0.normal() * c0 + plane1.normal() * c1 };
+        CorrectnessInfo< InfiniteLine3D > correctness{ line };
+        const auto compute_corectness =
+            [&line](
+                std::pair< bool, InfiniteLine3D >& info, const Plane& plane ) {
+                auto output = point_plane_distance( line.origin(), plane );
+                info.first = std::get< 0 >( output ) <= global_epsilon;
+                info.second = { line.direction(),
+                    std::move( std::get< 1 >( output ) ) };
+            };
+        compute_corectness( correctness.first, plane0 );
+        compute_corectness( correctness.second, plane1 );
+        return { std::move( line ), std::move( correctness ) };
     }
 
     template IntersectionResult< absl::InlinedVector< Point2D, 2 > >

@@ -24,6 +24,7 @@
 #include <geode/basic/assert.h>
 #include <geode/basic/logger.h>
 
+#include <geode/geometry/basic_objects/circle.h>
 #include <geode/geometry/basic_objects/cylinder.h>
 #include <geode/geometry/basic_objects/infinite_line.h>
 #include <geode/geometry/basic_objects/plane.h>
@@ -611,6 +612,144 @@ void test_segment_cylinder_intersection()
         "query segment_ef" );
 }
 
+void test_plane_plane_intersection()
+{
+    const geode::Vector3D Z{ { 0, 0, 1 } };
+    const geode::Point3D O{ { 0, 0, 0 } };
+    const geode::Plane planeZO{ Z, O };
+    const auto OO_result = geode::plane_plane_intersection( planeZO, planeZO );
+    OPENGEODE_EXCEPTION( OO_result.type == geode::IntersectionType::PARALLEL,
+        "[Test] Wrong intersection between planeZO, planeZO" );
+
+    const geode::Point3D o{ { 0, 0, 1 } };
+    const geode::Plane planeZo{ Z, o };
+    const auto Oo_result = geode::plane_plane_intersection( planeZO, planeZo );
+    OPENGEODE_EXCEPTION(
+        !Oo_result, "[Test] Wrong intersection between planeZO, planeZo" );
+
+    const geode::Vector3D XY{ { 1, 1, 0 } };
+    const geode::Plane planeXY0{ XY, o };
+    const auto XYO_result =
+        geode::plane_plane_intersection( planeZO, planeXY0 );
+    OPENGEODE_EXCEPTION(
+        XYO_result, "[Test] Wrong intersection between planeZO, planeXY0" );
+    OPENGEODE_EXCEPTION( XYO_result.result->origin().inexact_equal( O ),
+        "[Test] Wrong intersection between planeZO, planeXY0" );
+    const auto answer = geode::Vector3D{ { -1, 1, 0 } }.normalize();
+    OPENGEODE_EXCEPTION( XYO_result.result->direction().inexact_equal( answer ),
+        "[Test] Wrong intersection between planeZO, planeXY0" );
+}
+
+void test_plane_circle_intersection()
+{
+    const geode::Vector3D Z{ { 0, 0, 1 } };
+    const geode::Point3D O{ { 0, 0, 0 } };
+    const geode::Plane planeZO{ Z, O };
+    const geode::Circle circleZO{ planeZO, 42 };
+    const auto OO_result =
+        geode::plane_circle_intersection( planeZO, circleZO );
+    OPENGEODE_EXCEPTION( OO_result.type == geode::IntersectionType::PARALLEL,
+        "[Test] Wrong intersection between planeZO, circleZO" );
+
+    const geode::Point3D o{ { 0, 0, 1 } };
+    const geode::Plane planeZo{ Z, o };
+    const geode::Circle circleZo{ planeZo, 42 };
+    const auto Oo_result =
+        geode::plane_circle_intersection( planeZO, circleZo );
+    OPENGEODE_EXCEPTION(
+        !Oo_result, "[Test] Wrong intersection between planeZO, circleZo" );
+
+    const geode::Vector3D XY{ { 1, 1, 0 } };
+    const geode::Plane planeXY0{ XY, o };
+    const geode::Circle circleYZ42{ planeXY0, 42 };
+    const auto XY42_result =
+        geode::plane_circle_intersection( planeZO, circleYZ42 );
+    OPENGEODE_EXCEPTION(
+        XY42_result, "[Test] Wrong intersection between planeZO, circleYZ42" );
+    OPENGEODE_EXCEPTION( XY42_result.result->size() == 2,
+        "[Test] Wrong intersection between planeZO, circleYZ42" );
+    const double value42{ 29.690065678607 };
+    const geode::Point3D answer420{ { value42, -value42, 0 } };
+    OPENGEODE_EXCEPTION( XY42_result.result->at( 0 ).inexact_equal( answer420 ),
+        "[Test] Wrong intersection between planeZO, circleYZ42" );
+    const geode::Point3D answer421{ { -value42, value42, 0 } };
+    OPENGEODE_EXCEPTION( XY42_result.result->at( 1 ).inexact_equal( answer421 ),
+        "[Test] Wrong intersection between planeZO, circleYZ42" );
+
+    const geode::Circle circleYZ1{ planeXY0, 1 };
+    const auto XY1_result =
+        geode::plane_circle_intersection( planeZO, circleYZ1 );
+    OPENGEODE_EXCEPTION(
+        XY1_result, "[Test] Wrong intersection between planeZO, circleYZ1" );
+    OPENGEODE_EXCEPTION( XY1_result.result->size() == 1,
+        "[Test] Wrong intersection between planeZO, circleYZ1" );
+    OPENGEODE_EXCEPTION( XY1_result.result->at( 0 ).inexact_equal( O ),
+        "[Test] Wrong intersection between planeZO, circleYZ1" );
+
+    const geode::Circle circleYZ0{ planeXY0, 0.1 };
+    const auto XY0_result =
+        geode::plane_circle_intersection( planeZO, circleYZ0 );
+    OPENGEODE_EXCEPTION(
+        !XY0_result, "[Test] Wrong intersection between planeZO, circleYZ0" );
+}
+
+void test_triangle_circle_intersection()
+{
+    const geode::Vector3D Z{ { 0, 0, 1 } };
+    const geode::Point3D O{ { 0, 0, 0 } };
+    const geode::Plane planeZO{ Z, O };
+    const geode::Circle circleZO{ planeZO, 42 };
+    const geode::Point3D A{ { 1, 1, 0 } };
+    const geode::Point3D B{ { 1, -1, 0 } };
+    const geode::Point3D C{ { -1, 0, 0 } };
+    const geode::Triangle3D triangleABC{ A, B, C };
+    const auto Oabc_result =
+        geode::triangle_circle_intersection( triangleABC, circleZO );
+    OPENGEODE_EXCEPTION( Oabc_result.type == geode::IntersectionType::PARALLEL,
+        "[Test] Wrong intersection between triangleABC, circleZO" );
+
+    const geode::Point3D o{ { 0, 0, 1 } };
+    const geode::Plane planeZo{ Z, o };
+    const geode::Circle circleZo{ planeZo, 42 };
+    const auto oabc_result =
+        geode::triangle_circle_intersection( triangleABC, circleZo );
+    OPENGEODE_EXCEPTION( !oabc_result,
+        "[Test] Wrong intersection between triangleABC, circleZo" );
+
+    const geode::Vector3D XY{ { 1, 1, 0 } };
+    const geode::Plane planeXY0{ XY, o };
+    const geode::Circle circleYZ11{ planeXY0, 1.1 };
+    const auto XY11_result =
+        geode::triangle_circle_intersection( triangleABC, circleYZ11 );
+    OPENGEODE_EXCEPTION( XY11_result,
+        "[Test] Wrong intersection between triangleABC, circleYZ11" );
+    OPENGEODE_EXCEPTION( XY11_result.result->size() == 2,
+        "[Test] Wrong intersection between triangleABC, circleYZ11" );
+    const double value11{ 0.324037034920393 };
+    const geode::Point3D answer110{ { -value11, value11, 0 } };
+    OPENGEODE_EXCEPTION( XY11_result.result->at( 0 ).inexact_equal( answer110 ),
+        "[Test] Wrong intersection between triangleABC, circleYZ11" );
+    const geode::Point3D answer111{ { value11, -value11, 0 } };
+    OPENGEODE_EXCEPTION( XY11_result.result->at( 1 ).inexact_equal( answer111 ),
+        "[Test] Wrong intersection between triangleABC, circleYZ11" );
+
+    const geode::Circle circleYZ1{ planeXY0, 1 };
+    const auto XY1_result =
+        geode::triangle_circle_intersection( triangleABC, circleYZ1 );
+    OPENGEODE_EXCEPTION( XY1_result,
+        "[Test] Wrong intersection between triangleABC, circleYZ1" );
+    OPENGEODE_EXCEPTION( XY1_result.result->size() == 1,
+        "[Test] Wrong intersection between triangleABC, circleYZ1" );
+    OPENGEODE_EXCEPTION( XY1_result.result->at( 0 ).inexact_equal( O ),
+        "[Test] Wrong intersection between triangleABC, circleYZ1" );
+
+    const geode::Circle circleYZ0{ planeXY0, 0.1 };
+    const auto XY0_result =
+        geode::plane_circle_intersection( planeZO, circleYZ0 );
+    OPENGEODE_EXCEPTION(
+        !XY0_result, "[Test] Wrong intersection between planeZO, circleYZ0" );
+}
+
 void test()
 {
     test_line_sphere_intersection();
@@ -622,6 +761,9 @@ void test()
     test_segment_triangle_intersection();
     test_line_cylinder_intersection();
     test_segment_cylinder_intersection();
+    test_plane_plane_intersection();
+    test_plane_circle_intersection();
+    test_triangle_circle_intersection();
 }
 
 OPENGEODE_TEST( "intersection" )
