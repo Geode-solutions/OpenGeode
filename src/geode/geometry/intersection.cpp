@@ -954,7 +954,7 @@ namespace geode
         return { std::move( result ), std::move( correctness ) };
     }
 
-    IntersectionResult< InfiniteLine3D > plane_plane_intersection(
+    IntersectionResult< OwnerInfiniteLine3D > plane_plane_intersection(
         const Plane& plane0, const Plane& plane1 )
     {
         // If N0 and N1 are parallel, either the planes are parallel and
@@ -989,15 +989,15 @@ namespace geode
         const auto invDet = 1. / ( 1. - dot * dot );
         const auto c0 = ( constant0 - dot * constant1 ) * invDet;
         const auto c1 = ( constant1 - dot * constant0 ) * invDet;
-        InfiniteLine3D line{ plane0.normal().cross( plane1.normal() ),
+        OwnerInfiniteLine3D line{ plane0.normal().cross( plane1.normal() ),
             plane0.normal() * c0 + plane1.normal() * c1 };
-        CorrectnessInfo< InfiniteLine3D > correctness{ line };
+        CorrectnessInfo< OwnerInfiniteLine3D > correctness{ line };
         const auto compute_corectness =
-            [&line](
-                std::pair< bool, InfiniteLine3D >& info, const Plane& plane ) {
+            [&line]( std::pair< bool, OwnerInfiniteLine3D >& info,
+                const Plane& plane ) {
                 auto output = point_plane_distance( line.origin(), plane );
                 info.first = std::get< 0 >( output ) <= global_epsilon;
-                info.second = { line.direction(),
+                info.second = OwnerInfiniteLine3D{ line.direction(),
                     std::move( std::get< 1 >( output ) ) };
             };
         compute_corectness( correctness.first, plane0 );
