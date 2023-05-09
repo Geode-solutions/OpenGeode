@@ -190,8 +190,6 @@ namespace geode
             {
                 absl::FixedArray< bool > visited_polygons(
                     this->mesh().nb_polygons(), false );
-                absl::FixedArray< std::pair< index_t, index_t > > who(
-                    this->mesh().nb_polygons(), { NO_ID, NO_ID } );
                 for( const auto s : Indices{ this->meshes() } )
                 {
                     const auto& surface = this->meshes()[s].get();
@@ -204,7 +202,6 @@ namespace geode
                             continue;
                         }
                         visited_polygons[new_id] = true;
-                        who[new_id] = std::make_pair( s, p );
                         for( const auto e :
                             LRange{ surface.nb_polygon_edges( p ) } )
                         {
