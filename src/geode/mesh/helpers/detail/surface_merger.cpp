@@ -190,17 +190,21 @@ namespace geode
             {
                 absl::FixedArray< bool > visited_polygons(
                     this->mesh().nb_polygons(), false );
+                absl::FixedArray< std::pair< index_t, index_t > > who(
+                    this->mesh().nb_polygons(), { NO_ID, NO_ID } );
                 for( const auto s : Indices{ this->meshes() } )
                 {
                     const auto& surface = this->meshes()[s].get();
                     for( const auto p : Range{ surface.nb_polygons() } )
                     {
+                        const auto pv = surface.polygon_vertices( p );
                         const auto new_id = new_id_[s][p];
                         if( visited_polygons[new_id] )
                         {
                             continue;
                         }
                         visited_polygons[new_id] = true;
+                        who[new_id] = std::make_pair( s, p );
                         for( const auto e :
                             LRange{ surface.nb_polygon_edges( p ) } )
                         {
@@ -208,6 +212,10 @@ namespace geode
                                     surface.polygon_adjacent( { p, e } ) )
                             {
                                 const auto new_adj_id = new_id_[s][adj.value()];
+                                if( new_adj_id == new_id )
+                                {
+                                    continue;
+                                }
                                 this->builder().set_polygon_adjacent(
                                     { new_id, e }, new_adj_id );
                             }
