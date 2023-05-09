@@ -31,11 +31,13 @@
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( InfiniteLine );
+    FORWARD_DECLARATION_DIMENSION_CLASS( OwnerInfiniteLine );
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
     FORWARD_DECLARATION_DIMENSION_CLASS( Segment );
     FORWARD_DECLARATION_DIMENSION_CLASS( Sphere );
     FORWARD_DECLARATION_DIMENSION_CLASS( Triangle );
     ALIAS_2D_AND_3D( InfiniteLine );
+    ALIAS_2D_AND_3D( OwnerInfiniteLine );
     ALIAS_2D_AND_3D( Point );
     ALIAS_2D_AND_3D( Segment );
     ALIAS_3D( Triangle );
@@ -216,6 +218,6 @@ namespace geode
      * Compute the intersection between two planes
      * @return an optional of the intersection line.
      */
-    IntersectionResult< InfiniteLine3D > opengeode_geometry_api
+    IntersectionResult< OwnerInfiniteLine3D > opengeode_geometry_api
         plane_plane_intersection( const Plane& plane0, const Plane& plane1 );
 } // namespace geode
