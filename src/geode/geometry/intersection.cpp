@@ -971,8 +971,8 @@ namespace geode
         //   c1 = (d1 - d*d0)/det
         // where det = 1 - d^2.
         const auto dot = plane0.normal().dot( plane1.normal() );
-        const auto constant0 = plane0.plane_constant();
-        const auto constant1 = plane1.plane_constant();
+        const auto constant0 = -plane0.plane_constant();
+        const auto constant1 = -plane1.plane_constant();
         if( std::fabs( dot ) >= 1. )
         {
             // The planes are parallel.  Check if they are coplanar.
