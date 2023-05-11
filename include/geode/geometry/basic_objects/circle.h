@@ -29,7 +29,9 @@
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+    ALIAS_3D( BoundingBox );
     ALIAS_3D( Point );
     class OwnerCircle;
 
@@ -53,6 +55,7 @@ namespace geode
 
         const PlaneType& plane() const;
         double radius() const;
+        BoundingBox3D bounding_box() const;
 
     private:
         PlaneType plane_;
