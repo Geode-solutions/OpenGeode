@@ -23,6 +23,8 @@
 
 #include <geode/geometry/basic_objects/sphere.h>
 
+#include <geode/geometry/bounding_box.h>
+
 namespace geode
 {
     template < typename PointType, index_t dimension >
@@ -72,6 +74,22 @@ namespace geode
     double GenericSphere< PointType, dimension >::radius() const
     {
         return radius_;
+    }
+
+    template < typename PointType, index_t dimension >
+    BoundingBox< dimension >
+        GenericSphere< PointType, dimension >::bounding_box() const
+    {
+        Point< dimension > translation;
+        for( const auto i : LRange{ dimension } )
+        {
+            translation.set_value( i, radius_ );
+        }
+        BoundingBox< dimension > bbox;
+        const Point< dimension >& origin = origin_;
+        bbox.add_point( origin + translation );
+        bbox.add_point( origin - translation );
+        return bbox;
     }
 
     template < index_t dimension >

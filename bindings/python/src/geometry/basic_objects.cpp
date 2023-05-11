@@ -30,6 +30,7 @@
 #include <geode/geometry/basic_objects/sphere.h>
 #include <geode/geometry/basic_objects/tetrahedron.h>
 #include <geode/geometry/basic_objects/triangle.h>
+#include <geode/geometry/bounding_box.h>
 #include <geode/geometry/information.h>
 
 #define PYTHON_SEGMENT( dimension )                                            \
@@ -44,7 +45,8 @@
             &Segment##dimension##D::normalized_direction )                     \
         .def( "barycenter", &Segment##dimension##D::barycenter )               \
         .def( "length", &Segment##dimension##D::length )                       \
-        .def( "vertices", &Segment##dimension##D::vertices )
+        .def( "vertices", &Segment##dimension##D::vertices )                   \
+        .def( "bounding_box", &Segment##dimension##D::bounding_box )
 
 #define PYTHON_INFINITE_LINE( dimension )                                      \
     const auto line##dimension =                                               \
@@ -64,7 +66,8 @@
         module, triangle##dimension.c_str() )                                  \
         .def( pybind11::init< const Point< dimension >&,                       \
             const Point< dimension >&, const Point< dimension >& >() )         \
-        .def( "vertices", &Triangle##dimension##D::vertices )
+        .def( "vertices", &Triangle##dimension##D::vertices )                  \
+        .def( "bounding_box", &Triangle##dimension##D::bounding_box )
 
 #define PYTHON_SPHERE( dimension )                                             \
     const auto sphere##dimension =                                             \
@@ -73,7 +76,8 @@
         module, sphere##dimension.c_str() )                                    \
         .def( pybind11::init< const Point< dimension >&, double >() )          \
         .def( "origin", &Sphere##dimension##D::origin )                        \
-        .def( "radius", &Sphere##dimension##D::radius )
+        .def( "radius", &Sphere##dimension##D::radius )                        \
+        .def( "bounding_box", &Sphere##dimension##D::bounding_box )
 
 namespace geode
 {
@@ -103,12 +107,14 @@ namespace geode
         pybind11::class_< Tetrahedron >( module, "Tetrahedron" )
             .def( pybind11::init< const Point3D&, const Point3D&,
                 const Point3D&, const Point3D& >() )
-            .def( "vertices", &Tetrahedron::vertices );
+            .def( "vertices", &Tetrahedron::vertices )
+            .def( "bounding_box", &Tetrahedron::bounding_box );
 
         pybind11::class_< Circle >( module, "Circle" )
             .def( pybind11::init< const Plane&, double >() )
             .def( "plane", &Circle::plane )
-            .def( "radius", &Circle::radius );
+            .def( "radius", &Circle::radius )
+            .def( "bounding_box", &Circle::bounding_box );
 
         pybind11::enum_< Side >( module, "Side" )
             .value( "positive", Side::positive )

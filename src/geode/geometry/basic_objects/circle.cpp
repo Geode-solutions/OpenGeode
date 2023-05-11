@@ -23,6 +23,8 @@
 
 #include <geode/geometry/basic_objects/circle.h>
 
+#include <geode/geometry/bounding_box.h>
+
 namespace geode
 {
     template < typename PlaneType >
@@ -66,6 +68,30 @@ namespace geode
     double GenericCircle< PlaneType >::radius() const
     {
         return radius_;
+    }
+    template < typename PlaneType >
+    BoundingBox3D GenericCircle< PlaneType >::bounding_box() const
+    {
+        const auto sin_angle = [this]( Vector3D direction ) {
+            const auto dP = plane_.normal().dot( direction );
+            if( dP <= -1.0 )
+            {
+                return M_PI;
+            }
+            if( dP >= 1.0 )
+            {
+                return 0.;
+            }
+            return std::sqrt( 1 - dP * dP );
+        };
+        const auto x = sin_angle( { { 1, 0, 0 } } );
+        const auto y = sin_angle( { { 0, 1, 0 } } );
+        const auto z = sin_angle( { { 0, 0, 1 } } );
+        const auto translation = Vector3D{ { x, y, z } } * radius_;
+        BoundingBox3D bbox;
+        bbox.add_point( plane_.origin() + translation );
+        bbox.add_point( plane_.origin() - translation );
+        return bbox;
     }
 
     OwnerCircle::OwnerCircle( OwnerPlane plane, double radius )

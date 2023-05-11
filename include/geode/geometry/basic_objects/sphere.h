@@ -28,6 +28,7 @@
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
     FORWARD_DECLARATION_DIMENSION_CLASS( OwnerSphere );
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
 
@@ -53,6 +54,7 @@ namespace geode
 
         const Point< dimension >& origin() const;
         double radius() const;
+        BoundingBox< dimension > bounding_box() const;
 
     private:
         PointType origin_;
