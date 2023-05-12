@@ -90,7 +90,7 @@ namespace geode
                     } );
                 }
                 CMVmappings mapping;
-                async::when_all( tasks.begin(), tasks.end() )
+                async::when_all( tasks )
                     .then( [this, &mapping]( std::vector< Task > all_task ) {
                         for( auto& task : all_task )
                         {

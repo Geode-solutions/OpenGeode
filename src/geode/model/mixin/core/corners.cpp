@@ -112,7 +112,7 @@ namespace geode
                 save_point_set( mesh, file );
             } );
         }
-        auto all_tasks = async::when_all( tasks.begin(), tasks.end() );
+        auto all_tasks = async::when_all( tasks );
         all_tasks.wait();
         Logger::set_level( level );
         for( auto& task : all_tasks.get() )
@@ -139,7 +139,7 @@ namespace geode
                     typename Corner< dimension >::CornersKey{} );
             } );
         }
-        auto all_tasks = async::when_all( tasks.begin(), tasks.end() );
+        auto all_tasks = async::when_all( tasks );
         all_tasks.wait();
         Logger::set_level( level );
         for( auto& task : all_tasks.get() )

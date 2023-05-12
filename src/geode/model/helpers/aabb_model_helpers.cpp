@@ -60,7 +60,7 @@ namespace
             } );
             id++;
         }
-        for( auto& task : async::when_all( tasks.begin(), tasks.end() ).get() )
+        for( auto& task : async::when_all( tasks ).get() )
         {
             task.get();
         }
@@ -92,7 +92,7 @@ namespace
             result.mesh_tree_ids_.emplace( element.id(), id );
             id++;
         }
-        for( auto& task : async::when_all( tasks.begin(), tasks.end() ).get() )
+        for( auto& task : async::when_all( tasks ).get() )
         {
             task.get();
         }
