@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <geode/mesh/core/mesh_element.h>
+
 #include <geode/model/mixin/core/component_type.h>
 
 namespace geode
@@ -37,6 +39,11 @@ namespace geode
             : component_id( std::move( component_id_in ) ),
               element_id( element_id_in )
         {
+        }
+
+        MeshElement mesh_element() const
+        {
+            return { component_id.id(), element_id };
         }
 
         bool operator==( const ComponentMeshElement& other ) const

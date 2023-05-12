@@ -240,6 +240,12 @@ namespace geode
             block.mesh().polyhedron_facet_edge_vertices( edge ) );
     }
 
+    SectionComponentMeshEdges component_mesh_edges( const Section& section,
+        const std::array< index_t, 2 >& unique_vertices )
+    {
+        return section_component_mesh_edges( section, unique_vertices );
+    }
+
     SectionComponentMeshEdges component_mesh_edges(
         const Section& section, const Line2D& line, index_t edge )
     {
@@ -253,6 +259,12 @@ namespace geode
     {
         return section_component_mesh_edges(
             section, edge_unique_vertices( section, surface, edge ) );
+    }
+
+    BRepComponentMeshEdges component_mesh_edges(
+        const BRep& brep, const std::array< index_t, 2 >& unique_vertices )
+    {
+        return brep_component_mesh_edges( brep, unique_vertices );
     }
 
     BRepComponentMeshEdges component_mesh_edges(

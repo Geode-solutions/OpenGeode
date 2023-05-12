@@ -550,7 +550,7 @@ namespace
             for( auto& pair : surface_pair.second )
             {
                 absl::c_sort( pair );
-                for( auto& polygon_vertex :
+                for( const auto& polygon_vertex :
                     mesh.polygons_around_vertex( pair[0] ) )
                 {
                     auto vertices =
@@ -644,6 +644,12 @@ namespace geode
                         { polygon_id, polygon_vertex_id } ) } );
         }
         return polygon_unique_vertices;
+    }
+
+    BRepComponentMeshPolygons component_mesh_polygons(
+        const BRep& brep, const PolygonVertices& unique_vertices )
+    {
+        return brep_component_mesh_polygons( brep, unique_vertices );
     }
 
     BRepComponentMeshPolygons component_mesh_polygons(

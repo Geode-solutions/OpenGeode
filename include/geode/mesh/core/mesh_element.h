@@ -57,6 +57,11 @@ namespace geode
                            } } } );
         }
 
+        std::string string() const
+        {
+            return absl::StrCat( "[", mesh_id.string(), " ", element_id, "]" );
+        }
+
         uuid mesh_id;
         index_t element_id;
 

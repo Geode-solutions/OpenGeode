@@ -64,6 +64,9 @@ namespace geode
     };
 
     BRepComponentMeshPolygons opengeode_model_api component_mesh_polygons(
+        const BRep& brep, const PolygonVertices& polygon_unique_vertices );
+
+    BRepComponentMeshPolygons opengeode_model_api component_mesh_polygons(
         const BRep& brep, const Surface3D& surface, index_t polygon_id );
 
     BRepComponentMeshPolygons opengeode_model_api component_mesh_polygons(

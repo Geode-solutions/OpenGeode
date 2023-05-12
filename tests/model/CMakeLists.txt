@@ -39,6 +39,12 @@ add_geode_test(
         ${PROJECT_NAME}::model
 )
 add_geode_test(
+    SOURCE "test-component-mesh-polyhedra.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::model
+)
+add_geode_test(
     SOURCE "test-convert-brep.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic

@@ -63,7 +63,7 @@ namespace geode
             const auto status = mz_zip_writer_open_file(
                 writer_, to_string( file ).c_str(), 0, 0 );
             OPENGEODE_EXCEPTION(
-                status == MZ_OK, "[ZipFile] Error opening zip for writing" );
+                status == MZ_OK, "[ZipFile] Error opening zip for writing." );
         }
 
         ~Impl()

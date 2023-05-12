@@ -80,6 +80,10 @@ namespace geode
     };
 
     SectionComponentMeshEdges opengeode_model_api component_mesh_edges(
+        const Section& section,
+        const std::array< index_t, 2 >& edge_unique_vertices );
+
+    SectionComponentMeshEdges opengeode_model_api component_mesh_edges(
         const Section& section, const Line2D& line, index_t edge );
 
     SectionComponentMeshEdges opengeode_model_api component_mesh_edges(
@@ -94,6 +98,10 @@ namespace geode
 
         BlockEdges block_edges;
     };
+
+    BRepComponentMeshEdges opengeode_model_api component_mesh_edges(
+        const BRep& brep,
+        const std::array< index_t, 2 >& edge_unique_vertices );
 
     BRepComponentMeshEdges opengeode_model_api component_mesh_edges(
         const BRep& brep, const Line3D& line, index_t edge );
