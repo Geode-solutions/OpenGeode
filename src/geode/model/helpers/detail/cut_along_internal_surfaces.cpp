@@ -173,7 +173,7 @@ namespace geode
                         LRange{ mesh.nb_polyhedron_facets( p ) } )
                     {
                         PolyhedronFacet facet{ p, f };
-                        if( !mesh.is_polyhedron_facet_on_border( facet ) )
+                        if( mesh.is_polyhedron_facet_on_border( facet ) )
                         {
                             for( const auto vertex_id :
                                 mesh.polyhedron_facet_vertices( facet ) )

@@ -143,7 +143,9 @@ namespace geode
         {
             if( const auto id = relation_edge_index( from.id(), to.id() ) )
             {
-                Logger::warn( "There is already a relation between (",
+                const auto relation_type = relation_type_->value( id.value() );
+                Logger::warn( "There is already a ",
+                    relation_to_string( relation_type ), " between (",
                     from.string(), " and ", to.string(), ")" );
                 return id.value();
             }
@@ -233,6 +235,27 @@ namespace geode
             relation_type_ = relation_attribute_manager()
                                  .find_or_create_attribute< VariableAttribute,
                                      RelationType >( "relation_type", NO_ID );
+        }
+
+        std::string relation_to_string( index_t relation_type ) const
+        {
+            if( relation_type == NO_RELATION )
+            {
+                return "No relation";
+            }
+            if( relation_type == BOUNDARY_RELATION )
+            {
+                return "Boundary relation";
+            }
+            if( relation_type == INTERNAL_RELATION )
+            {
+                return "Internal relation";
+            }
+            if( relation_type == ITEM_RELATION )
+            {
+                return "Item relation";
+            }
+            return "Undefined relation";
         }
 
     private:

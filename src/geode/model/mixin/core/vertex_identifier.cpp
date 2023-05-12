@@ -17,6 +17,7 @@
 #include <geode/mesh/core/bitsery_archive.h>
 #include <geode/mesh/core/edged_curve.h>
 #include <geode/mesh/core/geode/geode_vertex_set.h>
+#include <geode/mesh/core/mesh_element.h>
 #include <geode/mesh/core/point_set.h>
 #include <geode/mesh/core/solid_mesh.h>
 #include <geode/mesh/core/surface_mesh.h>
@@ -41,6 +42,11 @@ namespace geode
     }
 
     ComponentMeshVertex::~ComponentMeshVertex() {} // NOLINT
+
+    MeshVertex ComponentMeshVertex::mesh_vertex() const
+    {
+        return { component_id.id(), vertex };
+    }
 
     bool ComponentMeshVertex::operator==(
         const ComponentMeshVertex& other ) const
@@ -87,6 +93,10 @@ namespace geode
         const std::vector< ComponentMeshVertex >& component_mesh_vertices(
             index_t unique_vertex_id ) const
         {
+            OPENGEODE_ASSERT( unique_vertex_id < nb_unique_vertices(),
+                "[VertexIdentifier::component_mesh_vertices] Given "
+                "unique_vertex_id is bigger than the number of unique "
+                "vertices." );
             return component_vertices_->value( unique_vertex_id );
         }
 

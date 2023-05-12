@@ -10,6 +10,7 @@
 
 namespace geode
 {
+    struct MeshVertex;
     class VertexIdentifierBuilder;
 } // namespace geode
 
@@ -24,6 +25,8 @@ namespace geode
             ComponentID component_id_in, index_t vertex_id_in );
 
         ~ComponentMeshVertex();
+
+        MeshVertex mesh_vertex() const;
 
         bool operator==( const ComponentMeshVertex& other ) const;
 
