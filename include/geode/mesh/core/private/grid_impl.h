@@ -128,8 +128,7 @@ namespace geode
                         }
                     } );
             }
-            for( auto& task :
-                async::when_all( tasks.begin(), tasks.end() ).get() )
+            for( auto& task : async::when_all( tasks ).get() )
             {
                 task.get();
             }
@@ -163,8 +162,7 @@ namespace geode
                         } );
                 }
             }
-            for( auto& task :
-                async::when_all( tasks.begin(), tasks.end() ).get() )
+            for( auto& task : async::when_all( tasks ).get() )
             {
                 task.get();
             }

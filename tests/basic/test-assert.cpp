@@ -41,7 +41,7 @@ void test_when_all()
                 throw std::runtime_error( "Some list error" );
             } ) );
         }
-        for( auto& task : async::when_all( tasks.begin(), tasks.end() ).get() )
+        for( auto& task : async::when_all( tasks ).get() )
         {
             task.get();
         }
@@ -63,7 +63,7 @@ void test_when_all()
                 return 42;
             } ) );
         }
-        async::when_all( tasks.begin(), tasks.end() )
+        async::when_all( tasks )
             .then( []( std::vector< async::task< int > > all_tasks ) {
                 for( auto& task : all_tasks )
                 {

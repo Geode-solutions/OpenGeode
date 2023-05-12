@@ -110,7 +110,7 @@ namespace geode
                 save_edged_curve( mesh, file );
             } );
         }
-        auto all_tasks = async::when_all( tasks.begin(), tasks.end() );
+        auto all_tasks = async::when_all( tasks );
         all_tasks.wait();
         Logger::set_level( level );
         for( auto& task : all_tasks.get() )
@@ -137,7 +137,7 @@ namespace geode
                     typename Line< dimension >::LinesKey{} );
             } );
         }
-        auto all_tasks = async::when_all( tasks.begin(), tasks.end() );
+        auto all_tasks = async::when_all( tasks );
         all_tasks.wait();
         Logger::set_level( level );
         for( auto& task : all_tasks.get() )
