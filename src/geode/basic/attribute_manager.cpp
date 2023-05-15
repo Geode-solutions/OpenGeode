@@ -29,8 +29,6 @@
 
 #include <bitsery/traits/string.h>
 
-#include <geode/basic/attribute.h>
-#include <geode/basic/bitsery_archive.h>
 #include <geode/basic/logger.h>
 #include <geode/basic/pimpl_impl.h>
 
@@ -254,6 +252,21 @@ namespace geode
             }
         }
 
+        void import( const AttributeManager::Impl &attribute_manager,
+            const GenericMapping< index_t > &old2new_mapping,
+            const AttributeBase::AttributeKey &key )
+        {
+            for( const auto &attribute : attribute_manager.attributes_ )
+            {
+                if( !attribute_exists( attribute.first ) )
+                {
+                    attributes_.emplace( attribute.first,
+                        attribute.second->extract(
+                            old2new_mapping, nb_elements_, key ) );
+                }
+            }
+        }
+
         void initialize_attribute_names(
             const AttributeBase::AttributeKey &key )
         {
@@ -414,6 +427,12 @@ namespace geode
         absl::Span< const index_t > old2new )
     {
         impl_->import( *attribute_manager.impl_, old2new, {} );
+    }
+
+    void AttributeManager::import( const AttributeManager &attribute_manager,
+        const GenericMapping< index_t > &old2new_mapping )
+    {
+        impl_->import( *attribute_manager.impl_, old2new_mapping, {} );
     }
 
     void AttributeManager::rename_attribute(

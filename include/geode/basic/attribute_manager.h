@@ -230,6 +230,9 @@ namespace geode
         void import( const AttributeManager& attribute_manager,
             absl::Span< const index_t > old2new );
 
+        void import( const AttributeManager& attribute_manager,
+            const GenericMapping< index_t >& old2new_mapping );
+
         template < typename Type, typename Serializer >
         static void register_attribute_type(
             PContext& context, absl::string_view name )
