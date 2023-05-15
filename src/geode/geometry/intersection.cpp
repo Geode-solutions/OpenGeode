@@ -230,16 +230,8 @@ namespace geode
             {
                 return { IntersectionType::NONE };
             }
-            std::array< double, 2 > lambdas;
-            try
-            {
-                lambdas = segment_barycentric_coordinates(
-                    line_plane_result.result.value(), segment );
-            }
-            catch( const OpenGeodeException& )
-            {
-                lambdas.fill( 0.5 );
-            }
+            const auto lambdas = safe_segment_barycentric_coordinates(
+                line_plane_result.result.value(), segment );
             line_plane_result.correctness->first.second =
                 segment.vertices()[0].get() * lambdas[0]
                 + segment.vertices()[1].get() * lambdas[1];
@@ -383,16 +375,8 @@ namespace geode
                 correctness.first.first = distance <= global_epsilon;
                 correctness.first.second =
                     point_line_projection( result, line );
-                std::array< double, 3 > tri_lambdas;
-                try
-                {
-                    tri_lambdas =
-                        triangle_barycentric_coordinates( result, triangle );
-                }
-                catch( const OpenGeodeException& )
-                {
-                    tri_lambdas.fill( 1. / 3. );
-                }
+                const auto tri_lambdas =
+                    safe_triangle_barycentric_coordinates( result, triangle );
                 correctness.second.second =
                     vertices[0].get() * tri_lambdas[0]
                     + vertices[1].get() * tri_lambdas[1]
@@ -510,16 +494,8 @@ namespace geode
             {
                 return { IntersectionType::NONE };
             }
-            std::array< double, 2 > lambdas;
-            try
-            {
-                lambdas = segment_barycentric_coordinates(
-                    line_intersection_result.result.value(), segment );
-            }
-            catch( const OpenGeodeException& )
-            {
-                lambdas.fill( 0.5 );
-            }
+            const auto lambdas = safe_segment_barycentric_coordinates(
+                line_intersection_result.result.value(), segment );
             line_intersection_result.correctness->first.second =
                 segment.vertices()[0].get() * lambdas[0]
                 + segment.vertices()[1].get() * lambdas[1];
