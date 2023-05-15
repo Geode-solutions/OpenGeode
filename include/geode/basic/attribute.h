@@ -40,6 +40,7 @@
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/common.h>
 #include <geode/basic/detail/mapping_after_deletion.h>
+#include <geode/basic/mapping.h>
 #include <geode/basic/passkey.h>
 #include <geode/basic/permutation.h>
 
@@ -104,6 +105,11 @@ namespace geode
 
         virtual std::shared_ptr< AttributeBase > extract(
             absl::Span< const index_t > old2new,
+            index_t nb_elements,
+            AttributeKey ) const = 0;
+
+        virtual std::shared_ptr< AttributeBase > extract(
+            const GenericMapping< index_t >& old2new_mapping,
             index_t nb_elements,
             AttributeKey ) const = 0;
 
@@ -338,6 +344,17 @@ namespace geode
             return attribute;
         }
 
+        std::shared_ptr< AttributeBase > extract(
+            const GenericMapping< index_t >& /* unused */,
+            index_t /* unused */,
+            AttributeBase::AttributeKey ) const override
+        {
+            std::shared_ptr< ConstantAttribute< T > > attribute{
+                new ConstantAttribute< T >{ value_, this->properties() }
+            };
+            return attribute;
+        }
+
     private:
         T value_;
     };
@@ -491,7 +508,7 @@ namespace geode
             std::shared_ptr< VariableAttribute< T > > attribute{
                 new VariableAttribute< T >{ default_value_, this->properties() }
             };
-            attribute->values_.resize( nb_elements );
+            attribute->values_.resize( nb_elements, default_value_ );
             for( const auto i : Indices{ old2new } )
             {
                 const auto new_index = old2new[i];
@@ -502,6 +519,29 @@ namespace geode
                         "contains values that go beyond the given number of "
                         "elements." );
                     attribute->set_value( new_index, value( i ) );
+                }
+            }
+            return attribute;
+        }
+
+        std::shared_ptr< AttributeBase > extract(
+            const GenericMapping< index_t >& old2new_mapping,
+            index_t nb_elements,
+            AttributeBase::AttributeKey ) const override
+        {
+            std::shared_ptr< VariableAttribute< T > > attribute{
+                new VariableAttribute< T >{ default_value_, this->properties() }
+            };
+            attribute->values_.resize( nb_elements, default_value_ );
+            for( const auto& in2out : old2new_mapping.in2out_map() )
+            {
+                for( const auto new_index : in2out.second )
+                {
+                    OPENGEODE_EXCEPTION( new_index < nb_elements,
+                        "[VariableAttribute::extract] The given mapping "
+                        "contains values that go beyond the given number "
+                        "of elements." );
+                    attribute->set_value( new_index, value( in2out.first ) );
                 }
             }
             return attribute;
@@ -662,7 +702,7 @@ namespace geode
                 new VariableAttribute< bool >{
                     static_cast< bool >( default_value_ ), this->properties() }
             };
-            attribute->values_.resize( nb_elements );
+            attribute->values_.resize( nb_elements, default_value_ );
             for( const auto i : Indices{ old2new } )
             {
                 const auto new_index = old2new[i];
@@ -673,6 +713,30 @@ namespace geode
                         "contains values that go beyond the given number of "
                         "elements." );
                     attribute->set_value( new_index, value( i ) );
+                }
+            }
+            return attribute;
+        }
+
+        std::shared_ptr< AttributeBase > extract(
+            const GenericMapping< index_t >& old2new_mapping,
+            index_t nb_elements,
+            AttributeBase::AttributeKey ) const override
+        {
+            std::shared_ptr< VariableAttribute< bool > > attribute{
+                new VariableAttribute< bool >{
+                    static_cast< bool >( default_value_ ), this->properties() }
+            };
+            attribute->values_.resize( nb_elements, default_value_ );
+            for( const auto& in2out : old2new_mapping.in2out_map() )
+            {
+                for( const auto new_index : in2out.second )
+                {
+                    OPENGEODE_EXCEPTION( new_index < nb_elements,
+                        "[VariableAttribute::extract] The given mapping "
+                        "contains values that go beyond the given number "
+                        "of elements." );
+                    attribute->set_value( new_index, value( in2out.first ) );
                 }
             }
             return attribute;
@@ -861,6 +925,32 @@ namespace geode
                         "contains values that go beyond the given number of "
                         "elements." );
                     attribute->set_value( new_index, value( i ) );
+                }
+            }
+            return attribute;
+        }
+
+        std::shared_ptr< AttributeBase > extract(
+            const GenericMapping< index_t >& old2new_mapping,
+            index_t nb_elements,
+            AttributeBase::AttributeKey ) const override
+        {
+            std::shared_ptr< SparseAttribute< T > > attribute{
+                new SparseAttribute< T >{ default_value_, this->properties() }
+            };
+            for( const auto& in2out : old2new_mapping.in2out_map() )
+            {
+                if( value( in2out.first ) != default_value_ )
+                {
+                    for( const auto new_index : in2out.second )
+                    {
+                        OPENGEODE_EXCEPTION( new_index < nb_elements,
+                            "[VariableAttribute::extract] The given mapping "
+                            "contains values that go beyond the given number "
+                            "of elements." );
+                        attribute->set_value(
+                            new_index, value( in2out.first ) );
+                    }
                 }
             }
             return attribute;
