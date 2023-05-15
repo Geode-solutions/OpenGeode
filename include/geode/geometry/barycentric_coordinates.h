@@ -38,22 +38,33 @@ namespace geode
 namespace geode
 {
     /*!
-     * Compute the barycentric coordinates of a point with regards to a tetra.
-     * @param[in] point the query point.
-     * @param[in] tetra the tetra.
+     * Compute the barycentric coordinates of a point with regards to a
+     * tetrahedron.
      * @return an array containing the parametric coordinates corresponding to
-     * the tetra vertices.
+     * the tetrahedron vertices.
+     * @exception throws if the tetrahedron is degenerated
      */
     std::array< double, 4 >
         opengeode_geometry_api tetrahedron_barycentric_coordinates(
-            const Point3D& point, const Tetrahedron& tetra );
+            const Point3D& point, const Tetrahedron& tetrahedron );
+
+    /*!
+     * Compute the barycentric coordinates of a point with regards to a
+     * tetrahedron.
+     * If tetrahedron is degenerated, computation fallbacks onto its largest
+     * facet.
+     * @return an array containing the parametric coordinates corresponding to
+     * the tetrahedron vertices.
+     */
+    std::array< double, 4 >
+        opengeode_geometry_api safe_tetrahedron_barycentric_coordinates(
+            const Point3D& point, const Tetrahedron& tetrahedron ) noexcept;
 
     /*!
      * Compute barycentric coordinates of a point with regards to a triangle.
-     * @param[in] point the query point.
-     * @param[in] triangle the triangle.
      * @return an array containing the parametric coordinates corresponding to
      * the triangle vertices.
+     * @exception throws if the triangle is degenerated
      */
     template < index_t dimension >
     std::array< double, 3 > triangle_barycentric_coordinates(
@@ -61,14 +72,36 @@ namespace geode
         const Triangle< dimension >& triangle );
 
     /*!
+     * Compute barycentric coordinates of a point with regards to a triangle.
+     * If triangle is degenerated, computation fallbacks onto its longest
+     * segment.
+     * @return an array containing the parametric coordinates corresponding to
+     * the triangle vertices.
+     */
+    template < index_t dimension >
+    std::array< double, 3 > safe_triangle_barycentric_coordinates(
+        const Point< dimension >& point,
+        const Triangle< dimension >& triangle ) noexcept;
+
+    /*!
      * Compute barycentric coordinates of a point with regards to a segment.
-     * @param[in] point the query point.
-     * @param[in] segment the segment.
      * @return an array containing the parametric coordinates corresponding to
      * the segment vertices.
+     * @exception throws if the segment is degenerated
      */
     template < index_t dimension >
     std::array< double, 2 > segment_barycentric_coordinates(
         const Point< dimension >& point, const Segment< dimension >& segment );
+
+    /*!
+     * Compute barycentric coordinates of a point with regards to a segment.
+     * If segment is degenerated, computation fallbacks onto its vertices.
+     * @return an array containing the parametric coordinates corresponding to
+     * the segment vertices.
+     */
+    template < index_t dimension >
+    std::array< double, 2 > safe_segment_barycentric_coordinates(
+        const Point< dimension >& point,
+        const Segment< dimension >& segment ) noexcept;
 
 } // namespace geode
