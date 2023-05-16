@@ -94,6 +94,11 @@ namespace geode
             return mesh_.polygon_adjacent_edge( polygon_edge );
         }
 
+        AttributeManager& element_attribute_manager() const
+        {
+            return mesh_.polygon_attribute_manager();
+        }
+
     private:
         const SurfaceMesh< dimension >& mesh_;
     };

@@ -28,13 +28,32 @@
 
 #include <geode/geometry/point.h>
 
+#include <geode/mesh/builder/edged_curve_builder.h>
 #include <geode/mesh/builder/tetrahedral_solid_builder.h>
 #include <geode/mesh/builder/triangulated_surface_builder.h>
+#include <geode/mesh/core/edged_curve.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
 #include <geode/mesh/core/triangulated_surface.h>
 
+#include <geode/mesh/helpers/generic_edged_curve_accessor.h>
 #include <geode/mesh/helpers/generic_solid_accessor.h>
 #include <geode/mesh/helpers/generic_surface_accessor.h>
+
+std::unique_ptr< geode::EdgedCurve3D > create_edged_curve()
+{
+    auto edged_curve = geode::EdgedCurve3D::create();
+    auto builder = geode::EdgedCurveBuilder3D::create( *edged_curve );
+    builder->create_point( { { 0, 0 } } );
+    builder->create_point( { { 1, 0 } } );
+    builder->create_point( { { 0, 1 } } );
+    builder->create_edge( 0, 1 );
+    builder->create_edge( 0, 2 );
+    auto attribute = edged_curve->edge_attribute_manager()
+                         .find_or_create_attribute< geode::VariableAttribute,
+                             geode::index_t >( "test_attribute", 2 );
+    attribute->set_value( 1, 5 );
+    return edged_curve;
+}
 
 std::unique_ptr< geode::TriangulatedSurface2D > create_surface()
 {
@@ -47,6 +66,10 @@ std::unique_ptr< geode::TriangulatedSurface2D > create_surface()
     builder->create_triangle( { 0, 1, 2 } );
     builder->create_triangle( { 0, 3, 1 } );
     builder->compute_polygon_adjacencies();
+    auto attribute = surface->polygon_attribute_manager()
+                         .find_or_create_attribute< geode::VariableAttribute,
+                             geode::index_t >( "test_attribute", 2 );
+    attribute->set_value( 1, 5 );
     return surface;
 }
 
@@ -62,28 +85,47 @@ std::unique_ptr< geode::TetrahedralSolid3D > create_solid()
     builder->create_tetrahedron( { 0, 1, 2, 3 } );
     builder->create_tetrahedron( { 3, 2, 4, 1 } );
     builder->compute_polyhedron_adjacencies();
+    auto attribute = solid->polyhedron_attribute_manager()
+                         .find_or_create_attribute< geode::VariableAttribute,
+                             geode::index_t >( "test_attribute", 2 );
+    attribute->set_value( 1, 5 );
     return solid;
 }
 
 template < typename Mesh >
-void test_accessor( const Mesh& mesh )
+void test_basic_accessor( const Mesh& mesh, geode::index_t nb_element_vertices )
 {
     using Accessor = geode::GenericMeshAccessor< Mesh >;
     const Accessor accessor{ mesh };
     OPENGEODE_EXCEPTION(
         accessor.nb_elements() == 2, "[Test] Wrong number of elements" );
-    OPENGEODE_EXCEPTION( accessor.nb_element_vertices( 0 ) == Mesh::dim + 1,
+    OPENGEODE_EXCEPTION(
+        accessor.nb_element_vertices( 0 ) == nb_element_vertices,
         "[Test] Wrong number of element vertices" );
-    OPENGEODE_EXCEPTION( accessor.nb_element_facets( 0 ) == Mesh::dim + 1,
+    OPENGEODE_EXCEPTION( accessor.nb_element_facets( 0 ) == nb_element_vertices,
         "[Test] Wrong number of element facets" );
     OPENGEODE_EXCEPTION( accessor.element_vertex( { 0, 0 } ) == 0,
         "[Test] Wrong element vertex { 0, 0 }" );
     OPENGEODE_EXCEPTION( accessor.element_vertex( { 0, 1 } ) == 1,
         "[Test] Wrong element vertex { 0, 1 }" );
+    OPENGEODE_EXCEPTION(
+        accessor.element_vertices( 0 ).size() == nb_element_vertices,
+        "[Test] Wrong size of element vertices container" );
+    const auto attribute =
+        accessor.element_attribute_manager()
+            .template find_attribute< geode::index_t >( "test_attribute" );
+    OPENGEODE_EXCEPTION(
+        attribute->value( 0 ) == 2 && attribute->value( 1 ) == 5,
+        "[Test] Wrong values of the element attributes." );
+}
+
+template < typename Mesh >
+void test_adjacent_accessor( const Mesh& mesh )
+{
+    using Accessor = geode::GenericMeshAccessor< Mesh >;
+    const Accessor accessor{ mesh };
     OPENGEODE_EXCEPTION( accessor.element_vertex( { 0, 2 } ) == 2,
         "[Test] Wrong element vertex { 0, 2 }" );
-    OPENGEODE_EXCEPTION( accessor.element_vertices( 0 ).size() == Mesh::dim + 1,
-        "[Test] Wrong number of element vertices" );
     const typename Accessor::ElementFacet facet{ 0, 0 };
     OPENGEODE_EXCEPTION(
         accessor.element_facet_vertices( facet ).size() == Mesh::dim,
@@ -101,11 +143,15 @@ void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
     geode::Logger::info( "Test Surface" );
+    const auto edged_curve = create_edged_curve();
+    test_basic_accessor( *edged_curve, 2 );
     const auto surface = create_surface();
-    test_accessor( *surface );
+    test_basic_accessor( *surface, 3 );
+    test_adjacent_accessor( *surface );
     geode::Logger::info( "Test Solid" );
     const auto solid = create_solid();
-    test_accessor( *solid );
+    test_basic_accessor( *solid, 4 );
+    test_adjacent_accessor( *solid );
 }
 
 OPENGEODE_TEST( "generic-mesh-accessor" )
