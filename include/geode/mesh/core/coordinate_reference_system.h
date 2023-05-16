@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <absl/hash/hash.h>
+
 #include <geode/basic/named_type.h>
 
 #include <geode/mesh/common.h>
@@ -78,3 +80,15 @@ namespace geode
     };
     ALIAS_1D_AND_2D_AND_3D( CoordinateReferenceSystem );
 } // namespace geode
+
+namespace std
+{
+    template <>
+    struct hash< geode::CRSType >
+    {
+        std::size_t operator()( const geode::CRSType& type ) const
+        {
+            return absl::Hash< std::string >{}( type.get() );
+        }
+    };
+} // namespace std

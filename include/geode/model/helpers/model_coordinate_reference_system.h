@@ -23,50 +23,21 @@
 
 #pragma once
 
-#include <string>
+#include <geode/mesh/core/coordinate_reference_system.h>
 
-#include <absl/hash/hash.h>
-
-#include <bitsery/brief_syntax/string.h>
-
-#include <geode/basic/named_type.h>
+#include <geode/model/common.h>
 
 namespace geode
 {
-    struct MeshImplTag
-    {
-    };
-    /*!
-     * Strong type for a mesh data structure
-     */
-    using MeshImpl = NamedType< std::string, MeshImplTag >;
-
-    struct MeshTypeTag
-    {
-    };
-    /*!
-     * Strong type for a mesh type
-     */
-    using MeshType = NamedType< std::string, MeshTypeTag >;
+    class BRep;
+    class Section;
 } // namespace geode
 
-namespace std
+namespace geode
 {
-    template <>
-    struct hash< geode::MeshImpl >
-    {
-        std::size_t operator()( const geode::MeshImpl& impl ) const
-        {
-            return absl::Hash< std::string >{}( impl.get() );
-        }
-    };
+    absl::FixedArray< std::pair< CRSType, std::string > > opengeode_model_api
+        brep_coordinate_reference_systems( const BRep& brep );
 
-    template <>
-    struct hash< geode::MeshType >
-    {
-        std::size_t operator()( const geode::MeshType& type ) const
-        {
-            return absl::Hash< std::string >{}( type.get() );
-        }
-    };
-} // namespace std
+    absl::FixedArray< std::pair< CRSType, std::string > > opengeode_model_api
+        section_coordinate_reference_systems( const Section& section );
+} // namespace geode

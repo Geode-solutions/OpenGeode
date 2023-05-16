@@ -42,6 +42,12 @@ namespace geode
 {
     void define_crs( pybind11::module& module )
     {
+        pybind11::class_< CRSType >( module, "CRSType" )
+            .def( pybind11::init<>() )
+            .def( pybind11::init< std::string >() )
+            .def( "get", &CRSType::get )
+            .def( "matches", &CRSType::operator== );
+
         PYTHON_CRS( 1 );
         PYTHON_CRS( 2 );
         PYTHON_CRS( 3 );
