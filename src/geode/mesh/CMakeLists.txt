@@ -226,6 +226,7 @@ add_geode_library(
         "helpers/euclidean_distance_transform.h"
         "helpers/generic_solid_accessor.h"
         "helpers/generic_surface_accessor.h"
+        "helpers/generic_edged_curve_accessor.h"
         "helpers/hausdorff_distance.h"
         "helpers/nnsearch_mesh.h"
         "helpers/rasterize.h"

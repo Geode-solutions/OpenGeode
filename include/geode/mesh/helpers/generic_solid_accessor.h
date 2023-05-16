@@ -94,6 +94,11 @@ namespace geode
             return mesh_.polyhedron_adjacent_facet( polyhedron_facet );
         }
 
+        AttributeManager& element_attribute_manager() const
+        {
+            return mesh_.polyhedron_attribute_manager();
+        }
+
     protected:
         const SolidMesh< dimension >& mesh() const
         {
