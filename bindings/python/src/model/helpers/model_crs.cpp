@@ -21,52 +21,20 @@
  *
  */
 
-#pragma once
+#include "../../common.h"
 
-#include <string>
-
-#include <absl/hash/hash.h>
-
-#include <bitsery/brief_syntax/string.h>
-
-#include <geode/basic/named_type.h>
+#include <geode/model/helpers/model_coordinate_reference_system.h>
+#include <geode/model/representation/core/brep.h>
+#include <geode/model/representation/core/section.h>
 
 namespace geode
 {
-    struct MeshImplTag
+    void define_model_coordinate_reference_system( pybind11::module& module )
     {
-    };
-    /*!
-     * Strong type for a mesh data structure
-     */
-    using MeshImpl = NamedType< std::string, MeshImplTag >;
-
-    struct MeshTypeTag
-    {
-    };
-    /*!
-     * Strong type for a mesh type
-     */
-    using MeshType = NamedType< std::string, MeshTypeTag >;
+        module
+            .def( "brep_coordinate_reference_systems",
+                &brep_coordinate_reference_systems )
+            .def( "section_coordinate_reference_systems",
+                &section_coordinate_reference_systems );
+    }
 } // namespace geode
-
-namespace std
-{
-    template <>
-    struct hash< geode::MeshImpl >
-    {
-        std::size_t operator()( const geode::MeshImpl& impl ) const
-        {
-            return absl::Hash< std::string >{}( impl.get() );
-        }
-    };
-
-    template <>
-    struct hash< geode::MeshType >
-    {
-        std::size_t operator()( const geode::MeshType& type ) const
-        {
-            return absl::Hash< std::string >{}( type.get() );
-        }
-    };
-} // namespace std

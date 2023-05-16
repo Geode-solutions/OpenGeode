@@ -28,6 +28,7 @@ add_geode_python_binding(
         "helpers/convert_to_mesh.cpp"
         "helpers/model_component_filter.cpp"
         "helpers/model_concatener.cpp"
+        "helpers/model_crs.cpp"
         "mixin/builder/blocks_builder.cpp"
         "mixin/builder/corners_builder.cpp"
         "mixin/builder/lines_builder.cpp"

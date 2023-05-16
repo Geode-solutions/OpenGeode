@@ -71,6 +71,7 @@ namespace geode
     void define_component_mesh_polygons( pybind11::module& );
     void define_model_component_filter( pybind11::module& );
     void define_model_concatener( pybind11::module& );
+    void define_model_coordinate_reference_system( pybind11::module& );
 } // namespace geode
 
 PYBIND11_MODULE( opengeode_py_model, module )
@@ -132,4 +133,5 @@ PYBIND11_MODULE( opengeode_py_model, module )
     geode::define_component_mesh_polygons( module );
     geode::define_model_component_filter( module );
     geode::define_model_concatener( module );
+    geode::define_model_coordinate_reference_system( module );
 }
