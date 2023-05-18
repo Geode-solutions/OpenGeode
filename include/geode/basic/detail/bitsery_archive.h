@@ -38,8 +38,8 @@ namespace
     void register_attribute_type_for_all_containers(
         geode::PContext& context, absl::string_view name )
     {
-        geode::AttributeManager::register_attribute_type< Type, Serializer >(
-            context, name );
+        geode::AttributeManager::register_attribute_type< std::vector< Type >,
+            Serializer >( context, absl::StrCat( "vector_", name ) );
         geode::AttributeManager::register_attribute_type< std::array< Type, 2 >,
             Serializer >( context, absl::StrCat( "array_", name, "_2" ) );
         geode::AttributeManager::register_attribute_type< std::array< Type, 3 >,
@@ -63,24 +63,6 @@ namespace
         geode::AttributeManager::register_attribute_type<
             absl::InlinedVector< geode::index_t, 4 >, Serializer >(
             context, "InlinedVector_index_t_4" );
-        geode::AttributeManager::register_attribute_type<
-            absl::InlinedVector< geode::index_t, 5 >, Serializer >(
-            context, "InlinedVector_index_t_5" );
-        geode::AttributeManager::register_attribute_type<
-            absl::InlinedVector< geode::index_t, 6 >, Serializer >(
-            context, "InlinedVector_index_t_6" );
-        geode::AttributeManager::register_attribute_type<
-            absl::InlinedVector< geode::index_t, 7 >, Serializer >(
-            context, "InlinedVector_index_t_7" );
-        geode::AttributeManager::register_attribute_type<
-            absl::InlinedVector< geode::index_t, 8 >, Serializer >(
-            context, "InlinedVector_index_t_8" );
-        geode::AttributeManager::register_attribute_type<
-            absl::InlinedVector< geode::index_t, 9 >, Serializer >(
-            context, "InlinedVector_index_t_9" );
-        geode::AttributeManager::register_attribute_type<
-            absl::InlinedVector< geode::index_t, 10 >, Serializer >(
-            context, "InlinedVector_index_t_10" );
     }
 } // namespace
 
@@ -91,20 +73,20 @@ namespace geode
         template < typename Serializer >
         void register_basic_pcontext( PContext& context )
         {
-            register_attribute_type_for_all_containers< Serializer, bool >(
+            AttributeManager::register_attribute_type< bool, Serializer >(
                 context, "bool" );
-            register_attribute_type_for_all_containers< Serializer, int >(
+            AttributeManager::register_attribute_type< int, Serializer >(
                 context, "int" );
-            register_attribute_type_for_all_containers< Serializer, double >(
+            AttributeManager::register_attribute_type< double, Serializer >(
                 context, "double" );
-            register_attribute_type_for_all_containers< Serializer,
-                local_index_t >( context, "local_index_t" );
-            register_attribute_type_for_all_containers< Serializer, index_t >(
+            AttributeManager::register_attribute_type< local_index_t,
+                Serializer >( context, "local_index_t" );
+            AttributeManager::register_attribute_type< index_t, Serializer >(
                 context, "index_t" );
-            AttributeManager::register_attribute_type< std::vector< index_t >,
-                Serializer >( context, "vector_index_t" );
             AttributeManager::register_attribute_type< uuid, Serializer >(
                 context, "uuid" );
+            register_attribute_type_for_all_containers< Serializer, index_t >(
+                context, "index_t" );
             register_inlinedvector< Serializer >( context );
         }
     } // namespace detail
