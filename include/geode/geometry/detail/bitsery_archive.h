@@ -76,9 +76,15 @@ namespace geode
                 context, "Point2D" );
             AttributeManager::register_attribute_type< Point3D, Serializer >(
                 context, "Point3D" );
-            register_inlinedvector< Point1D, Serializer >( context, "Point1D" );
-            register_inlinedvector< Point2D, Serializer >( context, "Point2D" );
-            register_inlinedvector< Point3D, Serializer >( context, "Point3D" );
+            AttributeManager::register_attribute_type<
+                absl::InlinedVector< Point1D, 2 >, Serializer >(
+                context, absl::StrCat( "InlinedVector_Point1D_2" ) );
+            AttributeManager::register_attribute_type<
+                absl::InlinedVector< Point2D, 3 >, Serializer >(
+                context, absl::StrCat( "InlinedVector_Point2D_3" ) );
+            AttributeManager::register_attribute_type<
+                absl::InlinedVector< Point3D, 4 >, Serializer >(
+                context, absl::StrCat( "InlinedVector_Point3D_4" ) );
         }
     } // namespace detail
 } // namespace geode

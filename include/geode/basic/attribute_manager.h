@@ -247,15 +247,6 @@ namespace geode
                 SparseAttribute< Type > >(
                 absl::StrCat( "SparseAttribute", name ).c_str() );
             context.registerSingleBaseBranch< Serializer,
-                ReadOnlyAttribute< Type >, ConstantAttribute< Type > >(
-                absl::StrCat( "ConstantAttribute", name ).c_str() );
-            context.registerSingleBaseBranch< Serializer,
-                ReadOnlyAttribute< Type >, VariableAttribute< Type > >(
-                absl::StrCat( "VariableAttribute", name ).c_str() );
-            context.registerSingleBaseBranch< Serializer,
-                ReadOnlyAttribute< Type >, SparseAttribute< Type > >(
-                absl::StrCat( "SparseAttribute", name ).c_str() );
-            context.registerSingleBaseBranch< Serializer,
                 ConstantAttribute< Type >, ConstantAttribute< Type > >(
                 absl::StrCat( "ConstantAttribute", name ).c_str() );
             context.registerSingleBaseBranch< Serializer,
