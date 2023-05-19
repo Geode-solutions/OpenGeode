@@ -49,10 +49,11 @@ namespace
                     OPENGEODE_ASSERT( cmv0.vertex != cmv1.vertex,
                         "[component_mesh_vertex_pairs] Vertices should be "
                         "different" );
-                    if( result.contains( cmv0.component_id ) )
+                    auto itr = result.find( cmv0.component_id );
+                    if( itr != result.end() )
                     {
-                        result.at( cmv0.component_id )
-                            .emplace_back( std::array< geode::index_t, 2 >{
+                        itr->second.emplace_back(
+                            std::array< geode::index_t, 2 >{
                                 cmv0.vertex, cmv1.vertex } );
                     }
                     else
