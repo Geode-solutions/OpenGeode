@@ -456,8 +456,6 @@ void test()
     test_point_segment_position();
     test_point_triangle_position();
     test_point_tetrahedron_position();
-
-    geode::Logger::info( "TEST SUCCESS" );
 }
 
 OPENGEODE_TEST( "position" )

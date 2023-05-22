@@ -77,10 +77,25 @@ namespace geode
     double tetrahedron_signed_volume( const Tetrahedron& tetra )
     {
         const auto& vertices = tetra.vertices();
-        return Vector3D{ vertices[0], vertices[1] }.dot(
-                   Vector3D{ vertices[0], vertices[2] }.cross(
-                       { vertices[0], vertices[3] } ) )
-               / 6.;
+        for( const auto v : LRange{ 4 } )
+        {
+            const auto v1 = v == 3 ? 0 : v + 1;
+            const auto v2 = v1 == 3 ? 0 : v1 + 1;
+            const auto v3 = v2 == 3 ? 0 : v2 + 1;
+            const Vector3D edge02{ vertices[v], vertices[v2] };
+            const Vector3D edge03{ vertices[v], vertices[v3] };
+            const auto cross02_03 = edge02.cross( edge03 );
+            if( cross02_03.length()
+                > global_angular_epsilon * edge02.length() * edge03.length() )
+            {
+                return Vector3D{ vertices[v], vertices[v1] }.dot( cross02_03 )
+                       / 6.;
+            }
+        }
+        OPENGEODE_ASSERT_NOT_REACHED(
+            "[tetrahedron_signed_volume] Tetrahedron signed volume uses "
+            "below angular threshold cross products" );
+        return 0.;
     }
 
     double tetrahedron_volume( const Tetrahedron& tetra )
