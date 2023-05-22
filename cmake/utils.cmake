@@ -156,14 +156,6 @@ function(_export_library library_name)
         COMPONENT public
         ${ARGN}
     )
-    if(CMAKE_STRIP AND BUILD_SHARED_LIBS AND CMAKE_BUILD_TYPE STREQUAL "Release")
-        add_custom_command(TARGET ${library_name} 
-            POST_BUILD
-            COMMAND ${CMAKE_STRIP}
-            ARGS --strip-all $<TARGET_FILE:${library_name}>
-            COMMENT "Stripping library"
-        )
-    endif()
 endfunction()
 
 function(add_geode_library)
@@ -207,6 +199,14 @@ function(add_geode_library)
             "${ABSOLUTE_GEODE_LIB_ADVANCED_HEADERS}"
             "${ABSOLUTE_GEODE_LIB_PRIVATE_HEADERS}"
         )
+        if(CMAKE_STRIP AND BUILD_SHARED_LIBS AND CMAKE_BUILD_TYPE STREQUAL "Release")
+            add_custom_command(TARGET ${GEODE_LIB_NAME} 
+                POST_BUILD
+                COMMAND ${CMAKE_STRIP}
+                ARGS --strip-all $<TARGET_FILE:${GEODE_LIB_NAME}>
+                COMMENT "Stripping library"
+            )
+        endif()
     endif()
     add_library(${PROJECT_NAME}::${GEODE_LIB_NAME} ALIAS ${GEODE_LIB_NAME})
     add_dependencies(essential ${GEODE_LIB_NAME})
