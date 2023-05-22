@@ -48,7 +48,7 @@ namespace
 
                 const auto normal = edge0.cross( edge1 );
                 const auto length = normal.length();
-                if( length > 0.001 )
+                if( length > geode::global_angular_epsilon )
                 {
                     return std::make_pair( pivot, normal / length );
                 }

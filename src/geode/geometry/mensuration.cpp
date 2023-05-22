@@ -77,10 +77,15 @@ namespace geode
     double tetrahedron_signed_volume( const Tetrahedron& tetra )
     {
         const auto& vertices = tetra.vertices();
-        return Vector3D{ vertices[0], vertices[1] }.dot(
-                   Vector3D{ vertices[0], vertices[2] }.cross(
-                       { vertices[0], vertices[3] } ) )
-               / 6.;
+        const Vector3D edge02{ vertices[0], vertices[2] };
+        const Vector3D edge03{ vertices[0], vertices[3] };
+        const auto cross02_03 = edge02.cross( edge03 );
+        OPENGEODE_ASSERT(
+            cross02_03.length()
+                > global_angular_epsilon * edge02.length() * edge03.length(),
+            "[tetrahedron_signed_volume] Tetrahedron signed volume uses a "
+            "below angular threshold cross product" );
+        return Vector3D{ vertices[0], vertices[1] }.dot( cross02_03 ) / 6.;
     }
 
     double tetrahedron_volume( const Tetrahedron& tetra )
