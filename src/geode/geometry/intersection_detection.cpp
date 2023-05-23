@@ -43,15 +43,13 @@ namespace
     std::array< geode::local_index_t, 2 > best_projection_axis(
         const geode::Triangle3D& triangle, const geode::Segment3D& segment )
     {
-        const auto normal_result = triangle.normal();
         geode::local_index_t largest_axis{ 2 };
-        if( normal_result )
+        if( const auto normal = triangle.normal() )
         {
-            const auto normal = normal_result.value();
             for( const auto other_axis : geode::LRange{ 2 } )
             {
-                if( std::fabs( normal.value( other_axis ) )
-                    > std::fabs( normal.value( largest_axis ) ) )
+                if( std::fabs( normal->value( other_axis ) )
+                    > std::fabs( normal->value( largest_axis ) ) )
                 {
                     largest_axis = other_axis;
                 }
