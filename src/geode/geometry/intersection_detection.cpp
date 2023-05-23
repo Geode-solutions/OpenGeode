@@ -26,6 +26,7 @@
 #include <geode/geometry/basic_objects/infinite_line.h>
 #include <geode/geometry/basic_objects/segment.h>
 #include <geode/geometry/basic_objects/triangle.h>
+#include <geode/geometry/bounding_box.h>
 #include <geode/geometry/intersection.h>
 #include <geode/geometry/point.h>
 #include <geode/geometry/position.h>
@@ -40,15 +41,34 @@ namespace
     };
 
     std::array< geode::local_index_t, 2 > best_projection_axis(
-        const geode::Vector3D& normal )
+        const geode::Triangle3D& triangle, const geode::Segment3D& segment )
     {
+        const auto normal_result = triangle.normal();
         geode::local_index_t largest_axis{ 2 };
-        for( const auto other_axis : geode::LRange{ 2 } )
+        if( normal_result )
         {
-            if( std::fabs( normal.value( other_axis ) )
-                > std::fabs( normal.value( 2 ) ) )
+            const auto normal = normal_result.value();
+            for( const auto other_axis : geode::LRange{ 2 } )
             {
-                largest_axis = other_axis;
+                if( std::fabs( normal.value( other_axis ) )
+                    > std::fabs( normal.value( largest_axis ) ) )
+                {
+                    largest_axis = other_axis;
+                }
+            }
+        }
+        else
+        {
+            auto bbox = triangle.bounding_box();
+            bbox.add_box( segment.bounding_box() );
+            const auto diagonal = bbox.diagonal();
+            for( const auto other_axis : geode::LRange{ 2 } )
+            {
+                if( std::fabs( diagonal.value( other_axis ) )
+                    < std::fabs( diagonal.value( largest_axis ) ) )
+                {
+                    largest_axis = other_axis;
+                }
             }
         }
         if( largest_axis == 0 )
@@ -66,13 +86,7 @@ namespace
         segment_triangle_plane_intersection_detection(
             const geode::Segment3D& segment, const geode::Triangle3D& triangle )
     {
-        const auto normal_result = triangle.normal();
-        if( !normal_result )
-        {
-            return { geode::Position::parallel, geode::Position::parallel };
-        }
-        const auto normal = normal_result.value();
-        const auto projection_axis = best_projection_axis( normal );
+        const auto projection_axis = best_projection_axis( triangle, segment );
         const geode::Point2D segment_proj_p0{
             { segment.vertices()[0].get().value( projection_axis[0] ),
                 segment.vertices()[0].get().value( projection_axis[1] ) }
