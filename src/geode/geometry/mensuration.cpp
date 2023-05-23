@@ -30,6 +30,10 @@
 
 namespace geode
 {
+    static constexpr std::array< std::array< geode::local_index_t, 3 >, 4 >
+        signed_volume_vertices_order{ { { 1, 2, 3 }, { 3, 2, 0 }, { 3, 0, 1 },
+            { 1, 0, 2 } } };
+
     template < index_t dimension >
     double triangle_area( const Triangle< dimension >& triangle )
     {
@@ -79,9 +83,9 @@ namespace geode
         const auto& vertices = tetra.vertices();
         for( const auto v : LRange{ 4 } )
         {
-            const auto v1 = v == 3 ? 0 : v + 1;
-            const auto v2 = v1 == 3 ? 0 : v1 + 1;
-            const auto v3 = v2 == 3 ? 0 : v2 + 1;
+            const auto v1 = signed_volume_vertices_order[v][0];
+            const auto v2 = signed_volume_vertices_order[v][1];
+            const auto v3 = signed_volume_vertices_order[v][2];
             const Vector3D edge02{ vertices[v], vertices[v2] };
             const Vector3D edge03{ vertices[v], vertices[v3] };
             const auto cross02_03 = edge02.cross( edge03 );
