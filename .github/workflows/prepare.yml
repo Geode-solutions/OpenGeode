@@ -1,0 +1,9 @@
+name: Prepare
+
+on:
+  workflow_dispatch:
+
+jobs:  
+  prepare:
+    uses: Geode-solutions/actions/.github/workflows/prepare.yml@master
+    secrets: inherit

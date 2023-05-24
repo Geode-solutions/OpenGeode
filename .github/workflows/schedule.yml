@@ -1,0 +1,20 @@
+name: Schedule
+
+on:
+  schedule:
+    - cron: 0 0 * * *
+
+jobs:
+  schedule:
+    uses: Geode-solutions/actions/.github/workflows/schedule.yml@master
+    strategy:
+      matrix:
+        config: 
+          - {branch: next, slack: "SLACK_WEBHOOK_URL"}
+          - {branch: master, slack: "SLACK_ECOSYSTEM"}
+    with:
+      directory: opengeode
+      branch: ${{ matrix.config.branch }}
+    secrets: 
+      TOKEN: ${{ secrets.TOKEN }}
+      SLACK_WEBHOOK_URL: ${{ secrets[matrix.config.slack] }}
