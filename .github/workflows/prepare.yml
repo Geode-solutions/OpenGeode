@@ -1,6 +1,7 @@
 name: Prepare
 
 on:
+  push:
   workflow_dispatch:
 
 jobs:  
