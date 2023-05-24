@@ -35,50 +35,104 @@
 
 namespace
 {
-    std::vector< std::pair< geode::uuid, geode::PolyhedronVertices > >
-        common_block_vertices(
+    class PolyhedronVerticesPossibilities
+    {
+    public:
+        PolyhedronVerticesPossibilities(
             absl::Span< const std::vector< geode::ComponentMeshVertex > >
                 unique_vertices_cmvs )
-    {
-        if( unique_vertices_cmvs.empty() || unique_vertices_cmvs[0].empty() )
+            : unique_vertices_cmvs_{ unique_vertices_cmvs },
+              nb_unique_vertices_{ static_cast< geode::local_index_t >(
+                  unique_vertices_cmvs_.size() ) }
         {
-            return {};
         }
-        const auto nb_unique_vertices = unique_vertices_cmvs.size();
+
         std::vector< std::pair< geode::uuid, geode::PolyhedronVertices > >
-            common_block_vertices_list;
-        for( const auto& first_cmv : unique_vertices_cmvs[0] )
+            compute_possibilities()
+        {
+            if( unique_vertices_cmvs_.empty() )
+            {
+                return {};
+            }
+            for( const auto& cmvs : unique_vertices_cmvs_ )
+            {
+                if( cmvs.empty() )
+                {
+                    return {};
+                }
+            }
+            common_block_vertices_list_.clear();
+            for( const auto& first_cmv : unique_vertices_cmvs_[0] )
+            {
+                const auto& mesh_vertices = block_mesh_vertices( first_cmv );
+                if( mesh_vertices.empty() )
+                {
+                    continue;
+                }
+                fill_polyhedron_vertices_possibilities(
+                    first_cmv.component_id.id(), mesh_vertices, 1,
+                    { first_cmv.vertex } );
+            }
+            return std::move( common_block_vertices_list_ );
+        }
+
+    private:
+        absl::FixedArray< std::vector< geode::index_t > > block_mesh_vertices(
+            const geode::ComponentMeshVertex& first_cmv )
         {
             const auto& first_cmv_block_id = first_cmv.component_id.id();
-            geode::PolyhedronVertices mesh_vertices;
-            mesh_vertices.push_back( first_cmv.vertex );
+            absl::FixedArray< std::vector< geode::index_t > > mesh_vertices(
+                nb_unique_vertices_ );
+            mesh_vertices[0].push_back( first_cmv.vertex );
             for( const auto other_cmv_list_id :
-                geode::LRange{ 1, nb_unique_vertices } )
+                geode::LRange{ 1, nb_unique_vertices_ } )
             {
-                /// If there is a cmv with same id, push_back and continue
-                /// If not, break
                 const auto& other_cmv_list =
-                    unique_vertices_cmvs[other_cmv_list_id];
-                const auto it = absl::c_find_if( other_cmv_list,
-                    [&first_cmv_block_id](
-                        const geode::ComponentMeshVertex& other_cmv ) {
-                        return first_cmv_block_id
-                               == other_cmv.component_id.id();
-                    } );
-                if( it == other_cmv_list.end() )
+                    unique_vertices_cmvs_[other_cmv_list_id];
+                for( const auto& other_cmv : other_cmv_list )
                 {
-                    break;
+                    if( first_cmv_block_id == other_cmv.component_id.id() )
+                    {
+                        mesh_vertices[other_cmv_list_id].push_back(
+                            other_cmv.vertex );
+                    }
                 }
-                mesh_vertices.push_back( it->vertex );
+                if( mesh_vertices[other_cmv_list_id].empty() )
+                {
+                    return {};
+                }
             }
-            if( mesh_vertices.size() == nb_unique_vertices )
+            return mesh_vertices;
+        }
+
+        void fill_polyhedron_vertices_possibilities(
+            const geode::uuid& current_block,
+            absl::Span< const std::vector< geode::index_t > > mesh_vertices,
+            geode::local_index_t current_index,
+            geode::PolyhedronVertices current_list )
+        {
+            for( const auto vertex_possibility : mesh_vertices[current_index] )
             {
-                common_block_vertices_list.emplace_back(
-                    first_cmv_block_id, mesh_vertices );
+                auto updated_list = current_list;
+                updated_list.push_back( vertex_possibility );
+                if( current_index == nb_unique_vertices_ - 1 )
+                {
+                    common_block_vertices_list_.emplace_back(
+                        current_block, std::move( updated_list ) );
+                    continue;
+                }
+                fill_polyhedron_vertices_possibilities( current_block,
+                    mesh_vertices, current_index + 1, updated_list );
             }
         }
-        return common_block_vertices_list;
-    }
+
+    private:
+        absl::Span< const std::vector< geode::ComponentMeshVertex > >
+            unique_vertices_cmvs_;
+        const geode::local_index_t nb_unique_vertices_;
+        std::vector< std::pair< geode::uuid, geode::PolyhedronVertices > >
+            common_block_vertices_list_;
+    };
 } // namespace
 
 namespace geode
@@ -110,8 +164,11 @@ namespace geode
                 unique_vertices[v_id], Block3D::component_type_static() );
         }
         std::vector< MeshElement > result;
+        PolyhedronVerticesPossibilities vertices_pair_computer{
+            unique_vertices_cmvs
+        };
         for( auto& block_vertices :
-            common_block_vertices( unique_vertices_cmvs ) )
+            vertices_pair_computer.compute_possibilities() )
         {
             const auto& block = brep.block( block_vertices.first );
             const auto& block_mesh = block.mesh();
