@@ -1,11 +1,10 @@
 {
-  "plugins": [
-    ["@semantic-release/commit-analyzer", {
-      "preset": "angular",
-      "releaseRules": [
-        {"type": "build", "release": "patch"}
-      ]
-    }],
+  branches: [
+    { name: "master" },
+    { name: "next", channel: "next", prerelease: "rc" }
+  ],
+  plugins: [
+    '@semantic-release/commit-analyzer', 
     '@semantic-release/release-notes-generator', 
     '@semantic-release/github'
   ]

@@ -6,4 +6,6 @@ on:
 jobs:
   release:
     uses: Geode-solutions/actions/.github/workflows/trigger-release.yml@master
+    with:
+      branch: next
     secrets: inherit
