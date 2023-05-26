@@ -70,6 +70,8 @@ namespace geode
             .def( "clear", &AttributeManager::clear )
             .def( "clear_attributes", &AttributeManager::clear_attributes )
             .def( "delete_attribute", &AttributeManager::delete_attribute )
+            .def( "set_attribute_properties",
+                &AttributeManager::set_attribute_properties )
             .def( "delete_elements", &AttributeManager::delete_elements );
         PYTHON_ATTRIBUTE_TYPE( bool, bool );
         PYTHON_ATTRIBUTE_TYPE( int, int );
