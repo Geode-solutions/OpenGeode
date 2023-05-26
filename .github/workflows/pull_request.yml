@@ -1,0 +1,11 @@
+name: Pull request
+
+on:
+  pull_request:
+    types: opened
+
+jobs:
+  update-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo ${{ toJson(github) }}
