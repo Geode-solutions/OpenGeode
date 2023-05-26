@@ -2,6 +2,7 @@ name: Pull request
 
 on:
   pull_request:
+    types: [opened, reopened]
     branches:
       - master
 
@@ -9,4 +10,13 @@ jobs:
   update-branch:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "${{ toJson(github) }}"
+      - uses: actions/github-script@v6
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            github.rest.pulls.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              base: 'next'
+            })
