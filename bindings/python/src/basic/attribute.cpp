@@ -57,9 +57,17 @@ namespace geode
 {
     void define_attributes( pybind11::module& module )
     {
+        pybind11::class_< AttributeProperties >( module, "AttributeProperties" )
+            .def( pybind11::init<>() )
+            .def( pybind11::init< bool, bool >() )
+            .def_readwrite( "assignable", &AttributeProperties::assignable )
+            .def_readwrite(
+                "interpolable", &AttributeProperties::interpolable );
+
         pybind11::class_< AttributeBase, std::shared_ptr< AttributeBase > >(
             module, "AttributeBase" )
             .def( "generic_value", &AttributeBase::generic_value )
+            .def( "properties", &AttributeBase::properties )
             .def( "is_genericable", &AttributeBase::is_genericable );
         PYTHON_ATTRIBUTE_CLASS( bool, Bool );
         PYTHON_ATTRIBUTE_CLASS( int, Int );

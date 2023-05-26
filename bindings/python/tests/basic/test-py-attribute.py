@@ -48,6 +48,10 @@ def test_int_variable_attribute(manager):
     variable_attribute.set_value(3, 3)
     if not variable_attribute.is_genericable():
         raise ValueError("[Test] Should be genericable")
+    
+    manager.set_attribute_properties("int",basic.AttributeProperties(True,True))
+    if not variable_attribute.properties().assignable or not variable_attribute.properties().interpolable :
+        raise ValueError("[Test] Should be assignable and interpolable")
 
     attribute = manager.find_attribute_int("int")
     if attribute.value(3) != 3:

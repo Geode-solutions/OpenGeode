@@ -289,6 +289,16 @@ namespace geode
             attributes_.erase( it );
         }
 
+        void set_attribute_properties( absl::string_view attribute_name,
+            AttributeProperties new_properties )
+        {
+            const auto it = attributes_.find( attribute_name );
+            OPENGEODE_EXCEPTION( it != attributes_.end(),
+                "[AttributeManager::rename_attribute] Attribute ",
+                attribute_name, "does not exist" );
+            it->second->set_properties( std::move( new_properties ) );
+        }
+
         template < typename Archive >
         void serialize( Archive &archive )
         {
@@ -439,6 +449,13 @@ namespace geode
         absl::string_view old_name, absl::string_view new_name )
     {
         impl_->rename_attribute( old_name, new_name, {} );
+    }
+
+    void AttributeManager::set_attribute_properties(
+        absl::string_view attribute_name, AttributeProperties new_properties )
+    {
+        impl_->set_attribute_properties(
+            attribute_name, std::move( new_properties ) );
     }
 
     template < typename Archive >
