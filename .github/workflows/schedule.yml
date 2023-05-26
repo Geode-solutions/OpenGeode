@@ -8,6 +8,7 @@ jobs:
   schedule:
     uses: Geode-solutions/actions/.github/workflows/schedule.yml@master
     strategy:
+      fail-fast: true
       matrix:
         config: 
           - {branch: next, slack: "SLACK_WEBHOOK_URL"}
