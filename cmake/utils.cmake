@@ -495,7 +495,7 @@ print(name + version + '-' + abi + '-' + platform)"
     )
     string(CONCAT import_test "import " "${project_name}")
     add_custom_target(test-wheel
-        COMMAND ${PYTHON_EXECUTABLE} -m pip install --pre --force-reinstall ${wheel_file}
+        COMMAND ${PYTHON_EXECUTABLE} -m pip install --force-reinstall ${wheel_file}
         COMMAND ${PYTHON_EXECUTABLE} -c ${import_test}
     )
 endfunction()
