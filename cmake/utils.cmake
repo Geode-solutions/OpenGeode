@@ -81,16 +81,22 @@ set(CPACK_COMPONENT_INCLUDE_TOPLEVEL_DIRECTORY ON)
 set(CPACK_COMPONENTS_GROUPING ALL_COMPONENTS_IN_ONE)
 set(CPACK_COMPONENTS_ALL public)
 
+if(WIN32)
+    set(CMAKE_CONFIG_DESTINATION cmake)
+else()
+    set(CMAKE_CONFIG_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
+endif()
+
 if(EXISTS ${PROJECT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in)
-    set(OUTPUT_CONFIG_FILE ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}Config.cmake)
+    set(OUTPUT_CONFIG_FILE ${PROJECT_BINARY_DIR}/${CMAKE_CONFIG_DESTINATION}/${PROJECT_NAME}Config.cmake)
     configure_package_config_file(
         ${PROJECT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in 
         ${OUTPUT_CONFIG_FILE}
-        INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+        INSTALL_DESTINATION ${CMAKE_CONFIG_DESTINATION}
     )
     install(
         FILES ${OUTPUT_CONFIG_FILE}
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+        DESTINATION ${CMAKE_CONFIG_DESTINATION}
         COMPONENT public
     )
 endif()
@@ -135,7 +141,7 @@ add_custom_target(essential)
 function(_export_library library_name)
     export(TARGETS ${library_name}
         NAMESPACE ${PROJECT_NAME}::
-        FILE ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}_${library_name}_target.cmake
+        FILE ${PROJECT_BINARY_DIR}/${CMAKE_CONFIG_DESTINATION}/${PROJECT_NAME}_${library_name}_target.cmake
     )
     install(TARGETS ${library_name}
         EXPORT ${library_name}
@@ -152,7 +158,7 @@ function(_export_library library_name)
     install(EXPORT ${library_name}
         FILE ${PROJECT_NAME}_${library_name}_target.cmake
         NAMESPACE ${PROJECT_NAME}::
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+        DESTINATION ${CMAKE_CONFIG_DESTINATION}
         COMPONENT public
         ${ARGN}
     )
