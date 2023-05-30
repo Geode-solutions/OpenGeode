@@ -76,7 +76,7 @@ endif()
 
 install(
     FILES "${PROJECT_SOURCE_DIR}/cmake/OpenGeodeModule-setup.py.in"
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+    DESTINATION ${CMAKE_CONFIG_DESTINATION}
     COMPONENT
         public
 )
