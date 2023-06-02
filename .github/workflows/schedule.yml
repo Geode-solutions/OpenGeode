@@ -1,20 +1,27 @@
 name: Schedule
 
 on:
+  workflow_dispatch:
   schedule:
-    - cron: 0 0 * * *
+    - cron: 0 23 * * *
 
 jobs:
-  schedule:
+  schedule-next:
+    if: ${{ github.event_name == 'schedule' }}
     uses: Geode-solutions/actions/.github/workflows/schedule.yml@master
-    strategy:
-      matrix:
-        config: 
-          - {branch: next, slack: "SLACK_WEBHOOK_URL"}
-          - {branch: master, slack: "SLACK_ECOSYSTEM"}
     with:
       directory: opengeode
-      branch: ${{ matrix.config.branch }}
+      branch: next
     secrets: 
       TOKEN: ${{ secrets.TOKEN }}
-      SLACK_WEBHOOK_URL: ${{ secrets[matrix.config.slack] }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  schedule-master:
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    uses: Geode-solutions/actions/.github/workflows/schedule.yml@master
+    with:
+      directory: opengeode
+      branch: master
+    secrets: 
+      TOKEN: ${{ secrets.TOKEN }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_ECOSYSTEM }}

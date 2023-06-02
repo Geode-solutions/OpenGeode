@@ -1,0 +1,11 @@
+name: Pull request
+
+on:
+  pull_request:
+    types: [opened, reopened]
+    branches:
+      - master
+
+jobs:
+  update-branch:
+    uses: Geode-solutions/actions/.github/workflows/update-branch.yml@master
