@@ -284,9 +284,10 @@ namespace geode
             OPENGEODE_EXCEPTION( it != attributes_.end(),
                 "[AttributeManager::rename_attribute] Attribute ", old_name,
                 "does not exist" );
-            it->second->set_name( new_name, key );
-            attributes_.emplace( new_name, it->second );
+            auto attribute = it->second;
             attributes_.erase( it );
+            attribute->set_name( new_name, key );
+            attributes_.emplace( new_name, attribute );
         }
 
         void set_attribute_properties( absl::string_view attribute_name,
