@@ -21,29 +21,38 @@
  *
  */
 
-#include "../../common.h"
+#pragma once
 
-#include <geode/geometry/coordinate_system.h>
-
-#include <geode/model/helpers/create_coordinate_system.h>
-#include <geode/model/helpers/model_coordinate_reference_system.h>
-#include <geode/model/representation/builder/brep_builder.h>
-#include <geode/model/representation/builder/section_builder.h>
-#include <geode/model/representation/core/brep.h>
-#include <geode/model/representation/core/section.h>
+#include <geode/geometry/common.h>
+#include <geode/geometry/frame.h>
 
 namespace geode
 {
-    void define_model_coordinate_reference_system( pybind11::module& module )
+    template < index_t dimension >
+    class CoordinateSystem : public Frame< dimension >
     {
-        module
-            .def( "brep_coordinate_reference_systems",
-                &brep_coordinate_reference_systems )
-            .def( "section_coordinate_reference_systems",
-                &section_coordinate_reference_systems )
-            .def( "create_brep_coordinate_system",
-                &create_brep_coordinate_system )
-            .def( "create_section_coordinate_system",
-                &create_section_coordinate_system );
-    }
+    public:
+        CoordinateSystem();
+        CoordinateSystem(
+            std::array< Vector< dimension >, dimension > directions,
+            Point< dimension > origin );
+        CoordinateSystem( Point< dimension > origin,
+            const std::array< Point< dimension >, dimension >& other_points );
+
+        const Point< dimension >& origin() const;
+
+        void set_origin( Point< dimension > origin );
+
+        Point< dimension > coordinates(
+            const Point< dimension >& global_coordinates ) const;
+
+        Point< dimension > global_coordinates(
+            const Point< dimension >& coordinates ) const;
+
+        std::string string() const;
+
+    private:
+        Point< dimension > origin_;
+    };
+    ALIAS_2D_AND_3D( CoordinateSystem );
 } // namespace geode

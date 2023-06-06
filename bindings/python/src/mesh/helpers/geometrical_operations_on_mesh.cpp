@@ -53,7 +53,7 @@
 
 namespace geode
 {
-    void geometrical_operations_on_mesh( pybind11::module& module )
+    void define_geometrical_operations_on_mesh( pybind11::module& module )
     {
         PYTHON_TRANSLATE( PointSet, "point_set", 2 );
         PYTHON_TRANSLATE( PointSet, "point_set", 3 );

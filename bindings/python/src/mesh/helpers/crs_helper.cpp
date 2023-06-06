@@ -25,25 +25,32 @@
 
 #include <geode/geometry/coordinate_system.h>
 
-#include <geode/model/helpers/create_coordinate_system.h>
-#include <geode/model/helpers/model_coordinate_reference_system.h>
-#include <geode/model/representation/builder/brep_builder.h>
-#include <geode/model/representation/builder/section_builder.h>
-#include <geode/model/representation/core/brep.h>
-#include <geode/model/representation/core/section.h>
+#include <geode/mesh/builder/edged_curve_builder.h>
+#include <geode/mesh/builder/point_set_builder.h>
+#include <geode/mesh/builder/solid_mesh_builder.h>
+#include <geode/mesh/builder/surface_mesh_builder.h>
+#include <geode/mesh/core/edged_curve.h>
+#include <geode/mesh/core/point_set.h>
+#include <geode/mesh/core/solid_mesh.h>
+#include <geode/mesh/core/surface_mesh.h>
+#include <geode/mesh/helpers/create_coordinate_system.h>
+
+#define PYTHON_MESH_CRS_HELPER( mesh, dimension )                              \
+    const auto name##mesh##dimension = absl::StrCat(                           \
+        "create_", #mesh, "_coordinate_system", dimension, "D" );              \
+    module.def( name##mesh##dimension.c_str(),                                 \
+        &create_##mesh##_coordinate_system< dimension > )
 
 namespace geode
 {
-    void define_model_coordinate_reference_system( pybind11::module& module )
+    void define_mesh_crs_helper( pybind11::module& module )
     {
-        module
-            .def( "brep_coordinate_reference_systems",
-                &brep_coordinate_reference_systems )
-            .def( "section_coordinate_reference_systems",
-                &section_coordinate_reference_systems )
-            .def( "create_brep_coordinate_system",
-                &create_brep_coordinate_system )
-            .def( "create_section_coordinate_system",
-                &create_section_coordinate_system );
+        PYTHON_MESH_CRS_HELPER( edged_curve, 2 );
+        PYTHON_MESH_CRS_HELPER( edged_curve, 3 );
+        PYTHON_MESH_CRS_HELPER( point_set, 2 );
+        PYTHON_MESH_CRS_HELPER( point_set, 3 );
+        PYTHON_MESH_CRS_HELPER( surface_mesh, 2 );
+        PYTHON_MESH_CRS_HELPER( surface_mesh, 3 );
+        PYTHON_MESH_CRS_HELPER( solid_mesh, 3 );
     }
 } // namespace geode
