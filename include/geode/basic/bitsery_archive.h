@@ -67,6 +67,19 @@ namespace geode
     void opengeode_basic_api register_basic_deserialize_pcontext(
         PContext &context );
 
+    class opengeode_basic_api BitseryExtensions
+    {
+    public:
+        using RegisterFunction = std::function< void( PContext & ) >;
+
+        static void register_functions(
+            RegisterFunction serializer, RegisterFunction deserializer );
+
+        static void register_serialize_pcontext( PContext &context );
+
+        static void register_deserialize_pcontext( PContext &context );
+    };
+
     template < typename Archive, typename T >
     class Growable
     {

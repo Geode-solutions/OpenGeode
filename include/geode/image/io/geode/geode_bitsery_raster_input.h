@@ -47,8 +47,8 @@ namespace geode
                 "[RasterImageInput] Failed to open file: ",
                 to_string( this->filename() ) );
             TContext context{};
-            register_basic_deserialize_pcontext( std::get< 0 >( context ) );
-            register_image_deserialize_pcontext( std::get< 0 >( context ) );
+            BitseryExtensions::register_deserialize_pcontext(
+                std::get< 0 >( context ) );
             Deserializer archive{ context, file };
             RasterImage< dimension > image;
             archive.object( image );

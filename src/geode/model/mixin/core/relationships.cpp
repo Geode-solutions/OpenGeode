@@ -165,10 +165,8 @@ namespace geode
             const auto filename = absl::StrCat( directory, "/relationships" );
             std::ofstream file{ filename, std::ofstream::binary };
             TContext context{};
-            register_basic_serialize_pcontext( std::get< 0 >( context ) );
-            register_geometry_serialize_pcontext( std::get< 0 >( context ) );
-            register_mesh_serialize_pcontext( std::get< 0 >( context ) );
-            register_model_serialize_pcontext( std::get< 0 >( context ) );
+            BitseryExtensions::register_serialize_pcontext(
+                std::get< 0 >( context ) );
             Serializer archive{ context, file };
             archive.object( *this );
             archive.adapter().flush();
@@ -181,10 +179,8 @@ namespace geode
             const auto filename = absl::StrCat( directory, "/relationships" );
             std::ifstream file{ filename, std::ifstream::binary };
             TContext context{};
-            register_basic_deserialize_pcontext( std::get< 0 >( context ) );
-            register_geometry_deserialize_pcontext( std::get< 0 >( context ) );
-            register_mesh_deserialize_pcontext( std::get< 0 >( context ) );
-            register_model_deserialize_pcontext( std::get< 0 >( context ) );
+            BitseryExtensions::register_deserialize_pcontext(
+                std::get< 0 >( context ) );
             Deserializer archive{ context, file };
             archive.object( *this );
             const auto& adapter = archive.adapter();

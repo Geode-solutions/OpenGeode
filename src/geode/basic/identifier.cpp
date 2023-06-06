@@ -61,7 +61,8 @@ namespace geode
             const auto filename = absl::StrCat( directory, "/identifier" );
             std::ofstream file{ filename, std::ofstream::binary };
             TContext context{};
-            register_basic_serialize_pcontext( std::get< 0 >( context ) );
+            BitseryExtensions::register_serialize_pcontext(
+                std::get< 0 >( context ) );
             Serializer archive{ context, file };
             archive.object( *this );
             archive.adapter().flush();
@@ -78,7 +79,8 @@ namespace geode
                 return;
             }
             TContext context{};
-            register_basic_deserialize_pcontext( std::get< 0 >( context ) );
+            BitseryExtensions::register_deserialize_pcontext(
+                std::get< 0 >( context ) );
             Deserializer archive{ context, file };
             archive.object( *this );
             const auto& adapter = archive.adapter();

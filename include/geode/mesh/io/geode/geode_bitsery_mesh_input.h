@@ -39,10 +39,8 @@
         OPENGEODE_EXCEPTION( file, "[Bitsery::read] Failed to open file: ",    \
             to_string( this->filename() ) );                                   \
         TContext context{};                                                    \
-        register_basic_deserialize_pcontext( std::get< 0 >( context ) );       \
-        register_geometry_deserialize_pcontext( std::get< 0 >( context ) );    \
-        register_image_deserialize_pcontext( std::get< 0 >( context ) );       \
-        register_mesh_deserialize_pcontext( std::get< 0 >( context ) );        \
+        BitseryExtensions::register_deserialize_pcontext(                      \
+            std::get< 0 >( context ) );                                        \
         Deserializer archive{ context, file };                                 \
         auto mesh = Mesh::create( impl );                                      \
         archive.object( dynamic_cast< OpenGeode##Mesh& >( *mesh ) );           \
