@@ -55,8 +55,6 @@ namespace geode
             using ComponentsStore = absl::flat_hash_map< uuid, ComponentPtr >;
             using Iterator = typename ComponentsStore::const_iterator;
 
-            virtual ~ComponentsStorage() = default;
-
             index_t nb_components() const
             {
                 return components_.size();
@@ -97,7 +95,8 @@ namespace geode
                 std::ofstream file{ to_string( filename ),
                     std::ofstream::binary };
                 TContext context{};
-                register_libraries_in_serialize_pcontext( context );
+                BitseryExtensions::register_serialize_pcontext(
+                    std::get< 0 >( context ) );
                 Serializer archive{ context, file };
                 archive.object( *this );
                 archive.adapter().flush();
@@ -121,7 +120,8 @@ namespace geode
                 std::ifstream file{ to_string( filename ),
                     std::ifstream::binary };
                 TContext context{};
-                register_libraries_in_deserialize_pcontext( context );
+                BitseryExtensions::register_deserialize_pcontext(
+                    std::get< 0 >( context ) );
                 Deserializer archive{ context, file };
                 archive.object( *this );
                 const auto& adapter = archive.adapter();
@@ -151,27 +151,6 @@ namespace geode
                     }
                 }
                 return mapping;
-            }
-
-        protected:
-            virtual void register_libraries_in_serialize_pcontext(
-                TContext& context ) const
-            {
-                register_basic_serialize_pcontext( std::get< 0 >( context ) );
-                register_geometry_serialize_pcontext(
-                    std::get< 0 >( context ) );
-                register_mesh_serialize_pcontext( std::get< 0 >( context ) );
-                register_model_serialize_pcontext( std::get< 0 >( context ) );
-            }
-
-            virtual void register_libraries_in_deserialize_pcontext(
-                TContext& context ) const
-            {
-                register_basic_deserialize_pcontext( std::get< 0 >( context ) );
-                register_geometry_deserialize_pcontext(
-                    std::get< 0 >( context ) );
-                register_mesh_deserialize_pcontext( std::get< 0 >( context ) );
-                register_model_deserialize_pcontext( std::get< 0 >( context ) );
             }
 
         private:

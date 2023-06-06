@@ -24,6 +24,7 @@
 
 #include <absl/memory/memory.h>
 
+#include <geode/basic/bitsery_archive.h>
 #include <geode/basic/console_logger_client.h>
 #include <geode/basic/console_progress_logger_client.h>
 #include <geode/basic/library.h>
@@ -36,8 +37,10 @@ namespace geode
     {
         LoggerManager::register_client(
             absl::make_unique< ConsoleLoggerClient >() );
-
         ProgressLoggerManager::register_client(
             absl::make_unique< ConsoleProgressLoggerClient >() );
+        BitseryExtensions::register_functions(
+            register_basic_serialize_pcontext,
+            register_basic_deserialize_pcontext );
     }
 } // namespace geode

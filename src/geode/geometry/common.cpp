@@ -23,6 +23,7 @@
 
 #include <geode/geometry/common.h>
 
+#include <geode/geometry/bitsery_archive.h>
 #include <geode/geometry/private/predicates.h>
 
 namespace geode
@@ -31,5 +32,8 @@ namespace geode
     {
         OpenGeodeBasicLibrary::initialize();
         GEO::PCK::initialize();
+        BitseryExtensions::register_functions(
+            register_geometry_serialize_pcontext,
+            register_geometry_deserialize_pcontext );
     }
 } // namespace geode

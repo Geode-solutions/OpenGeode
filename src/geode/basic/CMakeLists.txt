@@ -24,6 +24,7 @@ add_geode_library(
     SOURCES
         "assert.cpp"
         "attribute_manager.cpp"
+        "bitsery_archive.cpp"
         "bitsery_input.cpp"
         "bitsery_output.cpp"
         "cell_array.cpp"

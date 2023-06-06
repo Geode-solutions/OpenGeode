@@ -28,6 +28,7 @@
 #include <geode/image/common.h>
 
 #include <geode/mesh/builder/geode/register_builder.h>
+#include <geode/mesh/core/bitsery_archive.h>
 #include <geode/mesh/core/geode/register_mesh.h>
 #include <geode/mesh/io/geode/register_input.h>
 #include <geode/mesh/io/geode/register_output.h>
@@ -42,5 +43,7 @@ namespace geode
         register_geode_builder();
         register_geode_mesh_input();
         register_geode_mesh_output();
+        BitseryExtensions::register_functions( register_mesh_serialize_pcontext,
+            register_mesh_deserialize_pcontext );
     }
 } // namespace geode

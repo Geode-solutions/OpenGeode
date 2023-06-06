@@ -44,8 +44,8 @@ namespace geode
             std::ofstream file{ to_string( this->filename() ),
                 std::ofstream::binary };
             TContext context{};
-            register_basic_serialize_pcontext( std::get< 0 >( context ) );
-            register_image_serialize_pcontext( std::get< 0 >( context ) );
+            BitseryExtensions::register_serialize_pcontext(
+                std::get< 0 >( context ) );
             Serializer archive{ context, file };
             archive.object( mesh );
             archive.adapter().flush();

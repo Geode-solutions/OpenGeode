@@ -25,6 +25,7 @@
 
 #include <geode/mesh/common.h>
 
+#include <geode/model/mixin/core/bitsery_archive.h>
 #include <geode/model/representation/io/geode/geode_brep_input.h>
 #include <geode/model/representation/io/geode/geode_brep_output.h>
 #include <geode/model/representation/io/geode/geode_section_input.h>
@@ -69,5 +70,8 @@ namespace geode
         register_section_input();
         register_brep_output();
         register_section_output();
+        BitseryExtensions::register_functions(
+            register_model_serialize_pcontext,
+            register_model_deserialize_pcontext );
     }
 } // namespace geode
