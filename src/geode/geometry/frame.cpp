@@ -158,7 +158,7 @@ namespace geode
         return output;
     }
 
-    template opengeode_geometry_api class Frame< 1 >;
-    template opengeode_geometry_api class Frame< 2 >;
-    template opengeode_geometry_api class Frame< 3 >;
+    template class opengeode_geometry_api Frame< 1 >;
+    template class opengeode_geometry_api Frame< 2 >;
+    template class opengeode_geometry_api Frame< 3 >;
 } // namespace geode
