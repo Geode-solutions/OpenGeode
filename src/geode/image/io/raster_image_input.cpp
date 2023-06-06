@@ -23,11 +23,7 @@
 
 #include <geode/image/io/raster_image_input.h>
 
-#include <absl/strings/ascii.h>
-
-#include <geode/basic/filename.h>
-#include <geode/basic/identifier_builder.h>
-#include <geode/basic/timer.h>
+#include <geode/basic/private/geode_input_impl.h>
 
 #include <geode/image/core/raster_image.h>
 
@@ -38,24 +34,11 @@ namespace geode
     {
         try
         {
-            Timer timer;
-            const auto extension =
-                absl::AsciiStrToLower( extension_from_filename( filename ) );
-            OPENGEODE_EXCEPTION(
-                RasterImageInputFactory< dimension >::has_creator( extension ),
-                "Unknown extension: ", extension );
-            auto input = RasterImageInputFactory< dimension >::create(
-                extension, filename );
-            auto raster = input->read();
-            if( raster.name() == Identifier::DEFAULT_NAME )
-            {
-                IdentifierBuilder{ raster }.set_name(
-                    filename_without_extension( filename ) );
-            }
-            Logger::info( "RasterImage", dimension, "D loaded from ", filename,
-                " in ", timer.duration() );
-            Logger::info( "RasterImage", dimension,
-                "D has: ", raster.nb_cells(), " cells" );
+            const auto type = absl::StrCat( "RasterImage", dimension, "D" );
+            auto raster = detail::geode_object_input_impl<
+                RasterImageInputFactory< dimension >,
+                RasterImage< dimension > >( type, filename );
+            Logger::info( type, " has: ", raster.nb_cells(), " cells" );
             return raster;
         }
         catch( const OpenGeodeException& e )

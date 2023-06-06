@@ -57,8 +57,9 @@ void test()
     }
     test_raster( raster );
     test_raster( raster.clone() );
-    geode::save_raster_image( raster, "test.og_img2d" );
-    const auto reload = geode::load_raster_image< 2 >( "test.og_img2d" );
+    const auto filename_with_spaces = absl::StrCat( " ", "test.og_img2d", " " );
+    geode::save_raster_image( raster, filename_with_spaces );
+    const auto reload = geode::load_raster_image< 2 >( filename_with_spaces );
     test_raster( reload );
     auto raster2 = std::move( raster );
     OPENGEODE_EXCEPTION(

@@ -23,11 +23,7 @@
 
 #include <geode/mesh/io/polygonal_surface_input.h>
 
-#include <absl/strings/ascii.h>
-
-#include <geode/basic/filename.h>
-#include <geode/basic/identifier_builder.h>
-#include <geode/basic/timer.h>
+#include <geode/basic/private/geode_input_impl.h>
 
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polygonal_surface.h>
@@ -40,26 +36,14 @@ namespace geode
     {
         try
         {
-            Timer timer;
-            const auto extension =
-                absl::AsciiStrToLower( extension_from_filename( filename ) );
-            OPENGEODE_EXCEPTION(
-                PolygonalSurfaceInputFactory< dimension >::has_creator(
-                    extension ),
-                "Unknown extension: ", extension );
-            auto input = PolygonalSurfaceInputFactory< dimension >::create(
-                extension, filename );
-            auto polygonal_surface = input->read( impl );
-            if( polygonal_surface->name() == Identifier::DEFAULT_NAME )
-            {
-                IdentifierBuilder{ *polygonal_surface }.set_name(
-                    filename_without_extension( filename ) );
-            }
-            Logger::info( "PolygonalSurface", dimension, "D loaded from ",
-                filename, " in ", timer.duration() );
-            Logger::info( "PolygonalSurface", dimension,
-                "D has: ", polygonal_surface->nb_vertices(), " vertices, ",
-                polygonal_surface->nb_polygons(), " polygons" );
+            const auto type =
+                absl::StrCat( "PolygonalSurface", dimension, "D" );
+            auto polygonal_surface = detail::geode_object_input_impl<
+                PolygonalSurfaceInputFactory< dimension >,
+                std::unique_ptr< PolygonalSurface< dimension > > >(
+                type, filename, impl );
+            Logger::info( type, " has: ", polygonal_surface->nb_vertices(),
+                " vertices, ", polygonal_surface->nb_polygons(), " polygons" );
             return polygonal_surface;
         }
         catch( const OpenGeodeException& e )

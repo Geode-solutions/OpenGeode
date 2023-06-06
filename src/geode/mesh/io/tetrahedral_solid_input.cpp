@@ -23,11 +23,7 @@
 
 #include <geode/mesh/io/tetrahedral_solid_input.h>
 
-#include <absl/strings/ascii.h>
-
-#include <geode/basic/filename.h>
-#include <geode/basic/identifier_builder.h>
-#include <geode/basic/timer.h>
+#include <geode/basic/private/geode_input_impl.h>
 
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
@@ -40,26 +36,15 @@ namespace geode
     {
         try
         {
-            Timer timer;
-            const auto extension =
-                absl::AsciiStrToLower( extension_from_filename( filename ) );
-            OPENGEODE_EXCEPTION(
-                TetrahedralSolidInputFactory< dimension >::has_creator(
-                    extension ),
-                "Unknown extension: ", extension );
-            auto input = TetrahedralSolidInputFactory< dimension >::create(
-                extension, filename );
-            auto tetrahedral_solid = input->read( impl );
-            if( tetrahedral_solid->name() == Identifier::DEFAULT_NAME )
-            {
-                IdentifierBuilder{ *tetrahedral_solid }.set_name(
-                    filename_without_extension( filename ) );
-            }
-            Logger::info( "TetrahedralSolid", dimension, "D loaded from ",
-                filename, " in ", timer.duration() );
-            Logger::info( "TetrahedralSolid", dimension,
-                "D has: ", tetrahedral_solid->nb_vertices(), " vertices, ",
-                tetrahedral_solid->nb_polyhedra(), " tetrahedra" );
+            const auto type =
+                absl::StrCat( "TetrahedralSolid", dimension, "D" );
+            auto tetrahedral_solid = detail::geode_object_input_impl<
+                TetrahedralSolidInputFactory< dimension >,
+                std::unique_ptr< TetrahedralSolid< dimension > > >(
+                type, filename, impl );
+            Logger::info( type, " has: ", tetrahedral_solid->nb_vertices(),
+                " vertices, ", tetrahedral_solid->nb_polyhedra(),
+                " tetrahedra" );
             return tetrahedral_solid;
         }
         catch( const OpenGeodeException& e )

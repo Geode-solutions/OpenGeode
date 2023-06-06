@@ -23,11 +23,7 @@
 
 #include <geode/mesh/io/point_set_input.h>
 
-#include <absl/strings/ascii.h>
-
-#include <geode/basic/filename.h>
-#include <geode/basic/identifier_builder.h>
-#include <geode/basic/timer.h>
+#include <geode/basic/private/geode_input_impl.h>
 
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/point_set.h>
@@ -40,24 +36,13 @@ namespace geode
     {
         try
         {
-            Timer timer;
-            const auto extension =
-                absl::AsciiStrToLower( extension_from_filename( filename ) );
-            OPENGEODE_EXCEPTION(
-                PointSetInputFactory< dimension >::has_creator( extension ),
-                "Unknown extension: ", extension );
-            auto input = PointSetInputFactory< dimension >::create(
-                extension, filename );
-            auto point_set = input->read( impl );
-            if( point_set->name() == Identifier::DEFAULT_NAME )
-            {
-                IdentifierBuilder{ *point_set }.set_name(
-                    filename_without_extension( filename ) );
-            }
-            Logger::info( "PointSet", dimension, "D loaded from ", filename,
-                " in ", timer.duration() );
-            Logger::info( "PointSet", dimension,
-                "D has: ", point_set->nb_vertices(), " vertices" );
+            const auto type = absl::StrCat( "PointSet", dimension, "D" );
+            auto point_set = detail::geode_object_input_impl<
+                PointSetInputFactory< dimension >,
+                std::unique_ptr< PointSet< dimension > > >(
+                type, filename, impl );
+            Logger::info(
+                type, " has: ", point_set->nb_vertices(), " vertices" );
             return point_set;
         }
         catch( const OpenGeodeException& e )

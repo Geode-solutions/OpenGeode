@@ -23,11 +23,7 @@
 
 #include <geode/model/representation/io/section_input.h>
 
-#include <absl/strings/ascii.h>
-
-#include <geode/basic/filename.h>
-#include <geode/basic/identifier_builder.h>
-#include <geode/basic/timer.h>
+#include <geode/basic/private/geode_input_impl.h>
 
 #include <geode/model/representation/builder/section_builder.h>
 #include <geode/model/representation/core/section.h>
@@ -38,21 +34,11 @@ namespace geode
     {
         try
         {
-            Timer timer;
-            const auto extension =
-                absl::AsciiStrToLower( extension_from_filename( filename ) );
-            OPENGEODE_EXCEPTION( SectionInputFactory::has_creator( extension ),
-                "Unknown extension: ", extension );
-            auto input = SectionInputFactory::create( extension, filename );
-            auto section = input->read();
-            if( section.name() == Identifier::DEFAULT_NAME )
-            {
-                IdentifierBuilder{ section }.set_name(
-                    filename_without_extension( filename ) );
-            }
-            Logger::info(
-                "Section loaded from ", filename, " in ", timer.duration() );
-            Logger::info( "Section has: ", section.nb_surfaces(), " Surfaces, ",
+            const auto type = "Section";
+            auto section =
+                detail::geode_object_input_impl< SectionInputFactory, Section >(
+                    type, filename );
+            Logger::info( type, " has: ", section.nb_surfaces(), " Surfaces, ",
                 section.nb_lines(), " Lines, ", section.nb_corners(),
                 " Corners, ", section.nb_model_boundaries(),
                 " ModelBoundaries" );

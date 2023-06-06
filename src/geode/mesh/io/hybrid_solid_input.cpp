@@ -23,11 +23,7 @@
 
 #include <geode/mesh/io/hybrid_solid_input.h>
 
-#include <absl/strings/ascii.h>
-
-#include <geode/basic/filename.h>
-#include <geode/basic/identifier_builder.h>
-#include <geode/basic/timer.h>
+#include <geode/basic/private/geode_input_impl.h>
 
 #include <geode/mesh/core/hybrid_solid.h>
 #include <geode/mesh/core/mesh_factory.h>
@@ -40,25 +36,13 @@ namespace geode
     {
         try
         {
-            Timer timer;
-            const auto extension =
-                absl::AsciiStrToLower( extension_from_filename( filename ) );
-            OPENGEODE_EXCEPTION(
-                HybridSolidInputFactory< dimension >::has_creator( extension ),
-                "Unknown extension: ", extension );
-            auto input = HybridSolidInputFactory< dimension >::create(
-                extension, filename );
-            auto hybrid_solid = input->read( impl );
-            if( hybrid_solid->name() == Identifier::DEFAULT_NAME )
-            {
-                IdentifierBuilder{ *hybrid_solid }.set_name(
-                    filename_without_extension( filename ) );
-            }
-            Logger::info( "HybridSolid", dimension, "D loaded from ", filename,
-                " in ", timer.duration() );
-            Logger::info( "HybridSolid", dimension,
-                "D has: ", hybrid_solid->nb_vertices(), " vertices, ",
-                hybrid_solid->nb_polyhedra(), " polyhedra" );
+            const auto type = absl::StrCat( "HybridSolid", dimension, "D" );
+            auto hybrid_solid = detail::geode_object_input_impl<
+                HybridSolidInputFactory< dimension >,
+                std::unique_ptr< HybridSolid< dimension > > >(
+                type, filename, impl );
+            Logger::info( type, " has: ", hybrid_solid->nb_vertices(),
+                " vertices, ", hybrid_solid->nb_polyhedra(), " polyhedra" );
             return hybrid_solid;
         }
         catch( const OpenGeodeException& e )

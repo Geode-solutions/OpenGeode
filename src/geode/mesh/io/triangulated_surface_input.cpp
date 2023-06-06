@@ -23,11 +23,7 @@
 
 #include <geode/mesh/io/triangulated_surface_input.h>
 
-#include <absl/strings/ascii.h>
-
-#include <geode/basic/filename.h>
-#include <geode/basic/identifier_builder.h>
-#include <geode/basic/timer.h>
+#include <geode/basic/private/geode_input_impl.h>
 
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/triangulated_surface.h>
@@ -41,26 +37,15 @@ namespace geode
     {
         try
         {
-            Timer timer;
-            const auto extension =
-                absl::AsciiStrToLower( extension_from_filename( filename ) );
-            OPENGEODE_EXCEPTION(
-                TriangulatedSurfaceInputFactory< dimension >::has_creator(
-                    extension ),
-                "Unknown extension: ", extension );
-            auto input = TriangulatedSurfaceInputFactory< dimension >::create(
-                extension, filename );
-            auto triangulated_surface = input->read( impl );
-            if( triangulated_surface->name() == Identifier::DEFAULT_NAME )
-            {
-                IdentifierBuilder{ *triangulated_surface }.set_name(
-                    filename_without_extension( filename ) );
-            }
-            Logger::info( "TriangulatedSurface", dimension, "D loaded from ",
-                filename, " in ", timer.duration() );
-            Logger::info( "TriangulatedSurface", dimension,
-                "D has: ", triangulated_surface->nb_vertices(), " vertices, ",
-                triangulated_surface->nb_polygons(), " triangles" );
+            const auto type =
+                absl::StrCat( "TriangulatedSurface", dimension, "D" );
+            auto triangulated_surface = detail::geode_object_input_impl<
+                TriangulatedSurfaceInputFactory< dimension >,
+                std::unique_ptr< TriangulatedSurface< dimension > > >(
+                type, filename, impl );
+            Logger::info( type, " has: ", triangulated_surface->nb_vertices(),
+                " vertices, ", triangulated_surface->nb_polygons(),
+                " triangles" );
             return triangulated_surface;
         }
         catch( const OpenGeodeException& e )

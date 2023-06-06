@@ -23,11 +23,7 @@
 
 #include <geode/mesh/io/graph_input.h>
 
-#include <absl/strings/ascii.h>
-
-#include <geode/basic/filename.h>
-#include <geode/basic/identifier_builder.h>
-#include <geode/basic/timer.h>
+#include <geode/basic/private/geode_input_impl.h>
 
 #include <geode/mesh/core/graph.h>
 #include <geode/mesh/core/mesh_factory.h>
@@ -39,21 +35,10 @@ namespace geode
     {
         try
         {
-            Timer timer;
-            const auto extension =
-                absl::AsciiStrToLower( extension_from_filename( filename ) );
-            OPENGEODE_EXCEPTION( GraphInputFactory::has_creator( extension ),
-                "Unknown extension: ", extension );
-            auto input = GraphInputFactory::create( extension, filename );
-            auto graph = input->read( impl );
-            if( graph->name() == Identifier::DEFAULT_NAME )
-            {
-                IdentifierBuilder{ *graph }.set_name(
-                    filename_without_extension( filename ) );
-            }
-            Logger::info(
-                "Graph loaded from ", filename, " in ", timer.duration() );
-            Logger::info( "Graph has: ", graph->nb_vertices(), " vertices, ",
+            const auto type = "Graph";
+            auto graph = detail::geode_object_input_impl< GraphInputFactory,
+                std::unique_ptr< Graph > >( type, filename, impl );
+            Logger::info( type, " has: ", graph->nb_vertices(), " vertices, ",
                 graph->nb_edges(), " edges" );
             return graph;
         }

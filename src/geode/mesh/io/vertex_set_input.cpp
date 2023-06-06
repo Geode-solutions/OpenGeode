@@ -23,11 +23,7 @@
 
 #include <geode/mesh/io/vertex_set_input.h>
 
-#include <absl/strings/ascii.h>
-
-#include <geode/basic/filename.h>
-#include <geode/basic/identifier_builder.h>
-#include <geode/basic/timer.h>
+#include <geode/basic/private/geode_input_impl.h>
 
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/vertex_set.h>
@@ -46,23 +42,12 @@ namespace geode
     {
         try
         {
-            Timer timer;
-            const auto extension =
-                absl::AsciiStrToLower( extension_from_filename( filename ) );
-            OPENGEODE_EXCEPTION(
-                VertexSetInputFactory::has_creator( extension ),
-                "Unknown extension: ", extension );
-            auto input = VertexSetInputFactory::create( extension, filename );
-            auto vertex_set = input->read( impl );
-            if( vertex_set->name() == Identifier::DEFAULT_NAME )
-            {
-                IdentifierBuilder{ *vertex_set }.set_name(
-                    filename_without_extension( filename ) );
-            }
+            const auto type = "VertexSet";
+            auto vertex_set =
+                detail::geode_object_input_impl< VertexSetInputFactory,
+                    std::unique_ptr< VertexSet > >( type, filename, impl );
             Logger::info(
-                "VertexSet loaded from ", filename, " in ", timer.duration() );
-            Logger::info(
-                "VertexSet has: ", vertex_set->nb_vertices(), " vertices" );
+                type, " has: ", vertex_set->nb_vertices(), " vertices" );
             return vertex_set;
         }
         catch( const OpenGeodeException& e )
