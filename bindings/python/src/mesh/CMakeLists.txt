@@ -64,6 +64,7 @@ add_geode_python_binding(
         "helpers/convert_point_set.cpp"
         "helpers/convert_solid_mesh.cpp"
         "helpers/convert_surface_mesh.cpp"
+        "helpers/crs_helper.cpp"
         "helpers/euclidean_distance_transform.cpp"
         "helpers/geometrical_operations_on_mesh.cpp"
         "helpers/repair_polygon_orientations.cpp"

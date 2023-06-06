@@ -21,29 +21,35 @@
  *
  */
 
-#include "../../common.h"
+#pragma once
 
-#include <geode/geometry/coordinate_system.h>
-
-#include <geode/model/helpers/create_coordinate_system.h>
-#include <geode/model/helpers/model_coordinate_reference_system.h>
-#include <geode/model/representation/builder/brep_builder.h>
-#include <geode/model/representation/builder/section_builder.h>
-#include <geode/model/representation/core/brep.h>
-#include <geode/model/representation/core/section.h>
+#include <geode/geometry/common.h>
+#include <geode/geometry/vector.h>
 
 namespace geode
 {
-    void define_model_coordinate_reference_system( pybind11::module& module )
+    template < index_t dimension >
+    class Frame
     {
-        module
-            .def( "brep_coordinate_reference_systems",
-                &brep_coordinate_reference_systems )
-            .def( "section_coordinate_reference_systems",
-                &section_coordinate_reference_systems )
-            .def( "create_brep_coordinate_system",
-                &create_brep_coordinate_system )
-            .def( "create_section_coordinate_system",
-                &create_section_coordinate_system );
-    }
+    public:
+        Frame();
+        Frame( std::array< Vector< dimension >, dimension > directions );
+
+        const Vector< dimension >& direction( local_index_t index ) const;
+
+        void set_direction(
+            local_index_t index, Vector< dimension > direction );
+
+        Frame inverse() const;
+
+        Frame operator+( const Frame& rhs ) const;
+
+        Frame rescale( double length ) const;
+
+        std::string string() const;
+
+    private:
+        std::array< Vector< dimension >, dimension > frame_;
+    };
+    ALIAS_1D_AND_2D_AND_3D( Frame );
 } // namespace geode

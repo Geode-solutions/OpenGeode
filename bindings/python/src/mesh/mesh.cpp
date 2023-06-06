@@ -76,7 +76,8 @@ namespace geode
     void define_convert_solid_mesh( pybind11::module& );
     void define_euclidean_distance_transform( pybind11::module& );
     void define_repair_polygon_orientations( pybind11::module& );
-    void geometrical_operations_on_mesh( pybind11::module& );
+    void define_geometrical_operations_on_mesh( pybind11::module& );
+    void define_mesh_crs_helper( pybind11::module& );
 
     void define_vertex_set_io( pybind11::module& );
     void define_graph_io( pybind11::module& );
@@ -154,7 +155,8 @@ PYBIND11_MODULE( opengeode_py_mesh, module )
     geode::define_convert_solid_mesh( module );
     geode::define_euclidean_distance_transform( module );
     geode::define_repair_polygon_orientations( module );
-    geode::geometrical_operations_on_mesh( module );
+    geode::define_geometrical_operations_on_mesh( module );
+    geode::define_mesh_crs_helper( module );
 
     geode::define_vertex_set_io( module );
     geode::define_graph_io( module );

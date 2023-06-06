@@ -21,29 +21,32 @@
  *
  */
 
-#include "../../common.h"
+#pragma once
 
-#include <geode/geometry/coordinate_system.h>
-
-#include <geode/model/helpers/create_coordinate_system.h>
-#include <geode/model/helpers/model_coordinate_reference_system.h>
-#include <geode/model/representation/builder/brep_builder.h>
-#include <geode/model/representation/builder/section_builder.h>
-#include <geode/model/representation/core/brep.h>
-#include <geode/model/representation/core/section.h>
+#include <geode/model/common.h>
 
 namespace geode
 {
-    void define_model_coordinate_reference_system( pybind11::module& module )
-    {
-        module
-            .def( "brep_coordinate_reference_systems",
-                &brep_coordinate_reference_systems )
-            .def( "section_coordinate_reference_systems",
-                &section_coordinate_reference_systems )
-            .def( "create_brep_coordinate_system",
-                &create_brep_coordinate_system )
-            .def( "create_section_coordinate_system",
-                &create_section_coordinate_system );
-    }
+    FORWARD_DECLARATION_DIMENSION_CLASS( CoordinateSystem );
+    ALIAS_2D( CoordinateSystem );
+    class BRep;
+    class Section;
+    class BRepBuilder;
+    class SectionBuilder;
+} // namespace geode
+
+namespace geode
+{
+    void opengeode_model_api create_brep_coordinate_system( const BRep& model,
+        BRepBuilder& builder,
+        absl::string_view new_coordinate_system_name,
+        const CoordinateSystem2D& input,
+        const CoordinateSystem2D& output );
+
+    void opengeode_model_api create_section_coordinate_system(
+        const Section& model,
+        SectionBuilder& builder,
+        absl::string_view new_coordinate_system_name,
+        const CoordinateSystem2D& input,
+        const CoordinateSystem2D& output );
 } // namespace geode
