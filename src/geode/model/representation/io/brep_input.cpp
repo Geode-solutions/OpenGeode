@@ -23,11 +23,7 @@
 
 #include <geode/model/representation/io/brep_input.h>
 
-#include <absl/strings/ascii.h>
-
-#include <geode/basic/filename.h>
-#include <geode/basic/identifier_builder.h>
-#include <geode/basic/timer.h>
+#include <geode/basic/private/geode_input_impl.h>
 
 #include <geode/model/representation/builder/brep_builder.h>
 #include <geode/model/representation/core/brep.h>
@@ -38,21 +34,11 @@ namespace geode
     {
         try
         {
-            Timer timer;
-            const auto extension =
-                absl::AsciiStrToLower( extension_from_filename( filename ) );
-            OPENGEODE_EXCEPTION( BRepInputFactory::has_creator( extension ),
-                "Unknown extension: ", extension );
-            auto input = BRepInputFactory::create( extension, filename );
-            auto brep = input->read();
-            if( brep.name() == Identifier::DEFAULT_NAME )
-            {
-                IdentifierBuilder{ brep }.set_name(
-                    filename_without_extension( filename ) );
-            }
-            Logger::info(
-                "BRep loaded from ", filename, " in ", timer.duration() );
-            Logger::info( "BRep has: ", brep.nb_blocks(), " Blocks, ",
+            const auto type = "BRep";
+            auto brep =
+                detail::geode_object_input_impl< BRepInputFactory, BRep >(
+                    type, filename );
+            Logger::info( type, " has: ", brep.nb_blocks(), " Blocks, ",
                 brep.nb_surfaces(), " Surfaces, ", brep.nb_lines(), " Lines, ",
                 brep.nb_corners(), " Corners, ", brep.nb_model_boundaries(),
                 " ModelBoundaries" );

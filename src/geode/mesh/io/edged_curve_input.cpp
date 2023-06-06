@@ -23,11 +23,7 @@
 
 #include <geode/mesh/io/edged_curve_input.h>
 
-#include <absl/strings/ascii.h>
-
-#include <geode/basic/filename.h>
-#include <geode/basic/identifier_builder.h>
-#include <geode/basic/timer.h>
+#include <geode/basic/private/geode_input_impl.h>
 
 #include <geode/mesh/core/edged_curve.h>
 #include <geode/mesh/core/mesh_factory.h>
@@ -40,25 +36,13 @@ namespace geode
     {
         try
         {
-            Timer timer;
-            const auto extension =
-                absl::AsciiStrToLower( extension_from_filename( filename ) );
-            OPENGEODE_EXCEPTION(
-                EdgedCurveInputFactory< dimension >::has_creator( extension ),
-                "Unknown extension: ", extension );
-            auto input = EdgedCurveInputFactory< dimension >::create(
-                extension, filename );
-            auto edged_curve = input->read( impl );
-            if( edged_curve->name() == Identifier::DEFAULT_NAME )
-            {
-                IdentifierBuilder{ *edged_curve }.set_name(
-                    filename_without_extension( filename ) );
-            }
-            Logger::info( "EdgedCurve", dimension, "D loaded from ", filename,
-                " in ", timer.duration() );
-            Logger::info( "EdgedCurve", dimension,
-                "D has: ", edged_curve->nb_vertices(), " vertices, ",
-                edged_curve->nb_edges(), " edges" );
+            const auto type = absl::StrCat( "EdgedCurve", dimension, "D" );
+            auto edged_curve = detail::geode_object_input_impl<
+                EdgedCurveInputFactory< dimension >,
+                std::unique_ptr< EdgedCurve< dimension > > >(
+                type, filename, impl );
+            Logger::info( type, " has: ", edged_curve->nb_vertices(),
+                " vertices, ", edged_curve->nb_edges(), " edges" );
             return edged_curve;
         }
         catch( const OpenGeodeException& e )

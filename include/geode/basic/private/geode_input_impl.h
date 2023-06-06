@@ -23,21 +23,41 @@
 
 #pragma once
 
-#include <ghc/filesystem.hpp>
-
 #include <absl/strings/ascii.h>
 
 #include <geode/basic/filename.h>
+#include <geode/basic/identifier.h>
+#include <geode/basic/identifier_builder.h>
 #include <geode/basic/timer.h>
 
 namespace geode
 {
     namespace detail
     {
-        template < typename Factory, typename Object >
-        void geode_object_output_impl( absl::string_view type,
-            const Object& object,
-            absl::string_view filename )
+        template < typename Object >
+        void update_default_name( Object& object, absl::string_view filename )
+        {
+            if( object.name() == Identifier::DEFAULT_NAME )
+            {
+                IdentifierBuilder{ object }.set_name(
+                    filename_without_extension( filename ) );
+            }
+        }
+
+        template < typename Object >
+        void update_default_name(
+            std::unique_ptr< Object >& object, absl::string_view filename )
+        {
+            if( object->name() == Identifier::DEFAULT_NAME )
+            {
+                IdentifierBuilder{ *object }.set_name(
+                    filename_without_extension( filename ) );
+            }
+        }
+
+        template < typename Factory, typename Object, typename... Args >
+        Object geode_object_input_impl(
+            absl::string_view type, absl::string_view filename, Args... args )
         {
             Timer timer;
             filename = absl::StripAsciiWhitespace( filename );
@@ -45,11 +65,12 @@ namespace geode
                 absl::AsciiStrToLower( extension_from_filename( filename ) );
             OPENGEODE_EXCEPTION( Factory::has_creator( extension ),
                 "Unknown extension: ", extension );
-            ghc::filesystem::create_directories(
-                filepath_without_filename( filename ) );
-            Factory::create( extension, filename )->write( object );
+            auto input = Factory::create( extension, filename );
+            auto object = input->read( std::forward< Args >( args )... );
+            update_default_name( object, filename );
             Logger::info(
-                type, " saved in ", filename, " in ", timer.duration() );
+                type, " loaded from ", filename, " in ", timer.duration() );
+            return object;
         }
     } // namespace detail
 } // namespace geode

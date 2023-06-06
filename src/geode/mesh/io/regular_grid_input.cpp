@@ -23,11 +23,7 @@
 
 #include <geode/mesh/io/regular_grid_input.h>
 
-#include <absl/strings/ascii.h>
-
-#include <geode/basic/filename.h>
-#include <geode/basic/identifier_builder.h>
-#include <geode/basic/timer.h>
+#include <geode/basic/private/geode_input_impl.h>
 
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/regular_grid_solid.h>
@@ -41,24 +37,12 @@ namespace geode
     {
         try
         {
-            Timer timer;
-            const auto extension =
-                absl::AsciiStrToLower( extension_from_filename( filename ) );
-            OPENGEODE_EXCEPTION(
-                RegularGridInputFactory< dimension >::has_creator( extension ),
-                "Unknown extension: ", extension );
-            auto input = RegularGridInputFactory< dimension >::create(
-                extension, filename );
-            auto grid = input->read( impl );
-            if( grid->name() == Identifier::DEFAULT_NAME )
-            {
-                IdentifierBuilder{ *grid }.set_name(
-                    filename_without_extension( filename ) );
-            }
-            Logger::info( "RegularGrid", dimension, "D loaded from ", filename,
-                " in ", timer.duration() );
-            Logger::info( "RegularGrid", dimension, "D has: ", grid->nb_cells(),
-                " cells" );
+            const auto type = absl::StrCat( "RegularGrid", dimension, "D" );
+            auto grid = detail::geode_object_input_impl<
+                RegularGridInputFactory< dimension >,
+                std::unique_ptr< RegularGrid< dimension > > >(
+                type, filename, impl );
+            Logger::info( type, " has: ", grid->nb_cells(), " cells" );
             return grid;
         }
         catch( const OpenGeodeException& e )

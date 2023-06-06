@@ -23,11 +23,7 @@
 
 #include <geode/mesh/io/polyhedral_solid_input.h>
 
-#include <absl/strings/ascii.h>
-
-#include <geode/basic/filename.h>
-#include <geode/basic/identifier_builder.h>
-#include <geode/basic/timer.h>
+#include <geode/basic/private/geode_input_impl.h>
 
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polyhedral_solid.h>
@@ -40,26 +36,13 @@ namespace geode
     {
         try
         {
-            Timer timer;
-            const auto extension =
-                absl::AsciiStrToLower( extension_from_filename( filename ) );
-            OPENGEODE_EXCEPTION(
-                PolyhedralSolidInputFactory< dimension >::has_creator(
-                    extension ),
-                "Unknown extension: ", extension );
-            auto input = PolyhedralSolidInputFactory< dimension >::create(
-                extension, filename );
-            auto polyhedral_solid = input->read( impl );
-            if( polyhedral_solid->name() == Identifier::DEFAULT_NAME )
-            {
-                IdentifierBuilder{ *polyhedral_solid }.set_name(
-                    filename_without_extension( filename ) );
-            }
-            Logger::info( "PolyhedralSolid", dimension, "D loaded from ",
-                filename, " in ", timer.duration() );
-            Logger::info( "PolyhedralSolid", dimension,
-                "D has: ", polyhedral_solid->nb_vertices(), " vertices, ",
-                polyhedral_solid->nb_polyhedra(), " polyhedra" );
+            const auto type = absl::StrCat( "PolyhedralSolid", dimension, "D" );
+            auto polyhedral_solid = detail::geode_object_input_impl<
+                PolyhedralSolidInputFactory< dimension >,
+                std::unique_ptr< PolyhedralSolid< dimension > > >(
+                type, filename, impl );
+            Logger::info( type, " has: ", polyhedral_solid->nb_vertices(),
+                " vertices, ", polyhedral_solid->nb_polyhedra(), " polyhedra" );
             return polyhedral_solid;
         }
         catch( const OpenGeodeException& e )
