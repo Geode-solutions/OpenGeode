@@ -39,6 +39,7 @@ add_geode_library(
         "helpers/simplicial_section_creator.cpp"
         "helpers/surface_radial_sort.cpp"
         "helpers/ray_tracing.cpp"
+        "helpers/detail/build_model_boundaries.cpp"
         "helpers/detail/cut_along_internal_lines.cpp"
         "helpers/detail/cut_along_internal_surfaces.cpp"
         "mixin/builder/blocks_builder.cpp"
@@ -133,7 +134,9 @@ add_geode_library(
         "representation/io/geode/geode_brep_output.h"
         "representation/io/geode/geode_section_output.h"
     ADVANCED_HEADERS
+        "helpers/detail/build_model_boundaries.h"
         "helpers/detail/cut_along_internal_lines.h"
+        "helpers/detail/cut_along_internal_surfaces.h"
         "mixin/core/detail/components_storage.h"
         "mixin/core/detail/count_relationships.h"
         "mixin/core/detail/mesh_storage.h"
