@@ -59,7 +59,16 @@ namespace geode
 
         void emplace( const ComponentType& type, MappingType mapping )
         {
-            mappings.emplace( type, std::move( mapping ) );
+            const auto result =
+                mappings.try_emplace( type, std::move( mapping ) );
+            OPENGEODE_EXCEPTION( result.second,
+                "[ModelMapping::emplace] A mapping with the given "
+                "ComponentType is already present, cannot emplace another." );
+        }
+
+        void remove( const ComponentType& type )
+        {
+            mappings.erase( type );
         }
 
     private:
