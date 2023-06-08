@@ -289,6 +289,9 @@ namespace
             {
                 builder.disassociate_polygon_vertex_to_vertex(
                     mesh.polygon_vertex( { p, v } ) );
+            }
+            for( const auto v : geode::LRange{ mesh.nb_polygon_vertices( p ) } )
+            {
                 builder.set_polygon_vertex( { p, v }, vertices[v] );
                 builder.associate_polygon_vertex_to_vertex(
                     { p, v }, vertices[v] );
