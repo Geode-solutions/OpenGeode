@@ -37,9 +37,10 @@ namespace geode
 {
     namespace detail
     {
-        void build_model_boundaries(
+        void opengeode_model_api build_model_boundaries(
             const Section& model, SectionBuilder& builder );
 
-        void build_model_boundaries( const BRep& model, BRepBuilder& builder );
+        void opengeode_model_api build_model_boundaries(
+            const BRep& model, BRepBuilder& builder );
     } // namespace detail
 } // namespace geode
