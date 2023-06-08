@@ -59,5 +59,5 @@ namespace geode
     private:
         const EdgedCurve< dimension >& mesh_;
     };
-
+    ALIAS_2D_AND_3D( DistanceToEdge );
 } // namespace geode
