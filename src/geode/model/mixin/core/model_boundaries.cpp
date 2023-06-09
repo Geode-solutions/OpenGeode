@@ -49,6 +49,14 @@ namespace geode
     }
 
     template < index_t dimension >
+    ModelBoundaries< dimension >& ModelBoundaries< dimension >::operator=(
+        ModelBoundaries&& other )
+    {
+        impl_ = std::move( other.impl_ );
+        return *this;
+    }
+
+    template < index_t dimension >
     ModelBoundaries< dimension >::~ModelBoundaries() // NOLINT
     {
     }

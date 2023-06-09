@@ -84,7 +84,7 @@ namespace geode
         static constexpr index_t dim{ 3 };
 
         BRepBuilder( BRep& brep );
-        BRepBuilder( BRepBuilder&& ) = default;
+        BRepBuilder( BRepBuilder&& other ) = default;
 
         ModelCopyMapping copy( const BRep& brep );
 

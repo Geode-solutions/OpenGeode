@@ -47,7 +47,7 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        Component( Component&& );
+        Component( Component&& other );
         virtual ~Component();
 
         virtual ComponentType component_type() const = 0;

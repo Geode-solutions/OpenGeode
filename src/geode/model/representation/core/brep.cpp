@@ -627,6 +627,18 @@ namespace geode
     {
     }
 
+    BRep& BRep::operator=( BRep&& brep )
+    {
+        Topology::operator=( std::move( brep ) );
+        Corners3D::operator=( std::move( brep ) );
+        Lines3D::operator=( std::move( brep ) );
+        Surfaces3D::operator=( std::move( brep ) );
+        Blocks3D::operator=( std::move( brep ) );
+        ModelBoundaries3D::operator=( std::move( brep ) );
+        Identifier::operator=( std::move( brep ) );
+        return *this;
+    }
+
     BRep::~BRep() {} // NOLINT
 
     BRep::ItemSurfaceRange BRep::model_boundary_items(

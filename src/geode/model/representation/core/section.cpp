@@ -426,6 +426,17 @@ namespace geode
     {
     }
 
+    Section& Section::operator=( Section&& section )
+    {
+        Topology::operator=( std::move( section ) );
+        Corners2D::operator=( std::move( section ) );
+        Lines2D::operator=( std::move( section ) );
+        Surfaces2D::operator=( std::move( section ) );
+        ModelBoundaries2D::operator=( std::move( section ) );
+        Identifier::operator=( std::move( section ) );
+        return *this;
+    }
+
     Section::~Section() {} // NOLINT
 
     Section::ItemLineRange Section::model_boundary_items(

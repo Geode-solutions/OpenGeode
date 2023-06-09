@@ -111,7 +111,7 @@ namespace geode
 
     protected:
         Blocks();
-        Blocks( Blocks&& );
+        Blocks( Blocks&& other );
 
         Blocks& operator=( Blocks&& other );
 

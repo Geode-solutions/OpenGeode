@@ -95,7 +95,7 @@ namespace geode
 
     protected:
         Lines();
-        Lines( Lines&& );
+        Lines( Lines&& other );
 
         Lines& operator=( Lines&& other );
 

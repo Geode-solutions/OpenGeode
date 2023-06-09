@@ -54,7 +54,7 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        Block( Block&& );
+        Block( Block&& other );
         ~Block();
 
         static ComponentType component_type_static()

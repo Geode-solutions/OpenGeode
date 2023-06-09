@@ -226,6 +226,7 @@ namespace geode
     public:
         Section();
         Section( Section&& section );
+        Section& operator=( Section&& section );
         ~Section();
 
         BoundaryCornerRange boundaries( const Line2D& line ) const;

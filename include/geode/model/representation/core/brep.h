@@ -305,6 +305,7 @@ namespace geode
     public:
         BRep();
         BRep( BRep&& brep );
+        BRep& operator=( BRep&& brep );
         ~BRep();
 
         BoundaryCornerRange boundaries( const Line3D& line ) const;
