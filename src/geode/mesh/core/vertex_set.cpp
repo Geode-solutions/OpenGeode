@@ -62,6 +62,12 @@ namespace geode
     {
     }
 
+    VertexSet& VertexSet::operator=( VertexSet&& other )
+    {
+        impl_ = std::move( other.impl_ );
+        return *this;
+    }
+
     VertexSet::~VertexSet() {} // NOLINT
 
     std::unique_ptr< VertexSet > VertexSet::create()

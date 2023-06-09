@@ -69,6 +69,8 @@ namespace geode
 
     protected:
         TriangulatedSurface() = default;
+        TriangulatedSurface( TriangulatedSurface&& other ) = default;
+        TriangulatedSurface& operator=( TriangulatedSurface&& other ) = default;
 
     private:
         friend class bitsery::Access;

@@ -77,6 +77,17 @@ namespace geode
     }
 
     template < index_t dimension >
+    EdgedCurve< dimension >& EdgedCurve< dimension >::operator=(
+        EdgedCurve&& other )
+    {
+        Graph::operator=( std::move( other ) );
+        CoordinateReferenceSystemManagers< dimension >::operator=(
+            std::move( other ) );
+        impl_ = std::move( other.impl_ );
+        return *this;
+    }
+
+    template < index_t dimension >
     EdgedCurve< dimension >::~EdgedCurve()
     {
     }

@@ -52,9 +52,8 @@ namespace geode
         static constexpr index_t dim{ 2 };
 
         OpenGeodeRegularGrid();
-
         OpenGeodeRegularGrid( OpenGeodeRegularGrid&& other );
-
+        OpenGeodeRegularGrid& operator=( OpenGeodeRegularGrid&& other );
         ~OpenGeodeRegularGrid();
 
         static MeshImpl impl_name_static()

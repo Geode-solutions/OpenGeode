@@ -60,6 +60,13 @@ namespace geode
     {
     }
 
+    OpenGeodeGraph& OpenGeodeGraph::operator=( OpenGeodeGraph&& other )
+    {
+        Graph::operator=( std::move( other ) );
+        impl_ = std::move( other.impl_ );
+        return *this;
+    }
+
     OpenGeodeGraph::~OpenGeodeGraph() {} // NOLINT
 
     index_t OpenGeodeGraph::get_edge_vertex(

@@ -143,6 +143,14 @@ namespace geode
     {
     }
 
+    OpenGeodeRegularGrid< 3 >& OpenGeodeRegularGrid< 3 >::operator=(
+        OpenGeodeRegularGrid&& other )
+    {
+        RegularGrid< 3 >::operator=( std::move( other ) );
+        impl_ = std::move( other.impl_ );
+        return *this;
+    }
+
     OpenGeodeRegularGrid< 3 >::~OpenGeodeRegularGrid() // NOLINT
     {
     }

@@ -480,6 +480,16 @@ namespace geode
     }
 
     template < index_t dimension >
+    OpenGeodeHybridSolid< dimension >&
+        OpenGeodeHybridSolid< dimension >::operator=(
+            OpenGeodeHybridSolid&& other )
+    {
+        HybridSolid< dimension >::operator=( std::move( other ) );
+        impl_ = std::move( other.impl_ );
+        return *this;
+    }
+
+    template < index_t dimension >
     OpenGeodeHybridSolid< dimension >::~OpenGeodeHybridSolid() // NOLINT
     {
     }

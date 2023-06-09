@@ -44,7 +44,7 @@ namespace geode
     public:
         TextureManager(
             AttributeManager& manager, TextureStorage< dimension >& textures );
-        TextureManager( TextureManager&& );
+        TextureManager( TextureManager&& other );
         ~TextureManager();
 
         index_t nb_textures() const;

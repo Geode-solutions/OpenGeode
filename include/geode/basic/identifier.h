@@ -43,7 +43,7 @@ namespace geode
     public:
         static constexpr auto DEFAULT_NAME = "default_name";
 
-        Identifier( Identifier&& );
+        Identifier( Identifier&& other );
         ~Identifier();
 
         const uuid& id() const;

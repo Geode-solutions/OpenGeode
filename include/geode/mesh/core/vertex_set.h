@@ -84,7 +84,8 @@ namespace geode
 
     protected:
         VertexSet();
-        VertexSet( VertexSet&& );
+        VertexSet( VertexSet&& other );
+        VertexSet& operator=( VertexSet&& other );
 
     private:
         template < typename Archive >

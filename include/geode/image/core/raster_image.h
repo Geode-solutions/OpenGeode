@@ -47,8 +47,8 @@ namespace geode
 
         RasterImage();
         RasterImage( std::array< index_t, dimension > cells_number );
-        RasterImage( RasterImage&& );
-        RasterImage& operator=( RasterImage&& );
+        RasterImage( RasterImage&& other );
+        RasterImage& operator=( RasterImage&& other );
         ~RasterImage();
 
         static std::string native_extension_static()

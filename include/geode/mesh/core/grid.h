@@ -138,8 +138,8 @@ namespace geode
 
     protected:
         Grid();
-
-        Grid( Grid&& );
+        Grid( Grid&& other );
+        Grid& operator=( Grid&& other );
 
     private:
         template < typename Archive >

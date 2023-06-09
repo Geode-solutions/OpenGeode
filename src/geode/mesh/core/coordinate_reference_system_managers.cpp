@@ -160,6 +160,15 @@ namespace geode
     }
 
     template < index_t dimension >
+    CoordinateReferenceSystemManagers< dimension >&
+        CoordinateReferenceSystemManagers< dimension >::operator=(
+            CoordinateReferenceSystemManagers&& other )
+    {
+        impl_ = std::move( other.impl_ );
+        return *this;
+    }
+
+    template < index_t dimension >
     CoordinateReferenceSystemManagers<
         dimension >::~CoordinateReferenceSystemManagers()
     {

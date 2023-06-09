@@ -55,7 +55,7 @@ namespace geode
          */
         AABBTree();
         AABBTree( absl::Span< const BoundingBox< dimension > > bboxes );
-        AABBTree( AABBTree&& );
+        AABBTree( AABBTree&& other );
         ~AABBTree();
 
         AABBTree& operator=( AABBTree&& other );

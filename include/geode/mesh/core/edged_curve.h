@@ -80,6 +80,7 @@ namespace geode
     protected:
         EdgedCurve();
         EdgedCurve( EdgedCurve&& other );
+        EdgedCurve& operator=( EdgedCurve&& other );
 
     private:
         template < typename Archive >

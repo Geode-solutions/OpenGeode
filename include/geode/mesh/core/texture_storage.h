@@ -47,7 +47,7 @@ namespace geode
 
     public:
         TextureStorage();
-        TextureStorage( TextureStorage&& );
+        TextureStorage( TextureStorage&& other );
         ~TextureStorage();
 
     public:

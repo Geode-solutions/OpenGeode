@@ -230,6 +230,16 @@ namespace geode
     }
 
     template < index_t dimension >
+    OpenGeodePolygonalSurface< dimension >&
+        OpenGeodePolygonalSurface< dimension >::operator=(
+            OpenGeodePolygonalSurface&& other )
+    {
+        PolygonalSurface< dimension >::operator=( std::move( other ) );
+        impl_ = std::move( other.impl_ );
+        return *this;
+    }
+
+    template < index_t dimension >
     OpenGeodePolygonalSurface<
         dimension >::~OpenGeodePolygonalSurface() // NOLINT
     {
