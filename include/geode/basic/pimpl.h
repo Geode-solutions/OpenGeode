@@ -40,9 +40,9 @@ namespace geode
     public:
         template < typename... Args >
         explicit PImpl( Args &&... );
-        PImpl( PImpl< T > && other );
+        PImpl( PImpl< T > &&other );
         ~PImpl();
-        PImpl< T > &operator=( PImpl< T > && other );
+        PImpl< T > &operator=( PImpl< T > &&other );
         void reset();
         T *operator->();
         const T *operator->() const;
