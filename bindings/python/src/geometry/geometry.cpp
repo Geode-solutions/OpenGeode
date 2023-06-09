@@ -44,6 +44,8 @@ namespace geode
     void define_rotation( pybind11::module& );
     void define_sign( pybind11::module& );
     void define_vector( pybind11::module& );
+    void define_frame( pybind11::module& );
+    void define_coordinate_system( pybind11::module& module );
 } // namespace geode
 
 PYBIND11_MODULE( opengeode_py_geometry, module )
@@ -69,4 +71,6 @@ PYBIND11_MODULE( opengeode_py_geometry, module )
     geode::define_rotation( module );
     geode::define_sign( module );
     geode::define_vector( module );
+    geode::define_frame( module );
+    geode::define_coordinate_system( module );
 }
