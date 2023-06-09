@@ -163,7 +163,8 @@ namespace geode
 
     protected:
         Graph();
-        Graph( Graph&& );
+        Graph( Graph&& other );
+        Graph& operator=( Graph&& other );
 
     private:
         friend class bitsery::Access;

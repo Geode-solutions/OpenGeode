@@ -82,7 +82,9 @@ namespace geode
     protected:
         CoordinateReferenceSystemManagers();
         CoordinateReferenceSystemManagers(
-            CoordinateReferenceSystemManagers&& );
+            CoordinateReferenceSystemManagers&& other );
+        CoordinateReferenceSystemManagers& operator=(
+            CoordinateReferenceSystemManagers&& other );
 
     private:
         template < typename Archive >

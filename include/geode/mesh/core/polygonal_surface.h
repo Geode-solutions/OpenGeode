@@ -69,6 +69,8 @@ namespace geode
 
     protected:
         PolygonalSurface() = default;
+        PolygonalSurface( PolygonalSurface&& other ) = default;
+        PolygonalSurface& operator=( PolygonalSurface&& other ) = default;
     };
     ALIAS_2D_AND_3D( PolygonalSurface );
 } // namespace geode

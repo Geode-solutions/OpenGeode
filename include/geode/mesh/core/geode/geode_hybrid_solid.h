@@ -51,6 +51,7 @@ namespace geode
 
         OpenGeodeHybridSolid();
         OpenGeodeHybridSolid( OpenGeodeHybridSolid&& other );
+        OpenGeodeHybridSolid& operator=( OpenGeodeHybridSolid&& other );
         ~OpenGeodeHybridSolid();
 
         static MeshImpl impl_name_static()

@@ -50,6 +50,8 @@ namespace geode
 
         OpenGeodePolygonalSurface();
         OpenGeodePolygonalSurface( OpenGeodePolygonalSurface&& other );
+        OpenGeodePolygonalSurface& operator=(
+            OpenGeodePolygonalSurface&& other );
         ~OpenGeodePolygonalSurface();
 
         static MeshImpl impl_name_static()

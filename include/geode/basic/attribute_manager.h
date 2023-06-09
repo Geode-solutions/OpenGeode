@@ -47,7 +47,7 @@ namespace geode
 
     public:
         AttributeManager();
-        AttributeManager( AttributeManager&& );
+        AttributeManager( AttributeManager&& other );
         ~AttributeManager();
 
         /*!

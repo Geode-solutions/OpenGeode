@@ -52,6 +52,8 @@ namespace geode
 
         OpenGeodeTetrahedralSolid();
         OpenGeodeTetrahedralSolid( OpenGeodeTetrahedralSolid&& other );
+        OpenGeodeTetrahedralSolid& operator=(
+            OpenGeodeTetrahedralSolid&& other );
         ~OpenGeodeTetrahedralSolid();
 
         static MeshImpl impl_name_static()

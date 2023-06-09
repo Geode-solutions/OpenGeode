@@ -80,6 +80,16 @@ namespace geode
     }
 
     template < index_t dimension >
+    OpenGeodeEdgedCurve< dimension >&
+        OpenGeodeEdgedCurve< dimension >::operator=(
+            OpenGeodeEdgedCurve&& other )
+    {
+        EdgedCurve< dimension >::operator=( std::move( other ) );
+        impl_ = std::move( other.impl_ );
+        return *this;
+    }
+
+    template < index_t dimension >
     OpenGeodeEdgedCurve< dimension >::~OpenGeodeEdgedCurve() // NOLINT
     {
     }

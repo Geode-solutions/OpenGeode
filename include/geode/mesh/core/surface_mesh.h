@@ -414,6 +414,7 @@ namespace geode
     protected:
         SurfaceMesh();
         SurfaceMesh( SurfaceMesh&& other );
+        SurfaceMesh& operator=( SurfaceMesh&& other );
 
     private:
         friend class bitsery::Access;

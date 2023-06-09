@@ -81,6 +81,8 @@ namespace geode
 
     protected:
         RegularGrid() = default;
+        RegularGrid( RegularGrid&& other ) = default;
+        RegularGrid& operator=( RegularGrid&& other ) = default;
 
     private:
         template < typename Archive >

@@ -149,6 +149,13 @@ namespace geode
     {
     }
 
+    Graph& Graph::operator=( Graph&& other )
+    {
+        VertexSet::operator=( std::move( other ) );
+        impl_ = std::move( other.impl_ );
+        return *this;
+    }
+
     Graph::~Graph() {} // NOLINT
 
     std::unique_ptr< Graph > Graph::create()

@@ -383,6 +383,13 @@ namespace geode
     }
 
     template < index_t dimension >
+    Grid< dimension >& Grid< dimension >::operator=( Grid&& other )
+    {
+        impl_ = std::move( other.impl_ );
+        return *this;
+    }
+
+    template < index_t dimension >
     Grid< dimension >::~Grid() // NOLINT
     {
     }

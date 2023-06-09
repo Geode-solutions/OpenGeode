@@ -579,6 +579,7 @@ namespace geode
     protected:
         SolidMesh();
         SolidMesh( SolidMesh&& other );
+        SolidMesh& operator=( SolidMesh&& other );
 
     private:
         friend class bitsery::Access;

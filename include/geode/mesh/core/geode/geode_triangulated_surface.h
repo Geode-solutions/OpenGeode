@@ -52,6 +52,8 @@ namespace geode
 
         OpenGeodeTriangulatedSurface();
         OpenGeodeTriangulatedSurface( OpenGeodeTriangulatedSurface&& other );
+        OpenGeodeTriangulatedSurface& operator=(
+            OpenGeodeTriangulatedSurface&& other );
         ~OpenGeodeTriangulatedSurface();
 
         static MeshImpl impl_name_static()

@@ -48,7 +48,7 @@ namespace geode
 
     public:
         CoordinateReferenceSystemManager();
-        CoordinateReferenceSystemManager( CoordinateReferenceSystemManager&& );
+        CoordinateReferenceSystemManager( CoordinateReferenceSystemManager&& other );
         ~CoordinateReferenceSystemManager();
 
         index_t nb_coordinate_reference_systems() const;
