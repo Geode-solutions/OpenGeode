@@ -53,7 +53,7 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        Line( Line&& );
+        Line( Line&& other );
         ~Line();
 
         static ComponentType component_type_static()

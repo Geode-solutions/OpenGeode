@@ -110,7 +110,7 @@ namespace geode
 
     protected:
         Corners();
-        Corners( Corners&& );
+        Corners( Corners&& other );
 
         Corners& operator=( Corners&& other );
 

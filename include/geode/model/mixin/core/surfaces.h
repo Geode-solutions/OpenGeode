@@ -95,7 +95,7 @@ namespace geode
 
     protected:
         Surfaces();
-        Surfaces( Surfaces&& );
+        Surfaces( Surfaces&& other );
 
         Surfaces& operator=( Surfaces&& other );
 

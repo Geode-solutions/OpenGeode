@@ -433,7 +433,8 @@ namespace geode
             absl::string_view directory, RelationshipsBuilderKey );
 
     protected:
-        Relationships( Relationships&& );
+        Relationships( Relationships&& other );
+        Relationships& operator=( Relationships&& other );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

@@ -460,6 +460,13 @@ namespace geode
         : impl_( std::move( other.impl_ ) )
     {
     }
+
+    VertexIdentifier& VertexIdentifier::operator=( VertexIdentifier&& other )
+    {
+        impl_ = std::move( other.impl_ );
+        return *this;
+    }
+
     VertexIdentifier::~VertexIdentifier() {} // NOLINT
 
     index_t VertexIdentifier::nb_unique_vertices() const

@@ -263,6 +263,12 @@ namespace geode
         : impl_( std::move( other.impl_ ) )
     {
     }
+    Relationships& Relationships::operator=( Relationships&& other )
+    {
+        impl_ = std::move( other.impl_ );
+        return *this;
+    }
+
     Relationships::~Relationships() {} // NOLINT
 
     void Relationships::remove_component(

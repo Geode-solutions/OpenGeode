@@ -182,7 +182,8 @@ namespace geode
         std::vector< index_t > delete_isolated_vertices( BuilderKey );
 
     protected:
-        VertexIdentifier( VertexIdentifier&& );
+        VertexIdentifier( VertexIdentifier&& other );
+        VertexIdentifier& operator=( VertexIdentifier&& other );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );
