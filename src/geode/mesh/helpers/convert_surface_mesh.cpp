@@ -31,6 +31,8 @@
 #include <geode/mesh/builder/polygonal_surface_builder.h>
 #include <geode/mesh/builder/triangulated_surface_builder.h>
 #include <geode/mesh/core/polygonal_surface.h>
+#include <geode/mesh/core/regular_grid_solid.h>
+#include <geode/mesh/core/regular_grid_surface.h>
 #include <geode/mesh/core/surface_edges.h>
 #include <geode/mesh/core/triangulated_surface.h>
 #include <geode/mesh/helpers/detail/surface_merger.h>
@@ -109,6 +111,63 @@ namespace
                 surface_out.edges().edge_attribute_manager() );
         }
     }
+
+    template < geode::index_t dimension >
+    std::unique_ptr< geode::TriangulatedSurface< dimension > >
+        create_triangulated_surface_from_grid(
+            const geode::RegularGrid< dimension >& /*unused*/ )
+    {
+        throw geode::OpenGeodeException{
+            "[create_triangulated_surface_from_grid] Cannot convert "
+            "SurfaceMesh from RegularGrid3D"
+        };
+    }
+
+    template <>
+    std::unique_ptr< geode::TriangulatedSurface< 2 > >
+        create_triangulated_surface_from_grid(
+            const geode::RegularGrid< 2 >& grid )
+    {
+        auto surface = geode::TriangulatedSurface< 2 >::create();
+        auto builder =
+            geode::TriangulatedSurfaceBuilder< 2 >::create( *surface );
+        geode::detail::copy_meta_info( grid, *builder );
+        geode::detail::copy_points( grid, *builder );
+        builder->reserve_triangles( 2 * grid.nb_polygons() );
+        geode::GenericMapping< geode::index_t > old2new_mapping;
+        for( const auto j : geode::LRange{ grid.nb_cells_in_direction( 1 ) } )
+        {
+            for( const auto i :
+                geode::LRange{ grid.nb_cells_in_direction( 0 ) } )
+            {
+                const auto cell_vertices = grid.cell_vertices( { i, j } );
+                const auto cell = grid.cell_index( { i, j } );
+                std::array< geode::index_t, 4 > cell_mesh_vertices;
+                for( const auto v : geode::LIndices{ cell_mesh_vertices } )
+                {
+                    const auto cell_vertex_id =
+                        grid.vertex_index( cell_vertices[v] );
+                    cell_mesh_vertices[v] = cell_vertex_id;
+                }
+                const auto triangle0 =
+                    builder->create_triangle( { cell_mesh_vertices[0],
+                        cell_mesh_vertices[1], cell_mesh_vertices[3] } );
+                const auto triangle1 =
+                    builder->create_triangle( { cell_mesh_vertices[0],
+                        cell_mesh_vertices[3], cell_mesh_vertices[2] } );
+                builder->set_polygon_adjacent( { triangle0, 2 }, triangle1 );
+                builder->set_polygon_adjacent( { triangle1, 0 }, triangle0 );
+                old2new_mapping.map( cell, triangle0 );
+                old2new_mapping.map( cell, triangle1 );
+            }
+        }
+        builder->compute_polygon_adjacencies();
+        geode::detail::copy_attributes( grid.vertex_attribute_manager(),
+            surface->vertex_attribute_manager() );
+        surface->polygon_attribute_manager().import(
+            grid.polygon_attribute_manager(), old2new_mapping );
+        return surface;
+    }
 } // namespace
 
 namespace geode
@@ -128,10 +187,23 @@ namespace geode
         convert_surface_mesh_into_triangulated_surface(
             const SurfaceMesh< dimension >& surface )
     {
+        if( surface.type_name()
+            == TriangulatedSurface< dimension >::type_name_static() )
+        {
+            return dynamic_cast< const TriangulatedSurface< dimension >& >(
+                surface )
+                .clone();
+        }
+        if( surface.type_name()
+            == RegularGrid< dimension >::type_name_static() )
+        {
+            return create_triangulated_surface_from_grid(
+                dynamic_cast< const RegularGrid< dimension >& >( surface ) );
+        }
         if( !all_polygons_are_simplex( surface ) )
         {
             Logger::info( "[convert_surface_mesh_into_triangulated_surface] "
-                          "Surface is not made of only triangles." );
+                          "SurfaceMesh is not made of only triangles." );
             return absl::nullopt;
         }
         auto tri_surface = TriangulatedSurface< dimension >::create();
