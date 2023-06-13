@@ -24,6 +24,8 @@
 #include <geode/model/helpers/convert_model_meshes.h>
 
 #include <geode/mesh/builder/surface_mesh_builder.h>
+#include <geode/mesh/core/hybrid_solid.h>
+#include <geode/mesh/core/polygonal_surface.h>
 #include <geode/mesh/core/solid_mesh.h>
 #include <geode/mesh/core/surface_mesh.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
@@ -70,29 +72,47 @@ namespace
     }
 
     template < typename Model >
-    void do_convert_surfaces(
+    void do_convert_surface( const Model& model,
+        typename Model::Builder& builder,
+        const geode::Surface< Model::dim >& surface,
+        const geode::MeshType& mesh_type )
+    {
+        const auto& mesh = surface.mesh();
+        if( mesh.type_name() == mesh_type )
+        {
+            return;
+        }
+        const auto unique_vertices =
+            save_unique_vertices( model, mesh, surface.component_id() );
+        if( mesh_type
+            == geode::TriangulatedSurface< Model::dim >::type_name_static() )
+        {
+            auto tri_surface =
+                geode::convert_surface_mesh_into_triangulated_surface( mesh );
+            OPENGEODE_EXCEPTION( tri_surface,
+                "[do_convert_surface] Cannot convert SurfaceMesh "
+                "to TriangulatedSurface" );
+            builder.update_surface_mesh(
+                surface, std::move( tri_surface ).value() );
+        }
+        else if( mesh_type
+                 == geode::PolygonalSurface< Model::dim >::type_name_static() )
+        {
+            builder.update_surface_mesh( surface,
+                std::move( geode::convert_surface_mesh_into_polygonal_surface(
+                    mesh ) ) );
+        }
+        set_unique_vertices( builder, unique_vertices, surface.component_id() );
+    }
+
+    template < typename Model >
+    void do_convert_surfaces_to_triangulated(
         const Model& model, typename Model::Builder& builder )
     {
         for( const auto& surface : model.surfaces() )
         {
-            const auto& mesh = surface.mesh();
-            if( mesh.type_name()
-                == geode::TriangulatedSurface<
-                    Model::dim >::type_name_static() )
-            {
-                continue;
-            }
-            const auto unique_vertices =
-                save_unique_vertices( model, mesh, surface.component_id() );
-            auto tri_surface =
-                geode::convert_surface_mesh_into_triangulated_surface( mesh );
-            OPENGEODE_EXCEPTION( tri_surface,
-                "[convert_surface_meshes_into_triangulated_surfaces] Cannot "
-                "convert SurfaceMesh to TriangulatedSurface" );
-            builder.update_surface_mesh(
-                surface, std::move( tri_surface ).value() );
-            set_unique_vertices(
-                builder, unique_vertices, surface.component_id() );
+            do_convert_surface( model, builder, surface,
+                geode::TriangulatedSurface< Model::dim >::type_name_static() );
         }
     }
 
@@ -108,28 +128,63 @@ namespace
         }
     }
 
-    void do_convert_blocks(
-        const geode::BRep& model, geode::BRepBuilder& builder )
+    void do_convert_block( const geode::BRep& model,
+        geode::BRepBuilder& builder,
+        const geode::Block3D& block,
+        const geode::MeshType& mesh_type )
     {
-        for( const auto& block : model.blocks() )
+        OPENGEODE_EXCEPTION(
+            mesh_type == geode::TetrahedralSolid3D::type_name_static()
+                || mesh_type == geode::HybridSolid3D::type_name_static(),
+            "[do_convert_block] You can only convert block mesh to "
+            "TetrahedralSolid3D or HybridSolid3D, not ",
+            mesh_type.get() );
+        const auto& mesh = block.mesh();
+        if( mesh.type_name() == mesh_type )
         {
-            const auto& mesh = block.mesh();
-            const auto unique_vertices =
-                save_unique_vertices( model, mesh, block.component_id() );
+            return;
+        }
+        const auto unique_vertices =
+            save_unique_vertices( model, mesh, block.component_id() );
+        if( mesh_type == geode::TetrahedralSolid3D::type_name_static() )
+        {
             auto tet_solid =
                 geode::convert_solid_mesh_into_tetrahedral_solid( mesh );
-            OPENGEODE_EXCEPTION( tet_solid,
-                "[convert_block_meshes_into_tetrahedral_solids] Cannot "
-                "convert SolidMesh to TetrahedralSolid" );
+            OPENGEODE_EXCEPTION( tet_solid, "[do_convert_block] Cannot convert "
+                                            "SolidMesh to TetrahedralSolid" );
             builder.update_block_mesh( block, std::move( tet_solid ).value() );
-            set_unique_vertices(
-                builder, unique_vertices, block.component_id() );
         }
+        else if( mesh_type == geode::HybridSolid3D::type_name_static() )
+        {
+            auto hybrid_solid =
+                geode::convert_solid_mesh_into_hybrid_solid( mesh );
+            OPENGEODE_EXCEPTION( hybrid_solid,
+                "[do_convert_block] Cannot convert SolidMesh to HybridSolid" );
+            builder.update_block_mesh(
+                block, std::move( hybrid_solid ).value() );
+        }
+        set_unique_vertices( builder, unique_vertices, block.component_id() );
     }
 } // namespace
 
 namespace geode
 {
+    void convert_surface_mesh( const Section& model,
+        SectionBuilder& builder,
+        const geode::Surface2D& surface,
+        const geode::MeshType& mesh_type )
+    {
+        do_convert_surface( model, builder, surface, mesh_type );
+    }
+
+    void convert_surface_mesh( const BRep& model,
+        BRepBuilder& builder,
+        const geode::Surface3D& surface,
+        const geode::MeshType& mesh_type )
+    {
+        do_convert_surface( model, builder, surface, mesh_type );
+    }
+
     void convert_surface_meshes_into_triangulated_surfaces( BRep& brep )
     {
         BRepBuilder builder{ brep };
@@ -139,7 +194,7 @@ namespace geode
     void convert_surface_meshes_into_triangulated_surfaces(
         const BRep& brep, BRepBuilder& builder )
     {
-        do_convert_surfaces( brep, builder );
+        do_convert_surfaces_to_triangulated( brep, builder );
     }
 
     void convert_surface_meshes_into_triangulated_surfaces( Section& section )
@@ -151,7 +206,15 @@ namespace geode
     void convert_surface_meshes_into_triangulated_surfaces(
         const Section& section, SectionBuilder& builder )
     {
-        do_convert_surfaces( section, builder );
+        do_convert_surfaces_to_triangulated( section, builder );
+    }
+
+    void convert_block_mesh( const BRep& model,
+        BRepBuilder& builder,
+        const Block3D& block,
+        const MeshType& new_mesh_type )
+    {
+        do_convert_block( model, builder, block, new_mesh_type );
     }
 
     void convert_block_meshes_into_tetrahedral_solids( BRep& brep )
@@ -163,7 +226,11 @@ namespace geode
     void convert_block_meshes_into_tetrahedral_solids(
         const BRep& brep, BRepBuilder& builder )
     {
-        do_convert_blocks( brep, builder );
+        for( const auto& block : brep.blocks() )
+        {
+            do_convert_block(
+                brep, builder, block, TetrahedralSolid3D::type_name_static() );
+        }
     }
 
     void triangulate_surface_meshes( BRep& brep )
