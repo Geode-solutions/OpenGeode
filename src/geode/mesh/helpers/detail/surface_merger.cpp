@@ -45,22 +45,18 @@ namespace
             polygons_around_edges;
         for( const auto polygon_id : geode::Range{ mesh.nb_polygons() } )
         {
+            const auto& vertices = mesh.polygon_vertices( polygon_id );
             for( const auto polygon_edge_id :
                 geode::LRange{ mesh.nb_polygon_edges( polygon_id ) } )
             {
+                const auto next_vertex = polygon_edge_id == vertices.size() - 1
+                                             ? vertices[0]
+                                             : vertices[polygon_edge_id + 1];
                 const Edge polygon_edge_vertex_cycle{
-                    mesh.polygon_edge_vertices(
-                        { polygon_id, polygon_edge_id } )
+                    { vertices[polygon_edge_id], next_vertex }
                 };
-                geode::PolygonEdge polygon_edge{ polygon_id, polygon_edge_id };
-                if( !polygons_around_edges
-                         .try_emplace( polygon_edge_vertex_cycle,
-                             std::vector< geode::PolygonEdge >{ polygon_edge } )
-                         .second )
-                {
-                    polygons_around_edges[polygon_edge_vertex_cycle]
-                        .emplace_back( std::move( polygon_edge ) );
-                }
+                polygons_around_edges[polygon_edge_vertex_cycle].emplace_back(
+                    polygon_id, polygon_edge_id );
             }
         }
         return polygons_around_edges;
@@ -276,7 +272,7 @@ namespace geode
                 for( const auto& edge :
                     ::edge_to_polygons_around( this->mesh() ) )
                 {
-                    if( edge.second.size() == 2 )
+                    if( edge.second.size() < 3 )
                     {
                         continue;
                     }
