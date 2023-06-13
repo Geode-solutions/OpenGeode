@@ -340,6 +340,11 @@ namespace geode
         return merger.merge();
     }
 
+    template std::unique_ptr< PolygonalSurface2D > opengeode_mesh_api
+        convert_surface_mesh_into_polygonal_surface( const SurfaceMesh2D& );
+    template std::unique_ptr< PolygonalSurface3D > opengeode_mesh_api
+        convert_surface_mesh_into_polygonal_surface( const SurfaceMesh3D& );
+
     template absl::optional< std::unique_ptr< TriangulatedSurface2D > >
         opengeode_mesh_api convert_surface_mesh_into_triangulated_surface(
             const SurfaceMesh2D& );

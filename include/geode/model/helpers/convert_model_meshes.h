@@ -23,7 +23,11 @@
 
 #pragma once
 
+#include <geode/mesh/core/mesh_id.h>
+
 #include <geode/model/common.h>
+#include <geode/model/mixin/core/block.h>
+#include <geode/model/mixin/core/surface.h>
 
 namespace geode
 {
@@ -35,6 +39,16 @@ namespace geode
 
 namespace geode
 {
+    void opengeode_model_api convert_surface_mesh( const Section& model,
+        SectionBuilder& builder,
+        const geode::Surface2D& surface,
+        const geode::MeshType& mesh_type );
+
+    void opengeode_model_api convert_surface_mesh( const BRep& model,
+        BRepBuilder& builder,
+        const geode::Surface3D& surface,
+        const geode::MeshType& mesh_type );
+
     void opengeode_model_api convert_surface_meshes_into_triangulated_surfaces(
         BRep& brep );
     void opengeode_model_api convert_surface_meshes_into_triangulated_surfaces(
@@ -44,6 +58,11 @@ namespace geode
         Section& section );
     void opengeode_model_api convert_surface_meshes_into_triangulated_surfaces(
         const Section& section, SectionBuilder& builder );
+
+    void opengeode_model_api convert_block_mesh( const BRep& model,
+        BRepBuilder& builder,
+        const Block3D& block,
+        const MeshType& new_mesh_type );
 
     void opengeode_model_api convert_block_meshes_into_tetrahedral_solids(
         BRep& brep );
