@@ -33,6 +33,36 @@
 #include <geode/mesh/helpers/private/vertex_merger.h>
 #include <geode/mesh/helpers/repair_polygon_orientations.h>
 
+namespace
+{
+    using Edge = geode::detail::VertexCycle< std::array< geode::index_t, 2 > >;
+
+    template < geode::index_t dimension >
+    absl::flat_hash_map< Edge, std::vector< geode::PolygonEdge > >
+        edge_to_polygons_around( const geode::SurfaceMesh< dimension >& mesh )
+    {
+        absl::flat_hash_map< Edge, std::vector< geode::PolygonEdge > >
+            polygons_around_edges;
+        for( const auto polygon_id : geode::Range{ mesh.nb_polygons() } )
+        {
+            const auto& vertices = mesh.polygon_vertices( polygon_id );
+            for( const auto polygon_edge_id :
+                geode::LRange{ mesh.nb_polygon_edges( polygon_id ) } )
+            {
+                const auto next_vertex = polygon_edge_id == vertices.size() - 1
+                                             ? vertices[0]
+                                             : vertices[polygon_edge_id + 1];
+                const Edge polygon_edge_vertex_cycle{
+                    { vertices[polygon_edge_id], next_vertex }
+                };
+                polygons_around_edges[polygon_edge_vertex_cycle].emplace_back(
+                    polygon_id, polygon_edge_id );
+            }
+        }
+        return polygons_around_edges;
+    }
+} // namespace
+
 namespace geode
 {
     namespace detail
@@ -237,6 +267,18 @@ namespace geode
                                     { p, e } );
                             }
                         }
+                    }
+                }
+                for( const auto& edge :
+                    ::edge_to_polygons_around( this->mesh() ) )
+                {
+                    if( edge.second.size() < 3 )
+                    {
+                        continue;
+                    }
+                    for( const auto& polygon_edge : edge.second )
+                    {
+                        this->builder().unset_polygon_adjacent( polygon_edge );
                     }
                 }
             }
