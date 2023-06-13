@@ -82,12 +82,10 @@ namespace geode
                 OPENGEODE_ASSERT( mesh < meshes_.size(),
                     "[Merger::vertex_in_merged] Wrong mesh index" );
                 OPENGEODE_ASSERT( vertex < meshes_[mesh].get().nb_vertices(),
-                    "[Merger::vertex_in_merged] Wrong mesh vertex "
-                    "index" );
+                    "[Merger::vertex_in_merged] Wrong mesh vertex index" );
                 OPENGEODE_ASSERT(
                     offset_vertices_[mesh] + vertex < vertices_.size(),
-                    "[Merger::vertex_in_merged] Wrong global vertex "
-                    "index" );
+                    "[Merger::vertex_in_merged] Wrong global vertex index" );
                 return vertices_[offset_vertices_[mesh] + vertex];
             }
 

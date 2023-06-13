@@ -33,6 +33,40 @@
 #include <geode/mesh/helpers/private/vertex_merger.h>
 #include <geode/mesh/helpers/repair_polygon_orientations.h>
 
+namespace
+{
+    using Edge = geode::detail::VertexCycle< std::array< geode::index_t, 2 > >;
+
+    template < geode::index_t dimension >
+    absl::flat_hash_map< Edge, std::vector< geode::PolygonEdge > >
+        edge_to_polygons_around( const geode::SurfaceMesh< dimension >& mesh )
+    {
+        absl::flat_hash_map< Edge, std::vector< geode::PolygonEdge > >
+            polygons_around_edges;
+        for( const auto polygon_id : geode::Range{ mesh.nb_polygons() } )
+        {
+            for( const auto polygon_edge_id :
+                geode::LRange{ mesh.nb_polygon_edges( polygon_id ) } )
+            {
+                const Edge polygon_edge_vertex_cycle{
+                    mesh.polygon_edge_vertices(
+                        { polygon_id, polygon_edge_id } )
+                };
+                geode::PolygonEdge polygon_edge{ polygon_id, polygon_edge_id };
+                if( !polygons_around_edges
+                         .try_emplace( polygon_edge_vertex_cycle,
+                             std::vector< geode::PolygonEdge >{ polygon_edge } )
+                         .second )
+                {
+                    polygons_around_edges[polygon_edge_vertex_cycle]
+                        .emplace_back( std::move( polygon_edge ) );
+                }
+            }
+        }
+        return polygons_around_edges;
+    }
+} // namespace
+
 namespace geode
 {
     namespace detail
@@ -237,6 +271,18 @@ namespace geode
                                     { p, e } );
                             }
                         }
+                    }
+                }
+                for( const auto& edge :
+                    ::edge_to_polygons_around( this->mesh() ) )
+                {
+                    if( edge.second.size() == 2 )
+                    {
+                        continue;
+                    }
+                    for( const auto& polygon_edge : edge.second )
+                    {
+                        this->builder().unset_polygon_adjacent( polygon_edge );
                     }
                 }
             }
