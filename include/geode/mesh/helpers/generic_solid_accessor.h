@@ -76,6 +76,11 @@ namespace geode
             return mesh_.polyhedron_vertices( polyhedron_id );
         }
 
+        Point< dimension > element_barycenter( index_t polyhedron_id ) const
+        {
+            return mesh_.polyhedron_barycenter( polyhedron_id );
+        }
+
         ElementFacetVertices element_facet_vertices(
             const ElementFacet& polyhedron_facet ) const
         {
