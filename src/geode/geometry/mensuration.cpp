@@ -87,10 +87,20 @@ namespace geode
             const auto v2 = signed_volume_vertices_order[v][1];
             const auto v3 = signed_volume_vertices_order[v][2];
             const Vector3D edge02{ vertices[v], vertices[v2] };
+            const auto edge02_length = edge02.length();
+            if( edge02_length == 0 )
+            {
+                return 0;
+            }
             const Vector3D edge03{ vertices[v], vertices[v3] };
+            const auto edge03_length = edge03.length();
+            if( edge03_length == 0 )
+            {
+                return 0;
+            }
             const auto cross02_03 = edge02.cross( edge03 );
             if( cross02_03.length()
-                > global_angular_epsilon * edge02.length() * edge03.length() )
+                > global_angular_epsilon * edge02_length * edge03_length )
             {
                 return Vector3D{ vertices[v], vertices[v1] }.dot( cross02_03 )
                        / 6.;
