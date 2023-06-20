@@ -75,6 +75,11 @@ namespace geode
             return mesh_.edge_vertices( edge_id );
         }
 
+        Point< dimension > element_barycenter( index_t edge_id ) const
+        {
+            return mesh_.edge_barycenter( edge_id );
+        }
+
         AttributeManager& element_attribute_manager() const
         {
             return mesh_.edge_attribute_manager();
