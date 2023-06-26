@@ -79,6 +79,8 @@ namespace geode
         void set_surface_mesh(
             const uuid& id, std::unique_ptr< SurfaceMesh< dimension > > mesh );
 
+        SurfaceMesh< dimension >& modifiable_surface_mesh( const uuid& id );
+
     private:
         Surfaces< dimension >& surfaces_;
     };

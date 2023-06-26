@@ -76,6 +76,8 @@ namespace geode
         void set_block_mesh(
             const uuid& id, std::unique_ptr< SolidMesh< dimension > > mesh );
 
+        SolidMesh< dimension >& modifiable_block_mesh( const uuid& id );
+
     private:
         Blocks< dimension >& blocks_;
     };

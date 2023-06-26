@@ -80,6 +80,14 @@ namespace geode
             std::move( mesh ), typename Line< dimension >::LinesBuilderKey{} );
     }
 
+    template < index_t dimension >
+    EdgedCurve< dimension >& LinesBuilder< dimension >::modifiable_line_mesh(
+        const uuid& id )
+    {
+        return lines_.modifiable_line( id ).modifiable_mesh(
+            typename Line< dimension >::LinesBuilderKey{} );
+    }
+
     template class opengeode_model_api LinesBuilder< 2 >;
     template class opengeode_model_api LinesBuilder< 3 >;
 } // namespace geode

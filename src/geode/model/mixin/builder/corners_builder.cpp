@@ -83,6 +83,14 @@ namespace geode
             typename Corner< dimension >::CornersBuilderKey{} );
     }
 
+    template < index_t dimension >
+    PointSet< dimension >& CornersBuilder< dimension >::modifiable_corner_mesh(
+        const uuid& id )
+    {
+        return corners_.modifiable_corner( id ).modifiable_mesh(
+            typename Corner< dimension >::CornersBuilderKey{} );
+    }
+
     template class opengeode_model_api CornersBuilder< 2 >;
     template class opengeode_model_api CornersBuilder< 3 >;
 } // namespace geode
