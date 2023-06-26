@@ -68,6 +68,8 @@ namespace geode
         void set_line_mesh(
             const uuid& id, std::unique_ptr< EdgedCurve< dimension > > mesh );
 
+        EdgedCurve< dimension >& modifiable_line_mesh( const uuid& id );
+
     private:
         Lines< dimension >& lines_;
     };
