@@ -29,7 +29,7 @@
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/private/array_impl.h>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/vector.h>
 
 #include <geode/mesh/core/private/points_impl.h>
 #include <geode/mesh/core/regular_grid_solid.h>
@@ -92,6 +92,12 @@ namespace geode
                 PointsImpl< dimension >& impl,
                 const Point< dimension >& origin );
 
+            void do_update_origin_and_directions( Grid< dimension >& grid,
+                PointsImpl< dimension >& impl,
+                const Point< dimension >& origin,
+                const std::array< Vector< dimension >, dimension >&
+                    directions );
+
         private:
             template < typename Archive >
             void serialize( Archive& archive )
@@ -135,6 +141,37 @@ namespace geode
         }
 
         template <>
+        inline void GridImpl< 2 >::do_update_origin_and_directions(
+            Grid< 2 >& grid,
+            PointsImpl< 2 >& impl,
+            const Point< 2 >& origin,
+            const std::array< Vector2D, 2 >& directions )
+        {
+            const auto nu = grid.nb_vertices_in_direction( 0 );
+            const auto nv = grid.nb_vertices_in_direction( 1 );
+            const auto& vector_u = directions[0];
+            const auto& vector_v = directions[1];
+            index_t task_id{ 0 };
+            absl::FixedArray< async::task< void > > tasks( nv );
+            for( const auto v : Range{ nv } )
+            {
+                tasks[task_id++] = async::spawn(
+                    [&impl, &origin, v, &vector_u, &vector_v, nu, nv] {
+                        for( const auto u : Range{ nu } )
+                        {
+                            const auto vertex = u + v * nu;
+                            impl.set_point(
+                                vertex, origin + vector_u * u + vector_v * v );
+                        }
+                    } );
+            }
+            for( auto& task : async::when_all( tasks ).get() )
+            {
+                task.get();
+            }
+        }
+
+        template <>
         inline void GridImpl< 3 >::do_update_origin(
             Grid< 3 >& grid, PointsImpl< 3 >& impl, const Point< 3 >& origin )
         {
@@ -158,6 +195,44 @@ namespace geode
                                 const Point3D translation{ { u * du, v * dv,
                                     w * dw } };
                                 impl.set_point( vertex, origin + translation );
+                            }
+                        } );
+                }
+            }
+            for( auto& task : async::when_all( tasks ).get() )
+            {
+                task.get();
+            }
+        }
+
+        template <>
+        inline void GridImpl< 3 >::do_update_origin_and_directions(
+            Grid< 3 >& grid,
+            PointsImpl< 3 >& impl,
+            const Point< 3 >& origin,
+            const std::array< Vector3D, 3 >& directions )
+        {
+            const auto nu = grid.nb_vertices_in_direction( 0 );
+            const auto nv = grid.nb_vertices_in_direction( 1 );
+            const auto nw = grid.nb_vertices_in_direction( 2 );
+            const auto& vector_u = directions[0];
+            const auto& vector_v = directions[1];
+            const auto& vector_w = directions[2];
+            index_t task_id{ 0 };
+            absl::FixedArray< async::task< void > > tasks( nw * nv );
+            for( const auto w : Range{ nw } )
+            {
+                for( const auto v : Range{ nv } )
+                {
+                    tasks[task_id++] =
+                        async::spawn( [&impl, &origin, v, w, &vector_u,
+                                          &vector_v, &vector_w, nu, nv, nw] {
+                            for( const auto u : Range{ nu } )
+                            {
+                                const auto vertex = u + v * nu + w * nu * nv;
+                                impl.set_point( vertex, origin + vector_u * u
+                                                            + vector_v * v
+                                                            + vector_w * w );
                             }
                         } );
                 }

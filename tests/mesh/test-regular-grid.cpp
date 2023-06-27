@@ -27,7 +27,7 @@
 #include <geode/basic/logger.h>
 
 #include <geode/geometry/bounding_box.h>
-#include <geode/geometry/point.h>
+#include <geode/geometry/vector.h>
 
 #include <geode/mesh/builder/regular_grid_solid_builder.h>
 #include <geode/mesh/builder/regular_grid_surface_builder.h>
@@ -192,47 +192,57 @@ void test_vertex_on_border( const geode::RegularGrid3D& grid )
 
 void test_cell_geometry( const geode::RegularGrid3D& grid )
 {
-    OPENGEODE_EXCEPTION( grid.point( grid.vertex_index( { 0, 0, 0 } ) )
-                             == geode::Point3D( { 1.5, 0, 1 } ),
-        "[Test] Wrong point coordinates" );
-    OPENGEODE_EXCEPTION( grid.point( grid.vertex_index( { 0, 0, 1 } ) )
-                             == geode::Point3D( { 1.5, 0, 4 } ),
-        "[Test] Wrong point coordinates" );
-    OPENGEODE_EXCEPTION( grid.point( grid.vertex_index( { 1, 1, 1 } ) )
-                             == geode::Point3D( { 2.5, 2, 4 } ),
-        "[Test] Wrong point coordinates" );
-    OPENGEODE_EXCEPTION( grid.point( grid.vertex_index( { 2, 1, 4 } ) )
-                             == geode::Point3D( { 3.5, 2, 13 } ),
-        "[Test] Wrong point coordinates" );
-    OPENGEODE_EXCEPTION(
-        grid.polyhedron_barycenter( grid.cell_index( { 2, 1, 4 } ) )
-            == geode::Point3D( { 4, 3, 14.5 } ),
-        "[Test] Wrong point coordinates" );
+    const auto pt0 = grid.point( grid.vertex_index( { 0, 0, 0 } ) );
+    OPENGEODE_EXCEPTION( pt0 == geode::Point3D( { 1.5, 0, 1 } ),
+        "[Test] Wrong point coordinates: ", pt0.string(),
+        " instead of [1.5, 0, 1]." );
+    const auto pt1 = grid.point( grid.vertex_index( { 0, 0, 1 } ) );
+    OPENGEODE_EXCEPTION( pt1 == geode::Point3D( { 1.5, -3, 1 } ),
+        "[Test] Wrong point coordinates: ", pt1.string(),
+        " instead of [1.5, -3, 1]." );
+    const auto pt2 = grid.point( grid.vertex_index( { 1, 1, 1 } ) );
+    OPENGEODE_EXCEPTION( pt2 == geode::Point3D( { -0.5, -3, 2 } ),
+        "[Test] Wrong point coordinates: ", pt2.string(),
+        " instead of [-0.5, -3, 2]." );
+    const auto pt3 = grid.point( grid.vertex_index( { 2, 1, 4 } ) );
+    OPENGEODE_EXCEPTION( pt3 == geode::Point3D( { -0.5, -12, 3 } ),
+        "[Test] Wrong point coordinates: ", pt3.string(),
+        " instead of [-0.5, -12, 3]." );
+    const auto pt4 =
+        grid.polyhedron_barycenter( grid.cell_index( { 2, 1, 4 } ) );
+    OPENGEODE_EXCEPTION( pt4 == geode::Point3D( { -1.5, -13.5, 3.5 } ),
+        "[Test] Wrong point coordinates: ", pt4.string(),
+        " instead of [-1.5, -13.5, 3.5]." );
 }
 
 void test_cell_query( const geode::RegularGrid3D& grid )
 {
     OPENGEODE_EXCEPTION( !grid.contains( geode::Point3D( { 0, 0, 0 } ) ),
-        "[Test] Wrong result on contain: point is shown inside of grid where "
+        "[Test] Wrong result on contain: point [0,0,0] is shown inside of grid "
+        "where "
         "it is not." );
     OPENGEODE_EXCEPTION( !grid.contains( geode::Point3D( { 1.5, 0, 0 } ) ),
-        "[Test] Wrong result on contain: point is shown inside of grid where "
+        "[Test] Wrong result on contain: point [1.5,0,0] is shown inside of "
+        "grid where "
         "it is not." );
     OPENGEODE_EXCEPTION( grid.cells( geode::Point3D( { 0, 0, 0 } ) ).empty(),
         "[Test] Wrong query result: point is shown inside of grid where it is "
         "not." );
-    auto result = grid.cells( geode::Point3D( { 2, 2, 2 } ) );
+    auto result = grid.cells( geode::Point3D( { -0.5, -1.5, 1.5 } ) );
+    DEBUG( result.size() );
     OPENGEODE_EXCEPTION(
         result.size() == 2
             && result.front() == geode::Grid3D::CellIndices( { 0, 0, 0 } )
             && result.back() == geode::Grid3D::CellIndices( { 0, 1, 0 } ),
         "[Test] Wrong query result" );
-    result = grid.cells( geode::Point3D( { 5, 7, 9 } ) );
+    result = grid.cells( geode::Point3D( { -5.5, -8, 4.5 } ) );
+    DEBUG( result.size() );
     OPENGEODE_EXCEPTION(
         result.size() == 1
             && result.front() == geode::Grid3D::CellIndices( { 3, 3, 2 } ),
         "[Test] Wrong query result" );
-    result = grid.cells( geode::Point3D( { 4.5, 6, 7 - 1e-10 } ) );
+    result = grid.cells( geode::Point3D( { -4.5, -6 - 1e-10, 4 } ) );
+    DEBUG( result.size() );
     OPENGEODE_EXCEPTION(
         result.size() == 8
             && result[0] == geode::Grid3D::CellIndices( { 2, 2, 1 } )
@@ -244,8 +254,8 @@ void test_cell_query( const geode::RegularGrid3D& grid )
             && result[6] == geode::Grid3D::CellIndices( { 2, 3, 2 } )
             && result[7] == geode::Grid3D::CellIndices( { 3, 3, 2 } ),
         "[Test] Wrong query result" );
-    geode::Point3D near_origin_point{ { 1.5 - geode::global_epsilon / 2,
-        -geode::global_epsilon / 2, 1 - geode::global_epsilon / 2 } };
+    geode::Point3D near_origin_point{ { 1.5 + geode::global_epsilon / 2,
+        geode::global_epsilon / 2, 1 - geode::global_epsilon / 2 } };
     OPENGEODE_EXCEPTION( grid.contains( near_origin_point ),
         "[Test] Wrong result on contain: point is shown outside of grid when "
         "it should be inside." );
@@ -254,8 +264,8 @@ void test_cell_query( const geode::RegularGrid3D& grid )
         result.size() == 1
             && result.front() == geode::Grid3D::CellIndices( { 0, 0, 0 } ),
         "[Test] Wrong query result for point near origin." );
-    geode::Point3D grid_furthest_point{ { 6.5 + geode::global_epsilon / 2,
-        20 + geode::global_epsilon / 2, 46 + geode::global_epsilon / 2 } };
+    geode::Point3D grid_furthest_point{ { -18.5 - geode::global_epsilon / 2,
+        -45 - geode::global_epsilon / 2, 6 + geode::global_epsilon / 2 } };
     OPENGEODE_EXCEPTION( grid.contains( grid_furthest_point ),
         "[Test] Wrong result on contain: point is shown outside of grid when "
         "it should be inside." );
@@ -266,22 +276,26 @@ void test_cell_query( const geode::RegularGrid3D& grid )
         "[Test] Wrong query result for point near origin furthest corner." );
 }
 
-void test_boundary_box( const geode::RegularGrid3D& grid )
+void test_bounding_box( const geode::RegularGrid3D& grid )
 {
     const auto bbox = grid.bounding_box();
-    geode::Point3D min{ { 1.5, 0, 1 } };
-    geode::Point3D max{ { 6.5, 20, 46 } };
-    OPENGEODE_EXCEPTION( bbox.min() == min, "[Test] Wrong bounding box min" );
-    OPENGEODE_EXCEPTION( bbox.max() == max, "[Test] Wrong bounding box max" );
+    geode::Point3D min{ { -18.5, -45, 1 } };
+    geode::Point3D max{ { 1.5, 0, 6 } };
+    OPENGEODE_EXCEPTION( bbox.min() == min,
+        "[Test] Wrong bounding box min: ", bbox.min().string(), " instead of ",
+        min.string() );
+    OPENGEODE_EXCEPTION( bbox.max() == max,
+        "[Test] Wrong bounding box max: ", bbox.max().string(), " instead of ",
+        max.string() );
 }
 
 void test_closest_vertex( const geode::RegularGrid3D& grid )
 {
     const geode::Point3D p0{ { 1.5, 0, 1 } }; // (0,0,0)
-    const geode::Point3D p1{ { 6.5, 20, 46 } }; // (5,10,15)
-    const geode::Point3D p2{ { 0, -1, -1 } }; // (0,0,0)
-    const geode::Point3D p3{ { 10, 30, 50 } }; // (5,10,15)
-    const geode::Point3D p4{ { 3.55, 3.9, 7.5 } }; // (2,2,2)
+    const geode::Point3D p1{ { -18.5, -45, 6 } }; // (5,10,15)
+    const geode::Point3D p2{ { 2, 1, 0 } }; // (0,0,0)
+    const geode::Point3D p3{ { -20, -50, 10 } }; // (5,10,15)
+    const geode::Point3D p4{ { -2.55, -5.9, 3 } }; // (2,2,2)
 
     auto result = grid.closest_vertex( p0 );
     geode::Grid3D::VertexIndices answer{ 0, 0, 0 };
@@ -451,7 +465,7 @@ void test_grid( const geode::RegularGrid3D& grid )
     test_around_vertex( grid );
     test_cell_geometry( grid );
     test_cell_query( grid );
-    test_boundary_box( grid );
+    test_bounding_box( grid );
     test_closest_vertex( grid );
     test_clone( grid );
     test_io( grid, absl::StrCat( "test.", grid.native_extension() ) );
@@ -463,11 +477,17 @@ void test()
 
     auto grid = geode::RegularGrid3D::create();
     auto builder = geode::RegularGridBuilder3D::create( *grid );
-    builder->initialize_grid( { { 1.5, 0, 1 } }, { 5, 10, 15 }, { 1, 2, 3 } );
+    builder->initialize_grid( { { 1.5, 0, 1 } }, { 5, 10, 15 },
+        { geode::Vector3D{ { 0, 0, 1 } }, geode::Vector3D{ { -2, 0, 0 } },
+            geode::Vector3D{ { 0, -3, 0 } } } );
     test_grid( *grid );
 
-    const auto grid_v12 = geode::load_regular_grid< 3 >(
+    auto grid_v12 = geode::load_regular_grid< 3 >(
         absl::StrCat( geode::data_path, "test_v12.og_rgd3d" ) );
+    auto builder_v12 = geode::RegularGridBuilder3D::create( *grid_v12 );
+    builder_v12->update_origin_and_directions( { { 1.5, 0, 1 } },
+        { geode::Vector3D{ { 0, 0, 1 } }, geode::Vector3D{ { -2, 0, 0 } },
+            geode::Vector3D{ { 0, -3, 0 } } } );
     test_grid( *grid_v12 );
 
     test_adjacencies2D();

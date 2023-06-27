@@ -50,8 +50,6 @@ namespace geode
         LightRegularGrid( LightRegularGrid&& other );
         ~LightRegularGrid();
 
-        const Point< dimension >& origin() const override;
-
         index_t vertex_index( const VertexIndices& index ) const override;
 
         VertexIndices vertex_indices( index_t index ) const override;

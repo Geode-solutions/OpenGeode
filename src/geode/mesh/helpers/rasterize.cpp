@@ -34,6 +34,7 @@
 #include <geode/geometry/basic_objects/plane.h>
 #include <geode/geometry/basic_objects/segment.h>
 #include <geode/geometry/basic_objects/triangle.h>
+#include <geode/geometry/coordinate_system.h>
 #include <geode/geometry/distance.h>
 #include <geode/geometry/mensuration.h>
 #include <geode/geometry/perpendicular.h>
@@ -234,8 +235,7 @@ namespace
     }
 
     std::array< std::pair< geode::Vector2D, double >, 3 > get_edge_projection(
-        const geode::Grid3D& grid,
-        const geode::Triangle3D& triangle,
+        const geode::OwnerTriangle3D& triangle,
         const std::array< geode::Segment3D, 3 >& edges,
         const std::array< geode::index_t, 2 >& plane_axes,
         int normal_orientation )
@@ -248,30 +248,26 @@ namespace
                 { -1 * edges[e].direction().value( plane_axes[1] ),
                     edges[e].direction().value( plane_axes[0] ) }
             } * normal_orientation;
-            const auto& vertex = vertices[e].get();
-            result[e].second =
-                -result[e].first.dot(
-                    geode::Vector2D{ { vertex.value( plane_axes[0] ),
-                        vertex.value( plane_axes[1] ) } } )
-                + std::max( 0., grid.cell_length_in_direction( plane_axes[0] )
-                                    * result[e].first.value( 0 ) )
-                + std::max( 0., grid.cell_length_in_direction( plane_axes[1] )
-                                    * result[e].first.value( 1 ) );
+            const auto& vertex = vertices[e];
+            result[e].second = -result[e].first.dot( geode::Vector2D{
+                                   { vertex.value( plane_axes[0] ),
+                                       vertex.value( plane_axes[1] ) } } )
+                               + std::max( 0., result[e].first.value( 0 ) )
+                               + std::max( 0., result[e].first.value( 1 ) );
         }
         return result;
     }
 
     template < geode::index_t dimension >
     geode::Point< dimension > compute_critical_point(
-        const geode::Grid< dimension >& grid,
-        const geode::Vector< dimension >& normal )
+        const geode::Vector< dimension >& normal_in_grid )
     {
         geode::Point< dimension > critical;
         for( const auto d : geode::LRange{ dimension } )
         {
-            if( normal.value( d ) > 0. )
+            if( normal_in_grid.value( d ) > 0. )
             {
-                critical.set_value( d, grid.cell_length_in_direction( d ) );
+                critical.set_value( d, 1 );
             }
         }
         return critical;
@@ -279,7 +275,7 @@ namespace
 
     template < geode::index_t dimension >
     std::array< geode::Segment< dimension >, 3 > get_triangle_edges(
-        const geode::Triangle< dimension >& triangle )
+        const geode::OwnerTriangle< dimension >& triangle )
     {
         const auto& vertices = triangle.vertices();
         return { geode::Segment< dimension >{ vertices[0], vertices[1] },
@@ -330,8 +326,13 @@ namespace
         }
         std::vector< CellIndices< 3 > > cells;
         cells.reserve( max_number_cells( min, max ) );
-        const auto triangle_edges = get_triangle_edges( triangle );
-        const auto normal = triangle.normal();
+        const geode::OwnerTriangle3D triangle_in_grid{
+            grid.grid_coordinate_system().coordinates( triangle.vertices()[0] ),
+            grid.grid_coordinate_system().coordinates( triangle.vertices()[1] ),
+            grid.grid_coordinate_system().coordinates( triangle.vertices()[2] )
+        };
+        const auto triangle_edges = get_triangle_edges( triangle_in_grid );
+        const auto normal = triangle_in_grid.normal();
         if( !normal
             || absl::c_count_if( triangle_edges,
                    []( const geode::Segment3D& segment ) {
@@ -346,13 +347,12 @@ namespace
             }
             return cells;
         }
-        const auto critical_point =
-            compute_critical_point( grid, normal.value() );
-        const auto xy_params = get_edge_projection( grid, triangle,
+        const auto critical_point = compute_critical_point( normal.value() );
+        const auto xy_params = get_edge_projection( triangle_in_grid,
             triangle_edges, { 0, 1 }, ( normal->value( 2 ) >= 0 ? 1 : -1 ) );
-        const auto yz_params = get_edge_projection( grid, triangle,
+        const auto yz_params = get_edge_projection( triangle_in_grid,
             triangle_edges, { 1, 2 }, ( normal->value( 0 ) >= 0 ? 1 : -1 ) );
-        const auto zx_params = get_edge_projection( grid, triangle,
+        const auto zx_params = get_edge_projection( triangle_in_grid,
             triangle_edges, { 2, 0 }, ( normal->value( 1 ) >= 0 ? 1 : -1 ) );
         const auto plane = triangle.plane().value();
         for( const auto k : geode::Range( min[2], max[2] + 1 ) )
@@ -532,24 +532,31 @@ namespace
                 }
             }
         }
-        const auto normal = geode::perpendicular( segment.direction() );
-        const auto critical_point = compute_critical_point( grid, normal );
+        const auto& seg_vertices = segment.vertices();
+        const geode::Segment2D segment_in_grid{
+            grid.grid_coordinate_system().coordinates( seg_vertices[0] ),
+            grid.grid_coordinate_system().coordinates( seg_vertices[1] )
+        };
+        const auto normal = geode::perpendicular( segment_in_grid.direction() );
+        const auto critical_point = compute_critical_point( normal );
 
         for( const auto j : geode::Range( min[1], max[1] + 1 ) )
         {
             for( const auto i : geode::Range( min[0], max[0] + 1 ) )
             {
                 CellIndices< 2 > cur_cell{ { i, j } };
-                const auto point = grid.grid_point( cur_cell );
+                const geode::Point2D point{ { static_cast< double >( i ),
+                    static_cast< double >( j ) } };
+                // const auto point = grid.grid_point( cur_cell );
 
                 // Test segment line through box
                 const auto p_minus = point + critical_point;
-                const auto p_minus_dist =
-                    geode::point_line_signed_distance( p_minus, { segment } );
+                const auto p_minus_dist = geode::point_line_signed_distance(
+                    p_minus, { segment_in_grid } );
                 const auto p_plus =
                     grid.grid_point( { i + 1, j + 1 } ) - critical_point;
-                const auto p_plus_dist =
-                    geode::point_line_signed_distance( p_plus, { segment } );
+                const auto p_plus_dist = geode::point_line_signed_distance(
+                    p_plus, { segment_in_grid } );
                 if( std::fabs( p_minus_dist ) > 2. * geode::global_epsilon
                     && std::fabs( p_plus_dist ) > 2. * geode::global_epsilon
                     && p_minus_dist * p_plus_dist > 0. )

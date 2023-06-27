@@ -23,6 +23,7 @@
 
 #include <geode/mesh/helpers/private/regular_grid_shape_function.h>
 
+#include <geode/geometry/coordinate_system.h>
 #include <geode/geometry/point.h>
 
 #include <geode/mesh/core/grid.h>
@@ -39,27 +40,21 @@ namespace
     }
 
     template < geode::index_t dimension >
-    geode::Point< dimension > local_point_coordinates(
-        const geode::Grid< dimension >& grid,
-        const geode::Point< dimension >& point,
-        const typename geode::Grid< dimension >::CellIndices& cell_id )
+    double local_point_value( const geode::Point< dimension >& point_in_grid,
+        const typename geode::Grid< dimension >::CellIndices& cell_id,
+        geode::local_index_t direction )
     {
-        auto local_coords = point - grid.origin();
-        for( const auto d : geode::LRange{ dimension } )
+        auto local_coord =
+            point_in_grid.value( direction ) - cell_id[direction];
+        if( local_coord < 0 )
         {
-            local_coords.set_value(
-                d, local_coords.value( d ) / grid.cell_length_in_direction( d )
-                       - cell_id[d] );
-            if( local_coords.value( d ) < 0 )
-            {
-                local_coords.set_value( d, 0 );
-            }
-            else if( local_coords.value( d ) > 1 )
-            {
-                local_coords.set_value( d, 1 );
-            }
+            return 0;
         }
-        return local_coords;
+        else if( local_coord > 1 )
+        {
+            return 1;
+        }
+        return local_coord;
     }
 } // namespace
 
@@ -68,36 +63,35 @@ namespace geode
     namespace detail
     {
         template < index_t dimension >
-        double shape_function_value( const Grid< dimension >& grid,
+        double shape_function_value(
             const typename Grid< dimension >::CellIndices& cell_id,
             local_index_t node_id,
-            const Point< dimension >& point )
+            const Point< dimension >& point_in_grid )
         {
-            const auto local_coords =
-                local_point_coordinates< dimension >( grid, point, cell_id );
             double shape_function_value{ 1. };
             for( const auto d : LRange{ dimension } )
             {
                 if( node_is_on_axis_origin< dimension >( node_id, d ) )
                 {
-                    shape_function_value *= 1 - local_coords.value( d );
+                    shape_function_value *= 1
+                                            - local_point_value< dimension >(
+                                                point_in_grid, cell_id, d );
                 }
                 else
                 {
-                    shape_function_value *= local_coords.value( d );
+                    shape_function_value *= local_point_value< dimension >(
+                        point_in_grid, cell_id, d );
                 }
             }
             return shape_function_value;
         }
 
         template double opengeode_mesh_api shape_function_value< 2 >(
-            const Grid< 2 >& grid,
             const Grid< 2 >::CellIndices& cell_id,
             local_index_t node_id,
             const Point< 2 >& point );
 
         template double opengeode_mesh_api shape_function_value< 3 >(
-            const Grid< 3 >& grid,
             const Grid< 3 >::CellIndices& cell_id,
             local_index_t node_id,
             const Point< 3 >& point );

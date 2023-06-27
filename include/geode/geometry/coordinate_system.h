@@ -43,6 +43,9 @@ namespace geode
 
         void set_origin( Point< dimension > origin );
 
+        void set_directions(
+            std::array< Vector< dimension >, dimension > directions );
+
         Point< dimension > coordinates(
             const Point< dimension >& global_coordinates ) const;
 
@@ -50,6 +53,11 @@ namespace geode
             const Point< dimension >& coordinates ) const;
 
         std::string string() const;
+
+    private:
+        friend class bitsery::Access;
+        template < typename Archive >
+        void serialize( Archive& archive );
 
     private:
         Point< dimension > origin_;

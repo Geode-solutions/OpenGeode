@@ -23,7 +23,7 @@
 
 #include "../../common.h"
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/vector.h>
 
 #include <geode/mesh/builder/regular_grid_solid_builder.h>
 #include <geode/mesh/builder/regular_grid_surface_builder.h>
@@ -48,6 +48,11 @@
             ( void( RegularGridBuilder##dimension##D::* )(                     \
                 const Point##dimension##D&, std::array< index_t, dimension >,  \
                 double ) )                                                     \
+                & RegularGridBuilder##dimension##D::initialize_grid )          \
+        .def( "initialize_grid_with directions",                               \
+            ( void( RegularGridBuilder##dimension##D::* )(                     \
+                Point##dimension##D, std::array< index_t, dimension >,         \
+                std::array< Vector##dimension##D, dimension > ) )              \
                 & RegularGridBuilder##dimension##D::initialize_grid )          \
         .def( "update_origin",                                                 \
             &RegularGridBuilder##dimension##D::update_origin )

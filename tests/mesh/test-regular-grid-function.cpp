@@ -25,7 +25,7 @@
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/logger.h>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/vector.h>
 
 #include <geode/mesh/builder/regular_grid_solid_builder.h>
 #include <geode/mesh/core/regular_grid_solid.h>

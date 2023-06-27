@@ -49,6 +49,11 @@ namespace geode
         std::string string() const;
 
     private:
+        friend class bitsery::Access;
+        template < typename Archive >
+        void serialize( Archive& archive );
+
+    private:
         std::array< Vector< dimension >, dimension > frame_;
     };
     ALIAS_1D_AND_2D_AND_3D( Frame );

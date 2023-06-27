@@ -51,6 +51,7 @@ add_geode_library(
         "radial_sort.cpp"
         "rotation.cpp"
         "sign.cpp"
+        "square_matrix.cpp"
     PUBLIC_HEADERS
         "aabb.h"
         "barycentric_coordinates.h"
@@ -82,6 +83,7 @@ add_geode_library(
         "rotation.h"
         "sign.h"
         "vector.h"
+        "square_matrix.h"
     ADVANCED_HEADERS
         "detail/aabb_impl.h"
         "detail/bitsery_archive.h"

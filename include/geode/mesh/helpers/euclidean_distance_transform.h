@@ -39,7 +39,7 @@ namespace geode
 {
     /*!
      * API function for creating and computing the euclidean distance
-     * map from raterized objects.
+     * map from rasterized objects.
      * It computes the exact euclidean distance map.
      *
      * @param[in] grid Regular grid on which the euclidean distance map is

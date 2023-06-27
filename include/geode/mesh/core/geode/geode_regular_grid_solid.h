@@ -85,6 +85,10 @@ namespace geode
     public:
         void update_origin( const Point3D& origin, OGRegularGridKey );
 
+        void update_origin_and_directions( const Point3D& origin,
+            const std::array< Vector3D, 3 >& directions,
+            OGRegularGridKey );
+
     private:
         friend class bitsery::Access;
         template < typename Archive >
@@ -99,8 +103,6 @@ namespace geode
 
         absl::optional< index_t > get_polyhedron_adjacent(
             const PolyhedronFacet& polyhedron_facet ) const override;
-
-        const Point3D& origin() const override;
 
         index_t cell_index( const Grid3D::CellIndices& index ) const override;
 

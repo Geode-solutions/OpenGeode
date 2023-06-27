@@ -36,6 +36,8 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
     FORWARD_DECLARATION_DIMENSION_CLASS( GridBuilder );
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Vector );
+    FORWARD_DECLARATION_DIMENSION_CLASS( CoordinateSystem );
     class AttributeManager;
 } // namespace geode
 
@@ -59,7 +61,11 @@ namespace geode
 
         ~Grid();
 
-        virtual const Point< dimension >& origin() const = 0;
+        const Point< dimension >& origin() const
+            OPENGEODE_MESH_DEPRECATED; /* Access the origin through the grid
+                                          coordinate system*/
+
+        const CoordinateSystem< dimension >& grid_coordinate_system() const;
 
         local_index_t nb_cell_vertices() const
         {
@@ -130,9 +136,14 @@ namespace geode
         BoundingBox< dimension > grid_bounding_box() const;
 
     public:
+        void set_grid_origin( Point< dimension > origin, GridKey );
+
         void set_grid_dimensions( std::array< index_t, dimension > cells_number,
             std::array< double, dimension > cells_length,
             GridKey );
+
+        void set_grid_directions(
+            std::array< Vector< dimension >, dimension > directions, GridKey );
 
         void copy( const Grid< dimension >& grid, GridKey );
 

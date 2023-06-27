@@ -29,6 +29,7 @@
 #include <geode/geometry/distance.h>
 #include <geode/geometry/information.h>
 #include <geode/geometry/position.h>
+#include <geode/geometry/square_matrix.h>
 
 namespace geode
 {
@@ -73,13 +74,14 @@ namespace geode
         origin_ = std::move( origin );
     }
 
-    template <>
-    Point< 3 > opengeode_geometry_api CoordinateSystem< 3 >::coordinates(
-        const Point< 3 >& /*unused*/ ) const
+    template < index_t dimension >
+    void CoordinateSystem< dimension >::set_directions(
+        std::array< Vector< dimension >, dimension > directions )
     {
-        throw OpenGeodeException{
-            "[CoordinateSystem3D::coordinates] Not implemented yet"
-        };
+        for( const auto d : LRange{ dimension } )
+        {
+            this->set_direction( d, directions[d] );
+        }
     }
 
     template <>
@@ -105,6 +107,24 @@ namespace geode
         return { { ( 1. - ratio ) * scale * sign_A, ratio * scale * sign_B } };
     }
 
+    template <>
+    Point< 3 > opengeode_geometry_api CoordinateSystem< 3 >::coordinates(
+        const Point< 3 >& global_coordinates ) const
+    {
+        const auto OA = this->direction( 0 );
+        const auto OB = this->direction( 1 );
+        const auto OC = this->direction( 2 );
+        const SquareMatrix< 3 > system_matrix{
+            { Vector3D{ { OA.value( 0 ), OB.value( 0 ), OC.value( 0 ) } },
+                Vector3D{ { OA.value( 1 ), OB.value( 1 ), OC.value( 1 ) } },
+                Vector3D{ { OA.value( 2 ), OB.value( 2 ), OC.value( 2 ) } } }
+        };
+        const auto inverse_matrix = system_matrix.inverse();
+        const auto OP = global_coordinates - origin_;
+        const auto result = inverse_matrix * OP;
+        return result;
+    }
+
     template < index_t dimension >
     Point< dimension > CoordinateSystem< dimension >::global_coordinates(
         const Point< dimension >& coordinates ) const
@@ -124,6 +144,22 @@ namespace geode
             "(", origin_.string(), " # ", Frame< dimension >::string(), ")" );
     }
 
+    template < index_t dimension >
+    template < typename Archive >
+    void CoordinateSystem< dimension >::serialize( Archive& archive )
+    {
+        archive.ext( *this,
+            Growable< Archive, CoordinateSystem >{
+                { []( Archive& a, CoordinateSystem& coord_system ) {
+                    a.ext( coord_system,
+                        bitsery::ext::BaseClass< Frame< dimension > >{} );
+                    a.object( coord_system.origin_ );
+                } } } );
+    }
+
     template class opengeode_geometry_api CoordinateSystem< 2 >;
     template class opengeode_geometry_api CoordinateSystem< 3 >;
+
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_geometry_api, CoordinateSystem< 2 > );
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_geometry_api, CoordinateSystem< 3 > );
 } // namespace geode
