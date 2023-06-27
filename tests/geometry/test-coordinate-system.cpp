@@ -33,14 +33,10 @@ void check_point( const geode::CoordinateSystem< dimension >& coord_system,
     const geode::Point< dimension >& input,
     const geode::Point< dimension >& output )
 {
-    SDEBUG( input );
-    SDEBUG( output );
     const auto coordinates = coord_system.coordinates( input );
-    SDEBUG( coordinates );
     OPENGEODE_EXCEPTION( coordinates.inexact_equal( output ),
         "[Test] Wrong coordinates ", dimension, "D" );
     const auto global_point = coord_system.global_coordinates( coordinates );
-    SDEBUG( global_point );
     OPENGEODE_EXCEPTION( input.inexact_equal( global_point ),
         "[Test] Wrong global coordinates ", dimension, "D" );
 }
