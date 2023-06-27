@@ -56,7 +56,8 @@ namespace
                 mesh.main_coordinate_reference_system_manager();
             crss.emplace(
                 crs_manager.active_coordinate_reference_system().type_name(),
-                crs_manager.active_coordinate_reference_system_name() );
+                geode::to_string(
+                    crs_manager.active_coordinate_reference_system_name() ) );
         }
     }
 
