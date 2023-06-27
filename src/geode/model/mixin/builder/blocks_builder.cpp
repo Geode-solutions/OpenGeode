@@ -72,5 +72,13 @@ namespace geode
             typename Block< dimension >::BlocksBuilderKey{} );
     }
 
+    template < index_t dimension >
+    SolidMesh< dimension >& BlocksBuilder< dimension >::modifiable_block_mesh(
+        const uuid& id )
+    {
+        return blocks_.modifiable_block( id ).modifiable_mesh(
+            typename Block< dimension >::BlocksBuilderKey{} );
+    }
+
     template class opengeode_model_api BlocksBuilder< 3 >;
 } // namespace geode

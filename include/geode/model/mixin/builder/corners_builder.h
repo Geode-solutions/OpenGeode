@@ -68,6 +68,8 @@ namespace geode
         void set_corner_mesh(
             const uuid& id, std::unique_ptr< PointSet< dimension > > mesh );
 
+        PointSet< dimension >& modifiable_corner_mesh( const uuid& id );
+
     private:
         Corners< dimension >& corners_;
     };
