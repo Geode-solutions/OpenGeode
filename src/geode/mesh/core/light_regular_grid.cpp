@@ -38,8 +38,6 @@ namespace geode
         : public detail::GridImpl< dimension >
     {
     public:
-        Impl() = default;
-
         AttributeManager& cell_attribute_manager() const
         {
             return cell_attribute_manager_;

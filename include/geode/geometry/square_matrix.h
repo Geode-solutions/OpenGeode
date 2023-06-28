@@ -41,6 +41,7 @@ namespace geode
     class SquareMatrix
     {
     public:
+        SquareMatrix() = default;
         SquareMatrix(
             std::array< Vector< dimension >, dimension > matrix_rows );
 
@@ -55,7 +56,7 @@ namespace geode
         SquareMatrix< dimension > inverse() const;
 
     private:
-        const std::array< Vector< dimension >, dimension > matrix_rows_;
+        std::array< Vector< dimension >, dimension > matrix_rows_;
     };
     ALIAS_2D_AND_3D( SquareMatrix );
 } // namespace geode

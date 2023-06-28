@@ -60,15 +60,14 @@ namespace geode
 
         void update_origin( RegularGrid2D& grid, const Point2D& origin )
         {
-            do_update_origin( grid, *this, origin );
+            do_update_origin( grid, origin );
         }
 
         void update_origin_and_directions( RegularGrid2D& grid,
-            Point2D origin,
-            std::array< Vector2D, 2 > directions )
+            const Point2D& origin,
+            const std::array< Vector2D, 2 >& directions )
         {
-            do_update_origin_and_directions(
-                grid, *this, std::move( origin ), std::move( directions ) );
+            do_update_origin_and_directions( grid, origin, directions );
         }
 
         index_t get_polygon_vertex( const RegularGrid2D& grid,

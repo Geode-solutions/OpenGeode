@@ -71,13 +71,13 @@ namespace geode
     }
 
     template <>
-    double SquareMatrix< 2 >::determinant() const
+    double opengeode_geometry_api SquareMatrix< 2 >::determinant() const
     {
         return value( 0, 0 ) * value( 1, 1 ) - value( 0, 1 ) * value( 1, 0 );
     }
 
     template <>
-    double SquareMatrix< 3 >::determinant() const
+    double opengeode_geometry_api SquareMatrix< 3 >::determinant() const
     {
         return value( 0, 0 )
                    * ( value( 1, 1 ) * value( 2, 2 )
@@ -105,7 +105,7 @@ namespace geode
     }
 
     template <>
-    SquareMatrix< 2 > SquareMatrix< 2 >::inverse() const
+    SquareMatrix< 2 > opengeode_geometry_api SquareMatrix< 2 >::inverse() const
     {
         const auto det = determinant();
         OPENGEODE_EXCEPTION( det != 0,
@@ -113,15 +113,15 @@ namespace geode
             "null (given vectors do not form a well-defined base)." );
 
         std::array< Vector< 2 >, 2 > matrix_rows;
-        matrix_rows[0].set_value( 0, value( 1, 1 ) );
-        matrix_rows[0].set_value( 1, -value( 0, 1 ) );
-        matrix_rows[1].set_value( 0, -value( 1, 0 ) );
-        matrix_rows[1].set_value( 1, value( 0, 0 ) );
+        matrix_rows[0].set_value( 0, value( 1, 1 ) / det );
+        matrix_rows[0].set_value( 1, -value( 0, 1 ) / det );
+        matrix_rows[1].set_value( 0, -value( 1, 0 ) / det );
+        matrix_rows[1].set_value( 1, value( 0, 0 ) / det );
         return { std::move( matrix_rows ) };
     }
 
     template <>
-    SquareMatrix< 3 > SquareMatrix< 3 >::inverse() const
+    SquareMatrix< 3 > opengeode_geometry_api SquareMatrix< 3 >::inverse() const
     {
         const auto det = determinant();
         OPENGEODE_EXCEPTION( det != 0,

@@ -47,6 +47,7 @@ namespace geode
         const Point2D& origin )
     {
         geode_regular_grid_.update_origin( origin, {} );
+        this->set_grid_origin( origin );
     }
 
     void OpenGeodeRegularGridBuilder< 2 >::update_origin_and_directions(

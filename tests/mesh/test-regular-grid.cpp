@@ -229,20 +229,17 @@ void test_cell_query( const geode::RegularGrid3D& grid )
         "[Test] Wrong query result: point is shown inside of grid where it is "
         "not." );
     auto result = grid.cells( geode::Point3D( { -0.5, -1.5, 1.5 } ) );
-    DEBUG( result.size() );
     OPENGEODE_EXCEPTION(
         result.size() == 2
             && result.front() == geode::Grid3D::CellIndices( { 0, 0, 0 } )
             && result.back() == geode::Grid3D::CellIndices( { 0, 1, 0 } ),
         "[Test] Wrong query result" );
     result = grid.cells( geode::Point3D( { -5.5, -8, 4.5 } ) );
-    DEBUG( result.size() );
     OPENGEODE_EXCEPTION(
         result.size() == 1
             && result.front() == geode::Grid3D::CellIndices( { 3, 3, 2 } ),
         "[Test] Wrong query result" );
     result = grid.cells( geode::Point3D( { -4.5, -6 - 1e-10, 4 } ) );
-    DEBUG( result.size() );
     OPENGEODE_EXCEPTION(
         result.size() == 8
             && result[0] == geode::Grid3D::CellIndices( { 2, 2, 1 } )

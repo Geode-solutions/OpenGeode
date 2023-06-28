@@ -63,14 +63,14 @@ namespace geode
 
         void update_origin( RegularGrid3D& grid, const Point3D& origin )
         {
-            do_update_origin( grid, *this, origin );
+            do_update_origin( grid, origin );
         }
 
         void update_origin_and_directions( RegularGrid3D& grid,
             const Point3D& origin,
             const std::array< Vector3D, 3 >& directions )
         {
-            do_update_origin_and_directions( grid, *this, origin, directions );
+            do_update_origin_and_directions( grid, origin, directions );
         }
 
         index_t get_polyhedron_vertex( const RegularGrid3D& grid,
