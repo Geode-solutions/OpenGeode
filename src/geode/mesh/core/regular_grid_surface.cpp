@@ -23,6 +23,8 @@
 
 #include <geode/mesh/core/regular_grid_surface.h>
 
+#include <geode/geometry/point.h>
+
 #include <geode/mesh/builder/regular_grid_surface_builder.h>
 #include <geode/mesh/core/mesh_factory.h>
 
@@ -59,10 +61,17 @@ namespace geode
         archive.ext( *this,
             Growable< Archive, RegularGrid< 2 > >{
                 { []( Archive& a, RegularGrid< 2 >& grid ) {
-                    a.ext(
-                        grid, bitsery::ext::BaseClass< SurfaceMesh< 2 > >{} );
-                    a.ext( grid, bitsery::ext::BaseClass< Grid< 2 > >{} );
-                } } } );
+                     a.ext(
+                         grid, bitsery::ext::BaseClass< SurfaceMesh< 2 > >{} );
+                     a.ext( grid, bitsery::ext::BaseClass< Grid< 2 > >{} );
+                     GridBuilder2D builder{ grid };
+                     builder.set_grid_origin( grid.point( 0 ) );
+                 },
+                    []( Archive& a, RegularGrid< 2 >& grid ) {
+                        a.ext( grid,
+                            bitsery::ext::BaseClass< SurfaceMesh< 2 > >{} );
+                        a.ext( grid, bitsery::ext::BaseClass< Grid< 2 > >{} );
+                    } } } );
     }
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, RegularGrid< 2 > );
