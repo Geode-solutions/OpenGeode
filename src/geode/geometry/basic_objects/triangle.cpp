@@ -23,6 +23,10 @@
 
 #include <geode/geometry/basic_objects/triangle.h>
 
+#include <geode/basic/logger.h>
+
+#include <absl/algorithm/container.h>
+
 #include <geode/geometry/barycentric_coordinates.h>
 #include <geode/geometry/basic_objects/plane.h>
 #include <geode/geometry/basic_objects/segment.h>
@@ -31,17 +35,25 @@
 
 namespace
 {
+    struct PivotNormalResult
+    {
+        geode::local_index_t pivot{ geode::NO_LID };
+        geode::Vector3D normal;
+        std::array< double, 3 > lengths;
+    };
 
-    absl::optional< std::pair< geode::local_index_t, geode::Vector3D > >
-        pivot_and_normal( const std::array< geode::RefPoint3D, 3 >& points )
+    absl::optional< PivotNormalResult > simple_pivot_and_normal(
+        const std::array< geode::RefPoint3D, 3 >& points )
     {
         try
         {
+            PivotNormalResult result;
             for( const auto pivot : geode::LRange{ 3 } )
             {
                 const auto next = pivot + 1 == 3 ? 0 : pivot + 1;
-                const auto edge0 =
-                    geode::Vector3D{ points[pivot], points[next] }.normalize();
+                const geode::Vector3D edge{ points[pivot], points[next] };
+                result.lengths[pivot] = edge.length();
+                const auto edge0 = edge.normalize();
                 const auto prev = pivot == 0 ? 2 : pivot - 1;
                 const auto edge1 =
                     geode::Vector3D{ points[pivot], points[prev] }.normalize();
@@ -50,15 +62,72 @@ namespace
                 const auto length = normal.length();
                 if( length > geode::global_angular_epsilon )
                 {
-                    return std::make_pair( pivot, normal / length );
+                    result.pivot = pivot;
+                    result.normal = normal / length;
+                    return result;
                 }
             }
-            return absl::nullopt;
+            return result;
         }
         catch( const geode::OpenGeodeException& /*unused*/ )
         {
             return absl::nullopt;
         }
+    }
+
+    bool check_right( const PivotNormalResult& result_left,
+        const geode::Point3D& new_point,
+        const geode::Point3D& p1,
+        const geode::Point3D& p2 )
+    {
+        const auto result_right =
+            simple_pivot_and_normal( { new_point, p1, p2 } );
+        if( !result_right || result_right->pivot == geode::NO_LID )
+        {
+            return false;
+        }
+        return result_left.normal.cross( result_right->normal ).length()
+               < geode::global_angular_epsilon;
+    }
+
+    absl::optional< std::pair< geode::local_index_t, geode::Vector3D > >
+        pivot_and_normal( const std::array< geode::RefPoint3D, 3 >& points )
+    {
+        const auto result = simple_pivot_and_normal( points );
+        if( !result )
+        {
+            return absl::nullopt;
+        }
+        if( result->pivot != geode::NO_LID )
+        {
+            return std::make_pair( result->pivot, result->normal );
+        }
+        const auto max = absl::c_max_element( result->lengths );
+        const geode::local_index_t longest_e =
+            std::distance( result->lengths.begin(), max );
+        const auto& p0 = points[longest_e].get();
+        const auto e1 = longest_e == 2 ? 0 : longest_e + 1;
+        const auto& p1 = points[e1].get();
+        const auto e2 = e1 == 2 ? 0 : e1 + 1;
+        const auto& p2 = points[e2].get();
+        if( geode::point_segment_distance( p2, { p0, p1 } )
+            > geode::global_epsilon )
+        {
+            const auto ratio = result->lengths[e2]
+                               / ( result->lengths[e2] + result->lengths[e1] );
+            const auto new_point = p0 * ( 1. - ratio ) + p1 * ratio;
+            const auto result_left =
+                simple_pivot_and_normal( { p0, new_point, p2 } );
+            if( !result_left || result_left->pivot == geode::NO_LID )
+            {
+                return absl::nullopt;
+            }
+            OPENGEODE_ASSERT(
+                check_right( result_left.value(), new_point, p1, p2 ),
+                "[Triangle::pivot_and_normal] Wrong sub-triangle computation" );
+            return std::make_pair( e2, result_left->normal );
+        }
+        return absl::nullopt;
     }
 } // namespace
 
