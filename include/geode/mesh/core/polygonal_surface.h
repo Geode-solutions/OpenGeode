@@ -59,11 +59,7 @@ namespace geode
         static std::unique_ptr< PolygonalSurface< dimension > > create(
             const MeshImpl& impl );
 
-        static MeshType type_name_static()
-        {
-            return MeshType{ absl::StrCat(
-                "PolygonalSurface", dimension, "D" ) };
-        }
+        static MeshType type_name_static();
 
         std::unique_ptr< PolygonalSurface< dimension > > clone() const;
 

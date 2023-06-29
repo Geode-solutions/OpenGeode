@@ -42,6 +42,11 @@ namespace geode
         return MeshFactory::create_mesh< RegularGrid< 2 > >( impl );
     }
 
+    MeshType RegularGrid< 2 >::type_name_static()
+    {
+        return MeshType{ "RegularGrid2D" };
+    }
+
     std::unique_ptr< RegularGrid< 2 > > RegularGrid< 2 >::clone() const
     {
         auto clone = create( this->impl_name() );

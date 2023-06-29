@@ -57,10 +57,7 @@ namespace geode
         static std::unique_ptr< EdgedCurve< dimension > > create(
             const MeshImpl& impl );
 
-        static MeshType type_name_static()
-        {
-            return MeshType{ absl::StrCat( "EdgedCurve", dimension, "D" ) };
-        }
+        static MeshType type_name_static();
 
         std::unique_ptr< EdgedCurve< dimension > > clone() const;
 

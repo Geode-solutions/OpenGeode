@@ -46,6 +46,12 @@ namespace geode
     }
 
     template < index_t dimension >
+    MeshType HybridSolid< dimension >::type_name_static()
+    {
+        return MeshType{ absl::StrCat( "HybridSolid", dimension, "D" ) };
+    }
+
+    template < index_t dimension >
     std::unique_ptr< HybridSolid< dimension > >
         HybridSolid< dimension >::clone() const
     {

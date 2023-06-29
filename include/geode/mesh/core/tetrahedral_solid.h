@@ -56,11 +56,7 @@ namespace geode
         static std::unique_ptr< TetrahedralSolid< dimension > > create(
             const MeshImpl& impl );
 
-        static MeshType type_name_static()
-        {
-            return MeshType{ absl::StrCat(
-                "TetrahedralSolid", dimension, "D" ) };
-        }
+        static MeshType type_name_static();
 
         std::unique_ptr< TetrahedralSolid< dimension > > clone() const;
 

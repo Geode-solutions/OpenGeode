@@ -59,10 +59,7 @@ namespace geode
          */
         static std::unique_ptr< VertexSet > create( const MeshImpl& impl );
 
-        static MeshType type_name_static()
-        {
-            return MeshType{ "VertexSet" };
-        }
+        static MeshType type_name_static();
 
         std::unique_ptr< VertexSet > clone() const;
 

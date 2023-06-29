@@ -57,11 +57,7 @@ namespace geode
         static std::unique_ptr< TriangulatedSurface< dimension > > create(
             const MeshImpl& impl );
 
-        static MeshType type_name_static()
-        {
-            return MeshType{ absl::StrCat(
-                "TriangulatedSurface", dimension, "D" ) };
-        }
+        static MeshType type_name_static();
 
         std::unique_ptr< TriangulatedSurface< dimension > > clone() const;
 
