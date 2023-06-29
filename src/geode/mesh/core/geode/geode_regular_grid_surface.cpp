@@ -58,14 +58,16 @@ namespace geode
         {
         }
 
-        const Point< 2 >& origin( const RegularGrid< 2 >& grid ) const
-        {
-            return grid.point( 0 );
-        }
-
         void update_origin( RegularGrid2D& grid, const Point2D& origin )
         {
-            do_update_origin( grid, *this, origin );
+            do_update_origin( grid, origin );
+        }
+
+        void update_origin_and_directions( RegularGrid2D& grid,
+            const Point2D& origin,
+            const std::array< Vector2D, 2 >& directions )
+        {
+            do_update_origin_and_directions( grid, origin, directions );
         }
 
         index_t get_polygon_vertex( const RegularGrid2D& grid,
@@ -140,11 +142,6 @@ namespace geode
     {
     }
 
-    const Point2D& OpenGeodeRegularGrid< 2 >::origin() const
-    {
-        return impl_->origin( *this );
-    }
-
     index_t OpenGeodeRegularGrid< 2 >::cell_index(
         const Grid2D::CellIndices& index ) const
     {
@@ -185,6 +182,14 @@ namespace geode
         const Point2D& origin, OGRegularGridKey )
     {
         impl_->update_origin( *this, origin );
+    }
+
+    void OpenGeodeRegularGrid< 2 >::update_origin_and_directions(
+        const Point2D& origin,
+        const std::array< Vector2D, 2 >& directions,
+        OGRegularGridKey )
+    {
+        impl_->update_origin_and_directions( *this, origin, directions );
     }
 
     template < typename Archive >

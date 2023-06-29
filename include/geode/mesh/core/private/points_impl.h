@@ -37,6 +37,12 @@ namespace geode
 {
     namespace detail
     {
+        /*!
+         * This class implements the mesh points storage.
+         * Pre-v13: this class was used in the Mesh::Impl classes
+         * Post-v13: the inheritance in the Mesh::Impl is kept for backward file
+         * serialization, and it is now used in the CRS implementation.
+         */
         template < index_t dimension >
         class PointsImpl
         {

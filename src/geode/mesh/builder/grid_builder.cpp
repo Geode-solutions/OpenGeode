@@ -23,6 +23,8 @@
 
 #include <geode/mesh/builder/grid_builder.h>
 
+#include <geode/geometry/vector.h>
+
 #include <geode/mesh/core/grid.h>
 
 namespace geode
@@ -35,12 +37,25 @@ namespace geode
     }
 
     template < index_t dimension >
+    void GridBuilder< dimension >::set_grid_origin( Point< dimension > origin )
+    {
+        grid_.set_grid_origin( origin, {} );
+    }
+
+    template < index_t dimension >
     void GridBuilder< dimension >::set_grid_dimensions(
         std::array< index_t, dimension > cells_number,
         std::array< double, dimension > cells_length )
     {
         grid_.set_grid_dimensions(
             std::move( cells_number ), std::move( cells_length ), {} );
+    }
+
+    template < index_t dimension >
+    void GridBuilder< dimension >::set_grid_directions(
+        std::array< Vector< dimension >, dimension > directions )
+    {
+        grid_.set_grid_directions( std::move( directions ), {} );
     }
 
     template < index_t dimension >

@@ -29,7 +29,8 @@
 #include <geode/basic/pimpl_impl.h>
 
 #include <geode/geometry/bounding_box.h>
-#include <geode/geometry/point.h>
+#include <geode/geometry/coordinate_system.h>
+#include <geode/geometry/vector.h>
 
 namespace
 {
@@ -49,7 +50,15 @@ namespace geode
     class Grid< dimension >::Impl
     {
     public:
-        Impl() = default;
+        Impl()
+        {
+            set_base_grid_directions();
+        }
+
+        const CoordinateSystem< dimension >& grid_coordinate_system() const
+        {
+            return grid_coordinate_system_;
+        }
 
         double cell_length_in_direction( index_t direction ) const
         {
@@ -76,15 +85,12 @@ namespace geode
             return result;
         }
 
-        Point< dimension > point(
-            const Grid< dimension >& grid, const VertexIndices& index ) const
+        Point< dimension > point( const VertexIndices& index ) const
         {
-            auto point = grid.origin();
+            auto point = grid_coordinate_system_.origin();
             for( const auto d : LRange{ dimension } )
             {
-                point.set_value(
-                    d, point.value( d )
-                           + index[d] * cell_length_in_direction( d ) );
+                point += grid_coordinate_system_.direction( d ) * index[d];
             }
             return point;
         }
@@ -93,13 +99,13 @@ namespace geode
             const Grid< dimension >& grid ) const
         {
             BoundingBox< dimension > bbox;
-            bbox.add_point( grid.origin() );
+            bbox.add_point( grid_coordinate_system_.origin() );
             VertexIndices last;
             for( const auto d : LRange{ dimension } )
             {
                 last[d] = nb_vertices_in_direction( grid, d ) - 1;
             }
-            bbox.add_point( point( grid, last ) );
+            bbox.add_point( point( last ) );
             return bbox;
         }
 
@@ -195,15 +201,14 @@ namespace geode
         }
 
         bool contains( const Grid< dimension >& grid,
-            const geode::Point< dimension >& origin,
             const Point< dimension >& query ) const
         {
+            const auto query_in_grid =
+                grid_coordinate_system_.coordinates( query );
             for( const auto d : LRange{ dimension } )
             {
-                const auto value =
-                    point_local_grid_coordinate( origin, query, d );
-                if( value < -global_epsilon
-                    || value
+                if( query_in_grid.value( d ) < -global_epsilon
+                    || query_in_grid.value( d )
                            > grid.nb_cells_in_direction( d ) + global_epsilon )
                 {
                     return false;
@@ -213,14 +218,14 @@ namespace geode
         }
 
         VertexIndices closest_vertex( const Grid< dimension >& grid,
-            const geode::Point< dimension >& origin,
             const Point< dimension >& query ) const
         {
             VertexIndices closest;
+            const auto query_in_grid =
+                grid_coordinate_system_.coordinates( query );
             for( const auto d : LRange{ dimension } )
             {
-                const auto value =
-                    point_local_grid_coordinate( origin, query, d );
+                const auto value = query_in_grid.value( d );
                 if( value < 0. )
                 {
                     closest[d] = 0;
@@ -237,27 +242,26 @@ namespace geode
             return closest;
         }
 
-        Point< dimension > cell_barycenter(
-            const Grid< dimension >& grid, const CellIndices& cell_id ) const
+        Point< dimension > cell_barycenter( const CellIndices& cell_id ) const
         {
             auto other = cell_id;
             for( const auto d : LRange{ dimension } )
             {
                 other[d]++;
             }
-            return ( point( grid, cell_id ) + point( grid, other ) ) / 2.;
+            return ( point( cell_id ) + point( other ) ) / 2.;
         }
 
         CellsAroundVertex cells( const Grid< dimension >& grid,
-            const geode::Point< dimension >& origin,
             const Point< dimension >& query ) const
         {
             CellIndices min;
             CellIndices max;
+            const auto query_in_grid =
+                grid_coordinate_system_.coordinates( query );
             for( const auto d : LRange{ dimension } )
             {
-                const auto value =
-                    point_local_grid_coordinate( origin, query, d );
+                const auto value = query_in_grid.value( d );
                 if( value < -global_epsilon
                     || value
                            > grid.nb_cells_in_direction( d ) + global_epsilon )
@@ -309,6 +313,11 @@ namespace geode
             return cells_length_;
         }
 
+        void set_grid_origin( Point< dimension > origin )
+        {
+            grid_coordinate_system_.set_origin( std::move( origin ) );
+        }
+
         void set_grid_dimensions( Grid< dimension >& grid,
             std::array< double, dimension > cells_length )
         {
@@ -316,8 +325,8 @@ namespace geode
             for( const auto direction : LRange{ dimension } )
             {
                 OPENGEODE_EXCEPTION( cells_length_[direction] > global_epsilon,
-                    "[Grid] Creation of a grid with a cell length "
-                    "smaller than epsilon in direction ",
+                    "[Grid] Creation of a grid with a cell length smaller than "
+                    "epsilon in direction ",
                     direction, "." );
             }
             double nb_vertices_double{ 1 };
@@ -330,11 +339,34 @@ namespace geode
                 nb_vertices_double < static_cast< double >( UINT_MAX ),
                 "[Grid] Creation of a grid for which the number of cell "
                 "vertices exceeds the unsigned int limit." );
+            for( const auto d : LRange{ dimension } )
+            {
+                const auto& direction = grid_coordinate_system_.direction( d );
+                const auto current_length = direction.length();
+                if( current_length == cells_length_[d] )
+                {
+                    continue;
+                }
+                grid_coordinate_system_.set_direction(
+                    d, direction * cells_length_[d] / current_length );
+            }
+        }
+
+        void set_grid_directions(
+            std::array< Vector< dimension >, dimension > directions )
+        {
+            grid_coordinate_system_.set_directions( std::move( directions ) );
+            for( const auto d : LRange{ dimension } )
+            {
+                cells_length_[d] =
+                    grid_coordinate_system_.direction( d ).length();
+            }
         }
 
         void copy( const Grid< dimension >::Impl& impl )
         {
             cells_length_ = impl.cells_length_;
+            grid_coordinate_system_ = impl.grid_coordinate_system_;
         }
 
         std::array< index_t, dimension >&& deprecated_cells_number()
@@ -343,34 +375,47 @@ namespace geode
         }
 
     private:
-        double point_local_grid_coordinate(
-            const geode::Point< dimension >& origin,
-            const geode::Point< dimension >& query,
-            local_index_t axis ) const
-        {
-            return ( query.value( axis ) - origin.value( axis ) )
-                   / cells_length_[axis];
-        }
-
         friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, Growable< Archive, Impl >{
-                                    { []( Archive& a, Impl& impl ) {
-                                         a.container4b(
-                                             impl.deprecated_cells_number_ );
-                                         a.container8b( impl.cells_length_ );
-                                     },
-                                        []( Archive& a, Impl& impl ) {
-                                            a.container8b( impl.cells_length_ );
-                                        } } } );
+            archive.ext(
+                *this, Growable< Archive, Impl >{
+                           { []( Archive& a, Impl& impl ) {
+                                a.container4b( impl.deprecated_cells_number_ );
+                                a.container8b( impl.cells_length_ );
+                                impl.set_base_grid_directions();
+                            },
+                               []( Archive& a, Impl& impl ) {
+                                   a.container8b( impl.cells_length_ );
+                                   impl.set_base_grid_directions();
+                               },
+                               []( Archive& a, Impl& impl ) {
+                                   a.container8b( impl.cells_length_ );
+                                   a.object( impl.grid_coordinate_system_ );
+                               } } } );
         }
+
+        void set_base_grid_directions();
 
     private:
         std::array< index_t, dimension > deprecated_cells_number_;
         std::array< double, dimension > cells_length_;
+        CoordinateSystem< dimension > grid_coordinate_system_;
     };
+
+    template <>
+    void Grid< 2 >::Impl::set_base_grid_directions()
+    {
+        set_grid_directions( { Vector2D{ { 1, 0 } }, Vector2D{ { 0, 1 } } } );
+    }
+
+    template <>
+    void Grid< 3 >::Impl::set_base_grid_directions()
+    {
+        set_grid_directions( { Vector3D{ { 1, 0, 0 } }, Vector3D{ { 0, 1, 0 } },
+            Vector3D{ { 0, 0, 1 } } } );
+    }
 
     template < index_t dimension >
     Grid< dimension >::Grid()
@@ -395,6 +440,19 @@ namespace geode
     }
 
     template < index_t dimension >
+    const Point< dimension >& Grid< dimension >::origin() const
+    {
+        return grid_coordinate_system().origin();
+    }
+
+    template < index_t dimension >
+    const CoordinateSystem< dimension >&
+        Grid< dimension >::grid_coordinate_system() const
+    {
+        return impl_->grid_coordinate_system();
+    }
+
+    template < index_t dimension >
     double Grid< dimension >::cell_length_in_direction(
         index_t direction ) const
     {
@@ -411,7 +469,7 @@ namespace geode
     Point< dimension > Grid< dimension >::grid_point(
         const VertexIndices& index ) const
     {
-        return impl_->point( *this, index );
+        return impl_->point( index );
     }
 
     template < index_t dimension >
@@ -471,34 +529,41 @@ namespace geode
     template < index_t dimension >
     bool Grid< dimension >::contains( const Point< dimension >& query ) const
     {
-        return impl_->contains( *this, origin(), query );
+        return impl_->contains( *this, query );
     }
 
     template < index_t dimension >
     auto Grid< dimension >::closest_vertex(
         const Point< dimension >& query ) const -> VertexIndices
     {
-        return impl_->closest_vertex( *this, origin(), query );
+        return impl_->closest_vertex( *this, query );
     }
 
     template < index_t dimension >
     auto Grid< dimension >::cells( const Point< dimension >& query ) const
         -> CellsAroundVertex
     {
-        return impl_->cells( *this, origin(), query );
+        return impl_->cells( *this, query );
     }
 
     template < index_t dimension >
     Point< dimension > Grid< dimension >::cell_barycenter(
         const CellIndices& cell_id ) const
     {
-        return impl_->cell_barycenter( *this, cell_id );
+        return impl_->cell_barycenter( cell_id );
     }
 
     template < index_t dimension >
     BoundingBox< dimension > Grid< dimension >::grid_bounding_box() const
     {
         return impl_->grid_bounding_box( *this );
+    }
+
+    template < index_t dimension >
+    void Grid< dimension >::set_grid_origin(
+        Point< dimension > origin, GridKey )
+    {
+        impl_->set_grid_origin( std::move( origin ) );
     }
 
     template < index_t dimension >
@@ -509,6 +574,13 @@ namespace geode
     {
         set_array_dimensions( std::move( cells_number ) );
         impl_->set_grid_dimensions( *this, std::move( cells_length ) );
+    }
+
+    template < index_t dimension >
+    void Grid< dimension >::set_grid_directions(
+        std::array< Vector< dimension >, dimension > directions, GridKey )
+    {
+        impl_->set_grid_directions( std::move( directions ) );
     }
 
     template < index_t dimension >

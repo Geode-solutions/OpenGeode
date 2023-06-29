@@ -56,6 +56,9 @@ namespace geode
     private:
         void update_origin( const Point2D& origin ) final;
 
+        void update_origin_and_directions(
+            Point2D origin, std::array< Vector2D, 2 > directions ) final;
+
         void do_create_vertices( index_t /*unused*/ ) final;
 
         void do_create_vertex() final

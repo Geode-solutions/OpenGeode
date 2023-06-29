@@ -28,6 +28,8 @@
 
 #include <geode/basic/logger.h>
 
+#include <geode/geometry/vector.h>
+
 #include <geode/mesh/builder/geode/geode_regular_grid_solid_builder.h>
 #include <geode/mesh/builder/geode/geode_regular_grid_surface_builder.h>
 #include <geode/mesh/core/regular_grid_solid.h>
@@ -39,7 +41,8 @@ void test_distance_transform_2D( double cell_length )
 {
     const auto grid = geode::RegularGrid2D::create();
     const auto builder = geode::RegularGridBuilder2D::create( *grid );
-    builder->initialize_grid( { { 0., 0. } }, { 10, 10 }, cell_length );
+    builder->initialize_grid(
+        geode::Point2D{ { 0., 0. } }, { 10, 10 }, cell_length );
     const std::array< const geode::Grid2D::CellIndices, 2 > objects_raster{
         { { 0, 0 }, { 9, 9 } }
     };

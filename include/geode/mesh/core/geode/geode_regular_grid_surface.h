@@ -85,6 +85,10 @@ namespace geode
     public:
         void update_origin( const Point2D& origin, OGRegularGridKey );
 
+        void update_origin_and_directions( const Point2D& origin,
+            const std::array< Vector2D, 2 >& directions,
+            OGRegularGridKey );
+
     private:
         friend class bitsery::Access;
         template < typename Archive >
@@ -95,8 +99,6 @@ namespace geode
 
         absl::optional< index_t > get_polygon_adjacent(
             const PolygonEdge& polygon_edge ) const override;
-
-        const Point2D& origin() const override;
 
         index_t cell_index( const Grid2D::CellIndices& index ) const override;
 

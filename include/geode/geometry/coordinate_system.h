@@ -23,8 +23,11 @@
 
 #pragma once
 
+#include <geode/basic/cached_value.h>
+
 #include <geode/geometry/common.h>
 #include <geode/geometry/frame.h>
+#include <geode/geometry/square_matrix.h>
 
 namespace geode
 {
@@ -43,6 +46,9 @@ namespace geode
 
         void set_origin( Point< dimension > origin );
 
+        void set_directions(
+            std::array< Vector< dimension >, dimension > directions );
+
         Point< dimension > coordinates(
             const Point< dimension >& global_coordinates ) const;
 
@@ -52,7 +58,13 @@ namespace geode
         std::string string() const;
 
     private:
+        friend class bitsery::Access;
+        template < typename Archive >
+        void serialize( Archive& archive );
+
+    private:
         Point< dimension > origin_;
+        CachedValue< SquareMatrix< dimension > > global_to_local_matrix_;
     };
     ALIAS_2D_AND_3D( CoordinateSystem );
 } // namespace geode

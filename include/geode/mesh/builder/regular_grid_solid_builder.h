@@ -30,9 +30,11 @@
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Vector );
     FORWARD_DECLARATION_DIMENSION_CLASS( RegularGrid );
     FORWARD_DECLARATION_DIMENSION_CLASS( RegularGridBuilder );
     ALIAS_3D( Point );
+    ALIAS_3D( Vector );
     ALIAS_3D( RegularGrid );
 } // namespace geode
 
@@ -56,7 +58,14 @@ namespace geode
             std::array< index_t, 3 > cells_number,
             double cells_length );
 
+        void initialize_grid( Point3D origin,
+            std::array< index_t, 3 > cells_number,
+            std::array< Vector3D, 3 > cell_directions );
+
         virtual void update_origin( const Point3D& origin ) = 0;
+
+        virtual void update_origin_and_directions(
+            Point3D origin, std::array< Vector3D, 3 > cell_directions ) = 0;
 
         void copy( const RegularGrid3D& grid );
 

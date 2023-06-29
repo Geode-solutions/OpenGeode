@@ -23,23 +23,40 @@
 
 #pragma once
 
-#include <geode/mesh/common.h>
-#include <geode/mesh/core/grid.h>
+#include <geode/basic/range.h>
+
+#include <geode/geometry/common.h>
 
 namespace geode
 {
-    FORWARD_DECLARATION_DIMENSION_CLASS( Point );
-    FORWARD_DECLARATION_DIMENSION_CLASS( Grid );
-} // namespace geode
+    FORWARD_DECLARATION_DIMENSION_CLASS( Vector );
+}
 
 namespace geode
 {
-    namespace detail
+    /*!
+     * Description of a vector in the given dimension with double coordinates
+     */
+    template < index_t dimension >
+    class SquareMatrix
     {
-        template < index_t dimension >
-        double shape_function_value(
-            const typename Grid< dimension >::CellIndices& cell_id,
-            local_index_t node_id,
-            const Point< dimension >& point_in_grid );
-    } // namespace detail
+    public:
+        SquareMatrix() = default;
+        SquareMatrix(
+            std::array< Vector< dimension >, dimension > matrix_rows );
+
+        double value( local_index_t row, local_index_t column ) const;
+
+        Vector< dimension > operator*( const Vector< dimension > vector ) const;
+
+        double determinant() const;
+
+        SquareMatrix< dimension > transpose() const;
+
+        SquareMatrix< dimension > inverse() const;
+
+    private:
+        std::array< Vector< dimension >, dimension > matrix_rows_;
+    };
+    ALIAS_2D_AND_3D( SquareMatrix );
 } // namespace geode

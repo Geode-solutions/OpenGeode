@@ -23,15 +23,7 @@
 
 #include <geode/geometry/coordinate_system.h>
 
-#include <geode/basic/logger.h>
-
-#include <geode/geometry/basic_objects/infinite_line.h>
-#include <geode/geometry/basic_objects/plane.h>
-#include <geode/geometry/basic_objects/triangle.h>
-#include <geode/geometry/distance.h>
-#include <geode/geometry/information.h>
 #include <geode/geometry/perpendicular.h>
-#include <geode/geometry/position.h>
 
 namespace
 {
@@ -60,6 +52,35 @@ namespace
                     "CoordinateSystem with given directions" );
             }
         }
+    }
+
+    geode::SquareMatrix< 2 > frame_inverse_matrix(
+        const geode::CoordinateSystem2D& frame )
+    {
+        const auto OA = frame.direction( 0 );
+        const auto OB = frame.direction( 1 );
+        const geode::SquareMatrix< 2 > system_matrix{
+            { geode::Vector2D{ { OA.value( 0 ), OB.value( 0 ) } },
+                geode::Vector2D{ { OA.value( 1 ), OB.value( 1 ) } } }
+        };
+        return system_matrix.inverse();
+    }
+
+    geode::SquareMatrix< 3 > frame_inverse_matrix(
+        const geode::CoordinateSystem3D& frame )
+    {
+        const auto OA = frame.direction( 0 );
+        const auto OB = frame.direction( 1 );
+        const auto OC = frame.direction( 2 );
+        const geode::SquareMatrix< 3 > system_matrix{
+            { geode::Vector3D{
+                  { OA.value( 0 ), OB.value( 0 ), OC.value( 0 ) } },
+                geode::Vector3D{
+                    { OA.value( 1 ), OB.value( 1 ), OC.value( 1 ) } },
+                geode::Vector3D{
+                    { OA.value( 2 ), OB.value( 2 ), OC.value( 2 ) } } }
+        };
+        return system_matrix.inverse();
     }
 } // namespace
 
@@ -107,49 +128,22 @@ namespace geode
         origin_ = std::move( origin );
     }
 
-    template <>
-    Point< 3 > opengeode_geometry_api CoordinateSystem< 3 >::coordinates(
-        const Point< 3 >& global_coordinates ) const
+    template < index_t dimension >
+    void CoordinateSystem< dimension >::set_directions(
+        std::array< Vector< dimension >, dimension > directions )
     {
-        const auto A = origin_ + this->direction( 0 );
-        const auto B = origin_ + this->direction( 1 );
-        const auto C = origin_ + this->direction( 2 );
-        const auto OAB_plane = Triangle3D{ origin_, A, B }.plane().value();
-        const auto OBC_plane = Triangle3D{ origin_, B, C }.plane().value();
-        const auto OCA_plane = Triangle3D{ origin_, C, A }.plane().value();
-        const auto distance_A =
-            std::get< 0 >( point_plane_distance( A, OBC_plane ) );
-        const auto distance_AP = std::get< 0 >(
-            point_plane_signed_distance( global_coordinates, OBC_plane ) );
-        const auto distance_B =
-            std::get< 0 >( point_plane_distance( B, OCA_plane ) );
-        const auto distance_BP = std::get< 0 >(
-            point_plane_signed_distance( global_coordinates, OCA_plane ) );
-        const auto distance_C =
-            std::get< 0 >( point_plane_distance( C, OAB_plane ) );
-        const auto distance_CP = std::get< 0 >(
-            point_plane_signed_distance( global_coordinates, OAB_plane ) );
-        return { { distance_AP / distance_A, distance_BP / distance_B,
-            distance_CP / distance_C } };
+        for( const auto d : LRange{ dimension } )
+        {
+            this->set_direction( d, directions[d] );
+        }
     }
 
-    template <>
-    Point< 2 > opengeode_geometry_api CoordinateSystem< 2 >::coordinates(
-        const Point< 2 >& global_coordinates ) const
+    template < index_t dimension >
+    Point< dimension > CoordinateSystem< dimension >::coordinates(
+        const Point< dimension >& global_coordinates ) const
     {
-        const auto A = origin_ + this->direction( 0 );
-        const auto B = origin_ + this->direction( 1 );
-        const Vector2D OP{ origin_, global_coordinates };
-        const InfiniteLine2D OP_line{ OP, origin_ };
-        const InfiniteLine2D OA_line{ this->direction( 0 ), origin_ };
-        const InfiniteLine2D OB_line{ this->direction( 1 ), origin_ };
-        const auto distance_A = point_line_distance( A, OB_line );
-        const auto distance_AP =
-            point_line_signed_distance( global_coordinates, OB_line );
-        const auto distance_B = point_line_distance( B, OA_line );
-        const auto distance_BP =
-            point_line_signed_distance( global_coordinates, OA_line );
-        return { { -distance_AP / distance_A, distance_BP / distance_B } };
+        const auto OP = global_coordinates - origin_;
+        return global_to_local_matrix_( frame_inverse_matrix, *this ) * OP;
     }
 
     template < index_t dimension >
@@ -171,6 +165,22 @@ namespace geode
             "(", origin_.string(), " # ", Frame< dimension >::string(), ")" );
     }
 
+    template < index_t dimension >
+    template < typename Archive >
+    void CoordinateSystem< dimension >::serialize( Archive& archive )
+    {
+        archive.ext( *this,
+            Growable< Archive, CoordinateSystem >{
+                { []( Archive& a, CoordinateSystem& coord_system ) {
+                    a.ext( coord_system,
+                        bitsery::ext::BaseClass< Frame< dimension > >{} );
+                    a.object( coord_system.origin_ );
+                } } } );
+    }
+
     template class opengeode_geometry_api CoordinateSystem< 2 >;
     template class opengeode_geometry_api CoordinateSystem< 3 >;
+
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_geometry_api, CoordinateSystem< 2 > );
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_geometry_api, CoordinateSystem< 3 > );
 } // namespace geode

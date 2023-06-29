@@ -26,7 +26,8 @@
 #include <geode/basic/cell_array.h>
 
 #include <geode/geometry/bounding_box.h>
-#include <geode/geometry/point.h>
+#include <geode/geometry/coordinate_system.h>
+#include <geode/geometry/vector.h>
 
 #include <geode/mesh/core/grid.h>
 
@@ -36,6 +37,8 @@
         module, name##dimension.c_str() )                                      \
         .def( "nb_cell_vertices", &Grid##dimension##D::nb_cell_vertices )      \
         .def( "origin", &Grid##dimension##D::origin )                          \
+        .def( "grid_coordinate_system",                                        \
+            &Grid##dimension##D::grid_coordinate_system )                      \
         .def( "cell_length_in_direction",                                      \
             &Grid##dimension##D::cell_length_in_direction )                    \
         .def( "cell_size", &Grid##dimension##D::cell_size )                    \

@@ -26,6 +26,7 @@
 #include <geode/basic/attribute_manager.h>
 #include <geode/basic/pimpl_impl.h>
 
+#include <geode/geometry/coordinate_system.h>
 #include <geode/geometry/point.h>
 
 #include <geode/mesh/core/regular_grid_solid.h>
@@ -101,13 +102,15 @@ namespace geode
             const
         {
             Point< point_dimension > point_value;
+            const auto point_in_grid =
+                grid_.grid_coordinate_system().coordinates( point );
             for( const auto node_id : LRange{ grid_.nb_cell_vertices() } )
             {
                 point_value += function_attribute_->value( grid_.vertex_index(
                                    grid_.cell_vertex_indices(
                                        grid_cell_indices, node_id ) ) )
                                * detail::shape_function_value< dimension >(
-                                   grid_, grid_cell_indices, node_id, point );
+                                   grid_cell_indices, node_id, point_in_grid );
             }
             return point_value;
         }

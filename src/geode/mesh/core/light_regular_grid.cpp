@@ -38,13 +38,6 @@ namespace geode
         : public detail::GridImpl< dimension >
     {
     public:
-        Impl( Point< dimension > origin ) : origin_{ std::move( origin ) } {}
-
-        const Point< dimension >& origin() const
-        {
-            return origin_;
-        }
-
         AttributeManager& cell_attribute_manager() const
         {
             return cell_attribute_manager_;
@@ -56,7 +49,6 @@ namespace geode
         }
 
     private:
-        Point< dimension > origin_;
         mutable AttributeManager cell_attribute_manager_;
     };
 
@@ -64,9 +56,10 @@ namespace geode
     LightRegularGrid< dimension >::LightRegularGrid( Point< dimension > origin,
         std::array< index_t, dimension > cells_number,
         std::array< double, dimension > cells_length )
-        : impl_{ std::move( origin ) }
     {
-        GridBuilder< dimension >{ *this }.set_grid_dimensions(
+        auto builder = GridBuilder< dimension >{ *this };
+        builder.set_grid_origin( std::move( origin ) );
+        builder.set_grid_dimensions(
             std::move( cells_number ), std::move( cells_length ) );
         impl_->initialize_attribute_manager( this->nb_cells() );
     }
@@ -81,12 +74,6 @@ namespace geode
     template < index_t dimension >
     LightRegularGrid< dimension >::~LightRegularGrid() // NOLINT
     {
-    }
-
-    template < index_t dimension >
-    const Point< dimension >& LightRegularGrid< dimension >::origin() const
-    {
-        return impl_->origin();
     }
 
     template < index_t dimension >

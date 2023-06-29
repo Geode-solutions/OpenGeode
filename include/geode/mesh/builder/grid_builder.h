@@ -29,6 +29,8 @@
 
 namespace geode
 {
+    FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Vector );
     FORWARD_DECLARATION_DIMENSION_CLASS( Grid );
 } // namespace geode
 
@@ -42,8 +44,13 @@ namespace geode
 
         GridBuilder( Grid< dimension >& grid );
 
+        void set_grid_origin( Point< dimension > origin );
+
         void set_grid_dimensions( std::array< index_t, dimension > cells_number,
             std::array< double, dimension > cells_length );
+
+        void set_grid_directions(
+            std::array< Vector< dimension >, dimension > directions );
 
         void copy( const Grid< dimension >& grid );
 

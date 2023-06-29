@@ -23,7 +23,7 @@
 
 #include <geode/mesh/builder/geode/geode_regular_grid_solid_builder.h>
 
-#include <geode/geometry/point.h>
+#include <geode/geometry/vector.h>
 
 #include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/core/geode/geode_regular_grid_solid.h>
@@ -47,6 +47,16 @@ namespace geode
         const Point3D& origin )
     {
         geode_regular_grid_.update_origin( origin, {} );
+        this->set_grid_origin( origin );
+    }
+
+    void OpenGeodeRegularGridBuilder< 3 >::update_origin_and_directions(
+        Point3D origin, std::array< Vector3D, 3 > directions )
+    {
+        geode_regular_grid_.update_origin_and_directions(
+            origin, directions, {} );
+        this->set_grid_origin( std::move( origin ) );
+        this->set_grid_directions( std::move( directions ) );
     }
 
     void OpenGeodeRegularGridBuilder< 3 >::do_create_vertices(

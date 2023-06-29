@@ -158,7 +158,21 @@ namespace geode
         return output;
     }
 
+    template < index_t dimension >
+    template < typename Archive >
+    void Frame< dimension >::serialize( Archive& archive )
+    {
+        archive.ext( *this,
+            Growable< Archive, Frame >{ { []( Archive& a, Frame& frame ) {
+                a.container( frame.frame_ );
+            } } } );
+    }
+
     template class opengeode_geometry_api Frame< 1 >;
     template class opengeode_geometry_api Frame< 2 >;
     template class opengeode_geometry_api Frame< 3 >;
+
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_geometry_api, Frame< 1 > );
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_geometry_api, Frame< 2 > );
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_geometry_api, Frame< 3 > );
 } // namespace geode

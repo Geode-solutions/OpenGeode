@@ -27,6 +27,8 @@
 
 #include <geode/basic/attribute_manager.h>
 
+#include <geode/geometry/vector.h>
+
 #include <geode/mesh/builder/mesh_builder_factory.h>
 #include <geode/mesh/core/regular_grid_surface.h>
 
@@ -102,6 +104,16 @@ namespace geode
     {
         initialize_grid(
             origin, std::move( cells_number ), { cells_length, cells_length } );
+    }
+
+    void RegularGridBuilder< 2 >::initialize_grid( Point2D origin,
+        std::array< index_t, 2 > cells_number,
+        std::array< Vector2D, 2 > directions )
+    {
+        initialize_grid( origin, std::move( cells_number ),
+            { directions[0].length(), directions[1].length() } );
+        update_origin_and_directions(
+            std::move( origin ), std::move( directions ) );
     }
 
     void RegularGridBuilder< 2 >::copy( const RegularGrid2D& grid )
