@@ -112,10 +112,7 @@ namespace geode
          */
         static std::unique_ptr< Graph > create( const MeshImpl& impl );
 
-        static MeshType type_name_static()
-        {
-            return MeshType{ "Graph" };
-        }
+        static MeshType type_name_static();
 
         std::unique_ptr< Graph > clone() const;
 

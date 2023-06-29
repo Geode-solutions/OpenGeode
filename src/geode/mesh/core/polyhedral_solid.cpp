@@ -46,6 +46,12 @@ namespace geode
     }
 
     template < index_t dimension >
+    MeshType PolyhedralSolid< dimension >::type_name_static()
+    {
+        return MeshType{ absl::StrCat( "PolyhedralSolid", dimension, "D" ) };
+    }
+
+    template < index_t dimension >
     std::unique_ptr< PolyhedralSolid< dimension > >
         PolyhedralSolid< dimension >::clone() const
     {

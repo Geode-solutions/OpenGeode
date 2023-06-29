@@ -50,6 +50,13 @@ namespace geode
     }
 
     template < index_t dimension >
+    MeshType TriangulatedSurface< dimension >::type_name_static()
+    {
+        return MeshType{ absl::StrCat(
+            "TriangulatedSurface", dimension, "D" ) };
+    }
+
+    template < index_t dimension >
     std::unique_ptr< TriangulatedSurface< dimension > >
         TriangulatedSurface< dimension >::clone() const
     {

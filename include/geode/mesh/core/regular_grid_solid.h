@@ -59,10 +59,7 @@ namespace geode
          */
         static std::unique_ptr< RegularGrid3D > create( const MeshImpl& impl );
 
-        static MeshType type_name_static()
-        {
-            return MeshType{ "RegularGrid3D" };
-        }
+        static MeshType type_name_static();
 
         absl::string_view native_extension() const
         {

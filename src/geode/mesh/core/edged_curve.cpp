@@ -107,6 +107,12 @@ namespace geode
     }
 
     template < index_t dimension >
+    MeshType EdgedCurve< dimension >::type_name_static()
+    {
+        return MeshType{ absl::StrCat( "EdgedCurve", dimension, "D" ) };
+    }
+
+    template < index_t dimension >
     double EdgedCurve< dimension >::edge_length( index_t edge_id ) const
     {
         const auto& e0 = this->point( edge_vertex( { edge_id, 0 } ) );

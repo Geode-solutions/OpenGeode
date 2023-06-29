@@ -116,6 +116,12 @@ namespace geode
     }
 
     template < index_t dimension >
+    MeshType TetrahedralSolid< dimension >::type_name_static()
+    {
+        return MeshType{ absl::StrCat( "TetrahedralSolid", dimension, "D" ) };
+    }
+
+    template < index_t dimension >
     std::unique_ptr< TetrahedralSolid< dimension > >
         TetrahedralSolid< dimension >::clone() const
     {

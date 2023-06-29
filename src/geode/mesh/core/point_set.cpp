@@ -49,6 +49,12 @@ namespace geode
     }
 
     template < index_t dimension >
+    MeshType PointSet< dimension >::type_name_static()
+    {
+        return MeshType{ absl::StrCat( "PointSet", dimension, "D" ) };
+    }
+
+    template < index_t dimension >
     template < typename Archive >
     void PointSet< dimension >::serialize( Archive& archive )
     {

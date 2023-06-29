@@ -169,6 +169,11 @@ namespace geode
         return MeshFactory::create_mesh< Graph >( impl );
     }
 
+    MeshType Graph::type_name_static()
+    {
+        return MeshType{ "Graph" };
+    }
+
     index_t Graph::edge_vertex( const EdgeVertex& edge_vertex ) const
     {
         OPENGEODE_ASSERT( edge_vertex.edge_id < nb_edges(),

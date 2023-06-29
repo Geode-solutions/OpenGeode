@@ -46,6 +46,12 @@ namespace geode
     }
 
     template < index_t dimension >
+    MeshType PolygonalSurface< dimension >::type_name_static()
+    {
+        return MeshType{ absl::StrCat( "PolygonalSurface", dimension, "D" ) };
+    }
+
+    template < index_t dimension >
     std::unique_ptr< PolygonalSurface< dimension > >
         PolygonalSurface< dimension >::clone() const
     {

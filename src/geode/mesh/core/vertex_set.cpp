@@ -81,6 +81,11 @@ namespace geode
         return MeshFactory::create_mesh< VertexSet >( impl );
     }
 
+    MeshType VertexSet::type_name_static()
+    {
+        return MeshType{ "VertexSet" };
+    }
+
     index_t VertexSet::nb_vertices() const
     {
         return vertex_attribute_manager().nb_elements();
