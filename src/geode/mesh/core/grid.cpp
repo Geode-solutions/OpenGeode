@@ -52,6 +52,7 @@ namespace geode
     public:
         Impl()
         {
+            cells_length_.fill( 1 );
             set_base_grid_directions();
         }
 
@@ -396,26 +397,21 @@ namespace geode
                                } } } );
         }
 
-        void set_base_grid_directions();
+        void set_base_grid_directions()
+        {
+            std::array< Vector< dimension >, dimension > directions;
+            for( const auto d : LRange{ dimension } )
+            {
+                directions[d].set_value( d, cells_length_[d] );
+            }
+            set_grid_directions( std::move( directions ) );
+        }
 
     private:
         std::array< index_t, dimension > deprecated_cells_number_;
         std::array< double, dimension > cells_length_;
         CoordinateSystem< dimension > grid_coordinate_system_;
     };
-
-    template <>
-    void Grid< 2 >::Impl::set_base_grid_directions()
-    {
-        set_grid_directions( { Vector2D{ { 1, 0 } }, Vector2D{ { 0, 1 } } } );
-    }
-
-    template <>
-    void Grid< 3 >::Impl::set_base_grid_directions()
-    {
-        set_grid_directions( { Vector3D{ { 1, 0, 0 } }, Vector3D{ { 0, 1, 0 } },
-            Vector3D{ { 0, 0, 1 } } } );
-    }
 
     template < index_t dimension >
     Grid< dimension >::Grid()
