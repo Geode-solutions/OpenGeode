@@ -29,6 +29,7 @@
 #include <absl/types/span.h>
 
 #include <geode/mesh/common.h>
+#include <geode/mesh/helpers/detail/vertex_merger.h>
 
 namespace geode
 {
@@ -41,6 +42,7 @@ namespace geode
     {
         template < index_t dimension >
         class SurfaceMeshMerger
+            : public VertexMerger< SurfaceMesh< dimension > >
         {
         public:
             struct PolygonOrigin
@@ -58,12 +60,9 @@ namespace geode
             SurfaceMeshMerger( absl::Span< const std::reference_wrapper<
                                    const SurfaceMesh< dimension > > > surfaces,
                 double epsilon );
-
             ~SurfaceMeshMerger();
 
             std::unique_ptr< SurfaceMesh< dimension > > merge();
-
-            index_t vertex_in_merged( index_t surface, index_t vertex ) const;
 
             index_t polygon_in_merged( index_t surface, index_t polygon ) const;
 
