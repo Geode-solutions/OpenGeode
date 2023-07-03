@@ -23,56 +23,56 @@
 
 #pragma once
 
-#include <geode/basic/pimpl.h>
-
 #include <absl/container/inlined_vector.h>
 #include <absl/types/span.h>
 
-#include <geode/mesh/common.h>
-#include <geode/mesh/helpers/detail/vertex_merger.h>
-
-namespace geode
-{
-    FORWARD_DECLARATION_DIMENSION_CLASS( SolidMesh );
-} // namespace geode
+#include <geode/basic/pimpl.h>
 
 namespace geode
 {
     namespace detail
     {
-        template < index_t dimension >
-        class SolidMeshMerger : public VertexMerger< SolidMesh< dimension > >
+        template < typename Mesh >
+        class VertexMerger
         {
         public:
-            struct PolyhedronOrigin
+            using Builder = typename Mesh::Builder;
+
+            struct VertexOrigin
             {
-                PolyhedronOrigin( index_t solid_in, index_t polyhedron_in )
-                    : solid( solid_in ), polyhedron( polyhedron_in )
+                VertexOrigin( index_t mesh_in, index_t vertex_in )
+                    : mesh( mesh_in ), vertex( vertex_in )
                 {
                 }
 
-                index_t solid;
-                index_t polyhedron;
+                index_t mesh;
+                index_t vertex;
             };
-            using PolyhedronOrigins =
-                absl::InlinedVector< PolyhedronOrigin, 1 >;
+            using VertexOrigins = absl::InlinedVector< VertexOrigin, 1 >;
 
-            SolidMeshMerger( absl::Span< const std::reference_wrapper<
-                                 const SolidMesh< dimension > > > solids,
+            index_t vertex_in_merged( index_t mesh, index_t vertex ) const;
+
+            const VertexOrigins& vertex_origins( index_t vertex ) const;
+
+        protected:
+            VertexMerger(
+                absl::Span< const std::reference_wrapper< const Mesh > > meshes,
                 double epsilon );
-            ~SolidMeshMerger();
+            ~VertexMerger();
 
-            std::unique_ptr< SolidMesh< dimension > > merge();
+            absl::Span< const std::reference_wrapper< const Mesh > >
+                meshes() const;
 
-            index_t polyhedron_in_merged(
-                index_t solid, index_t polyhedron ) const;
+            const Mesh& mesh() const;
 
-            const PolyhedronOrigins& polyhedron_origins(
-                index_t polyhedron ) const;
+            std::unique_ptr< Mesh > steal_mesh();
+
+            Builder& builder();
+
+            void create_points();
 
         private:
             IMPLEMENTATION_MEMBER( impl_ );
         };
-        ALIAS_3D( SolidMeshMerger );
     } // namespace detail
 } // namespace geode

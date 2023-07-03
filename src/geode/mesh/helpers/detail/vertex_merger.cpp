@@ -21,12 +21,20 @@
  *
  */
 
-#pragma once
+#include <geode/mesh/helpers/detail/vertex_merger.h>
+
+#include <geode/basic/pimpl_impl.h>
 
 #include <geode/geometry/nn_search.h>
 #include <geode/geometry/point.h>
 
+#include <geode/mesh/builder/edged_curve_builder.h>
+#include <geode/mesh/builder/solid_mesh_builder.h>
+#include <geode/mesh/builder/surface_mesh_builder.h>
+#include <geode/mesh/core/edged_curve.h>
 #include <geode/mesh/core/mesh_factory.h>
+#include <geode/mesh/core/solid_mesh.h>
+#include <geode/mesh/core/surface_mesh.h>
 
 namespace
 {
@@ -50,22 +58,21 @@ namespace geode
 {
     namespace detail
     {
-        template < template < index_t > class Mesh,
-            template < index_t >
-            class Builder,
-            index_t dimension >
-        class VertexMerger
+        template < typename Mesh >
+        class VertexMerger< Mesh >::Impl
         {
+            static constexpr auto dimension = Mesh::dim;
+            using Builder = typename Mesh::Builder;
             using ColocatedInfo = typename NNSearch< dimension >::ColocatedInfo;
 
         public:
-            VertexMerger( absl::Span< const std::reference_wrapper<
-                              const Mesh< dimension > > > meshes,
+            Impl(
+                absl::Span< const std::reference_wrapper< const Mesh > > meshes,
                 double epsilon )
                 : meshes_( meshes ),
                   epsilon_( epsilon ),
                   mesh_{ create_mesh( meshes ) },
-                  builder_{ Builder< dimension >::create( *mesh_ ) },
+                  builder_{ Builder::create( *mesh_ ) },
                   offset_vertices_( meshes.size() + 1 )
             {
                 offset_vertices_[0] = 0;
@@ -75,6 +82,7 @@ namespace geode
                     offset_vertices_[m + 1] =
                         offset_vertices_[m] + mesh.nb_vertices();
                 }
+                vertices_origins_.resize( offset_vertices_.back() );
             }
 
             index_t vertex_in_merged( index_t mesh, index_t vertex ) const
@@ -89,25 +97,28 @@ namespace geode
                 return vertices_[offset_vertices_[mesh] + vertex];
             }
 
-        protected:
-            absl::Span<
-                const std::reference_wrapper< const Mesh< dimension > > >
+            const VertexOrigins& vertex_origins( index_t vertex ) const
+            {
+                return vertices_origins_[vertex];
+            }
+
+            absl::Span< const std::reference_wrapper< const Mesh > >
                 meshes() const
             {
                 return meshes_;
             }
 
-            const Mesh< dimension >& mesh() const
+            const Mesh& mesh() const
             {
                 return *mesh_;
             }
 
-            std::unique_ptr< Mesh< dimension > > steal_mesh()
+            std::unique_ptr< Mesh > steal_mesh()
             {
                 return std::move( mesh_ );
             }
 
-            Builder< dimension >& builder()
+            Builder& builder()
             {
                 return *builder_;
             }
@@ -116,9 +127,19 @@ namespace geode
             {
                 auto info = create_colocated_index_mapping();
                 vertices_ = std::move( info.colocated_mapping );
-                for( const auto& point : info.unique_points )
+                builder_->create_vertices( info.nb_unique_points() );
+                for( const auto p : Range{ info.nb_unique_points() } )
                 {
-                    builder_->create_point( point );
+                    builder_->set_point( p, info.unique_points[p] );
+                }
+                for( const auto m : Indices{ meshes_ } )
+                {
+                    const auto& mesh = meshes_[m].get();
+                    for( const auto v : Range{ mesh.nb_vertices() } )
+                    {
+                        vertices_origins_[vertex_in_merged( m, v )]
+                            .emplace_back( m, v );
+                    }
                 }
             }
 
@@ -144,14 +165,79 @@ namespace geode
             }
 
         private:
-            absl::Span<
-                const std::reference_wrapper< const Mesh< dimension > > >
-                meshes_;
+            absl::Span< const std::reference_wrapper< const Mesh > > meshes_;
             double epsilon_;
-            std::unique_ptr< Mesh< dimension > > mesh_;
-            std::unique_ptr< Builder< dimension > > builder_;
+            std::unique_ptr< Mesh > mesh_;
+            std::unique_ptr< Builder > builder_;
             std::vector< index_t > vertices_;
             absl::FixedArray< index_t > offset_vertices_;
+            std::vector< VertexOrigins > vertices_origins_;
         };
+
+        template < typename Mesh >
+        VertexMerger< Mesh >::VertexMerger(
+            absl::Span< const std::reference_wrapper< const Mesh > > meshes,
+            double epsilon )
+            : impl_{ meshes, epsilon }
+        {
+        }
+
+        template < typename Mesh >
+        VertexMerger< Mesh >::~VertexMerger()
+        {
+        }
+
+        template < typename Mesh >
+        index_t VertexMerger< Mesh >::vertex_in_merged(
+            index_t mesh, index_t vertex ) const
+        {
+            return impl_->vertex_in_merged( mesh, vertex );
+        }
+
+        template < typename Mesh >
+        auto VertexMerger< Mesh >::vertex_origins( index_t vertex ) const
+            -> const VertexOrigins&
+        {
+            return impl_->vertex_origins( vertex );
+        }
+
+        template < typename Mesh >
+        absl::Span< const std::reference_wrapper< const Mesh > >
+            VertexMerger< Mesh >::meshes() const
+        {
+            return impl_->meshes();
+        }
+
+        template < typename Mesh >
+        const Mesh& VertexMerger< Mesh >::mesh() const
+        {
+            return impl_->mesh();
+        }
+
+        template < typename Mesh >
+        std::unique_ptr< Mesh > VertexMerger< Mesh >::steal_mesh()
+        {
+            return impl_->steal_mesh();
+        }
+
+        template < typename Mesh >
+        auto VertexMerger< Mesh >::builder() -> Builder&
+        {
+            return impl_->builder();
+        }
+
+        template < typename Mesh >
+        void VertexMerger< Mesh >::create_points()
+        {
+            impl_->create_points();
+        }
+
+        template class opengeode_mesh_api VertexMerger< EdgedCurve2D >;
+        template class opengeode_mesh_api VertexMerger< EdgedCurve3D >;
+
+        template class opengeode_mesh_api VertexMerger< SurfaceMesh2D >;
+        template class opengeode_mesh_api VertexMerger< SurfaceMesh3D >;
+
+        template class opengeode_mesh_api VertexMerger< SolidMesh3D >;
     } // namespace detail
 } // namespace geode

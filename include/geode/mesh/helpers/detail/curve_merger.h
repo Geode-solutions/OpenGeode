@@ -29,6 +29,7 @@
 #include <absl/types/span.h>
 
 #include <geode/mesh/common.h>
+#include <geode/mesh/helpers/detail/vertex_merger.h>
 
 namespace geode
 {
@@ -40,7 +41,7 @@ namespace geode
     namespace detail
     {
         template < index_t dimension >
-        class EdgedCurveMerger
+        class EdgedCurveMerger : public VertexMerger< EdgedCurve< dimension > >
         {
         public:
             struct EdgeOrigin
@@ -58,12 +59,9 @@ namespace geode
             EdgedCurveMerger( absl::Span< const std::reference_wrapper<
                                   const EdgedCurve< dimension > > > curves,
                 double epsilon );
-
             ~EdgedCurveMerger();
 
             std::unique_ptr< EdgedCurve< dimension > > merge();
-
-            index_t vertex_in_merged( index_t curve, index_t vertex ) const;
 
             index_t edge_in_merged( index_t curve, index_t edge ) const;
 

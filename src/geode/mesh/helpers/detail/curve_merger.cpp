@@ -23,6 +23,7 @@
 
 #include <geode/mesh/helpers/detail/curve_merger.h>
 
+#include <absl/container/flat_hash_map.h>
 #include <absl/container/flat_hash_set.h>
 
 #include <geode/basic/pimpl_impl.h>
@@ -30,7 +31,6 @@
 #include <geode/mesh/builder/edged_curve_builder.h>
 #include <geode/mesh/core/detail/vertex_cycle.h>
 #include <geode/mesh/core/edged_curve.h>
-#include <geode/mesh/helpers/private/vertex_merger.h>
 
 namespace geode
 {
@@ -38,26 +38,20 @@ namespace geode
     {
         template < index_t dimension >
         class EdgedCurveMerger< dimension >::Impl
-            : public VertexMerger< EdgedCurve, EdgedCurveBuilder, dimension >
         {
-            using ColocatedInfo = typename NNSearch< dimension >::ColocatedInfo;
             using Edge = std::array< index_t, 2 >;
             using TypedVertexCycle = detail::VertexCycle< Edge >;
             using EdgedCurveId = absl::flat_hash_set< index_t >;
 
         public:
             Impl( absl::Span< const std::reference_wrapper<
-                      const EdgedCurve< dimension > > > curves,
-                double epsilon )
-                : VertexMerger< EdgedCurve,
-                    EdgedCurveBuilder,
-                    dimension >{ curves, epsilon },
-                  new_id_( curves.size() )
+                    const EdgedCurve< dimension > > > curves )
+                : new_id_( curves.size() )
             {
                 index_t nb_edges{ 0 };
-                for( const auto s : Indices{ this->meshes() } )
+                for( const auto s : Indices{ curves } )
                 {
-                    const auto& curve = this->meshes()[s].get();
+                    const auto& curve = curves[s].get();
                     new_id_[s].resize( curve.nb_edges(), NO_ID );
                     nb_edges += curve.nb_edges();
                 }
@@ -65,17 +59,24 @@ namespace geode
                 curve_id_.reserve( nb_edges );
             }
 
-            std::unique_ptr< EdgedCurve< dimension > > merge()
+            std::unique_ptr< EdgedCurve< dimension > > merge(
+                EdgedCurveMerger< dimension >& merger )
             {
-                create_curve_step();
-                return this->steal_mesh();
+                merger.create_points();
+                create_edges( merger );
+                clean_curve( merger );
+                curve_id_.clear();
+                return merger.steal_mesh();
             }
 
-            index_t edge_in_merged( index_t curve, index_t edge ) const
+            index_t edge_in_merged( const EdgedCurveMerger< dimension >& merger,
+                index_t curve,
+                index_t edge ) const
             {
-                OPENGEODE_ASSERT( curve < this->meshes().size(),
+                OPENGEODE_ASSERT( curve < merger.meshes().size(),
                     "[EdgedCurveMerger::edge_in_merged] Wrong curve index" );
-                OPENGEODE_ASSERT( edge < this->meshes()[curve].get().nb_edges(),
+                OPENGEODE_ASSERT(
+                    edge < merger.meshes()[curve].get().nb_edges(),
                     "[EdgedCurveMerger::edge_in_merged] Wrong curve edge "
                     "index" );
                 return new_id_[curve][edge];
@@ -87,21 +88,14 @@ namespace geode
             }
 
         private:
-            void create_curve_step()
-            {
-                this->create_points();
-                create_edges();
-                clean_curve();
-                curve_id_.clear();
-            }
-
-            void clean_curve()
+            void clean_curve( EdgedCurveMerger< dimension >& merger )
             {
                 bool delete_needed{ false };
-                std::vector< bool > to_delete( this->mesh().nb_edges(), false );
-                for( const auto e : Range{ this->mesh().nb_edges() } )
+                std::vector< bool > to_delete(
+                    merger.mesh().nb_edges(), false );
+                for( const auto e : Range{ merger.mesh().nb_edges() } )
                 {
-                    const auto vertices = this->mesh().edge_vertices( e );
+                    const auto vertices = merger.mesh().edge_vertices( e );
                     if( vertices[0] == vertices[1] )
                     {
                         to_delete[e] = true;
@@ -111,10 +105,10 @@ namespace geode
                 if( delete_needed )
                 {
                     const auto old2new =
-                        this->builder().delete_edges( to_delete );
-                    for( const auto curve_id : Indices{ this->meshes() } )
+                        merger.builder().delete_edges( to_delete );
+                    for( const auto curve_id : Indices{ merger.meshes() } )
                     {
-                        const auto& curve = this->meshes()[curve_id].get();
+                        const auto& curve = merger.meshes()[curve_id].get();
                         for( const auto e : Range{ curve.nb_edges() } )
                         {
                             const auto old = new_id_[curve_id][e];
@@ -124,25 +118,25 @@ namespace geode
                 }
             }
 
-            void create_edges()
+            void create_edges( EdgedCurveMerger< dimension >& merger )
             {
                 absl::flat_hash_map< TypedVertexCycle, index_t > edges;
-                for( const auto s : Indices{ this->meshes() } )
+                for( const auto s : Indices{ merger.meshes() } )
                 {
-                    const auto& curve = this->meshes()[s].get();
+                    const auto& curve = merger.meshes()[s].get();
                     for( const auto e : Range{ curve.nb_edges() } )
                     {
                         Edge vertices;
                         for( const auto v : LRange{ 2 } )
                         {
-                            vertices[v] = this->vertex_in_merged(
+                            vertices[v] = merger.vertex_in_merged(
                                 s, curve.edge_vertex( { e, v } ) );
                         }
                         const auto it = edges.try_emplace(
-                            vertices, this->mesh().nb_edges() );
+                            vertices, merger.mesh().nb_edges() );
                         if( it.second )
                         {
-                            const auto edge_id = this->builder().create_edge(
+                            const auto edge_id = merger.builder().create_edge(
                                 vertices[0], vertices[1] );
                             OPENGEODE_ASSERT( edge_id == curve_id_.size(),
                                 "[EdgedCurveMerger::create_edges] Issue in "
@@ -184,7 +178,8 @@ namespace geode
             absl::Span< const std::reference_wrapper<
                 const EdgedCurve< dimension > > > curves,
             double epsilon )
-            : impl_( curves, epsilon )
+            : VertexMerger< EdgedCurve< dimension > >{ curves, epsilon },
+              impl_{ curves }
         {
         }
 
@@ -197,21 +192,14 @@ namespace geode
         std::unique_ptr< EdgedCurve< dimension > >
             EdgedCurveMerger< dimension >::merge()
         {
-            return impl_->merge();
-        }
-
-        template < index_t dimension >
-        index_t EdgedCurveMerger< dimension >::vertex_in_merged(
-            index_t curve, index_t vertex ) const
-        {
-            return impl_->vertex_in_merged( curve, vertex );
+            return impl_->merge( *this );
         }
 
         template < index_t dimension >
         index_t EdgedCurveMerger< dimension >::edge_in_merged(
             index_t curve, index_t edge ) const
         {
-            return impl_->edge_in_merged( curve, edge );
+            return impl_->edge_in_merged( *this, curve, edge );
         }
 
         template < index_t dimension >

@@ -117,6 +117,7 @@ add_geode_library(
         "helpers/detail/curve_merger.cpp"
         "helpers/detail/solid_merger.cpp"
         "helpers/detail/surface_merger.cpp"
+        "helpers/detail/vertex_merger.cpp"
         "helpers/private/copy.cpp"
         "helpers/private/regular_grid_shape_function.cpp"
         "io/edged_curve_input.cpp"
@@ -290,6 +291,7 @@ add_geode_library(
         "helpers/detail/curve_merger.h"
         "helpers/detail/solid_merger.h"
         "helpers/detail/surface_merger.h"
+        "helpers/detail/vertex_merger.h"
     PRIVATE_HEADERS
         "core/private/edges_impl.h"
         "core/private/facet_edges_impl.h"
@@ -300,7 +302,6 @@ add_geode_library(
         "core/private/texture_impl.h"
         "helpers/private/copy.h"
         "helpers/private/regular_grid_shape_function.h"
-        "helpers/private/vertex_merger.h"
     PUBLIC_DEPENDENCIES
         absl::flat_hash_map
         Bitsery::bitsery
