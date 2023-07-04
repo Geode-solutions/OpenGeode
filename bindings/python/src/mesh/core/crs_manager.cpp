@@ -36,10 +36,12 @@
                 dimension >::nb_coordinate_reference_systems )                 \
         .def( "find_coordinate_reference_system",                              \
             &CoordinateReferenceSystemManager<                                 \
-                dimension >::find_coordinate_reference_system )                \
+                dimension >::find_coordinate_reference_system,                 \
+            pybind11::return_value_policy::reference )                         \
         .def( "active_coordinate_reference_system",                            \
             &CoordinateReferenceSystemManager<                                 \
-                dimension >::active_coordinate_reference_system )              \
+                dimension >::active_coordinate_reference_system,               \
+            pybind11::return_value_policy::reference )                         \
         .def( "active_coordinate_reference_system_name",                       \
             &CoordinateReferenceSystemManager<                                 \
                 dimension >::active_coordinate_reference_system_name )         \
