@@ -35,27 +35,34 @@
     const auto name##dimension = "Grid" + std::to_string( dimension ) + "D";   \
     pybind11::class_< Grid##dimension##D, CellArray##dimension##D >(           \
         module, name##dimension.c_str() )                                      \
-        .def( "nb_cell_vertices", &Grid##dimension##D::nb_cell_vertices )      \
         .def( "origin", &Grid##dimension##D::origin )                          \
         .def( "grid_coordinate_system",                                        \
             &Grid##dimension##D::grid_coordinate_system )                      \
+        .def( "nb_cell_vertices", &Grid##dimension##D::nb_cell_vertices )      \
         .def( "cell_length_in_direction",                                      \
             &Grid##dimension##D::cell_length_in_direction )                    \
         .def( "cell_size", &Grid##dimension##D::cell_size )                    \
+        .def( "grid_point", &Grid##dimension##D::grid_point )                  \
+        .def( "nb_grid_vertices", &Grid##dimension##D::nb_grid_vertices )      \
         .def( "nb_vertices_in_direction",                                      \
             &Grid##dimension##D::nb_vertices_in_direction )                    \
+        .def( "nb_vertices_on_borders",                                        \
+            &Grid##dimension##D::nb_vertices_on_borders )                      \
         .def( "vertex_index", &Grid##dimension##D::vertex_index )              \
         .def( "vertex_indices", &Grid##dimension##D::vertex_indices )          \
+        .def( "cell_vertices", &Grid##dimension##D::cell_vertices )            \
+        .def(                                                                  \
+            "cell_vertex_indices", &Grid##dimension##D::cell_vertex_indices )  \
         .def( "next_vertex", &Grid##dimension##D::next_vertex )                \
         .def( "previous_vertex", &Grid##dimension##D::previous_vertex )        \
         .def( "is_grid_vertex_on_border",                                      \
             &Grid##dimension##D::is_grid_vertex_on_border )                    \
-        .def( "cell_vertices", &Grid##dimension##D::cell_vertices )            \
-        .def(                                                                  \
-            "cell_vertex_indices", &Grid##dimension##D::cell_vertex_indices )  \
-        .def( "cells", &Grid##dimension##D::cells )                            \
+        .def( "cell_barycenter", &Grid##dimension##D::cell_barycenter )        \
         .def( "contains", &Grid##dimension##D::contains )                      \
         .def( "closest_vertex", &Grid##dimension##D::closest_vertex )          \
+        .def( "cells", &Grid##dimension##D::cells )                            \
+        .def( "cell_attribute_manager",                                        \
+            &Grid##dimension##D::cell_attribute_manager )                      \
         .def( "grid_bounding_box", &Grid##dimension##D::grid_bounding_box )
 
 namespace geode
