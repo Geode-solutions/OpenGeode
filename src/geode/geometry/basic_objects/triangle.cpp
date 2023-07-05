@@ -38,7 +38,7 @@ namespace
     struct PivotNormalResult
     {
         geode::local_index_t pivot{ geode::NO_LID };
-        geode::Vector3D normal;
+        geode::Vector3D normal{ { 0, 0, 0 } };
         std::array< double, 3 > lengths;
     };
 
@@ -53,7 +53,7 @@ namespace
                 const auto next = pivot + 1 == 3 ? 0 : pivot + 1;
                 const geode::Vector3D edge{ points[pivot], points[next] };
                 result.lengths[pivot] = edge.length();
-                const auto edge0 = edge.normalize();
+                const auto edge0 = edge / result.lengths[pivot];
                 const auto prev = pivot == 0 ? 2 : pivot - 1;
                 const auto edge1 =
                     geode::Vector3D{ points[pivot], points[prev] }.normalize();
@@ -88,46 +88,6 @@ namespace
         }
         return result_left.normal.cross( result_right->normal ).length()
                < geode::global_angular_epsilon;
-    }
-
-    absl::optional< std::pair< geode::local_index_t, geode::Vector3D > >
-        pivot_and_normal( const std::array< geode::RefPoint3D, 3 >& points )
-    {
-        const auto result = simple_pivot_and_normal( points );
-        if( !result )
-        {
-            return absl::nullopt;
-        }
-        if( result->pivot != geode::NO_LID )
-        {
-            return std::make_pair( result->pivot, result->normal );
-        }
-        const auto max = absl::c_max_element( result->lengths );
-        const geode::local_index_t longest_e =
-            std::distance( result->lengths.begin(), max );
-        const auto& p0 = points[longest_e].get();
-        const auto e1 = longest_e == 2 ? 0 : longest_e + 1;
-        const auto& p1 = points[e1].get();
-        const auto e2 = e1 == 2 ? 0 : e1 + 1;
-        const auto& p2 = points[e2].get();
-        if( geode::point_segment_distance( p2, { p0, p1 } )
-            > geode::global_epsilon )
-        {
-            const auto ratio = result->lengths[e2]
-                               / ( result->lengths[e2] + result->lengths[e1] );
-            const auto new_point = p0 * ( 1. - ratio ) + p1 * ratio;
-            const auto result_left =
-                simple_pivot_and_normal( { p0, new_point, p2 } );
-            if( !result_left || result_left->pivot == geode::NO_LID )
-            {
-                return absl::nullopt;
-            }
-            OPENGEODE_ASSERT(
-                check_right( result_left.value(), new_point, p1, p2 ),
-                "[Triangle::pivot_and_normal] Wrong sub-triangle computation" );
-            return std::make_pair( e2, result_left->normal );
-        }
-        return absl::nullopt;
     }
 } // namespace
 
@@ -187,8 +147,7 @@ namespace geode
     typename std::enable_if< T == 3, absl::optional< Vector3D > >::type
         GenericTriangle< PointType, dimension >::normal() const
     {
-        if( const auto result = pivot_and_normal(
-                { vertices_[0], vertices_[1], vertices_[2] } ) )
+        if( const auto result = pivot_and_normal() )
         {
             return result->second;
         }
@@ -226,10 +185,52 @@ namespace geode
     typename std::enable_if< T == 3, absl::optional< local_index_t > >::type
         GenericTriangle< PointType, dimension >::pivot() const
     {
-        if( const auto result = pivot_and_normal(
-                { vertices_[0], vertices_[1], vertices_[2] } ) )
+        if( const auto result = pivot_and_normal() )
         {
             return result->first;
+        }
+        return absl::nullopt;
+    }
+
+    template < typename PointType, index_t dimension >
+    template < index_t T >
+    typename std::enable_if< T == 3,
+        absl::optional< std::pair< local_index_t, Vector3D > > >::type
+        GenericTriangle< PointType, dimension >::pivot_and_normal() const
+    {
+        const auto result = simple_pivot_and_normal(
+            { vertices_[0], vertices_[1], vertices_[2] } );
+        if( !result )
+        {
+            return absl::nullopt;
+        }
+        if( result->pivot != NO_LID )
+        {
+            return std::make_pair( result->pivot, result->normal );
+        }
+        const auto max = absl::c_max_element( result->lengths );
+        const local_index_t longest_e =
+            std::distance( result->lengths.begin(), max );
+        const Point3D& p0 = vertices_[longest_e];
+        const auto e1 = longest_e == 2 ? 0 : longest_e + 1;
+        const Point3D& p1 = vertices_[e1];
+        const auto e2 = e1 == 2 ? 0 : e1 + 1;
+        const Point3D& p2 = vertices_[e2];
+        if( point_segment_distance( p2, { p0, p1 } ) > global_epsilon )
+        {
+            const auto ratio = result->lengths[e2]
+                               / ( result->lengths[e2] + result->lengths[e1] );
+            const auto new_point = p0 * ( 1. - ratio ) + p1 * ratio;
+            const auto result_left =
+                simple_pivot_and_normal( { p0, new_point, p2 } );
+            if( !result_left || result_left->pivot == NO_LID )
+            {
+                return absl::nullopt;
+            }
+            OPENGEODE_ASSERT(
+                check_right( result_left.value(), new_point, p1, p2 ),
+                "[Triangle::pivot_and_normal] Wrong sub-triangle computation" );
+            return std::make_pair( e2, result_left->normal );
         }
         return absl::nullopt;
     }
@@ -347,6 +348,9 @@ namespace geode
         GenericTriangle< Point< 3 >, 3 >::owner_plane< 3 >() const;
     template opengeode_geometry_api absl::optional< local_index_t >
         GenericTriangle< Point< 3 >, 3 >::pivot< 3 >() const;
+    template opengeode_geometry_api
+        absl::optional< std::pair< local_index_t, Vector3D > >
+        GenericTriangle< Point< 3 >, 3 >::pivot_and_normal< 3 >() const;
 
     template opengeode_geometry_api absl::optional< Vector3D >
         GenericTriangle< RefPoint< 3 >, 3 >::normal< 3 >() const;
@@ -356,4 +360,7 @@ namespace geode
         GenericTriangle< RefPoint< 3 >, 3 >::owner_plane< 3 >() const;
     template opengeode_geometry_api absl::optional< local_index_t >
         GenericTriangle< RefPoint< 3 >, 3 >::pivot< 3 >() const;
+    template opengeode_geometry_api
+        absl::optional< std::pair< local_index_t, Vector3D > >
+        GenericTriangle< RefPoint< 3 >, 3 >::pivot_and_normal< 3 >() const;
 } // namespace geode

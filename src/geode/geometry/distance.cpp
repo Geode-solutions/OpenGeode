@@ -165,6 +165,177 @@ namespace
             point_point_distance( point, nearest_p ), nearest_p );
     }
 
+    std::tuple< double, geode::Point3D > no_pivot_point_triangle_distance(
+        const geode::Point3D& point, const geode::Triangle3D& triangle )
+    {
+        std::array< std::tuple< double, geode::Point3D >, 3 > edge_distances;
+        auto min_distance = std::numeric_limits< double >::max();
+        geode::local_index_t selected_edge{ geode::NO_LID };
+        const auto& vertices = triangle.vertices();
+        for( const auto e : geode::LRange{ 3 } )
+        {
+            const auto next = e == 2 ? 0 : e + 1;
+            edge_distances[e] = point_segment_distance_using_projection(
+                point, { vertices[e], vertices[next] } );
+            const auto& cur_distance = std::get< 0 >( edge_distances[e] );
+            if( cur_distance < min_distance )
+            {
+                min_distance = cur_distance;
+                selected_edge = e;
+            }
+        }
+        return edge_distances[selected_edge];
+    }
+
+    std::tuple< double, geode::Point3D > pivot_point_triangle_distance(
+        const geode::Point3D& point,
+        const geode::Triangle3D& triangle,
+        geode::local_index_t v0 )
+    {
+        const auto v1 = v0 == 2 ? 0 : v0 + 1;
+        const auto v2 = v1 == 2 ? 0 : v1 + 1;
+        const auto& vertices = triangle.vertices();
+        const geode::Vector3D edge0{ vertices[v0], vertices[v1] };
+        const geode::Vector3D edge1{ vertices[v0], vertices[v2] };
+        const auto a00 = edge0.length2();
+        const auto a01 = edge0.dot( edge1 );
+        const auto a11 = edge1.length2();
+        const geode::Vector3D diff{ vertices[v0], point };
+        const auto b0 = -diff.dot( edge0 );
+        const auto b1 = -diff.dot( edge1 );
+
+        auto f00 = b0;
+        auto f10 = b0 + a00;
+        auto f01 = b0 + a01;
+
+        std::array< double, 2 > p0, p1, p;
+        double dt1, h0, h1;
+
+        if( f00 >= 0 )
+        {
+            if( f01 >= 0 )
+            { // (1) p0 = (0,0), p1 = (0,1), H(z) = G(L(z))
+                get_min_edge02( a11, b1, p );
+            }
+            else
+            { // (2) p0 = (0,t10), p1 = (t01,1-t01),
+                // H(z) = (t11 - t10)*G(L(z))
+                p0[0] = 0;
+                p0[1] = f00 / ( f00 - f01 );
+                p1[0] = f01 / ( f01 - f10 );
+                p1[1] = 1 - p1[0];
+                dt1 = p1[1] - p0[1];
+                h0 = dt1 * ( a11 * p0[1] + b1 );
+                if( h0 >= 0 )
+                {
+                    get_min_edge02( a11, b1, p );
+                }
+                else
+                {
+                    h1 = dt1 * ( a01 * p1[0] + a11 * p1[1] + b1 );
+                    if( h1 <= 0 )
+                    {
+                        get_min_edge12( a01, a11, b1, f10, f01, p );
+                    }
+                    else
+                    {
+                        get_min_interior( p0, h0, p1, h1, p );
+                    }
+                }
+            }
+        }
+        else if( f01 <= 0 )
+        {
+            if( f10 <= 0 )
+            {
+                // (3) p0 = (1,0), p1 = (0,1), H(z) = G(L(z)) - F(L(z))
+                get_min_edge12( a01, a11, b1, f10, f01, p );
+            }
+            else
+            {
+                // (4) p0 = (t00,0), p1 = (t01,1-t01), H(z) = t11*G(L(z))
+                p0[0] = f00 / ( f00 - f10 );
+                p0[1] = 0;
+                p1[0] = f01 / ( f01 - f10 );
+                p1[1] = 1 - p1[0];
+                h0 = p1[1] * ( a01 * p0[0] + b1 );
+                if( h0 >= 0 )
+                {
+                    p = p0; // GetMinEdge01
+                }
+                else
+                {
+                    h1 = p1[1] * ( a01 * p1[0] + a11 * p1[1] + b1 );
+                    if( h1 <= 0 )
+                    {
+                        get_min_edge12( a01, a11, b1, f10, f01, p );
+                    }
+                    else
+                    {
+                        get_min_interior( p0, h0, p1, h1, p );
+                    }
+                }
+            }
+        }
+        else if( f10 <= 0 )
+        {
+            // (5) p0 = (0,t10), p1 = (t01,1-t01),
+            // H(z) = (t11 - t10)*G(L(z))
+            p0[0] = 0;
+            p0[1] = f00 / ( f00 - f01 );
+            p1[0] = f01 / ( f01 - f10 );
+            p1[1] = 1 - p1[0];
+            dt1 = p1[1] - p0[1];
+            h0 = dt1 * ( a11 * p0[1] + b1 );
+            if( h0 >= 0 )
+            {
+                get_min_edge02( a11, b1, p );
+            }
+            else
+            {
+                h1 = dt1 * ( a01 * p1[0] + a11 * p1[1] + b1 );
+                if( h1 <= 0 )
+                {
+                    get_min_edge12( a01, a11, b1, f10, f01, p );
+                }
+                else
+                {
+                    get_min_interior( p0, h0, p1, h1, p );
+                }
+            }
+        }
+        else
+        {
+            // (6) p0 = (t00,0), p1 = (0,t11), H(z) = t11*G(L(z))
+            p0[0] = f00 / ( f00 - f10 );
+            p0[1] = 0;
+            p1[0] = 0;
+            p1[1] = f00 / ( f00 - f01 );
+            h0 = p1[1] * ( a01 * p0[0] + b1 );
+            if( h0 >= 0 )
+            {
+                p = p0; // GetMinEdge01
+            }
+            else
+            {
+                h1 = p1[1] * ( a11 * p1[1] + b1 );
+                if( h1 <= 0 )
+                {
+                    get_min_edge02( a11, b1, p );
+                }
+                else
+                {
+                    get_min_interior( p0, h0, p1, h1, p );
+                }
+            }
+        }
+
+        geode::Point3D closest_point{ vertices[v0].get() + edge0 * p[0]
+                                      + edge1 * p[1] };
+        const auto distance =
+            geode::point_point_distance( point, closest_point );
+        return std::make_tuple( distance, std::move( closest_point ) );
+    }
 } // namespace
 
 namespace geode
@@ -584,178 +755,16 @@ namespace geode
                    : -distance;
     }
 
-    std::tuple< double, Point3D > point_triangle_distance(
-        const Point3D& point, const Triangle3D& triangle, local_index_t v0 )
-    {
-        const auto v1 = v0 == 2 ? 0 : v0 + 1;
-        const auto v2 = v1 == 2 ? 0 : v1 + 1;
-        const auto& vertices = triangle.vertices();
-        const Vector3D edge0{ vertices[v0], vertices[v1] };
-        const Vector3D edge1{ vertices[v0], vertices[v2] };
-        const auto a00 = edge0.length2();
-        const auto a01 = edge0.dot( edge1 );
-        const auto a11 = edge1.length2();
-        const Vector3D diff{ vertices[v0], point };
-        const auto b0 = -diff.dot( edge0 );
-        const auto b1 = -diff.dot( edge1 );
-
-        auto f00 = b0;
-        auto f10 = b0 + a00;
-        auto f01 = b0 + a01;
-
-        std::array< double, 2 > p0, p1, p;
-        double dt1, h0, h1;
-
-        if( f00 >= 0 )
-        {
-            if( f01 >= 0 )
-            { // (1) p0 = (0,0), p1 = (0,1), H(z) = G(L(z))
-                get_min_edge02( a11, b1, p );
-            }
-            else
-            { // (2) p0 = (0,t10), p1 = (t01,1-t01),
-                // H(z) = (t11 - t10)*G(L(z))
-                p0[0] = 0;
-                p0[1] = f00 / ( f00 - f01 );
-                p1[0] = f01 / ( f01 - f10 );
-                p1[1] = 1 - p1[0];
-                dt1 = p1[1] - p0[1];
-                h0 = dt1 * ( a11 * p0[1] + b1 );
-                if( h0 >= 0 )
-                {
-                    get_min_edge02( a11, b1, p );
-                }
-                else
-                {
-                    h1 = dt1 * ( a01 * p1[0] + a11 * p1[1] + b1 );
-                    if( h1 <= 0 )
-                    {
-                        get_min_edge12( a01, a11, b1, f10, f01, p );
-                    }
-                    else
-                    {
-                        get_min_interior( p0, h0, p1, h1, p );
-                    }
-                }
-            }
-        }
-        else if( f01 <= 0 )
-        {
-            if( f10 <= 0 )
-            {
-                // (3) p0 = (1,0), p1 = (0,1), H(z) = G(L(z)) - F(L(z))
-                get_min_edge12( a01, a11, b1, f10, f01, p );
-            }
-            else
-            {
-                // (4) p0 = (t00,0), p1 = (t01,1-t01), H(z) = t11*G(L(z))
-                p0[0] = f00 / ( f00 - f10 );
-                p0[1] = 0;
-                p1[0] = f01 / ( f01 - f10 );
-                p1[1] = 1 - p1[0];
-                h0 = p1[1] * ( a01 * p0[0] + b1 );
-                if( h0 >= 0 )
-                {
-                    p = p0; // GetMinEdge01
-                }
-                else
-                {
-                    h1 = p1[1] * ( a01 * p1[0] + a11 * p1[1] + b1 );
-                    if( h1 <= 0 )
-                    {
-                        get_min_edge12( a01, a11, b1, f10, f01, p );
-                    }
-                    else
-                    {
-                        get_min_interior( p0, h0, p1, h1, p );
-                    }
-                }
-            }
-        }
-        else if( f10 <= 0 )
-        {
-            // (5) p0 = (0,t10), p1 = (t01,1-t01),
-            // H(z) = (t11 - t10)*G(L(z))
-            p0[0] = 0;
-            p0[1] = f00 / ( f00 - f01 );
-            p1[0] = f01 / ( f01 - f10 );
-            p1[1] = 1 - p1[0];
-            dt1 = p1[1] - p0[1];
-            h0 = dt1 * ( a11 * p0[1] + b1 );
-            if( h0 >= 0 )
-            {
-                get_min_edge02( a11, b1, p );
-            }
-            else
-            {
-                h1 = dt1 * ( a01 * p1[0] + a11 * p1[1] + b1 );
-                if( h1 <= 0 )
-                {
-                    get_min_edge12( a01, a11, b1, f10, f01, p );
-                }
-                else
-                {
-                    get_min_interior( p0, h0, p1, h1, p );
-                }
-            }
-        }
-        else
-        {
-            // (6) p0 = (t00,0), p1 = (0,t11), H(z) = t11*G(L(z))
-            p0[0] = f00 / ( f00 - f10 );
-            p0[1] = 0;
-            p1[0] = 0;
-            p1[1] = f00 / ( f00 - f01 );
-            h0 = p1[1] * ( a01 * p0[0] + b1 );
-            if( h0 >= 0 )
-            {
-                p = p0; // GetMinEdge01
-            }
-            else
-            {
-                h1 = p1[1] * ( a11 * p1[1] + b1 );
-                if( h1 <= 0 )
-                {
-                    get_min_edge02( a11, b1, p );
-                }
-                else
-                {
-                    get_min_interior( p0, h0, p1, h1, p );
-                }
-            }
-        }
-
-        Point3D closest_point{ vertices[v0].get() + edge0 * p[0]
-                               + edge1 * p[1] };
-        const auto distance = point_point_distance( point, closest_point );
-        return std::make_tuple( distance, std::move( closest_point ) );
-    }
-
     template <>
     std::tuple< double, Point3D > point_triangle_distance(
         const Point3D& point, const Triangle3D& triangle )
     {
         if( const auto pivot = triangle.pivot() )
         {
-            return point_triangle_distance( point, triangle, pivot.value() );
+            return pivot_point_triangle_distance(
+                point, triangle, pivot.value() );
         }
-        std::array< std::tuple< double, Point3D >, 3 > edge_distances;
-        auto min_distance = std::numeric_limits< double >::max();
-        local_index_t selected_edge{ NO_LID };
-        const auto& vertices = triangle.vertices();
-        for( const auto e : LRange{ 3 } )
-        {
-            const auto next = e == 2 ? 0 : e + 1;
-            edge_distances[e] = point_segment_distance_using_projection(
-                point, { vertices[e], vertices[next] } );
-            const auto& cur_distance = std::get< 0 >( edge_distances[e] );
-            if( cur_distance < min_distance )
-            {
-                min_distance = cur_distance;
-                selected_edge = e;
-            }
-        }
-        return edge_distances[selected_edge];
+        return no_pivot_point_triangle_distance( point, triangle );
     }
 
     template <>
@@ -928,7 +937,8 @@ namespace geode
         const auto output = point_triangle_signed_distance( point,
             Triangle3D{ vertices[facet_vertices[0]],
                 vertices[facet_vertices[1]], vertices[facet_vertices[2]] } );
-        if( tetrahedron_volume_sign( tetra ) == Sign::positive )
+        // Tetra facet normals point towards inside
+        if( tetrahedron_volume_sign( tetra ) == Sign::negative )
         {
             return output;
         }
@@ -939,19 +949,19 @@ namespace geode
     std::tuple< double, Point3D > point_triangle_signed_distance(
         const Point3D& point, const Triangle3D& triangle )
     {
-        Point3D nearest_point;
-        double distance;
-        std::tie( distance, nearest_point ) =
-            point_triangle_distance( point, triangle );
-        const Vector3D proj2point{ nearest_point, point };
-        // Tetra facet normals point towards inside
-        if( const auto normal = triangle.normal() )
+        if( const auto pivot_and_normal = triangle.pivot_and_normal() )
         {
-            const auto signed_distance =
-                proj2point.dot( normal.value() ) <= 0 ? distance : -distance;
-            return std::make_tuple( signed_distance, nearest_point );
+            const auto output = pivot_point_triangle_distance(
+                point, triangle, pivot_and_normal->first );
+            const auto& nearest_point = std::get< 1 >( output );
+            const Vector3D proj2point{ nearest_point, point };
+            if( proj2point.dot( pivot_and_normal->second ) >= 0 )
+            {
+                return output;
+            }
+            return std::make_tuple( -std::get< 0 >( output ), nearest_point );
         }
-        return std::make_tuple( distance, nearest_point );
+        return no_pivot_point_triangle_distance( point, triangle );
     }
 
     std::tuple< double, Point3D > point_plane_signed_distance(

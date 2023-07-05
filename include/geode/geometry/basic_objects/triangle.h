@@ -67,6 +67,10 @@ namespace geode
         template < index_t T = dimension >
         typename std::enable_if< T == 3, absl::optional< local_index_t > >::type
             pivot() const;
+        template < index_t T = dimension >
+        typename std::enable_if< T == 3,
+            absl::optional< std::pair< local_index_t, Vector3D > > >::type
+            pivot_and_normal() const;
         void set_point( index_t vertex, PointType point );
         const std::array< PointType, 3 >& vertices() const;
         BoundingBox< dimension > bounding_box() const;
