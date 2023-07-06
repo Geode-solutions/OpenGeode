@@ -113,4 +113,21 @@ namespace geode
         const BRep& brep,
         const Block3D& block,
         const PolyhedronFacetEdge& edge );
+
+    namespace detail
+    {
+        template < typename Model >
+        ModelComponentMeshEdges::LineEdges line_component_mesh_edges(
+            const Model& model,
+            const std::array< index_t, 2 >& edge_unique_vertices );
+
+        template < typename Model >
+        ModelComponentMeshEdges::SurfaceEdges surface_component_mesh_edges(
+            const Model& model,
+            const std::array< index_t, 2 >& edge_unique_vertices );
+
+        BRepComponentMeshEdges::BlockEdges opengeode_model_api
+            block_component_mesh_edges( const BRep& brep,
+                const std::array< index_t, 2 >& edge_unique_vertices );
+    } // namespace detail
 } // namespace geode
