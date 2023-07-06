@@ -72,110 +72,14 @@ namespace
         return edge_unique_vertices;
     }
 
-    template < class ModelType, geode::index_t dimension >
-    geode::ModelComponentMeshEdges::LineEdges line_edges(
-        const ModelType& model,
-        const std::array< geode::index_t, 2 >& edge_unique_vertices )
-    {
-        const auto line_pairs = model_edge_pairs( model, edge_unique_vertices,
-            geode::Line< dimension >::component_type_static() );
-        if( line_pairs.empty() )
-        {
-            return {};
-        }
-        geode::ModelComponentMeshEdges::LineEdges edges;
-        edges.reserve( line_pairs.size() );
-        for( const auto& line_pair : line_pairs )
-        {
-            const auto& line = model.line( line_pair.first.id() );
-            const auto& mesh = line.mesh();
-            for( const auto& pair : line_pair.second )
-            {
-                for( const auto& edge_vertex :
-                    mesh.edges_around_vertex( pair[0] ) )
-                {
-                    const auto opposite_vertex =
-                        mesh.edge_vertex( edge_vertex.opposite() );
-                    if( opposite_vertex == pair[1] )
-                    {
-                        edges[line.id()].emplace_back( edge_vertex.edge_id );
-                    }
-                }
-            }
-        }
-        filter_edges( edges );
-        return edges;
-    }
-
-    template < class ModelType, geode::index_t dimension >
-    geode::ModelComponentMeshEdges::SurfaceEdges surface_edges(
-        const ModelType& model,
-        const std::array< geode::index_t, 2 >& edge_unique_vertices )
-    {
-        const auto surface_pairs =
-            model_edge_pairs( model, edge_unique_vertices,
-                geode::Surface< dimension >::component_type_static() );
-        if( surface_pairs.empty() )
-        {
-            return {};
-        }
-        geode::ModelComponentMeshEdges::SurfaceEdges edges;
-        edges.reserve( surface_pairs.size() );
-        for( const auto& surface_pair : surface_pairs )
-        {
-            const auto& surface = model.surface( surface_pair.first.id() );
-            const auto& mesh = surface.mesh();
-            for( const auto& pair : surface_pair.second )
-            {
-                for( auto& polygon_vertex :
-                    mesh.polygons_from_edge_vertices( pair ) )
-                {
-                    edges[surface.id()].emplace_back(
-                        std::move( polygon_vertex ) );
-                }
-            }
-        }
-        filter_edges( edges );
-        return edges;
-    }
-
-    geode::BRepComponentMeshEdges::BlockEdges block_edges(
-        const geode::BRep& model,
-        const std::array< geode::index_t, 2 >& edge_unique_vertices )
-    {
-        const auto block_pairs = model_edge_pairs( model, edge_unique_vertices,
-            geode::Block3D::component_type_static() );
-        if( block_pairs.empty() )
-        {
-            return {};
-        }
-        geode::BRepComponentMeshEdges::BlockEdges edges;
-        edges.reserve( block_pairs.size() );
-        for( const auto& block_pair : block_pairs )
-        {
-            const auto& block = model.block( block_pair.first.id() );
-            const auto& mesh = block.mesh();
-            for( const auto& pair : block_pair.second )
-            {
-                if( auto edge =
-                        mesh.polyhedron_facet_edge_from_vertices( pair ) )
-                {
-                    edges[block.id()].emplace_back( std::move( edge.value() ) );
-                }
-            }
-        }
-        filter_edges( edges );
-        return edges;
-    }
-
-    template < class ModelType, geode::index_t dimension >
+    template < class ModelType >
     void model_component_mesh_edges( geode::ModelComponentMeshEdges& edges,
         const ModelType& model,
         const std::array< geode::index_t, 2 >& edge_unique_vertices )
     {
-        edges.line_edges =
-            line_edges< ModelType, dimension >( model, edge_unique_vertices );
-        edges.surface_edges = surface_edges< ModelType, dimension >(
+        edges.line_edges = geode::detail::line_component_mesh_edges(
+            model, edge_unique_vertices );
+        edges.surface_edges = geode::detail::surface_component_mesh_edges(
             model, edge_unique_vertices );
     }
 
@@ -184,8 +88,7 @@ namespace
         const std::array< geode::index_t, 2 >& edge_unique_vertices )
     {
         geode::SectionComponentMeshEdges edges;
-        model_component_mesh_edges< geode::Section, 2 >(
-            edges, section, edge_unique_vertices );
+        model_component_mesh_edges( edges, section, edge_unique_vertices );
         return edges;
     }
 
@@ -194,15 +97,117 @@ namespace
         const std::array< geode::index_t, 2 >& edge_unique_vertices )
     {
         geode::BRepComponentMeshEdges edges;
-        model_component_mesh_edges< geode::BRep, 3 >(
-            edges, brep, edge_unique_vertices );
-        edges.block_edges = block_edges( brep, edge_unique_vertices );
+        model_component_mesh_edges( edges, brep, edge_unique_vertices );
+        edges.block_edges = geode::detail::block_component_mesh_edges(
+            brep, edge_unique_vertices );
         return edges;
     }
 } // namespace
 
 namespace geode
 {
+    namespace detail
+    {
+        template < typename Model >
+        geode::ModelComponentMeshEdges::LineEdges line_component_mesh_edges(
+            const Model& model,
+            const std::array< geode::index_t, 2 >& edge_unique_vertices )
+        {
+            const auto line_pairs =
+                model_edge_pairs( model, edge_unique_vertices,
+                    geode::Line< Model::dim >::component_type_static() );
+            if( line_pairs.empty() )
+            {
+                return {};
+            }
+            geode::ModelComponentMeshEdges::LineEdges edges;
+            edges.reserve( line_pairs.size() );
+            for( const auto& line_pair : line_pairs )
+            {
+                const auto& line = model.line( line_pair.first.id() );
+                const auto& mesh = line.mesh();
+                for( const auto& pair : line_pair.second )
+                {
+                    for( const auto& edge_vertex :
+                        mesh.edges_around_vertex( pair[0] ) )
+                    {
+                        const auto opposite_vertex =
+                            mesh.edge_vertex( edge_vertex.opposite() );
+                        if( opposite_vertex == pair[1] )
+                        {
+                            edges[line.id()].emplace_back(
+                                edge_vertex.edge_id );
+                        }
+                    }
+                }
+            }
+            filter_edges( edges );
+            return edges;
+        }
+
+        template < typename Model >
+        geode::ModelComponentMeshEdges::SurfaceEdges
+            surface_component_mesh_edges( const Model& model,
+                const std::array< geode::index_t, 2 >& edge_unique_vertices )
+        {
+            const auto surface_pairs =
+                model_edge_pairs( model, edge_unique_vertices,
+                    geode::Surface< Model::dim >::component_type_static() );
+            if( surface_pairs.empty() )
+            {
+                return {};
+            }
+            geode::ModelComponentMeshEdges::SurfaceEdges edges;
+            edges.reserve( surface_pairs.size() );
+            for( const auto& surface_pair : surface_pairs )
+            {
+                const auto& surface = model.surface( surface_pair.first.id() );
+                const auto& mesh = surface.mesh();
+                for( const auto& pair : surface_pair.second )
+                {
+                    for( auto& polygon_vertex :
+                        mesh.polygons_from_edge_vertices( pair ) )
+                    {
+                        edges[surface.id()].emplace_back(
+                            std::move( polygon_vertex ) );
+                    }
+                }
+            }
+            filter_edges( edges );
+            return edges;
+        }
+
+        geode::BRepComponentMeshEdges::BlockEdges block_component_mesh_edges(
+            const geode::BRep& model,
+            const std::array< geode::index_t, 2 >& edge_unique_vertices )
+        {
+            const auto block_pairs = model_edge_pairs( model,
+                edge_unique_vertices, geode::Block3D::component_type_static() );
+            if( block_pairs.empty() )
+            {
+                return {};
+            }
+            geode::BRepComponentMeshEdges::BlockEdges edges;
+            edges.reserve( block_pairs.size() );
+            for( const auto& block_pair : block_pairs )
+            {
+                const auto& block = model.block( block_pair.first.id() );
+                const auto& mesh = block.mesh();
+                for( const auto& pair : block_pair.second )
+                {
+                    if( auto edge =
+                            mesh.polyhedron_facet_edge_from_vertices( pair ) )
+                    {
+                        edges[block.id()].emplace_back(
+                            std::move( edge.value() ) );
+                    }
+                }
+            }
+            filter_edges( edges );
+            return edges;
+        }
+    } // namespace detail
+
     std::array< index_t, 2 > edge_unique_vertices(
         const Section& section, const Line2D& line, index_t edge )
     {
@@ -288,4 +293,21 @@ namespace geode
         return brep_component_mesh_edges(
             brep, edge_unique_vertices( brep, block, edge ) );
     }
+
+    namespace detail
+    {
+        template ModelComponentMeshEdges::LineEdges opengeode_model_api
+            line_component_mesh_edges(
+                const Section&, const std::array< index_t, 2 >& );
+        template ModelComponentMeshEdges::LineEdges opengeode_model_api
+            line_component_mesh_edges(
+                const BRep&, const std::array< index_t, 2 >& );
+
+        template ModelComponentMeshEdges::SurfaceEdges opengeode_model_api
+            surface_component_mesh_edges(
+                const Section&, const std::array< index_t, 2 >& );
+        template ModelComponentMeshEdges::SurfaceEdges opengeode_model_api
+            surface_component_mesh_edges(
+                const BRep&, const std::array< index_t, 2 >& );
+    } // namespace detail
 } // namespace geode
