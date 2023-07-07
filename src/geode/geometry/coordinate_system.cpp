@@ -23,15 +23,17 @@
 
 #include <geode/geometry/coordinate_system.h>
 
+#include <geode/basic/logger.h>
+
 #include <geode/geometry/perpendicular.h>
 
 namespace
 {
     void check_frame( std::array< geode::Vector2D, 2 > directions )
     {
-        const auto dot =
-            geode::dot_perpendicular( directions[0], directions[1] );
-        OPENGEODE_EXCEPTION( dot > geode::global_angular_epsilon,
+        const auto dot = geode::dot_perpendicular(
+            directions[0].normalize(), directions[1].normalize() );
+        OPENGEODE_EXCEPTION( std::fabs( dot ) > geode::global_angular_epsilon,
             "[CoordinateSystem2D] Could not create a "
             "CoordinateSystem with given directions" );
     }
