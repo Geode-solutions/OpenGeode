@@ -23,14 +23,12 @@
 
 #pragma once
 
-#include <geode/basic/pimpl.h>
-
 #include <geode/geometry/common.h>
+#include <geode/geometry/point.h>
 
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( InfiniteLine );
-    FORWARD_DECLARATION_DIMENSION_CLASS( Point );
     FORWARD_DECLARATION_DIMENSION_CLASS( Ray );
     FORWARD_DECLARATION_DIMENSION_CLASS( Segment );
     FORWARD_DECLARATION_DIMENSION_CLASS( Triangle );
@@ -48,6 +46,7 @@ namespace geode
     {
     public:
         BoundingBox();
+        BoundingBox( Point< dimension > min, Point< dimension > max );
         BoundingBox( const BoundingBox& other );
         BoundingBox& operator=( const BoundingBox& other );
         BoundingBox( BoundingBox&& other ) noexcept;
@@ -105,7 +104,8 @@ namespace geode
         Vector< dimension > diagonal() const;
 
     private:
-        IMPLEMENTATION_MEMBER( impl_ );
+        Point< dimension > min_;
+        Point< dimension > max_;
     };
     ALIAS_1D_AND_2D_AND_3D( BoundingBox );
 } // namespace geode
