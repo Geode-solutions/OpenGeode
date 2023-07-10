@@ -48,7 +48,7 @@ namespace geode
                     "inconsistencies do not impact your following work. To do "
                     "so, you can for example use the Open-Source "
                     "OpenGeode-Inspector or the online free tool: "
-                    "https://geode-solutions.com/tools/validitychecker" );
+                    "https://geode-solutions.com/tools/validity_checker" );
             }
         }
 
