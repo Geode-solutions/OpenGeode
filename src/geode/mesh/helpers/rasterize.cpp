@@ -34,13 +34,17 @@
 #include <geode/geometry/basic_objects/plane.h>
 #include <geode/geometry/basic_objects/segment.h>
 #include <geode/geometry/basic_objects/triangle.h>
+#include <geode/geometry/bounding_box.h>
 #include <geode/geometry/coordinate_system.h>
 #include <geode/geometry/distance.h>
+#include <geode/geometry/information.h>
 #include <geode/geometry/mensuration.h>
 #include <geode/geometry/perpendicular.h>
 #include <geode/geometry/position.h>
 
+#include <geode/mesh/builder/triangulated_surface_builder.h>
 #include <geode/mesh/core/grid.h>
+#include <geode/mesh/core/triangulated_surface.h>
 
 namespace
 {
@@ -562,6 +566,182 @@ namespace
         }
         return cells;
     }
+
+    struct Cell
+    {
+        Cell( geode::index_t id_in, bool counter_clockwise_in )
+            : id( id_in ), counter_clockwise( counter_clockwise_in )
+        {
+        }
+
+        bool operator==( const Cell& other ) const
+        {
+            return id == other.id
+                   && counter_clockwise == other.counter_clockwise;
+        }
+
+        bool operator<( const Cell& other ) const
+        {
+            if( id != other.id )
+            {
+                return id < other.id;
+            }
+            return counter_clockwise < other.counter_clockwise;
+        }
+        geode::index_t id;
+        bool counter_clockwise;
+    };
+
+    bool is_edge_valid( const geode::Point2D& v0, const geode::Point2D& v1 )
+    {
+        if( v0.value( 1 ) == v1.value( 1 ) )
+        {
+            return v0.value( 0 ) > v1.value( 0 );
+        }
+        return v0.value( 1 ) > v1.value( 1 );
+    }
+
+    struct ProjectedTriangle
+    {
+        std::array< geode::Point2D, 3 > points;
+        bool counter_clockwise{ true };
+    };
+
+    double projected_i_coordinate( const geode::Vector3D& n,
+        const geode::Point3D& v0,
+        const geode::Point2D& point )
+    {
+        return -( n.value( 1 ) * ( point.value( 0 ) - v0.value( 1 ) )
+                   + n.value( 2 ) * ( point.value( 1 ) - v0.value( 2 ) ) )
+                   / n.value( 0 )
+               + v0.value( 0 );
+    }
+
+    bool is_JK_to_process(
+        const ProjectedTriangle& triangle, const geode::Point2D& point )
+    {
+        const auto position = geode::point_triangle_position( point,
+            { triangle.points[0], triangle.points[1], triangle.points[2] } );
+
+        if( position == geode::Position::outside )
+        {
+            return false;
+        }
+        if( position == geode::Position::inside )
+        {
+            return true;
+        }
+
+        if( position == geode::Position::edge0 )
+        {
+            return is_edge_valid( triangle.points[0], triangle.points[1] );
+        }
+        if( position == geode::Position::edge1 )
+        {
+            return is_edge_valid( triangle.points[1], triangle.points[2] );
+        }
+        if( position == geode::Position::edge2 )
+        {
+            return is_edge_valid( triangle.points[2], triangle.points[0] );
+        }
+
+        return true;
+    }
+
+    bool is_triangle_counterclockwise( const geode::Point2D& v0,
+        const geode::Point2D& v1,
+        const geode::Point2D& v2 )
+    {
+        const geode::Vector2D e0{ v0, v1 };
+        const geode::Vector2D e1{ v0, v2 };
+        return geode::dot_perpendicular( e0, e1 ) > 0;
+    }
+
+    ProjectedTriangle project_on_JK( const geode::TriangulatedSurface3D& mesh,
+        geode::index_t p,
+        absl::Span< const geode::Point3D > points )
+    {
+        ProjectedTriangle triangle;
+        for( const auto v : geode::LRange{ 3 } )
+        {
+            const auto& point = points[mesh.polygon_vertex( { p, v } )];
+            triangle.points[v] = { { point.value( 1 ), point.value( 2 ) } };
+        }
+        if( !is_triangle_counterclockwise(
+                triangle.points[0], triangle.points[1], triangle.points[2] ) )
+        {
+            triangle.counter_clockwise = false;
+            std::swap( triangle.points[1], triangle.points[2] );
+        }
+        return triangle;
+    }
+
+    using Values =
+        absl::flat_hash_map< std::pair< geode::index_t, geode::index_t >,
+            absl::InlinedVector< Cell, 2 > >;
+
+    Values paint_surface( const geode::Grid3D& grid,
+        const geode::TriangulatedSurface3D& closed_surface )
+    {
+        Values values;
+        const auto& origin = grid.grid_coordinate_system().origin();
+        absl::FixedArray< geode::Point3D > points(
+            closed_surface.nb_vertices() );
+        for( const auto v : geode::Range{ closed_surface.nb_vertices() } )
+        {
+            points[v] = closed_surface.point( v ) - origin;
+        }
+        for( const auto p : geode::Range{ closed_surface.nb_polygons() } )
+        {
+            const auto n = closed_surface.polygon_normal( p );
+            if( !n || std::fabs( n->value( 0 ) ) < geode::global_epsilon )
+            {
+                continue;
+            }
+            const auto triangle = project_on_JK( closed_surface, p, points );
+
+            geode::BoundingBox2D bbox;
+            bbox.add_point( triangle.points[0] );
+            bbox.add_point( triangle.points[1] );
+            bbox.add_point( triangle.points[2] );
+            const auto maxJ = std::floor(
+                bbox.max().value( 0 ) / grid.cell_length_in_direction( 1 )
+                - 0.5 );
+            const auto maxK = std::floor(
+                bbox.max().value( 1 ) / grid.cell_length_in_direction( 2 )
+                - 0.5 );
+            const auto minJ = std::ceil(
+                bbox.min().value( 0 ) / grid.cell_length_in_direction( 1 )
+                - 0.5 );
+            const auto minK = std::ceil(
+                bbox.min().value( 1 ) / grid.cell_length_in_direction( 2 )
+                - 0.5 );
+            for( const auto j : geode::Range{ minJ, maxJ + 1 } )
+            {
+                for( const auto k : geode::Range{ minK, maxK + 1 } )
+                {
+                    const geode::Point2D point{
+                        { ( j + 0.5 ) * grid.cell_length_in_direction( 1 ),
+                            ( k + 0.5 ) * grid.cell_length_in_direction( 2 ) }
+                    };
+                    if( !is_JK_to_process( triangle, point ) )
+                    {
+                        continue;
+                    }
+
+                    const auto maxI = std::floor(
+                        projected_i_coordinate( n.value(),
+                            points[closed_surface.polygon_vertex( { p, 0 } )],
+                            point )
+                            / grid.cell_length_in_direction( 0 )
+                        - 0.5 );
+                    values[{ j, k }].emplace_back(
+                        maxI, triangle.counter_clockwise );
+                }
+            }
+        }
+        return values;
+    }
 } // namespace
 
 namespace geode
@@ -637,6 +817,37 @@ namespace geode
         }
         return conservative_voxelization_triangle(
             grid, triangle, vertex_cells );
+    }
+
+    std::vector< Grid3D::CellIndices >
+        opengeode_mesh_api rasterize_closed_surface(
+            const Grid3D& grid, const TriangulatedSurface3D& closed_surface )
+    {
+        std::vector< Grid3D::CellIndices > cells;
+        for( auto& value : paint_surface( grid, closed_surface ) )
+        {
+            const auto j = value.first.first;
+            const auto k = value.first.second;
+            auto& i_values = value.second;
+            sort_unique( i_values );
+            OPENGEODE_EXCEPTION( i_values.size() % 2 == 0,
+                "[rasterize_closed_surface] Wrong "
+                "number of intervals to paint" );
+            bool paint{ true };
+            for( index_t it = 0; it < i_values.size(); it += 2, paint = !paint )
+            {
+                if( !paint )
+                {
+                    continue;
+                }
+                for( const auto i :
+                    Range{ i_values[it].id, i_values[it + 1].id + 1 } )
+                {
+                    cells.emplace_back( Grid3D::CellIndices{ i, j, k } );
+                }
+            }
+        }
+        return cells;
     }
 
     template std::vector< CellIndices< 2 > > opengeode_mesh_api

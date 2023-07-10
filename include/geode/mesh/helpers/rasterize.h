@@ -31,6 +31,9 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( Grid );
     FORWARD_DECLARATION_DIMENSION_CLASS( Segment );
     FORWARD_DECLARATION_DIMENSION_CLASS( Triangle );
+    FORWARD_DECLARATION_DIMENSION_CLASS( TriangulatedSurface );
+    ALIAS_3D( Grid );
+    ALIAS_3D( TriangulatedSurface );
 } // namespace geode
 
 namespace geode
@@ -47,4 +50,8 @@ namespace geode
     template < index_t dimension >
     std::vector< typename Grid< dimension >::CellIndices > rasterize_triangle(
         const Grid< dimension >& grid, const Triangle< dimension >& triangle );
+
+    std::vector< Grid3D::CellIndices >
+        opengeode_mesh_api rasterize_closed_surface(
+            const Grid3D& grid, const TriangulatedSurface3D& closed_surface );
 } // namespace geode
