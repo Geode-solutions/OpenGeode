@@ -46,15 +46,14 @@ namespace
         double volume{ 0 };
         for( const auto p : geode::Range{ mesh.nb_polygons() } )
         {
-            const auto& p0 = mesh.point( mesh.polygon_vertex( { p, 0 } ) );
+            const auto vertices = mesh.polygon_vertices( p );
+            const auto& p0 = mesh.point( vertices[0] );
             for( const auto v :
-                geode::LRange{ 1, mesh.nb_polygon_vertices( p ) - 1 } )
+                geode::LRange{ 2, mesh.nb_polygon_vertices( p ) } )
             {
-                volume += geode::tetrahedron_signed_volume( { p0,
-                    mesh.point( mesh.polygon_vertex( { p, v } ) ),
-                    mesh.point( mesh.polygon_vertex(
-                        { p, static_cast< geode::local_index_t >( v + 1 ) } ) ),
-                    anchor } );
+                volume += geode::tetrahedron_signed_volume(
+                    { p0, mesh.point( vertices[v - 1] ),
+                        mesh.point( vertices[v] ), anchor } );
             }
         }
         return volume;
