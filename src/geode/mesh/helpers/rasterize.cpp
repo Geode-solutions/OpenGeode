@@ -831,7 +831,7 @@ namespace geode
             auto& i_values = value.second;
             sort_unique( i_values );
             OPENGEODE_EXCEPTION( i_values.size() % 2 == 0,
-                "[BRepGridMetric::paint_block] Wrong "
+                "[rasterize_closed_surface] Wrong "
                 "number of intervals to paint" );
             bool paint{ true };
             for( index_t it = 0; it < i_values.size(); it += 2, paint = !paint )
