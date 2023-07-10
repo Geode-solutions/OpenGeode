@@ -130,7 +130,7 @@ namespace
         return surfaces;
     }
 
-    double mesh_block_volume( const geode::SolidMesh3D& mesh )
+    double block_mesh_volume( const geode::SolidMesh3D& mesh )
     {
         double total_volume{ 0 };
         for( const auto p : geode::Range{ mesh.nb_polyhedra() } )
@@ -147,7 +147,7 @@ namespace geode
     {
         if( block.mesh().nb_polyhedra() > 0 )
         {
-            return mesh_block_volume( block.mesh() );
+            return block_mesh_volume( block.mesh() );
         }
         double total_volume{ 0 };
         const auto& surfaces = sided_surfaces( brep, block );
