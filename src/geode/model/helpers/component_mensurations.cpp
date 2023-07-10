@@ -130,12 +130,26 @@ namespace
         }
         return surfaces;
     }
+
+    double mesh_block_volume( const geode::SolidMesh3D& mesh )
+    {
+        double total_volume{ 0 };
+        for( const auto p : geode::Range{ mesh.nb_polyhedra() } )
+        {
+            total_volume += mesh.polyhedron_volume( p );
+        }
+        return total_volume;
+    }
 } // namespace
 
 namespace geode
 {
     double block_volume( const BRep& brep, const Block3D& block )
     {
+        if( block.mesh().nb_polyhedra() > 0 )
+        {
+            return mesh_block_volume( block.mesh() );
+        }
         double total_volume{ 0 };
         const auto& surfaces = sided_surfaces( brep, block );
         const auto& anchor =
