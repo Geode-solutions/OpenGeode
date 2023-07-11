@@ -30,6 +30,7 @@
 #include <geode/mesh/builder/hybrid_solid_builder.h>
 #include <geode/mesh/builder/tetrahedral_solid_builder.h>
 #include <geode/mesh/core/hybrid_solid.h>
+#include <geode/mesh/core/light_regular_grid.h>
 #include <geode/mesh/core/regular_grid_solid.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
 #include <geode/mesh/helpers/detail/solid_merger.h>
@@ -49,14 +50,12 @@ namespace
         return true;
     }
 
-    std::unique_ptr< geode::TetrahedralSolid3D >
-        create_tetrahedral_solid_from_grid( const geode::RegularGrid3D& grid )
+    void create_tetrahedra_from_grid_cells(
+        const geode::TetrahedralSolid3D& tet_solid,
+        geode::TetrahedralSolidBuilder3D& builder,
+        const geode::Grid3D& grid )
     {
-        auto tet_solid = geode::TetrahedralSolid3D::create();
-        auto builder = geode::TetrahedralSolidBuilder3D::create( *tet_solid );
-        geode::detail::copy_meta_info( grid, *builder );
-        geode::detail::copy_points( grid, *builder );
-        builder->reserve_tetrahedra( 6 * grid.nb_polyhedra() );
+        builder.reserve_tetrahedra( 6 * grid.nb_cells() );
         geode::GenericMapping< geode::index_t > old2new_mapping;
         for( const auto k : geode::LRange{ grid.nb_cells_in_direction( 2 ) } )
         {
@@ -76,36 +75,36 @@ namespace
                             grid.vertex_index( cell_vertices[v] );
                         cell_mesh_vertices[v] = cell_vertex_id;
                     }
-                    const auto tetra0 = builder->create_tetrahedron(
+                    const auto tetra0 = builder.create_tetrahedron(
                         { cell_mesh_vertices[0], cell_mesh_vertices[1],
                             cell_mesh_vertices[2], cell_mesh_vertices[5] } );
-                    const auto tetra1 = builder->create_tetrahedron(
+                    const auto tetra1 = builder.create_tetrahedron(
                         { cell_mesh_vertices[1], cell_mesh_vertices[3],
                             cell_mesh_vertices[2], cell_mesh_vertices[5] } );
-                    const auto tetra2 = builder->create_tetrahedron(
+                    const auto tetra2 = builder.create_tetrahedron(
                         { cell_mesh_vertices[3], cell_mesh_vertices[7],
                             cell_mesh_vertices[2], cell_mesh_vertices[5] } );
-                    const auto tetra3 = builder->create_tetrahedron(
+                    const auto tetra3 = builder.create_tetrahedron(
                         { cell_mesh_vertices[5], cell_mesh_vertices[7],
                             cell_mesh_vertices[2], cell_mesh_vertices[6] } );
-                    const auto tetra4 = builder->create_tetrahedron(
+                    const auto tetra4 = builder.create_tetrahedron(
                         { cell_mesh_vertices[5], cell_mesh_vertices[6],
                             cell_mesh_vertices[2], cell_mesh_vertices[4] } );
-                    const auto tetra5 = builder->create_tetrahedron(
+                    const auto tetra5 = builder.create_tetrahedron(
                         { cell_mesh_vertices[4], cell_mesh_vertices[0],
                             cell_mesh_vertices[2], cell_mesh_vertices[5] } );
-                    builder->set_polyhedron_adjacent( { tetra1, 0 }, tetra2 );
-                    builder->set_polyhedron_adjacent( { tetra1, 1 }, tetra0 );
-                    builder->set_polyhedron_adjacent( { tetra0, 0 }, tetra1 );
-                    builder->set_polyhedron_adjacent( { tetra0, 1 }, tetra5 );
-                    builder->set_polyhedron_adjacent( { tetra2, 0 }, tetra3 );
-                    builder->set_polyhedron_adjacent( { tetra2, 1 }, tetra1 );
-                    builder->set_polyhedron_adjacent( { tetra3, 1 }, tetra4 );
-                    builder->set_polyhedron_adjacent( { tetra3, 3 }, tetra2 );
-                    builder->set_polyhedron_adjacent( { tetra4, 1 }, tetra5 );
-                    builder->set_polyhedron_adjacent( { tetra4, 3 }, tetra3 );
-                    builder->set_polyhedron_adjacent( { tetra5, 0 }, tetra0 );
-                    builder->set_polyhedron_adjacent( { tetra5, 1 }, tetra4 );
+                    builder.set_polyhedron_adjacent( { tetra1, 0 }, tetra2 );
+                    builder.set_polyhedron_adjacent( { tetra1, 1 }, tetra0 );
+                    builder.set_polyhedron_adjacent( { tetra0, 0 }, tetra1 );
+                    builder.set_polyhedron_adjacent( { tetra0, 1 }, tetra5 );
+                    builder.set_polyhedron_adjacent( { tetra2, 0 }, tetra3 );
+                    builder.set_polyhedron_adjacent( { tetra2, 1 }, tetra1 );
+                    builder.set_polyhedron_adjacent( { tetra3, 1 }, tetra4 );
+                    builder.set_polyhedron_adjacent( { tetra3, 3 }, tetra2 );
+                    builder.set_polyhedron_adjacent( { tetra4, 1 }, tetra5 );
+                    builder.set_polyhedron_adjacent( { tetra4, 3 }, tetra3 );
+                    builder.set_polyhedron_adjacent( { tetra5, 0 }, tetra0 );
+                    builder.set_polyhedron_adjacent( { tetra5, 1 }, tetra4 );
                     old2new_mapping.map( cell, tetra0 );
                     old2new_mapping.map( cell, tetra1 );
                     old2new_mapping.map( cell, tetra2 );
@@ -115,11 +114,37 @@ namespace
                 }
             }
         }
-        builder->compute_polyhedron_adjacencies();
-        geode::detail::copy_attributes( grid.vertex_attribute_manager(),
-            tet_solid->vertex_attribute_manager() );
-        tet_solid->polyhedron_attribute_manager().import(
-            grid.polyhedron_attribute_manager(), old2new_mapping );
+        builder.compute_polyhedron_adjacencies();
+        geode::detail::copy_attributes( grid.grid_vertex_attribute_manager(),
+            tet_solid.vertex_attribute_manager() );
+        tet_solid.polyhedron_attribute_manager().import(
+            grid.cell_attribute_manager(), old2new_mapping );
+    }
+
+    std::unique_ptr< geode::TetrahedralSolid3D >
+        create_tetrahedral_solid_from_grid(
+            const geode::LightRegularGrid3D& grid )
+    {
+        auto tet_solid = geode::TetrahedralSolid3D::create();
+        auto builder = geode::TetrahedralSolidBuilder3D::create( *tet_solid );
+        builder->create_vertices( grid.nb_grid_vertices() );
+        for( const auto v : geode::Range{ grid.nb_grid_vertices() } )
+        {
+            builder->set_point(
+                v, grid.grid_point( grid.vertex_indices( v ) ) );
+        }
+        create_tetrahedra_from_grid_cells( *tet_solid, *builder, grid );
+        return tet_solid;
+    }
+
+    std::unique_ptr< geode::TetrahedralSolid3D >
+        create_tetrahedral_solid_from_grid( const geode::RegularGrid3D& grid )
+    {
+        auto tet_solid = geode::TetrahedralSolid3D::create();
+        auto builder = geode::TetrahedralSolidBuilder3D::create( *tet_solid );
+        geode::detail::copy_meta_info( grid, *builder );
+        geode::detail::copy_points( grid, *builder );
+        create_tetrahedra_from_grid_cells( *tet_solid, *builder, grid );
         return tet_solid;
     }
 
@@ -235,6 +260,13 @@ namespace geode
         };
     }
 
+    template < class GridType >
+    std::unique_ptr< TetrahedralSolid3D > convert_grid_into_tetrahedral_solid(
+        const GridType& grid )
+    {
+        return create_tetrahedral_solid_from_grid( grid );
+    }
+
     absl::optional< std::unique_ptr< HybridSolid3D > >
         convert_solid_mesh_into_hybrid_solid( const SolidMesh3D& solid )
     {
@@ -298,4 +330,9 @@ namespace geode
         detail::SolidMeshMerger3D merger{ solids, global_epsilon };
         return merger.merge();
     }
+
+    template std::unique_ptr< TetrahedralSolid3D > opengeode_mesh_api
+        convert_grid_into_tetrahedral_solid( const LightRegularGrid3D& grid );
+    template std::unique_ptr< TetrahedralSolid3D > opengeode_mesh_api
+        convert_grid_into_tetrahedral_solid( const RegularGrid3D& grid );
 } // namespace geode

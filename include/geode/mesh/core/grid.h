@@ -133,6 +133,8 @@ namespace geode
 
         virtual AttributeManager& cell_attribute_manager() const = 0;
 
+        virtual AttributeManager& grid_vertex_attribute_manager() const = 0;
+
         BoundingBox< dimension > grid_bounding_box() const;
 
     public:

@@ -39,34 +39,33 @@ namespace geode
     class RegularGridPointFunction< dimension, point_dimension >::Impl
     {
     public:
-        Impl( const RegularGrid< dimension >& grid,
+        Impl( const Grid< dimension >& grid,
             absl::string_view function_name,
             Point< point_dimension > value )
             : grid_( grid )
         {
             OPENGEODE_EXCEPTION(
-                !grid_.vertex_attribute_manager().attribute_exists(
+                !grid_.grid_vertex_attribute_manager().attribute_exists(
                     function_name ),
-                "Cannot create RegularGridPointFunction: attribute with name",
+                "Cannot create RegularGridPointFunction: attribute with name ",
                 function_name, " already exists." );
             function_attribute_ =
-                grid_.vertex_attribute_manager()
+                grid_.grid_vertex_attribute_manager()
                     .template find_or_create_attribute< VariableAttribute,
                         Point< point_dimension > >(
                         function_name, std::move( value ), { false, true } );
         }
 
-        Impl( const RegularGrid< dimension >& grid,
-            absl::string_view function_name )
+        Impl( const Grid< dimension >& grid, absl::string_view function_name )
             : grid_( grid )
         {
             OPENGEODE_EXCEPTION(
-                grid_.vertex_attribute_manager().attribute_exists(
+                grid_.grid_vertex_attribute_manager().attribute_exists(
                     function_name ),
                 "Cannot create RegularGridPointFunction: attribute with name",
                 function_name, " does not exist." );
             function_attribute_ =
-                grid_.vertex_attribute_manager()
+                grid_.grid_vertex_attribute_manager()
                     .template find_or_create_attribute< VariableAttribute,
                         Point< point_dimension > >( function_name,
                         Point< point_dimension >(), { false, true } );
@@ -116,7 +115,7 @@ namespace geode
         }
 
     private:
-        const RegularGrid< dimension >& grid_;
+        const Grid< dimension >& grid_;
         std::shared_ptr< VariableAttribute< Point< point_dimension > > >
             function_attribute_;
     };
@@ -130,18 +129,20 @@ namespace geode
     }
 
     template < index_t dimension, index_t point_dimension >
-    RegularGridPointFunction< dimension, point_dimension >::
-        RegularGridPointFunction( const RegularGrid< dimension >& grid,
-            absl::string_view function_name,
-            Point< point_dimension > value )
+    RegularGridPointFunction< dimension,
+        point_dimension >::RegularGridPointFunction( const Grid< dimension >&
+                                                         grid,
+        absl::string_view function_name,
+        Point< point_dimension > value )
         : impl_{ grid, function_name, value }
     {
     }
 
     template < index_t dimension, index_t point_dimension >
-    RegularGridPointFunction< dimension, point_dimension >::
-        RegularGridPointFunction( const RegularGrid< dimension >& grid,
-            absl::string_view function_name )
+    RegularGridPointFunction< dimension,
+        point_dimension >::RegularGridPointFunction( const Grid< dimension >&
+                                                         grid,
+        absl::string_view function_name )
         : impl_{ grid, function_name }
     {
     }
@@ -155,7 +156,7 @@ namespace geode
     template < index_t dimension, index_t point_dimension >
     RegularGridPointFunction< dimension, point_dimension >
         RegularGridPointFunction< dimension, point_dimension >::create(
-            const RegularGrid< dimension >& grid,
+            const Grid< dimension >& grid,
             absl::string_view function_name,
             Point< point_dimension > value )
     {
@@ -165,8 +166,7 @@ namespace geode
     template < index_t dimension, index_t point_dimension >
     RegularGridPointFunction< dimension, point_dimension >
         RegularGridPointFunction< dimension, point_dimension >::find(
-            const RegularGrid< dimension >& grid,
-            absl::string_view function_name )
+            const Grid< dimension >& grid, absl::string_view function_name )
     {
         return { grid, function_name };
     }

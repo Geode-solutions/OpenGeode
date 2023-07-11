@@ -50,7 +50,7 @@ namespace geode
          * Throws an exception if an attribute with the same name exists.
          */
         static RegularGridPointFunction< dimension, point_dimension > create(
-            const RegularGrid< dimension >& grid,
+            const Grid< dimension >& grid,
             absl::string_view function_name,
             Point< point_dimension > value );
 
@@ -60,8 +60,7 @@ namespace geode
          * Throws an exception if no attribute with the same name exists.
          */
         static RegularGridPointFunction< dimension, point_dimension > find(
-            const RegularGrid< dimension >& grid,
-            absl::string_view function_name );
+            const Grid< dimension >& grid, absl::string_view function_name );
 
         void set_value(
             const typename Grid< dimension >::VertexIndices& vertex_index,
@@ -80,10 +79,10 @@ namespace geode
             const;
 
     private:
-        RegularGridPointFunction( const RegularGrid< dimension >& grid,
-            absl::string_view function_name );
+        RegularGridPointFunction(
+            const Grid< dimension >& grid, absl::string_view function_name );
 
-        RegularGridPointFunction( const RegularGrid< dimension >& grid,
+        RegularGridPointFunction( const Grid< dimension >& grid,
             absl::string_view function_name,
             Point< point_dimension > value );
 

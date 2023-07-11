@@ -50,7 +50,7 @@ namespace geode
          * Throws an exception if an attribute with the same name exists.
          */
         static RegularGridScalarFunction< dimension > create(
-            const RegularGrid< dimension >& grid,
+            const Grid< dimension >& grid,
             absl::string_view function_name,
             double value );
 
@@ -60,8 +60,7 @@ namespace geode
          * Throws an exception if no attribute with the same name exists.
          */
         static RegularGridScalarFunction< dimension > find(
-            const RegularGrid< dimension >& grid,
-            absl::string_view function_name );
+            const Grid< dimension >& grid, absl::string_view function_name );
 
         void set_value(
             const typename Grid< dimension >::VertexIndices& vertex_index,
@@ -80,10 +79,10 @@ namespace geode
             const;
 
     private:
-        RegularGridScalarFunction( const RegularGrid< dimension >& grid,
-            absl::string_view function_name );
+        RegularGridScalarFunction(
+            const Grid< dimension >& grid, absl::string_view function_name );
 
-        RegularGridScalarFunction( const RegularGrid< dimension >& grid,
+        RegularGridScalarFunction( const Grid< dimension >& grid,
             absl::string_view function_name,
             double value );
 
