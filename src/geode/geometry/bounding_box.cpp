@@ -178,8 +178,8 @@ namespace geode
     void BoundingBox< dimension >::add_box(
         const BoundingBox< dimension >& box )
     {
-        add_point( box.min() );
-        add_point( box.max() );
+        add_point( box.min_ );
+        add_point( box.max_ );
     }
 
     template < index_t dimension >
@@ -188,8 +188,8 @@ namespace geode
     {
         for( const auto i : LRange{ dimension } )
         {
-            if( point.value( i ) < min().value( i )
-                || point.value( i ) > max().value( i ) )
+            if( point.value( i ) < min_.value( i )
+                || point.value( i ) > max_.value( i ) )
             {
                 return false;
             }
@@ -203,8 +203,8 @@ namespace geode
     {
         for( const auto i : LRange{ dimension } )
         {
-            if( max().value( i ) < box.min().value( i )
-                || min().value( i ) > box.max().value( i ) )
+            if( max_.value( i ) < box.min_.value( i )
+                || min_.value( i ) > box.max_.value( i ) )
             {
                 return false;
             }
@@ -304,13 +304,15 @@ namespace geode
             interval.add_point( { { normal.dot( vertices[2].get() ) } } );
             return interval;
         };
-        const auto bbox_projection = [this]( const Vector3D& normal ) {
-            const auto origin = normal.dot( center() );
-            const auto extent = diagonal();
+        const auto box_center = center();
+        const auto box_diagonal = diagonal();
+        const auto bbox_projection = [this, &box_center, &box_diagonal](
+                                         const Vector3D& normal ) {
+            const auto origin = normal.dot( box_center );
             const auto maximum_extent =
-                ( std::fabs( normal.value( 0 ) * extent.value( 0 ) )
-                    + std::fabs( normal.value( 1 ) * extent.value( 1 ) )
-                    + std::fabs( normal.value( 2 ) * extent.value( 2 ) ) )
+                ( std::fabs( normal.value( 0 ) * box_diagonal.value( 0 ) )
+                    + std::fabs( normal.value( 1 ) * box_diagonal.value( 1 ) )
+                    + std::fabs( normal.value( 2 ) * box_diagonal.value( 2 ) ) )
                 / 2.;
             return BoundingBox1D{ { { origin - maximum_extent } },
                 { { origin + maximum_extent } } };
@@ -329,14 +331,12 @@ namespace geode
         }
 
         // Test direction of box faces.
-        const auto box_center = center();
-        const auto box_diagonal = diagonal();
         for( const auto i : LRange{ 3 } )
         {
             Vector3D axis;
             axis.set_value( i, 1 );
             const auto triangle_interval = triangle_projection( axis );
-            const auto& center_value = box_center.value( i );
+            const auto center_value = box_center.value( i );
             const auto extent = box_diagonal.value( i ) / 2.;
             const BoundingBox1D box_interval{ { { center_value - extent } },
                 { { center_value + extent } } };
@@ -419,13 +419,13 @@ namespace geode
     template < index_t dimension >
     Point< dimension > BoundingBox< dimension >::center() const
     {
-        return ( min() + max() ) / 2.;
+        return ( min_ + max_ ) / 2.;
     }
 
     template < index_t dimension >
     Vector< dimension > BoundingBox< dimension >::diagonal() const
     {
-        return { min(), max() };
+        return { min_, max_ };
     }
 
     template < index_t dimension >
@@ -437,23 +437,23 @@ namespace geode
         for( const auto c : LRange{ dimension } )
         {
             const auto value = point.value( c );
-            if( value < min().value( c ) )
+            if( value < min_.value( c ) )
             {
                 inside = false;
-                result.set_value( c, value - min().value( c ) );
+                result.set_value( c, value - min_.value( c ) );
             }
-            else if( value > max().value( c ) )
+            else if( value > max_.value( c ) )
             {
                 inside = false;
-                result.set_value( c, value - max().value( c ) );
+                result.set_value( c, value - max_.value( c ) );
             }
         }
         if( !inside )
         {
             return result.length();
         }
-        const auto Pmin = point - min();
-        const auto Pmax = point - max();
+        const auto Pmin = point - min_;
+        const auto Pmax = point - max_;
         auto inner_distance = std::numeric_limits< double >::max();
         for( const auto c : geode::LRange{ dimension } )
         {
