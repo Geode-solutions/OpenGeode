@@ -47,7 +47,7 @@ namespace geode
     template < index_t dimension >
     SquareMatrix< dimension >::SquareMatrix(
         std::array< Vector< dimension >, dimension > matrix_rows )
-        : matrix_rows_{ std::move( matrix_rows ) }
+        : matrix_rows_( std::move( matrix_rows ) )
     {
     }
 

@@ -119,8 +119,8 @@ namespace
                 find_surface_side( brep, surface_uuid, processed );
             if( surface_side )
             {
-                surfaces.emplace_back( surface_uuid, surface_side );
-                processed.emplace( surface_uuid, surface_side );
+                surfaces.emplace_back( surface_uuid, surface_side.value() );
+                processed.emplace( surface_uuid, surface_side.value() );
             }
             else
             {
