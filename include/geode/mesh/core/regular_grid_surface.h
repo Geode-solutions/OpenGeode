@@ -72,6 +72,8 @@ namespace geode
 
         AttributeManager& cell_attribute_manager() const override;
 
+        AttributeManager& grid_vertex_attribute_manager() const override;
+
         std::unique_ptr< RegularGrid2D > clone() const;
 
     protected:

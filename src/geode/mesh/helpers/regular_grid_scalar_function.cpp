@@ -39,33 +39,32 @@ namespace geode
     class RegularGridScalarFunction< dimension >::Impl
     {
     public:
-        Impl( const RegularGrid< dimension >& grid,
+        Impl( const Grid< dimension >& grid,
             absl::string_view function_name,
             double value )
             : grid_( grid )
         {
             OPENGEODE_EXCEPTION(
-                !grid_.vertex_attribute_manager().attribute_exists(
+                !grid_.grid_vertex_attribute_manager().attribute_exists(
                     function_name ),
-                "Cannot create RegularGridScalarFunction: attribute with name",
+                "Cannot create RegularGridScalarFunction: attribute with name ",
                 function_name, " already exists." );
             function_attribute_ =
-                grid_.vertex_attribute_manager()
+                grid_.grid_vertex_attribute_manager()
                     .template find_or_create_attribute< VariableAttribute,
                         double >( function_name, value, { false, true } );
         }
 
-        Impl( const RegularGrid< dimension >& grid,
-            absl::string_view function_name )
+        Impl( const Grid< dimension >& grid, absl::string_view function_name )
             : grid_( grid )
         {
             OPENGEODE_EXCEPTION(
-                grid_.vertex_attribute_manager().attribute_exists(
+                grid_.grid_vertex_attribute_manager().attribute_exists(
                     function_name ),
                 "Cannot create RegularGridScalarFunction: attribute with name",
                 function_name, " does not exist." );
             function_attribute_ =
-                grid_.vertex_attribute_manager()
+                grid_.grid_vertex_attribute_manager()
                     .template find_or_create_attribute< VariableAttribute,
                         double >( function_name, 0, { false, true } );
         }
@@ -114,7 +113,7 @@ namespace geode
         }
 
     private:
-        const RegularGrid< dimension >& grid_;
+        const Grid< dimension >& grid_;
         std::shared_ptr< VariableAttribute< double > > function_attribute_;
     };
 
@@ -127,7 +126,7 @@ namespace geode
 
     template < index_t dimension >
     RegularGridScalarFunction< dimension >::RegularGridScalarFunction(
-        const RegularGrid< dimension >& grid,
+        const Grid< dimension >& grid,
         absl::string_view function_name,
         double value )
         : impl_{ grid, function_name, value }
@@ -136,7 +135,7 @@ namespace geode
 
     template < index_t dimension >
     RegularGridScalarFunction< dimension >::RegularGridScalarFunction(
-        const RegularGrid< dimension >& grid, absl::string_view function_name )
+        const Grid< dimension >& grid, absl::string_view function_name )
         : impl_{ grid, function_name }
     {
     }
@@ -149,7 +148,7 @@ namespace geode
     template < index_t dimension >
     RegularGridScalarFunction< dimension >
         RegularGridScalarFunction< dimension >::create(
-            const RegularGrid< dimension >& grid,
+            const Grid< dimension >& grid,
             absl::string_view function_name,
             double value )
     {
@@ -159,8 +158,7 @@ namespace geode
     template < index_t dimension >
     RegularGridScalarFunction< dimension >
         RegularGridScalarFunction< dimension >::find(
-            const RegularGrid< dimension >& grid,
-            absl::string_view function_name )
+            const Grid< dimension >& grid, absl::string_view function_name )
     {
         return { grid, function_name };
     }

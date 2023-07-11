@@ -43,6 +43,10 @@ namespace geode
     absl::optional< std::unique_ptr< TetrahedralSolid3D > > opengeode_mesh_api
         convert_solid_mesh_into_tetrahedral_solid( const SolidMesh3D& solid );
 
+    template < class GridType >
+    std::unique_ptr< TetrahedralSolid3D > convert_grid_into_tetrahedral_solid(
+        const GridType& grid );
+
     absl::optional< std::unique_ptr< HybridSolid3D > > opengeode_mesh_api
         convert_solid_mesh_into_hybrid_solid( const SolidMesh3D& solid );
 

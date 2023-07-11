@@ -60,6 +60,11 @@ namespace geode
         return polyhedron_attribute_manager();
     }
 
+    AttributeManager& RegularGrid< 3 >::grid_vertex_attribute_manager() const
+    {
+        return vertex_attribute_manager();
+    }
+
     template < typename Archive >
     void RegularGrid< 3 >::serialize( Archive& archive )
     {

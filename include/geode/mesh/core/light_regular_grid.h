@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <geode/basic/identifier.h>
 #include <geode/basic/pimpl.h>
 
 #include <geode/mesh/common.h>
@@ -37,7 +38,7 @@ namespace geode
 namespace geode
 {
     template < index_t dimension >
-    class LightRegularGrid : public Grid< dimension >
+    class LightRegularGrid : public Grid< dimension >, Identifier
     {
     public:
         static constexpr auto dim = dimension;
@@ -59,6 +60,8 @@ namespace geode
         CellIndices cell_indices( index_t index ) const override;
 
         AttributeManager& cell_attribute_manager() const override;
+
+        AttributeManager& grid_vertex_attribute_manager() const override;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

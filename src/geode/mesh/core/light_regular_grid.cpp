@@ -43,13 +43,21 @@ namespace geode
             return cell_attribute_manager_;
         }
 
-        void initialize_attribute_manager( index_t nb_cells )
+        AttributeManager& vertex_attribute_manager() const
+        {
+            return vertex_attribute_manager_;
+        }
+
+        void initialize_attribute_managers(
+            index_t nb_cells, index_t nb_vertices )
         {
             cell_attribute_manager_.resize( nb_cells );
+            vertex_attribute_manager_.resize( nb_vertices );
         }
 
     private:
         mutable AttributeManager cell_attribute_manager_;
+        mutable AttributeManager vertex_attribute_manager_;
     };
 
     template < index_t dimension >
@@ -61,7 +69,8 @@ namespace geode
         builder.set_grid_origin( std::move( origin ) );
         builder.set_grid_dimensions(
             std::move( cells_number ), std::move( cells_length ) );
-        impl_->initialize_attribute_manager( this->nb_cells() );
+        impl_->initialize_attribute_managers(
+            this->nb_cells(), this->nb_grid_vertices() );
     }
 
     template < index_t dimension >
@@ -109,6 +118,13 @@ namespace geode
         LightRegularGrid< dimension >::cell_attribute_manager() const
     {
         return impl_->cell_attribute_manager();
+    }
+
+    template < index_t dimension >
+    AttributeManager&
+        LightRegularGrid< dimension >::grid_vertex_attribute_manager() const
+    {
+        return impl_->vertex_attribute_manager();
     }
 
     template class opengeode_mesh_api LightRegularGrid< 2 >;
