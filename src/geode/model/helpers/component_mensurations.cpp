@@ -26,6 +26,7 @@
 #include <queue>
 
 #include <geode/geometry/basic_objects/tetrahedron.h>
+#include <geode/geometry/bounding_box.h>
 #include <geode/geometry/mensuration.h>
 #include <geode/geometry/point.h>
 
@@ -167,6 +168,16 @@ namespace geode
             }
         }
         return std::fabs( total_volume );
+    }
+
+    BoundingBox3D block_bbox( const BRep& brep, const Block3D& block )
+    {
+        BoundingBox3D result;
+        for( const auto& surface : brep.boundaries( block ) )
+        {
+            result.add_box( surface.mesh().bounding_box() );
+        }
+        return result;
     }
 
     template < index_t dimension >

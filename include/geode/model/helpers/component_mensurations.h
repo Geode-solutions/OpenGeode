@@ -30,12 +30,17 @@ namespace geode
     class BRep;
     FORWARD_DECLARATION_DIMENSION_CLASS( Surface );
     FORWARD_DECLARATION_DIMENSION_CLASS( Block );
+    FORWARD_DECLARATION_DIMENSION_CLASS( BoundingBox );
     ALIAS_3D( Block );
+    ALIAS_2D_AND_3D( BoundingBox );
 } // namespace geode
 
 namespace geode
 {
     double opengeode_model_api block_volume(
+        const BRep& brep, const Block3D& block );
+
+    BoundingBox3D opengeode_model_api block_bounding_box(
         const BRep& brep, const Block3D& block );
 
     template < index_t dimension >
