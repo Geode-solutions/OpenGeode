@@ -428,7 +428,7 @@ namespace geode
          * Return the normal of a given PolyhedronFacet.
          * @param[in] polyhedron_facet Local index of facet in polyhedron.
          */
-        absl::optional< Vector3D >  new_polyhedron_facet_normal(
+        absl::optional< Vector3D > new_polyhedron_facet_normal(
             const PolyhedronFacet& polyhedron_facet ) const;
 
         /*!
