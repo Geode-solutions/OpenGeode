@@ -70,7 +70,7 @@ namespace geode
         using LineEdges = absl::flat_hash_map< uuid, std::vector< index_t > >;
         using SurfaceEdges =
             absl::flat_hash_map< uuid, std::vector< PolygonEdge > >;
-
+        std::array< index_t, 2 > edge_unique_vertices;
         LineEdges line_edges;
         SurfaceEdges surface_edges;
     };

@@ -77,6 +77,7 @@ namespace
         const ModelType& model,
         const std::array< geode::index_t, 2 >& edge_unique_vertices )
     {
+        edges.edge_unique_vertices = edge_unique_vertices;
         edges.line_edges = geode::detail::line_component_mesh_edges(
             model, edge_unique_vertices );
         edges.surface_edges = geode::detail::surface_component_mesh_edges(
