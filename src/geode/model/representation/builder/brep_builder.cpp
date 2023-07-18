@@ -83,6 +83,21 @@ namespace geode
         return mappings;
     }
 
+    void BRepBuilder::copy_components(
+        ModelCopyMapping& mapping, const BRep& brep )
+    {
+        detail::copy_corner_components(
+            brep, *this, mapping[Corner3D::component_type_static()] );
+        detail::copy_line_components(
+            brep, *this, mapping[Line3D::component_type_static()] );
+        detail::copy_surface_components(
+            brep, *this, mapping[Surface3D::component_type_static()] );
+        detail::copy_block_components(
+            brep, *this, mapping[Block3D::component_type_static()] );
+        detail::copy_model_boundary_components(
+            brep, *this, mapping[ModelBoundary3D::component_type_static()] );
+    }
+
     void BRepBuilder::copy_component_geometry(
         const ModelCopyMapping& mappings, const BRep& brep )
     {
@@ -160,6 +175,51 @@ namespace geode
     {
         const auto& id = create_model_boundary();
         return id;
+    }
+
+    void BRepBuilder::add_corner( uuid corner_id )
+    {
+        create_corner( std::move( corner_id ) );
+    }
+
+    void BRepBuilder::add_corner( uuid corner_id, const MeshImpl& impl )
+    {
+        create_corner( std::move( corner_id ), impl );
+    }
+
+    void BRepBuilder::add_line( uuid line_id )
+    {
+        create_line( std::move( line_id ) );
+    }
+
+    void BRepBuilder::add_line( uuid line_id, const MeshImpl& impl )
+    {
+        create_line( std::move( line_id ), impl );
+    }
+
+    void BRepBuilder::add_surface( uuid surface_id )
+    {
+        create_surface( std::move( surface_id ) );
+    }
+
+    void BRepBuilder::add_surface( uuid surface_id, const MeshImpl& impl )
+    {
+        create_surface( std::move( surface_id ), impl );
+    }
+
+    void BRepBuilder::add_block( uuid block_id )
+    {
+        create_block( std::move( block_id ) );
+    }
+
+    void BRepBuilder::add_block( uuid block_id, const MeshImpl& impl )
+    {
+        create_block( std::move( block_id ), impl );
+    }
+
+    void BRepBuilder::add_model_boundary( uuid model_boundary_id )
+    {
+        create_model_boundary( std::move( model_boundary_id ) );
     }
 
     void BRepBuilder::update_corner_mesh(

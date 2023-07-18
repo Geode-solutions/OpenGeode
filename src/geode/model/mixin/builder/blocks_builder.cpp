@@ -44,6 +44,19 @@ namespace geode
     }
 
     template < index_t dimension >
+    void BlocksBuilder< dimension >::create_block( uuid block_id )
+    {
+        blocks_.create_block( std::move( block_id ) );
+    }
+
+    template < index_t dimension >
+    void BlocksBuilder< dimension >::create_block(
+        uuid block_id, const MeshImpl& impl )
+    {
+        blocks_.create_block( std::move( block_id ), impl );
+    }
+
+    template < index_t dimension >
     void BlocksBuilder< dimension >::delete_block(
         const Block< dimension >& block )
     {

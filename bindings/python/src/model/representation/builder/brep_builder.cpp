@@ -49,7 +49,8 @@ namespace geode
                 ( const uuid& (BRepBuilder::*) () ) & BRepBuilder::add_surface )
             .def( "add_block",
                 ( const uuid& (BRepBuilder::*) () ) & BRepBuilder::add_block )
-            .def( "add_model_boundary", &BRepBuilder::add_model_boundary )
+            .def( "add_model_boundary", ( const uuid& (BRepBuilder::*) () )
+                                            & BRepBuilder::add_model_boundary )
             .def( "remove_corner", &BRepBuilder::remove_corner )
             .def( "remove_line", &BRepBuilder::remove_line )
             .def( "remove_surface", &BRepBuilder::remove_surface )

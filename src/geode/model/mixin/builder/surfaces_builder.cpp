@@ -45,6 +45,19 @@ namespace geode
     }
 
     template < index_t dimension >
+    void SurfacesBuilder< dimension >::create_surface( uuid surface_id )
+    {
+        surfaces_.create_surface( std::move( surface_id ) );
+    }
+
+    template < index_t dimension >
+    void SurfacesBuilder< dimension >::create_surface(
+        uuid surface_id, const MeshImpl& impl )
+    {
+        surfaces_.create_surface( std::move( surface_id ), impl );
+    }
+
+    template < index_t dimension >
     void SurfacesBuilder< dimension >::delete_surface(
         const Surface< dimension >& surface )
     {

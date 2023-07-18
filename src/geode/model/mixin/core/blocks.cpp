@@ -25,6 +25,7 @@
 
 #include <async++.h>
 
+#include <geode/basic/identifier_builder.h>
 #include <geode/basic/pimpl_impl.h>
 #include <geode/basic/range.h>
 
@@ -212,6 +213,27 @@ namespace geode
         const auto& id = block->id();
         impl_->add_component( std::move( block ) );
         return id;
+    }
+
+    template < index_t dimension >
+    void Blocks< dimension >::create_block( uuid block_id )
+    {
+        typename Blocks< dimension >::Impl::ComponentPtr block{
+            new Block< dimension >{ typename Block< dimension >::BlocksKey{} }
+        };
+        IdentifierBuilder{ *block }.set_id( std::move( block_id ) );
+        impl_->add_component( std::move( block ) );
+    }
+
+    template < index_t dimension >
+    void Blocks< dimension >::create_block(
+        uuid block_id, const MeshImpl& impl )
+    {
+        typename Blocks< dimension >::Impl::ComponentPtr block{
+            new Block< dimension >{ impl, {} }
+        };
+        IdentifierBuilder{ *block }.set_id( std::move( block_id ) );
+        impl_->add_component( std::move( block ) );
     }
 
     template < index_t dimension >

@@ -54,7 +54,7 @@ namespace geode
             section_.nb_corners() + section_.nb_lines() + section_.nb_surfaces()
             + section_.nb_model_boundaries() + section_.nb_unique_vertices();
         OPENGEODE_EXCEPTION( nb_components == 0,
-            "[BRepBuild::copy] Section should be empty before copy. To add "
+            "[SectionBuild::copy] Section should be empty before copy. To add "
             "Section components in a Section which is not empty, use "
             "ModelConcatener." );
         set_name( section.name() );
@@ -76,6 +76,19 @@ namespace geode
         mappings.emplace( ModelBoundary2D::component_type_static(),
             detail::copy_model_boundary_components( section, *this ) );
         return mappings;
+    }
+
+    void SectionBuilder::copy_components(
+        ModelCopyMapping& mapping, const Section& section )
+    {
+        detail::copy_corner_components(
+            section, *this, mapping[Corner3D::component_type_static()] );
+        detail::copy_line_components(
+            section, *this, mapping[Line3D::component_type_static()] );
+        detail::copy_surface_components(
+            section, *this, mapping[Surface3D::component_type_static()] );
+        detail::copy_model_boundary_components(
+            section, *this, mapping[ModelBoundary3D::component_type_static()] );
     }
 
     void SectionBuilder::copy_component_geometry(
@@ -139,6 +152,41 @@ namespace geode
     {
         const auto& id = create_model_boundary();
         return id;
+    }
+
+    void SectionBuilder::add_corner( uuid corner_id )
+    {
+        create_corner( std::move( corner_id ) );
+    }
+
+    void SectionBuilder::add_corner( uuid corner_id, const MeshImpl& impl )
+    {
+        create_corner( std::move( corner_id ), impl );
+    }
+
+    void SectionBuilder::add_line( uuid line_id )
+    {
+        create_line( std::move( line_id ) );
+    }
+
+    void SectionBuilder::add_line( uuid line_id, const MeshImpl& impl )
+    {
+        create_line( std::move( line_id ), impl );
+    }
+
+    void SectionBuilder::add_surface( uuid surface_id )
+    {
+        create_surface( std::move( surface_id ) );
+    }
+
+    void SectionBuilder::add_surface( uuid surface_id, const MeshImpl& impl )
+    {
+        create_surface( std::move( surface_id ), impl );
+    }
+
+    void SectionBuilder::add_model_boundary( uuid model_boundary_id )
+    {
+        create_model_boundary( std::move( model_boundary_id ) );
     }
 
     void SectionBuilder::update_corner_mesh(
