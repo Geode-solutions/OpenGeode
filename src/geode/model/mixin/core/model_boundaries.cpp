@@ -23,6 +23,7 @@
 
 #include <geode/model/mixin/core/model_boundaries.h>
 
+#include <geode/basic/identifier_builder.h>
 #include <geode/basic/pimpl_impl.h>
 #include <geode/basic/range.h>
 
@@ -122,6 +123,18 @@ namespace geode
         const auto& id = boundary->id();
         impl_->add_component( std::move( boundary ) );
         return id;
+    }
+
+    template < index_t dimension >
+    void ModelBoundaries< dimension >::create_model_boundary(
+        uuid model_boundary_id )
+    {
+        typename ModelBoundaries< dimension >::Impl::ComponentPtr
+            model_boundary{ new ModelBoundary< dimension >{
+                typename ModelBoundary< dimension >::ModelBoundariesKey{} } };
+        IdentifierBuilder{ *model_boundary }.set_id(
+            std::move( model_boundary_id ) );
+        impl_->add_component( std::move( model_boundary ) );
     }
 
     template < index_t dimension >

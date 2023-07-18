@@ -90,6 +90,8 @@ namespace geode
 
         ModelCopyMapping copy_components( const BRep& brep );
 
+        void copy_components( ModelCopyMapping& mapping, const BRep& brep );
+
         void copy_component_geometry(
             const ModelCopyMapping& mapping, const BRep& brep );
 
@@ -110,6 +112,24 @@ namespace geode
         const uuid& add_block( const MeshImpl& impl );
 
         const uuid& add_model_boundary();
+
+        void add_corner( uuid corner_id );
+
+        void add_corner( uuid corner_id, const MeshImpl& impl );
+
+        void add_line( uuid line_id );
+
+        void add_line( uuid line_id, const MeshImpl& impl );
+
+        void add_surface( uuid surface_id );
+
+        void add_surface( uuid surface_id, const MeshImpl& impl );
+
+        void add_block( uuid block_id );
+
+        void add_block( uuid block_id, const MeshImpl& impl );
+
+        void add_model_boundary( uuid model_boundary_id );
 
         void update_corner_mesh(
             const Corner3D& corner, std::unique_ptr< PointSet3D > mesh );

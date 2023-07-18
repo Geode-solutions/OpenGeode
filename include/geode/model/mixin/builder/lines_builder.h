@@ -63,6 +63,10 @@ namespace geode
 
         const uuid& create_line( const MeshImpl& impl );
 
+        void create_line( uuid line_id );
+
+        void create_line( uuid line_id, const MeshImpl& impl );
+
         void delete_line( const Line< dimension >& line );
 
         void set_line_mesh(

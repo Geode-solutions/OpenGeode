@@ -25,6 +25,7 @@
 
 #include <async++.h>
 
+#include <geode/basic/identifier_builder.h>
 #include <geode/basic/pimpl_impl.h>
 #include <geode/basic/range.h>
 
@@ -184,6 +185,28 @@ namespace geode
         const auto& id = corner->id();
         impl_->add_component( std::move( corner ) );
         return id;
+    }
+
+    template < index_t dimension >
+    void Corners< dimension >::create_corner( uuid corner_id )
+    {
+        typename Corners< dimension >::Impl::ComponentPtr corner{
+            new Corner< dimension >{
+                typename Corner< dimension >::CornersKey{} }
+        };
+        IdentifierBuilder{ *corner }.set_id( std::move( corner_id ) );
+        impl_->add_component( std::move( corner ) );
+    }
+
+    template < index_t dimension >
+    void Corners< dimension >::create_corner(
+        uuid corner_id, const MeshImpl& impl )
+    {
+        typename Corners< dimension >::Impl::ComponentPtr corner{
+            new Corner< dimension >{ impl, {} }
+        };
+        IdentifierBuilder{ *corner }.set_id( std::move( corner_id ) );
+        impl_->add_component( std::move( corner ) );
     }
 
     template < index_t dimension >

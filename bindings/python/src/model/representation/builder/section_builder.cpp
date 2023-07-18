@@ -45,7 +45,9 @@ namespace geode
                                   & SectionBuilder::add_line )
             .def( "add_surface", ( const uuid& (SectionBuilder::*) () )
                                      & SectionBuilder::add_surface )
-            .def( "add_model_boundary", &SectionBuilder::add_model_boundary )
+            .def(
+                "add_model_boundary", ( const uuid& (SectionBuilder::*) () )
+                                          & SectionBuilder::add_model_boundary )
             .def( "remove_corner", &SectionBuilder::remove_corner )
             .def( "remove_line", &SectionBuilder::remove_line )
             .def( "remove_surface", &SectionBuilder::remove_surface )

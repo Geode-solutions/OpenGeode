@@ -71,6 +71,10 @@ namespace geode
 
         const uuid& create_block( const MeshImpl& impl );
 
+        void create_block( uuid block_id );
+
+        void create_block( uuid block_id, const MeshImpl& impl );
+
         void delete_block( const Block< dimension >& block );
 
         void set_block_mesh(
