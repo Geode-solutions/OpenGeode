@@ -170,7 +170,7 @@ namespace geode
         return std::fabs( total_volume );
     }
 
-    BoundingBox3D block_bbox( const BRep& brep, const Block3D& block )
+    BoundingBox3D block_bounding_box( const BRep& brep, const Block3D& block )
     {
         BoundingBox3D result;
         for( const auto& surface : brep.boundaries( block ) )
