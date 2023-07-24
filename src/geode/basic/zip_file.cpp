@@ -41,9 +41,8 @@ namespace
         absl::string_view file, absl::string_view temp_filename )
     {
         const auto file_string = geode::to_string( file );
-        const auto directory =
-            ghc::filesystem::path{ file_string }.parent_path()
-            / geode::to_string( temp_filename );
+        auto directory = ghc::filesystem::path{ file_string }.parent_path()
+                         / geode::to_string( temp_filename );
         ghc::filesystem::create_directory( directory );
         return directory;
     }
@@ -89,7 +88,7 @@ namespace geode
         {
             const ghc::filesystem::path file_path{ to_string( file ) };
             const auto status = mz_zip_writer_add_path(
-                writer_, file_path.string().c_str(), NULL, 0, 1 );
+                writer_, file_path.string().c_str(), nullptr, 0, 1 );
             OPENGEODE_EXCEPTION( status == MZ_OK,
                 "[ZipFile::archive_file] Error adding path to zip" );
             ghc::filesystem::remove( file_path );
@@ -111,7 +110,7 @@ namespace geode
     {
     }
 
-    ZipFile::~ZipFile() {}
+    ZipFile::~ZipFile() {} // NOLINT
 
     void ZipFile::archive_file( absl::string_view file ) const
     {
@@ -185,7 +184,7 @@ namespace geode
     {
     }
 
-    UnzipFile::~UnzipFile() {}
+    UnzipFile::~UnzipFile() {} // NOLINT
 
     void UnzipFile::extract_all() const
     {

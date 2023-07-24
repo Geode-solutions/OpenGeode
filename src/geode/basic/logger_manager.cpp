@@ -88,9 +88,9 @@ namespace geode
         std::vector< std::unique_ptr< LoggerClient > > loggers_;
     };
 
-    LoggerManager::LoggerManager() {}
+    LoggerManager::LoggerManager() {} // NOLINT
 
-    LoggerManager::~LoggerManager() {}
+    LoggerManager::~LoggerManager() {} // NOLINT
 
     void LoggerManager::register_client(
         std::unique_ptr< LoggerClient > &&client )

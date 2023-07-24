@@ -72,9 +72,9 @@ namespace geode
         std::vector< std::unique_ptr< ProgressLoggerClient > > loggers_;
     };
 
-    ProgressLoggerManager::ProgressLoggerManager() {}
+    ProgressLoggerManager::ProgressLoggerManager() {} // NOLINT
 
-    ProgressLoggerManager::~ProgressLoggerManager() {}
+    ProgressLoggerManager::~ProgressLoggerManager() {} // NOLINT
 
     void ProgressLoggerManager::register_client(
         std::unique_ptr< ProgressLoggerClient >&& client )
