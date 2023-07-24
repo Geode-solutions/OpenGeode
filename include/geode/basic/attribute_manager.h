@@ -47,7 +47,7 @@ namespace geode
 
     public:
         AttributeManager();
-        AttributeManager( AttributeManager&& other );
+        AttributeManager( AttributeManager&& other ) noexcept;
         ~AttributeManager();
 
         /*!
@@ -196,7 +196,7 @@ namespace geode
             absl::string_view old_name, absl::string_view new_name );
 
         void set_attribute_properties( absl::string_view attribute_name,
-            AttributeProperties new_properties );
+            const AttributeProperties& new_properties );
 
         /*!
          * Remove all the attributes in the manager

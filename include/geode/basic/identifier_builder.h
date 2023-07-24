@@ -38,7 +38,7 @@ namespace geode
     public:
         IdentifierBuilder( Identifier& identifier );
 
-        void set_id( uuid id );
+        void set_id( const uuid& unique_id );
 
         void set_name( absl::string_view name );
 

@@ -43,7 +43,7 @@ namespace geode
     public:
         static constexpr auto DEFAULT_NAME = "default_name";
 
-        Identifier( Identifier&& other );
+        Identifier( Identifier&& other ) noexcept;
         ~Identifier();
 
         const uuid& id() const;
@@ -53,7 +53,7 @@ namespace geode
         void save_identifier( absl::string_view directory ) const;
 
     public:
-        void set_id( uuid id, IdentifierKey );
+        void set_id( const uuid& unique_id, IdentifierKey );
 
         void set_name( absl::string_view name, IdentifierKey );
 
@@ -62,9 +62,9 @@ namespace geode
     protected:
         Identifier();
 
-        Identifier& operator=( Identifier&& other );
+        Identifier& operator=( Identifier&& other ) noexcept;
 
-        void set_id( uuid id );
+        void set_id( const uuid& unique_id );
 
         void set_name( absl::string_view name );
 

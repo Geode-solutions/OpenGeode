@@ -33,7 +33,7 @@ namespace geode
     {
     public:
         Impl() = default;
-        Impl( std::array< index_t, dimension > cells_number )
+        explicit Impl( std::array< index_t, dimension > cells_number )
             : cells_number_( std::move( cells_number ) )
         {
         }
@@ -50,7 +50,7 @@ namespace geode
 
         index_t nb_cells_in_direction( index_t direction ) const
         {
-            return cells_number_[direction];
+            return cells_number_.at( direction );
         }
 
         absl::optional< CellIndices > next_cell(
@@ -81,8 +81,8 @@ namespace geode
         {
             for( const auto d : LRange{ dimension } )
             {
-                if( cell_indices[d] == 0
-                    || cell_indices[d] == nb_cells_in_direction( d ) - 1 )
+                const auto index = cell_indices[d];
+                if( index == 0 || index == nb_cells_in_direction( d ) - 1 )
                 {
                     return true;
                 }
@@ -109,10 +109,11 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this,
-                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.container4b( impl.cells_number_ );
-                } } } );
+            archive.ext( *this, Growable< Archive, Impl >{
+                                    { []( Archive& local_archive, Impl& impl ) {
+                                        local_archive.container4b(
+                                            impl.cells_number_ );
+                                    } } } );
         }
 
     private:
@@ -120,7 +121,7 @@ namespace geode
     };
 
     template < index_t dimension >
-    CellArray< dimension >::CellArray()
+    CellArray< dimension >::CellArray() // NOLINT
     {
     }
 
@@ -132,13 +133,14 @@ namespace geode
     }
 
     template < index_t dimension >
-    CellArray< dimension >::CellArray( CellArray&& other )
+    CellArray< dimension >::CellArray( CellArray&& other ) noexcept
         : impl_( std::move( other.impl_ ) )
     {
     }
 
     template < index_t dimension >
-    auto CellArray< dimension >::operator=( CellArray&& other ) -> CellArray&
+    auto CellArray< dimension >::operator=( CellArray&& other ) noexcept
+        -> CellArray&
     {
         impl_ = std::move( other.impl_ );
         return *this;
@@ -200,10 +202,11 @@ namespace geode
     template < typename Archive >
     void CellArray< dimension >::serialize( Archive& archive )
     {
-        archive.ext( *this, Growable< Archive, CellArray >{
-                                { []( Archive& a, CellArray& array ) {
-                                    a.object( array.impl_ );
-                                } } } );
+        archive.ext(
+            *this, Growable< Archive, CellArray >{
+                       { []( Archive& local_archive, CellArray& array ) {
+                           local_archive.object( array.impl_ );
+                       } } } );
     }
 
     template class opengeode_basic_api CellArray< 1 >;

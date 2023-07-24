@@ -33,18 +33,18 @@
 
 namespace
 {
-    static constexpr absl::Duration SLEEP = absl::Seconds( 1 );
-}
+    constexpr absl::Duration SLEEP = absl::Seconds( 1 );
+} // namespace
 
 namespace geode
 {
     class ProgressLogger::Impl
     {
     public:
-        Impl( std::string message, index_t nb_steps )
+        Impl( const std::string& message, index_t nb_steps )
             : nb_steps_( nb_steps ), current_time_{ absl::Now() }
         {
-            ProgressLoggerManager::start( std::move( message ), nb_steps_ );
+            ProgressLoggerManager::start( message, nb_steps_ );
         }
 
         ~Impl()
@@ -86,12 +86,13 @@ namespace geode
         std::mutex lock_;
     };
 
-    ProgressLogger::ProgressLogger( std::string message, index_t nb_steps )
-        : impl_( std::move( message ), nb_steps )
+    ProgressLogger::ProgressLogger(
+        const std::string& message, index_t nb_steps )
+        : impl_( message, nb_steps )
     {
     }
 
-    ProgressLogger::~ProgressLogger() {}
+    ProgressLogger::~ProgressLogger() {} // NOLINT
 
     index_t ProgressLogger::increment()
     {

@@ -51,9 +51,9 @@ namespace geode
         absl::Time start_time_;
     };
 
-    Timer::Timer() {}
+    Timer::Timer() {} // NOLINT
 
-    Timer::~Timer() {}
+    Timer::~Timer() {} // NOLINT
 
     std::string Timer::duration() const
     {

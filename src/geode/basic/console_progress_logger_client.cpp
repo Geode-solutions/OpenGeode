@@ -62,9 +62,9 @@ namespace geode
         std::string message_;
     };
 
-    ConsoleProgressLoggerClient::ConsoleProgressLoggerClient() {}
+    ConsoleProgressLoggerClient::ConsoleProgressLoggerClient() {} // NOLINT
 
-    ConsoleProgressLoggerClient::~ConsoleProgressLoggerClient() {}
+    ConsoleProgressLoggerClient::~ConsoleProgressLoggerClient() {} // NOLINT
 
     void ConsoleProgressLoggerClient::start(
         const std::string& message, index_t nb_steps )

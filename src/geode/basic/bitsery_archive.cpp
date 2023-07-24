@@ -35,8 +35,8 @@ namespace
         void register_functions(
             RegisterFunction serializer, RegisterFunction deserializer )
         {
-            serializers_.push_back( serializer );
-            deserializers_.push_back( deserializer );
+            serializers_.emplace_back( std::move( serializer ) );
+            deserializers_.emplace_back( std::move( deserializer ) );
         }
 
         absl::Span< const RegisterFunction > serializers()
@@ -66,7 +66,8 @@ namespace geode
     void BitseryExtensions::register_functions(
         RegisterFunction serializer, RegisterFunction deserializer )
     {
-        storage().register_functions( serializer, deserializer );
+        storage().register_functions(
+            std::move( serializer ), std::move( deserializer ) );
     }
 
     void BitseryExtensions::register_serialize_pcontext( PContext &context )
