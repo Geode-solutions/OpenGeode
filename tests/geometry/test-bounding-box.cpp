@@ -311,6 +311,18 @@ void test_segment_intersections()
     const geode::Segment2D parallel2{ f, i };
     OPENGEODE_EXCEPTION(
         !bbox.intersects( parallel2 ), "[Test] Wrong result with parallel2" );
+
+    const geode::Point2D j{ { 5, 5 } };
+    const geode::Point2D k{ { 5.5, 5.5 } };
+    const geode::Segment2D no_crossing2{ j, k };
+    OPENGEODE_EXCEPTION( !bbox.intersects( no_crossing2 ),
+        "[Test] Wrong result with no_crossing2" );
+
+    const geode::Point2D l{ { -0.5, 1.1 } };
+    const geode::Point2D m{ { -1.1, -0.5 } };
+    const geode::Segment2D crossing2{ l, m };
+    OPENGEODE_EXCEPTION(
+        bbox.intersects( crossing2 ), "[Test] Wrong result with crossing2" );
 }
 
 void test()
