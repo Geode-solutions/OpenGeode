@@ -84,6 +84,22 @@ namespace geode
             return !( *this == other );
         }
 
+        bool operator<( const Point &other ) const
+        {
+            for( const auto i : LRange{ dimension } )
+            {
+                if( value( i ) < other.value( i ) )
+                {
+                    return true;
+                }
+                if( value( i ) > other.value( i ) )
+                {
+                    return false;
+                }
+            }
+            return false;
+        }
+
         Point operator*( double multiplier ) const
         {
             return detail::coords_multiply( *this, multiplier );
