@@ -924,7 +924,7 @@ namespace geode
         const Point3D& point, const Tetrahedron& tetra )
     {
         const auto lambdas =
-            tetrahedron_barycentric_coordinates( point, tetra );
+            safe_tetrahedron_barycentric_coordinates( point, tetra );
         const auto facet = static_cast< local_index_t >(
             std::distance( lambdas.begin(), absl::c_min_element( lambdas ) ) );
         if( lambdas[facet] >= 0 )
