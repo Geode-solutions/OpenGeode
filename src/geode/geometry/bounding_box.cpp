@@ -274,53 +274,6 @@ namespace geode
         return this->intersects( InfiniteLine< dimension >{ segment } );
     }
 
-    // template < index_t dimension >
-    // template < index_t T >
-    // typename std::enable_if< T == 2, bool >::type
-    //     BoundingBox< dimension >::intersects(
-    //         const Segment< T >& segment ) const
-    // {
-    //     const auto& vertices = segment.vertices();
-    //     for( const auto v : LRange{ 2 } )
-    //     {
-    //         if( contains( vertices[v].get() ) )
-    //         {
-    //             return true;
-    //         }
-    //     }
-    //     if( segment.length() < global_epsilon )
-    //     {
-    //         return false;
-    //     }
-    //     const auto box_center = center();
-    //     const auto box_extent = diagonal() / 2.;
-    //     const Segment2D transformed_segment{ vertices[0].get() - box_center,
-    //         vertices[1].get() - box_center };
-    //     const auto segment_origin = transformed_segment.barycenter();
-    //     const auto segment_extent = transformed_segment.length() / 2.;
-    //     const auto segment_direction =
-    //         transformed_segment.normalized_direction();
-    //     for( const auto i : LRange{ 2 } )
-    //     {
-    //         const auto lhs = std::fabs( segment_origin.value( i ) );
-    //         const auto rhs =
-    //             box_extent.value( i )
-    //             + segment_extent * std::fabs( segment_direction.value( i ) );
-    //         if( lhs > rhs )
-    //         {
-    //             return false;
-    //         }
-    //     }
-    //     const auto lhs =
-    //         std::fabs( dot_perpendicular( segment_direction, segment_origin )
-    //         );
-    //     const auto rhs =
-    //         box_extent.value( 0 ) * std::fabs( segment_direction.value( 1 ) )
-    //         + box_extent.value( 1 ) * std::fabs( segment_direction.value( 0 )
-    //         );
-    //     return lhs <= rhs;
-    // }
-
     template <>
     template <>
     bool BoundingBox< 3 >::intersects< 3 >(
