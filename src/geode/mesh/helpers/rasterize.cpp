@@ -729,12 +729,16 @@ namespace
                         continue;
                     }
 
-                    const auto maxI = std::floor(
+                    auto maxI = std::floor(
                         projected_i_coordinate( n.value(),
                             points[closed_surface.polygon_vertex( { p, 0 } )],
                             point )
                             / grid.cell_length_in_direction( 0 )
                         - 0.5 );
+                    if( maxI < 0 )
+                    {
+                        maxI = 0;
+                    }
                     values[{ j, k }].emplace_back(
                         maxI, triangle.counter_clockwise );
                 }
