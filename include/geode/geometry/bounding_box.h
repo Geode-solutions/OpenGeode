@@ -69,9 +69,7 @@ namespace geode
          * Returns true if the element is crossing, is inside, or is containing
          * the bbox
          */
-        template < index_t T = dimension >
-        typename std::enable_if< T == 2, bool >::type intersects(
-            const Segment< T >& segment ) const;
+        bool intersects( const Segment< dimension >& segment ) const;
 
         /*!
          * Returns true if the element is crossing, is inside (or is containing
