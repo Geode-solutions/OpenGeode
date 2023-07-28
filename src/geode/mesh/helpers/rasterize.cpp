@@ -833,7 +833,7 @@ namespace geode
             const auto j = value.first.first;
             const auto k = value.first.second;
             auto& i_values = value.second;
-            sort_unique( i_values );
+            absl::c_sort( i_values );
             OPENGEODE_EXCEPTION( i_values.size() % 2 == 0,
                 "[rasterize_closed_surface] Wrong "
                 "number of intervals to paint" );
