@@ -286,7 +286,7 @@ namespace geode
         PolyhedronVertices polyhedron_vertices( index_t polyhedron_id ) const;
 
         /*!
-         * Return the local index in the tetrahedron of a vertex in the mesh.
+         * Return the local index in the polyhedron of a vertex in the mesh.
          * @param[in] polyhedron_id Index of polyhedron.
          * @param[in] vertex_id Index of a vertex in the mesh.
          * @return Index in [0,nb_polyhedron_vertices()[ if polyhedron is around
