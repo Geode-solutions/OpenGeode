@@ -23,6 +23,8 @@
 
 #include <geode/geometry/position.h>
 
+#include <geode/basic/logger.h>
+
 #include <geode/geometry/basic_objects/infinite_line.h>
 #include <geode/geometry/basic_objects/plane.h>
 #include <geode/geometry/basic_objects/segment.h>
@@ -75,6 +77,22 @@ namespace geode
             point_side_to_segment( point, { vertices[1], vertices[2] } );
         const auto s2 =
             point_side_to_segment( point, { vertices[2], vertices[0] } );
+        if( s0 == s1 && s1 == s2 && s2 == Side::zero )
+        {
+            if( point == vertices[0] )
+            {
+                return Position::vertex0;
+            }
+            if( point == vertices[1] )
+            {
+                return Position::vertex1;
+            }
+            if( point == vertices[2] )
+            {
+                return Position::vertex2;
+            }
+            return Position::parallel;
+        }
         return detail::point_triangle_position( s0, s1, s2 );
     }
 
