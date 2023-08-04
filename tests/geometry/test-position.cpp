@@ -222,12 +222,12 @@ void test_point_triangle_degenerated_position_2d()
 {
     const geode::Point2D a{ { 1.0, 1.0 } };
     const geode::Point2D b{ { 0.5, 0.5 } };
-    const geode::Point2D c{ { 1.0, 1.0 } };
+    const geode::Point2D c{ { 1.2, 1.2 } };
     const geode::Triangle2D triangle2D{ a, b, c };
 
     const geode::Point2D q1{ { 1.5, 1.5 } };
     const auto position_q1 = geode::point_triangle_position( q1, triangle2D );
-    OPENGEODE_EXCEPTION( position_q1 == geode::Position::parallel,
+    OPENGEODE_EXCEPTION( position_q1 == geode::Position::outside,
         "[Test] Wrong result for test_point_triangle_degenerated_position_2d "
         "with query point q1" );
 
