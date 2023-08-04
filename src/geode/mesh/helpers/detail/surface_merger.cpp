@@ -106,6 +106,7 @@ namespace geode
                 index_t surface,
                 index_t polygon ) const
             {
+                geode_unused( merger );
                 OPENGEODE_ASSERT( surface < merger.meshes().size(),
                     "[SurfaceMerger::polygon_in_merged] Wrong surface index" );
                 OPENGEODE_ASSERT(

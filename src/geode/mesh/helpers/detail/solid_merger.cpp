@@ -75,6 +75,7 @@ namespace geode
                 index_t solid,
                 index_t polyhedron ) const
             {
+                geode_unused( merger );
                 OPENGEODE_ASSERT( solid < merger.meshes().size(),
                     "[SolidMerger::polyhedron_in_merged] Wrong solid index" );
                 OPENGEODE_ASSERT(
