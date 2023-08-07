@@ -1,0 +1,9 @@
+name: Prepare PR
+
+on:
+  pull_request:
+
+jobs:  
+  prepare:
+    uses: Geode-solutions/actions/.github/workflows/prepare-pr.yml@master
+    secrets: inherit
