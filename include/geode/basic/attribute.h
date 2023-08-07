@@ -447,10 +447,10 @@ namespace geode
 
         void resize( index_t size, AttributeBase::AttributeKey ) override
         {
-            const auto capacity = values_.capacity();
+            const auto capacity = static_cast< index_t >( values_.capacity() );
             if( size > capacity )
             {
-                const index_t next_capacity = capacity * 2;
+                const auto next_capacity = capacity * 2;
                 values_.reserve( std::max( size, next_capacity ) );
             }
             values_.resize( size, default_value_ );
@@ -639,10 +639,10 @@ namespace geode
 
         void resize( index_t size, AttributeBase::AttributeKey ) override
         {
-            const auto capacity = values_.capacity();
+            const auto capacity = static_cast< index_t >( values_.capacity() );
             if( size > capacity )
             {
-                const index_t next_capacity = capacity * 2;
+                const auto next_capacity = capacity * 2;
                 values_.reserve( std::max( size, next_capacity ) );
             }
             values_.resize( size, default_value_ );

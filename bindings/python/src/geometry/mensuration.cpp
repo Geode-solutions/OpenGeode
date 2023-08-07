@@ -39,10 +39,11 @@ namespace geode
         PYTHON_MENSURATION( 2 );
         PYTHON_MENSURATION( 3 );
         module.def( "triangle_signed_area2D",
-            ( double ( * )( const Triangle2D& ) ) & triangle_signed_area );
+            static_cast< double ( * )( const Triangle2D& ) >(
+                &triangle_signed_area ) );
         module.def( "triangle_signed_area3D",
-            ( double ( * )( const Triangle3D&, const Vector3D& ) )
-                & triangle_signed_area );
+            static_cast< double ( * )( const Triangle3D&, const Vector3D& ) >(
+                &triangle_signed_area ) );
         module.def( "tetrahedron_signed_volume", &tetrahedron_signed_volume );
         module.def( "tetrahedron_volume", &tetrahedron_volume );
     }

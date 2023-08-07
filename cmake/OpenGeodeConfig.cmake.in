@@ -52,5 +52,9 @@ endif()
 set(CMAKE_CXX_STANDARD @OPENGEODE_CXX_STANDARD@)
 
 if(NOT COMMAND add_geode_library)
-@OPENGEODE_UTILS@
+    include(${CMAKE_CURRENT_LIST_DIR}/GlobalOptions.cmake)
+    include(${CMAKE_CURRENT_LIST_DIR}/CompilerWarnings.cmake)
+    include(${CMAKE_CURRENT_LIST_DIR}/ProjectOptions.cmake)
+    include(${CMAKE_CURRENT_LIST_DIR}/CppTargets.cmake)
+    include(${CMAKE_CURRENT_LIST_DIR}/PythonTargets.cmake)
 endif()
