@@ -22,6 +22,7 @@ set(OPENGEODE_CXX_STANDARD ${CMAKE_CXX_STANDARD})
 
 include(cmake/GlobalOptions.cmake)
 include(cmake/CompilerWarnings.cmake)
+include(cmake/Sanitizers.cmake)
 include(cmake/ProjectOptions.cmake)
 include(cmake/CppTargets.cmake)
 include(cmake/PythonTargets.cmake)
@@ -81,6 +82,7 @@ install(
         "cmake/OpenGeodeModule-setup.py.in"
         "cmake/GlobalOptions.cmake"
         "cmake/CompilerWarnings.cmake"
+        "cmake/Sanitizers.cmake"
         "cmake/ProjectOptions.cmake"
         "cmake/CppTargets.cmake"
         "cmake/PythonTargets.cmake"

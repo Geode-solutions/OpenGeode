@@ -1,0 +1,33 @@
+# Modified from https://github.com/cpp-best-practices/cmake_template/blob/main/cmake/Sanitizers.cmake
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
+    option(USE_SANITIZER_ADDRESS "Toggle address sanitizer" OFF)
+    option(USE_SANITIZER_LEAK "Toggle leak sanitizer" OFF)
+    option(USE_SANITIZER_UNDEFINED_BEHAVIOR "Toggle undefined sanitizer" OFF)
+    option(USE_SANITIZER_THREAD "Toggle thread sanitizer" OFF)
+
+    set(SANITIZERS "")
+    if(${USE_SANITIZER_ADDRESS})
+        list(APPEND SANITIZERS "address")
+    endif()
+    if(${USE_SANITIZER_LEAK})
+        list(APPEND SANITIZERS "leak")
+    endif()
+    if(${USE_SANITIZER_UNDEFINED_BEHAVIOR})
+        list(APPEND SANITIZERS "undefined")
+    endif()
+    if(${USE_SANITIZER_THREAD})
+        if("address" IN_LIST SANITIZERS OR "leak" IN_LIST SANITIZERS)
+            message(WARNING "Thread sanitizer does not work with Address and Leak sanitizer enabled")
+        else()
+            list(APPEND SANITIZERS "thread")
+        endif()
+    endif()
+
+    list(JOIN SANITIZERS "," LIST_OF_SANITIZERS)
+    if(LIST_OF_SANITIZERS AND NOT "${LIST_OF_SANITIZERS}" STREQUAL "")
+        add_compile_options(-fsanitize=${LIST_OF_SANITIZERS})
+        add_link_options(-fsanitize=${LIST_OF_SANITIZERS})
+    endif()
+endif()
+
