@@ -51,6 +51,10 @@ namespace geode
         convert_surface_mesh_into_triangulated_surface(
             const SurfaceMesh< dimension >& surface );
 
+    template < class GridType >
+    std::unique_ptr< TriangulatedSurface2D >
+        convert_grid_into_triangulated_surface( const GridType& grid );
+
     template < index_t dimension >
     void triangulate_surface_mesh( SurfaceMesh< dimension >& surface );
 

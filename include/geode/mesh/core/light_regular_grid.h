@@ -64,6 +64,10 @@ namespace geode
         AttributeManager& grid_vertex_attribute_manager() const override;
 
     private:
+        template < typename Archive >
+        void serialize( Archive& archive );
+
+    private:
         IMPLEMENTATION_MEMBER( impl_ );
     };
     ALIAS_2D_AND_3D( LightRegularGrid );

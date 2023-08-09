@@ -26,6 +26,9 @@
 #include <geode/basic/assert.h>
 #include <geode/basic/logger.h>
 
+#include <geode/geometry/point.h>
+
+#include <geode/mesh/core/light_regular_grid.h>
 #include <geode/mesh/core/triangulated_surface.h>
 #include <geode/mesh/io/triangulated_surface_input.h>
 
@@ -66,6 +69,14 @@ void test()
         surface2d->nb_polygons() == converted_surface2d->nb_polygons(),
         "[Test] Number of polygons in re-converted TriangulatedSurface2D "
         "is not correct" );
+
+    geode::LightRegularGrid2D grid{ geode::Point2D{ { 1, 2 } }, { 5, 6 },
+        { 1, 1 } };
+    const auto converted_grid2d =
+        geode::convert_grid_into_triangulated_surface( grid );
+    OPENGEODE_EXCEPTION( converted_grid2d->nb_polygons() == 5 * 6 * 2,
+        "[Test] Number of polygons in TriangulatedSurface2D from grid is not "
+        "correct." );
 }
 
 OPENGEODE_TEST( "convert-surface" )

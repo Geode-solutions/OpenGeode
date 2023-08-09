@@ -30,6 +30,7 @@
 
 #include <geode/mesh/builder/polygonal_surface_builder.h>
 #include <geode/mesh/builder/triangulated_surface_builder.h>
+#include <geode/mesh/core/light_regular_grid.h>
 #include <geode/mesh/core/polygonal_surface.h>
 #include <geode/mesh/core/regular_grid_solid.h>
 #include <geode/mesh/core/regular_grid_surface.h>
@@ -123,17 +124,12 @@ namespace
         };
     }
 
-    template <>
-    std::unique_ptr< geode::TriangulatedSurface< 2 > >
-        create_triangulated_surface_from_grid(
-            const geode::RegularGrid< 2 >& grid )
+    void create_triangles_from_grid_cells(
+        const geode::TriangulatedSurface2D& surface,
+        geode::TriangulatedSurfaceBuilder2D& builder,
+        const geode::Grid2D& grid )
     {
-        auto surface = geode::TriangulatedSurface< 2 >::create();
-        auto builder =
-            geode::TriangulatedSurfaceBuilder< 2 >::create( *surface );
-        geode::detail::copy_meta_info( grid, *builder );
-        geode::detail::copy_points( grid, *builder );
-        builder->reserve_triangles( 2 * grid.nb_polygons() );
+        builder.reserve_triangles( 2 * grid.nb_cells() );
         geode::GenericMapping< geode::index_t > old2new_mapping;
         for( const auto j : geode::LRange{ grid.nb_cells_in_direction( 1 ) } )
         {
@@ -150,22 +146,51 @@ namespace
                     cell_mesh_vertices[v] = cell_vertex_id;
                 }
                 const auto triangle0 =
-                    builder->create_triangle( { cell_mesh_vertices[0],
+                    builder.create_triangle( { cell_mesh_vertices[0],
                         cell_mesh_vertices[1], cell_mesh_vertices[3] } );
                 const auto triangle1 =
-                    builder->create_triangle( { cell_mesh_vertices[0],
+                    builder.create_triangle( { cell_mesh_vertices[0],
                         cell_mesh_vertices[3], cell_mesh_vertices[2] } );
-                builder->set_polygon_adjacent( { triangle0, 2 }, triangle1 );
-                builder->set_polygon_adjacent( { triangle1, 0 }, triangle0 );
+                builder.set_polygon_adjacent( { triangle0, 2 }, triangle1 );
+                builder.set_polygon_adjacent( { triangle1, 0 }, triangle0 );
                 old2new_mapping.map( cell, triangle0 );
                 old2new_mapping.map( cell, triangle1 );
             }
         }
-        builder->compute_polygon_adjacencies();
-        geode::detail::copy_attributes( grid.vertex_attribute_manager(),
-            surface->vertex_attribute_manager() );
-        surface->polygon_attribute_manager().import(
-            grid.polygon_attribute_manager(), old2new_mapping );
+        builder.compute_polygon_adjacencies();
+        geode::detail::copy_attributes( grid.grid_vertex_attribute_manager(),
+            surface.vertex_attribute_manager() );
+        surface.polygon_attribute_manager().import(
+            grid.cell_attribute_manager(), old2new_mapping );
+    }
+
+    std::unique_ptr< geode::TriangulatedSurface2D >
+        create_triangulated_surface_from_grid(
+            const geode::LightRegularGrid2D& grid )
+    {
+        auto surface = geode::TriangulatedSurface2D::create();
+        auto builder = geode::TriangulatedSurfaceBuilder2D::create( *surface );
+        builder->create_vertices( grid.nb_grid_vertices() );
+        for( const auto v : geode::Range{ grid.nb_grid_vertices() } )
+        {
+            builder->set_point(
+                v, grid.grid_point( grid.vertex_indices( v ) ) );
+        }
+        create_triangles_from_grid_cells( *surface, *builder, grid );
+        return surface;
+    }
+
+    template <>
+    std::unique_ptr< geode::TriangulatedSurface< 2 > >
+        create_triangulated_surface_from_grid(
+            const geode::RegularGrid< 2 >& grid )
+    {
+        auto surface = geode::TriangulatedSurface< 2 >::create();
+        auto builder =
+            geode::TriangulatedSurfaceBuilder< 2 >::create( *surface );
+        geode::detail::copy_meta_info( grid, *builder );
+        geode::detail::copy_points( grid, *builder );
+        create_triangles_from_grid_cells( *surface, *builder, grid );
         return surface;
     }
 } // namespace
@@ -212,6 +237,13 @@ namespace geode
             std::unique_ptr< TriangulatedSurface< dimension > > >{
             absl::in_place, tri_surface.release()
         };
+    }
+
+    template < class GridType >
+    std::unique_ptr< TriangulatedSurface2D >
+        convert_grid_into_triangulated_surface( const GridType& grid )
+    {
+        return create_triangulated_surface_from_grid( grid );
     }
 
     template < index_t dimension >
@@ -351,6 +383,12 @@ namespace geode
     template absl::optional< std::unique_ptr< TriangulatedSurface3D > >
         opengeode_mesh_api convert_surface_mesh_into_triangulated_surface(
             const SurfaceMesh3D& );
+
+    template std::unique_ptr< TriangulatedSurface2D >
+        opengeode_mesh_api convert_grid_into_triangulated_surface(
+            const LightRegularGrid2D& grid );
+    template std::unique_ptr< TriangulatedSurface2D > opengeode_mesh_api
+        convert_grid_into_triangulated_surface( const RegularGrid2D& grid );
 
     template void opengeode_mesh_api triangulate_surface_mesh( SurfaceMesh2D& );
     template void opengeode_mesh_api triangulate_surface_mesh( SurfaceMesh3D& );

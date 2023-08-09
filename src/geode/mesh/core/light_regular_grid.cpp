@@ -56,6 +56,18 @@ namespace geode
         }
 
     private:
+        friend class bitsery::Access;
+        template < typename Archive >
+        void serialize( Archive& archive )
+        {
+            archive.ext( *this,
+                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
+                    a.object( impl.cell_attribute_manager );
+                    a.object( impl.vertex_attribute_manager );
+                } } } );
+        }
+
+    private:
         mutable AttributeManager cell_attribute_manager_;
         mutable AttributeManager vertex_attribute_manager_;
     };
@@ -125,6 +137,19 @@ namespace geode
         LightRegularGrid< dimension >::grid_vertex_attribute_manager() const
     {
         return impl_->vertex_attribute_manager();
+    }
+
+    template < index_t dimension >
+    template < typename Archive >
+    void LightRegularGrid< dimension >::serialize( Archive& archive )
+    {
+        archive.ext(
+            *this, Growable< Archive, LightRegularGrid >{
+                       { []( Archive& a, LightRegularGrid& grid ) {
+                           a.ext( grid,
+                               bitsery::ext::BaseClass< Grid< dimension > >{} );
+                           a.object( grid.impl_ );
+                       } } } );
     }
 
     template class opengeode_mesh_api LightRegularGrid< 2 >;
