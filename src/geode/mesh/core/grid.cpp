@@ -174,6 +174,21 @@ namespace geode
             return node_index;
         }
 
+        local_index_t cell_local_vertex(
+            const CellIndices& cell_id, const VertexIndices& vertex_id ) const
+        {
+            local_index_t result{ 0 };
+            for( const auto d : LRange{ dimension } )
+            {
+                const auto diff = vertex_id[d] - cell_id[d];
+                OPENGEODE_EXCEPTION( diff == 0 || diff == 1,
+                    "[Grid::cell_local_vertex] vertex "
+                    "is not part of cell vertices." );
+                result += diff * ( 1 << d );
+            }
+            return result;
+        }
+
         absl::optional< VertexIndices > next_vertex(
             const Grid< dimension >& grid,
             const VertexIndices& index,
@@ -506,6 +521,13 @@ namespace geode
         local_index_t vertex_id ) const -> VertexIndices
     {
         return impl_->cell_vertex_indices( cell_id, vertex_id );
+    }
+
+    template < index_t dimension >
+    local_index_t Grid< dimension >::cell_local_vertex(
+        const CellIndices& cell_id, const VertexIndices& vertex_id ) const
+    {
+        return impl_->cell_local_vertex( cell_id, vertex_id );
     }
 
     template < index_t dimension >

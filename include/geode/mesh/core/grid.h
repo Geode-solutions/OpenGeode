@@ -99,6 +99,9 @@ namespace geode
         VertexIndices cell_vertex_indices(
             const CellIndices& cell_id, local_index_t vertex_id ) const;
 
+        local_index_t cell_local_vertex(
+            const CellIndices& cell_id, const VertexIndices& vertex_id ) const;
+
         absl::optional< VertexIndices > next_vertex(
             const VertexIndices& index, index_t direction ) const;
 
