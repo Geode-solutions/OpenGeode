@@ -53,6 +53,8 @@ namespace geode
 
         const uuid& create_model_boundary();
 
+        void create_model_boundary( uuid model_boundary_id );
+
         void delete_model_boundary(
             const ModelBoundary< dimension >& boundary );
 

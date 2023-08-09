@@ -35,37 +35,40 @@ namespace geode
 
     index_t string_to_index( absl::string_view string )
     {
-        index_t value;
-        const auto ok = absl::SimpleAtoi( string, &value );
-        OPENGEODE_EXCEPTION( ok, "[string_to_index] Cannot convert string \"",
-            string, "\" to index" );
+        index_t value{ 0 };
+        const auto status = absl::SimpleAtoi( string, &value );
+        OPENGEODE_EXCEPTION( status,
+            "[string_to_index] Cannot convert string \"", string,
+            "\" to index" );
         return value;
     }
 
     int string_to_int( absl::string_view string )
     {
-        int value;
-        const auto ok = absl::SimpleAtoi( string, &value );
-        OPENGEODE_EXCEPTION( ok, "[string_to_int] Cannot convert string \"",
+        int value{ 0 };
+        const auto status = absl::SimpleAtoi( string, &value );
+        OPENGEODE_EXCEPTION( status, "[string_to_int] Cannot convert string \"",
             string, "\" to int" );
         return value;
     }
 
     float string_to_float( absl::string_view string )
     {
-        float value;
-        const auto ok = absl::SimpleAtof( string, &value );
-        OPENGEODE_EXCEPTION( ok, "[string_to_float] Cannot convert string \"",
-            string, "\" to float" );
+        float value{ 0 };
+        const auto status = absl::SimpleAtof( string, &value );
+        OPENGEODE_EXCEPTION( status,
+            "[string_to_float] Cannot convert string \"", string,
+            "\" to float" );
         return value;
     }
 
     double string_to_double( absl::string_view string )
     {
-        double value;
-        const auto ok = absl::SimpleAtod( string, &value );
-        OPENGEODE_EXCEPTION( ok, "[string_to_double] Cannot convert string \"",
-            string, "\" to double" );
+        double value{ 0 };
+        const auto status = absl::SimpleAtod( string, &value );
+        OPENGEODE_EXCEPTION( status,
+            "[string_to_double] Cannot convert string \"", string,
+            "\" to double" );
         return value;
     }
 } // namespace geode

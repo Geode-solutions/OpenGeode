@@ -34,6 +34,7 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( TriangulatedSurface );
     ALIAS_3D( Grid );
     ALIAS_3D( TriangulatedSurface );
+    class Tetrahedron;
 } // namespace geode
 
 namespace geode
@@ -50,6 +51,10 @@ namespace geode
     template < index_t dimension >
     std::vector< typename Grid< dimension >::CellIndices > rasterize_triangle(
         const Grid< dimension >& grid, const Triangle< dimension >& triangle );
+
+    std::vector< typename Grid3D::CellIndices >
+        opengeode_mesh_api rasterize_tetrahedron(
+            const Grid3D& grid, const Tetrahedron& tetrahedron );
 
     std::vector< Grid3D::CellIndices >
         opengeode_mesh_api rasterize_closed_surface(

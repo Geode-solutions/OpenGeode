@@ -465,6 +465,21 @@ namespace geode
     }
 
     template < index_t dimension >
+    absl::optional< local_index_t > SurfaceMesh< dimension >::vertex_in_polygon(
+        index_t polygon_id, index_t vertex_id ) const
+    {
+        for( const auto v : LRange{ nb_polygon_vertices( polygon_id ) } )
+
+        {
+            if( polygon_vertex( { polygon_id, v } ) == vertex_id )
+            {
+                return v;
+            }
+        }
+        return absl::nullopt;
+    }
+
+    template < index_t dimension >
     absl::optional< PolygonVertex >
         SurfaceMesh< dimension >::polygon_around_vertex(
             index_t vertex_id ) const

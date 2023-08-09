@@ -233,6 +233,19 @@ namespace geode
     }
 
     template < index_t dimension >
+    template < class EvalIntersection >
+    void AABBTree< dimension >::compute_segment_element_bbox_intersections(
+        const Segment< dimension >& segment, EvalIntersection& action ) const
+    {
+        if( nb_bboxes() == 0 )
+        {
+            return;
+        }
+        impl_->line_intersect_recursive(
+            segment, Impl::ROOT_INDEX, 0, nb_bboxes(), action );
+    }
+
+    template < index_t dimension >
     template < typename ACTION >
     void AABBTree< dimension >::Impl::closest_element_box_recursive(
         const Point< dimension >& query,

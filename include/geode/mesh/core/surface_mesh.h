@@ -194,6 +194,16 @@ namespace geode
         PolygonVertices polygon_vertices( index_t polygon_id ) const;
 
         /*!
+         * Return the local index in the polygon of a vertex in the mesh.
+         * @param[in] polygon_id Index of polygon.
+         * @param[in] vertex_id Index of a vertex in the mesh.
+         * @return Index in [0,nb_polygon_vertices()[ if polygon is around
+         * the given vertex
+         */
+        absl::optional< local_index_t > vertex_in_polygon(
+            index_t polygon_id, index_t vertex_id ) const;
+
+        /*!
          * Return the index in the mesh of a given polygon edge vertex.
          * @param[in] polygon_edge Local index of edge in a polygon.
          * @param[in] vertex_id Local index of vertex in the edge (0 or 1).

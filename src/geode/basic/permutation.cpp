@@ -38,8 +38,8 @@ namespace geode
     {
         std::vector< index_t > old2new( permutation.size() );
         async::parallel_for( async::irange( size_t{ 0 }, permutation.size() ),
-            [&old2new, &permutation]( size_t i ) {
-                old2new[permutation[i]] = i;
+            [&old2new, &permutation]( size_t index ) {
+                old2new[permutation[index]] = index;
             } );
         return old2new;
     }

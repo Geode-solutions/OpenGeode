@@ -20,9 +20,11 @@
 
 set(OPENGEODE_CXX_STANDARD ${CMAKE_CXX_STANDARD})
 
-set(UTILS_FILE "${PROJECT_SOURCE_DIR}/cmake/utils.cmake")
-file(READ "${UTILS_FILE}" OPENGEODE_UTILS)
-include("${UTILS_FILE}")
+include(cmake/GlobalOptions.cmake)
+include(cmake/CompilerWarnings.cmake)
+include(cmake/ProjectOptions.cmake)
+include(cmake/CppTargets.cmake)
+include(cmake/PythonTargets.cmake)
 
 # Get OpenGeode dependencies
 find_package(absl REQUIRED CONFIG NO_DEFAULT_PATH PATHS ${ABSEIL_INSTALL_PREFIX})
@@ -75,8 +77,15 @@ if(OPENGEODE_WITH_PYTHON OR INCLUDE_PYBIND11)
 endif()
 
 install(
-    FILES "${PROJECT_SOURCE_DIR}/cmake/OpenGeodeModule-setup.py.in"
-    DESTINATION ${CMAKE_CONFIG_DESTINATION}
+    FILES 
+        "cmake/OpenGeodeModule-setup.py.in"
+        "cmake/GlobalOptions.cmake"
+        "cmake/CompilerWarnings.cmake"
+        "cmake/ProjectOptions.cmake"
+        "cmake/CppTargets.cmake"
+        "cmake/PythonTargets.cmake"
+    DESTINATION 
+        ${CMAKE_CONFIG_DESTINATION}
     COMPONENT
         public
 )

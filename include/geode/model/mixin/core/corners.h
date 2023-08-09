@@ -134,6 +134,10 @@ namespace geode
 
         const uuid& create_corner( const MeshImpl& impl );
 
+        void create_corner( uuid corner_id );
+
+        void create_corner( uuid corner_id, const MeshImpl& impl );
+
         void delete_corner( const Corner< dimension >& corner );
 
         void load_corners( absl::string_view directory );

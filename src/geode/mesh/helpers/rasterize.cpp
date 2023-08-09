@@ -33,6 +33,7 @@
 #include <geode/geometry/basic_objects/infinite_line.h>
 #include <geode/geometry/basic_objects/plane.h>
 #include <geode/geometry/basic_objects/segment.h>
+#include <geode/geometry/basic_objects/tetrahedron.h>
 #include <geode/geometry/basic_objects/triangle.h>
 #include <geode/geometry/bounding_box.h>
 #include <geode/geometry/coordinate_system.h>
@@ -657,14 +658,13 @@ namespace
         return geode::dot_perpendicular( e0, e1 ) > 0;
     }
 
-    ProjectedTriangle project_on_JK( const geode::TriangulatedSurface3D& mesh,
-        geode::index_t p,
-        absl::Span< const geode::Point3D > points )
+    ProjectedTriangle project_on_JK( absl::Span< const geode::Point3D > points,
+        absl::Span< const geode::index_t > vertices )
     {
         ProjectedTriangle triangle;
         for( const auto v : geode::LRange{ 3 } )
         {
-            const auto& point = points[mesh.polygon_vertex( { p, v } )];
+            const auto& point = points[vertices[v]];
             triangle.points[v] = { { point.value( 1 ), point.value( 2 ) } };
         }
         if( !is_triangle_counterclockwise(
@@ -680,6 +680,52 @@ namespace
         absl::flat_hash_map< std::pair< geode::index_t, geode::index_t >,
             absl::InlinedVector< Cell, 2 > >;
 
+    void fill_values( const geode::Grid3D& grid,
+        const ProjectedTriangle& triangle,
+        absl::Span< const geode::Point3D > points,
+        geode::index_t anchor,
+        const geode::Vector3D& normal,
+        Values& values )
+    {
+        geode::BoundingBox2D bbox;
+        bbox.add_point( triangle.points[0] );
+        bbox.add_point( triangle.points[1] );
+        bbox.add_point( triangle.points[2] );
+        const auto maxJ = std::floor(
+            bbox.max().value( 0 ) / grid.cell_length_in_direction( 1 ) - 0.5 );
+        const auto maxK = std::floor(
+            bbox.max().value( 1 ) / grid.cell_length_in_direction( 2 ) - 0.5 );
+        const auto minJ = std::ceil(
+            bbox.min().value( 0 ) / grid.cell_length_in_direction( 1 ) - 0.5 );
+        const auto minK = std::ceil(
+            bbox.min().value( 1 ) / grid.cell_length_in_direction( 2 ) - 0.5 );
+        for( const auto j : geode::Range{ minJ, maxJ + 1 } )
+        {
+            for( const auto k : geode::Range{ minK, maxK + 1 } )
+            {
+                const geode::Point2D point{
+                    { ( j + 0.5 ) * grid.cell_length_in_direction( 1 ),
+                        ( k + 0.5 ) * grid.cell_length_in_direction( 2 ) }
+                };
+                if( !is_JK_to_process( triangle, point ) )
+                {
+                    continue;
+                }
+
+                auto maxI = std::floor(
+                    projected_i_coordinate( normal, points[anchor], point )
+                        / grid.cell_length_in_direction( 0 )
+                    - 0.5 );
+                if( maxI < 0 )
+                {
+                    maxI = 0;
+                }
+                values[{ j, k }].emplace_back(
+                    maxI, triangle.counter_clockwise );
+            }
+        }
+    }
+
     Values paint_surface( const geode::Grid3D& grid,
         const geode::TriangulatedSurface3D& closed_surface )
     {
@@ -693,55 +739,82 @@ namespace
         }
         for( const auto p : geode::Range{ closed_surface.nb_polygons() } )
         {
-            const auto n = closed_surface.polygon_normal( p );
-            if( !n || std::fabs( n->value( 0 ) ) < geode::global_epsilon )
+            const auto normal = closed_surface.polygon_normal( p );
+            if( !normal
+                || std::fabs( normal->value( 0 ) ) < geode::global_epsilon )
             {
                 continue;
             }
-            const auto triangle = project_on_JK( closed_surface, p, points );
-
-            geode::BoundingBox2D bbox;
-            bbox.add_point( triangle.points[0] );
-            bbox.add_point( triangle.points[1] );
-            bbox.add_point( triangle.points[2] );
-            const auto maxJ = std::floor(
-                bbox.max().value( 0 ) / grid.cell_length_in_direction( 1 )
-                - 0.5 );
-            const auto maxK = std::floor(
-                bbox.max().value( 1 ) / grid.cell_length_in_direction( 2 )
-                - 0.5 );
-            const auto minJ = std::ceil(
-                bbox.min().value( 0 ) / grid.cell_length_in_direction( 1 )
-                - 0.5 );
-            const auto minK = std::ceil(
-                bbox.min().value( 1 ) / grid.cell_length_in_direction( 2 )
-                - 0.5 );
-            for( const auto j : geode::Range{ minJ, maxJ + 1 } )
-            {
-                for( const auto k : geode::Range{ minK, maxK + 1 } )
-                {
-                    const geode::Point2D point{
-                        { ( j + 0.5 ) * grid.cell_length_in_direction( 1 ),
-                            ( k + 0.5 ) * grid.cell_length_in_direction( 2 ) }
-                    };
-                    if( !is_JK_to_process( triangle, point ) )
-                    {
-                        continue;
-                    }
-
-                    const auto maxI = std::floor(
-                        projected_i_coordinate( n.value(),
-                            points[closed_surface.polygon_vertex( { p, 0 } )],
-                            point )
-                            / grid.cell_length_in_direction( 0 )
-                        - 0.5 );
-                    values[{ j, k }].emplace_back(
-                        maxI, triangle.counter_clockwise );
-                }
-            }
+            const auto triangle =
+                project_on_JK( points, closed_surface.polygon_vertices( p ) );
+            fill_values( grid, triangle, points,
+                closed_surface.polygon_vertex( { p, 0 } ), normal.value(),
+                values );
         }
         return values;
     }
+
+    Values paint_surface(
+        const geode::Grid3D& grid, const geode::Tetrahedron& tetrahedron )
+    {
+        Values values;
+        const auto& origin = grid.grid_coordinate_system().origin();
+        absl::FixedArray< geode::Point3D > points( 4 );
+        const auto& vertices = tetrahedron.vertices();
+        for( const auto v : geode::Range{ 4 } )
+        {
+            points[v] = vertices[v].get() - origin;
+        }
+        for( const auto f : geode::Range{ 4 } )
+        {
+            const auto& vertices_order =
+                tetrahedron.tetrahedron_facet_vertex[f];
+            const auto normal = geode::Triangle3D{ points[vertices_order[0]],
+                points[vertices_order[1]], points[vertices_order[2]] }
+                                    .normal();
+            if( !normal
+                || std::fabs( normal->value( 0 ) ) < geode::global_epsilon )
+            {
+                continue;
+            }
+            const auto triangle = project_on_JK( points, vertices_order );
+            fill_values( grid, triangle, points, vertices_order[0],
+                normal.value(), values );
+        }
+        return values;
+    }
+
+    std::vector< typename geode::Grid3D::CellIndices > paint_interior(
+        Values& values )
+    {
+        std::vector< geode::Grid3D::CellIndices > cells;
+        for( auto& value : values )
+        {
+            const auto j = value.first.first;
+            const auto k = value.first.second;
+            auto& i_values = value.second;
+            absl::c_sort( i_values );
+            OPENGEODE_EXCEPTION( i_values.size() % 2 == 0,
+                "[rasterize_closed_surface] Wrong "
+                "number of intervals to paint" );
+            bool paint{ true };
+            for( geode::index_t it = 0; it < i_values.size();
+                 it += 2, paint = !paint )
+            {
+                if( !paint )
+                {
+                    continue;
+                }
+                for( const auto i :
+                    geode::Range{ i_values[it].id, i_values[it + 1].id + 1 } )
+                {
+                    cells.emplace_back( geode::Grid3D::CellIndices{ i, j, k } );
+                }
+            }
+        }
+        return cells;
+    }
+
 } // namespace
 
 namespace geode
@@ -819,35 +892,19 @@ namespace geode
             grid, triangle, vertex_cells );
     }
 
+    std::vector< typename Grid3D::CellIndices > rasterize_tetrahedron(
+        const Grid3D& grid, const Tetrahedron& tetrahedron )
+    {
+        auto values = paint_surface( grid, tetrahedron );
+        return paint_interior( values );
+    }
+
     std::vector< Grid3D::CellIndices >
         opengeode_mesh_api rasterize_closed_surface(
             const Grid3D& grid, const TriangulatedSurface3D& closed_surface )
     {
-        std::vector< Grid3D::CellIndices > cells;
-        for( auto& value : paint_surface( grid, closed_surface ) )
-        {
-            const auto j = value.first.first;
-            const auto k = value.first.second;
-            auto& i_values = value.second;
-            sort_unique( i_values );
-            OPENGEODE_EXCEPTION( i_values.size() % 2 == 0,
-                "[rasterize_closed_surface] Wrong "
-                "number of intervals to paint" );
-            bool paint{ true };
-            for( index_t it = 0; it < i_values.size(); it += 2, paint = !paint )
-            {
-                if( !paint )
-                {
-                    continue;
-                }
-                for( const auto i :
-                    Range{ i_values[it].id, i_values[it + 1].id + 1 } )
-                {
-                    cells.emplace_back( Grid3D::CellIndices{ i, j, k } );
-                }
-            }
-        }
-        return cells;
+        auto values = paint_surface( grid, closed_surface );
+        return paint_interior( values );
     }
 
     template std::vector< CellIndices< 2 > > opengeode_mesh_api

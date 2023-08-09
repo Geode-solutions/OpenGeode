@@ -23,6 +23,8 @@
 
 #include <geode/geometry/position.h>
 
+#include <geode/basic/logger.h>
+
 #include <geode/geometry/basic_objects/infinite_line.h>
 #include <geode/geometry/basic_objects/plane.h>
 #include <geode/geometry/basic_objects/segment.h>
@@ -65,6 +67,42 @@ namespace geode
             detail::side( dot0 ), detail::opposite_side( dot1 ) );
     }
 
+    Position point_triangle_position_all_zero(
+        const Point2D& point, const Triangle2D& triangle )
+    {
+        const auto& vertices = triangle.vertices();
+        if( point == vertices[0] )
+        {
+            return Position::vertex0;
+        }
+        if( point == vertices[1] )
+        {
+            return Position::vertex1;
+        }
+        if( point == vertices[2] )
+        {
+            return Position::vertex2;
+        }
+        const auto smaller = point < vertices[0];
+        if( smaller && vertices[1].get() < point )
+        {
+            return Position::parallel;
+        }
+        if( smaller && vertices[2].get() < point )
+        {
+            return Position::parallel;
+        }
+        if( !smaller && point < vertices[1] )
+        {
+            return Position::parallel;
+        }
+        if( !smaller && point < vertices[2] )
+        {
+            return Position::parallel;
+        }
+        return Position::outside;
+    }
+
     Position point_triangle_position_exact(
         const Point2D& point, const Triangle2D& triangle )
     {
@@ -75,6 +113,10 @@ namespace geode
             point_side_to_segment( point, { vertices[1], vertices[2] } );
         const auto s2 =
             point_side_to_segment( point, { vertices[2], vertices[0] } );
+        if( s0 == s1 && s1 == s2 && s2 == Side::zero )
+        {
+            return point_triangle_position_all_zero( point, triangle );
+        }
         return detail::point_triangle_position( s0, s1, s2 );
     }
 

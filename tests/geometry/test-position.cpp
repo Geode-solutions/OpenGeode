@@ -218,6 +218,32 @@ void test_point_segment_position()
     test_point_segment_position_3d();
 }
 
+void test_point_triangle_degenerated_position_2d()
+{
+    const geode::Point2D a{ { 1.0, 1.0 } };
+    const geode::Point2D b{ { 0.5, 0.5 } };
+    const geode::Point2D c{ { 1.2, 1.2 } };
+    const geode::Triangle2D triangle2D{ a, b, c };
+
+    const geode::Point2D q1{ { 1.5, 1.5 } };
+    const auto position_q1 = geode::point_triangle_position( q1, triangle2D );
+    OPENGEODE_EXCEPTION( position_q1 == geode::Position::outside,
+        "[Test] Wrong result for test_point_triangle_degenerated_position_2d "
+        "with query point q1" );
+
+    const auto position_c = geode::point_triangle_position( c, triangle2D );
+    OPENGEODE_EXCEPTION( position_c == geode::Position::vertex0
+                             || position_c == geode::Position::vertex2,
+        "[Test] Wrong result for test_point_triangle_degenerated_position_2d "
+        "with query point c" );
+
+    const geode::Point2D q2{ { 0.75, 0.75 } };
+    const auto position_q2 = geode::point_triangle_position( q2, triangle2D );
+    OPENGEODE_EXCEPTION( position_q2 == geode::Position::parallel,
+        "[Test] Wrong result for test_point_triangle_degenerated_position_2d "
+        "with query point q2" );
+}
+
 void test_point_triangle_position_2d()
 {
     const geode::Point2D a{ { 0.0, 0.0 } };
@@ -336,6 +362,7 @@ void test_point_triangle_position_3d()
 void test_point_triangle_position()
 {
     test_point_triangle_position_2d();
+    test_point_triangle_degenerated_position_2d();
     test_point_triangle_position_3d();
 }
 

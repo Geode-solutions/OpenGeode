@@ -119,6 +119,10 @@ namespace geode
 
         const uuid& create_surface( const MeshImpl& impl );
 
+        void create_surface( uuid surface_id );
+
+        void create_surface( uuid surface_id, const MeshImpl& impl );
+
         void delete_surface( const Surface< dimension >& surface );
 
         void load_surfaces( absl::string_view directory );

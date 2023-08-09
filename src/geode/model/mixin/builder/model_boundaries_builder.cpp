@@ -35,6 +35,14 @@ namespace geode
     }
 
     template < index_t dimension >
+    void ModelBoundariesBuilder< dimension >::create_model_boundary(
+        uuid model_boundary_id )
+    {
+        model_boundaries_.create_model_boundary(
+            std::move( model_boundary_id ) );
+    }
+
+    template < index_t dimension >
     void ModelBoundariesBuilder< dimension >::delete_model_boundary(
         const ModelBoundary< dimension >& boundary )
     {

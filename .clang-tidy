@@ -1,0 +1,45 @@
+---
+# Configure clang-tidy for this project.
+Checks: >
+  *,
+  -altera*,
+  -fuchsia*,
+  -llvmlibc*,
+  -misc-no-recursion,
+  -modernize-use-trailing-return-type,
+  -readability-redundant-access-specifiers
+
+CheckOptions:
+  - key:    misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
+    value:  '1'
+  - key: readability-identifier-length.MinimumLoopCounterNameLength
+    value: 1
+  - key: readability-identifier-length.IgnoredVariableNames
+    value: '^[defijkuvw]$'
+  # More options here: https://clang.llvm.org/extra/clang-tidy/checks/readability/identifier-naming.html
+  - key: readability-identifier-naming.NamespaceCase
+    value: lower_case
+  - key: readability-identifier-naming.ClassCase
+    value: CamelCase 
+  - key: readability-identifier-naming.StructCase
+    value: CamelCase 
+  - key: readability-identifier-naming.FunctionCase
+    value: lower_case
+  - key: readability-identifier-naming.VariableCase
+    value: lower_case
+  - key: readability-identifier-naming.ConstexprVariableCase
+    value: UPPER_CASE
+  - key: readability-identifier-naming.PrivateMemberSuffix
+    value: _
+  - key: readability-identifier-naming.MacroDefinitionCase
+    value: UPPER_CASE
+  - key: readability-identifier-naming.EnumConstantCase
+    value: lower_case
+  - key: readability-identifier-naming.ConstexprVariableCase
+    value: lower_case
+  - key: readability-identifier-naming.GlobalConstantCase
+    value: UPPER_CASE
+  - key: readability-identifier-naming.MemberConstantCase
+    value: CamelCase 
+  - key: readability-identifier-naming.StaticConstantCase
+    value: CamelCase 

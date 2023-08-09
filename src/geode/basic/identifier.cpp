@@ -46,9 +46,9 @@ namespace geode
             return name_;
         }
 
-        void set_id( uuid id )
+        void set_id( const uuid& unique_id )
         {
-            id_ = std::move( id );
+            id_ = unique_id;
         }
 
         void set_name( absl::string_view name )
@@ -94,11 +94,12 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this,
-                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.object( impl.id_ );
-                    a.text1b( impl.name_, impl.name_.max_size() );
-                } } } );
+            archive.ext( *this, Growable< Archive, Impl >{
+                                    { []( Archive& local_archive, Impl& impl ) {
+                                        local_archive.object( impl.id_ );
+                                        local_archive.text1b(
+                                            impl.name_, impl.name_.max_size() );
+                                    } } } );
         }
 
     private:
@@ -106,16 +107,16 @@ namespace geode
         std::string name_ = std::string{ DEFAULT_NAME };
     };
 
-    Identifier::Identifier() {}
+    Identifier::Identifier() {} // NOLINT
 
-    Identifier::~Identifier() {}
+    Identifier::~Identifier() {} // NOLINT
 
-    Identifier::Identifier( Identifier&& other )
+    Identifier::Identifier( Identifier&& other ) noexcept
         : impl_( std::move( other.impl_ ) )
     {
     }
 
-    Identifier& Identifier::operator=( Identifier&& other )
+    Identifier& Identifier::operator=( Identifier&& other ) noexcept
     {
         impl_ = std::move( other.impl_ );
         return *this;
@@ -137,24 +138,25 @@ namespace geode
     }
 
     void Identifier::load_identifier(
-        absl::string_view directory, IdentifierKey )
+        absl::string_view directory, IdentifierKey /*unused*/ )
     {
         impl_->load( directory );
     }
 
-    void Identifier::set_id( uuid id, IdentifierKey )
+    void Identifier::set_id( const uuid& unique_id, IdentifierKey /*unused*/ )
     {
-        set_id( std::move( id ) );
+        set_id( unique_id );
     }
 
-    void Identifier::set_name( absl::string_view name, IdentifierKey )
+    void Identifier::set_name(
+        absl::string_view name, IdentifierKey /*unused*/ )
     {
         set_name( name );
     }
 
-    void Identifier::set_id( uuid id )
+    void Identifier::set_id( const uuid& unique_id )
     {
-        impl_->set_id( std::move( id ) );
+        impl_->set_id( unique_id );
     }
 
     void Identifier::set_name( absl::string_view name )
@@ -165,10 +167,11 @@ namespace geode
     template < typename Archive >
     void Identifier::serialize( Archive& archive )
     {
-        archive.ext( *this, Growable< Archive, Identifier >{
-                                { []( Archive& a, Identifier& identifier ) {
-                                    a.object( identifier.impl_ );
-                                } } } );
+        archive.ext(
+            *this, Growable< Archive, Identifier >{
+                       { []( Archive& local_archive, Identifier& identifier ) {
+                           local_archive.object( identifier.impl_ );
+                       } } } );
     }
 
     SERIALIZE_BITSERY_ARCHIVE( opengeode_basic_api, Identifier );

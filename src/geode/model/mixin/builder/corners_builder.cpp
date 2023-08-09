@@ -45,6 +45,19 @@ namespace geode
     }
 
     template < index_t dimension >
+    void CornersBuilder< dimension >::create_corner( uuid corner_id )
+    {
+        corners_.create_corner( std::move( corner_id ) );
+    }
+
+    template < index_t dimension >
+    void CornersBuilder< dimension >::create_corner(
+        uuid corner_id, const MeshImpl& impl )
+    {
+        corners_.create_corner( std::move( corner_id ), impl );
+    }
+
+    template < index_t dimension >
     void CornersBuilder< dimension >::delete_corner(
         const Corner< dimension >& corner )
     {

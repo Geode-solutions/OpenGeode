@@ -25,6 +25,7 @@
 
 #include <async++.h>
 
+#include <geode/basic/identifier_builder.h>
 #include <geode/basic/pimpl_impl.h>
 #include <geode/basic/range.h>
 
@@ -218,6 +219,28 @@ namespace geode
         const auto& id = surface->id();
         impl_->add_component( std::move( surface ) );
         return id;
+    }
+
+    template < index_t dimension >
+    void Surfaces< dimension >::create_surface( uuid surface_id )
+    {
+        typename Surfaces< dimension >::Impl::ComponentPtr surface{
+            new Surface< dimension >{
+                typename Surface< dimension >::SurfacesKey{} }
+        };
+        IdentifierBuilder{ *surface }.set_id( std::move( surface_id ) );
+        impl_->add_component( std::move( surface ) );
+    }
+
+    template < index_t dimension >
+    void Surfaces< dimension >::create_surface(
+        uuid surface_id, const MeshImpl& impl )
+    {
+        typename Surfaces< dimension >::Impl::ComponentPtr surface{
+            new Surface< dimension >{ impl, {} }
+        };
+        IdentifierBuilder{ *surface }.set_id( std::move( surface_id ) );
+        impl_->add_component( std::move( surface ) );
     }
 
     template < index_t dimension >

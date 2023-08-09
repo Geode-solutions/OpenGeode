@@ -44,6 +44,19 @@ namespace geode
     }
 
     template < index_t dimension >
+    void LinesBuilder< dimension >::create_line( uuid line_id )
+    {
+        lines_.create_line( std::move( line_id ) );
+    }
+
+    template < index_t dimension >
+    void LinesBuilder< dimension >::create_line(
+        uuid line_id, const MeshImpl& impl )
+    {
+        lines_.create_line( std::move( line_id ), impl );
+    }
+
+    template < index_t dimension >
     void LinesBuilder< dimension >::delete_line( const Line< dimension >& line )
     {
         lines_.delete_line( line );

@@ -36,16 +36,21 @@ namespace geode
 {
     class AttributeManager::Impl
     {
+        using AttributesMap = absl::flat_hash_map< std::string,
+            std::shared_ptr< AttributeBase > >;
+        using AttributesMapElement = std::pair< const AttributesMap::key_type,
+            AttributesMap::mapped_type >;
+
     public:
         std::shared_ptr< AttributeBase > find_attribute_base(
             absl::string_view name ) const
         {
-            const auto it = attributes_.find( name );
-            if( it == attributes_.end() )
+            const auto attribute_it = attributes_.find( name );
+            if( attribute_it == attributes_.end() )
             {
                 return nullptr;
             }
-            return it->second;
+            return attribute_it->second;
         }
 
         void register_attribute( std::shared_ptr< AttributeBase > &attribute,
@@ -64,9 +69,9 @@ namespace geode
                 return;
             }
             nb_elements_ = size;
-            for( auto &it : attributes_ )
+            for( auto &attribute_it : attributes_ )
             {
-                it.second->resize( size, key );
+                attribute_it.second->resize( size, key );
             }
         }
 
@@ -76,9 +81,9 @@ namespace geode
             {
                 return;
             }
-            for( auto &it : attributes_ )
+            for( auto &attribute_it : attributes_ )
             {
-                it.second->reserve( capacity, key );
+                attribute_it.second->reserve( capacity, key );
             }
         }
 
@@ -86,11 +91,12 @@ namespace geode
             index_t to_element,
             const AttributeBase::AttributeKey &key )
         {
-            for( auto &it : attributes_ )
+            for( auto &attribute_it : attributes_ )
             {
-                if( it.second->properties().assignable )
+                if( attribute_it.second->properties().assignable )
                 {
-                    it.second->compute_value( from_element, to_element, key );
+                    attribute_it.second->compute_value(
+                        from_element, to_element, key );
                 }
             }
         }
@@ -100,46 +106,39 @@ namespace geode
             index_t to_element,
             const AttributeBase::AttributeKey &key )
         {
-            for( auto &it : attributes_ )
+            for( auto &attribute_it : attributes_ )
             {
-                if( it.second->properties().interpolable )
+                if( attribute_it.second->properties().interpolable )
                 {
-                    it.second->compute_value( interpolation, to_element, key );
+                    attribute_it.second->compute_value(
+                        interpolation, to_element, key );
                 }
             }
         }
 
         bool has_assignable_attributes() const
         {
-            for( const auto &it : attributes_ )
-            {
-                if( it.second->properties().assignable )
-                {
-                    return true;
-                }
-            }
-            return false;
+            return absl::c_any_of(
+                attributes_, []( const AttributesMapElement &attribute ) {
+                    return attribute.second->properties().assignable;
+                } );
         }
 
         bool has_interpolable_attributes() const
         {
-            for( const auto &it : attributes_ )
-            {
-                if( it.second->properties().interpolable )
-                {
-                    return true;
-                }
-            }
-            return false;
+            return absl::c_any_of(
+                attributes_, []( const AttributesMapElement &attribute ) {
+                    return attribute.second->properties().interpolable;
+                } );
         }
 
         absl::FixedArray< absl::string_view > attribute_names() const
         {
             absl::FixedArray< absl::string_view > names( attributes_.size() );
             index_t count{ 0 };
-            for( const auto &it : attributes_ )
+            for( const auto &attribute_it : attributes_ )
             {
-                names[count++] = it.first;
+                names[count++] = attribute_it.first;
             }
             return names;
         }
@@ -151,22 +150,22 @@ namespace geode
 
         void delete_attribute( absl::string_view name )
         {
-            const auto it = attributes_.find( name );
-            if( it != attributes_.end() )
+            const auto attribute_it = attributes_.find( name );
+            if( attribute_it != attributes_.end() )
             {
-                attributes_.erase( it );
+                attributes_.erase( attribute_it );
             }
         }
 
         absl::string_view attribute_type( absl::string_view name ) const
         {
-            const auto it = attributes_.find( name );
-            if( it == attributes_.end() )
+            const auto attribute_it = attributes_.find( name );
+            if( attribute_it == attributes_.end() )
             {
                 static constexpr auto undefined = "undefined";
                 return undefined;
             }
-            return it->second->type();
+            return attribute_it->second->type();
         }
 
         void clear()
@@ -177,9 +176,9 @@ namespace geode
 
         void clear_attributes( const AttributeBase::AttributeKey &key )
         {
-            for( auto &it : attributes_ )
+            for( auto &attribute_it : attributes_ )
             {
-                it.second->resize( 0, key );
+                attribute_it.second->resize( 0, key );
             }
             nb_elements_ = 0;
         }
@@ -187,9 +186,9 @@ namespace geode
         void delete_elements( const std::vector< bool > &to_delete,
             const AttributeBase::AttributeKey &key )
         {
-            for( auto &it : attributes_ )
+            for( auto &attribute_it : attributes_ )
             {
-                it.second->delete_elements( to_delete, key );
+                attribute_it.second->delete_elements( to_delete, key );
             }
             nb_elements_ -=
                 static_cast< index_t >( absl::c_count( to_delete, true ) );
@@ -198,9 +197,9 @@ namespace geode
         void permute_elements( absl::Span< const index_t > permutation,
             const AttributeBase::AttributeKey &key )
         {
-            for( auto &it : attributes_ )
+            for( auto &attribute_it : attributes_ )
             {
-                it.second->permute_elements( permutation, key );
+                attribute_it.second->permute_elements( permutation, key );
             }
         }
 
@@ -215,12 +214,12 @@ namespace geode
             nb_elements_ = attribute_manager.nb_elements_;
             for( const auto &attribute : attribute_manager.attributes_ )
             {
-                const auto it = attributes_.find( attribute.first );
-                if( it != attributes_.end() )
+                const auto attribute_it = attributes_.find( attribute.first );
+                if( attribute_it != attributes_.end() )
                 {
                     try
                     {
-                        it->second->copy(
+                        attribute_it->second->copy(
                             *attribute.second, nb_elements_, key );
                     }
                     catch( const std::bad_cast &e )
@@ -280,50 +279,51 @@ namespace geode
             absl::string_view new_name,
             const AttributeBase::AttributeKey &key )
         {
-            const auto it = attributes_.find( old_name );
-            OPENGEODE_EXCEPTION( it != attributes_.end(),
+            const auto attribute_it = attributes_.find( old_name );
+            OPENGEODE_EXCEPTION( attribute_it != attributes_.end(),
                 "[AttributeManager::rename_attribute] Attribute ", old_name,
                 "does not exist" );
-            auto attribute = it->second;
-            attributes_.erase( it );
+            auto attribute = attribute_it->second;
+            attributes_.erase( attribute_it );
             attribute->set_name( new_name, key );
             attributes_.emplace( new_name, attribute );
         }
 
         void set_attribute_properties( absl::string_view attribute_name,
-            AttributeProperties new_properties )
+            const AttributeProperties &new_properties )
         {
-            const auto it = attributes_.find( attribute_name );
-            OPENGEODE_EXCEPTION( it != attributes_.end(),
+            const auto attribute_it = attributes_.find( attribute_name );
+            OPENGEODE_EXCEPTION( attribute_it != attributes_.end(),
                 "[AttributeManager::rename_attribute] Attribute ",
                 attribute_name, "does not exist" );
-            it->second->set_properties( std::move( new_properties ) );
+            attribute_it->second->set_properties( new_properties );
         }
 
         template < typename Archive >
         void serialize( Archive &archive )
         {
             archive.ext( *this,
-                Growable< Archive, Impl >{ { []( Archive &a, Impl &impl ) {
-                    a.value4b( impl.nb_elements_ );
-                    a.ext( impl.attributes_,
-                        bitsery::ext::StdMap{ impl.attributes_.max_size() },
-                        []( Archive &a2, std::string &name,
-                            std::shared_ptr< AttributeBase > &attribute ) {
-                            a2.text1b( name, name.max_size() );
-                            a2.ext( attribute, bitsery::ext::StdSmartPtr{} );
-                        } );
-                } } } );
+                Growable< Archive, Impl >{
+                    { []( Archive &local_archive, Impl &impl ) {
+                        local_archive.value4b( impl.nb_elements_ );
+                        local_archive.ext( impl.attributes_,
+                            bitsery::ext::StdMap{ impl.attributes_.max_size() },
+                            []( Archive &local_archive2, std::string &name,
+                                std::shared_ptr< AttributeBase > &attribute ) {
+                                local_archive2.text1b( name, name.max_size() );
+                                local_archive2.ext(
+                                    attribute, bitsery::ext::StdSmartPtr{} );
+                            } );
+                    } } } );
         }
 
     private:
         index_t nb_elements_{ 0 };
-        absl::flat_hash_map< std::string, std::shared_ptr< AttributeBase > >
-            attributes_;
+        AttributesMap attributes_;
     };
 
     AttributeManager::AttributeManager() {} // NOLINT
-    AttributeManager::AttributeManager( AttributeManager &&other )
+    AttributeManager::AttributeManager( AttributeManager &&other ) noexcept
         : impl_( std::move( other.impl_ ) )
     {
     }
@@ -453,10 +453,10 @@ namespace geode
     }
 
     void AttributeManager::set_attribute_properties(
-        absl::string_view attribute_name, AttributeProperties new_properties )
+        absl::string_view attribute_name,
+        const AttributeProperties &new_properties )
     {
-        impl_->set_attribute_properties(
-            attribute_name, std::move( new_properties ) );
+        impl_->set_attribute_properties( attribute_name, new_properties );
     }
 
     template < typename Archive >
@@ -464,13 +464,15 @@ namespace geode
     {
         archive.ext( *this,
             Growable< Archive, AttributeManager >{
-                { []( Archive &a, AttributeManager &attribute_manager ) {
-                     a.object( attribute_manager.impl_ );
+                { []( Archive &local_archive,
+                      AttributeManager &attribute_manager ) {
+                     local_archive.object( attribute_manager.impl_ );
                      const AttributeBase::AttributeKey key;
                      attribute_manager.impl_->initialize_attribute_names( key );
                  },
-                    []( Archive &a, AttributeManager &attribute_manager ) {
-                        a.object( attribute_manager.impl_ );
+                    []( Archive &local_archive,
+                        AttributeManager &attribute_manager ) {
+                        local_archive.object( attribute_manager.impl_ );
                     } } } );
     }
 

@@ -25,6 +25,7 @@
 
 // clang-format off
 #include <spdlog/spdlog.h>
+
 #include <spdlog/sinks/stdout_color_sinks.h>
 // clang-format on
 
@@ -75,9 +76,9 @@ namespace geode
         std::shared_ptr< spdlog::logger > logger_impl_;
     };
 
-    ConsoleLoggerClient::ConsoleLoggerClient() {}
+    ConsoleLoggerClient::ConsoleLoggerClient() {} // NOLINT
 
-    ConsoleLoggerClient::~ConsoleLoggerClient() {}
+    ConsoleLoggerClient::~ConsoleLoggerClient() {} // NOLINT
 
     void ConsoleLoggerClient::trace( const std::string &message )
     {

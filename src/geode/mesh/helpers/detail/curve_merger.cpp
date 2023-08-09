@@ -73,6 +73,7 @@ namespace geode
                 index_t curve,
                 index_t edge ) const
             {
+                geode_unused( merger );
                 OPENGEODE_ASSERT( curve < merger.meshes().size(),
                     "[EdgedCurveMerger::edge_in_merged] Wrong curve index" );
                 OPENGEODE_ASSERT(
