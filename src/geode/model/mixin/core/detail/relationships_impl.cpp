@@ -46,6 +46,11 @@ namespace geode
             initialize_attributes();
         }
 
+        index_t RelationshipsImpl::nb_components_with_relations() const
+        {
+            return graph_->nb_vertices();
+        }
+
         index_t RelationshipsImpl::nb_relations( const uuid& id ) const
         {
             if( const auto index = vertex_id( id ) )
@@ -77,9 +82,15 @@ namespace geode
         }
 
         const ComponentID& RelationshipsImpl::vertex_component_id(
+            index_t vertex ) const
+        {
+            return ids_->value( vertex );
+        }
+
+        const ComponentID& RelationshipsImpl::vertex_component_id(
             const EdgeVertex& edge_vertex ) const
         {
-            return ids_->value( graph_->edge_vertex( edge_vertex ) );
+            return vertex_component_id( graph_->edge_vertex( edge_vertex ) );
         }
 
         void RelationshipsImpl::remove_component( const uuid& id )

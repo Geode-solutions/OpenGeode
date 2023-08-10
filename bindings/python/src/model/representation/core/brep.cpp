@@ -106,8 +106,8 @@ namespace geode
                 },
                 pybind11::return_value_policy::reference )
             .def( "nb_internal_corners_of_surface",
-                ( index_t( BRep::* )( const Surface3D& ) const )
-                    & BRep::nb_internal_corners )
+                static_cast< index_t ( BRep::* )( const Surface3D& ) const >(
+                    &BRep::nb_internal_corners ) )
             .def(
                 "internal_corners_of_surface",
                 []( const BRep& brep, const Surface3D& surface ) {
@@ -121,8 +121,8 @@ namespace geode
                 },
                 pybind11::return_value_policy::reference )
             .def( "nb_internal_lines_of_surface",
-                ( index_t( BRep::* )( const Surface3D& ) const )
-                    & BRep::nb_internal_lines )
+                static_cast< index_t ( BRep::* )( const Surface3D& ) const >(
+                    &BRep::nb_internal_lines ) )
             .def(
                 "internal_lines_of_surface",
                 []( const BRep& brep, const Surface3D& surface ) {
@@ -136,8 +136,8 @@ namespace geode
                 },
                 pybind11::return_value_policy::reference )
             .def( "nb_internal_corners_of_block",
-                ( index_t( BRep::* )( const Block3D& ) const )
-                    & BRep::nb_internal_corners )
+                static_cast< index_t ( BRep::* )( const Block3D& ) const >(
+                    &BRep::nb_internal_corners ) )
             .def(
                 "internal_corners_of_block",
                 []( const BRep& brep, const Block3D& block ) {
@@ -151,8 +151,8 @@ namespace geode
                 },
                 pybind11::return_value_policy::reference )
             .def( "nb_internal_lines_of_block",
-                ( index_t( BRep::* )( const Block3D& ) const )
-                    & BRep::nb_internal_lines )
+                static_cast< index_t ( BRep::* )( const Block3D& ) const >(
+                    &BRep::nb_internal_lines ) )
             .def(
                 "internal_lines_of_block",
                 []( const BRep& brep, const Block3D& block ) {
@@ -164,9 +164,7 @@ namespace geode
                     return components;
                 },
                 pybind11::return_value_policy::reference )
-            .def( "nb_internal_surfaces_of_block",
-                ( index_t( BRep::* )( const Block3D& ) const )
-                    & BRep::nb_internal_surfaces )
+            .def( "nb_internal_surfaces_of_block", &BRep::nb_internal_surfaces )
             .def(
                 "internal_surfaces_of_block",
                 []( const BRep& brep, const Block3D& block ) {
@@ -180,8 +178,8 @@ namespace geode
                 },
                 pybind11::return_value_policy::reference )
             .def( "nb_embedding_surfaces_of_corner",
-                ( index_t( BRep::* )( const Corner3D& ) const )
-                    & BRep::nb_embedding_surfaces )
+                static_cast< index_t ( BRep::* )( const Corner3D& ) const >(
+                    &BRep::nb_embedding_surfaces ) )
             .def(
                 "embedding_surfaces_of_corner",
                 []( const BRep& brep, const Corner3D& corner ) {
@@ -195,8 +193,8 @@ namespace geode
                 },
                 pybind11::return_value_policy::reference )
             .def( "nb_embedding_surfaces_of_line",
-                ( index_t( BRep::* )( const Line3D& ) const )
-                    & BRep::nb_embedding_surfaces )
+                static_cast< index_t ( BRep::* )( const Line3D& ) const >(
+                    &BRep::nb_embedding_surfaces ) )
             .def(
                 "embedding_surfaces_of_line",
                 []( const BRep& brep, const Line3D& line ) {
@@ -210,8 +208,8 @@ namespace geode
                 },
                 pybind11::return_value_policy::reference )
             .def( "nb_embedding_blocks_of_corner",
-                ( index_t( BRep::* )( const Corner3D& ) const )
-                    & BRep::nb_embedding_blocks )
+                static_cast< index_t ( BRep::* )( const Corner3D& ) const >(
+                    &BRep::nb_embedding_blocks ) )
             .def(
                 "embedding_blocks_of_corner",
                 []( const BRep& brep, const Corner3D& corner ) {
@@ -225,8 +223,8 @@ namespace geode
                 },
                 pybind11::return_value_policy::reference )
             .def( "nb_embedding_blocks_of_line",
-                ( index_t( BRep::* )( const Line3D& ) const )
-                    & BRep::nb_embedding_blocks )
+                static_cast< index_t ( BRep::* )( const Line3D& ) const >(
+                    &BRep::nb_embedding_blocks ) )
             .def(
                 "embedding_blocks_of_line",
                 []( const BRep& brep, const Line3D& line ) {
@@ -239,8 +237,8 @@ namespace geode
                 },
                 pybind11::return_value_policy::reference )
             .def( "nb_embedding_blocks_of_surface",
-                ( index_t( BRep::* )( const Surface3D& ) const )
-                    & BRep::nb_embedding_blocks )
+                static_cast< index_t ( BRep::* )( const Surface3D& ) const >(
+                    &BRep::nb_embedding_blocks ) )
             .def(
                 "embedding_blocks_of_surface",
                 []( const BRep& brep, const Surface3D& surface ) {
@@ -266,34 +264,35 @@ namespace geode
                 },
                 pybind11::return_value_policy::reference )
             .def( "is_line_closed",
-                ( bool( BRep::* )( const Line3D& ) const ) & BRep::is_closed )
+                static_cast< bool ( BRep::* )( const Line3D& ) const >(
+                    &BRep::is_closed ) )
             .def( "is_surface_closed",
-                ( bool( BRep::* )( const Surface3D& ) const )
-                    & BRep::is_closed )
+                static_cast< bool ( BRep::* )( const Surface3D& ) const >(
+                    &BRep::is_closed ) )
             .def( "is_line_boundary",
-                ( bool( BRep::* )( const Corner3D&, const Line3D& ) const )
-                    & BRep::is_boundary )
+                static_cast< bool ( BRep::* )( const Corner3D&, const Line3D& )
+                        const >( &BRep::is_boundary ) )
             .def( "is_surface_boundary",
-                ( bool( BRep::* )( const Line3D&, const Surface3D& ) const )
-                    & BRep::is_boundary )
+                static_cast< bool ( BRep::* )( const Line3D&, const Surface3D& )
+                        const >( &BRep::is_boundary ) )
             .def( "is_block_boundary",
-                ( bool( BRep::* )( const Surface3D&, const Block3D& ) const )
-                    & BRep::is_boundary )
+                static_cast< bool ( BRep::* )( const Surface3D&,
+                    const Block3D& ) const >( &BRep::is_boundary ) )
             .def( "is_corner_in_surface_internals",
-                ( bool( BRep::* )( const Corner3D&, const Surface3D& ) const )
-                    & BRep::is_internal )
+                static_cast< bool ( BRep::* )( const Corner3D&,
+                    const Surface3D& ) const >( &BRep::is_internal ) )
             .def( "is_line_in_surface_internals",
-                ( bool( BRep::* )( const Line3D&, const Surface3D& ) const )
-                    & BRep::is_internal )
+                static_cast< bool ( BRep::* )( const Line3D&, const Surface3D& )
+                        const >( &BRep::is_internal ) )
             .def( "is_corner_in_block_internals",
-                ( bool( BRep::* )( const Corner3D&, const Block3D& ) const )
-                    & BRep::is_internal )
+                static_cast< bool ( BRep::* )( const Corner3D&, const Block3D& )
+                        const >( &BRep::is_internal ) )
             .def( "is_line_in_block_internals",
-                ( bool( BRep::* )( const Line3D&, const Block3D& ) const )
-                    & BRep::is_internal )
+                static_cast< bool ( BRep::* )( const Line3D&, const Block3D& )
+                        const >( &BRep::is_internal ) )
             .def( "is_surface_in_block_internals",
-                ( bool( BRep::* )( const Surface3D&, const Block3D& ) const )
-                    & BRep::is_internal )
+                static_cast< bool ( BRep::* )( const Surface3D&,
+                    const Block3D& ) const >( &BRep::is_internal ) )
             .def( "is_model_boundary_item", &BRep::is_model_boundary_item )
             .def( "bounding_box", &BRep::bounding_box )
             .def( "native_extension", &BRep::native_extension );

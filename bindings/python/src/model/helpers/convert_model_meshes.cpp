@@ -33,17 +33,19 @@ namespace geode
     {
         module
             .def( "triangulate_section_surface_meshes",
-                ( void ( * )( Section& ) ) & triangulate_surface_meshes )
+                static_cast< void ( * )( Section& ) >(
+                    &triangulate_surface_meshes ) )
             .def( "triangulate_brep_surface_meshes",
-                ( void ( * )( BRep& ) ) & triangulate_surface_meshes )
+                static_cast< void ( * )( BRep& ) >(
+                    &triangulate_surface_meshes ) )
             .def( "convert_section_surface_meshes_into_triangulated_surfaces",
-                ( void ( * )( Section& ) )
-                    & convert_surface_meshes_into_triangulated_surfaces )
+                static_cast< void ( * )( Section& ) >(
+                    &convert_surface_meshes_into_triangulated_surfaces ) )
             .def( "convert_brep_surface_meshes_into_triangulated_surfaces",
-                ( void ( * )( BRep& ) )
-                    & convert_surface_meshes_into_triangulated_surfaces )
+                static_cast< void ( * )( BRep& ) >(
+                    &convert_surface_meshes_into_triangulated_surfaces ) )
             .def( "convert_brep_block_meshes_into_tetrahedral_solids",
-                ( void ( * )( BRep& ) )
-                    & convert_block_meshes_into_tetrahedral_solids );
+                static_cast< void ( * )( BRep& ) >(
+                    &convert_block_meshes_into_tetrahedral_solids ) );
     }
 } // namespace geode

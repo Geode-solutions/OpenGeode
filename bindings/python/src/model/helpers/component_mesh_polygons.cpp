@@ -71,13 +71,11 @@ namespace geode
 
         module
             .def( "block_polygon_unique_vertices",
-                ( PolygonVertices( * )(
-                    const BRep&, const Block3D&, const PolyhedronFacet& ) )
-                    & polygon_unique_vertices )
+                static_cast< PolygonVertices ( * )( const BRep&, const Block3D&,
+                    const PolyhedronFacet& ) >( &polygon_unique_vertices ) )
             .def( "surface_polygon_unique_vertices",
-                ( PolygonVertices( * )(
-                    const BRep&, const Surface3D&, index_t ) )
-                    & polygon_unique_vertices )
+                static_cast< PolygonVertices ( * )( const BRep&,
+                    const Surface3D&, index_t ) >( &polygon_unique_vertices ) )
             .def( "block_mesh_polyhedra_from_surface_polygon",
                 &block_mesh_polyhedra_from_surface_polygon )
             .def( "block_vertices_from_surface_polygon",
@@ -85,20 +83,20 @@ namespace geode
             .def( "oriented_block_vertices_from_surface_polygon",
                 &oriented_block_vertices_from_surface_polygon )
             .def( "brep_surface_vertices_from_line_edge",
-                ( absl::InlinedVector< SurfacePolygonEdge, 2 >( * )(
-                    const BRep&, const Surface3D&, const Line3D&, index_t ) )
-                    & surface_vertices_from_line_edge )
+                static_cast< absl::InlinedVector< SurfacePolygonEdge, 2 > ( * )(
+                    const BRep&, const Surface3D&, const Line3D&, index_t ) >(
+                    &surface_vertices_from_line_edge ) )
             .def( "brep_oriented_surface_vertices_from_line_edge",
-                ( SurfacePolygonsEdgeVertices( * )(
-                    const BRep&, const Surface3D&, const Line3D&, index_t ) )
-                    & oriented_surface_vertices_from_line_edge )
+                static_cast< SurfacePolygonsEdgeVertices ( * )(
+                    const BRep&, const Surface3D&, const Line3D&, index_t ) >(
+                    &oriented_surface_vertices_from_line_edge ) )
             .def( "section_surface_vertices_from_line_edge",
-                ( absl::InlinedVector< SurfacePolygonEdge, 2 >( * )(
-                    const Section&, const Surface2D&, const Line2D&, index_t ) )
-                    & surface_vertices_from_line_edge )
+                static_cast< absl::InlinedVector< SurfacePolygonEdge, 2 > ( * )(
+                    const Section&, const Surface2D&, const Line2D&,
+                    index_t ) >( &surface_vertices_from_line_edge ) )
             .def( "section_oriented_surface_vertices_from_line_edge",
-                ( SurfacePolygonsEdgeVertices( * )(
-                    const Section&, const Surface2D&, const Line2D&, index_t ) )
-                    & oriented_surface_vertices_from_line_edge );
+                static_cast< SurfacePolygonsEdgeVertices ( * )( const Section&,
+                    const Surface2D&, const Line2D&, index_t ) >(
+                    &oriented_surface_vertices_from_line_edge ) );
     }
 } // namespace geode

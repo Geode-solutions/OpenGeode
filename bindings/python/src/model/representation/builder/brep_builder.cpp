@@ -41,16 +41,17 @@ namespace geode
             module, "BRepBuilder" )
             .def( pybind11::init< BRep& >() )
             .def( "copy", &BRepBuilder::copy )
-            .def( "add_corner",
-                ( const uuid& (BRepBuilder::*) () ) & BRepBuilder::add_corner )
-            .def( "add_line",
-                ( const uuid& (BRepBuilder::*) () ) & BRepBuilder::add_line )
-            .def( "add_surface",
-                ( const uuid& (BRepBuilder::*) () ) & BRepBuilder::add_surface )
-            .def( "add_block",
-                ( const uuid& (BRepBuilder::*) () ) & BRepBuilder::add_block )
-            .def( "add_model_boundary", ( const uuid& (BRepBuilder::*) () )
-                                            & BRepBuilder::add_model_boundary )
+            .def( "add_corner", static_cast< const uuid& (BRepBuilder::*) () >(
+                                    &BRepBuilder::add_corner ) )
+            .def( "add_line", static_cast< const uuid& (BRepBuilder::*) () >(
+                                  &BRepBuilder::add_line ) )
+            .def( "add_surface", static_cast< const uuid& (BRepBuilder::*) () >(
+                                     &BRepBuilder::add_surface ) )
+            .def( "add_block", static_cast< const uuid& (BRepBuilder::*) () >(
+                                   &BRepBuilder::add_block ) )
+            .def( "add_model_boundary",
+                static_cast< const uuid& (BRepBuilder::*) () >(
+                    &BRepBuilder::add_model_boundary ) )
             .def( "remove_corner", &BRepBuilder::remove_corner )
             .def( "remove_line", &BRepBuilder::remove_line )
             .def( "remove_surface", &BRepBuilder::remove_surface )

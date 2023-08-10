@@ -145,6 +145,7 @@ add_geode_library(
         "mixin/core/detail/uuid_to_index.h"
         "mixin/core/detail/relationships_impl.h"
         "representation/builder/detail/copy.h"
+        "representation/builder/detail/filter.h"
     PRIVATE_HEADERS
         "helpers/private/simplicial_model_creator.h"
     PUBLIC_DEPENDENCIES

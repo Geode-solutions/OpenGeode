@@ -66,6 +66,8 @@ namespace geode
     public:
         static constexpr index_t dim{ 2 };
         using Builder = SectionBuilder;
+        using Components =
+            std::tuple< Corner2D, Line2D, Surface2D, ModelBoundary2D >;
 
         class opengeode_model_api BoundaryCornerRange
             : public Relationships::BoundaryRangeIterator

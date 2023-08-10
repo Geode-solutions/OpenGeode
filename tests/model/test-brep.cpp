@@ -928,6 +928,14 @@ void test_backward_io()
     }
 }
 
+void test_components_filter()
+{
+    const auto brep = geode::load_brep(
+        absl::StrCat( geode::data_path, "structural_model.og_brep" ) );
+    OPENGEODE_EXCEPTION( brep.nb_components_with_relations() == 9,
+        "[Test] Wrong number of components with relations" );
+}
+
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
@@ -979,6 +987,7 @@ void test()
     test_compare_brep( model, model3 );
 
     test_backward_io();
+    test_components_filter();
 }
 
 OPENGEODE_TEST( "brep" )

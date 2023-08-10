@@ -34,9 +34,10 @@
         "RegularGrid" + std::to_string( dimension ) + "D";                     \
     pybind11::class_< RegularGrid##dimension##D, Base##dimension##D,           \
         Grid##dimension##D >( module, name##dimension.c_str() )                \
-        .def_static(                                                           \
-            "create", ( std::unique_ptr< RegularGrid##dimension##D >( * )() )  \
-                          & RegularGrid##dimension##D::create )                \
+        .def_static( "create",                                                 \
+            static_cast<                                                       \
+                std::unique_ptr< RegularGrid##dimension##D > ( * )() >(        \
+                &RegularGrid##dimension##D::create ) )                         \
         .def( "clone", &RegularGrid##dimension##D::clone )                     \
         .def( "bounding_box", &RegularGrid##dimension##D::bounding_box )
 

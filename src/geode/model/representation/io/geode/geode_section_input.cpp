@@ -28,6 +28,11 @@
 #include <geode/basic/uuid.h>
 #include <geode/basic/zip_file.h>
 
+#include <geode/model/mixin/core/corner.h>
+#include <geode/model/mixin/core/line.h>
+#include <geode/model/mixin/core/model_boundary.h>
+#include <geode/model/mixin/core/surface.h>
+#include <geode/model/representation/builder/detail/filter.h>
 #include <geode/model/representation/builder/section_builder.h>
 #include <geode/model/representation/core/section.h>
 
@@ -49,8 +54,9 @@ namespace geode
             [&builder, &directory] {
                 builder.load_model_boundaries( directory );
             },
-            [&builder, &directory] {
+            [&builder, &section, &directory] {
                 builder.load_relationships( directory );
+                detail::filter_unsupported_components( section );
             },
             [&builder, &directory] {
                 builder.load_unique_vertices( directory );

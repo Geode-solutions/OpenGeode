@@ -37,11 +37,11 @@ namespace geode
             .def( "convert_surface_mesh_into_triangulated_surface3D",
                 &convert_surface_mesh_into_triangulated_surface< 3 > )
             .def( "triangulate_surface_mesh2D",
-                ( void ( * )( SurfaceMesh< 2 >& ) )
-                    & triangulate_surface_mesh< 2 > )
+                static_cast< void ( * )( SurfaceMesh< 2 >& ) >(
+                    &triangulate_surface_mesh< 2 > ) )
             .def( "triangulate_surface_mesh3D",
-                ( void ( * )( SurfaceMesh< 3 >& ) )
-                    & triangulate_surface_mesh< 3 > )
+                static_cast< void ( * )( SurfaceMesh< 3 >& ) >(
+                    &triangulate_surface_mesh< 3 > ) )
             .def( "convert_surface_mesh2d_into_3d",
                 &convert_surface_mesh2d_into_3d )
             .def( "convert_surface_mesh3d_into_2d",

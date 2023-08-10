@@ -39,15 +39,17 @@ namespace geode
             IdentifierBuilder >( module, "SectionBuilder" )
             .def( pybind11::init< Section& >() )
             .def( "copy", &SectionBuilder::copy )
-            .def( "add_corner", ( const uuid& (SectionBuilder::*) () )
-                                    & SectionBuilder::add_corner )
-            .def( "add_line", ( const uuid& (SectionBuilder::*) () )
-                                  & SectionBuilder::add_line )
-            .def( "add_surface", ( const uuid& (SectionBuilder::*) () )
-                                     & SectionBuilder::add_surface )
             .def(
-                "add_model_boundary", ( const uuid& (SectionBuilder::*) () )
-                                          & SectionBuilder::add_model_boundary )
+                "add_corner", static_cast< const uuid& (SectionBuilder::*) () >(
+                                  &SectionBuilder::add_corner ) )
+            .def( "add_line", static_cast< const uuid& (SectionBuilder::*) () >(
+                                  &SectionBuilder::add_line ) )
+            .def( "add_surface",
+                static_cast< const uuid& (SectionBuilder::*) () >(
+                    &SectionBuilder::add_surface ) )
+            .def( "add_model_boundary",
+                static_cast< const uuid& (SectionBuilder::*) () >(
+                    &SectionBuilder::add_model_boundary ) )
             .def( "remove_corner", &SectionBuilder::remove_corner )
             .def( "remove_line", &SectionBuilder::remove_line )
             .def( "remove_surface", &SectionBuilder::remove_surface )
