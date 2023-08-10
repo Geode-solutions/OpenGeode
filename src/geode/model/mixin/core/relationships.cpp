@@ -274,7 +274,7 @@ namespace geode
     Relationships::~Relationships() {} // NOLINT
 
     void Relationships::remove_component(
-        const uuid& component_id, RelationshipsBuilderKey )
+        const uuid& component_id, RelationshipsBuilderKey  /*unused*/)
     {
         impl_->remove_component( component_id );
     }
@@ -393,7 +393,7 @@ namespace geode
 
     void Relationships::remove_relation( const uuid& component_id1,
         const uuid& component_id2,
-        RelationshipsBuilderKey )
+        RelationshipsBuilderKey  /*unused*/)
     {
         impl_->remove_relation( component_id1, component_id2 );
     }
