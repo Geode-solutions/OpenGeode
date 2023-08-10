@@ -6,4 +6,6 @@ on:
 jobs:  
   prepare:
     uses: Geode-solutions/actions/.github/workflows/prepare-pr.yml@master
+    with:
+      directory: opengeode
     secrets: inherit
