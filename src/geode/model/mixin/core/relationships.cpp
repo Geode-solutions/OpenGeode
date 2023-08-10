@@ -277,6 +277,17 @@ namespace geode
         impl_->remove_component( id );
     }
 
+    index_t Relationships::nb_components_with_relations() const
+    {
+        return impl_->nb_components_with_relations();
+    }
+
+    const ComponentID& Relationships::component_with_relation(
+        index_t component_id ) const
+    {
+        return impl_->vertex_component_id( component_id );
+    }
+
     index_t Relationships::nb_relations( const uuid& id ) const
     {
         return impl_->nb_relations( id );

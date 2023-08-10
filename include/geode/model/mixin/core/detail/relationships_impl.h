@@ -45,11 +45,15 @@ namespace geode
         public:
             using Iterator = typename EdgesAroundVertex::const_iterator;
 
+            index_t nb_components_with_relations() const;
+
             index_t nb_relations( const uuid& id ) const;
 
             Iterator begin_edge( const uuid& id ) const;
 
             Iterator end_edge( const uuid& id ) const;
+
+            const ComponentID& vertex_component_id( index_t vertex ) const;
 
             const ComponentID& vertex_component_id(
                 const EdgeVertex& edge_vertex ) const;

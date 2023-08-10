@@ -69,6 +69,8 @@ namespace geode
     public:
         static constexpr index_t dim{ 3 };
         using Builder = BRepBuilder;
+        using Components =
+            std::tuple< Corner3D, Line3D, Surface3D, Block3D, ModelBoundary3D >;
 
         class opengeode_model_api BoundaryCornerRange
             : public Relationships::BoundaryRangeIterator

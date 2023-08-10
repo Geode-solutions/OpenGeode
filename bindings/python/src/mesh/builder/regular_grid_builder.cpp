@@ -35,25 +35,22 @@
         "RegularGridBuilder" + std::to_string( dimension ) + "D";              \
     pybind11::class_< RegularGridBuilder##dimension##D,                        \
         Base##Builder##dimension##D >( module, name##dimension.c_str() )       \
-        .def_static( "create",                                                 \
-            ( std::unique_ptr< RegularGridBuilder##dimension##D >( * )(        \
-                RegularGrid< dimension >& ) )                                  \
-                & RegularGridBuilder##dimension##D::create )                   \
+        .def_static( "create", &RegularGridBuilder##dimension##D::create )     \
         .def( "initialize_grid",                                               \
-            ( void( RegularGridBuilder##dimension##D::* )(                     \
+            static_cast< void ( RegularGridBuilder##dimension##D::* )(         \
                 const Point##dimension##D&, std::array< index_t, dimension >,  \
-                std::array< double, dimension > ) )                            \
-                & RegularGridBuilder##dimension##D::initialize_grid )          \
+                std::array< double, dimension > ) >(                           \
+                &RegularGridBuilder##dimension##D::initialize_grid ) )         \
         .def( "initialize_cartesian_grid",                                     \
-            ( void( RegularGridBuilder##dimension##D::* )(                     \
+            static_cast< void ( RegularGridBuilder##dimension##D::* )(         \
                 const Point##dimension##D&, std::array< index_t, dimension >,  \
-                double ) )                                                     \
-                & RegularGridBuilder##dimension##D::initialize_grid )          \
+                double ) >(                                                    \
+                &RegularGridBuilder##dimension##D::initialize_grid ) )         \
         .def( "initialize_grid_with directions",                               \
-            ( void( RegularGridBuilder##dimension##D::* )(                     \
+            static_cast< void ( RegularGridBuilder##dimension##D::* )(         \
                 Point##dimension##D, std::array< index_t, dimension >,         \
-                std::array< Vector##dimension##D, dimension > ) )              \
-                & RegularGridBuilder##dimension##D::initialize_grid )          \
+                std::array< Vector##dimension##D, dimension > ) >(             \
+                &RegularGridBuilder##dimension##D::initialize_grid ) )         \
         .def( "update_origin",                                                 \
             &RegularGridBuilder##dimension##D::update_origin )
 

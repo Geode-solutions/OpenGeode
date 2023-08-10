@@ -28,7 +28,13 @@
 #include <geode/basic/uuid.h>
 #include <geode/basic/zip_file.h>
 
+#include <geode/model/mixin/core/block.h>
+#include <geode/model/mixin/core/corner.h>
+#include <geode/model/mixin/core/line.h>
+#include <geode/model/mixin/core/model_boundary.h>
+#include <geode/model/mixin/core/surface.h>
 #include <geode/model/representation/builder/brep_builder.h>
+#include <geode/model/representation/builder/detail/filter.h>
 #include <geode/model/representation/core/brep.h>
 
 namespace geode
@@ -50,8 +56,9 @@ namespace geode
             [&builder, &directory] {
                 builder.load_model_boundaries( directory );
             },
-            [&builder, &directory] {
+            [&builder, &brep, &directory] {
                 builder.load_relationships( directory );
+                detail::filter_unsupported_components( brep );
             },
             [&builder, &directory] {
                 builder.load_unique_vertices( directory );
