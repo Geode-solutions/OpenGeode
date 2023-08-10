@@ -54,9 +54,8 @@ namespace geode
             [&builder, &directory] {
                 builder.load_model_boundaries( directory );
             },
-            [&builder, &section, &directory] {
+            [&builder, &directory] {
                 builder.load_relationships( directory );
-                detail::filter_unsupported_components( section );
             },
             [&builder, &directory] {
                 builder.load_unique_vertices( directory );
@@ -81,6 +80,7 @@ namespace geode
         zip_reader.extract_all();
         Section section;
         load_section_files( section, zip_reader.directory() );
+        detail::filter_unsupported_components( section );
         return section;
     }
 } // namespace geode

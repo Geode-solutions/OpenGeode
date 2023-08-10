@@ -104,7 +104,7 @@ namespace geode
             {
                 return false;
             }
-            return vertex_component_id(
+            return graph_component_id(
                        { edge_id.value(), BOUNDARY_EDGE_VERTEX } )
                        .id()
                    == from;
@@ -118,7 +118,7 @@ namespace geode
             {
                 return false;
             }
-            return vertex_component_id(
+            return graph_component_id(
                        { edge_id.value(), INTERNAL_EDGE_VERTEX } )
                        .id()
                    == from;
@@ -132,7 +132,7 @@ namespace geode
             {
                 return false;
             }
-            return vertex_component_id( { edge_id.value(), ITEM_EDGE_VERTEX } )
+            return graph_component_id( { edge_id.value(), ITEM_EDGE_VERTEX } )
                        .id()
                    == from;
         }
@@ -274,7 +274,7 @@ namespace geode
     Relationships::~Relationships() {} // NOLINT
 
     void Relationships::remove_component(
-        const uuid& component_id, RelationshipsBuilderKey  /*unused*/)
+        const uuid& component_id, RelationshipsBuilderKey /*unused*/ )
     {
         impl_->remove_component( component_id );
     }
@@ -285,9 +285,9 @@ namespace geode
     }
 
     const ComponentID& Relationships::component_with_relation(
-        index_t component_id ) const
+        index_t relation_component_id ) const
     {
-        return impl_->vertex_component_id( component_id );
+        return impl_->graph_component_id( relation_component_id );
     }
 
     index_t Relationships::nb_relations( const uuid& component_id ) const
@@ -393,7 +393,7 @@ namespace geode
 
     void Relationships::remove_relation( const uuid& component_id1,
         const uuid& component_id2,
-        RelationshipsBuilderKey  /*unused*/)
+        RelationshipsBuilderKey /*unused*/ )
     {
         impl_->remove_relation( component_id1, component_id2 );
     }
@@ -470,10 +470,10 @@ namespace geode
             this->operator++();
         }
 
-        const ComponentID& vertex_component_id() const
+        const ComponentID& graph_component_id() const
         {
             const auto iterator = this->current();
-            return relationships_.vertex_component_id( iterator->opposite() );
+            return relationships_.graph_component_id( iterator->opposite() );
         }
 
     private:
@@ -515,7 +515,7 @@ namespace geode
 
     const ComponentID& Relationships::RelationRangeIterator::operator*() const
     {
-        return impl_->vertex_component_id();
+        return impl_->graph_component_id();
     }
 
     class Relationships::BoundaryRangeIterator::Impl
@@ -539,10 +539,10 @@ namespace geode
             next_boundary_iterator();
         }
 
-        const ComponentID& vertex_component_id() const
+        const ComponentID& graph_component_id() const
         {
             const auto iterator = this->current();
-            return relationships_.vertex_component_id( iterator->opposite() );
+            return relationships_.graph_component_id( iterator->opposite() );
         }
 
     private:
@@ -602,7 +602,7 @@ namespace geode
 
     const ComponentID& Relationships::BoundaryRangeIterator::operator*() const
     {
-        return impl_->vertex_component_id();
+        return impl_->graph_component_id();
     }
 
     class Relationships::IncidenceRangeIterator::Impl
@@ -626,10 +626,10 @@ namespace geode
             next_incidence_iterator();
         }
 
-        const ComponentID& vertex_component_id() const
+        const ComponentID& graph_component_id() const
         {
             const auto iterator = this->current();
-            return relationships_.vertex_component_id( iterator->opposite() );
+            return relationships_.graph_component_id( iterator->opposite() );
         }
 
     private:
@@ -690,7 +690,7 @@ namespace geode
 
     const ComponentID& Relationships::IncidenceRangeIterator::operator*() const
     {
-        return impl_->vertex_component_id();
+        return impl_->graph_component_id();
     }
 
     class Relationships::InternalRangeIterator::Impl
@@ -714,10 +714,10 @@ namespace geode
             next_internal_iterator();
         }
 
-        const ComponentID& vertex_component_id() const
+        const ComponentID& graph_component_id() const
         {
             const auto iterator = this->current();
-            return relationships_.vertex_component_id( iterator->opposite() );
+            return relationships_.graph_component_id( iterator->opposite() );
         }
 
     private:
@@ -777,7 +777,7 @@ namespace geode
 
     const ComponentID& Relationships::InternalRangeIterator::operator*() const
     {
-        return impl_->vertex_component_id();
+        return impl_->graph_component_id();
     }
 
     class Relationships::EmbeddingRangeIterator::Impl
@@ -801,10 +801,10 @@ namespace geode
             next_embedding_iterator();
         }
 
-        const ComponentID& vertex_component_id() const
+        const ComponentID& graph_component_id() const
         {
             const auto iterator = this->current();
-            return relationships_.vertex_component_id( iterator->opposite() );
+            return relationships_.graph_component_id( iterator->opposite() );
         }
 
     private:
@@ -865,7 +865,7 @@ namespace geode
 
     const ComponentID& Relationships::EmbeddingRangeIterator::operator*() const
     {
-        return impl_->vertex_component_id();
+        return impl_->graph_component_id();
     }
 
     class Relationships::ItemRangeIterator::Impl
@@ -889,10 +889,10 @@ namespace geode
             next_item_iterator();
         }
 
-        const ComponentID& vertex_component_id() const
+        const ComponentID& graph_component_id() const
         {
             const auto iterator = this->current();
-            return relationships_.vertex_component_id( iterator->opposite() );
+            return relationships_.graph_component_id( iterator->opposite() );
         }
 
     private:
@@ -952,7 +952,7 @@ namespace geode
 
     const ComponentID& Relationships::ItemRangeIterator::operator*() const
     {
-        return impl_->vertex_component_id();
+        return impl_->graph_component_id();
     }
 
     class Relationships::CollectionRangeIterator::Impl
@@ -976,10 +976,10 @@ namespace geode
             next_collection_iterator();
         }
 
-        const ComponentID& vertex_component_id() const
+        const ComponentID& graph_component_id() const
         {
             const auto iterator = this->current();
-            return relationships_.vertex_component_id( iterator->opposite() );
+            return relationships_.graph_component_id( iterator->opposite() );
         }
 
     private:
@@ -1040,6 +1040,6 @@ namespace geode
 
     const ComponentID& Relationships::CollectionRangeIterator::operator*() const
     {
-        return impl_->vertex_component_id();
+        return impl_->graph_component_id();
     }
 } // namespace geode
