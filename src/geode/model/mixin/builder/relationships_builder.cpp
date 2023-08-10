@@ -30,9 +30,9 @@ namespace geode
     {
     }
 
-    void RelationshipsBuilder::unregister_component( const uuid& id )
+    void RelationshipsBuilder::unregister_component( const uuid& component_id )
     {
-        relationships_.remove_component( id, {} );
+        relationships_.remove_component( component_id, {} );
     }
 
     index_t RelationshipsBuilder::add_boundary_relation(
@@ -54,9 +54,10 @@ namespace geode
     }
 
     void RelationshipsBuilder::remove_relation(
-        const uuid& id1, const uuid& id2 )
+        const uuid& component_id1, const uuid& component_id2 )
     {
-        return relationships_.remove_relation( id1, id2, {} );
+        return relationships_.remove_relation(
+            component_id1, component_id2, {} );
     }
 
     void RelationshipsBuilder::copy_relationships(

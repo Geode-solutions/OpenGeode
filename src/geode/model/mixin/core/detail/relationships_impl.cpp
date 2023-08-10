@@ -51,9 +51,10 @@ namespace geode
             return graph_->nb_vertices();
         }
 
-        index_t RelationshipsImpl::nb_relations( const uuid& id ) const
+        index_t RelationshipsImpl::nb_relations(
+            const uuid& component_id ) const
         {
-            if( const auto index = vertex_id( id ) )
+            if( const auto index = vertex_id( component_id ) )
             {
                 return static_cast< index_t >(
                     graph_->edges_around_vertex( index.value() ).size() );
@@ -62,9 +63,9 @@ namespace geode
         }
 
         RelationshipsImpl::Iterator RelationshipsImpl::begin_edge(
-            const uuid& id ) const
+            const uuid& component_id ) const
         {
-            if( const auto index = vertex_id( id ) )
+            if( const auto index = vertex_id( component_id ) )
             {
                 return graph_->edges_around_vertex( index.value() ).begin();
             }
@@ -72,9 +73,9 @@ namespace geode
         }
 
         RelationshipsImpl::Iterator RelationshipsImpl::end_edge(
-            const uuid& id ) const
+            const uuid& component_id ) const
         {
-            if( const auto index = vertex_id( id ) )
+            if( const auto index = vertex_id( component_id ) )
             {
                 return graph_->edges_around_vertex( index.value() ).end();
             }
@@ -93,14 +94,14 @@ namespace geode
             return vertex_component_id( graph_->edge_vertex( edge_vertex ) );
         }
 
-        void RelationshipsImpl::remove_component( const uuid& id )
+        void RelationshipsImpl::remove_component( const uuid& component_id )
         {
-            const auto index = vertex_id( id );
+            const auto index = vertex_id( component_id );
             if( !index )
             {
                 return;
             }
-            uuid2index_.erase( id );
+            uuid2index_.erase( component_id );
             std::vector< bool > to_delete( graph_->nb_edges(), false );
             for( const auto& edge :
                 graph_->edges_around_vertex( index.value() ) )
@@ -121,11 +122,12 @@ namespace geode
         index_t RelationshipsImpl::add_relation_edge(
             const ComponentID& from, const ComponentID& to )
         {
-            if( const auto id = relation_edge_index( from.id(), to.id() ) )
+            if( const auto component_id =
+                    relation_edge_index( from.id(), to.id() ) )
             {
                 Logger::warn( "This relation already exists (", from.string(),
                     " and ", to.string(), ")" );
-                return id.value();
+                return component_id.value();
             }
             const auto index = GraphBuilder::create( *graph_ )->create_edge(
                 find_or_create_vertex_id( from ),
@@ -134,12 +136,13 @@ namespace geode
         }
 
         void RelationshipsImpl::remove_relation(
-            const uuid& id1, const uuid& id2 )
+            const uuid& component_id1, const uuid& component_id2 )
         {
-            if( const auto id = relation_edge_index( id1, id2 ) )
+            if( const auto component_id =
+                    relation_edge_index( component_id1, component_id2 ) )
             {
                 std::vector< bool > to_delete( graph_->nb_edges(), false );
-                to_delete[id.value()] = true;
+                to_delete[component_id.value()] = true;
                 GraphBuilder::create( *graph_ )->delete_edges( to_delete );
             }
         }
@@ -150,9 +153,9 @@ namespace geode
         }
 
         const ComponentID& RelationshipsImpl::component_from_index(
-            index_t id ) const
+            index_t component_id ) const
         {
-            return ids_->value( id );
+            return ids_->value( component_id );
         }
 
         AttributeManager& RelationshipsImpl::relation_attribute_manager() const
@@ -161,14 +164,14 @@ namespace geode
         }
 
         absl::optional< index_t > RelationshipsImpl::relation_edge_index(
-            const uuid& id1, const uuid& id2 ) const
+            const uuid& component_id1, const uuid& component_id2 ) const
         {
-            const auto index1 = vertex_id( id1 );
+            const auto index1 = vertex_id( component_id1 );
             if( !index1 )
             {
                 return absl::nullopt;
             }
-            const auto index2 = vertex_id( id2 );
+            const auto index2 = vertex_id( component_id2 );
             if( !index2 )
             {
                 return absl::nullopt;
@@ -178,10 +181,10 @@ namespace geode
 
         std::tuple< ComponentID, ComponentID >
             RelationshipsImpl::relation_components_from_index(
-                index_t id ) const
+                index_t component_id ) const
         {
-            const auto id0 = graph_->edge_vertex( { id, 0 } );
-            const auto id1 = graph_->edge_vertex( { id, 1 } );
+            const auto id0 = graph_->edge_vertex( { component_id, 0 } );
+            const auto id1 = graph_->edge_vertex( { component_id, 1 } );
             return std::make_tuple(
                 component_from_index( id0 ), component_from_index( id1 ) );
         }
@@ -194,13 +197,14 @@ namespace geode
             std::vector< index_t > vertices_to_delete;
             for( const auto v : Range{ graph_->nb_vertices() } )
             {
-                const auto& id = component_from_index( v );
-                if( mapping.has_mapping_type( id.type() )
-                    && mapping.at( id.type() ).has_mapping_input( id.id() ) )
+                const auto& component_id = component_from_index( v );
+                if( mapping.has_mapping_type( component_id.type() )
+                    && mapping.at( component_id.type() )
+                           .has_mapping_input( component_id.id() ) )
                 {
-                    const auto& new_uuid =
-                        mapping.at( id.type() ).in2out( id.id() );
-                    ids_->set_value( v, { id.type(), new_uuid } );
+                    const auto& new_uuid = mapping.at( component_id.type() )
+                                               .in2out( component_id.id() );
+                    ids_->set_value( v, { component_id.type(), new_uuid } );
                     uuid2index_.set_new_mapping( new_uuid, v );
                 }
                 else
@@ -235,9 +239,9 @@ namespace geode
         }
 
         absl::optional< index_t > RelationshipsImpl::vertex_id(
-            const uuid& id ) const
+            const uuid& component_id ) const
         {
-            return uuid2index_.index( id );
+            return uuid2index_.index( component_id );
         }
 
         const Graph& RelationshipsImpl::graph() const
@@ -245,22 +249,23 @@ namespace geode
             return *graph_;
         }
 
-        index_t RelationshipsImpl::register_component( const ComponentID& id )
+        index_t RelationshipsImpl::register_component(
+            const ComponentID& component_id )
         {
             const auto index = GraphBuilder::create( *graph_ )->create_vertex();
-            uuid2index_.set_new_mapping( id.id(), index );
-            ids_->set_value( index, id );
+            uuid2index_.set_new_mapping( component_id.id(), index );
+            ids_->set_value( index, component_id );
             return index;
         }
 
         index_t RelationshipsImpl::find_or_create_vertex_id(
-            const ComponentID& id )
+            const ComponentID& component_id )
         {
-            if( const auto index = vertex_id( id.id() ) )
+            if( const auto index = vertex_id( component_id.id() ) )
             {
                 return index.value();
             }
-            return register_component( id );
+            return register_component( component_id );
         }
 
         void RelationshipsImpl::delete_isolated_vertices()

@@ -47,30 +47,31 @@ namespace geode
 
             index_t nb_components_with_relations() const;
 
-            index_t nb_relations( const uuid& id ) const;
+            index_t nb_relations( const uuid& component_id ) const;
 
-            Iterator begin_edge( const uuid& id ) const;
+            Iterator begin_edge( const uuid& component_id ) const;
 
-            Iterator end_edge( const uuid& id ) const;
+            Iterator end_edge( const uuid& component_id ) const;
 
             const ComponentID& vertex_component_id( index_t vertex ) const;
 
             const ComponentID& vertex_component_id(
                 const EdgeVertex& edge_vertex ) const;
 
-            void remove_component( const uuid& id );
+            void remove_component( const uuid& component_id );
 
             index_t add_relation_edge(
                 const ComponentID& from, const ComponentID& to );
 
-            void remove_relation( const uuid& id1, const uuid& id2 );
+            void remove_relation(
+                const uuid& component_id1, const uuid& component_id2 );
 
             AttributeManager& component_attribute_manager() const;
 
             AttributeManager& relation_attribute_manager() const;
 
             absl::optional< index_t > relation_edge_index(
-                const uuid& id1, const uuid& id2 ) const;
+                const uuid& component_id1, const uuid& component_id2 ) const;
 
             std::tuple< ComponentID, ComponentID >
                 relation_components_from_index( index_t id ) const;
@@ -83,7 +84,8 @@ namespace geode
 
             void initialize_attributes();
 
-            absl::optional< index_t > vertex_id( const uuid& id ) const;
+            absl::optional< index_t > vertex_id(
+                const uuid& component_id ) const;
 
             const Graph& graph() const;
 

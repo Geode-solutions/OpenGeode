@@ -23,8 +23,6 @@
 
 #pragma once
 
-#include <absl/utility/utility.h>
-
 #include <geode/model/common.h>
 #include <geode/model/mixin/core/component_type.h>
 
