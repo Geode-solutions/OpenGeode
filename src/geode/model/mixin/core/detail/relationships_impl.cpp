@@ -82,16 +82,17 @@ namespace geode
             return {};
         }
 
-        const ComponentID& RelationshipsImpl::vertex_component_id(
-            index_t vertex ) const
+        const ComponentID& RelationshipsImpl::graph_component_id(
+            index_t graph_component ) const
         {
-            return ids_->value( vertex );
+            return ids_->value( graph_component );
         }
 
-        const ComponentID& RelationshipsImpl::vertex_component_id(
-            const EdgeVertex& edge_vertex ) const
+        const ComponentID& RelationshipsImpl::graph_component_id(
+            const EdgeVertex& graph_edge_vertex ) const
         {
-            return vertex_component_id( graph_->edge_vertex( edge_vertex ) );
+            return graph_component_id(
+                graph_->edge_vertex( graph_edge_vertex ) );
         }
 
         void RelationshipsImpl::remove_component( const uuid& component_id )

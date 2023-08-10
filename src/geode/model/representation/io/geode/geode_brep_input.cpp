@@ -56,9 +56,8 @@ namespace geode
             [&builder, &directory] {
                 builder.load_model_boundaries( directory );
             },
-            [&builder, &brep, &directory] {
+            [&builder, &directory] {
                 builder.load_relationships( directory );
-                detail::filter_unsupported_components( brep );
             },
             [&builder, &directory] {
                 builder.load_unique_vertices( directory );
@@ -87,6 +86,7 @@ namespace geode
         zip_reader.extract_all();
         BRep brep;
         load_brep_files( brep, zip_reader.directory() );
+        detail::filter_unsupported_components( brep );
         return brep;
     }
 } // namespace geode

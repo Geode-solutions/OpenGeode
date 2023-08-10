@@ -53,10 +53,11 @@ namespace geode
 
             Iterator end_edge( const uuid& component_id ) const;
 
-            const ComponentID& vertex_component_id( index_t vertex ) const;
+            const ComponentID& graph_component_id(
+                index_t graph_component ) const;
 
-            const ComponentID& vertex_component_id(
-                const EdgeVertex& edge_vertex ) const;
+            const ComponentID& graph_component_id(
+                const EdgeVertex& graph_edge_vertex ) const;
 
             void remove_component( const uuid& component_id );
 

@@ -353,7 +353,7 @@ namespace geode
         index_t nb_components_with_relations() const;
 
         const ComponentID& component_with_relation(
-            index_t component_id ) const;
+            index_t relation_component_id ) const;
 
         index_t nb_relations( const uuid& component_id ) const;
 
