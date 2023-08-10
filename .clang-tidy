@@ -1,10 +1,13 @@
 ---
+# DO NOT MODIFY DIRECTLY THIS FILE
+# LOOK AT https://github.com/Geode-solutions/actions
 # Configure clang-tidy for this project.
 Checks: >
   *,
   -altera*,
   -fuchsia*,
   -llvmlibc*,
+  -llvm-header-guard,
   -misc-no-recursion,
   -modernize-use-trailing-return-type,
   -readability-redundant-access-specifiers

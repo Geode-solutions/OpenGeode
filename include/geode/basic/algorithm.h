@@ -33,7 +33,7 @@
 
 namespace geode
 {
-    /*
+    /*!
      * Delete some elements from a given vector.
      * @tparam T Type of the vector elements.
      * @param[in] to_delete Vector of the same size than values. If to_delete[i]
@@ -71,7 +71,7 @@ namespace geode
         return nb_removed_elements;
     }
 
-    /*
+    /*!
      * Create a new vector containing only some elements from a given vector.
      * @tparam T Type of the vector elements.
      * @param[in] to_keep Vector of the same size than in_values. If to_keep[i]
@@ -104,7 +104,7 @@ namespace geode
         return out_values;
     }
 
-    /*
+    /*!
      * Modify the container by removing every duplicated values inside
      * @tparam Container Type of container.
      * @param[in] in container in which perform the search.
@@ -117,4 +117,9 @@ namespace geode
         in.erase( last, in.end() );
     }
 
+    /*!
+     * Concatenate tuples into a single tuple.
+     */
+    template < typename... tuples >
+    using tuple_cat = decltype( std::tuple_cat( std::declval< tuples >()... ) );
 } // namespace geode
