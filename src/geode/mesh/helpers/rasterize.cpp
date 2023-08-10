@@ -44,6 +44,7 @@
 #include <geode/geometry/position.h>
 
 #include <geode/mesh/builder/triangulated_surface_builder.h>
+#include <geode/mesh/core/detail/vertex_cycle.h>
 #include <geode/mesh/core/grid.h>
 #include <geode/mesh/core/triangulated_surface.h>
 
@@ -593,19 +594,9 @@ namespace
         bool counter_clockwise;
     };
 
-    bool is_edge_valid( const geode::Point2D& v0, const geode::Point2D& v1 )
-    {
-        if( v0.value( 1 ) == v1.value( 1 ) )
-        {
-            return v0.value( 0 ) > v1.value( 0 );
-        }
-        return v0.value( 1 ) > v1.value( 1 );
-    }
-
     struct ProjectedTriangle
     {
         std::array< geode::Point2D, 3 > points;
-        bool counter_clockwise{ true };
     };
 
     double projected_i_coordinate( const geode::Vector3D& n,
@@ -618,37 +609,6 @@ namespace
                + v0.value( 0 );
     }
 
-    bool is_JK_to_process(
-        const ProjectedTriangle& triangle, const geode::Point2D& point )
-    {
-        const auto position = geode::point_triangle_position( point,
-            { triangle.points[0], triangle.points[1], triangle.points[2] } );
-
-        if( position == geode::Position::outside )
-        {
-            return false;
-        }
-        if( position == geode::Position::inside )
-        {
-            return true;
-        }
-
-        if( position == geode::Position::edge0 )
-        {
-            return is_edge_valid( triangle.points[0], triangle.points[1] );
-        }
-        if( position == geode::Position::edge1 )
-        {
-            return is_edge_valid( triangle.points[1], triangle.points[2] );
-        }
-        if( position == geode::Position::edge2 )
-        {
-            return is_edge_valid( triangle.points[2], triangle.points[0] );
-        }
-
-        return true;
-    }
-
     bool is_triangle_counterclockwise( const geode::Point2D& v0,
         const geode::Point2D& v1,
         const geode::Point2D& v2 )
@@ -658,78 +618,212 @@ namespace
         return geode::dot_perpendicular( e0, e1 ) > 0;
     }
 
-    ProjectedTriangle project_on_JK( absl::Span< const geode::Point3D > points,
-        absl::Span< const geode::index_t > vertices )
-    {
-        ProjectedTriangle triangle;
-        for( const auto v : geode::LRange{ 3 } )
-        {
-            const auto& point = points[vertices[v]];
-            triangle.points[v] = { { point.value( 1 ), point.value( 2 ) } };
-        }
-        if( !is_triangle_counterclockwise(
-                triangle.points[0], triangle.points[1], triangle.points[2] ) )
-        {
-            triangle.counter_clockwise = false;
-            std::swap( triangle.points[1], triangle.points[2] );
-        }
-        return triangle;
-    }
+    using OrientedJK = std::tuple< geode::index_t, geode::index_t, bool >;
+    using Edge = geode::detail::VertexCycle< std::array< geode::index_t, 2 > >;
+    using PaintedEdges = absl::flat_hash_map< Edge, std::vector< OrientedJK > >;
+    using PaintedVertices =
+        absl::flat_hash_map< geode::index_t, std::vector< OrientedJK > >;
 
     using Values =
         absl::flat_hash_map< std::pair< geode::index_t, geode::index_t >,
             absl::InlinedVector< Cell, 2 > >;
 
-    void fill_values( const geode::Grid3D& grid,
-        const ProjectedTriangle& triangle,
-        absl::Span< const geode::Point3D > points,
-        geode::index_t anchor,
-        const geode::Vector3D& normal,
-        Values& values )
+    class PaintTriangle
     {
-        geode::BoundingBox2D bbox;
-        bbox.add_point( triangle.points[0] );
-        bbox.add_point( triangle.points[1] );
-        bbox.add_point( triangle.points[2] );
-        const auto maxJ = std::floor(
-            bbox.max().value( 0 ) / grid.cell_length_in_direction( 1 ) - 0.5 );
-        const auto maxK = std::floor(
-            bbox.max().value( 1 ) / grid.cell_length_in_direction( 2 ) - 0.5 );
-        const auto minJ = std::ceil(
-            bbox.min().value( 0 ) / grid.cell_length_in_direction( 1 ) - 0.5 );
-        const auto minK = std::ceil(
-            bbox.min().value( 1 ) / grid.cell_length_in_direction( 2 ) - 0.5 );
-        for( const auto j : geode::Range{ minJ, maxJ + 1 } )
+    public:
+        PaintTriangle( Values& values,
+            const geode::Grid3D& grid,
+            absl::Span< const geode::Point3D > points,
+            absl::Span< const geode::index_t > vertices_order,
+            PaintedVertices& painted_vertices,
+            PaintedEdges& painted_edges )
+            : values_( values ),
+              grid_( grid ),
+              points_( points ),
+              vertices_order_( vertices_order ),
+              painted_vertices_( painted_vertices ),
+              painted_edges_( painted_edges )
         {
-            for( const auto k : geode::Range{ minK, maxK + 1 } )
-            {
-                const geode::Point2D point{
-                    { ( j + 0.5 ) * grid.cell_length_in_direction( 1 ),
-                        ( k + 0.5 ) * grid.cell_length_in_direction( 2 ) }
-                };
-                if( !is_JK_to_process( triangle, point ) )
-                {
-                    continue;
-                }
+        }
 
-                auto maxI = std::floor(
-                    projected_i_coordinate( normal, points[anchor], point )
-                        / grid.cell_length_in_direction( 0 )
-                    - 0.5 );
-                if( maxI < 0 )
+        void paint()
+        {
+            const auto normal = geode::Triangle3D{ points_[vertices_order_[0]],
+                points_[vertices_order_[1]], points_[vertices_order_[2]] }
+                                    .normal();
+            if( !normal
+                || std::fabs( normal->value( 0 ) ) < geode::global_epsilon )
+            {
+                return;
+            }
+            const auto triangle = project_on_JK();
+            fill_values( triangle, normal.value() );
+        }
+
+    private:
+        ProjectedTriangle project_on_JK()
+        {
+            ProjectedTriangle triangle;
+            for( const auto v : geode::LRange{ 3 } )
+            {
+                const auto& point = points_[vertices_order_[v]];
+                triangle.points[v] = { { point.value( 1 ), point.value( 2 ) } };
+            }
+            if( !is_triangle_counterclockwise( triangle.points[0],
+                    triangle.points[1], triangle.points[2] ) )
+            {
+                counter_clockwise_ = false;
+                std::swap( triangle.points[1], triangle.points[2] );
+            }
+            return triangle;
+        }
+
+        void fill_values(
+            const ProjectedTriangle& triangle, const geode::Vector3D& normal )
+        {
+            geode::BoundingBox2D bbox;
+            bbox.add_point( triangle.points[0] );
+            bbox.add_point( triangle.points[1] );
+            bbox.add_point( triangle.points[2] );
+            const auto maxJ = std::floor(
+                bbox.max().value( 0 ) / grid_.cell_length_in_direction( 1 )
+                - 0.5 );
+            const auto maxK = std::floor(
+                bbox.max().value( 1 ) / grid_.cell_length_in_direction( 2 )
+                - 0.5 );
+            const auto minJ = std::ceil(
+                bbox.min().value( 0 ) / grid_.cell_length_in_direction( 1 )
+                - 0.5 );
+            const auto minK = std::ceil(
+                bbox.min().value( 1 ) / grid_.cell_length_in_direction( 2 )
+                - 0.5 );
+            for( const auto j : geode::Range{ minJ, maxJ + 1 } )
+            {
+                for( const auto k : geode::Range{ minK, maxK + 1 } )
                 {
-                    maxI = 0;
+                    const geode::Point2D point{
+                        { ( j + 0.5 ) * grid_.cell_length_in_direction( 1 ),
+                            ( k + 0.5 ) * grid_.cell_length_in_direction( 2 ) }
+                    };
+                    if( !is_JK_to_process( triangle, point, j, k ) )
+                    {
+                        continue;
+                    }
+
+                    auto maxI =
+                        std::floor( projected_i_coordinate( normal,
+                                        points_[vertices_order_[0]], point )
+                                        / grid_.cell_length_in_direction( 0 )
+                                    - 0.5 );
+                    if( maxI < 0 )
+                    {
+                        maxI = 0;
+                    }
+                    values_[{ j, k }].emplace_back( maxI, counter_clockwise_ );
                 }
-                values[{ j, k }].emplace_back(
-                    maxI, triangle.counter_clockwise );
             }
         }
-    }
+
+        bool is_JK_to_process( const ProjectedTriangle& triangle,
+            const geode::Point2D& point,
+            geode::index_t j,
+            geode::index_t k )
+        {
+            const auto position = geode::point_triangle_position(
+                point, { triangle.points[0], triangle.points[1],
+                           triangle.points[2] } );
+
+            if( position == geode::Position::outside )
+            {
+                return false;
+            }
+            if( position == geode::Position::inside )
+            {
+                return true;
+            }
+
+            std::array< geode::local_index_t, 3 > order{ 0, 1, 2 };
+            if( !counter_clockwise_ )
+            {
+                order = { 0, 2, 1 };
+            }
+
+            if( position == geode::Position::edge0 )
+            {
+                return is_edge_valid( j, k,
+                    { { vertices_order_[order[0]],
+                        vertices_order_[order[1]] } } );
+            }
+            if( position == geode::Position::edge1 )
+            {
+                return is_edge_valid( j, k,
+                    { { vertices_order_[order[1]],
+                        vertices_order_[order[2]] } } );
+            }
+            if( position == geode::Position::edge2 )
+            {
+                return is_edge_valid( j, k,
+                    { { vertices_order_[order[2]],
+                        vertices_order_[order[0]] } } );
+            }
+            if( position == geode::Position::vertex0 )
+            {
+                return is_vertex_valid( j, k, vertices_order_[order[0]] );
+            }
+            if( position == geode::Position::vertex1 )
+            {
+                return is_vertex_valid( j, k, vertices_order_[order[1]] );
+            }
+            if( position == geode::Position::vertex2 )
+            {
+                return is_vertex_valid( j, k, vertices_order_[order[2]] );
+            }
+
+            return true;
+        }
+
+        bool is_vertex_valid(
+            geode::index_t j, geode::index_t k, geode::index_t vertex_id )
+        {
+            auto& vertex_jks = painted_vertices_[vertex_id];
+            auto oriented_jk = std::make_tuple( j, k, counter_clockwise_ );
+            if( absl::c_find( vertex_jks, oriented_jk ) == vertex_jks.end() )
+            {
+                vertex_jks.emplace_back( std::move( oriented_jk ) );
+                return true;
+            }
+            return false;
+        }
+
+        bool is_edge_valid(
+            geode::index_t j, geode::index_t k, const Edge& edge )
+        {
+            auto& edge_jks = painted_edges_[edge];
+            auto oriented_jk = std::make_tuple( j, k, counter_clockwise_ );
+            if( absl::c_find( edge_jks, oriented_jk ) == edge_jks.end() )
+            {
+                edge_jks.emplace_back( std::move( oriented_jk ) );
+                return true;
+            }
+            return false;
+        }
+
+    private:
+        Values& values_;
+        const geode::Grid3D& grid_;
+        absl::Span< const geode::Point3D > points_;
+        absl::Span< const geode::index_t > vertices_order_;
+        PaintedVertices& painted_vertices_;
+        PaintedEdges& painted_edges_;
+        bool counter_clockwise_{ true };
+    };
 
     Values paint_surface( const geode::Grid3D& grid,
         const geode::TriangulatedSurface3D& closed_surface )
     {
         Values values;
+        PaintedVertices painted_vertices;
+        PaintedEdges painted_edges;
         const auto& origin = grid.grid_coordinate_system().origin();
         absl::FixedArray< geode::Point3D > points(
             closed_surface.nb_vertices() );
@@ -739,17 +833,10 @@ namespace
         }
         for( const auto p : geode::Range{ closed_surface.nb_polygons() } )
         {
-            const auto normal = closed_surface.polygon_normal( p );
-            if( !normal
-                || std::fabs( normal->value( 0 ) ) < geode::global_epsilon )
-            {
-                continue;
-            }
-            const auto triangle =
-                project_on_JK( points, closed_surface.polygon_vertices( p ) );
-            fill_values( grid, triangle, points,
-                closed_surface.polygon_vertex( { p, 0 } ), normal.value(),
-                values );
+            const auto& vertices_order = closed_surface.polygon_vertices( p );
+            PaintTriangle painter{ values, grid, points, vertices_order,
+                painted_vertices, painted_edges };
+            painter.paint();
         }
         return values;
     }
@@ -758,6 +845,8 @@ namespace
         const geode::Grid3D& grid, const geode::Tetrahedron& tetrahedron )
     {
         Values values;
+        PaintedVertices painted_vertices;
+        PaintedEdges painted_edges;
         const auto& origin = grid.grid_coordinate_system().origin();
         absl::FixedArray< geode::Point3D > points( 4 );
         const auto& vertices = tetrahedron.vertices();
@@ -769,17 +858,9 @@ namespace
         {
             const auto& vertices_order =
                 tetrahedron.tetrahedron_facet_vertex[f];
-            const auto normal = geode::Triangle3D{ points[vertices_order[0]],
-                points[vertices_order[1]], points[vertices_order[2]] }
-                                    .normal();
-            if( !normal
-                || std::fabs( normal->value( 0 ) ) < geode::global_epsilon )
-            {
-                continue;
-            }
-            const auto triangle = project_on_JK( points, vertices_order );
-            fill_values( grid, triangle, points, vertices_order[0],
-                normal.value(), values );
+            PaintTriangle painter{ values, grid, points, vertices_order,
+                painted_vertices, painted_edges };
+            painter.paint();
         }
         return values;
     }
