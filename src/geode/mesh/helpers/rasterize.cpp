@@ -656,12 +656,12 @@ namespace
             {
                 return;
             }
-            const auto triangle = project_on_JK();
+            const auto triangle = project_on_jk();
             fill_values( triangle, normal.value() );
         }
 
     private:
-        ProjectedTriangle project_on_JK()
+        ProjectedTriangle project_on_jk()
         {
             ProjectedTriangle triangle;
             for( const auto v : geode::LRange{ 3 } )
@@ -685,49 +685,49 @@ namespace
             bbox.add_point( triangle.points[0] );
             bbox.add_point( triangle.points[1] );
             bbox.add_point( triangle.points[2] );
-            const auto maxJ = std::floor(
+            const auto max_j = std::floor(
                 bbox.max().value( 0 ) / grid_.cell_length_in_direction( 1 )
                 - 0.5 );
-            const auto maxK = std::floor(
+            const auto max_k = std::floor(
                 bbox.max().value( 1 ) / grid_.cell_length_in_direction( 2 )
                 - 0.5 );
-            const auto minJ = std::ceil(
+            const auto min_j = std::ceil(
                 bbox.min().value( 0 ) / grid_.cell_length_in_direction( 1 )
                 - 0.5 );
-            const auto minK = std::ceil(
+            const auto min_k = std::ceil(
                 bbox.min().value( 1 ) / grid_.cell_length_in_direction( 2 )
                 - 0.5 );
-            for( const auto j : geode::Range{ minJ, maxJ + 1 } )
+            for( const auto j : geode::Range{ min_j, max_j + 1 } )
             {
-                for( const auto k : geode::Range{ minK, maxK + 1 } )
+                for( const auto k : geode::Range{ min_k, max_k + 1 } )
                 {
                     const geode::Point2D point{
                         { ( j + 0.5 ) * grid_.cell_length_in_direction( 1 ),
                             ( k + 0.5 ) * grid_.cell_length_in_direction( 2 ) }
                     };
-                    if( !is_JK_to_process( triangle, point, j, k ) )
+                    if( !is_jk_to_process( triangle, point, j, k ) )
                     {
                         continue;
                     }
 
-                    auto maxI =
+                    auto max_i =
                         std::floor( projected_i_coordinate( normal,
                                         points_[vertices_order_[0]], point )
                                         / grid_.cell_length_in_direction( 0 )
                                     - 0.5 );
-                    if( maxI < 0 )
+                    if( max_i < 0 )
                     {
-                        maxI = 0;
+                        max_i = 0;
                     }
-                    values_[{ j, k }].emplace_back( maxI, counter_clockwise_ );
+                    values_[{ j, k }].emplace_back( max_i, counter_clockwise_ );
                 }
             }
         }
 
-        bool is_JK_to_process( const ProjectedTriangle& triangle,
+        bool is_jk_to_process( const ProjectedTriangle& triangle,
             const geode::Point2D& point,
-            geode::index_t j,
-            geode::index_t k )
+            geode::index_t current_j,
+            geode::index_t current_k ) const
         {
             const auto position = geode::point_triangle_position(
                 point, { triangle.points[0], triangle.points[1],
@@ -750,43 +750,48 @@ namespace
 
             if( position == geode::Position::edge0 )
             {
-                return is_edge_valid( j, k,
+                return is_edge_valid( current_j, current_k,
                     { { vertices_order_[order[0]],
                         vertices_order_[order[1]] } } );
             }
             if( position == geode::Position::edge1 )
             {
-                return is_edge_valid( j, k,
+                return is_edge_valid( current_j, current_k,
                     { { vertices_order_[order[1]],
                         vertices_order_[order[2]] } } );
             }
             if( position == geode::Position::edge2 )
             {
-                return is_edge_valid( j, k,
+                return is_edge_valid( current_j, current_k,
                     { { vertices_order_[order[2]],
                         vertices_order_[order[0]] } } );
             }
             if( position == geode::Position::vertex0 )
             {
-                return is_vertex_valid( j, k, vertices_order_[order[0]] );
+                return is_vertex_valid(
+                    current_j, current_k, vertices_order_[order[0]] );
             }
             if( position == geode::Position::vertex1 )
             {
-                return is_vertex_valid( j, k, vertices_order_[order[1]] );
+                return is_vertex_valid(
+                    current_j, current_k, vertices_order_[order[1]] );
             }
             if( position == geode::Position::vertex2 )
             {
-                return is_vertex_valid( j, k, vertices_order_[order[2]] );
+                return is_vertex_valid(
+                    current_j, current_k, vertices_order_[order[2]] );
             }
 
             return true;
         }
 
-        bool is_vertex_valid(
-            geode::index_t j, geode::index_t k, geode::index_t vertex_id )
+        bool is_vertex_valid( geode::index_t current_j,
+            geode::index_t current_k,
+            geode::index_t vertex_id ) const
         {
             auto& vertex_jks = painted_vertices_[vertex_id];
-            auto oriented_jk = std::make_tuple( j, k, counter_clockwise_ );
+            auto oriented_jk =
+                std::make_tuple( current_j, current_k, counter_clockwise_ );
             if( absl::c_find( vertex_jks, oriented_jk ) == vertex_jks.end() )
             {
                 vertex_jks.emplace_back( std::move( oriented_jk ) );
@@ -795,11 +800,13 @@ namespace
             return false;
         }
 
-        bool is_edge_valid(
-            geode::index_t j, geode::index_t k, const Edge& edge )
+        bool is_edge_valid( geode::index_t current_j,
+            geode::index_t current_k,
+            const Edge& edge ) const
         {
             auto& edge_jks = painted_edges_[edge];
-            auto oriented_jk = std::make_tuple( j, k, counter_clockwise_ );
+            auto oriented_jk =
+                std::make_tuple( current_j, current_k, counter_clockwise_ );
             if( absl::c_find( edge_jks, oriented_jk ) == edge_jks.end() )
             {
                 edge_jks.emplace_back( std::move( oriented_jk ) );
