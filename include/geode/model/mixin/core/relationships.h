@@ -58,7 +58,7 @@ namespace geode
         {
         public:
             RelationRangeIterator(
-                const Relationships& relationships, const uuid& id );
+                const Relationships& relationships, const uuid& component_id );
             RelationRangeIterator( RelationRangeIterator&& other ) noexcept;
             RelationRangeIterator( const RelationRangeIterator& other );
             ~RelationRangeIterator();
@@ -76,8 +76,9 @@ namespace geode
         class opengeode_model_api RelationRange : public RelationRangeIterator
         {
         public:
-            RelationRange( const Relationships& relationships, const uuid& id )
-                : RelationRangeIterator( relationships, id )
+            RelationRange(
+                const Relationships& relationships, const uuid& component_id )
+                : RelationRangeIterator( relationships, component_id )
             {
             }
 
@@ -99,7 +100,7 @@ namespace geode
         {
         public:
             BoundaryRangeIterator(
-                const Relationships& relationships, const uuid& id );
+                const Relationships& relationships, const uuid& component_id );
             BoundaryRangeIterator( BoundaryRangeIterator&& other ) noexcept;
             BoundaryRangeIterator( const BoundaryRangeIterator& other );
             ~BoundaryRangeIterator();
@@ -117,8 +118,9 @@ namespace geode
         class opengeode_model_api BoundaryRange : public BoundaryRangeIterator
         {
         public:
-            BoundaryRange( const Relationships& relationships, const uuid& id )
-                : BoundaryRangeIterator( relationships, id )
+            BoundaryRange(
+                const Relationships& relationships, const uuid& component_id )
+                : BoundaryRangeIterator( relationships, component_id )
             {
             }
 
@@ -140,7 +142,7 @@ namespace geode
         {
         public:
             IncidenceRangeIterator(
-                const Relationships& relationships, const uuid& id );
+                const Relationships& relationships, const uuid& component_id );
             IncidenceRangeIterator( IncidenceRangeIterator&& other ) noexcept;
             IncidenceRangeIterator( const IncidenceRangeIterator& other );
             ~IncidenceRangeIterator();
@@ -158,8 +160,9 @@ namespace geode
         class opengeode_model_api IncidenceRange : public IncidenceRangeIterator
         {
         public:
-            IncidenceRange( const Relationships& relationships, const uuid& id )
-                : IncidenceRangeIterator( relationships, id )
+            IncidenceRange(
+                const Relationships& relationships, const uuid& component_id )
+                : IncidenceRangeIterator( relationships, component_id )
             {
             }
 
@@ -181,7 +184,7 @@ namespace geode
         {
         public:
             InternalRangeIterator(
-                const Relationships& relationships, const uuid& id );
+                const Relationships& relationships, const uuid& component_id );
             InternalRangeIterator( InternalRangeIterator&& other ) noexcept;
             InternalRangeIterator( const InternalRangeIterator& other );
             ~InternalRangeIterator();
@@ -199,8 +202,9 @@ namespace geode
         class opengeode_model_api InternalRange : public InternalRangeIterator
         {
         public:
-            InternalRange( const Relationships& relationships, const uuid& id )
-                : InternalRangeIterator( relationships, id )
+            InternalRange(
+                const Relationships& relationships, const uuid& component_id )
+                : InternalRangeIterator( relationships, component_id )
             {
             }
 
@@ -222,7 +226,7 @@ namespace geode
         {
         public:
             EmbeddingRangeIterator(
-                const Relationships& relationships, const uuid& id );
+                const Relationships& relationships, const uuid& component_id );
             EmbeddingRangeIterator( EmbeddingRangeIterator&& other ) noexcept;
             EmbeddingRangeIterator( const EmbeddingRangeIterator& other );
             ~EmbeddingRangeIterator();
@@ -240,8 +244,9 @@ namespace geode
         class opengeode_model_api EmbeddingRange : public EmbeddingRangeIterator
         {
         public:
-            EmbeddingRange( const Relationships& relationships, const uuid& id )
-                : EmbeddingRangeIterator( relationships, id )
+            EmbeddingRange(
+                const Relationships& relationships, const uuid& component_id )
+                : EmbeddingRangeIterator( relationships, component_id )
             {
             }
 
@@ -263,7 +268,7 @@ namespace geode
         {
         public:
             ItemRangeIterator(
-                const Relationships& relationships, const uuid& id );
+                const Relationships& relationships, const uuid& component_id );
             ItemRangeIterator( ItemRangeIterator&& other ) noexcept;
             ItemRangeIterator( const ItemRangeIterator& other );
             ~ItemRangeIterator();
@@ -281,8 +286,9 @@ namespace geode
         class opengeode_model_api ItemRange : public ItemRangeIterator
         {
         public:
-            ItemRange( const Relationships& relationships, const uuid& id )
-                : ItemRangeIterator( relationships, id )
+            ItemRange(
+                const Relationships& relationships, const uuid& component_id )
+                : ItemRangeIterator( relationships, component_id )
             {
             }
 
@@ -304,7 +310,7 @@ namespace geode
         {
         public:
             CollectionRangeIterator(
-                const Relationships& relationships, const uuid& id );
+                const Relationships& relationships, const uuid& component_id );
             CollectionRangeIterator( CollectionRangeIterator&& other ) noexcept;
             CollectionRangeIterator( const CollectionRangeIterator& other );
             ~CollectionRangeIterator();
@@ -324,8 +330,8 @@ namespace geode
         {
         public:
             CollectionRange(
-                const Relationships& relationships, const uuid& id )
-                : CollectionRangeIterator( relationships, id )
+                const Relationships& relationships, const uuid& component_id )
+                : CollectionRangeIterator( relationships, component_id )
             {
             }
 
@@ -346,35 +352,36 @@ namespace geode
 
         index_t nb_components_with_relations() const;
 
-        const ComponentID& component_with_relation( index_t component_id ) const;
+        const ComponentID& component_with_relation(
+            index_t component_id ) const;
 
-        index_t nb_relations( const uuid& id ) const;
+        index_t nb_relations( const uuid& component_id ) const;
 
-        RelationRange relations( const uuid& id ) const;
+        RelationRange relations( const uuid& component_id ) const;
 
-        index_t nb_boundaries( const uuid& id ) const;
+        index_t nb_boundaries( const uuid& component_id ) const;
 
-        BoundaryRange boundaries( const uuid& id ) const;
+        BoundaryRange boundaries( const uuid& component_id ) const;
 
-        index_t nb_incidences( const uuid& id ) const;
+        index_t nb_incidences( const uuid& component_id ) const;
 
-        IncidenceRange incidences( const uuid& id ) const;
+        IncidenceRange incidences( const uuid& component_id ) const;
 
-        index_t nb_internals( const uuid& id ) const;
+        index_t nb_internals( const uuid& component_id ) const;
 
-        InternalRange internals( const uuid& id ) const;
+        InternalRange internals( const uuid& component_id ) const;
 
-        index_t nb_embeddings( const uuid& id ) const;
+        index_t nb_embeddings( const uuid& component_id ) const;
 
-        EmbeddingRange embeddings( const uuid& id ) const;
+        EmbeddingRange embeddings( const uuid& component_id ) const;
 
-        index_t nb_items( const uuid& id ) const;
+        index_t nb_items( const uuid& component_id ) const;
 
-        ItemRange items( const uuid& id ) const;
+        ItemRange items( const uuid& component_id ) const;
 
-        index_t nb_collections( const uuid& id ) const;
+        index_t nb_collections( const uuid& component_id ) const;
 
-        CollectionRange collections( const uuid& id ) const;
+        CollectionRange collections( const uuid& component_id ) const;
 
         bool is_boundary( const uuid& boundary, const uuid& incidence ) const;
 
@@ -385,10 +392,10 @@ namespace geode
         AttributeManager& relation_attribute_manager() const;
 
         absl::optional< index_t > relation_index(
-            const uuid& id1, const uuid& id2 ) const;
+            const uuid& component_id1, const uuid& component_id2 ) const;
 
         std::tuple< ComponentID, ComponentID > relation_from_index(
-            index_t id ) const;
+            index_t component_id ) const;
 
         void save_relationships( absl::string_view directory ) const;
 
@@ -396,9 +403,10 @@ namespace geode
         /*!
          * Remove a component from the set of components registered by the
          * Relationships and all its associated relationships
-         * @param[in] id Unique index of the component to remove
+         * @param[in] component_id Unique index of the component to remove
          */
-        void remove_component( const uuid& id, RelationshipsBuilderKey );
+        void remove_component(
+            const uuid& component_id, RelationshipsBuilderKey );
 
         /*!
          * Add a new relationship of type boundary-incidence between two
@@ -426,8 +434,9 @@ namespace geode
         /*!
          * Remove a relationship between two components
          */
-        void remove_relation(
-            const uuid& id1, const uuid& id2, RelationshipsBuilderKey );
+        void remove_relation( const uuid& component_id1,
+            const uuid& component_id2,
+            RelationshipsBuilderKey );
 
         void copy_relationships( const ModelCopyMapping& mapping,
             const Relationships& relationships,

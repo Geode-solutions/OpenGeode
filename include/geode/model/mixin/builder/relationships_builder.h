@@ -41,7 +41,7 @@ namespace geode
          * Relationships and all its associated relationships
          * @param[in] id Unique index of the component to remove
          */
-        void unregister_component( const uuid& id );
+        void unregister_component( const uuid& component_id );
 
         /*!
          * Add a new relationship of type boundary-incidence between two
@@ -66,7 +66,8 @@ namespace geode
         /*!
          * Remove a relationship between two components
          */
-        void remove_relation( const uuid& id1, const uuid& id2 );
+        void remove_relation(
+            const uuid& component_id1, const uuid& component_id2 );
 
         void copy_relationships( const ModelCopyMapping& mapping,
             const Relationships& relationships );

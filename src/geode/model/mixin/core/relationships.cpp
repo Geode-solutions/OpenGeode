@@ -141,13 +141,15 @@ namespace geode
             const ComponentID& to,
             const RelationType type )
         {
-            if( const auto id = relation_edge_index( from.id(), to.id() ) )
+            if( const auto component_id =
+                    relation_edge_index( from.id(), to.id() ) )
             {
-                const auto relation_type = relation_type_->value( id.value() );
+                const auto relation_type =
+                    relation_type_->value( component_id.value() );
                 Logger::warn( "There is already a ",
                     relation_to_string( relation_type ), " between (",
                     from.string(), " and ", to.string(), ")" );
-                return id.value();
+                return component_id.value();
             }
             const auto index = add_relation_edge( from, to );
             relation_type_->set_value( index, type );
@@ -272,9 +274,9 @@ namespace geode
     Relationships::~Relationships() {} // NOLINT
 
     void Relationships::remove_component(
-        const uuid& id, RelationshipsBuilderKey )
+        const uuid& component_id, RelationshipsBuilderKey )
     {
-        impl_->remove_component( id );
+        impl_->remove_component( component_id );
     }
 
     index_t Relationships::nb_components_with_relations() const
@@ -288,37 +290,37 @@ namespace geode
         return impl_->vertex_component_id( component_id );
     }
 
-    index_t Relationships::nb_relations( const uuid& id ) const
+    index_t Relationships::nb_relations( const uuid& component_id ) const
     {
-        return impl_->nb_relations( id );
+        return impl_->nb_relations( component_id );
     }
 
     Relationships::RelationRange Relationships::relations(
-        const uuid& id ) const
+        const uuid& component_id ) const
     {
-        return { *this, id };
+        return { *this, component_id };
     }
 
-    index_t Relationships::nb_boundaries( const uuid& id ) const
+    index_t Relationships::nb_boundaries( const uuid& component_id ) const
     {
-        return detail::count_relationships( boundaries( id ) );
+        return detail::count_relationships( boundaries( component_id ) );
     }
 
     Relationships::BoundaryRange Relationships::boundaries(
-        const uuid& id ) const
+        const uuid& component_id ) const
     {
-        return { *this, id };
+        return { *this, component_id };
     }
 
-    index_t Relationships::nb_incidences( const uuid& id ) const
+    index_t Relationships::nb_incidences( const uuid& component_id ) const
     {
-        return detail::count_relationships( incidences( id ) );
+        return detail::count_relationships( incidences( component_id ) );
     }
 
     Relationships::IncidenceRange Relationships::incidences(
-        const uuid& id ) const
+        const uuid& component_id ) const
     {
-        return { *this, id };
+        return { *this, component_id };
     }
 
     index_t Relationships::add_boundary_relation( const ComponentID& boundary,
@@ -329,26 +331,26 @@ namespace geode
             boundary, incidence, Relationships::Impl::BOUNDARY_RELATION );
     }
 
-    index_t Relationships::nb_internals( const uuid& id ) const
+    index_t Relationships::nb_internals( const uuid& component_id ) const
     {
-        return detail::count_relationships( internals( id ) );
+        return detail::count_relationships( internals( component_id ) );
     }
 
     Relationships::InternalRange Relationships::internals(
-        const uuid& id ) const
+        const uuid& component_id ) const
     {
-        return { *this, id };
+        return { *this, component_id };
     }
 
-    index_t Relationships::nb_embeddings( const uuid& id ) const
+    index_t Relationships::nb_embeddings( const uuid& component_id ) const
     {
-        return detail::count_relationships( embeddings( id ) );
+        return detail::count_relationships( embeddings( component_id ) );
     }
 
     Relationships::EmbeddingRange Relationships::embeddings(
-        const uuid& id ) const
+        const uuid& component_id ) const
     {
-        return { *this, id };
+        return { *this, component_id };
     }
 
     index_t Relationships::add_internal_relation( const ComponentID& internal,
@@ -359,25 +361,26 @@ namespace geode
             internal, embedding, Relationships::Impl::INTERNAL_RELATION );
     }
 
-    index_t Relationships::nb_items( const uuid& id ) const
+    index_t Relationships::nb_items( const uuid& component_id ) const
     {
-        return detail::count_relationships( items( id ) );
+        return detail::count_relationships( items( component_id ) );
     }
 
-    Relationships::ItemRange Relationships::items( const uuid& id ) const
+    Relationships::ItemRange Relationships::items(
+        const uuid& component_id ) const
     {
-        return { *this, id };
+        return { *this, component_id };
     }
 
-    index_t Relationships::nb_collections( const uuid& id ) const
+    index_t Relationships::nb_collections( const uuid& component_id ) const
     {
-        return detail::count_relationships( collections( id ) );
+        return detail::count_relationships( collections( component_id ) );
     }
 
     Relationships::CollectionRange Relationships::collections(
-        const uuid& id ) const
+        const uuid& component_id ) const
     {
-        return { *this, id };
+        return { *this, component_id };
     }
 
     index_t Relationships::add_item_in_collection( const ComponentID& item,
@@ -388,10 +391,11 @@ namespace geode
             item, collection, Relationships::Impl::ITEM_RELATION );
     }
 
-    void Relationships::remove_relation(
-        const uuid& id1, const uuid& id2, RelationshipsBuilderKey )
+    void Relationships::remove_relation( const uuid& component_id1,
+        const uuid& component_id2,
+        RelationshipsBuilderKey )
     {
-        impl_->remove_relation( id1, id2 );
+        impl_->remove_relation( component_id1, component_id2 );
     }
 
     bool Relationships::is_boundary(
@@ -436,15 +440,15 @@ namespace geode
     }
 
     absl::optional< index_t > Relationships::relation_index(
-        const uuid& id1, const uuid& id2 ) const
+        const uuid& component_id1, const uuid& component_id2 ) const
     {
-        return impl_->relation_edge_index( id1, id2 );
+        return impl_->relation_edge_index( component_id1, component_id2 );
     }
 
     std::tuple< ComponentID, ComponentID > Relationships::relation_from_index(
-        index_t id ) const
+        index_t component_id ) const
     {
-        return impl_->relation_components_from_index( id );
+        return impl_->relation_components_from_index( component_id );
     }
 
     class Relationships::RelationRangeIterator::Impl
@@ -477,10 +481,10 @@ namespace geode
     };
 
     Relationships::RelationRangeIterator::RelationRangeIterator(
-        const Relationships& relationships, const uuid& id )
+        const Relationships& relationships, const uuid& component_id )
         : impl_( *relationships.impl_,
-            relationships.impl_->begin_edge( id ),
-            relationships.impl_->end_edge( id ) )
+            relationships.impl_->begin_edge( component_id ),
+            relationships.impl_->end_edge( component_id ) )
     {
     }
 
@@ -564,10 +568,10 @@ namespace geode
     };
 
     Relationships::BoundaryRangeIterator::BoundaryRangeIterator(
-        const Relationships& relationships, const uuid& id )
+        const Relationships& relationships, const uuid& component_id )
         : impl_( *relationships.impl_,
-            relationships.impl_->begin_edge( id ),
-            relationships.impl_->end_edge( id ) )
+            relationships.impl_->begin_edge( component_id ),
+            relationships.impl_->end_edge( component_id ) )
     {
     }
 
@@ -651,10 +655,10 @@ namespace geode
     };
 
     Relationships::IncidenceRangeIterator::IncidenceRangeIterator(
-        const Relationships& relationships, const uuid& id )
+        const Relationships& relationships, const uuid& component_id )
         : impl_( *relationships.impl_,
-            relationships.impl_->begin_edge( id ),
-            relationships.impl_->end_edge( id ) )
+            relationships.impl_->begin_edge( component_id ),
+            relationships.impl_->end_edge( component_id ) )
     {
     }
 
@@ -739,10 +743,10 @@ namespace geode
     };
 
     Relationships::InternalRangeIterator::InternalRangeIterator(
-        const Relationships& relationships, const uuid& id )
+        const Relationships& relationships, const uuid& component_id )
         : impl_( *relationships.impl_,
-            relationships.impl_->begin_edge( id ),
-            relationships.impl_->end_edge( id ) )
+            relationships.impl_->begin_edge( component_id ),
+            relationships.impl_->end_edge( component_id ) )
     {
     }
 
@@ -826,10 +830,10 @@ namespace geode
     };
 
     Relationships::EmbeddingRangeIterator::EmbeddingRangeIterator(
-        const Relationships& relationships, const uuid& id )
+        const Relationships& relationships, const uuid& component_id )
         : impl_( *relationships.impl_,
-            relationships.impl_->begin_edge( id ),
-            relationships.impl_->end_edge( id ) )
+            relationships.impl_->begin_edge( component_id ),
+            relationships.impl_->end_edge( component_id ) )
     {
     }
 
@@ -914,10 +918,10 @@ namespace geode
     };
 
     Relationships::ItemRangeIterator::ItemRangeIterator(
-        const Relationships& relationships, const uuid& id )
+        const Relationships& relationships, const uuid& component_id )
         : impl_( *relationships.impl_,
-            relationships.impl_->begin_edge( id ),
-            relationships.impl_->end_edge( id ) )
+            relationships.impl_->begin_edge( component_id ),
+            relationships.impl_->end_edge( component_id ) )
     {
     }
 
@@ -1001,10 +1005,10 @@ namespace geode
     };
 
     Relationships::CollectionRangeIterator::CollectionRangeIterator(
-        const Relationships& relationships, const uuid& id )
+        const Relationships& relationships, const uuid& component_id )
         : impl_( *relationships.impl_,
-            relationships.impl_->begin_edge( id ),
-            relationships.impl_->end_edge( id ) )
+            relationships.impl_->begin_edge( component_id ),
+            relationships.impl_->end_edge( component_id ) )
     {
     }
 
