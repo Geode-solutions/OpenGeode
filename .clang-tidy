@@ -18,7 +18,7 @@ CheckOptions:
   - key: readability-identifier-length.MinimumLoopCounterNameLength
     value: 1
   - key: readability-identifier-length.IgnoredVariableNames
-    value: '^[defijkuvw]$'
+    value: '^[defijkpuvw]$'
   # More options here: https://clang.llvm.org/extra/clang-tidy/checks/readability/identifier-naming.html
   - key: readability-identifier-naming.NamespaceCase
     value: lower_case
@@ -46,3 +46,5 @@ CheckOptions:
     value: CamelCase 
   - key: readability-identifier-naming.StaticConstantCase
     value: CamelCase 
+  - key: readability-function-cognitive-complexity.Threshold
+    value: 15
