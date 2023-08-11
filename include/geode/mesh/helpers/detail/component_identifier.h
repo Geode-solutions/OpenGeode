@@ -42,8 +42,10 @@ namespace geode
     {
         class GraphIdentifier
         {
+            OPENGEODE_DISABLE_COPY_AND_MOVE( GraphIdentifier );
+
         public:
-            GraphIdentifier( const Graph& graph );
+            explicit GraphIdentifier( const Graph& graph );
 
             ~GraphIdentifier();
 
@@ -61,8 +63,11 @@ namespace geode
         template < index_t dimension >
         class EdgedCurveIdentifier
         {
+            OPENGEODE_DISABLE_COPY_AND_MOVE( EdgedCurveIdentifier );
+
         public:
-            EdgedCurveIdentifier( const EdgedCurve< dimension >& curve );
+            explicit EdgedCurveIdentifier(
+                const EdgedCurve< dimension >& curve );
 
             ~EdgedCurveIdentifier();
 
@@ -81,8 +86,11 @@ namespace geode
         template < index_t dimension >
         class SurfaceIdentifier
         {
+            OPENGEODE_DISABLE_COPY_AND_MOVE( SurfaceIdentifier< dimension > );
+
         public:
-            SurfaceIdentifier( const SurfaceMesh< dimension >& surface );
+            explicit SurfaceIdentifier(
+                const SurfaceMesh< dimension >& surface );
 
             ~SurfaceIdentifier();
 
@@ -100,8 +108,10 @@ namespace geode
 
         class opengeode_mesh_api SolidIdentifier
         {
+            OPENGEODE_DISABLE_COPY_AND_MOVE( SolidIdentifier );
+
         public:
-            SolidIdentifier( const SolidMesh3D& solid );
+            explicit SolidIdentifier( const SolidMesh3D& solid );
 
             ~SolidIdentifier();
 

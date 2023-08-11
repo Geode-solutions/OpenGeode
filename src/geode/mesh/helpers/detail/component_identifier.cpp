@@ -32,13 +32,38 @@
 #include <geode/mesh/core/edged_curve.h>
 #include <geode/mesh/core/solid_mesh.h>
 #include <geode/mesh/core/surface_mesh.h>
+#include <geode/mesh/helpers/generic_solid_accessor.h>
+#include <geode/mesh/helpers/generic_surface_accessor.h>
 
 namespace
 {
+    template < typename Mesh, typename Propagator >
+    void add_adjacents( const Mesh& mesh,
+        const Propagator& propagator,
+        geode::index_t element_id,
+        std::queue< geode::index_t >& queue )
+    {
+        for( const auto f :
+            geode::LRange{ mesh.nb_element_facets( element_id ) } )
+        {
+            if( const auto adj = mesh.element_adjacent( { element_id, f } ) )
+            {
+                if( propagator.identifier( adj.value() ) == geode::NO_ID )
+                {
+                    queue.emplace( adj.value() );
+                }
+            }
+        }
+    }
+
     template < typename Mesh >
     class Propagator
     {
+        OPENGEODE_DISABLE_COPY_AND_MOVE( Propagator< Mesh > );
+
     public:
+        virtual ~Propagator() = default;
+
         geode::index_t identifier( geode::index_t element ) const
         {
             OPENGEODE_ASSERT( element < identification_.size(),
@@ -76,8 +101,6 @@ namespace
             : mesh_( mesh ), identification_( nb_elements, geode::NO_ID )
         {
         }
-
-        virtual ~Propagator() = default;
 
         const Mesh& mesh() const
         {
@@ -119,7 +142,7 @@ namespace geode
         class GraphIdentifier::Impl : public Propagator< Graph >
         {
         public:
-            Impl( const Graph& curve )
+            explicit Impl( const Graph& curve )
                 : Propagator< Graph >( curve, curve.nb_vertices() )
             {
             }
@@ -170,7 +193,7 @@ namespace geode
             : public Propagator< EdgedCurve< dimension > >
         {
         public:
-            Impl( const EdgedCurve< dimension >& curve )
+            explicit Impl( const EdgedCurve< dimension >& curve )
                 : Propagator< EdgedCurve< dimension > >(
                     curve, curve.nb_edges() )
             {
@@ -234,7 +257,7 @@ namespace geode
             : public Propagator< SurfaceMesh< dimension > >
         {
         public:
-            Impl( const SurfaceMesh< dimension >& surface )
+            explicit Impl( const SurfaceMesh< dimension >& surface )
                 : Propagator< SurfaceMesh< dimension > >(
                     surface, surface.nb_polygons() )
             {
@@ -244,18 +267,10 @@ namespace geode
             void add_adjacents( index_t polygon_id,
                 std::queue< index_t >& queue ) const override
             {
-                for( const auto e :
-                    LRange{ this->mesh().nb_polygon_edges( polygon_id ) } )
-                {
-                    if( const auto adj =
-                            this->mesh().polygon_adjacent( { polygon_id, e } ) )
-                    {
-                        if( this->identifier( adj.value() ) == NO_ID )
-                        {
-                            queue.emplace( adj.value() );
-                        }
-                    }
-                }
+                ::add_adjacents(
+                    GenericMeshAccessor< SurfaceMesh< dimension > >{
+                        this->mesh() },
+                    *this, polygon_id, queue );
             }
         };
 
@@ -295,27 +310,18 @@ namespace geode
         class SolidIdentifier::Impl : public Propagator< SolidMesh3D >
         {
         public:
-            Impl( const SolidMesh3D& solid )
+            explicit Impl( const SolidMesh3D& solid )
                 : Propagator( solid, solid.nb_polyhedra() )
             {
             }
 
         private:
-            void add_adjacents(
-                index_t polyhedron_id, std::queue< index_t >& queue ) const
+            void add_adjacents( index_t polyhedron_id,
+                std::queue< index_t >& queue ) const override
             {
-                for( const auto f :
-                    LRange{ mesh().nb_polyhedron_facets( polyhedron_id ) } )
-                {
-                    if( const auto adj =
-                            mesh().polyhedron_adjacent( { polyhedron_id, f } ) )
-                    {
-                        if( identifier( adj.value() ) == NO_ID )
-                        {
-                            queue.emplace( adj.value() );
-                        }
-                    }
-                }
+                ::add_adjacents(
+                    GenericMeshAccessor< SolidMesh3D >{ this->mesh() }, *this,
+                    polyhedron_id, queue );
             }
         };
 
