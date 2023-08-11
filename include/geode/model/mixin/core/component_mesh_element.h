@@ -34,6 +34,8 @@ namespace geode
      */
     struct ComponentMeshElement
     {
+        ComponentMeshElement() = default;
+
         ComponentMeshElement(
             ComponentID component_id_in, index_t element_id_in )
             : component_id( std::move( component_id_in ) ),
