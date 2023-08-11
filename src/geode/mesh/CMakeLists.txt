@@ -103,7 +103,6 @@ add_geode_library(
         "helpers/convert_solid_mesh.cpp"
         "helpers/create_coordinate_system.cpp"
         "helpers/euclidean_distance_transform.cpp"
-        "helpers/detail/surface_merger.cpp"
         "helpers/hausdorff_distance.cpp"
         "helpers/rasterize.cpp"
         "helpers/ray_tracing.cpp"
@@ -118,6 +117,7 @@ add_geode_library(
         "helpers/detail/solid_merger.cpp"
         "helpers/detail/surface_merger.cpp"
         "helpers/detail/vertex_merger.cpp"
+        "helpers/detail/component_identifier.cpp"
         "helpers/private/copy.cpp"
         "helpers/private/regular_grid_shape_function.cpp"
         "io/edged_curve_input.cpp"
@@ -292,6 +292,7 @@ add_geode_library(
         "helpers/detail/solid_merger.h"
         "helpers/detail/surface_merger.h"
         "helpers/detail/vertex_merger.h"
+        "helpers/detail/component_identifier.h"
     PRIVATE_HEADERS
         "core/private/edges_impl.h"
         "core/private/facet_edges_impl.h"
