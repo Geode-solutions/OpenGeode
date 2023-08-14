@@ -29,6 +29,7 @@
 namespace geode
 {
     class ProgressLoggerClient;
+    struct uuid;
 } // namespace geode
 
 namespace geode
@@ -41,13 +42,17 @@ namespace geode
         static void register_client(
             std::unique_ptr< ProgressLoggerClient >&& client );
 
-        static void start( const std::string& message, index_t nb_steps );
+        static void start( const uuid& progress_logger_id,
+            const std::string& message,
+            index_t nb_steps );
 
-        static void update( index_t current_step, index_t nb_steps );
+        static void update( const uuid& progress_logger_id,
+            index_t current_step,
+            index_t nb_steps );
 
-        static void completed();
+        static void completed( const uuid& progress_logger_id );
 
-        static void failed();
+        static void failed( const uuid& progress_logger_id );
 
     private:
         ProgressLoggerManager();

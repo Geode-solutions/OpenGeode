@@ -30,6 +30,7 @@
 #include <geode/basic/logger.h>
 #include <geode/basic/pimpl_impl.h>
 #include <geode/basic/progress_logger_manager.h>
+#include <geode/basic/uuid.h>
 
 namespace
 {
@@ -44,18 +45,18 @@ namespace geode
         Impl( const std::string& message, index_t nb_steps )
             : nb_steps_( nb_steps ), current_time_{ absl::Now() }
         {
-            ProgressLoggerManager::start( message, nb_steps_ );
+            ProgressLoggerManager::start( id_, message, nb_steps_ );
         }
 
         ~Impl()
         {
             if( current_ == nb_steps_ )
             {
-                ProgressLoggerManager::completed();
+                ProgressLoggerManager::completed( id_ );
             }
             else
             {
-                ProgressLoggerManager::failed();
+                ProgressLoggerManager::failed( id_ );
             }
         }
 
@@ -67,7 +68,7 @@ namespace geode
             if( now - current_time_ > SLEEP )
             {
                 current_time_ = now;
-                ProgressLoggerManager::update( current_, nb_steps_ );
+                ProgressLoggerManager::update( id_, current_, nb_steps_ );
             }
             return current_;
         }
@@ -80,6 +81,7 @@ namespace geode
         }
 
     private:
+        uuid id_;
         index_t nb_steps_;
         index_t current_{ 0 };
         absl::Time current_time_;

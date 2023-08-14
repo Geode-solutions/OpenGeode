@@ -29,18 +29,27 @@
 
 namespace geode
 {
+    struct uuid;
+} // namespace geode
+
+namespace geode
+{
     class opengeode_basic_api ProgressLoggerClient
     {
     public:
         virtual ~ProgressLoggerClient() = default;
 
-        virtual void start( const std::string& message, index_t nb_steps ) = 0;
+        virtual void start( const uuid& progress_logger_id,
+            const std::string& message,
+            index_t nb_steps ) = 0;
 
-        virtual void update( index_t current_step, index_t nb_steps ) = 0;
+        virtual void update( const uuid& progress_logger_id,
+            index_t current_step,
+            index_t nb_steps ) = 0;
 
-        virtual void completed() = 0;
+        virtual void completed( const uuid& progress_logger_id ) = 0;
 
-        virtual void failed() = 0;
+        virtual void failed( const uuid& progress_logger_id ) = 0;
 
     protected:
         ProgressLoggerClient() = default;

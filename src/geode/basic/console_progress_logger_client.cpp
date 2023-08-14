@@ -23,68 +23,91 @@
 
 #include <geode/basic/console_progress_logger_client.h>
 
+#include <absl/container/flat_hash_map.h>
+
 #include <geode/basic/logger.h>
 #include <geode/basic/pimpl_impl.h>
 #include <geode/basic/timer.h>
+#include <geode/basic/uuid.h>
 
 namespace geode
 {
     class ConsoleProgressLoggerClient::Impl
     {
-    public:
-        void start( const std::string& message, index_t /*nb_steps */ )
+        struct Info
         {
-            timer_.reset();
-            message_ = message;
-            Logger::info( message_, " started" );
+            explicit Info( std::string message_in )
+                : message{ std::move( message_in ) }
+            {
+            }
+            Info( Info&& ) = default;
+
+            Timer timer;
+            std::string message;
+        };
+
+    public:
+        void start( const uuid& progress_logger_id,
+            const std::string& message,
+            index_t /*nb_steps */ )
+        {
+            info_.emplace( progress_logger_id, message );
+            Logger::info( message, " started" );
         }
 
-        void update( index_t current, index_t nb_steps )
+        void update(
+            const uuid& progress_logger_id, index_t current, index_t nb_steps )
         {
             const auto percent =
                 std::floor( static_cast< double >( current ) / nb_steps * 100 );
+            Logger::info( info_.at( progress_logger_id ).message, " ", current,
+                "/", nb_steps, " (", percent, "%)" );
+        }
+
+        void completed( const uuid& progress_logger_id )
+        {
+            const auto& info = info_.at( progress_logger_id );
             Logger::info(
-                message_, " ", current, "/", nb_steps, " (", percent, "%)" );
+                info.message, " completed in ", info.timer.duration() );
+            info_.erase( progress_logger_id );
         }
 
-        void completed()
+        void failed( const uuid& progress_logger_id )
         {
-            Logger::info( message_, " completed in ", timer_.duration() );
-        }
-
-        void failed()
-        {
-            Logger::info( message_, " failed in ", timer_.duration() );
+            const auto& info = info_.at( progress_logger_id );
+            Logger::info( info.message, " failed in ", info.timer.duration() );
+            info_.erase( progress_logger_id );
         }
 
     private:
-        Timer timer_;
-        std::string message_;
+        absl::flat_hash_map< uuid, Info > info_;
     };
 
     ConsoleProgressLoggerClient::ConsoleProgressLoggerClient() {} // NOLINT
 
     ConsoleProgressLoggerClient::~ConsoleProgressLoggerClient() {} // NOLINT
 
-    void ConsoleProgressLoggerClient::start(
-        const std::string& message, index_t nb_steps )
+    void ConsoleProgressLoggerClient::start( const uuid& progress_logger_id,
+        const std::string& message,
+        index_t nb_steps )
     {
-        impl_->start( message, nb_steps );
+        impl_->start( progress_logger_id, message, nb_steps );
     }
 
     void ConsoleProgressLoggerClient::update(
-        index_t current, index_t nb_steps )
+        const uuid& progress_logger_id, index_t current, index_t nb_steps )
     {
-        impl_->update( current, nb_steps );
+        impl_->update( progress_logger_id, current, nb_steps );
     }
 
-    void ConsoleProgressLoggerClient::completed()
+    void ConsoleProgressLoggerClient::completed(
+        const uuid& progress_logger_id )
     {
-        impl_->completed();
+        impl_->completed( progress_logger_id );
     }
 
-    void ConsoleProgressLoggerClient::failed()
+    void ConsoleProgressLoggerClient::failed( const uuid& progress_logger_id )
     {
-        impl_->failed();
+        impl_->failed( progress_logger_id );
     }
 } // namespace geode
