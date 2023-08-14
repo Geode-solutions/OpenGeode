@@ -50,7 +50,7 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        ModelBoundary( ModelBoundary&& other )  noexcept = default;
+        ModelBoundary( ModelBoundary&& other ) noexcept = default;
         ~ModelBoundary() = default;
 
         static ComponentType component_type_static()
