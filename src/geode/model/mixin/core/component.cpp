@@ -80,6 +80,12 @@ namespace geode
     }
 
     template < index_t dimension >
+    Component< dimension >::Component( Component&& other ) noexcept
+        : Identifier{ std::move( other ) }, impl_{ std::move( other.impl_ ) }
+    {
+    }
+
+    template < index_t dimension >
     template < typename Archive >
     void Component< dimension >::serialize( Archive& archive )
     {

@@ -53,7 +53,7 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        Corner( Corner&& other );
+        Corner( Corner&& other ) noexcept;
         ~Corner();
 
         static ComponentType component_type_static()

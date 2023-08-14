@@ -227,7 +227,7 @@ namespace geode
 
     public:
         Section();
-        Section( Section&& section );
+        Section( Section&& section ) noexcept;
         Section& operator=( Section&& section );
         ~Section();
 

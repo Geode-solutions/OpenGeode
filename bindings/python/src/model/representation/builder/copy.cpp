@@ -31,9 +31,9 @@ namespace geode
     {
         pybind11::class_< ModelCopyMapping >( module, "ModelCopyMapping" )
             .def( pybind11::init<>() )
-            .def( "at", ( ModelCopyMapping::Mapping
-                            & (ModelCopyMapping::*) (const ComponentType&) )
-                            & ModelCopyMapping::at )
+            .def( "at", static_cast< ModelCopyMapping::Mapping& (
+                            ModelCopyMapping::*) ( const ComponentType& ) >(
+                            &ModelCopyMapping::at ) )
             .def( "emplace", &ModelCopyMapping::emplace );
     }
 
@@ -41,9 +41,9 @@ namespace geode
     {
         pybind11::class_< ModelGenericMapping >( module, "ModelGenericMapping" )
             .def( pybind11::init<>() )
-            .def( "at", ( ModelGenericMapping::Mapping
-                            & (ModelGenericMapping::*) (const ComponentType&) )
-                            & ModelGenericMapping::at )
+            .def( "at", static_cast< ModelGenericMapping::Mapping& (
+                            ModelGenericMapping::*) ( const ComponentType& ) >(
+                            &ModelGenericMapping::at ) )
             .def( "emplace", &ModelGenericMapping::emplace );
     }
 } // namespace geode

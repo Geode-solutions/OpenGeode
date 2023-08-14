@@ -306,7 +306,7 @@ namespace geode
 
     public:
         BRep();
-        BRep( BRep&& brep );
+        BRep( BRep&& brep ) noexcept;
         BRep& operator=( BRep&& brep );
         ~BRep();
 

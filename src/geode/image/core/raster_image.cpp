@@ -98,8 +98,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    RasterImage< dimension >::RasterImage( RasterImage&& other )
+    RasterImage< dimension >::RasterImage( RasterImage&& other ) noexcept
         : CellArray< dimension >{ std::move( other ) },
+          Identifier{ std::move( other ) },
           impl_( std::move( other.impl_ ) )
     {
     }

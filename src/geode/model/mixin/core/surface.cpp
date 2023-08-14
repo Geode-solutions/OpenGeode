@@ -58,7 +58,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    Surface< dimension >::Surface( Surface< dimension >&& other )
+    Surface< dimension >::Surface( Surface< dimension >&& other ) noexcept
         : impl_( std::move( other.impl_ ) )
     {
     }

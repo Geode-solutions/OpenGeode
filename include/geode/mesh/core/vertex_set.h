@@ -81,7 +81,7 @@ namespace geode
 
     protected:
         VertexSet();
-        VertexSet( VertexSet&& other );
+        VertexSet( VertexSet&& other ) noexcept;
         VertexSet& operator=( VertexSet&& other );
 
     private:
