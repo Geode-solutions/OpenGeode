@@ -34,11 +34,13 @@ namespace geode
     public:
         void set_instance( const std::type_info &type, Singleton *singleton )
         {
+            const std::lock_guard< std::mutex > locking{ lock_ };
             singletons_[type.name()].reset( singleton );
         }
 
         Singleton *instance( const std::type_info &type )
         {
+            const std::lock_guard< std::mutex > locking{ lock_ };
             const auto iter = singletons_.find( type.name() );
             if( iter == singletons_.end() )
             {
@@ -50,6 +52,7 @@ namespace geode
     private:
         absl::flat_hash_map< std::string, std::unique_ptr< Singleton > >
             singletons_;
+        std::mutex lock_;
     };
 
     Singleton::Singleton() {} // NOLINT
