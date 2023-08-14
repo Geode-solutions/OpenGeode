@@ -60,8 +60,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    Block< dimension >::Block( Block&& other )
-        : impl_( std::move( other.impl_ ) )
+    Block< dimension >::Block( Block&& other ) noexcept
+        : Component< dimension >{ std::move( other ) },
+          impl_{ std::move( other.impl_ ) }
     {
     }
 

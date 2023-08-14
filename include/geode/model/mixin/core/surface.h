@@ -53,7 +53,7 @@ namespace geode
         friend class bitsery::Access;
 
     public:
-        Surface( Surface&& other );
+        Surface( Surface&& other ) noexcept;
         ~Surface();
 
         static ComponentType component_type_static()

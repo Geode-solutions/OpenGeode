@@ -616,7 +616,7 @@ namespace geode
 
     BRep::BRep() {} // NOLINT
 
-    BRep::BRep( BRep&& brep )
+    BRep::BRep( BRep&& brep ) noexcept
         : Topology{ std::move( brep ) },
           Corners3D{ std::move( brep ) },
           Lines3D{ std::move( brep ) },

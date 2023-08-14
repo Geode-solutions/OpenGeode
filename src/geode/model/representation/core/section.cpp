@@ -416,7 +416,7 @@ namespace geode
 
     Section::Section() {} // NOLINT
 
-    Section::Section( Section&& section )
+    Section::Section( Section&& section ) noexcept
         : Topology{ std::move( section ) },
           Corners2D{ std::move( section ) },
           Lines2D{ std::move( section ) },

@@ -65,8 +65,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    Corner< dimension >::Corner( Corner&& other )
-        : impl_( std::move( other.impl_ ) )
+    Corner< dimension >::Corner( Corner&& other ) noexcept
+        : Component< dimension >{ std::move( other ) },
+          impl_( std::move( other.impl_ ) )
     {
     }
 
