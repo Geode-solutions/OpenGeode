@@ -32,6 +32,8 @@
 #include <mutex>
 #include <typeinfo>
 
+#include <absl/memory/memory.h>
+
 #include <geode/basic/common.h>
 #include <geode/basic/pimpl.h>
 
@@ -57,28 +59,28 @@ namespace geode
         Singleton();
 
         template < class SingletonType >
-        static SingletonType &instance()
+        static SingletonType& instance()
         {
-            const auto &type = typeid( SingletonType );
-            auto singleton = instance( type );
+            const auto& type = typeid( SingletonType );
+            auto* singleton = instance( type );
             if( singleton == nullptr )
             {
                 static std::mutex lock;
                 const std::lock_guard< std::mutex > locking{ lock };
                 if( instance( type ) == nullptr )
                 {
-                    set_instance( type, new SingletonType{} );
+                    set_instance( type, absl::make_unique< SingletonType >() );
                 }
                 return instance< SingletonType >();
             }
-            return *dynamic_cast< SingletonType * >( singleton );
+            return *dynamic_cast< SingletonType* >( singleton );
         }
 
     private:
-        static Singleton &instance();
-        static void set_instance(
-            const std::type_info &type, Singleton *singleton );
-        static Singleton *instance( const std::type_info &type );
+        static Singleton& instance();
+        static void set_instance( const std::type_info& type,
+            std::unique_ptr< Singleton >&& singleton );
+        static Singleton* instance( const std::type_info& type );
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );
