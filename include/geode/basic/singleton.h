@@ -29,6 +29,7 @@
 
 #pragma once
 
+#include <mutex>
 #include <typeinfo>
 
 #include <geode/basic/common.h>
@@ -58,15 +59,19 @@ namespace geode
         template < class SingletonType >
         static SingletonType &instance()
         {
-            auto singleton = dynamic_cast< SingletonType * >(
-                instance( typeid( SingletonType ) ) );
+            const auto &type = typeid( SingletonType );
+            auto singleton = instance( type );
             if( singleton == nullptr )
             {
-                singleton = new SingletonType{};
-                set_instance( typeid( SingletonType ), singleton );
+                static std::mutex lock;
+                const std::lock_guard< std::mutex > locking{ lock };
+                if( instance( type ) == nullptr )
+                {
+                    set_instance( type, new SingletonType{} );
+                }
+                return instance< SingletonType >();
             }
-
-            return *singleton;
+            return *dynamic_cast< SingletonType * >( singleton );
         }
 
     private:
