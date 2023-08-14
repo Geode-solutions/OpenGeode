@@ -40,7 +40,7 @@ namespace geode
 {
     namespace detail
     {
-        class GraphIdentifier
+        class opengeode_mesh_api GraphIdentifier
         {
             OPENGEODE_DISABLE_COPY_AND_MOVE( GraphIdentifier );
 
