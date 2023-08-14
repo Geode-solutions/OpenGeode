@@ -53,6 +53,10 @@ namespace geode
 
     Timer::Timer() {} // NOLINT
 
+    Timer::Timer( Timer&& other ) noexcept : impl_{ std::move( other.impl_ ) }
+    {
+    }
+
     Timer::~Timer() {} // NOLINT
 
     std::string Timer::duration() const

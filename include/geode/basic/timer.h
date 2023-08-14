@@ -32,6 +32,7 @@ namespace geode
     {
     public:
         Timer();
+        Timer( Timer&& other ) noexcept;
         ~Timer();
 
         std::string duration() const;

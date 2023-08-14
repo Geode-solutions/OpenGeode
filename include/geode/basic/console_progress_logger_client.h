@@ -39,13 +39,17 @@ namespace geode
         ~ConsoleProgressLoggerClient();
 
     private:
-        void start( const std::string& message, index_t nb_steps ) override;
+        void start( const uuid& progress_logger_id,
+            const std::string& message,
+            index_t nb_steps ) override;
 
-        void update( index_t current_step, index_t nb_steps ) override;
+        void update( const uuid& progress_logger_id,
+            index_t current_step,
+            index_t nb_steps ) override;
 
-        void completed() override;
+        void completed( const uuid& progress_logger_id ) override;
 
-        void failed() override;
+        void failed( const uuid& progress_logger_id ) override;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

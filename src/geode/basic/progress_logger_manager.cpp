@@ -23,6 +23,8 @@
 
 #include <geode/basic/progress_logger_manager.h>
 
+#include <mutex>
+
 #include <geode/basic/pimpl_impl.h>
 #include <geode/basic/progress_logger_client.h>
 
@@ -36,40 +38,49 @@ namespace geode
             loggers_.emplace_back( std::move( client ) );
         }
 
-        void start( const std::string& message, index_t nb_steps )
+        void start( const uuid& progress_logger_id,
+            const std::string& message,
+            index_t nb_steps )
         {
+            const std::lock_guard< std::mutex > locking{ lock_ };
             for( auto& logger : loggers_ )
             {
-                logger->start( message, nb_steps );
+                logger->start( progress_logger_id, message, nb_steps );
             }
         }
 
-        void update( index_t current_step, index_t nb_steps )
+        void update( const uuid& progress_logger_id,
+            index_t current_step,
+            index_t nb_steps )
         {
+            const std::lock_guard< std::mutex > locking{ lock_ };
             for( auto& logger : loggers_ )
             {
-                logger->update( current_step, nb_steps );
+                logger->update( progress_logger_id, current_step, nb_steps );
             }
         }
 
-        void completed()
+        void completed( const uuid& progress_logger_id )
         {
+            const std::lock_guard< std::mutex > locking{ lock_ };
             for( auto& logger : loggers_ )
             {
-                logger->completed();
+                logger->completed( progress_logger_id );
             }
         }
 
-        void failed()
+        void failed( const uuid& progress_logger_id )
         {
+            const std::lock_guard< std::mutex > locking{ lock_ };
             for( auto& logger : loggers_ )
             {
-                logger->failed();
+                logger->failed( progress_logger_id );
             }
         }
 
     private:
         std::vector< std::unique_ptr< ProgressLoggerClient > > loggers_;
+        std::mutex lock_;
     };
 
     ProgressLoggerManager::ProgressLoggerManager() {} // NOLINT
@@ -82,25 +93,27 @@ namespace geode
         instance().impl_->register_client( std::move( client ) );
     }
 
-    void ProgressLoggerManager::start(
-        const std::string& message, index_t nb_steps )
+    void ProgressLoggerManager::start( const uuid& progress_logger_id,
+        const std::string& message,
+        index_t nb_steps )
     {
-        instance().impl_->start( message, nb_steps );
+        instance().impl_->start( progress_logger_id, message, nb_steps );
     }
 
-    void ProgressLoggerManager::update( index_t current_step, index_t nb_steps )
+    void ProgressLoggerManager::update(
+        const uuid& progress_logger_id, index_t current_step, index_t nb_steps )
     {
-        instance().impl_->update( current_step, nb_steps );
+        instance().impl_->update( progress_logger_id, current_step, nb_steps );
     }
 
-    void ProgressLoggerManager::completed()
+    void ProgressLoggerManager::completed( const uuid& progress_logger_id )
     {
-        instance().impl_->completed();
+        instance().impl_->completed( progress_logger_id );
     }
 
-    void ProgressLoggerManager::failed()
+    void ProgressLoggerManager::failed( const uuid& progress_logger_id )
     {
-        instance().impl_->failed();
+        instance().impl_->failed( progress_logger_id );
     }
 
     ProgressLoggerManager& ProgressLoggerManager::instance()
