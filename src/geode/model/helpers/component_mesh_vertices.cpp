@@ -23,6 +23,8 @@
 
 #include <geode/model/helpers/component_mesh_vertices.h>
 
+#include <geode/basic/logger.h>
+
 #include <geode/model/mixin/core/vertex_identifier.h>
 
 namespace
