@@ -42,16 +42,6 @@ namespace
         geode::ComponentMeshVertexPairs result;
         result.reserve(
             std::min( unique_vertices0.size(), unique_vertices1.size() ) );
-        DEBUG( unique_vertices0.size() );
-        DEBUG( unique_vertices1.size() );
-        for( const auto& cmv0 : unique_vertices0 )
-        {
-            SDEBUG( cmv0 );
-        }
-        for( const auto& cmv1 : unique_vertices1 )
-        {
-            SDEBUG( cmv1 );
-        }
         for( const auto& cmv0 : unique_vertices0 )
         {
             for( const auto& cmv1 : unique_vertices1 )
