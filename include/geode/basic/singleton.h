@@ -29,6 +29,7 @@
 
 #pragma once
 
+#include <iostream>
 #include <mutex>
 #include <typeinfo>
 
@@ -62,24 +63,27 @@ namespace geode
         static SingletonType& instance()
         {
             const auto& type = typeid( SingletonType );
-            auto* singleton = instance( type );
+            auto* singleton =
+                dynamic_cast< SingletonType* >( instance( type ) );
+            if( singleton != nullptr )
+            {
+                return *singleton;
+            }
+            static std::mutex lock;
+            const std::lock_guard< std::mutex > locking{ lock };
+            singleton = dynamic_cast< SingletonType* >( instance( type ) );
             if( singleton == nullptr )
             {
-                static std::mutex lock;
-                const std::lock_guard< std::mutex > locking{ lock };
-                if( instance( type ) == nullptr )
-                {
-                    set_instance( type, absl::make_unique< SingletonType >() );
-                }
-                return instance< SingletonType >();
+                singleton = new SingletonType{};
+                set_instance( type, singleton );
             }
-            return *dynamic_cast< SingletonType* >( singleton );
+            return *singleton;
         }
 
     private:
         static Singleton& instance();
-        static void set_instance( const std::type_info& type,
-            std::unique_ptr< Singleton >&& singleton );
+        static void set_instance(
+            const std::type_info& type, Singleton* singleton );
         static Singleton* instance( const std::type_info& type );
 
     private:

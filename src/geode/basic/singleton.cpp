@@ -32,11 +32,10 @@ namespace geode
     class Singleton::Impl
     {
     public:
-        void set_instance( const std::type_info &type,
-            std::unique_ptr< Singleton > &&singleton )
+        void set_instance( const std::type_info &type, Singleton *singleton )
         {
             const std::lock_guard< std::mutex > locking{ lock_ };
-            singletons_[type.name()] = std::move( singleton );
+            singletons_[type.name()].reset( singleton );
         }
 
         Singleton *instance( const std::type_info &type )
@@ -67,9 +66,9 @@ namespace geode
     }
 
     void Singleton::set_instance(
-        const std::type_info &type, std::unique_ptr< Singleton > &&singleton )
+        const std::type_info &type, Singleton *singleton )
     {
-        instance().impl_->set_instance( type, std::move( singleton ) );
+        instance().impl_->set_instance( type, singleton );
     }
 
     Singleton *Singleton::instance( const std::type_info &type )
