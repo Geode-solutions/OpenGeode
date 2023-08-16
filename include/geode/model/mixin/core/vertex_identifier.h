@@ -33,6 +33,11 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive );
 
+        std::string string() const
+        {
+            return absl::StrCat( component_id.string(), " ", vertex );
+        }
+
         ComponentID component_id;
         index_t vertex{ NO_ID };
 
