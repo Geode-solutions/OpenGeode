@@ -213,7 +213,11 @@ function(add_geode_test)
         add_dependencies(essential ${target_name})
         set_tests_properties(${target_name} PROPERTIES LABELS essential) 
     endif()
-    set_tests_properties(${target_name} PROPERTIES TIMEOUT 300)
+    set_tests_properties(${target_name} 
+        PROPERTIES 
+            TIMEOUT 300
+            FAIL_REGULAR_EXPRESSION "Sanitizer"
+    )
     _find_dependency_directories(directories projects ${GEODE_TEST_DEPENDENCIES})
     if(WIN32)
         list(JOIN directories "\\;" directories)
