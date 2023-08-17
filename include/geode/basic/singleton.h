@@ -63,15 +63,9 @@ namespace geode
         static SingletonType& instance()
         {
             const auto& type = typeid( SingletonType );
+            const std::lock_guard< std::mutex > locking{ lock() };
             auto* singleton =
                 dynamic_cast< SingletonType* >( instance( type ) );
-            if( singleton != nullptr )
-            {
-                return *singleton;
-            }
-            static std::mutex lock;
-            const std::lock_guard< std::mutex > locking{ lock };
-            singleton = dynamic_cast< SingletonType* >( instance( type ) );
             if( singleton == nullptr )
             {
                 singleton = new SingletonType{};
@@ -85,6 +79,7 @@ namespace geode
         static void set_instance(
             const std::type_info& type, Singleton* singleton );
         static Singleton* instance( const std::type_info& type );
+        static std::mutex& lock();
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

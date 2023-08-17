@@ -34,19 +34,22 @@ namespace geode
     public:
         void set_instance( const std::type_info &type, Singleton *singleton )
         {
-            const std::lock_guard< std::mutex > locking{ lock_ };
             singletons_[type.name()].reset( singleton );
         }
 
         Singleton *instance( const std::type_info &type )
         {
-            const std::lock_guard< std::mutex > locking{ lock_ };
             const auto iter = singletons_.find( type.name() );
             if( iter == singletons_.end() )
             {
                 return nullptr;
             }
             return iter->second.get();
+        }
+
+        std::mutex &lock()
+        {
+            return lock_;
         }
 
     private:
@@ -58,6 +61,11 @@ namespace geode
     Singleton::Singleton() {} // NOLINT
 
     Singleton::~Singleton() {} // NOLINT
+
+    std::mutex &Singleton::lock()
+    {
+        return instance().impl_->lock();
+    }
 
     Singleton &Singleton::instance()
     {
@@ -75,4 +83,5 @@ namespace geode
     {
         return instance().impl_->instance( type );
     }
+
 } // namespace geode
