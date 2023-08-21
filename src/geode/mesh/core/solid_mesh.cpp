@@ -225,31 +225,6 @@ namespace
     }
 
     template < geode::index_t dimension >
-    void output( const geode::SolidMesh< dimension >& solid,
-        const geode::index_t& vertex_id )
-    {
-        auto s = geode::TriangulatedSurface< dimension >::create();
-        auto b = geode::TriangulatedSurfaceBuilder< dimension >::create( *s );
-        for( const auto t : geode::Range{ solid.nb_polyhedra() } )
-        {
-            if( !solid.vertex_in_polyhedron( t, vertex_id ) )
-            {
-                continue;
-            }
-            const auto vertices = solid.polyhedron_vertices( t );
-            const auto v0 = b->create_point( solid.point( vertices[0] ) );
-            const auto v1 = b->create_point( solid.point( vertices[1] ) );
-            const auto v2 = b->create_point( solid.point( vertices[2] ) );
-            const auto v3 = b->create_point( solid.point( vertices[3] ) );
-            b->create_triangle( { v0, v1, v2 } );
-            b->create_triangle( { v0, v3, v2 } );
-            b->create_triangle( { v3, v1, v2 } );
-            b->create_triangle( { v0, v1, v3 } );
-        }
-        geode::save_triangulated_surface( *s, "pb.og_tsf3d" );
-    }
-
-    template < geode::index_t dimension >
     geode::detail::PolyhedraAroundVertexImpl compute_polyhedra_around_vertex(
         const geode::SolidMesh< dimension >& solid,
         const geode::index_t& vertex_id,

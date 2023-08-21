@@ -34,7 +34,7 @@ namespace geode
     template < typename T >
     class GenericMeshAccessor;
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
-    class uuid;
+    struct uuid;
 } // namespace geode
 
 namespace geode
