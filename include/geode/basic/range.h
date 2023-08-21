@@ -65,7 +65,7 @@ namespace geode
             return iter_ != last_;
         }
 
-        constexpr void operator++()
+        void operator++()
         {
             next_operator_( iter_ );
         }
