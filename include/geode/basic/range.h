@@ -35,7 +35,7 @@ namespace geode
     class IncrementOperator
     {
     public:
-        void operator()( Type& value ) const
+        constexpr void operator()( Type& value ) const
         {
             value++;
         }
@@ -45,7 +45,7 @@ namespace geode
     class DecrementOperator
     {
     public:
-        void operator()( Type& value ) const
+        constexpr void operator()( Type& value ) const
         {
             value--;
         }
@@ -60,24 +60,24 @@ namespace geode
     class BaseRange
     {
     public:
-        bool operator!=( const BaseRange& /*unused*/ ) const
+        constexpr bool operator!=( const BaseRange& /*unused*/ ) const
         {
             return iter_ != last_;
         }
 
-        void operator++()
+        constexpr void operator++()
         {
             next_operator_( iter_ );
         }
 
-        Type current() const
+        constexpr Type current() const
         {
             return iter_;
         }
 
     protected:
         template < typename T1, typename T2 >
-        BaseRange( T1 begin, T2 end )
+        constexpr BaseRange( T1 begin, T2 end )
             : iter_( static_cast< Type >( begin ) ),
               last_( static_cast< Type >( end ) )
         {
@@ -98,14 +98,14 @@ namespace geode
     class OPENGEODE_BASIC_DEPRECATED BeginEnd
     {
     public:
-        explicit BeginEnd( const Type& type ) : type_( type ) {}
+        constexpr explicit BeginEnd( const Type& type ) : type_( type ) {}
 
-        inline const Type& begin() const
+        inline constexpr const Type& begin() const
         {
             return type_;
         }
 
-        inline const Type& end() const
+        inline constexpr const Type& end() const
         {
             return type_;
         }
@@ -134,27 +134,27 @@ namespace geode
     {
     public:
         template < typename T1, typename T2 >
-        TRange( T1 begin, T2 end )
+        constexpr TRange( T1 begin, T2 end )
             : BaseRange< Type, IncrementOperator >( begin, end )
         {
         }
 
         template < typename T >
-        explicit TRange( T end ) : TRange( 0, end )
+        constexpr explicit TRange( T end ) : TRange( 0, end )
         {
         }
 
-        const TRange< Type >& begin() const
-        {
-            return *this;
-        }
-
-        const TRange< Type >& end() const
+        constexpr const TRange< Type >& begin() const
         {
             return *this;
         }
 
-        Type operator*() const
+        constexpr const TRange< Type >& end() const
+        {
+            return *this;
+        }
+
+        constexpr Type operator*() const
         {
             return this->current();
         }
@@ -167,27 +167,27 @@ namespace geode
     {
     public:
         template < typename T1, typename T2 >
-        TReverseRange( T1 begin, T2 end )
+        constexpr TReverseRange( T1 begin, T2 end )
             : BaseRange< Type, DecrementOperator >( begin - 1, end - 1 )
         {
         }
 
         template < typename T >
-        explicit TReverseRange( T begin ) : TReverseRange( begin, 0 )
+        constexpr explicit TReverseRange( T begin ) : TReverseRange( begin, 0 )
         {
         }
 
-        const TReverseRange< Type >& begin() const
-        {
-            return *this;
-        }
-
-        const TReverseRange< Type >& end() const
+        constexpr const TReverseRange< Type >& begin() const
         {
             return *this;
         }
 
-        Type operator*() const
+        constexpr const TReverseRange< Type >& end() const
+        {
+            return *this;
+        }
+
+        constexpr Type operator*() const
         {
             return this->current();
         }
@@ -200,22 +200,22 @@ namespace geode
     {
     public:
         template < typename Container >
-        explicit TIndices( const Container& container )
+        constexpr explicit TIndices( const Container& container )
             : BaseRange< Type, IncrementOperator >( 0, container.size() )
         {
         }
 
-        const TIndices< Type >& begin() const
+        constexpr const TIndices< Type >& begin() const
         {
             return *this;
         }
 
-        const TIndices< Type >& end() const
+        constexpr const TIndices< Type >& end() const
         {
             return *this;
         }
 
-        Type operator*() const
+        constexpr Type operator*() const
         {
             return this->current();
         }
