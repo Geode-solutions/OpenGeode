@@ -25,8 +25,6 @@
 
 #include <geode/basic/attribute_manager.h>
 
-#include <geode/basic/uuid.h>
-
 #include <geode/geometry/basic_objects/segment.h>
 
 #include <geode/mesh/common.h>
@@ -37,6 +35,7 @@ namespace geode
     template < typename T >
     class GenericMeshAccessor;
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+    class uuid;
 } // namespace geode
 
 namespace geode
@@ -83,12 +82,12 @@ namespace geode
             return mesh_.edge_barycenter( edge_id );
         }
 
-        uuid id() const
+        const uuid& id() const
         {
             return mesh_.id();
         }
 
-        Point< dimension > point( index_t vertex_id ) const
+        const Point< dimension >& point( index_t vertex_id ) const
         {
             return mesh_.point( vertex_id );
         }
