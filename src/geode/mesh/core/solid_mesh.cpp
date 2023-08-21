@@ -276,10 +276,6 @@ namespace
                 }
             }
         }
-        if( safety_count >= MAX_SAFETY_COUNT )
-        {
-            output( solid, vertex_id );
-        }
         OPENGEODE_EXCEPTION( safety_count < MAX_SAFETY_COUNT,
             "[SolidMesh::polygons_around_vertex] Too many polyhedra "
             "around vertex ",
