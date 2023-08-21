@@ -25,6 +25,8 @@
 
 #include <geode/geometry/basic_objects/tetrahedron.h>
 
+#include <geode/basic/uuid.h>
+
 #include <geode/mesh/common.h>
 #include <geode/mesh/core/polyhedral_solid.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
@@ -33,6 +35,7 @@ namespace geode
 {
     template < typename T >
     class GenericMeshAccessor;
+    FORWARD_DECLARATION_DIMENSION_CLASS( Point );
 } // namespace geode
 
 namespace geode
@@ -97,6 +100,16 @@ namespace geode
             const ElementFacet& polyhedron_facet ) const
         {
             return mesh_.polyhedron_adjacent_facet( polyhedron_facet );
+        }
+
+        uuid id() const
+        {
+            return mesh_.id();
+        }
+
+        Point< dimension > point( index_t vertex_id ) const
+        {
+            return mesh_.point( vertex_id );
         }
 
         AttributeManager& element_attribute_manager() const
