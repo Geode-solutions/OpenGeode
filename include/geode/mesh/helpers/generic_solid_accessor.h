@@ -33,6 +33,8 @@ namespace geode
 {
     template < typename T >
     class GenericMeshAccessor;
+    FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+    struct uuid;
 } // namespace geode
 
 namespace geode
@@ -97,6 +99,16 @@ namespace geode
             const ElementFacet& polyhedron_facet ) const
         {
             return mesh_.polyhedron_adjacent_facet( polyhedron_facet );
+        }
+
+        const uuid& id() const
+        {
+            return mesh_.id();
+        }
+
+        const Point< dimension >& point( index_t vertex_id ) const
+        {
+            return mesh_.point( vertex_id );
         }
 
         AttributeManager& element_attribute_manager() const

@@ -42,6 +42,7 @@
 #include <geode/mesh/builder/solid_edges_builder.h>
 #include <geode/mesh/builder/solid_facets_builder.h>
 #include <geode/mesh/builder/solid_mesh_builder.h>
+#include <geode/mesh/builder/triangulated_surface_builder.h>
 #include <geode/mesh/core/bitsery_archive.h>
 #include <geode/mesh/core/detail/vertex_cycle.h>
 #include <geode/mesh/core/mesh_factory.h>
@@ -51,6 +52,8 @@
 #include <geode/mesh/core/solid_facets.h>
 #include <geode/mesh/core/texture3d.h>
 #include <geode/mesh/core/texture_storage.h>
+#include <geode/mesh/core/triangulated_surface.h>
+#include <geode/mesh/io/triangulated_surface_output.h>
 
 namespace
 {
@@ -236,7 +239,7 @@ namespace
             "[SolidMesh::polyhedra_around_vertex] Wrong polyhedron "
             "around vertex" );
         geode::index_t safety_count{ 0 };
-        constexpr geode::index_t MAX_SAFETY_COUNT{ 10000 };
+        constexpr geode::index_t MAX_SAFETY_COUNT{ 40000 };
         geode::detail::PolyhedraAroundVertexImpl result;
         result.vertex_is_on_border = false;
         absl::flat_hash_set< geode::index_t > polyhedra_visited;

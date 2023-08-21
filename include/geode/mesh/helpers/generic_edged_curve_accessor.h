@@ -34,6 +34,8 @@ namespace geode
 {
     template < typename T >
     class GenericMeshAccessor;
+    FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+    struct uuid;
 } // namespace geode
 
 namespace geode
@@ -78,6 +80,16 @@ namespace geode
         Point< dimension > element_barycenter( index_t edge_id ) const
         {
             return mesh_.edge_barycenter( edge_id );
+        }
+
+        const uuid& id() const
+        {
+            return mesh_.id();
+        }
+
+        const Point< dimension >& point( index_t vertex_id ) const
+        {
+            return mesh_.point( vertex_id );
         }
 
         AttributeManager& element_attribute_manager() const

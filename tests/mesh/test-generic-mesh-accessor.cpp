@@ -25,6 +25,7 @@
 
 #include <geode/basic/assert.h>
 #include <geode/basic/logger.h>
+#include <geode/basic/uuid.h>
 
 #include <geode/geometry/point.h>
 
@@ -43,9 +44,9 @@ std::unique_ptr< geode::EdgedCurve3D > create_edged_curve()
 {
     auto edged_curve = geode::EdgedCurve3D::create();
     auto builder = geode::EdgedCurveBuilder3D::create( *edged_curve );
-    builder->create_point( { { 0, 0 } } );
-    builder->create_point( { { 1, 0 } } );
-    builder->create_point( { { 0, 1 } } );
+    builder->create_point( { { 0, 0, 0 } } );
+    builder->create_point( { { 1, 0, 0 } } );
+    builder->create_point( { { 0, 1, 0 } } );
     builder->create_edge( 0, 1 );
     builder->create_edge( 0, 2 );
     auto attribute = edged_curve->edge_attribute_manager()
@@ -117,6 +118,11 @@ void test_basic_accessor( const Mesh& mesh, geode::index_t nb_element_vertices )
     OPENGEODE_EXCEPTION(
         attribute->value( 0 ) == 2 && attribute->value( 1 ) == 5,
         "[Test] Wrong values of the element attributes." );
+    OPENGEODE_EXCEPTION(
+        accessor.id() == mesh.id(), "[Test] Wrong uuid value." );
+    OPENGEODE_EXCEPTION( accessor.point( 0 ).value( 0 ) == 0
+                             && accessor.point( 0 ).value( 1 ) == 0,
+        "[Test] Wrong point coordinate value." );
 }
 
 template < typename Mesh >
