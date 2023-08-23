@@ -599,13 +599,13 @@ namespace
         std::array< geode::Point2D, 3 > points;
     };
 
-    double projected_i_coordinate( const geode::Vector3D& n,
+    double projected_i_coordinate( const geode::Vector3D& normal,
         const geode::Point3D& v0,
         const geode::Point2D& point )
     {
-        return -( n.value( 1 ) * ( point.value( 0 ) - v0.value( 1 ) )
-                   + n.value( 2 ) * ( point.value( 1 ) - v0.value( 2 ) ) )
-                   / n.value( 0 )
+        return -( normal.value( 1 ) * ( point.value( 0 ) - v0.value( 1 ) )
+                   + normal.value( 2 ) * ( point.value( 1 ) - v0.value( 2 ) ) )
+                   / normal.value( 0 )
                + v0.value( 0 );
     }
 
@@ -651,8 +651,7 @@ namespace
             const auto normal = geode::Triangle3D{ points_[vertices_order_[0]],
                 points_[vertices_order_[1]], points_[vertices_order_[2]] }
                                     .normal();
-            if( !normal
-                || std::fabs( normal->value( 0 ) ) < geode::global_epsilon )
+            if( !normal || std::fabs( normal->value( 0 ) ) == 0 )
             {
                 return;
             }
@@ -732,8 +731,8 @@ namespace
             const auto position = geode::point_triangle_position(
                 point, { triangle.points[0], triangle.points[1],
                            triangle.points[2] } );
-
-            if( position == geode::Position::outside )
+            if( position == geode::Position::outside
+                || position == geode::Position::parallel )
             {
                 return false;
             }
