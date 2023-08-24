@@ -721,8 +721,6 @@ namespace
                     auto i_coord = compute_i_coordinates(
                         point, normal, jk_process.position );
 
-                    geode::Logger::info( j, " - ", k,
-                        " : ---> maxI = ", i_coord, " ", counter_clockwise_ );
                     values_[{ j, k }].emplace_back(
                         i_coord, counter_clockwise_ );
                 }
@@ -943,7 +941,6 @@ namespace
             const auto j = value.first.first;
             const auto k = value.first.second;
             auto& i_values = value.second;
-            geode::Logger::info( j, " - ", k );
             OPENGEODE_EXCEPTION( i_values.size() % 2 == 0,
                 "[rasterize_closed_surface] Wrong "
                 "number of intervals to paint" );
