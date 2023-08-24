@@ -47,7 +47,6 @@
 #include <geode/mesh/core/detail/vertex_cycle.h>
 #include <geode/mesh/core/grid.h>
 #include <geode/mesh/core/triangulated_surface.h>
-#include <geode/mesh/io/triangulated_surface_output.h>
 
 namespace
 {
@@ -736,32 +735,29 @@ namespace
             {
                 order = { 0, 2, 1 };
             }
+
+            const auto floor_fabs = [this]( double value ) {
+                return std::floor(
+                    std::fabs(
+                        value
+                        - grid_.grid_coordinate_system().origin().value( 0 ) )
+                    / grid_.cell_length_in_direction( 0 ) );
+            };
+
             if( position == geode::Position::vertex0 )
             {
                 const auto point_3d = points_.at( vertices_order_[order[0]] );
-                return std::floor(
-                    std::fabs(
-                        point_3d.value( 0 )
-                        - grid_.grid_coordinate_system().origin().value( 0 ) )
-                    / grid_.cell_length_in_direction( 0 ) );
+                return floor_fabs( point_3d.value( 0 ) );
             }
             if( position == geode::Position::vertex1 )
             {
                 const auto point_3d = points_.at( vertices_order_[order[1]] );
-                return std::floor(
-                    std::fabs(
-                        point_3d.value( 0 )
-                        - grid_.grid_coordinate_system().origin().value( 0 ) )
-                    / grid_.cell_length_in_direction( 0 ) );
+                return floor_fabs( point_3d.value( 0 ) );
             }
             if( position == geode::Position::vertex2 )
             {
                 const auto point_3d = points_.at( vertices_order_[order[2]] );
-                return std::floor(
-                    std::fabs(
-                        point_3d.value( 0 )
-                        - grid_.grid_coordinate_system().origin().value( 0 ) )
-                    / grid_.cell_length_in_direction( 0 ) );
+                return floor_fabs( point_3d.value( 0 ) );
             }
             auto i_coord = std::floor( projected_i_coordinate( normal,
                                            points_[vertices_order_[0]], point )
