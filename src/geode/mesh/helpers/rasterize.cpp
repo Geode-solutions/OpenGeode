@@ -933,7 +933,7 @@ namespace
     }
 
     std::vector< typename geode::Grid3D::CellIndices > paint_interior(
-        const geode::Grid3D& grid, Values& values )
+        Values& values )
     {
         std::vector< geode::Grid3D::CellIndices > cells;
         for( auto& value : values )
@@ -941,6 +941,7 @@ namespace
             const auto j = value.first.first;
             const auto k = value.first.second;
             auto& i_values = value.second;
+            absl::c_sort( i_values );
             OPENGEODE_EXCEPTION( i_values.size() % 2 == 0,
                 "[rasterize_closed_surface] Wrong "
                 "number of intervals to paint" );
@@ -1043,7 +1044,7 @@ namespace geode
         const Grid3D& grid, const Tetrahedron& tetrahedron )
     {
         auto values = paint_surface( grid, tetrahedron );
-        return paint_interior( grid, values );
+        return paint_interior( values );
     }
 
     std::vector< Grid3D::CellIndices >
@@ -1051,7 +1052,7 @@ namespace geode
             const Grid3D& grid, const TriangulatedSurface3D& closed_surface )
     {
         auto values = paint_surface( grid, closed_surface );
-        return paint_interior( grid, values );
+        return paint_interior( values );
     }
 
     template std::vector< CellIndices< 2 > > opengeode_mesh_api
