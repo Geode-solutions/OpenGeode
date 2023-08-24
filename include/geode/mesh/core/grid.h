@@ -126,8 +126,8 @@ namespace geode
         /*!
          * Return the cell(s) containing the query point
          * @param[in] query Position of point
-         * @return No, one index or several cell indices that contain the query
-         * point.
+         * @return None, one or several cell index/indices that contain the
+         * query point.
          * @detail When query point is geometrically near to cell limit, several
          * cell indices are returned: they correspond the potential cells that
          * may contain the point.

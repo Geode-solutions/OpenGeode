@@ -67,36 +67,30 @@ namespace geode
             detail::side( dot0 ), detail::opposite_side( dot1 ) );
     }
 
+    template < index_t dimension >
     Position point_triangle_position_all_zero(
-        const Point2D& point, const Triangle2D& triangle )
+        const Point< dimension >& point, const Triangle< dimension >& triangle )
     {
         const auto& vertices = triangle.vertices();
         if( point == vertices[0] )
         {
-            return Position::vertex0;
-        }
-        if( point == vertices[1] )
-        {
-            return Position::vertex1;
-        }
-        if( point == vertices[2] )
-        {
-            return Position::vertex2;
+            return Position::parallel;
         }
         const auto smaller = point < vertices[0];
-        if( smaller && vertices[1].get() < point )
+
+        if( smaller && vertices[1].get() <= point )
         {
             return Position::parallel;
         }
-        if( smaller && vertices[2].get() < point )
+        if( smaller && vertices[2].get() <= point )
         {
             return Position::parallel;
         }
-        if( !smaller && point < vertices[1] )
+        if( !smaller && point <= vertices[1] )
         {
             return Position::parallel;
         }
-        if( !smaller && point < vertices[2] )
+        if( !smaller && point <= vertices[2] )
         {
             return Position::parallel;
         }
@@ -134,9 +128,7 @@ namespace geode
 
         if( det0 == GEO::ZERO && det1 == GEO::ZERO && det2 == GEO::ZERO )
         {
-            return compute_determinants( point, triangle,
-                { { 2 * third_vector.value( 0 ), -3 * third_vector.value( 2 ),
-                    third_vector.value( 1 ) } } );
+            return point_triangle_position_all_zero( point, triangle );
         }
         return detail::point_triangle_position(
             detail::side( det0 ), detail::side( det1 ), detail::side( det2 ) );

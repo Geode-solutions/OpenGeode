@@ -232,8 +232,7 @@ void test_point_triangle_degenerated_position_2d()
         "with query point q1" );
 
     const auto position_c = geode::point_triangle_position( c, triangle2D );
-    OPENGEODE_EXCEPTION( position_c == geode::Position::vertex0
-                             || position_c == geode::Position::vertex2,
+    OPENGEODE_EXCEPTION( position_c == geode::Position::parallel,
         "[Test] Wrong result for test_point_triangle_degenerated_position_2d "
         "with query point c" );
 
@@ -297,7 +296,9 @@ void test_point_triangle_position_3d()
     const geode::Point3D a{ { 0.0, 0.0, 0.0 } };
     const geode::Point3D b{ { 1.0, 0.0, 0.0 } };
     const geode::Point3D c{ { 1.0, 1.0, 0.0 } };
+    const geode::Point3D d{ { 2.0, 0.0, 0.0 } };
     const geode::Triangle3D triangle3D{ a, b, c };
+    const geode::Triangle3D triangle3D_degen{ a, b, d };
 
     const geode::Point3D qout{ { 0.75, -0.25, 0.0 } };
     const auto position_qout =
@@ -357,6 +358,14 @@ void test_point_triangle_position_3d()
     OPENGEODE_EXCEPTION( position_q6 == geode::Position::outside,
         "[Test] Wrong result for point_triangle_position_3d with query point "
         "q6" );
+
+    const geode::Point3D qdeg{ { 0.75, 0.0, 0.0 } };
+    const auto position_inside_degen =
+        geode::point_triangle_position( qdeg, triangle3D_degen );
+
+    OPENGEODE_EXCEPTION( position_inside_degen == geode::Position::parallel,
+        "[Test] Wrong result for point_triangle_position_3d with query point "
+        "qdeg (degenerate case)" );
 }
 
 void test_point_triangle_position()
