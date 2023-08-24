@@ -100,6 +100,11 @@ namespace geode
             return false;
         }
 
+        bool operator<=( const Point &other ) const
+        {
+            return operator<( other ) || operator==( other );
+        }
+
         Point operator*( double multiplier ) const
         {
             return detail::coords_multiply( *this, multiplier );

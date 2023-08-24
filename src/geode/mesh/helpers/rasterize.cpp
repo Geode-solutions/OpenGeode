@@ -47,6 +47,7 @@
 #include <geode/mesh/core/detail/vertex_cycle.h>
 #include <geode/mesh/core/grid.h>
 #include <geode/mesh/core/triangulated_surface.h>
+#include <geode/mesh/io/triangulated_surface_output.h>
 
 namespace
 {
@@ -651,8 +652,7 @@ namespace
             const auto normal = geode::Triangle3D{ points_[vertices_order_[0]],
                 points_[vertices_order_[1]], points_[vertices_order_[2]] }
                                     .normal();
-            if( !normal
-                || std::fabs( normal->value( 0 ) ) < geode::global_epsilon )
+            if( !normal || std::fabs( normal->value( 0 ) ) == 0 )
             {
                 return;
             }
@@ -677,6 +677,12 @@ namespace
             }
             return triangle;
         }
+
+        struct JKPointTrianglePosition
+        {
+            bool to_process{ false };
+            geode::Position position{ geode::Position::outside };
+        };
 
         void fill_values(
             const ProjectedTriangle& triangle, const geode::Vector3D& normal )
@@ -705,41 +711,90 @@ namespace
                         { ( j + 0.5 ) * grid_.cell_length_in_direction( 1 ),
                             ( k + 0.5 ) * grid_.cell_length_in_direction( 2 ) }
                     };
-                    if( !is_jk_to_process( triangle, point, j, k ) )
+                    const auto jk_process =
+                        is_jk_to_process( triangle, point, j, k );
+                    if( !jk_process.to_process )
                     {
                         continue;
                     }
 
-                    auto max_i =
-                        std::floor( projected_i_coordinate( normal,
-                                        points_[vertices_order_[0]], point )
-                                        / grid_.cell_length_in_direction( 0 )
-                                    - 0.5 );
-                    if( max_i < 0 )
-                    {
-                        max_i = 0;
-                    }
-                    values_[{ j, k }].emplace_back( max_i, counter_clockwise_ );
+                    auto i_coord = compute_i_coordinates(
+                        point, normal, jk_process.position );
+
+                    geode::Logger::info( j, " - ", k,
+                        " : ---> maxI = ", i_coord, " ", counter_clockwise_ );
+                    values_[{ j, k }].emplace_back(
+                        i_coord, counter_clockwise_ );
                 }
             }
         }
 
-        bool is_jk_to_process( const ProjectedTriangle& triangle,
+        geode::index_t compute_i_coordinates( const geode::Point2D& point,
+            const geode::Vector3D& normal,
+            geode::Position position ) const
+        {
+            std::array< geode::local_index_t, 3 > order{ 0, 1, 2 };
+            if( !counter_clockwise_ )
+            {
+                order = { 0, 2, 1 };
+            }
+            if( position == geode::Position::vertex0 )
+            {
+                const auto point_3d = points_.at( vertices_order_[order[0]] );
+                return std::floor(
+                    std::fabs(
+                        point_3d.value( 0 )
+                        - grid_.grid_coordinate_system().origin().value( 0 ) )
+                    / grid_.cell_length_in_direction( 0 ) );
+            }
+            if( position == geode::Position::vertex1 )
+            {
+                const auto point_3d = points_.at( vertices_order_[order[1]] );
+                return std::floor(
+                    std::fabs(
+                        point_3d.value( 0 )
+                        - grid_.grid_coordinate_system().origin().value( 0 ) )
+                    / grid_.cell_length_in_direction( 0 ) );
+            }
+            if( position == geode::Position::vertex2 )
+            {
+                const auto point_3d = points_.at( vertices_order_[order[2]] );
+                return std::floor(
+                    std::fabs(
+                        point_3d.value( 0 )
+                        - grid_.grid_coordinate_system().origin().value( 0 ) )
+                    / grid_.cell_length_in_direction( 0 ) );
+            }
+            auto i_coord = std::floor( projected_i_coordinate( normal,
+                                           points_[vertices_order_[0]], point )
+                                           / grid_.cell_length_in_direction( 0 )
+                                       - 0.5 );
+            if( i_coord < 0 )
+            {
+                i_coord = 0;
+            }
+            return i_coord;
+        }
+
+        JKPointTrianglePosition is_jk_to_process(
+            const ProjectedTriangle& triangle,
             const geode::Point2D& point,
             geode::index_t current_j,
             geode::index_t current_k ) const
         {
-            const auto position = geode::point_triangle_position(
+            JKPointTrianglePosition result;
+            result.position = geode::point_triangle_position(
                 point, { triangle.points[0], triangle.points[1],
                            triangle.points[2] } );
-
-            if( position == geode::Position::outside )
+            if( result.position == geode::Position::outside
+                || result.position == geode::Position::parallel )
             {
-                return false;
+                return result;
             }
-            if( position == geode::Position::inside )
+            if( result.position == geode::Position::inside )
             {
-                return true;
+                result.to_process = true;
+                return result;
             }
 
             std::array< geode::local_index_t, 3 > order{ 0, 1, 2 };
@@ -748,41 +803,48 @@ namespace
                 order = { 0, 2, 1 };
             }
 
-            if( position == geode::Position::edge0 )
+            if( result.position == geode::Position::edge0 )
             {
-                return is_edge_valid( current_j, current_k,
+                result.to_process = is_edge_valid( current_j, current_k,
                     { { vertices_order_[order[0]],
                         vertices_order_[order[1]] } } );
+                return result;
             }
-            if( position == geode::Position::edge1 )
+            if( result.position == geode::Position::edge1 )
             {
-                return is_edge_valid( current_j, current_k,
+                result.to_process = is_edge_valid( current_j, current_k,
                     { { vertices_order_[order[1]],
                         vertices_order_[order[2]] } } );
+                return result;
             }
-            if( position == geode::Position::edge2 )
+            if( result.position == geode::Position::edge2 )
             {
-                return is_edge_valid( current_j, current_k,
+                result.to_process = is_edge_valid( current_j, current_k,
                     { { vertices_order_[order[2]],
                         vertices_order_[order[0]] } } );
+                return result;
             }
-            if( position == geode::Position::vertex0 )
+            if( result.position == geode::Position::vertex0 )
             {
-                return is_vertex_valid(
+                result.to_process = is_vertex_valid(
                     current_j, current_k, vertices_order_[order[0]] );
+                return result;
             }
-            if( position == geode::Position::vertex1 )
+            if( result.position == geode::Position::vertex1 )
             {
-                return is_vertex_valid(
+                result.to_process = is_vertex_valid(
                     current_j, current_k, vertices_order_[order[1]] );
+                return result;
             }
-            if( position == geode::Position::vertex2 )
+            if( result.position == geode::Position::vertex2 )
             {
-                return is_vertex_valid(
+                result.to_process = is_vertex_valid(
                     current_j, current_k, vertices_order_[order[2]] );
+                return result;
             }
-
-            return true;
+            OPENGEODE_ASSERT_NOT_REACHED(
+                "[Rasterize::is_jk_to_process] Missing position case" );
+            return result;
         }
 
         bool is_vertex_valid( geode::index_t current_j,
@@ -873,7 +935,7 @@ namespace
     }
 
     std::vector< typename geode::Grid3D::CellIndices > paint_interior(
-        Values& values )
+        const geode::Grid3D& grid, Values& values )
     {
         std::vector< geode::Grid3D::CellIndices > cells;
         for( auto& value : values )
@@ -881,7 +943,7 @@ namespace
             const auto j = value.first.first;
             const auto k = value.first.second;
             auto& i_values = value.second;
-            absl::c_sort( i_values );
+            geode::Logger::info( j, " - ", k );
             OPENGEODE_EXCEPTION( i_values.size() % 2 == 0,
                 "[rasterize_closed_surface] Wrong "
                 "number of intervals to paint" );
@@ -984,7 +1046,7 @@ namespace geode
         const Grid3D& grid, const Tetrahedron& tetrahedron )
     {
         auto values = paint_surface( grid, tetrahedron );
-        return paint_interior( values );
+        return paint_interior( grid, values );
     }
 
     std::vector< Grid3D::CellIndices >
@@ -992,7 +1054,7 @@ namespace geode
             const Grid3D& grid, const TriangulatedSurface3D& closed_surface )
     {
         auto values = paint_surface( grid, closed_surface );
-        return paint_interior( values );
+        return paint_interior( grid, values );
     }
 
     template std::vector< CellIndices< 2 > > opengeode_mesh_api
