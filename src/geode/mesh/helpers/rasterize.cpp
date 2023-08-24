@@ -599,13 +599,13 @@ namespace
         std::array< geode::Point2D, 3 > points;
     };
 
-    double projected_i_coordinate( const geode::Vector3D& n,
+    double projected_i_coordinate( const geode::Vector3D& normal,
         const geode::Point3D& v0,
         const geode::Point2D& point )
     {
-        return -( n.value( 1 ) * ( point.value( 0 ) - v0.value( 1 ) )
-                   + n.value( 2 ) * ( point.value( 1 ) - v0.value( 2 ) ) )
-                   / n.value( 0 )
+        return -( normal.value( 1 ) * ( point.value( 0 ) - v0.value( 1 ) )
+                   + normal.value( 2 ) * ( point.value( 1 ) - v0.value( 2 ) ) )
+                   / normal.value( 0 )
                + v0.value( 0 );
     }
 
