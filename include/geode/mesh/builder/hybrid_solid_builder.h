@@ -56,7 +56,7 @@ namespace geode
         index_t create_tetrahedron( const std::array< index_t, 4 >& vertices );
 
         /*!
-         * Create a new hexahedron from four vertices.
+         * Create a new hexahedron from eight vertices.
          * @param[in] vertices The eight vertices defining the hexahedron to
          * create
          * @return the index of the created hexahedron
@@ -64,14 +64,14 @@ namespace geode
         index_t create_hexahedron( const std::array< index_t, 8 >& vertices );
 
         /*!
-         * Create a new prism from four vertices.
+         * Create a new prism from six vertices.
          * @param[in] vertices The six vertices defining the prism to create
          * @return the index of the created prism
          */
         index_t create_prism( const std::array< index_t, 6 >& vertices );
 
         /*!
-         * Create a new pyramid from four vertices.
+         * Create a new pyramid from five vertices.
          * @param[in] vertices The five vertices defining the pyramid to
          * create
          * @return the index of the created pyramid

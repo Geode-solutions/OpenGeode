@@ -51,7 +51,7 @@ namespace geode
 
         static const std::array< std::vector< geode::local_index_t >, 5 >
             prism_facet_vertices{ { { 0, 1, 2 }, { 3, 5, 4 }, { 0, 3, 4, 1 },
-                { 1, 4, 5, 2 }, { 0, 2, 5, 3 } } };
+                { 1, 4, 5, 2 }, { 2, 5, 3, 0 } } };
 
         static constexpr std::array< std::array< geode::local_index_t, 2 >, 9 >
             prism_edge_vertices{ { { 0, 1 }, { 1, 2 }, { 2, 0 }, { 3, 4 },
