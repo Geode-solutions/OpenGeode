@@ -64,6 +64,7 @@ namespace geode
 
     VertexSet& VertexSet::operator=( VertexSet&& other )
     {
+        Identifier::operator=( std::move( other ) );
         impl_ = std::move( other.impl_ );
         return *this;
     }
