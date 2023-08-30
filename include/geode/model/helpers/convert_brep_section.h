@@ -45,5 +45,6 @@ namespace geode
     BRep opengeode_model_api extrude_section_to_brep( const Section& section,
         index_t axis_to_add,
         double min_coordinate,
-        double max_coordinate );
+        double max_coordinate,
+        index_t number_of_slices );
 } // namespace geode

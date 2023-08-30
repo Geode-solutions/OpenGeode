@@ -79,15 +79,19 @@ namespace
     {
     public:
         SectionExtruder( const geode::Section& section )
-            : section_( section ), brep_builder_{ brep_ }
+            : section_( section ),
+              brep_builder_{ brep_ },
+              number_of_slices_{ 1 }
 
         {
         }
 
         geode::BRep extrude( geode::index_t axis_to_extrude,
             double min_coordinate,
-            double max_coordinate )
+            double max_coordinate,
+            geode::index_t number_of_slices )
         {
+            number_of_slices_ = number_of_slices;
             initialize_extrusion(
                 axis_to_extrude, min_coordinate, max_coordinate );
             create_lines();
@@ -217,11 +221,11 @@ namespace
             const geode::Surface3D& surface )
         {
             const auto line_pointid = line.mesh().edge_vertex( e_vertex );
-            const auto uv =
+            const auto uvertex_id =
                 brep_.unique_vertex( { line.component_id(), line_pointid } );
-            const auto all_cmp =
-                brep_.component_mesh_vertices( uv, surface.component_type() );
-            for( const auto cmv : all_cmp )
+            const auto all_cmp = brep_.component_mesh_vertices(
+                uvertex_id, surface.component_type() );
+            for( const auto& cmv : all_cmp )
             {
                 if( cmv.component_id == surface.component_id() )
                 {
@@ -233,7 +237,7 @@ namespace
             auto pt_id = surface_builder->create_point(
                 line.mesh().point( line_pointid ) );
             brep_builder_.set_unique_vertex(
-                { surface.component_id(), pt_id }, uv );
+                { surface.component_id(), pt_id }, uvertex_id );
             return pt_id;
         }
 
@@ -321,10 +325,10 @@ namespace
             const geode::Block3D& block )
         {
             const auto surf_pointid = surface.mesh().polygon_vertex( p_vertex );
-            const auto uv =
+            const auto uvertex_id =
                 brep_.unique_vertex( { surface.component_id(), surf_pointid } );
-            const auto all_cmp =
-                brep_.component_mesh_vertices( uv, block.component_type() );
+            const auto all_cmp = brep_.component_mesh_vertices(
+                uvertex_id, block.component_type() );
             for( const auto cmv : all_cmp )
             {
                 if( cmv.component_id == block.component_id() )
@@ -336,7 +340,7 @@ namespace
             auto pt_id = block_builder->create_point(
                 surface.mesh().point( surf_pointid ) );
             brep_builder_.set_unique_vertex(
-                { block.component_id(), pt_id }, uv );
+                { block.component_id(), pt_id }, uvertex_id );
             return pt_id;
         }
 
@@ -433,6 +437,7 @@ namespace
         geode::ModelCopyMapping slice0_brep_mapping_;
         geode::ModelCopyMapping section_slice1_mapping_;
         geode::ModelCopyMapping slice1_brep_mapping_;
+        geode::index_t number_of_slices_;
     };
 } // namespace
 
@@ -510,10 +515,11 @@ namespace geode
     BRep extrude_section_to_brep( const Section& section,
         index_t axis_to_extrude,
         double min_coordinate,
-        double max_coordinate )
+        double max_coordinate,
+        index_t number_of_slices );
     {
         SectionExtruder extruder{ section };
         return extruder.extrude(
-            axis_to_extrude, min_coordinate, max_coordinate );
+            axis_to_extrude, min_coordinate, max_coordinate, number_of_slices );
     }
 } // namespace geode
