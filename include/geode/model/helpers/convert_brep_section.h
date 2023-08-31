@@ -52,5 +52,5 @@ namespace geode
     };
 
     BRep opengeode_model_api extrude_section_to_brep(
-        const Section& section, const SectionExtruderOptions& coordinate );
+        const Section& section, const SectionExtruderOptions& options );
 } // namespace geode
