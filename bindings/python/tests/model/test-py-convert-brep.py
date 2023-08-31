@@ -49,7 +49,11 @@ def test_convert_brep_section(data_dir):
 
 def test_extrusion_section_to_brep(data_dir):
     section = model.load_section(os.path.join(data_dir, "fractures.og_sctn"))
-    brep = model.extrude_section_to_brep(section, 2, 0., 10.)
+    options = model.SectionExtruderOptions()
+    options.axis_to_extrude = 2
+    options.min_coordinate = 0.
+    options.max_coordinate = 10.
+    brep = model.extrude_section_to_brep(section, options)
 
     if brep.nb_corners() != 2*section.nb_corners():
         raise ValueError("[Test] Extruded BRep have wrong number of corners")
