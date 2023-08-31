@@ -34,6 +34,15 @@ namespace geode
     {
         module.def( "convert_brep_into_section", &convert_brep_into_section );
         module.def( "convert_section_into_brep", &convert_section_into_brep );
+        pybind11::class_< SectionExtruderOptions >(
+            module, "SectionExtruderOptions" )
+            .def( pybind11::init<>() )
+            .def_readwrite(
+                "axis_to_extrude", &SectionExtruderOptions::axis_to_extrude )
+            .def_readwrite(
+                "min_coordinate", &SectionExtruderOptions::min_coordinate )
+            .def_readwrite(
+                "max_coordinate", &SectionExtruderOptions::max_coordinate );
         module.def( "extrude_section_to_brep", &extrude_section_to_brep );
     }
 } // namespace geode

@@ -34,15 +34,6 @@ namespace geode
 
 namespace geode
 {
-    struct Interval
-    {
-        Interval( double minimum, double maximum )
-            : min_{ minimum }, max_{ maximum }
-        {
-        }
-        double min_;
-        double max_;
-    };
 
     std::tuple< Section, ModelCopyMapping > opengeode_model_api
         convert_brep_into_section( const BRep& brep, index_t axis_to_remove );
@@ -52,7 +43,14 @@ namespace geode
             index_t axis_to_add,
             double axis_coordinate );
 
-    BRep opengeode_model_api extrude_section_to_brep( const Section& section,
-        index_t axis_to_add,
-        const Interval& coordinate );
+    struct opengeode_model_api SectionExtruderOptions
+    {
+        SectionExtruderOptions() = default;
+        index_t axis_to_extrude{ NO_ID };
+        double min_coordinate{ 0. };
+        double max_coordinate{ 0. };
+    };
+
+    BRep opengeode_model_api extrude_section_to_brep(
+        const Section& section, const SectionExtruderOptions& coordinate );
 } // namespace geode

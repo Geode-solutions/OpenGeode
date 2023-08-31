@@ -61,7 +61,11 @@ void test_extrusion_section_to_brep()
 {
     const auto section = geode::load_section(
         absl::StrCat( geode::data_path, "fractures.og_sctn" ) );
-    const auto brep = geode::extrude_section_to_brep( section, 2, { 0., 10. } );
+    geode::SectionExtruderOptions options;
+    options.axis_to_extrude = 2;
+    options.min_coordinate = 0.;
+    options.max_coordinate = 10.;
+    const auto brep = geode::extrude_section_to_brep( section, options );
     OPENGEODE_EXCEPTION( brep.nb_corners() == 2 * section.nb_corners(),
         "[Test] Extruded BRep - wrong number of corners." );
     OPENGEODE_EXCEPTION(

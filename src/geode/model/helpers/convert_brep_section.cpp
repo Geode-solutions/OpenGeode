@@ -83,10 +83,9 @@ namespace
         {
         }
 
-        geode::BRep extrude(
-            geode::index_t axis_to_extrude, const geode::Interval& coordinate )
+        geode::BRep extrude( const geode::SectionExtruderOptions& options )
         {
-            initialize_extrusion( axis_to_extrude, coordinate );
+            initialize_extrusion( options );
             create_lines();
             create_surfaces();
             create_blocks();
@@ -95,16 +94,16 @@ namespace
 
     private:
         void initialize_extrusion(
-            geode::index_t axis_to_extrude, const geode::Interval& coordinate )
+            const geode::SectionExtruderOptions& options )
         {
             auto slice0_conversion_output = convert_section_into_brep(
-                section_, axis_to_extrude, coordinate.min_ );
+                section_, options.axis_to_extrude, options.min_coordinate );
             section_slice0_mapping_ = std::get< 1 >( slice0_conversion_output );
             slice0_brep_mapping_ =
                 brep_builder_.copy( std::get< 0 >( slice0_conversion_output ) );
 
             auto slice1_conversion_output = convert_section_into_brep(
-                section_, axis_to_extrude, coordinate.max_ );
+                section_, options.axis_to_extrude, options.max_coordinate );
             section_slice1_mapping_ = std::get< 1 >( slice1_conversion_output );
             geode::BRepConcatener brep_concatener{ brep_ };
             slice1_brep_mapping_ = brep_concatener.concatenate(
@@ -493,11 +492,10 @@ namespace geode
         return std::make_tuple( std::move( brep ), std::move( mappings ) );
     }
 
-    BRep extrude_section_to_brep( const Section& section,
-        index_t axis_to_extrude,
-        const geode::Interval& coordinate )
+    BRep extrude_section_to_brep(
+        const Section& section, const geode::SectionExtruderOptions& options )
     {
         SectionExtruder extruder{ section };
-        return extruder.extrude( axis_to_extrude, coordinate );
+        return extruder.extrude( options );
     }
 } // namespace geode
