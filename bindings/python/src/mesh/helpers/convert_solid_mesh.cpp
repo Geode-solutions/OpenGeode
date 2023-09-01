@@ -23,6 +23,8 @@
 
 #include "../../common.h"
 
+#include <geode/mesh/core/light_regular_grid.h>
+#include <geode/mesh/core/regular_grid_solid.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
 #include <geode/mesh/helpers/convert_solid_mesh.h>
 
@@ -33,6 +35,10 @@ namespace geode
         module
             .def( "convert_solid_mesh_into_tetrahedral_solid",
                 &convert_solid_mesh_into_tetrahedral_solid )
+            .def( "convert_regular_grid_into_tetrahedral_solid",
+                &convert_grid_into_tetrahedral_solid< RegularGrid3D > )
+            .def( "convert_light_regular_grid_into_tetrahedral_solid",
+                &convert_grid_into_tetrahedral_solid< LightRegularGrid3D > )
             .def( "merge_solid_meshes", &merge_solid_meshes );
     }
 } // namespace geode
