@@ -174,9 +174,11 @@ function(_add_geode_executable exe_path folder_name)
                 COMMAND ${CMAKE_COMMAND} -E remove ${pdb_file}
             )
         endif()
-        add_custom_target(run-${target_name}
-            COMMAND ${CMAKE_COMMAND} -E env "PATH=${directories}\\;$ENV{Path}" $<TARGET_FILE:${target_name}>
-        )
+        if(CMAKE_GENERATOR STREQUAL "Ninja")
+            add_custom_target(run-${target_name}
+                COMMAND ${CMAKE_COMMAND} -E env "PATH=${directories}\\;$ENV{Path}" $<TARGET_FILE:${target_name}>
+            )
+        endif()
     endif()
 
     set_target_properties(${target_name}
