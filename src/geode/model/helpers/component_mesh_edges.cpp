@@ -196,8 +196,8 @@ namespace geode
                 const auto& mesh = block.mesh();
                 for( const auto& pair : block_pair.second )
                 {
-                    if( auto edge =
-                            mesh.polyhedron_facet_edge_from_vertices( pair ) )
+                    if( auto edge = mesh.polyhedron_facet_edge_from_vertices(
+                            { pair[0], pair[1] } ) )
                     {
                         edges[block.id()].emplace_back(
                             std::move( edge.value() ) );

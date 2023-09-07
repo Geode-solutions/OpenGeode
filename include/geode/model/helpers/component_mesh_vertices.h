@@ -28,6 +28,7 @@
 
 #include <geode/model/common.h>
 #include <geode/model/mixin/core/component_type.h>
+#include <geode/model/mixin/core/vertex_identifier.h>
 
 namespace geode
 {
@@ -36,31 +37,61 @@ namespace geode
 
 namespace geode
 {
-    using ComponentMeshVertexPairs = absl::flat_hash_map< ComponentID,
-        std::vector< std::array< index_t, 2 > > >;
+    template < index_t dimension >
+    using ComponentMeshVertexGenericStorage =
+        absl::InlinedVector< index_t, dimension >;
+    template < index_t dimension >
+    using ComponentMeshVertexGeneric = absl::flat_hash_map< ComponentID,
+        std::vector< ComponentMeshVertexGenericStorage< dimension > > >;
 
+    template < index_t dimension >
+    ComponentMeshVertexGeneric< dimension > component_mesh_vertex_generic(
+        absl::Span< const absl::Span< const ComponentMeshVertex > >
+            unique_vertices );
+
+    template < index_t dimension >
+    ComponentMeshVertexGeneric< dimension > component_mesh_vertex_generic(
+        absl::Span< const absl::Span< const ComponentMeshVertex > >
+            unique_vertices,
+        const ComponentType& type );
+
+    using ComponentMeshVertexPairs = ComponentMeshVertexGeneric< 2 >;
     ComponentMeshVertexPairs opengeode_model_api component_mesh_vertex_pairs(
         absl::Span< const ComponentMeshVertex > unique_vertices0,
         absl::Span< const ComponentMeshVertex > unique_vertices1 );
-
     ComponentMeshVertexPairs opengeode_model_api component_mesh_vertex_pairs(
         absl::Span< const ComponentMeshVertex > unique_vertices0,
         absl::Span< const ComponentMeshVertex > unique_vertices1,
         const ComponentType& type );
 
-    using ComponentMeshVertexTriplets = absl::flat_hash_map< ComponentID,
-        std::vector< std::array< index_t, 3 > > >;
-
+    using ComponentMeshVertexTriplets = ComponentMeshVertexGeneric< 3 >;
     ComponentMeshVertexTriplets opengeode_model_api
         component_mesh_vertex_triplets(
             absl::Span< const ComponentMeshVertex > unique_vertices0,
             absl::Span< const ComponentMeshVertex > unique_vertices1,
             absl::Span< const ComponentMeshVertex > unique_vertices2 );
-
     ComponentMeshVertexTriplets opengeode_model_api
         component_mesh_vertex_triplets(
             absl::Span< const ComponentMeshVertex > unique_vertices0,
             absl::Span< const ComponentMeshVertex > unique_vertices1,
             absl::Span< const ComponentMeshVertex > unique_vertices2,
             const ComponentType& type );
+
+    template < index_t dimension, typename... UniqueVertices >
+    ComponentMeshVertexGeneric< dimension > component_mesh_vertex_tuple(
+        UniqueVertices... unique_vertices )
+    {
+        return component_mesh_vertex_generic(
+            to_array< absl::Span< const ComponentMeshVertex > >(
+                unique_vertices... ) );
+    }
+    template < index_t dimension, typename... UniqueVertices >
+    ComponentMeshVertexGeneric< dimension > component_mesh_vertex_tuple(
+        UniqueVertices... unique_vertices, const ComponentType& type )
+    {
+        return component_mesh_vertex_generic(
+            to_array< absl::Span< const ComponentMeshVertex > >(
+                unique_vertices... ),
+            type );
+    }
 } // namespace geode
