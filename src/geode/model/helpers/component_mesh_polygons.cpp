@@ -519,15 +519,21 @@ namespace
         }
     }
 
-    geode::ComponentMeshVertexTriplets model_polygon_pairs(
+    geode::ComponentMeshVertexGeneric< 3 > model_polygon_pairs(
         const geode::BRep& model,
         const geode::PolygonVertices& polygon_unique_vertices,
         const geode::ComponentType& type )
     {
-        return geode::component_mesh_vertex_triplets(
-            model.component_mesh_vertices( polygon_unique_vertices[0] ),
-            model.component_mesh_vertices( polygon_unique_vertices[1] ),
-            model.component_mesh_vertices( polygon_unique_vertices[2] ), type );
+        std::vector< absl::Span< const geode::ComponentMeshVertex > >
+            unique_vertices;
+        unique_vertices.reserve( polygon_unique_vertices.size() );
+        for( const auto polygon_unique_vertex : polygon_unique_vertices )
+        {
+            unique_vertices.emplace_back(
+                model.component_mesh_vertices( polygon_unique_vertex ) );
+        }
+        return geode::component_mesh_vertex_generic< 3 >(
+            unique_vertices, type );
     }
 
     geode::BRepComponentMeshPolygons::SurfacePolygons surface_polygons(
@@ -587,8 +593,7 @@ namespace
             const auto& mesh = block.mesh();
             for( const auto& pair : block_pair.second )
             {
-                if( auto facet = mesh.polyhedron_facet_from_vertices(
-                        { pair[0], pair[1], pair[2] } ) )
+                if( auto facet = mesh.polyhedron_facet_from_vertices( pair ) )
                 {
                     polygons[block.id()].emplace_back(
                         std::move( facet.value() ) );
