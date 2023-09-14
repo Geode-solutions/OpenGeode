@@ -22,6 +22,7 @@
  */
 
 #include "../../basic/factory.h"
+#include "../../basic/input.h"
 #include "../../common.h"
 
 #include <geode/mesh/core/graph.h>
@@ -33,9 +34,11 @@ namespace geode
     void define_graph_io( pybind11::module& module )
     {
         module.def( "save_graph", &save_graph );
-        module.def(
-            "load_graph", ( std::unique_ptr< Graph >( * )( absl::string_view ) )
-                              & load_graph );
+        module.def( "load_graph",
+            static_cast< std::unique_ptr< Graph > ( * )( absl::string_view ) >(
+                &load_graph ) );
+        module.def( "check_graph_missing_files", &check_graph_missing_files );
+        PYTHON_INPUT_CLASS( std::unique_ptr< Graph >, "Graph" );
         PYTHON_FACTORY_CLASS( GraphInputFactory );
         PYTHON_FACTORY_CLASS( GraphOutputFactory );
     }

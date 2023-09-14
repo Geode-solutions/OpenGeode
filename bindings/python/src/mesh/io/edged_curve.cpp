@@ -22,6 +22,7 @@
  */
 
 #include "../../basic/factory.h"
+#include "../../basic/input.h"
 #include "../../common.h"
 
 #include <geode/mesh/core/edged_curve.h>
@@ -35,9 +36,14 @@
     const auto load##dimension =                                               \
         "load_edged_curve" + std::to_string( dimension ) + "D";                \
     module.def( load##dimension.c_str(),                                       \
-        ( std::unique_ptr< EdgedCurve< dimension > >( * )(                     \
-            absl::string_view ) )                                              \
-            & load_edged_curve< dimension > );                                 \
+        static_cast< std::unique_ptr< EdgedCurve< dimension > > ( * )(         \
+            absl::string_view ) >( &load_edged_curve< dimension > ) );         \
+    const auto check##dimension =                                              \
+        "check_edged_curve_missing_files" + std::to_string( dimension ) + "D"; \
+    module.def( check##dimension.c_str(),                                      \
+        &check_edged_curve_missing_files< dimension > );                       \
+    PYTHON_INPUT_CLASS( std::unique_ptr< EdgedCurve< dimension > >,            \
+        "EdgedCurve" + std::to_string( dimension ) + "D" );                    \
     PYTHON_FACTORY_CLASS( EdgedCurveInputFactory##dimension##D );              \
     PYTHON_FACTORY_CLASS( EdgedCurveOutputFactory##dimension##D )
 

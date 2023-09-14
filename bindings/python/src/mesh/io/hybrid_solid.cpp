@@ -22,6 +22,7 @@
  */
 
 #include "../../basic/factory.h"
+#include "../../basic/input.h"
 #include "../../common.h"
 
 #include <geode/mesh/core/hybrid_solid.h>
@@ -35,9 +36,14 @@
     const auto load##dimension =                                               \
         "load_hybrid_solid" + std::to_string( dimension ) + "D";               \
     module.def( load##dimension.c_str(),                                       \
-        ( std::unique_ptr< HybridSolid< dimension > >( * )(                    \
-            absl::string_view ) )                                              \
-            & load_hybrid_solid< dimension > );                                \
+        static_cast< std::unique_ptr< HybridSolid< dimension > > ( * )(        \
+            absl::string_view ) >( &load_hybrid_solid< dimension > ) );        \
+    const auto check##dimension = "check_hybrid_solid_missing_files"           \
+                                  + std::to_string( dimension ) + "D";         \
+    module.def( check##dimension.c_str(),                                      \
+        &check_hybrid_solid_missing_files< dimension > );                      \
+    PYTHON_INPUT_CLASS( std::unique_ptr< HybridSolid< dimension > >,           \
+        "HybridSolid" + std::to_string( dimension ) + "D" );                   \
     PYTHON_FACTORY_CLASS( HybridSolidInputFactory##dimension##D );             \
     PYTHON_FACTORY_CLASS( HybridSolidOutputFactory##dimension##D )
 

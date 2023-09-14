@@ -22,6 +22,7 @@
  */
 
 #include "../../basic/factory.h"
+#include "../../basic/input.h"
 #include "../../common.h"
 
 #include <geode/mesh/core/polygonal_surface.h>
@@ -36,9 +37,14 @@
     const auto load##dimension =                                               \
         "load_polygonal_surface" + std::to_string( dimension ) + "D";          \
     module.def( load##dimension.c_str(),                                       \
-        ( std::unique_ptr< PolygonalSurface< dimension > >( * )(               \
-            absl::string_view ) )                                              \
-            & load_polygonal_surface< dimension > );                           \
+        static_cast< std::unique_ptr< PolygonalSurface< dimension > > ( * )(   \
+            absl::string_view ) >( &load_polygonal_surface< dimension > ) );   \
+    const auto check##dimension = "check_polygonal_surface_missing_files"      \
+                                  + std::to_string( dimension ) + "D";         \
+    module.def( check##dimension.c_str(),                                      \
+        &check_polygonal_surface_missing_files< dimension > );                 \
+    PYTHON_INPUT_CLASS( std::unique_ptr< PolygonalSurface< dimension > >,      \
+        "PolygonalSurface" + std::to_string( dimension ) + "D" );              \
     PYTHON_FACTORY_CLASS( PolygonalSurfaceInputFactory##dimension##D );        \
     PYTHON_FACTORY_CLASS( PolygonalSurfaceOutputFactory##dimension##D )
 

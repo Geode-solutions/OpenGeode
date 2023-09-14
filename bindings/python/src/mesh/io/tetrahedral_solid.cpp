@@ -22,6 +22,7 @@
  */
 
 #include "../../basic/factory.h"
+#include "../../basic/input.h"
 #include "../../common.h"
 
 #include <geode/mesh/core/tetrahedral_solid.h>
@@ -36,9 +37,14 @@
     const auto load##dimension =                                               \
         "load_tetrahedral_solid" + std::to_string( dimension ) + "D";          \
     module.def( load##dimension.c_str(),                                       \
-        ( std::unique_ptr< TetrahedralSolid< dimension > >( * )(               \
-            absl::string_view ) )                                              \
-            & load_tetrahedral_solid< dimension > );                           \
+        static_cast< std::unique_ptr< TetrahedralSolid< dimension > > ( * )(   \
+            absl::string_view ) >( &load_tetrahedral_solid< dimension > ) );   \
+    const auto check##dimension = "check_tetrahedral_solid_missing_files"      \
+                                  + std::to_string( dimension ) + "D";         \
+    module.def( check##dimension.c_str(),                                      \
+        &check_tetrahedral_solid_missing_files< dimension > );                 \
+    PYTHON_INPUT_CLASS( std::unique_ptr< TetrahedralSolid< dimension > >,      \
+        "TetrahedralSolid" + std::to_string( dimension ) + "D" );              \
     PYTHON_FACTORY_CLASS( TetrahedralSolidInputFactory##dimension##D );        \
     PYTHON_FACTORY_CLASS( TetrahedralSolidOutputFactory##dimension##D )
 

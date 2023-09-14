@@ -21,26 +21,14 @@
  *
  */
 
-#include "../../basic/factory.h"
-#include "../../basic/input.h"
-#include "../../common.h"
+#include <geode/basic/input.h>
 
-#include <geode/mesh/core/vertex_set.h>
-#include <geode/mesh/io/vertex_set_input.h>
-#include <geode/mesh/io/vertex_set_output.h>
-
-namespace geode
-{
-    void define_vertex_set_io( pybind11::module& module )
-    {
-        module.def( "save_vertex_set", &save_vertex_set );
-        module.def(
-            "load_vertex_set", static_cast< std::unique_ptr< VertexSet > ( * )(
-                                   absl::string_view ) >( &load_vertex_set ) );
-        module.def(
-            "check_vertex_set_missing_files", &check_vertex_set_missing_files );
-        PYTHON_INPUT_CLASS( std::unique_ptr< VertexSet >, "VertexSet" );
-        PYTHON_FACTORY_CLASS( VertexSetInputFactory );
-        PYTHON_FACTORY_CLASS( VertexSetOutputFactory );
-    }
-} // namespace geode
+#define PYTHON_INPUT_CLASS( type, name )                                       \
+    pybind11::class_< Input< type >::MissingFiles >(                           \
+        module, absl::StrCat( "MissingFiles", name ).c_str() )                 \
+        .def( "has_missing_files",                                             \
+            &Input< type >::MissingFiles::has_missing_files )                  \
+        .def_readwrite( "additional_files",                                    \
+            &Input< type >::MissingFiles::additional_files )                   \
+        .def_readwrite(                                                        \
+            "mandatory_files", &Input< type >::MissingFiles::mandatory_files )

@@ -22,6 +22,7 @@
  */
 
 #include "../../../basic/factory.h"
+#include "../../../basic/input.h"
 #include "../../../common.h"
 
 #include <geode/model/representation/core/section.h>
@@ -34,6 +35,9 @@ namespace geode
     {
         module.def( "save_section", &save_section );
         module.def( "load_section", &load_section );
+        module.def(
+            "check_section_missing_files", &check_section_missing_files );
+        PYTHON_INPUT_CLASS( Section, "Section" );
         PYTHON_FACTORY_CLASS( SectionInputFactory );
         PYTHON_FACTORY_CLASS( SectionOutputFactory );
     }

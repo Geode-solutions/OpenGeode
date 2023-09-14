@@ -37,6 +37,16 @@ namespace geode
 
         struct MissingFiles
         {
+            bool has_missing_files() const
+            {
+                return !additional_files.empty() || !mandatory_files.empty();
+            }
+
+            operator bool() const
+            {
+                return has_missing_files();
+            }
+
             std::vector< std::string > additional_files;
             std::vector< std::string > mandatory_files;
         };
