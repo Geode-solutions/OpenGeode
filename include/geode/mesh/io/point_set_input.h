@@ -60,14 +60,19 @@ namespace geode
     class PointSetInput
         : public Input< std::unique_ptr< PointSet< dimension > >, MeshImpl >
     {
+    public:
+        using Base =
+            Input< std::unique_ptr< PointSet< dimension > >, MeshImpl >;
+        using Base::InputData;
+        using Base::MissingFiles;
+
     protected:
-        PointSetInput( absl::string_view filename )
-            : Input< std::unique_ptr< PointSet< dimension > >, MeshImpl >{
-                  filename
-              }
-        {
-        }
+        PointSetInput( absl::string_view filename ) : Base{ filename } {}
     };
+
+    template < index_t dimension >
+    typename PointSetInput< dimension >::MissingFiles
+        check_point_set_missing_files( absl::string_view filename );
 
     template < index_t dimension >
     using PointSetInputFactory =

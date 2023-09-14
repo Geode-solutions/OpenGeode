@@ -46,12 +46,17 @@ namespace geode
 
     class SectionInput : public Input< Section >
     {
+    public:
+        using Base = Input< Section >;
+        using Base::InputData;
+        using Base::MissingFiles;
+
     protected:
-        SectionInput( absl::string_view filename )
-            : Input< Section >{ filename }
-        {
-        }
+        SectionInput( absl::string_view filename ) : Base{ filename } {}
     };
+
+    typename SectionInput::MissingFiles opengeode_model_api
+        check_section_missing_files( absl::string_view filename );
 
     using SectionInputFactory =
         Factory< std::string, SectionInput, absl::string_view >;

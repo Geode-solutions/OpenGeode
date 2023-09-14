@@ -60,14 +60,19 @@ namespace geode
     class EdgedCurveInput
         : public Input< std::unique_ptr< EdgedCurve< dimension > >, MeshImpl >
     {
+    public:
+        using Base =
+            Input< std::unique_ptr< EdgedCurve< dimension > >, MeshImpl >;
+        using Base::InputData;
+        using Base::MissingFiles;
+
     protected:
-        EdgedCurveInput( absl::string_view filename )
-            : Input< std::unique_ptr< EdgedCurve< dimension > >, MeshImpl >{
-                  filename
-              }
-        {
-        }
+        EdgedCurveInput( absl::string_view filename ) : Base{ filename } {}
     };
+
+    template < index_t dimension >
+    typename EdgedCurveInput< dimension >::MissingFiles
+        check_edged_curve_missing_files( absl::string_view filename );
 
     template < index_t dimension >
     using EdgedCurveInputFactory =

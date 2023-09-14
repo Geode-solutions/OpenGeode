@@ -39,8 +39,7 @@ namespace geode
             const auto type =
                 absl::StrCat( "TetrahedralSolid", dimension, "D" );
             auto tetrahedral_solid = detail::geode_object_input_impl<
-                TetrahedralSolidInputFactory< dimension >,
-                std::unique_ptr< TetrahedralSolid< dimension > > >(
+                TetrahedralSolidInputFactory< dimension > >(
                 type, filename, impl );
             Logger::info( type, " has: ", tetrahedral_solid->nb_vertices(),
                 " vertices, ", tetrahedral_solid->nb_polyhedra(),
@@ -66,9 +65,21 @@ namespace geode
             filename );
     }
 
+    template < index_t dimension >
+    typename TetrahedralSolidInput< dimension >::MissingFiles
+        check_tetrahedral_solid_missing_files( absl::string_view filename )
+    {
+        const auto input = detail::geode_object_input_reader<
+            TetrahedralSolidInputFactory< dimension > >( filename );
+        return input->check_missing_files();
+    }
+
     template std::unique_ptr< TetrahedralSolid< 3 > > opengeode_mesh_api
         load_tetrahedral_solid( const MeshImpl&, absl::string_view );
 
     template std::unique_ptr< TetrahedralSolid< 3 > >
         opengeode_mesh_api load_tetrahedral_solid( absl::string_view );
+
+    template TetrahedralSolidInput< 3 >::MissingFiles opengeode_mesh_api
+        check_tetrahedral_solid_missing_files< 3 >( absl::string_view );
 } // namespace geode

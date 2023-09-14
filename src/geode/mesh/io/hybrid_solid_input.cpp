@@ -38,9 +38,7 @@ namespace geode
         {
             const auto type = absl::StrCat( "HybridSolid", dimension, "D" );
             auto hybrid_solid = detail::geode_object_input_impl<
-                HybridSolidInputFactory< dimension >,
-                std::unique_ptr< HybridSolid< dimension > > >(
-                type, filename, impl );
+                HybridSolidInputFactory< dimension > >( type, filename, impl );
             Logger::info( type, " has: ", hybrid_solid->nb_vertices(),
                 " vertices, ", hybrid_solid->nb_polyhedra(), " polyhedra" );
             return hybrid_solid;
@@ -63,9 +61,21 @@ namespace geode
             filename );
     }
 
+    template < index_t dimension >
+    typename HybridSolidInput< dimension >::MissingFiles
+        check_hybrid_solid_missing_files( absl::string_view filename )
+    {
+        const auto input = detail::geode_object_input_reader<
+            HybridSolidInputFactory< dimension > >( filename );
+        return input->check_missing_files();
+    }
+
     template std::unique_ptr< HybridSolid< 3 > > opengeode_mesh_api
         load_hybrid_solid( const MeshImpl&, absl::string_view );
 
     template std::unique_ptr< HybridSolid< 3 > >
         opengeode_mesh_api load_hybrid_solid( absl::string_view );
+
+    template HybridSolidInput< 3 >::MissingFiles opengeode_mesh_api
+        check_hybrid_solid_missing_files< 3 >( absl::string_view );
 } // namespace geode

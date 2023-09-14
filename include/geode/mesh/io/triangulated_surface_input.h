@@ -62,13 +62,22 @@ namespace geode
         : public Input< std::unique_ptr< TriangulatedSurface< dimension > >,
               MeshImpl >
     {
+    public:
+        using Base = Input< std::unique_ptr< TriangulatedSurface< dimension > >,
+            MeshImpl >;
+        using Base::InputData;
+        using Base::MissingFiles;
+
     protected:
         TriangulatedSurfaceInput( absl::string_view filename )
-            : Input< std::unique_ptr< TriangulatedSurface< dimension > >,
-                MeshImpl >{ filename }
+            : Base{ filename }
         {
         }
     };
+
+    template < index_t dimension >
+    typename TriangulatedSurfaceInput< dimension >::MissingFiles
+        check_triangulated_surface_missing_files( absl::string_view filename );
 
     template < index_t dimension >
     using TriangulatedSurfaceInputFactory = Factory< std::string,

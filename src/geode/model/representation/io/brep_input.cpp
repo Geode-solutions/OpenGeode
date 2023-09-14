@@ -35,9 +35,8 @@ namespace geode
         try
         {
             const auto type = "BRep";
-            auto brep =
-                detail::geode_object_input_impl< BRepInputFactory, BRep >(
-                    type, filename );
+            auto brep = detail::geode_object_input_impl< BRepInputFactory >(
+                type, filename );
             Logger::info( type, " has: ", brep.nb_blocks(), " Blocks, ",
                 brep.nb_surfaces(), " Surfaces, ", brep.nb_lines(), " Lines, ",
                 brep.nb_corners(), " Corners, ", brep.nb_model_boundaries(),
@@ -50,5 +49,13 @@ namespace geode
             throw OpenGeodeException{ "Cannot load BRep from file: ",
                 filename };
         }
+    }
+
+    typename BRepInput::MissingFiles check_brep_missing_files(
+        absl::string_view filename )
+    {
+        const auto input =
+            detail::geode_object_input_reader< BRepInputFactory >( filename );
+        return input->check_missing_files();
     }
 } // namespace geode

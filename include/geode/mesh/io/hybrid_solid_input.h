@@ -62,14 +62,19 @@ namespace geode
     {
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
 
+    public:
+        using Base =
+            Input< std::unique_ptr< HybridSolid< dimension > >, MeshImpl >;
+        using Base::InputData;
+        using Base::MissingFiles;
+
     protected:
-        HybridSolidInput( absl::string_view filename )
-            : Input< std::unique_ptr< HybridSolid< dimension > >, MeshImpl >{
-                  filename
-              }
-        {
-        }
+        HybridSolidInput( absl::string_view filename ) : Base{ filename } {}
     };
+
+    template < index_t dimension >
+    typename HybridSolidInput< dimension >::MissingFiles
+        check_hybrid_solid_missing_files( absl::string_view filename );
 
     template < index_t dimension >
     using HybridSolidInputFactory = Factory< std::string,

@@ -39,9 +39,7 @@ namespace geode
         {
             const auto type = absl::StrCat( "RegularGrid", dimension, "D" );
             auto grid = detail::geode_object_input_impl<
-                RegularGridInputFactory< dimension >,
-                std::unique_ptr< RegularGrid< dimension > > >(
-                type, filename, impl );
+                RegularGridInputFactory< dimension > >( type, filename, impl );
             Logger::info( type, " has: ", grid->nb_cells(), " cells" );
             return grid;
         }
@@ -63,6 +61,15 @@ namespace geode
             filename );
     }
 
+    template < index_t dimension >
+    typename RegularGridInput< dimension >::MissingFiles
+        check_regular_grid_missing_files( absl::string_view filename )
+    {
+        const auto input = detail::geode_object_input_reader<
+            RegularGridInputFactory< dimension > >( filename );
+        return input->check_missing_files();
+    }
+
     template std::unique_ptr< RegularGrid< 2 > > opengeode_mesh_api
         load_regular_grid( const MeshImpl&, absl::string_view );
     template std::unique_ptr< RegularGrid< 3 > > opengeode_mesh_api
@@ -72,4 +79,9 @@ namespace geode
         opengeode_mesh_api load_regular_grid( absl::string_view );
     template std::unique_ptr< RegularGrid< 3 > >
         opengeode_mesh_api load_regular_grid( absl::string_view );
+
+    template RegularGridInput< 2 >::MissingFiles opengeode_mesh_api
+        check_regular_grid_missing_files< 2 >( absl::string_view );
+    template RegularGridInput< 3 >::MissingFiles opengeode_mesh_api
+        check_regular_grid_missing_files< 3 >( absl::string_view );
 } // namespace geode

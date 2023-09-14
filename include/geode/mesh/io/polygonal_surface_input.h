@@ -61,13 +61,21 @@ namespace geode
         : public Input< std::unique_ptr< PolygonalSurface< dimension > >,
               MeshImpl >
     {
+    public:
+        using Base =
+            Input< std::unique_ptr< PolygonalSurface< dimension > >, MeshImpl >;
+        using Base::InputData;
+        using Base::MissingFiles;
+
     protected:
-        PolygonalSurfaceInput( absl::string_view filename )
-            : Input< std::unique_ptr< PolygonalSurface< dimension > >,
-                MeshImpl >{ filename }
+        PolygonalSurfaceInput( absl::string_view filename ) : Base{ filename }
         {
         }
     };
+
+    template < index_t dimension >
+    typename PolygonalSurfaceInput< dimension >::MissingFiles
+        check_polygonal_surface_missing_files( absl::string_view filename );
 
     template < index_t dimension >
     using PolygonalSurfaceInputFactory = Factory< std::string,

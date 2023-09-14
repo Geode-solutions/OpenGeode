@@ -44,8 +44,8 @@ namespace geode
         {
             const auto type = "VertexSet";
             auto vertex_set =
-                detail::geode_object_input_impl< VertexSetInputFactory,
-                    std::unique_ptr< VertexSet > >( type, filename, impl );
+                detail::geode_object_input_impl< VertexSetInputFactory >(
+                    type, filename, impl );
             Logger::info(
                 type, " has: ", vertex_set->nb_vertices(), " vertices" );
             return vertex_set;
@@ -56,5 +56,14 @@ namespace geode
             throw OpenGeodeException{ "Cannot load VertexSet from file: ",
                 filename };
         }
+    }
+
+    typename VertexSetInput::MissingFiles check_vertex_set_missing_files(
+        absl::string_view filename )
+    {
+        const auto input =
+            detail::geode_object_input_reader< VertexSetInputFactory >(
+                filename );
+        return input->check_missing_files();
     }
 } // namespace geode
