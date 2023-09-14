@@ -33,6 +33,17 @@ namespace geode
     class Input : public IOFile
     {
     public:
+        struct MissingFiles
+        {
+            std::vector< std::string > additional_files;
+            std::vector< std::string > mandatory_files;
+        };
+
+        virtual MissingFiles check_missing_files() const
+        {
+            return {};
+        }
+
         virtual Object read( const Args&... args ) = 0;
 
         ~Input()
