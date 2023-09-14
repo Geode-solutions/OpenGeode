@@ -52,10 +52,7 @@ namespace geode
 
     protected:
         RasterImageInput( absl::string_view filename )
-            : Input< RasterImage< dimension > >
-        {
-            filename
-        }
+            : Input< RasterImage< dimension > >{ filename }
         {
         }
     };
