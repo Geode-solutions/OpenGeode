@@ -23,7 +23,7 @@
 
 #include <geode/mesh/io/polyhedral_solid_input.h>
 
-#include <geode/basic/private/geode_input_impl.h>
+#include <geode/basic/detail/geode_input_impl.h>
 
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polyhedral_solid.h>

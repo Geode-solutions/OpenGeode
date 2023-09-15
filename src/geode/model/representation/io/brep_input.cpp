@@ -23,7 +23,7 @@
 
 #include <geode/model/representation/io/brep_input.h>
 
-#include <geode/basic/private/geode_input_impl.h>
+#include <geode/basic/detail/geode_input_impl.h>
 
 #include <geode/model/representation/builder/brep_builder.h>
 #include <geode/model/representation/core/brep.h>
@@ -37,10 +37,15 @@ namespace geode
             const auto type = "BRep";
             auto brep = detail::geode_object_input_impl< BRepInputFactory >(
                 type, filename );
-            Logger::info( type, " has: ", brep.nb_blocks(), " Blocks, ",
-                brep.nb_surfaces(), " Surfaces, ", brep.nb_lines(), " Lines, ",
-                brep.nb_corners(), " Corners, ", brep.nb_model_boundaries(),
-                " ModelBoundaries" );
+            auto message = absl::StrCat( type, " has: " );
+            detail::add_to_message( message, brep.nb_blocks(), " Blocks, " );
+            detail::add_to_message(
+                message, brep.nb_surfaces(), " Surfaces, " );
+            detail::add_to_message( message, brep.nb_lines(), " Lines, " );
+            detail::add_to_message( message, brep.nb_corners(), " Corners, " );
+            detail::add_to_message(
+                message, brep.nb_model_boundaries(), " ModelBoundaries" );
+            Logger::info( message );
             return brep;
         }
         catch( const OpenGeodeException& e )

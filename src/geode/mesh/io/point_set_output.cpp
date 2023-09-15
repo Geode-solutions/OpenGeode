@@ -23,7 +23,7 @@
 
 #include <geode/mesh/io/point_set_output.h>
 
-#include <geode/basic/private/geode_output_impl.h>
+#include <geode/basic/detail/geode_output_impl.h>
 
 #include <geode/mesh/core/point_set.h>
 #include <geode/mesh/io/vertex_set_output.h>

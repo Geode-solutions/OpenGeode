@@ -23,7 +23,7 @@
 
 #include <geode/model/representation/io/brep_output.h>
 
-#include <geode/basic/private/geode_output_impl.h>
+#include <geode/basic/detail/geode_output_impl.h>
 
 #include <geode/model/representation/core/brep.h>
 

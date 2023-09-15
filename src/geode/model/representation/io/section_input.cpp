@@ -23,7 +23,7 @@
 
 #include <geode/model/representation/io/section_input.h>
 
-#include <geode/basic/private/geode_input_impl.h>
+#include <geode/basic/detail/geode_input_impl.h>
 
 #include <geode/model/representation/builder/section_builder.h>
 #include <geode/model/representation/core/section.h>
@@ -38,10 +38,15 @@ namespace geode
             auto section =
                 detail::geode_object_input_impl< SectionInputFactory >(
                     type, filename );
-            Logger::info( type, " has: ", section.nb_surfaces(), " Surfaces, ",
-                section.nb_lines(), " Lines, ", section.nb_corners(),
-                " Corners, ", section.nb_model_boundaries(),
-                " ModelBoundaries" );
+            auto message = absl::StrCat( type, " has: " );
+            detail::add_to_message(
+                message, section.nb_surfaces(), " Surfaces, " );
+            detail::add_to_message( message, section.nb_lines(), " Lines, " );
+            detail::add_to_message(
+                message, section.nb_corners(), " Corners, " );
+            detail::add_to_message(
+                message, section.nb_model_boundaries(), " ModelBoundaries" );
+            Logger::info( message );
             return section;
         }
         catch( const OpenGeodeException& e )

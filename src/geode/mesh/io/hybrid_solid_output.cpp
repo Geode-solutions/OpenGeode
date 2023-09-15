@@ -23,7 +23,7 @@
 
 #include <geode/mesh/io/hybrid_solid_output.h>
 
-#include <geode/basic/private/geode_output_impl.h>
+#include <geode/basic/detail/geode_output_impl.h>
 
 #include <geode/mesh/core/hybrid_solid.h>
 

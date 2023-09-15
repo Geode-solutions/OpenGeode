@@ -79,5 +79,15 @@ namespace geode
                 type, " loaded from ", filename, " in ", timer.duration() );
             return object;
         }
+
+        inline void add_to_message( std::string& message,
+            geode::index_t nb_components,
+            absl::string_view component_text )
+        {
+            if( nb_components > 0 )
+            {
+                absl::StrAppend( &message, nb_components, component_text );
+            }
+        }
     } // namespace detail
 } // namespace geode

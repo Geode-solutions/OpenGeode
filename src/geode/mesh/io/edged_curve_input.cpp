@@ -23,7 +23,7 @@
 
 #include <geode/mesh/io/edged_curve_input.h>
 
-#include <geode/basic/private/geode_input_impl.h>
+#include <geode/basic/detail/geode_input_impl.h>
 
 #include <geode/mesh/core/edged_curve.h>
 #include <geode/mesh/core/mesh_factory.h>

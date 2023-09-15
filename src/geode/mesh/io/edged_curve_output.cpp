@@ -23,7 +23,7 @@
 
 #include <geode/mesh/io/edged_curve_output.h>
 
-#include <geode/basic/private/geode_output_impl.h>
+#include <geode/basic/detail/geode_output_impl.h>
 
 #include <geode/mesh/core/edged_curve.h>
 
