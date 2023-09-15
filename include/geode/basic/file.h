@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 - 2023 Geode-solutions
+ * Copyright (c) 2019 Geode-solutions
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,21 +23,30 @@
 
 #pragma once
 
+#include <absl/types/optional.h>
+#include <absl/types/span.h>
+
 #include <geode/basic/common.h>
 
 namespace geode
 {
-    std::vector< absl::string_view > opengeode_basic_api string_split(
-        absl::string_view string );
+    bool opengeode_basic_api file_exists( absl::string_view file_path );
 
-    bool opengeode_basic_api string_starts_with(
-        absl::string_view string, absl::string_view check );
+    void opengeode_basic_api check_keyword(
+        std::ifstream& file, absl::string_view keyword );
 
-    index_t opengeode_basic_api string_to_index( absl::string_view string );
+    bool opengeode_basic_api line_starts_with(
+        std::ifstream& file, absl::string_view check );
 
-    int opengeode_basic_api string_to_int( absl::string_view string );
+    std::string opengeode_basic_api goto_keyword(
+        std::ifstream& file, absl::string_view word );
 
-    float opengeode_basic_api string_to_float( absl::string_view string );
+    std::string opengeode_basic_api goto_keywords(
+        std::ifstream& file, absl::Span< const absl::string_view > words );
 
-    double opengeode_basic_api string_to_double( absl::string_view string );
+    absl::optional< std::string > opengeode_basic_api goto_keyword_if_it_exists(
+        std::ifstream& file, absl::string_view word );
+
+    absl::optional< std::string > opengeode_basic_api next_keyword_if_it_exists(
+        std::ifstream& file, absl::string_view word );
 } // namespace geode

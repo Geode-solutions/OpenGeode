@@ -33,6 +33,11 @@ namespace geode
             absl::ByAnyChar( " 	" ) /* space + tab */, absl::SkipWhitespace() );
     }
 
+    bool string_starts_with( absl::string_view string, absl::string_view check )
+    {
+        return absl::StartsWith( string, check );
+    }
+
     index_t string_to_index( absl::string_view string )
     {
         index_t value{ 0 };
