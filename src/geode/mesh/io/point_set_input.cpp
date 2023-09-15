@@ -38,9 +38,7 @@ namespace geode
         {
             const auto type = absl::StrCat( "PointSet", dimension, "D" );
             auto point_set = detail::geode_object_input_impl<
-                PointSetInputFactory< dimension >,
-                std::unique_ptr< PointSet< dimension > > >(
-                type, filename, impl );
+                PointSetInputFactory< dimension > >( type, filename, impl );
             Logger::info(
                 type, " has: ", point_set->nb_vertices(), " vertices" );
             return point_set;
@@ -63,6 +61,15 @@ namespace geode
             filename );
     }
 
+    template < index_t dimension >
+    typename PointSetInput< dimension >::MissingFiles
+        check_point_set_missing_files( absl::string_view filename )
+    {
+        const auto input = detail::geode_object_input_reader<
+            PointSetInputFactory< dimension > >( filename );
+        return input->check_missing_files();
+    }
+
     template std::unique_ptr< PointSet< 2 > > opengeode_mesh_api load_point_set(
         const MeshImpl&, absl::string_view );
     template std::unique_ptr< PointSet< 3 > > opengeode_mesh_api load_point_set(
@@ -72,4 +79,9 @@ namespace geode
         absl::string_view );
     template std::unique_ptr< PointSet< 3 > > opengeode_mesh_api load_point_set(
         absl::string_view );
+
+    template PointSetInput< 2 >::MissingFiles opengeode_mesh_api
+        check_point_set_missing_files< 2 >( absl::string_view );
+    template PointSetInput< 3 >::MissingFiles opengeode_mesh_api
+        check_point_set_missing_files< 3 >( absl::string_view );
 } // namespace geode

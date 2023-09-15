@@ -22,8 +22,9 @@
 import os
 import sys
 import platform
+
 if sys.version_info >= (3, 8, 0) and platform.system() == "Windows":
-    for path in [x.strip() for x in os.environ['PATH'].split(';') if x]:
+    for path in [x.strip() for x in os.environ["PATH"].split(";") if x]:
         os.add_dll_directory(path)
 
 
@@ -44,7 +45,7 @@ def test_raster(raster):
             raise ValueError("[Test] Wrong color for ", i)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     image.OpenGeodeImageLibrary.initialize()
     raster = image.RasterImage2D([10, 10])
     for i in range(raster.nb_cells()):

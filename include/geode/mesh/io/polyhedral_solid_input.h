@@ -63,13 +63,19 @@ namespace geode
     {
         OPENGEODE_TEMPLATE_ASSERT_3D( dimension );
 
+    public:
+        using Base =
+            Input< std::unique_ptr< PolyhedralSolid< dimension > >, MeshImpl >;
+        using Base::InputData;
+        using Base::MissingFiles;
+
     protected:
-        PolyhedralSolidInput( absl::string_view filename )
-            : Input< std::unique_ptr< PolyhedralSolid< dimension > >,
-                MeshImpl >{ filename }
-        {
-        }
+        PolyhedralSolidInput( absl::string_view filename ) : Base{ filename } {}
     };
+
+    template < index_t dimension >
+    typename PolyhedralSolidInput< dimension >::MissingFiles
+        check_polyhedral_solid_missing_files( absl::string_view filename );
 
     template < index_t dimension >
     using PolyhedralSolidInputFactory = Factory< std::string,

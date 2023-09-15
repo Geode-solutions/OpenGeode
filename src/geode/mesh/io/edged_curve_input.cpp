@@ -38,9 +38,7 @@ namespace geode
         {
             const auto type = absl::StrCat( "EdgedCurve", dimension, "D" );
             auto edged_curve = detail::geode_object_input_impl<
-                EdgedCurveInputFactory< dimension >,
-                std::unique_ptr< EdgedCurve< dimension > > >(
-                type, filename, impl );
+                EdgedCurveInputFactory< dimension > >( type, filename, impl );
             Logger::info( type, " has: ", edged_curve->nb_vertices(),
                 " vertices, ", edged_curve->nb_edges(), " edges" );
             return edged_curve;
@@ -63,6 +61,15 @@ namespace geode
             filename );
     }
 
+    template < index_t dimension >
+    typename EdgedCurveInput< dimension >::MissingFiles
+        check_edged_curve_missing_files( absl::string_view filename )
+    {
+        const auto input = detail::geode_object_input_reader<
+            EdgedCurveInputFactory< dimension > >( filename );
+        return input->check_missing_files();
+    }
+
     template std::unique_ptr< EdgedCurve< 2 > > opengeode_mesh_api
         load_edged_curve( const MeshImpl&, absl::string_view );
     template std::unique_ptr< EdgedCurve< 3 > > opengeode_mesh_api
@@ -72,4 +79,9 @@ namespace geode
         opengeode_mesh_api load_edged_curve( absl::string_view );
     template std::unique_ptr< EdgedCurve< 3 > >
         opengeode_mesh_api load_edged_curve( absl::string_view );
+
+    template EdgedCurveInput< 2 >::MissingFiles opengeode_mesh_api
+        check_edged_curve_missing_files< 2 >( absl::string_view );
+    template EdgedCurveInput< 3 >::MissingFiles opengeode_mesh_api
+        check_edged_curve_missing_files< 3 >( absl::string_view );
 } // namespace geode

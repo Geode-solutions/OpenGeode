@@ -36,8 +36,8 @@ namespace geode
         try
         {
             const auto type = "Graph";
-            auto graph = detail::geode_object_input_impl< GraphInputFactory,
-                std::unique_ptr< Graph > >( type, filename, impl );
+            auto graph = detail::geode_object_input_impl< GraphInputFactory >(
+                type, filename, impl );
             Logger::info( type, " has: ", graph->nb_vertices(), " vertices, ",
                 graph->nb_edges(), " edges" );
             return graph;
@@ -54,5 +54,13 @@ namespace geode
     {
         return load_graph(
             MeshFactory::default_impl( Graph::type_name_static() ), filename );
+    }
+
+    typename GraphInput::MissingFiles check_graph_missing_files(
+        absl::string_view filename )
+    {
+        const auto input =
+            detail::geode_object_input_reader< GraphInputFactory >( filename );
+        return input->check_missing_files();
     }
 } // namespace geode

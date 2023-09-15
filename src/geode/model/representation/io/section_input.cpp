@@ -36,7 +36,7 @@ namespace geode
         {
             const auto type = "Section";
             auto section =
-                detail::geode_object_input_impl< SectionInputFactory, Section >(
+                detail::geode_object_input_impl< SectionInputFactory >(
                     type, filename );
             Logger::info( type, " has: ", section.nb_surfaces(), " Surfaces, ",
                 section.nb_lines(), " Lines, ", section.nb_corners(),
@@ -50,5 +50,14 @@ namespace geode
             throw OpenGeodeException{ "Cannot load Section from file: ",
                 filename };
         }
+    }
+
+    typename SectionInput::MissingFiles check_section_missing_files(
+        absl::string_view filename )
+    {
+        const auto input =
+            detail::geode_object_input_reader< SectionInputFactory >(
+                filename );
+        return input->check_missing_files();
     }
 } // namespace geode

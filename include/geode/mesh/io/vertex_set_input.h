@@ -57,12 +57,17 @@ namespace geode
     class VertexSetInput
         : public Input< std::unique_ptr< VertexSet >, MeshImpl >
     {
+    public:
+        using Base = Input< std::unique_ptr< VertexSet >, MeshImpl >;
+        using Base::InputData;
+        using Base::MissingFiles;
+
     protected:
-        VertexSetInput( absl::string_view filename )
-            : Input< std::unique_ptr< VertexSet >, MeshImpl >{ filename }
-        {
-        }
+        VertexSetInput( absl::string_view filename ) : Base{ filename } {}
     };
+
+    typename VertexSetInput::MissingFiles opengeode_mesh_api
+        check_vertex_set_missing_files( absl::string_view filename );
 
     using VertexSetInputFactory =
         Factory< std::string, VertexSetInput, absl::string_view >;

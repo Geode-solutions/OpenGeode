@@ -55,17 +55,24 @@ namespace geode
             }
         }
 
-        template < typename Factory, typename Object, typename... Args >
-        Object geode_object_input_impl(
-            absl::string_view type, absl::string_view filename, Args... args )
+        template < typename Factory >
+        std::unique_ptr< typename Factory::BaseClass >
+            geode_object_input_reader( absl::string_view& filename )
         {
-            Timer timer;
             filename = absl::StripAsciiWhitespace( filename );
             const auto extension =
                 absl::AsciiStrToLower( extension_from_filename( filename ) );
             OPENGEODE_EXCEPTION( Factory::has_creator( extension ),
                 "Unknown extension: ", extension );
-            auto input = Factory::create( extension, filename );
+            return Factory::create( extension, filename );
+        }
+
+        template < typename Factory, typename... Args >
+        typename Factory::BaseClass::InputData geode_object_input_impl(
+            absl::string_view type, absl::string_view filename, Args... args )
+        {
+            const Timer timer;
+            auto input = geode_object_input_reader< Factory >( filename );
             auto object = input->read( std::forward< Args >( args )... );
             update_default_name( object, filename );
             Logger::info(

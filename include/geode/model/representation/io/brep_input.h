@@ -46,9 +46,17 @@ namespace geode
 
     class BRepInput : public Input< BRep >
     {
+    public:
+        using Base = Input< BRep >;
+        using Base::InputData;
+        using Base::MissingFiles;
+
     protected:
-        BRepInput( absl::string_view filename ) : Input< BRep >{ filename } {}
+        BRepInput( absl::string_view filename ) : Base{ filename } {}
     };
+
+    typename BRepInput::MissingFiles opengeode_model_api
+        check_brep_missing_files( absl::string_view filename );
 
     using BRepInputFactory =
         Factory< std::string, BRepInput, absl::string_view >;

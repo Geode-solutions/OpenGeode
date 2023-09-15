@@ -22,6 +22,7 @@
  */
 
 #include "../../basic/factory.h"
+#include "../../basic/input.h"
 #include "../../common.h"
 
 #include <geode/mesh/core/triangulated_surface.h>
@@ -36,9 +37,15 @@
     const auto load##dimension =                                               \
         "load_triangulated_surface" + std::to_string( dimension ) + "D";       \
     module.def( load##dimension.c_str(),                                       \
-        ( std::unique_ptr< TriangulatedSurface< dimension > >( * )(            \
-            absl::string_view ) )                                              \
-            & load_triangulated_surface< dimension > );                        \
+        static_cast< std::unique_ptr<                                          \
+            TriangulatedSurface< dimension > > ( * )( absl::string_view ) >(   \
+            &load_triangulated_surface< dimension > ) );                       \
+    const auto check##dimension = "check_triangulated_surface_missing_files"   \
+                                  + std::to_string( dimension ) + "D";         \
+    module.def( check##dimension.c_str(),                                      \
+        &check_triangulated_surface_missing_files< dimension > );              \
+    PYTHON_INPUT_CLASS( std::unique_ptr< TriangulatedSurface< dimension > >,   \
+        "TriangulatedSurface" + std::to_string( dimension ) + "D" );           \
     PYTHON_FACTORY_CLASS( TriangulatedSurfaceInputFactory##dimension##D );     \
     PYTHON_FACTORY_CLASS( TriangulatedSurfaceOutputFactory##dimension##D )
 

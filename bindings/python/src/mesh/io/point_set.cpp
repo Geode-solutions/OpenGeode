@@ -22,6 +22,7 @@
  */
 
 #include "../../basic/factory.h"
+#include "../../basic/input.h"
 #include "../../common.h"
 
 #include <geode/mesh/core/point_set.h>
@@ -35,8 +36,14 @@
     const auto load##dimension =                                               \
         "load_point_set" + std::to_string( dimension ) + "D";                  \
     module.def( load##dimension.c_str(),                                       \
-        ( std::unique_ptr< PointSet< dimension > >( * )( absl::string_view ) ) \
-            & load_point_set< dimension > );                                   \
+        static_cast< std::unique_ptr< PointSet< dimension > > ( * )(           \
+            absl::string_view ) >( &load_point_set< dimension > ) );           \
+    const auto check##dimension =                                              \
+        "check_point_set_missing_files" + std::to_string( dimension ) + "D";   \
+    module.def( check##dimension.c_str(),                                      \
+        &check_point_set_missing_files< dimension > );                         \
+    PYTHON_INPUT_CLASS( std::unique_ptr< PointSet< dimension > >,              \
+        "PointSet" + std::to_string( dimension ) + "D" );                      \
     PYTHON_FACTORY_CLASS( PointSetInputFactory##dimension##D );                \
     PYTHON_FACTORY_CLASS( PointSetOutputFactory##dimension##D )
 

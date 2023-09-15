@@ -40,8 +40,7 @@ namespace geode
             const auto type =
                 absl::StrCat( "TriangulatedSurface", dimension, "D" );
             auto triangulated_surface = detail::geode_object_input_impl<
-                TriangulatedSurfaceInputFactory< dimension >,
-                std::unique_ptr< TriangulatedSurface< dimension > > >(
+                TriangulatedSurfaceInputFactory< dimension > >(
                 type, filename, impl );
             Logger::info( type, " has: ", triangulated_surface->nb_vertices(),
                 " vertices, ", triangulated_surface->nb_polygons(),
@@ -67,6 +66,15 @@ namespace geode
             filename );
     }
 
+    template < index_t dimension >
+    typename TriangulatedSurfaceInput< dimension >::MissingFiles
+        check_triangulated_surface_missing_files( absl::string_view filename )
+    {
+        const auto input = detail::geode_object_input_reader<
+            TriangulatedSurfaceInputFactory< dimension > >( filename );
+        return input->check_missing_files();
+    }
+
     template std::unique_ptr< TriangulatedSurface< 2 > > opengeode_mesh_api
         load_triangulated_surface( const MeshImpl&, absl::string_view );
     template std::unique_ptr< TriangulatedSurface< 3 > > opengeode_mesh_api
@@ -76,4 +84,9 @@ namespace geode
         opengeode_mesh_api load_triangulated_surface( absl::string_view );
     template std::unique_ptr< TriangulatedSurface< 3 > >
         opengeode_mesh_api load_triangulated_surface( absl::string_view );
+
+    template TriangulatedSurfaceInput< 2 >::MissingFiles opengeode_mesh_api
+        check_triangulated_surface_missing_files< 2 >( absl::string_view );
+    template TriangulatedSurfaceInput< 3 >::MissingFiles opengeode_mesh_api
+        check_triangulated_surface_missing_files< 3 >( absl::string_view );
 } // namespace geode

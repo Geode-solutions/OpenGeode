@@ -58,13 +58,17 @@ namespace geode
      *      auto c = MyFactory::create( "key_value_for_C", 2, 8.6 );
      *      // where c is a std::unique_ptr< A >
      */
-    template < typename Key, typename BaseClass, typename... Args >
+    template < typename Key, typename BaseClassType, typename... Args >
     class Factory : public Singleton
     {
+    public:
+        using BaseClass = BaseClassType;
+        using Creator = typename std::add_pointer< std::unique_ptr< BaseClass >(
+            Args... ) >::type;
+        using FactoryStore = absl::flat_hash_map< Key, Creator >;
         static_assert( std::has_virtual_destructor< BaseClass >::value,
             "BaseClass must have a virtual destructor" );
 
-    public:
         template < typename DerivedClass >
         static inline void register_creator( Key key )
         {
@@ -112,10 +116,6 @@ namespace geode
             const auto &store = get_store();
             return store.find( key ) != store.end();
         }
-
-        using Creator = typename std::add_pointer< std::unique_ptr< BaseClass >(
-            Args... ) >::type;
-        using FactoryStore = absl::flat_hash_map< Key, Creator >;
 
     private:
         template < typename DerivedClass >

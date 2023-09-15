@@ -22,6 +22,7 @@
  */
 
 #include "../../basic/factory.h"
+#include "../../basic/input.h"
 #include "../../common.h"
 
 #include <geode/mesh/core/polyhedral_solid.h>
@@ -36,9 +37,14 @@
     const auto load##dimension =                                               \
         "load_polyhedral_solid" + std::to_string( dimension ) + "D";           \
     module.def( load##dimension.c_str(),                                       \
-        ( std::unique_ptr< PolyhedralSolid< dimension > >( * )(                \
-            absl::string_view ) )                                              \
-            & load_polyhedral_solid< dimension > );                            \
+        static_cast< std::unique_ptr< PolyhedralSolid< dimension > > ( * )(    \
+            absl::string_view ) >( &load_polyhedral_solid< dimension > ) );    \
+    const auto check##dimension = "check_polyhedral_solid_missing_files"       \
+                                  + std::to_string( dimension ) + "D";         \
+    module.def( check##dimension.c_str(),                                      \
+        &check_polyhedral_solid_missing_files< dimension > );                  \
+    PYTHON_INPUT_CLASS( std::unique_ptr< PolyhedralSolid< dimension > >,       \
+        "PolyhedralSolid" + std::to_string( dimension ) + "D" );               \
     PYTHON_FACTORY_CLASS( PolyhedralSolidInputFactory##dimension##D );         \
     PYTHON_FACTORY_CLASS( PolyhedralSolidOutputFactory##dimension##D )
 

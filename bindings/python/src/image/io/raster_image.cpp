@@ -24,6 +24,7 @@
 #include "../../common.h"
 
 #include "../../basic/factory.h"
+#include "../../basic/input.h"
 
 #include <geode/image/core/raster_image.h>
 #include <geode/image/io/raster_image_input.h>
@@ -36,6 +37,12 @@
     const auto load##dimension =                                               \
         "load_raster_image" + std::to_string( dimension ) + "D";               \
     module.def( load##dimension.c_str(), &load_raster_image< dimension > );    \
+    const auto check##dimension = "check_raster_image_missing_files"           \
+                                  + std::to_string( dimension ) + "D";         \
+    module.def( check##dimension.c_str(),                                      \
+        &check_raster_image_missing_files< dimension > );                      \
+    PYTHON_INPUT_CLASS( RasterImage##dimension##D,                             \
+        "RasterImage" + std::to_string( dimension ) + "D" );                   \
     PYTHON_FACTORY_CLASS( RasterImageInputFactory##dimension##D );             \
     PYTHON_FACTORY_CLASS( RasterImageOutputFactory##dimension##D )
 
