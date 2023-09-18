@@ -73,7 +73,7 @@ void test_bounding_box( const geode::HybridSolid3D& hybrid_solid )
 void test_facets( const geode::HybridSolid3D& hybrid_solid )
 {
     OPENGEODE_EXCEPTION(
-        hybrid_solid.facets().facet_from_vertices( { 0, 1, 3, 4 } ) == 0,
+        hybrid_solid.facets().facet_from_vertices( { 0, 1, 3, 4 } ) == 4,
         "[Test] Wrong facet from vertices" );
     OPENGEODE_EXCEPTION(
         hybrid_solid.facets().facet_from_vertices( { 8, 6, 7 } ) == 7,
@@ -134,7 +134,7 @@ void test_polyhedron_adjacencies( const geode::HybridSolid3D& hybrid_solid,
     builder.compute_polyhedron_adjacencies();
     OPENGEODE_EXCEPTION( !hybrid_solid.polyhedron_adjacent( { 0, 0 } ),
         "[Test] HybridSolid adjacent index is not correct" );
-    OPENGEODE_EXCEPTION( hybrid_solid.polyhedron_adjacent( { 0, 1 } ) == 2,
+    OPENGEODE_EXCEPTION( hybrid_solid.polyhedron_adjacent( { 0, 5 } ) == 2,
         "[Test] HybridSolid adjacent index is not correct" );
     OPENGEODE_EXCEPTION( !hybrid_solid.polyhedron_adjacent( { 0, 2 } ),
         "[Test] HybridSolid adjacent index is not correct" );
@@ -266,7 +266,7 @@ void test_permutation(
 
     OPENGEODE_EXCEPTION( solid.polyhedron_adjacent( { 0, 1 } ) == 1,
         "[Test] Wrong Adjacency after polyhedron permute" );
-    OPENGEODE_EXCEPTION( solid.polyhedron_adjacent( { 2, 1 } ) == 1,
+    OPENGEODE_EXCEPTION( solid.polyhedron_adjacent( { 2, 5 } ) == 1,
         "[Test] Wrong Adjacency after polyhedron permute" );
     OPENGEODE_EXCEPTION( solid.polyhedron_adjacent( { 0, 3 } ) == 3,
         "[Test] Wrong Adjacency after polyhedron permute" );

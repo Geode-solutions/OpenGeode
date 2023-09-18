@@ -40,9 +40,9 @@ namespace geode
                 { 1, 3 }, { 2, 3 } } };
 
         static constexpr std::array< std::array< geode::local_index_t, 4 >, 6 >
-            hexahedron_facet_vertices{ { { 0, 1, 2, 3 }, { 4, 7, 6, 5 },
-                { 0, 4, 5, 1 }, { 2, 6, 7, 3 }, { 1, 5, 6, 2 },
-                { 0, 3, 7, 4 } } };
+            hexahedron_facet_vertices{ { { 0, 4, 5, 1 }, { 2, 6, 7, 3 },
+                { 0, 3, 7, 4 }, { 1, 5, 6, 2 }, { 0, 1, 2, 3 },
+                { 4, 7, 6, 5 } } };
 
         static constexpr std::array< std::array< geode::local_index_t, 2 >, 12 >
             hexahedron_edge_vertices{ { { 0, 1 }, { 1, 2 }, { 2, 3 }, { 3, 0 },
