@@ -38,10 +38,8 @@ namespace geode
                 &convert_surface_mesh_into_triangulated_surface< 2 > )
             .def( "convert_surface_mesh_into_triangulated_surface3D",
                 &convert_surface_mesh_into_triangulated_surface< 3 > )
-            .def( "convert_regular_grid_into_triangulated_surface",
-                &convert_grid_into_triangulated_surface< RegularGrid2D > )
-            .def( "convert_light_regular_grid_into_triangulated_surface",
-                &convert_grid_into_triangulated_surface< LightRegularGrid2D > )
+            .def( "convert_grid_into_triangulated_surface",
+                &convert_grid_into_triangulated_surface )
             .def( "triangulate_surface_mesh2D",
                 static_cast< void ( * )( SurfaceMesh< 2 >& ) >(
                     &triangulate_surface_mesh< 2 > ) )
