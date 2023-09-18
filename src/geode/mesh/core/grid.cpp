@@ -182,8 +182,9 @@ namespace geode
             {
                 const auto diff = vertex_id[d] - cell_id[d];
                 OPENGEODE_EXCEPTION( diff == 0 || diff == 1,
-                    "[Grid::cell_local_vertex] vertex "
-                    "is not part of cell vertices." );
+                    "[Grid::cell_local_vertex] vertex [", vertex_id[0], ",",
+                    vertex_id[1], "] is not part of cell [", cell_id[0], ",",
+                    cell_id[1], "] vertices." );
                 result += diff * ( 1 << d );
             }
             return result;
