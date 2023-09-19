@@ -555,7 +555,7 @@ namespace geode
     /*!
      * Read and write interface for boolean variable attribute storage.
      * This class removes the custom storage use by the STL for
-     * std::vector<bool>.
+     * std::vector of bool.
      */
     template <>
     class VariableAttribute< bool > : public ReadOnlyAttribute< bool >
