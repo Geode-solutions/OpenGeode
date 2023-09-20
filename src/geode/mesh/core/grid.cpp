@@ -435,7 +435,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    Grid< dimension >::Grid( Grid&& other ) : impl_( std::move( other.impl_ ) )
+    Grid< dimension >::Grid( Grid&& other )
+        : CellArray< dimension >( std::move( other ) ),
+          impl_( std::move( other.impl_ ) )
     {
     }
 
