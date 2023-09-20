@@ -88,6 +88,7 @@ namespace geode
     template < index_t dimension >
     LightRegularGrid< dimension >::LightRegularGrid( LightRegularGrid&& other )
         : Grid< dimension >( std::move( other ) ),
+          Identifier( std::move( other ) ),
           impl_( std::move( other.impl_ ) )
     {
     }
