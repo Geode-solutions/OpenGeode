@@ -208,8 +208,12 @@ namespace geode
         if( surface.type_name()
             == RegularGrid< dimension >::type_name_static() )
         {
-            return create_triangulated_surface_from_grid(
+            auto result = create_triangulated_surface_from_grid(
                 dynamic_cast< const RegularGrid< dimension >& >( surface ) );
+            auto builder =
+                TriangulatedSurfaceBuilder< dimension >::create( *result );
+            detail::copy_meta_info( surface, *builder );
+            return result;
         }
         if( !all_polygons_are_simplex( surface ) )
         {

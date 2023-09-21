@@ -115,15 +115,12 @@ namespace
             }
         }
         builder.compute_polyhedron_adjacencies();
-        geode::detail::copy_attributes( grid.grid_vertex_attribute_manager(),
-            tet_solid.vertex_attribute_manager() );
         tet_solid.polyhedron_attribute_manager().import(
             grid.cell_attribute_manager(), old2new_mapping );
     }
 
     std::unique_ptr< geode::TetrahedralSolid3D >
-        create_tetrahedral_solid_from_grid(
-            const geode::LightRegularGrid3D& grid )
+        create_tetrahedral_solid_from_grid( const geode::Grid3D& grid )
     {
         auto tet_solid = geode::TetrahedralSolid3D::create();
         auto builder = geode::TetrahedralSolidBuilder3D::create( *tet_solid );
@@ -133,17 +130,8 @@ namespace
             builder->set_point(
                 v, grid.grid_point( grid.vertex_indices( v ) ) );
         }
-        create_tetrahedra_from_grid_cells( *tet_solid, *builder, grid );
-        return tet_solid;
-    }
-
-    std::unique_ptr< geode::TetrahedralSolid3D >
-        create_tetrahedral_solid_from_grid( const geode::RegularGrid3D& grid )
-    {
-        auto tet_solid = geode::TetrahedralSolid3D::create();
-        auto builder = geode::TetrahedralSolidBuilder3D::create( *tet_solid );
-        geode::detail::copy_meta_info( grid, *builder );
-        geode::detail::copy_points( grid, *builder );
+        geode::detail::copy_attributes( grid.grid_vertex_attribute_manager(),
+            tet_solid->vertex_attribute_manager() );
         create_tetrahedra_from_grid_cells( *tet_solid, *builder, grid );
         return tet_solid;
     }
@@ -216,8 +204,11 @@ namespace geode
         }
         if( solid.type_name() == RegularGrid3D::type_name_static() )
         {
-            return create_tetrahedral_solid_from_grid(
+            auto result = create_tetrahedral_solid_from_grid(
                 dynamic_cast< const RegularGrid3D& >( solid ) );
+            auto builder = geode::TetrahedralSolidBuilder3D::create( *result );
+            detail::copy_meta_info( solid, *builder );
+            return result;
         }
         if( !all_polyhedra_are_simplex( solid ) )
         {
@@ -260,9 +251,8 @@ namespace geode
         };
     }
 
-    template < class GridType >
     std::unique_ptr< TetrahedralSolid3D > convert_grid_into_tetrahedral_solid(
-        const GridType& grid )
+        const Grid3D& grid )
     {
         return create_tetrahedral_solid_from_grid( grid );
     }
@@ -330,9 +320,4 @@ namespace geode
         detail::SolidMeshMerger3D merger{ solids, global_epsilon };
         return merger.merge();
     }
-
-    template std::unique_ptr< TetrahedralSolid3D > opengeode_mesh_api
-        convert_grid_into_tetrahedral_solid( const LightRegularGrid3D& grid );
-    template std::unique_ptr< TetrahedralSolid3D > opengeode_mesh_api
-        convert_grid_into_tetrahedral_solid( const RegularGrid3D& grid );
 } // namespace geode
