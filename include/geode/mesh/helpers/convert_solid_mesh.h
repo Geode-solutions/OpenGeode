@@ -31,9 +31,11 @@
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( SolidMesh );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Grid );
     FORWARD_DECLARATION_DIMENSION_CLASS( TetrahedralSolid );
     FORWARD_DECLARATION_DIMENSION_CLASS( HybridSolid );
     ALIAS_3D( SolidMesh );
+    ALIAS_3D( Grid );
     ALIAS_3D( TetrahedralSolid );
     ALIAS_3D( HybridSolid );
 } // namespace geode
@@ -43,9 +45,8 @@ namespace geode
     absl::optional< std::unique_ptr< TetrahedralSolid3D > > opengeode_mesh_api
         convert_solid_mesh_into_tetrahedral_solid( const SolidMesh3D& solid );
 
-    template < class GridType >
-    std::unique_ptr< TetrahedralSolid3D > convert_grid_into_tetrahedral_solid(
-        const GridType& grid );
+    std::unique_ptr< TetrahedralSolid3D > opengeode_mesh_api
+        convert_grid_into_tetrahedral_solid( const Grid3D& grid );
 
     absl::optional< std::unique_ptr< HybridSolid3D > > opengeode_mesh_api
         convert_solid_mesh_into_hybrid_solid( const SolidMesh3D& solid );
