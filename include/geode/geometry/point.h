@@ -236,7 +236,44 @@ namespace geode
             return dimension;
         }
     };
+
+    template < index_t dimension >
+    class OpenGeodePointException : public OpenGeodeException
+    {
+    public:
+        template < typename... Args >
+        explicit OpenGeodePointException(
+            Point< dimension > point_in, const Args &...message )
+            : OpenGeodeException{ absl::StrCat(
+                message..., " at ", point_in.string() ) },
+              point{ std::move( point_in ) }
+        {
+        }
+
+        Point< dimension > point;
+    };
+    ALIAS_1D_AND_2D_AND_3D( OpenGeodePointException );
 } // namespace geode
+
+// NOLINTNEXTLINE
+#define OPENGEODE_POINT_EXCEPTION( dimension, condition, point, ... )          \
+    if( ABSL_PREDICT_FALSE( !( condition ) ) )                                 \
+        throw geode::OpenGeodePointException< dimension >                      \
+        {                                                                      \
+            point, __VA_ARGS__                                                 \
+        }
+
+// NOLINTNEXTLINE
+#define OPENGEODE_POINT_EXCEPTION1D( condition, point, ... )                   \
+    OPENGEODE_POINT_EXCEPTION( 1, condition, point, __VA_ARGS__ )
+
+// NOLINTNEXTLINE
+#define OPENGEODE_POINT_EXCEPTION2D( condition, point, ... )                   \
+    OPENGEODE_POINT_EXCEPTION( 2, condition, point, __VA_ARGS__ )
+
+// NOLINTNEXTLINE
+#define OPENGEODE_POINT_EXCEPTION3D( condition, point, ... )                   \
+    OPENGEODE_POINT_EXCEPTION( 3, condition, point, __VA_ARGS__ )
 
 namespace std
 {
