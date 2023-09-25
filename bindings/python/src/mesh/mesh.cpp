@@ -46,6 +46,7 @@ namespace geode
     void define_solid_mesh( pybind11::module& );
     void define_solid_edges( pybind11::module& );
     void define_solid_facets( pybind11::module& );
+    void define_light_regular_grid( pybind11::module& );
     void define_regular_grid( pybind11::module& );
     void define_polyhedral_solid( pybind11::module& );
     void define_tetrahedral_solid( pybind11::module& );
@@ -125,6 +126,7 @@ PYBIND11_MODULE( opengeode_py_mesh, module )
     geode::define_solid_mesh( module );
     geode::define_solid_edges( module );
     geode::define_solid_facets( module );
+    geode::define_light_regular_grid( module );
     geode::define_regular_grid( module );
     geode::define_polyhedral_solid( module );
     geode::define_tetrahedral_solid( module );

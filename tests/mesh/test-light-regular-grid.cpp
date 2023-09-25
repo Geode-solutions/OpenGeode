@@ -98,11 +98,11 @@ void test_cell_index( const geode::LightRegularGrid3D& grid )
 
 void test_cell_on_border( const geode::LightRegularGrid3D& grid )
 {
-    OPENGEODE_EXCEPTION( grid.is_cell_on_border( { { 0, 0, 0 } } ),
+    OPENGEODE_EXCEPTION( grid.is_cell_on_border( { 0, 0, 0 } ),
         "[Test] Vertex is not on border where it should be." );
-    OPENGEODE_EXCEPTION( grid.is_cell_on_border( { { 4, 8, 13 } } ),
+    OPENGEODE_EXCEPTION( grid.is_cell_on_border( { 4, 8, 13 } ),
         "[Test] Vertex is not on border where it should be." );
-    OPENGEODE_EXCEPTION( !grid.is_cell_on_border( { { 1, 2, 3 } } ),
+    OPENGEODE_EXCEPTION( !grid.is_cell_on_border( { 1, 2, 3 } ),
         "[Test] Vertex is on border where it should not be." );
 }
 
@@ -174,11 +174,11 @@ void test_vertex_index( const geode::LightRegularGrid3D& grid )
 
 void test_vertex_on_border( const geode::LightRegularGrid3D& grid )
 {
-    OPENGEODE_EXCEPTION( grid.is_grid_vertex_on_border( { { 0, 0, 0 } } ),
+    OPENGEODE_EXCEPTION( grid.is_grid_vertex_on_border( { 0, 0, 0 } ),
         "[Test] Vertex is not on border where it should be." );
-    OPENGEODE_EXCEPTION( grid.is_grid_vertex_on_border( { { 0, 9, 0 } } ),
+    OPENGEODE_EXCEPTION( grid.is_grid_vertex_on_border( { 0, 9, 0 } ),
         "[Test] Vertex is not on border where it should be." );
-    OPENGEODE_EXCEPTION( !grid.is_grid_vertex_on_border( { { 1, 2, 3 } } ),
+    OPENGEODE_EXCEPTION( !grid.is_grid_vertex_on_border( { 1, 2, 3 } ),
         "[Test] Vertex is on border where it should not be." );
 }
 
