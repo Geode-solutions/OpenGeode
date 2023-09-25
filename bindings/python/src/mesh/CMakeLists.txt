@@ -46,6 +46,7 @@ add_geode_python_binding(
         "core/graph.cpp"
         "core/grid.cpp"
         "core/hybrid_solid.cpp"
+        "core/light_regular_grid.cpp"
         "core/point_set.cpp"
         "core/polygonal_surface.cpp"
         "core/polyhedral_solid.cpp"

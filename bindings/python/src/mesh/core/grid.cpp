@@ -63,7 +63,11 @@
         .def( "closest_vertex", &Grid##dimension##D::closest_vertex )          \
         .def( "cells", &Grid##dimension##D::cells )                            \
         .def( "cell_attribute_manager",                                        \
-            &Grid##dimension##D::cell_attribute_manager )                      \
+            &Grid##dimension##D::cell_attribute_manager,                       \
+            pybind11::return_value_policy::reference )                         \
+        .def( "grid_vertex_attribute_manager",                                 \
+            &Grid##dimension##D::grid_vertex_attribute_manager,                \
+            pybind11::return_value_policy::reference )                         \
         .def( "grid_bounding_box", &Grid##dimension##D::grid_bounding_box )
 
 namespace geode
