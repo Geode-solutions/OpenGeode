@@ -67,8 +67,8 @@ Code and API are fully documented inside the code itself.
 To check out our live documentation, visit [docs.geode-solutions.com](https://docs.geode-solutions.com).
 
 Installing OpenGeode is done:
- * either, by compiling the C++ source. Check [this documentation page](https://docs.geode-solutions.com/how-to-compile) for more details.
- * or, by using pip command ```pip install OpenGeode-core``` and add ```import opengeode``` in your Python script. Check [this documentation page](https://docs.geode-solutions.com/how-to-use-binding) for more details.
+ * either, by compiling the C++ source. Check [this documentation page](https://docs.geode-solutions.com/guides/how-to-compile) for more details.
+ * or, by using pip command ```pip install OpenGeode-core``` and add ```import opengeode``` in your Python script. Check [this documentation page](https://docs.geode-solutions.com/guides/how-to-use-binding) for more details.
 
 
 ## Questions
