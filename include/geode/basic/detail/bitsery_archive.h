@@ -77,6 +77,8 @@ namespace geode
                 context, "bool" );
             AttributeManager::register_attribute_type< int, Serializer >(
                 context, "int" );
+            AttributeManager::register_attribute_type< float, Serializer >(
+                context, "float" );
             AttributeManager::register_attribute_type< double, Serializer >(
                 context, "double" );
             AttributeManager::register_attribute_type< local_index_t,
