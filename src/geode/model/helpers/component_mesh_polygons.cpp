@@ -536,89 +536,98 @@ namespace
             unique_vertices, type );
     }
 
-    geode::BRepComponentMeshPolygons::SurfacePolygons surface_polygons(
-        const geode::BRep& model,
-        const geode::PolygonVertices& polygon_unique_vertices )
-    {
-        auto surface_pairs =
-            model_polygon_pairs( model, polygon_unique_vertices,
-                geode::Surface3D::component_type_static() );
-        if( surface_pairs.empty() )
-        {
-            return {};
-        }
-        geode::BRepComponentMeshPolygons::SurfacePolygons polygons;
-        polygons.reserve( surface_pairs.size() );
-        for( auto& surface_pair : surface_pairs )
-        {
-            const auto& surface = model.surface( surface_pair.first.id() );
-            const auto& mesh = surface.mesh();
-            for( auto& pair : surface_pair.second )
-            {
-                absl::c_sort( pair );
-                for( const auto& polygon_vertex :
-                    mesh.polygons_around_vertex( pair[0] ) )
-                {
-                    auto vertices =
-                        mesh.polygon_vertices( polygon_vertex.polygon_id );
-                    absl::c_sort( vertices );
-                    if( absl::c_equal( pair, vertices ) )
-                    {
-                        polygons[surface.id()].emplace_back(
-                            polygon_vertex.polygon_id );
-                        break;
-                    }
-                }
-            }
-        }
-        filter_polygons( polygons );
-        return polygons;
-    }
-
-    geode::BRepComponentMeshPolygons::BlockPolygons block_polygons(
-        const geode::BRep& model,
-        const geode::PolygonVertices& polygon_unique_vertices )
-    {
-        const auto block_pairs = model_polygon_pairs( model,
-            polygon_unique_vertices, geode::Block3D::component_type_static() );
-        if( block_pairs.empty() )
-        {
-            return {};
-        }
-        geode::BRepComponentMeshPolygons::BlockPolygons polygons;
-        polygons.reserve( block_pairs.size() );
-        for( const auto& block_pair : block_pairs )
-        {
-            const auto& block = model.block( block_pair.first.id() );
-            const auto& mesh = block.mesh();
-            for( const auto& pair : block_pair.second )
-            {
-                if( auto facet = mesh.polyhedron_facet_from_vertices( pair ) )
-                {
-                    polygons[block.id()].emplace_back(
-                        std::move( facet.value() ) );
-                }
-            }
-        }
-        filter_polygons( polygons );
-        return polygons;
-    }
-
     geode::BRepComponentMeshPolygons brep_component_mesh_polygons(
         const geode::BRep& brep,
         const geode::PolygonVertices& polygon_unique_vertices )
     {
         geode::BRepComponentMeshPolygons polygons;
         polygons.surface_polygons =
-            surface_polygons( brep, polygon_unique_vertices );
-        polygons.block_polygons =
-            block_polygons( brep, polygon_unique_vertices );
+            geode::detail::surface_component_mesh_polygons(
+                brep, polygon_unique_vertices );
+        polygons.block_polygons = geode::detail::block_component_mesh_polygons(
+            brep, polygon_unique_vertices );
         return polygons;
     }
 } // namespace
 
 namespace geode
 {
+    namespace detail
+    {
+        BRepComponentMeshPolygons::SurfacePolygons
+            surface_component_mesh_polygons( const BRep& model,
+                const PolygonVertices& polygon_unique_vertices )
+        {
+            auto surface_pairs = model_polygon_pairs( model,
+                polygon_unique_vertices, Surface3D::component_type_static() );
+            if( surface_pairs.empty() )
+            {
+                return {};
+            }
+            BRepComponentMeshPolygons::SurfacePolygons polygons;
+            polygons.reserve( surface_pairs.size() );
+            for( auto& surface_pair : surface_pairs )
+            {
+                const auto& surface = model.surface( surface_pair.first.id() );
+                const auto& mesh = surface.mesh();
+                for( auto& pair : surface_pair.second )
+                {
+                    absl::c_sort( pair );
+                    for( const auto& polygon_vertex :
+                        mesh.polygons_around_vertex( pair[0] ) )
+                    {
+                        auto vertices =
+                            mesh.polygon_vertices( polygon_vertex.polygon_id );
+                        absl::c_sort( vertices );
+                        if( absl::c_equal( pair, vertices ) )
+                        {
+                            polygons[surface.id()].emplace_back(
+                                polygon_vertex.polygon_id );
+                            break;
+                        }
+                    }
+                }
+            }
+            filter_polygons( polygons );
+            return polygons;
+        }
+
+        BRepComponentMeshPolygons::BlockPolygons block_component_mesh_polygons(
+            const BRep& model, const PolygonVertices& polygon_unique_vertices )
+        {
+            const auto block_pairs = model_polygon_pairs( model,
+                polygon_unique_vertices, Block3D::component_type_static() );
+            if( block_pairs.empty() )
+            {
+                return {};
+            }
+            BRepComponentMeshPolygons::BlockPolygons polygons;
+            polygons.reserve( block_pairs.size() );
+            for( const auto& block_pair : block_pairs )
+            {
+                const auto& block = model.block( block_pair.first.id() );
+                const auto& mesh = block.mesh();
+                for( const auto& pair : block_pair.second )
+                {
+                    if( auto facet =
+                            mesh.polyhedron_facet_from_vertices( pair ) )
+                    {
+                        polygons[block.id()].emplace_back(
+                            std::move( facet.value() ) );
+                        if( auto adj = mesh.polyhedron_adjacent_facet(
+                                facet.value() ) )
+                        {
+                            polygons[block.id()].emplace_back(
+                                std::move( adj.value() ) );
+                        }
+                    }
+                }
+            }
+            filter_polygons( polygons );
+            return polygons;
+        }
+    } // namespace detail
+
     PolygonVertices polygon_unique_vertices(
         const BRep& model, const Block3D& block, const PolyhedronFacet& facet )
     {
