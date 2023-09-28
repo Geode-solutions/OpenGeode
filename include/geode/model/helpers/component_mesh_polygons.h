@@ -176,4 +176,15 @@ namespace geode
             const Surface2D& surface,
             const Line2D& line,
             index_t edge_id );
+
+    namespace detail
+    {
+        BRepComponentMeshPolygons::SurfacePolygons opengeode_model_api
+            surface_component_mesh_polygons( const BRep& model,
+                const PolygonVertices& polygon_unique_vertices );
+
+        BRepComponentMeshPolygons::BlockPolygons opengeode_model_api
+            block_component_mesh_polygons( const BRep& brep,
+                const PolygonVertices& polygon_unique_vertices );
+    } // namespace detail
 } // namespace geode
