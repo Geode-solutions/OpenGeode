@@ -48,3 +48,12 @@ CheckOptions:
     value: 10
   - key: readability-function-size.ParameterThreshold
     value: 4
+  - key: misc-include-cleaner.IgnoreHeaders
+    value:  '
+            math.h;
+            geode/.*_export\.h;
+            geode/.*/common\.h;
+            geode/basic/types\.h;
+            geode/basic/assert\.h;
+            '
+
