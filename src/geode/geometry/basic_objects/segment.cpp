@@ -31,7 +31,7 @@ namespace geode
     template < typename PointType, index_t dimension >
     GenericSegment< PointType, dimension >::GenericSegment(
         PointType point0, PointType point1 ) noexcept
-        : vertices_{ { std::move( point0 ), std::move( point1 ) } }
+        : vertices_{ { point0, point1 } }
     {
     }
     template < typename PointType, index_t dimension >
@@ -96,7 +96,7 @@ namespace geode
     void GenericSegment< PointType, dimension >::set_point(
         index_t vertex, PointType point )
     {
-        vertices_[vertex] = std::move( point );
+        vertices_[vertex] = point;
     }
     template < typename PointType, index_t dimension >
     const std::array< PointType, 2 >&
@@ -119,7 +119,7 @@ namespace geode
     template < index_t dimension >
     OwnerSegment< dimension >::OwnerSegment(
         Point< dimension > point0, Point< dimension > point1 ) noexcept
-        : Base( std::move( point0 ), std::move( point1 ) )
+        : Base( point0, point1 )
     {
     }
     template < index_t dimension >

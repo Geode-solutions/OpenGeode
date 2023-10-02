@@ -32,8 +32,7 @@ namespace geode
         PointType point1,
         PointType point2,
         PointType point3 ) noexcept
-        : vertices_{ { std::move( point0 ), std::move( point1 ),
-            std::move( point2 ), std::move( point3 ) } }
+        : vertices_{ { point0, point1, point2, point3 } }
     {
     }
     template < typename PointType >
@@ -75,7 +74,7 @@ namespace geode
     void GenericTetrahedron< PointType >::set_point(
         index_t vertex, PointType point )
     {
-        vertices_[vertex] = std::move( point );
+        vertices_[vertex] = point;
     }
     template < typename PointType >
     const std::array< PointType, 4 >&
@@ -98,16 +97,11 @@ namespace geode
         Point3D point1,
         Point3D point2,
         Point3D point3 ) noexcept
-        : Base( std::move( point0 ),
-            std::move( point1 ),
-            std::move( point2 ),
-            std::move( point3 ) )
+        : Base( point0, point1, point2, point3 )
     {
     }
     OwnerTetrahedron::OwnerTetrahedron( const OwnerTetrahedron& other ) noexcept
-        : Base( other )
-    {
-    }
+        : = default;
     OwnerTetrahedron& OwnerTetrahedron::operator=(
         const OwnerTetrahedron& other ) noexcept
     {
@@ -115,7 +109,7 @@ namespace geode
         return *this;
     }
     OwnerTetrahedron::OwnerTetrahedron( OwnerTetrahedron&& other ) noexcept
-        : Base( other )
+        : Base( std::move( other ) )
     {
     }
     OwnerTetrahedron& OwnerTetrahedron::operator=(
@@ -132,10 +126,7 @@ namespace geode
         : Base( point0, point1, point2, point3 )
     {
     }
-    Tetrahedron::Tetrahedron( const Tetrahedron& other ) noexcept
-        : Base( other )
-    {
-    }
+    Tetrahedron::Tetrahedron( const Tetrahedron& other ) noexcept : = default;
     Tetrahedron::Tetrahedron( const OwnerTetrahedron& other ) noexcept
         : Base( other.vertices()[0],
             other.vertices()[1],
@@ -143,12 +134,12 @@ namespace geode
             other.vertices()[3] )
     {
     }
-    Tetrahedron& Tetrahedron::operator=( const Tetrahedron& other ) noexcept
+    Tetrahedron& Tetrahedron::operator=(
+        const Tetrahedron& other ) noexcept = default;
+    Tetrahedron::Tetrahedron( Tetrahedron&& other ) noexcept
+        : Base( std::move( other ) )
     {
-        Base::operator=( other );
-        return *this;
     }
-    Tetrahedron::Tetrahedron( Tetrahedron&& other ) noexcept : Base( other ) {}
     Tetrahedron& Tetrahedron::operator=( Tetrahedron&& other ) noexcept
     {
         Base::operator=( other );
