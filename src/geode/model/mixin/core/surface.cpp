@@ -35,8 +35,7 @@
 namespace geode
 {
     template < index_t dimension >
-    class Surface< dimension >::Impl
-        : public detail::MeshStorage< SurfaceMesh< dimension > >
+    class Surface< dimension >::Impl : public detail::MeshStorage< Mesh >
     {
     private:
         friend class bitsery::Access;
@@ -46,8 +45,7 @@ namespace geode
             archive.ext( *this, Growable< Archive, Impl >{ { []( Archive& a,
                                                                  Impl& impl ) {
                 a.ext( impl,
-                    bitsery::ext::BaseClass<
-                        detail::MeshStorage< SurfaceMesh< dimension > > >{} );
+                    bitsery::ext::BaseClass< detail::MeshStorage< Mesh > >{} );
             } } } );
         }
     };
@@ -73,17 +71,17 @@ namespace geode
     template < index_t dimension >
     Surface< dimension >::Surface( const MeshImpl& impl )
     {
-        impl_->set_mesh( this->id(), SurfaceMesh< dimension >::create( impl ) );
+        impl_->set_mesh( this->id(), Mesh::create( impl ) );
     }
 
     template < index_t dimension >
-    const SurfaceMesh< dimension >& Surface< dimension >::get_mesh() const
+    auto Surface< dimension >::get_mesh() const -> const Mesh&
     {
         return impl_->mesh();
     }
 
     template < index_t dimension >
-    SurfaceMesh< dimension >& Surface< dimension >::get_modifiable_mesh()
+    auto Surface< dimension >::get_modifiable_mesh() -> Mesh&
     {
         return impl_->modifiable_mesh();
     }
@@ -118,14 +116,14 @@ namespace geode
 
     template < index_t dimension >
     void Surface< dimension >::set_mesh(
-        std::unique_ptr< SurfaceMesh< dimension > > mesh, SurfacesKey )
+        std::unique_ptr< Mesh > mesh, SurfacesKey )
     {
         impl_->set_mesh( this->id(), std::move( mesh ) );
     }
 
     template < index_t dimension >
     void Surface< dimension >::set_mesh(
-        std::unique_ptr< SurfaceMesh< dimension > > mesh, SurfacesBuilderKey )
+        std::unique_ptr< Mesh > mesh, SurfacesBuilderKey )
     {
         impl_->set_mesh( this->id(), std::move( mesh ) );
     }

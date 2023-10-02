@@ -54,6 +54,8 @@ namespace geode
         friend class bitsery::Access;
 
     public:
+        using Mesh = SolidMesh< dimension >;
+
         Block( Block&& other ) noexcept;
         ~Block();
 
@@ -72,18 +74,18 @@ namespace geode
             return { this->component_type_static(), this->id() };
         };
 
-        template < typename Mesh = SolidMesh< dimension > >
-        const Mesh& mesh() const
+        template < typename TypedMesh = Mesh >
+        const TypedMesh& mesh() const
         {
-            return dynamic_cast< const Mesh& >( get_mesh() );
+            return dynamic_cast< const TypedMesh& >( get_mesh() );
         }
 
         const MeshImpl& mesh_type() const;
 
-        template < typename Mesh = SolidMesh< dimension > >
-        Mesh& modifiable_mesh( BlocksKey )
+        template < typename TypedMesh = Mesh >
+        TypedMesh& modifiable_mesh( BlocksKey )
         {
-            return dynamic_cast< Mesh& >( get_modifiable_mesh() );
+            return dynamic_cast< TypedMesh& >( get_modifiable_mesh() );
         }
 
     public:
@@ -91,16 +93,14 @@ namespace geode
 
         Block( const MeshImpl& impl, BlocksKey ) : Block( impl ) {}
 
-        void set_mesh(
-            std::unique_ptr< SolidMesh< dimension > > mesh, BlocksKey );
+        void set_mesh( std::unique_ptr< Mesh > mesh, BlocksKey );
 
-        void set_mesh(
-            std::unique_ptr< SolidMesh< dimension > > mesh, BlocksBuilderKey );
+        void set_mesh( std::unique_ptr< Mesh > mesh, BlocksBuilderKey );
 
-        template < typename Mesh = SolidMesh< dimension > >
-        Mesh& modifiable_mesh( BlocksBuilderKey )
+        template < typename TypedMesh = Mesh >
+        TypedMesh& modifiable_mesh( BlocksBuilderKey )
         {
-            return dynamic_cast< Mesh& >( get_modifiable_mesh() );
+            return dynamic_cast< TypedMesh& >( get_modifiable_mesh() );
         }
 
         void set_block_name( absl::string_view name, BlocksBuilderKey )
@@ -113,9 +113,9 @@ namespace geode
 
         explicit Block( const MeshImpl& impl );
 
-        SolidMesh< dimension >& get_modifiable_mesh();
+        Mesh& get_modifiable_mesh();
 
-        const SolidMesh< dimension >& get_mesh() const;
+        const Mesh& get_mesh() const;
 
         template < typename Archive >
         void serialize( Archive& archive );

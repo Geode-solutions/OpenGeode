@@ -53,6 +53,8 @@ namespace geode
         friend class bitsery::Access;
 
     public:
+        using Mesh = PointSet< dimension >;
+
         Corner( Corner&& other ) noexcept;
         ~Corner();
 
@@ -71,9 +73,9 @@ namespace geode
             return { this->component_type_static(), this->id() };
         };
 
-        const PointSet< dimension >& mesh() const;
+        const Mesh& mesh() const;
 
-        PointSet< dimension >& modifiable_mesh( CornersKey )
+        Mesh& modifiable_mesh( CornersKey )
         {
             return modifiable_mesh();
         }
@@ -85,18 +87,16 @@ namespace geode
 
         Corner( const MeshImpl& impl, CornersKey ) : Corner( impl ) {}
 
-        void set_mesh(
-            std::unique_ptr< PointSet< dimension > > mesh, CornersKey );
+        void set_mesh( std::unique_ptr< Mesh > mesh, CornersKey );
 
-        void set_mesh(
-            std::unique_ptr< PointSet< dimension > > mesh, CornersBuilderKey );
+        void set_mesh( std::unique_ptr< Mesh > mesh, CornersBuilderKey );
 
         void set_corner_name( absl::string_view name, CornersBuilderKey )
         {
             this->set_name( name );
         }
 
-        PointSet< dimension >& modifiable_mesh( CornersBuilderKey )
+        Mesh& modifiable_mesh( CornersBuilderKey )
         {
             return modifiable_mesh();
         }
@@ -106,7 +106,7 @@ namespace geode
 
         explicit Corner( const MeshImpl& impl );
 
-        PointSet< dimension >& modifiable_mesh();
+        Mesh& modifiable_mesh();
 
         template < typename Archive >
         void serialize( Archive& archive );

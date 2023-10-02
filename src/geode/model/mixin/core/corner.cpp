@@ -35,20 +35,18 @@
 namespace geode
 {
     template < index_t dimension >
-    class Corner< dimension >::Impl
-        : public detail::MeshStorage< PointSet< dimension > >
+    class Corner< dimension >::Impl : public detail::MeshStorage< Mesh >
     {
     private:
         friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this,
-                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.ext( impl,
-                        bitsery::ext::BaseClass<
-                            detail::MeshStorage< PointSet< dimension > > >{} );
-                } } } );
+            archive.ext( *this, Growable< Archive, Impl >{ { []( Archive& a,
+                                                                 Impl& impl ) {
+                a.ext( impl,
+                    bitsery::ext::BaseClass< detail::MeshStorage< Mesh > >{} );
+            } } } );
         }
     };
 
@@ -59,8 +57,7 @@ namespace geode
 
     template < index_t dimension >
     Corner< dimension >::Corner()
-        : Corner( MeshFactory::default_impl(
-            PointSet< dimension >::type_name_static() ) )
+        : Corner( MeshFactory::default_impl( Mesh::type_name_static() ) )
     {
     }
 
@@ -74,17 +71,17 @@ namespace geode
     template < index_t dimension >
     Corner< dimension >::Corner( const MeshImpl& impl )
     {
-        impl_->set_mesh( this->id(), PointSet< dimension >::create( impl ) );
+        impl_->set_mesh( this->id(), Mesh::create( impl ) );
     }
 
     template < index_t dimension >
-    const PointSet< dimension >& Corner< dimension >::mesh() const
+    auto Corner< dimension >::mesh() const -> const Mesh&
     {
         return impl_->mesh();
     }
 
     template < index_t dimension >
-    PointSet< dimension >& Corner< dimension >::modifiable_mesh()
+    auto Corner< dimension >::modifiable_mesh() -> Mesh&
     {
         return impl_->modifiable_mesh();
     }
@@ -117,14 +114,14 @@ namespace geode
 
     template < index_t dimension >
     void Corner< dimension >::set_mesh(
-        std::unique_ptr< PointSet< dimension > > mesh, CornersKey )
+        std::unique_ptr< Mesh > mesh, CornersKey )
     {
         impl_->set_mesh( this->id(), std::move( mesh ) );
     }
 
     template < index_t dimension >
     void Corner< dimension >::set_mesh(
-        std::unique_ptr< PointSet< dimension > > mesh, CornersBuilderKey )
+        std::unique_ptr< Mesh > mesh, CornersBuilderKey )
     {
         impl_->set_mesh( this->id(), std::move( mesh ) );
     }

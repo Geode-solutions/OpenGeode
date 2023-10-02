@@ -34,8 +34,7 @@
 namespace geode
 {
     template < index_t dimension >
-    class Line< dimension >::Impl
-        : public detail::MeshStorage< EdgedCurve< dimension > >
+    class Line< dimension >::Impl : public detail::MeshStorage< Mesh >
     {
     private:
         friend class bitsery::Access;
@@ -45,8 +44,7 @@ namespace geode
             archive.ext( *this, Growable< Archive, Impl >{ { []( Archive& a,
                                                                  Impl& impl ) {
                 a.ext( impl,
-                    bitsery::ext::BaseClass<
-                        detail::MeshStorage< EdgedCurve< dimension > > >{} );
+                    bitsery::ext::BaseClass< detail::MeshStorage< Mesh > >{} );
             } } } );
         }
     };
@@ -58,8 +56,7 @@ namespace geode
 
     template < index_t dimension >
     Line< dimension >::Line()
-        : Line( MeshFactory::default_impl(
-            EdgedCurve< dimension >::type_name_static() ) )
+        : Line( MeshFactory::default_impl( Mesh::type_name_static() ) )
     {
     }
 
@@ -73,17 +70,17 @@ namespace geode
     template < index_t dimension >
     Line< dimension >::Line( const MeshImpl& impl )
     {
-        impl_->set_mesh( this->id(), EdgedCurve< dimension >::create( impl ) );
+        impl_->set_mesh( this->id(), Mesh::create( impl ) );
     }
 
     template < index_t dimension >
-    const EdgedCurve< dimension >& Line< dimension >::mesh() const
+    auto Line< dimension >::mesh() const -> const Mesh&
     {
         return impl_->mesh();
     }
 
     template < index_t dimension >
-    EdgedCurve< dimension >& Line< dimension >::modifiable_mesh()
+    auto Line< dimension >::modifiable_mesh() -> Mesh&
     {
         return impl_->modifiable_mesh();
     }
@@ -115,15 +112,14 @@ namespace geode
     }
 
     template < index_t dimension >
-    void Line< dimension >::set_mesh(
-        std::unique_ptr< EdgedCurve< dimension > > mesh, LinesKey )
+    void Line< dimension >::set_mesh( std::unique_ptr< Mesh > mesh, LinesKey )
     {
         impl_->set_mesh( this->id(), std::move( mesh ) );
     }
 
     template < index_t dimension >
     void Line< dimension >::set_mesh(
-        std::unique_ptr< EdgedCurve< dimension > > mesh, LinesBuilderKey )
+        std::unique_ptr< Mesh > mesh, LinesBuilderKey )
     {
         impl_->set_mesh( this->id(), std::move( mesh ) );
     }

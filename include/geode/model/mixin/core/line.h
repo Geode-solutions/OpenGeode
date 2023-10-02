@@ -53,6 +53,8 @@ namespace geode
         friend class bitsery::Access;
 
     public:
+        using Mesh = EdgedCurve< dimension >;
+
         Line( Line&& other ) noexcept;
         ~Line();
 
@@ -71,11 +73,11 @@ namespace geode
             return { this->component_type_static(), this->id() };
         };
 
-        const EdgedCurve< dimension >& mesh() const;
+        const Mesh& mesh() const;
 
         const MeshImpl& mesh_type() const;
 
-        EdgedCurve< dimension >& modifiable_mesh( LinesKey )
+        Mesh& modifiable_mesh( LinesKey )
         {
             return modifiable_mesh();
         }
@@ -86,17 +88,17 @@ namespace geode
         Line( const MeshImpl& impl, LinesKey ) : Line( impl ) {}
 
         void set_mesh(
-            std::unique_ptr< EdgedCurve< dimension > > mesh, LinesKey );
+            std::unique_ptr< Mesh > mesh, LinesKey );
 
         void set_mesh(
-            std::unique_ptr< EdgedCurve< dimension > > mesh, LinesBuilderKey );
+            std::unique_ptr< Mesh > mesh, LinesBuilderKey );
 
         void set_line_name( absl::string_view name, LinesBuilderKey )
         {
             this->set_name( name );
         }
 
-        EdgedCurve< dimension >& modifiable_mesh( LinesBuilderKey )
+        Mesh& modifiable_mesh( LinesBuilderKey )
         {
             return modifiable_mesh();
         }
@@ -106,7 +108,7 @@ namespace geode
 
         explicit Line( const MeshImpl& impl );
 
-        EdgedCurve< dimension >& modifiable_mesh();
+        Mesh& modifiable_mesh();
 
         template < typename Archive >
         void serialize( Archive& archive );

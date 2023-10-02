@@ -35,20 +35,18 @@
 namespace geode
 {
     template < index_t dimension >
-    class Block< dimension >::Impl
-        : public detail::MeshStorage< SolidMesh< dimension > >
+    class Block< dimension >::Impl : public detail::MeshStorage< Mesh >
     {
     private:
         friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this,
-                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.ext( impl,
-                        bitsery::ext::BaseClass<
-                            detail::MeshStorage< SolidMesh< dimension > > >{} );
-                } } } );
+            archive.ext( *this, Growable< Archive, Impl >{ { []( Archive& a,
+                                                                 Impl& impl ) {
+                a.ext( impl,
+                    bitsery::ext::BaseClass< detail::MeshStorage< Mesh > >{} );
+            } } } );
         }
     };
 
@@ -69,7 +67,7 @@ namespace geode
     template < index_t dimension >
     Block< dimension >::Block( const MeshImpl& impl )
     {
-        impl_->set_mesh( this->id(), SolidMesh< dimension >::create( impl ) );
+        impl_->set_mesh( this->id(), Mesh::create( impl ) );
     }
 
     template < index_t dimension >
@@ -78,13 +76,13 @@ namespace geode
     }
 
     template < index_t dimension >
-    const SolidMesh< dimension >& Block< dimension >::get_mesh() const
+    auto Block< dimension >::get_mesh() const -> const Mesh&
     {
         return impl_->mesh();
     }
 
     template < index_t dimension >
-    SolidMesh< dimension >& Block< dimension >::get_modifiable_mesh()
+    auto Block< dimension >::get_modifiable_mesh() -> Mesh&
     {
         return impl_->modifiable_mesh();
     }
@@ -118,15 +116,14 @@ namespace geode
     }
 
     template < index_t dimension >
-    void Block< dimension >::set_mesh(
-        std::unique_ptr< SolidMesh< dimension > > mesh, BlocksKey )
+    void Block< dimension >::set_mesh( std::unique_ptr< Mesh > mesh, BlocksKey )
     {
         impl_->set_mesh( this->id(), std::move( mesh ) );
     }
 
     template < index_t dimension >
     void Block< dimension >::set_mesh(
-        std::unique_ptr< SolidMesh< dimension > > mesh, BlocksBuilderKey )
+        std::unique_ptr< Mesh > mesh, BlocksBuilderKey )
     {
         impl_->set_mesh( this->id(), std::move( mesh ) );
     }
