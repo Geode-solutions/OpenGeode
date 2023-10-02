@@ -96,8 +96,7 @@ namespace geode
     template < typename PointType, index_t dimension >
     GenericTriangle< PointType, dimension >::GenericTriangle(
         PointType point0, PointType point1, PointType point2 ) noexcept
-        : vertices_{ { std::move( point0 ), std::move( point1 ),
-            std::move( point2 ) } }
+        : vertices_{ { point0, point1, point2 } }
     {
     }
 
@@ -241,7 +240,7 @@ namespace geode
     void GenericTriangle< PointType, dimension >::set_point(
         index_t vertex, PointType point )
     {
-        vertices_[vertex] = std::move( point );
+        vertices_[vertex] = point;
     }
 
     template < typename PointType, index_t dimension >
@@ -267,7 +266,7 @@ namespace geode
     OwnerTriangle< dimension >::OwnerTriangle( Point< dimension > point0,
         Point< dimension > point1,
         Point< dimension > point2 ) noexcept
-        : Base( std::move( point0 ), std::move( point1 ), std::move( point2 ) )
+        : Base( point0, point1, point2 )
     {
     }
     template < index_t dimension >
