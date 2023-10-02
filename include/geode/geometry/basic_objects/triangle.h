@@ -45,7 +45,8 @@ namespace geode
     class GenericTriangle
     {
     public:
-        GenericTriangle( PointType p0, PointType p1, PointType p2 ) noexcept;
+        GenericTriangle(
+            PointType point0, PointType point1, PointType point2 ) noexcept;
 
         GenericTriangle(
             const GenericTriangle< PointType, dimension >& other ) noexcept;
@@ -88,9 +89,9 @@ namespace geode
         using Base = GenericTriangle< Point< dimension >, dimension >;
 
     public:
-        explicit OwnerTriangle( Point< dimension > p0,
-            Point< dimension > p1,
-            Point< dimension > p2 ) noexcept;
+        explicit OwnerTriangle( Point< dimension > point0,
+            Point< dimension > point1,
+            Point< dimension > point2 ) noexcept;
 
         OwnerTriangle( const OwnerTriangle< dimension >& other ) noexcept;
         OwnerTriangle< dimension >& operator=(
@@ -106,9 +107,9 @@ namespace geode
         using Base = GenericTriangle< RefPoint< dimension >, dimension >;
 
     public:
-        Triangle( const Point< dimension >& p0,
-            const Point< dimension >& p1,
-            const Point< dimension >& p2 ) noexcept;
+        Triangle( const Point< dimension >& point0,
+            const Point< dimension >& point1,
+            const Point< dimension >& point2 ) noexcept;
 
         Triangle( const Triangle< dimension >& other ) noexcept;
         Triangle( const OwnerTriangle< dimension >& other ) noexcept;

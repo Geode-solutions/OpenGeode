@@ -49,8 +49,10 @@ namespace geode
             tetrahedron_facet_vertex{ { { { 1, 3, 2 } }, { { 0, 2, 3 } },
                 { { 3, 1, 0 } }, { { 0, 1, 2 } } } };
 
-        GenericTetrahedron(
-            PointType p0, PointType p1, PointType p2, PointType p3 ) noexcept;
+        GenericTetrahedron( PointType point0,
+            PointType point1,
+            PointType point2,
+            PointType point3 ) noexcept;
 
         GenericTetrahedron( const GenericTetrahedron& other ) noexcept;
         GenericTetrahedron& operator=(
@@ -73,8 +75,10 @@ namespace geode
         using Base = GenericTetrahedron< Point3D >;
 
     public:
-        explicit OwnerTetrahedron(
-            Point3D p0, Point3D p1, Point3D p2, Point3D p3 ) noexcept;
+        explicit OwnerTetrahedron( Point3D point0,
+            Point3D point1,
+            Point3D point2,
+            Point3D point3 ) noexcept;
 
         OwnerTetrahedron( const OwnerTetrahedron& other ) noexcept;
         OwnerTetrahedron& operator=( const OwnerTetrahedron& other ) noexcept;
@@ -88,10 +92,10 @@ namespace geode
         using Base = GenericTetrahedron< RefPoint3D >;
 
     public:
-        Tetrahedron( const Point3D& p0,
-            const Point3D& p1,
-            const Point3D& p2,
-            const Point3D& p3 ) noexcept;
+        Tetrahedron( const Point3D& point0,
+            const Point3D& point1,
+            const Point3D& point2,
+            const Point3D& point3 ) noexcept;
 
         Tetrahedron( const Tetrahedron& other ) noexcept;
         Tetrahedron( const OwnerTetrahedron& other ) noexcept;

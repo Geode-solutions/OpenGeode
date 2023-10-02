@@ -42,7 +42,7 @@ namespace geode
     class GenericSegment
     {
     public:
-        GenericSegment( PointType p0, PointType p1 ) noexcept;
+        GenericSegment( PointType point0, PointType point1 ) noexcept;
 
         GenericSegment(
             const GenericSegment< PointType, dimension >& other ) noexcept;
@@ -72,7 +72,7 @@ namespace geode
 
     public:
         explicit OwnerSegment(
-            Point< dimension > p0, Point< dimension > p1 ) noexcept;
+            Point< dimension > point0, Point< dimension > point1 ) noexcept;
 
         OwnerSegment( const OwnerSegment< dimension >& other ) noexcept;
         OwnerSegment< dimension >& operator=(
@@ -89,8 +89,8 @@ namespace geode
         using Base = GenericSegment< RefPoint< dimension >, dimension >;
 
     public:
-        Segment( const Point< dimension >& p0,
-            const Point< dimension >& p1 ) noexcept;
+        Segment( const Point< dimension >& point0,
+            const Point< dimension >& point1 ) noexcept;
 
         Segment( const Segment< dimension >& other ) noexcept;
         Segment( const OwnerSegment< dimension >& other ) noexcept;

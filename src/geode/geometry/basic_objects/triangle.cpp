@@ -77,11 +77,11 @@ namespace
 
     bool check_right( const PivotNormalResult& result_left,
         const geode::Point3D& new_point,
-        const geode::Point3D& p1,
-        const geode::Point3D& p2 )
+        const geode::Point3D& point1,
+        const geode::Point3D& point2 )
     {
         const auto result_right =
-            simple_pivot_and_normal( { new_point, p1, p2 } );
+            simple_pivot_and_normal( { new_point, point1, point2 } );
         if( !result_right || result_right->pivot == geode::NO_LID )
         {
             return false;
@@ -95,8 +95,9 @@ namespace geode
 {
     template < typename PointType, index_t dimension >
     GenericTriangle< PointType, dimension >::GenericTriangle(
-        PointType p0, PointType p1, PointType p2 ) noexcept
-        : vertices_{ { std::move( p0 ), std::move( p1 ), std::move( p2 ) } }
+        PointType point0, PointType point1, PointType point2 ) noexcept
+        : vertices_{ { std::move( point0 ), std::move( point1 ),
+            std::move( point2 ) } }
     {
     }
 
@@ -136,10 +137,10 @@ namespace geode
     Point< dimension >
         GenericTriangle< PointType, dimension >::barycenter() const
     {
-        const Point< dimension >& p0 = vertices_[0];
-        const Point< dimension >& p1 = vertices_[1];
-        const Point< dimension >& p2 = vertices_[2];
-        return ( p0 + p1 + p2 ) / 3.;
+        const Point< dimension >& point0 = vertices_[0];
+        const Point< dimension >& point1 = vertices_[1];
+        const Point< dimension >& point2 = vertices_[2];
+        return ( point0 + point1 + point2 ) / 3.;
     }
 
     template < typename PointType, index_t dimension >
@@ -211,24 +212,25 @@ namespace geode
         const auto max = absl::c_max_element( result->lengths );
         const local_index_t longest_e =
             std::distance( result->lengths.begin(), max );
-        const Point3D& p0 = vertices_[longest_e];
+        const Point3D& point0 = vertices_[longest_e];
         const auto e1 = longest_e == 2 ? 0 : longest_e + 1;
-        const Point3D& p1 = vertices_[e1];
+        const Point3D& point1 = vertices_[e1];
         const auto e2 = e1 == 2 ? 0 : e1 + 1;
-        const Point3D& p2 = vertices_[e2];
-        if( point_segment_distance( p2, { p0, p1 } ) > global_epsilon )
+        const Point3D& point2 = vertices_[e2];
+        if( point_segment_distance( point2, { point0, point1 } )
+            > global_epsilon )
         {
             const auto ratio = result->lengths[e2]
                                / ( result->lengths[e2] + result->lengths[e1] );
-            const auto new_point = p0 * ( 1. - ratio ) + p1 * ratio;
+            const auto new_point = point0 * ( 1. - ratio ) + point1 * ratio;
             const auto result_left =
-                simple_pivot_and_normal( { p0, new_point, p2 } );
+                simple_pivot_and_normal( { point0, new_point, point2 } );
             if( !result_left || result_left->pivot == NO_LID )
             {
                 return absl::nullopt;
             }
             OPENGEODE_ASSERT(
-                check_right( result_left.value(), new_point, p1, p2 ),
+                check_right( result_left.value(), new_point, point1, point2 ),
                 "[Triangle::pivot_and_normal] Wrong sub-triangle computation" );
             return std::make_pair( e2, result_left->normal );
         }
@@ -262,10 +264,10 @@ namespace geode
     }
 
     template < index_t dimension >
-    OwnerTriangle< dimension >::OwnerTriangle( Point< dimension > p0,
-        Point< dimension > p1,
-        Point< dimension > p2 ) noexcept
-        : Base( std::move( p0 ), std::move( p1 ), std::move( p2 ) )
+    OwnerTriangle< dimension >::OwnerTriangle( Point< dimension > point0,
+        Point< dimension > point1,
+        Point< dimension > point2 ) noexcept
+        : Base( std::move( point0 ), std::move( point1 ), std::move( point2 ) )
     {
     }
     template < index_t dimension >
@@ -296,10 +298,10 @@ namespace geode
     }
 
     template < index_t dimension >
-    Triangle< dimension >::Triangle( const Point< dimension >& p0,
-        const Point< dimension >& p1,
-        const Point< dimension >& p2 ) noexcept
-        : Base( p0, p1, p2 )
+    Triangle< dimension >::Triangle( const Point< dimension >& point0,
+        const Point< dimension >& point1,
+        const Point< dimension >& point2 ) noexcept
+        : Base( point0, point1, point2 )
     {
     }
     template < index_t dimension >
