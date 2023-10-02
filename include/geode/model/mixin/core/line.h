@@ -87,11 +87,9 @@ namespace geode
 
         Line( const MeshImpl& impl, LinesKey ) : Line( impl ) {}
 
-        void set_mesh(
-            std::unique_ptr< Mesh > mesh, LinesKey );
+        void set_mesh( std::unique_ptr< Mesh > mesh, LinesKey );
 
-        void set_mesh(
-            std::unique_ptr< Mesh > mesh, LinesBuilderKey );
+        void set_mesh( std::unique_ptr< Mesh > mesh, LinesBuilderKey );
 
         void set_line_name( absl::string_view name, LinesBuilderKey )
         {
