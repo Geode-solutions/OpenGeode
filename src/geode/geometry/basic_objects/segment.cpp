@@ -30,8 +30,8 @@ namespace geode
 {
     template < typename PointType, index_t dimension >
     GenericSegment< PointType, dimension >::GenericSegment(
-        PointType p0, PointType p1 ) noexcept
-        : vertices_{ { std::move( p0 ), std::move( p1 ) } }
+        PointType point0, PointType point1 ) noexcept
+        : vertices_{ { std::move( point0 ), std::move( point1 ) } }
     {
     }
     template < typename PointType, index_t dimension >
@@ -81,16 +81,16 @@ namespace geode
     Point< dimension >
         GenericSegment< PointType, dimension >::barycenter() const
     {
-        const Point< dimension >& p0 = vertices_[0];
-        const Point< dimension >& p1 = vertices_[1];
-        return ( p0 + p1 ) / 2.;
+        const Point< dimension >& point0 = vertices_[0];
+        const Point< dimension >& point1 = vertices_[1];
+        return ( point0 + point1 ) / 2.;
     }
     template < typename PointType, index_t dimension >
     double GenericSegment< PointType, dimension >::length() const
     {
-        const Point< dimension >& p0 = vertices_[0];
-        const Point< dimension >& p1 = vertices_[1];
-        return point_point_distance( p0, p1 );
+        const Point< dimension >& point0 = vertices_[0];
+        const Point< dimension >& point1 = vertices_[1];
+        return point_point_distance( point0, point1 );
     }
     template < typename PointType, index_t dimension >
     void GenericSegment< PointType, dimension >::set_point(
@@ -118,8 +118,8 @@ namespace geode
 
     template < index_t dimension >
     OwnerSegment< dimension >::OwnerSegment(
-        Point< dimension > p0, Point< dimension > p1 ) noexcept
-        : Base( std::move( p0 ), std::move( p1 ) )
+        Point< dimension > point0, Point< dimension > point1 ) noexcept
+        : Base( std::move( point0 ), std::move( point1 ) )
     {
     }
     template < index_t dimension >
@@ -150,9 +150,9 @@ namespace geode
     }
 
     template < index_t dimension >
-    Segment< dimension >::Segment(
-        const Point< dimension >& p0, const Point< dimension >& p1 ) noexcept
-        : Base( p0, p1 )
+    Segment< dimension >::Segment( const Point< dimension >& point0,
+        const Point< dimension >& point1 ) noexcept
+        : Base( point0, point1 )
     {
     }
     template < index_t dimension >

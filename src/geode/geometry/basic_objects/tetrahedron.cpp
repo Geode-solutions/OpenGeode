@@ -28,10 +28,12 @@
 namespace geode
 {
     template < typename PointType >
-    GenericTetrahedron< PointType >::GenericTetrahedron(
-        PointType p0, PointType p1, PointType p2, PointType p3 ) noexcept
-        : vertices_{ { std::move( p0 ), std::move( p1 ), std::move( p2 ),
-            std::move( p3 ) } }
+    GenericTetrahedron< PointType >::GenericTetrahedron( PointType point0,
+        PointType point1,
+        PointType point2,
+        PointType point3 ) noexcept
+        : vertices_{ { std::move( point0 ), std::move( point1 ),
+            std::move( point2 ), std::move( point3 ) } }
     {
     }
     template < typename PointType >
@@ -63,11 +65,11 @@ namespace geode
     template < typename PointType >
     Point3D GenericTetrahedron< PointType >::barycenter() const
     {
-        const Point3D& p0 = vertices_[0];
-        const Point3D& p1 = vertices_[1];
-        const Point3D& p2 = vertices_[2];
-        const Point3D& p3 = vertices_[3];
-        return ( p0 + p1 + p2 + p3 ) / 4.;
+        const Point3D& point0 = vertices_[0];
+        const Point3D& point1 = vertices_[1];
+        const Point3D& point2 = vertices_[2];
+        const Point3D& point3 = vertices_[3];
+        return ( point0 + point1 + point2 + point3 ) / 4.;
     }
     template < typename PointType >
     void GenericTetrahedron< PointType >::set_point(
@@ -92,10 +94,14 @@ namespace geode
         return bbox;
     }
 
-    OwnerTetrahedron::OwnerTetrahedron(
-        Point3D p0, Point3D p1, Point3D p2, Point3D p3 ) noexcept
-        : Base(
-            std::move( p0 ), std::move( p1 ), std::move( p2 ), std::move( p3 ) )
+    OwnerTetrahedron::OwnerTetrahedron( Point3D point0,
+        Point3D point1,
+        Point3D point2,
+        Point3D point3 ) noexcept
+        : Base( std::move( point0 ),
+            std::move( point1 ),
+            std::move( point2 ),
+            std::move( point3 ) )
     {
     }
     OwnerTetrahedron::OwnerTetrahedron( const OwnerTetrahedron& other ) noexcept
@@ -119,11 +125,11 @@ namespace geode
         return *this;
     }
 
-    Tetrahedron::Tetrahedron( const Point3D& p0,
-        const Point3D& p1,
-        const Point3D& p2,
-        const Point3D& p3 ) noexcept
-        : Base( p0, p1, p2, p3 )
+    Tetrahedron::Tetrahedron( const Point3D& point0,
+        const Point3D& point1,
+        const Point3D& point2,
+        const Point3D& point3 ) noexcept
+        : Base( point0, point1, point2, point3 )
     {
     }
     Tetrahedron::Tetrahedron( const Tetrahedron& other ) noexcept
