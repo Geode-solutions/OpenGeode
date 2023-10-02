@@ -10,7 +10,8 @@ Checks: >
   -llvm-header-guard,
   -misc-no-recursion,
   -modernize-use-trailing-return-type,
-  -readability-redundant-access-specifiers
+  -readability-redundant-access-specifiers,
+  -readability-convert-member-functions-to-static
 
 CheckOptions:
   - key:    misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
@@ -40,6 +41,10 @@ CheckOptions:
     value: lower_case
   - key: readability-identifier-naming.GlobalConstantCase
     value: UPPER_CASE
+  - key: readability-identifier-naming.GlobalConstantIgnoredRegexp
+    value: dimension
+  - key: readability-identifier-naming.GlobalFunctionCase
+    value: lower_case
   - key: readability-identifier-naming.MemberConstantCase
     value: CamelCase 
   - key: readability-identifier-naming.StaticConstantCase
@@ -50,6 +55,8 @@ CheckOptions:
     value: 4
   - key: misc-include-cleaner.IgnoreHeaders
     value:  '
+            utility;
+            cstddef;
             math.h;
             geode/.*_export\.h;
             geode/.*/common\.h;
