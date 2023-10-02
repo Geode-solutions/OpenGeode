@@ -45,14 +45,16 @@ namespace geode
     class GenericTriangle
     {
     public:
-        GenericTriangle( PointType p0, PointType p1, PointType p2 );
+        GenericTriangle( PointType p0, PointType p1, PointType p2 ) noexcept;
 
-        GenericTriangle( const GenericTriangle< PointType, dimension >& other );
+        GenericTriangle(
+            const GenericTriangle< PointType, dimension >& other ) noexcept;
         GenericTriangle< PointType, dimension >& operator=(
-            const GenericTriangle< PointType, dimension >& other );
-        GenericTriangle( GenericTriangle< PointType, dimension >&& other );
+            const GenericTriangle< PointType, dimension >& other ) noexcept;
+        GenericTriangle(
+            GenericTriangle< PointType, dimension >&& other ) noexcept;
         GenericTriangle< PointType, dimension >& operator=(
-            GenericTriangle< PointType, dimension >&& other );
+            GenericTriangle< PointType, dimension >&& other ) noexcept;
 
         Point< dimension > barycenter() const;
         template < index_t T = dimension >
@@ -88,14 +90,14 @@ namespace geode
     public:
         explicit OwnerTriangle( Point< dimension > p0,
             Point< dimension > p1,
-            Point< dimension > p2 );
+            Point< dimension > p2 ) noexcept;
 
-        OwnerTriangle( const OwnerTriangle< dimension >& other );
+        OwnerTriangle( const OwnerTriangle< dimension >& other ) noexcept;
         OwnerTriangle< dimension >& operator=(
-            const OwnerTriangle< dimension >& other );
-        OwnerTriangle( OwnerTriangle< dimension >&& other );
+            const OwnerTriangle< dimension >& other ) noexcept;
+        OwnerTriangle( OwnerTriangle< dimension >&& other ) noexcept;
         OwnerTriangle< dimension >& operator=(
-            OwnerTriangle< dimension >&& other );
+            OwnerTriangle< dimension >&& other ) noexcept;
     };
     ALIAS_2D_AND_3D( OwnerTriangle );
     template < index_t dimension >
@@ -106,13 +108,15 @@ namespace geode
     public:
         Triangle( const Point< dimension >& p0,
             const Point< dimension >& p1,
-            const Point< dimension >& p2 );
+            const Point< dimension >& p2 ) noexcept;
 
-        Triangle( const Triangle< dimension >& other );
-        Triangle( const OwnerTriangle< dimension >& other );
-        Triangle< dimension >& operator=( const Triangle< dimension >& other );
-        Triangle( Triangle< dimension >&& other );
-        Triangle< dimension >& operator=( Triangle< dimension >&& other );
+        Triangle( const Triangle< dimension >& other ) noexcept;
+        Triangle( const OwnerTriangle< dimension >& other ) noexcept;
+        Triangle< dimension >& operator=(
+            const Triangle< dimension >& other ) noexcept;
+        Triangle( Triangle< dimension >&& other ) noexcept;
+        Triangle< dimension >& operator=(
+            Triangle< dimension >&& other ) noexcept;
     };
     ALIAS_2D_AND_3D( Triangle );
 } // namespace geode

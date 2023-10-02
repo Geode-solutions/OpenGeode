@@ -42,14 +42,16 @@ namespace geode
     class GenericSegment
     {
     public:
-        GenericSegment( PointType p0, PointType p1 );
+        GenericSegment( PointType p0, PointType p1 ) noexcept;
 
-        GenericSegment( const GenericSegment< PointType, dimension >& other );
+        GenericSegment(
+            const GenericSegment< PointType, dimension >& other ) noexcept;
         GenericSegment< PointType, dimension >& operator=(
-            const GenericSegment< PointType, dimension >& other );
-        GenericSegment( GenericSegment< PointType, dimension >&& other );
+            const GenericSegment< PointType, dimension >& other ) noexcept;
+        GenericSegment(
+            GenericSegment< PointType, dimension >&& other ) noexcept;
         GenericSegment< PointType, dimension >& operator=(
-            GenericSegment< PointType, dimension >&& other );
+            GenericSegment< PointType, dimension >&& other ) noexcept;
 
         Vector< dimension > direction() const;
         Vector< dimension > normalized_direction() const;
@@ -69,14 +71,15 @@ namespace geode
         using Base = GenericSegment< Point< dimension >, dimension >;
 
     public:
-        explicit OwnerSegment( Point< dimension > p0, Point< dimension > p1 );
+        explicit OwnerSegment(
+            Point< dimension > p0, Point< dimension > p1 ) noexcept;
 
-        OwnerSegment( const OwnerSegment< dimension >& other );
+        OwnerSegment( const OwnerSegment< dimension >& other ) noexcept;
         OwnerSegment< dimension >& operator=(
-            const OwnerSegment< dimension >& other );
-        OwnerSegment( OwnerSegment< dimension >&& other );
+            const OwnerSegment< dimension >& other ) noexcept;
+        OwnerSegment( OwnerSegment< dimension >&& other ) noexcept;
         OwnerSegment< dimension >& operator=(
-            OwnerSegment< dimension >&& other );
+            OwnerSegment< dimension >&& other ) noexcept;
     };
     ALIAS_1D_AND_2D_AND_3D( OwnerSegment );
 
@@ -86,13 +89,16 @@ namespace geode
         using Base = GenericSegment< RefPoint< dimension >, dimension >;
 
     public:
-        Segment( const Point< dimension >& p0, const Point< dimension >& p1 );
+        Segment( const Point< dimension >& p0,
+            const Point< dimension >& p1 ) noexcept;
 
-        Segment( const Segment< dimension >& other );
-        Segment( const OwnerSegment< dimension >& other );
-        Segment< dimension >& operator=( const Segment< dimension >& other );
-        Segment( Segment< dimension >&& other );
-        Segment< dimension >& operator=( Segment< dimension >&& other );
+        Segment( const Segment< dimension >& other ) noexcept;
+        Segment( const OwnerSegment< dimension >& other ) noexcept;
+        Segment< dimension >& operator=(
+            const Segment< dimension >& other ) noexcept;
+        Segment( Segment< dimension >&& other ) noexcept;
+        Segment< dimension >& operator=(
+            Segment< dimension >&& other ) noexcept;
     };
     ALIAS_1D_AND_2D_AND_3D( Segment );
 } // namespace geode
