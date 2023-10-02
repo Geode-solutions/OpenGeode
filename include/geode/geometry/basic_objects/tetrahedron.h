@@ -50,12 +50,13 @@ namespace geode
                 { { 3, 1, 0 } }, { { 0, 1, 2 } } } };
 
         GenericTetrahedron(
-            PointType p0, PointType p1, PointType p2, PointType p3 );
+            PointType p0, PointType p1, PointType p2, PointType p3 ) noexcept;
 
-        GenericTetrahedron( const GenericTetrahedron& other );
-        GenericTetrahedron& operator=( const GenericTetrahedron& other );
-        GenericTetrahedron( GenericTetrahedron&& other );
-        GenericTetrahedron& operator=( GenericTetrahedron&& other );
+        GenericTetrahedron( const GenericTetrahedron& other ) noexcept;
+        GenericTetrahedron& operator=(
+            const GenericTetrahedron& other ) noexcept;
+        GenericTetrahedron( GenericTetrahedron&& other ) noexcept;
+        GenericTetrahedron& operator=( GenericTetrahedron&& other ) noexcept;
 
         Point3D barycenter() const;
         void set_point( index_t vertex, PointType point );
@@ -73,12 +74,12 @@ namespace geode
 
     public:
         explicit OwnerTetrahedron(
-            Point3D p0, Point3D p1, Point3D p2, Point3D p3 );
+            Point3D p0, Point3D p1, Point3D p2, Point3D p3 ) noexcept;
 
-        OwnerTetrahedron( const OwnerTetrahedron& other );
-        OwnerTetrahedron& operator=( const OwnerTetrahedron& other );
-        OwnerTetrahedron( OwnerTetrahedron&& other );
-        OwnerTetrahedron& operator=( OwnerTetrahedron&& other );
+        OwnerTetrahedron( const OwnerTetrahedron& other ) noexcept;
+        OwnerTetrahedron& operator=( const OwnerTetrahedron& other ) noexcept;
+        OwnerTetrahedron( OwnerTetrahedron&& other ) noexcept;
+        OwnerTetrahedron& operator=( OwnerTetrahedron&& other ) noexcept;
     };
 
     class opengeode_geometry_api Tetrahedron
@@ -90,12 +91,12 @@ namespace geode
         Tetrahedron( const Point3D& p0,
             const Point3D& p1,
             const Point3D& p2,
-            const Point3D& p3 );
+            const Point3D& p3 ) noexcept;
 
-        Tetrahedron( const Tetrahedron& other );
-        Tetrahedron( const OwnerTetrahedron& other );
-        Tetrahedron& operator=( const Tetrahedron& other );
-        Tetrahedron( Tetrahedron&& other );
-        Tetrahedron& operator=( Tetrahedron&& other );
+        Tetrahedron( const Tetrahedron& other ) noexcept;
+        Tetrahedron( const OwnerTetrahedron& other ) noexcept;
+        Tetrahedron& operator=( const Tetrahedron& other ) noexcept;
+        Tetrahedron( Tetrahedron&& other ) noexcept;
+        Tetrahedron& operator=( Tetrahedron&& other ) noexcept;
     };
 } // namespace geode

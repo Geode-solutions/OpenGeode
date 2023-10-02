@@ -95,14 +95,14 @@ namespace geode
 {
     template < typename PointType, index_t dimension >
     GenericTriangle< PointType, dimension >::GenericTriangle(
-        PointType p0, PointType p1, PointType p2 )
+        PointType p0, PointType p1, PointType p2 ) noexcept
         : vertices_{ { std::move( p0 ), std::move( p1 ), std::move( p2 ) } }
     {
     }
 
     template < typename PointType, index_t dimension >
     GenericTriangle< PointType, dimension >::GenericTriangle(
-        const GenericTriangle< PointType, dimension >& other )
+        const GenericTriangle< PointType, dimension >& other ) noexcept
         : vertices_( other.vertices_ )
     {
     }
@@ -110,7 +110,7 @@ namespace geode
     template < typename PointType, index_t dimension >
     GenericTriangle< PointType, dimension >&
         GenericTriangle< PointType, dimension >::operator=(
-            const GenericTriangle< PointType, dimension >& other )
+            const GenericTriangle< PointType, dimension >& other ) noexcept
     {
         vertices_ = other.vertices_;
         return *this;
@@ -118,7 +118,7 @@ namespace geode
 
     template < typename PointType, index_t dimension >
     GenericTriangle< PointType, dimension >::GenericTriangle(
-        GenericTriangle< PointType, dimension >&& other )
+        GenericTriangle< PointType, dimension >&& other ) noexcept
         : vertices_( std::move( other.vertices_ ) )
     {
     }
@@ -126,7 +126,7 @@ namespace geode
     template < typename PointType, index_t dimension >
     GenericTriangle< PointType, dimension >&
         GenericTriangle< PointType, dimension >::operator=(
-            GenericTriangle< PointType, dimension >&& other )
+            GenericTriangle< PointType, dimension >&& other ) noexcept
     {
         vertices_ = std::move( other.vertices_ );
         return *this;
@@ -262,33 +262,34 @@ namespace geode
     }
 
     template < index_t dimension >
-    OwnerTriangle< dimension >::OwnerTriangle(
-        Point< dimension > p0, Point< dimension > p1, Point< dimension > p2 )
+    OwnerTriangle< dimension >::OwnerTriangle( Point< dimension > p0,
+        Point< dimension > p1,
+        Point< dimension > p2 ) noexcept
         : Base( std::move( p0 ), std::move( p1 ), std::move( p2 ) )
     {
     }
     template < index_t dimension >
     OwnerTriangle< dimension >::OwnerTriangle(
-        const OwnerTriangle< dimension >& other )
+        const OwnerTriangle< dimension >& other ) noexcept
         : Base( other )
     {
     }
     template < index_t dimension >
     OwnerTriangle< dimension >& OwnerTriangle< dimension >::operator=(
-        const OwnerTriangle< dimension >& other )
+        const OwnerTriangle< dimension >& other ) noexcept
     {
         Base::operator=( other );
         return *this;
     }
     template < index_t dimension >
     OwnerTriangle< dimension >::OwnerTriangle(
-        OwnerTriangle< dimension >&& other )
+        OwnerTriangle< dimension >&& other ) noexcept
         : Base( other )
     {
     }
     template < index_t dimension >
     OwnerTriangle< dimension >& OwnerTriangle< dimension >::operator=(
-        OwnerTriangle< dimension >&& other )
+        OwnerTriangle< dimension >&& other ) noexcept
     {
         Base::operator=( other );
         return *this;
@@ -297,35 +298,37 @@ namespace geode
     template < index_t dimension >
     Triangle< dimension >::Triangle( const Point< dimension >& p0,
         const Point< dimension >& p1,
-        const Point< dimension >& p2 )
+        const Point< dimension >& p2 ) noexcept
         : Base( p0, p1, p2 )
     {
     }
     template < index_t dimension >
-    Triangle< dimension >::Triangle( const Triangle< dimension >& other )
+    Triangle< dimension >::Triangle(
+        const Triangle< dimension >& other ) noexcept
         : Base( other )
     {
     }
     template < index_t dimension >
-    Triangle< dimension >::Triangle( const OwnerTriangle< dimension >& other )
+    Triangle< dimension >::Triangle(
+        const OwnerTriangle< dimension >& other ) noexcept
         : Base( other.vertices()[0], other.vertices()[1], other.vertices()[2] )
     {
     }
     template < index_t dimension >
     Triangle< dimension >& Triangle< dimension >::operator=(
-        const Triangle< dimension >& other )
+        const Triangle< dimension >& other ) noexcept
     {
         Base::operator=( other );
         return *this;
     }
     template < index_t dimension >
-    Triangle< dimension >::Triangle( Triangle< dimension >&& other )
+    Triangle< dimension >::Triangle( Triangle< dimension >&& other ) noexcept
         : Base( other )
     {
     }
     template < index_t dimension >
     Triangle< dimension >& Triangle< dimension >::operator=(
-        Triangle< dimension >&& other )
+        Triangle< dimension >&& other ) noexcept
     {
         Base::operator=( other );
         return *this;

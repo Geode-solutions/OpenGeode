@@ -30,34 +30,34 @@ namespace geode
 {
     template < typename PointType, index_t dimension >
     GenericSegment< PointType, dimension >::GenericSegment(
-        PointType p0, PointType p1 )
+        PointType p0, PointType p1 ) noexcept
         : vertices_{ { std::move( p0 ), std::move( p1 ) } }
     {
     }
     template < typename PointType, index_t dimension >
     GenericSegment< PointType, dimension >::GenericSegment(
-        const GenericSegment< PointType, dimension >& other )
+        const GenericSegment< PointType, dimension >& other ) noexcept
         : vertices_( other.vertices_ )
     {
     }
     template < typename PointType, index_t dimension >
     GenericSegment< PointType, dimension >&
         GenericSegment< PointType, dimension >::operator=(
-            const GenericSegment< PointType, dimension >& other )
+            const GenericSegment< PointType, dimension >& other ) noexcept
     {
         vertices_ = other.vertices_;
         return *this;
     }
     template < typename PointType, index_t dimension >
     GenericSegment< PointType, dimension >::GenericSegment(
-        GenericSegment< PointType, dimension >&& other )
+        GenericSegment< PointType, dimension >&& other ) noexcept
         : vertices_( std::move( other.vertices_ ) )
     {
     }
     template < typename PointType, index_t dimension >
     GenericSegment< PointType, dimension >&
         GenericSegment< PointType, dimension >::operator=(
-            GenericSegment< PointType, dimension >&& other )
+            GenericSegment< PointType, dimension >&& other ) noexcept
     {
         vertices_ = std::move( other.vertices_ );
         return *this;
@@ -118,31 +118,32 @@ namespace geode
 
     template < index_t dimension >
     OwnerSegment< dimension >::OwnerSegment(
-        Point< dimension > p0, Point< dimension > p1 )
+        Point< dimension > p0, Point< dimension > p1 ) noexcept
         : Base( std::move( p0 ), std::move( p1 ) )
     {
     }
     template < index_t dimension >
     OwnerSegment< dimension >::OwnerSegment(
-        const OwnerSegment< dimension >& other )
+        const OwnerSegment< dimension >& other ) noexcept
         : Base( other )
     {
     }
     template < index_t dimension >
     OwnerSegment< dimension >& OwnerSegment< dimension >::operator=(
-        const OwnerSegment< dimension >& other )
+        const OwnerSegment< dimension >& other ) noexcept
     {
         Base::operator=( other );
         return *this;
     }
     template < index_t dimension >
-    OwnerSegment< dimension >::OwnerSegment( OwnerSegment< dimension >&& other )
+    OwnerSegment< dimension >::OwnerSegment(
+        OwnerSegment< dimension >&& other ) noexcept
         : Base( std::move( other ) )
     {
     }
     template < index_t dimension >
     OwnerSegment< dimension >& OwnerSegment< dimension >::operator=(
-        OwnerSegment< dimension >&& other )
+        OwnerSegment< dimension >&& other ) noexcept
     {
         Base::operator=( other );
         return *this;
@@ -150,35 +151,36 @@ namespace geode
 
     template < index_t dimension >
     Segment< dimension >::Segment(
-        const Point< dimension >& p0, const Point< dimension >& p1 )
+        const Point< dimension >& p0, const Point< dimension >& p1 ) noexcept
         : Base( p0, p1 )
     {
     }
     template < index_t dimension >
-    Segment< dimension >::Segment( const Segment< dimension >& other )
+    Segment< dimension >::Segment( const Segment< dimension >& other ) noexcept
         : Base( other )
     {
     }
     template < index_t dimension >
-    Segment< dimension >::Segment( const OwnerSegment< dimension >& other )
+    Segment< dimension >::Segment(
+        const OwnerSegment< dimension >& other ) noexcept
         : Base( other.vertices()[0], other.vertices()[1] )
     {
     }
     template < index_t dimension >
     Segment< dimension >& Segment< dimension >::operator=(
-        const Segment< dimension >& other )
+        const Segment< dimension >& other ) noexcept
     {
         Base::operator=( other );
         return *this;
     }
     template < index_t dimension >
-    Segment< dimension >::Segment( Segment< dimension >&& other )
+    Segment< dimension >::Segment( Segment< dimension >&& other ) noexcept
         : Base( std::move( other ) )
     {
     }
     template < index_t dimension >
     Segment< dimension >& Segment< dimension >::operator=(
-        Segment< dimension >&& other )
+        Segment< dimension >&& other ) noexcept
     {
         Base::operator=( other );
         return *this;
