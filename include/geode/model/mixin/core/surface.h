@@ -23,6 +23,10 @@
 
 #pragma once
 
+#include <memory>
+
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
@@ -53,6 +57,8 @@ namespace geode
         friend class bitsery::Access;
 
     public:
+        using Mesh = SurfaceMesh< dimension >;
+
         Surface( Surface&& other ) noexcept;
         ~Surface();
 
@@ -71,40 +77,35 @@ namespace geode
             return { this->component_type_static(), this->id() };
         };
 
-        template < typename Mesh = SurfaceMesh< dimension > >
-        const Mesh& mesh() const
+        template < typename TypedMesh = Mesh >
+        const TypedMesh& mesh() const
         {
-            return dynamic_cast< const Mesh& >( get_mesh() );
+            return dynamic_cast< const TypedMesh& >( get_mesh() );
         }
 
     public:
-        Surface( SurfacesKey ) : Surface() {}
+        explicit Surface( SurfacesKey key );
 
-        Surface( const MeshImpl& impl, SurfacesKey ) : Surface( impl ){};
+        Surface( const MeshImpl& impl, SurfacesKey key );
 
-        template < typename Mesh = SurfaceMesh< dimension > >
-        Mesh& modifiable_mesh( SurfacesKey )
+        template < typename TypedMesh = Mesh >
+        TypedMesh& modifiable_mesh( SurfacesKey /*unused*/ )
         {
-            return dynamic_cast< Mesh& >( get_modifiable_mesh() );
+            return dynamic_cast< TypedMesh& >( get_modifiable_mesh() );
         }
 
         const MeshImpl& mesh_type() const;
 
-        void set_mesh(
-            std::unique_ptr< SurfaceMesh< dimension > > mesh, SurfacesKey );
+        void set_mesh( std::unique_ptr< Mesh > mesh, SurfacesKey key );
 
-        void set_mesh( std::unique_ptr< SurfaceMesh< dimension > > mesh,
-            SurfacesBuilderKey );
+        void set_mesh( std::unique_ptr< Mesh > mesh, SurfacesBuilderKey key );
 
-        void set_surface_name( absl::string_view name, SurfacesBuilderKey )
+        void set_surface_name( absl::string_view name, SurfacesBuilderKey key );
+
+        template < typename TypedMesh = Mesh >
+        TypedMesh& modifiable_mesh( SurfacesBuilderKey /*unused*/ )
         {
-            this->set_name( name );
-        }
-
-        template < typename Mesh = SurfaceMesh< dimension > >
-        Mesh& modifiable_mesh( SurfacesBuilderKey )
-        {
-            return dynamic_cast< Mesh& >( get_modifiable_mesh() );
+            return dynamic_cast< TypedMesh& >( get_modifiable_mesh() );
         }
 
     private:
@@ -112,9 +113,9 @@ namespace geode
 
         explicit Surface( const MeshImpl& impl );
 
-        SurfaceMesh< dimension >& get_modifiable_mesh();
+        Mesh& get_modifiable_mesh();
 
-        const SurfaceMesh< dimension >& get_mesh() const;
+        const Mesh& get_mesh() const;
 
         template < typename Archive >
         void serialize( Archive& archive );

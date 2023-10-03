@@ -23,6 +23,10 @@
 
 #pragma once
 
+#include <memory>
+
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
@@ -53,6 +57,8 @@ namespace geode
         friend class bitsery::Access;
 
     public:
+        using Mesh = EdgedCurve< dimension >;
+
         Line( Line&& other ) noexcept;
         ~Line();
 
@@ -71,42 +77,31 @@ namespace geode
             return { this->component_type_static(), this->id() };
         };
 
-        const EdgedCurve< dimension >& mesh() const;
+        const Mesh& mesh() const;
 
         const MeshImpl& mesh_type() const;
 
-        EdgedCurve< dimension >& modifiable_mesh( LinesKey )
-        {
-            return modifiable_mesh();
-        }
+        Mesh& modifiable_mesh( LinesKey key );
 
     public:
-        Line( LinesKey ) : Line() {}
+        explicit Line( LinesKey key );
 
-        Line( const MeshImpl& impl, LinesKey ) : Line( impl ) {}
+        Line( const MeshImpl& impl, LinesKey key );
 
-        void set_mesh(
-            std::unique_ptr< EdgedCurve< dimension > > mesh, LinesKey );
+        void set_mesh( std::unique_ptr< Mesh > mesh, LinesKey key );
 
-        void set_mesh(
-            std::unique_ptr< EdgedCurve< dimension > > mesh, LinesBuilderKey );
+        void set_mesh( std::unique_ptr< Mesh > mesh, LinesBuilderKey key );
 
-        void set_line_name( absl::string_view name, LinesBuilderKey )
-        {
-            this->set_name( name );
-        }
+        void set_line_name( absl::string_view name, LinesBuilderKey key );
 
-        EdgedCurve< dimension >& modifiable_mesh( LinesBuilderKey )
-        {
-            return modifiable_mesh();
-        }
+        Mesh& modifiable_mesh( LinesBuilderKey key );
 
     private:
         Line();
 
         explicit Line( const MeshImpl& impl );
 
-        EdgedCurve< dimension >& modifiable_mesh();
+        Mesh& modifiable_mesh();
 
         template < typename Archive >
         void serialize( Archive& archive );

@@ -23,6 +23,10 @@
 
 #pragma once
 
+#include <memory>
+
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
@@ -53,6 +57,8 @@ namespace geode
         friend class bitsery::Access;
 
     public:
+        using Mesh = PointSet< dimension >;
+
         Corner( Corner&& other ) noexcept;
         ~Corner();
 
@@ -71,42 +77,31 @@ namespace geode
             return { this->component_type_static(), this->id() };
         };
 
-        const PointSet< dimension >& mesh() const;
+        const Mesh& mesh() const;
 
-        PointSet< dimension >& modifiable_mesh( CornersKey )
-        {
-            return modifiable_mesh();
-        }
+        Mesh& modifiable_mesh( CornersKey key );
 
         const MeshImpl& mesh_type() const;
 
     public:
-        Corner( CornersKey ) : Corner() {}
+        explicit Corner( CornersKey key );
 
-        Corner( const MeshImpl& impl, CornersKey ) : Corner( impl ) {}
+        Corner( const MeshImpl& impl, CornersKey key );
 
-        void set_mesh(
-            std::unique_ptr< PointSet< dimension > > mesh, CornersKey );
+        void set_mesh( std::unique_ptr< Mesh > mesh, CornersKey key );
 
-        void set_mesh(
-            std::unique_ptr< PointSet< dimension > > mesh, CornersBuilderKey );
+        void set_mesh( std::unique_ptr< Mesh > mesh, CornersBuilderKey key );
 
-        void set_corner_name( absl::string_view name, CornersBuilderKey )
-        {
-            this->set_name( name );
-        }
+        void set_corner_name( absl::string_view name, CornersBuilderKey key );
 
-        PointSet< dimension >& modifiable_mesh( CornersBuilderKey )
-        {
-            return modifiable_mesh();
-        }
+        Mesh& modifiable_mesh( CornersBuilderKey key );
 
     private:
         Corner();
 
         explicit Corner( const MeshImpl& impl );
 
-        PointSet< dimension >& modifiable_mesh();
+        Mesh& modifiable_mesh();
 
         template < typename Archive >
         void serialize( Archive& archive );

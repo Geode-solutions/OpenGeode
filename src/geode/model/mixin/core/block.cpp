@@ -23,32 +23,39 @@
 
 #include <geode/model/mixin/core/block.h>
 
+#include <memory>
+
+#include <bitsery/ext/inheritance.h>
+
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
 
 #include <geode/mesh/builder/solid_mesh_builder.h>
 #include <geode/mesh/core/mesh_factory.h>
+#include <geode/mesh/core/mesh_id.h>
 #include <geode/mesh/core/polyhedral_solid.h>
 
+#include <geode/model/mixin/core/component.h>
 #include <geode/model/mixin/core/detail/mesh_storage.h>
 
 namespace geode
 {
     template < index_t dimension >
-    class Block< dimension >::Impl
-        : public detail::MeshStorage< SolidMesh< dimension > >
+    class Block< dimension >::Impl : public detail::MeshStorage< Mesh >
     {
     private:
         friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this,
-                Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.ext( impl,
-                        bitsery::ext::BaseClass<
-                            detail::MeshStorage< SolidMesh< dimension > > >{} );
-                } } } );
+            archive.ext( *this, Growable< Archive,
+                                    Impl >{ { []( Archive& archive2,
+                                                  Impl& impl ) {
+                archive2.ext( impl,
+                    bitsery::ext::BaseClass< detail::MeshStorage< Mesh > >{} );
+            } } } );
         }
     };
 
@@ -67,9 +74,20 @@ namespace geode
     }
 
     template < index_t dimension >
+    Block< dimension >::Block( BlocksKey /*unused*/ ) : Block()
+    {
+    }
+
+    template < index_t dimension >
+    Block< dimension >::Block( const MeshImpl& impl, BlocksKey /*unused*/ )
+        : Block( impl )
+    {
+    }
+
+    template < index_t dimension >
     Block< dimension >::Block( const MeshImpl& impl )
     {
-        impl_->set_mesh( this->id(), SolidMesh< dimension >::create( impl ) );
+        impl_->set_mesh( this->id(), Mesh::create( impl ) );
     }
 
     template < index_t dimension >
@@ -78,13 +96,13 @@ namespace geode
     }
 
     template < index_t dimension >
-    const SolidMesh< dimension >& Block< dimension >::get_mesh() const
+    auto Block< dimension >::get_mesh() const -> const Mesh&
     {
         return impl_->mesh();
     }
 
     template < index_t dimension >
-    SolidMesh< dimension >& Block< dimension >::get_modifiable_mesh()
+    auto Block< dimension >::get_modifiable_mesh() -> Mesh&
     {
         return impl_->modifiable_mesh();
     }
@@ -101,34 +119,41 @@ namespace geode
     {
         archive.ext( *this,
             Growable< Archive, Block >{
-                { []( Archive& a, Block& block ) {
-                     a.object( block.impl_ );
-                     a.ext( block,
+                { []( Archive& archive2, Block& block ) {
+                     archive2.object( block.impl_ );
+                     archive2.ext( block,
                          bitsery::ext::BaseClass< Component< dimension > >{} );
                      IdentifierBuilder mesh_builder{
                          block.get_modifiable_mesh()
                      };
                      mesh_builder.set_id( block.id() );
                  },
-                    []( Archive& a, Block& block ) {
-                        a.object( block.impl_ );
-                        a.ext( block, bitsery::ext::BaseClass<
-                                          Component< dimension > >{} );
+                    []( Archive& archive2, Block& block ) {
+                        archive2.object( block.impl_ );
+                        archive2.ext( block, bitsery::ext::BaseClass<
+                                                 Component< dimension > >{} );
                     } } } );
     }
 
     template < index_t dimension >
     void Block< dimension >::set_mesh(
-        std::unique_ptr< SolidMesh< dimension > > mesh, BlocksKey )
+        std::unique_ptr< Mesh > mesh, BlocksKey /*unused*/ )
     {
         impl_->set_mesh( this->id(), std::move( mesh ) );
     }
 
     template < index_t dimension >
     void Block< dimension >::set_mesh(
-        std::unique_ptr< SolidMesh< dimension > > mesh, BlocksBuilderKey )
+        std::unique_ptr< Mesh > mesh, BlocksBuilderKey /*unused*/ )
     {
         impl_->set_mesh( this->id(), std::move( mesh ) );
+    }
+
+    template < index_t dimension >
+    void Block< dimension >::set_block_name(
+        absl::string_view name, BlocksBuilderKey /*unused*/ )
+    {
+        this->set_name( name );
     }
 
     template class opengeode_model_api Block< 3 >;

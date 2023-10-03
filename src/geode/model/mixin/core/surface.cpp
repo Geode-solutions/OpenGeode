@@ -23,31 +23,38 @@
 
 #include <geode/model/mixin/core/surface.h>
 
+#include <memory>
+
+#include <bitsery/ext/inheritance.h>
+
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
 
 #include <geode/mesh/core/mesh_factory.h>
+#include <geode/mesh/core/mesh_id.h>
 #include <geode/mesh/core/polygonal_surface.h>
 #include <geode/mesh/core/surface_mesh.h>
 
+#include <geode/model/mixin/core/component.h>
 #include <geode/model/mixin/core/detail/mesh_storage.h>
 
 namespace geode
 {
     template < index_t dimension >
-    class Surface< dimension >::Impl
-        : public detail::MeshStorage< SurfaceMesh< dimension > >
+    class Surface< dimension >::Impl : public detail::MeshStorage< Mesh >
     {
     private:
         friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, Growable< Archive, Impl >{ { []( Archive& a,
-                                                                 Impl& impl ) {
-                a.ext( impl,
-                    bitsery::ext::BaseClass<
-                        detail::MeshStorage< SurfaceMesh< dimension > > >{} );
+            archive.ext( *this, Growable< Archive,
+                                    Impl >{ { []( Archive& archive2,
+                                                  Impl& impl ) {
+                archive2.ext( impl,
+                    bitsery::ext::BaseClass< detail::MeshStorage< Mesh > >{} );
             } } } );
         }
     };
@@ -64,6 +71,18 @@ namespace geode
     }
 
     template < index_t dimension >
+    Surface< dimension >::Surface( SurfacesKey /*unused*/ ) : Surface()
+    {
+    }
+
+    template < index_t dimension >
+    Surface< dimension >::Surface(
+        const MeshImpl& impl, SurfacesKey /*unused*/ )
+        : Surface( impl )
+    {
+    }
+
+    template < index_t dimension >
     Surface< dimension >::Surface()
         : Surface( MeshFactory::default_impl(
             PolygonalSurface< dimension >::type_name_static() ) )
@@ -73,17 +92,17 @@ namespace geode
     template < index_t dimension >
     Surface< dimension >::Surface( const MeshImpl& impl )
     {
-        impl_->set_mesh( this->id(), SurfaceMesh< dimension >::create( impl ) );
+        impl_->set_mesh( this->id(), Mesh::create( impl ) );
     }
 
     template < index_t dimension >
-    const SurfaceMesh< dimension >& Surface< dimension >::get_mesh() const
+    auto Surface< dimension >::get_mesh() const -> const Mesh&
     {
         return impl_->mesh();
     }
 
     template < index_t dimension >
-    SurfaceMesh< dimension >& Surface< dimension >::get_modifiable_mesh()
+    auto Surface< dimension >::get_modifiable_mesh() -> Mesh&
     {
         return impl_->modifiable_mesh();
     }
@@ -100,34 +119,41 @@ namespace geode
     {
         archive.ext( *this,
             Growable< Archive, Surface >{
-                { []( Archive& a, Surface& surface ) {
-                     a.object( surface.impl_ );
-                     a.ext( surface,
+                { []( Archive& archive2, Surface& surface ) {
+                     archive2.object( surface.impl_ );
+                     archive2.ext( surface,
                          bitsery::ext::BaseClass< Component< dimension > >{} );
                      IdentifierBuilder mesh_builder{
                          surface.get_modifiable_mesh()
                      };
                      mesh_builder.set_id( surface.id() );
                  },
-                    []( Archive& a, Surface& surface ) {
-                        a.object( surface.impl_ );
-                        a.ext( surface, bitsery::ext::BaseClass<
-                                            Component< dimension > >{} );
+                    []( Archive& archive2, Surface& surface ) {
+                        archive2.object( surface.impl_ );
+                        archive2.ext( surface, bitsery::ext::BaseClass<
+                                                   Component< dimension > >{} );
                     } } } );
     }
 
     template < index_t dimension >
     void Surface< dimension >::set_mesh(
-        std::unique_ptr< SurfaceMesh< dimension > > mesh, SurfacesKey )
+        std::unique_ptr< Mesh > mesh, SurfacesKey /*unused*/ )
     {
         impl_->set_mesh( this->id(), std::move( mesh ) );
     }
 
     template < index_t dimension >
     void Surface< dimension >::set_mesh(
-        std::unique_ptr< SurfaceMesh< dimension > > mesh, SurfacesBuilderKey )
+        std::unique_ptr< Mesh > mesh, SurfacesBuilderKey /*unused*/ )
     {
         impl_->set_mesh( this->id(), std::move( mesh ) );
+    }
+
+    template < index_t dimension >
+    void Surface< dimension >::set_surface_name(
+        absl::string_view name, SurfacesBuilderKey /*unused*/ )
+    {
+        this->set_name( name );
     }
 
     template class opengeode_model_api Surface< 2 >;
