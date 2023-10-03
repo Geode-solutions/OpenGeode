@@ -25,6 +25,8 @@
 
 #include <memory>
 
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
@@ -82,7 +84,7 @@ namespace geode
         }
 
     public:
-        Surface( SurfacesKey key );
+        explicit Surface( SurfacesKey key );
 
         Surface( const MeshImpl& impl, SurfacesKey key );
 

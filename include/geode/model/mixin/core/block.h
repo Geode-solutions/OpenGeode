@@ -25,6 +25,8 @@
 
 #include <memory>
 
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
@@ -91,7 +93,7 @@ namespace geode
         }
 
     public:
-        Block( BlocksKey key );
+        explicit Block( BlocksKey key );
 
         Block( const MeshImpl& impl, BlocksKey key );
 

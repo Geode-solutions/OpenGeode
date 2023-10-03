@@ -25,6 +25,8 @@
 
 #include <memory>
 
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
@@ -82,7 +84,7 @@ namespace geode
         const MeshImpl& mesh_type() const;
 
     public:
-        Corner( CornersKey key );
+        explicit Corner( CornersKey key );
 
         Corner( const MeshImpl& impl, CornersKey key );
 

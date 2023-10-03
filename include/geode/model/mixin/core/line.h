@@ -25,6 +25,8 @@
 
 #include <memory>
 
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
@@ -82,7 +84,7 @@ namespace geode
         Mesh& modifiable_mesh( LinesKey key );
 
     public:
-        Line( LinesKey key );
+        explicit Line( LinesKey key );
 
         Line( const MeshImpl& impl, LinesKey key );
 

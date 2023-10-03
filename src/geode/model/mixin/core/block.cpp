@@ -23,15 +23,21 @@
 
 #include <geode/model/mixin/core/block.h>
 
+#include <memory>
+
 #include <bitsery/ext/inheritance.h>
+
+#include <absl/strings/string_view.h>
 
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
 
 #include <geode/mesh/builder/solid_mesh_builder.h>
 #include <geode/mesh/core/mesh_factory.h>
+#include <geode/mesh/core/mesh_id.h>
 #include <geode/mesh/core/polyhedral_solid.h>
 
+#include <geode/model/mixin/core/component.h>
 #include <geode/model/mixin/core/detail/mesh_storage.h>
 
 namespace geode
