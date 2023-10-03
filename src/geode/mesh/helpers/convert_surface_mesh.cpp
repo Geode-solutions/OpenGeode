@@ -213,7 +213,10 @@ namespace geode
             auto builder =
                 TriangulatedSurfaceBuilder< dimension >::create( *result );
             detail::copy_meta_info( surface, *builder );
-            return result;
+            return absl::optional<
+                std::unique_ptr< TriangulatedSurface< dimension > > >{
+                absl::in_place, std::move( result )
+            };
         }
         if( !all_polygons_are_simplex( surface ) )
         {
@@ -225,7 +228,7 @@ namespace geode
         convert_surface( surface, *tri_surface );
         return absl::optional<
             std::unique_ptr< TriangulatedSurface< dimension > > >{
-            absl::in_place, tri_surface.release()
+            absl::in_place, std::move( tri_surface )
         };
     }
 

@@ -208,7 +208,9 @@ namespace geode
                 dynamic_cast< const RegularGrid3D& >( solid ) );
             auto builder = geode::TetrahedralSolidBuilder3D::create( *result );
             detail::copy_meta_info( solid, *builder );
-            return result;
+            return absl::optional< std::unique_ptr< TetrahedralSolid3D > >{
+                absl::in_place, std::move( result )
+            };
         }
         if( !all_polyhedra_are_simplex( solid ) )
         {
@@ -247,7 +249,7 @@ namespace geode
         detail::copy_attributes( solid.polyhedron_attribute_manager(),
             tet_solid->polyhedron_attribute_manager() );
         return absl::optional< std::unique_ptr< TetrahedralSolid3D > >{
-            absl::in_place, tet_solid.release()
+            absl::in_place, std::move( tet_solid )
         };
     }
 
@@ -310,7 +312,7 @@ namespace geode
         detail::copy_attributes( solid.polyhedron_attribute_manager(),
             hybrid_solid->polyhedron_attribute_manager() );
         return absl::optional< std::unique_ptr< HybridSolid3D > >{
-            absl::in_place, hybrid_solid.release()
+            absl::in_place, std::move( hybrid_solid )
         };
     }
 
