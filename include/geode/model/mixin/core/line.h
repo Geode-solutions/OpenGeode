@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
@@ -77,31 +79,20 @@ namespace geode
 
         const MeshImpl& mesh_type() const;
 
-        Mesh& modifiable_mesh( LinesKey )
-        {
-            return modifiable_mesh();
-        }
+        Mesh& modifiable_mesh( LinesKey key );
 
     public:
-        Line( LinesKey ) : Line() {}
+        Line( LinesKey key );
 
-        Line( const MeshImpl& impl, LinesKey ) : Line( impl ) {}
+        Line( const MeshImpl& impl, LinesKey key );
 
-        void set_mesh(
-            std::unique_ptr< Mesh > mesh, LinesKey );
+        void set_mesh( std::unique_ptr< Mesh > mesh, LinesKey key );
 
-        void set_mesh(
-            std::unique_ptr< Mesh > mesh, LinesBuilderKey );
+        void set_mesh( std::unique_ptr< Mesh > mesh, LinesBuilderKey key );
 
-        void set_line_name( absl::string_view name, LinesBuilderKey )
-        {
-            this->set_name( name );
-        }
+        void set_line_name( absl::string_view name, LinesBuilderKey key );
 
-        Mesh& modifiable_mesh( LinesBuilderKey )
-        {
-            return modifiable_mesh();
-        }
+        Mesh& modifiable_mesh( LinesBuilderKey key );
 
     private:
         Line();

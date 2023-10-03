@@ -23,6 +23,8 @@
 
 #include <geode/model/mixin/core/line.h>
 
+#include <bitsery/ext/inheritance.h>
+
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
 
@@ -41,9 +43,10 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, Growable< Archive, Impl >{ { []( Archive& a,
-                                                                 Impl& impl ) {
-                a.ext( impl,
+            archive.ext( *this, Growable< Archive,
+                                    Impl >{ { []( Archive& archive2,
+                                                  Impl& impl ) {
+                archive2.ext( impl,
                     bitsery::ext::BaseClass< detail::MeshStorage< Mesh > >{} );
             } } } );
         }
@@ -68,6 +71,17 @@ namespace geode
     }
 
     template < index_t dimension >
+    Line< dimension >::Line( LinesKey /*unused*/ ) : Line()
+    {
+    }
+
+    template < index_t dimension >
+    Line< dimension >::Line( const MeshImpl& impl, LinesKey /*unused*/ )
+        : Line( impl )
+    {
+    }
+
+    template < index_t dimension >
     Line< dimension >::Line( const MeshImpl& impl )
     {
         impl_->set_mesh( this->id(), Mesh::create( impl ) );
@@ -77,6 +91,12 @@ namespace geode
     auto Line< dimension >::mesh() const -> const Mesh&
     {
         return impl_->mesh();
+    }
+
+    template < index_t dimension >
+    auto Line< dimension >::modifiable_mesh( LinesKey /*unused*/ ) -> Mesh&
+    {
+        return modifiable_mesh();
     }
 
     template < index_t dimension >
@@ -97,31 +117,46 @@ namespace geode
     {
         archive.ext( *this,
             Growable< Archive, Line >{
-                { []( Archive& a, Line& line ) {
-                     a.object( line.impl_ );
-                     a.ext( line,
+                { []( Archive& archive2, Line& line ) {
+                     archive2.object( line.impl_ );
+                     archive2.ext( line,
                          bitsery::ext::BaseClass< Component< dimension > >{} );
                      IdentifierBuilder mesh_builder{ line.modifiable_mesh() };
                      mesh_builder.set_id( line.id() );
                  },
-                    []( Archive& a, Line& line ) {
-                        a.object( line.impl_ );
-                        a.ext( line, bitsery::ext::BaseClass<
-                                         Component< dimension > >{} );
+                    []( Archive& archive2, Line& line ) {
+                        archive2.object( line.impl_ );
+                        archive2.ext( line, bitsery::ext::BaseClass<
+                                                Component< dimension > >{} );
                     } } } );
     }
 
     template < index_t dimension >
-    void Line< dimension >::set_mesh( std::unique_ptr< Mesh > mesh, LinesKey )
+    void Line< dimension >::set_mesh(
+        std::unique_ptr< Mesh > mesh, LinesKey /*unused*/ )
     {
         impl_->set_mesh( this->id(), std::move( mesh ) );
     }
 
     template < index_t dimension >
     void Line< dimension >::set_mesh(
-        std::unique_ptr< Mesh > mesh, LinesBuilderKey )
+        std::unique_ptr< Mesh > mesh, LinesBuilderKey /*unused*/ )
     {
         impl_->set_mesh( this->id(), std::move( mesh ) );
+    }
+
+    template < index_t dimension >
+    void Line< dimension >::set_line_name(
+        absl::string_view name, LinesBuilderKey /*unused*/ )
+    {
+        this->set_name( name );
+    }
+
+    template < index_t dimension >
+    auto Line< dimension >::modifiable_mesh( LinesBuilderKey /*unused*/ )
+        -> Mesh&
+    {
+        return modifiable_mesh();
     }
 
     template class opengeode_model_api Line< 2 >;

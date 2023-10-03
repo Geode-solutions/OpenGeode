@@ -23,6 +23,8 @@
 
 #include <geode/model/mixin/core/block.h>
 
+#include <bitsery/ext/inheritance.h>
+
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
 
@@ -42,9 +44,10 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, Growable< Archive, Impl >{ { []( Archive& a,
-                                                                 Impl& impl ) {
-                a.ext( impl,
+            archive.ext( *this, Growable< Archive,
+                                    Impl >{ { []( Archive& archive2,
+                                                  Impl& impl ) {
+                archive2.ext( impl,
                     bitsery::ext::BaseClass< detail::MeshStorage< Mesh > >{} );
             } } } );
         }
@@ -61,6 +64,17 @@ namespace geode
     Block< dimension >::Block( Block&& other ) noexcept
         : Component< dimension >{ std::move( other ) },
           impl_{ std::move( other.impl_ ) }
+    {
+    }
+
+    template < index_t dimension >
+    Block< dimension >::Block( BlocksKey /*unused*/ ) : Block()
+    {
+    }
+
+    template < index_t dimension >
+    Block< dimension >::Block( const MeshImpl& impl, BlocksKey /*unused*/ )
+        : Block( impl )
     {
     }
 
@@ -99,33 +113,41 @@ namespace geode
     {
         archive.ext( *this,
             Growable< Archive, Block >{
-                { []( Archive& a, Block& block ) {
-                     a.object( block.impl_ );
-                     a.ext( block,
+                { []( Archive& archive2, Block& block ) {
+                     archive2.object( block.impl_ );
+                     archive2.ext( block,
                          bitsery::ext::BaseClass< Component< dimension > >{} );
                      IdentifierBuilder mesh_builder{
                          block.get_modifiable_mesh()
                      };
                      mesh_builder.set_id( block.id() );
                  },
-                    []( Archive& a, Block& block ) {
-                        a.object( block.impl_ );
-                        a.ext( block, bitsery::ext::BaseClass<
-                                          Component< dimension > >{} );
+                    []( Archive& archive2, Block& block ) {
+                        archive2.object( block.impl_ );
+                        archive2.ext( block, bitsery::ext::BaseClass<
+                                                 Component< dimension > >{} );
                     } } } );
     }
 
     template < index_t dimension >
-    void Block< dimension >::set_mesh( std::unique_ptr< Mesh > mesh, BlocksKey )
+    void Block< dimension >::set_mesh(
+        std::unique_ptr< Mesh > mesh, BlocksKey /*unused*/ )
     {
         impl_->set_mesh( this->id(), std::move( mesh ) );
     }
 
     template < index_t dimension >
     void Block< dimension >::set_mesh(
-        std::unique_ptr< Mesh > mesh, BlocksBuilderKey )
+        std::unique_ptr< Mesh > mesh, BlocksBuilderKey /*unused*/ )
     {
         impl_->set_mesh( this->id(), std::move( mesh ) );
+    }
+
+    template < index_t dimension >
+    void Block< dimension >::set_block_name(
+        absl::string_view name, BlocksBuilderKey /*unused*/ )
+    {
+        this->set_name( name );
     }
 
     template class opengeode_model_api Block< 3 >;

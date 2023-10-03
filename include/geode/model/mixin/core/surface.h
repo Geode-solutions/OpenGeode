@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include <geode/basic/passkey.h>
 #include <geode/basic/pimpl.h>
 
@@ -80,29 +82,26 @@ namespace geode
         }
 
     public:
-        Surface( SurfacesKey ) : Surface() {}
+        Surface( SurfacesKey key );
 
-        Surface( const MeshImpl& impl, SurfacesKey ) : Surface( impl ){};
+        Surface( const MeshImpl& impl, SurfacesKey key );
 
         template < typename TypedMesh = Mesh >
-        TypedMesh& modifiable_mesh( SurfacesKey )
+        TypedMesh& modifiable_mesh( SurfacesKey /*unused*/ )
         {
             return dynamic_cast< TypedMesh& >( get_modifiable_mesh() );
         }
 
         const MeshImpl& mesh_type() const;
 
-        void set_mesh( std::unique_ptr< Mesh > mesh, SurfacesKey );
+        void set_mesh( std::unique_ptr< Mesh > mesh, SurfacesKey key );
 
-        void set_mesh( std::unique_ptr< Mesh > mesh, SurfacesBuilderKey );
+        void set_mesh( std::unique_ptr< Mesh > mesh, SurfacesBuilderKey key );
 
-        void set_surface_name( absl::string_view name, SurfacesBuilderKey )
-        {
-            this->set_name( name );
-        }
+        void set_surface_name( absl::string_view name, SurfacesBuilderKey key );
 
         template < typename TypedMesh = Mesh >
-        TypedMesh& modifiable_mesh( SurfacesBuilderKey )
+        TypedMesh& modifiable_mesh( SurfacesBuilderKey /*unused*/ )
         {
             return dynamic_cast< TypedMesh& >( get_modifiable_mesh() );
         }

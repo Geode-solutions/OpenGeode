@@ -23,6 +23,8 @@
 
 #include <geode/model/mixin/core/corner.h>
 
+#include <bitsery/ext/inheritance.h>
+
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/pimpl_impl.h>
 
@@ -42,9 +44,10 @@ namespace geode
         template < typename Archive >
         void serialize( Archive& archive )
         {
-            archive.ext( *this, Growable< Archive, Impl >{ { []( Archive& a,
-                                                                 Impl& impl ) {
-                a.ext( impl,
+            archive.ext( *this, Growable< Archive,
+                                    Impl >{ { []( Archive& archive2,
+                                                  Impl& impl ) {
+                archive2.ext( impl,
                     bitsery::ext::BaseClass< detail::MeshStorage< Mesh > >{} );
             } } } );
         }
@@ -69,6 +72,17 @@ namespace geode
     }
 
     template < index_t dimension >
+    Corner< dimension >::Corner( CornersKey /*unused*/ ) : Corner()
+    {
+    }
+
+    template < index_t dimension >
+    Corner< dimension >::Corner( const MeshImpl& impl, CornersKey /*unused*/ )
+        : Corner( impl )
+    {
+    }
+
+    template < index_t dimension >
     Corner< dimension >::Corner( const MeshImpl& impl )
     {
         impl_->set_mesh( this->id(), Mesh::create( impl ) );
@@ -78,6 +92,12 @@ namespace geode
     auto Corner< dimension >::mesh() const -> const Mesh&
     {
         return impl_->mesh();
+    }
+
+    template < index_t dimension >
+    auto Corner< dimension >::modifiable_mesh( CornersKey /*unused*/ ) -> Mesh&
+    {
+        return modifiable_mesh();
     }
 
     template < index_t dimension >
@@ -93,35 +113,49 @@ namespace geode
     }
 
     template < index_t dimension >
+    void Corner< dimension >::set_corner_name(
+        absl::string_view name, CornersBuilderKey /*unused*/ )
+    {
+        this->set_name( name );
+    }
+
+    template < index_t dimension >
+    auto Corner< dimension >::modifiable_mesh( CornersBuilderKey /*unused*/ )
+        -> Mesh&
+    {
+        return modifiable_mesh();
+    }
+
+    template < index_t dimension >
     template < typename Archive >
     void Corner< dimension >::serialize( Archive& archive )
     {
         archive.ext( *this,
             Growable< Archive, Corner >{
-                { []( Archive& a, Corner& corner ) {
-                     a.object( corner.impl_ );
-                     a.ext( corner,
+                { []( Archive& archive2, Corner& corner ) {
+                     archive2.object( corner.impl_ );
+                     archive2.ext( corner,
                          bitsery::ext::BaseClass< Component< dimension > >{} );
                      IdentifierBuilder mesh_builder{ corner.modifiable_mesh() };
                      mesh_builder.set_id( corner.id() );
                  },
-                    []( Archive& a, Corner& corner ) {
-                        a.object( corner.impl_ );
-                        a.ext( corner, bitsery::ext::BaseClass<
-                                           Component< dimension > >{} );
+                    []( Archive& archive2, Corner& corner ) {
+                        archive2.object( corner.impl_ );
+                        archive2.ext( corner, bitsery::ext::BaseClass<
+                                                  Component< dimension > >{} );
                     } } } );
     }
 
     template < index_t dimension >
     void Corner< dimension >::set_mesh(
-        std::unique_ptr< Mesh > mesh, CornersKey )
+        std::unique_ptr< Mesh > mesh, CornersKey /*unused*/ )
     {
         impl_->set_mesh( this->id(), std::move( mesh ) );
     }
 
     template < index_t dimension >
     void Corner< dimension >::set_mesh(
-        std::unique_ptr< Mesh > mesh, CornersBuilderKey )
+        std::unique_ptr< Mesh > mesh, CornersBuilderKey /*unused*/ )
     {
         impl_->set_mesh( this->id(), std::move( mesh ) );
     }
