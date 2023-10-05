@@ -98,10 +98,19 @@ namespace
                         .type_name(),
                     geode::to_string( crs_name ) );
             }
-            std::remove_if( crs_intersection.begin(), crs_intersection.end(),
-                [&crss]( const CRSMapValue& pair ) {
-                    return !crss.contains( pair );
-                } );
+            for( auto first = crs_intersection.begin(),
+                      last = crs_intersection.end();
+                 first != last; )
+            {
+                if( !crss.contains( *first ) )
+                {
+                    crs_intersection.erase( first++ );
+                }
+                else
+                {
+                    ++first;
+                }
+            }
         }
     }
 
