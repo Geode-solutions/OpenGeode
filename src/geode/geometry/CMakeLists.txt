@@ -39,6 +39,7 @@ add_geode_library(
         "coordinate_system.cpp"
         "distance.cpp"
         "frame.cpp"
+        "information.cpp"
         "intersection.cpp"
         "intersection_detection.cpp"
         "mensuration.cpp"

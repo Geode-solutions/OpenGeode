@@ -21,55 +21,35 @@
  *
  */
 
-#pragma once
+#include <geode/geometry/information.h>
 
-#include <geode/geometry/common.h>
+#include <absl/container/flat_hash_map.h>
 
 namespace geode
 {
-    enum struct Side
-    {
-        positive,
-        negative,
-        zero
-    };
-
-    using Sign = Side;
-
-    enum struct Position
-    {
-        // Strictly outside
-        outside,
-        // Strictly inside
-        inside,
-        // Vertices
-        vertex0,
-        vertex1,
-        vertex2,
-        vertex3,
-        // Three edges of a triangle
-        edge0,
-        edge1,
-        edge2,
-        // Six edges of a tetra
-        edge01,
-        edge02,
-        edge03,
-        edge12,
-        edge13,
-        edge23,
-        // Four facets of a tetra
-        facet0,
-        facet1,
-        facet2,
-        facet3,
-        // Parallel or coplanar configuration
-        parallel
-    };
-
     namespace detail
     {
-        local_index_t opengeode_geometry_api poistion_to_index(
-            Position position );
+        local_index_t poistion_to_index( Position position )
+        {
+            static const absl::flat_hash_map< Position, local_index_t > map = {
+                { Position::vertex0, 0 },
+                { Position::vertex1, 1 },
+                { Position::vertex2, 2 },
+                { Position::vertex3, 3 },
+                { Position::edge0, 0 },
+                { Position::edge1, 1 },
+                { Position::edge2, 2 },
+                { Position::facet0, 0 },
+                { Position::facet1, 1 },
+                { Position::facet2, 2 },
+                { Position::facet3, 3 },
+            };
+            const auto index_it = map.find( position );
+            if( index_it == map.end() )
+            {
+                return NO_LID;
+            }
+            return index_it->second;
+        }
     } // namespace detail
 } // namespace geode
