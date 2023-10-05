@@ -23,8 +23,14 @@
 
 #include <geode/model/helpers/model_coordinate_reference_system.h>
 
-#include <absl/container/flat_hash_set.h>
+#include <string>
+#include <utility>
+#include <vector>
 
+#include <absl/container/flat_hash_set.h>
+#include <absl/types/optional.h>
+
+#include <geode/mesh/core/coordinate_reference_system.h>
 #include <geode/mesh/core/coordinate_reference_system_manager.h>
 #include <geode/mesh/core/edged_curve.h>
 #include <geode/mesh/core/point_set.h>
@@ -100,17 +106,17 @@ namespace
                 continue;
             }
             std::vector< CRSMapValue > to_remove;
-            for( const auto& pair : crs_intersection )
-            {
-                if( !crss.contains( pair ) )
-                {
-                    to_remove.push_back( pair );
-                }
-            }
-            for( const auto& pair : to_remove )
-            {
-                crs_intersection.erase( pair );
-            }
+            absl::c_for_each( crs_intersection,
+                [&to_remove, &crss]( const CRSMapValue& pair ) {
+                    if( !crss.contains( pair ) )
+                    {
+                        to_remove.push_back( pair );
+                    }
+                } );
+            absl::c_for_each(
+                to_remove, [&crs_intersection]( const CRSMapValue& pair ) {
+                    crs_intersection.erase( pair );
+                } );
         }
     }
 

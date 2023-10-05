@@ -23,6 +23,11 @@
 
 #pragma once
 
+#include <string>
+#include <utility>
+
+#include <absl/container/fixed_array.h>
+
 #include <geode/mesh/core/coordinate_reference_system.h>
 
 #include <geode/model/common.h>
