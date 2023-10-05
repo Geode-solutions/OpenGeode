@@ -27,6 +27,7 @@
 #include <utility>
 #include <vector>
 
+#include <absl/container/fixed_array.h>
 #include <absl/container/flat_hash_set.h>
 #include <absl/types/optional.h>
 
@@ -92,30 +93,14 @@ namespace
             for( const auto& crs_name :
                 crs_manager.coordinate_reference_system_names() )
             {
-                auto pair = std::make_pair(
+                crss.emplace(
                     crs_manager.find_coordinate_reference_system( crs_name )
                         .type_name(),
                     geode::to_string( crs_name ) );
-                if( crs_intersection.contains( pair ) )
-                {
-                    crss.emplace( std::move( pair ) );
-                }
             }
-            if( crss.size() == crs_intersection.size() )
-            {
-                continue;
-            }
-            std::vector< CRSMapValue > to_remove;
-            absl::c_for_each( crs_intersection,
-                [&to_remove, &crss]( const CRSMapValue& pair ) {
-                    if( !crss.contains( pair ) )
-                    {
-                        to_remove.push_back( pair );
-                    }
-                } );
-            absl::c_for_each(
-                to_remove, [&crs_intersection]( const CRSMapValue& pair ) {
-                    crs_intersection.erase( pair );
+            std::remove_if( crs_intersection.begin(), crs_intersection.end(),
+                [&crss]( const CRSMapValue& pair ) {
+                    return !crss.contains( pair );
                 } );
         }
     }
