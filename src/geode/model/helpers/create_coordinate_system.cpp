@@ -23,6 +23,8 @@
 
 #include <geode/model/helpers/create_coordinate_system.h>
 
+#include <absl/strings/string_view.h>
+
 #include <geode/mesh/builder/coordinate_reference_system_manager_builder.h>
 #include <geode/mesh/builder/edged_curve_builder.h>
 #include <geode/mesh/builder/point_set_builder.h>
