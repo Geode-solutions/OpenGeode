@@ -11,7 +11,8 @@ Checks: >
   -misc-no-recursion,
   -modernize-use-trailing-return-type,
   -readability-redundant-access-specifiers,
-  -readability-convert-member-functions-to-static
+  -readability-convert-member-functions-to-static,
+  -cppcoreguidelines-avoid-const-or-ref-data-members
 
 CheckOptions:
   - key:    misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
@@ -33,9 +34,13 @@ CheckOptions:
     value: lower_case
   - key: readability-identifier-naming.ConstexprVariableCase
     value: UPPER_CASE
+  - key: readability-identifier-naming.ConstexprVariableIgnoredRegexp
+    value: dim.*
   - key: readability-identifier-naming.PrivateMemberSuffix
     value: _
   - key: readability-identifier-naming.MacroDefinitionCase
+    value: UPPER_CASE
+  - key: readability-identifier-naming.EnumCase
     value: UPPER_CASE
   - key: readability-identifier-naming.EnumConstantCase
     value: lower_case
@@ -55,10 +60,8 @@ CheckOptions:
     value: 4
   - key: misc-include-cleaner.IgnoreHeaders
     value:  '
-            utility;
-            cstddef;
-            math.h;
-            geode/.*_export\.h;
+            cstddef
+            .*_export\.h;
             geode/.*/common\.h;
             geode/basic/types\.h;
             geode/basic/assert\.h;
