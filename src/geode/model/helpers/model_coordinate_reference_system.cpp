@@ -40,10 +40,82 @@
 
 namespace
 {
+    using CRSMapValue = std::pair< geode::CRSType, std::string >;
+    using CRSMap = absl::flat_hash_set< CRSMapValue >;
+
     template < typename Range >
-    void get_components_crs(
-        absl::flat_hash_set< std::pair< geode::CRSType, std::string > >& crss,
-        Range range )
+    absl::optional< CRSMap > get_first_components_crs( Range range )
+    {
+        for( const auto& component : range )
+        {
+            const auto& mesh = component.mesh();
+            if( mesh.nb_vertices() == 0 )
+            {
+                continue;
+            }
+            const auto& crs_manager =
+                mesh.main_coordinate_reference_system_manager();
+            CRSMap crss;
+            for( const auto& crs_name :
+                crs_manager.coordinate_reference_system_names() )
+            {
+                crss.emplace(
+                    crs_manager.find_coordinate_reference_system( crs_name )
+                        .type_name(),
+                    geode::to_string( crs_name ) );
+            }
+            return crss;
+        }
+        return absl::nullopt;
+    }
+
+    template < typename Range >
+    void get_components_crs_intersection(
+        CRSMap& crs_intersection, Range range )
+    {
+        for( const auto& component : range )
+        {
+            const auto& mesh = component.mesh();
+            if( mesh.nb_vertices() == 0 )
+            {
+                continue;
+            }
+            const auto& crs_manager =
+                mesh.main_coordinate_reference_system_manager();
+            CRSMap crss;
+            for( const auto& crs_name :
+                crs_manager.coordinate_reference_system_names() )
+            {
+                auto pair = std::make_pair(
+                    crs_manager.find_coordinate_reference_system( crs_name )
+                        .type_name(),
+                    geode::to_string( crs_name ) );
+                if( crs_intersection.contains( pair ) )
+                {
+                    crss.emplace( std::move( pair ) );
+                }
+            }
+            if( crss.size() == crs_intersection.size() )
+            {
+                continue;
+            }
+            std::vector< CRSMapValue > to_remove;
+            for( const auto& pair : crs_intersection )
+            {
+                if( !crss.contains( pair ) )
+                {
+                    to_remove.push_back( pair );
+                }
+            }
+            for( const auto& pair : to_remove )
+            {
+                crs_intersection.erase( pair );
+            }
+        }
+    }
+
+    template < typename Range >
+    void get_components_crs( CRSMap& crss, Range range )
     {
         for( const auto& component : range )
         {
@@ -62,7 +134,7 @@ namespace
     }
 
     absl::FixedArray< std::pair< geode::CRSType, std::string > > get_result(
-        absl::flat_hash_set< std::pair< geode::CRSType, std::string > >& crss )
+        CRSMap& crss )
     {
         absl::FixedArray< std::pair< geode::CRSType, std::string > > result(
             crss.size() );
@@ -73,6 +145,42 @@ namespace
         }
         return result;
     }
+
+    template < typename Model >
+    absl::optional< CRSMap > get_first_model_crs( const Model& model )
+    {
+        if( auto crss = get_first_components_crs( model.corners() ) )
+        {
+            return crss;
+        }
+        if( auto crss = get_first_components_crs( model.lines() ) )
+        {
+            return crss;
+        }
+        if( auto crss = get_first_components_crs( model.surfaces() ) )
+        {
+            return crss;
+        }
+        return absl::nullopt;
+    }
+
+    template < typename Model >
+    CRSMap model_crss( const Model& model )
+    {
+        CRSMap crss;
+        get_components_crs( crss, model.corners() );
+        get_components_crs( crss, model.lines() );
+        get_components_crs( crss, model.surfaces() );
+        return crss;
+    }
+
+    template < typename Model >
+    void model_crss_intersection( const Model& model, CRSMap& intersection )
+    {
+        get_components_crs_intersection( intersection, model.corners() );
+        get_components_crs_intersection( intersection, model.lines() );
+        get_components_crs_intersection( intersection, model.surfaces() );
+    }
 } // namespace
 
 namespace geode
@@ -80,21 +188,44 @@ namespace geode
     absl::FixedArray< std::pair< CRSType, std::string > >
         brep_coordinate_reference_systems( const BRep& brep )
     {
-        absl::flat_hash_set< std::pair< CRSType, std::string > > crss;
-        get_components_crs( crss, brep.corners() );
-        get_components_crs( crss, brep.lines() );
-        get_components_crs( crss, brep.surfaces() );
-        get_components_crs( crss, brep.blocks() );
-        return get_result( crss );
+        if( auto crss = get_first_model_crs( brep ) )
+        {
+            model_crss_intersection( brep, crss.value() );
+            get_components_crs_intersection( crss.value(), brep.blocks() );
+            return get_result( crss.value() );
+        }
+        if( auto crss = get_first_components_crs( brep.blocks() ) )
+        {
+            model_crss_intersection( brep, crss.value() );
+            get_components_crs_intersection( crss.value(), brep.blocks() );
+            return get_result( crss.value() );
+        }
+        return {};
     }
 
     absl::FixedArray< std::pair< CRSType, std::string > >
         section_coordinate_reference_systems( const Section& section )
     {
-        absl::flat_hash_set< std::pair< CRSType, std::string > > crss;
-        get_components_crs( crss, section.corners() );
-        get_components_crs( crss, section.lines() );
-        get_components_crs( crss, section.surfaces() );
+        if( auto crss = get_first_model_crs( section ) )
+        {
+            model_crss_intersection( section, crss.value() );
+            return get_result( crss.value() );
+        }
+        return {};
+    }
+
+    absl::FixedArray< std::pair< CRSType, std::string > >
+        brep_active_coordinate_reference_systems( const BRep& brep )
+    {
+        auto crss = model_crss( brep );
+        get_components_crs( crss, brep.blocks() );
+        return get_result( crss );
+    }
+
+    absl::FixedArray< std::pair< CRSType, std::string > >
+        section_active_coordinate_reference_systems( const Section& section )
+    {
+        auto crss = model_crss( section );
         return get_result( crss );
     }
 } // namespace geode

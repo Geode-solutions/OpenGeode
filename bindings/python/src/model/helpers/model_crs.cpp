@@ -41,9 +41,17 @@ namespace geode
                 &brep_coordinate_reference_systems )
             .def( "section_coordinate_reference_systems",
                 &section_coordinate_reference_systems )
+            .def( "brep_active_coordinate_reference_systems",
+                &brep_active_coordinate_reference_systems )
+            .def( "section_active_coordinate_reference_systems",
+                &section_active_coordinate_reference_systems )
             .def( "create_brep_coordinate_system",
                 &create_brep_coordinate_system )
             .def( "create_section_coordinate_system",
-                &create_section_coordinate_system );
+                &create_section_coordinate_system )
+            .def( "set_brep_active_coordinate_system",
+                &set_brep_active_coordinate_system )
+            .def( "set_section_active_coordinate_system",
+                &set_section_active_coordinate_system );
     }
 } // namespace geode

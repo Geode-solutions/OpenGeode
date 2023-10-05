@@ -49,4 +49,14 @@ namespace geode
         absl::string_view new_coordinate_system_name,
         const CoordinateSystem2D& input,
         const CoordinateSystem2D& output );
+
+    void opengeode_model_api set_brep_active_coordinate_system(
+        const BRep& model,
+        BRepBuilder& builder,
+        absl::string_view coordinate_system_name );
+
+    void opengeode_model_api set_section_active_coordinate_system(
+        const Section& model,
+        SectionBuilder& builder,
+        absl::string_view coordinate_system_name );
 } // namespace geode
