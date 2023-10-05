@@ -53,7 +53,7 @@ CheckOptions:
   - key: readability-identifier-naming.MemberConstantCase
     value: CamelCase 
   - key: readability-identifier-naming.StaticConstantCase
-    value: CamelCase 
+    value: lower_case 
   - key: readability-function-cognitive-complexity.Threshold
     value: 10
   - key: readability-function-size.ParameterThreshold
