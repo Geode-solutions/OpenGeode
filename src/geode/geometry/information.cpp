@@ -29,7 +29,7 @@ namespace geode
 {
     namespace detail
     {
-        local_index_t poistion_to_index( Position position )
+        local_index_t position_to_index( Position position )
         {
             static const absl::flat_hash_map< Position, local_index_t > map = {
                 { Position::vertex0, 0 },
