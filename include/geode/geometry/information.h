@@ -69,7 +69,7 @@ namespace geode
 
     namespace detail
     {
-        local_index_t opengeode_geometry_api poistion_to_index(
+        local_index_t opengeode_geometry_api position_to_index(
             Position position );
     } // namespace detail
 } // namespace geode
