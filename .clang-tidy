@@ -59,11 +59,6 @@ CheckOptions:
   - key: readability-function-size.ParameterThreshold
     value: 4
   - key: misc-include-cleaner.IgnoreHeaders
-    value:  '
-            cstddef
-            .*_export\.h;
-            geode/.*/common\.h;
-            geode/basic/types\.h;
-            geode/basic/assert\.h;
-            '
+    value:  utility;cstddef;geode/.*_export\.h;geode/.*/common\.h;geode/basic/types\.h;geode/basic/assert\.h;
+
 
