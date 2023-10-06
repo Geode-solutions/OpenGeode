@@ -47,19 +47,36 @@ namespace geode
 namespace geode
 {
     PolygonVertices opengeode_model_api polygon_unique_vertices(
+        const Section& model, const Surface2D& surface, index_t polygon_id );
+
+    PolygonVertices opengeode_model_api polygon_unique_vertices(
         const BRep& model, const Surface3D& surface, index_t polygon_id );
 
     PolygonVertices opengeode_model_api polygon_unique_vertices(
         const BRep& model, const Block3D& block, const PolyhedronFacet& facet );
 
-    struct BRepComponentMeshPolygons
+    struct ModelComponentMeshPolygons
     {
         using SurfacePolygons =
             absl::flat_hash_map< uuid, std::vector< index_t > >;
+        SurfacePolygons surface_polygons;
+    };
+
+    struct SectionComponentMeshPolygons : public ModelComponentMeshPolygons
+    {
+    };
+
+    SectionComponentMeshPolygons opengeode_model_api component_mesh_polygons(
+        const Section& section,
+        const PolygonVertices& polygon_unique_vertices );
+
+    SectionComponentMeshPolygons opengeode_model_api component_mesh_polygons(
+        const Section& section, const Surface2D& surface, index_t polygon_id );
+
+    struct BRepComponentMeshPolygons : public ModelComponentMeshPolygons
+    {
         using BlockPolygons =
             absl::flat_hash_map< uuid, std::vector< PolyhedronFacet > >;
-
-        SurfacePolygons surface_polygons;
         BlockPolygons block_polygons;
     };
 
@@ -179,8 +196,9 @@ namespace geode
 
     namespace detail
     {
-        BRepComponentMeshPolygons::SurfacePolygons opengeode_model_api
-            surface_component_mesh_polygons( const BRep& model,
+        template < typename Model >
+        ModelComponentMeshPolygons::SurfacePolygons
+            surface_component_mesh_polygons( const Model& model,
                 const PolygonVertices& polygon_unique_vertices );
 
         BRepComponentMeshPolygons::BlockPolygons opengeode_model_api
