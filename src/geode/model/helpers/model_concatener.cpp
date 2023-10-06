@@ -147,7 +147,7 @@ namespace geode
 
         ModelCopyMapping concatenate( const Model& other_model )
         {
-            const auto mapping = builder_.copy_components( other_model );
+            auto mapping = builder_.copy_components( other_model );
             builder_.copy_component_geometry( mapping, other_model );
             copy_relationships( other_model, mapping );
             return mapping;

@@ -98,13 +98,14 @@ namespace
         {
             auto slice0_conversion_output = convert_section_into_brep(
                 section_, options.axis_to_extrude, options.min_coordinate );
-            section_slice0_mapping_ = std::get< 1 >( slice0_conversion_output );
-            slice0_brep_mapping_ =
-                brep_builder_.copy( std::get< 0 >( slice0_conversion_output ) );
+            section_slice0_mapping_ =
+                std::move( std::get< 1 >( slice0_conversion_output ) );
+            brep_ = std::move( std::get< 0 >( slice0_conversion_output ) );
 
             auto slice1_conversion_output = convert_section_into_brep(
                 section_, options.axis_to_extrude, options.max_coordinate );
-            section_slice1_mapping_ = std::get< 1 >( slice1_conversion_output );
+            section_slice1_mapping_ =
+                std::move( std::get< 1 >( slice1_conversion_output ) );
             geode::BRepConcatener brep_concatener{ brep_ };
             slice1_brep_mapping_ = brep_concatener.concatenate(
                 std::get< 0 >( slice1_conversion_output ) );
@@ -114,9 +115,8 @@ namespace
             const geode::ComponentType& brep_component_type,
             geode::uuid section_component )
         {
-            return slice0_brep_mapping_.at( brep_component_type )
-                .in2out( section_slice0_mapping_.at( brep_component_type )
-                             .in2out( section_component ) );
+            return section_slice0_mapping_.at( brep_component_type )
+                .in2out( section_component );
         }
 
         geode::uuid section_slice1_brep_mapping(
@@ -415,7 +415,6 @@ namespace
         geode::BRep brep_;
         geode::BRepBuilder brep_builder_;
         geode::ModelCopyMapping section_slice0_mapping_;
-        geode::ModelCopyMapping slice0_brep_mapping_;
         geode::ModelCopyMapping section_slice1_mapping_;
         geode::ModelCopyMapping slice1_brep_mapping_;
     };
@@ -428,7 +427,7 @@ namespace geode
     {
         Section section;
         SectionBuilder builder{ section };
-        DEBUG_CONST auto mappings =
+        auto mappings =
             copy_components< BRep, SectionBuilder >( brep, builder );
         for( const auto& corner : brep.corners() )
         {
@@ -462,7 +461,7 @@ namespace geode
     {
         BRep brep;
         BRepBuilder builder{ brep };
-        DEBUG_CONST auto mappings =
+        auto mappings =
             copy_components< Section, BRepBuilder >( section, builder );
         for( const auto& corner : section.corners() )
         {

@@ -39,8 +39,14 @@ namespace geode
     template < typename MappingType >
     class ModelMapping
     {
+        OPENGEODE_DISABLE_COPY( ModelMapping );
+
     public:
         using Mapping = MappingType;
+
+        ModelMapping() = default;
+        ModelMapping( ModelMapping&& other ) = default;
+        ModelMapping& operator=( ModelMapping&& other ) = default;
 
         MappingType& at( const ComponentType& type )
         {

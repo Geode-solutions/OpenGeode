@@ -36,6 +36,8 @@ namespace geode
         class StorageType >
     class MappingBase
     {
+        OPENGEODE_DISABLE_COPY( MappingBase );
+
     public:
         template < typename T >
         using Storage = typename StorageType< T >::Type;
@@ -78,6 +80,8 @@ namespace geode
 
     protected:
         MappingBase() = default;
+        MappingBase( MappingBase&& other ) = default;
+        MappingBase& operator=( MappingBase&& other ) = default;
 
         index_t size_input() const
         {

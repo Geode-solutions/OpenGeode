@@ -103,8 +103,12 @@ namespace geode
     {
     public:
         uuid();
-
         uuid( absl::string_view string );
+        uuid( const uuid & ) = default;
+        uuid( uuid && ) = default;
+        uuid &operator=( uuid &&other ) = default;
+        uuid &operator=( const uuid &other ) = default;
+        ~uuid() = default;
 
         bool operator==( const uuid &other ) const;
 

@@ -252,7 +252,7 @@ namespace geode
             value_ = std::move( value );
         }
 
-        T default_value() const
+        const T& default_value() const
         {
             return value();
         }
@@ -386,7 +386,7 @@ namespace geode
             values_[element] = std::move( value );
         }
 
-        T default_value() const
+        const T& default_value() const
         {
             return default_value_;
         }
@@ -780,7 +780,7 @@ namespace geode
             values_[element] = std::move( value );
         }
 
-        T default_value() const
+        const T& default_value() const
         {
             return default_value_;
         }
@@ -854,14 +854,15 @@ namespace geode
             AttributeBase::AttributeKey ) override
         {
             const auto old2new = detail::mapping_after_deletion( to_delete );
-            const auto old_values = values_;
-            values_.clear();
+            auto old_values = std::move( values_ );
+            values_ = decltype( values_ )();
             values_.reserve( old_values.size() );
-            for( const auto& value : old_values )
+            for( auto& value : old_values )
             {
                 if( !to_delete[value.first] && value.second != default_value_ )
                 {
-                    values_.emplace( old2new[value.first], value.second );
+                    values_.emplace(
+                        old2new[value.first], std::move( value.second ) );
                 }
             }
         }
@@ -869,12 +870,13 @@ namespace geode
         void permute_elements( absl::Span< const index_t > permutation,
             AttributeBase::AttributeKey ) override
         {
-            const auto old_values = values_;
-            values_.clear();
+            auto old_values = std::move( values_ );
+            values_ = decltype( values_ )();
             values_.reserve( old_values.size() );
-            for( const auto& value : old_values )
+            for( auto& value : old_values )
             {
-                values_.emplace( permutation[value.first], value.second );
+                values_.emplace(
+                    permutation[value.first], std::move( value.second ) );
             }
         }
 

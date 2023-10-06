@@ -30,8 +30,9 @@
     const auto name##type = absl::StrCat( "BijectiveMapping", #type );         \
     pybind11::class_< BijectiveMapping< type > >( module, name##type.c_str() ) \
         .def( pybind11::init<>() )                                             \
-        .def( "map", &BijectiveMapping< type >::map )                          \
-        .def( "reserve", &BijectiveMapping< type >::reserve )                  \
+        .def( pybind11::init( []( BijectiveMapping< type >& mapping ) {        \
+            return BijectiveMapping< type >{ std::move( mapping ) };           \
+        } ) )                                                                  \
         .def( "has_mapping_input",                                             \
             &BijectiveMapping< type >::has_mapping_input )                     \
         .def( "has_mapping_output",                                            \
