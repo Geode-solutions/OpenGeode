@@ -38,6 +38,24 @@
 
 namespace
 {
+    template < typename Model >
+    geode::PolygonVertices surface_polygon_unique_vertices( const Model& model,
+        const geode::Surface< Model::dim >& surface,
+        geode::index_t polygon_id )
+    {
+        const auto& surface_mesh = surface.mesh();
+        const auto nb_vertices = surface_mesh.nb_polygon_vertices( polygon_id );
+        geode::PolygonVertices polygon_unique_vertices( nb_vertices );
+        for( const auto polygon_vertex_id : geode::LRange{ nb_vertices } )
+        {
+            polygon_unique_vertices[polygon_vertex_id] =
+                model.unique_vertex( { surface.component_id(),
+                    surface_mesh.polygon_vertex(
+                        { polygon_id, polygon_vertex_id } ) } );
+        }
+        return polygon_unique_vertices;
+    }
+
     absl::FixedArray< std::vector< geode::index_t > >
         block_facet_from_model_unique_vertices( const geode::BRep& model,
             const geode::Block3D& block,
@@ -519,8 +537,9 @@ namespace
         }
     }
 
+    template < typename Model >
     geode::ComponentMeshVertexGeneric< 3 > model_polygon_pairs(
-        const geode::BRep& model,
+        const Model& model,
         const geode::PolygonVertices& polygon_unique_vertices,
         const geode::ComponentType& type )
     {
@@ -536,14 +555,34 @@ namespace
             unique_vertices, type );
     }
 
+    template < typename Model >
+    void model_component_mesh_polygons(
+        geode::ModelComponentMeshPolygons& polygons,
+        const Model& model,
+        const geode::PolygonVertices& polygon_unique_vertices )
+    {
+        polygons.surface_polygons =
+            geode::detail::surface_component_mesh_polygons(
+                model, polygon_unique_vertices );
+    }
+
+    geode::SectionComponentMeshPolygons section_component_mesh_polygons(
+        const geode::Section& section,
+        const geode::PolygonVertices& polygon_unique_vertices )
+    {
+        geode::SectionComponentMeshPolygons polygons;
+        model_component_mesh_polygons(
+            polygons, section, polygon_unique_vertices );
+        return polygons;
+    }
+
     geode::BRepComponentMeshPolygons brep_component_mesh_polygons(
         const geode::BRep& brep,
         const geode::PolygonVertices& polygon_unique_vertices )
     {
         geode::BRepComponentMeshPolygons polygons;
-        polygons.surface_polygons =
-            geode::detail::surface_component_mesh_polygons(
-                brep, polygon_unique_vertices );
+        model_component_mesh_polygons(
+            polygons, brep, polygon_unique_vertices );
         polygons.block_polygons = geode::detail::block_component_mesh_polygons(
             brep, polygon_unique_vertices );
         return polygons;
@@ -554,17 +593,19 @@ namespace geode
 {
     namespace detail
     {
-        BRepComponentMeshPolygons::SurfacePolygons
-            surface_component_mesh_polygons( const BRep& model,
+        template < typename Model >
+        ModelComponentMeshPolygons::SurfacePolygons
+            surface_component_mesh_polygons( const Model& model,
                 const PolygonVertices& polygon_unique_vertices )
         {
-            auto surface_pairs = model_polygon_pairs( model,
-                polygon_unique_vertices, Surface3D::component_type_static() );
+            auto surface_pairs =
+                model_polygon_pairs( model, polygon_unique_vertices,
+                    Surface< Model::dim >::component_type_static() );
             if( surface_pairs.empty() )
             {
                 return {};
             }
-            BRepComponentMeshPolygons::SurfacePolygons polygons;
+            ModelComponentMeshPolygons::SurfacePolygons polygons;
             polygons.reserve( surface_pairs.size() );
             for( auto& surface_pair : surface_pairs )
             {
@@ -626,6 +667,7 @@ namespace geode
             filter_polygons( polygons );
             return polygons;
         }
+
     } // namespace detail
 
     PolygonVertices polygon_unique_vertices(
@@ -645,19 +687,29 @@ namespace geode
     }
 
     PolygonVertices polygon_unique_vertices(
+        const Section& model, const Surface2D& surface, index_t polygon_id )
+    {
+        return ::surface_polygon_unique_vertices( model, surface, polygon_id );
+    }
+
+    PolygonVertices polygon_unique_vertices(
         const BRep& model, const Surface3D& surface, index_t polygon_id )
     {
-        const auto& surface_mesh = surface.mesh();
-        const auto nb_vertices = surface_mesh.nb_polygon_vertices( polygon_id );
-        PolygonVertices polygon_unique_vertices( nb_vertices );
-        for( const auto polygon_vertex_id : LRange{ nb_vertices } )
-        {
-            polygon_unique_vertices[polygon_vertex_id] =
-                model.unique_vertex( { surface.component_id(),
-                    surface_mesh.polygon_vertex(
-                        { polygon_id, polygon_vertex_id } ) } );
-        }
-        return polygon_unique_vertices;
+        return ::surface_polygon_unique_vertices( model, surface, polygon_id );
+    }
+
+    SectionComponentMeshPolygons component_mesh_polygons(
+        const Section& section, const PolygonVertices& polygon_unique_vertices )
+    {
+        return ::section_component_mesh_polygons(
+            section, polygon_unique_vertices );
+    }
+
+    SectionComponentMeshPolygons component_mesh_polygons(
+        const Section& section, const Surface2D& surface, index_t polygon_id )
+    {
+        return ::section_component_mesh_polygons(
+            section, polygon_unique_vertices( section, surface, polygon_id ) );
     }
 
     BRepComponentMeshPolygons component_mesh_polygons(
@@ -803,4 +855,14 @@ namespace geode
         return oriented_surface_vertices_from_model_line_edge< 2, Section >(
             model, surface, line, edge_id );
     }
+
+    namespace detail
+    {
+        template ModelComponentMeshPolygons::SurfacePolygons opengeode_model_api
+            surface_component_mesh_polygons(
+                const Section&, const PolygonVertices& );
+        template ModelComponentMeshPolygons::SurfacePolygons opengeode_model_api
+            surface_component_mesh_polygons(
+                const BRep&, const PolygonVertices& );
+    } // namespace detail
 } // namespace geode
