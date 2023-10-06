@@ -58,7 +58,7 @@ namespace geode
             "Section components in a Section which is not empty, use "
             "ModelConcatener." );
         set_name( section.name() );
-        const auto mapping = copy_components( section );
+        auto mapping = copy_components( section );
         copy_relationships( mapping, section );
         copy_component_geometry( mapping, section );
         return mapping;
