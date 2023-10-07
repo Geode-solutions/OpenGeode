@@ -43,6 +43,12 @@ namespace geode
                 { Position::facet1, 1 },
                 { Position::facet2, 2 },
                 { Position::facet3, 3 },
+                { Position::edge01, 0 },
+                { Position::edge02, 1 },
+                { Position::edge03, 2 },
+                { Position::edge12, 3 },
+                { Position::edge13, 4 },
+                { Position::edge23, 5 },
             };
             const auto index_it = map.find( position );
             if( index_it == map.end() )
