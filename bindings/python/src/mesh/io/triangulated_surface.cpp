@@ -44,7 +44,8 @@
                                   + std::to_string( dimension ) + "D";         \
     module.def( check##dimension.c_str(),                                      \
         &check_triangulated_surface_missing_files< dimension > );              \
-    PYTHON_INPUT_MESH_CLASS( std::unique_ptr< TriangulatedSurface< dimension > >,   \
+    PYTHON_INPUT_MESH_CLASS(                                                   \
+        std::unique_ptr< TriangulatedSurface< dimension > >,                   \
         "TriangulatedSurface" + std::to_string( dimension ) + "D" );           \
     PYTHON_FACTORY_CLASS( TriangulatedSurfaceInputFactory##dimension##D );     \
     PYTHON_FACTORY_CLASS( TriangulatedSurfaceOutputFactory##dimension##D )
