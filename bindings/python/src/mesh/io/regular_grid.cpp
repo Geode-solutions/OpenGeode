@@ -43,7 +43,7 @@
                                   + std::to_string( dimension ) + "D";         \
     module.def( check##dimension.c_str(),                                      \
         &check_regular_grid_missing_files< dimension > );                      \
-    PYTHON_INPUT_MESH_CLASS( std::unique_ptr< RegularGrid< dimension > >,           \
+    PYTHON_INPUT_MESH_CLASS( std::unique_ptr< RegularGrid< dimension > >,      \
         "RegularGrid" + std::to_string( dimension ) + "D" );                   \
     PYTHON_FACTORY_CLASS( RegularGridInputFactory##dimension##D );             \
     PYTHON_FACTORY_CLASS( RegularGridOutputFactory##dimension##D )
