@@ -329,7 +329,7 @@ namespace geode
         {
             builder.edges_builder().delete_isolated_edges();
         }
-        Logger::info( "Repair polygons orientations: ",
+        Logger::debug( "Repair polygons orientations: ",
             polygons_to_reorient.size(), " polygons reoriented" );
     }
 
