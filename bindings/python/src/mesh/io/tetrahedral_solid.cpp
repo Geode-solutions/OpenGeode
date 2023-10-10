@@ -43,7 +43,7 @@
                                   + std::to_string( dimension ) + "D";         \
     module.def( check##dimension.c_str(),                                      \
         &check_tetrahedral_solid_missing_files< dimension > );                 \
-    PYTHON_INPUT_CLASS( std::unique_ptr< TetrahedralSolid< dimension > >,      \
+    PYTHON_INPUT_MESH_CLASS( std::unique_ptr< TetrahedralSolid< dimension > >,      \
         "TetrahedralSolid" + std::to_string( dimension ) + "D" );              \
     PYTHON_FACTORY_CLASS( TetrahedralSolidInputFactory##dimension##D );        \
     PYTHON_FACTORY_CLASS( TetrahedralSolidOutputFactory##dimension##D )

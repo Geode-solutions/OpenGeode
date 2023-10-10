@@ -42,7 +42,7 @@
         "check_point_set_missing_files" + std::to_string( dimension ) + "D";   \
     module.def( check##dimension.c_str(),                                      \
         &check_point_set_missing_files< dimension > );                         \
-    PYTHON_INPUT_CLASS( std::unique_ptr< PointSet< dimension > >,              \
+    PYTHON_INPUT_MESH_CLASS( std::unique_ptr< PointSet< dimension > >,         \
         "PointSet" + std::to_string( dimension ) + "D" );                      \
     PYTHON_FACTORY_CLASS( PointSetInputFactory##dimension##D );                \
     PYTHON_FACTORY_CLASS( PointSetOutputFactory##dimension##D )

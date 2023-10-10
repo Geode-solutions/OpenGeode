@@ -39,7 +39,7 @@ namespace geode
                                    absl::string_view ) >( &load_vertex_set ) );
         module.def(
             "check_vertex_set_missing_files", &check_vertex_set_missing_files );
-        PYTHON_INPUT_CLASS( std::unique_ptr< VertexSet >, "VertexSet" );
+        PYTHON_INPUT_MESH_CLASS( std::unique_ptr< VertexSet >, "VertexSet" );
         PYTHON_FACTORY_CLASS( VertexSetInputFactory );
         PYTHON_FACTORY_CLASS( VertexSetOutputFactory );
     }

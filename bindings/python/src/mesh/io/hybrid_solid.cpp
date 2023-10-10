@@ -42,7 +42,7 @@
                                   + std::to_string( dimension ) + "D";         \
     module.def( check##dimension.c_str(),                                      \
         &check_hybrid_solid_missing_files< dimension > );                      \
-    PYTHON_INPUT_CLASS( std::unique_ptr< HybridSolid< dimension > >,           \
+    PYTHON_INPUT_MESH_CLASS( std::unique_ptr< HybridSolid< dimension > >,      \
         "HybridSolid" + std::to_string( dimension ) + "D" );                   \
     PYTHON_FACTORY_CLASS( HybridSolidInputFactory##dimension##D );             \
     PYTHON_FACTORY_CLASS( HybridSolidOutputFactory##dimension##D )

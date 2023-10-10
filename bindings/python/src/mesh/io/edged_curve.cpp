@@ -42,7 +42,7 @@
         "check_edged_curve_missing_files" + std::to_string( dimension ) + "D"; \
     module.def( check##dimension.c_str(),                                      \
         &check_edged_curve_missing_files< dimension > );                       \
-    PYTHON_INPUT_CLASS( std::unique_ptr< EdgedCurve< dimension > >,            \
+    PYTHON_INPUT_MESH_CLASS( std::unique_ptr< EdgedCurve< dimension > >,       \
         "EdgedCurve" + std::to_string( dimension ) + "D" );                    \
     PYTHON_FACTORY_CLASS( EdgedCurveInputFactory##dimension##D );              \
     PYTHON_FACTORY_CLASS( EdgedCurveOutputFactory##dimension##D )

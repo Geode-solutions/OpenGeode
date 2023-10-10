@@ -32,3 +32,13 @@
             &Input< type >::MissingFiles::additional_files )                   \
         .def_readwrite(                                                        \
             "mandatory_files", &Input< type >::MissingFiles::mandatory_files )
+
+#define PYTHON_INPUT_MESH_CLASS( type, name )                                  \
+    pybind11::class_< Input< type, MeshImpl >::MissingFiles >(                 \
+        module, absl::StrCat( "MissingFiles", name ).c_str() )                 \
+        .def( "has_missing_files",                                             \
+            &Input< type, MeshImpl >::MissingFiles::has_missing_files )        \
+        .def_readwrite( "additional_files",                                    \
+            &Input< type, MeshImpl >::MissingFiles::additional_files )         \
+        .def_readwrite( "mandatory_files",                                     \
+            &Input< type, MeshImpl >::MissingFiles::mandatory_files )
