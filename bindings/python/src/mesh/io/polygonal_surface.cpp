@@ -21,6 +21,8 @@
  *
  */
 
+#include <string>
+
 #include "../../basic/factory.h"
 #include "../../basic/input.h"
 #include "../../common.h"

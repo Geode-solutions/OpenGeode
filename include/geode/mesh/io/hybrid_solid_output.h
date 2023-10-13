@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/factory.h>
 #include <geode/basic/output.h>
 
@@ -52,7 +54,10 @@ namespace geode
 
     protected:
         HybridSolidOutput( absl::string_view filename )
-            : Output< HybridSolid< dimension > >{ filename }
+            : Output< HybridSolid< dimension > >
+        {
+            filename
+        }
         {
         }
     };

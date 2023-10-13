@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/factory.h>
 #include <geode/basic/output.h>
 
@@ -47,8 +49,10 @@ namespace geode
     class SectionOutput : public Output< Section >
     {
     protected:
-        SectionOutput( absl::string_view filename )
-            : Output< Section >{ filename }
+        SectionOutput( absl::string_view filename ) : Output< Section >
+        {
+            filename
+        }
         {
         }
     };

@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/factory.h>
 #include <geode/basic/output.h>
 
@@ -53,7 +55,10 @@ namespace geode
     {
     protected:
         PolygonalSurfaceOutput( absl::string_view filename )
-            : Output< PolygonalSurface< dimension > >{ filename }
+            : Output< PolygonalSurface< dimension > >
+        {
+            filename
+        }
         {
         }
     };

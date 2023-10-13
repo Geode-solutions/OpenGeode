@@ -23,11 +23,15 @@
 
 #pragma once
 
+#include <memory>
+
 #include <ghc/filesystem.hpp>
 
 #include <absl/strings/ascii.h>
+#include <absl/strings/string_view.h>
 
 #include <geode/basic/filename.h>
+#include <geode/basic/logger.h>
 #include <geode/basic/timer.h>
 
 namespace geode
@@ -51,7 +55,7 @@ namespace geode
             const Object& object,
             absl::string_view filename )
         {
-            Timer timer;
+            const Timer timer;
             auto output = geode_object_output_writer< Factory >( filename );
             ghc::filesystem::create_directories(
                 filepath_without_filename( filename ) );

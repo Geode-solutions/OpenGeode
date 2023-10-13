@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/factory.h>
 #include <geode/basic/output.h>
 
@@ -50,7 +52,10 @@ namespace geode
     {
     protected:
         RasterImageOutput( absl::string_view filename )
-            : Output< RasterImage< dimension > >{ filename }
+            : Output< RasterImage< dimension > >
+        {
+            filename
+        }
         {
         }
     };
