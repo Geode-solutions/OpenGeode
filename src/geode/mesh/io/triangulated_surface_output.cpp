@@ -50,8 +50,23 @@ namespace geode
         }
     }
 
+    template < index_t dimension >
+    bool is_triangulated_surface_savable(
+        const TriangulatedSurface< dimension >& triangulated_surface,
+        absl::string_view filename )
+    {
+        const auto output = detail::geode_object_output_writer<
+            TriangulatedSurfaceOutputFactory< dimension > >( filename );
+        return output->is_savable( triangulated_surface );
+    }
+
     template void opengeode_mesh_api save_triangulated_surface(
         const TriangulatedSurface< 2 >&, absl::string_view );
     template void opengeode_mesh_api save_triangulated_surface(
+        const TriangulatedSurface< 3 >&, absl::string_view );
+
+    template bool opengeode_mesh_api is_triangulated_surface_savable(
+        const TriangulatedSurface< 2 >&, absl::string_view );
+    template bool opengeode_mesh_api is_triangulated_surface_savable(
         const TriangulatedSurface< 3 >&, absl::string_view );
 } // namespace geode

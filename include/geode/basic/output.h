@@ -34,6 +34,11 @@ namespace geode
     public:
         virtual void write( const Object& object ) const = 0;
 
+        virtual bool is_savable( const Object& /*unused*/ ) const
+        {
+            return true;
+        }
+
     protected:
         Output( absl::string_view filename ) : IOFile( filename ) {}
     };

@@ -49,8 +49,22 @@ namespace geode
         }
     }
 
+    template < index_t dimension >
+    bool is_point_set_savable(
+        const PointSet< dimension >& point_set, absl::string_view filename )
+    {
+        const auto output = detail::geode_object_output_writer<
+            PointSetOutputFactory< dimension > >( filename );
+        return output->is_savable( point_set );
+    }
+
     template void opengeode_mesh_api save_point_set(
         const PointSet< 2 >&, absl::string_view );
     template void opengeode_mesh_api save_point_set(
+        const PointSet< 3 >&, absl::string_view );
+
+    template bool opengeode_mesh_api is_point_set_savable(
+        const PointSet< 2 >&, absl::string_view );
+    template bool opengeode_mesh_api is_point_set_savable(
         const PointSet< 3 >&, absl::string_view );
 } // namespace geode

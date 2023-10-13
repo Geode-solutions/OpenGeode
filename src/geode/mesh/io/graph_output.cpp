@@ -42,4 +42,13 @@ namespace geode
             throw OpenGeodeException{ "Cannot save Graph in file: ", filename };
         }
     }
+
+    bool is_graph_savable( const Graph& graph, absl::string_view filename )
+    {
+        const auto output =
+            detail::geode_object_output_writer< GraphOutputFactory >(
+                filename );
+        return output->is_savable( graph );
+    }
+
 } // namespace geode

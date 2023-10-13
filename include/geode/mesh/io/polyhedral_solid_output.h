@@ -53,10 +53,18 @@ namespace geode
 
     protected:
         PolyhedralSolidOutput( absl::string_view filename )
-            : Output< PolyhedralSolid< dimension > >{ filename }
+            : Output< PolyhedralSolid< dimension > >
+        {
+            filename
+        }
         {
         }
     };
+
+    template < index_t dimension >
+    bool is_polyhedral_solid_savable(
+        const PolyhedralSolid< dimension >& polyhedral_solid,
+        absl::string_view filename );
 
     template < index_t dimension >
     using PolyhedralSolidOutputFactory = Factory< std::string,

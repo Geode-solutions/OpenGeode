@@ -47,11 +47,16 @@ namespace geode
     class VertexSetOutput : public Output< VertexSet >
     {
     protected:
-        VertexSetOutput( absl::string_view filename )
-            : Output< VertexSet >{ filename }
+        VertexSetOutput( absl::string_view filename ) : Output< VertexSet >
+        {
+            filename
+        }
         {
         }
     };
+
+    bool opengeode_mesh_api is_vertex_set_savable(
+        const VertexSet& vertex_set, absl::string_view filename );
 
     using VertexSetOutputFactory =
         Factory< std::string, VertexSetOutput, absl::string_view >;

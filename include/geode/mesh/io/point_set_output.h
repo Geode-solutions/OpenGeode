@@ -50,10 +50,17 @@ namespace geode
     {
     protected:
         PointSetOutput( absl::string_view filename )
-            : Output< PointSet< dimension > >{ filename }
+            : Output< PointSet< dimension > >
+        {
+            filename
+        }
         {
         }
     };
+
+    template < index_t dimension >
+    bool is_point_set_savable(
+        const PointSet< dimension >& point_set, absl::string_view filename );
 
     template < index_t dimension >
     using PointSetOutputFactory =

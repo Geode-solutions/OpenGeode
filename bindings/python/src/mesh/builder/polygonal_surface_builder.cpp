@@ -31,10 +31,11 @@
         "PolygonalSurfaceBuilder" + std::to_string( dimension ) + "D";         \
     pybind11::class_< PolygonalSurfaceBuilder##dimension##D,                   \
         SurfaceMeshBuilder##dimension##D >( module, name##dimension.c_str() )  \
-        .def_static( "create",                                                 \
-            ( std::unique_ptr< PolygonalSurfaceBuilder##dimension##D >( * )(   \
-                PolygonalSurface< dimension >& ) )                             \
-                & PolygonalSurfaceBuilder##dimension##D::create )
+        .def_static(                                                           \
+            "create", static_cast< std::unique_ptr<                            \
+                          PolygonalSurfaceBuilder##dimension##D > ( * )(       \
+                          PolygonalSurface< dimension >& ) >(                  \
+                          &PolygonalSurfaceBuilder##dimension##D::create ) )
 
 namespace geode
 {

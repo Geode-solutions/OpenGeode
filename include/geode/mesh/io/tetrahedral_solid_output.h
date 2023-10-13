@@ -54,10 +54,18 @@ namespace geode
 
     protected:
         TetrahedralSolidOutput( absl::string_view filename )
-            : Output< TetrahedralSolid< dimension > >{ filename }
+            : Output< TetrahedralSolid< dimension > >
+        {
+            filename
+        }
         {
         }
     };
+
+    template < index_t dimension >
+    bool is_tetrahedral_solid_savable(
+        const TetrahedralSolid< dimension >& tetrahedral_solid,
+        absl::string_view filename );
 
     template < index_t dimension >
     using TetrahedralSolidOutputFactory = Factory< std::string,

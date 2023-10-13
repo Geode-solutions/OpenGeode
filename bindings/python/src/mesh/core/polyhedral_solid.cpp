@@ -31,8 +31,9 @@
     pybind11::class_< PolyhedralSolid##dimension##D,                           \
         SolidMesh##dimension##D >( module, name##dimension.c_str() )           \
         .def_static( "create",                                                 \
-            ( std::unique_ptr< PolyhedralSolid##dimension##D >( * )() )        \
-                & PolyhedralSolid##dimension##D::create )                      \
+            static_cast<                                                       \
+                std::unique_ptr< PolyhedralSolid##dimension##D > ( * )() >(    \
+                &PolyhedralSolid##dimension##D::create ) )                     \
         .def( "clone", &PolyhedralSolid##dimension##D::clone )
 
 namespace geode

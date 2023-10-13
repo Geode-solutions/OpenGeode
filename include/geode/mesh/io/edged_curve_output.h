@@ -50,10 +50,17 @@ namespace geode
     {
     protected:
         EdgedCurveOutput( absl::string_view filename )
-            : Output< EdgedCurve< dimension > >{ filename }
+            : Output< EdgedCurve< dimension > >
+        {
+            filename
+        }
         {
         }
     };
+
+    template < index_t dimension >
+    bool is_edged_curve_savable( const EdgedCurve< dimension >& edged_curve,
+        absl::string_view filename );
 
     template < index_t dimension >
     using EdgedCurveOutputFactory = Factory< std::string,

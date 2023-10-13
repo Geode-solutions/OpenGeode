@@ -33,7 +33,8 @@ namespace geode
     {
         pybind11::class_< Graph, VertexSet >( module, "Graph" )
             .def_static(
-                "create", ( std::unique_ptr< Graph >( * )() ) & Graph::create )
+                "create", static_cast< std::unique_ptr< Graph > ( * )() >(
+                              &Graph::create ) )
             .def( "clone", &Graph::clone )
             .def( "edge_vertex", &Graph::edge_vertex )
             .def( "edge_vertices", &Graph::edge_vertices )

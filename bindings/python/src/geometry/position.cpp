@@ -35,15 +35,13 @@
     const auto point_segment##dimension =                                      \
         "point_segment_position" + std::to_string( dimension ) + "D";          \
     module.def( point_segment##dimension.c_str(),                              \
-        ( Position( * )(                                                       \
-            const Point< dimension >&, const Segment< dimension >& ) )         \
-            & point_segment_position );                                        \
+        static_cast< Position ( * )( const Point< dimension >&,                \
+            const Segment< dimension >& ) >( &point_segment_position ) );      \
     const auto point_triangle##dimension =                                     \
         "point_triangle_position" + std::to_string( dimension ) + "D";         \
     module.def( point_triangle##dimension.c_str(),                             \
-        ( Position( * )(                                                       \
-            const Point< dimension >&, const Triangle< dimension >& ) )        \
-            & point_triangle_position )
+        static_cast< Position ( * )( const Point< dimension >&,                \
+            const Triangle< dimension >& ) >( &point_triangle_position ) )
 
 namespace geode
 {

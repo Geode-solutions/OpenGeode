@@ -47,11 +47,16 @@ namespace geode
     class SectionOutput : public Output< Section >
     {
     protected:
-        SectionOutput( absl::string_view filename )
-            : Output< Section >{ filename }
+        SectionOutput( absl::string_view filename ) : Output< Section >
+        {
+            filename
+        }
         {
         }
     };
+
+    bool opengeode_model_api is_section_savable(
+        const Section& section, absl::string_view filename );
 
     using SectionOutputFactory =
         Factory< std::string, SectionOutput, absl::string_view >;

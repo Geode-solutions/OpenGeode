@@ -44,4 +44,13 @@ namespace geode
                 filename };
         }
     }
+
+    bool is_vertex_set_savable(
+        const VertexSet& vertex_set, absl::string_view filename )
+    {
+        const auto output =
+            detail::geode_object_output_writer< VertexSetOutputFactory >(
+                filename );
+        return output->is_savable( vertex_set );
+    }
 } // namespace geode

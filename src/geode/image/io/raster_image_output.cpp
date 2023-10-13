@@ -48,8 +48,22 @@ namespace geode
         }
     }
 
+    template < index_t dimension >
+    bool is_raster_image_savable(
+        const RasterImage< dimension >& raster, absl::string_view filename )
+    {
+        const auto output = detail::geode_object_output_writer<
+            RasterImageOutputFactory< dimension > >( filename );
+        return output->is_savable( raster );
+    }
+
     template void opengeode_image_api save_raster_image(
         const RasterImage< 2 >&, absl::string_view );
     template void opengeode_image_api save_raster_image(
+        const RasterImage< 3 >&, absl::string_view );
+
+    template bool opengeode_image_api is_raster_image_savable(
+        const RasterImage< 2 >&, absl::string_view );
+    template bool opengeode_image_api is_raster_image_savable(
         const RasterImage< 3 >&, absl::string_view );
 } // namespace geode

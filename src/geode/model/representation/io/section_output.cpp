@@ -43,4 +43,13 @@ namespace geode
                 filename };
         }
     }
+
+    bool is_section_savable(
+        const Section& section, absl::string_view filename )
+    {
+        const auto output =
+            detail::geode_object_output_writer< SectionOutputFactory >(
+                filename );
+        return output->is_savable( section );
+    }
 } // namespace geode

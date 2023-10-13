@@ -31,8 +31,9 @@
     pybind11::class_< PolygonalSurface##dimension##D,                          \
         SurfaceMesh##dimension##D >( module, name##dimension.c_str() )         \
         .def_static( "create",                                                 \
-            ( std::unique_ptr< PolygonalSurface##dimension##D >( * )() )       \
-                & PolygonalSurface##dimension##D::create )                     \
+            static_cast<                                                       \
+                std::unique_ptr< PolygonalSurface##dimension##D > ( * )() >(   \
+                &PolygonalSurface##dimension##D::create ) )                    \
         .def( "clone", &PolygonalSurface##dimension##D::clone )
 
 namespace geode

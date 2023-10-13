@@ -42,4 +42,11 @@ namespace geode
             throw OpenGeodeException{ "Cannot save BRep in file: ", filename };
         }
     }
+
+    bool is_brep_savable( const BRep& brep, absl::string_view filename )
+    {
+        const auto output =
+            detail::geode_object_output_writer< BRepOutputFactory >( filename );
+        return output->is_savable( brep );
+    }
 } // namespace geode

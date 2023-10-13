@@ -52,10 +52,18 @@ namespace geode
     {
     protected:
         TriangulatedSurfaceOutput( absl::string_view filename )
-            : Output< TriangulatedSurface< dimension > >{ filename }
+            : Output< TriangulatedSurface< dimension > >
+        {
+            filename
+        }
         {
         }
     };
+
+    template < index_t dimension >
+    bool is_triangulated_surface_savable(
+        const TriangulatedSurface< dimension >& triangulated_surface,
+        absl::string_view filename );
 
     template < index_t dimension >
     using TriangulatedSurfaceOutputFactory = Factory< std::string,

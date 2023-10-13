@@ -36,9 +36,10 @@
         CoordinateReferenceSystemManagersBuilder##dimension##D >(              \
         module, name##dimension.c_str() )                                      \
         .def_static( "create",                                                 \
-            ( std::unique_ptr< SurfaceMeshBuilder##dimension##D >( * )(        \
-                SurfaceMesh< dimension >& ) )                                  \
-                & SurfaceMeshBuilder##dimension##D::create )                   \
+            static_cast<                                                       \
+                std::unique_ptr< SurfaceMeshBuilder##dimension##D > ( * )(     \
+                    SurfaceMesh< dimension >& ) >(                             \
+                &SurfaceMeshBuilder##dimension##D::create ) )                  \
         .def(                                                                  \
             "create_point", &SurfaceMeshBuilder##dimension##D::create_point )  \
         .def( "create_polygon",                                                \
@@ -48,9 +49,9 @@
         .def( "set_polygon_adjacent",                                          \
             &SurfaceMeshBuilder##dimension##D::set_polygon_adjacent )          \
         .def( "compute_polygon_adjacencies",                                   \
-            ( void( SurfaceMeshBuilder##dimension##D::* )() )                  \
-                & SurfaceMeshBuilder##dimension##D::                           \
-                    compute_polygon_adjacencies )                              \
+            static_cast< void ( SurfaceMeshBuilder##dimension##D::* )() >(     \
+                &SurfaceMeshBuilder##dimension##D::                            \
+                    compute_polygon_adjacencies ) )                            \
         .def( "delete_polygons",                                               \
             &SurfaceMeshBuilder##dimension##D::delete_polygons )               \
         .def( "permute_polygons",                                              \

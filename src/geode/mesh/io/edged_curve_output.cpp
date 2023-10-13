@@ -48,8 +48,22 @@ namespace geode
         }
     }
 
+    template < index_t dimension >
+    bool is_edged_curve_savable(
+        const EdgedCurve< dimension >& edged_curve, absl::string_view filename )
+    {
+        const auto output = detail::geode_object_output_writer<
+            EdgedCurveOutputFactory< dimension > >( filename );
+        return output->is_savable( edged_curve );
+    }
+
     template void opengeode_mesh_api save_edged_curve(
         const EdgedCurve< 2 >&, absl::string_view );
     template void opengeode_mesh_api save_edged_curve(
+        const EdgedCurve< 3 >&, absl::string_view );
+
+    template bool opengeode_mesh_api is_edged_curve_savable(
+        const EdgedCurve< 2 >&, absl::string_view );
+    template bool opengeode_mesh_api is_edged_curve_savable(
         const EdgedCurve< 3 >&, absl::string_view );
 } // namespace geode

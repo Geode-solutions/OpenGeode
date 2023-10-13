@@ -31,10 +31,10 @@ namespace geode
     void define_repair_polygon_orientations( pybind11::module& module )
     {
         module.def( "repair_polygon_orientations2D",
-            ( void ( * )( SurfaceMesh< 2 >& ) )
-                & repair_polygon_orientations< 2 > );
+            static_cast< void ( * )( SurfaceMesh< 2 >& ) >(
+                &repair_polygon_orientations< 2 > ) );
         module.def( "repair_polygon_orientations3D",
-            ( void ( * )( SurfaceMesh< 3 >& ) )
-                & repair_polygon_orientations< 3 > );
+            static_cast< void ( * )( SurfaceMesh< 3 >& ) >(
+                &repair_polygon_orientations< 3 > ) );
     }
 } // namespace geode

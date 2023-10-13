@@ -47,10 +47,16 @@ namespace geode
     class GraphOutput : public Output< Graph >
     {
     protected:
-        GraphOutput( absl::string_view filename ) : Output< Graph >{ filename }
+        GraphOutput( absl::string_view filename ) : Output< Graph >
+        {
+            filename
+        }
         {
         }
     };
+
+    bool opengeode_mesh_api is_graph_savable(
+        const Graph& graph, absl::string_view filename );
 
     using GraphOutputFactory =
         Factory< std::string, GraphOutput, absl::string_view >;

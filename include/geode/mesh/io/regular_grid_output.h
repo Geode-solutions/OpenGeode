@@ -50,10 +50,17 @@ namespace geode
     {
     protected:
         RegularGridOutput( absl::string_view filename )
-            : Output< RegularGrid< dimension > >{ filename }
+            : Output< RegularGrid< dimension > >
+        {
+            filename
+        }
         {
         }
     };
+
+    template < index_t dimension >
+    bool is_regular_grid_savable( const RegularGrid< dimension >& regular_grid,
+        absl::string_view filename );
 
     template < index_t dimension >
     using RegularGridOutputFactory = Factory< std::string,

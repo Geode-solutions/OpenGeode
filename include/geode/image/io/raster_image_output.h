@@ -50,10 +50,17 @@ namespace geode
     {
     protected:
         RasterImageOutput( absl::string_view filename )
-            : Output< RasterImage< dimension > >{ filename }
+            : Output< RasterImage< dimension > >
+        {
+            filename
+        }
         {
         }
     };
+
+    template < index_t dimension >
+    bool is_raster_image_savable(
+        const RasterImage< dimension >& raster, absl::string_view filename );
 
     template < index_t dimension >
     using RasterImageOutputFactory = Factory< std::string,

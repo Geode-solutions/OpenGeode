@@ -49,6 +49,19 @@ namespace geode
         }
     }
 
+    template < index_t dimension >
+    bool is_polyhedral_solid_savable(
+        const PolyhedralSolid< dimension >& polyhedral_solid,
+        absl::string_view filename )
+    {
+        const auto output = detail::geode_object_output_writer<
+            PolyhedralSolidOutputFactory< dimension > >( filename );
+        return output->is_savable( polyhedral_solid );
+    }
+
     template void opengeode_mesh_api save_polyhedral_solid(
+        const PolyhedralSolid< 3 >&, absl::string_view );
+
+    template bool opengeode_mesh_api is_polyhedral_solid_savable(
         const PolyhedralSolid< 3 >&, absl::string_view );
 } // namespace geode

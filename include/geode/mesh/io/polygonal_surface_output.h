@@ -53,10 +53,18 @@ namespace geode
     {
     protected:
         PolygonalSurfaceOutput( absl::string_view filename )
-            : Output< PolygonalSurface< dimension > >{ filename }
+            : Output< PolygonalSurface< dimension > >
+        {
+            filename
+        }
         {
         }
     };
+
+    template < index_t dimension >
+    bool is_polygonal_surface_savable(
+        const PolygonalSurface< dimension >& polygonal_surface,
+        absl::string_view filename );
 
     template < index_t dimension >
     using PolygonalSurfaceOutputFactory = Factory< std::string,
