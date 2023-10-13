@@ -44,10 +44,10 @@
         &check_point_set_missing_files< dimension > );                         \
     PYTHON_INPUT_MESH_CLASS( std::unique_ptr< PointSet< dimension > >,         \
         "PointSet" + std::to_string( dimension ) + "D" );                      \
-    const auto savable##dimension =                                            \
-        "is_point_set_savable" + std::to_string( dimension ) + "D";            \
+    const auto saveable##dimension =                                           \
+        "is_point_set_saveable" + std::to_string( dimension ) + "D";           \
     module.def(                                                                \
-        savable##dimension.c_str(), &is_point_set_savable< dimension > );      \
+        saveable##dimension.c_str(), &is_point_set_saveable< dimension > );    \
     PYTHON_FACTORY_CLASS( PointSetInputFactory##dimension##D );                \
     PYTHON_FACTORY_CLASS( PointSetOutputFactory##dimension##D )
 

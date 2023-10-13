@@ -49,17 +49,17 @@ namespace geode
     }
 
     template < index_t dimension >
-    bool is_hybrid_solid_savable( const HybridSolid< dimension >& hybrid_solid,
+    bool is_hybrid_solid_saveable( const HybridSolid< dimension >& hybrid_solid,
         absl::string_view filename )
     {
         const auto output = detail::geode_object_output_writer<
             HybridSolidOutputFactory< dimension > >( filename );
-        return output->is_savable( hybrid_solid );
+        return output->is_saveable( hybrid_solid );
     }
 
     template void opengeode_mesh_api save_hybrid_solid(
         const HybridSolid< 3 >&, absl::string_view );
 
-    template bool opengeode_mesh_api is_hybrid_solid_savable(
+    template bool opengeode_mesh_api is_hybrid_solid_saveable(
         const HybridSolid< 3 >&, absl::string_view );
 } // namespace geode

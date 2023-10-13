@@ -59,7 +59,7 @@ namespace geode
     };
 
     template < index_t dimension >
-    bool is_polyhedral_solid_savable(
+    bool is_polyhedral_solid_saveable(
         const PolyhedralSolid< dimension >& polyhedral_solid,
         absl::string_view filename );
 

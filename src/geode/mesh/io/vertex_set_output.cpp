@@ -45,12 +45,12 @@ namespace geode
         }
     }
 
-    bool is_vertex_set_savable(
+    bool is_vertex_set_saveable(
         const VertexSet& vertex_set, absl::string_view filename )
     {
         const auto output =
             detail::geode_object_output_writer< VertexSetOutputFactory >(
                 filename );
-        return output->is_savable( vertex_set );
+        return output->is_saveable( vertex_set );
     }
 } // namespace geode

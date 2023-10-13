@@ -45,10 +45,10 @@
         &check_polygonal_surface_missing_files< dimension > );                 \
     PYTHON_INPUT_MESH_CLASS( std::unique_ptr< PolygonalSurface< dimension > >, \
         "PolygonalSurface" + std::to_string( dimension ) + "D" );              \
-    const auto savable##dimension =                                            \
-        "is_polygonal_surface_savable" + std::to_string( dimension ) + "D";    \
-    module.def( savable##dimension.c_str(),                                    \
-        &is_polygonal_surface_savable< dimension > );                          \
+    const auto saveable##dimension =                                           \
+        "is_polygonal_surface_saveable" + std::to_string( dimension ) + "D";   \
+    module.def( saveable##dimension.c_str(),                                   \
+        &is_polygonal_surface_saveable< dimension > );                         \
     PYTHON_FACTORY_CLASS( PolygonalSurfaceInputFactory##dimension##D );        \
     PYTHON_FACTORY_CLASS( PolygonalSurfaceOutputFactory##dimension##D )
 

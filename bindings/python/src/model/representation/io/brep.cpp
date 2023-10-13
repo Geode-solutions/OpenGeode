@@ -36,7 +36,7 @@ namespace geode
         module.def( "save_brep", &save_brep );
         module.def( "load_brep", &load_brep );
         module.def( "check_brep_missing_files", &check_brep_missing_files );
-        module.def( "is_brep_savable", &is_brep_savable );
+        module.def( "is_brep_saveable", &is_brep_saveable );
         PYTHON_INPUT_CLASS( BRep, "BRep" );
         PYTHON_FACTORY_CLASS( BRepInputFactory );
         PYTHON_FACTORY_CLASS( BRepOutputFactory );

@@ -34,7 +34,7 @@ namespace geode
     public:
         virtual void write( const Object& object ) const = 0;
 
-        virtual bool is_savable( const Object& /*unused*/ ) const
+        virtual bool is_saveable( const Object& /*unused*/ ) const
         {
             return true;
         }

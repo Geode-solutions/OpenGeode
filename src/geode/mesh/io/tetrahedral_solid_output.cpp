@@ -50,18 +50,18 @@ namespace geode
     }
 
     template < index_t dimension >
-    bool is_tetrahedral_solid_savable(
+    bool is_tetrahedral_solid_saveable(
         const TetrahedralSolid< dimension >& tetrahedral_solid,
         absl::string_view filename )
     {
         const auto output = detail::geode_object_output_writer<
             TetrahedralSolidOutputFactory< dimension > >( filename );
-        return output->is_savable( tetrahedral_solid );
+        return output->is_saveable( tetrahedral_solid );
     }
 
     template void opengeode_mesh_api save_tetrahedral_solid(
         const TetrahedralSolid< 3 >&, absl::string_view );
 
-    template bool opengeode_mesh_api is_tetrahedral_solid_savable(
+    template bool opengeode_mesh_api is_tetrahedral_solid_saveable(
         const TetrahedralSolid< 3 >&, absl::string_view );
 } // namespace geode

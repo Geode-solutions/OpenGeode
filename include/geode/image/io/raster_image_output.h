@@ -56,7 +56,7 @@ namespace geode
     };
 
     template < index_t dimension >
-    bool is_raster_image_savable(
+    bool is_raster_image_saveable(
         const RasterImage< dimension >& raster, absl::string_view filename );
 
     template < index_t dimension >

@@ -49,12 +49,12 @@ namespace geode
     }
 
     template < index_t dimension >
-    bool is_raster_image_savable(
+    bool is_raster_image_saveable(
         const RasterImage< dimension >& raster, absl::string_view filename )
     {
         const auto output = detail::geode_object_output_writer<
             RasterImageOutputFactory< dimension > >( filename );
-        return output->is_savable( raster );
+        return output->is_saveable( raster );
     }
 
     template void opengeode_image_api save_raster_image(
@@ -62,8 +62,8 @@ namespace geode
     template void opengeode_image_api save_raster_image(
         const RasterImage< 3 >&, absl::string_view );
 
-    template bool opengeode_image_api is_raster_image_savable(
+    template bool opengeode_image_api is_raster_image_saveable(
         const RasterImage< 2 >&, absl::string_view );
-    template bool opengeode_image_api is_raster_image_savable(
+    template bool opengeode_image_api is_raster_image_saveable(
         const RasterImage< 3 >&, absl::string_view );
 } // namespace geode

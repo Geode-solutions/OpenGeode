@@ -59,7 +59,7 @@ namespace geode
     };
 
     template < index_t dimension >
-    bool is_polygonal_surface_savable(
+    bool is_polygonal_surface_saveable(
         const PolygonalSurface< dimension >& polygonal_surface,
         absl::string_view filename );
 

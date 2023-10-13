@@ -44,12 +44,12 @@ namespace geode
         }
     }
 
-    bool is_section_savable(
+    bool is_section_saveable(
         const Section& section, absl::string_view filename )
     {
         const auto output =
             detail::geode_object_output_writer< SectionOutputFactory >(
                 filename );
-        return output->is_savable( section );
+        return output->is_saveable( section );
     }
 } // namespace geode

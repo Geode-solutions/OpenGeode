@@ -43,12 +43,12 @@ namespace geode
         }
     }
 
-    bool is_graph_savable( const Graph& graph, absl::string_view filename )
+    bool is_graph_saveable( const Graph& graph, absl::string_view filename )
     {
         const auto output =
             detail::geode_object_output_writer< GraphOutputFactory >(
                 filename );
-        return output->is_savable( graph );
+        return output->is_saveable( graph );
     }
 
 } // namespace geode

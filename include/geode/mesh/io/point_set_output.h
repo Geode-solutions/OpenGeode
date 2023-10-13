@@ -56,7 +56,7 @@ namespace geode
     };
 
     template < index_t dimension >
-    bool is_point_set_savable(
+    bool is_point_set_saveable(
         const PointSet< dimension >& point_set, absl::string_view filename );
 
     template < index_t dimension >

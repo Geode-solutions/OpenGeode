@@ -58,7 +58,7 @@ namespace geode
     };
 
     template < index_t dimension >
-    bool is_hybrid_solid_savable( const HybridSolid< dimension >& hybrid_solid,
+    bool is_hybrid_solid_saveable( const HybridSolid< dimension >& hybrid_solid,
         absl::string_view filename );
 
     template < index_t dimension >

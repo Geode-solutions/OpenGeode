@@ -50,18 +50,18 @@ namespace geode
     }
 
     template < index_t dimension >
-    bool is_polyhedral_solid_savable(
+    bool is_polyhedral_solid_saveable(
         const PolyhedralSolid< dimension >& polyhedral_solid,
         absl::string_view filename )
     {
         const auto output = detail::geode_object_output_writer<
             PolyhedralSolidOutputFactory< dimension > >( filename );
-        return output->is_savable( polyhedral_solid );
+        return output->is_saveable( polyhedral_solid );
     }
 
     template void opengeode_mesh_api save_polyhedral_solid(
         const PolyhedralSolid< 3 >&, absl::string_view );
 
-    template bool opengeode_mesh_api is_polyhedral_solid_savable(
+    template bool opengeode_mesh_api is_polyhedral_solid_saveable(
         const PolyhedralSolid< 3 >&, absl::string_view );
 } // namespace geode

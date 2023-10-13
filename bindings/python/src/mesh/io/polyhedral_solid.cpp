@@ -45,10 +45,10 @@
         &check_polyhedral_solid_missing_files< dimension > );                  \
     PYTHON_INPUT_MESH_CLASS( std::unique_ptr< PolyhedralSolid< dimension > >,  \
         "PolyhedralSolid" + std::to_string( dimension ) + "D" );               \
-    const auto savable##dimension =                                            \
-        "is_polyhedral_solid_savable" + std::to_string( dimension ) + "D";     \
-    module.def( savable##dimension.c_str(),                                    \
-        &is_polyhedral_solid_savable< dimension > );                           \
+    const auto saveable##dimension =                                           \
+        "is_polyhedral_solid_saveable" + std::to_string( dimension ) + "D";    \
+    module.def( saveable##dimension.c_str(),                                   \
+        &is_polyhedral_solid_saveable< dimension > );                          \
     PYTHON_FACTORY_CLASS( PolyhedralSolidInputFactory##dimension##D );         \
     PYTHON_FACTORY_CLASS( PolyhedralSolidOutputFactory##dimension##D )
 

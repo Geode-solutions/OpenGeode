@@ -58,7 +58,7 @@ namespace geode
     };
 
     template < index_t dimension >
-    bool is_triangulated_surface_savable(
+    bool is_triangulated_surface_saveable(
         const TriangulatedSurface< dimension >& triangulated_surface,
         absl::string_view filename );
 

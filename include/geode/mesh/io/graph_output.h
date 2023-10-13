@@ -52,7 +52,7 @@ namespace geode
         }
     };
 
-    bool opengeode_mesh_api is_graph_savable(
+    bool opengeode_mesh_api is_graph_saveable(
         const Graph& graph, absl::string_view filename );
 
     using GraphOutputFactory =

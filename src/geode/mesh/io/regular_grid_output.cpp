@@ -50,12 +50,12 @@ namespace geode
     }
 
     template < index_t dimension >
-    bool is_regular_grid_savable( const RegularGrid< dimension >& regular_grid,
+    bool is_regular_grid_saveable( const RegularGrid< dimension >& regular_grid,
         absl::string_view filename )
     {
         const auto output = detail::geode_object_output_writer<
             RegularGridOutputFactory< dimension > >( filename );
-        return output->is_savable( regular_grid );
+        return output->is_saveable( regular_grid );
     }
 
     template void opengeode_mesh_api save_regular_grid(
@@ -63,8 +63,8 @@ namespace geode
     template void opengeode_mesh_api save_regular_grid(
         const RegularGrid< 3 >&, absl::string_view );
 
-    template bool opengeode_mesh_api is_regular_grid_savable(
+    template bool opengeode_mesh_api is_regular_grid_saveable(
         const RegularGrid< 2 >&, absl::string_view );
-    template bool opengeode_mesh_api is_regular_grid_savable(
+    template bool opengeode_mesh_api is_regular_grid_saveable(
         const RegularGrid< 3 >&, absl::string_view );
 } // namespace geode

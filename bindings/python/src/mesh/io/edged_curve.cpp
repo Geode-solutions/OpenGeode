@@ -44,10 +44,10 @@
         &check_edged_curve_missing_files< dimension > );                       \
     PYTHON_INPUT_MESH_CLASS( std::unique_ptr< EdgedCurve< dimension > >,       \
         "EdgedCurve" + std::to_string( dimension ) + "D" );                    \
-    const auto savable##dimension =                                            \
-        "is_edged_curve_savable" + std::to_string( dimension ) + "D";          \
+    const auto saveable##dimension =                                           \
+        "is_edged_curve_saveable" + std::to_string( dimension ) + "D";         \
     module.def(                                                                \
-        savable##dimension.c_str(), &is_edged_curve_savable< dimension > );    \
+        saveable##dimension.c_str(), &is_edged_curve_saveable< dimension > );  \
     PYTHON_FACTORY_CLASS( EdgedCurveInputFactory##dimension##D );              \
     PYTHON_FACTORY_CLASS( EdgedCurveOutputFactory##dimension##D )
 

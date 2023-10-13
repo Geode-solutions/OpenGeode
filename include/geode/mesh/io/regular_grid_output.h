@@ -56,7 +56,7 @@ namespace geode
     };
 
     template < index_t dimension >
-    bool is_regular_grid_savable( const RegularGrid< dimension >& regular_grid,
+    bool is_regular_grid_saveable( const RegularGrid< dimension >& regular_grid,
         absl::string_view filename );
 
     template < index_t dimension >

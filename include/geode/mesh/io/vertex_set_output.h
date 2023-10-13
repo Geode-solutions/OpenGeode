@@ -53,7 +53,7 @@ namespace geode
         }
     };
 
-    bool opengeode_mesh_api is_vertex_set_savable(
+    bool opengeode_mesh_api is_vertex_set_saveable(
         const VertexSet& vertex_set, absl::string_view filename );
 
     using VertexSetOutputFactory =

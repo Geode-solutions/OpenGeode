@@ -38,7 +38,7 @@ namespace geode
             static_cast< std::unique_ptr< Graph > ( * )( absl::string_view ) >(
                 &load_graph ) );
         module.def( "check_graph_missing_files", &check_graph_missing_files );
-        module.def( "is_graph_savable", &is_graph_savable );
+        module.def( "is_graph_saveable", &is_graph_saveable );
         PYTHON_INPUT_MESH_CLASS( std::unique_ptr< Graph >, "Graph" );
         PYTHON_FACTORY_CLASS( GraphInputFactory );
         PYTHON_FACTORY_CLASS( GraphOutputFactory );
