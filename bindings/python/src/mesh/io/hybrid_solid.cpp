@@ -44,6 +44,10 @@
         &check_hybrid_solid_missing_files< dimension > );                      \
     PYTHON_INPUT_MESH_CLASS( std::unique_ptr< HybridSolid< dimension > >,      \
         "HybridSolid" + std::to_string( dimension ) + "D" );                   \
+    const auto savable##dimension =                                            \
+        "is_hybrid_solid_savable" + std::to_string( dimension ) + "D";         \
+    module.def(                                                                \
+        savable##dimension.c_str(), &is_hybrid_solid_savable< dimension > );   \
     PYTHON_FACTORY_CLASS( HybridSolidInputFactory##dimension##D );             \
     PYTHON_FACTORY_CLASS( HybridSolidOutputFactory##dimension##D )
 

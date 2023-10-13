@@ -47,6 +47,10 @@
     PYTHON_INPUT_MESH_CLASS(                                                   \
         std::unique_ptr< TriangulatedSurface< dimension > >,                   \
         "TriangulatedSurface" + std::to_string( dimension ) + "D" );           \
+    const auto savable##dimension =                                            \
+        "is_triangulated_surface_savable" + std::to_string( dimension ) + "D"; \
+    module.def( savable##dimension.c_str(),                                    \
+        &is_triangulated_surface_savable< dimension > );                       \
     PYTHON_FACTORY_CLASS( TriangulatedSurfaceInputFactory##dimension##D );     \
     PYTHON_FACTORY_CLASS( TriangulatedSurfaceOutputFactory##dimension##D )
 
