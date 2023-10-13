@@ -50,10 +50,7 @@ namespace geode
     {
     protected:
         PointSetOutput( absl::string_view filename )
-            : Output< PointSet< dimension > >
-        {
-            filename
-        }
+            : Output< PointSet< dimension > >{ filename }
         {
         }
     };

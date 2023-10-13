@@ -50,10 +50,7 @@ namespace geode
     {
     protected:
         RasterImageOutput( absl::string_view filename )
-            : Output< RasterImage< dimension > >
-        {
-            filename
-        }
+            : Output< RasterImage< dimension > >{ filename }
         {
         }
     };

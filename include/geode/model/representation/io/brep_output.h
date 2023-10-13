@@ -47,12 +47,7 @@ namespace geode
     class BRepOutput : public Output< BRep >
     {
     protected:
-        BRepOutput( absl::string_view filename ) : Output< BRep >
-        {
-            filename
-        }
-        {
-        }
+        BRepOutput( absl::string_view filename ) : Output< BRep >{ filename } {}
     };
 
     bool opengeode_model_api is_brep_savable(

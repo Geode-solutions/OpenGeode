@@ -50,10 +50,7 @@ namespace geode
     {
     protected:
         EdgedCurveOutput( absl::string_view filename )
-            : Output< EdgedCurve< dimension > >
-        {
-            filename
-        }
+            : Output< EdgedCurve< dimension > >{ filename }
         {
         }
     };

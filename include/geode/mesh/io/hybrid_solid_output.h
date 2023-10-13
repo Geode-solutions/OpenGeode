@@ -52,10 +52,7 @@ namespace geode
 
     protected:
         HybridSolidOutput( absl::string_view filename )
-            : Output< HybridSolid< dimension > >
-        {
-            filename
-        }
+            : Output< HybridSolid< dimension > >{ filename }
         {
         }
     };

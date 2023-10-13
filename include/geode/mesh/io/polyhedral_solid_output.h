@@ -53,10 +53,7 @@ namespace geode
 
     protected:
         PolyhedralSolidOutput( absl::string_view filename )
-            : Output< PolyhedralSolid< dimension > >
-        {
-            filename
-        }
+            : Output< PolyhedralSolid< dimension > >{ filename }
         {
         }
     };

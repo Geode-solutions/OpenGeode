@@ -52,10 +52,7 @@ namespace geode
     {
     protected:
         TriangulatedSurfaceOutput( absl::string_view filename )
-            : Output< TriangulatedSurface< dimension > >
-        {
-            filename
-        }
+            : Output< TriangulatedSurface< dimension > >{ filename }
         {
         }
     };
