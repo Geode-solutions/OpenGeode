@@ -37,6 +37,7 @@ namespace geode
         module.def( "load_section", &load_section );
         module.def(
             "check_section_missing_files", &check_section_missing_files );
+        module.def( "is_section_saveable", &is_section_saveable );
         PYTHON_INPUT_CLASS( Section, "Section" );
         PYTHON_FACTORY_CLASS( SectionInputFactory );
         PYTHON_FACTORY_CLASS( SectionOutputFactory );

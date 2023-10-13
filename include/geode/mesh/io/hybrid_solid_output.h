@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/factory.h>
 #include <geode/basic/output.h>
 
@@ -56,6 +58,10 @@ namespace geode
         {
         }
     };
+
+    template < index_t dimension >
+    bool is_hybrid_solid_saveable( const HybridSolid< dimension >& hybrid_solid,
+        absl::string_view filename );
 
     template < index_t dimension >
     using HybridSolidOutputFactory = Factory< std::string,

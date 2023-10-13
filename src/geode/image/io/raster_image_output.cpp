@@ -23,6 +23,8 @@
 
 #include <geode/image/io/raster_image_output.h>
 
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/detail/geode_output_impl.h>
 
 #include <geode/image/core/raster_image.h>
@@ -48,8 +50,22 @@ namespace geode
         }
     }
 
+    template < index_t dimension >
+    bool is_raster_image_saveable(
+        const RasterImage< dimension >& raster, absl::string_view filename )
+    {
+        const auto output = detail::geode_object_output_writer<
+            RasterImageOutputFactory< dimension > >( filename );
+        return output->is_saveable( raster );
+    }
+
     template void opengeode_image_api save_raster_image(
         const RasterImage< 2 >&, absl::string_view );
     template void opengeode_image_api save_raster_image(
+        const RasterImage< 3 >&, absl::string_view );
+
+    template bool opengeode_image_api is_raster_image_saveable(
+        const RasterImage< 2 >&, absl::string_view );
+    template bool opengeode_image_api is_raster_image_saveable(
         const RasterImage< 3 >&, absl::string_view );
 } // namespace geode

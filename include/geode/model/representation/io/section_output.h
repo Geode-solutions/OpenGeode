@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/factory.h>
 #include <geode/basic/output.h>
 
@@ -52,6 +54,9 @@ namespace geode
         {
         }
     };
+
+    bool opengeode_model_api is_section_saveable(
+        const Section& section, absl::string_view filename );
 
     using SectionOutputFactory =
         Factory< std::string, SectionOutput, absl::string_view >;

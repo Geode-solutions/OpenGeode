@@ -23,6 +23,8 @@
 
 #include <geode/mesh/io/vertex_set_output.h>
 
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/detail/geode_output_impl.h>
 
 #include <geode/mesh/core/vertex_set.h>
@@ -43,5 +45,14 @@ namespace geode
             throw OpenGeodeException{ "Cannot save VertexSet in file: ",
                 filename };
         }
+    }
+
+    bool is_vertex_set_saveable(
+        const VertexSet& vertex_set, absl::string_view filename )
+    {
+        const auto output =
+            detail::geode_object_output_writer< VertexSetOutputFactory >(
+                filename );
+        return output->is_saveable( vertex_set );
     }
 } // namespace geode

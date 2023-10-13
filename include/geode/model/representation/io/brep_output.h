@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/factory.h>
 #include <geode/basic/output.h>
 
@@ -49,6 +51,9 @@ namespace geode
     protected:
         BRepOutput( absl::string_view filename ) : Output< BRep >{ filename } {}
     };
+
+    bool opengeode_model_api is_brep_saveable(
+        const BRep& brep, absl::string_view filename );
 
     using BRepOutputFactory =
         Factory< std::string, BRepOutput, absl::string_view >;

@@ -33,17 +33,17 @@ namespace geode
             .def( pybind11::init<>() )
             .def( "nb_unique_vertices", &VertexIdentifier::nb_unique_vertices )
             .def( "component_mesh_vertices",
-                ( const std::vector< ComponentMeshVertex >& (
-                    VertexIdentifier::*) ( index_t ) const )
-                    & VertexIdentifier::component_mesh_vertices )
+                static_cast< const std::vector< ComponentMeshVertex >& (
+                    VertexIdentifier::*) ( index_t ) const >(
+                    &VertexIdentifier::component_mesh_vertices ) )
             .def( "filtered_component_mesh_vertices_by_type",
-                ( std::vector< ComponentMeshVertex >( VertexIdentifier::* )(
-                    index_t, const ComponentType& ) const )
-                    & VertexIdentifier::component_mesh_vertices )
+                static_cast< std::vector< ComponentMeshVertex > (
+                    VertexIdentifier::* )( index_t, const ComponentType& )
+                        const >( &VertexIdentifier::component_mesh_vertices ) )
             .def( "filtered_component_mesh_vertices_by_id",
-                ( std::vector< index_t >( VertexIdentifier::* )(
-                    index_t, const uuid& ) const )
-                    & VertexIdentifier::component_mesh_vertices )
+                static_cast< std::vector< index_t > ( VertexIdentifier::* )(
+                    index_t, const uuid& ) const >(
+                    &VertexIdentifier::component_mesh_vertices ) )
             .def( "unique_vertex", &VertexIdentifier::unique_vertex );
 
         pybind11::class_< ComponentMeshVertex >( module, "ComponentMeshVertex" )

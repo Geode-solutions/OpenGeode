@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/factory.h>
 #include <geode/basic/output.h>
 
@@ -57,6 +59,11 @@ namespace geode
         {
         }
     };
+
+    template < index_t dimension >
+    bool is_polygonal_surface_saveable(
+        const PolygonalSurface< dimension >& polygonal_surface,
+        absl::string_view filename );
 
     template < index_t dimension >
     using PolygonalSurfaceOutputFactory = Factory< std::string,

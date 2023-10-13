@@ -23,6 +23,8 @@
 
 #include <geode/mesh/io/graph_output.h>
 
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/detail/geode_output_impl.h>
 
 #include <geode/mesh/core/graph.h>
@@ -42,4 +44,13 @@ namespace geode
             throw OpenGeodeException{ "Cannot save Graph in file: ", filename };
         }
     }
+
+    bool is_graph_saveable( const Graph& graph, absl::string_view filename )
+    {
+        const auto output =
+            detail::geode_object_output_writer< GraphOutputFactory >(
+                filename );
+        return output->is_saveable( graph );
+    }
+
 } // namespace geode

@@ -23,6 +23,8 @@
 
 #include <geode/mesh/io/point_set_output.h>
 
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/detail/geode_output_impl.h>
 
 #include <geode/mesh/core/point_set.h>
@@ -49,8 +51,22 @@ namespace geode
         }
     }
 
+    template < index_t dimension >
+    bool is_point_set_saveable(
+        const PointSet< dimension >& point_set, absl::string_view filename )
+    {
+        const auto output = detail::geode_object_output_writer<
+            PointSetOutputFactory< dimension > >( filename );
+        return output->is_saveable( point_set );
+    }
+
     template void opengeode_mesh_api save_point_set(
         const PointSet< 2 >&, absl::string_view );
     template void opengeode_mesh_api save_point_set(
+        const PointSet< 3 >&, absl::string_view );
+
+    template bool opengeode_mesh_api is_point_set_saveable(
+        const PointSet< 2 >&, absl::string_view );
+    template bool opengeode_mesh_api is_point_set_saveable(
         const PointSet< 3 >&, absl::string_view );
 } // namespace geode

@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/factory.h>
 #include <geode/basic/input.h>
 

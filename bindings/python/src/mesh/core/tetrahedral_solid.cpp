@@ -33,8 +33,9 @@
     pybind11::class_< TetrahedralSolid##dimension##D,                          \
         SolidMesh##dimension##D >( module, name##dimension.c_str() )           \
         .def_static( "create",                                                 \
-            ( std::unique_ptr< TetrahedralSolid##dimension##D >( * )() )       \
-                & TetrahedralSolid##dimension##D::create )                     \
+            static_cast<                                                       \
+                std::unique_ptr< TetrahedralSolid##dimension##D > ( * )() >(   \
+                &TetrahedralSolid##dimension##D::create ) )                    \
         .def( "clone", &TetrahedralSolid##dimension##D::clone )                \
         .def( "tetrahedron", &TetrahedralSolid##dimension##D::tetrahedron )    \
         .def( "triangle", &TetrahedralSolid##dimension##D::triangle )

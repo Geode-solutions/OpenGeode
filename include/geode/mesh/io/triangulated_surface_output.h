@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/factory.h>
 #include <geode/basic/output.h>
 
@@ -56,6 +58,11 @@ namespace geode
         {
         }
     };
+
+    template < index_t dimension >
+    bool is_triangulated_surface_saveable(
+        const TriangulatedSurface< dimension >& triangulated_surface,
+        absl::string_view filename );
 
     template < index_t dimension >
     using TriangulatedSurfaceOutputFactory = Factory< std::string,

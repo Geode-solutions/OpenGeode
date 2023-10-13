@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/factory.h>
 #include <geode/basic/output.h>
 
@@ -52,6 +54,9 @@ namespace geode
         {
         }
     };
+
+    bool opengeode_mesh_api is_vertex_set_saveable(
+        const VertexSet& vertex_set, absl::string_view filename );
 
     using VertexSetOutputFactory =
         Factory< std::string, VertexSetOutput, absl::string_view >;

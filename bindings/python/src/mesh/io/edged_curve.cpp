@@ -21,6 +21,8 @@
  *
  */
 
+#include <string>
+
 #include "../../basic/factory.h"
 #include "../../basic/input.h"
 #include "../../common.h"
@@ -44,6 +46,10 @@
         &check_edged_curve_missing_files< dimension > );                       \
     PYTHON_INPUT_MESH_CLASS( std::unique_ptr< EdgedCurve< dimension > >,       \
         "EdgedCurve" + std::to_string( dimension ) + "D" );                    \
+    const auto saveable##dimension =                                           \
+        "is_edged_curve_saveable" + std::to_string( dimension ) + "D";         \
+    module.def(                                                                \
+        saveable##dimension.c_str(), &is_edged_curve_saveable< dimension > );  \
     PYTHON_FACTORY_CLASS( EdgedCurveInputFactory##dimension##D );              \
     PYTHON_FACTORY_CLASS( EdgedCurveOutputFactory##dimension##D )
 

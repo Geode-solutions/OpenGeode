@@ -32,8 +32,9 @@ namespace geode
     void define_vertex_set( pybind11::module& module )
     {
         pybind11::class_< VertexSet, Identifier >( module, "VertexSet" )
-            .def_static( "create",
-                ( std::unique_ptr< VertexSet >( * )() ) & VertexSet::create )
+            .def_static(
+                "create", static_cast< std::unique_ptr< VertexSet > ( * )() >(
+                              &VertexSet::create ) )
             .def( "clone", &VertexSet::clone )
             .def( "native_extension", &VertexSet::native_extension )
             .def( "nb_vertices", &VertexSet::nb_vertices )

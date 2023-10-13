@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/factory.h>
 #include <geode/basic/output.h>
 
@@ -54,6 +56,10 @@ namespace geode
         {
         }
     };
+
+    template < index_t dimension >
+    bool is_regular_grid_saveable( const RegularGrid< dimension >& regular_grid,
+        absl::string_view filename );
 
     template < index_t dimension >
     using RegularGridOutputFactory = Factory< std::string,

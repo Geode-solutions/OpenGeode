@@ -37,17 +37,17 @@
     const auto line_sphere##dimension =                                        \
         "line_sphere_intersection" + std::to_string( dimension ) + "D";        \
     module.def( line_sphere##dimension.c_str(),                                \
-        ( IntersectionResult<                                                  \
-            absl::InlinedVector< Point< dimension >, 2 > >( * )(               \
-            const InfiniteLine< dimension >&, const Sphere< dimension >& ) )   \
-            & line_sphere_intersection );                                      \
+        static_cast< IntersectionResult<                                       \
+            absl::InlinedVector< Point< dimension >, 2 > > ( * )(              \
+            const InfiniteLine< dimension >&, const Sphere< dimension >& ) >(  \
+            &line_sphere_intersection ) );                                     \
     const auto segment_sphere##dimension =                                     \
         "segment_sphere_intersection" + std::to_string( dimension ) + "D";     \
     module.def( segment_sphere##dimension.c_str(),                             \
-        ( IntersectionResult<                                                  \
-            absl::InlinedVector< Point< dimension >, 2 > >( * )(               \
-            const Segment< dimension >&, const Sphere< dimension >& ) )        \
-            & segment_sphere_intersection )
+        static_cast< IntersectionResult<                                       \
+            absl::InlinedVector< Point< dimension >, 2 > > ( * )(              \
+            const Segment< dimension >&, const Sphere< dimension >& ) >(       \
+            &segment_sphere_intersection ) )
 
 #define PYTHON_INTERSECTION_RESULT( Type )                                     \
     const auto result##Type = std::string( "IntersectionResult" ) + #Type;     \

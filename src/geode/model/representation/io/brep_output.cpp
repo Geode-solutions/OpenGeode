@@ -23,6 +23,8 @@
 
 #include <geode/model/representation/io/brep_output.h>
 
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/detail/geode_output_impl.h>
 
 #include <geode/model/representation/core/brep.h>
@@ -41,5 +43,12 @@ namespace geode
             Logger::error( e.what() );
             throw OpenGeodeException{ "Cannot save BRep in file: ", filename };
         }
+    }
+
+    bool is_brep_saveable( const BRep& brep, absl::string_view filename )
+    {
+        const auto output =
+            detail::geode_object_output_writer< BRepOutputFactory >( filename );
+        return output->is_saveable( brep );
     }
 } // namespace geode

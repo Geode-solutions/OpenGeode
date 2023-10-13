@@ -23,31 +23,43 @@
 
 #pragma once
 
+#include <memory>
+
 #include <ghc/filesystem.hpp>
 
 #include <absl/strings/ascii.h>
+#include <absl/strings/string_view.h>
 
 #include <geode/basic/filename.h>
+#include <geode/basic/logger.h>
 #include <geode/basic/timer.h>
 
 namespace geode
 {
     namespace detail
     {
-        template < typename Factory, typename Object >
-        void geode_object_output_impl( absl::string_view type,
-            const Object& object,
-            absl::string_view filename )
+        template < typename Factory >
+        std::unique_ptr< typename Factory::BaseClass >
+            geode_object_output_writer( absl::string_view& filename )
         {
-            Timer timer;
             filename = absl::StripAsciiWhitespace( filename );
             const auto extension =
                 absl::AsciiStrToLower( extension_from_filename( filename ) );
             OPENGEODE_EXCEPTION( Factory::has_creator( extension ),
                 "Unknown extension: ", extension );
+            return Factory::create( extension, filename );
+        }
+
+        template < typename Factory, typename Object >
+        void geode_object_output_impl( absl::string_view type,
+            const Object& object,
+            absl::string_view filename )
+        {
+            const Timer timer;
+            auto output = geode_object_output_writer< Factory >( filename );
             ghc::filesystem::create_directories(
                 filepath_without_filename( filename ) );
-            Factory::create( extension, filename )->write( object );
+            output->write( object );
             Logger::info(
                 type, " saved in ", filename, " in ", timer.duration() );
         }

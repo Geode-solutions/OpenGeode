@@ -23,6 +23,8 @@
 
 #include <geode/mesh/io/tetrahedral_solid_input.h>
 
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/detail/geode_input_impl.h>
 
 #include <geode/mesh/core/mesh_factory.h>

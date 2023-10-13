@@ -21,6 +21,8 @@
  *
  */
 
+#include <string>
+
 #include "../../common.h"
 
 #include "../../basic/factory.h"
@@ -43,6 +45,10 @@
         &check_raster_image_missing_files< dimension > );                      \
     PYTHON_INPUT_CLASS( RasterImage##dimension##D,                             \
         "RasterImage" + std::to_string( dimension ) + "D" );                   \
+    const auto saveable##dimension =                                           \
+        "is_raster_image_saveable" + std::to_string( dimension ) + "D";        \
+    module.def(                                                                \
+        saveable##dimension.c_str(), &is_raster_image_saveable< dimension > ); \
     PYTHON_FACTORY_CLASS( RasterImageInputFactory##dimension##D );             \
     PYTHON_FACTORY_CLASS( RasterImageOutputFactory##dimension##D )
 

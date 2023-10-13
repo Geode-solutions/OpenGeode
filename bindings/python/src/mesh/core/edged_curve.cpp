@@ -34,9 +34,10 @@
     pybind11::class_< EdgedCurve##dimension##D, Graph,                         \
         CoordinateReferenceSystemManagers##dimension##D >(                     \
         module, name##dimension.c_str() )                                      \
-        .def_static(                                                           \
-            "create", ( std::unique_ptr< EdgedCurve##dimension##D >( * )() )   \
-                          & EdgedCurve##dimension##D::create )                 \
+        .def_static( "create",                                                 \
+            static_cast<                                                       \
+                std::unique_ptr< EdgedCurve##dimension##D > ( * )() >(         \
+                &EdgedCurve##dimension##D::create ) )                          \
         .def( "clone", &EdgedCurve##dimension##D::clone )                      \
         .def( "edge_length", &EdgedCurve##dimension##D::edge_length )          \
         .def( "edge_barycenter", &EdgedCurve##dimension##D::edge_barycenter )  \

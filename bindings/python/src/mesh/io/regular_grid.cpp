@@ -21,6 +21,8 @@
  *
  */
 
+#include <string>
+
 #include "../../basic/factory.h"
 #include "../../basic/input.h"
 #include "../../common.h"
@@ -45,6 +47,10 @@
         &check_regular_grid_missing_files< dimension > );                      \
     PYTHON_INPUT_MESH_CLASS( std::unique_ptr< RegularGrid< dimension > >,      \
         "RegularGrid" + std::to_string( dimension ) + "D" );                   \
+    const auto saveable##dimension =                                           \
+        "is_regular_grid_saveable" + std::to_string( dimension ) + "D";        \
+    module.def(                                                                \
+        saveable##dimension.c_str(), &is_regular_grid_saveable< dimension > ); \
     PYTHON_FACTORY_CLASS( RegularGridInputFactory##dimension##D );             \
     PYTHON_FACTORY_CLASS( RegularGridOutputFactory##dimension##D )
 

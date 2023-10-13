@@ -23,6 +23,8 @@
 
 #include <geode/mesh/io/triangulated_surface_output.h>
 
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/detail/geode_output_impl.h>
 
 #include <geode/mesh/core/triangulated_surface.h>
@@ -50,8 +52,23 @@ namespace geode
         }
     }
 
+    template < index_t dimension >
+    bool is_triangulated_surface_saveable(
+        const TriangulatedSurface< dimension >& triangulated_surface,
+        absl::string_view filename )
+    {
+        const auto output = detail::geode_object_output_writer<
+            TriangulatedSurfaceOutputFactory< dimension > >( filename );
+        return output->is_saveable( triangulated_surface );
+    }
+
     template void opengeode_mesh_api save_triangulated_surface(
         const TriangulatedSurface< 2 >&, absl::string_view );
     template void opengeode_mesh_api save_triangulated_surface(
+        const TriangulatedSurface< 3 >&, absl::string_view );
+
+    template bool opengeode_mesh_api is_triangulated_surface_saveable(
+        const TriangulatedSurface< 2 >&, absl::string_view );
+    template bool opengeode_mesh_api is_triangulated_surface_saveable(
         const TriangulatedSurface< 3 >&, absl::string_view );
 } // namespace geode

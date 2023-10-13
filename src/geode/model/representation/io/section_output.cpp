@@ -23,6 +23,8 @@
 
 #include <geode/model/representation/io/section_output.h>
 
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/detail/geode_output_impl.h>
 
 #include <geode/model/representation/core/section.h>
@@ -42,5 +44,14 @@ namespace geode
             throw OpenGeodeException{ "Cannot save Section in file: ",
                 filename };
         }
+    }
+
+    bool is_section_saveable(
+        const Section& section, absl::string_view filename )
+    {
+        const auto output =
+            detail::geode_object_output_writer< SectionOutputFactory >(
+                filename );
+        return output->is_saveable( section );
     }
 } // namespace geode

@@ -31,10 +31,11 @@
         "TetrahedralSolidBuilder" + std::to_string( dimension ) + "D";         \
     pybind11::class_< TetrahedralSolidBuilder##dimension##D,                   \
         SolidMeshBuilder##dimension##D >( module, name##dimension.c_str() )    \
-        .def_static( "create",                                                 \
-            ( std::unique_ptr< TetrahedralSolidBuilder##dimension##D >( * )(   \
-                TetrahedralSolid< dimension >& ) )                             \
-                & TetrahedralSolidBuilder##dimension##D::create )              \
+        .def_static(                                                           \
+            "create", static_cast< std::unique_ptr<                            \
+                          TetrahedralSolidBuilder##dimension##D > ( * )(       \
+                          TetrahedralSolid< dimension >& ) >(                  \
+                          &TetrahedralSolidBuilder##dimension##D::create ) )   \
         .def( "create_tetrahedron",                                            \
             &TetrahedralSolidBuilder##dimension##D::create_tetrahedron )
 

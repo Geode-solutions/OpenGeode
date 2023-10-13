@@ -44,9 +44,9 @@
         .def( "enable_edges", &SurfaceMesh##dimension##D::enable_edges )       \
         .def( "disable_edges", &SurfaceMesh##dimension##D::disable_edges )     \
         .def( "edges",                                                         \
-            ( const SurfaceEdges##dimension##D& (                              \
-                SurfaceMesh##dimension##D::*) () const )                       \
-                & SurfaceMesh##dimension##D::edges,                            \
+            static_cast< const SurfaceEdges##dimension##D& (                   \
+                SurfaceMesh##dimension##D::*) () const >(                      \
+                &SurfaceMesh##dimension##D::edges ),                           \
             pybind11::return_value_policy::reference )                         \
         .def( "nb_polygons", &SurfaceMesh##dimension##D::nb_polygons )         \
         .def( "nb_polygon_vertices",                                           \
@@ -76,33 +76,34 @@
         .def( "previous_on_border",                                            \
             &SurfaceMesh##dimension##D::previous_on_border )                   \
         .def( "polygon_edge_length",                                           \
-            ( double( SurfaceMesh##dimension##D::* )( const PolygonEdge& )     \
-                    const )                                                    \
-                & SurfaceMesh##dimension##D::edge_length )                     \
+            static_cast< double ( SurfaceMesh##dimension##D::* )(              \
+                const PolygonEdge& ) const >(                                  \
+                &SurfaceMesh##dimension##D::edge_length ) )                    \
         .def( "edge_length", ( double( SurfaceMesh##dimension##D::* )(         \
                                  const std::array< index_t, 2 >& ) const )     \
                                  & SurfaceMesh##dimension##D::edge_length )    \
         .def( "polygon_edge_barycenter",                                       \
-            ( Point< dimension >( SurfaceMesh##dimension##D::* )(              \
-                const PolygonEdge& ) const )                                   \
-                & SurfaceMesh##dimension##D::edge_barycenter )                 \
+            static_cast< Point< dimension > ( SurfaceMesh##dimension##D::* )(  \
+                const PolygonEdge& ) const >(                                  \
+                &SurfaceMesh##dimension##D::edge_barycenter ) )                \
         .def( "edge_barycenter",                                               \
-            ( Point< dimension >( SurfaceMesh##dimension##D::* )(              \
-                const std::array< index_t, 2 >& ) const )                      \
-                & SurfaceMesh##dimension##D::edge_barycenter )                 \
+            static_cast< Point< dimension > ( SurfaceMesh##dimension##D::* )(  \
+                const std::array< index_t, 2 >& ) const >(                     \
+                &SurfaceMesh##dimension##D::edge_barycenter ) )                \
         .def( "polygon_barycenter",                                            \
             &SurfaceMesh##dimension##D::polygon_barycenter )                   \
         .def( "polygon_area", &SurfaceMesh##dimension##D::polygon_area )       \
         .def( "polygon_around_vertex",                                         \
             &SurfaceMesh##dimension##D::polygon_around_vertex )                \
         .def( "polygons_around_vertex",                                        \
-            ( const PolygonsAroundVertex& (                                    \
-                SurfaceMesh##dimension##D::*) ( index_t ) const )              \
-                & SurfaceMesh##dimension##D::polygons_around_vertex )          \
+            static_cast< const PolygonsAroundVertex& (                         \
+                SurfaceMesh##dimension##D::*) ( index_t ) const >(             \
+                &SurfaceMesh##dimension##D::polygons_around_vertex ) )         \
         .def( "polygons_around_polygon_vertex",                                \
-            ( const PolygonsAroundVertex& (                                    \
-                SurfaceMesh##dimension##D::*) ( const PolygonVertex& ) const ) \
-                & SurfaceMesh##dimension##D::polygons_around_vertex )          \
+            static_cast< const PolygonsAroundVertex& (                         \
+                SurfaceMesh##dimension##D::*) ( const PolygonVertex& )         \
+                    const >(                                                   \
+                &SurfaceMesh##dimension##D::polygons_around_vertex ) )         \
         .def( "polygon_edge_from_vertices",                                    \
             &SurfaceMesh##dimension##D::polygon_edge_from_vertices )           \
         .def( "polygons_from_edge_vertices",                                   \
@@ -114,9 +115,10 @@
             &SurfaceMesh##dimension##D::is_vertex_on_border )                  \
         .def( "texture_manager", &SurfaceMesh##dimension##D::texture_manager ) \
         .def( "bounding_box", &SurfaceMesh##dimension##D::bounding_box )       \
-        .def_static(                                                           \
-            "create", ( std::unique_ptr< SurfaceMesh##dimension##D >( * )() )  \
-                          & SurfaceMesh##dimension##D::create )                \
+        .def_static( "create",                                                 \
+            static_cast<                                                       \
+                std::unique_ptr< SurfaceMesh##dimension##D > ( * )() >(        \
+                &SurfaceMesh##dimension##D::create ) )                         \
         .def( "clone", &SurfaceMesh##dimension##D::clone )                     \
         .def( "is_triangulated_type",                                          \
             []( const SurfaceMesh< dimension >& surface ) {                    \

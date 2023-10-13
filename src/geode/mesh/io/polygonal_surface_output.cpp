@@ -23,6 +23,8 @@
 
 #include <geode/mesh/io/polygonal_surface_output.h>
 
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/detail/geode_output_impl.h>
 
 #include <geode/mesh/core/polygonal_surface.h>
@@ -49,8 +51,23 @@ namespace geode
         }
     }
 
+    template < index_t dimension >
+    bool is_polygonal_surface_saveable(
+        const PolygonalSurface< dimension >& polygonal_surface,
+        absl::string_view filename )
+    {
+        const auto output = detail::geode_object_output_writer<
+            PolygonalSurfaceOutputFactory< dimension > >( filename );
+        return output->is_saveable( polygonal_surface );
+    }
+
     template void opengeode_mesh_api save_polygonal_surface(
         const PolygonalSurface< 2 >&, absl::string_view );
     template void opengeode_mesh_api save_polygonal_surface(
+        const PolygonalSurface< 3 >&, absl::string_view );
+
+    template bool opengeode_mesh_api is_polygonal_surface_saveable(
+        const PolygonalSurface< 2 >&, absl::string_view );
+    template bool opengeode_mesh_api is_polygonal_surface_saveable(
         const PolygonalSurface< 3 >&, absl::string_view );
 } // namespace geode

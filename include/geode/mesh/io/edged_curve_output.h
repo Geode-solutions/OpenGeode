@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/factory.h>
 #include <geode/basic/output.h>
 
@@ -54,6 +56,10 @@ namespace geode
         {
         }
     };
+
+    template < index_t dimension >
+    bool is_edged_curve_saveable( const EdgedCurve< dimension >& edged_curve,
+        absl::string_view filename );
 
     template < index_t dimension >
     using EdgedCurveOutputFactory = Factory< std::string,

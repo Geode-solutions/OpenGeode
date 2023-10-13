@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/factory.h>
 #include <geode/basic/output.h>
 
@@ -51,6 +53,9 @@ namespace geode
         {
         }
     };
+
+    bool opengeode_mesh_api is_graph_saveable(
+        const Graph& graph, absl::string_view filename );
 
     using GraphOutputFactory =
         Factory< std::string, GraphOutput, absl::string_view >;

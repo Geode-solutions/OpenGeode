@@ -23,11 +23,15 @@
 
 #pragma once
 
+#include <memory>
+
 #include <absl/strings/ascii.h>
+#include <absl/strings/string_view.h>
 
 #include <geode/basic/filename.h>
 #include <geode/basic/identifier.h>
 #include <geode/basic/identifier_builder.h>
+#include <geode/basic/logger.h>
 #include <geode/basic/timer.h>
 
 namespace geode

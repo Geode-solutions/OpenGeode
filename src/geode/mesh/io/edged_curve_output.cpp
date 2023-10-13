@@ -23,6 +23,8 @@
 
 #include <geode/mesh/io/edged_curve_output.h>
 
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/detail/geode_output_impl.h>
 
 #include <geode/mesh/core/edged_curve.h>
@@ -48,8 +50,22 @@ namespace geode
         }
     }
 
+    template < index_t dimension >
+    bool is_edged_curve_saveable(
+        const EdgedCurve< dimension >& edged_curve, absl::string_view filename )
+    {
+        const auto output = detail::geode_object_output_writer<
+            EdgedCurveOutputFactory< dimension > >( filename );
+        return output->is_saveable( edged_curve );
+    }
+
     template void opengeode_mesh_api save_edged_curve(
         const EdgedCurve< 2 >&, absl::string_view );
     template void opengeode_mesh_api save_edged_curve(
+        const EdgedCurve< 3 >&, absl::string_view );
+
+    template bool opengeode_mesh_api is_edged_curve_saveable(
+        const EdgedCurve< 2 >&, absl::string_view );
+    template bool opengeode_mesh_api is_edged_curve_saveable(
         const EdgedCurve< 3 >&, absl::string_view );
 } // namespace geode

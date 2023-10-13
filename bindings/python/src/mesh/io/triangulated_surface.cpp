@@ -21,6 +21,8 @@
  *
  */
 
+#include <string>
+
 #include "../../basic/factory.h"
 #include "../../basic/input.h"
 #include "../../common.h"
@@ -47,6 +49,10 @@
     PYTHON_INPUT_MESH_CLASS(                                                   \
         std::unique_ptr< TriangulatedSurface< dimension > >,                   \
         "TriangulatedSurface" + std::to_string( dimension ) + "D" );           \
+    const auto saveable##dimension = "is_triangulated_surface_saveable"        \
+                                     + std::to_string( dimension ) + "D";      \
+    module.def( saveable##dimension.c_str(),                                   \
+        &is_triangulated_surface_saveable< dimension > );                      \
     PYTHON_FACTORY_CLASS( TriangulatedSurfaceInputFactory##dimension##D );     \
     PYTHON_FACTORY_CLASS( TriangulatedSurfaceOutputFactory##dimension##D )
 

@@ -30,9 +30,10 @@
         "HybridSolid" + std::to_string( dimension ) + "D";                     \
     pybind11::class_< HybridSolid##dimension##D, SolidMesh##dimension##D >(    \
         module, name##dimension.c_str() )                                      \
-        .def_static(                                                           \
-            "create", ( std::unique_ptr< HybridSolid##dimension##D >( * )() )  \
-                          & HybridSolid##dimension##D::create )                \
+        .def_static( "create",                                                 \
+            static_cast<                                                       \
+                std::unique_ptr< HybridSolid##dimension##D > ( * )() >(        \
+                &HybridSolid##dimension##D::create ) )                         \
         .def( "clone", &HybridSolid##dimension##D::clone )
 
 namespace geode

@@ -33,8 +33,8 @@ namespace geode
         pybind11::class_< VertexSetBuilder, IdentifierBuilder >(
             module, "VertexSetBuilder" )
             .def_static( "create",
-                ( std::unique_ptr< VertexSetBuilder >( * )( VertexSet& ) )
-                    & VertexSetBuilder::create )
+                static_cast< std::unique_ptr< VertexSetBuilder > ( * )(
+                    VertexSet& ) >( &VertexSetBuilder::create ) )
             .def( "create_vertex", &VertexSetBuilder::create_vertex )
             .def( "create_vertices", &VertexSetBuilder::create_vertices )
             .def( "delete_vertices", &VertexSetBuilder::delete_vertices )
