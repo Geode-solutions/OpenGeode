@@ -49,10 +49,8 @@ namespace geode
     class VertexSetOutput : public Output< VertexSet >
     {
     protected:
-        VertexSetOutput( absl::string_view filename ) : Output< VertexSet >
-        {
-            filename
-        }
+        VertexSetOutput( absl::string_view filename )
+            : Output< VertexSet >{ filename }
         {
         }
     };

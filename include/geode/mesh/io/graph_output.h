@@ -49,10 +49,7 @@ namespace geode
     class GraphOutput : public Output< Graph >
     {
     protected:
-        GraphOutput( absl::string_view filename ) : Output< Graph >
-        {
-            filename
-        }
+        GraphOutput( absl::string_view filename ) : Output< Graph >{ filename }
         {
         }
     };

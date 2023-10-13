@@ -52,10 +52,7 @@ namespace geode
     {
     protected:
         RegularGridOutput( absl::string_view filename )
-            : Output< RegularGrid< dimension > >
-        {
-            filename
-        }
+            : Output< RegularGrid< dimension > >{ filename }
         {
         }
     };

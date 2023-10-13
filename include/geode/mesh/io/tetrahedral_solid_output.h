@@ -56,10 +56,7 @@ namespace geode
 
     protected:
         TetrahedralSolidOutput( absl::string_view filename )
-            : Output< TetrahedralSolid< dimension > >
-        {
-            filename
-        }
+            : Output< TetrahedralSolid< dimension > >{ filename }
         {
         }
     };
