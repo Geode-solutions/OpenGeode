@@ -23,6 +23,8 @@
 
 #include <geode/model/representation/io/section_output.h>
 
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/detail/geode_output_impl.h>
 
 #include <geode/model/representation/core/section.h>

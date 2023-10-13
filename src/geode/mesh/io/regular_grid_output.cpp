@@ -23,6 +23,8 @@
 
 #include <geode/mesh/io/regular_grid_output.h>
 
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/detail/geode_output_impl.h>
 
 #include <geode/mesh/core/regular_grid_solid.h>
