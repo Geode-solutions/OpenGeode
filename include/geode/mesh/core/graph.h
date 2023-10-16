@@ -188,4 +188,4 @@ namespace std
                    ^ absl::Hash< geode::index_t >()( edge_vertex.vertex_id );
         }
     };
-} //
+} // namespace std
