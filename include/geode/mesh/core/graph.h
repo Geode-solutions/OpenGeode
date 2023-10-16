@@ -175,3 +175,17 @@ namespace geode
         IMPLEMENTATION_MEMBER( impl_ );
     };
 } // namespace geode
+
+namespace std
+{
+    template <>
+    struct hash< geode::EdgeVertex >
+    {
+    public:
+        size_t operator()( const geode::EdgeVertex& edge_vertex ) const
+        {
+            return absl::Hash< geode::index_t >()( edge_vertex.edge_id )
+                   ^ absl::Hash< geode::index_t >()( edge_vertex.vertex_id );
+        }
+    };
+} // namespace std
