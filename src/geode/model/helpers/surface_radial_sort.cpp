@@ -107,14 +107,13 @@ namespace
     {
         const auto line_v0 = brep.unique_vertex( { line.component_id(), e0 } );
         const auto line_v1 = brep.unique_vertex( { line.component_id(), e1 } );
-        const auto surface_vertices0 = brep.component_mesh_vertices(
-            line_v0, geode::Surface3D::component_type_static() );
-        const auto surface_vertices1 = brep.component_mesh_vertices(
-            line_v1, geode::Surface3D::component_type_static() );
+        const auto& vertices0 = brep.component_mesh_vertices( line_v0 );
+        const auto& vertices1 = brep.component_mesh_vertices( line_v1 );
         std::vector< BorderPolygon > polygons;
         bool degenerate_polygon{ false };
-        for( const auto& vertex_pairs : geode::component_mesh_vertex_pairs(
-                 surface_vertices0, surface_vertices1 ) )
+        for( const auto& vertex_pairs :
+            geode::component_mesh_vertex_pairs( vertices0, vertices1,
+                geode::Surface3D::component_type_static() ) )
         {
             const auto& surface_id = vertex_pairs.first.id();
             const auto& surface = brep.surface( surface_id );

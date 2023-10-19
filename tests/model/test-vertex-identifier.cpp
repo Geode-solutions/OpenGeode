@@ -127,21 +127,6 @@ void test_set_unique_vertices(
                              0, geode::Corner2D::component_type_static() ),
         "[Test] Unique vertex should have component mesh vertices of type "
         "Corner" );
-    const auto& uvertices0_type = vertex_identifier.component_mesh_vertices(
-        0, geode::Corner2D::component_type_static() );
-    OPENGEODE_EXCEPTION( uvertices0_type.size() == 2,
-        "[Test] Search of unique vertices by "
-        "ComponentType is not correct" );
-    OPENGEODE_EXCEPTION(
-        vertex_identifier.has_component_mesh_vertices( 0, uuids[0] ),
-        "[Test] Unique vertex should have component mesh vertices of given "
-        "Corner id" );
-    OPENGEODE_EXCEPTION(
-        vertex_identifier.component_mesh_vertices( 0, uuids[0] ).size() == 1
-            && vertex_identifier.component_mesh_vertices( 0, uuids[0] ).front()
-                   == 0,
-        "[Test] Search of unique vertices by ComponentMeshUUID is not "
-        "correct" );
 
     const auto& uvertices3 = vertex_identifier.component_mesh_vertices( 3 );
     OPENGEODE_EXCEPTION( uvertices3.size() == 0,

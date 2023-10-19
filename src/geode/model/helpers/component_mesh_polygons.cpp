@@ -66,9 +66,15 @@ namespace
         for( const auto polygon_vertex_id :
             geode::LIndices{ facet_unique_vertices } )
         {
-            block_facet_from_unique_vertices[polygon_vertex_id] =
-                model.component_mesh_vertices(
-                    facet_unique_vertices[polygon_vertex_id], block.id() );
+            for( const auto& cmv : model.component_mesh_vertices(
+                     facet_unique_vertices[polygon_vertex_id] ) )
+            {
+                if( cmv.component_id.id() == block.id() )
+                {
+                    block_facet_from_unique_vertices[polygon_vertex_id]
+                        .emplace_back( cmv.vertex );
+                }
+            }
         }
         return block_facet_from_unique_vertices;
     }
@@ -293,9 +299,15 @@ namespace
             surface_edge_from_unique_vertices;
         for( const auto edge_vertex_id : geode::LRange{ 2 } )
         {
-            surface_edge_from_unique_vertices[edge_vertex_id] =
-                model.component_mesh_vertices(
-                    edge_unique_vertices[edge_vertex_id], surface.id() );
+            for( const auto& cmv : model.component_mesh_vertices(
+                     edge_unique_vertices[edge_vertex_id] ) )
+            {
+                if( cmv.component_id.id() == surface.id() )
+                {
+                    surface_edge_from_unique_vertices[edge_vertex_id]
+                        .emplace_back( cmv.vertex );
+                }
+            }
         }
         return surface_edge_from_unique_vertices;
     }
