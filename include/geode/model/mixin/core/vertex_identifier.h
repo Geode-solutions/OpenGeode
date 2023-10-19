@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include <absl/types/span.h>
 
 #include <geode/basic/passkey.h>
@@ -11,6 +13,7 @@
 namespace geode
 {
     struct MeshVertex;
+    struct uuid;
     class VertexIdentifierBuilder;
 } // namespace geode
 
@@ -76,8 +79,9 @@ namespace geode
          * @param[in] unique_vertex_id Indice of the unique vertex.
          * @param[in] type Type of components used to filter returned vertices.
          */
-        std::vector< ComponentMeshVertex > component_mesh_vertices(
-            index_t unique_vertex_id, const ComponentType& type ) const;
+        OPENGEODE_MODEL_DEPRECATED std::vector< ComponentMeshVertex >
+            component_mesh_vertices(
+                index_t unique_vertex_id, const ComponentType& type ) const;
 
         /*!
          * Return the component vertices identified with an unique vertex
@@ -86,8 +90,9 @@ namespace geode
          * @param[in] component_id Component unique index used to filter
          * returned vertices.
          */
-        std::vector< index_t > component_mesh_vertices(
-            index_t unique_vertex_id, const uuid& component_id ) const;
+        OPENGEODE_MODEL_DEPRECATED std::vector< index_t >
+            component_mesh_vertices(
+                index_t unique_vertex_id, const uuid& component_id ) const;
 
         /*!
          * Return the unique vertex index of a given component vertex.

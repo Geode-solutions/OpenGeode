@@ -213,10 +213,12 @@ namespace
             const auto line_pointid = line.mesh().edge_vertex( e_vertex );
             const auto uvertex_id =
                 brep_.unique_vertex( { line.component_id(), line_pointid } );
-            for( const auto vertex :
-                brep_.component_mesh_vertices( uvertex_id, surface.id() ) )
+            for( const auto& cmv : brep_.component_mesh_vertices( uvertex_id ) )
             {
-                return vertex;
+                if( cmv.component_id.id() == surface.id() )
+                {
+                    return cmv.vertex;
+                }
             }
             auto surface_builder =
                 brep_builder_.surface_mesh_builder( surface.id() );
@@ -312,10 +314,12 @@ namespace
             const auto surf_pointid = surface.mesh().polygon_vertex( p_vertex );
             const auto uvertex_id =
                 brep_.unique_vertex( { surface.component_id(), surf_pointid } );
-            for( const auto vertex :
-                brep_.component_mesh_vertices( uvertex_id, block.id() ) )
+            for( const auto& cmv : brep_.component_mesh_vertices( uvertex_id ) )
             {
-                return vertex;
+                if( cmv.component_id.id() == block.id() )
+                {
+                    return cmv.vertex;
+                }
             }
             auto block_builder = brep_builder_.block_mesh_builder( block.id() );
             auto pt_id = block_builder->create_point(
