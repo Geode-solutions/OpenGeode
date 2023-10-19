@@ -23,7 +23,11 @@
 
 #include <geode/model/helpers/component_mesh_polyhedra.h>
 
+#include <functional>
+#include <vector>
+
 #include <absl/container/inlined_vector.h>
+#include <absl/types/span.h>
 
 #include <geode/basic/algorithm.h>
 

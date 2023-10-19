@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include <absl/types/span.h>
 
 #include <geode/basic/passkey.h>
@@ -11,6 +13,7 @@
 namespace geode
 {
     struct MeshVertex;
+    struct uuid;
     class VertexIdentifierBuilder;
 } // namespace geode
 
