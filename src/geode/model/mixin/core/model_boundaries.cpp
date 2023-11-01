@@ -182,7 +182,8 @@ namespace geode
 
     template < index_t dimension >
     ModelBoundaries<
-        dimension >::ModelBoundaryRangeBase::~ModelBoundaryRangeBase() = default;
+        dimension >::ModelBoundaryRangeBase::~ModelBoundaryRangeBase() =
+        default;
 
     template < index_t dimension >
     bool ModelBoundaries< dimension >::ModelBoundaryRangeBase::operator!=(
@@ -212,8 +213,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    ModelBoundaries<
-        dimension >::ModelBoundaryRange::~ModelBoundaryRange() = default;
+    ModelBoundaries< dimension >::ModelBoundaryRange::~ModelBoundaryRange() =
+        default;
 
     template < index_t dimension >
     auto ModelBoundaries< dimension >::ModelBoundaryRange::begin() const
