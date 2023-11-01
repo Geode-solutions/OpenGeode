@@ -70,14 +70,10 @@ namespace geode
     };
 
     template < index_t dimension >
-    Component< dimension >::~Component() // NOLINT
-    {
-    }
+    Component< dimension >::~Component() = default;
 
     template < index_t dimension >
-    Component< dimension >::Component() // NOLINT
-    {
-    }
+    Component< dimension >::Component() = default;
 
     template < index_t dimension >
     Component< dimension >::Component( Component&& other ) noexcept

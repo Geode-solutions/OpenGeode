@@ -91,9 +91,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    Block< dimension >::~Block() // NOLINT
-    {
-    }
+    Block< dimension >::~Block() = default;
 
     template < index_t dimension >
     auto Block< dimension >::get_mesh() const -> const Mesh&

@@ -166,9 +166,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    SolidFacets< dimension >::~SolidFacets() // NOLINT
-    {
-    }
+    SolidFacets< dimension >::~SolidFacets() = default;
 
     template < index_t dimension >
     bool SolidFacets< dimension >::is_facet_isolated( index_t facet_id ) const

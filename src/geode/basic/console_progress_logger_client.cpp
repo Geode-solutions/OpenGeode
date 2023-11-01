@@ -83,9 +83,9 @@ namespace geode
         absl::flat_hash_map< uuid, Info > info_;
     };
 
-    ConsoleProgressLoggerClient::ConsoleProgressLoggerClient() {} // NOLINT
+    ConsoleProgressLoggerClient::ConsoleProgressLoggerClient() = default;
 
-    ConsoleProgressLoggerClient::~ConsoleProgressLoggerClient() {} // NOLINT
+    ConsoleProgressLoggerClient::~ConsoleProgressLoggerClient() = default;
 
     void ConsoleProgressLoggerClient::start( const uuid& progress_logger_id,
         const std::string& message,

@@ -60,9 +60,7 @@ namespace geode
     };
 
     template < index_t dimension >
-    Corner< dimension >::~Corner() // NOLINT
-    {
-    }
+    Corner< dimension >::~Corner() = default;
 
     template < index_t dimension >
     Corner< dimension >::Corner()

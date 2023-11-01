@@ -173,9 +173,7 @@ namespace geode
 
     template < index_t dimension >
     OpenGeodeTetrahedralSolid<
-        dimension >::~OpenGeodeTetrahedralSolid() // NOLINT
-    {
-    }
+        dimension >::~OpenGeodeTetrahedralSolid() = default;
 
     template < index_t dimension >
     void OpenGeodeTetrahedralSolid< dimension >::set_vertex(

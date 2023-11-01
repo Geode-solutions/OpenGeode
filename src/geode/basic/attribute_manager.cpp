@@ -322,12 +322,12 @@ namespace geode
         AttributesMap attributes_;
     };
 
-    AttributeManager::AttributeManager() {} // NOLINT
+    AttributeManager::AttributeManager() = default;
     AttributeManager::AttributeManager( AttributeManager &&other ) noexcept
         : impl_( std::move( other.impl_ ) )
     {
     }
-    AttributeManager::~AttributeManager() {} // NOLINT
+    AttributeManager::~AttributeManager() = default;
 
     std::shared_ptr< AttributeBase > AttributeManager::find_attribute_base(
         absl::string_view name ) const

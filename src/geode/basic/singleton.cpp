@@ -58,9 +58,9 @@ namespace geode
         std::mutex lock_;
     };
 
-    Singleton::Singleton() {} // NOLINT
+    Singleton::Singleton() = default;
 
-    Singleton::~Singleton() {} // NOLINT
+    Singleton::~Singleton() = default;
 
     std::mutex &Singleton::lock()
     {

@@ -156,7 +156,7 @@ namespace geode
         return *this;
     }
 
-    Graph::~Graph() {} // NOLINT
+    Graph::~Graph() = default;
 
     std::unique_ptr< Graph > Graph::create()
     {

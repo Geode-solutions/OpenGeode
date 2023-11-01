@@ -110,7 +110,7 @@ namespace geode
     {
     }
 
-    ZipFile::~ZipFile() {} // NOLINT
+    ZipFile::~ZipFile() = default;
 
     void ZipFile::archive_file( absl::string_view file ) const
     {
@@ -184,7 +184,7 @@ namespace geode
     {
     }
 
-    UnzipFile::~UnzipFile() {} // NOLINT
+    UnzipFile::~UnzipFile() = default;
 
     void UnzipFile::extract_all() const
     {

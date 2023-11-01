@@ -93,9 +93,9 @@ namespace geode
         Level level_{ Level::trace };
     };
 
-    Logger::Logger() {} // NOLINT
+    Logger::Logger() = default;
 
-    Logger::~Logger() {} // NOLINT
+    Logger::~Logger() = default;
 
     Logger &Logger::instance()
     {

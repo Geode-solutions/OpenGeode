@@ -76,9 +76,9 @@ namespace geode
         std::shared_ptr< spdlog::logger > logger_impl_;
     };
 
-    ConsoleLoggerClient::ConsoleLoggerClient() {} // NOLINT
+    ConsoleLoggerClient::ConsoleLoggerClient() = default;
 
-    ConsoleLoggerClient::~ConsoleLoggerClient() {} // NOLINT
+    ConsoleLoggerClient::~ConsoleLoggerClient() = default;
 
     void ConsoleLoggerClient::trace( const std::string &message )
     {

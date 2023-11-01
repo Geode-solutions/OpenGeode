@@ -55,7 +55,7 @@ namespace geode
         mutable AttributeManager vertex_attribute_manager_;
     };
 
-    VertexSet::VertexSet() {} // NOLINT
+    VertexSet::VertexSet() = default;
 
     VertexSet::VertexSet( VertexSet&& other ) noexcept
         : Identifier{ std::move( other ) }, impl_( std::move( other.impl_ ) )
@@ -69,7 +69,7 @@ namespace geode
         return *this;
     }
 
-    VertexSet::~VertexSet() {} // NOLINT
+    VertexSet::~VertexSet() = default;
 
     std::unique_ptr< VertexSet > VertexSet::create()
     {

@@ -51,13 +51,13 @@ namespace geode
         absl::Time start_time_;
     };
 
-    Timer::Timer() {} // NOLINT
+    Timer::Timer() = default;
 
     Timer::Timer( Timer&& other ) noexcept : impl_{ std::move( other.impl_ ) }
     {
     }
 
-    Timer::~Timer() {} // NOLINT
+    Timer::~Timer() = default;
 
     std::string Timer::duration() const
     {

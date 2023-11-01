@@ -52,9 +52,7 @@ namespace geode
     };
 
     template < index_t dimension >
-    Surfaces< dimension >::Surfaces() // NOLINT
-    {
-    }
+    Surfaces< dimension >::Surfaces() = default;
 
     template < index_t dimension >
     Surfaces< dimension >::Surfaces( Surfaces&& other )
@@ -63,9 +61,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    Surfaces< dimension >::~Surfaces() // NOLINT
-    {
-    }
+    Surfaces< dimension >::~Surfaces() = default;
 
     template < index_t dimension >
     Surfaces< dimension >& Surfaces< dimension >::operator=(
@@ -290,9 +286,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    Surfaces< dimension >::SurfaceRangeBase::~SurfaceRangeBase() // NOLINT
-    {
-    }
+    Surfaces< dimension >::SurfaceRangeBase::~SurfaceRangeBase() = default;
 
     template < index_t dimension >
     bool Surfaces< dimension >::SurfaceRangeBase::operator!=(
@@ -322,9 +316,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    Surfaces< dimension >::SurfaceRange::~SurfaceRange() // NOLINT
-    {
-    }
+    Surfaces< dimension >::SurfaceRange::~SurfaceRange() = default;
 
     template < index_t dimension >
     auto Surfaces< dimension >::SurfaceRange::begin() const

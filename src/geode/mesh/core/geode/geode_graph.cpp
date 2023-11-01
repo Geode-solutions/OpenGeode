@@ -67,7 +67,7 @@ namespace geode
         return *this;
     }
 
-    OpenGeodeGraph::~OpenGeodeGraph() {} // NOLINT
+    OpenGeodeGraph::~OpenGeodeGraph() = default;
 
     index_t OpenGeodeGraph::get_edge_vertex(
         const EdgeVertex& edge_vertex ) const

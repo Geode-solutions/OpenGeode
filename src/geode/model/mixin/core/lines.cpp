@@ -45,9 +45,7 @@ namespace geode
     };
 
     template < index_t dimension >
-    Lines< dimension >::Lines() // NOLINT
-    {
-    }
+    Lines< dimension >::Lines() = default;
 
     template < index_t dimension >
     Lines< dimension >::Lines( Lines&& other )
@@ -56,9 +54,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    Lines< dimension >::~Lines() // NOLINT
-    {
-    }
+    Lines< dimension >::~Lines() = default;
 
     template < index_t dimension >
     Lines< dimension >& Lines< dimension >::operator=(
@@ -248,9 +244,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    Lines< dimension >::LineRangeBase::~LineRangeBase() // NOLINT
-    {
-    }
+    Lines< dimension >::LineRangeBase::~LineRangeBase() = default;
 
     template < index_t dimension >
     bool Lines< dimension >::LineRangeBase::operator!=(
@@ -278,9 +272,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    Lines< dimension >::LineRange::~LineRange() // NOLINT
-    {
-    }
+    Lines< dimension >::LineRange::~LineRange() = default;
 
     template < index_t dimension >
     auto Lines< dimension >::LineRange::begin() const -> const LineRange&

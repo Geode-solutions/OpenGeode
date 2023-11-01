@@ -260,7 +260,7 @@ namespace geode
         std::shared_ptr< VariableAttribute< RelationType > > relation_type_;
     };
 
-    Relationships::Relationships() {} // NOLINT
+    Relationships::Relationships() = default;
     Relationships::Relationships( Relationships&& other )
         : impl_( std::move( other.impl_ ) )
     {
@@ -271,7 +271,7 @@ namespace geode
         return *this;
     }
 
-    Relationships::~Relationships() {} // NOLINT
+    Relationships::~Relationships() = default;
 
     void Relationships::remove_component(
         const uuid& component_id, RelationshipsBuilderKey /*unused*/ )
@@ -500,7 +500,7 @@ namespace geode
     {
     }
 
-    Relationships::RelationRangeIterator::~RelationRangeIterator() {} // NOLINT
+    Relationships::RelationRangeIterator::~RelationRangeIterator() = default;
 
     bool Relationships::RelationRangeIterator::operator!=(
         const RelationRangeIterator& /*unused*/ ) const
@@ -587,7 +587,7 @@ namespace geode
     {
     }
 
-    Relationships::BoundaryRangeIterator::~BoundaryRangeIterator() {} // NOLINT
+    Relationships::BoundaryRangeIterator::~BoundaryRangeIterator() = default;
 
     bool Relationships::BoundaryRangeIterator::operator!=(
         const BoundaryRangeIterator& /*unused*/ ) const
@@ -762,7 +762,7 @@ namespace geode
     {
     }
 
-    Relationships::InternalRangeIterator::~InternalRangeIterator() {} // NOLINT
+    Relationships::InternalRangeIterator::~InternalRangeIterator() = default;
 
     bool Relationships::InternalRangeIterator::operator!=(
         const InternalRangeIterator& /*unused*/ ) const
@@ -937,7 +937,7 @@ namespace geode
     {
     }
 
-    Relationships::ItemRangeIterator::~ItemRangeIterator() {} // NOLINT
+    Relationships::ItemRangeIterator::~ItemRangeIterator() = default;
 
     bool Relationships::ItemRangeIterator::operator!=(
         const ItemRangeIterator& /*unused*/ ) const

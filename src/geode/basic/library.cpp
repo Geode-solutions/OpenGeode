@@ -46,9 +46,9 @@ namespace geode
         bool is_loaded_{ false };
     };
 
-    Library::Library() {} // NOLINT
+    Library::Library() = default;
 
-    Library::~Library() {} // NOLINT
+    Library::~Library() = default;
 
     void Library::call_initialize( const char* library_name )
     {

@@ -94,7 +94,7 @@ namespace geode
     {
     }
 
-    ProgressLogger::~ProgressLogger() {} // NOLINT
+    ProgressLogger::~ProgressLogger() = default;
 
     index_t ProgressLogger::increment()
     {

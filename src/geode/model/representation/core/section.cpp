@@ -414,7 +414,7 @@ namespace geode
             Relationships::ItemRangeIterator::operator*().id() );
     }
 
-    Section::Section() {} // NOLINT
+    Section::Section() = default;
 
     Section::Section( Section&& section ) noexcept
         : Topology{ std::move( section ) },
@@ -437,7 +437,7 @@ namespace geode
         return *this;
     }
 
-    Section::~Section() {} // NOLINT
+    Section::~Section() = default;
 
     Section::ItemLineRange Section::model_boundary_items(
         const ModelBoundary2D& boundary ) const
