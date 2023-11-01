@@ -35,11 +35,7 @@
     pybind11::class_< SolidMeshBuilder##dimension##D, VertexSetBuilder,        \
         CoordinateReferenceSystemManagersBuilder##dimension##D >(              \
         module, name##dimension.c_str() )                                      \
-        .def_static( "create",                                                 \
-            static_cast<                                                       \
-                std::unique_ptr< SolidMeshBuilder##dimension##D > ( * )(       \
-                    SolidMesh< dimension >& ) >(                               \
-                &SolidMeshBuilder##dimension##D::create ) )                    \
+        .def_static( "create", &SolidMeshBuilder##dimension##D::create )       \
         .def( "create_point", &SolidMeshBuilder##dimension##D::create_point )  \
         .def( "create_polyhedron",                                             \
             &SolidMeshBuilder##dimension##D::create_polyhedron )               \

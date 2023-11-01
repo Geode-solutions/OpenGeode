@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <absl/strings/string_view.h>
 #include <absl/types/span.h>
 
 #include <geode/basic/common.h>
@@ -64,4 +65,5 @@ namespace geode
         IMPLEMENTATION_MEMBER( impl_ );
     };
 
+    bool opengeode_basic_api is_zip_file( absl::string_view file );
 } // namespace geode

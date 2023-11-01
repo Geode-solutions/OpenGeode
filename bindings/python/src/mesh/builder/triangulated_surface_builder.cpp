@@ -31,11 +31,8 @@
         "TriangulatedSurfaceBuilder" + std::to_string( dimension ) + "D";      \
     pybind11::class_< TriangulatedSurfaceBuilder##dimension##D,                \
         SurfaceMeshBuilder##dimension##D >( module, name##dimension.c_str() )  \
-        .def_static( "create",                                                 \
-            static_cast< std::unique_ptr<                                      \
-                TriangulatedSurfaceBuilder##dimension##D > ( * )(              \
-                TriangulatedSurface< dimension >& ) >(                         \
-                &TriangulatedSurfaceBuilder##dimension##D::create ) )          \
+        .def_static(                                                           \
+            "create", &TriangulatedSurfaceBuilder##dimension##D::create )      \
         .def( "create_triangle",                                               \
             &TriangulatedSurfaceBuilder##dimension##D::create_triangle )
 

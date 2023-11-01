@@ -31,11 +31,7 @@
         "HybridSolidBuilder" + std::to_string( dimension ) + "D";              \
     pybind11::class_< HybridSolidBuilder##dimension##D,                        \
         SolidMeshBuilder##dimension##D >( module, name##dimension.c_str() )    \
-        .def_static( "create",                                                 \
-            static_cast<                                                       \
-                std::unique_ptr< HybridSolidBuilder##dimension##D > ( * )(     \
-                    HybridSolid< dimension >& ) >(                             \
-                &HybridSolidBuilder##dimension##D::create ) )                  \
+        .def_static( "create", &HybridSolidBuilder##dimension##D::create )     \
         .def( "create_tetrahedron",                                            \
             &HybridSolidBuilder##dimension##D::create_tetrahedron )            \
         .def( "create_hexahedron",                                             \

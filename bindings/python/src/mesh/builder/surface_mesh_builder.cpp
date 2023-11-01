@@ -35,11 +35,7 @@
     pybind11::class_< SurfaceMeshBuilder##dimension##D, VertexSetBuilder,      \
         CoordinateReferenceSystemManagersBuilder##dimension##D >(              \
         module, name##dimension.c_str() )                                      \
-        .def_static( "create",                                                 \
-            static_cast<                                                       \
-                std::unique_ptr< SurfaceMeshBuilder##dimension##D > ( * )(     \
-                    SurfaceMesh< dimension >& ) >(                             \
-                &SurfaceMeshBuilder##dimension##D::create ) )                  \
+        .def_static( "create", &SurfaceMeshBuilder##dimension##D::create )     \
         .def(                                                                  \
             "create_point", &SurfaceMeshBuilder##dimension##D::create_point )  \
         .def( "create_polygon",                                                \

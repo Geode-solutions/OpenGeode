@@ -79,9 +79,10 @@
             static_cast< double ( SurfaceMesh##dimension##D::* )(              \
                 const PolygonEdge& ) const >(                                  \
                 &SurfaceMesh##dimension##D::edge_length ) )                    \
-        .def( "edge_length", ( double( SurfaceMesh##dimension##D::* )(         \
-                                 const std::array< index_t, 2 >& ) const )     \
-                                 & SurfaceMesh##dimension##D::edge_length )    \
+        .def( "edge_length",                                                   \
+            static_cast< double ( SurfaceMesh##dimension##D::* )(              \
+                const std::array< index_t, 2 >& ) const >(                     \
+                &SurfaceMesh##dimension##D::edge_length ) )                    \
         .def( "polygon_edge_barycenter",                                       \
             static_cast< Point< dimension > ( SurfaceMesh##dimension##D::* )(  \
                 const PolygonEdge& ) const >(                                  \

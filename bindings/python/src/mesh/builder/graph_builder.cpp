@@ -31,9 +31,7 @@ namespace geode
     {
         pybind11::class_< GraphBuilder, VertexSetBuilder >(
             module, "GraphBuilder" )
-            .def_static( "create",
-                static_cast< std::unique_ptr< GraphBuilder > ( * )( Graph& ) >(
-                    &GraphBuilder::create ) )
+            .def_static( "create", &GraphBuilder::create )
             .def( "create_edge", static_cast< index_t ( GraphBuilder::* )() >(
                                      &GraphBuilder::create_edge ) )
             .def( "create_edge_with_vertices",

@@ -23,8 +23,10 @@
 
 #pragma once
 
+#include <geode/basic/assert.h>
 #include <geode/basic/common.h>
 #include <geode/basic/library.h>
+#include <geode/basic/logger.h>
 
 namespace geode
 {

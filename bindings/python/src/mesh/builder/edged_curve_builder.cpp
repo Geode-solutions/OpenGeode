@@ -34,11 +34,7 @@
     pybind11::class_< EdgedCurveBuilder##dimension##D, GraphBuilder,           \
         CoordinateReferenceSystemManagersBuilder##dimension##D >(              \
         module, name##dimension.c_str() )                                      \
-        .def_static( "create",                                                 \
-            static_cast<                                                       \
-                std::unique_ptr< EdgedCurveBuilder##dimension##D > ( * )(      \
-                    EdgedCurve< dimension >& ) >(                              \
-                &EdgedCurveBuilder##dimension##D::create ) )                   \
+        .def_static( "create", &EdgedCurveBuilder##dimension##D::create )      \
         .def( "create_point", &EdgedCurveBuilder##dimension##D::create_point )
 
 namespace geode

@@ -32,6 +32,8 @@
 
 #include <ghc/filesystem.hpp>
 
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/logger.h>
 #include <geode/basic/pimpl_impl.h>
 
@@ -145,6 +147,7 @@ namespace geode
         ~Impl()
         {
             ghc::filesystem::remove_all( directory_ );
+            mz_zip_reader_close( reader_ );
             mz_zip_reader_delete( &reader_ );
         }
 
@@ -196,4 +199,14 @@ namespace geode
         return impl_->directory();
     }
 
+    bool is_zip_file( absl::string_view file )
+    {
+        void* reader{ nullptr };
+        mz_zip_reader_create( &reader );
+        const auto status =
+            mz_zip_reader_open_file( reader, to_string( file ).c_str() );
+        mz_zip_reader_close( reader );
+        mz_zip_reader_delete( &reader );
+        return status == MZ_OK;
+    }
 } // namespace geode
