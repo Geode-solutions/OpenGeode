@@ -166,11 +166,12 @@ namespace geode
         for( const auto v : LRange{ 4 } )
         {
             const PolyhedronVertex vertex{ tetrahedron_id, v };
-            if( this->polyhedron_vertex( vertex ) == edge_vertices[0] )
+            const auto vertex_id = this->polyhedron_vertex( vertex );
+            if( vertex_id == edge_vertices[0] )
             {
                 opposite_facets[0] = { vertex.polyhedron_id, vertex.vertex_id };
             }
-            else if( this->polyhedron_vertex( vertex ) == edge_vertices[1] )
+            else if( vertex_id == edge_vertices[1] )
             {
                 opposite_facets[1] = { vertex.polyhedron_id, vertex.vertex_id };
             }

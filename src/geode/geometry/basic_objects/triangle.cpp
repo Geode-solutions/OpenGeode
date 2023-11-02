@@ -262,6 +262,32 @@ namespace geode
         return bbox;
     }
 
+    template < typename PointType, index_t dimension >
+    double GenericTriangle< PointType, dimension >::minimum_height() const
+    {
+        local_index_t max_length_edge_id{ NO_LID };
+        double edge_max_length{ 0 };
+        for( const auto edge_id : LRange{ 3 } )
+        {
+            const auto next_vertex = edge_id == 2 ? 0 : edge_id + 1;
+            const Point< dimension >& point0 = vertices_.at( edge_id );
+            const Point< dimension >& point1 = vertices_.at( next_vertex );
+            const auto edge_length = point_point_distance( point0, point1 );
+            if( edge_length > edge_max_length )
+            {
+                max_length_edge_id = edge_id;
+                edge_max_length = edge_length;
+            }
+        }
+        const Point< dimension >& opposite_vertex = vertices_.at(
+            max_length_edge_id == 0 ? 2 : max_length_edge_id - 1 );
+        const Point< dimension >& next_vertex = vertices_.at(
+            max_length_edge_id == 2 ? 0 : max_length_edge_id + 1 );
+        Segment< dimension > longest_edge{ vertices_.at( max_length_edge_id ),
+            next_vertex };
+        return point_segment_distance( opposite_vertex, longest_edge );
+    }
+
     template < index_t dimension >
     OwnerTriangle< dimension >::OwnerTriangle( Point< dimension > point0,
         Point< dimension > point1,

@@ -77,6 +77,7 @@ namespace geode
         void set_point( index_t vertex, PointType point );
         const std::array< PointType, 3 >& vertices() const;
         BoundingBox< dimension > bounding_box() const;
+        double minimum_height() const;
 
     private:
         std::array< PointType, 3 > vertices_;
