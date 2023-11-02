@@ -147,9 +147,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    AABBTree< dimension >::~AABBTree() // NOLINT
-    {
-    }
+    AABBTree< dimension >::~AABBTree() = default;
 
     template < index_t dimension >
     AABBTree< dimension >& AABBTree< dimension >::operator=( AABBTree&& other )

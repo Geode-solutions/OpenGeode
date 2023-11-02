@@ -107,9 +107,9 @@ namespace geode
         std::string name_ = std::string{ DEFAULT_NAME };
     };
 
-    Identifier::Identifier() {} // NOLINT
+    Identifier::Identifier() = default;
 
-    Identifier::~Identifier() {} // NOLINT
+    Identifier::~Identifier() = default;
 
     Identifier::Identifier( Identifier&& other ) noexcept
         : impl_( std::move( other.impl_ ) )

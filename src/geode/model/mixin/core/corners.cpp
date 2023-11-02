@@ -45,9 +45,7 @@ namespace geode
     };
 
     template < index_t dimension >
-    Corners< dimension >::Corners() // NOLINT
-    {
-    }
+    Corners< dimension >::Corners() = default;
 
     template < index_t dimension >
     Corners< dimension >::Corners( Corners&& other )
@@ -56,9 +54,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    Corners< dimension >::~Corners() // NOLINT
-    {
-    }
+    Corners< dimension >::~Corners() = default;
 
     template < index_t dimension >
     Corners< dimension >& Corners< dimension >::operator=(
@@ -256,9 +252,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    Corners< dimension >::CornerRangeBase::~CornerRangeBase() // NOLINT
-    {
-    }
+    Corners< dimension >::CornerRangeBase::~CornerRangeBase() = default;
 
     template < index_t dimension >
     bool Corners< dimension >::CornerRangeBase::operator!=(
@@ -286,9 +280,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    Corners< dimension >::CornerRange::~CornerRange() // NOLINT
-    {
-    }
+    Corners< dimension >::CornerRange::~CornerRange() = default;
 
     template < index_t dimension >
     auto Corners< dimension >::CornerRange::begin() const -> const CornerRange&

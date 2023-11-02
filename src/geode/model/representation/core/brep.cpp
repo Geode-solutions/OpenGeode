@@ -97,7 +97,7 @@ namespace geode
     {
     }
 
-    BRep::BoundaryCornerRange::~BoundaryCornerRange() {} // NOLINT
+    BRep::BoundaryCornerRange::~BoundaryCornerRange() = default;
 
     auto BRep::BoundaryCornerRange::begin() const -> const BoundaryCornerRange&
     {
@@ -132,7 +132,7 @@ namespace geode
     {
     }
 
-    BRep::BoundaryLineRange::~BoundaryLineRange() {} // NOLINT
+    BRep::BoundaryLineRange::~BoundaryLineRange() = default;
 
     auto BRep::BoundaryLineRange::begin() const -> const BoundaryLineRange&
     {
@@ -168,7 +168,7 @@ namespace geode
     {
     }
 
-    BRep::BoundarySurfaceRange::~BoundarySurfaceRange() {} // NOLINT
+    BRep::BoundarySurfaceRange::~BoundarySurfaceRange() = default;
 
     auto BRep::BoundarySurfaceRange::begin() const
         -> const BoundarySurfaceRange&
@@ -204,7 +204,7 @@ namespace geode
     {
     }
 
-    BRep::IncidentLineRange::~IncidentLineRange() {} // NOLINT
+    BRep::IncidentLineRange::~IncidentLineRange() = default;
 
     auto BRep::IncidentLineRange::begin() const -> const IncidentLineRange&
     {
@@ -240,7 +240,7 @@ namespace geode
     {
     }
 
-    BRep::IncidentSurfaceRange::~IncidentSurfaceRange() {} // NOLINT
+    BRep::IncidentSurfaceRange::~IncidentSurfaceRange() = default;
 
     auto BRep::IncidentSurfaceRange::begin() const
         -> const IncidentSurfaceRange&
@@ -277,7 +277,7 @@ namespace geode
     {
     }
 
-    BRep::IncidentBlockRange::~IncidentBlockRange() {} // NOLINT
+    BRep::IncidentBlockRange::~IncidentBlockRange() = default;
 
     auto BRep::IncidentBlockRange::begin() const -> const IncidentBlockRange&
     {
@@ -319,7 +319,7 @@ namespace geode
         return { *this, block };
     }
 
-    BRep::InternalLineRange::~InternalLineRange() {} // NOLINT
+    BRep::InternalLineRange::~InternalLineRange() = default;
 
     auto BRep::InternalLineRange::begin() const -> const InternalLineRange&
     {
@@ -371,7 +371,7 @@ namespace geode
     {
     }
 
-    BRep::InternalCornerRange::~InternalCornerRange() {} // NOLINT
+    BRep::InternalCornerRange::~InternalCornerRange() = default;
 
     auto BRep::InternalCornerRange::begin() const -> const InternalCornerRange&
     {
@@ -429,7 +429,7 @@ namespace geode
     {
     }
 
-    BRep::InternalSurfaceRange::~InternalSurfaceRange() {} // NOLINT
+    BRep::InternalSurfaceRange::~InternalSurfaceRange() = default;
 
     auto BRep::InternalSurfaceRange::begin() const
         -> const InternalSurfaceRange&
@@ -474,7 +474,7 @@ namespace geode
     {
     }
 
-    BRep::EmbeddingSurfaceRange::~EmbeddingSurfaceRange() {} // NOLINT
+    BRep::EmbeddingSurfaceRange::~EmbeddingSurfaceRange() = default;
 
     auto BRep::EmbeddingSurfaceRange::begin() const
         -> const EmbeddingSurfaceRange&
@@ -547,7 +547,7 @@ namespace geode
     {
     }
 
-    BRep::EmbeddingBlockRange::~EmbeddingBlockRange() {} // NOLINT
+    BRep::EmbeddingBlockRange::~EmbeddingBlockRange() = default;
 
     auto BRep::EmbeddingBlockRange::begin() const -> const EmbeddingBlockRange&
     {
@@ -596,7 +596,7 @@ namespace geode
     {
     }
 
-    BRep::ItemSurfaceRange::~ItemSurfaceRange() {} // NOLINT
+    BRep::ItemSurfaceRange::~ItemSurfaceRange() = default;
 
     auto BRep::ItemSurfaceRange::begin() const -> const ItemSurfaceRange&
     {
@@ -614,7 +614,7 @@ namespace geode
             Relationships::ItemRangeIterator::operator*().id() );
     }
 
-    BRep::BRep() {} // NOLINT
+    BRep::BRep() = default;
 
     BRep::BRep( BRep&& brep ) noexcept
         : Topology{ std::move( brep ) },
@@ -639,7 +639,7 @@ namespace geode
         return *this;
     }
 
-    BRep::~BRep() {} // NOLINT
+    BRep::~BRep() = default;
 
     BRep::ItemSurfaceRange BRep::model_boundary_items(
         const ModelBoundary3D& boundary ) const

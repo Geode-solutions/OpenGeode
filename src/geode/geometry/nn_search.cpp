@@ -146,9 +146,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    NNSearch< dimension >::~NNSearch() // NOLINT
-    {
-    }
+    NNSearch< dimension >::~NNSearch() = default;
 
     template < index_t dimension >
     const Point< dimension >& NNSearch< dimension >::point(

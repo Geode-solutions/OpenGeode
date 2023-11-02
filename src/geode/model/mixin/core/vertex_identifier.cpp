@@ -41,7 +41,7 @@ namespace geode
     {
     }
 
-    ComponentMeshVertex::~ComponentMeshVertex() {} // NOLINT
+    ComponentMeshVertex::~ComponentMeshVertex() = default;
 
     MeshVertex ComponentMeshVertex::mesh_vertex() const
     {
@@ -455,7 +455,7 @@ namespace geode
             vertex2unique_vertex_;
     };
 
-    VertexIdentifier::VertexIdentifier() {} // NOLINT
+    VertexIdentifier::VertexIdentifier() = default;
     VertexIdentifier::VertexIdentifier( VertexIdentifier&& other )
         : impl_( std::move( other.impl_ ) )
     {
@@ -467,7 +467,7 @@ namespace geode
         return *this;
     }
 
-    VertexIdentifier::~VertexIdentifier() {} // NOLINT
+    VertexIdentifier::~VertexIdentifier() = default;
 
     index_t VertexIdentifier::nb_unique_vertices() const
     {

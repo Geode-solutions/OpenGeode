@@ -59,9 +59,7 @@ namespace geode
     };
 
     template < index_t dimension >
-    Line< dimension >::~Line() // NOLINT
-    {
-    }
+    Line< dimension >::~Line() = default;
 
     template < index_t dimension >
     Line< dimension >::Line()

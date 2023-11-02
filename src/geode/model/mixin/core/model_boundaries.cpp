@@ -39,9 +39,7 @@ namespace geode
     };
 
     template < index_t dimension >
-    ModelBoundaries< dimension >::ModelBoundaries() // NOLINT
-    {
-    }
+    ModelBoundaries< dimension >::ModelBoundaries() = default;
 
     template < index_t dimension >
     ModelBoundaries< dimension >::ModelBoundaries( ModelBoundaries&& other )
@@ -58,9 +56,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    ModelBoundaries< dimension >::~ModelBoundaries() // NOLINT
-    {
-    }
+    ModelBoundaries< dimension >::~ModelBoundaries() = default;
 
     template < index_t dimension >
     index_t ModelBoundaries< dimension >::nb_model_boundaries() const
@@ -186,9 +182,8 @@ namespace geode
 
     template < index_t dimension >
     ModelBoundaries<
-        dimension >::ModelBoundaryRangeBase::~ModelBoundaryRangeBase() // NOLINT
-    {
-    }
+        dimension >::ModelBoundaryRangeBase::~ModelBoundaryRangeBase() =
+        default;
 
     template < index_t dimension >
     bool ModelBoundaries< dimension >::ModelBoundaryRangeBase::operator!=(
@@ -218,10 +213,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    ModelBoundaries<
-        dimension >::ModelBoundaryRange::~ModelBoundaryRange() // NOLINT
-    {
-    }
+    ModelBoundaries< dimension >::ModelBoundaryRange::~ModelBoundaryRange() =
+        default;
 
     template < index_t dimension >
     auto ModelBoundaries< dimension >::ModelBoundaryRange::begin() const

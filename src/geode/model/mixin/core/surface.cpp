@@ -60,9 +60,7 @@ namespace geode
     };
 
     template < index_t dimension >
-    Surface< dimension >::~Surface() // NOLINT
-    {
-    }
+    Surface< dimension >::~Surface() = default;
 
     template < index_t dimension >
     Surface< dimension >::Surface( Surface< dimension >&& other ) noexcept

@@ -83,9 +83,9 @@ namespace geode
         std::mutex lock_;
     };
 
-    ProgressLoggerManager::ProgressLoggerManager() {} // NOLINT
+    ProgressLoggerManager::ProgressLoggerManager() = default;
 
-    ProgressLoggerManager::~ProgressLoggerManager() {} // NOLINT
+    ProgressLoggerManager::~ProgressLoggerManager() = default;
 
     void ProgressLoggerManager::register_client(
         std::unique_ptr< ProgressLoggerClient >&& client )

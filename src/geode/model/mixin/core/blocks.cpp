@@ -52,9 +52,7 @@ namespace geode
     };
 
     template < index_t dimension >
-    Blocks< dimension >::Blocks() // NOLINT
-    {
-    }
+    Blocks< dimension >::Blocks() = default;
 
     template < index_t dimension >
     Blocks< dimension >::Blocks( Blocks&& other )
@@ -63,9 +61,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    Blocks< dimension >::~Blocks() // NOLINT
-    {
-    }
+    Blocks< dimension >::~Blocks() = default;
 
     template < index_t dimension >
     auto Blocks< dimension >::operator=( Blocks&& other ) -> Blocks&
@@ -287,9 +283,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    Blocks< dimension >::BlockRangeBase::~BlockRangeBase() // NOLINT
-    {
-    }
+    Blocks< dimension >::BlockRangeBase::~BlockRangeBase() = default;
 
     template < index_t dimension >
     bool Blocks< dimension >::BlockRangeBase::operator!=(
@@ -317,9 +311,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    Blocks< dimension >::BlockRange::~BlockRange() // NOLINT
-    {
-    }
+    Blocks< dimension >::BlockRange::~BlockRange() = default;
 
     template < index_t dimension >
     auto Blocks< dimension >::BlockRange::begin() const -> const BlockRange&

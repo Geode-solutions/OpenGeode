@@ -100,9 +100,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    SolidEdges< dimension >::~SolidEdges() // NOLINT
-    {
-    }
+    SolidEdges< dimension >::~SolidEdges() = default;
 
     template < index_t dimension >
     bool SolidEdges< dimension >::is_edge_isolated( index_t edge_id ) const
