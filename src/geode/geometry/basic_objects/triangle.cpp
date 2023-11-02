@@ -263,7 +263,8 @@ namespace geode
     }
 
     template < typename PointType, index_t dimension >
-    double GenericTriangle< PointType, dimension >::minimum_height() const
+    local_index_t
+        GenericTriangle< PointType, dimension >::longest_edge_index() const
     {
         local_index_t max_length_edge_id{ NO_LID };
         double edge_max_length{ 0 };
@@ -279,12 +280,20 @@ namespace geode
                 edge_max_length = edge_length;
             }
         }
+        return max_length_edge_id;
+    }
+
+    template < typename PointType, index_t dimension >
+    double GenericTriangle< PointType, dimension >::minimum_height() const
+    {
+        const auto max_length_edge_id = longest_edge_index();
         const Point< dimension >& opposite_vertex = vertices_.at(
             max_length_edge_id == 0 ? 2 : max_length_edge_id - 1 );
         const Point< dimension >& next_vertex = vertices_.at(
             max_length_edge_id == 2 ? 0 : max_length_edge_id + 1 );
-        Segment< dimension > longest_edge{ vertices_.at( max_length_edge_id ),
-            next_vertex };
+        const Segment< dimension > longest_edge{
+            vertices_.at( max_length_edge_id ), next_vertex
+        };
         return point_segment_distance( opposite_vertex, longest_edge );
     }
 
