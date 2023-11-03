@@ -21,24 +21,22 @@
  *
  */
 
-#include "../../common.h"
+#include <absl/strings/str_cat.h>
 
-#include <geode/mesh/builder/polygonal_surface_builder.h>
-#include <geode/mesh/core/polygonal_surface.h>
+#include <geode/basic/assert.h>
+#include <geode/basic/zip_file.h>
 
-#define PYTHON_POLYGONAL_SURFACE_BUILDER( dimension )                          \
-    const auto name##dimension =                                               \
-        "PolygonalSurfaceBuilder" + std::to_string( dimension ) + "D";         \
-    pybind11::class_< PolygonalSurfaceBuilder##dimension##D,                   \
-        SurfaceMeshBuilder##dimension##D >( module, name##dimension.c_str() )  \
-        .def_static(                                                           \
-            "create", &PolygonalSurfaceBuilder##dimension##D::create )
+#include <geode/tests/common.h>
 
-namespace geode
+void test()
 {
-    void define_polygonal_surface_builder( pybind11::module& module )
-    {
-        PYTHON_POLYGONAL_SURFACE_BUILDER( 2 );
-        PYTHON_POLYGONAL_SURFACE_BUILDER( 3 );
-    }
-} // namespace geode
+    const auto is_not_a_zip = geode::is_zip_file(
+        absl::StrCat( geode::data_path, "triange.og_tsf3d" ) );
+    OPENGEODE_EXCEPTION(
+        !is_not_a_zip, "[Test] Not a zip file detection failed" );
+    const auto is_a_zip = geode::is_zip_file(
+        absl::StrCat( geode::data_path, "layers.og_brep" ) );
+    OPENGEODE_EXCEPTION( is_a_zip, "[Test] zip file detection failed" );
+}
+
+OPENGEODE_TEST( "zip-file" )

@@ -30,11 +30,7 @@
         "PolyhedralSolidBuilder" + std::to_string( dimension ) + "D";          \
     pybind11::class_< PolyhedralSolidBuilder##dimension##D,                    \
         SolidMeshBuilder##dimension##D >( module, name##dimension.c_str() )    \
-        .def_static( "create",                                                 \
-            static_cast<                                                       \
-                std::unique_ptr< PolyhedralSolidBuilder##dimension##D > ( * )( \
-                    PolyhedralSolid< dimension >& ) >(                         \
-                &PolyhedralSolidBuilder##dimension##D::create ) )
+        .def_static( "create", &PolyhedralSolidBuilder##dimension##D::create )
 
 namespace geode
 {

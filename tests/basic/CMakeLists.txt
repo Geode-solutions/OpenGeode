@@ -86,3 +86,8 @@ add_geode_test(
         ${PROJECT_NAME}::basic
     ESSENTIAL
 )
+add_geode_test(
+    SOURCE "test-zip-file.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+)
