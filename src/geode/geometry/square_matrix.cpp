@@ -45,6 +45,18 @@ namespace
 namespace geode
 {
     template < index_t dimension >
+    SquareMatrix< dimension >::SquareMatrix( double default_value )
+    {
+        for( auto& row : matrix_rows_ )
+        {
+            for( const auto d : LRange{ dimension } )
+            {
+                row.set_value( d, default_value );
+            }
+        }
+    }
+
+    template < index_t dimension >
     SquareMatrix< dimension >::SquareMatrix(
         std::array< Vector< dimension >, dimension > matrix_rows )
         : matrix_rows_( std::move( matrix_rows ) )
@@ -59,8 +71,15 @@ namespace geode
     }
 
     template < index_t dimension >
+    void SquareMatrix< dimension >::set_value(
+        local_index_t row, local_index_t column, double value )
+    {
+        matrix_rows_[row].set_value( column, value );
+    }
+
+    template < index_t dimension >
     geode::Vector< dimension > SquareMatrix< dimension >::operator*(
-        const geode::Vector< dimension > vector ) const
+        const geode::Vector< dimension >& vector ) const
     {
         Vector< dimension > result;
         for( const auto d : LRange{ dimension } )
@@ -68,6 +87,35 @@ namespace geode
             result.set_value( d, matrix_rows_[d].dot( vector ) );
         }
         return result;
+    }
+
+    template < index_t dimension >
+    SquareMatrix< dimension > SquareMatrix< dimension >::operator*(
+        const SquareMatrix< dimension >& matrix ) const
+    {
+        SquareMatrix< dimension > result{ 0 };
+        for( const auto row : LRange{ dimension } )
+        {
+            for( const auto column : LRange{ dimension } )
+            {
+                for( const auto d : LRange{ dimension } )
+                {
+                    result.set_value( row, column,
+                        result.value( row, column )
+                            + value( row, d ) * matrix.value( d, column ) );
+                }
+            }
+        }
+        return result;
+    }
+
+    template < index_t dimension >
+    double SquareMatrix< dimension >::determinant() const
+    {
+        throw OpenGeodeException{
+            "[SquareMatrix::determinant] Not implemented for dimension ",
+            dimension
+        };
     }
 
     template <>
@@ -102,6 +150,14 @@ namespace geode
             }
         }
         return { std::move( matrix_rows ) };
+    }
+
+    template < index_t dimension >
+    SquareMatrix< dimension > SquareMatrix< dimension >::inverse() const
+    {
+        throw OpenGeodeException{
+            "[SquareMatrix::inverse] Not implemented for dimension ", dimension
+        };
     }
 
     template <>
@@ -144,4 +200,5 @@ namespace geode
 
     template class opengeode_geometry_api SquareMatrix< 2 >;
     template class opengeode_geometry_api SquareMatrix< 3 >;
+    template class opengeode_geometry_api SquareMatrix< 9 >;
 } // namespace geode
