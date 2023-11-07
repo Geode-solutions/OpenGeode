@@ -23,6 +23,8 @@
 
 #include <geode/geometry/frame.h>
 
+#include <geode/geometry/vector.h>
+
 namespace
 {
     template < geode::index_t dimension >
@@ -131,6 +133,18 @@ namespace geode
         for( const auto d : geode::LRange{ dimension } )
         {
             result.set_direction( d, direction( d ) + rhs.direction( d ) );
+        }
+        return result;
+    }
+
+    template < index_t dimension >
+    Vector< dimension > Frame< dimension >::operator*(
+        const Vector< dimension >& rhs ) const
+    {
+        Vector< dimension > result;
+        for( const auto d : geode::LRange{ dimension } )
+        {
+            result.set_value( d, direction( d ).dot( rhs ) );
         }
         return result;
     }

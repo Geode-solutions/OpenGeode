@@ -44,6 +44,8 @@ namespace geode
 
         Frame operator+( const Frame& rhs ) const;
 
+        Vector< dimension > operator*( const Vector< dimension >& rhs ) const;
+
         Frame rescale( double length ) const;
 
         std::string string() const;
