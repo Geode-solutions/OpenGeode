@@ -134,6 +134,8 @@ namespace geode
          */
         CellsAroundVertex cells( const Point< dimension >& query ) const;
 
+        CellsAroundVertex cells_around( VertexIndices vertex_indices ) const;
+
         virtual AttributeManager& cell_attribute_manager() const = 0;
 
         virtual AttributeManager& grid_vertex_attribute_manager() const = 0;
