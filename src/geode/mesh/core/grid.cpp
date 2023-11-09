@@ -325,6 +325,35 @@ namespace geode
             return cells_around_point;
         }
 
+        CellsAroundVertex cells_around(
+            const Grid< dimension >& grid, VertexIndices vertex_indices ) const
+        {
+            CellIndices min;
+            CellIndices max;
+            for( const auto d : LRange{ dimension } )
+            {
+                min[d] = vertex_indices[d] > 0 ? vertex_indices[d] - 1 : 0;
+                max[d] = vertex_indices[d] < grid.nb_cells_in_direction( d )
+                             ? vertex_indices[d]
+                             : vertex_indices[d] - 1;
+            }
+            CellsAroundVertex cells_around_vertex;
+            cells_around_vertex.reserve( 4 );
+            cells_around_vertex.push_back( min );
+            for( const auto d : LRange{ dimension } )
+            {
+                if( max[d] != min[d] )
+                {
+                    for( const auto& cell_indices : cells_around_vertex )
+                    {
+                        cells_around_vertex.push_back( cell_indices );
+                        cells_around_vertex.back()[d] = max[d];
+                    }
+                }
+            }
+            return cells_around_vertex;
+        }
+
         const std::array< double, dimension >& cells_lengths() const
         {
             return cells_length_;
@@ -565,6 +594,13 @@ namespace geode
         -> CellsAroundVertex
     {
         return impl_->cells( *this, query );
+    }
+
+    template < index_t dimension >
+    auto Grid< dimension >::cells_around( VertexIndices vertex_indices ) const
+        -> CellsAroundVertex
+    {
+        return impl_->cells_around( *this, vertex_indices );
     }
 
     template < index_t dimension >
