@@ -48,7 +48,7 @@ namespace geode
         using Mapping = ModelCopyMapping::Mapping;
 
         template < typename ModelFrom, typename BuilderTo >
-        Mapping copy_corner_components(
+        OPENGEODE_MODEL_DEPRECATED Mapping copy_corner_components(
             const ModelFrom& from, BuilderTo& builder_to )
         {
             Mapping mapping;
@@ -92,7 +92,7 @@ namespace geode
         }
 
         template < typename ModelFrom, typename BuilderTo >
-        Mapping copy_line_components(
+        OPENGEODE_MODEL_DEPRECATED Mapping copy_line_components(
             const ModelFrom& from, BuilderTo& builder_to )
         {
             Mapping mapping;
@@ -136,7 +136,7 @@ namespace geode
         }
 
         template < typename ModelFrom, typename BuilderTo >
-        Mapping copy_surface_components(
+        OPENGEODE_MODEL_DEPRECATED Mapping copy_surface_components(
             const ModelFrom& from, BuilderTo& builder_to )
         {
             Mapping mapping;
@@ -181,7 +181,7 @@ namespace geode
         }
 
         template < typename ModelFrom, typename BuilderTo >
-        Mapping copy_block_components(
+        OPENGEODE_MODEL_DEPRECATED Mapping copy_block_components(
             const ModelFrom& from, BuilderTo& builder_to )
         {
             Mapping mapping;
@@ -223,7 +223,7 @@ namespace geode
         }
 
         template < typename Model, typename BuilderTo >
-        Mapping copy_model_boundary_components(
+        OPENGEODE_MODEL_DEPRECATED Mapping copy_model_boundary_components(
             const Model& from, BuilderTo& builder_to )
         {
             Mapping mapping;

@@ -67,14 +67,14 @@ namespace geode
     ModelCopyMapping SectionBuilder::copy_components( const Section& section )
     {
         ModelCopyMapping mappings;
-        mappings.emplace( Corner2D::component_type_static(),
-            detail::copy_corner_components( section, *this ) );
-        mappings.emplace( Line2D::component_type_static(),
-            detail::copy_line_components( section, *this ) );
-        mappings.emplace( Surface2D::component_type_static(),
-            detail::copy_surface_components( section, *this ) );
-        mappings.emplace( ModelBoundary2D::component_type_static(),
-            detail::copy_model_boundary_components( section, *this ) );
+        detail::copy_corner_components(
+            section, *this, mappings[Corner2D::component_type_static()] );
+        detail::copy_line_components(
+            section, *this, mappings[Line2D::component_type_static()] );
+        detail::copy_surface_components(
+            section, *this, mappings[Surface2D::component_type_static()] );
+        detail::copy_model_boundary_components( section, *this,
+            mappings[ModelBoundary2D::component_type_static()] );
         return mappings;
     }
 
