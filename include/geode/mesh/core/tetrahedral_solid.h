@@ -79,6 +79,16 @@ namespace geode
         absl::optional< PolyhedronFacet > polyhedron_adjacent_facet(
             const PolyhedronFacet& polyhedron_facet ) const final;
 
+        /*
+         * Return the two other tetrahedron vertices not given as input.
+         * @param[in] tetrahedron_id Index of tetrahedron.
+         * @param[in] edge_vertices Indices of the two vertices of an edge.
+         * @warning do not check that the given edge_vertices are in tetrahedron
+         * vertices.
+         */
+        std::array< index_t, 2 > opposite_edge_vertices( index_t tetrahedron_id,
+            const std::array< index_t, 2 >& edge_vertices ) const;
+
         /*!
          * Return the local indices of the two facets incident to the
          * edge in tetrahedron.

@@ -157,6 +157,33 @@ namespace geode
     }
 
     template < index_t dimension >
+    std::array< index_t, 2 >
+        TetrahedralSolid< dimension >::opposite_edge_vertices(
+            index_t tetrahedron_id,
+            const std::array< index_t, 2 >& edge_vertices ) const
+    {
+        std::array< index_t, 2 > edge{};
+        bool first_found{ false };
+        for( const auto v : geode::LRange{ 4 } )
+        {
+            const auto vertex =
+                this->polyhedron_vertex( { tetrahedron_id, v } );
+            if( vertex == edge_vertices[0] || vertex == edge_vertices[1] )
+            {
+                continue;
+            }
+            if( first_found )
+            {
+                edge[1] = vertex;
+                return edge;
+            }
+            edge[0] = vertex;
+            first_found = true;
+        }
+        return edge;
+    }
+
+    template < index_t dimension >
     std::array< PolyhedronFacet, 2 >
         TetrahedralSolid< dimension >::opposite_edge_incident_facets(
             index_t tetrahedron_id,
