@@ -23,7 +23,10 @@
 
 #pragma once
 
+#include <bitsery/ext/std_smart_ptr.h>
+
 #include <geode/basic/bitsery_archive.h>
+#include <geode/basic/pimpl.h>
 
 namespace geode
 {
@@ -35,22 +38,13 @@ namespace geode
     }
 
     template < typename T >
-    PImpl< T >::PImpl( PImpl< T >&& other )
-        : pimpl_{ std::move( other.pimpl_ ) }
-    {
-    }
+    PImpl< T >::PImpl( PImpl< T >&& other ) noexcept = default;
 
     template < typename T >
-    PImpl< T >::~PImpl()
-    {
-    }
+    PImpl< T >::~PImpl() = default;
 
     template < typename T >
-    PImpl< T >& PImpl< T >::operator=( PImpl< T >&& other )
-    {
-        pimpl_ = std::move( other.pimpl_ );
-        return *this;
-    }
+    PImpl< T >& PImpl< T >::operator=( PImpl< T >&& other ) noexcept = default;
 
     template < typename T >
     void PImpl< T >::reset()
@@ -86,11 +80,9 @@ namespace geode
     template < typename Archive >
     void PImpl< T >::serialize( Archive& archive )
     {
-        archive.ext(
-            *this, Growable< Archive, PImpl >{ { []( Archive& a, PImpl& impl ) {
-                a.ext( impl.pimpl_, bitsery::ext::StdSmartPtr{} );
+        archive.ext( *this,
+            Growable< Archive, PImpl >{ { []( Archive& archive2, PImpl& impl ) {
+                archive2.ext( impl.pimpl_, bitsery::ext::StdSmartPtr{} );
             } } } );
     }
-
-    // SERIALIZE_BITSERY_ARCHIVE( opengeode_basic_api, PImpl< T > );
 } // namespace geode
