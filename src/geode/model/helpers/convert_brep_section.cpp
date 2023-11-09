@@ -38,6 +38,7 @@
 #include <geode/model/helpers/model_concatener.h>
 #include <geode/model/mixin/core/corner.h>
 #include <geode/model/mixin/core/line.h>
+#include <geode/model/mixin/core/model_boundaries.h>
 #include <geode/model/mixin/core/surface.h>
 #include <geode/model/mixin/core/vertex_identifier.h>
 #include <geode/model/representation/builder/brep_builder.h>
@@ -54,12 +55,15 @@ namespace
     {
         geode::ModelCopyMapping mappings;
         const auto dimension = BuilderTo::dim;
-        mappings.emplace( geode::Corner< dimension >::component_type_static(),
-            geode::detail::copy_corner_components( from, builder_to ) );
-        mappings.emplace( geode::Line< dimension >::component_type_static(),
-            geode::detail::copy_line_components( from, builder_to ) );
-        mappings.emplace( geode::Surface< dimension >::component_type_static(),
-            geode::detail::copy_surface_components( from, builder_to ) );
+        geode::detail::copy_corner_components( from, builder_to,
+            mappings[geode::Corner< dimension >::component_type_static()] );
+        geode::detail::copy_line_components( from, builder_to,
+            mappings[geode::Line< dimension >::component_type_static()] );
+        geode::detail::copy_surface_components( from, builder_to,
+            mappings[geode::Surface< dimension >::component_type_static()] );
+        geode::detail::copy_model_boundary_components( from, builder_to,
+            mappings
+                [geode::ModelBoundary< dimension >::component_type_static()] );
         builder_to.copy_relationships( mappings, from );
         return mappings;
     }

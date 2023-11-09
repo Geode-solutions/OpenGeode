@@ -70,16 +70,16 @@ namespace geode
     ModelCopyMapping BRepBuilder::copy_components( const BRep& brep )
     {
         ModelCopyMapping mappings;
-        mappings.emplace( Corner3D::component_type_static(),
-            detail::copy_corner_components( brep, *this ) );
-        mappings.emplace( Line3D::component_type_static(),
-            detail::copy_line_components( brep, *this ) );
-        mappings.emplace( Surface3D::component_type_static(),
-            detail::copy_surface_components( brep, *this ) );
-        mappings.emplace( Block3D::component_type_static(),
-            detail::copy_block_components( brep, *this ) );
-        mappings.emplace( ModelBoundary3D::component_type_static(),
-            detail::copy_model_boundary_components( brep, *this ) );
+        detail::copy_corner_components(
+            brep, *this, mappings[Corner3D::component_type_static()] );
+        detail::copy_line_components(
+            brep, *this, mappings[Line3D::component_type_static()] );
+        detail::copy_surface_components(
+            brep, *this, mappings[Surface3D::component_type_static()] );
+        detail::copy_block_components(
+            brep, *this, mappings[Block3D::component_type_static()] );
+        detail::copy_model_boundary_components(
+            brep, *this, mappings[ModelBoundary3D::component_type_static()] );
         return mappings;
     }
 

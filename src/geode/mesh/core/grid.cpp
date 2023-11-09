@@ -332,13 +332,12 @@ namespace geode
             CellIndices max;
             for( const auto d : LRange{ dimension } )
             {
-                min[d] = vertex_indices[d] > 0 ? vertex_indices[d] - 1 : 0;
-                max[d] = vertex_indices[d] < grid.nb_cells_in_direction( d )
-                             ? vertex_indices[d]
-                             : vertex_indices[d] - 1;
+                min[d] = vertex_indices[d] == 0 ? 0 : vertex_indices[d] - 1;
+                max[d] = vertex_indices[d] == grid.nb_cells_in_direction( d )
+                             ? vertex_indices[d] - 1
+                             : vertex_indices[d];
             }
             CellsAroundVertex cells_around_vertex;
-            cells_around_vertex.reserve( 4 );
             cells_around_vertex.push_back( min );
             for( const auto d : LRange{ dimension } )
             {
