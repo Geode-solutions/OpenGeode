@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <array>
+
 #include <geode/mesh/common.h>
 #include <geode/mesh/core/solid_mesh.h>
 

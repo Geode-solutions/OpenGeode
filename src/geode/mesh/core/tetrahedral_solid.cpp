@@ -23,6 +23,8 @@
 
 #include <geode/mesh/core/tetrahedral_solid.h>
 
+#include <array>
+
 #include <geode/basic/bitsery_archive.h>
 
 #include <geode/geometry/basic_objects/tetrahedron.h>
