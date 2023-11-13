@@ -26,21 +26,28 @@
 #include <absl/strings/string_view.h>
 
 #include <geode/basic/detail/geode_output_impl.h>
+#include <geode/basic/io.h>
+#include <geode/basic/logger.h>
 
 #include <geode/mesh/core/graph.h>
+#include <geode/mesh/io/vertex_set_output.h>
 
 namespace geode
 {
     void save_graph( const Graph& graph, absl::string_view filename )
     {
+        constexpr auto TYPE = "Graph";
         try
         {
             detail::geode_object_output_impl< GraphOutputFactory >(
-                "Graph", graph, filename );
+                TYPE, graph, filename );
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
+            print_available_extensions< GraphOutputFactory >( TYPE );
+            Logger::info( "Other extensions are available in parent clases." );
+            print_available_extensions< VertexSetOutputFactory >( "VertexSet" );
             throw OpenGeodeException{ "Cannot save Graph in file: ", filename };
         }
     }

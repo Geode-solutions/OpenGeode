@@ -23,12 +23,16 @@
 
 #include <geode/mesh/io/hybrid_solid_input.h>
 
+#include <absl/strings/str_cat.h>
 #include <absl/strings/string_view.h>
 
 #include <geode/basic/detail/geode_input_impl.h>
+#include <geode/basic/io.h>
+#include <geode/basic/logger.h>
 
 #include <geode/mesh/core/hybrid_solid.h>
 #include <geode/mesh/core/mesh_factory.h>
+#include <geode/mesh/io/vertex_set_input.h>
 
 namespace geode
 {
@@ -36,9 +40,9 @@ namespace geode
     std::unique_ptr< HybridSolid< dimension > > load_hybrid_solid(
         const MeshImpl& impl, absl::string_view filename )
     {
+        const auto type = absl::StrCat( "HybridSolid", dimension, "D" );
         try
         {
-            const auto type = absl::StrCat( "HybridSolid", dimension, "D" );
             auto hybrid_solid = detail::geode_object_input_impl<
                 HybridSolidInputFactory< dimension > >( type, filename, impl );
             Logger::info( type, " has: ", hybrid_solid->nb_vertices(),
@@ -48,6 +52,10 @@ namespace geode
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
+            print_available_extensions< HybridSolidInputFactory< dimension > >(
+                type );
+            Logger::info( "Other extensions are available in parent clases." );
+            print_available_extensions< VertexSetInputFactory >( "VertexSet" );
             throw OpenGeodeException{ "Cannot load HybridSolid from file: ",
                 filename };
         }

@@ -23,9 +23,12 @@
 
 #include <geode/mesh/io/point_set_output.h>
 
+#include <absl/strings/str_cat.h>
 #include <absl/strings/string_view.h>
 
 #include <geode/basic/detail/geode_output_impl.h>
+#include <geode/basic/io.h>
+#include <geode/basic/logger.h>
 
 #include <geode/mesh/core/point_set.h>
 #include <geode/mesh/io/vertex_set_output.h>
@@ -36,16 +39,20 @@ namespace geode
     void save_point_set(
         const PointSet< dimension >& point_set, absl::string_view filename )
     {
+        const auto type = absl::StrCat( "PointSet", dimension, "D" );
         try
         {
             detail::geode_object_output_impl<
                 PointSetOutputFactory< dimension > >(
-                absl::StrCat( "PointSet", dimension, "D" ), point_set,
-                filename );
+                type, point_set, filename );
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
+            print_available_extensions< PointSetOutputFactory< dimension > >(
+                type );
+            Logger::info( "Other extensions are available in parent clases." );
+            print_available_extensions< VertexSetOutputFactory >( "VertexSet" );
             throw OpenGeodeException{ "Cannot save PointSet in file: ",
                 filename };
         }

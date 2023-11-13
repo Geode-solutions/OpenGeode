@@ -23,7 +23,11 @@
 
 #pragma once
 
+#include <absl/strings/str_cat.h>
+#include <absl/strings/string_view.h>
+
 #include <geode/basic/common.h>
+#include <geode/basic/logger.h>
 
 namespace geode
 {
@@ -43,4 +47,15 @@ namespace geode
     private:
         absl::string_view filename_;
     };
+
+    template < typename Factory >
+    void print_available_extensions( absl::string_view type )
+    {
+        auto message = absl::StrCat( "Available ", type, " extensions:" );
+        for( const auto& extension : Factory::list_creators() )
+        {
+            absl::StrAppend( &message, " ", extension );
+        }
+        Logger::info( message );
+    }
 } // namespace geode

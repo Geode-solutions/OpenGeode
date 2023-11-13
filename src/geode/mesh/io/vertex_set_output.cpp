@@ -26,6 +26,7 @@
 #include <absl/strings/string_view.h>
 
 #include <geode/basic/detail/geode_output_impl.h>
+#include <geode/basic/io.h>
 
 #include <geode/mesh/core/vertex_set.h>
 
@@ -34,14 +35,16 @@ namespace geode
     void save_vertex_set(
         const VertexSet& vertex_set, absl::string_view filename )
     {
+        constexpr auto type = "VertexSet";
         try
         {
             detail::geode_object_output_impl< VertexSetOutputFactory >(
-                "VertexSet", vertex_set, filename );
+                type, vertex_set, filename );
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
+            print_available_extensions< VertexSetOutputFactory >( type );
             throw OpenGeodeException{ "Cannot save VertexSet in file: ",
                 filename };
         }

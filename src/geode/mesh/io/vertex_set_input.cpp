@@ -26,6 +26,7 @@
 #include <absl/strings/string_view.h>
 
 #include <geode/basic/detail/geode_input_impl.h>
+#include <geode/basic/io.h>
 
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/vertex_set.h>
@@ -42,19 +43,20 @@ namespace geode
     std::unique_ptr< VertexSet > load_vertex_set(
         const MeshImpl& impl, absl::string_view filename )
     {
+        constexpr auto TYPE = "VertexSet";
         try
         {
-            const auto type = "VertexSet";
             auto vertex_set =
                 detail::geode_object_input_impl< VertexSetInputFactory >(
-                    type, filename, impl );
+                    TYPE, filename, impl );
             Logger::info(
-                type, " has: ", vertex_set->nb_vertices(), " vertices" );
+                TYPE, " has: ", vertex_set->nb_vertices(), " vertices" );
             return vertex_set;
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
+            print_available_extensions< VertexSetInputFactory >( TYPE );
             throw OpenGeodeException{ "Cannot load VertexSet from file: ",
                 filename };
         }

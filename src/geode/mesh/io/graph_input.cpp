@@ -26,27 +26,33 @@
 #include <absl/strings/string_view.h>
 
 #include <geode/basic/detail/geode_input_impl.h>
+#include <geode/basic/io.h>
+#include <geode/basic/logger.h>
 
 #include <geode/mesh/core/graph.h>
 #include <geode/mesh/core/mesh_factory.h>
+#include <geode/mesh/io/vertex_set_input.h>
 
 namespace geode
 {
     std::unique_ptr< Graph > load_graph(
         const MeshImpl& impl, absl::string_view filename )
     {
+        constexpr auto TYPE = "Graph";
         try
         {
-            const auto type = "Graph";
             auto graph = detail::geode_object_input_impl< GraphInputFactory >(
-                type, filename, impl );
-            Logger::info( type, " has: ", graph->nb_vertices(), " vertices, ",
+                TYPE, filename, impl );
+            Logger::info( TYPE, " has: ", graph->nb_vertices(), " vertices, ",
                 graph->nb_edges(), " edges" );
             return graph;
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
+            print_available_extensions< GraphInputFactory >( TYPE );
+            Logger::info( "Other extensions are available in parent clases." );
+            print_available_extensions< VertexSetInputFactory >( "VertexSet" );
             throw OpenGeodeException{ "Cannot load Graph from file: ",
                 filename };
         }
