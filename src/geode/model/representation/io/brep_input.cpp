@@ -23,9 +23,12 @@
 
 #include <geode/model/representation/io/brep_input.h>
 
+#include <absl/strings/str_cat.h>
 #include <absl/strings/string_view.h>
 
 #include <geode/basic/detail/geode_input_impl.h>
+#include <geode/basic/io.h>
+#include <geode/basic/logger.h>
 
 #include <geode/model/representation/builder/brep_builder.h>
 #include <geode/model/representation/core/brep.h>
@@ -34,12 +37,12 @@ namespace geode
 {
     BRep load_brep( absl::string_view filename )
     {
+        constexpr auto TYPE = "BRep";
         try
         {
-            const auto type = "BRep";
             auto brep = detail::geode_object_input_impl< BRepInputFactory >(
-                type, filename );
-            auto message = absl::StrCat( type, " has: " );
+                TYPE, filename );
+            auto message = absl::StrCat( TYPE, " has: " );
             detail::add_to_message( message, brep.nb_blocks(), " Blocks, " );
             detail::add_to_message(
                 message, brep.nb_surfaces(), " Surfaces, " );
@@ -53,6 +56,7 @@ namespace geode
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
+            print_available_extensions< BRepInputFactory >( TYPE );
             throw OpenGeodeException{ "Cannot load BRep from file: ",
                 filename };
         }

@@ -23,11 +23,15 @@
 
 #include <geode/mesh/io/triangulated_surface_output.h>
 
+#include <absl/strings/str_cat.h>
 #include <absl/strings/string_view.h>
 
 #include <geode/basic/detail/geode_output_impl.h>
+#include <geode/basic/io.h>
+#include <geode/basic/logger.h>
 
 #include <geode/mesh/core/triangulated_surface.h>
+#include <geode/mesh/io/vertex_set_output.h>
 
 namespace geode
 {
@@ -36,16 +40,20 @@ namespace geode
         const TriangulatedSurface< dimension >& triangulated_surface,
         absl::string_view filename )
     {
+        const auto type = absl::StrCat( "TriangulatedSurface", dimension, "D" );
         try
         {
             detail::geode_object_output_impl<
                 TriangulatedSurfaceOutputFactory< dimension > >(
-                absl::StrCat( "TriangulatedSurface", dimension, "D" ),
-                triangulated_surface, filename );
+                type, triangulated_surface, filename );
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
+            print_available_extensions<
+                TriangulatedSurfaceOutputFactory< dimension > >( type );
+            Logger::info( "Other extensions are available in parent clases." );
+            print_available_extensions< VertexSetOutputFactory >( "VertexSet" );
             throw OpenGeodeException{
                 "Cannot save TriangulatedSurface in file: ", filename
             };

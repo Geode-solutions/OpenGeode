@@ -23,12 +23,16 @@
 
 #include <geode/mesh/io/edged_curve_input.h>
 
+#include <absl/strings/str_cat.h>
 #include <absl/strings/string_view.h>
 
 #include <geode/basic/detail/geode_input_impl.h>
+#include <geode/basic/io.h>
+#include <geode/basic/logger.h>
 
 #include <geode/mesh/core/edged_curve.h>
 #include <geode/mesh/core/mesh_factory.h>
+#include <geode/mesh/io/vertex_set_input.h>
 
 namespace geode
 {
@@ -36,9 +40,9 @@ namespace geode
     std::unique_ptr< EdgedCurve< dimension > > load_edged_curve(
         const MeshImpl& impl, absl::string_view filename )
     {
+        const auto type = absl::StrCat( "EdgedCurve", dimension, "D" );
         try
         {
-            const auto type = absl::StrCat( "EdgedCurve", dimension, "D" );
             auto edged_curve = detail::geode_object_input_impl<
                 EdgedCurveInputFactory< dimension > >( type, filename, impl );
             Logger::info( type, " has: ", edged_curve->nb_vertices(),
@@ -48,6 +52,10 @@ namespace geode
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
+            print_available_extensions< EdgedCurveInputFactory< dimension > >(
+                type );
+            Logger::info( "Other extensions are available in parent clases." );
+            print_available_extensions< VertexSetInputFactory >( "VertexSet" );
             throw OpenGeodeException{ "Cannot load EdgedCurve from file: ",
                 filename };
         }

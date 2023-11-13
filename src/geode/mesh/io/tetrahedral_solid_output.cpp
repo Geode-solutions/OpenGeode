@@ -23,11 +23,15 @@
 
 #include <geode/mesh/io/tetrahedral_solid_output.h>
 
+#include <absl/strings/str_cat.h>
 #include <absl/strings/string_view.h>
 
 #include <geode/basic/detail/geode_output_impl.h>
+#include <geode/basic/io.h>
+#include <geode/basic/logger.h>
 
 #include <geode/mesh/core/tetrahedral_solid.h>
+#include <geode/mesh/io/vertex_set_output.h>
 
 namespace geode
 {
@@ -36,16 +40,20 @@ namespace geode
         const TetrahedralSolid< dimension >& tetrahedral_solid,
         absl::string_view filename )
     {
+        const auto type = absl::StrCat( "TetrahedralSolid", dimension, "D" );
         try
         {
             detail::geode_object_output_impl<
                 TetrahedralSolidOutputFactory< dimension > >(
-                absl::StrCat( "TetrahedralSolid", dimension, "D" ),
-                tetrahedral_solid, filename );
+                type, tetrahedral_solid, filename );
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
+            print_available_extensions<
+                TetrahedralSolidOutputFactory< dimension > >( type );
+            Logger::info( "Other extensions are available in parent clases." );
+            print_available_extensions< VertexSetOutputFactory >( "VertexSet" );
             throw OpenGeodeException{ "Cannot save TetrahedralSolid in file: ",
                 filename };
         }

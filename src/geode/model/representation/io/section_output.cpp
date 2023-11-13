@@ -26,6 +26,8 @@
 #include <absl/strings/string_view.h>
 
 #include <geode/basic/detail/geode_output_impl.h>
+#include <geode/basic/io.h>
+#include <geode/basic/logger.h>
 
 #include <geode/model/representation/core/section.h>
 
@@ -33,14 +35,16 @@ namespace geode
 {
     void save_section( const Section& section, absl::string_view filename )
     {
+        constexpr auto TYPE = "Section";
         try
         {
             detail::geode_object_output_impl< SectionOutputFactory >(
-                "Section", section, filename );
+                TYPE, section, filename );
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
+            print_available_extensions< SectionOutputFactory >( TYPE );
             throw OpenGeodeException{ "Cannot save Section in file: ",
                 filename };
         }

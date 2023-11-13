@@ -23,12 +23,16 @@
 
 #include <geode/mesh/io/point_set_input.h>
 
+#include <absl/strings/str_cat.h>
 #include <absl/strings/string_view.h>
 
 #include <geode/basic/detail/geode_input_impl.h>
+#include <geode/basic/io.h>
+#include <geode/basic/logger.h>
 
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/point_set.h>
+#include <geode/mesh/io/vertex_set_input.h>
 
 namespace geode
 {
@@ -36,9 +40,9 @@ namespace geode
     std::unique_ptr< PointSet< dimension > > load_point_set(
         const MeshImpl& impl, absl::string_view filename )
     {
+        const auto type = absl::StrCat( "PointSet", dimension, "D" );
         try
         {
-            const auto type = absl::StrCat( "PointSet", dimension, "D" );
             auto point_set = detail::geode_object_input_impl<
                 PointSetInputFactory< dimension > >( type, filename, impl );
             Logger::info(
@@ -48,6 +52,10 @@ namespace geode
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
+            print_available_extensions< PointSetInputFactory< dimension > >(
+                type );
+            Logger::info( "Other extensions are available in parent clases." );
+            print_available_extensions< VertexSetInputFactory >( "VertexSet" );
             throw OpenGeodeException{ "Cannot load PointSet from file: ",
                 filename };
         }

@@ -23,11 +23,15 @@
 
 #include <geode/mesh/io/hybrid_solid_output.h>
 
+#include <absl/strings/str_cat.h>
 #include <absl/strings/string_view.h>
 
 #include <geode/basic/detail/geode_output_impl.h>
+#include <geode/basic/io.h>
+#include <geode/basic/logger.h>
 
 #include <geode/mesh/core/hybrid_solid.h>
+#include <geode/mesh/io/vertex_set_output.h>
 
 namespace geode
 {
@@ -35,16 +39,20 @@ namespace geode
     void save_hybrid_solid( const HybridSolid< dimension >& hybrid_solid,
         absl::string_view filename )
     {
+        const auto type = absl::StrCat( "HybridSolid", dimension, "D" );
         try
         {
             detail::geode_object_output_impl<
                 HybridSolidOutputFactory< dimension > >(
-                absl::StrCat( "HybridSolid", dimension, "D" ), hybrid_solid,
-                filename );
+                type, hybrid_solid, filename );
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
+            print_available_extensions< HybridSolidOutputFactory< dimension > >(
+                type );
+            Logger::info( "Other extensions are available in parent clases." );
+            print_available_extensions< VertexSetOutputFactory >( "VertexSet" );
             throw OpenGeodeException{ "Cannot save HybridSolid in file: ",
                 filename };
         }

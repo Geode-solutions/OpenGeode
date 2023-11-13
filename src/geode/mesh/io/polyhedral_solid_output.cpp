@@ -23,11 +23,15 @@
 
 #include <geode/mesh/io/polyhedral_solid_output.h>
 
+#include <absl/strings/str_cat.h>
 #include <absl/strings/string_view.h>
 
 #include <geode/basic/detail/geode_output_impl.h>
+#include <geode/basic/io.h>
+#include <geode/basic/logger.h>
 
 #include <geode/mesh/core/polyhedral_solid.h>
+#include <geode/mesh/io/vertex_set_output.h>
 
 namespace geode
 {
@@ -36,16 +40,20 @@ namespace geode
         const PolyhedralSolid< dimension >& polyhedral_solid,
         absl::string_view filename )
     {
+        const auto type = absl::StrCat( "PolyhedralSolid", dimension, "D" );
         try
         {
             detail::geode_object_output_impl<
                 PolyhedralSolidOutputFactory< dimension > >(
-                absl::StrCat( "PolyhedralSolid", dimension, "D" ),
-                polyhedral_solid, filename );
+                type, polyhedral_solid, filename );
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
+            print_available_extensions<
+                PolyhedralSolidOutputFactory< dimension > >( type );
+            Logger::info( "Other extensions are available in parent clases." );
+            print_available_extensions< VertexSetOutputFactory >( "VertexSet" );
             throw OpenGeodeException{ "Cannot save PolyhedralSolid in file: ",
                 filename };
         }

@@ -23,12 +23,16 @@
 
 #include <geode/mesh/io/polyhedral_solid_input.h>
 
+#include <absl/strings/str_cat.h>
 #include <absl/strings/string_view.h>
 
 #include <geode/basic/detail/geode_input_impl.h>
+#include <geode/basic/io.h>
+#include <geode/basic/logger.h>
 
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/polyhedral_solid.h>
+#include <geode/mesh/io/vertex_set_input.h>
 
 namespace geode
 {
@@ -36,9 +40,9 @@ namespace geode
     std::unique_ptr< PolyhedralSolid< dimension > > load_polyhedral_solid(
         const MeshImpl& impl, absl::string_view filename )
     {
+        const auto type = absl::StrCat( "PolyhedralSolid", dimension, "D" );
         try
         {
-            const auto type = absl::StrCat( "PolyhedralSolid", dimension, "D" );
             auto polyhedral_solid = detail::geode_object_input_impl<
                 PolyhedralSolidInputFactory< dimension > >(
                 type, filename, impl );
@@ -49,6 +53,10 @@ namespace geode
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
+            print_available_extensions<
+                PolyhedralSolidInputFactory< dimension > >( type );
+            Logger::info( "Other extensions are available in parent clases." );
+            print_available_extensions< VertexSetInputFactory >( "VertexSet" );
             throw OpenGeodeException{ "Cannot load PolyhedralSolid from file: ",
                 filename };
         }

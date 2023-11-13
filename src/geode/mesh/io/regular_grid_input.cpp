@@ -23,13 +23,17 @@
 
 #include <geode/mesh/io/regular_grid_input.h>
 
+#include <absl/strings/str_cat.h>
 #include <absl/strings/string_view.h>
 
 #include <geode/basic/detail/geode_input_impl.h>
+#include <geode/basic/io.h>
+#include <geode/basic/logger.h>
 
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/regular_grid_solid.h>
 #include <geode/mesh/core/regular_grid_surface.h>
+#include <geode/mesh/io/vertex_set_input.h>
 
 namespace geode
 {
@@ -37,9 +41,9 @@ namespace geode
     std::unique_ptr< RegularGrid< dimension > > load_regular_grid(
         const MeshImpl& impl, absl::string_view filename )
     {
+        const auto type = absl::StrCat( "RegularGrid", dimension, "D" );
         try
         {
-            const auto type = absl::StrCat( "RegularGrid", dimension, "D" );
             auto grid = detail::geode_object_input_impl<
                 RegularGridInputFactory< dimension > >( type, filename, impl );
             Logger::info( type, " has: ", grid->nb_cells(), " cells" );
@@ -48,6 +52,10 @@ namespace geode
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
+            print_available_extensions< RegularGridInputFactory< dimension > >(
+                type );
+            Logger::info( "Other extensions are available in parent clases." );
+            print_available_extensions< VertexSetInputFactory >( "VertexSet" );
             throw OpenGeodeException{ "Cannot load RegularGrid from file: ",
                 filename };
         }

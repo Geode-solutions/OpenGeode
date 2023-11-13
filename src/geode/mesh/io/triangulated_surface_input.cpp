@@ -23,12 +23,16 @@
 
 #include <geode/mesh/io/triangulated_surface_input.h>
 
+#include <absl/strings/str_cat.h>
 #include <absl/strings/string_view.h>
 
 #include <geode/basic/detail/geode_input_impl.h>
+#include <geode/basic/io.h>
+#include <geode/basic/logger.h>
 
 #include <geode/mesh/core/mesh_factory.h>
 #include <geode/mesh/core/triangulated_surface.h>
+#include <geode/mesh/io/vertex_set_input.h>
 
 namespace geode
 {
@@ -37,10 +41,9 @@ namespace geode
         load_triangulated_surface(
             const MeshImpl& impl, absl::string_view filename )
     {
+        const auto type = absl::StrCat( "TriangulatedSurface", dimension, "D" );
         try
         {
-            const auto type =
-                absl::StrCat( "TriangulatedSurface", dimension, "D" );
             auto triangulated_surface = detail::geode_object_input_impl<
                 TriangulatedSurfaceInputFactory< dimension > >(
                 type, filename, impl );
@@ -52,6 +55,10 @@ namespace geode
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
+            print_available_extensions<
+                TriangulatedSurfaceInputFactory< dimension > >( type );
+            Logger::info( "Other extensions are available in parent clases." );
+            print_available_extensions< VertexSetInputFactory >( "VertexSet" );
             throw OpenGeodeException{
                 "Cannot load TriangulatedSurface from file: ", filename
             };
