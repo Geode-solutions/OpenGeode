@@ -48,6 +48,12 @@ namespace geode
             out2in_.reserve( capacity );
         }
 
+        void clear()
+        {
+            in2out_.clear();
+            out2in_.clear();
+        }
+
         bool has_mapping_input( const T1& value ) const
         {
             return in2out_.contains( value );
