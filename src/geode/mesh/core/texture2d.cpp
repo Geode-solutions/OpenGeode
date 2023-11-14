@@ -75,13 +75,11 @@ namespace geode
     {
     }
 
-    Texture< 2 >::Texture( Texture&& other ) : impl_{ std::move( other.impl_ ) }
-    {
-    }
+    Texture< 2 >::Texture( Texture&& ) noexcept = default;
 
-    Texture< 2 >::Texture() {}
+    Texture< 2 >::Texture() = default;
 
-    Texture< 2 >::~Texture() {}
+    Texture< 2 >::~Texture() = default;
 
     const RasterImage2D& Texture< 2 >::image() const
     {

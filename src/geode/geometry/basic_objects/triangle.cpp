@@ -102,35 +102,21 @@ namespace geode
 
     template < typename PointType, index_t dimension >
     GenericTriangle< PointType, dimension >::GenericTriangle(
-        const GenericTriangle< PointType, dimension >& other ) noexcept
-        : vertices_( other.vertices_ )
-    {
-    }
+        const GenericTriangle< PointType, dimension >& ) noexcept = default;
 
     template < typename PointType, index_t dimension >
     GenericTriangle< PointType, dimension >&
         GenericTriangle< PointType, dimension >::operator=(
-            const GenericTriangle< PointType, dimension >& other ) noexcept
-    {
-        vertices_ = other.vertices_;
-        return *this;
-    }
+            const GenericTriangle< PointType, dimension >& ) noexcept = default;
 
     template < typename PointType, index_t dimension >
     GenericTriangle< PointType, dimension >::GenericTriangle(
-        GenericTriangle< PointType, dimension >&& other ) noexcept
-        : vertices_( std::move( other.vertices_ ) )
-    {
-    }
+        GenericTriangle< PointType, dimension >&& ) noexcept = default;
 
     template < typename PointType, index_t dimension >
     GenericTriangle< PointType, dimension >&
         GenericTriangle< PointType, dimension >::operator=(
-            GenericTriangle< PointType, dimension >&& other ) noexcept
-    {
-        vertices_ = std::move( other.vertices_ );
-        return *this;
-    }
+            GenericTriangle< PointType, dimension >&& ) noexcept = default;
 
     template < typename PointType, index_t dimension >
     Point< dimension >
@@ -306,30 +292,16 @@ namespace geode
     }
     template < index_t dimension >
     OwnerTriangle< dimension >::OwnerTriangle(
-        const OwnerTriangle< dimension >& other ) noexcept
-        : Base( other )
-    {
-    }
+        const OwnerTriangle< dimension >& ) noexcept = default;
     template < index_t dimension >
     OwnerTriangle< dimension >& OwnerTriangle< dimension >::operator=(
-        const OwnerTriangle< dimension >& other ) noexcept
-    {
-        Base::operator=( other );
-        return *this;
-    }
+        const OwnerTriangle< dimension >& ) noexcept = default;
     template < index_t dimension >
     OwnerTriangle< dimension >::OwnerTriangle(
-        OwnerTriangle< dimension >&& other ) noexcept
-        : Base( other )
-    {
-    }
+        OwnerTriangle< dimension >&& ) noexcept = default;
     template < index_t dimension >
     OwnerTriangle< dimension >& OwnerTriangle< dimension >::operator=(
-        OwnerTriangle< dimension >&& other ) noexcept
-    {
-        Base::operator=( other );
-        return *this;
-    }
+        OwnerTriangle< dimension >&& ) noexcept = default;
 
     template < index_t dimension >
     Triangle< dimension >::Triangle( const Point< dimension >& point0,
@@ -340,10 +312,7 @@ namespace geode
     }
     template < index_t dimension >
     Triangle< dimension >::Triangle(
-        const Triangle< dimension >& other ) noexcept
-        : Base( other )
-    {
-    }
+        const Triangle< dimension >& ) noexcept = default;
     template < index_t dimension >
     Triangle< dimension >::Triangle(
         const OwnerTriangle< dimension >& other ) noexcept
@@ -352,23 +321,13 @@ namespace geode
     }
     template < index_t dimension >
     Triangle< dimension >& Triangle< dimension >::operator=(
-        const Triangle< dimension >& other ) noexcept
-    {
-        Base::operator=( other );
-        return *this;
-    }
+        const Triangle< dimension >& ) noexcept = default;
     template < index_t dimension >
-    Triangle< dimension >::Triangle( Triangle< dimension >&& other ) noexcept
-        : Base( other )
-    {
-    }
+    Triangle< dimension >::Triangle(
+        Triangle< dimension >&& ) noexcept = default;
     template < index_t dimension >
     Triangle< dimension >& Triangle< dimension >::operator=(
-        Triangle< dimension >&& other ) noexcept
-    {
-        Base::operator=( other );
-        return *this;
-    }
+        Triangle< dimension >&& ) noexcept = default;
 
     template class opengeode_geometry_api GenericTriangle< Point< 2 >, 2 >;
     template class opengeode_geometry_api GenericTriangle< Point< 3 >, 3 >;

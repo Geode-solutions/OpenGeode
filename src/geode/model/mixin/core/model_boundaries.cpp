@@ -42,18 +42,12 @@ namespace geode
     ModelBoundaries< dimension >::ModelBoundaries() = default;
 
     template < index_t dimension >
-    ModelBoundaries< dimension >::ModelBoundaries( ModelBoundaries&& other )
-        : impl_( std::move( other.impl_ ) )
-    {
-    }
+    ModelBoundaries< dimension >::ModelBoundaries(
+        ModelBoundaries&& ) noexcept = default;
 
     template < index_t dimension >
     ModelBoundaries< dimension >& ModelBoundaries< dimension >::operator=(
-        ModelBoundaries&& other )
-    {
-        impl_ = std::move( other.impl_ );
-        return *this;
-    }
+        ModelBoundaries&& ) noexcept = default;
 
     template < index_t dimension >
     ModelBoundaries< dimension >::~ModelBoundaries() = default;
@@ -168,10 +162,7 @@ namespace geode
 
     template < index_t dimension >
     ModelBoundaries< dimension >::ModelBoundaryRangeBase::
-        ModelBoundaryRangeBase( ModelBoundaryRangeBase&& other ) noexcept
-        : impl_( std::move( other.impl_ ) )
-    {
-    }
+        ModelBoundaryRangeBase( ModelBoundaryRangeBase&& ) noexcept = default;
 
     template < index_t dimension >
     ModelBoundaries< dimension >::ModelBoundaryRangeBase::

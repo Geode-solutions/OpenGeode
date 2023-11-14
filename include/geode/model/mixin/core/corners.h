@@ -110,9 +110,9 @@ namespace geode
 
     protected:
         Corners();
-        Corners( Corners&& other );
+        Corners( Corners&& other ) noexcept;
 
-        Corners& operator=( Corners&& other );
+        Corners& operator=( Corners&& other ) noexcept;
 
     private:
         class ModifiableCornerRange : public CornerRangeBase

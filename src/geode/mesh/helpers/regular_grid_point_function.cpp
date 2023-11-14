@@ -122,11 +122,8 @@ namespace geode
 
     template < index_t dimension, index_t point_dimension >
     RegularGridPointFunction< dimension, point_dimension >::
-        RegularGridPointFunction(
-            RegularGridPointFunction< dimension, point_dimension >&& other )
-        : impl_( std::move( other.impl_ ) )
-    {
-    }
+        RegularGridPointFunction( RegularGridPointFunction< dimension,
+            point_dimension >&& ) noexcept = default;
 
     template < index_t dimension, index_t point_dimension >
     RegularGridPointFunction< dimension,
@@ -149,9 +146,7 @@ namespace geode
 
     template < index_t dimension, index_t point_dimension >
     RegularGridPointFunction< dimension,
-        point_dimension >::~RegularGridPointFunction()
-    {
-    }
+        point_dimension >::~RegularGridPointFunction() = default;
 
     template < index_t dimension, index_t point_dimension >
     RegularGridPointFunction< dimension, point_dimension >

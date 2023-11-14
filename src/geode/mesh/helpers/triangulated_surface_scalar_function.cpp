@@ -107,10 +107,8 @@ namespace geode
     template < index_t dimension >
     TriangulatedSurfaceScalarFunction< dimension >::
         TriangulatedSurfaceScalarFunction(
-            TriangulatedSurfaceScalarFunction< dimension >&& other )
-        : impl_( std::move( other.impl_ ) )
-    {
-    }
+            TriangulatedSurfaceScalarFunction< dimension >&& ) noexcept =
+            default;
 
     template < index_t dimension >
     TriangulatedSurfaceScalarFunction< dimension >::
@@ -133,9 +131,7 @@ namespace geode
 
     template < index_t dimension >
     TriangulatedSurfaceScalarFunction<
-        dimension >::~TriangulatedSurfaceScalarFunction()
-    {
-    }
+        dimension >::~TriangulatedSurfaceScalarFunction() = default;
 
     template < index_t dimension >
     TriangulatedSurfaceScalarFunction< dimension >

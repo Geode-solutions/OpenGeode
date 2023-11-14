@@ -64,9 +64,7 @@ namespace geode
 
         Impl( absl::Span< const BoundingBox< dimension > > bboxes );
 
-        Impl( Impl&& other ) = default;
-
-        Impl& operator=( Impl&& other ) = default;
+        Impl& operator=( Impl&& other ) noexcept = default;
 
         index_t nb_bboxes() const;
 

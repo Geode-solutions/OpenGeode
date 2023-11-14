@@ -127,8 +127,9 @@ namespace geode
 
     protected:
         TetrahedralSolid() = default;
-        TetrahedralSolid( TetrahedralSolid&& other ) = default;
-        TetrahedralSolid& operator=( TetrahedralSolid&& other ) = default;
+        TetrahedralSolid( TetrahedralSolid&& other ) noexcept = default;
+        TetrahedralSolid& operator=(
+            TetrahedralSolid&& other ) noexcept = default;
 
     private:
         friend class bitsery::Access;

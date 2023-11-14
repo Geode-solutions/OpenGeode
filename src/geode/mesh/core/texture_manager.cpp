@@ -90,15 +90,11 @@ namespace geode
     }
 
     template < index_t dimension >
-    TextureManager< dimension >::TextureManager( TextureManager&& other )
-        : impl_{ std::move( other.impl_ ) }
-    {
-    }
+    TextureManager< dimension >::TextureManager(
+        TextureManager&& ) noexcept = default;
 
     template < index_t dimension >
-    TextureManager< dimension >::~TextureManager()
-    {
-    }
+    TextureManager< dimension >::~TextureManager() = default;
 
     template < index_t dimension >
     index_t TextureManager< dimension >::nb_textures() const

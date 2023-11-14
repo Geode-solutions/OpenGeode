@@ -473,26 +473,15 @@ namespace geode
 
     template < index_t dimension >
     OpenGeodeHybridSolid< dimension >::OpenGeodeHybridSolid(
-        OpenGeodeHybridSolid&& other )
-        : HybridSolid< dimension >( std::move( other ) ),
-          impl_( std::move( other.impl_ ) )
-    {
-    }
+        OpenGeodeHybridSolid&& ) noexcept = default;
 
     template < index_t dimension >
     OpenGeodeHybridSolid< dimension >&
         OpenGeodeHybridSolid< dimension >::operator=(
-            OpenGeodeHybridSolid&& other )
-    {
-        HybridSolid< dimension >::operator=( std::move( other ) );
-        impl_ = std::move( other.impl_ );
-        return *this;
-    }
+            OpenGeodeHybridSolid&& ) noexcept = default;
 
     template < index_t dimension >
-    OpenGeodeHybridSolid< dimension >::~OpenGeodeHybridSolid() // NOLINT
-    {
-    }
+    OpenGeodeHybridSolid< dimension >::~OpenGeodeHybridSolid() = default;
 
     template < index_t dimension >
     void OpenGeodeHybridSolid< dimension >::set_vertex(

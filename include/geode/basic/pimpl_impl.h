@@ -38,13 +38,13 @@ namespace geode
     }
 
     template < typename T >
-    PImpl< T >::PImpl( PImpl< T >&& other ) noexcept = default;
+    PImpl< T >::PImpl( PImpl< T >&& ) noexcept = default;
 
     template < typename T >
     PImpl< T >::~PImpl() = default;
 
     template < typename T >
-    PImpl< T >& PImpl< T >::operator=( PImpl< T >&& other ) noexcept = default;
+    PImpl< T >& PImpl< T >::operator=( PImpl< T >&& ) noexcept = default;
 
     template < typename T >
     void PImpl< T >::reset()

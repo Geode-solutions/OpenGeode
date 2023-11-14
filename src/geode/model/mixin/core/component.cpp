@@ -76,10 +76,7 @@ namespace geode
     Component< dimension >::Component() = default;
 
     template < index_t dimension >
-    Component< dimension >::Component( Component&& other ) noexcept
-        : Identifier{ std::move( other ) }, impl_{ std::move( other.impl_ ) }
-    {
-    }
+    Component< dimension >::Component( Component&& ) noexcept = default;
 
     template < index_t dimension >
     template < typename Archive >

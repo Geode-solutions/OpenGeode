@@ -133,18 +133,11 @@ namespace geode
     }
 
     template < index_t dimension >
-    CellArray< dimension >::CellArray( CellArray&& other ) noexcept
-        : impl_( std::move( other.impl_ ) )
-    {
-    }
+    CellArray< dimension >::CellArray( CellArray&& ) noexcept = default;
 
     template < index_t dimension >
-    auto CellArray< dimension >::operator=( CellArray&& other ) noexcept
-        -> CellArray&
-    {
-        impl_ = std::move( other.impl_ );
-        return *this;
-    }
+    auto CellArray< dimension >::operator=( CellArray&& ) noexcept
+        -> CellArray& = default;
 
     template < index_t dimension >
     CellArray< dimension >::~CellArray() // NOLINT

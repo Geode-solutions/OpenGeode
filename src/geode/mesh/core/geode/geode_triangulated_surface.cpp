@@ -139,27 +139,16 @@ namespace geode
 
     template < index_t dimension >
     OpenGeodeTriangulatedSurface< dimension >::OpenGeodeTriangulatedSurface(
-        OpenGeodeTriangulatedSurface&& other )
-        : TriangulatedSurface< dimension >( std::move( other ) ),
-          impl_( std::move( other.impl_ ) )
-    {
-    }
+        OpenGeodeTriangulatedSurface&& ) noexcept = default;
 
     template < index_t dimension >
     OpenGeodeTriangulatedSurface< dimension >&
         OpenGeodeTriangulatedSurface< dimension >::operator=(
-            OpenGeodeTriangulatedSurface&& other )
-    {
-        TriangulatedSurface< dimension >::operator=( std::move( other ) );
-        impl_ = std::move( other.impl_ );
-        return *this;
-    }
+            OpenGeodeTriangulatedSurface&& ) noexcept = default;
 
     template < index_t dimension >
-    OpenGeodeTriangulatedSurface<
-        dimension >::~OpenGeodeTriangulatedSurface() // NOLINT
-    {
-    }
+    OpenGeodeTriangulatedSurface< dimension >::~OpenGeodeTriangulatedSurface() =
+        default;
 
     template < index_t dimension >
     void OpenGeodeTriangulatedSurface< dimension >::set_vertex(

@@ -95,9 +95,9 @@ namespace geode
 
     protected:
         Lines();
-        Lines( Lines&& other );
+        Lines( Lines&& other ) noexcept;
 
-        Lines& operator=( Lines&& other );
+        Lines& operator=( Lines&& other ) noexcept;
 
     private:
         class ModifiableLineRange : public LineRangeBase

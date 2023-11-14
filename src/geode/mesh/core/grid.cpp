@@ -458,28 +458,17 @@ namespace geode
     };
 
     template < index_t dimension >
-    Grid< dimension >::Grid()
-    {
-    }
+    Grid< dimension >::Grid() = default;
 
     template < index_t dimension >
-    Grid< dimension >::Grid( Grid&& other )
-        : CellArray< dimension >( std::move( other ) ),
-          impl_( std::move( other.impl_ ) )
-    {
-    }
+    Grid< dimension >::Grid( Grid&& ) noexcept = default;
 
     template < index_t dimension >
-    Grid< dimension >& Grid< dimension >::operator=( Grid&& other )
-    {
-        impl_ = std::move( other.impl_ );
-        return *this;
-    }
+    Grid< dimension >& Grid< dimension >::operator=(
+        Grid&& ) noexcept = default;
 
     template < index_t dimension >
-    Grid< dimension >::~Grid() // NOLINT
-    {
-    }
+    Grid< dimension >::~Grid() = default;
 
     template < index_t dimension >
     const Point< dimension >& Grid< dimension >::origin() const

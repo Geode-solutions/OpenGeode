@@ -124,23 +124,12 @@ namespace geode
     OpenGeodeRegularGrid< 2 >::OpenGeodeRegularGrid() : impl_( *this ) {}
 
     OpenGeodeRegularGrid< 2 >::OpenGeodeRegularGrid(
-        OpenGeodeRegularGrid&& other )
-        : RegularGrid< 2 >( std::move( other ) ),
-          impl_( std::move( other.impl_ ) )
-    {
-    }
+        OpenGeodeRegularGrid&& ) noexcept = default;
 
     OpenGeodeRegularGrid< 2 >& OpenGeodeRegularGrid< 2 >::operator=(
-        OpenGeodeRegularGrid&& other )
-    {
-        RegularGrid< 2 >::operator=( std::move( other ) );
-        impl_ = std::move( other.impl_ );
-        return *this;
-    }
+        OpenGeodeRegularGrid&& ) noexcept = default;
 
-    OpenGeodeRegularGrid< 2 >::~OpenGeodeRegularGrid() // NOLINT
-    {
-    }
+    OpenGeodeRegularGrid< 2 >::~OpenGeodeRegularGrid() = default;
 
     index_t OpenGeodeRegularGrid< 2 >::cell_index(
         const Grid2D::CellIndices& index ) const

@@ -46,8 +46,8 @@ namespace geode
 
         GenericPlane( const GenericPlane& other );
         GenericPlane& operator=( const GenericPlane& other );
-        GenericPlane( GenericPlane&& other );
-        GenericPlane& operator=( GenericPlane&& other );
+        GenericPlane( GenericPlane&& other ) noexcept;
+        GenericPlane& operator=( GenericPlane&& other ) noexcept;
 
         const Vector3D& normal() const;
         const Point3D& origin() const;
@@ -66,8 +66,8 @@ namespace geode
         explicit OwnerPlane( const Vector3D& normal, Point3D origin );
         OwnerPlane( const OwnerPlane& other );
         OwnerPlane& operator=( const OwnerPlane& other );
-        OwnerPlane( OwnerPlane&& other );
-        OwnerPlane& operator=( OwnerPlane&& other );
+        OwnerPlane( OwnerPlane&& other ) noexcept;
+        OwnerPlane& operator=( OwnerPlane&& other ) noexcept;
     };
 
     class opengeode_geometry_api Plane : public GenericPlane< RefPoint3D >
@@ -80,7 +80,7 @@ namespace geode
         Plane( const Plane& other );
         Plane( const OwnerPlane& other );
         Plane& operator=( const Plane& other );
-        Plane( Plane&& other );
-        Plane& operator=( Plane&& other );
+        Plane( Plane&& other ) noexcept;
+        Plane& operator=( Plane&& other ) noexcept;
     };
 } // namespace geode

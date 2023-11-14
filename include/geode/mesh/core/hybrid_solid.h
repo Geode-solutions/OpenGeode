@@ -72,8 +72,8 @@ namespace geode
 
     protected:
         HybridSolid() = default;
-        HybridSolid( HybridSolid&& other ) = default;
-        HybridSolid& operator=( HybridSolid&& other ) = default;
+        HybridSolid( HybridSolid&& other ) noexcept = default;
+        HybridSolid& operator=( HybridSolid&& other ) noexcept = default;
 
     private:
         friend class bitsery::Access;

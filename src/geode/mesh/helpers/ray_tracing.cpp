@@ -317,12 +317,9 @@ namespace geode
     {
     }
 
-    RayTracing3D::RayTracing3D( RayTracing3D&& other )
-        : impl_{ std::move( other.impl_ ) }
-    {
-    }
+    RayTracing3D::RayTracing3D( RayTracing3D&& ) noexcept = default;
 
-    RayTracing3D::~RayTracing3D() {}
+    RayTracing3D::~RayTracing3D() = default;
 
     absl::optional< RayTracing3D::PolygonDistance >
         RayTracing3D::closest_polygon() const

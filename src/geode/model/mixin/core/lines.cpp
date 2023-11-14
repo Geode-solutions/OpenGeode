@@ -48,21 +48,14 @@ namespace geode
     Lines< dimension >::Lines() = default;
 
     template < index_t dimension >
-    Lines< dimension >::Lines( Lines&& other )
-        : impl_( std::move( other.impl_ ) )
-    {
-    }
+    Lines< dimension >::Lines( Lines&& ) noexcept = default;
 
     template < index_t dimension >
     Lines< dimension >::~Lines() = default;
 
     template < index_t dimension >
     Lines< dimension >& Lines< dimension >::operator=(
-        Lines< dimension >&& other )
-    {
-        impl_ = std::move( other.impl_ );
-        return *this;
-    }
+        Lines< dimension >&& ) noexcept = default;
 
     template < index_t dimension >
     index_t Lines< dimension >::nb_lines() const
@@ -231,10 +224,7 @@ namespace geode
 
     template < index_t dimension >
     Lines< dimension >::LineRangeBase::LineRangeBase(
-        LineRangeBase&& other ) noexcept
-        : impl_( std::move( other.impl_ ) )
-    {
-    }
+        LineRangeBase&& ) noexcept = default;
 
     template < index_t dimension >
     Lines< dimension >::LineRangeBase::LineRangeBase(

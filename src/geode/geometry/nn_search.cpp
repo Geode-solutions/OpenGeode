@@ -140,10 +140,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    NNSearch< dimension >::NNSearch( NNSearch&& other )
-        : impl_( std::move( other.impl_ ) )
-    {
-    }
+    NNSearch< dimension >::NNSearch( NNSearch&& ) noexcept = default;
 
     template < index_t dimension >
     NNSearch< dimension >::~NNSearch() = default;

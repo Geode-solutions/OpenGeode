@@ -80,14 +80,10 @@ namespace geode
     };
 
     template < index_t dimension >
-    RasterImage< dimension >::RasterImage()
-    {
-    }
+    RasterImage< dimension >::RasterImage() = default;
 
     template < index_t dimension >
-    RasterImage< dimension >::~RasterImage()
-    {
-    }
+    RasterImage< dimension >::~RasterImage() = default;
 
     template < index_t dimension >
     RasterImage< dimension >::RasterImage(
@@ -98,21 +94,11 @@ namespace geode
     }
 
     template < index_t dimension >
-    RasterImage< dimension >::RasterImage( RasterImage&& other ) noexcept
-        : CellArray< dimension >{ std::move( other ) },
-          Identifier{ std::move( other ) },
-          impl_( std::move( other.impl_ ) )
-    {
-    }
+    RasterImage< dimension >::RasterImage( RasterImage&& ) noexcept = default;
 
     template < index_t dimension >
     RasterImage< dimension >& RasterImage< dimension >::operator=(
-        RasterImage&& other )
-    {
-        CellArray< dimension >::operator=( std::move( other ) );
-        impl_ = std::move( other.impl_ );
-        return *this;
-    }
+        RasterImage&& ) noexcept = default;
 
     template < index_t dimension >
     index_t RasterImage< dimension >::cell_index(

@@ -48,7 +48,7 @@ namespace geode
         LightRegularGrid( Point< dimension > origin,
             std::array< index_t, dimension > cells_number,
             std::array< double, dimension > cells_length );
-        LightRegularGrid( LightRegularGrid&& other );
+        LightRegularGrid( LightRegularGrid&& other ) noexcept;
         ~LightRegularGrid();
 
         index_t vertex_index( const VertexIndices& index ) const override;

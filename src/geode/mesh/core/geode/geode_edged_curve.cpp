@@ -73,26 +73,15 @@ namespace geode
 
     template < index_t dimension >
     OpenGeodeEdgedCurve< dimension >::OpenGeodeEdgedCurve(
-        OpenGeodeEdgedCurve&& other )
-        : EdgedCurve< dimension >( std::move( other ) ),
-          impl_( std::move( other.impl_ ) )
-    {
-    }
+        OpenGeodeEdgedCurve&& ) noexcept = default;
 
     template < index_t dimension >
     OpenGeodeEdgedCurve< dimension >&
         OpenGeodeEdgedCurve< dimension >::operator=(
-            OpenGeodeEdgedCurve&& other )
-    {
-        EdgedCurve< dimension >::operator=( std::move( other ) );
-        impl_ = std::move( other.impl_ );
-        return *this;
-    }
+            OpenGeodeEdgedCurve&& ) noexcept = default;
 
     template < index_t dimension >
-    OpenGeodeEdgedCurve< dimension >::~OpenGeodeEdgedCurve() // NOLINT
-    {
-    }
+    OpenGeodeEdgedCurve< dimension >::~OpenGeodeEdgedCurve() = default;
 
     template < index_t dimension >
     void OpenGeodeEdgedCurve< dimension >::set_vertex(

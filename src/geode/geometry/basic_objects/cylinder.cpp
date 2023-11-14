@@ -32,29 +32,13 @@ namespace geode
     {
     }
 
-    Cylinder::Cylinder( const Cylinder& other )
-        : axis_( other.axis_ ), radius_( other.radius_ )
-    {
-    }
+    Cylinder::Cylinder( const Cylinder& ) = default;
 
-    Cylinder& Cylinder::operator=( const Cylinder& other )
-    {
-        axis_ = other.axis_;
-        radius_ = other.radius_;
-        return *this;
-    }
+    Cylinder& Cylinder::operator=( const Cylinder& ) = default;
 
-    Cylinder::Cylinder( Cylinder&& other )
-        : axis_( other.axis_ ), radius_( other.radius_ )
-    {
-    }
+    Cylinder::Cylinder( Cylinder&& ) noexcept = default;
 
-    Cylinder& Cylinder::operator=( Cylinder&& other )
-    {
-        axis_ = other.axis_;
-        radius_ = other.radius_;
-        return *this;
-    }
+    Cylinder& Cylinder::operator=( Cylinder&& ) noexcept = default;
 
     const Segment3D& Cylinder::axis() const
     {

@@ -49,7 +49,7 @@ namespace geode
     public:
         CoordinateReferenceSystemManager();
         CoordinateReferenceSystemManager(
-            CoordinateReferenceSystemManager&& other );
+            CoordinateReferenceSystemManager&& other ) noexcept;
         ~CoordinateReferenceSystemManager();
 
         index_t nb_coordinate_reference_systems() const;

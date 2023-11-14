@@ -68,11 +68,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    Line< dimension >::Line( Line&& other ) noexcept
-        : Component< dimension >{ std::move( other ) },
-          impl_( std::move( other.impl_ ) )
-    {
-    }
+    Line< dimension >::Line( Line&& ) noexcept = default;
 
     template < index_t dimension >
     Line< dimension >::Line( LinesKey /*unused*/ ) : Line()

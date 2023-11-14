@@ -50,8 +50,8 @@ namespace geode
 
         GenericCircle( const GenericCircle& other );
         GenericCircle& operator=( const GenericCircle& other );
-        GenericCircle( GenericCircle&& other );
-        GenericCircle& operator=( GenericCircle&& other );
+        GenericCircle( GenericCircle&& other ) noexcept;
+        GenericCircle& operator=( GenericCircle&& other ) noexcept;
 
         const PlaneType& plane() const;
         double radius() const;
@@ -72,8 +72,8 @@ namespace geode
 
         OwnerCircle( const OwnerCircle& other );
         OwnerCircle& operator=( const OwnerCircle& other );
-        OwnerCircle( OwnerCircle&& other );
-        OwnerCircle& operator=( OwnerCircle&& other );
+        OwnerCircle( OwnerCircle&& other ) noexcept;
+        OwnerCircle& operator=( OwnerCircle&& other ) noexcept;
     };
     using OwnerDisk = OwnerCircle;
 
@@ -87,8 +87,8 @@ namespace geode
         Circle( const Circle& other );
         Circle( const OwnerCircle& other );
         Circle& operator=( const Circle& other );
-        Circle( Circle&& other );
-        Circle& operator=( Circle&& other );
+        Circle( Circle&& other ) noexcept;
+        Circle& operator=( Circle&& other ) noexcept;
     };
     using Disk = Circle;
 } // namespace geode

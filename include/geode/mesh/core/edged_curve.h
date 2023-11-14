@@ -76,8 +76,8 @@ namespace geode
 
     protected:
         EdgedCurve();
-        EdgedCurve( EdgedCurve&& other );
-        EdgedCurve& operator=( EdgedCurve&& other );
+        EdgedCurve( EdgedCurve&& other ) noexcept;
+        EdgedCurve& operator=( EdgedCurve&& other ) noexcept;
 
     private:
         template < typename Archive >

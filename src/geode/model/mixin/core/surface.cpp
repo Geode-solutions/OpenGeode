@@ -63,10 +63,7 @@ namespace geode
     Surface< dimension >::~Surface() = default;
 
     template < index_t dimension >
-    Surface< dimension >::Surface( Surface< dimension >&& other ) noexcept
-        : impl_( std::move( other.impl_ ) )
-    {
-    }
+    Surface< dimension >::Surface( Surface< dimension >&& ) noexcept = default;
 
     template < index_t dimension >
     Surface< dimension >::Surface( SurfacesKey /*unused*/ ) : Surface()

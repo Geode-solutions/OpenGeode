@@ -37,30 +37,16 @@ namespace geode
     }
     template < typename PointType >
     GenericTetrahedron< PointType >::GenericTetrahedron(
-        const GenericTetrahedron& other ) noexcept
-        : vertices_( other.vertices_ )
-    {
-    }
+        const GenericTetrahedron& ) noexcept = default;
     template < typename PointType >
     GenericTetrahedron< PointType >& GenericTetrahedron< PointType >::operator=(
-        const GenericTetrahedron& other ) noexcept
-    {
-        vertices_ = other.vertices_;
-        return *this;
-    }
+        const GenericTetrahedron& ) noexcept = default;
     template < typename PointType >
     GenericTetrahedron< PointType >::GenericTetrahedron(
-        GenericTetrahedron&& other ) noexcept
-        : vertices_( std::move( other.vertices_ ) )
-    {
-    }
+        GenericTetrahedron&& ) noexcept = default;
     template < typename PointType >
     GenericTetrahedron< PointType >& GenericTetrahedron< PointType >::operator=(
-        GenericTetrahedron&& other ) noexcept
-    {
-        vertices_ = std::move( other.vertices_ );
-        return *this;
-    }
+        GenericTetrahedron&& ) noexcept = default;
     template < typename PointType >
     Point3D GenericTetrahedron< PointType >::barycenter() const
     {
@@ -101,23 +87,12 @@ namespace geode
     {
     }
     OwnerTetrahedron::OwnerTetrahedron(
-        const OwnerTetrahedron& other ) noexcept = default;
+        const OwnerTetrahedron& ) noexcept = default;
     OwnerTetrahedron& OwnerTetrahedron::operator=(
-        const OwnerTetrahedron& other ) noexcept
-    {
-        Base::operator=( other );
-        return *this;
-    }
-    OwnerTetrahedron::OwnerTetrahedron( OwnerTetrahedron&& other ) noexcept
-        : Base( std::move( other ) )
-    {
-    }
+        const OwnerTetrahedron& ) noexcept = default;
+    OwnerTetrahedron::OwnerTetrahedron( OwnerTetrahedron&& ) noexcept = default;
     OwnerTetrahedron& OwnerTetrahedron::operator=(
-        OwnerTetrahedron&& other ) noexcept
-    {
-        Base::operator=( other );
-        return *this;
-    }
+        OwnerTetrahedron&& ) noexcept = default;
 
     Tetrahedron::Tetrahedron( const Point3D& point0,
         const Point3D& point1,
@@ -135,16 +110,9 @@ namespace geode
     {
     }
     Tetrahedron& Tetrahedron::operator=(
-        const Tetrahedron& other ) noexcept = default;
-    Tetrahedron::Tetrahedron( Tetrahedron&& other ) noexcept
-        : Base( std::move( other ) )
-    {
-    }
-    Tetrahedron& Tetrahedron::operator=( Tetrahedron&& other ) noexcept
-    {
-        Base::operator=( other );
-        return *this;
-    }
+        const Tetrahedron& ) noexcept = default;
+    Tetrahedron::Tetrahedron( Tetrahedron&& ) noexcept = default;
+    Tetrahedron& Tetrahedron::operator=( Tetrahedron&& ) noexcept = default;
 
     template < typename PointType >
     constexpr std::array< std::array< index_t, 3 >, 4 >

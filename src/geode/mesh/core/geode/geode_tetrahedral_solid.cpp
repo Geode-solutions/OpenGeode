@@ -155,21 +155,12 @@ namespace geode
 
     template < index_t dimension >
     OpenGeodeTetrahedralSolid< dimension >::OpenGeodeTetrahedralSolid(
-        OpenGeodeTetrahedralSolid&& other )
-        : TetrahedralSolid< dimension >( std::move( other ) ),
-          impl_( std::move( other.impl_ ) )
-    {
-    }
+        OpenGeodeTetrahedralSolid&& ) noexcept = default;
 
     template < index_t dimension >
     OpenGeodeTetrahedralSolid< dimension >&
         OpenGeodeTetrahedralSolid< dimension >::operator=(
-            OpenGeodeTetrahedralSolid&& other )
-    {
-        TetrahedralSolid< dimension >::operator=( std::move( other ) );
-        impl_ = std::move( other.impl_ );
-        return *this;
-    }
+            OpenGeodeTetrahedralSolid&& ) noexcept = default;
 
     template < index_t dimension >
     OpenGeodeTetrahedralSolid< dimension >::~OpenGeodeTetrahedralSolid() =

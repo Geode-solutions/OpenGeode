@@ -64,33 +64,17 @@ namespace geode
     };
 
     template < index_t dimension >
-    EdgedCurve< dimension >::EdgedCurve()
-    {
-    }
+    EdgedCurve< dimension >::EdgedCurve() = default;
 
     template < index_t dimension >
-    EdgedCurve< dimension >::EdgedCurve( EdgedCurve&& other )
-        : Graph{ std::move( other ) },
-          CoordinateReferenceSystemManagers< dimension >( std::move( other ) ),
-          impl_{ std::move( other.impl_ ) }
-    {
-    }
+    EdgedCurve< dimension >::EdgedCurve( EdgedCurve&& ) noexcept = default;
 
     template < index_t dimension >
     EdgedCurve< dimension >& EdgedCurve< dimension >::operator=(
-        EdgedCurve&& other )
-    {
-        Graph::operator=( std::move( other ) );
-        CoordinateReferenceSystemManagers< dimension >::operator=(
-            std::move( other ) );
-        impl_ = std::move( other.impl_ );
-        return *this;
-    }
+        EdgedCurve&& ) noexcept = default;
 
     template < index_t dimension >
-    EdgedCurve< dimension >::~EdgedCurve()
-    {
-    }
+    EdgedCurve< dimension >::~EdgedCurve() = default;
 
     template < index_t dimension >
     std::unique_ptr< EdgedCurve< dimension > > EdgedCurve< dimension >::create()
