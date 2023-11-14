@@ -53,9 +53,7 @@ namespace geode
 
     Timer::Timer() = default;
 
-    Timer::Timer( Timer&& other ) noexcept : impl_{ std::move( other.impl_ ) }
-    {
-    }
+    Timer::Timer( Timer&& ) noexcept = default;
 
     Timer::~Timer() = default;
 

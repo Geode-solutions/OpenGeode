@@ -456,16 +456,10 @@ namespace geode
     };
 
     VertexIdentifier::VertexIdentifier() = default;
-    VertexIdentifier::VertexIdentifier( VertexIdentifier&& other )
-        : impl_( std::move( other.impl_ ) )
-    {
-    }
+    VertexIdentifier::VertexIdentifier( VertexIdentifier&& ) noexcept = default;
 
-    VertexIdentifier& VertexIdentifier::operator=( VertexIdentifier&& other )
-    {
-        impl_ = std::move( other.impl_ );
-        return *this;
-    }
+    VertexIdentifier& VertexIdentifier::operator=(
+        VertexIdentifier&& ) noexcept = default;
 
     VertexIdentifier::~VertexIdentifier() = default;
 

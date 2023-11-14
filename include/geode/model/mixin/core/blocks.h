@@ -111,9 +111,9 @@ namespace geode
 
     protected:
         Blocks();
-        Blocks( Blocks&& other );
+        Blocks( Blocks&& other ) noexcept;
 
-        Blocks& operator=( Blocks&& other );
+        Blocks& operator=( Blocks&& other ) noexcept;
 
     private:
         class ModifiableBlockRange : public BlockRangeBase

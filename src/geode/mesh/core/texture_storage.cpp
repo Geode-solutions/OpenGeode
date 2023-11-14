@@ -111,20 +111,14 @@ namespace geode
     };
 
     template < index_t dimension >
-    TextureStorage< dimension >::TextureStorage()
-    {
-    }
+    TextureStorage< dimension >::TextureStorage() = default;
 
     template < index_t dimension >
-    TextureStorage< dimension >::TextureStorage( TextureStorage&& other )
-        : impl_{ std::move( other.impl_ ) }
-    {
-    }
+    TextureStorage< dimension >::TextureStorage(
+        TextureStorage&& ) noexcept = default;
 
     template < index_t dimension >
-    TextureStorage< dimension >::~TextureStorage()
-    {
-    }
+    TextureStorage< dimension >::~TextureStorage() = default;
 
     template < index_t dimension >
     index_t TextureStorage< dimension >::nb_textures( TextureManagerKey ) const

@@ -75,8 +75,8 @@ namespace geode
 
     protected:
         PointSet() = default;
-        PointSet( PointSet&& other ) = default;
-        PointSet& operator=( PointSet&& other ) = default;
+        PointSet( PointSet&& other ) noexcept = default;
+        PointSet& operator=( PointSet&& other ) noexcept = default;
 
     private:
         friend class bitsery::Access;

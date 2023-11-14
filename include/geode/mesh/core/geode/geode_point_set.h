@@ -50,8 +50,8 @@ namespace geode
         static constexpr auto dim = dimension;
 
         OpenGeodePointSet();
-        OpenGeodePointSet( OpenGeodePointSet&& other );
-        OpenGeodePointSet& operator=( OpenGeodePointSet&& other );
+        OpenGeodePointSet( OpenGeodePointSet&& other ) noexcept;
+        OpenGeodePointSet& operator=( OpenGeodePointSet&& other ) noexcept;
         ~OpenGeodePointSet();
 
         static MeshImpl impl_name_static()

@@ -69,11 +69,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    Corner< dimension >::Corner( Corner&& other ) noexcept
-        : Component< dimension >{ std::move( other ) },
-          impl_( std::move( other.impl_ ) )
-    {
-    }
+    Corner< dimension >::Corner( Corner&& ) noexcept = default;
 
     template < index_t dimension >
     Corner< dimension >::Corner( CornersKey /*unused*/ ) : Corner()

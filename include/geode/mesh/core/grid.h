@@ -156,8 +156,8 @@ namespace geode
 
     protected:
         Grid();
-        Grid( Grid&& other );
-        Grid& operator=( Grid&& other );
+        Grid( Grid&& other ) noexcept;
+        Grid& operator=( Grid&& other ) noexcept;
 
     private:
         template < typename Archive >

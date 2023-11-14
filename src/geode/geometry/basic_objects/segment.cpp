@@ -36,32 +36,18 @@ namespace geode
     }
     template < typename PointType, index_t dimension >
     GenericSegment< PointType, dimension >::GenericSegment(
-        const GenericSegment< PointType, dimension >& other ) noexcept
-        : vertices_( other.vertices_ )
-    {
-    }
+        const GenericSegment< PointType, dimension >& ) noexcept = default;
     template < typename PointType, index_t dimension >
     GenericSegment< PointType, dimension >&
         GenericSegment< PointType, dimension >::operator=(
-            const GenericSegment< PointType, dimension >& other ) noexcept
-    {
-        vertices_ = other.vertices_;
-        return *this;
-    }
+            const GenericSegment< PointType, dimension >& ) noexcept = default;
     template < typename PointType, index_t dimension >
     GenericSegment< PointType, dimension >::GenericSegment(
-        GenericSegment< PointType, dimension >&& other ) noexcept
-        : vertices_( std::move( other.vertices_ ) )
-    {
-    }
+        GenericSegment< PointType, dimension >&& ) noexcept = default;
     template < typename PointType, index_t dimension >
     GenericSegment< PointType, dimension >&
         GenericSegment< PointType, dimension >::operator=(
-            GenericSegment< PointType, dimension >&& other ) noexcept
-    {
-        vertices_ = std::move( other.vertices_ );
-        return *this;
-    }
+            GenericSegment< PointType, dimension >&& ) noexcept = default;
     template < typename PointType, index_t dimension >
     Vector< dimension >
         GenericSegment< PointType, dimension >::direction() const
@@ -124,30 +110,16 @@ namespace geode
     }
     template < index_t dimension >
     OwnerSegment< dimension >::OwnerSegment(
-        const OwnerSegment< dimension >& other ) noexcept
-        : Base( other )
-    {
-    }
+        const OwnerSegment< dimension >& ) noexcept = default;
     template < index_t dimension >
     OwnerSegment< dimension >& OwnerSegment< dimension >::operator=(
-        const OwnerSegment< dimension >& other ) noexcept
-    {
-        Base::operator=( other );
-        return *this;
-    }
+        const OwnerSegment< dimension >& ) noexcept = default;
     template < index_t dimension >
     OwnerSegment< dimension >::OwnerSegment(
-        OwnerSegment< dimension >&& other ) noexcept
-        : Base( std::move( other ) )
-    {
-    }
+        OwnerSegment< dimension >&& ) noexcept = default;
     template < index_t dimension >
     OwnerSegment< dimension >& OwnerSegment< dimension >::operator=(
-        OwnerSegment< dimension >&& other ) noexcept
-    {
-        Base::operator=( other );
-        return *this;
-    }
+        OwnerSegment< dimension >&& ) noexcept = default;
 
     template < index_t dimension >
     Segment< dimension >::Segment( const Point< dimension >& point0,
@@ -156,10 +128,8 @@ namespace geode
     {
     }
     template < index_t dimension >
-    Segment< dimension >::Segment( const Segment< dimension >& other ) noexcept
-        : Base( other )
-    {
-    }
+    Segment< dimension >::Segment(
+        const Segment< dimension >& ) noexcept = default;
     template < index_t dimension >
     Segment< dimension >::Segment(
         const OwnerSegment< dimension >& other ) noexcept
@@ -168,23 +138,12 @@ namespace geode
     }
     template < index_t dimension >
     Segment< dimension >& Segment< dimension >::operator=(
-        const Segment< dimension >& other ) noexcept
-    {
-        Base::operator=( other );
-        return *this;
-    }
+        const Segment< dimension >& ) noexcept = default;
     template < index_t dimension >
-    Segment< dimension >::Segment( Segment< dimension >&& other ) noexcept
-        : Base( std::move( other ) )
-    {
-    }
+    Segment< dimension >::Segment( Segment< dimension >&& ) noexcept = default;
     template < index_t dimension >
     Segment< dimension >& Segment< dimension >::operator=(
-        Segment< dimension >&& other ) noexcept
-    {
-        Base::operator=( other );
-        return *this;
-    }
+        Segment< dimension >&& ) noexcept = default;
 
     template class opengeode_geometry_api GenericSegment< Point< 1 >, 1 >;
     template class opengeode_geometry_api GenericSegment< Point< 2 >, 2 >;

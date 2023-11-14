@@ -403,28 +403,14 @@ namespace geode
     }
 
     template < index_t dimension >
-    SurfaceMesh< dimension >::SurfaceMesh( SurfaceMesh&& other )
-        : VertexSet( std::move( other ) ),
-          CoordinateReferenceSystemManagers< dimension >( std::move( other ) ),
-          impl_( std::move( other.impl_ ) )
-    {
-    }
+    SurfaceMesh< dimension >::SurfaceMesh( SurfaceMesh&& ) noexcept = default;
 
     template < index_t dimension >
     SurfaceMesh< dimension >& SurfaceMesh< dimension >::operator=(
-        SurfaceMesh&& other )
-    {
-        VertexSet::operator=( std::move( other ) );
-        CoordinateReferenceSystemManagers< dimension >::operator=(
-            std::move( other ) );
-        impl_ = std::move( other.impl_ );
-        return *this;
-    }
+        SurfaceMesh&& ) noexcept = default;
 
     template < index_t dimension >
-    SurfaceMesh< dimension >::~SurfaceMesh() // NOLINT
-    {
-    }
+    SurfaceMesh< dimension >::~SurfaceMesh() = default;
 
     template < index_t dimension >
     std::unique_ptr< SurfaceMesh< dimension > >

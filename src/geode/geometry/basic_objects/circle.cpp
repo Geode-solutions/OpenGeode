@@ -33,32 +33,19 @@ namespace geode
     {
     }
     template < typename PlaneType >
-    GenericCircle< PlaneType >::GenericCircle( const GenericCircle& other )
-        : plane_( other.plane_ ), radius_( other.radius_ )
-    {
-    }
+    GenericCircle< PlaneType >::GenericCircle(
+        const GenericCircle& other ) = default;
     template < typename PlaneType >
     GenericCircle< PlaneType >& GenericCircle< PlaneType >::operator=(
-        const GenericCircle& other )
-    {
-        plane_ = other.plane_;
-        radius_ = other.radius_;
-        return *this;
-    }
+        const GenericCircle& other ) = default;
     template < typename PlaneType >
-    GenericCircle< PlaneType >::GenericCircle( GenericCircle&& other )
-        : plane_( std::move( other.plane_ ) ),
-          radius_( std::move( other.radius_ ) )
-    {
-    }
+    GenericCircle< PlaneType >::GenericCircle(
+        GenericCircle&& ) noexcept = default;
+
     template < typename PlaneType >
     GenericCircle< PlaneType >& GenericCircle< PlaneType >::operator=(
-        GenericCircle&& other )
-    {
-        plane_ = std::move( other.plane_ );
-        radius_ = std::move( other.radius_ );
-        return *this;
-    }
+        GenericCircle&& ) noexcept = default;
+
     template < typename PlaneType >
     const PlaneType& GenericCircle< PlaneType >::plane() const
     {
@@ -104,34 +91,22 @@ namespace geode
         Base::operator=( other );
         return *this;
     }
-    OwnerCircle::OwnerCircle( OwnerCircle&& other ) : Base( other ) {}
-    OwnerCircle& OwnerCircle::operator=( OwnerCircle&& other )
-    {
-        Base::operator=( other );
-        return *this;
-    }
+    OwnerCircle::OwnerCircle( OwnerCircle&& ) noexcept = default;
+    OwnerCircle& OwnerCircle::operator=( OwnerCircle&& ) noexcept = default;
 
     Circle::Circle( Plane plane, double radius )
         : Base( std::move( plane ), radius )
     {
     }
-    Circle::Circle( const Circle& other ) : Base( other ) {}
+    Circle::Circle( const Circle& ) = default;
     Circle::Circle( const OwnerCircle& other )
         : Base(
             { other.plane().normal(), other.plane().origin() }, other.radius() )
     {
     }
-    Circle& Circle::operator=( const Circle& other )
-    {
-        Base::operator=( other );
-        return *this;
-    }
-    Circle::Circle( Circle&& other ) : Base( other ) {}
-    Circle& Circle::operator=( Circle&& other )
-    {
-        Base::operator=( other );
-        return *this;
-    }
+    Circle& Circle::operator=( const Circle& ) = default;
+    Circle::Circle( Circle&& ) noexcept = default;
+    Circle& Circle::operator=( Circle&& ) noexcept = default;
 
     template class opengeode_geometry_api GenericCircle< Plane >;
     template class opengeode_geometry_api GenericCircle< OwnerPlane >;

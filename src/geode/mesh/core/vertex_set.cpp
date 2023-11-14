@@ -57,17 +57,9 @@ namespace geode
 
     VertexSet::VertexSet() = default;
 
-    VertexSet::VertexSet( VertexSet&& other ) noexcept
-        : Identifier{ std::move( other ) }, impl_( std::move( other.impl_ ) )
-    {
-    }
+    VertexSet::VertexSet( VertexSet&& ) noexcept = default;
 
-    VertexSet& VertexSet::operator=( VertexSet&& other )
-    {
-        Identifier::operator=( std::move( other ) );
-        impl_ = std::move( other.impl_ );
-        return *this;
-    }
+    VertexSet& VertexSet::operator=( VertexSet&& ) noexcept = default;
 
     VertexSet::~VertexSet() = default;
 

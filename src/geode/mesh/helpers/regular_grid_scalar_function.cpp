@@ -119,10 +119,7 @@ namespace geode
 
     template < index_t dimension >
     RegularGridScalarFunction< dimension >::RegularGridScalarFunction(
-        RegularGridScalarFunction< dimension >&& other )
-        : impl_( std::move( other.impl_ ) )
-    {
-    }
+        RegularGridScalarFunction< dimension >&& ) noexcept = default;
 
     template < index_t dimension >
     RegularGridScalarFunction< dimension >::RegularGridScalarFunction(
@@ -141,9 +138,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    RegularGridScalarFunction< dimension >::~RegularGridScalarFunction()
-    {
-    }
+    RegularGridScalarFunction< dimension >::~RegularGridScalarFunction() =
+        default;
 
     template < index_t dimension >
     RegularGridScalarFunction< dimension >

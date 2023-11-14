@@ -55,10 +55,10 @@ namespace geode
          */
         AABBTree();
         AABBTree( absl::Span< const BoundingBox< dimension > > bboxes );
-        AABBTree( AABBTree&& other );
+        AABBTree( AABBTree&& other ) noexcept;
         ~AABBTree();
 
-        AABBTree& operator=( AABBTree&& other );
+        AABBTree& operator=( AABBTree&& other ) noexcept;
 
         /*!
          * @brief Gets the number of boxes in the lower level of the aabb tree.

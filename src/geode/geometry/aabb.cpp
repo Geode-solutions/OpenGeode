@@ -141,20 +141,13 @@ namespace geode
     }
 
     template < index_t dimension >
-    AABBTree< dimension >::AABBTree( AABBTree&& other )
-        : impl_( std::move( other.impl_ ) )
-    {
-    }
-
+    AABBTree< dimension >::AABBTree( AABBTree&& ) noexcept = default;
     template < index_t dimension >
     AABBTree< dimension >::~AABBTree() = default;
 
     template < index_t dimension >
-    AABBTree< dimension >& AABBTree< dimension >::operator=( AABBTree&& other )
-    {
-        impl_ = std::move( other.impl_ );
-        return *this;
-    }
+    AABBTree< dimension >& AABBTree< dimension >::operator=(
+        AABBTree&& ) noexcept = default;
 
     template < index_t dimension >
     index_t AABBTree< dimension >::nb_bboxes() const

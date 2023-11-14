@@ -48,8 +48,8 @@ namespace geode
         static constexpr auto dim = dimension;
 
         OpenGeodeEdgedCurve();
-        OpenGeodeEdgedCurve( OpenGeodeEdgedCurve&& other );
-        OpenGeodeEdgedCurve& operator=( OpenGeodeEdgedCurve&& other );
+        OpenGeodeEdgedCurve( OpenGeodeEdgedCurve&& other ) noexcept;
+        OpenGeodeEdgedCurve& operator=( OpenGeodeEdgedCurve&& other ) noexcept;
         ~OpenGeodeEdgedCurve();
 
         static MeshImpl impl_name_static()

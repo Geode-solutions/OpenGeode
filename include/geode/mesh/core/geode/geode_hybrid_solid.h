@@ -50,8 +50,9 @@ namespace geode
         static constexpr auto dim = dimension;
 
         OpenGeodeHybridSolid();
-        OpenGeodeHybridSolid( OpenGeodeHybridSolid&& other );
-        OpenGeodeHybridSolid& operator=( OpenGeodeHybridSolid&& other );
+        OpenGeodeHybridSolid( OpenGeodeHybridSolid&& other ) noexcept;
+        OpenGeodeHybridSolid& operator=(
+            OpenGeodeHybridSolid&& other ) noexcept;
         ~OpenGeodeHybridSolid();
 
         static MeshImpl impl_name_static()

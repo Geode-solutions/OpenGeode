@@ -261,16 +261,9 @@ namespace geode
     };
 
     Relationships::Relationships() = default;
-    Relationships::Relationships( Relationships&& other )
-        : impl_( std::move( other.impl_ ) )
-    {
-    }
-    Relationships& Relationships::operator=( Relationships&& other )
-    {
-        impl_ = std::move( other.impl_ );
-        return *this;
-    }
-
+    Relationships::Relationships( Relationships&& ) noexcept = default;
+    Relationships& Relationships::operator=(
+        Relationships&& ) noexcept = default;
     Relationships::~Relationships() = default;
 
     void Relationships::remove_component(
@@ -489,10 +482,7 @@ namespace geode
     }
 
     Relationships::RelationRangeIterator::RelationRangeIterator(
-        RelationRangeIterator&& other ) noexcept
-        : impl_( *other.impl_ )
-    {
-    }
+        RelationRangeIterator&& ) noexcept = default;
 
     Relationships::RelationRangeIterator::RelationRangeIterator(
         const RelationRangeIterator& other )
@@ -576,10 +566,7 @@ namespace geode
     }
 
     Relationships::BoundaryRangeIterator::BoundaryRangeIterator(
-        BoundaryRangeIterator&& other ) noexcept
-        : impl_( *other.impl_ )
-    {
-    }
+        BoundaryRangeIterator&& ) noexcept = default;
 
     Relationships::BoundaryRangeIterator::BoundaryRangeIterator(
         const BoundaryRangeIterator& other )
@@ -663,10 +650,7 @@ namespace geode
     }
 
     Relationships::IncidenceRangeIterator::IncidenceRangeIterator(
-        IncidenceRangeIterator&& other ) noexcept
-        : impl_( *other.impl_ )
-    {
-    }
+        IncidenceRangeIterator&& ) noexcept = default;
 
     Relationships::IncidenceRangeIterator::IncidenceRangeIterator(
         const IncidenceRangeIterator& other )
@@ -674,8 +658,7 @@ namespace geode
     {
     }
 
-    Relationships::IncidenceRangeIterator::~IncidenceRangeIterator() {
-    } // NOLINT
+    Relationships::IncidenceRangeIterator::~IncidenceRangeIterator() = default;
 
     bool Relationships::IncidenceRangeIterator::operator!=(
         const IncidenceRangeIterator& /*unused*/ ) const
@@ -751,10 +734,7 @@ namespace geode
     }
 
     Relationships::InternalRangeIterator::InternalRangeIterator(
-        InternalRangeIterator&& other ) noexcept
-        : impl_( *other.impl_ )
-    {
-    }
+        InternalRangeIterator&& ) noexcept = default;
 
     Relationships::InternalRangeIterator::InternalRangeIterator(
         const InternalRangeIterator& other )
@@ -838,10 +818,7 @@ namespace geode
     }
 
     Relationships::EmbeddingRangeIterator::EmbeddingRangeIterator(
-        EmbeddingRangeIterator&& other ) noexcept
-        : impl_( *other.impl_ )
-    {
-    }
+        EmbeddingRangeIterator&& ) noexcept = default;
 
     Relationships::EmbeddingRangeIterator::EmbeddingRangeIterator(
         const EmbeddingRangeIterator& other )
@@ -849,8 +826,7 @@ namespace geode
     {
     }
 
-    Relationships::EmbeddingRangeIterator::~EmbeddingRangeIterator() {
-    } // NOLINT
+    Relationships::EmbeddingRangeIterator::~EmbeddingRangeIterator() = default;
 
     bool Relationships::EmbeddingRangeIterator::operator!=(
         const EmbeddingRangeIterator& /*unused*/ ) const
@@ -926,10 +902,7 @@ namespace geode
     }
 
     Relationships::ItemRangeIterator::ItemRangeIterator(
-        ItemRangeIterator&& other ) noexcept
-        : impl_( *other.impl_ )
-    {
-    }
+        ItemRangeIterator&& ) noexcept = default;
 
     Relationships::ItemRangeIterator::ItemRangeIterator(
         const ItemRangeIterator& other )
@@ -1013,10 +986,7 @@ namespace geode
     }
 
     Relationships::CollectionRangeIterator::CollectionRangeIterator(
-        CollectionRangeIterator&& other ) noexcept
-        : impl_( *other.impl_ )
-    {
-    }
+        CollectionRangeIterator&& ) noexcept = default;
 
     Relationships::CollectionRangeIterator::CollectionRangeIterator(
         const CollectionRangeIterator& other )
@@ -1024,8 +994,8 @@ namespace geode
     {
     }
 
-    Relationships::CollectionRangeIterator::~CollectionRangeIterator() {
-    } // NOLINT
+    Relationships::CollectionRangeIterator::
+        ~CollectionRangeIterator() noexcept = default;
 
     bool Relationships::CollectionRangeIterator::operator!=(
         const CollectionRangeIterator& /*unused*/ ) const

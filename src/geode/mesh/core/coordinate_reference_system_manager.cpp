@@ -172,23 +172,16 @@ namespace geode
 
     template < index_t dimension >
     CoordinateReferenceSystemManager<
-        dimension >::CoordinateReferenceSystemManager()
-    {
-    }
+        dimension >::CoordinateReferenceSystemManager() = default;
 
     template < index_t dimension >
     CoordinateReferenceSystemManager< dimension >::
         CoordinateReferenceSystemManager(
-            CoordinateReferenceSystemManager&& other )
-        : impl_{ std::move( other.impl_ ) }
-    {
-    }
+            CoordinateReferenceSystemManager&& ) noexcept = default;
 
     template < index_t dimension >
     CoordinateReferenceSystemManager<
-        dimension >::~CoordinateReferenceSystemManager()
-    {
-    }
+        dimension >::~CoordinateReferenceSystemManager() = default;
 
     template < index_t dimension >
     index_t CoordinateReferenceSystemManager<

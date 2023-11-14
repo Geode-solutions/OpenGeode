@@ -48,9 +48,9 @@ namespace geode
         GenericSphere( const GenericSphere< PointType, dimension >& other );
         GenericSphere< PointType, dimension >& operator=(
             const GenericSphere< PointType, dimension >& other );
-        GenericSphere( GenericSphere< PointType, dimension >&& other );
+        GenericSphere( GenericSphere< PointType, dimension >&& other ) noexcept;
         GenericSphere< PointType, dimension >& operator=(
-            GenericSphere< PointType, dimension >&& other );
+            GenericSphere< PointType, dimension >&& other ) noexcept;
 
         const Point< dimension >& origin() const;
         double radius() const;
@@ -72,8 +72,9 @@ namespace geode
         OwnerSphere( const OwnerSphere< dimension >& other );
         OwnerSphere< dimension >& operator=(
             const OwnerSphere< dimension >& other );
-        OwnerSphere( OwnerSphere< dimension >&& other );
-        OwnerSphere< dimension >& operator=( OwnerSphere< dimension >&& other );
+        OwnerSphere( OwnerSphere< dimension >&& other ) noexcept;
+        OwnerSphere< dimension >& operator=(
+            OwnerSphere< dimension >&& other ) noexcept;
     };
 
     template < index_t dimension >
@@ -92,8 +93,8 @@ namespace geode
         Sphere( const Sphere< dimension >& other );
         Sphere( const OwnerSphere< dimension >& other );
         Sphere< dimension >& operator=( const Sphere< dimension >& other );
-        Sphere( Sphere< dimension >&& other );
-        Sphere< dimension >& operator=( Sphere< dimension >&& other );
+        Sphere( Sphere< dimension >&& other ) noexcept;
+        Sphere< dimension >& operator=( Sphere< dimension >&& other ) noexcept;
     };
 
     template < index_t dimension >

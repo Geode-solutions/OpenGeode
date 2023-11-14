@@ -44,8 +44,8 @@ namespace geode
         using Builder = OpenGeodeGraphBuilder;
 
         OpenGeodeGraph();
-        OpenGeodeGraph( OpenGeodeGraph&& other );
-        OpenGeodeGraph& operator=( OpenGeodeGraph&& other );
+        OpenGeodeGraph( OpenGeodeGraph&& other ) noexcept;
+        OpenGeodeGraph& operator=( OpenGeodeGraph&& other ) noexcept;
         ~OpenGeodeGraph();
 
         static MeshImpl impl_name_static()

@@ -223,27 +223,16 @@ namespace geode
 
     template < index_t dimension >
     OpenGeodePolygonalSurface< dimension >::OpenGeodePolygonalSurface(
-        OpenGeodePolygonalSurface&& other )
-        : PolygonalSurface< dimension >( std::move( other ) ),
-          impl_( std::move( other.impl_ ) )
-    {
-    }
+        OpenGeodePolygonalSurface&& ) noexcept = default;
 
     template < index_t dimension >
     OpenGeodePolygonalSurface< dimension >&
         OpenGeodePolygonalSurface< dimension >::operator=(
-            OpenGeodePolygonalSurface&& other )
-    {
-        PolygonalSurface< dimension >::operator=( std::move( other ) );
-        impl_ = std::move( other.impl_ );
-        return *this;
-    }
+            OpenGeodePolygonalSurface&& ) noexcept = default;
 
     template < index_t dimension >
-    OpenGeodePolygonalSurface<
-        dimension >::~OpenGeodePolygonalSurface() // NOLINT
-    {
-    }
+    OpenGeodePolygonalSurface< dimension >::~OpenGeodePolygonalSurface() =
+        default;
 
     template < index_t dimension >
     void OpenGeodePolygonalSurface< dimension >::set_vertex(

@@ -74,7 +74,7 @@ namespace geode
         RayTracing3D( const SurfaceMesh3D& mesh, const Ray3D& ray );
         RayTracing3D(
             const SurfaceMesh3D& mesh, const InfiniteLine3D& infinite_line );
-        RayTracing3D( RayTracing3D&& other );
+        RayTracing3D( RayTracing3D&& other ) noexcept;
         ~RayTracing3D();
 
         absl::optional< PolygonDistance > closest_polygon() const;

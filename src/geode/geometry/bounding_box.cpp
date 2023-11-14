@@ -121,34 +121,18 @@ namespace geode
     BoundingBox< dimension >::~BoundingBox() = default;
 
     template < index_t dimension >
-    BoundingBox< dimension >::BoundingBox( const BoundingBox& other )
-        : min_{ other.min_ }, max_{ other.max_ }
-    {
-    }
+    BoundingBox< dimension >::BoundingBox( const BoundingBox& other ) = default;
 
     template < index_t dimension >
     BoundingBox< dimension >& BoundingBox< dimension >::operator=(
-        const BoundingBox& other )
-    {
-        min_ = other.min_;
-        max_ = other.max_;
-        return *this;
-    }
+        const BoundingBox& other ) = default;
 
     template < index_t dimension >
-    BoundingBox< dimension >::BoundingBox( BoundingBox&& other ) noexcept
-        : min_{ std::move( other.min_ ) }, max_{ std::move( other.max_ ) }
-    {
-    }
+    BoundingBox< dimension >::BoundingBox( BoundingBox&& ) noexcept = default;
 
     template < index_t dimension >
     BoundingBox< dimension >& BoundingBox< dimension >::operator=(
-        BoundingBox&& other ) noexcept
-    {
-        min_ = std::move( other.min_ );
-        max_ = std::move( other.max_ );
-        return *this;
-    }
+        BoundingBox&& ) noexcept = default;
 
     template < index_t dimension >
     const Point< dimension >& BoundingBox< dimension >::min() const

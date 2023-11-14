@@ -95,9 +95,9 @@ namespace geode
 
     protected:
         Surfaces();
-        Surfaces( Surfaces&& other );
+        Surfaces( Surfaces&& other ) noexcept;
 
-        Surfaces& operator=( Surfaces&& other );
+        Surfaces& operator=( Surfaces&& other ) noexcept;
 
     private:
         class ModifiableSurfaceRange : public SurfaceRangeBase

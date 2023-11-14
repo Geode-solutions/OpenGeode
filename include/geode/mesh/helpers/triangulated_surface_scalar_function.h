@@ -40,7 +40,7 @@ namespace geode
     {
     public:
         TriangulatedSurfaceScalarFunction(
-            TriangulatedSurfaceScalarFunction< dimension >&& other );
+            TriangulatedSurfaceScalarFunction< dimension >&& other ) noexcept;
         ~TriangulatedSurfaceScalarFunction();
 
         /*!

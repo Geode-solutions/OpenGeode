@@ -48,21 +48,14 @@ namespace geode
     Corners< dimension >::Corners() = default;
 
     template < index_t dimension >
-    Corners< dimension >::Corners( Corners&& other )
-        : impl_( std::move( other.impl_ ) )
-    {
-    }
+    Corners< dimension >::Corners( Corners&& ) noexcept = default;
 
     template < index_t dimension >
     Corners< dimension >::~Corners() = default;
 
     template < index_t dimension >
     Corners< dimension >& Corners< dimension >::operator=(
-        Corners< dimension >&& other )
-    {
-        impl_ = std::move( other.impl_ );
-        return *this;
-    }
+        Corners< dimension >&& ) noexcept = default;
 
     template < index_t dimension >
     bool Corners< dimension >::has_corner( const uuid& id ) const
@@ -239,10 +232,7 @@ namespace geode
 
     template < index_t dimension >
     Corners< dimension >::CornerRangeBase::CornerRangeBase(
-        CornerRangeBase&& other ) noexcept
-        : impl_( std::move( other.impl_ ) )
-    {
-    }
+        CornerRangeBase&& ) noexcept = default;
 
     template < index_t dimension >
     Corners< dimension >::CornerRangeBase::CornerRangeBase(

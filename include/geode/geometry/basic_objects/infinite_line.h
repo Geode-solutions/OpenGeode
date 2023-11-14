@@ -52,9 +52,9 @@ namespace geode
         GenericLine( const GenericLine< PointType, dimension >& other );
         GenericLine< PointType, dimension >& operator=(
             const GenericLine< PointType, dimension >& other );
-        GenericLine( GenericLine< PointType, dimension >&& other );
+        GenericLine( GenericLine< PointType, dimension >&& other ) noexcept;
         GenericLine< PointType, dimension >& operator=(
-            GenericLine< PointType, dimension >&& other );
+            GenericLine< PointType, dimension >&& other ) noexcept;
 
         const Point< dimension >& origin() const;
         const Vector< dimension >& direction() const;
@@ -78,9 +78,9 @@ namespace geode
         OwnerInfiniteLine( const OwnerInfiniteLine< dimension >& other );
         OwnerInfiniteLine< dimension >& operator=(
             const OwnerInfiniteLine< dimension >& other );
-        OwnerInfiniteLine( OwnerInfiniteLine< dimension >&& other );
+        OwnerInfiniteLine( OwnerInfiniteLine< dimension >&& other ) noexcept;
         OwnerInfiniteLine< dimension >& operator=(
-            OwnerInfiniteLine< dimension >&& other );
+            OwnerInfiniteLine< dimension >&& other ) noexcept;
     };
     ALIAS_1D_AND_2D_AND_3D( OwnerInfiniteLine );
 
@@ -96,8 +96,9 @@ namespace geode
         OwnerRay( const Segment< dimension >& segment );
         OwnerRay( const OwnerRay< dimension >& other );
         OwnerRay< dimension >& operator=( const OwnerRay< dimension >& other );
-        OwnerRay( OwnerRay< dimension >&& other );
-        OwnerRay< dimension >& operator=( OwnerRay< dimension >&& other );
+        OwnerRay( OwnerRay< dimension >&& other ) noexcept;
+        OwnerRay< dimension >& operator=(
+            OwnerRay< dimension >&& other ) noexcept;
     };
     ALIAS_1D_AND_2D_AND_3D( OwnerRay );
 
@@ -115,9 +116,9 @@ namespace geode
         InfiniteLine( const OwnerInfiniteLine< dimension >& other );
         InfiniteLine< dimension >& operator=(
             const InfiniteLine< dimension >& other );
-        InfiniteLine( InfiniteLine< dimension >&& other );
+        InfiniteLine( InfiniteLine< dimension >&& other ) noexcept;
         InfiniteLine< dimension >& operator=(
-            InfiniteLine< dimension >&& other );
+            InfiniteLine< dimension >&& other ) noexcept;
     };
     ALIAS_1D_AND_2D_AND_3D( InfiniteLine );
 
@@ -134,8 +135,8 @@ namespace geode
         Ray( const Ray< dimension >& other );
         Ray( const OwnerRay< dimension >& other );
         Ray< dimension >& operator=( const Ray< dimension >& other );
-        Ray( Ray< dimension >&& other );
-        Ray< dimension >& operator=( Ray< dimension >&& other );
+        Ray( Ray< dimension >&& other ) noexcept;
+        Ray< dimension >& operator=( Ray< dimension >&& other ) noexcept;
     };
     ALIAS_1D_AND_2D_AND_3D( Ray );
 } // namespace geode

@@ -41,7 +41,8 @@ namespace geode
     {
     public:
         RegularGridPointFunction(
-            RegularGridPointFunction< dimension, point_dimension >&& other );
+            RegularGridPointFunction< dimension, point_dimension >&&
+                other ) noexcept;
         ~RegularGridPointFunction();
 
         /*!

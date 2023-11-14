@@ -51,9 +51,9 @@ namespace geode
         static constexpr auto dim = dimension;
 
         OpenGeodeTetrahedralSolid();
-        OpenGeodeTetrahedralSolid( OpenGeodeTetrahedralSolid&& other );
+        OpenGeodeTetrahedralSolid( OpenGeodeTetrahedralSolid&& other ) noexcept;
         OpenGeodeTetrahedralSolid& operator=(
-            OpenGeodeTetrahedralSolid&& other );
+            OpenGeodeTetrahedralSolid&& other ) noexcept;
         ~OpenGeodeTetrahedralSolid();
 
         static MeshImpl impl_name_static()

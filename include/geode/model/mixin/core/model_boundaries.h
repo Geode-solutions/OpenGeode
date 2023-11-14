@@ -95,8 +95,8 @@ namespace geode
 
     protected:
         ModelBoundaries();
-        ModelBoundaries( ModelBoundaries&& other );
-        ModelBoundaries& operator=( ModelBoundaries&& other );
+        ModelBoundaries( ModelBoundaries&& other ) noexcept;
+        ModelBoundaries& operator=( ModelBoundaries&& other ) noexcept;
 
     private:
         class ModifiableModelBoundaryRange : public ModelBoundaryRangeBase

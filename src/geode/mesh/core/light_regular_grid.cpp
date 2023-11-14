@@ -38,6 +38,8 @@ namespace geode
         : public detail::GridImpl< dimension >
     {
     public:
+        Impl() = default;
+
         AttributeManager& cell_attribute_manager() const
         {
             return cell_attribute_manager_;
@@ -86,17 +88,11 @@ namespace geode
     }
 
     template < index_t dimension >
-    LightRegularGrid< dimension >::LightRegularGrid( LightRegularGrid&& other )
-        : Grid< dimension >( std::move( other ) ),
-          Identifier( std::move( other ) ),
-          impl_( std::move( other.impl_ ) )
-    {
-    }
+    LightRegularGrid< dimension >::LightRegularGrid(
+        LightRegularGrid&& ) noexcept = default;
 
     template < index_t dimension >
-    LightRegularGrid< dimension >::~LightRegularGrid() // NOLINT
-    {
-    }
+    LightRegularGrid< dimension >::~LightRegularGrid() = default;
 
     template < index_t dimension >
     index_t LightRegularGrid< dimension >::vertex_index(

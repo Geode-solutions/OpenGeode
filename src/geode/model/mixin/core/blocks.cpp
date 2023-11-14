@@ -55,20 +55,14 @@ namespace geode
     Blocks< dimension >::Blocks() = default;
 
     template < index_t dimension >
-    Blocks< dimension >::Blocks( Blocks&& other )
-        : impl_( std::move( other.impl_ ) )
-    {
-    }
+    Blocks< dimension >::Blocks( Blocks&& ) noexcept = default;
 
     template < index_t dimension >
     Blocks< dimension >::~Blocks() = default;
 
     template < index_t dimension >
-    auto Blocks< dimension >::operator=( Blocks&& other ) -> Blocks&
-    {
-        impl_ = std::move( other.impl_ );
-        return *this;
-    }
+    auto Blocks< dimension >::operator=( Blocks&& ) noexcept
+        -> Blocks& = default;
 
     template < index_t dimension >
     index_t Blocks< dimension >::nb_blocks() const
@@ -270,10 +264,7 @@ namespace geode
 
     template < index_t dimension >
     Blocks< dimension >::BlockRangeBase::BlockRangeBase(
-        BlockRangeBase&& other ) noexcept
-        : impl_( std::move( other.impl_ ) )
-    {
-    }
+        BlockRangeBase&& ) noexcept = default;
 
     template < index_t dimension >
     Blocks< dimension >::BlockRangeBase::BlockRangeBase(

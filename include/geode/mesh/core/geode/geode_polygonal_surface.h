@@ -49,9 +49,9 @@ namespace geode
         static constexpr auto dim = dimension;
 
         OpenGeodePolygonalSurface();
-        OpenGeodePolygonalSurface( OpenGeodePolygonalSurface&& other );
+        OpenGeodePolygonalSurface( OpenGeodePolygonalSurface&& other ) noexcept;
         OpenGeodePolygonalSurface& operator=(
-            OpenGeodePolygonalSurface&& other );
+            OpenGeodePolygonalSurface&& other ) noexcept;
         ~OpenGeodePolygonalSurface();
 
         static MeshImpl impl_name_static()

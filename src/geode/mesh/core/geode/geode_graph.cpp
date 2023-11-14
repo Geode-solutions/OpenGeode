@@ -55,17 +55,10 @@ namespace geode
 
     OpenGeodeGraph::OpenGeodeGraph() : impl_( *this ) {}
 
-    OpenGeodeGraph::OpenGeodeGraph( OpenGeodeGraph&& other )
-        : Graph( std::move( other ) ), impl_( std::move( other.impl_ ) )
-    {
-    }
+    OpenGeodeGraph::OpenGeodeGraph( OpenGeodeGraph&& ) noexcept = default;
 
-    OpenGeodeGraph& OpenGeodeGraph::operator=( OpenGeodeGraph&& other )
-    {
-        Graph::operator=( std::move( other ) );
-        impl_ = std::move( other.impl_ );
-        return *this;
-    }
+    OpenGeodeGraph& OpenGeodeGraph::operator=(
+        OpenGeodeGraph&& ) noexcept = default;
 
     OpenGeodeGraph::~OpenGeodeGraph() = default;
 

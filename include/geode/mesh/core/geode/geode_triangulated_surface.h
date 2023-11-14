@@ -51,9 +51,10 @@ namespace geode
         static constexpr auto dim = dimension;
 
         OpenGeodeTriangulatedSurface();
-        OpenGeodeTriangulatedSurface( OpenGeodeTriangulatedSurface&& other );
+        OpenGeodeTriangulatedSurface(
+            OpenGeodeTriangulatedSurface&& other ) noexcept;
         OpenGeodeTriangulatedSurface& operator=(
-            OpenGeodeTriangulatedSurface&& other );
+            OpenGeodeTriangulatedSurface&& other ) noexcept;
         ~OpenGeodeTriangulatedSurface();
 
         static MeshImpl impl_name_static()

@@ -52,8 +52,6 @@ namespace geode
         {
         }
 
-        Impl( Impl&& other ) = default;
-
         AttributeManager& edge_attribute_manager() const
         {
             return edge_attribute_manager_;
@@ -144,17 +142,9 @@ namespace geode
 
     Graph::Graph() : impl_( *this ) {}
 
-    Graph::Graph( Graph&& other )
-        : VertexSet( std::move( other ) ), impl_( std::move( other.impl_ ) )
-    {
-    }
+    Graph::Graph( Graph&& ) noexcept = default;
 
-    Graph& Graph::operator=( Graph&& other )
-    {
-        VertexSet::operator=( std::move( other ) );
-        impl_ = std::move( other.impl_ );
-        return *this;
-    }
+    Graph& Graph::operator=( Graph&& ) noexcept = default;
 
     Graph::~Graph() = default;
 

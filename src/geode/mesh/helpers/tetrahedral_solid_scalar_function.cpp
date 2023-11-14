@@ -106,10 +106,7 @@ namespace geode
 
     template < index_t dimension >
     TetrahedralSolidScalarFunction< dimension >::TetrahedralSolidScalarFunction(
-        TetrahedralSolidScalarFunction< dimension >&& other )
-        : impl_( std::move( other.impl_ ) )
-    {
-    }
+        TetrahedralSolidScalarFunction< dimension >&& ) noexcept = default;
 
     template < index_t dimension >
     TetrahedralSolidScalarFunction< dimension >::TetrahedralSolidScalarFunction(
@@ -130,9 +127,7 @@ namespace geode
 
     template < index_t dimension >
     TetrahedralSolidScalarFunction<
-        dimension >::~TetrahedralSolidScalarFunction()
-    {
-    }
+        dimension >::~TetrahedralSolidScalarFunction() = default;
 
     template < index_t dimension >
     TetrahedralSolidScalarFunction< dimension >

@@ -446,8 +446,8 @@ namespace geode
             absl::string_view directory, RelationshipsBuilderKey );
 
     protected:
-        Relationships( Relationships&& other );
-        Relationships& operator=( Relationships&& other );
+        Relationships( Relationships&& other ) noexcept;
+        Relationships& operator=( Relationships&& other ) noexcept;
 
     private:
         IMPLEMENTATION_MEMBER( impl_ );

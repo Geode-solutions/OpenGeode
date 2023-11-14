@@ -111,16 +111,9 @@ namespace geode
 
     Identifier::~Identifier() = default;
 
-    Identifier::Identifier( Identifier&& other ) noexcept
-        : impl_( std::move( other.impl_ ) )
-    {
-    }
+    Identifier::Identifier( Identifier&& ) noexcept = default;
 
-    Identifier& Identifier::operator=( Identifier&& other ) noexcept
-    {
-        impl_ = std::move( other.impl_ );
-        return *this;
-    }
+    Identifier& Identifier::operator=( Identifier&& ) noexcept = default;
 
     const uuid& Identifier::id() const
     {

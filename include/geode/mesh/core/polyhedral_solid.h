@@ -70,8 +70,9 @@ namespace geode
 
     protected:
         PolyhedralSolid() = default;
-        PolyhedralSolid( PolyhedralSolid&& other ) = default;
-        PolyhedralSolid& operator=( PolyhedralSolid&& other ) = default;
+        PolyhedralSolid( PolyhedralSolid&& other ) noexcept = default;
+        PolyhedralSolid& operator=(
+            PolyhedralSolid&& other ) noexcept = default;
 
     private:
         friend class bitsery::Access;

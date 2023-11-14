@@ -42,7 +42,7 @@ namespace geode
 
     public:
         TetrahedralSolidScalarFunction(
-            TetrahedralSolidScalarFunction< dimension >&& other );
+            TetrahedralSolidScalarFunction< dimension >&& other ) noexcept;
         ~TetrahedralSolidScalarFunction();
 
         /*!

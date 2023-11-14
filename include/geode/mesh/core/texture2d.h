@@ -48,7 +48,7 @@ namespace geode
 
     public:
         Texture( AttributeManager& manager, absl::string_view name );
-        Texture( Texture&& other );
+        Texture( Texture&& other ) noexcept;
         ~Texture();
 
         const RasterImage2D& image() const;

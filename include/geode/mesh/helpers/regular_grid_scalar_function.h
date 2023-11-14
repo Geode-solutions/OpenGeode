@@ -41,7 +41,7 @@ namespace geode
     {
     public:
         RegularGridScalarFunction(
-            RegularGridScalarFunction< dimension >&& other );
+            RegularGridScalarFunction< dimension >&& other ) noexcept;
         ~RegularGridScalarFunction();
 
         /*!

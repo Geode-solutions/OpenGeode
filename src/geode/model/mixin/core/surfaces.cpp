@@ -48,28 +48,20 @@ namespace geode
     {
     public:
         Impl() = default;
-        Impl( Impl&& other ) = default;
     };
 
     template < index_t dimension >
     Surfaces< dimension >::Surfaces() = default;
 
     template < index_t dimension >
-    Surfaces< dimension >::Surfaces( Surfaces&& other )
-        : impl_( std::move( other.impl_ ) )
-    {
-    }
+    Surfaces< dimension >::Surfaces( Surfaces&& ) noexcept = default;
 
     template < index_t dimension >
     Surfaces< dimension >::~Surfaces() = default;
 
     template < index_t dimension >
     Surfaces< dimension >& Surfaces< dimension >::operator=(
-        Surfaces< dimension >&& other )
-    {
-        impl_ = std::move( other.impl_ );
-        return *this;
-    }
+        Surfaces< dimension >&& ) noexcept = default;
 
     template < index_t dimension >
     index_t Surfaces< dimension >::nb_surfaces() const
@@ -273,10 +265,7 @@ namespace geode
 
     template < index_t dimension >
     Surfaces< dimension >::SurfaceRangeBase::SurfaceRangeBase(
-        SurfaceRangeBase&& other ) noexcept
-        : impl_( std::move( other.impl_ ) )
-    {
-    }
+        SurfaceRangeBase&& ) noexcept = default;
 
     template < index_t dimension >
     Surfaces< dimension >::SurfaceRangeBase::SurfaceRangeBase(

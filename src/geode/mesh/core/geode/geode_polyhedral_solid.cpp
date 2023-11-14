@@ -415,26 +415,16 @@ namespace geode
 
     template < index_t dimension >
     OpenGeodePolyhedralSolid< dimension >::OpenGeodePolyhedralSolid(
-        OpenGeodePolyhedralSolid&& other )
-        : PolyhedralSolid< dimension >( std::move( other ) ),
-          impl_( std::move( other.impl_ ) )
-    {
-    }
+        OpenGeodePolyhedralSolid&& ) noexcept = default;
 
     template < index_t dimension >
     OpenGeodePolyhedralSolid< dimension >&
         OpenGeodePolyhedralSolid< dimension >::operator=(
-            OpenGeodePolyhedralSolid&& other )
-    {
-        PolyhedralSolid< dimension >::operator=( std::move( other ) );
-        impl_ = std::move( other.impl_ );
-        return *this;
-    }
+            OpenGeodePolyhedralSolid&& ) noexcept = default;
 
     template < index_t dimension >
-    OpenGeodePolyhedralSolid< dimension >::~OpenGeodePolyhedralSolid() // NOLINT
-    {
-    }
+    OpenGeodePolyhedralSolid< dimension >::~OpenGeodePolyhedralSolid() =
+        default;
 
     template < index_t dimension >
     void OpenGeodePolyhedralSolid< dimension >::set_vertex(

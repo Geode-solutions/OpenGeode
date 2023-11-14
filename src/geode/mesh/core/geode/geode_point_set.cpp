@@ -67,25 +67,14 @@ namespace geode
 
     template < index_t dimension >
     OpenGeodePointSet< dimension >::OpenGeodePointSet(
-        OpenGeodePointSet&& other )
-        : PointSet< dimension >( std::move( other ) ),
-          impl_( std::move( other.impl_ ) )
-    {
-    }
+        OpenGeodePointSet&& ) noexcept = default;
 
     template < index_t dimension >
     OpenGeodePointSet< dimension >& OpenGeodePointSet< dimension >::operator=(
-        OpenGeodePointSet&& other )
-    {
-        PointSet< dimension >::operator=( std::move( other ) );
-        impl_ = std::move( other.impl_ );
-        return *this;
-    }
+        OpenGeodePointSet&& ) noexcept = default;
 
     template < index_t dimension >
-    OpenGeodePointSet< dimension >::~OpenGeodePointSet() // NOLINT
-    {
-    }
+    OpenGeodePointSet< dimension >::~OpenGeodePointSet() = default;
 
     template < index_t dimension >
     void OpenGeodePointSet< dimension >::set_vertex(
