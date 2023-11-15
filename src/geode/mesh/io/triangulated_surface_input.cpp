@@ -57,7 +57,7 @@ namespace geode
             Logger::error( e.what() );
             print_available_extensions<
                 TriangulatedSurfaceInputFactory< dimension > >( type );
-            Logger::info( "Other extensions are available in parent clases." );
+            Logger::info( "Other extensions are available in parent classes." );
             print_available_extensions< VertexSetInputFactory >( "VertexSet" );
             throw OpenGeodeException{
                 "Cannot load TriangulatedSurface from file: ", filename
