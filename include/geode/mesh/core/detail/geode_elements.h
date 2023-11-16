@@ -35,6 +35,10 @@ namespace geode
             quadrangle_edge_vertices{ { { 0, 1 }, { 0, 2 }, { 2, 3 },
                 { 1, 3 } } };
 
+        static constexpr std::array< std::array< geode::local_index_t, 2 >, 4 >
+            QUADRANGLE_EDGES_AROUND_VERTEX{ { { 0, 1 }, { 0, 3 }, { 1, 2 },
+                { 2, 3 } } };
+
         static constexpr std::array< std::array< geode::local_index_t, 3 >, 4 >
             tetrahedron_facet_vertices{ { { 1, 3, 2 }, { 0, 2, 3 }, { 3, 1, 0 },
                 { 0, 1, 2 } } };
