@@ -60,6 +60,8 @@ namespace geode
     typename SectionInput::MissingFiles opengeode_model_api
         check_section_missing_files( absl::string_view filename );
 
+    bool opengeode_model_api is_section_loadable( absl::string_view filename );
+
     using SectionInputFactory =
         Factory< std::string, SectionInput, absl::string_view >;
 } // namespace geode

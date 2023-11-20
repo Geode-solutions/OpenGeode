@@ -43,6 +43,10 @@
                                   + std::to_string( dimension ) + "D";         \
     module.def( check##dimension.c_str(),                                      \
         &check_raster_image_missing_files< dimension > );                      \
+    const auto loadable##dimension =                                           \
+        "is_raster_image_loadable" + std::to_string( dimension ) + "D";        \
+    module.def(                                                                \
+        loadable##dimension.c_str(), &is_raster_image_loadable< dimension > ); \
     PYTHON_INPUT_CLASS( RasterImage##dimension##D,                             \
         "RasterImage" + std::to_string( dimension ) + "D" );                   \
     const auto saveable##dimension =                                           \

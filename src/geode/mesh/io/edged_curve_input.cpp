@@ -80,6 +80,14 @@ namespace geode
         return input->check_missing_files();
     }
 
+    template < index_t dimension >
+    bool is_edged_curve_loadable( absl::string_view filename )
+    {
+        const auto input = detail::geode_object_input_reader<
+            EdgedCurveInputFactory< dimension > >( filename );
+        return input->is_loadable();
+    }
+
     template std::unique_ptr< EdgedCurve< 2 > > opengeode_mesh_api
         load_edged_curve( const MeshImpl&, absl::string_view );
     template std::unique_ptr< EdgedCurve< 3 > > opengeode_mesh_api
@@ -94,4 +102,9 @@ namespace geode
         check_edged_curve_missing_files< 2 >( absl::string_view );
     template EdgedCurveInput< 3 >::MissingFiles opengeode_mesh_api
         check_edged_curve_missing_files< 3 >( absl::string_view );
+
+    template bool opengeode_mesh_api is_edged_curve_loadable< 2 >(
+        absl::string_view );
+    template bool opengeode_mesh_api is_edged_curve_loadable< 3 >(
+        absl::string_view );
 } // namespace geode

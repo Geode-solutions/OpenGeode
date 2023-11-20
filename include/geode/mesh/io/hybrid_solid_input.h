@@ -79,6 +79,9 @@ namespace geode
         check_hybrid_solid_missing_files( absl::string_view filename );
 
     template < index_t dimension >
+    bool is_hybrid_solid_loadable( absl::string_view filename );
+
+    template < index_t dimension >
     using HybridSolidInputFactory = Factory< std::string,
         HybridSolidInput< dimension >,
         absl::string_view >;

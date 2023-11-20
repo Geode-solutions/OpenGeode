@@ -76,6 +76,9 @@ namespace geode
         check_regular_grid_missing_files( absl::string_view filename );
 
     template < index_t dimension >
+    bool is_regular_grid_loadable( absl::string_view filename );
+
+    template < index_t dimension >
     using RegularGridInputFactory = Factory< std::string,
         RegularGridInput< dimension >,
         absl::string_view >;

@@ -80,6 +80,9 @@ namespace geode
         check_polyhedral_solid_missing_files( absl::string_view filename );
 
     template < index_t dimension >
+    bool is_polyhedral_solid_loadable( absl::string_view filename );
+
+    template < index_t dimension >
     using PolyhedralSolidInputFactory = Factory< std::string,
         PolyhedralSolidInput< dimension >,
         absl::string_view >;

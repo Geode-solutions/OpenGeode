@@ -71,6 +71,9 @@ namespace geode
     typename VertexSetInput::MissingFiles opengeode_mesh_api
         check_vertex_set_missing_files( absl::string_view filename );
 
+    bool opengeode_mesh_api is_vertex_set_loadable(
+        absl::string_view filename );
+
     using VertexSetInputFactory =
         Factory< std::string, VertexSetInput, absl::string_view >;
 } // namespace geode

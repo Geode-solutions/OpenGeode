@@ -80,6 +80,14 @@ namespace geode
         return input->check_missing_files();
     }
 
+    template < index_t dimension >
+    bool is_point_set_loadable( absl::string_view filename )
+    {
+        const auto input = detail::geode_object_input_reader<
+            PointSetInputFactory< dimension > >( filename );
+        return input->is_loadable();
+    }
+
     template std::unique_ptr< PointSet< 2 > > opengeode_mesh_api load_point_set(
         const MeshImpl&, absl::string_view );
     template std::unique_ptr< PointSet< 3 > > opengeode_mesh_api load_point_set(
@@ -94,4 +102,9 @@ namespace geode
         check_point_set_missing_files< 2 >( absl::string_view );
     template PointSetInput< 3 >::MissingFiles opengeode_mesh_api
         check_point_set_missing_files< 3 >( absl::string_view );
+
+    template bool opengeode_mesh_api is_point_set_loadable< 2 >(
+        absl::string_view );
+    template bool opengeode_mesh_api is_point_set_loadable< 3 >(
+        absl::string_view );
 } // namespace geode

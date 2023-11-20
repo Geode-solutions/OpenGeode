@@ -82,6 +82,14 @@ namespace geode
         return input->check_missing_files();
     }
 
+    template < index_t dimension >
+    bool is_polygonal_surface_loadable( absl::string_view filename )
+    {
+        const auto input = detail::geode_object_input_reader<
+            PolygonalSurfaceInputFactory< dimension > >( filename );
+        return input->is_loadable();
+    }
+
     template std::unique_ptr< PolygonalSurface< 2 > > opengeode_mesh_api
         load_polygonal_surface( const MeshImpl&, absl::string_view );
     template std::unique_ptr< PolygonalSurface< 3 > > opengeode_mesh_api
@@ -96,4 +104,9 @@ namespace geode
         check_polygonal_surface_missing_files< 2 >( absl::string_view );
     template PolygonalSurfaceInput< 3 >::MissingFiles opengeode_mesh_api
         check_polygonal_surface_missing_files< 3 >( absl::string_view );
+
+    template bool opengeode_mesh_api is_polygonal_surface_loadable< 2 >(
+        absl::string_view );
+    template bool opengeode_mesh_api is_polygonal_surface_loadable< 3 >(
+        absl::string_view );
 } // namespace geode

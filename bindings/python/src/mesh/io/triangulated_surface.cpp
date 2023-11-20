@@ -46,6 +46,10 @@
                                   + std::to_string( dimension ) + "D";         \
     module.def( check##dimension.c_str(),                                      \
         &check_triangulated_surface_missing_files< dimension > );              \
+    const auto loadable##dimension = "is_triangulated_surface_loadable"        \
+                                     + std::to_string( dimension ) + "D";      \
+    module.def( loadable##dimension.c_str(),                                   \
+        &is_triangulated_surface_loadable< dimension > );                      \
     PYTHON_INPUT_MESH_CLASS(                                                   \
         std::unique_ptr< TriangulatedSurface< dimension > >,                   \
         "TriangulatedSurface" + std::to_string( dimension ) + "D" );           \

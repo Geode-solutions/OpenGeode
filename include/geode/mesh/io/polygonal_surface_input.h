@@ -80,6 +80,9 @@ namespace geode
         check_polygonal_surface_missing_files( absl::string_view filename );
 
     template < index_t dimension >
+    bool is_polygonal_surface_loadable( absl::string_view filename );
+
+    template < index_t dimension >
     using PolygonalSurfaceInputFactory = Factory< std::string,
         PolygonalSurfaceInput< dimension >,
         absl::string_view >;

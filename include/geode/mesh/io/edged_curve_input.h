@@ -77,6 +77,9 @@ namespace geode
         check_edged_curve_missing_files( absl::string_view filename );
 
     template < index_t dimension >
+    bool is_edged_curve_loadable( absl::string_view filename );
+
+    template < index_t dimension >
     using EdgedCurveInputFactory =
         Factory< std::string, EdgedCurveInput< dimension >, absl::string_view >;
     ALIAS_2D_AND_3D( EdgedCurveInputFactory );

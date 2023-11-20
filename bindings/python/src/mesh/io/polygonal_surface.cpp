@@ -45,6 +45,10 @@
                                   + std::to_string( dimension ) + "D";         \
     module.def( check##dimension.c_str(),                                      \
         &check_polygonal_surface_missing_files< dimension > );                 \
+    const auto loadable##dimension =                                           \
+        "is_polygonal_surface_loadable" + std::to_string( dimension ) + "D";   \
+    module.def( loadable##dimension.c_str(),                                   \
+        &is_polygonal_surface_loadable< dimension > );                         \
     PYTHON_INPUT_MESH_CLASS( std::unique_ptr< PolygonalSurface< dimension > >, \
         "PolygonalSurface" + std::to_string( dimension ) + "D" );              \
     const auto saveable##dimension =                                           \

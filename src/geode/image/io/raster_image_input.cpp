@@ -59,6 +59,14 @@ namespace geode
         return input->check_missing_files();
     }
 
+    template < index_t dimension >
+    bool is_raster_image_loadable( absl::string_view filename )
+    {
+        const auto input = detail::geode_object_input_reader<
+            RasterImageInputFactory< dimension > >( filename );
+        return input->is_loadable();
+    }
+
     template RasterImage< 2 > opengeode_image_api load_raster_image(
         absl::string_view );
     template RasterImage< 3 > opengeode_image_api load_raster_image(
@@ -68,4 +76,9 @@ namespace geode
         check_raster_image_missing_files< 2 >( absl::string_view );
     template RasterImageInput< 3 >::MissingFiles opengeode_image_api
         check_raster_image_missing_files< 3 >( absl::string_view );
+
+    template bool opengeode_image_api is_raster_image_loadable< 2 >(
+        absl::string_view );
+    template bool opengeode_image_api is_raster_image_loadable< 3 >(
+        absl::string_view );
 } // namespace geode

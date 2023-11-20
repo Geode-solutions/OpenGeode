@@ -44,6 +44,10 @@
                                   + std::to_string( dimension ) + "D";         \
     module.def( check##dimension.c_str(),                                      \
         &check_hybrid_solid_missing_files< dimension > );                      \
+    const auto loadable##dimension =                                           \
+        "is_hybrid_solid_loadable" + std::to_string( dimension ) + "D";        \
+    module.def(                                                                \
+        loadable##dimension.c_str(), &is_hybrid_solid_loadable< dimension > ); \
     PYTHON_INPUT_MESH_CLASS( std::unique_ptr< HybridSolid< dimension > >,      \
         "HybridSolid" + std::to_string( dimension ) + "D" );                   \
     const auto saveable##dimension =                                           \

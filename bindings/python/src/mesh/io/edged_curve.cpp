@@ -44,6 +44,10 @@
         "check_edged_curve_missing_files" + std::to_string( dimension ) + "D"; \
     module.def( check##dimension.c_str(),                                      \
         &check_edged_curve_missing_files< dimension > );                       \
+    const auto loadable##dimension =                                           \
+        "is_edged_curve_loadable" + std::to_string( dimension ) + "D";         \
+    module.def(                                                                \
+        loadable##dimension.c_str(), &is_edged_curve_loadable< dimension > );  \
     PYTHON_INPUT_MESH_CLASS( std::unique_ptr< EdgedCurve< dimension > >,       \
         "EdgedCurve" + std::to_string( dimension ) + "D" );                    \
     const auto saveable##dimension =                                           \

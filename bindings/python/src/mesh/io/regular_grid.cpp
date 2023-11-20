@@ -45,6 +45,10 @@
                                   + std::to_string( dimension ) + "D";         \
     module.def( check##dimension.c_str(),                                      \
         &check_regular_grid_missing_files< dimension > );                      \
+    const auto loadable##dimension =                                           \
+        "is_regular_grid_loadable" + std::to_string( dimension ) + "D";        \
+    module.def(                                                                \
+        loadable##dimension.c_str(), &is_regular_grid_loadable< dimension > ); \
     PYTHON_INPUT_MESH_CLASS( std::unique_ptr< RegularGrid< dimension > >,      \
         "RegularGrid" + std::to_string( dimension ) + "D" );                   \
     const auto saveable##dimension =                                           \

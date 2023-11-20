@@ -82,6 +82,9 @@ namespace geode
         check_triangulated_surface_missing_files( absl::string_view filename );
 
     template < index_t dimension >
+    bool is_triangulated_surface_loadable( absl::string_view filename );
+
+    template < index_t dimension >
     using TriangulatedSurfaceInputFactory = Factory< std::string,
         TriangulatedSurfaceInput< dimension >,
         absl::string_view >;
