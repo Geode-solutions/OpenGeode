@@ -63,6 +63,9 @@ namespace geode
         check_raster_image_missing_files( absl::string_view filename );
 
     template < index_t dimension >
+    bool is_raster_image_loadable( absl::string_view filename );
+
+    template < index_t dimension >
     using RasterImageInputFactory = Factory< std::string,
         RasterImageInput< dimension >,
         absl::string_view >;

@@ -70,4 +70,12 @@ namespace geode
                 filename );
         return input->check_missing_files();
     }
+
+    bool is_vertex_set_loadable( absl::string_view filename )
+    {
+        const auto input =
+            detail::geode_object_input_reader< VertexSetInputFactory >(
+                filename );
+        return input->is_loadable();
+    }
 } // namespace geode

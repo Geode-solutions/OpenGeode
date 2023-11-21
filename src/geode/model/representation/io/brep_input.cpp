@@ -69,4 +69,11 @@ namespace geode
             detail::geode_object_input_reader< BRepInputFactory >( filename );
         return input->check_missing_files();
     }
+
+    bool is_brep_loadable( absl::string_view filename )
+    {
+        const auto input =
+            detail::geode_object_input_reader< BRepInputFactory >( filename );
+        return input->is_loadable();
+    }
 } // namespace geode

@@ -60,6 +60,8 @@ namespace geode
     typename BRepInput::MissingFiles opengeode_model_api
         check_brep_missing_files( absl::string_view filename );
 
+    bool opengeode_model_api is_brep_loadable( absl::string_view filename );
+
     using BRepInputFactory =
         Factory< std::string, BRepInput, absl::string_view >;
 } // namespace geode

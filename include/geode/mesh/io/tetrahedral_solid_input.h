@@ -82,6 +82,9 @@ namespace geode
         check_tetrahedral_solid_missing_files( absl::string_view filename );
 
     template < index_t dimension >
+    bool is_tetrahedral_solid_loadable( absl::string_view filename );
+
+    template < index_t dimension >
     using TetrahedralSolidInputFactory = Factory< std::string,
         TetrahedralSolidInput< dimension >,
         absl::string_view >;

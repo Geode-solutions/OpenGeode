@@ -80,6 +80,14 @@ namespace geode
         return input->check_missing_files();
     }
 
+    template < index_t dimension >
+    bool is_hybrid_solid_loadable( absl::string_view filename )
+    {
+        const auto input = detail::geode_object_input_reader<
+            HybridSolidInputFactory< dimension > >( filename );
+        return input->is_loadable();
+    }
+
     template std::unique_ptr< HybridSolid< 3 > > opengeode_mesh_api
         load_hybrid_solid( const MeshImpl&, absl::string_view );
 
@@ -88,4 +96,7 @@ namespace geode
 
     template HybridSolidInput< 3 >::MissingFiles opengeode_mesh_api
         check_hybrid_solid_missing_files< 3 >( absl::string_view );
+
+    template bool opengeode_mesh_api is_hybrid_solid_loadable< 3 >(
+        absl::string_view );
 } // namespace geode

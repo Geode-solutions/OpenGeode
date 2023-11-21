@@ -45,6 +45,10 @@
                                   + std::to_string( dimension ) + "D";         \
     module.def( check##dimension.c_str(),                                      \
         &check_polyhedral_solid_missing_files< dimension > );                  \
+    const auto loadable##dimension =                                           \
+        "is_polyhedral_solid_loadable" + std::to_string( dimension ) + "D";    \
+    module.def( loadable##dimension.c_str(),                                   \
+        &is_polyhedral_solid_loadable< dimension > );                          \
     PYTHON_INPUT_MESH_CLASS( std::unique_ptr< PolyhedralSolid< dimension > >,  \
         "PolyhedralSolid" + std::to_string( dimension ) + "D" );               \
     const auto saveable##dimension =                                           \

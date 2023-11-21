@@ -83,6 +83,14 @@ namespace geode
         return input->check_missing_files();
     }
 
+    template < index_t dimension >
+    bool is_tetrahedral_solid_loadable( absl::string_view filename )
+    {
+        const auto input = detail::geode_object_input_reader<
+            TetrahedralSolidInputFactory< dimension > >( filename );
+        return input->is_loadable();
+    }
+
     template std::unique_ptr< TetrahedralSolid< 3 > > opengeode_mesh_api
         load_tetrahedral_solid( const MeshImpl&, absl::string_view );
 
@@ -91,4 +99,7 @@ namespace geode
 
     template TetrahedralSolidInput< 3 >::MissingFiles opengeode_mesh_api
         check_tetrahedral_solid_missing_files< 3 >( absl::string_view );
+
+    template bool opengeode_mesh_api is_tetrahedral_solid_loadable< 3 >(
+        absl::string_view );
 } // namespace geode

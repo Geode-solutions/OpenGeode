@@ -70,6 +70,8 @@ namespace geode
     typename GraphInput::MissingFiles opengeode_mesh_api
         check_graph_missing_files( absl::string_view filename );
 
+    bool opengeode_mesh_api is_graph_loadable( absl::string_view filename );
+
     using GraphInputFactory =
         Factory< std::string, GraphInput, absl::string_view >;
 } // namespace geode

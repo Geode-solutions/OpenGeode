@@ -77,6 +77,9 @@ namespace geode
         check_point_set_missing_files( absl::string_view filename );
 
     template < index_t dimension >
+    bool is_point_set_loadable( absl::string_view filename );
+
+    template < index_t dimension >
     using PointSetInputFactory =
         Factory< std::string, PointSetInput< dimension >, absl::string_view >;
     ALIAS_2D_AND_3D( PointSetInputFactory );

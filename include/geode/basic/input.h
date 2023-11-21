@@ -56,6 +56,11 @@ namespace geode
             return {};
         }
 
+        virtual bool is_loadable() const
+        {
+            return true;
+        }
+
         virtual Object read( const Args&... args ) = 0;
 
         ~Input()
