@@ -5,7 +5,7 @@ on:
 
 jobs:
   deploy:
-    uses: Geode-solutions/actions/.github/workflows/deploy.yml@master
+    uses: Geode-solutions/actions/.github/workflows/cpp-deploy.yml@master
     with:
       name: OPENGEODE
       directory: opengeode

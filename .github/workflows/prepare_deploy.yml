@@ -5,5 +5,5 @@ on:
 
 jobs:  
   prepare:
-    uses: Geode-solutions/actions/.github/workflows/prepare-deploy.yml@master
+    uses: Geode-solutions/actions/.github/workflows/cpp-prepare-deploy.yml@master
     secrets: inherit

@@ -8,8 +8,9 @@ on:
 jobs:
   schedule-next:
     if: ${{ github.event_name == 'schedule' }}
-    uses: Geode-solutions/actions/.github/workflows/schedule.yml@master
+    uses: Geode-solutions/actions/.github/workflows/cpp-schedule.yml@master
     with:
+      name: OPENGEODE
       directory: opengeode
       branch: next
     secrets: 
@@ -18,8 +19,9 @@ jobs:
 
   schedule-master:
     if: ${{ github.event_name == 'workflow_dispatch' }}
-    uses: Geode-solutions/actions/.github/workflows/schedule.yml@master
+    uses: Geode-solutions/actions/.github/workflows/cpp-schedule.yml@master
     with:
+      name: OPENGEODE
       directory: opengeode
       branch: master
     secrets: 
