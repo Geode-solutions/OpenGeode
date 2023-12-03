@@ -1,0 +1,9 @@
+name: Merge request
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    uses: Geode-solutions/actions/.github/workflows/cpp-merge-request.yml@master
+    secrets: inherit
