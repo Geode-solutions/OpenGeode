@@ -45,7 +45,7 @@ namespace geode
      * @param[in] filename Path to the file where save the PolygonalSurface.
      */
     template < index_t dimension >
-    void save_polygonal_surface(
+    std::vector< std::string > save_polygonal_surface(
         const PolygonalSurface< dimension >& polygonal_surface,
         absl::string_view filename );
 

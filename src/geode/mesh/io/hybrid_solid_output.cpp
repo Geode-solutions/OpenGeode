@@ -36,13 +36,14 @@
 namespace geode
 {
     template < index_t dimension >
-    void save_hybrid_solid( const HybridSolid< dimension >& hybrid_solid,
+    std::vector< std::string > save_hybrid_solid(
+        const HybridSolid< dimension >& hybrid_solid,
         absl::string_view filename )
     {
         const auto type = absl::StrCat( "HybridSolid", dimension, "D" );
         try
         {
-            detail::geode_object_output_impl<
+            return detail::geode_object_output_impl<
                 HybridSolidOutputFactory< dimension > >(
                 type, hybrid_solid, filename );
         }
@@ -67,7 +68,7 @@ namespace geode
         return output->is_saveable( hybrid_solid );
     }
 
-    template void opengeode_mesh_api save_hybrid_solid(
+    template std::vector< std::string > opengeode_mesh_api save_hybrid_solid(
         const HybridSolid< 3 >&, absl::string_view );
 
     template bool opengeode_mesh_api is_hybrid_solid_saveable(

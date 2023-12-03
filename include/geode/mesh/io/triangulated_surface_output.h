@@ -44,7 +44,7 @@ namespace geode
      * @param[in] filename Path to the file where save the TriangulatedSurface.
      */
     template < index_t dimension >
-    void save_triangulated_surface(
+    std::vector< std::string > save_triangulated_surface(
         const TriangulatedSurface< dimension >& triangulated_surface,
         absl::string_view filename );
 

@@ -36,14 +36,14 @@
 namespace geode
 {
     template < index_t dimension >
-    void save_polygonal_surface(
+    std::vector< std::string > save_polygonal_surface(
         const PolygonalSurface< dimension >& polygonal_surface,
         absl::string_view filename )
     {
         const auto type = absl::StrCat( "PolygonalSurface", dimension, "D" );
         try
         {
-            detail::geode_object_output_impl<
+            return detail::geode_object_output_impl<
                 PolygonalSurfaceOutputFactory< dimension > >(
                 type, polygonal_surface, filename );
         }
@@ -69,10 +69,12 @@ namespace geode
         return output->is_saveable( polygonal_surface );
     }
 
-    template void opengeode_mesh_api save_polygonal_surface(
-        const PolygonalSurface< 2 >&, absl::string_view );
-    template void opengeode_mesh_api save_polygonal_surface(
-        const PolygonalSurface< 3 >&, absl::string_view );
+    template std::vector< std::string >
+        opengeode_mesh_api save_polygonal_surface(
+            const PolygonalSurface< 2 >&, absl::string_view );
+    template std::vector< std::string >
+        opengeode_mesh_api save_polygonal_surface(
+            const PolygonalSurface< 3 >&, absl::string_view );
 
     template bool opengeode_mesh_api is_polygonal_surface_saveable(
         const PolygonalSurface< 2 >&, absl::string_view );

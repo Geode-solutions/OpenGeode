@@ -36,13 +36,13 @@
 namespace geode
 {
     template < index_t dimension >
-    void save_point_set(
+    std::vector< std::string > save_point_set(
         const PointSet< dimension >& point_set, absl::string_view filename )
     {
         const auto type = absl::StrCat( "PointSet", dimension, "D" );
         try
         {
-            detail::geode_object_output_impl<
+            return detail::geode_object_output_impl<
                 PointSetOutputFactory< dimension > >(
                 type, point_set, filename );
         }
@@ -67,9 +67,9 @@ namespace geode
         return output->is_saveable( point_set );
     }
 
-    template void opengeode_mesh_api save_point_set(
+    template std::vector< std::string > opengeode_mesh_api save_point_set(
         const PointSet< 2 >&, absl::string_view );
-    template void opengeode_mesh_api save_point_set(
+    template std::vector< std::string > opengeode_mesh_api save_point_set(
         const PointSet< 3 >&, absl::string_view );
 
     template bool opengeode_mesh_api is_point_set_saveable(

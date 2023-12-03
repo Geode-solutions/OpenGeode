@@ -36,14 +36,14 @@
 namespace geode
 {
     template < index_t dimension >
-    void save_polyhedral_solid(
+    std::vector< std::string > save_polyhedral_solid(
         const PolyhedralSolid< dimension >& polyhedral_solid,
         absl::string_view filename )
     {
         const auto type = absl::StrCat( "PolyhedralSolid", dimension, "D" );
         try
         {
-            detail::geode_object_output_impl<
+            return detail::geode_object_output_impl<
                 PolyhedralSolidOutputFactory< dimension > >(
                 type, polyhedral_solid, filename );
         }
@@ -69,8 +69,8 @@ namespace geode
         return output->is_saveable( polyhedral_solid );
     }
 
-    template void opengeode_mesh_api save_polyhedral_solid(
-        const PolyhedralSolid< 3 >&, absl::string_view );
+    template std::vector< std::string > opengeode_mesh_api
+        save_polyhedral_solid( const PolyhedralSolid< 3 >&, absl::string_view );
 
     template bool opengeode_mesh_api is_polyhedral_solid_saveable(
         const PolyhedralSolid< 3 >&, absl::string_view );

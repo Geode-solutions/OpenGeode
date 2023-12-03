@@ -33,12 +33,13 @@
 
 namespace geode
 {
-    void save_section( const Section& section, absl::string_view filename )
+    std::vector< std::string > save_section(
+        const Section& section, absl::string_view filename )
     {
         constexpr auto TYPE = "Section";
         try
         {
-            detail::geode_object_output_impl< SectionOutputFactory >(
+            return detail::geode_object_output_impl< SectionOutputFactory >(
                 TYPE, section, filename );
         }
         catch( const OpenGeodeException& e )

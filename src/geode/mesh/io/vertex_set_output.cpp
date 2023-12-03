@@ -32,13 +32,13 @@
 
 namespace geode
 {
-    void save_vertex_set(
+    std::vector< std::string > save_vertex_set(
         const VertexSet& vertex_set, absl::string_view filename )
     {
         constexpr auto type = "VertexSet";
         try
         {
-            detail::geode_object_output_impl< VertexSetOutputFactory >(
+            return detail::geode_object_output_impl< VertexSetOutputFactory >(
                 type, vertex_set, filename );
         }
         catch( const OpenGeodeException& e )

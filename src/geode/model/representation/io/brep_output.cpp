@@ -33,12 +33,13 @@
 
 namespace geode
 {
-    void save_brep( const BRep& brep, absl::string_view filename )
+    std::vector< std::string > save_brep(
+        const BRep& brep, absl::string_view filename )
     {
         constexpr auto TYPE = "BRep";
         try
         {
-            detail::geode_object_output_impl< BRepOutputFactory >(
+            return detail::geode_object_output_impl< BRepOutputFactory >(
                 TYPE, brep, filename );
         }
         catch( const OpenGeodeException& e )

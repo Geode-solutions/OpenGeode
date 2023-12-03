@@ -43,7 +43,7 @@ namespace geode
      * @param[in] section Section to save.
      * @param[in] filename Path to the file where save the section.
      */
-    void opengeode_model_api save_section(
+    std::vector< std::string > opengeode_model_api save_section(
         const Section& section, absl::string_view filename );
 
     class SectionOutput : public Output< Section >

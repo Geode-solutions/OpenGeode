@@ -43,7 +43,7 @@ namespace geode
      * @param[in] graph Graph to save.
      * @param[in] filename Path to the file where save the Graph.
      */
-    void opengeode_mesh_api save_graph(
+    std::vector< std::string > opengeode_mesh_api save_graph(
         const Graph& graph, absl::string_view filename );
 
     class GraphOutput : public Output< Graph >

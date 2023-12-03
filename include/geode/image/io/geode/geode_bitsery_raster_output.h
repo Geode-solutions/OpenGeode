@@ -39,7 +39,8 @@ namespace geode
         {
         }
 
-        void write( const RasterImage< dimension >& mesh ) const final
+        std::vector< std::string > write(
+            const RasterImage< dimension >& mesh ) const final
         {
             std::ofstream file{ to_string( this->filename() ),
                 std::ofstream::binary };
@@ -52,6 +53,7 @@ namespace geode
             OPENGEODE_EXCEPTION( std::get< 1 >( context ).isValid(),
                 "[Bitsery::write] Error while writing file: ",
                 this->filename() );
+            return { to_string( this->filename() ) };
         }
     };
     ALIAS_2D_AND_3D( OpenGeodeRasterImageOutput );

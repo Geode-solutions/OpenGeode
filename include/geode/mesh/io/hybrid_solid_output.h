@@ -44,7 +44,8 @@ namespace geode
      * @param[in] filename Path to the file where save the HybridSolid.
      */
     template < index_t dimension >
-    void save_hybrid_solid( const HybridSolid< dimension >& hybrid_solid,
+    std::vector< std::string > save_hybrid_solid(
+        const HybridSolid< dimension >& hybrid_solid,
         absl::string_view filename );
 
     template < index_t dimension >

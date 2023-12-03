@@ -34,12 +34,13 @@
 
 namespace geode
 {
-    void save_graph( const Graph& graph, absl::string_view filename )
+    std::vector< std::string > save_graph(
+        const Graph& graph, absl::string_view filename )
     {
         constexpr auto TYPE = "Graph";
         try
         {
-            detail::geode_object_output_impl< GraphOutputFactory >(
+            return detail::geode_object_output_impl< GraphOutputFactory >(
                 TYPE, graph, filename );
         }
         catch( const OpenGeodeException& e )

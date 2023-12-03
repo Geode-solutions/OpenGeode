@@ -44,7 +44,7 @@ namespace geode
      * @param[in] filename Path to the file where save the PointSet.
      */
     template < index_t dimension >
-    void save_point_set(
+    std::vector< std::string > save_point_set(
         const PointSet< dimension >& point_set, absl::string_view filename );
 
     template < index_t dimension >

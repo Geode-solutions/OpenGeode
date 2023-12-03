@@ -51,6 +51,6 @@ namespace geode
         void save_brep_files(
             const BRep& brep, absl::string_view directory ) const;
 
-        void write( const BRep& brep ) const final;
+        std::vector< std::string > write( const BRep& brep ) const final;
     };
 } // namespace geode

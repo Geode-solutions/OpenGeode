@@ -44,7 +44,7 @@ namespace geode
      * @param[in] filename Path to the file where save the TetrahedralSolid.
      */
     template < index_t dimension >
-    void save_tetrahedral_solid(
+    std::vector< std::string > save_tetrahedral_solid(
         const TetrahedralSolid< dimension >& tetrahedral_solid,
         absl::string_view filename );
 

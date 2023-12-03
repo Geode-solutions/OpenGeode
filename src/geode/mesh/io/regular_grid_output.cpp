@@ -37,13 +37,14 @@
 namespace geode
 {
     template < index_t dimension >
-    void save_regular_grid( const RegularGrid< dimension >& regular_grid,
+    std::vector< std::string > save_regular_grid(
+        const RegularGrid< dimension >& regular_grid,
         absl::string_view filename )
     {
         const auto type = absl::StrCat( "RegularGrid", dimension, "D" );
         try
         {
-            detail::geode_object_output_impl<
+            return detail::geode_object_output_impl<
                 RegularGridOutputFactory< dimension > >(
                 type, regular_grid, filename );
         }
@@ -68,9 +69,9 @@ namespace geode
         return output->is_saveable( regular_grid );
     }
 
-    template void opengeode_mesh_api save_regular_grid(
+    template std::vector< std::string > opengeode_mesh_api save_regular_grid(
         const RegularGrid< 2 >&, absl::string_view );
-    template void opengeode_mesh_api save_regular_grid(
+    template std::vector< std::string > opengeode_mesh_api save_regular_grid(
         const RegularGrid< 3 >&, absl::string_view );
 
     template bool opengeode_mesh_api is_regular_grid_saveable(
