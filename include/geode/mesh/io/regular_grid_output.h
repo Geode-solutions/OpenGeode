@@ -44,7 +44,8 @@ namespace geode
      * @param[in] filename Path to the file where save the RegularGrid.
      */
     template < index_t dimension >
-    void save_regular_grid( const RegularGrid< dimension >& regular_grid,
+    std::vector< std::string > save_regular_grid(
+        const RegularGrid< dimension >& regular_grid,
         absl::string_view filename );
 
     template < index_t dimension >

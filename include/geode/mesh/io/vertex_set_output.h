@@ -43,7 +43,7 @@ namespace geode
      * @param[in] vertex_set VertexSet to save.
      * @param[in] filename Path to the file where save the VertexSet.
      */
-    void opengeode_mesh_api save_vertex_set(
+    std::vector< std::string > opengeode_mesh_api save_vertex_set(
         const VertexSet& vertex_set, absl::string_view filename );
 
     class VertexSetOutput : public Output< VertexSet >

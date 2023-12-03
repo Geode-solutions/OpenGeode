@@ -43,7 +43,7 @@ namespace geode
      * @param[in] brep BRep to save.
      * @param[in] filename Path to the file where save the brep.
      */
-    void opengeode_model_api save_brep(
+    std::vector< std::string > opengeode_model_api save_brep(
         const BRep& brep, absl::string_view filename );
 
     class BRepOutput : public Output< BRep >

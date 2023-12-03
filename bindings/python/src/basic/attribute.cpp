@@ -36,8 +36,8 @@
         std::shared_ptr< ConstantAttribute< type > > >(                        \
         module, constant##name.c_str() )                                       \
         .def( "constant_value",                                                \
-            ( const type& (ConstantAttribute< type >::*) () const )            \
-                & ConstantAttribute< type >::value )                           \
+            static_cast< const type& (ConstantAttribute< type >::*) ()         \
+                    const >( &ConstantAttribute< type >::value ) )             \
         .def( "set_value", &ConstantAttribute< type >::set_value )             \
         .def( "default_value", &ConstantAttribute< type >::default_value );    \
     const auto variable##name = std::string{ "VariableAttribute" } + #name;    \

@@ -44,7 +44,8 @@ namespace geode
      * @param[in] filename Path to the file where save the EdgedCurve.
      */
     template < index_t dimension >
-    void save_edged_curve( const EdgedCurve< dimension >& edged_curve,
+    std::vector< std::string > save_edged_curve(
+        const EdgedCurve< dimension >& edged_curve,
         absl::string_view filename );
 
     template < index_t dimension >

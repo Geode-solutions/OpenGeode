@@ -65,10 +65,12 @@ namespace geode
         }
     }
 
-    void OpenGeodeSectionOutput::write( const Section& section ) const
+    std::vector< std::string > OpenGeodeSectionOutput::write(
+        const Section& section ) const
     {
         const ZipFile zip_writer{ filename(), uuid{}.string() };
         save_section_files( section, zip_writer.directory() );
         archive_section_files( zip_writer );
+        return { to_string( filename() ) };
     }
 } // namespace geode

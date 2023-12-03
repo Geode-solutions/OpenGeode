@@ -32,19 +32,21 @@
 namespace geode
 {
     template < index_t dimension >
-    void save_raster_image(
+    std::vector< std::string > save_raster_image(
         const RasterImage< dimension >& raster, absl::string_view filename )
     {
+        const auto type = absl::StrCat( "RasterImage", dimension, "D" );
         try
         {
-            detail::geode_object_output_impl<
+            return detail::geode_object_output_impl<
                 RasterImageOutputFactory< dimension > >(
-                absl::StrCat( "RasterImage", dimension, "D" ), raster,
-                filename );
+                type, raster, filename );
         }
         catch( const OpenGeodeException& e )
         {
             Logger::error( e.what() );
+            print_available_extensions< RasterImageOutputFactory< dimension > >(
+                type );
             throw OpenGeodeException{ "Cannot save RasterImage in file: ",
                 filename };
         }
@@ -59,9 +61,9 @@ namespace geode
         return output->is_saveable( raster );
     }
 
-    template void opengeode_image_api save_raster_image(
+    template std::vector< std::string > opengeode_image_api save_raster_image(
         const RasterImage< 2 >&, absl::string_view );
-    template void opengeode_image_api save_raster_image(
+    template std::vector< std::string > opengeode_image_api save_raster_image(
         const RasterImage< 3 >&, absl::string_view );
 
     template bool opengeode_image_api is_raster_image_saveable(

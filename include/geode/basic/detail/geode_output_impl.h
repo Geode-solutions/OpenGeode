@@ -51,7 +51,8 @@ namespace geode
         }
 
         template < typename Factory, typename Object >
-        void geode_object_output_impl( absl::string_view type,
+        std::vector< std::string > geode_object_output_impl(
+            absl::string_view type,
             const Object& object,
             absl::string_view filename )
         {
@@ -59,9 +60,10 @@ namespace geode
             auto output = geode_object_output_writer< Factory >( filename );
             ghc::filesystem::create_directories(
                 filepath_without_filename( filename ) );
-            output->write( object );
+            auto result = output->write( object );
             Logger::info(
                 type, " saved in ", filename, " in ", timer.duration() );
+            return result;
         }
     } // namespace detail
 } // namespace geode

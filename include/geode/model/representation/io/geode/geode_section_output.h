@@ -52,6 +52,6 @@ namespace geode
 
         void archive_section_files( const ZipFile& zip_writer ) const;
 
-        void write( const Section& section ) const final;
+        std::vector< std::string > write( const Section& section ) const final;
     };
 } // namespace geode

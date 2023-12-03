@@ -36,13 +36,13 @@
 namespace geode
 {
     template < index_t dimension >
-    void save_edged_curve(
+    std::vector< std::string > save_edged_curve(
         const EdgedCurve< dimension >& edged_curve, absl::string_view filename )
     {
         const auto type = absl::StrCat( "EdgedCurve", dimension, "D" );
         try
         {
-            detail::geode_object_output_impl<
+            return detail::geode_object_output_impl<
                 EdgedCurveOutputFactory< dimension > >(
                 type, edged_curve, filename );
         }
@@ -67,9 +67,9 @@ namespace geode
         return output->is_saveable( edged_curve );
     }
 
-    template void opengeode_mesh_api save_edged_curve(
+    template std::vector< std::string > opengeode_mesh_api save_edged_curve(
         const EdgedCurve< 2 >&, absl::string_view );
-    template void opengeode_mesh_api save_edged_curve(
+    template std::vector< std::string > opengeode_mesh_api save_edged_curve(
         const EdgedCurve< 3 >&, absl::string_view );
 
     template bool opengeode_mesh_api is_edged_curve_saveable(

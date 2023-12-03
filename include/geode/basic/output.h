@@ -32,7 +32,8 @@ namespace geode
     class Output : public IOFile
     {
     public:
-        virtual void write( const Object& object ) const = 0;
+        virtual std::vector< std::string > write(
+            const Object& object ) const = 0;
 
         virtual bool is_saveable( const Object& /*unused*/ ) const
         {
