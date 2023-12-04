@@ -24,6 +24,8 @@
 #pragma once
 
 #include <memory>
+#include <string>
+#include <vector>
 
 #include <ghc/filesystem.hpp>
 

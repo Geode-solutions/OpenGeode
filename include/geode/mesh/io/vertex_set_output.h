@@ -23,6 +23,9 @@
 
 #pragma once
 
+#include <string>
+#include <vector>
+
 #include <absl/strings/string_view.h>
 
 #include <geode/basic/factory.h>

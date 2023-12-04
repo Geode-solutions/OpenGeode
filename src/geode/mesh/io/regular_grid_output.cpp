@@ -23,6 +23,9 @@
 
 #include <geode/mesh/io/regular_grid_output.h>
 
+#include <string>
+#include <vector>
+
 #include <absl/strings/str_cat.h>
 #include <absl/strings/string_view.h>
 

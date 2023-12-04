@@ -24,6 +24,8 @@
 #pragma once
 
 #include <fstream>
+#include <string>
+#include <vector>
 
 #include <geode/image/core/bitsery_archive.h>
 #include <geode/image/io/raster_image_output.h>

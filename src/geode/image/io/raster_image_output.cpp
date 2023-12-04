@@ -23,6 +23,10 @@
 
 #include <geode/image/io/raster_image_output.h>
 
+#include <string>
+#include <vector>
+
+#include <absl/strings/str_cat.h>
 #include <absl/strings/string_view.h>
 
 #include <geode/basic/detail/geode_output_impl.h>

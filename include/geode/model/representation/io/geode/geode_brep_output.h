@@ -23,6 +23,9 @@
 
 #pragma once
 
+#include <string>
+#include <vector>
+
 #include <geode/model/representation/core/brep.h>
 #include <geode/model/representation/io/brep_output.h>
 
