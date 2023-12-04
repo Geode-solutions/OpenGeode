@@ -33,6 +33,8 @@
 #include <geode/basic/uuid.h>
 #include <geode/basic/zip_file.h>
 
+#include <geode/model/representation/core/section.h>
+
 namespace geode
 {
     void OpenGeodeSectionOutput::save_section_files(
