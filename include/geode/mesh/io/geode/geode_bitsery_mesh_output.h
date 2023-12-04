@@ -24,8 +24,6 @@
 #pragma once
 
 #include <fstream>
-#include <string>
-#include <vector>
 
 #include <geode/geometry/bitsery_archive.h>
 

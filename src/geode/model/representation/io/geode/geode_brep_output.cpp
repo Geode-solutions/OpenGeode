@@ -33,6 +33,8 @@
 #include <geode/basic/uuid.h>
 #include <geode/basic/zip_file.h>
 
+#include <geode/model/representation/core/brep.h>
+
 namespace geode
 {
     void OpenGeodeBRepOutput::archive_brep_files(
