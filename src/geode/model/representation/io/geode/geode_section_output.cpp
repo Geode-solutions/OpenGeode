@@ -23,6 +23,9 @@
 
 #include <geode/model/representation/io/geode/geode_section_output.h>
 
+#include <string>
+#include <vector>
+
 #include <async++.h>
 
 #include <ghc/filesystem.hpp>

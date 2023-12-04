@@ -23,6 +23,9 @@
 
 #pragma once
 
+#include <string>
+#include <vector>
+
 #include <geode/model/representation/core/section.h>
 #include <geode/model/representation/io/section_output.h>
 

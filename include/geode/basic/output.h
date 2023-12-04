@@ -23,6 +23,9 @@
 
 #pragma once
 
+#include <string>
+#include <vector>
+
 #include <geode/basic/common.h>
 #include <geode/basic/io.h>
 

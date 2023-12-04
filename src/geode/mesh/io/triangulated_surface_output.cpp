@@ -23,6 +23,9 @@
 
 #include <geode/mesh/io/triangulated_surface_output.h>
 
+#include <string>
+#include <vector>
+
 #include <absl/strings/str_cat.h>
 #include <absl/strings/string_view.h>
 
