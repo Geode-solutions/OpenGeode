@@ -64,8 +64,6 @@ namespace geode
 
         Impl( absl::Span< const BoundingBox< dimension > > bboxes );
 
-        Impl& operator=( Impl&& other ) noexcept = default;
-
         index_t nb_bboxes() const;
 
         static bool is_leaf( index_t box_begin, index_t box_end );
