@@ -35,17 +35,14 @@ namespace geode
 {
     /*!
      * Delete some elements from a given vector.
-     * @tparam T Type of the vector elements.
      * @param[in] to_delete Vector of the same size than values. If to_delete[i]
      * is true the i-th element is deleted, else the element is kept.
      * @param[in/out] values Vector in which perform deletions.
-     * @pre T should have default constructor (needed for call resize method on
-     * vector).
      * @return The number of deleted elements
      */
-    template < typename T >
+    template < typename DeleteContainer, typename ValueContainer >
     index_t delete_vector_elements(
-        const std::vector< bool >& to_delete, std::vector< T >& values )
+        const DeleteContainer& to_delete, ValueContainer& values )
     {
         OPENGEODE_ASSERT( to_delete.size() == values.size(),
             "[delete_vector_elements] Number of elements in the two vectors "
@@ -73,15 +70,14 @@ namespace geode
 
     /*!
      * Create a new vector containing only some elements from a given vector.
-     * @tparam T Type of the vector elements.
      * @param[in] to_keep Vector of the same size than in_values. If to_keep[i]
      * is true the i-th element is kept.
      * @param[in] in_values Vector in which perform deletions.
      * @return A vector containing only kept elements of in_values
      */
-    template < typename T >
-    std::vector< T > extract_vector_elements(
-        const std::vector< bool >& to_keep, const std::vector< T >& in_values )
+    template < typename DeleteContainer, typename ValueContainer >
+    ValueContainer extract_vector_elements(
+        const DeleteContainer& to_keep, const ValueContainer& in_values )
     {
         OPENGEODE_ASSERT( to_keep.size() == in_values.size(),
             "[extract_vector_elements] Number of elements in the two vectors "
@@ -92,7 +88,7 @@ namespace geode
         {
             return in_values;
         }
-        std::vector< T > out_values;
+        ValueContainer out_values;
         out_values.reserve( nb );
         for( const auto i : Indices{ to_keep } )
         {
