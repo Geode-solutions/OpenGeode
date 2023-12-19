@@ -34,6 +34,7 @@
 #include <geode/mesh/builder/surface_mesh_builder.h>
 #include <geode/mesh/core/edged_curve.h>
 #include <geode/mesh/core/hybrid_solid.h>
+#include <geode/mesh/core/mesh_element.h>
 #include <geode/mesh/core/polygonal_surface.h>
 #include <geode/mesh/core/polyhedral_solid.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
@@ -110,6 +111,11 @@ namespace
 
         const absl::flat_hash_map< geode::index_t, geode::index_t >&
             vertices() const
+        {
+            return vertices_;
+        }
+        const absl::flat_hash_map< geode::index_t, geode::MeshElement >&
+            polyhedra() const
         {
             return vertices_;
         }
@@ -191,6 +197,13 @@ namespace
                           geode::unique_vertex_from_conversion_attribute_type >(
                           geode::unique_vertex_from_conversion_attribute_name,
                           geode::NO_ID )
+              },
+              mesh_element_mapping_{
+                  mesh_->polyhedron_attribute_manager()
+                      .template find_or_create_attribute<
+                          geode::VariableAttribute,
+                          geode::mesh_elements_attribute_type >(
+                          geode::mesh_elements_attribute_name, {} )
               }
         {
         }
@@ -259,6 +272,8 @@ namespace
                 polyhedra[p] = builder_->create_polyhedron(
                     polyhedron_vertices, polyhedron_facet_vertices );
                 attribute_uuid_->set_value( polyhedra[p], block.id() );
+                mesh_element_mapping_->set_value(
+                    polyhedra[p], { block.id(), p } );
             }
             return polyhedra;
         }
@@ -273,6 +288,9 @@ namespace
         std::shared_ptr< geode::VariableAttribute<
             geode::unique_vertex_from_conversion_attribute_type > >
             attribute_unique_vertex_;
+        std::shared_ptr<
+            geode::VariableAttribute< geode::mesh_elements_attribute_type > >
+            mesh_element_mapping_;
     };
 
     template < typename SurfaceType, typename Model >
@@ -300,6 +318,13 @@ namespace
                           geode::unique_vertex_from_conversion_attribute_type >(
                           geode::unique_vertex_from_conversion_attribute_name,
                           geode::NO_ID )
+              },
+              mesh_element_mapping_{
+                  mesh_->polygon_attribute_manager()
+                      .template find_or_create_attribute<
+                          geode::VariableAttribute,
+                          geode::mesh_elements_attribute_type >(
+                          geode::mesh_elements_attribute_name, {} )
               }
         {
         }
@@ -378,6 +403,8 @@ namespace
                 }
                 polygons[p] = builder_->create_polygon( polygon );
                 attribute_uuid_->set_value( polygons[p], surface.id() );
+                mesh_element_mapping_->set_value(
+                    polygons[p], { surface.id(), p } );
             }
             return polygons;
         }
@@ -392,6 +419,9 @@ namespace
         std::shared_ptr< geode::VariableAttribute<
             geode::unique_vertex_from_conversion_attribute_type > >
             attribute_unique_vertex_;
+        std::shared_ptr<
+            geode::VariableAttribute< geode::mesh_elements_attribute_type > >
+            mesh_element_mapping_;
     };
 
     template < typename SurfaceType >
@@ -424,6 +454,13 @@ namespace
                           geode::unique_vertex_from_conversion_attribute_type >(
                           geode::unique_vertex_from_conversion_attribute_name,
                           geode::NO_ID )
+              },
+              mesh_element_mapping_{
+                  mesh_->edge_attribute_manager()
+                      .template find_or_create_attribute<
+                          geode::VariableAttribute,
+                          geode::mesh_elements_attribute_type >(
+                          geode::mesh_elements_attribute_name, {} )
               }
         {
         }
@@ -470,6 +507,7 @@ namespace
                 const auto edge =
                     builder_->create_edge( vertices[0], vertices[1] );
                 attribute_uuid_->set_value( edge, line.id() );
+                mesh_element_mapping_->set_value( edge, { line.id(), e } );
             }
         }
 
@@ -483,6 +521,9 @@ namespace
         std::shared_ptr< geode::VariableAttribute<
             geode::unique_vertex_from_conversion_attribute_type > >
             attribute_unique_vertex_;
+        std::shared_ptr<
+            geode::VariableAttribute< geode::mesh_elements_attribute_type > >
+            mesh_element_mapping_;
     };
 
     using CurveFromBRep = CurveFromModel< geode::BRep >;

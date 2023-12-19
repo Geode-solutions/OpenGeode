@@ -31,6 +31,7 @@ namespace geode
 {
     struct MeshElement
     {
+        OPENGEODE_MESH_DEPRECATED MeshElement() = default;
         MeshElement( uuid mesh_id_in, index_t element_id_in )
             : mesh_id( std::move( mesh_id_in ) ), element_id( element_id_in )
         {
@@ -63,11 +64,10 @@ namespace geode
         }
 
         uuid mesh_id;
-        index_t element_id;
+        index_t element_id = NO_ID;
 
     private:
         friend class bitsery::Access;
-        MeshElement() = default;
     };
 
     struct MeshVertex : public MeshElement
