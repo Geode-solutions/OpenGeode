@@ -114,11 +114,6 @@ namespace
         {
             return vertices_;
         }
-        const absl::flat_hash_map< geode::index_t, geode::MeshElement >&
-            polyhedra() const
-        {
-            return vertices_;
-        }
 
     private:
         const Model& model_;
