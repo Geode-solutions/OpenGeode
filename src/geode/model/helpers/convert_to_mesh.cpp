@@ -21,10 +21,13 @@
  *
  */
 
+#include <memory>
+
 #include <geode/model/helpers/convert_to_mesh.h>
 
 #include <absl/container/flat_hash_map.h>
 
+#include <geode/basic/attribute.h>
 #include <geode/basic/attribute_manager.h>
 
 #include <geode/geometry/point.h>
@@ -34,7 +37,6 @@
 #include <geode/mesh/builder/surface_mesh_builder.h>
 #include <geode/mesh/core/edged_curve.h>
 #include <geode/mesh/core/hybrid_solid.h>
-#include <geode/mesh/core/mesh_element.h>
 #include <geode/mesh/core/polygonal_surface.h>
 #include <geode/mesh/core/polyhedral_solid.h>
 #include <geode/mesh/core/tetrahedral_solid.h>
@@ -183,14 +185,14 @@ namespace
                       .template find_or_create_attribute<
                           geode::VariableAttribute,
                           geode::uuid_from_conversion_attribute_type >(
-                          geode::uuid_from_conversion_attribute_name, {} )
+                          geode::UUID_FROM_CONVERSION_ATTRIBUTE_NAME, {} )
               },
               attribute_unique_vertex_{
                   mesh_->vertex_attribute_manager()
                       .template find_or_create_attribute<
                           geode::VariableAttribute,
                           geode::unique_vertex_from_conversion_attribute_type >(
-                          geode::unique_vertex_from_conversion_attribute_name,
+                          geode::UNIQUE_VERTEX_FROM_CONVERSION_ATTRIBUTE_NAME,
                           geode::NO_ID )
               },
               mesh_element_mapping_{
@@ -198,7 +200,8 @@ namespace
                       .template find_or_create_attribute<
                           geode::VariableAttribute,
                           geode::mesh_elements_attribute_type >(
-                          geode::mesh_elements_attribute_name, {} )
+                          geode::MESH_ELEMENT_ATTRIBUTE_NAME,
+                          { {}, geode::NO_ID } )
               }
         {
         }
@@ -304,14 +307,14 @@ namespace
                       .template find_or_create_attribute<
                           geode::VariableAttribute,
                           geode::uuid_from_conversion_attribute_type >(
-                          geode::uuid_from_conversion_attribute_name, {} )
+                          geode::UUID_FROM_CONVERSION_ATTRIBUTE_NAME, {} )
               },
               attribute_unique_vertex_{
                   mesh_->vertex_attribute_manager()
                       .template find_or_create_attribute<
                           geode::VariableAttribute,
                           geode::unique_vertex_from_conversion_attribute_type >(
-                          geode::unique_vertex_from_conversion_attribute_name,
+                          geode::UNIQUE_VERTEX_FROM_CONVERSION_ATTRIBUTE_NAME,
                           geode::NO_ID )
               },
               mesh_element_mapping_{
@@ -319,7 +322,8 @@ namespace
                       .template find_or_create_attribute<
                           geode::VariableAttribute,
                           geode::mesh_elements_attribute_type >(
-                          geode::mesh_elements_attribute_name, {} )
+                          geode::MESH_ELEMENT_ATTRIBUTE_NAME,
+                          { {}, geode::NO_ID } )
               }
         {
         }
@@ -440,14 +444,14 @@ namespace
                       .template find_or_create_attribute<
                           geode::VariableAttribute,
                           geode::uuid_from_conversion_attribute_type >(
-                          geode::uuid_from_conversion_attribute_name, {} )
+                          geode::UUID_FROM_CONVERSION_ATTRIBUTE_NAME, {} )
               },
               attribute_unique_vertex_{
                   mesh_->vertex_attribute_manager()
                       .template find_or_create_attribute<
                           geode::VariableAttribute,
                           geode::unique_vertex_from_conversion_attribute_type >(
-                          geode::unique_vertex_from_conversion_attribute_name,
+                          geode::UNIQUE_VERTEX_FROM_CONVERSION_ATTRIBUTE_NAME,
                           geode::NO_ID )
               },
               mesh_element_mapping_{
@@ -455,7 +459,8 @@ namespace
                       .template find_or_create_attribute<
                           geode::VariableAttribute,
                           geode::mesh_elements_attribute_type >(
-                          geode::mesh_elements_attribute_name, {} )
+                          geode::MESH_ELEMENT_ATTRIBUTE_NAME,
+                          { {}, geode::NO_ID } )
               }
         {
         }

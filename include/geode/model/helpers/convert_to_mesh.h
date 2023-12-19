@@ -43,13 +43,13 @@ namespace geode
 
 namespace geode
 {
-    static constexpr auto uuid_from_conversion_attribute_name =
+    static constexpr auto UUID_FROM_CONVERSION_ATTRIBUTE_NAME =
         "uuid_from_conversion";
     using uuid_from_conversion_attribute_type = uuid;
-    static constexpr auto unique_vertex_from_conversion_attribute_name =
+    static constexpr auto UNIQUE_VERTEX_FROM_CONVERSION_ATTRIBUTE_NAME =
         "unique_vertex_from_conversion";
     using unique_vertex_from_conversion_attribute_type = index_t;
-    static constexpr auto mesh_elements_attribute_name =
+    static constexpr auto MESH_ELEMENT_ATTRIBUTE_NAME =
         "mesh_elements_from_conversion";
     using mesh_elements_attribute_type = MeshElement;
 
