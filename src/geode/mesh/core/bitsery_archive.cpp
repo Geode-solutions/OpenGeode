@@ -261,6 +261,8 @@ namespace
         geode::AttributeManager::register_attribute_type<
             geode::HybridSolid3D::Type, Serializer >(
             context, "HybridSolidType" );
+        geode::AttributeManager::register_attribute_type< geode::MeshElement,
+            Serializer >( context, "SingleMeshElement" );
         geode::AttributeManager::register_attribute_type<
             std::vector< geode::MeshElement >, Serializer >(
             context, "MeshElement" );
