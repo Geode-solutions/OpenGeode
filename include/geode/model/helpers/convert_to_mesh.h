@@ -38,6 +38,7 @@ namespace geode
     class BRep;
     class Section;
     struct uuid;
+    struct MeshElement;
 } // namespace geode
 
 namespace geode
@@ -48,6 +49,9 @@ namespace geode
     static constexpr auto unique_vertex_from_conversion_attribute_name =
         "unique_vertex_from_conversion";
     using unique_vertex_from_conversion_attribute_type = index_t;
+    static constexpr auto MESH_ELEMENT_ATTRIBUTE_NAME =
+        "mesh_elements_from_conversion";
+    using mesh_elements_attribute_type = MeshElement;
 
     std::unique_ptr< EdgedCurve2D > opengeode_model_api
         convert_section_into_curve( const Section& section );
