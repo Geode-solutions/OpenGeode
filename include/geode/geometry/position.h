@@ -94,8 +94,7 @@ namespace geode
      * Return true if the three points are exactly aligned.
      */
     template < index_t dimension >
-    bool opengeode_geometry_api are_points_aligned(
-        const Point< dimension >& point0,
+    bool are_points_aligned( const Point< dimension >& point0,
         const Point< dimension >& point1,
         const Point< dimension >& point2 );
 } // namespace geode
