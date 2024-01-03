@@ -23,6 +23,7 @@
 
 #include <geode/mesh/helpers/rasterize.h>
 
+#include <array>
 #include <queue>
 
 #include <absl/container/flat_hash_map.h>
@@ -44,11 +45,9 @@
 #include <geode/geometry/perpendicular.h>
 #include <geode/geometry/position.h>
 
-#include <geode/mesh/builder/triangulated_surface_builder.h>
 #include <geode/mesh/core/detail/vertex_cycle.h>
 #include <geode/mesh/core/grid.h>
 #include <geode/mesh/core/triangulated_surface.h>
-#include <geode/mesh/io/triangulated_surface_output.h>
 
 namespace
 {
@@ -645,8 +644,6 @@ namespace
         absl::flat_hash_map< std::pair< geode::index_t, geode::index_t >,
             absl::InlinedVector< Cell, 2 > >;
 
-    geode::index_t GLOBAL{ 0 };
-
     class PaintTriangle
     {
     public:
@@ -663,19 +660,6 @@ namespace
               painted_vertices_( painted_vertices ),
               painted_edges_( painted_edges )
         {
-            save_triangle();
-        }
-
-        void save_triangle() const
-        {
-            auto tri = geode::TriangulatedSurface3D::create();
-            auto bui = geode::TriangulatedSurfaceBuilder3D::create( *tri );
-            bui->create_point( points_[vertices_order_[0]] );
-            bui->create_point( points_[vertices_order_[1]] );
-            bui->create_point( points_[vertices_order_[2]] );
-            bui->create_triangle( { 0, 1, 2 } );
-            geode::save_triangulated_surface(
-                *tri, absl::StrCat( "tri3d_", GLOBAL++, ".og_tsf3d" ) );
         }
 
         void paint()

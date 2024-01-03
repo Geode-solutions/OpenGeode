@@ -300,22 +300,9 @@ namespace geode
         return GEO::PCK::aligned_3d( point0, point1, point2 );
     }
 
-    template Position opengeode_geometry_api point_triangle_position(
-        const Point2D&, const Triangle2D& );
-
     template Position opengeode_geometry_api point_segment_position(
         const Point2D&, const Segment2D& );
 
-    template bool opengeode_geometry_api are_points_aligned(
-        const Point2D&, const Point2D&, const Point2D& );
-
-    template Position opengeode_geometry_api point_triangle_position(
-        const Point3D&, const Triangle3D& );
-
     template Position opengeode_geometry_api point_segment_position(
         const Point3D&, const Segment3D& );
-
-    template bool opengeode_geometry_api are_points_aligned(
-        const Point3D&, const Point3D&, const Point3D& );
-
 } // namespace geode
