@@ -121,9 +121,7 @@ namespace geode
     };
 
     template < index_t dimension >
-    CellArray< dimension >::CellArray() // NOLINT
-    {
-    }
+    CellArray< dimension >::CellArray() = default;
 
     template < index_t dimension >
     CellArray< dimension >::CellArray(
@@ -140,9 +138,7 @@ namespace geode
         -> CellArray& = default;
 
     template < index_t dimension >
-    CellArray< dimension >::~CellArray() // NOLINT
-    {
-    }
+    CellArray< dimension >::~CellArray() = default;
 
     template < index_t dimension >
     index_t CellArray< dimension >::nb_cells() const

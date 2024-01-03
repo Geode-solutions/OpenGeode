@@ -101,7 +101,7 @@ namespace
 namespace geode
 {
     template < index_t dimension >
-    BoundingBox< dimension >::BoundingBox() // NOLINT
+    BoundingBox< dimension >::BoundingBox()
     {
         for( const auto i : LRange{ dimension } )
         {

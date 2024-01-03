@@ -101,9 +101,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    SurfaceEdges< dimension >::~SurfaceEdges() // NOLINT
-    {
-    }
+    SurfaceEdges< dimension >::~SurfaceEdges() = default;
 
     template < index_t dimension >
     index_t SurfaceEdges< dimension >::find_or_create_edge(
