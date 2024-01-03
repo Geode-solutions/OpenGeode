@@ -577,16 +577,10 @@ namespace
             : ids( std::move( ids_in ) ),
               counter_clockwise( counter_clockwise_in )
         {
-        }
-
-        geode::index_t min() const
-        {
-            return std::min( ids[0], ids[1] );
-        }
-
-        geode::index_t max() const
-        {
-            return std::max( ids[0], ids[1] );
+            if( ids[0] > ids[1] )
+            {
+                std::swap( ids[0], ids[1] );
+            }
         }
 
         bool operator==( const Cell& other ) const
@@ -597,17 +591,13 @@ namespace
 
         bool operator<( const Cell& other ) const
         {
-            const auto this_min = min();
-            const auto this_max = max();
-            const auto other_min = other.min();
-            const auto other_max = other.max();
-            if( this_min != other_min )
+            if( ids[0] != other.ids[0] )
             {
-                return this_min < other_min;
+                return ids[0] < other.ids[0];
             }
-            if( this_max != other_max )
+            if( ids[1] != ids[1] )
             {
-                return this_max > other_max;
+                return ids[1] > other.ids[1];
             }
             return counter_clockwise < other.counter_clockwise;
         }
@@ -1054,7 +1044,7 @@ namespace
                     continue;
                 }
                 for( const auto i : geode::Range{
-                         i_values[it].min(), i_values[it + 1].max() + 1 } )
+                         i_values[it].ids[0], i_values[it + 1].ids[1] + 1 } )
                 {
                     cells.emplace_back( geode::Grid3D::CellIndices{ i, j, k } );
                 }
