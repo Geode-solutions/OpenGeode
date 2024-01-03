@@ -775,22 +775,22 @@ namespace
             if( position == geode::Position::vertex0 )
             {
                 const auto point_3d = points_.at( vertices_order_[order[0]] );
-                const auto i_value =
-                    std::floor( decimal_fabs( point_3d.value( 0 ) ) );
+                const auto i_value = static_cast< geode::index_t >(
+                    std::floor( decimal_fabs( point_3d.value( 0 ) ) ) );
                 return { i_value, i_value };
             }
             if( position == geode::Position::vertex1 )
             {
                 const auto point_3d = points_.at( vertices_order_[order[1]] );
-                const auto i_value =
-                    std::floor( decimal_fabs( point_3d.value( 0 ) ) );
+                const auto i_value = static_cast< geode::index_t >(
+                    std::floor( decimal_fabs( point_3d.value( 0 ) ) ) );
                 return { i_value, i_value };
             }
             if( position == geode::Position::vertex2 )
             {
                 const auto point_3d = points_.at( vertices_order_[order[2]] );
-                const auto i_value =
-                    std::floor( decimal_fabs( point_3d.value( 0 ) ) );
+                const auto i_value = static_cast< geode::index_t >(
+                    std::floor( decimal_fabs( point_3d.value( 0 ) ) ) );
                 return { i_value, i_value };
             }
             std::array< double, 3 > i_values_triangle_vertices{
@@ -807,9 +807,9 @@ namespace
                     geode::safe_segment_barycentric_coordinates(
                         point, geode::Segment2D{ triangle.vertices()[0],
                                    triangle.vertices()[1] } );
-                const auto i_value =
-                    std::floor( i_values_triangle_vertices[0] * lambdas[0]
-                                + i_values_triangle_vertices[1] * lambdas[1] );
+                const auto i_value = static_cast< geode::index_t >( std::floor(
+                    i_values_triangle_vertices[0] * lambdas[0]
+                    + i_values_triangle_vertices[1] * lambdas[1] ) );
                 return { i_value, i_value };
             }
             if( position == geode::Position::edge1 )
@@ -818,9 +818,9 @@ namespace
                     geode::safe_segment_barycentric_coordinates(
                         point, geode::Segment2D{ triangle.vertices()[1],
                                    triangle.vertices()[2] } );
-                const auto i_value =
-                    std::floor( i_values_triangle_vertices[1] * lambdas[0]
-                                + i_values_triangle_vertices[2] * lambdas[1] );
+                const auto i_value = static_cast< geode::index_t >( std::floor(
+                    i_values_triangle_vertices[1] * lambdas[0]
+                    + i_values_triangle_vertices[2] * lambdas[1] ) );
                 return { i_value, i_value };
             }
             if( position == geode::Position::edge2 )
@@ -829,19 +829,19 @@ namespace
                     geode::safe_segment_barycentric_coordinates(
                         point, geode::Segment2D{ triangle.vertices()[2],
                                    triangle.vertices()[0] } );
-                const auto i_value =
-                    std::floor( i_values_triangle_vertices[2] * lambdas[0]
-                                + i_values_triangle_vertices[0] * lambdas[1] );
+                const auto i_value = static_cast< geode::index_t >( std::floor(
+                    i_values_triangle_vertices[2] * lambdas[0]
+                    + i_values_triangle_vertices[0] * lambdas[1] ) );
                 return { i_value, i_value };
             }
             try
             {
                 const auto lambdas =
                     geode::triangle_barycentric_coordinates( point, triangle );
-                const auto i_value =
-                    std::floor( i_values_triangle_vertices[0] * lambdas[0]
-                                + i_values_triangle_vertices[1] * lambdas[1]
-                                + i_values_triangle_vertices[2] * lambdas[2] );
+                const auto i_value = static_cast< geode::index_t >( std::floor(
+                    i_values_triangle_vertices[0] * lambdas[0]
+                    + i_values_triangle_vertices[1] * lambdas[1]
+                    + i_values_triangle_vertices[2] * lambdas[2] ) );
                 return { i_value, i_value };
             }
             catch( geode::OpenGeodeException& )
