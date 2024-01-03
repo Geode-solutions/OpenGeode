@@ -168,9 +168,7 @@ namespace geode
         {
         }
 
-        GraphIdentifier::~GraphIdentifier() // NOLINT
-        {
-        }
+        GraphIdentifier::~GraphIdentifier() = default;
 
         index_t GraphIdentifier::identify_vertices()
         {
@@ -227,9 +225,7 @@ namespace geode
         }
 
         template < index_t dimension >
-        EdgedCurveIdentifier< dimension >::~EdgedCurveIdentifier() // NOLINT
-        {
-        }
+        EdgedCurveIdentifier< dimension >::~EdgedCurveIdentifier() = default;
 
         template < index_t dimension >
         index_t EdgedCurveIdentifier< dimension >::identify_edges()
@@ -282,9 +278,7 @@ namespace geode
         }
 
         template < index_t dimension >
-        SurfaceIdentifier< dimension >::~SurfaceIdentifier() // NOLINT
-        {
-        }
+        SurfaceIdentifier< dimension >::~SurfaceIdentifier() = default;
 
         template < index_t dimension >
         index_t SurfaceIdentifier< dimension >::identify_polygons()
@@ -330,9 +324,7 @@ namespace geode
         {
         }
 
-        SolidIdentifier::~SolidIdentifier() // NOLINT
-        {
-        }
+        SolidIdentifier::~SolidIdentifier() = default;
 
         index_t SolidIdentifier::identify_polyhedra()
         {
