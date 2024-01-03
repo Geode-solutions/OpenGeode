@@ -89,4 +89,13 @@ namespace geode
      */
     Position opengeode_geometry_api point_tetrahedron_position(
         const Point3D& point, const Tetrahedron& tetra );
+
+    /*!
+     * Return true if the three points are exactly aligned.
+     */
+    template < index_t dimension >
+    bool opengeode_geometry_api are_points_aligned(
+        const Point< dimension >& point0,
+        const Point< dimension >& point1,
+        const Point< dimension >& point2 );
 } // namespace geode
