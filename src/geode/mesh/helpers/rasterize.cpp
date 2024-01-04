@@ -605,23 +605,12 @@ namespace
         bool counter_clockwise;
     };
 
-    double projected_i_coordinate( const geode::Vector3D& normal,
-        const geode::Point3D& v0,
-        const geode::Point2D& point )
-    {
-        return v0.value( 0 )
-               - ( normal.value( 1 ) * ( point.value( 0 ) - v0.value( 1 ) )
-                     + normal.value( 2 )
-                           * ( point.value( 1 ) - v0.value( 2 ) ) )
-                     / normal.value( 0 );
-    }
-
     bool is_triangle_counterclockwise(
         const std::array< geode::Point2D, 3 >& vertices )
     {
-        const geode::Vector2D e0{ vertices[0], vertices[1] };
-        const geode::Vector2D e1{ vertices[0], vertices[2] };
-        return geode::dot_perpendicular( e0, e1 ) > 0;
+        const geode::Vector2D edge0{ vertices[0], vertices[1] };
+        const geode::Vector2D edge1{ vertices[0], vertices[2] };
+        return geode::dot_perpendicular( edge0, edge1 ) > 0;
     }
 
     using OrientedJK = std::tuple< geode::index_t, geode::index_t, bool >;
@@ -655,18 +644,16 @@ namespace
         void paint()
         {
             const auto triangle = project_on_jk();
-            if( geode::are_points_aligned( triangle.vertices()[0].get(),
-                    triangle.vertices()[1].get(),
-                    triangle.vertices()[2].get() ) )
+            if( geode::are_points_aligned( triangle.vertices()[0],
+                    triangle.vertices()[1], triangle.vertices()[2] ) )
             {
                 return;
             }
-
             fill_values( triangle );
         }
 
     private:
-        geode::Triangle2D project_on_jk()
+        geode::OwnerTriangle2D project_on_jk()
         {
             std::array< geode::Point2D, 3 > triangle_vertices;
             for( const auto v : geode::LRange{ 3 } )
@@ -680,8 +667,8 @@ namespace
                 counter_clockwise_ = false;
                 std::swap( triangle_vertices[1], triangle_vertices[2] );
             }
-            return { triangle_vertices[0], triangle_vertices[1],
-                triangle_vertices[2] };
+            return geode::OwnerTriangle2D{ triangle_vertices[0],
+                triangle_vertices[1], triangle_vertices[2] };
         }
 
         struct JKPointTrianglePosition
