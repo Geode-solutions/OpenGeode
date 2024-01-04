@@ -30,6 +30,7 @@
 
 #include <geode/basic/algorithm.h>
 #include <geode/basic/attribute_manager.h>
+#include <geode/basic/logger.h>
 
 #include <geode/geometry/barycentric_coordinates.h>
 #include <geode/geometry/basic_objects/infinite_line.h>
@@ -726,11 +727,7 @@ namespace
             }
 
             const auto decimal_fabs = [this]( double value ) {
-                return std::fabs(
-                           value
-                           - grid_.grid_coordinate_system().origin().value(
-                               0 ) )
-                       / grid_.cell_length_in_direction( 0 );
+                return value / grid_.cell_length_in_direction( 0 );
             };
 
             if( position == geode::Position::vertex0 )
