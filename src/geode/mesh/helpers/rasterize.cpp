@@ -30,8 +30,6 @@
 
 #include <geode/basic/algorithm.h>
 #include <geode/basic/attribute_manager.h>
-#include <geode/basic/logger.h>
-
 #include <geode/geometry/barycentric_coordinates.h>
 #include <geode/geometry/basic_objects/infinite_line.h>
 #include <geode/geometry/basic_objects/plane.h>
