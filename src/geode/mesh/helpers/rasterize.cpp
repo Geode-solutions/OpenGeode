@@ -693,6 +693,7 @@ namespace
             const auto min_k = std::ceil(
                 bbox.min().value( 1 ) / grid_.cell_length_in_direction( 2 )
                 - 0.5 );
+            const auto max_i_grid = grid_.nb_cells_in_direction( 0 ) - 1;
             for( const auto j : geode::Range{ min_j, max_j + 1 } )
             {
                 for( const auto k : geode::Range{ min_k, max_k + 1 } )
@@ -709,6 +710,8 @@ namespace
                     }
                     auto i_coord = compute_i_coordinates(
                         point, triangle, jk_process.position );
+                    i_coord[0] = std::min( i_coord[0], max_i_grid );
+                    i_coord[1] = std::min( i_coord[1], max_i_grid );
                     values_[{ j, k }].emplace_back(
                         i_coord, counter_clockwise_ );
                 }
@@ -813,7 +816,7 @@ namespace
                         triangle.vertices()[next] };
                     distances_to_edges[e] =
                         geode::point_segment_distance( point, edge );
-                    const auto lambdas =
+                    edge_lambdas[e] =
                         geode::safe_segment_barycentric_coordinates(
                             point, edge );
                 }
