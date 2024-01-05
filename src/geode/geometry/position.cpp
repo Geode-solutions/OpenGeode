@@ -191,7 +191,7 @@ namespace geode
     }
 
     template <>
-    Position point_triangle_position(
+    Position opengeode_geometry_api point_triangle_position(
         const Point2D& point, const Triangle2D& triangle )
     {
         const auto& vertices = triangle.vertices();
@@ -224,7 +224,7 @@ namespace geode
     }
 
     template <>
-    Position point_triangle_position(
+    Position opengeode_geometry_api point_triangle_position(
         const Point3D& point, const Triangle3D& triangle )
     {
         double distance;
@@ -286,16 +286,23 @@ namespace geode
             vertices[0], vertices[1], vertices[2], point ) );
     }
 
-    template Position opengeode_geometry_api point_triangle_position(
-        const Point2D&, const Triangle2D& );
+    template <>
+    bool opengeode_geometry_api are_points_aligned(
+        const Point2D& point0, const Point2D& point1, const Point2D& point2 )
+    {
+        return GEO::PCK::orient_2d( point0, point1, point2 ) == GEO::Sign::ZERO;
+    }
+
+    template <>
+    bool opengeode_geometry_api are_points_aligned(
+        const Point3D& point0, const Point3D& point1, const Point3D& point2 )
+    {
+        return GEO::PCK::aligned_3d( point0, point1, point2 );
+    }
 
     template Position opengeode_geometry_api point_segment_position(
         const Point2D&, const Segment2D& );
 
-    template Position opengeode_geometry_api point_triangle_position(
-        const Point3D&, const Triangle3D& );
-
     template Position opengeode_geometry_api point_segment_position(
         const Point3D&, const Segment3D& );
-
 } // namespace geode
