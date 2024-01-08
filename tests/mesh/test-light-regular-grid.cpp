@@ -30,6 +30,8 @@
 #include <geode/geometry/point.h>
 
 #include <geode/mesh/core/light_regular_grid.h>
+#include <geode/mesh/io/light_regular_grid_input.h>
+#include <geode/mesh/io/light_regular_grid_output.h>
 
 #include <geode/tests/common.h>
 
@@ -312,6 +314,20 @@ void test_attribute( const geode::LightRegularGrid3D& grid )
         "[Test] Wrong attribute value" );
 }
 
+void test_io(
+    const geode::LightRegularGrid3D& grid, const std::string& filename )
+{
+    geode::save_light_regular_grid( grid, filename );
+    const auto new_grid = geode::load_light_regular_grid< 3 >( filename );
+
+    OPENGEODE_EXCEPTION( new_grid.nb_grid_vertices() == 1056,
+        "[Test] Reloaded LightRegularGrid should have 1056 vertices" );
+    test_cell_number( new_grid );
+    test_vertex_number( new_grid );
+    test_cell_geometry( new_grid );
+    test_boundary_box( new_grid );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
@@ -328,6 +344,7 @@ void test()
     test_boundary_box( grid );
     test_closest_vertex( grid );
     test_attribute( grid );
+    test_io( grid, absl::StrCat( "test.", grid.native_extension() ) );
 }
 
 OPENGEODE_TEST( "light-regular-grid" )

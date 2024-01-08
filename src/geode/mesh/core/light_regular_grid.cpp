@@ -64,8 +64,8 @@ namespace geode
         {
             archive.ext( *this,
                 Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.object( impl.cell_attribute_manager );
-                    a.object( impl.vertex_attribute_manager );
+                    a.object( impl.cell_attribute_manager_ );
+                    a.object( impl.vertex_attribute_manager_ );
                 } } } );
         }
 
@@ -140,15 +140,19 @@ namespace geode
     template < typename Archive >
     void LightRegularGrid< dimension >::serialize( Archive& archive )
     {
-        archive.ext(
-            *this, Growable< Archive, LightRegularGrid >{
-                       { []( Archive& a, LightRegularGrid& grid ) {
-                           a.ext( grid,
-                               bitsery::ext::BaseClass< Grid< dimension > >{} );
-                           a.object( grid.impl_ );
-                       } } } );
+        archive.ext( *this,
+            Growable< Archive, LightRegularGrid >{
+                { []( Archive& a, LightRegularGrid& grid ) {
+                    a.ext(
+                        grid, bitsery::ext::BaseClass< Grid< dimension > >{} );
+                    a.ext( grid, bitsery::ext::BaseClass< Identifier >{} );
+                    a.object( grid.impl_ );
+                } } } );
     }
 
     template class opengeode_mesh_api LightRegularGrid< 2 >;
     template class opengeode_mesh_api LightRegularGrid< 3 >;
+
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, LightRegularGrid< 2 > );
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, LightRegularGrid< 3 > );
 } // namespace geode

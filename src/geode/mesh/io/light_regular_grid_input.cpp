@@ -1,0 +1,92 @@
+/*
+ * Copyright (c) 2019 - 2024 Geode-solutions
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ */
+
+#include <geode/mesh/io/light_regular_grid_input.h>
+
+#include <absl/strings/str_cat.h>
+#include <absl/strings/string_view.h>
+
+#include <geode/basic/detail/geode_input_impl.h>
+#include <geode/basic/factory.h>
+#include <geode/basic/io.h>
+#include <geode/basic/logger.h>
+
+#include <geode/mesh/core/light_regular_grid.h>
+
+namespace geode
+{
+    template < index_t dimension >
+    LightRegularGrid< dimension > load_light_regular_grid(
+        absl::string_view filename )
+    {
+        const auto type = absl::StrCat( "LightRegularGrid", dimension, "D" );
+        try
+        {
+            auto grid = detail::geode_object_input_impl<
+                LightRegularGridInputFactory< dimension > >( type, filename );
+            Logger::info( type, " has: ", grid.nb_cells(), " cells" );
+            return grid;
+        }
+        catch( const OpenGeodeException& e )
+        {
+            Logger::error( e.what() );
+            print_available_extensions<
+                LightRegularGridInputFactory< dimension > >( type );
+            throw OpenGeodeException{
+                "Cannot load LightRegularGrid from file: ", filename
+            };
+        }
+    }
+
+    template < index_t dimension >
+    typename LightRegularGridInput< dimension >::MissingFiles
+        check_light_regular_grid_missing_files( absl::string_view filename )
+    {
+        const auto input = detail::geode_object_input_reader<
+            LightRegularGridInputFactory< dimension > >( filename );
+        return input->check_missing_files();
+    }
+
+    template < index_t dimension >
+    bool is_light_regular_grid_loadable( absl::string_view filename )
+    {
+        const auto input = detail::geode_object_input_reader<
+            LightRegularGridInputFactory< dimension > >( filename );
+        return input->is_loadable();
+    }
+
+    template LightRegularGrid< 2 > opengeode_mesh_api load_light_regular_grid(
+        absl::string_view );
+    template LightRegularGrid< 3 > opengeode_mesh_api load_light_regular_grid(
+        absl::string_view );
+
+    template LightRegularGridInput< 2 >::MissingFiles opengeode_mesh_api
+        check_light_regular_grid_missing_files< 2 >( absl::string_view );
+    template LightRegularGridInput< 3 >::MissingFiles opengeode_mesh_api
+        check_light_regular_grid_missing_files< 3 >( absl::string_view );
+
+    template bool opengeode_mesh_api is_light_regular_grid_loadable< 2 >(
+        absl::string_view );
+    template bool opengeode_mesh_api is_light_regular_grid_loadable< 3 >(
+        absl::string_view );
+} // namespace geode
