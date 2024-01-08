@@ -32,13 +32,14 @@
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Point );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Vector );
     class AttributeManager;
 } // namespace geode
 
 namespace geode
 {
     template < index_t dimension >
-    class LightRegularGrid : public Grid< dimension >, Identifier
+    class LightRegularGrid : public Grid< dimension >, public Identifier
     {
     public:
         static constexpr auto dim = dimension;
@@ -48,8 +49,23 @@ namespace geode
         LightRegularGrid( Point< dimension > origin,
             std::array< index_t, dimension > cells_number,
             std::array< double, dimension > cells_length );
+        LightRegularGrid( Point< dimension > origin,
+            std::array< index_t, dimension > cells_number,
+            std::array< Vector< dimension >, dimension > directions );
         LightRegularGrid( LightRegularGrid&& other ) noexcept;
         ~LightRegularGrid();
+
+        static absl::string_view native_extension_static()
+        {
+            static const auto extension =
+                absl::StrCat( "og_lrgd", dimension, "d" );
+            return extension;
+        }
+
+        absl::string_view native_extension() const
+        {
+            return native_extension_static();
+        }
 
         index_t vertex_index( const VertexIndices& index ) const override;
 
@@ -64,6 +80,7 @@ namespace geode
         AttributeManager& grid_vertex_attribute_manager() const override;
 
     private:
+        friend class bitsery::Access;
         template < typename Archive >
         void serialize( Archive& archive );
 

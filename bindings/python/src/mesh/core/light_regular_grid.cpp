@@ -26,6 +26,7 @@
 #include <geode/basic/attribute_manager.h>
 
 #include <geode/geometry/point.h>
+#include <geode/geometry/vector.h>
 
 #include <geode/mesh/core/light_regular_grid.h>
 
@@ -36,7 +37,10 @@
         module, name##dimension.c_str() )                                      \
         .def( pybind11::init< Point< dimension >,                              \
             std::array< index_t, dimension >,                                  \
-            std::array< double, dimension > >() )
+            std::array< double, dimension > >() )                              \
+        .def( pybind11::init< Point< dimension >,                              \
+            std::array< index_t, dimension >,                                  \
+            std::array< Vector< dimension >, dimension > >() )
 
 namespace geode
 {

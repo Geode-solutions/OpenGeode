@@ -27,6 +27,7 @@
 #include <geode/basic/pimpl_impl.h>
 
 #include <geode/geometry/point.h>
+#include <geode/geometry/vector.h>
 
 #include <geode/mesh/builder/grid_builder.h>
 #include <geode/mesh/core/private/grid_impl.h>
@@ -64,8 +65,8 @@ namespace geode
         {
             archive.ext( *this,
                 Growable< Archive, Impl >{ { []( Archive& a, Impl& impl ) {
-                    a.object( impl.cell_attribute_manager );
-                    a.object( impl.vertex_attribute_manager );
+                    a.object( impl.cell_attribute_manager_ );
+                    a.object( impl.vertex_attribute_manager_ );
                 } } } );
         }
 
@@ -83,6 +84,25 @@ namespace geode
         builder.set_grid_origin( std::move( origin ) );
         builder.set_grid_dimensions(
             std::move( cells_number ), std::move( cells_length ) );
+        impl_->initialize_attribute_managers(
+            this->nb_cells(), this->nb_grid_vertices() );
+    }
+
+    template < index_t dimension >
+    LightRegularGrid< dimension >::LightRegularGrid( Point< dimension > origin,
+        std::array< index_t, dimension > cells_number,
+        std::array< Vector< dimension >, dimension > directions )
+    {
+        auto builder = GridBuilder< dimension >{ *this };
+        builder.set_grid_origin( std::move( origin ) );
+        std::array< double, dimension > cells_length;
+        for( const auto d : LRange{ dimension } )
+        {
+            cells_length[d] = directions[d].length();
+        }
+        builder.set_grid_dimensions(
+            std::move( cells_number ), std::move( cells_length ) );
+        builder.set_grid_directions( std::move( directions ) );
         impl_->initialize_attribute_managers(
             this->nb_cells(), this->nb_grid_vertices() );
     }
@@ -140,15 +160,19 @@ namespace geode
     template < typename Archive >
     void LightRegularGrid< dimension >::serialize( Archive& archive )
     {
-        archive.ext(
-            *this, Growable< Archive, LightRegularGrid >{
-                       { []( Archive& a, LightRegularGrid& grid ) {
-                           a.ext( grid,
-                               bitsery::ext::BaseClass< Grid< dimension > >{} );
-                           a.object( grid.impl_ );
-                       } } } );
+        archive.ext( *this,
+            Growable< Archive, LightRegularGrid >{
+                { []( Archive& a, LightRegularGrid& grid ) {
+                    a.ext(
+                        grid, bitsery::ext::BaseClass< Grid< dimension > >{} );
+                    a.ext( grid, bitsery::ext::BaseClass< Identifier >{} );
+                    a.object( grid.impl_ );
+                } } } );
     }
 
     template class opengeode_mesh_api LightRegularGrid< 2 >;
     template class opengeode_mesh_api LightRegularGrid< 3 >;
+
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, LightRegularGrid< 2 > );
+    SERIALIZE_BITSERY_ARCHIVE( opengeode_mesh_api, LightRegularGrid< 3 > );
 } // namespace geode
