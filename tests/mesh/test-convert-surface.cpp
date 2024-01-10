@@ -27,6 +27,7 @@
 #include <geode/basic/logger.h>
 
 #include <geode/geometry/point.h>
+#include <geode/geometry/vector.h>
 
 #include <geode/mesh/core/light_regular_grid.h>
 #include <geode/mesh/core/triangulated_surface.h>
