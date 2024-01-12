@@ -83,6 +83,7 @@ namespace geode
     void define_vertex_set_io( pybind11::module& );
     void define_graph_io( pybind11::module& );
     void define_edged_curve_io( pybind11::module& );
+    void define_light_regular_grid_io( pybind11::module& );
     void define_point_set_io( pybind11::module& );
     void define_polygonal_surface_io( pybind11::module& );
     void define_triangulated_surface_io( pybind11::module& );
@@ -163,6 +164,7 @@ PYBIND11_MODULE( opengeode_py_mesh, module )
     geode::define_vertex_set_io( module );
     geode::define_graph_io( module );
     geode::define_edged_curve_io( module );
+    geode::define_light_regular_grid_io( module );
     geode::define_point_set_io( module );
     geode::define_polygonal_surface_io( module );
     geode::define_triangulated_surface_io( module );

@@ -249,6 +249,10 @@ def test_attribute( grid ):
         raise ValueError( "[Test] Wrong attribute value" )
     if attribute.value( grid.nb_cells() - 1 ) != -1:
         raise ValueError( "[Test] Wrong attribute value" )
+    
+def test_io(grid, filename):
+    mesh.save_light_regular_grid3D(grid, filename)
+    mesh.load_light_regular_grid3D(filename)
 
 if __name__ == '__main__':
     mesh.OpenGeodeMeshLibrary.initialize()
@@ -263,3 +267,4 @@ if __name__ == '__main__':
     test_boundary_box( grid )
     test_closest_vertex( grid )
     test_attribute( grid )
+    test_io(grid, "test." + grid.native_extension())

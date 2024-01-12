@@ -72,6 +72,7 @@ add_geode_python_binding(
         "io/edged_curve.cpp"
         "io/graph.cpp"
         "io/hybrid_solid.cpp"
+        "io/light_regular_grid.cpp"
         "io/point_set.cpp"
         "io/polygonal_surface.cpp"
         "io/polyhedral_solid.cpp"

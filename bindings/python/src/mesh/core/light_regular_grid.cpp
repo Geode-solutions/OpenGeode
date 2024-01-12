@@ -40,7 +40,9 @@
             std::array< double, dimension > >() )                              \
         .def( pybind11::init< Point< dimension >,                              \
             std::array< index_t, dimension >,                                  \
-            std::array< Vector< dimension >, dimension > >() )
+            std::array< Vector< dimension >, dimension > >() )                 \
+        .def( "native_extension",                                              \
+            &LightRegularGrid##dimension##D::native_extension )
 
 namespace geode
 {
