@@ -52,6 +52,11 @@ namespace geode
                 {
                 }
 
+                bool operator==( const PolygonOrigin& other ) const
+                {
+                    return surface == other.surface && polygon == other.polygon;
+                }
+
                 index_t surface;
                 index_t polygon;
             };
