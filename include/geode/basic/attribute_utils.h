@@ -25,6 +25,7 @@
 
 #include <geode/basic/bitsery_archive.h>
 #include <geode/basic/common.h>
+#include <geode/basic/types.h>
 
 namespace geode
 {
@@ -202,6 +203,7 @@ namespace geode
     IMPLICIT_GENERIC_ATTRIBUTE_CONVERSION( unsigned int );
     IMPLICIT_GENERIC_ATTRIBUTE_CONVERSION( float );
     IMPLICIT_GENERIC_ATTRIBUTE_CONVERSION( double );
+    IMPLICIT_GENERIC_ATTRIBUTE_CONVERSION( local_index_t );
 
 #define IMPLICIT_ARRAY_GENERIC_ATTRIBUTE_CONVERSION( Type )                    \
     template < size_t size >                                                   \
