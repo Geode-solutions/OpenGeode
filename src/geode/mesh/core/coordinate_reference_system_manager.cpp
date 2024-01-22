@@ -58,7 +58,7 @@ namespace geode
         const CoordinateReferenceSystem< dimension >&
             active_coordinate_reference_system() const
         {
-            OPENGEODE_EXCEPTION( active_crs_.use_count() > 1,
+            OPENGEODE_ASSERT( active_crs_.use_count() > 1,
                 "[CoordinateReferenceSystemManager::active_coordinate_"
                 "reference_system] Active CRS not defined" );
             return *active_crs_;
